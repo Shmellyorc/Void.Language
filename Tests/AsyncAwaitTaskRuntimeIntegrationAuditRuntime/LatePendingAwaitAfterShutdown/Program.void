@@ -1,0 +1,19 @@
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    private static async Task WaitLater(Task gate)
+    {
+        await gate;
+    }
+
+    public static void Main()
+    {
+        ThreadPool.Shutdown();
+        TaskCompletionSource source = new TaskCompletionSource();
+        Task pending = WaitLater(source.Task);
+        source.SetResult();
+        pending.Wait();
+    }
+}

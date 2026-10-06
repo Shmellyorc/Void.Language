@@ -1,0 +1,262 @@
+using Void;
+using Void.Threading;
+
+public interface IAuditScore
+{
+    int Score();
+}
+
+public sealed class AuditNode : IAuditScore
+{
+    public int Value;
+
+    public AuditNode(int value)
+    {
+        Value = value;
+    }
+
+    public int Score()
+    {
+        return Value;
+    }
+}
+
+public sealed class AlternateAuditNode : IAuditScore
+{
+    public int Value;
+
+    public AlternateAuditNode(int value)
+    {
+        Value = value;
+    }
+
+    public int Score()
+    {
+        return Value;
+    }
+}
+
+public sealed class AuditException : Exception
+{
+    public int Code;
+    public AuditNode Payload;
+
+    public AuditException(string message, int code, AuditNode payload) : base(message)
+    {
+        Code = code;
+        Payload = payload;
+    }
+}
+
+public sealed class AuditState
+{
+    public int Ready;
+    public int Sum;
+    public int DelegateCalls;
+    public int DisposeCount;
+    public int ExceptionCount;
+    public int NestedCount;
+    public int StaticReads;
+}
+
+public sealed class AuditResource : IDisposable
+{
+    private AuditState _state;
+
+    public AuditResource(AuditState state)
+    {
+        _state = state;
+    }
+
+    public void Dispose()
+    {
+        lock (_state)
+        {
+            _state.DisposeCount++;
+        }
+    }
+}
+
+public static class ContendedStaticAudit
+{
+    public static int InitCount;
+    public static AuditNode Node = Create();
+
+    private static AuditNode Create()
+    {
+        InitCount++;
+        GC.Collect();
+        return new AuditNode(97);
+    }
+
+    public static int Read()
+    {
+        return Node.Value;
+    }
+}
+
+public static class Program
+{
+    public static int ReadScore<T>(T value) where T : IAuditScore
+    {
+        return value.Score();
+    }
+
+    public static Action MakeWorker<T>(AuditState state, T value, int bias, bool shouldThrow) where T : IAuditScore
+    {
+        return () =>
+        {
+            using (AuditResource resource = new AuditResource(state))
+            {
+                Action combined = () =>
+                {
+                    AuditNode temporary = new AuditNode(ReadScore<T>(value) + bias);
+                    GC.Collect();
+                    lock (state)
+                    {
+                        state.Sum += temporary.Value;
+                        state.DelegateCalls++;
+                    }
+                };
+                combined += () =>
+                {
+                    lock (state)
+                    {
+                        lock (state)
+                        {
+                            state.Sum += 1;
+                            state.DelegateCalls++;
+                        }
+                    }
+                };
+                combined();
+
+                int staticValue = ContendedStaticAudit.Read();
+                lock (state)
+                {
+                    if (staticValue == 97)
+                        state.StaticReads++;
+                    state.Ready++;
+                }
+
+                if (shouldThrow)
+                    throw new AuditException("audit worker", 700 + bias, new AuditNode(staticValue + bias));
+            }
+        };
+    }
+
+    public static void WaitFor(AuditState state, int count)
+    {
+        while (true)
+        {
+            bool ready = false;
+            lock (state)
+            {
+                ready = state.Ready >= count;
+            }
+            if (ready)
+                return;
+            GC.Collect();
+        }
+    }
+
+    public static void Main()
+    {
+        AuditState state = new AuditState();
+
+        AuditNode firstValue = new AuditNode(10);
+        Action firstAction = MakeWorker<AuditNode>(state, firstValue, 1, false);
+        Thread first = new Thread(firstAction);
+        firstValue = null;
+        firstAction = null;
+
+        AlternateAuditNode secondValue = new AlternateAuditNode(20);
+        Action secondAction = MakeWorker<AlternateAuditNode>(state, secondValue, 2, true);
+        Thread second = new Thread(secondAction);
+        secondValue = null;
+        secondAction = null;
+
+        AuditNode thirdValue = new AuditNode(30);
+        Action thirdAction = MakeWorker<AuditNode>(state, thirdValue, 3, false);
+        Thread third = new Thread(thirdAction);
+        thirdValue = null;
+        thirdAction = null;
+
+        Thread nested = new Thread(() =>
+        {
+            Thread inner = new Thread(() =>
+            {
+                int staticValue = ContendedStaticAudit.Read();
+                GC.Collect();
+                lock (state)
+                {
+                    if (staticValue == 97)
+                        state.StaticReads++;
+                    state.NestedCount++;
+                    state.Ready++;
+                }
+            });
+            inner.Start();
+            inner.Join();
+        });
+
+        first.Start();
+        second.Start();
+        third.Start();
+        nested.Start();
+
+        for (int i = 0; i < 16; i++)
+            GC.Collect();
+
+        WaitFor(state, 4);
+
+        first.Join();
+
+        bool caught = false;
+        try
+        {
+            second.Join();
+        }
+        catch (AuditException error)
+        {
+            caught = error.Message == "audit worker" &&
+                error.Code == 702 &&
+                error.Payload != null &&
+                error.Payload.Value == 99;
+            if (caught)
+            {
+                lock (state)
+                {
+                    state.ExceptionCount++;
+                }
+            }
+        }
+
+        third.Join();
+        nested.Join();
+
+        GC.Collect();
+        GC.Collect();
+
+        Console.WriteLine(caught);
+        Console.WriteLine(state.Ready == 4);
+        Console.WriteLine(state.Sum == 69);
+        Console.WriteLine(state.DelegateCalls == 6);
+        Console.WriteLine(state.DisposeCount == 3);
+        Console.WriteLine(state.ExceptionCount == 1);
+        Console.WriteLine(state.NestedCount == 1);
+        Console.WriteLine(state.StaticReads == 4);
+        Console.WriteLine(ContendedStaticAudit.InitCount == 1);
+
+        Thread reuse = new Thread(() =>
+        {
+            lock (state)
+            {
+                state.Sum += 5;
+            }
+        });
+        reuse.Start();
+        reuse.Join();
+        Console.WriteLine(state.Sum == 74);
+    }
+}

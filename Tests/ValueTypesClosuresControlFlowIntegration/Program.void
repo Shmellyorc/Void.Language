@@ -1,0 +1,354 @@
+using Void;
+using Void.Collections;
+
+[Swizzle("IntVector")]
+public struct Int2
+{
+    public int X;
+    public int Y;
+
+    public Int2(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    public static Int2 operator +(Int2 left, Int2 right)
+    {
+        return new Int2(left.X + right.X, left.Y + right.Y);
+    }
+}
+
+[Swizzle("IntVector")]
+public struct Int4
+{
+    public int X;
+    public int Y;
+    public int Z;
+    public int W;
+
+    public Int4(int x, int y, int z, int w)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+        W = w;
+    }
+}
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public readonly struct Coord
+{
+    public readonly int X;
+    public readonly int Y;
+
+    public Coord(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    public int Sum()
+    {
+        return X + Y;
+    }
+}
+
+public struct Payload
+{
+    public Coord Coord;
+    public Node Owner;
+
+    public Payload(Coord coord, Node owner)
+    {
+        Coord = coord;
+        Owner = owner;
+    }
+
+    public int Read()
+    {
+        return Coord.Sum() + Owner.Value;
+    }
+
+    public Func<int> Capture()
+    {
+        return () => this.Coord.Sum() + this.Owner.Value;
+    }
+}
+
+public struct Frame
+{
+    public Payload Payload;
+    public int Weight;
+
+    public Frame(Payload payload, int weight)
+    {
+        Payload = payload;
+        Weight = weight;
+    }
+
+    public int Score()
+    {
+        return Payload.Read() + Weight;
+    }
+}
+
+public sealed class FrameBox
+{
+    public Frame First;
+    public Frame Second;
+    public int Gets;
+    public int Sets;
+
+    public int get_Item(int index)
+    {
+        Gets++;
+        return index == 0 ? First.Weight : Second.Weight;
+    }
+
+    public void set_Item(int index, int value)
+    {
+        Sets++;
+        if (index == 0)
+            First.Weight = value;
+        else
+            Second.Weight = value;
+    }
+}
+
+public sealed class VectorHolder
+{
+    public Int4 Value;
+}
+
+public unsafe struct PointerView
+{
+    private int* _pointer;
+
+    public int* Pointer
+    {
+        get { return _pointer; }
+        set { _pointer = value; }
+    }
+
+    public int Value => *_pointer;
+
+    public PointerView(int* pointer)
+    {
+        _pointer = pointer;
+    }
+}
+
+public static class Program
+{
+    private static FrameBox _box;
+    private static int _receiverCalls;
+    private static int _indexCalls;
+
+    private static Frame MakeFrame(int x, int y, int owner, int weight)
+    {
+        return new Frame(new Payload(new Coord(x, y), new Node(owner)), weight);
+    }
+
+    private static FrameBox GetBox()
+    {
+        _receiverCalls++;
+        return _box;
+    }
+
+    private static int NextIndex()
+    {
+        _indexCalls++;
+        return 1;
+    }
+
+    public static Func<int> CaptureRef(ref int value)
+    {
+        return () => value;
+    }
+
+    public static List<Func<int>> BuildClosures(Frame[][] rows)
+    {
+        List<Func<int>> result = new();
+        foreach (Frame[] row in rows)
+        {
+            foreach (Frame frame in row)
+                result.Add(() => frame.Score());
+        }
+        return result;
+    }
+
+    public static IEnumerator<int> IterateGrid(Frame[,] grid)
+    {
+        for (int row = 0; row < grid.GetLength(0); row++)
+        {
+            for (int column = 0; column < grid.GetLength(1); column++)
+            {
+                Frame frame = grid[row, column];
+                switch (frame.Weight)
+                {
+                    case 1:
+                        GC.Collect();
+                        yield return frame.Payload.Owner.Value;
+                        break;
+                    case 2:
+                        yield return frame.Payload.Coord.Sum();
+                        break;
+                    default:
+                        yield return frame.Score();
+                        break;
+                }
+            }
+        }
+    }
+
+    public static IEnumerator<int> IterateRows(Frame[][] rows)
+    {
+        foreach (Frame[] row in rows)
+        {
+            foreach (Frame frame in row)
+            {
+                if (frame.Weight == 2)
+                    continue;
+
+                yield return frame.Score();
+                if (frame.Weight == 3)
+                    break;
+            }
+        }
+    }
+
+    private static void Check(bool value)
+    {
+        Console.WriteLine(value);
+    }
+
+    private static void CheckSequence(IEnumerator<int> values, int[] expected)
+    {
+        int index = 0;
+        while (values.MoveNext())
+        {
+            Check(index < expected.Length && values.Current == expected[index]);
+            index++;
+        }
+        Check(index == expected.Length);
+    }
+
+    private static unsafe void CheckUnsafe()
+    {
+        int[] values = new int[] { 70, 80, 90 };
+        int* start = &values[0];
+        PointerView view = new PointerView(start);
+        Check(view.Pointer == start);
+        Check(view.Value == 70);
+        view.Pointer = start + 2;
+        Check(view.Value == 90);
+    }
+
+    public static unsafe void Main()
+    {
+        Frame first = MakeFrame(1, 2, 10, 1);
+        Frame second = MakeFrame(3, 4, 20, 2);
+        Frame third = MakeFrame(5, 6, 30, 3);
+
+        Check(first.Payload.Coord.Sum() == 3);
+        Check(first.Payload.Owner.Value == 10);
+        Check(first.Score() == 14);
+
+        Frame copy = first;
+        copy.Weight = 9;
+        Check(first.Weight == 1);
+        Check(copy.Weight == 9);
+
+        Func<int> structThis = first.Payload.Capture();
+        first.Payload.Owner = null;
+        GC.Collect();
+        Check(structThis() == 13);
+
+        Frame[][] rows = new Frame[2][];
+        rows[0] = new Frame[] { MakeFrame(1, 1, 40, 1), MakeFrame(2, 2, 50, 2) };
+        rows[1] = new Frame[] { MakeFrame(3, 3, 60, 3) };
+        Check(rows.Length == 2);
+        Check(rows[0][1].Payload.Owner.Value == 50);
+        Check(rows[1][0].Payload.Coord.Sum() == 6);
+
+        List<Func<int>> closures = BuildClosures(rows);
+        rows = null;
+        GC.Collect();
+        Check(closures.Count == 3);
+        Func<int> closure0 = closures[0];
+        Func<int> closure1 = closures[1];
+        Func<int> closure2 = closures[2];
+        Check(closure0() == 43);
+        Check(closure1() == 56);
+        Check(closure2() == 69);
+
+        Func<int, Func<int>> nestedFactory = offset => () => closure2() + offset;
+        Func<int> nested = nestedFactory(5);
+        GC.Collect();
+        Check(nested() == 74);
+
+        int captured = 100;
+        Func<int> refGetter = CaptureRef(ref captured);
+        Check(refGetter() == 100);
+        captured = 101;
+        Check(refGetter() == 101);
+
+        Frame[,] grid = new Frame[2, 2];
+        grid[0, 0] = MakeFrame(1, 2, 11, 1);
+        grid[0, 1] = MakeFrame(3, 4, 22, 2);
+        grid[1, 0] = MakeFrame(5, 6, 33, 4);
+        grid[1, 1] = MakeFrame(7, 8, 44, 3);
+        Check(grid.Rank == 2);
+        Check(grid.GetLength(0) == 2 && grid.GetLength(1) == 2);
+        Check(grid[1, 0].Payload.Owner.Value == 33);
+
+        IEnumerator<int> gridValues = IterateGrid(grid);
+        grid = null;
+        GC.Collect();
+        CheckSequence(gridValues, new int[] { 11, 7, 48, 62 });
+
+        Frame[][] iteratorRows = new Frame[2][];
+        iteratorRows[0] = new Frame[] { MakeFrame(1, 1, 10, 1), MakeFrame(2, 2, 20, 2), MakeFrame(3, 3, 30, 3) };
+        iteratorRows[1] = new Frame[] { MakeFrame(4, 4, 40, 1) };
+        IEnumerator<int> rowValues = IterateRows(iteratorRows);
+        iteratorRows = null;
+        GC.Collect();
+        CheckSequence(rowValues, new int[] { 13, 39, 49 });
+
+        _box = new FrameBox();
+        _box.First = second;
+        _box.Second = third;
+        int assigned = GetBox()[NextIndex()] += 7;
+        Check(assigned == 10);
+        Check(_box.Second.Weight == 10);
+        Check(_receiverCalls == 1);
+        Check(_indexCalls == 1);
+        Check(_box.Gets == 1);
+        Check(_box.Sets == 1);
+        Check(_box.Second.Payload.Owner.Value == 30);
+
+        VectorHolder vector = new VectorHolder();
+        vector.Value = new Int4(1, 2, 3, 4);
+        vector.Value.xy += new Int2(10, 20);
+        Check(vector.Value.X == 11);
+        Check(vector.Value.Y == 22);
+        Check(vector.Value.Z == 3 && vector.Value.W == 4);
+
+        CheckUnsafe();
+
+        GC.Collect();
+        Check(_box.Second.Payload.Owner.Value == 30);
+        Check(closure0() == 43);
+        Check(nested() == 74);
+    }
+}

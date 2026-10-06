@@ -1,0 +1,316 @@
+using Void.Collections;
+
+public enum IterMode
+{
+    One = 1,
+    Two = 2,
+    Three = 3
+}
+
+public sealed class Box
+{
+    public int Value { get; private set; }
+
+    public Box(int value)
+    {
+        Value = value;
+    }
+}
+
+public class IteratorBase
+{
+    protected int _value = 5;
+
+    public virtual int Read()
+    {
+        return _value + 1;
+    }
+
+    public virtual int Amount => _value + 2;
+}
+
+public sealed class IteratorDerived : IteratorBase
+{
+    public override int Read()
+    {
+        return _value + 100;
+    }
+
+    public override int Amount => _value + 200;
+
+    public IEnumerator<int> ReadBase()
+    {
+        yield return base.Read();
+        GC.Collect();
+        yield return base.Amount;
+        yield return base._value;
+    }
+}
+
+public sealed class IteratorProbe
+{
+    private int _arrayCalls;
+    private int _listCalls;
+    private int _switchCalls;
+
+    public int ArrayCalls => _arrayCalls;
+    public int ListCalls => _listCalls;
+    public int SwitchCalls => _switchCalls;
+
+    private int[] MakeArray()
+    {
+        _arrayCalls++;
+        int[] values = new int[3];
+        values[0] = 1;
+        values[1] = 2;
+        values[2] = 3;
+        return values;
+    }
+
+    private List<int> MakeList()
+    {
+        _listCalls++;
+        List<int> values = new List<int>();
+        values.Add(4);
+        values.Add(5);
+        return values;
+    }
+
+    private int TouchSwitch(int value)
+    {
+        _switchCalls++;
+        return value;
+    }
+
+    public IEnumerator<int> ArrayValues()
+    {
+        foreach (var value in MakeArray())
+        {
+            if (value == 2)
+                continue;
+
+            yield return value;
+            if (value == 3)
+                break;
+
+            yield return value + 10;
+        }
+
+        yield return 99;
+    }
+
+    public IEnumerator<int> ListValues()
+    {
+        foreach (var value in MakeList())
+        {
+            yield return value;
+            yield return value + 20;
+        }
+    }
+
+    public IEnumerator<int> SwitchValues(int value)
+    {
+        switch (TouchSwitch(value))
+        {
+            case 1:
+                yield return 10;
+                break;
+            case 2:
+            case 3:
+                yield return 20;
+                yield return 21;
+                break;
+            default:
+                yield return 30;
+                break;
+        }
+
+        yield return 99;
+    }
+}
+
+public static class Program
+{
+    public static IEnumerator<int> ManagedArray(Box[] values)
+    {
+        foreach (var value in values)
+        {
+            GC.Collect();
+            yield return value.Value;
+            GC.Collect();
+            yield return value.Value + 100;
+        }
+    }
+
+    public static IEnumerator<int> ManagedList(List<Box> values)
+    {
+        foreach (Box value in values)
+        {
+            GC.Collect();
+            yield return value.Value;
+            GC.Collect();
+            yield return value.Value + 200;
+        }
+    }
+
+    public static IEnumerator<int> Nested(int[] left, List<int> right)
+    {
+        foreach (int x in left)
+        {
+            foreach (int y in right)
+            {
+                switch (y)
+                {
+                    case 4:
+                        continue;
+                    case 5:
+                        yield return x * 10 + y;
+                        break;
+                    default:
+                        break;
+                }
+
+                if (y == 6)
+                    break;
+
+                yield return x * 100 + y;
+            }
+        }
+    }
+
+    public static IEnumerator<int> DeepControlFlow()
+    {
+        int outer = 0;
+        while (outer < 2)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        yield return outer * 10;
+                        break;
+                    case 1:
+                        if (outer == 0)
+                        {
+                            yield return 1;
+                            continue;
+                        }
+                        yield return 11;
+                        break;
+                    default:
+                        yield return outer * 10 + 2;
+                        break;
+                }
+            }
+            outer++;
+        }
+    }
+
+    public static IEnumerator<int> EnumSwitch(IterMode mode)
+    {
+        switch (mode)
+        {
+            case IterMode.One:
+                yield return 1;
+                break;
+            case IterMode.Two:
+                yield return 2;
+                break;
+            default:
+                yield return 3;
+                break;
+        }
+    }
+
+    public static IEnumerator<int> NoDefault(int value)
+    {
+        switch (value)
+        {
+            case 1:
+                yield return 1;
+                break;
+        }
+        yield return 7;
+    }
+
+    public static IEnumerator<int> StopInSwitch(int value)
+    {
+        switch (value)
+        {
+            case 1:
+                yield return 8;
+                yield break;
+            default:
+                break;
+        }
+        yield return 9;
+    }
+
+    private static void Check(bool value)
+    {
+        Console.WriteLine(value);
+    }
+
+    private static void CheckSequence(IEnumerator<int> values, int[] expected)
+    {
+        int index = 0;
+        while (values.MoveNext())
+        {
+            Check(index < expected.Length && values.Current == expected[index]);
+            index++;
+        }
+        Check(index == expected.Length);
+    }
+
+    public static void Main()
+    {
+        IteratorProbe probe = new IteratorProbe();
+        CheckSequence(probe.ArrayValues(), new int[] { 1, 11, 3, 99 });
+        Check(probe.ArrayCalls == 1);
+
+        CheckSequence(probe.ListValues(), new int[] { 4, 24, 5, 25 });
+        Check(probe.ListCalls == 1);
+
+        CheckSequence(probe.SwitchValues(2), new int[] { 20, 21, 99 });
+        Check(probe.SwitchCalls == 1);
+        CheckSequence(probe.SwitchValues(9), new int[] { 30, 99 });
+        Check(probe.SwitchCalls == 2);
+
+        Box[] boxes = new Box[2];
+        boxes[0] = new Box(7);
+        boxes[1] = new Box(8);
+        IEnumerator<int> managedArray = ManagedArray(boxes);
+        boxes = null;
+        GC.Collect();
+        CheckSequence(managedArray, new int[] { 7, 107, 8, 108 });
+
+        List<Box> boxList = new List<Box>();
+        boxList.Add(new Box(9));
+        boxList.Add(new Box(10));
+        IEnumerator<int> managedList = ManagedList(boxList);
+        boxList = null;
+        GC.Collect();
+        CheckSequence(managedList, new int[] { 9, 209, 10, 210 });
+
+        int[] left = new int[2];
+        left[0] = 1;
+        left[1] = 2;
+        List<int> right = new List<int>();
+        right.Add(4);
+        right.Add(5);
+        right.Add(6);
+        CheckSequence(Nested(left, right), new int[] { 15, 105, 25, 205 });
+
+        CheckSequence(DeepControlFlow(), new int[] { 0, 1, 2, 10, 11, 12 });
+        CheckSequence(EnumSwitch(IterMode.Two), new int[] { 2 });
+        CheckSequence(NoDefault(5), new int[] { 7 });
+        CheckSequence(StopInSwitch(1), new int[] { 8 });
+
+        IteratorDerived derived = new IteratorDerived();
+        IEnumerator<int> baseValues = derived.ReadBase();
+        derived = null;
+        GC.Collect();
+        CheckSequence(baseValues, new int[] { 6, 7, 5 });
+    }
+}

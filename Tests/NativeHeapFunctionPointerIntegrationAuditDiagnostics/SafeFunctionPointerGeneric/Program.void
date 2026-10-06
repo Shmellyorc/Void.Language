@@ -1,0 +1,9 @@
+using Void;
+public static class Program
+{
+    private static T Keep<T>(T value) where T : unmanaged => value;
+    public static void Main()
+    {
+        Keep<delegate*<int, int>>(null);
+    }
+}

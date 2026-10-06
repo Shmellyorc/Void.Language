@@ -1,0 +1,171 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class Payload
+{
+    public int Value;
+    public Payload(int value) { Value = value; }
+}
+
+public static class Program
+{
+    private static ManualResetEvent _gcDone = new ManualResetEvent(false);
+    private static int _raceErrors;
+
+    private static void CreateGcLinked(CancellationToken parent)
+    {
+        CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(parent);
+        Payload payload = new Payload(77);
+        linked.Token.Register(() =>
+        {
+            if (payload.Value == 77)
+                _gcDone.Set();
+        });
+        linked = null;
+    }
+
+    public static void Main()
+    {
+        CancellationTokenSource parent = new CancellationTokenSource();
+        CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(parent.Token);
+        int linkedCalls = 0;
+        linked.Token.Register(() => linkedCalls++);
+        Console.WriteLine(!linked.IsCancellationRequested);
+        parent.Cancel();
+        Console.WriteLine(linked.IsCancellationRequested);
+        Console.WriteLine(linkedCalls == 1);
+
+        CancellationTokenSource left = new CancellationTokenSource();
+        CancellationTokenSource right = new CancellationTokenSource();
+        CancellationTokenSource pair = CancellationTokenSource.CreateLinkedTokenSource(left.Token, right.Token);
+        int pairCalls = 0;
+        pair.Token.Register(() => pairCalls++);
+        right.Cancel();
+        Console.WriteLine(pair.IsCancellationRequested);
+        Console.WriteLine(pairCalls == 1);
+        left.Cancel();
+        Console.WriteLine(pairCalls == 1);
+
+        CancellationTokenSource arrayA = new CancellationTokenSource();
+        CancellationTokenSource arrayB = new CancellationTokenSource();
+        CancellationTokenSource arrayC = new CancellationTokenSource();
+        CancellationToken[] parents = new CancellationToken[] { arrayA.Token, arrayB.Token, arrayC.Token };
+        CancellationTokenSource arrayLinked = CancellationTokenSource.CreateLinkedTokenSource(parents);
+        arrayB.Cancel();
+        Console.WriteLine(arrayLinked.IsCancellationRequested);
+
+        CancellationTokenSource pre = new CancellationTokenSource();
+        pre.Cancel();
+        CancellationTokenSource preLinked = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken.None, pre.Token);
+        Console.WriteLine(preLinked.IsCancellationRequested);
+
+        CancellationTokenSource noneLinked = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken.None);
+        Console.WriteLine(!noneLinked.IsCancellationRequested);
+        noneLinked.Cancel();
+        Console.WriteLine(noneLinked.IsCancellationRequested);
+
+        CancellationTokenSource disposedParent = new CancellationTokenSource();
+        CancellationTokenSource disposedLinked = CancellationTokenSource.CreateLinkedTokenSource(disposedParent.Token);
+        CancellationToken disposedLinkedToken = disposedLinked.Token;
+        int disposedCalls = 0;
+        disposedLinkedToken.Register(() => disposedCalls++);
+        disposedLinked.Dispose();
+        disposedParent.Cancel();
+        Console.WriteLine(!disposedLinkedToken.IsCancellationRequested);
+        Console.WriteLine(disposedCalls == 0);
+
+        CancellationTokenSource manualParent = new CancellationTokenSource();
+        CancellationTokenSource manualLinked = CancellationTokenSource.CreateLinkedTokenSource(manualParent.Token);
+        int manualCalls = 0;
+        manualLinked.Token.Register(() => manualCalls++);
+        manualLinked.Cancel();
+        Console.WriteLine(manualCalls == 1);
+        manualParent.Cancel();
+        Console.WriteLine(manualCalls == 1);
+
+        CancellationTokenSource delayParent = new CancellationTokenSource();
+        CancellationTokenSource delayLinked = CancellationTokenSource.CreateLinkedTokenSource(delayParent.Token);
+        CancellationToken delayLinkedToken = delayLinked.Token;
+        Task wait = Task.Delay(Timeout.Infinite, delayLinkedToken);
+        delayParent.Cancel();
+        bool delayCanceled = false;
+        try
+        {
+            wait.Wait(1000);
+        }
+        catch (OperationCanceledException error)
+        {
+            delayCanceled = error.CancellationToken.IsSameSource(delayLinkedToken);
+        }
+        Console.WriteLine(delayCanceled);
+        Console.WriteLine(wait.IsCanceled);
+
+        CancellationTokenSource cancelAfterParent = new CancellationTokenSource();
+        CancellationTokenSource cancelAfterLinked = CancellationTokenSource.CreateLinkedTokenSource(cancelAfterParent.Token);
+        int cancelAfterCalls = 0;
+        cancelAfterLinked.Token.Register(() => cancelAfterCalls++);
+        cancelAfterLinked.CancelAfter(80);
+        cancelAfterParent.Cancel();
+        Console.WriteLine(cancelAfterLinked.IsCancellationRequested);
+        Thread.Sleep(130);
+        Console.WriteLine(cancelAfterCalls == 1);
+
+        CancellationTokenSource gcParent = new CancellationTokenSource();
+        CreateGcLinked(gcParent.Token);
+        GC.Collect();
+        gcParent.Cancel();
+        Console.WriteLine(_gcDone.WaitOne(1000));
+
+        CancellationTokenSource raceLeft = new CancellationTokenSource();
+        CancellationTokenSource raceRight = new CancellationTokenSource();
+        CancellationTokenSource raceLinked = CancellationTokenSource.CreateLinkedTokenSource(raceLeft.Token, raceRight.Token);
+        int raceCalls = 0;
+        raceLinked.Token.Register(() => Interlocked.Increment(ref raceCalls));
+        ManualResetEvent start = new ManualResetEvent(false);
+        ManualResetEvent doneA = new ManualResetEvent(false);
+        ManualResetEvent doneB = new ManualResetEvent(false);
+        ThreadPool.QueueUserWorkItem(() =>
+        {
+            start.WaitOne();
+            try { raceLeft.Cancel(); } catch (Exception) { Interlocked.Increment(ref _raceErrors); }
+            doneA.Set();
+        });
+        ThreadPool.QueueUserWorkItem(() =>
+        {
+            start.WaitOne();
+            try { raceRight.Cancel(); } catch (Exception) { Interlocked.Increment(ref _raceErrors); }
+            doneB.Set();
+        });
+        start.Set();
+        Console.WriteLine(doneA.WaitOne(1000));
+        Console.WriteLine(doneB.WaitOne(1000));
+        Console.WriteLine(raceLinked.IsCancellationRequested);
+        Console.WriteLine(raceCalls == 1);
+        Console.WriteLine(_raceErrors == 0);
+
+        CancellationTokenSource unwindParent = new CancellationTokenSource();
+        CancellationTokenSource unwindLinked = CancellationTokenSource.CreateLinkedTokenSource(unwindParent.Token);
+        ManualResetEvent callbackEntered = new ManualResetEvent(false);
+        ManualResetEvent callbackRelease = new ManualResetEvent(false);
+        ManualResetEvent cancelReturned = new ManualResetEvent(false);
+        unwindLinked.Token.Register(() =>
+        {
+            callbackEntered.Set();
+            callbackRelease.WaitOne();
+        });
+        ThreadPool.QueueUserWorkItem(() =>
+        {
+            try { unwindParent.Cancel(); } catch (Exception) { Interlocked.Increment(ref _raceErrors); }
+            cancelReturned.Set();
+        });
+        Console.WriteLine(callbackEntered.WaitOne(1000));
+        unwindLinked.Dispose();
+        callbackRelease.Set();
+        Console.WriteLine(cancelReturned.WaitOne(1000));
+        Console.WriteLine(_raceErrors == 0);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

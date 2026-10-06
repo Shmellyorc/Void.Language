@@ -1,0 +1,2 @@
+public sealed class Box { public int Value { get; set; } }
+public static class Program { public static void Main() { Box box = new Box(); if (box is { Value: 1, Value: 1 }) { } } }

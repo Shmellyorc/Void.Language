@@ -1,0 +1,17 @@
+public interface IMarker<T> { }
+public struct Number : IMarker<Number>
+{
+    public int Value;
+    public Number(int value) { Value = value; }
+    public static implicit operator int(Number value) { return value.Value; }
+    public static implicit operator Number(int value) { return new Number(value); }
+}
+public static class Program
+{
+    private static int Bad<T>(T value, int tag) where T : IMarker<T>
+    {
+        var copy = tag switch { 0 => value, _ => value };
+        return copy;
+    }
+    public static void Main() { int x = Bad<Number>(new Number(1), 0); }
+}

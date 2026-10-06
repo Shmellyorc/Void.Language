@@ -1,0 +1,12 @@
+namespace SemanticQueries;
+
+public sealed class Player
+{
+    public int Health;
+    public int Score { get; set; }
+
+    public int Add(int amount, int bonus = 1)
+    {
+        return Health + amount + bonus;
+    }
+}

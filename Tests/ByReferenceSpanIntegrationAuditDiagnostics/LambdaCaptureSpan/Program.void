@@ -1,0 +1,10 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        Span<int> values = new int[] { 1 };
+        Func<int> read = () => values[0];
+        Console.WriteLine(read());
+    }
+}

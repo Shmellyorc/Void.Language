@@ -1,0 +1,2 @@
+public sealed class C245 { public int Value; public C245(int value) { Value = value; } public ref int GetPinnableReference() { return ref Value; } }
+public static class Program { public static unsafe int* Escape(C245 x) { fixed (int* p = x) { return p + 0; } } public static unsafe void Main() { C245 x = new C245(1); int* p = Escape(x); } }

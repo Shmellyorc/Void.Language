@@ -1,0 +1,198 @@
+using Void;
+
+namespace Void.IO;
+
+// Synchronous, GC-owned byte storage. No native handle or async state is needed.
+public class MemoryStream : Stream
+{
+    private byte[] _buffer;
+    private int _origin;
+    private int _length;
+    private int _position;
+    private int _capacity;
+    private bool _expandable;
+    private bool _writable;
+    private bool _exposable;
+    private bool _open;
+
+    public MemoryStream() : this(0) { }
+    public MemoryStream(int capacity)
+    {
+        if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
+        _buffer = new byte[capacity];
+        _capacity = capacity;
+        _expandable = true;
+        _writable = true;
+        _exposable = true;
+        _open = true;
+    }
+    public MemoryStream(byte[] buffer) : this(buffer, true) { }
+    public MemoryStream(byte[] buffer, bool writable)
+    {
+        if (buffer == null) throw new ArgumentNullException("buffer");
+        _buffer = buffer;
+        _length = buffer.Length;
+        _capacity = buffer.Length;
+        _writable = writable;
+        _open = true;
+    }
+    public MemoryStream(byte[] buffer, int index, int count) : this(buffer, index, count, true, false) { }
+    public MemoryStream(byte[] buffer, int index, int count, bool writable) : this(buffer, index, count, writable, false) { }
+    public MemoryStream(byte[] buffer, int index, int count, bool writable, bool publiclyVisible)
+    {
+        ValidateBuffer(buffer, index, count, "index");
+        _buffer = buffer;
+        _origin = index;
+        _position = index;
+        _length = index + count;
+        _capacity = index + count;
+        _writable = writable;
+        _exposable = publiclyVisible;
+        _open = true;
+    }
+    public override bool CanRead { get { return _open; } }
+    public override bool CanSeek { get { return _open; } }
+    public override bool CanWrite { get { return _open && _writable; } }
+    public override long Length { get { this.CheckOpen(); return (long)(_length - _origin); } }
+    public override long Position
+    {
+        get { this.CheckOpen(); return (long)(_position - _origin); }
+        set
+        {
+            if (value < 0L) throw new ArgumentOutOfRangeException("value");
+            this.CheckOpen();
+            if (value > (long)(2147483647 - _origin)) throw new ArgumentOutOfRangeException("value");
+            _position = _origin + (int)value;
+        }
+    }
+    public virtual int Capacity
+    {
+        get { this.CheckOpen(); return _capacity - _origin; }
+        set
+        {
+            if (value < _length - _origin) throw new ArgumentOutOfRangeException("value");
+            this.CheckOpen();
+            if (!_expandable && value != _capacity - _origin) throw new NotSupportedException("Stream is not expandable.");
+            if (_expandable && value != _capacity)
+            {
+                byte[] buffer = new byte[value];
+                new ReadOnlySpan<byte>(_buffer, 0, _length).CopyTo(new Span<byte>(buffer));
+                _buffer = buffer;
+                _capacity = value;
+            }
+        }
+    }
+    public override void Flush() { }
+    public override void Dispose() { _open = false; _writable = false; _expandable = false; }
+    public virtual byte[] GetBuffer()
+    {
+        if (!_exposable) throw new UnauthorizedAccessException("Buffer is not publicly visible.");
+        return _buffer;
+    }
+    public virtual byte[] ToArray()
+    {
+        byte[] result = new byte[_length - _origin];
+        new ReadOnlySpan<byte>(_buffer, _origin, result.Length).CopyTo(new Span<byte>(result));
+        return result;
+    }
+    public virtual void WriteTo(Stream stream)
+    {
+        if (stream == null) throw new ArgumentNullException("stream");
+        this.CheckOpen();
+        stream.Write(_buffer, _origin, _length - _origin);
+    }
+    public override int Read(byte[] buffer, int offset, int count)
+    {
+        ValidateBuffer(buffer, offset, count, "offset");
+        this.CheckOpen();
+        int available = _position >= _length ? 0 : _length - _position;
+        if (count > available) count = available;
+        if (count == 0) return 0;
+        new ReadOnlySpan<byte>(_buffer, _position, count).CopyTo(new Span<byte>(buffer, offset, count));
+        _position += count;
+        return count;
+    }
+    public override int ReadByte()
+    {
+        this.CheckOpen();
+        if (_position >= _length) return -1;
+        int result = (int)_buffer[_position];
+        _position++;
+        return result;
+    }
+    public override long Seek(long offset, SeekOrigin origin)
+    {
+        this.CheckOpen();
+        if (offset > 2147483647L) throw new ArgumentOutOfRangeException("offset");
+        int basis = _origin;
+        if (origin == SeekOrigin.Current) basis = _position;
+        else if (origin == SeekOrigin.End) basis = _length;
+        else if (origin != SeekOrigin.Begin) throw new ArgumentException("Invalid seek origin.", "origin");
+        // Check before addition to avoid signed long overflow.
+        if (offset < (long)(_origin - basis)) throw new IOException("Cannot seek before the beginning.");
+        if (offset > (long)(2147483647 - basis)) throw new ArgumentOutOfRangeException("offset");
+        _position = basis + (int)offset;
+        // Existing .NET MemoryStream contract returns the backing-array offset.
+        return (long)_position;
+    }
+    public override void SetLength(long value)
+    {
+        if (value < 0L || value > (long)(2147483647 - _origin)) throw new ArgumentOutOfRangeException("value");
+        this.CheckOpen();
+        this.CheckWritable();
+        int length = _origin + (int)value;
+        this.EnsureCapacity(length);
+        if (length > _length) new Span<byte>(_buffer, _length, length - _length).Clear();
+        _length = length;
+        if (_position > length) _position = length;
+    }
+    public override void Write(byte[] buffer, int offset, int count)
+    {
+        ValidateBuffer(buffer, offset, count, "offset");
+        this.CheckOpen();
+        this.CheckWritable();
+        if (count > 2147483647 - _position) throw new IOException("Stream is too long.");
+        int end = _position + count;
+        this.EnsureCapacity(end);
+        if (_position > _length) new Span<byte>(_buffer, _length, _position - _length).Clear();
+        new ReadOnlySpan<byte>(buffer, offset, count).CopyTo(new Span<byte>(_buffer, _position, count));
+        if (end > _length) _length = end;
+        _position = end;
+    }
+    public override void WriteByte(byte value)
+    {
+        this.CheckOpen();
+        this.CheckWritable();
+        if (_position == 2147483647) throw new IOException("Stream is too long.");
+        int end = _position + 1;
+        this.EnsureCapacity(end);
+        if (_position > _length) new Span<byte>(_buffer, _length, _position - _length).Clear();
+        _buffer[_position] = value;
+        if (end > _length) _length = end;
+        _position = end;
+    }
+    private void EnsureCapacity(int capacity)
+    {
+        if (capacity <= _capacity) return;
+        if (!_expandable) throw new NotSupportedException("Stream is not expandable.");
+        int next = _capacity > 1073741823 ? 2147483647 : _capacity * 2;
+        if (next < 256) next = 256;
+        if (next < capacity) next = capacity;
+        this.Capacity = next;
+    }
+    private void CheckOpen()
+    {
+        if (!_open) throw new ObjectDisposedException("MemoryStream");
+    }
+    private void CheckWritable()
+    {
+        if (!_writable) throw new NotSupportedException("Stream does not support writing.");
+    }
+    private static void ValidateBuffer(byte[] buffer, int offset, int count, string offsetName)
+    {
+        if (buffer == null) throw new ArgumentNullException("buffer");
+        if (offset < 0) throw new ArgumentOutOfRangeException(offsetName);
+        if (count < 0) throw new ArgumentOutOfRangeException("count");
+        if (offset > buffer.Length || count > buffer.Length - offset) throw new ArgumentException("Buffer range is invalid.");
+    }
+}

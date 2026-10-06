@@ -1,0 +1,4 @@
+public static class Program {
+    private static unsafe int Size<T>() => sizeof(T);
+    public static unsafe void Main() { Console.WriteLine(Size<int>()); }
+}

@@ -1,0 +1,170 @@
+using Void;
+using Void.Threading.Tasks;
+
+public sealed class Payload211
+{
+    public int Value;
+
+    public Payload211(int value)
+    {
+        Value = value;
+    }
+
+    public static int operator +(Payload211 left, int right)
+    {
+        return left.Value + right;
+    }
+}
+
+public static class Program
+{
+    private static int _shared;
+    private static int _order;
+    private static Payload211 _payload;
+
+    private static int Before(int value)
+    {
+        _order = _order * 10 + 1;
+        return value;
+    }
+
+    private static int After(int value)
+    {
+        _order = _order * 10 + 3;
+        return value;
+    }
+
+    private static int Add(int left, int right)
+    {
+        return left + right;
+    }
+
+    private static async Task<int> NestedLocal(Task<int> source)
+    {
+        int value = 2 + await source;
+        return value * 2;
+    }
+
+    private static async Task<int> NestedReturn(Task<int> source)
+    {
+        return 5 + await source;
+    }
+
+    private static async Task<int> NestedAssignment(Task<int> source)
+    {
+        int value = 7;
+        value = value + await source;
+        return value;
+    }
+
+    private static async Task<int> EvaluationOrder(Task<int> source)
+    {
+        return Before(10) + await source + After(5);
+    }
+
+    private static async Task<int> CaptureLeftValue(Task<int> source)
+    {
+        return _shared + await source;
+    }
+
+    private static async Task<int> MultipleInExpression(Task<int> first, Task<int> second)
+    {
+        return await first * 10 + await second;
+    }
+
+    private static async Task<long> UnaryAndCast(Task<int> first, Task<int> second)
+    {
+        return -(long)(await first) + (long)(await second);
+    }
+
+    private static async Task<int> NestedFault(Task<int> source)
+    {
+        return 1 + await source;
+    }
+
+    private static async Task<int> ManagedLeftSpill(Task<int> source)
+    {
+        return _payload + await source;
+    }
+
+    public static void Main()
+    {
+        TaskCompletionSource<int> localSource = new TaskCompletionSource<int>();
+        Task<int> local = NestedLocal(localSource.Task);
+        Console.WriteLine(!local.IsCompleted);
+        localSource.SetResult(4);
+        Console.WriteLine(local.Result == 12);
+
+        TaskCompletionSource<int> returnSource = new TaskCompletionSource<int>();
+        Task<int> returned = NestedReturn(returnSource.Task);
+        Console.WriteLine(!returned.IsCompleted);
+        returnSource.SetResult(8);
+        Console.WriteLine(returned.Result == 13);
+
+        TaskCompletionSource<int> assignmentSource = new TaskCompletionSource<int>();
+        Task<int> assigned = NestedAssignment(assignmentSource.Task);
+        assignmentSource.SetResult(6);
+        Console.WriteLine(assigned.Result == 13);
+
+        _order = 0;
+        TaskCompletionSource<int> orderSource = new TaskCompletionSource<int>();
+        Task<int> ordered = EvaluationOrder(orderSource.Task);
+        Console.WriteLine(!ordered.IsCompleted && _order == 1);
+        orderSource.SetResult(2);
+        Console.WriteLine(ordered.Result == 17 && _order == 13);
+
+        _shared = 10;
+        TaskCompletionSource<int> captureSource = new TaskCompletionSource<int>();
+        Task<int> captured = CaptureLeftValue(captureSource.Task);
+        Console.WriteLine(!captured.IsCompleted);
+        _shared = 100;
+        captureSource.SetResult(1);
+        Console.WriteLine(captured.Result == 11);
+
+        TaskCompletionSource<int> first = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> second = new TaskCompletionSource<int>();
+        Task<int> multiple = MultipleInExpression(first.Task, second.Task);
+        Console.WriteLine(!multiple.IsCompleted);
+        first.SetResult(3);
+        Console.WriteLine(!multiple.IsCompleted);
+        second.SetResult(4);
+        Console.WriteLine(multiple.Result == 34);
+
+        TaskCompletionSource<int> unaryFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> unarySecond = new TaskCompletionSource<int>();
+        Task<long> unary = UnaryAndCast(unaryFirst.Task, unarySecond.Task);
+        unaryFirst.SetResult(9);
+        Console.WriteLine(!unary.IsCompleted);
+        unarySecond.SetResult(12);
+        Console.WriteLine(unary.Result == 3L);
+
+        TaskCompletionSource<int> completedSource = new TaskCompletionSource<int>();
+        completedSource.SetResult(20);
+        Task<int> completed = NestedReturn(completedSource.Task);
+        Console.WriteLine(completed.IsCompleted && completed.Result == 25);
+
+        TaskCompletionSource<int> faultSource = new TaskCompletionSource<int>();
+        Task<int> fault = NestedFault(faultSource.Task);
+        faultSource.SetException(new Exception("async-211-fault"));
+        bool caught = false;
+        try
+        {
+            fault.Wait();
+        }
+        catch (Exception error)
+        {
+            caught = error.Message == "async-211-fault";
+        }
+        Console.WriteLine(caught && fault.IsFaulted);
+
+        _payload = new Payload211(1);
+        TaskCompletionSource<int> managedSource = new TaskCompletionSource<int>();
+        Task<int> managed = ManagedLeftSpill(managedSource.Task);
+        Console.WriteLine(!managed.IsCompleted);
+        _payload = null;
+        GC.Collect();
+        GC.Collect();
+        managedSource.SetResult(2);
+        Console.WriteLine(managed.Result == 3);
+    }
+}

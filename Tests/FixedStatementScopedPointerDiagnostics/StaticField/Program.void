@@ -1,0 +1,2 @@
+public static class Holder244 { public static int Value; }
+public static class Program { public static unsafe void Main() { fixed (int* p = &Holder244.Value) { } } }

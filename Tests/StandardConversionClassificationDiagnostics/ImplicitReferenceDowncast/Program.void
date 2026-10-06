@@ -1,0 +1,16 @@
+public class BaseNode
+{
+}
+
+public sealed class DerivedNode : BaseNode
+{
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        BaseNode value = new DerivedNode();
+        DerivedNode derived = value;
+    }
+}

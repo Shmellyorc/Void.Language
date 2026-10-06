@@ -1,0 +1,146 @@
+namespace Void.Collections;
+
+private sealed class QueueNode<T>
+{
+    public T Value;
+    public QueueNode<T> Next;
+
+    public QueueNode(T value)
+    {
+        Value = value;
+        Next = null;
+    }
+}
+
+public sealed class Queue<T> : IReadOnlyCollection<T>
+{
+    private QueueNode<T> _head;
+    private QueueNode<T> _tail;
+    private int _count;
+    private int _version;
+
+    public int Count => _count;
+
+    public Queue()
+    {
+        _head = null;
+        _tail = null;
+        _count = 0;
+    }
+
+    public Queue(int capacity) : this()
+    {
+        if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
+    }
+    public Queue(IEnumerable<T> collection) : this()
+    {
+        if (collection == null) throw new ArgumentNullException("collection");
+        foreach (T item in collection) this.Enqueue(item);
+    }
+
+    public void Enqueue(T item)
+    {
+        QueueNode<T> node = new QueueNode<T>(item);
+
+        if (_tail == null)
+            _head = node;
+        else
+            _tail.Next = node;
+
+        _tail = node;
+        _count++;
+        _version++;
+    }
+
+    public T Dequeue()
+    {
+        if (_head == null)
+            throw new InvalidOperationException("Queue is empty");
+
+        T value = _head.Value;
+        _head = _head.Next;
+        _count--;
+        _version++;
+
+        if (_head == null)
+            _tail = null;
+
+        return value;
+    }
+
+    public T Peek()
+    {
+        if (_head == null)
+            throw new InvalidOperationException("Queue is empty");
+
+        return _head.Value;
+    }
+
+    public bool TryDequeue(out T result)
+    {
+        result = default(T);
+        if (_head == null) return false;
+        result = this.Dequeue();
+        return true;
+    }
+
+    public bool TryPeek(out T result)
+    {
+        result = default(T);
+        if (_head == null) return false;
+        result = _head.Value;
+        return true;
+    }
+
+    public bool Contains(T item)
+    {
+        IEqualityComparer<T> comparer = new DefaultEqualityComparer<T>();
+        QueueNode<T> node = _head;
+        while (node != null)
+        {
+            if (comparer.Equals(node.Value, item)) return true;
+            node = node.Next;
+        }
+        return false;
+    }
+
+    public void Clear()
+    {
+        _head = null;
+        _tail = null;
+        _count = 0;
+        _version++;
+    }
+
+    public T[] ToArray()
+    {
+        T[] array = new T[_count];
+        this.CopyTo(array, 0);
+        return array;
+    }
+    public void CopyTo(T[] array, int arrayIndex)
+    {
+        if (array == null) throw new ArgumentNullException("array");
+        if (arrayIndex < 0 || arrayIndex > array.Length) throw new ArgumentOutOfRangeException("arrayIndex");
+        if (_count > array.Length - arrayIndex) throw new ArgumentException("Destination is too short");
+        QueueNode<T> node = _head;
+        while (node != null)
+        {
+            array[arrayIndex] = node.Value;
+            arrayIndex++;
+            node = node.Next;
+        }
+    }
+    public IEnumerator<T> GetEnumerator() { return this.Enumerate(_version); }
+    private IEnumerator<T> Enumerate(int version)
+    {
+        if (version != _version) throw new InvalidOperationException("Collection was modified");
+        QueueNode<T> current = _head;
+        while (current != null)
+        {
+            yield return current.Value;
+            if (version != _version) throw new InvalidOperationException("Collection was modified");
+            current = current.Next;
+        }
+    }
+}

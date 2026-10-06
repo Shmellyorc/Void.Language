@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { bool value = Runtime.TerminalPrepareOutput(); } }

@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "FixedStatementScopedPointerDiagnostics",
+  "output": "exe",
+  "version": "0.0.244",
+  "compiler": { "unsafe": true }
+}

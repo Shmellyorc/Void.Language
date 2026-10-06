@@ -1,0 +1,2 @@
+public sealed class Box244 { public int Value; }
+public static class Program { private static unsafe int* Bad(Box244 b) { fixed (int* p = &b.Value) { return p + 0; } } public static unsafe void Main() { Box244 b = new Box244(); int* p = Bad(b); } }

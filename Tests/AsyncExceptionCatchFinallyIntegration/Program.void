@@ -1,0 +1,513 @@
+using Void;
+using Void.Threading.Tasks;
+
+public sealed class AsyncError206 : Exception
+{
+    public int Code;
+
+    public AsyncError206(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class AsyncResource206 : IDisposable
+{
+    public int Id;
+
+    public AsyncResource206(int id)
+    {
+        Id = id;
+        Program.Sequence = Program.Sequence * 10 + id;
+    }
+
+    public void Dispose()
+    {
+        Program.Sequence = Program.Sequence * 10 + Id;
+        Program.DisposeCount++;
+    }
+}
+
+
+public sealed class ThrowingAsyncResource206 : IDisposable
+{
+    public void Dispose()
+    {
+        Program.DisposeCount++;
+        throw new AsyncError206("dispose-fault", 90);
+    }
+}
+
+public struct ValueAsyncResource206 : IDisposable
+{
+    public int Id;
+
+    public ValueAsyncResource206(int id)
+    {
+        Id = id;
+    }
+
+    public void Dispose()
+    {
+        Program.Sequence = Program.Sequence * 10 + Id;
+        Program.DisposeCount++;
+    }
+}
+
+public static class Program
+{
+    public static int Sequence;
+    public static int DisposeCount;
+
+    private static async Task<int> CatchAfterAwait(Task signal)
+    {
+        try
+        {
+            await signal;
+            throw new AsyncError206("after", 7);
+        }
+        catch (AsyncError206 error)
+        {
+            return error.Code + 1;
+        }
+    }
+
+    private static async Task<int> AwaitInsideCatch(Task signal)
+    {
+        try
+        {
+            throw new AsyncError206("caught", 11);
+        }
+        catch (AsyncError206 error)
+        {
+            await signal;
+            GC.Collect();
+            return error.Code;
+        }
+    }
+
+    private static async Task RethrowAfterAwait(Task signal)
+    {
+        try
+        {
+            throw new AsyncError206("rethrow", 13);
+        }
+        catch (AsyncError206 error)
+        {
+            Console.WriteLine(error.Code == 13);
+            await signal;
+            throw;
+        }
+    }
+
+    private static async Task<int> FinallyNormal(Task first, Task finalSignal)
+    {
+        Sequence = 0;
+        try
+        {
+            Sequence = 1;
+            await first;
+            Sequence = Sequence * 10 + 2;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 3;
+            await finalSignal;
+            Sequence = Sequence * 10 + 4;
+        }
+        return Sequence;
+    }
+
+    private static async Task<int> ReturnThroughFinally(Task signal)
+    {
+        Sequence = 0;
+        try
+        {
+            await signal;
+            Sequence = 5;
+            return 42;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 6;
+        }
+    }
+
+    private static async Task<int> CatchFinally(Task signal)
+    {
+        Sequence = 0;
+        try
+        {
+            await signal;
+            throw new AsyncError206("cf", 8);
+        }
+        catch (AsyncError206 error)
+        {
+            Sequence = error.Code;
+            return error.Code + 1;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 9;
+        }
+    }
+
+    private static async Task<int> BreakContinueFinally(Task signal)
+    {
+        int total = 0;
+        for (int i = 0; i < 3; i++)
+        {
+            try
+            {
+                await signal;
+                if (i == 0)
+                {
+                    total += 1;
+                    continue;
+                }
+                total += 2;
+                break;
+            }
+            finally
+            {
+                total = total * 10 + 9;
+            }
+        }
+        return total;
+    }
+
+    private static async Task<int> UsingAwait(Task signal)
+    {
+        Sequence = 0;
+        DisposeCount = 0;
+        using (AsyncResource206 resource = new AsyncResource206(2))
+        {
+            Sequence = Sequence * 10 + 3;
+            await signal;
+            Sequence = Sequence * 10 + 4;
+        }
+        return Sequence;
+    }
+
+    private static async Task<int> UsingReturn(Task signal)
+    {
+        Sequence = 0;
+        DisposeCount = 0;
+        using AsyncResource206 resource = new AsyncResource206(5);
+        await signal;
+        Sequence = Sequence * 10 + 6;
+        return 77;
+    }
+
+    private static async Task FinallyFaultOverrides(Task signal)
+    {
+        try
+        {
+            await signal;
+            throw new AsyncError206("original", 1);
+        }
+        finally
+        {
+            throw new AsyncError206("finally", 2);
+        }
+    }
+
+
+    private static async Task ExceptionThroughAwaitingFinally(Task bodySignal, Task finalSignal)
+    {
+        Sequence = 0;
+        try
+        {
+            await bodySignal;
+            throw new AsyncError206("body-fault", 21);
+        }
+        finally
+        {
+            Sequence = 7;
+            await finalSignal;
+            GC.Collect();
+            GC.Collect();
+            Sequence = 78;
+        }
+    }
+
+    private static async Task<int> NestedCatchAfterFinally(Task bodySignal, Task finalSignal)
+    {
+        Sequence = 0;
+        try
+        {
+            try
+            {
+                await bodySignal;
+                throw new AsyncError206("nested", 31);
+            }
+            finally
+            {
+                Sequence = 4;
+                await finalSignal;
+                Sequence = 45;
+            }
+        }
+        catch (AsyncError206 error)
+        {
+            return error.Code + Sequence;
+        }
+    }
+
+    private static async Task<int> LocalAcrossExceptionFlow(Task first, Task second)
+    {
+        int saved = 40;
+        try
+        {
+            await first;
+            throw new AsyncError206("local", 2);
+        }
+        catch (AsyncError206 error)
+        {
+            await second;
+            return saved + error.Code;
+        }
+    }
+
+    private static async Task<int> UsingExpression(Task signal, AsyncResource206 resource)
+    {
+        using (resource)
+        {
+            await signal;
+            return resource.Id;
+        }
+    }
+
+    private static async Task UsingFault(Task signal)
+    {
+        Sequence = 0;
+        DisposeCount = 0;
+        using (AsyncResource206 resource = new AsyncResource206(6))
+        {
+            await signal;
+            throw new AsyncError206("using-fault", 6);
+        }
+    }
+
+
+    private static async Task<int> UsingInterfaceExpression(Task signal, IDisposable resource)
+    {
+        using (resource)
+        {
+            await signal;
+            return 12;
+        }
+    }
+
+    private static async Task<int> UsingValue(Task signal)
+    {
+        Sequence = 1;
+        DisposeCount = 0;
+        using (ValueAsyncResource206 resource = new ValueAsyncResource206(8))
+        {
+            await signal;
+            Sequence = Sequence * 10 + 2;
+        }
+        return Sequence;
+    }
+
+    private static async Task<int> DisposeOverridesReturn(Task signal)
+    {
+        DisposeCount = 0;
+        using (ThrowingAsyncResource206 resource = new ThrowingAsyncResource206())
+        {
+            await signal;
+            return 99;
+        }
+    }
+
+
+    private static async Task<int> UnmatchedCatchThroughFinally(Task signal)
+    {
+        Sequence = 0;
+        try
+        {
+            try
+            {
+                await signal;
+                throw new Exception("unmatched");
+            }
+            catch (AsyncError206 error)
+            {
+                return error.Code;
+            }
+            finally
+            {
+                Sequence = 9;
+            }
+        }
+        catch (Exception error)
+        {
+            return error.Message == "unmatched" && Sequence == 9 ? 44 : 0;
+        }
+    }
+
+    private static async Task CatchAllRethrow(Task signal)
+    {
+        try
+        {
+            throw new AsyncError206("catch-all", 55);
+        }
+        catch
+        {
+            await signal;
+            throw;
+        }
+    }
+
+    private static bool WaitFault(Task task, string message)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (Exception error)
+        {
+            return error.Message == message;
+        }
+        return false;
+    }
+
+    public static void Main()
+    {
+        TaskCompletionSource signal1 = new TaskCompletionSource();
+        Task<int> caught = CatchAfterAwait(signal1.Task);
+        Console.WriteLine(!caught.IsCompleted);
+        signal1.SetResult();
+        Console.WriteLine(caught.Result == 8);
+
+        TaskCompletionSource signal2 = new TaskCompletionSource();
+        Task<int> catchAwait = AwaitInsideCatch(signal2.Task);
+        Console.WriteLine(!catchAwait.IsCompleted);
+        GC.Collect();
+        GC.Collect();
+        signal2.SetResult();
+        Console.WriteLine(catchAwait.Result == 11);
+
+        TaskCompletionSource signal3 = new TaskCompletionSource();
+        Task rethrow = RethrowAfterAwait(signal3.Task);
+        Console.WriteLine(!rethrow.IsCompleted);
+        signal3.SetResult();
+        Console.WriteLine(WaitFault(rethrow, "rethrow"));
+
+        TaskCompletionSource first = new TaskCompletionSource();
+        TaskCompletionSource finalSignal = new TaskCompletionSource();
+        Task<int> finalNormal = FinallyNormal(first.Task, finalSignal.Task);
+        Console.WriteLine(Sequence == 1 && !finalNormal.IsCompleted);
+        first.SetResult();
+        while (Sequence != 123) { }
+        Console.WriteLine(!finalNormal.IsCompleted);
+        finalSignal.SetResult();
+        Console.WriteLine(finalNormal.Result == 1234 && Sequence == 1234);
+
+        TaskCompletionSource returnSignal = new TaskCompletionSource();
+        Task<int> returned = ReturnThroughFinally(returnSignal.Task);
+        returnSignal.SetResult();
+        Console.WriteLine(returned.Result == 42 && Sequence == 56);
+
+        TaskCompletionSource cfSignal = new TaskCompletionSource();
+        Task<int> cf = CatchFinally(cfSignal.Task);
+        cfSignal.SetResult();
+        Console.WriteLine(cf.Result == 9 && Sequence == 89);
+
+        TaskCompletionSource loopSignal = new TaskCompletionSource();
+        loopSignal.SetResult();
+        Console.WriteLine(BreakContinueFinally(loopSignal.Task).Result == 219);
+
+        TaskCompletionSource usingSignal = new TaskCompletionSource();
+        Task<int> usingTask = UsingAwait(usingSignal.Task);
+        Console.WriteLine(Sequence == 23 && DisposeCount == 0 && !usingTask.IsCompleted);
+        usingSignal.SetResult();
+        Console.WriteLine(usingTask.Result == 2342 && DisposeCount == 1);
+
+        TaskCompletionSource usingReturnSignal = new TaskCompletionSource();
+        Task<int> usingReturn = UsingReturn(usingReturnSignal.Task);
+        usingReturnSignal.SetResult();
+        Console.WriteLine(usingReturn.Result == 77 && Sequence == 565 && DisposeCount == 1);
+
+
+        TaskCompletionSource bodyFaultSignal = new TaskCompletionSource();
+        TaskCompletionSource bodyFinallySignal = new TaskCompletionSource();
+        Task bodyFault = ExceptionThroughAwaitingFinally(bodyFaultSignal.Task, bodyFinallySignal.Task);
+        bodyFaultSignal.SetResult();
+        while (Sequence != 7) { }
+        Console.WriteLine(!bodyFault.IsCompleted);
+        bodyFinallySignal.SetResult();
+        Console.WriteLine(WaitFault(bodyFault, "body-fault") && Sequence == 78);
+
+        TaskCompletionSource nestedBody = new TaskCompletionSource();
+        TaskCompletionSource nestedFinally = new TaskCompletionSource();
+        Task<int> nested = NestedCatchAfterFinally(nestedBody.Task, nestedFinally.Task);
+        nestedBody.SetResult();
+        while (Sequence != 4) { }
+        Console.WriteLine(!nested.IsCompleted);
+        nestedFinally.SetResult();
+        Console.WriteLine(nested.Result == 76 && Sequence == 45);
+
+        TaskCompletionSource localFirst = new TaskCompletionSource();
+        TaskCompletionSource localSecond = new TaskCompletionSource();
+        Task<int> localFlow = LocalAcrossExceptionFlow(localFirst.Task, localSecond.Task);
+        localFirst.SetResult();
+        GC.Collect();
+        GC.Collect();
+        localSecond.SetResult();
+        Console.WriteLine(localFlow.Result == 42);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        AsyncResource206 expressionResource = new AsyncResource206(3);
+        TaskCompletionSource expressionSignal = new TaskCompletionSource();
+        Task<int> expressionUsing = UsingExpression(expressionSignal.Task, expressionResource);
+        Console.WriteLine(DisposeCount == 0 && !expressionUsing.IsCompleted);
+        expressionSignal.SetResult();
+        Console.WriteLine(expressionUsing.Result == 3 && DisposeCount == 1 && Sequence == 33);
+
+        TaskCompletionSource usingFaultSignal = new TaskCompletionSource();
+        Task usingFault = UsingFault(usingFaultSignal.Task);
+        usingFaultSignal.SetResult();
+        Console.WriteLine(WaitFault(usingFault, "using-fault") && DisposeCount == 1 && Sequence == 66);
+
+
+        DisposeCount = 0;
+        AsyncResource206 interfaceConcrete = new AsyncResource206(4);
+        IDisposable interfaceResource = interfaceConcrete;
+        TaskCompletionSource interfaceSignal = new TaskCompletionSource();
+        Task<int> interfaceUsing = UsingInterfaceExpression(interfaceSignal.Task, interfaceResource);
+        interfaceSignal.SetResult();
+        Console.WriteLine(interfaceUsing.Result == 12 && DisposeCount == 1);
+
+        TaskCompletionSource valueSignal = new TaskCompletionSource();
+        Task<int> valueUsing = UsingValue(valueSignal.Task);
+        valueSignal.SetResult();
+        Console.WriteLine(valueUsing.Result == 128 && DisposeCount == 1);
+
+        TaskCompletionSource disposeSignal = new TaskCompletionSource();
+        Task<int> disposeOverride = DisposeOverridesReturn(disposeSignal.Task);
+        disposeSignal.SetResult();
+        Console.WriteLine(WaitFault(disposeOverride, "dispose-fault") && DisposeCount == 1);
+
+
+        TaskCompletionSource unmatchedSignal = new TaskCompletionSource();
+        Task<int> unmatched = UnmatchedCatchThroughFinally(unmatchedSignal.Task);
+        unmatchedSignal.SetResult();
+        Console.WriteLine(unmatched.Result == 44 && Sequence == 9);
+
+        TaskCompletionSource catchAllSignal = new TaskCompletionSource();
+        Task catchAll = CatchAllRethrow(catchAllSignal.Task);
+        Console.WriteLine(!catchAll.IsCompleted);
+        catchAllSignal.SetResult();
+        Console.WriteLine(WaitFault(catchAll, "catch-all"));
+
+        TaskCompletionSource faultSignal = new TaskCompletionSource();
+        Task overrideFault = FinallyFaultOverrides(faultSignal.Task);
+        faultSignal.SetResult();
+        Console.WriteLine(WaitFault(overrideFault, "finally"));
+
+        ThreadPool.Shutdown();
+    }
+}

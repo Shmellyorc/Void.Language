@@ -1,0 +1,1742 @@
+using Void.Collections;
+using Void.Threading;
+
+namespace Void.Threading.Tasks;
+
+private sealed class TaskGate
+{
+}
+
+private sealed class TaskWaitCancellationState
+{
+    private TaskGate _gate;
+    private Task _source;
+    private Task _completion;
+    private CancellationToken _token;
+    private CancellationTokenRegistration _registration;
+    private TimerQueueRegistration _timerRegistration;
+
+    public TaskWaitCancellationState(Task source, Task completion, CancellationToken token)
+    {
+        _gate = new TaskGate();
+        _source = source;
+        _completion = completion;
+        _token = token;
+        _registration = default;
+        _timerRegistration = default;
+    }
+
+    public bool IsActive
+    {
+        get
+        {
+            Monitor.Enter(_gate);
+            bool active = _completion != null;
+            Monitor.Exit(_gate);
+            return active;
+        }
+    }
+
+    public void SetRegistration(CancellationTokenRegistration registration)
+    {
+        bool dispose = false;
+        Monitor.Enter(_gate);
+        if (_completion == null)
+            dispose = true;
+        else
+            _registration = registration;
+        Monitor.Exit(_gate);
+
+        if (dispose)
+            registration.Dispose();
+    }
+
+    public void SetTimerRegistration(TimerQueueRegistration registration)
+    {
+        bool dispose = false;
+        Monitor.Enter(_gate);
+        if (_completion == null)
+            dispose = true;
+        else
+            _timerRegistration = registration;
+        Monitor.Exit(_gate);
+
+        if (dispose)
+            registration.Dispose();
+    }
+
+    private void Finish(Task completion)
+    {
+        CancellationTokenRegistration cancellationRegistration = default;
+        TimerQueueRegistration timerRegistration = default;
+
+        Monitor.Enter(_gate);
+        if (_completion == completion)
+        {
+            cancellationRegistration = _registration;
+            timerRegistration = _timerRegistration;
+            _source = null;
+            _completion = null;
+            _token = default;
+            _registration = default;
+            _timerRegistration = default;
+        }
+        Monitor.Exit(_gate);
+
+        cancellationRegistration.Dispose();
+        timerRegistration.Dispose();
+    }
+
+    public void OnCancellation()
+    {
+        Task completion = null;
+        CancellationToken token = default;
+
+        Monitor.Enter(_gate);
+        completion = _completion;
+        token = _token;
+        Monitor.Exit(_gate);
+
+        if (completion == null || !completion.TrySetCanceled(token))
+            return;
+
+        this.Finish(completion);
+    }
+
+    public void OnTimeout()
+    {
+        Task completion = null;
+
+        Monitor.Enter(_gate);
+        completion = _completion;
+        Monitor.Exit(_gate);
+
+        if (completion == null || !completion.TrySetException(new TimeoutException()))
+            return;
+
+        this.Finish(completion);
+    }
+
+    public void OnSourceCompleted()
+    {
+        Task source = null;
+        Task completion = null;
+        Monitor.Enter(_gate);
+        source = _source;
+        completion = _completion;
+        Monitor.Exit(_gate);
+
+        if (source == null || completion == null)
+            return;
+
+        Task.TransferCompletion(source, completion);
+        this.Finish(completion);
+    }
+}
+
+private sealed class TaskWaitCancellationState<T>
+{
+    private TaskGate _gate;
+    private Task<T> _source;
+    private Task<T> _completion;
+    private CancellationToken _token;
+    private CancellationTokenRegistration _registration;
+    private TimerQueueRegistration _timerRegistration;
+
+    public TaskWaitCancellationState(Task<T> source, Task<T> completion, CancellationToken token)
+    {
+        _gate = new TaskGate();
+        _source = source;
+        _completion = completion;
+        _token = token;
+        _registration = default;
+        _timerRegistration = default;
+    }
+
+    public bool IsActive
+    {
+        get
+        {
+            Monitor.Enter(_gate);
+            bool active = _completion != null;
+            Monitor.Exit(_gate);
+            return active;
+        }
+    }
+
+    public void SetRegistration(CancellationTokenRegistration registration)
+    {
+        bool dispose = false;
+        Monitor.Enter(_gate);
+        if (_completion == null)
+            dispose = true;
+        else
+            _registration = registration;
+        Monitor.Exit(_gate);
+
+        if (dispose)
+            registration.Dispose();
+    }
+
+    public void SetTimerRegistration(TimerQueueRegistration registration)
+    {
+        bool dispose = false;
+        Monitor.Enter(_gate);
+        if (_completion == null)
+            dispose = true;
+        else
+            _timerRegistration = registration;
+        Monitor.Exit(_gate);
+
+        if (dispose)
+            registration.Dispose();
+    }
+
+    private void Finish(Task<T> completion)
+    {
+        CancellationTokenRegistration cancellationRegistration = default;
+        TimerQueueRegistration timerRegistration = default;
+
+        Monitor.Enter(_gate);
+        if (_completion == completion)
+        {
+            cancellationRegistration = _registration;
+            timerRegistration = _timerRegistration;
+            _source = null;
+            _completion = null;
+            _token = default;
+            _registration = default;
+            _timerRegistration = default;
+        }
+        Monitor.Exit(_gate);
+
+        cancellationRegistration.Dispose();
+        timerRegistration.Dispose();
+    }
+
+    public void OnCancellation()
+    {
+        Task<T> completion = null;
+        CancellationToken token = default;
+
+        Monitor.Enter(_gate);
+        completion = _completion;
+        token = _token;
+        Monitor.Exit(_gate);
+
+        if (completion == null || !completion.TrySetCanceled(token))
+            return;
+
+        this.Finish(completion);
+    }
+
+    public void OnTimeout()
+    {
+        Task<T> completion = null;
+
+        Monitor.Enter(_gate);
+        completion = _completion;
+        Monitor.Exit(_gate);
+
+        if (completion == null || !completion.TrySetException(new TimeoutException()))
+            return;
+
+        this.Finish(completion);
+    }
+
+    public void OnSourceCompleted()
+    {
+        Task<T> source = null;
+        Task<T> completion = null;
+        Monitor.Enter(_gate);
+        source = _source;
+        completion = _completion;
+        Monitor.Exit(_gate);
+
+        if (source == null || completion == null)
+            return;
+
+        Task.TransferCompletion<T>(source, completion);
+        this.Finish(completion);
+    }
+}
+
+public enum TaskStatus
+{
+    Pending,
+    Running,
+    Completed,
+    Faulted,
+    Canceled
+}
+
+public class Task
+{
+    private TaskGate _gate;
+    private TaskStatus _status;
+    private Exception _exception;
+    private CancellationToken _cancellationToken;
+    private List<Action> _continuations;
+    private static Task _completedTask;
+
+    static Task()
+    {
+        _completedTask = new Task();
+        _completedTask.TrySetCompleted();
+    }
+
+    internal Task()
+    {
+        _gate = new TaskGate();
+        _status = TaskStatus.Pending;
+        _exception = null;
+        _cancellationToken = default;
+        _continuations = new List<Action>();
+    }
+
+    public TaskStatus Status
+    {
+        get
+        {
+            Monitor.Enter(_gate);
+            TaskStatus status = _status;
+            Monitor.Exit(_gate);
+            return status;
+        }
+    }
+
+    public bool IsCompleted
+    {
+        get
+        {
+            Monitor.Enter(_gate);
+            bool completed = _status == TaskStatus.Completed ||
+                _status == TaskStatus.Faulted || _status == TaskStatus.Canceled;
+            Monitor.Exit(_gate);
+            return completed;
+        }
+    }
+
+    public bool IsFaulted
+    {
+        get
+        {
+            Monitor.Enter(_gate);
+            bool faulted = _status == TaskStatus.Faulted;
+            Monitor.Exit(_gate);
+            return faulted;
+        }
+    }
+
+    public bool IsCanceled
+    {
+        get
+        {
+            Monitor.Enter(_gate);
+            bool canceled = _status == TaskStatus.Canceled;
+            Monitor.Exit(_gate);
+            return canceled;
+        }
+    }
+
+    public Exception Exception
+    {
+        get
+        {
+            Monitor.Enter(_gate);
+            Exception exception = _exception;
+            Monitor.Exit(_gate);
+            return exception;
+        }
+    }
+
+    public CancellationToken CancellationToken
+    {
+        get
+        {
+            Monitor.Enter(_gate);
+            CancellationToken token = _cancellationToken;
+            Monitor.Exit(_gate);
+            return token;
+        }
+    }
+
+    private bool IsTerminal()
+    {
+        return _status == TaskStatus.Completed ||
+            _status == TaskStatus.Faulted || _status == TaskStatus.Canceled;
+    }
+
+    internal bool TrySetRunning()
+    {
+        Monitor.Enter(_gate);
+        if (_status != TaskStatus.Pending)
+        {
+            Monitor.Exit(_gate);
+            return false;
+        }
+
+        _status = TaskStatus.Running;
+        Monitor.Exit(_gate);
+        return true;
+    }
+
+    private void QueueContinuations(List<Action> continuations)
+    {
+        for (int i = 0; i < continuations.Count; i++)
+            ThreadPool.QueueTaskContinuation(continuations[i]);
+    }
+
+    private bool TryTransitionTerminal(
+        TaskStatus status,
+        Exception exception,
+        CancellationToken cancellationToken,
+        bool pendingOnly)
+    {
+        List<Action> continuations = null;
+
+        Monitor.Enter(_gate);
+        if ((pendingOnly && _status != TaskStatus.Pending) || (!pendingOnly && this.IsTerminal()))
+        {
+            Monitor.Exit(_gate);
+            return false;
+        }
+
+        _exception = exception;
+        _cancellationToken = cancellationToken;
+        _status = status;
+        continuations = _continuations;
+        _continuations = new List<Action>();
+        Monitor.PulseAll(_gate);
+        Monitor.Exit(_gate);
+
+        this.QueueContinuations(continuations);
+        return true;
+    }
+
+    internal bool TrySetCompleted()
+    {
+        return this.TryTransitionTerminal(TaskStatus.Completed, null, default, false);
+    }
+
+    internal bool TrySetException(Exception exception)
+    {
+        if (exception == null)
+            Runtime.Fail("task exception cannot be null");
+
+        return this.TryTransitionTerminal(TaskStatus.Faulted, exception, default, false);
+    }
+
+    internal bool TrySetCanceled(CancellationToken cancellationToken)
+    {
+        return this.TryTransitionTerminal(TaskStatus.Canceled, null, cancellationToken, false);
+    }
+
+    internal bool TrySetCanceledIfPending(CancellationToken cancellationToken)
+    {
+        return this.TryTransitionTerminal(TaskStatus.Canceled, null, cancellationToken, true);
+    }
+
+    private void RegisterContinuation(Action workItem)
+    {
+        Monitor.Enter(_gate);
+        if (!this.IsTerminal())
+        {
+            _continuations.Add(workItem);
+            Monitor.Exit(_gate);
+            return;
+        }
+        Monitor.Exit(_gate);
+
+        ThreadPool.QueueUserWorkItem(workItem);
+    }
+
+    internal void RegisterAwaitContinuation(Action continuation)
+    {
+        if (continuation == null)
+            Runtime.Fail("task await continuation cannot be null");
+        this.RegisterContinuation(continuation);
+    }
+
+    public TaskAwaiter GetAwaiter()
+    {
+        return new TaskAwaiter(this);
+    }
+
+    public Task WaitAsync(CancellationToken cancellationToken)
+    {
+        if (this.IsCompleted || !cancellationToken.CanBeCanceled)
+            return this;
+
+        if (cancellationToken.IsCancellationRequested)
+            return Task.FromCanceled(cancellationToken);
+
+        Task completion = new Task();
+        TaskWaitCancellationState state = new TaskWaitCancellationState(this, completion, cancellationToken);
+        CancellationTokenRegistration registration = cancellationToken.Register(() => state.OnCancellation());
+        state.SetRegistration(registration);
+
+        if (state.IsActive)
+            this.RegisterAwaitContinuation(() => state.OnSourceCompleted());
+
+        return completion;
+    }
+
+    public Task WaitAsync(int millisecondsTimeout)
+    {
+        return this.WaitAsync(millisecondsTimeout, default);
+    }
+
+    public Task WaitAsync(int millisecondsTimeout, CancellationToken cancellationToken)
+    {
+        if (millisecondsTimeout < Timeout.Infinite)
+            Runtime.Fail("task wait timeout must be -1 or non-negative");
+
+        if (this.IsCompleted)
+            return this;
+
+        if (cancellationToken.IsCancellationRequested)
+            return Task.FromCanceled(cancellationToken);
+
+        if (millisecondsTimeout == Timeout.Infinite)
+            return this.WaitAsync(cancellationToken);
+
+        if (millisecondsTimeout == 0)
+            return Task.FromException(new TimeoutException());
+
+        Task completion = new Task();
+        TaskWaitCancellationState state = new TaskWaitCancellationState(this, completion, cancellationToken);
+
+        if (cancellationToken.CanBeCanceled)
+        {
+            CancellationTokenRegistration cancellationRegistration = cancellationToken.Register(() => state.OnCancellation());
+            state.SetRegistration(cancellationRegistration);
+        }
+
+        if (state.IsActive)
+        {
+            TimerQueueRegistration timerRegistration = TimerQueue.Register(millisecondsTimeout, () => state.OnTimeout());
+            state.SetTimerRegistration(timerRegistration);
+        }
+
+        if (state.IsActive)
+            this.RegisterAwaitContinuation(() => state.OnSourceCompleted());
+
+        return completion;
+    }
+
+    public Task ContinueWith(Action<Task> continuationAction)
+    {
+        if (continuationAction == null)
+            Runtime.Fail("task continuation action cannot be null");
+
+        Task antecedent = this;
+        Task continuationTask = new Task();
+        Action workItem = () =>
+        {
+            if (!continuationTask.TrySetRunning())
+                return;
+
+            try
+            {
+                continuationAction(antecedent);
+                continuationTask.TrySetCompleted();
+            }
+            catch (Exception error)
+            {
+                continuationTask.TrySetException(error);
+            }
+        };
+
+        this.RegisterContinuation(workItem);
+        return continuationTask;
+    }
+
+    public Task<TResult> ContinueWith<TResult>(Func<Task, TResult> continuationFunction)
+    {
+        if (continuationFunction == null)
+            Runtime.Fail("task continuation function cannot be null");
+
+        Task antecedent = this;
+        Task<TResult> continuationTask = new Task<TResult>();
+        Action workItem = () =>
+        {
+            if (!continuationTask.TrySetRunning())
+                return;
+
+            try
+            {
+                TResult result = continuationFunction(antecedent);
+                continuationTask.TrySetResult(result);
+            }
+            catch (Exception error)
+            {
+                continuationTask.TrySetException(error);
+            }
+        };
+
+        this.RegisterContinuation(workItem);
+        return continuationTask;
+    }
+
+    private void ThrowForTerminalOutcome(TaskStatus status, Exception exception, CancellationToken cancellationToken)
+    {
+        if (status == TaskStatus.Faulted)
+            throw exception;
+        if (status == TaskStatus.Canceled)
+            throw new OperationCanceledException(cancellationToken);
+    }
+
+    public void Wait()
+    {
+        Monitor.Enter(_gate);
+        while (!this.IsTerminal())
+            Monitor.Wait(_gate);
+
+        TaskStatus status = _status;
+        Exception exception = _exception;
+        CancellationToken cancellationToken = _cancellationToken;
+        Monitor.Exit(_gate);
+
+        this.ThrowForTerminalOutcome(status, exception, cancellationToken);
+    }
+
+    public bool Wait(int millisecondsTimeout)
+    {
+        if (millisecondsTimeout < Timeout.Infinite)
+            Runtime.Fail("task wait timeout must be -1 or non-negative");
+
+        Monitor.Enter(_gate);
+        if (!this.IsTerminal())
+        {
+            if (millisecondsTimeout == 0)
+            {
+                Monitor.Exit(_gate);
+                return false;
+            }
+
+            if (millisecondsTimeout == Timeout.Infinite)
+            {
+                while (!this.IsTerminal())
+                    Monitor.Wait(_gate);
+            }
+            else
+            {
+                bool signaled = Monitor.Wait(_gate, millisecondsTimeout);
+                if (!signaled && !this.IsTerminal())
+                {
+                    Monitor.Exit(_gate);
+                    return false;
+                }
+            }
+        }
+
+        TaskStatus status = _status;
+        Exception exception = _exception;
+        CancellationToken cancellationToken = _cancellationToken;
+        Monitor.Exit(_gate);
+
+        this.ThrowForTerminalOutcome(status, exception, cancellationToken);
+        return true;
+    }
+
+    public static Task CompletedTask
+    {
+        get { return _completedTask; }
+    }
+
+    public static Task Delay(int millisecondsDelay)
+    {
+        if (millisecondsDelay < Timeout.Infinite)
+            Runtime.Fail("task delay must be -1 or non-negative");
+
+        if (millisecondsDelay == 0)
+            return Task.CompletedTask;
+
+        Task task = new Task();
+        if (millisecondsDelay == Timeout.Infinite)
+            return task;
+
+        Action completion = () =>
+        {
+            task.TrySetCompleted();
+        };
+        TimerQueue.Register(millisecondsDelay, completion);
+        return task;
+    }
+
+    public static Task Delay(int millisecondsDelay, CancellationToken cancellationToken)
+    {
+        if (millisecondsDelay < Timeout.Infinite)
+            Runtime.Fail("task delay must be -1 or non-negative");
+
+        if (cancellationToken.IsCancellationRequested)
+            return Task.FromCanceled(cancellationToken);
+
+        if (millisecondsDelay == 0)
+            return Task.CompletedTask;
+
+        if (!cancellationToken.CanBeCanceled)
+            return Task.Delay(millisecondsDelay);
+
+        Task task = new Task();
+        TimerQueueRegistration timerRegistration = default;
+        CancellationTokenRegistration cancellationRegistration = default;
+
+        Action cancellation = () =>
+        {
+            if (task.TrySetCanceled(cancellationToken))
+                timerRegistration.Dispose();
+        };
+        cancellationRegistration = cancellationToken.Register(cancellation);
+
+        if (task.IsCompleted || millisecondsDelay == Timeout.Infinite)
+            return task;
+
+        Action completion = () =>
+        {
+            if (task.TrySetCompleted())
+                cancellationRegistration.Dispose();
+        };
+        timerRegistration = TimerQueue.Register(millisecondsDelay, completion);
+
+        if (task.IsCompleted)
+            timerRegistration.Dispose();
+
+        return task;
+    }
+
+    public static Task<T> FromResult<T>(T result)
+    {
+        Task<T> task = new Task<T>();
+        task.TrySetResult(result);
+        return task;
+    }
+
+    public static Task FromException(Exception exception)
+    {
+        if (exception == null)
+            Runtime.Fail("task exception cannot be null");
+
+        Task task = new Task();
+        task.TrySetException(exception);
+        return task;
+    }
+
+    public static Task<T> FromException<T>(Exception exception)
+    {
+        if (exception == null)
+            Runtime.Fail("task exception cannot be null");
+
+        Task<T> task = new Task<T>();
+        task.TrySetException(exception);
+        return task;
+    }
+
+    public static Task FromCanceled(CancellationToken cancellationToken)
+    {
+        if (!cancellationToken.IsCancellationRequested)
+            Runtime.Fail("task canceled token must already be canceled");
+
+        Task task = new Task();
+        task.TrySetCanceled(cancellationToken);
+        return task;
+    }
+
+    public static Task<T> FromCanceled<T>(CancellationToken cancellationToken)
+    {
+        if (!cancellationToken.IsCancellationRequested)
+            Runtime.Fail("task canceled token must already be canceled");
+
+        Task<T> task = new Task<T>();
+        task.TrySetCanceled(cancellationToken);
+        return task;
+    }
+
+    private static void CompleteWhenAll(Task[] tasks, Task completion)
+    {
+        for (int i = 0; i < tasks.Length; i++)
+        {
+            if (tasks[i].Status == TaskStatus.Faulted)
+            {
+                completion.TrySetException(tasks[i].Exception);
+                return;
+            }
+        }
+
+        for (int i = 0; i < tasks.Length; i++)
+        {
+            if (tasks[i].Status == TaskStatus.Canceled)
+            {
+                completion.TrySetCanceled(tasks[i].CancellationToken);
+                return;
+            }
+        }
+
+        completion.TrySetCompleted();
+    }
+
+    private static void CompleteWhenAll<T>(Task<T>[] tasks, Task<T[]> completion)
+    {
+        for (int i = 0; i < tasks.Length; i++)
+        {
+            if (tasks[i].Status == TaskStatus.Faulted)
+            {
+                completion.TrySetException(tasks[i].Exception);
+                return;
+            }
+        }
+
+        for (int i = 0; i < tasks.Length; i++)
+        {
+            if (tasks[i].Status == TaskStatus.Canceled)
+            {
+                completion.TrySetCanceled(tasks[i].CancellationToken);
+                return;
+            }
+        }
+
+        T[] results = new T[tasks.Length];
+        for (int i = 0; i < tasks.Length; i++)
+            results[i] = tasks[i].GetCompletedResult();
+        completion.TrySetResult(results);
+    }
+
+    public static Task WhenAll(params Task[] tasks)
+    {
+        if (tasks == null)
+            Runtime.Fail("task when-all tasks cannot be null");
+
+        int taskCount = tasks.Length;
+        bool allCompleted = true;
+        Task[] capturedTasks = new Task[taskCount];
+        for (int i = 0; i < taskCount; i++)
+        {
+            if (tasks[i] == null)
+                Runtime.Fail("task when-all task cannot be null");
+            capturedTasks[i] = tasks[i];
+            if (!capturedTasks[i].IsCompleted)
+                allCompleted = false;
+        }
+
+        if (taskCount == 0)
+            return Task.CompletedTask;
+
+        Task completion = new Task();
+        if (allCompleted)
+        {
+            Task.CompleteWhenAll(capturedTasks, completion);
+            return completion;
+        }
+
+        TaskGate gate = new TaskGate();
+        int remaining = taskCount;
+        Action completed = () =>
+        {
+            bool finalize = false;
+            Monitor.Enter(gate);
+            remaining--;
+            if (remaining == 0)
+                finalize = true;
+            Monitor.Exit(gate);
+
+            if (finalize)
+                Task.CompleteWhenAll(capturedTasks, completion);
+        };
+
+        for (int i = 0; i < taskCount; i++)
+            capturedTasks[i].RegisterAwaitContinuation(completed);
+
+        return completion;
+    }
+
+    public static Task<T[]> WhenAll<T>(params Task<T>[] tasks)
+    {
+        if (tasks == null)
+            Runtime.Fail("task when-all tasks cannot be null");
+
+        int taskCount = tasks.Length;
+        bool allCompleted = true;
+        Task<T>[] capturedTasks = new Task<T>[taskCount];
+        for (int i = 0; i < taskCount; i++)
+        {
+            if (tasks[i] == null)
+                Runtime.Fail("task when-all task cannot be null");
+            capturedTasks[i] = tasks[i];
+            if (!capturedTasks[i].IsCompleted)
+                allCompleted = false;
+        }
+
+        if (taskCount == 0)
+            return Task.FromResult<T[]>(new T[0]);
+
+        Task<T[]> completion = new Task<T[]>();
+        if (allCompleted)
+        {
+            Task.CompleteWhenAll<T>(capturedTasks, completion);
+            return completion;
+        }
+
+        TaskGate gate = new TaskGate();
+        int remaining = taskCount;
+        Action completed = () =>
+        {
+            bool finalize = false;
+            Monitor.Enter(gate);
+            remaining--;
+            if (remaining == 0)
+                finalize = true;
+            Monitor.Exit(gate);
+
+            if (finalize)
+                Task.CompleteWhenAll<T>(capturedTasks, completion);
+        };
+
+        for (int i = 0; i < taskCount; i++)
+            capturedTasks[i].RegisterAwaitContinuation(completed);
+
+        return completion;
+    }
+
+    private static void RegisterWhenAny(Task candidate, Task<Task> completion)
+    {
+        Action completed = () =>
+        {
+            completion.TrySetResult(candidate);
+        };
+        candidate.RegisterAwaitContinuation(completed);
+    }
+
+    private static void RegisterWhenAny<T>(Task<T> candidate, Task<Task<T>> completion)
+    {
+        Action completed = () =>
+        {
+            completion.TrySetResult(candidate);
+        };
+        candidate.RegisterAwaitContinuation(completed);
+    }
+
+    public static Task<Task> WhenAny(params Task[] tasks)
+    {
+        if (tasks == null)
+            Runtime.Fail("task when-any tasks cannot be null");
+
+        int taskCount = tasks.Length;
+        if (taskCount == 0)
+            Runtime.Fail("task when-any requires at least one task");
+
+        Task[] capturedTasks = new Task[taskCount];
+        for (int i = 0; i < taskCount; i++)
+        {
+            if (tasks[i] == null)
+                Runtime.Fail("task when-any task cannot be null");
+            capturedTasks[i] = tasks[i];
+        }
+
+        for (int i = 0; i < taskCount; i++)
+        {
+            if (capturedTasks[i].IsCompleted)
+                return Task.FromResult<Task>(capturedTasks[i]);
+        }
+
+        Task<Task> completion = new Task<Task>();
+        for (int i = 0; i < taskCount; i++)
+            Task.RegisterWhenAny(capturedTasks[i], completion);
+
+        return completion;
+    }
+
+    public static Task<Task<T>> WhenAny<T>(params Task<T>[] tasks)
+    {
+        if (tasks == null)
+            Runtime.Fail("task when-any tasks cannot be null");
+
+        int taskCount = tasks.Length;
+        if (taskCount == 0)
+            Runtime.Fail("task when-any requires at least one task");
+
+        Task<T>[] capturedTasks = new Task<T>[taskCount];
+        for (int i = 0; i < taskCount; i++)
+        {
+            if (tasks[i] == null)
+                Runtime.Fail("task when-any task cannot be null");
+            capturedTasks[i] = tasks[i];
+        }
+
+        for (int i = 0; i < taskCount; i++)
+        {
+            if (capturedTasks[i].IsCompleted)
+                return Task.FromResult<Task<T>>(capturedTasks[i]);
+        }
+
+        Task<Task<T>> completion = new Task<Task<T>>();
+        for (int i = 0; i < taskCount; i++)
+            Task.RegisterWhenAny<T>(capturedTasks[i], completion);
+
+        return completion;
+    }
+
+    internal static void TransferCompletion(Task source, Task destination)
+    {
+        TaskStatus status = source.Status;
+        if (status == TaskStatus.Completed)
+        {
+            destination.TrySetCompleted();
+            return;
+        }
+        if (status == TaskStatus.Faulted)
+        {
+            destination.TrySetException(source.Exception);
+            return;
+        }
+        if (status == TaskStatus.Canceled)
+        {
+            destination.TrySetCanceled(source.CancellationToken);
+            return;
+        }
+
+        destination.TrySetException(new Exception("task completion transfer requires a terminal source"));
+    }
+
+    internal static void TransferCompletion<T>(Task<T> source, Task<T> destination)
+    {
+        TaskStatus status = source.Status;
+        if (status == TaskStatus.Completed)
+        {
+            destination.TrySetResult(source.GetCompletedResult());
+            return;
+        }
+        if (status == TaskStatus.Faulted)
+        {
+            destination.TrySetException(source.Exception);
+            return;
+        }
+        if (status == TaskStatus.Canceled)
+        {
+            destination.TrySetCanceled(source.CancellationToken);
+            return;
+        }
+
+        destination.TrySetException(new Exception("task completion transfer requires a terminal source"));
+    }
+
+    private static Task RunAsync(Func<Task> function, CancellationToken cancellationToken, bool observeCancellation)
+    {
+        if (function == null)
+            Runtime.Fail("task async function cannot be null");
+
+        Task task = new Task();
+        if (observeCancellation && cancellationToken.IsCancellationRequested)
+        {
+            task.TrySetCanceled(cancellationToken);
+            return task;
+        }
+
+        CancellationTokenRegistration registration = default;
+        if (observeCancellation)
+        {
+            Action cancellation = () => task.TrySetCanceledIfPending(cancellationToken);
+            registration = cancellationToken.Register(cancellation);
+        }
+
+        Action workItem = () =>
+        {
+            if (!task.TrySetRunning())
+            {
+                if (observeCancellation)
+                    registration.Dispose();
+                return;
+            }
+
+            if (observeCancellation)
+                registration.Dispose();
+
+            Task innerTask = null;
+            try
+            {
+                innerTask = function();
+            }
+            catch (Exception error)
+            {
+                task.TrySetException(error);
+                return;
+            }
+
+            if (innerTask == null)
+            {
+                task.TrySetException(new Exception("task async function returned null"));
+                return;
+            }
+
+            Task completedInner = innerTask;
+            Action completion = () => Task.TransferCompletion(completedInner, task);
+            completedInner.RegisterContinuation(completion);
+        };
+
+        ThreadPool.QueueUserWorkItem(workItem);
+        return task;
+    }
+
+    private static Task<T> RunAsync<T>(Func<Task<T>> function, CancellationToken cancellationToken, bool observeCancellation)
+    {
+        if (function == null)
+            Runtime.Fail("task async function cannot be null");
+
+        Task<T> task = new Task<T>();
+        if (observeCancellation && cancellationToken.IsCancellationRequested)
+        {
+            task.TrySetCanceled(cancellationToken);
+            return task;
+        }
+
+        CancellationTokenRegistration registration = default;
+        if (observeCancellation)
+        {
+            Action cancellation = () => task.TrySetCanceledIfPending(cancellationToken);
+            registration = cancellationToken.Register(cancellation);
+        }
+
+        Action workItem = () =>
+        {
+            if (!task.TrySetRunning())
+            {
+                if (observeCancellation)
+                    registration.Dispose();
+                return;
+            }
+
+            if (observeCancellation)
+                registration.Dispose();
+
+            Task<T> innerTask = null;
+            try
+            {
+                innerTask = function();
+            }
+            catch (Exception error)
+            {
+                task.TrySetException(error);
+                return;
+            }
+
+            if (innerTask == null)
+            {
+                task.TrySetException(new Exception("task async function returned null"));
+                return;
+            }
+
+            Task<T> completedInner = innerTask;
+            Action completion = () => Task.TransferCompletion<T>(completedInner, task);
+            completedInner.RegisterAwaitContinuation(completion);
+        };
+
+        ThreadPool.QueueUserWorkItem(workItem);
+        return task;
+    }
+
+    public static Task Run(Func<Task> function)
+    {
+        return Task.RunAsync(function, default, false);
+    }
+
+    public static Task<T> Run<T>(Func<Task<T>> function)
+    {
+        return Task.RunAsync<T>(function, default, false);
+    }
+
+    public static Task Run(Func<Task> function, CancellationToken cancellationToken)
+    {
+        return Task.RunAsync(function, cancellationToken, true);
+    }
+
+    public static Task<T> Run<T>(Func<Task<T>> function, CancellationToken cancellationToken)
+    {
+        return Task.RunAsync<T>(function, cancellationToken, true);
+    }
+
+    public static YieldAwaitable Yield()
+    {
+        return default;
+    }
+
+    public static Task Run(Action action)
+    {
+        if (action == null)
+            Runtime.Fail("task action cannot be null");
+
+        Task task = new Task();
+        Action workItem = () =>
+        {
+            if (!task.TrySetRunning())
+                return;
+
+            try
+            {
+                action();
+                task.TrySetCompleted();
+            }
+            catch (Exception error)
+            {
+                task.TrySetException(error);
+            }
+        };
+
+        ThreadPool.QueueUserWorkItem(workItem);
+        return task;
+    }
+
+    public static Task<T> Run<T>(Func<T> function)
+    {
+        if (function == null)
+            Runtime.Fail("task function cannot be null");
+
+        Task<T> task = new Task<T>();
+        Action workItem = () =>
+        {
+            if (!task.TrySetRunning())
+                return;
+
+            try
+            {
+                T result = function();
+                task.TrySetResult(result);
+            }
+            catch (Exception error)
+            {
+                task.TrySetException(error);
+            }
+        };
+
+        ThreadPool.QueueUserWorkItem(workItem);
+        return task;
+    }
+    public static Task Run(Action action, CancellationToken cancellationToken)
+    {
+        if (action == null)
+            Runtime.Fail("task action cannot be null");
+
+        Task task = new Task();
+        if (cancellationToken.IsCancellationRequested)
+        {
+            task.TrySetCanceled(cancellationToken);
+            return task;
+        }
+
+        CancellationTokenRegistration registration = default;
+        Action cancellation = () => task.TrySetCanceledIfPending(cancellationToken);
+        registration = cancellationToken.Register(cancellation);
+
+        Action workItem = () =>
+        {
+            if (!task.TrySetRunning())
+            {
+                registration.Dispose();
+                return;
+            }
+
+            registration.Dispose();
+            try
+            {
+                action();
+                task.TrySetCompleted();
+            }
+            catch (OperationCanceledException error)
+            {
+                CancellationToken errorToken = error.CancellationToken;
+                if (cancellationToken.IsCancellationRequested && errorToken.IsSameSource(cancellationToken))
+                    task.TrySetCanceled(cancellationToken);
+                else
+                    task.TrySetException(error);
+            }
+            catch (Exception error)
+            {
+                task.TrySetException(error);
+            }
+        };
+
+        ThreadPool.QueueUserWorkItem(workItem);
+        return task;
+    }
+
+    public static Task<T> Run<T>(Func<T> function, CancellationToken cancellationToken)
+    {
+        if (function == null)
+            Runtime.Fail("task function cannot be null");
+
+        Task<T> task = new Task<T>();
+        if (cancellationToken.IsCancellationRequested)
+        {
+            task.TrySetCanceled(cancellationToken);
+            return task;
+        }
+
+        CancellationTokenRegistration registration = default;
+        Action cancellation = () => task.TrySetCanceledIfPending(cancellationToken);
+        registration = cancellationToken.Register(cancellation);
+
+        Action workItem = () =>
+        {
+            if (!task.TrySetRunning())
+            {
+                registration.Dispose();
+                return;
+            }
+
+            registration.Dispose();
+            try
+            {
+                T result = function();
+                task.TrySetResult(result);
+            }
+            catch (OperationCanceledException error)
+            {
+                CancellationToken errorToken = error.CancellationToken;
+                if (cancellationToken.IsCancellationRequested && errorToken.IsSameSource(cancellationToken))
+                    task.TrySetCanceled(cancellationToken);
+                else
+                    task.TrySetException(error);
+            }
+            catch (Exception error)
+            {
+                task.TrySetException(error);
+            }
+        };
+
+        ThreadPool.QueueUserWorkItem(workItem);
+        return task;
+    }
+
+}
+
+private sealed class TaskResultGate
+{
+}
+
+public class Task<T> : Task
+{
+    private TaskResultGate _resultGate;
+    private T _result;
+
+    internal Task() : base()
+    {
+        _resultGate = new TaskResultGate();
+        _result = default(T);
+    }
+
+    public T Result
+    {
+        get
+        {
+            this.Wait();
+
+            Monitor.Enter(_resultGate);
+            T result = _result;
+            Monitor.Exit(_resultGate);
+            return result;
+        }
+    }
+
+    internal bool TrySetResult(T result)
+    {
+        Monitor.Enter(_resultGate);
+        T previous = _result;
+        _result = result;
+        if (!this.TrySetCompleted())
+        {
+            _result = previous;
+            Monitor.Exit(_resultGate);
+            return false;
+        }
+
+        Monitor.Exit(_resultGate);
+        return true;
+    }
+
+    internal T GetCompletedResult()
+    {
+        Monitor.Enter(_resultGate);
+        T result = _result;
+        Monitor.Exit(_resultGate);
+        return result;
+    }
+
+    public TaskAwaiter<T> GetAwaiter()
+    {
+        return new TaskAwaiter<T>(this);
+    }
+
+    public Task<T> WaitAsync(CancellationToken cancellationToken)
+    {
+        if (this.IsCompleted || !cancellationToken.CanBeCanceled)
+            return this;
+
+        if (cancellationToken.IsCancellationRequested)
+            return Task.FromCanceled<T>(cancellationToken);
+
+        Task<T> completion = new Task<T>();
+        TaskWaitCancellationState<T> state = new TaskWaitCancellationState<T>(this, completion, cancellationToken);
+        CancellationTokenRegistration registration = cancellationToken.Register(() => state.OnCancellation());
+        state.SetRegistration(registration);
+
+        if (state.IsActive)
+            this.RegisterAwaitContinuation(() => state.OnSourceCompleted());
+
+        return completion;
+    }
+
+    public Task<T> WaitAsync(int millisecondsTimeout)
+    {
+        return this.WaitAsync(millisecondsTimeout, default);
+    }
+
+    public Task<T> WaitAsync(int millisecondsTimeout, CancellationToken cancellationToken)
+    {
+        if (millisecondsTimeout < Timeout.Infinite)
+            Runtime.Fail("task wait timeout must be -1 or non-negative");
+
+        if (this.IsCompleted)
+            return this;
+
+        if (cancellationToken.IsCancellationRequested)
+            return Task.FromCanceled<T>(cancellationToken);
+
+        if (millisecondsTimeout == Timeout.Infinite)
+            return this.WaitAsync(cancellationToken);
+
+        if (millisecondsTimeout == 0)
+            return Task.FromException<T>(new TimeoutException());
+
+        Task<T> completion = new Task<T>();
+        TaskWaitCancellationState<T> state = new TaskWaitCancellationState<T>(this, completion, cancellationToken);
+
+        if (cancellationToken.CanBeCanceled)
+        {
+            CancellationTokenRegistration cancellationRegistration = cancellationToken.Register(() => state.OnCancellation());
+            state.SetRegistration(cancellationRegistration);
+        }
+
+        if (state.IsActive)
+        {
+            TimerQueueRegistration timerRegistration = TimerQueue.Register(millisecondsTimeout, () => state.OnTimeout());
+            state.SetTimerRegistration(timerRegistration);
+        }
+
+        if (state.IsActive)
+            this.RegisterAwaitContinuation(() => state.OnSourceCompleted());
+
+        return completion;
+    }
+
+    public Task ContinueWith(Action<Task<T>> continuationAction)
+    {
+        if (continuationAction == null)
+            Runtime.Fail("task continuation action cannot be null");
+
+        Task<T> antecedent = this;
+        Action<Task> adapter = ignored => continuationAction(antecedent);
+        return base.ContinueWith(adapter);
+    }
+
+    public Task<TResult> ContinueWith<TResult>(Func<Task<T>, TResult> continuationFunction)
+    {
+        if (continuationFunction == null)
+            Runtime.Fail("task continuation function cannot be null");
+
+        Task<T> antecedent = this;
+        Func<Task, TResult> adapter = ignored => continuationFunction(antecedent);
+        return base.ContinueWith<TResult>(adapter);
+    }
+}
+
+public readonly struct ValueTask
+{
+    private readonly Task _task;
+
+    public ValueTask(Task task)
+    {
+        if (task == null)
+            Runtime.Fail("value task backing task cannot be null");
+        _task = task;
+    }
+
+    public bool IsCompleted => _task == null || _task.IsCompleted;
+
+    public ValueTaskAwaiter GetAwaiter()
+    {
+        return new ValueTaskAwaiter(_task);
+    }
+}
+
+public readonly struct ValueTaskAwaiter
+{
+    private readonly Task _task;
+
+    internal ValueTaskAwaiter(Task task)
+    {
+        _task = task;
+    }
+
+    public bool IsCompleted => _task == null || _task.IsCompleted;
+
+    public void OnCompleted(Action continuation)
+    {
+        if (continuation == null)
+            Runtime.Fail("value task await continuation cannot be null");
+
+        if (_task == null)
+        {
+            ThreadPool.QueueTaskContinuation(continuation);
+            return;
+        }
+
+        _task.RegisterAwaitContinuation(continuation);
+    }
+
+    public void GetResult()
+    {
+        if (_task != null)
+            _task.Wait();
+    }
+}
+
+public readonly struct ValueTask<T>
+{
+    private readonly T _result;
+    private readonly Task<T> _task;
+
+    public ValueTask(T result)
+    {
+        _result = result;
+        _task = null;
+    }
+
+    public ValueTask(Task<T> task)
+    {
+        if (task == null)
+            Runtime.Fail("value task backing task cannot be null");
+        _result = default(T);
+        _task = task;
+    }
+
+    public bool IsCompleted => _task == null || _task.IsCompleted;
+
+    public ValueTaskAwaiter<T> GetAwaiter()
+    {
+        return new ValueTaskAwaiter<T>(_result, _task);
+    }
+}
+
+public readonly struct ValueTaskAwaiter<T>
+{
+    private readonly T _result;
+    private readonly Task<T> _task;
+
+    internal ValueTaskAwaiter(T result, Task<T> task)
+    {
+        _result = result;
+        _task = task;
+    }
+
+    public bool IsCompleted => _task == null || _task.IsCompleted;
+
+    public void OnCompleted(Action continuation)
+    {
+        if (continuation == null)
+            Runtime.Fail("value task await continuation cannot be null");
+
+        if (_task == null)
+        {
+            ThreadPool.QueueTaskContinuation(continuation);
+            return;
+        }
+
+        _task.RegisterAwaitContinuation(continuation);
+    }
+
+    public T GetResult()
+    {
+        if (_task != null)
+            return _task.Result;
+        return _result;
+    }
+}
+
+public readonly struct YieldAwaitable
+{
+    public YieldAwaiter GetAwaiter()
+    {
+        return default;
+    }
+}
+
+public readonly struct YieldAwaiter
+{
+    public bool IsCompleted => false;
+
+    public void OnCompleted(Action continuation)
+    {
+        if (continuation == null)
+            Runtime.Fail("yield continuation cannot be null");
+        ThreadPool.QueueTaskContinuation(continuation);
+    }
+
+    public void GetResult()
+    {
+    }
+}
+
+public readonly struct TaskAwaiter
+{
+    private readonly Task _task;
+
+    internal TaskAwaiter(Task task)
+    {
+        _task = task;
+    }
+
+    public bool IsCompleted => _task.IsCompleted;
+
+    public void OnCompleted(Action continuation)
+    {
+        _task.RegisterAwaitContinuation(continuation);
+    }
+
+    public void GetResult()
+    {
+        _task.Wait();
+    }
+}
+
+public readonly struct TaskAwaiter<T>
+{
+    private readonly Task<T> _task;
+
+    internal TaskAwaiter(Task<T> task)
+    {
+        _task = task;
+    }
+
+    public bool IsCompleted => _task.IsCompleted;
+
+    public void OnCompleted(Action continuation)
+    {
+        _task.RegisterAwaitContinuation(continuation);
+    }
+
+    public T GetResult()
+    {
+        return _task.Result;
+    }
+}
+
+public sealed class TaskCompletionSource
+{
+    private Task _task;
+
+    public TaskCompletionSource()
+    {
+        _task = new Task();
+    }
+
+    public Task Task => _task;
+
+    public bool TrySetResult()
+    {
+        return _task.TrySetCompleted();
+    }
+
+    public void SetResult()
+    {
+        if (!this.TrySetResult())
+            Runtime.Fail("task completion source has already completed");
+    }
+
+    public bool TrySetException(Exception exception)
+    {
+        return _task.TrySetException(exception);
+    }
+
+    public void SetException(Exception exception)
+    {
+        if (!this.TrySetException(exception))
+            Runtime.Fail("task completion source has already completed");
+    }
+
+    public bool TrySetCanceled()
+    {
+        return _task.TrySetCanceled(default);
+    }
+
+    public bool TrySetCanceled(CancellationToken cancellationToken)
+    {
+        return _task.TrySetCanceled(cancellationToken);
+    }
+
+    public void SetCanceled()
+    {
+        if (!this.TrySetCanceled())
+            Runtime.Fail("task completion source has already completed");
+    }
+
+    public void SetCanceled(CancellationToken cancellationToken)
+    {
+        if (!this.TrySetCanceled(cancellationToken))
+            Runtime.Fail("task completion source has already completed");
+    }
+}
+
+public sealed class TaskCompletionSource<T>
+{
+    private Task<T> _task;
+
+    public TaskCompletionSource()
+    {
+        _task = new Task<T>();
+    }
+
+    public Task<T> Task => _task;
+
+    public bool TrySetResult(T result)
+    {
+        return _task.TrySetResult(result);
+    }
+
+    public void SetResult(T result)
+    {
+        if (!this.TrySetResult(result))
+            Runtime.Fail("task completion source has already completed");
+    }
+
+    public bool TrySetException(Exception exception)
+    {
+        return _task.TrySetException(exception);
+    }
+
+    public void SetException(Exception exception)
+    {
+        if (!this.TrySetException(exception))
+            Runtime.Fail("task completion source has already completed");
+    }
+
+    public bool TrySetCanceled()
+    {
+        return _task.TrySetCanceled(default);
+    }
+
+    public bool TrySetCanceled(CancellationToken cancellationToken)
+    {
+        return _task.TrySetCanceled(cancellationToken);
+    }
+
+    public void SetCanceled()
+    {
+        if (!this.TrySetCanceled())
+            Runtime.Fail("task completion source has already completed");
+    }
+
+    public void SetCanceled(CancellationToken cancellationToken)
+    {
+        if (!this.TrySetCanceled(cancellationToken))
+            Runtime.Fail("task completion source has already completed");
+    }
+}

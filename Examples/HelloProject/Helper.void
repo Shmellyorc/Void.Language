@@ -1,0 +1,5 @@
+namespace Something.Completely.Different;
+
+public static class Helper
+{
+}

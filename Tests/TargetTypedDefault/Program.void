@@ -1,0 +1,223 @@
+using Void;
+
+public enum Mode
+{
+    None = 0,
+    Playing = 1
+}
+
+public interface INode
+{
+    int Read();
+}
+
+public sealed class Node : INode
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+
+    public int Read()
+    {
+        return Value;
+    }
+}
+
+public sealed class Holder
+{
+    public int Value { get; set; }
+    public Node Ref { get; set; }
+    public Node Empty => default;
+
+    public Node EmptyBlock
+    {
+        get => default;
+    }
+}
+
+public delegate int Callback(int value);
+
+public struct Packet
+{
+    public int Count;
+    public Node Owner;
+}
+
+public static class Defaults
+{
+    public const int Zero = default;
+    public const Mode EmptyMode = default;
+}
+
+public static class Program
+{
+    public static T Zero<T>()
+    {
+        return default;
+    }
+
+    public static int ReturnInt()
+    {
+        return default;
+    }
+
+    public static Node ReturnNode()
+    {
+        return default;
+    }
+
+    public static Packet ReturnPacket()
+    {
+        return default;
+    }
+
+    public static int AcceptInt(int value)
+    {
+        return value;
+    }
+
+    public static bool AcceptNode(Node value)
+    {
+        return value == null;
+    }
+
+    public static bool AcceptNullable(int? value)
+    {
+        return !value.HasValue;
+    }
+
+    public static int Optional(int value = default)
+    {
+        return value;
+    }
+
+    public static int ParamsValue(int first, params int[] rest)
+    {
+        int total = first;
+        for (int i = 0; i < rest.Length; i++)
+            total += rest[i];
+        return total;
+    }
+
+    public static bool ParamsArray(params int[] values)
+    {
+        return values == null;
+    }
+
+    public static int Echo(int value)
+    {
+        return value;
+    }
+
+    public static T EchoGeneric<T>(T value)
+    {
+        return value;
+    }
+
+    public static unsafe bool PointerIsNull()
+    {
+        int* value = default;
+        int* casted = (int*)default;
+        return value == null && casted == null;
+    }
+
+    public static unsafe void Main()
+    {
+        bool boolValue = default;
+        int intValue = default;
+        float floatValue = default;
+        char charValue = default;
+        string text = default;
+        object boxed = default;
+        Node node = default;
+        INode interfaceNode = default;
+        Callback callbackValue = default;
+        int[] numbers = default;
+        Mode mode = default;
+        Packet packet = default;
+        int? nullable = default;
+        Type type = default;
+
+        Console.WriteLine(boolValue == false);
+        Console.WriteLine(intValue == 0);
+        Console.WriteLine((int)floatValue == 0);
+        Console.WriteLine((int)charValue == 0);
+        Console.WriteLine(text == null);
+        Console.WriteLine(boxed == null);
+        Console.WriteLine(node == null);
+        Console.WriteLine(interfaceNode == null);
+        Console.WriteLine(callbackValue == null);
+        Console.WriteLine(numbers == null);
+        Console.WriteLine(mode == Mode.None);
+        Console.WriteLine(packet.Count == 0 && packet.Owner == null);
+        Console.WriteLine(!nullable.HasValue);
+        Console.WriteLine(type == null);
+
+        intValue = 17;
+        intValue = default;
+        Console.WriteLine(intValue == 0);
+
+        node = new Node(17);
+        node = default;
+        Console.WriteLine(node == null);
+
+        Holder holder = new Holder();
+        holder.Value = 22;
+        holder.Value = default;
+        holder.Ref = new Node(5);
+        holder.Ref = default;
+        Console.WriteLine(holder.Value == 0);
+        Console.WriteLine(holder.Ref == null);
+        Console.WriteLine(holder.Empty == null);
+        Console.WriteLine(holder.EmptyBlock == null);
+
+        int[] values = new int[1];
+        values[0] = 99;
+        values[0] = default;
+        Console.WriteLine(values[0] == 0);
+
+        Console.WriteLine(ReturnInt() == 0);
+        Console.WriteLine(ReturnNode() == null);
+        Packet returnedPacket = ReturnPacket();
+        Console.WriteLine(returnedPacket.Count == 0 && returnedPacket.Owner == null);
+
+        Console.WriteLine(Zero<int>() == 0);
+        Console.WriteLine(Zero<Mode>() == Mode.None);
+        Console.WriteLine(Zero<Node>() == null);
+        Packet genericPacket = Zero<Packet>();
+        Console.WriteLine(genericPacket.Count == 0 && genericPacket.Owner == null);
+
+        Console.WriteLine(AcceptInt(default) == 0);
+        Console.WriteLine(AcceptInt(value: default) == 0);
+        Console.WriteLine(AcceptNode(default));
+        Console.WriteLine(AcceptNullable(default));
+
+        Node constructed = new Node(default);
+        Node namedConstructed = new Node(value: default);
+        Console.WriteLine(constructed.Value == 0);
+        Console.WriteLine(namedConstructed.Value == 0);
+
+        Callback callback = Echo;
+        Console.WriteLine(callback(default) == 0);
+        Console.WriteLine(EchoGeneric<int>(default) == 0);
+        Console.WriteLine(EchoGeneric<Node>(default) == null);
+
+        Console.WriteLine(Optional() == 0);
+        Console.WriteLine(Optional(default) == 0);
+
+        Console.WriteLine(ParamsValue(5, 1, default, 3) == 9);
+        Console.WriteLine(ParamsArray(default));
+
+        Console.WriteLine(Defaults.Zero == 0);
+        Console.WriteLine(Defaults.EmptyMode == Mode.None);
+
+        Node castedNode = (Node)default;
+        int castedInt = (int)default;
+        Console.WriteLine(castedNode == null);
+        Console.WriteLine(castedInt == 0);
+        Console.WriteLine(PointerIsNull());
+    }
+}

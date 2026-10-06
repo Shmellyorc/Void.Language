@@ -1,0 +1,12 @@
+public class Holder256
+{
+    public int AddOne(int value) { return value + 1; }
+}
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        Holder256 holder = new Holder256();
+        delegate*<int, int> callback = &holder.AddOne;
+    }
+}

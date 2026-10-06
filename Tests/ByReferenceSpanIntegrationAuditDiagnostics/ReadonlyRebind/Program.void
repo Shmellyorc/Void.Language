@@ -1,0 +1,10 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        ReadOnlySpan<int> values = new int[] { 1 };
+        ref int alias = ref values[0];
+        alias = 2;
+    }
+}

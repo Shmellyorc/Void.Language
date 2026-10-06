@@ -1,0 +1,194 @@
+using Void;
+
+public struct Pair239
+{
+    public int A;
+    public int B;
+    public Pair239(int a, int b) { A = a; B = b; }
+}
+
+public sealed class Node239
+{
+    public int Value;
+    public Node239(int value) { Value = value; }
+}
+
+public static class Tracker239
+{
+    public static int SourceCalls;
+    public static int DestinationCalls;
+    public static int[] Source = new int[] { 21, 22, 23 };
+    public static int[] Destination = new int[] { 0, 0, 0 };
+
+    public static Span<int> MakeSource()
+    {
+        SourceCalls++;
+        return Source;
+    }
+
+    public static Span<int> MakeDestination()
+    {
+        DestinationCalls++;
+        return Destination;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        int[] fillValues = new int[] { 1, 2, 3, 4 };
+        Span<int> fill = fillValues;
+        fill.Fill(9);
+        Console.WriteLine(fillValues[0] == 9 && fillValues[3] == 9);
+        fill.Clear();
+        Console.WriteLine(fillValues[0] == 0 && fillValues[3] == 0);
+
+        Span<int> stack = stackalloc int[3];
+        stack.Fill(7);
+        Console.WriteLine(stack[0] == 7 && stack[2] == 7);
+        stack.Clear();
+        Console.WriteLine(stack[0] == 0 && stack[2] == 0);
+
+        int[] sourceValues = new int[] { 1, 2, 3, 4 };
+        int[] destinationValues = new int[] { 9, 9, 9, 9, 99 };
+        Span<int> source = sourceValues;
+        Span<int> destination = destinationValues;
+        source.CopyTo(destination);
+        Console.WriteLine(destinationValues[0] == 1 && destinationValues[3] == 4 && destinationValues[4] == 99);
+
+        int[] readonlyDestinationValues = new int[] { 0, 0, 0, 0 };
+        ReadOnlySpan<int> readonlySource = source;
+        Span<int> readonlyDestination = readonlyDestinationValues;
+        readonlySource.CopyTo(readonlyDestination);
+        Console.WriteLine(readonlyDestinationValues[0] == 1 && readonlyDestinationValues[3] == 4);
+
+        int[] tryValues = new int[] { 0, 0, 0, 0 };
+        Span<int> tryDestination = tryValues;
+        bool copied = source.TryCopyTo(tryDestination);
+        Console.WriteLine(copied && tryValues[0] == 1 && tryValues[3] == 4);
+
+        int[] shortValues = new int[] { 8, 8, 8 };
+        Span<int> shortDestination = shortValues;
+        bool shortCopied = source.TryCopyTo(shortDestination);
+        Console.WriteLine(!shortCopied && shortValues[0] == 8 && shortValues[2] == 8);
+        bool readonlyShortCopied = readonlySource.TryCopyTo(shortDestination);
+        Console.WriteLine(!readonlyShortCopied && shortValues[0] == 8 && shortValues[2] == 8);
+
+        int[] forwardValues = new int[] { 1, 2, 3, 4, 5 };
+        Span<int> forward = forwardValues;
+        forward[0..4].CopyTo(forward[1..5]);
+        Console.WriteLine(forwardValues[0] == 1 && forwardValues[1] == 1 && forwardValues[2] == 2 && forwardValues[3] == 3 && forwardValues[4] == 4);
+
+        int[] backwardValues = new int[] { 1, 2, 3, 4, 5 };
+        Span<int> backward = backwardValues;
+        backward[1..5].CopyTo(backward[0..4]);
+        Console.WriteLine(backwardValues[0] == 2 && backwardValues[1] == 3 && backwardValues[2] == 4 && backwardValues[3] == 5 && backwardValues[4] == 5);
+
+        int[] sameValues = new int[] { 3, 4, 5 };
+        Span<int> same = sameValues;
+        same.CopyTo(same);
+        Console.WriteLine(sameValues[0] == 3 && sameValues[2] == 5);
+
+        Span<int> empty = default(Span<int>);
+        empty.CopyTo(empty);
+        Console.WriteLine(empty.TryCopyTo(empty));
+        ReadOnlySpan<int> readonlyEmpty = default(ReadOnlySpan<int>);
+        readonlyEmpty.CopyTo(empty);
+        Console.WriteLine(readonlyEmpty.TryCopyTo(empty));
+
+        int[] rangeValues = new int[] { 10, 20, 30, 40, 50, 60 };
+        Span<int> rangeSpan = rangeValues;
+        rangeSpan[1..4].CopyTo(rangeSpan[3..6]);
+        Console.WriteLine(rangeValues[0] == 10 && rangeValues[3] == 20 && rangeValues[4] == 30 && rangeValues[5] == 40);
+
+        Pair239[] pairs = new Pair239[] { new Pair239(1, 2), new Pair239(3, 4), new Pair239(5, 6) };
+        Span<Pair239> pairSpan = pairs;
+        pairSpan.Fill(new Pair239(7, 8));
+        Console.WriteLine(pairs[0].A == 7 && pairs[2].B == 8);
+        Pair239[] pairCopyValues = new Pair239[] { default(Pair239), default(Pair239), default(Pair239) };
+        Span<Pair239> pairCopy = pairCopyValues;
+        pairSpan.CopyTo(pairCopy);
+        Console.WriteLine(pairCopyValues[1].A == 7 && pairCopyValues[1].B == 8);
+        pairSpan.Clear();
+        Console.WriteLine(pairs[0].A == 0 && pairs[2].B == 0);
+
+        Node239 shared = new Node239(44);
+        Node239[] nodeValues = new Node239[] { new Node239(1), new Node239(2), new Node239(3) };
+        Span<Node239> nodeSpan = nodeValues;
+        nodeSpan.Fill(shared);
+        Console.WriteLine(nodeValues[0] == shared && nodeValues[2] == shared);
+        Node239[] nodeCopyValues = new Node239[] { null, null, null };
+        Span<Node239> nodeCopy = nodeCopyValues;
+        nodeSpan.CopyTo(nodeCopy);
+        nodeValues = null;
+        nodeSpan = default(Span<Node239>);
+        GC.Collect();
+        Console.WriteLine(nodeCopy[0].Value == 44 && nodeCopy[2].Value == 44);
+        nodeCopy.Clear();
+        Console.WriteLine(nodeCopyValues[0] == null && nodeCopyValues[2] == null);
+
+        int[] memorySourceValues = new int[] { 5, 6, 7, 8 };
+        int[] memoryDestinationValues = new int[] { 0, 0, 0, 0 };
+        Memory<int> memorySource = memorySourceValues;
+        Memory<int> memoryDestination = memoryDestinationValues;
+        memorySource.CopyTo(memoryDestination);
+        Console.WriteLine(memoryDestinationValues[0] == 5 && memoryDestinationValues[3] == 8);
+
+        int[] memoryTryValues = new int[] { 0, 0, 0, 0 };
+        Memory<int> memoryTryDestination = memoryTryValues;
+        Console.WriteLine(memorySource.TryCopyTo(memoryTryDestination));
+        Console.WriteLine(memoryTryValues[1] == 6 && memoryTryValues[3] == 8);
+
+        ReadOnlyMemory<int> readOnlyMemorySource = memorySource;
+        int[] readonlyMemoryDestinationValues = new int[] { 0, 0, 0, 0 };
+        Memory<int> readonlyMemoryDestination = readonlyMemoryDestinationValues;
+        readOnlyMemorySource.CopyTo(readonlyMemoryDestination);
+        Console.WriteLine(readonlyMemoryDestinationValues[0] == 5 && readonlyMemoryDestinationValues[3] == 8);
+
+        int[] memoryShortValues = new int[] { 9, 9, 9 };
+        Memory<int> memoryShort = memoryShortValues;
+        Console.WriteLine(!memorySource.TryCopyTo(memoryShort));
+        Console.WriteLine(!readOnlyMemorySource.TryCopyTo(memoryShort));
+        Console.WriteLine(memoryShortValues[0] == 9 && memoryShortValues[2] == 9);
+
+        int[] memoryOverlapValues = new int[] { 1, 2, 3, 4, 5 };
+        Memory<int> memoryOverlap = memoryOverlapValues;
+        memoryOverlap.Slice(0, 4).CopyTo(memoryOverlap.Slice(1, 4));
+        Console.WriteLine(memoryOverlapValues[0] == 1 && memoryOverlapValues[1] == 1 && memoryOverlapValues[4] == 4);
+
+        int[] memoryBackwardValues = new int[] { 1, 2, 3, 4, 5 };
+        ReadOnlyMemory<int> memoryBackwardSource = new ReadOnlyMemory<int>(memoryBackwardValues, 1, 4);
+        Memory<int> memoryBackwardDestination = new Memory<int>(memoryBackwardValues, 0, 4);
+        memoryBackwardSource.CopyTo(memoryBackwardDestination);
+        Console.WriteLine(memoryBackwardValues[0] == 2 && memoryBackwardValues[1] == 3 && memoryBackwardValues[3] == 5 && memoryBackwardValues[4] == 5);
+
+        int[] sliceFillValues = new int[] { 1, 2, 3, 4, 5 };
+        Memory<int> sliceMemory = sliceFillValues;
+        sliceMemory.Span[1..4].Fill(12);
+        Console.WriteLine(sliceFillValues[0] == 1 && sliceFillValues[1] == 12 && sliceFillValues[3] == 12 && sliceFillValues[4] == 5);
+        sliceMemory.Span[2..4].Clear();
+        Console.WriteLine(sliceFillValues[1] == 12 && sliceFillValues[2] == 0 && sliceFillValues[3] == 0);
+
+        Tracker239.SourceCalls = 0;
+        Tracker239.DestinationCalls = 0;
+        Tracker239.MakeSource().CopyTo(Tracker239.MakeDestination());
+        Console.WriteLine(Tracker239.SourceCalls == 1 && Tracker239.DestinationCalls == 1);
+        Console.WriteLine(Tracker239.Destination[0] == 21 && Tracker239.Destination[2] == 23);
+
+        Tracker239.SourceCalls = 0;
+        Tracker239.DestinationCalls = 0;
+        bool temporaryTry = Tracker239.MakeSource().TryCopyTo(Tracker239.MakeDestination());
+        Console.WriteLine(temporaryTry && Tracker239.SourceCalls == 1 && Tracker239.DestinationCalls == 1);
+
+        Node239 a = new Node239(70);
+        Node239 b = new Node239(80);
+        Node239 c = new Node239(90);
+        Node239[] overlapNodes = new Node239[] { a, b, c, null };
+        Span<Node239> overlapNodeSpan = overlapNodes;
+        overlapNodeSpan[0..3].CopyTo(overlapNodeSpan[1..4]);
+        a = null; b = null; c = null;
+        GC.Collect();
+        Console.WriteLine(overlapNodes[1].Value == 70 && overlapNodes[2].Value == 80 && overlapNodes[3].Value == 90);
+    }
+}

@@ -1,0 +1,3 @@
+using Void.Threading.Tasks;
+public sealed class Box244 { public int Value; }
+public static class Program { private static async unsafe Task Bad(Box244 b) { fixed (int* p = &b.Value) { } } public static void Main() { Bad(new Box244()).Wait(); } }

@@ -1,0 +1,230 @@
+public class RefNumber
+{
+    public int Value;
+
+    public RefNumber(int value)
+    {
+        Value = value;
+    }
+
+    public static RefNumber operator +(RefNumber left, RefNumber right)
+    {
+        return new RefNumber(left.Value + right.Value);
+    }
+
+    public static bool operator ==(RefNumber left, RefNumber right)
+    {
+        return left.Value == right.Value;
+    }
+
+    public static bool operator !=(RefNumber left, RefNumber right)
+    {
+        return left.Value != right.Value;
+    }
+}
+
+public struct Number
+{
+    public int Value;
+
+    public Number(int value)
+    {
+        Value = value;
+    }
+
+    public static Number operator +(Number left, Number right)
+    {
+        return new Number(left.Value + right.Value);
+    }
+
+    public static Number operator -(Number left, Number right)
+    {
+        return new Number(left.Value - right.Value);
+    }
+
+    public static Number operator *(Number left, Number right)
+    {
+        return new Number(left.Value * right.Value);
+    }
+
+    public static Number operator /(Number left, Number right)
+    {
+        return new Number(left.Value / right.Value);
+    }
+
+    public static Number operator %(Number left, Number right)
+    {
+        return new Number(left.Value % right.Value);
+    }
+
+    public static bool operator ==(Number left, Number right)
+    {
+        return left.Value == right.Value;
+    }
+
+    public static bool operator !=(Number left, Number right)
+    {
+        return left.Value != right.Value;
+    }
+
+    public static bool operator <(Number left, Number right)
+    {
+        return left.Value < right.Value;
+    }
+
+    public static bool operator >(Number left, Number right)
+    {
+        return left.Value > right.Value;
+    }
+}
+
+public struct Ranked
+{
+    public int Value;
+
+    public Ranked(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator Ranked(int value)
+    {
+        return new Ranked(value);
+    }
+
+    public static Ranked operator +(Ranked left, Ranked right)
+    {
+        return new Ranked(left.Value + right.Value + 100);
+    }
+
+    public static Ranked operator +(Ranked left, int right)
+    {
+        return new Ranked(left.Value + right);
+    }
+}
+
+public struct Counter
+{
+    public int Value;
+
+    public Counter(int value)
+    {
+        Value = value;
+    }
+
+    public static Counter operator +(Counter left, Counter right)
+    {
+        return new Counter(left.Value + right.Value);
+    }
+}
+
+public class CounterHolder
+{
+    private Counter _value;
+    public int Gets;
+    public int Sets;
+
+    public Counter Value
+    {
+        get
+        {
+            Gets += 1;
+            return _value;
+        }
+        set
+        {
+            Sets += 1;
+            _value = value;
+        }
+    }
+}
+
+public struct GenericBox<T>
+{
+    public T Value;
+
+    public GenericBox(T value)
+    {
+        Value = value;
+    }
+
+    public static GenericBox<T> operator +(GenericBox<T> left, GenericBox<T> right)
+    {
+        return left;
+    }
+}
+
+public static class Program
+{
+    private static CounterHolder _holder;
+    private static int _receiverCalls;
+
+    private static CounterHolder GetHolder()
+    {
+        _receiverCalls += 1;
+        return _holder;
+    }
+
+    public static void Main()
+    {
+        RefNumber ra = new RefNumber(4);
+        RefNumber rb = new RefNumber(6);
+        RefNumber rc = ra + rb;
+        Console.WriteLine(rc.Value == 10);
+        Console.WriteLine(new RefNumber(7) == new RefNumber(7));
+        Console.WriteLine(new RefNumber(7) != new RefNumber(8));
+
+        Number a = new Number(14);
+        Number b = new Number(4);
+        Console.WriteLine((a + b).Value == 18);
+        Console.WriteLine((a - b).Value == 10);
+        Console.WriteLine((a * b).Value == 56);
+        Console.WriteLine((a / b).Value == 3);
+        Console.WriteLine((a % b).Value == 2);
+        Console.WriteLine(a != b);
+        Console.WriteLine(b < a);
+        Console.WriteLine(a > b);
+
+        Ranked ranked = new Ranked(5);
+        Ranked rankedResult = ranked + 2;
+        Console.WriteLine(rankedResult.Value == 7);
+
+        Number? na = new Number(8);
+        Number? nb = new Number(3);
+        Number? nsum = na + nb;
+        Console.WriteLine(nsum.HasValue);
+        Console.WriteLine(nsum.Value.Value == 11);
+        Number? nnone = null;
+        Number? missing = na + nnone;
+        Console.WriteLine(!missing.HasValue);
+        Console.WriteLine(!(na == nb));
+        Console.WriteLine(nnone == null);
+        bool? less = nb < na;
+        Console.WriteLine(less.HasValue);
+        Console.WriteLine(less.Value);
+        bool? absentLess = nb < nnone;
+        Console.WriteLine(!absentLess.HasValue);
+
+        _holder = new CounterHolder();
+        _holder.Value = new Counter(10);
+        _holder.Gets = 0;
+        _holder.Sets = 0;
+        _receiverCalls = 0;
+        Counter assigned = GetHolder().Value += new Counter(5);
+        Console.WriteLine(assigned.Value == 15);
+        Console.WriteLine(_holder.Value.Value == 15);
+        Console.WriteLine(_receiverCalls == 1);
+        Console.WriteLine(_holder.Gets == 2);
+        Console.WriteLine(_holder.Sets == 1);
+
+        GenericBox<int> genericLeft = new GenericBox<int>(9);
+        GenericBox<int> genericRight = new GenericBox<int>(4);
+        GenericBox<int> genericResult = genericLeft + genericRight;
+        Console.WriteLine(genericResult.Value == 9);
+
+        Counter local = new Counter(20);
+        Counter localAssigned = local += new Counter(2);
+        Console.WriteLine(localAssigned.Value == 22);
+        Console.WriteLine(local.Value == 22);
+    }
+}

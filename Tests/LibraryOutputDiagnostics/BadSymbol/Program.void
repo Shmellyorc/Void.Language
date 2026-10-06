@@ -1,0 +1,1 @@
+public static class Api { [Export("bad-symbol")] public static int Get() { return 1; } }

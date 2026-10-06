@@ -1,0 +1,22 @@
+public sealed class FatalGameException : Exception
+{
+    public FatalGameException(string message) : base(message)
+    {
+    }
+}
+
+public static class Program
+{
+    public static void Crash()
+    {
+        FatalGameException error = new FatalGameException("boom");
+        GC.Collect();
+        throw error;
+    }
+
+    public static void Main()
+    {
+        Crash();
+        Console.WriteLine(false);
+    }
+}

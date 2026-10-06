@@ -1,0 +1,18 @@
+using Void.Collections;
+
+public sealed class MissingDisposeEnumerator : IEnumerator<int>
+{
+    public int Current => 0;
+
+    public bool MoveNext()
+    {
+        return false;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+    }
+}

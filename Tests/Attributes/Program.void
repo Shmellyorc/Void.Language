@@ -1,0 +1,59 @@
+[Discoverable(Name = "Level", Metadata = "Farm")]
+public class FarmLevel
+{
+}
+
+[Discoverable(Name = "Level", Metadata = "Cave")]
+public class CaveLevel
+{
+}
+
+[Service(Name = "Audio")]
+public class AudioService
+{
+}
+
+[Marker]
+public struct MarkerType
+{
+    public int Value;
+}
+
+[Version("alpha")]
+public class VersionedType
+{
+}
+
+namespace Game.Levels
+{
+    [Discoverable(Name = "Level", Metadata = "Town")]
+    public class TownLevel
+    {
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        string discoverable = "Discoverable";
+
+        Console.WriteLine(Runtime.AttributeCount(discoverable));
+        Console.WriteLine(Runtime.AttributeType(discoverable, 0));
+        Console.WriteLine(Runtime.AttributeType(discoverable, 1));
+        Console.WriteLine(Runtime.AttributeType(discoverable, 2));
+        Console.WriteLine(Runtime.HasAttribute("FarmLevel", discoverable));
+        Console.WriteLine(Runtime.HasAttribute("AudioService", discoverable));
+        Console.WriteLine(Runtime.AttributeValue("FarmLevel", discoverable, "Name"));
+        Console.WriteLine(Runtime.AttributeValue("FarmLevel", discoverable, "Metadata"));
+        Console.WriteLine(Runtime.AttributeValue("CaveLevel", discoverable, "Metadata"));
+        Console.WriteLine(Runtime.AttributeValue("Game.Levels.TownLevel", discoverable, "Metadata"));
+        Console.WriteLine(Runtime.AttributeCount("Service"));
+        Console.WriteLine(Runtime.AttributeType("Service", 0));
+        Console.WriteLine(Runtime.AttributeValue("AudioService", "Service", "Name"));
+        Console.WriteLine(Runtime.HasAttribute("MarkerType", "Marker"));
+        Console.WriteLine(Runtime.AttributeCount("Marker"));
+        Console.WriteLine(Runtime.AttributeValue("VersionedType", "Version", "0"));
+        Console.WriteLine(Runtime.AttributeCount("Missing"));
+    }
+}

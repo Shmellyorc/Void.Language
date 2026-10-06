@@ -1,0 +1,61 @@
+using Void;
+
+public static class StringExportApi
+{
+    [Export("void298_check_embedded")]
+    public static int CheckEmbedded(string text)
+    {
+        GC.Collect();
+        return text == "A\0B" ? 1 : 0;
+    }
+
+    [Export("void298_check_null")]
+    public static int CheckNull(string text)
+    {
+        return text == null ? 1 : 0;
+    }
+
+    [Export("void298_check_empty")]
+    public static int CheckEmpty(string text)
+    {
+        return text == "" ? 1 : 0;
+    }
+
+    [Export("void298_check_pair")]
+    public static int CheckPair(string left, int marker, string right)
+    {
+        GC.Collect();
+        return left == "left\0value" && marker == 298 && right == "right" ? 1 : 0;
+    }
+
+    [Export("void298_echo")]
+    public static string Echo(string text)
+    {
+        GC.Collect();
+        return text;
+    }
+
+    [Export("void298_make_embedded")]
+    public static string MakeEmbedded()
+    {
+        return "R\0S";
+    }
+
+    [Export("void298_make_utf8")]
+    public static string MakeUtf8()
+    {
+        return "é";
+    }
+
+    [Export("void298_make_empty")]
+    public static string MakeEmpty()
+    {
+        return "";
+    }
+
+    [Export("void298_make_null")]
+    public static string MakeNull()
+    {
+        return null;
+    }
+}

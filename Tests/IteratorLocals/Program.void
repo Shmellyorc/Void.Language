@@ -1,0 +1,181 @@
+using Void;
+using Void.Collections;
+
+public sealed class Box
+{
+    public int Value;
+
+    public Box(int value)
+    {
+        Value = value;
+    }
+}
+
+public struct Point
+{
+    public int X;
+
+    public Point(int x)
+    {
+        X = x;
+    }
+}
+
+public sealed class Producer
+{
+    private int _base;
+
+    public Producer(int value)
+    {
+        _base = value;
+    }
+
+    private int NextValue()
+    {
+        return _base + 1;
+    }
+
+    public IEnumerator<int> Values()
+    {
+        var value = NextValue();
+        yield return value;
+
+        {
+            var value = _base + 2;
+            yield return value;
+        }
+
+        yield return value;
+    }
+}
+
+public static class Program
+{
+    public static IEnumerator<int> VarValues()
+    {
+        var integer = 1;
+        var flag = true;
+        var amount = 2.5f;
+        var array = new int[2];
+        var box = new Box(5);
+        var list = new List<int>();
+        var point = new Point(7);
+        var choice = flag ? 8 : 9;
+
+        array[0] = 4;
+        list.Add(6);
+
+        yield return integer;
+        yield return flag ? 2 : -2;
+        yield return amount == 2.5f ? 3 : -3;
+        yield return array[0];
+
+        GC.Collect();
+        yield return box.Value;
+        yield return list[0];
+        yield return point.X;
+        yield return choice;
+    }
+
+    public static IEnumerator<int> Assigned(bool choose)
+    {
+        int value;
+        if (choose)
+            value = 10;
+        else
+            value = 20;
+
+        yield return value;
+        value += 1;
+        yield return value;
+
+        Box box;
+        box = new Box(30);
+        GC.Collect();
+        yield return box.Value;
+        GC.Collect();
+        yield return box.Value;
+
+        int[] values;
+        values = new int[1];
+        values[0] = 40;
+        yield return values[0];
+    }
+
+    public static IEnumerator<int> Shadowing()
+    {
+        int value = 1;
+        yield return value;
+
+        {
+            int value = 2;
+            yield return value;
+            value += 1;
+            yield return value;
+        }
+
+        yield return value;
+
+        {
+            var value = 4;
+            yield return value;
+        }
+
+        yield return value;
+
+        foreach (var value in new int[] { 5, 6 })
+            yield return value;
+
+        yield return value;
+
+        for (int value = 7; value < 9; value++)
+            yield return value;
+
+        yield return value;
+    }
+
+    public static IEnumerator<int> LoopScope()
+    {
+        int value = 50;
+        int i = 0;
+        while (i < 2)
+        {
+            int value = i;
+            yield return value;
+            i++;
+        }
+        yield return value;
+    }
+
+    public static IEnumerator<int> DeadIterator()
+    {
+        var value = 60;
+        yield return value;
+    }
+
+    private static void Check(IEnumerator<int> iterator, int[] expected)
+    {
+        int index = 0;
+        while (iterator.MoveNext())
+        {
+            Console.WriteLine(index < expected.Length && iterator.Current == expected[index]);
+            index++;
+        }
+        Console.WriteLine(index == expected.Length);
+    }
+
+    public static void Main()
+    {
+        Check(VarValues(), new int[] { 1, 2, 3, 4, 5, 6, 7, 8 });
+        Check(Assigned(true), new int[] { 10, 11, 30, 30, 40 });
+        Check(Assigned(false), new int[] { 20, 21, 30, 30, 40 });
+        Check(Shadowing(), new int[] { 1, 2, 3, 1, 4, 1, 5, 6, 1, 7, 8, 1 });
+        Check(LoopScope(), new int[] { 0, 1, 50 });
+
+        Producer producer = new Producer(70);
+        IEnumerator<int> produced = producer.Values();
+        producer = null;
+        GC.Collect();
+        Check(produced, new int[] { 71, 72, 71 });
+    }
+}

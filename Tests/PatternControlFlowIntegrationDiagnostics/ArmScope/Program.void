@@ -1,0 +1,14 @@
+public class A { }
+public class B : A { public int Value; }
+public static class Program
+{
+    public static void Main()
+    {
+        A value = new B();
+        int result = value switch
+        {
+            B hit => hit.Value,
+            _ => hit.Value
+        };
+    }
+}

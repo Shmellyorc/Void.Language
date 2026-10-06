@@ -1,0 +1,9 @@
+public sealed class Box { }
+public static class Program
+{
+    public static void Main()
+    {
+        Box value = new Box();
+        if (value is 1) { }
+    }
+}

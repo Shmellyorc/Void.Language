@@ -1,0 +1,127 @@
+using Void;
+using Void.Threading.Tasks;
+
+public sealed class AsyncWorker202
+{
+    private int _value;
+
+    public AsyncWorker202(int value)
+    {
+        _value = value;
+    }
+
+    private void AddCore(int amount)
+    {
+        _value += amount;
+    }
+
+    public int Value => _value;
+
+    public async Task Add(int amount)
+    {
+        AddCore(amount);
+        return;
+    }
+
+    public async Task AddWithEarlyReturn(int amount, bool apply)
+    {
+        if (!apply)
+            return;
+        _value += amount;
+    }
+
+    public async Task FinallyBeforeCompletion(int amount)
+    {
+        try
+        {
+            _value += amount;
+            return;
+        }
+        finally
+        {
+            _value += 1;
+        }
+    }
+}
+
+public static class Program
+{
+    private static int _staticValue;
+
+    private static async Task AddStatic(int left, int right)
+    {
+        int total = left + right;
+        _staticValue = total;
+    }
+
+    private static async Task Fault()
+    {
+        throw new Exception("async-202-fault");
+    }
+
+    private static async Task CatchInside()
+    {
+        try
+        {
+            throw new Exception("handled");
+        }
+        catch (Exception error)
+        {
+            if (error.Message == "handled")
+                _staticValue += 1;
+        }
+    }
+
+    public static void Main()
+    {
+        AsyncWorker202 worker = new AsyncWorker202(10);
+
+        Task add = worker.Add(5);
+        Console.WriteLine(add.IsCompleted && !add.IsFaulted && !add.IsCanceled);
+        Console.WriteLine(worker.Value == 15);
+
+        Task skipped = worker.AddWithEarlyReturn(100, false);
+        Console.WriteLine(skipped.IsCompleted && worker.Value == 15);
+
+        Task applied = worker.AddWithEarlyReturn(2, true);
+        Console.WriteLine(applied.IsCompleted && worker.Value == 17);
+
+        Task final = worker.FinallyBeforeCompletion(3);
+        Console.WriteLine(final.IsCompleted && worker.Value == 21);
+
+        Task stat = AddStatic(20, 2);
+        Console.WriteLine(stat.IsCompleted && _staticValue == 22);
+
+        Task handled = CatchInside();
+        Console.WriteLine(handled.IsCompleted && !handled.IsFaulted && _staticValue == 23);
+
+        Task fault = null;
+        bool callThrew = false;
+        try
+        {
+            fault = Fault();
+        }
+        catch (Exception ignored)
+        {
+            callThrew = true;
+        }
+        Console.WriteLine(!callThrew && fault != null);
+        Console.WriteLine(fault.IsCompleted && fault.IsFaulted && !fault.IsCanceled);
+        Console.WriteLine(fault.Exception != null && fault.Exception.Message == "async-202-fault");
+
+        bool waitThrew = false;
+        try
+        {
+            fault.Wait();
+        }
+        catch (Exception error)
+        {
+            waitThrew = error.Message == "async-202-fault";
+        }
+        Console.WriteLine(waitThrew);
+
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(add.IsCompleted && stat.IsCompleted && fault.IsFaulted);
+    }
+}

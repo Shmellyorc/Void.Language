@@ -1,0 +1,364 @@
+using Void.Collections;
+
+public interface IValue
+{
+    int Read();
+}
+
+public interface IBox<T>
+{
+    T Get();
+}
+
+public interface IGenericWorker
+{
+    T Echo<T>(T value);
+}
+
+public class BaseNode
+{
+    public int Value;
+
+    public BaseNode(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class DerivedNode : BaseNode, IValue
+{
+    public DerivedNode(int value) : base(value)
+    {
+    }
+
+    public int Read()
+    {
+        return Value;
+    }
+}
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Box<T> : IBox<T>
+{
+    private T _value;
+
+    public Box(T value)
+    {
+        _value = value;
+    }
+
+    public T Get()
+    {
+        return _value;
+    }
+
+    public U Convert<U>(U value)
+    {
+        return value;
+    }
+
+    public U Chain<U>(U value)
+    {
+        return this.Convert(value);
+    }
+}
+
+public sealed class IntBox : IBox<int>
+{
+    public int Get()
+    {
+        return 17;
+    }
+}
+
+public class GenericBase<T>
+{
+    public U Mix<U>(T left, U right)
+    {
+        return right;
+    }
+}
+
+public sealed class GenericChild<T> : GenericBase<T>
+{
+}
+
+public class VirtualBase
+{
+    public virtual T Echo<T>(T value)
+    {
+        return value;
+    }
+}
+
+public sealed class VirtualDerived : VirtualBase
+{
+    public override T Echo<T>(T value)
+    {
+        return value;
+    }
+}
+
+public sealed class GenericWorker : IGenericWorker
+{
+    public T Echo<T>(T value)
+    {
+        return value;
+    }
+
+    public T FromArray<T>(T[] values)
+    {
+        return values[0];
+    }
+
+    public T FromJagged<T>(T[][] values)
+    {
+        return values[0][0];
+    }
+
+    public T FromMatrix<T>(T[,] values)
+    {
+        return values[0, 0];
+    }
+
+    public T FromNullable<T>(T? value) where T : struct
+    {
+        return value.Value;
+    }
+
+    public T FromBox<T>(Box<T> value)
+    {
+        return value.Get();
+    }
+
+    public T FromInterface<T>(IBox<T> value)
+    {
+        return value.Get();
+    }
+
+    public T Optional<T>(T value, int marker = 7)
+    {
+        return value;
+    }
+
+    public T Params<T>(T first, params T[] rest)
+    {
+        return first;
+    }
+
+    public void Assign<T>(ref T target, T value)
+    {
+        target = value;
+    }
+
+    public void Produce<T>(out T target, T value)
+    {
+        target = value;
+    }
+
+    public T ReadIn<T>(in T value)
+    {
+        return value;
+    }
+
+    public int Select<T>(int marker, T value)
+    {
+        return 1;
+    }
+
+    public int Select<T>(float marker, T value)
+    {
+        return 2;
+    }
+
+    public T ReadValue<T>(T value) where T : IValue
+    {
+        return value;
+    }
+
+    public T KeepReference<T>(T value) where T : class
+    {
+        return value;
+    }
+
+    public T KeepValue<T>(T value) where T : struct
+    {
+        return value;
+    }
+}
+
+public static class GenericStatic
+{
+    public static T Echo<T>(T value)
+    {
+        return value;
+    }
+
+    public static U Second<T, U>(T first, U second)
+    {
+        return second;
+    }
+
+    public static T Pair<T>(T first, T second)
+    {
+        return second;
+    }
+
+    public static T FromInterface<T>(IBox<T> value)
+    {
+        return value.Get();
+    }
+
+    public static T TargetDefault<T>(T value, T fallback)
+    {
+        return fallback;
+    }
+}
+
+public static class Program
+{
+    private static int _receiverCalls;
+
+    private static void Check(bool value)
+    {
+        Console.WriteLine(value);
+    }
+
+    public static T Identity<T>(T value)
+    {
+        return value;
+    }
+
+    public static T Outer<T>(T value)
+    {
+        return Identity(value);
+    }
+
+    private static GenericWorker MakeWorker()
+    {
+        _receiverCalls++;
+        return new GenericWorker();
+    }
+
+    private static IEnumerator<int> IteratorInference(int value)
+    {
+        yield return Program.Identity(value);
+    }
+
+    public static void Main()
+    {
+        Check(Identity(1) == 1);
+        Check(GenericStatic.Echo(2) == 2);
+        Check(GenericStatic.Second(3, 4f) == 4f);
+
+        GenericWorker worker = new GenericWorker();
+        Check(worker.Echo(5) == 5);
+        Check((worker).Echo(6) == 6);
+        Check(new GenericWorker().Echo(7) == 7);
+        _receiverCalls = 0;
+        Check(MakeWorker().Echo(8) == 8);
+        Check(_receiverCalls == 1);
+
+        int[] values = new int[] { 9 };
+        Check(worker.FromArray(values) == 9);
+        int[][] jagged = new int[1][];
+        jagged[0] = new int[] { 10 };
+        Check(worker.FromJagged(jagged) == 10);
+        int[,] matrix = new int[,] { { 11, 12 } };
+        Check(worker.FromMatrix(matrix) == 11);
+        int? nullable = 13;
+        Check(worker.FromNullable(nullable) == 13);
+        Check(worker.Echo(nullable).Value == 13);
+
+        Box<int> box = new Box<int>(14);
+        Check(worker.FromBox(box) == 14);
+        Check(GenericStatic.Echo(box).Get() == 14);
+        IBox<int> interfaceBox = box;
+        Check(worker.FromInterface(interfaceBox) == 14);
+        IntBox concreteBox = new IntBox();
+        Check(worker.FromInterface(concreteBox) == 17);
+        Check(GenericStatic.FromInterface(concreteBox) == 17);
+
+        Check(worker.Optional(18) == 18);
+        Check(worker.Optional(marker: 2, value: 19) == 19);
+        Check(worker.Params(20, 21, 22) == 20);
+        int[] rest = new int[] { 24, 25 };
+        Check(worker.Params(23, rest) == 23);
+
+        int byRef = 0;
+        worker.Assign(ref byRef, 26);
+        Check(byRef == 26);
+        int byOut;
+        worker.Produce(out byOut, 27);
+        Check(byOut == 27);
+        int byIn = 28;
+        Check(worker.ReadIn(in byIn) == 28);
+
+        Check(worker.Select(1, 29) == 1);
+        Check(worker.Select(1f, 30) == 2);
+
+        IGenericWorker contract = worker;
+        Check(contract.Echo(31) == 31);
+        VirtualBase virtualWorker = new VirtualDerived();
+        Check(virtualWorker.Echo(32) == 32);
+
+        Box<int> genericBox = new Box<int>(33);
+        Check(genericBox.Convert(34) == 34);
+        Check(genericBox.Chain(35) == 35);
+        GenericChild<int> child = new GenericChild<int>();
+        Check(child.Mix(1, 36) == 36);
+
+        DerivedNode derived = new DerivedNode(37);
+        Check(worker.ReadValue(derived).Value == 37);
+        Check(worker.KeepReference(derived).Value == 37);
+        Check(worker.KeepValue(38) == 38);
+
+        BaseNode baseNode = new BaseNode(39);
+        BaseNode common = GenericStatic.Pair(derived, baseNode);
+        Check(common.Value == 39);
+        Check(GenericStatic.Pair(40, 41) == 41);
+
+        Check(GenericStatic.TargetDefault(42, default) == 0);
+        Check(Outer(43) == 43);
+        Check(Identity(Identity(44)) == 44);
+
+        Node node = new Node(45);
+        Node sameNode = Identity(node);
+        node = null;
+        GC.Collect();
+        Check(sameNode.Value == 45);
+
+        Box<Node> nodeBox = new Box<Node>(new Node(46));
+        Box<Node> sameNodeBox = Identity(nodeBox);
+        nodeBox = null;
+        GC.Collect();
+        Check(sameNodeBox.Get().Value == 46);
+
+        int[] sameValues = Identity(values);
+        Check(sameValues[0] == 9);
+        int? sameNullable = Identity(nullable);
+        Check(sameNullable.HasValue);
+        Check(sameNullable.Value == 13);
+        int[,] sameMatrix = Identity(matrix);
+        Check(sameMatrix[0, 1] == 12);
+
+        IEnumerator<int> iterator = IteratorInference(47);
+        Check(iterator.MoveNext());
+        Check(iterator.Current == 47);
+        Check(!iterator.MoveNext());
+        iterator.Dispose();
+
+        Check(GenericStatic.Echo(new Node(48)).Value == 48);
+        GC.Collect();
+        Check(true);
+    }
+}

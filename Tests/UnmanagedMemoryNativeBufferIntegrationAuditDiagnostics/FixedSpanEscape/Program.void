@@ -1,0 +1,11 @@
+using Void;
+public sealed class Box250 { public int Value; }
+public static class Program
+{
+    private static unsafe Span<int> Escape(Box250 box)
+    {
+        fixed (int* pointer = &box.Value)
+            return new Span<int>(pointer, 1);
+    }
+    public static unsafe void Main() { Escape(new Box250()); }
+}

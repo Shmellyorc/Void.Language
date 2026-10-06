@@ -1,0 +1,41 @@
+namespace Void;
+
+public readonly struct ConsoleKeyInfo
+{
+    private readonly char _keyChar;
+    private readonly ConsoleKey _key;
+    private readonly ConsoleModifiers _modifiers;
+
+    public ConsoleKeyInfo(char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+    {
+        int keyValue = (int)key;
+        if (keyValue < 0 || keyValue > 255)
+            throw new ArgumentOutOfRangeException("key");
+
+        int modifiers = 0;
+        if (alt) modifiers = modifiers + (int)ConsoleModifiers.Alt;
+        if (shift) modifiers = modifiers + (int)ConsoleModifiers.Shift;
+        if (control) modifiers = modifiers + (int)ConsoleModifiers.Control;
+
+        _keyChar = keyChar;
+        _key = key;
+        _modifiers = (ConsoleModifiers)modifiers;
+    }
+
+    public char KeyChar => _keyChar;
+    public ConsoleKey Key => _key;
+    public ConsoleModifiers Modifiers => _modifiers;
+
+    public bool Equals(ConsoleKeyInfo other)
+    {
+        return _keyChar == other._keyChar && _key == other._key && _modifiers == other._modifiers;
+    }
+
+    public int GetHashCode()
+    {
+        return (int)_keyChar + ((int)_key * 257) + ((int)_modifiers * 65537);
+    }
+
+    public static bool operator ==(ConsoleKeyInfo left, ConsoleKeyInfo right) { return left.Equals(right); }
+    public static bool operator !=(ConsoleKeyInfo left, ConsoleKeyInfo right) { return !left.Equals(right); }
+}

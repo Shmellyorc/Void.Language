@@ -1,0 +1,101 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    private static int _continuations;
+
+    private static async Task AwaitValueTask(ValueTask valueTask)
+    {
+        await valueTask;
+    }
+
+    private static async Task<int> AwaitThenReturn(ValueTask valueTask)
+    {
+        await valueTask;
+        return 42;
+    }
+
+    private static void WaitForContinuation(int expected)
+    {
+        int spins = 0;
+        while (Volatile.Read(ref _continuations) != expected && spins < 5000)
+        {
+            Thread.Sleep(1);
+            spins++;
+        }
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(typeof(ValueTask).IsValueType);
+        Console.WriteLine(typeof(ValueTaskAwaiter).IsValueType);
+
+        ValueTask completed = default;
+        Console.WriteLine(completed.IsCompleted);
+        ValueTaskAwaiter completedAwaiter = completed.GetAwaiter();
+        Console.WriteLine(completedAwaiter.IsCompleted);
+        completedAwaiter.GetResult();
+        Console.WriteLine(true);
+
+        Task completedOuter = AwaitValueTask(completed);
+        Console.WriteLine(completedOuter.IsCompleted);
+
+        Task<int> completedResult = AwaitThenReturn(completed);
+        Console.WriteLine(completedResult.IsCompleted && completedResult.Result == 42);
+
+        completedAwaiter.OnCompleted(() => Interlocked.Increment(ref _continuations));
+        WaitForContinuation(1);
+        Console.WriteLine(Volatile.Read(ref _continuations) == 1);
+
+        TaskCompletionSource source = new TaskCompletionSource();
+        ValueTask pending = new ValueTask(source.Task);
+        Console.WriteLine(!pending.IsCompleted);
+        Task pendingOuter = AwaitValueTask(pending);
+        Console.WriteLine(!pendingOuter.IsCompleted);
+        source.SetResult();
+        pendingOuter.Wait();
+        Console.WriteLine(pendingOuter.IsCompleted);
+
+        TaskCompletionSource directSource = new TaskCompletionSource();
+        ValueTaskAwaiter directAwaiter = new ValueTask(directSource.Task).GetAwaiter();
+        directAwaiter.OnCompleted(() => Interlocked.Increment(ref _continuations));
+        directSource.SetResult();
+        WaitForContinuation(2);
+        Console.WriteLine(Volatile.Read(ref _continuations) == 2);
+
+        TaskCompletionSource faultSource = new TaskCompletionSource();
+        faultSource.SetException(new Exception("value-task-266-fault"));
+        Task faulted = AwaitValueTask(new ValueTask(faultSource.Task));
+        bool faultObserved = false;
+        try
+        {
+            faulted.Wait();
+        }
+        catch (Exception error)
+        {
+            faultObserved = error.Message == "value-task-266-fault";
+        }
+        Console.WriteLine(faultObserved && faulted.IsFaulted);
+
+        CancellationTokenSource cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+        TaskCompletionSource canceledSource = new TaskCompletionSource();
+        canceledSource.SetCanceled(cancellation.Token);
+        Task canceled = AwaitValueTask(new ValueTask(canceledSource.Task));
+        bool cancellationObserved = false;
+        try
+        {
+            canceled.Wait();
+        }
+        catch (OperationCanceledException error)
+        {
+            cancellationObserved = error.CancellationToken.IsCancellationRequested;
+        }
+        Console.WriteLine(cancellationObserved && canceled.IsCanceled);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

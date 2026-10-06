@@ -1,0 +1,106 @@
+using Void;
+using Void.IO;
+using Void.Text;
+
+public static class Program
+{
+    private static void Report(bool value) { Console.Error.WriteLine(value ? "True" : "False"); }
+
+    private static bool ClearThrowsWhenRedirected()
+    {
+        try { Console.Clear(); }
+        catch (IOException e) { return true; }
+        return false;
+    }
+
+    private static bool ColorThrowsWhenRedirected()
+    {
+        try { Console.ForegroundColor = ConsoleColor.Red; }
+        catch (IOException e) { return true; }
+        return false;
+    }
+
+    private static bool InvalidColorThrows()
+    {
+        try { Console.ForegroundColor = (ConsoleColor)16; }
+        catch (ArgumentException e) { return true; }
+        return false;
+    }
+
+    private static bool InvalidCursorThrows()
+    {
+        try { Console.SetCursorPosition(-1, 0); }
+        catch (ArgumentOutOfRangeException e) { return true; }
+        return false;
+    }
+
+    private static bool LargeCursorThrows()
+    {
+        try { Console.SetCursorPosition(0, 32768); }
+        catch (ArgumentOutOfRangeException e) { return true; }
+        return false;
+    }
+
+    private static bool NullTitleThrows()
+    {
+        try { Console.Title = null; }
+        catch (ArgumentNullException e) { return true; }
+        return false;
+    }
+
+    private static bool LongTitleThrows()
+    {
+        StringBuilder text = new StringBuilder();
+        for (int i = 0; i < 24501; i++) text.Append('x');
+        try { Console.Title = text.ToString(); }
+        catch (ArgumentOutOfRangeException e) { return true; }
+        return false;
+    }
+
+    private static bool TitleGetUnsupported()
+    {
+        try { return Console.Title == "VOID #319" && Environment.NewLine == "\r\n"; }
+        catch (PlatformNotSupportedException e) { return Environment.NewLine == "\n"; }
+        return false;
+    }
+
+    public static void Main()
+    {
+        Report((int)ConsoleColor.Black == 0 && (int)ConsoleColor.White == 15 && (int)ConsoleColor.Red == 12);
+        Report(InvalidColorThrows());
+        Report(InvalidCursorThrows());
+        Report(LargeCursorThrows());
+        Report(NullTitleThrows());
+        Report(LongTitleThrows());
+
+        if (Console.IsOutputRedirected)
+        {
+            Report(ClearThrowsWhenRedirected());
+            Report(ColorThrowsWhenRedirected());
+            return;
+        }
+
+        Console.ForegroundColor = ConsoleColor.Red;
+        Report(Console.ForegroundColor == ConsoleColor.Red);
+        Console.BackgroundColor = ConsoleColor.DarkBlue;
+        Report(Console.BackgroundColor == ConsoleColor.DarkBlue);
+        Console.ResetColor();
+        Report((int)Console.ForegroundColor == -1 && (int)Console.BackgroundColor == -1);
+
+        Console.Clear();
+        Console.CursorVisible = false;
+        Report(!Console.CursorVisible);
+        Console.CursorVisible = true;
+        Report(Console.CursorVisible);
+
+        Console.SetCursorPosition(4, 2);
+        Report(Console.CursorLeft == 4);
+        Report(Console.CursorTop == 2);
+        Console.CursorLeft = 7;
+        Console.CursorTop = 4;
+        Report(Console.CursorLeft == 7 && Console.CursorTop == 4);
+
+        Console.Title = "VOID #319";
+        Report(TitleGetUnsupported());
+    }
+}

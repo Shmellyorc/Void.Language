@@ -1,0 +1,17 @@
+public class Box { }
+public static class Program
+{
+    public static void Main()
+    {
+        Box value = null;
+        switch (value)
+        {
+            case null:
+                break;
+            case null when true:
+                break;
+            default:
+                break;
+        }
+    }
+}

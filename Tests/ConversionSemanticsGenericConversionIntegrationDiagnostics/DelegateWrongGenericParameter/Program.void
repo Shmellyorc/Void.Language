@@ -1,0 +1,20 @@
+using Void;
+public interface IToInt<T> { static implicit operator int(T value); }
+public interface IMarker<T> {}
+public struct Number : IToInt<Number>, IMarker<Number>
+{
+    public int Value;
+    public Number(int value) { Value = value; }
+    public static implicit operator int(Number value) { return value.Value; }
+}
+public static class Program
+{
+    private static int Bad<T, U>(T authorized, U unauthorized)
+        where T : IToInt<T>
+        where U : IMarker<U>
+    {
+        Func<U> getter = () => unauthorized;
+        return getter();
+    }
+    public static void Main() { Console.WriteLine(Bad<Number, Number>(new Number(1), new Number(2))); }
+}

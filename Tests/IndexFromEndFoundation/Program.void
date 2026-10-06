@@ -1,0 +1,114 @@
+using Void;
+
+public sealed class IndexBox
+{
+    public Index Value;
+
+    public IndexBox(Index value)
+    {
+        Value = value;
+    }
+}
+
+public static class IndexHelpers
+{
+    public static int Calls;
+
+    public static int Next()
+    {
+        Calls += 1;
+        return 3;
+    }
+
+    public static Index Echo(Index value)
+    {
+        return value;
+    }
+
+    public static Index Last()
+    {
+        return ^1;
+    }
+
+    public static Index End => ^0;
+
+    public static T Identity<T>(T value)
+    {
+        return value;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Index last = ^1;
+        Console.WriteLine(last.Value == 1);
+        Console.WriteLine(last.IsFromEnd);
+        Console.WriteLine(last.GetOffset(4) == 3);
+
+        Index end = ^0;
+        Console.WriteLine(end.Value == 0);
+        Console.WriteLine(end.IsFromEnd);
+        Console.WriteLine(end.GetOffset(4) == 4);
+
+        Index secondFromEnd = ^(1 + 1);
+        Console.WriteLine(secondFromEnd.Value == 2);
+        Console.WriteLine(secondFromEnd.IsFromEnd);
+        Console.WriteLine(secondFromEnd.GetOffset(5) == 3);
+
+        Index secondFromStart = new Index(2, false);
+        Console.WriteLine(secondFromStart.Value == 2);
+        Console.WriteLine(!secondFromStart.IsFromEnd);
+        Console.WriteLine(secondFromStart.GetOffset(5) == 2);
+
+        Index zero = default(Index);
+        Console.WriteLine(zero.Value == 0);
+        Console.WriteLine(!zero.IsFromEnd);
+        Console.WriteLine(zero.GetOffset(5) == 0);
+
+        int callsBefore = IndexHelpers.Calls;
+        Index dynamicIndex = ^IndexHelpers.Next();
+        Console.WriteLine(IndexHelpers.Calls == callsBefore + 1);
+        Console.WriteLine(dynamicIndex.Value == 3);
+        Console.WriteLine(dynamicIndex.GetOffset(10) == 7);
+
+        Index copy = dynamicIndex;
+        Console.WriteLine(copy.Value == 3);
+        Console.WriteLine(copy.IsFromEnd);
+        Console.WriteLine(copy.GetOffset(8) == 5);
+
+        Index echoed = IndexHelpers.Echo(last);
+        Console.WriteLine(echoed.Value == 1);
+        Console.WriteLine(echoed.IsFromEnd);
+        Console.WriteLine(echoed.GetOffset(9) == 8);
+
+        Index[] values = new Index[] { ^1, new Index(1, false), ^0 };
+        Console.WriteLine(values.Length == 3);
+        Console.WriteLine(values[0].GetOffset(5) == 4);
+        Console.WriteLine(values[1].GetOffset(5) == 1);
+        Console.WriteLine(values[2].GetOffset(5) == 5);
+
+        Index beyondEnd = ^6;
+        Console.WriteLine(beyondEnd.GetOffset(5) == -1);
+
+        Index returned = IndexHelpers.Last();
+        Console.WriteLine(returned.Value == 1 && returned.IsFromEnd);
+        Console.WriteLine(IndexHelpers.End.GetOffset(7) == 7);
+
+        Index generic = IndexHelpers.Identity<Index>(^2);
+        Console.WriteLine(generic.Value == 2 && generic.IsFromEnd);
+        Console.WriteLine(generic.GetOffset(8) == 6);
+
+        IndexBox box = new IndexBox(^4);
+        Console.WriteLine(box.Value.Value == 4);
+        Console.WriteLine(box.Value.IsFromEnd);
+        Console.WriteLine(box.Value.GetOffset(10) == 6);
+
+        int nestedCallsBefore = IndexHelpers.Calls;
+        Index nested = ^(IndexHelpers.Next() + 1);
+        Console.WriteLine(IndexHelpers.Calls == nestedCallsBefore + 1);
+        Console.WriteLine(nested.Value == 4);
+        Console.WriteLine(nested.GetOffset(10) == 6);
+    }
+}

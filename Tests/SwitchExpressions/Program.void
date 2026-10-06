@@ -1,0 +1,118 @@
+using Void.Collections;
+
+public class Node
+{
+    public int Value { get; set; }
+    public Node Child { get; set; }
+}
+
+public class SpecialNode : Node
+{
+    public int Extra { get; set; }
+}
+
+public sealed class GenericBox<T>
+{
+    public int Choose(int value)
+    {
+        return value switch
+        {
+            < 0 => -1,
+            0 => 0,
+            _ => 1
+        };
+    }
+}
+
+public class Program
+{
+    private static int calls;
+
+    private static int Next()
+    {
+        calls = calls + 1;
+        return 7;
+    }
+
+    private static int MatchNode(Node node)
+    {
+        return node switch
+        {
+            SpecialNode special when special.Extra > 10 => special.Extra,
+            { Child: { Value: > 5 and < 10 } } => 20,
+            null => -1,
+            _ => 0
+        };
+    }
+
+    private static IEnumerator<int> Values()
+    {
+        int x = 3;
+        yield return x switch
+        {
+            1 => 10,
+            > 1 => 30,
+            _ => 0
+        };
+    }
+
+    public static void Main()
+    {
+        int a = 2 switch { 1 => 10, 2 => 20, _ => 0 };
+        Console.WriteLine(a == 20);
+
+        int b = 8 switch { < 0 => -1, >= 5 and < 10 => 1, _ => 0 };
+        Console.WriteLine(b == 1);
+
+        int? maybe = null;
+        int c = maybe switch { null => 4, > 0 => 5, _ => 6 };
+        Console.WriteLine(c == 4);
+
+        maybe = 9;
+        int d = maybe switch { > 5 => 7, _ => 0 };
+        Console.WriteLine(d == 7);
+
+        Node node = new SpecialNode { Value = 2, Extra = 14 };
+        Console.WriteLine(MatchNode(node) == 14);
+
+        node = new Node { Child = new Node { Value = 7 } };
+        Console.WriteLine(MatchNode(node) == 20);
+
+        node = null;
+        Console.WriteLine(MatchNode(node) == -1);
+
+        calls = 0;
+        int once = Next() switch { 7 => 1, _ => 0 };
+        Console.WriteLine(once == 1);
+        Console.WriteLine(calls == 1);
+
+        int guard = 6 switch { > 0 when true => 12, _ => 0 };
+        Console.WriteLine(guard == 12);
+
+        Node declared = new SpecialNode { Extra = 22 };
+        int declaration = declared switch
+        {
+            SpecialNode special => special.Extra,
+            _ => 0
+        };
+        Console.WriteLine(declaration == 22);
+
+        GenericBox<int> box = new GenericBox<int>();
+        Console.WriteLine(box.Choose(-3) == -1);
+        Console.WriteLine(box.Choose(0) == 0);
+        Console.WriteLine(box.Choose(4) == 1);
+
+        IEnumerator<int> values = Values();
+        Console.WriteLine(values.MoveNext());
+        Console.WriteLine(values.Current == 30);
+
+        string text = 1 switch { 1 => "yes", _ => "no" };
+        Console.WriteLine(text == "yes");
+
+        Node target = 1 switch { 1 => new Node { Value = 31 }, _ => null };
+        Console.WriteLine(target.Value == 31);
+
+        int nested = 2 switch { 2 => (3 switch { 3 => 44, _ => 0 }), _ => 0 };
+        Console.WriteLine(nested == 44);
+    }
+}

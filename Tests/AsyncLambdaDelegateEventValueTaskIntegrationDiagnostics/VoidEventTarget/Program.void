@@ -1,0 +1,19 @@
+using Void;
+using Void.Threading.Tasks;
+
+public sealed class Publisher274
+{
+    public event Action Changed;
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Publisher274 publisher = new Publisher274();
+        publisher.Changed += async () =>
+        {
+            await Task.Yield();
+        };
+    }
+}

@@ -1,0 +1,5 @@
+namespace Void.Threading.Tasks;
+public class Task { }
+public class Task<T> : Task { }
+public readonly struct ValueTask { }
+public readonly struct ValueTask<T> { }

@@ -1,0 +1,19 @@
+public sealed class Bad
+{
+    public event Action<int> Changed
+    {
+        add { }
+        remove { }
+    }
+
+    public bool HasHandlers() { return Changed != null; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Bad bad = new();
+        bool hasHandlers = bad.HasHandlers();
+    }
+}

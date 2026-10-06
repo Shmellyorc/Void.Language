@@ -1,0 +1,15 @@
+using Void;
+
+public static class AsyncLibraryNative209
+{
+    [Native("void209_async_library_value")]
+    public static unsafe extern int Run(int value);
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        Console.WriteLine(AsyncLibraryNative209.Run(30) == 42);
+    }
+}

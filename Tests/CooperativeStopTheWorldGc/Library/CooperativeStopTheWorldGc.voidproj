@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "Void164GcLib",
+  "version": "0.1.0",
+  "output": "library",
+  "compiler": {
+    "unsafe": true
+  }
+}

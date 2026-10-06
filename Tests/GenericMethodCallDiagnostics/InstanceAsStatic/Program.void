@@ -1,0 +1,11 @@
+public sealed class Worker
+{
+    public T Echo<T>(T value) { return value; }
+}
+public static class Program
+{
+    public static void Main()
+    {
+        Worker.Echo<int>(1);
+    }
+}

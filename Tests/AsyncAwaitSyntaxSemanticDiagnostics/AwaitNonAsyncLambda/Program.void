@@ -1,0 +1,16 @@
+using Void;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    public static async Task<int> Bad(Task<int> source)
+    {
+        Func<int> callback = () => await source;
+        return callback();
+    }
+
+    public static void Main()
+    {
+        Bad(null);
+    }
+}

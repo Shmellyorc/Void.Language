@@ -1,0 +1,1 @@
+public static class Program { private static unsafe int* Bad(int[] a) { fixed (int* p = a) { return p + 0; } } public static unsafe void Main(){ int* p = Bad(new int[]{1}); } }

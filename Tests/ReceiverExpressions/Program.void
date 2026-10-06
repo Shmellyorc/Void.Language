@@ -1,0 +1,306 @@
+public interface IValue
+{
+    int Add(int amount);
+}
+
+public struct Counter
+{
+    public int Value;
+
+    public Counter(int value)
+    {
+        Value = value;
+    }
+
+    public int Add(int amount)
+    {
+        Value += amount;
+        return Value;
+    }
+
+    public readonly int Read()
+    {
+        return Value;
+    }
+}
+
+public struct RefCounter
+{
+    public Node Ref;
+
+    public RefCounter(Node value)
+    {
+        Ref = value;
+    }
+
+    public int Add(int amount)
+    {
+        Ref.Value += amount;
+        return Ref.Value;
+    }
+}
+
+public class Node : IValue
+{
+    public int Value;
+
+    public Node()
+    {
+    }
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+
+    public virtual int Add(int amount)
+    {
+        Program.Record(3);
+        Value += amount;
+        return Value;
+    }
+
+    public Node Self()
+    {
+        return this;
+    }
+}
+
+public sealed class DerivedNode : Node
+{
+    public DerivedNode(int value) : base(value)
+    {
+    }
+
+    public override int Add(int amount)
+    {
+        Program.Record(3);
+        Value += amount * 2;
+        return Value;
+    }
+}
+
+public class Holder
+{
+    public Counter Value;
+    public RefCounter ManagedValue;
+    public Node Ref;
+    public IValue InterfaceRef;
+
+    public Counter Copy
+    {
+        get
+        {
+            Program.Record(1);
+            Program.PropertyCalls += 1;
+            return Value;
+        }
+    }
+
+    public RefCounter ManagedCopy
+    {
+        get
+        {
+            Program.Record(1);
+            Program.PropertyCalls += 1;
+            return ManagedValue;
+        }
+    }
+
+    public Node RefProperty
+    {
+        get
+        {
+            Program.Record(1);
+            Program.PropertyCalls += 1;
+            return Ref;
+        }
+    }
+
+    public IValue InterfaceProperty
+    {
+        get
+        {
+            Program.Record(1);
+            Program.PropertyCalls += 1;
+            return InterfaceRef;
+        }
+    }
+
+    public Counter get_Item(int index)
+    {
+        Program.Record(1);
+        Program.IndexerCalls += 1;
+        return Value;
+    }
+}
+
+public static class Program
+{
+    public static int MakeCalls;
+    public static int ArgCalls;
+    public static int PropertyCalls;
+    public static int IndexerCalls;
+    public static int IndexCalls;
+    public static int Order;
+    private static Holder _holder;
+
+    public static void Record(int value)
+    {
+        Order = Order * 10 + value;
+    }
+
+    private static Node MakeNode()
+    {
+        Record(1);
+        MakeCalls += 1;
+        return new Node(10);
+    }
+
+    private static Node MakeVirtual()
+    {
+        Record(1);
+        MakeCalls += 1;
+        return new DerivedNode(20);
+    }
+
+    private static Holder MakeHolder()
+    {
+        Record(1);
+        MakeCalls += 1;
+        return _holder;
+    }
+
+    private static Counter[] MakeArray()
+    {
+        Record(1);
+        MakeCalls += 1;
+        Counter[] values = new Counter[1];
+        values[0] = new Counter(30);
+        return values;
+    }
+
+    private static int NextIndex()
+    {
+        Record(2);
+        IndexCalls += 1;
+        return 0;
+    }
+
+    private static int CollectArg()
+    {
+        Record(4);
+        ArgCalls += 1;
+        GC.Collect();
+        return 5;
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(new Counter(3).Add(4) == 7);
+
+        Counter counter = new Counter(5);
+        Console.WriteLine((counter).Add(2) == 7);
+        Console.WriteLine(counter.Value == 7);
+        Console.WriteLine(((counter)).Read() == 7);
+
+        Order = 0;
+        Console.WriteLine(MakeNode().Add(CollectArg()) == 15);
+        Console.WriteLine(Order == 143);
+        Console.WriteLine(MakeCalls == 1);
+        Console.WriteLine(ArgCalls == 1);
+
+        Order = 0;
+        Console.WriteLine(MakeVirtual().Add(CollectArg()) == 30);
+        Console.WriteLine(Order == 143);
+        Console.WriteLine(MakeCalls == 2);
+        Console.WriteLine(ArgCalls == 2);
+
+        Order = 0;
+        Console.WriteLine(MakeNode().Self().Add(CollectArg()) == 15);
+        Console.WriteLine(Order == 143);
+        Console.WriteLine(MakeCalls == 3);
+        Console.WriteLine(ArgCalls == 3);
+
+        Console.WriteLine(new Node { Value = 8 }.Add(2) == 10);
+
+        _holder = new Holder();
+        _holder.Value = new Counter(11);
+        _holder.Ref = new Node(30);
+        _holder.InterfaceRef = _holder.Ref;
+        _holder.ManagedValue = new RefCounter(new Node(40));
+
+        Order = 0;
+        Console.WriteLine(_holder.Copy.Add(3) == 14);
+        Console.WriteLine(_holder.Value.Value == 11);
+        Console.WriteLine(Order == 1);
+        Console.WriteLine(PropertyCalls == 1);
+
+        Order = 0;
+        Console.WriteLine(_holder[0].Add(4) == 15);
+        Console.WriteLine(_holder.Value.Value == 11);
+        Console.WriteLine(Order == 1);
+        Console.WriteLine(IndexerCalls == 1);
+
+        Order = 0;
+        Console.WriteLine(_holder.RefProperty.Add(CollectArg()) == 35);
+        Console.WriteLine(_holder.Ref.Value == 35);
+        Console.WriteLine(Order == 143);
+        Console.WriteLine(PropertyCalls == 2);
+        Console.WriteLine(ArgCalls == 4);
+
+        Order = 0;
+        Console.WriteLine(_holder.InterfaceProperty.Add(CollectArg()) == 40);
+        Console.WriteLine(_holder.Ref.Value == 40);
+        Console.WriteLine(Order == 143);
+        Console.WriteLine(PropertyCalls == 3);
+        Console.WriteLine(ArgCalls == 5);
+
+        Order = 0;
+        Console.WriteLine(_holder.ManagedCopy.Add(CollectArg()) == 45);
+        Console.WriteLine(_holder.ManagedValue.Ref.Value == 45);
+        Console.WriteLine(Order == 14);
+        Console.WriteLine(PropertyCalls == 4);
+        Console.WriteLine(ArgCalls == 6);
+
+        Order = 0;
+        Console.WriteLine(MakeHolder().Value.Add(CollectArg()) == 16);
+        Console.WriteLine(_holder.Value.Value == 16);
+        Console.WriteLine(Order == 14);
+        Console.WriteLine(MakeCalls == 4);
+        Console.WriteLine(ArgCalls == 7);
+
+        Counter[] values = new Counter[1];
+        values[0] = new Counter(7);
+        Order = 0;
+        Console.WriteLine(values[NextIndex()].Add(2) == 9);
+        Console.WriteLine(values[0].Value == 9);
+        Console.WriteLine(Order == 2);
+        Console.WriteLine(IndexCalls == 1);
+
+        Order = 0;
+        Console.WriteLine(MakeArray()[NextIndex()].Add(CollectArg()) == 35);
+        Console.WriteLine(Order == 124);
+        Console.WriteLine(MakeCalls == 5);
+        Console.WriteLine(IndexCalls == 2);
+        Console.WriteLine(ArgCalls == 8);
+
+        Order = 0;
+        Console.WriteLine(MakeNode()?.Add(1) == 11);
+        Console.WriteLine(Order == 13);
+        Console.WriteLine(MakeCalls == 6);
+
+        Node left = new Node(50);
+        Node right = new Node(60);
+        bool chooseLeft = true;
+        Console.WriteLine((chooseLeft ? left : right).Add(5) == 55);
+        Console.WriteLine(left.Value == 55);
+        Console.WriteLine(right.Value == 60);
+
+        Counter first = new Counter(70);
+        Counter second = new Counter(80);
+        Console.WriteLine((chooseLeft ? first : second).Add(5) == 75);
+        Console.WriteLine(first.Value == 70);
+        Console.WriteLine(second.Value == 80);
+    }
+}

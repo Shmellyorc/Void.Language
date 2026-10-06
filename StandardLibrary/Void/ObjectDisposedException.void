@@ -1,0 +1,10 @@
+namespace Void;
+
+public class ObjectDisposedException : InvalidOperationException
+{
+    private string _objectName;
+    public string ObjectName => _objectName == null ? "" : _objectName;
+    public ObjectDisposedException(string objectName) : base("Cannot access a disposed object.") { _objectName = objectName; }
+    public ObjectDisposedException(string objectName, string message) : base(message) { _objectName = objectName; }
+    public ObjectDisposedException(string message, Exception innerException) : base(message, innerException) { }
+}

@@ -1,0 +1,336 @@
+using Void;
+using Void.Threading;
+
+public sealed class AuditGate
+{
+}
+
+public sealed class AuditPayload
+{
+    public int Value;
+
+    public AuditPayload(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class AuditState
+{
+    public int Ready;
+    public int Success;
+    public int Canceled;
+    public int TimedOut;
+    public int Done;
+    public int FinallyCount;
+    public int DisposeCount;
+    public int TokenObserved;
+    public int CallbackCount;
+    public int NativeValue;
+    public AuditPayload Payload;
+}
+
+public sealed class AuditScope : IDisposable
+{
+    private AuditState _state;
+
+    public AuditScope(AuditState state)
+    {
+        _state = state;
+    }
+
+    public void Dispose()
+    {
+        Interlocked.Increment(ref _state.DisposeCount);
+        GC.Collect();
+    }
+}
+
+public sealed class CallbackAuditException : Exception
+{
+    public CallbackAuditException(string message) : base(message)
+    {
+    }
+}
+
+public delegate bool AuditWait(CancellationToken token);
+
+public static class NativeFixture190
+{
+    [Native("voidc190_reset")]
+    public static unsafe extern void Reset();
+
+    [Native("voidc190_mark")]
+    public static unsafe extern int Mark(int value);
+
+    [Native("voidc190_calls")]
+    public static unsafe extern int Calls();
+}
+
+public static class Program
+{
+    private static void WaitReady(AuditState state)
+    {
+        while (Volatile.Read(ref state.Ready) == 0)
+            GC.Collect();
+    }
+
+    private static unsafe void CancellableAutoWorker(AutoResetEvent value, CancellationToken token, AuditState state)
+    {
+        Volatile.Write(ref state.Ready, 1);
+        try
+        {
+            using (AuditScope scope = new AuditScope(state))
+            {
+                int nativeValue = NativeFixture190.Mark(1);
+                Volatile.Write(ref state.NativeValue, nativeValue);
+                if (value.WaitOne(500, token))
+                    Volatile.Write(ref state.Success, 1);
+                else
+                    Volatile.Write(ref state.TimedOut, 1);
+            }
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observed = error.CancellationToken;
+            if (observed.IsCancellationRequested)
+                Volatile.Write(ref state.TokenObserved, 1);
+            Volatile.Write(ref state.Canceled, 1);
+        }
+        finally
+        {
+            Interlocked.Increment(ref state.FinallyCount);
+            GC.Collect();
+        }
+        Volatile.Write(ref state.Done, 1);
+    }
+
+    private static void CancellableSemaphoreWorker(Semaphore value, CancellationToken token, AuditState state)
+    {
+        Volatile.Write(ref state.Ready, 1);
+        try
+        {
+            if (value.WaitOne(500, token))
+                Volatile.Write(ref state.Success, 1);
+            else
+                Volatile.Write(ref state.TimedOut, 1);
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observed = error.CancellationToken;
+            if (observed.IsCancellationRequested)
+                Volatile.Write(ref state.TokenObserved, 1);
+            Volatile.Write(ref state.Canceled, 1);
+        }
+        finally
+        {
+            Interlocked.Increment(ref state.FinallyCount);
+        }
+        Volatile.Write(ref state.Done, 1);
+    }
+
+    private static void RecursiveTimedMonitorWorker(AuditGate gate, AuditState state)
+    {
+        Monitor.Enter(gate);
+        Monitor.Enter(gate);
+        Volatile.Write(ref state.Ready, 1);
+        bool notified = Monitor.Wait(gate, 500);
+        if (notified)
+            Volatile.Write(ref state.Success, 1);
+        Monitor.Exit(gate);
+        Monitor.Exit(gate);
+        Volatile.Write(ref state.Done, 1);
+    }
+
+    private static bool InvokeGeneric<T>(T payload, AuditWait wait, CancellationToken token) where T : class
+    {
+        GC.Collect();
+        bool result = wait(token);
+        GC.Collect();
+        return result && payload != null;
+    }
+
+    private static Action CaptureCallback(AuditState state, AuditPayload payload)
+    {
+        return () =>
+        {
+            if (payload != null && payload.Value == 707)
+                Interlocked.Increment(ref state.CallbackCount);
+            GC.Collect();
+        };
+    }
+
+    public static unsafe void Main()
+    {
+        NativeFixture190.Reset();
+
+        Console.WriteLine(Timeout.Infinite == -1);
+        Thread.Sleep(0);
+        Console.WriteLine(true);
+        Thread.Sleep(2);
+        Console.WriteLine(true);
+
+        AuditGate timeoutGate = new AuditGate();
+        Monitor.Enter(timeoutGate);
+        Monitor.Enter(timeoutGate);
+        bool timeoutNotified = Monitor.Wait(timeoutGate, 5);
+        Console.WriteLine(!timeoutNotified);
+        Monitor.Exit(timeoutGate);
+        Monitor.Exit(timeoutGate);
+        Monitor.Enter(timeoutGate);
+        Monitor.Exit(timeoutGate);
+        Console.WriteLine(true);
+
+        AuditGate pulseGate = new AuditGate();
+        AuditState pulseState = new AuditState();
+        Thread pulseThread = new Thread(() => RecursiveTimedMonitorWorker(pulseGate, pulseState));
+        pulseThread.Start();
+        WaitReady(pulseState);
+        Monitor.Enter(pulseGate);
+        Monitor.Pulse(pulseGate);
+        Monitor.Exit(pulseGate);
+        pulseThread.Join();
+        Console.WriteLine(Volatile.Read(ref pulseState.Success) == 1);
+        Console.WriteLine(Volatile.Read(ref pulseState.Done) == 1);
+
+        ManualResetEvent manual = new ManualResetEvent(false);
+        Console.WriteLine(!manual.WaitOne(0));
+        manual.Set();
+        Console.WriteLine(manual.WaitOne(0));
+        Console.WriteLine(manual.WaitOne(0));
+        manual.Reset();
+        Console.WriteLine(!manual.WaitOne(5));
+
+        CancellationTokenSource preCanceled = new CancellationTokenSource();
+        preCanceled.Cancel();
+        bool manualCanceled = false;
+        try
+        {
+            manual.WaitOne(100, preCanceled.Token);
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observedManualToken = error.CancellationToken;
+            manualCanceled = observedManualToken.IsCancellationRequested;
+        }
+        Console.WriteLine(manualCanceled);
+
+        AutoResetEvent auto = new AutoResetEvent(false);
+        auto.Set();
+        auto.Set();
+        Console.WriteLine(auto.WaitOne(0));
+        Console.WriteLine(!auto.WaitOne(0));
+
+        AuditState autoState = new AuditState();
+        autoState.Payload = new AuditPayload(303);
+        CancellationTokenSource autoSource = new CancellationTokenSource();
+        Thread autoThread = new Thread(() => CancellableAutoWorker(auto, autoSource.Token, autoState));
+        autoThread.Start();
+        WaitReady(autoState);
+        GC.Collect();
+        autoSource.Cancel();
+        autoThread.Join();
+        Console.WriteLine(Volatile.Read(ref autoState.Canceled) == 1);
+        Console.WriteLine(Volatile.Read(ref autoState.TokenObserved) == 1);
+        Console.WriteLine(Volatile.Read(ref autoState.TimedOut) == 0);
+        Console.WriteLine(Volatile.Read(ref autoState.DisposeCount) == 1);
+        Console.WriteLine(Volatile.Read(ref autoState.FinallyCount) == 1);
+        Console.WriteLine(Volatile.Read(ref autoState.Done) == 1);
+        Console.WriteLine(Volatile.Read(ref autoState.NativeValue) == 11);
+        Console.WriteLine(autoState.Payload != null && autoState.Payload.Value == 303);
+        auto.Set();
+        Console.WriteLine(auto.WaitOne(0));
+        Console.WriteLine(!auto.WaitOne(0));
+
+        Semaphore semaphore = new Semaphore(1, 2);
+        Console.WriteLine(semaphore.WaitOne(0));
+        Console.WriteLine(!semaphore.WaitOne(0));
+        Console.WriteLine(semaphore.Release() == 0);
+        Console.WriteLine(semaphore.WaitOne(0));
+        Console.WriteLine(!semaphore.WaitOne(5));
+
+        AuditState semaphoreState = new AuditState();
+        CancellationTokenSource semaphoreSource = new CancellationTokenSource();
+        Thread semaphoreThread = new Thread(() => CancellableSemaphoreWorker(semaphore, semaphoreSource.Token, semaphoreState));
+        semaphoreThread.Start();
+        WaitReady(semaphoreState);
+        GC.Collect();
+        semaphoreSource.Cancel();
+        semaphoreThread.Join();
+        Console.WriteLine(Volatile.Read(ref semaphoreState.Canceled) == 1);
+        Console.WriteLine(Volatile.Read(ref semaphoreState.TokenObserved) == 1);
+        Console.WriteLine(Volatile.Read(ref semaphoreState.Success) == 0 && Volatile.Read(ref semaphoreState.TimedOut) == 0);
+        Console.WriteLine(Volatile.Read(ref semaphoreState.FinallyCount) == 1 && Volatile.Read(ref semaphoreState.Done) == 1);
+        Console.WriteLine(semaphore.Release() == 0);
+        Console.WriteLine(semaphore.WaitOne(0));
+        Console.WriteLine(!semaphore.WaitOne(0));
+
+        AuditState callbackState = new AuditState();
+        CancellationTokenSource callbackSource = new CancellationTokenSource();
+        AuditPayload callbackPayload = new AuditPayload(707);
+        Action captured = CaptureCallback(callbackState, callbackPayload);
+        CancellationTokenRegistration callbackRegistration = callbackSource.Token.Register(captured);
+        callbackPayload = null;
+        captured = null;
+        GC.Collect();
+        callbackSource.Cancel();
+        callbackRegistration.Dispose();
+        GC.Collect();
+        Console.WriteLine(Volatile.Read(ref callbackState.CallbackCount) == 1);
+
+        CancellationTokenSource exceptionSource = new CancellationTokenSource();
+        AuditState exceptionState = new AuditState();
+        CancellationTokenRegistration first = exceptionSource.Token.Register(() => Interlocked.Increment(ref exceptionState.CallbackCount));
+        CancellationTokenRegistration second = exceptionSource.Token.Register(() =>
+        {
+            Interlocked.Increment(ref exceptionState.CallbackCount);
+            throw new CallbackAuditException("callback audit");
+        });
+        bool callbackExceptionObserved = false;
+        try
+        {
+            exceptionSource.Cancel();
+        }
+        catch (CallbackAuditException error)
+        {
+            callbackExceptionObserved = error.Message == "callback audit";
+        }
+        first.Dispose();
+        second.Dispose();
+        Console.WriteLine(callbackExceptionObserved);
+        Console.WriteLine(Volatile.Read(ref exceptionState.CallbackCount) == 2);
+        Console.WriteLine(exceptionSource.IsCancellationRequested);
+
+        ManualResetEvent genericManual = new ManualResetEvent(true);
+        AuditPayload genericPayload = new AuditPayload(909);
+        AuditWait wait = token => genericManual.WaitOne(100, token);
+        Console.WriteLine(InvokeGeneric<AuditPayload>(genericPayload, wait, CancellationToken.None));
+        genericPayload = null;
+        wait = null;
+        GC.Collect();
+
+        AuditState nestedState = new AuditState();
+        Thread outer = new Thread(() =>
+        {
+            CancellationTokenSource nestedSource = new CancellationTokenSource();
+            AutoResetEvent nestedEvent = new AutoResetEvent(false);
+            Thread inner = new Thread(() => CancellableAutoWorker(nestedEvent, nestedSource.Token, nestedState));
+            inner.Start();
+            WaitReady(nestedState);
+            nestedSource.Cancel();
+            inner.Join();
+        });
+        outer.Start();
+        outer.Join();
+        Console.WriteLine(Volatile.Read(ref nestedState.Canceled) == 1);
+        Console.WriteLine(Volatile.Read(ref nestedState.FinallyCount) == 1);
+        Console.WriteLine(Volatile.Read(ref nestedState.Done) == 1);
+
+        Console.WriteLine(NativeFixture190.Calls() == 2);
+        Console.WriteLine(NativeFixture190.Mark(40) == 50);
+        Console.WriteLine(NativeFixture190.Calls() == 3);
+
+        // #190 deliberately keeps cancellation off Monitor.Wait.
+        Console.WriteLine(true);
+    }
+}

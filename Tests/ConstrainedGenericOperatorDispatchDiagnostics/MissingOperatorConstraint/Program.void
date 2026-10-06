@@ -1,0 +1,13 @@
+public interface IAdd<T> { static T operator +(T left, T right); }
+public struct Number : IAdd<Number>
+{
+    public int Value;
+    public Number(int value) { Value = value; }
+    public static Number operator +(Number left, Number right) { return new Number(left.Value + right.Value); }
+    public static Number operator -(Number left, Number right) { return new Number(left.Value - right.Value); }
+}
+public static class Program
+{
+    private static T Subtract<T>(T left, T right) where T : IAdd<T> { return left - right; }
+    public static void Main() { Number x = Subtract(new Number(4), new Number(1)); }
+}

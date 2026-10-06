@@ -1,0 +1,238 @@
+using Void;
+using Void.Collections;
+
+public interface IMetric
+{
+    int Value { get; }
+
+    int Boost()
+    {
+        return this.Value + 10;
+    }
+}
+
+public sealed class Metric : IMetric
+{
+    private int _value;
+
+    public Metric(int value)
+    {
+        _value = value;
+    }
+
+    public int Value
+    {
+        get { return _value; }
+    }
+}
+
+public sealed class Envelope
+{
+    private IMetric _payload;
+    public int GetterCalls;
+
+    public Envelope(IMetric payload)
+    {
+        _payload = payload;
+    }
+
+    public IMetric Payload
+    {
+        get
+        {
+            GetterCalls++;
+            GC.Collect();
+            return _payload;
+        }
+    }
+}
+
+public struct Stat
+{
+    public int Value { get; set; }
+}
+
+public sealed class PatternIntegrationException : Exception
+{
+    public PatternIntegrationException(string message) : base(message) { }
+}
+
+public sealed class GenericClassifier<T>
+{
+    public int Classify(Envelope envelope)
+    {
+        return envelope switch
+        {
+            { Payload: IMetric metric } when metric.Value > 5 => metric.Boost(),
+            { Payload: null } => -1,
+            _ => 0
+        };
+    }
+}
+
+public static class Program
+{
+    private static int FinallyCount;
+    private static int GuardCalls;
+
+    private static bool ThrowingGuard(IMetric metric)
+    {
+        GuardCalls++;
+        GC.Collect();
+        if (metric.Value == 7)
+            throw new PatternIntegrationException("guard");
+        return true;
+    }
+
+    private static int GuardedExpression(Envelope envelope)
+    {
+        try
+        {
+            return envelope switch
+            {
+                { Payload: IMetric metric } when ThrowingGuard(metric) => metric.Boost(),
+                _ => 0
+            };
+        }
+        finally
+        {
+            FinallyCount++;
+        }
+    }
+
+    private static IEnumerator<int> Values(Envelope envelope)
+    {
+        yield return envelope switch
+        {
+            { Payload: IMetric metric } when metric.Value > 0 => metric.Boost(),
+            _ => 0
+        };
+
+        if (envelope is { Payload: { Value: > 0 } } and { Payload: not null })
+            yield return 17;
+    }
+
+    private static int StatementSwitch(Envelope envelope)
+    {
+        int marker = 0;
+        try
+        {
+            switch (envelope)
+            {
+                case { Payload: IMetric metric } when metric.Value == 7:
+                    marker = metric.Boost();
+                    break;
+                case null:
+                    marker = -1;
+                    break;
+                default:
+                    marker = 0;
+                    break;
+            }
+        }
+        finally
+        {
+            marker = marker + 100;
+        }
+        return marker;
+    }
+
+    public static void Main()
+    {
+        Envelope envelope = new Envelope(new Metric(7));
+
+        int expression = envelope switch
+        {
+            { Payload: IMetric metric } when metric.Value == 7 => metric.Boost(),
+            _ => 0
+        };
+        Console.WriteLine(expression == 17);
+        Console.WriteLine(envelope.GetterCalls == 1);
+
+        IMetric contract = new Metric(4);
+        int interfaceResult = contract switch
+        {
+            IMetric metric when metric.Value == 4 => metric.Boost(),
+            _ => 0
+        };
+        Console.WriteLine(interfaceResult == 14);
+
+        Stat stat = new Stat();
+        stat.Value = 8;
+        Stat? maybe = stat;
+        int nullableResult = maybe switch
+        {
+            { Value: > 5 and < 10 } => 1,
+            null => -1,
+            _ => 0
+        };
+        Console.WriteLine(nullableResult == 1);
+
+        maybe = null;
+        int nullableNull = maybe switch
+        {
+            null => 2,
+            _ => 0
+        };
+        Console.WriteLine(nullableNull == 2);
+
+        GenericClassifier<int> generic = new GenericClassifier<int>();
+        envelope.GetterCalls = 0;
+        Console.WriteLine(generic.Classify(envelope) == 17);
+        Console.WriteLine(envelope.GetterCalls == 1);
+
+        envelope.GetterCalls = 0;
+        Console.WriteLine(StatementSwitch(envelope) == 117);
+        Console.WriteLine(envelope.GetterCalls == 1);
+
+        FinallyCount = 0;
+        GuardCalls = 0;
+        bool caught = false;
+        try
+        {
+            int unused = GuardedExpression(envelope);
+        }
+        catch (PatternIntegrationException error)
+        {
+            caught = error.Message == "guard";
+        }
+        Console.WriteLine(caught);
+        Console.WriteLine(GuardCalls == 1);
+        Console.WriteLine(FinallyCount == 1);
+
+        IEnumerator<int> iterator = Values(envelope);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == 17);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == 17);
+        Console.WriteLine(!iterator.MoveNext());
+        iterator.Dispose();
+
+        Envelope none = new Envelope(null);
+        int noneResult = none switch
+        {
+            { Payload: null } => 3,
+            _ => 0
+        };
+        Console.WriteLine(noneResult == 3);
+
+        Envelope nullEnvelope = null;
+        int outerNull = nullEnvelope switch
+        {
+            null => 4,
+            _ => 0
+        };
+        Console.WriteLine(outerNull == 4);
+
+        int nested = envelope switch
+        {
+            { Payload: IMetric metric } => metric.Value switch
+            {
+                > 5 and < 10 => metric.Boost(),
+                _ => 0
+            },
+            _ => 0
+        };
+        Console.WriteLine(nested == 17);
+    }
+}

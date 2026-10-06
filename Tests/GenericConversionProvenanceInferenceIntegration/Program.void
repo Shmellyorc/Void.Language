@@ -1,0 +1,186 @@
+using Void;
+
+public interface IToInt<T>
+{
+    static implicit operator int(T value);
+}
+
+public interface IFromInt<T>
+{
+    static implicit operator T(int value);
+}
+
+public struct Number : IToInt<Number>, IFromInt<Number>
+{
+    public int Value;
+
+    public Number(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator int(Number value)
+    {
+        return value.Value;
+    }
+
+    public static implicit operator Number(int value)
+    {
+        return new Number(value + 100);
+    }
+}
+
+public sealed class Box<T>
+{
+    public T Value;
+
+    public T Item
+    {
+        get { return Value; }
+        set { Value = value; }
+    }
+
+    public Box(T value)
+    {
+        Value = value;
+    }
+
+    public void Accept(T value)
+    {
+        Value = value;
+    }
+
+    public T Get()
+    {
+        return Value;
+    }
+}
+
+public static class Program
+{
+    private static U Identity<U>(U value)
+    {
+        return value;
+    }
+
+    private static int ViaVar<T>(T value) where T : IToInt<T>
+    {
+        var copy = value;
+        return copy;
+    }
+
+    private static int ViaConditional<T>(T value, bool flag) where T : IToInt<T>
+    {
+        var copy = flag ? value : value;
+        return copy;
+    }
+
+    private static int ViaSwitch<T>(T value, int tag) where T : IToInt<T>
+    {
+        var copy = tag switch
+        {
+            0 => value,
+            _ => value
+        };
+        return copy;
+    }
+
+    private static int ViaInferredIdentity<T>(T value) where T : IToInt<T>
+    {
+        var copy = Identity(value);
+        return copy;
+    }
+
+    private static int ViaExplicitIdentity<T>(T value) where T : IToInt<T>
+    {
+        var copy = Identity<T>(value);
+        return copy;
+    }
+
+    private static T TargetConditional<T>(bool flag) where T : IFromInt<T>
+    {
+        return flag ? 1 : 2;
+    }
+
+    private static T TargetSwitch<T>(int tag) where T : IFromInt<T>
+    {
+        return tag switch
+        {
+            0 => 3,
+            _ => 4
+        };
+    }
+
+    private static int ReadField<T>(Box<T> box) where T : IToInt<T>
+    {
+        return box.Value;
+    }
+
+    private static int ReadProperty<T>(Box<T> box) where T : IToInt<T>
+    {
+        return box.Item;
+    }
+
+    private static int ReadMethod<T>(Box<T> box) where T : IToInt<T>
+    {
+        return box.Get();
+    }
+
+    private static void WriteField<T>(Box<T> box) where T : IFromInt<T>
+    {
+        box.Value = 5;
+    }
+
+    private static void WriteProperty<T>(Box<T> box) where T : IFromInt<T>
+    {
+        box.Item = 6;
+    }
+
+    private static void WriteMethod<T>(Box<T> box) where T : IFromInt<T>
+    {
+        box.Accept(7);
+    }
+
+    private static Box<T> Construct<T>() where T : IFromInt<T>
+    {
+        return new Box<T>(8);
+    }
+
+    private static Box<T> ObjectInitialize<T>() where T : IFromInt<T>
+    {
+        return new Box<T>(0) { Value = 9 };
+    }
+
+    public static void Main()
+    {
+        Number number = new Number(11);
+        Console.WriteLine(ViaVar(number) == 11);
+        Console.WriteLine(ViaConditional(number, true) == 11);
+        Console.WriteLine(ViaSwitch(number, 0) == 11);
+        Console.WriteLine(ViaInferredIdentity(number) == 11);
+        Console.WriteLine(ViaExplicitIdentity(number) == 11);
+
+        Console.WriteLine(TargetConditional<Number>(true).Value == 101);
+        Console.WriteLine(TargetSwitch<Number>(0).Value == 103);
+
+        Box<Number> box = new Box<Number>(new Number(12));
+        Console.WriteLine(ReadField(box) == 12);
+        Console.WriteLine(ReadProperty(box) == 12);
+        Console.WriteLine(ReadMethod(box) == 12);
+        WriteField(box);
+        Console.WriteLine(box.Value.Value == 105);
+        WriteProperty(box);
+        Console.WriteLine(box.Value.Value == 106);
+        WriteMethod(box);
+        Console.WriteLine(box.Value.Value == 107);
+        Console.WriteLine(Construct<Number>().Value.Value == 108);
+        Console.WriteLine(ObjectInitialize<Number>().Value.Value == 109);
+
+        Number concreteIdentity = Identity<Number>(new Number(13));
+        int concreteIdentityValue = concreteIdentity;
+        Console.WriteLine(concreteIdentityValue == 13);
+        Box<Number> concreteBox = new Box<Number>(1);
+        int concreteBoxValue = concreteBox.Value;
+        Console.WriteLine(concreteBoxValue == 101);
+    }
+}

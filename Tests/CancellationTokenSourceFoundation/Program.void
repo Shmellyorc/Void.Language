@@ -1,0 +1,117 @@
+using Void;
+using Void.Threading;
+
+public static class Program
+{
+    private static void CancelWorker(CancellationTokenSource source)
+    {
+        source.Cancel();
+    }
+
+    public static void Main()
+    {
+        CancellationToken none = default;
+        Console.WriteLine(!none.CanBeCanceled);
+        Console.WriteLine(!none.IsCancellationRequested);
+        none.ThrowIfCancellationRequested();
+        Console.WriteLine(true);
+
+        CancellationToken staticNone = CancellationToken.None;
+        Console.WriteLine(!staticNone.CanBeCanceled);
+        Console.WriteLine(!staticNone.IsCancellationRequested);
+
+        CancellationTokenSource source = new CancellationTokenSource();
+        CancellationToken token = source.Token;
+        CancellationToken copy = token;
+        Console.WriteLine(token.CanBeCanceled);
+        Console.WriteLine(!source.IsCancellationRequested);
+        Console.WriteLine(!token.IsCancellationRequested);
+        Console.WriteLine(!copy.IsCancellationRequested);
+
+        token.ThrowIfCancellationRequested();
+        Console.WriteLine(true);
+
+        source.Cancel();
+        Console.WriteLine(source.IsCancellationRequested);
+        Console.WriteLine(token.IsCancellationRequested);
+        Console.WriteLine(copy.IsCancellationRequested);
+
+        source.Cancel();
+        source.Cancel();
+        Console.WriteLine(source.IsCancellationRequested);
+
+        bool canceled = false;
+        try
+        {
+            token.ThrowIfCancellationRequested();
+        }
+        catch (OperationCanceledException error)
+        {
+            canceled = true;
+            Console.WriteLine(Runtime.Equals(error.Message, "The operation was canceled."));
+            CancellationToken errorToken = error.CancellationToken;
+            Console.WriteLine(errorToken.IsCancellationRequested);
+            Console.WriteLine(errorToken.CanBeCanceled);
+        }
+        Console.WriteLine(canceled);
+
+        OperationCanceledException custom = new OperationCanceledException("custom", token);
+        Console.WriteLine(Runtime.Equals(custom.Message, "custom"));
+        CancellationToken customToken = custom.CancellationToken;
+        Console.WriteLine(customToken.IsCancellationRequested);
+        Exception asBase = custom;
+        Console.WriteLine(Runtime.Equals(asBase.Message, "custom"));
+
+        CancellationTokenSource first = new CancellationTokenSource();
+        CancellationTokenSource second = new CancellationTokenSource();
+        CancellationToken firstToken = first.Token;
+        CancellationToken secondToken = second.Token;
+        first.Cancel();
+        Console.WriteLine(firstToken.IsCancellationRequested);
+        Console.WriteLine(!secondToken.IsCancellationRequested);
+        second.Cancel();
+        Console.WriteLine(secondToken.IsCancellationRequested);
+
+        CancellationToken retained;
+        {
+            CancellationTokenSource owner = new CancellationTokenSource();
+            owner.Cancel();
+            retained = owner.Token;
+            owner = null;
+        }
+        GC.Collect();
+        Console.WriteLine(retained.IsCancellationRequested);
+        Console.WriteLine(retained.CanBeCanceled);
+
+        CancellationTokenSource concurrent = new CancellationTokenSource();
+        CancellationToken concurrentToken = concurrent.Token;
+        Thread one = new Thread(() => CancelWorker(concurrent));
+        Thread two = new Thread(() => CancelWorker(concurrent));
+        Thread three = new Thread(() => CancelWorker(concurrent));
+        Thread four = new Thread(() => CancelWorker(concurrent));
+        one.Start();
+        two.Start();
+        three.Start();
+        four.Start();
+        one.Join();
+        two.Join();
+        three.Join();
+        four.Join();
+        Console.WriteLine(concurrent.IsCancellationRequested);
+        Console.WriteLine(concurrentToken.IsCancellationRequested);
+
+        CancellationToken directNull = new CancellationToken(null);
+        Console.WriteLine(!directNull.CanBeCanceled);
+        Console.WriteLine(!directNull.IsCancellationRequested);
+
+        OperationCanceledException empty = new OperationCanceledException();
+        Console.WriteLine(Runtime.Equals(empty.Message, "The operation was canceled."));
+        CancellationToken emptyToken = empty.CancellationToken;
+        Console.WriteLine(!emptyToken.CanBeCanceled);
+
+        OperationCanceledException text = new OperationCanceledException("text");
+        Console.WriteLine(Runtime.Equals(text.Message, "text"));
+        CancellationToken textToken = text.CancellationToken;
+        Console.WriteLine(!textToken.CanBeCanceled);
+    }
+}

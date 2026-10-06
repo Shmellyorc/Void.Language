@@ -1,0 +1,205 @@
+using Void;
+using Void.Collections;
+
+public interface IStateContract
+{
+    static int Value { get; set; }
+}
+
+public sealed class State : IStateContract
+{
+    public static int Value { get; set; }
+}
+
+public interface IHubContract
+{
+    static event Action<int> Changed;
+}
+
+public sealed class Hub : IHubContract
+{
+    public static event Action<int> Changed;
+
+    public static void Raise(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+}
+
+public sealed class EarlyBox
+{
+    public int Value;
+
+    public EarlyBox(int value, bool stop)
+    {
+        Value = value;
+        if (stop)
+            return;
+        Value += 100;
+    }
+}
+
+public struct Counter
+{
+    public int Value;
+
+    public Counter(int value)
+    {
+        Value = value;
+    }
+
+    public int Add(int amount)
+    {
+        Value += amount;
+        return Value;
+    }
+}
+
+public interface IGenericWorker
+{
+    T Echo<T>(T value);
+}
+
+public sealed class GenericWorker : IGenericWorker
+{
+    public T Echo<T>(T value)
+    {
+        return value;
+    }
+}
+
+public sealed class WorkerHolder
+{
+    private GenericWorker _worker;
+
+    public GenericWorker Worker
+    {
+        get { return _worker; }
+    }
+
+    public WorkerHolder(GenericWorker worker)
+    {
+        _worker = worker;
+    }
+}
+
+public static class GenericStatic
+{
+    public static T Identity<T>(T value)
+    {
+        return value;
+    }
+}
+
+public static class IntegrationApi
+{
+    private static int _eventValue;
+
+    private static void Capture(int value)
+    {
+        _eventValue += value;
+    }
+
+    private static int CollectAndReturn(int value)
+    {
+        GC.Collect();
+        return value;
+    }
+
+    private static IEnumerator<int> Values(int seed)
+    {
+        var value = seed;
+        yield return value;
+
+        int next;
+        if (seed > 0)
+            next = seed + 1;
+        else
+            next = 1;
+        yield return next;
+
+        {
+            var value = next + 1;
+            yield return value;
+        }
+
+        yield return value;
+    }
+
+    [Export("void100_run_core")]
+    public static int RunCore(int seed)
+    {
+        int mask = 0;
+
+        State.Value = seed;
+        if (State.Value == seed)
+            mask += 1;
+
+        _eventValue = 0;
+        Hub.Changed += Capture;
+        Hub.Raise(3);
+        Hub.Changed -= Capture;
+        Hub.Raise(7);
+        if (_eventValue == 3)
+            mask += 2;
+
+        EarlyBox early = new EarlyBox(5, true);
+        if (early.Value == 5)
+            mask += 4;
+
+        int[,] matrix = new int[,] { { 1, 2 }, { 3, 4 } };
+        if (matrix.Rank == 2 && matrix.Length == 4 && matrix[1, 0] == 3 && matrix[1, 1] == 4)
+            mask += 8;
+
+        IEnumerator<int> iterator = Values(seed);
+        int sum = 0;
+        int count = 0;
+        while (iterator.MoveNext())
+        {
+            sum += iterator.Current;
+            count++;
+        }
+        if (count == 4 && sum == seed * 2 + (seed + 1) + (seed + 2))
+            mask += 16;
+
+        if (new Counter(7).Add(2) == 9)
+            mask += 32;
+
+        WorkerHolder holder = new WorkerHolder(new GenericWorker());
+        if (holder.Worker.Echo<int>(CollectAndReturn(6)) == 6)
+            mask += 64;
+
+        IGenericWorker contract = new GenericWorker();
+        if (contract.Echo<int>(7) == 7)
+            mask += 128;
+
+        int[,] sameMatrix = GenericStatic.Identity<int[,]>(matrix);
+        if (sameMatrix[0, 1] == 2 && sameMatrix[1, 1] == 4)
+            mask += 256;
+
+        GenericWorker worker = GenericStatic.Identity<GenericWorker>(new GenericWorker());
+        if (worker.Echo<int>(9) == 9)
+            mask += 512;
+
+        return mask;
+    }
+
+    [Export("void100_adjust")]
+    public static void Adjust(ref int value, int amount)
+    {
+        value += amount;
+    }
+
+    [Export("void100_write")]
+    public static void Write(out int value)
+    {
+        value = 100;
+    }
+
+    [Export("void100_read")]
+    public static int Read(in int value)
+    {
+        return value;
+    }
+}

@@ -1,0 +1,26 @@
+using Void.Threading;
+
+public sealed class JoinFailure : Exception
+{
+    public JoinFailure(string message) : base(message) { }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Thread worker = new Thread(() =>
+        {
+            throw new JoinFailure("worker failed");
+        });
+        worker.Start();
+        try
+        {
+            worker.Join();
+        }
+        catch (JoinFailure)
+        {
+        }
+        worker.Join();
+    }
+}

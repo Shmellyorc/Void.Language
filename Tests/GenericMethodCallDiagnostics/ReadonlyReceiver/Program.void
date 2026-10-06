@@ -1,0 +1,17 @@
+public struct Counter
+{
+    public int Value;
+    public T Add<T>(T result) { Value++; return result; }
+}
+public static class Program
+{
+    private static int Read(in Counter value)
+    {
+        return value.Add<int>(1);
+    }
+    public static void Main()
+    {
+        Counter value = new Counter();
+        Read(in value);
+    }
+}

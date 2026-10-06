@@ -1,0 +1,16 @@
+public interface IFromInt<T> { static implicit operator T(int value); }
+public struct Number : IFromInt<Number>
+{
+    public int Value;
+    public Number(int value) { Value = value; }
+    public static implicit operator Number(int value) { return new Number(value); }
+}
+public static class Program
+{
+    private static U Convert<T, U>(int value) where T : IFromInt<T>
+    {
+        U result = value;
+        return result;
+    }
+    public static void Main() { Number value = Convert<Number, Number>(1); }
+}

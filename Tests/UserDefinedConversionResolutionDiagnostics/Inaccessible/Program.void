@@ -1,0 +1,14 @@
+public struct Hidden
+{
+    private static implicit operator Hidden(int value)
+    {
+        return new Hidden();
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+    }
+}

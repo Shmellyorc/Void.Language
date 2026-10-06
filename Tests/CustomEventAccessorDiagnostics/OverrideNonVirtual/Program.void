@@ -1,0 +1,17 @@
+public class Base
+{
+    public event Action<int> Changed
+    {
+        add { }
+        remove { }
+    }
+}
+public sealed class Bad : Base
+{
+    public override event Action<int> Changed
+    {
+        add { }
+        remove { }
+    }
+}
+public static class Program { public static void Main() { } }

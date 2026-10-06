@@ -1,0 +1,3 @@
+using Void.Collections.Generic;
+public sealed class Box244 { public int Value; }
+public static class Program { private static unsafe IEnumerable<int> Bad(Box244 b) { fixed (int* p = &b.Value) { yield return p[0]; } } public static void Main() { foreach (int x in Bad(new Box244())) { } } }

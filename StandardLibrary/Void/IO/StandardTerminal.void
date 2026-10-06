@@ -1,0 +1,239 @@
+using Void.Text;
+
+namespace Void.IO;
+
+// Native terminal acquisition stays low-level. Mapping to the public Console API lives here.
+internal static class StandardTerminal
+{
+    private const int EventCharacter = 0;
+    private const int EventEnter = 1;
+    private const int EventBackspace = 2;
+    private const int EventTab = 3;
+    private const int EventEscape = 4;
+    private const int EventUp = 5;
+    private const int EventDown = 6;
+    private const int EventLeft = 7;
+    private const int EventRight = 8;
+    private const int EventHome = 9;
+    private const int EventEnd = 10;
+    private const int EventInsert = 11;
+    private const int EventDelete = 12;
+    private const int EventPageUp = 13;
+    private const int EventPageDown = 14;
+    private const int EventF1 = 15;
+
+
+    internal static bool KeyAvailable()
+    {
+        int available = Runtime.TerminalKeyAvailable();
+        if (available < 0)
+            throw new InvalidOperationException("Cannot determine key availability when standard input is redirected or no console is available.");
+        return available != 0;
+    }
+
+    internal static bool GetTreatControlCAsInput()
+    {
+        int signalProcessing = Runtime.TerminalSignalProcessingEnabled();
+        if (signalProcessing < 0)
+            throw new IOException("Unable to query console input control mode.");
+        return signalProcessing == 0;
+    }
+
+    internal static void SetTreatControlCAsInput(bool value)
+    {
+        if (!Runtime.TerminalSetSignalProcessingEnabled(!value))
+            throw new IOException("Unable to set console input control mode.");
+    }
+
+    internal static ConsoleKeyInfo ReadKey(bool intercept)
+    {
+        int[] data = new int[3];
+        if (!Runtime.TerminalReadEvent(data))
+            throw new InvalidOperationException("Cannot read keys when standard input is redirected or no console is available.");
+
+        int scalar = data[0];
+        int eventKind = data[1];
+        int modifiers = data[2];
+        ConsoleKey key = MapKey(eventKind, scalar);
+        bool alt = modifiers % 2 != 0;
+        bool shift = (modifiers / 2) % 2 != 0;
+        bool control = (modifiers / 4) % 2 != 0;
+        char keyChar = (char)scalar;
+        ConsoleKeyInfo info = new ConsoleKeyInfo(keyChar, key, shift, alt, control);
+
+        if (!intercept && scalar != 0)
+            Console.Write(keyChar);
+        return info;
+    }
+
+    private static ConsoleKey MapKey(int eventKind, int scalar)
+    {
+        if (eventKind == EventEnter) return ConsoleKey.Enter;
+        if (eventKind == EventBackspace) return ConsoleKey.Backspace;
+        if (eventKind == EventTab) return ConsoleKey.Tab;
+        if (eventKind == EventEscape) return ConsoleKey.Escape;
+        if (eventKind == EventUp) return ConsoleKey.UpArrow;
+        if (eventKind == EventDown) return ConsoleKey.DownArrow;
+        if (eventKind == EventLeft) return ConsoleKey.LeftArrow;
+        if (eventKind == EventRight) return ConsoleKey.RightArrow;
+        if (eventKind == EventHome) return ConsoleKey.Home;
+        if (eventKind == EventEnd) return ConsoleKey.End;
+        if (eventKind == EventInsert) return ConsoleKey.Insert;
+        if (eventKind == EventDelete) return ConsoleKey.Delete;
+        if (eventKind == EventPageUp) return ConsoleKey.PageUp;
+        if (eventKind == EventPageDown) return ConsoleKey.PageDown;
+        if (eventKind >= EventF1 && eventKind < EventF1 + 12)
+            return (ConsoleKey)((int)ConsoleKey.F1 + eventKind - EventF1);
+
+        if (scalar >= 1 && scalar <= 26)
+            return (ConsoleKey)((int)ConsoleKey.A + scalar - 1);
+        if (scalar >= 48 && scalar <= 57)
+            return (ConsoleKey)((int)ConsoleKey.D0 + scalar - 48);
+        if (scalar >= 65 && scalar <= 90)
+            return (ConsoleKey)((int)ConsoleKey.A + scalar - 65);
+        if (scalar >= 97 && scalar <= 122)
+            return (ConsoleKey)((int)ConsoleKey.A + scalar - 97);
+        if (scalar == 32) return ConsoleKey.Spacebar;
+        return (ConsoleKey)0;
+    }
+
+    private static int _foregroundColor = -1;
+    private static int _backgroundColor = -1;
+    private static bool _cursorVisible = true;
+
+    internal static ConsoleColor GetForegroundColor()
+    {
+        return (ConsoleColor)_foregroundColor;
+    }
+
+    internal static void SetForegroundColor(ConsoleColor value)
+    {
+        int raw = (int)value;
+        ValidateColor(raw);
+        EnsureOutputTerminal();
+        WriteControl("[" + ColorCode(raw, true) + "m");
+        _foregroundColor = raw;
+    }
+
+    internal static ConsoleColor GetBackgroundColor()
+    {
+        return (ConsoleColor)_backgroundColor;
+    }
+
+    internal static void SetBackgroundColor(ConsoleColor value)
+    {
+        int raw = (int)value;
+        ValidateColor(raw);
+        EnsureOutputTerminal();
+        WriteControl("[" + ColorCode(raw, false) + "m");
+        _backgroundColor = raw;
+    }
+
+    internal static void ResetColor()
+    {
+        EnsureOutputTerminal();
+        WriteControl("[0m");
+        _foregroundColor = -1;
+        _backgroundColor = -1;
+    }
+
+    internal static void Clear()
+    {
+        EnsureOutputTerminal();
+        WriteControl("[2J");
+        WriteControl("[H");
+    }
+
+    internal static int GetCursorLeft()
+    {
+        int[] position = GetCursorPosition();
+        return position[0];
+    }
+
+    internal static int GetCursorTop()
+    {
+        int[] position = GetCursorPosition();
+        return position[1];
+    }
+
+    internal static void SetCursorPosition(int left, int top)
+    {
+        if (left < 0 || left > 32767) throw new ArgumentOutOfRangeException("left");
+        if (top < 0 || top > 32767) throw new ArgumentOutOfRangeException("top");
+        EnsureOutputTerminal();
+        WriteControl("[" + (top + 1) + ";" + (left + 1) + "H");
+    }
+
+    internal static bool GetCursorVisible()
+    {
+        return _cursorVisible;
+    }
+
+    internal static void SetCursorVisible(bool value)
+    {
+        EnsureOutputTerminal();
+        WriteControl(value ? "[?25h" : "[?25l");
+        _cursorVisible = value;
+    }
+
+    internal static string GetTitle()
+    {
+        string title = Runtime.TerminalGetTitle();
+        if (title == null)
+            throw new PlatformNotSupportedException("Console.Title get is not supported by this terminal platform.");
+        return title;
+    }
+
+    internal static void SetTitle(string value)
+    {
+        if (value == null) throw new ArgumentNullException("value");
+        if (value.Length > 24500) throw new ArgumentOutOfRangeException("value");
+        if (!Runtime.TerminalSetTitle(value))
+            throw new IOException("Unable to set console title.");
+    }
+
+    private static int[] GetCursorPosition()
+    {
+        int[] position = new int[2];
+        if (!Runtime.TerminalGetCursorPosition(position))
+            throw new IOException("Unable to query console cursor position.");
+        return position;
+    }
+
+    private static void ValidateColor(int value)
+    {
+        if (value < 0 || value > 15)
+            throw new ArgumentException("The value is not a valid ConsoleColor.");
+    }
+
+    private static int ColorCode(int value, bool foreground)
+    {
+        int baseCode = foreground ? (value < 8 ? 30 : 90) : (value < 8 ? 40 : 100);
+        int color = value % 8;
+        if (color == 0) return baseCode;
+        if (color == 1) return baseCode + 4;
+        if (color == 2) return baseCode + 2;
+        if (color == 3) return baseCode + 6;
+        if (color == 4) return baseCode + 1;
+        if (color == 5) return baseCode + 5;
+        if (color == 6) return baseCode + 3;
+        return baseCode + 7;
+    }
+
+    private static void EnsureOutputTerminal()
+    {
+        if (!StandardStreams.IsTerminal(1) || !Runtime.TerminalPrepareOutput())
+            throw new IOException("Console output is not attached to a terminal.");
+    }
+
+    private static void WriteControl(string suffix)
+    {
+        StringBuilder control = new StringBuilder();
+        control.Append((char)27);
+        control.Append(suffix);
+        byte[] bytes = Encoding.UTF8.GetBytes(control.ToString());
+        StandardStreams.Write(1, bytes, 0, bytes.Length);
+        if (!StandardStreams.Flush(1)) throw new IOException("Unable to flush terminal output.");
+    }
+
+}

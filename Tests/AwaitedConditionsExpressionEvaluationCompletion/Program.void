@@ -1,0 +1,288 @@
+using Void;
+using Void.Threading.Tasks;
+
+public sealed class Box212
+{
+    public int Base;
+    public Box212(int value) { Base = value; }
+    public int Add(int value) { return Base + value; }
+}
+
+public static class Program
+{
+    private static int _order;
+    private static int _counter;
+
+    private static Task<bool> BoolTask(bool value)
+    {
+        TaskCompletionSource<bool> source = new TaskCompletionSource<bool>();
+        source.SetResult(value);
+        return source.Task;
+    }
+
+    private static Task<int> IntTask(int value)
+    {
+        TaskCompletionSource<int> source = new TaskCompletionSource<int>();
+        source.SetResult(value);
+        return source.Task;
+    }
+
+    private static int Before(int value)
+    {
+        _order = _order * 10 + 1;
+        return value;
+    }
+
+    private static int After(int value)
+    {
+        _order = _order * 10 + 3;
+        return value;
+    }
+
+    private static Box212 Receiver()
+    {
+        _order = _order * 10 + 1;
+        return new Box212(10);
+    }
+
+    private static int Combine(int a, int b, int c)
+    {
+        return a * 100 + b * 10 + c;
+    }
+
+    private static async Task<int> CallArguments(Task<int> source)
+    {
+        return Combine(Before(2), await source, After(4));
+    }
+
+    private static async Task<int> CallReceiver(Task<int> source)
+    {
+        return Receiver().Add(await source);
+    }
+
+    private static async Task<int> CallTwoArguments(Task<int> first, Task<int> second)
+    {
+        return Combine(await first, Before(2), await second);
+    }
+
+    private static async Task<bool> LazyAnd(Task<bool> left, Task<bool> right)
+    {
+        return await left && await right;
+    }
+
+    private static async Task<bool> LazyOr(Task<bool> left, Task<bool> right)
+    {
+        return await left || await right;
+    }
+
+    private static async Task<string> LazyNull(Task<string> left, Task<string> right)
+    {
+        return await left ?? await right;
+    }
+
+    private static async Task<int> Conditional(Task<bool> condition, Task<int> yes, Task<int> no)
+    {
+        return await condition ? await yes : await no;
+    }
+
+    private static async Task<int> IfCondition(Task<bool> source)
+    {
+        if (await source)
+            return 11;
+        return 22;
+    }
+
+    private static async Task<int> WhileCondition()
+    {
+        int value = 0;
+        while (await BoolTask(value < 3))
+        {
+            value = value + 1;
+            if (value == 1)
+                continue;
+        }
+        return value;
+    }
+
+    private static async Task<int> DoCondition()
+    {
+        int value = 0;
+        do
+        {
+            value = value + 1;
+            if (value < 2)
+                continue;
+        }
+        while (await BoolTask(value < 3));
+        return value;
+    }
+
+    private static async Task<int> ForConditionIncrement()
+    {
+        int total = 0;
+        _counter = 0;
+        for (; await BoolTask(_counter < 3); await IntTask(0))
+        {
+            _counter = _counter + 1;
+            total = total + 10;
+            if (_counter == 1)
+                continue;
+        }
+        return total + _counter;
+    }
+
+    private static async Task<int> SwitchInput(Task<int> source)
+    {
+        switch (await source)
+        {
+            case 1: return 10;
+            case 2: return 20;
+            default: return 30;
+        }
+    }
+
+    private static async Task ThrowAwaited(Task<Exception> source)
+    {
+        throw await source;
+    }
+
+    private static async Task<int> IndexRead(Task<int> index)
+    {
+        int[] values = new int[3];
+        values[0] = 4;
+        values[1] = 7;
+        values[2] = 9;
+        return values[await index];
+    }
+
+    private static async Task<int> IndexAssignment(Task<int> value)
+    {
+        int[] values = new int[2];
+        _order = 0;
+        values[Before(1)] = await value;
+        _order = _order * 10 + 3;
+        return values[1];
+    }
+
+    private static async Task<int> NewArgument(Task<int> value)
+    {
+        Box212 box = new Box212(await value);
+        return box.Base;
+    }
+
+    public static void Main()
+    {
+        _order = 0;
+        TaskCompletionSource<int> arg = new TaskCompletionSource<int>();
+        Task<int> call = CallArguments(arg.Task);
+        Console.WriteLine(!call.IsCompleted && _order == 1);
+        arg.SetResult(3);
+        Console.WriteLine(call.Result == 234 && _order == 13);
+
+        _order = 0;
+        TaskCompletionSource<int> receiver = new TaskCompletionSource<int>();
+        Task<int> receiverTask = CallReceiver(receiver.Task);
+        Console.WriteLine(!receiverTask.IsCompleted && _order == 1);
+        GC.Collect();
+        GC.Collect();
+        receiver.SetResult(5);
+        Console.WriteLine(receiverTask.Result == 15);
+
+        _order = 0;
+        TaskCompletionSource<int> firstArg = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> secondArg = new TaskCompletionSource<int>();
+        firstArg.SetResult(1);
+        Task<int> twoArgs = CallTwoArguments(firstArg.Task, secondArg.Task);
+        Console.WriteLine(!twoArgs.IsCompleted && _order == 1);
+        secondArg.SetResult(3);
+        Console.WriteLine(twoArgs.Result == 123);
+
+        TaskCompletionSource<bool> andLeft = new TaskCompletionSource<bool>();
+        TaskCompletionSource<bool> andRight = new TaskCompletionSource<bool>();
+        Task<bool> andTask = LazyAnd(andLeft.Task, andRight.Task);
+        andLeft.SetResult(false);
+        andTask.Wait();
+        Console.WriteLine(!andTask.Result && !andRight.Task.IsCompleted);
+
+        TaskCompletionSource<bool> andTrueLeft = new TaskCompletionSource<bool>();
+        TaskCompletionSource<bool> andTrueRight = new TaskCompletionSource<bool>();
+        Task<bool> andTrue = LazyAnd(andTrueLeft.Task, andTrueRight.Task);
+        andTrueLeft.SetResult(true);
+        Console.WriteLine(!andTrue.IsCompleted);
+        andTrueRight.SetResult(true);
+        Console.WriteLine(andTrue.Result);
+
+        TaskCompletionSource<bool> orLeft = new TaskCompletionSource<bool>();
+        TaskCompletionSource<bool> orRight = new TaskCompletionSource<bool>();
+        Task<bool> orTask = LazyOr(orLeft.Task, orRight.Task);
+        orLeft.SetResult(true);
+        orTask.Wait();
+        Console.WriteLine(orTask.Result && !orRight.Task.IsCompleted);
+
+        TaskCompletionSource<string> nullLeft = new TaskCompletionSource<string>();
+        TaskCompletionSource<string> nullRight = new TaskCompletionSource<string>();
+        Task<string> nullTask = LazyNull(nullLeft.Task, nullRight.Task);
+        nullLeft.SetResult("left");
+        nullTask.Wait();
+        Console.WriteLine(nullTask.Result == "left" && !nullRight.Task.IsCompleted);
+
+        TaskCompletionSource<string> nullNeededLeft = new TaskCompletionSource<string>();
+        TaskCompletionSource<string> nullNeededRight = new TaskCompletionSource<string>();
+        Task<string> nullNeeded = LazyNull(nullNeededLeft.Task, nullNeededRight.Task);
+        nullNeededLeft.SetResult(null);
+        Console.WriteLine(!nullNeeded.IsCompleted);
+        nullNeededRight.SetResult("right");
+        Console.WriteLine(nullNeeded.Result == "right");
+
+        TaskCompletionSource<bool> choose = new TaskCompletionSource<bool>();
+        TaskCompletionSource<int> yes = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> no = new TaskCompletionSource<int>();
+        Task<int> conditional = Conditional(choose.Task, yes.Task, no.Task);
+        choose.SetResult(false);
+        Console.WriteLine(!conditional.IsCompleted && !yes.Task.IsCompleted);
+        no.SetResult(8);
+        Console.WriteLine(conditional.Result == 8 && !yes.Task.IsCompleted);
+
+        TaskCompletionSource<bool> ifSource = new TaskCompletionSource<bool>();
+        Task<int> ifTask = IfCondition(ifSource.Task);
+        Console.WriteLine(!ifTask.IsCompleted);
+        ifSource.SetResult(true);
+        Console.WriteLine(ifTask.Result == 11);
+
+        Console.WriteLine(WhileCondition().Result == 3);
+        Console.WriteLine(DoCondition().Result == 3);
+        Console.WriteLine(ForConditionIncrement().Result == 33);
+
+        TaskCompletionSource<int> switchSource = new TaskCompletionSource<int>();
+        Task<int> switched = SwitchInput(switchSource.Task);
+        Console.WriteLine(!switched.IsCompleted);
+        switchSource.SetResult(2);
+        Console.WriteLine(switched.Result == 20);
+
+        TaskCompletionSource<Exception> errorSource = new TaskCompletionSource<Exception>();
+        Task thrown = ThrowAwaited(errorSource.Task);
+        errorSource.SetResult(new Exception("async-212-throw"));
+        bool caught = false;
+        try { thrown.Wait(); }
+        catch (Exception error) { caught = error.Message == "async-212-throw"; }
+        Console.WriteLine(caught && thrown.IsFaulted);
+
+        TaskCompletionSource<int> indexSource = new TaskCompletionSource<int>();
+        Task<int> indexed = IndexRead(indexSource.Task);
+        GC.Collect();
+        GC.Collect();
+        indexSource.SetResult(1);
+        Console.WriteLine(indexed.Result == 7);
+
+        TaskCompletionSource<int> assignmentSource = new TaskCompletionSource<int>();
+        Task<int> assigned = IndexAssignment(assignmentSource.Task);
+        Console.WriteLine(!assigned.IsCompleted && _order == 1);
+        assignmentSource.SetResult(42);
+        Console.WriteLine(assigned.Result == 42 && _order == 13);
+
+        TaskCompletionSource<int> newSource = new TaskCompletionSource<int>();
+        Task<int> created = NewArgument(newSource.Task);
+        newSource.SetResult(17);
+        Console.WriteLine(created.Result == 17);
+    }
+}

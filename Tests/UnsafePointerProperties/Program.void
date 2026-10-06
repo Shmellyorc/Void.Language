@@ -1,0 +1,128 @@
+public unsafe interface IPointerView
+{
+    public int* Pointer { get; }
+}
+
+public unsafe interface IDerivedPointerView : IPointerView
+{
+}
+
+public unsafe interface IStaticPointer
+{
+    public static int* Shared { get; set; }
+}
+
+public unsafe class PointerBox : IDerivedPointerView, IStaticPointer
+{
+    public int* Pointer { get; set; } = null;
+    public static int* Shared { get; set; }
+    public int** Nested { get; set; }
+    public void* Empty { get; set; }
+
+    public int* Alias
+    {
+        get { return Pointer; }
+        set { Pointer = value; }
+    }
+
+    public int* Next => Pointer + 1;
+}
+
+public unsafe class PointerBase
+{
+    public virtual int* Virtual { get; set; }
+}
+
+public unsafe sealed class PointerDerived : PointerBase
+{
+    public override int* Virtual { get; set; }
+}
+
+public unsafe class InheritedPointerBase
+{
+    public int* Pointer { get; set; }
+}
+
+public unsafe sealed class InheritedPointerDerived : InheritedPointerBase, IPointerView
+{
+}
+
+public unsafe struct PointerValue : IPointerView
+{
+    public int* Pointer { get; set; }
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        int[] values = new int[5];
+        values[0] = 10;
+        values[1] = 20;
+        values[2] = 30;
+        values[3] = 40;
+        values[4] = 50;
+        int* start = &values[0];
+
+        PointerBox box = new();
+        Console.WriteLine(box.Pointer == null);
+        box.Pointer = start;
+        Console.WriteLine(box.Pointer == start);
+        Console.WriteLine(box.Next == start + 1);
+
+        box.Alias = start + 1;
+        Console.WriteLine(box.Pointer == start + 1);
+        Console.WriteLine(box.Alias == start + 1);
+        Console.WriteLine(box.Next == start + 2);
+
+        PointerBox.Shared = start + 2;
+        Console.WriteLine(PointerBox.Shared == start + 2);
+
+        int* local = start + 3;
+        int** nested = &local;
+        box.Nested = nested;
+        Console.WriteLine(box.Nested == nested);
+        Console.WriteLine(**box.Nested == 40);
+
+        box.Empty = null;
+        Console.WriteLine(box.Empty == null);
+
+        IPointerView view = box;
+        Console.WriteLine(view.Pointer == start + 1);
+        IDerivedPointerView derivedView = box;
+        Console.WriteLine(derivedView.Pointer == start + 1);
+
+        GC.Collect();
+        Console.WriteLine(box.Pointer == start + 1);
+        Console.WriteLine(view.Pointer == start + 1);
+        Console.WriteLine(PointerBox.Shared == start + 2);
+        Console.WriteLine(**box.Nested == 40);
+
+        PointerDerived derived = new();
+        PointerBase baseValue = derived;
+        baseValue.Virtual = start + 3;
+        Console.WriteLine(derived.Virtual == start + 3);
+        Console.WriteLine(baseValue.Virtual == start + 3);
+        derived.Virtual = start + 4;
+        Console.WriteLine(baseValue.Virtual == start + 4);
+
+        InheritedPointerDerived inherited = new();
+        inherited.Pointer = start;
+        IPointerView inheritedView = inherited;
+        Console.WriteLine(inheritedView.Pointer == start);
+
+        PointerValue value = new();
+        value.Pointer = start + 2;
+        Console.WriteLine(value.Pointer == start + 2);
+        IPointerView valueView = value;
+        Console.WriteLine(valueView.Pointer == start + 2);
+
+        Console.WriteLine(PointerBox.Shared == start + 2);
+        PointerBox.Shared = null;
+        Console.WriteLine(PointerBox.Shared == null);
+
+        box.Pointer += 1;
+        Console.WriteLine(box.Pointer == start + 2);
+        Console.WriteLine(box.Next == start + 3);
+    }
+}

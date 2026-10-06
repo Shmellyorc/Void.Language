@@ -1,0 +1,15 @@
+public struct Bad
+{
+    public Bad()
+    {
+        return default;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Bad value = new Bad();
+    }
+}

@@ -1,0 +1,13 @@
+public sealed class Bad
+{
+    public int Value() => "wrong";
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Bad bad = new();
+        Console.WriteLine(bad.Value() == 0);
+    }
+}

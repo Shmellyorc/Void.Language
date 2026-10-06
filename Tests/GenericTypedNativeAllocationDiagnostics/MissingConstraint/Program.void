@@ -1,0 +1,6 @@
+using Void;
+public static class Program
+{
+    private static unsafe T* AllocateAny<T>(ulong count) => NativeMemory.Allocate<T>(count);
+    public static unsafe void Main() { int* value = AllocateAny<int>(1ul); NativeMemory.Free(value); }
+}

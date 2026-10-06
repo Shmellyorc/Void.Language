@@ -1,0 +1,8 @@
+public interface IImplicit<T> { static implicit operator int(T value); }
+public interface IExplicit<T> { static explicit operator int(T value); }
+public interface IConflict<T> : IImplicit<T>, IExplicit<T> { }
+public struct Number : IConflict<Number>
+{
+    public static implicit operator int(Number value) { return 0; }
+}
+public static class Program { public static void Main() { } }

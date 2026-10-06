@@ -1,0 +1,34 @@
+namespace Void.Threading;
+
+public static class Volatile
+{
+    public static int Read(ref int location)
+    {
+        return Runtime.VolatileReadInt(ref location);
+    }
+
+    public static long Read(ref long location)
+    {
+        return Runtime.VolatileReadLong(ref location);
+    }
+
+    public static void Write(ref int location, int value)
+    {
+        Runtime.VolatileWriteInt(ref location, value);
+    }
+
+    public static void Write(ref long location, long value)
+    {
+        Runtime.VolatileWriteLong(ref location, value);
+    }
+
+    public static T Read<T>(ref T location) where T : class
+    {
+        return Runtime.VolatileReadRef(ref location);
+    }
+
+    public static void Write<T>(ref T location, T value) where T : class
+    {
+        Runtime.VolatileWriteRef(ref location, value);
+    }
+}

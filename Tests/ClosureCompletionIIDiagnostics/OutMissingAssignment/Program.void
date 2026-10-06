@@ -1,0 +1,8 @@
+public delegate void OutAction(out int value);
+public static class Program
+{
+    public static void Main()
+    {
+        OutAction action = value => { };
+    }
+}

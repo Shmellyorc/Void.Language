@@ -1,0 +1,1 @@
+using Void; public static class Program { public static unsafe void Main(){ int[] a = new int[]{1}; Span<int> s = new Span<int>(a); fixed (long* p = s) { } } }

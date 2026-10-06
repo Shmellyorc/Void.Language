@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "ForeachDisposalCompletion",
+  "version": "0.1.0",
+  "output": "exe",
+  "compiler": {
+    "unsafe": false
+  }
+}

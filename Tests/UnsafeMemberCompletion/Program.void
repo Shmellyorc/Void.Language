@@ -1,0 +1,152 @@
+public unsafe struct PointerBox
+{
+    private int* _pointer;
+
+    public int* Pointer
+    {
+        get { return _pointer; }
+        set { _pointer = value; }
+    }
+
+    public int* Auto { get; set; }
+    public static int* Shared { get; set; }
+    public int** Nested { get; set; }
+    public void* Empty { get; set; }
+    public int* NullPointer { get; set; } = null;
+
+    public int* Next => _pointer + 1;
+    public int Value => *_pointer;
+
+    public PointerBox(int* pointer)
+    {
+        _pointer = pointer;
+        Auto = pointer;
+        Empty = null;
+    }
+
+    public PointerBox(int* pointer, int offset) : this(pointer + offset)
+    {
+    }
+}
+
+public unsafe struct RefPointerBox
+{
+    public int* Pointer;
+
+    public RefPointerBox(ref int* pointer)
+    {
+        Pointer = pointer;
+        pointer++;
+    }
+}
+
+public unsafe struct OutPointerBox
+{
+    public int Value;
+
+    public OutPointerBox(out int* pointer)
+    {
+        pointer = null;
+        Value = pointer == null ? 1 : 0;
+    }
+}
+
+public unsafe struct InPointerBox
+{
+    public int* Pointer;
+
+    public InPointerBox(in int* pointer)
+    {
+        Pointer = pointer;
+    }
+}
+
+public class Reader
+{
+    public int Value;
+
+    public unsafe Reader(int* pointer)
+    {
+        Value = *pointer;
+    }
+}
+
+public class BaseReader
+{
+    public int Value;
+
+    public unsafe BaseReader(int* pointer)
+    {
+        Value = *pointer;
+    }
+}
+
+public class DerivedReader : BaseReader
+{
+    public unsafe DerivedReader(int* pointer) : base(pointer + 1)
+    {
+    }
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        int[] values = new int[4];
+        values[0] = 10;
+        values[1] = 20;
+        values[2] = 30;
+        values[3] = 40;
+
+        int* start = &values[0];
+        PointerBox box = new PointerBox(start);
+        Console.WriteLine(box.Pointer == start);
+        Console.WriteLine(box.Auto == start);
+        Console.WriteLine(box.Value == 10);
+        Console.WriteLine(box.Next == start + 1);
+        Console.WriteLine(box.NullPointer == null);
+
+        box.Pointer = start + 1;
+        Console.WriteLine(box.Value == 20);
+        Console.WriteLine(box.Next == start + 2);
+
+        PointerBox offset = new PointerBox(start, 2);
+        Console.WriteLine(offset.Pointer == start + 2);
+        Console.WriteLine(offset.Value == 30);
+        Console.WriteLine(offset.Next == start + 3);
+
+        PointerBox.Shared = start + 3;
+        Console.WriteLine(PointerBox.Shared == start + 3);
+
+        int* local = start;
+        int** nested = &local;
+        box.Nested = nested;
+        Console.WriteLine(box.Nested == nested);
+        Console.WriteLine(**box.Nested == 10);
+        Console.WriteLine(box.Empty == null);
+
+        Reader reader = new Reader(start + 1);
+        Console.WriteLine(reader.Value == 20);
+
+        BaseReader baseReader = new BaseReader(start);
+        Console.WriteLine(baseReader.Value == 10);
+
+        DerivedReader derived = new DerivedReader(start + 1);
+        Console.WriteLine(derived.Value == 30);
+
+        int* refPointer = start;
+        RefPointerBox refBox = new RefPointerBox(ref refPointer);
+        Console.WriteLine(refBox.Pointer == start);
+        Console.WriteLine(refPointer == start + 1);
+
+        int* outPointer = start;
+        OutPointerBox outBox = new OutPointerBox(out outPointer);
+        Console.WriteLine(outPointer == null);
+        Console.WriteLine(outBox.Value == 1);
+
+        int* inPointer = start + 3;
+        InPointerBox inBox = new InPointerBox(in inPointer);
+        Console.WriteLine(inBox.Pointer == start + 3);
+        Console.WriteLine(inPointer == start + 3);
+    }
+}

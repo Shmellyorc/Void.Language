@@ -1,0 +1,11 @@
+{
+  "format": 1,
+  "name": "LanguageEdgeProjectCompletionIntegration",
+  "version": "0.1.0",
+  "output": "exe",
+  "compiler": {
+    "unsafe": true,
+    "libraries": ["Void100Lib", "void100fixture"],
+    "libraryPaths": ["native"]
+  }
+}

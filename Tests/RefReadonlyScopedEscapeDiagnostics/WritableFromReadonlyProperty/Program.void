@@ -1,0 +1,13 @@
+public sealed class Box225Diag
+{
+    public int Value;
+    public ref readonly int View { get { return ref Value; } }
+}
+public static class Program
+{
+    public static void Main()
+    {
+        Box225Diag box = new Box225Diag();
+        ref int alias = ref box.View;
+    }
+}

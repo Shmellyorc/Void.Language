@@ -1,0 +1,16 @@
+using Void;
+using Void.Threading.Tasks;
+public sealed class Gate275 { }
+public sealed class R { public async Task DisposeAsync(){ await Task.Yield(); } }
+public static class Program
+{
+    private static Gate275 Gate = new Gate275();
+    private static async Task M()
+    {
+        lock (Gate)
+        {
+            await using (R r = new R()) { }
+        }
+    }
+    public static void Main() { }
+}

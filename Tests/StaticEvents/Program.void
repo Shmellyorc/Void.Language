@@ -1,0 +1,200 @@
+using Void;
+
+public static class Recorder
+{
+    public static int Value;
+
+    public static void Reset()
+    {
+        Value = 0;
+    }
+
+    public static void Push(int digit)
+    {
+        Value = Value * 10 + digit;
+    }
+}
+
+public sealed class Listener
+{
+    private int _digit;
+
+    public Listener(int digit)
+    {
+        _digit = digit;
+    }
+
+    public void Handle(int value)
+    {
+        Recorder.Push(_digit);
+    }
+}
+
+public static class StaticHub
+{
+    public static event Action<int> Changed;
+    public static int Initialized;
+
+    static StaticHub()
+    {
+        Initialized = 1;
+        Changed += BuiltIn;
+    }
+
+    private static void BuiltIn(int value)
+    {
+        Recorder.Push(1);
+    }
+
+    public static void Raise(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+
+    public static void RaiseQualified(int value)
+    {
+        if (StaticHub.Changed != null)
+            StaticHub.Changed(value);
+    }
+
+    public static void Clear()
+    {
+        Changed = null;
+    }
+
+    public static bool HasHandlers()
+    {
+        return Changed != null;
+    }
+}
+
+public class BaseHub
+{
+    public static event Action<int> Changed;
+
+    public static void Raise(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+
+    public static void Clear()
+    {
+        Changed = null;
+    }
+}
+
+public sealed class DerivedHub : BaseHub
+{
+}
+
+public class GenericHub<T>
+{
+    public static event Action<int> Changed;
+    private static int _digit;
+
+    private static void Handle(int value)
+    {
+        Recorder.Push(_digit);
+    }
+
+    public void Configure(int digit)
+    {
+        _digit = digit;
+        Changed += Handle;
+    }
+
+    public void Unsubscribe()
+    {
+        Changed -= Handle;
+    }
+
+    public void Raise(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+
+    public void Clear()
+    {
+        Changed = null;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Listener two = new Listener(2);
+        StaticHub.Changed += two.Handle;
+        Console.WriteLine(StaticHub.Initialized == 1);
+
+        Recorder.Reset();
+        StaticHub.Raise(0);
+        Console.WriteLine(Recorder.Value == 12);
+
+        StaticHub.Changed -= two.Handle;
+        Recorder.Reset();
+        StaticHub.RaiseQualified(0);
+        Console.WriteLine(Recorder.Value == 1);
+
+        Listener three = new Listener(3);
+        StaticHub.Changed += three.Handle;
+        three = null;
+        GC.Collect();
+        Recorder.Reset();
+        StaticHub.Raise(0);
+        Console.WriteLine(Recorder.Value == 13);
+
+        StaticHub.Clear();
+        Console.WriteLine(!StaticHub.HasHandlers());
+
+        Listener four = new Listener(4);
+        DerivedHub.Changed += four.Handle;
+        Recorder.Reset();
+        BaseHub.Raise(0);
+        Console.WriteLine(Recorder.Value == 4);
+        DerivedHub.Changed -= four.Handle;
+        Recorder.Reset();
+        BaseHub.Raise(0);
+        Console.WriteLine(Recorder.Value == 0);
+        BaseHub.Clear();
+
+        GenericHub<int> ints = new GenericHub<int>();
+        GenericHub<float> floats = new GenericHub<float>();
+        ints.Configure(5);
+        floats.Configure(6);
+
+        Recorder.Reset();
+        ints.Raise(0);
+        Console.WriteLine(Recorder.Value == 5);
+
+        Recorder.Reset();
+        floats.Raise(0);
+        Console.WriteLine(Recorder.Value == 6);
+
+        ints.Unsubscribe();
+        Recorder.Reset();
+        ints.Raise(0);
+        Console.WriteLine(Recorder.Value == 0);
+
+        Recorder.Reset();
+        floats.Raise(0);
+        Console.WriteLine(Recorder.Value == 6);
+
+        ints.Clear();
+        floats.Clear();
+
+        Listener seven = new Listener(7);
+        StaticHub.Changed += seven.Handle;
+        StaticHub.Changed += seven.Handle;
+        StaticHub.Changed -= seven.Handle;
+        Recorder.Reset();
+        StaticHub.Raise(0);
+        Console.WriteLine(Recorder.Value == 7);
+        StaticHub.Clear();
+
+        Console.WriteLine(StaticHub.Initialized == 1);
+    }
+}

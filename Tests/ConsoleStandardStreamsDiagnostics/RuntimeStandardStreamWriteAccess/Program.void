@@ -1,0 +1,8 @@
+public static class Program
+{
+    public static void Main()
+    {
+        byte[] buffer = new byte[1];
+        Runtime.StandardStreamWrite(1, buffer, 0, 1);
+    }
+}

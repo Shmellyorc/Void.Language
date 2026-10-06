@@ -1,0 +1,6 @@
+{
+  "format": 1,
+  "name": "TimedMonitorWaitCompletion",
+  "output": "exe",
+  "version": "0.1.0"
+}

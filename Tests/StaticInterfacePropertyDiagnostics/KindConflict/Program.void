@@ -1,0 +1,4 @@
+public interface ILeft { static int Value { get; } }
+public interface IRight { int Value { get; } }
+public interface IBad : ILeft, IRight { }
+public static class Program { public static void Main() { } }

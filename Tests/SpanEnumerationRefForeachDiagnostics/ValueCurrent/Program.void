@@ -1,0 +1,3 @@
+public struct ValueSequence238 { public ValueEnumerator238 GetEnumerator() { return new ValueEnumerator238(); } }
+public struct ValueEnumerator238 { private int _i; public bool MoveNext() { _i++; return _i == 1; } public int Current => 1; }
+public static class Program { public static void Main() { ValueSequence238 s = new ValueSequence238(); foreach (ref int x in s) { } } }

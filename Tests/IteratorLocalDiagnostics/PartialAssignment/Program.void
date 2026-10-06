@@ -1,0 +1,12 @@
+using Void.Collections;
+public static class Program
+{
+    public static IEnumerator<int> Bad(bool flag)
+    {
+        int value;
+        if (flag)
+            value = 1;
+        yield return value;
+    }
+    public static void Main() { IEnumerator<int> e = Bad(true); }
+}

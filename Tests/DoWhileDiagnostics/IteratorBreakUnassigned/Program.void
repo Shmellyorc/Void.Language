@@ -1,0 +1,18 @@
+using Void.Collections;
+
+public static class Program
+{
+    public static IEnumerator<int> Values(bool stop)
+    {
+        int value;
+        do
+        {
+            if (stop)
+                break;
+            value = 1;
+        } while (false);
+        yield return value;
+    }
+
+    public static void Main() { }
+}

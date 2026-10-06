@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { Range r = 1..2; int o; int l; r.GetOffsetAndLength(-1, out o, out l); } }

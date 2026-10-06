@@ -1,0 +1,4 @@
+public static class Program {
+    private static unsafe bool Use<T>() => default(T*) == null;
+    public static unsafe void Main() { Console.WriteLine(Use<int>()); }
+}

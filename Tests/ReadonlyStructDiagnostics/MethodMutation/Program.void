@@ -1,0 +1,9 @@
+public struct Bad
+{
+    public int Value;
+    public readonly void Change() { Value = 2; }
+}
+public static class Program
+{
+    public static void Main() { Bad value = new Bad(); value.Change(); }
+}

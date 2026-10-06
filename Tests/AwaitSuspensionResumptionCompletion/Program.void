@@ -1,0 +1,135 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class AwaitWorker203
+{
+    private int _value;
+    public static int LastObserved;
+
+    public AwaitWorker203(int value)
+    {
+        _value = value;
+    }
+
+    public async Task WaitAndPublish(Task signal, int amount)
+    {
+        _value += 1;
+        await signal;
+        _value += amount;
+        LastObserved = _value;
+    }
+}
+
+public static class Program
+{
+    private static int _stage;
+    private static int _blockers;
+
+    private static async Task Observe(Task source)
+    {
+        _stage = 1;
+        await source;
+        _stage = 2;
+    }
+
+    private static bool WaitFault(Task task, string message)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (Exception error)
+        {
+            return error.Message == message;
+        }
+        return false;
+    }
+
+    public static void Main()
+    {
+        ManualResetEvent release = new ManualResetEvent(false);
+        Task blockerOne = Task.Run(() =>
+        {
+            Interlocked.Increment(ref _blockers);
+            release.WaitOne();
+        });
+        Task blockerTwo = Task.Run(() =>
+        {
+            Interlocked.Increment(ref _blockers);
+            release.WaitOne();
+        });
+        while (Volatile.Read(ref _blockers) != 2)
+            Thread.Sleep(1);
+        Console.WriteLine(true);
+
+        TaskCompletionSource alreadyCompleteSource = new TaskCompletionSource();
+        alreadyCompleteSource.SetResult();
+        _stage = 0;
+        Task immediate = Observe(alreadyCompleteSource.Task);
+        Console.WriteLine(immediate.IsCompleted);
+        Console.WriteLine(immediate.Status == TaskStatus.Completed);
+        Console.WriteLine(_stage == 2);
+
+        TaskCompletionSource pendingSource = new TaskCompletionSource();
+        _stage = 0;
+        Task pending = Observe(pendingSource.Task);
+        Console.WriteLine(_stage == 1);
+        Console.WriteLine(!pending.IsCompleted && pending.Status == TaskStatus.Pending);
+        pendingSource.SetResult();
+        Thread.Sleep(10);
+        Console.WriteLine(_stage == 1 && !pending.IsCompleted);
+
+        release.Set();
+        blockerOne.Wait();
+        blockerTwo.Wait();
+        pending.Wait();
+        Console.WriteLine(_stage == 2);
+        Console.WriteLine(pending.IsCompleted && !pending.IsFaulted && !pending.IsCanceled);
+
+        TaskCompletionSource workerSource = new TaskCompletionSource();
+        AwaitWorker203 worker = new AwaitWorker203(10);
+        Task workerTask = worker.WaitAndPublish(workerSource.Task, 5);
+        Console.WriteLine(!workerTask.IsCompleted);
+        worker = null;
+        GC.Collect();
+        GC.Collect();
+        workerSource.SetResult();
+        workerTask.Wait();
+        Console.WriteLine(AwaitWorker203.LastObserved == 16);
+        Console.WriteLine(workerTask.Status == TaskStatus.Completed);
+
+        TaskCompletionSource pendingFaultSource = new TaskCompletionSource();
+        Task pendingFault = Observe(pendingFaultSource.Task);
+        pendingFaultSource.SetException(new Exception("await-203-pending-fault"));
+        Console.WriteLine(WaitFault(pendingFault, "await-203-pending-fault"));
+        Console.WriteLine(pendingFault.IsFaulted && pendingFault.Exception != null);
+
+        TaskCompletionSource immediateFaultSource = new TaskCompletionSource();
+        immediateFaultSource.SetException(new Exception("await-203-immediate-fault"));
+        bool callThrew = false;
+        Task immediateFault = null;
+        try
+        {
+            immediateFault = Observe(immediateFaultSource.Task);
+        }
+        catch (Exception ignored)
+        {
+            callThrew = true;
+        }
+        Console.WriteLine(!callThrew && immediateFault != null);
+        Console.WriteLine(immediateFault.IsCompleted && immediateFault.IsFaulted);
+        Console.WriteLine(WaitFault(immediateFault, "await-203-immediate-fault"));
+
+        TaskCompletionSource postGcSource = new TaskCompletionSource();
+        Task postGc = Observe(postGcSource.Task);
+        GC.Collect();
+        GC.Collect();
+        postGcSource.SetResult();
+        postGc.Wait();
+        Console.WriteLine(postGc.Status == TaskStatus.Completed);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

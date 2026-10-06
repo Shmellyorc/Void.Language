@@ -1,0 +1,30 @@
+using Void;
+
+public static class StringAuditExports300
+{
+    [Export("void300_export_check")]
+    public static int Check(string text)
+    {
+        GC.Collect();
+        return text == "export\0value" ? 300 : -1;
+    }
+
+    [Export("void300_export_echo")]
+    public static string Echo(string text)
+    {
+        GC.Collect();
+        return text;
+    }
+
+    [Export("void300_export_empty")]
+    public static string Empty()
+    {
+        return "";
+    }
+
+    [Export("void300_export_null")]
+    public static string Null()
+    {
+        return null;
+    }
+}

@@ -1,0 +1,26 @@
+public sealed class LibraryBoundaryException : Exception
+{
+    public LibraryBoundaryException(string message) : base(message) { }
+}
+
+public static class BoundaryLibrary
+{
+    [Export("void119_library_handled")]
+    public static int Handled()
+    {
+        try
+        {
+            throw new LibraryBoundaryException("handled library exception");
+        }
+        catch (LibraryBoundaryException)
+        {
+            return 42;
+        }
+    }
+
+    [Export("void119_library_throw")]
+    public static int Throwing()
+    {
+        throw new LibraryBoundaryException("library boundary boom");
+    }
+}

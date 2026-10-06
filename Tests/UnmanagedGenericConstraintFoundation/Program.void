@@ -1,0 +1,174 @@
+using Void;
+
+public interface IScore241
+{
+    int Score();
+}
+
+public enum Mode241
+{
+    First = 1,
+    Second = 2
+}
+
+public struct Point241
+{
+    public int X;
+    public float Y;
+
+    public Point241(int x, float y)
+    {
+        X = x;
+        Y = y;
+    }
+}
+
+public readonly struct Nested241
+{
+    public readonly Point241 Point;
+    public readonly Mode241 Mode;
+
+    public Nested241(Point241 point, Mode241 mode)
+    {
+        Point = point;
+        Mode = mode;
+    }
+}
+
+public struct AutoValue241
+{
+    public int Value { get; set; }
+}
+
+public struct StaticManaged241
+{
+    public static string Label;
+    public int Value;
+}
+
+public struct ComputedManagedProperty241
+{
+    public int Value;
+    public string Label => "computed";
+}
+
+public unsafe struct PointerBox241
+{
+    public int* Pointer;
+    public int Count;
+}
+
+public struct Scored241 : IScore241
+{
+    public int Value;
+
+    public Scored241(int value)
+    {
+        Value = value;
+    }
+
+    public int Score() => Value + 1;
+}
+
+public struct Pair241<T> where T : unmanaged
+{
+    public T Left;
+    public T Right;
+
+    public Pair241(T left, T right)
+    {
+        Left = left;
+        Right = right;
+    }
+}
+
+public sealed class Holder241<T> where T : unmanaged
+{
+    public T Value;
+
+    public Holder241(T value)
+    {
+        Value = value;
+    }
+
+    public T Get() => Value;
+}
+
+public static class Program
+{
+    private static T Keep<T>(T value) where T : unmanaged => value;
+
+    private static T Forward<T>(T value) where T : unmanaged => Keep(value);
+
+    private static int Score<T>(T value) where T : unmanaged, IScore241 => value.Score();
+
+    private static Holder241<T> Box<T>(T value) where T : unmanaged => new Holder241<T>(value);
+
+    private static unsafe int PointerScore<T>(T value) where T : unmanaged => 1;
+
+    public static unsafe void Main()
+    {
+        Console.WriteLine(Keep(42) == 42);
+        Console.WriteLine(Keep(7.5f) == 7.5f);
+        Console.WriteLine(Keep(true));
+        Console.WriteLine(Keep('A') == 'A');
+        Console.WriteLine(Keep(Mode241.Second) == Mode241.Second);
+
+        Point241 point = Keep(new Point241(3, 4.5f));
+        Console.WriteLine(point.X == 3 && point.Y == 4.5f);
+
+        Nested241 nested = Keep(new Nested241(point, Mode241.First));
+        Console.WriteLine(nested.Point.X == 3 && nested.Mode == Mode241.First);
+
+        AutoValue241 autoValue = new AutoValue241();
+        autoValue.Value = 19;
+        Console.WriteLine(Keep(autoValue).Value == 19);
+
+        StaticManaged241 staticManaged = new StaticManaged241();
+        staticManaged.Value = 23;
+        Console.WriteLine(Keep(staticManaged).Value == 23);
+
+        ComputedManagedProperty241 computed = new ComputedManagedProperty241();
+        computed.Value = 29;
+        Console.WriteLine(Keep(computed).Value == 29);
+
+        Scored241 scored = new Scored241(30);
+        Console.WriteLine(Score(scored) == 31);
+        Console.WriteLine(Forward(scored).Value == 30);
+
+        Holder241<Point241> holder = Box(point);
+        Console.WriteLine(holder.Get().X == 3);
+
+        Pair241<int> pair = new Pair241<int>(5, 8);
+        Pair241<int> keptPair = Keep(pair);
+        Console.WriteLine(keptPair.Left == 5 && keptPair.Right == 8);
+
+        Pair241<Point241> nestedPair = new Pair241<Point241>(point, new Point241(9, 2.0f));
+        Console.WriteLine(Keep(nestedPair).Right.X == 9);
+
+        Index index = Keep(new Index(2, true));
+        Console.WriteLine(index.Value == 2 && index.IsFromEnd);
+
+        Range range = Keep(new Range(new Index(1, false), new Index(1, true)));
+        int offset = 0;
+        int length = 0;
+        range.GetOffsetAndLength(6, out offset, out length);
+        Console.WriteLine(offset == 1 && length == 4);
+
+        int local = 77;
+        int* pointer = &local;
+        Console.WriteLine(PointerScore(pointer) == 1);
+
+        PointerBox241 pointerBox = new PointerBox241();
+        pointerBox.Pointer = pointer;
+        pointerBox.Count = 1;
+        PointerBox241 keptPointerBox = Keep(pointerBox);
+        Console.WriteLine(keptPointerBox.Count == 1 && *keptPointerBox.Pointer == 77);
+
+        Console.WriteLine(Keep<long>(123L) == 123L);
+        Console.WriteLine(Box(new Pair241<int>(11, 12)).Get().Right == 12);
+
+        int unmanaged = 41;
+        Console.WriteLine(unmanaged == 41);
+    }
+}

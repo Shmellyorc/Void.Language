@@ -1,0 +1,6 @@
+public class ArgumentOutOfRangeException : ArgumentException
+{
+    public ArgumentOutOfRangeException() : base("Argument was out of range.") { }
+    public ArgumentOutOfRangeException(string paramName) : base("Argument was out of range.", paramName) { }
+    public ArgumentOutOfRangeException(string paramName, string message) : base(message, paramName) { }
+}

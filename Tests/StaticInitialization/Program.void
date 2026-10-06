@@ -1,0 +1,384 @@
+using Void;
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class InitLog
+{
+    public static int Code;
+
+    public static int Mark(int digit)
+    {
+        Code = Code * 10 + digit;
+        return digit;
+    }
+
+    public static void Reset()
+    {
+        Code = 0;
+    }
+}
+
+public class BaseState
+{
+    public static int BaseValue = InitLog.Mark(1);
+
+    static BaseState()
+    {
+        BaseValue += 10;
+        InitLog.Mark(2);
+    }
+}
+
+public class DerivedState : BaseState
+{
+    public static int DerivedValue = InitLog.Mark(3);
+    public static int Auto { get; set; } = InitLog.Mark(4);
+    public static readonly int Ready;
+
+    static DerivedState()
+    {
+        Ready = BaseValue + DerivedValue + Auto;
+        InitLog.Mark(5);
+    }
+}
+
+public static class MethodFirst
+{
+    public static int Count = InitLog.Mark(6);
+
+    static MethodFirst()
+    {
+        Count += 1;
+        InitLog.Mark(7);
+    }
+
+    public static int Read()
+    {
+        return Count;
+    }
+}
+
+public static class PropertyFirst
+{
+    private static int _value = InitLog.Mark(8);
+
+    static PropertyFirst()
+    {
+        _value += 1;
+        InitLog.Mark(9);
+    }
+
+    public static int Value
+    {
+        get { return _value; }
+        set { _value = value; }
+    }
+}
+
+public static class PropertyWriteFirst
+{
+    public static int Value { get; set; } = InitLog.Mark(1);
+
+    static PropertyWriteFirst()
+    {
+        InitLog.Mark(2);
+    }
+}
+
+public sealed class ConstructFirst
+{
+    public static int StaticValue = InitLog.Mark(2);
+    public int InstanceValue = 4;
+
+    static ConstructFirst()
+    {
+        StaticValue += 1;
+        InitLog.Mark(3);
+    }
+}
+
+public static class WriteFirst
+{
+    public static int Value = InitLog.Mark(4);
+
+    static WriteFirst()
+    {
+        InitLog.Mark(5);
+    }
+}
+
+public static class IncrementFirst
+{
+    public static int Value = InitLog.Mark(6);
+
+    static IncrementFirst()
+    {
+        InitLog.Mark(7);
+    }
+}
+
+public static class CoalesceFirst
+{
+    public static Node Value = null;
+
+    static CoalesceFirst()
+    {
+        InitLog.Mark(8);
+    }
+}
+
+public static class SelfHelper
+{
+    public static int Value = Seed();
+    public static readonly int Ready;
+
+    static SelfHelper()
+    {
+        Ready = ReadOwnValue() + 2;
+    }
+
+    private static int Seed()
+    {
+        return 3;
+    }
+
+    private static int ReadOwnValue()
+    {
+        return Value;
+    }
+}
+
+public static class DependencyB
+{
+    public static int Value = 5;
+}
+
+public static class DependencyA
+{
+    public static int Value = DependencyB.Value + 1;
+}
+
+public static class ManagedStatics
+{
+    public static Node Field = new Node(10);
+    public static Node Auto { get; set; } = new Node(20);
+    public static Node[] Nodes = new Node[] { new Node(30) };
+
+    static ManagedStatics()
+    {
+        GC.Collect();
+    }
+}
+
+public struct StructStatics
+{
+    public static int Value = 3;
+
+    static StructStatics()
+    {
+        Value += 2;
+    }
+}
+
+public static class EarlyReturn
+{
+    public static int Value = 1;
+
+    static EarlyReturn()
+    {
+        if (Value == 1)
+            return;
+        Value = 9;
+    }
+}
+
+public static class ReadonlyState
+{
+    public static readonly int Value = 5;
+
+    static ReadonlyState()
+    {
+        ReadonlyState.Value = 7;
+    }
+}
+
+public class GenericState<T>
+{
+    public static int Count = 1;
+
+    static GenericState()
+    {
+        Count += 1;
+    }
+
+    public int Read()
+    {
+        return Count;
+    }
+}
+
+public struct ConversionOnly
+{
+    public int Value;
+    public static int Initialized = InitLog.Mark(1);
+
+    static ConversionOnly()
+    {
+        InitLog.Mark(2);
+    }
+
+    public static implicit operator ConversionOnly(int value)
+    {
+        ConversionOnly result = default;
+        result.Value = value;
+        return result;
+    }
+}
+
+public struct OperatorOnly
+{
+    public int Value;
+    public static int Initialized = InitLog.Mark(3);
+
+    static OperatorOnly()
+    {
+        InitLog.Mark(4);
+    }
+
+    public static OperatorOnly operator +(OperatorOnly left, OperatorOnly right)
+    {
+        OperatorOnly result = default;
+        result.Value = left.Value + right.Value;
+        return result;
+    }
+}
+
+public static class RefFirst
+{
+    public static int Value = InitLog.Mark(9);
+
+    static RefFirst()
+    {
+        InitLog.Mark(1);
+    }
+}
+
+public static class Program
+{
+    public static int Started = 7;
+
+    static Program()
+    {
+        Started += 1;
+    }
+
+    private static void Increment(ref int value)
+    {
+        value += 1;
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(Started == 8);
+
+        InitLog.Reset();
+        Console.WriteLine(InitLog.Code == 0);
+        Console.WriteLine(DerivedState.DerivedValue == 3);
+        Console.WriteLine(BaseState.BaseValue == 11);
+        Console.WriteLine(DerivedState.Auto == 4);
+        Console.WriteLine(DerivedState.Ready == 18);
+        Console.WriteLine(InitLog.Code == 12345);
+        Console.WriteLine(DerivedState.DerivedValue == 3);
+        Console.WriteLine(InitLog.Code == 12345);
+
+        InitLog.Reset();
+        Console.WriteLine(MethodFirst.Read() == 7);
+        Console.WriteLine(InitLog.Code == 67);
+        Console.WriteLine(MethodFirst.Read() == 7);
+        Console.WriteLine(InitLog.Code == 67);
+
+        InitLog.Reset();
+        Console.WriteLine(PropertyFirst.Value == 9);
+        Console.WriteLine(InitLog.Code == 89);
+        PropertyFirst.Value = 20;
+        Console.WriteLine(PropertyFirst.Value == 20);
+        Console.WriteLine(InitLog.Code == 89);
+
+        InitLog.Reset();
+        PropertyWriteFirst.Value = 9;
+        Console.WriteLine(PropertyWriteFirst.Value == 9);
+        Console.WriteLine(InitLog.Code == 12);
+
+        InitLog.Reset();
+        ConstructFirst constructed = new ConstructFirst();
+        Console.WriteLine(constructed.InstanceValue == 4);
+        Console.WriteLine(ConstructFirst.StaticValue == 3);
+        Console.WriteLine(InitLog.Code == 23);
+
+        InitLog.Reset();
+        WriteFirst.Value = 9;
+        Console.WriteLine(WriteFirst.Value == 9);
+        Console.WriteLine(InitLog.Code == 45);
+
+        InitLog.Reset();
+        IncrementFirst.Value++;
+        Console.WriteLine(IncrementFirst.Value == 7);
+        Console.WriteLine(InitLog.Code == 67);
+
+        InitLog.Reset();
+        CoalesceFirst.Value ??= new Node(9);
+        Console.WriteLine(CoalesceFirst.Value.Value == 9);
+        Console.WriteLine(InitLog.Code == 8);
+
+        Console.WriteLine(SelfHelper.Value == 3);
+        Console.WriteLine(SelfHelper.Ready == 5);
+
+        Console.WriteLine(DependencyA.Value == 6);
+        Console.WriteLine(DependencyB.Value == 5);
+
+        Console.WriteLine(ManagedStatics.Field.Value == 10);
+        Console.WriteLine(ManagedStatics.Auto.Value == 20);
+        Console.WriteLine(ManagedStatics.Nodes[0].Value == 30);
+        GC.Collect();
+        Console.WriteLine(ManagedStatics.Field.Value == 10);
+        Console.WriteLine(ManagedStatics.Auto.Value == 20);
+        Console.WriteLine(ManagedStatics.Nodes[0].Value == 30);
+
+        Console.WriteLine(StructStatics.Value == 5);
+        Console.WriteLine(EarlyReturn.Value == 1);
+        Console.WriteLine(EarlyReturn.Value == 1);
+        Console.WriteLine(ReadonlyState.Value == 7);
+
+        GenericState<int> genericInt = new GenericState<int>();
+        GenericState<float> genericFloat = new GenericState<float>();
+        Console.WriteLine(genericInt.Read() == 2);
+        Console.WriteLine(genericFloat.Read() == 2);
+
+        InitLog.Reset();
+        ConversionOnly converted = 9;
+        Console.WriteLine(converted.Value == 9);
+        Console.WriteLine(InitLog.Code == 12);
+
+        OperatorOnly left = default;
+        OperatorOnly right = default;
+        left.Value = 4;
+        right.Value = 5;
+        InitLog.Reset();
+        OperatorOnly added = left + right;
+        Console.WriteLine(added.Value == 9);
+        Console.WriteLine(InitLog.Code == 34);
+
+        InitLog.Reset();
+        Increment(ref RefFirst.Value);
+        Console.WriteLine(RefFirst.Value == 10);
+        Console.WriteLine(InitLog.Code == 91);
+    }
+}

@@ -1,0 +1,146 @@
+using Void;
+
+public interface IValue
+{
+    int Raw();
+
+    int Value()
+    {
+        return this.Raw() + 1;
+    }
+
+    int Twice() => this.Value() * 2;
+}
+
+public interface IDerivedValue : IValue
+{
+    int Value()
+    {
+        return this.Raw() + 10;
+    }
+}
+
+public sealed class DefaultValue : IValue
+{
+    public int Raw() { return 4; }
+}
+
+public sealed class ConcreteValue : IValue
+{
+    public int Raw() { return 5; }
+    public int Value() { return 50; }
+}
+
+public sealed class DerivedValue : IDerivedValue
+{
+    public int Raw() { return 7; }
+}
+
+public struct StructValue : IValue
+{
+    public int Raw() { return 8; }
+}
+
+public sealed class Node
+{
+    public int Value;
+    public Node(int value) { Value = value; }
+}
+
+public interface INodeKeeper
+{
+    Node Get();
+
+    Node Keep()
+    {
+        Node value = this.Get();
+        GC.Collect();
+        return value;
+    }
+}
+
+public sealed class NodeKeeper : INodeKeeper
+{
+    private Node _node;
+    public NodeKeeper(Node node) { _node = node; }
+    public Node Get() { return _node; }
+}
+
+public sealed class DefaultError : Exception
+{
+    public DefaultError(string message) : base(message) { }
+}
+
+public interface IThrower
+{
+    int Run(bool fail)
+    {
+        if (fail) throw new DefaultError("default");
+        return 9;
+    }
+}
+
+public sealed class Thrower : IThrower
+{
+}
+
+
+public interface IGenericDefault
+{
+    T Echo<T>(T value)
+    {
+        return value;
+    }
+}
+
+public sealed class GenericDefault : IGenericDefault
+{
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        IValue first = new DefaultValue();
+        Console.WriteLine(first.Value() == 5);
+        Console.WriteLine(first.Twice() == 10);
+
+        IValue second = new ConcreteValue();
+        Console.WriteLine(second.Value() == 50);
+        Console.WriteLine(second.Twice() == 100);
+
+        IDerivedValue derived = new DerivedValue();
+        Console.WriteLine(derived.Value() == 17);
+        Console.WriteLine(derived.Twice() == 34);
+
+        IValue derivedAsBase = derived;
+        Console.WriteLine(derivedAsBase.Value() == 17);
+
+        IValue valueStruct = new StructValue();
+        Console.WriteLine(valueStruct.Value() == 9);
+        Console.WriteLine(valueStruct.Twice() == 18);
+
+        Node node = new Node(77);
+        INodeKeeper keeper = new NodeKeeper(node);
+        Node kept = keeper.Keep();
+        Console.WriteLine(kept == node);
+        Console.WriteLine(kept.Value == 77);
+
+        IGenericDefault generic = new GenericDefault();
+        Console.WriteLine(generic.Echo<int>(12) == 12);
+        Console.WriteLine(generic.Echo<string>("generic") == "generic");
+
+        IThrower thrower = new Thrower();
+        Console.WriteLine(thrower.Run(false) == 9);
+        bool caught = false;
+        try
+        {
+            thrower.Run(true);
+        }
+        catch (DefaultError error)
+        {
+            caught = error.Message == "default";
+        }
+        Console.WriteLine(caught);
+    }
+}

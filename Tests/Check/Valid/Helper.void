@@ -1,0 +1,7 @@
+public static class CheckHelper
+{
+    public static int Value()
+    {
+        return 42;
+    }
+}

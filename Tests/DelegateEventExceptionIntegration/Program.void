@@ -1,0 +1,476 @@
+using Void;
+
+public sealed class SignalException : Exception
+{
+    public int Code;
+
+    public SignalException(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class ThrowingTarget
+{
+    private Node _node;
+
+    public ThrowingTarget(int value)
+    {
+        _node = new Node(value);
+    }
+
+    public void Invoke()
+    {
+        GC.Collect();
+        throw new SignalException("instance", _node.Value);
+    }
+}
+
+
+public sealed class Publisher
+{
+    public event Action<int> Changed;
+
+    public void Raise(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+}
+
+public sealed class EventListener
+{
+    private int _digit;
+    private bool _throws;
+
+    public EventListener(int digit, bool throws)
+    {
+        _digit = digit;
+        _throws = throws;
+    }
+
+    public void Handle(int value)
+    {
+        Program.Sequence = Program.Sequence * 10 + _digit;
+        if (_throws)
+            throw new SignalException("event", value + _digit);
+    }
+}
+
+public sealed class GatePublisher
+{
+    private Action<int> _changed;
+    public bool FailAdd;
+    public bool FailRemove;
+
+    public event Action<int> Changed
+    {
+        add
+        {
+            if (FailAdd)
+                throw new SignalException("add", 41);
+            _changed += value;
+        }
+        remove
+        {
+            if (FailRemove)
+                throw new SignalException("remove", 42);
+            _changed -= value;
+        }
+    }
+
+    public void Raise(int value)
+    {
+        if (_changed != null)
+            _changed(value);
+    }
+}
+
+public interface IContractPublisher
+{
+    event Action<int> Changed { add; remove; }
+}
+
+public sealed class ContractPublisher : IContractPublisher
+{
+    private Action<int> _changed;
+    public bool FailAdd;
+
+    public event Action<int> Changed
+    {
+        add
+        {
+            if (FailAdd)
+                throw new SignalException("contract-add", 51);
+            _changed += value;
+        }
+        remove => _changed -= value;
+    }
+
+    public void Raise(int value)
+    {
+        if (_changed != null)
+            _changed(value);
+    }
+}
+
+public static class StaticPublisher
+{
+    public static event Action Changed;
+
+    public static void Raise()
+    {
+        if (Changed != null)
+            Changed();
+    }
+}
+
+public static class Program
+{
+    public static int Sequence;
+
+    public static void MarkOne()
+    {
+        Sequence = Sequence * 10 + 1;
+    }
+
+    public static void ThrowTwo()
+    {
+        Sequence = Sequence * 10 + 2;
+        throw new SignalException("multicast", 12);
+    }
+
+    public static void MarkThree()
+    {
+        Sequence = Sequence * 10 + 3;
+    }
+
+    public static int ReturnOne()
+    {
+        Sequence = Sequence * 10 + 1;
+        return 1;
+    }
+
+    public static int ThrowReturn()
+    {
+        Sequence = Sequence * 10 + 2;
+        throw new SignalException("returning", 22);
+    }
+
+    public static int ReturnThree()
+    {
+        Sequence = Sequence * 10 + 3;
+        return 3;
+    }
+
+
+    public static Action MakeThrowingClosure()
+    {
+        Node node = new Node(77);
+        return () =>
+        {
+            GC.Collect();
+            throw new SignalException("lambda", node.Value);
+        };
+    }
+
+    public static void ThrowWithFinally()
+    {
+        try
+        {
+            Sequence = Sequence * 10 + 1;
+            throw new SignalException("finally", 61);
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 2;
+        }
+    }
+
+    public static void ThrowOriginal(SignalException original)
+    {
+        try
+        {
+            throw original;
+        }
+        catch (SignalException error)
+        {
+            if (error.Code != original.Code)
+                Console.WriteLine(false);
+            throw;
+        }
+    }
+
+
+    public static void CatchInsideHandler()
+    {
+        Sequence = Sequence * 10 + 4;
+        Action inner = ThrowTwo;
+        try
+        {
+            inner();
+        }
+        catch (SignalException error)
+        {
+            if (error.Code == 12)
+                Sequence = Sequence * 10 + 5;
+        }
+    }
+
+    public static void EventThrowWithFinally(int value)
+    {
+        try
+        {
+            Sequence = Sequence * 10 + 6;
+            throw new SignalException("event-finally", value);
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 7;
+        }
+    }
+
+    public static void EventMark(int value)
+    {
+        Sequence = Sequence * 10 + value;
+    }
+
+    public static void StaticThrow()
+    {
+        throw new SignalException("static-event", 71);
+    }
+
+    public static void Main()
+    {
+        try
+        {
+            Action direct = ThrowTwo;
+            direct();
+            Console.WriteLine(false);
+        }
+        catch (SignalException error)
+        {
+            Console.WriteLine(error.Code == 12);
+            Console.WriteLine(Runtime.Equals(error.Message, "multicast"));
+        }
+
+        Sequence = 0;
+        Action chain = MarkOne;
+        chain += ThrowTwo;
+        chain += MarkThree;
+        try
+        {
+            chain();
+            Console.WriteLine(false);
+        }
+        catch (SignalException error)
+        {
+            Console.WriteLine(error.Code == 12);
+            Console.WriteLine(Sequence == 12);
+        }
+        chain -= ThrowTwo;
+        Sequence = 0;
+        chain();
+        Console.WriteLine(Sequence == 13);
+
+        Sequence = 0;
+        Func<int> values = ReturnOne;
+        values += ThrowReturn;
+        values += ReturnThree;
+        try
+        {
+            int ignored = values();
+            Console.WriteLine(ignored == -1);
+        }
+        catch (SignalException error)
+        {
+            Console.WriteLine(error.Code == 22);
+            Console.WriteLine(Sequence == 12);
+        }
+        values -= ThrowReturn;
+        Sequence = 0;
+        Console.WriteLine(values() == 3);
+        Console.WriteLine(Sequence == 13);
+
+        ThrowingTarget target = new ThrowingTarget(31);
+        Action instance = target.Invoke;
+        target = null;
+        GC.Collect();
+        try
+        {
+            instance();
+            Console.WriteLine(false);
+        }
+        catch (SignalException error)
+        {
+            Console.WriteLine(error.Code == 31);
+            Console.WriteLine(Runtime.Equals(error.Message, "instance"));
+        }
+
+
+        Action closure = MakeThrowingClosure();
+        GC.Collect();
+        try
+        {
+            closure();
+            Console.WriteLine(false);
+        }
+        catch (SignalException error)
+        {
+            Console.WriteLine(error.Code == 77);
+            Console.WriteLine(Runtime.Equals(error.Message, "lambda"));
+        }
+
+        Sequence = 0;
+        Action withFinally = ThrowWithFinally;
+        try
+        {
+            withFinally();
+            Console.WriteLine(false);
+        }
+        catch (SignalException error)
+        {
+            Console.WriteLine(error.Code == 61);
+            Console.WriteLine(Sequence == 12);
+        }
+
+
+        Sequence = 0;
+        Action handledChain = CatchInsideHandler;
+        handledChain += MarkThree;
+        handledChain();
+        Console.WriteLine(Sequence == 4253);
+
+        SignalException original = new SignalException("same", 62);
+        Action rethrow = () => ThrowOriginal(original);
+        try
+        {
+            rethrow();
+            Console.WriteLine(false);
+        }
+        catch (SignalException error)
+        {
+            Console.WriteLine(error == original);
+            Console.WriteLine(error.Code == 62);
+        }
+
+        Publisher publisher = new Publisher();
+        EventListener eventOne = new EventListener(1, false);
+        EventListener eventThrow = new EventListener(2, true);
+        EventListener eventThree = new EventListener(3, false);
+        publisher.Changed += eventOne.Handle;
+        publisher.Changed += eventThrow.Handle;
+        publisher.Changed += eventThree.Handle;
+        Sequence = 0;
+        try
+        {
+            publisher.Raise(20);
+            Console.WriteLine(false);
+        }
+        catch (SignalException error)
+        {
+            Console.WriteLine(error.Code == 22);
+            Console.WriteLine(Sequence == 12);
+        }
+        publisher.Changed -= eventThrow.Handle;
+        Sequence = 0;
+        publisher.Raise(20);
+        Console.WriteLine(Sequence == 13);
+
+
+        Publisher finallyPublisher = new Publisher();
+        EventListener afterFinallyThrow = new EventListener(8, false);
+        finallyPublisher.Changed += EventThrowWithFinally;
+        finallyPublisher.Changed += afterFinallyThrow.Handle;
+        Sequence = 0;
+        try
+        {
+            finallyPublisher.Raise(63);
+            Console.WriteLine(false);
+        }
+        catch (SignalException error)
+        {
+            Console.WriteLine(error.Code == 63);
+            Console.WriteLine(Sequence == 67);
+        }
+
+        GatePublisher gate = new GatePublisher();
+        Action<int> gateHandler = EventMark;
+        gate.FailAdd = true;
+        try
+        {
+            gate.Changed += gateHandler;
+            Console.WriteLine(false);
+        }
+        catch (SignalException error)
+        {
+            Console.WriteLine(error.Code == 41);
+        }
+        gate.FailAdd = false;
+        gate.Changed += gateHandler;
+        Sequence = 0;
+        gate.Raise(4);
+        Console.WriteLine(Sequence == 4);
+        gate.FailRemove = true;
+        try
+        {
+            gate.Changed -= gateHandler;
+            Console.WriteLine(false);
+        }
+        catch (SignalException error)
+        {
+            Console.WriteLine(error.Code == 42);
+        }
+        Sequence = 0;
+        gate.Raise(5);
+        Console.WriteLine(Sequence == 5);
+        gate.FailRemove = false;
+        gate.Changed -= gateHandler;
+        Sequence = 0;
+        gate.Raise(6);
+        Console.WriteLine(Sequence == 0);
+
+        ContractPublisher contractObject = new ContractPublisher();
+        IContractPublisher contract = contractObject;
+        contractObject.FailAdd = true;
+        try
+        {
+            contract.Changed += gateHandler;
+            Console.WriteLine(false);
+        }
+        catch (SignalException error)
+        {
+            Console.WriteLine(error.Code == 51);
+        }
+        contractObject.FailAdd = false;
+        contract.Changed += gateHandler;
+        Sequence = 0;
+        contractObject.Raise(7);
+        Console.WriteLine(Sequence == 7);
+        contract.Changed -= gateHandler;
+
+        StaticPublisher.Changed += StaticThrow;
+        try
+        {
+            StaticPublisher.Raise();
+            Console.WriteLine(false);
+        }
+        catch (SignalException error)
+        {
+            Console.WriteLine(error.Code == 71);
+        }
+        StaticPublisher.Changed -= StaticThrow;
+
+        Console.WriteLine(true);
+    }
+}

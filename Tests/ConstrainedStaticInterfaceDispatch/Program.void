@@ -1,0 +1,211 @@
+using Void;
+using Void.Collections;
+
+public interface IFactory
+{
+    static int Create(int value);
+    static int Create(int left, int right);
+    static T Echo<T>(T value);
+    static int Sum(params int[] values);
+    static int Touch(ref int value, out int doubled, in int add);
+}
+
+public interface IDerivedFactory : IFactory
+{
+    static int Extra(int value);
+}
+
+public sealed class ClassFactory : IDerivedFactory
+{
+    public static int Create(int value) { return value + 1; }
+    public static int Create(int left, int right) { return left + right; }
+    public static T Echo<T>(T value) { return value; }
+    public static int Sum(params int[] values)
+    {
+        int total = 0;
+        for (int i = 0; i < values.Length; i++) total += values[i];
+        return total;
+    }
+    public static int Touch(ref int value, out int doubled, in int add)
+    {
+        value += add;
+        doubled = value * 2;
+        return value;
+    }
+    public static int Extra(int value) { return value * 3; }
+}
+
+public struct StructFactory : IFactory
+{
+    public static int Create(int value) { return value + 2; }
+    public static int Create(int left, int right) { return left * right; }
+    public static T Echo<T>(T value) { return value; }
+    public static int Sum(params int[] values)
+    {
+        int total = 1;
+        for (int i = 0; i < values.Length; i++) total *= values[i];
+        return total;
+    }
+    public static int Touch(ref int value, out int doubled, in int add)
+    {
+        value += add + 1;
+        doubled = value * 2;
+        return value;
+    }
+}
+
+public interface ITagFactory
+{
+    static int Tag(int value);
+}
+
+public interface IGenericFactory<T>
+{
+    static T Identity(T value);
+}
+
+public sealed class TaggedFactory : IFactory, ITagFactory
+{
+    public static int Create(int value) { return value + 10; }
+    public static int Create(int left, int right) { return left + right + 10; }
+    public static T Echo<T>(T value) { return value; }
+    public static int Sum(params int[] values)
+    {
+        int total = 0;
+        for (int i = 0; i < values.Length; i++) total += values[i];
+        return total + 10;
+    }
+    public static int Touch(ref int value, out int doubled, in int add)
+    {
+        value += add;
+        doubled = value * 2;
+        return value;
+    }
+    public static int Tag(int value) { return value + 100; }
+}
+
+public sealed class StringFactory : IGenericFactory<string>
+{
+    public static string Identity(string value) { return value; }
+}
+
+public sealed class Node
+{
+    public int Value;
+    public Node(int value) { Value = value; }
+}
+
+public interface INodeFactory
+{
+    static Node Keep(Node value);
+}
+
+public sealed class DispatchError : Exception
+{
+    public DispatchError(string message) : base(message) { }
+}
+
+public interface IRuntimeFactory
+{
+    static int Next(bool fail);
+}
+
+public sealed class RuntimeFactory : IRuntimeFactory
+{
+    private static int _count = 40;
+    public static int Next(bool fail)
+    {
+        if (fail) throw new DispatchError("dispatch");
+        _count++;
+        return _count;
+    }
+}
+
+public sealed class NodeFactory : INodeFactory
+{
+    public static Node Keep(Node value)
+    {
+        GC.Collect();
+        return value;
+    }
+}
+
+public static class Program
+{
+    private static int Make<T>(int value) where T : IFactory { return T.Create(value); }
+    private static int MakeInferred<T>(T marker, int value) where T : IFactory { return T.Create(value); }
+    private static int Pair<T>(int left, int right) where T : IFactory { return T.Create(left, right); }
+    private static U Echo<T, U>(U value) where T : IFactory { return T.Echo<U>(value); }
+    private static U EchoInferred<T, U>(T marker, U value) where T : IFactory { return T.Echo(value); }
+    private static int Sum<T>() where T : IFactory { return T.Sum(2, 3, 4); }
+    private static int ByRef<T>() where T : IFactory
+    {
+        int value = 5;
+        int add = 2;
+        int doubled;
+        int result = T.Touch(ref value, out doubled, in add);
+        return result * 100 + value * 10 + doubled;
+    }
+    private static int Extra<T>(int value) where T : IDerivedFactory { return T.Extra(value); }
+    private static int Inherited<T>(int value) where T : IDerivedFactory { return T.Create(value); }
+    private static string GenericConstraint<T>(string value) where T : IGenericFactory<string> { return T.Identity(value); }
+    private static Node KeepNode<T>(Node value) where T : INodeFactory { return T.Keep(value); }
+    private static int Tagged<T>(int value) where T : IFactory, ITagFactory { return T.Create(value) + T.Tag(value); }
+    private static int RuntimeCall<T>(bool fail) where T : IRuntimeFactory { return T.Next(fail); }
+    private static int Forward<T>(T marker, int value) where T : IFactory { return MakeInferred(marker, value); }
+
+    public static void Main()
+    {
+        Console.WriteLine(Make<ClassFactory>(4) == 5);
+        Console.WriteLine(Make<StructFactory>(4) == 6);
+        Console.WriteLine(MakeInferred(new ClassFactory(), 8) == 9);
+        Console.WriteLine(MakeInferred(new StructFactory(), 8) == 10);
+        Console.WriteLine(Pair<ClassFactory>(3, 4) == 7);
+        Console.WriteLine(Pair<StructFactory>(3, 4) == 12);
+        Console.WriteLine(Echo<ClassFactory, int>(11) == 11);
+        Console.WriteLine(Echo<ClassFactory, string>("ok") == "ok");
+        Console.WriteLine(EchoInferred(new ClassFactory(), 12) == 12);
+        Console.WriteLine(EchoInferred(new StructFactory(), "yes") == "yes");
+        Console.WriteLine(Sum<ClassFactory>() == 9);
+        Console.WriteLine(Sum<StructFactory>() == 24);
+        Console.WriteLine(ByRef<ClassFactory>() == 784);
+        Console.WriteLine(ByRef<StructFactory>() == 896);
+        Console.WriteLine(Extra<ClassFactory>(5) == 15);
+        Console.WriteLine(Inherited<ClassFactory>(5) == 6);
+        Console.WriteLine(GenericConstraint<StringFactory>("generic") == "generic");
+        Node node = new Node(77);
+        Node kept = KeepNode<NodeFactory>(node);
+        Console.WriteLine(kept.Value == 77);
+        Console.WriteLine(kept == node);
+        Console.WriteLine(Tagged<TaggedFactory>(1) == 112);
+        Console.WriteLine(Forward(new ClassFactory(), 20) == 21);
+        Console.WriteLine(RuntimeCall<RuntimeFactory>(false) == 41);
+        bool caught = false;
+        try
+        {
+            RuntimeCall<RuntimeFactory>(true);
+        }
+        catch (DispatchError error)
+        {
+            caught = error.Message == "dispatch";
+        }
+        Console.WriteLine(caught);
+        Console.WriteLine(RuntimeCall<RuntimeFactory>(false) == 42);
+        Console.WriteLine(GenericTypeChecks.Check());
+    }
+}
+
+public sealed class Runner<T> where T : IFactory
+{
+    public int Run(int value) { return T.Create(value); }
+}
+
+public static class GenericTypeChecks
+{
+    public static bool Check()
+    {
+        Runner<ClassFactory> classRunner = new Runner<ClassFactory>();
+        Runner<StructFactory> structRunner = new Runner<StructFactory>();
+        return classRunner.Run(30) == 31 && structRunner.Run(30) == 32;
+    }
+}

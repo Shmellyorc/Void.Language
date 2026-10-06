@@ -1,0 +1,158 @@
+using Void;
+using Void.Threading;
+
+public sealed class AutoEventState
+{
+    public int Ready;
+    public int Success;
+    public int Done;
+}
+
+public static class Program
+{
+    private static void WaitUntilAtLeast(int value, ref int location)
+    {
+        while (Volatile.Read(ref location) < value)
+        {
+        }
+    }
+
+    private static void TimedWorker(AutoResetEvent value, AutoEventState state, int timeout)
+    {
+        Interlocked.Increment(ref state.Ready);
+        bool released = value.WaitOne(timeout);
+        if (released)
+            Interlocked.Increment(ref state.Success);
+        Interlocked.Increment(ref state.Done);
+    }
+
+    private static void InfiniteWorker(AutoResetEvent value, AutoEventState state)
+    {
+        Interlocked.Increment(ref state.Ready);
+        bool released = value.WaitOne();
+        if (released)
+            Interlocked.Increment(ref state.Success);
+        Interlocked.Increment(ref state.Done);
+    }
+
+    public static void Main()
+    {
+        AutoResetEvent closed = new AutoResetEvent(false);
+        Console.WriteLine(!closed.WaitOne(0));
+        Console.WriteLine(!closed.WaitOne(20));
+        Console.WriteLine(closed.Set());
+        Console.WriteLine(closed.WaitOne(0));
+        Console.WriteLine(!closed.WaitOne(0));
+
+        Console.WriteLine(closed.Set());
+        Console.WriteLine(closed.Set());
+        Console.WriteLine(closed.WaitOne(0));
+        Console.WriteLine(!closed.WaitOne(0));
+
+        AutoResetEvent opened = new AutoResetEvent(true);
+        Console.WriteLine(opened.WaitOne());
+        Console.WriteLine(!opened.WaitOne(0));
+        Console.WriteLine(opened.Set());
+        Console.WriteLine(opened.Reset());
+        Console.WriteLine(!opened.WaitOne(0));
+
+        AutoResetEvent many = new AutoResetEvent(false);
+        AutoEventState manyState = new AutoEventState();
+        Thread a = new Thread(() => TimedWorker(many, manyState, 2000));
+        Thread b = new Thread(() => TimedWorker(many, manyState, 2000));
+        Thread c = new Thread(() => TimedWorker(many, manyState, 2000));
+        a.Start();
+        b.Start();
+        c.Start();
+        WaitUntilAtLeast(3, ref manyState.Ready);
+        Thread.Sleep(30);
+        GC.Collect();
+        Console.WriteLine(Volatile.Read(ref manyState.Done) == 0);
+
+        many.Set();
+        WaitUntilAtLeast(1, ref manyState.Done);
+        Console.WriteLine(Volatile.Read(ref manyState.Success) == 1 && Volatile.Read(ref manyState.Done) == 1);
+
+        many.Set();
+        WaitUntilAtLeast(2, ref manyState.Done);
+        Console.WriteLine(Volatile.Read(ref manyState.Success) == 2 && Volatile.Read(ref manyState.Done) == 2);
+
+        many.Set();
+        a.Join();
+        b.Join();
+        c.Join();
+        Console.WriteLine(Volatile.Read(ref manyState.Success) == 3 && Volatile.Read(ref manyState.Done) == 3);
+        Console.WriteLine(!many.WaitOne(0));
+
+        AutoResetEvent selected = new AutoResetEvent(false);
+        AutoEventState selectedState = new AutoEventState();
+        Thread selectedWorker = new Thread(() => TimedWorker(selected, selectedState, 1000));
+        selectedWorker.Start();
+        WaitUntilAtLeast(1, ref selectedState.Ready);
+        Thread.Sleep(30);
+        selected.Set();
+        selected.Reset();
+        selectedWorker.Join();
+        Console.WriteLine(Volatile.Read(ref selectedState.Success) == 1);
+        Console.WriteLine(!selected.WaitOne(0));
+
+        AutoResetEvent timedOut = new AutoResetEvent(false);
+        AutoEventState timeoutState = new AutoEventState();
+        Thread timeoutWorker = new Thread(() => TimedWorker(timedOut, timeoutState, 30));
+        timeoutWorker.Start();
+        timeoutWorker.Join();
+        Console.WriteLine(Volatile.Read(ref timeoutState.Success) == 0 && Volatile.Read(ref timeoutState.Done) == 1);
+        timedOut.Set();
+        Console.WriteLine(timedOut.WaitOne(0));
+        Console.WriteLine(!timedOut.WaitOne(0));
+
+        AutoResetEvent race = new AutoResetEvent(false);
+        AutoEventState raceState = new AutoEventState();
+        Thread raceWorker = new Thread(() => TimedWorker(race, raceState, 30));
+        raceWorker.Start();
+        WaitUntilAtLeast(1, ref raceState.Ready);
+        Thread.Sleep(30);
+        race.Set();
+        raceWorker.Join();
+        bool raceWorkerSucceeded = Volatile.Read(ref raceState.Success) == 1;
+        bool raceStoredSignal = race.WaitOne(0);
+        Console.WriteLine(raceWorkerSucceeded != raceStoredSignal);
+        Console.WriteLine(!race.WaitOne(0));
+
+        AutoResetEvent infinite = new AutoResetEvent(false);
+        AutoEventState infiniteState = new AutoEventState();
+        Thread infiniteWorker = new Thread(() => InfiniteWorker(infinite, infiniteState));
+        infiniteWorker.Start();
+        WaitUntilAtLeast(1, ref infiniteState.Ready);
+        Thread.Sleep(30);
+        GC.Collect();
+        Console.WriteLine(Volatile.Read(ref infiniteState.Done) == 0);
+        infinite.Set();
+        infiniteWorker.Join();
+        Console.WriteLine(Volatile.Read(ref infiniteState.Success) == 1 && Volatile.Read(ref infiniteState.Done) == 1);
+
+        AutoResetEvent infiniteTimeout = new AutoResetEvent(false);
+        AutoEventState infiniteTimeoutState = new AutoEventState();
+        Thread infiniteTimeoutWorker = new Thread(() => TimedWorker(infiniteTimeout, infiniteTimeoutState, Timeout.Infinite));
+        infiniteTimeoutWorker.Start();
+        WaitUntilAtLeast(1, ref infiniteTimeoutState.Ready);
+        Thread.Sleep(30);
+        infiniteTimeout.Set();
+        infiniteTimeoutWorker.Join();
+        Console.WriteLine(Volatile.Read(ref infiniteTimeoutState.Success) == 1);
+
+        AutoResetEvent pair = new AutoResetEvent(false);
+        AutoEventState pairState = new AutoEventState();
+        Thread first = new Thread(() => TimedWorker(pair, pairState, 1000));
+        Thread second = new Thread(() => TimedWorker(pair, pairState, 1000));
+        first.Start();
+        second.Start();
+        WaitUntilAtLeast(2, ref pairState.Ready);
+        Thread.Sleep(30);
+        pair.Set();
+        pair.Set();
+        first.Join();
+        second.Join();
+        Console.WriteLine(Volatile.Read(ref pairState.Success) == 2 && Volatile.Read(ref pairState.Done) == 2);
+    }
+}

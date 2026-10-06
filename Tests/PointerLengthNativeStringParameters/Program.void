@@ -1,0 +1,52 @@
+using Void;
+
+public static class Native295
+{
+    [Native("void295_pair_kind")]
+    public static unsafe extern int PairKind(
+        [NativeString(NativeStringKind.BorrowedPointerLength)] string text);
+
+    [Native("void295_length")]
+    public static unsafe extern int Length(
+        [NativeString(NativeStringKind.BorrowedPointerLength)] string text);
+
+    [Native("void295_embedded")]
+    public static unsafe extern int Embedded(
+        [NativeString(NativeStringKind.BorrowedPointerLength)] string text);
+
+    [Native("void295_mix")]
+    public static unsafe extern int Mix(
+        int prefix,
+        [NativeString(NativeStringKind.BorrowedPointerLength)] string left,
+        int middle,
+        [NativeString(NativeStringKind.BorrowedPointerLength)] string right,
+        int suffix);
+
+    [Native("void295_borrowed_nul_length")]
+    public static unsafe extern int BorrowedNulLength(
+        [NativeString] string text);
+
+    [Native("void295_legacy_length")]
+    public static unsafe extern int LegacyLength(string text);
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        NativeStringKind kind = NativeStringKind.BorrowedPointerLength;
+        Console.WriteLine(kind == NativeStringKind.BorrowedPointerLength);
+        Console.WriteLine(Native295.PairKind(null) == 1);
+        Console.WriteLine(Native295.PairKind("") == 2);
+        Console.WriteLine(Native295.PairKind("x") == 3);
+        Console.WriteLine(Native295.Length(null) == 0);
+        Console.WriteLine(Native295.Length("") == 0);
+        Console.WriteLine(Native295.Length("hello") == 5);
+        Console.WriteLine(Native295.Length("é") == 2);
+        Console.WriteLine(Native295.Length("ab\0cd") == 5);
+        Console.WriteLine(Native295.Embedded("ab\0cd") == 1);
+        Console.WriteLine(Native295.Mix(1, "A\0B", 2, "é", 3) == 1);
+        Console.WriteLine(Native295.BorrowedNulLength("nul") == 3);
+        Console.WriteLine(Native295.LegacyLength("legacy") == 6);
+    }
+}

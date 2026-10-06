@@ -1,0 +1,2 @@
+public static class Sizes { public const int Rows = 1 + 1; public const int Columns = 1 + 2; }
+public static class Program { public static void Main() { int[,] values = new int[Sizes.Rows, Sizes.Columns] { { 1, 2 }, { 3, 4 } }; } }

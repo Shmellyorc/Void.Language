@@ -1,0 +1,250 @@
+using Void;
+using Void.Threading;
+
+public sealed class NativeBoundaryException259 : Exception
+{
+    public int Code;
+
+    public NativeBoundaryException259(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public delegate int ManagedCallback259(int value);
+
+public static class Native259
+{
+    [Native("voidc259_reset")]
+    public static unsafe extern void Reset();
+
+    [Native("voidc259_ready")]
+    public static unsafe extern int Ready();
+
+    [Native("voidc259_release")]
+    public static unsafe extern void Release();
+
+    [Native("voidc259_add")]
+    public static unsafe extern int Add(int left, int right);
+
+    [Native("voidc259_subtract")]
+    public static unsafe extern int Subtract(int left, int right);
+
+    [Native("voidc259_block_sum")]
+    public static unsafe extern int BlockSum(int* values, int count);
+
+    [Native("voidc259_drive")]
+    public static unsafe extern int Drive(
+        delegate*<int, int, int> operation,
+        ManagedCallback259 callback,
+        int tag);
+
+    [Native("voidc259_gc_contains")]
+    public static unsafe extern int GcContains(void* memory);
+
+    [Native("voidc259_drive_function_result")]
+    public static unsafe extern int DriveFunctionResult();
+
+    [Native("voidc259_drive_callback_result")]
+    public static unsafe extern int DriveCallbackResult();
+
+    [Native("voidc259_drive_after_callback")]
+    public static unsafe extern int DriveAfterCallback();
+}
+
+public unsafe struct NativeOps259
+{
+    public delegate*<int, int, int> Binary;
+    public delegate*<int*, int, int> Block;
+}
+
+public static class NativeHeapFunctionPointerIntegration259
+{
+    private static unsafe void* AsVoid259<T>(T* pointer) where T : unmanaged
+    {
+        return pointer;
+    }
+
+    private static int CollectCallback259(int value)
+    {
+        GC.Collect();
+        GC.Collect();
+        return value + 5;
+    }
+
+    private static int ThrowCallback259(int value)
+    {
+        GC.Collect();
+        throw new NativeBoundaryException259("native function table callback", value);
+    }
+
+    [Export("void259_threaded_native_gc")]
+    public static unsafe int ThreadedNativeGc()
+    {
+        Native259.Reset();
+        int workerResult = -1;
+        int nonGc = 0;
+        int cleanupCount = 0;
+
+        Thread worker = new Thread(() =>
+        {
+            NativeOps259* operations = NativeMemory.Allocate<NativeOps259>(1ul);
+            int* values = NativeMemory.Allocate<int>(3ul);
+            try
+            {
+                operations[0].Block = &Native259.BlockSum;
+                operations[0].Binary = &Native259.Add;
+                values[0] = 10;
+                values[1] = 20;
+                values[2] = 12;
+                nonGc = Native259.GcContains(AsVoid259<NativeOps259>(operations)) == 0 &&
+                    Native259.GcContains(AsVoid259<int>(values)) == 0 ? 1 : 0;
+                workerResult = operations[0].Block(values, 3);
+                if (operations[0].Binary(20, 22) != 42)
+                    workerResult = -2;
+            }
+            finally
+            {
+                NativeMemory.Free(values);
+                NativeMemory.Free(operations);
+                cleanupCount++;
+            }
+        });
+        worker.Start();
+
+        while (Native259.Ready() == 0)
+            Thread.Sleep(1);
+
+        for (int i = 0; i < 5; i++)
+            GC.Collect();
+
+        Native259.Release();
+        worker.Join();
+        GC.Collect();
+
+        return workerResult == 42 && nonGc == 1 && cleanupCount == 1 ? 1 : 0;
+    }
+
+    [Export("void259_callback_gc")]
+    public static unsafe int CallbackGc()
+    {
+        Native259.Reset();
+        NativeOps259* operations = NativeMemory.Allocate<NativeOps259>(1ul);
+        int cleanupCount = 0;
+        int result = -1;
+        int nonGc = 0;
+        try
+        {
+            operations[0].Binary = &Native259.Add;
+            nonGc = Native259.GcContains(AsVoid259<NativeOps259>(operations)) == 0 ? 1 : 0;
+            result = Native259.Drive(operations[0].Binary, CollectCallback259, 37);
+        }
+        finally
+        {
+            NativeMemory.Free(operations);
+            cleanupCount++;
+        }
+
+        GC.Collect();
+        return result == 81 && nonGc == 1 && cleanupCount == 1 &&
+            Native259.DriveFunctionResult() == 39 &&
+            Native259.DriveCallbackResult() == 42 &&
+            Native259.DriveAfterCallback() == 1 ? 1 : 0;
+    }
+
+    [Export("void259_callback_exception_cleanup")]
+    public static unsafe int CallbackExceptionCleanup()
+    {
+        Native259.Reset();
+        NativeOps259* operations = NativeMemory.Allocate<NativeOps259>(1ul);
+        int cleanupCount = 0;
+        bool caught = false;
+        try
+        {
+            operations[0].Binary = &Native259.Subtract;
+            Native259.Drive(operations[0].Binary, ThrowCallback259, 73);
+        }
+        catch (NativeBoundaryException259 error)
+        {
+            caught = error.Code == 73;
+        }
+        finally
+        {
+            NativeMemory.Free(operations);
+            cleanupCount++;
+        }
+
+        GC.Collect();
+        return caught && cleanupCount == 1 &&
+            Native259.DriveFunctionResult() == 71 &&
+            Native259.DriveCallbackResult() == 0 &&
+            Native259.DriveAfterCallback() == 1 ? 1 : 0;
+    }
+
+    [Export("void259_thread_exception_cleanup")]
+    public static unsafe int ThreadExceptionCleanup()
+    {
+        Native259.Reset();
+        int cleanupCount = 0;
+        int nonGc = 0;
+
+        Thread worker = new Thread(() =>
+        {
+            NativeOps259* operations = NativeMemory.Allocate<NativeOps259>(1ul);
+            try
+            {
+                operations[0].Binary = &Native259.Add;
+                nonGc = Native259.GcContains(AsVoid259<NativeOps259>(operations)) == 0 ? 1 : 0;
+                Native259.Drive(operations[0].Binary, ThrowCallback259, 91);
+            }
+            finally
+            {
+                NativeMemory.Free(operations);
+                cleanupCount++;
+            }
+        });
+        worker.Start();
+
+        bool caught = false;
+        try
+        {
+            worker.Join();
+        }
+        catch (NativeBoundaryException259 error)
+        {
+            caught = error.Code == 91;
+        }
+
+        GC.Collect();
+        return caught && cleanupCount == 1 && nonGc == 1 &&
+            Native259.DriveFunctionResult() == 93 &&
+            Native259.DriveCallbackResult() == 0 &&
+            Native259.DriveAfterCallback() == 1 ? 1 : 0;
+    }
+
+    [Export("void259_post_failure_reuse")]
+    public static unsafe int PostFailureReuse()
+    {
+        NativeOps259* operations = NativeMemory.AllocateAligned<NativeOps259>(2ul, 64ul);
+        try
+        {
+            operations[0].Binary = &Native259.Add;
+            operations[1].Binary = &Native259.Subtract;
+            bool resized = NativeMemory.TryReallocateAligned<NativeOps259>(ref operations, 3ul, 128ul);
+            if (!resized || operations == null)
+                return 0;
+            operations[2].Binary = &Native259.Add;
+            GC.Collect();
+            Exception marker = new Exception("post-failure native heap reuse");
+            return marker.Message != null &&
+                Native259.GcContains(AsVoid259<NativeOps259>(operations)) == 0 &&
+                operations[0].Binary(40, 2) == 42 &&
+                operations[1].Binary(50, 8) == 42 &&
+                operations[2].Binary(21, 21) == 42 ? 1 : 0;
+        }
+        finally
+        {
+            NativeMemory.Free(operations);
+        }
+    }
+}

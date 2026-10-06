@@ -1,0 +1,270 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public struct Score204
+{
+    public int Value;
+
+    public Score204(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Payload204
+{
+    public int Value;
+
+    public Payload204(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class AsyncWorker204
+{
+    private int _offset;
+
+    public AsyncWorker204(int offset)
+    {
+        _offset = offset;
+    }
+
+    public async Task<int> Immediate(int value)
+    {
+        return value + _offset;
+    }
+
+    public async Task<int> AddAwaited(Task<int> source)
+    {
+        int value = await source;
+        return value + _offset;
+    }
+}
+
+public static class Program
+{
+    private static int _observed;
+
+    private static async Task<int> ImmediateInt(int value)
+    {
+        return value + 1;
+    }
+
+    private static async Task<Score204> ImmediateScore(int value)
+    {
+        return new Score204(value);
+    }
+
+    private static async Task<Payload204> ImmediatePayload(int value)
+    {
+        return new Payload204(value);
+    }
+
+    private static async Task<int> Select(bool first)
+    {
+        if (first)
+            return 11;
+        return 22;
+    }
+
+    private static async Task<int> FinallyReturn()
+    {
+        try
+        {
+            return 30;
+        }
+        finally
+        {
+            _observed += 1;
+        }
+    }
+
+    private static async Task<int> ImmediateFault()
+    {
+        throw new Exception("async-204-immediate-body-fault");
+    }
+
+    private static async Task<int> AwaitInt(Task<int> source, int add)
+    {
+        int value = await source;
+        return value + add;
+    }
+
+    private static async Task<int> ReturnAwait(Task<int> source) => await source;
+
+    private static async Task AwaitIntIntoTask(Task<int> source)
+    {
+        int value = await source;
+        _observed = value;
+    }
+
+    private static async Task<long> AwaitIntConversion(Task<int> source)
+    {
+        long value = await source;
+        return value + 2L;
+    }
+
+    private static async Task<int> AwaitSignal(Task source, int value)
+    {
+        await source;
+        return value;
+    }
+
+    private static async Task<int> IgnoreTypedResult(Task<int> source)
+    {
+        await source;
+        return 73;
+    }
+
+    private static async Task<Score204> AwaitScore(Task<Score204> source)
+    {
+        Score204 value = await source;
+        return value;
+    }
+
+    private static async Task<Payload204> AwaitPayload(Task<Payload204> source)
+    {
+        Payload204 value = await source;
+        GC.Collect();
+        GC.Collect();
+        return value;
+    }
+
+    private static bool WaitFault(Task task, string message)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (Exception error)
+        {
+            return error.Message == message;
+        }
+        return false;
+    }
+
+    public static void Main()
+    {
+        Task<int> immediate = ImmediateInt(41);
+        Console.WriteLine(immediate.IsCompleted && !immediate.IsFaulted && !immediate.IsCanceled);
+        Console.WriteLine(immediate.Result == 42);
+
+        Task<Score204> scoreTask = ImmediateScore(51);
+        Score204 score = scoreTask.Result;
+        Console.WriteLine(scoreTask.IsCompleted && score.Value == 51);
+
+        Task<Payload204> immediatePayload = ImmediatePayload(61);
+        GC.Collect();
+        GC.Collect();
+        Payload204 immediateObserved = immediatePayload.Result;
+        Console.WriteLine(immediateObserved != null && immediateObserved.Value == 61);
+
+        Console.WriteLine(Select(true).Result == 11);
+        Console.WriteLine(Select(false).Result == 22);
+
+        _observed = 0;
+        Task<int> finallyResult = FinallyReturn();
+        Console.WriteLine(finallyResult.Result == 30 && _observed == 1);
+
+        Task<int> bodyFault = ImmediateFault();
+        Console.WriteLine(bodyFault.IsCompleted && bodyFault.IsFaulted);
+        Console.WriteLine(WaitFault(bodyFault, "async-204-immediate-body-fault"));
+
+        TaskCompletionSource<int> completedSource = new TaskCompletionSource<int>();
+        completedSource.SetResult(10);
+        Task<int> completedAwait = AwaitInt(completedSource.Task, 5);
+        Console.WriteLine(completedAwait.IsCompleted);
+        Console.WriteLine(completedAwait.Result == 15);
+
+        TaskCompletionSource<int> returnAwaitSource = new TaskCompletionSource<int>();
+        Task<int> returnAwait = ReturnAwait(returnAwaitSource.Task);
+        Console.WriteLine(!returnAwait.IsCompleted);
+        returnAwaitSource.SetResult(18);
+        Console.WriteLine(returnAwait.Result == 18);
+
+        TaskCompletionSource<int> pendingSource = new TaskCompletionSource<int>();
+        Task<int> pendingAwait = AwaitInt(pendingSource.Task, 7);
+        Console.WriteLine(!pendingAwait.IsCompleted && pendingAwait.Status == TaskStatus.Pending);
+        pendingSource.SetResult(20);
+        pendingAwait.Wait();
+        Console.WriteLine(pendingAwait.Result == 27);
+
+        _observed = 0;
+        TaskCompletionSource<int> taskOuterSource = new TaskCompletionSource<int>();
+        Task taskOuter = AwaitIntIntoTask(taskOuterSource.Task);
+        Console.WriteLine(!taskOuter.IsCompleted && _observed == 0);
+        taskOuterSource.SetResult(33);
+        taskOuter.Wait();
+        Console.WriteLine(_observed == 33 && taskOuter.Status == TaskStatus.Completed);
+
+        TaskCompletionSource<int> conversionSource = new TaskCompletionSource<int>();
+        Task<long> converted = AwaitIntConversion(conversionSource.Task);
+        conversionSource.SetResult(40);
+        Console.WriteLine(converted.Result == 42L);
+
+        TaskCompletionSource signalSource = new TaskCompletionSource();
+        Task<int> afterSignal = AwaitSignal(signalSource.Task, 88);
+        Console.WriteLine(!afterSignal.IsCompleted);
+        signalSource.SetResult();
+        Console.WriteLine(afterSignal.Result == 88);
+
+        TaskCompletionSource<int> ignoredSource = new TaskCompletionSource<int>();
+        Task<int> ignored = IgnoreTypedResult(ignoredSource.Task);
+        ignoredSource.SetResult(999);
+        Console.WriteLine(ignored.Result == 73);
+
+        AsyncWorker204 worker = new AsyncWorker204(3);
+        Task<int> workerImmediate = worker.Immediate(7);
+        Console.WriteLine(workerImmediate.Result == 10);
+        TaskCompletionSource<int> workerSource = new TaskCompletionSource<int>();
+        Task<int> workerAwait = worker.AddAwaited(workerSource.Task);
+        worker = null;
+        GC.Collect();
+        GC.Collect();
+        workerSource.SetResult(12);
+        Console.WriteLine(workerAwait.Result == 15);
+
+        TaskCompletionSource<Score204> scoreSource = new TaskCompletionSource<Score204>();
+        Task<Score204> awaitedScore = AwaitScore(scoreSource.Task);
+        scoreSource.SetResult(new Score204(81));
+        Console.WriteLine(awaitedScore.Result.Value == 81);
+
+        TaskCompletionSource<Payload204> payloadSource = new TaskCompletionSource<Payload204>();
+        Task<Payload204> payloadAwait = AwaitPayload(payloadSource.Task);
+        Payload204 payload = new Payload204(91);
+        payloadSource.SetResult(payload);
+        payload = null;
+        payloadSource = null;
+        GC.Collect();
+        GC.Collect();
+        Payload204 observedPayload = payloadAwait.Result;
+        Console.WriteLine(observedPayload != null && observedPayload.Value == 91);
+
+        TaskCompletionSource<int> pendingFaultSource = new TaskCompletionSource<int>();
+        Task<int> pendingFault = AwaitInt(pendingFaultSource.Task, 1);
+        pendingFaultSource.SetException(new Exception("async-204-pending-fault"));
+        Console.WriteLine(WaitFault(pendingFault, "async-204-pending-fault"));
+        Console.WriteLine(pendingFault.IsFaulted && pendingFault.Exception != null);
+
+        TaskCompletionSource<int> completedFaultSource = new TaskCompletionSource<int>();
+        completedFaultSource.SetException(new Exception("async-204-immediate-fault"));
+        bool callThrew = false;
+        Task<int> completedFault = null;
+        try
+        {
+            completedFault = AwaitInt(completedFaultSource.Task, 1);
+        }
+        catch (Exception ignoredError)
+        {
+            callThrew = true;
+        }
+        Console.WriteLine(!callThrew && completedFault != null);
+        Console.WriteLine(completedFault.IsCompleted && completedFault.IsFaulted);
+        Console.WriteLine(WaitFault(completedFault, "async-204-immediate-fault"));
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

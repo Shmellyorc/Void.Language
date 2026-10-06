@@ -1,0 +1,30 @@
+namespace Arrays.Features;
+
+public struct Point
+{
+    public int X;
+    public int Y;
+
+    public Point(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+}
+
+public static class ArrayExamples
+{
+    public static int Sum(int[] values)
+    {
+        int total = 0;
+        for (int i = 0; i < values.Length; i++)
+            total += values[i];
+        return total;
+    }
+
+    public static void Fill(Point[] points)
+    {
+        points[0] = new Point(1, 2);
+        points[1] = new Point(3, 4);
+    }
+}

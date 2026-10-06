@@ -1,0 +1,16 @@
+public static class Native256Diag
+{
+    [Native("abs")]
+    public static unsafe extern int Abs(int value);
+}
+public unsafe struct Holder256
+{
+    public static delegate*<int, int> Callback;
+}
+public static class Program
+{
+    public static void Main()
+    {
+        Holder256.Callback = &Native256Diag.Abs;
+    }
+}

@@ -1,0 +1,2 @@
+public sealed class Node { public int Value; }
+public static class Program { public static void Main() { Node[] values = new Node[] { new Node() }; values?[0].Value = 2; } }

@@ -1,0 +1,81 @@
+public interface IValue
+{
+    int GetValue();
+}
+
+public interface IDamageable
+{
+    void Damage(int amount);
+}
+
+public class BaseValue : IValue
+{
+    public int GetValue()
+    {
+        return 7;
+    }
+}
+
+public class DerivedValue : BaseValue
+{
+}
+
+public sealed class Player : IValue, IDamageable
+{
+    private int _health;
+
+    public Player(int health)
+    {
+        _health = health;
+    }
+
+    public int GetValue()
+    {
+        return _health;
+    }
+
+    public void Damage(int amount)
+    {
+        _health -= amount;
+    }
+}
+
+public sealed class Holder
+{
+    public IValue Item;
+}
+
+public static class Program
+{
+    public static void Hit(IDamageable target)
+    {
+        target.Damage(10);
+    }
+
+    public static void Main()
+    {
+        Player player = new Player(50);
+        IValue value = player;
+        IDamageable damageable = player;
+
+        Console.WriteLine(value.GetValue());
+        Hit(damageable);
+        Console.WriteLine(value.GetValue());
+        Console.WriteLine(value == player);
+
+        IValue inherited = new DerivedValue();
+        Console.WriteLine(inherited.GetValue());
+
+        IValue none = null;
+        Console.WriteLine(none == null);
+
+        Holder holder = new();
+        holder.Item = player;
+        value = null;
+        damageable = null;
+        player = null;
+
+        GC.Collect();
+        Console.WriteLine(holder.Item.GetValue());
+    }
+}

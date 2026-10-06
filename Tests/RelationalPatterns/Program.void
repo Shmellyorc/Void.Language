@@ -1,0 +1,54 @@
+using Void;
+
+public sealed class Probe
+{
+    public int Calls;
+
+    public int? Next(int? value)
+    {
+        Calls++;
+        return value;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        int five = 5;
+        Console.WriteLine(five is < 6);
+        Console.WriteLine(five is <= 5);
+        Console.WriteLine(five is > 4);
+        Console.WriteLine(five is >= 5);
+        Console.WriteLine(!(five is < 5));
+        Console.WriteLine(!(five is > 5));
+
+        int negative = -4;
+        Console.WriteLine(negative is < -3);
+        Console.WriteLine(negative is <= -4);
+        Console.WriteLine(negative is > -5);
+        Console.WriteLine(negative is >= -4);
+
+        double fraction = 2.5;
+        Console.WriteLine(fraction is > 2.0);
+        Console.WriteLine(fraction is < 3.0);
+
+        char letter = 'm';
+        Console.WriteLine(letter is > 'a');
+        Console.WriteLine(letter is <= 'm');
+
+        int? present = 7;
+        int? missing = null;
+        Console.WriteLine(present is > 6);
+        Console.WriteLine(present is <= 7);
+        Console.WriteLine(!(present is > 7));
+        Console.WriteLine(!(missing is > 0));
+        Console.WriteLine(!(missing is <= 100));
+
+        Probe probe = new Probe();
+        Console.WriteLine(probe.Next(9) is >= 9);
+        Console.WriteLine(probe.Calls == 1);
+        Console.WriteLine(!(probe.Next(null) is < 10));
+        Console.WriteLine(probe.Calls == 2);
+    }
+}

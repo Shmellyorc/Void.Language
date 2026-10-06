@@ -1,0 +1,57 @@
+public class Player
+{
+    private int _health;
+
+    public int Health
+    {
+        get { return _health; }
+        private set { _health = value; }
+    }
+
+    public int Score { get; set; }
+    public int Id { get; }
+    public bool IsDead => Health <= 0;
+
+    public Player(int health)
+    {
+        Health = health;
+        Score = 5;
+    }
+
+    public void Damage(int amount)
+    {
+        Health -= amount;
+    }
+}
+
+public class Item
+{
+    public int Value { get; set; }
+}
+
+public class Holder
+{
+    public Item Current { get; set; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Player player = new Player(100);
+        Console.WriteLine(player.Health);
+        Console.WriteLine(player.Score);
+        Console.WriteLine(player.Id);
+        Console.WriteLine(player.IsDead);
+        player.Damage(25);
+        Console.WriteLine(player.Health);
+
+        Holder holder = new();
+        Item item = new();
+        item.Value = 77;
+        holder.Current = item;
+        item = null;
+        GC.Collect();
+        Console.WriteLine(holder.Current.Value);
+    }
+}

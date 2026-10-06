@@ -1,0 +1,304 @@
+using Void;
+using Void.Collections;
+
+public enum Mode
+{
+    None = 0,
+    Ready = 2,
+    Done = 4
+}
+
+public struct Packet
+{
+    public int Count;
+
+    public int GetCount()
+    {
+        return Count;
+    }
+}
+
+public sealed class Node
+{
+    public int Value;
+    public int[] Values;
+    public Packet Packet;
+
+    public Node(int value)
+    {
+        Value = value;
+        Values = new int[2];
+        Values[0] = value;
+        Values[1] = value + 1;
+        Packet = default(Packet);
+        Packet.Count = value + 10;
+    }
+
+    public int GetValue()
+    {
+        return Value;
+    }
+
+    public int Add(int amount)
+    {
+        return Value + amount;
+    }
+}
+
+public sealed class Holder
+{
+    public int? Score;
+    public int? Value { get; set; }
+    public Node Ref { get; set; }
+}
+
+public sealed class Probe
+{
+    public int Calls;
+
+    public int? NextNullable(int? value)
+    {
+        Calls++;
+        return value;
+    }
+
+    public int NextInt(int value)
+    {
+        Calls++;
+        return value;
+    }
+
+    public Node NextNode(Node value)
+    {
+        Calls++;
+        return value;
+    }
+
+    public Holder NextHolder(Holder value)
+    {
+        Calls++;
+        return value;
+    }
+
+    public int CollectInt(int value)
+    {
+        GC.Collect();
+        return value;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        int? none = null;
+        int? five = 5;
+        int? seven = 7;
+
+        Console.WriteLine((none ?? 9) == 9);
+        Console.WriteLine((five ?? 9) == 5);
+        int? coalescedNullable = none ?? seven;
+        Console.WriteLine(coalescedNullable.Value == 7);
+        int? keptNullable = five ?? seven;
+        Console.WriteLine(keptNullable.Value == 5);
+
+        none ??= 11;
+        Console.WriteLine(none.Value == 11);
+        none ??= 99;
+        Console.WriteLine(none.Value == 11);
+
+        int? sum1 = five + seven;
+        int? sum2 = five + 3;
+        int? sum3 = 3 + five;
+        int? missingSum = five + default(int?);
+        Console.WriteLine(sum1.Value == 12);
+        Console.WriteLine(sum2.Value == 8);
+        Console.WriteLine(sum3.Value == 8);
+        Console.WriteLine(missingSum.HasValue == false);
+
+        int? difference = seven - five;
+        int? product = five * 3;
+        int? quotient = seven / 2;
+        int? remainder = seven % 4;
+        Console.WriteLine(difference.Value == 2);
+        Console.WriteLine(product.Value == 15);
+        Console.WriteLine(quotient.Value == 3);
+        Console.WriteLine(remainder.Value == 3);
+
+        Console.WriteLine(five == 5);
+        Console.WriteLine(5 == five);
+        Console.WriteLine(five != 6);
+        Console.WriteLine(default(int?) == default(int?));
+        Console.WriteLine(default(int?) != five);
+        bool? less = five < seven;
+        bool? lessEqual = five <= 5;
+        bool? greater = seven > five;
+        bool? missingLess = default(int?) < seven;
+        Console.WriteLine(less.Value);
+        Console.WriteLine(lessEqual.Value);
+        Console.WriteLine(greater.Value);
+        Console.WriteLine(missingLess.HasValue == false);
+
+        bool condition = false;
+        if (five == 5)
+            condition = true;
+        Console.WriteLine(condition);
+        condition = false;
+        if (default(int?) == null)
+            condition = true;
+        Console.WriteLine(condition);
+
+        int? negative = -five;
+        int? positive = +five;
+        int? inverted = ~five;
+        bool? flag = true;
+        bool? notFlag = !flag;
+        Console.WriteLine(negative.Value == -5);
+        Console.WriteLine(positive.Value == 5);
+        Console.WriteLine(inverted.Value == ~5);
+        Console.WriteLine(notFlag.Value == false);
+        Console.WriteLine((!default(bool?)).HasValue == false);
+        Console.WriteLine(flag == true);
+        Console.WriteLine(default(bool?) != false);
+
+        Mode? mode = Mode.Ready;
+        Mode? mode2 = Mode.Done;
+        Console.WriteLine(mode == Mode.Ready);
+        Console.WriteLine(mode != mode2);
+        bool? modeLess = mode < mode2;
+        Console.WriteLine(modeLess.Value);
+        Console.WriteLine(default(Mode?) == null);
+
+        Node node = new Node(20);
+        Node absent = null;
+        int? fieldValue = node?.Value;
+        int? missingField = absent?.Value;
+        int? methodValue = node?.GetValue();
+        int? missingMethod = absent?.GetValue();
+        Console.WriteLine(fieldValue.Value == 20);
+        Console.WriteLine(missingField.HasValue == false);
+        Console.WriteLine(methodValue.Value == 20);
+        Console.WriteLine(missingMethod.HasValue == false);
+
+        int? length = node?.Values.Length;
+        int? missingLength = absent?.Values.Length;
+        Console.WriteLine(length.Value == 2);
+        Console.WriteLine(missingLength.HasValue == false);
+
+        int[] values = node.Values;
+        int[] noValues = null;
+        int? indexed = values?[1];
+        int? missingIndexed = noValues?[0];
+        Console.WriteLine(indexed.Value == 21);
+        Console.WriteLine(missingIndexed.HasValue == false);
+        Console.WriteLine((values?[0] ?? -1) == 20);
+        Console.WriteLine((noValues?[0] ?? -1) == -1);
+
+        List<int> list = new List<int>();
+        list.Add(31);
+        List<int> noList = null;
+        int? listValue = list?[0];
+        int? missingListValue = noList?[0];
+        Console.WriteLine(listValue.Value == 31);
+        Console.WriteLine(missingListValue.HasValue == false);
+
+        int? chainedIndex = node?.Values[1];
+        int? missingChainedIndex = absent?.Values[0];
+        Console.WriteLine(chainedIndex.Value == 21);
+        Console.WriteLine(missingChainedIndex.HasValue == false);
+
+        Packet packet = default(Packet);
+        packet.Count = 33;
+        Packet? maybePacket = packet;
+        Packet? noPacket = null;
+        int? packetCount = maybePacket?.Count;
+        int? noPacketCount = noPacket?.Count;
+        int? packetMethod = maybePacket?.GetCount();
+        int? noPacketMethod = noPacket?.GetCount();
+        Console.WriteLine(packetCount.Value == 33);
+        Console.WriteLine(noPacketCount.HasValue == false);
+        Console.WriteLine(packetMethod.Value == 33);
+        Console.WriteLine(noPacketMethod.HasValue == false);
+
+        Type missingType = Runtime.FindType("Missing.Type");
+        bool? missingIsValue = missingType?.IsValueType;
+        bool? intIsValue = typeof(int)?.IsValueType;
+        Console.WriteLine(missingIsValue.HasValue == false);
+        Console.WriteLine(intIsValue.Value);
+
+        Probe probe = new Probe();
+        probe.Calls = 0;
+        int firstCoalesce = probe.NextNullable(5) ?? probe.NextInt(99);
+        Console.WriteLine(firstCoalesce == 5);
+        Console.WriteLine(probe.Calls == 1);
+        int secondCoalesce = probe.NextNullable(null) ?? probe.NextInt(99);
+        Console.WriteLine(secondCoalesce == 99);
+        Console.WriteLine(probe.Calls == 3);
+
+        probe.Calls = 0;
+        int? bothEvaluated = probe.NextNullable(null) + probe.NextNullable(2);
+        Console.WriteLine(bothEvaluated.HasValue == false);
+        Console.WriteLine(probe.Calls == 2);
+
+        probe.Calls = 0;
+        int? skippedCall = absent?.Add(probe.NextInt(3));
+        Console.WriteLine(skippedCall.HasValue == false);
+        Console.WriteLine(probe.Calls == 0);
+        int? called = node?.Add(probe.NextInt(3));
+        Console.WriteLine(called.Value == 23);
+        Console.WriteLine(probe.Calls == 1);
+
+        probe.Calls = 0;
+        int? skippedIndex = noValues?[probe.NextInt(0)];
+        Console.WriteLine(skippedIndex.HasValue == false);
+        Console.WriteLine(probe.Calls == 0);
+
+        probe.Calls = 0;
+        int? singleReceiver = probe.NextNode(node)?.Value;
+        Console.WriteLine(singleReceiver.Value == 20);
+        Console.WriteLine(probe.Calls == 1);
+
+        Holder holder = new Holder();
+        probe.Calls = 0;
+        probe.NextHolder(holder).Score ??= probe.NextInt(41);
+        Console.WriteLine(holder.Score.Value == 41);
+        Console.WriteLine(probe.Calls == 2);
+        probe.NextHolder(holder).Score ??= probe.NextInt(90);
+        Console.WriteLine(holder.Score.Value == 41);
+        Console.WriteLine(probe.Calls == 3);
+
+        probe.Calls = 0;
+        probe.NextHolder(holder).Value ??= probe.NextInt(71);
+        Console.WriteLine(holder.Value.Value == 71);
+        Console.WriteLine(probe.Calls == 2);
+        probe.NextHolder(holder).Value ??= probe.NextInt(72);
+        Console.WriteLine(holder.Value.Value == 71);
+        Console.WriteLine(probe.Calls == 3);
+
+        probe.Calls = 0;
+        probe.NextHolder(holder).Ref ??= probe.NextNode(node);
+        Console.WriteLine(holder.Ref == node);
+        Console.WriteLine(probe.Calls == 2);
+        probe.NextHolder(holder).Ref ??= probe.NextNode(absent);
+        Console.WriteLine(holder.Ref == node);
+        Console.WriteLine(probe.Calls == 3);
+
+        int?[] nullableArray = new int?[1];
+        nullableArray[0] ??= 55;
+        Console.WriteLine(nullableArray[0].Value == 55);
+        nullableArray[0] ??= 77;
+        Console.WriteLine(nullableArray[0].Value == 55);
+
+        int? stillEmpty = null;
+        stillEmpty ??= null;
+        Console.WriteLine(stillEmpty.HasValue == false);
+        int? nullableFallback = 81;
+        stillEmpty ??= nullableFallback;
+        Console.WriteLine(stillEmpty.Value == 81);
+
+        int? temporaryField = new Holder().Score ??= probe.CollectInt(61);
+        Console.WriteLine(temporaryField.Value == 61);
+        int? temporaryArray = new int?[1][0] ??= probe.CollectInt(62);
+        Console.WriteLine(temporaryArray.Value == 62);
+    }
+}

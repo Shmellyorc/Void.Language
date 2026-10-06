@@ -1,0 +1,188 @@
+using Void;
+
+public ref struct RefView227
+{
+    public ref int Value;
+    public int Tag;
+
+    public RefView227(ref int value, int tag)
+    {
+        Value = ref value;
+        Tag = tag;
+    }
+
+    public RefView227 Snapshot
+    {
+        get { return this; }
+    }
+
+    public RefView227 Copy()
+    {
+        return this;
+    }
+}
+
+public ref struct Wrapper227
+{
+    public RefView227 Inner;
+    public RefView227 Auto { get; set; }
+
+    public Wrapper227(RefView227 value)
+    {
+        Inner = value;
+        Auto = value;
+    }
+
+    public RefView227 GetInner()
+    {
+        return Inner;
+    }
+}
+
+public sealed class Owner227
+{
+    public int Value;
+
+    public Owner227(int value)
+    {
+        Value = value;
+    }
+
+    public RefView227 View
+    {
+        get { return new RefView227(ref Value, 20); }
+    }
+}
+
+public ref struct GenericView227<T>
+{
+    public ref int Value;
+    public T Extra;
+
+    public GenericView227(ref int value, T extra)
+    {
+        Value = ref value;
+        Extra = extra;
+    }
+}
+
+public static class Program
+{
+    public static RefView227 Identity(RefView227 value)
+    {
+        return value;
+    }
+
+    public static RefView227 Make(ref int value, int tag)
+    {
+        return new RefView227(ref value, tag);
+    }
+
+    public static RefView227 Forward(ref int value)
+    {
+        RefView227 local = new RefView227(ref value, 30);
+        return local;
+    }
+
+    public static RefView227 FromOwner(Owner227 owner)
+    {
+        return Make(ref owner.Value, 25);
+    }
+
+    public static RefView227 Choose(bool first, RefView227 left, RefView227 right)
+    {
+        if (first)
+            return left;
+        return right;
+    }
+
+    public static GenericView227<T> GenericIdentity<T>(GenericView227<T> value)
+    {
+        return value;
+    }
+
+    public static int ReadScoped(scoped RefView227 value)
+    {
+        return value.Value + value.Tag;
+    }
+
+    public static void Main()
+    {
+        int first = 10;
+        RefView227 a = Make(ref first, 1);
+        Console.WriteLine(a.Value == 10);
+        Console.WriteLine(a.Tag == 1);
+        a.Value = 11;
+        Console.WriteLine(first == 11);
+
+        RefView227 b = Identity(a);
+        b.Value = 12;
+        Console.WriteLine(first == 12);
+
+        RefView227 c = Forward(ref first);
+        Console.WriteLine(c.Value == 12);
+        Console.WriteLine(c.Tag == 30);
+
+        RefView227 snapshot = c.Snapshot;
+        Console.WriteLine(snapshot.Value == 12);
+        RefView227 copied = c.Copy();
+        Console.WriteLine(copied.Tag == 30);
+
+        int second = 40;
+        RefView227 other = new RefView227(ref second, 2);
+        RefView227 chosen = Choose(false, c, other);
+        chosen.Value = 41;
+        Console.WriteLine(second == 41);
+        Console.WriteLine(chosen.Tag == 2);
+
+        Wrapper227 wrapper = new Wrapper227(c);
+        RefView227 nested = wrapper.GetInner();
+        nested.Value = 13;
+        Console.WriteLine(first == 13);
+        RefView227 automatic = wrapper.Auto;
+        Console.WriteLine(automatic.Value == 13);
+
+        Owner227 owner = new Owner227(50);
+        RefView227 owned = owner.View;
+        owner = null;
+        GC.Collect();
+        Console.WriteLine(owned.Value == 50);
+        owned.Value = 51;
+        GC.Collect();
+        Console.WriteLine(owned.Value == 51);
+        Console.WriteLine(owned.Tag == 20);
+
+        Owner227 methodOwner = new Owner227(55);
+        RefView227 throughMethod = FromOwner(methodOwner);
+        methodOwner = null;
+        GC.Collect();
+        Console.WriteLine(throughMethod.Value == 55);
+        Console.WriteLine(throughMethod.Tag == 25);
+
+        int scopedStorage = 60;
+        scoped RefView227 scopedValue = new RefView227(ref scopedStorage, 3);
+        Console.WriteLine(ReadScoped(scopedValue) == 63);
+        scopedValue.Value = 61;
+        Console.WriteLine(scopedStorage == 61);
+
+        int ordinaryStorage = 70;
+        RefView227 localValue = new RefView227(ref ordinaryStorage, 4);
+        Console.WriteLine(localValue.Value == 70);
+        localValue.Value = 71;
+        Console.WriteLine(ordinaryStorage == 71);
+
+        int genericStorage = 80;
+        GenericView227<string> generic = new GenericView227<string>(ref genericStorage, "kept");
+        GenericView227<string> genericCopy = GenericIdentity<string>(generic);
+        generic = default(GenericView227<string>);
+        GC.Collect();
+        Console.WriteLine(genericCopy.Value == 80);
+        Console.WriteLine(Runtime.Equals(genericCopy.Extra, "kept"));
+        genericCopy.Value = 81;
+        Console.WriteLine(genericStorage == 81);
+
+        RefView227 empty = default(RefView227);
+        RefView227 emptyCopy = Identity(empty);
+        Console.WriteLine(emptyCopy.Tag == 0);
+    }
+}

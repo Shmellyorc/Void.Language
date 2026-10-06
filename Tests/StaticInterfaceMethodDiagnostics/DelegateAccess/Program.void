@@ -1,0 +1,4 @@
+public delegate int Getter();
+public interface IValue { static int Get(); }
+public sealed class Good : IValue { public static int Get(){return 1;} }
+public static class Program { public static void Main() { Getter g = IValue.Get; Console.WriteLine(g()); } }

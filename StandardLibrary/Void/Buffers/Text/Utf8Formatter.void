@@ -1,0 +1,115 @@
+using Void;
+using Void.Buffers;
+
+namespace Void.Buffers.Text;
+
+public static class Utf8Formatter
+{
+    public static bool TryFormat(bool value, Span<byte> destination, out int bytesWritten, StandardFormat format = default)
+    {
+        if (!format.IsDefault)
+            throw new FormatException("non-default StandardFormat is not implemented yet");
+        bytesWritten = 0;
+        ref byte first = ref destination.GetPinnableReference();
+        return Runtime.Utf8TryFormatBool(value, ref first, destination.Length, out bytesWritten);
+    }
+
+    public static bool TryFormat(byte value, Span<byte> destination, out int bytesWritten, StandardFormat format = default)
+    {
+        if (!format.IsDefault)
+            throw new FormatException("non-default StandardFormat is not implemented yet");
+        bytesWritten = 0;
+        ref byte first = ref destination.GetPinnableReference();
+        return Runtime.Utf8TryFormatUInt64((ulong)value, ref first, destination.Length, out bytesWritten);
+    }
+
+    public static bool TryFormat(sbyte value, Span<byte> destination, out int bytesWritten, StandardFormat format = default)
+    {
+        if (!format.IsDefault)
+            throw new FormatException("non-default StandardFormat is not implemented yet");
+        bytesWritten = 0;
+        ref byte first = ref destination.GetPinnableReference();
+        return Runtime.Utf8TryFormatInt64((long)value, ref first, destination.Length, out bytesWritten);
+    }
+
+    public static bool TryFormat(short value, Span<byte> destination, out int bytesWritten, StandardFormat format = default)
+    {
+        if (!format.IsDefault)
+            throw new FormatException("non-default StandardFormat is not implemented yet");
+        bytesWritten = 0;
+        ref byte first = ref destination.GetPinnableReference();
+        return Runtime.Utf8TryFormatInt64((long)value, ref first, destination.Length, out bytesWritten);
+    }
+
+    public static bool TryFormat(ushort value, Span<byte> destination, out int bytesWritten, StandardFormat format = default)
+    {
+        if (!format.IsDefault)
+            throw new FormatException("non-default StandardFormat is not implemented yet");
+        bytesWritten = 0;
+        ref byte first = ref destination.GetPinnableReference();
+        return Runtime.Utf8TryFormatUInt64((ulong)value, ref first, destination.Length, out bytesWritten);
+    }
+
+    public static bool TryFormat(int value, Span<byte> destination, out int bytesWritten, StandardFormat format = default)
+    {
+        if (!format.IsDefault)
+            throw new FormatException("non-default StandardFormat is not implemented yet");
+        bytesWritten = 0;
+        ref byte first = ref destination.GetPinnableReference();
+        return Runtime.Utf8TryFormatInt64((long)value, ref first, destination.Length, out bytesWritten);
+    }
+
+    public static bool TryFormat(uint value, Span<byte> destination, out int bytesWritten, StandardFormat format = default)
+    {
+        if (!format.IsDefault)
+            throw new FormatException("non-default StandardFormat is not implemented yet");
+        bytesWritten = 0;
+        ref byte first = ref destination.GetPinnableReference();
+        return Runtime.Utf8TryFormatUInt64((ulong)value, ref first, destination.Length, out bytesWritten);
+    }
+
+    public static bool TryFormat(long value, Span<byte> destination, out int bytesWritten, StandardFormat format = default)
+    {
+        if (!format.IsDefault)
+            throw new FormatException("non-default StandardFormat is not implemented yet");
+        bytesWritten = 0;
+        ref byte first = ref destination.GetPinnableReference();
+        return Runtime.Utf8TryFormatInt64(value, ref first, destination.Length, out bytesWritten);
+    }
+
+    public static bool TryFormat(ulong value, Span<byte> destination, out int bytesWritten, StandardFormat format = default)
+    {
+        if (!format.IsDefault)
+            throw new FormatException("non-default StandardFormat is not implemented yet");
+        bytesWritten = 0;
+        ref byte first = ref destination.GetPinnableReference();
+        return Runtime.Utf8TryFormatUInt64(value, ref first, destination.Length, out bytesWritten);
+    }
+
+    public static bool TryFormat(float value, Span<byte> destination, out int bytesWritten, StandardFormat format = default)
+    {
+        if (!format.IsDefault)
+            throw new FormatException("non-default StandardFormat is not implemented yet");
+        bytesWritten = 0;
+        ref byte first = ref destination.GetPinnableReference();
+        return Runtime.Utf8TryFormatFloat(value, ref first, destination.Length, out bytesWritten);
+    }
+
+    public static bool TryFormat(double value, Span<byte> destination, out int bytesWritten, StandardFormat format = default)
+    {
+        if (!format.IsDefault)
+            throw new FormatException("non-default StandardFormat is not implemented yet");
+        bytesWritten = 0;
+        ref byte first = ref destination.GetPinnableReference();
+        return Runtime.Utf8TryFormatDouble(value, ref first, destination.Length, out bytesWritten);
+    }
+
+    public static bool TryFormat(decimal value, Span<byte> destination, out int bytesWritten, StandardFormat format = default)
+    {
+        if (!format.IsDefault)
+            throw new FormatException("non-default StandardFormat is not implemented yet");
+        bytesWritten = 0;
+        ref byte first = ref destination.GetPinnableReference();
+        return Runtime.Utf8TryFormatDecimal(value, ref first, destination.Length, out bytesWritten);
+    }
+}

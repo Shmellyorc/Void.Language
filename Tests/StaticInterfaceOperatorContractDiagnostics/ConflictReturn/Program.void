@@ -1,0 +1,8 @@
+public interface ILeft<T> { static T operator +(T left, T right); }
+public interface IRight<T> { static int operator +(T left, T right); }
+public interface IBoth<T> : ILeft<T>, IRight<T> { }
+public struct Number : IBoth<Number>
+{
+    public static Number operator +(Number left, Number right) { return left; }
+}
+public static class Program { public static void Main() { } }

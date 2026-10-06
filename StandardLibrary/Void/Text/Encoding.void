@@ -1,0 +1,102 @@
+using Void;
+
+namespace Void.Text;
+
+public abstract class Encoding
+{
+    internal virtual bool SupportsConsoleStreaming { get { return false; } }
+    internal virtual bool ThrowsOnInvalidBytes { get { return false; } }
+
+    public static Encoding UTF8
+    {
+        get { return UTF8Encoding.Shared; }
+    }
+
+    public virtual Decoder GetDecoder() { throw new NotSupportedException("This encoding does not support incremental decoding."); }
+
+    public abstract byte[] GetPreamble();
+    public abstract int GetByteCount(string value);
+    public abstract byte[] GetBytes(string value);
+    public abstract int GetBytes(string value, int charIndex, int charCount, byte[] bytes, int byteIndex);
+    public abstract string GetString(byte[] bytes);
+    public abstract string GetString(byte[] bytes, int index, int count);
+}
+
+public sealed class UTF8Encoding : Encoding
+{
+    internal override bool SupportsConsoleStreaming { get { return true; } }
+    internal override bool ThrowsOnInvalidBytes { get { return _throwOnInvalidBytes; } }
+
+    internal static readonly Encoding Shared = new UTF8Encoding(true);
+
+    private bool _emitIdentifier;
+    private bool _throwOnInvalidBytes;
+    public UTF8Encoding() : this(false, false) { }
+    public UTF8Encoding(bool encoderShouldEmitUTF8Identifier) : this(encoderShouldEmitUTF8Identifier, false) { }
+    public UTF8Encoding(bool encoderShouldEmitUTF8Identifier, bool throwOnInvalidBytes)
+    {
+        _emitIdentifier = encoderShouldEmitUTF8Identifier;
+        _throwOnInvalidBytes = throwOnInvalidBytes;
+    }
+    public override Decoder GetDecoder() { return new UTF8Decoder(_throwOnInvalidBytes); }
+
+    public override byte[] GetPreamble()
+    {
+        if (!_emitIdentifier) return new byte[0];
+        return new byte[] { (byte)239, (byte)187, (byte)191 };
+    }
+
+    public override int GetByteCount(string value)
+    {
+        if (value == null)
+            throw new ArgumentNullException("value", "Encoding.GetByteCount value cannot be null");
+        return Runtime.Utf8StringByteCount(value);
+    }
+
+    public override byte[] GetBytes(string value)
+    {
+        if (value == null)
+            throw new ArgumentNullException("value", "Encoding.GetBytes value cannot be null");
+        int byteCount = Runtime.Utf8StringByteCount(value);
+        byte[] bytes = new byte[byteCount];
+        if (byteCount > 0)
+            Runtime.Utf8StringCopy(value, bytes, 0);
+        return bytes;
+    }
+
+    public override int GetBytes(string value, int charIndex, int charCount, byte[] bytes, int byteIndex)
+    {
+        if (value == null)
+            throw new ArgumentNullException("value", "Encoding.GetBytes value cannot be null");
+        if (bytes == null)
+            throw new ArgumentNullException("bytes", "Encoding.GetBytes destination cannot be null");
+        if (charIndex < 0 || charCount < 0 || charIndex > value.Length || charCount > value.Length - charIndex)
+            throw new ArgumentOutOfRangeException("charIndex", "Encoding.GetBytes character range is out of range");
+        if (byteIndex < 0 || byteIndex > bytes.Length)
+            throw new ArgumentOutOfRangeException("byteIndex", "Encoding.GetBytes destination index is out of range");
+
+        string slice = value.Substring(charIndex, charCount);
+        int byteCount = Runtime.Utf8StringByteCount(slice);
+        if (byteCount > bytes.Length - byteIndex)
+            throw new ArgumentException("Encoding.GetBytes destination is too short");
+        if (byteCount > 0)
+            Runtime.Utf8StringCopy(slice, bytes, byteIndex);
+        return byteCount;
+    }
+
+    public override string GetString(byte[] bytes)
+    {
+        if (bytes == null)
+            throw new ArgumentNullException("bytes", "Encoding.GetString bytes cannot be null");
+        return this.GetString(bytes, 0, bytes.Length);
+    }
+
+    public override string GetString(byte[] bytes, int index, int count)
+    {
+        if (bytes == null)
+            throw new ArgumentNullException("bytes", "Encoding.GetString bytes cannot be null");
+        if (index < 0 || count < 0 || index > bytes.Length || count > bytes.Length - index)
+            throw new ArgumentOutOfRangeException("index", "Encoding.GetString byte range is out of range");
+        return new UTF8Decoder(_throwOnInvalidBytes).Decode(bytes, index, count, true);
+    }
+}

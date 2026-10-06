@@ -1,0 +1,27 @@
+using Void;
+
+public static class Native294
+{
+    [Native("void294_is_null")]
+    public static unsafe extern int IsNull([NativeString] string text);
+
+    [Native("void294_length")]
+    public static unsafe extern int Length([NativeString(NativeStringKind.BorrowedNul)] string text);
+
+    [Native("void294_length_legacy")]
+    public static unsafe extern int LegacyLength(string text);
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        NativeStringKind kind = NativeStringKind.BorrowedNul;
+        Console.WriteLine(kind == NativeStringKind.BorrowedNul);
+        Console.WriteLine(Native294.IsNull(null) == 1);
+        Console.WriteLine(Native294.IsNull("") == 0);
+        Console.WriteLine(Native294.Length("") == 0);
+        Console.WriteLine(Native294.Length("hello") == 5);
+        Console.WriteLine(Native294.LegacyLength("legacy") == 6);
+    }
+}

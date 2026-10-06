@@ -1,0 +1,347 @@
+namespace Void;
+
+internal static class SpanIntrinsics
+{
+    public static ref T Add<T>(ref T source, int offset)
+    {
+        return ref source;
+    }
+
+    public static ref readonly T AddReadOnly<T>(in T source, int offset)
+    {
+        return ref source;
+    }
+
+    public static void Copy<T>(ref T destination, in T source, int length)
+    {
+    }
+
+    public static ref T ArrayPinnableReference<T>(T[] array, int start, int length)
+    {
+        return ref array[start];
+    }
+
+    public static ref readonly T ArrayPinnableReferenceReadOnly<T>(T[] array, int start, int length)
+    {
+        return ref array[start];
+    }
+
+    public static unsafe ref T PointerReference<T>(void* pointer) where T : unmanaged
+    {
+        return ref *((T*)pointer);
+    }
+
+    public static unsafe ref readonly T PointerReferenceReadOnly<T>(void* pointer) where T : unmanaged
+    {
+        return ref *((T*)pointer);
+    }
+}
+
+public ref struct Span<T>
+{
+    private ref T _reference;
+    private int _length;
+
+    public Span(T[] array)
+    {
+        _length = 0;
+        if (array != null && array.Length > 0)
+        {
+            _reference = ref array[0];
+            _length = array.Length;
+        }
+    }
+
+    public Span(T[] array, int start, int length)
+    {
+        _length = 0;
+        int arrayLength = 0;
+        if (array != null)
+            arrayLength = array.Length;
+        if (start < 0 || length < 0 || start > arrayLength || length > arrayLength - start)
+            throw new ArgumentOutOfRangeException("start", "Span range out of range");
+        if (length > 0)
+        {
+            _reference = ref array[start];
+            _length = length;
+        }
+    }
+
+    public unsafe Span(void* pointer, int length)
+    {
+        if (length < 0)
+            throw new ArgumentOutOfRangeException("length", "Span length cannot be negative");
+        if (pointer == null && length > 0)
+            throw new ArgumentNullException("pointer", "Span pointer cannot be null for a non-empty span");
+        _length = length;
+        if (length > 0)
+            _reference = ref SpanIntrinsics.PointerReference<T>(pointer);
+    }
+
+    public Span(ref T reference, int length)
+    {
+        if (length < 0)
+            throw new ArgumentOutOfRangeException("length", "Span length cannot be negative");
+        _length = length;
+        if (length > 0)
+            _reference = ref reference;
+    }
+
+    public int Length => _length;
+    public bool IsEmpty => _length == 0;
+
+    public ref T GetPinnableReference()
+    {
+        return ref _reference;
+    }
+
+    public ref T get_Item(int index)
+    {
+        if (index < 0 || index >= _length)
+            throw new IndexOutOfRangeException("Span index out of range");
+        return ref SpanIntrinsics.Add<T>(ref _reference, index);
+    }
+
+    public Span<T> Slice(int start)
+    {
+        return this.Slice(start, _length - start);
+    }
+
+    public Span<T> Slice(int start, int length)
+    {
+        if (start < 0 || length < 0 || start > _length || length > _length - start)
+            throw new ArgumentOutOfRangeException("start", "Span range out of range");
+        if (length == 0)
+            return default(Span<T>);
+        ref T first = ref SpanIntrinsics.Add<T>(ref _reference, start);
+        return new Span<T>(ref first, length);
+    }
+
+    public readonly void CopyTo(Span<T> destination)
+    {
+        if (destination.Length < _length)
+            throw new ArgumentException("Destination is too short");
+        if (_length == 0)
+            return;
+        ref T destinationFirst = ref destination[0];
+        SpanIntrinsics.Copy<T>(ref destinationFirst, in _reference, _length);
+    }
+
+    public readonly bool TryCopyTo(Span<T> destination)
+    {
+        if (destination.Length < _length)
+            return false;
+        if (_length == 0)
+            return true;
+        ref T destinationFirst = ref destination[0];
+        SpanIntrinsics.Copy<T>(ref destinationFirst, in _reference, _length);
+        return true;
+    }
+
+    public void Fill(T value)
+    {
+        for (int i = 0; i < _length; i++)
+            this[i] = value;
+    }
+
+    public void Clear()
+    {
+        this.Fill(default(T));
+    }
+
+    public T[] ToArray()
+    {
+        T[] array = new T[_length];
+        this.CopyTo(new Span<T>(array));
+        return array;
+    }
+
+    public SpanEnumerator<T> GetEnumerator()
+    {
+        return new SpanEnumerator<T>(this);
+    }
+
+    public static implicit operator Span<T>(T[] array)
+    {
+        return new Span<T>(array);
+    }
+
+    public static implicit operator ReadOnlySpan<T>(Span<T> span)
+    {
+        if (span._length == 0)
+            return default(ReadOnlySpan<T>);
+        return new ReadOnlySpan<T>(in span._reference, span._length);
+    }
+}
+
+public readonly ref struct ReadOnlySpan<T>
+{
+    private ref readonly T _reference;
+    private readonly int _length;
+
+    public ReadOnlySpan(T[] array)
+    {
+        _length = 0;
+        if (array != null && array.Length > 0)
+        {
+            _reference = ref array[0];
+            _length = array.Length;
+        }
+    }
+
+    public ReadOnlySpan(T[] array, int start, int length)
+    {
+        _length = 0;
+        int arrayLength = 0;
+        if (array != null)
+            arrayLength = array.Length;
+        if (start < 0 || length < 0 || start > arrayLength || length > arrayLength - start)
+            throw new ArgumentOutOfRangeException("start", "ReadOnlySpan range out of range");
+        if (length > 0)
+        {
+            _reference = ref array[start];
+            _length = length;
+        }
+    }
+
+    public unsafe ReadOnlySpan(void* pointer, int length)
+    {
+        if (length < 0)
+            throw new ArgumentOutOfRangeException("length", "ReadOnlySpan length cannot be negative");
+        if (pointer == null && length > 0)
+            throw new ArgumentNullException("pointer", "ReadOnlySpan pointer cannot be null for a non-empty span");
+        _length = length;
+        if (length > 0)
+            _reference = ref SpanIntrinsics.PointerReferenceReadOnly<T>(pointer);
+    }
+
+    public ReadOnlySpan(in T reference, int length)
+    {
+        if (length < 0)
+            throw new ArgumentOutOfRangeException("length", "ReadOnlySpan length cannot be negative");
+        _length = length;
+        if (length > 0)
+            _reference = ref reference;
+    }
+
+    public int Length => _length;
+    public bool IsEmpty => _length == 0;
+
+    public ref readonly T GetPinnableReference()
+    {
+        return ref _reference;
+    }
+
+    public ref readonly T get_Item(int index)
+    {
+        if (index < 0 || index >= _length)
+            throw new IndexOutOfRangeException("ReadOnlySpan index out of range");
+        return ref SpanIntrinsics.AddReadOnly<T>(in _reference, index);
+    }
+
+    public ReadOnlySpan<T> Slice(int start)
+    {
+        return this.Slice(start, _length - start);
+    }
+
+    public ReadOnlySpan<T> Slice(int start, int length)
+    {
+        if (start < 0 || length < 0 || start > _length || length > _length - start)
+            throw new ArgumentOutOfRangeException("start", "ReadOnlySpan range out of range");
+        if (length == 0)
+            return default(ReadOnlySpan<T>);
+        ref readonly T first = ref SpanIntrinsics.AddReadOnly<T>(in _reference, start);
+        return new ReadOnlySpan<T>(in first, length);
+    }
+
+    public void CopyTo(Span<T> destination)
+    {
+        if (destination.Length < _length)
+            throw new ArgumentException("Destination is too short");
+        if (_length == 0)
+            return;
+        ref T destinationFirst = ref destination[0];
+        SpanIntrinsics.Copy<T>(ref destinationFirst, in _reference, _length);
+    }
+
+    public bool TryCopyTo(Span<T> destination)
+    {
+        if (destination.Length < _length)
+            return false;
+        if (_length == 0)
+            return true;
+        ref T destinationFirst = ref destination[0];
+        SpanIntrinsics.Copy<T>(ref destinationFirst, in _reference, _length);
+        return true;
+    }
+
+    public T[] ToArray()
+    {
+        T[] array = new T[_length];
+        this.CopyTo(new Span<T>(array));
+        return array;
+    }
+
+    public ReadOnlySpanEnumerator<T> GetEnumerator()
+    {
+        return new ReadOnlySpanEnumerator<T>(this);
+    }
+
+    public static implicit operator ReadOnlySpan<T>(T[] array)
+    {
+        return new ReadOnlySpan<T>(array);
+    }
+}
+
+
+public ref struct SpanEnumerator<T>
+{
+    private Span<T> _span;
+    private int _index;
+
+    public SpanEnumerator(Span<T> span)
+    {
+        _span = span;
+        _index = -1;
+    }
+
+    public bool MoveNext()
+    {
+        int next = _index + 1;
+        if (next >= _span.Length)
+            return false;
+        _index = next;
+        return true;
+    }
+
+    public ref T Current
+    {
+        get { return ref _span[_index]; }
+    }
+}
+
+public ref struct ReadOnlySpanEnumerator<T>
+{
+    private ReadOnlySpan<T> _span;
+    private int _index;
+
+    public ReadOnlySpanEnumerator(ReadOnlySpan<T> span)
+    {
+        _span = span;
+        _index = -1;
+    }
+
+    public bool MoveNext()
+    {
+        int next = _index + 1;
+        if (next >= _span.Length)
+            return false;
+        _index = next;
+        return true;
+    }
+
+    public ref readonly T Current
+    {
+        get { return ref _span[_index]; }
+    }
+}

@@ -1,0 +1,1 @@
+public static class Program { public const int Value = 1; public static void Main() { ref int alias = ref Value; } }

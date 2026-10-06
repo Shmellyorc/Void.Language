@@ -1,0 +1,41 @@
+public sealed class ThreadNode
+{
+    public int Value;
+
+    static ThreadNode()
+    {
+        GC.Collect();
+    }
+
+    public ThreadNode(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class ThreadAllocationApi
+{
+    private static ThreadNode Persistent;
+
+    [Export("void163_allocate_sum")]
+    public static int AllocateSum(int seed, int count)
+    {
+        int sum = 0;
+        for (int i = 0; i < count; i++)
+        {
+            ThreadNode node = new ThreadNode(seed + i);
+            if ((i % 16) == 0)
+                GC.Collect();
+            sum += node.Value;
+        }
+        return sum;
+    }
+
+    [Export("void163_collect_value")]
+    public static int CollectValue(int value)
+    {
+        Persistent = new ThreadNode(value);
+        GC.Collect();
+        return Persistent.Value;
+    }
+}

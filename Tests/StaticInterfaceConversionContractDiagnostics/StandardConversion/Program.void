@@ -1,0 +1,5 @@
+public interface IInvalid
+{
+    static implicit operator long(int value);
+}
+public static class Program { public static void Main() { } }

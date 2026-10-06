@@ -1,0 +1,50 @@
+using Void;
+
+namespace Void.IO;
+
+public sealed class DirectoryInfo
+{
+    private string _path;
+    public DirectoryInfo(string path) { IOErrors.CheckPath(path); _path = Path.GetFullPath(path); }
+    public string Name
+    {
+        get
+        {
+            int end = _path.Length;
+            int root = Path.RootLength(_path);
+            while (end > root && (_path[end - 1] == Path.DirectorySeparatorChar || _path[end - 1] == Path.AltDirectorySeparatorChar)) end--;
+            string trimmed = _path.Substring(0, end);
+            string name = Path.GetFileName(trimmed);
+            return name.Length == 0 ? trimmed : name;
+        }
+    }
+    public string FullName { get { return _path; } }
+    public bool Exists { get { return Directory.Exists(_path); } }
+    public void Create() { Directory.CreateDirectory(_path); }
+    public void Delete() { Directory.Delete(_path); }
+}
+
+public static class Directory
+{
+    public static bool Exists(string path)
+    {
+        if (path == null || path.Length == 0 || path.IndexOf((char)0) >= 0) return false;
+        return Runtime.NativePathKind(path) == 2;
+    }
+    public static DirectoryInfo CreateDirectory(string path)
+    {
+        IOErrors.CheckPath(path); path = Path.GetFullPath(path);
+        if (!Exists(path))
+        {
+            string parent = Path.GetDirectoryName(path);
+            if (parent != null && parent.Length != 0 && parent != path && !Exists(parent)) CreateDirectory(parent);
+            IOErrors.Throw(Runtime.NativePathCreateDirectory(path), path, true);
+        }
+        return new DirectoryInfo(path);
+    }
+    public static void Delete(string path)
+    {
+        IOErrors.CheckPath(path);
+        IOErrors.Throw(Runtime.NativePathDelete(path, true), path, true);
+    }
+}

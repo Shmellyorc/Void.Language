@@ -1,0 +1,12 @@
+public static class Native256Diag
+{
+    [Native("abs")]
+    public static unsafe extern int Abs(int value);
+}
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        delegate*<long, long> callback = &Native256Diag.Abs;
+    }
+}

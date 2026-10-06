@@ -1,0 +1,186 @@
+using Void;
+using Void.IO;
+using Void.Text;
+using Void.Collections;
+public sealed class FailingStream : Stream
+{
+    public int Disposals;
+    public override bool CanRead { get { return false; } }
+    public override bool CanWrite { get { return true; } }
+    public override bool CanSeek { get { return false; } }
+    public override long Length { get { throw new NotSupportedException(); } }
+    public override long Position { get { throw new NotSupportedException(); } set { throw new NotSupportedException(); } }
+    public override void Flush() { throw new IOException("flush"); }
+    public override int Read(byte[] buffer, int offset, int count) { throw new NotSupportedException(); }
+    public override void Write(byte[] buffer, int offset, int count) { if (count > 0) throw new IOException("write"); }
+    public override long Seek(long offset, SeekOrigin origin) { throw new NotSupportedException(); }
+    public override void SetLength(long value) { throw new NotSupportedException(); }
+    public override void Dispose() { Disposals++; }
+}
+public static class Program
+{
+    private static void Abandon(string path) { FileStream abandoned = File.OpenRead(path); }
+    private static string NestedReturn(string path)
+    {
+        using (FileStream file = File.OpenRead(path))
+        {
+            using (StreamReader reader = new StreamReader(file, Encoding.UTF8, true, 1, true))
+            {
+                GC.Collect(); return reader.ReadToEnd();
+            }
+        }
+    }
+    private static IEnumerable<int> RetainedKeys()
+    {
+        Dictionary<int, string> dictionary = new Dictionary<int, string>();
+        dictionary.Add(23, "held"); return dictionary.Keys;
+    }
+    public static void Main()
+    {
+        string root = "void-engineering-files";
+        Directory.CreateDirectory(Path.Combine(root, "nested"));
+        string file = Path.Combine(root, "nested/😀.txt");
+        File.WriteAllText(file, "é😀漢");
+        Console.WriteLine(File.ReadAllText(file) == "é😀漢");
+        File.AppendAllText(file, "x");
+        Console.WriteLine(File.ReadAllText(file) == "é😀漢x");
+        using (FileStream handle = new FileStream(file, FileMode.Open))
+        {
+            Console.WriteLine(handle.CanRead && handle.CanWrite && handle.CanSeek && handle.Length == 10L);
+            handle.Position = 20L; handle.WriteByte((byte)42);
+            Console.WriteLine(handle.Length == 21L && handle.Position == 21L);
+            handle.Position = 12L; Console.WriteLine(handle.ReadByte() == 0);
+            handle.SetLength(4L); Console.WriteLine(handle.Length == 4L && handle.Position == 4L);
+            handle.Flush(); GC.Collect(); Console.WriteLine(handle.Length == 4L);
+        }
+        File.Delete(file); Directory.Delete(Path.Combine(root, "nested")); Directory.Delete(root);
+        Console.WriteLine(!File.Exists(file) && !Directory.Exists(root));
+        Console.WriteLine(Path.Combine("a", "b") == "a" + Path.DirectorySeparatorChar + "b");
+        Console.WriteLine(Path.GetFileName("a/b.txt") == "b.txt" && Path.GetFileNameWithoutExtension("a/b.txt") == "b");
+        Console.WriteLine(Path.GetDirectoryName("a/b/") == "a/b" && Path.GetDirectoryName("a") == string.Empty);
+        Console.WriteLine(Path.GetExtension("a/b.txt") == ".txt" && Path.ChangeExtension("a/b.txt", "dat") == "a/b.dat");
+        Console.WriteLine(Path.IsPathRooted("/a") && !Path.IsPathRooted("a") && Path.GetDirectoryName("/") == null);
+        Console.WriteLine(!File.Exists(null) && !Directory.Exists("a\0b"));
+        DirectoryInfo info = Directory.CreateDirectory(root + "/nested/");
+        Console.WriteLine(info.Exists && info.Name == "nested");
+        File.WriteAllText(file, "retainedé😀"); Abandon(file); GC.Collect();
+        Console.WriteLine(File.ReadAllText(file) == "retainedé😀");
+        Console.WriteLine(NestedReturn(file) == "retainedé😀");
+        File.Copy(file, Path.Combine(root, "copy.txt"));
+        Console.WriteLine(File.ReadAllText(Path.Combine(root, "copy.txt")) == "retainedé😀");
+        bool failure = false;
+        try { File.Copy(file, Path.Combine(root, "copy.txt")); } catch (IOException) { failure = true; }
+        Console.WriteLine(failure);
+        failure = false;
+        try { using (FileStream create = new FileStream(file, FileMode.CreateNew)) { } } catch (IOException) { failure = true; }
+        Console.WriteLine(failure);
+        using (FileStream readOnly = File.OpenRead(file))
+        {
+            failure = false; try { readOnly.WriteByte((byte)0); } catch (NotSupportedException) { failure = true; }
+            Console.WriteLine(failure);
+            failure = false; try { new FileStream(file, FileMode.Create); } catch (IOException) { failure = true; }
+            Console.WriteLine(failure && readOnly.Length == (long)Encoding.UTF8.GetByteCount("retainedé😀"));
+        }
+        using (FileStream append = new FileStream(file, FileMode.Append))
+        {
+            long initial = append.Position;
+            failure = false; try { append.Position = 0L; } catch (IOException) { failure = true; }
+            Console.WriteLine(failure && append.Position == initial && !append.CanRead);
+        }
+        failure = false; try { File.OpenRead(Path.Combine(root, "missing.txt")); } catch (FileNotFoundException) { failure = true; }
+        Console.WriteLine(failure);
+        failure = false; try { File.OpenRead(Path.Combine(root, "absent/missing.txt")); } catch (DirectoryNotFoundException) { failure = true; }
+        Console.WriteLine(failure);
+        failure = false; try { new FileStream(root, FileMode.Open); } catch (UnauthorizedAccessException) { failure = true; }
+        Console.WriteLine(failure);
+        failure = false; try { new FileStream("a\0b", FileMode.Create); } catch (ArgumentException) { failure = true; }
+        Console.WriteLine(failure);
+        failure = false; try { new FileStream(file, FileMode.Open, (FileAccess)0); } catch (ArgumentOutOfRangeException) { failure = true; }
+        Console.WriteLine(failure);
+        failure = false; try { new FileStream(file, FileMode.Append, FileAccess.Read); } catch (ArgumentException) { failure = true; }
+        Console.WriteLine(failure);
+        FileStream disposed = File.OpenRead(file); disposed.Dispose(); disposed.Close();
+        failure = false; try { disposed.ReadByte(); } catch (ObjectDisposedException) { failure = true; }
+        Console.WriteLine(failure && !disposed.CanRead && !disposed.CanSeek);
+        failure = false;
+        try { using (FileStream nested = File.OpenRead(file)) { GC.Collect(); throw new IOException("test"); } }
+        catch (IOException) { failure = true; }
+        Console.WriteLine(failure && File.ReadAllText(file) == "retainedé😀");
+        failure = false; try { Directory.Delete(root); } catch (IOException) { failure = true; }
+        Console.WriteLine(failure);
+        File.Delete(file); File.Delete(file); File.Delete(Path.Combine(root, "copy.txt"));
+        Directory.Delete(Path.Combine(root, "nested")); Directory.Delete(root);
+        Console.WriteLine(!Directory.Exists(root));
+        IEnumerable<int> retained = RetainedKeys(); GC.Collect();
+        int retainedValue = 0; foreach (int key in retained) retainedValue = key;
+        Console.WriteLine(retainedValue == 23);
+        MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes("é😀漢\r\nx\ry\nz"));
+        StreamReader reader = new StreamReader(stream, Encoding.UTF8, true, 1, true);
+        Console.WriteLine(reader.ReadLine() == "é😀漢");
+        GC.Collect();
+        Console.WriteLine(reader.ReadLine() == "x");
+        Console.WriteLine(reader.ReadLine() == "y");
+        Console.WriteLine(reader.ReadLine() == "z");
+        Console.WriteLine(reader.ReadLine() == null && reader.EndOfStream && reader.Read() == -1);
+        reader.Dispose(); reader.Dispose();
+        Console.WriteLine(stream.CanRead);
+        bool closed = false; try { reader.Read(); } catch (ObjectDisposedException) { closed = true; }
+        Console.WriteLine(closed);
+        MemoryStream output = new MemoryStream();
+        StreamWriter writer = new StreamWriter(output, new UTF8Encoding(false), 1, true);
+        writer.Write("é😀漢"); writer.Flush();
+        Console.WriteLine(Encoding.UTF8.GetString(output.ToArray()) == "é😀漢");
+        writer.AutoFlush = true; writer.Write("x"); GC.Collect();
+        Console.WriteLine(Encoding.UTF8.GetString(output.ToArray()) == "é😀漢x");
+        writer.Dispose(); writer.Dispose(); Console.WriteLine(output.CanWrite);
+        closed = false; try { writer.Write("x"); } catch (ObjectDisposedException) { closed = true; }
+        Console.WriteLine(closed);
+        MemoryStream bom = new MemoryStream();
+        StreamWriter bomWriter = new StreamWriter(bom, new UTF8Encoding(true), 2, true);
+        bomWriter.Write("😀"); bomWriter.Dispose(); bom.Position = 0L;
+        StreamReader bomReader = new StreamReader(bom, Encoding.UTF8, true, 1, false);
+        Console.WriteLine(bomReader.ReadToEnd() == "😀"); bomReader.Dispose(); Console.WriteLine(!bom.CanRead);
+        Decoder decoder = new UTF8Encoding(false, true).GetDecoder();
+        byte[] scalar = Encoding.UTF8.GetBytes("😀"); char[] decoded = new char[1];
+        Console.WriteLine(decoder.GetChars(scalar, 0, 1, decoded, 0, false) == 0);
+        Console.WriteLine(decoder.GetChars(scalar, 1, 1, decoded, 0, false) == 0);
+        Console.WriteLine(decoder.GetChars(scalar, 2, 1, decoded, 0, false) == 0);
+        Console.WriteLine(decoder.GetChars(scalar, 3, 1, decoded, 0, true) == 1 && decoded[0] == (char)128512);
+        decoder.Reset(); decoder.GetChars(scalar, 0, 2, decoded, 0, false);
+        bool malformed = false;
+        try { decoder.GetChars(new byte[0], 0, 0, decoded, 0, true); } catch (DecoderFallbackException) { malformed = true; }
+        Console.WriteLine(malformed);
+        decoder.Reset(); Console.WriteLine(decoder.GetChars(new byte[0], 0, 0, decoded, 0, true) == 0);
+        Decoder replacement = Encoding.UTF8.GetDecoder();
+        replacement.GetChars(scalar, 0, 2, decoded, 0, false);
+        Console.WriteLine(replacement.GetChars(new byte[0], 0, 0, decoded, 0, true) == 1 && decoded[0] == (char)65533);
+        for (int size = 1; size <= 7; size++)
+        {
+            using (MemoryStream source = new MemoryStream(Encoding.UTF8.GetBytes("Aé漢😀Z")))
+            {
+                using (StreamReader split = new StreamReader(source, Encoding.UTF8, false, size, true))
+                    Console.WriteLine(split.ReadToEnd() == "Aé漢😀Z");
+            }
+        }
+        FailingStream failing = new FailingStream();
+        StreamWriter failedWriter = new StreamWriter(failing, new UTF8Encoding(false), 32, false);
+        failedWriter.Write("pending");
+        failure = false; try { failedWriter.Dispose(); } catch (IOException) { failure = true; }
+        failedWriter.Dispose(); Console.WriteLine(failure && failing.Disposals == 1);
+        Decoder transactional = new UTF8Encoding(false, true).GetDecoder();
+        transactional.GetChars(scalar, 0, 3, decoded, 0, false);
+        failure = false;
+        try { transactional.GetChars(scalar, 3, 1, new char[0], 0, true); } catch (ArgumentException) { failure = true; }
+        Console.WriteLine(failure && transactional.GetChars(scalar, 3, 1, decoded, 0, true) == 1 && decoded[0] == (char)128512);
+        string full = Path.GetFullPath("./one/../probe.txt");
+        Console.WriteLine(Path.IsPathRooted(full) && full == Path.GetFullPath("probe.txt"));
+        Console.WriteLine(new DirectoryInfo(".").FullName == Path.GetFullPath("."));
+        using (StreamWriter pathWriter = new StreamWriter("path.txt")) pathWriter.Write("é漢😀");
+        using (StreamWriter pathWriter = new StreamWriter("path.txt", true)) pathWriter.Write("tail");
+        using (StreamReader pathReader = new StreamReader("path.txt")) Console.WriteLine(pathReader.ReadToEnd() == "é漢😀tail");
+        failure = false;
+        try { new StreamWriter("path.txt", false, null, 10); } catch (ArgumentNullException) { failure = true; }
+        Console.WriteLine(failure && File.ReadAllText("path.txt") == "é漢😀tail");
+        File.Delete("path.txt");
+    }
+}

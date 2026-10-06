@@ -1,0 +1,7 @@
+public static class Program
+{
+    public static void Main()
+    {
+        var grid = new[,] { { 1, 2 }, { 3 } };
+    }
+}

@@ -1,0 +1,18 @@
+public struct Value
+{
+    public int X;
+}
+public class Box
+{
+    public Value Item;
+    public Value get_Item(int index) { return Item; }
+    public void set_Item(int index, Value value) { Item = value; }
+}
+public static class Program
+{
+    public static void Main()
+    {
+        Box box = new Box();
+        box[0] += new Value();
+    }
+}

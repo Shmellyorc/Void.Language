@@ -1,0 +1,183 @@
+using Void.Collections;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class Node219
+{
+    public int Value;
+    public Node219(int value) { Value = value; }
+}
+
+public static class Program
+{
+    public static TaskCompletionSource<int> Gate;
+    public static TaskCompletionSource<int> ManagedGate;
+    public static int CleanupCount;
+    public static int InnerCleanup;
+
+    private static async IAsyncEnumerable<int> Observe(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            yield return cancellationToken.CanBeCanceled ? 1 : 0;
+            int ignored = await Program.Gate.Task;
+            cancellationToken.ThrowIfCancellationRequested();
+            yield return 2;
+        }
+        finally
+        {
+            Program.CleanupCount++;
+        }
+    }
+
+    public static async IAsyncEnumerable<int> Inner(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            yield return 10;
+            cancellationToken.ThrowIfCancellationRequested();
+            yield return 20;
+        }
+        finally
+        {
+            Program.InnerCleanup++;
+        }
+    }
+
+    private static async IAsyncEnumerable<int> Outer(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        await foreach (var value in Program.Inner(cancellationToken))
+            yield return value + 1;
+    }
+
+
+
+    private static async IAsyncEnumerable<Node219> Managed(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        Node219 node = new Node219(219);
+        int ignored = await Program.ManagedGate.Task;
+        cancellationToken.ThrowIfCancellationRequested();
+        yield return node;
+    }
+
+    private static async IAsyncEnumerable<int> Unmarked(CancellationToken cancellationToken = default)
+    {
+        yield return cancellationToken.CanBeCanceled ? 30 : 31;
+    }
+
+    private static async IAsyncEnumerable<T> Generic<T>(
+        T value,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        yield return value;
+    }
+
+    private static bool WaitCanceled(Task task)
+    {
+        try
+        {
+            task.Wait();
+            return false;
+        }
+        catch (OperationCanceledException error)
+        {
+            return error != null;
+        }
+    }
+
+    public static void Main()
+    {
+        CancellationTokenSource factory = new CancellationTokenSource();
+        CancellationTokenSource consumer = new CancellationTokenSource();
+
+        Program.CleanupCount = 0;
+        Program.Gate = new TaskCompletionSource<int>();
+        IAsyncEnumerable<int> source = Observe(factory.Token);
+        IAsyncEnumerator<int> enumerator = source.GetAsyncEnumerator(consumer.Token);
+        Console.WriteLine(enumerator.MoveNextAsync().Result && enumerator.Current == 1);
+        Task<bool> pending = enumerator.MoveNextAsync();
+        Console.WriteLine(!pending.IsCompleted);
+        factory.Cancel();
+        Program.Gate.SetResult(1);
+        Console.WriteLine(pending.Result && enumerator.Current == 2);
+        enumerator.DisposeAsync().Wait();
+        Console.WriteLine(Program.CleanupCount == 1);
+
+        Program.CleanupCount = 0;
+        Program.Gate = new TaskCompletionSource<int>();
+        source = Observe(factory.Token);
+        enumerator = source.GetAsyncEnumerator();
+        Console.WriteLine(enumerator.MoveNextAsync().Result && enumerator.Current == 1);
+        pending = enumerator.MoveNextAsync();
+        Program.Gate.SetResult(1);
+        Console.WriteLine(WaitCanceled(pending));
+        Console.WriteLine(Program.CleanupCount == 1);
+
+        CancellationTokenSource consumer2 = new CancellationTokenSource();
+        Program.CleanupCount = 0;
+        Program.Gate = new TaskCompletionSource<int>();
+        source = Observe();
+        enumerator = source.GetAsyncEnumerator(consumer2.Token);
+        Console.WriteLine(enumerator.MoveNextAsync().Result && enumerator.Current == 1);
+        pending = enumerator.MoveNextAsync();
+        consumer2.Cancel();
+        Program.Gate.SetResult(1);
+        Console.WriteLine(WaitCanceled(pending));
+        Console.WriteLine(Program.CleanupCount == 1);
+
+        CancellationTokenSource left = new CancellationTokenSource();
+        CancellationTokenSource right = new CancellationTokenSource();
+        Program.Gate = new TaskCompletionSource<int>();
+        source = Observe();
+        IAsyncEnumerator<int> leftEnumerator = source.GetAsyncEnumerator(left.Token);
+        IAsyncEnumerator<int> rightEnumerator = source.GetAsyncEnumerator(right.Token);
+        Console.WriteLine(leftEnumerator.MoveNextAsync().Result && rightEnumerator.MoveNextAsync().Result);
+        Task<bool> leftMove = leftEnumerator.MoveNextAsync();
+        Task<bool> rightMove = rightEnumerator.MoveNextAsync();
+        left.Cancel();
+        Program.Gate.SetResult(1);
+        Console.WriteLine(WaitCanceled(leftMove));
+        Console.WriteLine(rightMove.Result && rightEnumerator.Current == 2);
+        leftEnumerator.DisposeAsync().Wait();
+        rightEnumerator.DisposeAsync().Wait();
+
+        Program.InnerCleanup = 0;
+        CancellationTokenSource composed = new CancellationTokenSource();
+        IAsyncEnumerator<int> outer = Outer().GetAsyncEnumerator(composed.Token);
+        Console.WriteLine(outer.MoveNextAsync().Result && outer.Current == 11);
+        composed.Cancel();
+        Task<bool> outerMove = outer.MoveNextAsync();
+        Console.WriteLine(WaitCanceled(outerMove));
+        Console.WriteLine(Program.InnerCleanup == 1);
+        outer.DisposeAsync().Wait();
+
+        CancellationTokenSource unmarkedFactory = new CancellationTokenSource();
+        CancellationTokenSource ignoredConsumer = new CancellationTokenSource();
+        ignoredConsumer.Cancel();
+        IAsyncEnumerator<int> unmarked = Unmarked(unmarkedFactory.Token).GetAsyncEnumerator(ignoredConsumer.Token);
+        Console.WriteLine(unmarked.MoveNextAsync().Result && unmarked.Current == 30);
+        unmarked.DisposeAsync().Wait();
+
+        CancellationTokenSource genericCancel = new CancellationTokenSource();
+        genericCancel.Cancel();
+        IAsyncEnumerator<int> generic = Generic<int>(219).GetAsyncEnumerator(genericCancel.Token);
+        Console.WriteLine(WaitCanceled(generic.MoveNextAsync()));
+        generic.DisposeAsync().Wait();
+
+        CancellationTokenSource managedToken = new CancellationTokenSource();
+        Program.ManagedGate = new TaskCompletionSource<int>();
+        IAsyncEnumerator<Node219> managedEnumerator = Managed().GetAsyncEnumerator(managedToken.Token);
+        Task<bool> managedMove = managedEnumerator.MoveNextAsync();
+        Console.WriteLine(!managedMove.IsCompleted);
+        GC.Collect();
+        GC.Collect();
+        Program.ManagedGate.SetResult(1);
+        Console.WriteLine(managedMove.Result && managedEnumerator.Current.Value == 219);
+        managedEnumerator.DisposeAsync().Wait();
+    }
+}

@@ -1,0 +1,299 @@
+using Void.Collections;
+
+public sealed class IntegrationError : Exception
+{
+    public IntegrationError(string message) : base(message) { }
+}
+
+public sealed class Node
+{
+    public int Value;
+    public Node(int value) { Value = value; }
+}
+
+public interface IAdvancedResource : IDisposable
+{
+    static int Transform(int value);
+
+    int Raw();
+
+    int Score()
+    {
+        return this.Raw() + 1;
+    }
+}
+
+public sealed class AdvancedResource : IAdvancedResource
+{
+    private int _value;
+    private Node _node;
+    private bool _throwOnDispose;
+
+    public AdvancedResource(int value, bool throwOnDispose)
+    {
+        _value = value;
+        _node = new Node(value * 10);
+        _throwOnDispose = throwOnDispose;
+        Program.Acquired++;
+    }
+
+    public static int Transform(int value)
+    {
+        return value * 3;
+    }
+
+    public int Raw()
+    {
+        return _value;
+    }
+
+    public int NodeValue()
+    {
+        return _node.Value;
+    }
+
+    public void Dispose()
+    {
+        Program.DisposeCount++;
+        GC.Collect();
+        Program.LastDisposedNode = _node.Value;
+        if (_throwOnDispose)
+            throw new IntegrationError("dispose");
+    }
+}
+
+public struct ValueResource : IAdvancedResource
+{
+    private int _value;
+
+    public ValueResource(int value)
+    {
+        _value = value;
+    }
+
+    public static int Transform(int value)
+    {
+        return value + 20;
+    }
+
+    public readonly int Raw()
+    {
+        return _value;
+    }
+
+    public void Dispose()
+    {
+        Program.ValueDisposeCount++;
+    }
+}
+
+
+public sealed class IntegrationEnumerable
+{
+    private int _value;
+
+    public IntegrationEnumerable(int value)
+    {
+        _value = value;
+    }
+
+    public IEnumerator<int> GetEnumerator()
+    {
+        return Program.StatementIterator(_value);
+    }
+}
+
+public static class AdvancedExtensions
+{
+    public static int Bonus(this IAdvancedResource value)
+    {
+        return value.Score() + 1;
+    }
+
+    public static T Echo<T>(this T value)
+    {
+        return value;
+    }
+}
+
+public static class Program
+{
+    public static int Acquired;
+    public static int DisposeCount;
+    public static int ValueDisposeCount;
+    public static int LastDisposedNode;
+    public static int Sequence;
+
+    public static int TransformInferred<T>(T marker, int value) where T : IAdvancedResource
+    {
+        return T.Transform(value);
+    }
+
+    public static T Identity<T>(T value)
+    {
+        return value;
+    }
+
+    public static IEnumerator<int> StatementIterator(int value)
+    {
+        using (AdvancedResource resource = new AdvancedResource(value, false))
+        {
+            Program.Sequence = Program.Sequence * 10 + 1;
+            yield return resource.Bonus();
+            Program.Sequence = Program.Sequence * 10 + 2;
+        }
+        Program.Sequence = Program.Sequence * 10 + 3;
+    }
+
+    public static IEnumerator<int> DeclarationIterator(int value)
+    {
+        using var resource = new AdvancedResource(value, false);
+        Program.Sequence = Program.Sequence * 10 + 4;
+        yield return resource.Bonus();
+        Program.Sequence = Program.Sequence * 10 + 5;
+    }
+
+    public static IEnumerator<int> ThrowingCleanupIterator()
+    {
+        using var resource = new AdvancedResource(9, true);
+        yield return resource.Bonus();
+    }
+
+    public static IEnumerator<int> ExpressionIterator(AdvancedResource resource)
+    {
+        using (resource)
+        {
+            yield return resource.Bonus();
+        }
+    }
+
+    public static IEnumerator<int> MultipleResourceIterator()
+    {
+        using (AdvancedResource first = new AdvancedResource(1, false),
+               second = new AdvancedResource(2, false))
+        {
+            yield return first.Raw() + second.Raw();
+        }
+    }
+
+    public static void Main()
+    {
+        Acquired = 0;
+        DisposeCount = 0;
+        ValueDisposeCount = 0;
+        LastDisposedNode = 0;
+        Sequence = 0;
+
+        AdvancedResource direct = new AdvancedResource(5, false);
+        IAdvancedResource asInterface = direct;
+        Console.WriteLine(asInterface.Score() == 6);
+        Console.WriteLine(direct.Bonus() == 7);
+        Console.WriteLine(TransformInferred(direct, 4) == 12);
+        Console.WriteLine(Identity("inferred") == "inferred");
+        Console.WriteLine(8.Echo() == 8);
+        direct.Dispose();
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(LastDisposedNode == 50);
+
+        ValueResource value = new ValueResource(6);
+        IAdvancedResource boxed = value;
+        Console.WriteLine(boxed.Score() == 7);
+        Console.WriteLine(boxed.Bonus() == 8);
+        Console.WriteLine(TransformInferred(value, 4) == 24);
+        using (ValueResource scoped = value)
+        {
+            Console.WriteLine(scoped.Raw() == 6);
+        }
+        Console.WriteLine(ValueDisposeCount == 1);
+
+        DisposeCount = 0;
+        LastDisposedNode = 0;
+        {
+            using var resource = new AdvancedResource(7, false);
+            Console.WriteLine(resource.Bonus() == 9);
+            Console.WriteLine(TransformInferred(resource, 3) == 9);
+        }
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(LastDisposedNode == 70);
+
+        DisposeCount = 0;
+        Sequence = 0;
+        IEnumerator<int> statement = StatementIterator(10);
+        Console.WriteLine(statement.MoveNext());
+        Console.WriteLine(statement.Current == 12);
+        Console.WriteLine(Sequence == 1);
+        GC.Collect();
+        statement.Dispose();
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(LastDisposedNode == 100);
+        Console.WriteLine(Sequence == 1);
+        Console.WriteLine(!statement.MoveNext());
+        statement.Dispose();
+        Console.WriteLine(DisposeCount == 1);
+
+        DisposeCount = 0;
+        Sequence = 0;
+        IEnumerator<int> declaration = DeclarationIterator(11);
+        Console.WriteLine(declaration.MoveNext());
+        Console.WriteLine(declaration.Current == 13);
+        Console.WriteLine(Sequence == 4);
+        Console.WriteLine(!declaration.MoveNext());
+        Console.WriteLine(Sequence == 45);
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(LastDisposedNode == 110);
+        declaration.Dispose();
+        Console.WriteLine(DisposeCount == 1);
+
+        DisposeCount = 0;
+        Sequence = 0;
+        foreach (int item in new IntegrationEnumerable(12))
+        {
+            Console.WriteLine(item == 14);
+            break;
+        }
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(LastDisposedNode == 120);
+        Console.WriteLine(Sequence == 1);
+
+        DisposeCount = 0;
+        LastDisposedNode = 0;
+        AdvancedResource expressionResource = new AdvancedResource(13, false);
+        IEnumerator<int> expression = ExpressionIterator(expressionResource);
+        Console.WriteLine(expression.MoveNext());
+        Console.WriteLine(expression.Current == 15);
+        expression.Dispose();
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(LastDisposedNode == 130);
+        Console.WriteLine(!expression.MoveNext());
+
+        DisposeCount = 0;
+        LastDisposedNode = 0;
+        IEnumerator<int> multiple = MultipleResourceIterator();
+        Console.WriteLine(multiple.MoveNext());
+        Console.WriteLine(multiple.Current == 3);
+        multiple.Dispose();
+        Console.WriteLine(DisposeCount == 2);
+        Console.WriteLine(LastDisposedNode == 10);
+        multiple.Dispose();
+        Console.WriteLine(DisposeCount == 2);
+
+        DisposeCount = 0;
+        bool caught = false;
+        IEnumerator<int> throwing = ThrowingCleanupIterator();
+        Console.WriteLine(throwing.MoveNext());
+        try
+        {
+            throwing.Dispose();
+        }
+        catch (IntegrationError error)
+        {
+            caught = error.Message == "dispose";
+        }
+        Console.WriteLine(caught);
+        Console.WriteLine(DisposeCount == 1);
+        throwing.Dispose();
+        Console.WriteLine(DisposeCount == 1);
+
+        Console.WriteLine(Acquired == 9);
+    }
+}

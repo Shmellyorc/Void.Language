@@ -1,0 +1,11 @@
+using Void;
+using Void.Threading;
+
+public static class Program
+{
+    public static void Main()
+    {
+        long value = Runtime.MonotonicTimeMilliseconds();
+        Console.WriteLine(value > 0L);
+    }
+}

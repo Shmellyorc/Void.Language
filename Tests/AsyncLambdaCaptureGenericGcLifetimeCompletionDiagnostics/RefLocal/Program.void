@@ -1,0 +1,16 @@
+using Void;
+using Void.Threading.Tasks;
+public static class Program
+{
+    public static void Main()
+    {
+        int value = 1;
+        ref int alias = ref value;
+        Func<Task<int>> work = async () =>
+        {
+            await Task.Yield();
+            return alias;
+        };
+        Console.WriteLine(work().Result);
+    }
+}

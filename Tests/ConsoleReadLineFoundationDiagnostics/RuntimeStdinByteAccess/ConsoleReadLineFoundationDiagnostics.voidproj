@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "ConsoleReadLineFoundationDiagnostics",
+  "version": "0.0.311",
+  "output": "exe",
+  "compiler": { "unsafe": false }
+}

@@ -1,0 +1,195 @@
+using Void;
+using Void.Threading;
+
+public sealed class RaceState
+{
+    public int Ready;
+    public int Go;
+    public int Success;
+    public int Canceled;
+    public int TimedOut;
+}
+
+public static class Program
+{
+    private static void WaitReady(RaceState state)
+    {
+        while (Volatile.Read(ref state.Ready) == 0)
+            Thread.Sleep(0);
+    }
+
+    private static void WaitGo(RaceState state)
+    {
+        while (Volatile.Read(ref state.Go) == 0)
+            Thread.Sleep(0);
+    }
+
+    private static bool RunManualRace()
+    {
+        ManualResetEvent value = new ManualResetEvent(false);
+        CancellationTokenSource source = new CancellationTokenSource();
+        RaceState state = new RaceState();
+
+        Thread waiter = new Thread(() =>
+        {
+            Volatile.Write(ref state.Ready, 1);
+            try
+            {
+                if (value.WaitOne(1000, source.Token))
+                    Volatile.Write(ref state.Success, 1);
+                else
+                    Volatile.Write(ref state.TimedOut, 1);
+            }
+            catch (OperationCanceledException)
+            {
+                Volatile.Write(ref state.Canceled, 1);
+            }
+        });
+        Thread signaler = new Thread(() =>
+        {
+            WaitGo(state);
+            value.Set();
+        });
+        Thread canceler = new Thread(() =>
+        {
+            WaitGo(state);
+            source.Cancel();
+        });
+
+        waiter.Start();
+        WaitReady(state);
+        signaler.Start();
+        canceler.Start();
+        Volatile.Write(ref state.Go, 1);
+        waiter.Join();
+        signaler.Join();
+        canceler.Join();
+
+        int outcomes = Volatile.Read(ref state.Success) + Volatile.Read(ref state.Canceled) + Volatile.Read(ref state.TimedOut);
+        return outcomes == 1 && Volatile.Read(ref state.TimedOut) == 0 && value.WaitOne(0);
+    }
+
+    private static bool RunAutoRace()
+    {
+        AutoResetEvent value = new AutoResetEvent(false);
+        CancellationTokenSource source = new CancellationTokenSource();
+        RaceState state = new RaceState();
+
+        Thread waiter = new Thread(() =>
+        {
+            Volatile.Write(ref state.Ready, 1);
+            try
+            {
+                if (value.WaitOne(1000, source.Token))
+                    Volatile.Write(ref state.Success, 1);
+                else
+                    Volatile.Write(ref state.TimedOut, 1);
+            }
+            catch (OperationCanceledException)
+            {
+                Volatile.Write(ref state.Canceled, 1);
+            }
+        });
+        Thread signaler = new Thread(() =>
+        {
+            WaitGo(state);
+            value.Set();
+        });
+        Thread canceler = new Thread(() =>
+        {
+            WaitGo(state);
+            source.Cancel();
+        });
+
+        waiter.Start();
+        WaitReady(state);
+        signaler.Start();
+        canceler.Start();
+        Volatile.Write(ref state.Go, 1);
+        waiter.Join();
+        signaler.Join();
+        canceler.Join();
+
+        bool storedSignal = value.WaitOne(0);
+        bool extraSignal = value.WaitOne(0);
+        int outcomes = Volatile.Read(ref state.Success) + Volatile.Read(ref state.Canceled) + Volatile.Read(ref state.TimedOut);
+        int resourceAccounting = Volatile.Read(ref state.Success) + (storedSignal ? 1 : 0);
+        return outcomes == 1 && Volatile.Read(ref state.TimedOut) == 0 && resourceAccounting == 1 && !extraSignal;
+    }
+
+    private static bool RunSemaphoreRace()
+    {
+        Semaphore value = new Semaphore(0, 1);
+        CancellationTokenSource source = new CancellationTokenSource();
+        RaceState state = new RaceState();
+
+        Thread waiter = new Thread(() =>
+        {
+            Volatile.Write(ref state.Ready, 1);
+            try
+            {
+                if (value.WaitOne(1000, source.Token))
+                    Volatile.Write(ref state.Success, 1);
+                else
+                    Volatile.Write(ref state.TimedOut, 1);
+            }
+            catch (OperationCanceledException)
+            {
+                Volatile.Write(ref state.Canceled, 1);
+            }
+        });
+        Thread releaser = new Thread(() =>
+        {
+            WaitGo(state);
+            value.Release();
+        });
+        Thread canceler = new Thread(() =>
+        {
+            WaitGo(state);
+            source.Cancel();
+        });
+
+        waiter.Start();
+        WaitReady(state);
+        releaser.Start();
+        canceler.Start();
+        Volatile.Write(ref state.Go, 1);
+        waiter.Join();
+        releaser.Join();
+        canceler.Join();
+
+        bool storedPermit = value.WaitOne(0);
+        bool extraPermit = value.WaitOne(0);
+        int outcomes = Volatile.Read(ref state.Success) + Volatile.Read(ref state.Canceled) + Volatile.Read(ref state.TimedOut);
+        int resourceAccounting = Volatile.Read(ref state.Success) + (storedPermit ? 1 : 0);
+        return outcomes == 1 && Volatile.Read(ref state.TimedOut) == 0 && resourceAccounting == 1 && !extraPermit;
+    }
+
+    public static void Main()
+    {
+        bool manualOk = true;
+        bool autoOk = true;
+        bool semaphoreOk = true;
+
+        for (int i = 0; i < 50; i++)
+        {
+            if (!RunManualRace())
+                manualOk = false;
+        }
+        Console.WriteLine(manualOk);
+
+        for (int i = 0; i < 50; i++)
+        {
+            if (!RunAutoRace())
+                autoOk = false;
+        }
+        Console.WriteLine(autoOk);
+
+        for (int i = 0; i < 50; i++)
+        {
+            if (!RunSemaphoreRace())
+                semaphoreOk = false;
+        }
+        Console.WriteLine(semaphoreOk);
+    }
+}

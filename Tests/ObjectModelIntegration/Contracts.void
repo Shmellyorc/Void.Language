@@ -1,0 +1,47 @@
+using Void;
+
+public delegate void RefAdjust(ref int value);
+
+public interface IScore
+{
+    int Score { get; }
+}
+
+public interface IActor : IScore
+{
+    event Action<int> Changed;
+    int Apply(int amount);
+}
+
+public interface IAdvancedActor : IActor
+{
+    int Bonus { get; }
+}
+
+public struct ScorePacket : IScore
+{
+    public int Score { get; set; }
+
+    public ScorePacket(int score)
+    {
+        Score = score;
+    }
+}
+
+public struct Modifier
+{
+    private int _value;
+
+    public int Value => _value;
+
+    public Modifier(int value)
+    {
+        _value = value;
+    }
+
+    public int Add(int amount)
+    {
+        _value += amount;
+        return _value;
+    }
+}

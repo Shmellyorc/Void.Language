@@ -1,0 +1,1 @@
+public sealed class Box<T> where T : struct { } public static class Program { public static void Main() { Box<int?> value = new Box<int?>(); } }

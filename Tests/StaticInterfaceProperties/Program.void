@@ -1,0 +1,203 @@
+using Void;
+
+public sealed class Node
+{
+    public int Value { get; set; }
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public interface ISettingsBase
+{
+    static int Version { get; }
+    static string Label { get; }
+}
+
+public interface ISettings : ISettingsBase
+{
+    static int Count { get; set; }
+    static Node Root { get; set; }
+}
+
+public sealed class Settings : ISettings
+{
+    private static int _count;
+
+    public static int Version => 91;
+    public static string Label => "static-interface";
+
+    public static int Count
+    {
+        get { return _count; }
+        set { _count = value; }
+    }
+
+    public static Node Root { get; set; }
+}
+
+public interface IBaseValues
+{
+    static int BaseValue { get; }
+}
+
+public interface IDerivedValues : IBaseValues
+{
+    static int DerivedValue { get; set; }
+}
+
+public class ValueBase
+{
+    public static int BaseValue { get; set; }
+}
+
+public sealed class ValueDerived : ValueBase, IDerivedValues
+{
+    public static int DerivedValue { get; set; }
+}
+
+public interface IGenericValue<T>
+{
+    static T Default { get; }
+    static int Uses { get; set; }
+}
+
+public sealed class IntGenericValue : IGenericValue<int>
+{
+    public static int Default => 42;
+    public static int Uses { get; set; }
+}
+
+public sealed class NodeGenericValue : IGenericValue<Node>
+{
+    public static Node Default { get; set; }
+    public static int Uses { get; set; }
+}
+
+public interface ILeftShared
+{
+    static int Shared { get; }
+}
+
+public interface IRightShared
+{
+    static int Shared { get; set; }
+}
+
+public interface IDiamondShared : ILeftShared, IRightShared
+{
+}
+
+public struct DiamondValue : IDiamondShared
+{
+    public static int Shared { get; set; }
+}
+
+public interface IMixedContract
+{
+    int InstanceValue { get; }
+    static int StaticValue { get; }
+}
+
+public sealed class MixedValue : IMixedContract
+{
+    public int InstanceValue { get; set; }
+    public static int StaticValue { get; set; }
+
+    public MixedValue(int value)
+    {
+        InstanceValue = value;
+    }
+}
+
+public interface IFirstCode
+{
+    static int Code { get; }
+}
+
+public interface ISecondCode
+{
+    static int Code { get; }
+}
+
+public sealed class MultiCode : IFirstCode, ISecondCode
+{
+    public static int Code => 123;
+}
+
+public interface IPublicContract
+{
+    public static int PublicValue { get; }
+}
+
+public sealed class PublicContractValue : IPublicContract
+{
+    public static int PublicValue => 144;
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine(Settings.Version == 91);
+        Console.WriteLine(Settings.Label != null);
+
+        Settings.Count = 10;
+        Console.WriteLine(Settings.Count == 10);
+        Settings.Count += 5;
+        Console.WriteLine(Settings.Count == 15);
+        Settings.Count = 22;
+        Console.WriteLine(Settings.Count == 22);
+
+        Settings.Root = new Node(31);
+        GC.Collect();
+        Console.WriteLine(Settings.Root != null);
+        Console.WriteLine(Settings.Root.Value == 31);
+        Settings.Root.Value += 2;
+        Console.WriteLine(Settings.Root.Value == 33);
+
+        ValueBase.BaseValue = 40;
+        ValueDerived.DerivedValue = 41;
+        Console.WriteLine(ValueDerived.BaseValue == 40);
+        Console.WriteLine(ValueDerived.DerivedValue == 41);
+        ValueDerived.DerivedValue += 1;
+        Console.WriteLine(ValueDerived.DerivedValue == 42);
+
+        Console.WriteLine(IntGenericValue.Default == 42);
+        IntGenericValue.Uses = 2;
+        Console.WriteLine(IntGenericValue.Uses == 2);
+        IntGenericValue.Uses *= 3;
+        Console.WriteLine(IntGenericValue.Uses == 6);
+
+        NodeGenericValue.Default = new Node(55);
+        NodeGenericValue.Uses = 7;
+        GC.Collect();
+        Console.WriteLine(NodeGenericValue.Default != null);
+        Console.WriteLine(NodeGenericValue.Default.Value == 55);
+        Console.WriteLine(NodeGenericValue.Uses == 7);
+
+        DiamondValue.Shared = 70;
+        Console.WriteLine(DiamondValue.Shared == 70);
+        DiamondValue.Shared += 3;
+        Console.WriteLine(DiamondValue.Shared == 73);
+
+        MixedValue mixed = new MixedValue(80);
+        MixedValue.StaticValue = 81;
+        IMixedContract mixedContract = mixed;
+        Console.WriteLine(mixedContract.InstanceValue == 80);
+        Console.WriteLine(MixedValue.StaticValue == 81);
+
+        Console.WriteLine(MultiCode.Code == 123);
+        Console.WriteLine(PublicContractValue.PublicValue == 144);
+
+        Settings.Root = null;
+        GC.Collect();
+        Console.WriteLine(Settings.Root == null);
+
+        NodeGenericValue.Default = new Node(99);
+        GC.Collect();
+        Console.WriteLine(NodeGenericValue.Default.Value == 99);
+    }
+}

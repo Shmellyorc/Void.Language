@@ -1,0 +1,1 @@
+using Void.Collections; public static class Program { public static void Main() { new HashSet<int>().UnionWith(new List<string>()); } }

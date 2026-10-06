@@ -1,0 +1,9 @@
+public sealed class Hidden { private int Value => 1; }
+public static class Program
+{
+    public static void Main()
+    {
+        Hidden hidden = new();
+        Console.WriteLine(hidden.Value);
+    }
+}

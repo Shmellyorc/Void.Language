@@ -1,0 +1,10 @@
+using Void;
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        delegate*<int, int> callback = null;
+        Console.WriteLine(callback(1));
+    }
+}

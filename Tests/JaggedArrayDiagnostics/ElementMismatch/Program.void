@@ -1,0 +1,7 @@
+public static class Program
+{
+    public static void Main()
+    {
+        int[][] values = new int[][] { new int[] { 1 }, new string[] { "bad" } };
+    }
+}

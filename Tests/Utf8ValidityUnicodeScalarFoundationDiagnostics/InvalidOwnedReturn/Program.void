@@ -1,0 +1,11 @@
+using Void;
+public static class Native301InvalidOwned
+{
+    [NativeString(NativeStringKind.OwnedPointerLength, "void301_release_invalid")]
+    [Native("void301_owned_invalid")]
+    public static unsafe extern string Value();
+}
+public static class Program
+{
+    public static unsafe void Main() { string value = Native301InvalidOwned.Value(); Console.WriteLine(value == null); }
+}

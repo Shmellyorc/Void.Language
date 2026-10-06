@@ -1,0 +1,15 @@
+public sealed class Bad
+{
+    private int _value;
+
+    public int Value
+    {
+        get => _value;
+        set => _value = value
+    }
+}
+
+public static class Program
+{
+    public static void Main() { }
+}

@@ -1,0 +1,42 @@
+# VOID generated output
+**/.void/
+**/bin/
+**/publish/
+/Docs/
+
+# Test output
+Tests/.test-logs/
+*.log
+
+# Native build artifacts
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.exe
+*.pdb
+
+# Python cache
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# IDE / editor
+.idea/
+.vs/
+*.user
+*.suo
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Crash / temporary files
+core
+core.*
+*.tmp
+*.swp
+*~

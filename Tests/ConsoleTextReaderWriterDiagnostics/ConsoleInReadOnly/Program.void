@@ -1,0 +1,8 @@
+using Void.IO;
+public static class Program
+{
+    public static void Main()
+    {
+        Console.In = null;
+    }
+}

@@ -1,0 +1,3 @@
+using Void;
+public interface IHub { static event Action<int> Changed = null; }
+public static class Program { public static void Main() { } }

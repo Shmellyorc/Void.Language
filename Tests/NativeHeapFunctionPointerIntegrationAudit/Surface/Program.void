@@ -1,0 +1,120 @@
+using Void;
+
+public static class Native260
+{
+    [Native("voidc260_add")]
+    public static unsafe extern int Add(int left, int right);
+
+    [Native("voidc260_subtract")]
+    public static unsafe extern int Subtract(int left, int right);
+
+    [Native("voidc260_apply")]
+    public static unsafe extern int Apply(delegate*<int, int, int> callback, int left, int right);
+
+    [Native("voidc260_select")]
+    public static unsafe extern delegate*<int, int, int> Select(int mode);
+}
+
+public unsafe struct AuditEntry260
+{
+    public delegate*<int, int, int> Function;
+    public int Tag;
+
+    public AuditEntry260(delegate*<int, int, int> function, int tag)
+    {
+        Function = function;
+        Tag = tag;
+    }
+}
+
+public struct AuditSlot260<T> where T : unmanaged
+{
+    private T _value;
+
+    public AuditSlot260(T value)
+    {
+        _value = value;
+    }
+
+    public T Value => _value;
+}
+
+public static class Program
+{
+    private static T Keep260<T>(T value) where T : unmanaged => value;
+
+    private static unsafe T StackKeep260<T>(T value) where T : unmanaged
+    {
+        T* storage = stackalloc T[1];
+        storage[0] = value;
+        return storage[0];
+    }
+
+    public static unsafe void Main()
+    {
+        void* empty = NativeMemory.Allocate(0ul);
+        Console.WriteLine(empty == null);
+        void* tryEmpty;
+        Console.WriteLine(NativeMemory.TryAllocate(0ul, out tryEmpty) && tryEmpty == null);
+        Console.WriteLine(NativeMemory.AllocateAligned(0ul, 64ul) == null);
+        void* invalidAligned;
+        Console.WriteLine(!NativeMemory.TryAllocateAligned(8ul, 3ul, out invalidAligned) && invalidAligned == null);
+
+        int* values = NativeMemory.AllocateAligned<int>(4ul, 64ul);
+        values[0] = 10;
+        values[1] = 20;
+        values[2] = 30;
+        values[3] = 40;
+        Console.WriteLine(values != null && values[0] + values[3] == 50);
+        Console.WriteLine(NativeMemory.TryReallocateAligned<int>(ref values, 6ul, 128ul));
+        Console.WriteLine(values != null && values[0] == 10 && values[1] == 20 && values[2] == 30 && values[3] == 40);
+        values[4] = 50;
+        values[5] = 60;
+        Span<int> valueSpan = new Span<int>(values, 6);
+        ReadOnlySpan<int> valueReadOnly = new ReadOnlySpan<int>(values, 6);
+        Console.WriteLine(valueSpan[4] == 50 && valueReadOnly[5] == 60);
+        NativeMemory.Free(values);
+
+        delegate*<int, int, int> add = &Native260.Add;
+        delegate*<int, int, int> subtract = &Native260.Subtract;
+        delegate*<int, int, int> selected = Native260.Select(0);
+        Console.WriteLine(add != null && subtract != null && selected == add);
+        Console.WriteLine(add(20, 22) == 42);
+        Console.WriteLine(subtract(50, 8) == 42);
+        Console.WriteLine(Native260.Apply(selected, 21, 21) == 42);
+        Console.WriteLine(Keep260<delegate*<int, int, int>>(add) == add);
+        Console.WriteLine(StackKeep260<delegate*<int, int, int>>(subtract) == subtract);
+
+        AuditSlot260<delegate*<int, int, int>> slot =
+            new AuditSlot260<delegate*<int, int, int>>(add);
+        Console.WriteLine(slot.Value(40, 2) == 42);
+
+        var stackTable = stackalloc delegate*<int, int, int>[2];
+        stackTable[0] = add;
+        stackTable[1] = subtract;
+        Span<delegate*<int, int, int>> stackSpan =
+            new Span<delegate*<int, int, int>>(stackTable, 2);
+        Console.WriteLine(stackSpan[0](39, 3) == 42 && stackSpan[1](90, 48) == 42);
+
+        var nativeTable = NativeMemory.Allocate<delegate*<int, int, int>>(2ul);
+        nativeTable[0] = add;
+        nativeTable[1] = Native260.Select(1);
+        Console.WriteLine(nativeTable[0](30, 12) == 42);
+        Console.WriteLine(nativeTable[1](70, 28) == 42);
+        Console.WriteLine(NativeMemory.TryReallocate<delegate*<int, int, int>>(ref nativeTable, 3ul));
+        nativeTable[2] = selected;
+        ReadOnlySpan<delegate*<int, int, int>> nativeReadOnly =
+            new ReadOnlySpan<delegate*<int, int, int>>(nativeTable, 3);
+        Console.WriteLine(nativeReadOnly[0](10, 32) == 42 && nativeReadOnly[2](18, 24) == 42);
+        NativeMemory.Free(nativeTable);
+
+        AuditEntry260* entries = NativeMemory.Allocate<AuditEntry260>(2ul);
+        entries[0] = new AuditEntry260(add, 10);
+        entries[1] = new AuditEntry260(subtract, 32);
+        Span<AuditEntry260> entrySpan = new Span<AuditEntry260>(entries, 2);
+        Console.WriteLine(entrySpan[0].Function(40, 2) == 42);
+        Console.WriteLine(entrySpan[1].Function(100, 58) == 42);
+        Console.WriteLine(entrySpan[0].Tag + entrySpan[1].Tag == 42);
+        NativeMemory.Free(entries);
+    }
+}

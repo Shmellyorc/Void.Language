@@ -1,0 +1,421 @@
+using Void.Collections;
+
+public sealed class ForeachError : Exception
+{
+    public int Code;
+
+    public ForeachError(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class ForeachNode
+{
+    public int Value;
+
+    public ForeachNode(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class TrackingEnumerator
+{
+    private int _current;
+    private int _limit;
+    private int _mode;
+    private int _disposeId;
+    private ForeachNode _node;
+
+    public int Current
+    {
+        get
+        {
+            if (_mode == 2 && _current == 1)
+                throw new ForeachError("current", 200);
+            return _current;
+        }
+    }
+
+    public TrackingEnumerator(int limit, int mode, int disposeId, ForeachNode node)
+    {
+        _current = 0;
+        _limit = limit;
+        _mode = mode;
+        _disposeId = disposeId;
+        _node = node;
+    }
+
+    public bool MoveNext()
+    {
+        _current++;
+        if (_mode == 1 && _current == 2)
+            throw new ForeachError("move", 201);
+        return _current <= _limit;
+    }
+
+    public void Dispose()
+    {
+        Program.DisposeCount++;
+        Program.DisposeSequence = Program.DisposeSequence * 10 + _disposeId;
+        if (_node != null)
+        {
+            GC.Collect();
+            Program.Seen = _node.Value;
+        }
+        if (_mode == 3)
+            throw new ForeachError("dispose", 300);
+    }
+}
+
+public sealed class TrackingEnumerable
+{
+    private int _limit;
+    private int _mode;
+    private int _disposeId;
+    private ForeachNode _node;
+
+    public TrackingEnumerable(int limit, int mode, int disposeId, ForeachNode node)
+    {
+        _limit = limit;
+        _mode = mode;
+        _disposeId = disposeId;
+        _node = node;
+    }
+
+    public TrackingEnumerator GetEnumerator()
+    {
+        return new TrackingEnumerator(_limit, _mode, _disposeId, _node);
+    }
+}
+
+public struct LegacyEnumerator
+{
+    private int _current;
+    private int _limit;
+
+    public int Current => _current;
+
+    public LegacyEnumerator(int limit)
+    {
+        _current = 0;
+        _limit = limit;
+    }
+
+    public bool MoveNext()
+    {
+        _current++;
+        return _current <= _limit;
+    }
+}
+
+public struct LegacyEnumerable
+{
+    private int _limit;
+
+    public LegacyEnumerable(int limit)
+    {
+        _limit = limit;
+    }
+
+    public LegacyEnumerator GetEnumerator()
+    {
+        return new LegacyEnumerator(_limit);
+    }
+}
+
+public sealed class IteratorSource
+{
+    private int _kind;
+
+    public IteratorSource(int kind)
+    {
+        _kind = kind;
+    }
+
+    public IEnumerator<int> GetEnumerator()
+    {
+        if (_kind == 2)
+            return Program.NestedIterator();
+        return Program.SimpleIterator();
+    }
+}
+
+public static class Program
+{
+    public static int DisposeCount;
+    public static int DisposeSequence;
+    public static int IteratorFinally;
+    public static int Seen;
+
+    public static IEnumerator<int> SimpleIterator()
+    {
+        try
+        {
+            yield return 5;
+            yield return 6;
+        }
+        finally
+        {
+            Program.IteratorFinally++;
+        }
+    }
+
+    public static IEnumerator<int> NestedIterator()
+    {
+        try
+        {
+            try
+            {
+                yield return 7;
+            }
+            finally
+            {
+                Program.DisposeSequence = Program.DisposeSequence * 10 + 8;
+            }
+        }
+        finally
+        {
+            Program.DisposeSequence = Program.DisposeSequence * 10 + 9;
+            Program.IteratorFinally++;
+        }
+    }
+
+    public static int ReturnFromForeach()
+    {
+        foreach (int value in new TrackingEnumerable(3, 0, 1, null))
+            return value + 40;
+        return -1;
+    }
+
+    public static int ReturnWithThrowingDispose()
+    {
+        foreach (int value in new TrackingEnumerable(1, 3, 1, null))
+            return value;
+        return 0;
+    }
+
+    public static int NestedReturn()
+    {
+        foreach (int outer in new TrackingEnumerable(1, 0, 1, null))
+        {
+            foreach (int inner in new TrackingEnumerable(1, 0, 2, null))
+                return outer + inner;
+        }
+        return 0;
+    }
+
+    public static int ReturnThroughOuterFinally()
+    {
+        try
+        {
+            foreach (int value in new TrackingEnumerable(1, 0, 1, null))
+                return value;
+        }
+        finally
+        {
+            Program.DisposeSequence = Program.DisposeSequence * 10 + 9;
+        }
+    }
+
+    public static void Main()
+    {
+        Program.DisposeCount = 0;
+        int sum = 0;
+        foreach (int value in new TrackingEnumerable(3, 0, 1, null))
+            sum += value;
+        Console.WriteLine(sum == 6);
+        Console.WriteLine(Program.DisposeCount == 1);
+
+        Program.DisposeCount = 0;
+        sum = 0;
+        foreach (int value in new TrackingEnumerable(4, 0, 1, null))
+        {
+            sum += value;
+            if (value == 2)
+                break;
+        }
+        Console.WriteLine(sum == 3);
+        Console.WriteLine(Program.DisposeCount == 1);
+
+        Program.DisposeCount = 0;
+        sum = 0;
+        foreach (int value in new TrackingEnumerable(4, 0, 1, null))
+        {
+            if (value == 2)
+                continue;
+            sum += value;
+        }
+        Console.WriteLine(sum == 8);
+        Console.WriteLine(Program.DisposeCount == 1);
+
+        Program.DisposeCount = 0;
+        Console.WriteLine(ReturnFromForeach() == 41);
+        Console.WriteLine(Program.DisposeCount == 1);
+
+        Program.DisposeCount = 0;
+        try
+        {
+            foreach (int value in new TrackingEnumerable(2, 0, 1, null))
+                throw new ForeachError("body", 100);
+            Console.WriteLine(false);
+        }
+        catch (ForeachError error)
+        {
+            Console.WriteLine(error.Code == 100);
+        }
+        Console.WriteLine(Program.DisposeCount == 1);
+
+        Program.DisposeCount = 0;
+        try
+        {
+            foreach (int value in new TrackingEnumerable(2, 2, 1, null))
+                Console.WriteLine(false);
+            Console.WriteLine(false);
+        }
+        catch (ForeachError error)
+        {
+            Console.WriteLine(error.Code == 200);
+        }
+        Console.WriteLine(Program.DisposeCount == 1);
+
+        Program.DisposeCount = 0;
+        try
+        {
+            foreach (int value in new TrackingEnumerable(3, 1, 1, null))
+                sum += value;
+            Console.WriteLine(false);
+        }
+        catch (ForeachError error)
+        {
+            Console.WriteLine(error.Code == 201);
+        }
+        Console.WriteLine(Program.DisposeCount == 1);
+
+        Program.DisposeCount = 0;
+        try
+        {
+            foreach (int value in new TrackingEnumerable(1, 3, 1, null))
+                sum += value;
+            Console.WriteLine(false);
+        }
+        catch (ForeachError error)
+        {
+            Console.WriteLine(error.Code == 300);
+        }
+        Console.WriteLine(Program.DisposeCount == 1);
+
+        Program.DisposeCount = 0;
+        try
+        {
+            foreach (int value in new TrackingEnumerable(1, 3, 1, null))
+                throw new ForeachError("body replaced", 101);
+            Console.WriteLine(false);
+        }
+        catch (ForeachError error)
+        {
+            Console.WriteLine(error.Code == 300);
+        }
+        Console.WriteLine(Program.DisposeCount == 1);
+
+        Program.DisposeCount = 0;
+        try
+        {
+            foreach (int value in new TrackingEnumerable(1, 3, 1, null))
+                break;
+            Console.WriteLine(false);
+        }
+        catch (ForeachError error)
+        {
+            Console.WriteLine(error.Code == 300);
+        }
+        Console.WriteLine(Program.DisposeCount == 1);
+
+        Program.DisposeCount = 0;
+        try
+        {
+            Console.WriteLine(ReturnWithThrowingDispose() == -1);
+            Console.WriteLine(false);
+        }
+        catch (ForeachError error)
+        {
+            Console.WriteLine(error.Code == 300);
+        }
+        Console.WriteLine(Program.DisposeCount == 1);
+
+        Program.DisposeCount = 0;
+        Program.DisposeSequence = 0;
+        Console.WriteLine(NestedReturn() == 2);
+        Console.WriteLine(Program.DisposeCount == 2);
+        Console.WriteLine(Program.DisposeSequence == 21);
+
+        Program.DisposeCount = 0;
+        Program.DisposeSequence = 0;
+        Console.WriteLine(ReturnThroughOuterFinally() == 1);
+        Console.WriteLine(Program.DisposeCount == 1);
+        Console.WriteLine(Program.DisposeSequence == 19);
+
+        Program.IteratorFinally = 0;
+        foreach (int value in new IteratorSource(1))
+        {
+            Console.WriteLine(value == 5);
+            break;
+        }
+        Console.WriteLine(Program.IteratorFinally == 1);
+
+        Program.IteratorFinally = 0;
+        Program.DisposeSequence = 0;
+        foreach (int value in new IteratorSource(2))
+        {
+            Console.WriteLine(value == 7);
+            break;
+        }
+        Console.WriteLine(Program.DisposeSequence == 89);
+        Console.WriteLine(Program.IteratorFinally == 1);
+
+        Program.IteratorFinally = 0;
+        sum = 0;
+        foreach (int value in new IteratorSource(1))
+            sum += value;
+        Console.WriteLine(sum == 11);
+        Console.WriteLine(Program.IteratorFinally == 1);
+
+        Program.IteratorFinally = 0;
+        try
+        {
+            foreach (int value in new IteratorSource(1))
+                throw new ForeachError("iterator body", 110);
+            Console.WriteLine(false);
+        }
+        catch (ForeachError error)
+        {
+            Console.WriteLine(error.Code == 110);
+        }
+        Console.WriteLine(Program.IteratorFinally == 1);
+
+        Program.DisposeCount = 0;
+        Program.Seen = 0;
+        ForeachNode node = new ForeachNode(88);
+        TrackingEnumerable managedSource = new TrackingEnumerable(1, 0, 1, node);
+        node = null;
+        foreach (int value in managedSource)
+            break;
+        Console.WriteLine(Program.DisposeCount == 1);
+        Console.WriteLine(Program.Seen == 88);
+
+        sum = 0;
+        foreach (int value in new LegacyEnumerable(3))
+            sum += value;
+        Console.WriteLine(sum == 6);
+
+        int[] values = new int[3];
+        values[0] = 2;
+        values[1] = 3;
+        values[2] = 4;
+        sum = 0;
+        foreach (int value in values)
+            sum += value;
+        Console.WriteLine(sum == 9);
+    }
+}

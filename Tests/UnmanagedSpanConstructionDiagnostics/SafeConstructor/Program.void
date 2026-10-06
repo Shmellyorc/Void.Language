@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { Span<int> span = new Span<int>(null, 0); Console.WriteLine(span.Length); } }

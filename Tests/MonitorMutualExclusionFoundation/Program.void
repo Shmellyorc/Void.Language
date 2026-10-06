@@ -1,0 +1,160 @@
+using Void;
+using Void.Threading;
+
+public sealed class Gate
+{
+    public int Value;
+    public Box Reference;
+}
+
+public sealed class Box
+{
+    public int Value;
+}
+
+public sealed class Counter
+{
+    public int Value;
+}
+
+public static class Program
+{
+    private static void Increment(Counter counter, object gate, int iterations, int seed)
+    {
+        for (int i = 0; i < iterations; i++)
+        {
+            Monitor.Enter(gate);
+            counter.Value += 1;
+            if (((i + seed) % 31) == 0)
+                GC.Collect();
+            Monitor.Exit(gate);
+        }
+    }
+
+    private static void UseTransientMonitor(int value)
+    {
+        Gate gate = new Gate();
+        Monitor.Enter(gate);
+        gate.Value = value;
+        Monitor.Exit(gate);
+    }
+
+    public static void Main()
+    {
+        Gate recursive = new Gate();
+        Monitor.Enter(recursive);
+        Monitor.Enter(recursive);
+        recursive.Value = 1;
+        GC.Collect();
+        recursive.Value += 1;
+        Monitor.Exit(recursive);
+        Monitor.Exit(recursive);
+        Console.WriteLine(recursive.Value == 2);
+
+        object alias = recursive;
+        Monitor.Enter(alias);
+        recursive.Value += 3;
+        Monitor.Exit(recursive);
+        Console.WriteLine(recursive.Value == 5);
+
+        Counter counter = new Counter();
+        Gate sharedGate = new Gate();
+        Thread one = new Thread(() => Increment(counter, sharedGate, 120, 1));
+        Thread two = new Thread(() => Increment(counter, sharedGate, 120, 2));
+        Thread three = new Thread(() => Increment(counter, sharedGate, 120, 3));
+        Thread four = new Thread(() => Increment(counter, sharedGate, 120, 4));
+        one.Start();
+        two.Start();
+        three.Start();
+        four.Start();
+        one.Join();
+        two.Join();
+        three.Join();
+        four.Join();
+        Console.WriteLine(counter.Value == 480);
+
+        Gate blocked = new Gate();
+        blocked.Value = 10;
+        Monitor.Enter(blocked);
+        Thread waiter = new Thread(() =>
+        {
+            Monitor.Enter(blocked);
+            blocked.Value += 7;
+            Monitor.Exit(blocked);
+        });
+        waiter.Start();
+        GC.Collect();
+        blocked.Value += 1;
+        Monitor.Exit(blocked);
+        waiter.Join();
+        Console.WriteLine(blocked.Value == 18);
+
+        int[] values = new int[1];
+        Monitor.Enter(values);
+        values[0] = 29;
+        GC.Collect();
+        Monitor.Exit(values);
+        Console.WriteLine(values[0] == 29);
+
+        Gate managed = new Gate();
+        Monitor.Enter(managed);
+        managed.Reference = new Box();
+        managed.Reference.Value = 37;
+        GC.Collect();
+        Console.WriteLine(managed.Reference.Value == 37);
+        Monitor.Exit(managed);
+
+        Counter arrayCounter = new Counter();
+        int[] arrayGate = new int[1];
+        Thread arrayOne = new Thread(() =>
+        {
+            for (int i = 0; i < 75; i++)
+            {
+                Monitor.Enter(arrayGate);
+                arrayCounter.Value += 1;
+                Monitor.Exit(arrayGate);
+            }
+        });
+        Thread arrayTwo = new Thread(() =>
+        {
+            for (int i = 0; i < 75; i++)
+            {
+                Monitor.Enter(arrayGate);
+                arrayCounter.Value += 1;
+                Monitor.Exit(arrayGate);
+            }
+        });
+        arrayOne.Start();
+        arrayTwo.Start();
+        arrayOne.Join();
+        arrayTwo.Join();
+        Console.WriteLine(arrayCounter.Value == 150);
+
+        Gate exceptionGate = new Gate();
+        try
+        {
+            Monitor.Enter(exceptionGate);
+            try
+            {
+                throw new Exception("monitor-finally");
+            }
+            finally
+            {
+                Monitor.Exit(exceptionGate);
+            }
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message == "monitor-finally");
+        }
+        Monitor.Enter(exceptionGate);
+        exceptionGate.Value = 71;
+        Monitor.Exit(exceptionGate);
+        Console.WriteLine(exceptionGate.Value == 71);
+
+        for (int i = 0; i < 80; i++)
+            UseTransientMonitor(i);
+        GC.Collect();
+        Console.WriteLine(true);
+    }
+}

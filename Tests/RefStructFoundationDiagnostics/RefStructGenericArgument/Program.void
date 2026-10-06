@@ -1,0 +1,1 @@
+public class Marker<T> { } public ref struct R { public int X; } public static class Program { public static void Main() { Marker<R> value = new Marker<R>(); } }

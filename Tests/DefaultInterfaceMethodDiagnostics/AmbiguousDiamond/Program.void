@@ -1,0 +1,5 @@
+public interface ILeft { int Value() { return 1; } }
+public interface IRight { int Value() { return 2; } }
+public interface IDiamond : ILeft, IRight { }
+public sealed class Value : IDiamond { }
+public static class Program { public static void Main() { } }

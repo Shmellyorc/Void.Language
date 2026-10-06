@@ -1,0 +1,1 @@
+using Void; public static class Program { public static void Main(){ int n = -1; Span<int> span = stackalloc int[n]; Console.WriteLine(span.Length); } }

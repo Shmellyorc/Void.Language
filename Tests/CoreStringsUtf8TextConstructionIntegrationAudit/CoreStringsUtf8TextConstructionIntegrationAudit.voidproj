@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "CoreStringsUtf8TextConstructionIntegrationAudit",
+  "version": "0.0.310",
+  "output": "exe",
+  "compiler": { "unsafe": false }
+}

@@ -1,0 +1,150 @@
+using Void.Collections;
+
+public sealed class Item
+{
+    public int Value;
+
+    public Item(int value)
+    {
+        Value = value;
+    }
+}
+
+
+public struct GridKey
+{
+    public int X;
+    public int Y;
+
+    public GridKey(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    public int GetHashCode()
+    {
+        return X * 397 + Y;
+    }
+
+    public bool Equals(GridKey other)
+    {
+        return X == other.X && Y == other.Y;
+    }
+}
+
+public struct NegativeKey
+{
+    public int Value;
+
+    public NegativeKey(int value)
+    {
+        Value = value;
+    }
+
+    public int GetHashCode()
+    {
+        return -5;
+    }
+
+    public bool Equals(NegativeKey other)
+    {
+        return Value == other.Value;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Dictionary<int, int> values = new();
+        for (int i = 0; i < 20; i++)
+            values.Add(i, i * 10);
+
+        Console.WriteLine(values.Count);
+        Console.WriteLine(values[7]);
+
+        values[7] = 77;
+        Console.WriteLine(values[7]);
+        Console.WriteLine(values.ContainsKey(19));
+        Console.WriteLine(values.Remove(3));
+        Console.WriteLine(values.ContainsKey(3));
+        Console.WriteLine(values.Count);
+
+        int sum = 0;
+        foreach (var pair in values)
+            sum += pair.Value;
+        Console.WriteLine(sum);
+
+        Dictionary<string, int> names = new();
+        names.Add("apple", 4);
+        names["banana"] = 6;
+        Console.WriteLine(names["apple"] + names["banana"]);
+
+        HashSet<int> valuesSet = new();
+        Console.WriteLine(valuesSet.Add(5));
+        Console.WriteLine(valuesSet.Add(5));
+        valuesSet.Add(6);
+        valuesSet.Add(7);
+        Console.WriteLine(valuesSet.Count);
+        Console.WriteLine(valuesSet.Contains(6));
+        Console.WriteLine(valuesSet.Remove(6));
+        Console.WriteLine(valuesSet.Contains(6));
+
+        int setSum = 0;
+        foreach (var value in valuesSet)
+            setSum += value;
+        Console.WriteLine(setSum);
+
+        Dictionary<int, Item> managed = new();
+        Item item = new Item(88);
+        managed.Add(1, item);
+        item = null;
+        GC.Collect();
+        Console.WriteLine(managed[1].Value);
+
+        IEnumerator<KeyValuePair<int, Item>> managedEnumerator = managed.GetEnumerator();
+        managed = null;
+        GC.Collect();
+        managedEnumerator.MoveNext();
+        GC.Collect();
+        KeyValuePair<int, Item> managedPair = managedEnumerator.Current;
+        Console.WriteLine(managedPair.Value.Value);
+
+        HashSet<Item> managedSet = new();
+        Item key = new Item(99);
+        managedSet.Add(key);
+        key = null;
+        GC.Collect();
+        foreach (var retained in managedSet)
+            Console.WriteLine(retained.Value);
+
+        Dictionary<GridKey, int> grid = new();
+        GridKey gridA = new GridKey(4, 9);
+        GridKey gridB = new GridKey(4, 9);
+        grid.Add(gridA, 123);
+        Console.WriteLine(grid[gridB]);
+
+        HashSet<GridKey> gridSet = new();
+        gridSet.Add(gridA);
+        Console.WriteLine(gridSet.Contains(gridB));
+
+        Dictionary<NegativeKey, int> negativeHash = new();
+        NegativeKey negativeA = new NegativeKey(4);
+        NegativeKey negativeB = new NegativeKey(4);
+        negativeHash.Add(negativeA, 321);
+        Console.WriteLine(negativeHash[negativeB]);
+
+        Item first = new Item(1);
+        Item second = new Item(1);
+        HashSet<Item> identity = new();
+        identity.Add(first);
+        Console.WriteLine(identity.Contains(first));
+        Console.WriteLine(identity.Contains(second));
+
+        values.Clear();
+        valuesSet.Clear();
+        Console.WriteLine(values.Count);
+        Console.WriteLine(valuesSet.Count);
+    }
+}

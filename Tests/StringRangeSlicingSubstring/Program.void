@@ -1,0 +1,81 @@
+using Void;
+
+public static class Eval304
+{
+    public static int ReceiverCalls;
+    public static int StartCalls;
+    public static int LengthCalls;
+    public static int Order;
+
+    public static string MakeText()
+    {
+        ReceiverCalls += 1;
+        Order = Order * 10 + 1;
+        return "Aé😀B";
+    }
+
+    public static int MakeStart()
+    {
+        StartCalls += 1;
+        Order = Order * 10 + 2;
+        return 1;
+    }
+
+    public static int MakeLength()
+    {
+        LengthCalls += 1;
+        Order = Order * 10 + 3;
+        return 2;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        string ascii = "Player";
+        Console.WriteLine(ascii[1..4] == "lay");
+
+        string unicode = "Aé😀B";
+        Console.WriteLine(unicode[1..3] == "é😀");
+        Console.WriteLine(unicode[..] == unicode);
+        Console.WriteLine(unicode[1..] == "é😀B");
+        Console.WriteLine(unicode[..^1] == "Aé😀");
+        Console.WriteLine(unicode[^2..] == "😀B");
+        Console.WriteLine(unicode[1..^1] == "é😀");
+        Range middle = 1..^1;
+        Console.WriteLine(unicode[middle] == "é😀");
+
+        string embedded = "A\0B";
+        Console.WriteLine(embedded[1..3] == "\0B");
+        Console.WriteLine(unicode[2..2].IsEmpty);
+        string scalarSlice = unicode[1..3];
+        Console.WriteLine(scalarSlice.Length == 2);
+        Console.WriteLine(scalarSlice.ByteLength == 6);
+
+        Console.WriteLine(unicode.Substring(1) == "é😀B");
+        Console.WriteLine(unicode.Substring(1, 2) == "é😀");
+        Console.WriteLine(unicode.Substring(0, 0) == string.Empty);
+        Console.WriteLine(unicode.Substring(4, 0).IsEmpty);
+        Console.WriteLine(embedded.Substring(1, 2) == "\0B");
+        Console.WriteLine(unicode.Substring(1, 2) == unicode[1..3]);
+
+        string absent = null;
+        Console.WriteLine(absent?.Substring(1) == null);
+        Console.WriteLine(absent?[1..2] == null);
+        Console.WriteLine(unicode?.Substring(1, 2) == "é😀");
+        Console.WriteLine(unicode?[1..3] == "é😀");
+
+        Eval304.Order = 0;
+        string evaluated = Eval304.MakeText().Substring(Eval304.MakeStart(), Eval304.MakeLength());
+        Console.WriteLine(evaluated == "é😀");
+        Console.WriteLine(Eval304.ReceiverCalls == 1 && Eval304.StartCalls == 1 && Eval304.LengthCalls == 1 && Eval304.Order == 123);
+
+        string original = "abcd";
+        string slice = original[1..3];
+        GC.Collect();
+        Console.WriteLine(original == "abcd");
+        Console.WriteLine(slice == "bc");
+        Console.WriteLine(slice != original);
+    }
+}

@@ -1,0 +1,257 @@
+using Void;
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public class OrderedBase
+{
+    public static int Trace;
+    private int _baseInit = Mark(1);
+
+    public OrderedBase(int value)
+    {
+        Mark(2);
+    }
+
+    public static int Mark(int value)
+    {
+        Trace = Trace * 10 + value;
+        return value;
+    }
+}
+
+public sealed class OrderedDerived : OrderedBase
+{
+    private int _derivedInit = OrderedBase.Mark(3);
+
+    public OrderedDerived(int value) : base(value)
+    {
+        OrderedBase.Mark(4);
+    }
+}
+
+public class OverloadBase
+{
+    protected int Marker;
+
+    public OverloadBase(int value) { Marker = value; }
+    public OverloadBase(string value) { Marker = 20; }
+}
+
+public sealed class OverloadDerived : OverloadBase
+{
+    public OverloadDerived(string value) : base(value) { }
+    public int GetMarker() { return Marker; }
+}
+
+public class NamedBase
+{
+    protected int Combined;
+
+    public NamedBase(int left, int right = 5)
+    {
+        Combined = left * 10 + right;
+    }
+}
+
+public sealed class NamedDerived : NamedBase
+{
+    public NamedDerived() : base(right: 4, left: 3) { }
+    public int GetCombined() { return Combined; }
+}
+
+public class ParamsBase
+{
+    protected int Sum;
+
+    public ParamsBase(int first, params int[] rest)
+    {
+        Sum = first + rest[0] + rest[1];
+    }
+}
+
+public sealed class ParamsDerived : ParamsBase
+{
+    public ParamsDerived() : base(1, 2, 3) { }
+    public int GetSum() { return Sum; }
+}
+
+public class OptionalBase
+{
+    protected int Number;
+
+    public OptionalBase(int value = 15)
+    {
+        Number = value;
+    }
+}
+
+public sealed class OptionalDerived : OptionalBase
+{
+    public OptionalDerived() : base() { }
+    public int GetNumber() { return Number; }
+}
+
+public class DefaultBase
+{
+    protected int Number;
+
+    public DefaultBase()
+    {
+        Number = 41;
+    }
+}
+
+public sealed class DefaultDerived : DefaultBase
+{
+    public DefaultDerived()
+    {
+        Number += 1;
+    }
+
+    public int GetNumber() { return Number; }
+}
+
+public sealed class ImplicitDerived : DefaultBase
+{
+    public int GetNumber() { return Number; }
+}
+
+public class MiddleImplicit : DefaultBase
+{
+}
+
+public sealed class LeafImplicit : MiddleImplicit
+{
+    public int GetNumber() { return Number; }
+}
+
+public class EvalBase
+{
+    protected int Stored;
+
+    public EvalBase(int value)
+    {
+        Stored = value;
+    }
+}
+
+public sealed class EvalDerived : EvalBase
+{
+    public static int Calls;
+
+    public EvalDerived() : base(Next()) { }
+
+    private static int Next()
+    {
+        Calls += 1;
+        return Calls;
+    }
+
+    public int GetStored() { return Stored; }
+}
+
+public class GenericBase<T>
+{
+    protected T Stored;
+
+    public GenericBase(T value)
+    {
+        Stored = value;
+    }
+}
+
+public sealed class GenericDerived<T> : GenericBase<T>
+{
+    public GenericDerived(T value) : base(value) { }
+    public T GetStored() { return Stored; }
+}
+
+public class GcBase
+{
+    protected Node Stored;
+
+    public GcBase(Node node)
+    {
+        GC.Collect();
+        Stored = node;
+    }
+}
+
+public sealed class GcDerived : GcBase
+{
+    public GcDerived() : base(new Node(99)) { }
+    public int StoredValue() { return Stored.Value; }
+}
+
+public class VirtualBase
+{
+    protected int Seen;
+
+    public VirtualBase()
+    {
+        Seen = this.Kind();
+    }
+
+    public virtual int Kind() { return 1; }
+}
+
+public sealed class VirtualDerived : VirtualBase
+{
+    public VirtualDerived() : base() { }
+    public override int Kind() { return 2; }
+    public int GetSeen() { return Seen; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        OrderedBase.Trace = 0;
+        OrderedDerived ordered = new OrderedDerived(7);
+        Console.WriteLine(OrderedBase.Trace == 1234);
+
+        OverloadDerived overload = new OverloadDerived("x");
+        Console.WriteLine(overload.GetMarker() == 20);
+
+        NamedDerived named = new NamedDerived();
+        Console.WriteLine(named.GetCombined() == 34);
+
+        ParamsDerived packed = new ParamsDerived();
+        Console.WriteLine(packed.GetSum() == 6);
+
+        OptionalDerived optional = new OptionalDerived();
+        Console.WriteLine(optional.GetNumber() == 15);
+
+        DefaultDerived explicitImplicit = new DefaultDerived();
+        Console.WriteLine(explicitImplicit.GetNumber() == 42);
+
+        ImplicitDerived implicitDerived = new ImplicitDerived();
+        Console.WriteLine(implicitDerived.GetNumber() == 41);
+
+        LeafImplicit leaf = new LeafImplicit();
+        Console.WriteLine(leaf.GetNumber() == 41);
+
+        EvalDerived.Calls = 0;
+        EvalDerived evaluated = new EvalDerived();
+        Console.WriteLine(EvalDerived.Calls == 1);
+        Console.WriteLine(evaluated.GetStored() == 1);
+
+        GenericDerived<int> generic = new GenericDerived<int>(77);
+        Console.WriteLine(generic.GetStored() == 77);
+
+        GcDerived gc = new GcDerived();
+        GC.Collect();
+        Console.WriteLine(gc.StoredValue() == 99);
+
+        VirtualDerived virtualDerived = new VirtualDerived();
+        Console.WriteLine(virtualDerived.GetSeen() == 2);
+    }
+}

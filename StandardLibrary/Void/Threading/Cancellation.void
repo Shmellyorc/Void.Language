@@ -1,0 +1,531 @@
+namespace Void.Threading;
+
+private sealed class CancellationSourceGate
+{
+}
+
+private sealed class CancellationCallbackNode
+{
+    public Action Callback;
+    public CancellationCallbackNode Next;
+    public int State;
+
+    public CancellationCallbackNode(Action callback)
+    {
+        Callback = callback;
+        Next = null;
+        State = 0;
+    }
+}
+
+public readonly struct CancellationTokenRegistration : IDisposable
+{
+    private readonly CancellationTokenSource _source;
+    private readonly CancellationCallbackNode _node;
+
+    internal CancellationTokenRegistration(CancellationTokenSource source, CancellationCallbackNode node)
+    {
+        _source = source;
+        _node = node;
+    }
+
+    public void Dispose()
+    {
+        if (_source != null && _node != null)
+            _source.Unregister(_node);
+    }
+}
+
+public readonly struct CancellationToken
+{
+    private readonly CancellationTokenSource _source;
+
+    internal CancellationToken(CancellationTokenSource source)
+    {
+        _source = source;
+    }
+
+    public static readonly CancellationToken None;
+
+    public bool CanBeCanceled => _source != null;
+
+    public bool IsCancellationRequested
+    {
+        get
+        {
+            if (_source == null)
+                return false;
+            return _source.IsCancellationRequested;
+        }
+    }
+
+    public CancellationTokenRegistration Register(Action callback)
+    {
+        if (callback == null)
+            Runtime.Fail("cancellation callback cannot be null");
+        if (_source == null)
+            return default;
+        return _source.Register(callback);
+    }
+
+    internal bool IsSameSource(CancellationToken other)
+    {
+        return _source == other._source;
+    }
+
+    public void ThrowIfCancellationRequested()
+    {
+        if (this.IsCancellationRequested)
+            throw new OperationCanceledException(this);
+    }
+}
+
+private sealed class CancellationOwnedResourceNode
+{
+    public CancellationTokenRegistration CancellationRegistration;
+    public TimerQueueRegistration TimerRegistration;
+    public CancellationOwnedResourceNode Next;
+    public int Kind;
+    public int State;
+
+    public CancellationOwnedResourceNode(CancellationTokenRegistration registration)
+    {
+        CancellationRegistration = registration;
+        TimerRegistration = default;
+        Next = null;
+        Kind = 1;
+        State = 0;
+    }
+
+    public CancellationOwnedResourceNode(TimerQueueRegistration registration)
+    {
+        CancellationRegistration = default;
+        TimerRegistration = registration;
+        Next = null;
+        Kind = 2;
+        State = 0;
+    }
+
+    public void DisposeResource()
+    {
+        if (Interlocked.CompareExchange(ref State, 1, 0) != 0)
+            return;
+
+        if (Kind == 1)
+        {
+            CancellationTokenRegistration registration = CancellationRegistration;
+            CancellationRegistration = default;
+            Kind = 0;
+            registration.Dispose();
+        }
+        else if (Kind == 2)
+        {
+            TimerQueueRegistration registration = TimerRegistration;
+            TimerRegistration = default;
+            Kind = 0;
+            registration.Dispose();
+        }
+    }
+}
+
+internal readonly struct CancellationSourceOwnership : IDisposable
+{
+    private readonly CancellationTokenSource _source;
+    private readonly CancellationOwnedResourceNode _node;
+
+    internal CancellationSourceOwnership(CancellationTokenSource source, CancellationOwnedResourceNode node)
+    {
+        _source = source;
+        _node = node;
+    }
+
+    public void Dispose()
+    {
+        if (_source != null && _node != null)
+            _source.ReleaseOwnedResource(_node);
+    }
+}
+
+public sealed class CancellationTokenSource : IDisposable
+{
+    private int _cancellationRequested;
+    private int _disposed;
+    private CancellationSourceGate _gate;
+    private CancellationCallbackNode _callbacks;
+    private CancellationOwnedResourceNode _ownedResources;
+    private CancellationOwnedResourceNode _cancelAfterResource;
+    private long _cancelAfterGeneration;
+
+    public CancellationTokenSource()
+    {
+        _cancellationRequested = 0;
+        _disposed = 0;
+        _gate = new CancellationSourceGate();
+        _callbacks = null;
+        _ownedResources = null;
+        _cancelAfterResource = null;
+        _cancelAfterGeneration = 0L;
+    }
+
+    public bool IsCancellationRequested => Volatile.Read(ref _cancellationRequested) != 0;
+
+    public CancellationToken Token
+    {
+        get
+        {
+            if (Volatile.Read(ref _disposed) != 0)
+                Runtime.Fail("cancellation token source has been disposed");
+            return new CancellationToken(this);
+        }
+    }
+
+    private bool Remove(CancellationCallbackNode node)
+    {
+        CancellationCallbackNode previous = null;
+        CancellationCallbackNode current = _callbacks;
+        while (current != null)
+        {
+            if (current == node)
+            {
+                if (previous == null)
+                    _callbacks = current.Next;
+                else
+                    previous.Next = current.Next;
+                current.Next = null;
+                return true;
+            }
+
+            previous = current;
+            current = current.Next;
+        }
+        return false;
+    }
+
+    private bool RemoveOwnedResource(CancellationOwnedResourceNode node)
+    {
+        CancellationOwnedResourceNode previous = null;
+        CancellationOwnedResourceNode current = _ownedResources;
+        while (current != null)
+        {
+            if (current == node)
+            {
+                if (previous == null)
+                    _ownedResources = current.Next;
+                else
+                    previous.Next = current.Next;
+                current.Next = null;
+                return true;
+            }
+
+            previous = current;
+            current = current.Next;
+        }
+        return false;
+    }
+
+    private static void DisposeOwnedResources(CancellationOwnedResourceNode resources)
+    {
+        CancellationOwnedResourceNode current = resources;
+        while (current != null)
+        {
+            CancellationOwnedResourceNode next = current.Next;
+            current.Next = null;
+            current.DisposeResource();
+            current = next;
+        }
+    }
+
+    internal CancellationTokenRegistration Register(Action callback)
+    {
+        CancellationCallbackNode node = new CancellationCallbackNode(callback);
+
+        Monitor.Enter(_gate);
+        if (Volatile.Read(ref _disposed) != 0)
+        {
+            Monitor.Exit(_gate);
+            Runtime.Fail("cancellation token source has been disposed");
+        }
+        if (Volatile.Read(ref _cancellationRequested) != 0)
+        {
+            Monitor.Exit(_gate);
+            callback();
+            return default;
+        }
+
+        node.Next = _callbacks;
+        _callbacks = node;
+        Monitor.Exit(_gate);
+        return new CancellationTokenRegistration(this, node);
+    }
+
+    internal void Unregister(CancellationCallbackNode node)
+    {
+        if (node == null)
+            return;
+        if (Interlocked.CompareExchange(ref node.State, 1, 0) != 0)
+            return;
+
+        Monitor.Enter(_gate);
+        bool removed = this.Remove(node);
+        Monitor.Exit(_gate);
+
+        node.Callback = null;
+        if (removed)
+            node.Next = null;
+    }
+
+    internal CancellationSourceOwnership Own(CancellationTokenRegistration registration)
+    {
+        CancellationOwnedResourceNode node = new CancellationOwnedResourceNode(registration);
+
+        Monitor.Enter(_gate);
+        if (Volatile.Read(ref _disposed) != 0 || Volatile.Read(ref _cancellationRequested) != 0)
+        {
+            Monitor.Exit(_gate);
+            node.DisposeResource();
+            return default;
+        }
+        node.Next = _ownedResources;
+        _ownedResources = node;
+        Monitor.Exit(_gate);
+        return new CancellationSourceOwnership(this, node);
+    }
+
+    internal CancellationSourceOwnership Own(TimerQueueRegistration registration)
+    {
+        CancellationOwnedResourceNode node = new CancellationOwnedResourceNode(registration);
+
+        Monitor.Enter(_gate);
+        if (Volatile.Read(ref _disposed) != 0 || Volatile.Read(ref _cancellationRequested) != 0)
+        {
+            Monitor.Exit(_gate);
+            node.DisposeResource();
+            return default;
+        }
+        node.Next = _ownedResources;
+        _ownedResources = node;
+        Monitor.Exit(_gate);
+        return new CancellationSourceOwnership(this, node);
+    }
+
+    internal void ReleaseOwnedResource(CancellationOwnedResourceNode node)
+    {
+        if (node == null)
+            return;
+
+        Monitor.Enter(_gate);
+        this.RemoveOwnedResource(node);
+        Monitor.Exit(_gate);
+        node.DisposeResource();
+    }
+
+    private static void FinishCancellation(CancellationCallbackNode callbacks, CancellationOwnedResourceNode ownedResources)
+    {
+        CancellationTokenSource.DisposeOwnedResources(ownedResources);
+
+        Exception firstError = null;
+        CancellationCallbackNode current = callbacks;
+        while (current != null)
+        {
+            CancellationCallbackNode next = current.Next;
+            current.Next = null;
+
+            if (Interlocked.CompareExchange(ref current.State, 2, 0) == 0)
+            {
+                Action callback = current.Callback;
+                try
+                {
+                    callback();
+                }
+                catch (Exception error)
+                {
+                    if (firstError == null)
+                        firstError = error;
+                }
+                finally
+                {
+                    current.Callback = null;
+                    Interlocked.Exchange(ref current.State, 3);
+                }
+            }
+
+            current = next;
+        }
+
+        if (firstError != null)
+            throw firstError;
+    }
+
+    private void CancelAfterFired(long generation)
+    {
+        CancellationCallbackNode callbacks = null;
+        CancellationOwnedResourceNode ownedResources = null;
+
+        Monitor.Enter(_gate);
+        if (Volatile.Read(ref _disposed) != 0 ||
+            Volatile.Read(ref _cancellationRequested) != 0 ||
+            generation != _cancelAfterGeneration ||
+            _cancelAfterResource == null)
+        {
+            Monitor.Exit(_gate);
+            return;
+        }
+
+        Interlocked.Exchange(ref _cancellationRequested, 1);
+        _cancelAfterGeneration++;
+        _cancelAfterResource = null;
+        callbacks = _callbacks;
+        _callbacks = null;
+        ownedResources = _ownedResources;
+        _ownedResources = null;
+        Monitor.Exit(_gate);
+
+        CancellationTokenSource.FinishCancellation(callbacks, ownedResources);
+    }
+
+    public void CancelAfter(int millisecondsDelay)
+    {
+        if (millisecondsDelay < Timeout.Infinite)
+            Runtime.Fail("cancellation delay must be -1 or non-negative");
+
+        CancellationOwnedResourceNode previous = null;
+
+        Monitor.Enter(_gate);
+        if (Volatile.Read(ref _disposed) != 0)
+        {
+            Monitor.Exit(_gate);
+            Runtime.Fail("cancellation token source has been disposed");
+        }
+        if (Volatile.Read(ref _cancellationRequested) != 0)
+        {
+            Monitor.Exit(_gate);
+            return;
+        }
+
+        _cancelAfterGeneration++;
+        long generation = _cancelAfterGeneration;
+        previous = _cancelAfterResource;
+        _cancelAfterResource = null;
+        if (previous != null)
+            this.RemoveOwnedResource(previous);
+
+        if (millisecondsDelay != Timeout.Infinite)
+        {
+            Action cancellation = () => this.CancelAfterFired(generation);
+            TimerQueueRegistration registration = TimerQueue.Register(millisecondsDelay, cancellation);
+            CancellationOwnedResourceNode resource = new CancellationOwnedResourceNode(registration);
+            resource.Next = _ownedResources;
+            _ownedResources = resource;
+            _cancelAfterResource = resource;
+        }
+        Monitor.Exit(_gate);
+
+        if (previous != null)
+            previous.DisposeResource();
+    }
+
+    private void CancelCore(bool failIfDisposed)
+    {
+        CancellationCallbackNode callbacks = null;
+        CancellationOwnedResourceNode ownedResources = null;
+
+        Monitor.Enter(_gate);
+        if (Volatile.Read(ref _disposed) != 0)
+        {
+            Monitor.Exit(_gate);
+            if (failIfDisposed)
+                Runtime.Fail("cancellation token source has been disposed");
+            return;
+        }
+        if (Volatile.Read(ref _cancellationRequested) != 0)
+        {
+            Monitor.Exit(_gate);
+            return;
+        }
+
+        Interlocked.Exchange(ref _cancellationRequested, 1);
+        _cancelAfterGeneration++;
+        _cancelAfterResource = null;
+        callbacks = _callbacks;
+        _callbacks = null;
+        ownedResources = _ownedResources;
+        _ownedResources = null;
+        Monitor.Exit(_gate);
+
+        CancellationTokenSource.FinishCancellation(callbacks, ownedResources);
+    }
+
+    private void CancelFromLinkedParent()
+    {
+        this.CancelCore(false);
+    }
+
+    private static void LinkParent(CancellationTokenSource linkedSource, CancellationToken token)
+    {
+        if (!token.CanBeCanceled)
+            return;
+
+        CancellationTokenRegistration registration = token.Register(() => linkedSource.CancelFromLinkedParent());
+        linkedSource.Own(registration);
+    }
+
+    public static CancellationTokenSource CreateLinkedTokenSource(params CancellationToken[] tokens)
+    {
+        if (tokens == null)
+            Runtime.Fail("linked cancellation token array cannot be null");
+        if (tokens.Length == 0)
+            Runtime.Fail("linked cancellation requires at least one token");
+
+        CancellationTokenSource linkedSource = new CancellationTokenSource();
+        try
+        {
+            for (int i = 0; i < tokens.Length; i++)
+                CancellationTokenSource.LinkParent(linkedSource, tokens[i]);
+            return linkedSource;
+        }
+        catch (Exception error)
+        {
+            linkedSource.Dispose();
+            throw error;
+        }
+    }
+
+    public void Cancel()
+    {
+        this.CancelCore(true);
+    }
+
+    public void Dispose()
+    {
+        CancellationCallbackNode callbacks = null;
+        CancellationOwnedResourceNode ownedResources = null;
+
+        Monitor.Enter(_gate);
+        if (Volatile.Read(ref _disposed) != 0)
+        {
+            Monitor.Exit(_gate);
+            return;
+        }
+
+        Interlocked.Exchange(ref _disposed, 1);
+        _cancelAfterGeneration++;
+        _cancelAfterResource = null;
+        callbacks = _callbacks;
+        _callbacks = null;
+        ownedResources = _ownedResources;
+        _ownedResources = null;
+        Monitor.Exit(_gate);
+
+        CancellationCallbackNode current = callbacks;
+        while (current != null)
+        {
+            CancellationCallbackNode next = current.Next;
+            current.Next = null;
+            if (Interlocked.CompareExchange(ref current.State, 1, 0) == 0)
+                current.Callback = null;
+            current = next;
+        }
+
+        CancellationTokenSource.DisposeOwnedResources(ownedResources);
+    }
+}

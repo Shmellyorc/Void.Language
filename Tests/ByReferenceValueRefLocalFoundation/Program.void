@@ -1,0 +1,208 @@
+public struct Pair221
+{
+    public int X;
+    public int Y;
+
+    public Pair221(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    public void Add(int amount)
+    {
+        X += amount;
+    }
+}
+
+public sealed class Node221
+{
+    public int Value;
+
+    public Node221(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Holder221
+{
+    public int Value;
+    public Pair221 Pair;
+    public Node221 Node;
+
+    public Holder221(int value)
+    {
+        Value = value;
+        Pair = new Pair221(value + 1, value + 2);
+        Node = new Node221(value + 3);
+    }
+
+    public void IncrementViaRef()
+    {
+        ref int alias = ref Value;
+        alias += 1;
+    }
+}
+
+public static class Program
+{
+    public static int StaticValue = 5;
+    public static int HolderCalls;
+    public static int ArrayCalls;
+
+    public static Holder221 MakeHolder()
+    {
+        HolderCalls += 1;
+        return new Holder221(20);
+    }
+
+    public static int[] MakeArray()
+    {
+        ArrayCalls += 1;
+        return new int[] { 30, 31 };
+    }
+
+    public static void SetRef(ref int value, int replacement)
+    {
+        value = replacement;
+    }
+
+    public static int ReadIn(in int value)
+    {
+        return value;
+    }
+
+    public static void SetOut(out int value)
+    {
+        value = 71;
+    }
+
+    public static void AssignOutThroughAlias(out int value)
+    {
+        ref int alias = ref value;
+        alias = 61;
+    }
+
+    public static void RouteOutThroughAlias(out int value)
+    {
+        ref int alias = ref value;
+        SetOut(out alias);
+    }
+
+    public static void GenericSet<T>(ref T target, T value)
+    {
+        ref T alias = ref target;
+        alias = value;
+    }
+
+    public static void Main()
+    {
+        int local = 10;
+        ref int localAlias = ref local;
+        localAlias += 2;
+        Console.WriteLine(local == 12);
+        Console.WriteLine(localAlias == 12);
+
+        ref int aliasChain = ref localAlias;
+        aliasChain = 15;
+        Console.WriteLine(local == 15 && localAlias == 15);
+
+        SetRef(ref aliasChain, 18);
+        Console.WriteLine(local == 18);
+        Console.WriteLine(ReadIn(in aliasChain) == 18);
+
+        int uninitialized;
+        ref int initializeAlias = ref uninitialized;
+        initializeAlias = 23;
+        Console.WriteLine(uninitialized == 23);
+
+        int outValue;
+        AssignOutThroughAlias(out outValue);
+        Console.WriteLine(outValue == 61);
+
+        int routedOut;
+        RouteOutThroughAlias(out routedOut);
+        Console.WriteLine(routedOut == 71);
+
+        ref int staticAlias = ref Program.StaticValue;
+        staticAlias = 8;
+        Console.WriteLine(StaticValue == 8);
+
+        Pair221 pair = new Pair221(3, 4);
+        ref int structField = ref pair.X;
+        structField = 9;
+        Console.WriteLine(pair.X == 9 && pair.Y == 4);
+
+        ref Pair221 wholeStruct = ref pair;
+        wholeStruct.Add(3);
+        Console.WriteLine(pair.X == 12);
+
+        Holder221 holder = new Holder221(6);
+        holder.IncrementViaRef();
+        Console.WriteLine(holder.Value == 7);
+
+        ref int nestedField = ref holder.Pair.X;
+        holder = null;
+        GC.Collect();
+        nestedField = 44;
+        Console.WriteLine(nestedField == 44);
+
+        int[] values = new int[] { 1, 2, 3 };
+        ref var arrayElement = ref values[1];
+        values = null;
+        GC.Collect();
+        arrayElement = 52;
+        Console.WriteLine(arrayElement == 52);
+
+        Pair221[] pairs = new Pair221[] { new Pair221(10, 11) };
+        ref int arrayStructField = ref pairs[0].X;
+        pairs = null;
+        GC.Collect();
+        arrayStructField = 53;
+        Console.WriteLine(arrayStructField == 53);
+
+        ref int temporaryHolderField = ref MakeHolder().Value;
+        GC.Collect();
+        temporaryHolderField = 54;
+        Console.WriteLine(temporaryHolderField == 54 && HolderCalls == 1);
+
+        ref int temporaryArrayElement = ref MakeArray()[0];
+        GC.Collect();
+        temporaryArrayElement = 55;
+        Console.WriteLine(temporaryArrayElement == 55 && ArrayCalls == 1);
+
+        Holder221 managedHolder = new Holder221(60);
+        ref Node221 managedField = ref managedHolder.Node;
+        managedHolder = null;
+        GC.Collect();
+        Console.WriteLine(managedField.Value == 63);
+        managedField = new Node221(64);
+        GC.Collect();
+        Console.WriteLine(managedField.Value == 64);
+
+        Node221 node = new Node221(70);
+        ref Node221 nodeAlias = ref node;
+        nodeAlias = new Node221(72);
+        Console.WriteLine(node.Value == 72);
+
+        int genericInt = 80;
+        GenericSet<int>(ref genericInt, 81);
+        Console.WriteLine(genericInt == 81);
+
+        Node221 genericNode = new Node221(82);
+        GenericSet<Node221>(ref genericNode, new Node221(83));
+        Console.WriteLine(genericNode.Value == 83);
+
+        int? maybe = 90;
+        ref int? maybeAlias = ref maybe;
+        maybeAlias = null;
+        Console.WriteLine(maybe == null);
+
+        int forValue = 100;
+        for (ref int forAlias = ref forValue; forAlias < 101; forAlias += 1)
+        {
+        }
+        Console.WriteLine(forValue == 101);
+    }
+}

@@ -1,0 +1,3 @@
+using Void;
+public sealed class C { public int Length => 3; public void Slice(int start, int length) {} }
+public static class Program { public static void Main() { C c = new C(); c[1..2]; } }

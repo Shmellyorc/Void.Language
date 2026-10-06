@@ -1,0 +1,6 @@
+public unsafe delegate int* Step(int* value);
+public unsafe sealed class PointerBox
+{
+    public int* Pointer { get; set; }
+}
+public static class Program { public static void Main() { } }

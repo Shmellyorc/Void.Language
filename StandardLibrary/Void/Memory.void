@@ -1,0 +1,154 @@
+namespace Void;
+
+public readonly struct Memory<T>
+{
+    private readonly T[] _array;
+    private readonly int _start;
+    private readonly int _length;
+
+    public Memory(T[] array)
+    {
+        _array = array;
+        _start = 0;
+        _length = 0;
+        if (array != null)
+            _length = array.Length;
+    }
+
+    public Memory(T[] array, int start, int length)
+    {
+        _array = array;
+        _start = start;
+        _length = length;
+
+        int arrayLength = 0;
+        if (array != null)
+            arrayLength = array.Length;
+        if (start < 0 || length < 0 || start > arrayLength || length > arrayLength - start)
+            throw new ArgumentOutOfRangeException("start", "Memory range out of range");
+    }
+
+    public ref T GetPinnableReference()
+    {
+        return ref SpanIntrinsics.ArrayPinnableReference<T>(_array, _start, _length);
+    }
+
+    public T[] ToArray() { var span = this.Span; return span.ToArray(); }
+
+    public int Length => _length;
+    public bool IsEmpty => _length == 0;
+
+    public Memory<T> Slice(int start)
+    {
+        return this.Slice(start, _length - start);
+    }
+
+    public Memory<T> Slice(int start, int length)
+    {
+        if (start < 0 || length < 0 || start > _length || length > _length - start)
+            throw new ArgumentOutOfRangeException("start", "Memory range out of range");
+        return new Memory<T>(_array, _start + start, length);
+    }
+
+    public Span<T> Span
+    {
+        get
+        {
+            return new Span<T>(_array, _start, _length);
+        }
+    }
+
+    public void CopyTo(Memory<T> destination)
+    {
+        this.Span.CopyTo(destination.Span);
+    }
+
+    public bool TryCopyTo(Memory<T> destination)
+    {
+        return this.Span.TryCopyTo(destination.Span);
+    }
+
+    public static implicit operator Memory<T>(T[] array)
+    {
+        return new Memory<T>(array);
+    }
+
+    public static implicit operator ReadOnlyMemory<T>(Memory<T> memory)
+    {
+        return new ReadOnlyMemory<T>(memory._array, memory._start, memory._length);
+    }
+}
+
+public readonly struct ReadOnlyMemory<T>
+{
+    private readonly T[] _array;
+    private readonly int _start;
+    private readonly int _length;
+
+    public ReadOnlyMemory(T[] array)
+    {
+        _array = array;
+        _start = 0;
+        _length = 0;
+        if (array != null)
+            _length = array.Length;
+    }
+
+    public ReadOnlyMemory(T[] array, int start, int length)
+    {
+        _array = array;
+        _start = start;
+        _length = length;
+
+        int arrayLength = 0;
+        if (array != null)
+            arrayLength = array.Length;
+        if (start < 0 || length < 0 || start > arrayLength || length > arrayLength - start)
+            throw new ArgumentOutOfRangeException("start", "ReadOnlyMemory range out of range");
+    }
+
+    public ref readonly T GetPinnableReference()
+    {
+        return ref SpanIntrinsics.ArrayPinnableReferenceReadOnly<T>(_array, _start, _length);
+    }
+
+    public T[] ToArray() { var span = this.Span; return span.ToArray(); }
+
+    public int Length => _length;
+    public bool IsEmpty => _length == 0;
+
+    public ReadOnlyMemory<T> Slice(int start)
+    {
+        return this.Slice(start, _length - start);
+    }
+
+    public ReadOnlyMemory<T> Slice(int start, int length)
+    {
+        if (start < 0 || length < 0 || start > _length || length > _length - start)
+            throw new ArgumentOutOfRangeException("start", "ReadOnlyMemory range out of range");
+        return new ReadOnlyMemory<T>(_array, _start + start, length);
+    }
+
+    public ReadOnlySpan<T> Span
+    {
+        get
+        {
+            return new ReadOnlySpan<T>(_array, _start, _length);
+        }
+    }
+
+    public void CopyTo(Memory<T> destination)
+    {
+        this.Span.CopyTo(destination.Span);
+    }
+
+    public bool TryCopyTo(Memory<T> destination)
+    {
+        return this.Span.TryCopyTo(destination.Span);
+    }
+
+    public static implicit operator ReadOnlyMemory<T>(T[] array)
+    {
+        return new ReadOnlyMemory<T>(array);
+    }
+}

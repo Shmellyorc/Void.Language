@@ -1,0 +1,3 @@
+using Void;
+public struct Bad { public event Action<int> Changed; }
+public static class Program { public static void Main() { } }

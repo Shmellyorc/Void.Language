@@ -1,0 +1,306 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public delegate int SyncHandler274(int value);
+public delegate Task<int> AsyncHandler274(int value);
+public delegate ValueTask<int> AsyncValueHandler274(int value);
+public delegate ValueTask<TResult> AsyncMap274<T, TResult>(T value);
+
+public sealed class Node274
+{
+    public int Value;
+
+    public Node274(int value)
+    {
+        Value = value;
+    }
+}
+
+public struct InlineAwaiter274
+{
+    private int _value;
+
+    public InlineAwaiter274(int value)
+    {
+        _value = value;
+    }
+
+    public bool IsCompleted => true;
+
+    public void OnCompleted(Action continuation)
+    {
+        continuation();
+    }
+
+    public int GetResult()
+    {
+        return _value;
+    }
+}
+
+public struct InlineAwaitable274
+{
+    private int _value;
+
+    public InlineAwaitable274(int value)
+    {
+        _value = value;
+    }
+
+    public InlineAwaiter274 GetAwaiter()
+    {
+        return new InlineAwaiter274(_value);
+    }
+}
+
+public sealed class Holder274
+{
+    public AsyncHandler274 Callback;
+}
+
+public sealed class TaskPublisher274
+{
+    public event AsyncHandler274 Changed;
+
+    public Task<int> Raise(int value)
+    {
+        return Changed(value);
+    }
+}
+
+public interface ITaskPublisher274
+{
+    event AsyncHandler274 Changed;
+}
+
+public sealed class InterfaceTaskPublisher274 : ITaskPublisher274
+{
+    public event AsyncHandler274 Changed;
+
+    public Task<int> Raise(int value)
+    {
+        return Changed(value);
+    }
+}
+
+public class VirtualPublisher274
+{
+    private AsyncHandler274 _changed;
+
+    public virtual event AsyncHandler274 Changed
+    {
+        add => _changed += value;
+        remove => _changed -= value;
+    }
+
+    public Task<int> Raise(int value)
+    {
+        return _changed(value);
+    }
+}
+
+public sealed class DerivedPublisher274 : VirtualPublisher274
+{
+    private AsyncHandler274 _changed;
+
+    public override event AsyncHandler274 Changed
+    {
+        add => _changed += value;
+        remove => _changed -= value;
+    }
+
+    public Task<int> RaiseDerived(int value)
+    {
+        return _changed(value);
+    }
+}
+
+public static class StaticPublisher274
+{
+    public static event AsyncHandler274 Changed;
+
+    public static Task<int> Raise(int value)
+    {
+        return Changed(value);
+    }
+
+    public static void Clear()
+    {
+        Changed = null;
+    }
+}
+
+public sealed class ValuePublisher274
+{
+    public event AsyncValueHandler274 Changed;
+
+    public ValueTask<int> Raise(int value)
+    {
+        return Changed(value);
+    }
+}
+
+public static class Program
+{
+    private static int _sequence;
+
+    private static SyncHandler274 MakeSync(int add)
+    {
+        return value => value + add;
+    }
+
+    private static AsyncHandler274 Make(int add)
+    {
+        return async value =>
+        {
+            await Task.Yield();
+            return value + add;
+        };
+    }
+
+    private static AsyncHandler274 MakeCaptured(int add)
+    {
+        Node274 node = new Node274(add);
+        return async value =>
+        {
+            await Task.Yield();
+            GC.Collect();
+            return value + node.Value;
+        };
+    }
+
+    private static Task<int> Apply(AsyncHandler274 callback, int value)
+    {
+        return callback(value);
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(MakeSync(1)(41) == 42);
+
+        AsyncHandler274 direct = async value =>
+        {
+            await Task.Yield();
+            return value + 1;
+        };
+        Console.WriteLine(direct(41).Result == 42);
+
+        Console.WriteLine(Apply(async value =>
+        {
+            await Task.Yield();
+            return value + 2;
+        }, 40).Result == 42);
+
+        Console.WriteLine(Make(3)(39).Result == 42);
+
+        Holder274 holder = new Holder274();
+        holder.Callback = async value =>
+        {
+            int awaited = await new InlineAwaitable274(value);
+            return awaited + 4;
+        };
+        Console.WriteLine(holder.Callback(38).Result == 42);
+
+        AsyncMap274<int, int> generic = async value =>
+        {
+            await Task.Yield();
+            return value + 5;
+        };
+        Console.WriteLine(generic(37).GetAwaiter().GetResult() == 42);
+
+        AsyncHandler274[] handlers = new AsyncHandler274[1];
+        handlers[0] = async value =>
+        {
+            await Task.Yield();
+            return value + 7;
+        };
+        Console.WriteLine(handlers[0](35).Result == 42);
+
+        TaskCompletionSource firstGate = new TaskCompletionSource();
+        TaskCompletionSource secondGate = new TaskCompletionSource();
+        TaskCompletionSource firstDone = new TaskCompletionSource();
+        TaskPublisher274 publisher = new TaskPublisher274();
+        AsyncHandler274 first = async value =>
+        {
+            _sequence = _sequence * 10 + 1;
+            await firstGate.Task;
+            _sequence = _sequence * 10 + 3;
+            firstDone.SetResult();
+            return value + 10;
+        };
+        publisher.Changed += first;
+        publisher.Changed += async value =>
+        {
+            _sequence = _sequence * 10 + 2;
+            await secondGate.Task;
+            _sequence = _sequence * 10 + 4;
+            return value + 20;
+        };
+
+        Task<int> pending = publisher.Raise(10);
+        Console.WriteLine(_sequence == 12);
+        Console.WriteLine(!pending.IsCompleted);
+        secondGate.SetResult();
+        Console.WriteLine(pending.Result == 30);
+        Console.WriteLine(_sequence == 124);
+        firstGate.SetResult();
+        firstDone.Task.Wait();
+        Console.WriteLine(_sequence == 1243);
+
+        TaskPublisher274 removedPublisher = new TaskPublisher274();
+        removedPublisher.Changed += first;
+        removedPublisher.Changed -= first;
+        removedPublisher.Changed += async value =>
+        {
+            await Task.Yield();
+            return value + 2;
+        };
+        Console.WriteLine(removedPublisher.Raise(40).Result == 42);
+
+        InterfaceTaskPublisher274 concrete = new InterfaceTaskPublisher274();
+        ITaskPublisher274 viaInterface = concrete;
+        viaInterface.Changed += async value =>
+        {
+            await Task.Yield();
+            return value + 3;
+        };
+        Console.WriteLine(concrete.Raise(39).Result == 42);
+
+        DerivedPublisher274 derived = new DerivedPublisher274();
+        VirtualPublisher274 baseView = derived;
+        baseView.Changed += async value =>
+        {
+            await Task.Yield();
+            return value + 4;
+        };
+        Console.WriteLine(derived.RaiseDerived(38).Result == 42);
+
+        StaticPublisher274.Changed += async value =>
+        {
+            await Task.Yield();
+            return value + 5;
+        };
+        Console.WriteLine(StaticPublisher274.Raise(37).Result == 42);
+        StaticPublisher274.Clear();
+
+        ValuePublisher274 valuePublisher = new ValuePublisher274();
+        valuePublisher.Changed += async value =>
+        {
+            await Task.Yield();
+            return value + 6;
+        };
+        ValueTask<int> valuePending = valuePublisher.Raise(36);
+        Console.WriteLine(valuePending.GetAwaiter().GetResult() == 42);
+
+        TaskPublisher274 capturedPublisher = new TaskPublisher274();
+        AsyncHandler274 captured = MakeCaptured(8);
+        capturedPublisher.Changed += captured;
+        captured = null;
+        GC.Collect();
+        Console.WriteLine(capturedPublisher.Raise(34).Result == 42);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

@@ -1,0 +1,1 @@
+public static class Program { static int Pick<T>(T value, int marker = 0) { return 1; } static int Pick<T>(T value, float marker = 0f) { return 2; } public static void Main() { Pick(1); } }

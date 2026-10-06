@@ -1,0 +1,7 @@
+public delegate void RefIntCallback(ref int value);
+public static class Native
+{
+    [Native("unused")]
+    public static unsafe extern void Use(ref RefIntCallback callback);
+}
+public static class Program { public static void Main() { } }

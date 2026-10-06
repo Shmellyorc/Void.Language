@@ -1,0 +1,10 @@
+using Void.Threading;
+
+public static class Program
+{
+    public static void Main()
+    {
+        int value = 1;
+        Interlocked.Exchange<int>(ref value, 2);
+    }
+}

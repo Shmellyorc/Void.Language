@@ -1,0 +1,19 @@
+using Void.Threading.Tasks;
+
+public static class AsyncLibrary209
+{
+    private static async Task<int> Core(Task gate, int value)
+    {
+        await gate;
+        return value + 12;
+    }
+
+    [Export("void209_async_library_value")]
+    public static int Run(int value)
+    {
+        TaskCompletionSource gate = new TaskCompletionSource();
+        Task<int> task = Core(gate.Task, value);
+        gate.SetResult();
+        return task.Result;
+    }
+}

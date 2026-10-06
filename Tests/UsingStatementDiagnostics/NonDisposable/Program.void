@@ -1,0 +1,8 @@
+public sealed class NotDisposable { }
+public static class Program
+{
+    public static void Main()
+    {
+        using (NotDisposable value = new NotDisposable()) { }
+    }
+}

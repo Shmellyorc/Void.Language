@@ -1,0 +1,151 @@
+public interface IMarker
+{
+}
+
+public class BaseNode
+{
+    public int Value;
+
+    public BaseNode(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class DerivedNode : BaseNode, IMarker
+{
+    public DerivedNode(int value) : base(value)
+    {
+    }
+}
+
+public struct MarkerValue : IMarker
+{
+    public int Value;
+
+    public MarkerValue(int value)
+    {
+        Value = value;
+    }
+}
+
+public enum Mode
+{
+    Idle = 1,
+    Run = 2
+}
+
+public static class Program
+{
+    private static long WidenReturn(int value)
+    {
+        return value;
+    }
+
+    private static double WidenParameter(double value)
+    {
+        return value;
+    }
+
+    private static int Pick(int value)
+    {
+        return 1;
+    }
+
+    private static int Pick(long value)
+    {
+        return 2;
+    }
+
+    public static unsafe void Main()
+    {
+        int identitySource = 17;
+        int identity = identitySource;
+        Console.WriteLine(identity == 17);
+
+        sbyte signedByte = (sbyte)-4;
+        short shortValue = signedByte;
+        int intValue = shortValue;
+        long longValue = intValue;
+        float floatValue = longValue;
+        double doubleValue = floatValue;
+        decimal decimalValue = longValue;
+        Console.WriteLine(shortValue == -4);
+        Console.WriteLine(intValue == -4);
+        Console.WriteLine(longValue == -4);
+        Console.WriteLine(floatValue == -4f);
+        Console.WriteLine(doubleValue == -4.0);
+        Console.WriteLine(decimalValue == -4m);
+
+        byte byteValue = (byte)200;
+        ushort ushortValue = byteValue;
+        uint uintValue = ushortValue;
+        ulong ulongValue = uintValue;
+        double unsignedDouble = ulongValue;
+        Console.WriteLine(ushortValue == 200);
+        Console.WriteLine(uintValue == 200u);
+        Console.WriteLine(ulongValue == 200ul);
+        Console.WriteLine(unsignedDouble == 200.0);
+
+        char letter = 'A';
+        int letterValue = letter;
+        Console.WriteLine(letterValue == 65);
+
+        Console.WriteLine(WidenReturn(23) == 23);
+        Console.WriteLine(WidenParameter(24) == 24.0);
+        Console.WriteLine(Pick(identitySource) == 1);
+
+        long? nullableLong = identitySource;
+        double? nullableDouble = identitySource;
+        int? nullableNull = null;
+        Console.WriteLine(nullableLong.HasValue && nullableLong.Value == 17);
+        Console.WriteLine(nullableDouble.HasValue && nullableDouble.Value == 17.0);
+        Console.WriteLine(nullableNull.HasValue == false);
+
+        double fractional = 9.75;
+        int? narrowedNullable = (int?)fractional;
+        long unwrappedWidened = (long)narrowedNullable;
+        Console.WriteLine(narrowedNullable.HasValue && narrowedNullable.Value == 9);
+        Console.WriteLine(unwrappedWidened == 9);
+
+        Mode mode = (Mode)2;
+        int rawMode = (int)mode;
+        Console.WriteLine(mode == Mode.Run);
+        Console.WriteLine(rawMode == 2);
+
+        DerivedNode derived = new DerivedNode(31);
+        BaseNode baseNode = derived;
+        IMarker marker = derived;
+        object boxedReference = derived;
+        Console.WriteLine(baseNode.Value == 31);
+        Console.WriteLine(marker != null);
+        Console.WriteLine(boxedReference != null);
+
+        DerivedNode downcast = (DerivedNode)baseNode;
+        DerivedNode objectDowncast = (DerivedNode)boxedReference;
+        Console.WriteLine(downcast.Value == 31);
+        Console.WriteLine(objectDowncast.Value == 31);
+
+        MarkerValue markerValue = new MarkerValue(41);
+        IMarker boxedValue = markerValue;
+        Console.WriteLine(boxedValue != null);
+
+        DerivedNode missingNode = null;
+        IMarker missingMarker = null;
+        object missingObject = null;
+        string missingText = null;
+        Console.WriteLine(missingNode == null);
+        Console.WriteLine(missingMarker == null);
+        Console.WriteLine(missingObject == null);
+        Console.WriteLine(missingText == null);
+
+        int* intPointer = null;
+        void* voidPointer = null;
+        Console.WriteLine(intPointer == null);
+        Console.WriteLine(voidPointer == null);
+
+        double explicitNumericSource = 44.8;
+        int explicitNumeric = (int)explicitNumericSource;
+        Console.WriteLine(explicitNumeric == 44);
+    }
+}

@@ -1,0 +1,10 @@
+using Void.Collections;
+public static class Program
+{
+    private static async IAsyncEnumerable<int> Bad()
+    {
+        try { throw new Exception("x"); }
+        catch (Exception error) { yield return 1; }
+    }
+    public static void Main() { }
+}

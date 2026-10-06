@@ -1,0 +1,14 @@
+public enum Mode
+{
+    Idle = 0,
+    Run = 1
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        int value = 1;
+        Mode mode = value;
+    }
+}

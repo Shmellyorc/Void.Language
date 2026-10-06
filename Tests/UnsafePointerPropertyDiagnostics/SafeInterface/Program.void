@@ -1,0 +1,2 @@
+public interface Bad { public int* Pointer { get; } }
+public static class Program { public static void Main() { } }

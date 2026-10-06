@@ -1,0 +1,13 @@
+public static class AsyncStreamNative220
+{
+    [Native("void220_async_stream_sum")]
+    public static unsafe extern int Run(int value);
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        Console.WriteLine(AsyncStreamNative220.Run(109) == 220);
+    }
+}

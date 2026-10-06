@@ -1,0 +1,114 @@
+using Void;
+
+public interface IValue
+{
+    int Get();
+}
+
+public class BaseValue
+{
+    public int Value;
+    public BaseValue(int value) { Value = value; }
+}
+
+public sealed class DerivedValue : BaseValue, IValue
+{
+    public DerivedValue(int value) : base(value) { }
+    public int Get() { return Value; }
+}
+
+public sealed class OtherValue : BaseValue
+{
+    public OtherValue(int value) : base(value) { }
+}
+
+public struct Point
+{
+    public int X;
+    public Point(int x) { X = x; }
+}
+
+public static class Program
+{
+    private static BaseValue MakeValue(int value)
+    {
+        return new DerivedValue(value);
+    }
+
+    public static void Main()
+    {
+        BaseValue first = new DerivedValue(7);
+        if (first is DerivedValue derived)
+        {
+            Console.WriteLine(derived.Value == 7);
+            Console.WriteLine(derived.Get() == 7);
+        }
+        else Console.WriteLine(false);
+
+        if (first is IValue contract)
+            Console.WriteLine(contract.Get() == 7);
+        else Console.WriteLine(false);
+
+        IValue interfaceValue = new DerivedValue(8);
+        if (interfaceValue is DerivedValue fromInterface)
+            Console.WriteLine(fromInterface.Value == 8);
+        else Console.WriteLine(false);
+
+        if (first is object boxedReference)
+            Console.WriteLine(boxedReference != null);
+        else Console.WriteLine(false);
+
+        BaseValue second = new OtherValue(3);
+        if (second is DerivedValue missing)
+            Console.WriteLine(false);
+        else
+            Console.WriteLine(true);
+
+        BaseValue none = null;
+        if (none is DerivedValue absent)
+            Console.WriteLine(false);
+        else
+            Console.WriteLine(true);
+
+        DerivedValue exactNull = null;
+        if (exactNull is DerivedValue exactMissing)
+            Console.WriteLine(false);
+        else
+            Console.WriteLine(true);
+
+        int number = 42;
+        if (number is int matched)
+            Console.WriteLine(matched == 42);
+        else
+            Console.WriteLine(false);
+
+        Point point = new Point(6);
+        if (point is Point matchedPoint)
+            Console.WriteLine(matchedPoint.X == 6);
+        else
+            Console.WriteLine(false);
+
+        if (MakeValue(33) is DerivedValue temporary)
+        {
+            GC.Collect();
+            Console.WriteLine(temporary.Value == 33);
+        }
+        else Console.WriteLine(false);
+
+        BaseValue loop = new DerivedValue(9);
+        int count = 0;
+        while (loop is DerivedValue item)
+        {
+            Console.WriteLine(item.Value == 9);
+            count++;
+            loop = new OtherValue(1);
+        }
+        Console.WriteLine(count == 1);
+
+        BaseValue parenthesized = new DerivedValue(11);
+        if ((parenthesized is DerivedValue nested))
+            Console.WriteLine(nested.Value == 11);
+        else
+            Console.WriteLine(false);
+    }
+}

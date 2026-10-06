@@ -1,0 +1,8 @@
+using Void.Threading.Tasks;
+public static class Program
+{
+    public static void Main()
+    {
+        Task.WhenAny<int>();
+    }
+}

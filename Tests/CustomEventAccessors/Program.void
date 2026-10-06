@@ -1,0 +1,343 @@
+using Void;
+
+public sealed class Recorder
+{
+    public int Value;
+
+    public void Handle(int value)
+    {
+        Value = Value * 10 + value;
+    }
+}
+
+public sealed class CustomHub
+{
+    private Action<int> _changed;
+    public int Adds;
+    public int Removes;
+
+    public event Action<int> Changed
+    {
+        add
+        {
+            Adds++;
+            _changed += value;
+        }
+        remove
+        {
+            Removes++;
+            _changed -= value;
+        }
+    }
+
+    public void Raise(int value)
+    {
+        if (_changed != null)
+            _changed(value);
+    }
+}
+
+public static class StaticCustomHub
+{
+    private static Action<int> _changed;
+    public static int Initialized;
+
+    static StaticCustomHub()
+    {
+        Initialized = 1;
+    }
+
+    public static event Action<int> Changed
+    {
+        add => _changed += value;
+        remove => _changed -= value;
+    }
+
+    public static void Raise(int value)
+    {
+        if (_changed != null)
+            _changed(value);
+    }
+}
+
+public interface ICustomHub
+{
+    event Action<int> Changed { add; remove; }
+}
+
+public sealed class InterfaceHub : ICustomHub
+{
+    private Action<int> _changed;
+    public int Adds;
+    public int Removes;
+
+    public event Action<int> Changed
+    {
+        add
+        {
+            Adds++;
+            _changed += value;
+        }
+        remove
+        {
+            Removes++;
+            _changed -= value;
+        }
+    }
+
+    public void Raise(int value)
+    {
+        if (_changed != null)
+            _changed(value);
+    }
+}
+
+public class VirtualHub
+{
+    private Action<int> _changed;
+    public int BaseAdds;
+    public int BaseRemoves;
+
+    public virtual event Action<int> Changed
+    {
+        add
+        {
+            BaseAdds++;
+            _changed += value;
+        }
+        remove
+        {
+            BaseRemoves++;
+            _changed -= value;
+        }
+    }
+
+    public void Subscribe(Action<int> handler)
+    {
+        Changed += handler;
+    }
+
+    public void Unsubscribe(Action<int> handler)
+    {
+        Changed -= handler;
+    }
+
+    public void RaiseBase(int value)
+    {
+        if (_changed != null)
+            _changed(value);
+    }
+}
+
+public class OverrideHub : VirtualHub
+{
+    private Action<int> _changed;
+    public int OverrideAdds;
+    public int OverrideRemoves;
+
+    public override event Action<int> Changed
+    {
+        add
+        {
+            OverrideAdds++;
+            _changed += value;
+        }
+        remove
+        {
+            OverrideRemoves++;
+            _changed -= value;
+        }
+    }
+
+    public void RaiseOverride(int value)
+    {
+        if (_changed != null)
+            _changed(value);
+    }
+
+    public void SubscribeBase(Action<int> handler)
+    {
+        base.Changed += handler;
+    }
+
+    public void UnsubscribeBase(Action<int> handler)
+    {
+        base.Changed -= handler;
+    }
+}
+
+public sealed class SealedOverrideHub : OverrideHub
+{
+    private Action<int> _changed;
+    public int SealedAdds;
+
+    public sealed override event Action<int> Changed
+    {
+        add
+        {
+            SealedAdds++;
+            _changed += value;
+        }
+        remove => _changed -= value;
+    }
+
+    public void RaiseSealed(int value)
+    {
+        if (_changed != null)
+            _changed(value);
+    }
+}
+
+public abstract class AbstractHub
+{
+    public abstract event Action<int> Changed
+    {
+        add;
+        remove;
+    }
+}
+
+public sealed class ConcreteHub : AbstractHub
+{
+    private Action<int> _changed;
+    public int Adds;
+    public int Removes;
+
+    public override event Action<int> Changed
+    {
+        add
+        {
+            Adds++;
+            _changed += value;
+        }
+        remove
+        {
+            Removes++;
+            _changed -= value;
+        }
+    }
+
+    public void Raise(int value)
+    {
+        if (_changed != null)
+            _changed(value);
+    }
+}
+
+public sealed class GcListener
+{
+    public static int Seen;
+    private int _digit;
+
+    public GcListener(int digit)
+    {
+        _digit = digit;
+    }
+
+    public void Handle(int value)
+    {
+        Seen = _digit * 10 + value;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Recorder recorder = new Recorder();
+        CustomHub hub = new CustomHub();
+        hub.Changed += recorder.Handle;
+        Console.WriteLine(hub.Adds == 1);
+        hub.Raise(3);
+        Console.WriteLine(recorder.Value == 3);
+        hub.Changed -= recorder.Handle;
+        Console.WriteLine(hub.Removes == 1);
+        hub.Raise(4);
+        Console.WriteLine(recorder.Value == 3);
+
+        Recorder staticRecorder = new Recorder();
+        StaticCustomHub.Changed += staticRecorder.Handle;
+        Console.WriteLine(StaticCustomHub.Initialized == 1);
+        StaticCustomHub.Raise(5);
+        Console.WriteLine(staticRecorder.Value == 5);
+        StaticCustomHub.Changed -= staticRecorder.Handle;
+        StaticCustomHub.Raise(6);
+        Console.WriteLine(staticRecorder.Value == 5);
+
+        InterfaceHub interfaceHub = new InterfaceHub();
+        ICustomHub contract = interfaceHub;
+        Recorder interfaceRecorder = new Recorder();
+        contract.Changed += interfaceRecorder.Handle;
+        Console.WriteLine(interfaceHub.Adds == 1);
+        interfaceHub.Raise(7);
+        Console.WriteLine(interfaceRecorder.Value == 7);
+        contract.Changed -= interfaceRecorder.Handle;
+        Console.WriteLine(interfaceHub.Removes == 1);
+        interfaceHub.Raise(8);
+        Console.WriteLine(interfaceRecorder.Value == 7);
+
+        OverrideHub derived = new OverrideHub();
+        VirtualHub baseView = derived;
+        Recorder virtualRecorder = new Recorder();
+        baseView.Changed += virtualRecorder.Handle;
+        Console.WriteLine(derived.OverrideAdds == 1);
+        Console.WriteLine(derived.BaseAdds == 0);
+        derived.RaiseOverride(2);
+        Console.WriteLine(virtualRecorder.Value == 2);
+        baseView.Changed -= virtualRecorder.Handle;
+        Console.WriteLine(derived.OverrideRemoves == 1);
+        Console.WriteLine(derived.BaseRemoves == 0);
+
+        Recorder selfRecorder = new Recorder();
+        Action<int> selfHandler = selfRecorder.Handle;
+        derived.Subscribe(selfHandler);
+        Console.WriteLine(derived.OverrideAdds == 2);
+        derived.Unsubscribe(selfHandler);
+        Console.WriteLine(derived.OverrideRemoves == 2);
+
+        Recorder baseRecorder = new Recorder();
+        Action<int> baseHandler = baseRecorder.Handle;
+        derived.SubscribeBase(baseHandler);
+        Console.WriteLine(derived.BaseAdds == 1);
+        Console.WriteLine(derived.OverrideAdds == 2);
+        derived.RaiseBase(6);
+        Console.WriteLine(baseRecorder.Value == 6);
+        derived.UnsubscribeBase(baseHandler);
+        Console.WriteLine(derived.BaseRemoves == 1);
+
+        SealedOverrideHub sealedHub = new SealedOverrideHub();
+        VirtualHub sealedBase = sealedHub;
+        Recorder sealedRecorder = new Recorder();
+        sealedBase.Changed += sealedRecorder.Handle;
+        Console.WriteLine(sealedHub.SealedAdds == 1);
+        sealedHub.RaiseSealed(9);
+        Console.WriteLine(sealedRecorder.Value == 9);
+        sealedBase.Changed -= sealedRecorder.Handle;
+
+        ConcreteHub concrete = new ConcreteHub();
+        AbstractHub abstractView = concrete;
+        Recorder abstractRecorder = new Recorder();
+        abstractView.Changed += abstractRecorder.Handle;
+        Console.WriteLine(concrete.Adds == 1);
+        concrete.Raise(4);
+        Console.WriteLine(abstractRecorder.Value == 4);
+        abstractView.Changed -= abstractRecorder.Handle;
+        Console.WriteLine(concrete.Removes == 1);
+
+        CustomHub gcHub = new CustomHub();
+        GcListener listener = new GcListener(6);
+        gcHub.Changed += listener.Handle;
+        listener = null;
+        GC.Collect();
+        gcHub.Raise(5);
+        Console.WriteLine(GcListener.Seen == 65);
+
+        GcListener removable = new GcListener(8);
+        gcHub.Changed += removable.Handle;
+        gcHub.Changed -= removable.Handle;
+        removable = null;
+        GC.Collect();
+        gcHub.Raise(1);
+        Console.WriteLine(GcListener.Seen == 61);
+    }
+}

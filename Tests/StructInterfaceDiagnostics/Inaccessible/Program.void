@@ -1,0 +1,20 @@
+public interface IValue
+{
+    int Get();
+}
+
+public struct Broken : IValue
+{
+    private int Get()
+    {
+        return 1;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Broken value = new Broken();
+    }
+}

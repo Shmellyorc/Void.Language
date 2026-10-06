@@ -1,0 +1,1 @@
+using Void; using Void.Threading.Tasks; public sealed class R { } public static class Program { private static async Task M(){ await using (R r = new R()) { } } public static void Main(){} }

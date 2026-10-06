@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "NativeStringLifetimeCallbackBoundaryIntegrationDiagnostics",
+  "output": "exe",
+  "version": "0.0.299",
+  "compiler": { "unsafe": true }
+}

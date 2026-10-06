@@ -1,0 +1,2 @@
+public sealed class Box { private int Hidden { get { return 1; } } }
+public static class Program { public static void Main() { Box box = new Box(); if (box is { Hidden: 1 }) { } } }

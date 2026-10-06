@@ -1,0 +1,61 @@
+using Void.Threading.Tasks;
+
+public sealed class async
+{
+    public int Value;
+
+    public async(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class AsyncAwaitSyntaxSemantic201
+{
+    public static async Task Observe(Task source)
+    {
+        await source;
+        return;
+    }
+
+    public static async Task<int> Transform(Task<int> source)
+    {
+        int value = await source;
+        return value + 1;
+    }
+
+    public static async Task<int> Immediate()
+    {
+        return 201;
+    }
+
+    public static async Task<int> ExpressionBody(Task<int> source) => await source;
+
+    public static async MakeContextualType()
+    {
+        return new async(201);
+    }
+
+    public static int await(int value)
+    {
+        return value + 1;
+    }
+
+    public static int ContextualAwaitIdentifier()
+    {
+        int await = 20;
+        return await + AsyncAwaitSyntaxSemantic201.await(1);
+    }
+
+    public static void Main()
+    {
+        Observe(null);
+        Transform(null);
+        Immediate();
+        ExpressionBody(null);
+        async value = MakeContextualType();
+        int contextual = ContextualAwaitIdentifier();
+        if (value.Value + contextual == 0)
+            return;
+    }
+}

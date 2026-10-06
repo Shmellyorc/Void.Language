@@ -1,0 +1,20 @@
+using Void.Collections;
+
+public sealed class Gate
+{
+}
+
+public static class Program
+{
+    public static IEnumerable<int> Values(Gate gate)
+    {
+        lock (gate)
+        {
+            yield return 1;
+        }
+    }
+
+    public static void Main()
+    {
+    }
+}

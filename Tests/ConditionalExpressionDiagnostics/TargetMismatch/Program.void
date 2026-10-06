@@ -1,0 +1,11 @@
+public sealed class Node
+{
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Node value = true ? new Node() : 5;
+    }
+}

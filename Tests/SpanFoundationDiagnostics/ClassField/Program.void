@@ -1,0 +1,3 @@
+using Void;
+public sealed class Holder { public Span<int> Value; }
+public static class Program { public static void Main() {} }

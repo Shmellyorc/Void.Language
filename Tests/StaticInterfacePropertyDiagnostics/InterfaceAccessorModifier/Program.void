@@ -1,0 +1,2 @@
+public interface IValue { static int Value { public get; } }
+public static class Program { public static void Main() { } }

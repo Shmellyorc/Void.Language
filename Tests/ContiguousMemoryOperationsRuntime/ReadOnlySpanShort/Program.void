@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { int[] a = new int[] {1,2}; int[] b = new int[] {0}; ReadOnlySpan<int> s = a; Span<int> d = b; s.CopyTo(d); } }

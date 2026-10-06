@@ -1,0 +1,1 @@
+using Void.Collections; public ref struct R { public int X; } public static class Program { public static IEnumerator<int> Run(R value) { yield return 1; } public static void Main() { R value = new R(); foreach (int x in Run(value)) { } } }

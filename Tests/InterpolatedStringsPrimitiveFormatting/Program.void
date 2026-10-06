@@ -1,0 +1,142 @@
+using Void;
+using Void.Text;
+using Void.Buffers;
+using Void.Buffers.Text;
+
+public static class Program
+{
+    private static int _sequence;
+
+    private static int Mark(int value)
+    {
+        _sequence = (_sequence * 10) + value;
+        return value;
+    }
+
+    private static int CollectValue(int value)
+    {
+        GC.Collect();
+        return value;
+    }
+
+    public static void Main()
+    {
+        string name = "é😀";
+        int count = 42;
+        bool ready = true;
+        string value = $"A {{ {name} }} count={count} ready={ready} nul=\0";
+        Console.WriteLine(value.Equals("A { é😀 } count=42 ready=True nul=\0"));
+        Console.WriteLine(value.Length == 34);
+        Console.WriteLine(value.ByteLength == 38);
+
+        Console.WriteLine($"".Equals(""));
+        Console.WriteLine($"plain UTF-8 é😀".Equals("plain UTF-8 é😀"));
+        Console.WriteLine($"{{left}} {{right}}".Equals("{left} {right}"));
+        Console.WriteLine($"char={(char)128512}".Equals("char=😀"));
+        string missing = null;
+        Console.WriteLine($"null=<{missing}>".Equals("null=<>"));
+
+        Console.WriteLine($"bool={false}".Equals("bool=False"));
+        Console.WriteLine($"byte={(byte)255}".Equals("byte=255"));
+        Console.WriteLine($"sbyte={(sbyte)-12}".Equals("sbyte=-12"));
+        Console.WriteLine($"short={(short)-1234}".Equals("short=-1234"));
+        Console.WriteLine($"ushort={(ushort)65000}".Equals("ushort=65000"));
+        Console.WriteLine($"int={-123456}".Equals("int=-123456"));
+        Console.WriteLine($"uint={(uint)4000000000}".Equals("uint=4000000000"));
+        Console.WriteLine($"long={(long)-9000000000}".Equals("long=-9000000000"));
+        Console.WriteLine($"ulong={(ulong)18000000000}".Equals("ulong=18000000000"));
+        Console.WriteLine($"float={(float)1.25}".Equals("float=1.25"));
+        Console.WriteLine($"double={2.5}".Equals("double=2.5"));
+        Console.WriteLine($"decimal={(decimal)3.75}".Equals("decimal=3.75"));
+
+        StringBuilder builder = new StringBuilder();
+        builder.Append(false).Append('|')
+            .Append((byte)255).Append('|')
+            .Append((sbyte)-12).Append('|')
+            .Append((short)-1234).Append('|')
+            .Append((ushort)65000).Append('|')
+            .Append(-123456).Append('|')
+            .Append((uint)4000000000).Append('|')
+            .Append((long)-9000000000).Append('|')
+            .Append((ulong)18000000000).Append('|')
+            .Append((float)1.25).Append('|')
+            .Append(2.5).Append('|')
+            .Append((decimal)3.75);
+        string primitive = builder.ToString();
+        Console.WriteLine(primitive.Equals("False|255|-12|-1234|65000|-123456|4000000000|-9000000000|18000000000|1.25|2.5|3.75"));
+        Console.WriteLine(builder.Length == primitive.Length);
+        Console.WriteLine(builder.ByteLength == primitive.ByteLength);
+
+        string nested = $"outer={$"inner={count}"}";
+        Console.WriteLine(nested.Equals("outer=inner=42"));
+        string expression = $"math={count + 8}";
+        Console.WriteLine(expression.Equals("math=50"));
+
+        _sequence = 0;
+        string ordered = $"{Mark(1)}-{Mark(2)}-{Mark(3)}";
+        Console.WriteLine(ordered.Equals("1-2-3"));
+        Console.WriteLine(_sequence == 123);
+
+        string rooted = $"start-{CollectValue(7)}-end";
+        Console.WriteLine(rooted.Equals("start-7-end"));
+        GC.Collect();
+        Console.WriteLine(rooted.Equals("start-7-end"));
+
+        string concatA = "score=" + count;
+        string concatB = false + ":ready";
+        string concatC = "u=" + (uint)4000000000;
+        string concatD = "f=" + (float)1.25;
+        string concatE = "d=" + 2.5;
+        string concatF = "m=" + (decimal)3.75;
+        Console.WriteLine(concatA.Equals("score=42"));
+        Console.WriteLine(concatB.Equals("False:ready") &&
+            string.Concat((long)-7, "x").Equals("-7x") &&
+            string.Concat((float)1.5, "x").Equals("1.5x") &&
+            string.Concat(2.5, "x").Equals("2.5x") &&
+            string.Concat((decimal)3.75, "x").Equals("3.75x"));
+        Console.WriteLine(concatC.Equals("u=4000000000"));
+        Console.WriteLine(concatD.Equals("f=1.25"));
+        Console.WriteLine(concatE.Equals("d=2.5"));
+        Console.WriteLine(concatF.Equals("m=3.75"));
+
+        string compound = "value=";
+        compound += -12;
+        Console.WriteLine(compound.Equals("value=-12"));
+
+        Console.WriteLine(string.Concat("n=", (long)-9000000000).Equals("n=-9000000000"));
+        Console.WriteLine(string.Concat((ulong)18000000000, "!").Equals("18000000000!"));
+        Console.WriteLine(string.Concat("b=", true).Equals("b=True"));
+
+        byte[] utf8 = new byte[32];
+        Span<byte> utf8Destination = new Span<byte>(utf8);
+        int bytesWritten;
+        Console.WriteLine(Utf8Formatter.TryFormat(true, utf8Destination, out bytesWritten) && bytesWritten == 4 && utf8[0] == (byte)84 && utf8[3] == (byte)101);
+        Console.WriteLine(Utf8Formatter.TryFormat((byte)255, utf8Destination, out bytesWritten) && bytesWritten == 3 && utf8[0] == (byte)50 && utf8[2] == (byte)53);
+        Console.WriteLine(Utf8Formatter.TryFormat((sbyte)-12, utf8Destination, out bytesWritten) && bytesWritten == 3 && utf8[0] == (byte)45 && utf8[2] == (byte)50);
+        Console.WriteLine(Utf8Formatter.TryFormat((short)-1234, utf8Destination, out bytesWritten) && bytesWritten == 5 && utf8[0] == (byte)45 && utf8[4] == (byte)52);
+        Console.WriteLine(Utf8Formatter.TryFormat((ushort)65000, utf8Destination, out bytesWritten) && bytesWritten == 5 && utf8[0] == (byte)54 && utf8[4] == (byte)48);
+        Console.WriteLine(Utf8Formatter.TryFormat(-123456, utf8Destination, out bytesWritten) && bytesWritten == 7 && utf8[0] == (byte)45 && utf8[6] == (byte)54);
+        Console.WriteLine(Utf8Formatter.TryFormat((uint)4000000000, utf8Destination, out bytesWritten) && bytesWritten == 10 && utf8[0] == (byte)52 && utf8[9] == (byte)48);
+        Console.WriteLine(Utf8Formatter.TryFormat((long)-9000000000, utf8Destination, out bytesWritten) && bytesWritten == 11 && utf8[0] == (byte)45 && utf8[10] == (byte)48);
+        Console.WriteLine(Utf8Formatter.TryFormat((ulong)18000000000, utf8Destination, out bytesWritten) && bytesWritten == 11 && utf8[0] == (byte)49 && utf8[10] == (byte)48);
+        Console.WriteLine(Utf8Formatter.TryFormat((float)1.25, utf8Destination, out bytesWritten) && bytesWritten == 4 && utf8[0] == (byte)49 && utf8[3] == (byte)53);
+        Console.WriteLine(Utf8Formatter.TryFormat(2.5, utf8Destination, out bytesWritten) && bytesWritten == 3 && utf8[0] == (byte)50 && utf8[2] == (byte)53);
+        Console.WriteLine(Utf8Formatter.TryFormat((decimal)3.75, utf8Destination, out bytesWritten) && bytesWritten == 4 && utf8[0] == (byte)51 && utf8[3] == (byte)53);
+        byte[] tinyUtf8 = new byte[2];
+        int tinyWritten = -1;
+        Console.WriteLine(!Utf8Formatter.TryFormat(12345, new Span<byte>(tinyUtf8), out tinyWritten) && tinyWritten == 0);
+        byte[] emptyUtf8 = new byte[0];
+        int emptyWritten = -1;
+        Console.WriteLine(!Utf8Formatter.TryFormat(true, new Span<byte>(emptyUtf8), out emptyWritten) && emptyWritten == 0);
+        StandardFormat defaultFormat = default(StandardFormat);
+        Console.WriteLine(defaultFormat.IsDefault && !defaultFormat.HasPrecision && defaultFormat.Symbol == '\0' && defaultFormat.Precision == StandardFormat.NoPrecision);
+        StandardFormat generalFormat = new StandardFormat('G', StandardFormat.NoPrecision);
+        Console.WriteLine(!generalFormat.IsDefault && !generalFormat.HasPrecision && generalFormat.Symbol == 'G' && generalFormat.Precision == StandardFormat.NoPrecision);
+        StandardFormat preciseFormat = new StandardFormat('D', (byte)3);
+        Console.WriteLine(preciseFormat.HasPrecision && preciseFormat.Symbol == 'D' && preciseFormat.Precision == (byte)3);
+
+        string snapshot = $"snapshot={count}";
+        count = 99;
+        Console.WriteLine(snapshot.Equals("snapshot=42"));
+    }
+}

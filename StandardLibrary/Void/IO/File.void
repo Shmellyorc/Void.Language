@@ -1,0 +1,86 @@
+using Void;
+using Void.Text;
+
+namespace Void.IO;
+
+public static class File
+{
+    public static bool Exists(string path)
+    {
+        if (path == null || path.Length == 0 || path.IndexOf((char)0) >= 0) return false;
+        return Runtime.NativePathKind(path) == 1;
+    }
+    public static void Delete(string path)
+    {
+        IOErrors.CheckPath(path);
+        int status = Runtime.NativePathDelete(path, false);
+        if (status == 1)
+        {
+            string parent = Path.GetDirectoryName(path);
+            if (parent == null || parent.Length == 0 || Directory.Exists(parent)) return;
+        }
+        IOErrors.Throw(status, path, false);
+    }
+    public static FileStream Create(string path) { return new FileStream(path, FileMode.Create); }
+    public static FileStream Open(string path, FileMode mode) { return new FileStream(path, mode); }
+    public static FileStream Open(string path, FileMode mode, FileAccess access) { return new FileStream(path, mode, access); }
+    public static FileStream OpenRead(string path) { return new FileStream(path, FileMode.Open, FileAccess.Read); }
+    public static FileStream OpenWrite(string path) { return new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write); }
+    public static byte[] ReadAllBytes(string path)
+    {
+        using (FileStream stream = OpenRead(path))
+        {
+            using (MemoryStream result = new MemoryStream())
+            {
+                byte[] buffer = new byte[4096];
+                int count = stream.Read(buffer, 0, buffer.Length);
+                while (count > 0) { result.Write(buffer, 0, count); count = stream.Read(buffer, 0, buffer.Length); }
+                return result.ToArray();
+            }
+        }
+    }
+    public static void WriteAllBytes(string path, byte[] bytes)
+    {
+        if (bytes == null) throw new ArgumentNullException("bytes");
+        using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write)) stream.Write(bytes, 0, bytes.Length);
+    }
+    public static string ReadAllText(string path) { return ReadAllText(path, Encoding.UTF8); }
+    public static string ReadAllText(string path, Encoding encoding)
+    {
+        if (encoding == null) throw new ArgumentNullException("encoding");
+        using (FileStream stream = OpenRead(path))
+        {
+            using (StreamReader reader = new StreamReader(stream, encoding, true, 4096, true)) return reader.ReadToEnd();
+        }
+    }
+    public static void WriteAllText(string path, string contents) { WriteAllText(path, contents, new UTF8Encoding(false)); }
+    public static void WriteAllText(string path, string contents, Encoding encoding)
+    {
+        if (encoding == null) throw new ArgumentNullException("encoding");
+        using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write))
+        {
+            using (StreamWriter writer = new StreamWriter(stream, encoding, 4096, true)) writer.Write(contents);
+        }
+    }
+    public static void AppendAllText(string path, string contents)
+    {
+        using (FileStream stream = new FileStream(path, FileMode.Append, FileAccess.Write))
+        {
+            using (StreamWriter writer = new StreamWriter(stream, new UTF8Encoding(false), 4096, true)) writer.Write(contents);
+        }
+    }
+    public static void Copy(string sourceFileName, string destFileName) { Copy(sourceFileName, destFileName, false); }
+    public static void Copy(string sourceFileName, string destFileName, bool overwrite)
+    {
+        IOErrors.CheckPath(sourceFileName); IOErrors.CheckPath(destFileName);
+        using (FileStream source = OpenRead(sourceFileName))
+        {
+            using (FileStream destination = new FileStream(destFileName, overwrite ? FileMode.Create : FileMode.CreateNew, FileAccess.Write))
+            {
+                byte[] buffer = new byte[4096];
+                int count = source.Read(buffer, 0, buffer.Length);
+                while (count > 0) { destination.Write(buffer, 0, count); count = source.Read(buffer, 0, buffer.Length); }
+            }
+        }
+    }
+}

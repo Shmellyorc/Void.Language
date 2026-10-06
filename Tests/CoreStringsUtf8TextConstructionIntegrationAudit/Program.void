@@ -1,0 +1,78 @@
+using Void;
+using Void.Text;
+
+public static class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine(Environment.NewLine != null && Environment.NewLine.Length >= 1);
+
+        StringBuilder empty = new StringBuilder();
+        Console.WriteLine(empty.Length == 0);
+        Console.WriteLine(empty.Capacity == 16);
+        Console.WriteLine(empty.MaxCapacity == 2147483647);
+        Console.WriteLine(empty.ToString().Equals(""));
+
+        StringBuilder reserved = new StringBuilder(2);
+        Console.WriteLine(reserved.Capacity == 2 && reserved.Length == 0);
+        reserved.Append("é😀");
+        Console.WriteLine(reserved.Length == 2 && reserved.Capacity == 2);
+        reserved.Append('X');
+        Console.WriteLine(reserved.Length == 3 && reserved.Capacity >= 3);
+        Console.WriteLine(reserved.ToString().Equals("é😀X"));
+
+        reserved.Capacity = 20;
+        Console.WriteLine(reserved.Capacity == 20);
+        reserved.Length = 5;
+        string padded = reserved.ToString();
+        Console.WriteLine(padded.Length == 5 && padded[3] == (char)0 && padded[4] == (char)0);
+        reserved.Length = 2;
+        Console.WriteLine(reserved.ToString().Equals("é😀"));
+        Console.WriteLine(reserved.Capacity == 20);
+
+        StringBuilder limited = new StringBuilder(2, 5);
+        Console.WriteLine(limited.Capacity == 2 && limited.MaxCapacity == 5);
+        limited.Append("abcde");
+        Console.WriteLine(limited.Length == 5 && limited.Capacity == 5);
+
+        StringBuilder fromValue = new StringBuilder("é😀");
+        Console.WriteLine(fromValue.ToString().Equals("é😀") && fromValue.Capacity >= 2);
+        StringBuilder fromValueCapacity = new StringBuilder("abc", 1);
+        Console.WriteLine(fromValueCapacity.ToString().Equals("abc") && fromValueCapacity.Capacity >= 3);
+
+        StringBuilder lines = new StringBuilder();
+        lines.AppendLine("first").AppendLine().Append("last");
+        string expectedLines = "first" + Environment.NewLine + Environment.NewLine + "last";
+        Console.WriteLine(lines.ToString().Equals(expectedLines));
+
+        Encoding utf8 = Encoding.UTF8;
+        Console.WriteLine(utf8 != null);
+        Console.WriteLine(Encoding.UTF8 == utf8);
+        string text = "Aé😀\0Z";
+        Console.WriteLine(utf8.GetByteCount(text) == 9);
+        byte[] bytes = utf8.GetBytes(text);
+        Console.WriteLine(bytes.Length == 9);
+        Console.WriteLine(bytes[0] == (byte)65 && bytes[1] == (byte)195 && bytes[2] == (byte)169);
+        Console.WriteLine(bytes[3] == (byte)240 && bytes[6] == (byte)128 && bytes[7] == (byte)0 && bytes[8] == (byte)90);
+        Console.WriteLine(utf8.GetString(bytes).Equals(text));
+
+        byte[] destination = new byte[10];
+        int written = utf8.GetBytes("xé😀y", 1, 2, destination, 2);
+        Console.WriteLine(written == 6);
+        Console.WriteLine(destination[2] == (byte)195 && destination[3] == (byte)169);
+        Console.WriteLine(destination[4] == (byte)240 && destination[7] == (byte)128);
+        Console.WriteLine(utf8.GetString(destination, 2, written).Equals("é😀"));
+
+        byte[] noBytes = utf8.GetBytes("");
+        Console.WriteLine(noBytes.Length == 0);
+        Console.WriteLine(utf8.GetString(noBytes).Equals(""));
+
+        string composed = $"{fromValue.ToString()}:{utf8.GetString(bytes)}";
+        Console.WriteLine(composed.Equals("é😀:Aé😀\0Z"));
+        Console.WriteLine(composed.IndexOf((char)0) == 6);
+
+        GC.Collect();
+        Console.WriteLine(lines.ToString().Equals(expectedLines));
+        Console.WriteLine(Encoding.UTF8.GetString(Encoding.UTF8.GetBytes("stable😀")).Equals("stable😀"));
+    }
+}

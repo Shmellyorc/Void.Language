@@ -1,0 +1,3 @@
+using Void;
+public static class Hub { public static event Action<int> Changed = null; }
+public static class Program { public static void Main() { } }

@@ -1,0 +1,15 @@
+public sealed class ThisAccess
+{
+    private int _value = 7;
+
+    public ThisAccess() : this(this._value) { }
+    public ThisAccess(int value) { }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        ThisAccess value = new ThisAccess();
+    }
+}

@@ -1,0 +1,6 @@
+public delegate int Bad299(string text);
+public static class Native299Diag
+{
+    public static unsafe extern int Use(Bad299 callback);
+}
+public static class Program { public static void Main() { } }

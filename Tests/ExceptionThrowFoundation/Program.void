@@ -1,0 +1,58 @@
+public class GameException : Exception
+{
+    public int Code;
+
+    public GameException(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class DerivedGameException : GameException
+{
+    public DerivedGameException(string message, int code) : base(message, code)
+    {
+    }
+}
+
+public static class Program
+{
+    public static Exception Keep(Exception value)
+    {
+        return value;
+    }
+
+    public static void Main()
+    {
+        Exception empty = new Exception();
+        Console.WriteLine(Runtime.Equals(empty.Message, "Exception"));
+
+        Exception basic = new Exception("base-message");
+        Console.WriteLine(Runtime.Equals(basic.Message, "base-message"));
+
+        GameException game = new GameException("game-message", 17);
+        Console.WriteLine(Runtime.Equals(game.Message, "game-message"));
+        Console.WriteLine(game.Code == 17);
+
+        Exception asBase = game;
+        Console.WriteLine(asBase == game);
+        Console.WriteLine(asBase is GameException);
+        Console.WriteLine(asBase is Exception);
+
+        GameException recast = asBase as GameException;
+        Console.WriteLine(recast == game);
+        Console.WriteLine(recast.Code == 17);
+
+        DerivedGameException derived = new DerivedGameException("derived-message", 29);
+        Exception derivedBase = derived;
+        Console.WriteLine(derivedBase is DerivedGameException);
+        Console.WriteLine(derivedBase is GameException);
+        Console.WriteLine(Runtime.Equals(derived.Message, "derived-message"));
+        Console.WriteLine(derived.Code == 29);
+
+        Exception kept = Keep(derived);
+        GC.Collect();
+        Console.WriteLine(kept == derived);
+        Console.WriteLine(Runtime.Equals(kept.Message, "derived-message"));
+    }
+}

@@ -1,0 +1,28 @@
+using Void.Collections;
+
+public interface IAdd<T>
+{
+    static T operator +(T left, T right);
+}
+
+public struct Number : IAdd<Number>
+{
+    public int Value;
+    public Number(int value) { Value = value; }
+    public static Number operator +(Number left, Number right) { return new Number(left.Value + right.Value); }
+    public static Number operator -(Number value) { return new Number(-value.Value); }
+}
+
+public static class Program
+{
+    private static IEnumerator<T> Values<T>(T value) where T : IAdd<T>
+    {
+        yield return value;
+        yield return -value;
+    }
+
+    public static void Main()
+    {
+        Values(new Number(1));
+    }
+}

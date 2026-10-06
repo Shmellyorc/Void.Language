@@ -1,0 +1,143 @@
+[Discoverable(Name = "Player", Metadata = "Runtime")]
+public class Player
+{
+}
+
+public struct Point
+{
+    public int X;
+    public int Y;
+}
+
+public interface IEntity
+{
+}
+
+public delegate void Callback();
+
+public enum Mode : byte
+{
+    None = 0,
+    Run = 1
+}
+
+namespace Game.World
+{
+    [Discoverable(Name = "Zone", Metadata = "World")]
+    public class Zone
+    {
+    }
+}
+
+public class Program
+{
+    public static Type TypeOf<T>()
+    {
+        return typeof(T);
+    }
+
+    public static bool Same(Type left, Type right)
+    {
+        return left == right;
+    }
+
+    public static unsafe Type IntPointerType()
+    {
+        return typeof(int*);
+    }
+
+    public static unsafe void Main()
+    {
+        Type integer = typeof(int);
+        Console.WriteLine(Runtime.Equals(integer.Name, "int"));
+        Console.WriteLine(Runtime.Equals(integer.FullName, "int"));
+        Console.WriteLine(integer.IsPrimitive);
+        Console.WriteLine(integer.IsValueType);
+        Console.WriteLine(!integer.IsReferenceType);
+
+        Type text = typeof(string);
+        Console.WriteLine(Runtime.Equals(text.Name, "string"));
+        Console.WriteLine(text.IsReferenceType);
+        Console.WriteLine(!text.IsPrimitive);
+
+        Type player = typeof(Player);
+        Console.WriteLine(player.IsClass);
+        Console.WriteLine(player.IsReferenceType);
+        Console.WriteLine(Runtime.Equals(player.Name, "Player"));
+        Console.WriteLine(Runtime.Equals(player.FullName, "Player"));
+
+        Type point = typeof(Point);
+        Console.WriteLine(point.IsStruct);
+        Console.WriteLine(point.IsValueType);
+        Console.WriteLine(!point.IsReferenceType);
+
+        Type entity = typeof(IEntity);
+        Console.WriteLine(entity.IsInterface);
+        Console.WriteLine(entity.IsReferenceType);
+
+        Type callback = typeof(Callback);
+        Console.WriteLine(callback.IsDelegate);
+        Console.WriteLine(callback.IsReferenceType);
+        Console.WriteLine(!callback.IsClass);
+
+        Type mode = typeof(Mode);
+        Console.WriteLine(mode.IsEnum);
+        Console.WriteLine(mode.IsValueType);
+        Console.WriteLine(mode.UnderlyingType == typeof(byte));
+        Console.WriteLine(Runtime.Equals(mode.UnderlyingType.Name, "byte"));
+        Console.WriteLine(mode.ElementType == null);
+
+        Type numbers = typeof(int[]);
+        Console.WriteLine(numbers.IsArray);
+        Console.WriteLine(numbers.IsReferenceType);
+        Console.WriteLine(numbers.ElementType == typeof(int));
+        Console.WriteLine(Runtime.Equals(numbers.FullName, "int[]"));
+        Console.WriteLine(numbers.UnderlyingType == null);
+
+        Type players = typeof(Player[]);
+        Console.WriteLine(players.ElementType == player);
+        Console.WriteLine(Runtime.Equals(players.Name, "Player[]"));
+
+        Type pointer = IntPointerType();
+        Console.WriteLine(pointer.IsPointer);
+        Console.WriteLine(!pointer.IsReferenceType);
+        Console.WriteLine(pointer.ElementType == integer);
+        Console.WriteLine(Runtime.Equals(pointer.FullName, "int*"));
+
+        Type zone = typeof(Zone);
+        Console.WriteLine(Runtime.Equals(zone.Name, "Zone"));
+        Console.WriteLine(Runtime.Equals(zone.FullName, "Game.World.Zone"));
+
+        Console.WriteLine(Same(typeof(Player), player));
+        Console.WriteLine(TypeOf<Player>() == player);
+        Console.WriteLine(TypeOf<int>() == integer);
+        Console.WriteLine(typeof(Player) != typeof(Point));
+
+        Console.WriteLine(Runtime.FindType("Player") == player);
+        Console.WriteLine(Runtime.FindType("Game.World.Zone") == zone);
+        Console.WriteLine(Runtime.FindType("Missing.Type") == null);
+        Console.WriteLine(Runtime.FindType("int[]") == numbers);
+        Type missing = Runtime.FindType("Missing.Type");
+        Console.WriteLine(missing?.Name == null);
+
+        Console.WriteLine(Runtime.HasAttribute(player, "Discoverable"));
+        Console.WriteLine(Runtime.Equals(Runtime.AttributeValue(player, "Discoverable", "Name"), "Player"));
+        Console.WriteLine(Runtime.HasAttribute(zone, "Discoverable"));
+        Console.WriteLine(Runtime.Equals(Runtime.AttributeValue(zone, "Discoverable", "Metadata"), "World"));
+        Console.WriteLine(Runtime.HasAttribute("Player", "Discoverable"));
+        Console.WriteLine(Runtime.Equals(Runtime.AttributeValue("Player", "Discoverable", "Metadata"), "Runtime"));
+        Type discovered = Runtime.FindType(Runtime.AttributeType("Discoverable", 0));
+        Console.WriteLine(discovered != null);
+
+        Type typeType = typeof(Type);
+        Console.WriteLine(Runtime.Equals(typeType.Name, "Type"));
+        Console.WriteLine(typeType.IsReferenceType);
+        Console.WriteLine(default(Type) == null);
+
+        Type voidType = typeof(void);
+        Console.WriteLine(Runtime.Equals(voidType.Name, "void"));
+        Console.WriteLine(!voidType.IsPrimitive);
+        Console.WriteLine(!voidType.IsReferenceType);
+        Console.WriteLine(!voidType.IsValueType);
+    }
+}

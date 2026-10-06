@@ -1,0 +1,8 @@
+public static class Program
+{
+    public static void Main()
+    {
+        int rows = 2;
+        int[,] values = new int[rows, 2] { { 1, 2 }, { 3, 4 } };
+    }
+}

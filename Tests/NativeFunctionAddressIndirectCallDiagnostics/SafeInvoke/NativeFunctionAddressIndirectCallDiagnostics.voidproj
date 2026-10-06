@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "NativeFunctionAddressIndirectCallDiagnosticsSafeInvoke",
+  "output": "exe",
+  "version": "0.0.256",
+  "compiler": { "unsafe": true }
+}

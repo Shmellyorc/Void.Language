@@ -1,0 +1,128 @@
+using Void;
+
+public struct Meters
+{
+    public int Value;
+    public Meters(int value) { Value = value; }
+    public static implicit operator Meters(int value) { return new Meters(value); }
+}
+
+public sealed class Box
+{
+    public int Value;
+    public Box(int value) { Value = value; }
+}
+
+public static class Program
+{
+    private static int _step;
+
+    private static int Next()
+    {
+        _step++;
+        return _step;
+    }
+
+    private static Box CollectAndMake(int value)
+    {
+        GC.Collect();
+        return new Box(value);
+    }
+
+    public static void Main()
+    {
+        var a = new[,] { { 1, 2, 3 }, { 4, 5, 6 } };
+        Console.WriteLine(a.Rank == 2);
+        Console.WriteLine(a.Length == 6);
+        Console.WriteLine(a.GetLength(0) == 2);
+        Console.WriteLine(a.GetLength(1) == 3);
+        Console.WriteLine(a[0, 0] == 1);
+        Console.WriteLine(a[0, 2] == 3);
+        Console.WriteLine(a[1, 0] == 4);
+        Console.WriteLine(a[1, 2] == 6);
+
+        var b = new[,,] { { { 7, 8 } }, { { 9, 10 } } };
+        Console.WriteLine(b.Rank == 3);
+        Console.WriteLine(b.Length == 4);
+        Console.WriteLine(b.GetLength(0) == 2);
+        Console.WriteLine(b.GetLength(1) == 1);
+        Console.WriteLine(b.GetLength(2) == 2);
+        Console.WriteLine(b[0, 0, 1] == 8);
+        Console.WriteLine(b[1, 0, 0] == 9);
+        Console.WriteLine(b[1, 0, 1] == 10);
+
+        var c = new[,,,] { { { { 11, 12 }, { 13, 14 } } } };
+        Console.WriteLine(c.Rank == 4);
+        Console.WriteLine(c.Length == 4);
+        Console.WriteLine(c.GetLength(0) == 1);
+        Console.WriteLine(c.GetLength(1) == 1);
+        Console.WriteLine(c.GetLength(2) == 2);
+        Console.WriteLine(c.GetLength(3) == 2);
+        Console.WriteLine(c[0, 0, 1, 1] == 14);
+
+        var flags = new[,] { { true, false }, { false, true } };
+        Console.WriteLine(flags.Rank == 2);
+        Console.WriteLine(flags.Length == 4);
+        Console.WriteLine(flags[0, 0] && flags[1, 1] && !flags[0, 1]);
+
+        var scalar = new[] { 21, 22, 23 };
+        Console.WriteLine(scalar.Rank == 1);
+        Console.WriteLine(scalar.Length == 3 && scalar[1] == 22);
+
+        var jagged = new[] { new[] { 31 }, new[] { 32, 33 } };
+        Console.WriteLine(jagged.Rank == 1);
+        Console.WriteLine(jagged.Length == 2);
+        Console.WriteLine(jagged[0].Length == 1 && jagged[1].Length == 2);
+        Console.WriteLine(jagged[1][1] == 33);
+
+        int[,] target = new[,] { { 41, 42 }, { 43, 44 } };
+        Console.WriteLine(target.Rank == 2);
+        Console.WriteLine(target.Length == 4);
+        Console.WriteLine(target.GetLength(0) == 2 && target.GetLength(1) == 2);
+        Console.WriteLine(target[1, 0] == 43);
+
+        int[,] empty = new[,] { };
+        Console.WriteLine(empty.Rank == 2);
+        Console.WriteLine(empty.Length == 0);
+        Console.WriteLine(empty.GetLength(0) == 0 && empty.GetLength(1) == 0);
+
+        int[,] zeroColumns = new[,] { { }, { } };
+        Console.WriteLine(zeroColumns.Length == 0);
+        Console.WriteLine(zeroColumns.GetLength(0) == 2);
+        Console.WriteLine(zeroColumns.GetLength(1) == 0);
+
+        int?[,] nullable = new[,] { { 51, null }, { null, 54 } };
+        Console.WriteLine(nullable.Rank == 2);
+        Console.WriteLine(nullable[0, 0].HasValue && nullable[0, 0].Value == 51);
+        Console.WriteLine(!nullable[0, 1].HasValue && !nullable[1, 0].HasValue);
+        Console.WriteLine(nullable[1, 1].HasValue && nullable[1, 1].Value == 54);
+
+        Meters[,] converted = new[,] { { 61, 62 } };
+        Console.WriteLine(converted.Rank == 2);
+        Console.WriteLine(converted[0, 0].Value == 61);
+        Console.WriteLine(converted[0, 1].Value == 62);
+
+        var inferredStruct = new[,] { { new Meters(65), new Meters(66) } };
+        Console.WriteLine(inferredStruct.Rank == 2);
+        Console.WriteLine(inferredStruct[0, 0].Value == 65);
+        Console.WriteLine(inferredStruct[0, 1].Value == 66);
+
+        var boxes = new[,] {
+            { new Box(71), CollectAndMake(72) },
+            { new Box(73), new Box(74) }
+        };
+        GC.Collect();
+        Console.WriteLine(boxes.Rank == 2);
+        Console.WriteLine(boxes[0, 0].Value == 71);
+        Console.WriteLine(boxes[0, 1].Value == 72);
+        Console.WriteLine(boxes[1, 0].Value == 73 && boxes[1, 1].Value == 74);
+
+        _step = 0;
+        var order = new[,] { { Next(), Next() }, { Next(), Next() } };
+        Console.WriteLine(_step == 4);
+        Console.WriteLine(order[0, 0] == 1);
+        Console.WriteLine(order[0, 1] == 2);
+        Console.WriteLine(order[1, 0] == 3);
+        Console.WriteLine(order[1, 1] == 4);
+    }
+}

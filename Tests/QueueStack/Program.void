@@ -1,0 +1,86 @@
+using Void.Collections;
+
+public sealed class Item
+{
+    public int Value;
+
+    public Item(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Queue<int> queue = new();
+        queue.Enqueue(10);
+        queue.Enqueue(20);
+        queue.Enqueue(30);
+
+        Console.WriteLine(queue.Count);
+        Console.WriteLine(queue.Peek());
+        Console.WriteLine(queue.Dequeue());
+        Console.WriteLine(queue.Count);
+
+        int queueTotal = 0;
+        foreach (int value in queue)
+            queueTotal += value;
+        Console.WriteLine(queueTotal);
+
+        queue.Clear();
+        Console.WriteLine(queue.Count);
+
+        Stack<int> stack = new();
+        stack.Push(10);
+        stack.Push(20);
+        stack.Push(30);
+
+        Console.WriteLine(stack.Count);
+        Console.WriteLine(stack.Peek());
+        Console.WriteLine(stack.Pop());
+        Console.WriteLine(stack.Count);
+
+        int stackOrder = 0;
+        foreach (int value in stack)
+            stackOrder = stackOrder * 10 + value / 10;
+        Console.WriteLine(stackOrder);
+
+        stack.Clear();
+        Console.WriteLine(stack.Count);
+
+        Queue<Item> itemQueue = new();
+        Item first = new Item(77);
+        Item second = new Item(88);
+        itemQueue.Enqueue(first);
+        itemQueue.Enqueue(second);
+        first = null;
+        second = null;
+        GC.Collect();
+        Console.WriteLine(itemQueue.Dequeue().Value);
+        GC.Collect();
+        Console.WriteLine(itemQueue.Peek().Value);
+
+        Stack<Item> itemStack = new();
+        Item a = new Item(99);
+        Item b = new Item(111);
+        itemStack.Push(a);
+        itemStack.Push(b);
+        a = null;
+        b = null;
+        GC.Collect();
+        Console.WriteLine(itemStack.Pop().Value);
+        GC.Collect();
+        Console.WriteLine(itemStack.Peek().Value);
+
+        Queue<Item> retainedQueue = new();
+        retainedQueue.Enqueue(new Item(123));
+        IEnumerator<Item> retained = retainedQueue.GetEnumerator();
+        retainedQueue = null;
+        GC.Collect();
+        retained.MoveNext();
+        GC.Collect();
+        Console.WriteLine(retained.Current.Value);
+    }
+}

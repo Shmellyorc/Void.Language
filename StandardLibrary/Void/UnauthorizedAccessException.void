@@ -1,0 +1,8 @@
+namespace Void;
+
+public class UnauthorizedAccessException : Exception
+{
+    public UnauthorizedAccessException() : base("Access is denied.") { }
+    public UnauthorizedAccessException(string message) : base(message) { }
+    public UnauthorizedAccessException(string message, Exception innerException) : base(message, innerException) { }
+}

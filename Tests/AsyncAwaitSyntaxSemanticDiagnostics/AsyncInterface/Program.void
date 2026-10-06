@@ -1,0 +1,16 @@
+using Void.Threading.Tasks;
+
+public interface IAsync201
+{
+    public async Task Run()
+    {
+        return;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+    }
+}

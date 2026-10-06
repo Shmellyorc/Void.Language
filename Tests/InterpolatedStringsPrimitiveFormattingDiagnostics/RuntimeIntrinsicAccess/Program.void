@@ -1,0 +1,9 @@
+public static class Program
+{
+    public static void Main()
+    {
+        byte destination = (byte)0;
+        int bytesWritten = 0;
+        Runtime.Utf8TryFormatInt64((long)42, ref destination, 1, out bytesWritten);
+    }
+}

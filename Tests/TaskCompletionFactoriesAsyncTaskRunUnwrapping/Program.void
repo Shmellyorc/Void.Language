@@ -1,0 +1,234 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class Payload277
+{
+    public int Value;
+
+    public Payload277(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    private static bool WaitCompleted(Task task)
+    {
+        int elapsed = 0;
+        while (!task.IsCompleted && elapsed < 5000)
+        {
+            Thread.Sleep(1);
+            elapsed++;
+        }
+        return task.IsCompleted;
+    }
+
+    private static bool WaitCanceled(Task task, CancellationToken token)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (OperationCanceledException error)
+        {
+            return error.CancellationToken.IsSameSource(token);
+        }
+        return false;
+    }
+
+    private static Func<Task> MakePending(TaskCompletionSource source, ManualResetEvent entered)
+    {
+        return () =>
+        {
+            entered.Set();
+            return source.Task;
+        };
+    }
+
+    private static Func<Task<int>> MakePendingResult(TaskCompletionSource<int> source, ManualResetEvent entered)
+    {
+        return () =>
+        {
+            entered.Set();
+            return source.Task;
+        };
+    }
+
+    private static async Task<int> RunPayload(Payload277 payload)
+    {
+        await Task.Yield();
+        return payload.Value;
+    }
+
+    private static Task<int> SchedulePayload(Payload277 payload)
+    {
+        return Task.Run<int>(async () => await RunPayload(payload));
+    }
+
+    public static void Main()
+    {
+        Task completedOne = Task.CompletedTask;
+        Task completedTwo = Task.CompletedTask;
+        Console.WriteLine(completedOne != null && completedOne.IsCompleted);
+        Console.WriteLine(completedOne.Status == TaskStatus.Completed);
+        Console.WriteLine(completedOne == completedTwo);
+
+        Task<int> result = Task.FromResult<int>(277);
+        Console.WriteLine(result.IsCompleted && result.Result == 277);
+
+        Payload277 payload = new Payload277(91);
+        Task<Payload277> payloadResult = Task.FromResult<Payload277>(payload);
+        payload = null;
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(payloadResult.Result != null && payloadResult.Result.Value == 91);
+
+        Task fault = Task.FromException(new Exception("factory fault"));
+        Console.WriteLine(fault.IsFaulted && fault.Exception.Message == "factory fault");
+        Task<int> typedFault = Task.FromException<int>(new Exception("typed factory fault"));
+        Console.WriteLine(typedFault.IsFaulted && typedFault.Exception.Message == "typed factory fault");
+
+        CancellationTokenSource canceledSource = new CancellationTokenSource();
+        CancellationToken canceledToken = canceledSource.Token;
+        canceledSource.Cancel();
+        Task canceled = Task.FromCanceled(canceledToken);
+        Task<int> typedCanceled = Task.FromCanceled<int>(canceledToken);
+        Console.WriteLine(canceled.IsCanceled && WaitCanceled(canceled, canceledToken));
+        Console.WriteLine(typedCanceled.IsCanceled && WaitCanceled(typedCanceled, canceledToken));
+
+        ManualResetEvent pendingEntered = new ManualResetEvent(false);
+        TaskCompletionSource pendingSource = new TaskCompletionSource();
+        Task unwrapped = Task.Run(MakePending(pendingSource, pendingEntered));
+        Console.WriteLine(pendingEntered.WaitOne(5000));
+        Console.WriteLine(!unwrapped.IsCompleted);
+        pendingSource.SetResult();
+        Console.WriteLine(WaitCompleted(unwrapped) && unwrapped.Status == TaskStatus.Completed);
+
+        ManualResetEvent resultEntered = new ManualResetEvent(false);
+        TaskCompletionSource<int> resultSource = new TaskCompletionSource<int>();
+        Task<int> unwrappedResult = Task.Run<int>(MakePendingResult(resultSource, resultEntered));
+        Console.WriteLine(resultEntered.WaitOne(5000));
+        Console.WriteLine(!unwrappedResult.IsCompleted);
+        resultSource.SetResult(64);
+        Console.WriteLine(WaitCompleted(unwrappedResult) && unwrappedResult.Result == 64);
+
+        ManualResetEvent lambdaEntered = new ManualResetEvent(false);
+        Task asyncLambda = Task.Run(async () =>
+        {
+            lambdaEntered.Set();
+            await Task.Yield();
+        });
+        Console.WriteLine(lambdaEntered.WaitOne(5000));
+        Console.WriteLine(WaitCompleted(asyncLambda) && asyncLambda.Status == TaskStatus.Completed);
+
+        Task<int> asyncResult = Task.Run<int>(async () =>
+        {
+            await Task.Yield();
+            return 73;
+        });
+        Console.WriteLine(WaitCompleted(asyncResult) && asyncResult.Result == 73);
+
+        Task first = Task.Run(async () =>
+        {
+            await Task.Yield();
+            await Task.Yield();
+        });
+        Task second = Task.Run(async () =>
+        {
+            await Task.Yield();
+            await Task.Yield();
+        });
+        Console.WriteLine(WaitCompleted(first));
+        Console.WriteLine(WaitCompleted(second));
+
+        Task asyncFault = Task.Run(async () =>
+        {
+            await Task.Yield();
+            throw new Exception("async run fault");
+        });
+        Console.WriteLine(WaitCompleted(asyncFault));
+        Console.WriteLine(asyncFault.IsFaulted && asyncFault.Exception.Message == "async run fault");
+
+        CancellationTokenSource innerCancelSource = new CancellationTokenSource();
+        CancellationToken innerCancelToken = innerCancelSource.Token;
+        innerCancelSource.Cancel();
+        Task asyncCanceled = Task.Run(async () =>
+        {
+            await Task.Yield();
+            throw new OperationCanceledException(innerCancelToken);
+        });
+        Console.WriteLine(WaitCompleted(asyncCanceled));
+        Console.WriteLine(asyncCanceled.IsCanceled && WaitCanceled(asyncCanceled, innerCancelToken));
+
+        ManualResetEvent directFaultEntered = new ManualResetEvent(false);
+        TaskCompletionSource directFaultSource = new TaskCompletionSource();
+        Task directFault = Task.Run(() =>
+        {
+            directFaultEntered.Set();
+            return directFaultSource.Task;
+        });
+        Console.WriteLine(directFaultEntered.WaitOne(5000));
+        directFaultSource.SetException(new Exception("inner direct fault"));
+        Console.WriteLine(WaitCompleted(directFault));
+        Console.WriteLine(directFault.IsFaulted && directFault.Exception.Message == "inner direct fault");
+
+        CancellationTokenSource directCancelTokenSource = new CancellationTokenSource();
+        CancellationToken directCancelToken = directCancelTokenSource.Token;
+        directCancelTokenSource.Cancel();
+        Task directCanceled = Task.Run(() => { return Task.FromCanceled(directCancelToken); });
+        Console.WriteLine(WaitCompleted(directCanceled));
+        Console.WriteLine(directCanceled.IsCanceled && WaitCanceled(directCanceled, directCancelToken));
+
+        Func<Task> synchronousThrow = () =>
+        {
+            throw new Exception("sync delegate fault");
+        };
+        Task synchronousFault = Task.Run(synchronousThrow);
+        Console.WriteLine(WaitCompleted(synchronousFault));
+        Console.WriteLine(synchronousFault.IsFaulted && synchronousFault.Exception.Message == "sync delegate fault");
+
+        Func<Task> nullInnerFunction = () =>
+        {
+            return null;
+        };
+        Task nullInner = Task.Run(nullInnerFunction);
+        Console.WriteLine(WaitCompleted(nullInner));
+        Console.WriteLine(nullInner.IsFaulted && nullInner.Exception.Message == "task async function returned null");
+
+        ManualResetEvent afterStartEntered = new ManualResetEvent(false);
+        TaskCompletionSource afterStartSource = new TaskCompletionSource();
+        CancellationTokenSource afterStartCancellation = new CancellationTokenSource();
+        CancellationToken afterStartToken = afterStartCancellation.Token;
+        Task afterStartRun = Task.Run(MakePending(afterStartSource, afterStartEntered), afterStartToken);
+        Console.WriteLine(afterStartEntered.WaitOne(5000));
+        afterStartCancellation.Cancel();
+        Thread.Sleep(10);
+        Console.WriteLine(!afterStartRun.IsCompleted && !afterStartRun.IsCanceled);
+        afterStartSource.SetResult();
+        Console.WriteLine(WaitCompleted(afterStartRun) && afterStartRun.Status == TaskStatus.Completed);
+
+        Payload277 preCanceledState = new Payload277(0);
+        CancellationTokenSource preRunSource = new CancellationTokenSource();
+        CancellationToken preRunToken = preRunSource.Token;
+        preRunSource.Cancel();
+        Task preCanceledRun = Task.Run(async () =>
+        {
+            Interlocked.Increment(ref preCanceledState.Value);
+            await Task.Yield();
+        }, preRunToken);
+        Console.WriteLine(preCanceledRun.IsCanceled);
+        Console.WriteLine(preCanceledState.Value == 0);
+        Console.WriteLine(WaitCanceled(preCanceledRun, preRunToken));
+
+        Task<int> capturedTask = SchedulePayload(new Payload277(118));
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(WaitCompleted(capturedTask));
+        Console.WriteLine(capturedTask.Result == 118);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

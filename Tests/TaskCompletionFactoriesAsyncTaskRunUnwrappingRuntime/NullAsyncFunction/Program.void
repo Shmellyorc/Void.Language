@@ -1,0 +1,11 @@
+using Void;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    public static void Main()
+    {
+        Func<Task> function = null;
+        Task.Run(function);
+    }
+}

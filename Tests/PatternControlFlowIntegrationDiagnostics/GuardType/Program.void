@@ -1,0 +1,14 @@
+public interface IMetric { int Value { get; } }
+public sealed class Metric : IMetric { public int Value { get { return 1; } } }
+public static class Program
+{
+    public static void Main()
+    {
+        IMetric value = new Metric();
+        int result = value switch
+        {
+            IMetric metric when metric.Value => 1,
+            _ => 0
+        };
+    }
+}

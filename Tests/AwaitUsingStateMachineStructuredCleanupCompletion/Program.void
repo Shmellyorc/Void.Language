@@ -1,0 +1,579 @@
+using Void;
+using Void.Threading.Tasks;
+using AwaitUsingExtensions276;
+
+public sealed class AwaitUsingError276 : Exception
+{
+    public int Code;
+
+    public AwaitUsingError276(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class Payload276
+{
+    public int Value;
+
+    public Payload276(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class AsyncResource276
+{
+    private Task _gate;
+    private int _start;
+    private int _finish;
+    private Payload276 _payload;
+
+    public AsyncResource276(Task gate, int start, int finish, Payload276 payload)
+    {
+        _gate = gate;
+        _start = start;
+        _finish = finish;
+        _payload = payload;
+    }
+
+    public async Task DisposeAsync()
+    {
+        Program.Sequence = Program.Sequence * 10 + _start;
+        Program.DisposeStarts++;
+        await _gate;
+        GC.Collect();
+        if (_payload != null)
+            Program.PayloadTotal += _payload.Value;
+        Program.Sequence = Program.Sequence * 10 + _finish;
+        Program.DisposeFinishes++;
+    }
+}
+
+public sealed class YieldResource276
+{
+    private int _start;
+    private int _finish;
+
+    public YieldResource276(int start, int finish)
+    {
+        _start = start;
+        _finish = finish;
+    }
+
+    public async Task DisposeAsync()
+    {
+        Program.Sequence = Program.Sequence * 10 + _start;
+        await Task.Yield();
+        Program.Sequence = Program.Sequence * 10 + _finish;
+    }
+}
+
+public sealed class ThrowingResource276
+{
+    private Task _gate;
+
+    public ThrowingResource276(Task gate)
+    {
+        _gate = gate;
+    }
+
+    public async Task DisposeAsync()
+    {
+        Program.Sequence = Program.Sequence * 10 + 8;
+        await _gate;
+        Program.Sequence = Program.Sequence * 10 + 9;
+        throw new AwaitUsingError276("dispose", 22);
+    }
+}
+
+public sealed class SyncResource276 : IDisposable
+{
+    private int _marker;
+
+    public SyncResource276(int marker)
+    {
+        _marker = marker;
+    }
+
+    public void Dispose()
+    {
+        Program.Sequence = Program.Sequence * 10 + _marker;
+    }
+}
+
+public readonly struct CustomDisposeAwaiter276
+{
+    private readonly TaskAwaiter _awaiter;
+
+    public CustomDisposeAwaiter276(Task task)
+    {
+        _awaiter = task.GetAwaiter();
+    }
+
+    public bool IsCompleted { get { return _awaiter.IsCompleted; } }
+
+    public void OnCompleted(Action continuation)
+    {
+        _awaiter.OnCompleted(continuation);
+    }
+
+    public void GetResult()
+    {
+        _awaiter.GetResult();
+    }
+}
+
+public readonly struct CustomDisposeCompletion276
+{
+    public readonly Task Task;
+
+    public CustomDisposeCompletion276(Task task)
+    {
+        Task = task;
+    }
+}
+
+namespace AwaitUsingExtensions276
+{
+    public static class CustomDisposeExtensions276
+    {
+        public static CustomDisposeAwaiter276 GetAwaiter(this CustomDisposeCompletion276 completion)
+        {
+            return new CustomDisposeAwaiter276(completion.Task);
+        }
+    }
+}
+
+public sealed class CustomResource276
+{
+    private Task _gate;
+
+    public CustomResource276(Task gate)
+    {
+        _gate = gate;
+    }
+
+    public CustomDisposeCompletion276 DisposeAsync()
+    {
+        Program.CustomStarts++;
+        return new CustomDisposeCompletion276(_gate);
+    }
+}
+
+
+public sealed class InterfaceResource276 : IAsyncDisposable
+{
+    private Task _gate;
+
+    public InterfaceResource276(Task gate)
+    {
+        _gate = gate;
+    }
+
+    public async Task DisposeAsync()
+    {
+        Program.InterfaceStarts++;
+        await _gate;
+        Program.InterfaceFinishes++;
+    }
+}
+
+public sealed class ValueTaskResource276
+{
+    private Task _gate;
+
+    public ValueTaskResource276(Task gate)
+    {
+        _gate = gate;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        Program.ValueTaskStarts++;
+        await _gate;
+        Program.ValueTaskFinishes++;
+    }
+}
+
+public static class Program
+{
+    public static int Sequence;
+    public static int DisposeStarts;
+    public static int DisposeFinishes;
+    public static int PayloadTotal;
+    public static int CustomStarts;
+    public static int ValueTaskStarts;
+    public static int ValueTaskFinishes;
+    public static int InterfaceStarts;
+    public static int InterfaceFinishes;
+
+    private static async Task<int> NormalExit(Task gate)
+    {
+        Sequence = 0;
+        await using (AsyncResource276 resource = new AsyncResource276(gate, 2, 3, null))
+        {
+            Sequence = 1;
+        }
+        Sequence = Sequence * 10 + 4;
+        return Sequence;
+    }
+
+    private static async Task<int> ReturnExit(Task gate)
+    {
+        Sequence = 0;
+        await using (AsyncResource276 resource = new AsyncResource276(gate, 6, 7, null))
+        {
+            Sequence = 5;
+            return 77;
+        }
+    }
+
+    private static async Task<int> BreakExit()
+    {
+        Sequence = 0;
+        for (int i = 0; i < 3; i++)
+        {
+            await using (YieldResource276 resource = new YieldResource276(2, 3))
+            {
+                Sequence = Sequence * 10 + 1;
+                break;
+            }
+            Sequence = Sequence * 10 + 9;
+        }
+        Sequence = Sequence * 10 + 4;
+        return Sequence;
+    }
+
+    private static async Task<int> ContinueExit()
+    {
+        Sequence = 0;
+        for (int i = 0; i < 2; i++)
+        {
+            await using (YieldResource276 resource = new YieldResource276(2, 3))
+            {
+                Sequence = Sequence * 10 + 1;
+                continue;
+            }
+            Sequence = Sequence * 10 + 9;
+        }
+        Sequence = Sequence * 10 + 4;
+        return Sequence;
+    }
+
+    private static async Task<int> BodyException(Task gate)
+    {
+        Sequence = 0;
+        try
+        {
+            await using (AsyncResource276 resource = new AsyncResource276(gate, 2, 3, null))
+            {
+                Sequence = 1;
+                throw new AwaitUsingError276("body", 11);
+            }
+        }
+        catch (AwaitUsingError276 error)
+        {
+            Sequence = Sequence * 10 + 4;
+            return error.Code;
+        }
+    }
+
+    private static async Task<int> DisposeOverridesBody(Task gate)
+    {
+        Sequence = 0;
+        try
+        {
+            await using (ThrowingResource276 resource = new ThrowingResource276(gate))
+            {
+                Sequence = 7;
+                throw new AwaitUsingError276("body", 11);
+            }
+        }
+        catch (AwaitUsingError276 error)
+        {
+            return error.Code;
+        }
+    }
+
+    private static async Task<int> DisposeOverridesReturn(Task gate)
+    {
+        Sequence = 0;
+        await using (ThrowingResource276 resource = new ThrowingResource276(gate))
+        {
+            Sequence = 7;
+            return 44;
+        }
+    }
+
+    private static async Task<int> DisposeOverridesBreak(Task gate)
+    {
+        Sequence = 0;
+        for (int i = 0; i < 2; i++)
+        {
+            await using (ThrowingResource276 resource = new ThrowingResource276(gate))
+            {
+                Sequence = 7;
+                break;
+            }
+            Sequence = Sequence * 10 + 4;
+        }
+        Sequence = Sequence * 10 + 5;
+        return Sequence;
+    }
+
+    private static async Task<int> DisposeOverridesContinue(Task gate)
+    {
+        Sequence = 0;
+        for (int i = 0; i < 2; i++)
+        {
+            await using (ThrowingResource276 resource = new ThrowingResource276(gate))
+            {
+                Sequence = 7;
+                continue;
+            }
+            Sequence = Sequence * 10 + 4;
+        }
+        Sequence = Sequence * 10 + 5;
+        return Sequence;
+    }
+
+    private static async Task<int> NestedLifo()
+    {
+        Sequence = 0;
+        await using (YieldResource276 outer = new YieldResource276(4, 5))
+        {
+            await using (YieldResource276 inner = new YieldResource276(2, 3))
+            {
+                Sequence = 1;
+            }
+        }
+        return Sequence;
+    }
+
+    private static async Task<int> MultiResourceLifo()
+    {
+        Sequence = 0;
+        await using (YieldResource276 first = new YieldResource276(4, 5),
+            second = new YieldResource276(2, 3))
+        {
+            Sequence = 1;
+        }
+        return Sequence;
+    }
+
+    private static async Task<int> MixedCleanup()
+    {
+        Sequence = 0;
+        using (SyncResource276 sync = new SyncResource276(4))
+        {
+            await using (YieldResource276 asyncResource = new YieldResource276(2, 3))
+            {
+                Sequence = 1;
+            }
+        }
+        return Sequence;
+    }
+
+    private static async Task<int> DeclarationReturn(Task gate)
+    {
+        Sequence = 0;
+        await using AsyncResource276 resource = new AsyncResource276(gate, 2, 3, null);
+        Sequence = 1;
+        return 91;
+    }
+
+    private static async Task<int> ResourceLifetime(Task bodyGate)
+    {
+        TaskCompletionSource disposeGate = new TaskCompletionSource();
+        disposeGate.SetResult();
+        await using (AsyncResource276 resource = new AsyncResource276(
+            disposeGate.Task, 0, 0, new Payload276(42)))
+        {
+            await bodyGate;
+        }
+        return PayloadTotal;
+    }
+
+    private static async Task CustomAwaitable(Task gate)
+    {
+        await using (CustomResource276 resource = new CustomResource276(gate))
+        {
+        }
+    }
+
+    private static async Task ValueTaskAwaitable(Task gate)
+    {
+        await using (ValueTaskResource276 resource = new ValueTaskResource276(gate))
+        {
+        }
+    }
+
+
+    private static async Task<int> ReturnThroughFinally()
+    {
+        Sequence = 0;
+        try
+        {
+            await using (YieldResource276 resource = new YieldResource276(2, 3))
+            {
+                Sequence = 1;
+                return 55;
+            }
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 4;
+        }
+    }
+
+    private static async Task<int> DisposeFaultThroughFinally(Task gate)
+    {
+        Sequence = 0;
+        try
+        {
+            await using (ThrowingResource276 resource = new ThrowingResource276(gate))
+            {
+                Sequence = 7;
+                return 44;
+            }
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 4;
+        }
+    }
+
+    private static async Task InterfaceAwaitable(IAsyncDisposable resource)
+    {
+        await using (resource)
+        {
+        }
+    }
+
+    private static async Task NullResource()
+    {
+        AsyncResource276 resource = null;
+        await using (resource)
+        {
+            Sequence = 7;
+        }
+    }
+
+    public static void Main()
+    {
+        DisposeStarts = 0;
+        DisposeFinishes = 0;
+        TaskCompletionSource normalGate = new TaskCompletionSource();
+        Task<int> normal = NormalExit(normalGate.Task);
+        Console.WriteLine(Sequence == 12 && !normal.IsCompleted && DisposeStarts == 1 && DisposeFinishes == 0);
+        normalGate.SetResult();
+        Console.WriteLine(normal.Result == 1234 && DisposeFinishes == 1);
+
+        TaskCompletionSource returnGate = new TaskCompletionSource();
+        Task<int> returning = ReturnExit(returnGate.Task);
+        Console.WriteLine(Sequence == 56 && !returning.IsCompleted);
+        returnGate.SetResult();
+        Console.WriteLine(returning.Result == 77 && Sequence == 567);
+
+        Console.WriteLine(BreakExit().Result == 1234);
+        Console.WriteLine(ContinueExit().Result == 1231234);
+
+        TaskCompletionSource bodyFaultGate = new TaskCompletionSource();
+        Task<int> bodyFault = BodyException(bodyFaultGate.Task);
+        Console.WriteLine(Sequence == 12 && !bodyFault.IsCompleted);
+        bodyFaultGate.SetResult();
+        Console.WriteLine(bodyFault.Result == 11 && Sequence == 1234);
+
+        TaskCompletionSource overrideGate = new TaskCompletionSource();
+        Task<int> overridden = DisposeOverridesBody(overrideGate.Task);
+        Console.WriteLine(Sequence == 78 && !overridden.IsCompleted);
+        overrideGate.SetResult();
+        Console.WriteLine(overridden.Result == 22 && Sequence == 789);
+
+        TaskCompletionSource returnOverrideGate = new TaskCompletionSource();
+        Task<int> returnOverride = DisposeOverridesReturn(returnOverrideGate.Task);
+        Console.WriteLine(Sequence == 78 && !returnOverride.IsCompleted);
+        returnOverrideGate.SetResult();
+        while (!returnOverride.IsCompleted) { }
+        Console.WriteLine(returnOverride.IsFaulted && returnOverride.Exception != null &&
+            returnOverride.Exception.Message == "dispose" && Sequence == 789);
+
+        TaskCompletionSource breakOverrideGate = new TaskCompletionSource();
+        Task<int> breakOverride = DisposeOverridesBreak(breakOverrideGate.Task);
+        Console.WriteLine(Sequence == 78 && !breakOverride.IsCompleted);
+        breakOverrideGate.SetResult();
+        while (!breakOverride.IsCompleted) { }
+        Console.WriteLine(breakOverride.IsFaulted && breakOverride.Exception != null &&
+            breakOverride.Exception.Message == "dispose" && Sequence == 789);
+
+        TaskCompletionSource continueOverrideGate = new TaskCompletionSource();
+        Task<int> continueOverride = DisposeOverridesContinue(continueOverrideGate.Task);
+        Console.WriteLine(Sequence == 78 && !continueOverride.IsCompleted);
+        continueOverrideGate.SetResult();
+        while (!continueOverride.IsCompleted) { }
+        Console.WriteLine(continueOverride.IsFaulted && continueOverride.Exception != null &&
+            continueOverride.Exception.Message == "dispose" && Sequence == 789);
+
+        Console.WriteLine(NestedLifo().Result == 12345);
+        Console.WriteLine(MultiResourceLifo().Result == 12345);
+        Console.WriteLine(MixedCleanup().Result == 1234);
+
+        TaskCompletionSource declarationGate = new TaskCompletionSource();
+        Task<int> declarationReturn = DeclarationReturn(declarationGate.Task);
+        Console.WriteLine(Sequence == 12 && !declarationReturn.IsCompleted);
+        declarationGate.SetResult();
+        Console.WriteLine(declarationReturn.Result == 91 && Sequence == 123);
+
+        PayloadTotal = 0;
+        TaskCompletionSource lifetimeGate = new TaskCompletionSource();
+        Task<int> lifetime = ResourceLifetime(lifetimeGate.Task);
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(!lifetime.IsCompleted && PayloadTotal == 0);
+        lifetimeGate.SetResult();
+        Console.WriteLine(lifetime.Result == 42);
+
+        CustomStarts = 0;
+        TaskCompletionSource customGate = new TaskCompletionSource();
+        Task custom = CustomAwaitable(customGate.Task);
+        Console.WriteLine(CustomStarts == 1 && !custom.IsCompleted);
+        customGate.SetResult();
+        custom.Wait();
+        Console.WriteLine(CustomStarts == 1 && custom.IsCompleted);
+
+        ValueTaskStarts = 0;
+        ValueTaskFinishes = 0;
+        TaskCompletionSource valueGate = new TaskCompletionSource();
+        Task value = ValueTaskAwaitable(valueGate.Task);
+        Console.WriteLine(ValueTaskStarts == 1 && ValueTaskFinishes == 0 && !value.IsCompleted);
+        valueGate.SetResult();
+        value.Wait();
+        Console.WriteLine(ValueTaskStarts == 1 && ValueTaskFinishes == 1);
+
+
+        Console.WriteLine(ReturnThroughFinally().Result == 55 && Sequence == 1234);
+
+        TaskCompletionSource finallyFaultGate = new TaskCompletionSource();
+        Task<int> finallyFault = DisposeFaultThroughFinally(finallyFaultGate.Task);
+        Console.WriteLine(Sequence == 78 && !finallyFault.IsCompleted);
+        finallyFaultGate.SetResult();
+        while (!finallyFault.IsCompleted) { }
+        Console.WriteLine(finallyFault.IsFaulted && finallyFault.Exception != null &&
+            finallyFault.Exception.Message == "dispose" && Sequence == 7894);
+
+        InterfaceStarts = 0;
+        InterfaceFinishes = 0;
+        TaskCompletionSource interfaceGate = new TaskCompletionSource();
+        IAsyncDisposable interfaceResource = new InterfaceResource276(interfaceGate.Task);
+        Task interfaceTask = InterfaceAwaitable(interfaceResource);
+        Console.WriteLine(InterfaceStarts == 1 && InterfaceFinishes == 0 && !interfaceTask.IsCompleted);
+        interfaceGate.SetResult();
+        interfaceTask.Wait();
+        Console.WriteLine(InterfaceStarts == 1 && InterfaceFinishes == 1);
+
+        Sequence = 0;
+        NullResource().Wait();
+        Console.WriteLine(Sequence == 7);
+    }
+}

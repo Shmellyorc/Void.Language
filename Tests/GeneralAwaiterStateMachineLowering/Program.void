@@ -1,0 +1,462 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class AwaitProbe262
+{
+    public int FactoryCalls;
+    public int GetAwaiterCalls;
+    public int IsCompletedCalls;
+    public int OnCompletedCalls;
+    public int GetResultCalls;
+    public int FinallyCalls;
+    public int Value;
+}
+
+public struct SyncIntAwaiter262
+{
+    private AwaitProbe262 _probe;
+
+    public SyncIntAwaiter262(AwaitProbe262 probe)
+    {
+        _probe = probe;
+    }
+
+    public bool IsCompleted
+    {
+        get
+        {
+            _probe.IsCompletedCalls++;
+            return true;
+        }
+    }
+
+    public void OnCompleted(Action continuation)
+    {
+        _probe.OnCompletedCalls++;
+        continuation();
+    }
+
+    public int GetResult()
+    {
+        _probe.GetResultCalls++;
+        return _probe.Value;
+    }
+}
+
+public struct SyncIntAwaitable262
+{
+    private AwaitProbe262 _probe;
+
+    public SyncIntAwaitable262(AwaitProbe262 probe)
+    {
+        _probe = probe;
+    }
+
+    public SyncIntAwaiter262 GetAwaiter()
+    {
+        _probe.GetAwaiterCalls++;
+        return new SyncIntAwaiter262(_probe);
+    }
+}
+
+public sealed class AsyncIntAwaiter262
+{
+    private AwaitProbe262 _probe;
+
+    public AsyncIntAwaiter262(AwaitProbe262 probe)
+    {
+        _probe = probe;
+    }
+
+    public bool IsCompleted
+    {
+        get
+        {
+            _probe.IsCompletedCalls++;
+            return false;
+        }
+    }
+
+    public void OnCompleted(Action continuation)
+    {
+        _probe.OnCompletedCalls++;
+        ThreadPool.QueueUserWorkItem(continuation);
+    }
+
+    public int GetResult()
+    {
+        _probe.GetResultCalls++;
+        return _probe.Value;
+    }
+}
+
+public sealed class AsyncIntAwaitable262
+{
+    private AwaitProbe262 _probe;
+
+    public AsyncIntAwaitable262(AwaitProbe262 probe)
+    {
+        _probe = probe;
+    }
+
+    public AsyncIntAwaiter262 GetAwaiter()
+    {
+        _probe.GetAwaiterCalls++;
+        return new AsyncIntAwaiter262(_probe);
+    }
+}
+
+public struct ReentrantAwaiter262
+{
+    private AwaitProbe262 _probe;
+
+    public ReentrantAwaiter262(AwaitProbe262 probe)
+    {
+        _probe = probe;
+    }
+
+    public bool IsCompleted
+    {
+        get
+        {
+            _probe.IsCompletedCalls++;
+            return false;
+        }
+    }
+
+    public void OnCompleted(Action continuation)
+    {
+        _probe.OnCompletedCalls++;
+        continuation();
+    }
+
+    public int GetResult()
+    {
+        _probe.GetResultCalls++;
+        return _probe.Value;
+    }
+}
+
+public struct ReentrantAwaitable262
+{
+    private AwaitProbe262 _probe;
+
+    public ReentrantAwaitable262(AwaitProbe262 probe)
+    {
+        _probe = probe;
+    }
+
+    public ReentrantAwaiter262 GetAwaiter()
+    {
+        _probe.GetAwaiterCalls++;
+        return new ReentrantAwaiter262(_probe);
+    }
+}
+
+public struct VoidAwaiter262
+{
+    private AwaitProbe262 _probe;
+
+    public VoidAwaiter262(AwaitProbe262 probe)
+    {
+        _probe = probe;
+    }
+
+    public bool IsCompleted
+    {
+        get
+        {
+            _probe.IsCompletedCalls++;
+            return false;
+        }
+    }
+
+    public void OnCompleted(Action continuation)
+    {
+        _probe.OnCompletedCalls++;
+        ThreadPool.QueueUserWorkItem(continuation);
+    }
+
+    public void GetResult()
+    {
+        _probe.GetResultCalls++;
+    }
+}
+
+public struct VoidAwaitable262
+{
+    private AwaitProbe262 _probe;
+
+    public VoidAwaitable262(AwaitProbe262 probe)
+    {
+        _probe = probe;
+    }
+
+    public VoidAwaiter262 GetAwaiter()
+    {
+        _probe.GetAwaiterCalls++;
+        return new VoidAwaiter262(_probe);
+    }
+}
+
+public struct ThrowingAwaiter262
+{
+    private AwaitProbe262 _probe;
+
+    public ThrowingAwaiter262(AwaitProbe262 probe)
+    {
+        _probe = probe;
+    }
+
+    public bool IsCompleted
+    {
+        get
+        {
+            _probe.IsCompletedCalls++;
+            return false;
+        }
+    }
+
+    public void OnCompleted(Action continuation)
+    {
+        _probe.OnCompletedCalls++;
+        ThreadPool.QueueUserWorkItem(continuation);
+    }
+
+    public int GetResult()
+    {
+        _probe.GetResultCalls++;
+        throw new Exception("awaiter boom");
+    }
+}
+
+public struct ThrowingAwaitable262
+{
+    private AwaitProbe262 _probe;
+
+    public ThrowingAwaitable262(AwaitProbe262 probe)
+    {
+        _probe = probe;
+    }
+
+    public ThrowingAwaiter262 GetAwaiter()
+    {
+        _probe.GetAwaiterCalls++;
+        return new ThrowingAwaiter262(_probe);
+    }
+}
+
+public interface IAwaiter262
+{
+    bool IsCompleted { get; }
+    void OnCompleted(Action continuation);
+    int GetResult();
+}
+
+public interface IAwaitable262
+{
+    IAwaiter262 GetAwaiter();
+}
+
+public sealed class InterfaceAwaiter262 : IAwaiter262
+{
+    private AwaitProbe262 _probe;
+
+    public InterfaceAwaiter262(AwaitProbe262 probe)
+    {
+        _probe = probe;
+    }
+
+    public bool IsCompleted
+    {
+        get
+        {
+            _probe.IsCompletedCalls++;
+            return true;
+        }
+    }
+
+    public void OnCompleted(Action continuation)
+    {
+        _probe.OnCompletedCalls++;
+        continuation();
+    }
+
+    public int GetResult()
+    {
+        _probe.GetResultCalls++;
+        return _probe.Value;
+    }
+}
+
+public sealed class InterfaceAwaitable262 : IAwaitable262
+{
+    private AwaitProbe262 _probe;
+
+    public InterfaceAwaitable262(AwaitProbe262 probe)
+    {
+        _probe = probe;
+    }
+
+    public IAwaiter262 GetAwaiter()
+    {
+        _probe.GetAwaiterCalls++;
+        return new InterfaceAwaiter262(_probe);
+    }
+}
+
+public static class Program
+{
+    private static SyncIntAwaitable262 MakeSync(AwaitProbe262 probe)
+    {
+        probe.FactoryCalls++;
+        return new SyncIntAwaitable262(probe);
+    }
+
+    private static AsyncIntAwaitable262 MakeAsync(AwaitProbe262 probe)
+    {
+        probe.FactoryCalls++;
+        return new AsyncIntAwaitable262(probe);
+    }
+
+    private static async Task<int> AwaitSync(AwaitProbe262 probe)
+    {
+        int value = await MakeSync(probe);
+        return value + 1;
+    }
+
+    private static async Task<int> AwaitAsync(AwaitProbe262 probe)
+    {
+        return await MakeAsync(probe);
+    }
+
+    private static async Task<int> AwaitReentrant(AwaitProbe262 probe)
+    {
+        return await new ReentrantAwaitable262(probe);
+    }
+
+    private static async Task AwaitVoid(AwaitProbe262 probe)
+    {
+        await new VoidAwaitable262(probe);
+        probe.Value++;
+    }
+
+    private static async Task<int> AwaitTwice(AwaitProbe262 first, AwaitProbe262 second)
+    {
+        int left = await new SyncIntAwaitable262(first);
+        int right = await new AsyncIntAwaitable262(second);
+        return left + right;
+    }
+
+
+
+    private static async Task<int> AwaitAssignment(AwaitProbe262 probe)
+    {
+        int value = 0;
+        value = await new SyncIntAwaitable262(probe);
+        return value;
+    }
+
+    private static async Task<int> AwaitInterface(IAwaitable262 awaitable)
+    {
+        return await awaitable;
+    }
+
+    private static async Task<int> AwaitThrow(AwaitProbe262 probe)
+    {
+        try
+        {
+            return await new ThrowingAwaitable262(probe);
+        }
+        catch (Exception error)
+        {
+            return error.Message == "awaiter boom" ? 91 : -1;
+        }
+        finally
+        {
+            probe.FinallyCalls++;
+        }
+    }
+
+    public static void Main()
+    {
+        AwaitProbe262 sync = new AwaitProbe262();
+        sync.Value = 41;
+        Task<int> syncTask = AwaitSync(sync);
+        syncTask.Wait();
+        Console.WriteLine(syncTask.Result == 42);
+        Console.WriteLine(sync.FactoryCalls == 1);
+        Console.WriteLine(sync.GetAwaiterCalls == 1);
+        Console.WriteLine(sync.IsCompletedCalls == 1);
+        Console.WriteLine(sync.OnCompletedCalls == 0);
+        Console.WriteLine(sync.GetResultCalls == 1);
+
+        AwaitProbe262 asyncProbe = new AwaitProbe262();
+        asyncProbe.Value = 77;
+        Task<int> asyncTask = AwaitAsync(asyncProbe);
+        asyncTask.Wait();
+        Console.WriteLine(asyncTask.Result == 77);
+        Console.WriteLine(asyncProbe.FactoryCalls == 1);
+        Console.WriteLine(asyncProbe.GetAwaiterCalls == 1);
+        Console.WriteLine(asyncProbe.IsCompletedCalls == 1);
+        Console.WriteLine(asyncProbe.OnCompletedCalls == 1);
+        Console.WriteLine(asyncProbe.GetResultCalls == 1);
+
+        AwaitProbe262 reentrant = new AwaitProbe262();
+        reentrant.Value = 23;
+        Task<int> reentrantTask = AwaitReentrant(reentrant);
+        reentrantTask.Wait();
+        Console.WriteLine(reentrantTask.Result == 23);
+        Console.WriteLine(reentrant.GetAwaiterCalls == 1);
+        Console.WriteLine(reentrant.OnCompletedCalls == 1);
+        Console.WriteLine(reentrant.GetResultCalls == 1);
+
+        AwaitProbe262 voidProbe = new AwaitProbe262();
+        voidProbe.Value = 4;
+        Task voidTask = AwaitVoid(voidProbe);
+        voidTask.Wait();
+        Console.WriteLine(voidProbe.Value == 5);
+        Console.WriteLine(voidProbe.GetAwaiterCalls == 1);
+        Console.WriteLine(voidProbe.OnCompletedCalls == 1);
+        Console.WriteLine(voidProbe.GetResultCalls == 1);
+
+        AwaitProbe262 left = new AwaitProbe262();
+        AwaitProbe262 right = new AwaitProbe262();
+        left.Value = 10;
+        right.Value = 32;
+        Task<int> twice = AwaitTwice(left, right);
+        twice.Wait();
+        Console.WriteLine(twice.Result == 42);
+        Console.WriteLine(left.GetResultCalls == 1 && right.GetResultCalls == 1);
+
+
+
+        AwaitProbe262 assignmentProbe = new AwaitProbe262();
+        assignmentProbe.Value = 58;
+        Task<int> assignmentTask = AwaitAssignment(assignmentProbe);
+        assignmentTask.Wait();
+        Console.WriteLine(assignmentTask.Result == 58);
+        Console.WriteLine(assignmentProbe.GetResultCalls == 1);
+
+        AwaitProbe262 interfaceProbe = new AwaitProbe262();
+        interfaceProbe.Value = 66;
+        IAwaitable262 interfaceAwaitable = new InterfaceAwaitable262(interfaceProbe);
+        Task<int> interfaceTask = AwaitInterface(interfaceAwaitable);
+        interfaceTask.Wait();
+        Console.WriteLine(interfaceTask.Result == 66);
+        Console.WriteLine(interfaceProbe.GetAwaiterCalls == 1);
+        Console.WriteLine(interfaceProbe.IsCompletedCalls == 1);
+        Console.WriteLine(interfaceProbe.GetResultCalls == 1);
+
+        AwaitProbe262 throwing = new AwaitProbe262();
+        Task<int> throwingTask = AwaitThrow(throwing);
+        throwingTask.Wait();
+        Console.WriteLine(throwingTask.Result == 91);
+        Console.WriteLine(throwing.OnCompletedCalls == 1);
+        Console.WriteLine(throwing.GetResultCalls == 1);
+        Console.WriteLine(throwing.FinallyCalls == 1);
+
+        ThreadPool.Shutdown();
+    }
+}

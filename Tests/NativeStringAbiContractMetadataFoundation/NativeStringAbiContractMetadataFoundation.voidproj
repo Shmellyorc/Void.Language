@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "NativeStringAbiContractMetadataFoundation",
+  "output": "exe",
+  "version": "0.0.293",
+  "compiler": {
+    "unsafe": true
+  }
+}

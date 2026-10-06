@@ -1,0 +1,8 @@
+public static class Program
+{
+    public static void Main()
+    {
+        var value = 40 + 2;
+        Console.WriteLine(value);
+    }
+}

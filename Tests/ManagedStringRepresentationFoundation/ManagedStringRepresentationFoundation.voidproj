@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "ManagedStringRepresentationFoundation",
+  "output": "exe",
+  "version": "0.0.291",
+  "compiler": {
+    "unsafe": true
+  }
+}

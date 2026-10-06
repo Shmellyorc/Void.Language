@@ -1,0 +1,65 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class LibraryEnumerator269
+{
+    private int _value;
+    private int _step;
+
+    public LibraryEnumerator269(int value)
+    {
+        _value = value;
+        _step = 0;
+    }
+
+    public int Current => _value + _step;
+
+    public ValueTask<bool> MoveNextAsync()
+    {
+        _step++;
+        return new ValueTask<bool>(_step <= 2);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return default;
+    }
+}
+
+public sealed class LibraryEnumerable269
+{
+    private int _value;
+
+    public LibraryEnumerable269(int value)
+    {
+        _value = value;
+    }
+
+    public LibraryEnumerator269 GetAsyncEnumerator()
+    {
+        return new LibraryEnumerator269(_value);
+    }
+}
+
+public static class AwaiterValueTaskLibrary269
+{
+    private static async ValueTask<int> Core(int value)
+    {
+        int sum = 0;
+        await foreach (var item in new LibraryEnumerable269(value))
+        {
+            await Task.Yield();
+            sum += item;
+        }
+        return sum;
+    }
+
+    [Export("void269_value_task_library")]
+    public static int Run(int value)
+    {
+        int result = Core(value).GetAwaiter().GetResult();
+        ThreadPool.Shutdown();
+        return result;
+    }
+}

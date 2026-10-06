@@ -1,0 +1,1 @@
+using Void; public static class Program { public static void Main() { string value = "abc"; value[0] = 'z'; } }

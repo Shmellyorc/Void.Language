@@ -1,0 +1,94 @@
+using Void;
+
+public sealed class OwnedNativeStringException : Exception
+{
+    public OwnedNativeStringException(string message) : base(message) { }
+}
+
+public delegate int OwnedStringCallback(int value);
+
+public static class Native297
+{
+    [Native("void297_reset")]
+    public static unsafe extern void Reset();
+
+    [NativeString(NativeStringKind.OwnedNul, "void297_release_nul")]
+    [Native("void297_owned_nul")]
+    public static unsafe extern string OwnedNul();
+
+    [NativeString(NativeStringKind.OwnedPointerLength, "void297_release_view")]
+    [Native("void297_owned_view")]
+    public static unsafe extern string OwnedView();
+
+    [NativeString(NativeStringKind.OwnedNul, "void297_release_nul")]
+    [Native("void297_null_nul")]
+    public static unsafe extern string NullNul();
+
+    [NativeString(NativeStringKind.OwnedPointerLength, "void297_release_view")]
+    [Native("void297_empty_view")]
+    public static unsafe extern string EmptyView();
+
+    [NativeString(NativeStringKind.OwnedNul, "void297_release_nul")]
+    [Native("void297_owned_then_callback")]
+    public static unsafe extern string OwnedThenCallback(OwnedStringCallback callback);
+
+    [Native("void297_nul_release_count")]
+    public static unsafe extern int NulReleaseCount();
+
+    [Native("void297_view_release_count")]
+    public static unsafe extern int ViewReleaseCount();
+
+    [Native("void297_callback_count")]
+    public static unsafe extern int CallbackCount();
+}
+
+public static class OwnedCallbacks
+{
+    public static int Throwing(int value)
+    {
+        throw new OwnedNativeStringException("owned callback boom");
+    }
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        Native297.Reset();
+
+        string nul = Native297.OwnedNul();
+        Console.WriteLine(nul == "owned-nul");
+        Console.WriteLine(Native297.NulReleaseCount() == 1);
+        Console.WriteLine(nul == "owned-nul");
+
+        string view = Native297.OwnedView();
+        Console.WriteLine(view == "A\0B");
+        Console.WriteLine(Native297.ViewReleaseCount() == 1);
+        Console.WriteLine(view == "A\0B");
+
+        string nullValue = Native297.NullNul();
+        Console.WriteLine(nullValue == null);
+        Console.WriteLine(Native297.NulReleaseCount() == 1);
+
+        string empty = Native297.EmptyView();
+        Console.WriteLine(empty != null);
+        Console.WriteLine(empty == "");
+        Console.WriteLine(Native297.ViewReleaseCount() == 2);
+
+        bool caught = false;
+        try
+        {
+            Native297.OwnedThenCallback(OwnedCallbacks.Throwing);
+        }
+        catch (OwnedNativeStringException error)
+        {
+            caught = error.Message == "owned callback boom";
+        }
+        Console.WriteLine(caught);
+        Console.WriteLine(Native297.CallbackCount() == 1);
+        Console.WriteLine(Native297.NulReleaseCount() == 2);
+
+        Console.WriteLine(nul == "owned-nul");
+        Console.WriteLine(view == "A\0B");
+    }
+}

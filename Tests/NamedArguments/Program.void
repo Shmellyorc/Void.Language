@@ -1,0 +1,262 @@
+using Void;
+
+public delegate int NamedDelegate(int left, int right = 4);
+public delegate int NamedParamsDelegate(int start = 1, params int[] values);
+
+public struct Meters
+{
+    public int Value;
+
+    public Meters(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator Meters(int value)
+    {
+        return new Meters(value);
+    }
+}
+
+public sealed class Point
+{
+    public int X;
+    public int Y;
+
+    public Point(int x = 1, int y = 2)
+    {
+        X = x;
+        Y = y;
+    }
+}
+
+public sealed class Choice
+{
+    public int Kind;
+
+    public Choice(int value, int count = 0)
+    {
+        Kind = 1;
+    }
+
+    public Choice(int number, string text = "VOID")
+    {
+        Kind = 2;
+    }
+}
+
+public sealed class DistanceHolder
+{
+    public int Total;
+
+    public DistanceHolder(Meters distance, int scale = 1)
+    {
+        Total = distance.Value * scale;
+    }
+}
+
+public static class NamedMath
+{
+    public static int Scale(Meters value, int factor = 2)
+    {
+        return value.Value * factor;
+    }
+}
+
+public class BaseCounter
+{
+    public virtual int Read(int value = 5, int extra = 1)
+    {
+        return value + extra + 100;
+    }
+}
+
+public sealed class DerivedCounter : BaseCounter
+{
+    public override int Read(int value = 9, int extra = 2)
+    {
+        return value + extra + 200;
+    }
+}
+
+public interface IReader
+{
+    int Read(int value = 4, int extra = 1);
+}
+
+public sealed class Reader : IReader
+{
+    public int Read(int value = 4, int extra = 1)
+    {
+        return value * 10 + extra;
+    }
+}
+
+public sealed class Calculator
+{
+    public int Bias;
+
+    public Calculator(int bias = 3)
+    {
+        Bias = bias;
+    }
+
+    public int Add(int left, int right = 2)
+    {
+        return Bias + left + right;
+    }
+}
+
+public static class Program
+{
+    public static int Mix(int a, int b = 2, int c = 3)
+    {
+        return a * 100 + b * 10 + c;
+    }
+
+    public static int Sum(int start = 10, params int[] values)
+    {
+        int total = start;
+        for (int i = 0; i < values.Length; i++)
+            total += values[i];
+        return total;
+    }
+
+    public static int SumMeters(int start = 0, params Meters[] values)
+    {
+        int total = start;
+        for (int i = 0; i < values.Length; i++)
+            total += values[i].Value;
+        return total;
+    }
+
+    public static int Combine(int left, int right = 4)
+    {
+        return left * 10 + right;
+    }
+
+    public static int CombineArray(int start, int[] values)
+    {
+        int total = start;
+        for (int i = 0; i < values.Length; i++)
+            total += values[i];
+        return total;
+    }
+
+    public static int Select(int value, int count = 0)
+    {
+        return 1;
+    }
+
+    public static int Select(int number, string text = "VOID")
+    {
+        return 2;
+    }
+
+    public static int UseMeters(Meters distance, int scale = 1)
+    {
+        return distance.Value * scale;
+    }
+
+    public static int Generic<T>(T value, int marker = 1)
+    {
+        return marker;
+    }
+
+    public static int GenericNamedBody<T>(T value)
+    {
+        return Mix(c: 9, a: 1);
+    }
+
+    public static void AddTo(ref int value, int amount = 1)
+    {
+        value += amount;
+    }
+
+    public static void MakeValue(out int value, int source = 7)
+    {
+        value = source;
+    }
+
+    public static int ReadValue(in int value, int add = 1)
+    {
+        return value + add;
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(Mix(a: 1, b: 5, c: 9) == 159);
+        Console.WriteLine(Mix(c: 9, a: 1, b: 5) == 159);
+        Console.WriteLine(Mix(c: 9, a: 1) == 129);
+        Console.WriteLine(Mix(1, c: 9) == 129);
+        Console.WriteLine(Mix(1, c: 9, b: 7) == 179);
+
+        Point first = new Point(y: 8, x: 3);
+        Console.WriteLine(first.X == 3);
+        Console.WriteLine(first.Y == 8);
+
+        Point second = new(y: 6, x: 4);
+        Console.WriteLine(second.X == 4);
+        Console.WriteLine(second.Y == 6);
+
+        Choice firstChoice = new Choice(value: 9);
+        Choice secondChoice = new Choice(number: 9);
+        Console.WriteLine(firstChoice.Kind == 1);
+        Console.WriteLine(secondChoice.Kind == 2);
+
+        DistanceHolder holder = new DistanceHolder(scale: 4, distance: 3);
+        Console.WriteLine(holder.Total == 12);
+        Console.WriteLine(NamedMath.Scale(factor: 5, value: 2) == 10);
+
+        Calculator calculator = new Calculator(bias: 10);
+        Console.WriteLine(calculator.Bias == 10);
+        Console.WriteLine(calculator.Add(right: 8, left: 2) == 20);
+        Console.WriteLine(calculator.Add(left: 5) == 17);
+
+        BaseCounter baseCounter = new DerivedCounter();
+        DerivedCounter derivedCounter = new DerivedCounter();
+        Console.WriteLine(baseCounter.Read(extra: 3, value: 4) == 207);
+        Console.WriteLine(baseCounter.Read(value: 4) == 205);
+        Console.WriteLine(derivedCounter.Read(extra: 3, value: 4) == 207);
+        Console.WriteLine(derivedCounter.Read(value: 4) == 206);
+
+        IReader reader = new Reader();
+        Console.WriteLine(reader.Read(extra: 3, value: 6) == 63);
+        Console.WriteLine(reader.Read(value: 6) == 61);
+
+        NamedDelegate named = Combine;
+        Console.WriteLine(named(right: 8, left: 2) == 28);
+        Console.WriteLine(named(left: 3) == 34);
+
+        int[] numbers = new int[3];
+        numbers[0] = 4;
+        numbers[1] = 5;
+        numbers[2] = 6;
+
+        Console.WriteLine(Sum(start: 5, 1, 2, 3) == 11);
+        Console.WriteLine(Sum(values: numbers, start: 5) == 20);
+        Console.WriteLine(Sum(start: 5) == 5);
+        Console.WriteLine(SumMeters(start: 5, 1, 2) == 8);
+
+        NamedParamsDelegate packed = CombineArray;
+        Console.WriteLine(packed(start: 5, 1, 2, 3) == 11);
+        Console.WriteLine(packed(values: numbers, start: 5) == 20);
+        Console.WriteLine(packed(start: 5) == 5);
+
+        Console.WriteLine(Select(value: 9) == 1);
+        Console.WriteLine(Select(number: 9) == 2);
+
+        Console.WriteLine(UseMeters(scale: 3, distance: 4) == 12);
+        Console.WriteLine(Generic<int>(marker: 8, value: 100) == 8);
+        Console.WriteLine(GenericNamedBody<int>(0) == 129);
+
+        int refValue = 10;
+        AddTo(amount: 5, value: ref refValue);
+        Console.WriteLine(refValue == 15);
+
+        int outValue;
+        MakeValue(source: 22, value: out outValue);
+        Console.WriteLine(outValue == 22);
+        Console.WriteLine(ReadValue(add: 4, value: in refValue) == 19);
+    }
+}

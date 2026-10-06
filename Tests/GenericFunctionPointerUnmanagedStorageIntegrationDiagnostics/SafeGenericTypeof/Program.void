@@ -1,0 +1,14 @@
+using Void;
+
+public struct Slot258<T> where T : unmanaged
+{
+    public T Value;
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine(typeof(Slot258<delegate*<int, int>>) == typeof(Slot258<delegate*<int, int>>));
+    }
+}

@@ -1,0 +1,1 @@
+public ref struct S { public static ref int X; } public static class Program { public static void Main() { } }

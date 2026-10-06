@@ -1,0 +1,1 @@
+using Void.Threading; public static class Program { public static int X=1; public static async ref int Bad(){ return ref X; } public static void Main(){} }

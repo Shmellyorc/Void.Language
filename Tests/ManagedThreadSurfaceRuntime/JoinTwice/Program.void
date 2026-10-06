@@ -1,0 +1,11 @@
+using Void.Threading;
+public static class Program
+{
+    public static void Main()
+    {
+        Thread thread = new Thread(() => { });
+        thread.Start();
+        thread.Join();
+        thread.Join();
+    }
+}

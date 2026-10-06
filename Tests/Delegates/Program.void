@@ -1,0 +1,174 @@
+using Void;
+
+public delegate int Transformer(int value);
+
+public sealed class Counter
+{
+    private int _amount;
+
+    public Counter(int amount)
+    {
+        _amount = amount;
+    }
+
+    public int Add(int value)
+    {
+        return value + _amount;
+    }
+}
+
+public interface ICalculator
+{
+    int Calculate(int value);
+}
+
+public class BaseCalculator
+{
+    public virtual int Calculate(int value)
+    {
+        return value + 1;
+    }
+}
+
+public sealed class DerivedCalculator : BaseCalculator, ICalculator
+{
+    public override int Calculate(int value)
+    {
+        return value + 10;
+    }
+}
+
+public sealed class Factory
+{
+    private int _offset;
+
+    public Factory(int offset)
+    {
+        _offset = offset;
+    }
+
+    private int Add(int value)
+    {
+        return value + _offset;
+    }
+
+    public Func<int, int> Make()
+    {
+        return Add;
+    }
+}
+
+public sealed class Holder
+{
+    private int _offset;
+    public Func<int, int> Callback;
+
+    public Holder(int offset)
+    {
+        _offset = offset;
+        Callback = Add;
+    }
+
+    private int Add(int value)
+    {
+        return value + _offset;
+    }
+
+    public int Run(int value)
+    {
+        return Callback(value);
+    }
+}
+
+public static class Program
+{
+    public static int Double(int value)
+    {
+        return value * 2;
+    }
+
+    public static void Print(int value)
+    {
+        Console.WriteLine(value);
+    }
+
+    public static int Apply(Func<int, int> callback, int value)
+    {
+        return callback(value);
+    }
+
+    public static void Ping()
+    {
+        Console.WriteLine(99);
+    }
+
+    public static int FortyTwo()
+    {
+        return 42;
+    }
+
+    public static int Sum(int left, int right)
+    {
+        return left + right;
+    }
+
+    public static void PrintSum(int left, int right)
+    {
+        Console.WriteLine(left + right);
+    }
+
+    public static void Main()
+    {
+        Transformer transform = Double;
+        Console.WriteLine(transform(4));
+
+        Func<int, int> func = Double;
+        Console.WriteLine(func(5));
+
+        Action<int> action = Print;
+        action(7);
+
+        Counter counter = new Counter(3);
+        Func<int, int> bound = counter.Add;
+        counter = null;
+        GC.Collect();
+        Console.WriteLine(bound(10));
+
+        Func<int, int> apply = Double;
+        Console.WriteLine(Apply(apply, 6));
+        Console.WriteLine(bound != null);
+
+        BaseCalculator baseCalculator = new DerivedCalculator();
+        Func<int, int> virtualCall = baseCalculator.Calculate;
+        Console.WriteLine(virtualCall(5));
+
+        ICalculator calculator = new DerivedCalculator();
+        Func<int, int> interfaceCall = calculator.Calculate;
+        Console.WriteLine(interfaceCall(5));
+
+        Factory factory = new Factory(20);
+        Func<int, int> implicitThis = factory.Make();
+        factory = null;
+        GC.Collect();
+        Console.WriteLine(implicitThis(2));
+
+        Holder holder = new Holder(30);
+        Console.WriteLine(holder.Run(2));
+        Func<int, int> fieldCopy = holder.Callback;
+        holder = null;
+        GC.Collect();
+        Console.WriteLine(fieldCopy(3));
+
+        Action ping = Ping;
+        ping();
+
+        Func<int> fortyTwo = FortyTwo;
+        Console.WriteLine(fortyTwo());
+
+        Func<int, int, int> sum = Sum;
+        Console.WriteLine(sum(4, 5));
+
+        Action<int, int> printSum = PrintSum;
+        printSum(6, 7);
+    }
+}

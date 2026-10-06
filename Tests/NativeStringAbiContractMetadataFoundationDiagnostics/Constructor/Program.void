@@ -1,0 +1,2 @@
+using Void;
+public class Native293 { public Native293([NativeString(NativeStringKind.BorrowedNul)] string text) { } } public static class Program { public static void Main() { } }

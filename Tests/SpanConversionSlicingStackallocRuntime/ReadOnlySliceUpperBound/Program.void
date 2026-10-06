@@ -1,0 +1,1 @@
+using Void; public static class Program { public static void Main(){ ReadOnlySpan<int> span = new int[3]; ReadOnlySpan<int> slice = span.Slice(4); Console.WriteLine(slice.Length); } }

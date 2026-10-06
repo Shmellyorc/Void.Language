@@ -1,0 +1,40 @@
+using Void.Collections;
+
+public sealed class Item
+{
+    public int Value;
+
+    public Item(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        List<int> values = new();
+        for (int i = 0; i < 10; i++)
+            values.Add(i * 10);
+
+        Console.WriteLine(values.Count);
+        Console.WriteLine(values[0]);
+        Console.WriteLine(values[9]);
+
+        values[0] = 42;
+        Console.WriteLine(values[0]);
+
+        values.Clear();
+        Console.WriteLine(values.Count);
+        values.Add(7);
+        Console.WriteLine(values[0]);
+
+        List<Item> items = new();
+        Item item = new Item(77);
+        items.Add(item);
+        item = null;
+        GC.Collect();
+        Console.WriteLine(items[0].Value);
+    }
+}

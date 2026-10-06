@@ -1,0 +1,2 @@
+using Void;
+public static class Program { [NativeString(NativeStringKind.BorrowedNul)] public static string Get() { return "x"; } public static void Main() { } }

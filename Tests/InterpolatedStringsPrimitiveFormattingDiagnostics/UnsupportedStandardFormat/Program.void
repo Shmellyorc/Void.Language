@@ -1,0 +1,13 @@
+using Void;
+using Void.Buffers;
+using Void.Buffers.Text;
+
+public static class Program
+{
+    public static void Main()
+    {
+        byte[] buffer = new byte[32];
+        int bytesWritten;
+        Utf8Formatter.TryFormat(42, new Span<byte>(buffer), out bytesWritten, new StandardFormat('D'));
+    }
+}

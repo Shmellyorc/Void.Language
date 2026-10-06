@@ -1,0 +1,10 @@
+using Void.Collections;
+
+public static class Program
+{
+    [Export("void220_bad_async_stream")]
+    public static async IAsyncEnumerable<int> Values()
+    {
+        yield return 1;
+    }
+}

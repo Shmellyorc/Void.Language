@@ -1,0 +1,9 @@
+public class Base225Diag
+{
+    public virtual void Use(scoped ref int value) { value = value + 1; }
+}
+public sealed class Derived225Diag : Base225Diag
+{
+    public override void Use(ref int value) { value = value + 1; }
+}
+public static class Program { public static void Main() { } }

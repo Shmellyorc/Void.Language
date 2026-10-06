@@ -1,0 +1,39 @@
+using Void;
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        void* empty = NativeMemory.Allocate(0ul);
+        Console.WriteLine(empty == null);
+        NativeMemory.Free(empty);
+        Console.WriteLine(true);
+
+        void* tried = null;
+        bool allocated = NativeMemory.TryAllocate(32ul, out tried);
+        Console.WriteLine(allocated);
+        Console.WriteLine(tried != null);
+        byte* bytes = (byte*)tried;
+        for (int i = 0; i < 32; i++)
+            bytes[i] = (byte)(i + 1);
+        Console.WriteLine(bytes[0] == 1);
+        Console.WriteLine(bytes[31] == 32);
+        NativeMemory.Free(tried);
+
+        int* values = (int*)NativeMemory.Allocate(16ul);
+        values[0] = 10;
+        values[1] = 20;
+        values[2] = 30;
+        values[3] = 40;
+        Console.WriteLine(values[0] + values[3] == 50);
+        NativeMemory.Free(values);
+
+        NativeMemory.Free(null);
+        Console.WriteLine(true);
+
+        void* tryEmpty = null;
+        bool emptyOk = NativeMemory.TryAllocate(0ul, out tryEmpty);
+        Console.WriteLine(emptyOk);
+        Console.WriteLine(tryEmpty == null);
+    }
+}

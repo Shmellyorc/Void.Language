@@ -1,0 +1,289 @@
+namespace Hello;
+
+[Swizzle("Vector")]
+public struct Vector2
+{
+    public float X;
+    public float Y;
+
+    public Vector2(float x, float y)
+    {
+        X = x;
+        Y = y;
+    }
+}
+
+[Swizzle("Vector")]
+public struct Vector3
+{
+    public float X;
+    public float Y;
+    public float Z;
+
+    public Vector3(float x, float y, float z)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+    }
+}
+
+[Swizzle("Vector")]
+public struct Vector4
+{
+    public float X;
+    public float Y;
+    public float Z;
+    public float W;
+
+    public Vector4(float x, float y, float z, float w)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+        W = w;
+    }
+}
+
+public sealed class Player
+{
+    private int _health;
+    public Vector2 Position;
+
+    public int Health
+    {
+        get { return _health; }
+        private set { _health = value; }
+    }
+
+    public int Score { get; set; }
+    public int Id { get; }
+    public bool IsDead => Health <= 0;
+
+    public Player(int health, Vector2 position)
+    {
+        Health = health;
+        Position = position;
+        Score = 5;
+    }
+
+    public void Damage(int amount)
+    {
+        Health -= amount;
+    }
+}
+
+public interface IValue
+{
+    int GetValue();
+}
+
+public interface IKind
+{
+    int Kind();
+}
+
+public abstract class Actor
+{
+    protected int _value;
+
+    public int Value
+    {
+        get { return _value; }
+        protected set { _value = value; }
+    }
+
+    public virtual int GetValue()
+    {
+        return _value;
+    }
+
+    public abstract int Kind();
+
+    public virtual int SealedValue()
+    {
+        return 1;
+    }
+}
+
+public class Creature : Actor
+{
+    public override int GetValue()
+    {
+        return _value + 10;
+    }
+
+    public override int Kind()
+    {
+        return 2;
+    }
+
+    public sealed override int SealedValue()
+    {
+        return 2;
+    }
+}
+
+public sealed class Enemy : Creature, IValue, IKind
+{
+    public override int GetValue()
+    {
+        return _value + 20;
+    }
+
+    public void Set(int value)
+    {
+        Value = value;
+    }
+
+    public int BaseValue()
+    {
+        return base.GetValue();
+    }
+}
+
+public static class Program
+{
+
+    public static void Add(ref int value, int amount)
+    {
+        value += amount;
+    }
+
+    public static bool TryGet(out int value)
+    {
+        value = 42;
+        return true;
+    }
+
+    public static float Sum(in Vector2 value)
+    {
+        return value.X + value.Y;
+    }
+
+    public static int SumArray(int[] values)
+    {
+        int total = 0;
+        for (int i = 0; i < values.Length; i++)
+            total += values[i];
+        return total;
+    }
+
+    public static void MakeGarbage()
+    {
+        for (int i = 0; i < 80; i++)
+        {
+            Player garbage = new Player(i, new Vector2(0f, 0f));
+        }
+    }
+
+    public static void Main()
+    {
+        Vector4 value = new(10f, 20f, 30f, 40f);
+
+        Vector2 xy = value.xy;
+        Vector3 zyx = value.zyx;
+        Vector2 rg = value.rg;
+        Vector2 repeated = value.xx;
+
+        Console.WriteLine(xy.X);
+        Console.WriteLine(xy.Y);
+        Console.WriteLine(zyx.X);
+        Console.WriteLine(zyx.Y);
+        Console.WriteLine(zyx.Z);
+        Console.WriteLine(rg.X);
+        Console.WriteLine(rg.Y);
+        Console.WriteLine(repeated.X);
+        Console.WriteLine(repeated.Y);
+
+        value.xy = new Vector2(5f, 8f);
+        value.w = 99f;
+        value.bg = new Vector2(60f, 70f);
+
+        Console.WriteLine(value.X);
+        Console.WriteLine(value.Y);
+        Console.WriteLine(value.Z);
+        Console.WriteLine(value.W);
+
+        Vector4 bgra = value.bgra;
+        Console.WriteLine(bgra.X);
+        Console.WriteLine(bgra.Y);
+        Console.WriteLine(bgra.Z);
+        Console.WriteLine(bgra.W);
+
+        int number = 10;
+        Add(ref number, 5);
+        Console.WriteLine(number);
+
+        int result = 0;
+        bool found = TryGet(out result);
+        Console.WriteLine(found);
+        Console.WriteLine(result);
+
+        Vector2 pair = new(10f, 15f);
+        Console.WriteLine(Sum(in pair));
+
+        int[] values = new int[4];
+        values[0] = 5;
+        values[1] = 10;
+        values[2] = values[0] + values[1];
+        values[3] = 20;
+        Console.WriteLine(values.Length);
+        Console.WriteLine(values[2]);
+        Console.WriteLine(SumArray(values));
+
+        Vector2[] points = new Vector2[2];
+        points[0] = new(3f, 4f);
+        points[1] = new(8f, 9f);
+        Console.WriteLine(points[0].X);
+        Console.WriteLine(points[1].Y);
+
+        Player player = new Player(100, new Vector2(3f, 4f));
+        Player alias = player;
+        alias.Damage(10);
+        alias.Position.X += 2f;
+
+        Console.WriteLine(player.Health);
+        Console.WriteLine(player.Position.X);
+        Console.WriteLine(player == alias);
+
+        Player nobody = null;
+        Console.WriteLine(nobody == null);
+
+        Player[] party = new Player[2];
+        party[0] = player;
+        party[1] = alias;
+        Console.WriteLine(party[0] == party[1]);
+
+        MakeGarbage();
+        GC.Collect();
+        Console.WriteLine(player.Health);
+        Console.WriteLine(party[1].Health);
+
+        player.Score = 7;
+        Console.WriteLine(player.Score);
+        Console.WriteLine(player.Id);
+        Console.WriteLine(player.IsDead);
+
+        Enemy enemy = new();
+        enemy.Set(5);
+        Actor actor = enemy;
+        Creature creature = enemy;
+
+        Console.WriteLine(enemy.GetValue());
+        Console.WriteLine(actor.GetValue());
+        Console.WriteLine(creature.GetValue());
+        Console.WriteLine(enemy.BaseValue());
+        Console.WriteLine(actor.Kind());
+        Console.WriteLine(actor.SealedValue());
+        Console.WriteLine(enemy.Value);
+        Console.WriteLine(actor == enemy);
+
+        IValue interfaceValue = enemy;
+        IKind interfaceKind = enemy;
+        Console.WriteLine(interfaceValue.GetValue());
+        Console.WriteLine(interfaceKind.Kind());
+        GC.Collect();
+        Console.WriteLine(interfaceValue.GetValue());
+    }
+}

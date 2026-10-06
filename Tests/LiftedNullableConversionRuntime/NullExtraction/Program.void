@@ -1,0 +1,21 @@
+public struct Source
+{
+    public static explicit operator Target(Source value)
+    {
+        return new Target();
+    }
+}
+
+public struct Target
+{
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        Source? source = null;
+        Target target = (Target)source;
+        Console.WriteLine(true);
+    }
+}

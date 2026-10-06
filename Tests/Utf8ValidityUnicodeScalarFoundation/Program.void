@@ -1,0 +1,51 @@
+using Void;
+
+public delegate int Utf8ViewCallback301(
+    [NativeString(NativeStringKind.BorrowedPointerLength)] string text);
+
+public static class Native301
+{
+    [NativeString(NativeStringKind.BorrowedNul)]
+    [Native("void301_valid_nul")]
+    public static unsafe extern string ValidNul();
+
+    [NativeString(NativeStringKind.StaticPointerLength)]
+    [Native("void301_valid_view")]
+    public static unsafe extern string ValidView();
+
+    [Native("void301_view_matches")]
+    public static unsafe extern int ViewMatches(
+        [NativeString(NativeStringKind.BorrowedPointerLength)] string text);
+
+    [Native("void301_call_valid_view")]
+    public static unsafe extern int CallValidView(Utf8ViewCallback301 callback);
+}
+
+public static class Program
+{
+    private static int CheckCallback(string text)
+    {
+        return text == "callback\0😀" ? 301 : -1;
+    }
+
+    public static unsafe void Main()
+    {
+        Console.WriteLine("ASCII" == "ASCII");
+        Console.WriteLine("héllo" == "héllo");
+        Console.WriteLine("漢字" == "漢字");
+        Console.WriteLine("😀" == "😀");
+        Console.WriteLine("A\0😀B" == "A\0😀B");
+
+        Console.WriteLine(Native301.ValidNul() == "héllo");
+        Console.WriteLine(Native301.ValidView() == "A\0😀B");
+        Console.WriteLine(Native301.ViewMatches("A\0😀B") == 1);
+        Console.WriteLine(Native301.CallValidView(CheckCallback) == 301);
+
+        char ascii = (char)0x41;
+        char emoji = (char)128512;
+        char maximum = (char)1114111;
+        Console.WriteLine((int)ascii == 0x41);
+        Console.WriteLine((int)emoji == 128512);
+        Console.WriteLine((int)maximum == 1114111);
+    }
+}

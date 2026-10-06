@@ -1,0 +1,165 @@
+using Void;
+using Void.Threading;
+
+public sealed class Gate
+{
+    public int Phase;
+}
+
+public sealed class PulseState
+{
+    public int Ready;
+    public int Woke;
+    public int SawPhase;
+    public int RecursiveOk;
+}
+
+public static class Program
+{
+    private static void WaitForReady(PulseState state, int count)
+    {
+        while (true)
+        {
+            bool ready = false;
+            lock (state)
+            {
+                ready = state.Ready >= count;
+            }
+            if (ready)
+                return;
+            GC.Collect();
+        }
+    }
+
+    private static void WaitForWoke(PulseState state, int count)
+    {
+        while (true)
+        {
+            bool woke = false;
+            lock (state)
+            {
+                woke = state.Woke >= count;
+            }
+            if (woke)
+                return;
+            GC.Collect();
+        }
+    }
+
+    private static void SingleWaiter(Gate gate, PulseState state)
+    {
+        Monitor.Enter(gate);
+        lock (state)
+        {
+            state.Ready++;
+        }
+        bool waited = Monitor.Wait(gate);
+        if (waited && gate.Phase == 173)
+        {
+            lock (state)
+            {
+                state.SawPhase++;
+                state.Woke++;
+            }
+        }
+        Monitor.Exit(gate);
+    }
+
+    private static void RecursiveWaiter(Gate gate, PulseState state)
+    {
+        Monitor.Enter(gate);
+        Monitor.Enter(gate);
+        lock (state)
+        {
+            state.Ready++;
+        }
+        bool waited = Monitor.Wait(gate);
+        Monitor.Exit(gate);
+        Monitor.Pulse(gate);
+        bool ok = waited && gate.Phase == 173;
+        Monitor.Exit(gate);
+        lock (state)
+        {
+            if (ok)
+                state.RecursiveOk++;
+            state.Woke++;
+        }
+    }
+
+    public static void Main()
+    {
+        Gate singleGate = new Gate();
+        PulseState singleState = new PulseState();
+        Thread singleOne = new Thread(() => SingleWaiter(singleGate, singleState));
+        Thread singleTwo = new Thread(() => SingleWaiter(singleGate, singleState));
+        singleOne.Start();
+        singleTwo.Start();
+        WaitForReady(singleState, 2);
+
+        Monitor.Enter(singleGate);
+        Monitor.Pulse(singleGate);
+        singleGate.Phase = 173;
+        int wokeWhileOwnerHeld = 0;
+        lock (singleState)
+        {
+            wokeWhileOwnerHeld = singleState.Woke;
+        }
+        Console.WriteLine(wokeWhileOwnerHeld == 0);
+        Monitor.Exit(singleGate);
+
+        WaitForWoke(singleState, 1);
+        int wokeAfterPulse = 0;
+        lock (singleState)
+        {
+            wokeAfterPulse = singleState.Woke;
+        }
+        Console.WriteLine(wokeAfterPulse == 1);
+
+        Monitor.Enter(singleGate);
+        Monitor.PulseAll(singleGate);
+        Monitor.Exit(singleGate);
+        singleOne.Join();
+        singleTwo.Join();
+        Console.WriteLine(singleState.Woke == 2);
+        Console.WriteLine(singleState.SawPhase == 2);
+
+        Gate allGate = new Gate();
+        PulseState allState = new PulseState();
+        Thread allOne = new Thread(() => SingleWaiter(allGate, allState));
+        Thread allTwo = new Thread(() => SingleWaiter(allGate, allState));
+        Thread allThree = new Thread(() => SingleWaiter(allGate, allState));
+        allOne.Start();
+        allTwo.Start();
+        allThree.Start();
+        WaitForReady(allState, 3);
+        Monitor.Enter(allGate);
+        allGate.Phase = 173;
+        Monitor.PulseAll(allGate);
+        Monitor.Exit(allGate);
+        allOne.Join();
+        allTwo.Join();
+        allThree.Join();
+        Console.WriteLine(allState.Woke == 3);
+        Console.WriteLine(allState.SawPhase == 3);
+
+        Gate recursiveGate = new Gate();
+        PulseState recursiveState = new PulseState();
+        Thread recursive = new Thread(() => RecursiveWaiter(recursiveGate, recursiveState));
+        recursive.Start();
+        WaitForReady(recursiveState, 1);
+        Monitor.Enter(recursiveGate);
+        recursiveGate.Phase = 173;
+        Monitor.Pulse(recursiveGate);
+        Monitor.Exit(recursiveGate);
+        recursive.Join();
+        Console.WriteLine(recursiveState.Woke == 1);
+        Console.WriteLine(recursiveState.RecursiveOk == 1);
+
+        Gate noWaiters = new Gate();
+        Monitor.Enter(noWaiters);
+        Monitor.Pulse(noWaiters);
+        Monitor.PulseAll(noWaiters);
+        Monitor.Exit(noWaiters);
+        Console.WriteLine(true);
+    }
+}

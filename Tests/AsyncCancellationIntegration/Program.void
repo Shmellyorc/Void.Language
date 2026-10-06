@@ -1,0 +1,293 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class AsyncCancelFault207 : Exception
+{
+    public AsyncCancelFault207(string message) : base(message)
+    {
+    }
+}
+
+public static class Program
+{
+    public static int Sequence;
+
+    private static bool WaitCanceled(Task task, CancellationToken expected)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observed = error.CancellationToken;
+            CancellationToken stored = task.CancellationToken;
+            return task.IsCanceled && !task.IsFaulted &&
+                observed.IsSameSource(expected) &&
+                stored.IsSameSource(expected);
+        }
+        return false;
+    }
+
+    private static bool WaitCanceledWithoutSource(Task task)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observed = error.CancellationToken;
+            CancellationToken stored = task.CancellationToken;
+            return task.IsCanceled && !task.IsFaulted &&
+                !observed.CanBeCanceled && !stored.CanBeCanceled;
+        }
+        return false;
+    }
+
+    private static async Task CancelBeforeAwait(Task signal, CancellationToken token)
+    {
+        token.ThrowIfCancellationRequested();
+        await signal;
+    }
+
+    private static async Task CancelAfterAwait(Task signal, CancellationToken token)
+    {
+        await signal;
+        token.ThrowIfCancellationRequested();
+    }
+
+    private static async Task AwaitCanceled(Task task)
+    {
+        await task;
+    }
+
+    private static async Task<int> AwaitCanceledTyped(Task<int> task)
+    {
+        int value = await task;
+        return value + 1;
+    }
+
+    private static async Task<int> CatchDirectCancellation(CancellationToken token)
+    {
+        try
+        {
+            token.ThrowIfCancellationRequested();
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observed = error.CancellationToken;
+            return observed.IsSameSource(token) ? 17 : -1;
+        }
+        return -2;
+    }
+
+    private static async Task<int> CatchAwaitCancellation(Task task, CancellationToken token)
+    {
+        try
+        {
+            await task;
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observed = error.CancellationToken;
+            if (!observed.IsSameSource(token))
+                return -1;
+        }
+        return 23;
+    }
+
+    private static async Task CancelThroughFinally(Task signal, CancellationToken token)
+    {
+        Sequence = 0;
+        try
+        {
+            Sequence = 1;
+            await signal;
+            token.ThrowIfCancellationRequested();
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 2;
+        }
+    }
+
+    private static async Task<int> CancelInFinallyOverridesReturn(Task signal, CancellationToken token)
+    {
+        try
+        {
+            await signal;
+            return 41;
+        }
+        finally
+        {
+            token.ThrowIfCancellationRequested();
+        }
+    }
+
+    private static async Task<int> CancelInFinallyOverridesFault(Task signal, CancellationToken token)
+    {
+        try
+        {
+            await signal;
+            throw new AsyncCancelFault207("original");
+        }
+        finally
+        {
+            token.ThrowIfCancellationRequested();
+        }
+    }
+
+    private static async Task NoAwaitCancellation(CancellationToken token)
+    {
+        token.ThrowIfCancellationRequested();
+    }
+
+    private static async Task NoTokenCancellation()
+    {
+        throw new OperationCanceledException();
+    }
+
+    private static async Task ManualCancellation(CancellationToken token)
+    {
+        throw new OperationCanceledException(token);
+    }
+
+    private static async Task NormalFault()
+    {
+        throw new AsyncCancelFault207("fault");
+    }
+
+    public static void Main()
+    {
+        CancellationTokenSource preSource = new CancellationTokenSource();
+        CancellationToken preToken = preSource.Token;
+        preSource.Cancel();
+        TaskCompletionSource preSignal = new TaskCompletionSource();
+        preSignal.SetResult();
+        Task pre = CancelBeforeAwait(preSignal.Task, preToken);
+        Console.WriteLine(pre.Status == TaskStatus.Canceled);
+        Console.WriteLine(pre.IsCanceled);
+        Console.WriteLine(!pre.IsFaulted);
+        CancellationToken preStored = pre.CancellationToken;
+        Console.WriteLine(preStored.IsSameSource(preToken));
+        Console.WriteLine(WaitCanceled(pre, preToken));
+
+        CancellationTokenSource afterSource = new CancellationTokenSource();
+        CancellationToken afterToken = afterSource.Token;
+        TaskCompletionSource afterSignal = new TaskCompletionSource();
+        Task after = CancelAfterAwait(afterSignal.Task, afterToken);
+        Console.WriteLine(!after.IsCompleted);
+        afterSource.Cancel();
+        Console.WriteLine(!after.IsCompleted);
+        afterSignal.SetResult();
+        Console.WriteLine(WaitCanceled(after, afterToken));
+        Console.WriteLine(after.Status == TaskStatus.Canceled);
+
+        CancellationTokenSource awaitedSource = new CancellationTokenSource();
+        CancellationToken awaitedToken = awaitedSource.Token;
+        TaskCompletionSource awaitedTcs = new TaskCompletionSource();
+        Task awaitedOuter = AwaitCanceled(awaitedTcs.Task);
+        Console.WriteLine(!awaitedOuter.IsCompleted);
+        awaitedSource.Cancel();
+        awaitedTcs.SetCanceled(awaitedToken);
+        Console.WriteLine(WaitCanceled(awaitedOuter, awaitedToken));
+        CancellationToken awaitedStored = awaitedOuter.CancellationToken;
+        Console.WriteLine(awaitedStored.IsSameSource(awaitedToken));
+
+        CancellationTokenSource completedSource = new CancellationTokenSource();
+        CancellationToken completedToken = completedSource.Token;
+        completedSource.Cancel();
+        TaskCompletionSource completedTcs = new TaskCompletionSource();
+        completedTcs.SetCanceled(completedToken);
+        Task completedOuter = AwaitCanceled(completedTcs.Task);
+        Console.WriteLine(completedOuter.Status == TaskStatus.Canceled);
+        Console.WriteLine(WaitCanceled(completedOuter, completedToken));
+
+        CancellationTokenSource typedSource = new CancellationTokenSource();
+        CancellationToken typedToken = typedSource.Token;
+        TaskCompletionSource<int> typedTcs = new TaskCompletionSource<int>();
+        Task<int> typedOuter = AwaitCanceledTyped(typedTcs.Task);
+        typedSource.Cancel();
+        typedTcs.SetCanceled(typedToken);
+        Console.WriteLine(WaitCanceled(typedOuter, typedToken));
+        Console.WriteLine(typedOuter.Status == TaskStatus.Canceled);
+        CancellationToken typedStored = typedOuter.CancellationToken;
+        Console.WriteLine(typedStored.IsSameSource(typedToken));
+
+        Task<int> caughtDirect = CatchDirectCancellation(preToken);
+        Console.WriteLine(caughtDirect.Result == 17);
+        Console.WriteLine(caughtDirect.Status == TaskStatus.Completed);
+
+        CancellationTokenSource caughtSource = new CancellationTokenSource();
+        CancellationToken caughtToken = caughtSource.Token;
+        TaskCompletionSource caughtTcs = new TaskCompletionSource();
+        Task<int> caughtAwait = CatchAwaitCancellation(caughtTcs.Task, caughtToken);
+        caughtSource.Cancel();
+        caughtTcs.SetCanceled(caughtToken);
+        Console.WriteLine(caughtAwait.Result == 23);
+        Console.WriteLine(!caughtAwait.IsCanceled);
+
+        CancellationTokenSource finallySource = new CancellationTokenSource();
+        CancellationToken finallyToken = finallySource.Token;
+        TaskCompletionSource finallySignal = new TaskCompletionSource();
+        Task finallyTask = CancelThroughFinally(finallySignal.Task, finallyToken);
+        finallySource.Cancel();
+        finallySignal.SetResult();
+        Console.WriteLine(WaitCanceled(finallyTask, finallyToken));
+        Console.WriteLine(Sequence == 12);
+
+        CancellationTokenSource overrideReturnSource = new CancellationTokenSource();
+        CancellationToken overrideReturnToken = overrideReturnSource.Token;
+        TaskCompletionSource overrideReturnSignal = new TaskCompletionSource();
+        Task<int> overrideReturn = CancelInFinallyOverridesReturn(overrideReturnSignal.Task, overrideReturnToken);
+        overrideReturnSource.Cancel();
+        overrideReturnSignal.SetResult();
+        Console.WriteLine(WaitCanceled(overrideReturn, overrideReturnToken));
+        Console.WriteLine(overrideReturn.Status == TaskStatus.Canceled);
+
+        CancellationTokenSource overrideFaultSource = new CancellationTokenSource();
+        CancellationToken overrideFaultToken = overrideFaultSource.Token;
+        TaskCompletionSource overrideFaultSignal = new TaskCompletionSource();
+        Task<int> overrideFault = CancelInFinallyOverridesFault(overrideFaultSignal.Task, overrideFaultToken);
+        overrideFaultSource.Cancel();
+        overrideFaultSignal.SetResult();
+        Console.WriteLine(WaitCanceled(overrideFault, overrideFaultToken));
+        Console.WriteLine(!overrideFault.IsFaulted);
+
+        CancellationTokenSource noAwaitSource = new CancellationTokenSource();
+        CancellationToken noAwaitToken = noAwaitSource.Token;
+        noAwaitSource.Cancel();
+        Task noAwait = NoAwaitCancellation(noAwaitToken);
+        Console.WriteLine(WaitCanceled(noAwait, noAwaitToken));
+        Console.WriteLine(noAwait.Status == TaskStatus.Canceled);
+
+        Task noToken = NoTokenCancellation();
+        Console.WriteLine(WaitCanceledWithoutSource(noToken));
+        Console.WriteLine(noToken.Status == TaskStatus.Canceled);
+
+        CancellationTokenSource manualSource = new CancellationTokenSource();
+        CancellationToken manualToken = manualSource.Token;
+        Task manual = ManualCancellation(manualToken);
+        Console.WriteLine(WaitCanceled(manual, manualToken));
+        Console.WriteLine(!manualToken.IsCancellationRequested);
+        Console.WriteLine(manual.Status == TaskStatus.Canceled);
+
+        Task fault = NormalFault();
+        try
+        {
+            fault.Wait();
+            Console.WriteLine(false);
+        }
+        catch (AsyncCancelFault207 error)
+        {
+            Console.WriteLine(error.Message == "fault");
+            Console.WriteLine(fault.IsFaulted);
+            Console.WriteLine(!fault.IsCanceled);
+        }
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

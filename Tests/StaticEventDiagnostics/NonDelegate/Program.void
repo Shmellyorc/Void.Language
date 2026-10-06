@@ -1,0 +1,2 @@
+public static class Hub { public static event int Changed; }
+public static class Program { public static void Main() { } }

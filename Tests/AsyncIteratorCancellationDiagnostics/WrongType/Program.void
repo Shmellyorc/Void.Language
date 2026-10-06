@@ -1,0 +1,11 @@
+using Void.Collections;
+
+public static class Program
+{
+    private static async IAsyncEnumerable<int> Values([EnumeratorCancellation] int value)
+    {
+        yield return value;
+    }
+
+    public static void Main() { }
+}

@@ -1,0 +1,11 @@
+using Void;
+
+public static class Program
+{
+    public static void Main()
+    {
+        Player player = new Player();
+        player.Damage(5);
+        Console.WriteLine(player.Health);
+    }
+}

@@ -1,0 +1,41 @@
+public static class LibraryNative
+{
+    [Native("void099_add")]
+    public static unsafe extern int Add(int left, int right);
+    [Native("void099_adjust")]
+    public static unsafe extern void Adjust(ref int value, int amount);
+    [Native("void099_write")]
+    public static unsafe extern void Write(out int value);
+    [Native("void099_read")]
+    public static unsafe extern int Read(in int value);
+    [Native("void099_increment")]
+    public static unsafe extern int Increment();
+    [Native("void099_init_count")]
+    public static unsafe extern int InitCountValue();
+    [Native("void099_gc_value")]
+    public static unsafe extern int GcValue();
+    [Native("void099_replace_gc_value")]
+    public static unsafe extern int ReplaceGcValue(int value);
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        Console.WriteLine(LibraryNative.Add(20, 22) == 42);
+        int value = 5;
+        LibraryNative.Adjust(ref value, 7);
+        Console.WriteLine(value == 12);
+        Console.WriteLine(LibraryNative.Read(in value) == 12);
+        LibraryNative.Write(out value);
+        Console.WriteLine(value == 99);
+        Console.WriteLine(LibraryNative.InitCountValue() == 1);
+        Console.WriteLine(LibraryNative.InitCountValue() == 1);
+        Console.WriteLine(LibraryNative.Increment() == 1);
+        Console.WriteLine(LibraryNative.Increment() == 2);
+        Console.WriteLine(LibraryNative.GcValue() == 42);
+        Console.WriteLine(LibraryNative.GcValue() == 42);
+        Console.WriteLine(LibraryNative.ReplaceGcValue(77) == 77);
+        Console.WriteLine(LibraryNative.GcValue() == 79);
+    }
+}

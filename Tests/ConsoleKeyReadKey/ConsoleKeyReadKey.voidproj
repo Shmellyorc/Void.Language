@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "ConsoleKeyReadKey",
+  "version": "0.0.317",
+  "output": "exe",
+  "compiler": { "unsafe": false }
+}

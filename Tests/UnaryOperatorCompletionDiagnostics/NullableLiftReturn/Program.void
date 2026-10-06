@@ -1,0 +1,13 @@
+public sealed class RefValue {}
+public struct Value
+{
+    public static RefValue operator -(Value value) { return new RefValue(); }
+}
+public static class Program
+{
+    public static void Main()
+    {
+        Value? value = default(Value);
+        RefValue result = -value;
+    }
+}

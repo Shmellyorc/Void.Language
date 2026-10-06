@@ -1,0 +1,3 @@
+public interface IFactory { static int Create(int x); }
+public sealed class Bad : IFactory { public static string Create(int x) { return "bad"; } }
+public static class Program { static int Make<T>(int x) where T : IFactory { return T.Create(x); } public static void Main() { Make<Bad>(1); } }

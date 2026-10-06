@@ -1,0 +1,16 @@
+public interface IIntValue
+{
+    int Get();
+}
+
+public interface IFloatValue
+{
+    float Get();
+}
+
+public interface IBad : IIntValue, IFloatValue { }
+
+public static class Program
+{
+    public static void Main() { }
+}

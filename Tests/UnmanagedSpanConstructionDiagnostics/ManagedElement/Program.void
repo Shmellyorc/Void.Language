@@ -1,0 +1,3 @@
+using Void;
+public struct Bad247 { public string Text; }
+public static class Program { public static unsafe void Main() { void* p = null; Span<Bad247> span = new Span<Bad247>(p, 1); Console.WriteLine(span.Length); } }

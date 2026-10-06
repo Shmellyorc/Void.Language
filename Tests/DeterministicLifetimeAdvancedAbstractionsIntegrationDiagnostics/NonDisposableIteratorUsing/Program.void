@@ -1,0 +1,20 @@
+using Void.Collections;
+
+public sealed class Plain
+{
+}
+
+public static class Program
+{
+    public static IEnumerator<int> Values()
+    {
+        using (Plain value = new Plain())
+        {
+            yield return 1;
+        }
+    }
+
+    public static void Main()
+    {
+    }
+}

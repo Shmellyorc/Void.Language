@@ -1,0 +1,10 @@
+using Void.Text;
+public static class Program
+{
+    public static void Main()
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.Append("abc");
+        builder.Capacity = 2;
+    }
+}

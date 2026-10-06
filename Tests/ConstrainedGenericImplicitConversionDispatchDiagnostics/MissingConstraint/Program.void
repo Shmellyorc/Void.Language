@@ -1,0 +1,11 @@
+public struct Sneaky
+{
+    public int Value;
+    public Sneaky(int value) { Value = value; }
+    public static implicit operator int(Sneaky value) { return value.Value; }
+}
+public static class Program
+{
+    private static int Convert<T>(T value) { return value; }
+    public static void Main() { int value = Convert(new Sneaky(1)); }
+}

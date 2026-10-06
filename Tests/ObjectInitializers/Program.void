@@ -1,0 +1,207 @@
+using Void;
+
+public sealed class Node
+{
+    public int Value { get; set; } = 1;
+    public string Name { get; set; } = "Default";
+}
+
+public struct Meters
+{
+    public int Value;
+
+    public Meters(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator Meters(int value)
+    {
+        return new Meters(value);
+    }
+}
+
+public sealed class Player
+{
+    public int Health = 100;
+    public string Name { get; set; } = "Player";
+    public int? Score { get; set; } = 5;
+    public Meters Distance { get; set; } = 2;
+    public Node Friend { get; set; } = new Node();
+
+    public Player() { }
+
+    public Player(int health)
+    {
+        Health = health;
+    }
+}
+
+public sealed class Ordered
+{
+    public int A;
+    private int _result;
+
+    public int B
+    {
+        get { return _result; }
+        set { _result = A + value; }
+    }
+}
+
+public sealed class GcHolder
+{
+    private Node _node;
+
+    public Node Node
+    {
+        get { return _node; }
+        set
+        {
+            GC.Collect();
+            _node = value;
+        }
+    }
+}
+
+public class BaseThing
+{
+    public int BaseValue = 3;
+}
+
+public sealed class DerivedThing : BaseThing
+{
+    public int DerivedValue { get; set; } = 4;
+}
+
+public struct Point
+{
+    public int X = 1;
+    public int Y { get; set; } = 2;
+}
+
+public sealed class Container
+{
+    public Node Child { get; set; }
+}
+
+public sealed class Box<T>
+{
+    public T Value { get; set; } = default;
+}
+
+public static class Program
+{
+    public static int Next(ref int count)
+    {
+        count += 1;
+        return 75;
+    }
+
+    public static void Main()
+    {
+        Player player = new Player
+        {
+            Health = 80,
+            Name = "Hero",
+            Score = 9,
+            Distance = 12,
+            Friend = new Node { Value = 22, Name = "Buddy" }
+        };
+        Console.WriteLine(player.Health == 80);
+        string hero = "Hero";
+        Console.WriteLine(player.Name == hero);
+        Console.WriteLine(player.Score.HasValue);
+        Console.WriteLine(player.Score.Value == 9);
+        Console.WriteLine(player.Distance.Value == 12);
+        Console.WriteLine(player.Friend.Value == 22);
+        string buddy = "Buddy";
+        Console.WriteLine(player.Friend.Name == buddy);
+
+        int calls = 0;
+        Player constructed = new Player(Next(ref calls))
+        {
+            Name = "Once"
+        };
+        Console.WriteLine(calls == 1);
+        Console.WriteLine(constructed.Health == 75);
+        string once = "Once";
+        Console.WriteLine(constructed.Name == once);
+
+        Player targetTyped = new()
+        {
+            Health = 60,
+            Name = "Target"
+        };
+        Console.WriteLine(targetTyped.Health == 60);
+        string targetName = "Target";
+        Console.WriteLine(targetTyped.Name == targetName);
+
+        Ordered ordered = new Ordered
+        {
+            A = 3,
+            B = 4
+        };
+        Console.WriteLine(ordered.A == 3);
+        Console.WriteLine(ordered.B == 7);
+
+        DerivedThing derived = new DerivedThing
+        {
+            BaseValue = 11,
+            DerivedValue = 12
+        };
+        Console.WriteLine(derived.BaseValue == 11);
+        Console.WriteLine(derived.DerivedValue == 12);
+
+        Point point = new Point
+        {
+            X = 7,
+            Y = 8
+        };
+        Console.WriteLine(point.X == 7);
+        Console.WriteLine(point.Y == 8);
+
+        Point targetPoint = new()
+        {
+            Y = 9,
+            X = 10
+        };
+        Console.WriteLine(targetPoint.X == 10);
+        Console.WriteLine(targetPoint.Y == 9);
+
+        Container container = new Container
+        {
+            Child = new Node
+            {
+                Value = 31,
+                Name = "Nested"
+            }
+        };
+        Console.WriteLine(container.Child.Value == 31);
+        string nested = "Nested";
+        Console.WriteLine(container.Child.Name == nested);
+
+        GcHolder gc = new GcHolder
+        {
+            Node = new Node { Value = 44 }
+        };
+        GC.Collect();
+        Console.WriteLine(gc.Node != null);
+        Console.WriteLine(gc.Node.Value == 44);
+
+        Box<int> intBox = new Box<int> { Value = 55 };
+        Console.WriteLine(intBox.Value == 55);
+
+        Box<string> stringBox = new Box<string> { Value = "Generic" };
+        string generic = "Generic";
+        Console.WriteLine(stringBox.Value == generic);
+
+        Node defaulted = new Node
+        {
+            Value = default,
+            Name = null
+        };
+        Console.WriteLine(defaulted.Value == 0);
+        Console.WriteLine(defaulted.Name == null);
+    }
+}

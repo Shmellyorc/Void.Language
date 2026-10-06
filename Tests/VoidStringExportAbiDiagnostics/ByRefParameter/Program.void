@@ -1,0 +1,7 @@
+public static class BadExport
+{
+    [Export("void298_bad_ref")]
+    public static void Bad(ref string text)
+    {
+    }
+}

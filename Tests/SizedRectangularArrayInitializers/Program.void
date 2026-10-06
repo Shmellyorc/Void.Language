@@ -1,0 +1,128 @@
+using Void;
+
+public static class Dimensions
+{
+    public const int Rows = 1 + 1;
+    public const int Columns = 6 / 2;
+    public const int Layers = true ? 2 : 1;
+}
+
+public struct Meters
+{
+    public int Value;
+    public Meters(int value) { Value = value; }
+    public static implicit operator Meters(int value) { return new Meters(value); }
+}
+
+public sealed class Box
+{
+    public int Value;
+    public Box(int value) { Value = value; }
+}
+
+public static class Program
+{
+    private static int _step;
+
+    private static int Next()
+    {
+        _step++;
+        return _step;
+    }
+
+    private static Box CollectAndMake(int value)
+    {
+        GC.Collect();
+        return new Box(value);
+    }
+
+    public static void Main()
+    {
+        int[,] a = new int[2, 3] { { 1, 2, 3 }, { 4, 5, 6 } };
+        Console.WriteLine(a.Rank == 2);
+        Console.WriteLine(a.Length == 6);
+        Console.WriteLine(a.GetLength(0) == 2);
+        Console.WriteLine(a.GetLength(1) == 3);
+        Console.WriteLine(a[0, 0] == 1);
+        Console.WriteLine(a[0, 2] == 3);
+        Console.WriteLine(a[1, 0] == 4);
+        Console.WriteLine(a[1, 2] == 6);
+
+        int[,,] b = new int[2, 1, 2] { { { 7, 8 } }, { { 9, 10 } } };
+        Console.WriteLine(b.Rank == 3);
+        Console.WriteLine(b.Length == 4);
+        Console.WriteLine(b.GetLength(0) == 2);
+        Console.WriteLine(b.GetLength(1) == 1);
+        Console.WriteLine(b.GetLength(2) == 2);
+        Console.WriteLine(b[0, 0, 1] == 8);
+        Console.WriteLine(b[1, 0, 0] == 9);
+        Console.WriteLine(b[1, 0, 1] == 10);
+
+        int[,,,] c = new int[1, 1, 2, 2] { { { { 1, 2 }, { 3, 4 } } } };
+        Console.WriteLine(c.Rank == 4);
+        Console.WriteLine(c.Length == 4);
+        Console.WriteLine(c.GetLength(0) == 1);
+        Console.WriteLine(c.GetLength(1) == 1);
+        Console.WriteLine(c.GetLength(2) == 2);
+        Console.WriteLine(c.GetLength(3) == 2);
+        Console.WriteLine(c[0, 0, 1, 1] == 4);
+
+        int[,] constants = new int[Dimensions.Rows, Dimensions.Columns] {
+            { 11, 12, 13 },
+            { 14, 15, 16 }
+        };
+        Console.WriteLine(constants.Length == 6);
+        Console.WriteLine(constants.GetLength(0) == 2);
+        Console.WriteLine(constants.GetLength(1) == 3);
+        Console.WriteLine(constants[1, 2] == 16);
+
+        int[,] arithmetic = new int[1 + 1, 8 / 4] { { 21, 22 }, { 23, 24 } };
+        Console.WriteLine(arithmetic.Length == 4);
+        Console.WriteLine(arithmetic[0, 1] == 22);
+        Console.WriteLine(arithmetic[1, 0] == 23);
+
+        int[,,] conditional = new int[Dimensions.Layers, true ? 1 : 2, 1] {
+            { { 31 } },
+            { { 32 } }
+        };
+        Console.WriteLine(conditional.GetLength(0) == 2);
+        Console.WriteLine(conditional.GetLength(1) == 1);
+        Console.WriteLine(conditional[1, 0, 0] == 32);
+
+        Meters[,] converted = new Meters[1, 2] { { 41, 42 } };
+        Console.WriteLine(converted[0, 0].Value == 41);
+        Console.WriteLine(converted[0, 1].Value == 42);
+
+        Box[,] boxes = new Box[2, 1] {
+            { new Box(51) },
+            { CollectAndMake(52) }
+        };
+        GC.Collect();
+        Console.WriteLine(boxes[0, 0].Value == 51);
+        Console.WriteLine(boxes[1, 0].Value == 52);
+
+        int?[,] nullable = new int?[1, 2] { { 61, null } };
+        Console.WriteLine(nullable.Length == 2);
+        Console.WriteLine(nullable[0, 0].HasValue);
+        Console.WriteLine(nullable[0, 0].Value == 61);
+        Console.WriteLine(!nullable[0, 1].HasValue);
+
+        int[,] empty = new int[0, 0] { };
+        Console.WriteLine(empty.Length == 0);
+        Console.WriteLine(empty.GetLength(0) == 0);
+        Console.WriteLine(empty.GetLength(1) == 0);
+
+        int[,] zeroColumns = new int[2, 0] { { }, { } };
+        Console.WriteLine(zeroColumns.Length == 0);
+        Console.WriteLine(zeroColumns.GetLength(0) == 2);
+        Console.WriteLine(zeroColumns.GetLength(1) == 0);
+
+        _step = 0;
+        int[,] order = new int[2, 2] { { Next(), Next() }, { Next(), Next() } };
+        Console.WriteLine(_step == 4);
+        Console.WriteLine(order[0, 0] == 1);
+        Console.WriteLine(order[0, 1] == 2);
+        Console.WriteLine(order[1, 0] == 3);
+        Console.WriteLine(order[1, 1] == 4);
+    }
+}

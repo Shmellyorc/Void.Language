@@ -1,0 +1,9 @@
+public sealed class Box225Diag
+{
+    public int[] Values = new int[] { 1 };
+    public ref readonly int get_Item(int index) { return ref Values[index]; }
+}
+public static class Program
+{
+    public static void Main() { Box225Diag box = new Box225Diag(); box[0] = 2; }
+}

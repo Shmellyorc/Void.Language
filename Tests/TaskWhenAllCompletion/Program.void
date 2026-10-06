@@ -1,0 +1,221 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class Payload278
+{
+    public int Value;
+
+    public Payload278(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    private static bool WaitCompleted(Task task)
+    {
+        int elapsed = 0;
+        while (!task.IsCompleted && elapsed < 5000)
+        {
+            Thread.Sleep(1);
+            elapsed++;
+        }
+        return task.IsCompleted;
+    }
+
+    private static bool WaitCanceled(Task task, CancellationToken token)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (OperationCanceledException error)
+        {
+            return error.CancellationToken.IsSameSource(token);
+        }
+        return false;
+    }
+
+    private static async Task<int> AwaitTyped(Task<int> first, Task<int> second)
+    {
+        int[] results = await Task.WhenAll(first, second);
+        return results[0] * 10 + results[1];
+    }
+
+    private static async Task AwaitUntyped(Task first, Task second)
+    {
+        await Task.WhenAll(first, second);
+    }
+
+    public static void Main()
+    {
+        Task empty = Task.WhenAll();
+        Console.WriteLine(empty == Task.CompletedTask && empty.IsCompleted);
+
+        Task<int[]> emptyTyped = Task.WhenAll<int>();
+        Console.WriteLine(emptyTyped.IsCompleted && emptyTyped.Result.Length == 0);
+
+        Task immediate = Task.WhenAll(Task.CompletedTask, Task.CompletedTask);
+        Console.WriteLine(immediate.IsCompleted && immediate.Status == TaskStatus.Completed);
+
+        Task<int[]> inferredImmediate = Task.WhenAll(Task.FromResult<int>(10), Task.FromResult<int>(20));
+        Console.WriteLine(inferredImmediate.IsCompleted);
+        Console.WriteLine(inferredImmediate.Result.Length == 2 &&
+            inferredImmediate.Result[0] == 10 && inferredImmediate.Result[1] == 20);
+
+        TaskCompletionSource firstSource = new TaskCompletionSource();
+        TaskCompletionSource secondSource = new TaskCompletionSource();
+        Task pending = Task.WhenAll(firstSource.Task, secondSource.Task);
+        Console.WriteLine(!pending.IsCompleted);
+        secondSource.SetResult();
+        Thread.Sleep(5);
+        Console.WriteLine(!pending.IsCompleted);
+        firstSource.SetResult();
+        Console.WriteLine(WaitCompleted(pending) && pending.Status == TaskStatus.Completed);
+
+        TaskCompletionSource duplicateSource = new TaskCompletionSource();
+        Task duplicate = Task.WhenAll(duplicateSource.Task, duplicateSource.Task);
+        Console.WriteLine(!duplicate.IsCompleted);
+        duplicateSource.SetResult();
+        Console.WriteLine(WaitCompleted(duplicate) && duplicate.IsCompleted);
+
+        TaskCompletionSource<int> typedFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> typedSecond = new TaskCompletionSource<int>();
+        Task<int[]> ordered = Task.WhenAll(typedFirst.Task, typedSecond.Task);
+        typedSecond.SetResult(2);
+        typedFirst.SetResult(1);
+        Console.WriteLine(WaitCompleted(ordered));
+        Console.WriteLine(ordered.Result[0] == 1 && ordered.Result[1] == 2);
+
+        Task<int>[] typedArray = new Task<int>[2];
+        typedArray[0] = Task.FromResult<int>(7);
+        typedArray[1] = Task.FromResult<int>(8);
+        Task<int[]> arrayAggregate = Task.WhenAll(typedArray);
+        Console.WriteLine(arrayAggregate.IsCompleted && arrayAggregate.Result[0] == 7 &&
+            arrayAggregate.Result[1] == 8);
+
+        Task[] plainArray = new Task[2];
+        plainArray[0] = Task.CompletedTask;
+        plainArray[1] = Task.CompletedTask;
+        Console.WriteLine(Task.WhenAll(plainArray).IsCompleted);
+
+        TaskCompletionSource<int> awaitFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> awaitSecond = new TaskCompletionSource<int>();
+        Task<int> awaited = AwaitTyped(awaitFirst.Task, awaitSecond.Task);
+        Console.WriteLine(!awaited.IsCompleted);
+        awaitSecond.SetResult(4);
+        awaitFirst.SetResult(3);
+        Console.WriteLine(WaitCompleted(awaited) && awaited.Result == 34);
+
+        TaskCompletionSource awaitVoidFirst = new TaskCompletionSource();
+        TaskCompletionSource awaitVoidSecond = new TaskCompletionSource();
+        Task awaitedVoid = AwaitUntyped(awaitVoidFirst.Task, awaitVoidSecond.Task);
+        Console.WriteLine(!awaitedVoid.IsCompleted);
+        awaitVoidFirst.SetResult();
+        awaitVoidSecond.SetResult();
+        Console.WriteLine(WaitCompleted(awaitedVoid) && awaitedVoid.Status == TaskStatus.Completed);
+
+        TaskCompletionSource firstFaultSource = new TaskCompletionSource();
+        TaskCompletionSource secondFaultSource = new TaskCompletionSource();
+        Task deterministicFault = Task.WhenAll(firstFaultSource.Task, secondFaultSource.Task);
+        secondFaultSource.SetException(new Exception("second fault"));
+        Thread.Sleep(5);
+        Console.WriteLine(!deterministicFault.IsCompleted);
+        firstFaultSource.SetException(new Exception("first fault"));
+        Console.WriteLine(WaitCompleted(deterministicFault));
+        Console.WriteLine(deterministicFault.IsFaulted && deterministicFault.Exception.Message == "first fault");
+
+        CancellationTokenSource canceledFirstSource = new CancellationTokenSource();
+        CancellationTokenSource canceledSecondSource = new CancellationTokenSource();
+        CancellationToken canceledFirstToken = canceledFirstSource.Token;
+        CancellationToken canceledSecondToken = canceledSecondSource.Token;
+        canceledFirstSource.Cancel();
+        canceledSecondSource.Cancel();
+        Task deterministicCancellation = Task.WhenAll(
+            Task.FromCanceled(canceledFirstToken), Task.FromCanceled(canceledSecondToken));
+        Console.WriteLine(deterministicCancellation.IsCanceled &&
+            WaitCanceled(deterministicCancellation, canceledFirstToken));
+
+        Task faultBeatsCancellation = Task.WhenAll(
+            Task.FromCanceled(canceledFirstToken), Task.FromException(new Exception("fault wins")));
+        Console.WriteLine(faultBeatsCancellation.IsFaulted &&
+            faultBeatsCancellation.Exception.Message == "fault wins");
+
+        TaskCompletionSource<int> typedFaultSource = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> typedSuccessSource = new TaskCompletionSource<int>();
+        Task<int[]> typedFault = Task.WhenAll(typedFaultSource.Task, typedSuccessSource.Task);
+        typedSuccessSource.SetResult(9);
+        typedFaultSource.SetException(new Exception("typed fault"));
+        Console.WriteLine(WaitCompleted(typedFault));
+        Console.WriteLine(typedFault.IsFaulted && typedFault.Exception.Message == "typed fault");
+
+        Task<int[]> typedCanceled = Task.WhenAll(
+            Task.FromResult<int>(1), Task.FromCanceled<int>(canceledSecondToken));
+        Console.WriteLine(typedCanceled.IsCanceled && WaitCanceled(typedCanceled, canceledSecondToken));
+
+        TaskCompletionSource snapshotFirst = new TaskCompletionSource();
+        TaskCompletionSource snapshotSecond = new TaskCompletionSource();
+        Task[] snapshotInputs = new Task[2];
+        snapshotInputs[0] = snapshotFirst.Task;
+        snapshotInputs[1] = snapshotSecond.Task;
+        Task snapshotAggregate = Task.WhenAll(snapshotInputs);
+        snapshotInputs[0] = Task.CompletedTask;
+        snapshotInputs[1] = Task.CompletedTask;
+        Thread.Sleep(5);
+        Console.WriteLine(!snapshotAggregate.IsCompleted);
+        snapshotFirst.SetResult();
+        snapshotSecond.SetResult();
+        Console.WriteLine(WaitCompleted(snapshotAggregate));
+
+        TaskCompletionSource<int> snapshotTypedFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> snapshotTypedSecond = new TaskCompletionSource<int>();
+        Task<int>[] snapshotTypedInputs = new Task<int>[2];
+        snapshotTypedInputs[0] = snapshotTypedFirst.Task;
+        snapshotTypedInputs[1] = snapshotTypedSecond.Task;
+        Task<int[]> snapshotTypedAggregate = Task.WhenAll(snapshotTypedInputs);
+        snapshotTypedInputs[0] = Task.FromResult<int>(90);
+        snapshotTypedInputs[1] = Task.FromResult<int>(91);
+        snapshotTypedSecond.SetResult(32);
+        snapshotTypedFirst.SetResult(31);
+        Console.WriteLine(WaitCompleted(snapshotTypedAggregate) &&
+            snapshotTypedAggregate.Result[0] == 31 && snapshotTypedAggregate.Result[1] == 32);
+
+        TaskCompletionSource holdSource = new TaskCompletionSource();
+        Task heldAggregate = Task.WhenAll(holdSource.Task);
+        Task<int> unrelated = Task.Run<int>(() => 278);
+        Console.WriteLine(WaitCompleted(unrelated) && unrelated.Result == 278 && !heldAggregate.IsCompleted);
+        holdSource.SetResult();
+        Console.WriteLine(WaitCompleted(heldAggregate));
+
+        Task<int> runFirst = Task.Run<int>(async () =>
+        {
+            await Task.Yield();
+            return 12;
+        });
+        Task<int> runSecond = Task.Run<int>(async () =>
+        {
+            await Task.Yield();
+            await Task.Yield();
+            return 13;
+        });
+        Task<int[]> runAggregate = Task.WhenAll(runFirst, runSecond);
+        Console.WriteLine(WaitCompleted(runAggregate));
+        Console.WriteLine(runAggregate.Result[0] == 12 && runAggregate.Result[1] == 13);
+
+        Payload278 firstPayload = new Payload278(27);
+        Payload278 secondPayload = new Payload278(28);
+        Task<Payload278>[] payloadTasks = new Task<Payload278>[2];
+        payloadTasks[0] = Task.FromResult<Payload278>(firstPayload);
+        payloadTasks[1] = Task.FromResult<Payload278>(secondPayload);
+        Task<Payload278[]> payloadAggregate = Task.WhenAll(payloadTasks);
+        firstPayload = null;
+        secondPayload = null;
+        payloadTasks = null;
+        GC.Collect();
+        GC.Collect();
+        Payload278[] payloadResults = payloadAggregate.Result;
+        Console.WriteLine(payloadResults[0].Value == 27 && payloadResults[1].Value == 28);
+    }
+}

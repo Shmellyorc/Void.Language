@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { NativeMemory.Allocate<int>(1ul); } }

@@ -1,0 +1,9 @@
+using Void.Collections;
+public static class Program
+{
+    public static IEnumerator<int> Values()
+    {
+        try { yield return 1; } catch { }
+    }
+    public static void Main() { }
+}

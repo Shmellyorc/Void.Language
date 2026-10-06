@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "Utf8ValidityUnicodeScalarFoundationDiagnostics",
+  "output": "exe",
+  "version": "0.0.301",
+  "compiler": { "unsafe": false }
+}

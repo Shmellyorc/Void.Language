@@ -1,0 +1,306 @@
+using Void;
+using Void.Collections;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class Node220
+{
+    public int Value;
+    public Node220(int value) { Value = value; }
+}
+
+public interface IStream220
+{
+    IAsyncEnumerable<int> Values(int seed, Task<int> gate);
+}
+
+public class StreamBase220
+{
+    protected int ProtectedBias() { return 2; }
+    public virtual int VirtualBias() { return 3; }
+
+    public virtual async IAsyncEnumerable<int> Values(int seed, Task<int> gate)
+    {
+        int add = await gate;
+        yield return seed + add;
+    }
+}
+
+public sealed class Stream220 : StreamBase220, IStream220
+{
+    private int _privateBias;
+
+    public Stream220(int privateBias)
+    {
+        _privateBias = privateBias;
+    }
+
+    public override int VirtualBias() { return 20; }
+
+    public override async IAsyncEnumerable<int> Values(int seed, Task<int> gate)
+    {
+        int add = await gate;
+        yield return seed + _privateBias + base.VirtualBias() + ProtectedBias() + this.VirtualBias() + add;
+    }
+}
+
+public delegate IAsyncEnumerable<int> StreamDelegate220(int seed, Task<int> gate);
+
+public static class Program
+{
+    public static TaskCompletionSource<int> LeftGate;
+    public static TaskCompletionSource<int> RightGate;
+    public static TaskCompletionSource<bool> ConditionGate;
+    public static TaskCompletionSource<int> SwitchSourceGate;
+    public static TaskCompletionSource<bool> SwitchGuardGate;
+    public static TaskCompletionSource<int> SwitchArmGate;
+    public static TaskCompletionSource<int> LoopGate;
+    public static TaskCompletionSource<int> CancelGate;
+    public static TaskCompletionSource CleanupGate;
+    public static TaskCompletionSource<int> ManagedGate;
+    public static TaskCompletionSource<int> FaultGate;
+
+    public static int InnerCleanup;
+    public static int OuterCleanup;
+    public static int CleanupStarted;
+    public static int CleanupDone;
+    public static int FaultCleanup;
+
+    private static int Add(int left, int right)
+    {
+        return left + right;
+    }
+
+    private static async IAsyncEnumerable<int> ExpressionStream(int[] values)
+    {
+        int pair = Program.Add(await Program.LeftGate.Task, await Program.RightGate.Task);
+        if (await Program.ConditionGate.Task)
+        {
+            int selected = (await Program.SwitchSourceGate.Task) switch
+            {
+                > 0 when await Program.SwitchGuardGate.Task => await Program.SwitchArmGate.Task,
+                _ => 0
+            };
+
+            foreach (var value in values)
+            {
+                int offset = await Program.LoopGate.Task;
+                yield return pair + selected + value + offset;
+            }
+        }
+    }
+
+    private static async IAsyncEnumerable<int> CancellableInner(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            yield return 7;
+            int value = await Program.CancelGate.Task;
+            cancellationToken.ThrowIfCancellationRequested();
+            yield return value;
+        }
+        finally
+        {
+            Program.InnerCleanup++;
+        }
+    }
+
+    private static async IAsyncEnumerable<int> CancellableOuter(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await foreach (var value in Program.CancellableInner(cancellationToken))
+                yield return value + 1;
+        }
+        finally
+        {
+            Program.OuterCleanup++;
+        }
+    }
+
+    private static async IAsyncEnumerable<int> CleanupStream()
+    {
+        try
+        {
+            yield return 5;
+            yield return 6;
+        }
+        finally
+        {
+            Program.CleanupStarted++;
+            await Program.CleanupGate.Task;
+            Program.CleanupDone++;
+        }
+    }
+
+    private static async IAsyncEnumerable<Node220> ManagedClosureStream()
+    {
+        Node220 node = new Node220(220);
+        Node220 captured = node;
+        Func<int> read = () => captured.Value;
+        int ignored = await Program.ManagedGate.Task;
+        GC.Collect();
+        yield return new Node220(read());
+    }
+
+    private static async IAsyncEnumerable<T> Echo<T>(T value)
+    {
+        yield return value;
+        TaskCompletionSource<T> gate = new TaskCompletionSource<T>();
+        gate.SetResult(value);
+        yield return await gate.Task;
+    }
+
+    private static async IAsyncEnumerable<int> FaultStream()
+    {
+        try
+        {
+            yield return 1;
+            int ignored = await Program.FaultGate.Task;
+            throw new Exception("fault-220");
+        }
+        finally
+        {
+            Program.FaultCleanup++;
+        }
+    }
+
+    private static async Task<int> Sum(IAsyncEnumerable<int> source)
+    {
+        int sum = 0;
+        await foreach (var value in source)
+            sum += value;
+        return sum;
+    }
+
+    private static async Task<int> BreakFirst(IAsyncEnumerable<int> source)
+    {
+        await foreach (var value in source)
+            return value;
+        return -1;
+    }
+
+    private static async Task<int> FirstNode(IAsyncEnumerable<Node220> source)
+    {
+        await foreach (var value in source)
+            return value.Value;
+        return -1;
+    }
+
+    private static async Task<int> CatchFault(IAsyncEnumerable<int> source)
+    {
+        try
+        {
+            return await Program.Sum(source);
+        }
+        catch (Exception error)
+        {
+            return Runtime.Equals(error.Message, "fault-220") ? 220 : -1;
+        }
+    }
+
+    private static bool WaitCanceled(Task task)
+    {
+        try
+        {
+            task.Wait();
+            return false;
+        }
+        catch (OperationCanceledException error)
+        {
+            return error != null;
+        }
+    }
+
+    public static void Main()
+    {
+        TaskCompletionSource<int> objectGate = new TaskCompletionSource<int>();
+        Stream220 producer = new Stream220(188);
+        IStream220 contract = producer;
+        Task<int> interfaceTask = Sum(contract.Values(3, objectGate.Task));
+        producer = null;
+        GC.Collect();
+        Console.WriteLine(!interfaceTask.IsCompleted);
+        objectGate.SetResult(4);
+        Console.WriteLine(interfaceTask.Result == 220);
+
+        Stream220 virtualOwner = new Stream220(188);
+        StreamBase220 virtualValue = virtualOwner;
+        TaskCompletionSource<int> completedObjectGate = new TaskCompletionSource<int>();
+        completedObjectGate.SetResult(4);
+        Console.WriteLine(Sum(virtualValue.Values(3, completedObjectGate.Task)).Result == 220);
+
+        StreamDelegate220 streamDelegate = virtualOwner.Values;
+        virtualOwner = null;
+        GC.Collect();
+        Console.WriteLine(Sum(streamDelegate(3, completedObjectGate.Task)).Result == 220);
+
+        Program.LeftGate = new TaskCompletionSource<int>();
+        Program.RightGate = new TaskCompletionSource<int>();
+        Program.ConditionGate = new TaskCompletionSource<bool>();
+        Program.SwitchSourceGate = new TaskCompletionSource<int>();
+        Program.SwitchGuardGate = new TaskCompletionSource<bool>();
+        Program.SwitchArmGate = new TaskCompletionSource<int>();
+        Program.LoopGate = new TaskCompletionSource<int>();
+        Task<int> expression = Sum(ExpressionStream(new int[] { 1, 2 }));
+        Console.WriteLine(!expression.IsCompleted);
+        Program.LeftGate.SetResult(2);
+        Console.WriteLine(!expression.IsCompleted);
+        Program.RightGate.SetResult(3);
+        Console.WriteLine(!expression.IsCompleted);
+        Program.ConditionGate.SetResult(true);
+        Console.WriteLine(!expression.IsCompleted);
+        Program.SwitchSourceGate.SetResult(1);
+        Console.WriteLine(!expression.IsCompleted);
+        Program.SwitchGuardGate.SetResult(true);
+        Console.WriteLine(!expression.IsCompleted);
+        Program.SwitchArmGate.SetResult(10);
+        Console.WriteLine(!expression.IsCompleted);
+        Program.LoopGate.SetResult(1);
+        Console.WriteLine(expression.Result == 35);
+
+        Program.InnerCleanup = 0;
+        Program.OuterCleanup = 0;
+        Program.CancelGate = new TaskCompletionSource<int>();
+        CancellationTokenSource cancellation = new CancellationTokenSource();
+        IAsyncEnumerator<int> cancellable = CancellableOuter().GetAsyncEnumerator(cancellation.Token);
+        Console.WriteLine(cancellable.MoveNextAsync().Result && cancellable.Current == 8);
+        Task<bool> pendingMove = cancellable.MoveNextAsync();
+        Console.WriteLine(!pendingMove.IsCompleted);
+        cancellation.Cancel();
+        Program.CancelGate.SetResult(9);
+        Console.WriteLine(WaitCanceled(pendingMove));
+        Console.WriteLine(Program.InnerCleanup == 1 && Program.OuterCleanup == 1);
+        cancellable.DisposeAsync().Wait();
+        Console.WriteLine(Program.InnerCleanup == 1 && Program.OuterCleanup == 1);
+
+        Program.CleanupStarted = 0;
+        Program.CleanupDone = 0;
+        Program.CleanupGate = new TaskCompletionSource();
+        Task<int> early = BreakFirst(CleanupStream());
+        Console.WriteLine(!early.IsCompleted && Program.CleanupStarted == 1 && Program.CleanupDone == 0);
+        Program.CleanupGate.SetResult();
+        Console.WriteLine(early.Result == 5 && Program.CleanupDone == 1);
+
+        Program.ManagedGate = new TaskCompletionSource<int>();
+        Task<int> managed = FirstNode(ManagedClosureStream());
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(!managed.IsCompleted);
+        Program.ManagedGate.SetResult(1);
+        Console.WriteLine(managed.Result == 220);
+
+        IAsyncEnumerable<int> replay = Echo<int>(110);
+        Console.WriteLine(Sum(replay).Result == 220);
+        Console.WriteLine(Sum(replay).Result == 220);
+
+        Program.FaultCleanup = 0;
+        Program.FaultGate = new TaskCompletionSource<int>();
+        Task<int> fault = CatchFault(FaultStream());
+        Console.WriteLine(!fault.IsCompleted);
+        Program.FaultGate.SetResult(1);
+        Console.WriteLine(fault.Result == 220 && Program.FaultCleanup == 1);
+    }
+}

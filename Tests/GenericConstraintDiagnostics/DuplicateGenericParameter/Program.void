@@ -1,0 +1,1 @@
+public sealed class Box<T, T> { } public static class Program { public static void Main() { } }

@@ -1,0 +1,17 @@
+public struct Value
+{
+    public int Data;
+    public static Value operator ++(Value value) { value.Data++; return value; }
+}
+public sealed class Holder
+{
+    public Value Item { get; set; }
+}
+public static class Program
+{
+    public static void Main()
+    {
+        Holder holder = new Holder();
+        holder.Item++;
+    }
+}

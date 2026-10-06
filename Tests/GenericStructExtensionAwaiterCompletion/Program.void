@@ -1,0 +1,292 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+using AwaitExtensions264;
+
+public struct GenericAwaiter264<T>
+{
+    private T _value;
+    private bool _suspend;
+
+    public GenericAwaiter264(T value, bool suspend)
+    {
+        _value = value;
+        _suspend = suspend;
+    }
+
+    public bool IsCompleted
+    {
+        get { return !_suspend; }
+    }
+
+    public void OnCompleted(Action continuation)
+    {
+        GC.Collect();
+        ThreadPool.QueueUserWorkItem(continuation);
+    }
+
+    public T GetResult()
+    {
+        return _value;
+    }
+}
+
+public struct GenericAwaitable264<T>
+{
+    private T _value;
+    private bool _suspend;
+
+    public GenericAwaitable264(T value, bool suspend)
+    {
+        _value = value;
+        _suspend = suspend;
+    }
+
+    public GenericAwaiter264<T> GetAwaiter()
+    {
+        return new GenericAwaiter264<T>(_value, _suspend);
+    }
+}
+
+public struct StatefulStructAwaiter264
+{
+    private int _value;
+
+    public StatefulStructAwaiter264(int value)
+    {
+        _value = value;
+    }
+
+    public bool IsCompleted
+    {
+        get { return false; }
+    }
+
+    public void OnCompleted(Action continuation)
+    {
+        _value += 7;
+        ThreadPool.QueueUserWorkItem(continuation);
+    }
+
+    public int GetResult()
+    {
+        return _value;
+    }
+}
+
+public struct StatefulStructAwaitable264
+{
+    private int _value;
+
+    public StatefulStructAwaitable264(int value)
+    {
+        _value = value;
+    }
+
+    public StatefulStructAwaiter264 GetAwaiter()
+    {
+        return new StatefulStructAwaiter264(_value);
+    }
+}
+
+public struct ExtensionIntAwaiter264
+{
+    private int _value;
+
+    public ExtensionIntAwaiter264(int value)
+    {
+        _value = value;
+    }
+
+    public bool IsCompleted
+    {
+        get { return true; }
+    }
+
+    public void OnCompleted(Action continuation)
+    {
+        continuation();
+    }
+
+    public int GetResult()
+    {
+        return _value;
+    }
+}
+
+public sealed class ExtensionObject264
+{
+    public int Value;
+
+    public ExtensionObject264(int value)
+    {
+        Value = value;
+    }
+}
+
+public interface IExtensionValue264
+{
+    int Read();
+}
+
+public sealed class ExtensionGenericObject264 : IExtensionValue264
+{
+    private int _value;
+
+    public ExtensionGenericObject264(int value)
+    {
+        _value = value;
+    }
+
+    public int Read()
+    {
+        return _value;
+    }
+}
+
+public struct GenericExtensionAwaitable264<T>
+{
+    public T Value;
+
+    public GenericExtensionAwaitable264(T value)
+    {
+        Value = value;
+    }
+}
+
+public struct InstancePreferred264
+{
+    private int _value;
+
+    public InstancePreferred264(int value)
+    {
+        _value = value;
+    }
+
+    public ExtensionIntAwaiter264 GetAwaiter()
+    {
+        return new ExtensionIntAwaiter264(_value);
+    }
+}
+
+namespace AwaitExtensions264
+{
+    public static class AwaitableExtensions264
+    {
+        public static ExtensionIntAwaiter264 GetAwaiter(this int value)
+        {
+            return new ExtensionIntAwaiter264(value + 1);
+        }
+
+        public static ExtensionIntAwaiter264 GetAwaiter(this ExtensionObject264 value)
+        {
+            return new ExtensionIntAwaiter264(value.Value + 2);
+        }
+
+        public static ExtensionIntAwaiter264 GetAwaiter(this IExtensionValue264 value)
+        {
+            return new ExtensionIntAwaiter264(value.Read() + 3);
+        }
+
+        public static GenericAwaiter264<T> GetAwaiter<T>(this GenericExtensionAwaitable264<T> value)
+        {
+            return new GenericAwaiter264<T>(value.Value, false);
+        }
+
+        public static ExtensionIntAwaiter264 GetAwaiter(this InstancePreferred264 value)
+        {
+            return new ExtensionIntAwaiter264(999);
+        }
+    }
+}
+
+public static class Program
+{
+    private static int _extensionFactoryCalls;
+
+    private static ExtensionObject264 MakeExtensionObject()
+    {
+        _extensionFactoryCalls++;
+        return new ExtensionObject264(40);
+    }
+
+    private static async Task<T> AwaitGeneric<T>(GenericAwaitable264<T> awaitable)
+    {
+        return await awaitable;
+    }
+
+    private static async Task<int> AwaitStatefulStruct()
+    {
+        return await new StatefulStructAwaitable264(35);
+    }
+
+    private static async Task<int> AwaitIntExtension()
+    {
+        return await 41;
+    }
+
+    private static async Task<int> AwaitObjectExtension()
+    {
+        return await MakeExtensionObject();
+    }
+
+    private static async Task<int> AwaitGenericExtension<T>(T value) where T : IExtensionValue264
+    {
+        return await value;
+    }
+
+    private static async Task<T> AwaitGenericExtensionMethod<T>(GenericExtensionAwaitable264<T> value)
+    {
+        return await value;
+    }
+
+    private static async Task<int> AwaitInstancePreferred()
+    {
+        return await new InstancePreferred264(17);
+    }
+
+    public static void Main()
+    {
+        Task<int> genericInt = AwaitGeneric<int>(new GenericAwaitable264<int>(42, false));
+        genericInt.Wait();
+        Console.WriteLine(genericInt.Result == 42);
+
+        Task<string> genericString = AwaitGeneric<string>(new GenericAwaitable264<string>("kept", true));
+        genericString.Wait();
+        Console.WriteLine(Runtime.Equals(genericString.Result, "kept"));
+
+        Task<int> stateful = AwaitStatefulStruct();
+        stateful.Wait();
+        Console.WriteLine(stateful.Result == 42);
+
+        Task<int> primitiveExtension = AwaitIntExtension();
+        primitiveExtension.Wait();
+        Console.WriteLine(primitiveExtension.Result == 42);
+
+        Task<int> objectExtension = AwaitObjectExtension();
+        objectExtension.Wait();
+        Console.WriteLine(objectExtension.Result == 42);
+        Console.WriteLine(_extensionFactoryCalls == 1);
+
+        Task<int> genericExtension = AwaitGenericExtension<ExtensionGenericObject264>(
+            new ExtensionGenericObject264(39));
+        genericExtension.Wait();
+        Console.WriteLine(genericExtension.Result == 42);
+
+        Task<int> genericExtensionMethod = AwaitGenericExtensionMethod<int>(
+            new GenericExtensionAwaitable264<int>(42));
+        genericExtensionMethod.Wait();
+        Console.WriteLine(genericExtensionMethod.Result == 42);
+
+        Task<string> genericExtensionString = AwaitGenericExtensionMethod<string>(
+            new GenericExtensionAwaitable264<string>("extension"));
+        genericExtensionString.Wait();
+        Console.WriteLine(Runtime.Equals(genericExtensionString.Result, "extension"));
+
+        Task<int> preferred = AwaitInstancePreferred();
+        preferred.Wait();
+        Console.WriteLine(preferred.Result == 17);
+
+        ThreadPool.Shutdown();
+    }
+}

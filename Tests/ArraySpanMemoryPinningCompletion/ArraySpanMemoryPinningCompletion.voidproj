@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "ArraySpanMemoryPinningCompletion",
+  "output": "exe",
+  "version": "0.0.246",
+  "compiler": { "unsafe": true }
+}

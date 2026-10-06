@@ -1,0 +1,6 @@
+public class IndexOutOfRangeException : Exception
+{
+    public IndexOutOfRangeException() : base("Index was outside the bounds.") { }
+    public IndexOutOfRangeException(string message) : base(message) { }
+    public IndexOutOfRangeException(string message, Exception innerException) : base(message, innerException) { }
+}

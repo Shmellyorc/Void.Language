@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { Memory<int> value = new Memory<int>(new int[2], 0, -1); } }

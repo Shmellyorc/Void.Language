@@ -1,0 +1,188 @@
+using Void.Collections;
+
+namespace Void.Threading;
+
+private sealed class ThreadPoolGate
+{
+}
+
+public static class ThreadPool
+{
+    private static ThreadPoolGate _gate = new ThreadPoolGate();
+    private static Queue<Action> _queue = new Queue<Action>();
+    private static Thread[] _workers = new Thread[2];
+    private static bool _started;
+    private static int _readyWorkers;
+    private static int _activeWorkItems;
+    private static bool _shutdownRequested;
+    private static bool _shutdownDrained;
+    private static bool _shutdownCompleted;
+
+    private static bool EnsureStarted()
+    {
+        Monitor.Enter(_gate);
+        if (_shutdownRequested || _shutdownCompleted)
+        {
+            Monitor.Exit(_gate);
+            return false;
+        }
+
+        if (!_started)
+        {
+            _started = true;
+
+            Action firstAction = WorkerLoop;
+            Action secondAction = WorkerLoop;
+            Thread first = new Thread(firstAction);
+            Thread second = new Thread(secondAction);
+            _workers[0] = first;
+            _workers[1] = second;
+            first.Start();
+            second.Start();
+
+            while (_readyWorkers < 2)
+                Monitor.Wait(_gate);
+        }
+        Monitor.Exit(_gate);
+        return true;
+    }
+
+    private static void WorkerLoop()
+    {
+        Monitor.Enter(_gate);
+        _readyWorkers++;
+        Monitor.PulseAll(_gate);
+        Monitor.Exit(_gate);
+
+        while (true)
+        {
+            Action workItem = null;
+
+            Monitor.Enter(_gate);
+            while (_queue.Count == 0)
+            {
+                if (_shutdownRequested && _activeWorkItems == 0)
+                {
+                    _shutdownDrained = true;
+                    Monitor.PulseAll(_gate);
+                    Monitor.Exit(_gate);
+                    return;
+                }
+                Monitor.Wait(_gate);
+            }
+
+            workItem = _queue.Dequeue();
+            _activeWorkItems++;
+            Monitor.Exit(_gate);
+
+            try
+            {
+                workItem();
+            }
+            catch (Exception)
+            {
+                // QueueUserWorkItem is fire-and-forget. Keep the worker alive;
+                // task-backed work will own observable fault propagation.
+            }
+
+            Monitor.Enter(_gate);
+            _activeWorkItems--;
+            Monitor.PulseAll(_gate);
+            Monitor.Exit(_gate);
+        }
+    }
+
+    public static bool QueueUserWorkItem(Action workItem)
+    {
+        if (workItem == null)
+            Runtime.Fail("thread pool work item cannot be null");
+
+        if (!EnsureStarted())
+            Runtime.Fail("thread pool has been shut down");
+
+        Monitor.Enter(_gate);
+        if (_shutdownRequested || _shutdownCompleted)
+        {
+            Monitor.Exit(_gate);
+            Runtime.Fail("thread pool has been shut down");
+        }
+        _queue.Enqueue(workItem);
+        Monitor.Pulse(_gate);
+        Monitor.Exit(_gate);
+        return true;
+    }
+
+    internal static bool QueueTaskContinuation(Action workItem)
+    {
+        if (workItem == null)
+            Runtime.Fail("thread pool work item cannot be null");
+
+        Monitor.Enter(_gate);
+        if (_shutdownCompleted || _shutdownDrained)
+        {
+            Monitor.Exit(_gate);
+            Runtime.Fail("thread pool has been shut down");
+        }
+
+        if (_started)
+        {
+            _queue.Enqueue(workItem);
+            Monitor.Pulse(_gate);
+            Monitor.Exit(_gate);
+            return true;
+        }
+        Monitor.Exit(_gate);
+
+        return QueueUserWorkItem(workItem);
+    }
+
+    public static void Shutdown()
+    {
+        TimerQueue.Shutdown();
+
+        Thread first = null;
+        Thread second = null;
+
+        Monitor.Enter(_gate);
+        if (_shutdownCompleted)
+        {
+            Monitor.Exit(_gate);
+            return;
+        }
+
+        if (_shutdownRequested)
+        {
+            while (!_shutdownCompleted)
+                Monitor.Wait(_gate);
+            Monitor.Exit(_gate);
+            return;
+        }
+
+        _shutdownRequested = true;
+        if (!_started)
+        {
+            _shutdownDrained = true;
+            _shutdownCompleted = true;
+            Monitor.PulseAll(_gate);
+            Monitor.Exit(_gate);
+            return;
+        }
+
+        first = _workers[0];
+        second = _workers[1];
+        Monitor.PulseAll(_gate);
+        Monitor.Exit(_gate);
+
+        first.Join();
+        second.Join();
+
+        Monitor.Enter(_gate);
+        _workers[0] = null;
+        _workers[1] = null;
+        _started = false;
+        _readyWorkers = 0;
+        _shutdownCompleted = true;
+        Monitor.PulseAll(_gate);
+        Monitor.Exit(_gate);
+    }
+}

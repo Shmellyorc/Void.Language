@@ -1,0 +1,7 @@
+public static class PrefixCaretSyntax
+{
+    public static void Build()
+    {
+        var value = ^1;
+    }
+}

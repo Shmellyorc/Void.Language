@@ -1,0 +1,120 @@
+using Void;
+
+public sealed class Item
+{
+    public int Value;
+
+    public Item(int value)
+    {
+        Value = value;
+    }
+}
+
+public struct Holder
+{
+    public Item Item;
+
+    public Holder(Item item)
+    {
+        Item = item;
+    }
+}
+
+public sealed class Counter
+{
+    private int _value;
+
+    public Counter(int value)
+    {
+        _value = value;
+    }
+
+    public Func<int> Getter()
+    {
+        return () => _value;
+    }
+}
+
+public static class Program
+{
+    public static Func<int> MakeGetter()
+    {
+        Item item = new Item(77);
+        return () => item.Value;
+    }
+
+    public static Func<int> CaptureParameter(int value)
+    {
+        Func<int> result = () => value;
+        value += 2;
+        return result;
+    }
+
+    public static Func<int> CaptureStruct()
+    {
+        Holder holder = new(new Item(99));
+        return () => holder.Item.Value;
+    }
+
+    public static Func<T, T> IdentityFactory<T>()
+    {
+        return x => x;
+    }
+
+    public static void Main()
+    {
+        Func<int, int> doubleIt = x => x * 2;
+        Console.WriteLine(doubleIt(5));
+
+        int factor = 2;
+        Func<int, int> times = x => x * factor;
+        factor = 3;
+        Console.WriteLine(times(4));
+
+        int total = 1;
+        Action<int> add = x => { total += x; };
+        add(4);
+        Console.WriteLine(total);
+
+        int shared = 10;
+        Action inc = () => { shared++; };
+        Func<int> read = () => shared;
+        inc();
+        inc();
+        Console.WriteLine(read());
+
+        Func<int, int, int> sum = (a, b) => a + b;
+        Console.WriteLine(sum(7, 8));
+
+        Func<int, int> block = x =>
+        {
+            int value = x + 1;
+            return value * 2;
+        };
+        Console.WriteLine(block(4));
+
+        Action<int> echo = x => Console.WriteLine(x);
+        echo(21);
+
+        Func<int> parameter = CaptureParameter(5);
+        GC.Collect();
+        Console.WriteLine(parameter());
+
+        Func<int> getter = MakeGetter();
+        GC.Collect();
+        Console.WriteLine(getter());
+
+        Func<int> structGetter = CaptureStruct();
+        GC.Collect();
+        Console.WriteLine(structGetter());
+
+        Func<int, int> identity = IdentityFactory<int>();
+        Console.WriteLine(identity(33));
+
+        Counter counter = new Counter(88);
+        Func<int> counterGetter = counter.Getter();
+        counter = null;
+        GC.Collect();
+        Console.WriteLine(counterGetter());
+    }
+}

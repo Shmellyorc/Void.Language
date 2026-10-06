@@ -1,0 +1,58 @@
+using Void;
+using Void.Text;
+
+public sealed class UnsupportedEncoding : Encoding
+{
+    public override byte[] GetPreamble() { return new byte[0]; }
+    public override int GetByteCount(string value) { return 0; }
+    public override byte[] GetBytes(string value) { return new byte[0]; }
+    public override int GetBytes(string value, int charIndex, int charCount, byte[] bytes, int byteIndex) { return 0; }
+    public override string GetString(byte[] bytes) { return string.Empty; }
+    public override string GetString(byte[] bytes, int index, int count) { return string.Empty; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine(Console.InputEncoding.GetPreamble().Length == 3);
+        Console.WriteLine(Console.OutputEncoding.GetPreamble().Length == 3);
+
+        UTF8Encoding replacement = new UTF8Encoding(false, false);
+        Console.InputEncoding = replacement;
+        Console.OutputEncoding = replacement;
+        Console.WriteLine(Console.InputEncoding.GetPreamble().Length == 0);
+        Console.WriteLine(Console.OutputEncoding.GetPreamble().Length == 0);
+
+        bool caught = false;
+        try { Console.InputEncoding = null; } catch (ArgumentNullException e) { caught = e.ParamName == "value"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { Console.OutputEncoding = null; } catch (ArgumentNullException e) { caught = e.ParamName == "value"; }
+        Console.WriteLine(caught);
+
+        caught = false;
+        try { Console.InputEncoding = new UnsupportedEncoding(); } catch (NotSupportedException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { Console.OutputEncoding = new UnsupportedEncoding(); } catch (NotSupportedException e) { caught = true; }
+        Console.WriteLine(caught);
+
+        Console.WriteLine(Console.ReadLine() == "βeta");
+
+        Console.InputEncoding = new UTF8Encoding(false, true);
+        caught = false;
+        try { Console.ReadLine(); } catch (DecoderFallbackException e) { caught = true; }
+        Console.WriteLine(caught);
+
+        Console.InputEncoding = new UTF8Encoding(false, false);
+        Console.WriteLine(Console.Read() == 65533);
+        Console.WriteLine(Console.Read() == 40);
+
+        Console.InputEncoding = new UTF8Encoding(false, true);
+        caught = false;
+        try { Console.Read(); } catch (DecoderFallbackException e) { caught = true; }
+        Console.WriteLine(caught);
+        Console.WriteLine(Console.Read() == -1);
+    }
+}

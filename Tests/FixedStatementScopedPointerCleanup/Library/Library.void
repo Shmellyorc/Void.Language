@@ -1,0 +1,103 @@
+using Void;
+
+public sealed class CleanupBox244
+{
+    public int First;
+    public int Second;
+
+    public CleanupBox244(int value)
+    {
+        First = value;
+        Second = value + 1;
+    }
+}
+
+public static class FixedCleanup244
+{
+    [Export("void244_fixed_normal")]
+    public static unsafe int Normal()
+    {
+        CleanupBox244 box = new CleanupBox244(1);
+        fixed (int* p = &box.First)
+        {
+            p[0] = 2;
+        }
+        return box.First;
+    }
+
+    [Export("void244_fixed_return")]
+    public static unsafe int EarlyReturn()
+    {
+        CleanupBox244 box = new CleanupBox244(3);
+        fixed (int* p = &box.First)
+        {
+            return p[0];
+        }
+    }
+
+    [Export("void244_fixed_break")]
+    public static unsafe int BreakPath()
+    {
+        CleanupBox244 box = new CleanupBox244(4);
+        while (true)
+        {
+            fixed (int* p = &box.First)
+            {
+                p[0] = 5;
+                break;
+            }
+        }
+        return box.First;
+    }
+
+    [Export("void244_fixed_continue")]
+    public static unsafe int ContinuePath()
+    {
+        CleanupBox244 box = new CleanupBox244(0);
+        int i = 0;
+        while (i < 2)
+        {
+            i++;
+            fixed (int* p = &box.First)
+            {
+                p[0]++;
+                continue;
+            }
+        }
+        return box.First;
+    }
+
+    [Export("void244_fixed_exception")]
+    public static unsafe int ExceptionPath()
+    {
+        try
+        {
+            CleanupBox244 box = new CleanupBox244(6);
+            fixed (int* p = &box.First)
+            {
+                p[0] = 7;
+                throw new Exception();
+            }
+        }
+        catch (Exception)
+        {
+            return 7;
+        }
+        return 0;
+    }
+
+    [Export("void244_fixed_nested")]
+    public static unsafe int NestedPath()
+    {
+        CleanupBox244 box = new CleanupBox244(8);
+        fixed (int* a = &box.First)
+        {
+            fixed (int* b = &box.Second)
+            {
+                a[0] = 9;
+                b[0] = 10;
+            }
+        }
+        return box.First + box.Second;
+    }
+}

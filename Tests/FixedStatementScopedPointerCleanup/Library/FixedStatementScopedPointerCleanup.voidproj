@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "Void244FixedCleanup",
+  "output": "library",
+  "version": "0.0.244",
+  "compiler": { "unsafe": true }
+}

@@ -1,0 +1,2 @@
+public struct Value { public int X; }
+public static class Program { public static void Main() { Value value = new Value(); int x = value?[0]; } }

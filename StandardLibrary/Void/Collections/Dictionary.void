@@ -1,0 +1,365 @@
+namespace Void.Collections;
+
+private sealed class DictionaryNode<TKey, TValue>
+{
+    public bool Alive;
+    public int Hash;
+    public TKey Key;
+    public TValue Value;
+    public DictionaryNode<TKey, TValue> Next;
+
+    public DictionaryNode(int hash, TKey key, TValue value, DictionaryNode<TKey, TValue> next)
+    {
+        Alive = true;
+        Hash = hash;
+        Key = key;
+        Value = value;
+        Next = next;
+    }
+}
+
+public sealed class Dictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>, ICollection<KeyValuePair<TKey, TValue>>
+{
+    private DictionaryNode<TKey, TValue>[] _buckets;
+    private int _count;
+    private int _version;
+    private IEqualityComparer<TKey> _comparer;
+    public IEqualityComparer<TKey> Comparer => _comparer;
+
+    public IEnumerable<TKey> Keys { get { return new DictionaryKeys<TKey, TValue>(this); } }
+    public IEnumerable<TValue> Values { get { return new DictionaryValues<TKey, TValue>(this); } }
+
+    public bool ContainsValue(TValue value)
+    {
+        IEqualityComparer<TValue> comparer = new DefaultEqualityComparer<TValue>();
+        foreach (KeyValuePair<TKey, TValue> pair in this)
+            if (comparer.Equals(pair.Value, value)) return true;
+        return false;
+    }
+
+    public bool Remove(TKey key, out TValue value)
+    {
+        if (!this.TryGetValue(key, out value)) return false;
+        return this.Remove(key);
+    }
+
+    // Capacity denotes the number of entries accepted without rehashing.
+    private int EntryCapacity() { return (_buckets.Length / 4) * 3; }
+    private static int BucketCapacity(int capacity)
+    {
+        if (capacity > 1610612733) throw new OutOfMemoryException();
+        int buckets = ((capacity + 2) / 3) * 4;
+        return buckets < 8 ? 8 : buckets;
+    }
+    public int EnsureCapacity(int capacity)
+    {
+        if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
+        if (capacity > this.EntryCapacity())
+        {
+            this.Rehash(BucketCapacity(capacity));
+            _version++;
+        }
+        return this.EntryCapacity();
+    }
+    public void TrimExcess() { this.TrimExcess(_count); }
+    public void TrimExcess(int capacity)
+    {
+        if (capacity < _count) throw new ArgumentOutOfRangeException("capacity");
+        int buckets = BucketCapacity(capacity);
+        if (buckets < _buckets.Length)
+        {
+            this.Rehash(buckets);
+            _version++;
+        }
+    }
+
+    public bool IsReadOnly { get { return false; } }
+    public void Add(KeyValuePair<TKey, TValue> item) { this.Add(item.Key, item.Value); }
+    public bool Contains(KeyValuePair<TKey, TValue> item)
+    {
+        DictionaryNode<TKey, TValue> node = this.FindNode(item.Key);
+        return node != null && new DefaultEqualityComparer<TValue>().Equals(node.Value, item.Value);
+    }
+    public bool Remove(KeyValuePair<TKey, TValue> item)
+    {
+        return this.Contains(item) && this.Remove(item.Key);
+    }
+    public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+    {
+        if (array == null) throw new ArgumentNullException("array");
+        if (arrayIndex < 0 || arrayIndex > array.Length) throw new ArgumentOutOfRangeException("arrayIndex");
+        if (_count > array.Length - arrayIndex) throw new ArgumentException("Destination is too short.");
+        foreach (KeyValuePair<TKey, TValue> item in this) array[arrayIndex++] = item;
+    }
+    public int Count => _count;
+
+    public Dictionary() : this(0, null) { }
+    public Dictionary(int capacity) : this(capacity, null) { }
+
+    public Dictionary(IEqualityComparer<TKey> comparer) : this(0, comparer) { }
+    public Dictionary(int capacity, IEqualityComparer<TKey> comparer)
+    {
+        if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
+        _comparer = comparer == null ? new DefaultEqualityComparer<TKey>() : comparer;
+        _buckets = new DictionaryNode<TKey, TValue>[BucketCapacity(capacity)];
+        _count = 0;
+    }
+
+    public Dictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection) : this(0, null)
+    {
+        if (collection == null) throw new ArgumentNullException("collection");
+        foreach (KeyValuePair<TKey, TValue> pair in collection) this.Add(pair.Key, pair.Value);
+    }
+    public Dictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer) : this(0, comparer)
+    {
+        if (collection == null) throw new ArgumentNullException("collection");
+        foreach (KeyValuePair<TKey, TValue> pair in collection) this.Add(pair.Key, pair.Value);
+    }
+    public bool TryAdd(TKey key, TValue value)
+    {
+        if (this.FindNode(key) != null) return false;
+        this.Add(key, value);
+        return true;
+    }
+
+    public void Add(TKey key, TValue value)
+    {
+        this.CheckKey(key);
+        int hash = _comparer.GetHashCode(key);
+        int bucket = hash % _buckets.Length;
+        if (bucket < 0) bucket += _buckets.Length;
+        DictionaryNode<TKey, TValue> node = _buckets[bucket];
+
+        while (node != null)
+        {
+            if (node.Hash == hash && _comparer.Equals(node.Key, key))
+                throw new ArgumentException("Dictionary already contains the key");
+
+            node = node.Next;
+        }
+
+        if (_count >= (_buckets.Length / 4) * 3)
+        {
+            this.Grow();
+            bucket = hash % _buckets.Length;
+            if (bucket < 0) bucket += _buckets.Length;
+        }
+        _buckets[bucket] = new DictionaryNode<TKey, TValue>(hash, key, value, _buckets[bucket]);
+        _count++;
+        _version++;
+    }
+
+    public bool TryGetValue(TKey key, out TValue value)
+    {
+        DictionaryNode<TKey, TValue> node = this.FindNode(key);
+        value = default(TValue);
+        if (node == null) return false;
+        value = node.Value;
+        return true;
+    }
+
+    public bool ContainsKey(TKey key)
+    {
+        return this.FindNode(key) != null;
+    }
+
+    public bool Remove(TKey key)
+    {
+        this.CheckKey(key);
+        int hash = _comparer.GetHashCode(key);
+        int bucket = hash % _buckets.Length;
+        if (bucket < 0) bucket += _buckets.Length;
+        DictionaryNode<TKey, TValue> node = _buckets[bucket];
+        DictionaryNode<TKey, TValue> previous = null;
+
+        while (node != null)
+        {
+            if (node.Hash == hash && _comparer.Equals(node.Key, key))
+            {
+                if (previous == null)
+                    _buckets[bucket] = node.Next;
+                else
+                    previous.Next = node.Next;
+
+                node.Alive = false;
+                node.Key = default(TKey); node.Value = default(TValue);
+                _count--;
+                return true;
+            }
+
+            previous = node;
+            node = node.Next;
+        }
+
+        return false;
+    }
+
+    public void Clear()
+    {
+        for (int i = 0; i < _buckets.Length; i++)
+        {
+            DictionaryNode<TKey, TValue> node = _buckets[i];
+            while (node != null) { node.Alive = false; node.Key = default(TKey); node.Value = default(TValue); node = node.Next; }
+            _buckets[i] = null;
+        }
+        _count = 0;
+    }
+
+    public TValue get_Item(TKey key)
+    {
+        DictionaryNode<TKey, TValue> node = this.FindNode(key);
+        if (node == null)
+            throw new KeyNotFoundException("Dictionary key was not found");
+
+        return node.Value;
+    }
+
+    public void set_Item(TKey key, TValue value)
+    {
+        this.CheckKey(key);
+        int hash = _comparer.GetHashCode(key);
+        int bucket = hash % _buckets.Length;
+        if (bucket < 0) bucket += _buckets.Length;
+        DictionaryNode<TKey, TValue> node = _buckets[bucket];
+
+        while (node != null)
+        {
+            if (node.Hash == hash && _comparer.Equals(node.Key, key))
+            {
+                node.Value = value;
+                return;
+            }
+
+            node = node.Next;
+        }
+
+        this.Add(key, value);
+    }
+
+    public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() { return this.Enumerate(_version); }
+    private IEnumerator<KeyValuePair<TKey, TValue>> Enumerate(int version)
+    {
+        if (version != _version) throw new InvalidOperationException("Collection was modified");
+        for (int i = 0; i < _buckets.Length; i++)
+        {
+            DictionaryNode<TKey, TValue> node = _buckets[i];
+            while (node != null)
+            {
+                if (node.Alive)
+                {
+                    yield return new KeyValuePair<TKey, TValue>(node.Key, node.Value);
+                    if (version != _version) throw new InvalidOperationException("Collection was modified");
+                }
+                node = node.Next;
+            }
+        }
+    }
+
+    private DictionaryNode<TKey, TValue> FindNode(TKey key)
+    {
+        this.CheckKey(key);
+        int hash = _comparer.GetHashCode(key);
+        int bucket = hash % _buckets.Length;
+        if (bucket < 0) bucket += _buckets.Length;
+        DictionaryNode<TKey, TValue> node = _buckets[bucket];
+
+        while (node != null)
+        {
+            if (node.Hash == hash && _comparer.Equals(node.Key, key))
+                return node;
+
+            node = node.Next;
+        }
+
+        return null;
+    }
+
+    private void CheckKey(TKey key)
+    {
+        if (EqualityContracts.IsNull(key))
+            throw new ArgumentNullException("key");
+    }
+
+    private void Grow()
+    {
+        if (_buckets.Length > 1073741823) throw new OutOfMemoryException();
+        this.Rehash(_buckets.Length * 2);
+    }
+
+    private void Rehash(int capacity)
+    {
+        DictionaryNode<TKey, TValue>[] buckets = new DictionaryNode<TKey, TValue>[capacity];
+
+        for (int i = 0; i < _buckets.Length; i++)
+        {
+            DictionaryNode<TKey, TValue> node = _buckets[i];
+            while (node != null)
+            {
+                DictionaryNode<TKey, TValue> next = node.Next;
+                int bucket = node.Hash % buckets.Length;
+                if (bucket < 0) bucket += buckets.Length;
+                node.Next = buckets[bucket];
+                buckets[bucket] = node;
+                node = next;
+            }
+        }
+
+        _buckets = buckets;
+    }
+}
+
+
+// Live views retain their dictionary. Each enumeration owns the underlying
+// dictionary enumerator and inherits its mutation/disposal policy.
+internal sealed class DictionaryKeys<TKey, TValue> : IReadOnlyCollection<TKey>, ICollection<TKey>
+{
+    private Dictionary<TKey, TValue> _dictionary;
+    internal DictionaryKeys(Dictionary<TKey, TValue> dictionary) { _dictionary = dictionary; }
+    public int Count { get { return _dictionary.Count; } }
+    public bool IsReadOnly { get { return true; } }
+    public bool Contains(TKey item) { return _dictionary.ContainsKey(item); }
+    public void CopyTo(TKey[] array, int arrayIndex)
+    {
+        if (array == null) throw new ArgumentNullException("array");
+        if (arrayIndex < 0 || arrayIndex > array.Length) throw new ArgumentOutOfRangeException("arrayIndex");
+        if (this.Count > array.Length - arrayIndex) throw new ArgumentException("Destination is too short.");
+        foreach (TKey item in this) array[arrayIndex++] = item;
+    }
+    public void Add(TKey item) { throw new NotSupportedException("Collection is read-only."); }
+    public bool Remove(TKey item) { throw new NotSupportedException("Collection is read-only."); }
+    public void Clear() { throw new NotSupportedException("Collection is read-only."); }
+    public IEnumerator<TKey> GetEnumerator() { return this.Enumerate(_dictionary.GetEnumerator()); }
+    private IEnumerator<TKey> Enumerate(IEnumerator<KeyValuePair<TKey, TValue>> entries)
+    {
+        using (entries)
+        {
+            while (entries.MoveNext()) yield return entries.Current.Key;
+        }
+    }
+}
+internal sealed class DictionaryValues<TKey, TValue> : IReadOnlyCollection<TValue>, ICollection<TValue>
+{
+    private Dictionary<TKey, TValue> _dictionary;
+    internal DictionaryValues(Dictionary<TKey, TValue> dictionary) { _dictionary = dictionary; }
+    public int Count { get { return _dictionary.Count; } }
+    public bool IsReadOnly { get { return true; } }
+    public bool Contains(TValue item) { return _dictionary.ContainsValue(item); }
+    public void CopyTo(TValue[] array, int arrayIndex)
+    {
+        if (array == null) throw new ArgumentNullException("array");
+        if (arrayIndex < 0 || arrayIndex > array.Length) throw new ArgumentOutOfRangeException("arrayIndex");
+        if (this.Count > array.Length - arrayIndex) throw new ArgumentException("Destination is too short.");
+        foreach (TValue item in this) array[arrayIndex++] = item;
+    }
+    public void Add(TValue item) { throw new NotSupportedException("Collection is read-only."); }
+    public bool Remove(TValue item) { throw new NotSupportedException("Collection is read-only."); }
+    public void Clear() { throw new NotSupportedException("Collection is read-only."); }
+    public IEnumerator<TValue> GetEnumerator() { return this.Enumerate(_dictionary.GetEnumerator()); }
+    private IEnumerator<TValue> Enumerate(IEnumerator<KeyValuePair<TKey, TValue>> entries)
+    {
+        using (entries)
+        {
+            while (entries.MoveNext()) yield return entries.Current.Value;
+        }
+    }
+}

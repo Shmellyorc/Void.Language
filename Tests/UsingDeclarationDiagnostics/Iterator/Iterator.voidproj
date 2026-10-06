@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "Iterator",
+  "version": "0.1.0",
+  "output": "exe",
+  "compiler": { "unsafe": false }
+}

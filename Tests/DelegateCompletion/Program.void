@@ -1,0 +1,195 @@
+using Void;
+
+public delegate void RefAction(ref int value);
+public delegate void OutAction(out int value);
+public delegate int InFunc(in int value);
+public delegate void RefValue<T>(ref T value);
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public struct Counter
+{
+    public int Value;
+
+    public Counter(int value)
+    {
+        Value = value;
+    }
+
+    public int Add(int amount)
+    {
+        Value += amount;
+        return Value;
+    }
+
+    public Func<int, int> Capture()
+    {
+        return Add;
+    }
+}
+
+public struct NodeHolder
+{
+    public Node Node;
+
+    public NodeHolder(Node node)
+    {
+        Node = node;
+    }
+
+    public int Read(int add)
+    {
+        GC.Collect();
+        return Node.Value + add;
+    }
+}
+
+public sealed class Receiver
+{
+    private int _value;
+
+    public Receiver(int value)
+    {
+        _value = value;
+    }
+
+    public int Add(int value)
+    {
+        return _value + value;
+    }
+}
+
+public static class Program
+{
+    public static void Increment(ref int value)
+    {
+        value += 1;
+    }
+
+    public static void Double(ref int value)
+    {
+        value *= 2;
+    }
+
+    public static void SetFive(out int value)
+    {
+        value = 5;
+    }
+
+    public static void SetNine(out int value)
+    {
+        value = 9;
+    }
+
+    public static int ReadPlusOne(in int value)
+    {
+        return value + 1;
+    }
+
+    public static void IncrementGeneric(ref int value)
+    {
+        value += 3;
+    }
+
+    public static void Ping()
+    {
+    }
+
+    public static void Pong()
+    {
+    }
+
+    public static void Main()
+    {
+        RefAction one = Increment;
+        int value = 4;
+        one(ref value);
+        Console.WriteLine(value == 5);
+
+        RefAction chain = Increment;
+        chain += Double;
+        int chained = 3;
+        chain(ref chained);
+        Console.WriteLine(chained == 8);
+
+        OutAction output = SetFive;
+        output += SetNine;
+        int assigned;
+        output(out assigned);
+        Console.WriteLine(assigned == 9);
+
+        InFunc read = ReadPlusOne;
+        int input = 20;
+        Console.WriteLine(read(in input) == 21);
+        Console.WriteLine(input == 20);
+
+        RefValue<int> generic = IncrementGeneric;
+        int genericValue = 7;
+        generic(ref genericValue);
+        Console.WriteLine(genericValue == 10);
+
+        Counter counter = new Counter(10);
+        Func<int, int> boxed = counter.Add;
+        Console.WriteLine(boxed(2) == 12);
+        Console.WriteLine(boxed(3) == 15);
+        Console.WriteLine(counter.Value == 10);
+
+        Counter maker = new Counter(20);
+        Func<int, int> capturedThis = maker.Capture();
+        Console.WriteLine(capturedThis(4) == 24);
+        Console.WriteLine(capturedThis(1) == 25);
+        Console.WriteLine(maker.Value == 20);
+
+        Node node = new Node(30);
+        NodeHolder holder = new NodeHolder(node);
+        Func<int, int> keepNode = holder.Read;
+        holder.Node = null;
+        node = null;
+        GC.Collect();
+        Console.WriteLine(keepNode(2) == 32);
+
+        RefAction sameStaticA = Increment;
+        RefAction sameStaticB = Increment;
+        Console.WriteLine(sameStaticA == sameStaticB);
+        Console.WriteLine(!(sameStaticA != sameStaticB));
+
+        Receiver receiver = new Receiver(40);
+        Func<int, int> sameInstanceA = receiver.Add;
+        Func<int, int> sameInstanceB = receiver.Add;
+        Console.WriteLine(sameInstanceA == sameInstanceB);
+
+        Receiver otherReceiver = new Receiver(40);
+        Func<int, int> differentInstance = otherReceiver.Add;
+        Console.WriteLine(sameInstanceA != differentInstance);
+
+        Action multicastA = Ping;
+        multicastA += Pong;
+        Action multicastB = Ping;
+        multicastB += Pong;
+        Console.WriteLine(multicastA == multicastB);
+
+        Action reversed = Pong;
+        reversed += Ping;
+        Console.WriteLine(multicastA != reversed);
+
+        multicastB -= Pong;
+        Console.WriteLine(multicastA != multicastB);
+
+        Action copied = multicastA;
+        Console.WriteLine(copied == multicastA);
+
+        Action nothing = null;
+        Console.WriteLine(nothing == null);
+        Console.WriteLine(null == nothing);
+        Console.WriteLine(multicastA != null);
+        Console.WriteLine(null != multicastA);
+    }
+}

@@ -1,0 +1,16 @@
+using Void;
+public ref struct View230
+{
+    private ref int _value;
+    public View230(ref int value) { _value = ref value; }
+    public ref int Value { get { return ref _value; } }
+}
+public static class Program
+{
+    public static View230 Bad()
+    {
+        int local = 1;
+        return new View230(ref local);
+    }
+    public static void Main() { View230 value = Bad(); Console.WriteLine(value.Value); }
+}

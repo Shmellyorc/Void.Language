@@ -1,0 +1,6 @@
+{
+  "format": 1,
+  "name": "CancellationUnhandled",
+  "output": "exe",
+  "version": "0.1.0"
+}

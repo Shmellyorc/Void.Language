@@ -1,0 +1,127 @@
+using Void;
+
+public class Holder305
+{
+    public string Text;
+    public Holder305(string text) { Text = text; }
+}
+
+public class PropertyHolder305
+{
+    public string Text { get; set; }
+}
+
+public static class Eval305
+{
+    public static int Order;
+    public static int LeftCalls;
+    public static int RightCalls;
+    public static int HolderCalls;
+    public static int IndexCalls;
+    public static Holder305 Holder = new Holder305("A");
+
+    public static string Left()
+    {
+        LeftCalls += 1;
+        Order = Order * 10 + 1;
+        return "L";
+    }
+
+    public static string Right()
+    {
+        RightCalls += 1;
+        Order = Order * 10 + 2;
+        return "R";
+    }
+
+    public static Holder305 GetHolder()
+    {
+        HolderCalls += 1;
+        return Holder;
+    }
+
+    public static int Index()
+    {
+        IndexCalls += 1;
+        return 0;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        string a = "A";
+        string b = "B";
+        Console.WriteLine(a + b == "AB");
+        Console.WriteLine("A" + "é" == "Aé");
+        Console.WriteLine("A" + (char)128512 == "A😀");
+        Console.WriteLine((char)128512 + "B" == "😀B");
+        Console.WriteLine("A\0" + "B" == "A\0B");
+        Console.WriteLine(("A\0" + "B").Length == 3);
+        Console.WriteLine(("A" + (char)128512).ByteLength == 5);
+
+        string absent = null;
+        Console.WriteLine(absent + "B" == "B");
+        Console.WriteLine("A" + absent == "A");
+        Console.WriteLine(absent + absent == string.Empty);
+
+        Console.WriteLine(string.Concat("A", "B") == "AB");
+        Console.WriteLine(string.Concat("A", (char)233) == "Aé");
+        Console.WriteLine(string.Concat((char)233, "B") == "éB");
+        Console.WriteLine(string.Concat(null, "B") == "B");
+        Console.WriteLine(string.Concat("A", null) == "A");
+        Console.WriteLine(string.Concat(null, null) == string.Empty);
+
+        string compound = "A";
+        compound += "B";
+        Console.WriteLine(compound == "AB");
+        compound += (char)233;
+        Console.WriteLine(compound == "ABé");
+        GC.Collect();
+        Console.WriteLine(compound == "ABé");
+
+        Eval305.Order = 0;
+        string ordered = Eval305.Left() + Eval305.Right();
+        Console.WriteLine(ordered == "LR");
+        Console.WriteLine(Eval305.LeftCalls == 1 && Eval305.RightCalls == 1 && Eval305.Order == 12);
+
+        Eval305.Order = 0;
+        string orderedConcat = string.Concat(Eval305.Left(), Eval305.Right());
+        Console.WriteLine(orderedConcat == "LR");
+        Console.WriteLine(Eval305.LeftCalls == 2 && Eval305.RightCalls == 2 && Eval305.Order == 12);
+
+        Eval305.Holder = new Holder305("A");
+        Eval305.HolderCalls = 0;
+        Eval305.GetHolder().Text += "B";
+        Console.WriteLine(Eval305.Holder.Text == "AB");
+        Console.WriteLine(Eval305.HolderCalls == 1);
+
+        string[] items = new string[1];
+        items[0] = "A";
+        Eval305.IndexCalls = 0;
+        items[Eval305.Index()] += "B";
+        Console.WriteLine(items[0] == "AB");
+        Console.WriteLine(Eval305.IndexCalls == 1);
+
+        PropertyHolder305 property = new PropertyHolder305();
+        property.Text = "A";
+        property.Text += "B";
+        Console.WriteLine(property.Text == "AB");
+        property.Text += (char)128512;
+        Console.WriteLine(property.Text == "AB😀");
+
+        Console.WriteLine(("A" + "B") + "C" == "ABC");
+        Console.WriteLine("A" + ("B" + "C") == "ABC");
+        Console.WriteLine(string.Concat("A\0", "B") == "A\0B");
+        Console.WriteLine(string.Concat((char)0, "B") == "\0B");
+
+        string gcLeft = "left";
+        string gcRight = "right";
+        GC.Collect();
+        string gcCombined = gcLeft + gcRight;
+        GC.Collect();
+        Console.WriteLine(gcCombined == "leftright");
+        Console.WriteLine(gcLeft == "left" && gcRight == "right");
+    }
+}

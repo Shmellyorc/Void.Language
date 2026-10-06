@@ -1,0 +1,236 @@
+public struct Pair222
+{
+    public int X;
+    public int Y;
+
+    public Pair222(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+}
+
+public sealed class Node222
+{
+    public int Value;
+
+    public Node222(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Box222
+{
+    public int Value;
+    public Pair222 Pair;
+    public Node222 Node;
+
+    public Box222(int value)
+    {
+        Value = value;
+        Pair = new Pair222(value + 1, value + 2);
+        Node = new Node222(value + 3);
+    }
+}
+
+public static class Program
+{
+    public static int StaticA = 10;
+    public static int StaticB = 20;
+    public static int BoxCalls;
+    public static int ArrayCalls;
+
+    public static Box222 MakeBox(int value)
+    {
+        BoxCalls += 1;
+        return new Box222(value);
+    }
+
+    public static int[] MakeArray(int value)
+    {
+        ArrayCalls += 1;
+        return new int[] { value, value + 1 };
+    }
+
+    public static void SetRef(ref int value, int replacement)
+    {
+        value = replacement;
+    }
+
+    public static int ReadIn(in int value)
+    {
+        return value;
+    }
+
+    public static void GenericRoute<T>(ref T first, ref T second, T value)
+    {
+        ref T alias = ref first;
+        alias = ref second;
+        alias = value;
+    }
+
+    public static void AssignOutAfterRebind(out int value)
+    {
+        int scratch = 1;
+        ref int alias = ref scratch;
+        alias = ref value;
+        alias = 71;
+    }
+
+    public static void Main()
+    {
+        int a = 1;
+        int b = 2;
+        ref int alias = ref a;
+        alias = ref b;
+        alias = 7;
+        Console.WriteLine(a == 1);
+        Console.WriteLine(b == 7);
+        Console.WriteLine(alias == 7);
+
+        ref int copy = ref alias;
+        alias = ref a;
+        alias = 9;
+        copy = 11;
+        Console.WriteLine(a == 9 && b == 11);
+
+        ref int chain = ref alias;
+        chain = ref copy;
+        chain += 1;
+        Console.WriteLine(b == 12 && a == 9);
+
+        chain = ref chain;
+        chain += 1;
+        Console.WriteLine(b == 13);
+
+        ref int staticAlias = ref StaticA;
+        staticAlias = ref StaticB;
+        staticAlias = 25;
+        Console.WriteLine(StaticA == 10 && StaticB == 25);
+
+        Pair222 pair = new Pair222(30, 31);
+        int local = 40;
+        ref int mixed = ref local;
+        mixed = ref pair.X;
+        mixed = 35;
+        Console.WriteLine(pair.X == 35 && local == 40);
+
+        int[] values = new int[] { 50, 51 };
+        mixed = ref values[1];
+        values = null;
+        GC.Collect();
+        mixed = 55;
+        Console.WriteLine(mixed == 55);
+
+        Box222 box = new Box222(60);
+        mixed = ref box.Pair.X;
+        box = null;
+        GC.Collect();
+        mixed = 65;
+        Console.WriteLine(mixed == 65);
+
+        ref int temporary = ref a;
+        temporary = ref MakeBox(70).Value;
+        GC.Collect();
+        temporary = 75;
+        Console.WriteLine(temporary == 75 && BoxCalls == 1);
+
+        temporary = ref MakeArray(80)[0];
+        GC.Collect();
+        temporary = 85;
+        Console.WriteLine(temporary == 85 && ArrayCalls == 1);
+
+        Box222 firstBox = new Box222(90);
+        Box222 secondBox = new Box222(100);
+        ref int moving = ref firstBox.Value;
+        ref int retained = ref moving;
+        moving = ref secondBox.Value;
+        firstBox = null;
+        secondBox = null;
+        GC.Collect();
+        retained = 95;
+        moving = 105;
+        Console.WriteLine(retained == 95);
+        Console.WriteLine(moving == 105);
+
+        int[] retainedArray = new int[] { 110 };
+        ref int arrayAlias = ref retainedArray[0];
+        ref int arrayCopy = ref arrayAlias;
+        arrayAlias = ref a;
+        retainedArray = null;
+        GC.Collect();
+        arrayCopy = 115;
+        Console.WriteLine(arrayCopy == 115 && a == 9);
+
+        Node222 firstNode = new Node222(120);
+        Node222 secondNode = new Node222(121);
+        ref Node222 nodeAlias = ref firstNode;
+        nodeAlias = ref secondNode;
+        nodeAlias = new Node222(122);
+        Console.WriteLine(firstNode.Value == 120 && secondNode.Value == 122);
+
+        int? firstMaybe = 130;
+        int? secondMaybe = 131;
+        ref int? maybeAlias = ref firstMaybe;
+        maybeAlias = ref secondMaybe;
+        maybeAlias = null;
+        Console.WriteLine(firstMaybe == 130 && secondMaybe == null);
+
+        int genericA = 140;
+        int genericB = 141;
+        GenericRoute<int>(ref genericA, ref genericB, 145);
+        Console.WriteLine(genericA == 140 && genericB == 145);
+
+        Node222 genericNodeA = new Node222(150);
+        Node222 genericNodeB = new Node222(151);
+        GenericRoute<Node222>(ref genericNodeA, ref genericNodeB, new Node222(155));
+        Console.WriteLine(genericNodeA.Value == 150 && genericNodeB.Value == 155);
+
+        int refArgA = 160;
+        int refArgB = 161;
+        ref int refArg = ref refArgA;
+        refArg = ref refArgB;
+        SetRef(ref refArg, 165);
+        Console.WriteLine(refArgA == 160 && refArgB == 165);
+        Console.WriteLine(ReadIn(in refArg) == 165);
+
+        int outValue;
+        AssignOutAfterRebind(out outValue);
+        Console.WriteLine(outValue == 71);
+
+        int branchA = 170;
+        int branchB = 171;
+        ref int branch = ref branchA;
+        bool chooseB = true;
+        if (chooseB)
+            branch = ref branchB;
+        branch = 175;
+        Console.WriteLine(branchA == 170 && branchB == 175);
+
+        ref int branchElse = ref branchA;
+        if (false)
+            branchElse = ref branchB;
+        branchElse = 176;
+        Console.WriteLine(branchA == 176 && branchB == 175);
+
+        int loopA = 180;
+        int loopB = 181;
+        ref int loopAlias = ref loopA;
+        bool run = true;
+        while (run)
+        {
+            loopAlias = ref loopB;
+            run = false;
+        }
+        loopAlias = 185;
+        Console.WriteLine(loopA == 180 && loopB == 185);
+
+        int parenA = 190;
+        int parenB = 191;
+        ref var inferred = ref parenA;
+        inferred = ref (parenB);
+        inferred = 195;
+        Console.WriteLine(parenA == 190 && parenB == 195);
+    }
+}

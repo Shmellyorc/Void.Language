@@ -1,0 +1,183 @@
+using Void;
+using Void.IO;
+using Void.Text;
+
+public static class Console
+{
+    private static TextReader _in = new StandardTextReader();
+    private static TextWriter _out = new StandardTextWriter(false);
+    private static bool _outIsStandard = true;
+    private static TextWriter _error = new StandardTextWriter(true);
+    private static Encoding _inputEncoding = Encoding.UTF8;
+    private static Encoding _outputEncoding = Encoding.UTF8;
+
+    public static TextReader In { get { return _in; } }
+    public static TextWriter Out { get { return _out; } }
+    public static TextWriter Error { get { return _error; } }
+
+    public static Encoding InputEncoding
+    {
+        get { return _inputEncoding; }
+        set
+        {
+            if (value == null) throw new ArgumentNullException("value");
+            if (!value.SupportsConsoleStreaming) throw new NotSupportedException("The selected input encoding is not supported for Console streaming.");
+            _inputEncoding = value;
+        }
+    }
+
+    public static Encoding OutputEncoding
+    {
+        get { return _outputEncoding; }
+        set
+        {
+            if (value == null) throw new ArgumentNullException("value");
+            if (!value.SupportsConsoleStreaming) throw new NotSupportedException("The selected output encoding is not supported for Console streaming.");
+            _outputEncoding = value;
+        }
+    }
+
+    public static bool IsInputRedirected { get { return !StandardStreams.IsTerminal(0); } }
+    public static bool IsOutputRedirected { get { return !StandardStreams.IsTerminal(1); } }
+    public static bool IsErrorRedirected { get { return !StandardStreams.IsTerminal(2); } }
+
+    public static void SetIn(TextReader newIn)
+    {
+        if (newIn == null) throw new ArgumentNullException("newIn");
+        _in = newIn;
+    }
+
+    public static void SetOut(TextWriter newOut)
+    {
+        if (newOut == null) throw new ArgumentNullException("newOut");
+        _outIsStandard = newOut is StandardTextWriter;
+        _out = newOut;
+    }
+
+    public static void SetError(TextWriter newError)
+    {
+        if (newError == null) throw new ArgumentNullException("newError");
+        _error = newError;
+    }
+
+    public static Stream OpenStandardInput() { return new StandardStream(0); }
+    public static Stream OpenStandardInput(int bufferSize)
+    {
+        if (bufferSize < 0) throw new ArgumentOutOfRangeException("bufferSize");
+        return new StandardStream(0);
+    }
+    public static Stream OpenStandardOutput() { return new StandardStream(1); }
+    public static Stream OpenStandardOutput(int bufferSize)
+    {
+        if (bufferSize < 0) throw new ArgumentOutOfRangeException("bufferSize");
+        return new StandardStream(1);
+    }
+    public static Stream OpenStandardError() { return new StandardStream(2); }
+    public static Stream OpenStandardError(int bufferSize)
+    {
+        if (bufferSize < 0) throw new ArgumentOutOfRangeException("bufferSize");
+        return new StandardStream(2);
+    }
+
+    public static int Read() { return Console.In.Read(); }
+    public static string ReadLine() { return Console.In.ReadLine(); }
+    public static bool KeyAvailable
+    {
+        get
+        {
+            if (!(Console.In is StandardTextReader))
+                throw new InvalidOperationException("Cannot determine key availability when Console.In has been replaced.");
+            return StandardTerminal.KeyAvailable();
+        }
+    }
+    public static bool TreatControlCAsInput
+    {
+        get { return StandardTerminal.GetTreatControlCAsInput(); }
+        set { StandardTerminal.SetTreatControlCAsInput(value); }
+    }
+    public static ConsoleColor ForegroundColor
+    {
+        get { return StandardTerminal.GetForegroundColor(); }
+        set { StandardTerminal.SetForegroundColor(value); }
+    }
+    public static ConsoleColor BackgroundColor
+    {
+        get { return StandardTerminal.GetBackgroundColor(); }
+        set { StandardTerminal.SetBackgroundColor(value); }
+    }
+    public static int CursorLeft
+    {
+        get { return StandardTerminal.GetCursorLeft(); }
+        set { StandardTerminal.SetCursorPosition(value, StandardTerminal.GetCursorTop()); }
+    }
+    public static int CursorTop
+    {
+        get { return StandardTerminal.GetCursorTop(); }
+        set { StandardTerminal.SetCursorPosition(StandardTerminal.GetCursorLeft(), value); }
+    }
+    public static bool CursorVisible
+    {
+        get { return StandardTerminal.GetCursorVisible(); }
+        set { StandardTerminal.SetCursorVisible(value); }
+    }
+    public static string Title
+    {
+        get { return StandardTerminal.GetTitle(); }
+        set { StandardTerminal.SetTitle(value); }
+    }
+    public static void ResetColor() { StandardTerminal.ResetColor(); }
+    public static void Clear() { StandardTerminal.Clear(); }
+    public static void SetCursorPosition(int left, int top) { StandardTerminal.SetCursorPosition(left, top); }
+    public static ConsoleKeyInfo ReadKey() { return ReadKey(false); }
+    public static ConsoleKeyInfo ReadKey(bool intercept)
+    {
+        if (!(Console.In is StandardTextReader))
+            throw new InvalidOperationException("Cannot read keys when Console.In has been replaced.");
+        return StandardTerminal.ReadKey(intercept);
+    }
+    public static void Write(string value)
+    {
+        if (_outIsStandard) StandardOutput.Write(value);
+        else _out.Write(value);
+    }
+    public static void WriteLine()
+    {
+        if (_outIsStandard) StandardOutput.Write(Environment.NewLine);
+        else _out.WriteLine();
+    }
+    public static void WriteLine(string value)
+    {
+        if (_outIsStandard)
+        {
+            StandardOutput.Write(value);
+            StandardOutput.Write(Environment.NewLine);
+        }
+        else _out.WriteLine(value);
+    }
+    public static void Write(bool value) { Console.Write(value ? "True" : "False"); }
+    public static void WriteLine(bool value) { Console.Write(value); Console.WriteLine(); }
+    public static void Write(char value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.Write(text.ToString()); }
+    public static void WriteLine(char value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.WriteLine(text.ToString()); }
+    public static void Write(byte value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.Write(text.ToString()); }
+    public static void WriteLine(byte value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.WriteLine(text.ToString()); }
+    public static void Write(sbyte value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.Write(text.ToString()); }
+    public static void WriteLine(sbyte value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.WriteLine(text.ToString()); }
+    public static void Write(short value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.Write(text.ToString()); }
+    public static void WriteLine(short value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.WriteLine(text.ToString()); }
+    public static void Write(ushort value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.Write(text.ToString()); }
+    public static void WriteLine(ushort value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.WriteLine(text.ToString()); }
+    public static void Write(int value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.Write(text.ToString()); }
+    public static void WriteLine(int value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.WriteLine(text.ToString()); }
+    public static void Write(uint value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.Write(text.ToString()); }
+    public static void WriteLine(uint value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.WriteLine(text.ToString()); }
+    public static void Write(long value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.Write(text.ToString()); }
+    public static void WriteLine(long value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.WriteLine(text.ToString()); }
+    public static void Write(ulong value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.Write(text.ToString()); }
+    public static void WriteLine(ulong value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.WriteLine(text.ToString()); }
+    public static void Write(float value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.Write(text.ToString()); }
+    public static void WriteLine(float value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.WriteLine(text.ToString()); }
+    public static void Write(double value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.Write(text.ToString()); }
+    public static void WriteLine(double value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.WriteLine(text.ToString()); }
+    public static void Write(decimal value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.Write(text.ToString()); }
+    public static void WriteLine(decimal value) { StringBuilder text = new StringBuilder(); text.Append(value); Console.WriteLine(text.ToString()); }
+}

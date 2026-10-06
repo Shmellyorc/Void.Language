@@ -1,0 +1,2 @@
+namespace Void;
+public delegate void Action();

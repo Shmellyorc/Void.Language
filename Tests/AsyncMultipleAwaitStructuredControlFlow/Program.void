@@ -1,0 +1,267 @@
+using Void;
+using Void.Threading.Tasks;
+
+public sealed class Payload205
+{
+    public int Value;
+
+    public Payload205(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class AsyncWorker205
+{
+    private int _offset;
+
+    public AsyncWorker205(int offset)
+    {
+        _offset = offset;
+    }
+
+    public async Task<int> Multiple(Task<int> first, Task<int> second)
+    {
+        int a = await first;
+        int saved = a + _offset;
+        int b = await second;
+        return saved + b;
+    }
+}
+
+public static class Program
+{
+    private static int _stage;
+
+    private static async Task<int> Sequential(Task<int> first, Task<int> second)
+    {
+        _stage = 1;
+        int a = await first;
+        _stage = 2;
+        int b = await second;
+        _stage = 3;
+        return a + b;
+    }
+
+    private static async Task<int> CompletedFastPath(Task<int> first, Task<int> second)
+    {
+        int a = await first;
+        int b = await second;
+        return a * 10 + b;
+    }
+
+    private static async Task<int> Branch(bool firstBranch, Task<int> first, Task<int> second)
+    {
+        int total = 5;
+        if (firstBranch)
+        {
+            int value = await first;
+            total += value;
+        }
+        else
+        {
+            await second;
+            total += 20;
+        }
+        return total;
+    }
+
+    private static async Task<int> WhileFlow(Task signal)
+    {
+        int i = 0;
+        int total = 0;
+        while (i < 5)
+        {
+            i++;
+            if (i == 2)
+            {
+                await signal;
+                continue;
+            }
+            total += i;
+            if (i == 4)
+                break;
+            await signal;
+        }
+        return total;
+    }
+
+    private static async Task<int> DoWhileFlow(Task signal)
+    {
+        int i = 0;
+        int total = 0;
+        do
+        {
+            i++;
+            total += i;
+            await signal;
+        }
+        while (i < 3);
+        return total;
+    }
+
+    private static async Task<int> ForFlow(Task signal)
+    {
+        int total = 0;
+        for (int i = 0; i < 4; i++)
+        {
+            if (i == 1)
+            {
+                await signal;
+                continue;
+            }
+            total += i;
+            if (i == 3)
+                break;
+            await signal;
+        }
+        return total;
+    }
+
+    private static async Task<int> SwitchFlow(int mode, Task<int> first, Task<int> second)
+    {
+        int result = 1;
+        switch (mode)
+        {
+            case 1:
+            {
+                int value = await first;
+                result += value;
+                break;
+            }
+            case 2:
+            {
+                int value = await second;
+                result += value * 2;
+                break;
+            }
+            default:
+                result = 99;
+                break;
+        }
+        return result;
+    }
+
+    private static async Task<int> AssignmentAwait(Task<int> source)
+    {
+        int value = 0;
+        value = await source;
+        return value + 1;
+    }
+
+    private static async Task<int> EarlyReturn(bool stop, Task signal)
+    {
+        if (stop)
+            return 7;
+        await signal;
+        return 8;
+    }
+
+    private static async Task<int> RetainManaged(Task signal)
+    {
+        Payload205 payload = new Payload205(44);
+        await signal;
+        GC.Collect();
+        GC.Collect();
+        return payload.Value;
+    }
+
+    private static bool WaitFault(Task task, string message)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (Exception error)
+        {
+            return error.Message == message;
+        }
+        return false;
+    }
+
+    public static void Main()
+    {
+        TaskCompletionSource<int> first = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> second = new TaskCompletionSource<int>();
+        _stage = 0;
+        Task<int> sequence = Sequential(first.Task, second.Task);
+        Console.WriteLine(_stage == 1 && !sequence.IsCompleted);
+        first.SetResult(10);
+        while (_stage < 2) { }
+        Console.WriteLine(_stage == 2 && !sequence.IsCompleted);
+        second.SetResult(20);
+        Console.WriteLine(sequence.Result == 30 && _stage == 3);
+
+        TaskCompletionSource<int> completedA = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> completedB = new TaskCompletionSource<int>();
+        completedA.SetResult(3);
+        completedB.SetResult(4);
+        Task<int> fast = CompletedFastPath(completedA.Task, completedB.Task);
+        Console.WriteLine(fast.IsCompleted && fast.Result == 34);
+
+        TaskCompletionSource<int> branchA = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> branchB = new TaskCompletionSource<int>();
+        Task<int> branchFirst = Branch(true, branchA.Task, branchB.Task);
+        Console.WriteLine(!branchFirst.IsCompleted);
+        branchA.SetResult(6);
+        Console.WriteLine(branchFirst.Result == 11);
+        branchB.SetResult(9);
+        Task<int> branchSecond = Branch(false, branchA.Task, branchB.Task);
+        Console.WriteLine(branchSecond.Result == 25);
+
+        TaskCompletionSource signalSource = new TaskCompletionSource();
+        Task<int> whileTask = WhileFlow(signalSource.Task);
+        Console.WriteLine(!whileTask.IsCompleted);
+        signalSource.SetResult();
+        Console.WriteLine(whileTask.Result == 8);
+        Console.WriteLine(DoWhileFlow(signalSource.Task).Result == 6);
+        Console.WriteLine(ForFlow(signalSource.Task).Result == 5);
+
+        TaskCompletionSource<int> switchA = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> switchB = new TaskCompletionSource<int>();
+        Task<int> switchOne = SwitchFlow(1, switchA.Task, switchB.Task);
+        switchA.SetResult(7);
+        Console.WriteLine(switchOne.Result == 8);
+        switchB.SetResult(5);
+        Console.WriteLine(SwitchFlow(2, switchA.Task, switchB.Task).Result == 11);
+        Console.WriteLine(SwitchFlow(3, switchA.Task, switchB.Task).Result == 99);
+
+        TaskCompletionSource<int> assignment = new TaskCompletionSource<int>();
+        Task<int> assigned = AssignmentAwait(assignment.Task);
+        assignment.SetResult(12);
+        Console.WriteLine(assigned.Result == 13);
+
+        TaskCompletionSource earlySignal = new TaskCompletionSource();
+        Task<int> early = EarlyReturn(true, earlySignal.Task);
+        Console.WriteLine(early.IsCompleted && early.Result == 7);
+        Task<int> later = EarlyReturn(false, earlySignal.Task);
+        Console.WriteLine(!later.IsCompleted);
+        earlySignal.SetResult();
+        Console.WriteLine(later.Result == 8);
+
+        TaskCompletionSource retainSignal = new TaskCompletionSource();
+        Task<int> retained = RetainManaged(retainSignal.Task);
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(!retained.IsCompleted);
+        retainSignal.SetResult();
+        Console.WriteLine(retained.Result == 44);
+
+        AsyncWorker205 worker = new AsyncWorker205(2);
+        TaskCompletionSource<int> workerA = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> workerB = new TaskCompletionSource<int>();
+        Task<int> workerTask = worker.Multiple(workerA.Task, workerB.Task);
+        worker = null;
+        workerA.SetResult(5);
+        workerB.SetResult(7);
+        Console.WriteLine(workerTask.Result == 14);
+
+        TaskCompletionSource<int> faultA = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> faultB = new TaskCompletionSource<int>();
+        Task<int> faultTask = Sequential(faultA.Task, faultB.Task);
+        faultA.SetResult(1);
+        faultB.SetException(new Exception("async-205-second-fault"));
+        Console.WriteLine(WaitFault(faultTask, "async-205-second-fault"));
+        Console.WriteLine(faultTask.IsFaulted && faultTask.Exception != null);
+    }
+}

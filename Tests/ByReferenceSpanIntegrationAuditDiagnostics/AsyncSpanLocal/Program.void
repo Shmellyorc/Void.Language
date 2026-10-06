@@ -1,0 +1,11 @@
+using Void;
+using Void.Threading.Tasks;
+public static class Program
+{
+    public static async Task<int> Bad()
+    {
+        Span<int> values = stackalloc int[1];
+        return values.Length;
+    }
+    public static void Main() { }
+}

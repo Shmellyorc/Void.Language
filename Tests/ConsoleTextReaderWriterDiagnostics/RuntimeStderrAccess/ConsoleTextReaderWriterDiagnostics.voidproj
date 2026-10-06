@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "ConsoleTextReaderWriterDiagnostics",
+  "version": "0.0.313",
+  "output": "exe",
+  "compiler": { "unsafe": false }
+}

@@ -1,0 +1,10 @@
+public static class Program
+{
+    public static void Main()
+    {
+        object gate = null;
+        lock (gate)
+        {
+        }
+    }
+}

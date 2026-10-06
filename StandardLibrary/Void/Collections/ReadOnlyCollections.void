@@ -1,0 +1,32 @@
+namespace Void.Collections;
+
+public interface IReadOnlyCollection<T> : IEnumerable<T>
+{
+    int Count { get; }
+}
+
+
+public interface IReadOnlyList<T> : IReadOnlyCollection<T>
+{
+    T get_Item(int index);
+}
+
+public interface IReadOnlyDictionary<TKey, TValue> : IReadOnlyCollection<KeyValuePair<TKey, TValue>>
+{
+    TValue get_Item(TKey key);
+    IEnumerable<TKey> Keys { get; }
+    IEnumerable<TValue> Values { get; }
+    bool ContainsKey(TKey key);
+    bool TryGetValue(TKey key, out TValue value);
+}
+
+public interface ICollection<T> : IEnumerable<T>
+{
+    int Count { get; }
+    bool IsReadOnly { get; }
+    void Add(T item);
+    void Clear();
+    bool Contains(T item);
+    void CopyTo(T[] array, int arrayIndex);
+    bool Remove(T item);
+}

@@ -1,0 +1,27 @@
+public interface IMarker<T>
+{
+}
+
+public struct Sneaky : IMarker<Sneaky>
+{
+    public int Value;
+
+    public static explicit operator int(Sneaky value)
+    {
+        return value.Value;
+    }
+}
+
+public static class Program
+{
+    private static int Convert<T>(T value) where T : IMarker<T>
+    {
+        return (int)value;
+    }
+
+    public static void Main()
+    {
+        Sneaky value = new Sneaky();
+        int result = Convert(value);
+    }
+}

@@ -1,0 +1,4 @@
+using Void;
+public class Base { }
+public sealed class Derived : Base { }
+public static class Program { public static void Main() { Base value = new Derived(); bool ok = value is Derived item; Console.WriteLine(ok); } }

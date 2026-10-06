@@ -1,0 +1,21 @@
+using Void;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    private static async Task Work(Task source)
+    {
+        try
+        {
+            await source;
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error.Message);
+        }
+    }
+
+    public static void Main()
+    {
+    }
+}

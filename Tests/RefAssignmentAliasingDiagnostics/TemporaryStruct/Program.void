@@ -1,0 +1,1 @@
+public struct Pair { public int X; public Pair(int x) { X = x; } } public static class Program { public static Pair Make() { return new Pair(1); } public static void Main() { int local = 1; ref int alias = ref local; alias = ref Make().X; } }

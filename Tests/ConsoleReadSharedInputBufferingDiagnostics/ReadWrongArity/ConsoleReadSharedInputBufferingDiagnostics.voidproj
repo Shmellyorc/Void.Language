@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "ConsoleReadSharedInputBufferingDiagnostics",
+  "version": "0.0.312",
+  "output": "exe",
+  "compiler": { "unsafe": false }
+}

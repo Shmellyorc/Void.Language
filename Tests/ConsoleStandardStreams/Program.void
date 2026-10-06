@@ -1,0 +1,116 @@
+using Void;
+using Void.IO;
+
+public sealed class CaptureWriter315 : TextWriter
+{
+    public string Text = "";
+    public override void Write(string value) { Text = Text + value; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Stream input = Console.OpenStandardInput();
+        Stream output = Console.OpenStandardOutput();
+        Stream error = Console.OpenStandardError();
+
+        Console.WriteLine(input.CanRead && !input.CanWrite && !input.CanSeek);
+        Console.WriteLine(!output.CanRead && output.CanWrite && !output.CanSeek);
+        Console.WriteLine(!error.CanRead && error.CanWrite && !error.CanSeek);
+
+        bool caught = false;
+        long unsupportedLength = 0;
+        try { unsupportedLength = input.Length; }
+        catch (NotSupportedException) { caught = true; }
+        Console.WriteLine(caught && unsupportedLength == 0L);
+
+        caught = false;
+        try { output.Read(new byte[1], 0, 1); }
+        catch (NotSupportedException) { caught = true; }
+        Console.WriteLine(caught);
+
+        caught = false;
+        try { input.Write(new byte[1], 0, 1); }
+        catch (NotSupportedException) { caught = true; }
+        Console.WriteLine(caught);
+
+        caught = false;
+        try { Console.OpenStandardInput(-1); }
+        catch (ArgumentOutOfRangeException error315) { caught = error315.ParamName == "bufferSize"; }
+        Console.WriteLine(caught);
+        Console.WriteLine(Console.OpenStandardInput(0).CanRead);
+        Console.WriteLine(Console.OpenStandardOutput(32).CanWrite);
+        Console.WriteLine(Console.OpenStandardError(64).CanWrite);
+
+        caught = false;
+        try { input.Read(null, 0, 1); }
+        catch (ArgumentNullException error315) { caught = error315.ParamName == "buffer"; }
+        Console.WriteLine(caught);
+
+        caught = false;
+        try { input.Read(new byte[1], -1, 1); }
+        catch (ArgumentOutOfRangeException error315) { caught = error315.ParamName == "offset"; }
+        Console.WriteLine(caught);
+
+        caught = false;
+        try { output.Write(new byte[1], 0, 2); }
+        catch (ArgumentException) { caught = true; }
+        Console.WriteLine(caught);
+
+        caught = false;
+        try { input.Seek(0L, SeekOrigin.Begin); }
+        catch (NotSupportedException) { caught = true; }
+        Console.WriteLine(caught);
+
+        caught = false;
+        try { output.SetLength(0L); }
+        catch (NotSupportedException) { caught = true; }
+        Console.WriteLine(caught);
+
+        caught = false;
+        long unsupportedPosition = 0;
+        try { unsupportedPosition = output.Position; }
+        catch (NotSupportedException) { caught = true; }
+        Console.WriteLine(caught && unsupportedPosition == 0L);
+
+        caught = false;
+        try { output.Position = 0L; }
+        catch (NotSupportedException) { caught = true; }
+        Console.WriteLine(caught);
+
+        // A redirected Console.Out does not change where OpenStandardOutput writes.
+        TextWriter originalOut = Console.Out;
+        CaptureWriter315 capture = new CaptureWriter315();
+        Console.SetOut(capture);
+        Console.Write("redirected-writer");
+        byte[] direct = new byte[] { (byte)83, (byte)84, (byte)68, (byte)79, (byte)85, (byte)84, (byte)10 };
+        output.Write(direct, 0, direct.Length);
+        output.Flush();
+        Console.SetOut(originalOut);
+        Console.WriteLine(capture.Text == "redirected-writer");
+
+        // ReadLine consumes CR and stores the following byte as lookahead. The raw
+        // standard-input Stream must consume that byte before reading more native input.
+        Console.WriteLine(Console.ReadLine() == "line");
+        byte[] bytes = new byte[8];
+        int count = input.Read(bytes, 1, 5);
+        Console.WriteLine(count == 5);
+        Console.WriteLine(bytes[1] == (byte)90);
+        Console.WriteLine(bytes[2] == (byte)240 && bytes[3] == (byte)159 && bytes[4] == (byte)152 && bytes[5] == (byte)128);
+        Console.WriteLine(input.Read(bytes, 0, 0) == 0);
+        Console.WriteLine(input.ReadByte() == -1);
+
+        // Arbitrary bytes are allowed on the byte streams; stderr is distinct.
+        byte[] err = new byte[] { (byte)69, (byte)82, (byte)82, (byte)10 };
+        error.Write(err, 0, err.Length);
+        error.Flush();
+
+        byte[] single = new byte[1];
+        single[0] = (byte)88;
+        output.WriteByte(single[0]);
+        output.WriteByte((byte)10);
+        output.Flush();
+        Console.WriteLine(true);
+    }
+}

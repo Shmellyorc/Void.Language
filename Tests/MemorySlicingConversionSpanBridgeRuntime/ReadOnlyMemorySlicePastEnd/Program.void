@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { int[] a = new int[3]; ReadOnlyMemory<int> m = a; ReadOnlyMemory<int> s = m.Slice(1, 3); } }

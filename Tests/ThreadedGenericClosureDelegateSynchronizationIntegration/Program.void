@@ -1,0 +1,277 @@
+using Void;
+using Void.Threading;
+
+public interface IScore
+{
+    int Score();
+}
+
+public sealed class Payload
+{
+    public int Value;
+
+    public Payload(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class ScoreNode : IScore
+{
+    public int Value;
+    public Payload Payload;
+
+    public ScoreNode(int value)
+    {
+        Value = value;
+        Payload = new Payload(value + 1000);
+    }
+
+    public int Score()
+    {
+        return Value;
+    }
+}
+
+public sealed class AlternateScore : IScore
+{
+    public int Value;
+    public Payload Payload;
+
+    public AlternateScore(int value)
+    {
+        Value = value;
+        Payload = new Payload(value + 2000);
+    }
+
+    public int Score()
+    {
+        return Value;
+    }
+}
+
+public sealed class SharedState
+{
+    public int Ready;
+    public int Phase;
+    public int Completed;
+    public int Sum;
+    public int GenericCount;
+    public int DelegateCount;
+    public int NestedCount;
+    public int ReferenceOk;
+    public int PublishedOk;
+    public ScoreNode SharedRef;
+    public ScoreNode Published;
+}
+
+public sealed class GenericRunner<T> where T : IScore
+{
+    private SharedState _state;
+    private T _value;
+    private int _bias;
+
+    public GenericRunner(SharedState state, T value, int bias)
+    {
+        _state = state;
+        _value = value;
+        _bias = bias;
+    }
+
+    public void Run()
+    {
+        Program.WaitForStart(_state);
+        Program.Record<T>(_state, _value, _bias);
+        Interlocked.Increment(ref _state.Completed);
+    }
+}
+
+public static class Program
+{
+    public static int ReadScore<T>(T value) where T : IScore
+    {
+        return value.Score();
+    }
+
+    public static void WaitForStart(SharedState state)
+    {
+        lock (state)
+        {
+            Interlocked.Increment(ref state.Ready);
+            while (Volatile.Read(ref state.Phase) == 0)
+                Monitor.Wait(state);
+        }
+    }
+
+    public static void Record<T>(SharedState state, T value, int bias) where T : IScore
+    {
+        int score = ReadScore<T>(value) + bias;
+
+        ScoreNode replacement = new ScoreNode(score);
+        ScoreNode previous = Interlocked.Exchange(ref state.SharedRef, replacement);
+        GC.Collect();
+
+        if (previous != null && previous.Payload != null && previous.Payload.Value == previous.Value + 1000)
+            Interlocked.Increment(ref state.ReferenceOk);
+
+        Volatile.Write(ref state.Published, replacement);
+        ScoreNode published = Volatile.Read(ref state.Published);
+        GC.Collect();
+
+        if (published != null && published.Payload != null && published.Payload.Value == published.Value + 1000)
+            Interlocked.Increment(ref state.PublishedOk);
+
+        Interlocked.Add(ref state.Sum, score);
+        Interlocked.Increment(ref state.GenericCount);
+    }
+
+    public static Action MakeCapturedWorker<T>(SharedState state, T value, int bias) where T : IScore
+    {
+        return () =>
+        {
+            WaitForStart(state);
+            Record<T>(state, value, bias);
+            Interlocked.Increment(ref state.Completed);
+        };
+    }
+
+    public static Action MakeNestedWorker(SharedState state, ScoreNode value)
+    {
+        return () =>
+        {
+            WaitForStart(state);
+
+            Action innerAction = () =>
+            {
+                Record<ScoreNode>(state, value, 5);
+                Interlocked.Increment(ref state.NestedCount);
+            };
+
+            Thread inner = new Thread(innerAction);
+            innerAction = null;
+            inner.Start();
+            GC.Collect();
+            inner.Join();
+
+            Interlocked.Increment(ref state.Completed);
+        };
+    }
+
+    public static void ReleaseWorkers(SharedState state, int readyCount)
+    {
+        while (Volatile.Read(ref state.Ready) < readyCount)
+            GC.Collect();
+
+        lock (state)
+        {
+            Volatile.Write(ref state.Phase, 1);
+            Monitor.PulseAll(state);
+        }
+    }
+
+    public static void RunReuseCase()
+    {
+        SharedState state = new SharedState();
+        state.SharedRef = new ScoreNode(300);
+        state.Published = new ScoreNode(400);
+
+        ScoreNode value = new ScoreNode(7);
+        Action action = MakeCapturedWorker<ScoreNode>(state, value, 6);
+        Thread thread = new Thread(action);
+        value = null;
+        action = null;
+
+        thread.Start();
+        ReleaseWorkers(state, 1);
+        GC.Collect();
+        thread.Join();
+
+        Console.WriteLine(state.Ready == 1);
+        Console.WriteLine(state.Completed == 1);
+        Console.WriteLine(state.GenericCount == 1);
+        Console.WriteLine(state.ReferenceOk == 1);
+        Console.WriteLine(state.PublishedOk == 1);
+        Console.WriteLine(state.Sum == 13);
+    }
+
+    public static void Main()
+    {
+        SharedState state = new SharedState();
+        state.SharedRef = new ScoreNode(100);
+        state.Published = new ScoreNode(200);
+
+        ScoreNode firstValue = new ScoreNode(10);
+        Action firstAction = MakeCapturedWorker<ScoreNode>(state, firstValue, 1);
+        Thread first = new Thread(firstAction);
+        firstValue = null;
+        firstAction = null;
+
+        AlternateScore secondValue = new AlternateScore(20);
+        Action secondAction = MakeCapturedWorker<AlternateScore>(state, secondValue, 2);
+        Thread second = new Thread(secondAction);
+        secondValue = null;
+        secondAction = null;
+
+        ScoreNode boundValue = new ScoreNode(30);
+        GenericRunner<ScoreNode> runner = new GenericRunner<ScoreNode>(state, boundValue, 3);
+        Action boundAction = runner.Run;
+        Thread bound = new Thread(boundAction);
+        boundValue = null;
+        runner = null;
+        boundAction = null;
+
+        ScoreNode multicastValue = new ScoreNode(40);
+        Action multicast = () =>
+        {
+            WaitForStart(state);
+            Record<ScoreNode>(state, multicastValue, 4);
+            Interlocked.Increment(ref state.DelegateCount);
+        };
+        multicast += () =>
+        {
+            GC.Collect();
+            Interlocked.Add(ref state.Sum, 4);
+            Interlocked.Increment(ref state.DelegateCount);
+            Interlocked.Increment(ref state.Completed);
+        };
+        Thread multicastThread = new Thread(multicast);
+        multicast = null;
+
+        ScoreNode nestedValue = new ScoreNode(50);
+        Action nestedAction = MakeNestedWorker(state, nestedValue);
+        Thread nested = new Thread(nestedAction);
+        nestedValue = null;
+        nestedAction = null;
+
+        first.Start();
+        second.Start();
+        bound.Start();
+        multicastThread.Start();
+        nested.Start();
+
+        ReleaseWorkers(state, 5);
+
+        for (int i = 0; i < 16; i++)
+            GC.Collect();
+
+        first.Join();
+        second.Join();
+        bound.Join();
+        multicastThread.Join();
+        nested.Join();
+
+        Console.WriteLine(state.Ready == 5);
+        Console.WriteLine(Volatile.Read(ref state.Phase) == 1);
+        Console.WriteLine(state.Completed == 5);
+        Console.WriteLine(state.GenericCount == 5);
+        Console.WriteLine(state.DelegateCount == 2);
+        Console.WriteLine(state.NestedCount == 1);
+        Console.WriteLine(state.ReferenceOk == 5);
+        Console.WriteLine(state.PublishedOk == 5);
+        Console.WriteLine(state.Sum == 169);
+        Console.WriteLine(state.SharedRef != null && state.SharedRef.Payload != null && state.SharedRef.Payload.Value == state.SharedRef.Value + 1000);
+        Console.WriteLine(state.Published != null && state.Published.Payload != null && state.Published.Payload.Value == state.Published.Value + 1000);
+
+        RunReuseCase();
+    }
+}

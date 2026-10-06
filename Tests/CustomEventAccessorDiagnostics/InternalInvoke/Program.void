@@ -1,0 +1,19 @@
+public sealed class Bad
+{
+    public event Action<int> Changed
+    {
+        add { }
+        remove { }
+    }
+
+    public void Raise() { Changed(1); }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Bad bad = new();
+        bad.Raise();
+    }
+}

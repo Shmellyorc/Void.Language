@@ -1,0 +1,9 @@
+public interface IEqual<T>
+{
+    static bool operator ==(T left, T right);
+}
+public struct Number : IEqual<Number>
+{
+    public static bool operator ==(Number left, Number right) { return true; }
+}
+public static class Program { public static void Main() { } }

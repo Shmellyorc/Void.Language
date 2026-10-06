@@ -1,0 +1,25 @@
+using Void;
+using Void.Threading;
+
+public static class Program
+{
+    private static int _started;
+    private static int _finished;
+
+    public static void Main()
+    {
+        Thread worker = new Thread(() =>
+        {
+            Volatile.Write(ref _started, 1);
+            Thread.Sleep(Timeout.Infinite);
+            Volatile.Write(ref _finished, 1);
+        });
+        worker.Start();
+        while (Volatile.Read(ref _started) == 0)
+        {
+        }
+
+        GC.Collect();
+        Console.WriteLine(Volatile.Read(ref _finished) == 0);
+    }
+}

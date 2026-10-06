@@ -1,0 +1,24 @@
+public static class NativeMath
+{
+    [Native("sqrtf")]
+    public static unsafe extern float Sqrt(float value);
+
+    [Native("cosf")]
+    public static unsafe extern float Cos(float value);
+
+    [Native("sinf")]
+    public static unsafe extern float Sin(float value);
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        float value = 81f;
+        float zero = 0f;
+
+        Console.WriteLine(NativeMath.Sqrt(value) == 9f);
+        Console.WriteLine(NativeMath.Cos(zero) == 1f);
+        Console.WriteLine(NativeMath.Sin(zero) == 0f);
+    }
+}

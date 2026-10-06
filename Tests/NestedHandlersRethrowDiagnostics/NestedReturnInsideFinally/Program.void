@@ -1,0 +1,17 @@
+public static class Program
+{
+    public static void F()
+    {
+        try { }
+        finally
+        {
+            try
+            {
+                return;
+            }
+            finally { }
+        }
+    }
+
+    public static void Main() { F(); }
+}

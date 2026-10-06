@@ -1,0 +1,31 @@
+public struct BadEnumerator
+{
+    private int _value;
+    public int Current => _value;
+    public bool MoveNext()
+    {
+        _value++;
+        return _value <= 1;
+    }
+    public int Dispose()
+    {
+        return 1;
+    }
+}
+
+public struct BadEnumerable
+{
+    public BadEnumerator GetEnumerator()
+    {
+        return new BadEnumerator();
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        foreach (int value in new BadEnumerable())
+            Console.WriteLine(value);
+    }
+}

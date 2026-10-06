@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { int[] a = new int[] { 1 }; Span<int> s = a; foreach (ref long x in s) { } } }

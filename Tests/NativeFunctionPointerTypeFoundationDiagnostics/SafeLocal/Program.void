@@ -1,0 +1,8 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        delegate*<int, int> callback = null;
+    }
+}

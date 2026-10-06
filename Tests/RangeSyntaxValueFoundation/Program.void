@@ -1,0 +1,131 @@
+using Void;
+
+public sealed class RangeBox
+{
+    public Range Value;
+
+    public RangeBox(Range value)
+    {
+        Value = value;
+    }
+}
+
+public static class RangeHelpers
+{
+    public static int StartCalls;
+    public static int EndCalls;
+
+    public static int Start()
+    {
+        StartCalls += 1;
+        return 2;
+    }
+
+    public static int End()
+    {
+        EndCalls += 1;
+        return 6;
+    }
+
+    public static T Identity<T>(T value)
+    {
+        return value;
+    }
+
+    public static Range GenericRange<T>(T ignored)
+    {
+        return 1..^1;
+    }
+}
+
+public static class Program
+{
+    private static void CheckRange(Range range, int length, int expectedOffset, int expectedLength)
+    {
+        int offset;
+        int rangeLength;
+        range.GetOffsetAndLength(length, out offset, out rangeLength);
+        Console.WriteLine(offset == expectedOffset);
+        Console.WriteLine(rangeLength == expectedLength);
+    }
+
+    public static void Main()
+    {
+        Index implicitIndex = 3;
+        Console.WriteLine(implicitIndex.Value == 3);
+        Console.WriteLine(!implicitIndex.IsFromEnd);
+
+        Range basic = 1..4;
+        Index basicStart = basic.Start;
+        Index basicEnd = basic.End;
+        Console.WriteLine(basicStart.Value == 1);
+        Console.WriteLine(!basicStart.IsFromEnd);
+        Console.WriteLine(basicEnd.Value == 4);
+        Console.WriteLine(!basicEnd.IsFromEnd);
+        CheckRange(basic, 10, 1, 3);
+
+        Range endRelative = 1..^1;
+        Index endRelativeStart = endRelative.Start;
+        Index endRelativeEnd = endRelative.End;
+        Console.WriteLine(endRelativeStart.Value == 1);
+        Console.WriteLine(endRelativeEnd.Value == 1);
+        Console.WriteLine(endRelativeEnd.IsFromEnd);
+        CheckRange(endRelative, 6, 1, 4);
+
+        Range bothRelative = ^4..^1;
+        Index bothRelativeStart = bothRelative.Start;
+        Index bothRelativeEnd = bothRelative.End;
+        Console.WriteLine(bothRelativeStart.IsFromEnd);
+        Console.WriteLine(bothRelativeEnd.IsFromEnd);
+        CheckRange(bothRelative, 8, 4, 3);
+
+        Range openStart = ..4;
+        Index openStartIndex = openStart.Start;
+        Console.WriteLine(openStartIndex.Value == 0);
+        Console.WriteLine(!openStartIndex.IsFromEnd);
+        CheckRange(openStart, 9, 0, 4);
+
+        Range openEnd = 2..;
+        Index openEndIndex = openEnd.End;
+        Console.WriteLine(openEndIndex.Value == 0);
+        Console.WriteLine(openEndIndex.IsFromEnd);
+        CheckRange(openEnd, 9, 2, 7);
+
+        Range all = ..;
+        Index allStart = all.Start;
+        Index allEnd = all.End;
+        Console.WriteLine(allStart.Value == 0 && !allStart.IsFromEnd);
+        Console.WriteLine(allEnd.Value == 0 && allEnd.IsFromEnd);
+        CheckRange(all, 7, 0, 7);
+
+        Index directStart = new Index(2, false);
+        Index directEnd = ^2;
+        Range direct = directStart..directEnd;
+        CheckRange(direct, 10, 2, 6);
+
+        Range precedence = 1 + 1..2 + 4;
+        CheckRange(precedence, 10, 2, 4);
+
+        int beforeStart = RangeHelpers.StartCalls;
+        int beforeEnd = RangeHelpers.EndCalls;
+        Range dynamic = RangeHelpers.Start()..RangeHelpers.End();
+        Console.WriteLine(RangeHelpers.StartCalls == beforeStart + 1);
+        Console.WriteLine(RangeHelpers.EndCalls == beforeEnd + 1);
+        CheckRange(dynamic, 10, 2, 4);
+
+        Range copy = dynamic;
+        CheckRange(copy, 10, 2, 4);
+
+        Range generic = RangeHelpers.Identity<Range>(^5..^2);
+        CheckRange(generic, 12, 7, 3);
+
+        Range genericBody = RangeHelpers.GenericRange<int>(123);
+        CheckRange(genericBody, 8, 1, 6);
+
+        RangeBox box = new RangeBox(..^1);
+        CheckRange(box.Value, 5, 0, 4);
+
+        Range explicitRange = new Range(2, ^1);
+        CheckRange(explicitRange, 7, 2, 4);
+    }
+}

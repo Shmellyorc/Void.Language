@@ -1,0 +1,11 @@
+public static class Program
+{
+    public static void Main()
+    {
+        while (true)
+        {
+            try { break; }
+            finally { Console.WriteLine(true); }
+        }
+    }
+}

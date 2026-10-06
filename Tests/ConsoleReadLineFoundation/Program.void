@@ -1,0 +1,46 @@
+public static class Program
+{
+    public static void Main()
+    {
+        string alpha = Console.ReadLine();
+        Console.WriteLine(alpha == "alpha");
+
+        string unicode = Console.ReadLine();
+        Console.WriteLine(unicode == "βeta");
+        Console.WriteLine(unicode.Length == 4);
+
+        string cr = Console.ReadLine();
+        Console.WriteLine(cr == "gamma");
+
+        string pending = Console.ReadLine();
+        Console.WriteLine(pending == "delta");
+
+        string empty = Console.ReadLine();
+        Console.WriteLine(empty == "");
+
+        string embeddedNull = Console.ReadLine();
+        Console.WriteLine(embeddedNull.Length == 10);
+        Console.WriteLine(embeddedNull[3] == '\0');
+        Console.WriteLine(embeddedNull == "nul\0inside");
+
+        string emoji = Console.ReadLine();
+        Console.WriteLine(emoji == "emoji 😀");
+        Console.WriteLine(emoji.Length == 7);
+
+        string longLine = Console.ReadLine();
+        Console.WriteLine(longLine.Length == 1024);
+        Console.WriteLine(longLine[0] == 'x');
+        Console.WriteLine(longLine[1023] == 'x');
+
+        string invalid = Console.ReadLine();
+        Console.WriteLine(invalid.Length == 6);
+        Console.WriteLine(invalid[4] == (char)65533);
+        Console.WriteLine(invalid[5] == (char)65533);
+
+        string tail = Console.ReadLine();
+        Console.WriteLine(tail == "tail");
+
+        string eof = Console.ReadLine();
+        Console.WriteLine(eof == null);
+    }
+}

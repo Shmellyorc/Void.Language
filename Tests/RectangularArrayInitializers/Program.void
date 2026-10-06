@@ -1,0 +1,125 @@
+using Void;
+
+public struct Pair
+{
+    public int X;
+    public int Y;
+}
+
+public struct Meters
+{
+    public int Value;
+    public Meters(int value) { Value = value; }
+    public static implicit operator Meters(int value) { return new Meters(value); }
+}
+
+public struct Holder
+{
+    public Box Ref;
+}
+
+public sealed class Box
+{
+    public int Value;
+    public Box(int value) { Value = value; }
+}
+
+public static class Program
+{
+    private static int _step;
+
+    private static int Next()
+    {
+        _step++;
+        return _step;
+    }
+
+    private static Box CollectAndMake(int value)
+    {
+        GC.Collect();
+        return new Box(value);
+    }
+
+    public static void Main()
+    {
+        int[,] a = new int[,] { { 1, 2 }, { 3, 4 } };
+        Console.WriteLine(a.Rank == 2);
+        Console.WriteLine(a.Length == 4);
+        Console.WriteLine(a.GetLength(0) == 2);
+        Console.WriteLine(a.GetLength(1) == 2);
+        Console.WriteLine(a[0, 0] == 1);
+        Console.WriteLine(a[1, 0] == 3);
+        Console.WriteLine(a[1, 1] == 4);
+
+        int[,,] b = new int[,,] { { { 1, 2 }, { 3, 4 } }, { { 5, 6 }, { 7, 8 } } };
+        Console.WriteLine(b.Rank == 3);
+        Console.WriteLine(b.Length == 8);
+        Console.WriteLine(b.GetLength(0) == 2);
+        Console.WriteLine(b.GetLength(1) == 2);
+        Console.WriteLine(b.GetLength(2) == 2);
+        Console.WriteLine(b[0, 1, 0] == 3);
+        Console.WriteLine(b[1, 0, 1] == 6);
+        Console.WriteLine(b[1, 1, 1] == 8);
+
+        int[,,,] c = new int[,,,] { { { { 1, 2 } } }, { { { 3, 4 } } } };
+        Console.WriteLine(c.Rank == 4);
+        Console.WriteLine(c.Length == 4);
+        Console.WriteLine(c.GetLength(0) == 2);
+        Console.WriteLine(c.GetLength(1) == 1);
+        Console.WriteLine(c.GetLength(2) == 1);
+        Console.WriteLine(c.GetLength(3) == 2);
+        Console.WriteLine(c[1, 0, 0, 1] == 4);
+
+        Meters[,] converted = new Meters[,] { { 1, 2 }, { 3, 4 } };
+        Console.WriteLine(converted[0, 0].Value == 1);
+        Console.WriteLine(converted[1, 1].Value == 4);
+
+        Pair[,] pairs = new Pair[,] {
+            { new Pair { X = 1, Y = 2 }, new Pair { X = 3, Y = 4 } }
+        };
+        Console.WriteLine(pairs[0, 0].X == 1);
+        Console.WriteLine(pairs[0, 1].X == 3);
+        Console.WriteLine(pairs[0, 1].Y == 4);
+
+        Box[,] boxes = new Box[,] {
+            { new Box(10), CollectAndMake(20) },
+            { new Box(30), new Box(40) }
+        };
+        GC.Collect();
+        Console.WriteLine(boxes[0, 0].Value == 10);
+        Console.WriteLine(boxes[0, 1].Value == 20);
+        Console.WriteLine(boxes[1, 0].Value == 30);
+        Console.WriteLine(boxes[1, 1].Value == 40);
+
+        _step = 0;
+        int[,] order = new int[,] { { Next(), Next() }, { Next(), Next() } };
+        Console.WriteLine(_step == 4);
+        Console.WriteLine(order[0, 0] == 1);
+        Console.WriteLine(order[0, 1] == 2);
+        Console.WriteLine(order[1, 0] == 3);
+        Console.WriteLine(order[1, 1] == 4);
+
+        int?[,] nullable = new int?[,] { { 1, null }, { 3, 4 } };
+        Console.WriteLine(nullable.Length == 4);
+        Console.WriteLine(nullable[0, 0].HasValue);
+        Console.WriteLine(nullable[0, 0].Value == 1);
+        Console.WriteLine(!nullable[0, 1].HasValue);
+
+        Holder[,] holders = new Holder[,] {
+            { new Holder { Ref = new Box(50) }, new Holder { Ref = new Box(60) } }
+        };
+        GC.Collect();
+        Console.WriteLine(holders[0, 0].Ref.Value == 50);
+        Console.WriteLine(holders[0, 1].Ref.Value == 60);
+
+        int[,] empty = new int[,] { };
+        Console.WriteLine(empty.Length == 0);
+        Console.WriteLine(empty.GetLength(0) == 0);
+        Console.WriteLine(empty.GetLength(1) == 0);
+
+        int[,] zeroColumns = new int[,] { { }, { } };
+        Console.WriteLine(zeroColumns.Length == 0);
+        Console.WriteLine(zeroColumns.GetLength(0) == 2);
+        Console.WriteLine(zeroColumns.GetLength(1) == 0);
+    }
+}

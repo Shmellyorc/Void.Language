@@ -1,0 +1,140 @@
+using Void;
+
+public sealed class Node
+{
+    public int Value { get; set; }
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public struct Meters
+{
+    public int Value;
+
+    public Meters(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator Meters(int value)
+    {
+        return new Meters(value);
+    }
+}
+
+public sealed class Player
+{
+    private int _health = 100;
+    private readonly int _id = 7;
+    private Node _first = new Node(11);
+    private int _afterFirst = CollectAndReturn();
+
+    public string Name { get; set; } = "Player";
+    public int Score { get; } = 5;
+    public Node Friend { get; set; } = new Node(22);
+    public int? Maybe { get; set; } = 9;
+    public Meters Distance { get; set; } = 12;
+
+    public Player(int health, int id)
+    {
+        _health = health;
+        _id = id;
+    }
+
+    public static int CollectAndReturn()
+    {
+        GC.Collect();
+        return 1;
+    }
+
+    public int Health() { return _health; }
+    public int Id() { return _id; }
+    public int FirstValue() { return _first.Value; }
+    public int AfterFirst() { return _afterFirst; }
+}
+
+public sealed class DefaultsOnly
+{
+    public int Count = 3;
+    public string Name { get; set; } = "Ready";
+}
+
+public struct Point
+{
+    public int X = 3;
+    public int Y { get; set; } = 4;
+}
+
+public class BaseEntity
+{
+    protected int _baseValue = 5;
+}
+
+public sealed class DerivedEntity : BaseEntity
+{
+    private int _derivedValue = 7;
+    private int _seen;
+
+    public DerivedEntity()
+    {
+        _seen = _baseValue + _derivedValue;
+    }
+
+    public int Seen() { return _seen; }
+}
+
+public sealed class Box<T>
+{
+    public T Value { get; set; } = default;
+    public int Count = 6;
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Player player = new Player(80, 42);
+        Console.WriteLine(player.Health() == 80);
+        Console.WriteLine(player.Id() == 42);
+        Console.WriteLine(player.FirstValue() == 11);
+        Console.WriteLine(player.AfterFirst() == 1);
+        string playerName = "Player";
+        Console.WriteLine(player.Name == playerName);
+        Console.WriteLine(player.Score == 5);
+        Console.WriteLine(player.Friend.Value == 22);
+        Console.WriteLine(player.Maybe.HasValue);
+        Console.WriteLine(player.Maybe.Value == 9);
+        Console.WriteLine(player.Distance.Value == 12);
+
+        DefaultsOnly defaultsOnly = new DefaultsOnly();
+        Console.WriteLine(defaultsOnly.Count == 3);
+        string readyName = "Ready";
+        Console.WriteLine(defaultsOnly.Name == readyName);
+
+        Point point = new Point();
+        Console.WriteLine(point.X == 3);
+        Console.WriteLine(point.Y == 4);
+
+        Point zero = default(Point);
+        Console.WriteLine(zero.X == 0);
+        Console.WriteLine(zero.Y == 0);
+
+        DerivedEntity derived = new DerivedEntity();
+        Console.WriteLine(derived.Seen() == 12);
+
+        Box<int> intBox = new Box<int>();
+        Console.WriteLine(intBox.Value == 0);
+        Console.WriteLine(intBox.Count == 6);
+
+        Box<string> stringBox = new Box<string>();
+        Console.WriteLine(stringBox.Value == null);
+        Console.WriteLine(stringBox.Count == 6);
+
+        GC.Collect();
+        Console.WriteLine(player.FirstValue() == 11);
+        Console.WriteLine(player.Friend.Value == 22);
+    }
+}

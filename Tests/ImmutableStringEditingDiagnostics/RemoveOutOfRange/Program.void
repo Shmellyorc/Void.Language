@@ -1,0 +1,9 @@
+using Void;
+
+public static class Program
+{
+    public static void Main()
+    {
+        string value = "Aé😀"; string result = value.Remove(2, 2); Console.WriteLine(result);
+    }
+}

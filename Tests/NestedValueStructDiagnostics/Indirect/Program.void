@@ -1,0 +1,14 @@
+public struct Left
+{
+    public Right Value;
+}
+
+public struct Right
+{
+    public Left Value;
+}
+
+public static class Program
+{
+    public static void Main() { }
+}

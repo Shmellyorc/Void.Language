@@ -1,0 +1,1 @@
+public static class Native293 { [Native("void293_nonliteral")] public static unsafe extern void Use([NativeString(123)] string text); } public static class Program { public static void Main() { } }

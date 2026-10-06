@@ -1,0 +1,20 @@
+public static class Program
+{
+    public static void Assign(out int value)
+    {
+        try
+        {
+            return;
+        }
+        finally
+        {
+            Console.WriteLine(true);
+        }
+    }
+
+    public static void Main()
+    {
+        int value;
+        Assign(out value);
+    }
+}

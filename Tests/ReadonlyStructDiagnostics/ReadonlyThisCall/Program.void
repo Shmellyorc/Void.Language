@@ -1,0 +1,23 @@
+public struct Counter
+{
+    public int Value;
+
+    public void Add()
+    {
+        Value += 1;
+    }
+
+    public readonly void TryChange()
+    {
+        this.Add();
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Counter value = new Counter();
+        value.TryChange();
+    }
+}

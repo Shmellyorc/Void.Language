@@ -1,0 +1,59 @@
+public static class Program
+{
+    public static void Main()
+    {
+        int ascii = Console.Read();
+        Console.WriteLine(ascii == 65);
+
+        int beta = Console.Read();
+        Console.WriteLine(beta == 946);
+
+        string rest = Console.ReadLine();
+        Console.WriteLine(rest == "rest");
+
+        string crLine = Console.ReadLine();
+        Console.WriteLine(crLine == "line");
+
+        int pending = Console.Read();
+        Console.WriteLine(pending == 81);
+
+        string afterPending = Console.ReadLine();
+        Console.WriteLine(afterPending == "next");
+
+        int newline = Console.Read();
+        Console.WriteLine(newline == 10);
+
+        string afterNewline = Console.ReadLine();
+        Console.WriteLine(afterNewline == "hello");
+
+        int embeddedNull = Console.Read();
+        Console.WriteLine(embeddedNull == 0);
+
+        int emoji = Console.Read();
+        Console.WriteLine(emoji == 128512);
+
+        string afterEmoji = Console.ReadLine();
+        Console.WriteLine(afterEmoji == "z");
+
+        int invalidPrefix = Console.Read();
+        Console.WriteLine(invalidPrefix == 65533);
+
+        int pushedBack = Console.Read();
+        Console.WriteLine(pushedBack == 40);
+
+        int invalidLead = Console.Read();
+        Console.WriteLine(invalidLead == 65533);
+
+        string afterInvalid = Console.ReadLine();
+        Console.WriteLine(afterInvalid == "OK");
+
+        int truncated = Console.Read();
+        Console.WriteLine(truncated == 65533);
+
+        int eofRead = Console.Read();
+        Console.WriteLine(eofRead == -1);
+
+        string eofLine = Console.ReadLine();
+        Console.WriteLine(eofLine == null);
+    }
+}

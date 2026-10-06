@@ -1,0 +1,28 @@
+public interface IExplicitToInt<T>
+{
+    static explicit operator int(T value);
+}
+
+public struct Number : IExplicitToInt<Number>
+{
+    public int Value;
+
+    public static explicit operator int(Number value)
+    {
+        return value.Value;
+    }
+}
+
+public static class Program
+{
+    private static int Convert<T, U>(U value) where T : IExplicitToInt<T>
+    {
+        return (int)value;
+    }
+
+    public static void Main()
+    {
+        Number value = new Number();
+        int result = Convert<Number, Number>(value);
+    }
+}

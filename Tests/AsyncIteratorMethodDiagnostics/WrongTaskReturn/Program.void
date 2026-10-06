@@ -1,0 +1,9 @@
+using Void.Threading.Tasks;
+public static class Program
+{
+    private static async Task<int> Bad()
+    {
+        yield return 1;
+    }
+    public static void Main() { }
+}

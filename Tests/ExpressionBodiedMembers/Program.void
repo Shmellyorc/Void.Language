@@ -1,0 +1,180 @@
+public interface ICalculator
+{
+    public int Calculate(int value);
+}
+
+public class Counter : ICalculator
+{
+    private int _value;
+    private static int _shared;
+
+    public Counter(int value) => _value = value;
+
+    public Counter() : this(4) => _value += 1;
+
+    public int Value
+    {
+        get => _value;
+        set => _value = value;
+    }
+
+    public static int Shared
+    {
+        get => _shared;
+        set => _shared = value;
+    }
+
+    public int Double() => _value * 2;
+
+    public static int Add(int left, int right) => left + right;
+
+    public void Increment() => _value++;
+
+    public void AddToValue(int amount) => _value += amount;
+
+    public static void Assign(out int value) => value = 17;
+
+    public T Echo<T>(T value) => value;
+
+    public virtual int VirtualValue() => _value + 1;
+
+    public int Calculate(int value) => _value + value;
+}
+
+public sealed class DerivedCounter : Counter
+{
+    public DerivedCounter(int value) : base(value) => Value += 2;
+
+    public override int VirtualValue() => Value + 10;
+}
+
+public struct Number
+{
+    private int _value;
+
+    public Number(int value) => _value = value;
+
+    public int Value => _value;
+
+    public static Number operator +(Number left, Number right) => new Number(left._value + right._value);
+
+    public static implicit operator Number(int value) => new Number(value);
+
+    public static implicit operator int(Number value) => value._value;
+
+    public static explicit operator float(Number value) => (float)value._value;
+}
+
+public struct MutableValue
+{
+    private int _value;
+
+    public MutableValue(int value) => _value = value;
+
+    public int Value
+    {
+        get => _value;
+        set => _value = value;
+    }
+
+    public void Add(int amount) => _value += amount;
+}
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value) => Value = value;
+}
+
+public static class NodeFactory
+{
+    public static Node Create(int value) => new Node(value);
+
+    public static Node Echo(Node value) => value;
+}
+
+public static class StaticInitializationProbe
+{
+    private static int _value;
+
+    static StaticInitializationProbe() => _value = 73;
+
+    public static int Read() => _value;
+}
+
+public delegate int Transform(int value);
+
+public static class Program
+{
+    public static void Main()
+    {
+        Counter counter = new Counter();
+        Console.WriteLine(counter.Value == 5);
+        Console.WriteLine(counter.Double() == 10);
+
+        counter.Increment();
+        Console.WriteLine(counter.Value == 6);
+        counter.AddToValue(4);
+        Console.WriteLine(counter.Value == 10);
+
+        counter.Value = 21;
+        Console.WriteLine(counter.Value == 21);
+
+        Counter.Shared = 31;
+        Console.WriteLine(Counter.Shared == 31);
+        Counter.Shared += 2;
+        Console.WriteLine(Counter.Shared == 33);
+
+        Console.WriteLine(Counter.Add(8, 9) == 17);
+
+        int assigned;
+        Counter.Assign(out assigned);
+        Console.WriteLine(assigned == 17);
+
+        Console.WriteLine(counter.Echo<int>(44) == 44);
+        Console.WriteLine(counter.Echo<string>("void") == "void");
+
+        ICalculator calculator = counter;
+        Console.WriteLine(calculator.Calculate(4) == 25);
+
+        DerivedCounter derived = new DerivedCounter(7);
+        Console.WriteLine(derived.Value == 9);
+        Console.WriteLine(derived.VirtualValue() == 19);
+        Counter baseCounter = derived;
+        Console.WriteLine(baseCounter.VirtualValue() == 19);
+
+        Number first = 12;
+        Number second = new Number(8);
+        Number total = first + second;
+        Console.WriteLine(total.Value == 20);
+        int totalInt = total;
+        Console.WriteLine(totalInt == 20);
+        float totalFloat = (float)total;
+        Console.WriteLine(totalFloat == 20f);
+
+        MutableValue mutable = new MutableValue(3);
+        mutable.Add(4);
+        Console.WriteLine(mutable.Value == 7);
+        mutable.Value = 15;
+        Console.WriteLine(mutable.Value == 15);
+
+        Node node = NodeFactory.Create(55);
+        Console.WriteLine(node.Value == 55);
+        Node same = NodeFactory.Echo(node);
+        Console.WriteLine(same == node);
+        GC.Collect();
+        Console.WriteLine(node.Value == 55);
+        Console.WriteLine(same.Value == 55);
+
+        Transform transform = CounterExtensions.AddOne;
+        Console.WriteLine(transform(9) == 10);
+
+        Console.WriteLine(StaticInitializationProbe.Read() == 73);
+    }
+}
+
+public static class CounterExtensions
+{
+    public static int AddOne(int value) => value + 1;
+}

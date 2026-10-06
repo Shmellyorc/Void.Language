@@ -1,0 +1,5 @@
+public struct Value
+{
+    public static int operator +(int left, int right) { return left + right; }
+}
+public static class Program { public static void Main() {} }

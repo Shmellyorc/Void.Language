@@ -1,0 +1,9 @@
+using Void.Collections;
+public static class Program
+{
+    private static async IAsyncEnumerable<int> Bad(ref int value)
+    {
+        yield return value;
+    }
+    public static void Main() { }
+}

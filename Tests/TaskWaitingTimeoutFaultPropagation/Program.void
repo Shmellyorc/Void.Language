@@ -1,0 +1,245 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class WaitState
+{
+    public int Ready;
+    public int Done;
+    public ManualResetEvent AllReady;
+
+    public WaitState()
+    {
+        Ready = 0;
+        Done = 0;
+        AllReady = new ManualResetEvent(false);
+    }
+}
+
+public sealed class WaitPayload
+{
+    public int Value;
+
+    public WaitPayload(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    private static Action MakeWaiter(Task task, WaitState state)
+    {
+        return () =>
+        {
+            int ready = Interlocked.Increment(ref state.Ready);
+            if (ready == 3)
+                state.AllReady.Set();
+            task.Wait();
+            Interlocked.Increment(ref state.Done);
+        };
+    }
+
+    public static void Main()
+    {
+        Task direct = new Task();
+        Thread directCompleter = new Thread(() =>
+        {
+            Thread.Sleep(20);
+            direct.TrySetCompleted();
+        });
+        directCompleter.Start();
+        direct.Wait();
+        directCompleter.Join();
+        Console.WriteLine(direct.Status == TaskStatus.Completed);
+        Console.WriteLine(direct.IsCompleted);
+        Console.WriteLine(direct.Wait(0));
+        Console.WriteLine(direct.Wait(10));
+
+        Task timed = new Task();
+        Console.WriteLine(!timed.Wait(0));
+        Console.WriteLine(!timed.Wait(20));
+        Console.WriteLine(!timed.IsCompleted);
+        Console.WriteLine(timed.TrySetCompleted());
+        Console.WriteLine(timed.Wait(0));
+
+        Task timedSignal = new Task();
+        Thread timedSignalCompleter = new Thread(() =>
+        {
+            Thread.Sleep(20);
+            timedSignal.TrySetCompleted();
+        });
+        timedSignalCompleter.Start();
+        Console.WriteLine(timedSignal.Wait(5000));
+        timedSignalCompleter.Join();
+
+        Task infinite = new Task();
+        Thread infiniteCompleter = new Thread(() =>
+        {
+            Thread.Sleep(20);
+            infinite.TrySetCompleted();
+        });
+        infiniteCompleter.Start();
+        Console.WriteLine(infinite.Wait(Timeout.Infinite));
+        infiniteCompleter.Join();
+
+        Task faulted = new Task();
+        Exception storedFault = new Exception("wait fault");
+        Console.WriteLine(faulted.TrySetException(storedFault));
+        storedFault = null;
+        GC.Collect();
+        bool caughtFault = false;
+        try
+        {
+            faulted.Wait();
+        }
+        catch (Exception error)
+        {
+            caughtFault = error.Message == "wait fault";
+        }
+        Console.WriteLine(caughtFault);
+        Console.WriteLine(faulted.IsFaulted);
+
+        bool caughtTimedFault = false;
+        try
+        {
+            faulted.Wait(0);
+        }
+        catch (Exception error)
+        {
+            caughtTimedFault = error.Message == "wait fault";
+        }
+        Console.WriteLine(caughtTimedFault);
+
+        CancellationTokenSource source = new CancellationTokenSource();
+        CancellationToken token = source.Token;
+        source.Cancel();
+        Task canceled = new Task();
+        Console.WriteLine(canceled.TrySetCanceled(token));
+        source = null;
+        GC.Collect();
+        bool caughtCanceled = false;
+        try
+        {
+            canceled.Wait();
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observed = error.CancellationToken;
+            caughtCanceled = observed.CanBeCanceled && observed.IsCancellationRequested;
+        }
+        Console.WriteLine(caughtCanceled);
+        Console.WriteLine(canceled.IsCanceled);
+
+        bool caughtTimedCanceled = false;
+        try
+        {
+            canceled.Wait(0);
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observed = error.CancellationToken;
+            caughtTimedCanceled = observed.IsCancellationRequested;
+        }
+        Console.WriteLine(caughtTimedCanceled);
+
+        Task broadcast = new Task();
+        WaitState waitState = new WaitState();
+        Thread waiter1 = new Thread(MakeWaiter(broadcast, waitState));
+        Thread waiter2 = new Thread(MakeWaiter(broadcast, waitState));
+        Thread waiter3 = new Thread(MakeWaiter(broadcast, waitState));
+        waiter1.Start();
+        waiter2.Start();
+        waiter3.Start();
+        Console.WriteLine(waitState.AllReady.WaitOne(5000));
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(broadcast.TrySetCompleted());
+        waiter1.Join();
+        waiter2.Join();
+        waiter3.Join();
+        Console.WriteLine(waitState.Done == 3);
+
+        Task<int> resultTask = new Task<int>();
+        Thread resultCompleter = new Thread(() =>
+        {
+            Thread.Sleep(20);
+            resultTask.TrySetResult(197);
+        });
+        resultCompleter.Start();
+        int result = resultTask.Result;
+        resultCompleter.Join();
+        Console.WriteLine(result == 197);
+        Console.WriteLine(resultTask.IsCompleted);
+
+        Task<WaitPayload> payloadTask = new Task<WaitPayload>();
+        WaitPayload payload = new WaitPayload(297);
+        Console.WriteLine(payloadTask.TrySetResult(payload));
+        payload = null;
+        GC.Collect();
+        WaitPayload observedPayload = payloadTask.Result;
+        Console.WriteLine(observedPayload != null && observedPayload.Value == 297);
+
+        Task<int> faultedResult = new Task<int>();
+        Console.WriteLine(faultedResult.TrySetException(new Exception("result fault")));
+        bool caughtResultFault = false;
+        try
+        {
+            int unused = faultedResult.Result;
+        }
+        catch (Exception error)
+        {
+            caughtResultFault = error.Message == "result fault";
+        }
+        Console.WriteLine(caughtResultFault);
+
+        CancellationTokenSource resultSource = new CancellationTokenSource();
+        resultSource.Cancel();
+        Task<int> canceledResult = new Task<int>();
+        Console.WriteLine(canceledResult.TrySetCanceled(resultSource.Token));
+        bool caughtResultCanceled = false;
+        try
+        {
+            int unused = canceledResult.Result;
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observed = error.CancellationToken;
+            caughtResultCanceled = observed.IsCancellationRequested;
+        }
+        Console.WriteLine(caughtResultCanceled);
+
+        ManualResetEvent started = new ManualResetEvent(false);
+        ManualResetEvent release = new ManualResetEvent(false);
+        Task held = Task.Run(() =>
+        {
+            started.Set();
+            release.WaitOne();
+        });
+        Console.WriteLine(started.WaitOne(5000));
+        Console.WriteLine(!held.Wait(0));
+        Console.WriteLine(!held.Wait(20));
+        release.Set();
+        held.Wait();
+        Console.WriteLine(held.IsCompleted && held.Status == TaskStatus.Completed);
+
+        Task runFault = Task.Run(() => { throw new Exception("run wait fault"); });
+        bool caughtRunFault = false;
+        try
+        {
+            runFault.Wait();
+        }
+        catch (Exception error)
+        {
+            caughtRunFault = error.Message == "run wait fault";
+        }
+        Console.WriteLine(caughtRunFault);
+        Console.WriteLine(runFault.IsFaulted);
+
+        Task<int> runResult = Task.Run<int>(() => 397);
+        Console.WriteLine(runResult.Result == 397);
+        Console.WriteLine(runResult.Wait(0));
+
+        ThreadPool.Shutdown();
+    }
+}

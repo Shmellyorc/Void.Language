@@ -1,0 +1,12 @@
+[Marker(Name = "Value")]
+public sealed class Tagged292Metadata
+{
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine(Runtime.AttributeValue("Tagged292Metadata", "Marker", "Name\0suffix"));
+    }
+}

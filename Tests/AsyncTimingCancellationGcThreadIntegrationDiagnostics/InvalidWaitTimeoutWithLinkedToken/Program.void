@@ -1,0 +1,12 @@
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    public static void Main()
+    {
+        CancellationTokenSource parent = new CancellationTokenSource();
+        CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(parent.Token);
+        Task.Delay(100).WaitAsync(-2, linked.Token).Wait();
+    }
+}

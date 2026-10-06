@@ -1,0 +1,167 @@
+using Void;
+
+public interface IToInt<T>
+{
+    static implicit operator int(T value);
+}
+
+public interface IInheritedToInt<T> : IToInt<T>
+{
+}
+
+public interface IFromShort<T>
+{
+    static implicit operator T(short value);
+}
+
+public struct Number : IInheritedToInt<Number>, IFromShort<Number>
+{
+    public int Value;
+
+    public Number(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator int(Number value)
+    {
+        return value.Value;
+    }
+
+    public static implicit operator Number(short value)
+    {
+        return new Number((int)value + 10);
+    }
+}
+
+public sealed class Box : IToInt<Box>
+{
+    public int Value;
+
+    public Box(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator int(Box value)
+    {
+        return value.Value;
+    }
+}
+
+public sealed class Runner<T> where T : IToInt<T>
+{
+    private T _value;
+
+    public Runner(T value)
+    {
+        _value = value;
+    }
+
+    public int Convert(T value)
+    {
+        return value;
+    }
+
+    public long ConvertFieldToLong()
+    {
+        return _value;
+    }
+}
+
+public sealed class Maker<T> where T : IFromShort<T>
+{
+    public T Make(byte value)
+    {
+        T result = value;
+        return result;
+    }
+
+    public T Assign(byte value)
+    {
+        T result;
+        result = value;
+        return result;
+    }
+}
+
+public static class Program
+{
+    private static int ConsumeInt(int value)
+    {
+        return value;
+    }
+
+    private static int ToInt<T>(T value) where T : IToInt<T>
+    {
+        return value;
+    }
+
+    private static long ToLong<T>(T value) where T : IToInt<T>
+    {
+        return value;
+    }
+
+    private static int ViaInheritedConstraint<T>(T value) where T : IInheritedToInt<T>
+    {
+        return value;
+    }
+
+    private static int ViaLocal<T>(T value) where T : IToInt<T>
+    {
+        T copy = value;
+        int result = copy;
+        return result;
+    }
+
+    private static int ViaArgument<T>(T value) where T : IToInt<T>
+    {
+        return ConsumeInt(value);
+    }
+
+    private static T FromShort<T>(short value) where T : IFromShort<T>
+    {
+        return value;
+    }
+
+    private static T FromByte<T>(byte value) where T : IFromShort<T>
+    {
+        T result = value;
+        return result;
+    }
+
+    private static T ViaAssignment<T>(byte value) where T : IFromShort<T>
+    {
+        T result;
+        result = value;
+        return result;
+    }
+
+    public static void Main()
+    {
+        Number number = new Number(7);
+        Console.WriteLine(ToInt(number) == 7);
+        Console.WriteLine(ToLong(number) == 7L);
+        Console.WriteLine(ViaInheritedConstraint(number) == 7);
+        Console.WriteLine(ViaLocal(number) == 7);
+        Console.WriteLine(ViaArgument(number) == 7);
+
+        Number fromShort = FromShort<Number>((short)3);
+        Console.WriteLine(fromShort.Value == 13);
+        Number fromByte = FromByte<Number>((byte)4);
+        Console.WriteLine(fromByte.Value == 14);
+        Number assigned = ViaAssignment<Number>((byte)5);
+        Console.WriteLine(assigned.Value == 15);
+
+        Box box = new Box(9);
+        Console.WriteLine(ToInt(box) == 9);
+
+        Runner<Number> runner = new Runner<Number>(number);
+        Console.WriteLine(runner.Convert(number) == 7);
+        Console.WriteLine(runner.ConvertFieldToLong() == 7L);
+
+        Maker<Number> maker = new Maker<Number>();
+        Console.WriteLine(maker.Make((byte)6).Value == 16);
+        Console.WriteLine(maker.Assign((byte)7).Value == 17);
+    }
+}

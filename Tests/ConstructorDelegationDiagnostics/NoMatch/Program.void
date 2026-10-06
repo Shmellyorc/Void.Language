@@ -1,0 +1,13 @@
+public sealed class NoMatch
+{
+    public NoMatch() : this("bad") { }
+    public NoMatch(int value) { }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        NoMatch value = new NoMatch();
+    }
+}

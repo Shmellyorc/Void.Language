@@ -1,0 +1,22 @@
+public sealed class OtherException : Exception
+{
+    public OtherException(string message) : base(message) { }
+}
+public sealed class FatalException : Exception
+{
+    public FatalException(string message) : base(message) { }
+}
+public static class Program
+{
+    public static void Main()
+    {
+        try
+        {
+            throw new FatalException("miss");
+        }
+        catch (OtherException error)
+        {
+            Console.WriteLine(false);
+        }
+    }
+}

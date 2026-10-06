@@ -1,0 +1,22 @@
+using Void;
+using Void.Threading.Tasks;
+public struct A275 { public W275 GetAwaiter(){ return default; } }
+public struct W275
+{
+    public bool IsCompleted { get { return true; } }
+    public void OnCompleted(Action continuation) { }
+    public void GetResult() { }
+}
+public sealed class R275 { public A275 DisposeAsync(){ return default; } }
+public static class Program
+{
+    public static void Main()
+    {
+        Func<Task> work = () =>
+        {
+            await using (R275 resource = new R275()) { }
+            return null;
+        };
+        work;
+    }
+}

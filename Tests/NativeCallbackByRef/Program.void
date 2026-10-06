@@ -1,0 +1,133 @@
+public struct Pair
+{
+    public int A;
+    public int B;
+}
+
+public delegate void RefIntCallback(ref int value);
+public delegate void OutIntCallback(out int value);
+public delegate int InIntCallback(in int value);
+public delegate void RefPairCallback(ref Pair value);
+public delegate int InPairCallback(in Pair value);
+public delegate void OutPairCallback(out Pair value);
+public delegate void MixedCallback(ref int left, out int right, in int addend);
+
+public static class NativeFixture
+{
+    [Native("voidc098_callback_ref_int")]
+    public static unsafe extern int RefInt(int value, RefIntCallback callback);
+
+    [Native("voidc098_callback_out_int")]
+    public static unsafe extern int OutInt(OutIntCallback callback);
+
+    [Native("voidc098_callback_in_int")]
+    public static unsafe extern int InInt(int value, InIntCallback callback);
+
+    [Native("voidc098_callback_ref_pair")]
+    public static unsafe extern int RefPair(int a, int b, RefPairCallback callback);
+
+    [Native("voidc098_callback_in_pair")]
+    public static unsafe extern int InPair(int a, int b, InPairCallback callback);
+
+    [Native("voidc098_callback_out_pair")]
+    public static unsafe extern int OutPair(OutPairCallback callback);
+
+    [Native("voidc098_callback_mixed")]
+    public static unsafe extern int Mixed(int left, int addend, MixedCallback callback);
+}
+
+public static class Callbacks
+{
+    public static int RefCalls;
+    public static int RefSeen;
+    public static int OutCalls;
+    public static int InCalls;
+    public static int InSeen;
+    public static int RefPairCalls;
+    public static int RefPairSeen;
+    public static int InPairCalls;
+    public static int OutPairCalls;
+    public static int MixedCalls;
+    public static int MixedAddend;
+
+    public static void AddFive(ref int value)
+    {
+        RefCalls++;
+        RefSeen = value;
+        value += 5;
+    }
+
+    public static void WriteFortyTwo(out int value)
+    {
+        OutCalls++;
+        value = 42;
+    }
+
+    public static int Double(in int value)
+    {
+        InCalls++;
+        InSeen = value;
+        return value * 2;
+    }
+
+    public static void Shift(ref Pair value)
+    {
+        RefPairCalls++;
+        RefPairSeen = value.A * 10 + value.B;
+        value.A += 3;
+        value.B += 4;
+    }
+
+    public static int Sum(in Pair value)
+    {
+        InPairCalls++;
+        return value.A + value.B;
+    }
+
+    public static void WritePair(out Pair value)
+    {
+        OutPairCalls++;
+        value = new Pair();
+        value.A = 6;
+        value.B = 7;
+    }
+
+    public static void Mixed(ref int left, out int right, in int addend)
+    {
+        MixedCalls++;
+        MixedAddend = addend;
+        left += addend;
+        right = left * 2;
+    }
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        Console.WriteLine(NativeFixture.RefInt(7, Callbacks.AddFive) == 12);
+        Console.WriteLine(Callbacks.RefCalls == 1);
+        Console.WriteLine(Callbacks.RefSeen == 7);
+
+        Console.WriteLine(NativeFixture.OutInt(Callbacks.WriteFortyTwo) == 42);
+        Console.WriteLine(Callbacks.OutCalls == 1);
+
+        Console.WriteLine(NativeFixture.InInt(9, Callbacks.Double) == 18);
+        Console.WriteLine(Callbacks.InCalls == 1);
+        Console.WriteLine(Callbacks.InSeen == 9);
+
+        Console.WriteLine(NativeFixture.RefPair(10, 20, Callbacks.Shift) == 37);
+        Console.WriteLine(Callbacks.RefPairCalls == 1);
+        Console.WriteLine(Callbacks.RefPairSeen == 120);
+
+        Console.WriteLine(NativeFixture.InPair(11, 13, Callbacks.Sum) == 24);
+        Console.WriteLine(Callbacks.InPairCalls == 1);
+
+        Console.WriteLine(NativeFixture.OutPair(Callbacks.WritePair) == 67);
+        Console.WriteLine(Callbacks.OutPairCalls == 1);
+
+        Console.WriteLine(NativeFixture.Mixed(5, 3, Callbacks.Mixed) == 24);
+        Console.WriteLine(Callbacks.MixedCalls == 1);
+        Console.WriteLine(Callbacks.MixedAddend == 3);
+    }
+}

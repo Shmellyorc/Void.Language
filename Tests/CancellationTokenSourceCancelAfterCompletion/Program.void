@@ -1,0 +1,199 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    private static int _poolBlockers;
+    private static ManualResetEvent _poolReady = new ManualResetEvent(false);
+    private static ManualResetEvent _poolRelease = new ManualResetEvent(false);
+    private static ManualResetEvent _gcCanceled = new ManualResetEvent(false);
+
+    private static void BlockPool()
+    {
+        if (Interlocked.Increment(ref _poolBlockers) == 2)
+            _poolReady.Set();
+        _poolRelease.WaitOne();
+    }
+
+    private static void StartGcCancellation()
+    {
+        CancellationTokenSource source = new CancellationTokenSource();
+        source.Token.Register(() => _gcCanceled.Set());
+        source.CancelAfter(25);
+        source = null;
+    }
+
+    public static void Main()
+    {
+        CancellationTokenSource finite = new CancellationTokenSource();
+        CancellationToken finiteToken = finite.Token;
+        ManualResetEvent finiteDone = new ManualResetEvent(false);
+        int finiteCalls = 0;
+        finiteToken.Register(() =>
+        {
+            finiteCalls++;
+            finiteDone.Set();
+        });
+        finite.CancelAfter(25);
+        Console.WriteLine(!finite.IsCancellationRequested);
+        Console.WriteLine(finiteDone.WaitOne(2000));
+        Console.WriteLine(finite.IsCancellationRequested);
+        Console.WriteLine(finiteToken.IsCancellationRequested);
+        Console.WriteLine(finiteCalls == 1);
+        bool finiteThrow = false;
+        try
+        {
+            finiteToken.ThrowIfCancellationRequested();
+        }
+        catch (OperationCanceledException error)
+        {
+            finiteThrow = error.CancellationToken.IsSameSource(finiteToken);
+        }
+        Console.WriteLine(finiteThrow);
+
+        CancellationTokenSource infinite = new CancellationTokenSource();
+        int infiniteCalls = 0;
+        infinite.Token.Register(() => infiniteCalls++);
+        infinite.CancelAfter(Timeout.Infinite);
+        Thread.Sleep(60);
+        Console.WriteLine(!infinite.IsCancellationRequested);
+        Console.WriteLine(infiniteCalls == 0);
+        infinite.Cancel();
+
+        CancellationTokenSource disabled = new CancellationTokenSource();
+        int disabledCalls = 0;
+        disabled.Token.Register(() => disabledCalls++);
+        disabled.CancelAfter(20);
+        Thread.Sleep(5);
+        disabled.CancelAfter(Timeout.Infinite);
+        Thread.Sleep(70);
+        Console.WriteLine(!disabled.IsCancellationRequested);
+        Console.WriteLine(disabledCalls == 0);
+        disabled.Cancel();
+
+        CancellationTokenSource resetLater = new CancellationTokenSource();
+        ManualResetEvent resetLaterDone = new ManualResetEvent(false);
+        resetLater.Token.Register(() => resetLaterDone.Set());
+        resetLater.CancelAfter(25);
+        Thread.Sleep(5);
+        resetLater.CancelAfter(120);
+        Thread.Sleep(55);
+        Console.WriteLine(!resetLater.IsCancellationRequested);
+        Console.WriteLine(resetLaterDone.WaitOne(2000));
+        Console.WriteLine(resetLater.IsCancellationRequested);
+
+        CancellationTokenSource resetEarlier = new CancellationTokenSource();
+        ManualResetEvent resetEarlierDone = new ManualResetEvent(false);
+        resetEarlier.Token.Register(() => resetEarlierDone.Set());
+        resetEarlier.CancelAfter(250);
+        Thread.Sleep(5);
+        resetEarlier.CancelAfter(20);
+        Console.WriteLine(resetEarlierDone.WaitOne(1000));
+        Console.WriteLine(resetEarlier.IsCancellationRequested);
+
+        CancellationTokenSource zero = new CancellationTokenSource();
+        ManualResetEvent zeroDone = new ManualResetEvent(false);
+        zero.Token.Register(() => zeroDone.Set());
+        zero.CancelAfter(0);
+        Console.WriteLine(zeroDone.WaitOne(1000));
+        Console.WriteLine(zero.IsCancellationRequested);
+
+        CancellationTokenSource manual = new CancellationTokenSource();
+        int manualCalls = 0;
+        manual.Token.Register(() => manualCalls++);
+        manual.CancelAfter(35);
+        manual.Cancel();
+        Console.WriteLine(manual.IsCancellationRequested);
+        Console.WriteLine(manualCalls == 1);
+        Thread.Sleep(70);
+        Console.WriteLine(manualCalls == 1);
+
+        CancellationTokenSource disposed = new CancellationTokenSource();
+        CancellationToken disposedToken = disposed.Token;
+        int disposedCalls = 0;
+        disposedToken.Register(() => disposedCalls++);
+        disposed.CancelAfter(25);
+        disposed.Dispose();
+        Thread.Sleep(70);
+        Console.WriteLine(!disposedToken.IsCancellationRequested);
+        Console.WriteLine(disposedCalls == 0);
+
+        StartGcCancellation();
+        GC.Collect();
+        Console.WriteLine(_gcCanceled.WaitOne(2000));
+
+        CancellationTokenSource delaySource = new CancellationTokenSource();
+        CancellationToken delayToken = delaySource.Token;
+        Task infiniteDelay = Task.Delay(Timeout.Infinite, delayToken);
+        delaySource.CancelAfter(20);
+        bool delayCanceled = false;
+        try
+        {
+            infiniteDelay.Wait(2000);
+        }
+        catch (OperationCanceledException error)
+        {
+            delayCanceled = error.CancellationToken.IsSameSource(delayToken);
+        }
+        Console.WriteLine(delayCanceled);
+        Console.WriteLine(infiniteDelay.Status == TaskStatus.Canceled);
+
+        ThreadPool.QueueUserWorkItem(BlockPool);
+        ThreadPool.QueueUserWorkItem(BlockPool);
+        Console.WriteLine(_poolReady.WaitOne(1000));
+        CancellationTokenSource queuedReset = new CancellationTokenSource();
+        ManualResetEvent queuedResetDone = new ManualResetEvent(false);
+        queuedReset.Token.Register(() => queuedResetDone.Set());
+        queuedReset.CancelAfter(10);
+        Thread.Sleep(60);
+        queuedReset.CancelAfter(120);
+        _poolRelease.Set();
+        Thread.Sleep(40);
+        Console.WriteLine(!queuedReset.IsCancellationRequested);
+        Console.WriteLine(queuedResetDone.WaitOne(2000));
+        Console.WriteLine(queuedReset.IsCancellationRequested);
+
+        CancellationTokenSource repeated = new CancellationTokenSource();
+        ManualResetEvent repeatedDone = new ManualResetEvent(false);
+        repeated.Token.Register(() => repeatedDone.Set());
+        repeated.CancelAfter(200);
+        repeated.CancelAfter(150);
+        repeated.CancelAfter(Timeout.Infinite);
+        repeated.CancelAfter(25);
+        Console.WriteLine(repeatedDone.WaitOne(1000));
+        Console.WriteLine(repeated.IsCancellationRequested);
+
+        CancellationTokenSource race = new CancellationTokenSource();
+        int raceCalls = 0;
+        race.Token.Register(() => Interlocked.Increment(ref raceCalls));
+        ManualResetEvent raceStart = new ManualResetEvent(false);
+        ManualResetEvent raceA = new ManualResetEvent(false);
+        ManualResetEvent raceB = new ManualResetEvent(false);
+        ThreadPool.QueueUserWorkItem(() =>
+        {
+            raceStart.WaitOne();
+            race.CancelAfter(10);
+            raceA.Set();
+        });
+        ThreadPool.QueueUserWorkItem(() =>
+        {
+            raceStart.WaitOne();
+            race.Cancel();
+            raceB.Set();
+        });
+        raceStart.Set();
+        Console.WriteLine(raceA.WaitOne(1000));
+        Console.WriteLine(raceB.WaitOne(1000));
+        Thread.Sleep(50);
+        Console.WriteLine(race.IsCancellationRequested);
+        Console.WriteLine(raceCalls == 1);
+
+        race.CancelAfter(10);
+        Thread.Sleep(20);
+        Console.WriteLine(raceCalls == 1);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

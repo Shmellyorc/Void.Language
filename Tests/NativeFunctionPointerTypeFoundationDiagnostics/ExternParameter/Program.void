@@ -1,0 +1,6 @@
+using Void;
+public static class Native255
+{
+    public static unsafe extern int Use(delegate*<int, int> callback);
+}
+public static class Program { public static void Main() { } }

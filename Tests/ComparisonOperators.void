@@ -1,0 +1,36 @@
+namespace Parser.Operators;
+
+public struct Number
+{
+    public int Value;
+
+    public static bool operator ==(Number left, Number right)
+    {
+        return left.Value == right.Value;
+    }
+
+    public static bool operator !=(Number left, Number right)
+    {
+        return left.Value != right.Value;
+    }
+
+    public static bool operator <(Number left, Number right)
+    {
+        return left.Value < right.Value;
+    }
+
+    public static bool operator >(Number left, Number right)
+    {
+        return left.Value > right.Value;
+    }
+
+    public static bool operator <=(Number left, Number right)
+    {
+        return left.Value <= right.Value;
+    }
+
+    public static bool operator >=(Number left, Number right)
+    {
+        return left.Value >= right.Value;
+    }
+}

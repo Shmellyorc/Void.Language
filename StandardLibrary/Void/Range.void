@@ -1,0 +1,37 @@
+namespace Void;
+
+public readonly struct Range
+{
+    private readonly Index _start;
+    private readonly Index _end;
+
+    public Range(Index start, Index end)
+    {
+        _start = start;
+        _end = end;
+    }
+
+    public static Range StartAt(Index start) { return new Range(start, new Index(0, true)); }
+    public static Range EndAt(Index end) { return new Range(new Index(0, false), end); }
+    public bool Equals(Range other) { return _start.Equals(other._start) && _end.Equals(other._end); }
+    public int GetHashCode() { return _start.GetHashCode() % 1073741823 + _end.GetHashCode() % 1073741823; }
+    public string ToString() { return _start.ToString() + ".." + _end.ToString(); }
+
+    public Index Start => _start;
+    public Index End => _end;
+
+    public void GetOffsetAndLength(int length, out int offset, out int rangeLength)
+    {
+        if (length < 0)
+            throw new ArgumentOutOfRangeException("length", "Range length cannot be negative");
+
+        int startOffset = _start.GetOffset(length);
+        int endOffset = _end.GetOffset(length);
+        if (startOffset < 0 || startOffset > length ||
+            endOffset < 0 || endOffset > length || endOffset < startOffset)
+            throw new ArgumentOutOfRangeException("length", "Range out of range");
+
+        offset = startOffset;
+        rangeLength = endOffset - startOffset;
+    }
+}

@@ -1,0 +1,11 @@
+using Void.Collections;
+using Void.Threading.Tasks;
+public static class Program
+{
+    private static async Task Read(IAsyncEnumerable<int> source)
+    {
+        await foreach (var value in source)
+            value = 2;
+    }
+    public static void Main() {}
+}

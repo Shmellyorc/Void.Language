@@ -1,0 +1,236 @@
+using Void;
+using Void.Collections;
+
+public sealed class IntegrationException : Exception
+{
+    public int Code;
+
+    public IntegrationException(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class IntegrationNode
+{
+    public int Value;
+
+    public IntegrationNode(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class StaticFieldRetry
+{
+    public static int Attempts;
+    public static int Value = Initialize();
+
+    private static int Initialize()
+    {
+        IntegrationNode node = new IntegrationNode(42);
+        Attempts++;
+        if (Attempts == 1)
+            throw new IntegrationException("field-init", 101);
+        return node.Value;
+    }
+}
+
+public static class StaticConstructorRetry
+{
+    public static int Attempts;
+    public static int FinallyCount;
+    public static int Value = 5;
+
+    static StaticConstructorRetry()
+    {
+        Attempts++;
+        try
+        {
+            if (Attempts == 1)
+                throw new IntegrationException("static-ctor", 102);
+            Value = 9;
+        }
+        finally
+        {
+            FinallyCount++;
+        }
+    }
+}
+
+public class RetryBase
+{
+    public static int Attempts;
+    public static int BaseValue = InitializeBase();
+
+    private static int InitializeBase()
+    {
+        Attempts++;
+        if (Attempts == 1)
+            throw new IntegrationException("base-init", 103);
+        return 10;
+    }
+}
+
+public class RetryDerived : RetryBase
+{
+    public static int DerivedValue = 20;
+}
+
+public sealed class IntegrationPublisher
+{
+    public event Action<int> Changed;
+
+    public void Raise(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+}
+
+public static class Program
+{
+    public static int Sequence;
+
+    public static void DelegateThrow()
+    {
+        try
+        {
+            throw new IntegrationException("delegate-iterator", 201);
+        }
+        catch (IntegrationException error)
+        {
+            GC.Collect();
+            if (error.Code == 201)
+                Sequence = Sequence * 10 + 2;
+            throw;
+        }
+    }
+
+    public static IEnumerator<int> DelegateIterator()
+    {
+        Program.Sequence = 1;
+        try
+        {
+            yield return 7;
+            Action action = Program.DelegateThrow;
+            action();
+        }
+        finally
+        {
+            Program.Sequence = Program.Sequence * 10 + 3;
+        }
+    }
+
+    public static void EventFirst(int value)
+    {
+        Sequence = Sequence * 10 + 5;
+    }
+
+    public static void EventThrow(int value)
+    {
+        Sequence = Sequence * 10 + 6;
+        throw new IntegrationException("event", 300 + value);
+    }
+
+    public static void EventLast(int value)
+    {
+        Sequence = Sequence * 10 + 7;
+    }
+
+    public static int RunEventScenario(IntegrationPublisher publisher)
+    {
+        try
+        {
+            publisher.Raise(6);
+            return -1;
+        }
+        catch (IntegrationException error)
+        {
+            return error.Code;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 9;
+        }
+    }
+
+    public static void Main()
+    {
+        bool caught = false;
+        try
+        {
+            int unused = StaticFieldRetry.Value;
+        }
+        catch (IntegrationException error)
+        {
+            caught = error.Code == 101 && Runtime.Equals(error.Message, "field-init");
+            GC.Collect();
+        }
+        Console.WriteLine(caught);
+        Console.WriteLine(StaticFieldRetry.Value == 42);
+        Console.WriteLine(StaticFieldRetry.Attempts == 2);
+        Console.WriteLine(StaticFieldRetry.Value == 42 && StaticFieldRetry.Attempts == 2);
+
+        caught = false;
+        try
+        {
+            int unused = StaticConstructorRetry.Value;
+        }
+        catch (IntegrationException error)
+        {
+            caught = error.Code == 102 && Runtime.Equals(error.Message, "static-ctor");
+        }
+        Console.WriteLine(caught);
+        Console.WriteLine(StaticConstructorRetry.Value == 9);
+        Console.WriteLine(StaticConstructorRetry.Attempts == 2);
+        Console.WriteLine(StaticConstructorRetry.FinallyCount == 2);
+        Console.WriteLine(StaticConstructorRetry.Value == 9 && StaticConstructorRetry.FinallyCount == 2);
+
+        caught = false;
+        try
+        {
+            int unused = RetryDerived.DerivedValue;
+        }
+        catch (IntegrationException error)
+        {
+            caught = error.Code == 103 && Runtime.Equals(error.Message, "base-init");
+        }
+        Console.WriteLine(caught);
+        Console.WriteLine(RetryDerived.DerivedValue == 20);
+        Console.WriteLine(RetryBase.BaseValue == 10);
+        Console.WriteLine(RetryBase.Attempts == 2);
+
+        IEnumerator<int> iterator = DelegateIterator();
+        Console.WriteLine(iterator.MoveNext() && iterator.Current == 7 && Sequence == 1);
+        caught = false;
+        try
+        {
+            iterator.MoveNext();
+        }
+        catch (IntegrationException error)
+        {
+            caught = error.Code == 201 && Runtime.Equals(error.Message, "delegate-iterator") && Sequence == 123;
+            Sequence = Sequence * 10 + 4;
+        }
+        Console.WriteLine(caught);
+        Console.WriteLine(Sequence == 1234);
+        Console.WriteLine(!iterator.MoveNext());
+
+        IntegrationPublisher publisher = new IntegrationPublisher();
+        publisher.Changed += EventFirst;
+        publisher.Changed += EventThrow;
+        publisher.Changed += EventLast;
+        Sequence = 0;
+        int eventCode = RunEventScenario(publisher);
+        Console.WriteLine(eventCode == 306);
+        Console.WriteLine(Sequence == 569);
+
+        publisher.Changed -= EventThrow;
+        Sequence = 0;
+        publisher.Raise(8);
+        Console.WriteLine(Sequence == 57);
+
+        Console.WriteLine(true);
+    }
+}

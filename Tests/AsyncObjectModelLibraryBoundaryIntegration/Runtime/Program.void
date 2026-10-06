@@ -1,0 +1,223 @@
+using Void;
+using Void.Threading.Tasks;
+
+public interface IDefaultAsync209
+{
+    int Bias();
+
+    public async Task<int> Read(Task gate, int value)
+    {
+        await gate;
+        return this.Bias() + value;
+    }
+}
+
+public sealed class DefaultAsync209 : IDefaultAsync209
+{
+    public int Bias() { return 3; }
+}
+
+public interface IAsyncContract209
+{
+    Task<int> Invoke(Task gate, int value);
+}
+
+public sealed class AsyncContract209 : IAsyncContract209
+{
+    public async Task<int> Invoke(Task gate, int value)
+    {
+        await gate;
+        return value + 4;
+    }
+}
+
+public class AsyncVirtualBase209
+{
+    public virtual async Task<int> Calculate(Task gate, int value)
+    {
+        await gate;
+        return value + 5;
+    }
+}
+
+public sealed class SyncOverride209 : AsyncVirtualBase209
+{
+    public override Task<int> Calculate(Task gate, int value)
+    {
+        TaskCompletionSource<int> source = new TaskCompletionSource<int>();
+        source.SetResult(value + 6);
+        return source.Task;
+    }
+}
+
+public class SyncVirtualBase209
+{
+    public virtual Task<int> Calculate(Task gate, int value)
+    {
+        TaskCompletionSource<int> source = new TaskCompletionSource<int>();
+        source.SetResult(value + 7);
+        return source.Task;
+    }
+}
+
+public sealed class AsyncOverride209 : SyncVirtualBase209
+{
+    public override async Task<int> Calculate(Task gate, int value)
+    {
+        await gate;
+        Task<int> parent = base.Calculate(gate, value);
+        int parentValue = await parent;
+        return parentValue + 1;
+    }
+}
+
+public abstract class AbstractContract209
+{
+    public abstract Task<int> Read(Task gate, int value);
+}
+
+public sealed class AsyncAbstractImplementation209 : AbstractContract209
+{
+    public override async Task<int> Read(Task gate, int value)
+    {
+        await gate;
+        return value + 9;
+    }
+}
+
+public delegate Task<int> AsyncDelegate209(Task gate, int value);
+
+public sealed class BoundAsync209
+{
+    private int _bias;
+
+    public BoundAsync209(int bias)
+    {
+        _bias = bias;
+    }
+
+    public async Task<int> Read(Task gate, int value)
+    {
+        await gate;
+        GC.Collect();
+        return value + _bias;
+    }
+}
+
+public static class AsyncEventHub209
+{
+    public static event AsyncDelegate209 Changed;
+
+    public static Task<int> Raise(Task gate, int value)
+    {
+        return Changed(gate, value);
+    }
+
+    public static void Clear()
+    {
+        Changed = null;
+    }
+}
+
+public static class Native209
+{
+    [Native("void209_native_add")]
+    public static unsafe extern int Add(int value, int amount);
+}
+
+public static class Program
+{
+    private static void Check(bool value)
+    {
+        Console.WriteLine(value);
+    }
+
+    public static async Task<int> StaticRead(Task gate, int value)
+    {
+        await gate;
+        return value + 10;
+    }
+
+    public static unsafe async Task<int> NativeRead(Task gate, int value)
+    {
+        await gate;
+        return Native209.Add(value, 11);
+    }
+
+    public static unsafe void Main()
+    {
+        TaskCompletionSource defaultGate = new TaskCompletionSource();
+        IDefaultAsync209 defaultValue = new DefaultAsync209();
+        Task<int> defaultTask = defaultValue.Read(defaultGate.Task, 10);
+        Check(!defaultTask.IsCompleted);
+        defaultGate.SetResult();
+        Check(defaultTask.Result == 13);
+
+        TaskCompletionSource interfaceGate = new TaskCompletionSource();
+        IAsyncContract209 contract = new AsyncContract209();
+        Task<int> interfaceTask = contract.Invoke(interfaceGate.Task, 10);
+        interfaceGate.SetResult();
+        Check(interfaceTask.Result == 14);
+
+        TaskCompletionSource virtualGate = new TaskCompletionSource();
+        AsyncVirtualBase209 virtualBase = new AsyncVirtualBase209();
+        Task<int> virtualTask = virtualBase.Calculate(virtualGate.Task, 10);
+        virtualGate.SetResult();
+        Check(virtualTask.Result == 15);
+
+        TaskCompletionSource syncOverrideGate = new TaskCompletionSource();
+        AsyncVirtualBase209 syncOverride = new SyncOverride209();
+        Task<int> syncOverrideTask = syncOverride.Calculate(syncOverrideGate.Task, 10);
+        Check(syncOverrideTask.Result == 16);
+
+        TaskCompletionSource asyncOverrideGate = new TaskCompletionSource();
+        SyncVirtualBase209 asyncOverride = new AsyncOverride209();
+        Task<int> asyncOverrideTask = asyncOverride.Calculate(asyncOverrideGate.Task, 10);
+        Check(!asyncOverrideTask.IsCompleted);
+        asyncOverrideGate.SetResult();
+        Check(asyncOverrideTask.Result == 18);
+
+        TaskCompletionSource abstractGate = new TaskCompletionSource();
+        AbstractContract209 abstractValue = new AsyncAbstractImplementation209();
+        Task<int> abstractTask = abstractValue.Read(abstractGate.Task, 10);
+        abstractGate.SetResult();
+        Check(abstractTask.Result == 19);
+
+        TaskCompletionSource staticGate = new TaskCompletionSource();
+        Task<int> staticTask = StaticRead(staticGate.Task, 10);
+        Check(!staticTask.IsCompleted);
+        staticGate.SetResult();
+        Check(staticTask.Result == 20);
+
+        TaskCompletionSource delegateGate = new TaskCompletionSource();
+        AsyncDelegate209 function = StaticRead;
+        Task<int> delegateTask = function(delegateGate.Task, 20);
+        Check(!delegateTask.IsCompleted);
+        delegateGate.SetResult();
+        Check(delegateTask.Result == 30);
+
+        TaskCompletionSource boundGate = new TaskCompletionSource();
+        BoundAsync209 boundOwner = new BoundAsync209(12);
+        AsyncDelegate209 bound = boundOwner.Read;
+        Task<int> boundTask = bound(boundGate.Task, 20);
+        boundOwner = null;
+        GC.Collect();
+        Check(!boundTask.IsCompleted);
+        boundGate.SetResult();
+        Check(boundTask.Result == 32);
+
+        TaskCompletionSource eventGate = new TaskCompletionSource();
+        eventGate.SetResult();
+        AsyncEventHub209.Changed += StaticRead;
+        Task<int> eventTask = AsyncEventHub209.Raise(eventGate.Task, 30);
+        Check(eventTask.Result == 40);
+        AsyncEventHub209.Changed -= StaticRead;
+        AsyncEventHub209.Clear();
+
+        TaskCompletionSource nativeGate = new TaskCompletionSource();
+        Task<int> nativeTask = NativeRead(nativeGate.Task, 31);
+        Check(!nativeTask.IsCompleted);
+        nativeGate.SetResult();
+        Check(nativeTask.Result == 42);
+    }
+}

@@ -1,0 +1,17 @@
+public sealed class C245
+{
+    public int Value;
+    public ref int GetPinnableReference() { return ref Value; }
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        C245 value = null;
+        fixed (int* p = value)
+        {
+            p[0] = 1;
+        }
+    }
+}

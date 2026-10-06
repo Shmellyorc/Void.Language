@@ -1,0 +1,38 @@
+namespace Void.Buffers;
+
+public readonly struct StandardFormat
+{
+    private readonly char _symbol;
+    private readonly byte _precision;
+
+    public static readonly byte NoPrecision = (byte)255;
+    public static readonly byte MaxPrecision = (byte)99;
+
+    public char Symbol => _symbol;
+    public byte Precision => _precision == 0 ? (byte)255 : (byte)((int)_precision - 1);
+    public bool HasPrecision => _precision != 0;
+    public bool IsDefault => _symbol == '\0' && _precision == 0;
+
+    public StandardFormat(char symbol)
+    {
+        if (symbol > (char)255)
+            throw new ArgumentOutOfRangeException("symbol", "StandardFormat symbol must fit in one byte");
+        _symbol = symbol;
+        _precision = (byte)0;
+    }
+
+    public StandardFormat(char symbol, byte precision)
+    {
+        if (precision != (byte)255 && precision > (byte)99)
+            throw new ArgumentOutOfRangeException("precision", "StandardFormat precision is out of range");
+        if (symbol > (char)255)
+            throw new ArgumentOutOfRangeException("symbol", "StandardFormat symbol must fit in one byte");
+        _symbol = symbol;
+        _precision = precision == (byte)255 ? (byte)0 : (byte)((int)precision + 1);
+    }
+
+    public static implicit operator StandardFormat(char symbol)
+    {
+        return new StandardFormat(symbol);
+    }
+}

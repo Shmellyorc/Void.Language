@@ -1,0 +1,176 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class DelayPayload283
+{
+    public int Value;
+
+    public DelayPayload283(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    private static bool WaitCanceled(Task task, CancellationToken expectedToken)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken actualToken = error.CancellationToken;
+            return actualToken.IsSameSource(expectedToken) &&
+                actualToken.CanBeCanceled && actualToken.IsCancellationRequested;
+        }
+        return false;
+    }
+
+    private static async Task<int> AwaitCancelableDelay(DelayPayload283 payload, CancellationToken token)
+    {
+        await Task.Delay(30, token);
+        return payload.Value;
+    }
+
+    private static async Task<bool> ObserveCanceledAwait(CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(500, token);
+        }
+        catch (OperationCanceledException error)
+        {
+            return error.CancellationToken.IsSameSource(token);
+        }
+        return false;
+    }
+
+    public static void Main()
+    {
+        CancellationTokenSource preSource = new CancellationTokenSource();
+        CancellationToken preToken = preSource.Token;
+        preSource.Cancel();
+
+        Task preCanceled = Task.Delay(100, preToken);
+        Console.WriteLine(preCanceled.IsCanceled);
+        Console.WriteLine(preCanceled.Status == TaskStatus.Canceled);
+        Console.WriteLine(WaitCanceled(preCanceled, preToken));
+        Console.WriteLine(preCanceled.CancellationToken.IsSameSource(preToken));
+
+        Task preCanceledZero = Task.Delay(0, preToken);
+        Console.WriteLine(preCanceledZero.IsCanceled);
+        Console.WriteLine(WaitCanceled(preCanceledZero, preToken));
+
+        Task preCanceledInfinite = Task.Delay(Timeout.Infinite, preToken);
+        Console.WriteLine(preCanceledInfinite.IsCanceled);
+        Console.WriteLine(WaitCanceled(preCanceledInfinite, preToken));
+
+        CancellationTokenSource pendingSource = new CancellationTokenSource();
+        CancellationToken pendingToken = pendingSource.Token;
+        Task pending = Task.Delay(1000, pendingToken);
+        Console.WriteLine(!pending.IsCompleted);
+        pendingSource.Cancel();
+        Console.WriteLine(pending.IsCanceled);
+        Console.WriteLine(WaitCanceled(pending, pendingToken));
+        Console.WriteLine(pending.CancellationToken.IsSameSource(pendingToken));
+
+        CancellationTokenSource infiniteSource = new CancellationTokenSource();
+        CancellationToken infiniteToken = infiniteSource.Token;
+        Task infinite = Task.Delay(Timeout.Infinite, infiniteToken);
+        Console.WriteLine(!infinite.IsCompleted);
+        Console.WriteLine(!infinite.Wait(25));
+        infiniteSource.Cancel();
+        Console.WriteLine(WaitCanceled(infinite, infiniteToken));
+
+        CancellationTokenSource zeroSource = new CancellationTokenSource();
+        Task zero = Task.Delay(0, zeroSource.Token);
+        Console.WriteLine(zero == Task.CompletedTask);
+        zeroSource.Cancel();
+        Console.WriteLine(zero.Status == TaskStatus.Completed);
+        Console.WriteLine(!zero.IsCanceled);
+
+        CancellationTokenSource completedSource = new CancellationTokenSource();
+        CancellationToken completedToken = completedSource.Token;
+        Task completed = Task.Delay(20, completedToken);
+        Console.WriteLine(completed.Wait(2000));
+        Console.WriteLine(completed.Status == TaskStatus.Completed);
+        completedSource.Cancel();
+        Console.WriteLine(completed.Status == TaskStatus.Completed);
+        Console.WriteLine(!completed.IsCanceled);
+
+        Task noneDelay = Task.Delay(15, CancellationToken.None);
+        Console.WriteLine(noneDelay.Wait(2000));
+        Console.WriteLine(noneDelay.Status == TaskStatus.Completed);
+
+        CancellationTokenSource gcSource = new CancellationTokenSource();
+        DelayPayload283 payload = new DelayPayload283(283);
+        Task<int> retained = AwaitCancelableDelay(payload, gcSource.Token);
+        payload = null;
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(retained.Wait(2000));
+        Console.WriteLine(retained.Result == 283);
+
+        CancellationTokenSource awaitCancelSource = new CancellationTokenSource();
+        CancellationToken awaitCancelToken = awaitCancelSource.Token;
+        Task<bool> observed = ObserveCanceledAwait(awaitCancelToken);
+        awaitCancelSource.Cancel();
+        Console.WriteLine(observed.Wait(2000));
+        Console.WriteLine(observed.Result);
+
+        ManualResetEvent blockersReady = new ManualResetEvent(false);
+        ManualResetEvent blockersRelease = new ManualResetEvent(false);
+        int blockerCount = 0;
+        Action blocker = () =>
+        {
+            int ready = Interlocked.Increment(ref blockerCount);
+            if (ready == 2)
+                blockersReady.Set();
+            blockersRelease.WaitOne();
+        };
+        Task blockerOne = Task.Run(blocker);
+        Task blockerTwo = Task.Run(blocker);
+        Console.WriteLine(blockersReady.WaitOne(5000));
+
+        CancellationTokenSource queuedSource = new CancellationTokenSource();
+        CancellationToken queuedToken = queuedSource.Token;
+        Task queuedDue = Task.Delay(20, queuedToken);
+        Thread.Sleep(80);
+        Console.WriteLine(!queuedDue.IsCompleted);
+        queuedSource.Cancel();
+        Console.WriteLine(queuedDue.IsCanceled);
+        blockersRelease.Set();
+        blockerOne.Wait();
+        blockerTwo.Wait();
+        Console.WriteLine(WaitCanceled(queuedDue, queuedToken));
+        Thread.Sleep(30);
+        Console.WriteLine(queuedDue.Status == TaskStatus.Canceled);
+
+        CancellationTokenSource raceSource = new CancellationTokenSource();
+        CancellationToken raceToken = raceSource.Token;
+        Task raceDelay = Task.Delay(30, raceToken);
+        Task canceler = Task.Run(() =>
+        {
+            Thread.Sleep(5);
+            raceSource.Cancel();
+        });
+        canceler.Wait();
+        Console.WriteLine(WaitCanceled(raceDelay, raceToken));
+        Console.WriteLine(raceDelay.IsCanceled && !raceDelay.IsFaulted);
+
+        Task[] mix = new Task[]
+        {
+            Task.Delay(10, CancellationToken.None),
+            Task.Delay(20, CancellationToken.None),
+            Task.Delay(30, CancellationToken.None)
+        };
+        Console.WriteLine(Task.WhenAll(mix).Wait(2000));
+        Console.WriteLine(mix[0].IsCompleted && mix[1].IsCompleted && mix[2].IsCompleted);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

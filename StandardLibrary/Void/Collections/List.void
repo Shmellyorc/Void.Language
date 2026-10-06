@@ -1,0 +1,259 @@
+namespace Void.Collections;
+
+public sealed class List<T> : IReadOnlyList<T>, ICollection<T>
+{
+    private T[] _items;
+    private int _count;
+    private int _version;
+    internal int Version => _version;
+
+    public int Count => _count;
+    public bool IsReadOnly { get { return false; } }
+
+    public List() : this(0) { }
+    public List(int capacity)
+    {
+        if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
+        _items = new T[capacity];
+        _count = 0;
+        _version = 0;
+    }
+    public List(IEnumerable<T> collection) : this(0)
+    {
+        if (collection == null) throw new ArgumentNullException("collection");
+        foreach (T item in collection) this.Add(item);
+    }
+    public int Capacity
+    {
+        get { return _items.Length; }
+        set
+        {
+            if (value < _count) throw new ArgumentOutOfRangeException("value");
+            if (value == _items.Length) return;
+            T[] items = new T[value];
+            for (int i = 0; i < _count; i++) items[i] = _items[i];
+            _items = items;
+        }
+    }
+    public int EnsureCapacity(int capacity)
+    {
+        if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
+        if (capacity > _items.Length)
+        {
+            int next = _items.Length > 1073741823 ? 2147483647 : _items.Length * 2;
+            if (next < 4) next = 4;
+            if (next < capacity) next = capacity;
+            this.Capacity = next;
+        }
+        return _items.Length;
+    }
+    public void TrimExcess()
+    {
+        // Integer arithmetic avoids rounding and overflow at large capacities.
+        int threshold = _items.Length / 10 * 9 + _items.Length % 10 * 9 / 10;
+        if (_count < threshold) this.Capacity = _count;
+    }
+    public int IndexOf(T item) { return this.IndexOf(item, 0, _count); }
+    public int IndexOf(T item, int index)
+    {
+        if (index < 0 || index > _count) throw new ArgumentOutOfRangeException("index");
+        return this.IndexOf(item, index, _count - index);
+    }
+    public int IndexOf(T item, int index, int count)
+    {
+        if (index < 0 || index > _count) throw new ArgumentOutOfRangeException("index");
+        if (count < 0 || count > _count - index) throw new ArgumentOutOfRangeException("count");
+        IEqualityComparer<T> comparer = new DefaultEqualityComparer<T>();
+        int end = index + count;
+        for (int i = index; i < end; i++)
+            if (comparer.Equals(_items[i], item)) return i;
+        return -1;
+    }
+    public int LastIndexOf(T item) { return this.LastIndexOf(item, _count - 1, _count); }
+    public int LastIndexOf(T item, int index)
+    {
+        if (index >= _count) throw new ArgumentOutOfRangeException("index");
+        return this.LastIndexOf(item, index, index + 1);
+    }
+    public int LastIndexOf(T item, int index, int count)
+    {
+        // Match the established empty-list behavior, including index -1.
+        if (_count == 0) return -1;
+        if (index < 0 || index >= _count) throw new ArgumentOutOfRangeException("index");
+        if (count < 0 || count > index + 1) throw new ArgumentOutOfRangeException("count");
+        IEqualityComparer<T> comparer = new DefaultEqualityComparer<T>();
+        int end = index - count;
+        for (int i = index; i > end; i--)
+            if (comparer.Equals(_items[i], item)) return i;
+        return -1;
+    }
+    public List<T> GetRange(int index, int count)
+    {
+        this.CheckRange(index, count);
+        List<T> result = new List<T>(count);
+        for (int i = 0; i < count; i++) result.Add(_items[index + i]);
+        return result;
+    }
+    public void RemoveRange(int index, int count)
+    {
+        this.CheckRange(index, count);
+        if (count == 0) return;
+        int remaining = _count - count;
+        for (int i = index; i < remaining; i++) _items[i] = _items[i + count];
+        for (int i = remaining; i < _count; i++) _items[i] = default(T);
+        _count = remaining;
+        _version++;
+    }
+    public void Reverse() { this.Reverse(0, _count); }
+    public void Reverse(int index, int count)
+    {
+        this.CheckRange(index, count);
+        int left = index;
+        int right = index + count - 1;
+        while (left < right)
+        {
+            T value = _items[left];
+            _items[left] = _items[right];
+            _items[right] = value;
+            left++;
+            right--;
+        }
+        _version++;
+    }
+    public bool Contains(T item) { return this.IndexOf(item) >= 0; }
+    public bool Remove(T item)
+    {
+        int index = this.IndexOf(item);
+        if (index < 0) return false;
+        this.RemoveAt(index);
+        return true;
+    }
+    public void RemoveAt(int index)
+    {
+        this.CheckIndex(index);
+        for (int i = index; i < _count - 1; i++) _items[i] = _items[i + 1];
+        _count--;
+        _items[_count] = default(T);
+        _version++;
+    }
+    public void Insert(int index, T item)
+    {
+        if (index < 0 || index > _count) throw new ArgumentOutOfRangeException("index");
+        if (_count == _items.Length) this.Grow();
+        for (int i = _count; i > index; i--) _items[i] = _items[i - 1];
+        _items[index] = item;
+        _count++;
+        _version++;
+    }
+    public T[] ToArray()
+    {
+        T[] items = new T[_count];
+        this.CopyTo(items, 0);
+        return items;
+    }
+    public void CopyTo(T[] array) { this.CopyTo(array, 0); }
+    public void CopyTo(T[] array, int arrayIndex) { this.CopyTo(0, array, arrayIndex, _count); }
+    public void CopyTo(int index, T[] array, int arrayIndex, int count)
+    {
+        this.CheckRange(index, count);
+        if (array == null) throw new ArgumentNullException("array");
+        if (arrayIndex < 0) throw new ArgumentOutOfRangeException("arrayIndex");
+        if (arrayIndex > array.Length || count > array.Length - arrayIndex)
+            throw new ArgumentException("Destination is too short");
+        for (int i = 0; i < count; i++) array[arrayIndex + i] = _items[index + i];
+    }
+
+    public void AddRange(IEnumerable<T> collection) { this.InsertRange(_count, collection); }
+    public void InsertRange(int index, IEnumerable<T> collection)
+    {
+        if (collection == null) throw new ArgumentNullException("collection");
+        if (index < 0 || index > _count) throw new ArgumentOutOfRangeException("index");
+        if (collection == (IEnumerable<T>)this)
+        {
+            int count = _count;
+            if (count == 0) return;
+            if (count > 2147483647 - _count) throw new OutOfMemoryException();
+            // Snapshot before shifting, so insertion at any position is safe.
+            T[] snapshot = this.ToArray();
+            this.EnsureCapacity(_count + count);
+            for (int i = _count - 1; i >= index; i--) _items[i + count] = _items[i];
+            for (int i = 0; i < count; i++) _items[index + i] = snapshot[i];
+            _count += count;
+            _version++;
+            return;
+        }
+        // Ordinary enumeration preserves order, disposal and partial progress
+        // if the input enumerator throws, as for the established .NET contract.
+        int destination = index;
+        this.InsertRangeItems(ref destination, collection);
+    }
+
+    private void InsertRangeItems(ref int destination, IEnumerable<T> collection)
+    {
+        IEnumerator<T> enumerator = collection.GetEnumerator();
+        try
+        {
+            while (enumerator.MoveNext())
+            {
+                this.Insert(destination, enumerator.Current);
+                destination++;
+            }
+        }
+        finally { if (enumerator != null) enumerator.Dispose(); }
+    }
+
+    public void Add(T item)
+    {
+        if (_count >= _items.Length)
+            this.Grow();
+
+        _items[_count] = item;
+        _count++;
+        _version++;
+    }
+
+    public void Clear()
+    {
+        for (int i = 0; i < _count; i++) _items[i] = default(T);
+        _count = 0;
+        _version++;
+    }
+
+    public IEnumerator<T> GetEnumerator()
+    {
+        return new ListEnumerator<T>(this);
+    }
+
+    public T get_Item(int index)
+    {
+        this.CheckIndex(index);
+        return _items[index];
+    }
+
+    public void set_Item(int index, T value)
+    {
+        this.CheckIndex(index);
+        _items[index] = value;
+        _version++;
+    }
+
+    private void Grow()
+    {
+        if (_count == 2147483647) throw new OutOfMemoryException();
+        this.EnsureCapacity(_count + 1);
+    }
+
+    private void CheckRange(int index, int count)
+    {
+        if (index < 0) throw new ArgumentOutOfRangeException("index");
+        if (count < 0) throw new ArgumentOutOfRangeException("count");
+        if (index > _count || count > _count - index)
+            throw new ArgumentException("Range exceeds the list");
+    }
+
+    private void CheckIndex(int index)
+    {
+        if (index < 0 || index >= _count)
+            throw new ArgumentOutOfRangeException("index", "List index out of range");
+    }
+}

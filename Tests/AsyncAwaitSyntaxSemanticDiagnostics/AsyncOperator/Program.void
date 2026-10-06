@@ -1,0 +1,11 @@
+using Void.Threading.Tasks;
+
+public sealed class Program
+{
+    public static async Task operator +(Program left, Program right)
+    {
+        return;
+    }
+
+    public static void Main() {}
+}

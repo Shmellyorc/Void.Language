@@ -1,0 +1,4 @@
+public static class Program {
+    private static void Use<T>() where T : unmanaged { T* pointer = null; }
+    public static void Main() { Use<int>(); }
+}

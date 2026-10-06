@@ -1,0 +1,10 @@
+public class TimeoutException : Exception
+{
+    public TimeoutException() : base("The operation has timed out.")
+    {
+    }
+
+    public TimeoutException(string message) : base(message)
+    {
+    }
+}

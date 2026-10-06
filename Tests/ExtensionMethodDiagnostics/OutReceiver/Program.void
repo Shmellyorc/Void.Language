@@ -1,0 +1,5 @@
+public static class Extensions
+{
+    public static void Fill(this out int value) { value = 1; }
+}
+public static class Program { public static void Main() { } }

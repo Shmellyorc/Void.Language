@@ -1,0 +1,225 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+using AwaitForeachExtensions270;
+
+public sealed class AwaitForeachProbe270
+{
+    public int MoveCalls;
+    public int MoveAwaiterCalls;
+    public int MoveOnCompletedCalls;
+    public int MoveGetResultCalls;
+    public int DisposeCalls;
+    public int DisposeAwaiterCalls;
+    public int DisposeOnCompletedCalls;
+    public int DisposeGetResultCalls;
+    public int FinallyCalls;
+}
+
+public struct MoveCompletion270
+{
+    public AwaitForeachProbe270 Probe;
+    public bool Result;
+
+    public MoveCompletion270(AwaitForeachProbe270 probe, bool result)
+    {
+        Probe = probe;
+        Result = result;
+    }
+}
+
+public struct DisposeCompletion270
+{
+    public AwaitForeachProbe270 Probe;
+
+    public DisposeCompletion270(AwaitForeachProbe270 probe)
+    {
+        Probe = probe;
+    }
+}
+
+public sealed class MoveAwaiter270
+{
+    private AwaitForeachProbe270 _probe;
+    private bool _result;
+
+    public MoveAwaiter270(AwaitForeachProbe270 probe, bool result)
+    {
+        _probe = probe;
+        _result = result;
+    }
+
+    public bool IsCompleted { get { return false; } }
+
+    public void OnCompleted(Action continuation)
+    {
+        _probe.MoveOnCompletedCalls++;
+        GC.Collect();
+        ThreadPool.QueueUserWorkItem(continuation);
+    }
+
+    public bool GetResult()
+    {
+        _probe.MoveGetResultCalls++;
+        return _result;
+    }
+}
+
+public sealed class DisposeAwaiter270
+{
+    private AwaitForeachProbe270 _probe;
+
+    public DisposeAwaiter270(AwaitForeachProbe270 probe)
+    {
+        _probe = probe;
+    }
+
+    public bool IsCompleted { get { return false; } }
+
+    public void OnCompleted(Action continuation)
+    {
+        _probe.DisposeOnCompletedCalls++;
+        GC.Collect();
+        ThreadPool.QueueUserWorkItem(continuation);
+    }
+
+    public void GetResult()
+    {
+        _probe.DisposeGetResultCalls++;
+    }
+}
+
+namespace AwaitForeachExtensions270
+{
+    public static class AwaitExtensions270
+    {
+        public static MoveAwaiter270 GetAwaiter(this MoveCompletion270 completion)
+        {
+            completion.Probe.MoveAwaiterCalls++;
+            return new MoveAwaiter270(completion.Probe, completion.Result);
+        }
+
+        public static DisposeAwaiter270 GetAwaiter(this DisposeCompletion270 completion)
+        {
+            completion.Probe.DisposeAwaiterCalls++;
+            return new DisposeAwaiter270(completion.Probe);
+        }
+    }
+}
+
+public sealed class CustomAsyncEnumerator270
+{
+    private AwaitForeachProbe270 _probe;
+    private int _index;
+
+    public CustomAsyncEnumerator270(AwaitForeachProbe270 probe)
+    {
+        _probe = probe;
+        _index = 0;
+    }
+
+    public int Current { get { return _index * 10; } }
+
+    public MoveCompletion270 MoveNextAsync()
+    {
+        _probe.MoveCalls++;
+        _index++;
+        return new MoveCompletion270(_probe, _index <= 3);
+    }
+
+    public DisposeCompletion270 DisposeAsync()
+    {
+        _probe.DisposeCalls++;
+        return new DisposeCompletion270(_probe);
+    }
+}
+
+public sealed class CustomAsyncSequence270
+{
+    private AwaitForeachProbe270 _probe;
+
+    public CustomAsyncSequence270(AwaitForeachProbe270 probe)
+    {
+        _probe = probe;
+    }
+
+    public CustomAsyncEnumerator270 GetAsyncEnumerator()
+    {
+        return new CustomAsyncEnumerator270(_probe);
+    }
+}
+
+public static class Program
+{
+    private static async ValueTask<int> Mixed(AwaitForeachProbe270 probe)
+    {
+        int total = 0;
+        await foreach (int value in new CustomAsyncSequence270(probe))
+            total += value;
+        await Task.Yield();
+        int bonus = await new ValueTask<int>(2);
+        return total + bonus;
+    }
+
+    private static async Task<int> ReturnEarly(AwaitForeachProbe270 probe)
+    {
+        await foreach (int value in new CustomAsyncSequence270(probe))
+            return value;
+        return -1;
+    }
+
+    private static async Task ThrowFromBody(AwaitForeachProbe270 probe)
+    {
+        try
+        {
+            await foreach (int value in new CustomAsyncSequence270(probe))
+                throw new Exception("audit body failure");
+        }
+        finally
+        {
+            probe.FinallyCalls++;
+        }
+    }
+
+    public static void Main()
+    {
+        AwaitForeachProbe270 normal = new AwaitForeachProbe270();
+        int result = Mixed(normal).GetAwaiter().GetResult();
+
+        Console.WriteLine(result == 62);
+        Console.WriteLine(normal.MoveCalls == 4);
+        Console.WriteLine(normal.MoveAwaiterCalls == 4);
+        Console.WriteLine(normal.MoveOnCompletedCalls == 4);
+        Console.WriteLine(normal.MoveGetResultCalls == 4);
+        Console.WriteLine(normal.DisposeCalls == 1);
+        Console.WriteLine(normal.DisposeAwaiterCalls == 1);
+        Console.WriteLine(normal.DisposeOnCompletedCalls == 1);
+        Console.WriteLine(normal.DisposeGetResultCalls == 1);
+
+        AwaitForeachProbe270 early = new AwaitForeachProbe270();
+        Console.WriteLine(ReturnEarly(early).GetAwaiter().GetResult() == 10);
+        Console.WriteLine(early.MoveCalls == 1);
+        Console.WriteLine(early.MoveGetResultCalls == 1);
+        Console.WriteLine(early.DisposeCalls == 1);
+        Console.WriteLine(early.DisposeGetResultCalls == 1);
+
+        AwaitForeachProbe270 fault = new AwaitForeachProbe270();
+        bool caught = false;
+        try
+        {
+            ThrowFromBody(fault).GetAwaiter().GetResult();
+        }
+        catch (Exception error)
+        {
+            caught = Runtime.Equals(error.Message, "audit body failure");
+        }
+        Console.WriteLine(caught);
+        Console.WriteLine(fault.MoveCalls == 1);
+        Console.WriteLine(fault.MoveGetResultCalls == 1);
+        Console.WriteLine(fault.DisposeCalls == 1);
+        Console.WriteLine(fault.DisposeGetResultCalls == 1);
+        Console.WriteLine(fault.FinallyCalls == 1);
+
+        ThreadPool.Shutdown();
+    }
+}

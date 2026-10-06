@@ -1,0 +1,90 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class StressFault210 : Exception
+{
+    public StressFault210(string message) : base(message)
+    {
+    }
+}
+
+public static class Program
+{
+    private static async Task<int> Sum(Task<int> first, Task<int> second)
+    {
+        int a = await first;
+        GC.Collect();
+        int b = await second;
+        return a + b;
+    }
+
+    private static async Task Fault(Task gate)
+    {
+        await gate;
+        throw new StressFault210("stress");
+    }
+
+    private static async Task Cancel(Task gate, CancellationToken token)
+    {
+        await gate;
+        token.ThrowIfCancellationRequested();
+    }
+
+    private static bool IsFault(Task task)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (StressFault210)
+        {
+            return task.IsFaulted;
+        }
+        return false;
+    }
+
+    private static bool IsCanceled(Task task, CancellationToken token)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (OperationCanceledException error)
+        {
+            return task.IsCanceled && error.CancellationToken.IsSameSource(token);
+        }
+        return false;
+    }
+
+    public static void Main()
+    {
+        TaskCompletionSource<int> first = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> second = new TaskCompletionSource<int>();
+        Task<int> sum = Sum(first.Task, second.Task);
+        Task<int> continuation = sum.ContinueWith<int>(task => task.Result + 1);
+
+        TaskCompletionSource faultGate = new TaskCompletionSource();
+        Task fault = Fault(faultGate.Task);
+
+        CancellationTokenSource cancellationSource = new CancellationTokenSource();
+        CancellationToken cancellationToken = cancellationSource.Token;
+        TaskCompletionSource cancelGate = new TaskCompletionSource();
+        Task canceled = Cancel(cancelGate.Task, cancellationToken);
+
+        ThreadPool.QueueUserWorkItem(() => first.SetResult(20));
+        ThreadPool.QueueUserWorkItem(() => second.SetResult(21));
+        ThreadPool.QueueUserWorkItem(() => faultGate.SetResult());
+        ThreadPool.QueueUserWorkItem(() =>
+        {
+            cancellationSource.Cancel();
+            cancelGate.SetResult();
+        });
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(sum.Result == 41);
+        Console.WriteLine(continuation.Result == 42);
+        Console.WriteLine(IsFault(fault));
+        Console.WriteLine(IsCanceled(canceled, cancellationToken));
+    }
+}

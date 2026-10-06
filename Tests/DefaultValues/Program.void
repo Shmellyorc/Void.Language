@@ -1,0 +1,105 @@
+using Void;
+
+public enum Mode
+{
+    None = 0,
+    Ready = 4
+}
+
+public interface INode
+{
+    int Read();
+}
+
+public sealed class Node : INode
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+
+    public int Read()
+    {
+        return Value;
+    }
+}
+
+public delegate int Callback(int value);
+
+public struct Packet
+{
+    public int Count;
+    public Node Owner;
+}
+
+public static class Defaults
+{
+    public const int Zero = default(int);
+    public const Mode EmptyMode = default(Mode);
+}
+
+public static class Program
+{
+    public static T Zero<T>()
+    {
+        return default(T);
+    }
+
+    public static int Optional(int value = default(int))
+    {
+        return value;
+    }
+
+    public static unsafe bool PointerIsNull()
+    {
+        int* value = default(int*);
+        return value == null;
+    }
+
+    public static unsafe void Main()
+    {
+        Console.WriteLine(default(bool) == false);
+        Console.WriteLine((int)default(byte) == 0);
+        Console.WriteLine((int)default(sbyte) == 0);
+        Console.WriteLine((int)default(short) == 0);
+        Console.WriteLine((int)default(ushort) == 0);
+        Console.WriteLine(default(int) == 0);
+        Console.WriteLine((int)default(uint) == 0);
+        Console.WriteLine((int)default(long) == 0);
+        Console.WriteLine((int)default(ulong) == 0);
+        Console.WriteLine((int)default(float) == 0);
+        Console.WriteLine((int)default(double) == 0);
+        Console.WriteLine((int)default(decimal) == 0);
+        Console.WriteLine((int)default(char) == 0);
+
+        Console.WriteLine(default(string) == null);
+        Console.WriteLine(default(object) == null);
+        Console.WriteLine(default(int[]) == null);
+        Console.WriteLine(default(Node) == null);
+        Console.WriteLine(default(INode) == null);
+        Console.WriteLine(default(Callback) == null);
+        Console.WriteLine(default(Mode) == Mode.None);
+
+        Packet packet = default(Packet);
+        Console.WriteLine(packet.Count == 0);
+        Console.WriteLine(packet.Owner == null);
+
+        Console.WriteLine(Zero<int>() == 0);
+        Console.WriteLine(Zero<Mode>() == Mode.None);
+        Console.WriteLine(Zero<Node>() == null);
+        Console.WriteLine(Zero<int[]>() == null);
+        Packet genericPacket = Zero<Packet>();
+        Console.WriteLine(genericPacket.Count == 0);
+        Console.WriteLine(genericPacket.Owner == null);
+
+        Console.WriteLine(Defaults.Zero == 0);
+        Console.WriteLine(Defaults.EmptyMode == Mode.None);
+        Console.WriteLine(Optional() == 0);
+        Console.WriteLine(PointerIsNull());
+
+        Node fallback = default(Node) ?? new Node(17);
+        Console.WriteLine(fallback.Value == 17);
+    }
+}

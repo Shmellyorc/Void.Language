@@ -1,0 +1,34 @@
+namespace Void;
+
+public readonly struct Index
+{
+    private readonly int _value;
+    private readonly bool _fromEnd;
+
+    public Index(int value, bool fromEnd = false)
+    {
+        if (value < 0)
+            throw new ArgumentOutOfRangeException("value", "Index value cannot be negative");
+        _value = value;
+        _fromEnd = fromEnd;
+    }
+
+    public static Index FromStart(int value) { return new Index(value, false); }
+    public static Index FromEnd(int value) { return new Index(value, true); }
+    public bool Equals(Index other) { return _value == other._value && _fromEnd == other._fromEnd; }
+    public int GetHashCode() { return _fromEnd ? -1 - _value : _value; }
+    public string ToString() { return _fromEnd ? "^" + _value : "" + _value; }
+
+    public int Value => _value;
+    public bool IsFromEnd => _fromEnd;
+
+    public int GetOffset(int length)
+    {
+        return _fromEnd ? length - _value : _value;
+    }
+
+    public static implicit operator Index(int value)
+    {
+        return new Index(value, false);
+    }
+}

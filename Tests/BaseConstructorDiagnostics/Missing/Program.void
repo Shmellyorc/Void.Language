@@ -1,0 +1,16 @@
+using Void;
+
+public class Base
+{
+    public Base(int value) { }
+}
+
+public sealed class Derived : Base
+{
+    public Derived() { }
+}
+
+public static class Program
+{
+    public static void Main() { Derived value = new Derived(); }
+}

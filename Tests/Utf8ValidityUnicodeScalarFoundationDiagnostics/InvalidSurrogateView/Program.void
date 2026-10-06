@@ -1,0 +1,11 @@
+using Void;
+public static class Native301InvalidSurrogate
+{
+    [NativeString(NativeStringKind.StaticPointerLength)]
+    [Native("void301_invalid_surrogate")]
+    public static unsafe extern string Value();
+}
+public static class Program
+{
+    public static unsafe void Main() { string value = Native301InvalidSurrogate.Value(); Console.WriteLine(value == null); }
+}

@@ -1,0 +1,13 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    public static void Main()
+    {
+        CancellationTokenSource source = new CancellationTokenSource();
+        Func<int> function = null;
+        Task.Run(function, source.Token);
+    }
+}

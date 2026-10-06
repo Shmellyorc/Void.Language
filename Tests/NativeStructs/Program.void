@@ -1,0 +1,40 @@
+public struct TimeValue
+{
+    public long Seconds;
+    public long Microseconds;
+}
+
+public unsafe struct NativeNode
+{
+    public int Value;
+    public NativeNode* Next;
+}
+
+public static class Program
+{
+    public static unsafe extern int gettimeofday(TimeValue* value, void* zone);
+    public static unsafe extern TimeValue voidc_native_struct_roundtrip(TimeValue value);
+
+    public static unsafe void Main()
+    {
+        TimeValue time = new TimeValue();
+        int result = gettimeofday(&time, null);
+        long zero = time.Seconds - time.Seconds;
+        Console.WriteLine(result == 0);
+        Console.WriteLine(time.Seconds != zero);
+        Console.WriteLine(time.Microseconds >= zero);
+
+        NativeNode first = new NativeNode();
+        NativeNode second = new NativeNode();
+        first.Value = 11;
+        second.Value = 22;
+        first.Next = &second;
+
+        Console.WriteLine(first.Value);
+        Console.WriteLine((*first.Next).Value);
+        Console.WriteLine(first.Next == &second);
+
+        second.Next = &first;
+        Console.WriteLine((*second.Next).Value);
+    }
+}

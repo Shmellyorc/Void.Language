@@ -1,0 +1,11 @@
+{
+  "format": 1,
+  "name": "BorrowedStaticNativeStringReturnsDiagnostics",
+  "output": "exe",
+  "version": "0.0.296",
+  "compiler": {
+    "unsafe": true,
+    "libraryPaths": ["native"],
+    "libraries": ["voidc296invalidfixture"]
+  }
+}

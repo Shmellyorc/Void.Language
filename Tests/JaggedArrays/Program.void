@@ -1,0 +1,183 @@
+using Void;
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public struct Point
+{
+    public int X;
+    public int Y;
+
+    public Point(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+}
+
+public sealed class Holder
+{
+    public Node[][] Nodes;
+
+    public Holder(Node[][] nodes)
+    {
+        Nodes = nodes;
+    }
+}
+
+public static class JaggedHelpers
+{
+    public static int Sum(int[][] values)
+    {
+        int total = 0;
+        foreach (int[] row in values)
+        {
+            if (row == null)
+                continue;
+            foreach (int value in row)
+                total += value;
+        }
+        return total;
+    }
+}
+
+public static class Program
+{
+    public static Node[][] StaticNodes;
+
+    public static T[][] Pair<T>(T first, T second)
+    {
+        T[][] result = new T[2][];
+        result[0] = new T[] { first };
+        result[1] = new T[] { second };
+        return result;
+    }
+
+    public static void Main()
+    {
+        int[][] explicitRows = new int[][]
+        {
+            new int[] { 1, 2 },
+            new int[] { 3, 4, 5 }
+        };
+        Console.WriteLine(explicitRows.Length == 2);
+        Console.WriteLine(explicitRows[0].Length == 2 && explicitRows[1].Length == 3);
+        Console.WriteLine(explicitRows[0][1] == 2 && explicitRows[1][2] == 5);
+
+        int[][] sized = new int[2][];
+        Console.WriteLine(sized.Length == 2 && sized[0] == null && sized[1] == null);
+        sized[0] = new int[2];
+        sized[1] = new int[] { 7, 8, 9 };
+        sized[0][0] = 5;
+        sized[0][1] = 6;
+        Console.WriteLine(sized[0][0] == 5 && sized[0][1] == 6);
+        Console.WriteLine(JaggedHelpers.Sum(sized) == 35);
+
+        var inferred = new[]
+        {
+            new[] { 10, 11 },
+            new[] { 12 }
+        };
+        Console.WriteLine(inferred[0][1] == 11 && inferred[1][0] == 12);
+
+        int[][] nullableRows = new int[][] { null, new int[] { 13 } };
+        Console.WriteLine(nullableRows[0] == null && nullableRows[1][0] == 13);
+
+        int[][][] three = new int[1][][];
+        three[0] = new int[1][];
+        three[0][0] = new int[] { 14, 15 };
+        Console.WriteLine(three[0][0][1] == 15);
+
+        Point[][] points = new Point[1][];
+        points[0] = new Point[] { new Point(2, 3), new Point(4, 5) };
+        Console.WriteLine(points[0][0].X == 2 && points[0][1].Y == 5);
+
+        Point[][] pointCopy = points;
+        pointCopy[0][0] = new Point(20, 30);
+        Console.WriteLine(points[0][0].X == 20 && points[0][0].Y == 30);
+
+        int?[][] optional = new int?[1][];
+        optional[0] = new int?[] { 21, null, 23 };
+        Console.WriteLine(optional[0][0] == 21 && optional[0][1] == null && optional[0][2] == 23);
+
+        int[][] genericInts = Pair<int>(24, 25);
+        Console.WriteLine(genericInts[0][0] == 24 && genericInts[1][0] == 25);
+
+        Node first = new Node(26);
+        Node second = new Node(27);
+        Node[][] genericNodes = Pair<Node>(first, second);
+        first = null;
+        second = null;
+        GC.Collect();
+        Console.WriteLine(genericNodes[0][0].Value == 26 && genericNodes[1][0].Value == 27);
+
+        Node[][] managed = new Node[2][];
+        managed[0] = new Node[] { new Node(28), new Node(29) };
+        managed[1] = new Node[] { new Node(30) };
+        GC.Collect();
+        Console.WriteLine(managed[0][0].Value == 28 && managed[0][1].Value == 29 && managed[1][0].Value == 30);
+
+        Holder holder = new Holder(managed);
+        managed = null;
+        GC.Collect();
+        Console.WriteLine(holder.Nodes[1][0].Value == 30);
+
+        StaticNodes = new Node[][] { new Node[] { new Node(31) } };
+        GC.Collect();
+        Console.WriteLine(StaticNodes[0][0].Value == 31);
+
+        object asObject = explicitRows;
+        Console.WriteLine(asObject != null);
+
+        int[][] alias = explicitRows;
+        alias[0][0] = 32;
+        Console.WriteLine(explicitRows[0][0] == 32);
+
+        int[][] selected = true ? explicitRows : sized;
+        Console.WriteLine(selected[1][2] == 5);
+
+        int foreachRows = 0;
+        int foreachValues = 0;
+        foreach (int[] row in explicitRows)
+        {
+            foreachRows++;
+            foreach (int value in row)
+                foreachValues += value;
+        }
+        Console.WriteLine(foreachRows == 2);
+        Console.WriteLine(foreachValues == 46);
+
+        int[][] targetTyped = new[] { new int[] { 33, 34 } };
+        Console.WriteLine(targetTyped[0][1] == 34);
+
+        var inferredNull = new[] { new int[] { 37 }, null };
+        Console.WriteLine(inferredNull[0][0] == 37 && inferredNull[1] == null);
+
+        int[][] defaults = default;
+        Console.WriteLine(defaults == null);
+
+        int[][] nullArray = null;
+        Console.WriteLine(nullArray == null);
+
+        Node[][] initialized = new Node[][]
+        {
+            new Node[] { new Node(35) },
+            null
+        };
+        GC.Collect();
+        Console.WriteLine(initialized[0][0].Value == 35 && initialized[1] == null);
+
+        int[][][][] deep = new int[1][][][];
+        deep[0] = new int[1][][];
+        deep[0][0] = new int[1][];
+        deep[0][0][0] = new int[] { 36 };
+        Console.WriteLine(deep[0][0][0][0] == 36);
+    }
+}

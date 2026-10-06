@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "ConsoleStandardStreams",
+  "version": "0.0.315",
+  "output": "exe",
+  "compiler": { "unsafe": false }
+}

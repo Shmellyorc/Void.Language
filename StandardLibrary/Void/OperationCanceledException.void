@@ -1,0 +1,30 @@
+using Void.Threading;
+
+public class OperationCanceledException : Exception
+{
+    private CancellationToken _cancellationToken;
+
+    public CancellationToken CancellationToken => _cancellationToken;
+
+    public OperationCanceledException() : base("The operation was canceled.")
+    {
+        _cancellationToken = default;
+    }
+
+    public OperationCanceledException(string message) : base(message)
+    {
+        _cancellationToken = default;
+    }
+
+    public OperationCanceledException(CancellationToken cancellationToken)
+        : base("The operation was canceled.")
+    {
+        _cancellationToken = cancellationToken;
+    }
+
+    public OperationCanceledException(string message, CancellationToken cancellationToken)
+        : base(message)
+    {
+        _cancellationToken = cancellationToken;
+    }
+}

@@ -1,0 +1,1 @@
+public sealed class C { public int X; public ref int P => X; } public static class Program { public static void Main(){} }

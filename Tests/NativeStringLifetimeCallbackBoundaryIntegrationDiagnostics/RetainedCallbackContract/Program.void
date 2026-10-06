@@ -1,0 +1,3 @@
+using Void;
+public delegate int Bad299([NativeString(NativeStringKind.RetainedNul)] string text);
+public static class Program { public static void Main() { } }

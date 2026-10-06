@@ -1,0 +1,10 @@
+public struct Counter
+{
+    public int Value;
+    public void Add() { Value += 1; }
+}
+public static class Program
+{
+    public static void Change(in Counter value) { value.Add(); }
+    public static void Main() { Counter value = new Counter(); Change(in value); }
+}

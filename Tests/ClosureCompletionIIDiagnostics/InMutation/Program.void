@@ -1,0 +1,12 @@
+public delegate int InFunc(in int value);
+public static class Program
+{
+    public static void Main()
+    {
+        InFunc action = value =>
+        {
+            value = 3;
+            return value;
+        };
+    }
+}

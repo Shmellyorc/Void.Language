@@ -1,0 +1,16 @@
+public interface IIntCode
+{
+    int Code { get; }
+}
+
+public interface IFloatCode
+{
+    float Code { get; }
+}
+
+public interface IBad : IIntCode, IFloatCode { }
+
+public static class Program
+{
+    public static void Main() { }
+}

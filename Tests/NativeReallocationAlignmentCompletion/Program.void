@@ -1,0 +1,87 @@
+using Void;
+
+public struct Pair254
+{
+    public int X;
+    public long Y;
+
+    public Pair254(int x, long y)
+    {
+        X = x;
+        Y = y;
+    }
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        int* values = NativeMemory.Allocate<int>(2ul);
+        values[0] = 11;
+        values[1] = 22;
+        values = NativeMemory.Reallocate<int>(values, 4ul);
+        Console.WriteLine(values != null);
+        Console.WriteLine(values[0] == 11 && values[1] == 22);
+        values[2] = 33;
+        values[3] = 44;
+        values = NativeMemory.Reallocate<int>(values, 1ul);
+        Console.WriteLine(values[0] == 11);
+
+        int* original = values;
+        bool overflow = NativeMemory.TryReallocate<int>(ref values, 9223372036854775808ul);
+        Console.WriteLine(!overflow && values == original && values[0] == 11);
+
+        bool emptied = NativeMemory.TryReallocate<int>(ref values, 0ul);
+        Console.WriteLine(emptied && values == null);
+
+        void* raw = NativeMemory.Allocate(24ul);
+        Console.WriteLine(raw != null);
+        void* rawOriginal = raw;
+        bool invalidResize = NativeMemory.TryReallocateAligned(ref raw, 48ul, 3ul);
+        Console.WriteLine(!invalidResize && raw == rawOriginal);
+        bool rawEmpty = NativeMemory.TryReallocate(ref raw, 0ul);
+        Console.WriteLine(rawEmpty && raw == null);
+
+        void* emptyAligned = null;
+        bool emptyAlignedOk = NativeMemory.TryAllocateAligned(0ul, 64ul, out emptyAligned);
+        Console.WriteLine(emptyAlignedOk && emptyAligned == null);
+        bool invalidEmptyAligned = NativeMemory.TryAllocateAligned(0ul, 3ul, out emptyAligned);
+        Console.WriteLine(!invalidEmptyAligned && emptyAligned == null);
+
+        int* aligned = NativeMemory.AllocateAligned<int>(4ul, 64ul);
+        Console.WriteLine(aligned != null);
+        aligned[0] = 7;
+        aligned[1] = 8;
+        aligned[2] = 9;
+        aligned[3] = 10;
+        aligned = NativeMemory.ReallocateAligned<int>(aligned, 8ul, 128ul);
+        Console.WriteLine(aligned != null);
+        Console.WriteLine(aligned[0] == 7 && aligned[1] == 8 && aligned[2] == 9 && aligned[3] == 10);
+        bool alignedZero = NativeMemory.TryReallocateAligned<int>(ref aligned, 0ul, 128ul);
+        Console.WriteLine(alignedZero && aligned == null);
+
+        Pair254* pairs = NativeMemory.AllocateAligned<Pair254>(2ul, 64ul);
+        pairs[0] = new Pair254(5, 6);
+        pairs[1] = new Pair254(7, 8);
+        Pair254* pairOriginal = pairs;
+        bool pairOverflow = NativeMemory.TryReallocateAligned<Pair254>(ref pairs, 9223372036854775808ul, 64ul);
+        Console.WriteLine(!pairOverflow && pairs == pairOriginal);
+        Console.WriteLine(pairs[0].X == 5 && pairs[1].Y == 8);
+        pairs = NativeMemory.ReallocateAligned<Pair254>(pairs, 3ul, 256ul);
+        Console.WriteLine(pairs[0].X == 5 && pairs[1].Y == 8);
+        NativeMemory.Free(pairs);
+
+        void* fromNull = null;
+        bool nullResize = NativeMemory.TryReallocate(ref fromNull, 16ul);
+        Console.WriteLine(nullResize && fromNull != null);
+        NativeMemory.Free(fromNull);
+
+        int* alignedTry = null;
+        bool alignedTryOk = NativeMemory.TryAllocateAligned<int>(2ul, 32ul, out alignedTry);
+        Console.WriteLine(alignedTryOk && alignedTry != null);
+        alignedTry[0] = 91;
+        bool alignedTryResize = NativeMemory.TryReallocateAligned<int>(ref alignedTry, 3ul, 64ul);
+        Console.WriteLine(alignedTryResize && alignedTry != null && alignedTry[0] == 91);
+        NativeMemory.Free(alignedTry);
+    }
+}

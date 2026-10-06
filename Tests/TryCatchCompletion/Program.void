@@ -1,0 +1,108 @@
+public class GameException : Exception
+{
+    public int Code;
+
+    public GameException(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class FatalGameException : GameException
+{
+    public FatalGameException(string message, int code) : base(message, code)
+    {
+    }
+}
+
+public static class Program
+{
+    public static int GenericCatch<T>(T value) where T : Exception
+    {
+        try
+        {
+            throw value;
+        }
+        catch (Exception error)
+        {
+            return Runtime.Equals(error.Message, "generic") ? 1 : 0;
+        }
+    }
+
+    public static void Main()
+    {
+        int state = 0;
+        try
+        {
+            state = 1;
+        }
+        catch (Exception error)
+        {
+            state = 99;
+        }
+        Console.WriteLine(state == 1);
+
+        try
+        {
+            throw new Exception("base");
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(Runtime.Equals(error.Message, "base"));
+        }
+
+        try
+        {
+            throw new FatalGameException("fatal", 17);
+        }
+        catch (FatalGameException error)
+        {
+            Console.WriteLine(Runtime.Equals(error.Message, "fatal"));
+            Console.WriteLine(error.Code == 17);
+        }
+        catch (GameException error)
+        {
+            Console.WriteLine(false);
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(false);
+        }
+
+        try
+        {
+            if (true)
+            {
+                Exception nested = new Exception("nested");
+                throw nested;
+            }
+        }
+        catch (Exception)
+        {
+            Console.WriteLine(true);
+        }
+
+        try
+        {
+            throw new GameException("all", 5);
+        }
+        catch
+        {
+            Console.WriteLine(true);
+        }
+
+        Exception generic = new Exception("generic");
+        Console.WriteLine(GenericCatch<Exception>(generic) == 1);
+
+        int assigned;
+        try
+        {
+            assigned = 7;
+        }
+        catch
+        {
+            assigned = 7;
+        }
+        Console.WriteLine(assigned == 7);
+    }
+}

@@ -1,0 +1,300 @@
+using Void;
+using Void.Collections;
+
+public sealed class LifetimeError : Exception
+{
+    public int Code;
+
+    public LifetimeError(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class Box
+{
+    public int Value;
+
+    public Box(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Holder
+{
+    public object Item { get; set; }
+}
+
+public sealed class GcHolder
+{
+    private object _item;
+
+    public GcHolder(object item)
+    {
+        _item = item;
+    }
+
+    public object Item
+    {
+        get
+        {
+            GC.Collect();
+            return _item;
+        }
+    }
+}
+
+public static class Program
+{
+    public static int Seen;
+    public static int FinallyCount;
+    public static int Sequence;
+
+    public static object MakeBox(int value)
+    {
+        return new Box(value);
+    }
+
+    public static Holder MakeHolder(int value)
+    {
+        Holder holder = new Holder();
+        holder.Item = new Box(value);
+        return holder;
+    }
+
+    private static IEnumerator<int> DisposeIfCapture()
+    {
+        if (Program.MakeBox(71) is Box box)
+        {
+            try
+            {
+                yield return 1;
+            }
+            finally
+            {
+                GC.Collect();
+                Program.Seen = box.Value;
+                Program.FinallyCount++;
+            }
+        }
+    }
+
+    private static IEnumerator<int> ThrowIfCapture()
+    {
+        if (Program.MakeBox(72) is Box box)
+        {
+            try
+            {
+                yield return 2;
+                throw new LifetimeError("resume", 82);
+            }
+            finally
+            {
+                GC.Collect();
+                Program.Seen = box.Value;
+                Program.FinallyCount++;
+            }
+        }
+    }
+
+    private static IEnumerator<int> NaturalCompletionCapture()
+    {
+        if (Program.MakeBox(73) is Box box)
+        {
+            try
+            {
+                yield return 3;
+            }
+            finally
+            {
+                GC.Collect();
+                Program.Seen = box.Value;
+                Program.FinallyCount++;
+            }
+        }
+    }
+
+    private static IEnumerator<int> DisposeRecursiveSwitchCapture()
+    {
+        switch (Program.MakeHolder(74))
+        {
+            case { Item: Box box } when box.Value == 74:
+                try
+                {
+                    yield return 4;
+                }
+                finally
+                {
+                    GC.Collect();
+                    Program.Seen = box.Value;
+                    Program.FinallyCount++;
+                }
+                break;
+            default:
+                yield break;
+        }
+    }
+
+    public static GcHolder MakeGcHolder(int value)
+    {
+        return new GcHolder(new Box(value));
+    }
+
+    private static IEnumerator<int> GcGetterRecursiveCapture()
+    {
+        switch (Program.MakeGcHolder(77))
+        {
+            case { Item: Box box } when box.Value == 77:
+                try
+                {
+                    yield return 7;
+                }
+                finally
+                {
+                    GC.Collect();
+                    Program.Seen = box.Value;
+                    Program.FinallyCount++;
+                }
+                break;
+            default:
+                yield break;
+        }
+    }
+
+    private static IEnumerator<int> NestedFinallyCapture()
+    {
+        if (Program.MakeBox(75) is Box box)
+        {
+            try
+            {
+                try
+                {
+                    yield return 5;
+                }
+                finally
+                {
+                    GC.Collect();
+                    Program.Sequence = box.Value;
+                    Program.FinallyCount++;
+                }
+            }
+            finally
+            {
+                GC.Collect();
+                Program.Sequence = Program.Sequence * 100 + box.Value;
+                Program.FinallyCount++;
+            }
+        }
+    }
+
+    private static IEnumerator<int> ThrowingDisposeCapture()
+    {
+        if (Program.MakeBox(76) is Box box)
+        {
+            try
+            {
+                yield return 6;
+            }
+            finally
+            {
+                GC.Collect();
+                Program.Seen = box.Value;
+                Program.FinallyCount++;
+                throw new LifetimeError("dispose", 96);
+            }
+        }
+    }
+
+    public static void Main()
+    {
+        Seen = 0;
+        FinallyCount = 0;
+        IEnumerator<int> disposed = DisposeIfCapture();
+        Console.WriteLine(disposed.MoveNext());
+        Console.WriteLine(disposed.Current == 1);
+        disposed.Dispose();
+        Console.WriteLine(Seen == 71);
+        Console.WriteLine(FinallyCount == 1);
+        Console.WriteLine(!disposed.MoveNext());
+        disposed.Dispose();
+        Console.WriteLine(FinallyCount == 1);
+
+        Seen = 0;
+        FinallyCount = 0;
+        IEnumerator<int> faulted = ThrowIfCapture();
+        Console.WriteLine(faulted.MoveNext() && faulted.Current == 2);
+        bool caughtResume = false;
+        try
+        {
+            faulted.MoveNext();
+        }
+        catch (LifetimeError error)
+        {
+            caughtResume = error.Code == 82 && Runtime.Equals(error.Message, "resume");
+        }
+        Console.WriteLine(caughtResume);
+        Console.WriteLine(Seen == 72);
+        Console.WriteLine(FinallyCount == 1);
+        Console.WriteLine(!faulted.MoveNext());
+        faulted.Dispose();
+        Console.WriteLine(FinallyCount == 1);
+
+        Seen = 0;
+        FinallyCount = 0;
+        IEnumerator<int> natural = NaturalCompletionCapture();
+        Console.WriteLine(natural.MoveNext() && natural.Current == 3);
+        Console.WriteLine(!natural.MoveNext());
+        Console.WriteLine(Seen == 73);
+        Console.WriteLine(FinallyCount == 1);
+        natural.Dispose();
+        Console.WriteLine(FinallyCount == 1);
+
+        Seen = 0;
+        FinallyCount = 0;
+        IEnumerator<int> recursive = DisposeRecursiveSwitchCapture();
+        Console.WriteLine(recursive.MoveNext() && recursive.Current == 4);
+        recursive.Dispose();
+        Console.WriteLine(Seen == 74);
+        Console.WriteLine(FinallyCount == 1);
+        Console.WriteLine(!recursive.MoveNext());
+
+        Seen = 0;
+        FinallyCount = 0;
+        IEnumerator<int> getter = GcGetterRecursiveCapture();
+        Console.WriteLine(getter.MoveNext() && getter.Current == 7);
+        getter.Dispose();
+        Console.WriteLine(Seen == 77);
+        Console.WriteLine(FinallyCount == 1);
+        Console.WriteLine(!getter.MoveNext());
+
+        Sequence = 0;
+        FinallyCount = 0;
+        IEnumerator<int> nested = NestedFinallyCapture();
+        Console.WriteLine(nested.MoveNext() && nested.Current == 5);
+        nested.Dispose();
+        Console.WriteLine(Sequence == 7575);
+        Console.WriteLine(FinallyCount == 2);
+        Console.WriteLine(!nested.MoveNext());
+
+        Seen = 0;
+        FinallyCount = 0;
+        IEnumerator<int> throwingDispose = ThrowingDisposeCapture();
+        Console.WriteLine(throwingDispose.MoveNext() && throwingDispose.Current == 6);
+        bool caughtDispose = false;
+        try
+        {
+            throwingDispose.Dispose();
+        }
+        catch (LifetimeError error)
+        {
+            caughtDispose = error.Code == 96 && Runtime.Equals(error.Message, "dispose");
+        }
+        Console.WriteLine(caughtDispose);
+        Console.WriteLine(Seen == 76);
+        Console.WriteLine(FinallyCount == 1);
+        throwingDispose.Dispose();
+        Console.WriteLine(FinallyCount == 1);
+        Console.WriteLine(!throwingDispose.MoveNext());
+    }
+}

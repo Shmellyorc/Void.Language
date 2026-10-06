@@ -1,0 +1,15 @@
+public sealed class Bad
+{
+    public Bad()
+    {
+        return 1;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Bad value = new Bad();
+    }
+}

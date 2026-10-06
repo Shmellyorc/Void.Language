@@ -1,0 +1,266 @@
+[Swizzle("IntVector")]
+public struct Int2
+{
+    public int X;
+    public int Y;
+
+    public Int2(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    public static Int2 operator +(Int2 left, Int2 right)
+    {
+        return new Int2(left.X + right.X, left.Y + right.Y);
+    }
+}
+
+[Swizzle("IntVector")]
+public struct Int4
+{
+    public int X;
+    public int Y;
+    public int Z;
+    public int W;
+
+    public Int4(int x, int y, int z, int w)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+        W = w;
+    }
+}
+
+public struct Counter
+{
+    public int Value;
+
+    public Counter(int value)
+    {
+        Value = value;
+    }
+
+    public static Counter operator +(Counter left, Counter right)
+    {
+        return new Counter(left.Value + right.Value);
+    }
+}
+
+public class IntBox
+{
+    public int A;
+    public int B;
+    public int Gets;
+    public int Sets;
+
+    public int get_Item(int index)
+    {
+        Program.Record(3);
+        Gets += 1;
+        return index == 0 ? A : B;
+    }
+
+    public void set_Item(int index, int value)
+    {
+        Program.Record(5);
+        Sets += 1;
+        if (index == 0) A = value;
+        else B = value;
+    }
+}
+
+public class CounterBox
+{
+    public Counter Value;
+    public int Gets;
+    public int Sets;
+
+    public Counter get_Item(int index)
+    {
+        Gets += 1;
+        return Value;
+    }
+
+    public void set_Item(int index, Counter value)
+    {
+        Sets += 1;
+        Value = value;
+    }
+}
+
+public struct ValueBox
+{
+    public int A;
+    public int B;
+
+    public int get_Item(int index)
+    {
+        return index == 0 ? A : B;
+    }
+
+    public void set_Item(int index, int value)
+    {
+        if (index == 0) A = value;
+        else B = value;
+    }
+}
+
+public class GcBox
+{
+    public int Value;
+
+    public int get_Item(int index)
+    {
+        return Value;
+    }
+
+    public void set_Item(int index, int value)
+    {
+        Value = value;
+        Program.GcObserved = value;
+    }
+}
+
+public class VectorHolder
+{
+    public Int4 Value;
+}
+
+public static class Program
+{
+    private static IntBox _box;
+    private static int _receiverCalls;
+    private static int _indexCalls;
+    private static int _rhsCalls;
+    private static int _order;
+    private static int _vectorRhsCalls;
+    private static int _valueIndexCalls;
+
+    public static int GcObserved;
+
+    public static void Record(int value)
+    {
+        _order = _order * 10 + value;
+    }
+
+    private static IntBox GetBox()
+    {
+        Record(1);
+        _receiverCalls += 1;
+        return _box;
+    }
+
+    private static int GetIndex()
+    {
+        Record(2);
+        _indexCalls += 1;
+        return 1;
+    }
+
+    private static int GetRhs()
+    {
+        Record(4);
+        _rhsCalls += 1;
+        return 5;
+    }
+
+    private static int NextValueIndex()
+    {
+        _valueIndexCalls += 1;
+        return 0;
+    }
+
+    private static Int2 GetVectorRhs()
+    {
+        _vectorRhsCalls += 1;
+        return new Int2(10, 20);
+    }
+
+    private static GcBox MakeGcBox()
+    {
+        GcBox box = new GcBox();
+        box.Value = 40;
+        return box;
+    }
+
+    private static int CollectAndReturnTwo()
+    {
+        GC.Collect();
+        return 2;
+    }
+
+    public static void Main()
+    {
+        _box = new IntBox();
+        _box.A = 10;
+        _box.B = 20;
+
+        int assigned = GetBox()[GetIndex()] += GetRhs();
+        Console.WriteLine(assigned == 25);
+        Console.WriteLine(_box.B == 25);
+        Console.WriteLine(_receiverCalls == 1);
+        Console.WriteLine(_indexCalls == 1);
+        Console.WriteLine(_rhsCalls == 1);
+        Console.WriteLine(_box.Gets == 1);
+        Console.WriteLine(_box.Sets == 1);
+        Console.WriteLine(_order == 12345);
+        _order = 0;
+
+        _box[0] -= 2;
+        Console.WriteLine(_box.A == 8);
+        _box[0] *= 3;
+        Console.WriteLine(_box.A == 24);
+        _box[0] /= 4;
+        Console.WriteLine(_box.A == 6);
+        _box[0] %= 4;
+        Console.WriteLine(_box.A == 2);
+
+        ValueBox valueBox = new ValueBox();
+        valueBox.A = 4;
+        int valueAssigned = valueBox[NextValueIndex()] += 6;
+        Console.WriteLine(valueAssigned == 10);
+        Console.WriteLine(valueBox.A == 10);
+        Console.WriteLine(_valueIndexCalls == 1);
+
+        CounterBox counterBox = new CounterBox();
+        counterBox.Value = new Counter(7);
+        Counter counterAssigned = counterBox[0] += new Counter(8);
+        Console.WriteLine(counterAssigned.Value == 15);
+        Console.WriteLine(counterBox.Value.Value == 15);
+        Console.WriteLine(counterBox.Gets == 1);
+        Console.WriteLine(counterBox.Sets == 1);
+
+        GcObserved = 0;
+        int gcAssigned = MakeGcBox()[0] += CollectAndReturnTwo();
+        Console.WriteLine(gcAssigned == 42);
+        Console.WriteLine(GcObserved == 42);
+
+        Int4 vector = new Int4(10, 20, 30, 40);
+        int scalarAssigned = vector.x += 5;
+        Console.WriteLine(scalarAssigned == 15);
+        Console.WriteLine(vector.X == 15);
+        vector.y -= 2;
+        Console.WriteLine(vector.Y == 18);
+        vector.z *= 2;
+        Console.WriteLine(vector.Z == 60);
+        vector.w /= 4;
+        Console.WriteLine(vector.W == 10);
+        vector.x %= 6;
+        Console.WriteLine(vector.X == 3);
+
+        Int2 swizzleAssigned = vector.xy += GetVectorRhs();
+        Console.WriteLine(swizzleAssigned.X == 13);
+        Console.WriteLine(swizzleAssigned.Y == 38);
+        Console.WriteLine(vector.X == 13);
+        Console.WriteLine(vector.Y == 38);
+        Console.WriteLine(_vectorRhsCalls == 1);
+
+        VectorHolder holder = new VectorHolder();
+        holder.Value = new Int4(1, 2, 3, 4);
+        holder.Value.yx += new Int2(5, 7);
+        Console.WriteLine(holder.Value.X == 8);
+        Console.WriteLine(holder.Value.Y == 7);
+    }
+}

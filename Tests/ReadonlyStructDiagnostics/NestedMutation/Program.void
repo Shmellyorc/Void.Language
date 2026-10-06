@@ -1,0 +1,28 @@
+public struct Inner
+{
+    public int Value;
+}
+
+public struct Outer
+{
+    public readonly Inner Value;
+
+    public Outer(Inner value)
+    {
+        Value = value;
+    }
+
+    public void TryChange()
+    {
+        Value.Value = 3;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Outer value = new Outer(new Inner());
+        value.TryChange();
+    }
+}

@@ -1,0 +1,1 @@
+public ref struct R { public ref int Value; public void Bind() { int local = 1; Value = ref local; } } public static class Program { public static void Main() { R value = new R(); value.Bind(); } }

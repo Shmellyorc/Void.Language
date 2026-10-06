@@ -1,0 +1,108 @@
+using Void;
+using Void.IO;
+
+public sealed class RedirectReader : TextReader
+{
+    private int _readCount;
+    private int _lineCount;
+
+    public override int Read()
+    {
+        _readCount++;
+        return _readCount == 1 ? 82 : -1;
+    }
+
+    public override string ReadLine()
+    {
+        _lineCount++;
+        return _lineCount == 1 ? "redirected" : null;
+    }
+}
+
+public sealed class RedirectWriter : TextWriter
+{
+    public string Text = "";
+
+    public override void Write(string value)
+    {
+        Text = Text + value;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        TextReader originalIn = Console.In;
+        TextWriter originalOut = Console.Out;
+        TextWriter originalError = Console.Error;
+        bool inputRedirected = Console.IsInputRedirected;
+        bool outputRedirected = Console.IsOutputRedirected;
+        bool errorRedirected = Console.IsErrorRedirected;
+
+        // The focused harness launches with all three process streams redirected.
+        Console.WriteLine(inputRedirected);
+        Console.WriteLine(outputRedirected);
+        Console.WriteLine(errorRedirected);
+
+        bool caught = false;
+        try { Console.SetIn(null); }
+        catch (ArgumentNullException error) { caught = error.ParamName == "newIn"; }
+        Console.WriteLine(caught);
+        Console.WriteLine(Console.In == originalIn);
+
+        caught = false;
+        try { Console.SetOut(null); }
+        catch (ArgumentNullException error) { caught = error.ParamName == "newOut"; }
+        Console.WriteLine(caught);
+        Console.WriteLine(Console.Out == originalOut);
+
+        caught = false;
+        try { Console.SetError(null); }
+        catch (ArgumentNullException error) { caught = error.ParamName == "newError"; }
+        Console.WriteLine(caught);
+        Console.WriteLine(Console.Error == originalError);
+
+        RedirectReader redirectedInput = new RedirectReader();
+        Console.SetIn(redirectedInput);
+        Console.WriteLine(Console.In == redirectedInput);
+        Console.WriteLine(Console.Read() == 82);
+        Console.WriteLine(Console.Read() == -1);
+        Console.WriteLine(Console.ReadLine() == "redirected");
+        Console.WriteLine(Console.ReadLine() == null);
+        Console.WriteLine(Console.IsInputRedirected == inputRedirected);
+
+        RedirectWriter redirectedOutput = new RedirectWriter();
+        Console.SetOut(redirectedOutput);
+        Console.Write("A");
+        Console.WriteLine("B");
+        Console.WriteLine(42);
+        Console.Out.Write("C");
+        bool outputFlagStable = Console.IsOutputRedirected == outputRedirected;
+
+        RedirectWriter redirectedError = new RedirectWriter();
+        Console.SetError(redirectedError);
+        Console.Error.Write("E");
+        Console.Error.WriteLine("F");
+        bool errorFlagStable = Console.IsErrorRedirected == errorRedirected;
+
+        Console.SetIn(originalIn);
+        Console.SetOut(originalOut);
+        Console.SetError(originalError);
+
+        Console.WriteLine(Console.In == originalIn);
+        Console.WriteLine(Console.Out == originalOut);
+        Console.WriteLine(Console.Error == originalError);
+        Console.WriteLine(redirectedOutput.Text == "AB" + Environment.NewLine + "42" + Environment.NewLine + "C");
+        Console.WriteLine(redirectedError.Text == "EF" + Environment.NewLine);
+        Console.WriteLine(outputFlagStable);
+        Console.WriteLine(errorFlagStable);
+        Console.WriteLine(Console.IsInputRedirected == inputRedirected);
+        Console.WriteLine(Console.IsOutputRedirected == outputRedirected);
+        Console.WriteLine(Console.IsErrorRedirected == errorRedirected);
+
+        // Restoring Console.In resumes the untouched native input source.
+        Console.WriteLine(Console.ReadLine() == "native");
+        Console.WriteLine(Console.ReadLine() == null);
+    }
+}

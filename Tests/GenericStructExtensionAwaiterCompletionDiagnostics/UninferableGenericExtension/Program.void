@@ -1,0 +1,25 @@
+using Void;
+using Void.Threading.Tasks;
+
+public struct Awaiter264<T>
+{
+    public bool IsCompleted { get { return true; } }
+    public void OnCompleted(Action continuation) { continuation(); }
+    public T GetResult() { return default(T); }
+}
+
+public struct Awaitable264<T> { }
+
+public static class Extensions264
+{
+    public static Awaiter264<U> GetAwaiter<T, U>(this Awaitable264<T> value)
+    {
+        return default(Awaiter264<U>);
+    }
+}
+
+public static class Program
+{
+    private static async Task<int> Run() { return await new Awaitable264<int>(); }
+    public static void Main() { }
+}

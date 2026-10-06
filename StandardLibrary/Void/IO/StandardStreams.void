@@ -1,0 +1,27 @@
+namespace Void.IO;
+
+// Low-level standard stream capability adapter. Console policy stays in Void.Console.
+internal static class StandardStreams
+{
+    internal static bool IsTerminal(int stream)
+    {
+        return Runtime.StandardStreamIsTerminal(stream);
+    }
+
+    internal static void Write(int stream, byte[] buffer, int offset, int count)
+    {
+        if (buffer == null) throw new ArgumentNullException("buffer");
+        if (offset < 0) throw new ArgumentOutOfRangeException("offset");
+        if (count < 0) throw new ArgumentOutOfRangeException("count");
+        if (offset > buffer.Length || count > buffer.Length - offset)
+            throw new ArgumentException("Offset and count exceed the buffer length.");
+        if (count == 0) return;
+        if (!Runtime.StandardStreamWrite(stream, buffer, offset, count))
+            throw new IOException("Unable to write standard stream.");
+    }
+
+    internal static bool Flush(int stream)
+    {
+        return Runtime.StandardStreamFlush(stream);
+    }
+}

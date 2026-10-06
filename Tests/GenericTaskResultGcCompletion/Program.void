@@ -1,0 +1,121 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public struct Score
+{
+    public int Value;
+
+    public Score(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Payload
+{
+    public int Value;
+
+    public Payload(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class ResultRace
+{
+    public int Ready;
+    public int Wins;
+    public ManualResetEvent ReadyEvent;
+    public ManualResetEvent StartEvent;
+
+    public ResultRace()
+    {
+        Ready = 0;
+        Wins = 0;
+        ReadyEvent = new ManualResetEvent(false);
+        StartEvent = new ManualResetEvent(false);
+    }
+}
+
+public static class Program
+{
+    private static Action MakeResultRace(Task<int> task, ResultRace state, int value)
+    {
+        return () =>
+        {
+            int ready = Interlocked.Increment(ref state.Ready);
+            if (ready == 2)
+                state.ReadyEvent.Set();
+            state.StartEvent.WaitOne();
+            if (task.TrySetResult(value))
+                Interlocked.Increment(ref state.Wins);
+        };
+    }
+
+    public static void Main()
+    {
+        Task<int> integerTask = new Task<int>();
+        Console.WriteLine(integerTask.Status == TaskStatus.Pending);
+        Console.WriteLine(integerTask.TrySetRunning());
+        Console.WriteLine(integerTask.TrySetResult(42));
+        Console.WriteLine(integerTask.Status == TaskStatus.Completed);
+        Console.WriteLine(integerTask.IsCompleted && !integerTask.IsFaulted && !integerTask.IsCanceled);
+        Console.WriteLine(integerTask.Result == 42);
+        Console.WriteLine(!integerTask.TrySetResult(99));
+        Console.WriteLine(integerTask.Result == 42);
+
+        Task<Score> structTask = new Task<Score>();
+        Console.WriteLine(structTask.TrySetResult(new Score(73)));
+        Score score = structTask.Result;
+        Console.WriteLine(score.Value == 73);
+
+        Task<Payload> payloadTask = new Task<Payload>();
+        Payload payload = new Payload(91);
+        Console.WriteLine(payloadTask.TrySetResult(payload));
+        payload = null;
+        GC.Collect();
+        GC.Collect();
+        Payload observed = payloadTask.Result;
+        Console.WriteLine(observed != null && observed.Value == 91);
+        Console.WriteLine(payloadTask.Status == TaskStatus.Completed);
+
+        Task<Payload> nullTask = new Task<Payload>();
+        Console.WriteLine(nullTask.TrySetResult(null));
+        Console.WriteLine(nullTask.Result == null);
+
+        Task<Payload> faulted = new Task<Payload>();
+        Exception fault = new Exception("generic fault");
+        Console.WriteLine(faulted.TrySetException(fault));
+        fault = null;
+        GC.Collect();
+        Console.WriteLine(faulted.IsFaulted && faulted.Exception != null);
+        Console.WriteLine(faulted.Exception.Message == "generic fault");
+
+        CancellationTokenSource source = new CancellationTokenSource();
+        source.Cancel();
+        Task<Payload> canceled = new Task<Payload>();
+        Console.WriteLine(canceled.TrySetCanceled(source.Token));
+        source = null;
+        GC.Collect();
+        Console.WriteLine(canceled.IsCanceled);
+        CancellationToken token = canceled.CancellationToken;
+        Console.WriteLine(token.IsCancellationRequested);
+
+        Task<int> race = new Task<int>();
+        ResultRace raceState = new ResultRace();
+        Thread first = new Thread(MakeResultRace(race, raceState, 11));
+        Thread second = new Thread(MakeResultRace(race, raceState, 22));
+        first.Start();
+        second.Start();
+        Console.WriteLine(raceState.ReadyEvent.WaitOne(5000));
+        raceState.StartEvent.Set();
+        first.Join();
+        second.Join();
+        Console.WriteLine(raceState.Wins == 1);
+        int raceResult = race.Result;
+        Console.WriteLine(raceResult == 11 || raceResult == 22);
+        Console.WriteLine(!race.TrySetResult(33));
+        Console.WriteLine(race.Result == raceResult);
+    }
+}

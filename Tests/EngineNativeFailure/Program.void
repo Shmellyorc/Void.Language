@@ -1,0 +1,19 @@
+using Void;
+using Void.IO;
+public static class Program
+{
+    public static void Main()
+    {
+        bool expectedOom = File.Exists("oom.expected");
+        bool correct = true;
+        for (int i = 0; i < 16; i++)
+        {
+            bool failed = false;
+            try { using (FileStream file = File.OpenRead("probe.txt")) { } }
+            catch (OutOfMemoryException) { failed = expectedOom; }
+            catch (UnauthorizedAccessException) { failed = !expectedOom; }
+            correct = correct && failed; GC.Collect();
+        }
+        Console.WriteLine(correct && File.Exists("probe.txt"));
+    }
+}

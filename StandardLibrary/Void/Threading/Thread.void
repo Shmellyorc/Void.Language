@@ -1,0 +1,36 @@
+namespace Void.Threading;
+
+using Void;
+
+public sealed class Thread
+{
+    private Action _start;
+    private long _nativeState;
+    private bool _started;
+    private bool _joined;
+
+    public Thread(Action start)
+    {
+        if (start == null)
+            Runtime.Fail("thread start delegate cannot be null");
+        _start = start;
+        _nativeState = 0;
+        _started = false;
+        _joined = false;
+    }
+
+    public void Start()
+    {
+        Runtime.ThreadStart(this);
+    }
+
+    public void Join()
+    {
+        Runtime.ThreadJoin(this);
+    }
+
+    public static void Sleep(int millisecondsTimeout)
+    {
+        Runtime.ThreadSleep(millisecondsTimeout);
+    }
+}

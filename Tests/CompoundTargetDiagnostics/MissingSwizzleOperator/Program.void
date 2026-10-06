@@ -1,0 +1,22 @@
+[Swizzle("V")]
+public struct V2
+{
+    public int X;
+    public int Y;
+}
+[Swizzle("V")]
+public struct V4
+{
+    public int X;
+    public int Y;
+    public int Z;
+    public int W;
+}
+public static class Program
+{
+    public static void Main()
+    {
+        V4 value = new V4();
+        value.xy += new V2();
+    }
+}

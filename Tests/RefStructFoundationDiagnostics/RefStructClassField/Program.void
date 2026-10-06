@@ -1,0 +1,1 @@
+public ref struct R { public int X; } public class C { public R Value; } public static class Program { public static void Main() { } }

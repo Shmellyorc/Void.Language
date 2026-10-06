@@ -1,0 +1,10 @@
+using Void.Threading;
+
+public static class Program
+{
+    public static void Main()
+    {
+        CancellationTokenSource source = new CancellationTokenSource();
+        source.CancelAfter(-2);
+    }
+}

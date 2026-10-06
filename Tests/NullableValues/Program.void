@@ -1,0 +1,176 @@
+using Void;
+
+public enum Mode
+{
+    None = 0,
+    Ready = 4
+}
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public struct Packet
+{
+    public int Count;
+    public Node Owner;
+}
+
+public sealed class Holder
+{
+    public int? Score;
+    public Packet? Data { get; set; }
+}
+
+public static class Program
+{
+    public static int? Maybe(bool present, int value)
+    {
+        if (present)
+            return value;
+        return null;
+    }
+
+    public static T? Wrap<T>(T value)
+    {
+        return value;
+    }
+
+    public static int ReadOrZero(int? value)
+    {
+        if (value.HasValue)
+            return value.Value;
+        return 0;
+    }
+
+    public static Packet? MakePacket()
+    {
+        Packet packet = default(Packet);
+        packet.Count = 99;
+        packet.Owner = new Node(77);
+        return packet;
+    }
+
+    public static Packet MakeRawPacket()
+    {
+        Packet packet = default(Packet);
+        packet.Count = 123;
+        packet.Owner = new Node(91);
+        return packet;
+    }
+
+    public static void Main()
+    {
+        int? empty = null;
+        Console.WriteLine(empty.HasValue == false);
+        Console.WriteLine(empty == null);
+        Console.WriteLine(null == empty);
+        Console.WriteLine(empty != null == false);
+
+        int? number = 42;
+        Console.WriteLine(number.HasValue);
+        Console.WriteLine(number.Value == 42);
+        Console.WriteLine((int)number == 42);
+        Console.WriteLine(number != null);
+
+        number = null;
+        Console.WriteLine(number.HasValue == false);
+        number = 19;
+        Console.WriteLine(number.Value == 19);
+
+        int? defaultNumber = default(int?);
+        Console.WriteLine(defaultNumber.HasValue == false);
+
+        Mode? defaultMode = default(Mode?);
+        Packet? defaultPacket = default(Packet?);
+        Console.WriteLine(defaultMode.HasValue == false);
+        Console.WriteLine(defaultPacket.HasValue == false);
+
+        bool? flag = true;
+        Console.WriteLine(flag.HasValue);
+        Console.WriteLine(flag.Value);
+
+        float? amount = 3.5f;
+        Console.WriteLine(amount.HasValue);
+        Console.WriteLine((int)amount.Value == 3);
+
+        Mode? mode = Mode.Ready;
+        Console.WriteLine(mode.HasValue);
+        Console.WriteLine(mode.Value == Mode.Ready);
+        Console.WriteLine((Mode)mode == Mode.Ready);
+
+        Packet packet = default(Packet);
+        packet.Count = 7;
+        packet.Owner = new Node(31);
+        Packet? maybePacket = packet;
+        Console.WriteLine(maybePacket.HasValue);
+        Console.WriteLine(maybePacket.Value.Count == 7);
+        Console.WriteLine(maybePacket.Value.Owner.Value == 31);
+        Packet unwrappedPacket = (Packet)maybePacket;
+        Console.WriteLine(unwrappedPacket.Count == 7);
+        Console.WriteLine(unwrappedPacket.Owner.Value == 31);
+
+        Holder holder = new Holder();
+        Console.WriteLine(holder.Score.HasValue == false);
+        Console.WriteLine(holder.Data.HasValue == false);
+        holder.Score = 9;
+        holder.Data = packet;
+        Console.WriteLine(holder.Score.Value == 9);
+        Console.WriteLine(holder.Data.Value.Count == 7);
+        GC.Collect();
+        Console.WriteLine(holder.Data.Value.Owner.Value == 31);
+
+        int? fromMethod = Maybe(true, 88);
+        int? fromMissing = Maybe(false, 88);
+        Console.WriteLine(fromMethod.Value == 88);
+        Console.WriteLine(fromMissing.HasValue == false);
+        Console.WriteLine(ReadOrZero(fromMethod) == 88);
+        Console.WriteLine(ReadOrZero(null) == 0);
+
+        var inferred = Maybe(true, 66);
+        Console.WriteLine(inferred.Value == 66);
+
+        int? wrapped = Wrap<int>(55);
+        Console.WriteLine(wrapped.HasValue);
+        Console.WriteLine(wrapped.Value == 55);
+
+        Mode? wrappedMode = Wrap<Mode>(Mode.Ready);
+        Console.WriteLine(wrappedMode.Value == Mode.Ready);
+
+        Packet? rootedPacket = MakePacket();
+        GC.Collect();
+        Console.WriteLine(rootedPacket.HasValue);
+        Console.WriteLine(rootedPacket.Value.Count == 99);
+        Console.WriteLine(rootedPacket.Value.Owner.Value == 77);
+
+        int?[] values = new int?[3];
+        values[0] = 5;
+        values[1] = null;
+        values[2] = 11;
+        Console.WriteLine(values[0].Value == 5);
+        Console.WriteLine(values[1].HasValue == false);
+        Console.WriteLine(values[2].Value == 11);
+
+        Packet?[] packets = new Packet?[1];
+        packets[0] = MakeRawPacket();
+        GC.Collect();
+        Console.WriteLine(packets[0].HasValue);
+        Console.WriteLine(packets[0].Value.Count == 123);
+        Console.WriteLine(packets[0].Value.Owner.Value == 91);
+
+        Type nullableType = typeof(int?);
+        Console.WriteLine(Runtime.Equals(nullableType.Name, "int?"));
+        Console.WriteLine(Runtime.Equals(nullableType.FullName, "int?"));
+        Console.WriteLine(nullableType.IsStruct);
+        Console.WriteLine(nullableType.IsValueType);
+        Console.WriteLine(nullableType.IsReferenceType == false);
+        Console.WriteLine(nullableType.UnderlyingType == typeof(int));
+        Console.WriteLine(Runtime.FindType("int?") == nullableType);
+    }
+}

@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "Void260NativeHeapFunctionPointerAudit",
+  "version": "0.0.260",
+  "output": "library",
+  "compiler": { "unsafe": true }
+}

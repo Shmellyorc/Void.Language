@@ -1,0 +1,270 @@
+using Void;
+
+public sealed class Window233
+{
+    private int[] _values;
+    private int _start;
+    private int _length;
+    public int LengthCalls;
+
+    public Window233(int[] values) : this(values, 0, values.Length) {}
+
+    private Window233(int[] values, int start, int length)
+    {
+        _values = values;
+        _start = start;
+        _length = length;
+        LengthCalls = 0;
+    }
+
+    public int Length
+    {
+        get
+        {
+            LengthCalls += 1;
+            return _length;
+        }
+    }
+
+    public int get_Item(int index)
+    {
+        if (index < 0 || index >= _length)
+            Runtime.Fail("Window233 index out of range");
+        return _values[_start + index];
+    }
+
+    public void set_Item(int index, int value)
+    {
+        if (index < 0 || index >= _length)
+            Runtime.Fail("Window233 index out of range");
+        _values[_start + index] = value;
+    }
+
+    public Window233 Slice(int start, int length)
+    {
+        if (start < 0 || length < 0 || start > _length || length > _length - start)
+            Runtime.Fail("Window233 range out of range");
+        return new Window233(_values, _start + start, length);
+    }
+}
+
+public struct ValueWindow233
+{
+    private int[] _values;
+    private int _start;
+    private int _length;
+
+    public ValueWindow233(int[] values) : this(values, 0, values.Length) {}
+
+    private ValueWindow233(int[] values, int start, int length)
+    {
+        _values = values;
+        _start = start;
+        _length = length;
+    }
+
+    public int Length => _length;
+    public int get_Item(int index) { return _values[_start + index]; }
+    public ValueWindow233 Slice(int start, int length)
+    {
+        return new ValueWindow233(_values, _start + start, length);
+    }
+}
+
+public sealed class RefWindow233
+{
+    public int[] Values;
+    public RefWindow233(int[] values) { Values = values; }
+    public int Length => Values.Length;
+    public ref int get_Item(int index) { return ref Values[index]; }
+}
+
+public interface IWindow233
+{
+    int Length { get; }
+    int get_Item(int index);
+    IWindow233 Slice(int start, int length);
+}
+
+public sealed class InterfaceWindow233 : IWindow233
+{
+    private int[] _values;
+    private int _start;
+    private int _length;
+
+    public InterfaceWindow233(int[] values) : this(values, 0, values.Length) {}
+    private InterfaceWindow233(int[] values, int start, int length)
+    {
+        _values = values;
+        _start = start;
+        _length = length;
+    }
+
+    public int Length => _length;
+    public int get_Item(int index) { return _values[_start + index]; }
+    public IWindow233 Slice(int start, int length)
+    {
+        return new InterfaceWindow233(_values, _start + start, length);
+    }
+}
+
+public class VirtualWindowBase233
+{
+    public virtual int Length => 1;
+    public virtual int get_Item(int index) { return -1; }
+    public virtual VirtualWindowBase233 Slice(int start, int length) { return this; }
+}
+
+public sealed class VirtualWindow233 : VirtualWindowBase233
+{
+    private int[] _values;
+    private int _start;
+    private int _length;
+
+    public VirtualWindow233(int[] values) : this(values, 0, values.Length) {}
+    private VirtualWindow233(int[] values, int start, int length)
+    {
+        _values = values;
+        _start = start;
+        _length = length;
+    }
+
+    public override int Length => _length;
+    public override int get_Item(int index) { return _values[_start + index]; }
+    public override VirtualWindowBase233 Slice(int start, int length)
+    {
+        return new VirtualWindow233(_values, _start + start, length);
+    }
+}
+
+public sealed class DirectIndex233
+{
+    public int Length => 5;
+    public int get_Item(int index) { return 100 + index; }
+    public int get_Item(Index index) { return 200 + index.Value; }
+}
+
+public sealed class DirectRange233
+{
+    public int Length => 5;
+    public int get_Item(Range range) { return 733; }
+    public DirectRange233 Slice(int start, int length) { return this; }
+}
+
+public static class Eval233
+{
+    public static int ReceiverCalls;
+    public static int StartCalls;
+    public static int EndCalls;
+    public static int Order;
+
+    public static Window233 Make()
+    {
+        ReceiverCalls += 1;
+        Order = Order * 10 + 1;
+        return new Window233(new int[] { 10, 20, 30, 40, 50 });
+    }
+
+    public static int Start()
+    {
+        StartCalls += 1;
+        Order = Order * 10 + 2;
+        return 1;
+    }
+
+    public static int End()
+    {
+        EndCalls += 1;
+        Order = Order * 10 + 3;
+        return 4;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Window233 window = new Window233(new int[] { 10, 20, 30, 40, 50 });
+
+        Console.WriteLine(window[^1] == 50);
+        Console.WriteLine(window[^5] == 10);
+        Index fromStart = 1;
+        Console.WriteLine(window[fromStart] == 20);
+        Index fromEnd = ^2;
+        Console.WriteLine(window[fromEnd] == 40);
+
+        Window233 middle = window[1..4];
+        Console.WriteLine(middle.Length == 3);
+        Console.WriteLine(middle[^1] == 40);
+        Window233 prefix = window[..2];
+        Console.WriteLine(prefix.Length == 2);
+        Console.WriteLine(prefix[^1] == 20);
+        Window233 suffix = window[2..];
+        Console.WriteLine(suffix.Length == 3);
+        Console.WriteLine(suffix[^3] == 30);
+        Window233 full = window[..];
+        Console.WriteLine(full.Length == 5);
+        Console.WriteLine(full[^1] == 50);
+        Window233 fromEnds = window[^4..^1];
+        Console.WriteLine(fromEnds.Length == 3);
+        Console.WriteLine(fromEnds[^1] == 40);
+
+        int receiverBefore = Eval233.ReceiverCalls;
+        Eval233.Order = 0;
+        Window233 dynamic = Eval233.Make()[Eval233.Start()..Eval233.End()];
+        Console.WriteLine(dynamic.Length == 3);
+        Console.WriteLine(Eval233.ReceiverCalls == receiverBefore + 1);
+        Console.WriteLine(Eval233.StartCalls == 1);
+        Console.WriteLine(Eval233.EndCalls == 1);
+        Console.WriteLine(Eval233.Order == 123);
+
+        int lengthBefore = window.LengthCalls;
+        Console.WriteLine(window[^1] == 50);
+        Console.WriteLine(window.LengthCalls == lengthBefore + 1);
+        lengthBefore = window.LengthCalls;
+        Window233 once = window[1..^1];
+        Console.WriteLine(once.Length == 3);
+        Console.WriteLine(window.LengthCalls == lengthBefore + 1);
+
+        window[^1] = 55;
+        Console.WriteLine(window[4] == 55);
+        window[^1] += 5;
+        Console.WriteLine(window[4] == 60);
+
+        RefWindow233 refWindow = new RefWindow233(new int[] { 2, 4, 6 });
+        ref int alias = ref refWindow[^1];
+        alias = 9;
+        Console.WriteLine(refWindow[2] == 9);
+        refWindow[^2] += 3;
+        Console.WriteLine(refWindow[1] == 7);
+
+        ValueWindow233 valueWindow = new ValueWindow233(new int[] { 3, 6, 9, 12 });
+        Console.WriteLine(valueWindow[^1] == 12);
+        ValueWindow233 valueSlice = valueWindow[1..^1];
+        Console.WriteLine(valueSlice.Length == 2);
+        Console.WriteLine(valueSlice[^2] == 6);
+
+        IWindow233 iface = new InterfaceWindow233(new int[] { 5, 10, 15, 20 });
+        Console.WriteLine(iface[^1] == 20);
+        IWindow233 ifaceSlice = iface[1..^1];
+        Console.WriteLine(ifaceSlice.Length == 2);
+        Console.WriteLine(ifaceSlice[^2] == 10);
+
+        VirtualWindowBase233 virtualWindow = new VirtualWindow233(new int[] { 7, 14, 21, 28 });
+        Console.WriteLine(virtualWindow[^1] == 28);
+        VirtualWindowBase233 virtualSlice = virtualWindow[1..^1];
+        Console.WriteLine(virtualSlice.Length == 2);
+        Console.WriteLine(virtualSlice[^2] == 14);
+
+        DirectIndex233 directIndex = new DirectIndex233();
+        Console.WriteLine(directIndex[^1] == 201);
+        DirectRange233 directRange = new DirectRange233();
+        Console.WriteLine(directRange[1..3] == 733);
+
+        Window233 missing = null;
+        int? missingValue = missing?[^1];
+        Console.WriteLine(!missingValue.HasValue);
+        Window233 missingSlice = missing?[1..3];
+        Console.WriteLine(missingSlice == null);
+    }
+}

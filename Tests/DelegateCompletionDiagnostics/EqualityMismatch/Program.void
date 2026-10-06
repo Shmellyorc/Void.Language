@@ -1,0 +1,18 @@
+using Void;
+
+public delegate void First();
+public delegate void Second();
+
+public static class Program
+{
+    public static void Ping()
+    {
+    }
+
+    public static void Main()
+    {
+        First first = Ping;
+        Second second = Ping;
+        Console.WriteLine(first == second);
+    }
+}

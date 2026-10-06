@@ -1,0 +1,96 @@
+using Void;
+using Void.Collections;
+
+public interface IValue
+{
+    int Value { get; }
+}
+
+public sealed class Box : IValue
+{
+    private int _value;
+
+    public Box(int value)
+    {
+        _value = value;
+    }
+
+    public int Value
+    {
+        get { return _value; }
+    }
+}
+
+public struct Pair
+{
+    public int Value { get; set; }
+}
+
+public static class Program
+{
+    private static IEnumerator<int> CaptureReference(object item)
+    {
+        if (item is Box box)
+        {
+            yield return 1;
+            GC.Collect();
+            yield return box.Value;
+        }
+    }
+
+    private static IEnumerator<int> CaptureInterface(object item)
+    {
+        if (item is IValue value and not null)
+        {
+            yield return 2;
+            GC.Collect();
+            yield return value.Value;
+        }
+    }
+
+    private static IEnumerator<int> CaptureValue(Pair pair)
+    {
+        if (pair is Pair value)
+        {
+            yield return 3;
+            value.Value = value.Value + 1;
+            yield return value.Value;
+        }
+    }
+
+    private static IEnumerator<int> CaptureWhile(object item)
+    {
+        while (item is Box box)
+        {
+            yield return 4;
+            item = null;
+            yield return box.Value;
+        }
+    }
+
+    private static void Check(IEnumerator<int> iterator, int first, int second)
+    {
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == first);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == second);
+        Console.WriteLine(!iterator.MoveNext());
+        iterator.Dispose();
+    }
+
+    public static void Main()
+    {
+        Check(CaptureReference(new Box(7)), 1, 7);
+        Check(CaptureInterface(new Box(8)), 2, 8);
+
+        Pair pair = new Pair();
+        pair.Value = 9;
+        Check(CaptureValue(pair), 3, 10);
+
+        Check(CaptureWhile(new Box(11)), 4, 11);
+
+        IEnumerator<int> none = CaptureReference(null);
+        Console.WriteLine(!none.MoveNext());
+        none.Dispose();
+    }
+}

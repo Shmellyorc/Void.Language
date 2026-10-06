@@ -1,0 +1,12 @@
+using Void;
+using Void.Threading;
+
+public static class Program
+{
+    public static void Main()
+    {
+        ThreadPool.Shutdown();
+        Action callback = () => { };
+        TimerQueue.Register(1, callback);
+    }
+}

@@ -1,0 +1,5 @@
+public struct Value
+{
+    public static Value operator !(Value left, Value right) { return left; }
+}
+public static class Program { public static void Main() {} }

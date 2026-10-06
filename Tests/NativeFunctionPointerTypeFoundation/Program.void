@@ -1,0 +1,64 @@
+using Void;
+
+public struct Pair255
+{
+    public int X;
+    public int Y;
+}
+
+public unsafe struct NativeTable255
+{
+    public delegate*<int, int> Transform;
+    public delegate*<int, int, int> Combine;
+    public delegate*<void> Notify;
+    public delegate*<int*, void*> PointerBridge;
+    public delegate*<Pair255, Pair255> PairTransform;
+}
+
+public static class Program
+{
+    private static unsafe delegate*<int, int> Identity(delegate*<int, int> value)
+    {
+        return value;
+    }
+
+    private static unsafe int UnmanagedSize<T>() where T : unmanaged
+    {
+        return sizeof(T);
+    }
+
+    public static unsafe void Main()
+    {
+        delegate*<int, int> first = null;
+        delegate*<int, int> second = default(delegate*<int, int>);
+        delegate*<int, int> third = Identity(first);
+        Console.WriteLine(first == null);
+        Console.WriteLine(null == second);
+        Console.WriteLine(first == second);
+        Console.WriteLine(third == null);
+        Console.WriteLine(!(first != default(delegate*<int, int>)));
+
+        NativeTable255 table = default(NativeTable255);
+        Console.WriteLine(table.Transform == null);
+        Console.WriteLine(table.Combine == null);
+        Console.WriteLine(table.Notify == null);
+        Console.WriteLine(table.PointerBridge == null);
+        Console.WriteLine(table.PairTransform == null);
+        Console.WriteLine(UnmanagedSize<NativeTable255>() > 0);
+
+        Type transformType = typeof(delegate*<int, int>);
+        Type combineType = typeof(delegate*<int, int, int>);
+        Type voidType = typeof(delegate*<void>);
+        Console.WriteLine(transformType.IsFunctionPointer);
+        Console.WriteLine(!transformType.IsPointer);
+        Console.WriteLine(!transformType.IsReferenceType);
+        Console.WriteLine(!transformType.IsValueType);
+        Console.WriteLine(transformType.ElementType == null);
+        Console.WriteLine(transformType != combineType);
+        Console.WriteLine(voidType.IsFunctionPointer);
+        Console.WriteLine(Runtime.Equals(transformType.FullName, "delegate*<int, int>"));
+        Console.WriteLine(Runtime.Equals(combineType.FullName, "delegate*<int, int, int>"));
+        Console.WriteLine(Runtime.Equals(voidType.FullName, "delegate*<void>"));
+        Console.WriteLine(sizeof(delegate*<int, int>) > 0);
+    }
+}

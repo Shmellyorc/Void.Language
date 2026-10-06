@@ -1,0 +1,7 @@
+public unsafe delegate int* PointerMap(int* value);
+public static class NativeC
+{
+    [Native("vc101_outer_ref")]
+    public static unsafe extern void Apply(ref PointerMap callback);
+}
+public static class Program { public static void Main() { } }

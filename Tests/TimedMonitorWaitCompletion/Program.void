@@ -1,0 +1,134 @@
+using Void;
+using Void.Threading;
+
+public sealed class Gate
+{
+    public int Phase;
+}
+
+public sealed class TimedWaitState
+{
+    public int Ready;
+    public int Done;
+    public int Signaled;
+    public int RecursiveOk;
+    public int SawPhase;
+}
+
+public static class Program
+{
+    private static void WaitUntilReady(TimedWaitState state)
+    {
+        while (Volatile.Read(ref state.Ready) == 0)
+        {
+        }
+    }
+
+    private static void TimeoutWorker(Gate gate, TimedWaitState state)
+    {
+        Monitor.Enter(gate);
+        Monitor.Enter(gate);
+        Volatile.Write(ref state.Ready, 1);
+        bool signaled = Monitor.Wait(gate, 20);
+        Monitor.Exit(gate);
+        Monitor.Pulse(gate);
+        Monitor.Exit(gate);
+        state.Signaled = signaled ? 1 : 0;
+        state.RecursiveOk = 1;
+        Volatile.Write(ref state.Done, 1);
+    }
+
+    private static void SignalWorker(Gate gate, TimedWaitState state, int timeout)
+    {
+        Monitor.Enter(gate);
+        Monitor.Enter(gate);
+        Volatile.Write(ref state.Ready, 1);
+        bool signaled = Monitor.Wait(gate, timeout);
+        Monitor.Exit(gate);
+        Monitor.Pulse(gate);
+        bool sawPhase = gate.Phase == 183;
+        Monitor.Exit(gate);
+        state.Signaled = signaled ? 1 : 0;
+        state.RecursiveOk = 1;
+        state.SawPhase = sawPhase ? 1 : 0;
+        Volatile.Write(ref state.Done, 1);
+    }
+
+    private static void IndefiniteWorker(Gate gate, TimedWaitState state)
+    {
+        Monitor.Enter(gate);
+        Volatile.Write(ref state.Ready, 1);
+        bool signaled = Monitor.Wait(gate);
+        Monitor.Exit(gate);
+        state.Signaled = signaled ? 1 : 0;
+        Volatile.Write(ref state.Done, 1);
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(Timeout.Infinite == -1);
+
+        Gate zeroGate = new Gate();
+        Monitor.Enter(zeroGate);
+        bool zeroSignaled = Monitor.Wait(zeroGate, 0);
+        Monitor.Pulse(zeroGate);
+        Monitor.Exit(zeroGate);
+        Console.WriteLine(!zeroSignaled);
+
+        Gate timeoutGate = new Gate();
+        TimedWaitState timeoutState = new TimedWaitState();
+        Thread timeoutWorker = new Thread(() => TimeoutWorker(timeoutGate, timeoutState));
+        timeoutWorker.Start();
+        WaitUntilReady(timeoutState);
+        Monitor.Enter(timeoutGate);
+        GC.Collect();
+        Thread.Sleep(50);
+        Console.WriteLine(Volatile.Read(ref timeoutState.Done) == 0);
+        Monitor.Exit(timeoutGate);
+        timeoutWorker.Join();
+        Console.WriteLine(timeoutState.Signaled == 0);
+        Console.WriteLine(timeoutState.RecursiveOk == 1);
+        Console.WriteLine(Volatile.Read(ref timeoutState.Done) == 1);
+
+        Gate signalGate = new Gate();
+        TimedWaitState signalState = new TimedWaitState();
+        Thread signalWorker = new Thread(() => SignalWorker(signalGate, signalState, 2000));
+        signalWorker.Start();
+        WaitUntilReady(signalState);
+        Monitor.Enter(signalGate);
+        signalGate.Phase = 183;
+        GC.Collect();
+        Monitor.Pulse(signalGate);
+        Console.WriteLine(Volatile.Read(ref signalState.Done) == 0);
+        Monitor.Exit(signalGate);
+        signalWorker.Join();
+        Console.WriteLine(signalState.Signaled == 1);
+        Console.WriteLine(signalState.RecursiveOk == 1);
+        Console.WriteLine(signalState.SawPhase == 1);
+
+        Gate infiniteGate = new Gate();
+        TimedWaitState infiniteState = new TimedWaitState();
+        Thread infiniteWorker = new Thread(() => SignalWorker(infiniteGate, infiniteState, Timeout.Infinite));
+        infiniteWorker.Start();
+        WaitUntilReady(infiniteState);
+        Monitor.Enter(infiniteGate);
+        infiniteGate.Phase = 183;
+        Monitor.Pulse(infiniteGate);
+        Monitor.Exit(infiniteGate);
+        infiniteWorker.Join();
+        Console.WriteLine(infiniteState.Signaled == 1);
+        Console.WriteLine(infiniteState.RecursiveOk == 1);
+
+        Gate indefiniteGate = new Gate();
+        TimedWaitState indefiniteState = new TimedWaitState();
+        Thread indefiniteWorker = new Thread(() => IndefiniteWorker(indefiniteGate, indefiniteState));
+        indefiniteWorker.Start();
+        WaitUntilReady(indefiniteState);
+        Monitor.Enter(indefiniteGate);
+        Monitor.Pulse(indefiniteGate);
+        Monitor.Exit(indefiniteGate);
+        indefiniteWorker.Join();
+        Console.WriteLine(indefiniteState.Signaled == 1);
+        Console.WriteLine(Volatile.Read(ref indefiniteState.Done) == 1);
+    }
+}

@@ -1,0 +1,16 @@
+public interface IValue
+{
+    int Value { get; }
+}
+
+public struct Broken : IValue
+{
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Broken value = new Broken();
+    }
+}

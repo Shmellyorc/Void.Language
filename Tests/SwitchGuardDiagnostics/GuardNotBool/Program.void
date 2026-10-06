@@ -1,0 +1,14 @@
+public static class Program
+{
+    public static void Main()
+    {
+        int value = 1;
+        switch (value)
+        {
+            case 1 when 4:
+                break;
+            default:
+                break;
+        }
+    }
+}

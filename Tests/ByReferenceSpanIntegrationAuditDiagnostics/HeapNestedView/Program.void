@@ -1,0 +1,10 @@
+using Void;
+public ref struct View230
+{
+    public Span<int> Values;
+}
+public sealed class Holder230
+{
+    public View230 View;
+}
+public static class Program { public static void Main() { } }

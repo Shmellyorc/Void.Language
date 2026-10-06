@@ -1,0 +1,16 @@
+using Void.Collections;
+public static class Program
+{
+    public static IEnumerator<int> Values()
+    {
+        try
+        {
+            Console.WriteLine(true);
+        }
+        finally
+        {
+            yield return 1;
+        }
+    }
+    public static void Main() { }
+}

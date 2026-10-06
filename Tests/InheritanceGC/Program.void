@@ -1,0 +1,30 @@
+namespace InheritanceGC;
+
+public class Item
+{
+    public int Value;
+}
+
+public class HolderBase
+{
+    public Item Current;
+}
+
+public sealed class Holder : HolderBase
+{
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Holder holder = new();
+        Item item = new();
+        item.Value = 77;
+        holder.Current = item;
+        item = null;
+
+        GC.Collect();
+        Console.WriteLine(holder.Current.Value);
+    }
+}

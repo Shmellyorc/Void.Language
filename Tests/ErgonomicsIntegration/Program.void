@@ -1,0 +1,187 @@
+using Void;
+
+public enum GameState
+{
+    None = 0,
+    Playing = 2,
+    Paused = 3
+}
+
+public static class Rules
+{
+    public const int DefaultId = 7;
+    public const int Bonus = 2;
+    public const string DefaultName = "Hero";
+    public const GameState DefaultState = GameState.Playing;
+}
+
+public struct Damage
+{
+    public int Value;
+
+    public Damage(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator Damage(int value)
+    {
+        return new Damage(value);
+    }
+
+    public static implicit operator int(Damage value)
+    {
+        return value.Value;
+    }
+
+    public static explicit operator float(Damage value)
+    {
+        return (float)value.Value;
+    }
+}
+
+public interface IActor
+{
+    int Kind();
+}
+
+public class Actor
+{
+    public virtual int Kind()
+    {
+        return 1;
+    }
+}
+
+[Discoverable(Name = "Hero", Metadata = "Integration050")]
+public sealed class Hero : Actor, IActor
+{
+    public readonly int Id;
+    public string Name;
+
+    public Hero(int id = Rules.DefaultId, string name = null)
+    {
+        Id = id;
+        Name = name ?? Rules.DefaultName;
+    }
+
+    public override int Kind()
+    {
+        return 2;
+    }
+
+    public string Label => Name ?? Rules.DefaultName;
+}
+
+public static class Program
+{
+    public static T Zero<T>()
+    {
+        return default(T);
+    }
+
+    public static int Resolve(GameState state = Rules.DefaultState, params Damage[] values)
+    {
+        int total = 0;
+        for (int i = 0; i < values.Length; i++)
+            total += values[i].Value;
+
+        switch (state)
+        {
+            case Rules.DefaultState:
+                return total + Rules.Bonus;
+            case GameState.Paused:
+                return default(int);
+            default:
+                return -1;
+        }
+    }
+
+    public static Hero Choose(Hero value = null)
+    {
+        return value ?? new Hero();
+    }
+
+    public static Type TypeOf<T>()
+    {
+        return typeof(T);
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(Rules.DefaultState == GameState.Playing);
+        Console.WriteLine(Resolve() == 2);
+        Console.WriteLine(Resolve(GameState.Playing, 1, 2, 3) == 8);
+        Console.WriteLine(Resolve(GameState.Paused, 9) == 0);
+        Console.WriteLine(Resolve(GameState.None, 9) == -1);
+
+        Hero hero = Choose();
+        Console.WriteLine(hero.Id == Rules.DefaultId);
+        Console.WriteLine(Runtime.Equals(hero.Name, Rules.DefaultName));
+        Console.WriteLine(Runtime.Equals(hero.Label, Rules.DefaultName));
+
+        Hero explicitHero = new Hero(12, null);
+        Console.WriteLine(explicitHero.Id == 12);
+        Console.WriteLine(Runtime.Equals(explicitHero.Name, Rules.DefaultName));
+
+        Hero missing = null;
+        Hero fallback = missing ?? hero;
+        Console.WriteLine(fallback == hero);
+        missing ??= new Hero(20, "Fallback");
+        Console.WriteLine(missing.Id == 20);
+        Console.WriteLine(Runtime.Equals(missing?.Name, "Fallback"));
+
+        Actor actor = hero;
+        Console.WriteLine(actor is Hero);
+        Console.WriteLine(actor is IActor);
+        Hero asHero = actor as Hero;
+        IActor asActor = actor as IActor;
+        Console.WriteLine(asHero == hero);
+        Console.WriteLine(asActor.Kind() == 2);
+        Hero castHero = (Hero)actor;
+        Console.WriteLine(castHero.Id == Rules.DefaultId);
+
+        Actor none = null;
+        Hero noneHero = none as Hero;
+        Console.WriteLine(noneHero == null);
+        Console.WriteLine(noneHero?.Name == null);
+
+        Damage damage = 5;
+        int rawDamage = damage;
+        float floatDamage = (float)damage;
+        Console.WriteLine(damage.Value == 5);
+        Console.WriteLine(rawDamage == 5);
+        Console.WriteLine(floatDamage == 5f);
+
+        Damage emptyDamage = default(Damage);
+        Console.WriteLine(emptyDamage.Value == 0);
+        Console.WriteLine(Zero<int>() == 0);
+        Console.WriteLine(Zero<GameState>() == GameState.None);
+        Console.WriteLine(Zero<Hero>() == null);
+
+        int rawState = (int)GameState.Playing;
+        GameState castState = (GameState)3;
+        Console.WriteLine(rawState == 2);
+        Console.WriteLine(castState == GameState.Paused);
+
+        Type heroType = typeof(Hero);
+        Console.WriteLine(heroType == TypeOf<Hero>());
+        Console.WriteLine(heroType.IsClass);
+        Console.WriteLine(heroType.IsReferenceType);
+        Console.WriteLine(Runtime.Equals(heroType.Name, "Hero"));
+        Console.WriteLine(Runtime.FindType("Hero") == heroType);
+        Console.WriteLine(Runtime.HasAttribute(heroType, "Discoverable"));
+        Console.WriteLine(Runtime.Equals(Runtime.AttributeValue(heroType, "Discoverable", "Metadata"), "Integration050"));
+
+        Type stateType = typeof(GameState);
+        Console.WriteLine(stateType.IsEnum);
+        Console.WriteLine(stateType.UnderlyingType == typeof(int));
+
+        Type damageType = typeof(Damage);
+        Console.WriteLine(damageType.IsStruct);
+        Console.WriteLine(damageType.IsValueType);
+
+        Hero optionalDefault = default(Hero) ?? Choose();
+        Console.WriteLine(optionalDefault.Id == Rules.DefaultId);
+    }
+}

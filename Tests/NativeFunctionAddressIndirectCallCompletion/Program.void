@@ -1,0 +1,64 @@
+using Void;
+
+public static class Native256
+{
+    [Native("voidc256_add")]
+    public static unsafe extern int Add(int left, int right);
+
+    [Native("voidc256_answer")]
+    public static unsafe extern int Answer();
+
+    [Native("voidc256_scale")]
+    public static unsafe extern void Scale(int* values, int count, int factor);
+
+    [Native("voidc256_identity")]
+    public static unsafe extern int* Identity(int* value);
+}
+
+public unsafe struct Table256
+{
+    public delegate*<int, int, int> Add;
+}
+
+public static class Program
+{
+    private static unsafe int CallTwice(delegate*<int, int, int> callback, int a, int b)
+    {
+        return callback(a, b) + callback(b, a);
+    }
+
+    public static unsafe void Main()
+    {
+        delegate*<int, int, int> add = &Native256.Add;
+        delegate*<int> answer = &Native256.Answer;
+        delegate*<int*, int, int, void> scale = &Native256.Scale;
+        delegate*<int*, int*> identity = &Native256.Identity;
+
+        Console.WriteLine(add != null);
+        Console.WriteLine(answer != null);
+        Console.WriteLine(scale != null);
+        Console.WriteLine(identity != null);
+        Console.WriteLine(add(20, 22) == 42);
+        Console.WriteLine(add(-7, 5) == -2);
+        Console.WriteLine(answer() == 42);
+
+        Table256 table = default(Table256);
+        table.Add = add;
+        Console.WriteLine(table.Add(7, 8) == 15);
+        Console.WriteLine(CallTwice(add, 3, 9) == 24);
+
+        int* values = stackalloc int[3];
+        values[0] = 2;
+        values[1] = 3;
+        values[2] = 5;
+        scale(values, 3, 4);
+        Console.WriteLine(values[0] == 8);
+        Console.WriteLine(values[1] == 12);
+        Console.WriteLine(values[2] == 20);
+        Console.WriteLine(identity(values) == values);
+
+        delegate*<int, int, int> copied = table.Add;
+        Console.WriteLine(copied(10, 11) == 21);
+        Console.WriteLine(copied == add);
+    }
+}

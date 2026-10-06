@@ -1,0 +1,86 @@
+using Void;
+using Void.Text;
+
+namespace Void.IO;
+
+public class StreamWriter : TextWriter
+{
+    private Stream _stream;
+    private Encoding _encoding;
+    private byte[] _bytes;
+    private int _count;
+    private bool _disposed;
+    private bool _leaveOpen;
+    private bool _preambleWritten;
+    private bool _autoFlush;
+    public Stream BaseStream { get { return _stream; } }
+    public Encoding Encoding { get { return _encoding; } }
+    public bool AutoFlush
+    {
+        get { return _autoFlush; }
+        set { this.CheckOpen(); _autoFlush = value; if (value) this.Flush(); }
+    }
+    public StreamWriter(Stream stream) : this(stream, new UTF8Encoding(false), 1024, false) { }
+    public StreamWriter(Stream stream, Encoding encoding) : this(stream, encoding, 1024, false) { }
+    public StreamWriter(Stream stream, Encoding encoding, int bufferSize, bool leaveOpen)
+    {
+        if (stream == null) throw new ArgumentNullException("stream");
+        if (encoding == null) throw new ArgumentNullException("encoding");
+        if (bufferSize <= 0) throw new ArgumentOutOfRangeException("bufferSize");
+        if (!stream.CanWrite) throw new ArgumentException("Stream does not support writing.");
+        _bytes = new byte[bufferSize]; _stream = stream; _encoding = encoding; _leaveOpen = leaveOpen;
+        _preambleWritten = stream.CanSeek && stream.Position > 0L;
+    }
+    public StreamWriter(string path) : this(path, false, new UTF8Encoding(false), 1024) { }
+    public StreamWriter(string path, bool append) : this(path, append, new UTF8Encoding(false), 1024) { }
+    public StreamWriter(string path, bool append, Encoding encoding) : this(path, append, encoding, 1024) { }
+    public StreamWriter(string path, bool append, Encoding encoding, int bufferSize)
+    {
+        IOErrors.CheckPath(path);
+        if (encoding == null) throw new ArgumentNullException("encoding");
+        if (bufferSize <= 0) throw new ArgumentOutOfRangeException("bufferSize");
+        _bytes = new byte[bufferSize]; _encoding = encoding;
+        FileStream file = new FileStream(path, append ? FileMode.Append : FileMode.Create, FileAccess.Write);
+        _stream = file;
+        _preambleWritten = file.Position > 0L;
+    }
+    private void CheckOpen()
+    {
+        if (_disposed) throw new ObjectDisposedException("StreamWriter");
+    }
+    private void WritePreamble()
+    {
+        if (_preambleWritten) return;
+        byte[] preamble = _encoding.GetPreamble();
+        _stream.Write(preamble, 0, preamble.Length);
+        _preambleWritten = true;
+    }
+    private void Drain()
+    {
+        this.WritePreamble();
+        if (_count > 0) { _stream.Write(_bytes, 0, _count); _count = 0; }
+    }
+    public void Flush() { this.CheckOpen(); this.Drain(); _stream.Flush(); }
+    public override void Write(string value)
+    {
+        this.CheckOpen();
+        if (value == null) return;
+        byte[] encoded = _encoding.GetBytes(value);
+        for (int i = 0; i < encoded.Length; i++)
+        {
+            if (_count == _bytes.Length) this.Drain();
+            _bytes[_count++] = encoded[i];
+        }
+        if (_autoFlush) this.Flush();
+    }
+    public override void Dispose()
+    {
+        if (_disposed) return;
+        try { this.Flush(); }
+        finally
+        {
+            _disposed = true;
+            if (!_leaveOpen) _stream.Dispose();
+        }
+    }
+}

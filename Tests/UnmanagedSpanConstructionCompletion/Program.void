@@ -1,0 +1,137 @@
+using Void;
+
+public struct Pair247
+{
+    public int X;
+    public int Y;
+}
+
+public sealed class Box247
+{
+    public int Value;
+}
+
+public static class Program
+{
+    private static int Calls;
+
+    private static unsafe T First<T>(T first, T second) where T : unmanaged
+    {
+        T* pointer = stackalloc T[2];
+        pointer[0] = first;
+        pointer[1] = second;
+        Span<T> span = new Span<T>(pointer, 2);
+        return span[0];
+    }
+
+    private static unsafe void* CountedPointer(int* pointer)
+    {
+        Calls++;
+        return pointer;
+    }
+
+    private static unsafe bool FixedBridge(Box247 box)
+    {
+        fixed (int* pointer = &box.Value)
+        {
+            Span<int> span = new Span<int>(pointer, 1);
+            span[0] = 91;
+            fixed (int* nested = span)
+                return nested == pointer && *nested == 91;
+        }
+    }
+
+    public static unsafe void Main()
+    {
+        int* values = stackalloc int[6];
+        for (int i = 0; i < 6; i++)
+            values[i] = i + 1;
+
+        Span<int> span = new Span<int>(values, 6);
+        Console.WriteLine(span.Length == 6);
+        Console.WriteLine(span[0] == 1 && span[5] == 6);
+
+        span[2] = 30;
+        Console.WriteLine(values[2] == 30);
+
+        Span<int> middle = span[1..5];
+        Console.WriteLine(middle.Length == 4 && middle[0] == 2 && middle[1] == 30);
+        middle[0] = 20;
+        Console.WriteLine(values[1] == 20);
+
+        ref int alias = ref span[3];
+        alias = 40;
+        Console.WriteLine(values[3] == 40);
+
+        int sum = 0;
+        foreach (ref int value in span)
+        {
+            sum += value;
+            value += 1;
+        }
+        Console.WriteLine(sum == 1 + 20 + 30 + 40 + 5 + 6);
+        Console.WriteLine(values[0] == 2 && values[5] == 7);
+
+        span.Fill(8);
+        Console.WriteLine(values[0] == 8 && values[5] == 8);
+        span[1..5].Clear();
+        Console.WriteLine(values[0] == 8 && values[1] == 0 && values[4] == 0 && values[5] == 8);
+
+        int* copyTarget = stackalloc int[6];
+        Span<int> destination = new Span<int>(copyTarget, 6);
+        span.CopyTo(destination);
+        Console.WriteLine(copyTarget[0] == 8 && copyTarget[5] == 8);
+
+        ReadOnlySpan<int> readOnly = new ReadOnlySpan<int>(values, 6);
+        Console.WriteLine(readOnly.Length == 6 && readOnly[0] == 8 && readOnly[5] == 8);
+        ReadOnlySpan<int> readMiddle = readOnly[1..^1];
+        Console.WriteLine(readMiddle.Length == 4 && readMiddle[0] == 0);
+
+        int readSum = 0;
+        foreach (ref readonly int value in readOnly)
+            readSum += value;
+        Console.WriteLine(readSum == 16);
+
+        void* raw = values;
+        Console.WriteLine(raw != null);
+        int* roundTrip = (int*)raw;
+        Console.WriteLine(roundTrip == values && roundTrip[0] == 8);
+
+        Span<int> rawSpan = new Span<int>(raw, 6);
+        Console.WriteLine(rawSpan[5] == 8);
+
+        Span<int> empty = new Span<int>((void*)null, 0);
+        ReadOnlySpan<int> readEmpty = new ReadOnlySpan<int>((void*)null, 0);
+        Console.WriteLine(empty.Length == 0 && empty.IsEmpty);
+        Console.WriteLine(readEmpty.Length == 0 && readEmpty.IsEmpty);
+
+        Pair247* pairs = stackalloc Pair247[2];
+        pairs[0].X = 3;
+        pairs[0].Y = 4;
+        pairs[1].X = 5;
+        pairs[1].Y = 6;
+        Span<Pair247> pairSpan = new Span<Pair247>(pairs, 2);
+        Console.WriteLine(pairSpan[0].X == 3 && pairSpan[1].Y == 6);
+        pairSpan[1].X = 50;
+        Console.WriteLine(pairs[1].X == 50);
+
+        Console.WriteLine(First<int>(17, 18) == 17);
+        Pair247 firstPair = First<Pair247>(pairs[0], pairs[1]);
+        Console.WriteLine(firstPair.X == 3 && firstPair.Y == 4);
+
+        Calls = 0;
+        Span<int> once = new Span<int>(CountedPointer(values), 6);
+        Console.WriteLine(once[0] == 8 && Calls == 1);
+
+        fixed (int* pinned = span)
+            Console.WriteLine(pinned == values && pinned[0] == 8);
+
+        Box247 box = new Box247();
+        box.Value = 7;
+        Console.WriteLine(FixedBridge(box));
+        Console.WriteLine(box.Value == 91);
+
+        Console.WriteLine(span.TryCopyTo(destination));
+        Console.WriteLine(destination[0] == span[0] && destination[5] == span[5]);
+    }
+}

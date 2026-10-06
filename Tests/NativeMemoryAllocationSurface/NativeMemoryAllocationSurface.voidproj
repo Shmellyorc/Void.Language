@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "NativeMemoryAllocationSurface",
+  "output": "exe",
+  "version": "0.0.252",
+  "compiler": {
+    "unsafe": true
+  }
+}

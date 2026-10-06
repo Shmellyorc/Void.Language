@@ -1,0 +1,23 @@
+[Swizzle("V")]
+public struct V2
+{
+    public int X;
+    public int Y;
+    public static V2 operator +(V2 left, V2 right) { return left; }
+}
+[Swizzle("V")]
+public struct V4
+{
+    public int X;
+    public int Y;
+    public int Z;
+    public int W;
+}
+public static class Program
+{
+    private static V4 GetValue() { return new V4(); }
+    public static void Main()
+    {
+        GetValue().xy += new V2();
+    }
+}

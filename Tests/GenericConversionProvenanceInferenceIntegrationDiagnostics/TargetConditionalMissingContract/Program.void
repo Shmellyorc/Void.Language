@@ -1,0 +1,16 @@
+public interface IMarker<T> { }
+public struct Number : IMarker<Number>
+{
+    public int Value;
+    public Number(int value) { Value = value; }
+    public static implicit operator int(Number value) { return value.Value; }
+    public static implicit operator Number(int value) { return new Number(value); }
+}
+public static class Program
+{
+    private static T Bad<T>(bool flag) where T : IMarker<T>
+    {
+        return flag ? 1 : 2;
+    }
+    public static void Main() { Number x = Bad<Number>(true); }
+}

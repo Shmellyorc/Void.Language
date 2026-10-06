@@ -1,0 +1,16 @@
+using Void.Collections;
+public sealed class Resource : IDisposable
+{
+    public void Dispose() { }
+}
+public static class Program
+{
+    public static IEnumerator<int> Values()
+    {
+        using (Resource value = new Resource())
+        {
+            yield return 1;
+        }
+    }
+    public static void Main() { }
+}

@@ -1,0 +1,290 @@
+namespace Void.Threading;
+
+private sealed class SemaphoreGate
+{
+}
+
+private sealed class SemaphoreWaiter
+{
+    public SemaphoreWaiter Next;
+    public bool Released;
+    public bool Canceled;
+
+    public SemaphoreWaiter()
+    {
+        Next = null;
+        Released = false;
+        Canceled = false;
+    }
+}
+
+public sealed class Semaphore
+{
+    private SemaphoreGate _gate;
+    private int _count;
+    private int _maximumCount;
+    private SemaphoreWaiter _head;
+    private SemaphoreWaiter _tail;
+
+    public Semaphore(int initialCount, int maximumCount)
+    {
+        if (maximumCount <= 0)
+            Runtime.Fail("semaphore maximum count must be positive");
+        if (initialCount < 0)
+            Runtime.Fail("semaphore initial count must be non-negative");
+        if (initialCount > maximumCount)
+            Runtime.Fail("semaphore initial count cannot exceed maximum count");
+
+        _gate = new SemaphoreGate();
+        _count = initialCount;
+        _maximumCount = maximumCount;
+        _head = null;
+        _tail = null;
+    }
+
+    private void Enqueue(SemaphoreWaiter waiter)
+    {
+        if (_tail == null)
+            _head = waiter;
+        else
+            _tail.Next = waiter;
+        _tail = waiter;
+    }
+
+    private SemaphoreWaiter Dequeue()
+    {
+        SemaphoreWaiter waiter = _head;
+        if (waiter == null)
+            return null;
+
+        _head = waiter.Next;
+        waiter.Next = null;
+        if (_head == null)
+            _tail = null;
+        return waiter;
+    }
+
+    private bool Remove(SemaphoreWaiter waiter)
+    {
+        SemaphoreWaiter previous = null;
+        SemaphoreWaiter current = _head;
+        while (current != null)
+        {
+            if (current == waiter)
+            {
+                if (previous == null)
+                    _head = current.Next;
+                else
+                    previous.Next = current.Next;
+
+                if (_tail == current)
+                    _tail = previous;
+                current.Next = null;
+                return true;
+            }
+
+            previous = current;
+            current = current.Next;
+        }
+        return false;
+    }
+
+    private void ReleaseWaiter(SemaphoreWaiter waiter)
+    {
+        Monitor.Enter(waiter);
+        waiter.Released = true;
+        Monitor.Pulse(waiter);
+        Monitor.Exit(waiter);
+    }
+
+    private void CancelWaiter(SemaphoreWaiter waiter)
+    {
+        Monitor.Enter(_gate);
+        bool removed = this.Remove(waiter);
+        if (removed)
+        {
+            Monitor.Enter(waiter);
+            waiter.Canceled = true;
+            Monitor.Pulse(waiter);
+            Monitor.Exit(waiter);
+        }
+        Monitor.Exit(_gate);
+    }
+
+    public bool WaitOne()
+    {
+        SemaphoreWaiter waiter = new SemaphoreWaiter();
+
+        Monitor.Enter(_gate);
+        if (_count > 0)
+        {
+            _count -= 1;
+            Monitor.Exit(_gate);
+            return true;
+        }
+        this.Enqueue(waiter);
+        Monitor.Exit(_gate);
+
+        Monitor.Enter(waiter);
+        while (!waiter.Released)
+            Monitor.Wait(waiter);
+        Monitor.Exit(waiter);
+        return true;
+    }
+
+    public bool WaitOne(int millisecondsTimeout)
+    {
+        if (millisecondsTimeout < Timeout.Infinite)
+            Runtime.Fail("semaphore wait timeout must be -1 or non-negative");
+
+        SemaphoreWaiter waiter = new SemaphoreWaiter();
+
+        Monitor.Enter(_gate);
+        if (_count > 0)
+        {
+            _count -= 1;
+            Monitor.Exit(_gate);
+            return true;
+        }
+        if (millisecondsTimeout == 0)
+        {
+            Monitor.Exit(_gate);
+            return false;
+        }
+        this.Enqueue(waiter);
+        Monitor.Exit(_gate);
+
+        Monitor.Enter(waiter);
+        if (waiter.Released)
+        {
+            Monitor.Exit(waiter);
+            return true;
+        }
+
+        bool notified = Monitor.Wait(waiter, millisecondsTimeout);
+        bool released = waiter.Released;
+        Monitor.Exit(waiter);
+        if (released)
+            return true;
+        if (notified)
+            Runtime.Fail("semaphore waiter signaled without release");
+
+        Monitor.Enter(_gate);
+        bool removed = this.Remove(waiter);
+        Monitor.Exit(_gate);
+        return !removed;
+    }
+
+    public bool WaitOne(CancellationToken cancellationToken)
+    {
+        return this.WaitOne(Timeout.Infinite, cancellationToken);
+    }
+
+    public bool WaitOne(int millisecondsTimeout, CancellationToken cancellationToken)
+    {
+        if (millisecondsTimeout < Timeout.Infinite)
+            Runtime.Fail("semaphore wait timeout must be -1 or non-negative");
+
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!cancellationToken.CanBeCanceled)
+            return this.WaitOne(millisecondsTimeout);
+
+        SemaphoreWaiter waiter = new SemaphoreWaiter();
+
+        Monitor.Enter(_gate);
+        if (_count > 0)
+        {
+            _count -= 1;
+            Monitor.Exit(_gate);
+            return true;
+        }
+        if (millisecondsTimeout == 0)
+        {
+            Monitor.Exit(_gate);
+            cancellationToken.ThrowIfCancellationRequested();
+            return false;
+        }
+        this.Enqueue(waiter);
+        Monitor.Exit(_gate);
+
+        CancellationTokenRegistration registration = cancellationToken.Register(() => this.CancelWaiter(waiter));
+        try
+        {
+            Monitor.Enter(waiter);
+            if (millisecondsTimeout == Timeout.Infinite)
+            {
+                while (!waiter.Released && !waiter.Canceled)
+                    Monitor.Wait(waiter);
+            }
+            else if (!waiter.Released && !waiter.Canceled)
+            {
+                Monitor.Wait(waiter, millisecondsTimeout);
+            }
+
+            bool released = waiter.Released;
+            bool canceled = waiter.Canceled;
+            Monitor.Exit(waiter);
+
+            if (released)
+                return true;
+            if (canceled)
+                throw new OperationCanceledException(cancellationToken);
+
+            Monitor.Enter(_gate);
+            bool removed = this.Remove(waiter);
+            Monitor.Exit(_gate);
+            if (removed)
+                return false;
+
+            Monitor.Enter(waiter);
+            released = waiter.Released;
+            canceled = waiter.Canceled;
+            Monitor.Exit(waiter);
+
+            if (released)
+                return true;
+            if (canceled)
+                throw new OperationCanceledException(cancellationToken);
+
+            Runtime.Fail("semaphore cancellable waiter completed without outcome");
+            return false;
+        }
+        finally
+        {
+            registration.Dispose();
+        }
+    }
+
+    public int Release()
+    {
+        return this.Release(1);
+    }
+
+    public int Release(int releaseCount)
+    {
+        if (releaseCount <= 0)
+            Runtime.Fail("semaphore release count must be positive");
+
+        Monitor.Enter(_gate);
+        int previousCount = _count;
+        if (releaseCount > _maximumCount - _count)
+        {
+            Monitor.Exit(_gate);
+            Runtime.Fail("semaphore release would exceed maximum count");
+        }
+
+        int remaining = releaseCount;
+        while (remaining > 0)
+        {
+            SemaphoreWaiter waiter = this.Dequeue();
+            if (waiter == null)
+                _count += 1;
+            else
+                this.ReleaseWaiter(waiter);
+            remaining -= 1;
+        }
+
+        Monitor.Exit(_gate);
+        return previousCount;
+    }
+}

@@ -1,0 +1,6 @@
+{
+  "format": 1,
+  "name": "ManagedStringsNativeStringAbiIntegrationAuditLibrary",
+  "version": "0.0.300",
+  "output": "library"
+}

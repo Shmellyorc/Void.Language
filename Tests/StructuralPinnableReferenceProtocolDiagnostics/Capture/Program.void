@@ -1,0 +1,2 @@
+using Void; public sealed class C245 { public int Value; public C245(int value) { Value = value; } public ref int GetPinnableReference() { return ref Value; } }
+public static class Program { public static unsafe void Main() { C245 x = new C245(1); fixed (int* p = x) { Action a = () => { int y = p[0]; }; } } }

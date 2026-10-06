@@ -1,0 +1,36 @@
+public delegate void ExitCallback();
+public delegate int UnaryCallback(int value);
+
+public static class NativeC
+{
+    [Native("atexit")]
+    public static unsafe extern int AtExit(ExitCallback callback);
+}
+
+public static class Callbacks
+{
+    public static void OnExit()
+    {
+        Console.WriteLine(99);
+    }
+}
+
+public static class Program
+{
+    public static int Double(int value)
+    {
+        return value * 2;
+    }
+
+    public static int Apply(UnaryCallback callback, int value)
+    {
+        return callback(value);
+    }
+
+    public static unsafe void Main()
+    {
+        Console.WriteLine(NativeC.AtExit(Callbacks.OnExit) == 0);
+        Console.WriteLine(Apply(Double, 6));
+        Console.WriteLine(37);
+    }
+}

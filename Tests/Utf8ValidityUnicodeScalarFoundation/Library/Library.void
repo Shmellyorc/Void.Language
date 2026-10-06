@@ -1,0 +1,9 @@
+using Void;
+public static class Utf8Export301
+{
+    [Export("void301_accept_export")]
+    public static int Accept(string text)
+    {
+        return text == null ? 0 : 1;
+    }
+}

@@ -1,0 +1,2 @@
+public unsafe struct Box242<T> { public T* Pointer; }
+public static class Program { public static void Main() { Box242<int> box = new Box242<int>(); } }

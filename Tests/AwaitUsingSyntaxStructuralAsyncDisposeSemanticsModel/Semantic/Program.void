@@ -1,0 +1,48 @@
+using Void;
+using Void.Threading.Tasks;
+using AwaitUsingExtensions275;
+
+public struct CustomCompletion275 { }
+public struct CustomAwaiter275
+{
+    public bool IsCompleted { get { return true; } }
+    public void OnCompleted(Action continuation) { continuation(); }
+    public void GetResult() { }
+}
+namespace AwaitUsingExtensions275
+{
+    public static class Extensions275
+    {
+        public static CustomAwaiter275 GetAwaiter(this CustomCompletion275 value)
+        {
+            return default;
+        }
+    }
+}
+public sealed class CustomResource275
+{
+    public CustomCompletion275 DisposeAsync() { return default; }
+}
+public sealed class TaskResource275
+{
+    public Task DisposeAsync() { return new Task(); }
+}
+public sealed class ValueTaskResource275
+{
+    public ValueTask DisposeAsync() { return default; }
+}
+public sealed class GenericResource275<T>
+{
+    public CustomCompletion275 DisposeAsync() { return default; }
+}
+public static class Program
+{
+    private static async Task Test()
+    {
+        await using (CustomResource275 custom = new CustomResource275()) { }
+        await using (new TaskResource275()) { }
+        await using var valueTask = new ValueTaskResource275();
+        await using GenericResource275<int> generic = new GenericResource275<int>();
+    }
+    public static void Main() { }
+}

@@ -1,0 +1,14 @@
+public struct Point225Diag
+{
+    public int X;
+    public Point225Diag(int x) { X = x; }
+}
+public static class Program
+{
+    public static void Main()
+    {
+        Point225Diag point = new Point225Diag(1);
+        ref readonly Point225Diag view = ref point;
+        view.X = 2;
+    }
+}

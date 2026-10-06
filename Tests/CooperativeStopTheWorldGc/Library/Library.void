@@ -1,0 +1,85 @@
+public sealed class GcThreadNode
+{
+    public int Value;
+    public GcThreadNode Child;
+
+    public GcThreadNode(int value)
+    {
+        Value = value;
+        Child = null;
+    }
+}
+
+public static class GcThreadNative
+{
+    [Native("void164_blocked_ready")]
+    public static unsafe extern void BlockedReady();
+
+    [Native("void164_wait_blocked_release")]
+    public static unsafe extern void WaitBlockedRelease();
+
+    [Native("void164_managed_ready")]
+    public static unsafe extern void ManagedReady();
+}
+
+public static class GcThreadApi
+{
+    private static void MakeGarbage(int seed)
+    {
+        GcThreadNode first = new GcThreadNode(seed);
+        GcThreadNode second = new GcThreadNode(seed + 1);
+        first.Child = second;
+        second.Child = first;
+    }
+
+    [Export("void164_blocked_root")]
+    public static unsafe int BlockedRoot(int value)
+    {
+        GcThreadNode root = new GcThreadNode(value);
+        root.Child = new GcThreadNode(value + 1000);
+        GcThreadNative.BlockedReady();
+        GcThreadNative.WaitBlockedRelease();
+        return root.Child.Value;
+    }
+
+    [Export("void164_managed_root")]
+    public static unsafe int ManagedRoot(int value, int iterations)
+    {
+        GcThreadNode root = new GcThreadNode(value);
+        root.Child = new GcThreadNode(value + 2000);
+        GcThreadNative.ManagedReady();
+
+        int spin = 0;
+        for (int i = 0; i < iterations; i++)
+        {
+            spin++;
+            if (spin == 1000)
+                spin = 0;
+        }
+
+        if (spin < 0)
+            return -1;
+        return root.Child.Value;
+    }
+
+    [Export("void164_collect_stress")]
+    public static int CollectStress(int rounds)
+    {
+        for (int round = 0; round < rounds; round++)
+        {
+            for (int i = 0; i < 256; i++)
+                MakeGarbage((round * 1000) + i);
+            GC.Collect();
+        }
+        return 164;
+    }
+
+    [Export("void164_collect_after_join")]
+    public static int CollectAfterJoin(int value)
+    {
+        GcThreadNode root = new GcThreadNode(value);
+        root.Child = new GcThreadNode(value + 3000);
+        GC.Collect();
+        return root.Child.Value;
+    }
+}

@@ -1,0 +1,8 @@
+public static class PinApi
+{
+    [Export("void243_ping")]
+    public static int Ping()
+    {
+        return 243;
+    }
+}

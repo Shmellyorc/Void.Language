@@ -1,0 +1,2 @@
+public sealed class Box244 { public readonly int Value; public Box244(int value) { Value = value; } }
+public static class Program { public static unsafe void Main() { Box244 b = new Box244(1); fixed (int* p = &b.Value) { } } }

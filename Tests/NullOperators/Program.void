@@ -1,0 +1,180 @@
+using Void;
+
+public sealed class Node
+{
+    public string Name;
+    public Node Child;
+
+    public Node(string name)
+    {
+        Name = name;
+    }
+
+    public string Label
+    {
+        get { return Name; }
+    }
+
+    public string GetName()
+    {
+        return Name;
+    }
+
+    public Node GetChild()
+    {
+        return Child;
+    }
+
+    public void SetName(string value)
+    {
+        Name = value;
+    }
+}
+
+public sealed class NullBodies
+{
+    public Node Value;
+
+    public NullBodies(Node value, Node fallback)
+    {
+        Value = value ?? fallback;
+    }
+
+    public Node Current => Value ?? null;
+
+    public Node Choose(Node value)
+    {
+        return value ?? Value;
+    }
+}
+
+public sealed class Holder
+{
+    public Node Value;
+}
+
+public sealed class Probe
+{
+    public int NodeCalls;
+    public int HolderCalls;
+    public int TextCalls;
+
+    public Node NextNode(Node value)
+    {
+        NodeCalls++;
+        return value;
+    }
+
+    public Holder NextHolder(Holder value)
+    {
+        HolderCalls++;
+        return value;
+    }
+
+    public string NextText(string value)
+    {
+        TextCalls++;
+        return value;
+    }
+
+    public Node CollectNode(Node value)
+    {
+        GC.Collect();
+        return value;
+    }
+
+    public Node[] NewNodes()
+    {
+        return new Node[1];
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Probe probe = new Probe();
+        Node fallback = new Node("fallback");
+        Node existing = new Node("existing");
+        Node none = null;
+
+        probe.NodeCalls = 0;
+        Node first = probe.NextNode(existing) ?? probe.NextNode(fallback);
+        Console.WriteLine(first == existing);
+        Console.WriteLine(probe.NodeCalls == 1);
+
+        probe.NodeCalls = 0;
+        Node second = probe.NextNode(none) ?? probe.NextNode(fallback);
+        Console.WriteLine(second == fallback);
+        Console.WriteLine(probe.NodeCalls == 2);
+
+        Node chained = none ?? none ?? fallback;
+        Console.WriteLine(chained == fallback);
+        Node fromNull = null ?? fallback;
+        Console.WriteLine(fromNull == fallback);
+
+        Node local = null;
+        probe.NodeCalls = 0;
+        local ??= probe.NextNode(fallback);
+        Console.WriteLine(local == fallback);
+        Console.WriteLine(probe.NodeCalls == 1);
+        local ??= probe.NextNode(existing);
+        Console.WriteLine(local == fallback);
+        Console.WriteLine(probe.NodeCalls == 1);
+
+        Holder holder = new Holder();
+        probe.HolderCalls = 0;
+        probe.NodeCalls = 0;
+        probe.NextHolder(holder).Value ??= probe.NextNode(fallback);
+        Console.WriteLine(holder.Value == fallback);
+        Console.WriteLine(probe.HolderCalls == 1);
+        Console.WriteLine(probe.NodeCalls == 1);
+        probe.NextHolder(holder).Value ??= probe.NextNode(existing);
+        Console.WriteLine(holder.Value == fallback);
+        Console.WriteLine(probe.HolderCalls == 2);
+        Console.WriteLine(probe.NodeCalls == 1);
+
+        Node temporaryField = new Holder().Value ??= probe.CollectNode(fallback);
+        Console.WriteLine(temporaryField == fallback);
+        Node temporaryArray = probe.NewNodes()[0] ??= probe.CollectNode(fallback);
+        Console.WriteLine(temporaryArray == fallback);
+
+        probe.NodeCalls = 0;
+        string fieldName = probe.NextNode(existing)?.Name;
+        Console.WriteLine(fieldName == existing.Name);
+        Console.WriteLine(probe.NodeCalls == 1);
+        string missingField = probe.NextNode(none)?.Name;
+        Console.WriteLine(missingField == null);
+        Console.WriteLine(probe.NodeCalls == 2);
+
+        Console.WriteLine(existing?.Label == existing.Name);
+        Console.WriteLine(none?.Label == null);
+        Console.WriteLine(existing?.GetName() == existing.Name);
+        Console.WriteLine(none?.GetName() == null);
+
+        probe.TextCalls = 0;
+        none?.SetName(probe.NextText("bad"));
+        Console.WriteLine(probe.TextCalls == 0);
+        string changed = "changed";
+        existing?.SetName(probe.NextText(changed));
+        Console.WriteLine(probe.TextCalls == 1);
+        Console.WriteLine(existing.Name == changed);
+
+        existing.Child = fallback;
+        Console.WriteLine(existing?.Child.Name == fallback.Name);
+        Console.WriteLine(none?.Child.Name == null);
+        Console.WriteLine(existing?.GetChild().Name == fallback.Name);
+        Console.WriteLine(none?.GetChild().Name == null);
+
+        existing.Child = null;
+        Console.WriteLine(existing?.Child?.Name == null);
+
+        NullBodies bodies = new NullBodies(null, fallback);
+        Console.WriteLine(bodies.Value == fallback);
+        Console.WriteLine(bodies.Current == fallback);
+        Console.WriteLine(bodies.Choose(null) == fallback);
+
+        Func<Node, Node> choose = value => value ?? fallback;
+        Console.WriteLine(choose(null) == fallback);
+    }
+}

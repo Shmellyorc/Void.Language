@@ -1,0 +1,296 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class AuditNode210
+{
+    public int Value;
+    public AuditNode210 Next;
+
+    public AuditNode210(int value)
+    {
+        Value = value;
+        Next = null;
+    }
+}
+
+public sealed class AuditFault210 : Exception
+{
+    public AuditNode210 Payload;
+
+    public AuditFault210(string message, AuditNode210 payload) : base(message)
+    {
+        Payload = payload;
+    }
+}
+
+public interface IAuditService210
+{
+    Task<int> Compute(Task gate, int value);
+}
+
+public sealed class AuditService210 : IAuditService210
+{
+    private int _bias;
+
+    public AuditService210(int bias)
+    {
+        _bias = bias;
+    }
+
+    public async Task<int> Compute(Task gate, int value)
+    {
+        await gate;
+        GC.Collect();
+        return value + _bias;
+    }
+}
+
+public static class Program
+{
+    public static int Sequence;
+
+    private static void Check(bool value)
+    {
+        Console.WriteLine(value);
+    }
+
+    private static bool WaitAuditFault(Task task, int expected)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (AuditFault210 error)
+        {
+            GC.Collect();
+            return task.IsFaulted && !task.IsCanceled &&
+                error.Payload != null &&
+                error.Payload.Value == expected &&
+                error.Payload.Next != null &&
+                error.Payload.Next.Value == expected + 1;
+        }
+        return false;
+    }
+
+    private static bool WaitCanceled(Task task, CancellationToken expected)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observed = error.CancellationToken;
+            CancellationToken stored = task.CancellationToken;
+            return task.IsCanceled && !task.IsFaulted &&
+                observed.IsSameSource(expected) &&
+                stored.IsSameSource(expected);
+        }
+        return false;
+    }
+
+    private static async Task<int> MultiAwait(
+        Task<int> first,
+        Task second,
+        AuditNode210 node)
+    {
+        int firstValue = await first;
+        AuditNode210 kept = node;
+        await second;
+        GC.Collect();
+        Func<int> read = () => kept.Value;
+        return firstValue + read();
+    }
+
+    private static async Task<int> CatchAwaitFault(Task gate, AuditNode210 payload)
+    {
+        Sequence = 0;
+        try
+        {
+            await gate;
+            throw new AuditFault210("handled", payload);
+        }
+        catch (AuditFault210 error)
+        {
+            Sequence = Sequence * 10 + 2;
+            await CompletedTask();
+            return error.Payload.Value + 1;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 3;
+        }
+    }
+
+    private static async Task ThrowAfterAwait(Task gate, AuditNode210 payload)
+    {
+        await gate;
+        GC.Collect();
+        throw new AuditFault210("audit", payload);
+    }
+
+    private static async Task CancelAfterAwait(Task gate, CancellationToken token)
+    {
+        Sequence = 0;
+        try
+        {
+            Sequence = 1;
+            await gate;
+            token.ThrowIfCancellationRequested();
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 4;
+        }
+    }
+
+    private static async Task<T> GenericClosure<T>(Task gate, T value)
+    {
+        T captured = value;
+        Func<T> read = () => captured;
+        await gate;
+        GC.Collect();
+        return read();
+    }
+
+    private static async Task<int> ShutdownChain(
+        Task<int> first,
+        Task<int> second,
+        AuditNode210 node)
+    {
+        int a = await first;
+        GC.Collect();
+        int b = await second;
+        return a + b + node.Value;
+    }
+
+    private static Task CompletedTask()
+    {
+        TaskCompletionSource source = new TaskCompletionSource();
+        source.SetResult();
+        return source.Task;
+    }
+
+    public static void Main()
+    {
+        TaskCompletionSource<int> completedFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource completedSecond = new TaskCompletionSource();
+        completedFirst.SetResult(20);
+        completedSecond.SetResult();
+        AuditNode210 completedNode = new AuditNode210(22);
+        Task<int> completed = MultiAwait(completedFirst.Task, completedSecond.Task, completedNode);
+        Check(completed.Status == TaskStatus.Completed);
+        Check(completed.Result == 42);
+
+        TaskCompletionSource<int> pendingFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource pendingSecond = new TaskCompletionSource();
+        AuditNode210 pendingNode = new AuditNode210(30);
+        Task<int> pending = MultiAwait(pendingFirst.Task, pendingSecond.Task, pendingNode);
+        pendingNode = null;
+        GC.Collect();
+        Check(!pending.IsCompleted);
+        pendingFirst.SetResult(12);
+        pendingSecond.SetResult();
+        Check(pending.Result == 42);
+        Check(pending.Status == TaskStatus.Completed);
+
+        TaskCompletionSource handledGate = new TaskCompletionSource();
+        AuditNode210 handledPayload = new AuditNode210(40);
+        Task<int> handled = CatchAwaitFault(handledGate.Task, handledPayload);
+        handledGate.SetResult();
+        Check(handled.Result == 41);
+        Check(Sequence == 23);
+        Check(!handled.IsFaulted && !handled.IsCanceled);
+
+        TaskCompletionSource faultGate = new TaskCompletionSource();
+        AuditNode210 faultPayload = new AuditNode210(50);
+        faultPayload.Next = new AuditNode210(51);
+        Task faulted = ThrowAfterAwait(faultGate.Task, faultPayload);
+        faultPayload = null;
+        GC.Collect();
+        faultGate.SetResult();
+        Check(WaitAuditFault(faulted, 50));
+        Check(faulted.Status == TaskStatus.Faulted);
+
+        CancellationTokenSource cancelSource = new CancellationTokenSource();
+        CancellationToken cancelToken = cancelSource.Token;
+        TaskCompletionSource cancelGate = new TaskCompletionSource();
+        Task canceled = CancelAfterAwait(cancelGate.Task, cancelToken);
+        cancelSource.Cancel();
+        cancelGate.SetResult();
+        Check(WaitCanceled(canceled, cancelToken));
+        Check(canceled.Status == TaskStatus.Canceled);
+        Check(Sequence == 14);
+
+        TaskCompletionSource genericGate = new TaskCompletionSource();
+        AuditNode210 genericNode = new AuditNode210(60);
+        genericNode.Next = new AuditNode210(61);
+        Task<AuditNode210> generic = GenericClosure<AuditNode210>(genericGate.Task, genericNode);
+        genericNode = null;
+        GC.Collect();
+        Check(!generic.IsCompleted);
+        genericGate.SetResult();
+        AuditNode210 genericResult = generic.Result;
+        Check(genericResult.Value == 60 && genericResult.Next.Value == 61);
+
+        TaskCompletionSource serviceGate = new TaskCompletionSource();
+        IAuditService210 service = new AuditService210(7);
+        Task<int> serviceTask = service.Compute(serviceGate.Task, 35);
+        service = null;
+        GC.Collect();
+        Check(!serviceTask.IsCompleted);
+        serviceGate.SetResult();
+        Check(serviceTask.Result == 42);
+
+        TaskCompletionSource<int> continuationFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource continuationSecond = new TaskCompletionSource();
+        Task<int> continuationRoot = MultiAwait(
+            continuationFirst.Task,
+            continuationSecond.Task,
+            new AuditNode210(2));
+        Task<int> continuation = continuationRoot.ContinueWith<int>(task => task.Result + 1);
+        continuationFirst.SetResult(39);
+        continuationSecond.SetResult();
+        Check(continuationRoot.Result == 41);
+        Check(continuation.Result == 42);
+
+        TaskCompletionSource<int> shutdownFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> shutdownSecond = new TaskCompletionSource<int>();
+        AuditNode210 shutdownNode = new AuditNode210(10);
+        Task<int> shutdownRoot = ShutdownChain(
+            shutdownFirst.Task,
+            shutdownSecond.Task,
+            shutdownNode);
+        Task<int> shutdownContinuation =
+            shutdownRoot.ContinueWith<int>(task => task.Result + 1);
+        Check(!shutdownRoot.IsCompleted);
+
+        ThreadPool.QueueUserWorkItem(() =>
+        {
+            GC.Collect();
+            shutdownFirst.SetResult(12);
+        });
+        ThreadPool.QueueUserWorkItem(() =>
+        {
+            GC.Collect();
+            shutdownSecond.SetResult(19);
+        });
+
+        ThreadPool.Shutdown();
+        Check(shutdownRoot.Status == TaskStatus.Completed);
+        Check(shutdownRoot.Result == 41);
+        Check(shutdownContinuation.Result == 42);
+
+        TaskCompletionSource<int> postShutdownFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource postShutdownSecond = new TaskCompletionSource();
+        postShutdownFirst.SetResult(20);
+        postShutdownSecond.SetResult();
+        Task<int> postShutdown = MultiAwait(
+            postShutdownFirst.Task,
+            postShutdownSecond.Task,
+            new AuditNode210(22));
+        Check(postShutdown.Status == TaskStatus.Completed);
+        Check(postShutdown.Result == 42);
+    }
+}

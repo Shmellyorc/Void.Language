@@ -1,0 +1,189 @@
+using Void;
+using Void.Collections;
+
+public interface ILeaf
+{
+    int Value { get; }
+}
+
+public sealed class Leaf : ILeaf
+{
+    private int _value;
+    public Leaf(int value) { _value = value; }
+    public int Value { get { return _value; } }
+}
+
+public sealed class Child
+{
+    public Leaf Leaf { get; set; }
+    public ILeaf Contract { get; set; }
+    public int Number { get; set; }
+}
+
+public sealed class Holder
+{
+    public Child Child { get; set; }
+}
+
+public struct Point
+{
+    public int X { get; set; }
+}
+
+public struct ValueHolder
+{
+    public Point Point { get; set; }
+}
+
+public sealed class ProbeChild
+{
+    private Leaf _leaf;
+    public int Calls;
+    public ProbeChild(Leaf leaf) { _leaf = leaf; }
+    public Leaf Leaf
+    {
+        get
+        {
+            Calls++;
+            return _leaf;
+        }
+    }
+}
+
+public sealed class ProbeHolder
+{
+    private ProbeChild _child;
+    public int Calls;
+    public ProbeHolder(ProbeChild child) { _child = child; }
+    public ProbeChild Child
+    {
+        get
+        {
+            Calls++;
+            return _child;
+        }
+    }
+}
+
+public sealed class GcChild
+{
+    private Leaf _leaf;
+    public GcChild(Leaf leaf) { _leaf = leaf; }
+    public Leaf Leaf
+    {
+        get
+        {
+            GC.Collect();
+            return _leaf;
+        }
+    }
+}
+
+public sealed class GcHolder
+{
+    private GcChild _child;
+    public GcHolder(GcChild child) { _child = child; }
+    public GcChild Child
+    {
+        get
+        {
+            GC.Collect();
+            return _child;
+        }
+    }
+}
+
+public sealed class GenericMatcher<T>
+{
+    public bool Match(Holder holder)
+    {
+        return holder is { Child: { Leaf: { Value: > 5 and < 10 } } };
+    }
+}
+
+public static class Program
+{
+    private static IEnumerator<int> MatchYield(Holder holder)
+    {
+        if (holder is { Child: { Leaf: { Value: 7 } } })
+            yield return 7;
+        else
+            yield return 0;
+    }
+
+    public static void Main()
+    {
+        Leaf leaf = new Leaf(7);
+        Child child = new Child();
+        child.Leaf = leaf;
+        child.Contract = leaf;
+        child.Number = 3;
+        Holder holder = new Holder();
+        holder.Child = child;
+
+        Console.WriteLine(holder is { Child: { Leaf: { Value: 7 } } });
+        Console.WriteLine(holder is { Child: { Leaf: { Value: > 5 and < 10 } } });
+        Console.WriteLine(!(holder is { Child: { Leaf: { Value: < 0 } } }));
+        Console.WriteLine(holder is { Child: { Contract: { Value: 7 } } });
+
+        if (holder is { Child: Child matchedChild })
+            Console.WriteLine(matchedChild.Number == 3);
+        else
+            Console.WriteLine(false);
+
+        if (holder is { Child: { Leaf: Leaf matchedLeaf } })
+            Console.WriteLine(matchedLeaf.Value == 7);
+        else
+            Console.WriteLine(false);
+
+        if (holder is { Child: Child narrowed and { Number: > 0, Leaf: { Value: 7 } } })
+            Console.WriteLine(narrowed.Number == 3);
+        else
+            Console.WriteLine(false);
+
+        Holder none = new Holder();
+        none.Child = null;
+        Console.WriteLine(!(none is { Child: { Leaf: { Value: 7 } } }));
+        if (none is { Child: Child absent })
+            Console.WriteLine(false);
+        else
+            Console.WriteLine(true);
+
+        ValueHolder valueHolder = new ValueHolder();
+        Point point = new Point();
+        point.X = 12;
+        valueHolder.Point = point;
+        Console.WriteLine(valueHolder is { Point: { X: 12 } });
+        Console.WriteLine(valueHolder is { Point: { X: > 10 } });
+
+        ProbeChild probeChild = new ProbeChild(new Leaf(9));
+        ProbeHolder probeHolder = new ProbeHolder(probeChild);
+        Console.WriteLine(probeHolder is { Child: { Leaf: { Value: 9 } } });
+        Console.WriteLine(probeHolder.Calls == 1);
+        Console.WriteLine(probeChild.Calls == 1);
+
+        GcHolder gcHolder = new GcHolder(new GcChild(new Leaf(11)));
+        Console.WriteLine(gcHolder is { Child: { Leaf: { Value: 11 } } });
+
+        GenericMatcher<int> matcher = new GenericMatcher<int>();
+        Console.WriteLine(matcher.Match(holder));
+
+        Holder loop = holder;
+        int count = 0;
+        while (loop is { Child: { Leaf: Leaf loopLeaf } })
+        {
+            Console.WriteLine(loopLeaf.Value == 7);
+            count++;
+            loop = none;
+        }
+        Console.WriteLine(count == 1);
+
+        var iterator = MatchYield(holder);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == 7);
+        iterator.Dispose();
+
+        Console.WriteLine(holder is { Child: { Leaf: { } } });
+        Console.WriteLine(holder is { Child: { Contract: not null } });
+    }
+}

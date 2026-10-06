@@ -1,0 +1,6 @@
+{
+  "format": 1,
+  "name": "ByReferenceSpanIntegrationAudit",
+  "version": "0.0.230",
+  "output": "exe"
+}

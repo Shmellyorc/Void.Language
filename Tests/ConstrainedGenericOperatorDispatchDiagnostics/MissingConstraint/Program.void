@@ -1,0 +1,11 @@
+public struct Number
+{
+    public int Value;
+    public Number(int value) { Value = value; }
+    public static Number operator +(Number left, Number right) { return new Number(left.Value + right.Value); }
+}
+public static class Program
+{
+    private static T Add<T>(T left, T right) { T a = left; T b = right; return a + b; }
+    public static void Main() { Number x = Add(new Number(1), new Number(2)); }
+}

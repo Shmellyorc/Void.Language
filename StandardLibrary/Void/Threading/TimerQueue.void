@@ -1,0 +1,285 @@
+namespace Void.Threading;
+
+using Void;
+
+private sealed class TimerQueueGate
+{
+}
+
+private sealed class TimerQueueNode
+{
+    public long DueMilliseconds;
+    public Action Callback;
+    public TimerQueueNode Next;
+    public int State;
+
+    public TimerQueueNode(long dueMilliseconds, Action callback)
+    {
+        DueMilliseconds = dueMilliseconds;
+        Callback = callback;
+        Next = null;
+        State = 0;
+    }
+
+    public void Invoke()
+    {
+        if (Interlocked.CompareExchange(ref State, 2, 1) != 1)
+            return;
+
+        Action callback = Callback;
+        Callback = null;
+        try
+        {
+            callback();
+        }
+        finally
+        {
+            Interlocked.Exchange(ref State, 3);
+        }
+    }
+}
+
+internal readonly struct TimerQueueRegistration : IDisposable
+{
+    private readonly TimerQueueNode _node;
+
+    internal TimerQueueRegistration(TimerQueueNode node)
+    {
+        _node = node;
+    }
+
+    public void Dispose()
+    {
+        if (_node != null)
+            TimerQueue.Cancel(_node);
+    }
+}
+
+internal static class TimerQueue
+{
+    private static TimerQueueGate _gate = new TimerQueueGate();
+    private static TimerQueueNode _head;
+    private static Thread _worker;
+    private static bool _started;
+    private static bool _ready;
+    private static bool _shutdownRequested;
+    private static bool _shutdownCompleted;
+
+    private static long NowMilliseconds()
+    {
+        return Runtime.MonotonicTimeMilliseconds();
+    }
+
+    private static void EnsureStarted()
+    {
+        Monitor.Enter(_gate);
+        if (_shutdownRequested || _shutdownCompleted)
+        {
+            Monitor.Exit(_gate);
+            Runtime.Fail("timer queue has been shut down");
+        }
+
+        if (!_started)
+        {
+            _started = true;
+            Action workerAction = WorkerLoop;
+            _worker = new Thread(workerAction);
+            _worker.Start();
+            while (!_ready)
+                Monitor.Wait(_gate);
+        }
+        Monitor.Exit(_gate);
+    }
+
+    private static void Insert(TimerQueueNode node)
+    {
+        if (_head == null || node.DueMilliseconds < _head.DueMilliseconds)
+        {
+            node.Next = _head;
+            _head = node;
+            return;
+        }
+
+        TimerQueueNode current = _head;
+        while (current.Next != null && current.Next.DueMilliseconds <= node.DueMilliseconds)
+            current = current.Next;
+        node.Next = current.Next;
+        current.Next = node;
+    }
+
+    private static bool Remove(TimerQueueNode node)
+    {
+        TimerQueueNode previous = null;
+        TimerQueueNode current = _head;
+        while (current != null)
+        {
+            if (current == node)
+            {
+                if (previous == null)
+                    _head = current.Next;
+                else
+                    previous.Next = current.Next;
+                current.Next = null;
+                return true;
+            }
+            previous = current;
+            current = current.Next;
+        }
+        return false;
+    }
+
+    private static void WorkerLoop()
+    {
+        Monitor.Enter(_gate);
+        _ready = true;
+        Monitor.PulseAll(_gate);
+        Monitor.Exit(_gate);
+
+        while (true)
+        {
+            TimerQueueNode due = null;
+
+            Monitor.Enter(_gate);
+            while (due == null)
+            {
+                if (_shutdownRequested)
+                {
+                    Monitor.Exit(_gate);
+                    return;
+                }
+
+                if (_head == null)
+                {
+                    Monitor.Wait(_gate);
+                    continue;
+                }
+
+                long now = NowMilliseconds();
+                long remaining = _head.DueMilliseconds - now;
+                if (remaining <= 0L)
+                {
+                    due = _head;
+                    _head = due.Next;
+                    due.Next = null;
+                    if (Interlocked.CompareExchange(ref due.State, 1, 0) != 0)
+                        due = null;
+                    continue;
+                }
+
+                int waitMilliseconds = remaining > 2147483647L ? 2147483647 : (int)remaining;
+                Monitor.Wait(_gate, waitMilliseconds);
+            }
+            Monitor.Exit(_gate);
+
+            Action invoke = due.Invoke;
+            ThreadPool.QueueTaskContinuation(invoke);
+        }
+    }
+
+    internal static TimerQueueRegistration Register(int millisecondsDelay, Action callback)
+    {
+        if (millisecondsDelay < 0)
+            Runtime.Fail("timer delay must be non-negative");
+        if (callback == null)
+            Runtime.Fail("timer callback cannot be null");
+
+        EnsureStarted();
+
+        long dueMilliseconds = NowMilliseconds() + (long)millisecondsDelay;
+        TimerQueueNode node = new TimerQueueNode(dueMilliseconds, callback);
+
+        Monitor.Enter(_gate);
+        if (_shutdownRequested || _shutdownCompleted)
+        {
+            Monitor.Exit(_gate);
+            Runtime.Fail("timer queue has been shut down");
+        }
+        bool wakesWorker = _head == null || dueMilliseconds < _head.DueMilliseconds;
+        Insert(node);
+        if (wakesWorker)
+            Monitor.Pulse(_gate);
+        Monitor.Exit(_gate);
+
+        return new TimerQueueRegistration(node);
+    }
+
+    internal static void Cancel(TimerQueueNode node)
+    {
+        if (node == null)
+            return;
+
+        int state = Volatile.Read(ref node.State);
+        while (state == 0 || state == 1)
+        {
+            if (Interlocked.CompareExchange(ref node.State, 4, state) == state)
+                break;
+            state = Volatile.Read(ref node.State);
+        }
+
+        if (state == 0)
+        {
+            Monitor.Enter(_gate);
+            bool removedHead = _head == node;
+            Remove(node);
+            if (removedHead)
+                Monitor.Pulse(_gate);
+            Monitor.Exit(_gate);
+        }
+
+        if (Volatile.Read(ref node.State) == 4)
+            node.Callback = null;
+    }
+
+    internal static void Shutdown()
+    {
+        Thread worker = null;
+
+        Monitor.Enter(_gate);
+        if (_shutdownCompleted)
+        {
+            Monitor.Exit(_gate);
+            return;
+        }
+
+        if (!_started)
+        {
+            _shutdownRequested = true;
+            _shutdownCompleted = true;
+            Monitor.Exit(_gate);
+            return;
+        }
+
+        if (_shutdownRequested)
+        {
+            while (!_shutdownCompleted)
+                Monitor.Wait(_gate);
+            Monitor.Exit(_gate);
+            return;
+        }
+
+        _shutdownRequested = true;
+        TimerQueueNode current = _head;
+        _head = null;
+        while (current != null)
+        {
+            TimerQueueNode next = current.Next;
+            current.Next = null;
+            if (Interlocked.CompareExchange(ref current.State, 4, 0) == 0)
+                current.Callback = null;
+            current = next;
+        }
+        worker = _worker;
+        Monitor.PulseAll(_gate);
+        Monitor.Exit(_gate);
+
+        worker.Join();
+
+        Monitor.Enter(_gate);
+        _worker = null;
+        _started = false;
+        _ready = false;
+        _shutdownCompleted = true;
+        Monitor.PulseAll(_gate);
+        Monitor.Exit(_gate);
+    }
+}

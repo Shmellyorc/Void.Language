@@ -1,0 +1,229 @@
+using Void.Collections;
+using Void.Threading.Tasks;
+
+public sealed class Node217
+{
+    public int Value;
+    public Node217(int value) { Value = value; }
+}
+
+public sealed class Producer217
+{
+    public int Base;
+
+    public Producer217(int value)
+    {
+        Base = value;
+    }
+
+    public async IAsyncEnumerable<int> Produce(int add)
+    {
+        yield return Base + add;
+        int next = await Program.InstanceGate.Task;
+        yield return Base + next;
+    }
+}
+
+public static class Program
+{
+    public static TaskCompletionSource<int> MoveGate;
+    public static TaskCompletionSource<int> YieldGate;
+    public static TaskCompletionSource CleanupGate;
+    public static TaskCompletionSource<int> FaultGate;
+    public static TaskCompletionSource<int> ManagedGate;
+    public static TaskCompletionSource<int> InstanceGate;
+
+    public static int Started;
+    public static int CleanupEntered;
+    public static int CleanupCompleted;
+    public static int FaultCleanup;
+
+    private static async IAsyncEnumerable<int> Simple(int start)
+    {
+        Program.Started++;
+        yield return start;
+        yield return start + 1;
+        yield break;
+    }
+
+    private static async IAsyncEnumerable<int> Pending(int start)
+    {
+        Program.Started++;
+        yield return start;
+        int next = await Program.MoveGate.Task;
+        yield return next;
+    }
+
+    private static async IAsyncEnumerable<int> YieldAwaited()
+    {
+        yield return await Program.YieldGate.Task;
+    }
+
+    private static async IAsyncEnumerable<int> CleanupSequence()
+    {
+        try
+        {
+            yield return 7;
+            yield return 8;
+        }
+        finally
+        {
+            Program.CleanupEntered++;
+            await Program.CleanupGate.Task;
+            Program.CleanupCompleted++;
+        }
+    }
+
+    private static async IAsyncEnumerable<int> FaultSequence()
+    {
+        try
+        {
+            yield return 3;
+            int ignored = await Program.FaultGate.Task;
+            throw new Exception("fault-217");
+        }
+        finally
+        {
+            Program.FaultCleanup++;
+        }
+    }
+
+    private static async IAsyncEnumerable<Node217> ManagedSequence()
+    {
+        Node217 node = new Node217(217);
+        int ignored = await Program.ManagedGate.Task;
+        yield return node;
+    }
+
+    private static async IAsyncEnumerable<T> Echo<T>(T value)
+    {
+        yield return value;
+        TaskCompletionSource<T> source = new TaskCompletionSource<T>();
+        source.SetResult(value);
+        T again = await source.Task;
+        yield return again;
+    }
+
+    private static async Task<int> Sum(IAsyncEnumerable<int> source)
+    {
+        int sum = 0;
+        await foreach (var value in source)
+            sum += value;
+        return sum;
+    }
+
+    private static async Task<int> BreakFirst(IAsyncEnumerable<int> source)
+    {
+        await foreach (var value in source)
+        {
+            int result = value;
+            break;
+        }
+        return 7;
+    }
+
+    private static async Task<int> CatchFault()
+    {
+        try
+        {
+            int sum = 0;
+            await foreach (var value in FaultSequence())
+                sum += value;
+            return sum;
+        }
+        catch (Exception error)
+        {
+            return Runtime.Equals(error.Message, "fault-217") ? 217 : -1;
+        }
+    }
+
+    private static async Task<int> FirstNodeValue()
+    {
+        await foreach (var node in ManagedSequence())
+            return node.Value;
+        return -1;
+    }
+
+    private static async Task<int> FirstValue(IAsyncEnumerable<int> source)
+    {
+        await foreach (var value in source)
+            return value;
+        return -1;
+    }
+
+    private static async Task<int> GenericSum()
+    {
+        int sum = 0;
+        await foreach (var value in Echo<int>(6))
+            sum += value;
+        return sum;
+    }
+
+    public static void Main()
+    {
+        Program.Started = 0;
+        IAsyncEnumerable<int> lazy = Simple(10);
+        Console.WriteLine(Program.Started == 0);
+        IAsyncEnumerator<int> manual = lazy.GetAsyncEnumerator();
+        Console.WriteLine(Program.Started == 0);
+        Console.WriteLine(manual.MoveNextAsync().Result && manual.Current == 10 && Program.Started == 1);
+        Console.WriteLine(manual.MoveNextAsync().Result && manual.Current == 11);
+        Console.WriteLine(!manual.MoveNextAsync().Result);
+        manual.DisposeAsync().Wait();
+        Console.WriteLine(Sum(lazy).Result == 21 && Program.Started == 2);
+        Console.WriteLine(Sum(lazy).Result == 21 && Program.Started == 3);
+
+        Program.MoveGate = new TaskCompletionSource<int>();
+        Task<int> pending = Sum(Pending(4));
+        Console.WriteLine(!pending.IsCompleted && Program.Started == 4);
+        Program.MoveGate.SetResult(6);
+        Console.WriteLine(pending.Result == 10);
+
+        Program.YieldGate = new TaskCompletionSource<int>();
+        Task<int> yielded = FirstValue(YieldAwaited());
+        Console.WriteLine(!yielded.IsCompleted);
+        Program.YieldGate.SetResult(217);
+        Console.WriteLine(yielded.Result == 217);
+
+        Program.CleanupEntered = 0;
+        Program.CleanupCompleted = 0;
+        Program.CleanupGate = new TaskCompletionSource();
+        Task<int> breaking = BreakFirst(CleanupSequence());
+        Console.WriteLine(!breaking.IsCompleted && Program.CleanupEntered == 1 && Program.CleanupCompleted == 0);
+        Program.CleanupGate.SetResult();
+        Console.WriteLine(breaking.Result == 7 && Program.CleanupCompleted == 1);
+
+        Program.CleanupEntered = 0;
+        Program.CleanupCompleted = 0;
+        Program.CleanupGate = new TaskCompletionSource();
+        Program.CleanupGate.SetResult();
+        Console.WriteLine(Sum(CleanupSequence()).Result == 15);
+        Console.WriteLine(Program.CleanupEntered == 1 && Program.CleanupCompleted == 1);
+
+        Program.FaultCleanup = 0;
+        Program.FaultGate = new TaskCompletionSource<int>();
+        Task<int> faulted = CatchFault();
+        Console.WriteLine(!faulted.IsCompleted);
+        Program.FaultGate.SetResult(1);
+        Console.WriteLine(faulted.Result == 217 && Program.FaultCleanup == 1);
+
+        Program.ManagedGate = new TaskCompletionSource<int>();
+        Task<int> managed = FirstNodeValue();
+        Console.WriteLine(!managed.IsCompleted);
+        GC.Collect();
+        GC.Collect();
+        Program.ManagedGate.SetResult(1);
+        Console.WriteLine(managed.Result == 217);
+
+        Producer217 producer = new Producer217(20);
+        Program.InstanceGate = new TaskCompletionSource<int>();
+        Task<int> instance = Sum(producer.Produce(3));
+        producer = null;
+        GC.Collect();
+        Console.WriteLine(!instance.IsCompleted);
+        Program.InstanceGate.SetResult(4);
+        Console.WriteLine(instance.Result == 47);
+
+        Console.WriteLine(GenericSum().Result == 12);
+    }
+}

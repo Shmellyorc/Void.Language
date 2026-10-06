@@ -1,0 +1,3 @@
+public class Base { public static int Create(int x) { return x; } }
+public sealed class Value : Base { }
+public static class Program { static int Make<T>(int x) where T : Base { return T.Create(x); } public static void Main() { Make<Value>(1); } }

@@ -1,0 +1,115 @@
+using Void;
+
+public sealed class Recorder
+{
+    private int _value;
+
+    public int Value => _value;
+
+    public void Push(int digit)
+    {
+        _value = _value * 10 + digit;
+    }
+
+    public void Reset()
+    {
+        _value = 0;
+    }
+}
+
+public sealed class Listener
+{
+    private Recorder _recorder;
+    private int _digit;
+
+    public Listener(Recorder recorder, int digit)
+    {
+        _recorder = recorder;
+        _digit = digit;
+    }
+
+    public void Handle(int value)
+    {
+        _recorder.Push(_digit);
+    }
+}
+
+public sealed class Publisher
+{
+    public event Action<int> Changed;
+
+    public void Raise(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+
+    public void Clear()
+    {
+        Changed = null;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Recorder recorder = new Recorder();
+        Listener one = new Listener(recorder, 1);
+        Listener two = new Listener(recorder, 2);
+        Publisher publisher = new Publisher();
+
+        publisher.Changed += one.Handle;
+        publisher.Changed += two.Handle;
+        publisher.Raise(0);
+        Console.WriteLine(recorder.Value);
+
+        publisher.Changed -= one.Handle;
+        recorder.Reset();
+        publisher.Raise(0);
+        Console.WriteLine(recorder.Value);
+
+        publisher.Changed += one.Handle;
+        publisher.Changed += one.Handle;
+        recorder.Reset();
+        publisher.Raise(0);
+        Console.WriteLine(recorder.Value);
+
+        publisher.Changed -= one.Handle;
+        recorder.Reset();
+        publisher.Raise(0);
+        Console.WriteLine(recorder.Value);
+
+        Action<int> closure = value => recorder.Push(3);
+        publisher.Changed += closure;
+        closure = null;
+        one = null;
+        two = null;
+        GC.Collect();
+        recorder.Reset();
+        publisher.Raise(0);
+        Console.WriteLine(recorder.Value);
+
+        publisher.Clear();
+        recorder.Reset();
+        publisher.Raise(0);
+        Console.WriteLine(recorder.Value);
+
+        Listener first = new Listener(recorder, 4);
+        Listener second = new Listener(recorder, 5);
+        Action<int> chain = first.Handle;
+        chain += second.Handle;
+        recorder.Reset();
+        chain(0);
+        Console.WriteLine(recorder.Value);
+
+        chain -= first.Handle;
+        recorder.Reset();
+        chain(0);
+        Console.WriteLine(recorder.Value);
+
+        Func<int> result = () => 5;
+        result += () => 9;
+        Console.WriteLine(result());
+    }
+}

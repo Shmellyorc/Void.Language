@@ -1,0 +1,14 @@
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    public static async Task<int> Bad()
+    {
+        return await 201;
+    }
+
+    public static void Main()
+    {
+        Bad();
+    }
+}

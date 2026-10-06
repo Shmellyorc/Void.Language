@@ -1,0 +1,6 @@
+public struct Bad
+{
+    public int Value;
+    public readonly Bad(int value) { Value = value; }
+}
+public static class Program { public static void Main() { } }

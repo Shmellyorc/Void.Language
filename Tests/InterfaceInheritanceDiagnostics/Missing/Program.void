@@ -1,0 +1,23 @@
+public interface IBase
+{
+    void BaseCall();
+}
+
+public interface IChild : IBase
+{
+    void ChildCall();
+}
+
+public sealed class Broken : IChild
+{
+    public void ChildCall() { }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Broken broken = new Broken();
+        broken.ChildCall();
+    }
+}

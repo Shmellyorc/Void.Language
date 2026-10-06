@@ -1,0 +1,124 @@
+public struct Pair223
+{
+    public int Value;
+    public Pair223(int value) { Value = value; }
+    public ref int GetRef() { return ref Value; }
+}
+
+public sealed class Node223
+{
+    public int Value;
+    public Node223(int value) { Value = value; }
+}
+
+public sealed class Box223
+{
+    public int Value;
+    public Node223 Node;
+    public Box223(int value) { Value = value; Node = new Node223(value + 1); }
+}
+
+public interface IRef223
+{
+    ref int GetRef();
+}
+
+public class Base223 : IRef223
+{
+    public int Value;
+    public Base223(int value) { Value = value; }
+    public virtual ref int GetRef() { return ref Value; }
+}
+
+public sealed class Derived223 : Base223
+{
+    public Derived223(int value) : base(value) {}
+    public override ref int GetRef() { return ref Value; }
+}
+
+public static class Program
+{
+    public static int StaticA = 10;
+    public static int StaticB = 20;
+
+    public static ref int StaticRef() { return ref StaticA; }
+    public static ref int Choose(bool second) { if (second) return ref StaticB; return ref StaticA; }
+    public static ref int ArrayRef(int[] values, int index) { return ref values[index]; }
+    public static ref int ForwardArray(int[] values, int index) { return ref ArrayRef(values, index); }
+    public static ref int LocalAliasForward(int[] values) { ref int alias = ref values[0]; return ref alias; }
+    public static ref int BoxRef(Box223 box) { return ref box.Value; }
+    public static ref T GenericRef<T>(T[] values, int index) { return ref values[index]; }
+    public static ref int RefParameter(ref int value) { return ref value; }
+
+    public static void Main()
+    {
+        ref int a = ref StaticRef(); a = 30;
+        Console.WriteLine(StaticA == 30);
+        StaticRef() = 31;
+        Console.WriteLine(StaticRef() == 31);
+
+        ref int selected = ref Choose(true); selected = 40;
+        Console.WriteLine(StaticB == 40);
+
+        int[] values = new int[] { 1, 2, 3 };
+        ref int b = ref ArrayRef(values, 1);
+        values = null; GC.Collect(); b = 9;
+        Console.WriteLine(b == 9);
+
+        int[] forwardValues = new int[] { 4, 5 };
+        ref int forwarded = ref ForwardArray(forwardValues, 0);
+        forwardValues = null; GC.Collect(); forwarded = 44;
+        Console.WriteLine(forwarded == 44);
+
+        int[] aliasValues = new int[] { 6 };
+        ref int localForward = ref LocalAliasForward(aliasValues);
+        aliasValues = null; GC.Collect(); localForward = 66;
+        Console.WriteLine(localForward == 66);
+
+        Box223 box = new Box223(7);
+        ref int c = ref BoxRef(box);
+        box = null; GC.Collect(); c = 77;
+        Console.WriteLine(c == 77);
+
+        Base223 poly = new Derived223(8);
+        ref int d = ref poly.GetRef(); d = 88;
+        Console.WriteLine(poly.Value == 88);
+        poly.GetRef() = 89;
+        Console.WriteLine(poly.Value == 89);
+
+        IRef223 iface = poly;
+        ref int e = ref iface.GetRef(); e = 90;
+        Console.WriteLine(poly.Value == 90);
+
+        int[] genericValues = new int[] { 11, 12 };
+        ref int g = ref GenericRef<int>(genericValues, 0); g = 110;
+        Console.WriteLine(genericValues[0] == 110);
+
+        Node223[] nodes = new Node223[] { new Node223(13) };
+        ref Node223 nr = ref GenericRef<Node223>(nodes, 0);
+        nodes = null; GC.Collect();
+        Console.WriteLine(nr.Value == 13);
+        nr = new Node223(14);
+        Console.WriteLine(nr.Value == 14);
+
+        int?[] nullableValues = new int?[] { 15 };
+        ref int? nullableRef = ref GenericRef<int?>(nullableValues, 0);
+        nullableValues = null; GC.Collect(); nullableRef = 16;
+        Console.WriteLine(nullableRef.HasValue && nullableRef.Value == 16);
+
+        int local = 17;
+        ref int p = ref RefParameter(ref local); p = 18;
+        Console.WriteLine(local == 18);
+
+        Pair223 pair = new Pair223(19);
+        ref int pairRef = ref pair.GetRef(); pairRef = 20;
+        Console.WriteLine(pair.Value == 20);
+
+        ref int independent = ref StaticRef();
+        ref int copy = ref independent;
+        independent = ref StaticB;
+        independent = 100;
+        copy = 101;
+        Console.WriteLine(StaticA == 101 && StaticB == 100);
+    }
+}

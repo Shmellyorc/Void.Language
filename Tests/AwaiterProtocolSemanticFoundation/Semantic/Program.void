@@ -1,0 +1,47 @@
+using Void;
+using Void.Threading.Tasks;
+
+public struct IntAwaiter261
+{
+    public bool IsCompleted { get { return true; } }
+    public void OnCompleted(Action continuation) { }
+    public int GetResult() { return 261; }
+}
+
+public struct IntAwaitable261
+{
+    public IntAwaiter261 GetAwaiter() { return default; }
+}
+
+public sealed class VoidAwaiter261
+{
+    public bool IsCompleted { get { return false; } }
+    public void OnCompleted(Action continuation) { }
+    public void GetResult() { }
+}
+
+public sealed class VoidAwaitable261
+{
+    public VoidAwaiter261 GetAwaiter() { return new VoidAwaiter261(); }
+}
+
+public static class Program
+{
+    private static async Task<int> ReadValue()
+    {
+        int value = await new IntAwaitable261();
+        return value;
+    }
+
+    private static async Task Observe()
+    {
+        await new VoidAwaitable261();
+        return;
+    }
+
+    public static void Main()
+    {
+        ReadValue();
+        Observe();
+    }
+}

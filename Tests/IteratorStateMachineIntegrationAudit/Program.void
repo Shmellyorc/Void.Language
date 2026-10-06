@@ -1,0 +1,199 @@
+using Void;
+using Void.Collections;
+
+public sealed class AuditError : Exception
+{
+    public int Code;
+
+    public AuditError(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class Box
+{
+    public int Value;
+
+    public Box(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Node
+{
+    public object Payload { get; set; }
+}
+
+public sealed class AuditResource : IDisposable
+{
+    public int Id;
+
+    public AuditResource(int id)
+    {
+        Id = id;
+        Program.Sequence = Program.Sequence * 10 + id;
+    }
+
+    public void Dispose()
+    {
+        GC.Collect();
+        Program.Sequence = Program.Sequence * 10 + Id;
+        Program.DisposeCount++;
+    }
+}
+
+public static class Program
+{
+    public static int Sequence;
+    public static int DisposeCount;
+    public static int FinallyCount;
+    public static int Seen;
+
+    public static T Identity<T>(T value)
+    {
+        return value;
+    }
+
+    public static Node MakeNode(int value)
+    {
+        Node node = new Node();
+        node.Payload = new Box(value);
+        return node;
+    }
+
+    private static IEnumerator<int> Combined(bool fail)
+    {
+        int total = 1;
+        Node node = Program.Identity<Node>(Program.MakeNode(40));
+
+        if (node is { Payload: Box box } and not null)
+        {
+            using (AuditResource resource = new AuditResource(3))
+            {
+                try
+                {
+                    int[] values = new int[] { 2, 4 };
+                    foreach (int value in values)
+                    {
+                        total += value;
+                    }
+
+                    switch ((object)box)
+                    {
+                        case Box hit when hit.Value == 40:
+                            total += hit.Value;
+                            yield return total;
+                            GC.Collect();
+                            total += hit.Value;
+                            break;
+                        default:
+                            yield break;
+                    }
+
+                    int selected = (object)box switch
+                    {
+                        Box arm when arm.Value > 0 => arm.Value,
+                        _ => 0
+                    };
+
+                    yield return total + selected + resource.Id;
+
+                    if (fail)
+                        throw new AuditError("combined", box.Value + 2);
+
+                    yield return box.Value;
+                }
+                finally
+                {
+                    GC.Collect();
+                    Program.Seen = box.Value + total;
+                    Program.FinallyCount++;
+                }
+            }
+        }
+    }
+
+    private static void CheckNormal()
+    {
+        Sequence = 0;
+        DisposeCount = 0;
+        FinallyCount = 0;
+        Seen = 0;
+
+        IEnumerator<int> iterator = Combined(false);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == 47);
+        Console.WriteLine(Sequence == 3);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == 130);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == 40);
+        Console.WriteLine(!iterator.MoveNext());
+        Console.WriteLine(Seen == 127);
+        Console.WriteLine(FinallyCount == 1);
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(Sequence == 33);
+        iterator.Dispose();
+        Console.WriteLine(FinallyCount == 1 && DisposeCount == 1);
+    }
+
+    private static void CheckDispose()
+    {
+        Sequence = 0;
+        DisposeCount = 0;
+        FinallyCount = 0;
+        Seen = 0;
+
+        IEnumerator<int> iterator = Combined(false);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == 47);
+        iterator.Dispose();
+        Console.WriteLine(Seen == 87);
+        Console.WriteLine(FinallyCount == 1);
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(Sequence == 33);
+        Console.WriteLine(!iterator.MoveNext());
+    }
+
+    private static void CheckFault()
+    {
+        Sequence = 0;
+        DisposeCount = 0;
+        FinallyCount = 0;
+        Seen = 0;
+
+        IEnumerator<int> iterator = Combined(true);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == 47);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == 130);
+
+        bool caught = false;
+        try
+        {
+            iterator.MoveNext();
+        }
+        catch (AuditError error)
+        {
+            caught = error.Code == 42;
+        }
+
+        Console.WriteLine(caught);
+        Console.WriteLine(Seen == 127);
+        Console.WriteLine(FinallyCount == 1);
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(Sequence == 33);
+        Console.WriteLine(!iterator.MoveNext());
+        iterator.Dispose();
+        Console.WriteLine(FinallyCount == 1 && DisposeCount == 1);
+    }
+
+    public static void Main()
+    {
+        CheckNormal();
+        CheckDispose();
+        CheckFault();
+    }
+}

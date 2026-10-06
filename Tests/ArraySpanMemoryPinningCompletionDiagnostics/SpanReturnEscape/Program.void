@@ -1,0 +1,1 @@
+using Void; public static class Program { private static unsafe int* Bad(Span<int> s) { fixed (int* p = s) { return p + 0; } } public static unsafe void Main(){ int[] a = new int[]{1}; int* p = Bad(new Span<int>(a)); } }

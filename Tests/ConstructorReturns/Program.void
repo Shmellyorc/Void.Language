@@ -1,0 +1,356 @@
+using Void;
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Basic
+{
+    public int Value;
+
+    public Basic(bool stop)
+    {
+        Value = 1;
+        if (stop)
+            return;
+        Value = 2;
+    }
+}
+
+public sealed class Initialized
+{
+    public static int Trace;
+    private int _value = Mark(1);
+
+    public Initialized(bool stop)
+    {
+        Mark(2);
+        if (stop)
+            return;
+        Mark(3);
+    }
+
+    private static int Mark(int value)
+    {
+        Trace = Trace * 10 + value;
+        return value;
+    }
+
+    public int Value() { return _value; }
+}
+
+public class BaseCtor
+{
+    public static int Trace;
+
+    public BaseCtor()
+    {
+        Trace = Trace * 10 + 1;
+    }
+}
+
+public sealed class DerivedCtor : BaseCtor
+{
+    private int _value = Mark(2);
+
+    public DerivedCtor(bool stop) : base()
+    {
+        Mark(3);
+        if (stop)
+            return;
+        Mark(4);
+    }
+
+    private static int Mark(int value)
+    {
+        BaseCtor.Trace = BaseCtor.Trace * 10 + value;
+        return value;
+    }
+
+    public int Value() { return _value; }
+}
+
+public sealed class Delegated
+{
+    public static int Trace;
+
+    public Delegated() : this(true)
+    {
+        Trace = Trace * 10 + 3;
+        return;
+        Trace = Trace * 10 + 4;
+    }
+
+    public Delegated(bool stop)
+    {
+        Trace = Trace * 10 + 1;
+        if (stop)
+            return;
+        Trace = Trace * 10 + 2;
+    }
+
+    public Delegated(int value) : this(false)
+    {
+        Trace = Trace * 10 + value;
+    }
+}
+
+public struct Point
+{
+    public int X;
+    public int Y;
+
+    public Point(bool stop)
+    {
+        X = 3;
+        if (stop)
+            return;
+        Y = 4;
+    }
+}
+
+public struct InitializedPoint
+{
+    public int X = 5;
+    public int Y;
+
+    public InitializedPoint(bool stop)
+    {
+        Y = 6;
+        if (stop)
+            return;
+        X = 7;
+    }
+}
+
+public struct DelegatedPoint
+{
+    public int Value;
+
+    public DelegatedPoint() : this(true)
+    {
+        Value += 10;
+        return;
+        Value += 100;
+    }
+
+    public DelegatedPoint(bool stop)
+    {
+        Value = 1;
+        if (stop)
+            return;
+        Value = 2;
+    }
+}
+
+public readonly struct ReadonlyPoint
+{
+    public readonly int Value;
+
+    public ReadonlyPoint(int value, bool stop)
+    {
+        Value = value;
+        if (stop)
+            return;
+    }
+}
+
+public sealed class OutCtor
+{
+    public OutCtor(bool stop, out int value)
+    {
+        if (stop)
+        {
+            value = 7;
+            return;
+        }
+        value = 9;
+    }
+}
+
+
+public sealed class DelegatedOut
+{
+    public int Marker;
+
+    public DelegatedOut(out int value) : this(out value, true)
+    {
+        Marker = 2;
+        return;
+        Marker = 3;
+    }
+
+    public DelegatedOut(out int value, bool stop)
+    {
+        value = 14;
+        Marker = 1;
+        if (stop)
+            return;
+        Marker = 4;
+    }
+}
+
+public sealed class GcCtor
+{
+    public Node Stored;
+
+    public GcCtor(Node node, bool stop)
+    {
+        Node local = new Node(11);
+        Stored = node;
+        GC.Collect();
+        if (stop)
+            return;
+        Stored = local;
+    }
+}
+
+public sealed class NestedFlow
+{
+    public int Value;
+
+    public NestedFlow(int mode)
+    {
+        Value = 1;
+        switch (mode)
+        {
+            case 0:
+                Value = 10;
+                return;
+            case 1:
+                for (int i = 0; i < 3; i += 1)
+                {
+                    if (i == 1)
+                    {
+                        Value = 20;
+                        return;
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        Value = 30;
+    }
+}
+
+public sealed class GenericBox<T>
+{
+    private T _value;
+    private bool _tail;
+
+    public GenericBox(T value, bool stop)
+    {
+        _value = value;
+        if (stop)
+            return;
+        _tail = true;
+    }
+
+    public T Value() { return _value; }
+    public bool Tail() { return _tail; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Basic basicStopped = new Basic(true);
+        Basic basicFull = new Basic(false);
+        Console.WriteLine(basicStopped.Value == 1);
+        Console.WriteLine(basicFull.Value == 2);
+
+        Initialized.Trace = 0;
+        Initialized initializedStopped = new Initialized(true);
+        Console.WriteLine(Initialized.Trace == 12);
+        Console.WriteLine(initializedStopped.Value() == 1);
+        Initialized.Trace = 0;
+        Initialized initializedFull = new Initialized(false);
+        Console.WriteLine(Initialized.Trace == 123);
+        Console.WriteLine(initializedFull.Value() == 1);
+
+        BaseCtor.Trace = 0;
+        BaseCtor baseDirect = new BaseCtor();
+        Console.WriteLine(BaseCtor.Trace == 1);
+
+        BaseCtor.Trace = 0;
+        DerivedCtor derivedStopped = new DerivedCtor(true);
+        Console.WriteLine(BaseCtor.Trace == 123);
+        Console.WriteLine(derivedStopped.Value() == 2);
+        BaseCtor.Trace = 0;
+        DerivedCtor derivedFull = new DerivedCtor(false);
+        Console.WriteLine(BaseCtor.Trace == 1234);
+
+        Delegated.Trace = 0;
+        Delegated delegatedDirect = new Delegated(false);
+        Console.WriteLine(Delegated.Trace == 12);
+
+        Delegated.Trace = 0;
+        Delegated delegatedStopped = new Delegated();
+        Console.WriteLine(Delegated.Trace == 13);
+        Delegated.Trace = 0;
+        Delegated delegatedFull = new Delegated(5);
+        Console.WriteLine(Delegated.Trace == 125);
+
+        Point pointStopped = new Point(true);
+        Point pointFull = new Point(false);
+        Console.WriteLine(pointStopped.X == 3);
+        Console.WriteLine(pointStopped.Y == 0);
+        Console.WriteLine(pointFull.X == 3);
+        Console.WriteLine(pointFull.Y == 4);
+
+        InitializedPoint initializedPointStopped = new InitializedPoint(true);
+        InitializedPoint initializedPointFull = new InitializedPoint(false);
+        Console.WriteLine(initializedPointStopped.X == 5);
+        Console.WriteLine(initializedPointStopped.Y == 6);
+        Console.WriteLine(initializedPointFull.X == 7);
+        Console.WriteLine(initializedPointFull.Y == 6);
+
+        DelegatedPoint delegatedPoint = new DelegatedPoint();
+        Console.WriteLine(delegatedPoint.Value == 11);
+
+        ReadonlyPoint readonlyPoint = new ReadonlyPoint(44, true);
+        Console.WriteLine(readonlyPoint.Value == 44);
+
+        int outValue;
+        OutCtor outStopped = new OutCtor(true, out outValue);
+        Console.WriteLine(outValue == 7);
+        OutCtor outFull = new OutCtor(false, out outValue);
+        Console.WriteLine(outValue == 9);
+
+        int delegatedOutValue;
+        DelegatedOut delegatedOutDirect = new DelegatedOut(out delegatedOutValue, false);
+        Console.WriteLine(delegatedOutValue == 14);
+        Console.WriteLine(delegatedOutDirect.Marker == 4);
+        DelegatedOut delegatedOut = new DelegatedOut(out delegatedOutValue);
+        Console.WriteLine(delegatedOutValue == 14);
+        Console.WriteLine(delegatedOut.Marker == 2);
+
+        GcCtor gcStopped = new GcCtor(new Node(21), true);
+        GC.Collect();
+        Console.WriteLine(gcStopped.Stored.Value == 21);
+        GcCtor gcFull = new GcCtor(new Node(22), false);
+        GC.Collect();
+        Console.WriteLine(gcFull.Stored.Value == 11);
+
+        NestedFlow flowSwitch = new NestedFlow(0);
+        NestedFlow flowLoop = new NestedFlow(1);
+        NestedFlow flowFull = new NestedFlow(2);
+        Console.WriteLine(flowSwitch.Value == 10);
+        Console.WriteLine(flowLoop.Value == 20);
+        Console.WriteLine(flowFull.Value == 30);
+
+        GenericBox<int> genericStopped = new GenericBox<int>(31, true);
+        GenericBox<int> genericFull = new GenericBox<int>(32, false);
+        Console.WriteLine(genericStopped.Value() == 31);
+        Console.WriteLine(!genericStopped.Tail());
+        Console.WriteLine(genericFull.Value() == 32);
+        Console.WriteLine(genericFull.Tail());
+    }
+}

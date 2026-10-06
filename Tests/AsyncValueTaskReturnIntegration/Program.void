@@ -1,0 +1,182 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class Payload268
+{
+    public int Value;
+
+    public Payload268(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Fault268 : Exception
+{
+    public Fault268(string message) : base(message)
+    {
+    }
+}
+
+public static class Program
+{
+    private static int _finallyCount;
+
+    private static async ValueTask CompletedVoid()
+    {
+    }
+
+    private static async ValueTask<int> CompletedInt()
+    {
+        return 42;
+    }
+
+    private static async ValueTask<Payload268> CompletedPayload(Payload268 payload)
+    {
+        return payload;
+    }
+
+    private static async ValueTask AwaitSignal(Task signal)
+    {
+        await signal;
+    }
+
+    private static async ValueTask<int> AwaitIntSignal(Task<int> signal)
+    {
+        int value = await signal;
+        return value + 1;
+    }
+
+    private static async ValueTask<Payload268> AwaitPayloadSignal(Task<Payload268> signal)
+    {
+        return await signal;
+    }
+
+    private static async ValueTask<int> AwaitValueTask(ValueTask<int> value)
+    {
+        int result = await value;
+        return result + 10;
+    }
+
+    private static async ValueTask<int> NestedValueTask(Task<int> signal)
+    {
+        int first = await AwaitIntSignal(signal);
+        int second = await new ValueTask<int>(5);
+        return first + second;
+    }
+
+    private static async ValueTask FaultAfterSignal(Task signal)
+    {
+        await signal;
+        throw new Fault268("value-task-268-fault");
+    }
+
+    private static async ValueTask CancelAfterSignal(Task signal, CancellationToken token)
+    {
+        await signal;
+        throw new OperationCanceledException(token);
+    }
+
+    private static async ValueTask<int> FinallyAfterSignal(Task<int> signal)
+    {
+        try
+        {
+            return await signal;
+        }
+        finally
+        {
+            _finallyCount++;
+        }
+    }
+
+    public static void Main()
+    {
+        ValueTask completedVoid = CompletedVoid();
+        Console.WriteLine(completedVoid.IsCompleted);
+        completedVoid.GetAwaiter().GetResult();
+        Console.WriteLine(true);
+
+        ValueTask<int> completedInt = CompletedInt();
+        Console.WriteLine(completedInt.IsCompleted);
+        Console.WriteLine(completedInt.GetAwaiter().GetResult() == 42);
+
+        Payload268 payload = new Payload268(268);
+        ValueTask<Payload268> completedPayload = CompletedPayload(payload);
+        payload = null;
+        GC.Collect();
+        Payload268 completedPayloadResult = completedPayload.GetAwaiter().GetResult();
+        Console.WriteLine(completedPayloadResult != null && completedPayloadResult.Value == 268);
+
+        TaskCompletionSource signal = new TaskCompletionSource();
+        ValueTask suspendedVoid = AwaitSignal(signal.Task);
+        Console.WriteLine(!suspendedVoid.IsCompleted);
+        signal.SetResult();
+        suspendedVoid.GetAwaiter().GetResult();
+        Console.WriteLine(suspendedVoid.IsCompleted);
+
+        TaskCompletionSource<int> intSignal = new TaskCompletionSource<int>();
+        ValueTask<int> suspendedInt = AwaitIntSignal(intSignal.Task);
+        Console.WriteLine(!suspendedInt.IsCompleted);
+        intSignal.SetResult(99);
+        Console.WriteLine(suspendedInt.GetAwaiter().GetResult() == 100);
+
+        TaskCompletionSource<Payload268> payloadSignal = new TaskCompletionSource<Payload268>();
+        ValueTask<Payload268> suspendedPayload = AwaitPayloadSignal(payloadSignal.Task);
+        Console.WriteLine(!suspendedPayload.IsCompleted);
+        GC.Collect();
+        payloadSignal.SetResult(new Payload268(67));
+        GC.Collect();
+        Payload268 suspendedPayloadResult = suspendedPayload.GetAwaiter().GetResult();
+        Console.WriteLine(suspendedPayloadResult != null && suspendedPayloadResult.Value == 67);
+
+        ValueTask<int> nestedInline = AwaitValueTask(new ValueTask<int>(32));
+        Console.WriteLine(nestedInline.GetAwaiter().GetResult() == 42);
+
+        TaskCompletionSource<int> nestedSignal = new TaskCompletionSource<int>();
+        ValueTask<int> nested = NestedValueTask(nestedSignal.Task);
+        Console.WriteLine(!nested.IsCompleted);
+        nestedSignal.SetResult(36);
+        Console.WriteLine(nested.GetAwaiter().GetResult() == 42);
+
+        TaskCompletionSource faultSignal = new TaskCompletionSource();
+        ValueTask faulted = FaultAfterSignal(faultSignal.Task);
+        faultSignal.SetResult();
+        bool faultObserved = false;
+        try
+        {
+            faulted.GetAwaiter().GetResult();
+        }
+        catch (Fault268 error)
+        {
+            faultObserved = error.Message == "value-task-268-fault";
+        }
+        Console.WriteLine(faultObserved);
+
+        CancellationTokenSource cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+        TaskCompletionSource cancelSignal = new TaskCompletionSource();
+        ValueTask canceled = CancelAfterSignal(cancelSignal.Task, cancellation.Token);
+        cancelSignal.SetResult();
+        bool cancelObserved = false;
+        try
+        {
+            canceled.GetAwaiter().GetResult();
+        }
+        catch (OperationCanceledException error)
+        {
+            cancelObserved = error.CancellationToken.IsSameSource(cancellation.Token);
+        }
+        Console.WriteLine(cancelObserved);
+
+        TaskCompletionSource<int> finallySignal = new TaskCompletionSource<int>();
+        ValueTask<int> withFinally = FinallyAfterSignal(finallySignal.Task);
+        Console.WriteLine(_finallyCount == 0);
+        finallySignal.SetResult(55);
+        Console.WriteLine(withFinally.GetAwaiter().GetResult() == 55);
+        Console.WriteLine(_finallyCount == 1);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

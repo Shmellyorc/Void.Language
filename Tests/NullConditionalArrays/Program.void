@@ -1,0 +1,209 @@
+using Void;
+
+public sealed class Node
+{
+    public int Value;
+    public Node(int value) { Value = value; }
+    public int GetValue() => Value;
+}
+
+public struct Cell
+{
+    public int Value;
+    public Cell(int value) { Value = value; }
+}
+
+public sealed class Holder
+{
+    public int[] Values;
+    public int[][] Jagged;
+    public int[,] Grid;
+
+    public Holder(int[] values, int[][] jagged, int[,] grid)
+    {
+        Values = values;
+        Jagged = jagged;
+        Grid = grid;
+    }
+}
+
+public sealed class Probe
+{
+    public int Calls;
+
+    public int NextInt(int value)
+    {
+        Calls++;
+        return value;
+    }
+
+    public int[] NextArray(int[] value)
+    {
+        Calls++;
+        return value;
+    }
+
+    public int[][] NextJagged(int[][] value)
+    {
+        Calls++;
+        return value;
+    }
+
+    public int[,] NextGrid(int[,] value)
+    {
+        Calls++;
+        return value;
+    }
+
+    public int CollectIndex(int value)
+    {
+        GC.Collect();
+        Calls++;
+        return value;
+    }
+}
+
+public static class Program
+{
+    public static Node[] MakeNodes() => new Node[] { new Node(121) };
+
+    public static void Main()
+    {
+        int[] values = new int[] { 10, 20, 30 };
+        int[] noValues = null;
+        int? value = values?[1];
+        int? noValue = noValues?[1];
+        Console.WriteLine(value.Value == 20);
+        Console.WriteLine(noValue.HasValue == false);
+        Console.WriteLine((values?[2] ?? -1) == 30);
+        Console.WriteLine((noValues?[2] ?? -1) == -1);
+
+        Probe probe = new Probe();
+        probe.Calls = 0;
+        int? once = probe.NextArray(values)?[probe.NextInt(0)];
+        Console.WriteLine(once.Value == 10);
+        Console.WriteLine(probe.Calls == 2);
+        probe.Calls = 0;
+        int? skipped = probe.NextArray(noValues)?[probe.NextInt(0)];
+        Console.WriteLine(skipped.HasValue == false);
+        Console.WriteLine(probe.Calls == 1);
+
+        Node node = new Node(41);
+        Node[] nodes = new Node[] { node };
+        Node[] noNodes = null;
+        Node selected = nodes?[0];
+        Node missingNode = noNodes?[0];
+        Console.WriteLine(selected == node);
+        Console.WriteLine(missingNode == null);
+        int? nodeValue = nodes?[0].Value;
+        int? missingNodeValue = noNodes?[0].Value;
+        Console.WriteLine(nodeValue.Value == 41);
+        Console.WriteLine(missingNodeValue.HasValue == false);
+        int? calledValue = nodes?[0].GetValue();
+        Console.WriteLine(calledValue.Value == 41);
+
+        Node[] nullableNodes = new Node[1];
+        int? missingElementValue = nullableNodes?[0]?.Value;
+        Console.WriteLine(missingElementValue.HasValue == false);
+
+        Cell[] cells = new Cell[] { new Cell(51) };
+        Cell? cell = cells?[0];
+        Console.WriteLine(cell.HasValue);
+        Console.WriteLine(cell.Value.Value == 51);
+
+        int?[] optional = new int?[] { 61, null };
+        int? optionalValue = optional?[0];
+        int? optionalMissing = optional?[1];
+        Console.WriteLine(optionalValue.Value == 61);
+        Console.WriteLine(optionalMissing.HasValue == false);
+
+        int[][] jagged = new int[2][];
+        jagged[0] = new int[] { 70, 71 };
+        jagged[1] = null;
+        int[][] noJagged = null;
+        int? jaggedValue = jagged?[0]?[1];
+        int? noOuter = noJagged?[0]?[0];
+        int? noInner = jagged?[1]?[0];
+        Console.WriteLine(jaggedValue.Value == 71);
+        Console.WriteLine(noOuter.HasValue == false);
+        Console.WriteLine(noInner.HasValue == false);
+        int? rowLength = jagged?[0].Length;
+        int? noRowLength = noJagged?[0].Length;
+        Console.WriteLine(rowLength.Value == 2);
+        Console.WriteLine(noRowLength.HasValue == false);
+
+        probe.Calls = 0;
+        int? jaggedOnce = probe.NextJagged(jagged)?[probe.NextInt(0)]?[probe.NextInt(1)];
+        Console.WriteLine(jaggedOnce.Value == 71);
+        Console.WriteLine(probe.Calls == 3);
+        probe.Calls = 0;
+        int? jaggedSkipped = probe.NextJagged(noJagged)?[probe.NextInt(0)]?[probe.NextInt(1)];
+        Console.WriteLine(jaggedSkipped.HasValue == false);
+        Console.WriteLine(probe.Calls == 1);
+        probe.Calls = 0;
+        int? innerSkipped = probe.NextJagged(jagged)?[probe.NextInt(1)]?[probe.NextInt(0)];
+        Console.WriteLine(innerSkipped.HasValue == false);
+        Console.WriteLine(probe.Calls == 2);
+
+        int[,] grid = new int[2, 2];
+        grid[1, 1] = 81;
+        int[,] noGrid = null;
+        int? gridValue = grid?[1, 1];
+        int? noGridValue = noGrid?[1, 1];
+        Console.WriteLine(gridValue.Value == 81);
+        Console.WriteLine(noGridValue.HasValue == false);
+
+        probe.Calls = 0;
+        int? gridOnce = probe.NextGrid(grid)?[probe.NextInt(1), probe.NextInt(1)];
+        Console.WriteLine(gridOnce.Value == 81);
+        Console.WriteLine(probe.Calls == 3);
+        probe.Calls = 0;
+        int? gridSkipped = probe.NextGrid(noGrid)?[probe.NextInt(0), probe.NextInt(0)];
+        Console.WriteLine(gridSkipped.HasValue == false);
+        Console.WriteLine(probe.Calls == 1);
+
+        Node[,] nodeGrid = new Node[1, 1];
+        nodeGrid[0, 0] = new Node(91);
+        Node[,] noNodeGrid = null;
+        int? gridNodeValue = nodeGrid?[0, 0].Value;
+        int? missingGridNodeValue = noNodeGrid?[0, 0].Value;
+        Console.WriteLine(gridNodeValue.Value == 91);
+        Console.WriteLine(missingGridNodeValue.HasValue == false);
+
+        Node[][] nodeJagged = new Node[1][];
+        nodeJagged[0] = new Node[] { new Node(101) };
+        int? deepValue = nodeJagged?[0]?[0]?.Value;
+        Console.WriteLine(deepValue.Value == 101);
+
+
+        probe.Calls = 0;
+        int? continued = probe.NextJagged(jagged)?[probe.NextInt(0)][probe.NextInt(1)];
+        Console.WriteLine(continued.Value == 71);
+        Console.WriteLine(probe.Calls == 3);
+        probe.Calls = 0;
+        int? continuedSkipped = probe.NextJagged(noJagged)?[probe.NextInt(0)][probe.NextInt(1)];
+        Console.WriteLine(continuedSkipped.HasValue == false);
+        Console.WriteLine(probe.Calls == 1);
+
+        int[,,] cube = new int[2, 2, 2];
+        cube[1, 0, 1] = 111;
+        int[,,] noCube = null;
+        int? cubeValue = cube?[1, 0, 1];
+        int? missingCube = noCube?[1, 0, 1];
+        Console.WriteLine(cubeValue.Value == 111);
+        Console.WriteLine(missingCube.HasValue == false);
+
+        probe.Calls = 0;
+        int? gcSafeValue = MakeNodes()?[probe.CollectIndex(0)].Value;
+        Console.WriteLine(gcSafeValue.Value == 121);
+        Console.WriteLine(probe.Calls == 1);
+
+        Holder holder = new Holder(values, jagged, grid);
+        int? holderValue = holder.Values?[1];
+        Console.WriteLine(holderValue.Value == 20);
+        int? holderJagged = holder.Jagged?[0]?[0];
+        Console.WriteLine(holderJagged.Value == 70);
+        int? holderGrid = holder.Grid?[1, 1];
+        Console.WriteLine(holderGrid.Value == 81);
+    }
+}

@@ -1,0 +1,107 @@
+using Void;
+using Void.Text;
+
+namespace Void.IO;
+
+public class StreamReader : TextReader
+{
+    private Stream _stream;
+    private Decoder _decoder;
+    private byte[] _bytes;
+    private string _text = string.Empty;
+    private int _position;
+    private bool _eof;
+    private bool _disposed;
+    private bool _leaveOpen;
+    private bool _first = true;
+    private bool _detectBom;
+    public Stream BaseStream { get { return _stream; } }
+    private Encoding _encoding;
+    public Encoding CurrentEncoding { get { return _encoding; } }
+    public StreamReader(Stream stream) : this(stream, Encoding.UTF8, true, 1024, false) { }
+    public StreamReader(Stream stream, Encoding encoding) : this(stream, encoding, true, 1024, false) { }
+    public StreamReader(Stream stream, Encoding encoding, bool detectEncodingFromByteOrderMarks,
+        int bufferSize, bool leaveOpen)
+    {
+        if (stream == null) throw new ArgumentNullException("stream");
+        if (encoding == null) throw new ArgumentNullException("encoding");
+        if (bufferSize <= 0) throw new ArgumentOutOfRangeException("bufferSize");
+        if (!stream.CanRead) throw new ArgumentException("Stream does not support reading.");
+        _decoder = encoding.GetDecoder();
+        _bytes = new byte[bufferSize];
+        _stream = stream; _encoding = encoding;
+        _leaveOpen = leaveOpen; _detectBom = detectEncodingFromByteOrderMarks;
+    }
+    public StreamReader(string path) : this(path, Encoding.UTF8, true, 1024) { }
+    public StreamReader(string path, Encoding encoding) : this(path, encoding, true, 1024) { }
+    public StreamReader(string path, Encoding encoding, bool detectEncodingFromByteOrderMarks, int bufferSize)
+    {
+        IOErrors.CheckPath(path);
+        if (encoding == null) throw new ArgumentNullException("encoding");
+        if (bufferSize <= 0) throw new ArgumentOutOfRangeException("bufferSize");
+        _decoder = encoding.GetDecoder(); _bytes = new byte[bufferSize];
+        _encoding = encoding; _detectBom = detectEncodingFromByteOrderMarks;
+        _stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+    }
+    private void CheckOpen()
+    {
+        if (_disposed) throw new ObjectDisposedException("StreamReader");
+    }
+    private bool Fill()
+    {
+        this.CheckOpen();
+        while (_position >= _text.Length && !_eof)
+        {
+            int count = _stream.Read(_bytes, 0, _bytes.Length);
+            _eof = count == 0;
+            _text = _decoder.Decode(_bytes, 0, count, _eof);
+            _position = 0;
+            if (_first && _text.Length != 0)
+            {
+                _first = false;
+                if (_detectBom && _text[0] == (char)65279) _position = 1;
+            }
+        }
+        return _position < _text.Length;
+    }
+    public int Peek() { return this.Fill() ? (int)_text[_position] : -1; }
+    public override int Read()
+    {
+        if (!this.Fill()) return -1;
+        return (int)_text[_position++];
+    }
+    public bool EndOfStream { get { return this.Peek() < 0; } }
+    public override string ReadLine()
+    {
+        this.CheckOpen();
+        StringBuilder line = new StringBuilder();
+        int current = this.Read();
+        if (current < 0) return null;
+        while (current >= 0)
+        {
+            if (current == 10) break;
+            if (current == 13)
+            {
+                if (this.Peek() == 10) this.Read();
+                break;
+            }
+            line.Append((char)current);
+            current = this.Read();
+        }
+        return line.ToString();
+    }
+    public string ReadToEnd()
+    {
+        this.CheckOpen();
+        StringBuilder result = new StringBuilder();
+        int current = this.Read();
+        while (current >= 0) { result.Append((char)current); current = this.Read(); }
+        return result.ToString();
+    }
+    public override void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true; _text = string.Empty;
+        if (!_leaveOpen) _stream.Dispose();
+    }
+}

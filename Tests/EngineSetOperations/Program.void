@@ -1,0 +1,140 @@
+using Void;
+using Void.Collections;
+
+public sealed class CollisionComparer : EqualityComparer<int>
+{
+    public override bool Equals(int a, int b) { return a % 10 == b % 10; }
+    public override int GetHashCode(int value) { return -2147483647 - 1; }
+}
+public static class Program
+{
+    private static int Power(int value)
+    {
+        int result = 1;
+        for (int i = 0; i < value; i++) result *= 2;
+        return result;
+    }
+    private static int Oracle(int a, int b, int operation)
+    {
+        int result = 0;
+        int power = 1;
+        for (int i = 0; i < 4; i++)
+        {
+            bool left = a % 2 != 0;
+            bool right = b % 2 != 0;
+            bool include = operation == 0 ? left || right : operation == 1 ? left && right : operation == 2 ? left && !right : left != right;
+            if (include) result += power;
+            a /= 2; b /= 2; power *= 2;
+        }
+        return result;
+    }
+    private static HashSet<int> FromMask(int mask)
+    {
+        HashSet<int> values = new HashSet<int>();
+        for (int i = 0; i < 4; i++) if (mask / Power(i) % 2 != 0) values.Add(i);
+        return values;
+    }
+    private static int Mask(HashSet<int> values)
+    {
+        int result = 0;
+        foreach (int value in values) result += Power(value);
+        return result;
+    }
+    public static void Main()
+    {
+        // Exhaustive independent bit-mask oracle: 256 pairs, all ten operations.
+        for (int a = 0; a < 16; a++)
+        {
+            for (int b = 0; b < 16; b++)
+            {
+                HashSet<int> other = FromMask(b);
+                HashSet<int> values = FromMask(a); values.UnionWith(other);
+                Console.WriteLine(Mask(values) == Oracle(a, b, 0));
+                values = FromMask(a); values.IntersectWith(other);
+                Console.WriteLine(Mask(values) == Oracle(a, b, 1));
+                values = FromMask(a); values.ExceptWith(other);
+                Console.WriteLine(Mask(values) == Oracle(a, b, 2));
+                values = FromMask(a); values.SymmetricExceptWith(other);
+                Console.WriteLine(Mask(values) == Oracle(a, b, 3));
+                values = FromMask(a);
+                Console.WriteLine(values.Overlaps(other) == (Oracle(a, b, 1) != 0));
+                Console.WriteLine(values.SetEquals(other) == (a == b));
+                Console.WriteLine(values.IsSubsetOf(other) == (Oracle(a, b, 1) == a));
+                Console.WriteLine(values.IsProperSubsetOf(other) == (Oracle(a, b, 1) == a && a != b));
+                Console.WriteLine(values.IsSupersetOf(other) == (Oracle(a, b, 1) == b));
+                Console.WriteLine(values.IsProperSupersetOf(other) == (Oracle(a, b, 1) == b && a != b));
+            }
+        }
+        HashSet<int> values = FromMask(3);
+        List<int> duplicates = new List<int>(); duplicates.Add(1); duplicates.Add(1); duplicates.Add(2); duplicates.Add(2);
+        values.SymmetricExceptWith(duplicates);
+        Console.WriteLine(values.Count == 2 && values.Contains(0) && values.Contains(2));
+        duplicates.Clear(); duplicates.Add(0); duplicates.Add(0); duplicates.Add(2);
+        Console.WriteLine(values.SetEquals(duplicates) && values.IsSubsetOf(duplicates) && values.IsSupersetOf(duplicates));
+        Console.WriteLine(!values.IsProperSubsetOf(duplicates) && !values.IsProperSupersetOf(duplicates));
+        IEnumerator<int> en = values.GetEnumerator(); values.UnionWith(values); values.IntersectWith(values);
+        Console.WriteLine(en.MoveNext() && values.Count == 2);
+        Console.WriteLine(values.SetEquals(values) && values.IsSubsetOf(values) && values.IsSupersetOf(values) && values.Overlaps(values));
+        Console.WriteLine(!values.IsProperSubsetOf(values) && !values.IsProperSupersetOf(values));
+        values.ExceptWith(values); Console.WriteLine(values.Count == 0);
+        values.Add(2); values.SymmetricExceptWith(values); Console.WriteLine(values.Count == 0);
+        CollisionComparer comparer = new CollisionComparer();
+        HashSet<int> custom = new HashSet<int>(comparer); custom.Add(1); custom.Add(2);
+        duplicates.Clear(); duplicates.Add(11); duplicates.Add(21); duplicates.Add(3); duplicates.Add(13);
+        custom.SymmetricExceptWith(duplicates);
+        Console.WriteLine(custom.Count == 2 && custom.Contains(12) && custom.Contains(23) && !custom.Contains(1));
+        duplicates.Clear(); duplicates.Add(12); duplicates.Add(22); duplicates.Add(13);
+        Console.WriteLine(custom.SetEquals(duplicates) && !custom.IsProperSupersetOf(duplicates));
+        HashSet<int> differentlyCompared = new HashSet<int>(); differentlyCompared.Add(12); differentlyCompared.Add(22); differentlyCompared.Add(13);
+        Console.WriteLine(custom.SetEquals(differentlyCompared) && custom.IsSubsetOf(differentlyCompared));
+        custom.IntersectWith(duplicates); Console.WriteLine(custom.Count == 2);
+        custom.ExceptWith(duplicates); Console.WriteLine(custom.Count == 0);
+        HashSet<string> text = new HashSet<string>(); text.Add("😀"); text.Add(null);
+        List<string> texts = new List<string>(); texts.Add(null); texts.Add("é"); texts.Add("é");
+        text.SymmetricExceptWith(texts); GC.Collect();
+        Console.WriteLine(text.Count == 2 && text.Contains("😀") && text.Contains("é") && !text.Contains(null));
+        text.IntersectWith(texts); GC.Collect();
+        Console.WriteLine(text.Count == 1 && text.Contains("é"));
+        values = FromMask(7); en = values.GetEnumerator();
+        duplicates.Clear(); duplicates.Add(1); values.IntersectWith(duplicates);
+        int observed = 0; while (en.MoveNext()) observed++;
+        Console.WriteLine(observed == 1 && values.Count == 1);
+        en = values.GetEnumerator(); duplicates.Add(3); values.UnionWith(duplicates);
+        IReadOnlySet<int> readOnly = values;
+        Console.WriteLine(readOnly.Count == 2 && readOnly.Contains(1) && readOnly.SetEquals(values) && readOnly.IsSubsetOf(values) && readOnly.IsSupersetOf(values) && !readOnly.IsProperSubsetOf(values) && !readOnly.IsProperSupersetOf(values) && readOnly.Overlaps(values));
+        bool caught = false;
+        try { en.MoveNext(); } catch (InvalidOperationException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { values.UnionWith(null); } catch (ArgumentNullException e) { caught = e.ParamName == "other"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { values.IntersectWith(null); } catch (ArgumentNullException e) { caught = e.ParamName == "other"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { values.ExceptWith(null); } catch (ArgumentNullException e) { caught = e.ParamName == "other"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { values.SymmetricExceptWith(null); } catch (ArgumentNullException e) { caught = e.ParamName == "other"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { values.Overlaps(null); } catch (ArgumentNullException e) { caught = e.ParamName == "other"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { values.SetEquals(null); } catch (ArgumentNullException e) { caught = e.ParamName == "other"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { values.IsSubsetOf(null); } catch (ArgumentNullException e) { caught = e.ParamName == "other"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { values.IsProperSubsetOf(null); } catch (ArgumentNullException e) { caught = e.ParamName == "other"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { values.IsSupersetOf(null); } catch (ArgumentNullException e) { caught = e.ParamName == "other"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { values.IsProperSupersetOf(null); } catch (ArgumentNullException e) { caught = e.ParamName == "other"; }
+        Console.WriteLine(caught);
+        Console.WriteLine(values.Count == 2 && values.Contains(1) && values.Contains(3));
+    }
+}

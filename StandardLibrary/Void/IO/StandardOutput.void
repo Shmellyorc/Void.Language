@@ -1,0 +1,28 @@
+using Void;
+using Void.Text;
+
+namespace Void.IO;
+
+// Standard-output adapter. Encoding policy stays in visible StandardLibrary code.
+internal static class StandardOutput
+{
+    internal static void Write(string value)
+    {
+        WriteStream(1, value);
+    }
+
+    internal static void WriteError(string value)
+    {
+        WriteStream(2, value);
+    }
+
+    private static void WriteStream(int stream, string value)
+    {
+        if (value == null) value = string.Empty;
+        // Console streaming currently accepts UTF8Encoding only. VOID strings are already
+        // valid UTF-8, so write their payload directly without a temporary byte[] allocation.
+        if (!Runtime.StandardStreamWriteUtf8(stream, value))
+            throw new IOException("Unable to write standard output stream.");
+        if (!StandardStreams.Flush(stream)) throw new IOException("Unable to flush standard output stream.");
+    }
+}

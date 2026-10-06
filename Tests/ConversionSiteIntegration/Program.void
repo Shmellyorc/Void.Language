@@ -1,0 +1,202 @@
+using Void.Collections;
+
+public struct Measure
+{
+    public int Value;
+
+    public Measure(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator Measure(int value)
+    {
+        Program.ConversionCalls++;
+        return new Measure(value);
+    }
+}
+
+public sealed class SiteHolder
+{
+    public Measure Field = 1;
+    public Measure Property { get; set; } = 2;
+    public static Measure StaticField = 3;
+    public static Measure StaticProperty { get; set; } = 4;
+
+    private Measure _assigned;
+
+    public Measure Assigned
+    {
+        get { return _assigned; }
+        set { _assigned = value; }
+    }
+
+    public Measure ExpressionProperty
+    {
+        get => 5;
+    }
+}
+
+public sealed class ConstructorHolder
+{
+    public Measure Value;
+
+    public ConstructorHolder(Measure value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class ObjectHolder
+{
+    public Measure Field;
+    public Measure Property { get; set; }
+}
+
+public sealed class MeasureBag
+{
+    public int Total;
+
+    public void Add(Measure value)
+    {
+        Total += value.Value;
+    }
+}
+
+public delegate Measure MeasureFactory();
+
+public static class Program
+{
+    public static int ConversionCalls;
+
+    public static Measure ReturnMeasure()
+    {
+        return 6;
+    }
+
+    public static Measure ExpressionReturn() => 7;
+
+    public static int Consume(Measure value)
+    {
+        return value.Value;
+    }
+
+    public static int ConsumeNamed(Measure value, int bonus = 0)
+    {
+        return value.Value + bonus;
+    }
+
+    public static int Sum(params Measure[] values)
+    {
+        int total = 0;
+        for (int i = 0; i < values.Length; i++)
+            total += values[i].Value;
+        return total;
+    }
+
+    public static T Identity<T>(T value)
+    {
+        return value;
+    }
+
+    public static IEnumerator<Measure> Values()
+    {
+        yield return 8;
+        yield return 9;
+    }
+
+    public static void Main()
+    {
+        ConversionCalls = 0;
+
+        Measure local = 10;
+        Console.WriteLine(local.Value == 10);
+
+        local = 11;
+        Console.WriteLine(local.Value == 11);
+
+        Measure? maybe = null;
+        maybe ??= 12;
+        Console.WriteLine(maybe.HasValue && maybe.Value.Value == 12);
+
+        SiteHolder holder = new SiteHolder();
+        Console.WriteLine(holder.Field.Value == 1);
+        Console.WriteLine(holder.Property.Value == 2);
+        Console.WriteLine(SiteHolder.StaticField.Value == 3);
+        Console.WriteLine(SiteHolder.StaticProperty.Value == 4);
+        Console.WriteLine(holder.ExpressionProperty.Value == 5);
+
+        holder.Assigned = 13;
+        Console.WriteLine(holder.Assigned.Value == 13);
+
+        Console.WriteLine(ReturnMeasure().Value == 6);
+        Console.WriteLine(ExpressionReturn().Value == 7);
+
+        Console.WriteLine(Consume(14) == 14);
+        Console.WriteLine(ConsumeNamed(value: 15, bonus: 2) == 17);
+
+        ConstructorHolder constructed = new ConstructorHolder(16);
+        Console.WriteLine(constructed.Value.Value == 16);
+
+        Measure[] array = new Measure[] { 17, 18 };
+        Console.WriteLine(array[0].Value == 17 && array[1].Value == 18);
+        array[0] = 19;
+        Console.WriteLine(array[0].Value == 19);
+
+        Measure[,] rectangular = new Measure[,] { { 20, 21 }, { 22, 23 } };
+        Console.WriteLine(rectangular[0, 0].Value == 20 && rectangular[1, 1].Value == 23);
+
+        ObjectHolder objectHolder = new ObjectHolder
+        {
+            Field = 24,
+            Property = 25
+        };
+        Console.WriteLine(objectHolder.Field.Value == 24 && objectHolder.Property.Value == 25);
+
+        MeasureBag bag = new MeasureBag { 26, 27 };
+        Console.WriteLine(bag.Total == 53);
+
+        Console.WriteLine(Sum(28, 29, 30) == 87);
+
+        Measure conditionalTarget = true ? 31 : 32;
+        Console.WriteLine(conditionalTarget.Value == 31);
+
+        var conditionalInferred = true ? 33 : new Measure(34);
+        Console.WriteLine(conditionalInferred.Value == 33);
+
+        Measure switchTarget = 1 switch
+        {
+            1 => 35,
+            _ => 36
+        };
+        Console.WriteLine(switchTarget.Value == 35);
+
+        var switchInferredForward = 1 switch
+        {
+            1 => new Measure(37),
+            _ => 38
+        };
+        Console.WriteLine(switchInferredForward.Value == 37);
+
+        var switchInferredReverse = 1 switch
+        {
+            1 => 39,
+            _ => new Measure(40)
+        };
+        Console.WriteLine(switchInferredReverse.Value == 39);
+
+        MeasureFactory factory = () => 41;
+        Console.WriteLine(factory().Value == 41);
+
+        Measure generic = Identity<Measure>(42);
+        Console.WriteLine(generic.Value == 42);
+
+        IEnumerator<Measure> values = Values();
+        Console.WriteLine(values.MoveNext());
+        Console.WriteLine(values.Current.Value == 8);
+        Console.WriteLine(values.MoveNext());
+        Console.WriteLine(values.Current.Value == 9);
+
+        Console.WriteLine(ConversionCalls >= 30);
+    }
+}

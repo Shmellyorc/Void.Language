@@ -1,0 +1,4 @@
+using Void;
+public interface IHub { static event Action<int> Changed; }
+public sealed class Good : IHub { public static event Action<int> Changed; }
+public static class Program { public static void Main() { Action<int> h = value => { }; IHub.Changed += h; } }

@@ -1,0 +1,1 @@
+public sealed class Node { public Node(int value) { } } public sealed class Box<T> where T : class, new() { public T Make() { return new T(); } } public static class Program { public static void Main() { Box<Node> value = new Box<Node>(); } }

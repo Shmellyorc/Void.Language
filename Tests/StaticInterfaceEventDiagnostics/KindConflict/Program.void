@@ -1,0 +1,5 @@
+using Void;
+public interface ILeft { static event Action<int> Changed; }
+public interface IRight { event Action<int> Changed; }
+public interface IBad : ILeft, IRight { }
+public static class Program { public static void Main() { } }

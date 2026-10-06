@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "UnmanagedMemoryNativeBufferIntegrationAuditAsyncUnsafe",
+  "version": "0.0.250",
+  "output": "exe",
+  "compiler": {
+    "unsafe": true
+  }
+}

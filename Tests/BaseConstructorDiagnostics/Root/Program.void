@@ -1,0 +1,11 @@
+using Void;
+
+public sealed class Root
+{
+    public Root() : base() { }
+}
+
+public static class Program
+{
+    public static void Main() { }
+}

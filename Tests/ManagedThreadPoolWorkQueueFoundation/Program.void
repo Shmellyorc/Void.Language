@@ -1,0 +1,130 @@
+using Void;
+using Void.Threading;
+
+public sealed class Payload
+{
+    public int Value;
+
+    public Payload(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class PoolState
+{
+    public int Count;
+    public int Order;
+    public int PairStarted;
+    public int PairCompleted;
+    public int PayloadValue;
+    public ManualResetEvent BlockerStarted;
+    public ManualResetEvent BlockerRelease;
+    public ManualResetEvent BlockerDone;
+    public ManualResetEvent OrderedDone;
+    public ManualResetEvent PairReady;
+    public ManualResetEvent PairRelease;
+    public ManualResetEvent PairDone;
+    public ManualResetEvent PayloadDone;
+
+    public PoolState()
+    {
+        Count = 0;
+        Order = 0;
+        PairStarted = 0;
+        PairCompleted = 0;
+        PayloadValue = 0;
+        BlockerStarted = new ManualResetEvent(false);
+        BlockerRelease = new ManualResetEvent(false);
+        BlockerDone = new ManualResetEvent(false);
+        OrderedDone = new ManualResetEvent(false);
+        PairReady = new ManualResetEvent(false);
+        PairRelease = new ManualResetEvent(false);
+        PairDone = new ManualResetEvent(false);
+        PayloadDone = new ManualResetEvent(false);
+    }
+}
+
+public static class Program
+{
+    public static void Append(PoolState state, int digit)
+    {
+        lock (state)
+        {
+            state.Order = state.Order * 10 + digit;
+            state.Count++;
+            if (state.Count == 3)
+                state.OrderedDone.Set();
+        }
+    }
+
+    public static Action MakePayloadWork(PoolState state, Payload payload)
+    {
+        return () =>
+        {
+            state.PayloadValue = payload.Value;
+            state.PayloadDone.Set();
+        };
+    }
+
+    public static Action MakePairBlocker(PoolState state)
+    {
+        return () =>
+        {
+            int ready = Interlocked.Increment(ref state.PairStarted);
+            if (ready == 2)
+                state.PairReady.Set();
+            state.PairRelease.WaitOne();
+            int completed = Interlocked.Increment(ref state.PairCompleted);
+            if (completed == 2)
+                state.PairDone.Set();
+        };
+    }
+
+    public static void Main()
+    {
+        PoolState state = new PoolState();
+
+        bool blockerAccepted = ThreadPool.QueueUserWorkItem(() =>
+        {
+            state.BlockerStarted.Set();
+            state.BlockerRelease.WaitOne();
+            state.BlockerDone.Set();
+        });
+        Console.WriteLine(blockerAccepted);
+        Console.WriteLine(state.BlockerStarted.WaitOne(5000));
+
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(() => Append(state, 1)));
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(() => Append(state, 2)));
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(() => Append(state, 3)));
+        Console.WriteLine(state.OrderedDone.WaitOne(5000));
+        Console.WriteLine(state.Count == 3);
+        Console.WriteLine(state.Order == 123);
+
+        state.BlockerRelease.Set();
+        Console.WriteLine(state.BlockerDone.WaitOne(5000));
+
+        Action firstBlocker = MakePairBlocker(state);
+        Action secondBlocker = MakePairBlocker(state);
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(firstBlocker));
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(secondBlocker));
+        firstBlocker = null;
+        secondBlocker = null;
+        Console.WriteLine(state.PairReady.WaitOne(5000));
+        Console.WriteLine(state.PairStarted == 2);
+
+        Payload payload = new Payload(191);
+        Action payloadWork = MakePayloadWork(state, payload);
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(payloadWork));
+        payload = null;
+        payloadWork = null;
+        GC.Collect();
+        Console.WriteLine(!state.PayloadDone.WaitOne(0));
+
+        state.PairRelease.Set();
+        Console.WriteLine(state.PairDone.WaitOne(5000));
+        Console.WriteLine(state.PairCompleted == 2);
+        Console.WriteLine(state.PayloadDone.WaitOne(5000));
+        Console.WriteLine(state.PayloadValue == 191);
+    }
+}

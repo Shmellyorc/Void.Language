@@ -1,0 +1,13 @@
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    public static void Main()
+    {
+        CancellationTokenSource source = new CancellationTokenSource();
+        source.Cancel();
+        TaskCompletionSource pending = new TaskCompletionSource();
+        pending.Task.WaitAsync(-2, source.Token);
+    }
+}

@@ -1,0 +1,271 @@
+public sealed class FlowException : Exception
+{
+    public int Code;
+
+    public FlowException(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class OtherException : Exception
+{
+    public OtherException(string message) : base(message) { }
+}
+
+public sealed class Node
+{
+    public int Value;
+    public Node(int value) { Value = value; }
+}
+
+public static class Program
+{
+    public static int Sequence;
+
+    public static bool NormalFinally()
+    {
+        int value = 0;
+        try
+        {
+            value = 1;
+        }
+        finally
+        {
+            value = value * 10 + 2;
+        }
+        return value == 12;
+    }
+
+    public static bool HandledFinally()
+    {
+        int value = 0;
+        try
+        {
+            throw new FlowException("handled", 2);
+        }
+        catch (FlowException error)
+        {
+            value = error.Code;
+        }
+        finally
+        {
+            value = value * 10 + 3;
+        }
+        return value == 23;
+    }
+
+    public static void PropagateThroughFinally()
+    {
+        Sequence = 1;
+        try
+        {
+            Node temporary = new Node(44);
+            if (temporary.Value == 44)
+                throw new FlowException("propagate", 4);
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 2;
+            GC.Collect();
+        }
+    }
+
+    public static void UnmatchedCatchThroughFinally()
+    {
+        Sequence = 3;
+        try
+        {
+            throw new FlowException("unmatched", 5);
+        }
+        catch (OtherException error)
+        {
+            Sequence = 99;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 4;
+        }
+    }
+
+    public static void ThrowFromCatchThroughFinally()
+    {
+        Sequence = 5;
+        try
+        {
+            throw new OtherException("source");
+        }
+        catch (OtherException error)
+        {
+            Sequence = Sequence * 10 + 6;
+            throw new FlowException("translated", 7);
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 8;
+        }
+    }
+
+    public static void FinallyOverridesPending()
+    {
+        try
+        {
+            throw new FlowException("original", 8);
+        }
+        finally
+        {
+            throw new FlowException("replacement", 9);
+        }
+    }
+
+    public static void GenericFinally<T>(T error) where T : Exception
+    {
+        Sequence = 7;
+        try
+        {
+            throw error;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 1;
+        }
+    }
+
+    public static bool AssignmentByFinally()
+    {
+        int value;
+        try
+        {
+        }
+        finally
+        {
+            value = 12;
+        }
+        return value == 12;
+    }
+
+    public static bool InternalLoopControl()
+    {
+        int count = 0;
+        try
+        {
+            while (count < 3)
+            {
+                count++;
+                if (count == 1)
+                    continue;
+                break;
+            }
+        }
+        finally
+        {
+            count += 10;
+        }
+        return count == 12;
+    }
+
+    public static bool InternalFinallyLoopControl()
+    {
+        int value = 1;
+        try
+        {
+            value = 2;
+        }
+        finally
+        {
+            int count = 0;
+            while (count < 3)
+            {
+                count++;
+                if (count == 1)
+                    continue;
+                break;
+            }
+            value += count;
+        }
+        return value == 4;
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(NormalFinally());
+        Console.WriteLine(HandledFinally());
+
+        try
+        {
+            PropagateThroughFinally();
+            Console.WriteLine(false);
+        }
+        catch (FlowException error)
+        {
+            Console.WriteLine(Sequence == 12);
+            Console.WriteLine(Runtime.Equals(error.Message, "propagate"));
+            Console.WriteLine(error.Code == 4);
+        }
+
+        try
+        {
+            UnmatchedCatchThroughFinally();
+            Console.WriteLine(false);
+        }
+        catch (FlowException error)
+        {
+            Console.WriteLine(Sequence == 34);
+            Console.WriteLine(error.Code == 5);
+        }
+
+        try
+        {
+            ThrowFromCatchThroughFinally();
+            Console.WriteLine(false);
+        }
+        catch (FlowException error)
+        {
+            Console.WriteLine(Sequence == 568);
+            Console.WriteLine(Runtime.Equals(error.Message, "translated"));
+            Console.WriteLine(error.Code == 7);
+        }
+
+        try
+        {
+            FinallyOverridesPending();
+            Console.WriteLine(false);
+        }
+        catch (FlowException error)
+        {
+            Console.WriteLine(Runtime.Equals(error.Message, "replacement"));
+            Console.WriteLine(error.Code == 9);
+        }
+
+        Exception generic = new FlowException("generic", 10);
+        try
+        {
+            GenericFinally<Exception>(generic);
+            Console.WriteLine(false);
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(Sequence == 71);
+            Console.WriteLine(Runtime.Equals(error.Message, "generic"));
+        }
+
+        Console.WriteLine(AssignmentByFinally());
+        Console.WriteLine(InternalLoopControl());
+        Console.WriteLine(InternalFinallyLoopControl());
+
+        int noThrow = 1;
+        try
+        {
+            noThrow = 2;
+        }
+        catch
+        {
+            noThrow = 99;
+        }
+        finally
+        {
+            noThrow += 3;
+        }
+        Console.WriteLine(noThrow == 5);
+    }
+}

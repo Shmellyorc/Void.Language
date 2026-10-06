@@ -1,0 +1,11 @@
+using Void.Threading;
+public static class Program
+{
+    public static void Main()
+    {
+        CancellationTokenSource source = new CancellationTokenSource();
+        CancellationToken token = source.Token;
+        source.Dispose();
+        token.Register(() => { });
+    }
+}

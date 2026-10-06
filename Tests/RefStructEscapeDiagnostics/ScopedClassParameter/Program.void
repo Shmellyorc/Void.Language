@@ -1,0 +1,1 @@
+public sealed class C {} public static class Program { public static void Use(scoped C value){} public static void Main(){ Use(new C()); } }

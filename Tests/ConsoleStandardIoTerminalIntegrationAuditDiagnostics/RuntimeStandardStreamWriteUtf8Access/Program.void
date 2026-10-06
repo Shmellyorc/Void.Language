@@ -1,0 +1,10 @@
+using Void;
+
+public static class Program
+{
+    public static void Main()
+    {
+        bool ok = Runtime.StandardStreamWriteUtf8(1, "hidden");
+        Console.WriteLine(ok);
+    }
+}

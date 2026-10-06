@@ -1,0 +1,18 @@
+public sealed class Bad
+{
+    public Bad(bool stop, out int value)
+    {
+        if (stop)
+            return;
+        value = 1;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        int value;
+        Bad bad = new Bad(true, out value);
+    }
+}

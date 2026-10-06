@@ -1,0 +1,44 @@
+public sealed class Node
+{
+    public int Value;
+    public Node Next;
+
+    public Node(int value)
+    {
+        Value = value;
+        Next = null;
+    }
+}
+
+public struct Holder
+{
+    public Node Ref;
+}
+
+public static class Program
+{
+    public static void MakeCycle()
+    {
+        Node a = new Node(1);
+        Node b = new Node(2);
+        a.Next = b;
+        b.Next = a;
+    }
+
+    public static void Main()
+    {
+        Node[] nodes = new Node[2];
+        nodes[0] = new Node(10);
+        nodes[1] = new Node(20);
+
+        Holder holder = new();
+        holder.Ref = new Node(30);
+
+        MakeCycle();
+        GC.Collect();
+
+        Console.WriteLine(nodes[0].Value);
+        Console.WriteLine(nodes[1].Value);
+        Console.WriteLine(holder.Ref.Value);
+    }
+}

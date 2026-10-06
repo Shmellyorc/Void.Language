@@ -1,0 +1,133 @@
+using Void;
+
+public enum Mode253
+{
+    First = 1,
+    Second = 2
+}
+
+public struct Pair253
+{
+    public int X;
+    public long Y;
+
+    public Pair253(int x, long y)
+    {
+        X = x;
+        Y = y;
+    }
+}
+
+public struct Nested253
+{
+    public Pair253 Pair;
+    public Mode253 Mode;
+
+    public Nested253(Pair253 pair, Mode253 mode)
+    {
+        Pair = pair;
+        Mode = mode;
+    }
+}
+
+public struct GenericPair253<T> where T : unmanaged
+{
+    public T Left;
+    public T Right;
+
+    public GenericPair253(T left, T right)
+    {
+        Left = left;
+        Right = right;
+    }
+}
+
+public static class Program
+{
+    private static unsafe T RoundTrip<T>(T value) where T : unmanaged
+    {
+        T* storage = NativeMemory.Allocate<T>(2ul);
+        storage[0] = value;
+        storage[1] = value;
+        T result = storage[1];
+        NativeMemory.Free(storage);
+        return result;
+    }
+
+    private static unsafe bool TryRoundTrip<T>(T value) where T : unmanaged
+    {
+        T* storage = null;
+        bool allocated = NativeMemory.TryAllocate<T>(1ul, out storage);
+        if (!allocated || storage == null)
+            return false;
+        storage[0] = value;
+        bool nonNull = storage != null;
+        NativeMemory.Free(storage);
+        return nonNull;
+    }
+
+    public static unsafe void Main()
+    {
+        int* values = NativeMemory.Allocate<int>(4ul);
+        Console.WriteLine(values != null);
+        values[0] = 10;
+        values[1] = 20;
+        values[2] = 30;
+        values[3] = 40;
+        Console.WriteLine(values[0] + values[3] == 50);
+
+        Span<int> span = new Span<int>(values, 4);
+        span[2] = 300;
+        Console.WriteLine(values[2] == 300 && span[2] == 300);
+        NativeMemory.Free(values);
+
+        Pair253* pairs = NativeMemory.Allocate<Pair253>(2ul);
+        pairs[0] = new Pair253(7, 8);
+        pairs[1] = new Pair253(9, 10);
+        Console.WriteLine(pairs[0].X == 7 && pairs[1].Y == 10);
+        NativeMemory.Free(pairs);
+
+        Pair253* triedPairs = null;
+        bool pairOk = NativeMemory.TryAllocate<Pair253>(2ul, out triedPairs);
+        Console.WriteLine(pairOk && triedPairs != null);
+        triedPairs[0] = new Pair253(11, 12);
+        Console.WriteLine(triedPairs[0].X == 11 && triedPairs[0].Y == 12);
+        NativeMemory.Free(triedPairs);
+
+        Nested253* nested = NativeMemory.Allocate<Nested253>(2ul);
+        nested[0] = new Nested253(new Pair253(17, 18), Mode253.Second);
+        Console.WriteLine(nested != null);
+        Console.WriteLine(nested[0].Pair.X == 17 && nested[0].Pair.Y == 18 && nested[0].Mode == Mode253.Second);
+        NativeMemory.Free(nested);
+
+        Mode253* modes = NativeMemory.Allocate<Mode253>(2ul);
+        modes[0] = Mode253.First;
+        modes[1] = Mode253.Second;
+        Console.WriteLine(modes[0] == Mode253.First && modes[1] == Mode253.Second);
+        NativeMemory.Free(modes);
+
+        Console.WriteLine(RoundTrip<int>(77) == 77);
+        Pair253 roundPair = RoundTrip<Pair253>(new Pair253(13, 14));
+        Console.WriteLine(roundPair.X == 13 && roundPair.Y == 14);
+        Nested253 roundNested = RoundTrip<Nested253>(new Nested253(new Pair253(17, 18), Mode253.Second));
+        Console.WriteLine(roundNested.Pair.X == 17 && roundNested.Pair.Y == 18 && roundNested.Mode == Mode253.Second);
+        Console.WriteLine(RoundTrip<Mode253>(Mode253.Second) == Mode253.Second);
+        GenericPair253<int> generic = RoundTrip<GenericPair253<int>>(new GenericPair253<int>(15, 16));
+        Console.WriteLine(generic.Left == 15 && generic.Right == 16);
+
+        int* empty = NativeMemory.Allocate<int>(0ul);
+        Console.WriteLine(empty == null);
+        NativeMemory.Free(empty);
+
+        Pair253* tryEmpty = null;
+        bool emptyOk = NativeMemory.TryAllocate<Pair253>(0ul, out tryEmpty);
+        Console.WriteLine(emptyOk && tryEmpty == null);
+
+        long* overflow = stackalloc long[1];
+        bool overflowOk = NativeMemory.TryAllocate<long>(9223372036854775808ul, out overflow);
+        Console.WriteLine(!overflowOk && overflow == null);
+
+        Console.WriteLine(TryRoundTrip<int>(21));
+        Console.WriteLine(TryRoundTrip<Mode253>(Mode253.Second));
+    }
+}

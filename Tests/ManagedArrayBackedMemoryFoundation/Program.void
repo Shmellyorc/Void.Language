@@ -1,0 +1,115 @@
+using Void;
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class MemoryHolder
+{
+    public Memory<int> Writable;
+    public ReadOnlyMemory<int> ReadOnly;
+    public Memory<Node> References;
+}
+
+public struct Box<T>
+{
+    public T Value;
+
+    public Box(T value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    private static Memory<int> PassMemory(Memory<int> value)
+    {
+        return value;
+    }
+
+    private static ReadOnlyMemory<int> PassReadOnlyMemory(ReadOnlyMemory<int> value)
+    {
+        return value;
+    }
+
+    public static void Main()
+    {
+        int[] values = new int[5];
+        values[0] = 10;
+        values[1] = 20;
+        values[2] = 30;
+        values[3] = 40;
+        values[4] = 50;
+
+        Console.WriteLine(typeof(Memory<int>).IsValueType);
+        Console.WriteLine(typeof(ReadOnlyMemory<int>).IsValueType);
+
+        Memory<int> full = new Memory<int>(values);
+        Memory<int> segment = new Memory<int>(values, 1, 3);
+        Memory<int> emptyAtEnd = new Memory<int>(values, values.Length, 0);
+        Memory<int> nullFull = new Memory<int>(null);
+        Memory<int> nullEmpty = new Memory<int>(null, 0, 0);
+        Memory<int> defaultMemory = default(Memory<int>);
+        Console.WriteLine(true);
+
+        ReadOnlyMemory<int> readOnlyFull = new ReadOnlyMemory<int>(values);
+        ReadOnlyMemory<int> readOnlySegment = new ReadOnlyMemory<int>(values, 2, 2);
+        ReadOnlyMemory<int> readOnlyEmptyAtEnd = new ReadOnlyMemory<int>(values, values.Length, 0);
+        ReadOnlyMemory<int> readOnlyNullFull = new ReadOnlyMemory<int>(null);
+        ReadOnlyMemory<int> readOnlyNullEmpty = new ReadOnlyMemory<int>(null, 0, 0);
+        ReadOnlyMemory<int> defaultReadOnly = default(ReadOnlyMemory<int>);
+        Console.WriteLine(true);
+
+        Memory<int> copied = full;
+        copied = segment;
+        copied = PassMemory(copied);
+        Console.WriteLine(true);
+
+        ReadOnlyMemory<int> readOnlyCopied = readOnlyFull;
+        readOnlyCopied = readOnlySegment;
+        readOnlyCopied = PassReadOnlyMemory(readOnlyCopied);
+        Console.WriteLine(true);
+
+        MemoryHolder holder = new MemoryHolder();
+        holder.Writable = full;
+        holder.ReadOnly = readOnlySegment;
+        Node[] nodes = new Node[2];
+        nodes[0] = new Node(7);
+        nodes[1] = new Node(9);
+        holder.References = new Memory<Node>(nodes, 0, nodes.Length);
+        Console.WriteLine(true);
+
+        Memory<int>[] writableArray = new Memory<int>[3];
+        writableArray[0] = full;
+        writableArray[1] = segment;
+        writableArray[2] = emptyAtEnd;
+        Memory<int> fromArray = writableArray[1];
+        Console.WriteLine(true);
+
+        ReadOnlyMemory<int>[] readOnlyArray = new ReadOnlyMemory<int>[2];
+        readOnlyArray[0] = readOnlyFull;
+        readOnlyArray[1] = readOnlySegment;
+        ReadOnlyMemory<int> readOnlyFromArray = readOnlyArray[1];
+        Console.WriteLine(true);
+
+        Box<Memory<int>> boxedMemory = new Box<Memory<int>>(fromArray);
+        Box<ReadOnlyMemory<int>> boxedReadOnlyMemory = new Box<ReadOnlyMemory<int>>(readOnlyFromArray);
+        Console.WriteLine(true);
+
+        Memory<Node>[] referenceMemories = new Memory<Node>[1];
+        referenceMemories[0] = holder.References;
+        holder = null;
+        nodes = null;
+        GC.Collect();
+        Console.WriteLine(true);
+
+        Console.WriteLine(true);
+    }
+}

@@ -1,0 +1,151 @@
+using Void;
+using Void.Collections;
+
+public interface IValue
+{
+    int Value { get; }
+}
+
+public class BaseValue
+{
+    public virtual int Value { get { return 4; } }
+}
+
+public sealed class DerivedValue : BaseValue, IValue
+{
+    private int _value;
+
+    public DerivedValue(int value)
+    {
+        _value = value;
+    }
+
+    public override int Value { get { return _value; } }
+}
+
+public struct Pair
+{
+    public int Left { get; set; }
+    public int Right { get; set; }
+}
+
+public sealed class Holder
+{
+    public DerivedValue Child { get; set; }
+}
+
+public sealed class Probe
+{
+    private int _value;
+    public int Calls;
+
+    public Probe(int value)
+    {
+        _value = value;
+    }
+
+    public int Value
+    {
+        get
+        {
+            Calls++;
+            return _value;
+        }
+    }
+}
+
+public sealed class GcProbe
+{
+    private int _value;
+
+    public GcProbe(int value)
+    {
+        _value = value;
+    }
+
+    public int Value
+    {
+        get
+        {
+            GC.Collect();
+            return _value;
+        }
+    }
+}
+
+public sealed class GenericBox<T>
+{
+    public bool Match(Pair value)
+    {
+        return value is { Left: 2, Right: > 2 };
+    }
+}
+
+public static class Program
+{
+    private static IEnumerator<int> MatchYield(IValue value)
+    {
+        if (value is { Value: 7 })
+            yield return 1;
+        else
+            yield return 0;
+    }
+
+    public static void Main()
+    {
+        DerivedValue value = new DerivedValue(7);
+        Console.WriteLine(value is { Value: 7 });
+        Console.WriteLine(value is { Value: > 5 });
+        Console.WriteLine(!(value is { Value: < 0 }));
+        Console.WriteLine(value is { Value: > 0 and < 10 });
+        Console.WriteLine(value is { });
+
+        DerivedValue none = null;
+        Console.WriteLine(!(none is { Value: 7 }));
+        Console.WriteLine(!(none is { }));
+
+        BaseValue baseValue = value;
+        Console.WriteLine(baseValue is { Value: 7 });
+
+        IValue interfaceValue = value;
+        Console.WriteLine(interfaceValue is { Value: 7 });
+
+        Pair pair = new Pair();
+        pair.Left = 2;
+        pair.Right = 3;
+        Console.WriteLine(pair is { Left: 2, Right: 3 });
+        Console.WriteLine(pair is { Left: > 0, Right: < 5 });
+
+        Pair? nullablePair = pair;
+        Pair? missingPair = null;
+        Console.WriteLine(nullablePair is { Left: 2 });
+        Console.WriteLine(!(missingPair is { Left: 2 }));
+        Console.WriteLine(!(missingPair is { }));
+
+        Holder holder = new Holder();
+        holder.Child = value;
+        Console.WriteLine(holder is { Child: DerivedValue });
+        Console.WriteLine(!(holder is { Child: null }));
+
+        holder.Child = null;
+        Console.WriteLine(holder is { Child: null });
+        Console.WriteLine(!(holder is { Child: DerivedValue }));
+
+        Probe probe = new Probe(9);
+        Console.WriteLine(probe is { Value: 9 });
+        Console.WriteLine(probe.Calls == 1);
+
+        Console.WriteLine(probe is { Value: > 5 and < 10 });
+        Console.WriteLine(probe.Calls == 2);
+
+        Console.WriteLine(new GcProbe(11) is { Value: 11 });
+
+        GenericBox<int> generic = new GenericBox<int>();
+        Console.WriteLine(generic.Match(pair));
+
+        var iterator = MatchYield(value);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == 1);
+        iterator.Dispose();
+    }
+}

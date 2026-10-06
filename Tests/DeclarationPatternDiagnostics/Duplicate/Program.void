@@ -1,0 +1,4 @@
+using Void;
+public class Base { }
+public sealed class Derived : Base { }
+public static class Program { public static void Main() { Derived item = new Derived(); Base value = item; if (value is Derived item) { } } }

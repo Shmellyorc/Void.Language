@@ -1,0 +1,1 @@
+public class Api { [Export("bad_instance")] public int Get() { return 1; } }

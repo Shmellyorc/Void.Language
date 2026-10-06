@@ -1,0 +1,6 @@
+using Void;
+public sealed class Box247 { public int Value; }
+public static class Program {
+    private static unsafe Span<int> Escape(Box247 box) { fixed (int* p = &box.Value) { return new Span<int>(p, 1); } }
+    public static void Main() { Escape(new Box247()); }
+}

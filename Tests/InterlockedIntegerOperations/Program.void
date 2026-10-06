@@ -1,0 +1,115 @@
+using Void;
+using Void.Threading;
+
+public sealed class Box
+{
+    public int IntValue;
+    public long LongValue;
+}
+
+public static class Program
+{
+    private static int _sharedInt;
+    private static long _sharedLong;
+    private static int _addCalls;
+
+    public static void IncrementWorker()
+    {
+        for (int i = 0; i < 1000; i++)
+            Interlocked.Increment(ref _sharedInt);
+    }
+
+    public static int NextAddAmount()
+    {
+        _addCalls++;
+        return 6;
+    }
+
+    public static void AddWorker()
+    {
+        for (int i = 0; i < 500; i++)
+            Interlocked.Add(ref _sharedLong, 2);
+    }
+
+    public static int ForwardIncrement(ref int value)
+    {
+        return Interlocked.Increment(ref value);
+    }
+
+    public static long ForwardAdd(ref long value, long amount)
+    {
+        return Interlocked.Add(ref value, amount);
+    }
+
+    public static void Main()
+    {
+        int value = 10;
+        Console.WriteLine(Interlocked.Increment(ref value) == 11);
+        Console.WriteLine(value == 11);
+        Console.WriteLine(Interlocked.Decrement(ref value) == 10);
+        Console.WriteLine(value == 10);
+        Console.WriteLine(Interlocked.Add(ref value, 7) == 17);
+        Console.WriteLine(value == 17);
+        Console.WriteLine(Interlocked.Exchange(ref value, 25) == 17);
+        Console.WriteLine(value == 25);
+        Console.WriteLine(Interlocked.CompareExchange(ref value, 40, 25) == 25);
+        Console.WriteLine(value == 40);
+        Console.WriteLine(Interlocked.CompareExchange(ref value, 99, 25) == 40);
+        Console.WriteLine(value == 40);
+        Console.WriteLine(ForwardIncrement(ref value) == 41);
+        _addCalls = 0;
+        Console.WriteLine(Interlocked.Add(ref value, NextAddAmount()) == 47);
+        Console.WriteLine(_addCalls == 1);
+
+        long wide = 100;
+        Console.WriteLine(Interlocked.Increment(ref wide) == 101);
+        Console.WriteLine(Interlocked.Decrement(ref wide) == 100);
+        Console.WriteLine(Interlocked.Add(ref wide, 50) == 150);
+        Console.WriteLine(ForwardAdd(ref wide, 25) == 175);
+        Console.WriteLine(Interlocked.Exchange(ref wide, 500) == 175);
+        Console.WriteLine(Interlocked.CompareExchange(ref wide, 700, 500) == 500);
+        Console.WriteLine(wide == 700);
+        Console.WriteLine(Interlocked.CompareExchange(ref wide, 900, 500) == 700);
+        Console.WriteLine(wide == 700);
+
+        Box box = new Box();
+        box.IntValue = 3;
+        box.LongValue = 9;
+        Console.WriteLine(Interlocked.Add(ref box.IntValue, 4) == 7);
+        Console.WriteLine(Interlocked.Exchange(ref box.LongValue, 12) == 9);
+        Console.WriteLine(box.IntValue == 7);
+        Console.WriteLine(box.LongValue == 12);
+
+        _sharedInt = 0;
+        Action incrementAction = IncrementWorker;
+        Thread a = new Thread(incrementAction);
+        Thread b = new Thread(incrementAction);
+        Thread c = new Thread(incrementAction);
+        Thread d = new Thread(incrementAction);
+        a.Start();
+        b.Start();
+        c.Start();
+        d.Start();
+        a.Join();
+        b.Join();
+        c.Join();
+        d.Join();
+        Console.WriteLine(_sharedInt == 4000);
+
+        _sharedLong = 0;
+        Action addAction = AddWorker;
+        Thread e = new Thread(addAction);
+        Thread f = new Thread(addAction);
+        Thread g = new Thread(addAction);
+        Thread h = new Thread(addAction);
+        e.Start();
+        f.Start();
+        g.Start();
+        h.Start();
+        e.Join();
+        f.Join();
+        g.Join();
+        h.Join();
+        Console.WriteLine(_sharedLong == 4000);
+    }
+}

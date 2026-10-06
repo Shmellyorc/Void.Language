@@ -1,0 +1,21 @@
+public struct Choice
+{
+    public static implicit operator Choice(short value)
+    {
+        return new Choice();
+    }
+
+    public static implicit operator Choice(ushort value)
+    {
+        return new Choice();
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        byte? source = (byte)1;
+        Choice? choice = source;
+    }
+}

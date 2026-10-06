@@ -1,0 +1,174 @@
+using Void;
+using Void.IO;
+using Void.Text;
+
+public sealed class AuditReader320 : TextReader
+{
+    private int _readCount;
+    private int _lineCount;
+
+    public override int Read()
+    {
+        _readCount++;
+        return _readCount == 1 ? 82 : -1;
+    }
+
+    public override string ReadLine()
+    {
+        _lineCount++;
+        return _lineCount == 1 ? "custom-input" : null;
+    }
+}
+
+public sealed class AuditWriter320 : TextWriter
+{
+    public string Text = "";
+    public override void Write(string value) { Text = Text + value; }
+}
+
+public static class Program
+{
+    private static void Report(bool value) { Console.Error.WriteLine(value ? "True" : "False"); }
+
+    private static bool KeyAvailableThrows()
+    {
+        try { if (Console.KeyAvailable) { } }
+        catch (InvalidOperationException e) { return true; }
+        return false;
+    }
+
+    private static bool ReadKeyThrows()
+    {
+        try { Console.ReadKey(true); }
+        catch (InvalidOperationException e) { return true; }
+        return false;
+    }
+
+    private static bool ClearThrows()
+    {
+        try { Console.Clear(); }
+        catch (IOException e) { return true; }
+        return false;
+    }
+
+    private static void RunRedirected()
+    {
+        Report(Console.IsInputRedirected);
+        Report(Console.IsOutputRedirected);
+        Report(Console.IsErrorRedirected);
+
+        UTF8Encoding utf8 = new UTF8Encoding(false, false);
+        Console.InputEncoding = utf8;
+        Console.OutputEncoding = utf8;
+        Report(Console.InputEncoding.GetPreamble().Length == 0);
+        Report(Console.OutputEncoding.GetPreamble().Length == 0);
+
+        // Shared input state across ReadLine -> raw Stream -> Read -> ReadLine.
+        Report(Console.ReadLine() == "first");
+        Stream input = Console.OpenStandardInput();
+        Report(input.ReadByte() == 81); // pending 'Q' preserved after lone CR
+        Report(Console.Read() == 946);  // beta scalar
+        Report(Console.ReadLine() == "");
+        Report(Console.ReadLine() == "last");
+        Report(Console.ReadLine() == null);
+
+        TextReader originalIn = Console.In;
+        AuditReader320 replacement = new AuditReader320();
+        Console.SetIn(replacement);
+        Report(Console.Read() == 82);
+        Report(Console.ReadLine() == "custom-input");
+        Report(KeyAvailableThrows());
+        Report(ReadKeyThrows());
+        Console.SetIn(originalIn);
+
+        TextWriter originalOut = Console.Out;
+        AuditWriter320 capture = new AuditWriter320();
+        bool outputRedirected = Console.IsOutputRedirected;
+        Console.SetOut(capture);
+        Console.Write(42);
+        Console.Write("|");
+        Console.WriteLine("captured");
+        Stream directOut = Console.OpenStandardOutput();
+        byte[] direct = new byte[] { (byte)68, (byte)73, (byte)82, (byte)69, (byte)67, (byte)84, (byte)10 };
+        directOut.Write(direct, 0, direct.Length);
+        directOut.Flush();
+        GC.Collect();
+        Console.SetOut(originalOut);
+        Report(capture.Text == "42|captured" + Environment.NewLine);
+        Report(Console.IsOutputRedirected == outputRedirected);
+
+        TextWriter originalError = Console.Error;
+        AuditWriter320 errorCapture = new AuditWriter320();
+        Console.SetError(errorCapture);
+        Console.Error.WriteLine("captured-error");
+        Console.SetError(originalError);
+        Report(errorCapture.Text == "captured-error" + Environment.NewLine);
+
+        Stream directError = Console.OpenStandardError();
+        byte[] err = new byte[] { (byte)82, (byte)65, (byte)87, (byte)69, (byte)82, (byte)82, (byte)10 };
+        directError.Write(err, 0, err.Length);
+        directError.Flush();
+
+        Report(ClearThrows());
+        Report(KeyAvailableThrows());
+        Report(ReadKeyThrows());
+        GC.Collect();
+        Report(true);
+        Console.WriteLine("TEXT-" + (char)937);
+    }
+
+    private static void RunTerminal()
+    {
+        Report(!Console.IsInputRedirected);
+        Report(!Console.IsOutputRedirected);
+        Report(Console.IsErrorRedirected);
+        Report(!Console.KeyAvailable);
+
+        while (!Console.KeyAvailable) { }
+        Report(Console.KeyAvailable);
+        ConsoleKeyInfo key = Console.ReadKey(true);
+        Report(key.KeyChar == 'a' && key.Key == ConsoleKey.A && (int)key.Modifiers == 0);
+        Report(!Console.KeyAvailable);
+
+        Console.TreatControlCAsInput = true;
+        Report(Console.TreatControlCAsInput);
+        while (!Console.KeyAvailable) { }
+        ConsoleKeyInfo control = Console.ReadKey(true);
+        Report((int)control.KeyChar == 3 && control.Key == ConsoleKey.C && (int)control.Modifiers == 4);
+        Console.TreatControlCAsInput = false;
+        Report(!Console.TreatControlCAsInput);
+
+        Console.OutputEncoding = new UTF8Encoding(false, false);
+        Console.ForegroundColor = ConsoleColor.Green;
+        Report(Console.ForegroundColor == ConsoleColor.Green);
+        Console.BackgroundColor = ConsoleColor.DarkBlue;
+        Report(Console.BackgroundColor == ConsoleColor.DarkBlue);
+        Console.ResetColor();
+        Console.Clear();
+        Console.CursorVisible = false;
+        Report(!Console.CursorVisible);
+        Console.CursorVisible = true;
+        Report(Console.CursorVisible);
+        Console.SetCursorPosition(2, 1);
+        Report(Console.CursorLeft == 2);
+        Report(Console.CursorTop == 1);
+        Console.Title = "VOID #320";
+
+        Console.Write((char)937);
+        Stream directOut = Console.OpenStandardOutput();
+        directOut.WriteByte((byte)33);
+        directOut.Flush();
+        GC.Collect();
+        Report(true);
+    }
+
+    public static void Main()
+    {
+        Report(Console.In != null && Console.Out != null && Console.Error != null);
+        Report(Console.InputEncoding != null && Console.OutputEncoding != null);
+        if (Console.IsInputRedirected || Console.IsOutputRedirected)
+            RunRedirected();
+        else
+            RunTerminal();
+    }
+}

@@ -1,0 +1,11 @@
+using Void;
+public static class Native301InvalidNul
+{
+    [NativeString(NativeStringKind.BorrowedNul)]
+    [Native("void301_invalid_nul")]
+    public static unsafe extern string Value();
+}
+public static class Program
+{
+    public static unsafe void Main() { string value = Native301InvalidNul.Value(); Console.WriteLine(value == null); }
+}

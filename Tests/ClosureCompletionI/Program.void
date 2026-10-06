@@ -1,0 +1,129 @@
+using Void;
+using Void.Collections;
+
+public sealed class Node
+{
+    public int Value;
+    public Node(int value) { Value = value; }
+}
+
+public sealed class Owner
+{
+    private int _value;
+    public Owner(int value) { _value = value; }
+    public Func<Func<int>> Build() { return () => () => _value; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Func<int, Func<int>> make = x => () => x;
+        Func<int> a = make(5);
+        Func<int> b = make(9);
+        Console.WriteLine(a() == 5);
+        Console.WriteLine(b() == 9);
+
+        Func<int, int, Func<int>> pairFactory = (x, y) => () => x + y;
+        Func<int> pairGetter = pairFactory(7, 8);
+        Console.WriteLine(pairGetter() == 15);
+
+        Func<int, Func<int>> makeCounter = start =>
+        {
+            int value = start;
+            return () =>
+            {
+                value++;
+                return value;
+            };
+        };
+        Func<int> counterA = makeCounter(10);
+        Func<int> counterB = makeCounter(20);
+        Console.WriteLine(counterA() == 11 && counterA() == 12);
+        Console.WriteLine(counterB() == 21 && counterB() == 22);
+
+        int offset = 100;
+        Func<int, Func<int>> withOffset = x => () => x + offset;
+        Func<int> offsetA = withOffset(1);
+        Func<int> offsetB = withOffset(2);
+        offset = 200;
+        Console.WriteLine(offsetA() == 201);
+        Console.WriteLine(offsetB() == 202);
+
+        Func<int, Func<int>> makeNode = value =>
+        {
+            Node node = new Node(value);
+            return () => node.Value;
+        };
+        Func<int> nodeGetter = makeNode(44);
+        GC.Collect();
+        Console.WriteLine(nodeGetter() == 44);
+
+        Owner owner = new Owner(73);
+        Func<Func<int>> ownerFactory = owner.Build();
+        owner = null;
+        GC.Collect();
+        Func<int> ownerGetter = ownerFactory();
+        Console.WriteLine(ownerGetter() == 73);
+
+        List<Func<int>> arrayClosures = new();
+        int[] numbers = new int[] { 2, 4, 6 };
+        foreach (int number in numbers)
+            arrayClosures.Add(() => number);
+        Func<int> array0 = arrayClosures[0];
+        Func<int> array1 = arrayClosures[1];
+        Func<int> array2 = arrayClosures[2];
+        Console.WriteLine(array0() == 2);
+        Console.WriteLine(array1() == 4);
+        Console.WriteLine(array2() == 6);
+
+        List<int> source = new() { 3, 5, 7 };
+        List<Func<int>> listClosures = new();
+        foreach (int value in source)
+            listClosures.Add(() => value);
+        Func<int> list0 = listClosures[0];
+        Func<int> list1 = listClosures[1];
+        Func<int> list2 = listClosures[2];
+        Console.WriteLine(list0() == 3);
+        Console.WriteLine(list1() == 5);
+        Console.WriteLine(list2() == 7);
+
+        List<Func<Func<int>>> factories = new();
+        foreach (int number in numbers)
+            factories.Add(() => () => number);
+        Func<Func<int>> factory0 = factories[0];
+        Func<Func<int>> factory2 = factories[2];
+        Func<int> nested0 = factory0();
+        Func<int> nested2 = factory2();
+        Console.WriteLine(nested0() == 2);
+        Console.WriteLine(nested2() == 6);
+
+        Node[] nodes = new Node[] { new Node(11), new Node(22) };
+        List<Func<int>> nodeClosures = new();
+        foreach (Node node in nodes)
+            nodeClosures.Add(() => node.Value);
+        nodes = null;
+        GC.Collect();
+        Func<int> node0 = nodeClosures[0];
+        Func<int> node1 = nodeClosures[1];
+        Console.WriteLine(node0() == 11);
+        Console.WriteLine(node1() == 22);
+
+        int[] outerValues = new int[] { 1, 2 };
+        int[] innerValues = new int[] { 10, 20 };
+        List<Func<int>> pairs = new();
+        foreach (int outerValue in outerValues)
+        {
+            foreach (int innerValue in innerValues)
+                pairs.Add(() => outerValue + innerValue);
+        }
+        Func<int> pair0 = pairs[0];
+        Func<int> pair1 = pairs[1];
+        Func<int> pair2 = pairs[2];
+        Func<int> pair3 = pairs[3];
+        Console.WriteLine(pair0() == 11);
+        Console.WriteLine(pair1() == 21);
+        Console.WriteLine(pair2() == 12);
+        Console.WriteLine(pair3() == 22);
+    }
+}

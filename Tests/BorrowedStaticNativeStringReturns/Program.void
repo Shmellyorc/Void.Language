@@ -1,0 +1,68 @@
+using Void;
+
+public static class Native296
+{
+    [NativeString]
+    [Native("void296_borrowed_nul")]
+    public static unsafe extern string BorrowedNul();
+
+    [NativeString(NativeStringKind.StaticNul)]
+    [Native("void296_static_nul")]
+    public static unsafe extern string StaticNul();
+
+    [NativeString(NativeStringKind.BorrowedPointerLength)]
+    [Native("void296_borrowed_view")]
+    public static unsafe extern string BorrowedPointerLength();
+
+    [NativeString(NativeStringKind.StaticPointerLength)]
+    [Native("void296_static_view")]
+    public static unsafe extern string StaticPointerLength();
+
+    [NativeString(NativeStringKind.BorrowedNul)]
+    [Native("void296_null_nul")]
+    public static unsafe extern string NullNul();
+
+    [NativeString(NativeStringKind.BorrowedPointerLength)]
+    [Native("void296_null_view")]
+    public static unsafe extern string NullPointerLength();
+
+    [NativeString(NativeStringKind.StaticPointerLength)]
+    [Native("void296_empty_view")]
+    public static unsafe extern string EmptyPointerLength();
+
+    [Native("void296_legacy_nul")]
+    public static unsafe extern string LegacyNul();
+
+    [Native("void296_mutate_borrowed")]
+    public static unsafe extern void MutateBorrowed();
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        NativeStringKind borrowedKind = NativeStringKind.BorrowedNul;
+        NativeStringKind staticKind = NativeStringKind.StaticPointerLength;
+        Console.WriteLine(borrowedKind == NativeStringKind.BorrowedNul);
+        Console.WriteLine(staticKind == NativeStringKind.StaticPointerLength);
+
+        string borrowedNul = Native296.BorrowedNul();
+        string borrowedView = Native296.BorrowedPointerLength();
+        Console.WriteLine(borrowedNul == "borrowed");
+        Console.WriteLine(borrowedView == "A\0B");
+
+        Native296.MutateBorrowed();
+        Console.WriteLine(borrowedNul == "borrowed");
+        Console.WriteLine(borrowedView == "A\0B");
+
+        Console.WriteLine(Native296.StaticNul() == "static");
+        Console.WriteLine(Native296.StaticPointerLength() == "é\0Z");
+        Console.WriteLine(Native296.NullNul() == null);
+        Console.WriteLine(Native296.NullPointerLength() == null);
+
+        string empty = Native296.EmptyPointerLength();
+        Console.WriteLine(empty != null);
+        Console.WriteLine(empty == "");
+        Console.WriteLine(Native296.LegacyNul() == "legacy");
+    }
+}

@@ -1,0 +1,208 @@
+using Void;
+
+public enum Mode242
+{
+    First = 1,
+    Second = 2
+}
+
+public struct Inner242
+{
+    public int Value;
+
+    public Inner242(int value)
+    {
+        Value = value;
+    }
+}
+
+public struct Nested242
+{
+    public Inner242 Inner;
+    public long Extra;
+
+    public Nested242(int value, long extra)
+    {
+        Inner = new Inner242(value);
+        Extra = extra;
+    }
+}
+
+public struct Auto242
+{
+    public int Value { get; set; }
+}
+
+public struct Pair242<T> where T : unmanaged
+{
+    public T Left;
+    public T Right;
+
+    public Pair242(T left, T right)
+    {
+        Left = left;
+        Right = right;
+    }
+}
+
+public unsafe struct PointerBox242<T> where T : unmanaged
+{
+    public T* Pointer;
+
+    public PointerBox242(T* pointer)
+    {
+        Pointer = pointer;
+    }
+
+    public T* Value => Pointer;
+
+    public unsafe T* Get() => Pointer;
+}
+
+public static class Program
+{
+    private static int CountCalls;
+
+    private static int NextCount()
+    {
+        CountCalls++;
+        return 3;
+    }
+
+    private static unsafe T* Identity<T>(T* value) where T : unmanaged => value;
+
+    private static unsafe T* Offset<T>(T* value, int amount) where T : unmanaged => value + amount;
+
+    private static unsafe long Distance<T>(T* left, T* right) where T : unmanaged => right - left;
+
+    private static unsafe bool PointerMotion<T>(T first, T second) where T : unmanaged
+    {
+        T* values = stackalloc T[4];
+        values[0] = first;
+        values[1] = second;
+        T* cursor = values;
+        cursor++;
+        bool one = cursor - values == 1 && values < cursor;
+        cursor += 2;
+        bool three = cursor - values == 3 && cursor > values;
+        cursor--;
+        bool two = cursor - values == 2;
+        cursor -= 2;
+        bool zero = cursor == values;
+        T copy = cursor[0];
+        values[3] = copy;
+        return one && three && two && zero && Identity(cursor) == values && Offset(values, 2) - values == 2;
+    }
+
+    private static unsafe T StackRoundTrip<T>(T value) where T : unmanaged
+    {
+        T* values = stackalloc T[2];
+        values[0] = value;
+        T* first = &values[0];
+        return *first;
+    }
+
+    private static T SpanRoundTrip<T>(T value) where T : unmanaged
+    {
+        Span<T> values = stackalloc T[2];
+        values[0] = value;
+        return values[0];
+    }
+
+    private static T ReadOnlySpanRoundTrip<T>(T value) where T : unmanaged
+    {
+        ReadOnlySpan<T> values = stackalloc T[2];
+        Span<T> writable = stackalloc T[2];
+        writable[0] = value;
+        values = writable;
+        return values[0];
+    }
+
+    private static unsafe int SizeOf<T>() where T : unmanaged => sizeof(T);
+
+    private static unsafe int PointerSizeOf<T>() where T : unmanaged => sizeof(T*);
+
+    private static unsafe bool DefaultPointerIsNull<T>() where T : unmanaged => default(T*) == null;
+
+    private static unsafe bool TypeofPointerIsStable<T>() where T : unmanaged => typeof(T*) == typeof(T*);
+
+    private static unsafe T AddressRoundTrip<T>(T value) where T : unmanaged
+    {
+        T* pointer = &value;
+        return *pointer;
+    }
+
+    private static unsafe bool StackCountEvaluatesOnce<T>(T value) where T : unmanaged
+    {
+        CountCalls = 0;
+        T* values = stackalloc T[NextCount()];
+        values[2] = value;
+        return CountCalls == 1;
+    }
+
+    private static unsafe bool EmptyStackIsNull<T>() where T : unmanaged
+    {
+        T* values = stackalloc T[0];
+        return values == null;
+    }
+
+    private static unsafe bool PointerBoxWorks<T>(T value) where T : unmanaged
+    {
+        T* storage = stackalloc T[1];
+        storage[0] = value;
+        PointerBox242<T> box = new PointerBox242<T>(storage);
+        return box.Pointer == storage && box.Value == storage && box.Get() == storage;
+    }
+
+    public static unsafe void Main()
+    {
+        Console.WriteLine(PointerMotion<int>(10, 20));
+        Console.WriteLine(PointerMotion<Nested242>(new Nested242(1, 2), new Nested242(3, 4)));
+        Console.WriteLine(PointerMotion<Auto242>(new Auto242(), new Auto242()));
+        Console.WriteLine(PointerMotion<Mode242>(Mode242.First, Mode242.Second));
+
+        Console.WriteLine(StackRoundTrip<int>(42) == 42);
+        Nested242 nested = StackRoundTrip(new Nested242(7, 99));
+        Console.WriteLine(nested.Inner.Value == 7 && nested.Extra == 99);
+        Auto242 autoValue = new Auto242();
+        autoValue.Value = 31;
+        Console.WriteLine(StackRoundTrip(autoValue).Value == 31);
+        Pair242<int> pair = StackRoundTrip(new Pair242<int>(5, 8));
+        Console.WriteLine(pair.Left == 5 && pair.Right == 8);
+
+        Console.WriteLine(SpanRoundTrip<int>(17) == 17);
+        Console.WriteLine(SpanRoundTrip(new Nested242(12, 13)).Inner.Value == 12);
+        Console.WriteLine(ReadOnlySpanRoundTrip<int>(21) == 21);
+        Console.WriteLine(ReadOnlySpanRoundTrip(new Nested242(22, 23)).Extra == 23);
+
+        Console.WriteLine(SizeOf<int>() == sizeof(int));
+        Console.WriteLine(SizeOf<Nested242>() > 0);
+        Console.WriteLine(SizeOf<Auto242>() > 0);
+        Console.WriteLine(SizeOf<Mode242>() > 0);
+        Console.WriteLine(PointerSizeOf<int>() == sizeof(int*));
+        Console.WriteLine(PointerSizeOf<Nested242>() == PointerSizeOf<int>());
+
+        Console.WriteLine(AddressRoundTrip<int>(55) == 55);
+        Console.WriteLine(AddressRoundTrip(new Nested242(61, 62)).Extra == 62);
+        Console.WriteLine(DefaultPointerIsNull<int>());
+        Console.WriteLine(DefaultPointerIsNull<Nested242>());
+        Console.WriteLine(TypeofPointerIsStable<int>());
+        Console.WriteLine(TypeofPointerIsStable<Nested242>());
+        Console.WriteLine(StackCountEvaluatesOnce<int>(1));
+        Console.WriteLine(StackCountEvaluatesOnce<Nested242>(new Nested242(1, 2)));
+        Console.WriteLine(EmptyStackIsNull<int>());
+        Console.WriteLine(EmptyStackIsNull<Nested242>());
+        Console.WriteLine(PointerBoxWorks<int>(73));
+        Console.WriteLine(PointerBoxWorks<Nested242>(new Nested242(74, 75)));
+
+        int* values = stackalloc int[4];
+        values[0] = 1;
+        values[1] = 2;
+        values[2] = 3;
+        values[3] = 4;
+        Console.WriteLine(Distance(values, Offset(values, 3)) == 3);
+        int* moved = Offset(values, 2);
+        *moved = 30;
+        Console.WriteLine(values[2] == 30);
+    }
+}

@@ -1,0 +1,152 @@
+public unsafe delegate int* PointerMap(int* value);
+public unsafe delegate int** NestedPointerMap(int** value);
+public unsafe delegate void* VoidPointerMap(void* value);
+public unsafe delegate void PointerByRef(ref int* current, out int* previous, in int* next);
+public unsafe delegate int* PointerOffset(int* value, int amount);
+
+public sealed class PointerTarget
+{
+    private int _amount;
+
+    public PointerTarget(int amount)
+    {
+        _amount = amount;
+    }
+
+    public unsafe int* Move(int* value, int amount)
+    {
+        return value + _amount + amount;
+    }
+}
+
+public struct PointerWalker
+{
+    public unsafe int* Move(int* value, int amount)
+    {
+        return value + amount;
+    }
+}
+
+public static class NativeC
+{
+    [Native("vc101_apply_pointer")]
+    public static unsafe extern int* ApplyPointer(PointerMap callback, int* value);
+
+    [Native("vc101_apply_nested")]
+    public static unsafe extern int** ApplyNested(NestedPointerMap callback, int** value);
+
+    [Native("vc101_apply_void")]
+    public static unsafe extern void* ApplyVoid(VoidPointerMap callback, void* value);
+
+    [Native("vc101_apply_byref")]
+    public static unsafe extern void ApplyByRef(
+        PointerByRef callback,
+        ref int* current,
+        out int* previous,
+        in int* next);
+}
+
+public static class Program
+{
+    public static unsafe int* Identity(int* value)
+    {
+        return value;
+    }
+
+    public static unsafe int* Advance(int* value)
+    {
+        return value + 1;
+    }
+
+    public static unsafe int** NestedIdentity(int** value)
+    {
+        return value;
+    }
+
+    public static unsafe void* VoidIdentity(void* value)
+    {
+        return value;
+    }
+
+    public static unsafe void Rotate(ref int* current, out int* previous, in int* next)
+    {
+        previous = current;
+        current = next;
+    }
+
+    public static PointerMap GetMap()
+    {
+        return Identity;
+    }
+
+    public static unsafe int* ApplyManaged(PointerMap callback, int* value)
+    {
+        return callback(value);
+    }
+
+    public static unsafe void Main()
+    {
+        int* values = stackalloc int[5];
+        values[0] = 10;
+        values[1] = 20;
+        values[2] = 30;
+        values[3] = 40;
+        values[4] = 50;
+
+        PointerMap identity = Identity;
+        Console.WriteLine(identity(values) == values);
+        Console.WriteLine(*identity(values) == 10);
+
+        PointerMap fromMethod = GetMap();
+        Console.WriteLine(fromMethod(values + 2) == values + 2);
+        Console.WriteLine(*ApplyManaged(fromMethod, values + 3) == 40);
+
+        PointerMap multicast = Identity;
+        multicast += Advance;
+        Console.WriteLine(multicast(values) == values + 1);
+        Console.WriteLine(*multicast(values) == 20);
+        multicast -= Advance;
+        Console.WriteLine(multicast(values) == values);
+
+        int* current = values;
+        int** nested = &current;
+        NestedPointerMap nestedMap = NestedIdentity;
+        Console.WriteLine(nestedMap(nested) == nested);
+        Console.WriteLine(*nestedMap(nested) == values);
+
+        void* raw = null;
+        VoidPointerMap voidMap = VoidIdentity;
+        Console.WriteLine(voidMap(raw) == raw);
+
+        int* next = values + 4;
+        int* previous;
+        PointerByRef rotate = Rotate;
+        rotate(ref current, out previous, in next);
+        Console.WriteLine(current == values + 4);
+        Console.WriteLine(previous == values);
+        Console.WriteLine(next == values + 4);
+
+        PointerOffset classMove = new PointerTarget(1).Move;
+        GC.Collect();
+        Console.WriteLine(classMove(values, 1) == values + 2);
+        Console.WriteLine(*classMove(values, 1) == 30);
+
+        PointerWalker walker = new PointerWalker();
+        PointerOffset structMove = walker.Move;
+        Console.WriteLine(structMove(values, 3) == values + 3);
+        Console.WriteLine(*structMove(values, 3) == 40);
+
+        Console.WriteLine(NativeC.ApplyPointer(Identity, values + 1) == values + 1);
+        Console.WriteLine(*NativeC.ApplyPointer(Identity, values + 1) == 20);
+        Console.WriteLine(NativeC.ApplyNested(NestedIdentity, nested) == nested);
+        Console.WriteLine(*NativeC.ApplyNested(NestedIdentity, nested) == values + 4);
+        Console.WriteLine(NativeC.ApplyVoid(VoidIdentity, raw) == raw);
+
+        current = values + 1;
+        next = values + 3;
+        NativeC.ApplyByRef(Rotate, ref current, out previous, in next);
+        Console.WriteLine(current == values + 3);
+        Console.WriteLine(previous == values + 1);
+        Console.WriteLine(next == values + 3);
+    }
+}

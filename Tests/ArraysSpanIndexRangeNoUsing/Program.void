@@ -1,0 +1,11 @@
+public static class Program
+{
+    public static void Main()
+    {
+        int[] values = new int[] { 4, 5, 6, 7 };
+        Console.WriteLine(values[^1] == 7);
+        int[] middle = values[1..^1];
+        Console.WriteLine(middle.Length == 2);
+        Console.WriteLine(middle[0] == 5 && middle[1] == 6);
+    }
+}

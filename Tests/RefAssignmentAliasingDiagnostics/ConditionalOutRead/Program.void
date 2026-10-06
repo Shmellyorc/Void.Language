@@ -1,0 +1,13 @@
+public static class Program
+{
+    public static void Bad(out int value, bool chooseOther)
+    {
+        int other = 2;
+        ref int alias = ref value;
+        if (chooseOther)
+            alias = ref other;
+        Console.WriteLine(alias);
+        value = 1;
+    }
+    public static void Main() { int value; Bad(out value, true); }
+}

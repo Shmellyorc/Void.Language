@@ -1,0 +1,3 @@
+using Void;
+public interface IEmitter { event Action<int> Changed = null; }
+public static class Program { public static void Main() { } }

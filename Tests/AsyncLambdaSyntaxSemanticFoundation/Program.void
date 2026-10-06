@@ -1,0 +1,51 @@
+using Void;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    public static void Main()
+    {
+        Func<Task> taskVoid = async () =>
+        {
+            await Task.Yield();
+            return;
+        };
+
+        Func<Task<int>> taskResult = async () =>
+        {
+            await Task.Yield();
+            return 271;
+        };
+
+        Func<int, Task<int>> taskParameter = async (value) =>
+        {
+            await Task.Yield();
+            return value;
+        };
+
+        Func<ValueTask> valueTaskVoid = async () =>
+        {
+            await Task.Yield();
+            return;
+        };
+
+        Func<int, ValueTask<int>> valueTaskResult = async value =>
+        {
+            await Task.Yield();
+            return value + 1;
+        };
+
+        Func<Task<int>> expressionTask = async () => 271;
+        Func<int, int> ordinary = value => value + 1;
+        Func<int, int> namedAsync = async => async + 1;
+
+        taskVoid;
+        taskResult;
+        taskParameter;
+        valueTaskVoid;
+        valueTaskResult;
+        expressionTask;
+        ordinary;
+        namedAsync;
+    }
+}

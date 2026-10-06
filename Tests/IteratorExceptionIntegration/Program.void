@@ -1,0 +1,354 @@
+using Void.Collections;
+
+public sealed class IteratorError : Exception
+{
+    public int Code;
+
+    public IteratorError(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class IteratorNode
+{
+    public int Value;
+
+    public IteratorNode(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class IteratorProducer
+{
+    private void Fail()
+    {
+        throw new IteratorError("instance", 20);
+    }
+
+    public IEnumerator<int> Values()
+    {
+        yield return 70;
+        Fail();
+        yield return 71;
+    }
+}
+
+public static class Program
+{
+    public static int Sequence;
+
+    public static IEnumerator<int> ThrowAfterYield()
+    {
+        yield return 1;
+        throw new IteratorError("after", 11);
+    }
+
+    public static IEnumerator<int> ThrowBeforeYield(bool fail)
+    {
+        if (fail)
+            throw new IteratorError("before", 12);
+        yield return 2;
+    }
+
+    public static IEnumerator<int> InternalCatch()
+    {
+        int value = 0;
+        try
+        {
+            throw new IteratorError("iterator", 13);
+        }
+        catch (IteratorError error)
+        {
+            value = error.Code;
+        }
+        yield return value;
+    }
+
+    public static IEnumerator<int> InternalRethrow()
+    {
+        int value = 0;
+        try
+        {
+            try
+            {
+                throw new IteratorError("iterator", 14);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        catch (IteratorError error)
+        {
+            value = error.Code;
+        }
+        yield return value;
+    }
+
+    public static IEnumerator<int> NormalFinally()
+    {
+        Program.Sequence = 1;
+        try
+        {
+            yield return 10;
+            Program.Sequence = Program.Sequence * 10 + 2;
+            yield return 20;
+            Program.Sequence = Program.Sequence * 10 + 3;
+        }
+        finally
+        {
+            Program.Sequence = Program.Sequence * 10 + 4;
+        }
+    }
+
+    public static IEnumerator<int> YieldBreakFinally()
+    {
+        Program.Sequence = 1;
+        try
+        {
+            yield return 30;
+            Program.Sequence = Program.Sequence * 10 + 2;
+            yield break;
+        }
+        finally
+        {
+            Program.Sequence = Program.Sequence * 10 + 3;
+        }
+    }
+
+    public static IEnumerator<int> ThrowFinally()
+    {
+        IteratorNode node = new IteratorNode(77);
+        Program.Sequence = 1;
+        try
+        {
+            yield return node.Value;
+            Program.Sequence = Program.Sequence * 10 + 2;
+            throw new IteratorError("fault", 15);
+        }
+        finally
+        {
+            GC.Collect();
+            Program.Sequence = Program.Sequence * 10 + (node.Value == 77 ? 3 : 9);
+        }
+    }
+
+    public static IEnumerator<int> NestedFinallyThrow()
+    {
+        Program.Sequence = 1;
+        try
+        {
+            try
+            {
+                yield return 40;
+                Program.Sequence = Program.Sequence * 10 + 2;
+                throw new IteratorError("nested", 16);
+            }
+            finally
+            {
+                Program.Sequence = Program.Sequence * 10 + 3;
+            }
+        }
+        finally
+        {
+            Program.Sequence = Program.Sequence * 10 + 4;
+        }
+    }
+
+    public static IEnumerator<int> FinallyReplacesException()
+    {
+        try
+        {
+            yield return 50;
+            throw new IteratorError("original", 17);
+        }
+        finally
+        {
+            throw new IteratorError("replacement", 18);
+        }
+    }
+
+    public static IEnumerator<int> BreakThroughFinally()
+    {
+        Program.Sequence = 0;
+        int i = 0;
+        while (i < 3)
+        {
+            try
+            {
+                i++;
+                if (i == 2)
+                    break;
+                yield return i;
+            }
+            finally
+            {
+                Program.Sequence++;
+            }
+        }
+        yield return 90 + Program.Sequence;
+    }
+
+    public static IEnumerator<int> ContinueThroughFinally()
+    {
+        Program.Sequence = 0;
+        int i = 0;
+        while (i < 3)
+        {
+            try
+            {
+                i++;
+                if (i == 1)
+                    continue;
+                yield return i;
+            }
+            finally
+            {
+                Program.Sequence++;
+            }
+        }
+        yield return 90 + Program.Sequence;
+    }
+
+    public static IEnumerator<int> ThrowAcrossCall()
+    {
+        yield return 60;
+        throw new IteratorError("iterator", 19);
+        yield return 61;
+    }
+
+    public static void Main()
+    {
+        IEnumerator<int> after = ThrowAfterYield();
+        Console.WriteLine(after.MoveNext() && after.Current == 1);
+        bool caughtAfter = false;
+        try
+        {
+            after.MoveNext();
+        }
+        catch (IteratorError error)
+        {
+            caughtAfter = error.Code == 11 && Runtime.Equals(error.Message, "after");
+        }
+        Console.WriteLine(caughtAfter);
+        Console.WriteLine(!after.MoveNext());
+
+        IEnumerator<int> before = ThrowBeforeYield(true);
+        bool caughtBefore = false;
+        try
+        {
+            before.MoveNext();
+        }
+        catch (IteratorError error)
+        {
+            caughtBefore = error.Code == 12;
+        }
+        Console.WriteLine(caughtBefore);
+        Console.WriteLine(!before.MoveNext());
+
+        IEnumerator<int> internalCatch = InternalCatch();
+        Console.WriteLine(internalCatch.MoveNext() && internalCatch.Current == 13);
+        Console.WriteLine(!internalCatch.MoveNext());
+
+        IEnumerator<int> internalRethrow = InternalRethrow();
+        Console.WriteLine(internalRethrow.MoveNext() && internalRethrow.Current == 14);
+        Console.WriteLine(!internalRethrow.MoveNext());
+
+        IEnumerator<int> normal = NormalFinally();
+        Console.WriteLine(normal.MoveNext() && normal.Current == 10 && Program.Sequence == 1);
+        Console.WriteLine(normal.MoveNext() && normal.Current == 20 && Program.Sequence == 12);
+        Console.WriteLine(!normal.MoveNext() && Program.Sequence == 1234);
+        Console.WriteLine(!normal.MoveNext() && Program.Sequence == 1234);
+
+        IEnumerator<int> stopped = YieldBreakFinally();
+        Console.WriteLine(stopped.MoveNext() && stopped.Current == 30 && Program.Sequence == 1);
+        Console.WriteLine(!stopped.MoveNext() && Program.Sequence == 123);
+
+        IEnumerator<int> fault = ThrowFinally();
+        Console.WriteLine(fault.MoveNext() && fault.Current == 77 && Program.Sequence == 1);
+        bool caughtFault = false;
+        try
+        {
+            fault.MoveNext();
+        }
+        catch (IteratorError error)
+        {
+            caughtFault = error.Code == 15 && Program.Sequence == 123;
+        }
+        Console.WriteLine(caughtFault);
+        Console.WriteLine(!fault.MoveNext());
+
+        IEnumerator<int> nested = NestedFinallyThrow();
+        Console.WriteLine(nested.MoveNext() && nested.Current == 40 && Program.Sequence == 1);
+        bool caughtNested = false;
+        try
+        {
+            nested.MoveNext();
+        }
+        catch (IteratorError error)
+        {
+            Program.Sequence = Program.Sequence * 10 + 5;
+            caughtNested = error.Code == 16 && Program.Sequence == 12345;
+        }
+        Console.WriteLine(caughtNested);
+        Console.WriteLine(!nested.MoveNext());
+
+        IEnumerator<int> replacement = FinallyReplacesException();
+        Console.WriteLine(replacement.MoveNext() && replacement.Current == 50);
+        bool caughtReplacement = false;
+        try
+        {
+            replacement.MoveNext();
+        }
+        catch (IteratorError error)
+        {
+            caughtReplacement = error.Code == 18 && Runtime.Equals(error.Message, "replacement");
+        }
+        Console.WriteLine(caughtReplacement);
+        Console.WriteLine(!replacement.MoveNext());
+
+        IEnumerator<int> broken = BreakThroughFinally();
+        Console.WriteLine(broken.MoveNext() && broken.Current == 1 && Program.Sequence == 0);
+        Console.WriteLine(broken.MoveNext() && broken.Current == 92 && Program.Sequence == 2);
+        Console.WriteLine(!broken.MoveNext());
+
+        IEnumerator<int> continued = ContinueThroughFinally();
+        Console.WriteLine(continued.MoveNext() && continued.Current == 2 && Program.Sequence == 1);
+        Console.WriteLine(continued.MoveNext() && continued.Current == 3 && Program.Sequence == 2);
+        Console.WriteLine(continued.MoveNext() && continued.Current == 93 && Program.Sequence == 3);
+        Console.WriteLine(!continued.MoveNext());
+
+        IEnumerator<int> across = ThrowAcrossCall();
+        Console.WriteLine(across.MoveNext() && across.Current == 60);
+        bool caughtAcross = false;
+        try
+        {
+            across.MoveNext();
+        }
+        catch (IteratorError error)
+        {
+            caughtAcross = error.Code == 19;
+        }
+        Console.WriteLine(caughtAcross);
+        Console.WriteLine(!across.MoveNext());
+
+        IteratorProducer producer = new IteratorProducer();
+        IEnumerator<int> instance = producer.Values();
+        producer = null;
+        GC.Collect();
+        Console.WriteLine(instance.MoveNext() && instance.Current == 70);
+        bool caughtInstance = false;
+        try
+        {
+            instance.MoveNext();
+        }
+        catch (IteratorError error)
+        {
+            caughtInstance = error.Code == 20 && Runtime.Equals(error.Message, "instance");
+        }
+        Console.WriteLine(caughtInstance);
+        Console.WriteLine(!instance.MoveNext());
+    }
+}

@@ -1,0 +1,232 @@
+using Void;
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node()
+    {
+        Value = 3;
+    }
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public class BaseValue
+{
+    public int Value;
+
+    public BaseValue(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class DerivedValue : BaseValue
+{
+    public DerivedValue(int value) : base(value)
+    {
+    }
+}
+
+public struct Meters
+{
+    public int Value;
+
+    public Meters(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator Meters(int value)
+    {
+        Program.ConversionCalls++;
+        return new Meters(value);
+    }
+}
+
+public interface IReadValue
+{
+    int Read();
+}
+
+public struct StructValue : IReadValue
+{
+    public int Value;
+
+    public StructValue(int value)
+    {
+        Value = value;
+    }
+
+    public int Read()
+    {
+        return Value;
+    }
+}
+
+public sealed class RefValue : IReadValue
+{
+    private int _value;
+
+    public RefValue(int value)
+    {
+        _value = value;
+    }
+
+    public int Read()
+    {
+        return _value;
+    }
+}
+
+public delegate int Transform(int value);
+
+public static class Program
+{
+    public const int ChosenConst = true ? 34 : 35;
+    public static int ConditionCalls;
+    public static int TrueCalls;
+    public static int FalseCalls;
+    public static int ConversionCalls;
+
+    public static bool Check(bool value)
+    {
+        ConditionCalls++;
+        return value;
+    }
+
+    public static int TrueValue()
+    {
+        TrueCalls++;
+        return 10;
+    }
+
+    public static int FalseValue()
+    {
+        FalseCalls++;
+        return 20;
+    }
+
+    public static int ReadNode(Node node)
+    {
+        return node == null ? -1 : node.Value;
+    }
+
+    public static T Pick<T>(bool chooseFirst, T first, T second)
+    {
+        return chooseFirst ? first : second;
+    }
+
+    public static T PickDefault<T>(bool chooseDefault, T value)
+    {
+        return chooseDefault ? default : value;
+    }
+
+    public static int ReturnConditional(bool choose)
+    {
+        return choose ? 31 : 32;
+    }
+
+    public static int AddOne(int value)
+    {
+        return value + 1;
+    }
+
+    public static int AddTwo(int value)
+    {
+        return value + 2;
+    }
+
+    public static void SetOut(bool choose, out int value)
+    {
+        int selected = choose ? (value = 40) : (value = 41);
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine((true ? 1 : 2) == 1);
+        Console.WriteLine((false ? 1 : 2) == 2);
+        Console.WriteLine((true ? 1 : false ? 2 : 3) == 1);
+        Console.WriteLine((false ? 1 : true ? 2 : 3) == 2);
+        Console.WriteLine((false || true ? 4 : 5) == 4);
+
+        ConditionCalls = 0;
+        TrueCalls = 0;
+        FalseCalls = 0;
+        int lazyTrue = Check(true) ? TrueValue() : FalseValue();
+        Console.WriteLine(lazyTrue == 10 && ConditionCalls == 1 && TrueCalls == 1 && FalseCalls == 0);
+
+        ConditionCalls = 0;
+        TrueCalls = 0;
+        FalseCalls = 0;
+        int lazyFalse = Check(false) ? TrueValue() : FalseValue();
+        Console.WriteLine(lazyFalse == 20 && ConditionCalls == 1 && TrueCalls == 0 && FalseCalls == 1);
+
+        int assigned = true ? 7 : 8;
+        Console.WriteLine(assigned == 7);
+
+        var inferredDefault = false ? default : 9;
+        Console.WriteLine(inferredDefault == 9);
+
+        Node targetNew = true ? new() : new Node(8);
+        Console.WriteLine(targetNew.Value == 3);
+        Console.WriteLine(ReadNode(true ? new() : null) == 3);
+
+        Transform transform = true ? value => value + 1 : value => value + 2;
+        Console.WriteLine(transform(5) == 6);
+        Transform methodTransform = false ? AddOne : AddTwo;
+        Console.WriteLine(methodTransform(5) == 7);
+
+        int? nullableTarget = true ? 11 : null;
+        Console.WriteLine(nullableTarget.HasValue && nullableTarget.Value == 11);
+
+        int? nullableEmpty = null;
+        var nullableInferred = false ? 12 : nullableEmpty;
+        Console.WriteLine(!nullableInferred.HasValue);
+
+        ConversionCalls = 0;
+        Meters targetedConversion = true ? 13 : 14;
+        Console.WriteLine(targetedConversion.Value == 13 && ConversionCalls == 1);
+
+        ConversionCalls = 0;
+        var inferredConversion = true ? 15 : new Meters(16);
+        Console.WriteLine(inferredConversion.Value == 15 && ConversionCalls == 1);
+
+        var commonBase = true ? new DerivedValue(17) : new BaseValue(18);
+        Console.WriteLine(commonBase.Value == 17);
+
+        IReadValue interfaceValue = true ? new StructValue(19) : new RefValue(20);
+        Console.WriteLine(interfaceValue.Read() == 19);
+
+        Console.WriteLine(Pick<int>(true, 21, 22) == 21);
+        Node genericNode = Pick<Node>(false, new Node(23), new Node(24));
+        Console.WriteLine(genericNode.Value == 24);
+        Console.WriteLine(PickDefault<int>(false, 25) == 25);
+        Console.WriteLine(PickDefault<int>(true, 25) == 0);
+        Console.WriteLine(PickDefault<Node>(true, new Node(26)) == null);
+
+        Console.WriteLine(ReturnConditional(true) == 31);
+        Console.WriteLine(ReturnConditional(false) == 32);
+        Console.WriteLine(ChosenConst == 34);
+
+        int definitelyAssigned;
+        int assignmentResult = true ? (definitelyAssigned = 27) : (definitelyAssigned = 28);
+        Console.WriteLine(assignmentResult == 27 && definitelyAssigned == 27);
+
+        int outValue;
+        SetOut(false, out outValue);
+        Console.WriteLine(outValue == 41);
+
+        var nullReference = false ? new Node(29) : null;
+        Console.WriteLine(nullReference == null);
+        var liveReference = true ? new Node(30) : null;
+        Console.WriteLine(liveReference != null && liveReference.Value == 30);
+
+        Node targetDefault = false ? new Node(33) : default;
+        Console.WriteLine(targetDefault == null);
+    }
+}

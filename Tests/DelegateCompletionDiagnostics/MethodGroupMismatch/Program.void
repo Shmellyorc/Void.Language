@@ -1,0 +1,15 @@
+using Void;
+
+public delegate void RefAction(ref int value);
+
+public static class Program
+{
+    public static void Plain(int value)
+    {
+    }
+
+    public static void Main()
+    {
+        RefAction callback = Plain;
+    }
+}

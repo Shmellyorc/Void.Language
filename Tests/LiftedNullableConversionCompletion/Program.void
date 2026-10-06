@@ -1,0 +1,163 @@
+public struct LiftSource
+{
+    public int Value;
+
+    public LiftSource(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator LiftTarget(LiftSource value)
+    {
+        Program.ConversionCalls += 1;
+        return new LiftTarget(value.Value + 10);
+    }
+}
+
+public struct LiftTarget
+{
+    public int Value;
+
+    public LiftTarget(int value)
+    {
+        Value = value;
+    }
+}
+
+public struct ExplicitSource
+{
+    public int Value;
+
+    public ExplicitSource(int value)
+    {
+        Value = value;
+    }
+
+    public static explicit operator ExplicitTarget(ExplicitSource value)
+    {
+        return new ExplicitTarget(value.Value + 20);
+    }
+}
+
+public struct ExplicitTarget
+{
+    public int Value;
+
+    public ExplicitTarget(int value)
+    {
+        Value = value;
+    }
+}
+
+public struct PreLiftTarget
+{
+    public int Value;
+
+    public PreLiftTarget(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator PreLiftTarget(short value)
+    {
+        return new PreLiftTarget((int)value + 30);
+    }
+}
+
+public struct PostLiftSource
+{
+    public int Value;
+
+    public PostLiftSource(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator short(PostLiftSource value)
+    {
+        return (short)(value.Value + 40);
+    }
+}
+
+public struct ExtractSource
+{
+    public int Value;
+
+    public ExtractSource(int value)
+    {
+        Value = value;
+    }
+
+    public static explicit operator ExtractTarget(ExtractSource value)
+    {
+        return new ExtractTarget(value.Value + 50);
+    }
+}
+
+public struct ExtractTarget
+{
+    public int Value;
+
+    public ExtractTarget(int value)
+    {
+        Value = value;
+    }
+}
+
+public class Program
+{
+    public static int ConversionCalls;
+    public static int SourceEvaluations;
+
+    public static LiftSource? MakeNullableSource(int value)
+    {
+        SourceEvaluations += 1;
+        return new LiftSource(value);
+    }
+
+    public static void Main()
+    {
+        ConversionCalls = 0;
+        SourceEvaluations = 0;
+
+        LiftSource? source = new LiftSource(1);
+        LiftTarget? target = source;
+        Console.WriteLine(target.HasValue);
+        Console.WriteLine(target.Value.Value == 11);
+        Console.WriteLine(ConversionCalls == 1);
+
+        LiftSource? missingSource = null;
+        LiftTarget? missingTarget = missingSource;
+        Console.WriteLine(missingTarget.HasValue == false);
+        Console.WriteLine(ConversionCalls == 1);
+
+        LiftTarget? evaluatedOnce = MakeNullableSource(2);
+        Console.WriteLine(evaluatedOnce.HasValue && evaluatedOnce.Value.Value == 12);
+        Console.WriteLine(SourceEvaluations == 1);
+        Console.WriteLine(ConversionCalls == 2);
+
+        LiftTarget? wrappedResult = new LiftSource(3);
+        Console.WriteLine(wrappedResult.HasValue && wrappedResult.Value.Value == 13);
+        Console.WriteLine(ConversionCalls == 3);
+
+        ExplicitSource? explicitSource = new ExplicitSource(4);
+        ExplicitTarget? explicitTarget = (ExplicitTarget?)explicitSource;
+        Console.WriteLine(explicitTarget.HasValue && explicitTarget.Value.Value == 24);
+
+        ExplicitSource? explicitMissing = null;
+        ExplicitTarget? explicitMissingTarget = (ExplicitTarget?)explicitMissing;
+        Console.WriteLine(explicitMissingTarget.HasValue == false);
+
+        byte? small = (byte)5;
+        PreLiftTarget? pre = small;
+        Console.WriteLine(pre.HasValue && pre.Value.Value == 35);
+
+        PostLiftSource? postSource = new PostLiftSource(6);
+        long? post = postSource;
+        Console.WriteLine(post.HasValue && post.Value == 46);
+
+        ExtractSource? extractSource = new ExtractSource(7);
+        ExtractTarget extracted = (ExtractTarget)extractSource;
+        Console.WriteLine(extracted.Value == 57);
+    }
+}

@@ -1,0 +1,10 @@
+using Void;
+public static class Program
+{
+    public static ReadOnlySpan<int> Make()
+    {
+        ReadOnlySpan<int> span = stackalloc int[2];
+        return span;
+    }
+    public static void Main() { Make(); }
+}

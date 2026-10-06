@@ -1,0 +1,1 @@
+public static class Api { [Export("bad_private")] private static int Get() { return 1; } }

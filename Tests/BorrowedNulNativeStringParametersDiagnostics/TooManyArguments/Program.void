@@ -1,0 +1,9 @@
+using Void;
+public static class Native294
+{
+    [Native("strcmp")]
+    public static unsafe extern int Compare(
+        [NativeString(NativeStringKind.BorrowedNul, "release", "extra")] string left,
+        string right);
+}
+public static class Program { public static void Main() { } }

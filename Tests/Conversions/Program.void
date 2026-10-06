@@ -1,0 +1,232 @@
+public struct Meters
+{
+    public int Value;
+
+    public Meters(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator Meters(int value)
+    {
+        return new Meters(value);
+    }
+
+    public static implicit operator int(Meters value)
+    {
+        return value.Value;
+    }
+
+    public static explicit operator float(Meters value)
+    {
+        return (float)value.Value;
+    }
+
+    public static Meters operator +(Meters left, Meters right)
+    {
+        return new Meters(left.Value + right.Value);
+    }
+}
+
+public struct Seconds
+{
+    public int Value;
+
+    public Seconds(int value)
+    {
+        Value = value;
+    }
+
+    public static explicit operator Seconds(int value)
+    {
+        return new Seconds(value);
+    }
+
+    public static explicit operator Seconds(Meters value)
+    {
+        return new Seconds(value.Value);
+    }
+}
+
+public class Token
+{
+    public int Value;
+
+    public Token(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator Token(int value)
+    {
+        Token result = new Token(value);
+        GC.Collect();
+        return result;
+    }
+
+    public static explicit operator int(Token value)
+    {
+        return value.Value;
+    }
+
+    public static implicit operator Meters(Token value)
+    {
+        GC.Collect();
+        return new Meters(value.Value);
+    }
+}
+
+public class Holder
+{
+    private Meters _value;
+
+    public Meters Value
+    {
+        get { return _value; }
+        set { _value = value; }
+    }
+
+    public Holder()
+    {
+        _value = 2;
+    }
+}
+
+public class Box
+{
+    public int Value;
+
+    public Box(Meters value)
+    {
+        Value = value.Value;
+    }
+}
+
+public delegate int MeterReader(Meters value);
+
+public struct Wrapped<T>
+{
+    public T Value;
+
+    public Wrapped(T value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator Wrapped<T>(T value)
+    {
+        return new Wrapped<T>(value);
+    }
+}
+
+public class Program
+{
+    public static Meters MakeMeters()
+    {
+        return 12;
+    }
+
+    public static int ReadMeters(Meters value)
+    {
+        return value.Value;
+    }
+
+    public static int Choose(int value)
+    {
+        return 1;
+    }
+
+    public static int Choose(Meters value)
+    {
+        return 2;
+    }
+
+    public static int Sum(params Meters[] values)
+    {
+        int total = 0;
+        for (int i = 0; i < values.Length; i++)
+            total += values[i].Value;
+        return total;
+    }
+
+    public static T Identity<T>(T value)
+    {
+        return value;
+    }
+
+    public static void Main()
+    {
+        Meters a = 5;
+        Console.WriteLine(a.Value == 5);
+
+        int raw = a;
+        Console.WriteLine(raw == 5);
+
+        Console.WriteLine(ReadMeters(8) == 8);
+        Console.WriteLine(MakeMeters().Value == 12);
+
+        float f = (float)a;
+        Console.WriteLine(f == 5f);
+
+        Seconds seconds = (Seconds)9;
+        Console.WriteLine(seconds.Value == 9);
+
+        Seconds fromMeters = (Seconds)a;
+        Console.WriteLine(fromMeters.Value == 5);
+
+        Meters explicitImplicit = (Meters)11;
+        Console.WriteLine(explicitImplicit.Value == 11);
+
+        Token token = 20;
+        Console.WriteLine(token.Value == 20);
+
+        int tokenValue = (int)token;
+        Console.WriteLine(tokenValue == 20);
+
+        Meters tokenMeters = token;
+        Console.WriteLine(tokenMeters.Value == 20);
+
+        Console.WriteLine(Choose(4) == 1);
+
+        Meters chosen = 4;
+        Console.WriteLine(Choose(chosen) == 2);
+
+        Meters sum = a + 3;
+        Console.WriteLine(sum.Value == 8);
+
+        Holder holder = new Holder();
+        Console.WriteLine(holder.Value.Value == 2);
+        holder.Value = 14;
+        Console.WriteLine(holder.Value.Value == 14);
+
+        Meters[] values = new Meters[2];
+        values[0] = 15;
+        values[1] = 16;
+        Console.WriteLine(values[0].Value == 15);
+        Console.WriteLine(values[1].Value == 16);
+
+        Box box = new Box(21);
+        Console.WriteLine(box.Value == 21);
+
+        Console.WriteLine(Sum() == 0);
+        Console.WriteLine(Sum(1, 2, 3) == 6);
+
+        MeterReader reader = ReadMeters;
+        Console.WriteLine(reader(23) == 23);
+
+        Meters generic = Identity<Meters>(24);
+        Console.WriteLine(generic.Value == 24);
+
+        Wrapped<int> wrapped = 25;
+        Console.WriteLine(wrapped.Value == 25);
+
+        var inferred = 6;
+        Console.WriteLine(inferred == 6);
+
+        Meters copied = a;
+        Console.WriteLine(copied.Value == 5);
+
+        int copiedRaw = copied;
+        Console.WriteLine(copiedRaw == 5);
+    }
+}

@@ -1,0 +1,135 @@
+using Void;
+using Void.Threading;
+
+public sealed class AuditException250 : Exception
+{
+    public int Code;
+
+    public AuditException250(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public delegate int AuditCallback250(int value);
+
+public static class Native250
+{
+    [Native("voidc250_audit_buffers")]
+    public static unsafe extern int AuditBuffers(
+        Span<int> writable,
+        ReadOnlySpan<int> readable,
+        AuditCallback250 callback,
+        int tag);
+
+    [Native("voidc250_observe_pin")]
+    public static unsafe extern int ObservePin(Span<int> values);
+
+    [Native("voidc250_pin_count")]
+    public static unsafe extern int PinCount(int* data);
+}
+
+public static class Audit250
+{
+    private static int CollectCallback(int value)
+    {
+        GC.Collect();
+        GC.Collect();
+        return value + 1;
+    }
+
+    private static int ThrowCallback(int value)
+    {
+        GC.Collect();
+        throw new AuditException250("audit callback", value);
+    }
+
+    [Export("void250_managed_memory_native")]
+    public static unsafe int ManagedMemoryNative()
+    {
+        int[] values = new int[] { 5, 10, 20, 30, 40 };
+        Memory<int> memory = new Memory<int>(values, 1, 3);
+        Span<int> writable = memory.Span;
+        ReadOnlySpan<int> readable = new ReadOnlySpan<int>(values, 2, 2);
+        int result = Native250.AuditBuffers(writable, readable, CollectCallback, 50);
+        Exception marker = new Exception("audit marker");
+        return marker.Message != null && result == 101 &&
+            values[0] == 5 && values[1] == 11 && values[2] == 21 && values[3] == 31 && values[4] == 40 ? 1 : 0;
+    }
+
+    [Export("void250_nested_array_fixed_native")]
+    public static unsafe int NestedArrayFixedNative()
+    {
+        int[] values = new int[] { 7, 8, 9 };
+        Span<int> span = new Span<int>(values);
+        int nestedCount = -1;
+        int fixedOnlyCount = -1;
+        fixed (int* pointer = values)
+        {
+            nestedCount = Native250.ObservePin(span);
+            fixedOnlyCount = Native250.PinCount(pointer);
+            GC.Collect();
+            pointer[1] = 80;
+        }
+        GC.Collect();
+        return nestedCount == 2 && fixedOnlyCount == 1 && values[1] == 80 ? 1 : 0;
+    }
+
+    [Export("void250_callback_exception_thread")]
+    public static unsafe int CallbackExceptionThread()
+    {
+        int[] values = new int[] { 2, 4, 6, 8 };
+        int finallyCount = 0;
+        Thread worker = new Thread(() =>
+        {
+            try
+            {
+                Span<int> writable = new Span<int>(values, 1, 2);
+                ReadOnlySpan<int> readable = new ReadOnlySpan<int>(values, 1, 2);
+                Native250.AuditBuffers(writable, readable, ThrowCallback, 77);
+            }
+            finally
+            {
+                finallyCount++;
+            }
+        });
+        worker.Start();
+
+        bool caught = false;
+        try
+        {
+            worker.Join();
+        }
+        catch (AuditException250 error)
+        {
+            caught = error.Code == 77;
+        }
+        GC.Collect();
+        return caught && finallyCount == 1 && values[1] == 5 && values[2] == 7 ? 1 : 0;
+    }
+
+    [Export("void250_ownerless_native")]
+    public static unsafe int OwnerlessNative()
+    {
+        int* values = stackalloc int[3];
+        values[0] = 1;
+        values[1] = 2;
+        values[2] = 3;
+        Span<int> writable = new Span<int>(values, 3);
+        ReadOnlySpan<int> readable = new ReadOnlySpan<int>(values, 3);
+        int result = Native250.AuditBuffers(writable, readable, CollectCallback, 10);
+        return result == 17 && values[0] == 2 && values[1] == 3 && values[2] == 4 ? 1 : 0;
+    }
+
+    [Export("void250_readonly_separate")]
+    public static unsafe int ReadOnlySeparate()
+    {
+        int[] writableBacking = new int[] { 3, 4 };
+        int[] readonlyBacking = new int[] { 7, 8, 9 };
+        Span<int> writable = new Span<int>(writableBacking);
+        ReadOnlySpan<int> readable = new ReadOnlySpan<int>(readonlyBacking);
+        int result = Native250.AuditBuffers(writable, readable, CollectCallback, 20);
+        return result == 45 && writableBacking[0] == 4 && writableBacking[1] == 5 &&
+            readonlyBacking[0] == 7 && readonlyBacking[1] == 8 && readonlyBacking[2] == 9 ? 1 : 0;
+    }
+}

@@ -1,0 +1,24 @@
+using Void.Collections;
+
+public sealed class Box
+{
+    public int Value { get; set; }
+}
+
+public static class Program
+{
+    private static IEnumerator<int> Values(object item)
+    {
+        switch (item)
+        {
+            case Box box:
+                yield return box.Value;
+                break;
+            default:
+                break;
+        }
+        yield return box.Value;
+    }
+
+    public static void Main() {}
+}

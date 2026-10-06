@@ -1,0 +1,24 @@
+using Void;
+using Void.Threading;
+
+public sealed class Gate
+{
+    public int Value;
+}
+
+public static class Program
+{
+    public static bool WaitWithRecursiveOwnership(Gate gate)
+    {
+        Monitor.Enter(gate);
+        Monitor.Enter(gate);
+        return Monitor.Wait(gate);
+    }
+
+    public static void Main()
+    {
+        Gate gate = new Gate();
+        gate.Value = 172;
+        Console.WriteLine(gate.Value == 172);
+    }
+}

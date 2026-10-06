@@ -1,0 +1,148 @@
+using Void;
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+// Deliberately declared before the value structs it stores. This proves
+// generated C definitions follow value-layout dependencies, not source order.
+public sealed class Holder
+{
+    public Outer Value;
+
+    public Holder(Outer value)
+    {
+        Value = value;
+    }
+}
+
+public struct Leaf
+{
+    public int Number;
+    public Node Owner;
+
+    public Leaf(int number, Node owner)
+    {
+        Number = number;
+        Owner = owner;
+    }
+}
+
+public struct Middle
+{
+    public Leaf Leaf;
+    public int Extra;
+
+    public Middle(Leaf leaf, int extra)
+    {
+        Leaf = leaf;
+        Extra = extra;
+    }
+}
+
+public struct Outer
+{
+    public Middle Middle;
+    public Leaf PropertyLeaf { get; set; }
+
+    public Outer(Middle middle, Leaf propertyLeaf)
+    {
+        Middle = middle;
+        PropertyLeaf = propertyLeaf;
+    }
+}
+
+public struct Box<T>
+{
+    public T Value;
+
+    public Box(T value)
+    {
+        Value = value;
+    }
+}
+
+public struct GenericOuter
+{
+    public Box<Leaf> Box;
+
+    public GenericOuter(Box<Leaf> box)
+    {
+        Box = box;
+    }
+}
+
+public static class Roots
+{
+    public static Outer Stored;
+}
+
+public static class Program
+{
+    public static Outer MakeOuter(int first, int second)
+    {
+        Leaf a = new Leaf(first, new Node(first + 100));
+        Leaf b = new Leaf(second, new Node(second + 100));
+        Middle middle = new Middle(a, 7);
+        return new Outer(middle, b);
+    }
+
+    public static void Main()
+    {
+        Outer value = MakeOuter(10, 20);
+        Console.WriteLine(value.Middle.Leaf.Number == 10);
+        Console.WriteLine(value.Middle.Extra == 7);
+        Console.WriteLine(value.PropertyLeaf.Number == 20);
+        Console.WriteLine(value.Middle.Leaf.Owner.Value == 110);
+        Console.WriteLine(value.PropertyLeaf.Owner.Value == 120);
+
+        value.Middle.Leaf.Number = 11;
+        Console.WriteLine(value.Middle.Leaf.Number == 11);
+
+        Outer copy = value;
+        copy.Middle.Leaf.Number = 99;
+        Console.WriteLine(value.Middle.Leaf.Number == 11);
+        Console.WriteLine(copy.Middle.Leaf.Number == 99);
+
+        Outer empty = default(Outer);
+        Console.WriteLine(empty.Middle.Leaf.Number == 0);
+        Console.WriteLine(empty.Middle.Leaf.Owner == null);
+        Console.WriteLine(empty.PropertyLeaf.Owner == null);
+
+        Holder holder = new Holder(MakeOuter(30, 40));
+        GC.Collect();
+        Console.WriteLine(holder.Value.Middle.Leaf.Owner.Value == 130);
+        Console.WriteLine(holder.Value.PropertyLeaf.Owner.Value == 140);
+
+        Outer[] values = new Outer[1];
+        values[0] = MakeOuter(50, 60);
+        GC.Collect();
+        Console.WriteLine(values[0].Middle.Leaf.Owner.Value == 150);
+        Console.WriteLine(values[0].PropertyLeaf.Owner.Value == 160);
+
+        Outer? nullable = MakeOuter(70, 80);
+        GC.Collect();
+        Console.WriteLine(nullable.HasValue);
+        Console.WriteLine(nullable.Value.Middle.Leaf.Owner.Value == 170);
+        Outer nullableValue = nullable.Value;
+        Console.WriteLine(nullableValue.PropertyLeaf.Owner.Value == 180);
+
+        Box<Leaf> box = new Box<Leaf>(new Leaf(90, new Node(190)));
+        GenericOuter generic = new GenericOuter(box);
+        GC.Collect();
+        Console.WriteLine(generic.Box.Value.Number == 90);
+        Console.WriteLine(generic.Box.Value.Owner.Value == 190);
+
+        Roots.Stored = MakeOuter(100, 110);
+        GC.Collect();
+        Console.WriteLine(Roots.Stored.Middle.Leaf.Owner.Value == 200);
+        Outer stored = Roots.Stored;
+        Console.WriteLine(stored.PropertyLeaf.Owner.Value == 210);
+    }
+}

@@ -1,0 +1,12 @@
+public interface IToInt<T> { static implicit operator int(T value); }
+public struct Number : IToInt<Number>
+{
+    public int Value;
+    public Number(int value) { Value = value; }
+    public static implicit operator int(Number value) { return value.Value; }
+}
+public static class Program
+{
+    private static int Convert<T, U>(U value) where T : IToInt<T> { return value; }
+    public static void Main() { int value = Convert<Number, Number>(new Number(1)); }
+}

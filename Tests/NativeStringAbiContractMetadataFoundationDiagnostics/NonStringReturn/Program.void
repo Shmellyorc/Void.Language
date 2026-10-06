@@ -1,0 +1,2 @@
+using Void;
+public static class Native293 { [NativeString(NativeStringKind.BorrowedNul)] [Native("void293_nonstring_return")] public static unsafe extern int Get(); } public static class Program { public static void Main() { } }

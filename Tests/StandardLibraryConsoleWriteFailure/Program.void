@@ -1,0 +1,11 @@
+using Void.IO;
+public static class Program
+{
+    public static void Main()
+    {
+        bool caught = false;
+        try { Console.WriteLine("write failure"); }
+        catch (IOException error) { caught = true; }
+        if (!caught) throw new Exception("Expected an IOException for a failed stdout write");
+    }
+}

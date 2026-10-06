@@ -1,0 +1,6 @@
+public abstract class Base
+{
+    public abstract event Action<int> Changed { add; remove; }
+}
+public sealed class Bad : Base { }
+public static class Program { public static void Main() { Bad bad = new(); } }

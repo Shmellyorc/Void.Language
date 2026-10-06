@@ -1,0 +1,1 @@
+public static class Program { static T Keep<T>(T value) where T : class { return value; } public static void Main() { Keep(1); } }

@@ -1,0 +1,17 @@
+using Void;
+
+public static class Native296Invalid
+{
+    [NativeString(NativeStringKind.BorrowedPointerLength)]
+    [Native("void296_invalid_view")]
+    public static unsafe extern string Invalid();
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        string value = Native296Invalid.Invalid();
+        Console.WriteLine(value == null);
+    }
+}

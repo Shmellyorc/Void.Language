@@ -1,0 +1,152 @@
+using Void;
+using Void.Threading;
+
+public sealed class NativeAuditException260 : Exception
+{
+    public int Code;
+
+    public NativeAuditException260(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public delegate int AuditCallback260(int value);
+
+public static class NativeAudit260
+{
+    [Native("voidc260_audit_reset")]
+    public static unsafe extern void Reset();
+
+    [Native("voidc260_audit_ready")]
+    public static unsafe extern int Ready();
+
+    [Native("voidc260_audit_release")]
+    public static unsafe extern void Release();
+
+    [Native("voidc260_audit_add")]
+    public static unsafe extern int Add(int left, int right);
+
+    [Native("voidc260_audit_block_sum")]
+    public static unsafe extern int BlockSum(int* values, int count);
+
+    [Native("voidc260_audit_drive")]
+    public static unsafe extern int Drive(
+        delegate*<int, int, int> operation,
+        AuditCallback260 callback,
+        int tag);
+
+    [Native("voidc260_audit_gc_contains")]
+    public static unsafe extern int GcContains(void* memory);
+
+    [Native("voidc260_audit_after_callback")]
+    public static unsafe extern int AfterCallback();
+}
+
+public unsafe struct NativeAuditOps260
+{
+    public delegate*<int, int, int> Binary;
+    public delegate*<int*, int, int> Block;
+}
+
+public static class NativeHeapFunctionPointerAudit260
+{
+    private static unsafe void* AsVoid260<T>(T* pointer) where T : unmanaged => pointer;
+
+    private static int CollectCallback260(int value)
+    {
+        GC.Collect();
+        GC.Collect();
+        return value + 1;
+    }
+
+    private static int ThrowCallback260(int value)
+    {
+        GC.Collect();
+        throw new NativeAuditException260("audit callback", value);
+    }
+
+    [Export("void260_native_heap_thread_gc")]
+    public static unsafe int NativeHeapThreadGc()
+    {
+        NativeAudit260.Reset();
+        int result = -1;
+        int nonGc = 0;
+        int cleanup = 0;
+        Thread worker = new Thread(() =>
+        {
+            NativeAuditOps260* operations = NativeMemory.AllocateAligned<NativeAuditOps260>(1ul, 64ul);
+            int* values = NativeMemory.Allocate<int>(3ul);
+            try
+            {
+                operations[0].Binary = &NativeAudit260.Add;
+                operations[0].Block = &NativeAudit260.BlockSum;
+                values[0] = 10;
+                values[1] = 20;
+                values[2] = 12;
+                nonGc = NativeAudit260.GcContains(AsVoid260<NativeAuditOps260>(operations)) == 0 &&
+                    NativeAudit260.GcContains(AsVoid260<int>(values)) == 0 ? 1 : 0;
+                result = operations[0].Block(values, 3);
+                if (operations[0].Binary(20, 22) != 42)
+                    result = -2;
+            }
+            finally
+            {
+                NativeMemory.Free(values);
+                NativeMemory.Free(operations);
+                cleanup++;
+            }
+        });
+        worker.Start();
+        while (NativeAudit260.Ready() == 0)
+            Thread.Sleep(1);
+        for (int i = 0; i < 4; i++)
+            GC.Collect();
+        NativeAudit260.Release();
+        worker.Join();
+        GC.Collect();
+        return result == 42 && nonGc == 1 && cleanup == 1 ? 1 : 0;
+    }
+
+    [Export("void260_callback_exception_cleanup")]
+    public static unsafe int CallbackExceptionCleanup()
+    {
+        NativeAudit260.Reset();
+        NativeAuditOps260* operations = NativeMemory.Allocate<NativeAuditOps260>(1ul);
+        bool caught = false;
+        int cleanup = 0;
+        try
+        {
+            operations[0].Binary = &NativeAudit260.Add;
+            NativeAudit260.Drive(operations[0].Binary, ThrowCallback260, 77);
+        }
+        catch (NativeAuditException260 error)
+        {
+            caught = error.Code == 77;
+        }
+        finally
+        {
+            NativeMemory.Free(operations);
+            cleanup++;
+        }
+        GC.Collect();
+        return caught && cleanup == 1 && NativeAudit260.AfterCallback() == 1 ? 1 : 0;
+    }
+
+    [Export("void260_post_exception_reuse")]
+    public static unsafe int PostExceptionReuse()
+    {
+        NativeAuditOps260* operations = NativeMemory.AllocateAligned<NativeAuditOps260>(1ul, 64ul);
+        try
+        {
+            operations[0].Binary = &NativeAudit260.Add;
+            int result = NativeAudit260.Drive(operations[0].Binary, CollectCallback260, 20);
+            GC.Collect();
+            return result == 63 && NativeAudit260.GcContains(AsVoid260<NativeAuditOps260>(operations)) == 0 ? 1 : 0;
+        }
+        finally
+        {
+            NativeMemory.Free(operations);
+        }
+    }
+}

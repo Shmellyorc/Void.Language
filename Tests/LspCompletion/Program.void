@@ -1,0 +1,56 @@
+using Void;
+
+public enum Mode
+{
+    Idle,
+    Run
+}
+
+public class BaseThing
+{
+    public int PublicBase;
+    protected int ProtectedBase;
+    private int HiddenBase;
+
+    public void BaseMethod()
+    {
+    }
+}
+
+public sealed class Player : BaseThing
+{
+    public int Health;
+    private int Secret;
+    public static int Count;
+
+    public int Score { get; set; }
+    public static int Max { get; set; }
+
+    public void Damage(int amount)
+    {
+        Health -= amount;
+    }
+
+    public static void Reset()
+    {
+        Count = 0;
+    }
+
+    public void Inspect(int amount)
+    {
+        int local = amount;
+        Health = local;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Player player = new Player();
+        int total = player.Health;
+        int count = Player.Count;
+        Mode mode = Mode.Idle;
+        Console.WriteLine(total + count);
+    }
+}

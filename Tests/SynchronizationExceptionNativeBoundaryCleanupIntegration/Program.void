@@ -1,0 +1,232 @@
+using Void;
+using Void.Threading;
+
+public sealed class Payload
+{
+    public int Value;
+
+    public Payload(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Node
+{
+    public int Value;
+    public Payload Payload;
+
+    public Node(int value)
+    {
+        Value = value;
+        Payload = new Payload(value + 1000);
+    }
+}
+
+public sealed class SyncException : Exception
+{
+    public int Code;
+    public Payload Payload;
+
+    public SyncException(string message, int code, Payload payload) : base(message)
+    {
+        Code = code;
+        Payload = payload;
+    }
+}
+
+public sealed class SharedState
+{
+    public int Ready;
+    public int Wake;
+    public int DisposeCount;
+    public int FinallyCount;
+    public int CallbackCount;
+    public int NativeReferenceOk;
+    public int AtomicValue;
+    public int Status;
+    public Node SharedRef;
+}
+
+public sealed class SyncResource : IDisposable
+{
+    private SharedState _state;
+
+    public SyncResource(SharedState state)
+    {
+        _state = state;
+    }
+
+    public void Dispose()
+    {
+        Interlocked.Increment(ref _state.DisposeCount);
+        Volatile.Write(ref _state.Status, 3);
+        GC.Collect();
+    }
+}
+
+public delegate int NativeIntCallback(int value);
+
+public static class NativeFixture178
+{
+    [Native("voidc178_reset")]
+    public static unsafe extern void Reset();
+
+    [Native("voidc178_invoke")]
+    public static unsafe extern int Invoke(NativeIntCallback callback);
+
+    [Native("voidc178_callback_entries")]
+    public static unsafe extern int CallbackEntries();
+
+    [Native("voidc178_after_steps")]
+    public static unsafe extern int AfterSteps();
+
+    [Native("voidc178_observed")]
+    public static unsafe extern int Observed();
+}
+
+public static class Program
+{
+    public static SharedState State;
+    public static int NativeCalls;
+
+    public static int NativeThrowing(int value)
+    {
+        NativeCalls++;
+        Interlocked.Increment(ref State.CallbackCount);
+
+        Node replacement = new Node(88);
+        Node previous = Interlocked.Exchange(ref State.SharedRef, replacement);
+        GC.Collect();
+
+        bool referenceOk = previous != null && previous.Value == 42 &&
+            previous.Payload != null && previous.Payload.Value == 1042;
+        Volatile.Write(ref State.NativeReferenceOk, referenceOk ? 1 : -1);
+
+        Payload failurePayload = new Payload(700 + value);
+        throw new SyncException("synchronized native callback", 600 + value, failurePayload);
+    }
+
+    public static unsafe void Worker()
+    {
+        try
+        {
+            lock (State)
+            {
+                Monitor.Enter(State);
+                Volatile.Write(ref State.Ready, 1);
+
+                while (Volatile.Read(ref State.Wake) == 0)
+                    Monitor.Wait(State);
+
+                // Wait must restore the full recursive depth. Drop one level, then
+                // Pulse while still owning the outer lock to prove one level remains.
+                Monitor.Exit(State);
+                Monitor.Pulse(State);
+
+                using (SyncResource resource = new SyncResource(State))
+                {
+                    Volatile.Write(ref State.Status, 2);
+                    NativeFixture178.Invoke(NativeThrowing);
+                    Volatile.Write(ref State.Status, -2);
+                }
+            }
+        }
+        finally
+        {
+            Interlocked.Increment(ref State.FinallyCount);
+            Volatile.Write(ref State.Status, 4);
+            GC.Collect();
+        }
+    }
+
+    public static void Coordinator()
+    {
+        while (Volatile.Read(ref State.Ready) == 0)
+            GC.Collect();
+
+        // The waiting worker held State recursively. Acquiring it here proves
+        // Monitor.Wait released the complete recursion depth while blocked.
+        lock (State)
+        {
+            Interlocked.Add(ref State.AtomicValue, 5);
+            Volatile.Write(ref State.Wake, 1);
+            Monitor.PulseAll(State);
+        }
+    }
+
+    public static void RecoveryWorker()
+    {
+        lock (State)
+        {
+            Interlocked.Increment(ref State.AtomicValue);
+            Volatile.Write(ref State.Status, 5);
+            Monitor.Pulse(State);
+        }
+    }
+
+    public static unsafe void Main()
+    {
+        State = new SharedState();
+        State.SharedRef = new Node(42);
+        NativeCalls = 0;
+        NativeFixture178.Reset();
+
+        Action workerAction = Worker;
+        Action coordinatorAction = Coordinator;
+        Thread worker = new Thread(workerAction);
+        Thread coordinator = new Thread(coordinatorAction);
+        worker.Start();
+        coordinator.Start();
+
+        coordinator.Join();
+        GC.Collect();
+
+        bool caught = false;
+        try
+        {
+            worker.Join();
+        }
+        catch (SyncException error)
+        {
+            caught = error.Message == "synchronized native callback" &&
+                error.Code == 601 && error.Payload != null && error.Payload.Value == 701;
+        }
+
+        Console.WriteLine(caught);
+        Console.WriteLine(State.Ready == 1);
+        Console.WriteLine(State.Wake == 1);
+        Console.WriteLine(State.AtomicValue == 5);
+        Console.WriteLine(State.CallbackCount == 1);
+        Console.WriteLine(State.NativeReferenceOk == 1);
+        Console.WriteLine(State.SharedRef != null && State.SharedRef.Value == 88);
+        GC.Collect();
+        Console.WriteLine(State.SharedRef.Payload.Value == 1088);
+        Console.WriteLine(State.DisposeCount == 1);
+        Console.WriteLine(State.FinallyCount == 1);
+        Console.WriteLine(Volatile.Read(ref State.Status) == 4);
+        Console.WriteLine(NativeCalls == 1);
+        Console.WriteLine(NativeFixture178.CallbackEntries() == 1);
+        Console.WriteLine(NativeFixture178.AfterSteps() == 1);
+        Console.WriteLine(NativeFixture178.Observed() == 0);
+
+        // If the exceptional unwind stranded either recursive monitor depth,
+        // this lock would deadlock.
+        lock (State)
+        {
+            Interlocked.Increment(ref State.AtomicValue);
+            Monitor.Pulse(State);
+        }
+        Console.WriteLine(State.AtomicValue == 6);
+
+        Action recoveryAction = RecoveryWorker;
+        Thread recovery = new Thread(recoveryAction);
+        recovery.Start();
+        recovery.Join();
+        Console.WriteLine(State.AtomicValue == 7);
+        Console.WriteLine(Volatile.Read(ref State.Status) == 5);
+
+        GC.Collect();
+        Console.WriteLine(State.SharedRef.Value == 88 && State.SharedRef.Payload.Value == 1088);
+    }
+}

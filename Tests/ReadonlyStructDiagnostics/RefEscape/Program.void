@@ -1,0 +1,10 @@
+public struct Bad
+{
+    public int Value;
+    public static void Change(ref int value) { value += 1; }
+    public readonly void Leak() { Change(ref Value); }
+}
+public static class Program
+{
+    public static void Main() { Bad value = new Bad(); value.Leak(); }
+}

@@ -1,0 +1,17 @@
+using Void;
+public interface IMarker<T> { }
+public struct Number : IMarker<Number>
+{
+    public int Value;
+    public Number(int value) { Value = value; }
+    public static explicit operator int(Number value) { return value.Value; }
+}
+public static class Program
+{
+    private static Func<int> Bad<T>(T value) where T : IMarker<T>
+    {
+        var copy = value;
+        return () => (int)copy;
+    }
+    public static void Main() { Func<int> getter = Bad<Number>(new Number(1)); }
+}

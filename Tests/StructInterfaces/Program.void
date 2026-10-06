@@ -1,0 +1,210 @@
+using Void.Collections;
+
+public interface ICounterBase
+{
+    int Value { get; }
+}
+
+public interface ICounter : ICounterBase
+{
+    int Add(int amount);
+    int NodeValue();
+}
+
+public interface IBox<T>
+{
+    T Get();
+}
+
+public struct GenericBox<T> : IBox<T>
+{
+    private T _value;
+
+    public GenericBox(T value)
+    {
+        _value = value;
+    }
+
+    public T Get()
+    {
+        return _value;
+    }
+}
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public struct Counter : ICounter, IBox<int>
+{
+    public int Value { get; set; }
+    public Node Node;
+
+    public Counter(int value)
+    {
+        Value = value;
+        Node = new Node(value + 100);
+    }
+
+    public int Add(int amount)
+    {
+        Value += amount;
+        return Value;
+    }
+
+    public int NodeValue()
+    {
+        return Node.Value;
+    }
+
+    public int Get()
+    {
+        return Value;
+    }
+}
+
+public struct RangeEnumerator : IEnumerator<int>
+{
+    private int _current;
+    private int _end;
+
+    public int Current => _current;
+
+    public RangeEnumerator(int end)
+    {
+        _current = 0;
+        _end = end;
+    }
+
+    public bool MoveNext()
+    {
+        _current++;
+        return _current <= _end;
+    }
+
+    public void Dispose()
+    {
+    }
+}
+
+public struct Range : IEnumerable<int>
+{
+    private int _end;
+
+    public Range(int end)
+    {
+        _end = end;
+    }
+
+    public IEnumerator<int> GetEnumerator()
+    {
+        return new RangeEnumerator(_end);
+    }
+}
+
+public struct PatternEnumerator
+{
+    private int _current;
+    private int _end;
+
+    public int Current => _current;
+
+    public PatternEnumerator(int end)
+    {
+        _current = 0;
+        _end = end;
+    }
+
+    public bool MoveNext()
+    {
+        _current++;
+        return _current <= _end;
+    }
+}
+
+public struct PatternRange
+{
+    private int _end;
+
+    public PatternRange(int end)
+    {
+        _end = end;
+    }
+
+    public PatternEnumerator GetEnumerator()
+    {
+        return new PatternEnumerator(_end);
+    }
+}
+
+public static class Program
+{
+    public static int Read(ICounterBase value)
+    {
+        return value.Value;
+    }
+
+    public static void Main()
+    {
+        Counter counter = new Counter(5);
+        ICounter boxed = counter;
+        Console.WriteLine(boxed.Value == 5);
+        Console.WriteLine(boxed.Add(3) == 8);
+        Console.WriteLine(counter.Value == 5);
+        Console.WriteLine(Read(counter) == 5);
+
+        ICounterBase inherited = counter;
+        Console.WriteLine(inherited.Value == 5);
+
+        ICounter recast = (ICounter)inherited;
+        Console.WriteLine(recast.Add(1) == 6);
+        ICounter recastAs = inherited as ICounter;
+        Console.WriteLine(recastAs.Value == 6);
+
+        IBox<int> generic = counter;
+        Console.WriteLine(generic.Get() == 5);
+
+        GenericBox<int> numberBox = new GenericBox<int>(42);
+        IBox<int> genericStruct = numberBox;
+        Console.WriteLine(genericStruct.Get() == 42);
+
+        GenericBox<Node> nodeBox = new GenericBox<Node>(new Node(77));
+        IBox<Node> genericNode = nodeBox;
+        nodeBox = default;
+        GC.Collect();
+        Console.WriteLine(genericNode.Get().Value == 77);
+
+        ICounter second = counter;
+        boxed.Add(2);
+        Console.WriteLine(boxed.Value == 10);
+        Console.WriteLine(second.Value == 5);
+
+        GC.Collect();
+        Console.WriteLine(boxed.NodeValue() == 105);
+        Console.WriteLine(boxed is ICounterBase);
+
+        Range range = new Range(4);
+        int total = 0;
+        foreach (var value in range)
+            total += value;
+        Console.WriteLine(total == 10);
+
+        IEnumerable<int> sequence = range;
+        total = 0;
+        foreach (var value in sequence)
+            total += value;
+        Console.WriteLine(total == 10);
+
+        PatternRange pattern = new PatternRange(3);
+        total = 0;
+        foreach (var value in pattern)
+            total += value;
+        Console.WriteLine(total == 6);
+    }
+}

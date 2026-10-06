@@ -1,0 +1,6 @@
+public class PlatformNotSupportedException : NotSupportedException
+{
+    public PlatformNotSupportedException() : base("Operation is not supported on this platform.") { }
+    public PlatformNotSupportedException(string message) : base(message) { }
+    public PlatformNotSupportedException(string message, Exception innerException) : base(message, innerException) { }
+}

@@ -1,0 +1,2 @@
+public unsafe interface Bad { public string* Pointer { get; } }
+public static class Program { public static void Main() { } }

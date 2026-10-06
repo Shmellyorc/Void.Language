@@ -1,0 +1,16 @@
+using Void;
+
+public static class Program
+{
+    public static int Add(int left, int right)
+    {
+        int sum = left + right;
+        return sum;
+    }
+
+    public static void Main()
+    {
+        int value = Add(2, 3);
+        Console.WriteLine(value);
+    }
+}

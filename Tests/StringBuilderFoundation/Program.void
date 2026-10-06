@@ -1,0 +1,95 @@
+using Void;
+using Void.Text;
+
+public static class Program
+{
+    private static void Check(bool condition)
+    {
+        Console.WriteLine(condition);
+        if (!condition)
+            throw new Exception("StringBuilder assertion failed");
+    }
+
+    public static void Main()
+    {
+        StringBuilder builder = new StringBuilder();
+        Check(builder.Length == 0);
+        Check(builder.ByteLength == 0);
+        Check(builder.ByteCapacity >= 16);
+        Check(builder.ToString().Equals(""));
+
+        Check(builder.Append("A") == builder);
+        Check(builder.Append((char)233) == builder);
+        Check(builder.Append((char)128512) == builder);
+        Check(builder.Append("B") == builder);
+        Check(builder.Length == 4);
+        Check(builder.ByteLength == 8);
+        Check(builder.ToString().Equals("Aé😀B"));
+
+        int capacityAfterUtf8 = builder.ByteCapacity;
+        Check(capacityAfterUtf8 >= builder.ByteLength);
+        builder.Append(null);
+        Check(builder.Length == 4 && builder.ByteLength == 8);
+        Check(builder.ByteCapacity == capacityAfterUtf8);
+
+        builder.Append("\0X");
+        Check(builder.Length == 6);
+        Check(builder.ByteLength == 10);
+        string embedded = builder.ToString();
+        Check(embedded.Equals("Aé😀B\0X"));
+        Check(embedded.IndexOf((char)0) == 4);
+
+        string snapshot = builder.ToString();
+        builder.Append("!");
+        Check(snapshot.Equals("Aé😀B\0X"));
+        Check(builder.ToString().Equals("Aé😀B\0X!"));
+
+        Check(builder.Clear() == builder);
+        Check(builder.Length == 0 && builder.ByteLength == 0);
+        Check(builder.ToString().Equals(""));
+        Check(snapshot.Equals("Aé😀B\0X"));
+
+        builder.AppendLine("hello").AppendLine().Append("world");
+        Check(builder.ToString().Equals("hello" + Environment.NewLine + Environment.NewLine + "world"));
+        Check(builder.Length == 10 + 2 * Environment.NewLine.Length);
+        Check(builder.ByteLength == 10 + 2 * Environment.NewLine.ByteLength);
+
+        StringBuilder zero = new StringBuilder(0);
+        Check(zero.ByteCapacity == 0);
+        zero.Append("é😀");
+        Check(zero.ToString().Equals("é😀"));
+        Check(zero.Length == 2);
+        Check(zero.ByteLength == 6);
+        Check(zero.ByteCapacity >= 6);
+
+        StringBuilder growth = new StringBuilder(1);
+        for (int i = 0; i < 50; i++)
+        {
+            growth.Append("é😀");
+            if (i % 7 == 0)
+                GC.Collect();
+        }
+        Check(growth.Length == 100);
+        Check(growth.ByteLength == 300);
+        Check(growth.ByteCapacity >= 300);
+        string grown = growth.ToString();
+        Check(grown.Length == 100);
+        Check(grown.ByteLength == 300);
+        Check(grown.StartsWith("é😀é😀"));
+        Check(grown.EndsWith("é😀é😀"));
+
+        GC.Collect();
+        growth.Append('Z');
+        GC.Collect();
+        Check(growth.Length == 101);
+        Check(growth.ByteLength == 301);
+        Check(growth.ToString().EndsWith("😀Z"));
+        Check(grown.Length == 100 && grown.EndsWith("é😀"));
+
+        StringBuilder chained = new StringBuilder();
+        string result = chained.Append("A").Append((char)233).Append("😀").AppendLine("B").Append("C").ToString();
+        Check(result.Equals("Aé😀B" + Environment.NewLine + "C"));
+        Check(result.Length == 5 + Environment.NewLine.Length);
+        Check(result.ByteLength == 9 + Environment.NewLine.ByteLength);
+    }
+}

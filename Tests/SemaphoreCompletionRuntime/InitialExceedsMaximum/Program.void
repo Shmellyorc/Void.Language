@@ -1,0 +1,10 @@
+using Void;
+using Void.Threading;
+
+public static class Program
+{
+    public static void Main()
+    {
+        Semaphore value = new Semaphore(2, 1);
+    }
+}

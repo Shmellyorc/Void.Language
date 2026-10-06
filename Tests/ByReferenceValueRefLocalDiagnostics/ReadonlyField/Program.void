@@ -1,0 +1,18 @@
+public sealed class Box
+{
+    public readonly int Value = 1;
+
+    public void Bad()
+    {
+        ref int alias = ref Value;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Box box = new Box();
+        box.Bad();
+    }
+}

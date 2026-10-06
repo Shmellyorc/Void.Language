@@ -1,0 +1,5 @@
+public unsafe struct Bad
+{
+    public string* Pointer { get; set; }
+}
+public static class Program { public static void Main() { } }

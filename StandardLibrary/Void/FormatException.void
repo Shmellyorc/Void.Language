@@ -1,0 +1,6 @@
+public class FormatException : Exception
+{
+    public FormatException() : base("Input was not in a correct format.") { }
+    public FormatException(string message) : base(message) { }
+    public FormatException(string message, Exception innerException) : base(message, innerException) { }
+}

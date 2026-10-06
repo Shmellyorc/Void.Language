@@ -1,0 +1,6 @@
+public class OutOfMemoryException : Exception
+{
+    public OutOfMemoryException() : base("Insufficient memory.") { }
+    public OutOfMemoryException(string message) : base(message) { }
+    public OutOfMemoryException(string message, Exception innerException) : base(message, innerException) { }
+}

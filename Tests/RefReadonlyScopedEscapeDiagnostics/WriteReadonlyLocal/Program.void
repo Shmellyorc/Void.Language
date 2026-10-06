@@ -1,0 +1,9 @@
+public static class Program
+{
+    public static void Main()
+    {
+        int value = 1;
+        ref readonly int alias = ref value;
+        alias = 2;
+    }
+}

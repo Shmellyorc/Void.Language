@@ -1,0 +1,152 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    private static int _timerCalls;
+
+    public static void Main()
+    {
+        CancellationTokenSource source = new CancellationTokenSource();
+        CancellationToken token = source.Token;
+        int calls = 0;
+        CancellationTokenRegistration registration = token.Register(() => calls++);
+        source.Dispose();
+        source.Dispose();
+        Console.WriteLine(!source.IsCancellationRequested);
+        Console.WriteLine(token.CanBeCanceled);
+        Console.WriteLine(!token.IsCancellationRequested);
+        token.ThrowIfCancellationRequested();
+        Console.WriteLine(true);
+        registration.Dispose();
+        registration.Dispose();
+        Console.WriteLine(calls == 0);
+
+        CancellationToken retainedToken;
+        using (CancellationTokenSource scoped = new CancellationTokenSource())
+        {
+            retainedToken = scoped.Token;
+            Console.WriteLine(retainedToken.CanBeCanceled);
+        }
+        Console.WriteLine(!retainedToken.IsCancellationRequested);
+
+        CancellationTokenSource canceled = new CancellationTokenSource();
+        CancellationToken canceledToken = canceled.Token;
+        int canceledCalls = 0;
+        canceledToken.Register(() => canceledCalls++);
+        canceled.Cancel();
+        canceled.Dispose();
+        canceled.Dispose();
+        Console.WriteLine(canceledCalls == 1);
+        Console.WriteLine(canceled.IsCancellationRequested);
+        Console.WriteLine(canceledToken.IsCancellationRequested);
+        bool threw = false;
+        try
+        {
+            canceledToken.ThrowIfCancellationRequested();
+        }
+        catch (OperationCanceledException error)
+        {
+            threw = error.CancellationToken.IsSameSource(canceledToken);
+        }
+        Console.WriteLine(threw);
+
+        CancellationTokenSource parent = new CancellationTokenSource();
+        CancellationToken parentToken = parent.Token;
+        int parentCalls = 0;
+        CancellationTokenRegistration parentRegistration = parentToken.Register(() => parentCalls++);
+        CancellationTokenSource owner = new CancellationTokenSource();
+        CancellationSourceOwnership parentOwnership = owner.Own(parentRegistration);
+        owner.Dispose();
+        parent.Cancel();
+        Console.WriteLine(parentCalls == 0);
+        parentOwnership.Dispose();
+        Console.WriteLine(parentCalls == 0);
+
+        _timerCalls = 0;
+        CancellationTokenSource timerOwner = new CancellationTokenSource();
+        TimerQueueRegistration timer = TimerQueue.Register(60, () => Interlocked.Increment(ref _timerCalls));
+        CancellationSourceOwnership timerOwnership = timerOwner.Own(timer);
+        timerOwner.Dispose();
+        Thread.Sleep(120);
+        Console.WriteLine(Volatile.Read(ref _timerCalls) == 0);
+        timerOwnership.Dispose();
+        Console.WriteLine(Volatile.Read(ref _timerCalls) == 0);
+
+        CancellationTokenSource cancelOwner = new CancellationTokenSource();
+        CancellationTokenSource cancelParent = new CancellationTokenSource();
+        int cancelParentCalls = 0;
+        CancellationTokenRegistration cancelParentRegistration = cancelParent.Token.Register(() => cancelParentCalls++);
+        CancellationSourceOwnership cancelOwnership = cancelOwner.Own(cancelParentRegistration);
+        cancelOwner.Cancel();
+        cancelParent.Cancel();
+        Console.WriteLine(cancelOwner.IsCancellationRequested);
+        Console.WriteLine(cancelParentCalls == 0);
+        cancelOwnership.Dispose();
+        Console.WriteLine(cancelParentCalls == 0);
+
+        _timerCalls = 0;
+        CancellationTokenSource cancelTimerOwner = new CancellationTokenSource();
+        TimerQueueRegistration cancelTimer = TimerQueue.Register(60, () => Interlocked.Increment(ref _timerCalls));
+        CancellationSourceOwnership cancelTimerOwnership = cancelTimerOwner.Own(cancelTimer);
+        cancelTimerOwner.Cancel();
+        Thread.Sleep(120);
+        Console.WriteLine(cancelTimerOwner.IsCancellationRequested);
+        Console.WriteLine(Volatile.Read(ref _timerCalls) == 0);
+        cancelTimerOwnership.Dispose();
+
+        CancellationTokenSource manualOwner = new CancellationTokenSource();
+        CancellationTokenSource manualParent = new CancellationTokenSource();
+        int manualCalls = 0;
+        CancellationTokenRegistration manualRegistration = manualParent.Token.Register(() => manualCalls++);
+        CancellationSourceOwnership manualOwnership = manualOwner.Own(manualRegistration);
+        manualOwnership.Dispose();
+        manualOwnership.Dispose();
+        manualParent.Cancel();
+        Console.WriteLine(manualCalls == 0);
+        manualOwner.Cancel();
+        Console.WriteLine(manualOwner.IsCancellationRequested);
+
+        CancellationTokenSource alreadyCanceledOwner = new CancellationTokenSource();
+        alreadyCanceledOwner.Cancel();
+        CancellationTokenSource lateParent = new CancellationTokenSource();
+        int lateCalls = 0;
+        CancellationTokenRegistration lateRegistration = lateParent.Token.Register(() => lateCalls++);
+        CancellationSourceOwnership lateOwnership = alreadyCanceledOwner.Own(lateRegistration);
+        lateParent.Cancel();
+        Console.WriteLine(lateCalls == 0);
+        lateOwnership.Dispose();
+
+        CancellationTokenSource alreadyDisposedOwner = new CancellationTokenSource();
+        alreadyDisposedOwner.Dispose();
+        CancellationTokenSource disposedParent = new CancellationTokenSource();
+        int disposedOwnedCalls = 0;
+        CancellationTokenRegistration disposedOwnedRegistration = disposedParent.Token.Register(() => disposedOwnedCalls++);
+        CancellationSourceOwnership disposedOwnership = alreadyDisposedOwner.Own(disposedOwnedRegistration);
+        disposedParent.Cancel();
+        Console.WriteLine(disposedOwnedCalls == 0);
+        disposedOwnership.Dispose();
+
+        CancellationTokenSource delaySource = new CancellationTokenSource();
+        CancellationToken delayToken = delaySource.Token;
+        Task delay = Task.Delay(25, delayToken);
+        delaySource.Dispose();
+        Console.WriteLine(delay.Wait(2000));
+        Console.WriteLine(delay.Status == TaskStatus.Completed);
+        Console.WriteLine(!delayToken.IsCancellationRequested);
+
+        CancellationTokenSource many = new CancellationTokenSource();
+        int manyCalls = 0;
+        CancellationTokenRegistration[] manyRegistrations = new CancellationTokenRegistration[32];
+        for (int i = 0; i < manyRegistrations.Length; i++)
+            manyRegistrations[i] = many.Token.Register(() => Interlocked.Increment(ref manyCalls));
+        many.Dispose();
+        for (int i = 0; i < manyRegistrations.Length; i++)
+            manyRegistrations[i].Dispose();
+        Console.WriteLine(manyCalls == 0);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

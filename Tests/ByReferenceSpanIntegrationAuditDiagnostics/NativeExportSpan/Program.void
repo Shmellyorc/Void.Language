@@ -1,0 +1,9 @@
+using Void;
+public static class Api230
+{
+    [Export("void230_bad_span")]
+    public static Span<int> Bad()
+    {
+        return default(Span<int>);
+    }
+}

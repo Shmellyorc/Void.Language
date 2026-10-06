@@ -1,0 +1,150 @@
+using Void;
+
+public static class Eval307
+{
+    public static int Order;
+    public static int ReceiverCalls;
+    public static int FirstCalls;
+    public static int SecondCalls;
+
+    public static string Receiver()
+    {
+        ReceiverCalls += 1;
+        Order = Order * 10 + 1;
+        return "A😀C";
+    }
+
+    public static int Index()
+    {
+        FirstCalls += 1;
+        Order = Order * 10 + 2;
+        return 2;
+    }
+
+    public static string TextValue()
+    {
+        SecondCalls += 1;
+        Order = Order * 10 + 3;
+        return "é";
+    }
+
+    public static string OldValue()
+    {
+        FirstCalls += 1;
+        Order = Order * 10 + 2;
+        return "😀";
+    }
+
+    public static string NewValue()
+    {
+        SecondCalls += 1;
+        Order = Order * 10 + 3;
+        return "éé";
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        string text = "Aé😀B";
+        string embedded = "A\0B\0C";
+
+        Console.WriteLine(text.Insert(0, "X").Equals("XAé😀B"));
+        Console.WriteLine(text.Insert(2, "XY").Equals("AéXY😀B"));
+        Console.WriteLine(text.Insert(text.Length, "!").Equals("Aé😀B!"));
+        Console.WriteLine(text.Insert(2, "").Equals(text));
+        Console.WriteLine(embedded.Insert(2, "😀").Equals("A\0😀B\0C"));
+        Console.WriteLine(text.Equals("Aé😀B"));
+
+        Console.WriteLine(text.Remove(0).Equals(""));
+        Console.WriteLine(text.Remove(2).Equals("Aé"));
+        Console.WriteLine(text.Remove(text.Length).Equals(text));
+        Console.WriteLine(text.Remove(1, 2).Equals("AB"));
+        Console.WriteLine(text.Remove(2, 1).Equals("AéB"));
+        Console.WriteLine(text.Remove(1, 0).Equals(text));
+        Console.WriteLine(text.Remove(0, text.Length).Equals(""));
+        Console.WriteLine(embedded.Remove(1, 2).Equals("A\0C"));
+        Console.WriteLine(text.Equals("Aé😀B"));
+
+        Console.WriteLine("abcabc".Replace("ab", "X").Equals("XcXc"));
+        Console.WriteLine("Aé😀Bé😀".Replace("é😀", "Z").Equals("AZBZ"));
+        Console.WriteLine(embedded.Replace("\0B", "X").Equals("AX\0C"));
+        Console.WriteLine("aaaa".Replace("aa", "b").Equals("bb"));
+        Console.WriteLine("abc".Replace("x", "long").Equals("abc"));
+        Console.WriteLine("abcabc".Replace("abc", "").Equals(""));
+        Console.WriteLine("abcabc".Replace("abc", null).Equals(""));
+        Console.WriteLine("abc".Replace("b", "b").Equals("abc"));
+        Console.WriteLine("😀😀".Replace("😀", "éé").Equals("éééé"));
+        Console.WriteLine("ééé".Replace("éé", "😀").Equals("😀é"));
+
+        Console.WriteLine("banana".Replace((char)97, (char)111).Equals("bonono"));
+        Console.WriteLine("Aé😀B".Replace((char)233, (char)128512).Equals("A😀😀B"));
+        Console.WriteLine("A😀😀B".Replace((char)128512, (char)233).Equals("AééB"));
+        Console.WriteLine(embedded.Replace((char)0, (char)95).Equals("A_B_C"));
+        Console.WriteLine("abc".Replace((char)120, (char)121).Equals("abc"));
+        Console.WriteLine("abc".Replace((char)98, (char)98).Equals("abc"));
+
+        string widened = "éé".Replace((char)233, (char)128512);
+        Console.WriteLine(widened.Length == 2);
+        Console.WriteLine(widened.ByteLength == 8);
+        string narrowed = "😀😀".Replace((char)128512, (char)65);
+        Console.WriteLine(narrowed.Length == 2);
+        Console.WriteLine(narrowed.ByteLength == 2);
+        string replaced = "Aé😀B".Replace("é😀", "XYZ");
+        Console.WriteLine(replaced.Length == 5);
+        Console.WriteLine(replaced.ByteLength == 5);
+
+        string absent = null;
+        string missingInsert = absent?.Insert(0, "x");
+        string missingRemove = absent?.Remove(0);
+        string missingReplace = absent?.Replace("a", "b");
+        string present = "abc";
+        string presentEdit = present?.Replace("b", "😀");
+        Console.WriteLine(missingInsert == null);
+        Console.WriteLine(missingRemove == null);
+        Console.WriteLine(missingReplace == null);
+        Console.WriteLine(presentEdit != null && presentEdit.Equals("a😀c"));
+
+        Eval307.Order = 0;
+        Eval307.ReceiverCalls = 0;
+        Eval307.FirstCalls = 0;
+        Eval307.SecondCalls = 0;
+        string orderedInsert = Eval307.Receiver().Insert(Eval307.Index(), Eval307.TextValue());
+        Console.WriteLine(orderedInsert.Equals("A😀éC"));
+        Console.WriteLine(Eval307.ReceiverCalls == 1 && Eval307.FirstCalls == 1 && Eval307.SecondCalls == 1 && Eval307.Order == 123);
+
+        Eval307.Order = 0;
+        Eval307.ReceiverCalls = 0;
+        Eval307.FirstCalls = 0;
+        Eval307.SecondCalls = 0;
+        string orderedReplace = Eval307.Receiver().Replace(Eval307.OldValue(), Eval307.NewValue());
+        Console.WriteLine(orderedReplace.Equals("AééC"));
+        Console.WriteLine(Eval307.ReceiverCalls == 1 && Eval307.FirstCalls == 1 && Eval307.SecondCalls == 1 && Eval307.Order == 123);
+
+        Eval307.Order = 0;
+        Eval307.ReceiverCalls = 0;
+        Eval307.FirstCalls = 0;
+        Eval307.SecondCalls = 0;
+        string orderedRemove = Eval307.Receiver().Remove(Eval307.Index(), 1);
+        Console.WriteLine(orderedRemove.Equals("A😀"));
+        Console.WriteLine(Eval307.ReceiverCalls == 1 && Eval307.FirstCalls == 1 && Eval307.Order == 12);
+
+        string chain = "Aé😀B".Insert(1, "XY").Replace("é😀", "Q").Remove(2, 1);
+        Console.WriteLine(chain.Equals("AXQ B".Replace(" ", "")));
+        Console.WriteLine(chain.Equals("AXQB"));
+
+        string gcValue = "Aé😀Bé😀C";
+        gcValue = gcValue.Replace("é😀", "XYZ");
+        GC.Collect();
+        Console.WriteLine(gcValue.Equals("AXYZBXYZC"));
+        gcValue = gcValue.Insert(1, "\0😀");
+        GC.Collect();
+        Console.WriteLine(gcValue.Equals("A\0😀XYZBXYZC"));
+        gcValue = gcValue.Remove(1, 2);
+        GC.Collect();
+        Console.WriteLine(gcValue.Equals("AXYZBXYZC"));
+        Console.WriteLine(gcValue.Length == 9);
+        Console.WriteLine(gcValue.ByteLength == 9);
+    }
+}

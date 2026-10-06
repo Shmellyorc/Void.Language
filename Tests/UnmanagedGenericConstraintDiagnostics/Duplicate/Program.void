@@ -1,0 +1,1 @@
+public static class Program { private static T Keep<T>(T value) where T : unmanaged, unmanaged => value; public static void Main() { } }

@@ -1,0 +1,4 @@
+public class BaseValue { public virtual int Value => 1; }
+public class MiddleValue : BaseValue { public sealed override int Value => 2; }
+public sealed class Broken : MiddleValue { public override int Value => 3; }
+public static class Program { public static void Main() { Broken value = new(); Console.WriteLine(value.Value); } }

@@ -1,0 +1,10 @@
+public struct ValueType
+{
+    public int Value;
+    public int Current { get { return Value; } }
+}
+public static class Program
+{
+    public static int Read(in ValueType value) { return value.Current; }
+    public static void Main() { ValueType value = new ValueType(); Console.WriteLine(Read(in value)); }
+}

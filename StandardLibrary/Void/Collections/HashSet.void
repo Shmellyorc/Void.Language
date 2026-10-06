@@ -1,0 +1,291 @@
+namespace Void.Collections;
+
+private sealed class HashSetNode<T>
+{
+    public bool Alive;
+    public int Hash;
+    public T Value;
+    public HashSetNode<T> Next;
+
+    public HashSetNode(int hash, T value, HashSetNode<T> next)
+    {
+        Alive = true;
+        Hash = hash;
+        Value = value;
+        Next = next;
+    }
+}
+
+public sealed class HashSet<T> : IReadOnlySet<T>
+{
+    private HashSetNode<T>[] _buckets;
+    private int _count;
+    private int _version;
+    private IEqualityComparer<T> _comparer;
+    public IEqualityComparer<T> Comparer => _comparer;
+
+    public int Count => _count;
+
+    public HashSet() : this(0, null) { }
+    public HashSet(int capacity) : this(capacity, null) { }
+
+    public HashSet(IEqualityComparer<T> comparer) : this(0, comparer) { }
+    public HashSet(int capacity, IEqualityComparer<T> comparer)
+    {
+        if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
+        _comparer = comparer == null ? new DefaultEqualityComparer<T>() : comparer;
+        _buckets = new HashSetNode<T>[capacity < 8 ? 8 : capacity];
+        _count = 0;
+    }
+
+    public HashSet(IEnumerable<T> collection) : this(0, null)
+    {
+        if (collection == null) throw new ArgumentNullException("collection");
+        foreach (T item in collection) this.Add(item);
+    }
+    public HashSet(IEnumerable<T> collection, IEqualityComparer<T> comparer) : this(0, comparer)
+    {
+        if (collection == null) throw new ArgumentNullException("collection");
+        foreach (T item in collection) this.Add(item);
+    }
+    public bool TryGetValue(T equalValue, out T actualValue)
+    {
+        int hash = _comparer.GetHashCode(equalValue);
+        int bucket = hash % _buckets.Length;
+        if (bucket < 0) bucket += _buckets.Length;
+        HashSetNode<T> node = _buckets[bucket];
+        while (node != null)
+        {
+            if (node.Hash == hash && _comparer.Equals(node.Value, equalValue))
+            {
+                actualValue = node.Value;
+                return true;
+            }
+            node = node.Next;
+        }
+        actualValue = default(T);
+        return false;
+    }
+    public void CopyTo(T[] array) { this.CopyTo(array, 0); }
+    public void CopyTo(T[] array, int arrayIndex)
+    {
+        if (array == null) throw new ArgumentNullException("array");
+        if (arrayIndex < 0) throw new ArgumentOutOfRangeException("arrayIndex");
+        if (arrayIndex > array.Length || _count > array.Length - arrayIndex)
+            throw new ArgumentException("Destination is too short");
+        int destinationIndex = arrayIndex;
+        foreach (T item in this)
+        {
+            array[destinationIndex] = item;
+            destinationIndex++;
+        }
+    }
+
+    public void UnionWith(IEnumerable<T> other)
+    {
+        if (other == null) throw new ArgumentNullException("other");
+        if (other == (IEnumerable<T>)this) return;
+        foreach (T item in other) this.Add(item);
+    }
+    public void ExceptWith(IEnumerable<T> other)
+    {
+        if (other == null) throw new ArgumentNullException("other");
+        if (other == (IEnumerable<T>)this) { this.Clear(); return; }
+        foreach (T item in other) this.Remove(item);
+    }
+    public void IntersectWith(IEnumerable<T> other)
+    {
+        if (other == null) throw new ArgumentNullException("other");
+        if (other == (IEnumerable<T>)this || _count == 0) return;
+        HashSet<T> retained = new HashSet<T>(other, _comparer);
+        foreach (T item in this)
+            if (!retained.Contains(item)) this.Remove(item);
+    }
+    public void SymmetricExceptWith(IEnumerable<T> other)
+    {
+        if (other == null) throw new ArgumentNullException("other");
+        if (other == (IEnumerable<T>)this) { this.Clear(); return; }
+        // Normalize duplicates using THIS set's equality policy before toggling.
+        // Also finish reading any aliased input before adding to this set.
+        HashSet<T> unique = new HashSet<T>(other, _comparer);
+        foreach (T item in unique)
+            if (!this.Remove(item)) this.Add(item);
+    }
+    public bool Overlaps(IEnumerable<T> other)
+    {
+        if (other == null) throw new ArgumentNullException("other");
+        if (_count == 0) return false;
+        foreach (T item in other)
+            if (this.Contains(item)) return true;
+        return false;
+    }
+    public bool IsSubsetOf(IEnumerable<T> other)
+    {
+        if (other == null) throw new ArgumentNullException("other");
+        if (_count == 0 || other == (IEnumerable<T>)this) return true;
+        HashSet<T> unique = new HashSet<T>(other, _comparer);
+        return _count <= unique.Count && this.IsContainedIn(unique);
+    }
+    public bool IsProperSubsetOf(IEnumerable<T> other)
+    {
+        if (other == null) throw new ArgumentNullException("other");
+        if (other == (IEnumerable<T>)this) return false;
+        HashSet<T> unique = new HashSet<T>(other, _comparer);
+        return _count < unique.Count && this.IsContainedIn(unique);
+    }
+    public bool IsSupersetOf(IEnumerable<T> other)
+    {
+        if (other == null) throw new ArgumentNullException("other");
+        if (other == (IEnumerable<T>)this) return true;
+        foreach (T item in other)
+            if (!this.Contains(item)) return false;
+        return true;
+    }
+    public bool IsProperSupersetOf(IEnumerable<T> other)
+    {
+        if (other == null) throw new ArgumentNullException("other");
+        if (other == (IEnumerable<T>)this || _count == 0) return false;
+        HashSet<T> unique = new HashSet<T>(other, _comparer);
+        return _count > unique.Count && unique.IsContainedIn(this);
+    }
+    public bool SetEquals(IEnumerable<T> other)
+    {
+        if (other == null) throw new ArgumentNullException("other");
+        if (other == (IEnumerable<T>)this) return true;
+        HashSet<T> unique = new HashSet<T>(other, _comparer);
+        return _count == unique.Count && this.IsContainedIn(unique);
+    }
+    private bool IsContainedIn(HashSet<T> other)
+    {
+        foreach (T item in this)
+            if (!other.Contains(item)) return false;
+        return true;
+    }
+
+    public bool Add(T value)
+    {
+        int hash = _comparer.GetHashCode(value);
+        int bucket = hash % _buckets.Length;
+        if (bucket < 0) bucket += _buckets.Length;
+        HashSetNode<T> node = _buckets[bucket];
+
+        while (node != null)
+        {
+            if (node.Hash == hash && _comparer.Equals(node.Value, value))
+                return false;
+
+            node = node.Next;
+        }
+
+        if (_count >= (_buckets.Length / 4) * 3)
+        {
+            this.Grow();
+            bucket = hash % _buckets.Length;
+            if (bucket < 0) bucket += _buckets.Length;
+        }
+        _buckets[bucket] = new HashSetNode<T>(hash, value, _buckets[bucket]);
+        _count++;
+        _version++;
+        return true;
+    }
+
+    public bool Contains(T value)
+    {
+        int hash = _comparer.GetHashCode(value);
+        int bucket = hash % _buckets.Length;
+        if (bucket < 0) bucket += _buckets.Length;
+        HashSetNode<T> node = _buckets[bucket];
+
+        while (node != null)
+        {
+            if (node.Hash == hash && _comparer.Equals(node.Value, value))
+                return true;
+
+            node = node.Next;
+        }
+
+        return false;
+    }
+
+    public bool Remove(T value)
+    {
+        int hash = _comparer.GetHashCode(value);
+        int bucket = hash % _buckets.Length;
+        if (bucket < 0) bucket += _buckets.Length;
+        HashSetNode<T> node = _buckets[bucket];
+        HashSetNode<T> previous = null;
+
+        while (node != null)
+        {
+            if (node.Hash == hash && _comparer.Equals(node.Value, value))
+            {
+                if (previous == null)
+                    _buckets[bucket] = node.Next;
+                else
+                    previous.Next = node.Next;
+
+                node.Alive = false;
+                _count--;
+                return true;
+            }
+
+            previous = node;
+            node = node.Next;
+        }
+
+        return false;
+    }
+
+    public void Clear()
+    {
+        for (int i = 0; i < _buckets.Length; i++)
+        {
+            HashSetNode<T> node = _buckets[i];
+            while (node != null) { node.Alive = false; node = node.Next; }
+            _buckets[i] = null;
+        }
+        _count = 0;
+    }
+
+    public IEnumerator<T> GetEnumerator() { return this.Enumerate(_version); }
+    private IEnumerator<T> Enumerate(int version)
+    {
+        if (version != _version) throw new InvalidOperationException("Collection was modified");
+        for (int i = 0; i < _buckets.Length; i++)
+        {
+            HashSetNode<T> node = _buckets[i];
+            while (node != null)
+            {
+                if (node.Alive)
+                {
+                    yield return node.Value;
+                    if (version != _version) throw new InvalidOperationException("Collection was modified");
+                }
+                node = node.Next;
+            }
+        }
+    }
+
+    private void Grow()
+    {
+        if (_buckets.Length > 1073741823) throw new OutOfMemoryException();
+        HashSetNode<T>[] buckets = new HashSetNode<T>[_buckets.Length * 2];
+
+        for (int i = 0; i < _buckets.Length; i++)
+        {
+            HashSetNode<T> node = _buckets[i];
+            while (node != null)
+            {
+                HashSetNode<T> next = node.Next;
+                int bucket = node.Hash % buckets.Length;
+                if (bucket < 0) bucket += buckets.Length;
+                node.Next = buckets[bucket];
+                buckets[bucket] = node;
+                node = next;
+            }
+        }
+
+        _buckets = buckets;
+    }
+}
+

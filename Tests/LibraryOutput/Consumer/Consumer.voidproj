@@ -1,0 +1,11 @@
+{
+  "format": 1,
+  "name": "LibraryConsumer",
+  "version": "0.1.0",
+  "output": "exe",
+  "compiler": {
+    "unsafe": true,
+    "libraries": ["Void099Lib"],
+    "libraryPaths": ["native"]
+  }
+}

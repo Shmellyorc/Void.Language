@@ -1,0 +1,149 @@
+public abstract class Metric
+{
+    protected int _value;
+
+    public abstract int Value
+    {
+        get;
+        protected set;
+    }
+
+    public void SetFromBase(int value)
+    {
+        Value = value;
+    }
+
+    public int ReadFromBase()
+    {
+        return Value;
+    }
+}
+
+public class MiddleMetric : Metric
+{
+    public override int Value
+    {
+        get { return _value + 10; }
+        protected set { _value = value + 1; }
+    }
+}
+
+public class FinalMetric : MiddleMetric
+{
+    public sealed override int Value
+    {
+        get { return base.Value + 20; }
+        protected set { base.Value = value + 2; }
+    }
+
+    public void SetFromDerived(int value)
+    {
+        Value = value;
+    }
+
+    public int ReadImmediateBase()
+    {
+        return base.Value;
+    }
+}
+
+public class AutoBase
+{
+    public virtual int Score { get; set; } = 3;
+}
+
+public sealed class AutoDerived : AutoBase
+{
+    public override int Score { get; set; } = 7;
+}
+
+public class ExpressionBase
+{
+    protected int _amount = 4;
+    public virtual int Amount => _amount;
+}
+
+public sealed class ExpressionDerived : ExpressionBase
+{
+    public override int Amount => base.Amount + 5;
+}
+
+public class ReAbstractRoot
+{
+    public virtual int Code => 1;
+}
+
+public abstract class ReAbstractMiddle : ReAbstractRoot
+{
+    public abstract override int Code { get; }
+}
+
+public sealed class ReAbstractFinal : ReAbstractMiddle
+{
+    public override int Code => 9;
+}
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public class RefBase
+{
+    public virtual Node Target { get; set; }
+}
+
+public sealed class RefDerived : RefBase
+{
+    public override Node Target { get; set; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        FinalMetric finalMetric = new();
+        Metric metric = finalMetric;
+        MiddleMetric middle = finalMetric;
+
+        metric.SetFromBase(5);
+        Console.WriteLine(metric.Value == 38);
+        Console.WriteLine(middle.Value == 38);
+        Console.WriteLine(finalMetric.Value == 38);
+        Console.WriteLine(metric.ReadFromBase() == 38);
+        Console.WriteLine(finalMetric.ReadImmediateBase() == 18);
+
+        finalMetric.SetFromDerived(10);
+        Console.WriteLine(metric.Value == 43);
+        Console.WriteLine(finalMetric.ReadImmediateBase() == 23);
+
+        AutoDerived autoDerived = new();
+        AutoBase autoBase = autoDerived;
+        Console.WriteLine(autoBase.Score == 7);
+        autoBase.Score = 11;
+        Console.WriteLine(autoDerived.Score == 11);
+        autoBase.Score += 2;
+        Console.WriteLine(autoDerived.Score == 13);
+
+        ExpressionDerived expressionDerived = new();
+        ExpressionBase expressionBase = expressionDerived;
+        Console.WriteLine(expressionBase.Amount == 9);
+        Console.WriteLine(expressionDerived.Amount == 9);
+
+        ReAbstractFinal reAbstractFinal = new();
+        ReAbstractRoot reAbstractRoot = reAbstractFinal;
+        Console.WriteLine(reAbstractRoot.Code == 9);
+
+        RefDerived refDerived = new();
+        RefBase refBase = refDerived;
+        refBase.Target ??= new Node(7);
+        Console.WriteLine(refDerived.Target.Value == 7);
+        refBase.Target ??= new Node(9);
+        Console.WriteLine(refDerived.Target.Value == 7);
+    }
+}

@@ -1,0 +1,1 @@
+public interface I { int Read(); } public ref struct R : I { public int Read() { return 1; } } public static class Program { public static void Main() { } }

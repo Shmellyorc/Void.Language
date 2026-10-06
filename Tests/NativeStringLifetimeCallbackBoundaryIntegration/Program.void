@@ -1,0 +1,72 @@
+using Void;
+
+public delegate int NativeNul299([NativeString] string text);
+public delegate int NativeView299([NativeString(NativeStringKind.BorrowedPointerLength)] string text);
+public delegate int NativePair299(
+    [NativeString(NativeStringKind.BorrowedPointerLength)] string left,
+    int marker,
+    [NativeString(NativeStringKind.BorrowedPointerLength)] string right);
+
+public static class Native299
+{
+    [Native("void299_call_nul")]
+    public static unsafe extern int CallNul(NativeNul299 callback);
+
+    [Native("void299_call_view")]
+    public static unsafe extern int CallView(NativeView299 callback);
+
+    [Native("void299_call_pair")]
+    public static unsafe extern int CallPair(NativePair299 callback);
+
+    [Native("void299_call_throw")]
+    public static unsafe extern int CallThrow(NativeView299 callback);
+}
+
+public static class Program
+{
+    private static int CheckNul(string text)
+    {
+        Console.WriteLine(text != null);
+        Console.WriteLine(Runtime.Equals(text, "héllo"));
+        return Runtime.Equals(text, "héllo") ? 11 : -1;
+    }
+
+    private static int CheckView(string text)
+    {
+        Console.WriteLine(text != null);
+        Console.WriteLine(Runtime.Equals(text, "A\0B"));
+        return Runtime.Equals(text, "A\0B") ? 22 : -1;
+    }
+
+    private static int CheckPair(string left, int marker, string right)
+    {
+        Console.WriteLine(Runtime.Equals(left, "L\0X"));
+        Console.WriteLine(marker == 299);
+        Console.WriteLine(Runtime.Equals(right, "R\0Y"));
+        return Runtime.Equals(left, "L\0X") && marker == 299 && Runtime.Equals(right, "R\0Y") ? 33 : -1;
+    }
+
+    private static int ThrowFromCallback(string text)
+    {
+        Console.WriteLine(Runtime.Equals(text, "E\0X"));
+        throw new Exception("void299 callback");
+    }
+
+    public static unsafe void Main()
+    {
+        Console.WriteLine(Native299.CallNul(CheckNul) == 11);
+        Console.WriteLine(Native299.CallView(CheckView) == 22);
+        Console.WriteLine(Native299.CallPair(CheckPair) == 33);
+
+        bool caught = false;
+        try
+        {
+            Native299.CallThrow(ThrowFromCallback);
+        }
+        catch (Exception ex)
+        {
+            caught = Runtime.Equals(ex.Message, "void299 callback");
+        }
+        Console.WriteLine(caught);
+    }
+}

@@ -1,0 +1,11 @@
+public unsafe struct Holder256
+{
+    public static delegate*<int, int> Callback;
+}
+public static class Program
+{
+    public static void Main()
+    {
+        int result = Holder256.Callback(1);
+    }
+}

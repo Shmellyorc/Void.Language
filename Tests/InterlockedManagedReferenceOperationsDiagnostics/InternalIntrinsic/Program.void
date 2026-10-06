@@ -1,0 +1,12 @@
+using Void;
+
+public sealed class Node { }
+
+public static class Program
+{
+    public static void Main()
+    {
+        Node value = new Node();
+        Runtime.InterlockedExchangeRef(ref value, new Node());
+    }
+}

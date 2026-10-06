@@ -1,0 +1,31 @@
+using Void;
+
+namespace Void.IO;
+
+// Text-oriented writer abstraction. Formatting remains in visible StandardLibrary code.
+public abstract class TextWriter : IDisposable
+{
+    public virtual void Dispose() { }
+    public virtual void Close() { this.Dispose(); }
+
+    public abstract void Write(string value);
+    public virtual void WriteLine() { this.Write(Environment.NewLine); }
+    public virtual void WriteLine(string value) { this.Write(value); this.WriteLine(); }
+}
+
+// Console.Out / Console.Error adapter. The bool selects only the low-level native handle.
+internal sealed class StandardTextWriter : TextWriter
+{
+    private bool _error;
+
+    internal StandardTextWriter(bool error)
+    {
+        _error = error;
+    }
+
+    public override void Write(string value)
+    {
+        if (_error) StandardOutput.WriteError(value);
+        else StandardOutput.Write(value);
+    }
+}

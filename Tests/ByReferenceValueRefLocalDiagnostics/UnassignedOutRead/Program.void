@@ -1,0 +1,15 @@
+public static class Program
+{
+    public static void Bad(out int value)
+    {
+        ref int alias = ref value;
+        Console.WriteLine(alias);
+        value = 1;
+    }
+
+    public static void Main()
+    {
+        int value;
+        Bad(out value);
+    }
+}

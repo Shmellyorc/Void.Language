@@ -1,0 +1,6 @@
+using Void;
+public static class Program
+{
+    public static ReadOnlySpan<int> Wrap(scoped in int value) { return new ReadOnlySpan<int>(in value, 1); }
+    public static void Main() { int x = 1; Wrap(in x); }
+}

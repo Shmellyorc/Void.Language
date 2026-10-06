@@ -1,0 +1,223 @@
+using Void;
+
+public interface IScore
+{
+    int Score { get; }
+}
+
+public sealed class Node : IScore
+{
+    private int _score;
+
+    public Node() => _score = 7;
+    public Node(int score) => _score = score;
+
+    public int Score => _score;
+}
+
+public sealed class Listener
+{
+    public int Seen;
+    public void Handle(int value) => Seen = Seen * 10 + value;
+}
+
+public sealed class GcListener
+{
+    public static int Seen;
+    private int _prefix;
+
+    public GcListener(int prefix) => _prefix = prefix;
+    public void Handle(int value) => Seen = _prefix * 10 + value;
+}
+
+public sealed class IntegrationHub<T> where T : class, IScore, new()
+{
+    private Action<int> _changed;
+    public int Adds;
+    public int Removes;
+
+    public event Action<int> Changed
+    {
+        add => this.Add(value);
+        remove => this.Remove(value);
+    }
+
+    private void Add(Action<int> handler)
+    {
+        Adds++;
+        _changed += handler;
+    }
+
+    private void Remove(Action<int> handler)
+    {
+        Removes++;
+        _changed -= handler;
+    }
+
+    public T Create() => new T();
+    public int Read(T value) => value.Score;
+
+    public U KeepReference<U>(U value) where U : class => value;
+
+    public void Raise(int value)
+    {
+        if (_changed != null)
+            _changed(value);
+    }
+}
+
+public unsafe delegate int* PointerStep(int* value);
+
+public unsafe sealed class PointerState
+{
+    public int* Current { get; set; } = null;
+    public int* Next => Current + 1;
+}
+
+public static class Program
+{
+    private static T KeepReference<T>(T value) where T : class => value;
+
+    private static unsafe int* Advance(int* value) => value + 1;
+
+    private static int SumMaybeGrid(int[,] grid)
+    {
+        int row = 0;
+        int total = 0;
+        do
+        {
+            int col = 0;
+            do
+            {
+                total += grid?[row, col] ?? 0;
+                col++;
+            } while (col < 2);
+            row++;
+        } while (row < 2);
+        return total;
+    }
+
+    public static unsafe void Main()
+    {
+        // #104 + #105 + #109: constrained generic type with expression-bodied custom accessors.
+        IntegrationHub<Node> hub = new IntegrationHub<Node>();
+        Node created = hub.Create();
+        Console.WriteLine(created.Score == 7);
+        Console.WriteLine(hub.Read(created) == 7);
+
+        Listener listener = new Listener();
+        hub.Changed += listener.Handle;
+        Console.WriteLine(hub.Adds == 1);
+
+        // #103 + #105: do/while drives a custom event subscription.
+        int eventValue = 1;
+        do
+        {
+            hub.Raise(eventValue);
+            eventValue++;
+        } while (eventValue <= 3);
+        Console.WriteLine(listener.Seen == 123);
+
+        hub.Changed -= listener.Handle;
+        Console.WriteLine(hub.Removes == 1);
+        hub.Raise(9);
+        Console.WriteLine(listener.Seen == 123);
+
+        // #105 + GC: a custom event must keep its bound receiver alive.
+        GcListener gcListener = new GcListener(6);
+        hub.Changed += gcListener.Handle;
+        gcListener = null;
+        GC.Collect();
+        hub.Raise(5);
+        Console.WriteLine(GcListener.Seen == 65);
+
+        // #107: sized rectangular initializer.
+        int[,] sized = new int[2, 2] { { 5, 6 }, { 7, 8 } };
+        Console.WriteLine(sized.Rank == 2);
+        Console.WriteLine(sized.Length == 4);
+        Console.WriteLine(sized[1, 1] == 8);
+
+        // #108: implicit rectangular initializer.
+        var inferred = new[,] { { 1, 2 }, { 3, 4 } };
+        Console.WriteLine(inferred.Rank == 2);
+        Console.WriteLine(inferred.GetLength(0) == 2);
+        Console.WriteLine(inferred.GetLength(1) == 2);
+        Console.WriteLine(inferred[1, 0] == 3);
+
+        // #103 + #106 + #107/#108: do/while consumes lifted rectangular element access.
+        Console.WriteLine(SumMaybeGrid(sized) == 26);
+        Console.WriteLine(SumMaybeGrid(inferred) == 10);
+        int[,] missingGrid = null;
+        Console.WriteLine(SumMaybeGrid(missingGrid) == 0);
+
+        int? present = inferred?[1, 1];
+        int? missing = missingGrid?[1, 1];
+        Console.WriteLine(present.HasValue);
+        Console.WriteLine(present.Value == 4);
+        Console.WriteLine(!missing.HasValue);
+
+        // #104 + #108 + #109: rectangular arrays satisfy class constraints and preserve identity.
+        int[,] kept = KeepReference<int[,]>(inferred);
+        Console.WriteLine(kept == inferred);
+        Console.WriteLine(kept[0, 1] == 2);
+        int[,] keptByHub = hub.KeepReference<int[,]>(sized);
+        Console.WriteLine(keptByHub == sized);
+        GC.Collect();
+        Console.WriteLine(kept[1, 1] == 4);
+        Console.WriteLine(keptByHub[1, 0] == 7);
+
+        // #106 + #108 + GC with reference elements.
+        var nodes = new[,] {
+            { new Node(11), new Node(12) },
+            { new Node(13), new Node(14) }
+        };
+        Node selected = nodes?[1, 1];
+        Console.WriteLine(selected.Score == 14);
+        Node[,] noNodes = null;
+        Node absent = noNodes?[0, 0];
+        Console.WriteLine(absent == null);
+        Node[,] keptNodes = KeepReference<Node[,]>(nodes);
+        nodes = null;
+        GC.Collect();
+        Console.WriteLine(keptNodes[0, 0].Score == 11);
+        Console.WriteLine(keptNodes[1, 1].Score == 14);
+
+        // #101 + #102 + #104: unsafe delegate target fed by pointer-valued properties.
+        int[] storage = new int[] { 10, 20, 30, 40 };
+        int* start = &storage[0];
+        PointerState state = new PointerState();
+        state.Current = start;
+        PointerStep step = Advance;
+        Console.WriteLine(state.Current == start);
+        Console.WriteLine(state.Next == start + 1);
+        Console.WriteLine(step(state.Current) == state.Next);
+        Console.WriteLine(*step(state.Current) == 20);
+        state.Current += 1;
+        Console.WriteLine(state.Current == start + 1);
+        Console.WriteLine(step(state.Current) == start + 2);
+        Console.WriteLine(*step(state.Current) == 30);
+        GC.Collect();
+        Console.WriteLine(*state.Current == 20);
+        Console.WriteLine(*state.Next == 30);
+
+        // #103 + #101/#102: pointer delegates and properties survive loop control.
+        int pointerSteps = 0;
+        do
+        {
+            state.Current = step(state.Current);
+            pointerSteps++;
+        } while (pointerSteps < 2);
+        Console.WriteLine(state.Current == start + 3);
+        Console.WriteLine(*state.Current == 40);
+
+        // #104 + #109: constrained construction and expression-bodied members remain composable.
+        Node second = hub.Create();
+        Console.WriteLine(second.Score == 7);
+        Console.WriteLine(KeepReference<Node>(second) == second);
+
+        // Final cross-feature state checks.
+        Console.WriteLine(hub.Adds == 2);
+        Console.WriteLine(hub.Removes == 1);
+        Console.WriteLine(sized[0, 0] + inferred[1, 1] == 9);
+    }
+}

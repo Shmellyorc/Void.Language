@@ -1,0 +1,10 @@
+public static class Bad
+{
+    private static Action<int> _changed;
+    public static event Action<int> Changed
+    {
+        add => _changed += value
+        remove => _changed -= value;
+    }
+}
+public static class Program { public static void Main() { } }

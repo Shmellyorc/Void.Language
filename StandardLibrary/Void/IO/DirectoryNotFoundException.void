@@ -1,0 +1,8 @@
+namespace Void.IO;
+
+public class DirectoryNotFoundException : IOException
+{
+    public DirectoryNotFoundException() : base("Directory was not found.") { }
+    public DirectoryNotFoundException(string message) : base(message) { }
+    public DirectoryNotFoundException(string message, Exception innerException) : base(message, innerException) { }
+}

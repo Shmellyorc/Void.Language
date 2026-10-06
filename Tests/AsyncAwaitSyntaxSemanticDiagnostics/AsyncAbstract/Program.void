@@ -1,0 +1,11 @@
+using Void.Threading.Tasks;
+
+public abstract class Worker
+{
+    public abstract async Task Bad();
+}
+
+public static class Program
+{
+    public static void Main() {}
+}

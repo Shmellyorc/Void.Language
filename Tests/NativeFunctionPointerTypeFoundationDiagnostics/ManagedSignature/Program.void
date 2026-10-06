@@ -1,0 +1,7 @@
+using Void;
+public class Ref255 { }
+public unsafe struct Holder255
+{
+    public delegate*<Ref255, void> Callback;
+}
+public static class Program { public static void Main() { } }

@@ -1,0 +1,1 @@
+public class B { public int X; public virtual ref int Get(){return ref X;} } public class D:B { public override int Get(){return 1;} } public static class Program { public static void Main(){} }

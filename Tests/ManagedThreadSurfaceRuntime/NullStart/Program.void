@@ -1,0 +1,9 @@
+using Void.Threading;
+public static class Program
+{
+    public static void Main()
+    {
+        Thread thread = new Thread(null);
+        thread.Start();
+    }
+}

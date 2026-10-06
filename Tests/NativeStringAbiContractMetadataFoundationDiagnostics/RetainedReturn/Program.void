@@ -1,0 +1,2 @@
+using Void;
+public static class Native293 { [NativeString(NativeStringKind.RetainedNul)] [Native("void293_retained_return")] public static unsafe extern string Get(); } public static class Program { public static void Main() { } }

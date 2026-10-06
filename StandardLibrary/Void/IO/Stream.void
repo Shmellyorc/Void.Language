@@ -1,0 +1,92 @@
+using Void;
+
+namespace Void.IO;
+
+// Synchronous Stream foundation. Async Stream APIs are intentionally deferred while
+// async/threading architecture is protected by the #311-#320 Console roadmap.
+public abstract class Stream : IDisposable
+{
+    public abstract bool CanRead { get; }
+    public abstract bool CanSeek { get; }
+    public abstract bool CanWrite { get; }
+    public abstract long Length { get; }
+    public abstract long Position { get; set; }
+
+    public abstract void Flush();
+    public abstract int Read(byte[] buffer, int offset, int count);
+    public abstract long Seek(long offset, SeekOrigin origin);
+    public abstract void SetLength(long value);
+    public abstract void Write(byte[] buffer, int offset, int count);
+
+    public virtual int ReadByte()
+    {
+        byte[] one = new byte[1];
+        return this.Read(one, 0, 1) == 0 ? -1 : (int)one[0];
+    }
+
+    public virtual void WriteByte(byte value)
+    {
+        byte[] one = new byte[1];
+        one[0] = value;
+        this.Write(one, 0, 1);
+    }
+
+    public virtual void Close() { this.Dispose(); }
+    public virtual void Dispose() { }
+}
+
+// Raw standard-handle Stream returned by Console.OpenStandard*.
+internal sealed class StandardStream : Stream
+{
+    private int _stream;
+
+    internal StandardStream(int stream)
+    {
+        _stream = stream;
+    }
+
+    public override bool CanRead { get { return _stream == 0; } }
+    public override bool CanSeek { get { return false; } }
+    public override bool CanWrite { get { return _stream == 1 || _stream == 2; } }
+    public override long Length { get { throw new NotSupportedException("This stream does not support seeking."); } }
+    public override long Position
+    {
+        get { throw new NotSupportedException("This stream does not support seeking."); }
+        set
+        {
+            if (value < 0L) throw new NotSupportedException("This stream does not support seeking.");
+            throw new NotSupportedException("This stream does not support seeking.");
+        }
+    }
+
+    public override void Flush()
+    {
+        if (this.CanWrite && !StandardStreams.Flush(_stream))
+            throw new IOException("Unable to flush standard stream.");
+    }
+
+    public override int Read(byte[] buffer, int offset, int count)
+    {
+        if (!this.CanRead) throw new NotSupportedException("Stream does not support reading.");
+        return StandardInput.ReadBytes(buffer, offset, count);
+    }
+
+    public override long Seek(long offset, SeekOrigin origin)
+    {
+        if (offset < 0L || origin == SeekOrigin.Begin)
+            throw new NotSupportedException("This stream does not support seeking.");
+        throw new NotSupportedException("This stream does not support seeking.");
+    }
+
+    public override void SetLength(long value)
+    {
+        if (value < 0L) throw new NotSupportedException("This stream does not support seeking.");
+        throw new NotSupportedException("This stream does not support seeking.");
+    }
+
+    public override void Write(byte[] buffer, int offset, int count)
+    {
+        if (!this.CanWrite) throw new NotSupportedException("Stream does not support writing.");
+        StandardStreams.Write(_stream, buffer, offset, count);
+    }
+}

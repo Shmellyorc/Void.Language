@@ -1,0 +1,5 @@
+public static class Extensions
+{
+    public static int Add(int left, this int right) { return left + right; }
+}
+public static class Program { public static void Main() { } }

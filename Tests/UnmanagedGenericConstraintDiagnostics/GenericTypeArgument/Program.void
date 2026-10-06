@@ -1,0 +1,3 @@
+public sealed class Node241 { }
+public sealed class Holder241<T> where T : unmanaged { }
+public static class Program { public static void Main() { Holder241<Node241> value = new Holder241<Node241>(); } }

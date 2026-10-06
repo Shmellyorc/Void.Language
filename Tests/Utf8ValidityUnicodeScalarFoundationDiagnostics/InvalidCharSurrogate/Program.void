@@ -1,0 +1,9 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        char invalid = (char)55296;
+        Console.WriteLine((int)invalid == 55296);
+    }
+}

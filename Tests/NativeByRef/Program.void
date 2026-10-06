@@ -1,0 +1,57 @@
+public struct TimeValue
+{
+    public long Seconds;
+    public long Microseconds;
+}
+
+public struct TimeSpec
+{
+    public long Seconds;
+    public long Nanoseconds;
+}
+
+public static class Program
+{
+    public static unsafe extern long time(ref long value);
+    public static unsafe extern int gettimeofday(out TimeValue value, void* zone);
+    public static unsafe extern int nanosleep(in TimeSpec request, TimeSpec* remaining);
+
+    public static unsafe bool SamePointer(in int* value, int* expected)
+    {
+        return value == expected;
+    }
+
+    public static unsafe bool ReadTime(out TimeValue value)
+    {
+        int result = gettimeofday(out value, null);
+        return result == 0;
+    }
+
+    public static unsafe void Main()
+    {
+        long stamp = 0L;
+        long returned = time(ref stamp);
+        Console.WriteLine(stamp > 0L);
+        Console.WriteLine(returned == stamp);
+
+        TimeValue value = new TimeValue();
+        bool result = ReadTime(out value);
+        long zero = value.Seconds - value.Seconds;
+        Console.WriteLine(result);
+        Console.WriteLine(value.Seconds != zero);
+        Console.WriteLine(value.Microseconds >= zero);
+
+        TimeSpec request = new TimeSpec();
+        request.Seconds = 0L;
+        request.Nanoseconds = 0L;
+        int sleepResult = nanosleep(in request, null);
+        Console.WriteLine(sleepResult == 0);
+        Console.WriteLine(request.Seconds == 0L);
+        Console.WriteLine(request.Nanoseconds == 0L);
+
+        int marker = 5;
+        int* pointer = &marker;
+        Console.WriteLine(SamePointer(in pointer, &marker));
+
+    }
+}

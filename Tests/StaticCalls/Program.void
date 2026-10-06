@@ -1,0 +1,54 @@
+public static class NativeC
+{
+    public static unsafe extern int abs(int value);
+    public static unsafe extern int toupper(int value);
+    public static unsafe extern int strcmp(string left, string right);
+
+    public static int Add(int left, int right)
+    {
+        return left + right;
+    }
+
+    public static int Pick(int value)
+    {
+        return value + 1;
+    }
+
+    public static long Pick(long value)
+    {
+        return value + 2L;
+    }
+}
+
+public class Counter
+{
+    public int Value;
+
+    public int Read()
+    {
+        return Value;
+    }
+}
+
+public static class Program
+{
+    public static int Identity(int value)
+    {
+        return value;
+    }
+
+    public static unsafe void Main()
+    {
+        Console.WriteLine(NativeC.abs(-42));
+        Console.WriteLine(NativeC.toupper(97));
+        Console.WriteLine(NativeC.strcmp("void", "void") == 0);
+        Console.WriteLine(NativeC.Add(20, 22));
+        Console.WriteLine(NativeC.Pick(5));
+        Console.WriteLine(NativeC.Pick(5L));
+        Console.WriteLine(Program.Identity(9));
+
+        Counter NativeC = new Counter();
+        NativeC.Value = 77;
+        Console.WriteLine(NativeC.Read());
+    }
+}

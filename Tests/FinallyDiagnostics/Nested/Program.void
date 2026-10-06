@@ -1,0 +1,12 @@
+public static class Program
+{
+    public static void Main()
+    {
+        try
+        {
+            try { Console.WriteLine(true); }
+            finally { Console.WriteLine(true); }
+        }
+        finally { Console.WriteLine(true); }
+    }
+}

@@ -1,0 +1,9 @@
+using Void.Collections;
+public static class Program
+{
+    public static void Main()
+    {
+        IReadOnlyList<int> values = new List<int>();
+        string invalid = values[0];
+    }
+}

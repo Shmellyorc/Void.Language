@@ -1,0 +1,164 @@
+using Void;
+
+public sealed class Node
+{
+    public int Value { get; set; }
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public struct Packet
+{
+    public Node Node;
+}
+
+public class BaseState
+{
+    public static int Shared;
+    protected static int ProtectedShared;
+}
+
+public sealed class StaticState : BaseState
+{
+    public static int Count;
+    private static int _hidden;
+    public static Node Root;
+    public static Node[] Nodes;
+    public static Packet? MaybePacket;
+
+    public static int Auto { get; set; }
+    public static Node AutoRoot { get; set; }
+    public static int ReadOnlyAuto { get; }
+    public static int Restricted { get; private set; }
+
+    public static int Double
+    {
+        get { return Count * 2; }
+    }
+
+    public static int Explicit
+    {
+        get { return Count + 1; }
+        set { Count = value - 1; }
+    }
+
+    public static int Triple => Count * 3;
+
+    public static int HiddenRoundTrip(int value)
+    {
+        _hidden = value;
+        return _hidden;
+    }
+
+    public static void SetRestricted(int value)
+    {
+        Restricted = value;
+    }
+
+    public static void SetInherited(int first, int second)
+    {
+        Shared = first;
+        ProtectedShared = second;
+    }
+
+    public static int ProtectedValue()
+    {
+        return ProtectedShared;
+    }
+
+    public int ReadFromInstance()
+    {
+        return Count + Auto;
+    }
+}
+
+public struct StructState
+{
+    public static int Count;
+    public static int Value { get; set; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine(StaticState.Count == 0);
+        Console.WriteLine(StaticState.Auto == 0);
+        Console.WriteLine(StaticState.Root == null);
+        Console.WriteLine(StaticState.AutoRoot == null);
+        Console.WriteLine(StaticState.ReadOnlyAuto == 0);
+        Console.WriteLine(StaticState.Restricted == 0);
+        StaticState.SetRestricted(12);
+        Console.WriteLine(StaticState.Restricted == 12);
+
+        StaticState.Count = 5;
+        Console.WriteLine(StaticState.Count == 5);
+        StaticState.Count += 2;
+        Console.WriteLine(StaticState.Count == 7);
+        StaticState.Count -= 2;
+        Console.WriteLine(StaticState.Count == 5);
+        Console.WriteLine(StaticState.Double == 10);
+        Console.WriteLine(StaticState.Triple == 15);
+
+        StaticState.Auto = 8;
+        Console.WriteLine(StaticState.Auto == 8);
+        StaticState.Auto += 2;
+        Console.WriteLine(StaticState.Auto == 10);
+        StaticState.Auto -= 2;
+        Console.WriteLine(StaticState.Auto == 8);
+
+        StaticState.Root ??= new Node(66);
+        StaticState.AutoRoot ??= new Node(67);
+        Console.WriteLine(StaticState.Root.Value == 66);
+        Console.WriteLine(StaticState.AutoRoot.Value == 67);
+        StaticState.Root = null;
+        StaticState.AutoRoot = null;
+
+        StaticState.Explicit = 21;
+        Console.WriteLine(StaticState.Count == 20);
+        Console.WriteLine(StaticState.Explicit == 21);
+        Console.WriteLine(StaticState.Double == 40);
+
+        Console.WriteLine(StaticState.HiddenRoundTrip(33) == 33);
+
+        StaticState.SetInherited(7, 9);
+        Console.WriteLine(StaticState.Shared == 7);
+        Console.WriteLine(BaseState.Shared == 7);
+        Console.WriteLine(StaticState.ProtectedValue() == 9);
+
+        StaticState state = new StaticState();
+        Console.WriteLine(state.ReadFromInstance() == 28);
+
+        StructState.Count = 4;
+        StructState.Value = 6;
+        Console.WriteLine(StructState.Count == 4);
+        Console.WriteLine(StructState.Value == 6);
+
+        StaticState.Root = new Node(77);
+        StaticState.AutoRoot = new Node(88);
+        StaticState.Nodes = new Node[] { new Node(11), new Node(22) };
+        StaticState.MaybePacket = new Packet { Node = new Node(99) };
+
+        GC.Collect();
+        Console.WriteLine(StaticState.Root.Value == 77);
+        Console.WriteLine(StaticState.AutoRoot.Value == 88);
+        Console.WriteLine(StaticState.Nodes.Length == 2);
+        Console.WriteLine(StaticState.Nodes[0].Value == 11);
+        Console.WriteLine(StaticState.Nodes[1].Value == 22);
+        Console.WriteLine(StaticState.MaybePacket.HasValue);
+        Console.WriteLine(StaticState.MaybePacket.Value.Node.Value == 99);
+
+        StaticState.Root = null;
+        StaticState.AutoRoot = null;
+        StaticState.Nodes = null;
+        StaticState.MaybePacket = null;
+        GC.Collect();
+        Console.WriteLine(StaticState.Root == null);
+        Console.WriteLine(StaticState.AutoRoot == null);
+        Console.WriteLine(StaticState.Nodes == null);
+        Console.WriteLine(StaticState.MaybePacket == null);
+    }
+}

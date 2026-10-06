@@ -1,0 +1,270 @@
+using Void;
+
+public sealed class PinBox245
+{
+    public int Value;
+    public int Calls;
+
+    public PinBox245(int value)
+    {
+        Value = value;
+        Calls = 0;
+    }
+
+    public ref int GetPinnableReference()
+    {
+        Calls++;
+        return ref Value;
+    }
+}
+
+public sealed class CollectingPinBox245
+{
+    public int Value;
+    public CollectingPinBox245(int value) { Value = value; }
+
+    public ref int GetPinnableReference()
+    {
+        GC.Collect();
+        return ref Value;
+    }
+}
+
+public ref struct RefPin245
+{
+    private ref int _value;
+    public RefPin245(ref int value) { _value = ref value; }
+    public ref int GetPinnableReference() { return ref _value; }
+}
+
+public struct ValuePin245
+{
+    public int Value;
+    public ValuePin245(int value) { Value = value; }
+    public ref int GetPinnableReference() { return ref Value; }
+}
+
+public sealed class ValueHolder245
+{
+    public ValuePin245 Pin;
+    public ValueHolder245(int value) { Pin = new ValuePin245(value); }
+}
+
+public sealed class RelayPin245
+{
+    public PinBox245 Target;
+    public RelayPin245(PinBox245 target) { Target = target; }
+    public ref int GetPinnableReference() { return ref Target.Value; }
+}
+
+public interface IPin245
+{
+    ref int GetPinnableReference();
+}
+
+public class BasePin245 : IPin245
+{
+    public int A;
+    public BasePin245(int value) { A = value; }
+    public virtual ref int GetPinnableReference() { return ref A; }
+}
+
+public sealed class DerivedPin245 : BasePin245
+{
+    public int B;
+    public DerivedPin245(int value) : base(value) { B = value + 1; }
+    public override ref int GetPinnableReference() { return ref B; }
+}
+
+public sealed class GenericPin245<T> where T : unmanaged
+{
+    public T Value;
+    public GenericPin245(T value) { Value = value; }
+    public ref T GetPinnableReference() { return ref Value; }
+}
+
+public sealed class StaticPin245
+{
+    public static int Storage = 90;
+    public ref int GetPinnableReference() { return ref Storage; }
+}
+
+public static class Program
+{
+    private static int MakeCalls;
+    private static int HolderCalls;
+
+    private static PinBox245 MakeBox()
+    {
+        MakeCalls++;
+        return new PinBox245(10);
+    }
+
+    private static CollectingPinBox245 MakeCollecting()
+    {
+        MakeCalls++;
+        return new CollectingPinBox245(30);
+    }
+
+    private static ValueHolder245 MakeHolder()
+    {
+        HolderCalls++;
+        return new ValueHolder245(40);
+    }
+
+    private static unsafe int ReturnThroughProtocol()
+    {
+        PinBox245 box = new PinBox245(50);
+        fixed (int* p = box)
+        {
+            p[0] = 51;
+            return p[0];
+        }
+    }
+
+    private static unsafe bool ExceptionThroughProtocol()
+    {
+        PinBox245 box = new PinBox245(60);
+        try
+        {
+            fixed (int* p = box)
+            {
+                p[0] = 61;
+                throw new Exception();
+            }
+        }
+        catch (Exception)
+        {
+            GC.Collect();
+            return box.Value == 61;
+        }
+        return false;
+    }
+
+    private static unsafe T ReadGeneric<T>(GenericPin245<T> pin) where T : unmanaged
+    {
+        fixed (T* p = pin)
+        {
+            return p[0];
+        }
+    }
+
+    public static unsafe void Main()
+    {
+        PinBox245 box = new PinBox245(1);
+        fixed (int* p = box)
+        {
+            p[0] = 2;
+        }
+        Console.WriteLine(box.Value == 2 && box.Calls == 1);
+
+        int local = 3;
+        RefPin245 refPin = new RefPin245(ref local);
+        fixed (int* p = refPin)
+        {
+            p[0] = 4;
+        }
+        Console.WriteLine(local == 4);
+
+        ValuePin245 value = new ValuePin245(5);
+        fixed (int* p = value)
+        {
+            p[0] = 6;
+        }
+        Console.WriteLine(value.Value == 6);
+
+        ValueHolder245 holder = new ValueHolder245(7);
+        fixed (int* p = holder.Pin)
+        {
+            GC.Collect();
+            p[0] = 8;
+        }
+        Console.WriteLine(holder.Pin.Value == 8);
+
+        MakeCalls = 0;
+        fixed (int* p = MakeBox())
+        {
+            GC.Collect();
+            Console.WriteLine(MakeCalls == 1 && p[0] == 10);
+            p[0] = 11;
+            Console.WriteLine(MakeCalls == 1 && p[0] == 11);
+        }
+
+        MakeCalls = 0;
+        fixed (int* p = MakeCollecting())
+        {
+            Console.WriteLine(MakeCalls == 1 && p[0] == 30);
+        }
+
+        PinBox245 target = new PinBox245(12);
+        RelayPin245 relay = new RelayPin245(target);
+        fixed (int* p = relay)
+        {
+            relay.Target = null;
+            target = null;
+            GC.Collect();
+            Console.WriteLine(p[0] == 12);
+            p[0] = 13;
+            Console.WriteLine(p[0] == 13);
+        }
+
+        BasePin245 poly = new DerivedPin245(20);
+        fixed (int* p = poly)
+        {
+            p[0] = 22;
+        }
+        Console.WriteLine(((DerivedPin245)poly).B == 22);
+
+        IPin245 iface = poly;
+        fixed (int* p = iface)
+        {
+            p[0] = 23;
+        }
+        Console.WriteLine(((DerivedPin245)poly).B == 23);
+
+        GenericPin245<int> generic = new GenericPin245<int>(70);
+        fixed (int* p = generic)
+        {
+            p[0] = 71;
+        }
+        Console.WriteLine(generic.Value == 71);
+        Console.WriteLine(ReadGeneric<int>(new GenericPin245<int>(72)) == 72);
+
+        fixed (int* p = new ValuePin245(80))
+        {
+            Console.WriteLine(p[0] == 80);
+            p[0] = 81;
+            Console.WriteLine(p[0] == 81);
+        }
+
+        StaticPin245 staticPin = new StaticPin245();
+        fixed (int* p = staticPin)
+        {
+            GC.Collect();
+            p[0] = 91;
+        }
+        Console.WriteLine(StaticPin245.Storage == 91);
+
+        HolderCalls = 0;
+        fixed (int* p = MakeHolder().Pin)
+        {
+            GC.Collect();
+            Console.WriteLine(HolderCalls == 1 && p[0] == 40);
+            p[0] = 41;
+            Console.WriteLine(HolderCalls == 1 && p[0] == 41);
+        }
+
+        PinBox245 direct = new PinBox245(100);
+        PinBox245 protocol = new PinBox245(101);
+        fixed (int* a = protocol, b = &direct.Value)
+        {
+            int* alias = a + 0;
+            alias[0] = 102;
+            b[0] = 103;
+        }
+        Console.WriteLine(protocol.Value == 102 && direct.Value == 103);
+
+        Console.WriteLine(ReturnThroughProtocol() == 51);
+        Console.WriteLine(ExceptionThroughProtocol());
+    }
+}

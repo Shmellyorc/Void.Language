@@ -1,0 +1,6 @@
+using Void;
+public struct Holder255
+{
+    public delegate*<int, int> Callback;
+}
+public static class Program { public static void Main() { } }

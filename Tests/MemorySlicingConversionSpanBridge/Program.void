@@ -1,0 +1,124 @@
+using Void;
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    private static int ReceiverCalls;
+    private static int StartCalls;
+    private static int EndCalls;
+
+    private static Memory<int> MakeMemory(int[] values)
+    {
+        ReceiverCalls++;
+        return values;
+    }
+
+    private static int StartBound()
+    {
+        StartCalls++;
+        return 1;
+    }
+
+    private static int EndBound()
+    {
+        EndCalls++;
+        return 5;
+    }
+
+    public static void Main()
+    {
+        int[] values = new int[6];
+        values[0] = 10;
+        values[1] = 20;
+        values[2] = 30;
+        values[3] = 40;
+        values[4] = 50;
+        values[5] = 60;
+
+        Memory<int> memory = values;
+        Console.WriteLine(memory.Length == 6);
+        Console.WriteLine(!memory.IsEmpty);
+
+        ReadOnlyMemory<int> directReadOnly = values;
+        Console.WriteLine(directReadOnly.Length == 6);
+        Console.WriteLine(!directReadOnly.IsEmpty);
+
+        ReadOnlyMemory<int> convertedReadOnly = memory;
+        Console.WriteLine(convertedReadOnly.Length == 6);
+
+        Memory<int> middle = memory.Slice(1, 4);
+        Console.WriteLine(middle.Length == 4);
+        Console.WriteLine(!middle.IsEmpty);
+        Console.WriteLine(middle.Span[0] == 20);
+        Console.WriteLine(middle.Span[^1] == 50);
+
+        Memory<int> tail = middle.Slice(2);
+        Console.WriteLine(tail.Length == 2);
+        Console.WriteLine(tail.Span[0] == 40 && tail.Span[1] == 50);
+
+        middle.Span[1] = 33;
+        Console.WriteLine(values[2] == 33);
+        Console.WriteLine(memory.Span.Length == 6);
+        Console.WriteLine(memory.Span[2] == 33);
+
+        Span<int> writableSpan = middle.Span;
+        ref int alias = ref writableSpan[2];
+        alias += 2;
+        Console.WriteLine(values[3] == 42);
+
+        Memory<int> ranged = memory[1..^1];
+        Console.WriteLine(ranged.Length == 4);
+        Console.WriteLine(ranged.Span[0] == 20 && ranged.Span[^1] == 50);
+        ranged.Span[0] = 21;
+        Console.WriteLine(values[1] == 21);
+
+        ReadOnlyMemory<int> readOnlySlice = convertedReadOnly.Slice(2, 3);
+        Console.WriteLine(readOnlySlice.Length == 3);
+        ReadOnlySpan<int> readOnlySpan = readOnlySlice.Span;
+        Console.WriteLine(readOnlySpan[0] == 33 && readOnlySpan[^1] == 50);
+
+        ReadOnlyMemory<int> readOnlyRange = convertedReadOnly[1..4];
+        Console.WriteLine(readOnlyRange.Length == 3);
+        Console.WriteLine(readOnlyRange.Span[0] == 21 && readOnlyRange.Span[2] == 42);
+
+        Memory<int> evaluated = MakeMemory(values)[StartBound()..EndBound()];
+        Console.WriteLine(evaluated.Length == 4);
+        Console.WriteLine(ReceiverCalls == 1 && StartCalls == 1 && EndCalls == 1);
+
+        Memory<int> emptySlice = memory.Slice(memory.Length, 0);
+        Console.WriteLine(emptySlice.IsEmpty && emptySlice.Length == 0);
+        Console.WriteLine(emptySlice.Span.IsEmpty);
+
+        Memory<int> defaultMemory = default(Memory<int>);
+        ReadOnlyMemory<int> defaultReadOnly = default(ReadOnlyMemory<int>);
+        Console.WriteLine(defaultMemory.IsEmpty && defaultMemory.Length == 0);
+        Console.WriteLine(defaultReadOnly.IsEmpty && defaultReadOnly.Length == 0);
+        Console.WriteLine(defaultMemory.Span.Length == 0);
+        Console.WriteLine(defaultReadOnly.Span.Length == 0);
+        Console.WriteLine(defaultMemory.Slice(0, 0).IsEmpty);
+        Console.WriteLine(defaultReadOnly.Slice(0).IsEmpty);
+
+        Node[] nodes = new Node[2];
+        nodes[0] = new Node(7);
+        nodes[1] = new Node(9);
+        Memory<Node> nodeMemory = nodes;
+        Span<Node> nodeSpan = nodeMemory.Span;
+        ReadOnlyMemory<Node> nodeReadOnly = nodeMemory;
+        ReadOnlySpan<Node> nodeReadOnlySpan = nodeReadOnly.Span;
+        nodes = null;
+        nodeMemory = default(Memory<Node>);
+        nodeReadOnly = default(ReadOnlyMemory<Node>);
+        GC.Collect();
+        Console.WriteLine(nodeSpan[0].Value == 7 && nodeSpan[1].Value == 9);
+        Console.WriteLine(nodeReadOnlySpan[0].Value == 7 && nodeReadOnlySpan[1].Value == 9);
+    }
+}

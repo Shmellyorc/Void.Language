@@ -1,0 +1,2 @@
+using Void.Collections;
+public static class Program { public static void Main() { KeyValuePair<int, int> pair = new KeyValuePair<int, int>(1, 2); pair.Key = 3; } }

@@ -1,0 +1,17 @@
+using Void;
+using Void.Threading.Tasks;
+public ref struct RefValue273 { public int Value; }
+public static class Program
+{
+    public static void Main()
+    {
+        RefValue273 value = new RefValue273();
+        value.Value = 2;
+        Func<Task<int>> work = async () =>
+        {
+            await Task.Yield();
+            return value.Value;
+        };
+        Console.WriteLine(work().Result);
+    }
+}

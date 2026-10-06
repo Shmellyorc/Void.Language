@@ -1,0 +1,146 @@
+using Void;
+
+public static class Native258
+{
+    [Native("voidc258_add")]
+    public static unsafe extern int Add(int left, int right);
+
+    [Native("voidc258_subtract")]
+    public static unsafe extern int Subtract(int left, int right);
+
+    [Native("voidc258_apply")]
+    public static unsafe extern int Apply(delegate*<int, int, int> callback, int left, int right);
+
+    [Native("voidc258_select")]
+    public static unsafe extern delegate*<int, int, int> Select(int mode);
+}
+
+public struct GenericSlot258<T> where T : unmanaged
+{
+    private T _value;
+
+    public GenericSlot258(T value)
+    {
+        _value = value;
+    }
+
+    public T Value
+    {
+        get { return _value; }
+        set { _value = value; }
+    }
+}
+
+public unsafe struct NativeEntry258
+{
+    public delegate*<int, int, int> Function;
+    public int Tag;
+
+    public NativeEntry258(delegate*<int, int, int> function, int tag)
+    {
+        Function = function;
+        Tag = tag;
+    }
+}
+
+public static class Program
+{
+    private static T Identity258<T>(T value) where T : unmanaged
+    {
+        T copy = value;
+        return copy;
+    }
+
+    private static unsafe int SizeOf258<T>() where T : unmanaged
+    {
+        return sizeof(T);
+    }
+
+    private static unsafe T* PointerIdentity258<T>(T* value) where T : unmanaged
+    {
+        return value;
+    }
+
+    private static unsafe T StackRoundTrip258<T>(T value) where T : unmanaged
+    {
+        T* storage = stackalloc T[1];
+        storage[0] = value;
+        return storage[0];
+    }
+
+    private static T SpanRoundTrip258<T>(T value) where T : unmanaged
+    {
+        Span<T> storage = stackalloc T[1];
+        storage[0] = value;
+        return storage[0];
+    }
+
+    public static unsafe void Main()
+    {
+        delegate*<int, int, int> add = &Native258.Add;
+        delegate*<int, int, int> subtract = &Native258.Subtract;
+        delegate*<int, int, int> selected = Native258.Select(0);
+
+        Console.WriteLine(add != null);
+        Console.WriteLine(subtract != null);
+        Console.WriteLine(selected == add);
+        Console.WriteLine(Identity258<delegate*<int, int, int>>(add) == add);
+        Console.WriteLine(SizeOf258<delegate*<int, int, int>>() == sizeof(delegate*<int, int, int>));
+        Console.WriteLine(StackRoundTrip258<delegate*<int, int, int>>(add) == add);
+        Console.WriteLine(SpanRoundTrip258<delegate*<int, int, int>>(subtract) == subtract);
+
+        GenericSlot258<delegate*<int, int, int>> slot =
+            new GenericSlot258<delegate*<int, int, int>>(subtract);
+        Console.WriteLine(slot.Value == subtract);
+        slot.Value = add;
+        Console.WriteLine(slot.Value(19, 23) == 42);
+
+        var stackTable = stackalloc delegate*<int, int, int>[2];
+        stackTable[0] = add;
+        stackTable[1] = subtract;
+        Console.WriteLine(stackTable[0](20, 22) == 42);
+        Console.WriteLine(stackTable[1](50, 8) == 42);
+
+        delegate*<int, int, int>[] managedTable = new delegate*<int, int, int>[2];
+        managedTable[0] = stackTable[0];
+        managedTable[1] = stackTable[1];
+        Console.WriteLine(managedTable[0](30, 12) == 42);
+        Console.WriteLine(managedTable[1](50, 8) == 42);
+
+        var nativeTable = NativeMemory.Allocate<delegate*<int, int, int>>(2ul);
+        nativeTable[0] = managedTable[0];
+        nativeTable[1] = managedTable[1];
+        Console.WriteLine(nativeTable != null);
+        Console.WriteLine(PointerIdentity258<delegate*<int, int, int>>(nativeTable) == nativeTable);
+        Console.WriteLine(nativeTable[0](21, 21) == 42);
+        Console.WriteLine(nativeTable[1](100, 58) == 42);
+
+        bool grew = NativeMemory.TryReallocate<delegate*<int, int, int>>(ref nativeTable, 3ul);
+        Console.WriteLine(grew && nativeTable != null);
+        Console.WriteLine(nativeTable[0](40, 2) == 42);
+        Console.WriteLine(nativeTable[1](90, 48) == 42);
+        nativeTable[2] = Native258.Select(0);
+        Console.WriteLine(nativeTable[2](39, 3) == 42);
+
+        Span<delegate*<int, int, int>> span =
+            new Span<delegate*<int, int, int>>(nativeTable, 3);
+        ReadOnlySpan<delegate*<int, int, int>> readOnly =
+            new ReadOnlySpan<delegate*<int, int, int>>(nativeTable, 3);
+        Console.WriteLine(span.Length == 3 && readOnly.Length == 3);
+        Console.WriteLine(span[0](10, 32) == 42);
+        Console.WriteLine(readOnly[1](60, 18) == 42);
+        span[2] = subtract;
+        Console.WriteLine(readOnly[2](70, 28) == 42);
+        Console.WriteLine(Native258.Apply(span[0], 16, 26) == 42);
+        NativeMemory.Free(nativeTable);
+
+        NativeEntry258* entries = NativeMemory.Allocate<NativeEntry258>(2ul);
+        entries[0] = new NativeEntry258(add, 1);
+        entries[1] = new NativeEntry258(subtract, 2);
+        Span<NativeEntry258> entrySpan = new Span<NativeEntry258>(entries, 2);
+        Console.WriteLine(entrySpan[0].Function(40, 2) == 42);
+        Console.WriteLine(entrySpan[1].Function(44, 2) == 42);
+        Console.WriteLine(entrySpan[0].Tag + entrySpan[1].Tag == 3);
+        NativeMemory.Free(entries);
+    }
+}

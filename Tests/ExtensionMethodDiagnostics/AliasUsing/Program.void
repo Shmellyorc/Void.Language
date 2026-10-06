@@ -1,0 +1,12 @@
+using E = Ext.Space;
+namespace Ext.Space
+{
+    public static class Extensions
+    {
+        public static int Triple(this int value) { return value * 3; }
+    }
+}
+public static class Program
+{
+    public static void Main() { Console.WriteLine(4.Triple()); }
+}

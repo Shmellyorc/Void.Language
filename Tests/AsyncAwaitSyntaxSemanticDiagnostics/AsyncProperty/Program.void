@@ -1,0 +1,7 @@
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    public static async Task Value { get; }
+    public static void Main() {}
+}

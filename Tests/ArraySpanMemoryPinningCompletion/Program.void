@@ -1,0 +1,195 @@
+using Void;
+
+public struct Pair246
+{
+    public int A;
+    public int B;
+    public Pair246(int a, int b) { A = a; B = b; }
+}
+
+public static class Program
+{
+    private static int Calls;
+    private static int StartCalls;
+    private static int EndCalls;
+
+    private static int[] MakeArray()
+    {
+        Calls++;
+        return new int[] { 10, 20, 30, 40, 50 };
+    }
+
+    private static Memory<int> MakeMemory(int[] values)
+    {
+        Calls++;
+        return new Memory<int>(values, 1, 4);
+    }
+
+    private static Span<int> MakeSpan(int[] values)
+    {
+        Calls++;
+        return new Span<int>(values, 1, 4);
+    }
+
+    private static int Start()
+    {
+        StartCalls++;
+        return 1;
+    }
+
+    private static int End()
+    {
+        EndCalls++;
+        return 1;
+    }
+
+    private static unsafe T First<T>(T[] values) where T : unmanaged
+    {
+        fixed (T* p = values)
+            return p[0];
+    }
+
+    public static unsafe void Main()
+    {
+        int[] values = new int[] { 1, 2, 3, 4, 5 };
+        fixed (int* p = values)
+        {
+            Console.WriteLine(p[0] == 1 && p[4] == 5);
+            p[2] = 30;
+        }
+        Console.WriteLine(values[2] == 30);
+
+        Calls = 0;
+        fixed (int* p = MakeArray())
+            Console.WriteLine(Calls == 1 && p[0] == 10 && p[4] == 50);
+
+        int[] emptyArray = new int[0];
+        fixed (int* p = emptyArray)
+            Console.WriteLine(p == null);
+
+        int[] nullArray = null;
+        fixed (int* p = nullArray)
+            Console.WriteLine(p == null);
+
+        Pair246[] pairs = new Pair246[] { new Pair246(6, 7), new Pair246(8, 9) };
+        fixed (Pair246* p = pairs)
+        {
+            Console.WriteLine(p[1].A == 8 && p[1].B == 9);
+            p[0].B = 70;
+        }
+        Console.WriteLine(pairs[0].B == 70);
+        Console.WriteLine(First<int>(new int[] { 77, 88 }) == 77);
+        Pair246 firstPair = First<Pair246>(pairs);
+        Console.WriteLine(firstPair.A == 6 && firstPair.B == 70);
+
+        int[] gcArray = new int[] { 91, 92 };
+        fixed (int* p = gcArray)
+        {
+            gcArray = null;
+            GC.Collect();
+            Console.WriteLine(p[0] == 91 && p[1] == 92);
+        }
+
+        int[] spanBacking = new int[] { 100, 110, 120, 130, 140 };
+        Span<int> span = new Span<int>(spanBacking, 1, 3);
+        fixed (int* p = span)
+        {
+            Console.WriteLine(p[0] == 110 && p[2] == 130);
+            p[1] = 121;
+        }
+        Console.WriteLine(spanBacking[2] == 121);
+
+        Span<int> spanRange = span[1..3];
+        fixed (int* p = spanRange)
+            Console.WriteLine(p[0] == 121 && p[1] == 130);
+
+        Span<int> emptySpan = new Span<int>(spanBacking, 2, 0);
+        fixed (int* p = emptySpan)
+            Console.WriteLine(p == null);
+        Span<int> defaultSpan = default(Span<int>);
+        fixed (int* p = defaultSpan)
+            Console.WriteLine(p == null);
+
+        int[] spanGcBacking = new int[] { 151, 152, 153 };
+        Span<int> gcSpan = new Span<int>(spanGcBacking, 1, 2);
+        fixed (int* p = gcSpan)
+        {
+            spanGcBacking = null;
+            gcSpan = default(Span<int>);
+            GC.Collect();
+            Console.WriteLine(p[0] == 152 && p[1] == 153);
+        }
+
+        Calls = 0;
+        fixed (int* p = MakeSpan(new int[] { 161, 162, 163, 164, 165 }))
+            Console.WriteLine(Calls == 1 && p[0] == 162 && p[3] == 165);
+
+        int[] memoryBacking = new int[] { 200, 210, 220, 230, 240, 250 };
+        Memory<int> memory = new Memory<int>(memoryBacking, 1, 4);
+        fixed (int* p = memory)
+        {
+            Console.WriteLine(p[0] == 210 && p[3] == 240);
+            p[2] = 231;
+        }
+        Console.WriteLine(memoryBacking[3] == 231);
+
+        Memory<int> memoryRange = memory[1..^1];
+        fixed (int* p = memoryRange)
+            Console.WriteLine(p[0] == 220 && p[1] == 231);
+
+        Memory<int> emptyMemory = new Memory<int>(memoryBacking, 3, 0);
+        fixed (int* p = emptyMemory)
+            Console.WriteLine(p == null);
+        Memory<int> defaultMemory = default(Memory<int>);
+        fixed (int* p = defaultMemory)
+            Console.WriteLine(p == null);
+
+        int[] memoryGcBacking = new int[] { 261, 262, 263, 264 };
+        Memory<int> gcMemory = new Memory<int>(memoryGcBacking, 1, 2);
+        fixed (int* p = gcMemory)
+        {
+            memoryGcBacking = null;
+            gcMemory = default(Memory<int>);
+            GC.Collect();
+            Console.WriteLine(p[0] == 262 && p[1] == 263);
+        }
+
+        Calls = 0;
+        StartCalls = 0;
+        EndCalls = 0;
+        int[] chainedBacking = new int[] { 300, 310, 320, 330, 340, 350 };
+        fixed (int* p = MakeMemory(chainedBacking)[Start()..^End()])
+        {
+            Console.WriteLine(Calls == 1 && StartCalls == 1 && EndCalls == 1);
+            Console.WriteLine(p[0] == 320 && p[1] == 330);
+            p[1] = 331;
+        }
+        Console.WriteLine(chainedBacking[3] == 331);
+
+        Calls = 0;
+        StartCalls = 0;
+        EndCalls = 0;
+        fixed (int* p = MakeSpan(chainedBacking)[Start()..^End()])
+        {
+            Console.WriteLine(Calls == 1 && StartCalls == 1 && EndCalls == 1);
+            Console.WriteLine(p[0] == 320 && p[1] == 331);
+        }
+
+        fixed (int* pa = values, ps = span, pm = memory)
+            Console.WriteLine(pa[0] == 1 && ps[0] == 110 && pm[0] == 210);
+
+        ReadOnlySpan<int> readOnlySpan = new ReadOnlySpan<int>(memoryBacking, 2, 2);
+        ref readonly int readOnlySpanRef = ref readOnlySpan.GetPinnableReference();
+        Console.WriteLine(readOnlySpanRef == 220);
+        ReadOnlySpan<int> readOnlySpanSlice = readOnlySpan[1..];
+        ref readonly int readOnlySpanSliceRef = ref readOnlySpanSlice.GetPinnableReference();
+        Console.WriteLine(readOnlySpanSliceRef == 231);
+
+        ReadOnlyMemory<int> readOnlyMemory = new ReadOnlyMemory<int>(memoryBacking, 2, 2);
+        ref readonly int readOnlyMemoryRef = ref readOnlyMemory.GetPinnableReference();
+        Console.WriteLine(readOnlyMemoryRef == 220);
+        ReadOnlyMemory<int> readOnlyMemorySlice = readOnlyMemory[1..];
+        ref readonly int readOnlyMemorySliceRef = ref readOnlyMemorySlice.GetPinnableReference();
+        Console.WriteLine(readOnlyMemorySliceRef == 231);
+    }
+}

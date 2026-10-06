@@ -1,0 +1,10 @@
+using Void.Threading.Tasks;
+public static class Program
+{
+    public static async Task Bad()
+    {
+        int value = 1;
+        ref readonly int alias = ref value;
+    }
+    public static void Main() { }
+}

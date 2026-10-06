@@ -1,0 +1,154 @@
+public struct Number
+{
+    public int Value;
+
+    public Number(int value)
+    {
+        Value = value;
+    }
+
+    public static Number operator +(Number value)
+    {
+        return new Number(value.Value + 100);
+    }
+
+    public static Number operator -(Number value)
+    {
+        return new Number(-value.Value);
+    }
+
+    public static Number operator ~(Number value)
+    {
+        return new Number(~value.Value);
+    }
+
+    public static bool operator !(Number value)
+    {
+        return value.Value == 0;
+    }
+
+    public static Number operator ++(Number value)
+    {
+        return new Number(value.Value + 1);
+    }
+
+    public static Number operator --(Number value)
+    {
+        return new Number(value.Value - 1);
+    }
+}
+
+public sealed class Flag
+{
+    public int Value;
+
+    public Flag(int value)
+    {
+        Value = value;
+    }
+
+    public static bool operator !(Flag value)
+    {
+        return value.Value == 0;
+    }
+
+    public static Flag operator -(Flag value)
+    {
+        return new Flag(-value.Value);
+    }
+
+    public static Flag operator ++(Flag value)
+    {
+        return new Flag(value.Value + 1);
+    }
+}
+
+public struct GenericBox<T>
+{
+    public T Value;
+
+    public GenericBox(T value)
+    {
+        Value = value;
+    }
+
+    public static GenericBox<T> operator -(GenericBox<T> value)
+    {
+        return value;
+    }
+}
+
+public struct Holder
+{
+    public Number Value;
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Number number = new Number(3);
+        Console.WriteLine((-number).Value == -3);
+        Console.WriteLine((+number).Value == 103);
+        Console.WriteLine((~number).Value == ~3);
+        Console.WriteLine((!number) == false);
+        Console.WriteLine((!new Number(0)) == true);
+
+        Number prefix = ++number;
+        Console.WriteLine(prefix.Value == 4);
+        Console.WriteLine(number.Value == 4);
+
+        Number postfix = number++;
+        Console.WriteLine(postfix.Value == 4);
+        Console.WriteLine(number.Value == 5);
+
+        Number prefixDown = --number;
+        Console.WriteLine(prefixDown.Value == 4);
+        Console.WriteLine(number.Value == 4);
+
+        Number postfixDown = number--;
+        Console.WriteLine(postfixDown.Value == 4);
+        Console.WriteLine(number.Value == 3);
+
+        Number? maybe = number;
+        Number? liftedNegative = -maybe;
+        Console.WriteLine(liftedNegative.Value.Value == -3);
+        Number? none = null;
+        Console.WriteLine((-none).HasValue == false);
+        Number? liftedInvert = ~maybe;
+        Console.WriteLine(liftedInvert.Value.Value == ~3);
+
+        Number? liftedPostfix = maybe++;
+        Console.WriteLine(liftedPostfix.Value.Value == 3);
+        Console.WriteLine(maybe.Value.Value == 4);
+        Number? liftedPrefix = ++maybe;
+        Console.WriteLine(liftedPrefix.Value.Value == 5);
+        Console.WriteLine(maybe.Value.Value == 5);
+        Number? absentUpdate = none++;
+        Console.WriteLine(absentUpdate.HasValue == false);
+        Console.WriteLine(none.HasValue == false);
+
+        Flag flag = new Flag(2);
+        Console.WriteLine((!flag) == false);
+        Console.WriteLine((-flag).Value == -2);
+        Flag oldFlag = flag++;
+        Console.WriteLine(oldFlag.Value == 2);
+        Console.WriteLine(flag.Value == 3);
+
+        GenericBox<int> generic = new GenericBox<int>(7);
+        GenericBox<int> genericResult = -generic;
+        Console.WriteLine(genericResult.Value == 7);
+
+        Number[] values = new Number[1];
+        values[0] = new Number(8);
+        Number arrayOld = values[0]++;
+        Console.WriteLine(arrayOld.Value == 8);
+        Console.WriteLine(values[0].Value == 9);
+
+        Holder holder = default(Holder);
+        holder.Value = new Number(11);
+        Number fieldOld = holder.Value++;
+        Console.WriteLine(fieldOld.Value == 11);
+        Console.WriteLine(holder.Value.Value == 12);
+    }
+}

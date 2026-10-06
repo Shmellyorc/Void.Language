@@ -1,0 +1,17 @@
+using Void.Threading;
+
+public sealed class BoundaryGate
+{
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        BoundaryGate gate = new BoundaryGate();
+        CancellationTokenSource source = new CancellationTokenSource();
+        Monitor.Enter(gate);
+        Monitor.Wait(gate, 10, source.Token);
+        Monitor.Exit(gate);
+    }
+}

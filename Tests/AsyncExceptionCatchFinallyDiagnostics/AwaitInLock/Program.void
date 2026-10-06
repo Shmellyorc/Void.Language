@@ -1,0 +1,17 @@
+using Void;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    private static async Task Work(object gate, Task signal)
+    {
+        lock (gate)
+        {
+            await signal;
+        }
+    }
+
+    public static void Main()
+    {
+    }
+}

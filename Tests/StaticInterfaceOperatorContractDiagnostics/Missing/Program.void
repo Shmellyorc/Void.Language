@@ -1,0 +1,3 @@
+public interface IAdd<T> { static T operator +(T left, T right); }
+public struct Number : IAdd<Number> { public int Value; }
+public static class Program { public static void Main() { } }

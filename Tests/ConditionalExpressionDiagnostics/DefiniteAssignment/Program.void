@@ -1,0 +1,13 @@
+public static class Program
+{
+    public static void Set(bool choose, out int value)
+    {
+        int selected = choose ? (value = 1) : 0;
+    }
+
+    public static void Main()
+    {
+        int value;
+        Set(true, out value);
+    }
+}

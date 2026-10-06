@@ -1,0 +1,424 @@
+using Void;
+
+public static class Recorder
+{
+    public static int Value;
+
+    public static void Reset()
+    {
+        Value = 0;
+    }
+
+    public static void Push(int digit)
+    {
+        Value = Value * 10 + digit;
+    }
+}
+
+public sealed class Listener
+{
+    private int _digit;
+
+    public Listener(int digit)
+    {
+        _digit = digit;
+    }
+
+    public void Handle(int value)
+    {
+        Recorder.Push(_digit);
+    }
+}
+
+public interface IStaticBase
+{
+    static event Action<int> Changed;
+}
+
+public interface IStaticAdvanced : IStaticBase
+{
+    static event Action<int> Secondary;
+}
+
+public sealed class StaticPublisher : IStaticAdvanced
+{
+    public static event Action<int> Changed;
+    public static event Action<int> Secondary = BuiltInSecondary;
+
+    private static void BuiltInSecondary(int value)
+    {
+        Recorder.Push(9);
+    }
+
+    public static void RaiseChanged(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+
+    public static void RaiseSecondary(int value)
+    {
+        if (Secondary != null)
+            Secondary(value);
+    }
+
+    public static void Clear()
+    {
+        Changed = null;
+        Secondary = null;
+    }
+}
+
+public interface IBaseInherited
+{
+    static event Action<int> BaseChanged;
+}
+
+public interface IDerivedInherited : IBaseInherited
+{
+    static event Action<int> DerivedChanged;
+}
+
+public class StaticBaseHub
+{
+    public static event Action<int> BaseChanged;
+
+    public static void RaiseBase(int value)
+    {
+        if (BaseChanged != null)
+            BaseChanged(value);
+    }
+
+    public static void ClearBase()
+    {
+        BaseChanged = null;
+    }
+}
+
+public sealed class DerivedStaticHub : StaticBaseHub, IDerivedInherited
+{
+    public static event Action<int> DerivedChanged;
+
+    public static void RaiseDerived(int value)
+    {
+        if (DerivedChanged != null)
+            DerivedChanged(value);
+    }
+
+    public static void ClearDerived()
+    {
+        DerivedChanged = null;
+    }
+}
+
+public interface IGenericStaticEmitter<T>
+{
+    static event Action<T> Changed;
+}
+
+public sealed class IntStaticHub : IGenericStaticEmitter<int>
+{
+    public static event Action<int> Changed;
+
+    public static void Raise(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+
+    public static void Clear()
+    {
+        Changed = null;
+    }
+}
+
+public sealed class StringStaticHub : IGenericStaticEmitter<string>
+{
+    public static event Action<string> Changed;
+
+    public static void Raise(string value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+
+    public static void Clear()
+    {
+        Changed = null;
+    }
+}
+
+public interface ILeftStatic
+{
+    static event Action<int> Shared;
+}
+
+public interface IRightStatic
+{
+    static event Action<int> Shared;
+}
+
+public interface IDiamondStatic : ILeftStatic, IRightStatic
+{
+}
+
+public sealed class DiamondStaticHub : IDiamondStatic
+{
+    public static event Action<int> Shared;
+
+    public static void Raise(int value)
+    {
+        if (Shared != null)
+            Shared(value);
+    }
+
+    public static void Clear()
+    {
+        Shared = null;
+    }
+}
+
+public interface IMixedEmitter
+{
+    event Action<int> InstanceChanged;
+    static event Action<int> StaticChanged;
+}
+
+public sealed class MixedEmitter : IMixedEmitter
+{
+    public event Action<int> InstanceChanged;
+    public static event Action<int> StaticChanged;
+
+    public void RaiseInstance(int value)
+    {
+        if (InstanceChanged != null)
+            InstanceChanged(value);
+    }
+
+    public static void RaiseStatic(int value)
+    {
+        if (StaticChanged != null)
+            StaticChanged(value);
+    }
+
+    public static void ClearStatic()
+    {
+        StaticChanged = null;
+    }
+}
+
+public interface IFirstStatic
+{
+    static event Action<int> Shared;
+}
+
+public interface ISecondStatic
+{
+    static event Action<int> Shared;
+}
+
+public sealed class MultiStaticHub : IFirstStatic, ISecondStatic
+{
+    public static event Action<int> Shared;
+
+    public static void Raise(int value)
+    {
+        if (Shared != null)
+            Shared(value);
+    }
+
+    public static void Clear()
+    {
+        Shared = null;
+    }
+}
+
+public interface IPublicStaticEvent
+{
+    public static event Action<int> Changed;
+}
+
+public sealed class PublicStaticHub : IPublicStaticEvent
+{
+    public static event Action<int> Changed;
+
+    public static void Raise(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+
+    public static void Clear()
+    {
+        Changed = null;
+    }
+}
+
+public interface IStructStaticEvent
+{
+    static event Action<int> Changed;
+}
+
+public struct StructStaticHub : IStructStaticEvent
+{
+    public static event Action<int> Changed;
+
+    public static void Raise(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+
+    public static void Clear()
+    {
+        Changed = null;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Listener one = new Listener(1);
+        Listener two = new Listener(2);
+        StaticPublisher.Changed += one.Handle;
+        StaticPublisher.Changed += two.Handle;
+        Recorder.Reset();
+        StaticPublisher.RaiseChanged(0);
+        Console.WriteLine(Recorder.Value == 12);
+
+        StaticPublisher.Changed -= one.Handle;
+        Recorder.Reset();
+        StaticPublisher.RaiseChanged(0);
+        Console.WriteLine(Recorder.Value == 2);
+
+        Listener three = new Listener(3);
+        StaticPublisher.Changed += three.Handle;
+        three = null;
+        GC.Collect();
+        Recorder.Reset();
+        StaticPublisher.RaiseChanged(0);
+        Console.WriteLine(Recorder.Value == 23);
+
+        Recorder.Reset();
+        StaticPublisher.RaiseSecondary(0);
+        Console.WriteLine(Recorder.Value == 9);
+        Listener four = new Listener(4);
+        StaticPublisher.Secondary += four.Handle;
+        Recorder.Reset();
+        StaticPublisher.RaiseSecondary(0);
+        Console.WriteLine(Recorder.Value == 94);
+        StaticPublisher.Secondary -= four.Handle;
+        Recorder.Reset();
+        StaticPublisher.RaiseSecondary(0);
+        Console.WriteLine(Recorder.Value == 9);
+        StaticPublisher.Clear();
+
+        Listener five = new Listener(5);
+        DerivedStaticHub.BaseChanged += five.Handle;
+        Recorder.Reset();
+        StaticBaseHub.RaiseBase(0);
+        Console.WriteLine(Recorder.Value == 5);
+        DerivedStaticHub.BaseChanged -= five.Handle;
+        Recorder.Reset();
+        StaticBaseHub.RaiseBase(0);
+        Console.WriteLine(Recorder.Value == 0);
+        StaticBaseHub.ClearBase();
+
+        Listener six = new Listener(6);
+        DerivedStaticHub.DerivedChanged += six.Handle;
+        Recorder.Reset();
+        DerivedStaticHub.RaiseDerived(0);
+        Console.WriteLine(Recorder.Value == 6);
+        DerivedStaticHub.DerivedChanged -= six.Handle;
+        Recorder.Reset();
+        DerivedStaticHub.RaiseDerived(0);
+        Console.WriteLine(Recorder.Value == 0);
+        DerivedStaticHub.ClearDerived();
+
+        int intSeen = 0;
+        Action<int> intHandler = value => intSeen = value;
+        IntStaticHub.Changed += intHandler;
+        IntStaticHub.Raise(77);
+        Console.WriteLine(intSeen == 77);
+
+        bool stringSeen = false;
+        Action<string> stringHandler = value => stringSeen = value != null;
+        StringStaticHub.Changed += stringHandler;
+        StringStaticHub.Raise("generic");
+        Console.WriteLine(stringSeen);
+        IntStaticHub.Raise(88);
+        Console.WriteLine(intSeen == 88);
+        Console.WriteLine(stringSeen);
+        IntStaticHub.Clear();
+        StringStaticHub.Clear();
+
+        Listener seven = new Listener(7);
+        DiamondStaticHub.Shared += seven.Handle;
+        Recorder.Reset();
+        DiamondStaticHub.Raise(0);
+        Console.WriteLine(Recorder.Value == 7);
+        DiamondStaticHub.Shared -= seven.Handle;
+        Recorder.Reset();
+        DiamondStaticHub.Raise(0);
+        Console.WriteLine(Recorder.Value == 0);
+        DiamondStaticHub.Clear();
+
+        MixedEmitter mixed = new MixedEmitter();
+        IMixedEmitter mixedInterface = mixed;
+        Listener eight = new Listener(8);
+        Listener nine = new Listener(9);
+        mixedInterface.InstanceChanged += eight.Handle;
+        MixedEmitter.StaticChanged += nine.Handle;
+        Recorder.Reset();
+        mixed.RaiseInstance(0);
+        Console.WriteLine(Recorder.Value == 8);
+        Recorder.Reset();
+        MixedEmitter.RaiseStatic(0);
+        Console.WriteLine(Recorder.Value == 9);
+        mixedInterface.InstanceChanged -= eight.Handle;
+        MixedEmitter.StaticChanged -= nine.Handle;
+        MixedEmitter.ClearStatic();
+
+        Listener oneAgain = new Listener(1);
+        MultiStaticHub.Shared += oneAgain.Handle;
+        Recorder.Reset();
+        MultiStaticHub.Raise(0);
+        Console.WriteLine(Recorder.Value == 1);
+        MultiStaticHub.Shared -= oneAgain.Handle;
+        MultiStaticHub.Clear();
+
+        Listener twoAgain = new Listener(2);
+        PublicStaticHub.Changed += twoAgain.Handle;
+        Recorder.Reset();
+        PublicStaticHub.Raise(0);
+        Console.WriteLine(Recorder.Value == 2);
+        PublicStaticHub.Changed -= twoAgain.Handle;
+        PublicStaticHub.Clear();
+
+        Listener gcListener = new Listener(4);
+        PublicStaticHub.Changed += gcListener.Handle;
+        gcListener = null;
+        GC.Collect();
+        Recorder.Reset();
+        PublicStaticHub.Raise(0);
+        Console.WriteLine(Recorder.Value == 4);
+        PublicStaticHub.Clear();
+        GC.Collect();
+
+        Listener structListener = new Listener(5);
+        StructStaticHub.Changed += structListener.Handle;
+        Recorder.Reset();
+        StructStaticHub.Raise(0);
+        Console.WriteLine(Recorder.Value == 5);
+        StructStaticHub.Changed -= structListener.Handle;
+        Recorder.Reset();
+        StructStaticHub.Raise(0);
+        Console.WriteLine(Recorder.Value == 0);
+        StructStaticHub.Clear();
+
+        Console.WriteLine(intSeen == 88);
+        Console.WriteLine(stringSeen);
+        Console.WriteLine(mixedInterface != null);
+    }
+}

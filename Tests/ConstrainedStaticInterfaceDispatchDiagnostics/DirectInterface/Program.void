@@ -1,0 +1,2 @@
+public interface IFactory { static int Create(int x); }
+public static class Program { public static void Main() { IFactory.Create(1); } }

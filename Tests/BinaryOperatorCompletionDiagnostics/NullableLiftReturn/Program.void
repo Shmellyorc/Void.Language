@@ -1,0 +1,14 @@
+public class RefValue {}
+public struct Value
+{
+    public static RefValue operator +(Value left, Value right) { return new RefValue(); }
+}
+public static class Program
+{
+    public static void Main()
+    {
+        Value? left = new Value();
+        Value? right = new Value();
+        Value? result = left + right;
+    }
+}

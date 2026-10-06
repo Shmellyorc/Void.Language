@@ -1,0 +1,13 @@
+using Void.Collections;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    private static async Task Consume(IAsyncEnumerable<int> source)
+    {
+        await foreach (int value in source)
+            Console.WriteLine(value);
+    }
+
+    public static void Main() {}
+}

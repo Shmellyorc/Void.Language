@@ -1,0 +1,223 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class Item273
+{
+    public int Value;
+
+    public Item273(int value)
+    {
+        Value = value;
+    }
+}
+
+public struct Holder273
+{
+    public Item273 Item;
+
+    public Holder273(Item273 item)
+    {
+        Item = item;
+    }
+}
+
+public sealed class Counter273
+{
+    private int _value;
+
+    public Counter273(int value)
+    {
+        _value = value;
+    }
+
+    public Func<Task<int>> Getter()
+    {
+        return async () =>
+        {
+            await Task.Yield();
+            return _value;
+        };
+    }
+}
+
+public sealed class GenericBox273<T>
+{
+    private T _value;
+
+    public GenericBox273(T value)
+    {
+        _value = value;
+    }
+
+    public Func<Task<T>> Getter()
+    {
+        return async () =>
+        {
+            await Task.Yield();
+            return _value;
+        };
+    }
+}
+
+public static class Program
+{
+    private static TaskCompletionSource _gcGate = new TaskCompletionSource();
+
+    private static Func<Task<int>> CaptureParameter(int value)
+    {
+        return async () =>
+        {
+            await Task.Yield();
+            return value;
+        };
+    }
+
+    private static Func<Task<T>> CaptureGeneric<T>(T value)
+    {
+        return async () =>
+        {
+            await Task.Yield();
+            return value;
+        };
+    }
+
+    private static Task<int> StartGcLifetime()
+    {
+        Item273 item = new Item273(73);
+        Func<Task<int>> work = async () =>
+        {
+            await _gcGate.Task;
+            return item.Value;
+        };
+        return work();
+    }
+
+    private static async Task<int> NestedInsideAsync(int seed)
+    {
+        int local = seed;
+        Func<Task<int>> work = async () =>
+        {
+            await Task.Yield();
+            local += 2;
+            return local;
+        };
+        int result = await work();
+        return result + local;
+    }
+
+    public static void Main()
+    {
+        int shared = 10;
+        Func<Task<int>> mutate = async () =>
+        {
+            await Task.Yield();
+            shared++;
+            return shared;
+        };
+        Func<int> read = () => shared;
+        shared = 40;
+        Console.WriteLine(mutate().Result == 41);
+        Console.WriteLine(read() == 41);
+
+        int sharedAsync = 5;
+        Func<Task> incrementAsync = async () =>
+        {
+            await Task.Yield();
+            sharedAsync++;
+        };
+        Func<Task<int>> readAsync = async () =>
+        {
+            await Task.Yield();
+            return sharedAsync;
+        };
+        incrementAsync().Wait();
+        Console.WriteLine(readAsync().Result == 6);
+
+        Func<int, Task<int>> addShared = async value =>
+        {
+            await Task.Yield();
+            return value + shared;
+        };
+        Console.WriteLine(addShared(1).Result == 42);
+
+        Func<Task<int>> parameter = CaptureParameter(42);
+        GC.Collect();
+        Console.WriteLine(parameter().Result == 42);
+
+        Holder273 holder = new Holder273(new Item273(43));
+        Func<Task<int>> structCapture = async () =>
+        {
+            await Task.Yield();
+            return holder.Item.Value;
+        };
+        GC.Collect();
+        Console.WriteLine(structCapture().Result == 43);
+
+        Counter273 counter = new Counter273(44);
+        Func<Task<int>> counterGetter = counter.Getter();
+        counter = null;
+        GC.Collect();
+        Console.WriteLine(counterGetter().Result == 44);
+
+        Task<int> pending = StartGcLifetime();
+        Console.WriteLine(!pending.IsCompleted);
+        GC.Collect();
+        _gcGate.SetResult();
+        Console.WriteLine(pending.Result == 73);
+
+        Func<Task<int>> genericInt = CaptureGeneric<int>(45);
+        Console.WriteLine(genericInt().Result == 45);
+
+        Item273 genericItemValue = new Item273(46);
+        Func<Task<Item273>> genericItem = CaptureGeneric<Item273>(genericItemValue);
+        genericItemValue = null;
+        GC.Collect();
+        Console.WriteLine(genericItem().Result.Value == 46);
+
+        GenericBox273<Item273> box = new GenericBox273<Item273>(new Item273(47));
+        Func<Task<Item273>> boxGetter = box.Getter();
+        box = null;
+        GC.Collect();
+        Console.WriteLine(boxGetter().Result.Value == 47);
+
+        int outer = 40;
+        Func<Task<int>> nested = async () =>
+        {
+            await Task.Yield();
+            int local = 2;
+            Func<int> inner = () => outer + local;
+            return inner();
+        };
+        Console.WriteLine(nested().Result == 42);
+
+        Console.WriteLine(NestedInsideAsync(20).Result == 44);
+
+        int valueTaskCapture = 48;
+        Func<ValueTask<int>> valueTaskWork = async () =>
+        {
+            await Task.Yield();
+            return valueTaskCapture;
+        };
+        valueTaskCapture = 49;
+        Console.WriteLine(valueTaskWork().GetAwaiter().GetResult() == 49);
+
+        int finallyCapture = 0;
+        Func<Task> finallyWork = async () =>
+        {
+            try
+            {
+                await Task.Yield();
+            }
+            finally
+            {
+                finallyCapture = 50;
+            }
+        };
+        finallyWork().Wait();
+        Console.WriteLine(finallyCapture == 50);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

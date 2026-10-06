@@ -1,0 +1,88 @@
+public struct Pair
+{
+    public int A;
+    public int B;
+}
+
+public delegate int Transform(int value);
+
+public static class NativeFixture
+{
+    [Native("voidc040_add")]
+    public static unsafe extern int Add(int left, int right);
+
+    [Native("voidc040_make_pair")]
+    public static unsafe extern void MakePair(int a, int b, out Pair value);
+
+    [Native("voidc040_sum_pair")]
+    public static unsafe extern int SumPair(in Pair value);
+
+    [Native("voidc040_shift_pair")]
+    public static unsafe extern void ShiftPair(ref Pair value, int da, int db);
+
+    [Native("voidc040_read_int")]
+    public static unsafe extern int ReadInt(in int value);
+
+    [Native("voidc040_increment")]
+    public static unsafe extern void Increment(ref int value);
+
+    [Native("voidc040_write_int")]
+    public static unsafe extern void WriteInt(out int value);
+
+    [Native("voidc040_apply")]
+    public static unsafe extern int Apply(int value, Transform callback);
+
+    [Native("voidc040_fill")]
+    public static unsafe extern void Fill(int* values, int count);
+
+    [Native("voidc040_pair_size_matches")]
+    public static unsafe extern int PairSizeMatches(int bytes);
+}
+
+public static class Program
+{
+    public static int Double(int value)
+    {
+        return value * 2;
+    }
+
+    public static unsafe void Main()
+    {
+        Console.WriteLine(NativeFixture.Add(20, 22));
+
+        Pair pair = new Pair();
+        NativeFixture.MakePair(7, 9, out pair);
+        Console.WriteLine(pair.A);
+        Console.WriteLine(pair.B);
+        Console.WriteLine(NativeFixture.SumPair(in pair));
+
+        NativeFixture.ShiftPair(ref pair, 3, 4);
+        Console.WriteLine(pair.A);
+        Console.WriteLine(pair.B);
+
+        int value = 5;
+        Console.WriteLine(NativeFixture.ReadInt(in value));
+        NativeFixture.Increment(ref value);
+        Console.WriteLine(value);
+        NativeFixture.WriteInt(out value);
+        Console.WriteLine(value);
+
+        Console.WriteLine(NativeFixture.Apply(6, Double));
+
+        int* values = stackalloc int[4];
+        Runtime.MemoryClear(values, sizeof(int) * 4);
+        NativeFixture.Fill(values, 4);
+        Console.WriteLine(values[0]);
+        Console.WriteLine(values[2]);
+
+        int* third = values + 2;
+        Console.WriteLine(*third);
+
+        Pair copy = new Pair();
+        Runtime.MemoryCopy(&copy, &pair, sizeof(Pair));
+        Console.WriteLine(copy.A);
+        Console.WriteLine(copy.B);
+
+        Console.WriteLine(NativeFixture.PairSizeMatches(sizeof(Pair)) == 1);
+    }
+}

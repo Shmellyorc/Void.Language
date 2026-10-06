@@ -1,0 +1,3 @@
+public interface IValue { static int Get(int value); }
+public sealed class Bad : IValue { public static int Get(float value){return 1;} }
+public static class Program { public static void Main() { } }

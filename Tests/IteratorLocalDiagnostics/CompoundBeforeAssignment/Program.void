@@ -1,0 +1,11 @@
+using Void.Collections;
+public static class Program
+{
+    public static IEnumerator<int> Bad()
+    {
+        int value;
+        value += 1;
+        yield return value;
+    }
+    public static void Main() { IEnumerator<int> e = Bad(); }
+}

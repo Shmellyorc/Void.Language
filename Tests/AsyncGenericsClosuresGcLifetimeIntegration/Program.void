@@ -1,0 +1,277 @@
+using Void;
+using Void.Threading.Tasks;
+
+public interface IScore208
+{
+    int Score();
+}
+
+public sealed class Node208 : IScore208
+{
+    public int Value;
+    public Node208 Next;
+
+    public Node208(int value)
+    {
+        Value = value;
+        Next = null;
+    }
+
+    public int Score()
+    {
+        return Value;
+    }
+}
+
+public struct Packet208
+{
+    public Node208 Node;
+    public int Marker;
+
+    public Packet208(Node208 node, int marker)
+    {
+        Node = node;
+        Marker = marker;
+    }
+}
+
+public sealed class AsyncBox208<T>
+{
+    private T _value;
+
+    public AsyncBox208(T value)
+    {
+        _value = value;
+    }
+
+    public async Task<T> GetAfter(Task gate)
+    {
+        await gate;
+        GC.Collect();
+        return _value;
+    }
+
+    public async Task<U> EchoAfter<U>(Task gate, U value)
+    {
+        await gate;
+        GC.Collect();
+        return value;
+    }
+}
+
+public sealed class AsyncOwner208
+{
+    private Node208 _node;
+    private int _bias;
+
+    public AsyncOwner208(Node208 node, int bias)
+    {
+        _node = node;
+        _bias = bias;
+    }
+
+    public async Task<int> ReadWithClosure(Task gate)
+    {
+        Func<int> read = () => _node.Value + _bias;
+        await gate;
+        GC.Collect();
+        return read();
+    }
+}
+
+public static class Program
+{
+    private static void Check(bool value)
+    {
+        Console.WriteLine(value);
+    }
+
+    public static async Task<T> EchoAfter<T>(Task gate, T value)
+    {
+        await gate;
+        GC.Collect();
+        return value;
+    }
+
+    public static async Task<int> ScoreAfter<T>(Task gate, T value) where T : IScore208
+    {
+        await gate;
+        GC.Collect();
+        return value.Score();
+    }
+
+    public static async Task<int?> NullableAfter(Task gate, bool present, int value)
+    {
+        await gate;
+        if (present)
+            return value;
+        return null;
+    }
+
+    public static async Task<Packet208> PacketAfter(Task gate, Packet208 value)
+    {
+        await gate;
+        GC.Collect();
+        return value;
+    }
+
+    public static async Task<int> ClosureBeforeAwait(Task gate, Node208 value)
+    {
+        Node208 captured = value;
+        int bias = 4;
+        Func<int> read = () => captured.Value + bias;
+        await gate;
+        GC.Collect();
+        return read();
+    }
+
+    public static async Task<int> ClosureAfterAwait(Task gate, Node208 value)
+    {
+        Node208 local = value;
+        await gate;
+        GC.Collect();
+        Func<int> read = () => local.Value;
+        return read();
+    }
+
+    public static async Task<int> BlockClosureAcrossAwait(Task gate, int start)
+    {
+        int counter = start;
+        Func<int> bump = () =>
+        {
+            counter++;
+            return counter;
+        };
+        await gate;
+        int first = bump();
+        GC.Collect();
+        return first + bump();
+    }
+
+    public static async Task<T> GenericClosureAfter<T>(Task gate, T value)
+    {
+        T captured = value;
+        Func<T> read = () => captured;
+        await gate;
+        GC.Collect();
+        return read();
+    }
+
+    public static void Main()
+    {
+        TaskCompletionSource genericGate = new TaskCompletionSource();
+        Node208 genericNode = new Node208(11);
+        Task<Node208> genericTask = EchoAfter<Node208>(genericGate.Task, genericNode);
+        genericNode = null;
+        GC.Collect();
+        Check(!genericTask.IsCompleted);
+        genericGate.SetResult();
+        Check(genericTask.Result.Value == 11);
+
+        TaskCompletionSource constrainedGate = new TaskCompletionSource();
+        Node208 constrainedNode = new Node208(12);
+        Task<int> constrainedTask = ScoreAfter<Node208>(constrainedGate.Task, constrainedNode);
+        constrainedNode = null;
+        GC.Collect();
+        constrainedGate.SetResult();
+        Check(constrainedTask.Result == 12);
+
+        TaskCompletionSource boxGate = new TaskCompletionSource();
+        AsyncBox208<Node208> box = new AsyncBox208<Node208>(new Node208(22));
+        Task<Node208> boxTask = box.GetAfter(boxGate.Task);
+        box = null;
+        GC.Collect();
+        Check(!boxTask.IsCompleted);
+        boxGate.SetResult();
+        Check(boxTask.Result.Value == 22);
+
+        TaskCompletionSource boxMethodGate = new TaskCompletionSource();
+        AsyncBox208<int> numberBox = new AsyncBox208<int>(3);
+        Node208 boxMethodNode = new Node208(23);
+        Task<Node208> boxMethodTask = numberBox.EchoAfter<Node208>(boxMethodGate.Task, boxMethodNode);
+        boxMethodNode = null;
+        numberBox = null;
+        GC.Collect();
+        boxMethodGate.SetResult();
+        Check(boxMethodTask.Result.Value == 23);
+
+        TaskCompletionSource nullableGate = new TaskCompletionSource();
+        Task<int?> nullableTask = NullableAfter(nullableGate.Task, true, 31);
+        nullableGate.SetResult();
+        Check(nullableTask.Result.HasValue);
+        Check(nullableTask.Result.Value == 31);
+
+        TaskCompletionSource emptyGate = new TaskCompletionSource();
+        Task<int?> emptyTask = NullableAfter(emptyGate.Task, false, 31);
+        emptyGate.SetResult();
+        Check(!emptyTask.Result.HasValue);
+
+        TaskCompletionSource packetGate = new TaskCompletionSource();
+        Node208 packetNode = new Node208(41);
+        Packet208 packet = new Packet208(packetNode, 42);
+        Task<Packet208> packetTask = PacketAfter(packetGate.Task, packet);
+        packet.Node = null;
+        packetNode = null;
+        GC.Collect();
+        packetGate.SetResult();
+        Packet208 packetResult = packetTask.Result;
+        Check(packetResult.Marker == 42);
+        Check(packetResult.Node.Value == 41);
+
+        TaskCompletionSource beforeGate = new TaskCompletionSource();
+        Node208 beforeNode = new Node208(50);
+        Task<int> beforeTask = ClosureBeforeAwait(beforeGate.Task, beforeNode);
+        beforeNode = null;
+        GC.Collect();
+        Check(!beforeTask.IsCompleted);
+        beforeGate.SetResult();
+        Check(beforeTask.Result == 54);
+
+        TaskCompletionSource afterGate = new TaskCompletionSource();
+        Node208 afterNode = new Node208(61);
+        Task<int> afterTask = ClosureAfterAwait(afterGate.Task, afterNode);
+        afterNode = null;
+        GC.Collect();
+        afterGate.SetResult();
+        Check(afterTask.Result == 61);
+
+        TaskCompletionSource blockGate = new TaskCompletionSource();
+        Task<int> blockTask = BlockClosureAcrossAwait(blockGate.Task, 70);
+        GC.Collect();
+        blockGate.SetResult();
+        Check(blockTask.Result == 143);
+
+        TaskCompletionSource genericClosureGate = new TaskCompletionSource();
+        Node208 genericClosureNode = new Node208(81);
+        Task<Node208> genericClosureTask = GenericClosureAfter<Node208>(
+            genericClosureGate.Task, genericClosureNode);
+        genericClosureNode = null;
+        GC.Collect();
+        genericClosureGate.SetResult();
+        Check(genericClosureTask.Result.Value == 81);
+
+        TaskCompletionSource ownerGate = new TaskCompletionSource();
+        AsyncOwner208 owner = new AsyncOwner208(new Node208(90), 2);
+        Task<int> ownerTask = owner.ReadWithClosure(ownerGate.Task);
+        owner = null;
+        GC.Collect();
+        ownerGate.SetResult();
+        Check(ownerTask.Result == 92);
+
+        genericTask = null;
+        constrainedTask = null;
+        boxTask = null;
+        boxMethodTask = null;
+        nullableTask = null;
+        emptyTask = null;
+        packetTask = null;
+        beforeTask = null;
+        afterTask = null;
+        blockTask = null;
+        genericClosureTask = null;
+        ownerTask = null;
+        for (int i = 0; i < 4; i++)
+            GC.Collect();
+        Check(true);
+    }
+}

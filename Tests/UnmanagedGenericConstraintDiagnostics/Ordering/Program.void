@@ -1,0 +1,1 @@
+public interface I241 { } public static class Program { private static T Keep<T>(T value) where T : I241, unmanaged => value; public static void Main() { } }

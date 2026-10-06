@@ -1,0 +1,99 @@
+using Void;
+
+public interface IMath<T>
+{
+    static T operator +(T left, T right);
+    static T operator -(T left, T right);
+    static T operator -(T value);
+    static T operator ++(T value);
+    static bool operator ==(T left, T right);
+    static bool operator !=(T left, T right);
+    static bool operator <(T left, T right);
+    static bool operator >(T left, T right);
+}
+
+public interface IAdvancedMath<T> : IMath<T>
+{
+}
+
+public struct Number : IAdvancedMath<Number>
+{
+    public int Value;
+    public Number(int value) { Value = value; }
+    public static Number operator +(Number left, Number right) { return new Number(left.Value + right.Value); }
+    public static Number operator -(Number left, Number right) { return new Number(left.Value - right.Value); }
+    public static Number operator -(Number value) { return new Number(-value.Value); }
+    public static Number operator ++(Number value) { return new Number(value.Value + 1); }
+    public static bool operator ==(Number left, Number right) { return left.Value == right.Value; }
+    public static bool operator !=(Number left, Number right) { return left.Value != right.Value; }
+    public static bool operator <(Number left, Number right) { return left.Value < right.Value; }
+    public static bool operator >(Number left, Number right) { return left.Value > right.Value; }
+}
+
+public sealed class Box : IMath<Box>
+{
+    public int Value;
+    public Box(int value) { Value = value; }
+    public static Box operator +(Box left, Box right) { return new Box(left.Value + right.Value); }
+    public static Box operator -(Box left, Box right) { return new Box(left.Value - right.Value); }
+    public static Box operator -(Box value) { return new Box(-value.Value); }
+    public static Box operator ++(Box value) { return new Box(value.Value + 1); }
+    public static bool operator ==(Box left, Box right) { return left.Value == right.Value; }
+    public static bool operator !=(Box left, Box right) { return left.Value != right.Value; }
+    public static bool operator <(Box left, Box right) { return left.Value < right.Value; }
+    public static bool operator >(Box left, Box right) { return left.Value > right.Value; }
+}
+
+public sealed class Runner<T> where T : IMath<T>
+{
+    private T _value;
+    public Runner(T value) { _value = value; }
+    public T Add(T left, T right) { return left + right; }
+    public T Neg(T value) { return -value; }
+    public T AddField(T other) { return _value + other; }
+}
+
+public static class Program
+{
+    private static T Add<T>(T left, T right) where T : IMath<T> { return left + right; }
+    private static T Neg<T>(T value) where T : IMath<T> { return -value; }
+    private static T Inc<T>(T value) where T : IMath<T> { return ++value; }
+    private static T PostInc<T>(T value) where T : IMath<T> { return value++; }
+    private static T Accumulate<T>(T left, T right) where T : IMath<T> { left += right; return left; }
+    private static T LocalAdd<T>(T left, T right) where T : IMath<T> { T a = left; T b = right; return a + b; }
+    private static T Nested<T>(T left, T right) where T : IMath<T> { return (left + right) - right; }
+    private static bool Eq<T>(T left, T right) where T : IMath<T> { return left == right; }
+    private static bool Lt<T>(T left, T right) where T : IMath<T> { return left < right; }
+    private static T Inherited<T>(T left, T right) where T : IAdvancedMath<T> { return left + right; }
+
+    public static void Main()
+    {
+        Number a = new Number(2);
+        Number b = new Number(3);
+        Console.WriteLine(Add(a, b).Value == 5);
+        Console.WriteLine(Neg(a).Value == -2);
+        Console.WriteLine(Inc(a).Value == 3);
+        Console.WriteLine(PostInc(a).Value == 2);
+        Console.WriteLine(Accumulate(a, b).Value == 5);
+        Console.WriteLine(LocalAdd(a, b).Value == 5);
+        Console.WriteLine(Nested(a, b).Value == 2);
+        Console.WriteLine(Eq(a, new Number(2)));
+        Console.WriteLine(Lt(a, b));
+        Console.WriteLine(Inherited(a, b).Value == 5);
+
+        Box left = new Box(4);
+        Box right = new Box(5);
+        Console.WriteLine(Add(left, right).Value == 9);
+        Console.WriteLine(Neg(left).Value == -4);
+        Console.WriteLine(Eq(left, new Box(4)));
+        Console.WriteLine(Lt(left, right));
+
+        Runner<Number> numberRunner = new Runner<Number>(a);
+        Console.WriteLine(numberRunner.Add(a, b).Value == 5);
+        Console.WriteLine(numberRunner.Neg(a).Value == -2);
+        Console.WriteLine(numberRunner.AddField(b).Value == 5);
+        Runner<Box> boxRunner = new Runner<Box>(left);
+        Console.WriteLine(boxRunner.Add(left, right).Value == 9);
+        Console.WriteLine(boxRunner.AddField(right).Value == 9);
+    }
+}

@@ -1,0 +1,219 @@
+using Void;
+using Void.Collections;
+using Void.Text;
+using Void.Buffers;
+using Void.Buffers.Text;
+
+public sealed class SignedComparer : EqualityComparer<int>
+{
+    public override bool Equals(int x, int y) { return x % 10 == y % 10; }
+    public override int GetHashCode(int obj) { return -2147483647 - 1; }
+}
+
+public static class Program
+{
+    private static bool Pair(int a, int b, int c) { return a + b == c; }
+    public static unsafe void Main()
+    {
+        bool caught = false;
+        List<int> list = new List<int>(0);
+        list.Add(1); list.Insert(0, 2);
+        Console.WriteLine(list.Count == 2 && list.Capacity >= 2);
+        Console.WriteLine(list.IndexOf(1) == 1 && list.Contains(2));
+        Console.WriteLine(list.Remove(2) && !list.Remove(9));
+        Console.WriteLine(list.ToArray()[0] == 1);
+        int[] destination = new int[3]; list.CopyTo(destination, 1);
+        Console.WriteLine(destination[1] == 1);
+        try { list.RemoveAt(1); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "index"; }
+        Console.WriteLine(caught);
+        IEnumerator<int> enumerator = list.GetEnumerator();
+        Console.WriteLine(enumerator.Current == 0);
+        Console.WriteLine(enumerator.MoveNext() && enumerator.Current == 1);
+        list.Add(2); caught = false;
+        try { enumerator.MoveNext(); } catch (InvalidOperationException e) { caught = true; }
+        Console.WriteLine(caught);
+        list.Clear(); Console.WriteLine(list.Count == 0 && list.Capacity >= 2);
+        caught = false;
+        try { list.Capacity = -1; } catch (ArgumentOutOfRangeException e) { caught = true; }
+        Console.WriteLine(caught);
+
+        list.Add(9); list.Add(10);
+        List<int> copied = new List<int>((IEnumerable<int>)list);
+        Console.WriteLine(copied.Count == 2 && copied[1] == 10);
+        Stack<int> constructedStack = new Stack<int>((IEnumerable<int>)list);
+        Console.WriteLine(constructedStack.Pop() == 10 && constructedStack.Pop() == 9);
+        Queue<int> constructedQueue = new Queue<int>((IEnumerable<int>)list);
+        Console.WriteLine(constructedQueue.Dequeue() == 9 && constructedQueue.Dequeue() == 10);
+        caught = false;
+        try { new Dictionary<int, string>(-1); } catch (ArgumentOutOfRangeException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { new Queue<int>(-1); } catch (ArgumentOutOfRangeException e) { caught = true; }
+        Console.WriteLine(caught);
+
+        IReadOnlyCollection<int> readOnlyCollection = copied;
+        Console.WriteLine(readOnlyCollection.Count == 2);
+        copied.AddRange((IEnumerable<int>)copied);
+        Console.WriteLine(copied.Count == 4 && copied[2] == 9 && copied[3] == 10);
+        HashSet<int> seededSet = new HashSet<int>((IEnumerable<int>)copied, new SignedComparer());
+        Console.WriteLine(seededSet.Count == 2);
+        int actualValue;
+        Console.WriteLine(seededSet.TryGetValue(19, out actualValue) && actualValue == 9);
+        Console.WriteLine(!seededSet.TryGetValue(2, out actualValue) && actualValue == 0);
+        int[] setCopy = new int[2]; seededSet.CopyTo(setCopy);
+        Console.WriteLine(setCopy[0] + setCopy[1] == 19);
+        List<KeyValuePair<int, string>> seed = new List<KeyValuePair<int, string>>();
+        seed.Add(new KeyValuePair<int, string>(7, "seven"));
+        Dictionary<int, string> seededMap = new Dictionary<int, string>((IEnumerable<KeyValuePair<int, string>>)seed, new SignedComparer());
+        Console.WriteLine(seededMap.Count == 1 && seededMap[17] == "seven");
+        Console.WriteLine(!seededMap.TryAdd(17, "duplicate") && seededMap.TryAdd(8, "eight") && seededMap.Count == 2);
+
+        Dictionary<int, string> map = new Dictionary<int, string>(new SignedComparer());
+        map.Add(1, "one");
+        Console.WriteLine(map.ContainsKey(11) && map[21] == "one");
+        string result;
+        Console.WriteLine(map.TryGetValue(11, out result) && result == "one");
+        Console.WriteLine(!map.TryGetValue(2, out result) && result == null);
+        caught = false;
+        try { map.Add(11, "duplicate"); } catch (ArgumentException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { caught = map[9] == "unexpected"; } catch (KeyNotFoundException e) { caught = true; }
+        Console.WriteLine(caught);
+        for (int i = 2; i < 10; i++) map.Add(i, "value");
+        Console.WriteLine(map.Count == 9 && map[31] == "one" && map.Remove(11));
+        Dictionary<string, int> strings = new Dictionary<string, int>();
+        caught = false;
+        try { strings.Add(null, 1); } catch (ArgumentNullException e) { caught = e.ParamName == "key"; }
+        Console.WriteLine(caught);
+        HashSet<int> unique = new HashSet<int>(new SignedComparer());
+        Console.WriteLine(unique.Add(1) && !unique.Add(11) && unique.Contains(21) && unique.Remove(31));
+        KeyValuePair<int, string> pair = new KeyValuePair<int, string>(2, "two");
+        KeyValuePair<int, string> copy = pair;
+        pair = new KeyValuePair<int, string>(3, "three");
+        Console.WriteLine(copy.Key == 2 && pair.Key == 3 && copy.Value == "two");
+        Queue<int> queue = new Queue<int>(); int item;
+        Console.WriteLine(!queue.TryDequeue(out item) && item == 0 && !queue.TryPeek(out item));
+        caught = false;
+        try { queue.Dequeue(); } catch (InvalidOperationException e) { caught = true; }
+        Console.WriteLine(caught);
+        queue.Enqueue(4); Console.WriteLine(queue.Contains(4) && queue.TryPeek(out item) && item == 4 && queue.TryDequeue(out item) && item == 4);
+        Stack<int> stack = new Stack<int>();
+        Console.WriteLine(!stack.TryPop(out item) && item == 0 && !stack.TryPeek(out item));
+        caught = false;
+        try { stack.Peek(); } catch (InvalidOperationException e) { caught = true; }
+        Console.WriteLine(caught);
+        stack.Push(5); Console.WriteLine(stack.Contains(5) && stack.TryPop(out item) && item == 5);
+
+        int formatted = -12;
+        Console.WriteLine(formatted.ToString() == "-12");
+        bool truth = true;
+        Console.WriteLine(truth.ToString() == "True");
+        double fraction = 1.5;
+        Console.WriteLine(fraction.ToString() == "1.5");
+        char scalar = (char)128512;
+        Console.WriteLine(scalar.ToString() == "😀");
+        Queue<int> enumerationQueue = new Queue<int>(); enumerationQueue.Enqueue(1);
+        IEnumerator<int> queueEnumerator = enumerationQueue.GetEnumerator();
+        enumerationQueue.Enqueue(2); caught = false;
+        try { queueEnumerator.MoveNext(); } catch (InvalidOperationException e) { caught = true; }
+        Console.WriteLine(caught);
+        Stack<int> enumerationStack = new Stack<int>(); enumerationStack.Push(1);
+        IEnumerator<int> stackEnumerator = enumerationStack.GetEnumerator();
+        enumerationStack.Push(2); caught = false;
+        try { stackEnumerator.MoveNext(); } catch (InvalidOperationException e) { caught = true; }
+        Console.WriteLine(caught);
+        IEnumerator<KeyValuePair<int, string>> mapEnumerator = map.GetEnumerator();
+        map.Add(0, "zero"); caught = false;
+        try { mapEnumerator.MoveNext(); } catch (InvalidOperationException e) { caught = true; }
+        Console.WriteLine(caught);
+        unique.Add(1); IEnumerator<int> setEnumerator = unique.GetEnumerator();
+        unique.Add(2); caught = false;
+        try { setEnumerator.MoveNext(); } catch (InvalidOperationException e) { caught = true; }
+        Console.WriteLine(caught);
+        setEnumerator = unique.GetEnumerator(); unique.Remove(1);
+        Console.WriteLine(setEnumerator.Current == 0 && setEnumerator.MoveNext() && setEnumerator.Current == 2 && !setEnumerator.MoveNext());
+        mapEnumerator = map.GetEnumerator(); map.Remove(2);
+        bool removedSkipped = true;
+        while (mapEnumerator.MoveNext()) if (mapEnumerator.Current.Key == 2) removedSkipped = false;
+        Console.WriteLine(removedSkipped);
+        setEnumerator = unique.GetEnumerator(); mapEnumerator = map.GetEnumerator();
+        unique.Clear(); map.Clear();
+        Console.WriteLine(!setEnumerator.MoveNext() && !mapEnumerator.MoveNext());
+        unique.Add(1); setEnumerator = unique.GetEnumerator();
+        Console.WriteLine(!unique.Add(11) && setEnumerator.MoveNext() && setEnumerator.Current == 1);
+        int[] queued = enumerationQueue.ToArray(); int[] stacked = enumerationStack.ToArray();
+        int[] copiedStack = new int[3]; enumerationStack.CopyTo(copiedStack, 1);
+        Console.WriteLine(queued[0] == 1 && queued[1] == 2 && stacked[0] == 2 && copiedStack[2] == 1);
+
+        Index index = Index.FromEnd(2);
+        Console.WriteLine(index.Equals(new Index(2, true)) && index.GetOffset(10) == 8 && index.ToString() == "^2");
+        Console.WriteLine(Index.FromStart(2).GetOffset(-1) == 2 && index.GetOffset(-1) == -3);
+        Range range = Range.StartAt(new Index(2));
+        int offset; int length; range.GetOffsetAndLength(6, out offset, out length);
+        Console.WriteLine(offset == 2 && length == 4 && range.ToString() == "2..^0");
+        caught = false;
+        try { new Index(-1); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "value"; }
+        Console.WriteLine(caught);
+        int[] values = new int[] {1, 2, 3}; Span<int> span = new Span<int>(values);
+        span.Fill(7); Console.WriteLine(span.ToArray()[2] == 7);
+        span.Clear(); Console.WriteLine(values[0] == 0 && values[2] == 0);
+        caught = false;
+        try { caught = span[3] == -999; } catch (IndexOutOfRangeException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { span.CopyTo(new Span<int>(new int[1])); } catch (ArgumentException e) { caught = true; }
+        Console.WriteLine(caught);
+        Memory<int> memory = new Memory<int>(values);
+        Console.WriteLine(memory.ToArray().Length == 3);
+
+        UTF8Encoding encoding = new UTF8Encoding();
+        Console.WriteLine(encoding.GetPreamble().Length == 0 && Encoding.UTF8.GetPreamble().Length == 3);
+        byte[] invalid = new byte[] {(byte)224, (byte)128, (byte)128};
+        Console.WriteLine(encoding.GetString(invalid) == "���");
+        Console.WriteLine(encoding.GetString(new byte[] {(byte)226, (byte)130}) == "�");
+        Console.WriteLine(encoding.GetString(new byte[] {(byte)226, (byte)130, (byte)65}) == "�A");
+        Console.WriteLine(encoding.GetString(new byte[] {(byte)240, (byte)159, (byte)152, (byte)128}) == "😀");
+        caught = false;
+        try { new UTF8Encoding(false, true).GetString(invalid); } catch (DecoderFallbackException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { encoding.GetBytes(null); } catch (ArgumentNullException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { new StringBuilder(-1); } catch (ArgumentOutOfRangeException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { Utf8Formatter.TryFormat(12, new Span<byte>(new byte[20]), out item, new StandardFormat('X')); } catch (FormatException e) { caught = true; }
+        Console.WriteLine(caught);
+        Exception inner = new Exception("inner"); Exception outer = new Exception("outer", inner);
+        Console.WriteLine(outer.Message == "outer" && outer.InnerException == inner);
+        Func<int, int, int, bool> callback = Pair;
+        Console.WriteLine(callback(1, 2, 3));
+
+        byte* allocation = (byte*)NativeMemory.AllocZeroed(8ul);
+        Console.WriteLine(allocation[0] == (byte)0 && allocation[7] == (byte)0);
+        NativeMemory.Fill(allocation, 8ul, (byte)9); allocation[0] = (byte)1;
+        NativeMemory.Copy(allocation, allocation + 1, 7ul);
+        Console.WriteLine(allocation[1] == (byte)1 && allocation[7] == (byte)9);
+        NativeMemory.Clear(allocation, 8ul); Console.WriteLine(allocation[7] == (byte)0);
+        NativeMemory.Free(allocation);
+        caught = false;
+        try { NativeMemory.AlignedAlloc(8ul, 3ul); } catch (ArgumentException e) { caught = true; }
+        Console.WriteLine(caught);
+        byte* sized = (byte*)NativeMemory.AllocZeroed(2ul, 4ul);
+        Console.WriteLine(sized[7] == (byte)0);
+        sized = (byte*)NativeMemory.Realloc(sized, 16ul);
+        Console.WriteLine(sized[7] == (byte)0);
+        NativeMemory.Free(sized);
+        void* aligned = NativeMemory.AlignedAlloc(8ul, 16ul);
+        aligned = NativeMemory.AlignedRealloc(aligned, 16ul, 16ul);
+        Console.WriteLine(aligned != null);
+        NativeMemory.AlignedFree(aligned);
+        caught = false;
+        try { NativeMemory.Alloc(18446744073709551615ul, 2ul); } catch (OutOfMemoryException e) { caught = true; }
+        Console.WriteLine(caught);
+        NativeMemory.Copy(null, null, 0ul);
+        Console.WriteLine(true);
+    }
+}

@@ -1,0 +1,159 @@
+using Void;
+
+public interface IToInt<T>
+{
+    static implicit operator int(T value);
+}
+
+public interface IFromInt<T>
+{
+    static explicit operator T(int value);
+}
+
+public interface IConvert<T> : IToInt<T>, IFromInt<T>
+{
+}
+
+public struct Number : IConvert<Number>
+{
+    public int Value;
+
+    public Number(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator int(Number value)
+    {
+        return value.Value;
+    }
+
+    public static explicit operator Number(int value)
+    {
+        return new Number(value);
+    }
+}
+
+public sealed class Box : IToInt<Box>
+{
+    public int Value;
+
+    public Box(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator int(Box value)
+    {
+        return value.Value;
+    }
+}
+
+public interface IToLong<T>
+{
+    static implicit operator long(T value);
+}
+
+public interface IMultiTarget<T> : IToInt<T>, IToLong<T>
+{
+}
+
+public struct MultiTarget : IMultiTarget<MultiTarget>
+{
+    public int Value;
+
+    public MultiTarget(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator int(MultiTarget value)
+    {
+        return value.Value + 10;
+    }
+
+    public static implicit operator long(MultiTarget value)
+    {
+        return (long)value.Value + 20L;
+    }
+}
+
+public interface IFromShort<T>
+{
+    static implicit operator T(short value);
+}
+
+public struct FromShort : IFromShort<FromShort>
+{
+    public int Value;
+
+    public FromShort(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator FromShort(short value)
+    {
+        return new FromShort((int)value + 30);
+    }
+}
+
+public interface ILeft<T>
+{
+    static implicit operator int(T value);
+}
+
+public interface IRight<T>
+{
+    static implicit operator int(T value);
+}
+
+public interface IDiamond<T> : ILeft<T>, IRight<T>
+{
+}
+
+public struct Diamond : IDiamond<Diamond>
+{
+    public int Value;
+
+    public Diamond(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator int(Diamond value)
+    {
+        return value.Value + 40;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Number number = new Number(7);
+        int numberValue = number;
+        Console.WriteLine(numberValue == 7);
+
+        Number fromInt = (Number)8;
+        Console.WriteLine(fromInt.Value == 8);
+
+        Box box = new Box(9);
+        int boxValue = box;
+        Console.WriteLine(boxValue == 9);
+
+        MultiTarget multi = new MultiTarget(10);
+        int asInt = multi;
+        long asLong = multi;
+        Console.WriteLine(asInt == 20);
+        Console.WriteLine(asLong == 30L);
+
+        short small = (short)11;
+        FromShort fromShort = small;
+        Console.WriteLine(fromShort.Value == 41);
+
+        Diamond diamond = new Diamond(12);
+        int diamondValue = diamond;
+        Console.WriteLine(diamondValue == 52);
+    }
+}

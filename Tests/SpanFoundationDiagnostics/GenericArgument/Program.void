@@ -1,0 +1,3 @@
+using Void;
+public sealed class Box<T> { public int Marker; }
+public static class Program { public static void Main() { Box<Span<int>> value = new Box<Span<int>>(); Console.WriteLine(value.Marker); } }

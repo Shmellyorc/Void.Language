@@ -1,0 +1,1 @@
+public static class Program { public static unsafe void Main(){ int[,] a = new int[2,2]; fixed (int* p = a) { } } }

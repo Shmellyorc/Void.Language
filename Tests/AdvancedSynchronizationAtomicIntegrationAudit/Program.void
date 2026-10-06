@@ -1,0 +1,409 @@
+using Void;
+using Void.Threading;
+
+public interface IAuditScore
+{
+    int Score();
+}
+
+public sealed class AuditPayload
+{
+    public int Value;
+
+    public AuditPayload(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class AuditNode : IAuditScore
+{
+    public int Value;
+    public AuditPayload Payload;
+
+    public AuditNode(int value)
+    {
+        Value = value;
+        Payload = new AuditPayload(value + 1000);
+    }
+
+    public int Score()
+    {
+        return Value;
+    }
+}
+
+public sealed class AlternateAuditNode : IAuditScore
+{
+    public int Value;
+    public AuditPayload Payload;
+
+    public AlternateAuditNode(int value)
+    {
+        Value = value;
+        Payload = new AuditPayload(value + 2000);
+    }
+
+    public int Score()
+    {
+        return Value;
+    }
+}
+
+public sealed class AuditException : Exception
+{
+    public int Code;
+    public AuditPayload Payload;
+
+    public AuditException(string message, int code, AuditPayload payload) : base(message)
+    {
+        Code = code;
+        Payload = payload;
+    }
+}
+
+public sealed class AuditState
+{
+    public int Ready;
+    public int Phase;
+    public int Woken;
+    public int Completed;
+    public int Sum;
+    public long LongSum;
+    public int GenericCount;
+    public int DelegateCount;
+    public int NestedCount;
+    public int ReferenceOk;
+    public int PublishedOk;
+    public int DisposeCount;
+    public int FinallyCount;
+    public int ExceptionCount;
+    public int LongPublicationOk;
+    public long LongSignal;
+    public AuditNode SharedRef;
+    public AuditNode Published;
+}
+
+public sealed class AuditResource : IDisposable
+{
+    private AuditState _state;
+
+    public AuditResource(AuditState state)
+    {
+        _state = state;
+    }
+
+    public void Dispose()
+    {
+        Interlocked.Increment(ref _state.DisposeCount);
+        GC.Collect();
+    }
+}
+
+public sealed class AuditRunner<T> where T : IAuditScore
+{
+    private AuditState _state;
+    private T _value;
+    private int _bias;
+    private bool _throwOnExit;
+
+    public AuditRunner(AuditState state, T value, int bias, bool throwOnExit)
+    {
+        _state = state;
+        _value = value;
+        _bias = bias;
+        _throwOnExit = throwOnExit;
+    }
+
+    public void Run()
+    {
+        Program.ExecuteWorker<T>(_state, _value, _bias, _throwOnExit, false);
+    }
+}
+
+public static class Program
+{
+    public static int ReadScore<T>(T value) where T : IAuditScore
+    {
+        return value.Score();
+    }
+
+    public static void WaitForRelease(AuditState state)
+    {
+        lock (state)
+        {
+            // Recursive ownership makes the final lock exit a runtime proof that
+            // Wait restored the full depth after the explicit Exit below.
+            Monitor.Enter(state);
+            Interlocked.Increment(ref state.Ready);
+            while (Volatile.Read(ref state.Phase) == 0)
+                Monitor.Wait(state);
+            Monitor.Exit(state);
+        }
+
+        Interlocked.Increment(ref state.Woken);
+    }
+
+    public static void Record<T>(AuditState state, T value, int bias) where T : IAuditScore
+    {
+        int score = ReadScore<T>(value) + bias;
+
+        AuditNode replacement = new AuditNode(score);
+        AuditNode previous = Interlocked.Exchange(ref state.SharedRef, replacement);
+        GC.Collect();
+        if (previous != null && previous.Payload != null && previous.Payload.Value == previous.Value + 1000)
+            Interlocked.Increment(ref state.ReferenceOk);
+
+        Volatile.Write(ref state.Published, replacement);
+        AuditNode published = Volatile.Read(ref state.Published);
+        GC.Collect();
+        if (published != null && published.Payload != null && published.Payload.Value == published.Value + 1000)
+            Interlocked.Increment(ref state.PublishedOk);
+
+        if (Volatile.Read(ref state.LongSignal) == 9876543210L)
+            Interlocked.Increment(ref state.LongPublicationOk);
+
+        Interlocked.Add(ref state.Sum, score);
+        Interlocked.Add(ref state.LongSum, score);
+        Interlocked.Increment(ref state.GenericCount);
+    }
+
+    public static void RunNested(AuditState state)
+    {
+        Action nestedAction = () =>
+        {
+            Interlocked.Add(ref state.Sum, 5);
+            Interlocked.Add(ref state.LongSum, 5);
+            Interlocked.Increment(ref state.NestedCount);
+            GC.Collect();
+        };
+
+        Thread nested = new Thread(nestedAction);
+        nestedAction = null;
+        nested.Start();
+        GC.Collect();
+        nested.Join();
+    }
+
+    public static void ExecuteWorker<T>(AuditState state, T value, int bias, bool throwOnExit, bool nested)
+        where T : IAuditScore
+    {
+        try
+        {
+            using (AuditResource resource = new AuditResource(state))
+            {
+                WaitForRelease(state);
+                Record<T>(state, value, bias);
+                if (nested)
+                    RunNested(state);
+
+                if (throwOnExit)
+                {
+                    int score = ReadScore<T>(value) + bias;
+                    throw new AuditException(
+                        "advanced synchronization audit",
+                        700 + bias,
+                        new AuditPayload(score + 5000));
+                }
+            }
+        }
+        finally
+        {
+            Interlocked.Increment(ref state.FinallyCount);
+            Interlocked.Increment(ref state.Completed);
+            GC.Collect();
+        }
+    }
+
+    public static Action MakeCapturedWorker<T>(AuditState state, T value, int bias, bool nested)
+        where T : IAuditScore
+    {
+        return () => ExecuteWorker<T>(state, value, bias, false, nested);
+    }
+
+    public static void WaitForReady(AuditState state, int count)
+    {
+        while (Volatile.Read(ref state.Ready) < count)
+            GC.Collect();
+    }
+
+    public static void WaitForWoken(AuditState state, int count)
+    {
+        while (Volatile.Read(ref state.Woken) < count)
+            GC.Collect();
+    }
+
+    public static void ReleaseOneThenAll(AuditState state)
+    {
+        WaitForReady(state, 3);
+
+        lock (state)
+        {
+            Volatile.Write(ref state.LongSignal, 9876543210L);
+            Volatile.Write(ref state.Phase, 1);
+            Monitor.Pulse(state);
+        }
+
+        WaitForWoken(state, 1);
+        Console.WriteLine(Volatile.Read(ref state.Woken) == 1);
+        GC.Collect();
+
+        lock (state)
+        {
+            Monitor.PulseAll(state);
+        }
+
+        WaitForWoken(state, 3);
+    }
+
+    public static void RunReuseCase()
+    {
+        AuditState state = new AuditState();
+        state.SharedRef = new AuditNode(300);
+        state.Published = new AuditNode(400);
+
+        AuditNode value = new AuditNode(7);
+        Action action = MakeCapturedWorker<AuditNode>(state, value, 6, false);
+        Thread thread = new Thread(action);
+        value = null;
+        action = null;
+
+        thread.Start();
+        WaitForReady(state, 1);
+        lock (state)
+        {
+            Volatile.Write(ref state.LongSignal, 9876543210L);
+            Volatile.Write(ref state.Phase, 1);
+            Monitor.Pulse(state);
+        }
+        thread.Join();
+        GC.Collect();
+
+        Console.WriteLine(state.Ready == 1);
+        Console.WriteLine(state.Woken == 1);
+        Console.WriteLine(state.Completed == 1);
+        Console.WriteLine(state.DisposeCount == 1 && state.FinallyCount == 1);
+        Console.WriteLine(state.ReferenceOk == 1 && state.PublishedOk == 1 && state.LongPublicationOk == 1);
+        Console.WriteLine(state.Sum == 13 && state.LongSum == 13L);
+    }
+
+    public static void Main()
+    {
+        int integer = 10;
+        bool integerOk = Interlocked.Increment(ref integer) == 11 &&
+            Interlocked.Decrement(ref integer) == 10 &&
+            Interlocked.Add(ref integer, 7) == 17 &&
+            Interlocked.Exchange(ref integer, 20) == 17 &&
+            Interlocked.CompareExchange(ref integer, 30, 20) == 20 &&
+            Interlocked.CompareExchange(ref integer, 99, 20) == 30 && integer == 30;
+        Console.WriteLine(integerOk);
+
+        long wide = 100L;
+        bool longOk = Interlocked.Increment(ref wide) == 101L &&
+            Interlocked.Decrement(ref wide) == 100L &&
+            Interlocked.Add(ref wide, 50L) == 150L &&
+            Interlocked.Exchange(ref wide, 200L) == 150L &&
+            Interlocked.CompareExchange(ref wide, 250L, 200L) == 200L &&
+            Interlocked.CompareExchange(ref wide, 999L, 200L) == 250L && wide == 250L;
+        Console.WriteLine(longOk);
+
+        AuditState state = new AuditState();
+        state.SharedRef = new AuditNode(80);
+        state.Published = new AuditNode(81);
+
+        AuditNode original = state.SharedRef;
+        AuditNode candidate = new AuditNode(90);
+        AuditNode observed = Interlocked.CompareExchange(ref state.SharedRef, candidate, original);
+        original = null;
+        GC.Collect();
+        Console.WriteLine(observed != null && observed.Value == 80 && observed.Payload.Value == 1080 && state.SharedRef.Value == 90);
+
+        AuditNode failedCandidate = new AuditNode(91);
+        AuditNode failedComparand = new AuditNode(999);
+        AuditNode failedObserved = Interlocked.CompareExchange(ref state.SharedRef, failedCandidate, failedComparand);
+        failedCandidate = null;
+        failedComparand = null;
+        GC.Collect();
+        Console.WriteLine(failedObserved != null && failedObserved.Value == 90 && failedObserved.Payload.Value == 1090 && state.SharedRef.Value == 90);
+
+        AuditNode firstValue = new AuditNode(10);
+        Action firstAction = MakeCapturedWorker<AuditNode>(state, firstValue, 1, true);
+        Thread first = new Thread(firstAction);
+        firstValue = null;
+        firstAction = null;
+
+        AlternateAuditNode secondValue = new AlternateAuditNode(20);
+        AuditRunner<AlternateAuditNode> runner = new AuditRunner<AlternateAuditNode>(state, secondValue, 2, true);
+        Action secondAction = runner.Run;
+        Thread second = new Thread(secondAction);
+        secondValue = null;
+        runner = null;
+        secondAction = null;
+
+        AuditNode thirdValue = new AuditNode(30);
+        Action multicast = () =>
+        {
+            ExecuteWorker<AuditNode>(state, thirdValue, 3, false, false);
+            Interlocked.Increment(ref state.DelegateCount);
+        };
+        multicast += () =>
+        {
+            GC.Collect();
+            Interlocked.Add(ref state.Sum, 4);
+            Interlocked.Add(ref state.LongSum, 4);
+            Interlocked.Increment(ref state.DelegateCount);
+        };
+        Thread third = new Thread(multicast);
+        multicast = null;
+
+        first.Start();
+        second.Start();
+        third.Start();
+
+        ReleaseOneThenAll(state);
+
+        for (int i = 0; i < 16; i++)
+            GC.Collect();
+
+        first.Join();
+
+        bool caught = false;
+        try
+        {
+            second.Join();
+        }
+        catch (AuditException error)
+        {
+            caught = error.Message == "advanced synchronization audit" &&
+                error.Code == 702 && error.Payload != null && error.Payload.Value == 5022;
+            Interlocked.Increment(ref state.ExceptionCount);
+        }
+
+        third.Join();
+        GC.Collect();
+
+        Console.WriteLine(caught);
+        Console.WriteLine(state.Ready == 3);
+        Console.WriteLine(state.Woken == 3);
+        Console.WriteLine(state.Completed == 3);
+        Console.WriteLine(state.GenericCount == 3);
+        Console.WriteLine(state.DelegateCount == 2);
+        Console.WriteLine(state.NestedCount == 1);
+        Console.WriteLine(state.ReferenceOk == 3);
+        Console.WriteLine(state.PublishedOk == 3);
+        Console.WriteLine(state.DisposeCount == 3);
+        Console.WriteLine(state.FinallyCount == 3);
+        Console.WriteLine(state.ExceptionCount == 1);
+        Console.WriteLine(state.LongPublicationOk == 3);
+        Console.WriteLine(state.Sum == 75);
+        Console.WriteLine(state.LongSum == 75L);
+        Console.WriteLine(Volatile.Read(ref state.Phase) == 1);
+        Console.WriteLine(Volatile.Read(ref state.LongSignal) == 9876543210L);
+        Console.WriteLine(state.SharedRef != null && state.SharedRef.Payload != null && state.SharedRef.Payload.Value == state.SharedRef.Value + 1000);
+        Console.WriteLine(state.Published != null && state.Published.Payload != null && state.Published.Payload.Value == state.Published.Value + 1000);
+
+        // Runtime and condition queues must still be reusable after the mixed
+        // pulse-one/pulse-all workload and cross-thread exception delivery.
+        RunReuseCase();
+    }
+}

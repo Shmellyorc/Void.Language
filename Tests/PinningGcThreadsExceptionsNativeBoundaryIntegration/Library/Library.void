@@ -1,0 +1,201 @@
+using Void;
+using Void.Threading;
+
+public sealed class PinBoundaryException249 : Exception
+{
+    public int Code;
+
+    public PinBoundaryException249(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public delegate int PinCallback249(int value);
+
+public static class Native249
+{
+    [Native("voidc249_reset")]
+    public static unsafe extern void Reset();
+
+    [Native("voidc249_block_until_release")]
+    public static unsafe extern int BlockUntilRelease(Span<int> values);
+
+    [Native("voidc249_ready")]
+    public static unsafe extern int Ready();
+
+    [Native("voidc249_release")]
+    public static unsafe extern void Release();
+
+    [Native("voidc249_roundtrip")]
+    public static unsafe extern int Roundtrip(Span<int> values, PinCallback249 callback, int tag);
+
+    [Native("voidc249_two_buffers")]
+    public static unsafe extern int TwoBuffers(
+        Span<int> writable,
+        ReadOnlySpan<int> readable,
+        PinCallback249 callback,
+        int tag);
+
+    [Native("voidc249_observe_pin")]
+    public static unsafe extern int ObservePin(Span<int> values);
+
+    [Native("voidc249_pin_count")]
+    public static unsafe extern int PinCount(int* data);
+}
+
+public static class PinIntegration249
+{
+    private static int CollectCallback(int value)
+    {
+        GC.Collect();
+        GC.Collect();
+        return value + 1;
+    }
+
+    private static int ThrowCallback(int value)
+    {
+        GC.Collect();
+        throw new PinBoundaryException249("native buffer callback", value);
+    }
+
+    [Export("void249_concurrent_gc")]
+    public static unsafe int ConcurrentGc()
+    {
+        Native249.Reset();
+        int[] values = new int[] { 10, 20, 30, 40, 50 };
+        int workerResult = -1;
+
+        Thread worker = new Thread(() =>
+        {
+            Span<int> middle = new Span<int>(values, 1, 3);
+            workerResult = Native249.BlockUntilRelease(middle);
+        });
+        worker.Start();
+
+        while (Native249.Ready() == 0)
+            Thread.Sleep(1);
+
+        for (int i = 0; i < 4; i++)
+            GC.Collect();
+
+        Native249.Release();
+        worker.Join();
+
+        return workerResult == 90 &&
+            values[0] == 10 && values[1] == 21 && values[2] == 31 && values[3] == 41 && values[4] == 50 ? 1 : 0;
+    }
+
+    [Export("void249_callback_gc")]
+    public static unsafe int CallbackGc()
+    {
+        Native249.Reset();
+        int[] values = new int[] { 2, 4, 6, 8 };
+        int workerResult = -1;
+
+        Thread worker = new Thread(() =>
+        {
+            Memory<int> memory = new Memory<int>(values, 1, 3);
+            workerResult = Native249.Roundtrip(memory.Span, CollectCallback, 40);
+        });
+        worker.Start();
+        worker.Join();
+
+        return workerResult == 59 &&
+            values[0] == 2 && values[1] == 14 && values[2] == 16 && values[3] == 18 ? 1 : 0;
+    }
+
+    [Export("void249_callback_exception")]
+    public static unsafe int CallbackException()
+    {
+        Native249.Reset();
+        int[] values = new int[] { 3, 6, 9, 12 };
+        int finallyCount = 0;
+
+        Thread worker = new Thread(() =>
+        {
+            try
+            {
+                Span<int> span = new Span<int>(values, 1, 2);
+                Native249.Roundtrip(span, ThrowCallback, 73);
+            }
+            finally
+            {
+                finallyCount++;
+            }
+        });
+        worker.Start();
+
+        bool caught = false;
+        try
+        {
+            worker.Join();
+        }
+        catch (PinBoundaryException249 error)
+        {
+            caught = error.Code == 73;
+        }
+
+        GC.Collect();
+        return caught && finallyCount == 1 &&
+            values[0] == 3 && values[1] == 16 && values[2] == 19 && values[3] == 12 ? 1 : 0;
+    }
+
+    [Export("void249_fixed_nested_native")]
+    public static unsafe int FixedNestedNative()
+    {
+        Native249.Reset();
+        int[] values = new int[] { 5, 6, 7 };
+        Span<int> span = new Span<int>(values);
+        int nestedCount = -1;
+        int fixedOnlyCount = -1;
+
+        fixed (int* p = values)
+        {
+            GC.Collect();
+            nestedCount = Native249.ObservePin(span);
+            fixedOnlyCount = Native249.PinCount(p);
+            p[1] = 60;
+        }
+
+        GC.Collect();
+        return nestedCount == 2 && fixedOnlyCount == 1 && values[1] == 60 ? 1 : 0;
+    }
+
+    [Export("void249_two_buffer_memory")]
+    public static unsafe int TwoBufferMemory()
+    {
+        Native249.Reset();
+        int[] values = new int[] { 7, 8, 9, 10, 11 };
+        Memory<int> memory = new Memory<int>(values, 1, 3);
+        Span<int> writable = memory.Span;
+        ReadOnlySpan<int> readable = new ReadOnlySpan<int>(values, 2, 2);
+
+        int result = Native249.TwoBuffers(writable, readable, CollectCallback, 20);
+        return result == 40 &&
+            values[0] == 7 && values[1] == 9 && values[2] == 10 && values[3] == 11 && values[4] == 11 ? 1 : 0;
+    }
+
+    [Export("void249_ownerless_stack")]
+    public static unsafe int OwnerlessStack()
+    {
+        Native249.Reset();
+        int* values = stackalloc int[3];
+        values[0] = 4;
+        values[1] = 5;
+        values[2] = 6;
+        Span<int> span = new Span<int>(values, 3);
+        int result = Native249.Roundtrip(span, CollectCallback, 10);
+        return result == 26 && values[0] == 14 && values[1] == 15 && values[2] == 16 ? 1 : 0;
+    }
+
+    [Export("void249_post_failure_reuse")]
+    public static unsafe int PostFailureReuse()
+    {
+        int[] values = new int[] { 1, 2, 3 };
+        int result = Native249.Roundtrip(values, CollectCallback, 5);
+        GC.Collect();
+        Exception marker = new Exception("post-failure marker");
+        return marker.Message != null && result == 12 && values[0] == 11 && values[1] == 12 && values[2] == 13 ? 1 : 0;
+    }
+}

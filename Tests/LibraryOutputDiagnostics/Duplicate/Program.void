@@ -1,0 +1,1 @@
+public static class Api { [Export("same_symbol")] public static int A() { return 1; } [Export("same_symbol")] public static int B() { return 2; } }

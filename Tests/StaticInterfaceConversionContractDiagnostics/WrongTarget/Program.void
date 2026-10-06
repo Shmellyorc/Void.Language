@@ -1,0 +1,6 @@
+public interface IConvert<T> { static implicit operator int(T value); }
+public struct Number : IConvert<Number>
+{
+    public static implicit operator long(Number value) { return 0L; }
+}
+public static class Program { public static void Main() { } }

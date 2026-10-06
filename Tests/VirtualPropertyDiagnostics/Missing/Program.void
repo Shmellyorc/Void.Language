@@ -1,0 +1,3 @@
+public class BaseValue { }
+public sealed class Broken : BaseValue { public override int Value => 2; }
+public static class Program { public static void Main() { Broken value = new(); Console.WriteLine(value.Value); } }

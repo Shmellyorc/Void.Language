@@ -1,0 +1,74 @@
+using Void.Collections;
+
+public sealed class Item
+{
+    private int _value;
+    public int Value => _value;
+
+    public Item(int value)
+    {
+        _value = value;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        List<int> values = new();
+        values.Add(3);
+        values.Add(4);
+        values.Add(5);
+
+        int total = 0;
+        foreach (var value in values)
+            total += value;
+        Console.WriteLine(total);
+
+        IEnumerable<int> sequence = values;
+        int selected = 0;
+        foreach (int value in sequence)
+        {
+            if (value == 4)
+                continue;
+            selected += value;
+            if (value == 5)
+                break;
+        }
+        Console.WriteLine(selected);
+
+        List<Item> items = new();
+        items.Add(new Item(7));
+        items.Add(new Item(8));
+        GC.Collect();
+        foreach (var item in items)
+            Console.WriteLine(item.Value);
+
+        List<int> empty = new();
+        int count = 0;
+        foreach (var value in empty)
+            count++;
+        Console.WriteLine(count);
+
+        int[] array = new int[3];
+        array[0] = 2;
+        array[1] = 4;
+        array[2] = 6;
+        int arrayTotal = 0;
+        foreach (var value in array)
+        {
+            if (value == 4)
+                continue;
+            arrayTotal += value;
+        }
+        Console.WriteLine(arrayTotal);
+
+        int pairs = 0;
+        foreach (var left in values)
+        {
+            foreach (var right in values)
+                pairs++;
+        }
+        Console.WriteLine(pairs);
+    }
+}

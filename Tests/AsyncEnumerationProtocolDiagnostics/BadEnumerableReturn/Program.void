@@ -1,0 +1,12 @@
+using Void.Collections;
+using Void.Threading;
+
+public sealed class Bad215 : IAsyncEnumerable<int>
+{
+    public IAsyncEnumerator<string> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+    {
+        return null;
+    }
+}
+
+public static class Program { public static void Main() {} }

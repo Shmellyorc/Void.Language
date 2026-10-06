@@ -1,0 +1,1 @@
+public interface IMark { } public class Base : IMark { } public sealed class Child : Base { } public sealed class Box<T> where T : IMark, Base { } public static class Program { public static void Main() { Box<Child> value = new Box<Child>(); } }

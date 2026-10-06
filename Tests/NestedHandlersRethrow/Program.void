@@ -1,0 +1,409 @@
+public sealed class NestedError : Exception
+{
+    public int Code;
+
+    public NestedError(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class NestedNode
+{
+    public int Value;
+
+    public NestedNode(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    public static int Sequence;
+
+    public static bool BasicNestedCatch()
+    {
+        try
+        {
+            try
+            {
+                throw new NestedError("inner", 1);
+            }
+            catch (NestedError error)
+            {
+                return error.Code == 1;
+            }
+        }
+        catch (Exception error)
+        {
+            return error == null;
+        }
+        return false;
+    }
+
+    public static bool TypedRethrowIdentity()
+    {
+        NestedError original = new NestedError("same", 2);
+        try
+        {
+            try
+            {
+                throw original;
+            }
+            catch (NestedError error)
+            {
+                if (error.Code != 2)
+                    return false;
+                throw;
+            }
+        }
+        catch (NestedError error)
+        {
+            return error == original && error.Code == 2 && Runtime.Equals(error.Message, "same");
+        }
+        return false;
+    }
+
+    public static bool CatchAllRethrowSurvivesGc()
+    {
+        try
+        {
+            try
+            {
+                throw new NestedError("rooted", 3);
+            }
+            catch
+            {
+                GC.Collect();
+                throw;
+            }
+        }
+        catch (NestedError error)
+        {
+            return error.Code == 3 && Runtime.Equals(error.Message, "rooted");
+        }
+        return false;
+    }
+
+    public static bool RethrowRestoresOuterCatch()
+    {
+        try
+        {
+            try
+            {
+                throw new NestedError("outer", 4);
+            }
+            catch (NestedError outer)
+            {
+                if (outer.Code != 4)
+                    return false;
+
+                try
+                {
+                    try
+                    {
+                        throw new NestedError("inner", 5);
+                    }
+                    catch (NestedError inner)
+                    {
+                        if (inner.Code != 5)
+                            return false;
+                        throw;
+                    }
+                }
+                catch (NestedError innerAgain)
+                {
+                    if (innerAgain.Code != 5)
+                        return false;
+                }
+
+                throw;
+            }
+        }
+        catch (NestedError outerAgain)
+        {
+            return outerAgain.Code == 4 && Runtime.Equals(outerAgain.Message, "outer");
+        }
+        return false;
+    }
+
+    public static bool RethrowRunsFinally()
+    {
+        Sequence = 0;
+        try
+        {
+            try
+            {
+                Sequence = 1;
+                throw new NestedError("finally", 6);
+            }
+            catch (NestedError error)
+            {
+                Sequence = Sequence * 10 + 2;
+                if (error.Code != 6)
+                    return false;
+                throw;
+            }
+            finally
+            {
+                Sequence = Sequence * 10 + 3;
+            }
+        }
+        catch (NestedError error)
+        {
+            Sequence = Sequence * 10 + 4;
+            return error.Code == 6 && Sequence == 1234;
+        }
+        return false;
+    }
+
+    public static int ReturnThroughTwoFinalies()
+    {
+        Sequence = 0;
+        try
+        {
+            try
+            {
+                Sequence = 1;
+                return 7;
+            }
+            finally
+            {
+                Sequence = Sequence * 10 + 2;
+            }
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 3;
+        }
+    }
+
+    public static bool BreakThroughTwoFinalies()
+    {
+        Sequence = 0;
+        while (true)
+        {
+            try
+            {
+                try
+                {
+                    Sequence = 1;
+                    break;
+                }
+                finally
+                {
+                    Sequence = Sequence * 10 + 2;
+                }
+            }
+            finally
+            {
+                Sequence = Sequence * 10 + 3;
+            }
+        }
+        return Sequence == 123;
+    }
+
+    public static int ReturnFromNestedHandlers()
+    {
+        try
+        {
+            try
+            {
+                return 42;
+            }
+            catch (NestedError error)
+            {
+                return error.Code;
+            }
+        }
+        catch (Exception error)
+        {
+            return error == null ? -1 : -2;
+        }
+    }
+
+    public static bool ReturnedMethodRestoresCallerHandler()
+    {
+        try
+        {
+            int value = ReturnFromNestedHandlers();
+            throw new NestedError("caller", value);
+        }
+        catch (NestedError error)
+        {
+            return error.Code == 42;
+        }
+        return false;
+    }
+
+    public static bool NestedExceptionAcrossTwoFinalies()
+    {
+        Sequence = 0;
+        try
+        {
+            try
+            {
+                try
+                {
+                    Sequence = 1;
+                    throw new NestedError("deep", 8);
+                }
+                finally
+                {
+                    Sequence = Sequence * 10 + 2;
+                }
+            }
+            finally
+            {
+                Sequence = Sequence * 10 + 3;
+            }
+        }
+        catch (NestedError error)
+        {
+            Sequence = Sequence * 10 + 4;
+            return error.Code == 8 && Sequence == 1234;
+        }
+        return false;
+    }
+
+    public static bool RethrowInsideNestedTryInCatch()
+    {
+        NestedError original = new NestedError("lexical", 9);
+        try
+        {
+            throw original;
+        }
+        catch (NestedError outer)
+        {
+            try
+            {
+                throw;
+            }
+            catch (NestedError again)
+            {
+                return again == outer && again == original;
+            }
+        }
+        return false;
+    }
+
+    public static bool InnerHandlerContinueStaysInsideOuterTry()
+    {
+        Sequence = 0;
+        int count = 0;
+        try
+        {
+            while (count < 2)
+            {
+                try
+                {
+                    count++;
+                    Sequence = Sequence * 10 + count;
+                    continue;
+                }
+                catch (NestedError error)
+                {
+                    return error.Code == -1;
+                }
+            }
+            Sequence = Sequence * 10 + 7;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 8;
+        }
+        return Sequence == 1278;
+    }
+
+    public static bool InnerHandlerBreakStaysInsideOuterTry()
+    {
+        Sequence = 0;
+        try
+        {
+            while (true)
+            {
+                try
+                {
+                    Sequence = 1;
+                    break;
+                }
+                catch (NestedError error)
+                {
+                    return error.Code == -1;
+                }
+            }
+            Sequence = Sequence * 10 + 2;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 3;
+        }
+        return Sequence == 123;
+    }
+
+    public static NestedNode ReturnManagedThroughTwoFinalies()
+    {
+        try
+        {
+            try
+            {
+                return new NestedNode(42);
+            }
+            finally
+            {
+                GC.Collect();
+            }
+        }
+        finally
+        {
+            GC.Collect();
+        }
+    }
+
+    public static void AssignOutThroughTwoFinalies(out int value)
+    {
+        try
+        {
+            try
+            {
+                return;
+            }
+            finally
+            {
+            }
+        }
+        finally
+        {
+            value = 10;
+        }
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(BasicNestedCatch());
+        Console.WriteLine(TypedRethrowIdentity());
+        Console.WriteLine(CatchAllRethrowSurvivesGc());
+        Console.WriteLine(RethrowRestoresOuterCatch());
+        Console.WriteLine(RethrowRunsFinally());
+
+        int returned = ReturnThroughTwoFinalies();
+        Console.WriteLine(returned == 7);
+        Console.WriteLine(Sequence == 123);
+
+        Console.WriteLine(BreakThroughTwoFinalies());
+        Console.WriteLine(ReturnedMethodRestoresCallerHandler());
+        Console.WriteLine(NestedExceptionAcrossTwoFinalies());
+        Console.WriteLine(RethrowInsideNestedTryInCatch());
+        Console.WriteLine(InnerHandlerContinueStaysInsideOuterTry());
+        Console.WriteLine(InnerHandlerBreakStaysInsideOuterTry());
+
+        NestedNode node = ReturnManagedThroughTwoFinalies();
+        GC.Collect();
+        Console.WriteLine(node != null && node.Value == 42);
+
+        int outValue;
+        AssignOutThroughTwoFinalies(out outValue);
+        Console.WriteLine(outValue == 10);
+    }
+}

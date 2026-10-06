@@ -1,0 +1,254 @@
+using Void;
+using Void.Collections;
+
+public enum GameMode
+{
+    None = 0,
+    Playing = 1,
+    Paused = 2
+}
+
+public struct Damage
+{
+    public int Value;
+
+    public Damage(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator Damage(int value)
+    {
+        return new Damage(value);
+    }
+
+    public static implicit operator int(Damage value)
+    {
+        return value.Value;
+    }
+}
+
+public sealed class Node
+{
+    public int Id = 1;
+    public string Name { get; set; } = "Node";
+    public int? Score { get; set; } = default;
+
+    public Node(int id = 1, string name = null)
+    {
+        Id = id;
+        Name = name ?? "Node";
+    }
+
+    public int ReadScore(int fallback = 0)
+    {
+        return Score ?? fallback;
+    }
+}
+
+public static class Factory
+{
+    public static Node Create(int id = 1, string name = null, int? score = default)
+    {
+        return new Node(id: id, name: name)
+        {
+            Score = score
+        };
+    }
+}
+
+public class Cache<T>
+{
+    public static T Value = default;
+    public static int Runs = 0;
+
+    static Cache()
+    {
+        Runs += 1;
+    }
+
+    public int ReadRuns()
+    {
+        return Runs;
+    }
+
+    public T ReadValue()
+    {
+        return Value;
+    }
+
+    public void WriteValue(T value)
+    {
+        Value = value;
+    }
+}
+
+public static class Registry
+{
+    public static int InitRuns = 0;
+    public static readonly int Seed = 10;
+
+    public static Node Primary { get; set; } = Factory.Create(
+        name: "Alpha",
+        score: 5,
+        id: Seed);
+
+    public static List<Node> Nodes { get; set; } = new List<Node>
+    {
+        Primary,
+        new Node(name: "Beta", id: 20)
+        {
+            Score = default
+        },
+        new Node(id: 30)
+        {
+            Name = "Gamma",
+            Score = 9
+        }
+    };
+
+    public static List<Damage> DamageValues { get; set; } = new()
+    {
+        2,
+        3,
+        4
+    };
+
+    public static int? LastScore = default;
+    public static int Ready { get; private set; } = 0;
+
+    static Registry()
+    {
+        InitRuns += 1;
+        LastScore ??= Nodes?[0]?.Score;
+        Ready = Seed + Nodes.Count;
+        GC.Collect();
+    }
+
+    public static int Resolve(int index = 0, int fallback = -1)
+    {
+        return Nodes?[index]?.Score ?? fallback;
+    }
+}
+
+public static class Program
+{
+    public static int Started = 1;
+
+    static Program()
+    {
+        Started += 1;
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(Started == 2);
+
+        Console.WriteLine(Registry.InitRuns == 1);
+        Console.WriteLine(Registry.Seed == 10);
+        Console.WriteLine(Registry.Ready == 13);
+        Console.WriteLine(Registry.LastScore.HasValue);
+        Console.WriteLine(Registry.LastScore.Value == 5);
+        Console.WriteLine(Registry.InitRuns == 1);
+
+        Console.WriteLine(Registry.Primary.Id == 10);
+        string alpha = "Alpha";
+        Console.WriteLine(Runtime.Equals(Registry.Primary.Name, alpha));
+        Console.WriteLine(Registry.Primary.Score.Value == 5);
+
+        Console.WriteLine(Registry.Nodes.Count == 3);
+        Console.WriteLine(Registry.Nodes[0] == Registry.Primary);
+        Console.WriteLine(Registry.Nodes[1].Id == 20);
+        string beta = "Beta";
+        Console.WriteLine(Runtime.Equals(Registry.Nodes[1].Name, beta));
+        Console.WriteLine(!Registry.Nodes[1].Score.HasValue);
+        Console.WriteLine(Registry.Nodes[2].Id == 30);
+        string gamma = "Gamma";
+        Console.WriteLine(Runtime.Equals(Registry.Nodes[2].Name, gamma));
+        Console.WriteLine(Registry.Nodes[2].Score.Value == 9);
+
+        Console.WriteLine(Registry.DamageValues.Count == 3);
+        Console.WriteLine(Registry.DamageValues[0].Value == 2);
+        Console.WriteLine(Registry.DamageValues[1].Value == 3);
+        Console.WriteLine(Registry.DamageValues[2].Value == 4);
+
+        Console.WriteLine(Registry.Resolve() == 5);
+        Console.WriteLine(Registry.Resolve(index: 1, fallback: -5) == -5);
+        Console.WriteLine(Registry.Resolve(fallback: -5, index: 2) == 9);
+
+        int? boosted = Registry.LastScore + 2;
+        Console.WriteLine(boosted.Value == 7);
+        bool? scoreIsSmall = Registry.LastScore < 10;
+        Console.WriteLine(scoreIsSmall.Value);
+
+        Node absent = default;
+        int? absentScore = absent?.Score;
+        Console.WriteLine(!absentScore.HasValue);
+
+        Node custom = new Node(name: "Ctor", id: 50)
+        {
+            Name = "Override",
+            Score = 12
+        };
+        Console.WriteLine(custom.Id == 50);
+        string overrideName = "Override";
+        Console.WriteLine(Runtime.Equals(custom.Name, overrideName));
+        Console.WriteLine(custom.Score.Value == 12);
+
+        Node[] array = new Node[]
+        {
+            Registry.Primary,
+            new Node(id: 40)
+            {
+                Name = "Array",
+                Score = default
+            }
+        };
+        Console.WriteLine(array.Length == 2);
+        int? firstArrayScore = array?[0]?.Score;
+        Console.WriteLine(firstArrayScore.Value == 5);
+        int? missingArrayScore = array?[1]?.Score;
+        Console.WriteLine(!missingArrayScore.HasValue);
+
+        List<Node> localNodes = new()
+        {
+            custom,
+            Factory.Create(name: "Local", id: 60, score: 3)
+        };
+        Console.WriteLine(localNodes.Count == 2);
+        Console.WriteLine(localNodes[0] == custom);
+        Console.WriteLine(localNodes[1].Id == 60);
+        string local = "Local";
+        Console.WriteLine(Runtime.Equals(localNodes[1].Name, local));
+        Console.WriteLine(localNodes[1].Score.Value == 3);
+
+        List<Damage> localDamage = new() { 5, 6, 7 };
+        int damageTotal = 0;
+        for (int i = 0; i < localDamage.Count; i++)
+            damageTotal += localDamage[i].Value;
+        Console.WriteLine(damageTotal == 18);
+
+        Cache<int> intCache = new Cache<int>();
+        Console.WriteLine(intCache.ReadRuns() == 1);
+        Console.WriteLine(intCache.ReadValue() == 0);
+        intCache.WriteValue(7);
+        Console.WriteLine(intCache.ReadValue() == 7);
+        Console.WriteLine(intCache.ReadRuns() == 1);
+
+        Cache<Node> nodeCache = new Cache<Node>();
+        nodeCache.WriteValue(Registry.Primary);
+        Console.WriteLine(nodeCache.ReadRuns() == 1);
+        Console.WriteLine(nodeCache.ReadValue() == Registry.Primary);
+
+        GC.Collect();
+        Console.WriteLine(Registry.Primary.Id == 10);
+        Console.WriteLine(Registry.Nodes[2].Score.Value == 9);
+        Console.WriteLine(nodeCache.ReadValue().Id == 10);
+        Console.WriteLine(localNodes[1].Score.Value == 3);
+
+        int? empty = default;
+        Console.WriteLine(!empty.HasValue);
+        GameMode mode = default;
+        Console.WriteLine(mode == GameMode.None);
+    }
+}

@@ -1,0 +1,373 @@
+using Void.Collections;
+using Imported.Extensions;
+
+public interface IReadable
+{
+    int Read();
+}
+
+public interface IBox<T>
+{
+    T Get();
+}
+
+public sealed class ReadableNode : IReadable
+{
+    private int _value;
+
+    public ReadableNode(int value)
+    {
+        _value = value;
+    }
+
+    public int Read()
+    {
+        return _value;
+    }
+}
+
+public sealed class IntBox : IBox<int>
+{
+    private int _value;
+
+    public IntBox(int value)
+    {
+        _value = value;
+    }
+
+    public int Get()
+    {
+        return _value;
+    }
+}
+
+public class BaseNode
+{
+    public int Value;
+
+    public BaseNode(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class DerivedNode : BaseNode
+{
+    public DerivedNode(int value) : base(value)
+    {
+    }
+}
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Holder
+{
+    public Node Item { get; set; }
+}
+
+public sealed class HasInstance
+{
+    public int Value()
+    {
+        return 1;
+    }
+}
+
+public struct Counter
+{
+    public int Value;
+
+    public Counter(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class ExtensionFailure : Exception
+{
+    public ExtensionFailure(string message) : base(message)
+    {
+    }
+}
+
+public static class RootExtensions
+{
+    public static int Twice(this int value)
+    {
+        return value * 2;
+    }
+
+    public static int Plus(this int value, int amount = 3)
+    {
+        return value + amount;
+    }
+
+    public static int Adjust(this int value, int add, int factor)
+    {
+        return (value + add) * factor;
+    }
+
+    public static int Sum(this int value, params int[] rest)
+    {
+        int total = value;
+        for (int i = 0; i < rest.Length; i++)
+            total += rest[i];
+        return total;
+    }
+
+    public static int Kind(this int value)
+    {
+        return 1;
+    }
+
+    public static int Kind(this float value)
+    {
+        return 2;
+    }
+
+    public static T Echo<T>(this T value)
+    {
+        return value;
+    }
+
+    public static T First<T>(this T[] values)
+    {
+        return values[0];
+    }
+
+    public static U Second<T, U>(this T value, U other)
+    {
+        return other;
+    }
+
+    public static int ReadExtension<T>(this T value) where T : IReadable
+    {
+        return value.Read();
+    }
+
+    public static T ReadBox<T>(this IBox<T> value)
+    {
+        return value.Get();
+    }
+
+    public static int BaseValue(this BaseNode value)
+    {
+        return value.Value;
+    }
+
+    public static bool IsMissing(this Node value)
+    {
+        return value == null;
+    }
+
+    public static int NodeValue(this Node value)
+    {
+        return value.Value;
+    }
+
+    public static int NodeValuePlus(this Node value, int amount)
+    {
+        return value.Value + amount;
+    }
+
+    public static int OrZero(this int? value)
+    {
+        return value.HasValue ? value.Value : 0;
+    }
+
+    public static int PlusOne(this int value)
+    {
+        return value + 1;
+    }
+
+    public static int CopyBump(this Counter value)
+    {
+        value.Value += 1;
+        return value.Value;
+    }
+
+    public static void Bump(this ref Counter value)
+    {
+        value.Value += 1;
+    }
+
+    public static int ReadCounter(this in Counter value)
+    {
+        return value.Value;
+    }
+
+    public static int Value(this HasInstance value)
+    {
+        return 2;
+    }
+
+    public static int Throwing(this int value)
+    {
+        try
+        {
+            throw new ExtensionFailure("extension");
+        }
+        finally
+        {
+            Program.FinallyCount++;
+        }
+    }
+
+    public static IEnumerator<int> Repeat(this int value)
+    {
+        yield return value;
+        yield return value + 1;
+    }
+}
+
+namespace Imported.Extensions
+{
+    public static class ImportedNumberExtensions
+    {
+        public static int Triple(this int value)
+        {
+            return value * 3;
+        }
+    }
+}
+
+public static class Program
+{
+    public static int FinallyCount;
+    private static int _makeCalls;
+
+    private static void Check(bool value)
+    {
+        Console.WriteLine(value);
+    }
+
+    private static Node MakeNode()
+    {
+        _makeCalls++;
+        return new Node(20);
+    }
+
+    private static int ForceGc()
+    {
+        GC.Collect();
+        return 2;
+    }
+
+    private static IEnumerator<int> IteratorUsesExtension()
+    {
+        yield return 6.Twice();
+    }
+
+    public static void Main()
+    {
+        Check(3.Twice() == 6);
+        Check(RootExtensions.Twice(4) == 8);
+        Check(5.Plus() == 8);
+        Check(5.Plus(7) == 12);
+        Check(3.Adjust(add: 2, factor: 4) == 20);
+        Check(1.Sum() == 1);
+        Check(1.Sum(2, 3, 4) == 10);
+        Check(5.Kind() == 1);
+        Check(((float)5).Kind() == 2);
+        Check(4.Triple() == 12);
+
+        HasInstance instance = new HasInstance();
+        Check(instance.Value() == 1);
+        Check(RootExtensions.Value(instance) == 2);
+
+        Check(7.Echo() == 7);
+        Check(8.Echo<int>() == 8);
+        string text = "hello";
+        Check(Runtime.Equals(text.Echo(), "hello"));
+        int[] values = new int[2];
+        values[0] = 9;
+        values[1] = 10;
+        Check(values.First() == 9);
+        Check(3.Second("other") == "other");
+
+        ReadableNode readable = new ReadableNode(11);
+        Check(readable.ReadExtension() == 11);
+        IReadable readableInterface = readable;
+        Check(readableInterface.ReadExtension() == 11);
+        IntBox box = new IntBox(12);
+        Check(box.ReadBox() == 12);
+        IBox<int> boxInterface = box;
+        Check(boxInterface.ReadBox() == 12);
+
+        DerivedNode derived = new DerivedNode(13);
+        Check(derived.BaseValue() == 13);
+        BaseNode baseNode = derived;
+        Check(baseNode.BaseValue() == 13);
+
+        Node missing = null;
+        Check(missing.IsMissing());
+        Node present = new Node(14);
+        Check(!present.IsMissing());
+        int? none = null;
+        int? some = 15;
+        Check(none.OrZero() == 0);
+        Check(some.OrZero() == 15);
+        Check(some?.PlusOne() == 16);
+        Check(none?.PlusOne() == null);
+
+        Counter counter = new Counter(20);
+        Check(counter.CopyBump() == 21);
+        Check(counter.Value == 20);
+        counter.Bump();
+        Check(counter.Value == 21);
+        Check(counter.ReadCounter() == 21);
+
+        Holder holder = new Holder();
+        holder.Item = new Node(22);
+        Check(holder.Item.NodeValue() == 22);
+        Check((true ? new Node(23) : new Node(24)).NodeValue() == 23);
+
+        _makeCalls = 0;
+        Check(MakeNode().NodeValue() == 20);
+        Check(_makeCalls == 1);
+        _makeCalls = 0;
+        Check(MakeNode().Value + ForceGc() == 22);
+        Check(_makeCalls == 1);
+        _makeCalls = 0;
+        Check(MakeNode().NodeValue() + ForceGc() == 22);
+        Check(_makeCalls == 1);
+        _makeCalls = 0;
+        Check(MakeNode().NodeValuePlus(ForceGc()) == 22);
+        Check(_makeCalls == 1);
+
+        bool caught = false;
+        FinallyCount = 0;
+        try
+        {
+            1.Throwing();
+        }
+        catch (ExtensionFailure ex)
+        {
+            caught = Runtime.Equals(ex.Message, "extension");
+        }
+        Check(caught);
+        Check(FinallyCount == 1);
+
+        IEnumerator<int> generated = IteratorUsesExtension();
+        Check(generated.MoveNext());
+        Check(generated.Current == 12);
+        Check(!generated.MoveNext());
+        generated.Dispose();
+
+        IEnumerator<int> repeated = 30.Repeat();
+        Check(repeated.MoveNext());
+        Check(repeated.Current == 30);
+        Check(repeated.MoveNext());
+        Check(repeated.Current == 31);
+        Check(!repeated.MoveNext());
+        repeated.Dispose();
+    }
+}

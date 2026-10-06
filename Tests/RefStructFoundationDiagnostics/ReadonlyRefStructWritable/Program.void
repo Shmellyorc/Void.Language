@@ -1,0 +1,1 @@
+public readonly ref struct S { public ref int X; } public static class Program { public static void Main() { } }

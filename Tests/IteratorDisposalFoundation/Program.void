@@ -1,0 +1,330 @@
+using Void.Collections;
+
+public sealed class DisposalError : Exception
+{
+    public int Code;
+
+    public DisposalError(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class DisposalNode
+{
+    public int Value;
+
+    public DisposalNode(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class ManualDisposable : IDisposable
+{
+    public int Count;
+
+    public ManualDisposable()
+    {
+        Count = 0;
+    }
+
+    public void Dispose()
+    {
+        Count++;
+    }
+}
+
+public sealed class ManualEnumerator : IEnumerator<int>
+{
+    private int _current;
+    public int DisposeCount;
+
+    public int Current => _current;
+
+    public ManualEnumerator()
+    {
+        _current = 0;
+        DisposeCount = 0;
+    }
+
+    public bool MoveNext()
+    {
+        _current++;
+        return _current <= 1;
+    }
+
+    public void Dispose()
+    {
+        DisposeCount++;
+    }
+}
+
+public static class Program
+{
+    public static int Sequence;
+    public static int FinallyCount;
+    public static int Seen;
+
+    public static IEnumerator<int> NeverStarted()
+    {
+        try
+        {
+            Program.Sequence = 1;
+            yield return 10;
+        }
+        finally
+        {
+            Program.Sequence = Program.Sequence * 10 + 9;
+            Program.FinallyCount++;
+        }
+    }
+
+    public static IEnumerator<int> Simple()
+    {
+        Program.Sequence = 1;
+        try
+        {
+            yield return 20;
+            Program.Sequence = Program.Sequence * 10 + 2;
+        }
+        finally
+        {
+            Program.Sequence = Program.Sequence * 10 + 9;
+            Program.FinallyCount++;
+        }
+    }
+
+    public static IEnumerator<int> Nested()
+    {
+        Program.Sequence = 1;
+        try
+        {
+            try
+            {
+                yield return 30;
+            }
+            finally
+            {
+                Program.Sequence = Program.Sequence * 10 + 2;
+            }
+        }
+        finally
+        {
+            Program.Sequence = Program.Sequence * 10 + 3;
+            Program.FinallyCount++;
+        }
+    }
+
+    public static IEnumerator<int> OuterOnlyAfterInnerCompletes()
+    {
+        Program.Sequence = 1;
+        try
+        {
+            try
+            {
+                yield return 40;
+            }
+            finally
+            {
+                Program.Sequence = Program.Sequence * 10 + 2;
+            }
+
+            yield return 41;
+        }
+        finally
+        {
+            Program.Sequence = Program.Sequence * 10 + 3;
+            Program.FinallyCount++;
+        }
+    }
+
+    public static IEnumerator<int> NaturalCompletion()
+    {
+        Program.Sequence = 1;
+        try
+        {
+            yield return 50;
+        }
+        finally
+        {
+            Program.Sequence = Program.Sequence * 10 + 9;
+            Program.FinallyCount++;
+        }
+    }
+
+    public static IEnumerator<int> ThrowingDispose()
+    {
+        try
+        {
+            yield return 60;
+        }
+        finally
+        {
+            Program.FinallyCount++;
+            throw new DisposalError("dispose", 77);
+        }
+    }
+
+    public static IEnumerator<int> NestedThrowingDispose()
+    {
+        Program.Sequence = 1;
+        try
+        {
+            try
+            {
+                yield return 70;
+            }
+            finally
+            {
+                Program.Sequence = Program.Sequence * 10 + 2;
+                throw new DisposalError("inner dispose", 78);
+            }
+        }
+        finally
+        {
+            Program.Sequence = Program.Sequence * 10 + 3;
+            Program.FinallyCount++;
+        }
+    }
+
+    public static IEnumerator<int> ManagedCleanup()
+    {
+        DisposalNode node = new DisposalNode(88);
+        try
+        {
+            yield return 80;
+        }
+        finally
+        {
+            GC.Collect();
+            Program.Seen = node.Value;
+            Program.FinallyCount++;
+        }
+    }
+
+    public static void Main()
+    {
+        ManualDisposable manual = new ManualDisposable();
+        IDisposable disposable = manual;
+        disposable.Dispose();
+        Console.WriteLine(manual.Count == 1);
+
+        ManualEnumerator manualEnumerator = new ManualEnumerator();
+        IEnumerator<int> manualInterface = manualEnumerator;
+        manualInterface.Dispose();
+        Console.WriteLine(manualEnumerator.DisposeCount == 1);
+
+        List<int> list = new List<int>();
+        list.Add(5);
+        IEnumerator<int> listEnumerator = list.GetEnumerator();
+        listEnumerator.Dispose();
+        Console.WriteLine(listEnumerator.MoveNext());
+        Console.WriteLine(listEnumerator.Current == 5);
+
+        Program.Sequence = 0;
+        Program.FinallyCount = 0;
+        IEnumerator<int> neverStarted = NeverStarted();
+        neverStarted.Dispose();
+        Console.WriteLine(Program.Sequence == 0);
+        Console.WriteLine(Program.FinallyCount == 0);
+        Console.WriteLine(!neverStarted.MoveNext());
+        neverStarted.Dispose();
+        Console.WriteLine(Program.FinallyCount == 0);
+
+        Program.Sequence = 0;
+        Program.FinallyCount = 0;
+        IEnumerator<int> simple = Simple();
+        Console.WriteLine(simple.MoveNext());
+        Console.WriteLine(simple.Current == 20);
+        Console.WriteLine(Program.Sequence == 1);
+        simple.Dispose();
+        Console.WriteLine(Program.Sequence == 19);
+        Console.WriteLine(Program.FinallyCount == 1);
+        simple.Dispose();
+        Console.WriteLine(Program.Sequence == 19);
+        Console.WriteLine(Program.FinallyCount == 1);
+        Console.WriteLine(!simple.MoveNext());
+
+        Program.Sequence = 0;
+        Program.FinallyCount = 0;
+        IEnumerator<int> nested = Nested();
+        Console.WriteLine(nested.MoveNext());
+        Console.WriteLine(nested.Current == 30);
+        nested.Dispose();
+        Console.WriteLine(Program.Sequence == 123);
+        Console.WriteLine(Program.FinallyCount == 1);
+        nested.Dispose();
+        Console.WriteLine(Program.Sequence == 123);
+
+        Program.Sequence = 0;
+        Program.FinallyCount = 0;
+        IEnumerator<int> outerOnly = OuterOnlyAfterInnerCompletes();
+        Console.WriteLine(outerOnly.MoveNext());
+        Console.WriteLine(outerOnly.Current == 40);
+        Console.WriteLine(outerOnly.MoveNext());
+        Console.WriteLine(outerOnly.Current == 41);
+        Console.WriteLine(Program.Sequence == 12);
+        outerOnly.Dispose();
+        Console.WriteLine(Program.Sequence == 123);
+        Console.WriteLine(Program.FinallyCount == 1);
+
+        Program.Sequence = 0;
+        Program.FinallyCount = 0;
+        IEnumerator<int> natural = NaturalCompletion();
+        Console.WriteLine(natural.MoveNext());
+        Console.WriteLine(natural.Current == 50);
+        Console.WriteLine(!natural.MoveNext());
+        Console.WriteLine(Program.Sequence == 19);
+        Console.WriteLine(Program.FinallyCount == 1);
+        natural.Dispose();
+        Console.WriteLine(Program.Sequence == 19);
+        Console.WriteLine(Program.FinallyCount == 1);
+
+        Program.FinallyCount = 0;
+        IEnumerator<int> throwing = ThrowingDispose();
+        Console.WriteLine(throwing.MoveNext());
+        try
+        {
+            throwing.Dispose();
+            Console.WriteLine(false);
+        }
+        catch (DisposalError error)
+        {
+            Console.WriteLine(error.Code == 77);
+        }
+        Console.WriteLine(Program.FinallyCount == 1);
+        Console.WriteLine(!throwing.MoveNext());
+        throwing.Dispose();
+        Console.WriteLine(Program.FinallyCount == 1);
+
+        Program.Sequence = 0;
+        Program.FinallyCount = 0;
+        IEnumerator<int> nestedThrowing = NestedThrowingDispose();
+        Console.WriteLine(nestedThrowing.MoveNext());
+        try
+        {
+            nestedThrowing.Dispose();
+            Console.WriteLine(false);
+        }
+        catch (DisposalError error)
+        {
+            Console.WriteLine(error.Code == 78);
+        }
+        Console.WriteLine(Program.Sequence == 123);
+        Console.WriteLine(Program.FinallyCount == 1);
+        nestedThrowing.Dispose();
+        Console.WriteLine(Program.Sequence == 123);
+
+        Program.Seen = 0;
+        Program.FinallyCount = 0;
+        IEnumerator<int> managed = ManagedCleanup();
+        Console.WriteLine(managed.MoveNext());
+        GC.Collect();
+        IDisposable managedDisposable = managed;
+        managedDisposable.Dispose();
+        Console.WriteLine(Program.Seen == 88);
+        Console.WriteLine(Program.FinallyCount == 1);
+        Console.WriteLine(!managed.MoveNext());
+    }
+}

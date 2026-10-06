@@ -1,0 +1,58 @@
+using Void;
+using Void.Threading;
+
+public sealed class SleepState
+{
+    public int Started;
+    public int Finished;
+    public int Value;
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine(Timeout.Infinite == -1);
+
+        Thread.Sleep(0);
+        Console.WriteLine(true);
+
+        Thread.Sleep(5);
+        Console.WriteLine(true);
+
+        SleepState state = new SleepState();
+        Thread worker = new Thread(() =>
+        {
+            Volatile.Write(ref state.Started, 1);
+            Thread.Sleep(80);
+            state.Value = 182;
+            Volatile.Write(ref state.Finished, 1);
+        });
+        worker.Start();
+        while (Volatile.Read(ref state.Started) == 0)
+        {
+        }
+        Console.WriteLine(Volatile.Read(ref state.Finished) == 0);
+        GC.Collect();
+        int afterCollect = Volatile.Read(ref state.Finished);
+        Console.WriteLine(afterCollect == 0 || afterCollect == 1);
+        worker.Join();
+        Console.WriteLine(Volatile.Read(ref state.Finished) == 1);
+        Console.WriteLine(state.Value == 182);
+
+        int captured = 7;
+        Thread closure = new Thread(() =>
+        {
+            Thread.Sleep(1);
+            captured += 5;
+        });
+        closure.Start();
+        closure.Join();
+        Console.WriteLine(captured == 12);
+
+        Thread reuse = new Thread(() => Thread.Sleep(0));
+        reuse.Start();
+        reuse.Join();
+        Console.WriteLine(true);
+    }
+}

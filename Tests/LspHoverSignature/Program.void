@@ -1,0 +1,47 @@
+using Void;
+
+public delegate int Work(int value, int bonus = 1);
+
+public sealed class Calculator
+{
+    public Calculator(int seed, int extra = 1)
+    {
+    }
+
+    public Calculator(string name)
+    {
+    }
+
+    public int Mix(int left, int right = 2)
+    {
+        return left + right;
+    }
+
+    public int Mix(string text, int count = 1)
+    {
+        return count;
+    }
+
+    public int Sum(int start, params int[] values)
+    {
+        return start + values.Length;
+    }
+}
+
+public static class Program
+{
+    public static int Twice(int value, int bonus = 1)
+    {
+        return value + bonus;
+    }
+
+    public static void Main()
+    {
+        Calculator calc = new Calculator(1, extra: 3);
+        int mixed = calc.Mix(right: 4, left: 2);
+        int summed = calc.Sum(1, 2, 3);
+        Work work = Twice;
+        int delegated = work(bonus: 2, value: 5);
+        Console.WriteLine(mixed + summed + delegated);
+    }
+}

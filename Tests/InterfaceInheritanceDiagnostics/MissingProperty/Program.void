@@ -1,0 +1,20 @@
+public interface IBase
+{
+    int Value { get; }
+}
+
+public interface IChild : IBase
+{
+}
+
+public sealed class Broken : IChild
+{
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Broken broken = new Broken();
+    }
+}

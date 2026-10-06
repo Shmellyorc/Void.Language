@@ -1,0 +1,161 @@
+using Void;
+using Void.Threading;
+
+public sealed class TimerPayload281
+{
+    public int Value;
+
+    public TimerPayload281(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    private static int _sequence;
+    private static int _earlyOrder;
+    private static int _middleOrder;
+    private static int _lateOrder;
+    private static int _canceledCount;
+    private static int _capturedValue;
+    private static int _manyCount;
+    private static ManualResetEvent _done = new ManualResetEvent(false);
+    private static ManualResetEvent _manyDone = new ManualResetEvent(false);
+    private static ManualResetEvent _poolReady = new ManualResetEvent(false);
+    private static ManualResetEvent _poolRelease = new ManualResetEvent(false);
+    private static ManualResetEvent _poolSentinel = new ManualResetEvent(false);
+    private static ManualResetEvent _afterThrow = new ManualResetEvent(false);
+    private static int _poolBlockers;
+
+    private static void Early()
+    {
+        _earlyOrder = Interlocked.Increment(ref _sequence);
+    }
+
+    private static void Middle()
+    {
+        _middleOrder = Interlocked.Increment(ref _sequence);
+    }
+
+    private static void Late()
+    {
+        _lateOrder = Interlocked.Increment(ref _sequence);
+        _done.Set();
+    }
+
+    private static void Canceled()
+    {
+        Interlocked.Increment(ref _canceledCount);
+    }
+
+    private static void Many()
+    {
+        int value = Interlocked.Increment(ref _manyCount);
+        if (value == 6)
+            _manyDone.Set();
+    }
+
+    private static void BlockPool()
+    {
+        if (Interlocked.Increment(ref _poolBlockers) == 2)
+            _poolReady.Set();
+        _poolRelease.WaitOne();
+    }
+
+    private static void PoolSentinel()
+    {
+        _poolSentinel.Set();
+    }
+
+    private static void ThrowingCallback()
+    {
+        throw new Exception("timer callback fault");
+    }
+
+    private static void AfterThrow()
+    {
+        _afterThrow.Set();
+    }
+
+    private static TimerQueueRegistration RegisterCaptured(TimerPayload281 payload)
+    {
+        return TimerQueue.Register(25, () =>
+        {
+            _capturedValue = payload.Value;
+        });
+    }
+
+    public static void Main()
+    {
+        TimerQueueRegistration late = TimerQueue.Register(80, Late);
+        TimerQueueRegistration middle = TimerQueue.Register(45, Middle);
+        TimerQueueRegistration early = TimerQueue.Register(15, Early);
+        Console.WriteLine(_done.WaitOne(2000));
+        Console.WriteLine(_earlyOrder == 1);
+        Console.WriteLine(_middleOrder == 2);
+        Console.WriteLine(_lateOrder == 3);
+
+        TimerQueueRegistration canceled = TimerQueue.Register(20, Canceled);
+        canceled.Dispose();
+        Thread.Sleep(60);
+        Console.WriteLine(_canceledCount == 0);
+
+        ManualResetEvent earlierDone = new ManualResetEvent(false);
+        int earlierValue = 0;
+        TimerQueueRegistration far = TimerQueue.Register(250, () => { earlierValue += 10; });
+        Thread.Sleep(5);
+        TimerQueueRegistration nearer = TimerQueue.Register(20, () =>
+        {
+            earlierValue += 1;
+            earlierDone.Set();
+        });
+        Console.WriteLine(earlierDone.WaitOne(1000));
+        Console.WriteLine(earlierValue == 1);
+        far.Dispose();
+
+        ThreadPool.QueueUserWorkItem(BlockPool);
+        ThreadPool.QueueUserWorkItem(BlockPool);
+        Console.WriteLine(_poolReady.WaitOne(1000));
+        TimerQueueRegistration queuedCanceled = TimerQueue.Register(15, Canceled);
+        Thread.Sleep(80);
+        queuedCanceled.Dispose();
+        ThreadPool.QueueUserWorkItem(PoolSentinel);
+        _poolRelease.Set();
+        Console.WriteLine(_poolSentinel.WaitOne(1000));
+        Console.WriteLine(_canceledCount == 0);
+
+        TimerQueueRegistration throwing = TimerQueue.Register(10, ThrowingCallback);
+        TimerQueueRegistration afterThrow = TimerQueue.Register(25, AfterThrow);
+        Console.WriteLine(_afterThrow.WaitOne(1000));
+
+        TimerPayload281 payload = new TimerPayload281(281);
+        TimerQueueRegistration captured = RegisterCaptured(payload);
+        payload = null;
+        GC.Collect();
+        Thread.Sleep(80);
+        Console.WriteLine(_capturedValue == 281);
+
+        TimerQueueRegistration[] registrations = new TimerQueueRegistration[12];
+        for (int i = 0; i < registrations.Length; i++)
+        {
+            registrations[i] = TimerQueue.Register(10 + i * 2, Many);
+            if ((i % 2) != 0)
+                registrations[i].Dispose();
+        }
+        Console.WriteLine(_manyDone.WaitOne(1000));
+        Console.WriteLine(_manyCount == 6);
+
+        late.Dispose();
+        middle.Dispose();
+        early.Dispose();
+        nearer.Dispose();
+        captured.Dispose();
+        queuedCanceled.Dispose();
+        throwing.Dispose();
+        afterThrow.Dispose();
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

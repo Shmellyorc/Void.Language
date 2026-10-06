@@ -1,0 +1,2 @@
+public sealed class FatalException : Exception { }
+public static class Program { public static void Main() { try { } catch (Exception value) { } catch (FatalException value) { } } }

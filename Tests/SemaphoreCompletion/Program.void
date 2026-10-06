@@ -1,0 +1,141 @@
+using Void;
+using Void.Threading;
+
+public sealed class SemaphoreState
+{
+    public int Ready;
+    public int Success;
+    public int Done;
+}
+
+public static class Program
+{
+    private static void WaitUntilAtLeast(int value, ref int location)
+    {
+        while (Volatile.Read(ref location) < value)
+        {
+        }
+    }
+
+    private static void TimedWorker(Semaphore value, SemaphoreState state, int timeout)
+    {
+        Interlocked.Increment(ref state.Ready);
+        bool entered = value.WaitOne(timeout);
+        if (entered)
+            Interlocked.Increment(ref state.Success);
+        Interlocked.Increment(ref state.Done);
+    }
+
+    private static void InfiniteWorker(Semaphore value, SemaphoreState state)
+    {
+        Interlocked.Increment(ref state.Ready);
+        bool entered = value.WaitOne();
+        if (entered)
+            Interlocked.Increment(ref state.Success);
+        Interlocked.Increment(ref state.Done);
+    }
+
+    public static void Main()
+    {
+        Semaphore empty = new Semaphore(0, 1);
+        Console.WriteLine(!empty.WaitOne(0));
+
+        Semaphore basic = new Semaphore(2, 3);
+        Console.WriteLine(basic.WaitOne(0));
+        Console.WriteLine(basic.WaitOne(0));
+        Console.WriteLine(!basic.WaitOne(0));
+        Console.WriteLine(basic.Release() == 0);
+        Console.WriteLine(basic.WaitOne(0));
+        Console.WriteLine(!basic.WaitOne(0));
+        Console.WriteLine(basic.Release(3) == 0);
+        Console.WriteLine(basic.WaitOne(0) && basic.WaitOne(0) && basic.WaitOne(0));
+        Console.WriteLine(!basic.WaitOne(0));
+
+        Semaphore counts = new Semaphore(1, 3);
+        Console.WriteLine(counts.Release() == 1);
+        Console.WriteLine(counts.Release() == 2);
+        Console.WriteLine(counts.WaitOne(0) && counts.WaitOne(0) && counts.WaitOne(0));
+        Console.WriteLine(!counts.WaitOne(0));
+
+        Semaphore many = new Semaphore(0, 3);
+        SemaphoreState manyState = new SemaphoreState();
+        Thread a = new Thread(() => TimedWorker(many, manyState, 2000));
+        Thread b = new Thread(() => TimedWorker(many, manyState, 2000));
+        Thread c = new Thread(() => TimedWorker(many, manyState, 2000));
+        a.Start();
+        b.Start();
+        c.Start();
+        WaitUntilAtLeast(3, ref manyState.Ready);
+        Thread.Sleep(30);
+        GC.Collect();
+        Console.WriteLine(Volatile.Read(ref manyState.Done) == 0);
+        Console.WriteLine(many.Release() == 0);
+        WaitUntilAtLeast(1, ref manyState.Done);
+        Console.WriteLine(Volatile.Read(ref manyState.Success) == 1 && Volatile.Read(ref manyState.Done) == 1);
+        Console.WriteLine(many.Release(2) == 0);
+        a.Join();
+        b.Join();
+        c.Join();
+        Console.WriteLine(Volatile.Read(ref manyState.Success) == 3 && Volatile.Read(ref manyState.Done) == 3);
+        Console.WriteLine(!many.WaitOne(0));
+
+        Semaphore direct = new Semaphore(0, 1);
+        SemaphoreState directState = new SemaphoreState();
+        Thread directA = new Thread(() => TimedWorker(direct, directState, 1000));
+        Thread directB = new Thread(() => TimedWorker(direct, directState, 1000));
+        directA.Start();
+        directB.Start();
+        WaitUntilAtLeast(2, ref directState.Ready);
+        Thread.Sleep(30);
+        bool twoDirectReleases = direct.Release() == 0 && direct.Release() == 0;
+        directA.Join();
+        directB.Join();
+        Console.WriteLine(twoDirectReleases);
+        Console.WriteLine(Volatile.Read(ref directState.Success) == 2 && Volatile.Read(ref directState.Done) == 2);
+        Console.WriteLine(!direct.WaitOne(0));
+
+        Semaphore timedOut = new Semaphore(0, 1);
+        SemaphoreState timeoutState = new SemaphoreState();
+        Thread timeoutWorker = new Thread(() => TimedWorker(timedOut, timeoutState, 30));
+        timeoutWorker.Start();
+        timeoutWorker.Join();
+        Console.WriteLine(Volatile.Read(ref timeoutState.Success) == 0 && Volatile.Read(ref timeoutState.Done) == 1);
+        Console.WriteLine(timedOut.Release() == 0);
+        Console.WriteLine(timedOut.WaitOne(0) && !timedOut.WaitOne(0));
+
+        Semaphore race = new Semaphore(0, 1);
+        SemaphoreState raceState = new SemaphoreState();
+        Thread raceWorker = new Thread(() => TimedWorker(race, raceState, 30));
+        raceWorker.Start();
+        WaitUntilAtLeast(1, ref raceState.Ready);
+        Thread.Sleep(30);
+        race.Release();
+        raceWorker.Join();
+        bool raceWorkerSucceeded = Volatile.Read(ref raceState.Success) == 1;
+        bool raceStoredPermit = race.WaitOne(0);
+        Console.WriteLine(raceWorkerSucceeded != raceStoredPermit);
+        Console.WriteLine(!race.WaitOne(0));
+
+        Semaphore infinite = new Semaphore(0, 1);
+        SemaphoreState infiniteState = new SemaphoreState();
+        Thread infiniteWorker = new Thread(() => InfiniteWorker(infinite, infiniteState));
+        infiniteWorker.Start();
+        WaitUntilAtLeast(1, ref infiniteState.Ready);
+        Thread.Sleep(30);
+        GC.Collect();
+        Console.WriteLine(Volatile.Read(ref infiniteState.Done) == 0);
+        infinite.Release();
+        infiniteWorker.Join();
+        Console.WriteLine(Volatile.Read(ref infiniteState.Success) == 1 && Volatile.Read(ref infiniteState.Done) == 1);
+
+        Semaphore infiniteTimeout = new Semaphore(0, 1);
+        SemaphoreState infiniteTimeoutState = new SemaphoreState();
+        Thread infiniteTimeoutWorker = new Thread(() => TimedWorker(infiniteTimeout, infiniteTimeoutState, Timeout.Infinite));
+        infiniteTimeoutWorker.Start();
+        WaitUntilAtLeast(1, ref infiniteTimeoutState.Ready);
+        Thread.Sleep(30);
+        infiniteTimeout.Release();
+        infiniteTimeoutWorker.Join();
+        Console.WriteLine(Volatile.Read(ref infiniteTimeoutState.Success) == 1);
+    }
+}

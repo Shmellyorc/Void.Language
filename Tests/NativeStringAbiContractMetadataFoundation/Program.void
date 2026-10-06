@@ -1,0 +1,54 @@
+using Void;
+
+public static class Native293
+{
+    [Native("strcmp")]
+    public static unsafe extern int Compare(
+        [NativeString] string left,
+        [NativeString(NativeStringKind.BorrowedNul)] string right);
+
+    [NativeString]
+    [Native("void293_return_borrowed_nul")]
+    public static unsafe extern string BorrowedNulReturn();
+
+    [Native("void293_borrowed_pointer_length")]
+    public static unsafe extern void BorrowedPointerLength(
+        [NativeString(NativeStringKind.BorrowedPointerLength)] string text);
+
+    [Native("void293_retained_nul")]
+    public static unsafe extern void RetainedNul(
+        [NativeString(NativeStringKind.RetainedNul)] string text);
+
+    [Native("void293_retained_pointer_length")]
+    public static unsafe extern void RetainedPointerLength(
+        [NativeString(NativeStringKind.RetainedPointerLength)] string text);
+
+    [NativeString(NativeStringKind.BorrowedPointerLength)]
+    [Native("void293_return_borrowed_pointer_length")]
+    public static unsafe extern string BorrowedPointerLengthReturn();
+
+    [NativeString(NativeStringKind.StaticNul)]
+    [Native("void293_return_static_nul")]
+    public static unsafe extern string StaticNulReturn();
+
+    [NativeString(NativeStringKind.StaticPointerLength)]
+    [Native("void293_return_static_pointer_length")]
+    public static unsafe extern string StaticPointerLengthReturn();
+
+    [NativeString(NativeStringKind.OwnedNul, "void293_release_owned_nul")]
+    [Native("void293_return_owned_nul")]
+    public static unsafe extern string OwnedNulReturn();
+
+    [NativeString(NativeStringKind.OwnedPointerLength, "void293_release_owned_pointer_length")]
+    [Native("void293_return_owned_pointer_length")]
+    public static unsafe extern string OwnedPointerLengthReturn();
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        Console.WriteLine(Native293.Compare("void", "void") == 0);
+        Console.WriteLine(Native293.Compare("abc", "abd") < 0);
+    }
+}

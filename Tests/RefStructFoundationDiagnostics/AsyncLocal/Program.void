@@ -1,0 +1,1 @@
+using Void.Threading.Tasks; public ref struct R { public int X; } public static class Program { public static async Task Run() { R value = new R(); return; } public static void Main() { Run(); } }

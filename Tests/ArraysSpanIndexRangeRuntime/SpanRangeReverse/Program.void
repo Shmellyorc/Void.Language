@@ -1,0 +1,1 @@
+using Void; public static class Program { public static void Main(){ Span<int> span = new int[] {1,2,3}; Span<int> bad = span[2..1]; Console.WriteLine(bad.Length); } }

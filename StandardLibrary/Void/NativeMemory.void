@@ -1,0 +1,207 @@
+namespace Void;
+
+public static class NativeMemory
+{
+    public static unsafe void* Allocate(ulong byteCount)
+    {
+        void* memory = null;
+        if (!Runtime.NativeMemoryTryAllocate(byteCount, out memory))
+            throw new OutOfMemoryException("native memory allocation failed");
+        return memory;
+    }
+
+    public static unsafe bool TryAllocate(ulong byteCount, out void* memory)
+    {
+        memory = null;
+        return Runtime.NativeMemoryTryAllocate(byteCount, out memory);
+    }
+
+    public static unsafe T* Allocate<T>(ulong count) where T : unmanaged
+    {
+        void* memory = null;
+        if (!Runtime.NativeMemoryTryAllocateElements(count, sizeof(T), out memory))
+            throw new OutOfMemoryException("native typed memory allocation failed");
+        return (T*)memory;
+    }
+
+    public static unsafe bool TryAllocate<T>(ulong count, out T* memory) where T : unmanaged
+    {
+        void* raw = null;
+        bool allocated = Runtime.NativeMemoryTryAllocateElements(count, sizeof(T), out raw);
+        memory = (T*)raw;
+        return allocated;
+    }
+
+    public static unsafe void* Reallocate(void* memory, ulong byteCount)
+    {
+        void* resized = memory;
+        if (!Runtime.NativeMemoryTryReallocate(memory, byteCount, out resized))
+            throw new OutOfMemoryException("native memory reallocation failed");
+        return resized;
+    }
+
+    public static unsafe bool TryReallocate(ref void* memory, ulong byteCount)
+    {
+        void* resized = memory;
+        if (!Runtime.NativeMemoryTryReallocate(memory, byteCount, out resized))
+            return false;
+        memory = resized;
+        return true;
+    }
+
+    public static unsafe T* Reallocate<T>(T* memory, ulong count) where T : unmanaged
+    {
+        void* resized = (void*)memory;
+        if (!Runtime.NativeMemoryTryReallocateElements((void*)memory, count, sizeof(T), out resized))
+            throw new OutOfMemoryException("native typed memory reallocation failed");
+        return (T*)resized;
+    }
+
+    public static unsafe bool TryReallocate<T>(ref T* memory, ulong count) where T : unmanaged
+    {
+        void* resized = (void*)memory;
+        if (!Runtime.NativeMemoryTryReallocateElements((void*)memory, count, sizeof(T), out resized))
+            return false;
+        memory = (T*)resized;
+        return true;
+    }
+
+    public static unsafe void* AllocateAligned(ulong byteCount, ulong alignment)
+    {
+        NativeMemory.CheckAlignment(alignment);
+        void* memory = null;
+        if (!Runtime.NativeMemoryTryAllocateAligned(byteCount, alignment, out memory))
+            throw new OutOfMemoryException("native aligned memory allocation failed");
+        return memory;
+    }
+
+    public static unsafe bool TryAllocateAligned(ulong byteCount, ulong alignment, out void* memory)
+    {
+        memory = null;
+        return Runtime.NativeMemoryTryAllocateAligned(byteCount, alignment, out memory);
+    }
+
+    public static unsafe T* AllocateAligned<T>(ulong count, ulong alignment) where T : unmanaged
+    {
+        NativeMemory.CheckAlignment(alignment);
+        void* memory = null;
+        if (!Runtime.NativeMemoryTryAllocateAlignedElements(count, sizeof(T), alignment, out memory))
+            throw new OutOfMemoryException("native aligned typed memory allocation failed");
+        return (T*)memory;
+    }
+
+    public static unsafe bool TryAllocateAligned<T>(ulong count, ulong alignment, out T* memory) where T : unmanaged
+    {
+        void* raw = null;
+        bool allocated = Runtime.NativeMemoryTryAllocateAlignedElements(count, sizeof(T), alignment, out raw);
+        memory = (T*)raw;
+        return allocated;
+    }
+
+    public static unsafe void* ReallocateAligned(void* memory, ulong byteCount, ulong alignment)
+    {
+        NativeMemory.CheckAlignment(alignment);
+        void* resized = memory;
+        if (!Runtime.NativeMemoryTryReallocateAligned(memory, byteCount, alignment, out resized))
+            throw new OutOfMemoryException("native aligned memory reallocation failed");
+        return resized;
+    }
+
+    public static unsafe bool TryReallocateAligned(ref void* memory, ulong byteCount, ulong alignment)
+    {
+        void* resized = memory;
+        if (!Runtime.NativeMemoryTryReallocateAligned(memory, byteCount, alignment, out resized))
+            return false;
+        memory = resized;
+        return true;
+    }
+
+    public static unsafe T* ReallocateAligned<T>(T* memory, ulong count, ulong alignment) where T : unmanaged
+    {
+        NativeMemory.CheckAlignment(alignment);
+        void* resized = (void*)memory;
+        if (!Runtime.NativeMemoryTryReallocateAlignedElements((void*)memory, count, sizeof(T), alignment, out resized))
+            throw new OutOfMemoryException("native aligned typed memory reallocation failed");
+        return (T*)resized;
+    }
+
+    public static unsafe bool TryReallocateAligned<T>(ref T* memory, ulong count, ulong alignment) where T : unmanaged
+    {
+        void* resized = (void*)memory;
+        if (!Runtime.NativeMemoryTryReallocateAlignedElements((void*)memory, count, sizeof(T), alignment, out resized))
+            return false;
+        memory = (T*)resized;
+        return true;
+    }
+
+    public static unsafe void* Alloc(ulong byteCount) { return NativeMemory.Allocate(byteCount); }
+    public static unsafe void* Alloc(ulong elementCount, ulong elementSize)
+    {
+        if (elementCount != 0ul && elementSize > 18446744073709551615ul / elementCount)
+            throw new OutOfMemoryException();
+        return NativeMemory.Allocate(elementCount * elementSize);
+    }
+    public static unsafe void* Realloc(void* memory, ulong byteCount) { return NativeMemory.Reallocate(memory, byteCount); }
+    public static unsafe void* AlignedAlloc(ulong byteCount, ulong alignment)
+    {
+        NativeMemory.CheckAlignment(alignment);
+        return NativeMemory.AllocateAligned(byteCount, alignment);
+    }
+    public static unsafe void* AlignedRealloc(void* memory, ulong byteCount, ulong alignment)
+    {
+        NativeMemory.CheckAlignment(alignment);
+        return NativeMemory.ReallocateAligned(memory, byteCount, alignment);
+    }
+    private static void CheckAlignment(ulong alignment)
+    {
+        if (alignment == (ulong)0) throw new ArgumentException("Alignment must be a power of two", "alignment");
+        while (alignment > (ulong)1)
+        {
+            if (alignment % (ulong)2 != (ulong)0) throw new ArgumentException("Alignment must be a power of two", "alignment");
+            alignment /= (ulong)2;
+        }
+    }
+    public static unsafe void Copy(void* source, void* destination, ulong byteCount)
+    {
+        Runtime.MemoryMoveBytes(destination, source, byteCount);
+    }
+    public static unsafe void AlignedFree(void* memory) { NativeMemory.Free(memory); }
+    public static unsafe void Clear(void* memory, ulong byteCount)
+    {
+        byte* current = (byte*)memory;
+        while (byteCount > (ulong)0)
+        {
+            int count = byteCount > (ulong)2147483647 ? 2147483647 : (int)byteCount;
+            Runtime.MemoryClear(current, count);
+            current += count;
+            byteCount -= (ulong)count;
+        }
+    }
+    public static unsafe void Fill(void* memory, ulong byteCount, byte value)
+    {
+        byte* current = (byte*)memory;
+        while (byteCount > (ulong)0)
+        {
+            *current = value;
+            current++;
+            byteCount--;
+        }
+    }
+    public static unsafe void* AllocZeroed(ulong byteCount)
+    {
+        void* memory = NativeMemory.Alloc(byteCount);
+        NativeMemory.Clear(memory, byteCount);
+        return memory;
+    }
+    public static unsafe void* AllocZeroed(ulong elementCount, ulong elementSize)
+    {
+        void* memory = NativeMemory.Alloc(elementCount, elementSize);
+        NativeMemory.Clear(memory, elementCount * elementSize);
+        return memory;
+    }
+
+    public static unsafe void Free(void* memory)
+    {
+        Runtime.NativeMemoryFree(memory);
+    }
+}

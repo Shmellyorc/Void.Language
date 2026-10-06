@@ -1,0 +1,360 @@
+public sealed class DeclarationResource : IDisposable
+{
+    public int Id;
+
+    public DeclarationResource(int id)
+    {
+        Id = id;
+        Program.Sequence = Program.Sequence * 10 + id;
+    }
+
+    public void Dispose()
+    {
+        Program.Sequence = Program.Sequence * 10 + Id;
+        Program.DisposeCount++;
+    }
+}
+
+public struct DeclarationValueResource : IDisposable
+{
+    public int Id;
+
+    public DeclarationValueResource(int id)
+    {
+        Id = id;
+    }
+
+    public void Dispose()
+    {
+        Program.Sequence = Program.Sequence * 10 + Id;
+        Program.DisposeCount++;
+    }
+}
+
+public sealed class DeclarationError : Exception
+{
+    public int Code;
+
+    public DeclarationError(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class DeclarationThrowingResource : IDisposable
+{
+    public int Code;
+
+    public DeclarationThrowingResource(int code)
+    {
+        Code = code;
+    }
+
+    public void Dispose()
+    {
+        Program.Sequence = Program.Sequence * 10 + 9;
+        throw new DeclarationError("dispose", Code);
+    }
+}
+
+public sealed class DeclarationConstructorResource : IDisposable
+{
+    public int Id;
+
+    public DeclarationConstructorResource(int id, bool fail)
+    {
+        Id = id;
+        Program.Sequence = Program.Sequence * 10 + id;
+        if (fail)
+            throw new DeclarationError("constructor", 31);
+    }
+
+    public void Dispose()
+    {
+        Program.Sequence = Program.Sequence * 10 + Id;
+        Program.DisposeCount++;
+    }
+}
+
+public sealed class DeclarationGcResource : IDisposable
+{
+    public int Value;
+
+    public DeclarationGcResource(int value)
+    {
+        Value = value;
+    }
+
+    public void Dispose()
+    {
+        GC.Collect();
+        Program.Seen = Value;
+        Program.DisposeCount++;
+    }
+}
+
+public static class Program
+{
+    public static int Sequence;
+    public static int DisposeCount;
+    public static int Seen;
+
+    public static int Record(int value)
+    {
+        Sequence = Sequence * 10 + value;
+        return value;
+    }
+
+    public static int ReturnThroughDeclaration()
+    {
+        using var resource = new DeclarationResource(4);
+        Sequence = Sequence * 10 + 5;
+        return 77;
+    }
+
+    public static int ReturnExpressionBeforeDispose()
+    {
+        using DeclarationResource resource = new DeclarationResource(2);
+        return Record(3);
+    }
+
+    public static int ReturnWithThrowingDispose()
+    {
+        using var resource = new DeclarationThrowingResource(22);
+        return 5;
+    }
+
+    public static int NestedReturnFinally()
+    {
+        try
+        {
+            using var resource = new DeclarationResource(4);
+            Sequence = Sequence * 10 + 5;
+            return 9;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 6;
+        }
+    }
+
+    public static int GenericUse<T>(T resource) where T : IDisposable
+    {
+        using T value = resource;
+        Sequence = Sequence * 10 + 8;
+        return 12;
+    }
+
+    public static int BreakAndContinue()
+    {
+        DisposeCount = 0;
+        int iterations = 0;
+        for (int i = 0; i < 4; i++)
+        {
+            using var resource = new DeclarationResource(i + 1);
+            iterations++;
+            if (i == 0)
+                continue;
+            break;
+        }
+        return iterations;
+    }
+
+    public static int ResourceOutsideLoop()
+    {
+        DisposeCount = 0;
+        using var resource = new DeclarationResource(7);
+        for (int i = 0; i < 3; i++)
+        {
+            Console.WriteLine(DisposeCount == 0);
+            if (i == 0)
+                continue;
+            break;
+        }
+        Console.WriteLine(DisposeCount == 0);
+        return 6;
+    }
+
+    public static void Main()
+    {
+        Sequence = 0;
+        DisposeCount = 0;
+        {
+            using var resource = new DeclarationResource(1);
+            Sequence = Sequence * 10 + 2;
+            Console.WriteLine(resource.Id == 1);
+        }
+        Console.WriteLine(Sequence == 121);
+        Console.WriteLine(DisposeCount == 1);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        {
+            using DeclarationResource resource = new DeclarationResource(3);
+            Sequence = Sequence * 10 + 4;
+        }
+        Console.WriteLine(Sequence == 343);
+        Console.WriteLine(DisposeCount == 1);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        {
+            using DeclarationResource none = null;
+            Sequence = 9;
+        }
+        Console.WriteLine(Sequence == 9);
+        Console.WriteLine(DisposeCount == 0);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        {
+            IDisposable value = null;
+            using IDisposable none = value;
+            Sequence = 6;
+        }
+        Console.WriteLine(Sequence == 6);
+        Console.WriteLine(DisposeCount == 0);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        {
+            using DeclarationValueResource value = new DeclarationValueResource(8);
+            Sequence = 1;
+            Console.WriteLine(value.Id == 8);
+        }
+        Console.WriteLine(Sequence == 18);
+        Console.WriteLine(DisposeCount == 1);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        {
+            using var first = new DeclarationResource(1);
+            Sequence = Sequence * 10 + 2;
+            using var second = new DeclarationResource(3);
+            Sequence = Sequence * 10 + 4;
+        }
+        Console.WriteLine(Sequence == 123431);
+        Console.WriteLine(DisposeCount == 2);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        int returned = ReturnThroughDeclaration();
+        Console.WriteLine(returned == 77);
+        Console.WriteLine(Sequence == 454);
+        Console.WriteLine(DisposeCount == 1);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        int expressionReturn = ReturnExpressionBeforeDispose();
+        Console.WriteLine(expressionReturn == 3);
+        Console.WriteLine(Sequence == 232);
+        Console.WriteLine(DisposeCount == 1);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        try
+        {
+            using var resource = new DeclarationResource(6);
+            Sequence = Sequence * 10 + 7;
+            throw new DeclarationError("body", 10);
+        }
+        catch (DeclarationError error)
+        {
+            Console.WriteLine(error.Code == 10);
+        }
+        Console.WriteLine(Sequence == 676);
+        Console.WriteLine(DisposeCount == 1);
+
+        Sequence = 0;
+        try
+        {
+            using var resource = new DeclarationThrowingResource(21);
+            throw new DeclarationError("body", 20);
+        }
+        catch (DeclarationError error)
+        {
+            Console.WriteLine(error.Code == 21);
+        }
+        Console.WriteLine(Sequence == 9);
+
+        Sequence = 0;
+        try
+        {
+            ReturnWithThrowingDispose();
+        }
+        catch (DeclarationError error)
+        {
+            Console.WriteLine(error.Code == 22);
+        }
+        Console.WriteLine(Sequence == 9);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        int nested = NestedReturnFinally();
+        Console.WriteLine(nested == 9);
+        Console.WriteLine(Sequence == 4546);
+        Console.WriteLine(DisposeCount == 1);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        try
+        {
+            using var first = new DeclarationConstructorResource(1, false);
+            using var second = new DeclarationConstructorResource(2, true);
+            Console.WriteLine(false);
+        }
+        catch (DeclarationError error)
+        {
+            Console.WriteLine(error.Code == 31);
+        }
+        Console.WriteLine(Sequence == 121);
+        Console.WriteLine(DisposeCount == 1);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        DeclarationResource generic = new DeclarationResource(6);
+        int genericResult = GenericUse<DeclarationResource>(generic);
+        Console.WriteLine(genericResult == 12);
+        Console.WriteLine(Sequence == 686);
+        Console.WriteLine(DisposeCount == 1);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        Seen = 0;
+        {
+            using var resource = new DeclarationGcResource(73);
+            GC.Collect();
+            Console.WriteLine(resource.Value == 73);
+        }
+        Console.WriteLine(Seen == 73);
+        Console.WriteLine(DisposeCount == 1);
+
+        Sequence = 0;
+        int loopIterations = BreakAndContinue();
+        Console.WriteLine(loopIterations == 2);
+        Console.WriteLine(DisposeCount == 2);
+        Console.WriteLine(Sequence == 1122);
+
+        Sequence = 0;
+        int outerLoop = ResourceOutsideLoop();
+        Console.WriteLine(outerLoop == 6);
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(Sequence == 77);
+
+        Sequence = 0;
+        DisposeCount = 0;
+        int selector = 1;
+        switch (selector)
+        {
+            case 1:
+                using var resource = new DeclarationResource(5);
+                Sequence = Sequence * 10 + 6;
+                break;
+            default:
+                Sequence = 9;
+                break;
+        }
+        Console.WriteLine(Sequence == 565);
+        Console.WriteLine(DisposeCount == 1);
+    }
+}

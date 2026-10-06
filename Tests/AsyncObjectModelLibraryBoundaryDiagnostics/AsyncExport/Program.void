@@ -1,0 +1,10 @@
+using Void.Threading.Tasks;
+
+public static class Bad209
+{
+    [Export("void209_bad_async_export")]
+    public static async Task Run()
+    {
+        return;
+    }
+}

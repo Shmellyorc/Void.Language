@@ -1,0 +1,2 @@
+using Void;
+public static class Native293 { [Native("void293_owned_param")] public static unsafe extern void Use([NativeString(NativeStringKind.OwnedNul)] string text); } public static class Program { public static void Main() { } }

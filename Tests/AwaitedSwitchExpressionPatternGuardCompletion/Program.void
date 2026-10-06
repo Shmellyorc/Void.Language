@@ -1,0 +1,169 @@
+using Void;
+using Void.Threading.Tasks;
+
+public class Node214
+{
+    public int Value { get; set; }
+    public Node214 Child { get; set; }
+}
+
+public class SpecialNode214 : Node214
+{
+    public int Extra { get; set; }
+}
+
+public static class Program
+{
+    private static int _calls;
+
+    private static Task<int> IntTask(int value)
+    {
+        TaskCompletionSource<int> source = new TaskCompletionSource<int>();
+        source.SetResult(value);
+        return source.Task;
+    }
+
+    private static async Task<int> AwaitedSource(Task<int> source)
+    {
+        return (await source) switch { 1 => 10, 2 => 20, _ => 30 };
+    }
+
+    private static async Task<int> AwaitedResult(int value, Task<int> selected, Task<int> skipped)
+    {
+        return value switch { 1 => await selected, 2 => await skipped, _ => 0 };
+    }
+
+    private static async Task<int> AwaitedGuard(int value, Task<bool> guard)
+    {
+        return value switch
+        {
+            > 0 when await guard => 11,
+            > 0 => 22,
+            _ => 33
+        };
+    }
+
+    private static async Task<int> GuardSkipsResult(int value, Task<bool> guard, Task<int> skipped)
+    {
+        return value switch
+        {
+            > 0 when await guard => await skipped,
+            > 0 => 44,
+            _ => 0
+        };
+    }
+
+    private static async Task<int> PatternResult(Node214 node, Task<int> source)
+    {
+        return node switch
+        {
+            SpecialNode214 special => await source + special.Extra,
+            _ => 0
+        };
+    }
+
+    private static async Task<int> PatternGuard(Node214 node, Task<bool> guard)
+    {
+        return node switch
+        {
+            SpecialNode214 special when await guard && special.Extra > 10 => special.Extra,
+            _ => 0
+        };
+    }
+
+    private static async Task<int> RecursivePattern(Node214 node, Task<int> source)
+    {
+        return node switch
+        {
+            { Child: SpecialNode214 child } => await source + child.Extra,
+            _ => 0
+        };
+    }
+
+    private static int Count(int value)
+    {
+        _calls++;
+        return value;
+    }
+
+    private static async Task<int> SourceOnce(Task<int> arm)
+    {
+        return Count(2) switch { 1 => 1, 2 => await arm, _ => 0 };
+    }
+
+    private static async Task<int> Nested(Task<int> inner)
+    {
+        return 1 switch { 1 => (2 switch { 2 => await inner, _ => 0 }), _ => 0 };
+    }
+
+    public static void Main()
+    {
+        TaskCompletionSource<int> source = new TaskCompletionSource<int>();
+        Task<int> sourceTask = AwaitedSource(source.Task);
+        Console.WriteLine(!sourceTask.IsCompleted);
+        source.SetResult(2);
+        Console.WriteLine(sourceTask.Result == 20);
+
+        TaskCompletionSource<int> selected = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> skipped = new TaskCompletionSource<int>();
+        Task<int> resultTask = AwaitedResult(1, selected.Task, skipped.Task);
+        Console.WriteLine(!resultTask.IsCompleted && !skipped.Task.IsCompleted);
+        selected.SetResult(41);
+        Console.WriteLine(resultTask.Result == 41 && !skipped.Task.IsCompleted);
+
+        TaskCompletionSource<bool> guard = new TaskCompletionSource<bool>();
+        Task<int> guardTask = AwaitedGuard(5, guard.Task);
+        Console.WriteLine(!guardTask.IsCompleted);
+        guard.SetResult(false);
+        Console.WriteLine(guardTask.Result == 22);
+
+        TaskCompletionSource<bool> lazyGuard = new TaskCompletionSource<bool>();
+        TaskCompletionSource<int> skippedResult = new TaskCompletionSource<int>();
+        Task<int> lazyGuardTask = GuardSkipsResult(5, lazyGuard.Task, skippedResult.Task);
+        Console.WriteLine(!lazyGuardTask.IsCompleted && !skippedResult.Task.IsCompleted);
+        lazyGuard.SetResult(false);
+        Console.WriteLine(lazyGuardTask.Result == 44 && !skippedResult.Task.IsCompleted);
+
+        SpecialNode214 special = new SpecialNode214();
+        special.Extra = 14;
+        TaskCompletionSource<int> patternSource = new TaskCompletionSource<int>();
+        Task<int> patternTask = PatternResult(special, patternSource.Task);
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(!patternTask.IsCompleted);
+        patternSource.SetResult(3);
+        Console.WriteLine(patternTask.Result == 17);
+
+        TaskCompletionSource<bool> patternGuard = new TaskCompletionSource<bool>();
+        Task<int> patternGuardTask = PatternGuard(special, patternGuard.Task);
+        GC.Collect();
+        patternGuard.SetResult(true);
+        Console.WriteLine(patternGuardTask.Result == 14);
+
+        Node214 holder = new Node214();
+        SpecialNode214 child = new SpecialNode214();
+        child.Extra = 9;
+        holder.Child = child;
+        TaskCompletionSource<int> recursiveSource = new TaskCompletionSource<int>();
+        Task<int> recursiveTask = RecursivePattern(holder, recursiveSource.Task);
+        holder = null;
+        child = null;
+        GC.Collect();
+        Console.WriteLine(!recursiveTask.IsCompleted);
+        recursiveSource.SetResult(6);
+        Console.WriteLine(recursiveTask.Result == 15);
+
+        _calls = 0;
+        TaskCompletionSource<int> onceSource = new TaskCompletionSource<int>();
+        Task<int> once = SourceOnce(onceSource.Task);
+        Console.WriteLine(_calls == 1 && !once.IsCompleted);
+        onceSource.SetResult(7);
+        Console.WriteLine(once.Result == 7 && _calls == 1);
+
+        TaskCompletionSource<int> nestedSource = new TaskCompletionSource<int>();
+        Task<int> nested = Nested(nestedSource.Task);
+        Console.WriteLine(!nested.IsCompleted);
+        nestedSource.SetResult(55);
+        Console.WriteLine(nested.Result == 55);
+    }
+}

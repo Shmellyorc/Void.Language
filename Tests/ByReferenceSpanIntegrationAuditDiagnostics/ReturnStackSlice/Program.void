@@ -1,0 +1,10 @@
+using Void;
+public static class Program
+{
+    public static Span<int> Bad()
+    {
+        Span<int> values = stackalloc int[3];
+        return values.Slice(1, 2);
+    }
+    public static void Main() { Span<int> value = Bad(); Console.WriteLine(value.Length); }
+}

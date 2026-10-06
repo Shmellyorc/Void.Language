@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { int[] a = new int[] {1}; long[] b = new long[] {0}; Span<int> s = a; Span<long> d = b; s.CopyTo(d); } }

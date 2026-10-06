@@ -1,0 +1,76 @@
+using Void;
+using Void.Threading;
+
+public sealed class StressRound
+{
+    public int Count;
+    public ManualResetEvent Done;
+
+    public StressRound()
+    {
+        Count = 0;
+        Done = new ManualResetEvent(false);
+    }
+}
+
+public static class Program
+{
+    public static Action MakeIncrement(StressRound round)
+    {
+        return () =>
+        {
+            int count = Interlocked.Increment(ref round.Count);
+            if (count == 40)
+                round.Done.Set();
+        };
+    }
+
+    public static Action MakeProducer(StressRound round)
+    {
+        return () =>
+        {
+            int index = 0;
+            while (index < 10)
+            {
+                ThreadPool.QueueUserWorkItem(MakeIncrement(round));
+                index++;
+            }
+        };
+    }
+
+    public static void Main()
+    {
+        bool allRounds = true;
+        int iteration = 0;
+        while (iteration < 50)
+        {
+            StressRound round = new StressRound();
+            Thread first = new Thread(MakeProducer(round));
+            Thread second = new Thread(MakeProducer(round));
+            Thread third = new Thread(MakeProducer(round));
+            Thread fourth = new Thread(MakeProducer(round));
+
+            first.Start();
+            second.Start();
+            third.Start();
+            fourth.Start();
+            first.Join();
+            second.Join();
+            third.Join();
+            fourth.Join();
+
+            if (!round.Done.WaitOne(5000))
+                allRounds = false;
+            if (round.Count != 40)
+                allRounds = false;
+
+            iteration++;
+        }
+
+        Console.WriteLine(allRounds);
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+        GC.Collect();
+        Console.WriteLine(true);
+    }
+}

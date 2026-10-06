@@ -1,0 +1,44 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class NativeBoundaryResource289
+{
+    public static int DisposeCount;
+
+    public async ValueTask DisposeAsync()
+    {
+        await Task.Delay(5);
+        DisposeCount++;
+    }
+}
+
+public static class NativeBoundary289
+{
+    private static async Task<int> Compute(int value)
+    {
+        await using var resource = new NativeBoundaryResource289();
+        CancellationTokenSource deadline = new CancellationTokenSource();
+        deadline.CancelAfter(500);
+        CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(deadline.Token);
+        Task<int> work = Task.Run<int>(async () =>
+        {
+            await Task.Delay(10, linked.Token);
+            return value + 1;
+        });
+        int result = await work.WaitAsync(250, linked.Token);
+        linked.Dispose();
+        deadline.Dispose();
+        return result;
+    }
+
+    [Export("void289_async_timing_cancellation_integration")]
+    public static int Run(int value)
+    {
+        NativeBoundaryResource289.DisposeCount = 0;
+        int result = Compute(value).Result;
+        int disposed = NativeBoundaryResource289.DisposeCount;
+        ThreadPool.Shutdown();
+        return result == 42 && disposed == 1 ? 42 : -1;
+    }
+}

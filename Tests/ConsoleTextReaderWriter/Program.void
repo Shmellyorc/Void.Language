@@ -1,0 +1,73 @@
+using Void;
+using Void.IO;
+
+public sealed class MemoryReader : TextReader
+{
+    private int _readCount;
+    private int _lineCount;
+
+    public override int Read()
+    {
+        _readCount++;
+        return _readCount == 1 ? 90 : -1;
+    }
+
+    public override string ReadLine()
+    {
+        _lineCount++;
+        return _lineCount == 1 ? "memory" : null;
+    }
+}
+
+public sealed class MemoryWriter : TextWriter
+{
+    public string Text = "";
+
+    public override void Write(string value)
+    {
+        Text = Text + value;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        TextReader input = Console.In;
+        TextWriter output = Console.Out;
+        TextWriter error = Console.Error;
+        Console.WriteLine(input != null);
+        Console.WriteLine(output != null);
+        Console.WriteLine(error != null);
+        Console.WriteLine(Console.In == input);
+        Console.WriteLine(Console.Out == output);
+        Console.WriteLine(Console.Error == error);
+
+        int scalar = Console.In.Read();
+        Console.WriteLine(scalar == 65);
+        Console.WriteLine(Console.ReadLine() == "rest");
+        Console.WriteLine(Console.Read() == 946);
+        Console.WriteLine(Console.In.ReadLine() == "tail");
+        Console.WriteLine(Console.In.Read() == -1);
+        Console.WriteLine(Console.ReadLine() == null);
+
+        MemoryReader memoryReader = new MemoryReader();
+        TextReader reader = memoryReader;
+        Console.WriteLine(reader.Read() == 90);
+        Console.WriteLine(reader.Read() == -1);
+        Console.WriteLine(reader.ReadLine() == "memory");
+        Console.WriteLine(reader.ReadLine() == null);
+
+        MemoryWriter memoryWriter = new MemoryWriter();
+        TextWriter writer = memoryWriter;
+        writer.Write("one");
+        writer.WriteLine("two");
+        writer.WriteLine();
+        Console.WriteLine(memoryWriter.Text == "onetwo" + Environment.NewLine + Environment.NewLine);
+
+        Console.Out.Write("STDOUT|");
+        Console.Out.WriteLine("line");
+        Console.Error.Write("STDERR|");
+        Console.Error.WriteLine("line");
+    }
+}

@@ -1,0 +1,194 @@
+using Void;
+
+public sealed class SpanOwner228
+{
+    public int[] Values;
+    public string[] Names;
+
+    public SpanOwner228()
+    {
+        Values = new int[] { 40, 41, 42 };
+        Names = new string[] { "alpha", "beta" };
+    }
+
+    public Span<int> ValuesSpan
+    {
+        get { return new Span<int>(Values); }
+    }
+
+    public ReadOnlySpan<string> NamesSpan
+    {
+        get { return new ReadOnlySpan<string>(Names); }
+    }
+}
+
+public static class Program
+{
+    public static int[] MakeValues()
+    {
+        return new int[] { 10, 20, 30, 40 };
+    }
+
+    public static string[] MakeNames()
+    {
+        return new string[] { "kept", "alive", "span" };
+    }
+
+    public static Span<int> MakeSpan(int[] values)
+    {
+        return new Span<int>(values);
+    }
+
+    public static Span<int> MakeOwnedSpan()
+    {
+        int[] values = new int[] { 71, 72, 73 };
+        return new Span<int>(values);
+    }
+
+    public static ReadOnlySpan<string> MakeOwnedReadOnlySpan()
+    {
+        string[] values = new string[] { "one", "two" };
+        return new ReadOnlySpan<string>(values);
+    }
+
+    public static Span<int> Identity(Span<int> span)
+    {
+        return span;
+    }
+
+    public static int ReadScoped(scoped ReadOnlySpan<int> span)
+    {
+        return span[0] + span[1];
+    }
+
+    public static void AddOne(Span<int> span, int index)
+    {
+        span[index] += 1;
+    }
+
+    public static void Main()
+    {
+        int[] values = new int[] { 1, 2, 3, 4 };
+        Span<int> span = new Span<int>(values);
+        Console.WriteLine(span.Length == 4);
+        Console.WriteLine(!span.IsEmpty);
+        Console.WriteLine(span[0] == 1);
+        Console.WriteLine(span[3] == 4);
+
+        span[1] = 20;
+        Console.WriteLine(values[1] == 20);
+        span[1] += 2;
+        Console.WriteLine(values[1] == 22);
+        AddOne(span, 1);
+        Console.WriteLine(values[1] == 23);
+
+        ref int alias = ref span[2];
+        Console.WriteLine(alias == 3);
+        alias = 33;
+        Console.WriteLine(values[2] == 33);
+        ref int rebound = ref span[0];
+        rebound = ref span[3];
+        rebound = 44;
+        Console.WriteLine(values[3] == 44);
+
+        Span<int> copy = span;
+        span = default(Span<int>);
+        GC.Collect();
+        Console.WriteLine(copy.Length == 4);
+        Console.WriteLine(copy[1] == 23);
+        copy[0] = 11;
+        Console.WriteLine(values[0] == 11);
+
+        Span<int> identity = Identity(copy);
+        Console.WriteLine(identity[2] == 33);
+        identity[2] = 34;
+        Console.WriteLine(values[2] == 34);
+
+        Span<int> returned = MakeSpan(values);
+        Console.WriteLine(returned.Length == 4);
+        Console.WriteLine(returned[3] == 44);
+
+        Span<int> owned = MakeOwnedSpan();
+        GC.Collect();
+        Console.WriteLine(owned.Length == 3);
+        Console.WriteLine(owned[0] == 71);
+        owned[2] = 74;
+        GC.Collect();
+        Console.WriteLine(owned[2] == 74);
+
+        SpanOwner228 owner = new SpanOwner228();
+        Span<int> propertySpan = owner.ValuesSpan;
+        owner = null;
+        GC.Collect();
+        Console.WriteLine(propertySpan.Length == 3);
+        Console.WriteLine(propertySpan[1] == 41);
+        propertySpan[1] = 51;
+        GC.Collect();
+        Console.WriteLine(propertySpan[1] == 51);
+
+        string[] names = MakeNames();
+        Span<string> stringSpan = new Span<string>(names);
+        names = null;
+        GC.Collect();
+        Console.WriteLine(stringSpan.Length == 3);
+        Console.WriteLine(Runtime.Equals(stringSpan[0], "kept"));
+        Console.WriteLine(Runtime.Equals(stringSpan[2], "span"));
+        stringSpan[1] = "changed";
+        GC.Collect();
+        Console.WriteLine(Runtime.Equals(stringSpan[1], "changed"));
+
+        ReadOnlySpan<int> readOnly = new ReadOnlySpan<int>(values);
+        Console.WriteLine(readOnly.Length == 4);
+        Console.WriteLine(!readOnly.IsEmpty);
+        Console.WriteLine(readOnly[0] == 11);
+        Console.WriteLine(readOnly[1] == 23);
+        ref readonly int readOnlyAlias = ref readOnly[2];
+        Console.WriteLine(readOnlyAlias == 34);
+
+        scoped ReadOnlySpan<int> scopedReadOnly = new ReadOnlySpan<int>(values);
+        Console.WriteLine(ReadScoped(scopedReadOnly) == 34);
+
+        ReadOnlySpan<string> ownedReadOnly = MakeOwnedReadOnlySpan();
+        GC.Collect();
+        Console.WriteLine(ownedReadOnly.Length == 2);
+        Console.WriteLine(Runtime.Equals(ownedReadOnly[0], "one"));
+        Console.WriteLine(Runtime.Equals(ownedReadOnly[1], "two"));
+
+        SpanOwner228 readOnlyOwner = new SpanOwner228();
+        ReadOnlySpan<string> propertyReadOnly = readOnlyOwner.NamesSpan;
+        readOnlyOwner = null;
+        GC.Collect();
+        Console.WriteLine(propertyReadOnly.Length == 2);
+        Console.WriteLine(Runtime.Equals(propertyReadOnly[1], "beta"));
+
+        int[] emptyValues = new int[0];
+        Span<int> emptySpan = new Span<int>(emptyValues);
+        ReadOnlySpan<int> emptyReadOnly = new ReadOnlySpan<int>(emptyValues);
+        Console.WriteLine(emptySpan.Length == 0);
+        Console.WriteLine(emptySpan.IsEmpty);
+        Console.WriteLine(emptyReadOnly.Length == 0);
+        Console.WriteLine(emptyReadOnly.IsEmpty);
+
+        Span<int> nullSpan = new Span<int>((int[])null);
+        ReadOnlySpan<int> nullReadOnly = new ReadOnlySpan<int>((int[])null);
+        Console.WriteLine(nullSpan.Length == 0);
+        Console.WriteLine(nullSpan.IsEmpty);
+        Console.WriteLine(nullReadOnly.Length == 0);
+        Console.WriteLine(nullReadOnly.IsEmpty);
+
+        Span<int> defaultSpan = default(Span<int>);
+        ReadOnlySpan<int> defaultReadOnly = default(ReadOnlySpan<int>);
+        Console.WriteLine(defaultSpan.Length == 0);
+        Console.WriteLine(defaultSpan.IsEmpty);
+        Console.WriteLine(defaultReadOnly.Length == 0);
+        Console.WriteLine(defaultReadOnly.IsEmpty);
+
+        Span<int> temporary = new Span<int>(MakeValues());
+        GC.Collect();
+        Console.WriteLine(temporary.Length == 4);
+        Console.WriteLine(temporary[0] == 10);
+        temporary[3] = 99;
+        GC.Collect();
+        Console.WriteLine(temporary[3] == 99);
+    }
+}

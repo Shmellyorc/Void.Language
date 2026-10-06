@@ -1,0 +1,17 @@
+public unsafe delegate int* PointerMap(int* value);
+public static class NativeC
+{
+    [Native("vc101_apply")]
+    public static unsafe extern int* Apply(PointerMap callback, int* value);
+}
+public static class Program
+{
+    public static unsafe int* Keep(int* value) { return value; }
+    public static unsafe void Main()
+    {
+        int value = 1;
+        int* pointer = &value;
+        PointerMap callback = Keep;
+        NativeC.Apply(callback, pointer);
+    }
+}

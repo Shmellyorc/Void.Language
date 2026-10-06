@@ -1,0 +1,4 @@
+public static class Program {
+    private static unsafe void Use<T>() { var pointer = (T*)null; }
+    public static unsafe void Main() { Use<int>(); }
+}

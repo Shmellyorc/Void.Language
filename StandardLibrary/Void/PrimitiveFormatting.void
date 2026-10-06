@@ -1,0 +1,85 @@
+using Void.Text;
+
+namespace Void;
+
+public static class PrimitiveFormatting
+{
+    public static string ToString(this bool value)
+    {
+        StringBuilder text = new StringBuilder();
+        text.Append(value);
+        return text.ToString();
+    }
+    public static string ToString(this char value)
+    {
+        StringBuilder text = new StringBuilder();
+        text.Append(value);
+        return text.ToString();
+    }
+    public static string ToString(this byte value)
+    {
+        StringBuilder text = new StringBuilder();
+        text.Append(value);
+        return text.ToString();
+    }
+    public static string ToString(this sbyte value)
+    {
+        StringBuilder text = new StringBuilder();
+        text.Append(value);
+        return text.ToString();
+    }
+    public static string ToString(this short value)
+    {
+        StringBuilder text = new StringBuilder();
+        text.Append(value);
+        return text.ToString();
+    }
+    public static string ToString(this ushort value)
+    {
+        StringBuilder text = new StringBuilder();
+        text.Append(value);
+        return text.ToString();
+    }
+    public static string ToString(this int value)
+    {
+        StringBuilder text = new StringBuilder();
+        text.Append(value);
+        return text.ToString();
+    }
+    public static string ToString(this uint value)
+    {
+        StringBuilder text = new StringBuilder();
+        text.Append(value);
+        return text.ToString();
+    }
+    public static string ToString(this long value)
+    {
+        StringBuilder text = new StringBuilder();
+        text.Append(value);
+        return text.ToString();
+    }
+    public static string ToString(this ulong value)
+    {
+        StringBuilder text = new StringBuilder();
+        text.Append(value);
+        return text.ToString();
+    }
+    public static string ToString(this float value)
+    {
+        StringBuilder text = new StringBuilder();
+        text.Append(value);
+        return text.ToString();
+    }
+    public static string ToString(this double value)
+    {
+        StringBuilder text = new StringBuilder();
+        text.Append(value);
+        return text.ToString();
+    }
+    public static string ToString(this decimal value)
+    {
+        StringBuilder text = new StringBuilder();
+        text.Append(value);
+        return text.ToString();
+    }
+}

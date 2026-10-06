@@ -1,0 +1,307 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class ContinuationState199
+{
+    public int BlockerCount;
+    public int Count;
+    public int Value;
+    public int FaultObserved;
+    public int CancellationObserved;
+    public int GcValue;
+    public ManualResetEvent BlockersReady;
+    public ManualResetEvent BlockersRelease;
+
+    public ContinuationState199()
+    {
+        BlockerCount = 0;
+        Count = 0;
+        Value = 0;
+        FaultObserved = 0;
+        CancellationObserved = 0;
+        GcValue = 0;
+        BlockersReady = new ManualResetEvent(false);
+        BlockersRelease = new ManualResetEvent(false);
+    }
+}
+
+public sealed class ContinuationPayload199
+{
+    public int Value;
+
+    public ContinuationPayload199(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class ContinuationRaceState199
+{
+    public Task Continuation;
+    public int Ran;
+
+    public ContinuationRaceState199()
+    {
+        Continuation = null;
+        Ran = 0;
+    }
+}
+
+public static class Program
+{
+    private static Action MakeBlocker(ContinuationState199 state)
+    {
+        return () =>
+        {
+            int ready = Interlocked.Increment(ref state.BlockerCount);
+            if (ready == 2)
+                state.BlockersReady.Set();
+            state.BlockersRelease.WaitOne();
+        };
+    }
+
+    private static Action<Task> MakeGcContinuation(
+        ContinuationPayload199 payload,
+        ContinuationState199 state)
+    {
+        return antecedent =>
+        {
+            if (antecedent.IsCompleted)
+                state.GcValue = payload.Value;
+        };
+    }
+
+    private static bool WaitFault(Task task, string message)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (Exception error)
+        {
+            return error.Message == message;
+        }
+        return false;
+    }
+
+    private static bool WaitCanceled(Task task)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken token = error.CancellationToken;
+            return token.CanBeCanceled && token.IsCancellationRequested;
+        }
+        return false;
+    }
+
+    public static void Main()
+    {
+        ContinuationState199 state = new ContinuationState199();
+
+        Task blockerOne = Task.Run(MakeBlocker(state));
+        Task blockerTwo = Task.Run(MakeBlocker(state));
+        Console.WriteLine(state.BlockersReady.WaitOne(5000));
+
+        TaskCompletionSource queuedSource = new TaskCompletionSource();
+        Action<Task> queuedAction = antecedent =>
+        {
+            if (antecedent.Status == TaskStatus.Completed)
+                Interlocked.Increment(ref state.Count);
+        };
+        Task queuedContinuation = queuedSource.Task.ContinueWith(queuedAction);
+        Console.WriteLine(queuedContinuation.Status == TaskStatus.Pending);
+        Console.WriteLine(queuedSource.TrySetResult());
+        Console.WriteLine(queuedSource.Task.IsCompleted);
+        Console.WriteLine(!queuedContinuation.IsCompleted);
+        state.BlockersRelease.Set();
+        blockerOne.Wait();
+        blockerTwo.Wait();
+        queuedContinuation.Wait();
+        Console.WriteLine(state.Count == 1);
+        Console.WriteLine(queuedContinuation.Status == TaskStatus.Completed);
+
+        TaskCompletionSource lateSource = new TaskCompletionSource();
+        lateSource.SetResult();
+        Action<Task> lateAction = antecedent =>
+        {
+            if (antecedent.IsCompleted)
+                Interlocked.Increment(ref state.Count);
+        };
+        Task lateContinuation = lateSource.Task.ContinueWith(lateAction);
+        lateContinuation.Wait();
+        Console.WriteLine(state.Count == 2);
+        Console.WriteLine(lateContinuation.IsCompleted);
+
+        TaskCompletionSource multipleSource = new TaskCompletionSource();
+        Action<Task> increment = antecedent => Interlocked.Increment(ref state.Count);
+        Task multipleOne = multipleSource.Task.ContinueWith(increment);
+        Task multipleTwo = multipleSource.Task.ContinueWith(increment);
+        Task multipleThree = multipleSource.Task.ContinueWith(increment);
+        Console.WriteLine(multipleSource.TrySetResult());
+        multipleOne.Wait();
+        multipleTwo.Wait();
+        multipleThree.Wait();
+        Console.WriteLine(state.Count == 5);
+        Console.WriteLine(multipleOne.IsCompleted && multipleTwo.IsCompleted && multipleThree.IsCompleted);
+
+        TaskCompletionSource resultSource = new TaskCompletionSource();
+        Func<Task, int> resultFunction = antecedent => antecedent.IsCompleted ? 199 : -1;
+        Task<int> resultContinuation = resultSource.Task.ContinueWith<int>(resultFunction);
+        resultSource.SetResult();
+        Console.WriteLine(resultContinuation.Result == 199);
+        Console.WriteLine(resultContinuation.Status == TaskStatus.Completed);
+
+        TaskCompletionSource<int> typedSource = new TaskCompletionSource<int>();
+        Action<Task<int>> typedAction = antecedent => state.Value = antecedent.Result + 1;
+        Task typedContinuation = typedSource.Task.ContinueWith(typedAction);
+        Console.WriteLine(typedSource.TrySetResult(41));
+        typedContinuation.Wait();
+        Console.WriteLine(state.Value == 42);
+        Console.WriteLine(typedSource.Task.Result == 41);
+
+        TaskCompletionSource<int> typedResultSource = new TaskCompletionSource<int>();
+        Func<Task<int>, ContinuationPayload199> typedFunction = antecedent =>
+            new ContinuationPayload199(antecedent.Result + 100);
+        Task<ContinuationPayload199> typedResultContinuation =
+            typedResultSource.Task.ContinueWith<ContinuationPayload199>(typedFunction);
+        typedResultSource.SetResult(99);
+        ContinuationPayload199 typedPayload = typedResultContinuation.Result;
+        Console.WriteLine(typedPayload != null && typedPayload.Value == 199);
+        Console.WriteLine(typedResultContinuation.IsCompleted);
+
+        TaskCompletionSource faultSource = new TaskCompletionSource();
+        Action<Task> faultAction = antecedent =>
+        {
+            Exception fault = antecedent.Exception;
+            if (antecedent.IsFaulted && fault != null && fault.Message == "antecedent fault")
+                state.FaultObserved = 1;
+        };
+        Task faultContinuation = faultSource.Task.ContinueWith(faultAction);
+        faultSource.SetException(new Exception("antecedent fault"));
+        faultContinuation.Wait();
+        Console.WriteLine(state.FaultObserved == 1);
+        Console.WriteLine(faultContinuation.Status == TaskStatus.Completed);
+
+        CancellationTokenSource cancellationSource = new CancellationTokenSource();
+        CancellationToken cancellationToken = cancellationSource.Token;
+        cancellationSource.Cancel();
+        TaskCompletionSource canceledSource = new TaskCompletionSource();
+        Action<Task> canceledAction = antecedent =>
+        {
+            CancellationToken observed = antecedent.CancellationToken;
+            if (antecedent.IsCanceled && observed.CanBeCanceled && observed.IsCancellationRequested)
+                state.CancellationObserved = 1;
+        };
+        Task canceledContinuation = canceledSource.Task.ContinueWith(canceledAction);
+        canceledSource.SetCanceled(cancellationToken);
+        canceledContinuation.Wait();
+        Console.WriteLine(state.CancellationObserved == 1);
+        Console.WriteLine(canceledContinuation.Status == TaskStatus.Completed);
+        Console.WriteLine(WaitCanceled(canceledSource.Task));
+
+        TaskCompletionSource continuationFaultSource = new TaskCompletionSource();
+        Action<Task> throwingContinuation = antecedent =>
+        {
+            throw new Exception("continuation fault");
+        };
+        Task faultedContinuation = continuationFaultSource.Task.ContinueWith(throwingContinuation);
+        continuationFaultSource.SetResult();
+        Console.WriteLine(WaitFault(faultedContinuation, "continuation fault"));
+        Console.WriteLine(faultedContinuation.IsFaulted);
+
+        TaskCompletionSource gcSource = new TaskCompletionSource();
+        ContinuationPayload199 gcPayload = new ContinuationPayload199(599);
+        Action<Task> gcAction = MakeGcContinuation(gcPayload, state);
+        Task gcContinuation = gcSource.Task.ContinueWith(gcAction);
+        gcPayload = null;
+        gcAction = null;
+        GC.Collect();
+        GC.Collect();
+        gcSource.SetResult();
+        gcContinuation.Wait();
+        Console.WriteLine(state.GcValue == 599);
+
+        TaskCompletionSource directSource = new TaskCompletionSource();
+        Console.WriteLine(directSource.Task.Status == TaskStatus.Pending);
+        Console.WriteLine(directSource.TrySetResult());
+        Console.WriteLine(!directSource.TrySetResult());
+        Console.WriteLine(directSource.Task.Status == TaskStatus.Completed);
+
+        TaskCompletionSource<ContinuationPayload199> managedSource =
+            new TaskCompletionSource<ContinuationPayload199>();
+        ContinuationPayload199 managedPayload = new ContinuationPayload199(699);
+        Console.WriteLine(managedSource.TrySetResult(managedPayload));
+        managedPayload = null;
+        GC.Collect();
+        GC.Collect();
+        ContinuationPayload199 managedObserved = managedSource.Task.Result;
+        Console.WriteLine(managedObserved != null && managedObserved.Value == 699);
+        Console.WriteLine(!managedSource.TrySetResult(new ContinuationPayload199(1)));
+
+        TaskCompletionSource retainedFaultSource = new TaskCompletionSource();
+        Exception retainedFault = new Exception("source fault");
+        Console.WriteLine(retainedFaultSource.TrySetException(retainedFault));
+        retainedFault = null;
+        GC.Collect();
+        Console.WriteLine(retainedFaultSource.Task.Exception != null &&
+            retainedFaultSource.Task.Exception.Message == "source fault");
+        Console.WriteLine(WaitFault(retainedFaultSource.Task, "source fault"));
+
+        CancellationTokenSource retainedCancelSource = new CancellationTokenSource();
+        retainedCancelSource.Cancel();
+        TaskCompletionSource sourceCanceled = new TaskCompletionSource();
+        Console.WriteLine(sourceCanceled.TrySetCanceled(retainedCancelSource.Token));
+        Console.WriteLine(!sourceCanceled.TrySetCanceled(retainedCancelSource.Token));
+        Console.WriteLine(WaitCanceled(sourceCanceled.Task));
+
+        TaskCompletionSource defaultCanceled = new TaskCompletionSource();
+        defaultCanceled.SetCanceled();
+        Console.WriteLine(defaultCanceled.Task.IsCanceled);
+        CancellationToken defaultCanceledToken = defaultCanceled.Task.CancellationToken;
+        Console.WriteLine(!defaultCanceledToken.CanBeCanceled);
+
+        TaskCompletionSource raceSource = new TaskCompletionSource();
+        Task raceAntecedent = raceSource.Task;
+        ContinuationRaceState199 raceState = new ContinuationRaceState199();
+        ManualResetEvent raceGo = new ManualResetEvent(false);
+        Thread registrar = new Thread(() =>
+        {
+            raceGo.WaitOne();
+            Action<Task> raceAction = antecedent => Interlocked.Increment(ref raceState.Ran);
+            raceState.Continuation = raceAntecedent.ContinueWith(raceAction);
+        });
+        Thread completer = new Thread(() =>
+        {
+            raceGo.WaitOne();
+            raceSource.TrySetResult();
+        });
+        registrar.Start();
+        completer.Start();
+        raceGo.Set();
+        registrar.Join();
+        completer.Join();
+        Console.WriteLine(raceState.Continuation != null);
+        raceState.Continuation.Wait();
+        Console.WriteLine(raceAntecedent.IsCompleted);
+        Console.WriteLine(raceState.Ran == 1);
+        Console.WriteLine(raceState.Continuation.Status == TaskStatus.Completed);
+
+        TaskCompletionSource chainSource = new TaskCompletionSource();
+        Action<Task> firstChainAction = antecedent => Interlocked.Increment(ref state.Count);
+        Task chainOne = chainSource.Task.ContinueWith(firstChainAction);
+        Action<Task> secondChainAction = antecedent => Interlocked.Increment(ref state.Count);
+        Task chainTwo = chainOne.ContinueWith(secondChainAction);
+        chainSource.SetResult();
+        chainTwo.Wait();
+        Console.WriteLine(chainOne.IsCompleted && chainTwo.IsCompleted);
+        Console.WriteLine(state.Count == 7);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

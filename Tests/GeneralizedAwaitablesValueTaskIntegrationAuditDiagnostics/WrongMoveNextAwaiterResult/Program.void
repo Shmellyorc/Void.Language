@@ -1,0 +1,48 @@
+using Void;
+using Void.Threading.Tasks;
+
+public struct BadMoveAwaiter270
+{
+    public bool IsCompleted { get { return true; } }
+    public void OnCompleted(Action continuation) { continuation(); }
+    public int GetResult() { return 1; }
+}
+
+public struct BadMoveCompletion270
+{
+    public BadMoveAwaiter270 GetAwaiter() { return default; }
+}
+
+public struct GoodDisposeAwaiter270
+{
+    public bool IsCompleted { get { return true; } }
+    public void OnCompleted(Action continuation) { continuation(); }
+    public void GetResult() { }
+}
+
+public struct GoodDisposeCompletion270
+{
+    public GoodDisposeAwaiter270 GetAwaiter() { return default; }
+}
+
+public sealed class BadEnumerator270
+{
+    public int Current { get { return 0; } }
+    public BadMoveCompletion270 MoveNextAsync() { return default; }
+    public GoodDisposeCompletion270 DisposeAsync() { return default; }
+}
+
+public sealed class BadSequence270
+{
+    public BadEnumerator270 GetAsyncEnumerator() { return new BadEnumerator270(); }
+}
+
+public static class Program
+{
+    private static async Task Consume()
+    {
+        await foreach (int value in new BadSequence270()) { }
+    }
+
+    public static void Main() { Consume(); }
+}

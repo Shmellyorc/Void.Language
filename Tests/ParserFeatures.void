@@ -1,0 +1,21 @@
+using Void.Collections;
+
+namespace Parser.Features;
+
+[Discoverable(Name = "Thing")]
+public sealed class Box<T> : BaseBox, IThing
+{
+    private readonly List<List<int>> _items = new();
+
+    public Box(int size)
+    {
+        var value = new Vector2(10, 20);
+        value += size * 2;
+    }
+
+    public static int Try(ref int a, out int b, in Vector2 c)
+    {
+        Console.WriteLine("ok");
+        return a + 2 * 3;
+    }
+}

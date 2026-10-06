@@ -1,0 +1,84 @@
+namespace Hello;
+
+[Swizzle("Vector")]
+public struct Vector2
+{
+    public float X;
+    public float Y;
+
+    public Vector2(float x, float y)
+    {
+        X = x;
+        Y = y;
+    }
+}
+
+[Swizzle("Vector")]
+public struct Vector3
+{
+    public float X;
+    public float Y;
+    public float Z;
+
+    public Vector3(float x, float y, float z)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+    }
+}
+
+[Swizzle("Vector")]
+public struct Vector4
+{
+    public float X;
+    public float Y;
+    public float Z;
+    public float W;
+
+    public Vector4(float x, float y, float z, float w)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+        W = w;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Vector4 value = new(10f, 20f, 30f, 40f);
+
+        Vector2 xy = value.xy;
+        Vector3 zyx = value.zyx;
+        Vector2 rg = value.rg;
+        Vector2 repeated = value.xx;
+
+        Console.WriteLine(xy.X);
+        Console.WriteLine(xy.Y);
+        Console.WriteLine(zyx.X);
+        Console.WriteLine(zyx.Y);
+        Console.WriteLine(zyx.Z);
+        Console.WriteLine(rg.X);
+        Console.WriteLine(rg.Y);
+        Console.WriteLine(repeated.X);
+        Console.WriteLine(repeated.Y);
+
+        value.xy = new Vector2(5f, 8f);
+        value.w = 99f;
+        value.bg = new Vector2(60f, 70f);
+
+        Console.WriteLine(value.X);
+        Console.WriteLine(value.Y);
+        Console.WriteLine(value.Z);
+        Console.WriteLine(value.W);
+
+        Vector4 bgra = value.bgra;
+        Console.WriteLine(bgra.X);
+        Console.WriteLine(bgra.Y);
+        Console.WriteLine(bgra.Z);
+        Console.WriteLine(bgra.W);
+    }
+}

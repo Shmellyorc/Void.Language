@@ -1,0 +1,7 @@
+using Void;
+public static class Native250Bad
+{
+    [Native("voidc250_bad")]
+    public static unsafe extern void Bad(Memory<int> values);
+}
+public static class Program { public static void Main() { } }

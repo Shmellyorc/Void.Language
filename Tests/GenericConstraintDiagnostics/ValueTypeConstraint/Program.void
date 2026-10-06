@@ -1,0 +1,1 @@
+public struct Point { } public sealed class Box<T> where T : Point { } public static class Program { public static void Main() { Box<Point> value = new Box<Point>(); } }

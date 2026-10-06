@@ -1,0 +1,90 @@
+public enum Mode
+{
+    Idle = 1,
+    Run = 2
+}
+
+public sealed class Values
+{
+    public const int Base = 10;
+    public const int Double = Base + Base;
+    public const int Negative = -3;
+    public const float Speed = 2.5f;
+    public const bool Enabled = true;
+    public const char Marker = 'V';
+    public const string Name = "VOID";
+    public const Mode DefaultMode = Mode.Run;
+
+    public static int GetDouble()
+    {
+        return Double;
+    }
+}
+
+public sealed class Player
+{
+    public readonly int Id;
+    public readonly string Label;
+
+    public Player(int id, string label)
+    {
+        Id = id;
+        this.Label = label;
+    }
+
+    public int GetId()
+    {
+        return Id;
+    }
+
+    public string GetLabel()
+    {
+        return Label;
+    }
+}
+
+public static class Program
+{
+    public static int MatchConstant(int value)
+    {
+        switch (value)
+        {
+            case Values.Base:
+                return 1;
+            default:
+                return 0;
+        }
+    }
+
+    public static int MatchEnum(Mode mode)
+    {
+        switch (mode)
+        {
+            case Values.DefaultMode:
+                return 1;
+            default:
+                return 0;
+        }
+    }
+
+    public static void Main()
+    {
+        Player player = new Player(42, "player");
+
+        Console.WriteLine(Values.Base == 10);
+        Console.WriteLine(Values.Double == 20);
+        Console.WriteLine(Values.GetDouble() == 20);
+        Console.WriteLine(Values.Negative == -3);
+        Console.WriteLine(Values.Speed == 2.5f);
+        Console.WriteLine(Values.Enabled);
+        Console.WriteLine(Values.Marker == 'V');
+        Console.WriteLine(Values.Name != null);
+        Console.WriteLine(Values.DefaultMode == Mode.Run);
+        Console.WriteLine(MatchConstant(10) == 1);
+        Console.WriteLine(MatchConstant(9) == 0);
+        Console.WriteLine(MatchEnum(Mode.Run) == 1);
+        Console.WriteLine(MatchEnum(Mode.Idle) == 0);
+        Console.WriteLine(player.GetId() == 42);
+        Console.WriteLine(player.GetLabel() != null);
+    }
+}

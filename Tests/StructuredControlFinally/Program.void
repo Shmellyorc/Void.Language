@@ -1,0 +1,342 @@
+public sealed class FlowException : Exception
+{
+    public int Code;
+
+    public FlowException(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class EarlyReturn
+{
+    public int Value;
+
+    public EarlyReturn(bool stop)
+    {
+        try
+        {
+            Value = 1;
+            if (stop)
+                return;
+            Value += 100;
+        }
+        finally
+        {
+            Value += 10;
+        }
+    }
+}
+
+public static class Program
+{
+    public static int Sequence;
+
+    public static int ReturnValue()
+    {
+        Sequence = 1;
+        try
+        {
+            return Sequence * 10 + 2;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 3;
+        }
+    }
+
+    public static int ReturnFromCatch()
+    {
+        Sequence = 2;
+        try
+        {
+            throw new FlowException("caught", 7);
+        }
+        catch (FlowException error)
+        {
+            Sequence = Sequence * 10 + 4;
+            return error.Code;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 5;
+        }
+    }
+
+    public static void VoidReturn()
+    {
+        Sequence = 3;
+        try
+        {
+            return;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 6;
+        }
+        Sequence = 999;
+    }
+
+    public static int ReturnFromProtectedWithCatchFinally()
+    {
+        Sequence = 4;
+        try
+        {
+            return 8;
+        }
+        catch (FlowException error)
+        {
+            return error.Code;
+        }
+        finally
+        {
+            Sequence = Sequence * 10 + 7;
+        }
+    }
+
+    public static bool BreakRestoresHandlerChain()
+    {
+        while (true)
+        {
+            try
+            {
+                break;
+            }
+            catch (FlowException error)
+            {
+                return false;
+            }
+            finally
+            {
+                Sequence = 51;
+            }
+        }
+
+        try
+        {
+            throw new FlowException("after-break", 52);
+        }
+        catch (FlowException error)
+        {
+            return Sequence == 51 && error.Code == 52;
+        }
+        return false;
+    }
+
+    public static bool BreakThroughFinally()
+    {
+        int value = 0;
+        while (true)
+        {
+            try
+            {
+                value = 1;
+                break;
+            }
+            finally
+            {
+                value = value * 10 + 2;
+            }
+        }
+        return value == 12;
+    }
+
+    public static bool ContinueThroughFinally()
+    {
+        int count = 0;
+        int value = 0;
+        while (count < 3)
+        {
+            try
+            {
+                count++;
+                value = value * 10 + count;
+                continue;
+            }
+            finally
+            {
+                value = value * 10 + 9;
+            }
+        }
+        return value == 192939;
+    }
+
+    public static bool BreakFromCatchThroughFinally()
+    {
+        int value = 0;
+        while (true)
+        {
+            try
+            {
+                throw new FlowException("break", 1);
+            }
+            catch (FlowException error)
+            {
+                value = error.Code;
+                break;
+            }
+            finally
+            {
+                value = value * 10 + 8;
+            }
+        }
+        return value == 18;
+    }
+
+    public static Node ReturnManaged()
+    {
+        try
+        {
+            Node source = new Node(40);
+            return new Node(source.Value + 2);
+        }
+        finally
+        {
+            GC.Collect();
+        }
+    }
+
+    public static int ReturnOverriddenByThrow()
+    {
+        try
+        {
+            return 4;
+        }
+        finally
+        {
+            throw new FlowException("finally", 9);
+        }
+    }
+
+    public static bool InternalLoopStillInternal()
+    {
+        int value = 0;
+        try
+        {
+            while (true)
+            {
+                value = 1;
+                break;
+            }
+            value = value * 10 + 2;
+        }
+        finally
+        {
+            value = value * 10 + 3;
+        }
+        return value == 123;
+    }
+
+
+
+    public static bool AssignmentThroughBreakFinally()
+    {
+        int value;
+        do
+        {
+            try
+            {
+                break;
+            }
+            finally
+            {
+                value = 61;
+            }
+        }
+        while (false);
+        return value == 61;
+    }
+
+    public static bool AssignmentThroughContinueFinally()
+    {
+        int value;
+        int count = 0;
+        do
+        {
+            try
+            {
+                count++;
+                continue;
+            }
+            finally
+            {
+                value = 62;
+            }
+        }
+        while (count < 1);
+        return value == 62;
+    }
+
+    public static void AssignOutInFinally(out int value)
+    {
+        try
+        {
+            return;
+        }
+        finally
+        {
+            value = 55;
+        }
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(AssignmentThroughBreakFinally());
+        Console.WriteLine(AssignmentThroughContinueFinally());
+
+        int outValue;
+        AssignOutInFinally(out outValue);
+        Console.WriteLine(outValue == 55);
+
+        int returned = ReturnValue();
+        Console.WriteLine(returned == 12);
+        Console.WriteLine(Sequence == 13);
+
+        int caught = ReturnFromCatch();
+        Console.WriteLine(caught == 7);
+        Console.WriteLine(Sequence == 245);
+
+        VoidReturn();
+        Console.WriteLine(Sequence == 36);
+
+        int protectedReturn = ReturnFromProtectedWithCatchFinally();
+        Console.WriteLine(protectedReturn == 8);
+        Console.WriteLine(Sequence == 47);
+        Console.WriteLine(BreakRestoresHandlerChain());
+
+        Console.WriteLine(BreakThroughFinally());
+        Console.WriteLine(ContinueThroughFinally());
+        Console.WriteLine(BreakFromCatchThroughFinally());
+
+        Node managed = ReturnManaged();
+        GC.Collect();
+        Console.WriteLine(managed != null);
+        Console.WriteLine(managed.Value == 42);
+
+        try
+        {
+            Console.WriteLine(ReturnOverriddenByThrow() == 4 && false);
+        }
+        catch (FlowException error)
+        {
+            Console.WriteLine(Runtime.Equals(error.Message, "finally"));
+            Console.WriteLine(error.Code == 9);
+        }
+
+        EarlyReturn stopped = new EarlyReturn(true);
+        EarlyReturn completed = new EarlyReturn(false);
+        Console.WriteLine(stopped.Value == 11);
+        Console.WriteLine(completed.Value == 111);
+        Console.WriteLine(InternalLoopStillInternal());
+    }
+}

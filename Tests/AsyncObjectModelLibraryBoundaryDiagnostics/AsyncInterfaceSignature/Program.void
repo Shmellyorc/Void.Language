@@ -1,0 +1,11 @@
+using Void.Threading.Tasks;
+
+public interface IBad209
+{
+    public async Task Run();
+}
+
+public static class Program
+{
+    public static void Main() { }
+}

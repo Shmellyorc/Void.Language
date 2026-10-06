@@ -1,0 +1,218 @@
+public struct PreImplicit
+{
+    public int Value;
+
+    public PreImplicit(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator PreImplicit(int value)
+    {
+        return new PreImplicit(value + 10);
+    }
+}
+
+public struct PostImplicit
+{
+    public int Value;
+
+    public PostImplicit(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator int(PostImplicit value)
+    {
+        return value.Value + 20;
+    }
+}
+
+public struct BestSource
+{
+    public int Value;
+
+    public BestSource(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator BestSource(short value)
+    {
+        return new BestSource(100 + (int)value);
+    }
+
+    public static implicit operator BestSource(int value)
+    {
+        return new BestSource(200 + value);
+    }
+}
+
+public struct BestTarget
+{
+    public int Value;
+
+    public BestTarget(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator short(BestTarget value)
+    {
+        return (short)(100 + value.Value);
+    }
+
+    public static implicit operator int(BestTarget value)
+    {
+        return 200 + value.Value;
+    }
+}
+
+public struct ExplicitPre
+{
+    public int Value;
+
+    public ExplicitPre(int value)
+    {
+        Value = value;
+    }
+
+    public static explicit operator ExplicitPre(int value)
+    {
+        return new ExplicitPre(value + 30);
+    }
+}
+
+public struct ExplicitPost
+{
+    public int Value;
+
+    public ExplicitPost(int value)
+    {
+        Value = value;
+    }
+
+    public static explicit operator int(ExplicitPost value)
+    {
+        return value.Value + 40;
+    }
+}
+
+public struct ImplicitInsideExplicit
+{
+    public int Value;
+
+    public ImplicitInsideExplicit(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator ImplicitInsideExplicit(int value)
+    {
+        return new ImplicitInsideExplicit(value + 50);
+    }
+}
+
+public class BaseSource
+{
+    public int Value;
+}
+
+public class DerivedSource : BaseSource
+{
+}
+
+public struct ReferencePre
+{
+    public int Value;
+
+    public ReferencePre(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator ReferencePre(BaseSource value)
+    {
+        return new ReferencePre(value.Value + 60);
+    }
+}
+
+public class BaseResult
+{
+    public int Value;
+}
+
+public class DerivedResult : BaseResult
+{
+}
+
+public struct ReferencePost
+{
+    public int Value;
+
+    public ReferencePost(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator DerivedResult(ReferencePost value)
+    {
+        DerivedResult result = new DerivedResult();
+        result.Value = value.Value + 70;
+        return result;
+    }
+}
+
+public class Program
+{
+    public static PreImplicit MakePre(byte value)
+    {
+        return value;
+    }
+
+    public static int ReadPre(PreImplicit value)
+    {
+        return value.Value;
+    }
+
+    public static void Main()
+    {
+        byte small = (byte)3;
+        PreImplicit pre = small;
+        Console.WriteLine(pre.Value == 13);
+        Console.WriteLine(ReadPre(small) == 13);
+        Console.WriteLine(MakePre(small).Value == 13);
+
+        PostImplicit post = new PostImplicit(4);
+        long widenedPost = post;
+        Console.WriteLine(widenedPost == 24);
+
+        BestSource bestSource = small;
+        Console.WriteLine(bestSource.Value == 103);
+
+        BestTarget bestTarget = new BestTarget(5);
+        long bestTargetValue = bestTarget;
+        Console.WriteLine(bestTargetValue == 205);
+
+        long wide = 6;
+        ExplicitPre explicitPre = (ExplicitPre)wide;
+        Console.WriteLine(explicitPre.Value == 36);
+
+        ExplicitPost explicitPost = new ExplicitPost(7);
+        short narrowedPost = (short)explicitPost;
+        Console.WriteLine(narrowedPost == 47);
+
+        long explicitViaImplicitInput = 8;
+        ImplicitInsideExplicit explicitViaImplicit = (ImplicitInsideExplicit)explicitViaImplicitInput;
+        Console.WriteLine(explicitViaImplicit.Value == 58);
+
+        DerivedSource derived = new DerivedSource();
+        derived.Value = 9;
+        ReferencePre referencePre = derived;
+        Console.WriteLine(referencePre.Value == 69);
+
+        ReferencePost referencePost = new ReferencePost(10);
+        BaseResult referenceResult = referencePost;
+        Console.WriteLine(referenceResult.Value == 80);
+    }
+}

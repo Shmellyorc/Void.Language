@@ -1,0 +1,3 @@
+public class Base { }
+public sealed class Derived : Base { }
+public static class Program { public static void Main(){ Base x = new Derived(); if (x is not Derived d) { } } }

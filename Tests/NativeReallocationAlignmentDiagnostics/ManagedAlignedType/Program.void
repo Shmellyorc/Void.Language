@@ -1,0 +1,8 @@
+using Void;
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        NativeMemory.AllocateAligned<string>(2ul, 16ul);
+    }
+}

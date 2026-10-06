@@ -1,0 +1,8 @@
+public static class Program
+{
+    public static void Main()
+    {
+        bool value = true;
+        if (value is > true) { }
+    }
+}

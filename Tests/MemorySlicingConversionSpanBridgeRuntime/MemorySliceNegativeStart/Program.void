@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { int[] a = new int[2]; Memory<int> m = a; m.Slice(-1, 1); } }

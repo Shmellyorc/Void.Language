@@ -1,0 +1,74 @@
+public sealed class LibraryNode
+{
+    public int Value;
+    public LibraryNode(int value) { Value = value; }
+}
+
+public static class LibraryApi
+{
+    private static int InitCount = Initialize();
+    private static int Counter;
+    private static LibraryNode Current = new LibraryNode(40);
+
+    private static int Initialize()
+    {
+        return 1;
+    }
+
+    private static int PlusOne(int value)
+    {
+        return value + 1;
+    }
+
+    [Export("void099_add")]
+    public static int Add(int left, int right)
+    {
+        return PlusOne(left + right - 1);
+    }
+
+    [Export("void099_adjust")]
+    public static void Adjust(ref int value, int amount)
+    {
+        value += amount;
+    }
+
+    [Export("void099_write")]
+    public static void Write(out int value)
+    {
+        value = 99;
+    }
+
+    [Export("void099_read")]
+    public static int Read(in int value)
+    {
+        return value;
+    }
+
+    [Export("void099_increment")]
+    public static int Increment()
+    {
+        Counter++;
+        return Counter;
+    }
+
+    [Export("void099_init_count")]
+    public static int InitCountValue()
+    {
+        return InitCount;
+    }
+
+    [Export("void099_gc_value")]
+    public static int GcValue()
+    {
+        GC.Collect();
+        return Current.Value + 2;
+    }
+
+    [Export("void099_replace_gc_value")]
+    public static int ReplaceGcValue(int value)
+    {
+        Current = new LibraryNode(value);
+        GC.Collect();
+        return Current.Value;
+    }
+}

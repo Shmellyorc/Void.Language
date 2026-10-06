@@ -1,0 +1,23 @@
+public sealed class RethrowError : Exception
+{
+    public RethrowError(string message) : base(message) { }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        try
+        {
+            throw new RethrowError("x");
+        }
+        catch (RethrowError error)
+        {
+            Console.WriteLine(error != null);
+        }
+        finally
+        {
+            throw;
+        }
+    }
+}

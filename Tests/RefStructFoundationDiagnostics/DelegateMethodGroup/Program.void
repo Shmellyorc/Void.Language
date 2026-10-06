@@ -1,0 +1,1 @@
+using Void; public ref struct R { public void Touch() { } } public static class Program { public static void Main() { R value = new R(); Action callback = value.Touch; callback(); } }

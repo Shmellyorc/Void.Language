@@ -1,0 +1,116 @@
+using Void;
+
+public static class Eval303
+{
+    public static int ReceiverCalls;
+    public static int IndexCalls;
+    public static int ForeachCalls;
+    public static int Order;
+
+    public static string MakeText()
+    {
+        ReceiverCalls += 1;
+        Order = Order * 10 + 1;
+        return "Aé😀";
+    }
+
+    public static int MakeIndex()
+    {
+        IndexCalls += 1;
+        Order = Order * 10 + 2;
+        return 1;
+    }
+
+    public static string MakeForeachText()
+    {
+        ForeachCalls += 1;
+        return "x😀z";
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        string ascii = "Player";
+        Console.WriteLine(ascii[0] == 'P');
+        Console.WriteLine(ascii[5] == 'r');
+
+        string unicode = "Aé😀";
+        Console.WriteLine(unicode[0] == 'A');
+        Console.WriteLine(unicode[1] == (char)233);
+        Console.WriteLine(unicode[2] == (char)128512);
+        Console.WriteLine(unicode[^1] == (char)128512);
+        Console.WriteLine(unicode[^2] == (char)233);
+        Console.WriteLine(unicode[^3] == 'A');
+        Index stored = ^2;
+        Console.WriteLine(unicode[stored] == (char)233);
+
+        string embedded = "A\0B";
+        Console.WriteLine(embedded[0] == 'A');
+        Console.WriteLine((int)embedded[1] == 0);
+        Console.WriteLine(embedded[2] == 'B');
+
+        Eval303.Order = 0;
+        Console.WriteLine(Eval303.MakeText()[Eval303.MakeIndex()] == (char)233);
+        Console.WriteLine(Eval303.ReceiverCalls == 1 && Eval303.IndexCalls == 1 && Eval303.Order == 12);
+
+        string absent = null;
+        char? missing = absent?[0];
+        Console.WriteLine(!missing.HasValue);
+        char? present = unicode?[^1];
+        Console.WriteLine(present.HasValue && present.Value == (char)128512);
+
+        int count = 0;
+        int scalarSum = 0;
+        foreach (char c in unicode)
+        {
+            count += 1;
+            scalarSum += (int)c;
+        }
+        Console.WriteLine(count == 3);
+        Console.WriteLine(scalarSum == 65 + 233 + 128512);
+
+        int embeddedCount = 0;
+        int zeroCount = 0;
+        foreach (char c in embedded)
+        {
+            embeddedCount += 1;
+            if ((int)c == 0)
+                zeroCount += 1;
+        }
+        Console.WriteLine(embeddedCount == 3);
+        Console.WriteLine(zeroCount == 1);
+
+        int emptyCount = 0;
+        foreach (char c in string.Empty)
+            emptyCount += 1;
+        Console.WriteLine(emptyCount == 0);
+
+        int gcCount = 0;
+        foreach (char c in "é😀")
+        {
+            GC.Collect();
+            if (c == (char)233 || c == (char)128512)
+                gcCount += 1;
+        }
+        Console.WriteLine(gcCount == 2);
+
+        int flow = 0;
+        foreach (char c in "abcd")
+        {
+            if (c == 'b')
+                continue;
+            if (c == 'd')
+                break;
+            flow += (int)c;
+        }
+        Console.WriteLine(flow == (int)'a' + (int)'c');
+
+        int foreachCount = 0;
+        foreach (var c in Eval303.MakeForeachText())
+            foreachCount += (int)c;
+        Console.WriteLine(Eval303.ForeachCalls == 1);
+        Console.WriteLine(foreachCount == (int)'x' + 128512 + (int)'z');
+    }
+}

@@ -1,0 +1,4 @@
+using Void;
+public interface IHub { static event Action<int> Changed; }
+public sealed class Bad : IHub { private static event Action<int> Changed; }
+public static class Program { public static void Main() { } }

@@ -1,0 +1,10 @@
+using Void;
+public static class Program
+{
+    public static Span<int> Bad(scoped Span<int> values) { return values; }
+    public static void Main()
+    {
+        Span<int> values = stackalloc int[1];
+        Bad(values);
+    }
+}

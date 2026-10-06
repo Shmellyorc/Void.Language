@@ -1,0 +1,14 @@
+using Void;
+using Void.IO;
+public static class Program
+{
+    public static void Main()
+    {
+        MemoryStream stream = new MemoryStream();
+        stream.WriteByte((byte)7);
+        Console.WriteLine(stream.Length == 1L);
+        long preserved = 1L;
+        try { preserved = 42L; throw new Exception("probe"); }
+        catch (Exception e) { Console.WriteLine(preserved == 42L); }
+    }
+}

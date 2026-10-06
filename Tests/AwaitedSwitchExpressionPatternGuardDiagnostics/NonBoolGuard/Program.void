@@ -1,0 +1,15 @@
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    private static async Task<int> Run(Task<int> guard)
+    {
+        return 1 switch
+        {
+            1 when await guard => 1,
+            _ => 0
+        };
+    }
+
+    public static void Main() {}
+}

@@ -1,0 +1,30 @@
+public sealed class HiddenEnumerator
+{
+    private int _value;
+    public int Current => _value;
+    public bool MoveNext()
+    {
+        _value++;
+        return _value <= 1;
+    }
+    private void Dispose()
+    {
+    }
+}
+
+public sealed class HiddenEnumerable
+{
+    public HiddenEnumerator GetEnumerator()
+    {
+        return new HiddenEnumerator();
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        foreach (int value in new HiddenEnumerable())
+            Console.WriteLine(value);
+    }
+}

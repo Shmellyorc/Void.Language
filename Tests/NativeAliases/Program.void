@@ -1,0 +1,24 @@
+public static class NativeC
+{
+    [Native("abs")]
+    public static unsafe extern int Absolute(int value);
+
+    [Native("toupper")]
+    public static unsafe extern int ToUpper(int value);
+
+    [Native("strcmp")]
+    public static unsafe extern int Compare(string left, string right);
+
+    public static unsafe extern int tolower(int value);
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        Console.WriteLine(NativeC.Absolute(-42));
+        Console.WriteLine(NativeC.ToUpper(97));
+        Console.WriteLine(NativeC.Compare("void", "void") == 0);
+        Console.WriteLine(NativeC.tolower(66));
+    }
+}

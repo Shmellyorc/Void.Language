@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "ConsoleRedirectionDiagnostics",
+  "version": "0.0.314",
+  "output": "exe",
+  "compiler": { "unsafe": false }
+}

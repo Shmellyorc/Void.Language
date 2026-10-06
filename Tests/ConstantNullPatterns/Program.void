@@ -1,0 +1,72 @@
+using Void;
+
+public sealed class RefValue
+{
+    public int Value;
+    public RefValue(int value) { Value = value; }
+}
+
+public sealed class Probe
+{
+    public int Calls;
+
+    public int? NextNullable(int? value)
+    {
+        Calls++;
+        return value;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        int five = 5;
+        Console.WriteLine(five is 5);
+        Console.WriteLine(!(five is 6));
+
+        int negative = -4;
+        Console.WriteLine(negative is -4);
+        Console.WriteLine(!(negative is +4));
+
+        bool enabled = true;
+        Console.WriteLine(enabled is true);
+        Console.WriteLine(!(enabled is false));
+
+        char letter = 'v';
+        Console.WriteLine(letter is 'v');
+        Console.WriteLine(!(letter is 'x'));
+
+        string text = "void";
+        Console.WriteLine(text is "void");
+        Console.WriteLine(!(text is "other"));
+        Console.WriteLine(!(text is null));
+
+        string missingText = null;
+        Console.WriteLine(missingText is null);
+        Console.WriteLine(!(missingText is "void"));
+
+        RefValue reference = new RefValue(7);
+        Console.WriteLine(!(reference is null));
+        reference = null;
+        Console.WriteLine(reference is null);
+
+        int? nullableFive = 5;
+        int? nullableNone = null;
+        Console.WriteLine(nullableFive is 5);
+        Console.WriteLine(!(nullableFive is 6));
+        Console.WriteLine(!(nullableFive is null));
+        Console.WriteLine(nullableNone is null);
+        Console.WriteLine(!(nullableNone is 5));
+
+        bool? nullableFlag = false;
+        Console.WriteLine(nullableFlag is false);
+        Console.WriteLine(!(nullableFlag is true));
+
+        Probe probe = new Probe();
+        Console.WriteLine(probe.NextNullable(7) is 7);
+        Console.WriteLine(probe.Calls == 1);
+        Console.WriteLine(probe.NextNullable(null) is null);
+        Console.WriteLine(probe.Calls == 2);
+    }
+}

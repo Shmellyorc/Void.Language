@@ -1,0 +1,2 @@
+public struct S245 { public int Value; public S245(int value) { Value = value; } public ref int GetPinnableReference() { return ref Value; } }
+public static class Program { private static unsafe void Pin(in S245 value) { fixed (int* p = value) { } } public static unsafe void Main() { S245 x = new S245(1); Pin(in x); } }

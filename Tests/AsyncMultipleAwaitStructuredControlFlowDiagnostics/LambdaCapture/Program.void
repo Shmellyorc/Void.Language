@@ -1,0 +1,17 @@
+using Void;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    private static async Task Work(Task source)
+    {
+        int value = 4;
+        Action callback = () => Console.WriteLine(value);
+        await source;
+        callback();
+    }
+
+    public static void Main()
+    {
+    }
+}

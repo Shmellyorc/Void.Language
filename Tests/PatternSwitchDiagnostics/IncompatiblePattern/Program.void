@@ -1,0 +1,3 @@
+public class A { }
+public struct S { }
+public static class Program { public static void Main() { A a = new A(); switch (a) { case S: break; default: break; } } }

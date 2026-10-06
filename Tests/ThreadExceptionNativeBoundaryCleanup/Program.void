@@ -1,0 +1,286 @@
+using Void;
+using Void.Threading;
+
+public sealed class Payload
+{
+    public int Value;
+
+    public Payload(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class ThreadBoundaryException : Exception
+{
+    public int Code;
+    public Payload Payload;
+
+    public ThreadBoundaryException(string message, int code) : base(message)
+    {
+        Code = code;
+        Payload = null;
+    }
+}
+
+public sealed class SharedState
+{
+    public int Ready;
+    public int FinallyCount;
+    public int DisposeCount;
+    public int NestedCaught;
+}
+
+public sealed class TrackedResource : IDisposable
+{
+    private SharedState _state;
+
+    public TrackedResource(SharedState state)
+    {
+        _state = state;
+    }
+
+    public void Dispose()
+    {
+        lock (_state)
+        {
+            _state.DisposeCount++;
+            _state.Ready++;
+        }
+    }
+}
+
+public delegate int NativeIntCallback(int value);
+
+public static class NativeFixture168
+{
+    [Native("voidc168_reset")]
+    public static unsafe extern void Reset();
+
+    [Native("voidc168_invoke_twice")]
+    public static unsafe extern int InvokeTwice(NativeIntCallback callback);
+
+    [Native("voidc168_callback_entries")]
+    public static unsafe extern int CallbackEntries();
+
+    [Native("voidc168_after_steps")]
+    public static unsafe extern int AfterSteps();
+
+    [Native("voidc168_observed_sum")]
+    public static unsafe extern int ObservedSum();
+}
+
+public static class Program
+{
+    public static int NativeCalls;
+
+    public static void WaitForReady(SharedState state, int target)
+    {
+        while (true)
+        {
+            bool ready = false;
+            lock (state)
+            {
+                ready = state.Ready >= target;
+            }
+            if (ready)
+                return;
+            GC.Collect();
+        }
+    }
+
+    public static int NativeThrowing(int value)
+    {
+        NativeCalls++;
+        throw new ThreadBoundaryException("native worker callback", 70 + value);
+    }
+
+    public static unsafe void Main()
+    {
+        SharedState basicState = new SharedState();
+        Thread basic = new Thread(() =>
+        {
+            try
+            {
+                ThreadBoundaryException failure = new ThreadBoundaryException("worker basic", 11);
+                failure.Payload = new Payload(111);
+                throw failure;
+            }
+            finally
+            {
+                lock (basicState)
+                {
+                    basicState.FinallyCount++;
+                    basicState.Ready++;
+                }
+            }
+        });
+        basic.Start();
+        WaitForReady(basicState, 1);
+        GC.Collect();
+        GC.Collect();
+        bool basicCaught = false;
+        try
+        {
+            basic.Join();
+        }
+        catch (ThreadBoundaryException error)
+        {
+            basicCaught = error.Message == "worker basic" && error.Code == 11 &&
+                error.Payload != null && error.Payload.Value == 111;
+        }
+        Console.WriteLine(basicCaught);
+        Console.WriteLine(basicState.FinallyCount == 1);
+
+        SharedState usingState = new SharedState();
+        Thread usingThread = new Thread(() =>
+        {
+            using (TrackedResource resource = new TrackedResource(usingState))
+            {
+                throw new ThreadBoundaryException("worker using", 22);
+            }
+        });
+        usingThread.Start();
+        WaitForReady(usingState, 1);
+        GC.Collect();
+        bool usingCaught = false;
+        try
+        {
+            usingThread.Join();
+        }
+        catch (ThreadBoundaryException error)
+        {
+            usingCaught = error.Message == "worker using" && error.Code == 22;
+        }
+        Console.WriteLine(usingCaught);
+        Console.WriteLine(usingState.DisposeCount == 1);
+
+        SharedState lockState = new SharedState();
+        Thread lockThread = new Thread(() =>
+        {
+            try
+            {
+                lock (lockState)
+                {
+                    throw new ThreadBoundaryException("worker lock", 33);
+                }
+            }
+            finally
+            {
+                lock (lockState)
+                {
+                    lockState.FinallyCount++;
+                    lockState.Ready++;
+                }
+            }
+        });
+        lockThread.Start();
+        WaitForReady(lockState, 1);
+        GC.Collect();
+        bool lockCaught = false;
+        try
+        {
+            lockThread.Join();
+        }
+        catch (ThreadBoundaryException error)
+        {
+            lockCaught = error.Code == 33;
+        }
+        Console.WriteLine(lockCaught);
+        lock (lockState)
+        {
+            lockState.FinallyCount++;
+        }
+        Console.WriteLine(lockState.FinallyCount == 2);
+
+        SharedState nestedState = new SharedState();
+        Thread outer = new Thread(() =>
+        {
+            Thread inner = new Thread(() =>
+            {
+                throw new ThreadBoundaryException("nested worker", 44);
+            });
+            inner.Start();
+            try
+            {
+                inner.Join();
+            }
+            catch (ThreadBoundaryException error)
+            {
+                if (error.Code == 44)
+                    nestedState.NestedCaught = 1;
+            }
+        });
+        outer.Start();
+        outer.Join();
+        Console.WriteLine(nestedState.NestedCaught == 1);
+
+        SharedState concurrentState = new SharedState();
+        Thread first = new Thread(() =>
+        {
+            try { throw new ThreadBoundaryException("one", 51); }
+            finally { lock (concurrentState) { concurrentState.Ready++; } }
+        });
+        Thread second = new Thread(() =>
+        {
+            try { throw new ThreadBoundaryException("two", 52); }
+            finally { lock (concurrentState) { concurrentState.Ready++; } }
+        });
+        Thread third = new Thread(() =>
+        {
+            try { throw new ThreadBoundaryException("three", 53); }
+            finally { lock (concurrentState) { concurrentState.Ready++; } }
+        });
+        Thread fourth = new Thread(() =>
+        {
+            try { throw new ThreadBoundaryException("four", 54); }
+            finally { lock (concurrentState) { concurrentState.Ready++; } }
+        });
+        first.Start();
+        second.Start();
+        third.Start();
+        fourth.Start();
+        WaitForReady(concurrentState, 4);
+        for (int i = 0; i < 8; i++)
+            GC.Collect();
+        int concurrentCaught = 0;
+        try { first.Join(); } catch (ThreadBoundaryException error) { if (error.Code == 51) concurrentCaught++; }
+        try { second.Join(); } catch (ThreadBoundaryException error) { if (error.Code == 52) concurrentCaught++; }
+        try { third.Join(); } catch (ThreadBoundaryException error) { if (error.Code == 53) concurrentCaught++; }
+        try { fourth.Join(); } catch (ThreadBoundaryException error) { if (error.Code == 54) concurrentCaught++; }
+        Console.WriteLine(concurrentCaught == 4);
+
+        NativeFixture168.Reset();
+        NativeCalls = 0;
+        Thread nativeWorker = new Thread(() =>
+        {
+            NativeFixture168.InvokeTwice(NativeThrowing);
+        });
+        nativeWorker.Start();
+        bool nativeCaught = false;
+        try
+        {
+            nativeWorker.Join();
+        }
+        catch (ThreadBoundaryException error)
+        {
+            nativeCaught = error.Message == "native worker callback" && error.Code == 71;
+        }
+        Console.WriteLine(nativeCaught);
+        Console.WriteLine(NativeCalls == 1);
+        Console.WriteLine(NativeFixture168.CallbackEntries() == 2);
+        Console.WriteLine(NativeFixture168.AfterSteps() == 2);
+        Console.WriteLine(NativeFixture168.ObservedSum() == 0);
+
+        Thread after = new Thread(() =>
+        {
+            lock (basicState)
+            {
+                basicState.Ready++;
+            }
+        });
+        after.Start();
+        after.Join();
+        Console.WriteLine(basicState.Ready == 2);
+    }
+}

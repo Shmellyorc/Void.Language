@@ -1,0 +1,9 @@
+using Void.Threading.Tasks;
+public static class Program
+{
+    private static async Task<int> Run(Task<int> source)
+    {
+        return 1 switch { 1 => await source, _ => 0 };
+    }
+    public static void Main() {}
+}

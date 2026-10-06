@@ -1,0 +1,2 @@
+using Void.Collections;
+public static class Program { public static void Main() { Runtime.WriteUtf8Stdout("hidden"); } }

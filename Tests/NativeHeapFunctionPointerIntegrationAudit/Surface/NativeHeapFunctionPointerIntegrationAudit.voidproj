@@ -1,0 +1,11 @@
+{
+  "format": 1,
+  "name": "NativeHeapFunctionPointerIntegrationAudit",
+  "output": "exe",
+  "version": "0.0.260",
+  "compiler": {
+    "unsafe": true,
+    "libraryPaths": ["native"],
+    "libraries": ["voidc260audit"]
+  }
+}

@@ -1,0 +1,7 @@
+public class BaseType { }
+public interface IBad : BaseType { }
+
+public static class Program
+{
+    public static void Main() { }
+}

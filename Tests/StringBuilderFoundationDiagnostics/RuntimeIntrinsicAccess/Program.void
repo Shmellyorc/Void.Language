@@ -1,0 +1,8 @@
+public static class Program
+{
+    public static void Main()
+    {
+        byte[] buffer = new byte[4];
+        Runtime.Utf8StringCopy("x", buffer, 0);
+    }
+}

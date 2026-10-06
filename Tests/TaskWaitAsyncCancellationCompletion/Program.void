@@ -1,0 +1,218 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class WaitPayload
+{
+    public int Value;
+    public WaitPayload(int value) { Value = value; }
+}
+
+public static class Program
+{
+    private static async Task<int> AwaitValue(Task<int> source, CancellationToken token)
+    {
+        return await source.WaitAsync(token);
+    }
+
+    private static async Task<bool> AwaitCanceled(Task source, CancellationToken token)
+    {
+        try
+        {
+            await source.WaitAsync(token);
+        }
+        catch (OperationCanceledException error)
+        {
+            return error.CancellationToken.IsSameSource(token);
+        }
+        return false;
+    }
+
+    public static void Main()
+    {
+        CancellationTokenSource preCanceled = new CancellationTokenSource();
+        preCanceled.Cancel();
+
+        Task completed = Task.CompletedTask;
+        Task completedWait = completed.WaitAsync(preCanceled.Token);
+        Console.WriteLine(completedWait == completed);
+        Console.WriteLine(completedWait.IsCompleted && !completedWait.IsCanceled && !completedWait.IsFaulted);
+
+        TaskCompletionSource identitySource = new TaskCompletionSource();
+        Task identityWait = identitySource.Task.WaitAsync(CancellationToken.None);
+        Console.WriteLine(identityWait == identitySource.Task);
+        identitySource.SetResult();
+        Console.WriteLine(identityWait.Wait(1000));
+
+        TaskCompletionSource preSource = new TaskCompletionSource();
+        Task preWait = preSource.Task.WaitAsync(preCanceled.Token);
+        Console.WriteLine(preWait.IsCanceled);
+        Console.WriteLine(!preSource.Task.IsCompleted);
+        bool preToken = false;
+        try { preWait.Wait(); }
+        catch (OperationCanceledException error) { preToken = error.CancellationToken.IsSameSource(preCanceled.Token); }
+        Console.WriteLine(preToken);
+        preSource.SetResult();
+        Console.WriteLine(preSource.Task.IsCompleted && !preSource.Task.IsCanceled);
+        Console.WriteLine(preWait.IsCanceled);
+
+        TaskCompletionSource sourceWins = new TaskCompletionSource();
+        CancellationTokenSource sourceWinsCancel = new CancellationTokenSource();
+        Task sourceWinsWait = sourceWins.Task.WaitAsync(sourceWinsCancel.Token);
+        Console.WriteLine(sourceWinsWait != sourceWins.Task && !sourceWinsWait.IsCompleted);
+        sourceWins.SetResult();
+        Console.WriteLine(sourceWinsWait.Wait(1000));
+        sourceWinsCancel.Cancel();
+        Console.WriteLine(sourceWinsWait.IsCompleted && !sourceWinsWait.IsCanceled && !sourceWinsWait.IsFaulted);
+
+        TaskCompletionSource faultSource = new TaskCompletionSource();
+        CancellationTokenSource faultWaitCancel = new CancellationTokenSource();
+        Exception sourceFault = new Exception("wait-source-fault");
+        Task faultWait = faultSource.Task.WaitAsync(faultWaitCancel.Token);
+        faultSource.SetException(sourceFault);
+        bool faultSeen = false;
+        try { faultWait.Wait(); }
+        catch (Exception error) { faultSeen = error == sourceFault; }
+        Console.WriteLine(faultSeen);
+        Console.WriteLine(faultWait.IsFaulted && faultWait.Exception == sourceFault);
+
+        TaskCompletionSource canceledSource = new TaskCompletionSource();
+        CancellationTokenSource sourceCancellation = new CancellationTokenSource();
+        CancellationToken sourceToken = sourceCancellation.Token;
+        Task canceledSourceWait = canceledSource.Task.WaitAsync(new CancellationTokenSource().Token);
+        sourceCancellation.Cancel();
+        canceledSource.SetCanceled(sourceToken);
+        bool sourceCancelSeen = false;
+        try { canceledSourceWait.Wait(); }
+        catch (OperationCanceledException error) { sourceCancelSeen = error.CancellationToken.IsSameSource(sourceToken); }
+        Console.WriteLine(sourceCancelSeen);
+        Console.WriteLine(canceledSourceWait.IsCanceled);
+
+        TaskCompletionSource waitCanceledSource = new TaskCompletionSource();
+        CancellationTokenSource waitCancellation = new CancellationTokenSource();
+        CancellationToken waitToken = waitCancellation.Token;
+        Task waitCanceled = waitCanceledSource.Task.WaitAsync(waitToken);
+        waitCancellation.Cancel();
+        Console.WriteLine(waitCanceled.IsCanceled);
+        Console.WriteLine(!waitCanceledSource.Task.IsCompleted);
+        bool waitCancelSeen = false;
+        try { waitCanceled.Wait(); }
+        catch (OperationCanceledException error) { waitCancelSeen = error.CancellationToken.IsSameSource(waitToken); }
+        Console.WriteLine(waitCancelSeen);
+        waitCanceledSource.SetResult();
+        Console.WriteLine(waitCanceledSource.Task.IsCompleted && !waitCanceledSource.Task.IsCanceled);
+        Console.WriteLine(waitCanceled.IsCanceled);
+
+        TaskCompletionSource<int> genericSource = new TaskCompletionSource<int>();
+        CancellationTokenSource genericCancellation = new CancellationTokenSource();
+        Task<int> genericWait = genericSource.Task.WaitAsync(genericCancellation.Token);
+        genericSource.SetResult(42);
+        Console.WriteLine(genericWait.Result == 42);
+        genericCancellation.Cancel();
+        Console.WriteLine(genericWait.Result == 42);
+
+        TaskCompletionSource<int> genericCanceledSource = new TaskCompletionSource<int>();
+        CancellationTokenSource genericWaitCancellation = new CancellationTokenSource();
+        Task<int> genericCanceledWait = genericCanceledSource.Task.WaitAsync(genericWaitCancellation.Token);
+        genericWaitCancellation.Cancel();
+        Console.WriteLine(genericCanceledWait.IsCanceled);
+        genericCanceledSource.SetResult(73);
+        Console.WriteLine(genericCanceledSource.Task.Result == 73);
+        Console.WriteLine(genericCanceledWait.IsCanceled);
+
+        TaskCompletionSource<int> genericSourceCanceled = new TaskCompletionSource<int>();
+        CancellationTokenSource genericAntecedentCancellation = new CancellationTokenSource();
+        CancellationToken genericAntecedentToken = genericAntecedentCancellation.Token;
+        CancellationTokenSource genericWaitTokenSource = new CancellationTokenSource();
+        Task<int> genericSourceCanceledWait = genericSourceCanceled.Task.WaitAsync(genericWaitTokenSource.Token);
+        genericAntecedentCancellation.Cancel();
+        genericSourceCanceled.SetCanceled(genericAntecedentToken);
+        bool genericSourceCancelSeen = false;
+        try { int ignored = genericSourceCanceledWait.Result; }
+        catch (OperationCanceledException error) { genericSourceCancelSeen = error.CancellationToken.IsSameSource(genericAntecedentToken); }
+        Console.WriteLine(genericSourceCancelSeen);
+
+        TaskCompletionSource disposedTokenSource = new TaskCompletionSource();
+        CancellationTokenSource disposableWaitCts = new CancellationTokenSource();
+        CancellationToken disposableWaitToken = disposableWaitCts.Token;
+        Task disposedTokenWait = disposedTokenSource.Task.WaitAsync(disposableWaitToken);
+        disposableWaitCts.Dispose();
+        disposedTokenSource.SetResult();
+        Console.WriteLine(disposedTokenWait.Wait(1000));
+
+        TaskCompletionSource delayedCancelSource = new TaskCompletionSource();
+        CancellationTokenSource delayedCancel = new CancellationTokenSource();
+        Task delayedCanceledWait = delayedCancelSource.Task.WaitAsync(delayedCancel.Token);
+        delayedCancel.CancelAfter(30);
+        bool delayedCancelSeen = false;
+        try { delayedCanceledWait.Wait(1000); }
+        catch (OperationCanceledException error) { delayedCancelSeen = error.CancellationToken.IsSameSource(delayedCancel.Token); }
+        Console.WriteLine(delayedCancelSeen);
+        Console.WriteLine(!delayedCancelSource.Task.IsCompleted);
+        delayedCancelSource.SetResult();
+        Console.WriteLine(delayedCancelSource.Task.IsCompleted);
+
+        CancellationTokenSource linkedParent = new CancellationTokenSource();
+        CancellationTokenSource linkedWait = CancellationTokenSource.CreateLinkedTokenSource(linkedParent.Token);
+        TaskCompletionSource linkedAntecedent = new TaskCompletionSource();
+        Task linkedProxy = linkedAntecedent.Task.WaitAsync(linkedWait.Token);
+        linkedParent.Cancel();
+        Console.WriteLine(linkedProxy.IsCanceled && !linkedAntecedent.Task.IsCompleted);
+        linkedAntecedent.SetResult();
+
+        TaskCompletionSource<int> awaitSource = new TaskCompletionSource<int>();
+        CancellationTokenSource awaitTokenSource = new CancellationTokenSource();
+        Task<int> awaiting = AwaitValue(awaitSource.Task, awaitTokenSource.Token);
+        awaitSource.SetResult(91);
+        Console.WriteLine(awaiting.Result == 91);
+
+        TaskCompletionSource awaitCancelSource = new TaskCompletionSource();
+        CancellationTokenSource awaitCancelTokenSource = new CancellationTokenSource();
+        Task<bool> awaitingCancel = AwaitCanceled(awaitCancelSource.Task, awaitCancelTokenSource.Token);
+        awaitCancelTokenSource.Cancel();
+        Console.WriteLine(awaitingCancel.Result);
+        Console.WriteLine(!awaitCancelSource.Task.IsCompleted);
+        awaitCancelSource.SetResult();
+
+        TaskCompletionSource<WaitPayload> payloadSource = new TaskCompletionSource<WaitPayload>();
+        CancellationTokenSource payloadCancel = new CancellationTokenSource();
+        Task<WaitPayload> payloadWait = payloadSource.Task.WaitAsync(payloadCancel.Token);
+        GC.Collect();
+        payloadSource.SetResult(new WaitPayload(123));
+        GC.Collect();
+        Console.WriteLine(payloadWait.Result.Value == 123);
+
+        CancellationTokenSource disposedFastSource = new CancellationTokenSource();
+        CancellationToken disposedFastToken = disposedFastSource.Token;
+        disposedFastSource.Dispose();
+        Task disposedFastWait = Task.CompletedTask.WaitAsync(disposedFastToken);
+        Console.WriteLine(disposedFastWait == Task.CompletedTask);
+
+        Task<int> genericCompleted = Task.FromResult<int>(314);
+        Task<int> genericFastWait = genericCompleted.WaitAsync(disposedFastToken);
+        Console.WriteLine(genericFastWait == genericCompleted && genericFastWait.Result == 314);
+
+        TaskCompletionSource<int> genericIdentitySource = new TaskCompletionSource<int>();
+        Task<int> genericIdentityWait = genericIdentitySource.Task.WaitAsync(CancellationToken.None);
+        Console.WriteLine(genericIdentityWait == genericIdentitySource.Task);
+        genericIdentitySource.SetResult(808);
+        Console.WriteLine(genericIdentityWait.Result == 808);
+
+        TaskCompletionSource raceSource = new TaskCompletionSource();
+        CancellationTokenSource raceCancel = new CancellationTokenSource();
+        Task raceWait = raceSource.Task.WaitAsync(raceCancel.Token);
+        ManualResetEvent raceStart = new ManualResetEvent(false);
+        ManualResetEvent raceDoneA = new ManualResetEvent(false);
+        ManualResetEvent raceDoneB = new ManualResetEvent(false);
+        ThreadPool.QueueUserWorkItem(() => { raceStart.WaitOne(); raceSource.TrySetResult(); raceDoneA.Set(); });
+        ThreadPool.QueueUserWorkItem(() => { raceStart.WaitOne(); raceCancel.Cancel(); raceDoneB.Set(); });
+        raceStart.Set();
+        Console.WriteLine(raceDoneA.WaitOne(1000));
+        Console.WriteLine(raceDoneB.WaitOne(1000));
+        Console.WriteLine(raceWait.IsCompleted && !raceWait.IsFaulted);
+        Console.WriteLine(raceSource.Task.IsCompleted && !raceSource.Task.IsCanceled);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

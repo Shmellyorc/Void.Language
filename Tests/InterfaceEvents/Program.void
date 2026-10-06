@@ -1,0 +1,214 @@
+using Void;
+
+public static class Recorder
+{
+    public static int Value;
+
+    public static void Reset()
+    {
+        Value = 0;
+    }
+
+    public static void Push(int digit)
+    {
+        Value = Value * 10 + digit;
+    }
+}
+
+public sealed class Listener
+{
+    private int _digit;
+
+    public Listener(int digit)
+    {
+        _digit = digit;
+    }
+
+    public void Handle(int value)
+    {
+        Recorder.Push(_digit);
+    }
+}
+
+public interface IEmitter
+{
+    event Action<int> Changed;
+}
+
+public interface IAdvancedEmitter : IEmitter
+{
+    event Action<int> Secondary;
+}
+
+public sealed class Publisher : IAdvancedEmitter
+{
+    public event Action<int> Changed = new Listener(1).Handle;
+    public event Action<int> Secondary = BuiltInSecondary;
+
+    private static void BuiltInSecondary(int value)
+    {
+        Recorder.Push(2);
+    }
+
+    public void RaiseChanged(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+
+    public void RaiseSecondary(int value)
+    {
+        if (Secondary != null)
+            Secondary(value);
+    }
+}
+
+public class BasePublisher : IEmitter
+{
+    public event Action<int> Changed;
+
+    public void Raise(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+}
+
+public sealed class DerivedPublisher : BasePublisher
+{
+}
+
+
+public interface ILeftEmitter
+{
+    event Action<int> Changed;
+}
+
+public interface IRightEmitter
+{
+    event Action<int> Changed;
+}
+
+public interface IDiamondEmitter : ILeftEmitter, IRightEmitter
+{
+}
+
+public sealed class DiamondPublisher : IDiamondEmitter
+{
+    public event Action<int> Changed;
+
+    public void Raise(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+}
+
+public interface IGenericEmitter<T>
+{
+    event Action<T> Changed;
+}
+
+public sealed class GenericPublisher<T> : IGenericEmitter<T>
+{
+    public event Action<T> Changed;
+
+    public void Raise(T value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+}
+
+public static class StaticHub
+{
+    public static event Action<int> Changed = BuiltIn;
+
+    private static void BuiltIn(int value)
+    {
+        Recorder.Push(9);
+    }
+
+    public static void Raise(int value)
+    {
+        if (Changed != null)
+            Changed(value);
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Publisher publisher = new Publisher();
+        IAdvancedEmitter advanced = publisher;
+        IEmitter inherited = advanced;
+        Listener three = new Listener(3);
+        Listener four = new Listener(4);
+
+        advanced.Changed += three.Handle;
+        advanced.Secondary += four.Handle;
+
+        Recorder.Reset();
+        publisher.RaiseChanged(0);
+        Console.WriteLine(Recorder.Value == 13);
+
+        Recorder.Reset();
+        publisher.RaiseSecondary(0);
+        Console.WriteLine(Recorder.Value == 24);
+
+        inherited.Changed -= three.Handle;
+        Recorder.Reset();
+        publisher.RaiseChanged(0);
+        Console.WriteLine(Recorder.Value == 1);
+
+        three = null;
+        four = null;
+        GC.Collect();
+        Recorder.Reset();
+        publisher.RaiseChanged(0);
+        Console.WriteLine(Recorder.Value == 1);
+        Recorder.Reset();
+        publisher.RaiseSecondary(0);
+        Console.WriteLine(Recorder.Value == 24);
+
+        DerivedPublisher derived = new DerivedPublisher();
+        IEmitter baseEvent = derived;
+        Listener five = new Listener(5);
+        baseEvent.Changed += five.Handle;
+        Recorder.Reset();
+        derived.Raise(0);
+        Console.WriteLine(Recorder.Value == 5);
+        baseEvent.Changed -= five.Handle;
+        Recorder.Reset();
+        derived.Raise(0);
+        Console.WriteLine(Recorder.Value == 0);
+
+        DiamondPublisher diamond = new DiamondPublisher();
+        IDiamondEmitter diamondInterface = diamond;
+        Listener six = new Listener(6);
+        diamondInterface.Changed += six.Handle;
+        Recorder.Reset();
+        diamond.Raise(0);
+        Console.WriteLine(Recorder.Value == 6);
+        diamondInterface.Changed -= six.Handle;
+
+        GenericPublisher<int> generic = new GenericPublisher<int>();
+        IGenericEmitter<int> genericInterface = generic;
+        int seen = 0;
+        Action<int> genericHandler = value => seen = value;
+        genericInterface.Changed += genericHandler;
+        generic.Raise(77);
+        Console.WriteLine(seen == 77);
+        genericInterface.Changed -= genericHandler;
+        generic.Raise(99);
+        Console.WriteLine(seen == 77);
+
+        Recorder.Reset();
+        StaticHub.Raise(0);
+        Console.WriteLine(Recorder.Value == 9);
+
+        Console.WriteLine(advanced is IEmitter);
+        Console.WriteLine(inherited != null);
+    }
+}

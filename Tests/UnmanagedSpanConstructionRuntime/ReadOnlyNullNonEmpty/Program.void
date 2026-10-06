@@ -1,0 +1,1 @@
+using Void; public static class Program { public static unsafe void Main() { ReadOnlySpan<int> span = new ReadOnlySpan<int>((void*)null, 1); Console.WriteLine(span.Length); } }

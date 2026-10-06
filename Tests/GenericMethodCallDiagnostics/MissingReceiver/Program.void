@@ -1,0 +1,13 @@
+public sealed class Other
+{
+    public T Echo<T>(T value) { return value; }
+}
+public sealed class Plain { }
+public static class Program
+{
+    public static void Main()
+    {
+        Plain value = new Plain();
+        value.Echo<int>(1);
+    }
+}

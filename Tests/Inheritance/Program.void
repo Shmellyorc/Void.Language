@@ -1,0 +1,81 @@
+namespace Inheritance;
+
+public abstract class Entity
+{
+    protected int _value;
+
+    public int Value
+    {
+        get { return _value; }
+        protected set { _value = value; }
+    }
+
+    public virtual int GetValue()
+    {
+        return _value;
+    }
+
+    public abstract int Kind();
+
+    public virtual int SealedValue()
+    {
+        return 1;
+    }
+}
+
+public class Middle : Entity
+{
+    public override int GetValue()
+    {
+        return _value + 10;
+    }
+
+    public override int Kind()
+    {
+        return 2;
+    }
+
+    public sealed override int SealedValue()
+    {
+        return 2;
+    }
+}
+
+public sealed class Player : Middle
+{
+    public override int GetValue()
+    {
+        return _value + 20;
+    }
+
+    public void Set(int value)
+    {
+        Value = value;
+    }
+
+    public int BaseValue()
+    {
+        return base.GetValue();
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Player player = new();
+        player.Set(5);
+
+        Entity entity = player;
+        Middle middle = player;
+
+        Console.WriteLine(player.GetValue());
+        Console.WriteLine(entity.GetValue());
+        Console.WriteLine(middle.GetValue());
+        Console.WriteLine(player.BaseValue());
+        Console.WriteLine(entity.Kind());
+        Console.WriteLine(entity.SealedValue());
+        Console.WriteLine(player.Value);
+        Console.WriteLine(entity == player);
+    }
+}

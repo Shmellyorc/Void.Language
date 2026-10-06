@@ -1,0 +1,150 @@
+using Void;
+using Void.Threading;
+
+public interface ITagged
+{
+    int Read();
+}
+
+public sealed class Payload
+{
+    public int Value;
+
+    public Payload(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Node : ITagged
+{
+    public int Value;
+    public Payload Payload;
+
+    public Node(int value)
+    {
+        Value = value;
+        Payload = new Payload(value + 10000);
+    }
+
+    public int Read()
+    {
+        return Value;
+    }
+}
+
+public sealed class Holder
+{
+    public Node Value;
+}
+
+public static class Program
+{
+    private static Node _shared;
+    private static int _survivals;
+
+    public static T Swap<T>(ref T location, T value) where T : class
+    {
+        return Interlocked.Exchange(ref location, value);
+    }
+
+    public static void SwapWorker()
+    {
+        for (int i = 0; i < 24; i++)
+        {
+            Node next = new Node(1000 + i);
+            Node old = Interlocked.Exchange(ref _shared, next);
+            GC.Collect();
+            if (old != null && old.Payload != null && old.Payload.Value == old.Value + 10000)
+                Interlocked.Increment(ref _survivals);
+        }
+    }
+
+    public static void Main()
+    {
+        Node first = new Node(1);
+        Node second = new Node(2);
+        Node slot = first;
+        Node old = Interlocked.Exchange(ref slot, second);
+        GC.Collect();
+        Console.WriteLine(old == first);
+        Console.WriteLine(old.Payload.Value == 10001);
+        Console.WriteLine(slot == second);
+
+        Node third = new Node(3);
+        Node observed = Interlocked.CompareExchange(ref slot, third, second);
+        GC.Collect();
+        Console.WriteLine(observed == second);
+        Console.WriteLine(observed.Payload.Value == 10002);
+        Console.WriteLine(slot == third);
+
+        Node fourth = new Node(4);
+        observed = Interlocked.CompareExchange(ref slot, fourth, second);
+        GC.Collect();
+        Console.WriteLine(observed == third);
+        Console.WriteLine(observed.Payload.Value == 10003);
+        Console.WriteLine(slot == third);
+
+        old = Interlocked.Exchange(ref slot, null);
+        GC.Collect();
+        Console.WriteLine(old == third);
+        Console.WriteLine(old.Payload.Value == 10003);
+        Console.WriteLine(slot == null);
+
+        Holder holder = new Holder();
+        holder.Value = new Node(5);
+        old = Interlocked.Exchange(ref holder.Value, new Node(6));
+        GC.Collect();
+        Console.WriteLine(old.Value == 5);
+        Console.WriteLine(old.Payload.Value == 10005);
+        Console.WriteLine(holder.Value.Value == 6);
+
+        Node genericSlot = new Node(7);
+        old = Swap(ref genericSlot, new Node(8));
+        GC.Collect();
+        Console.WriteLine(old.Value == 7);
+        Console.WriteLine(genericSlot.Value == 8);
+
+        ITagged interfaceSlot = new Node(9);
+        ITagged interfaceOld = Interlocked.Exchange(ref interfaceSlot, new Node(10));
+        GC.Collect();
+        Console.WriteLine(interfaceOld.Read() == 9);
+        Console.WriteLine(interfaceSlot.Read() == 10);
+
+        ITagged interfaceReplacement = new Node(11);
+        ITagged interfaceObserved = Interlocked.CompareExchange(ref interfaceSlot, interfaceReplacement, interfaceSlot);
+        GC.Collect();
+        Console.WriteLine(interfaceObserved.Read() == 10);
+        Console.WriteLine(interfaceSlot.Read() == 11);
+
+        Node[] arrayA = new Node[1];
+        arrayA[0] = new Node(12);
+        Node[] arrayB = new Node[1];
+        arrayB[0] = new Node(13);
+        Node[] arrayOld = Interlocked.Exchange(ref arrayA, arrayB);
+        GC.Collect();
+        Console.WriteLine(arrayOld[0].Value == 12);
+        Console.WriteLine(arrayOld[0].Payload.Value == 10012);
+        Console.WriteLine(arrayA[0].Value == 13);
+
+        _shared = new Node(20);
+        _survivals = 0;
+        Action worker = SwapWorker;
+        Thread a = new Thread(worker);
+        Thread b = new Thread(worker);
+        Thread c = new Thread(worker);
+        Thread d = new Thread(worker);
+        a.Start();
+        b.Start();
+        c.Start();
+        d.Start();
+        a.Join();
+        b.Join();
+        c.Join();
+        d.Join();
+        GC.Collect();
+        Console.WriteLine(_survivals == 96);
+        Console.WriteLine(_shared != null);
+        Console.WriteLine(_shared.Payload.Value == _shared.Value + 10000);
+    }
+}

@@ -1,0 +1,5 @@
+public static class Native299Diag
+{
+    public static unsafe extern int Use(delegate*<string, int> callback);
+}
+public static class Program { public static void Main() { } }

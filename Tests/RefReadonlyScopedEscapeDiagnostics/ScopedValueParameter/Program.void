@@ -1,0 +1,5 @@
+public static class Program
+{
+    public static void Bad(scoped int value) {}
+    public static void Main() {}
+}

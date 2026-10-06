@@ -1,0 +1,1 @@
+public static class Program { public static void Main() { long value = 1; ref int alias = ref value; } }

@@ -1,0 +1,272 @@
+namespace Void.Threading;
+
+private sealed class AutoResetEventGate
+{
+}
+
+private sealed class AutoResetEventWaiter
+{
+    public AutoResetEventWaiter Next;
+    public bool Released;
+    public bool Canceled;
+
+    public AutoResetEventWaiter()
+    {
+        Next = null;
+        Released = false;
+        Canceled = false;
+    }
+}
+
+public sealed class AutoResetEvent
+{
+    private AutoResetEventGate _gate;
+    private bool _signaled;
+    private AutoResetEventWaiter _head;
+    private AutoResetEventWaiter _tail;
+
+    public AutoResetEvent(bool initialState)
+    {
+        _gate = new AutoResetEventGate();
+        _signaled = initialState;
+        _head = null;
+        _tail = null;
+    }
+
+    private void Enqueue(AutoResetEventWaiter waiter)
+    {
+        if (_tail == null)
+            _head = waiter;
+        else
+            _tail.Next = waiter;
+        _tail = waiter;
+    }
+
+    private AutoResetEventWaiter Dequeue()
+    {
+        AutoResetEventWaiter waiter = _head;
+        if (waiter == null)
+            return null;
+
+        _head = waiter.Next;
+        waiter.Next = null;
+        if (_head == null)
+            _tail = null;
+        return waiter;
+    }
+
+    private bool Remove(AutoResetEventWaiter waiter)
+    {
+        AutoResetEventWaiter previous = null;
+        AutoResetEventWaiter current = _head;
+        while (current != null)
+        {
+            if (current == waiter)
+            {
+                if (previous == null)
+                    _head = current.Next;
+                else
+                    previous.Next = current.Next;
+
+                if (_tail == current)
+                    _tail = previous;
+                current.Next = null;
+                return true;
+            }
+
+            previous = current;
+            current = current.Next;
+        }
+        return false;
+    }
+
+    private void ReleaseWaiter(AutoResetEventWaiter waiter)
+    {
+        Monitor.Enter(waiter);
+        waiter.Released = true;
+        Monitor.Pulse(waiter);
+        Monitor.Exit(waiter);
+    }
+
+    private void CancelWaiter(AutoResetEventWaiter waiter)
+    {
+        Monitor.Enter(_gate);
+        bool removed = this.Remove(waiter);
+        if (removed)
+        {
+            Monitor.Enter(waiter);
+            waiter.Canceled = true;
+            Monitor.Pulse(waiter);
+            Monitor.Exit(waiter);
+        }
+        Monitor.Exit(_gate);
+    }
+
+    public bool Set()
+    {
+        Monitor.Enter(_gate);
+        AutoResetEventWaiter waiter = this.Dequeue();
+        if (waiter == null)
+        {
+            _signaled = true;
+            Monitor.Exit(_gate);
+            return true;
+        }
+
+        this.ReleaseWaiter(waiter);
+        Monitor.Exit(_gate);
+        return true;
+    }
+
+    public bool Reset()
+    {
+        Monitor.Enter(_gate);
+        _signaled = false;
+        Monitor.Exit(_gate);
+        return true;
+    }
+
+    public bool WaitOne()
+    {
+        AutoResetEventWaiter waiter = new AutoResetEventWaiter();
+
+        Monitor.Enter(_gate);
+        if (_signaled)
+        {
+            _signaled = false;
+            Monitor.Exit(_gate);
+            return true;
+        }
+        this.Enqueue(waiter);
+        Monitor.Exit(_gate);
+
+        Monitor.Enter(waiter);
+        while (!waiter.Released)
+            Monitor.Wait(waiter);
+        Monitor.Exit(waiter);
+        return true;
+    }
+
+    public bool WaitOne(int millisecondsTimeout)
+    {
+        if (millisecondsTimeout < Timeout.Infinite)
+            Runtime.Fail("auto reset event wait timeout must be -1 or non-negative");
+
+        AutoResetEventWaiter waiter = new AutoResetEventWaiter();
+
+        Monitor.Enter(_gate);
+        if (_signaled)
+        {
+            _signaled = false;
+            Monitor.Exit(_gate);
+            return true;
+        }
+        if (millisecondsTimeout == 0)
+        {
+            Monitor.Exit(_gate);
+            return false;
+        }
+        this.Enqueue(waiter);
+        Monitor.Exit(_gate);
+
+        Monitor.Enter(waiter);
+        if (waiter.Released)
+        {
+            Monitor.Exit(waiter);
+            return true;
+        }
+
+        bool notified = Monitor.Wait(waiter, millisecondsTimeout);
+        bool released = waiter.Released;
+        Monitor.Exit(waiter);
+        if (released)
+            return true;
+        if (notified)
+            Runtime.Fail("auto reset event waiter signaled without release");
+
+        Monitor.Enter(_gate);
+        bool removed = this.Remove(waiter);
+        Monitor.Exit(_gate);
+        return !removed;
+    }
+
+    public bool WaitOne(CancellationToken cancellationToken)
+    {
+        return this.WaitOne(Timeout.Infinite, cancellationToken);
+    }
+
+    public bool WaitOne(int millisecondsTimeout, CancellationToken cancellationToken)
+    {
+        if (millisecondsTimeout < Timeout.Infinite)
+            Runtime.Fail("auto reset event wait timeout must be -1 or non-negative");
+
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!cancellationToken.CanBeCanceled)
+            return this.WaitOne(millisecondsTimeout);
+
+        AutoResetEventWaiter waiter = new AutoResetEventWaiter();
+
+        Monitor.Enter(_gate);
+        if (_signaled)
+        {
+            _signaled = false;
+            Monitor.Exit(_gate);
+            return true;
+        }
+        if (millisecondsTimeout == 0)
+        {
+            Monitor.Exit(_gate);
+            cancellationToken.ThrowIfCancellationRequested();
+            return false;
+        }
+        this.Enqueue(waiter);
+        Monitor.Exit(_gate);
+
+        CancellationTokenRegistration registration = cancellationToken.Register(() => this.CancelWaiter(waiter));
+        try
+        {
+            Monitor.Enter(waiter);
+            if (millisecondsTimeout == Timeout.Infinite)
+            {
+                while (!waiter.Released && !waiter.Canceled)
+                    Monitor.Wait(waiter);
+            }
+            else if (!waiter.Released && !waiter.Canceled)
+            {
+                Monitor.Wait(waiter, millisecondsTimeout);
+            }
+
+            bool released = waiter.Released;
+            bool canceled = waiter.Canceled;
+            Monitor.Exit(waiter);
+
+            if (released)
+                return true;
+            if (canceled)
+                throw new OperationCanceledException(cancellationToken);
+
+            Monitor.Enter(_gate);
+            bool removed = this.Remove(waiter);
+            Monitor.Exit(_gate);
+            if (removed)
+                return false;
+
+            Monitor.Enter(waiter);
+            released = waiter.Released;
+            canceled = waiter.Canceled;
+            Monitor.Exit(waiter);
+
+            if (released)
+                return true;
+            if (canceled)
+                throw new OperationCanceledException(cancellationToken);
+
+            Runtime.Fail("auto reset event cancellable waiter completed without outcome");
+            return false;
+        }
+        finally
+        {
+            registration.Dispose();
+        }
+    }
+}

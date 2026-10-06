@@ -1,0 +1,269 @@
+using Void.Threading.Tasks;
+
+public sealed class Node213
+{
+    public int Value;
+    public Node213(int value) { Value = value; }
+}
+
+public sealed class TrackingEnumerator213
+{
+    private int _current;
+    private int _limit;
+    private int _mode;
+    private int _disposeId;
+
+    public int Current => _current;
+
+    public TrackingEnumerator213(int limit, int mode, int disposeId)
+    {
+        _current = 0;
+        _limit = limit;
+        _mode = mode;
+        _disposeId = disposeId;
+    }
+
+    public bool MoveNext()
+    {
+        _current++;
+        return _current <= _limit;
+    }
+
+    public void Dispose()
+    {
+        Program.DisposeCount++;
+        Program.DisposeSequence = Program.DisposeSequence * 10 + _disposeId;
+        if (_mode == 1)
+            throw new Exception("dispose-213");
+    }
+}
+
+public sealed class TrackingEnumerable213
+{
+    private int _limit;
+    private int _mode;
+    private int _disposeId;
+
+    public TrackingEnumerable213(int limit, int mode, int disposeId)
+    {
+        _limit = limit;
+        _mode = mode;
+        _disposeId = disposeId;
+    }
+
+    public TrackingEnumerator213 GetEnumerator()
+    {
+        return new TrackingEnumerator213(_limit, _mode, _disposeId);
+    }
+}
+
+public struct LegacyEnumerator213
+{
+    private int _current;
+    private int _limit;
+    public int Current => _current;
+    public LegacyEnumerator213(int limit) { _current = 0; _limit = limit; }
+    public bool MoveNext() { _current++; return _current <= _limit; }
+}
+
+public struct LegacyEnumerable213
+{
+    private int _limit;
+    public LegacyEnumerable213(int limit) { _limit = limit; }
+    public LegacyEnumerator213 GetEnumerator() { return new LegacyEnumerator213(_limit); }
+}
+
+public static class Program
+{
+    public static int DisposeCount;
+    public static int DisposeSequence;
+
+    private static async Task<int> SumEnumerable(TrackingEnumerable213 values, Task signal)
+    {
+        int sum = 0;
+        foreach (int value in values)
+        {
+            await signal;
+            sum = sum + value;
+        }
+        return sum;
+    }
+
+    private static async Task<int> ContinueBreak(TrackingEnumerable213 values, Task signal)
+    {
+        int sum = 0;
+        foreach (int value in values)
+        {
+            await signal;
+            if (value == 2)
+                continue;
+            if (value == 4)
+                break;
+            sum = sum + value;
+        }
+        return sum;
+    }
+
+    private static async Task<int> ReturnFromForeach(TrackingEnumerable213 values, Task signal)
+    {
+        foreach (int value in values)
+        {
+            await signal;
+            return value + 40;
+        }
+        return -1;
+    }
+
+    private static async Task FaultFromForeach(TrackingEnumerable213 values, Task signal)
+    {
+        foreach (int value in values)
+        {
+            await signal;
+            throw new Exception("body-213");
+        }
+    }
+
+    private static async Task<int> ArraySum(int[] values, Task signal)
+    {
+        int sum = 0;
+        foreach (int value in values)
+        {
+            await signal;
+            if (value == 2)
+                continue;
+            sum = sum + value;
+        }
+        return sum;
+    }
+
+    private static async Task<int> RectangularSum(int[,] values, Task signal)
+    {
+        int sum = 0;
+        foreach (int value in values)
+        {
+            await signal;
+            sum = sum * 10 + value;
+        }
+        return sum;
+    }
+
+    private static async Task<int> ManagedItem(Node213[] values, Task signal)
+    {
+        foreach (Node213 value in values)
+        {
+            await signal;
+            GC.Collect();
+            return value.Value;
+        }
+        return -1;
+    }
+
+    private static async Task<int> NoDispose(LegacyEnumerable213 values, Task signal)
+    {
+        int sum = 0;
+        foreach (int value in values)
+        {
+            await signal;
+            sum = sum + value;
+        }
+        return sum;
+    }
+
+    private static async Task<int> AwaitedCollection(Task<TrackingEnumerable213> source, Task signal)
+    {
+        int sum = 0;
+        foreach (int value in await source)
+        {
+            await signal;
+            sum = sum + value;
+        }
+        return sum;
+    }
+
+    public static void Main()
+    {
+        Program.DisposeCount = 0;
+        Program.DisposeSequence = 0;
+        TaskCompletionSource signal1 = new TaskCompletionSource();
+        Task<int> natural = SumEnumerable(new TrackingEnumerable213(3, 0, 1), signal1.Task);
+        Console.WriteLine(!natural.IsCompleted && Program.DisposeCount == 0);
+        GC.Collect();
+        GC.Collect();
+        signal1.SetResult();
+        Console.WriteLine(natural.Result == 6 && Program.DisposeCount == 1 && Program.DisposeSequence == 1);
+
+        Program.DisposeCount = 0;
+        Program.DisposeSequence = 0;
+        TaskCompletionSource signal2 = new TaskCompletionSource();
+        Task<int> control = ContinueBreak(new TrackingEnumerable213(5, 0, 2), signal2.Task);
+        signal2.SetResult();
+        Console.WriteLine(control.Result == 4 && Program.DisposeCount == 1 && Program.DisposeSequence == 2);
+
+        Program.DisposeCount = 0;
+        Program.DisposeSequence = 0;
+        TaskCompletionSource signal3 = new TaskCompletionSource();
+        Task<int> returned = ReturnFromForeach(new TrackingEnumerable213(3, 0, 3), signal3.Task);
+        signal3.SetResult();
+        Console.WriteLine(returned.Result == 41 && Program.DisposeCount == 1 && Program.DisposeSequence == 3);
+
+        Program.DisposeCount = 0;
+        Program.DisposeSequence = 0;
+        TaskCompletionSource signal4 = new TaskCompletionSource();
+        Task faulted = FaultFromForeach(new TrackingEnumerable213(2, 0, 4), signal4.Task);
+        signal4.SetResult();
+        bool sawBody = false;
+        try { faulted.Wait(); }
+        catch (Exception error) { sawBody = error.Message == "body-213"; }
+        Console.WriteLine(sawBody && faulted.IsFaulted && Program.DisposeCount == 1 && Program.DisposeSequence == 4);
+
+        Program.DisposeCount = 0;
+        TaskCompletionSource signal5 = new TaskCompletionSource();
+        Task faultDispose = FaultFromForeach(new TrackingEnumerable213(1, 1, 5), signal5.Task);
+        signal5.SetResult();
+        bool sawDispose = false;
+        try { faultDispose.Wait(); }
+        catch (Exception error) { sawDispose = error.Message == "dispose-213"; }
+        Console.WriteLine(sawDispose && faultDispose.IsFaulted && Program.DisposeCount == 1);
+
+        int[] array = new int[3];
+        array[0] = 1; array[1] = 2; array[2] = 3;
+        TaskCompletionSource signal6 = new TaskCompletionSource();
+        Task<int> arrayTask = ArraySum(array, signal6.Task);
+        Console.WriteLine(!arrayTask.IsCompleted);
+        signal6.SetResult();
+        Console.WriteLine(arrayTask.Result == 4);
+
+        int[,] grid = new int[2, 2];
+        grid[0, 0] = 1; grid[0, 1] = 2; grid[1, 0] = 3; grid[1, 1] = 4;
+        TaskCompletionSource signal7 = new TaskCompletionSource();
+        Task<int> rectangular = RectangularSum(grid, signal7.Task);
+        signal7.SetResult();
+        Console.WriteLine(rectangular.Result == 1234);
+
+        Node213[] nodes = new Node213[1];
+        nodes[0] = new Node213(213);
+        TaskCompletionSource signal8 = new TaskCompletionSource();
+        Task<int> managed = ManagedItem(nodes, signal8.Task);
+        nodes = null;
+        GC.Collect();
+        GC.Collect();
+        signal8.SetResult();
+        Console.WriteLine(managed.Result == 213);
+
+        TaskCompletionSource signal9 = new TaskCompletionSource();
+        Task<int> legacy = NoDispose(new LegacyEnumerable213(3), signal9.Task);
+        signal9.SetResult();
+        Console.WriteLine(legacy.Result == 6);
+
+        Program.DisposeCount = 0;
+        Program.DisposeSequence = 0;
+        TaskCompletionSource<TrackingEnumerable213> collection = new TaskCompletionSource<TrackingEnumerable213>();
+        TaskCompletionSource signal10 = new TaskCompletionSource();
+        Task<int> awaited = AwaitedCollection(collection.Task, signal10.Task);
+        Console.WriteLine(!awaited.IsCompleted && Program.DisposeCount == 0);
+        collection.SetResult(new TrackingEnumerable213(2, 0, 6));
+        Console.WriteLine(!awaited.IsCompleted && Program.DisposeCount == 0);
+        signal10.SetResult();
+        Console.WriteLine(awaited.Result == 3 && Program.DisposeCount == 1 && Program.DisposeSequence == 6);
+    }
+}

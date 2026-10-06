@@ -1,0 +1,1 @@
+public static class Program { public static void Main() { string value = "abc"; Console.WriteLine(value.Contains(1)); } }

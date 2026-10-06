@@ -1,0 +1,6 @@
+using Void;
+public static class Program
+{
+    public static Span<int> Make() { int x = 1; Span<int> span = new Span<int>(ref x, 1); return span; }
+    public static void Main() { Make(); }
+}

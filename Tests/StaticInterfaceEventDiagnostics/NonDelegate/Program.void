@@ -1,0 +1,2 @@
+public interface IHub { static event int Changed; }
+public static class Program { public static void Main() { } }

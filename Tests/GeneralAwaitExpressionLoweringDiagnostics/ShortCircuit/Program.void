@@ -1,0 +1,11 @@
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    private static async Task<bool> Run(bool left, Task<bool> source)
+    {
+        return left && await source;
+    }
+
+    public static void Main() {}
+}

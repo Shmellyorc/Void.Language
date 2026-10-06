@@ -1,0 +1,8 @@
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        void* memory = null;
+        Runtime.NativeMemoryTryAllocateAligned(8ul, 16ul, out memory);
+    }
+}

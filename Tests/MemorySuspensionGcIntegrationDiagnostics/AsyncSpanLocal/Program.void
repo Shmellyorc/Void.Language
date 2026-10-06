@@ -1,0 +1,14 @@
+using Void;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    public static async Task<int> Bad(Task gate, Memory<int> memory)
+    {
+        await gate;
+        Span<int> span = memory.Span;
+        return span[0];
+    }
+
+    public static void Main() { }
+}

@@ -1,0 +1,9 @@
+public abstract class Bad
+{
+    public abstract int Value() => 1;
+}
+
+public static class Program
+{
+    public static void Main() { }
+}

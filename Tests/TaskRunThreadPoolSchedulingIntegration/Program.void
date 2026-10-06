@@ -1,0 +1,196 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public struct RunScore
+{
+    public int Value;
+
+    public RunScore(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class RunPayload
+{
+    public int Value;
+
+    public RunPayload(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class RunState
+{
+    public int ActionCount;
+    public int NestedCount;
+    public int BlockerReady;
+    public ManualResetEvent ActionEntered;
+    public ManualResetEvent ActionRelease;
+    public ManualResetEvent NestedDone;
+    public ManualResetEvent BlockersReady;
+    public ManualResetEvent BlockersRelease;
+
+    public RunState()
+    {
+        ActionCount = 0;
+        NestedCount = 0;
+        BlockerReady = 0;
+        ActionEntered = new ManualResetEvent(false);
+        ActionRelease = new ManualResetEvent(false);
+        NestedDone = new ManualResetEvent(false);
+        BlockersReady = new ManualResetEvent(false);
+        BlockersRelease = new ManualResetEvent(false);
+    }
+}
+
+public static class NativeFixture196
+{
+    [Native("voidc196_add")]
+    public static unsafe extern int Add(int value);
+}
+
+public static class Program
+{
+    private static bool WaitCompleted(Task task)
+    {
+        int elapsed = 0;
+        while (!task.IsCompleted && elapsed < 5000)
+        {
+            Thread.Sleep(1);
+            elapsed++;
+        }
+        return task.IsCompleted;
+    }
+
+    private static Action MakeBlockingAction(RunState state)
+    {
+        return () =>
+        {
+            state.ActionEntered.Set();
+            state.ActionRelease.WaitOne();
+            Interlocked.Increment(ref state.ActionCount);
+        };
+    }
+
+    private static Action MakeQueueBlocker(RunState state)
+    {
+        return () =>
+        {
+            int ready = Interlocked.Increment(ref state.BlockerReady);
+            if (ready == 2)
+                state.BlockersReady.Set();
+            state.BlockersRelease.WaitOne();
+        };
+    }
+
+    private static Func<RunPayload> MakePayloadFunction(RunPayload payload)
+    {
+        return () => payload;
+    }
+
+    private static Action MakeNestedAction(RunState state)
+    {
+        return () =>
+        {
+            Task.Run(() =>
+            {
+                Interlocked.Increment(ref state.NestedCount);
+                state.NestedDone.Set();
+            });
+        };
+    }
+
+    private static Action MakeFaultAction()
+    {
+        return () => { throw new Exception("task run action fault"); };
+    }
+
+    private static Func<int> MakeFaultFunction()
+    {
+        return () => { throw new Exception("task run function fault"); };
+    }
+
+    private static Task<T> Schedule<T>(Func<T> function)
+    {
+        return Task.Run(function);
+    }
+
+    public static unsafe void Main()
+    {
+        RunState state = new RunState();
+
+        Task actionTask = Task.Run(MakeBlockingAction(state));
+        Console.WriteLine(state.ActionEntered.WaitOne(5000));
+        Console.WriteLine(actionTask.Status == TaskStatus.Running);
+        Console.WriteLine(!actionTask.IsCompleted);
+        state.ActionRelease.Set();
+        Console.WriteLine(WaitCompleted(actionTask));
+        Console.WriteLine(actionTask.Status == TaskStatus.Completed);
+        Console.WriteLine(state.ActionCount == 1);
+
+        Task<int> explicitLambdaTask = Task.Run<int>(() => 64);
+        Console.WriteLine(WaitCompleted(explicitLambdaTask));
+        Console.WriteLine(explicitLambdaTask.Result == 64);
+
+        Func<int> integerWork = () => 42;
+        Task<int> integerTask = Task.Run(integerWork);
+        Console.WriteLine(WaitCompleted(integerTask));
+        Console.WriteLine(integerTask.Status == TaskStatus.Completed);
+        Console.WriteLine(integerTask.Result == 42);
+
+        Func<RunScore> scoreWork = () => new RunScore(73);
+        Task<RunScore> scoreTask = Schedule(scoreWork);
+        Console.WriteLine(WaitCompleted(scoreTask));
+        RunScore score = scoreTask.Result;
+        Console.WriteLine(score.Value == 73);
+
+        Task firstBlocker = Task.Run(MakeQueueBlocker(state));
+        Task secondBlocker = Task.Run(MakeQueueBlocker(state));
+        Console.WriteLine(state.BlockersReady.WaitOne(5000));
+        Console.WriteLine(firstBlocker.Status == TaskStatus.Running);
+        Console.WriteLine(secondBlocker.Status == TaskStatus.Running);
+
+        RunPayload payload = new RunPayload(91);
+        Func<RunPayload> payloadWork = MakePayloadFunction(payload);
+        Task<RunPayload> payloadTask = Task.Run(payloadWork);
+        payload = null;
+        payloadWork = null;
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(!payloadTask.IsCompleted);
+        state.BlockersRelease.Set();
+        Console.WriteLine(WaitCompleted(firstBlocker));
+        Console.WriteLine(WaitCompleted(secondBlocker));
+        Console.WriteLine(WaitCompleted(payloadTask));
+        RunPayload observed = payloadTask.Result;
+        Console.WriteLine(observed != null && observed.Value == 91);
+        observed = null;
+        GC.Collect();
+        Console.WriteLine(payloadTask.Result.Value == 91);
+
+        Task faultedAction = Task.Run(MakeFaultAction());
+        Console.WriteLine(WaitCompleted(faultedAction));
+        Console.WriteLine(faultedAction.IsFaulted);
+        Console.WriteLine(faultedAction.Exception != null && faultedAction.Exception.Message == "task run action fault");
+
+        Task<int> faultedFunction = Task.Run(MakeFaultFunction());
+        Console.WriteLine(WaitCompleted(faultedFunction));
+        Console.WriteLine(faultedFunction.IsFaulted);
+        Console.WriteLine(faultedFunction.Exception != null && faultedFunction.Exception.Message == "task run function fault");
+
+        Task nestedOuter = Task.Run(MakeNestedAction(state));
+        Console.WriteLine(WaitCompleted(nestedOuter));
+        Console.WriteLine(state.NestedDone.WaitOne(5000));
+        Console.WriteLine(state.NestedCount == 1);
+
+        Task<int> nativeTask = Task.Run<int>(() => NativeFixture196.Add(10));
+        Console.WriteLine(WaitCompleted(nativeTask));
+        Console.WriteLine(nativeTask.Result == 17);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

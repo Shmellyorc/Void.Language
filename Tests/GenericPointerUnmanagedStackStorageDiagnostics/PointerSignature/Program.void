@@ -1,0 +1,4 @@
+public static class Program {
+    private static unsafe T* Identity<T>(T* value) => value;
+    public static unsafe void Main() { int value = 1; int* pointer = &value; Identity<int>(pointer); }
+}

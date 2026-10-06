@@ -1,0 +1,129 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class Payload267
+{
+    public int Value;
+
+    public Payload267(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    private static int _continuations;
+
+    private static async Task<T> AwaitValueTask<T>(ValueTask<T> valueTask)
+    {
+        return await valueTask;
+    }
+
+    private static void WaitForContinuation(int expected)
+    {
+        int spins = 0;
+        while (Volatile.Read(ref _continuations) != expected && spins < 5000)
+        {
+            Thread.Sleep(1);
+            spins++;
+        }
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(typeof(ValueTask<int>).IsValueType);
+        Console.WriteLine(typeof(ValueTaskAwaiter<int>).IsValueType);
+
+        ValueTask<int> defaultValue = default;
+        Console.WriteLine(defaultValue.IsCompleted);
+        Console.WriteLine(defaultValue.GetAwaiter().GetResult() == 0);
+
+        ValueTask<Payload267> defaultManaged = default;
+        Console.WriteLine(defaultManaged.IsCompleted && defaultManaged.GetAwaiter().GetResult() == null);
+
+        ValueTask<int> inlineValue = new ValueTask<int>(42);
+        Console.WriteLine(inlineValue.IsCompleted);
+        Console.WriteLine(inlineValue.GetAwaiter().GetResult() == 42);
+
+        Task<int> inlineOuter = AwaitValueTask<int>(inlineValue);
+        Console.WriteLine(inlineOuter.IsCompleted && inlineOuter.Result == 42);
+
+        ValueTask<string> inlineString = new ValueTask<string>("value-task-267");
+        Console.WriteLine(inlineString.GetAwaiter().GetResult() == "value-task-267");
+
+        Payload267 payload = new Payload267(77);
+        ValueTask<Payload267> inlineManaged = new ValueTask<Payload267>(payload);
+        payload = null;
+        GC.Collect();
+        Payload267 recovered = inlineManaged.GetAwaiter().GetResult();
+        Console.WriteLine(recovered != null && recovered.Value == 77);
+
+        ValueTaskAwaiter<int> inlineAwaiter = inlineValue.GetAwaiter();
+        inlineAwaiter.OnCompleted(() => Interlocked.Increment(ref _continuations));
+        WaitForContinuation(1);
+        Console.WriteLine(Volatile.Read(ref _continuations) == 1);
+
+        TaskCompletionSource<int> intSource = new TaskCompletionSource<int>();
+        ValueTask<int> pending = new ValueTask<int>(intSource.Task);
+        Console.WriteLine(!pending.IsCompleted);
+        Task<int> pendingOuter = AwaitValueTask<int>(pending);
+        Console.WriteLine(!pendingOuter.IsCompleted);
+        GC.Collect();
+        intSource.SetResult(123);
+        pendingOuter.Wait();
+        Console.WriteLine(pendingOuter.Result == 123);
+
+        TaskCompletionSource<Payload267> payloadSource = new TaskCompletionSource<Payload267>();
+        ValueTask<Payload267> pendingManaged = new ValueTask<Payload267>(payloadSource.Task);
+        Task<Payload267> managedOuter = AwaitValueTask<Payload267>(pendingManaged);
+        Console.WriteLine(!managedOuter.IsCompleted);
+        pendingManaged = default;
+        GC.Collect();
+        payloadSource.SetResult(new Payload267(267));
+        GC.Collect();
+        Payload267 managedResult = managedOuter.Result;
+        Console.WriteLine(managedResult != null && managedResult.Value == 267);
+
+        TaskCompletionSource<int> directSource = new TaskCompletionSource<int>();
+        ValueTaskAwaiter<int> directAwaiter = new ValueTask<int>(directSource.Task).GetAwaiter();
+        directAwaiter.OnCompleted(() => Interlocked.Increment(ref _continuations));
+        directSource.SetResult(88);
+        WaitForContinuation(2);
+        Console.WriteLine(Volatile.Read(ref _continuations) == 2 && directAwaiter.GetResult() == 88);
+
+        TaskCompletionSource<int> faultSource = new TaskCompletionSource<int>();
+        faultSource.SetException(new Exception("value-task-267-fault"));
+        Task<int> faulted = AwaitValueTask<int>(new ValueTask<int>(faultSource.Task));
+        bool faultObserved = false;
+        try
+        {
+            faulted.Wait();
+        }
+        catch (Exception error)
+        {
+            faultObserved = error.Message == "value-task-267-fault";
+        }
+        Console.WriteLine(faultObserved && faulted.IsFaulted);
+
+        CancellationTokenSource cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+        TaskCompletionSource<int> canceledSource = new TaskCompletionSource<int>();
+        canceledSource.SetCanceled(cancellation.Token);
+        Task<int> canceled = AwaitValueTask<int>(new ValueTask<int>(canceledSource.Task));
+        bool cancellationObserved = false;
+        try
+        {
+            canceled.Wait();
+        }
+        catch (OperationCanceledException error)
+        {
+            cancellationObserved = error.CancellationToken.IsCancellationRequested;
+        }
+        Console.WriteLine(cancellationObserved && canceled.IsCanceled);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

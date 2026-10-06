@@ -1,0 +1,3 @@
+using Void;
+public struct Holder { public ReadOnlySpan<int> Value; }
+public static class Program { public static void Main() {} }

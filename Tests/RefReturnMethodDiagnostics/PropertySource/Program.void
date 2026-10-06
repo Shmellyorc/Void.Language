@@ -1,0 +1,1 @@
+public sealed class Box { public int Value { get; set; } } public static class Program { public static ref int Bad(Box b){ return ref b.Value; } public static void Main(){ ref int r = ref Bad(new Box()); } }

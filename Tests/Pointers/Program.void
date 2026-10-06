@@ -1,0 +1,54 @@
+public static class Program
+{
+    public static unsafe int* Offset(int* value, int amount)
+    {
+        return value + amount;
+    }
+
+    public static unsafe void Main()
+    {
+        int value = 7;
+        int* valuePtr = &value;
+        Console.WriteLine(*valuePtr);
+
+        *valuePtr = 12;
+        Console.WriteLine(value);
+
+        *valuePtr += 3;
+        Console.WriteLine(value);
+
+        int** pointerPtr = &valuePtr;
+        Console.WriteLine(**pointerPtr);
+
+        int[] values = new int[4];
+        values[0] = 10;
+        values[1] = 20;
+        values[2] = 30;
+        values[3] = 40;
+
+        int* start = &values[0];
+        int* cursor = start;
+        Console.WriteLine(*cursor);
+
+        cursor++;
+        Console.WriteLine(*cursor);
+
+        cursor += 2;
+        Console.WriteLine(*cursor);
+
+        cursor--;
+        Console.WriteLine(*cursor);
+        cursor = Offset(start, 2);
+        Console.WriteLine(cursor - start);
+        Console.WriteLine(start < cursor);
+        Console.WriteLine(cursor > start);
+        Console.WriteLine(cursor == start + 2);
+        Console.WriteLine(cursor != start);
+
+        *cursor = 33;
+        Console.WriteLine(values[2]);
+
+        void* nothing = null;
+        Console.WriteLine(nothing == null);
+    }
+}

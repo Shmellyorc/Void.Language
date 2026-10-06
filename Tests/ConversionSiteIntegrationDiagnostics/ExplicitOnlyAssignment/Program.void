@@ -1,0 +1,14 @@
+public struct Target
+{
+    public int Value;
+    public Target(int value) { Value = value; }
+    public static explicit operator Target(int value) { return new Target(value); }
+}
+public class Program
+{
+    public static void Main()
+    {
+        Target target = new Target(1);
+        target = 2;
+    }
+}

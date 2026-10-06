@@ -1,0 +1,1 @@
+public interface IMark { } public sealed class Box<T> where T : IMark, class { } public static class Program { public static void Main() { } }

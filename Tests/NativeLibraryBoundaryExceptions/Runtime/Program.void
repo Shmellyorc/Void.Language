@@ -1,0 +1,145 @@
+public sealed class NativeBoundaryException : Exception
+{
+    public NativeBoundaryException(string message) : base(message) { }
+}
+
+public delegate int NativeIntCallback(int value);
+public delegate void NativeRefCallback(ref int value);
+
+public static class NativeFixture
+{
+    [Native("voidc119_reset")]
+    public static unsafe extern void Reset();
+
+    [Native("voidc119_invoke_twice")]
+    public static unsafe extern int InvokeTwice(NativeIntCallback callback);
+
+    [Native("voidc119_invoke_once")]
+    public static unsafe extern int InvokeOnce(int value, NativeIntCallback callback);
+
+    [Native("voidc119_ref_then_continue")]
+    public static unsafe extern int RefThenContinue(int value, NativeRefCallback callback);
+
+    [Native("voidc119_callback_entries")]
+    public static unsafe extern int CallbackEntries();
+
+    [Native("voidc119_after_steps")]
+    public static unsafe extern int AfterSteps();
+
+    [Native("voidc119_observed_sum")]
+    public static unsafe extern int ObservedSum();
+
+    [Native("voidc119_ref_observed")]
+    public static unsafe extern int RefObserved();
+
+    [Native("voidc119_plain_add")]
+    public static unsafe extern int PlainAdd(int left, int right);
+}
+
+public static class Callbacks
+{
+    public static int ThrowCalls;
+    public static int HandledCalls;
+    public static int OuterCalls;
+    public static int RefCalls;
+
+    public static int Throwing(int value)
+    {
+        ThrowCalls++;
+        throw new NativeBoundaryException("native callback boom");
+    }
+
+    public static int Handled(int value)
+    {
+        HandledCalls++;
+        try
+        {
+            throw new NativeBoundaryException("handled inside callback");
+        }
+        catch (NativeBoundaryException)
+        {
+            return value * 3;
+        }
+    }
+
+    public static unsafe int Nested(int value)
+    {
+        OuterCalls++;
+        return NativeFixture.InvokeTwice(Throwing) + value;
+    }
+
+    public static void RefThrow(ref int value)
+    {
+        RefCalls++;
+        value += 5;
+        throw new NativeBoundaryException("ref callback boom");
+    }
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        NativeFixture.Reset();
+        bool caught = false;
+        try
+        {
+            NativeFixture.InvokeTwice(Callbacks.Throwing);
+        }
+        catch (NativeBoundaryException error)
+        {
+            caught = error.Message == "native callback boom";
+        }
+        Console.WriteLine(caught);
+        Console.WriteLine(Callbacks.ThrowCalls == 1);
+        Console.WriteLine(NativeFixture.CallbackEntries() == 2);
+        Console.WriteLine(NativeFixture.AfterSteps() == 2);
+        Console.WriteLine(NativeFixture.ObservedSum() == 0);
+        Console.WriteLine(NativeFixture.PlainAdd(20, 22) == 42);
+
+        NativeFixture.Reset();
+        Console.WriteLine(NativeFixture.InvokeTwice(Callbacks.Handled) == 109);
+        Console.WriteLine(Callbacks.HandledCalls == 2);
+        Console.WriteLine(NativeFixture.CallbackEntries() == 2);
+        Console.WriteLine(NativeFixture.ObservedSum() == 9);
+
+        NativeFixture.Reset();
+        caught = false;
+        try
+        {
+            NativeFixture.RefThenContinue(10, Callbacks.RefThrow);
+        }
+        catch (NativeBoundaryException error)
+        {
+            caught = error.Message == "ref callback boom";
+        }
+        Console.WriteLine(caught);
+        Console.WriteLine(Callbacks.RefCalls == 1);
+        Console.WriteLine(NativeFixture.RefObserved() == 15);
+        Console.WriteLine(NativeFixture.AfterSteps() == 1);
+
+        NativeFixture.Reset();
+        caught = false;
+        int finallyCount = 0;
+        try
+        {
+            try
+            {
+                NativeFixture.InvokeOnce(7, Callbacks.Nested);
+            }
+            finally
+            {
+                finallyCount++;
+            }
+        }
+        catch (NativeBoundaryException error)
+        {
+            caught = error.Message == "native callback boom";
+        }
+        Console.WriteLine(caught);
+        Console.WriteLine(finallyCount == 1);
+        Console.WriteLine(Callbacks.OuterCalls == 1);
+        Console.WriteLine(Callbacks.ThrowCalls == 2);
+        Console.WriteLine(NativeFixture.PlainAdd(1, 2) == 3);
+    }
+}

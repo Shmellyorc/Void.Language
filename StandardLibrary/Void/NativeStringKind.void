@@ -1,0 +1,13 @@
+namespace Void;
+
+public enum NativeStringKind
+{
+    BorrowedNul,
+    BorrowedPointerLength,
+    RetainedNul,
+    RetainedPointerLength,
+    StaticNul,
+    StaticPointerLength,
+    OwnedNul,
+    OwnedPointerLength
+}

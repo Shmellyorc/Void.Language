@@ -1,0 +1,2 @@
+public delegate int* Bad(int* value);
+public static class Program { public static void Main() { } }

@@ -1,0 +1,3 @@
+using Void;
+public struct Managed253 { public string Text; }
+public static class Program { public static unsafe void Main() { Managed253* value = NativeMemory.Allocate<Managed253>(1ul); } }

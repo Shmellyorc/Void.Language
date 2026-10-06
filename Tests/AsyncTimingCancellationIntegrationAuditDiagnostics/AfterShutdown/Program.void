@@ -1,0 +1,12 @@
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    public static void Main()
+    {
+        Task.Delay(5).Wait();
+        ThreadPool.Shutdown();
+        Task.Delay(5);
+    }
+}

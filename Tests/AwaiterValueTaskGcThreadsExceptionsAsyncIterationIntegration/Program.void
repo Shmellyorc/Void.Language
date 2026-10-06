@@ -1,0 +1,469 @@
+using Void;
+using Void.Collections;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class Payload269
+{
+    public int Value;
+
+    public Payload269(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Fault269 : Exception
+{
+    public Fault269(string message) : base(message)
+    {
+    }
+}
+
+public sealed class InlineEnumerator269
+{
+    private int _index;
+
+    public InlineEnumerator269()
+    {
+        _index = 0;
+    }
+
+    public int Current => _index;
+
+    public ValueTask<bool> MoveNextAsync()
+    {
+        _index++;
+        return new ValueTask<bool>(_index <= 3);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        Program.DisposeCount++;
+        return default;
+    }
+}
+
+public sealed class InlineEnumerable269
+{
+    public InlineEnumerator269 GetAsyncEnumerator()
+    {
+        return new InlineEnumerator269();
+    }
+}
+
+public sealed class ManagedPendingEnumerator269
+{
+    private Payload269 _payload;
+    private TaskCompletionSource<bool> _signal;
+    private int _step;
+
+    public ManagedPendingEnumerator269(Payload269 payload, TaskCompletionSource<bool> signal)
+    {
+        _payload = payload;
+        _signal = signal;
+        _step = 0;
+    }
+
+    public Payload269 Current => _payload;
+
+    public ValueTask<bool> MoveNextAsync()
+    {
+        if (_step == 0)
+        {
+            _step = 1;
+            return new ValueTask<bool>(_signal.Task);
+        }
+        return new ValueTask<bool>(false);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        Program.DisposeCount++;
+        return default;
+    }
+}
+
+public sealed class ManagedPendingEnumerable269
+{
+    private Payload269 _payload;
+    private TaskCompletionSource<bool> _signal;
+
+    public ManagedPendingEnumerable269(Payload269 payload, TaskCompletionSource<bool> signal)
+    {
+        _payload = payload;
+        _signal = signal;
+    }
+
+    public ManagedPendingEnumerator269 GetAsyncEnumerator()
+    {
+        return new ManagedPendingEnumerator269(_payload, _signal);
+    }
+}
+
+public sealed class PendingDisposeEnumerator269
+{
+    private TaskCompletionSource _disposeSignal;
+    private int _step;
+
+    public PendingDisposeEnumerator269(TaskCompletionSource disposeSignal)
+    {
+        _disposeSignal = disposeSignal;
+        _step = 0;
+    }
+
+    public int Current => 9;
+
+    public ValueTask<bool> MoveNextAsync()
+    {
+        if (_step == 0)
+        {
+            _step = 1;
+            return new ValueTask<bool>(true);
+        }
+        return new ValueTask<bool>(false);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        Program.DisposeCount++;
+        return new ValueTask(_disposeSignal.Task);
+    }
+}
+
+public sealed class PendingDisposeEnumerable269
+{
+    private TaskCompletionSource _disposeSignal;
+
+    public PendingDisposeEnumerable269(TaskCompletionSource disposeSignal)
+    {
+        _disposeSignal = disposeSignal;
+    }
+
+    public PendingDisposeEnumerator269 GetAsyncEnumerator()
+    {
+        return new PendingDisposeEnumerator269(_disposeSignal);
+    }
+}
+
+public sealed class FaultingMoveEnumerator269
+{
+    private TaskCompletionSource<bool> _faultSignal;
+
+    public FaultingMoveEnumerator269(TaskCompletionSource<bool> faultSignal)
+    {
+        _faultSignal = faultSignal;
+    }
+
+    public int Current => 0;
+
+    public ValueTask<bool> MoveNextAsync()
+    {
+        return new ValueTask<bool>(_faultSignal.Task);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        Program.DisposeCount++;
+        return default;
+    }
+}
+
+public sealed class FaultingMoveEnumerable269
+{
+    private TaskCompletionSource<bool> _faultSignal;
+
+    public FaultingMoveEnumerable269(TaskCompletionSource<bool> faultSignal)
+    {
+        _faultSignal = faultSignal;
+    }
+
+    public FaultingMoveEnumerator269 GetAsyncEnumerator()
+    {
+        return new FaultingMoveEnumerator269(_faultSignal);
+    }
+}
+
+public sealed class CancelingMoveEnumerator269
+{
+    private TaskCompletionSource<bool> _cancelSignal;
+
+    public CancelingMoveEnumerator269(TaskCompletionSource<bool> cancelSignal)
+    {
+        _cancelSignal = cancelSignal;
+    }
+
+    public int Current => 0;
+
+    public ValueTask<bool> MoveNextAsync()
+    {
+        return new ValueTask<bool>(_cancelSignal.Task);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        Program.DisposeCount++;
+        return default;
+    }
+}
+
+public sealed class CancelingMoveEnumerable269
+{
+    private TaskCompletionSource<bool> _cancelSignal;
+
+    public CancelingMoveEnumerable269(TaskCompletionSource<bool> cancelSignal)
+    {
+        _cancelSignal = cancelSignal;
+    }
+
+    public CancelingMoveEnumerator269 GetAsyncEnumerator()
+    {
+        return new CancelingMoveEnumerator269(_cancelSignal);
+    }
+}
+
+public sealed class BodyFaultEnumerator269
+{
+    private TaskCompletionSource _disposeSignal;
+    private int _step;
+
+    public BodyFaultEnumerator269(TaskCompletionSource disposeSignal)
+    {
+        _disposeSignal = disposeSignal;
+        _step = 0;
+    }
+
+    public int Current => 17;
+
+    public ValueTask<bool> MoveNextAsync()
+    {
+        if (_step == 0)
+        {
+            _step = 1;
+            return new ValueTask<bool>(true);
+        }
+        return new ValueTask<bool>(false);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        Program.DisposeCount++;
+        return new ValueTask(_disposeSignal.Task);
+    }
+}
+
+public sealed class BodyFaultEnumerable269
+{
+    private TaskCompletionSource _disposeSignal;
+
+    public BodyFaultEnumerable269(TaskCompletionSource disposeSignal)
+    {
+        _disposeSignal = disposeSignal;
+    }
+
+    public BodyFaultEnumerator269 GetAsyncEnumerator()
+    {
+        return new BodyFaultEnumerator269(_disposeSignal);
+    }
+}
+
+public static class Program
+{
+    public static int DisposeCount;
+    public static int FinallyCount;
+
+    private static async ValueTask<int> SumInline()
+    {
+        int sum = 0;
+        await foreach (var value in new InlineEnumerable269())
+            sum += value;
+        return sum;
+    }
+
+    private static async ValueTask<int> ConsumeManaged(ManagedPendingEnumerable269 source)
+    {
+        int result = 0;
+        await foreach (var payload in source)
+        {
+            GC.Collect();
+            result += payload.Value;
+            await Task.Yield();
+        }
+        return result;
+    }
+
+    private static async ValueTask<int> ConsumePendingDispose(PendingDisposeEnumerable269 source)
+    {
+        int result = 0;
+        await foreach (var value in source)
+            result += value;
+        return result;
+    }
+
+    private static async ValueTask ObserveMoveFault(FaultingMoveEnumerable269 source)
+    {
+        try
+        {
+            await foreach (var value in source)
+            {
+            }
+        }
+        finally
+        {
+            FinallyCount++;
+        }
+    }
+
+    private static async ValueTask ObserveCancellation(CancelingMoveEnumerable269 source)
+    {
+        try
+        {
+            await foreach (var value in source)
+            {
+            }
+        }
+        finally
+        {
+            FinallyCount++;
+        }
+    }
+
+    private static async ValueTask BodyFaultAfterPendingDispose(BodyFaultEnumerable269 source)
+    {
+        try
+        {
+            await foreach (var value in source)
+                throw new Fault269("body-269");
+        }
+        finally
+        {
+            FinallyCount++;
+        }
+    }
+
+    private static async IAsyncEnumerable<int> PassThrough(InlineEnumerable269 source)
+    {
+        await foreach (var value in source)
+        {
+            await Task.Yield();
+            yield return value * 10;
+        }
+    }
+
+    private static async ValueTask<int> SumGeneratedIterator()
+    {
+        int sum = 0;
+        await foreach (var value in PassThrough(new InlineEnumerable269()))
+            sum += value;
+        return sum;
+    }
+
+    private static async ValueTask<int> MixedAwait(Task<int> task)
+    {
+        int first = await task;
+        int second = await new ValueTask<int>(2);
+        await Task.Yield();
+        return first + second;
+    }
+
+    public static void Main()
+    {
+        DisposeCount = 0;
+        FinallyCount = 0;
+
+        ValueTask<int> inline = SumInline();
+        Console.WriteLine(inline.GetAwaiter().GetResult() == 6);
+        Console.WriteLine(DisposeCount == 1);
+
+        TaskCompletionSource<bool> moveSignal = new TaskCompletionSource<bool>();
+        Payload269 payload = new Payload269(269);
+        ManagedPendingEnumerable269 managedSource = new ManagedPendingEnumerable269(payload, moveSignal);
+        ValueTask<int> managed = ConsumeManaged(managedSource);
+        Console.WriteLine(!managed.IsCompleted);
+        payload = null;
+        managedSource = null;
+        GC.Collect();
+        Thread moveWorker = new Thread(() => moveSignal.SetResult(true));
+        moveWorker.Start();
+        moveWorker.Join();
+        Console.WriteLine(managed.GetAwaiter().GetResult() == 269);
+        Console.WriteLine(DisposeCount == 2);
+
+        TaskCompletionSource disposeSignal = new TaskCompletionSource();
+        ValueTask<int> pendingDispose = ConsumePendingDispose(new PendingDisposeEnumerable269(disposeSignal));
+        Console.WriteLine(!pendingDispose.IsCompleted);
+        Console.WriteLine(DisposeCount == 3);
+        Thread disposeWorker = new Thread(() => disposeSignal.SetResult());
+        disposeWorker.Start();
+        disposeWorker.Join();
+        Console.WriteLine(pendingDispose.GetAwaiter().GetResult() == 9);
+
+        TaskCompletionSource<bool> faultSignal = new TaskCompletionSource<bool>();
+        ValueTask faulted = ObserveMoveFault(new FaultingMoveEnumerable269(faultSignal));
+        Console.WriteLine(!faulted.IsCompleted);
+        faultSignal.SetException(new Fault269("move-269"));
+        bool moveFaultObserved = false;
+        try
+        {
+            faulted.GetAwaiter().GetResult();
+        }
+        catch (Fault269 error)
+        {
+            moveFaultObserved = error.Message == "move-269";
+        }
+        Console.WriteLine(moveFaultObserved);
+        Console.WriteLine(FinallyCount == 1);
+        Console.WriteLine(DisposeCount == 4);
+
+        CancellationTokenSource cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+        TaskCompletionSource<bool> cancelSignal = new TaskCompletionSource<bool>();
+        ValueTask canceled = ObserveCancellation(new CancelingMoveEnumerable269(cancelSignal));
+        cancelSignal.SetCanceled(cancellation.Token);
+        bool canceledObserved = false;
+        try
+        {
+            canceled.GetAwaiter().GetResult();
+        }
+        catch (OperationCanceledException error)
+        {
+            canceledObserved = error.CancellationToken.IsSameSource(cancellation.Token);
+        }
+        Console.WriteLine(canceledObserved);
+        Console.WriteLine(FinallyCount == 2);
+        Console.WriteLine(DisposeCount == 5);
+
+        TaskCompletionSource bodyDisposeSignal = new TaskCompletionSource();
+        ValueTask bodyFault = BodyFaultAfterPendingDispose(new BodyFaultEnumerable269(bodyDisposeSignal));
+        Console.WriteLine(!bodyFault.IsCompleted);
+        Console.WriteLine(DisposeCount == 6);
+        bodyDisposeSignal.SetResult();
+        bool bodyFaultObserved = false;
+        try
+        {
+            bodyFault.GetAwaiter().GetResult();
+        }
+        catch (Fault269 error)
+        {
+            bodyFaultObserved = error.Message == "body-269";
+        }
+        Console.WriteLine(bodyFaultObserved);
+        Console.WriteLine(FinallyCount == 3);
+
+        Console.WriteLine(SumGeneratedIterator().GetAwaiter().GetResult() == 60);
+
+        TaskCompletionSource<int> mixedSignal = new TaskCompletionSource<int>();
+        ValueTask<int> mixed = MixedAwait(mixedSignal.Task);
+        Console.WriteLine(!mixed.IsCompleted);
+        Thread mixedWorker = new Thread(() => mixedSignal.SetResult(40));
+        mixedWorker.Start();
+        mixedWorker.Join();
+        Console.WriteLine(mixed.GetAwaiter().GetResult() == 42);
+
+        GC.Collect();
+        Console.WriteLine(true);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

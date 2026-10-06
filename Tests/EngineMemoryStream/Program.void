@@ -1,0 +1,163 @@
+using Void;
+using Void.IO;
+using Void.Text;
+
+public static class Program
+{
+    public static void Main()
+    {
+        MemoryStream stream = new MemoryStream();
+        Console.WriteLine(stream.CanRead && stream.CanWrite && stream.CanSeek && stream.Length == 0L && stream.Position == 0L && stream.Capacity == 0);
+        byte[] bytes = Encoding.UTF8.GetBytes("😀é\0");
+        Stream polymorphic = stream; polymorphic.Write(bytes, 0, bytes.Length);
+        Console.WriteLine(stream.Length == (long)bytes.Length && stream.Position == stream.Length && stream.Capacity >= bytes.Length);
+        byte[] snapshot = stream.ToArray(); snapshot[0] = (byte)0;
+        Console.WriteLine(stream.GetBuffer()[0] == bytes[0]);
+        stream.Position = 0L;
+        byte[] destination = new byte[20];
+        Console.WriteLine(polymorphic.Read(destination, 2, 20 - 2) == bytes.Length && stream.Position == stream.Length);
+        Console.WriteLine(Encoding.UTF8.GetString(destination, 2, bytes.Length) == "😀é\0");
+        Console.WriteLine(stream.ReadByte() == -1 && stream.Read(destination, 0, 0) == 0);
+        Console.WriteLine(stream.Seek(-1L, SeekOrigin.End) == stream.Length - 1L && stream.ReadByte() == 0);
+        stream.Position = 10L; stream.WriteByte((byte)9);
+        Console.WriteLine(stream.Length == 11L && stream.GetBuffer()[7] == (byte)0 && stream.GetBuffer()[9] == (byte)0 && stream.GetBuffer()[10] == (byte)9);
+        stream.SetLength(3L);
+        Console.WriteLine(stream.Length == 3L && stream.Position == 3L);
+        stream.SetLength(12L);
+        Console.WriteLine(stream.GetBuffer()[3] == (byte)0 && stream.GetBuffer()[10] == (byte)0 && stream.Length == 12L && stream.Position == 3L);
+        stream.Position = 15L; stream.Write(bytes, bytes.Length, 0);
+        Console.WriteLine(stream.Length == 15L && stream.Position == 15L && stream.GetBuffer()[14] == (byte)0);
+        stream.Capacity = 15;
+        Console.WriteLine(stream.Capacity == 15 && stream.GetBuffer().Length == 15);
+        byte[] backing = new byte[8]; for (int i = 0; i < 8; i++) backing[i] = (byte)(i + 1);
+        MemoryStream region = new MemoryStream(backing, 2, 4, true, true);
+        Console.WriteLine(region.Length == 4L && region.Position == 0L && region.Capacity == 4 && region.ReadByte() == 3);
+        Console.WriteLine(region.Seek(0L, SeekOrigin.Begin) == 2L && region.Position == 0L);
+        Console.WriteLine(region.Seek(1L, SeekOrigin.Current) == 3L && region.Position == 1L);
+        Console.WriteLine(region.Seek(-1L, SeekOrigin.End) == 5L && region.Position == 3L);
+        region.Position = 0L; region.WriteByte((byte)99);
+        Console.WriteLine(backing[2] == (byte)99 && region.GetBuffer() == backing && region.ToArray().Length == 4);
+        region.Position = 1L; region.Write(backing, 2, 3);
+        Console.WriteLine(backing[3] == (byte)99 && backing[4] == (byte)4 && backing[5] == (byte)5);
+        region.Position = 0L; region.Read(backing, 3, 3);
+        Console.WriteLine(backing[3] == (byte)99 && backing[4] == (byte)99 && backing[5] == (byte)4);
+        region.SetLength(1L); region.SetLength(4L);
+        Console.WriteLine(backing[0] == (byte)1 && backing[1] == (byte)2 && backing[3] == (byte)0 && backing[5] == (byte)0 && backing[6] == (byte)7);
+        region.Capacity = 4;
+        MemoryStream target = new MemoryStream(); region.Position = 2L; region.WriteTo(target);
+        Console.WriteLine(region.Position == 2L && target.Length == 4L && target.ToArray()[0] == (byte)99);
+        MemoryStream readOnly = new MemoryStream(backing, false);
+        Console.WriteLine(readOnly.CanRead && readOnly.CanSeek && !readOnly.CanWrite && readOnly.Length == 8L);
+        MemoryStream simple = new MemoryStream(backing);
+        Console.WriteLine(simple.Length == 8L && simple.CanWrite);
+        MemoryStream three = new MemoryStream(backing, 1, 2);
+        MemoryStream four = new MemoryStream(backing, 1, 2, false);
+        Console.WriteLine(three.Length == 2L && three.CanWrite && four.Length == 2L && !four.CanWrite);
+        MemoryStream empty = new MemoryStream(backing, 8, 0, true, true);
+        Console.WriteLine(empty.ReadByte() == -1 && empty.ToArray().Length == 0 && empty.Position == 0L);
+        bool caught = false;
+        caught = false;
+        try { new MemoryStream(-1); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "capacity"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { new MemoryStream(null); } catch (ArgumentNullException e) { caught = e.ParamName == "buffer"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { new MemoryStream(backing, -1, 0); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "index"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { new MemoryStream(backing, 0, -1); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "count"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { new MemoryStream(backing, 2147483647, 1); } catch (ArgumentException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.Capacity = 3; } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "value"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.Capacity = 5; } catch (NotSupportedException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.SetLength(5L); } catch (NotSupportedException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.Position = -1L; } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "value"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.Position = 2147483647L; } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "value"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.Seek(-1L, SeekOrigin.Begin); } catch (IOException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.Seek(-9223372036854775807L, SeekOrigin.Current); } catch (IOException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.Seek(2147483648L, SeekOrigin.Begin); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "offset"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.Seek(0L, (SeekOrigin)9); } catch (ArgumentException e) { caught = e.ParamName == "origin"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { stream.Read(null, 0, 0); } catch (ArgumentNullException e) { caught = e.ParamName == "buffer"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { stream.Read(destination, -1, 0); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "offset"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { stream.Write(destination, 0, -1); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "count"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { stream.Write(destination, 19, 2); } catch (ArgumentException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { stream.WriteTo(null); } catch (ArgumentNullException e) { caught = e.ParamName == "stream"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { readOnly.WriteByte((byte)1); } catch (NotSupportedException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { readOnly.Write(destination, 0, 0); } catch (NotSupportedException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { readOnly.SetLength(0L); } catch (NotSupportedException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { readOnly.GetBuffer(); } catch (UnauthorizedAccessException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { stream.SetLength(-1L); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "value"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { stream.SetLength(2147483648L); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "value"; }
+        Console.WriteLine(caught);
+        stream.Position = 2147483647L; caught = false;
+        try { stream.WriteByte((byte)1); } catch (IOException e) { caught = true; }
+        Console.WriteLine(caught && stream.Length == 15L);
+        region.Close(); region.Dispose(); region.Flush(); GC.Collect();
+        Console.WriteLine(!region.CanRead && !region.CanWrite && !region.CanSeek && region.GetBuffer() == backing && region.ToArray()[0] == (byte)99);
+        caught = false;
+        try { region.ReadByte(); } catch (ObjectDisposedException e) { caught = e.ObjectName == "MemoryStream"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.Read(destination, 0, 0); } catch (ObjectDisposedException e) { caught = e.ObjectName == "MemoryStream"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.WriteByte((byte)0); } catch (ObjectDisposedException e) { caught = e.ObjectName == "MemoryStream"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.Seek(0L, SeekOrigin.Begin); } catch (ObjectDisposedException e) { caught = e.ObjectName == "MemoryStream"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.SetLength(0L); } catch (ObjectDisposedException e) { caught = e.ObjectName == "MemoryStream"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { region.WriteTo(target); } catch (ObjectDisposedException e) { caught = e.ObjectName == "MemoryStream"; }
+        Console.WriteLine(caught);
+        byte[] retained = target.ToArray(); target.Dispose(); GC.Collect();
+        Console.WriteLine(retained[0] == (byte)99 && target.ToArray()[0] == (byte)99);
+        using (MemoryStream ownedStream = new MemoryStream(2)) { ownedStream.WriteByte((byte)7); }
+        ObjectDisposedException named = new ObjectDisposedException(null);
+        Console.WriteLine(named.ObjectName == "");
+    }
+}

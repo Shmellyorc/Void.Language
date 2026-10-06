@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "UnmanagedSpanConstructionDiagnosticsManagedElement",
+  "output": "exe",
+  "version": "0.0.247",
+  "compiler": { "unsafe": true }
+}

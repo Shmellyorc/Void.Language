@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "ConsoleInputControlDiagnostics",
+  "version": "0.0.318",
+  "output": "exe",
+  "compiler": { "unsafe": false }
+}

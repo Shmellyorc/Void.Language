@@ -1,0 +1,13 @@
+public struct Counter
+{
+    public int Value;
+    public Counter(int value) { Value = value; }
+}
+public static class Extensions
+{
+    public static void Bump(this ref Counter value) { value.Value += 1; }
+}
+public static class Program
+{
+    public static void Main() { new Counter(1).Bump(); }
+}

@@ -1,0 +1,136 @@
+using Void;
+using Void.Collections;
+
+public interface IIndexed<T>
+{
+    T get_Item(int index);
+    void set_Item(int index, T value);
+}
+public interface IInherited : IIndexed<int> { }
+public sealed class Indexed : IInherited
+{
+    private int _value;
+    public Indexed(int value) { _value = value; }
+    public int get_Item(int index) { return _value + index; }
+    public void set_Item(int index, int value) { _value = value - index; }
+}
+public class BaseIndexed
+{
+    public virtual int get_Item(int index) { return 100 + index; }
+    public virtual void set_Item(int index, int value) { }
+}
+public sealed class DerivedIndexed : BaseIndexed
+{
+    private int _value = 17;
+    public override int get_Item(int index) { return _value + index; }
+    public override void set_Item(int index, int value) { _value = value - index; }
+}
+public interface IRefIndexed
+{
+    ref int get_Item(int index);
+}
+public class RefIndexed : IRefIndexed
+{
+    public int[] Items = new int[] { 5, 6 };
+    public virtual ref int get_Item(int index) { return ref Items[index]; }
+}
+public sealed class DerivedRefIndexed : RefIndexed
+{
+    public override ref int get_Item(int index) { return ref Items[1 - index]; }
+}
+public static class Program
+{
+    private static int _calls;
+    private static IIndexed<int> Receiver(IIndexed<int> value) { _calls++; return value; }
+    private static int Index() { _calls++; return 1; }
+    public static void Main()
+    {
+        IIndexed<int> indexed = new Indexed(17);
+        Console.WriteLine(indexed[0] == 17);
+        Console.WriteLine(indexed.get_Item(0) == indexed[0]);
+        indexed[1] = 24;
+        Console.WriteLine(indexed[0] == 23);
+        indexed[1] += 5;
+        Console.WriteLine(indexed[1] == 29);
+        _calls = 0;
+        Receiver(indexed)[Index()] += 3;
+        Console.WriteLine(_calls == 2 && indexed[1] == 32);
+        IInherited inherited = new Indexed(19);
+        Console.WriteLine(inherited[0] == 19);
+        BaseIndexed polymorphic = new DerivedIndexed();
+        Console.WriteLine(polymorphic[0] == 17);
+        polymorphic[1] = 40;
+        Console.WriteLine(polymorphic[0] == 39);
+        polymorphic[1] += 3;
+        Console.WriteLine(polymorphic[1] == 43);
+        List<string> list = new List<string>(); list.Add("retained");
+        IReadOnlyList<string> readOnly = list;
+        GC.Collect();
+        Console.WriteLine(readOnly[0] == "retained" && readOnly.Count == 1);
+        Dictionary<int, string> dictionary = new Dictionary<int, string>();
+        dictionary.Add(1, "one"); dictionary.Add(2, "two");
+        IReadOnlyDictionary<int, string> readOnlyDictionary = dictionary;
+        Console.WriteLine(readOnlyDictionary[1] == "one" && readOnlyDictionary.Count == 2);
+        Console.WriteLine(dictionary.ContainsValue("two") && !dictionary.ContainsValue("missing"));
+        IEnumerable<int> keys = readOnlyDictionary.Keys;
+        IEnumerable<string> values = readOnlyDictionary.Values;
+        dictionary.Add(3, "three"); GC.Collect();
+        int keySum = 0; foreach (int key in keys) keySum += key;
+        Console.WriteLine(keySum == 6);
+        int valueCount = 0; foreach (string value in values) if (dictionary.ContainsValue(value)) valueCount++;
+        Console.WriteLine(valueCount == 3);
+        string removed;
+        Console.WriteLine(dictionary.Remove(2, out removed) && removed == "two");
+        Console.WriteLine(!dictionary.Remove(2, out removed) && removed == null);
+        int capacity = dictionary.EnsureCapacity(60);
+        Console.WriteLine(capacity >= 60 && dictionary[1] == "one" && dictionary[3] == "three");
+        for (int i = 4; i < 62; i++) dictionary.Add(i, "entry");
+        Console.WriteLine(dictionary.EnsureCapacity(0) == capacity && dictionary.Count == 60);
+        for (int i = 4; i < 62; i++) dictionary.Remove(i);
+        dictionary.TrimExcess();
+        Console.WriteLine(dictionary.EnsureCapacity(0) < capacity && dictionary[1] == "one");
+        bool badCapacity = false;
+        try { dictionary.EnsureCapacity(-1); } catch (ArgumentOutOfRangeException) { badCapacity = true; }
+        Console.WriteLine(badCapacity);
+        badCapacity = false;
+        try { dictionary.TrimExcess(1); } catch (ArgumentOutOfRangeException) { badCapacity = true; }
+        Console.WriteLine(badCapacity);
+        IEnumerator<int> active = keys.GetEnumerator();
+        Console.WriteLine(active.MoveNext());
+        dictionary.EnsureCapacity(200);
+        bool invalidated = false;
+        try { active.MoveNext(); } catch (InvalidOperationException) { invalidated = true; }
+        finally { active.Dispose(); }
+        Console.WriteLine(invalidated);
+        ICollection<int> keyView = (ICollection<int>)dictionary.Keys;
+        ICollection<string> valueView = (ICollection<string>)dictionary.Values;
+        Console.WriteLine(keyView.IsReadOnly && keyView.Count == 2 && keyView.Contains(1));
+        Console.WriteLine(valueView.IsReadOnly && valueView.Contains("three"));
+        int[] copiedKeys = new int[4]; keyView.CopyTo(copiedKeys, 1);
+        Console.WriteLine(copiedKeys[0] == 0 && copiedKeys[3] == 0 && copiedKeys[1] + copiedKeys[2] == 4);
+        string[] copiedValues = new string[2]; valueView.CopyTo(copiedValues, 0);
+        Console.WriteLine(copiedValues[0] != null && copiedValues[1] != null);
+        bool readOnlyFailure = false;
+        try { keyView.Add(9); } catch (NotSupportedException) { readOnlyFailure = true; }
+        Console.WriteLine(readOnlyFailure);
+        ICollection<KeyValuePair<int, string>> pairs = dictionary;
+        Console.WriteLine(!pairs.IsReadOnly && pairs.Contains(new KeyValuePair<int, string>(1, "one")) && !pairs.Contains(new KeyValuePair<int, string>(1, "wrong")));
+        KeyValuePair<int, string>[] copy = new KeyValuePair<int, string>[2]; pairs.CopyTo(copy, 0);
+        Console.WriteLine(copy[0].Key + copy[1].Key == 4);
+        Console.WriteLine(!pairs.Remove(new KeyValuePair<int, string>(1, "wrong")) && pairs.Remove(new KeyValuePair<int, string>(1, "one")) && dictionary.Count == 1);
+        IRefIndexed refIndexed = new DerivedRefIndexed();
+        Console.WriteLine(refIndexed[0] == 6);
+        refIndexed[0] = 42;
+        Console.WriteLine(refIndexed[0] == 42);
+        ref int retainedRef = ref refIndexed[0];
+        GC.Collect(); retainedRef = 43;
+        Console.WriteLine(refIndexed[0] == 43);
+        RefIndexed virtualRef = new DerivedRefIndexed();
+        Console.WriteLine(virtualRef[0] == 6);
+        virtualRef[0] = 50;
+        Console.WriteLine(virtualRef[0] == 50);
+        IIndexed<int> absent = null;
+        Console.WriteLine(absent?[0] == null);
+        Console.WriteLine(indexed?[1] == 32);
+    }
+}

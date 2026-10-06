@@ -1,0 +1,53 @@
+using Void;
+using Void.Collections;
+
+[Marker(Name = "Value")]
+public sealed class Tagged292
+{
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        string first = "A\0B";
+        string same = "A\0B";
+        string different = "A\0C";
+        string prefix = "A";
+
+        Console.WriteLine(first == same);
+        Console.WriteLine(first != different);
+        Console.WriteLine(first != prefix);
+        Console.WriteLine(Runtime.Equals(first, same));
+        Console.WriteLine(!Runtime.Equals(first, different));
+        Console.WriteLine(Runtime.Hash(first) == Runtime.Hash(same));
+        Console.WriteLine(Runtime.Hash(first) != Runtime.Hash(different));
+        Console.WriteLine(first is "A\0B");
+        Console.WriteLine(!(first is "A\0C"));
+
+        Dictionary<string, int> values = new();
+        values.Add(first, 11);
+        values.Add(different, 22);
+        Console.WriteLine(values.Count == 2);
+        Console.WriteLine(values["A\0B"] == 11);
+        Console.WriteLine(values["A\0C"] == 22);
+
+        HashSet<string> keys = new();
+        Console.WriteLine(keys.Add(first));
+        Console.WriteLine(keys.Add(different));
+        Console.WriteLine(keys.Count == 2);
+        Console.WriteLine(keys.Contains("A\0B") && keys.Contains("A\0C"));
+
+        Type tagged = typeof(Tagged292);
+        Console.WriteLine(Runtime.FindType("Tagged292") == tagged);
+        Console.WriteLine(Runtime.FindType("Tagged292\0suffix") == null);
+        Console.WriteLine(Runtime.HasAttribute("Tagged292", "Marker"));
+        Console.WriteLine(!Runtime.HasAttribute("Tagged292\0suffix", "Marker"));
+        Console.WriteLine(!Runtime.HasAttribute("Tagged292", "Marker\0suffix"));
+        Console.WriteLine(!Runtime.HasAttribute(tagged, "Marker\0suffix"));
+        Console.WriteLine(Runtime.AttributeCount("Marker") == 1);
+        Console.WriteLine(Runtime.AttributeCount("Marker\0suffix") == 0);
+        Console.WriteLine(Runtime.Equals(Runtime.AttributeValue("Tagged292", "Marker", "Name"), "Value"));
+        Console.WriteLine(Runtime.Equals(Runtime.AttributeValue(tagged, "Marker", "Name"), "Value"));
+    }
+}

@@ -1,0 +1,9 @@
+using Void;
+public static class Native257 { public static unsafe extern delegate*<int, int> Get(); }
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        void* data = (void*)Native257.Get();
+    }
+}

@@ -1,0 +1,5 @@
+public interface IInvalid
+{
+    static int Value() { return 1; }
+}
+public static class Program { public static void Main() { } }

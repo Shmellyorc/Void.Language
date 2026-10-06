@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { ReadOnlyMemory<int> value = new ReadOnlyMemory<int>(new int[2], 2, 1); } }

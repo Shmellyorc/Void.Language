@@ -1,0 +1,282 @@
+using Void.Collections;
+using Void.Threading.Tasks;
+
+public sealed class Node218
+{
+    public int Value;
+    public Node218(int value) { Value = value; }
+}
+
+public static class Program
+{
+    public static TaskCompletionSource<int> MoveGate;
+    public static TaskCompletionSource DisposeGate;
+    public static TaskCompletionSource<int> FaultGate;
+    public static TaskCompletionSource<int> ManagedGate;
+    public static TaskCompletionSource<IAsyncEnumerable<int>> SourceGate;
+
+    public static int PendingCleanup;
+    public static int CleanupStarted;
+    public static int CleanupDone;
+    public static int OuterCleanup;
+    public static int FaultCleanup;
+    public static int OuterFaultCleanup;
+    public static int SourceCalls;
+
+    public static async IAsyncEnumerable<int> Pair(int first, int second)
+    {
+        yield return first;
+        yield return second;
+    }
+
+    public static async IAsyncEnumerable<int> PendingInner()
+    {
+        try
+        {
+            yield return 1;
+            int value = await Program.MoveGate.Task;
+            yield return value;
+        }
+        finally
+        {
+            Program.PendingCleanup++;
+        }
+    }
+
+    public static async IAsyncEnumerable<int> CleanupInner()
+    {
+        try
+        {
+            yield return 7;
+            yield return 8;
+        }
+        finally
+        {
+            Program.CleanupStarted++;
+            await Program.DisposeGate.Task;
+            Program.CleanupDone++;
+        }
+    }
+
+    public static async IAsyncEnumerable<int> FaultInner()
+    {
+        try
+        {
+            yield return 5;
+            int ignored = await Program.FaultGate.Task;
+            throw new Exception("inner-218");
+        }
+        finally
+        {
+            Program.FaultCleanup++;
+        }
+    }
+
+    public static async IAsyncEnumerable<Node218> ManagedInner()
+    {
+        Node218 node = new Node218(218);
+        yield return node;
+    }
+
+    public static IAsyncEnumerable<int> CountedSource()
+    {
+        Program.SourceCalls++;
+        return Program.Pair(2, 3);
+    }
+
+    private static async IAsyncEnumerable<int> Compose(IAsyncEnumerable<int> source)
+    {
+        yield return -1;
+        await foreach (var value in source)
+        {
+            if (value == 2)
+                continue;
+            yield return value * 10;
+            if (value == 3)
+                break;
+        }
+        yield return 99;
+    }
+
+    private static async IAsyncEnumerable<int> BreakCompose(IAsyncEnumerable<int> source)
+    {
+        await foreach (int value in source)
+        {
+            yield return value;
+            break;
+        }
+        yield return 20;
+    }
+
+    private static async IAsyncEnumerable<int> Pass(IAsyncEnumerable<int> source)
+    {
+        try
+        {
+            await foreach (var value in source)
+                yield return value;
+        }
+        finally
+        {
+            Program.OuterCleanup++;
+        }
+    }
+
+    private static async IAsyncEnumerable<int> YieldBreakCompose(IAsyncEnumerable<int> source)
+    {
+        await foreach (var value in source)
+        {
+            yield return value;
+            yield break;
+        }
+    }
+
+    private static async IAsyncEnumerable<int> FaultCompose(IAsyncEnumerable<int> source)
+    {
+        try
+        {
+            await foreach (var value in source)
+                yield return value;
+        }
+        finally
+        {
+            Program.OuterFaultCleanup++;
+        }
+    }
+
+    private static async IAsyncEnumerable<int> Nested(
+        IAsyncEnumerable<int> left,
+        IAsyncEnumerable<int> right)
+    {
+        await foreach (var a in left)
+        {
+            await foreach (var b in right)
+                yield return a + b;
+        }
+    }
+
+    private static async IAsyncEnumerable<int> AwaitedSource(Task<IAsyncEnumerable<int>> source)
+    {
+        await foreach (var value in await source)
+            yield return value + 1;
+    }
+
+    private static async IAsyncEnumerable<Node218> ManagedCompose(IAsyncEnumerable<Node218> source)
+    {
+        await foreach (var node in source)
+        {
+            int ignored = await Program.ManagedGate.Task;
+            yield return node;
+        }
+    }
+
+    private static async IAsyncEnumerable<int> CountedCompose()
+    {
+        await foreach (var value in Program.CountedSource())
+            yield return value;
+    }
+
+    private static async Task<int> Sum(IAsyncEnumerable<int> source)
+    {
+        int sum = 0;
+        await foreach (var value in source)
+            sum += value;
+        return sum;
+    }
+
+    private static async Task<int> BreakFirst(IAsyncEnumerable<int> source)
+    {
+        await foreach (var value in source)
+        {
+            int result = value;
+            break;
+        }
+        return 7;
+    }
+
+    private static async Task<int> CatchFault(IAsyncEnumerable<int> source)
+    {
+        try
+        {
+            int sum = 0;
+            await foreach (var value in source)
+                sum += value;
+            return sum;
+        }
+        catch (Exception error)
+        {
+            return Runtime.Equals(error.Message, "inner-218") ? 218 : -1;
+        }
+    }
+
+    private static async Task<int> FirstNodeValue(IAsyncEnumerable<Node218> source)
+    {
+        await foreach (var node in source)
+            return node.Value;
+        return -1;
+    }
+
+    public static void Main()
+    {
+        Program.PendingCleanup = 0;
+        Program.MoveGate = new TaskCompletionSource<int>();
+        Task<int> composed = Sum(Compose(Program.PendingInner()));
+        Console.WriteLine(!composed.IsCompleted && Program.PendingCleanup == 0);
+        Program.MoveGate.SetResult(2);
+        Console.WriteLine(composed.Result == 108 && Program.PendingCleanup == 1);
+
+        Program.CleanupStarted = 0;
+        Program.CleanupDone = 0;
+        Program.DisposeGate = new TaskCompletionSource();
+        Task<int> breaking = Sum(BreakCompose(Program.CleanupInner()));
+        Console.WriteLine(!breaking.IsCompleted && Program.CleanupStarted == 1 && Program.CleanupDone == 0);
+        Program.DisposeGate.SetResult();
+        Console.WriteLine(breaking.Result == 27 && Program.CleanupDone == 1);
+
+        Program.CleanupStarted = 0;
+        Program.CleanupDone = 0;
+        Program.OuterCleanup = 0;
+        Program.DisposeGate = new TaskCompletionSource();
+        Task<int> earlyDispose = BreakFirst(Pass(Program.CleanupInner()));
+        Console.WriteLine(!earlyDispose.IsCompleted && Program.CleanupStarted == 1 && Program.CleanupDone == 0 && Program.OuterCleanup == 0);
+        Program.DisposeGate.SetResult();
+        Console.WriteLine(earlyDispose.Result == 7 && Program.CleanupDone == 1 && Program.OuterCleanup == 1);
+
+        Program.CleanupStarted = 0;
+        Program.CleanupDone = 0;
+        Program.DisposeGate = new TaskCompletionSource();
+        Program.DisposeGate.SetResult();
+        Console.WriteLine(Sum(YieldBreakCompose(Program.CleanupInner())).Result == 7 &&
+            Program.CleanupStarted == 1 && Program.CleanupDone == 1);
+
+        Program.FaultCleanup = 0;
+        Program.OuterFaultCleanup = 0;
+        Program.FaultGate = new TaskCompletionSource<int>();
+        Task<int> faulted = CatchFault(FaultCompose(Program.FaultInner()));
+        Console.WriteLine(!faulted.IsCompleted);
+        Program.FaultGate.SetResult(1);
+        Console.WriteLine(faulted.Result == 218 && Program.FaultCleanup == 1 && Program.OuterFaultCleanup == 1);
+
+        Console.WriteLine(Sum(Nested(Program.Pair(1, 2), Program.Pair(10, 20))).Result == 66);
+
+        Program.SourceGate = new TaskCompletionSource<IAsyncEnumerable<int>>();
+        Task<int> awaitedSource = Sum(AwaitedSource(Program.SourceGate.Task));
+        Console.WriteLine(!awaitedSource.IsCompleted);
+        Program.SourceGate.SetResult(Program.Pair(4, 5));
+        Console.WriteLine(awaitedSource.Result == 11);
+
+        Program.ManagedGate = new TaskCompletionSource<int>();
+        Task<int> managed = FirstNodeValue(ManagedCompose(Program.ManagedInner()));
+        Console.WriteLine(!managed.IsCompleted);
+        GC.Collect();
+        GC.Collect();
+        Program.ManagedGate.SetResult(1);
+        Console.WriteLine(managed.Result == 218);
+
+        Program.SourceCalls = 0;
+        Console.WriteLine(Sum(CountedCompose()).Result == 5 && Program.SourceCalls == 1);
+
+        IAsyncEnumerable<int> replay = Compose(Program.Pair(1, 3));
+        Console.WriteLine(Sum(replay).Result == 138);
+        Console.WriteLine(Sum(replay).Result == 138);
+    }
+}

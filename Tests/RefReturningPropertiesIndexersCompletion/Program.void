@@ -1,0 +1,95 @@
+public sealed class Box224
+{
+    public int Value;
+    public int[] Values;
+    public Box224(int value) { Value = value; Values = new int[] { value + 1, value + 2 }; }
+    public ref int RefValue { get { return ref Value; } }
+    public ref int ExprRef => ref Value;
+    public ref int get_Item(int index) { return ref Values[index]; }
+}
+
+public struct Pair224
+{
+    public int Value;
+    public Pair224(int value) { Value = value; }
+    public ref int RefValue { get { return ref Value; } }
+}
+
+public static class Storage224
+{
+    public static int Value = 20;
+    public static ref int RefValue => ref Value;
+}
+
+public interface IRefProperty224
+{
+    ref int RefValue { get; }
+}
+
+public class BaseRefProperty224 : IRefProperty224
+{
+    public int Value;
+    public BaseRefProperty224(int value) { Value = value; }
+    public virtual ref int RefValue { get { return ref Value; } }
+}
+
+public sealed class DerivedRefProperty224 : BaseRefProperty224
+{
+    public int Other;
+    public DerivedRefProperty224(int value) : base(value) { Other = value + 1; }
+    public override ref int RefValue { get { return ref Other; } }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Box224 box = new Box224(10);
+        ref int a = ref box.RefValue;
+        a = 11;
+        Console.WriteLine(box.Value == 11);
+        ref int b = ref box.ExprRef;
+        b = 12;
+        Console.WriteLine(box.Value == 12);
+        ref int c = ref box[0];
+        c = 30;
+        Console.WriteLine(box.Values[0] == 30);
+        ref int s = ref Storage224.RefValue;
+        s = 21;
+        Console.WriteLine(Storage224.Value == 21);
+        Pair224 pair = new Pair224(40);
+        ref int p = ref pair.RefValue;
+        p = 41;
+        Console.WriteLine(pair.Value == 41);
+        Console.WriteLine(box.RefValue == 12);
+        box.RefValue = 50;
+        Console.WriteLine(box.Value == 50);
+        box[1] = 60;
+        Console.WriteLine(box.Values[1] == 60);
+        box.RefValue += 2;
+        Console.WriteLine(box.Value == 52);
+        box[1] += 3;
+        Console.WriteLine(box.Values[1] == 63);
+        BaseRefProperty224 poly = new DerivedRefProperty224(70);
+        ref int v = ref poly.RefValue;
+        v = 72;
+        Console.WriteLine(poly.RefValue == 72);
+        IRefProperty224 iface = poly;
+        ref int iv = ref iface.RefValue;
+        iv = 73;
+        Console.WriteLine(iface.RefValue == 73);
+        ref int held = ref new Box224(80).RefValue;
+        ref int heldIndex = ref new Box224(90)[0];
+        for (int i = 0; i < 80; i++)
+        {
+            Box224 garbage = new Box224(i);
+        }
+        Console.WriteLine(held == 80);
+        held = 81;
+        Console.WriteLine(held == 81);
+        Console.WriteLine(heldIndex == 91);
+        heldIndex = 92;
+        Console.WriteLine(heldIndex == 92);
+        Console.WriteLine(box[0] == 30);
+    }
+}

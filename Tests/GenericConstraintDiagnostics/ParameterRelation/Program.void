@@ -1,0 +1,1 @@
+public class Base { } public sealed class Other { } public static class Program { static T Keep<T, U>(T value) where T : U { return value; } public static void Main() { Other value = new Other(); Keep<Other, Base>(value); } }

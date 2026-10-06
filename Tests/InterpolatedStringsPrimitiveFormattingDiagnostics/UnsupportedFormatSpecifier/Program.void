@@ -1,0 +1,8 @@
+public static class Program
+{
+    public static void Main()
+    {
+        int value = 42;
+        string text = $"value={value:D2}";
+    }
+}

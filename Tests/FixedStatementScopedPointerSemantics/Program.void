@@ -1,0 +1,185 @@
+using Void;
+
+public sealed class Box244
+{
+    public int First;
+    public int Second;
+
+    public Box244(int first, int second)
+    {
+        First = first;
+        Second = second;
+    }
+
+    public unsafe int BumpFirst()
+    {
+        fixed (int* p = &this.First)
+        {
+            p[0]++;
+            return p[0];
+        }
+    }
+}
+
+public sealed class GenericBox244<T> where T : unmanaged
+{
+    public T Value;
+
+    public GenericBox244(T value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    private static int MakeCalls;
+
+    private static Box244 MakeBox()
+    {
+        MakeCalls++;
+        return new Box244(10, 20);
+    }
+
+    private static unsafe bool OwnerEvaluatesOnceAndPinRoots()
+    {
+        MakeCalls = 0;
+        fixed (int* p = &MakeBox().First)
+        {
+            GC.Collect();
+            bool before = MakeCalls == 1 && p[0] == 10;
+            p[0] = 11;
+            return before && p[0] == 11 && MakeCalls == 1;
+        }
+    }
+
+    private static unsafe bool LocalPointerAliasStaysInScope()
+    {
+        Box244 box = new Box244(30, 40);
+        fixed (int* p = &box.First)
+        {
+            int* alias = p + 0;
+            alias[0] = 31;
+            return alias == p && box.First == 31;
+        }
+    }
+
+    private static unsafe int ReturnFromFixed()
+    {
+        Box244 box = new Box244(50, 60);
+        fixed (int* p = &box.First)
+        {
+            p[0] = 51;
+            return p[0];
+        }
+    }
+
+    private static unsafe bool BreakFromFixed()
+    {
+        Box244 box = new Box244(0, 0);
+        int i = 0;
+        while (i < 4)
+        {
+            i++;
+            fixed (int* p = &box.First)
+            {
+                p[0]++;
+                break;
+            }
+        }
+        return i == 1 && box.First == 1;
+    }
+
+    private static unsafe bool ContinueFromFixed()
+    {
+        Box244 box = new Box244(0, 0);
+        int i = 0;
+        while (i < 3)
+        {
+            i++;
+            fixed (int* p = &box.First)
+            {
+                p[0]++;
+                continue;
+            }
+        }
+        return box.First == 3;
+    }
+
+    private static unsafe bool ExceptionFromFixed()
+    {
+        Box244 box = new Box244(70, 80);
+        try
+        {
+            fixed (int* p = &box.First)
+            {
+                p[0] = 71;
+                throw new Exception();
+            }
+        }
+        catch (Exception)
+        {
+            return box.First == 71;
+        }
+        return false;
+    }
+
+    private static unsafe bool MultipleDeclarators()
+    {
+        Box244 left = new Box244(1, 2);
+        Box244 right = new Box244(3, 4);
+        fixed (int* a = &left.First, b = &right.Second)
+        {
+            a[0] = 5;
+            b[0] = 6;
+        }
+        return left.First == 5 && right.Second == 6;
+    }
+
+    private static unsafe bool NestedPins()
+    {
+        Box244 box = new Box244(7, 8);
+        fixed (int* first = &box.First)
+        {
+            fixed (int* second = &box.Second)
+            {
+                GC.Collect();
+                first[0] = 9;
+                second[0] = 10;
+            }
+            first[0]++;
+        }
+        return box.First == 10 && box.Second == 10;
+    }
+
+    private static unsafe T GenericRoundTrip<T>(GenericBox244<T> box) where T : unmanaged
+    {
+        fixed (T* p = &box.Value)
+        {
+            return p[0];
+        }
+    }
+
+    public static unsafe void Main()
+    {
+        Console.WriteLine(OwnerEvaluatesOnceAndPinRoots());
+        Console.WriteLine(LocalPointerAliasStaysInScope());
+        Console.WriteLine(ReturnFromFixed() == 51);
+        Console.WriteLine(BreakFromFixed());
+        Console.WriteLine(ContinueFromFixed());
+        Console.WriteLine(ExceptionFromFixed());
+        Console.WriteLine(MultipleDeclarators());
+        Console.WriteLine(NestedPins());
+
+        Box244 box = new Box244(100, 200);
+        fixed (int* p = &box.First)
+        {
+            Console.WriteLine(p[0] == 100);
+            p[0] = 101;
+            Console.WriteLine(box.First == 101);
+        }
+
+        Console.WriteLine(box.BumpFirst() == 102);
+        Console.WriteLine(GenericRoundTrip<int>(new GenericBox244<int>(244)) == 244);
+    }
+}

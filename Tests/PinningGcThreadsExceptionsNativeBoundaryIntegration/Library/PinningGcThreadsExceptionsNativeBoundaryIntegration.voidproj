@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "Void249PinInteropIntegration",
+  "version": "0.0.249",
+  "output": "library",
+  "compiler": {
+    "unsafe": true
+  }
+}

@@ -1,0 +1,81 @@
+public delegate void MixedCallback(ref int left, out int right, in int addend);
+
+public static class LibraryNative
+{
+    [Native("void100_run_core")]
+    public static unsafe extern int RunCore(int seed);
+
+    [Native("void100_adjust")]
+    public static unsafe extern void Adjust(ref int value, int amount);
+
+    [Native("void100_write")]
+    public static unsafe extern void Write(out int value);
+
+    [Native("void100_read")]
+    public static unsafe extern int Read(in int value);
+}
+
+public static class NativeFixture
+{
+    [Native("void100_callback_mixed")]
+    public static unsafe extern int Mixed(int left, int addend, MixedCallback callback);
+}
+
+public static class Callbacks
+{
+    public static int Calls;
+    public static int Addend;
+
+    public static void Mixed(ref int left, out int right, in int addend)
+    {
+        Calls++;
+        Addend = addend;
+        left += addend;
+        right = left * 2;
+    }
+}
+
+public static class Program
+{
+    private static void CheckMask(int mask)
+    {
+        Console.WriteLine(mask >= 512);
+        if (mask >= 512) mask -= 512;
+        Console.WriteLine(mask >= 256);
+        if (mask >= 256) mask -= 256;
+        Console.WriteLine(mask >= 128);
+        if (mask >= 128) mask -= 128;
+        Console.WriteLine(mask >= 64);
+        if (mask >= 64) mask -= 64;
+        Console.WriteLine(mask >= 32);
+        if (mask >= 32) mask -= 32;
+        Console.WriteLine(mask >= 16);
+        if (mask >= 16) mask -= 16;
+        Console.WriteLine(mask >= 8);
+        if (mask >= 8) mask -= 8;
+        Console.WriteLine(mask >= 4);
+        if (mask >= 4) mask -= 4;
+        Console.WriteLine(mask >= 2);
+        if (mask >= 2) mask -= 2;
+        Console.WriteLine(mask == 1);
+        if (mask == 1) mask -= 1;
+        Console.WriteLine(mask == 0);
+    }
+
+    public static unsafe void Main()
+    {
+        CheckMask(LibraryNative.RunCore(10));
+        CheckMask(LibraryNative.RunCore(20));
+
+        int value = 5;
+        LibraryNative.Adjust(ref value, 7);
+        Console.WriteLine(value == 12);
+        Console.WriteLine(LibraryNative.Read(in value) == 12);
+        LibraryNative.Write(out value);
+        Console.WriteLine(value == 100);
+
+        Console.WriteLine(NativeFixture.Mixed(5, 3, Callbacks.Mixed) == 24);
+        Console.WriteLine(Callbacks.Calls == 1);
+        Console.WriteLine(Callbacks.Addend == 3);
+    }
+}

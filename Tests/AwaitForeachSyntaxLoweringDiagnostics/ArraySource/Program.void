@@ -1,0 +1,9 @@
+using Void.Threading.Tasks;
+public static class Program
+{
+    private static async Task Read(int[] values)
+    {
+        await foreach (var value in values) {}
+    }
+    public static void Main() {}
+}

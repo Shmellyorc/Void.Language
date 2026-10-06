@@ -1,0 +1,9 @@
+public sealed class Player
+{
+    public int Health;
+
+    public void Damage(int amount)
+    {
+        Health -= amount;
+    }
+}

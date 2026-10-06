@@ -1,0 +1,12 @@
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    private static async Task Work([EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        await Task.Run(() => Console.WriteLine(cancellationToken.CanBeCanceled));
+    }
+
+    public static void Main() { }
+}

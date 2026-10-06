@@ -1,0 +1,156 @@
+public enum State
+{
+    Idle,
+    Walk,
+    Attack,
+    Dead
+}
+
+public sealed class Box
+{
+    public int Value;
+}
+
+public static class Program
+{
+    public static int Describe(State state)
+    {
+        switch (state)
+        {
+            case State.Idle:
+                return 10;
+            case State.Walk:
+            case State.Attack:
+                return 20;
+            default:
+                return 30;
+        }
+    }
+
+    public static int Number(int value)
+    {
+        int result = 0;
+        switch (value)
+        {
+            case -1:
+                result = 5;
+                break;
+            case 0:
+            case 1:
+                result = 10;
+                break;
+            default:
+                result = 99;
+                break;
+        }
+        return result;
+    }
+
+    public static int Character(char value)
+    {
+        switch (value)
+        {
+            case 'a':
+                return 1;
+            case '\n':
+                return 2;
+            default:
+                return 3;
+        }
+    }
+
+    public static int LoopControl()
+    {
+        int total = 0;
+        for (int i = 0; i < 3; i++)
+        {
+            switch (i)
+            {
+                case 0:
+                    total += 1;
+                    break;
+                case 1:
+                    total += 10;
+                    continue;
+                default:
+                    total += 100;
+                    break;
+            }
+            total += 1000;
+        }
+        return total;
+    }
+
+    public static int NoMatch(int value)
+    {
+        int result = 7;
+        switch (value)
+        {
+            case 1:
+                result = 1;
+                break;
+        }
+        return result;
+    }
+
+    public static int ManagedCase(int value)
+    {
+        int result = 0;
+        switch (value)
+        {
+            case 1:
+                Box box = new Box();
+                box.Value = 42;
+                result = box.Value;
+                break;
+            default:
+                break;
+        }
+        return result;
+    }
+
+    public static int NestedSwitch(int outer, int inner)
+    {
+        int result = 0;
+        switch (outer)
+        {
+            case 1:
+                switch (inner)
+                {
+                    case 2:
+                        result = 20;
+                        break;
+                    default:
+                        result = 30;
+                        break;
+                }
+                result += 1;
+                break;
+            default:
+                result = 99;
+                break;
+        }
+        return result;
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(Describe(State.Idle) == 10);
+        Console.WriteLine(Describe(State.Walk) == 20);
+        Console.WriteLine(Describe(State.Attack) == 20);
+        Console.WriteLine(Describe(State.Dead) == 30);
+        Console.WriteLine(Number(-1) == 5);
+        Console.WriteLine(Number(0) == 10);
+        Console.WriteLine(Number(1) == 10);
+        Console.WriteLine(Number(8) == 99);
+        Console.WriteLine(Character('a') == 1);
+        Console.WriteLine(Character('\n') == 2);
+        Console.WriteLine(Character('z') == 3);
+        Console.WriteLine(LoopControl() == 2111);
+        Console.WriteLine(NoMatch(9) == 7);
+        Console.WriteLine(ManagedCase(1) == 42);
+        Console.WriteLine(NestedSwitch(1, 2) == 21);
+        Console.WriteLine(NestedSwitch(1, 9) == 31);
+        Console.WriteLine(NestedSwitch(9, 2) == 99);
+    }
+}

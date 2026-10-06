@@ -1,0 +1,4 @@
+using Void;
+public interface IEmitter { event Action<int> Changed; }
+public sealed class Broken : IEmitter { }
+public static class Program { public static void Main() { Broken b = new Broken(); } }

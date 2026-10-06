@@ -1,0 +1,13 @@
+using Void.Collections;
+public sealed class Gate217 { }
+public static class Program
+{
+    private static async IAsyncEnumerable<int> Bad(Gate217 gate)
+    {
+        lock (gate)
+        {
+            yield return 1;
+        }
+    }
+    public static void Main() { }
+}

@@ -1,0 +1,14 @@
+using Void.Collections;
+using Void.Threading.Tasks;
+public sealed class Gate216 {}
+public static class Program
+{
+    private static async Task Read(IAsyncEnumerable<int> source, Gate216 gate)
+    {
+        lock (gate)
+        {
+            await foreach (var value in source) {}
+        }
+    }
+    public static void Main() {}
+}

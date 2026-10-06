@@ -1,0 +1,20 @@
+public delegate void TextHandler(string value);
+
+public sealed class Bad
+{
+    public event Action<int> Changed
+    {
+        add { }
+        remove { }
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Bad bad = new();
+        TextHandler handler = null;
+        bad.Changed += (TextHandler)handler;
+    }
+}

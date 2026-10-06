@@ -1,0 +1,1 @@
+public sealed class Box<T> where T : class where T : new() { } public static class Program { public static void Main() { } }

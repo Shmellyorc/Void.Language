@@ -1,0 +1,15 @@
+using Void.Threading;
+using Void.Threading.Tasks;
+
+namespace Void.Collections;
+
+public interface IAsyncEnumerator<T> : IAsyncDisposable
+{
+    T Current { get; }
+    Task<bool> MoveNextAsync();
+}
+
+public interface IAsyncEnumerable<T>
+{
+    IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default);
+}

@@ -1,0 +1,13 @@
+public sealed class Worker
+{
+    private T Hidden<T>(T value) { return value; }
+    public static Worker Create() { return new Worker(); }
+}
+public static class Program
+{
+    public static void Main()
+    {
+        Worker value = Worker.Create();
+        value.Hidden<int>(1);
+    }
+}

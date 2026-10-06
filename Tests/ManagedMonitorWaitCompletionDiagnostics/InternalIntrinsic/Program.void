@@ -1,0 +1,14 @@
+using Void;
+
+public sealed class Gate
+{
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        object gate = new Gate();
+        Runtime.MonitorWait(gate);
+    }
+}

@@ -1,0 +1,11 @@
+namespace Void.IO;
+
+public class FileNotFoundException : IOException
+{
+    public FileNotFoundException() : base("File was not found.") { }
+    public FileNotFoundException(string message) : base(message) { }
+    public FileNotFoundException(string message, Exception innerException) : base(message, innerException) { }
+    private string _fileName;
+    public string FileName { get { return _fileName; } }
+    public FileNotFoundException(string message, string fileName) : base(message) { _fileName = fileName; }
+}

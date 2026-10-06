@@ -1,0 +1,17 @@
+namespace Tests.Classes;
+
+public class Node
+{
+    public int Value;
+    public Node Next;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+
+    public void SetNext(Node next)
+    {
+        Next = next;
+    }
+}

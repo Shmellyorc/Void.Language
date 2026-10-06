@@ -1,0 +1,242 @@
+public interface INode
+{
+    int Value { get; }
+}
+
+public class Node : INode
+{
+    public int Value { get; set; }
+    public Node Child { get; set; }
+}
+
+public class SpecialNode : Node
+{
+    public int Extra { get; set; }
+}
+
+public struct Pair
+{
+    public int Left { get; set; }
+    public int Right { get; set; }
+}
+
+
+public sealed class GcHolder
+{
+    private Node _child;
+
+    public GcHolder(Node child)
+    {
+        _child = child;
+    }
+
+    public Node Child
+    {
+        get
+        {
+            GC.Collect();
+            return _child;
+        }
+    }
+}
+
+public sealed class GenericSwitch<T>
+{
+    public int Match(Node node)
+    {
+        switch (node)
+        {
+            case { Value: > 5 }:
+                return 1;
+            default:
+                return 0;
+        }
+    }
+}
+
+public static class Program
+{
+    private static int _factoryCalls;
+
+    private static Node MakeNode()
+    {
+        _factoryCalls++;
+        Node node = new Node();
+        node.Value = 18;
+        return node;
+    }
+
+    private static IEnumerator<int> SwitchYield(Node node)
+    {
+        switch (node)
+        {
+            case { Value: > 5 }:
+                yield return 1;
+                break;
+            default:
+                yield return 0;
+                break;
+        }
+    }
+
+    public static int Classify(Node node)
+    {
+        switch (node)
+        {
+            case SpecialNode special:
+                return special.Extra;
+            case { Value: > 10 and < 20 }:
+                return 20;
+            case { Child: { Value: 7 } }:
+                return 70;
+            case null:
+                return -1;
+            default:
+                return 0;
+        }
+    }
+
+    public static int InterfaceCase(INode node)
+    {
+        switch (node)
+        {
+            case SpecialNode special:
+                return special.Extra + special.Value;
+            case { Value: >= 5 }:
+                return 5;
+            default:
+                return 0;
+        }
+    }
+
+    public static int StructCase(Pair pair)
+    {
+        switch (pair)
+        {
+            case { Left: > 0, Right: < 0 }:
+                return 1;
+            case { Left: 0 }:
+                return 2;
+            default:
+                return 3;
+        }
+    }
+
+    public static int Constants(int value)
+    {
+        switch (value)
+        {
+            case 1:
+            case 2:
+                return 12;
+            case > 10 and < 20:
+                return 15;
+            default:
+                return 99;
+        }
+    }
+
+    public static int LoopContinue()
+    {
+        int total = 0;
+        for (int i = 0; i < 4; i++)
+        {
+            switch (i)
+            {
+                case 1:
+                    continue;
+                case 2:
+                    total += 20;
+                    break;
+                default:
+                    total += 1;
+                    break;
+            }
+            total += 100;
+        }
+        return total;
+    }
+
+    public static int DefaultBeforeCase(int value)
+    {
+        switch (value)
+        {
+            default:
+            case 9:
+                return 9;
+            case 4:
+                return 4;
+        }
+    }
+
+    public static void Main()
+    {
+        SpecialNode special = new SpecialNode();
+        special.Value = 3;
+        special.Extra = 42;
+        Console.WriteLine(Classify(special) == 42);
+
+        Node ranged = new Node();
+        ranged.Value = 15;
+        Console.WriteLine(Classify(ranged) == 20);
+
+        Node nested = new Node();
+        nested.Value = 1;
+        nested.Child = new Node();
+        nested.Child.Value = 7;
+        Console.WriteLine(Classify(nested) == 70);
+
+        Node none = new Node();
+        none.Value = 2;
+        Console.WriteLine(Classify(none) == 0);
+        Console.WriteLine(Classify(null) == -1);
+
+        INode iface = special;
+        Console.WriteLine(InterfaceCase(iface) == 45);
+        Node ifaceNode = new Node();
+        ifaceNode.Value = 8;
+        Console.WriteLine(InterfaceCase(ifaceNode) == 5);
+
+        Pair pair = new Pair();
+        pair.Left = 2;
+        pair.Right = -1;
+        Console.WriteLine(StructCase(pair) == 1);
+        pair.Left = 0;
+        pair.Right = 9;
+        Console.WriteLine(StructCase(pair) == 2);
+
+        Console.WriteLine(Constants(1) == 12);
+        Console.WriteLine(Constants(2) == 12);
+        Console.WriteLine(Constants(15) == 15);
+        Console.WriteLine(Constants(30) == 99);
+        Console.WriteLine(LoopContinue() == 322);
+        Console.WriteLine(DefaultBeforeCase(4) == 4);
+        Console.WriteLine(DefaultBeforeCase(9) == 9);
+        Console.WriteLine(DefaultBeforeCase(77) == 9);
+
+        _factoryCalls = 0;
+        Console.WriteLine(Classify(MakeNode()) == 20);
+        Console.WriteLine(_factoryCalls == 1);
+
+        Node gcChild = new Node();
+        gcChild.Value = 33;
+        GcHolder gcHolder = new GcHolder(gcChild);
+        switch (gcHolder)
+        {
+            case { Child: { Value: 33 } }:
+                Console.WriteLine(true);
+                break;
+            default:
+                Console.WriteLine(false);
+                break;
+        }
+
+        GenericSwitch<int> genericSwitch = new GenericSwitch<int>();
+        Console.WriteLine(genericSwitch.Match(ranged) == 1);
+
+        var iterator = SwitchYield(ranged);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == 1);
+        iterator.Dispose();
+    }
+}

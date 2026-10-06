@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "GenericPointerUnmanagedStackStorageNegativeCount",
+  "output": "exe",
+  "version": "0.0.242",
+  "compiler": {
+    "unsafe": true
+  }
+}

@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { Span<int>[] values = new Span<int>[1]; } }

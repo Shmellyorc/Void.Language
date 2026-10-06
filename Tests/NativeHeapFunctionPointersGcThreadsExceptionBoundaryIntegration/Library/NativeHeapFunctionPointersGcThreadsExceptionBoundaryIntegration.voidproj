@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "Void259NativeHeapFunctionPointerIntegration",
+  "version": "0.0.259",
+  "output": "library",
+  "compiler": {
+    "unsafe": true
+  }
+}

@@ -1,0 +1,52 @@
+public enum Direction
+{
+    None,
+    Left = 4,
+    Right,
+    Up = 9
+}
+
+public enum Tiny : byte
+{
+    Zero,
+    Max = 200,
+    Next
+}
+
+public enum SignedTiny : sbyte
+{
+    Negative = -3,
+    Zero = 0,
+    Positive
+}
+
+public static class Program
+{
+    public static Direction Echo(Direction value)
+    {
+        return value;
+    }
+
+    public static Tiny GetTiny()
+    {
+        return Tiny.Next;
+    }
+
+    public static void Main()
+    {
+        Direction current = Direction.Right;
+        var inferred = Direction.Left;
+
+        Console.WriteLine(Direction.None < Direction.Left);
+        Console.WriteLine(Direction.Right > Direction.Left);
+        Console.WriteLine(Direction.Right < Direction.Up);
+        Console.WriteLine(Echo(Direction.Right) == Direction.Right);
+        Console.WriteLine(Direction.Up != Direction.Left);
+        Console.WriteLine(current == Direction.Right);
+        Console.WriteLine(inferred == Direction.Left);
+        Console.WriteLine(Tiny.Zero < Tiny.Max);
+        Console.WriteLine(GetTiny() == Tiny.Next);
+        Console.WriteLine(SignedTiny.Negative < SignedTiny.Zero);
+        Console.WriteLine(SignedTiny.Positive > SignedTiny.Zero);
+    }
+}

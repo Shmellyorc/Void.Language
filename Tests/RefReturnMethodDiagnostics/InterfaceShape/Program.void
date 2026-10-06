@@ -1,0 +1,1 @@
+public interface I { ref int Get(); } public sealed class C:I { public int Get(){return 1;} } public static class Program { public static void Main(){} }

@@ -1,0 +1,17 @@
+public class Box { public int Value { get; set; } }
+public static class Program
+{
+    public static void Main()
+    {
+        Box value = new Box();
+        switch (value)
+        {
+            case Box box when box.Value > 0:
+                break;
+            case Box when box.Value > 0:
+                break;
+            default:
+                break;
+        }
+    }
+}

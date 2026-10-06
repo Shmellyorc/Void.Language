@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "NullableOperators",
+  "output": "exe",
+  "version": "0.1.0",
+  "compiler": {
+    "unsafe": false
+  }
+}

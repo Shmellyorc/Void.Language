@@ -1,0 +1,14 @@
+using Void;
+
+namespace SemanticQueries;
+
+public static class Program
+{
+    public static void Main()
+    {
+        Player player = new Player();
+        player.Health = 10;
+        int total = player.Add(2, bonus: 3);
+        Console.WriteLine(total);
+    }
+}

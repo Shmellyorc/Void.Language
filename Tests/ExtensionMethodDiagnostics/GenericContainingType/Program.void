@@ -1,0 +1,5 @@
+public class Extensions<T>
+{
+    public static T Echo(this T value) { return value; }
+}
+public static class Program { public static void Main() { } }

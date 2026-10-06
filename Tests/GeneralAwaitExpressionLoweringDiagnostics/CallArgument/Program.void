@@ -1,0 +1,13 @@
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    private static int Identity(int value) => value;
+
+    private static async Task<int> Run(Task<int> source)
+    {
+        return Identity(await source);
+    }
+
+    public static void Main() {}
+}

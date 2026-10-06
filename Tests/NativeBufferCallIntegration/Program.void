@@ -1,0 +1,132 @@
+using Void;
+
+public struct Pair248
+{
+    public int A;
+    public int B;
+
+    public Pair248(int a, int b)
+    {
+        A = a;
+        B = b;
+    }
+}
+
+public static class Native248
+{
+    [Native("voidc248_sum_i32")]
+    public static unsafe extern int Sum(ReadOnlySpan<int> values);
+
+    [Native("voidc248_add_i32")]
+    public static unsafe extern void Add(Span<int> values, int delta);
+
+    [Native("voidc248_dot_i32")]
+    public static unsafe extern int Dot(ReadOnlySpan<int> left, ReadOnlySpan<int> right);
+
+    [Native("voidc248_empty_readonly")]
+    public static unsafe extern int EmptyReadOnly(ReadOnlySpan<int> values);
+
+    [Native("voidc248_empty_writable")]
+    public static unsafe extern int EmptyWritable(Span<int> values);
+
+    [Native("voidc248_sum_pairs")]
+    public static unsafe extern int SumPairs(ReadOnlySpan<Pair248> values);
+
+    [Native("voidc248_shift_pairs")]
+    public static unsafe extern void ShiftPairs(Span<Pair248> values, int delta);
+}
+
+public static class Program
+{
+    private static int Calls;
+
+    private static Span<int> MakeSpan(int[] values)
+    {
+        Calls++;
+        return new Span<int>(values, 1, 3);
+    }
+
+    private static ReadOnlySpan<int> MakeReadOnlySpan(int[] values)
+    {
+        Calls++;
+        return new ReadOnlySpan<int>(values, 1, 3);
+    }
+
+    public static unsafe void Main()
+    {
+        int[] values = new int[] { 1, 2, 3, 4, 5 };
+        Console.WriteLine(Native248.Sum(values) == 15);
+
+        Native248.Add(values, 10);
+        Console.WriteLine(values[0] == 11 && values[4] == 15);
+        Console.WriteLine(Native248.Sum(values) == 65);
+
+        Span<int> middle = new Span<int>(values, 1, 3);
+        Native248.Add(middle, 5);
+        Console.WriteLine(values[0] == 11 && values[1] == 17 && values[2] == 18 && values[3] == 19 && values[4] == 15);
+
+        ReadOnlySpan<int> readonlyMiddle = middle;
+        Console.WriteLine(Native248.Sum(readonlyMiddle) == 54);
+        Console.WriteLine(Native248.Dot(readonlyMiddle, readonlyMiddle) == 17 * 17 + 18 * 18 + 19 * 19);
+
+        Memory<int> memory = new Memory<int>(values, 1, 3);
+        Native248.Add(memory.Span, 1);
+        Console.WriteLine(values[1] == 18 && values[2] == 19 && values[3] == 20);
+
+        ReadOnlyMemory<int> readOnlyMemory = new ReadOnlyMemory<int>(values, 1, 3);
+        Console.WriteLine(Native248.Sum(readOnlyMemory.Span) == 57);
+
+        Span<int> ranged = memory.Span[1..^0];
+        Native248.Add(ranged, 2);
+        Console.WriteLine(values[1] == 18 && values[2] == 21 && values[3] == 22);
+
+        Calls = 0;
+        Native248.Add(MakeSpan(values), 3);
+        Console.WriteLine(Calls == 1);
+        Console.WriteLine(values[1] == 21 && values[2] == 24 && values[3] == 25);
+
+        Calls = 0;
+        Console.WriteLine(Native248.Sum(MakeReadOnlySpan(values)) == 70);
+        Console.WriteLine(Calls == 1);
+
+        int* stackValues = stackalloc int[4];
+        stackValues[0] = 3;
+        stackValues[1] = 4;
+        stackValues[2] = 5;
+        stackValues[3] = 6;
+        Span<int> stackSpan = new Span<int>(stackValues, 4);
+        Console.WriteLine(Native248.Sum(stackSpan) == 18);
+        Native248.Add(stackSpan, 2);
+        Console.WriteLine(stackValues[0] == 5 && stackValues[3] == 8);
+
+        int* external = stackalloc int[3];
+        external[0] = 30;
+        external[1] = 40;
+        external[2] = 50;
+        ReadOnlySpan<int> externalReadOnly = new ReadOnlySpan<int>(external, 3);
+        Console.WriteLine(Native248.Sum(externalReadOnly) == 120);
+        Span<int> externalWritable = new Span<int>(external, 3);
+        Native248.Add(externalWritable, -5);
+        Console.WriteLine(external[0] == 25 && external[2] == 45);
+
+        Span<int> empty = default(Span<int>);
+        ReadOnlySpan<int> readOnlyEmpty = default(ReadOnlySpan<int>);
+        Console.WriteLine(Native248.EmptyWritable(empty) == 1);
+        Console.WriteLine(Native248.EmptyReadOnly(readOnlyEmpty) == 1);
+
+        Pair248[] pairs = new Pair248[] { new Pair248(1, 2), new Pair248(3, 4), new Pair248(5, 6) };
+        Console.WriteLine(Native248.SumPairs(pairs) == 21);
+        Span<Pair248> pairSpan = new Span<Pair248>(pairs, 1, 2);
+        Native248.ShiftPairs(pairSpan, 10);
+        Console.WriteLine(pairs[0].A == 1 && pairs[1].A == 13 && pairs[1].B == 14 && pairs[2].A == 15 && pairs[2].B == 16);
+        Console.WriteLine(Native248.SumPairs(new ReadOnlySpan<Pair248>(pairs, 1, 2)) == 58);
+
+        int[] left = new int[] { 2, 3, 4 };
+        int[] right = new int[] { 5, 6, 7 };
+        Console.WriteLine(Native248.Dot(left, right) == 56);
+
+        Span<int> leftSpan = new Span<int>(left);
+        ReadOnlySpan<int> rightSpan = new ReadOnlySpan<int>(right);
+        Console.WriteLine(Native248.Dot(leftSpan, rightSpan) == 56);
+    }
+}

@@ -1,0 +1,92 @@
+using Void;
+
+namespace Void.IO;
+
+public enum FileMode { CreateNew = 1, Create = 2, Open = 3, OpenOrCreate = 4, Truncate = 5, Append = 6 }
+public enum FileAccess { Read = 1, Write = 2, ReadWrite = 3 }
+
+public class FileStream : Stream
+{
+    private FileAccess _access;
+    private string _name;
+    private bool _disposed;
+    private bool _seekable;
+    public string Name { get { return _name; } }
+    public FileStream(string path, FileMode mode) : this(path, mode, mode == FileMode.Append ? FileAccess.Write : FileAccess.ReadWrite) { }
+    public FileStream(string path, FileMode mode, FileAccess access)
+    {
+        IOErrors.CheckPath(path);
+        if ((int)mode < 1 || (int)mode > 6) throw new ArgumentOutOfRangeException("mode");
+        if ((int)access < 1 || (int)access > 3) throw new ArgumentOutOfRangeException("access");
+        if ((mode == FileMode.CreateNew || mode == FileMode.Create || mode == FileMode.Truncate) && access == FileAccess.Read)
+            throw new ArgumentException("Mode requires write access.");
+        if (mode == FileMode.Append && access != FileAccess.Write) throw new ArgumentException("Append requires write-only access.");
+        _name = Path.GetFullPath(path); _access = access;
+        IOErrors.Throw(Runtime.NativeHandleOpen(this, _name, (int)mode, (int)access), path, false);
+        _seekable = Runtime.NativeHandleCanSeek(this);
+    }
+    public override bool CanRead { get { return !_disposed && _access != FileAccess.Write; } }
+    public override bool CanWrite { get { return !_disposed && _access != FileAccess.Read; } }
+    public override bool CanSeek { get { return !_disposed && _seekable; } }
+    private void CheckOpen() { if (_disposed) throw new ObjectDisposedException("FileStream"); }
+    private void CheckSeek() { this.CheckOpen(); if (!_seekable) throw new NotSupportedException("Stream does not support seeking."); }
+    private long Result(long value)
+    {
+        if (value < 0L) IOErrors.Throw((int)(-value), _name, false);
+        return value;
+    }
+    public override long Length { get { this.CheckSeek(); return this.Result(Runtime.NativeHandleLength(this)); } }
+    public override long Position
+    {
+        get { this.CheckSeek(); return this.Result(Runtime.NativeHandleSeek(this, 0L, 1)); }
+        set { if (value < 0L) throw new ArgumentOutOfRangeException("value"); this.Seek(value, SeekOrigin.Begin); }
+    }
+    public override long Seek(long offset, SeekOrigin origin)
+    {
+        this.CheckSeek();
+        if ((int)origin < 0 || (int)origin > 2) throw new ArgumentOutOfRangeException("origin");
+        return this.Result(Runtime.NativeHandleSeek(this, offset, (int)origin));
+    }
+    public override void SetLength(long value)
+    {
+        this.CheckOpen();
+        if (!this.CanWrite) throw new NotSupportedException("Stream does not support writing.");
+        this.CheckSeek(); if (value < 0L) throw new ArgumentOutOfRangeException("value");
+        IOErrors.Throw(Runtime.NativeHandleSetLength(this, value), _name, false);
+    }
+    public override void Flush()
+    {
+        this.CheckOpen();
+        if (this.CanWrite) IOErrors.Throw(Runtime.NativeHandleFlush(this), _name, false);
+    }
+    private static void CheckBuffer(byte[] buffer, int offset, int count)
+    {
+        if (buffer == null) throw new ArgumentNullException("buffer");
+        if (offset < 0) throw new ArgumentOutOfRangeException("offset");
+        if (count < 0) throw new ArgumentOutOfRangeException("count");
+        if (offset > buffer.Length || count > buffer.Length - offset) throw new ArgumentException("Buffer range is out of bounds.");
+    }
+    public override int Read(byte[] buffer, int offset, int count)
+    {
+        this.CheckOpen(); if (!this.CanRead) throw new NotSupportedException("Stream does not support reading.");
+        CheckBuffer(buffer, offset, count);
+        return (int)this.Result((long)Runtime.NativeHandleRead(this, buffer, offset, count));
+    }
+    public override void Write(byte[] buffer, int offset, int count)
+    {
+        this.CheckOpen(); if (!this.CanWrite) throw new NotSupportedException("Stream does not support writing.");
+        CheckBuffer(buffer, offset, count);
+        while (count > 0)
+        {
+            int written = (int)this.Result((long)Runtime.NativeHandleWrite(this, buffer, offset, count));
+            if (written == 0) throw new IOException("Native write made no progress.");
+            offset += written; count -= written;
+        }
+    }
+    public override void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        IOErrors.Throw(Runtime.NativeHandleClose(this), _name, false);
+    }
+}

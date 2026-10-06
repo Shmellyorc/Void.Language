@@ -1,0 +1,289 @@
+using Void;
+using Void.Collections;
+
+public interface IToInt<T>
+{
+    static implicit operator int(T value);
+}
+
+public interface IFromInt<T>
+{
+    static implicit operator T(int value);
+}
+
+public interface IExplicitToLong<T>
+{
+    static explicit operator long(T value);
+}
+
+public interface IToPayload<T>
+{
+    static implicit operator Payload(T value);
+}
+
+public struct Number : IToInt<Number>, IFromInt<Number>, IExplicitToLong<Number>
+{
+    public int Value;
+
+    public Number(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator int(Number value)
+    {
+        return value.Value;
+    }
+
+    public static implicit operator Number(int value)
+    {
+        return new Number(value + 100);
+    }
+
+    public static explicit operator long(Number value)
+    {
+        return value.Value + 1000;
+    }
+}
+
+public struct Ranked
+{
+    public int Code;
+
+    public Ranked(int code)
+    {
+        Code = code;
+    }
+
+    public static implicit operator Ranked(short value)
+    {
+        return new Ranked(1);
+    }
+
+    public static implicit operator Ranked(int value)
+    {
+        return new Ranked(2);
+    }
+}
+
+public sealed class Payload
+{
+    public int Value;
+
+    public Payload(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class ConversionError : Exception
+{
+    public int Code;
+
+    public ConversionError(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class ManagedSource : IToPayload<ManagedSource>
+{
+    public Payload Payload;
+    public bool Fail;
+
+    public ManagedSource(Payload payload, bool fail)
+    {
+        Payload = payload;
+        Fail = fail;
+    }
+
+    public static implicit operator Payload(ManagedSource value)
+    {
+        Program.ConversionCalls++;
+        if (value.Fail)
+            throw new ConversionError("conversion", 160);
+        return value.Payload;
+    }
+}
+
+public sealed class Resource : IDisposable
+{
+    public Resource()
+    {
+        Program.ResourceCount++;
+    }
+
+    public void Dispose()
+    {
+        GC.Collect();
+        Program.DisposeCount++;
+    }
+}
+
+public static class Program
+{
+    public static int ConversionCalls;
+    public static int FinallyCount;
+    public static int DisposeCount;
+    public static int ResourceCount;
+
+    private static U Identity<U>(U value)
+    {
+        return value;
+    }
+
+    private static int Read<T>(T value) where T : IToInt<T>
+    {
+        return value;
+    }
+
+    private static T Make<T>(int value) where T : IFromInt<T>
+    {
+        return value;
+    }
+
+    private static long ReadExplicit<T>(T value) where T : IExplicitToLong<T>
+    {
+        return (long)value;
+    }
+
+    private static int ViaDelegate<T>(T value) where T : IToInt<T>
+    {
+        Func<T> getter = () => value;
+        GC.Collect();
+        return getter();
+    }
+
+    private static int ViaInferredHelper<T>(T value) where T : IToInt<T>
+    {
+        var copy = Identity(value);
+        return copy;
+    }
+
+    private static int ViaConditional<T>(T value, bool flag) where T : IToInt<T>
+    {
+        var copy = flag ? value : value;
+        return copy;
+    }
+
+    private static int ViaSwitch<T>(T value, int tag) where T : IToInt<T>
+    {
+        var copy = tag switch
+        {
+            0 => value,
+            _ => value
+        };
+        return copy;
+    }
+
+    private static int ViaCoalesce<T>(T value, int? maybe) where T : IToInt<T>
+    {
+        return maybe ?? value;
+    }
+
+    private static IEnumerator<int> IteratorValues<T>(T value) where T : IToInt<T>
+    {
+        var copy = value;
+        Func<T> getter = () => copy;
+        yield return 1;
+        GC.Collect();
+        yield return getter();
+    }
+
+    private static Payload ManagedClosure<T>(T value) where T : IToPayload<T>
+    {
+        Func<T> getter = () => value;
+        GC.Collect();
+        return getter();
+    }
+
+    private static bool ThrowingConversion<T>(T value) where T : IToPayload<T>
+    {
+        bool caught = false;
+        using (Resource resource = new Resource())
+        {
+            try
+            {
+                Payload payload = value;
+                Console.WriteLine(payload.Value == -1);
+            }
+            catch (ConversionError error)
+            {
+                caught = error.Code == 160;
+            }
+            finally
+            {
+                GC.Collect();
+                FinallyCount++;
+            }
+        }
+        return caught;
+    }
+
+    public static void Main()
+    {
+        int small = 7;
+        long wide = small;
+        double wider = wide;
+        Console.WriteLine(wide == 7);
+        Console.WriteLine((int)wider == 7);
+
+        Number number = new Number(11);
+        int concrete = number;
+        Console.WriteLine(concrete == 11);
+        Number fromInt = 5;
+        Console.WriteLine(fromInt.Value == 105);
+        long explicitValue = (long)number;
+        Console.WriteLine(explicitValue == 1011);
+
+        byte choice = (byte)4;
+        Ranked ranked = choice;
+        Console.WriteLine(ranked.Code == 1);
+
+        Number? lifted = 6;
+        Console.WriteLine(lifted.HasValue);
+        Console.WriteLine(lifted.Value.Value == 106);
+        Number? empty = null;
+        Console.WriteLine(empty.HasValue == false);
+        Number coalesced = empty ?? 7;
+        Console.WriteLine(coalesced.Value == 107);
+        Number? present = new Number(8);
+        Number kept = present ?? 9;
+        Console.WriteLine(kept.Value == 8);
+
+        Console.WriteLine(Read<Number>(number) == 11);
+        Console.WriteLine(Make<Number>(10).Value == 110);
+        Console.WriteLine(ReadExplicit<Number>(number) == 1011);
+        Console.WriteLine(ViaDelegate<Number>(number) == 11);
+        Console.WriteLine(ViaInferredHelper<Number>(number) == 11);
+        Console.WriteLine(ViaConditional<Number>(number, true) == 11);
+        Console.WriteLine(ViaSwitch<Number>(number, 0) == 11);
+        Console.WriteLine(ViaCoalesce<Number>(number, null) == 11);
+        Console.WriteLine(ViaCoalesce<Number>(number, 12) == 12);
+
+        IEnumerator<int> iterator = IteratorValues<Number>(new Number(21));
+        Console.WriteLine(iterator.MoveNext() && iterator.Current == 1);
+        GC.Collect();
+        Console.WriteLine(iterator.MoveNext() && iterator.Current == 21);
+        Console.WriteLine(!iterator.MoveNext());
+
+        ConversionCalls = 0;
+        Payload managed = ManagedClosure<ManagedSource>(
+            new ManagedSource(new Payload(31), false));
+        GC.Collect();
+        Console.WriteLine(managed.Value == 31);
+        Console.WriteLine(ConversionCalls == 1);
+
+        ConversionCalls = 0;
+        FinallyCount = 0;
+        DisposeCount = 0;
+        ResourceCount = 0;
+        bool caught = ThrowingConversion<ManagedSource>(
+            new ManagedSource(new Payload(40), true));
+        Console.WriteLine(caught);
+        Console.WriteLine(ConversionCalls == 1);
+        Console.WriteLine(FinallyCount == 1);
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(ResourceCount == 1);
+    }
+}

@@ -1,0 +1,8 @@
+public interface IA : IB { }
+public interface IB : IC { }
+public interface IC : IA { }
+
+public static class Program
+{
+    public static void Main() { }
+}

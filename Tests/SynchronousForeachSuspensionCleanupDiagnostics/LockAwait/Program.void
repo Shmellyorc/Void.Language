@@ -1,0 +1,17 @@
+using Void.Threading.Tasks;
+public sealed class Gate213 {}
+public static class Program
+{
+    private static Gate213 _gate = new Gate213();
+    private static async Task Run(int[] values, Task signal)
+    {
+        foreach (int value in values)
+        {
+            lock (_gate)
+            {
+                await signal;
+            }
+        }
+    }
+    public static void Main() {}
+}

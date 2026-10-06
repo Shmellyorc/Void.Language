@@ -1,0 +1,166 @@
+using Void;
+using Void.Collections;
+
+public sealed class FailingSequence : IEnumerable<int>
+{
+    public bool Disposed;
+    public IEnumerator<int> GetEnumerator() { return new FailingEnumerator(this); }
+}
+public sealed class FailingEnumerator : IEnumerator<int>
+{
+    private FailingSequence _owner;
+    private int _step;
+    public FailingEnumerator(FailingSequence owner) { _owner = owner; }
+    public int Current => 7;
+    public bool MoveNext()
+    {
+        _step++;
+        if (_step == 1) return true;
+        throw new InvalidOperationException("input failure");
+    }
+    public void Dispose() { _owner.Disposed = true; }
+}
+public static class Program
+{
+    public static void Main()
+    {
+        List<int> list = new List<int>();
+        Console.WriteLine(list.EnsureCapacity(0) == 0);
+        Console.WriteLine(list.EnsureCapacity(3) >= 3 && list.Count == 0);
+        int capacity = list.Capacity;
+        Console.WriteLine(list.EnsureCapacity(1) == capacity);
+        list.Add(1); list.Add(2); list.Add(1); list.Add(3);
+        Console.WriteLine(list.IndexOf(1) == 0 && list.LastIndexOf(1) == 2);
+        Console.WriteLine(list.IndexOf(1, 1) == 2 && list.IndexOf(1, 1, 1) == -1);
+        Console.WriteLine(list.IndexOf(1, 4, 0) == -1 && list.IndexOf(1, 4) == -1);
+        Console.WriteLine(list.LastIndexOf(1, 1) == 0 && list.LastIndexOf(1, 3, 2) == 2);
+        Console.WriteLine(list.LastIndexOf(1, 1, 0) == -1 && list.LastIndexOf(9) == -1);
+        List<int> slice = list.GetRange(1, 2);
+        Console.WriteLine(slice.Count == 2 && slice[0] == 2 && slice[1] == 1);
+        slice[0] = 99;
+        Console.WriteLine(list[1] == 2);
+        Console.WriteLine(list.GetRange(4, 0).Count == 0);
+        int[] output = new int[5]; list.CopyTo(1, output, 2, 2);
+        Console.WriteLine(output[0] == 0 && output[2] == 2 && output[3] == 1 && output[4] == 0);
+        list.CopyTo(4, output, 5, 0);
+        Console.WriteLine(output[3] == 1);
+        IEnumerator<int> en = list.GetEnumerator();
+        list.EnsureCapacity(20); list.Capacity = list.Capacity;
+        Console.WriteLine(en.MoveNext() && en.Current == 1);
+        list.TrimExcess();
+        Console.WriteLine(list.Capacity == 4 && en.MoveNext() && en.Current == 2);
+        list.RemoveRange(4, 0);
+        Console.WriteLine(en.MoveNext() && en.Current == 1);
+        list.Reverse(1, 3);
+        Console.WriteLine(list[0] == 1 && list[1] == 3 && list[2] == 1 && list[3] == 2);
+        bool caught = false;
+        try { en.MoveNext(); } catch (InvalidOperationException e) { caught = true; }
+        Console.WriteLine(caught);
+        list.Reverse();
+        Console.WriteLine(list[0] == 2 && list[3] == 1);
+        en = list.GetEnumerator(); list.Reverse(0, 0); caught = false;
+        try { en.MoveNext(); } catch (InvalidOperationException e) { caught = true; }
+        Console.WriteLine(caught);
+        list.RemoveRange(1, 2);
+        Console.WriteLine(list.Count == 2 && list[0] == 2 && list[1] == 1);
+        en = list.GetEnumerator(); list.RemoveRange(0, 2); caught = false;
+        try { en.MoveNext(); } catch (InvalidOperationException e) { caught = true; }
+        Console.WriteLine(caught && list.Count == 0);
+        list.TrimExcess(); Console.WriteLine(list.Capacity == 0);
+        Console.WriteLine(list.LastIndexOf(1) == -1 && list.LastIndexOf(1, -1) == -1);
+        List<int> input = new List<int>(); input.Add(8); input.Add(9);
+        list.InsertRange(0, input);
+        Console.WriteLine(list.Count == 2 && list[0] == 8 && list[1] == 9);
+        list.InsertRange(1, input);
+        Console.WriteLine(list.Count == 4 && list[0] == 8 && list[1] == 8 && list[2] == 9 && list[3] == 9);
+        list.Clear(); list.Add(1); list.Add(2); list.Add(3);
+        list.InsertRange(1, list);
+        Console.WriteLine(list.Count == 6 && list[0] == 1 && list[1] == 1 && list[2] == 2 && list[3] == 3 && list[4] == 2 && list[5] == 3);
+        list.Clear(); list.Add(1); list.Add(2); list.InsertRange(0, list);
+        Console.WriteLine(list.Count == 4 && list[0] == 1 && list[1] == 2 && list[2] == 1 && list[3] == 2);
+        list.InsertRange(list.Count, list);
+        Console.WriteLine(list.Count == 8 && list[4] == 1 && list[7] == 2);
+        List<int> empty = new List<int>(); en = list.GetEnumerator(); list.InsertRange(1, empty);
+        Console.WriteLine(en.MoveNext());
+        FailingSequence failing = new FailingSequence(); caught = false;
+        try { list.InsertRange(1, failing); } catch (InvalidOperationException e) { caught = e.Message == "input failure"; }
+        Console.WriteLine(caught && failing.Disposed && list.Count == 9 && list[1] == 7);
+        List<string> names = new List<string>(); names.Add("😀"); names.Add(null); names.Add("é");
+        names.InsertRange(1, names); names.RemoveRange(0, 1); names.Reverse();
+        GC.Collect();
+        Console.WriteLine(names.Count == 5 && names[0] == "é" && names[4] == "😀");
+        Console.WriteLine(names.IndexOf(null) == 1 && names.LastIndexOf(null) == 3);
+        List<string> owned = names.GetRange(0, 3); names.Clear(); GC.Collect();
+        Console.WriteLine(owned.Count == 3 && owned[0] == "é" && owned[1] == null);
+        caught = false;
+        try { list.EnsureCapacity(-1); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "capacity"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.GetRange(-1, 0); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "index"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.GetRange(0, -1); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "count"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.GetRange(9, 1); } catch (ArgumentException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.RemoveRange(2147483647, 2147483647); } catch (ArgumentException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.RemoveRange(0, -1); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "count"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.Reverse(-1, 0); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "index"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.Reverse(0, 2147483647); } catch (ArgumentException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.CopyTo(0, null, 0, 0); } catch (ArgumentNullException e) { caught = e.ParamName == "array"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.CopyTo(0, output, -1, 0); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "arrayIndex"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.CopyTo(0, output, 5, 1); } catch (ArgumentException e) { caught = true; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.CopyTo(0, output, 0, -1); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "count"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.IndexOf(1, -1); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "index"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.IndexOf(1, 10); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "index"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.IndexOf(1, 0, -1); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "count"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.IndexOf(1, 8, 2); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "count"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.LastIndexOf(1, -1); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "index"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.LastIndexOf(1, 9); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "index"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.LastIndexOf(1, 0, -1); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "count"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.LastIndexOf(1, 1, 3); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "count"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.InsertRange(0, null); } catch (ArgumentNullException e) { caught = e.ParamName == "collection"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.InsertRange(-1, input); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "index"; }
+        Console.WriteLine(caught);
+        caught = false;
+        try { list.InsertRange(10, input); } catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "index"; }
+        Console.WriteLine(caught);
+        Console.WriteLine(list.Count == 9 && list[1] == 7);
+    }
+}

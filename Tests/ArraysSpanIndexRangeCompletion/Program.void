@@ -1,0 +1,125 @@
+using Void;
+
+public static class Eval234
+{
+    public static int ReceiverCalls;
+    public static int IndexCalls;
+    public static int StartCalls;
+    public static int EndCalls;
+    public static int Order;
+
+    public static int[] MakeArray()
+    {
+        ReceiverCalls += 1;
+        Order = Order * 10 + 1;
+        return new int[] { 10, 20, 30, 40, 50 };
+    }
+
+    public static int IndexValue()
+    {
+        IndexCalls += 1;
+        Order = Order * 10 + 2;
+        return 2;
+    }
+
+    public static int Start()
+    {
+        StartCalls += 1;
+        Order = Order * 10 + 2;
+        return 1;
+    }
+
+    public static int End()
+    {
+        EndCalls += 1;
+        Order = Order * 10 + 3;
+        return 4;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        int[] values = new int[] { 10, 20, 30, 40, 50 };
+
+        Console.WriteLine(values[^1] == 50);
+        Console.WriteLine(values[^5] == 10);
+        Index storedIndex = ^2;
+        Console.WriteLine(values[storedIndex] == 40);
+
+        values[^1] = 55;
+        Console.WriteLine(values[4] == 55);
+        values[^2] += 7;
+        Console.WriteLine(values[3] == 47);
+        values[^3]++;
+        Console.WriteLine(values[2] == 31);
+        ref int alias = ref values[^4];
+        alias = 22;
+        Console.WriteLine(values[1] == 22);
+
+        int[] middle = values[1..4];
+        Console.WriteLine(middle.Length == 3);
+        Console.WriteLine(middle[0] == 22 && middle[1] == 31 && middle[2] == 47);
+        middle[0] = 999;
+        Console.WriteLine(values[1] == 22);
+        values[2] = 777;
+        Console.WriteLine(middle[1] == 31);
+
+        int[] full = values[..];
+        Console.WriteLine(full.Length == values.Length && full[0] == values[0] && full[4] == values[4]);
+        int[] suffix = values[^2..];
+        Console.WriteLine(suffix.Length == 2 && suffix[0] == 47 && suffix[1] == 55);
+        int[] prefix = values[..^2];
+        Console.WriteLine(prefix.Length == 3 && prefix[0] == 10 && prefix[2] == 777);
+        Range storedRange = 1..^1;
+        int[] storedSlice = values[storedRange];
+        Console.WriteLine(storedSlice.Length == 3 && storedSlice[0] == 22 && storedSlice[2] == 47);
+
+        Eval234.Order = 0;
+        Console.WriteLine(Eval234.MakeArray()[^Eval234.IndexValue()] == 40);
+        Console.WriteLine(Eval234.ReceiverCalls == 1 && Eval234.IndexCalls == 1 && Eval234.Order == 12);
+        Eval234.Order = 0;
+        int[] dynamicSlice = Eval234.MakeArray()[Eval234.Start()..Eval234.End()];
+        Console.WriteLine(dynamicSlice.Length == 3 && dynamicSlice[0] == 20 && dynamicSlice[2] == 40);
+        Console.WriteLine(Eval234.ReceiverCalls == 2 && Eval234.StartCalls == 1 && Eval234.EndCalls == 1 && Eval234.Order == 123);
+
+        string[] names = new string[] { "zero", "one", "two", "three" };
+        string[] nameSlice = names[1..3];
+        names = null;
+        GC.Collect();
+        Console.WriteLine(nameSlice.Length == 2);
+        Console.WriteLine(Runtime.Equals(nameSlice[0], "one"));
+        Console.WriteLine(Runtime.Equals(nameSlice[1], "two"));
+
+        int[] absent = null;
+        int? missingValue = absent?[^1];
+        int[] missingSlice = absent?[1..2];
+        Console.WriteLine(!missingValue.HasValue);
+        Console.WriteLine(missingSlice == null);
+        int[] present = new int[] { 4, 5, 6 };
+        int? presentValue = present?[^1];
+        int[] presentSlice = present?[1..];
+        Console.WriteLine(presentValue.HasValue && presentValue.Value == 6);
+        Console.WriteLine(presentSlice != null && presentSlice.Length == 2 && presentSlice[0] == 5);
+
+        Span<int> span = values;
+        Console.WriteLine(span[^1] == 55);
+        Span<int> spanMiddle = span[1..4];
+        Console.WriteLine(spanMiddle.Length == 3 && spanMiddle[0] == 22 && spanMiddle[^1] == 47);
+        spanMiddle[0] = 1234;
+        Console.WriteLine(values[1] == 1234);
+        ref int spanAlias = ref span[^3];
+        spanAlias = 888;
+        Console.WriteLine(values[2] == 888);
+        Span<int> spanStoredRange = span[storedRange];
+        Console.WriteLine(spanStoredRange.Length == 3 && spanStoredRange[0] == 1234 && spanStoredRange[^1] == 47);
+
+        ReadOnlySpan<int> readOnly = values;
+        Console.WriteLine(readOnly[^1] == 55);
+        ReadOnlySpan<int> readOnlyMiddle = readOnly[^4..^1];
+        Console.WriteLine(readOnlyMiddle.Length == 3 && readOnlyMiddle[0] == 1234 && readOnlyMiddle[^1] == 47);
+        ref readonly int readOnlyAlias = ref readOnly[^2];
+        Console.WriteLine(readOnlyAlias == 47);
+    }
+}

@@ -1,0 +1,9 @@
+public interface IBad
+{
+    event Action<int> Changed
+    {
+        add { }
+        remove;
+    }
+}
+public static class Program { public static void Main() { } }

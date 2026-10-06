@@ -1,0 +1,363 @@
+public interface IValue
+{
+    int GetValue();
+}
+
+public interface ITag
+{
+    int GetTag();
+}
+
+public interface IBox<T>
+{
+    T Get();
+}
+
+public class BaseNode
+{
+    public int Value;
+
+    public BaseNode()
+    {
+        Value = 10;
+    }
+}
+
+public class DerivedNode : BaseNode, IValue, ITag
+{
+    public DerivedNode()
+    {
+        Value = 42;
+    }
+
+    public int GetValue()
+    {
+        return Value;
+    }
+
+    public int GetTag()
+    {
+        return 7;
+    }
+}
+
+public class PlainNode
+{
+    public int Value = 21;
+}
+
+public class ExplicitNode
+{
+    public int Value;
+
+    public ExplicitNode()
+    {
+        Value = 33;
+    }
+}
+
+public struct ValuePoint : IValue, ITag
+{
+    public int Value;
+
+    public ValuePoint(int value)
+    {
+        Value = value;
+    }
+
+    public int GetValue()
+    {
+        return Value;
+    }
+
+    public int GetTag()
+    {
+        return Value + 1;
+    }
+}
+
+public enum Mode
+{
+    First = 1,
+    Second = 2
+}
+
+public sealed class IntBox : IBox<int>
+{
+    public int Get()
+    {
+        return 99;
+    }
+}
+
+public sealed class RefBox<T> where T : class
+{
+    public T Value;
+
+    public RefBox(T value)
+    {
+        Value = value;
+    }
+
+    public T Get()
+    {
+        return Value;
+    }
+}
+
+public struct ValueBox<T> where T : struct
+{
+    public T Value;
+
+    public ValueBox(T value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class InterfaceBox<T> where T : IValue
+{
+    public T Value;
+
+    public InterfaceBox(T value)
+    {
+        Value = value;
+    }
+
+    public int Read()
+    {
+        return Value.GetValue();
+    }
+}
+
+public sealed class BaseBox<T> where T : BaseNode
+{
+    public T Value;
+
+    public BaseBox(T value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class MultiBox<T> where T : class, IValue, ITag, new()
+{
+    public T Create()
+    {
+        return new T();
+    }
+}
+
+public class ConstrainedBase<T> where T : class
+{
+    public T Value;
+
+    public ConstrainedBase(T value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class ConstrainedDerived<T> : ConstrainedBase<T> where T : class
+{
+    public ConstrainedDerived(T value) : base(value)
+    {
+    }
+}
+
+public sealed class RelationBox<T, U> where U : class where T : U
+{
+    public T Value;
+
+    public RelationBox(T value)
+    {
+        Value = value;
+    }
+}
+
+public delegate T RefFactory<T>() where T : class;
+
+public interface IConstraintWorker
+{
+    T Echo<T>(T value) where T : class;
+}
+
+public class ConstraintWorker : IConstraintWorker
+{
+    public T Echo<T>(T value) where T : class
+    {
+        return value;
+    }
+}
+
+public class GenericVirtualBase
+{
+    public virtual T EchoVirtual<T>(T value) where T : class
+    {
+        return value;
+    }
+}
+
+public sealed class GenericVirtualDerived : GenericVirtualBase
+{
+    public override T EchoVirtual<T>(T value) where T : class
+    {
+        return value;
+    }
+}
+
+public static class Program
+{
+    private static T RefIdentity<T>(T value) where T : class
+    {
+        return value;
+    }
+
+    private static T ValueIdentity<T>(T value) where T : struct
+    {
+        return value;
+    }
+
+    private static int ReadValue<T>(T value) where T : IValue
+    {
+        return value.GetValue();
+    }
+
+    private static int ReadBoth<T>(T value) where T : IValue, ITag
+    {
+        return value.GetValue() + value.GetTag();
+    }
+
+    private static T Make<T>() where T : new()
+    {
+        return new T();
+    }
+
+    private static T MakeReference<T>() where T : class, IValue, new()
+    {
+        return new T();
+    }
+
+    private static T KeepNew<T>(T value) where T : new()
+    {
+        return value;
+    }
+
+    private static T Related<T, U>(T value) where T : U
+    {
+        return value;
+    }
+
+    private static T RelatedWithClass<T, U>(T value) where U : class where T : U
+    {
+        return value;
+    }
+
+    private static T BoxConstraint<T>(T value) where T : IBox<int>
+    {
+        return value;
+    }
+
+    private static DerivedNode BuildDerived()
+    {
+        return new DerivedNode();
+    }
+
+    public static void Main()
+    {
+        DerivedNode derived = new DerivedNode();
+        ValuePoint point = new ValuePoint(8);
+
+        RefBox<DerivedNode> refBox = new RefBox<DerivedNode>(derived);
+        Console.WriteLine(refBox.Get() == derived);
+        Console.WriteLine(refBox.Get().GetValue() == 42);
+
+        ValueBox<int> intBox = new ValueBox<int>(12);
+        Console.WriteLine(intBox.Value == 12);
+        ValueBox<ValuePoint> pointBox = new ValueBox<ValuePoint>(point);
+        Console.WriteLine(pointBox.Value.GetValue() == 8);
+        ValueBox<Mode> modeBox = new ValueBox<Mode>(Mode.Second);
+        Console.WriteLine(modeBox.Value == Mode.Second);
+
+        InterfaceBox<DerivedNode> classInterface = new InterfaceBox<DerivedNode>(derived);
+        Console.WriteLine(classInterface.Read() == 42);
+        InterfaceBox<ValuePoint> structInterface = new InterfaceBox<ValuePoint>(point);
+        Console.WriteLine(structInterface.Read() == 8);
+
+        BaseBox<DerivedNode> baseBox = new BaseBox<DerivedNode>(derived);
+        Console.WriteLine(baseBox.Value.GetValue() == 42);
+
+        MultiBox<DerivedNode> multi = new MultiBox<DerivedNode>();
+        DerivedNode created = multi.Create();
+        Console.WriteLine(created.GetValue() == 42);
+        Console.WriteLine(created.GetTag() == 7);
+
+        ConstrainedDerived<DerivedNode> inherited = new ConstrainedDerived<DerivedNode>(derived);
+        Console.WriteLine(inherited.Value == derived);
+
+        RelationBox<DerivedNode, BaseNode> relation = new RelationBox<DerivedNode, BaseNode>(derived);
+        Console.WriteLine(relation.Value == derived);
+
+        Console.WriteLine(RefIdentity<DerivedNode>(derived) == derived);
+        Console.WriteLine(RefIdentity<string>("hello") == "hello");
+        IValue interfaceValue = derived;
+        Console.WriteLine(RefIdentity<IValue>(interfaceValue) == interfaceValue);
+        int[] values = new int[] { 1, 2, 3 };
+        Console.WriteLine(RefIdentity<int[]>(values) == values);
+
+        Console.WriteLine(ValueIdentity<int>(15) == 15);
+        Console.WriteLine(ValueIdentity<ValuePoint>(point).GetValue() == 8);
+        Console.WriteLine(ValueIdentity<Mode>(Mode.First) == Mode.First);
+
+        Console.WriteLine(ReadValue<DerivedNode>(derived) == 42);
+        Console.WriteLine(ReadValue<ValuePoint>(point) == 8);
+        Console.WriteLine(ReadBoth<DerivedNode>(derived) == 49);
+        Console.WriteLine(ReadBoth<ValuePoint>(point) == 17);
+
+        PlainNode plain = Make<PlainNode>();
+        Console.WriteLine(plain.Value == 21);
+        ExplicitNode explicitNode = Make<ExplicitNode>();
+        Console.WriteLine(explicitNode.Value == 33);
+        ValuePoint defaultPoint = Make<ValuePoint>();
+        Console.WriteLine(defaultPoint.Value == 0);
+        DerivedNode madeReference = MakeReference<DerivedNode>();
+        Console.WriteLine(madeReference.GetValue() == 42);
+
+        Console.WriteLine(Related<DerivedNode, BaseNode>(derived) == derived);
+        Console.WriteLine(Related<ValuePoint, IValue>(point).GetValue() == 8);
+        Console.WriteLine(Related<int, int>(5) == 5);
+        Console.WriteLine(KeepNew<int>(9) == 9);
+        Console.WriteLine(RelatedWithClass<DerivedNode, BaseNode>(derived) == derived);
+
+        IntBox concreteBox = new IntBox();
+        Console.WriteLine(BoxConstraint<IntBox>(concreteBox).Get() == 99);
+
+        RefFactory<DerivedNode> factory = BuildDerived;
+        Console.WriteLine(factory().GetValue() == 42);
+
+        ConstraintWorker worker = new ConstraintWorker();
+        IConstraintWorker contract = worker;
+        Console.WriteLine(worker.Echo<DerivedNode>(derived) == derived);
+        Console.WriteLine(contract.Echo<DerivedNode>(derived) == derived);
+
+        GenericVirtualBase virtualWorker = new GenericVirtualDerived();
+        Console.WriteLine(virtualWorker.EchoVirtual<DerivedNode>(derived) == derived);
+
+        DerivedNode gcNode = MakeReference<DerivedNode>();
+        GC.Collect();
+        Console.WriteLine(gcNode.GetValue() == 42);
+
+        RefBox<string> stringBox = new RefBox<string>("constraint");
+        Console.WriteLine(stringBox.Get() == "constraint");
+        RefBox<int[]> arrayBox = new RefBox<int[]>(values);
+        Console.WriteLine(arrayBox.Get()[2] == 3);
+
+        ValueBox<bool> boolBox = new ValueBox<bool>(true);
+        Console.WriteLine(boolBox.Value);
+        ValueBox<char> charBox = new ValueBox<char>('x');
+        Console.WriteLine(charBox.Value == 'x');
+
+        DerivedNode nested = new RelationBox<DerivedNode, BaseNode>(derived).Value;
+        Console.WriteLine(nested.GetValue() == 42);
+    }
+}

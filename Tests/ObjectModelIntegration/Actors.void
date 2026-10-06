@@ -1,0 +1,88 @@
+using Void;
+
+public static class Recorder
+{
+    public static int Value;
+
+    public static void Reset()
+    {
+        Value = 0;
+    }
+
+    public static void Push(int digit)
+    {
+        Value = Value * 10 + digit;
+    }
+}
+
+public sealed class Listener
+{
+    private int _digit;
+
+    public Listener(int digit)
+    {
+        _digit = digit;
+    }
+
+    public void Handle(int value)
+    {
+        Recorder.Push(_digit);
+    }
+}
+
+public abstract class Entity
+{
+    private int _id;
+
+    public int Id => _id;
+
+    public abstract int Score
+    {
+        get;
+        protected set;
+    }
+
+    public Entity(int id)
+    {
+        _id = id;
+    }
+}
+
+public sealed class Actor : Entity, IAdvancedActor
+{
+    private int _bonus = 1;
+
+    public override int Score { get; protected set; } = 2;
+    public int Bonus => _bonus;
+
+    public event Action<int> Changed = new Listener(1).Handle;
+    public static event Action<int> GlobalChanged = BuiltInGlobal;
+
+    public Actor() : this(10, 3)
+    {
+    }
+
+    public Actor(int score, int bonus) : base(score + 100)
+    {
+        Score = score;
+        _bonus = bonus;
+    }
+
+    private static void BuiltInGlobal(int value)
+    {
+        Recorder.Push(9);
+    }
+
+    public int Apply(int amount)
+    {
+        Score += amount;
+
+        if (Changed != null)
+            Changed(Score);
+
+        if (GlobalChanged != null)
+            GlobalChanged(Score);
+
+        return Score;
+    }
+}

@@ -1,0 +1,8 @@
+namespace Void.Text;
+
+public class DecoderFallbackException : ArgumentException
+{
+    public DecoderFallbackException() : base("Unable to decode the input bytes.") { }
+    public DecoderFallbackException(string message) : base(message) { }
+    public DecoderFallbackException(string message, Exception innerException) : base(message, innerException) { }
+}

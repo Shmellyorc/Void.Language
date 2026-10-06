@@ -1,0 +1,248 @@
+public sealed class FlowException : Exception
+{
+    public int Code;
+
+    public FlowException(string message, int code) : base(message)
+    {
+        Code = code;
+    }
+}
+
+public sealed class OtherException : Exception
+{
+    public OtherException(string message) : base(message) { }
+}
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Exploder
+{
+    public Exploder()
+    {
+        Node temporary = new Node(44);
+        if (temporary.Value == 44)
+            throw new FlowException("ctor", 44);
+    }
+}
+
+public static class Program
+{
+    public static void Level3()
+    {
+        Node third = new Node(3);
+        if (third.Value == 3)
+            throw new FlowException("deep", 30);
+    }
+
+    public static void Level2()
+    {
+        Node second = new Node(2);
+        if (second.Value == 2)
+            Level3();
+    }
+
+    public static void Level1()
+    {
+        Node first = new Node(1);
+        if (first.Value == 1)
+            Level2();
+    }
+
+    public static void InnerNonMatchingHandler()
+    {
+        try
+        {
+            Level3();
+        }
+        catch (OtherException error)
+        {
+            Console.WriteLine(false);
+        }
+    }
+
+    public static int CatchLocally()
+    {
+        try
+        {
+            Level3();
+        }
+        catch (FlowException error)
+        {
+            return error.Code;
+        }
+        return 0;
+    }
+
+    public static void ThrowOther()
+    {
+        throw new OtherException("other");
+    }
+
+    public static void TranslateException()
+    {
+        try
+        {
+            ThrowOther();
+        }
+        catch (OtherException error)
+        {
+            throw new FlowException("translated", 70);
+        }
+    }
+
+    public static int ReturnFromTry()
+    {
+        try
+        {
+            return 7;
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
+    public static bool BreakFromTry()
+    {
+        int value = 0;
+        while (true)
+        {
+            try
+            {
+                value = 1;
+                break;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        return value == 1;
+    }
+
+    public static bool ContinueFromTry()
+    {
+        int count = 0;
+        while (count < 2)
+        {
+            try
+            {
+                count++;
+                continue;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        return count == 2;
+    }
+
+    public static bool BreakInsideTryKeepsHandler()
+    {
+        try
+        {
+            while (true)
+            {
+                break;
+            }
+            throw new FlowException("break-kept", 13);
+        }
+        catch (FlowException error)
+        {
+            return error.Code == 13;
+        }
+        return false;
+    }
+
+    public static bool ContinueInsideTryKeepsHandler()
+    {
+        try
+        {
+            int count = 0;
+            while (count < 1)
+            {
+                count++;
+                continue;
+            }
+            throw new FlowException("continue-kept", 14);
+        }
+        catch (FlowException error)
+        {
+            return error.Code == 14;
+        }
+        return false;
+    }
+
+    public static void Main()
+    {
+        Node survivor = new Node(99);
+        try
+        {
+            Level1();
+            Console.WriteLine(false);
+        }
+        catch (FlowException error)
+        {
+            GC.Collect();
+            Console.WriteLine(survivor.Value == 99);
+            Console.WriteLine(Runtime.Equals(error.Message, "deep"));
+            Console.WriteLine(error.Code == 30);
+        }
+
+        try
+        {
+            InnerNonMatchingHandler();
+            Console.WriteLine(false);
+        }
+        catch (FlowException error)
+        {
+            Console.WriteLine(error.Code == 30);
+        }
+
+        Console.WriteLine(CatchLocally() == 30);
+
+        try
+        {
+            TranslateException();
+            Console.WriteLine(false);
+        }
+        catch (FlowException error)
+        {
+            Console.WriteLine(Runtime.Equals(error.Message, "translated"));
+            Console.WriteLine(error.Code == 70);
+        }
+
+        try
+        {
+            Exploder value = new Exploder();
+            Console.WriteLine(value != null && false);
+        }
+        catch (FlowException error)
+        {
+            Console.WriteLine(error.Code == 44);
+        }
+
+        try
+        {
+            Console.WriteLine(ReturnFromTry() == 7);
+            Console.WriteLine(BreakFromTry());
+            Console.WriteLine(ContinueFromTry());
+            Console.WriteLine(BreakInsideTryKeepsHandler());
+            Console.WriteLine(ContinueInsideTryKeepsHandler());
+            throw new FlowException("after-exits", 12);
+        }
+        catch (FlowException error)
+        {
+            Console.WriteLine(error.Code == 12);
+        }
+    }
+}

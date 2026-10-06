@@ -1,0 +1,254 @@
+using Void;
+using Void.Threading;
+
+public interface IGate
+{
+}
+
+public sealed class Box
+{
+    public int Value;
+}
+
+public sealed class Gate : IGate
+{
+    public int Value;
+    public Box Reference;
+}
+
+public sealed class Counter
+{
+    public int Value;
+}
+
+public static class Program
+{
+    private static Gate SharedGate = new Gate();
+    private static int ResolveCount;
+
+    private static Gate ResolveGate()
+    {
+        ResolveCount++;
+        return SharedGate;
+    }
+
+    private static int ReturnThroughLock(Gate gate)
+    {
+        lock (gate)
+        {
+            gate.Value = 11;
+            return 7;
+        }
+    }
+
+    private static int BreakContinueThroughLock(Gate gate)
+    {
+        int value = 0;
+        for (int i = 0; i < 6; i++)
+        {
+            lock (gate)
+            {
+                if (i < 2)
+                    continue;
+                value += i;
+                if (i == 4)
+                    break;
+            }
+        }
+        return value;
+    }
+
+    private static bool ThrowThroughLock(Gate gate)
+    {
+        try
+        {
+            lock (gate)
+            {
+                throw new Exception("lock-throw");
+            }
+        }
+        catch (Exception error)
+        {
+            return error.Message == "lock-throw";
+        }
+        return false;
+    }
+
+    private static void Increment(Counter counter, Gate gate, int count, int seed)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            lock (gate)
+            {
+                counter.Value += 1;
+                if (((i + seed) % 29) == 0)
+                    GC.Collect();
+            }
+        }
+    }
+
+    private static void LockTransient()
+    {
+        lock (new Gate())
+        {
+            GC.Collect();
+        }
+    }
+
+    public static void Main()
+    {
+        ResolveCount = 0;
+        lock (ResolveGate())
+        {
+            SharedGate.Value = 1;
+        }
+        Console.WriteLine(ResolveCount == 1 && SharedGate.Value == 1);
+
+        Gate recursive = new Gate();
+        lock (recursive)
+        {
+            recursive.Value = 2;
+            lock (recursive)
+            {
+                recursive.Value += 3;
+                GC.Collect();
+            }
+        }
+        Console.WriteLine(recursive.Value == 5);
+
+        Gate left = new Gate();
+        Gate right = new Gate();
+        lock (left)
+        {
+            lock (right)
+            {
+                left.Value = 7;
+                right.Value = 8;
+            }
+        }
+        Console.WriteLine(left.Value == 7 && right.Value == 8);
+
+        object alias = left;
+        lock (alias)
+        {
+            left.Value += 2;
+        }
+        Console.WriteLine(left.Value == 9);
+
+        IGate interfaceGate = right;
+        lock (interfaceGate)
+        {
+            right.Value += 3;
+        }
+        Console.WriteLine(right.Value == 11);
+
+        Action callback = () => {};
+        lock (callback)
+        {
+            left.Value += 1;
+        }
+        Console.WriteLine(left.Value == 10);
+
+        int[] values = new int[1];
+        lock (values)
+        {
+            values[0] = 23;
+            GC.Collect();
+        }
+        Console.WriteLine(values[0] == 23);
+
+        Gate managed = new Gate();
+        lock (managed)
+        {
+            managed.Reference = new Box();
+            managed.Reference.Value = 31;
+            GC.Collect();
+            Console.WriteLine(managed.Reference.Value == 31);
+        }
+
+        Counter counter = new Counter();
+        Gate shared = new Gate();
+        Thread one = new Thread(() => Increment(counter, shared, 100, 1));
+        Thread two = new Thread(() => Increment(counter, shared, 100, 2));
+        Thread three = new Thread(() => Increment(counter, shared, 100, 3));
+        Thread four = new Thread(() => Increment(counter, shared, 100, 4));
+        one.Start();
+        two.Start();
+        three.Start();
+        four.Start();
+        one.Join();
+        two.Join();
+        three.Join();
+        four.Join();
+        Console.WriteLine(counter.Value == 400);
+
+        Gate blocked = new Gate();
+        Thread waiter = null;
+        lock (blocked)
+        {
+            waiter = new Thread(() =>
+            {
+                lock (blocked)
+                {
+                    blocked.Value += 5;
+                }
+            });
+            waiter.Start();
+            GC.Collect();
+            blocked.Value = 10;
+        }
+        waiter.Join();
+        Thread afterBlocked = new Thread(() =>
+        {
+            lock (blocked)
+            {
+                blocked.Value += 7;
+            }
+        });
+        afterBlocked.Start();
+        afterBlocked.Join();
+        Console.WriteLine(blocked.Value == 22);
+
+        Gate returnGate = new Gate();
+        Console.WriteLine(ReturnThroughLock(returnGate) == 7 && returnGate.Value == 11);
+        Thread afterReturn = new Thread(() =>
+        {
+            lock (returnGate)
+            {
+                returnGate.Value += 1;
+            }
+        });
+        afterReturn.Start();
+        afterReturn.Join();
+        Console.WriteLine(returnGate.Value == 12);
+
+        Gate loopGate = new Gate();
+        Console.WriteLine(BreakContinueThroughLock(loopGate) == 9);
+        Thread afterLoop = new Thread(() =>
+        {
+            lock (loopGate)
+            {
+                loopGate.Value = 41;
+            }
+        });
+        afterLoop.Start();
+        afterLoop.Join();
+        Console.WriteLine(loopGate.Value == 41);
+
+        Gate exceptionGate = new Gate();
+        Console.WriteLine(ThrowThroughLock(exceptionGate));
+        Thread afterThrow = new Thread(() =>
+        {
+            lock (exceptionGate)
+            {
+                exceptionGate.Value = 53;
+            }
+        });
+        afterThrow.Start();
+        afterThrow.Join();
+        Console.WriteLine(exceptionGate.Value == 53);
+
+        LockTransient();
+        Console.WriteLine(true);
+    }
+}

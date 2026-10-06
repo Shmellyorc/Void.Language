@@ -1,0 +1,286 @@
+using Void;
+using Void.Collections;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class TimingPayload289
+{
+    public int Value;
+    public TimingPayload289(int value) { Value = value; }
+}
+
+public sealed class WorkerIntAwaiter289
+{
+    private int _value;
+    public WorkerIntAwaiter289(int value) { _value = value; }
+    public bool IsCompleted => false;
+    public void OnCompleted(Action continuation) { ThreadPool.QueueUserWorkItem(continuation); }
+    public int GetResult() { return _value; }
+}
+
+public struct WorkerIntAwaitable289
+{
+    private int _value;
+    public WorkerIntAwaitable289(int value) { _value = value; }
+    public WorkerIntAwaiter289 GetAwaiter() { return new WorkerIntAwaiter289(_value); }
+}
+
+public sealed class TimedResource289
+{
+    public static int DisposeCount;
+    public async ValueTask DisposeAsync()
+    {
+        await Task.Delay(10);
+        DisposeCount++;
+    }
+}
+
+public static class Program
+{
+    private static int FinallyCount;
+    private static int IteratorCleanupCount;
+
+    private static bool WaitCanceled(Task task, CancellationToken token)
+    {
+        try
+        {
+            task.Wait();
+            return false;
+        }
+        catch (OperationCanceledException error)
+        {
+            return error.CancellationToken.IsSameSource(token);
+        }
+    }
+
+    private static bool WaitTimedOut(Task task)
+    {
+        try
+        {
+            task.Wait();
+            return false;
+        }
+        catch (TimeoutException)
+        {
+            return true;
+        }
+    }
+
+    private static async Task<int> CaptureAfterDelay(TimingPayload289 payload)
+    {
+        await Task.Delay(15);
+        return payload.Value;
+    }
+
+    private static async ValueTask<int> MixedValueTask(int value)
+    {
+        int custom = await new WorkerIntAwaitable289(value);
+        await Task.Delay(5);
+        return custom + 1;
+    }
+
+    private static async Task<int> DisposeAndReturn(int value)
+    {
+        await using var resource = new TimedResource289();
+        await Task.Delay(5);
+        return value;
+    }
+
+    private static async Task FaultWithFinally()
+    {
+        try
+        {
+            await Task.Delay(5);
+            throw new Exception("timing-289");
+        }
+        finally
+        {
+            FinallyCount++;
+        }
+    }
+
+    private static async IAsyncEnumerable<int> TimedSequence(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await Task.Delay(10, cancellationToken);
+            yield return 1;
+            await Task.Delay(Timeout.Infinite, cancellationToken);
+            yield return 2;
+        }
+        finally
+        {
+            Program.IteratorCleanupCount++;
+        }
+    }
+
+    private static async Task<int> RunComposed(int value, CancellationToken token)
+    {
+        Func<Task<int>> work = async () =>
+        {
+            await Task.Delay(10, token);
+            int custom = await new WorkerIntAwaitable289(value);
+            return custom + 1;
+        };
+        return await Task.Run<int>(work).WaitAsync(500, token);
+    }
+
+    public static void Main()
+    {
+        Task zero = Task.Delay(0);
+        Console.WriteLine(zero == Task.CompletedTask && zero.IsCompleted);
+
+        Task finite = Task.Delay(20);
+        Console.WriteLine(!finite.IsCompleted);
+        Console.WriteLine(finite.Wait(1000));
+
+        Task never = Task.Delay(Timeout.Infinite);
+        Console.WriteLine(!never.IsCompleted);
+
+        CancellationTokenSource delayCts = new CancellationTokenSource();
+        CancellationToken delayToken = delayCts.Token;
+        Task cancellableDelay = Task.Delay(Timeout.Infinite, delayToken);
+        delayCts.CancelAfter(20);
+        Console.WriteLine(WaitCanceled(cancellableDelay, delayToken));
+        Console.WriteLine(cancellableDelay.IsCanceled);
+        delayCts.Dispose();
+
+        CancellationTokenSource parent = new CancellationTokenSource();
+        CancellationTokenSource secondParent = new CancellationTokenSource();
+        CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(parent.Token, secondParent.Token);
+        CancellationToken linkedToken = linked.Token;
+        Task linkedDelay = Task.Delay(Timeout.Infinite, linkedToken);
+        secondParent.CancelAfter(20);
+        Console.WriteLine(WaitCanceled(linkedDelay, linkedToken));
+        Console.WriteLine(linked.IsCancellationRequested);
+        linked.Dispose();
+        parent.Dispose();
+        secondParent.Dispose();
+
+        TaskCompletionSource timeoutSource = new TaskCompletionSource();
+        Task timeoutProxy = timeoutSource.Task.WaitAsync(20);
+        Console.WriteLine(WaitTimedOut(timeoutProxy));
+        Console.WriteLine(!timeoutSource.Task.IsCompleted && timeoutProxy.IsFaulted);
+        timeoutSource.SetResult();
+        Console.WriteLine(timeoutSource.Task.IsCompleted && timeoutProxy.IsFaulted);
+
+        TaskCompletionSource cancellationSource = new TaskCompletionSource();
+        CancellationTokenSource waiterCts = new CancellationTokenSource();
+        CancellationToken waiterToken = waiterCts.Token;
+        Task cancellationProxy = cancellationSource.Task.WaitAsync(500, waiterToken);
+        waiterCts.CancelAfter(20);
+        Console.WriteLine(WaitCanceled(cancellationProxy, waiterToken));
+        Console.WriteLine(!cancellationSource.Task.IsCompleted);
+        cancellationSource.SetResult();
+        Console.WriteLine(cancellationSource.Task.IsCompleted && cancellationProxy.IsCanceled);
+        waiterCts.Dispose();
+
+        TaskCompletionSource<int> sourceWins = new TaskCompletionSource<int>();
+        CancellationTokenSource sourceWinsCts = new CancellationTokenSource();
+        Task<int> sourceWinsProxy = sourceWins.Task.WaitAsync(500, sourceWinsCts.Token);
+        sourceWins.SetResult(42);
+        Console.WriteLine(sourceWinsProxy.Result == 42);
+        sourceWinsCts.Cancel();
+        Console.WriteLine(sourceWinsProxy.Result == 42);
+        sourceWinsCts.Dispose();
+
+        Task<int> first = Task.Run<int>(async () => { await Task.Delay(10); return 4; });
+        Task<int> second = Task.Run<int>(async () => { await Task.Delay(20); return 2; });
+        int[] all = Task.WhenAll(first, second).Result;
+        Console.WriteLine(all[0] == 4 && all[1] == 2);
+
+        Task<int> slow = Task.Run<int>(async () => { await Task.Delay(80); return 1; });
+        Task<int> fast = Task.Run<int>(async () => { await Task.Delay(10); return 42; });
+        Task<int> winner = Task.WhenAny(slow, fast).Result;
+        Console.WriteLine(winner == fast && winner.Result == 42);
+        Console.WriteLine(slow.Result == 1);
+
+        TimingPayload289 payload = new TimingPayload289(289);
+        Task<int> payloadTask = CaptureAfterDelay(payload);
+        payload = null;
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(payloadTask.Result == 289);
+
+        Console.WriteLine(MixedValueTask(41).GetAwaiter().GetResult() == 42);
+
+        TimedResource289.DisposeCount = 0;
+        Task<int> disposed = DisposeAndReturn(42);
+        Console.WriteLine(disposed.Result == 42);
+        Console.WriteLine(TimedResource289.DisposeCount == 1);
+
+        FinallyCount = 0;
+        bool faultSeen = false;
+        try
+        {
+            FaultWithFinally().Wait();
+        }
+        catch (Exception error)
+        {
+            faultSeen = error.Message == "timing-289";
+        }
+        Console.WriteLine(faultSeen);
+        Console.WriteLine(FinallyCount == 1);
+
+        CancellationTokenSource iteratorParent = new CancellationTokenSource();
+        CancellationTokenSource iteratorTimeout = new CancellationTokenSource();
+        CancellationTokenSource iteratorLinked = CancellationTokenSource.CreateLinkedTokenSource(iteratorParent.Token, iteratorTimeout.Token);
+        IteratorCleanupCount = 0;
+        IAsyncEnumerator<int> iterator = TimedSequence().GetAsyncEnumerator(iteratorLinked.Token);
+        Console.WriteLine(iterator.MoveNextAsync().Result && iterator.Current == 1);
+        Task<bool> iteratorPending = iterator.MoveNextAsync();
+        Console.WriteLine(!iteratorPending.IsCompleted);
+        iteratorTimeout.CancelAfter(20);
+        Console.WriteLine(WaitCanceled(iteratorPending, iteratorLinked.Token));
+        Console.WriteLine(IteratorCleanupCount == 1);
+        iterator.DisposeAsync().Wait();
+        iteratorLinked.Dispose();
+        iteratorParent.Dispose();
+        iteratorTimeout.Dispose();
+
+        CancellationTokenSource composedParent = new CancellationTokenSource();
+        CancellationTokenSource composedDeadline = new CancellationTokenSource();
+        composedDeadline.CancelAfter(500);
+        CancellationTokenSource composed = CancellationTokenSource.CreateLinkedTokenSource(composedParent.Token, composedDeadline.Token);
+        Console.WriteLine(RunComposed(41, composed.Token).Result == 42);
+        composed.Dispose();
+        composedParent.Dispose();
+        composedDeadline.Dispose();
+
+        ManualResetEvent blockersRelease = new ManualResetEvent(false);
+        ManualResetEvent blockerAStarted = new ManualResetEvent(false);
+        ManualResetEvent blockerBStarted = new ManualResetEvent(false);
+        ThreadPool.QueueUserWorkItem(() => { blockerAStarted.Set(); blockersRelease.WaitOne(); });
+        ThreadPool.QueueUserWorkItem(() => { blockerBStarted.Set(); blockersRelease.WaitOne(); });
+        Console.WriteLine(blockerAStarted.WaitOne(1000));
+        Console.WriteLine(blockerBStarted.WaitOne(1000));
+        Task queuedDelay = Task.Delay(20);
+        Thread.Sleep(60);
+        Console.WriteLine(!queuedDelay.IsCompleted);
+        blockersRelease.Set();
+        Console.WriteLine(queuedDelay.Wait(1000));
+
+        TaskCompletionSource queuedWaitSource = new TaskCompletionSource();
+        CancellationTokenSource queuedWaitCts = new CancellationTokenSource();
+        Task queuedWait = queuedWaitSource.Task.WaitAsync(20, queuedWaitCts.Token);
+        ManualResetEvent holdRelease = new ManualResetEvent(false);
+        ManualResetEvent holdAStarted = new ManualResetEvent(false);
+        ManualResetEvent holdBStarted = new ManualResetEvent(false);
+        ThreadPool.QueueUserWorkItem(() => { holdAStarted.Set(); holdRelease.WaitOne(); });
+        ThreadPool.QueueUserWorkItem(() => { holdBStarted.Set(); holdRelease.WaitOne(); });
+        Console.WriteLine(holdAStarted.WaitOne(1000));
+        Console.WriteLine(holdBStarted.WaitOne(1000));
+        Thread.Sleep(60);
+        queuedWaitCts.Cancel();
+        Console.WriteLine(queuedWait.IsCanceled && !queuedWait.IsFaulted);
+        holdRelease.Set();
+        Thread.Sleep(20);
+        Console.WriteLine(queuedWait.IsCanceled && !queuedWaitSource.Task.IsCompleted);
+        queuedWaitSource.SetResult();
+        queuedWaitCts.Dispose();
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

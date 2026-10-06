@@ -1,0 +1,33 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public delegate ValueTask<int> LibraryHandler274(int value);
+
+public sealed class LibraryHub274
+{
+    public event LibraryHandler274 Changed;
+
+    public ValueTask<int> Raise(int value)
+    {
+        return Changed(value);
+    }
+}
+
+public static class AsyncLambdaDelegateEventLibrary274
+{
+    [Export("void274_async_lambda_delegate_event")]
+    public static int Run(int value)
+    {
+        int add = 2;
+        LibraryHub274 hub = new LibraryHub274();
+        hub.Changed += async current =>
+        {
+            await Task.Yield();
+            return current + add;
+        };
+        int result = hub.Raise(value).GetAwaiter().GetResult();
+        ThreadPool.Shutdown();
+        return result;
+    }
+}

@@ -1,0 +1,6 @@
+{
+  "format": 1,
+  "name": "SharedMonotonicTimerQueueFoundation",
+  "output": "exe",
+  "version": "0.0.281"
+}

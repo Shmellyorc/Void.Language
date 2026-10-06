@@ -1,0 +1,176 @@
+public class Node
+{
+    public int Value { get; set; }
+    public Node Child { get; set; }
+}
+
+public class SpecialNode : Node
+{
+    public int Extra { get; set; }
+}
+
+public sealed class GenericGuard<T>
+{
+    public int Match(Node node, int limit)
+    {
+        switch (node)
+        {
+            case { Value: > 0 } when node.Value > limit:
+                return 1;
+            case { Value: > 0 }:
+                return 2;
+            default:
+                return 0;
+        }
+    }
+}
+
+public static class Program
+{
+    private static int _guardCalls;
+
+    private static bool CountGuard(bool result)
+    {
+        _guardCalls++;
+        return result;
+    }
+
+    private static int ConstantGuard(int value, bool first)
+    {
+        switch (value)
+        {
+            case 1 when first:
+                return 10;
+            case 1:
+                return 20;
+            default:
+                return 30;
+        }
+    }
+
+    private static int DeclarationGuard(Node node)
+    {
+        switch (node)
+        {
+            case SpecialNode special when special.Extra > 10:
+                return special.Extra;
+            case SpecialNode:
+                return 5;
+            default:
+                return 0;
+        }
+    }
+
+    private static int RecursiveDeclarationGuard(Node node)
+    {
+        switch (node)
+        {
+            case { Child: Node child } when child.Value == 7:
+                return child.Value;
+            default:
+                return 0;
+        }
+    }
+
+    private static int PatternThenGuard(int value)
+    {
+        _guardCalls = 0;
+        switch (value)
+        {
+            case > 10 when CountGuard(true):
+                return 1;
+            case > 0 when CountGuard(false):
+                return 2;
+            default:
+                return _guardCalls + 10;
+        }
+    }
+
+    private static int OrderedGuards(int value)
+    {
+        switch (value)
+        {
+            case > 0 when value > 20:
+                return 3;
+            case > 0 when value > 10:
+                return 2;
+            case > 0:
+                return 1;
+            default:
+                return 0;
+        }
+    }
+
+    private static int DefaultBeforeGuard(int value)
+    {
+        switch (value)
+        {
+            default:
+                return 9;
+            case > 0 when value < 5:
+                return 1;
+            case > 0:
+                return 2;
+        }
+    }
+
+    private static IEnumerator<int> GuardYield(Node node)
+    {
+        switch (node)
+        {
+            case { Value: > 0 } when node.Value == 7:
+                yield return 7;
+                break;
+            default:
+                yield return 0;
+                break;
+        }
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(ConstantGuard(1, true) == 10);
+        Console.WriteLine(ConstantGuard(1, false) == 20);
+        Console.WriteLine(ConstantGuard(2, true) == 30);
+
+        SpecialNode special = new SpecialNode();
+        special.Extra = 12;
+        Console.WriteLine(DeclarationGuard(special) == 12);
+        special.Extra = 4;
+        Console.WriteLine(DeclarationGuard(special) == 5);
+
+        Node outer = new Node();
+        outer.Child = new Node();
+        outer.Child.Value = 7;
+        Console.WriteLine(RecursiveDeclarationGuard(outer) == 7);
+        outer.Child.Value = 8;
+        Console.WriteLine(RecursiveDeclarationGuard(outer) == 0);
+
+        Console.WriteLine(PatternThenGuard(15) == 1);
+        Console.WriteLine(_guardCalls == 1);
+        Console.WriteLine(PatternThenGuard(5) == 11);
+        Console.WriteLine(_guardCalls == 1);
+        Console.WriteLine(PatternThenGuard(-1) == 10);
+        Console.WriteLine(_guardCalls == 0);
+
+        Console.WriteLine(OrderedGuards(25) == 3);
+        Console.WriteLine(OrderedGuards(15) == 2);
+        Console.WriteLine(OrderedGuards(5) == 1);
+        Console.WriteLine(OrderedGuards(-1) == 0);
+
+        Console.WriteLine(DefaultBeforeGuard(3) == 1);
+        Console.WriteLine(DefaultBeforeGuard(8) == 2);
+        Console.WriteLine(DefaultBeforeGuard(-2) == 9);
+
+        Node node = new Node();
+        node.Value = 7;
+        GenericGuard<int> generic = new GenericGuard<int>();
+        Console.WriteLine(generic.Match(node, 5) == 1);
+        Console.WriteLine(generic.Match(node, 10) == 2);
+
+        var iterator = GuardYield(node);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == 7);
+        iterator.Dispose();
+    }
+}

@@ -1,0 +1,107 @@
+using Void;
+using Void.Collections;
+
+public class Base
+{
+}
+
+public sealed class Derived : Base
+{
+    public int Value;
+
+    public Derived(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Probe
+{
+    public int Calls;
+
+    public int? Next(int? value)
+    {
+        Calls++;
+        return value;
+    }
+}
+
+public sealed class GenericBox<T>
+{
+    public bool InRange(int value)
+    {
+        return value is >= 1 and <= 3;
+    }
+}
+
+public static class Program
+{
+    private static IEnumerator<int> YieldPattern(int? value)
+    {
+        if (value is not null and > 0)
+            yield return 1;
+        else
+            yield return 0;
+    }
+
+    public static void Main()
+    {
+        int five = 5;
+        Console.WriteLine(five is > 0 and < 10);
+        Console.WriteLine(five is >= 5 and <= 5);
+        Console.WriteLine(five is < 0 or > 4);
+        Console.WriteLine(!(five is < 0 or > 10));
+        Console.WriteLine(five is not < 0);
+        Console.WriteLine(five is not (> 10 or < 0));
+        Console.WriteLine(five is > 0 and not > 10);
+        Console.WriteLine(five is < 0 or > 3 and < 10);
+        Console.WriteLine(!(five is (< 0 or > 10) and not 5));
+
+        int? present = 7;
+        int? missing = null;
+        Console.WriteLine(present is not null and > 6);
+        Console.WriteLine(!(missing is not null and > 0));
+        Console.WriteLine(missing is null or > 100);
+        Console.WriteLine(present is null or >= 7);
+
+        Probe probe = new Probe();
+        Console.WriteLine(probe.Next(9) is not null and >= 9 and < 10);
+        Console.WriteLine(probe.Calls == 1);
+        Console.WriteLine(!(probe.Next(null) is not null and < 10));
+        Console.WriteLine(probe.Calls == 2);
+
+        Base item = new Derived(42);
+        if (item is Derived derived and not null)
+            Console.WriteLine(derived.Value == 42);
+        else
+            Console.WriteLine(false);
+
+        if (item is Derived first and Derived second)
+            Console.WriteLine(first.Value == second.Value && first.Value == 42);
+        else
+            Console.WriteLine(false);
+
+        Base none = null;
+        Console.WriteLine(none is null or Derived);
+        Console.WriteLine(none is not Derived);
+
+        GenericBox<int> generic = new GenericBox<int>();
+        Console.WriteLine(generic.InRange(2));
+        Console.WriteLine(!generic.InRange(5));
+
+        var yes = YieldPattern(3);
+        Console.WriteLine(yes.MoveNext());
+        Console.WriteLine(yes.Current == 1);
+        yes.Dispose();
+
+        var no = YieldPattern(null);
+        Console.WriteLine(no.MoveNext());
+        Console.WriteLine(no.Current == 0);
+        no.Dispose();
+
+        int and = 1;
+        int or = 2;
+        int not = 3;
+        Console.WriteLine(and + or + not == 6);
+    }
+}

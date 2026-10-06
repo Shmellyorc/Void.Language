@@ -1,0 +1,18 @@
+using Void;
+
+public delegate void RefAction(ref int value);
+
+public static class Program
+{
+    public static void Touch(ref int value)
+    {
+        value++;
+    }
+
+    public static void Main()
+    {
+        RefAction callback = Touch;
+        int value = 1;
+        callback(out value);
+    }
+}

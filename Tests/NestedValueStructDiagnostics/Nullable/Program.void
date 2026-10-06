@@ -1,0 +1,9 @@
+public struct MaybeLoop
+{
+    public MaybeLoop? Value;
+}
+
+public static class Program
+{
+    public static void Main() { }
+}

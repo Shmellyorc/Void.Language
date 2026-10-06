@@ -1,0 +1,2 @@
+public class Bad { public int* Pointer { get; set; } }
+public static class Program { public static void Main() { } }

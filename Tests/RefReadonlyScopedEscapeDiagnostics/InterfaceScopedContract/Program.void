@@ -1,0 +1,9 @@
+public interface I225Diag
+{
+    void Use(scoped ref int value);
+}
+public sealed class C225Diag : I225Diag
+{
+    public void Use(ref int value) { value = value + 1; }
+}
+public static class Program { public static void Main() { } }

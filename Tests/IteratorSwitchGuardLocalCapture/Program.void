@@ -1,0 +1,164 @@
+using Void;
+using Void.Collections;
+
+public interface IValue
+{
+    int Value { get; }
+}
+
+public sealed class Box : IValue
+{
+    private int _value;
+
+    public Box(int value)
+    {
+        _value = value;
+    }
+
+    public int Value
+    {
+        get { return _value; }
+    }
+}
+
+public class Node
+{
+    public int Value { get; set; }
+    public Node Child { get; set; }
+}
+
+public struct Pair
+{
+    public int Value { get; set; }
+}
+
+public static class Program
+{
+    private static IEnumerator<int> CaptureCase(object item)
+    {
+        switch (item)
+        {
+            case Box box when box.Value > 0:
+                yield return 1;
+                GC.Collect();
+                yield return box.Value;
+                break;
+            default:
+                yield break;
+        }
+    }
+
+    private static IEnumerator<int> CaptureInterface(object item)
+    {
+        switch (item)
+        {
+            case IValue value when value.Value >= 5:
+                yield return 2;
+                GC.Collect();
+                yield return value.Value;
+                break;
+            default:
+                yield break;
+        }
+    }
+
+    private static IEnumerator<int> CaptureRecursive(Node node)
+    {
+        switch (node)
+        {
+            case { Child: Node child } when child.Value > 3:
+                yield return 3;
+                GC.Collect();
+                yield return child.Value;
+                break;
+            default:
+                yield break;
+        }
+    }
+
+    private static IEnumerator<int> CaptureDeepRecursive(Node node)
+    {
+        switch (node)
+        {
+            case { Child: { Child: Node leaf } } when leaf.Value == 11:
+                yield return 4;
+                GC.Collect();
+                yield return leaf.Value;
+                break;
+            default:
+                yield break;
+        }
+    }
+
+    private static IEnumerator<int> CaptureRecursiveIf(Node node)
+    {
+        if (node is { Child: Node child } and not null)
+        {
+            yield return 7;
+            GC.Collect();
+            yield return child.Value;
+        }
+    }
+
+    private static IEnumerator<int> CaptureValue(Pair pair)
+    {
+        switch (pair)
+        {
+            case Pair value when value.Value > 0:
+                yield return 5;
+                value.Value = value.Value + 1;
+                yield return value.Value;
+                break;
+            default:
+                yield break;
+        }
+    }
+
+    private static IEnumerator<int> ArmLocal(object item)
+    {
+        yield return item switch
+        {
+            Box box when box.Value > 0 => box.Value,
+            _ => 0
+        };
+        yield return 6;
+    }
+
+    private static void Check(IEnumerator<int> iterator, int first, int second)
+    {
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == first);
+        Console.WriteLine(iterator.MoveNext());
+        Console.WriteLine(iterator.Current == second);
+        Console.WriteLine(!iterator.MoveNext());
+        iterator.Dispose();
+    }
+
+    public static void Main()
+    {
+        Check(CaptureCase(new Box(7)), 1, 7);
+        Check(CaptureInterface(new Box(8)), 2, 8);
+
+        Node parent = new Node();
+        parent.Child = new Node();
+        parent.Child.Value = 9;
+        Check(CaptureRecursive(parent), 3, 9);
+
+        Node root = new Node();
+        root.Child = new Node();
+        root.Child.Child = new Node();
+        root.Child.Child.Value = 11;
+        Check(CaptureDeepRecursive(root), 4, 11);
+        Check(CaptureRecursiveIf(parent), 7, 9);
+
+        Pair pair = new Pair();
+        pair.Value = 12;
+        Check(CaptureValue(pair), 5, 13);
+
+        Check(ArmLocal(new Box(14)), 14, 6);
+
+        IEnumerator<int> none = CaptureCase(new Box(0));
+        Console.WriteLine(!none.MoveNext());
+        none.Dispose();
+    }
+}

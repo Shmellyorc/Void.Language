@@ -1,0 +1,9 @@
+public sealed class Bad
+{
+    public event Action<int> Changed
+    {
+        add { }
+        remove { }
+    } = null;
+}
+public static class Program { public static void Main() { } }

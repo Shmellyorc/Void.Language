@@ -1,0 +1,9 @@
+using Void;
+public static class Forms
+{
+    public static Range Closed() { return 1..^1; }
+    public static Range OpenStart() { return ..4; }
+    public static Range OpenEnd() { return 2..; }
+    public static Range All() { return ..; }
+    public static float Decimal() { return 1.25f; }
+}

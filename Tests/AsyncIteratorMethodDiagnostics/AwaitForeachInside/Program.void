@@ -1,0 +1,12 @@
+using Void.Collections;
+
+public static class Program
+{
+    private static async IAsyncEnumerable<int> Good(IAsyncEnumerable<int> source)
+    {
+        await foreach (var value in source)
+            yield return value;
+    }
+
+    public static void Main() { }
+}

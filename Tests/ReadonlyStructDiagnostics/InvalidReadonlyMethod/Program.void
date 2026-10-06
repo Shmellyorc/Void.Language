@@ -1,0 +1,5 @@
+public sealed class Bad
+{
+    public readonly int Read() { return 1; }
+}
+public static class Program { public static void Main() { } }

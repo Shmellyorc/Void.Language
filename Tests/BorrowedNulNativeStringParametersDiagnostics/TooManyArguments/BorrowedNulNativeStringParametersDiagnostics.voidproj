@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "BorrowedNulNativeStringParametersDiagnostics",
+  "output": "exe",
+  "version": "0.0.294",
+  "compiler": { "unsafe": true }
+}

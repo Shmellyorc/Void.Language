@@ -1,0 +1,4 @@
+public interface IBase { int Value() { return 1; } }
+public interface IDerived : IBase { int Value(); }
+public sealed class Value : IDerived { }
+public static class Program { public static void Main() { } }

@@ -1,0 +1,11 @@
+{
+  "format": 1,
+  "name": "AsyncLanguageAsynchronousIterationLibraryConsumer220",
+  "version": "0.1.0",
+  "output": "exe",
+  "compiler": {
+    "unsafe": true,
+    "libraries": ["Void220AsyncStreamLib"],
+    "libraryPaths": ["native"]
+  }
+}

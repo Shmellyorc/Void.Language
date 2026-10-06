@@ -1,0 +1,10 @@
+using Void.Threading;
+
+public static class Program
+{
+    public static void Main()
+    {
+        ManualResetEvent value = new ManualResetEvent(true);
+        value.WaitOne(-2);
+    }
+}

@@ -1,0 +1,186 @@
+using Void;
+
+public delegate void RefAction(ref int value);
+public delegate void OutAction(out int value);
+public delegate int InFunc(in int value);
+public delegate Func<int> RefGetterFactory(ref int value);
+public delegate Action RefActionFactory(ref int value);
+public delegate Func<int> OutGetterFactory(out int value);
+public delegate Func<int> InGetterFactory(in int value);
+public delegate void RefValue<T>(ref T value);
+
+public sealed class Node
+{
+    public int Value;
+    public Node(int value) { Value = value; }
+}
+
+public struct Counter
+{
+    public int Value;
+
+    public Counter(int value) { Value = value; }
+
+    public Func<int> MakeCounter()
+    {
+        return () =>
+        {
+            Value++;
+            return Value;
+        };
+    }
+
+    public Func<Func<int>> BuildNested()
+    {
+        return () => () => Value;
+    }
+}
+
+public struct Holder
+{
+    public Node Node;
+
+    public Holder(Node node) { Node = node; }
+
+    public Func<int> Capture()
+    {
+        return () => this.Node.Value;
+    }
+}
+
+public readonly struct ReadonlyCounter
+{
+    public readonly int Value;
+
+    public ReadonlyCounter(int value) { Value = value; }
+
+    public Func<int> Capture()
+    {
+        return () => Value;
+    }
+}
+
+public static class Program
+{
+    public static Func<int> CaptureRef(ref int value)
+    {
+        return () => value;
+    }
+
+    public static Action CaptureRefMutation(ref int value)
+    {
+        return () => value++;
+    }
+
+    public static Func<int> CaptureOut(out int value)
+    {
+        GC.Collect();
+        value = 12;
+        return () => value;
+    }
+
+    public static Func<int> CaptureIn(in int value)
+    {
+        return () => value;
+    }
+
+    public static void Main()
+    {
+        RefAction addTwo = value => value += 2;
+        int refValue = 5;
+        addTwo(ref refValue);
+        Console.WriteLine(refValue == 7);
+
+        OutAction setNine = value => { value = 9; };
+        int outValue;
+        setNine(out outValue);
+        Console.WriteLine(outValue == 9);
+
+        InFunc plusThree = value => value + 3;
+        int inValue = 8;
+        Console.WriteLine(plusThree(in inValue) == 11);
+        Console.WriteLine(inValue == 8);
+
+        RefValue<int> generic = value => value += 4;
+        int genericValue = 6;
+        generic(ref genericValue);
+        Console.WriteLine(genericValue == 10);
+
+        int capturedRef = 20;
+        Func<int> refGetter = CaptureRef(ref capturedRef);
+        Console.WriteLine(refGetter() == 20);
+        capturedRef = 25;
+        Console.WriteLine(refGetter() == 25);
+
+        Action refMutation = CaptureRefMutation(ref capturedRef);
+        refMutation();
+        Console.WriteLine(capturedRef == 26);
+
+        int capturedOut;
+        Func<int> outGetter = CaptureOut(out capturedOut);
+        Console.WriteLine(capturedOut == 12);
+        Console.WriteLine(outGetter() == 12);
+        capturedOut = 15;
+        Console.WriteLine(outGetter() == 15);
+
+        int capturedIn = 30;
+        Func<int> inGetter = CaptureIn(in capturedIn);
+        Console.WriteLine(inGetter() == 30);
+        capturedIn = 31;
+        Console.WriteLine(inGetter() == 31);
+
+        RefGetterFactory factory = value => () => value;
+        int nestedRef = 40;
+        Func<int> nestedGetter = factory(ref nestedRef);
+        Console.WriteLine(nestedGetter() == 40);
+        nestedRef = 44;
+        Console.WriteLine(nestedGetter() == 44);
+
+        RefActionFactory actionFactory = value => () => value++;
+        Action nestedMutation = actionFactory(ref nestedRef);
+        nestedMutation();
+        Console.WriteLine(nestedRef == 45);
+
+        OutGetterFactory outFactory = value =>
+        {
+            GC.Collect();
+            value = 46;
+            return () => value;
+        };
+        int lambdaOut;
+        Func<int> lambdaOutGetter = outFactory(out lambdaOut);
+        Console.WriteLine(lambdaOut == 46);
+        lambdaOut = 47;
+        Console.WriteLine(lambdaOutGetter() == 47);
+
+        InGetterFactory inFactory = value => () => value;
+        int lambdaIn = 48;
+        Func<int> lambdaInGetter = inFactory(in lambdaIn);
+        Console.WriteLine(lambdaInGetter() == 48);
+        lambdaIn = 49;
+        Console.WriteLine(lambdaInGetter() == 49);
+
+        Counter counter = new Counter(50);
+        Func<int> counterClosure = counter.MakeCounter();
+        Console.WriteLine(counterClosure() == 51);
+        Console.WriteLine(counterClosure() == 52);
+        Console.WriteLine(counter.Value == 50);
+
+        Counter nestedCounter = new Counter(60);
+        Func<Func<int>> nestedFactory = nestedCounter.BuildNested();
+        Func<int> nestedThis = nestedFactory();
+        Console.WriteLine(nestedThis() == 60);
+
+        Node node = new Node(73);
+        Holder holder = new Holder(node);
+        Func<int> holderGetter = holder.Capture();
+        holder.Node = null;
+        node = null;
+        GC.Collect();
+        Console.WriteLine(holderGetter() == 73);
+
+        ReadonlyCounter readonlyCounter = new ReadonlyCounter(81);
+        Func<int> readonlyGetter = readonlyCounter.Capture();
+        Console.WriteLine(readonlyGetter() == 81);
+    }
+}

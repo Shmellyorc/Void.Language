@@ -1,0 +1,18 @@
+namespace Void.IO;
+
+// Text-oriented reader abstraction. Concrete readers own their transport/buffering policy.
+public abstract class TextReader : IDisposable
+{
+    public virtual void Dispose() { }
+    public virtual void Close() { this.Dispose(); }
+
+    public abstract int Read();
+    public abstract string ReadLine();
+}
+
+// Console.In adapter over the shared standard-input buffer used by Console.Read/ReadLine.
+internal sealed class StandardTextReader : TextReader
+{
+    public override int Read() { return StandardInput.Read(); }
+    public override string ReadLine() { return StandardInput.ReadLine(); }
+}

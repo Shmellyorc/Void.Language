@@ -1,0 +1,11 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        int[] values = new int[] { 1, 2, 3 };
+        Memory<int> memory = values;
+        Span<int> span = memory;
+        Console.WriteLine(span.Length);
+    }
+}

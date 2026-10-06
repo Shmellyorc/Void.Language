@@ -1,0 +1,1 @@
+public static class Program { public static void Main() { int[,] values = new int[2, 2]; int value = values[0]; } }

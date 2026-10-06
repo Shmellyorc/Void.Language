@@ -1,0 +1,15 @@
+using Void.Threading;
+
+public sealed class Gate
+{
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Gate gate = new Gate();
+        Monitor.Enter(gate);
+        Monitor.Wait(gate, -2);
+    }
+}

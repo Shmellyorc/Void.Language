@@ -1,0 +1,164 @@
+using Void;
+using Void.Text;
+
+namespace Void.IO;
+
+// Low-level standard-input adapter. Line policy remains visible StandardLibrary code.
+internal static class StandardInput
+{
+    private static int _pendingByte = -1;
+
+    private static int ReadByte()
+    {
+        if (_pendingByte >= 0)
+        {
+            int value = _pendingByte;
+            _pendingByte = -1;
+            return value;
+        }
+        return Runtime.ReadStdinByte();
+    }
+
+    internal static int ReadBytes(byte[] buffer, int offset, int count)
+    {
+        if (buffer == null) throw new ArgumentNullException("buffer");
+        if (offset < 0) throw new ArgumentOutOfRangeException("offset");
+        if (count < 0) throw new ArgumentOutOfRangeException("count");
+        if (offset > buffer.Length || count > buffer.Length - offset)
+            throw new ArgumentException("Offset and count exceed the buffer length.");
+        if (count == 0) return 0;
+
+        int written = 0;
+        if (_pendingByte >= 0)
+        {
+            buffer[offset] = (byte)_pendingByte;
+            _pendingByte = -1;
+            offset++;
+            count--;
+            written = 1;
+            if (count == 0) return written;
+        }
+
+        int read = Runtime.StandardStreamRead(0, buffer, offset, count);
+        if (read < 0) throw new IOException("Unable to read standard input.");
+        return written + read;
+    }
+
+    private static string DecodeLine(byte[] bytes, int length)
+    {
+        return Console.InputEncoding.GetString(bytes, 0, length);
+    }
+
+    private static int InvalidScalar()
+    {
+        if (Console.InputEncoding.ThrowsOnInvalidBytes) throw new DecoderFallbackException("Invalid UTF-8 sequence");
+        return 65533;
+    }
+
+    // Reads one VOID Unicode scalar from the same byte source used by ReadLine.
+    // EOF is -1. Invalid UTF-8 follows Console.InputEncoding decoder policy.
+    internal static int Read()
+    {
+        int lead = ReadByte();
+        if (lead == -2)
+            throw new IOException("Unable to read standard input.");
+        if (lead == -1)
+            return -1;
+        if (lead < 128)
+            return lead;
+
+        int needed = 0;
+        int scalar = 0;
+        int secondMin = 128;
+        int secondMax = 191;
+        if (lead >= 194 && lead <= 223)
+        {
+            needed = 2;
+            scalar = lead - 192;
+        }
+        else if (lead >= 224 && lead <= 239)
+        {
+            needed = 3;
+            scalar = lead - 224;
+            if (lead == 224) secondMin = 160;
+            if (lead == 237) secondMax = 159;
+        }
+        else if (lead >= 240 && lead <= 244)
+        {
+            needed = 4;
+            scalar = lead - 240;
+            if (lead == 240) secondMin = 144;
+            if (lead == 244) secondMax = 143;
+        }
+        else
+            return InvalidScalar();
+
+        int consumed = 1;
+        while (consumed < needed)
+        {
+            int next = ReadByte();
+            if (next == -2)
+                throw new IOException("Unable to read standard input.");
+            if (next == -1)
+                return InvalidScalar();
+
+            int minimum = consumed == 1 ? secondMin : 128;
+            int maximum = consumed == 1 ? secondMax : 191;
+            if (next < minimum || next > maximum)
+            {
+                _pendingByte = next;
+                return InvalidScalar();
+            }
+            scalar = scalar * 64 + next - 128;
+            consumed++;
+        }
+        return scalar;
+    }
+
+    internal static string ReadLine()
+    {
+        byte[] bytes = new byte[64];
+        int length = 0;
+
+        while (true)
+        {
+            int value = ReadByte();
+            if (value == -2)
+                throw new IOException("Unable to read standard input.");
+            if (value == -1)
+            {
+                if (length == 0)
+                    return null;
+                return DecodeLine(bytes, length);
+            }
+            if (value == 10)
+                return DecodeLine(bytes, length);
+            if (value == 13)
+            {
+                int next = ReadByte();
+                if (next == -2)
+                    throw new IOException("Unable to read standard input.");
+                if (next >= 0 && next != 10)
+                    _pendingByte = next;
+                return DecodeLine(bytes, length);
+            }
+
+            if (length == bytes.Length)
+            {
+                if (bytes.Length > 1073741823)
+                    throw new OutOfMemoryException("Console input line is too large");
+                int capacity = bytes.Length == 0 ? 64 : bytes.Length * 2;
+                byte[] grown = new byte[capacity];
+                if (length > 0)
+                {
+                    Span<byte> source = new Span<byte>(bytes, 0, length);
+                    Span<byte> destination = new Span<byte>(grown, 0, length);
+                    source.CopyTo(destination);
+                }
+                bytes = grown;
+            }
+            bytes[length] = (byte)value;
+            length++;
+        }
+    }
+}

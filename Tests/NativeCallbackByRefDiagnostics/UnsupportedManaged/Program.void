@@ -1,0 +1,8 @@
+public sealed class Node { }
+public delegate void RefNodeCallback(ref Node value);
+public static class Native
+{
+    [Native("unused")]
+    public static unsafe extern void Use(RefNodeCallback callback);
+}
+public static class Program { public static void Main() { } }

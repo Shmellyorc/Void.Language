@@ -1,0 +1,4 @@
+using Void;
+public struct Bad248 { public string Text; }
+public static class Native248Bad { public static unsafe extern void Bad(Span<Bad248> values); }
+public static class Program { public static void Main() { } }

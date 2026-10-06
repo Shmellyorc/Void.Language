@@ -1,0 +1,20 @@
+public struct Source
+{
+    public static implicit operator Target(Source value)
+    {
+        return new Target();
+    }
+}
+
+public struct Target
+{
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        Source? source = new Source();
+        Target target = source;
+    }
+}

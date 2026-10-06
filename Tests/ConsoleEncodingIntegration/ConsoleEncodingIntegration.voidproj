@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "ConsoleEncodingIntegration",
+  "version": "0.0.316",
+  "output": "exe",
+  "compiler": { "unsafe": false }
+}

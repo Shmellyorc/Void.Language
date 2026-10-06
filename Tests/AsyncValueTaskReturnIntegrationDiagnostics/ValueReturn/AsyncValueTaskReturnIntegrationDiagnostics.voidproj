@@ -1,0 +1,6 @@
+{
+  "format": 1,
+  "name": "AsyncValueTaskReturnIntegrationDiagnostics",
+  "output": "exe",
+  "version": "0.0.268"
+}

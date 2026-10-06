@@ -1,0 +1,7 @@
+public static class Program
+{
+    public static void Main()
+    {
+        string value = $"value={1
+    }
+}

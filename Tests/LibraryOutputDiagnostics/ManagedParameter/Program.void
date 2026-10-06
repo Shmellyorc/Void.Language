@@ -1,0 +1,1 @@
+public sealed class Node { } public static class Api { [Export("bad_param")] public static int Get(Node value) { return 1; } }

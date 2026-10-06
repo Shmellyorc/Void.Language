@@ -1,0 +1,178 @@
+using Void;
+
+public interface IBase
+{
+    int Value();
+    int Number { get; }
+}
+
+public interface ILeft : IBase
+{
+    int Left();
+}
+
+public interface IRight : IBase
+{
+    int Right();
+}
+
+public interface IDiamond : ILeft, IRight
+{
+    int Sum();
+}
+
+public sealed class DiamondValue : IDiamond
+{
+    public int Number { get; set; }
+
+    public DiamondValue(int value)
+    {
+        Number = value;
+    }
+
+    public int Value() { return Number; }
+    public int Left() { return Number + 1; }
+    public int Right() { return Number + 2; }
+    public int Sum() { return Number * 2 + 3; }
+}
+
+public interface IPingA
+{
+    int Ping(int value);
+}
+
+public interface IPingB
+{
+    int Ping(int value);
+}
+
+public interface IPing : IPingA, IPingB
+{
+}
+
+public sealed class Pinger : IPing
+{
+    public int Ping(int value)
+    {
+        return value + 1;
+    }
+}
+
+public interface ICodeA
+{
+    int Code { get; }
+}
+
+public interface ICodeB
+{
+    int Code { get; }
+}
+
+public interface ICode : ICodeA, ICodeB
+{
+}
+
+public sealed class CodeValue : ICode
+{
+    public int Code { get; set; }
+
+    public CodeValue(int code)
+    {
+        Code = code;
+    }
+}
+
+public interface IChooseInt
+{
+    int Choose(int value);
+}
+
+public interface IChooseString
+{
+    int Choose(string value);
+}
+
+public interface IChoose : IChooseInt, IChooseString
+{
+}
+
+public sealed class Chooser : IChoose
+{
+    public int Choose(int value) { return value + 10; }
+    public int Choose(string value) { return 44; }
+}
+
+public interface IRead<T>
+{
+    T Read();
+}
+
+public interface ITaggedRead<T> : IRead<T>
+{
+    int Tag();
+}
+
+public sealed class IntReader : ITaggedRead<int>
+{
+    private int _value;
+
+    public IntReader(int value)
+    {
+        _value = value;
+    }
+
+    public int Read() { return _value; }
+    public int Tag() { return 73; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        DiamondValue value = new DiamondValue(10);
+        IDiamond diamond = value;
+
+        Console.WriteLine(diamond.Value() == 10);
+        Console.WriteLine(diamond.Number == 10);
+        Console.WriteLine(diamond.Left() == 11);
+        Console.WriteLine(diamond.Right() == 12);
+        Console.WriteLine(diamond.Sum() == 23);
+
+        IBase baseValue = diamond;
+        Console.WriteLine(baseValue.Value() == 10);
+        Console.WriteLine(value is IBase);
+        Console.WriteLine(diamond is IBase);
+
+        IBase castBase = value as IBase;
+        Console.WriteLine(castBase != null);
+        Console.WriteLine(castBase.Number == 10);
+
+        ILeft castLeft = diamond as ILeft;
+        Console.WriteLine(castLeft != null);
+        Console.WriteLine(castLeft.Left() == 11);
+
+        IPing ping = new Pinger();
+        Console.WriteLine(ping.Ping(4) == 5);
+        IPingA pingA = ping;
+        IPingB pingB = ping;
+        Console.WriteLine(pingA.Ping(8) == 9);
+        Console.WriteLine(pingB.Ping(9) == 10);
+
+        ICode code = new CodeValue(33);
+        Console.WriteLine(code.Code == 33);
+        ICodeA codeA = code;
+        ICodeB codeB = code;
+        Console.WriteLine(codeA.Code == 33);
+        Console.WriteLine(codeB.Code == 33);
+
+        IChoose chooser = new Chooser();
+        Console.WriteLine(chooser.Choose(5) == 15);
+        Console.WriteLine(chooser.Choose("void") == 44);
+
+        ITaggedRead<int> tagged = new IntReader(91);
+        Console.WriteLine(tagged.Read() == 91);
+        Console.WriteLine(tagged.Tag() == 73);
+        IRead<int> reader = tagged;
+        Console.WriteLine(reader.Read() == 91);
+    }
+}

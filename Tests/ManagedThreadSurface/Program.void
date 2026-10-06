@@ -1,0 +1,146 @@
+using Void;
+using Void.Threading;
+
+public sealed class Box
+{
+    public int Value;
+
+    public Box()
+    {
+        Value = 0;
+    }
+}
+
+public static class Program
+{
+    private static int _methodValue;
+
+    public static void MethodWorker()
+    {
+        _methodValue = 19;
+    }
+
+    public static Thread MakeThread<T>(Action<T> action, T value)
+    {
+        return new Thread(() => action(value));
+    }
+
+    public static void Burn(Box result, int seed)
+    {
+        int total = 0;
+        for (int i = 0; i < 80; i++)
+        {
+            Box temp = new Box();
+            temp.Value = seed + i;
+            total += temp.Value;
+            if ((i % 13) == 0)
+                GC.Collect();
+        }
+        result.Value = total;
+    }
+
+    public static void Main()
+    {
+        Box simple = new Box();
+        int captured = 7;
+        Thread first = new Thread(() =>
+        {
+            Box temp = new Box();
+            temp.Value = captured + 5;
+            GC.Collect();
+            simple.Value = temp.Value;
+        });
+        first.Start();
+        first.Join();
+        Console.WriteLine(simple.Value == 12);
+
+        Action methodAction = MethodWorker;
+        Thread method = new Thread(methodAction);
+        method.Start();
+        method.Join();
+        Console.WriteLine(_methodValue == 19);
+
+        Box genericValue = new Box();
+        Action<int> storeInt = value => genericValue.Value = value;
+        Thread genericInt = MakeThread<int>(storeInt, 23);
+        genericInt.Start();
+        genericInt.Join();
+        Console.WriteLine(genericValue.Value == 23);
+
+        Box genericReference = new Box();
+        Action<Box> setReference = value => value.Value = 31;
+        Thread genericBox = MakeThread<Box>(setReference, genericReference);
+        genericBox.Start();
+        genericBox.Join();
+        Console.WriteLine(genericReference.Value == 31);
+
+        Box one = new Box();
+        Box two = new Box();
+        Box three = new Box();
+        Box four = new Box();
+        Thread t1 = new Thread(() => Burn(one, 1));
+        Thread t2 = new Thread(() => Burn(two, 2));
+        Thread t3 = new Thread(() => Burn(three, 3));
+        Thread t4 = new Thread(() => Burn(four, 4));
+        t1.Start();
+        t2.Start();
+        t3.Start();
+        t4.Start();
+        GC.Collect();
+        t1.Join();
+        t2.Join();
+        t3.Join();
+        t4.Join();
+        Console.WriteLine(one.Value == 3240);
+        Console.WriteLine(two.Value == 3320);
+        Console.WriteLine(three.Value == 3400);
+        Console.WriteLine(four.Value == 3480);
+
+        Box nested = new Box();
+        Thread outer = new Thread(() =>
+        {
+            Thread inner = new Thread(() =>
+            {
+                GC.Collect();
+                nested.Value = 44;
+            });
+            inner.Start();
+            inner.Join();
+            nested.Value += 1;
+        });
+        outer.Start();
+        outer.Join();
+        Console.WriteLine(nested.Value == 45);
+
+        Box multicast = new Box();
+        Action combined = () => multicast.Value += 2;
+        combined += () => multicast.Value += 3;
+        Thread multi = new Thread(combined);
+        multi.Start();
+        multi.Join();
+        Console.WriteLine(multicast.Value == 5);
+
+        Box handoff = new Box();
+        Thread handoffThread = new Thread(() =>
+        {
+            Box local = new Box();
+            local.Value = 57;
+            for (int i = 0; i < 40; i++)
+                new Box();
+            GC.Collect();
+            handoff.Value = local.Value;
+        });
+        handoffThread.Start();
+        GC.Collect();
+        handoffThread.Join();
+        Console.WriteLine(handoff.Value == 57);
+
+        Thread sequentialA = new Thread(() => simple.Value = 61);
+        Thread sequentialB = new Thread(() => simple.Value = 62);
+        sequentialA.Start();
+        sequentialA.Join();
+        sequentialB.Start();
+        sequentialB.Join();
+        Console.WriteLine(simple.Value == 62);
+    }
+}

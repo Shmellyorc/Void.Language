@@ -1,0 +1,1 @@
+public static class Api { [Export(123)] public static int Get() { return 1; } }

@@ -1,0 +1,164 @@
+using Void;
+using Void.Collections;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class AuditStringHolder300
+{
+    public string Value;
+    public AuditStringHolder300(string value) { Value = value; }
+}
+
+public sealed class AuditBox300<T>
+{
+    public T Value;
+    public AuditBox300(T value) { Value = value; }
+}
+
+public struct AuditStringPair300
+{
+    public string Left;
+    public string Right;
+    public AuditStringPair300(string left, string right) { Left = left; Right = right; }
+}
+
+public delegate int AuditNativeView300(
+    [NativeString(NativeStringKind.BorrowedPointerLength)] string text);
+
+public static class Native300
+{
+    [Native("void300_reset")]
+    public static unsafe extern void Reset();
+
+    [Native("void300_borrowed_nul_length")]
+    public static unsafe extern int BorrowedNulLength([NativeString] string text);
+
+    [Native("void300_view_matches")]
+    public static unsafe extern int ViewMatches(
+        [NativeString(NativeStringKind.BorrowedPointerLength)] string text);
+
+    [NativeString(NativeStringKind.BorrowedNul)]
+    [Native("void300_borrowed_nul")]
+    public static unsafe extern string BorrowedNul();
+
+    [NativeString(NativeStringKind.StaticPointerLength)]
+    [Native("void300_static_view")]
+    public static unsafe extern string StaticView();
+
+    [NativeString(NativeStringKind.OwnedNul, "void300_release")]
+    [Native("void300_owned_nul")]
+    public static unsafe extern string OwnedNul();
+
+    [NativeString(NativeStringKind.OwnedPointerLength, "void300_release")]
+    [Native("void300_owned_view")]
+    public static unsafe extern string OwnedView();
+
+    [Native("void300_release_count")]
+    public static unsafe extern int ReleaseCount();
+
+    [Native("void300_call_view")]
+    public static unsafe extern int CallView(AuditNativeView300 callback);
+}
+
+public static class Program
+{
+    private static string ThreadResult;
+
+    private static Func<string> Capture(string value)
+    {
+        return () => value;
+    }
+
+    private static IEnumerator<string> Iterate(string value)
+    {
+        GC.Collect();
+        yield return value;
+        GC.Collect();
+        yield return "tail\0value";
+    }
+
+    private static async Task<string> AwaitValue(string value)
+    {
+        await Task.Delay(5);
+        GC.Collect();
+        return value;
+    }
+
+    private static int CheckNativeView(string text)
+    {
+        GC.Collect();
+        return text == "callback\0value" ? 300 : -1;
+    }
+
+    public static unsafe void Main()
+    {
+        Native300.Reset();
+
+        string embedded = "A\0B";
+        AuditStringHolder300 holder = new AuditStringHolder300(embedded);
+        AuditBox300<string> box = new AuditBox300<string>("box\0value");
+        AuditStringPair300 pair = new AuditStringPair300("left\0value", "right\0value");
+        string[] array = new string[] { embedded, "array\0value" };
+        Func<string> closure = Capture("closure\0value");
+        GC.Collect();
+        GC.Collect();
+
+        Console.WriteLine(holder.Value == "A\0B");
+        Console.WriteLine(box.Value == "box\0value");
+        Console.WriteLine(pair.Left == "left\0value" && pair.Right == "right\0value");
+        Console.WriteLine(array[0] == "A\0B" && array[1] == "array\0value");
+        Console.WriteLine(closure() == "closure\0value");
+
+        Dictionary<string, int> map = new();
+        map.Add("key\0A", 1);
+        map.Add("key\0B", 2);
+        Console.WriteLine(map.Count == 2 && map["key\0A"] == 1 && map["key\0B"] == 2);
+
+        IEnumerator<string> iterator = Iterate("iterator\0value");
+        Console.WriteLine(iterator.MoveNext() && iterator.Current == "iterator\0value");
+        Console.WriteLine(iterator.MoveNext() && iterator.Current == "tail\0value");
+        Console.WriteLine(!iterator.MoveNext());
+        iterator.Dispose();
+
+        Task<string> awaited = AwaitValue("async\0value");
+        GC.Collect();
+        Console.WriteLine(awaited.Result == "async\0value");
+
+        string threadValue = "thread\0value";
+        Thread worker = new Thread(() =>
+        {
+            ThreadResult = threadValue;
+            GC.Collect();
+        });
+        worker.Start();
+        worker.Join();
+        Console.WriteLine(ThreadResult == "thread\0value");
+
+        bool caught = false;
+        try
+        {
+            throw new Exception("exception\0value");
+        }
+        catch (Exception error)
+        {
+            GC.Collect();
+            caught = error.Message == "exception\0value";
+        }
+        Console.WriteLine(caught);
+
+        Console.WriteLine(Native300.BorrowedNulLength("hello") == 5);
+        Console.WriteLine(Native300.ViewMatches("A\0B") == 1);
+        Console.WriteLine(Native300.BorrowedNul() == "borrowed-300");
+        Console.WriteLine(Native300.StaticView() == "static\0view");
+
+        string ownedNul = Native300.OwnedNul();
+        string ownedView = Native300.OwnedView();
+        Console.WriteLine(ownedNul == "owned-300");
+        Console.WriteLine(ownedView == "owned\0view");
+        Console.WriteLine(Native300.ReleaseCount() == 2);
+        GC.Collect();
+        Console.WriteLine(ownedNul == "owned-300" && ownedView == "owned\0view");
+
+        Console.WriteLine(Native300.CallView(CheckNativeView) == 300);
+    }
+}

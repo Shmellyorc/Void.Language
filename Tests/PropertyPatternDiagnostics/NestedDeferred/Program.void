@@ -1,0 +1,3 @@
+public sealed class Child { public int Value { get; set; } }
+public sealed class Box { public Child Child { get; set; } }
+public static class Program { public static void Main() { Box box = new Box(); if (box is { Child: { Value: 1 } }) { } } }

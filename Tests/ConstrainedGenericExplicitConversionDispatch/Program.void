@@ -1,0 +1,163 @@
+using Void;
+
+public interface IExplicitToInt<T>
+{
+    static explicit operator int(T value);
+}
+
+public interface IInheritedExplicitToInt<T> : IExplicitToInt<T>
+{
+}
+
+public interface IExplicitFromInt<T>
+{
+    static explicit operator T(int value);
+}
+
+public interface IImplicitToInt<T>
+{
+    static implicit operator int(T value);
+}
+
+public struct Number : IInheritedExplicitToInt<Number>, IExplicitFromInt<Number>
+{
+    public int Value;
+
+    public Number(int value)
+    {
+        Value = value;
+    }
+
+    public static explicit operator int(Number value)
+    {
+        return value.Value;
+    }
+
+    public static explicit operator Number(int value)
+    {
+        return new Number(value + 10);
+    }
+}
+
+public sealed class Box : IExplicitToInt<Box>
+{
+    public int Value;
+
+    public Box(int value)
+    {
+        Value = value;
+    }
+
+    public static explicit operator int(Box value)
+    {
+        return value.Value;
+    }
+}
+
+public struct ImplicitNumber : IImplicitToInt<ImplicitNumber>
+{
+    public int Value;
+
+    public ImplicitNumber(int value)
+    {
+        Value = value;
+    }
+
+    public static implicit operator int(ImplicitNumber value)
+    {
+        return value.Value;
+    }
+}
+
+public sealed class Runner<T> where T : IExplicitToInt<T>
+{
+    private T _value;
+
+    public Runner(T value)
+    {
+        _value = value;
+    }
+
+    public int Convert()
+    {
+        return (int)_value;
+    }
+
+    public long ConvertToLong()
+    {
+        return (long)_value;
+    }
+}
+
+public sealed class Maker<T> where T : IExplicitFromInt<T>
+{
+    public T Make(int value)
+    {
+        return (T)value;
+    }
+
+    public T MakeFromShort(short value)
+    {
+        return (T)value;
+    }
+}
+
+public static class Program
+{
+    private static int ToInt<T>(T value) where T : IExplicitToInt<T>
+    {
+        return (int)value;
+    }
+
+    private static long ToLong<T>(T value) where T : IExplicitToInt<T>
+    {
+        return (long)value;
+    }
+
+    private static int ViaInheritedConstraint<T>(T value) where T : IInheritedExplicitToInt<T>
+    {
+        return (int)value;
+    }
+
+    private static T FromInt<T>(int value) where T : IExplicitFromInt<T>
+    {
+        return (T)value;
+    }
+
+    private static T FromShort<T>(short value) where T : IExplicitFromInt<T>
+    {
+        return (T)value;
+    }
+
+    private static int ExplicitSyntaxUsingImplicitContract<T>(T value) where T : IImplicitToInt<T>
+    {
+        return (int)value;
+    }
+
+    public static void Main()
+    {
+        Number number = new Number(7);
+        Console.WriteLine(ToInt(number) == 7);
+        Console.WriteLine(ToLong(number) == 7L);
+        Console.WriteLine(ViaInheritedConstraint(number) == 7);
+
+        Number fromInt = FromInt<Number>(8);
+        Console.WriteLine(fromInt.Value == 18);
+        Number fromShort = FromShort<Number>((short)9);
+        Console.WriteLine(fromShort.Value == 19);
+
+        Box box = new Box(11);
+        Console.WriteLine(ToInt(box) == 11);
+
+        Runner<Number> runner = new Runner<Number>(new Number(12));
+        Console.WriteLine(runner.Convert() == 12);
+        Console.WriteLine(runner.ConvertToLong() == 12L);
+
+        Maker<Number> maker = new Maker<Number>();
+        Console.WriteLine(maker.Make(13).Value == 23);
+        Console.WriteLine(maker.MakeFromShort((short)14).Value == 24);
+
+        ImplicitNumber implicitNumber = new ImplicitNumber(15);
+        Console.WriteLine(ExplicitSyntaxUsingImplicitContract(implicitNumber) == 15);
+    }
+}

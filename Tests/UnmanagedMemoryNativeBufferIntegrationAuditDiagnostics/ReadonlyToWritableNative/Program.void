@@ -1,0 +1,15 @@
+using Void;
+public static class Native250Bad
+{
+    [Native("voidc250_bad")]
+    public static unsafe extern void Bad(Span<int> values);
+}
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        int[] values = new int[] { 1, 2 };
+        ReadOnlySpan<int> readOnly = new ReadOnlySpan<int>(values);
+        Native250Bad.Bad(readOnly);
+    }
+}

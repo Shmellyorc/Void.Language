@@ -1,0 +1,3 @@
+using Void;
+public static class Native248Bad { public static unsafe extern void Bad(Span<string> values); }
+public static class Program { public static void Main() { } }

@@ -1,0 +1,5 @@
+public static class Native299Diag
+{
+    public static unsafe extern void Fill(ref string text);
+}
+public static class Program { public static void Main() { } }

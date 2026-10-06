@@ -1,0 +1,1 @@
+public sealed class Resource : IDisposable { public void Dispose() { } } public static class Program { public static void Main() { using Resource resource = new Resource(); ref Resource alias = ref resource; } }

@@ -1,0 +1,44 @@
+using Void;
+using Void.Threading.Tasks;
+
+public struct BadDisposeAwaiter280
+{
+    public bool IsCompleted => true;
+
+    public void OnCompleted(Action continuation)
+    {
+        continuation();
+    }
+
+    public int GetResult()
+    {
+        return 1;
+    }
+}
+
+public struct BadDisposeAwaitable280
+{
+    public BadDisposeAwaiter280 GetAwaiter()
+    {
+        return new BadDisposeAwaiter280();
+    }
+}
+
+public sealed class BadResource280
+{
+    public BadDisposeAwaitable280 DisposeAsync()
+    {
+        return new BadDisposeAwaitable280();
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Func<Task> work = async () =>
+        {
+            await using var resource = new BadResource280();
+        };
+    }
+}

@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "ConsoleStandardIoTerminalIntegrationAudit",
+  "version": "0.0.320",
+  "output": "exe",
+  "compiler": { "unsafe": false }
+}

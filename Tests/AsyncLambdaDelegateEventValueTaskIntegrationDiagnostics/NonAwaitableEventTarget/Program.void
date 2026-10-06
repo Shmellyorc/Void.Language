@@ -1,0 +1,17 @@
+using Void;
+
+public delegate int Handler274(int value);
+
+public sealed class Publisher274
+{
+    public event Handler274 Changed;
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Publisher274 publisher = new Publisher274();
+        publisher.Changed += async value => value + 1;
+    }
+}

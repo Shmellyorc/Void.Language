@@ -1,0 +1,10 @@
+public class Base225Diag
+{
+    public int Value;
+    public virtual ref readonly int View { get { return ref Value; } }
+}
+public sealed class Derived225Diag : Base225Diag
+{
+    public override ref int View { get { return ref Value; } }
+}
+public static class Program { public static void Main() { } }

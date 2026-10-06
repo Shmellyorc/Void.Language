@@ -1,0 +1,6 @@
+using Void.Threading.Tasks;
+
+public interface IAsyncDisposable
+{
+    Task DisposeAsync();
+}

@@ -1,0 +1,230 @@
+using Void;
+
+public enum Mode
+{
+    Idle = 0,
+    Run = 2
+}
+
+public delegate int OptionalDelegate(int value = 6);
+public delegate int ParamsDelegate(params int[] values);
+
+public static class Defaults
+{
+    public const int Base = 7;
+    public const string Word = "VOID";
+}
+
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value = Defaults.Base)
+    {
+        Value = value;
+    }
+}
+
+public class BaseCounter
+{
+    public virtual int Read(int value = 5)
+    {
+        return value + 100;
+    }
+}
+
+public sealed class DerivedCounter : BaseCounter
+{
+    public override int Read(int value = 9)
+    {
+        return value + 200;
+    }
+}
+
+public interface IReader
+{
+    int Read(int value = 4);
+}
+
+public sealed class Reader : IReader
+{
+    public int Read(int value = 4)
+    {
+        return value * 2;
+    }
+}
+
+public sealed class Calculator
+{
+    public int Bias;
+
+    public Calculator(int bias = 3)
+    {
+        Bias = bias;
+    }
+
+    public int Add(int value, int extra = 2)
+    {
+        return Bias + value + extra;
+    }
+
+    public int Sum(params int[] values)
+    {
+        int total = 0;
+        for (int i = 0; i < values.Length; i++)
+            total += values[i];
+        return total;
+    }
+
+    public int SumFrom(int start = 10, params int[] values)
+    {
+        int total = start;
+        for (int i = 0; i < values.Length; i++)
+            total += values[i];
+        return total;
+    }
+}
+
+public sealed class Bucket
+{
+    public int Total;
+
+    public Bucket(int start = 1, params int[] values)
+    {
+        Total = start;
+        for (int i = 0; i < values.Length; i++)
+            Total += values[i];
+    }
+}
+
+public static class Program
+{
+    public static int Echo(int value)
+    {
+        return value;
+    }
+
+    public static int SumArray(int[] values)
+    {
+        int total = 0;
+        for (int i = 0; i < values.Length; i++)
+            total += values[i];
+        return total;
+    }
+
+    public static int StaticAdd(int left = Defaults.Base, int right = 3)
+    {
+        return left + right;
+    }
+
+    public static string Text(string value = Defaults.Word)
+    {
+        return value;
+    }
+
+    public static Mode ModeValue(Mode value = Mode.Run)
+    {
+        return value;
+    }
+
+    public static Node Maybe(Node value = null)
+    {
+        return value;
+    }
+
+    public static int Pick(int value)
+    {
+        return 1;
+    }
+
+    public static int Pick(params int[] values)
+    {
+        return 2;
+    }
+
+    public static int CountText(params string[] values)
+    {
+        return values.Length;
+    }
+
+    public static Node FirstNode(params Node[] values)
+    {
+        GC.Collect();
+        if (values.Length == 0)
+            return null;
+        return values[0];
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(StaticAdd() == 10);
+        Console.WriteLine(StaticAdd(2) == 5);
+        Console.WriteLine(StaticAdd(2, 8) == 10);
+        string defaultText = Defaults.Word;
+        string explicitText = "X";
+        Console.WriteLine(Text() == defaultText);
+        Console.WriteLine(Text(explicitText) == explicitText);
+        Console.WriteLine(ModeValue() == Mode.Run);
+        Console.WriteLine(Maybe() == null);
+
+        Node defaultNode = new Node();
+        Node explicitNode = new Node(12);
+        Console.WriteLine(defaultNode.Value == Defaults.Base);
+        Console.WriteLine(explicitNode.Value == 12);
+
+        Calculator first = new Calculator();
+        Calculator second = new Calculator(10);
+        Console.WriteLine(first.Bias == 3);
+        Console.WriteLine(second.Bias == 10);
+        Console.WriteLine(first.Add(5) == 10);
+        Console.WriteLine(first.Add(5, 7) == 15);
+
+        Console.WriteLine(first.Sum() == 0);
+        Console.WriteLine(first.Sum(1) == 1);
+        Console.WriteLine(first.Sum(1, 2, 3, 4) == 10);
+
+        int[] numbers = new int[3];
+        numbers[0] = 4;
+        numbers[1] = 5;
+        numbers[2] = 6;
+        Console.WriteLine(first.Sum(numbers) == 15);
+
+        Console.WriteLine(first.SumFrom() == 10);
+        Console.WriteLine(first.SumFrom(5) == 5);
+        Console.WriteLine(first.SumFrom(5, 1, 2, 3) == 11);
+
+        Bucket empty = new Bucket();
+        Bucket packed = new Bucket(2, 3, 4);
+        Bucket explicitPacked = new Bucket(5, numbers);
+        Console.WriteLine(empty.Total == 1);
+        Console.WriteLine(packed.Total == 9);
+        Console.WriteLine(explicitPacked.Total == 20);
+
+        Console.WriteLine(Pick(9) == 1);
+        Console.WriteLine(Pick() == 2);
+        Console.WriteLine(Pick(1, 2) == 2);
+
+        Console.WriteLine(CountText() == 0);
+        Console.WriteLine(CountText("a", "b", "c") == 3);
+
+        Node kept = FirstNode(new Node(21), new Node(22));
+        Console.WriteLine(kept.Value == 21);
+
+        BaseCounter baseCounter = new DerivedCounter();
+        DerivedCounter derivedCounter = new DerivedCounter();
+        Console.WriteLine(baseCounter.Read() == 205);
+        Console.WriteLine(derivedCounter.Read() == 209);
+
+        IReader reader = new Reader();
+        Console.WriteLine(reader.Read() == 8);
+
+        OptionalDelegate optionalDelegate = Echo;
+        Console.WriteLine(optionalDelegate() == 6);
+        Console.WriteLine(optionalDelegate(13) == 13);
+
+        ParamsDelegate paramsDelegate = SumArray;
+        Console.WriteLine(paramsDelegate() == 0);
+        Console.WriteLine(paramsDelegate(2, 3, 4) == 9);
+        Console.WriteLine(paramsDelegate(numbers) == 15);
+    }
+}

@@ -1,0 +1,137 @@
+using Void;
+
+public static class Eval306
+{
+    public static int Order;
+    public static int ReceiverCalls;
+    public static int ArgumentCalls;
+    public static int LeftCalls;
+    public static int RightCalls;
+
+    public static string Receiver()
+    {
+        ReceiverCalls += 1;
+        Order = Order * 10 + 1;
+        return "Aé😀Bé";
+    }
+
+    public static string Argument()
+    {
+        ArgumentCalls += 1;
+        Order = Order * 10 + 2;
+        return "😀";
+    }
+
+    public static string Left()
+    {
+        LeftCalls += 1;
+        Order = Order * 10 + 1;
+        return "abc";
+    }
+
+    public static string Right()
+    {
+        RightCalls += 1;
+        Order = Order * 10 + 2;
+        return "abd";
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        string text = "Aé😀Bé";
+        string embedded = "A\0B\0C";
+
+        Console.WriteLine(text.Equals("Aé😀Bé"));
+        Console.WriteLine(!text.Equals("Aé😀BE"));
+        Console.WriteLine(!text.Equals(null));
+        Console.WriteLine(string.Equals(text, "Aé😀Bé"));
+        Console.WriteLine(!string.Equals(text, "Aé😀BE"));
+        Console.WriteLine(string.Equals(null, null));
+        Console.WriteLine(!string.Equals(null, text));
+        Console.WriteLine(!string.Equals(text, null));
+        Console.WriteLine(embedded.Equals("A\0B\0C"));
+
+        Console.WriteLine(string.CompareOrdinal("abc", "abc") == 0);
+        Console.WriteLine(string.CompareOrdinal("abc", "abd") < 0);
+        Console.WriteLine(string.CompareOrdinal("abd", "abc") > 0);
+        Console.WriteLine(string.CompareOrdinal("abc", "abcd") < 0);
+        Console.WriteLine(string.CompareOrdinal("abcd", "abc") > 0);
+        Console.WriteLine(string.CompareOrdinal(null, null) == 0);
+        Console.WriteLine(string.CompareOrdinal(null, "") < 0);
+        Console.WriteLine(string.CompareOrdinal("", null) > 0);
+        Console.WriteLine(string.CompareOrdinal("é", "😀") < 0);
+        Console.WriteLine(string.CompareOrdinal("A\0B", "A\0C") < 0);
+
+        Console.WriteLine(text.Contains("é😀"));
+        Console.WriteLine(text.Contains(""));
+        Console.WriteLine(!text.Contains("xyz"));
+        Console.WriteLine(embedded.Contains("\0B"));
+        Console.WriteLine(text.StartsWith("Aé"));
+        Console.WriteLine(text.StartsWith(""));
+        Console.WriteLine(!text.StartsWith("é"));
+        Console.WriteLine(text.EndsWith("Bé"));
+        Console.WriteLine(text.EndsWith(""));
+        Console.WriteLine(!text.EndsWith("😀"));
+        Console.WriteLine(embedded.StartsWith("A\0"));
+        Console.WriteLine(embedded.EndsWith("\0C"));
+
+        Console.WriteLine(text.IndexOf("A") == 0);
+        Console.WriteLine(text.IndexOf("é") == 1);
+        Console.WriteLine(text.IndexOf("😀") == 2);
+        Console.WriteLine(text.IndexOf("Bé") == 3);
+        Console.WriteLine(text.IndexOf("missing") == -1);
+        Console.WriteLine(text.IndexOf("") == 0);
+        Console.WriteLine(embedded.IndexOf("\0") == 1);
+        Console.WriteLine(text.LastIndexOf("é") == 4);
+        Console.WriteLine(text.LastIndexOf("A") == 0);
+        Console.WriteLine(text.LastIndexOf("missing") == -1);
+        Console.WriteLine(text.LastIndexOf("") == text.Length);
+        Console.WriteLine(embedded.LastIndexOf("\0") == 3);
+
+        Console.WriteLine(text.IndexOf((char)65) == 0);
+        Console.WriteLine(text.IndexOf((char)233) == 1);
+        Console.WriteLine(text.IndexOf((char)128512) == 2);
+        Console.WriteLine(text.IndexOf((char)90) == -1);
+        Console.WriteLine(embedded.IndexOf((char)0) == 1);
+        Console.WriteLine(text.LastIndexOf((char)233) == 4);
+        Console.WriteLine(text.LastIndexOf((char)128512) == 2);
+        Console.WriteLine(text.LastIndexOf((char)90) == -1);
+        Console.WriteLine(embedded.LastIndexOf((char)0) == 3);
+
+        string absent = null;
+        bool? missingContains = absent?.Contains("A");
+        int? missingIndex = absent?.IndexOf("A");
+        string present = "Aé";
+        bool? presentContains = present?.Contains("é");
+        int? presentIndex = present?.IndexOf((char)233);
+        Console.WriteLine(!missingContains.HasValue);
+        Console.WriteLine(!missingIndex.HasValue);
+        Console.WriteLine(presentContains.HasValue && presentContains.Value);
+        Console.WriteLine(presentIndex.HasValue && presentIndex.Value == 1);
+
+        Eval306.Order = 0;
+        Eval306.ReceiverCalls = 0;
+        Eval306.ArgumentCalls = 0;
+        int orderedIndex = Eval306.Receiver().IndexOf(Eval306.Argument());
+        Console.WriteLine(orderedIndex == 2);
+        Console.WriteLine(Eval306.ReceiverCalls == 1 && Eval306.ArgumentCalls == 1 && Eval306.Order == 12);
+
+        Eval306.Order = 0;
+        Eval306.LeftCalls = 0;
+        Eval306.RightCalls = 0;
+        int orderedCompare = string.CompareOrdinal(Eval306.Left(), Eval306.Right());
+        Console.WriteLine(orderedCompare < 0);
+        Console.WriteLine(Eval306.LeftCalls == 1 && Eval306.RightCalls == 1 && Eval306.Order == 12);
+
+        string composed = "A" + "é" + (char)128512 + "Bé";
+        GC.Collect();
+        Console.WriteLine(composed.IndexOf("😀") == 2);
+        Console.WriteLine(composed.LastIndexOf("é") == 4);
+        Console.WriteLine(composed.Contains("é😀B"));
+        GC.Collect();
+        Console.WriteLine(composed.Equals(text));
+    }
+}

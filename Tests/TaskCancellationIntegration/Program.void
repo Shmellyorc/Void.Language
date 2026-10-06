@@ -1,0 +1,190 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class CancellationState198
+{
+    public int Executed;
+    public int BlockerReady;
+    public ManualResetEvent BlockersReady;
+    public ManualResetEvent BlockersRelease;
+    public ManualResetEvent RunningEntered;
+    public ManualResetEvent RunningRelease;
+    public ManualResetEvent CooperativeEntered;
+
+    public CancellationState198()
+    {
+        Executed = 0;
+        BlockerReady = 0;
+        BlockersReady = new ManualResetEvent(false);
+        BlockersRelease = new ManualResetEvent(false);
+        RunningEntered = new ManualResetEvent(false);
+        RunningRelease = new ManualResetEvent(false);
+        CooperativeEntered = new ManualResetEvent(false);
+    }
+}
+
+public static class Program
+{
+    private static Action MakeBlocker(CancellationState198 state)
+    {
+        return () =>
+        {
+            int ready = Interlocked.Increment(ref state.BlockerReady);
+            if (ready == 2)
+                state.BlockersReady.Set();
+            state.BlockersRelease.WaitOne();
+        };
+    }
+
+    private static bool WaitCanceled(Task task)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken token = error.CancellationToken;
+            return token.CanBeCanceled && token.IsCancellationRequested;
+        }
+        return false;
+    }
+
+    private static bool ResultCanceled(Task<int> task)
+    {
+        try
+        {
+            int value = task.Result;
+            return value == -1;
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken token = error.CancellationToken;
+            return token.CanBeCanceled && token.IsCancellationRequested;
+        }
+    }
+
+    public static void Main()
+    {
+        CancellationState198 state = new CancellationState198();
+
+        CancellationTokenSource preSource = new CancellationTokenSource();
+        CancellationToken preToken = preSource.Token;
+        preSource.Cancel();
+        Task preCanceled = Task.Run(() => Interlocked.Increment(ref state.Executed), preToken);
+        Console.WriteLine(preCanceled.IsCanceled);
+        Console.WriteLine(preCanceled.Status == TaskStatus.Canceled);
+        Console.WriteLine(state.Executed == 0);
+        Console.WriteLine(WaitCanceled(preCanceled));
+
+        Task blockerOne = Task.Run(MakeBlocker(state));
+        Task blockerTwo = Task.Run(MakeBlocker(state));
+        Console.WriteLine(state.BlockersReady.WaitOne(5000));
+
+        CancellationTokenSource pendingSource = new CancellationTokenSource();
+        CancellationToken pendingToken = pendingSource.Token;
+        Task pendingTask = Task.Run(() => Interlocked.Increment(ref state.Executed), pendingToken);
+        pendingSource.Cancel();
+        Console.WriteLine(pendingTask.IsCanceled);
+        Console.WriteLine(pendingTask.Status == TaskStatus.Canceled);
+        state.BlockersRelease.Set();
+        blockerOne.Wait();
+        blockerTwo.Wait();
+        Console.WriteLine(WaitCanceled(pendingTask));
+        Console.WriteLine(state.Executed == 0);
+
+        CancellationTokenSource runningSource = new CancellationTokenSource();
+        CancellationToken runningToken = runningSource.Token;
+        Task runningTask = Task.Run(() =>
+        {
+            state.RunningEntered.Set();
+            state.RunningRelease.WaitOne();
+            Interlocked.Increment(ref state.Executed);
+        }, runningToken);
+        Console.WriteLine(state.RunningEntered.WaitOne(5000));
+        Console.WriteLine(runningTask.Status == TaskStatus.Running);
+        runningSource.Cancel();
+        Console.WriteLine(!runningTask.IsCanceled);
+        state.RunningRelease.Set();
+        runningTask.Wait();
+        Console.WriteLine(runningTask.Status == TaskStatus.Completed);
+        Console.WriteLine(state.Executed == 1);
+
+        CancellationTokenSource cooperativeSource = new CancellationTokenSource();
+        CancellationToken cooperativeToken = cooperativeSource.Token;
+        Task cooperativeTask = Task.Run(() =>
+        {
+            state.CooperativeEntered.Set();
+            while (!cooperativeToken.IsCancellationRequested)
+                Thread.Sleep(1);
+            cooperativeToken.ThrowIfCancellationRequested();
+        }, cooperativeToken);
+        Console.WriteLine(state.CooperativeEntered.WaitOne(5000));
+        cooperativeSource.Cancel();
+        Console.WriteLine(WaitCanceled(cooperativeTask));
+        Console.WriteLine(cooperativeTask.IsCanceled);
+        CancellationToken storedCooperative = cooperativeTask.CancellationToken;
+        Console.WriteLine(storedCooperative.IsCancellationRequested);
+
+        CancellationTokenSource resultSource = new CancellationTokenSource();
+        CancellationToken resultToken = resultSource.Token;
+        ManualResetEvent resultEntered = new ManualResetEvent(false);
+        Task<int> canceledResult = Task.Run<int>(() =>
+        {
+            resultEntered.Set();
+            while (!resultToken.IsCancellationRequested)
+                Thread.Sleep(1);
+            resultToken.ThrowIfCancellationRequested();
+            return 99;
+        }, resultToken);
+        Console.WriteLine(resultEntered.WaitOne(5000));
+        resultSource.Cancel();
+        Console.WriteLine(ResultCanceled(canceledResult));
+        Console.WriteLine(canceledResult.IsCanceled);
+
+        CancellationTokenSource unrelatedSource = new CancellationTokenSource();
+        CancellationToken unrelatedToken = unrelatedSource.Token;
+        CancellationTokenSource schedulingSource = new CancellationTokenSource();
+        CancellationToken schedulingToken = schedulingSource.Token;
+        Task unrelated = Task.Run(() => { throw new OperationCanceledException(unrelatedToken); }, schedulingToken);
+        try
+        {
+            unrelated.Wait();
+            Console.WriteLine(false);
+        }
+        catch (OperationCanceledException error)
+        {
+            Console.WriteLine(unrelated.IsFaulted);
+            Console.WriteLine(!unrelated.IsCanceled);
+            CancellationToken unrelatedObserved = error.CancellationToken;
+            Console.WriteLine(unrelatedObserved.CanBeCanceled);
+        }
+
+        CancellationTokenSource gcSource = new CancellationTokenSource();
+        CancellationToken gcToken = gcSource.Token;
+        gcSource.Cancel();
+        Task gcTask = Task.Run(() => Interlocked.Increment(ref state.Executed), gcToken);
+        gcSource = null;
+        gcToken = default;
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(gcTask.IsCanceled);
+        CancellationToken retained = gcTask.CancellationToken;
+        Console.WriteLine(retained.CanBeCanceled);
+        Console.WriteLine(retained.IsCancellationRequested);
+        Console.WriteLine(WaitCanceled(gcTask));
+
+        CancellationTokenSource completedSource = new CancellationTokenSource();
+        CancellationToken completedToken = completedSource.Token;
+        Task completed = Task.Run(() => Interlocked.Increment(ref state.Executed), completedToken);
+        completed.Wait();
+        completedSource.Cancel();
+        Console.WriteLine(completed.Status == TaskStatus.Completed);
+        Console.WriteLine(!completed.IsCanceled);
+        Console.WriteLine(state.Executed == 2);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

@@ -1,0 +1,10 @@
+public interface I225Diag
+{
+    ref readonly int View { get; }
+}
+public sealed class C225Diag : I225Diag
+{
+    public int Value;
+    public ref int View { get { return ref Value; } }
+}
+public static class Program { public static void Main() { C225Diag value = new C225Diag(); Console.WriteLine(value.Value == 0); } }

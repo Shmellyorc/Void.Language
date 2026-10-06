@@ -1,0 +1,4 @@
+using Void;
+public interface IValue { static int Value { get; } }
+public sealed class Good : IValue { public static int Value => 3; }
+public static class Program { public static void Main() { Console.WriteLine(IValue.Value); } }

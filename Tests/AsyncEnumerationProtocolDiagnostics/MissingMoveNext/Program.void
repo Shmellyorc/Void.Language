@@ -1,0 +1,15 @@
+using Void.Collections;
+using Void.Threading.Tasks;
+
+public sealed class Bad215 : IAsyncEnumerator<int>
+{
+    public int Current => 1;
+    public Task DisposeAsync()
+    {
+        TaskCompletionSource done = new TaskCompletionSource();
+        done.SetResult();
+        return done.Task;
+    }
+}
+
+public static class Program { public static void Main() {} }

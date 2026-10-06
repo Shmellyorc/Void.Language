@@ -1,0 +1,12 @@
+public class Box
+{
+    public int get_Item(int index) { return 1; }
+}
+public static class Program
+{
+    public static void Main()
+    {
+        Box box = new Box();
+        box[0] += 1;
+    }
+}

@@ -1,0 +1,11 @@
+using Void.Collections;
+public static class Program
+{
+    private static async IAsyncEnumerable<int> Bad()
+    {
+        int[] values = new int[1];
+        await foreach (var value in values)
+            yield return value;
+    }
+    public static void Main() { }
+}

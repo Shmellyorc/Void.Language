@@ -1,0 +1,1 @@
+public struct Bad241 { public int[] Values; } public static class Program { private static T Keep<T>(T value) where T : unmanaged => value; public static void Main() { Keep(new Bad241()); } }

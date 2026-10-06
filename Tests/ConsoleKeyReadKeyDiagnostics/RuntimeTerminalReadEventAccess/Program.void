@@ -1,0 +1,10 @@
+using Void;
+
+public static class Program
+{
+    public static void Main()
+    {
+        int[] data = new int[3];
+        Console.WriteLine(Runtime.TerminalReadEvent(data));
+    }
+}

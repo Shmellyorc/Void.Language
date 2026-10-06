@@ -1,0 +1,287 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public delegate Task<int> AuditHandler280(int value);
+
+public sealed class Payload280
+{
+    public int Value;
+
+    public Payload280(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class WorkerIntAwaiter280
+{
+    private int _value;
+
+    public WorkerIntAwaiter280(int value)
+    {
+        _value = value;
+    }
+
+    public bool IsCompleted => false;
+
+    public void OnCompleted(Action continuation)
+    {
+        ThreadPool.QueueUserWorkItem(continuation);
+    }
+
+    public int GetResult()
+    {
+        return _value;
+    }
+}
+
+public struct WorkerIntAwaitable280
+{
+    private int _value;
+
+    public WorkerIntAwaitable280(int value)
+    {
+        _value = value;
+    }
+
+    public WorkerIntAwaiter280 GetAwaiter()
+    {
+        return new WorkerIntAwaiter280(_value);
+    }
+}
+
+public sealed class GateResource280
+{
+    public static int DisposeCount;
+    private Task _gate;
+
+    public GateResource280(Task gate)
+    {
+        _gate = gate;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _gate;
+        DisposeCount++;
+    }
+}
+
+public sealed class FaultResource280
+{
+    public async Task DisposeAsync()
+    {
+        await Task.Yield();
+        throw new Exception("dispose 280");
+    }
+}
+
+public sealed class AuditHub280
+{
+    public event AuditHandler280 Changed;
+
+    public Task<int> Raise(int value)
+    {
+        return Changed(value);
+    }
+}
+
+public static class Program
+{
+    private static bool WaitCompleted(Task task)
+    {
+        int elapsed = 0;
+        while (!task.IsCompleted && elapsed < 5000)
+        {
+            Thread.Sleep(1);
+            elapsed++;
+        }
+        return task.IsCompleted;
+    }
+
+    private static Func<Task<T>> CaptureGeneric<T>(T value)
+    {
+        return async () =>
+        {
+            await Task.Yield();
+            return value;
+        };
+    }
+
+    private static async Task<int> ResourceReturn(Task gate, int value)
+    {
+        await using var resource = new GateResource280(gate);
+        int custom = await new WorkerIntAwaitable280(value);
+        return custom + 1;
+    }
+
+    private static async Task FaultDuringDispose()
+    {
+        await using var resource = new FaultResource280();
+        await Task.Yield();
+        throw new Exception("body 280");
+    }
+
+    private static async Task<int> AwaitAll(Task<int> first, Task<int> second)
+    {
+        int[] results = await Task.WhenAll(first, second);
+        return results[0] * 10 + results[1];
+    }
+
+    private static async Task<int> AwaitWinner(Task<int> first, Task<int> second)
+    {
+        Task<int> winner = await Task.WhenAny(first, second);
+        return await winner;
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(Task.CompletedTask.IsCompleted);
+        Console.WriteLine(Task.FromResult<int>(280).Result == 280);
+
+        int captured = 39;
+        Func<Task<int>> capturedWork = async () =>
+        {
+            await Task.Yield();
+            captured += 3;
+            return captured;
+        };
+        captured = 40;
+        Console.WriteLine(capturedWork().Result == 43);
+        Console.WriteLine(captured == 43);
+
+        Payload280 payload = new Payload280(44);
+        Func<Task<Payload280>> genericCapture = CaptureGeneric<Payload280>(payload);
+        payload = null;
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(genericCapture().Result.Value == 44);
+
+        Func<ValueTask<int>> valueTaskLambda = async () =>
+        {
+            int custom = await new WorkerIntAwaitable280(20);
+            int inlineValue = await new ValueTask<int>(22);
+            return custom + inlineValue;
+        };
+        Console.WriteLine(valueTaskLambda().GetAwaiter().GetResult() == 42);
+
+        int eventCalls = 0;
+        AuditHub280 hub = new AuditHub280();
+        hub.Changed += async value =>
+        {
+            eventCalls++;
+            await Task.Yield();
+            return value + 1;
+        };
+        hub.Changed += async value =>
+        {
+            eventCalls++;
+            await Task.Yield();
+            return value + 2;
+        };
+        Console.WriteLine(hub.Raise(40).Result == 42);
+        Console.WriteLine(eventCalls == 2);
+
+        TaskCompletionSource<int> runGate = new TaskCompletionSource<int>();
+        Task<int> unwrapped = Task.Run<int>(async () =>
+        {
+            int value = await runGate.Task;
+            await Task.Yield();
+            return value + 1;
+        });
+        Console.WriteLine(!unwrapped.IsCompleted);
+        runGate.SetResult(41);
+        Console.WriteLine(WaitCompleted(unwrapped));
+        Console.WriteLine(unwrapped.Result == 42);
+
+        TaskCompletionSource<int> allFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> allSecond = new TaskCompletionSource<int>();
+        Task<int[]> all = Task.WhenAll(allFirst.Task, allSecond.Task);
+        Console.WriteLine(!all.IsCompleted);
+        allSecond.SetResult(2);
+        Console.WriteLine(!all.IsCompleted);
+        allFirst.SetResult(4);
+        Console.WriteLine(WaitCompleted(all));
+        Console.WriteLine(all.Result[0] == 4 && all.Result[1] == 2);
+
+        TaskCompletionSource<int> awaitAllFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> awaitAllSecond = new TaskCompletionSource<int>();
+        Task<int> awaitedAll = AwaitAll(awaitAllFirst.Task, awaitAllSecond.Task);
+        awaitAllSecond.SetResult(2);
+        awaitAllFirst.SetResult(4);
+        Console.WriteLine(WaitCompleted(awaitedAll) && awaitedAll.Result == 42);
+
+        TaskCompletionSource<int> anyFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> anySecond = new TaskCompletionSource<int>();
+        Task<Task<int>> any = Task.WhenAny(anyFirst.Task, anySecond.Task);
+        Console.WriteLine(!any.IsCompleted);
+        anySecond.SetResult(42);
+        Console.WriteLine(WaitCompleted(any));
+        Console.WriteLine(any.Result == anySecond.Task && any.Result.Result == 42);
+        anyFirst.SetResult(41);
+
+        TaskCompletionSource<int> awaitAnyFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> awaitAnySecond = new TaskCompletionSource<int>();
+        Task<int> awaitedWinner = AwaitWinner(awaitAnyFirst.Task, awaitAnySecond.Task);
+        awaitAnySecond.SetResult(42);
+        Console.WriteLine(WaitCompleted(awaitedWinner) && awaitedWinner.Result == 42);
+        awaitAnyFirst.SetResult(41);
+
+        Task faultCandidate = Task.FromException(new Exception("winner 280"));
+        Task<Task> faultWinner = Task.WhenAny(faultCandidate, Task.CompletedTask);
+        Console.WriteLine(faultWinner.IsCompleted && faultWinner.Status == TaskStatus.Completed);
+        Console.WriteLine(faultWinner.Result == faultCandidate && faultWinner.Result.IsFaulted);
+
+        CancellationTokenSource cancellation = new CancellationTokenSource();
+        CancellationToken token = cancellation.Token;
+        cancellation.Cancel();
+        Task canceled = Task.FromCanceled(token);
+        Task<Task> canceledWinner = Task.WhenAny(canceled, Task.CompletedTask);
+        Console.WriteLine(canceledWinner.Status == TaskStatus.Completed);
+        Console.WriteLine(canceledWinner.Result.IsCanceled && canceledWinner.Result.CancellationToken.IsSameSource(token));
+
+        GateResource280.DisposeCount = 0;
+        TaskCompletionSource disposeGate = new TaskCompletionSource();
+        Task<int> resourceTask = ResourceReturn(disposeGate.Task, 41);
+        Thread.Sleep(5);
+        Console.WriteLine(!resourceTask.IsCompleted);
+        Console.WriteLine(GateResource280.DisposeCount == 0);
+        disposeGate.SetResult();
+        Console.WriteLine(WaitCompleted(resourceTask) && resourceTask.Result == 42);
+        Console.WriteLine(GateResource280.DisposeCount == 1);
+
+        bool disposeWon = false;
+        try
+        {
+            FaultDuringDispose().Wait();
+        }
+        catch (Exception error)
+        {
+            disposeWon = Runtime.Equals(error.Message, "dispose 280");
+        }
+        Console.WriteLine(disposeWon);
+
+        Task<int> integratedA = Task.Run<int>(async () =>
+        {
+            await using var resource = new GateResource280(Task.CompletedTask);
+            int value = await new WorkerIntAwaitable280(20);
+            return value + 1;
+        });
+        Task<int> integratedB = Task.Run<int>(async () =>
+        {
+            int value = await new ValueTask<int>(21);
+            return value;
+        });
+        Task<int[]> integratedAll = Task.WhenAll(integratedA, integratedB);
+        Console.WriteLine(WaitCompleted(integratedAll));
+        Console.WriteLine(integratedAll.Result[0] == 21 && integratedAll.Result[1] == 21);
+
+        Task<Task<int>> integratedAny = Task.WhenAny(integratedA, integratedB);
+        Console.WriteLine(integratedAny.IsCompleted);
+        Console.WriteLine(integratedAny.Result == integratedA || integratedAny.Result == integratedB);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

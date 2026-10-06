@@ -1,0 +1,205 @@
+using Void;
+using Void.Threading;
+
+public sealed class CallbackError : Exception
+{
+    public CallbackError(string message) : base(message)
+    {
+    }
+}
+
+public sealed class CapturedValue
+{
+    public int Value;
+
+    public CapturedValue(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class CallbackResult
+{
+    public int Value;
+}
+
+public sealed class RaceState
+{
+    public CancellationToken Token;
+    public int Calls;
+
+    public RaceState(CancellationToken token)
+    {
+        Token = token;
+        Calls = 0;
+    }
+}
+
+public static class Program
+{
+    private static int _ordered;
+    private static int _wakeObserved;
+
+    private static void RegisterWorker(RaceState state)
+    {
+        CancellationToken token = state.Token;
+        token.Register(() => Interlocked.Increment(ref state.Calls));
+    }
+
+    private static Action MakeRootedCallback(CapturedValue value, CallbackResult result)
+    {
+        return () => result.Value = value.Value;
+    }
+
+    private static void WakeWorker(ManualResetEvent ready, ManualResetEvent wake)
+    {
+        ready.Set();
+        wake.WaitOne();
+        Interlocked.Exchange(ref _wakeObserved, 1);
+    }
+
+    public static void Main()
+    {
+        CancellationToken none = CancellationToken.None;
+        int noneCalls = 0;
+        CancellationTokenRegistration noneRegistration = none.Register(() => noneCalls++);
+        Console.WriteLine(noneCalls == 0);
+        noneRegistration.Dispose();
+        Console.WriteLine(noneCalls == 0);
+
+        CancellationTokenSource source = new CancellationTokenSource();
+        CancellationToken token = source.Token;
+        int calls = 0;
+        CancellationTokenRegistration registration = token.Register(() => calls++);
+        Console.WriteLine(calls == 0);
+        source.Cancel();
+        Console.WriteLine(calls == 1);
+        Console.WriteLine(token.IsCancellationRequested);
+        source.Cancel();
+        Console.WriteLine(calls == 1);
+        registration.Dispose();
+        Console.WriteLine(calls == 1);
+
+        CancellationTokenSource disposedSource = new CancellationTokenSource();
+        CancellationToken disposedToken = disposedSource.Token;
+        int disposedCalls = 0;
+        CancellationTokenRegistration disposed = disposedToken.Register(() => disposedCalls++);
+        disposed.Dispose();
+        disposed.Dispose();
+        disposedSource.Cancel();
+        Console.WriteLine(disposedCalls == 0);
+
+        CancellationTokenSource afterSource = new CancellationTokenSource();
+        CancellationToken afterToken = afterSource.Token;
+        afterSource.Cancel();
+        int afterCalls = 0;
+        CancellationTokenRegistration after = afterToken.Register(() => afterCalls++);
+        Console.WriteLine(afterCalls == 1);
+        after.Dispose();
+        Console.WriteLine(afterCalls == 1);
+
+        CancellationTokenSource orderSource = new CancellationTokenSource();
+        CancellationToken orderToken = orderSource.Token;
+        _ordered = 0;
+        orderToken.Register(() => _ordered = _ordered * 10 + 1);
+        orderToken.Register(() => _ordered = _ordered * 10 + 2);
+        orderToken.Register(() => _ordered = _ordered * 10 + 3);
+        orderSource.Cancel();
+        Console.WriteLine(_ordered == 321);
+
+        CancellationTokenSource rootSource = new CancellationTokenSource();
+        CancellationToken rootToken = rootSource.Token;
+        CallbackResult rootResult = new CallbackResult();
+        CapturedValue captured = new CapturedValue(77);
+        Action rootedCallback = MakeRootedCallback(captured, rootResult);
+        rootToken.Register(rootedCallback);
+        rootedCallback = null;
+        captured = null;
+        GC.Collect();
+        rootSource.Cancel();
+        Console.WriteLine(rootResult.Value == 77);
+
+        CancellationTokenSource exceptionSource = new CancellationTokenSource();
+        CancellationToken exceptionToken = exceptionSource.Token;
+        int exceptionCalls = 0;
+        exceptionToken.Register(() => exceptionCalls += 1);
+        exceptionToken.Register(() =>
+        {
+            exceptionCalls += 10;
+            throw new CallbackError("callback failure");
+        });
+        exceptionToken.Register(() => exceptionCalls += 100);
+        bool sawCallbackError = false;
+        try
+        {
+            exceptionSource.Cancel();
+        }
+        catch (CallbackError error)
+        {
+            sawCallbackError = Runtime.Equals(error.Message, "callback failure");
+        }
+        Console.WriteLine(sawCallbackError);
+        Console.WriteLine(exceptionCalls == 111);
+        Console.WriteLine(exceptionSource.IsCancellationRequested);
+        exceptionSource.Cancel();
+        Console.WriteLine(exceptionCalls == 111);
+
+        CancellationTokenSource wakeSource = new CancellationTokenSource();
+        CancellationToken wakeToken = wakeSource.Token;
+        ManualResetEvent ready = new ManualResetEvent(false);
+        ManualResetEvent wake = new ManualResetEvent(false);
+        _wakeObserved = 0;
+        CancellationTokenRegistration wakeRegistration = wakeToken.Register(() => wake.Set());
+        Thread wakeThread = new Thread(() => WakeWorker(ready, wake));
+        wakeThread.Start();
+        Console.WriteLine(ready.WaitOne(1000));
+        wakeSource.Cancel();
+        wakeThread.Join();
+        Console.WriteLine(Volatile.Read(ref _wakeObserved) == 1);
+        wakeRegistration.Dispose();
+
+        CancellationTokenSource raceSource = new CancellationTokenSource();
+        CancellationToken raceToken = raceSource.Token;
+        RaceState race = new RaceState(raceToken);
+        Thread r1 = new Thread(() => RegisterWorker(race));
+        Thread r2 = new Thread(() => RegisterWorker(race));
+        Thread r3 = new Thread(() => RegisterWorker(race));
+        Thread cancel = new Thread(() => raceSource.Cancel());
+        r1.Start();
+        r2.Start();
+        cancel.Start();
+        r3.Start();
+        r1.Join();
+        r2.Join();
+        r3.Join();
+        cancel.Join();
+        Console.WriteLine(raceSource.IsCancellationRequested);
+        Console.WriteLine(Volatile.Read(ref race.Calls) == 3);
+
+        CancellationTokenSource disposeRaceSource = new CancellationTokenSource();
+        CancellationToken disposeRaceToken = disposeRaceSource.Token;
+        int disposeRaceCalls = 0;
+        CancellationTokenRegistration disposeRace = disposeRaceToken.Register(() => Interlocked.Increment(ref disposeRaceCalls));
+        Thread disposeThread = new Thread(() => disposeRace.Dispose());
+        Thread cancelThread = new Thread(() => disposeRaceSource.Cancel());
+        disposeThread.Start();
+        cancelThread.Start();
+        disposeThread.Join();
+        cancelThread.Join();
+        Console.WriteLine(disposeRaceSource.IsCancellationRequested);
+        int raceCount = Volatile.Read(ref disposeRaceCalls);
+        Console.WriteLine(raceCount == 0 || raceCount == 1);
+        disposeRaceSource.Cancel();
+        Console.WriteLine(Volatile.Read(ref disposeRaceCalls) == raceCount);
+
+        CancellationTokenSource copiedSource = new CancellationTokenSource();
+        CancellationToken copiedToken = copiedSource.Token;
+        int copiedCalls = 0;
+        CancellationTokenRegistration original = copiedToken.Register(() => copiedCalls++);
+        CancellationTokenRegistration copied = original;
+        copied.Dispose();
+        original.Dispose();
+        copiedSource.Cancel();
+        Console.WriteLine(copiedCalls == 0);
+    }
+}

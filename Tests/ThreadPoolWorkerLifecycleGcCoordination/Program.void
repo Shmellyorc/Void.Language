@@ -1,0 +1,126 @@
+using Void;
+using Void.Threading;
+
+public sealed class WorkerPayload
+{
+    public int Value;
+
+    public WorkerPayload(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class LifecycleState
+{
+    public int ActiveReady;
+    public int ActiveDone;
+    public int ActiveSum;
+    public int IdleReuseDone;
+    public int QueuedValue;
+    public ManualResetEvent ActiveReadyEvent;
+    public ManualResetEvent ActiveRelease;
+    public ManualResetEvent ActiveDoneEvent;
+    public ManualResetEvent IdleReuseDoneEvent;
+    public ManualResetEvent QueuedDone;
+
+    public LifecycleState()
+    {
+        ActiveReady = 0;
+        ActiveDone = 0;
+        ActiveSum = 0;
+        IdleReuseDone = 0;
+        QueuedValue = 0;
+        ActiveReadyEvent = new ManualResetEvent(false);
+        ActiveRelease = new ManualResetEvent(false);
+        ActiveDoneEvent = new ManualResetEvent(false);
+        IdleReuseDoneEvent = new ManualResetEvent(false);
+        QueuedDone = new ManualResetEvent(false);
+    }
+}
+
+public static class Program
+{
+    public static Action MakeActiveWorker(LifecycleState state, int value)
+    {
+        return () =>
+        {
+            WorkerPayload payload = new WorkerPayload(value);
+            int ready = Interlocked.Increment(ref state.ActiveReady);
+            if (ready == 2)
+                state.ActiveReadyEvent.Set();
+
+            state.ActiveRelease.WaitOne();
+
+            Interlocked.Add(ref state.ActiveSum, payload.Value);
+            int done = Interlocked.Increment(ref state.ActiveDone);
+            if (done == 2)
+                state.ActiveDoneEvent.Set();
+        };
+    }
+
+    public static Action MakeQueuedWork(LifecycleState state, WorkerPayload payload)
+    {
+        return () =>
+        {
+            state.QueuedValue = payload.Value;
+            state.QueuedDone.Set();
+        };
+    }
+
+    public static Action MakeIdleReuseWork(LifecycleState state)
+    {
+        return () =>
+        {
+            int done = Interlocked.Increment(ref state.IdleReuseDone);
+            if (done == 2)
+                state.IdleReuseDoneEvent.Set();
+        };
+    }
+
+    public static void Main()
+    {
+        LifecycleState state = new LifecycleState();
+
+        Action first = MakeActiveWorker(state, 192);
+        Action second = MakeActiveWorker(state, 193);
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(first));
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(second));
+        first = null;
+        second = null;
+
+        Console.WriteLine(state.ActiveReadyEvent.WaitOne(5000));
+        Console.WriteLine(state.ActiveReady == 2);
+
+        WorkerPayload queuedPayload = new WorkerPayload(384);
+        Action queued = MakeQueuedWork(state, queuedPayload);
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(queued));
+        queuedPayload = null;
+        queued = null;
+
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(!state.QueuedDone.WaitOne(0));
+
+        state.ActiveRelease.Set();
+        Console.WriteLine(state.ActiveDoneEvent.WaitOne(5000));
+        Console.WriteLine(state.ActiveDone == 2);
+        Console.WriteLine(state.ActiveSum == 385);
+        Console.WriteLine(state.QueuedDone.WaitOne(5000));
+        Console.WriteLine(state.QueuedValue == 384);
+
+        GC.Collect();
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(true);
+
+        Action reuseFirst = MakeIdleReuseWork(state);
+        Action reuseSecond = MakeIdleReuseWork(state);
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(reuseFirst));
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(reuseSecond));
+        reuseFirst = null;
+        reuseSecond = null;
+        Console.WriteLine(state.IdleReuseDoneEvent.WaitOne(5000));
+        Console.WriteLine(state.IdleReuseDone == 2);
+    }
+}

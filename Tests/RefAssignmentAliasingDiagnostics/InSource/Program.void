@@ -1,0 +1,1 @@
+public static class Program { public static void Bad(in int value) { int local = 1; ref int alias = ref local; alias = ref value; } public static void Main() { int value = 2; Bad(in value); } }

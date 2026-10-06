@@ -1,0 +1,96 @@
+using Void;
+
+public static class Program
+{
+    public static void Increment(ref int value)
+    {
+        value += 1;
+    }
+
+    public static void Double(ref int value)
+    {
+        value *= 2;
+    }
+
+    public static void Main()
+    {
+        Actor actor = new Actor();
+        Console.WriteLine(actor.Id == 110);
+        Console.WriteLine(actor.Score == 10);
+        Console.WriteLine(actor.Bonus == 3);
+
+        Entity entity = actor;
+        Console.WriteLine(entity.Score == 10);
+
+        IAdvancedActor advanced = actor;
+        IActor inherited = advanced;
+        Console.WriteLine(inherited.Score == 10);
+        Console.WriteLine(advanced.Bonus == 3);
+
+        Listener two = new Listener(2);
+        Listener three = new Listener(3);
+        inherited.Changed += two.Handle;
+        Actor.GlobalChanged += three.Handle;
+
+        Recorder.Reset();
+        Console.WriteLine(inherited.Apply(5) == 15);
+        Console.WriteLine(entity.Score == 15);
+        Console.WriteLine(Recorder.Value == 1293);
+
+        inherited.Changed -= two.Handle;
+        Actor.GlobalChanged -= three.Handle;
+        two = null;
+        three = null;
+        GC.Collect();
+
+        Recorder.Reset();
+        Console.WriteLine(actor.Apply(1) == 16);
+        Console.WriteLine(Recorder.Value == 19);
+
+        ScorePacket packet = new ScorePacket(40);
+        IScore selectedPacket = false ? actor : packet;
+        Console.WriteLine(selectedPacket.Score == 40);
+        GC.Collect();
+        Console.WriteLine(selectedPacket.Score == 40);
+
+        IScore selectedActor = true ? actor : packet;
+        Console.WriteLine(selectedActor.Score == 16);
+        Console.WriteLine(selectedActor is IActor);
+
+        RefAdjust incrementA = Increment;
+        RefAdjust incrementB = Increment;
+        Console.WriteLine(incrementA == incrementB);
+
+        RefAdjust adjust = actor.Bonus > 0 ? Increment : Double;
+        int adjusted = 6;
+        adjust(ref adjusted);
+        Console.WriteLine(adjusted == 7);
+
+        RefAdjust chainA = Increment;
+        chainA += Double;
+        RefAdjust chainB = Increment;
+        chainB += Double;
+        Console.WriteLine(chainA == chainB);
+        chainB -= Double;
+        Console.WriteLine(chainA != chainB);
+
+        Modifier modifier = new Modifier(5);
+        Func<int, int> captured = modifier.Add;
+        Console.WriteLine(captured(2) == 7);
+        Console.WriteLine(captured(3) == 10);
+        Console.WriteLine(modifier.Value == 5);
+
+        Func<int, int> chosen = true ? modifier.Add : value => value * 10;
+        Console.WriteLine(chosen(4) == 9);
+        Console.WriteLine(modifier.Value == 5);
+
+        IActor conditionalActor = actor.Score > 0 ? actor : null;
+        Console.WriteLine(conditionalActor != null);
+        Console.WriteLine(conditionalActor.Score == 16);
+
+        Actor second = new Actor(20, 4);
+        Console.WriteLine(second.Id == 120);
+        Console.WriteLine(second.Score == 20);
+        Console.WriteLine(second.Bonus == 4);
+    }
+}

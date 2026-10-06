@@ -1,0 +1,317 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class AuditPayload290
+{
+    public int Value;
+    public AuditPayload290(int value) { Value = value; }
+}
+
+public sealed class AuditIntAwaiter290
+{
+    private int _value;
+    public AuditIntAwaiter290(int value) { _value = value; }
+    public bool IsCompleted => false;
+    public void OnCompleted(Action continuation) { ThreadPool.QueueUserWorkItem(continuation); }
+    public int GetResult() { return _value; }
+}
+
+public struct AuditIntAwaitable290
+{
+    private int _value;
+    public AuditIntAwaitable290(int value) { _value = value; }
+    public AuditIntAwaiter290 GetAwaiter() { return new AuditIntAwaiter290(_value); }
+}
+
+public sealed class AuditResource290
+{
+    public static int DisposeCount;
+
+    public async ValueTask DisposeAsync()
+    {
+        await Task.Delay(5);
+        DisposeCount++;
+    }
+}
+
+public static class Program
+{
+    private static int FinallyCount;
+    private static int IteratorCleanupCount;
+
+    private static bool WaitCanceled(Task task, CancellationToken token)
+    {
+        try
+        {
+            task.Wait();
+            return false;
+        }
+        catch (OperationCanceledException error)
+        {
+            return error.CancellationToken.IsSameSource(token);
+        }
+    }
+
+    private static bool WaitTimedOut(Task task)
+    {
+        try
+        {
+            task.Wait();
+            return false;
+        }
+        catch (TimeoutException)
+        {
+            return true;
+        }
+    }
+
+    private static async Task<int> CaptureAfterDelay(AuditPayload290 payload)
+    {
+        await Task.Delay(10);
+        return payload.Value;
+    }
+
+    private static async ValueTask<int> MixedAwait(int value)
+    {
+        int custom = await new AuditIntAwaitable290(value);
+        await Task.Delay(5);
+        return custom + 1;
+    }
+
+    private static async Task<int> DisposeAndReturn(int value)
+    {
+        await using var resource = new AuditResource290();
+        await Task.Delay(5);
+        return value;
+    }
+
+    private static async Task FaultWithFinally()
+    {
+        try
+        {
+            await Task.Delay(5);
+            throw new Exception("audit-290");
+        }
+        finally
+        {
+            FinallyCount++;
+        }
+    }
+
+    private static async IAsyncEnumerable<int> TimedSequence(
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await Task.Delay(5, cancellationToken);
+            yield return 1;
+            await Task.Delay(Timeout.Infinite, cancellationToken);
+            yield return 2;
+        }
+        finally
+        {
+            Program.IteratorCleanupCount++;
+        }
+    }
+
+    public static void Main()
+    {
+        Task zero = Task.Delay(0);
+        Console.WriteLine(zero == Task.CompletedTask && zero.IsCompleted);
+
+        Task finite = Task.Delay(20);
+        Console.WriteLine(!finite.IsCompleted);
+        Console.WriteLine(finite.Wait(1000));
+
+        Task never = Task.Delay(Timeout.Infinite);
+        Console.WriteLine(!never.IsCompleted);
+
+        Task orderSlow = Task.Delay(60);
+        Task orderFast = Task.Delay(10);
+        Task orderMiddle = Task.Delay(30);
+        Task orderWinner = Task.WhenAny(orderSlow, orderFast, orderMiddle).Result;
+        Console.WriteLine(orderWinner == orderFast);
+        Console.WriteLine(Task.WhenAll(orderSlow, orderFast, orderMiddle).Wait(1000));
+
+        CancellationTokenSource reset = new CancellationTokenSource();
+        reset.CancelAfter(20);
+        reset.CancelAfter(90);
+        Thread.Sleep(45);
+        Console.WriteLine(!reset.IsCancellationRequested);
+        Thread.Sleep(80);
+        Console.WriteLine(reset.IsCancellationRequested);
+        reset.Dispose();
+
+        CancellationTokenSource disabled = new CancellationTokenSource();
+        disabled.CancelAfter(20);
+        disabled.CancelAfter(Timeout.Infinite);
+        Thread.Sleep(45);
+        Console.WriteLine(!disabled.IsCancellationRequested);
+        disabled.Cancel();
+        Console.WriteLine(disabled.IsCancellationRequested);
+        disabled.Dispose();
+
+        CancellationTokenSource parentA = new CancellationTokenSource();
+        CancellationTokenSource parentB = new CancellationTokenSource();
+        CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(parentA.Token, parentB.Token);
+        CancellationToken linkedToken = linked.Token;
+        Task linkedDelay = Task.Delay(Timeout.Infinite, linkedToken);
+        parentB.CancelAfter(15);
+        Console.WriteLine(WaitCanceled(linkedDelay, linkedToken));
+        Console.WriteLine(linked.IsCancellationRequested);
+        linked.Dispose();
+        parentA.Cancel();
+        Console.WriteLine(parentA.IsCancellationRequested);
+        parentA.Dispose();
+        parentB.Dispose();
+
+        TaskCompletionSource timeoutSource = new TaskCompletionSource();
+        Task timeoutProxy = timeoutSource.Task.WaitAsync(15);
+        Console.WriteLine(WaitTimedOut(timeoutProxy));
+        Console.WriteLine(!timeoutSource.Task.IsCompleted && timeoutProxy.IsFaulted);
+        timeoutSource.SetResult();
+        Console.WriteLine(timeoutSource.Task.IsCompleted && timeoutProxy.IsFaulted);
+
+        TaskCompletionSource cancelSource = new TaskCompletionSource();
+        CancellationTokenSource waiter = new CancellationTokenSource();
+        CancellationToken waiterToken = waiter.Token;
+        Task cancelProxy = cancelSource.Task.WaitAsync(500, waiterToken);
+        waiter.CancelAfter(15);
+        Console.WriteLine(WaitCanceled(cancelProxy, waiterToken));
+        Console.WriteLine(!cancelSource.Task.IsCompleted);
+        cancelSource.SetResult();
+        Console.WriteLine(cancelSource.Task.IsCompleted && cancelProxy.IsCanceled);
+        waiter.Dispose();
+
+        TaskCompletionSource<int> sourceWins = new TaskCompletionSource<int>();
+        CancellationTokenSource sourceWinsCts = new CancellationTokenSource();
+        Task<int> sourceWinsProxy = sourceWins.Task.WaitAsync(500, sourceWinsCts.Token);
+        sourceWins.SetResult(42);
+        Console.WriteLine(sourceWinsProxy.Result == 42);
+        sourceWinsCts.Cancel();
+        Console.WriteLine(sourceWinsProxy.Result == 42);
+        sourceWinsCts.Dispose();
+
+        CancellationTokenSource preCanceled = new CancellationTokenSource();
+        CancellationToken preToken = preCanceled.Token;
+        preCanceled.Cancel();
+        TaskCompletionSource preSource = new TaskCompletionSource();
+        Task preProxy = preSource.Task.WaitAsync(0, preToken);
+        Console.WriteLine(WaitCanceled(preProxy, preToken));
+        Console.WriteLine(!preSource.Task.IsCompleted);
+        preSource.SetResult();
+        preCanceled.Dispose();
+
+        TaskCompletionSource<int> faultSource = new TaskCompletionSource<int>();
+        Task<int> faultProxy = faultSource.Task.WaitAsync(500);
+        faultSource.SetException(new Exception("source-fault-290"));
+        bool sourceFault = false;
+        try
+        {
+            int ignored = faultProxy.Result;
+        }
+        catch (Exception error)
+        {
+            sourceFault = error.Message == "source-fault-290";
+        }
+        Console.WriteLine(sourceFault);
+
+        Task<int> run = Task.Run<int>(async () =>
+        {
+            await Task.Delay(10);
+            return 42;
+        });
+        Console.WriteLine(run.Result == 42);
+
+        Task<int> allSlow = Task.Run<int>(async () => { await Task.Delay(25); return 1; });
+        Task<int> allFast = Task.Run<int>(async () => { await Task.Delay(5); return 2; });
+        int[] all = Task.WhenAll(allSlow, allFast).Result;
+        Console.WriteLine(all[0] == 1 && all[1] == 2);
+
+        Task<int> anySlow = Task.Run<int>(async () => { await Task.Delay(40); return 1; });
+        Task<int> anyFast = Task.Run<int>(async () => { await Task.Delay(5); return 42; });
+        Task<int> anyWinner = Task.WhenAny(anySlow, anyFast).Result;
+        Console.WriteLine(anyWinner == anyFast && anyWinner.Result == 42);
+        Console.WriteLine(anySlow.Result == 1);
+
+        AuditPayload290 payload = new AuditPayload290(290);
+        Task<int> payloadTask = CaptureAfterDelay(payload);
+        payload = null;
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(payloadTask.Result == 290);
+
+        Console.WriteLine(MixedAwait(41).GetAwaiter().GetResult() == 42);
+
+        AuditResource290.DisposeCount = 0;
+        Task<int> disposed = DisposeAndReturn(42);
+        Console.WriteLine(disposed.Result == 42);
+        Console.WriteLine(AuditResource290.DisposeCount == 1);
+
+        FinallyCount = 0;
+        bool faultSeen = false;
+        try
+        {
+            FaultWithFinally().Wait();
+        }
+        catch (Exception error)
+        {
+            faultSeen = error.Message == "audit-290";
+        }
+        Console.WriteLine(faultSeen);
+        Console.WriteLine(FinallyCount == 1);
+
+        CancellationTokenSource iteratorParent = new CancellationTokenSource();
+        CancellationTokenSource iteratorDeadline = new CancellationTokenSource();
+        CancellationTokenSource iteratorLinked = CancellationTokenSource.CreateLinkedTokenSource(iteratorParent.Token, iteratorDeadline.Token);
+        IteratorCleanupCount = 0;
+        IAsyncEnumerator<int> iterator = TimedSequence().GetAsyncEnumerator(iteratorLinked.Token);
+        Console.WriteLine(iterator.MoveNextAsync().Result && iterator.Current == 1);
+        Task<bool> iteratorPending = iterator.MoveNextAsync();
+        Console.WriteLine(!iteratorPending.IsCompleted);
+        iteratorDeadline.CancelAfter(15);
+        Console.WriteLine(WaitCanceled(iteratorPending, iteratorLinked.Token));
+        Console.WriteLine(IteratorCleanupCount == 1);
+        iterator.DisposeAsync().Wait();
+        iteratorLinked.Dispose();
+        iteratorParent.Dispose();
+        iteratorDeadline.Dispose();
+
+        ManualResetEvent release = new ManualResetEvent(false);
+        ManualResetEvent startedA = new ManualResetEvent(false);
+        ManualResetEvent startedB = new ManualResetEvent(false);
+        ThreadPool.QueueUserWorkItem(() => { startedA.Set(); release.WaitOne(); });
+        ThreadPool.QueueUserWorkItem(() => { startedB.Set(); release.WaitOne(); });
+        Console.WriteLine(startedA.WaitOne(1000));
+        Console.WriteLine(startedB.WaitOne(1000));
+        Task queuedDelay = Task.Delay(15);
+        Thread.Sleep(50);
+        Console.WriteLine(!queuedDelay.IsCompleted);
+        release.Set();
+        Console.WriteLine(queuedDelay.Wait(1000));
+
+        ManualResetEvent waitRelease = new ManualResetEvent(false);
+        ManualResetEvent waitStartedA = new ManualResetEvent(false);
+        ManualResetEvent waitStartedB = new ManualResetEvent(false);
+        ThreadPool.QueueUserWorkItem(() => { waitStartedA.Set(); waitRelease.WaitOne(); });
+        ThreadPool.QueueUserWorkItem(() => { waitStartedB.Set(); waitRelease.WaitOne(); });
+        Console.WriteLine(waitStartedA.WaitOne(1000));
+        Console.WriteLine(waitStartedB.WaitOne(1000));
+        TaskCompletionSource queuedWaitSource = new TaskCompletionSource();
+        CancellationTokenSource queuedWaitCts = new CancellationTokenSource();
+        CancellationToken queuedWaitToken = queuedWaitCts.Token;
+        Task queuedWait = queuedWaitSource.Task.WaitAsync(15, queuedWaitToken);
+        Thread.Sleep(50);
+        queuedWaitCts.Cancel();
+        Console.WriteLine(queuedWait.IsCanceled && !queuedWait.IsFaulted);
+        waitRelease.Set();
+        Thread.Sleep(20);
+        Console.WriteLine(queuedWait.IsCanceled && !queuedWaitSource.Task.IsCompleted);
+        queuedWaitSource.SetResult();
+        queuedWaitCts.Dispose();
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

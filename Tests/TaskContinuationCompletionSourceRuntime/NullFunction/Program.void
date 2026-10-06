@@ -1,0 +1,12 @@
+using Void;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    public static void Main()
+    {
+        TaskCompletionSource source = new TaskCompletionSource();
+        Func<Task, int> continuation = null;
+        source.Task.ContinueWith<int>(continuation);
+    }
+}

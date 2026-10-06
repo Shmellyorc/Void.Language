@@ -1,0 +1,5 @@
+public abstract class Broken
+{
+    public abstract int Value { get { return 1; } }
+}
+public static class Program { public static void Main() { } }

@@ -1,0 +1,13 @@
+public static class Program
+{
+    public static void Bad(in int value)
+    {
+        ref int alias = ref value;
+    }
+
+    public static void Main()
+    {
+        int value = 1;
+        Bad(in value);
+    }
+}

@@ -1,0 +1,27 @@
+namespace Void.Collections;
+
+public interface IEqualityComparer<T>
+{
+    bool Equals(T x, T y);
+    int GetHashCode(T obj);
+}
+
+public abstract class EqualityComparer<T> : IEqualityComparer<T>
+{
+    public abstract bool Equals(T x, T y);
+    public abstract int GetHashCode(T obj);
+}
+
+private sealed class DefaultEqualityComparer<T> : EqualityComparer<T>
+{
+    public override bool Equals(T x, T y) { return Runtime.Equals(x, y); }
+    public override int GetHashCode(T obj) { return Runtime.Hash(obj); }
+}
+
+internal static class EqualityContracts
+{
+    internal static bool IsNull<T>(T value)
+    {
+        return typeof(T).IsReferenceType && Runtime.Equals(value, default(T));
+    }
+}

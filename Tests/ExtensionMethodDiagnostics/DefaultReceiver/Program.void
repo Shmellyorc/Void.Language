@@ -1,0 +1,5 @@
+public static class Extensions
+{
+    public static int Read(this int value = 3) { return value; }
+}
+public static class Program { public static void Main() { } }

@@ -1,0 +1,34 @@
+namespace Void.Threading;
+
+public sealed class Monitor
+{
+    public static void Enter(object value)
+    {
+        Runtime.MonitorEnter(value);
+    }
+
+    public static void Exit(object value)
+    {
+        Runtime.MonitorExit(value);
+    }
+
+    public static bool Wait(object value)
+    {
+        return Runtime.MonitorWait(value);
+    }
+
+    public static bool Wait(object value, int millisecondsTimeout)
+    {
+        return Runtime.MonitorWait(value, millisecondsTimeout);
+    }
+
+    public static void Pulse(object value)
+    {
+        Runtime.MonitorPulse(value);
+    }
+
+    public static void PulseAll(object value)
+    {
+        Runtime.MonitorPulseAll(value);
+    }
+}

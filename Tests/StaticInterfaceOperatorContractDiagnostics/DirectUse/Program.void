@@ -1,0 +1,14 @@
+public interface IAdd<T> { static T operator +(T left, T right); }
+public struct Number : IAdd<Number>
+{
+    public static Number operator +(Number left, Number right) { return left; }
+}
+public static class Program
+{
+    public static void Main()
+    {
+        IAdd<Number> left = new Number();
+        IAdd<Number> right = new Number();
+        IAdd<Number> result = left + right;
+    }
+}

@@ -1,0 +1,248 @@
+using Void;
+
+public sealed class SpanOwner229
+{
+    public int Value;
+    public int[] Values;
+
+    public SpanOwner229()
+    {
+        Value = 90;
+        Values = new int[] { 10, 20, 30, 40, 50 };
+    }
+
+    public Span<int> Middle
+    {
+        get { return new Span<int>(Values).Slice(1, 3); }
+    }
+}
+
+public static class Program
+{
+    private static int _countCalls;
+
+    public static int NextCount()
+    {
+        _countCalls += 1;
+        return 4;
+    }
+
+    public static int Sum(ReadOnlySpan<int> span)
+    {
+        int total = 0;
+        for (int i = 0; i < span.Length; i++)
+            total += span[i];
+        return total;
+    }
+
+    public static ReadOnlySpan<int> AsReadOnly(Span<int> span)
+    {
+        return span;
+    }
+
+    public static int[] MakeValues()
+    {
+        return new int[] { 7, 8, 9, 10 };
+    }
+
+    public static string[] MakeNames()
+    {
+        return new string[] { "alpha", "beta", "gamma" };
+    }
+
+    public static Span<int> FromRef(ref int value)
+    {
+        return new Span<int>(ref value, 1);
+    }
+
+    public static ReadOnlySpan<int> FromIn(in int value)
+    {
+        return new ReadOnlySpan<int>(in value, 1);
+    }
+
+    public static void Main()
+    {
+        int[] values = new int[] { 1, 2, 3, 4, 5, 6 };
+
+        Span<int> implicitSpan = values;
+        Console.WriteLine(implicitSpan.Length == 6);
+        Console.WriteLine(implicitSpan[0] == 1);
+        implicitSpan[1] = 22;
+        Console.WriteLine(values[1] == 22);
+
+        ReadOnlySpan<int> implicitReadOnly = values;
+        Console.WriteLine(implicitReadOnly.Length == 6);
+        Console.WriteLine(implicitReadOnly[1] == 22);
+
+        ReadOnlySpan<int> converted = implicitSpan;
+        Console.WriteLine(converted.Length == 6);
+        Console.WriteLine(converted[5] == 6);
+        Console.WriteLine(Sum(values) == 41);
+        Console.WriteLine(Sum(implicitSpan) == 41);
+        Console.WriteLine(Sum(converted) == 41);
+        ReadOnlySpan<int> asReadOnly = AsReadOnly(implicitSpan);
+        Console.WriteLine(asReadOnly[2] == 3);
+
+        Span<int> segment = new Span<int>(values, 1, 3);
+        Console.WriteLine(segment.Length == 3);
+        Console.WriteLine(segment[0] == 22);
+        Console.WriteLine(segment[2] == 4);
+        segment[1] = 33;
+        Console.WriteLine(values[2] == 33);
+
+        ReadOnlySpan<int> readOnlySegment = new ReadOnlySpan<int>(values, 2, 2);
+        Console.WriteLine(readOnlySegment.Length == 2);
+        Console.WriteLine(readOnlySegment[0] == 33);
+        Console.WriteLine(readOnlySegment[1] == 4);
+
+        Span<int> slice = implicitSpan.Slice(2, 3);
+        Console.WriteLine(slice.Length == 3);
+        Console.WriteLine(slice[0] == 33);
+        Console.WriteLine(slice[2] == 5);
+        slice[1] = 44;
+        Console.WriteLine(values[3] == 44);
+
+        Span<int> suffix = implicitSpan.Slice(4);
+        Console.WriteLine(suffix.Length == 2);
+        Console.WriteLine(suffix[0] == 5);
+        suffix[1] = 66;
+        Console.WriteLine(values[5] == 66);
+
+        Span<int> nested = implicitSpan.Slice(1, 4).Slice(1, 2);
+        Console.WriteLine(nested.Length == 2);
+        Console.WriteLine(nested[0] == 33);
+        nested[1] = 45;
+        Console.WriteLine(values[3] == 45);
+
+        ReadOnlySpan<int> readonlySlice = converted.Slice(1, 3);
+        Console.WriteLine(readonlySlice.Length == 3);
+        Console.WriteLine(readonlySlice[0] == 22);
+        Console.WriteLine(readonlySlice[2] == 45);
+        ReadOnlySpan<int> readonlySuffix = converted.Slice(5);
+        Console.WriteLine(readonlySuffix.Length == 1);
+        Console.WriteLine(readonlySuffix[0] == 66);
+
+        Span<int> emptySlice = implicitSpan.Slice(6, 0);
+        ReadOnlySpan<int> emptyReadonlySlice = converted.Slice(6, 0);
+        Console.WriteLine(emptySlice.IsEmpty);
+        Console.WriteLine(emptyReadonlySlice.IsEmpty);
+
+        int local = 70;
+        Span<int> direct = new Span<int>(ref local, 1);
+        Console.WriteLine(direct.Length == 1);
+        Console.WriteLine(direct[0] == 70);
+        direct[0] = 71;
+        Console.WriteLine(local == 71);
+        ref int directAlias = ref direct[0];
+        directAlias += 1;
+        Console.WriteLine(local == 72);
+        ReadOnlySpan<int> directReadOnly = new ReadOnlySpan<int>(in local, 1);
+        Console.WriteLine(directReadOnly[0] == 72);
+        Span<int> fromRef = FromRef(ref local);
+        ReadOnlySpan<int> fromIn = FromIn(in local);
+        Console.WriteLine(fromRef[0] == 72);
+        Console.WriteLine(fromIn[0] == 72);
+
+        int[] directArray = new int[] { 100, 101, 102, 103 };
+        ref int directArrayFirst = ref directArray[1];
+        Span<int> directArraySpan = new Span<int>(ref directArrayFirst, 3);
+        directArray = null;
+        GC.Collect();
+        Console.WriteLine(directArraySpan.Length == 3);
+        Console.WriteLine(directArraySpan[0] == 101);
+        Console.WriteLine(directArraySpan[2] == 103);
+        directArraySpan[1] = 202;
+        GC.Collect();
+        Console.WriteLine(directArraySpan[1] == 202);
+
+        SpanOwner229 owner = new SpanOwner229();
+        Span<int> fieldSpan = new Span<int>(ref owner.Value, 1);
+        owner = null;
+        GC.Collect();
+        Console.WriteLine(fieldSpan[0] == 90);
+        fieldSpan[0] = 91;
+        GC.Collect();
+        Console.WriteLine(fieldSpan[0] == 91);
+
+        SpanOwner229 propertyOwner = new SpanOwner229();
+        Span<int> propertySlice = propertyOwner.Middle;
+        propertyOwner = null;
+        GC.Collect();
+        Console.WriteLine(propertySlice.Length == 3);
+        Console.WriteLine(propertySlice[0] == 20);
+        propertySlice[2] = 77;
+        GC.Collect();
+        Console.WriteLine(propertySlice[2] == 77);
+
+        Span<string> names = MakeNames();
+        Span<string> nameSlice = names.Slice(1, 2);
+        names = default(Span<string>);
+        GC.Collect();
+        Console.WriteLine(nameSlice.Length == 2);
+        Console.WriteLine(Runtime.Equals(nameSlice[0], "beta"));
+        nameSlice[1] = "delta";
+        GC.Collect();
+        Console.WriteLine(Runtime.Equals(nameSlice[1], "delta"));
+
+        Span<int> temporary = MakeValues();
+        Span<int> temporarySlice = temporary.Slice(1, 2);
+        temporary = default(Span<int>);
+        GC.Collect();
+        Console.WriteLine(temporarySlice.Length == 2);
+        Console.WriteLine(temporarySlice[0] == 8);
+        temporarySlice[1] = 99;
+        GC.Collect();
+        Console.WriteLine(temporarySlice[1] == 99);
+
+        Span<int> stack = stackalloc int[4];
+        Console.WriteLine(stack.Length == 4);
+        stack[0] = 11;
+        stack[1] = 12;
+        stack[2] = 13;
+        stack[3] = 14;
+        Console.WriteLine(stack[0] == 11);
+        Console.WriteLine(stack[3] == 14);
+        stack[2] += 10;
+        Console.WriteLine(stack[2] == 23);
+        ref int stackAlias = ref stack[1];
+        stackAlias = 21;
+        Console.WriteLine(stack[1] == 21);
+
+        Span<int> stackSlice = stack.Slice(1, 2);
+        Console.WriteLine(stackSlice.Length == 2);
+        Console.WriteLine(stackSlice[0] == 21);
+        stackSlice[1] = 31;
+        Console.WriteLine(stack[2] == 31);
+        ReadOnlySpan<int> stackReadOnly = stackSlice;
+        Console.WriteLine(stackReadOnly[1] == 31);
+
+        _countCalls = 0;
+        Span<int> dynamicStack = stackalloc int[NextCount()];
+        Console.WriteLine(_countCalls == 1);
+        Console.WriteLine(dynamicStack.Length == 4);
+        dynamicStack[3] = 88;
+        Console.WriteLine(dynamicStack[3] == 88);
+
+        ReadOnlySpan<int> readonlyStack = stackalloc int[2];
+        Console.WriteLine(readonlyStack.Length == 2);
+        Console.WriteLine(readonlyStack.IsEmpty == false);
+
+        Span<int> zeroStack = stackalloc int[0];
+        ReadOnlySpan<int> zeroReadonlyStack = stackalloc int[0];
+        Console.WriteLine(zeroStack.IsEmpty);
+        Console.WriteLine(zeroReadonlyStack.IsEmpty);
+
+        int[] tempArray = MakeValues();
+        Span<int> tempConverted = tempArray;
+        tempArray = null;
+        GC.Collect();
+        Console.WriteLine(tempConverted[2] == 9);
+
+        Span<int> temporaryArrayConversion = MakeValues();
+        GC.Collect();
+        Console.WriteLine(temporaryArrayConversion[3] == 10);
+        ReadOnlySpan<int> temporaryReadonlyConversion = MakeValues();
+        GC.Collect();
+        Console.WriteLine(temporaryReadonlyConversion[0] == 7);
+    }
+}

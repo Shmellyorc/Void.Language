@@ -1,0 +1,282 @@
+using Void;
+
+public sealed class Node230
+{
+    public int Value;
+    public Node230(int value) { Value = value; }
+}
+
+public sealed class Owner230
+{
+    public int[] Values;
+    public Node230[] Nodes;
+    public int Scalar;
+
+    public Owner230()
+    {
+        Values = new int[] { 10, 20, 30, 40, 50 };
+        Nodes = new Node230[] { new Node230(60), new Node230(70) };
+        Scalar = 80;
+    }
+
+    public ref int Head { get { return ref Values[0]; } }
+    public ref readonly int Tail { get { return ref Values[Values.Length - 1]; } }
+    public ref int get_Item(int index) { return ref Values[index]; }
+    public ref int ScalarRef() { return ref Scalar; }
+    public Span<int> Middle { get { return new Span<int>(Values).Slice(1, 3); } }
+}
+
+
+public interface IRefSource230
+{
+    ref int Value { get; }
+}
+
+public class RefSource230 : IRefSource230
+{
+    public int Storage;
+
+    public RefSource230(int value)
+    {
+        Storage = value;
+    }
+
+    public virtual ref int Value { get { return ref Storage; } }
+}
+
+public sealed class DerivedRefSource230 : RefSource230
+{
+    public int Other;
+
+    public DerivedRefSource230(int value) : base(value)
+    {
+        Other = value + 1;
+    }
+
+    public override ref int Value { get { return ref Other; } }
+}
+
+public ref struct View230
+{
+    private Span<int> _span;
+
+    public View230(Span<int> span)
+    {
+        _span = span;
+    }
+
+    public int Length => _span.Length;
+    public ref int First { get { return ref _span[0]; } }
+    public Span<int> Slice(int start, int length) { return _span.Slice(start, length); }
+}
+
+public readonly ref struct ReadView230
+{
+    private readonly ReadOnlySpan<int> _span;
+
+    public ReadView230(ReadOnlySpan<int> span)
+    {
+        _span = span;
+    }
+
+    public int Length => _span.Length;
+    public ref readonly int First { get { return ref _span[0]; } }
+}
+
+public static class Program
+{
+    private static int[] MakeValues()
+    {
+        return new int[] { 3, 4, 5, 6 };
+    }
+
+    private static string[] MakeNames()
+    {
+        return new string[] { "zero", "one", "two", "three" };
+    }
+
+    private static Span<T> GenericWindow<T>(T[] values, int start, int length)
+    {
+        return new Span<T>(values).Slice(start, length);
+    }
+
+    private static T FirstValue<T>(ReadOnlySpan<T> values)
+    {
+        return values[0];
+    }
+
+    private static void CopyFirst<T>(Span<T> source, Span<T> destination)
+    {
+        destination[0] = source[0];
+    }
+
+    private static View230 MakeView(int[] values)
+    {
+        Span<int> span = values;
+        return new View230(span.Slice(1, 2));
+    }
+
+    private static ReadView230 MakeReadView(int[] values)
+    {
+        ReadOnlySpan<int> span = values;
+        return new ReadView230(span.Slice(2, 2));
+    }
+
+    private static void Bump(scoped Span<int> values)
+    {
+        values[0] += 1;
+        values[1] += 2;
+    }
+
+    private static int Read(in int value)
+    {
+        return value;
+    }
+
+    private static void Set(ref int value, int replacement)
+    {
+        value = replacement;
+    }
+
+    public static void Main()
+    {
+        Owner230 owner = new Owner230();
+        ref int head = ref owner.Head;
+        head = 11;
+        Console.WriteLine(owner.Values[0] == 11);
+
+        ref int indexed = ref owner[1];
+        indexed += 2;
+        Console.WriteLine(owner.Values[1] == 22);
+
+        ref int scalar = ref owner.ScalarRef();
+        Set(ref scalar, 81);
+        Console.WriteLine(owner.Scalar == 81);
+
+        ref readonly int tail = ref owner.Tail;
+        Console.WriteLine(tail == 50);
+        Console.WriteLine(Read(in tail) == 50);
+
+        Span<int> middle = owner.Middle;
+        Console.WriteLine(middle.Length == 3);
+        middle[1] = 33;
+        Console.WriteLine(owner.Values[2] == 33);
+
+        int local = 1;
+        ref int moving = ref local;
+        moving = ref middle[2];
+        middle = default(Span<int>);
+        owner = null;
+        GC.Collect();
+        moving = 55;
+        Console.WriteLine(moving == 55 && local == 1);
+
+        int[] viewValues = new int[] { 100, 101, 102, 103 };
+        View230 view = MakeView(viewValues);
+        viewValues = null;
+        GC.Collect();
+        Console.WriteLine(view.Length == 2);
+        Console.WriteLine(view.First == 101);
+        ref int viewFirst = ref view.First;
+        view = default(View230);
+        GC.Collect();
+        viewFirst = 111;
+        Console.WriteLine(viewFirst == 111);
+
+        int[] readValues = new int[] { 200, 201, 202, 203 };
+        ReadView230 readView = MakeReadView(readValues);
+        readValues = null;
+        GC.Collect();
+        Console.WriteLine(readView.Length == 2);
+        ref readonly int readFirst = ref readView.First;
+        Console.WriteLine(readFirst == 202);
+
+        Span<int> converted = MakeValues();
+        ReadOnlySpan<int> readonlyConverted = converted;
+        Console.WriteLine(converted.Length == 4);
+        Console.WriteLine(readonlyConverted[2] == 5);
+        converted[2] = 50;
+        Console.WriteLine(readonlyConverted[2] == 50);
+
+        Span<int> nested = converted.Slice(1, 3).Slice(1, 2);
+        converted = default(Span<int>);
+        readonlyConverted = default(ReadOnlySpan<int>);
+        GC.Collect();
+        Console.WriteLine(nested.Length == 2);
+        Console.WriteLine(nested[0] == 50);
+        nested[1] = 60;
+        Console.WriteLine(nested[1] == 60);
+
+        Span<string> names = GenericWindow<string>(MakeNames(), 1, 2);
+        GC.Collect();
+        Console.WriteLine(names.Length == 2);
+        Console.WriteLine(Runtime.Equals(names[0], "one"));
+        ReadOnlySpan<string> readonlyNames = names;
+        Console.WriteLine(Runtime.Equals(FirstValue<string>(readonlyNames), "one"));
+        names[1] = "changed";
+        GC.Collect();
+        Console.WriteLine(Runtime.Equals(readonlyNames[1], "changed"));
+
+        int directValue = 300;
+        Span<int> direct = new Span<int>(ref directValue, 1);
+        direct[0] += 1;
+        Console.WriteLine(directValue == 301);
+        ref int directAlias = ref direct[0];
+        directAlias += 1;
+        Console.WriteLine(directValue == 302);
+
+        Span<int> stack = stackalloc int[4];
+        stack[0] = 1;
+        stack[1] = 2;
+        stack[2] = 3;
+        stack[3] = 4;
+        Bump(stack);
+        Console.WriteLine(stack[0] == 2 && stack[1] == 4);
+        Span<int> stackSlice = stack.Slice(1, 2);
+        ReadOnlySpan<int> stackReadonly = stackSlice;
+        Console.WriteLine(stackReadonly[0] == 4 && stackReadonly[1] == 3);
+        ref int stackAlias = ref stackSlice[1];
+        stackAlias = 30;
+        Console.WriteLine(stack[2] == 30);
+
+        Span<int> destination = stackalloc int[2];
+        CopyFirst<int>(stackSlice, destination);
+        Console.WriteLine(destination[0] == 4);
+
+        int[] nodeBacking = new int[] { 7, 8, 9 };
+        Span<int> arraySpan = nodeBacking;
+        ref int arrayAlias = ref arraySpan[1];
+        arraySpan = default(Span<int>);
+        nodeBacking = null;
+        GC.Collect();
+        arrayAlias = 88;
+        Console.WriteLine(arrayAlias == 88);
+
+        RefSource230 refOwner = new DerivedRefSource230(500);
+        IRefSource230 refContract = refOwner;
+        Span<int> interfaceRefSpan = new Span<int>(ref refContract.Value, 1);
+        refOwner = null;
+        refContract = null;
+        GC.Collect();
+        Console.WriteLine(interfaceRefSpan[0] == 501);
+        interfaceRefSpan[0] = 502;
+        GC.Collect();
+        Console.WriteLine(interfaceRefSpan[0] == 502);
+
+        Span<int> temporaryRefSpan = new Span<int>(ref new Owner230().Head, 1);
+        GC.Collect();
+        Console.WriteLine(temporaryRefSpan[0] == 10);
+        temporaryRefSpan[0] = 12;
+        GC.Collect();
+        Console.WriteLine(temporaryRefSpan[0] == 12);
+
+        Node230[] nodes = new Node230[] { new Node230(400), new Node230(401) };
+        Span<Node230> nodeSpan = nodes;
+        nodes = null;
+        GC.Collect();
+        Console.WriteLine(nodeSpan[0].Value == 400);
+        nodeSpan[1] = new Node230(402);
+        GC.Collect();
+        Console.WriteLine(nodeSpan[1].Value == 402);
+    }
+}

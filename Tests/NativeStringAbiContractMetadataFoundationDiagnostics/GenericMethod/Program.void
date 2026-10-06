@@ -1,0 +1,2 @@
+using Void;
+public static class Native293 { [NativeString(NativeStringKind.BorrowedNul)] public static string Echo<T>(string text) { return text; } } public static class Program { public static void Main() { } }

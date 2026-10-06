@@ -1,0 +1,316 @@
+using Void.Collections;
+
+public sealed class Box
+{
+    public int Value;
+
+    public Box(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    private static bool CheckLessThan(int value, int limit, ref int calls)
+    {
+        calls++;
+        return value < limit;
+    }
+
+    private static int RunOnce()
+    {
+        int count = 0;
+        do
+        {
+            count++;
+        } while (false);
+        return count;
+    }
+
+    private static int CountToFive()
+    {
+        int count = 0;
+        do
+        {
+            count++;
+        } while (count < 5);
+        return count;
+    }
+
+    private static int ContinueChecksCondition()
+    {
+        int value = 0;
+        int calls = 0;
+        do
+        {
+            value++;
+            if (value < 3)
+                continue;
+        } while (CheckLessThan(value, 4, ref calls));
+        return value * 10 + calls;
+    }
+
+    private static int BreakSkipsCondition()
+    {
+        int calls = 0;
+        do
+        {
+            break;
+        } while (CheckLessThan(0, 1, ref calls));
+        return calls;
+    }
+
+    private static int SwitchControl()
+    {
+        int i = 0;
+        int total = 0;
+        do
+        {
+            i++;
+            switch (i)
+            {
+                case 1:
+                    total += 10;
+                    break;
+                case 2:
+                    total += 20;
+                    continue;
+                default:
+                    total += 100;
+                    break;
+            }
+            total += 1;
+        } while (i < 3);
+        return total;
+    }
+
+    private static int NestedLoops()
+    {
+        int outer = 0;
+        int total = 0;
+        do
+        {
+            outer++;
+            int inner = 0;
+            do
+            {
+                inner++;
+                if (inner == 2)
+                    continue;
+                total += outer * 10 + inner;
+                if (inner == 3)
+                    break;
+            } while (inner < 4);
+        } while (outer < 2);
+        return total;
+    }
+
+    private static int SingleStatement()
+    {
+        int i = 0;
+        do
+            i++;
+        while (i < 3);
+        return i;
+    }
+
+    private static int ReturnFromBody()
+    {
+        do
+        {
+            return 7;
+        } while (true);
+    }
+
+    private static T GenericLoop<T>(T value)
+    {
+        int count = 0;
+        do
+        {
+            count++;
+        } while (count < 2);
+        return value;
+    }
+
+    private static int ManagedLoop()
+    {
+        Box box = new Box(7);
+        int count = 0;
+        int total = 0;
+        do
+        {
+            GC.Collect();
+            total += box.Value;
+            count++;
+        } while (count < 3);
+        return total;
+    }
+
+    private static int LambdaLoop()
+    {
+        int seed = 2;
+        Func<int> run = () =>
+        {
+            int value = seed;
+            do
+            {
+                value++;
+            } while (value < 5);
+            return value;
+        };
+        return run();
+    }
+
+    private static int ContinueAssigned(bool flag)
+    {
+        int value;
+        do
+        {
+            value = 1;
+            if (flag)
+                continue;
+            value = 2;
+        } while (value < 0);
+        return value;
+    }
+
+    private static int BreakAssigned(bool flag)
+    {
+        int value;
+        do
+        {
+            value = 3;
+            if (flag)
+                break;
+            value = 4;
+        } while (false);
+        return value;
+    }
+
+    private static IEnumerator<int> IteratorValues()
+    {
+        int i = 0;
+        do
+        {
+            i++;
+            if (i == 2)
+                continue;
+            yield return i;
+            if (i == 3)
+                break;
+        } while (i < 5);
+        yield return 9;
+    }
+
+    private static IEnumerator<int> IteratorAssigned(bool flag)
+    {
+        int value;
+        do
+        {
+            value = 10;
+            if (flag)
+                continue;
+            value = 20;
+        } while (value < 0);
+        yield return value;
+    }
+
+    private static IEnumerator<int> IteratorSwitch()
+    {
+        int i = 0;
+        do
+        {
+            i++;
+            switch (i)
+            {
+                case 1:
+                    yield return 11;
+                    break;
+                case 2:
+                    continue;
+                default:
+                    yield return 33;
+                    break;
+            }
+        } while (i < 3);
+        yield return 44;
+    }
+
+    private static IEnumerator<int> IteratorNested()
+    {
+        int outer = 0;
+        do
+        {
+            outer++;
+            int inner = 0;
+            do
+            {
+                inner++;
+                yield return outer * 10 + inner;
+                if (inner == 2)
+                    break;
+            } while (inner < 3);
+        } while (outer < 2);
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(RunOnce() == 1);
+        Console.WriteLine(CountToFive() == 5);
+        Console.WriteLine(ContinueChecksCondition() == 44);
+        Console.WriteLine(BreakSkipsCondition() == 0);
+        Console.WriteLine(SwitchControl() == 132);
+        Console.WriteLine(NestedLoops() == 68);
+        Console.WriteLine(SingleStatement() == 3);
+        Console.WriteLine(ReturnFromBody() == 7);
+        Console.WriteLine(GenericLoop<int>(42) == 42);
+        Box genericBox = GenericLoop<Box>(new Box(55));
+        GC.Collect();
+        Console.WriteLine(genericBox.Value == 55);
+        Console.WriteLine(ManagedLoop() == 21);
+        Console.WriteLine(LambdaLoop() == 5);
+        Console.WriteLine(ContinueAssigned(true) == 1);
+        Console.WriteLine(ContinueAssigned(false) == 2);
+        Console.WriteLine(BreakAssigned(true) == 3);
+        Console.WriteLine(BreakAssigned(false) == 4);
+
+        IEnumerator<int> values = IteratorValues();
+        Console.WriteLine(values.MoveNext());
+        Console.WriteLine(values.Current == 1);
+        Console.WriteLine(values.MoveNext());
+        Console.WriteLine(values.Current == 3);
+        Console.WriteLine(values.MoveNext());
+        Console.WriteLine(values.Current == 9);
+        Console.WriteLine(!values.MoveNext());
+
+        IEnumerator<int> assignedTrue = IteratorAssigned(true);
+        Console.WriteLine(assignedTrue.MoveNext());
+        Console.WriteLine(assignedTrue.Current == 10);
+        Console.WriteLine(!assignedTrue.MoveNext());
+        IEnumerator<int> assignedFalse = IteratorAssigned(false);
+        Console.WriteLine(assignedFalse.MoveNext());
+        Console.WriteLine(assignedFalse.Current == 20);
+        Console.WriteLine(!assignedFalse.MoveNext());
+
+        IEnumerator<int> switched = IteratorSwitch();
+        Console.WriteLine(switched.MoveNext());
+        Console.WriteLine(switched.Current == 11);
+        Console.WriteLine(switched.MoveNext());
+        Console.WriteLine(switched.Current == 33);
+        Console.WriteLine(switched.MoveNext());
+        Console.WriteLine(switched.Current == 44);
+        Console.WriteLine(!switched.MoveNext());
+
+        IEnumerator<int> nested = IteratorNested();
+        Console.WriteLine(nested.MoveNext());
+        Console.WriteLine(nested.Current == 11);
+        Console.WriteLine(nested.MoveNext());
+        Console.WriteLine(nested.Current == 12);
+        Console.WriteLine(nested.MoveNext());
+        Console.WriteLine(nested.Current == 21);
+        Console.WriteLine(nested.MoveNext());
+        Console.WriteLine(nested.Current == 22);
+        Console.WriteLine(!nested.MoveNext());
+    }
+}

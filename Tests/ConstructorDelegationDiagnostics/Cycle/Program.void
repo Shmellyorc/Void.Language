@@ -1,0 +1,13 @@
+public sealed class Cycle
+{
+    public Cycle() : this(1) { }
+    public Cycle(int value) : this() { }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Cycle value = new Cycle();
+    }
+}

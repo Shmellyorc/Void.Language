@@ -1,0 +1,6 @@
+{
+  "format": 1,
+  "name": "SpanConversionSlicingStackallocCompletion",
+  "version": "0.0.229",
+  "output": "exe"
+}

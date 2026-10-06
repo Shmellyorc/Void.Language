@@ -1,0 +1,1 @@
+public ref struct R { public ref int V; public R(ref int v){ V = ref v; } } public static class Program { public static R Make(ref int v){ return new R(ref v); } public static R Bad(){ int x=1; return Make(ref x); } public static void Main(){ Bad(); } }

@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "OwnedNativeStringReturnsDiagnostics",
+  "output": "exe",
+  "version": "0.0.297",
+  "compiler": { "unsafe": true }
+}

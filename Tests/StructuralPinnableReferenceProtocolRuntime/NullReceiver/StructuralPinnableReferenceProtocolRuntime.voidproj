@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "name": "StructuralPinnableReferenceProtocolRuntime",
+  "output": "exe",
+  "version": "0.0.245",
+  "compiler": { "unsafe": true }
+}

@@ -1,0 +1,5 @@
+public static class Extensions
+{
+    public static int Count(this params int[] values) { return values.Length; }
+}
+public static class Program { public static void Main() { } }

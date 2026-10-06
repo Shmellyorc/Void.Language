@@ -1,0 +1,55 @@
+public sealed class ContextNode
+{
+    public int Value;
+
+    public ContextNode(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class ContextException : Exception
+{
+    public ContextException(string message) : base(message) { }
+}
+
+public static class ContextStatics
+{
+    public static ContextNode Node = new ContextNode(41);
+    public static int Count;
+
+    static ContextStatics()
+    {
+        Count++;
+    }
+}
+
+public static class Program
+{
+    private static void ThrowNow()
+    {
+        throw new ContextException("context");
+    }
+
+    public static void Main()
+    {
+        ContextNode local = new ContextNode(17);
+        GC.Collect();
+        Console.WriteLine(local.Value == 17);
+
+        try
+        {
+            ThrowNow();
+            Console.WriteLine(false);
+        }
+        catch (ContextException error)
+        {
+            GC.Collect();
+            Console.WriteLine(Runtime.Equals(error.Message, "context"));
+            Console.WriteLine(local.Value == 17);
+        }
+
+        Console.WriteLine(ContextStatics.Node.Value == 41);
+        Console.WriteLine(ContextStatics.Count == 1);
+    }
+}

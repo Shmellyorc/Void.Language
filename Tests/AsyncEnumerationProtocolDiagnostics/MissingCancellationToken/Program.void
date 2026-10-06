@@ -1,0 +1,11 @@
+using Void.Collections;
+
+public sealed class Bad215 : IAsyncEnumerable<int>
+{
+    public IAsyncEnumerator<int> GetAsyncEnumerator()
+    {
+        return null;
+    }
+}
+
+public static class Program { public static void Main() {} }

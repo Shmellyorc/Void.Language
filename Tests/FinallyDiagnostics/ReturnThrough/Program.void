@@ -1,0 +1,9 @@
+public static class Program
+{
+    public static int Value()
+    {
+        try { return 1; }
+        finally { Console.WriteLine(true); }
+    }
+    public static void Main() { Console.WriteLine(Value()); }
+}

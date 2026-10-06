@@ -1,0 +1,16 @@
+using Void;
+public sealed class Hub<T> where T : class
+{
+    private Action<int> _changed;
+    public event Action<int> Changed
+    {
+        add => _changed += value;
+        remove => _changed -= value;
+    }
+    public Action<int> Read() => Changed;
+}
+public sealed class Node { }
+public static class Program
+{
+    public static void Main() { Hub<Node> hub = new Hub<Node>(); hub.Read(); }
+}

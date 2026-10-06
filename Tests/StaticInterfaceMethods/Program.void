@@ -1,0 +1,124 @@
+public interface IFactory
+{
+    static int Create(int value);
+    static int Create(float value);
+    public static int Explicit();
+    static int Sum(int first, params int[] rest);
+    static void Assign(ref int target, int value);
+    static void Produce(out int target, int value);
+    static int Read(in int value);
+}
+
+public sealed class Factory : IFactory
+{
+    public static int Create(int value) { return value + 1; }
+    public static int Create(float value) { return value == 4.5f ? 6 : 0; }
+    public static int Explicit() { return 99; }
+    public static int Sum(int first, params int[] rest)
+    {
+        int total = first;
+        for (int i = 0; i < rest.Length; i++) total += rest[i];
+        return total;
+    }
+    public static void Assign(ref int target, int value) { target = value; }
+    public static void Produce(out int target, int value) { target = value; }
+    public static int Read(in int value) { return value; }
+}
+
+public interface IBaseFactory
+{
+    static int BaseValue();
+}
+public interface IDerivedFactory : IBaseFactory
+{
+    static int DerivedValue();
+}
+public class BaseFactoryImpl
+{
+    public static int BaseValue() { return 10; }
+}
+public sealed class DerivedFactoryImpl : BaseFactoryImpl, IDerivedFactory
+{
+    public static int DerivedValue() { return 20; }
+}
+
+public interface ILeft
+{
+    static int Shared(int value);
+}
+public interface IRight
+{
+    static int Shared(int value);
+}
+public interface IDiamond : ILeft, IRight
+{
+}
+public sealed class DiamondImpl : IDiamond
+{
+    public static int Shared(int value) { return value * 2; }
+}
+
+public interface IValueFactory<T>
+{
+    static T Make(T value);
+}
+public sealed class IntFactory : IValueFactory<int>
+{
+    public static int Make(int value) { return value + 3; }
+}
+public struct StructFactory : IValueFactory<int>
+{
+    public static int Make(int value) { return value + 4; }
+}
+
+public interface IGenericMethodFactory
+{
+    static T Echo<T>(T value);
+}
+public sealed class GenericMethodFactory : IGenericMethodFactory
+{
+    public static T Echo<T>(T value) { return value; }
+}
+
+public sealed class Node
+{
+    public int Value;
+    public Node(int value) { Value = value; }
+}
+public interface INodeFactory
+{
+    static Node MakeNode(int value);
+}
+public sealed class NodeFactory : INodeFactory
+{
+    public static Node MakeNode(int value) { return new Node(value); }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine(Factory.Create(4) == 5);
+        Console.WriteLine(Factory.Create(4.5f) == 6);
+        Console.WriteLine(Factory.Explicit() == 99);
+        Console.WriteLine(Factory.Sum(1) == 1);
+        Console.WriteLine(Factory.Sum(1, 2, 3) == 6);
+        int a = 0;
+        Factory.Assign(ref a, 7);
+        Console.WriteLine(a == 7);
+        int b;
+        Factory.Produce(out b, 8);
+        Console.WriteLine(b == 8);
+        Console.WriteLine(Factory.Read(in b) == 8);
+        Console.WriteLine(BaseFactoryImpl.BaseValue() == 10);
+        Console.WriteLine(DerivedFactoryImpl.DerivedValue() == 20);
+        Console.WriteLine(DiamondImpl.Shared(6) == 12);
+        Console.WriteLine(IntFactory.Make(7) == 10);
+        Console.WriteLine(StructFactory.Make(7) == 11);
+        Console.WriteLine(GenericMethodFactory.Echo<int>(12) == 12);
+        Console.WriteLine(GenericMethodFactory.Echo(13) == 13);
+        Node node = NodeFactory.MakeNode(44);
+        GC.Collect();
+        Console.WriteLine(node.Value == 44);
+    }
+}

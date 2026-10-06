@@ -1,0 +1,6 @@
+public static class Program
+{
+    public static ref int Identity(ref int value) { return ref value; }
+    public static ref int Bad(scoped ref int value) { return ref Identity(ref value); }
+    public static void Main() { int value = 1; ref int alias = ref Bad(ref value); }
+}

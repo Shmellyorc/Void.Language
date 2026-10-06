@@ -1,0 +1,1 @@
+public static class Api { [Export("bad_extern")] public static unsafe extern int Get(); }

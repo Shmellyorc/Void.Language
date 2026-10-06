@@ -1,0 +1,13 @@
+using Void.Collections;
+using Void.Threading;
+
+public static class Program
+{
+    private static IEnumerator<int> Values(
+        [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        yield return cancellationToken.CanBeCanceled ? 1 : 0;
+    }
+
+    public static void Main() { }
+}

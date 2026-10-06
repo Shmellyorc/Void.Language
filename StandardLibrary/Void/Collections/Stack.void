@@ -1,0 +1,134 @@
+namespace Void.Collections;
+
+private sealed class StackNode<T>
+{
+    public T Value;
+    public StackNode<T> Next;
+
+    public StackNode(T value, StackNode<T> next)
+    {
+        Value = value;
+        Next = next;
+    }
+}
+
+public sealed class Stack<T> : IReadOnlyCollection<T>
+{
+    private StackNode<T> _top;
+    private int _count;
+    private int _version;
+
+    public int Count => _count;
+
+    public Stack()
+    {
+        _top = null;
+        _count = 0;
+    }
+
+    public Stack(int capacity) : this()
+    {
+        if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
+    }
+    public Stack(IEnumerable<T> collection) : this()
+    {
+        if (collection == null) throw new ArgumentNullException("collection");
+        foreach (T item in collection) this.Push(item);
+    }
+
+    public void Push(T item)
+    {
+        _top = new StackNode<T>(item, _top);
+        _count++;
+        _version++;
+    }
+
+    public T Pop()
+    {
+        if (_top == null)
+            throw new InvalidOperationException("Stack is empty");
+
+        T value = _top.Value;
+        _top = _top.Next;
+        _count--;
+        _version++;
+        return value;
+    }
+
+    public T Peek()
+    {
+        if (_top == null)
+            throw new InvalidOperationException("Stack is empty");
+
+        return _top.Value;
+    }
+
+    public bool TryPop(out T result)
+    {
+        result = default(T);
+        if (_top == null) return false;
+        result = this.Pop();
+        return true;
+    }
+
+    public bool TryPeek(out T result)
+    {
+        result = default(T);
+        if (_top == null) return false;
+        result = _top.Value;
+        return true;
+    }
+
+    public bool Contains(T item)
+    {
+        IEqualityComparer<T> comparer = new DefaultEqualityComparer<T>();
+        StackNode<T> node = _top;
+        while (node != null)
+        {
+            if (comparer.Equals(node.Value, item)) return true;
+            node = node.Next;
+        }
+        return false;
+    }
+
+    public void Clear()
+    {
+        _top = null;
+        _count = 0;
+        _version++;
+    }
+
+    public T[] ToArray()
+    {
+        T[] array = new T[_count];
+        this.CopyTo(array, 0);
+        return array;
+    }
+    public void CopyTo(T[] array, int arrayIndex)
+    {
+        if (array == null) throw new ArgumentNullException("array");
+        if (arrayIndex < 0 || arrayIndex > array.Length) throw new ArgumentOutOfRangeException("arrayIndex");
+        if (_count > array.Length - arrayIndex) throw new ArgumentException("Destination is too short");
+        StackNode<T> node = _top;
+        while (node != null)
+        {
+            array[arrayIndex] = node.Value;
+            arrayIndex++;
+            node = node.Next;
+        }
+    }
+    public IEnumerator<T> GetEnumerator() { return this.Enumerate(_version); }
+    private IEnumerator<T> Enumerate(int version)
+    {
+        if (version != _version) throw new InvalidOperationException("Collection was modified");
+        StackNode<T> current = _top;
+        while (current != null)
+        {
+            yield return current.Value;
+            if (version != _version) throw new InvalidOperationException("Collection was modified");
+            current = current.Next;
+        }
+    }
+
+}
+

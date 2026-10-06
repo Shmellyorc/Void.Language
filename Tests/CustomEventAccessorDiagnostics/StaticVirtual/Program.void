@@ -1,0 +1,9 @@
+public class Bad
+{
+    public static virtual event Action<int> Changed
+    {
+        add { }
+        remove { }
+    }
+}
+public static class Program { public static void Main() { } }

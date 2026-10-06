@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { Func<int> value = async () => 1; value; } }

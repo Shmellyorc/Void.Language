@@ -1,0 +1,3 @@
+using Void;
+public static class Native257 { public static unsafe extern int Bad(ref delegate*<int, int> callback); }
+public static class Program { public static void Main() { } }

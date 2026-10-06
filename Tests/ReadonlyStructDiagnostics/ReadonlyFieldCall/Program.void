@@ -1,0 +1,15 @@
+public struct Counter
+{
+    public int Value;
+    public void Add() { Value += 1; }
+}
+public struct Holder
+{
+    public readonly Counter Value;
+    public Holder(Counter value) { Value = value; }
+    public void Change() { Value.Add(); }
+}
+public static class Program
+{
+    public static void Main() { Holder value = new Holder(new Counter()); value.Change(); }
+}

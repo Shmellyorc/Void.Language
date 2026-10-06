@@ -1,0 +1,9 @@
+using Void.Collections;
+public static class Program
+{
+    private static void Read(IAsyncEnumerable<int> source)
+    {
+        await foreach (var value in source) {}
+    }
+    public static void Main() { Read(null); }
+}

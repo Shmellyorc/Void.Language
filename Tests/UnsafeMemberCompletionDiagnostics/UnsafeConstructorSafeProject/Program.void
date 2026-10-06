@@ -1,0 +1,5 @@
+public class Bad
+{
+    public unsafe Bad(int value) { }
+}
+public static class Program { public static void Main() { } }

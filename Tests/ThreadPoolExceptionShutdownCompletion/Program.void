@@ -1,0 +1,95 @@
+using Void;
+using Void.Threading;
+
+public sealed class PoolState
+{
+    public int BlockerStarted;
+    public int SurvivorCount;
+    public int DrainCount;
+    public ManualResetEvent BlockerStartedEvent;
+    public ManualResetEvent BlockerRelease;
+    public ManualResetEvent SurvivorDone;
+
+    public PoolState()
+    {
+        BlockerStarted = 0;
+        SurvivorCount = 0;
+        DrainCount = 0;
+        BlockerStartedEvent = new ManualResetEvent(false);
+        BlockerRelease = new ManualResetEvent(false);
+        SurvivorDone = new ManualResetEvent(false);
+    }
+}
+
+public static class Program
+{
+    public static Action MakeBlocker(PoolState state)
+    {
+        return () =>
+        {
+            state.BlockerStarted = 1;
+            state.BlockerStartedEvent.Set();
+            state.BlockerRelease.WaitOne();
+        };
+    }
+
+    public static Action MakeFailure()
+    {
+        return () =>
+        {
+            throw new Exception("thread pool work failure");
+        };
+    }
+
+    public static Action MakeSurvivor(PoolState state)
+    {
+        return () =>
+        {
+            Interlocked.Increment(ref state.SurvivorCount);
+            state.SurvivorDone.Set();
+        };
+    }
+
+    public static Action MakeDrain(PoolState state)
+    {
+        return () =>
+        {
+            Interlocked.Increment(ref state.DrainCount);
+        };
+    }
+
+    public static void Main()
+    {
+        PoolState state = new PoolState();
+
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(MakeBlocker(state)));
+        Console.WriteLine(state.BlockerStartedEvent.WaitOne(5000));
+        Console.WriteLine(state.BlockerStarted == 1);
+
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(MakeFailure()));
+        Console.WriteLine(ThreadPool.QueueUserWorkItem(MakeSurvivor(state)));
+        Console.WriteLine(state.SurvivorDone.WaitOne(5000));
+        Console.WriteLine(state.SurvivorCount == 1);
+
+        state.BlockerRelease.Set();
+
+        bool accepted = true;
+        int index = 0;
+        while (index < 32)
+        {
+            if (!ThreadPool.QueueUserWorkItem(MakeDrain(state)))
+                accepted = false;
+            index++;
+        }
+        Console.WriteLine(accepted);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(state.DrainCount == 32);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+
+        GC.Collect();
+        Console.WriteLine(true);
+    }
+}

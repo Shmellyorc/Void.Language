@@ -1,0 +1,23 @@
+using Void;
+
+public static class Native258Bad
+{
+    [Native("voidc258_add")]
+    public static unsafe extern int Add(int left, int right);
+}
+
+public static class Program
+{
+    private static unsafe T* Bad<T>(T* value)
+    {
+        return value;
+    }
+
+    public static unsafe void Main()
+    {
+        var table = NativeMemory.Allocate<delegate*<int, int, int>>(1ul);
+        table[0] = &Native258Bad.Add;
+        Bad<delegate*<int, int, int>>(table);
+        NativeMemory.Free(table);
+    }
+}

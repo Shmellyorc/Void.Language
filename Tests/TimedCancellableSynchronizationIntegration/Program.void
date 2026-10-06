@@ -1,0 +1,319 @@
+using Void;
+using Void.Threading;
+
+public sealed class Payload
+{
+    public int Value;
+
+    public Payload(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class WaitState
+{
+    public int Ready;
+    public int Success;
+    public int Canceled;
+    public int Done;
+    public int FinallyCount;
+    public int DisposeCount;
+    public int TokenObserved;
+    public Payload Payload;
+}
+
+public sealed class WaitScope : IDisposable
+{
+    private WaitState _state;
+
+    public WaitScope(WaitState state)
+    {
+        _state = state;
+    }
+
+    public void Dispose()
+    {
+        Interlocked.Increment(ref _state.DisposeCount);
+        GC.Collect();
+    }
+}
+
+public delegate bool TokenWait(CancellationToken token);
+
+public static class NativeFixture189
+{
+    [Native("voidc189_reset")]
+    public static unsafe extern void Reset();
+
+    [Native("voidc189_mark")]
+    public static unsafe extern int Mark(int value);
+
+    [Native("voidc189_calls")]
+    public static unsafe extern int Calls();
+}
+
+public static class Program
+{
+    private static void WaitReady(WaitState state)
+    {
+        while (Volatile.Read(ref state.Ready) == 0)
+            GC.Collect();
+    }
+
+    private static unsafe void ManualWorker(ManualResetEvent value, CancellationToken token, WaitState state)
+    {
+        Volatile.Write(ref state.Ready, 1);
+        try
+        {
+            using (WaitScope scope = new WaitScope(state))
+            {
+                int nativeValue = NativeFixture189.Mark(10);
+                bool released = value.WaitOne(1000, token);
+                if (released && nativeValue == 11)
+                    Volatile.Write(ref state.Success, 1);
+            }
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observedToken = error.CancellationToken;
+            if (observedToken.IsCancellationRequested)
+                Volatile.Write(ref state.TokenObserved, 1);
+            Volatile.Write(ref state.Canceled, 1);
+        }
+        finally
+        {
+            NativeFixture189.Mark(20);
+            Interlocked.Increment(ref state.FinallyCount);
+            GC.Collect();
+        }
+        Volatile.Write(ref state.Done, 1);
+    }
+
+    private static void AutoWorker(AutoResetEvent value, CancellationToken token, WaitState state)
+    {
+        Volatile.Write(ref state.Ready, 1);
+        try
+        {
+            if (value.WaitOne(token))
+                Volatile.Write(ref state.Success, 1);
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observedToken = error.CancellationToken;
+            if (observedToken.IsCancellationRequested)
+                Volatile.Write(ref state.TokenObserved, 1);
+            Volatile.Write(ref state.Canceled, 1);
+        }
+        finally
+        {
+            Interlocked.Increment(ref state.FinallyCount);
+        }
+        Volatile.Write(ref state.Done, 1);
+    }
+
+    private static void SemaphoreWorker(Semaphore value, CancellationToken token, WaitState state)
+    {
+        Volatile.Write(ref state.Ready, 1);
+        try
+        {
+            if (value.WaitOne(1000, token))
+                Volatile.Write(ref state.Success, 1);
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observedToken = error.CancellationToken;
+            if (observedToken.IsCancellationRequested)
+                Volatile.Write(ref state.TokenObserved, 1);
+            Volatile.Write(ref state.Canceled, 1);
+        }
+        finally
+        {
+            Interlocked.Increment(ref state.FinallyCount);
+        }
+        Volatile.Write(ref state.Done, 1);
+    }
+
+    private static bool InvokeGeneric<T>(T payload, TokenWait wait, CancellationToken token) where T : class
+    {
+        GC.Collect();
+        bool result = wait(token);
+        GC.Collect();
+        return result && payload != null;
+    }
+
+    private static void NestedCancellation(WaitState state)
+    {
+        CancellationTokenSource source = new CancellationTokenSource();
+        CancellationToken token = source.Token;
+        AutoResetEvent value = new AutoResetEvent(false);
+        Thread inner = new Thread(() => AutoWorker(value, token, state));
+        inner.Start();
+        WaitReady(state);
+        GC.Collect();
+        source.Cancel();
+        inner.Join();
+    }
+
+    public static unsafe void Main()
+    {
+        NativeFixture189.Reset();
+
+        CancellationToken none = CancellationToken.None;
+        ManualResetEvent openManual = new ManualResetEvent(true);
+        Console.WriteLine(openManual.WaitOne(none));
+        Console.WriteLine(openManual.WaitOne(0, none));
+
+        ManualResetEvent timeoutManual = new ManualResetEvent(false);
+        CancellationTokenSource timeoutManualSource = new CancellationTokenSource();
+        Console.WriteLine(!timeoutManual.WaitOne(10, timeoutManualSource.Token));
+        timeoutManualSource.Cancel();
+        timeoutManual.Set();
+        Console.WriteLine(timeoutManual.WaitOne(0));
+
+        ManualResetEvent cancelManual = new ManualResetEvent(false);
+        CancellationTokenSource manualSource = new CancellationTokenSource();
+        WaitState manualState = new WaitState();
+        manualState.Payload = new Payload(101);
+        Thread manualThread = new Thread(() => ManualWorker(cancelManual, manualSource.Token, manualState));
+        manualThread.Start();
+        WaitReady(manualState);
+        GC.Collect();
+        manualSource.Cancel();
+        manualThread.Join();
+        Console.WriteLine(Volatile.Read(ref manualState.Canceled) == 1);
+        Console.WriteLine(Volatile.Read(ref manualState.TokenObserved) == 1);
+        Console.WriteLine(Volatile.Read(ref manualState.Success) == 0);
+        Console.WriteLine(Volatile.Read(ref manualState.DisposeCount) == 1);
+        Console.WriteLine(Volatile.Read(ref manualState.FinallyCount) == 1);
+        Console.WriteLine(manualState.Payload != null && manualState.Payload.Value == 101);
+        Console.WriteLine(Volatile.Read(ref manualState.Done) == 1);
+        Console.WriteLine(!cancelManual.WaitOne(0));
+        cancelManual.Set();
+        Console.WriteLine(cancelManual.WaitOne(0));
+
+        ManualResetEvent signalManual = new ManualResetEvent(false);
+        CancellationTokenSource manualSignalSource = new CancellationTokenSource();
+        WaitState manualSignalState = new WaitState();
+        Thread manualSignalThread = new Thread(() => ManualWorker(signalManual, manualSignalSource.Token, manualSignalState));
+        manualSignalThread.Start();
+        WaitReady(manualSignalState);
+        signalManual.Set();
+        manualSignalSource.Cancel();
+        manualSignalThread.Join();
+        bool manualSignalSucceeded = Volatile.Read(ref manualSignalState.Success) == 1;
+        bool manualSignalCanceled = Volatile.Read(ref manualSignalState.Canceled) == 1;
+        Console.WriteLine(manualSignalSucceeded != manualSignalCanceled);
+        Console.WriteLine(signalManual.WaitOne(0));
+
+        CancellationTokenSource preCanceled = new CancellationTokenSource();
+        preCanceled.Cancel();
+        bool preCanceledThrew = false;
+        try
+        {
+            openManual.WaitOne(preCanceled.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            preCanceledThrew = true;
+        }
+        Console.WriteLine(preCanceledThrew);
+
+        AutoResetEvent cancelAuto = new AutoResetEvent(false);
+        CancellationTokenSource autoSource = new CancellationTokenSource();
+        WaitState autoState = new WaitState();
+        Thread autoThread = new Thread(() => AutoWorker(cancelAuto, autoSource.Token, autoState));
+        autoThread.Start();
+        WaitReady(autoState);
+        GC.Collect();
+        autoSource.Cancel();
+        autoThread.Join();
+        Console.WriteLine(Volatile.Read(ref autoState.Canceled) == 1 && Volatile.Read(ref autoState.TokenObserved) == 1);
+        cancelAuto.Set();
+        Console.WriteLine(cancelAuto.WaitOne(0));
+        Console.WriteLine(!cancelAuto.WaitOne(0));
+
+        AutoResetEvent signalAuto = new AutoResetEvent(false);
+        CancellationTokenSource autoSignalSource = new CancellationTokenSource();
+        WaitState autoSignalState = new WaitState();
+        Thread autoSignalThread = new Thread(() => AutoWorker(signalAuto, autoSignalSource.Token, autoSignalState));
+        autoSignalThread.Start();
+        WaitReady(autoSignalState);
+        signalAuto.Set();
+        autoSignalSource.Cancel();
+        autoSignalThread.Join();
+        bool autoSignalSucceeded = Volatile.Read(ref autoSignalState.Success) == 1;
+        bool autoSignalCanceled = Volatile.Read(ref autoSignalState.Canceled) == 1;
+        bool autoStoredSignal = signalAuto.WaitOne(0);
+        Console.WriteLine(autoSignalSucceeded != autoSignalCanceled);
+        Console.WriteLine(autoSignalSucceeded != autoStoredSignal);
+        Console.WriteLine(!signalAuto.WaitOne(0));
+
+        AutoResetEvent timeoutAuto = new AutoResetEvent(false);
+        CancellationTokenSource timeoutAutoSource = new CancellationTokenSource();
+        Console.WriteLine(!timeoutAuto.WaitOne(10, timeoutAutoSource.Token));
+        timeoutAutoSource.Cancel();
+        timeoutAuto.Set();
+        Console.WriteLine(timeoutAuto.WaitOne(0));
+
+        Semaphore cancelSemaphore = new Semaphore(0, 1);
+        CancellationTokenSource semaphoreSource = new CancellationTokenSource();
+        WaitState semaphoreState = new WaitState();
+        Thread semaphoreThread = new Thread(() => SemaphoreWorker(cancelSemaphore, semaphoreSource.Token, semaphoreState));
+        semaphoreThread.Start();
+        WaitReady(semaphoreState);
+        GC.Collect();
+        semaphoreSource.Cancel();
+        semaphoreThread.Join();
+        Console.WriteLine(Volatile.Read(ref semaphoreState.Canceled) == 1 && Volatile.Read(ref semaphoreState.TokenObserved) == 1);
+        Console.WriteLine(cancelSemaphore.Release() == 0);
+        Console.WriteLine(cancelSemaphore.WaitOne(0));
+        Console.WriteLine(!cancelSemaphore.WaitOne(0));
+
+        Semaphore signalSemaphore = new Semaphore(0, 1);
+        CancellationTokenSource semaphoreSignalSource = new CancellationTokenSource();
+        WaitState semaphoreSignalState = new WaitState();
+        Thread semaphoreSignalThread = new Thread(() => SemaphoreWorker(signalSemaphore, semaphoreSignalSource.Token, semaphoreSignalState));
+        semaphoreSignalThread.Start();
+        WaitReady(semaphoreSignalState);
+        Console.WriteLine(signalSemaphore.Release() == 0);
+        semaphoreSignalSource.Cancel();
+        semaphoreSignalThread.Join();
+        bool semaphoreSignalSucceeded = Volatile.Read(ref semaphoreSignalState.Success) == 1;
+        bool semaphoreSignalCanceled = Volatile.Read(ref semaphoreSignalState.Canceled) == 1;
+        bool semaphoreStoredPermit = signalSemaphore.WaitOne(0);
+        Console.WriteLine(semaphoreSignalSucceeded != semaphoreSignalCanceled);
+        Console.WriteLine(semaphoreSignalSucceeded != semaphoreStoredPermit);
+        Console.WriteLine(!signalSemaphore.WaitOne(0));
+
+        Semaphore timeoutSemaphore = new Semaphore(0, 1);
+        CancellationTokenSource timeoutSemaphoreSource = new CancellationTokenSource();
+        Console.WriteLine(!timeoutSemaphore.WaitOne(10, timeoutSemaphoreSource.Token));
+        timeoutSemaphoreSource.Cancel();
+        timeoutSemaphore.Release();
+        Console.WriteLine(timeoutSemaphore.WaitOne(0));
+
+        ManualResetEvent genericManual = new ManualResetEvent(true);
+        Payload genericPayload = new Payload(303);
+        TokenWait waitDelegate = token => genericManual.WaitOne(100, token);
+        Console.WriteLine(InvokeGeneric<Payload>(genericPayload, waitDelegate, CancellationToken.None));
+        genericPayload = null;
+        waitDelegate = null;
+        GC.Collect();
+
+        WaitState nestedState = new WaitState();
+        Thread outer = new Thread(() => NestedCancellation(nestedState));
+        outer.Start();
+        outer.Join();
+        Console.WriteLine(Volatile.Read(ref nestedState.Canceled) == 1);
+        Console.WriteLine(Volatile.Read(ref nestedState.FinallyCount) == 1);
+        Console.WriteLine(Volatile.Read(ref nestedState.Done) == 1);
+
+        Console.WriteLine(NativeFixture189.Calls() == 4);
+        Console.WriteLine(NativeFixture189.Mark(40) == 41);
+        Console.WriteLine(NativeFixture189.Calls() == 5);
+
+        // Monitor.Wait deliberately remains cancellation-free in #189.
+        Console.WriteLine(true);
+    }
+}

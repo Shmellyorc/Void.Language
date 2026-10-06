@@ -1,0 +1,49 @@
+public struct Pair
+{
+    public int A;
+    public int B;
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        int* values = stackalloc int[4];
+        values[0] = 10;
+        values[1] = 20;
+        values[2] = 30;
+        values[3] = 40;
+
+        Console.WriteLine(values[0]);
+        Console.WriteLine(values[1]);
+        Console.WriteLine(values[2]);
+        Console.WriteLine(values[3]);
+
+        int* cursor = values + 2;
+        Console.WriteLine(*cursor);
+
+        Runtime.MemoryClear(values, sizeof(int) * 4);
+        Console.WriteLine(values[2] == 0);
+
+        int count = 3;
+        int* dynamicValues = stackalloc int[count++];
+        dynamicValues[2] = 77;
+        Console.WriteLine(count);
+        Console.WriteLine(dynamicValues[2]);
+
+        var inferred = stackalloc int[2];
+        inferred[1] = 88;
+        Console.WriteLine(inferred[1]);
+
+        Pair* pairs = stackalloc Pair[2];
+        Runtime.MemoryClear(pairs, sizeof(Pair) * 2);
+        Pair* second = pairs + 1;
+        (*second).A = 12;
+        (*second).B = 34;
+        Console.WriteLine((*second).A);
+        Console.WriteLine((*second).B);
+
+        byte* empty = stackalloc byte[0];
+        Console.WriteLine(empty == null);
+    }
+}

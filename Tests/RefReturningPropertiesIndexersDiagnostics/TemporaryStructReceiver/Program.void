@@ -1,0 +1,1 @@
+public struct S { public int X; public S(int x){X=x;} public ref int P { get { return ref X; } } } public static class Program { public static void Main(){ ref int r = ref new S(1).P; } }

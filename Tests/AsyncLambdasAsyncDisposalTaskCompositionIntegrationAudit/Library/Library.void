@@ -1,0 +1,41 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class AuditLibraryResource280
+{
+    public static int DisposeCount;
+
+    public async ValueTask DisposeAsync()
+    {
+        await Task.Yield();
+        DisposeCount++;
+    }
+}
+
+public static class AuditLibrary280
+{
+    private static async Task<int> Compute(int value)
+    {
+        await using var resource = new AuditLibraryResource280();
+        Task<int> first = Task.Run<int>(async () =>
+        {
+            await Task.Yield();
+            return value;
+        });
+        Task<int> second = Task.FromResult<int>(2);
+        int[] results = await Task.WhenAll(first, second);
+        Task<int> winner = await Task.WhenAny(Task.FromResult<int>(results[0] + results[1]), Task.FromResult<int>(-1));
+        return await winner;
+    }
+
+    [Export("void280_async_composition_audit")]
+    public static int Run(int value)
+    {
+        AuditLibraryResource280.DisposeCount = 0;
+        int result = Compute(value).Result;
+        int disposeCount = AuditLibraryResource280.DisposeCount;
+        ThreadPool.Shutdown();
+        return result == 42 && disposeCount == 1 ? 42 : -1;
+    }
+}

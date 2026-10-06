@@ -1,0 +1,103 @@
+using Void;
+
+public interface IAdd<T>
+{
+    static T operator +(T left, T right);
+}
+
+public interface IUnary<T>
+{
+    static T operator -(T value);
+    static T operator ++(T value);
+}
+
+public interface IOrder<T>
+{
+    static bool operator ==(T left, T right);
+    static bool operator !=(T left, T right);
+    static bool operator <(T left, T right);
+    static bool operator >(T left, T right);
+    static bool operator <=(T left, T right);
+    static bool operator >=(T left, T right);
+}
+
+public interface IAdvanced<T> : IAdd<T>, IUnary<T>, IOrder<T>
+{
+    static T operator *(T left, T right);
+}
+
+public struct Number : IAdvanced<Number>
+{
+    public int Value;
+    public Number(int value) { Value = value; }
+
+    public static Number operator +(Number left, Number right) { return new Number(left.Value + right.Value); }
+    public static Number operator *(Number left, Number right) { return new Number(left.Value * right.Value); }
+    public static Number operator -(Number value) { return new Number(-value.Value); }
+    public static Number operator ++(Number value) { return new Number(value.Value + 1); }
+    public static bool operator ==(Number left, Number right) { return left.Value == right.Value; }
+    public static bool operator !=(Number left, Number right) { return left.Value != right.Value; }
+    public static bool operator <(Number left, Number right) { return left.Value < right.Value; }
+    public static bool operator >(Number left, Number right) { return left.Value > right.Value; }
+    public static bool operator <=(Number left, Number right) { return left.Value <= right.Value; }
+    public static bool operator >=(Number left, Number right) { return left.Value >= right.Value; }
+}
+
+public sealed class Box : IAdd<Box>
+{
+    public int Value;
+    public Box(int value) { Value = value; }
+    public static Box operator +(Box left, Box right) { return new Box(left.Value + right.Value); }
+}
+
+public interface ILeftAdd<T>
+{
+    static T operator +(T left, T right);
+}
+
+public interface IRightAdd<T>
+{
+    static T operator +(T left, T right);
+}
+
+public interface IDiamondAdd<T> : ILeftAdd<T>, IRightAdd<T>
+{
+}
+
+public struct DiamondNumber : IDiamondAdd<DiamondNumber>
+{
+    public int Value;
+    public DiamondNumber(int value) { Value = value; }
+    public static DiamondNumber operator +(DiamondNumber left, DiamondNumber right)
+    {
+        return new DiamondNumber(left.Value + right.Value);
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Number a = new Number(2);
+        Number b = new Number(3);
+        Console.WriteLine((a + b).Value == 5);
+        Console.WriteLine((a * b).Value == 6);
+        Console.WriteLine((-a).Value == -2);
+        Console.WriteLine((++a).Value == 3);
+        Console.WriteLine(a.Value == 3);
+        Console.WriteLine(a == b);
+        Console.WriteLine(a != new Number(4));
+        Console.WriteLine(a < new Number(4));
+        Console.WriteLine(a > new Number(2));
+        Console.WriteLine(a <= b);
+        Console.WriteLine(a >= b);
+
+        Box left = new Box(4);
+        Box right = new Box(5);
+        Console.WriteLine((left + right).Value == 9);
+
+        DiamondNumber d1 = new DiamondNumber(7);
+        DiamondNumber d2 = new DiamondNumber(8);
+        Console.WriteLine((d1 + d2).Value == 15);
+    }
+}

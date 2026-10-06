@@ -1,0 +1,259 @@
+using Void;
+using Void.Collections;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class Node237
+{
+    public int Value;
+
+    public Node237(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class ThreadState237
+{
+    public int Value;
+    public ManualResetEvent Done;
+
+    public ThreadState237()
+    {
+        Value = 0;
+        Done = new ManualResetEvent(false);
+    }
+}
+
+public static class Program
+{
+    private static void Check(bool value)
+    {
+        Console.WriteLine(value);
+    }
+
+    private static Node237[] MakeNodes(int first, int second, int third)
+    {
+        Node237[] nodes = new Node237[3];
+        nodes[0] = new Node237(first);
+        nodes[1] = new Node237(second);
+        nodes[2] = new Node237(third);
+        return nodes;
+    }
+
+    private static async Task<int> ReadAfter(Task gate, Memory<Node237> memory)
+    {
+        await gate;
+        GC.Collect();
+        return memory.Span[0].Value + memory.Span[^1].Value;
+    }
+
+    private static async Task<int> ReadOnlyAfter(Task gate, ReadOnlyMemory<Node237> memory)
+    {
+        await gate;
+        GC.Collect();
+        return memory.Span[0].Value + memory.Span[^1].Value;
+    }
+
+    private static async Task<int> LocalMemoryAfter(Task gate, Node237[] nodes)
+    {
+        Memory<Node237> memory = nodes;
+        nodes = null;
+        await gate;
+        GC.Collect();
+        return memory.Span[1].Value;
+    }
+
+    private static async Task<Memory<Node237>> RoundTripAfter(Task gate, Memory<Node237> memory)
+    {
+        await gate;
+        GC.Collect();
+        return memory.Slice(1, memory.Length - 1);
+    }
+
+    private static IEnumerator<int> IterateMemory(Memory<Node237> memory)
+    {
+        yield return memory.Length;
+        GC.Collect();
+        yield return memory.Span[0].Value;
+        GC.Collect();
+        yield return memory.Span[^1].Value;
+    }
+
+    private static async IAsyncEnumerable<int> IterateMemoryAsync(Memory<Node237> memory, Task gate)
+    {
+        yield return memory.Span[0].Value;
+        await gate;
+        GC.Collect();
+        yield return memory.Span[^1].Value;
+    }
+
+    private static Func<int> MakeTaskWork(Memory<Node237> memory, ManualResetEvent release)
+    {
+        return () =>
+        {
+            release.WaitOne();
+            GC.Collect();
+            return memory.Span[0].Value + memory.Span[^1].Value;
+        };
+    }
+
+    private static Action MakeThreadPoolWork(Memory<Node237> memory, ManualResetEvent release, ThreadState237 state)
+    {
+        return () =>
+        {
+            release.WaitOne();
+            GC.Collect();
+            state.Value = memory.Span[1].Value;
+            state.Done.Set();
+        };
+    }
+
+    private static Func<Task, int> MakeContinuation(ReadOnlyMemory<Node237> memory)
+    {
+        return antecedent =>
+        {
+            GC.Collect();
+            return antecedent.IsCompleted ? memory.Span[0].Value + memory.Span[^1].Value : -1;
+        };
+    }
+
+    public static void Main()
+    {
+        TaskCompletionSource asyncGate = new TaskCompletionSource();
+        Node237[] asyncNodes = MakeNodes(10, 20, 30);
+        Memory<Node237> asyncMemory = asyncNodes;
+        Task<int> asyncTask = ReadAfter(asyncGate.Task, asyncMemory);
+        asyncNodes = null;
+        asyncMemory = default(Memory<Node237>);
+        GC.Collect();
+        GC.Collect();
+        Check(!asyncTask.IsCompleted);
+        asyncGate.SetResult();
+        Check(asyncTask.Result == 40);
+
+        TaskCompletionSource readOnlyGate = new TaskCompletionSource();
+        Node237[] readOnlyNodes = MakeNodes(11, 21, 31);
+        ReadOnlyMemory<Node237> readOnlyMemory = readOnlyNodes;
+        Task<int> readOnlyTask = ReadOnlyAfter(readOnlyGate.Task, readOnlyMemory);
+        readOnlyNodes = null;
+        readOnlyMemory = default(ReadOnlyMemory<Node237>);
+        GC.Collect();
+        Check(!readOnlyTask.IsCompleted);
+        readOnlyGate.SetResult();
+        Check(readOnlyTask.Result == 42);
+
+        TaskCompletionSource localGate = new TaskCompletionSource();
+        Node237[] localNodes = MakeNodes(12, 22, 32);
+        Task<int> localTask = LocalMemoryAfter(localGate.Task, localNodes);
+        localNodes = null;
+        GC.Collect();
+        Check(!localTask.IsCompleted);
+        localGate.SetResult();
+        Check(localTask.Result == 22);
+
+        TaskCompletionSource roundTripGate = new TaskCompletionSource();
+        Node237[] roundTripNodes = MakeNodes(13, 23, 33);
+        Memory<Node237> roundTripMemory = roundTripNodes;
+        Task<Memory<Node237>> roundTripTask = RoundTripAfter(roundTripGate.Task, roundTripMemory);
+        roundTripNodes = null;
+        roundTripMemory = default(Memory<Node237>);
+        GC.Collect();
+        roundTripGate.SetResult();
+        Memory<Node237> roundTripResult = roundTripTask.Result;
+        GC.Collect();
+        Check(roundTripResult.Length == 2);
+        Check(roundTripResult.Span[0].Value == 23 && roundTripResult.Span[1].Value == 33);
+
+        Node237[] iteratorNodes = MakeNodes(14, 24, 34);
+        Memory<Node237> iteratorMemory = iteratorNodes;
+        IEnumerator<int> iterator = IterateMemory(iteratorMemory);
+        iteratorNodes = null;
+        iteratorMemory = default(Memory<Node237>);
+        GC.Collect();
+        Check(iterator.MoveNext() && iterator.Current == 3);
+        GC.Collect();
+        Check(iterator.MoveNext() && iterator.Current == 14);
+        GC.Collect();
+        Check(iterator.MoveNext() && iterator.Current == 34);
+        Check(!iterator.MoveNext());
+        iterator.Dispose();
+
+        TaskCompletionSource asyncIteratorGate = new TaskCompletionSource();
+        Node237[] asyncIteratorNodes = MakeNodes(15, 25, 35);
+        Memory<Node237> asyncIteratorMemory = asyncIteratorNodes;
+        IAsyncEnumerator<int> asyncIterator = IterateMemoryAsync(asyncIteratorMemory, asyncIteratorGate.Task).GetAsyncEnumerator();
+        asyncIteratorNodes = null;
+        asyncIteratorMemory = default(Memory<Node237>);
+        GC.Collect();
+        Check(asyncIterator.MoveNextAsync().Result && asyncIterator.Current == 15);
+        Task<bool> pendingMove = asyncIterator.MoveNextAsync();
+        GC.Collect();
+        Check(!pendingMove.IsCompleted);
+        asyncIteratorGate.SetResult();
+        Check(pendingMove.Result && asyncIterator.Current == 35);
+        Check(!asyncIterator.MoveNextAsync().Result);
+        asyncIterator.DisposeAsync().Wait();
+
+        ManualResetEvent taskRelease = new ManualResetEvent(false);
+        Node237[] taskNodes = MakeNodes(16, 26, 36);
+        Memory<Node237> taskMemory = taskNodes;
+        Func<int> taskWork = MakeTaskWork(taskMemory, taskRelease);
+        Task<int> queuedTask = Task.Run<int>(taskWork);
+        taskNodes = null;
+        taskMemory = default(Memory<Node237>);
+        taskWork = null;
+        GC.Collect();
+        taskRelease.Set();
+        Check(queuedTask.Result == 52);
+
+        ManualResetEvent threadRelease = new ManualResetEvent(false);
+        ThreadState237 threadState = new ThreadState237();
+        Node237[] threadNodes = MakeNodes(17, 27, 37);
+        Memory<Node237> threadMemory = threadNodes;
+        Action threadWork = MakeThreadPoolWork(threadMemory, threadRelease, threadState);
+        Check(ThreadPool.QueueUserWorkItem(threadWork));
+        threadNodes = null;
+        threadMemory = default(Memory<Node237>);
+        threadWork = null;
+        GC.Collect();
+        GC.Collect();
+        threadRelease.Set();
+        Check(threadState.Done.WaitOne(5000));
+        Check(threadState.Value == 27);
+
+        TaskCompletionSource continuationSource = new TaskCompletionSource();
+        Node237[] continuationNodes = MakeNodes(18, 28, 38);
+        ReadOnlyMemory<Node237> continuationMemory = continuationNodes;
+        Func<Task, int> continuationWork = MakeContinuation(continuationMemory);
+        Task<int> continuation = continuationSource.Task.ContinueWith<int>(continuationWork);
+        continuationNodes = null;
+        continuationMemory = default(ReadOnlyMemory<Node237>);
+        continuationWork = null;
+        GC.Collect();
+        Check(!continuation.IsCompleted);
+        continuationSource.SetResult();
+        Check(continuation.Result == 56);
+
+        Node237[] resultNodes = MakeNodes(19, 29, 39);
+        Memory<Node237> resultMemory = resultNodes;
+        TaskCompletionSource<Memory<Node237>> memorySource = new TaskCompletionSource<Memory<Node237>>();
+        memorySource.SetResult(resultMemory);
+        resultNodes = null;
+        resultMemory = default(Memory<Node237>);
+        GC.Collect();
+        GC.Collect();
+        Memory<Node237> taskResultMemory = memorySource.Task.Result;
+        Check(taskResultMemory.Span[0].Value == 19);
+        Check(taskResultMemory.Span[^1].Value == 39);
+
+        Node237[] aliasNodes = MakeNodes(20, 30, 40);
+        Memory<Node237> aliasMemory = aliasNodes;
+        Memory<Node237> aliasSlice = aliasMemory.Slice(1, 2);
+        aliasSlice.Span[0] = new Node237(300);
+        Check(aliasNodes[1].Value == 300);
+        Check(aliasMemory.Span[1].Value == 300);
+
+        ThreadPool.Shutdown();
+    }
+}

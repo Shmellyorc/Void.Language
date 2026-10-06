@@ -1,0 +1,273 @@
+using Void;
+using Void.Collections;
+
+public interface IMath<T>
+{
+    static T operator +(T left, T right);
+    static T operator -(T left, T right);
+    static T operator -(T value);
+    static T operator ++(T value);
+    static bool operator ==(T left, T right);
+    static bool operator !=(T left, T right);
+    static bool operator <(T left, T right);
+    static bool operator >(T left, T right);
+}
+
+public struct ValueNumber : IMath<ValueNumber>
+{
+    public int Value;
+    public ValueNumber(int value) { Value = value; }
+    public static ValueNumber operator +(ValueNumber left, ValueNumber right) { return new ValueNumber(left.Value + right.Value); }
+    public static ValueNumber operator -(ValueNumber left, ValueNumber right) { return new ValueNumber(left.Value - right.Value); }
+    public static ValueNumber operator -(ValueNumber value) { return new ValueNumber(-value.Value); }
+    public static ValueNumber operator ++(ValueNumber value) { return new ValueNumber(value.Value + 1); }
+    public static bool operator ==(ValueNumber left, ValueNumber right) { return left.Value == right.Value; }
+    public static bool operator !=(ValueNumber left, ValueNumber right) { return left.Value != right.Value; }
+    public static bool operator <(ValueNumber left, ValueNumber right) { return left.Value < right.Value; }
+    public static bool operator >(ValueNumber left, ValueNumber right) { return left.Value > right.Value; }
+}
+
+public sealed class RefNumber : IMath<RefNumber>
+{
+    public int Value;
+    public RefNumber(int value) { Value = value; }
+    public static RefNumber operator +(RefNumber left, RefNumber right) { return new RefNumber(left.Value + right.Value); }
+    public static RefNumber operator -(RefNumber left, RefNumber right) { return new RefNumber(left.Value - right.Value); }
+    public static RefNumber operator -(RefNumber value) { return new RefNumber(-value.Value); }
+    public static RefNumber operator ++(RefNumber value) { return new RefNumber(value.Value + 1); }
+    public static bool operator ==(RefNumber left, RefNumber right) { return left.Value == right.Value; }
+    public static bool operator !=(RefNumber left, RefNumber right) { return left.Value != right.Value; }
+    public static bool operator <(RefNumber left, RefNumber right) { return left.Value < right.Value; }
+    public static bool operator >(RefNumber left, RefNumber right) { return left.Value > right.Value; }
+}
+
+public sealed class IntegrationError : Exception
+{
+    public int Code;
+    public IntegrationError(string message, int code) : base(message) { Code = code; }
+}
+
+public sealed class Resource : IDisposable
+{
+    public int Id;
+    public Resource(int id) { Id = id; Program.ResourceSequence = Program.ResourceSequence * 10 + id; }
+    public void Dispose()
+    {
+        GC.Collect();
+        Program.ResourceSequence = Program.ResourceSequence * 10 + Id;
+        Program.DisposeCount++;
+    }
+}
+
+public sealed class ValueHolder
+{
+    public ValueNumber Value { get; set; }
+    public ValueHolder(ValueNumber value) { Value = value; }
+}
+
+public sealed class GenericSequence<T> where T : IMath<T>
+{
+    private T _seed;
+    public GenericSequence(T seed) { _seed = seed; }
+
+    public IEnumerator<T> Values(T delta, bool fail)
+    {
+        T current = _seed + delta;
+        using (Resource resource = new Resource(4))
+        {
+            try
+            {
+                yield return current;
+                GC.Collect();
+                current += delta;
+                yield return current;
+                current++;
+                yield return current;
+                if (current == current)
+                    Program.OperatorChecks++;
+                if (fail)
+                    throw new IntegrationError("generic-iterator", 91);
+                yield return -current;
+            }
+            finally
+            {
+                GC.Collect();
+                if (current == current)
+                    Program.OperatorChecks++;
+                Program.FinallyCount++;
+            }
+        }
+    }
+}
+
+public static class Program
+{
+    public static int FinallyCount;
+    public static int DisposeCount;
+    public static int OperatorChecks;
+    public static int ResourceSequence;
+    public static int ReceiverCalls;
+
+    private static IEnumerator<T> MethodValues<T>(T left, T right) where T : IMath<T>
+    {
+        T current = left + right;
+        yield return current;
+        GC.Collect();
+        current += right;
+        yield return current;
+        ++current;
+        yield return current;
+        if (current > left)
+            Program.OperatorChecks++;
+    }
+
+    private static IEnumerator<T> PatternValues<T>(object source, T delta) where T : IMath<T>
+    {
+        if (source is T item)
+        {
+            yield return item;
+            GC.Collect();
+            item = item + item;
+            yield return item;
+            item += delta;
+            yield return item;
+        }
+    }
+
+    private static IEnumerator<int> NullableValues()
+    {
+        ValueNumber? left = new ValueNumber(3);
+        ValueNumber? right = new ValueNumber(4);
+        ValueNumber? sum = left + right;
+        yield return sum.Value.Value;
+        GC.Collect();
+        sum = sum + right;
+        yield return sum.Value.Value;
+    }
+
+    public static ValueHolder Touch(ValueHolder holder)
+    {
+        ReceiverCalls++;
+        return holder;
+    }
+
+    private static IEnumerator<int> CompoundPropertyValues()
+    {
+        ValueHolder holder = new ValueHolder(new ValueNumber(5));
+        yield return holder.Value.Value;
+        ValueNumber assigned = Program.Touch(holder).Value += new ValueNumber(6);
+        yield return assigned.Value;
+        yield return holder.Value.Value;
+    }
+
+    private static IEnumerator<int> SwitchPatternValues()
+    {
+        object source = new RefNumber(12);
+        if (source is RefNumber captured)
+        {
+            yield return captured.Value;
+            GC.Collect();
+            int selected = (object)captured switch
+            {
+                RefNumber arm when arm.Value > 0 => arm.Value,
+                _ => 0
+            };
+            yield return selected;
+        }
+    }
+
+    private static void CheckValueGenericType()
+    {
+        FinallyCount = 0;
+        DisposeCount = 0;
+        OperatorChecks = 0;
+        ResourceSequence = 0;
+        GenericSequence<ValueNumber> sequence = new GenericSequence<ValueNumber>(new ValueNumber(2));
+        IEnumerator<ValueNumber> it = sequence.Values(new ValueNumber(3), false);
+        Console.WriteLine(it.MoveNext() && it.Current.Value == 5);
+        Console.WriteLine(it.MoveNext() && it.Current.Value == 8);
+        Console.WriteLine(it.MoveNext() && it.Current.Value == 9);
+        Console.WriteLine(it.MoveNext() && it.Current.Value == -9);
+        Console.WriteLine(!it.MoveNext());
+        Console.WriteLine(FinallyCount == 1);
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(OperatorChecks == 2);
+        Console.WriteLine(ResourceSequence == 44);
+    }
+
+    private static void CheckReferenceDispose()
+    {
+        FinallyCount = 0;
+        DisposeCount = 0;
+        OperatorChecks = 0;
+        ResourceSequence = 0;
+        GenericSequence<RefNumber> sequence = new GenericSequence<RefNumber>(new RefNumber(10));
+        IEnumerator<RefNumber> it = sequence.Values(new RefNumber(2), false);
+        Console.WriteLine(it.MoveNext() && it.Current.Value == 12);
+        GC.Collect();
+        it.Dispose();
+        Console.WriteLine(FinallyCount == 1);
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(OperatorChecks == 1);
+        Console.WriteLine(ResourceSequence == 44);
+        Console.WriteLine(!it.MoveNext());
+    }
+
+    private static void CheckFault()
+    {
+        FinallyCount = 0;
+        DisposeCount = 0;
+        OperatorChecks = 0;
+        ResourceSequence = 0;
+        IEnumerator<ValueNumber> it = new GenericSequence<ValueNumber>(new ValueNumber(1)).Values(new ValueNumber(2), true);
+        Console.WriteLine(it.MoveNext() && it.Current.Value == 3);
+        Console.WriteLine(it.MoveNext() && it.Current.Value == 5);
+        Console.WriteLine(it.MoveNext() && it.Current.Value == 6);
+        bool caught = false;
+        try { it.MoveNext(); }
+        catch (IntegrationError error) { caught = error.Code == 91; }
+        Console.WriteLine(caught);
+        Console.WriteLine(FinallyCount == 1);
+        Console.WriteLine(DisposeCount == 1);
+        Console.WriteLine(OperatorChecks == 2);
+        Console.WriteLine(ResourceSequence == 44);
+        Console.WriteLine(!it.MoveNext());
+    }
+
+    public static void Main()
+    {
+        CheckValueGenericType();
+        CheckReferenceDispose();
+        CheckFault();
+
+        IEnumerator<ValueNumber> method = MethodValues(new ValueNumber(4), new ValueNumber(2));
+        Console.WriteLine(method.MoveNext() && method.Current.Value == 6);
+        Console.WriteLine(method.MoveNext() && method.Current.Value == 8);
+        Console.WriteLine(method.MoveNext() && method.Current.Value == 9);
+        Console.WriteLine(!method.MoveNext());
+
+        IEnumerator<RefNumber> pattern = PatternValues<RefNumber>(new RefNumber(3), new RefNumber(2));
+        Console.WriteLine(pattern.MoveNext() && pattern.Current.Value == 3);
+        Console.WriteLine(pattern.MoveNext() && pattern.Current.Value == 6);
+        Console.WriteLine(pattern.MoveNext() && pattern.Current.Value == 8);
+        Console.WriteLine(!pattern.MoveNext());
+
+        IEnumerator<int> nullable = NullableValues();
+        Console.WriteLine(nullable.MoveNext() && nullable.Current == 7);
+        Console.WriteLine(nullable.MoveNext() && nullable.Current == 11);
+        Console.WriteLine(!nullable.MoveNext());
+
+        ReceiverCalls = 0;
+        IEnumerator<int> compound = CompoundPropertyValues();
+        Console.WriteLine(compound.MoveNext() && compound.Current == 5);
+        Console.WriteLine(compound.MoveNext() && compound.Current == 11);
+        Console.WriteLine(ReceiverCalls == 1);
+        Console.WriteLine(compound.MoveNext() && compound.Current == 11);
+        Console.WriteLine(!compound.MoveNext());
+
+        IEnumerator<int> switched = SwitchPatternValues();
+        Console.WriteLine(switched.MoveNext() && switched.Current == 12);
+        Console.WriteLine(switched.MoveNext() && switched.Current == 12);
+        Console.WriteLine(!switched.MoveNext());
+    }
+}

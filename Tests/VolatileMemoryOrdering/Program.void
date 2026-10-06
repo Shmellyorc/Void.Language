@@ -1,0 +1,267 @@
+using Void;
+using Void.Threading;
+
+public interface IValue
+{
+    int Read();
+}
+
+public sealed class Payload
+{
+    public int Value;
+
+    public Payload(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class Node : IValue
+{
+    public int Value;
+    public Payload Payload;
+
+    public Node(int value)
+    {
+        Value = value;
+        Payload = new Payload(value + 1000);
+    }
+
+    public int Read()
+    {
+        return Value;
+    }
+}
+
+public sealed class Holder
+{
+    public int Number;
+    public long Wide;
+    public Node RefValue;
+}
+
+public static class Program
+{
+    private static int _intSlot;
+    private static Node _refSlot;
+    private static int _evalCount;
+
+    private static int _ready;
+    private static int _publishedData;
+    private static int _publicationOk;
+
+    private static long _longReady;
+    private static long _longData;
+    private static int _longPublicationOk;
+
+    private static Node _publishedRef;
+    private static int _refPublicationOk;
+
+    private static Node _gcSlot;
+    private static int _readerHasValue;
+    private static int _slotCleared;
+    private static int _gcReadOk;
+
+    public static int NextInt()
+    {
+        _evalCount++;
+        return 77;
+    }
+
+    public static T ReadRef<T>(ref T location) where T : class
+    {
+        return Volatile.Read(ref location);
+    }
+
+    public static void WriteRef<T>(ref T location, T value) where T : class
+    {
+        Volatile.Write(ref location, value);
+    }
+
+    public static void PublishInt()
+    {
+        _publishedData = 12345;
+        Volatile.Write(ref _ready, 1);
+    }
+
+    public static void ObserveInt()
+    {
+        while (Volatile.Read(ref _ready) == 0)
+        {
+        }
+        _publicationOk = _publishedData == 12345 ? 1 : 0;
+    }
+
+    public static void PublishLong()
+    {
+        _longData = 9876543210L;
+        Volatile.Write(ref _longReady, 1L);
+    }
+
+    public static void ObserveLong()
+    {
+        while (Volatile.Read(ref _longReady) == 0L)
+        {
+        }
+        _longPublicationOk = _longData == 9876543210L ? 1 : 0;
+    }
+
+    public static void PublishReference()
+    {
+        Node value = new Node(91);
+        Volatile.Write(ref _publishedRef, value);
+    }
+
+    public static void ObserveReference()
+    {
+        Node value = null;
+        while (value == null)
+        {
+            value = Volatile.Read(ref _publishedRef);
+        }
+        GC.Collect();
+        _refPublicationOk = value.Value == 91 && value.Payload.Value == 1091 ? 1 : 0;
+    }
+
+    public static void HoldReadAcrossCollection()
+    {
+        Node value = Volatile.Read(ref _gcSlot);
+        Volatile.Write(ref _readerHasValue, 1);
+        while (Volatile.Read(ref _slotCleared) == 0)
+        {
+        }
+        GC.Collect();
+        _gcReadOk = value != null && value.Value == 44 && value.Payload.Value == 1044 ? 1 : 0;
+    }
+
+    public static void ClearSharedSlot()
+    {
+        while (Volatile.Read(ref _readerHasValue) == 0)
+        {
+        }
+        Volatile.Write(ref _gcSlot, null);
+        GC.Collect();
+        Volatile.Write(ref _slotCleared, 1);
+    }
+
+    public static void Main()
+    {
+        int number = 10;
+        Console.WriteLine(Volatile.Read(ref number) == 10);
+        Volatile.Write(ref number, 20);
+        Console.WriteLine(Volatile.Read(ref number) == 20);
+
+        long wide = 10000000000L;
+        Console.WriteLine(Volatile.Read(ref wide) == 10000000000L);
+        Volatile.Write(ref wide, 20000000000L);
+        Console.WriteLine(Volatile.Read(ref wide) == 20000000000L);
+
+        _evalCount = 0;
+        Volatile.Write(ref number, NextInt());
+        Console.WriteLine(number == 77);
+        Console.WriteLine(_evalCount == 1);
+
+        Holder holder = new Holder();
+        holder.Number = 3;
+        holder.Wide = 4L;
+        holder.RefValue = new Node(5);
+        Console.WriteLine(Volatile.Read(ref holder.Number) == 3);
+        Volatile.Write(ref holder.Number, 6);
+        Console.WriteLine(holder.Number == 6);
+        Console.WriteLine(Volatile.Read(ref holder.Wide) == 4L);
+        Volatile.Write(ref holder.Wide, 7L);
+        Console.WriteLine(holder.Wide == 7L);
+
+        _intSlot = 8;
+        Console.WriteLine(Volatile.Read(ref _intSlot) == 8);
+        Volatile.Write(ref _intSlot, 9);
+        Console.WriteLine(_intSlot == 9);
+
+        Node first = new Node(11);
+        Node second = new Node(12);
+        Node nodeSlot = first;
+        Console.WriteLine(Volatile.Read(ref nodeSlot) == first);
+        Volatile.Write(ref nodeSlot, second);
+        Console.WriteLine(nodeSlot == second);
+        GC.Collect();
+        Console.WriteLine(Volatile.Read(ref nodeSlot).Payload.Value == 1012);
+
+        _refSlot = first;
+        Console.WriteLine(Volatile.Read(ref _refSlot) == first);
+        Volatile.Write(ref _refSlot, second);
+        Console.WriteLine(_refSlot == second);
+
+        IValue interfaceSlot = new Node(13);
+        Console.WriteLine(Volatile.Read(ref interfaceSlot).Read() == 13);
+        Volatile.Write(ref interfaceSlot, new Node(14));
+        Console.WriteLine(interfaceSlot.Read() == 14);
+
+        Node[] arraySlot = new Node[1];
+        arraySlot[0] = new Node(15);
+        Node[] otherArray = new Node[1];
+        otherArray[0] = new Node(16);
+        Console.WriteLine(Volatile.Read(ref arraySlot)[0].Value == 15);
+        Volatile.Write(ref arraySlot, otherArray);
+        Console.WriteLine(arraySlot[0].Value == 16);
+
+        Node genericSlot = new Node(17);
+        Console.WriteLine(ReadRef(ref genericSlot).Value == 17);
+        WriteRef(ref genericSlot, new Node(18));
+        Console.WriteLine(genericSlot.Value == 18);
+        WriteRef(ref genericSlot, null);
+        Console.WriteLine(ReadRef(ref genericSlot) == null);
+
+        _ready = 0;
+        _publishedData = 0;
+        _publicationOk = 0;
+        Action intReaderAction = ObserveInt;
+        Action intWriterAction = PublishInt;
+        Thread intReader = new Thread(intReaderAction);
+        Thread intWriter = new Thread(intWriterAction);
+        intReader.Start();
+        intWriter.Start();
+        intReader.Join();
+        intWriter.Join();
+        Console.WriteLine(_publicationOk == 1);
+
+        _longReady = 0L;
+        _longData = 0L;
+        _longPublicationOk = 0;
+        Action longReaderAction = ObserveLong;
+        Action longWriterAction = PublishLong;
+        Thread longReader = new Thread(longReaderAction);
+        Thread longWriter = new Thread(longWriterAction);
+        longReader.Start();
+        longWriter.Start();
+        longReader.Join();
+        longWriter.Join();
+        Console.WriteLine(_longPublicationOk == 1);
+
+        _publishedRef = null;
+        _refPublicationOk = 0;
+        Action refReaderAction = ObserveReference;
+        Action refWriterAction = PublishReference;
+        Thread refReader = new Thread(refReaderAction);
+        Thread refWriter = new Thread(refWriterAction);
+        refReader.Start();
+        refWriter.Start();
+        refReader.Join();
+        refWriter.Join();
+        Console.WriteLine(_refPublicationOk == 1);
+
+        _gcSlot = new Node(44);
+        _readerHasValue = 0;
+        _slotCleared = 0;
+        _gcReadOk = 0;
+        Action gcReaderAction = HoldReadAcrossCollection;
+        Action gcWriterAction = ClearSharedSlot;
+        Thread gcReader = new Thread(gcReaderAction);
+        Thread gcWriter = new Thread(gcWriterAction);
+        gcReader.Start();
+        gcWriter.Start();
+        gcReader.Join();
+        gcWriter.Join();
+        Console.WriteLine(_gcSlot == null);
+        Console.WriteLine(_gcReadOk == 1);
+    }
+}

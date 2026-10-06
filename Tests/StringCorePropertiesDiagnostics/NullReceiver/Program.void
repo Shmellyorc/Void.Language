@@ -1,0 +1,10 @@
+using Void;
+
+public static class Program
+{
+    public static void Main()
+    {
+        string text = null;
+        Console.WriteLine(text.Length);
+    }
+}

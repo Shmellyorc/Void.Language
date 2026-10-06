@@ -1,0 +1,4 @@
+using Void.Threading.Tasks;
+public struct Seq238 { private int[] _a; public Seq238(int[] a) { _a = a; } public Enum238 GetEnumerator() { return new Enum238(_a); } }
+public struct Enum238 { private int[] _a; private int _i; public Enum238(int[] a) { _a = a; _i = -1; } public bool MoveNext() { _i++; return _i < _a.Length; } public ref int Current { get { return ref _a[_i]; } } }
+public static class Program { public static async Task Run(Seq238 s) { foreach (ref int x in s) { x++; } return; } public static void Main() { } }

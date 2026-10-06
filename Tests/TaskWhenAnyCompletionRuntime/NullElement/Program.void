@@ -1,0 +1,11 @@
+using Void.Threading.Tasks;
+public static class Program
+{
+    public static void Main()
+    {
+        Task[] tasks = new Task[2];
+        tasks[0] = Task.CompletedTask;
+        tasks[1] = null;
+        Task.WhenAny(tasks);
+    }
+}

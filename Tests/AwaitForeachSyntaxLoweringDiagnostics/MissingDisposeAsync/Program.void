@@ -1,0 +1,18 @@
+using Void.Threading.Tasks;
+public sealed class Enumerator216
+{
+    public int Current => 1;
+    public Task<bool> MoveNextAsync() { return null; }
+}
+public sealed class Source216
+{
+    public Enumerator216 GetAsyncEnumerator() { return new Enumerator216(); }
+}
+public static class Program
+{
+    private static async Task Read(Source216 source)
+    {
+        await foreach (var value in source) {}
+    }
+    public static void Main() {}
+}

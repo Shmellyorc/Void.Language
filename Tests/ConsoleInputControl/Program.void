@@ -1,0 +1,65 @@
+using Void;
+using Void.IO;
+
+public sealed class EmptyReader318 : TextReader
+{
+    public override int Read() { return -1; }
+    public override string ReadLine() { return null; }
+}
+
+public static class Program
+{
+    private static bool KeyAvailableThrows()
+    {
+        try { if (Console.KeyAvailable) { } }
+        catch (InvalidOperationException e) { return true; }
+        return false;
+    }
+
+    private static bool TreatControlGetThrows()
+    {
+        try { if (Console.TreatControlCAsInput) { } }
+        catch (IOException e) { return true; }
+        return false;
+    }
+
+    private static bool TreatControlSetThrows()
+    {
+        try { Console.TreatControlCAsInput = true; }
+        catch (IOException e) { return true; }
+        return false;
+    }
+
+    public static void Main()
+    {
+        TextReader originalIn = Console.In;
+        Console.SetIn(new EmptyReader318());
+        Console.WriteLine(KeyAvailableThrows());
+        Console.SetIn(originalIn);
+
+        if (Console.IsInputRedirected)
+        {
+            Console.WriteLine(KeyAvailableThrows());
+            Console.WriteLine(TreatControlGetThrows());
+            Console.WriteLine(TreatControlSetThrows());
+            return;
+        }
+
+        Console.WriteLine(!Console.TreatControlCAsInput);
+        Console.WriteLine(!Console.KeyAvailable);
+        while (!Console.KeyAvailable) { }
+        Console.WriteLine(Console.KeyAvailable);
+        ConsoleKeyInfo normal = Console.ReadKey(true);
+        Console.WriteLine(normal.KeyChar == 'x' && normal.Key == ConsoleKey.X && (int)normal.Modifiers == 0);
+        Console.WriteLine(!Console.KeyAvailable);
+
+        Console.TreatControlCAsInput = true;
+        Console.WriteLine(Console.TreatControlCAsInput);
+        while (!Console.KeyAvailable) { }
+        ConsoleKeyInfo controlC = Console.ReadKey(true);
+        Console.WriteLine((int)controlC.KeyChar == 3 && controlC.Key == ConsoleKey.C && (int)controlC.Modifiers == 4);
+
+        Console.TreatControlCAsInput = false;
+        Console.WriteLine(!Console.TreatControlCAsInput);
+    }
+}

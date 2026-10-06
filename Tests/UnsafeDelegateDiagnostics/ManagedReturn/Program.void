@@ -1,0 +1,2 @@
+public unsafe delegate string* Bad();
+public static class Program { public static void Main() { } }

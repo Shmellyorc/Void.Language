@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "UnmanagedGenericConstraintFoundation",
+  "output": "exe",
+  "version": "0.0.241",
+  "compiler": {
+    "unsafe": true
+  }
+}

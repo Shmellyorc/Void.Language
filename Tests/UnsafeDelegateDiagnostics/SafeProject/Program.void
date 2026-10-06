@@ -1,0 +1,2 @@
+public unsafe delegate void Bad(int value);
+public static class Program { public static void Main() { } }

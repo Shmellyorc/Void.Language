@@ -1,0 +1,83 @@
+using Void;
+using Void.IO;
+
+public sealed class EmptyReader : TextReader
+{
+    public override int Read() { return -1; }
+    public override string ReadLine() { return null; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine((int)ConsoleModifiers.None == 0);
+        Console.WriteLine((int)ConsoleModifiers.Alt == 1);
+        Console.WriteLine((int)ConsoleModifiers.Shift == 2);
+        Console.WriteLine((int)ConsoleModifiers.Control == 4);
+        Console.WriteLine((int)ConsoleKey.A == 65 && (int)ConsoleKey.F12 == 123 && (int)ConsoleKey.OemClear == 254);
+
+        ConsoleKeyInfo constructed = new ConsoleKeyInfo('Q', ConsoleKey.Q, true, false, true);
+        Console.WriteLine(constructed.KeyChar == 'Q');
+        Console.WriteLine(constructed.Key == ConsoleKey.Q);
+        Console.WriteLine((int)constructed.Modifiers == 6);
+        ConsoleKeyInfo same = new ConsoleKeyInfo('Q', ConsoleKey.Q, true, false, true);
+        Console.WriteLine(constructed == same && !(constructed != same));
+        Console.WriteLine(constructed.GetHashCode() == same.GetHashCode());
+
+        bool caught = false;
+        try { ConsoleKeyInfo invalid = new ConsoleKeyInfo('x', (ConsoleKey)300, false, false, false); }
+        catch (ArgumentOutOfRangeException e) { caught = e.ParamName == "key"; }
+        Console.WriteLine(caught);
+
+        TextReader originalIn = Console.In;
+        Console.SetIn(new EmptyReader());
+        caught = false;
+        try { Console.ReadKey(true); }
+        catch (InvalidOperationException e) { caught = true; }
+        Console.WriteLine(caught);
+        Console.SetIn(originalIn);
+
+        if (Console.IsInputRedirected)
+        {
+            caught = false;
+            try { Console.ReadKey(true); }
+            catch (InvalidOperationException e) { caught = true; }
+            Console.WriteLine(caught);
+            return;
+        }
+
+        ConsoleKeyInfo lower = Console.ReadKey(true);
+        Console.WriteLine(lower.KeyChar == 'a' && lower.Key == ConsoleKey.A && (int)lower.Modifiers == 0);
+
+        ConsoleKeyInfo upper = Console.ReadKey(true);
+        Console.WriteLine(upper.KeyChar == 'A' && upper.Key == ConsoleKey.A && (int)upper.Modifiers == 2);
+
+        ConsoleKeyInfo control = Console.ReadKey(true);
+        Console.WriteLine((int)control.KeyChar == 1 && control.Key == ConsoleKey.A && (int)control.Modifiers == 4);
+
+        ConsoleKeyInfo alt = Console.ReadKey(true);
+        Console.WriteLine(alt.KeyChar == 'x' && alt.Key == ConsoleKey.X && (int)alt.Modifiers == 1);
+
+        ConsoleKeyInfo up = Console.ReadKey(true);
+        Console.WriteLine((int)up.KeyChar == 0 && up.Key == ConsoleKey.UpArrow && (int)up.Modifiers == 0);
+
+        ConsoleKeyInfo ctrlRight = Console.ReadKey(true);
+        Console.WriteLine((int)ctrlRight.KeyChar == 0 && ctrlRight.Key == ConsoleKey.RightArrow && (int)ctrlRight.Modifiers == 4);
+
+        ConsoleKeyInfo f5 = Console.ReadKey(true);
+        Console.WriteLine((int)f5.KeyChar == 0 && f5.Key == ConsoleKey.F5 && (int)f5.Modifiers == 0);
+
+        ConsoleKeyInfo unicode = Console.ReadKey(true);
+        Console.WriteLine((int)unicode.KeyChar == 946 && (int)unicode.Key == 0 && (int)unicode.Modifiers == 0);
+
+        ConsoleKeyInfo enter = Console.ReadKey(true);
+        Console.WriteLine((int)enter.KeyChar == 13 && enter.Key == ConsoleKey.Enter);
+
+        ConsoleKeyInfo echo = Console.ReadKey(false);
+        Console.WriteLine(echo.KeyChar == 'z' && echo.Key == ConsoleKey.Z);
+
+        ConsoleKeyInfo escape = Console.ReadKey(true);
+        Console.WriteLine((int)escape.KeyChar == 27 && escape.Key == ConsoleKey.Escape && (int)escape.Modifiers == 0);
+    }
+}

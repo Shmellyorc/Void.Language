@@ -1,0 +1,112 @@
+using Void;
+
+public struct Pair250Surface
+{
+    public int X;
+    public int Y;
+
+    public Pair250Surface(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+}
+
+public sealed class GenericPin250<T> where T : unmanaged
+{
+    public T Value;
+
+    public GenericPin250(T value)
+    {
+        Value = value;
+    }
+
+    public ref T GetPinnableReference()
+    {
+        return ref Value;
+    }
+}
+
+public static class Program
+{
+    private static unsafe T GenericRoundTrip<T>(T value) where T : unmanaged
+    {
+        T* storage = stackalloc T[2];
+        storage[0] = value;
+        Span<T> span = new Span<T>(storage, 2);
+        fixed (T* pinned = span)
+            return pinned[0];
+    }
+
+    private static unsafe bool FixedPointerSpanBridge(int[] values)
+    {
+        fixed (int* pointer = values)
+        {
+            Span<int> span = new Span<int>(pointer, values.Length);
+            span[1] = 42;
+            return span[0] == values[0] && pointer[1] == 42;
+        }
+    }
+
+    public static unsafe void Main()
+    {
+        Console.WriteLine(GenericRoundTrip<int>(17) == 17);
+        Pair250Surface pair = GenericRoundTrip<Pair250Surface>(new Pair250Surface(3, 4));
+        Console.WriteLine(pair.X == 3 && pair.Y == 4);
+
+        GenericPin250<int> generic = new GenericPin250<int>(20);
+        fixed (int* pointer = generic)
+        {
+            GC.Collect();
+            pointer[0] = 21;
+        }
+        Console.WriteLine(generic.Value == 21);
+
+        int[] values = new int[] { 1, 2, 3, 4 };
+        Console.WriteLine(FixedPointerSpanBridge(values));
+        Console.WriteLine(values[1] == 42);
+
+        Span<int> span = new Span<int>(values, 1, 2);
+        fixed (int* pointer = span)
+        {
+            GC.Collect();
+            Console.WriteLine(pointer[0] == 42 && pointer[1] == 3);
+            pointer[1] = 30;
+        }
+        Console.WriteLine(values[2] == 30);
+
+        Memory<int> memory = new Memory<int>(values, 1, 2);
+        fixed (int* pointer = memory)
+        {
+            GC.Collect();
+            Console.WriteLine(pointer[0] == 42 && pointer[1] == 30);
+            pointer[0] = 43;
+        }
+        Console.WriteLine(values[1] == 43);
+
+        ReadOnlySpan<int> readOnly = new ReadOnlySpan<int>(values, 1, 2);
+        ref readonly int readOnlyRef = ref readOnly.GetPinnableReference();
+        Console.WriteLine(readOnlyRef == 43);
+
+        ReadOnlyMemory<int> readOnlyMemory = new ReadOnlyMemory<int>(values, 1, 2);
+        ref readonly int readOnlyMemoryRef = ref readOnlyMemory.GetPinnableReference();
+        Console.WriteLine(readOnlyMemoryRef == 43);
+
+        int* unmanaged = stackalloc int[3];
+        unmanaged[0] = 7;
+        unmanaged[1] = 8;
+        unmanaged[2] = 9;
+        Span<int> unmanagedSpan = new Span<int>(unmanaged, 3);
+        ReadOnlySpan<int> unmanagedReadOnly = new ReadOnlySpan<int>(unmanaged, 3);
+        Console.WriteLine(unmanagedSpan[2] == 9 && unmanagedReadOnly[0] == 7);
+        unmanagedSpan[1] = 80;
+        Console.WriteLine(unmanaged[1] == 80 && unmanagedReadOnly[1] == 80);
+
+        Span<int> empty = new Span<int>((void*)null, 0);
+        ReadOnlySpan<int> readOnlyEmpty = new ReadOnlySpan<int>((void*)null, 0);
+        Console.WriteLine(empty.IsEmpty && readOnlyEmpty.IsEmpty);
+
+        fixed (int* arrayPointer = values, spanPointer = span, memoryPointer = memory)
+            Console.WriteLine(arrayPointer[1] == 43 && spanPointer[0] == 43 && memoryPointer[1] == 30);
+    }
+}

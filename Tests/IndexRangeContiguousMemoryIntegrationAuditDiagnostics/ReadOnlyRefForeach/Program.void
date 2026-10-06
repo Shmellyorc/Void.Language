@@ -1,0 +1,11 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        int[] values = new int[] { 1, 2, 3 };
+        ReadOnlyMemory<int> memory = values;
+        foreach (ref int value in memory[1..].Span)
+            value++;
+    }
+}

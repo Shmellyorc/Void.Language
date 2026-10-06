@@ -1,0 +1,8 @@
+public static class Extensions
+{
+    public static T Missing<T>(this int value) { return default(T); }
+}
+public static class Program
+{
+    public static void Main() { Console.WriteLine(1.Missing()); }
+}

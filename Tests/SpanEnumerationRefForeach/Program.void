@@ -1,0 +1,199 @@
+using Void;
+using Void.Collections;
+
+public sealed class Node238
+{
+    public int Value;
+    public Node238(int value) { Value = value; }
+}
+
+public static class Tracker238
+{
+    public static int GetEnumeratorCalls;
+    public static int DisposeCalls;
+    public static int MakeSpanCalls;
+    public static int[] Shared = new int[] { 40, 50, 60 };
+
+    public static Span<int> MakeSpan()
+    {
+        MakeSpanCalls++;
+        return Shared;
+    }
+}
+
+public struct RefSequence238
+{
+    private int[] _values;
+    public RefSequence238(int[] values) { _values = values; }
+    public RefEnumerator238 GetEnumerator()
+    {
+        Tracker238.GetEnumeratorCalls++;
+        return new RefEnumerator238(_values);
+    }
+}
+
+public struct RefEnumerator238
+{
+    private int[] _values;
+    private int _index;
+    public RefEnumerator238(int[] values) { _values = values; _index = -1; }
+    public bool MoveNext() { _index++; return _index < _values.Length; }
+    public ref int Current { get { return ref _values[_index]; } }
+    public void Dispose() { Tracker238.DisposeCalls++; }
+}
+
+public struct ReadSequence238
+{
+    private int[] _values;
+    public ReadSequence238(int[] values) { _values = values; }
+    public ReadEnumerator238 GetEnumerator() { return new ReadEnumerator238(_values); }
+}
+
+public struct ReadEnumerator238
+{
+    private int[] _values;
+    private int _index;
+    public ReadEnumerator238(int[] values) { _values = values; _index = -1; }
+    public bool MoveNext() { _index++; return _index < _values.Length; }
+    public ref readonly int Current { get { return ref _values[_index]; } }
+}
+
+public static class Program
+{
+    private static void Add(ref int value, int amount) { value += amount; }
+    private static int Read(in int value) { return value; }
+
+    public static void Main()
+    {
+        int[] values = new int[] { 1, 2, 3, 4 };
+        Span<int> span = values;
+
+        int sum = 0;
+        foreach (var value in span)
+            sum += value;
+        Console.WriteLine(sum == 10);
+
+        int typedSum = 0;
+        foreach (int value in span)
+            typedSum += value;
+        Console.WriteLine(typedSum == 10);
+
+        foreach (ref int value in span)
+            value *= 2;
+        Console.WriteLine(values[0] == 2 && values[3] == 8);
+
+        foreach (ref var value in span)
+            Add(ref value, 1);
+        Console.WriteLine(values[0] == 3 && values[3] == 9);
+
+        int aliasTotal = 0;
+        foreach (ref int value in span)
+        {
+            ref int alias = ref value;
+            alias += 1;
+            aliasTotal += value;
+        }
+        Console.WriteLine(aliasTotal == 28);
+        Console.WriteLine(values[1] == 6);
+
+        int readonlyTotal = 0;
+        foreach (ref readonly int value in span)
+            readonlyTotal += Read(in value);
+        Console.WriteLine(readonlyTotal == 28);
+
+        ReadOnlySpan<int> readonlySpan = span;
+        int readonlySpanTotal = 0;
+        foreach (ref readonly var value in readonlySpan)
+            readonlySpanTotal += value;
+        Console.WriteLine(readonlySpanTotal == 28);
+
+        int readonlyCopyTotal = 0;
+        foreach (var value in readonlySpan)
+            readonlyCopyTotal += value;
+        Console.WriteLine(readonlyCopyTotal == 28);
+
+        Span<int> stack = stackalloc int[3];
+        stack[0] = 5;
+        stack[1] = 6;
+        stack[2] = 7;
+        foreach (ref int value in stack)
+            value += 10;
+        Console.WriteLine(stack[0] == 15 && stack[2] == 17);
+        int stackTotal = 0;
+        foreach (int value in stack)
+            stackTotal += value;
+        Console.WriteLine(stackTotal == 48);
+
+        int[] slicedValues = new int[] { 10, 20, 30, 40, 50 };
+        Span<int> sliced = slicedValues;
+        foreach (ref int value in sliced[1..^1])
+            value += 5;
+        Console.WriteLine(slicedValues[0] == 10 && slicedValues[1] == 25 && slicedValues[3] == 45 && slicedValues[4] == 50);
+
+        int[] customValues = new int[] { 10, 20, 30 };
+        RefSequence238 custom = new RefSequence238(customValues);
+        foreach (ref int value in custom)
+            value += 5;
+        Console.WriteLine(customValues[0] == 15 && customValues[2] == 35);
+        Console.WriteLine(Tracker238.GetEnumeratorCalls == 1);
+        Console.WriteLine(Tracker238.DisposeCalls == 1);
+
+        int customTotal = 0;
+        foreach (var value in custom)
+            customTotal += value;
+        Console.WriteLine(customTotal == 75);
+        Console.WriteLine(Tracker238.GetEnumeratorCalls == 2);
+        Console.WriteLine(Tracker238.DisposeCalls == 2);
+
+        ReadSequence238 readCustom = new ReadSequence238(customValues);
+        int readCustomTotal = 0;
+        foreach (ref readonly int value in readCustom)
+            readCustomTotal += value;
+        Console.WriteLine(readCustomTotal == 75);
+
+        int readCustomCopyTotal = 0;
+        foreach (var value in readCustom)
+            readCustomCopyTotal += value;
+        Console.WriteLine(readCustomCopyTotal == 75);
+
+        Tracker238.MakeSpanCalls = 0;
+        foreach (ref int value in Tracker238.MakeSpan())
+            value += 1;
+        Console.WriteLine(Tracker238.MakeSpanCalls == 1);
+        Console.WriteLine(Tracker238.Shared[0] == 41 && Tracker238.Shared[2] == 61);
+
+        int control = 0;
+        foreach (ref int value in span)
+        {
+            if (value == 6)
+                continue;
+            control += value;
+            if (value == 8)
+                break;
+        }
+        Console.WriteLine(control == 12);
+
+        Node238[] nodes = new Node238[] { new Node238(100), new Node238(200) };
+        Span<Node238> nodeSpan = nodes;
+        nodes = null;
+        GC.Collect();
+        foreach (ref Node238 node in nodeSpan)
+        {
+            GC.Collect();
+            node.Value += 1;
+        }
+        GC.Collect();
+        Console.WriteLine(nodeSpan[0].Value == 101 && nodeSpan[1].Value == 201);
+
+        Span<int> empty = default(Span<int>);
+        int emptyCount = 0;
+        foreach (var value in empty)
+            emptyCount++;
+        Console.WriteLine(emptyCount == 0);
+
+        ReadOnlySpan<int> emptyReadonly = default(ReadOnlySpan<int>);
+        foreach (ref readonly int value in emptyReadonly)
+            emptyCount++;
+        Console.WriteLine(emptyCount == 0);
+    }
+}

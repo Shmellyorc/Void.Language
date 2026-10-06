@@ -1,0 +1,8 @@
+using Void.Threading.Tasks;
+public static class Program
+{
+    public static void Main()
+    {
+        ValueTask value = new ValueTask(null);
+    }
+}

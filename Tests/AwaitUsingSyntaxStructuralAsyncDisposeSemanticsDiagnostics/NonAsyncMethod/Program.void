@@ -1,0 +1,1 @@
+using Void; public sealed class R { public A DisposeAsync(){return default;} } public struct A { public W GetAwaiter(){return default;} } public struct W { public bool IsCompleted { get { return true; } } public void OnCompleted(Action c){c();} public void GetResult(){} } public static class Program { public static void Main(){ await using (R r = new R()) { } } }

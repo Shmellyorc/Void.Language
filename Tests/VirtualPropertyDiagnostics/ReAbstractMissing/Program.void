@@ -1,0 +1,4 @@
+public class RootValue { public virtual int Value => 1; }
+public abstract class MiddleValue : RootValue { public abstract override int Value { get; } }
+public sealed class Broken : MiddleValue { }
+public static class Program { public static void Main() { Broken value = new(); } }

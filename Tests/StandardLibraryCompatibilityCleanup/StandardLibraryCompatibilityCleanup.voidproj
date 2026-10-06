@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "StandardLibraryCompatibilityCleanup",
+  "version": "0.0.310",
+  "output": "exe",
+  "compiler": {
+    "unsafe": true
+  }
+}

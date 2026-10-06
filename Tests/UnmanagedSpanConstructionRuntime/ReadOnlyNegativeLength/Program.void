@@ -1,0 +1,1 @@
+using Void; public static class Program { public static unsafe void Main() { int* p = stackalloc int[1]; ReadOnlySpan<int> span = new ReadOnlySpan<int>(p, -1); Console.WriteLine(span.Length); } }

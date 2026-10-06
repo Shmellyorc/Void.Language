@@ -1,0 +1,21 @@
+using Void;
+using Void.Threading.Tasks;
+
+public static class Native250Async
+{
+    [Native("voidc250_async_add")]
+    public static unsafe extern int Add(int value);
+}
+
+public static class Program
+{
+    public static unsafe async Task<int> ReadAfterAwait(Task gate, int value)
+    {
+        await gate;
+        return Native250Async.Add(value);
+    }
+
+    public static unsafe void Main()
+    {
+    }
+}

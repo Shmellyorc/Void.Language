@@ -1,0 +1,361 @@
+public sealed class Node
+{
+    public int Value;
+
+    public Node(int value)
+    {
+        Value = value;
+    }
+}
+
+public interface IGenericWorker
+{
+    int Apply<T>(T ignored, int amount);
+    T Echo<T>(T value);
+}
+
+public class GenericWorker : IGenericWorker
+{
+    public int Value;
+
+    public GenericWorker(int value)
+    {
+        Value = value;
+    }
+
+    public int Apply<T>(T ignored, int amount)
+    {
+        Value += amount;
+        return Value;
+    }
+
+    public T Echo<T>(T value)
+    {
+        return value;
+    }
+
+    public static T StaticEcho<T>(T value)
+    {
+        return value;
+    }
+
+    public T Select<T>(int marker, T value)
+    {
+        return value;
+    }
+
+    public T Select<T>(float marker, T value)
+    {
+        return value;
+    }
+
+    public T Optional<T>(T value, int marker = 7)
+    {
+        return value;
+    }
+
+    public T Params<T>(T first, params T[] rest)
+    {
+        return first;
+    }
+
+    public void Assign<T>(ref T target, T value)
+    {
+        target = value;
+    }
+
+    public void Produce<T>(out T target, T value)
+    {
+        target = value;
+    }
+
+    public T Read<T>(in T value)
+    {
+        return value;
+    }
+
+    public T ViaThis<T>(T value)
+    {
+        return this.Echo<T>(value);
+    }
+
+    public T DefaultValue<T>()
+    {
+        return default(T);
+    }
+}
+
+public sealed class DerivedWorker : GenericWorker
+{
+    public DerivedWorker(int value) : base(value)
+    {
+    }
+
+    public int BaseEcho()
+    {
+        return base.Echo<int>(31);
+    }
+}
+
+public class VirtualBase
+{
+    public virtual T Echo<T>(T value)
+    {
+        return value;
+    }
+}
+
+public sealed class VirtualDerived : VirtualBase
+{
+    public override T Echo<T>(T value)
+    {
+        return value;
+    }
+}
+
+public sealed class WorkerHolder
+{
+    private GenericWorker _worker;
+
+    public GenericWorker Worker
+    {
+        get { return _worker; }
+    }
+
+    public WorkerHolder(GenericWorker worker)
+    {
+        _worker = worker;
+    }
+
+    public GenericWorker get_Item(int index)
+    {
+        return _worker;
+    }
+}
+
+public sealed class GenericBox<T>
+{
+    private T _value;
+
+    public GenericBox(T value)
+    {
+        _value = value;
+    }
+
+    public T Get()
+    {
+        return _value;
+    }
+
+    public U Convert<U>(U value)
+    {
+        return value;
+    }
+
+    public U Chain<U>(U value)
+    {
+        return this.Convert<U>(value);
+    }
+}
+
+public class GenericBase<T>
+{
+    public U Mix<U>(T left, U right)
+    {
+        return right;
+    }
+}
+
+public sealed class GenericChild<T> : GenericBase<T>
+{
+}
+
+public struct GenericCounter
+{
+    public int Value;
+
+    public GenericCounter(int value)
+    {
+        Value = value;
+    }
+
+    public T Add<T>(T result, int amount)
+    {
+        Value += amount;
+        return result;
+    }
+}
+
+public static class GenericStatic
+{
+    public static T Echo<T>(T value)
+    {
+        return value;
+    }
+
+    public static int Rank<T>(int marker, T value)
+    {
+        return 1;
+    }
+
+    public static int Rank<T>(float marker, T value)
+    {
+        return 2;
+    }
+
+    public static U Second<T, U>(T first, U second)
+    {
+        return second;
+    }
+}
+
+public static class Program
+{
+    private static GenericWorker _field = new GenericWorker(40);
+    private static int _receiverCalls;
+
+    public static GenericWorker WorkerProperty
+    {
+        get { return _field; }
+    }
+
+    private static void Check(bool value)
+    {
+        Console.WriteLine(value);
+    }
+
+    private static GenericWorker MakeWorker(int value)
+    {
+        _receiverCalls++;
+        return new GenericWorker(value);
+    }
+
+    private static int CollectAndReturn(int value)
+    {
+        GC.Collect();
+        return value;
+    }
+
+    public static T Identity<T>(T value)
+    {
+        return value;
+    }
+
+    public static void Main()
+    {
+        Check(GenericStatic.Echo<int>(1) == 1);
+        Check(GenericStatic.Rank<int>(1, 2) == 1);
+        Check(GenericStatic.Rank<int>(1f, 2) == 2);
+        Check(GenericStatic.Second<int, float>(1, 2f) == 2f);
+
+        GenericWorker worker = new GenericWorker(10);
+        Check(worker.Echo<int>(3) == 3);
+        Check((worker).Echo<int>(4) == 4);
+        Check(new GenericWorker(0).Echo<int>(5) == 5);
+        Check(MakeWorker(0).Echo<int>(6) == 6);
+        Check(_receiverCalls == 1);
+        Check(_field.Echo<int>(7) == 7);
+        Check(WorkerProperty.Echo<int>(8) == 8);
+
+        WorkerHolder holder = new WorkerHolder(worker);
+        Check(holder.Worker.Echo<int>(9) == 9);
+        Check(holder[0].Echo<int>(10) == 10);
+        GenericWorker[] workers = new GenericWorker[] { worker };
+        Check(workers[0].Echo<int>(11) == 11);
+        Check((true ? worker : _field).Echo<int>(12) == 12);
+
+        DerivedWorker derived = new DerivedWorker(20);
+        Check(derived.Echo<int>(13) == 13);
+        Check(derived.BaseEcho() == 31);
+
+        Check(worker.Select<int>(1, 14) == 14);
+        Check(worker.Select<int>(1f, 15) == 15);
+        Check(worker.Optional<int>(16) == 16);
+        Check(worker.Optional<int>(marker: 2, value: 17) == 17);
+        Check(worker.Params<int>(18, 19, 20) == 18);
+
+        int byRef = 0;
+        worker.Assign<int>(ref byRef, 21);
+        Check(byRef == 21);
+        int byOut;
+        worker.Produce<int>(out byOut, 22);
+        Check(byOut == 22);
+        int byIn = 23;
+        Check(worker.Read<int>(in byIn) == 23);
+
+        Check(worker.ViaThis<int>(24) == 24);
+        Check(worker.DefaultValue<int>() == 0);
+        Check(worker.DefaultValue<Node>() == null);
+
+        IGenericWorker contract = worker;
+        Check(contract.Echo<int>(25) == 25);
+        Check(contract.Apply<int>(0, 2) == 12);
+        Check(worker.Value == 12);
+
+        VirtualBase virtualWorker = new VirtualDerived();
+        Check(virtualWorker.Echo<int>(26) == 26);
+
+        GenericBox<int> box = new GenericBox<int>(27);
+        Check(box.Get() == 27);
+        Check(box.Convert<int>(28) == 28);
+        Check(box.Chain<int>(29) == 29);
+        GenericBox<int> sameBox = Identity<GenericBox<int>>(box);
+        Check(sameBox.Convert<int>(30) == 30);
+
+        GenericChild<int> child = new GenericChild<int>();
+        Check(child.Mix<int>(1, 32) == 32);
+
+        GenericCounter counter = new GenericCounter(5);
+        Check(counter.Add<int>(33, 2) == 33);
+        Check(counter.Value == 7);
+        Check(new GenericCounter(1).Add<int>(34, 3) == 34);
+
+        var inferred = new GenericWorker(0);
+        Check(inferred.Echo<int>(35) == 35);
+        GenericWorker shadow = new GenericWorker(1);
+        {
+            GenericWorker shadowInner = new GenericWorker(2);
+            Check(shadowInner.Echo<int>(36) == 36);
+        }
+        Check(shadow.Echo<int>(37) == 37);
+
+        Node node = new Node(38);
+        Node echoedNode = GenericStatic.Echo<Node>(node);
+        node = null;
+        GC.Collect();
+        Check(echoedNode.Value == 38);
+
+        Node boxedNode = new Node(39);
+        GenericBox<Node> nodeBox = new GenericBox<Node>(boxedNode);
+        boxedNode = null;
+        GC.Collect();
+        Check(nodeBox.Get().Value == 39);
+        Check(nodeBox.Convert<int>(40) == 40);
+
+        _receiverCalls = 0;
+        Check(MakeWorker(41).Apply<int>(CollectAndReturn(0), 1) == 42);
+        Check(_receiverCalls == 1);
+
+        GenericWorker nested = Identity<GenericWorker>(worker);
+        Check(nested.Echo<int>(43) == 43);
+        Check(Identity<GenericWorker>(worker).Echo<int>(44) == 44);
+
+        int[] values = new int[] { 45 };
+        int[] sameValues = Identity<int[]>(values);
+        Check(sameValues[0] == 45);
+
+        int? nullable = 46;
+        int? sameNullable = Identity<int?>(nullable);
+        Check(sameNullable.HasValue);
+        Check(sameNullable.Value == 46);
+
+        int[,] matrix = new int[,] { { 47, 48 } };
+        int[,] sameMatrix = Identity<int[,]>(matrix);
+        Check(sameMatrix[0, 0] == 47);
+        Check(sameMatrix[0, 1] == 48);
+
+        GenericStatic.Echo<Node>(new Node(49));
+        GC.Collect();
+        Check(true);
+    }
+}

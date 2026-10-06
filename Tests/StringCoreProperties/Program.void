@@ -1,0 +1,46 @@
+using Void;
+
+public static class Program
+{
+    public static void Main()
+    {
+        string ascii = "Player";
+        Console.WriteLine(ascii.Length == 6);
+        Console.WriteLine(ascii.ByteLength == 6);
+        Console.WriteLine(ascii.IsEmpty == false);
+
+        string unicode = "Aé😀";
+        Console.WriteLine(unicode.Length == 3);
+        Console.WriteLine(unicode.ByteLength == 7);
+        Console.WriteLine(unicode.IsEmpty == false);
+
+        string embedded = "A\0B";
+        Console.WriteLine(embedded.Length == 3);
+        Console.WriteLine(embedded.ByteLength == 3);
+        Console.WriteLine(embedded.IsEmpty == false);
+
+        string empty = string.Empty;
+        Console.WriteLine(empty != null);
+        Console.WriteLine(empty == "");
+        Console.WriteLine(empty.Length == 0);
+        Console.WriteLine(empty.ByteLength == 0);
+        Console.WriteLine(empty.IsEmpty);
+        Console.WriteLine(string.Empty == string.Empty);
+
+        string missing = null;
+        int? missingLength = missing?.Length;
+        int? missingByteLength = missing?.ByteLength;
+        bool? missingIsEmpty = missing?.IsEmpty;
+        Console.WriteLine(missingLength.HasValue == false);
+        Console.WriteLine(missingByteLength.HasValue == false);
+        Console.WriteLine(missingIsEmpty.HasValue == false);
+
+        string present = "é";
+        int? presentLength = present?.Length;
+        int? presentByteLength = present?.ByteLength;
+        bool? presentIsEmpty = present?.IsEmpty;
+        Console.WriteLine(presentLength.Value == 1);
+        Console.WriteLine(presentByteLength.Value == 2);
+        Console.WriteLine(presentIsEmpty.Value == false);
+    }
+}

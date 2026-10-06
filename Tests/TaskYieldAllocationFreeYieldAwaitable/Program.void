@@ -1,0 +1,121 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class YieldState265
+{
+    public int Ready;
+    public int Stage;
+    public int Continuations;
+    public ManualResetEvent BlockersReady;
+    public ManualResetEvent Release;
+
+    public YieldState265()
+    {
+        Ready = 0;
+        Stage = 0;
+        Continuations = 0;
+        BlockersReady = new ManualResetEvent(false);
+        Release = new ManualResetEvent(false);
+    }
+}
+
+public sealed class YieldPayload265
+{
+    public int Value;
+
+    public YieldPayload265(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    private static Action MakeBlocker(YieldState265 state)
+    {
+        return () =>
+        {
+            int ready = Interlocked.Increment(ref state.Ready);
+            if (ready == 2)
+                state.BlockersReady.Set();
+            state.Release.WaitOne();
+        };
+    }
+
+    private static async Task YieldOnce(YieldState265 state)
+    {
+        state.Stage = 1;
+        await Task.Yield();
+        state.Stage = 2;
+    }
+
+    private static async Task<int> YieldTwice()
+    {
+        int value = 40;
+        await Task.Yield();
+        value++;
+        await Task.Yield();
+        value++;
+        return value;
+    }
+
+    private static async Task<int> KeepManagedAcrossYield()
+    {
+        YieldPayload265 payload = new YieldPayload265(42);
+        await Task.Yield();
+        GC.Collect();
+        return payload.Value;
+    }
+
+    private static void WaitForContinuation(YieldState265 state)
+    {
+        int spins = 0;
+        while (Volatile.Read(ref state.Continuations) == 0 && spins < 5000)
+        {
+            Thread.Sleep(1);
+            spins++;
+        }
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(typeof(YieldAwaitable).IsValueType);
+        Console.WriteLine(typeof(YieldAwaiter).IsValueType);
+        YieldAwaitable value = Task.Yield();
+        YieldAwaiter awaiter = value.GetAwaiter();
+        Console.WriteLine(!awaiter.IsCompleted);
+        awaiter.GetResult();
+        Console.WriteLine(true);
+
+        YieldState265 state = new YieldState265();
+        Task blockerOne = Task.Run(MakeBlocker(state));
+        Task blockerTwo = Task.Run(MakeBlocker(state));
+        Console.WriteLine(state.BlockersReady.WaitOne(5000));
+
+        Task yielded = YieldOnce(state);
+        Console.WriteLine(state.Stage == 1);
+        Console.WriteLine(!yielded.IsCompleted);
+
+        state.Release.Set();
+        blockerOne.Wait();
+        blockerTwo.Wait();
+        yielded.Wait();
+        Console.WriteLine(state.Stage == 2);
+        Console.WriteLine(yielded.IsCompleted);
+
+        YieldAwaiter direct = Task.Yield().GetAwaiter();
+        direct.OnCompleted(() => Interlocked.Increment(ref state.Continuations));
+        WaitForContinuation(state);
+        Console.WriteLine(Volatile.Read(ref state.Continuations) == 1);
+
+        Task<int> twice = YieldTwice();
+        Console.WriteLine(twice.Result == 42);
+
+        Task<int> managed = KeepManagedAcrossYield();
+        Console.WriteLine(managed.Result == 42);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

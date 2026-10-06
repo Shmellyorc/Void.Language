@@ -1,0 +1,10 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        int[] values = new int[] { 1, 2, 3 };
+        ReadOnlyMemory<int> memory = values;
+        memory[1..].Span[0] = 9;
+    }
+}

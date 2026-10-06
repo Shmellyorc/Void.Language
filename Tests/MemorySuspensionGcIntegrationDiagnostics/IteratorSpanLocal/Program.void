@@ -1,0 +1,13 @@
+using Void;
+using Void.Collections;
+
+public static class Program
+{
+    public static IEnumerator<int> Bad(Memory<int> memory)
+    {
+        Span<int> span = memory.Span;
+        yield return span[0];
+    }
+
+    public static void Main() { }
+}

@@ -1,0 +1,8 @@
+namespace Void.IO;
+
+public class IOException : Exception
+{
+    public IOException() : base("An I/O error occurred.") { }
+    public IOException(string message) : base(message) { }
+    public IOException(string message, Exception innerException) : base(message, innerException) { }
+}

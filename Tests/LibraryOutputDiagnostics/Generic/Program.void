@@ -1,0 +1,1 @@
+public static class Api { [Export("bad_generic")] public static T Echo<T>(T value) { return value; } }

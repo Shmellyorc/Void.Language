@@ -1,0 +1,90 @@
+public enum Mode
+{
+    Idle = 1,
+    Run = 2
+}
+
+public interface IAnimal
+{
+    int Kind();
+}
+
+public class Animal
+{
+    public virtual int Kind()
+    {
+        return 1;
+    }
+}
+
+public sealed class Dog : Animal, IAnimal
+{
+    public override int Kind()
+    {
+        return 2;
+    }
+}
+
+public sealed class Cat : Animal
+{
+    public override int Kind()
+    {
+        return 3;
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Animal animal = new Dog();
+        Animal none = null;
+
+        Console.WriteLine(animal is Animal);
+        Console.WriteLine(animal is Dog);
+        Console.WriteLine(!(animal is Cat));
+        Console.WriteLine(animal is IAnimal);
+        Console.WriteLine(!(none is Dog));
+
+        Dog dog = animal as Dog;
+        Cat cat = animal as Cat;
+        IAnimal interfaceAnimal = animal as IAnimal;
+        Console.WriteLine(dog != null);
+        Console.WriteLine(cat == null);
+        Console.WriteLine(interfaceAnimal != null);
+        Console.WriteLine(interfaceAnimal.Kind() == 2);
+
+        Dog castDog = (Dog)animal;
+        IAnimal castInterface = (IAnimal)animal;
+        Console.WriteLine(castDog.Kind() == 2);
+        Console.WriteLine(castInterface.Kind() == 2);
+
+        object boxedAnimal = animal;
+        Console.WriteLine(boxedAnimal is Dog);
+        Console.WriteLine((boxedAnimal as Dog) != null);
+        Dog boxedDog = (Dog)boxedAnimal;
+        Console.WriteLine(boxedDog.Kind() == 2);
+
+        object boxedText = "VOID";
+        Console.WriteLine(!(boxedText is Dog));
+        Console.WriteLine((boxedText as Dog) == null);
+        Console.WriteLine(boxedText is object);
+
+        float value = 12.75f;
+        int whole = (int)value;
+        double wider = (double)whole;
+        byte wrapped = (byte)300;
+        Console.WriteLine(whole == 12);
+        Console.WriteLine(wider == 12.0);
+        Console.WriteLine((int)wrapped == 44);
+
+        int rawMode = (int)Mode.Run;
+        Mode mode = (Mode)1;
+        Console.WriteLine(rawMode == 2);
+        Console.WriteLine(mode == Mode.Idle);
+
+        int x = 4;
+        Console.WriteLine((x) + 1 == 5);
+        Console.WriteLine((animal as Dog) != null && animal is IAnimal);
+    }
+}

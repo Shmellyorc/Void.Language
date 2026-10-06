@@ -1,0 +1,20 @@
+using Void;
+using Void.Threading;
+
+public sealed class Gate
+{
+    public int Value;
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Gate gate = new Gate();
+        Monitor.Enter(gate);
+        gate.Value = 171;
+        GC.Collect();
+        Monitor.Exit(gate);
+        Console.WriteLine(gate.Value == 171);
+    }
+}

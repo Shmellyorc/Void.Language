@@ -1,0 +1,17 @@
+using Void.Threading.Tasks;
+
+public class DerivedTask : Task {}
+
+public static class Program
+{
+    public static async Task Bad(DerivedTask source)
+    {
+        await source;
+        return;
+    }
+
+    public static void Main()
+    {
+        Bad(null);
+    }
+}

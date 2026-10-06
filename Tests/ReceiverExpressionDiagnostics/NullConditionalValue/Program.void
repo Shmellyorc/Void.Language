@@ -1,0 +1,8 @@
+public struct Counter
+{
+    public int Read() { return 1; }
+}
+public static class Program
+{
+    public static void Main() { int value = new Counter()?.Read(); Console.WriteLine(value); }
+}

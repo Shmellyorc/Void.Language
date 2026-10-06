@@ -1,0 +1,1 @@
+public static class Program { [Export("bad")] public static void Main() { } }

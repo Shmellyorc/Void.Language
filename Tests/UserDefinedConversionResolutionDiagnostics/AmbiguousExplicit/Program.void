@@ -1,0 +1,21 @@
+public struct Choice
+{
+    public static explicit operator Choice(short value)
+    {
+        return new Choice();
+    }
+
+    public static explicit operator Choice(ushort value)
+    {
+        return new Choice();
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        int value = 1;
+        Choice choice = (Choice)value;
+    }
+}

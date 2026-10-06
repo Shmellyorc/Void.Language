@@ -1,0 +1,10 @@
+using Void;
+public static class Native299Diag
+{
+    [Native("void299_retain")]
+    public static unsafe extern void Retain([NativeString(NativeStringKind.RetainedNul)] string text);
+}
+public static class Program
+{
+    public static unsafe void Main() { Native299Diag.Retain("persist"); }
+}

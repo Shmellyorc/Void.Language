@@ -1,0 +1,220 @@
+using Void;
+using Void.Threading;
+
+public interface IScore
+{
+    int Score();
+}
+
+public sealed class ScoreNode : IScore
+{
+    public int Value;
+
+    public ScoreNode(int value)
+    {
+        Value = value;
+    }
+
+    public int Score()
+    {
+        return Value;
+    }
+}
+
+public sealed class AlternateScore : IScore
+{
+    public int Value;
+
+    public AlternateScore(int value)
+    {
+        Value = value;
+    }
+
+    public int Score()
+    {
+        return Value;
+    }
+}
+
+public sealed class SharedResults
+{
+    public int Ready;
+    public int Sum;
+    public int DelegateCount;
+    public int GenericCount;
+    public int NestedCount;
+}
+
+public sealed class GenericRunner<T> where T : IScore
+{
+    private SharedResults _results;
+    private T _value;
+    private int _bias;
+
+    public GenericRunner(SharedResults results, T value, int bias)
+    {
+        _results = results;
+        _value = value;
+        _bias = bias;
+    }
+
+    public void Run()
+    {
+        int score = Program.ReadScore<T>(_value) + _bias;
+        GC.Collect();
+        lock (_results)
+        {
+            _results.Sum += score;
+            _results.GenericCount++;
+            _results.Ready++;
+        }
+    }
+}
+
+public static class Program
+{
+    public static int ReadScore<T>(T value) where T : IScore
+    {
+        return value.Score();
+    }
+
+    public static Action MakeCapturedWorker<T>(SharedResults results, T value, int bias) where T : IScore
+    {
+        return () =>
+        {
+            int first = ReadScore<T>(value);
+            ScoreNode temporary = new ScoreNode(first + bias);
+            GC.Collect();
+            int second = temporary.Score();
+            lock (results)
+            {
+                results.Sum += second;
+                results.GenericCount++;
+                results.Ready++;
+            }
+        };
+    }
+
+    public static Action MakeNestedWorker(SharedResults results, ScoreNode value)
+    {
+        return () =>
+        {
+            Thread inner = new Thread(() =>
+            {
+                GC.Collect();
+                lock (results)
+                {
+                    results.Sum += value.Value;
+                    results.NestedCount++;
+                }
+            });
+            inner.Start();
+            inner.Join();
+            lock (results)
+            {
+                results.Ready++;
+            }
+        };
+    }
+
+    public static void WaitFor(SharedResults results, int count)
+    {
+        while (true)
+        {
+            bool done = false;
+            lock (results)
+            {
+                done = results.Ready >= count;
+            }
+            if (done)
+                return;
+            GC.Collect();
+        }
+    }
+
+    public static void Main()
+    {
+        SharedResults results = new SharedResults();
+
+        ScoreNode firstValue = new ScoreNode(10);
+        Action firstAction = MakeCapturedWorker<ScoreNode>(results, firstValue, 1);
+        Thread first = new Thread(firstAction);
+        firstValue = null;
+        firstAction = null;
+
+        AlternateScore secondValue = new AlternateScore(20);
+        Action secondAction = MakeCapturedWorker<AlternateScore>(results, secondValue, 2);
+        Thread second = new Thread(secondAction);
+        secondValue = null;
+        secondAction = null;
+
+        ScoreNode boundValue = new ScoreNode(30);
+        GenericRunner<ScoreNode> runner = new GenericRunner<ScoreNode>(results, boundValue, 3);
+        Action boundAction = runner.Run;
+        Thread bound = new Thread(boundAction);
+        boundValue = null;
+        runner = null;
+        boundAction = null;
+
+        ScoreNode multicastValue = new ScoreNode(40);
+        Action multicast = () =>
+        {
+            GC.Collect();
+            lock (results)
+            {
+                results.Sum += multicastValue.Value;
+                results.DelegateCount++;
+            }
+        };
+        multicast += () =>
+        {
+            lock (results)
+            {
+                results.Sum += 4;
+                results.DelegateCount++;
+                results.Ready++;
+            }
+        };
+        Thread multicastThread = new Thread(multicast);
+        multicast = null;
+
+        ScoreNode nestedValue = new ScoreNode(50);
+        Thread nested = new Thread(MakeNestedWorker(results, nestedValue));
+        nestedValue = null;
+
+        first.Start();
+        second.Start();
+        bound.Start();
+        multicastThread.Start();
+        nested.Start();
+
+        for (int i = 0; i < 12; i++)
+            GC.Collect();
+
+        WaitFor(results, 5);
+        first.Join();
+        second.Join();
+        bound.Join();
+        multicastThread.Join();
+        nested.Join();
+
+        Console.WriteLine(results.Ready == 5);
+        Console.WriteLine(results.GenericCount == 3);
+        Console.WriteLine(results.DelegateCount == 2);
+        Console.WriteLine(results.NestedCount == 1);
+        Console.WriteLine(results.Sum == 160);
+
+        ScoreNode reuseValue = new ScoreNode(7);
+        Action reuseAction = MakeCapturedWorker<ScoreNode>(results, reuseValue, 5);
+        Thread reuse = new Thread(reuseAction);
+        reuseValue = null;
+        reuseAction = null;
+        reuse.Start();
+        GC.Collect();
+        reuse.Join();
+
+        Console.WriteLine(results.Ready == 6);
+        Console.WriteLine(results.GenericCount == 4);
+        Console.WriteLine(results.Sum == 172);
+    }
+}

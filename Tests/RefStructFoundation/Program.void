@@ -1,0 +1,187 @@
+using Void;
+
+public ref struct IntWindow
+{
+    public ref int Value;
+    public ref readonly int Stable;
+    public int Tag;
+
+    public IntWindow(int[] values, in int stable, int tag)
+    {
+        Value = ref values[0];
+        Stable = ref stable;
+        Tag = tag;
+    }
+
+    public ref int GetValue()
+    {
+        return ref Value;
+    }
+
+    public ref readonly int GetStable()
+    {
+        return ref Stable;
+    }
+
+    public void Rebind(ref int value)
+    {
+        Value = ref value;
+    }
+
+    public void Add(int amount)
+    {
+        Value += amount;
+    }
+
+    public int ReadSum()
+    {
+        return Value + Stable + Tag;
+    }
+}
+
+public ref struct NestedWindow
+{
+    public IntWindow Inner;
+    public int Marker;
+
+    public NestedWindow(IntWindow inner, int marker)
+    {
+        Inner = inner;
+        Marker = marker;
+    }
+}
+
+public readonly ref struct ReadWindow
+{
+    public ref readonly int Value;
+    public readonly int Tag;
+
+    public ReadWindow(in int value, int tag)
+    {
+        Value = ref value;
+        Tag = tag;
+    }
+
+    public int Read()
+    {
+        return Value + Tag;
+    }
+}
+
+public ref struct RefCell<T>
+{
+    public T Extra;
+    public ref int Value;
+
+    public RefCell(ref int value, T extra)
+    {
+        Value = ref value;
+        Extra = extra;
+    }
+
+    public int Read()
+    {
+        return Value;
+    }
+}
+
+public static class Program
+{
+    public static int[] MakeValues()
+    {
+        return new int[] { 21, 22 };
+    }
+
+    public static string MakeText()
+    {
+        return "kept";
+    }
+
+    public static bool CheckByValue(IntWindow window, int expected)
+    {
+        GC.Collect();
+        return window.Value == expected;
+    }
+
+    public static void Main()
+    {
+        int stable = 7;
+        IntWindow window = new IntWindow(MakeValues(), in stable, 4);
+        GC.Collect();
+        Console.WriteLine(window.Value == 21);
+        Console.WriteLine(window.Stable == 7);
+        Console.WriteLine(window.Tag == 4);
+        Console.WriteLine(window.ReadSum() == 32);
+
+        window.Value = 30;
+        Console.WriteLine(window.Value == 30);
+        window.Add(2);
+        Console.WriteLine(window.Value == 32);
+
+        ref int alias = ref window.Value;
+        alias = 40;
+        Console.WriteLine(window.Value == 40);
+        ref int methodAlias = ref window.GetValue();
+        methodAlias = 41;
+        Console.WriteLine(window.Value == 41);
+        ref readonly int readonlyAlias = ref window.GetStable();
+        Console.WriteLine(readonlyAlias == 7);
+
+        Console.WriteLine(CheckByValue(window, 41));
+
+        IntWindow copy = window;
+        window = default(IntWindow);
+        GC.Collect();
+        Console.WriteLine(copy.Value == 41);
+        copy.Value = 42;
+        GC.Collect();
+        Console.WriteLine(copy.Value == 42);
+
+        NestedWindow nested = new NestedWindow(copy, 9);
+        copy = default(IntWindow);
+        GC.Collect();
+        Console.WriteLine(nested.Inner.Value == 42);
+        Console.WriteLine(nested.Marker == 9);
+        nested.Inner.Value = 43;
+        Console.WriteLine(nested.Inner.Value == 43);
+
+        int rebound = 55;
+        nested.Inner.Rebind(ref rebound);
+        Console.WriteLine(nested.Inner.Value == 55);
+        nested.Inner.Value = 56;
+        Console.WriteLine(rebound == 56);
+
+        int scratch = -1;
+        ref int carriedAlias = ref scratch;
+        carriedAlias = ref nested.Inner.Value;
+        nested = default(NestedWindow);
+        GC.Collect();
+        Console.WriteLine(carriedAlias == 56);
+        carriedAlias = 57;
+        GC.Collect();
+        Console.WriteLine(carriedAlias == 57);
+
+        int readonlyValue = 60;
+        ReadWindow readWindow = new ReadWindow(in readonlyValue, 2);
+        Console.WriteLine(readWindow.Value == 60);
+        Console.WriteLine(readWindow.Read() == 62);
+
+        int genericValue = 70;
+        RefCell<string> cell = new RefCell<string>(ref genericValue, MakeText());
+        GC.Collect();
+        Console.WriteLine(cell.Value == 70);
+        Console.WriteLine(Runtime.Equals(cell.Extra, "kept"));
+        cell.Value = 71;
+        Console.WriteLine(genericValue == 71);
+        Console.WriteLine(cell.Read() == 71);
+
+        RefCell<string> cellCopy = cell;
+        cell = default(RefCell<string>);
+        GC.Collect();
+        Console.WriteLine(cellCopy.Value == 71);
+        Console.WriteLine(Runtime.Equals(cellCopy.Extra, "kept"));
+
+        IntWindow empty = default(IntWindow);
+        Console.WriteLine(empty.Tag == 0);
+    }
+}

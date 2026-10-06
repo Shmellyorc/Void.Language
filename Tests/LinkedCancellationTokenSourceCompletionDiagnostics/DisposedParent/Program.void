@@ -1,0 +1,12 @@
+using Void.Threading;
+
+public static class Program
+{
+    public static void Main()
+    {
+        CancellationTokenSource parent = new CancellationTokenSource();
+        CancellationToken token = parent.Token;
+        parent.Dispose();
+        CancellationTokenSource.CreateLinkedTokenSource(token);
+    }
+}

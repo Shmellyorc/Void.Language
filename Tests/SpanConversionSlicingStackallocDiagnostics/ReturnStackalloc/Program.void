@@ -1,0 +1,1 @@
+using Void; public static class Program { public static Span<int> F(){ Span<int> s = stackalloc int[2]; return s; } public static void Main(){ F(); } }

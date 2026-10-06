@@ -1,0 +1,51 @@
+using Void;
+
+public static class Native257
+{
+    [Native("voidc257_add")]
+    public static unsafe extern int Add(int left, int right);
+
+    [Native("voidc257_subtract")]
+    public static unsafe extern int Subtract(int left, int right);
+
+    [Native("voidc257_apply")]
+    public static unsafe extern int Apply(delegate*<int, int, int> callback, int left, int right);
+
+    [Native("voidc257_select")]
+    public static unsafe extern delegate*<int, int, int> Select(int operation);
+
+    [Native("voidc257_passthrough")]
+    public static unsafe extern delegate*<int, int, int> Passthrough(delegate*<int, int, int> callback);
+
+    [Native("voidc257_is_null")]
+    public static unsafe extern bool IsNull(delegate*<int, int, int> callback);
+}
+
+public static class Program
+{
+    public static unsafe void Main()
+    {
+        delegate*<int, int, int> add = &Native257.Add;
+        delegate*<int, int, int> subtract = &Native257.Subtract;
+
+        Console.WriteLine(add != null);
+        Console.WriteLine(subtract != null);
+        Console.WriteLine(Native257.Apply(add, 20, 22) == 42);
+        Console.WriteLine(Native257.Apply(subtract, 50, 8) == 42);
+
+        delegate*<int, int, int> selectedAdd = Native257.Select(0);
+        delegate*<int, int, int> selectedSubtract = Native257.Select(1);
+        Console.WriteLine(selectedAdd != null);
+        Console.WriteLine(selectedSubtract != null);
+        Console.WriteLine(selectedAdd(19, 23) == 42);
+        Console.WriteLine(selectedSubtract(100, 58) == 42);
+
+        delegate*<int, int, int> roundTrip = Native257.Passthrough(add);
+        Console.WriteLine(roundTrip == add);
+        Console.WriteLine(roundTrip(40, 2) == 42);
+
+        delegate*<int, int, int> empty = null;
+        Console.WriteLine(Native257.IsNull(empty));
+        Console.WriteLine(!Native257.IsNull(add));
+    }
+}

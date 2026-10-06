@@ -1,0 +1,14 @@
+using Void;
+public static class Program
+{
+    private static Span<int> Bad()
+    {
+        Span<int> values = stackalloc int[4];
+        return values[1..^1];
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(Bad().Length);
+    }
+}

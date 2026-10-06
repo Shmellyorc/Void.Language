@@ -1,0 +1,221 @@
+using Void.Collections;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class Node215
+{
+    public int Value;
+
+    public Node215(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class PendingIntEnumerator215 : IAsyncEnumerator<int>
+{
+    private int _step;
+
+    public int Current => 7;
+
+    public PendingIntEnumerator215()
+    {
+        _step = 0;
+    }
+
+    public Task<bool> MoveNextAsync()
+    {
+        if (_step == 0)
+        {
+            _step = 1;
+            return Program.MoveSignal.Task;
+        }
+
+        TaskCompletionSource<bool> completed = new TaskCompletionSource<bool>();
+        completed.SetResult(false);
+        return completed.Task;
+    }
+
+    public Task DisposeAsync()
+    {
+        Program.DisposeCount++;
+        return Program.DisposeSignal.Task;
+    }
+}
+
+public sealed class PendingIntEnumerable215 : IAsyncEnumerable<int>
+{
+    public IAsyncEnumerator<int> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+    {
+        return new PendingIntEnumerator215();
+    }
+}
+
+
+public sealed class DisposePendingEnumerator215 : IAsyncEnumerator<int>
+{
+    private int _step;
+
+    public int Current => 7;
+
+    public DisposePendingEnumerator215()
+    {
+        _step = 0;
+    }
+
+    public Task<bool> MoveNextAsync()
+    {
+        TaskCompletionSource<bool> completed = new TaskCompletionSource<bool>();
+        if (_step == 0)
+        {
+            _step = 1;
+            completed.SetResult(true);
+        }
+        else
+        {
+            completed.SetResult(false);
+        }
+        return completed.Task;
+    }
+
+    public Task DisposeAsync()
+    {
+        Program.DisposeCount++;
+        return Program.DisposeSignal.Task;
+    }
+}
+
+public sealed class DisposePendingEnumerable215 : IAsyncEnumerable<int>
+{
+    public IAsyncEnumerator<int> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+    {
+        return new DisposePendingEnumerator215();
+    }
+}
+
+public sealed class NodeEnumerator215 : IAsyncEnumerator<Node215>
+{
+    private Node215 _node;
+    private int _step;
+
+    public Node215 Current => _node;
+
+    public NodeEnumerator215(Node215 node)
+    {
+        _node = node;
+        _step = 0;
+    }
+
+    public Task<bool> MoveNextAsync()
+    {
+        if (_step == 0)
+        {
+            _step = 1;
+            return Program.NodeMoveSignal.Task;
+        }
+
+        TaskCompletionSource<bool> completed = new TaskCompletionSource<bool>();
+        completed.SetResult(false);
+        return completed.Task;
+    }
+
+    public Task DisposeAsync()
+    {
+        TaskCompletionSource completed = new TaskCompletionSource();
+        completed.SetResult();
+        return completed.Task;
+    }
+}
+
+public sealed class NodeEnumerable215 : IAsyncEnumerable<Node215>
+{
+    private Node215 _node;
+
+    public NodeEnumerable215(Node215 node)
+    {
+        _node = node;
+    }
+
+    public IAsyncEnumerator<Node215> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+    {
+        return new NodeEnumerator215(_node);
+    }
+}
+
+public static class Program
+{
+    public static TaskCompletionSource<bool> MoveSignal;
+    public static TaskCompletionSource DisposeSignal;
+    public static TaskCompletionSource<bool> NodeMoveSignal;
+    public static int DisposeCount;
+
+    private static async Task<int> SumAsync(IAsyncEnumerable<int> source)
+    {
+        IAsyncEnumerator<int> enumerator = source.GetAsyncEnumerator();
+        int sum = 0;
+        try
+        {
+            while (await enumerator.MoveNextAsync())
+                sum += enumerator.Current;
+        }
+        finally
+        {
+            await enumerator.DisposeAsync();
+        }
+        return sum;
+    }
+
+    private static async Task<int> ReadManagedAsync(IAsyncEnumerable<Node215> source)
+    {
+        IAsyncEnumerator<Node215> enumerator = source.GetAsyncEnumerator();
+        try
+        {
+            if (!await enumerator.MoveNextAsync())
+                return -1;
+            GC.Collect();
+            GC.Collect();
+            return enumerator.Current.Value;
+        }
+        finally
+        {
+            await enumerator.DisposeAsync();
+        }
+    }
+
+    public static void Main()
+    {
+        Program.MoveSignal = new TaskCompletionSource<bool>();
+        Program.DisposeSignal = new TaskCompletionSource();
+        Program.NodeMoveSignal = new TaskCompletionSource<bool>();
+        Program.DisposeCount = 0;
+
+        IAsyncEnumerable<int> source = new PendingIntEnumerable215();
+        IAsyncEnumerator<int> protocol = source.GetAsyncEnumerator();
+        Console.WriteLine(protocol != null);
+        Console.WriteLine(protocol.Current == 7);
+        Task<bool> pendingMove = protocol.MoveNextAsync();
+        Console.WriteLine(!pendingMove.IsCompleted);
+        Program.MoveSignal.SetResult(true);
+        Console.WriteLine(pendingMove.Result);
+
+        Task<int> sum = SumAsync(new DisposePendingEnumerable215());
+        Console.WriteLine(!sum.IsCompleted && Program.DisposeCount == 1);
+        Program.DisposeSignal.SetResult();
+        Console.WriteLine(sum.Result == 7 && Program.DisposeCount == 1);
+
+        Node215 node = new Node215(215);
+        IAsyncEnumerable<Node215> managedSource = new NodeEnumerable215(node);
+        Task<int> managed = ReadManagedAsync(managedSource);
+        node = null;
+        managedSource = null;
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(!managed.IsCompleted);
+        Program.NodeMoveSignal.SetResult(true);
+        Console.WriteLine(managed.Result == 215);
+
+        Console.WriteLine(source.GetAsyncEnumerator() is IAsyncEnumerator<int>);
+        Console.WriteLine(source.GetAsyncEnumerator(CancellationToken.None) is IAsyncEnumerator<int>);
+        Console.WriteLine(protocol is IAsyncDisposable);
+    }
+}

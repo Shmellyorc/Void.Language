@@ -1,0 +1,14 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    public static void Main()
+    {
+        TaskCompletionSource source = new TaskCompletionSource();
+        source.SetResult();
+        ThreadPool.Shutdown();
+        source.Task.ContinueWith(antecedent => Console.WriteLine(true));
+    }
+}

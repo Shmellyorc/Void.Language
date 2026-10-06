@@ -1,0 +1,6 @@
+public static class Program
+{
+    public static int Value = 1;
+    public static ref readonly int View() { return ref Value; }
+    public static void Main() { View() = 2; }
+}

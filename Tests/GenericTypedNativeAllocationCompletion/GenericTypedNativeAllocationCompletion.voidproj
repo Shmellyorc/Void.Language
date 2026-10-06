@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "GenericTypedNativeAllocationCompletion",
+  "output": "exe",
+  "version": "0.0.253",
+  "compiler": {
+    "unsafe": true
+  }
+}

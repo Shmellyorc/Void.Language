@@ -1,0 +1,49 @@
+public struct Pair
+{
+    public int A;
+    public int B;
+}
+
+public static class Program
+{
+    public static int IntSize()
+    {
+        return sizeof(int);
+    }
+
+    public static unsafe void Main()
+    {
+        Console.WriteLine(sizeof(byte) == 1);
+        Console.WriteLine(IntSize() == 4);
+        Console.WriteLine(sizeof(Pair) >= sizeof(int) * 2);
+        Console.WriteLine(sizeof(Pair*) == sizeof(void*));
+
+        Pair source = new Pair();
+        source.A = 12;
+        source.B = 34;
+
+        Pair target = new Pair();
+        target.A = 99;
+        target.B = 88;
+
+        Runtime.MemoryClear(&target, sizeof(Pair));
+        Console.WriteLine(target.A == 0);
+        Console.WriteLine(target.B == 0);
+
+        Runtime.MemoryCopy(&target, &source, sizeof(Pair));
+        Console.WriteLine(target.A);
+        Console.WriteLine(target.B);
+
+        int[] values = new int[4];
+        values[0] = 1;
+        values[1] = 2;
+        values[2] = 3;
+        values[3] = 4;
+
+        Runtime.MemoryCopy(&values[1], &values[0], sizeof(int) * 3);
+        Console.WriteLine(values[0]);
+        Console.WriteLine(values[1]);
+        Console.WriteLine(values[2]);
+        Console.WriteLine(values[3]);
+    }
+}

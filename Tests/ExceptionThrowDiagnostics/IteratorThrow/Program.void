@@ -1,0 +1,11 @@
+using Void.Collections;
+public static class Program
+{
+    public static IEnumerator<int> Values()
+    {
+        yield return 1;
+        throw new Exception("iterator");
+    }
+
+    public static void Main() { }
+}

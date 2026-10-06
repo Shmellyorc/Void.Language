@@ -1,0 +1,6 @@
+using Void;
+public static class Program
+{
+    public static Span<int> Wrap(scoped ref int value) { return new Span<int>(ref value, 1); }
+    public static void Main() { int x = 1; Wrap(ref x); }
+}

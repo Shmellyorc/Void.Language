@@ -1,0 +1,13 @@
+public sealed class Resource : IDisposable
+{
+    public void Dispose() {}
+}
+public static class Program
+{
+    public static void Main()
+    {
+        int value = 1;
+        using var resource = new Resource();
+        int value = 2;
+    }
+}

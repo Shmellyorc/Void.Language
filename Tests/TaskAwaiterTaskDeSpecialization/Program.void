@@ -1,0 +1,164 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public static class Program
+{
+    private static int _stage;
+    private static int _continuationCount;
+
+    private static async Task AwaitVoid(Task task)
+    {
+        _stage = 1;
+        await task;
+        _stage = 2;
+    }
+
+    private static async Task<int> AwaitValue(Task<int> task)
+    {
+        return await task;
+    }
+
+    private static async Task<int> AwaitNested(Task<int> task)
+    {
+        return (await task) + 1;
+    }
+
+    private static async Task<int> AwaitTwice(Task<int> first, Task<int> second)
+    {
+        int left = await first;
+        int right = await second;
+        return left + right;
+    }
+
+    private static void WaitForContinuationCount(int expected)
+    {
+        int spins = 0;
+        while (Volatile.Read(ref _continuationCount) != expected && spins < 5000)
+        {
+            Thread.Sleep(1);
+            spins++;
+        }
+    }
+
+    public static void Main()
+    {
+        TaskCompletionSource completedSource = new TaskCompletionSource();
+        completedSource.SetResult();
+        TaskAwaiter completedAwaiter = completedSource.Task.GetAwaiter();
+        Console.WriteLine(completedAwaiter.IsCompleted);
+        completedAwaiter.GetResult();
+        Console.WriteLine(true);
+
+        TaskCompletionSource<int> completedValueSource = new TaskCompletionSource<int>();
+        completedValueSource.SetResult(42);
+        TaskAwaiter<int> completedValueAwaiter = completedValueSource.Task.GetAwaiter();
+        Console.WriteLine(completedValueAwaiter.IsCompleted);
+        Console.WriteLine(completedValueAwaiter.GetResult() == 42);
+
+        TaskCompletionSource pendingSource = new TaskCompletionSource();
+        TaskAwaiter pendingAwaiter = pendingSource.Task.GetAwaiter();
+        Console.WriteLine(!pendingAwaiter.IsCompleted);
+        pendingAwaiter.OnCompleted(() => Interlocked.Increment(ref _continuationCount));
+        pendingSource.SetResult();
+        WaitForContinuationCount(1);
+        Console.WriteLine(Volatile.Read(ref _continuationCount) == 1);
+
+        TaskCompletionSource<int> pendingValueSource = new TaskCompletionSource<int>();
+        TaskAwaiter<int> pendingValueAwaiter = pendingValueSource.Task.GetAwaiter();
+        Console.WriteLine(!pendingValueAwaiter.IsCompleted);
+        pendingValueAwaiter.OnCompleted(() => Interlocked.Increment(ref _continuationCount));
+        pendingValueSource.SetResult(9);
+        WaitForContinuationCount(2);
+        Console.WriteLine(Volatile.Read(ref _continuationCount) == 2);
+        Console.WriteLine(pendingValueAwaiter.GetResult() == 9);
+
+        TaskCompletionSource alreadyDoneContinuation = new TaskCompletionSource();
+        alreadyDoneContinuation.SetResult();
+        alreadyDoneContinuation.Task.GetAwaiter().OnCompleted(
+            () => Interlocked.Increment(ref _continuationCount));
+        WaitForContinuationCount(3);
+        Console.WriteLine(Volatile.Read(ref _continuationCount) == 3);
+
+        _stage = 0;
+        Task immediateVoid = AwaitVoid(completedSource.Task);
+        Console.WriteLine(immediateVoid.IsCompleted);
+        Console.WriteLine(_stage == 2);
+
+        Task<int> immediateValue = AwaitValue(completedValueSource.Task);
+        Console.WriteLine(immediateValue.IsCompleted);
+        Console.WriteLine(immediateValue.Result == 42);
+
+        TaskCompletionSource suspendedSource = new TaskCompletionSource();
+        _stage = 0;
+        Task suspended = AwaitVoid(suspendedSource.Task);
+        Console.WriteLine(_stage == 1 && !suspended.IsCompleted);
+        suspendedSource.SetResult();
+        suspended.Wait();
+        Console.WriteLine(_stage == 2 && suspended.IsCompleted);
+
+        TaskCompletionSource<int> suspendedValueSource = new TaskCompletionSource<int>();
+        Task<int> suspendedValue = AwaitValue(suspendedValueSource.Task);
+        Console.WriteLine(!suspendedValue.IsCompleted);
+        suspendedValueSource.SetResult(17);
+        Console.WriteLine(suspendedValue.Result == 17);
+
+        TaskCompletionSource<int> nestedSource = new TaskCompletionSource<int>();
+        Task<int> nested = AwaitNested(nestedSource.Task);
+        Console.WriteLine(!nested.IsCompleted);
+        nestedSource.SetResult(41);
+        Console.WriteLine(nested.Result == 42);
+
+        TaskCompletionSource<int> firstSource = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> secondSource = new TaskCompletionSource<int>();
+        Task<int> twice = AwaitTwice(firstSource.Task, secondSource.Task);
+        firstSource.SetResult(20);
+        Thread.Sleep(5);
+        Console.WriteLine(!twice.IsCompleted);
+        secondSource.SetResult(22);
+        Console.WriteLine(twice.Result == 42);
+
+        TaskCompletionSource<int> faultSource = new TaskCompletionSource<int>();
+        faultSource.SetException(new Exception("task-awaiter-263-fault"));
+        bool directFault = false;
+        try
+        {
+            faultSource.Task.GetAwaiter().GetResult();
+        }
+        catch (Exception error)
+        {
+            directFault = error.Message == "task-awaiter-263-fault";
+        }
+        Console.WriteLine(directFault);
+
+        Task<int> awaitedFault = AwaitValue(faultSource.Task);
+        bool asyncFault = false;
+        try
+        {
+            awaitedFault.Wait();
+        }
+        catch (Exception error)
+        {
+            asyncFault = error.Message == "task-awaiter-263-fault";
+        }
+        Console.WriteLine(asyncFault && awaitedFault.IsFaulted);
+
+        CancellationTokenSource cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+        TaskCompletionSource canceledSource = new TaskCompletionSource();
+        canceledSource.SetCanceled(cancellation.Token);
+        bool canceled = false;
+        try
+        {
+            canceledSource.Task.GetAwaiter().GetResult();
+        }
+        catch (OperationCanceledException error)
+        {
+            canceled = error.CancellationToken.IsCancellationRequested;
+        }
+        Console.WriteLine(canceled);
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

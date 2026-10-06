@@ -1,0 +1,4 @@
+using Void;
+public interface IEmitter { event Action<int> Changed; }
+public sealed class Publisher : IEmitter { public event Action<int> Changed; }
+public static class Program { public static void Main() { IEmitter e = new Publisher(); Action<int> copy = e.Changed; } }

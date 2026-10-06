@@ -1,0 +1,15 @@
+using Void;
+
+public struct Slot258<T> where T : unmanaged
+{
+    public T Value;
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Slot258<delegate*<int, int>> slot = default(Slot258<delegate*<int, int>>);
+        Console.WriteLine(slot.Value == null);
+    }
+}

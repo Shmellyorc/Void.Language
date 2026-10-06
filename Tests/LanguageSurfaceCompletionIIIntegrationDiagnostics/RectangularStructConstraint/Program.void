@@ -1,0 +1,9 @@
+public static class Program
+{
+    private static T Keep<T>(T value) where T : struct => value;
+    public static void Main()
+    {
+        var grid = new[,] { { 1, 2 }, { 3, 4 } };
+        Keep<int[,]>(grid);
+    }
+}

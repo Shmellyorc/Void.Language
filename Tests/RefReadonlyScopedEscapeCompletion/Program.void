@@ -1,0 +1,183 @@
+public sealed class Node225
+{
+    public int Value;
+    public Node225(int value) { Value = value; }
+}
+
+public struct Point225
+{
+    public int X;
+    public Point225(int x) { X = x; }
+}
+
+public sealed class Box225
+{
+    public int Value;
+    public int[] Values;
+    public Box225(int value) { Value = value; Values = new int[] { value + 1, value + 2 }; }
+    public ref readonly int View { get { return ref Value; } }
+    public ref readonly int ExprView => ref Value;
+    public ref readonly int get_Item(int index) { return ref Values[index]; }
+}
+
+public interface IReadOnlyRef225
+{
+    ref readonly int View { get; }
+    ref readonly int Get();
+}
+
+public class Base225 : IReadOnlyRef225
+{
+    public int Value;
+    public Base225(int value) { Value = value; }
+    public virtual ref readonly int View { get { return ref Value; } }
+    public virtual ref readonly int Get() { return ref Value; }
+}
+
+public sealed class Derived225 : Base225
+{
+    public int Other;
+    public Derived225(int value) : base(value) { Other = value + 1; }
+    public override ref readonly int View { get { return ref Other; } }
+    public override ref readonly int Get() { return ref Other; }
+}
+
+public static class Program
+{
+    public static int StaticValue = 10;
+    public static readonly int StaticReadonly = 11;
+
+    public static ref readonly int StaticView() { return ref StaticValue; }
+    public static ref readonly int StaticReadonlyView() { return ref StaticReadonly; }
+    public static ref readonly int FromIn(in int value) { return ref value; }
+    public static ref readonly int ForwardIn(in int value) { return ref FromIn(in value); }
+    public static int ReadInAlias(in int value)
+    {
+        ref readonly int alias = ref value;
+        return alias;
+    }
+    public static ref int Writable(ref int value) { return ref value; }
+    public static ref int ForwardWritable(ref int value) { return ref Writable(ref value); }
+    public static ref int StaticWithScoped(scoped ref int ignored) { return ref StaticValue; }
+    public static ref int ForwardStaticWithScoped()
+    {
+        int local = 0;
+        return ref StaticWithScoped(ref local);
+    }
+
+    public static void AddOne(scoped ref int value) { value = value + 1; }
+    public static int ReadScoped(scoped in int value) { return value; }
+    public static void AssignScoped(scoped out int value) { value = 44; }
+
+    public static ref readonly T GenericView<T>(T[] values, int index) { return ref values[index]; }
+
+    public static void Main()
+    {
+        ref readonly int a = ref StaticView();
+        Console.WriteLine(a == 10);
+
+        ref readonly int b = ref StaticReadonlyView();
+        Console.WriteLine(b == 11);
+
+        ref readonly int directReadonly = ref StaticReadonly;
+        Console.WriteLine(directReadonly == 11);
+
+        ref readonly var inferred = ref StaticValue;
+        Console.WriteLine(inferred == 10);
+
+        int local = 20;
+        scoped ref int scopedLocal = ref local;
+        scopedLocal = 21;
+        Console.WriteLine(local == 21);
+
+        AddOne(ref scopedLocal);
+        Console.WriteLine(local == 22);
+        Console.WriteLine(ReadScoped(in local) == 22);
+        Console.WriteLine(ReadInAlias(in local) == 22);
+
+        int outValue;
+        AssignScoped(out outValue);
+        Console.WriteLine(outValue == 44);
+
+        ref readonly int fromIn = ref FromIn(in local);
+        Console.WriteLine(fromIn == 22);
+        ref readonly int forwarded = ref ForwardIn(in local);
+        Console.WriteLine(forwarded == 22);
+        ref int forwardedWritable = ref ForwardWritable(ref local);
+        forwardedWritable = 23;
+        Console.WriteLine(local == 23);
+        ref int staticFromScoped = ref StaticWithScoped(ref local);
+        staticFromScoped = 12;
+        Console.WriteLine(StaticValue == 12);
+        ref int forwardedStatic = ref ForwardStaticWithScoped();
+        forwardedStatic = 13;
+        Console.WriteLine(StaticValue == 13);
+        Console.WriteLine(StaticView() == 13);
+
+        Box225 box = new Box225(30);
+        ref readonly int propertyView = ref box.View;
+        Console.WriteLine(propertyView == 30);
+        ref readonly int exprView = ref box.ExprView;
+        Console.WriteLine(exprView == 30);
+        ref readonly int indexView = ref box[1];
+        Console.WriteLine(indexView == 32);
+        Console.WriteLine(box.View == 30);
+        Console.WriteLine(box[0] == 31);
+
+        Base225 poly = new Derived225(40);
+        ref readonly int virtualView = ref poly.View;
+        Console.WriteLine(virtualView == 41);
+        ref readonly int virtualMethod = ref poly.Get();
+        Console.WriteLine(virtualMethod == 41);
+        IReadOnlyRef225 iface = poly;
+        ref readonly int interfaceView = ref iface.View;
+        Console.WriteLine(interfaceView == 41);
+        ref readonly int interfaceMethod = ref iface.Get();
+        Console.WriteLine(interfaceMethod == 41);
+
+        int[] values = new int[] { 50, 51 };
+        ref readonly int generic = ref GenericView<int>(values, 1);
+        values = null;
+        GC.Collect();
+        Console.WriteLine(generic == 51);
+
+        Node225[] nodes = new Node225[] { new Node225(60) };
+        ref readonly Node225 node = ref GenericView<Node225>(nodes, 0);
+        nodes = null;
+        GC.Collect();
+        Console.WriteLine(node.Value == 60);
+        node.Value = 61;
+        Console.WriteLine(node.Value == 61);
+
+        ref readonly int heldProperty = ref new Box225(70).View;
+        ref readonly int heldIndex = ref new Box225(80)[0];
+        for (int i = 0; i < 80; i++)
+        {
+            Box225 garbage = new Box225(i);
+        }
+        GC.Collect();
+        Console.WriteLine(heldProperty == 70);
+        Console.WriteLine(heldIndex == 81);
+
+        int writableStorage = 90;
+        ref int writable = ref Writable(ref writableStorage);
+        writable = 91;
+        ref readonly int readonlyCopy = ref writable;
+        Console.WriteLine(writableStorage == 91 && readonlyCopy == 91);
+        Console.WriteLine(ReadScoped(in readonlyCopy) == 91);
+
+        int first = 100;
+        int second = 101;
+        ref readonly int rebound = ref first;
+        rebound = ref second;
+        Console.WriteLine(rebound == 101);
+        rebound = ref StaticReadonlyView();
+        Console.WriteLine(rebound == 11);
+
+        scoped ref readonly int scopedReadonly = ref second;
+        Console.WriteLine(scopedReadonly == 101);
+
+        int scoped = 102;
+        Console.WriteLine(scoped == 102);
+    }
+}

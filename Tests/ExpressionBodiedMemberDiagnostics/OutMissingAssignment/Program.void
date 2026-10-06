@@ -1,0 +1,13 @@
+public static class Bad
+{
+    public static void Fill(out int value) => Console.WriteLine(true);
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        int value;
+        Bad.Fill(out value);
+    }
+}

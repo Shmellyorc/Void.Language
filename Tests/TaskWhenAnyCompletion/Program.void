@@ -1,0 +1,246 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class Payload279
+{
+    public int Value;
+
+    public Payload279(int value)
+    {
+        Value = value;
+    }
+}
+
+public sealed class WorkerIntAwaiter279
+{
+    private int _value;
+
+    public WorkerIntAwaiter279(int value)
+    {
+        _value = value;
+    }
+
+    public bool IsCompleted => false;
+
+    public void OnCompleted(Action continuation)
+    {
+        ThreadPool.QueueUserWorkItem(continuation);
+    }
+
+    public int GetResult()
+    {
+        return _value;
+    }
+}
+
+public readonly struct WorkerIntAwaitable279
+{
+    private readonly int _value;
+
+    public WorkerIntAwaitable279(int value)
+    {
+        _value = value;
+    }
+
+    public WorkerIntAwaiter279 GetAwaiter()
+    {
+        return new WorkerIntAwaiter279(_value);
+    }
+}
+
+public sealed class AsyncResource279
+{
+    public static int DisposeCount;
+
+    public ValueTask DisposeAsync()
+    {
+        DisposeCount++;
+        return new ValueTask(Task.CompletedTask);
+    }
+}
+
+public static class Program
+{
+    private static bool WaitCompleted(Task task)
+    {
+        int elapsed = 0;
+        while (!task.IsCompleted && elapsed < 5000)
+        {
+            Thread.Sleep(1);
+            elapsed++;
+        }
+        return task.IsCompleted;
+    }
+
+    private static async Task<int> AwaitWinner(Task<int> first, Task<int> second)
+    {
+        Task<int> winner = await Task.WhenAny(first, second);
+        return await winner;
+    }
+
+    private static async Task<int> IntegratedCandidate()
+    {
+        await using var resource = new AsyncResource279();
+        int custom = await new WorkerIntAwaitable279(27);
+        int valueTask = await new ValueTask<int>(9);
+        return custom + valueTask;
+    }
+
+    public static void Main()
+    {
+        Task completed = Task.CompletedTask;
+        Task faulted = Task.FromException(new Exception("first fault"));
+        Task<Task> immediate = Task.WhenAny(faulted, completed);
+        Console.WriteLine(immediate.IsCompleted && immediate.Status == TaskStatus.Completed);
+        Console.WriteLine(immediate.Result == faulted && immediate.Result.IsFaulted);
+
+        Task<Task> immediateOrder = Task.WhenAny(completed, faulted);
+        Console.WriteLine(immediateOrder.IsCompleted && immediateOrder.Result == completed);
+
+        Task<int> firstTypedImmediate = Task.FromResult<int>(11);
+        Task<int> secondTypedImmediate = Task.FromResult<int>(12);
+        Task<Task<int>> inferredImmediate = Task.WhenAny(firstTypedImmediate, secondTypedImmediate);
+        Console.WriteLine(inferredImmediate.IsCompleted);
+        Console.WriteLine(inferredImmediate.Result == firstTypedImmediate && inferredImmediate.Result.Result == 11);
+
+        TaskCompletionSource firstSource = new TaskCompletionSource();
+        TaskCompletionSource secondSource = new TaskCompletionSource();
+        Task<Task> pending = Task.WhenAny(firstSource.Task, secondSource.Task);
+        Console.WriteLine(!pending.IsCompleted);
+        secondSource.SetResult();
+        Console.WriteLine(WaitCompleted(pending));
+        Console.WriteLine(pending.Status == TaskStatus.Completed && pending.Result == secondSource.Task);
+        Console.WriteLine(!firstSource.Task.IsCompleted);
+        firstSource.SetResult();
+        Console.WriteLine(pending.Result == secondSource.Task);
+
+        TaskCompletionSource<int> typedFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> typedSecond = new TaskCompletionSource<int>();
+        Task<Task<int>> typedPending = Task.WhenAny(typedFirst.Task, typedSecond.Task);
+        typedSecond.SetResult(22);
+        Console.WriteLine(WaitCompleted(typedPending));
+        Console.WriteLine(typedPending.Result == typedSecond.Task && typedPending.Result.Result == 22);
+        typedFirst.SetResult(21);
+
+        TaskCompletionSource faultWinnerSource = new TaskCompletionSource();
+        TaskCompletionSource faultLoserSource = new TaskCompletionSource();
+        Task<Task> faultWinner = Task.WhenAny(faultWinnerSource.Task, faultLoserSource.Task);
+        faultWinnerSource.SetException(new Exception("winner fault"));
+        Console.WriteLine(WaitCompleted(faultWinner));
+        Console.WriteLine(faultWinner.Status == TaskStatus.Completed && !faultWinner.IsFaulted && !faultWinner.IsCanceled);
+        Console.WriteLine(faultWinner.Result == faultWinnerSource.Task && faultWinner.Result.IsFaulted &&
+            faultWinner.Result.Exception.Message == "winner fault");
+        Console.WriteLine(!faultLoserSource.Task.IsCompleted);
+        faultLoserSource.SetResult();
+
+        CancellationTokenSource cancellationSource = new CancellationTokenSource();
+        CancellationToken cancellationToken = cancellationSource.Token;
+        TaskCompletionSource cancelWinnerSource = new TaskCompletionSource();
+        TaskCompletionSource cancelLoserSource = new TaskCompletionSource();
+        Task<Task> cancelWinner = Task.WhenAny(cancelWinnerSource.Task, cancelLoserSource.Task);
+        cancellationSource.Cancel();
+        cancelWinnerSource.SetCanceled(cancellationToken);
+        Console.WriteLine(WaitCompleted(cancelWinner));
+        Console.WriteLine(cancelWinner.Status == TaskStatus.Completed && !cancelWinner.IsCanceled);
+        Console.WriteLine(cancelWinner.Result == cancelWinnerSource.Task && cancelWinner.Result.IsCanceled &&
+            cancelWinner.Result.CancellationToken.IsSameSource(cancellationToken));
+        cancelLoserSource.SetResult();
+
+        CancellationTokenSource typedCancellationSource = new CancellationTokenSource();
+        CancellationToken typedCancellationToken = typedCancellationSource.Token;
+        typedCancellationSource.Cancel();
+        Task<int> typedCanceledCandidate = Task.FromCanceled<int>(typedCancellationToken);
+        Task<Task<int>> typedCanceledWinner = Task.WhenAny(typedCanceledCandidate, Task.FromResult<int>(88));
+        Console.WriteLine(typedCanceledWinner.IsCompleted && typedCanceledWinner.Status == TaskStatus.Completed);
+        Console.WriteLine(typedCanceledWinner.Result == typedCanceledCandidate &&
+            typedCanceledWinner.Result.IsCanceled &&
+            typedCanceledWinner.Result.CancellationToken.IsSameSource(typedCancellationToken));
+
+        TaskCompletionSource<int> awaitFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> awaitSecond = new TaskCompletionSource<int>();
+        Task<int> awaited = AwaitWinner(awaitFirst.Task, awaitSecond.Task);
+        Console.WriteLine(!awaited.IsCompleted);
+        awaitSecond.SetResult(32);
+        Console.WriteLine(WaitCompleted(awaited) && awaited.Result == 32);
+        awaitFirst.SetResult(31);
+
+        TaskCompletionSource duplicateSource = new TaskCompletionSource();
+        Task<Task> duplicate = Task.WhenAny(duplicateSource.Task, duplicateSource.Task);
+        duplicateSource.SetResult();
+        Console.WriteLine(WaitCompleted(duplicate) && duplicate.Result == duplicateSource.Task);
+
+        TaskCompletionSource snapshotFirst = new TaskCompletionSource();
+        TaskCompletionSource snapshotSecond = new TaskCompletionSource();
+        Task[] snapshotInputs = new Task[2];
+        snapshotInputs[0] = snapshotFirst.Task;
+        snapshotInputs[1] = snapshotSecond.Task;
+        Task<Task> snapshot = Task.WhenAny(snapshotInputs);
+        snapshotInputs[0] = Task.CompletedTask;
+        snapshotInputs[1] = Task.CompletedTask;
+        Thread.Sleep(5);
+        Console.WriteLine(!snapshot.IsCompleted);
+        snapshotSecond.SetResult();
+        Console.WriteLine(WaitCompleted(snapshot) && snapshot.Result == snapshotSecond.Task);
+        snapshotFirst.SetResult();
+
+        TaskCompletionSource<int> snapshotTypedFirst = new TaskCompletionSource<int>();
+        TaskCompletionSource<int> snapshotTypedSecond = new TaskCompletionSource<int>();
+        Task<int>[] snapshotTypedInputs = new Task<int>[2];
+        snapshotTypedInputs[0] = snapshotTypedFirst.Task;
+        snapshotTypedInputs[1] = snapshotTypedSecond.Task;
+        Task<Task<int>> snapshotTyped = Task.WhenAny(snapshotTypedInputs);
+        snapshotTypedInputs[0] = Task.FromResult<int>(90);
+        snapshotTypedInputs[1] = Task.FromResult<int>(91);
+        snapshotTypedFirst.SetResult(41);
+        Console.WriteLine(WaitCompleted(snapshotTyped) && snapshotTyped.Result == snapshotTypedFirst.Task &&
+            snapshotTyped.Result.Result == 41);
+        snapshotTypedSecond.SetResult(42);
+
+        Task<int> raceFirst = Task.Run<int>(async () =>
+        {
+            await Task.Yield();
+            return 51;
+        });
+        Task<int> raceSecond = Task.Run<int>(async () =>
+        {
+            await Task.Yield();
+            return 52;
+        });
+        Task<Task<int>> raced = Task.WhenAny(raceFirst, raceSecond);
+        Console.WriteLine(WaitCompleted(raced));
+        Task<int> raceWinner = raced.Result;
+        Console.WriteLine(raceWinner == raceFirst || raceWinner == raceSecond);
+        Console.WriteLine(WaitCompleted(raceWinner) && (raceWinner.Result == 51 || raceWinner.Result == 52));
+
+        AsyncResource279.DisposeCount = 0;
+        Task<int> integrated = Task.Run<int>(async () => await IntegratedCandidate());
+        TaskCompletionSource<int> integratedLoser = new TaskCompletionSource<int>();
+        Task<Task<int>> integratedRace = Task.WhenAny(integrated, integratedLoser.Task);
+        Console.WriteLine(WaitCompleted(integratedRace));
+        Console.WriteLine(integratedRace.Result == integrated);
+        Console.WriteLine(WaitCompleted(integrated) && integrated.Result == 36);
+        Console.WriteLine(AsyncResource279.DisposeCount == 1);
+        integratedLoser.SetResult(99);
+
+        Payload279 payload = new Payload279(279);
+        Task<Payload279> payloadTask = Task.FromResult<Payload279>(payload);
+        TaskCompletionSource<Payload279> payloadLoser = new TaskCompletionSource<Payload279>();
+        Task<Task<Payload279>> payloadWinner = Task.WhenAny(payloadTask, payloadLoser.Task);
+        payload = null;
+        payloadTask = null;
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(payloadWinner.IsCompleted && payloadWinner.Result.Result.Value == 279);
+        payloadLoser.SetResult(new Payload279(0));
+
+        TaskCompletionSource holdFirst = new TaskCompletionSource();
+        TaskCompletionSource holdSecond = new TaskCompletionSource();
+        Task<Task> heldRace = Task.WhenAny(holdFirst.Task, holdSecond.Task);
+        Task<int> unrelated = Task.Run<int>(() => 279);
+        Console.WriteLine(WaitCompleted(unrelated) && unrelated.Result == 279 && !heldRace.IsCompleted);
+        holdFirst.SetResult();
+        Console.WriteLine(WaitCompleted(heldRace) && heldRace.Result == holdFirst.Task);
+        holdSecond.SetResult();
+    }
+}

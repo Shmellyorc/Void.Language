@@ -1,0 +1,103 @@
+using Void;
+
+namespace Void.Text;
+
+public abstract class Decoder
+{
+    public abstract int GetChars(byte[] bytes, int byteIndex, int byteCount,
+        char[] chars, int charIndex, bool flush);
+    public abstract void Reset();
+    internal abstract string Decode(byte[] bytes, int index, int count, bool flush);
+}
+
+internal sealed class UTF8Decoder : Decoder
+{
+    private bool _throwOnInvalidBytes;
+    private byte[] _pending = new byte[3];
+    private int _pendingCount;
+    internal UTF8Decoder(bool throwOnInvalidBytes) { _throwOnInvalidBytes = throwOnInvalidBytes; }
+    public override void Reset() { _pendingCount = 0; }
+    public override int GetChars(byte[] bytes, int byteIndex, int byteCount,
+        char[] chars, int charIndex, bool flush)
+    {
+        if (chars == null) throw new ArgumentNullException("chars");
+        if (charIndex < 0 || charIndex > chars.Length) throw new ArgumentOutOfRangeException("charIndex");
+        // Decode into an independent state so insufficient destination space or
+        // invalid input cannot consume the caller's pending sequence.
+        UTF8Decoder next = new UTF8Decoder(_throwOnInvalidBytes);
+        next._pendingCount = _pendingCount;
+        for (int i = 0; i < _pendingCount; i++) next._pending[i] = _pending[i];
+        string value = next.Decode(bytes, byteIndex, byteCount, flush);
+        if (value.Length > chars.Length - charIndex) throw new ArgumentException("Destination is too short.");
+        for (int i = 0; i < value.Length; i++) chars[charIndex + i] = value[i];
+        _pendingCount = next._pendingCount;
+        for (int i = 0; i < _pendingCount; i++) _pending[i] = next._pending[i];
+        return value.Length;
+    }
+    internal override string Decode(byte[] bytes, int index, int count, bool flush)
+    {
+        if (bytes == null) throw new ArgumentNullException("bytes");
+        if (index < 0 || count < 0 || index > bytes.Length || count > bytes.Length - index)
+            throw new ArgumentOutOfRangeException("index");
+        if (count > 2147483647 - _pendingCount) throw new OutOfMemoryException();
+        byte[] input = new byte[count + _pendingCount];
+        for (int i = 0; i < _pendingCount; i++) input[i] = _pending[i];
+        for (int i = 0; i < count; i++) input[_pendingCount + i] = bytes[index + i];
+        _pendingCount = 0;
+        StringBuilder text = new StringBuilder();
+        int end = input.Length;
+        int position = 0;
+        while (position < end)
+        {
+            int lead = (int)input[position];
+            if (lead < 128)
+            {
+                text.Append((char)lead);
+                position++;
+                continue;
+            }
+            int needed = 0;
+            int scalar = 0;
+            int secondMin = 128;
+            int secondMax = 191;
+            if (lead >= 194 && lead <= 223) { needed = 2; scalar = lead - 192; }
+            else if (lead >= 224 && lead <= 239)
+            {
+                needed = 3; scalar = lead - 224;
+                if (lead == 224) secondMin = 160;
+                if (lead == 237) secondMax = 159;
+            }
+            else if (lead >= 240 && lead <= 244)
+            {
+                needed = 4; scalar = lead - 240;
+                if (lead == 240) secondMin = 144;
+                if (lead == 244) secondMax = 143;
+            }
+            int consumed = 1;
+            while (consumed < needed && position + consumed < end)
+            {
+                int next = (int)input[position + consumed];
+                int minimum = consumed == 1 ? secondMin : 128;
+                int maximum = consumed == 1 ? secondMax : 191;
+                if (next < minimum || next > maximum) break;
+                scalar = scalar * 64 + next - 128;
+                consumed++;
+            }
+            if (!flush && needed > 0 && consumed < needed && position + consumed == end)
+            {
+                _pendingCount = consumed;
+                for (int i = 0; i < consumed; i++) _pending[i] = input[position + i];
+                break;
+            }
+            if (needed > 0 && consumed == needed)
+                text.Append((char)scalar);
+            else
+            {
+                if (_throwOnInvalidBytes) throw new DecoderFallbackException("Invalid UTF-8 sequence");
+                text.Append((char)65533);
+            }
+            position += consumed;
+        }
+        return text.ToString();
+    }
+}

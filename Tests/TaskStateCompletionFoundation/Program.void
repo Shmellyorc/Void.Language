@@ -1,0 +1,150 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class RaceState
+{
+    public int Ready;
+    public int Wins;
+    public int CompletedWins;
+    public int FaultedWins;
+    public int CanceledWins;
+    public ManualResetEvent ReadyEvent;
+    public ManualResetEvent StartEvent;
+
+    public RaceState()
+    {
+        Ready = 0;
+        Wins = 0;
+        CompletedWins = 0;
+        FaultedWins = 0;
+        CanceledWins = 0;
+        ReadyEvent = new ManualResetEvent(false);
+        StartEvent = new ManualResetEvent(false);
+    }
+}
+
+public static class Program
+{
+    private static void SignalReady(RaceState state)
+    {
+        int ready = Interlocked.Increment(ref state.Ready);
+        if (ready == 3)
+            state.ReadyEvent.Set();
+        state.StartEvent.WaitOne();
+    }
+
+    private static Action MakeCompleteRace(Task task, RaceState state)
+    {
+        return () =>
+        {
+            SignalReady(state);
+            if (task.TrySetCompleted())
+            {
+                Interlocked.Increment(ref state.Wins);
+                Interlocked.Increment(ref state.CompletedWins);
+            }
+        };
+    }
+
+    private static Action MakeFaultRace(Task task, RaceState state)
+    {
+        return () =>
+        {
+            SignalReady(state);
+            if (task.TrySetException(new Exception("race fault")))
+            {
+                Interlocked.Increment(ref state.Wins);
+                Interlocked.Increment(ref state.FaultedWins);
+            }
+        };
+    }
+
+    private static Action MakeCancelRace(Task task, RaceState state, CancellationToken token)
+    {
+        return () =>
+        {
+            SignalReady(state);
+            if (task.TrySetCanceled(token))
+            {
+                Interlocked.Increment(ref state.Wins);
+                Interlocked.Increment(ref state.CanceledWins);
+            }
+        };
+    }
+
+    public static void Main()
+    {
+        Task running = new Task();
+        Console.WriteLine(running.Status == TaskStatus.Pending);
+        Console.WriteLine(!running.IsCompleted && !running.IsFaulted && !running.IsCanceled);
+        Console.WriteLine(running.Exception == null);
+        CancellationToken runningToken = running.CancellationToken;
+        Console.WriteLine(!runningToken.CanBeCanceled);
+        Console.WriteLine(running.TrySetRunning());
+        Console.WriteLine(running.Status == TaskStatus.Running);
+        Console.WriteLine(!running.TrySetRunning());
+        Console.WriteLine(running.TrySetCompleted());
+        Console.WriteLine(running.Status == TaskStatus.Completed && running.IsCompleted);
+        Console.WriteLine(!running.IsFaulted && !running.IsCanceled);
+        Console.WriteLine(!running.TrySetException(new Exception("late fault")));
+        Console.WriteLine(!running.TrySetCanceled(default));
+        Console.WriteLine(!running.TrySetCompleted());
+
+        Task direct = new Task();
+        Console.WriteLine(direct.TrySetCompleted());
+        Console.WriteLine(direct.Status == TaskStatus.Completed && direct.IsCompleted);
+
+        Task faulted = new Task();
+        Exception fault = new Exception("stored fault");
+        Console.WriteLine(faulted.TrySetException(fault));
+        fault = null;
+        GC.Collect();
+        GC.Collect();
+        Console.WriteLine(faulted.IsCompleted && faulted.IsFaulted && !faulted.IsCanceled);
+        Console.WriteLine(faulted.Status == TaskStatus.Faulted);
+        Console.WriteLine(faulted.Exception != null && faulted.Exception.Message == "stored fault");
+        CancellationToken faultedToken = faulted.CancellationToken;
+        Console.WriteLine(!faultedToken.CanBeCanceled);
+
+        CancellationTokenSource source = new CancellationTokenSource();
+        CancellationToken canceledToken = source.Token;
+        source.Cancel();
+        Task canceled = new Task();
+        Console.WriteLine(canceled.TrySetCanceled(canceledToken));
+        source = null;
+        GC.Collect();
+        Console.WriteLine(canceled.IsCompleted && canceled.IsCanceled && !canceled.IsFaulted);
+        Console.WriteLine(canceled.Status == TaskStatus.Canceled);
+        Console.WriteLine(canceled.Exception == null);
+        CancellationToken observedCanceledToken = canceled.CancellationToken;
+        Console.WriteLine(observedCanceledToken.CanBeCanceled);
+        Console.WriteLine(observedCanceledToken.IsCancellationRequested);
+
+        Task race = new Task();
+        RaceState raceState = new RaceState();
+        CancellationTokenSource raceSource = new CancellationTokenSource();
+        raceSource.Cancel();
+
+        Thread completeThread = new Thread(MakeCompleteRace(race, raceState));
+        Thread faultThread = new Thread(MakeFaultRace(race, raceState));
+        Thread cancelThread = new Thread(MakeCancelRace(race, raceState, raceSource.Token));
+        completeThread.Start();
+        faultThread.Start();
+        cancelThread.Start();
+
+        Console.WriteLine(raceState.ReadyEvent.WaitOne(5000));
+        raceState.StartEvent.Set();
+        completeThread.Join();
+        faultThread.Join();
+        cancelThread.Join();
+
+        Console.WriteLine(raceState.Wins == 1);
+        Console.WriteLine(raceState.CompletedWins + raceState.FaultedWins + raceState.CanceledWins == 1);
+        Console.WriteLine(race.IsCompleted);
+        Console.WriteLine(race.Status == TaskStatus.Completed || race.Status == TaskStatus.Faulted || race.Status == TaskStatus.Canceled);
+        Console.WriteLine(!race.TrySetCompleted());
+        Console.WriteLine(!race.TrySetException(new Exception("late race fault")));
+        Console.WriteLine(!race.TrySetCanceled(default));
+    }
+}

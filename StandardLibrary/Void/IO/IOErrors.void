@@ -1,0 +1,31 @@
+using Void;
+
+namespace Void.IO;
+
+internal static class IOErrors
+{
+    internal static void CheckPath(string path)
+    {
+        if (path == null) throw new ArgumentNullException("path");
+        if (path.Length == 0 || path.IndexOf((char)0) >= 0) throw new ArgumentException("Invalid path.", "path");
+    }
+    internal static void Throw(int status, string path, bool directory)
+    {
+        if (status == 0) return;
+        if (status == 1)
+        {
+            if (directory) throw new DirectoryNotFoundException(path);
+            string parent = Path.GetDirectoryName(path);
+            if (parent != null && parent.Length != 0 && !Directory.Exists(parent))
+                throw new DirectoryNotFoundException(path);
+            throw new FileNotFoundException("File was not found.", path);
+        }
+        if (status == 2) throw new DirectoryNotFoundException(path);
+        if (status == 3) throw new UnauthorizedAccessException(path);
+        if (status == 5) throw new ArgumentException("Invalid filesystem operation.");
+        if (status == 6) throw new OutOfMemoryException();
+        if (status == 7) throw new NotSupportedException("Native handle does not support this operation.");
+        if (status == 9) throw new ObjectDisposedException("NativeHandle");
+        throw new IOException("Filesystem operation failed: " + path);
+    }
+}

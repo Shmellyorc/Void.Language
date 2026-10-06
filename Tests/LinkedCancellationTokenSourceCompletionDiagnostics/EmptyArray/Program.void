@@ -1,0 +1,9 @@
+using Void.Threading;
+
+public static class Program
+{
+    public static void Main()
+    {
+        CancellationTokenSource.CreateLinkedTokenSource(new CancellationToken[0]);
+    }
+}

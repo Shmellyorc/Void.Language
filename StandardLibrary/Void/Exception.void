@@ -1,0 +1,10 @@
+public class Exception
+{
+    private string _message;
+    private Exception _innerException;
+    public string Message => _message;
+    public Exception InnerException => _innerException;
+    public Exception() { _message = "Exception"; _innerException = null; }
+    public Exception(string message) { _message = message == null ? "Exception" : message; _innerException = null; }
+    public Exception(string message, Exception innerException) { _message = message == null ? "Exception" : message; _innerException = innerException; }
+}

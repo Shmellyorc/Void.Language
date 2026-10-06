@@ -1,0 +1,15 @@
+public struct ExplicitOnly
+{
+    public static explicit operator ExplicitOnly(int value)
+    {
+        return new ExplicitOnly();
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        ExplicitOnly value = 1;
+    }
+}

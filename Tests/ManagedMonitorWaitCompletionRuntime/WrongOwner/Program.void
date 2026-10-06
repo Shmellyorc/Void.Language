@@ -1,0 +1,17 @@
+using Void.Threading;
+
+public sealed class Gate
+{
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Gate gate = new Gate();
+        Monitor.Enter(gate);
+        Thread worker = new Thread(() => Monitor.Wait(gate));
+        worker.Start();
+        worker.Join();
+    }
+}

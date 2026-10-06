@@ -1,0 +1,27 @@
+using Void.Collections;
+using Void.Threading.Tasks;
+
+public static class AsyncStreamLibrary220
+{
+    private static async IAsyncEnumerable<int> Values(int value)
+    {
+        TaskCompletionSource<int> gate = new TaskCompletionSource<int>();
+        gate.SetResult(value);
+        yield return await gate.Task;
+        yield return value + 2;
+    }
+
+    private static async Task<int> SumAsync(int value)
+    {
+        int sum = 0;
+        await foreach (var item in AsyncStreamLibrary220.Values(value))
+            sum += item;
+        return sum;
+    }
+
+    [Export("void220_async_stream_sum")]
+    public static int Run(int value)
+    {
+        return AsyncStreamLibrary220.SumAsync(value).Result;
+    }
+}

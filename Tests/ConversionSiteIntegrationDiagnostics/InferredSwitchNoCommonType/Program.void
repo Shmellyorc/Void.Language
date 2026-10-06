@@ -1,0 +1,9 @@
+public struct Left { public int Value; }
+public struct Right { public int Value; }
+public class Program
+{
+    public static void Main()
+    {
+        var value = 1 switch { 1 => new Left(), _ => new Right() };
+    }
+}

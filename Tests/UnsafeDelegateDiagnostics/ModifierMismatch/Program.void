@@ -1,0 +1,6 @@
+public unsafe delegate void PointerRef(ref int* value);
+public static class Program
+{
+    public static unsafe void Wrong(out int* value) { value = null; }
+    public static void Main() { PointerRef callback = Wrong; }
+}

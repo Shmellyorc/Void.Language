@@ -1,0 +1,1 @@
+public static class Program { public static int X=1; public static ref int Bad(){ return X; } public static void Main(){ ref int r = ref Bad(); } }

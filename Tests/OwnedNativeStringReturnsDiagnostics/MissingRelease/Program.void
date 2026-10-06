@@ -1,0 +1,8 @@
+using Void;
+public static class Native297
+{
+    [NativeString(NativeStringKind.OwnedNul)]
+    [Native("void297_missing_release")]
+    public static unsafe extern string Get();
+}
+public static class Program { public static void Main() { } }

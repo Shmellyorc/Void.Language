@@ -1,0 +1,263 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class AuditPayload200
+{
+    public int Value;
+    public AuditPayload200 Next;
+
+    public AuditPayload200(int value)
+    {
+        Value = value;
+        Next = null;
+    }
+}
+
+public sealed class AuditFault200 : Exception
+{
+    public AuditPayload200 Payload;
+
+    public AuditFault200(string message, AuditPayload200 payload) : base(message)
+    {
+        Payload = payload;
+    }
+}
+
+public sealed class AuditState200
+{
+    public int BlockerCount;
+    public int ShutdownStarted;
+    public int ShutdownContinuationCount;
+    public ManualResetEvent BlockersReady;
+    public ManualResetEvent BlockersRelease;
+
+    public AuditState200()
+    {
+        BlockerCount = 0;
+        ShutdownStarted = 0;
+        ShutdownContinuationCount = 0;
+        BlockersReady = new ManualResetEvent(false);
+        BlockersRelease = new ManualResetEvent(false);
+    }
+}
+
+public static class Program
+{
+    private static Action MakeBlocker(AuditState200 state)
+    {
+        return () =>
+        {
+            int ready = Interlocked.Increment(ref state.BlockerCount);
+            if (ready == 2)
+                state.BlockersReady.Set();
+            state.BlockersRelease.WaitOne();
+        };
+    }
+
+    private static Action MakeFault(AuditPayload200 payload)
+    {
+        return () =>
+        {
+            throw new AuditFault200("audit fault", payload);
+        };
+    }
+
+    private static Func<AuditPayload200> MakeQueuedResult(AuditPayload200 payload)
+    {
+        return () => payload;
+    }
+
+    private static Func<Task<AuditPayload200>, int> MakePayloadContinuation(AuditPayload200 payload)
+    {
+        return antecedent => antecedent.Result.Value + payload.Value;
+    }
+
+    private static Action MakeCompletion(
+        TaskCompletionSource<AuditPayload200> source,
+        AuditPayload200 payload)
+    {
+        return () => source.SetResult(payload);
+    }
+
+    private static Func<AuditPayload200> MakeShutdownWork(
+        AuditState200 state,
+        AuditPayload200 payload)
+    {
+        return () =>
+        {
+            Volatile.Write(ref state.ShutdownStarted, 1);
+            Thread.Sleep(150);
+            GC.Collect();
+            return payload;
+        };
+    }
+
+    private static bool WaitAuditFault(Task task, int value)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (AuditFault200 error)
+        {
+            GC.Collect();
+            return error.Message == "audit fault" &&
+                error.Payload != null &&
+                error.Payload.Value == value &&
+                error.Payload.Next != null &&
+                error.Payload.Next.Value == value + 1;
+        }
+        return false;
+    }
+
+    private static bool WaitCanceled(Task task, CancellationToken expected)
+    {
+        try
+        {
+            task.Wait();
+        }
+        catch (OperationCanceledException error)
+        {
+            CancellationToken observed = error.CancellationToken;
+            return observed.IsSameSource(expected) && observed.IsCancellationRequested;
+        }
+        return false;
+    }
+
+    public static void Main()
+    {
+        AuditState200 state = new AuditState200();
+
+        Task<int> root = Task.Run<int>(() => 20);
+        Task<int> plus = root.ContinueWith<int>(antecedent => antecedent.Result + 22);
+        Task<int> chain = plus.ContinueWith<int>(antecedent => antecedent.Result + 1);
+        Console.WriteLine(chain.Result == 43);
+        Console.WriteLine(root.Status == TaskStatus.Completed &&
+            plus.Status == TaskStatus.Completed && chain.Status == TaskStatus.Completed);
+
+        root.Wait();
+        Task<int> late = root.ContinueWith<int>(antecedent => antecedent.Result * 2);
+        Console.WriteLine(late.Result == 40);
+
+        AuditPayload200 faultPayload = new AuditPayload200(300);
+        faultPayload.Next = new AuditPayload200(301);
+        Action faultAction = MakeFault(faultPayload);
+        Task faulted = Task.Run(faultAction);
+        Task<int> faultObserver = faulted.ContinueWith<int>(antecedent =>
+            antecedent.IsFaulted && antecedent.Exception != null ? 1 : 0);
+        faultPayload = null;
+        faultAction = null;
+        GC.Collect();
+        Console.WriteLine(WaitAuditFault(faulted, 300));
+        Console.WriteLine(faultObserver.Result == 1);
+
+        Task continuationFault = root.ContinueWith(antecedent =>
+        {
+            AuditPayload200 payload = new AuditPayload200(320);
+            payload.Next = new AuditPayload200(321);
+            throw new AuditFault200("audit fault", payload);
+        });
+        Console.WriteLine(WaitAuditFault(continuationFault, 320));
+        Console.WriteLine(continuationFault.IsFaulted);
+
+        Task blockerOne = Task.Run(MakeBlocker(state));
+        Task blockerTwo = Task.Run(MakeBlocker(state));
+        Console.WriteLine(state.BlockersReady.WaitOne(5000));
+
+        CancellationTokenSource cancellationSource = new CancellationTokenSource();
+        CancellationToken cancellationToken = cancellationSource.Token;
+        Task<int> canceled = Task.Run<int>(() => 999, cancellationToken);
+        Task<int> canceledObserver = canceled.ContinueWith<int>(antecedent =>
+            antecedent.IsCanceled && antecedent.CancellationToken.IsSameSource(cancellationToken) ? 1 : 0);
+
+        AuditPayload200 queuedPayload = new AuditPayload200(500);
+        queuedPayload.Next = new AuditPayload200(501);
+        Func<AuditPayload200> queuedFunction = MakeQueuedResult(queuedPayload);
+        Task<AuditPayload200> queuedTask = Task.Run<AuditPayload200>(queuedFunction);
+        AuditPayload200 continuationPayload = new AuditPayload200(7);
+        Func<Task<AuditPayload200>, int> queuedContinuationFunction =
+            MakePayloadContinuation(continuationPayload);
+        Task<int> queuedContinuation =
+            queuedTask.ContinueWith<int>(queuedContinuationFunction);
+
+        queuedPayload = null;
+        queuedFunction = null;
+        continuationPayload = null;
+        queuedContinuationFunction = null;
+        GC.Collect();
+        GC.Collect();
+
+        cancellationSource.Cancel();
+        Console.WriteLine(canceled.IsCanceled);
+        Console.WriteLine(WaitCanceled(canceled, cancellationToken));
+        state.BlockersRelease.Set();
+        blockerOne.Wait();
+        blockerTwo.Wait();
+        Console.WriteLine(canceledObserver.Result == 1);
+        Console.WriteLine(queuedContinuation.Result == 507);
+        AuditPayload200 queuedObserved = queuedTask.Result;
+        GC.Collect();
+        Console.WriteLine(queuedObserved != null && queuedObserved.Value == 500 &&
+            queuedObserved.Next != null && queuedObserved.Next.Value == 501);
+
+        TaskCompletionSource<AuditPayload200> externalSource =
+            new TaskCompletionSource<AuditPayload200>();
+        Task<AuditPayload200> externalTask = externalSource.Task;
+        AuditPayload200 externalPayload = new AuditPayload200(600);
+        externalPayload.Next = new AuditPayload200(601);
+        Action completeExternal = MakeCompletion(externalSource, externalPayload);
+        AuditPayload200 externalContinuationPayload = new AuditPayload200(8);
+        Func<Task<AuditPayload200>, int> externalContinuationFunction =
+            MakePayloadContinuation(externalContinuationPayload);
+        Task<int> externalContinuation =
+            externalTask.ContinueWith<int>(externalContinuationFunction);
+        Thread completer = new Thread(completeExternal);
+
+        externalSource = null;
+        externalPayload = null;
+        completeExternal = null;
+        externalContinuationPayload = null;
+        externalContinuationFunction = null;
+        GC.Collect();
+        GC.Collect();
+        completer.Start();
+        completer.Join();
+        Console.WriteLine(externalContinuation.Result == 608);
+        AuditPayload200 externalObserved = externalTask.Result;
+        GC.Collect();
+        Console.WriteLine(externalObserved != null && externalObserved.Value == 600 &&
+            externalObserved.Next != null && externalObserved.Next.Value == 601);
+
+        AuditPayload200 shutdownPayload = new AuditPayload200(700);
+        shutdownPayload.Next = new AuditPayload200(701);
+        Func<AuditPayload200> shutdownFunction = MakeShutdownWork(state, shutdownPayload);
+        Task<AuditPayload200> shutdownTask = Task.Run<AuditPayload200>(shutdownFunction);
+        Task<int> shutdownContinuation = shutdownTask.ContinueWith<int>(antecedent =>
+        {
+            Interlocked.Increment(ref state.ShutdownContinuationCount);
+            return antecedent.Result.Value + 1;
+        });
+        Task<int> shutdownChain = shutdownContinuation.ContinueWith<int>(antecedent =>
+            antecedent.Result + 1);
+
+        shutdownPayload = null;
+        shutdownFunction = null;
+        GC.Collect();
+        while (Volatile.Read(ref state.ShutdownStarted) == 0)
+            Thread.Sleep(1);
+
+        ThreadPool.Shutdown();
+
+        AuditPayload200 shutdownObserved = shutdownTask.Result;
+        GC.Collect();
+        Console.WriteLine(shutdownObserved != null && shutdownObserved.Value == 700 &&
+            shutdownObserved.Next != null && shutdownObserved.Next.Value == 701);
+        Console.WriteLine(shutdownContinuation.Result == 701);
+        Console.WriteLine(shutdownChain.Result == 702);
+        Console.WriteLine(state.ShutdownContinuationCount == 1);
+        Console.WriteLine(shutdownTask.Status == TaskStatus.Completed &&
+            shutdownContinuation.Status == TaskStatus.Completed &&
+            shutdownChain.Status == TaskStatus.Completed);
+    }
+}

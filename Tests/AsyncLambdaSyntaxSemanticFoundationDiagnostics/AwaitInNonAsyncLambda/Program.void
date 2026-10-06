@@ -1,0 +1,12 @@
+using Void;
+using Void.Threading.Tasks;
+public static class Program
+{
+    private static async Task Outer()
+    {
+        Action value = () => { await Task.Yield(); };
+        value;
+        return;
+    }
+    public static void Main() { Outer(); }
+}

@@ -1,0 +1,14 @@
+public static class Program
+{
+    public static unsafe extern int abs(int value);
+    public static unsafe extern int toupper(int value);
+    public static unsafe extern int strcmp(string left, string right);
+
+    public static unsafe void Main()
+    {
+        Console.WriteLine(abs(-42));
+        Console.WriteLine(toupper(97));
+        Console.WriteLine(strcmp("void", "void") == 0);
+        Console.WriteLine(strcmp("abc", "abd") < 0);
+    }
+}

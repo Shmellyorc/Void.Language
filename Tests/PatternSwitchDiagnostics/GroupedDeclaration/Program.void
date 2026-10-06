@@ -1,0 +1,2 @@
+public class A { }
+public static class Program { public static void Main() { A a = new A(); switch (a) { case A x: case A: Console.WriteLine(x != null); break; } } }

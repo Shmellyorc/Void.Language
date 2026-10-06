@@ -1,0 +1,5 @@
+public class Node { }
+public static class Program
+{
+    public static void Main() { new Node().Missing(); }
+}

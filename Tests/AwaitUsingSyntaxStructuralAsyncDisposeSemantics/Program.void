@@ -1,0 +1,81 @@
+using Void;
+using Void.Threading.Tasks;
+using AwaitUsingExtensions275;
+
+public struct DisposeCompletion275 { }
+
+public struct DisposeAwaiter275
+{
+    public bool IsCompleted { get { return true; } }
+    public void OnCompleted(Action continuation) { continuation(); }
+    public void GetResult() { }
+}
+
+namespace AwaitUsingExtensions275
+{
+    public static class DisposeAwaitableExtensions275
+    {
+        public static DisposeAwaiter275 GetAwaiter(this DisposeCompletion275 completion)
+        {
+            return default;
+        }
+    }
+}
+
+public sealed class StructuralResource275
+{
+    public DisposeCompletion275 DisposeAsync() { return default; }
+}
+
+public sealed class TaskResource275
+{
+    public async Task DisposeAsync() { await Task.Yield(); }
+}
+
+public sealed class ValueTaskResource275
+{
+    public ValueTask DisposeAsync() { return default; }
+}
+
+public sealed class GenericResource275<T>
+{
+    public DisposeCompletion275 DisposeAsync() { return default; }
+}
+
+public static class Program
+{
+    private static async Task StatementForms()
+    {
+        await using (StructuralResource275 resource = new StructuralResource275())
+        {
+            await Task.Yield();
+        }
+
+        await using (new TaskResource275()) { }
+        await using (ValueTaskResource275 first = new ValueTaskResource275(),
+            second = new ValueTaskResource275()) { }
+    }
+
+    private static async Task DeclarationForms()
+    {
+        await using var first = new StructuralResource275();
+        await using ValueTaskResource275 second = new ValueTaskResource275();
+        await using GenericResource275<int> generic = new GenericResource275<int>();
+        await Task.Yield();
+    }
+
+    private static async Task SwitchDeclaration(int value)
+    {
+        switch (value)
+        {
+            case 0:
+                await using var resource = new StructuralResource275();
+                await Task.Yield();
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void Main() { }
+}

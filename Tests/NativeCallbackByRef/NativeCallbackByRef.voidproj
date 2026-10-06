@@ -1,0 +1,11 @@
+{
+  "format": 1,
+  "name": "NativeCallbackByRef",
+  "output": "exe",
+  "version": "0.1.0",
+  "compiler": {
+    "unsafe": true,
+    "libraryPaths": ["native"],
+    "libraries": ["voidc098fixture"]
+  }
+}

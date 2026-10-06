@@ -1,0 +1,10 @@
+public struct Bad
+{
+    private int _value;
+    public int Value
+    {
+        get { return _value; }
+        readonly set { _value = value; }
+    }
+}
+public static class Program { public static void Main() { } }

@@ -1,0 +1,1 @@
+public sealed class Node { } public static class Api { [Export("bad_return")] public static Node Get() { return new Node(); } }

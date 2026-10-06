@@ -1,0 +1,5 @@
+public struct Value
+{
+    public static int operator ++(Value value) { return 1; }
+}
+public static class Program { public static void Main() {} }

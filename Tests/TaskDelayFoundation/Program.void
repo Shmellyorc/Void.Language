@@ -1,0 +1,95 @@
+using Void;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class DelayPayload282
+{
+    public int Value;
+
+    public DelayPayload282(int value)
+    {
+        Value = value;
+    }
+}
+
+public static class Program
+{
+    private static async Task<int> AwaitDelayedValue(DelayPayload282 payload)
+    {
+        await Task.Delay(30);
+        return payload.Value;
+    }
+
+    private static async ValueTask<int> AwaitDelayValueTask()
+    {
+        await Task.Delay(15);
+        return 282;
+    }
+
+    private static async Task<int> MultipleDelays()
+    {
+        await Task.Delay(5);
+        await Task.Delay(10);
+        await Task.Delay(15);
+        return 3;
+    }
+
+    public static void Main()
+    {
+        Task zero = Task.Delay(0);
+        Console.WriteLine(zero == Task.CompletedTask);
+        Console.WriteLine(zero.IsCompleted);
+        Console.WriteLine(zero.Status == TaskStatus.Completed);
+
+        Task finite = Task.Delay(40);
+        Console.WriteLine(!finite.IsCompleted);
+        Console.WriteLine(finite.Wait(2000));
+        Console.WriteLine(finite.IsCompleted);
+        Console.WriteLine(finite.Status == TaskStatus.Completed);
+
+        Task infinite = Task.Delay(Timeout.Infinite);
+        Console.WriteLine(!infinite.IsCompleted);
+        Console.WriteLine(!infinite.Wait(40));
+        Console.WriteLine(!infinite.IsCompleted);
+        Console.WriteLine(infinite.Status == TaskStatus.Pending);
+
+        Task pending = Task.Delay(180);
+        Task<int> firstWorker = Task.Run<int>(() => 100);
+        Task<int> secondWorker = Task.Run<int>(() => 182);
+        Console.WriteLine(firstWorker.Wait(1000));
+        Console.WriteLine(secondWorker.Wait(1000));
+        Console.WriteLine(firstWorker.Result + secondWorker.Result == 282);
+        Console.WriteLine(!pending.IsCompleted);
+        Console.WriteLine(pending.Wait(2000));
+
+        DelayPayload282 payload = new DelayPayload282(282);
+        Task<int> retained = AwaitDelayedValue(payload);
+        payload = null;
+        GC.Collect();
+        Console.WriteLine(retained.Wait(2000));
+        Console.WriteLine(retained.Result == 282);
+
+        ValueTask<int> valueTask = AwaitDelayValueTask();
+        Console.WriteLine(valueTask.GetAwaiter().GetResult() == 282);
+
+        Task<int> multiple = MultipleDelays();
+        Console.WriteLine(multiple.Wait(2000));
+        Console.WriteLine(multiple.Result == 3);
+
+        Task[] delays = new Task[] { Task.Delay(10), Task.Delay(20), Task.Delay(30) };
+        Task all = Task.WhenAll(delays);
+        Console.WriteLine(all.Wait(2000));
+        Console.WriteLine(delays[0].IsCompleted && delays[1].IsCompleted && delays[2].IsCompleted);
+
+        Task shortDelay = Task.Delay(10);
+        Task longDelay = Task.Delay(120);
+        Task<Task> winnerTask = Task.WhenAny(shortDelay, longDelay);
+        Console.WriteLine(winnerTask.Wait(2000));
+        Console.WriteLine(winnerTask.Result == shortDelay);
+        Console.WriteLine(!longDelay.IsCompleted);
+        Console.WriteLine(longDelay.Wait(2000));
+
+        ThreadPool.Shutdown();
+        Console.WriteLine(true);
+    }
+}

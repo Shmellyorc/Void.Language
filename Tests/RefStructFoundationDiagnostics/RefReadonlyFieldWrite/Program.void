@@ -1,0 +1,1 @@
+public ref struct R { public ref readonly int Value; public R(in int value) { Value = ref value; } public void Write() { Value = 3; } } public static class Program { public static void Main() { int x = 1; R value = new R(in x); value.Write(); } }

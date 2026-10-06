@@ -1,0 +1,7 @@
+public interface I225Diag { ref readonly int Get(); }
+public class C225Diag : I225Diag
+{
+    public int Value;
+    public ref int Get() { return ref Value; }
+}
+public static class Program { public static void Main() {} }

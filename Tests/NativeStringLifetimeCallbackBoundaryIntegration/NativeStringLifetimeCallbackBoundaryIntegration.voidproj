@@ -1,0 +1,11 @@
+{
+  "format": 1,
+  "name": "NativeStringLifetimeCallbackBoundaryIntegration",
+  "output": "exe",
+  "version": "0.0.299",
+  "compiler": {
+    "unsafe": true,
+    "libraryPaths": ["native"],
+    "libraries": ["voidc299fixture"]
+  }
+}
