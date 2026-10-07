@@ -1,0 +1,28 @@
+namespace V
+{
+    public class Monster
+    {
+        public int Health;
+    }
+
+    public class GameLoop
+    {
+        private Monster _monster;
+
+        public void Loop()
+        {
+            while (_monster.Health > 0)
+            {
+            }
+        }
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        V.GameLoop game = new V.GameLoop();
+        game.Loop();
+    }
+}

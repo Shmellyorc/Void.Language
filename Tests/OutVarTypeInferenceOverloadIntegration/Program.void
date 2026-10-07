@@ -1,0 +1,168 @@
+using Void;
+
+namespace Out342.One
+{
+    public struct Widget
+    {
+        public int Value;
+    }
+}
+
+namespace Out342
+{
+    public enum Shade
+    {
+        Red,
+        Blue
+    }
+
+    public struct Item
+    {
+        public int Value;
+    }
+
+    public class RefItem
+    {
+        public int Value;
+    }
+
+    public class Box<T>
+    {
+        public T Value;
+    }
+
+    public static class Producer
+    {
+        public static void ProduceBool(out bool value) { value = true; }
+        public static void ProduceByte(out byte value) { value = (byte)7; }
+        public static void ProduceInt(out int value) { value = 17; }
+        public static void ProduceLong(out long value) { value = 19l; }
+        public static void ProduceFloat(out float value) { value = 1.5f; }
+        public static void ProduceDouble(out double value) { value = 2.5; }
+        public static void ProduceDecimal(out decimal value) { value = 3.5m; }
+        public static void ProduceChar(out char value) { value = 'Q'; }
+        public static void ProduceString(out string value) { value = "inferred"; }
+        public static void ProduceItem(out Item value)
+        {
+            value = new Item();
+            value.Value = 23;
+        }
+        public static void ProduceRefItem(out RefItem value)
+        {
+            value = new RefItem();
+            value.Value = 29;
+        }
+        public static void ProduceShade(out Shade value) { value = Shade.Blue; }
+        public static void ProduceQualified(out Out342.One.Widget value)
+        {
+            value = new Out342.One.Widget();
+            value.Value = 31;
+        }
+        public static void ProduceArray(out int[] value)
+        {
+            value = new int[] { 2, 3, 5 };
+        }
+        public static void Get(int kind, out int value) { value = kind + 40; }
+        public static void Get(string kind, out string value) { value = kind; }
+        public static void Explicit<T>(out T value) { value = default(T); }
+        public static void Transform<T>(T input, out T value) { value = input; }
+        public static void MakeBox<T>(T input, out Box<T> value)
+        {
+            value = new Box<T>();
+            value.Value = input;
+        }
+    }
+}
+
+public static class Program
+{
+    static void Check(bool value) { Console.WriteLine(value); }
+
+    static int EarlyReturn()
+    {
+        if (!int.TryParse("41", out var value))
+            return -1;
+        return value;
+    }
+
+    public static void Main()
+    {
+        Out342.Producer.ProduceBool(out var boolValue);
+        Check(boolValue);
+        Out342.Producer.ProduceByte(out var byteValue);
+        Check(byteValue == (byte)7);
+        Out342.Producer.ProduceInt(out var intValue);
+        Check(intValue == 17);
+        Out342.Producer.ProduceLong(out var longValue);
+        Check(longValue == 19l);
+        Out342.Producer.ProduceFloat(out var floatValue);
+        Check(floatValue == 1.5f);
+        Out342.Producer.ProduceDouble(out var doubleValue);
+        Check(doubleValue == 2.5);
+        Out342.Producer.ProduceDecimal(out var decimalValue);
+        Check(decimalValue == 3.5m);
+        Out342.Producer.ProduceChar(out var charValue);
+        Check(charValue == 'Q');
+        Out342.Producer.ProduceString(out var stringValue);
+        Check(stringValue == "inferred");
+
+        Out342.Producer.ProduceItem(out var item);
+        Check(item.Value == 23);
+        Out342.Producer.ProduceRefItem(out var refItem);
+        Check(refItem.Value == 29);
+        Out342.Producer.ProduceShade(out var shade);
+        Check(shade == Out342.Shade.Blue);
+        Out342.Producer.ProduceQualified(out var qualified);
+        Check(qualified.Value == 31);
+        Out342.Producer.ProduceArray(out var values);
+        Check(values.Length == 3 && values[2] == 5);
+
+        Out342.Producer.Get(1, out var overloadedInt);
+        Check(overloadedInt == 41);
+        Out342.Producer.Get("selected", out var overloadedString);
+        Check(overloadedString == "selected");
+
+        Out342.Producer.Explicit<int>(out var explicitGeneric);
+        Check(explicitGeneric == 0);
+        Out342.Producer.Transform(43, out var inferredGeneric);
+        Check(inferredGeneric == 43);
+        Out342.Producer.MakeBox(47, out var inferredBox);
+        Check(inferredBox.Value == 47);
+
+        Check(int.TryParse("53", out var parsedInt));
+        Check(parsedInt == 53);
+        Check(uint.TryParse("59", out var parsedUInt));
+        Check(parsedUInt == 59u);
+        Check(long.TryParse("61", out var parsedLong));
+        Check(parsedLong == 61l);
+        Check(bool.TryParse("true", out var parsedBool));
+        Check(parsedBool);
+        Check(char.TryParse("Z", out var parsedChar));
+        Check(parsedChar == 'Z');
+        Check(float.TryParse("1.25", out var parsedFloat));
+        Check(parsedFloat == 1.25f);
+        Check(double.TryParse("2.25", out var parsedDouble));
+        Check(parsedDouble == 2.25);
+        Check(decimal.TryParse("3.25", out var parsedDecimal));
+        Check(parsedDecimal == 3.25m);
+
+        if (int.TryParse("67", out var conditionValue))
+            Check(conditionValue == 67);
+        else
+            Check(false);
+        Check(conditionValue == 67);
+        Check(EarlyReturn() == 41);
+
+        int.TryParse("71", out var statementValue);
+        Check(statementValue == 71);
+
+        Out342.Producer.ProduceInt(out int typed341);
+        Check(typed341 == 17);
+        int predeclared;
+        Out342.Producer.ProduceInt(out predeclared);
+        Check(predeclared == 17);
+        var ordinaryVar = 0;
+        Out342.Producer.ProduceInt(out ordinaryVar);
+        Check(ordinaryVar == 17);
+    }
+}

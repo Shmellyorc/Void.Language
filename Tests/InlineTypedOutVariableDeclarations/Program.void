@@ -1,0 +1,118 @@
+using Void;
+
+namespace Out341
+{
+    public struct Item
+    {
+        public int Value;
+    }
+
+    public class Box<T>
+    {
+        public T Value;
+    }
+
+    public static class Producer
+    {
+        public static void ProduceInt(out int value) { value = 17; }
+        public static bool ProduceString(out string value) { value = "typed"; return true; }
+        public static void ProduceItem(out Item value)
+        {
+            value = new Item();
+            value.Value = 23;
+        }
+        public static void ProduceQualified(out Item value)
+        {
+            value = new Item();
+            value.Value = 29;
+        }
+        public static void ProduceBox(out Box<int> value)
+        {
+            value = new Box<int>();
+            value.Value = 31;
+        }
+        public static void ProduceArray(out int[] values)
+        {
+            values = new int[] { 2, 3, 5 };
+        }
+        public static void Get(out int value) { value = 37; }
+        public static void Get(out string value) { value = "overload"; }
+        public static bool Generic<T>(T input, out T value)
+        {
+            value = input;
+            return true;
+        }
+    }
+}
+
+public static class Program
+{
+    static void Check(bool value) { Console.WriteLine(value); }
+
+    static int EarlyReturn()
+    {
+        if (!int.TryParse("41", out int value))
+            return -1;
+        return value;
+    }
+
+    public static void Main()
+    {
+        Out341.Producer.ProduceInt(out int integer);
+        Check(integer == 17);
+
+        if (Out341.Producer.ProduceString(out string text))
+            Check(text == "typed");
+        else
+            Check(false);
+        Check(text == "typed");
+
+        Out341.Producer.ProduceItem(out Out341.Item item);
+        Check(item.Value == 23);
+
+        Out341.Producer.ProduceQualified(out Out341.Item qualified);
+        Check(qualified.Value == 29);
+
+        Out341.Producer.ProduceBox(out Out341.Box<int> box);
+        Check(box.Value == 31);
+
+        Out341.Producer.ProduceArray(out int[] values);
+        Check(values.Length == 3);
+        Check(values[2] == 5);
+
+        Out341.Producer.Get(out int overloadedInt);
+        Out341.Producer.Get(out string overloadedString);
+        Check(overloadedInt == 37);
+        Check(overloadedString == "overload");
+
+        Check(Out341.Producer.Generic<int>(43, out int explicitGeneric));
+        Check(explicitGeneric == 43);
+        Check(Out341.Producer.Generic(47, out int inferredGeneric));
+        Check(inferredGeneric == 47);
+
+        Check(int.TryParse("53", out int parsedInt));
+        Check(parsedInt == 53);
+        Check(bool.TryParse("true", out bool parsedBool));
+        Check(parsedBool);
+        Check(char.TryParse("Q", out char parsedChar));
+        Check(parsedChar == 'Q');
+        Check(float.TryParse("1.5", out float parsedFloat));
+        Check(parsedFloat == 1.5f);
+        Check(double.TryParse("2.5", out double parsedDouble));
+        Check(parsedDouble == 2.5);
+        Check(decimal.TryParse("3.5", out decimal parsedDecimal));
+        Check(parsedDecimal == 3.5m);
+
+        Check(EarlyReturn() == 41);
+
+        int predeclared;
+        Out341.Producer.ProduceInt(out predeclared);
+        Check(predeclared == 17);
+        int initialized = 0;
+        Out341.Producer.ProduceInt(out initialized);
+        Check(initialized == 17);
+        var inferred = 0;
+        Out341.Producer.ProduceInt(out inferred);
+        Check(inferred == 17);
+    }
+}

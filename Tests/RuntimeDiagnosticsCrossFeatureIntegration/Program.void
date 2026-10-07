@@ -1,0 +1,93 @@
+using Void;
+
+public interface ITurn
+{
+    void TakeTurn();
+}
+
+public sealed class Box<T>
+{
+    private T[] _values;
+
+    public Box(T[] values)
+    {
+        _values = values;
+    }
+
+    public T Read(int index)
+    {
+        return _values[index];
+    }
+}
+
+public static class GenericHelpers
+{
+    public static void Invoke<T>(Box<T> box, int index)
+    {
+        Console.WriteLine(box.Read(index));
+    }
+}
+
+public class ActorBase
+{
+    public virtual int Score => 1;
+}
+
+public sealed class Player : ActorBase, ITurn
+{
+    private Box<int> _inventory;
+
+    public override int Score => 7;
+
+    public Player()
+    {
+        _inventory = new Box<int>(new int[] { 10, 20 });
+    }
+
+    public void TakeTurn()
+    {
+        int score = this.Score;
+        Action callback = () => GenericHelpers.Invoke<int>(_inventory, score);
+        GC.Collect();
+        callback();
+    }
+}
+
+public sealed class GameLoop
+{
+    private ITurn _turn;
+
+    public GameLoop(ITurn turn)
+    {
+        _turn = turn;
+    }
+
+    public void Update()
+    {
+        _turn.TakeTurn();
+    }
+}
+
+public sealed class Game
+{
+    private GameLoop _loop;
+
+    public Game()
+    {
+        _loop = new GameLoop(new Player());
+    }
+
+    public void Run()
+    {
+        _loop.Update();
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Game game = new Game();
+        game.Run();
+    }
+}

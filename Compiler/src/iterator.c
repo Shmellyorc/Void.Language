@@ -2581,6 +2581,7 @@ static bool lower_method(VcAstTree *tree, VcAstNodeList *parent_declarations,
         : named_type(tree, location, "bool");
     move_next->as.method_declaration.name = copy_text(tree,
         async_iterator ? "MoveNextAsync" : "MoveNext");
+    move_next->as.method_declaration.runtime_source_method_node = method;
     move_next->as.method_declaration.body = move_body;
     move_loop->as.while_statement.condition = bool_literal(tree, location, true);
     move_loop->as.while_statement.body = move_loop_body;
@@ -2611,6 +2612,7 @@ static bool lower_method(VcAstTree *tree, VcAstNodeList *parent_declarations,
         async_iterator ? "Task" : "void");
     dispose->as.method_declaration.name = copy_text(tree,
         async_iterator ? "DisposeAsync" : "Dispose");
+    dispose->as.method_declaration.runtime_source_method_node = method;
     dispose->as.method_declaration.body = dispose_body;
     dispose_state->as.local_declaration.type = named_type(tree, location, "int");
     dispose_state->as.local_declaration.name = copy_text(tree, "__iterator_dispose_state");

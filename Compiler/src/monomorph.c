@@ -492,12 +492,10 @@ static VcAstNode *clone_node(
         set_error(context, "out of memory while specializing generic node");
         return NULL;
     }
+    copy->span = source->span;
     copy->receiver_type = clone_type(context, tree, source->receiver_type, substitution);
-    if (source->kind == VC_AST_TYPE_RECEIVER_EXPRESSION)
-    {
-        copy->span = source->span;
-        if (copy->receiver_type != NULL) copy->receiver_type->span = source->receiver_type->span;
-    }
+    if (source->kind == VC_AST_TYPE_RECEIVER_EXPRESSION && copy->receiver_type != NULL)
+        copy->receiver_type->span = source->receiver_type->span;
     copy->argument_name = source->argument_name;
     if (!clone_node_list(context, tree, &source->attributes, &copy->attributes, substitution))
         return NULL;
@@ -549,6 +547,10 @@ static VcAstNode *clone_node(
             copy->as.method_declaration.returns_ref_readonly = source->as.method_declaration.returns_ref_readonly;
             copy->as.method_declaration.name = source->as.method_declaration.name;
             copy->as.method_declaration.original_generic_name = source->as.method_declaration.original_generic_name;
+            copy->as.method_declaration.runtime_source_method_node =
+                source->as.method_declaration.runtime_source_method_node;
+            copy->as.method_declaration.runtime_hide_frame =
+                source->as.method_declaration.runtime_hide_frame;
             copy->as.method_declaration.generic_parameters = source->as.method_declaration.generic_parameters;
             if (!clone_node_list(context, tree, &source->as.method_declaration.generic_constraints,
                     &copy->as.method_declaration.generic_constraints, method_sub)) return NULL;
@@ -939,6 +941,14 @@ static VcAstNode *clone_node(
         case VC_AST_UNARY_EXPRESSION:
             copy->as.unary_expression.operator_kind = source->as.unary_expression.operator_kind;
             copy->as.unary_expression.operand = clone_node(context, tree, source->as.unary_expression.operand, substitution);
+            copy->as.unary_expression.inline_out_type = clone_type(context, tree,
+                source->as.unary_expression.inline_out_type, substitution);
+            copy->as.unary_expression.inline_out_inference_span =
+                source->as.unary_expression.inline_out_inference_span;
+            copy->as.unary_expression.inline_out_inferred =
+                source->as.unary_expression.inline_out_inferred;
+            copy->as.unary_expression.inline_out_discard =
+                source->as.unary_expression.inline_out_discard;
             copy->as.unary_expression.constrained_static_parameter =
                 source->as.unary_expression.constrained_static_parameter != NULL
                     ? source->as.unary_expression.constrained_static_parameter

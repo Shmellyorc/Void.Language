@@ -1,0 +1,29 @@
+using Void;
+using Void.Threading;
+
+public static class Program
+{
+    static void Old(int depth)
+    {
+        if (depth < 0) return;
+        if (depth > 0) { Old(depth - 1); return; }
+        throw new Exception("thread-handled-350");
+    }
+    static void Success(int depth) { if (depth > 0) Success(depth - 1); }
+    static void Crash()
+    {
+        int.TryParse("4", out var index);
+        int[] values = new[] { 1, 2 };
+        Console.WriteLine(values[index]);
+    }
+    static void Worker()
+    {
+        try { Old(16); } catch (Exception error) { GC.Collect(); }
+        Success(20); Success(20); GC.Collect(); Crash();
+    }
+    public static void Main()
+    {
+        Success(20);
+        Thread worker = new Thread(() => Worker()); worker.Start(); worker.Join();
+    }
+}

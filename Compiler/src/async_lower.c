@@ -4914,6 +4914,8 @@ static bool make_awaiter_resume_method(VcAsyncContext *context, VcAstNode *state
         (context->method->as.method_declaration.modifiers & VC_AST_MOD_UNSAFE);
     method->as.method_declaration.return_type = named_type(context->tree, location, "void");
     method->as.method_declaration.name = copy_text(context->tree, "ResumeAwaiter");
+    method->as.method_declaration.runtime_source_method_node = context->method;
+    method->as.method_declaration.runtime_hide_frame = true;
     method->as.method_declaration.body = body;
     return method->as.method_declaration.return_type != NULL &&
         method->as.method_declaration.name != NULL &&
@@ -5352,6 +5354,7 @@ static bool make_async_cfg_move_next_method(VcAsyncContext *context, VcAstNode *
         (context->method->as.method_declaration.modifiers & VC_AST_MOD_UNSAFE);
     move_next->as.method_declaration.return_type = named_type(context->tree, location, "void");
     move_next->as.method_declaration.name = copy_text(context->tree, "MoveNext");
+    move_next->as.method_declaration.runtime_source_method_node = context->method;
     move_next->as.method_declaration.body = body;
     move_loop->as.while_statement.condition = bool_literal(context->tree, location, true);
     move_loop->as.while_statement.body = loop_body;
@@ -5476,6 +5479,7 @@ static bool make_execute_method(VcAsyncContext *context, VcAstNode *state_type, 
         ? named_type(context->tree, context->method->location, "void")
         : clone_type(context->tree, return_type);
     execute->as.method_declaration.name = copy_text(context->tree, "Execute");
+    execute->as.method_declaration.runtime_source_method_node = context->method;
     execute->as.method_declaration.body = original_body;
     return execute->as.method_declaration.return_type != NULL &&
         execute->as.method_declaration.name != NULL &&
@@ -5494,6 +5498,7 @@ static bool make_move_next_method(VcAsyncContext *context, VcAstNode *state_type
         (context->method->as.method_declaration.modifiers & VC_AST_MOD_UNSAFE);
     move_next->as.method_declaration.return_type = named_type(context->tree, location, "void");
     move_next->as.method_declaration.name = copy_text(context->tree, "MoveNext");
+    move_next->as.method_declaration.runtime_source_method_node = context->method;
     move_next->as.method_declaration.body = body;
     if (move_next->as.method_declaration.return_type == NULL ||
         move_next->as.method_declaration.name == NULL)

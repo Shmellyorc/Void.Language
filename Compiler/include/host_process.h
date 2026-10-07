@@ -4,6 +4,26 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+typedef enum VcHostProcessTermination
+{
+    VC_HOST_PROCESS_EXITED,
+    VC_HOST_PROCESS_SIGNALED
+} VcHostProcessTermination;
+
+typedef struct VcHostProcessResult
+{
+    VcHostProcessTermination termination;
+    unsigned long exit_code;
+    int signal_number;
+    const char *signal_name;
+} VcHostProcessResult;
+
+/* Detailed process result used when the caller must distinguish normal exit
+ * from native signal termination. Failure means launch/wait infrastructure
+ * failed and writes a diagnostic when space permits. */
+bool vc_host_process_run_status(char *const argv[], VcHostProcessResult *result,
+                                char *error, size_t error_size);
+
 /* argv is a NULL-terminated UTF-8 vector; no shell splitting or expansion.
  * Inherits cwd, environment and standard handles; waits synchronously.
  * Success means a normal child exit (including nonzero), not exit code zero.

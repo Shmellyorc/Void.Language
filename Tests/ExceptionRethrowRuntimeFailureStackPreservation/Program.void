@@ -1,0 +1,36 @@
+public sealed class AppFailure : Exception
+{
+    public AppFailure(string message) : base(message) { }
+}
+
+public static class Program
+{
+    public static void Crash()
+    {
+        throw new AppFailure("original-346");
+    }
+
+    public static void Work()
+    {
+        Crash();
+    }
+
+    public static void Rethrow()
+    {
+        try
+        {
+            Work();
+        }
+        catch (AppFailure error)
+        {
+            if (error == null)
+                Runtime.Fail("unexpected null exception");
+            throw;
+        }
+    }
+
+    public static void Main()
+    {
+        Rethrow();
+    }
+}

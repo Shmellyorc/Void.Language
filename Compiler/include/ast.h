@@ -220,6 +220,8 @@ struct VcAstNode
             bool returns_ref_readonly;
             char *name;
             char *original_generic_name;
+            const VcAstNode *runtime_source_method_node;
+            bool runtime_hide_frame;
             VcAstStringList generic_parameters;
             VcAstNodeList generic_constraints;
             VcAstNodeList parameters;
@@ -547,7 +549,11 @@ struct VcAstNode
         {
             VcTokenKind operator_kind;
             VcAstNode *operand;
+            VcAstTypeRef *inline_out_type;
+            VcSourceSpan inline_out_inference_span;
             const char *constrained_static_parameter;
+            bool inline_out_inferred;
+            bool inline_out_discard;
             bool postfix;
         } unary_expression;
 

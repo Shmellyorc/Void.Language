@@ -88,11 +88,13 @@ char *vc_host_process_windows_command_line(char *const argv[])
     return line;
 }
 
-bool vc_host_process_run(char *const argv[], unsigned long *exit_code,
-                         char *error, size_t error_size)
+bool vc_host_process_run_status(char *const argv[], VcHostProcessResult *result,
+                                char *error, size_t error_size)
 {
-    if (argv == NULL || argv[0] == NULL || argv[0][0] == '\0' || exit_code == NULL)
+    if (argv == NULL || argv[0] == NULL || argv[0][0] == '\0' || result == NULL)
         return fail(error, error_size, "invalid host process arguments");
+    memset(result, 0, sizeof(*result));
+    result->termination = VC_HOST_PROCESS_EXITED;
 #ifdef _WIN32
     char *line = vc_host_process_windows_command_line(argv);
     if (line == NULL)
@@ -140,7 +142,7 @@ bool vc_host_process_run(char *const argv[], unsigned long *exit_code,
     if (!got_code)
         return fail(error, error_size, "could not wait for process: Windows error %lu",
                     (unsigned long)wait_error);
-    *exit_code = (unsigned long)code;
+    result->exit_code = (unsigned long)code;
     return true;
 #else
     /* A close-on-exec pipe separates exec failure from a real child exit 127.
@@ -189,7 +191,7 @@ bool vc_host_process_run(char *const argv[], unsigned long *exit_code,
         return fail(error, error_size, "could not execute '%s': %s", argv[0], strerror(launch_error));
     if (WIFEXITED(status))
     {
-        *exit_code = (unsigned long)WEXITSTATUS(status);
+        result->exit_code = (unsigned long)WEXITSTATUS(status);
         return true;
     }
     if (WIFSIGNALED(status))
@@ -206,8 +208,26 @@ bool vc_host_process_run(char *const argv[], unsigned long *exit_code,
             case SIGINT: name = "SIGINT (interrupt)"; break;
             default: break;
         }
-        return fail(error, error_size, "process terminated by signal %d: %s", signal, name);
+        result->termination = VC_HOST_PROCESS_SIGNALED;
+        result->signal_number = signal;
+        result->signal_name = name;
+        return true;
     }
     return fail(error, error_size, "process ended unexpectedly");
 #endif
+}
+
+bool vc_host_process_run(char *const argv[], unsigned long *exit_code,
+                         char *error, size_t error_size)
+{
+    if (exit_code == NULL)
+        return fail(error, error_size, "invalid host process arguments");
+    VcHostProcessResult result;
+    if (!vc_host_process_run_status(argv, &result, error, error_size))
+        return false;
+    if (result.termination == VC_HOST_PROCESS_SIGNALED)
+        return fail(error, error_size, "process terminated by signal %d: %s",
+                    result.signal_number, result.signal_name != NULL ? result.signal_name : "unknown signal");
+    *exit_code = result.exit_code;
+    return true;
 }

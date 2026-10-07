@@ -1,0 +1,67 @@
+using Void;
+
+public delegate bool Producer(out int value);
+public interface IProducer { bool Produce(out int value); }
+public sealed class Box<T> { public T Value; }
+public sealed class Source : IProducer
+{
+    public bool Produce(out int value) { value = 7; return true; }
+}
+public sealed class Resource : IDisposable
+{
+    public Resource(out int value) { value = 9; }
+    public void Dispose() { GC.Collect(); }
+}
+public static class Program
+{
+    static bool Produce(out int value) { value = 7; return true; }
+    static int Number(out int value) { value = 2; return 2; }
+    static int[] Values(out int value) { value = 3; return new[] { 4, 5 }; }
+    static void Transform<T>(T input, out Box<T> value) { value = new Box<T>(); value.Value = input; }
+    static void Pick(int key, out int first, out string second) { first = key; second = "selected"; }
+    static void Pick(long key, out string first, out int second) { first = "rejected"; second = 0; }
+    static void Pair(out int first, out bool second, out string third) { first = 1; second = true; third = "three"; }
+    static void Check(bool result) { Console.WriteLine(result); }
+    public static void Main()
+    {
+        bool[] flags = new[] { Produce(out var arrayValue), Produce(out int typedValue) };
+        Check(flags[0] && flags[1] && arrayValue == typedValue);
+        Action capture = () => Check(arrayValue == 7);
+        GC.Collect(); capture();
+        switch (Produce(out var switchValue))
+        {
+            case true: Check(switchValue == 7); break;
+            default: Check(false); break;
+        }
+        bool selected = Produce(out var scrutineeValue) switch { true => true, _ => false };
+        Check(selected && scrutineeValue == 7);
+        int shadow = 91;
+        bool arm = true switch { true => Produce(out var shadow), _ => Produce(out var shadow) };
+        Check(arm && shadow == 91);
+        foreach (int number in Values(out var collectionValue)) { Check(number > collectionValue); }
+        int[] sized = new int[Number(out var dimensionValue)];
+        Check(sized.Length == dimensionValue);
+        Box<int> initialized = new Box<int>() { Value = Number(out var initializerValue) };
+        Check(initialized.Value == initializerValue);
+        Producer producer = Produce; producer(out var delegatedValue); Check(delegatedValue == 7);
+        IProducer source = new Source(); source.Produce(out var dispatchedValue); Check(dispatchedValue == 7);
+        using (Resource resource = new Resource(out var constructorValue)) { Check(constructorValue == 9); }
+        Transform(new Box<int>(), out var nestedGeneric);
+        GC.Collect(); Check(nestedGeneric.Value != null);
+        Pick(3, out var first, out var second); Check(first == 3 && second == "selected");
+        Pair(out int a, out var b, out string c); Check(a == 1 && b && c == "three");
+        Pair(out _, out _, out _);
+        bool branch = (Produce(out var left) && Produce(out var right)) ? right == left : false;
+        Check(branch);
+        if (!(Produce(out var early) && Produce(out var later))) return;
+        Check(early == later);
+        int iteration = 0;
+        while (Produce(out var loopValue) && iteration < 2)
+        {
+            iteration++; if (iteration == 1) continue; Check(loopValue == 7); break;
+        }
+        for (int i = 0; Produce(out var forValue) && i < 1; i++) { Check(forValue == 7); }
+        do { iteration++; } while (Produce(out var doValue) && doValue < 0);
+        Check(iteration == 3);
+    }
+}

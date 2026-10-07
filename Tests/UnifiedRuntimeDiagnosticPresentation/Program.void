@@ -1,0 +1,44 @@
+namespace V
+{
+    public class Monster
+    {
+        public string Name;
+    }
+
+    public class GameLoop
+    {
+        public void Attack()
+        {
+            Monster monster = null;
+            Console.WriteLine(monster.Name);
+        }
+
+        public void PlayerTurn()
+        {
+            this.Attack();
+        }
+
+        public void Loop()
+        {
+            this.PlayerTurn();
+        }
+    }
+
+    public class Game
+    {
+        public void Run()
+        {
+            var loop = new GameLoop();
+            loop.Loop();
+        }
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        var game = new V.Game();
+        game.Run();
+    }
+}

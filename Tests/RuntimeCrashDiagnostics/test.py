@@ -17,22 +17,44 @@ def invoke(*args, env=None):
 
 
 def assert_source_frames(stderr, source_path, source, expected):
-    """Accept a truthful ordered prefix, including a future complete caller chain.
+    """Validate the exact synchronous VOID stack when a stack section is present.
 
-    Each expected entry names a real method and its fault/call expression. A
-    truncated trace is allowed; unknown methods, wrong order and invented source
-    locations are not. The fault column has its own exact check below.
+    Each expected entry names a real method and its fault/call expression. #346
+    preserves the complete captured failure chain across exception unwind/rethrow;
+    unknown, missing, reordered or invented frames are rejected. The fault column
+    has its own exact check below.
     """
-    frames = [line.strip() for line in stderr.replace('\\', '/').splitlines()
+    normalized = stderr.replace('\\', '/')
+    stack_present = 'Stack trace:' in normalized
+    frame_text = normalized.split('Stack trace:', 1)[1] if stack_present else normalized
+    frames = [line.strip() for line in frame_text.splitlines()
               if line.lstrip().startswith('at ')]
-    assert frames and len(frames) <= len(expected), stderr
-    for frame, (method, marker) in zip(frames, expected):
+    assert frames, stderr
+    if stack_present:
+        assert len(frames) == len(expected), stderr
+    else:
+        assert len(frames) <= len(expected), stderr
+    parsed = []
+    for frame in frames:
         match = re.fullmatch(r'at (.+) in (.+):(\d+):(\d+)', frame)
         assert match is not None, frame
+        parsed.append((frame, match))
+
+    if stack_present:
+        assert [match[1] for _, match in parsed] == [method for method, _ in expected], stderr
+
+    for index, ((frame, match), (method, marker)) in enumerate(
+            zip(parsed, expected[:len(parsed)])):
         line = source[:source.index(marker)].count('\n') + 1
+        actual_line = int(match[3])
         assert match[1] == method and match[2] == source_path.as_posix(), frame
-        assert int(match[3]) == line, frame
-        assert 1 <= int(match[4]) <= len(source.splitlines()[line - 1]) + 1, frame
+        # The faulting top frame keeps the exact #344 site. Caller frames use
+        # truthful method-declaration locations until richer call-site frame
+        # metadata is introduced; never label those declarations as call sites.
+        if not stack_present or index == 0:
+            assert actual_line == line, frame
+        assert 1 <= actual_line <= len(source.splitlines()), frame
+        assert 1 <= int(match[4]) <= len(source.splitlines()[actual_line - 1]) + 1, frame
 
 
 def check_frame_contract():
@@ -198,7 +220,7 @@ public static class Program
 
         _, result = run('Fatal', 'public static class Program { public static void Main() { Runtime.Fail("invariant probe"); } }\n')
         assert result.returncode == 1 and 'VOID runtime error: invariant probe' in result.stderr
-        assert '   at ' not in result.stderr and 'VOID4000' not in result.stderr
+        assert '   at Program.Main()' in result.stderr and 'Stack trace:' in result.stderr and 'VOID4000' not in result.stderr
 
         native = '''public static class Native
 {

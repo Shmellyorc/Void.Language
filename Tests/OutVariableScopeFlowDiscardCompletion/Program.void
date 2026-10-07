@@ -1,0 +1,165 @@
+public static class Program
+{
+    static int counter = 0;
+
+    static void Check(bool value)
+    {
+        Console.WriteLine(value);
+    }
+
+    static bool Produce(out int value)
+    {
+        value = 42;
+        return true;
+    }
+
+    static bool ProduceString(out string value)
+    {
+        value = "ok";
+        return true;
+    }
+
+    static bool TryA(out int value)
+    {
+        value = 7;
+        return true;
+    }
+
+    static bool TryB(int input, out string value)
+    {
+        value = input == 7 ? "seven" : "other";
+        return true;
+    }
+
+    static bool Read(out int value)
+    {
+        value = counter;
+        counter = counter + 1;
+        return value < 4;
+    }
+
+    static void Triple(out int first, out string second, out bool third)
+    {
+        first = 3;
+        second = "three";
+        third = true;
+    }
+
+    static void Generic<T>(out T value)
+    {
+        value = default(T);
+    }
+
+    static void Transform<T>(T input, out T value)
+    {
+        value = input;
+    }
+
+    static void Pick(int kind, out int value)
+    {
+        value = kind + 10;
+    }
+
+    static void Pick(string kind, out string value)
+    {
+        value = kind + "!";
+    }
+
+    static bool EarlyReturnPattern()
+    {
+        if (!Produce(out var value))
+            return false;
+        return value == 42;
+    }
+
+    static bool NestedEarlyReturnPattern()
+    {
+        if (!(TryA(out var a) && TryB(a, out var b)))
+            return false;
+        return a == 7 && b == "seven";
+    }
+
+    public static void Main()
+    {
+        Produce(out int explicitValue);
+        Check(explicitValue == 42);
+
+        Produce(out var inferredValue);
+        Check(inferredValue == 42);
+        Check(EarlyReturnPattern());
+        Check(NestedEarlyReturnPattern());
+
+        if (TryA(out var andA) && TryB(andA, out var andB))
+        {
+            Check(andA == 7);
+            Check(andB == "seven");
+        }
+
+        if (Produce(out var branchValue))
+            Check(branchValue == 42);
+        else
+            Check(branchValue == 42);
+        Check(branchValue == 42);
+
+        int shadow = 1;
+        {
+            Produce(out var shadow);
+            Check(shadow == 42);
+        }
+        Check(shadow == 1);
+
+        Triple(out int multipleInt, out var multipleString, out bool multipleBool);
+        Check(multipleInt == 3);
+        Check(multipleString == "three");
+        Check(multipleBool);
+
+        counter = 0;
+        int whileSum = 0;
+        while (Read(out var whileValue))
+        {
+            if (whileValue == 1)
+                continue;
+            whileSum = whileSum + whileValue;
+            if (whileValue == 3)
+                break;
+        }
+        Check(whileSum == 5);
+
+        counter = 0;
+        int forSum = 0;
+        for (; Read(out var forValue); )
+        {
+            forSum = forSum + forValue;
+            if (forValue == 2)
+                break;
+        }
+        Check(forSum == 3);
+
+        counter = 0;
+        int doCount = 0;
+        do
+        {
+            doCount = doCount + 1;
+        }
+        while (Read(out var doValue) && doValue < 1);
+        Check(doCount == 2);
+
+        Produce(out _);
+        ProduceString(out _);
+        Generic<int>(out _);
+        Transform(5, out _);
+        Pick(1, out _);
+        Pick("x", out _);
+        Check(true);
+
+        int _ = 9;
+        Check(_ == 9);
+
+        int predeclared;
+        Produce(out predeclared);
+        Check(predeclared == 42);
+        var ordinaryVar = 0;
+        Produce(out ordinaryVar);
+        Check(ordinaryVar == 42);
+    }
+}

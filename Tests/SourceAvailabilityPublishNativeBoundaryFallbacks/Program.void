@@ -1,0 +1,29 @@
+namespace V;
+
+public class Monster
+{
+    public int Health;
+}
+
+public class GameLoop
+{
+    public void Crash()
+    {
+        Monster monster = null;
+        Console.WriteLine(monster.Health);
+    }
+
+    public void Run()
+    {
+        this.Crash();
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        var loop = new GameLoop();
+        loop.Run();
+    }
+}

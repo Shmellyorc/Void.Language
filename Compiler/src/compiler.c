@@ -21,6 +21,8 @@
 #include <sys/types.h>
 #ifdef _WIN32
 #include <direct.h>
+#else
+#include <unistd.h>
 #endif
 
 #define VC_PATH_MAX 4096u
@@ -51,6 +53,7 @@ struct VcQuerySession
 typedef struct VcCodegenName
 {
     const char *source_name;
+    const VcAstNode *declaration_node;
     char c_name[256];
     bool is_ref_local;
     char ref_pointer_name[256];
@@ -95,6 +98,7 @@ typedef struct VcExceptionHandlerFrame
 {
     const char *name;
     struct VcExceptionHandlerFrame *previous;
+    struct VcExceptionHandlerFrame *caught_previous;
 } VcExceptionHandlerFrame;
 
 typedef enum VcFinallyTransferKind
@@ -136,6 +140,7 @@ typedef struct VcCodegenContext
     const VcSource *source;
     const VcAstNode *owner_node;
     const VcAstNode *diagnostic_node;
+    const char *runtime_display_name;
     size_t owner_struct_index;
     bool has_owner_struct;
     VcCodegenName *names;
@@ -163,6 +168,7 @@ typedef struct VcCodegenContext
     const char *active_storage_name;
     bool in_static_initializer;
     bool constructor_returns_value;
+    bool call_frame_active;
     size_t static_initializer_struct_index;
     bool suppress_static_type_init;
     size_t next_local;
@@ -173,15 +179,18 @@ typedef struct VcCodegenContext
     size_t gc_root_capacity;
     size_t *loop_gc_root_counts;
     VcExceptionHandlerFrame **loop_exception_handlers;
+    VcExceptionHandlerFrame **loop_caught_exceptions;
     size_t loop_depth;
     size_t loop_capacity;
     size_t *break_gc_root_counts;
     VcExceptionHandlerFrame **break_exception_handlers;
+    VcExceptionHandlerFrame **break_caught_exceptions;
     bool *break_uses_goto;
     size_t *break_label_ids;
     size_t break_depth;
     size_t break_capacity;
     VcExceptionHandlerFrame *active_exception_handler;
+    VcExceptionHandlerFrame *active_caught_exception;
     const char *active_rethrow_exception_name;
     VcFinallyTransferFrame *finally_transfer;
     char *error;
@@ -843,6 +852,15 @@ static bool push_break_gc_root_count(VcCodegenContext *context, size_t count)
             return false;
         }
         context->break_exception_handlers = handlers;
+        VcExceptionHandlerFrame **caught = realloc(context->break_caught_exceptions,
+            capacity * sizeof(*caught));
+        if (caught == NULL)
+        {
+            set_error(context->error, context->error_size,
+                "out of memory while tracking break caught exceptions");
+            return false;
+        }
+        context->break_caught_exceptions = caught;
         bool *uses_goto = realloc(context->break_uses_goto, capacity * sizeof(*uses_goto));
         if (uses_goto == NULL)
         {
@@ -863,6 +881,7 @@ static bool push_break_gc_root_count(VcCodegenContext *context, size_t count)
     }
     context->break_gc_root_counts[context->break_depth] = count;
     context->break_exception_handlers[context->break_depth] = context->active_exception_handler;
+    context->break_caught_exceptions[context->break_depth] = context->active_caught_exception;
     context->break_uses_goto[context->break_depth] = false;
     context->break_label_ids[context->break_depth] = 0;
     context->break_depth++;
@@ -896,12 +915,22 @@ static bool push_loop_gc_root_count(VcCodegenContext *context, size_t count)
             return false;
         }
         context->loop_exception_handlers = handlers;
+        VcExceptionHandlerFrame **caught = realloc(context->loop_caught_exceptions,
+            capacity * sizeof(*caught));
+        if (caught == NULL)
+        {
+            set_error(context->error, context->error_size,
+                "out of memory while tracking loop caught exceptions");
+            return false;
+        }
+        context->loop_caught_exceptions = caught;
         context->loop_capacity = capacity;
     }
     if (!push_break_gc_root_count(context, count))
         return false;
     context->loop_gc_root_counts[context->loop_depth] = count;
     context->loop_exception_handlers[context->loop_depth] = context->active_exception_handler;
+    context->loop_caught_exceptions[context->loop_depth] = context->active_caught_exception;
     context->loop_depth++;
     return true;
 }
@@ -924,8 +953,10 @@ static void destroy_codegen_context(VcCodegenContext *context)
     free(context->gc_roots);
     free(context->loop_gc_root_counts);
     free(context->loop_exception_handlers);
+    free(context->loop_caught_exceptions);
     free(context->break_gc_root_counts);
     free(context->break_exception_handlers);
+    free(context->break_caught_exceptions);
     free(context->break_uses_goto);
     free(context->break_label_ids);
     context->names = NULL;
@@ -936,8 +967,10 @@ static void destroy_codegen_context(VcCodegenContext *context)
     context->gc_roots = NULL;
     context->loop_gc_root_counts = NULL;
     context->loop_exception_handlers = NULL;
+    context->loop_caught_exceptions = NULL;
     context->break_gc_root_counts = NULL;
     context->break_exception_handlers = NULL;
+    context->break_caught_exceptions = NULL;
 }
 
 static void emit_exception_handler_restore(
@@ -959,6 +992,37 @@ static void emit_exception_handler_restore(
     while (outermost->previous != NULL)
         outermost = outermost->previous;
     fprintf(context->file, "vc_exception_handler_current = %s.previous;\n", outermost->name);
+}
+
+static void emit_exception_trace_handler_init(VcCodegenContext *context, const char *handler_name)
+{
+    emit_indent(context->file, context->depth);
+    fprintf(context->file, "%s.captured_baseline = vc_exception_trace_count;\n", handler_name);
+    emit_indent(context->file, context->depth);
+    fprintf(context->file, "%s.captured_start = 0u; %s.captured_count = 0u;\n",
+        handler_name, handler_name);
+}
+
+static void emit_exception_trace_rewind(
+    VcCodegenContext *context,
+    VcExceptionHandlerFrame *target_caught)
+{
+    VcExceptionHandlerFrame *active = context->active_caught_exception;
+    if (active == NULL || active == target_caught)
+        return;
+
+    VcExceptionHandlerFrame *outermost_exited = NULL;
+    while (active != NULL && active != target_caught)
+    {
+        outermost_exited = active;
+        active = active->caught_previous;
+    }
+    if (active != target_caught || outermost_exited == NULL)
+        return;
+
+    emit_indent(context->file, context->depth);
+    fprintf(context->file, "vc_exception_trace_rewind(%s.captured_baseline);\n",
+        outermost_exited->name);
 }
 
 static void emit_swizzle_helper_name(FILE *file, const char *prefix, const VcSemanticBinding *binding)
@@ -1680,7 +1744,7 @@ static bool emit_exception_runtime(
     fputs("        default: return \"Exception\";\n", file);
     fputs("    }\n}\n\n", file);
 
-    fputs("static _Noreturn VC_MAYBE_UNUSED void vc_native_boundary_abort(void *vc_exception, const char *vc_boundary, VcFaultSite vc_site)\n{\n", file);
+    fputs("static _Noreturn VC_MAYBE_UNUSED void vc_native_boundary_abort(void *vc_exception, const char *vc_boundary, VcFaultSite vc_site, size_t vc_captured_start, size_t vc_captured_count)\n{\n", file);
     fputs("    VcString *vc_message = ((", file);
     fputs(exception->c_name, file);
     fputs(" *)vc_exception)->", file);
@@ -1694,45 +1758,49 @@ static bool emit_exception_runtime(
     fputs("    }\n", file);
     fputs("    else\n", file);
     fputs("        fprintf(stderr, \"Unhandled exception at %s: %s\\n\", vc_boundary, vc_type);\n", file);
-    fputs("    vc_fault_site_report(vc_site);\n", file);
+    fputs("    vc_runtime_diagnostic_context_report(vc_site, vc_captured_start, vc_captured_count);\n", file);
     fputs("    vc_runtime_cleanup();\n", file);
     fputs("    fflush(NULL);\n", file);
     fputs("    _Exit(1);\n", file);
     fputs("}\n\n", file);
 
-    fputs("static VC_MAYBE_UNUSED void vc_native_capture_exception(void *vc_exception)\n{\n", file);
+    fputs("static VC_MAYBE_UNUSED void vc_native_capture_exception(void *vc_exception, VcFaultSite vc_site, size_t vc_captured_start, size_t vc_captured_count)\n{\n", file);
     fputs("    if (vc_native_pending_exception != NULL) return;\n", file);
     fputs("    vc_native_pending_exception = vc_exception;\n", file);
+    fputs("    vc_native_pending_fault_site = vc_site; vc_native_pending_captured_start = vc_captured_start; vc_native_pending_captured_count = vc_captured_count;\n", file);
     fputs("    vc_gc_root_push(&vc_native_pending_root, (void *)&vc_native_pending_exception, vc_gc_trace_ref_slot);\n", file);
     fputs("    vc_native_pending_root_active = true;\n", file);
     fputs("}\n\n", file);
 
-    fputs("static VC_MAYBE_UNUSED void *vc_native_take_pending_exception(void)\n{\n", file);
+    fputs("static VC_MAYBE_UNUSED void *vc_native_take_pending_exception(VcFaultSite *vc_site, size_t *vc_captured_start, size_t *vc_captured_count)\n{\n", file);
     fputs("    void *vc_exception = vc_native_pending_exception;\n", file);
     fputs("    vc_exception_in_flight = vc_exception;\n", file);
+    fputs("    if (vc_site != NULL) *vc_site = vc_native_pending_fault_site;\n", file);
+    fputs("    if (vc_captured_start != NULL) *vc_captured_start = vc_native_pending_captured_start;\n", file);
+    fputs("    if (vc_captured_count != NULL) *vc_captured_count = vc_native_pending_captured_count;\n", file);
     fputs("    if (vc_native_pending_root_active)\n", file);
     fputs("    {\n", file);
     fputs("        vc_gc_root_pop(&vc_native_pending_root);\n", file);
     fputs("        vc_native_pending_root_active = false;\n", file);
     fputs("    }\n", file);
-    fputs("    vc_native_pending_exception = NULL;\n", file);
+    fputs("    vc_native_pending_exception = NULL; vc_native_pending_fault_site = (VcFaultSite){0}; vc_native_pending_captured_start = 0u; vc_native_pending_captured_count = 0u;\n", file);
     fputs("    return vc_exception;\n", file);
     fputs("}\n\n", file);
 
-    fputs("static _Noreturn VC_MAYBE_UNUSED void vc_throw_at(void *vc_exception, VcFaultSite vc_site)\n{\n", file);
+    fputs("static _Noreturn VC_MAYBE_UNUSED void vc_throw_captured(void *vc_exception, VcFaultSite vc_site, size_t vc_captured_start, size_t vc_captured_count)\n{\n", file);
     fputs("    if (vc_exception == NULL)\n    {\n", file);
     fputs("        fprintf(stderr, \"VOID runtime error: cannot throw null exception\\n\");\n", file);
-    fputs("        vc_fault_site_report(vc_site);\n", file);
+    fputs("        vc_runtime_diagnostic_context_report(vc_site, vc_captured_start, vc_captured_count);\n", file);
     fputs("        vc_runtime_cleanup();\n", file);
     fputs("        exit(1);\n", file);
     fputs("    }\n", file);
     fputs("    vc_exception_in_flight = vc_exception;\n", file);
     fputs("    if (vc_exception_handler_current != NULL)\n    {\n", file);
     fputs("        VcExceptionHandler *vc_handler = vc_exception_handler_current;\n", file);
-    fputs("        vc_handler->exception = vc_exception;\n", file);
-    fputs("        vc_handler->fault_site = vc_site;\n", file);
+    fputs("        vc_handler->exception = vc_exception; vc_handler->fault_site = vc_site; vc_handler->captured_start = vc_captured_start; vc_handler->captured_count = vc_captured_count;\n", file);
     fputs("        vc_exception_handler_current = vc_handler->previous;\n", file);
     fputs("        vc_gc_unwind_to(vc_handler->gc_roots);\n", file);
+    fputs("        vc_call_frame_current = vc_handler->call_frame;\n", file);
     fputs("        longjmp(vc_handler->jump, 1);\n", file);
     fputs("    }\n", file);
     fprintf(file, "    VcString *vc_message = ((%s *)vc_exception)->%s;\n",
@@ -1745,9 +1813,18 @@ static bool emit_exception_runtime(
     fputs("    }\n", file);
     fputs("    else\n", file);
     fputs("        fprintf(stderr, \"Unhandled %s\\n\", vc_type);\n", file);
-    fputs("    vc_fault_site_report(vc_site);\n", file);
+    fputs("    vc_runtime_diagnostic_context_report(vc_site, vc_captured_start, vc_captured_count);\n", file);
     fputs("    vc_runtime_cleanup();\n", file);
     fputs("    exit(1);\n", file);
+    fputs("}\n\n", file);
+
+    fputs("static _Noreturn VC_MAYBE_UNUSED void vc_throw_at(void *vc_exception, VcFaultSite vc_site)\n{\n", file);
+    fputs("    size_t vc_captured_start = vc_exception_trace_count, vc_captured_count = 0u; (void)vc_exception_trace_capture(&vc_captured_start, &vc_captured_count);\n", file);
+    fputs("    vc_throw_captured(vc_exception, vc_site, vc_captured_start, vc_captured_count);\n", file);
+    fputs("}\n\n", file);
+    fputs("static _Noreturn VC_MAYBE_UNUSED void vc_rethrow_handler(VcExceptionHandler *vc_handler)\n{\n", file);
+    fputs("    if (vc_handler == NULL) abort();\n", file);
+    fputs("    vc_throw_captured((void *)vc_handler->exception, vc_handler->fault_site, vc_handler->captured_start, vc_handler->captured_count);\n", file);
     fputs("}\n\n", file);
     fputs("static _Noreturn VC_MAYBE_UNUSED void vc_throw(void *exception) { vc_throw_at(exception, (VcFaultSite){0}); }\n\n", file);
     return true;
@@ -1805,6 +1882,161 @@ static void emit_diagnostic_string(FILE *file, const char *text)
     fputc('"', file);
 }
 
+static bool runtime_struct_display_name(
+    const VcSemanticModel *semantic,
+    size_t struct_index,
+    char *output,
+    size_t output_size)
+{
+    if (semantic == NULL || struct_index >= semantic->struct_count ||
+        output == NULL || output_size == 0)
+        return false;
+    const VcSemanticStruct *structure = &semantic->structs[struct_index];
+    char type_name[512];
+    vc_semantic_type_display_name(semantic, vc_semantic_struct_type(struct_index),
+        type_name, sizeof(type_name));
+    if (structure->namespace_name != NULL && structure->namespace_name[0] != '\0')
+        return snprintf(output, output_size, "%s.%s", structure->namespace_name, type_name) > 0;
+    return snprintf(output, output_size, "%s", type_name) > 0;
+}
+
+static bool runtime_method_display_name(
+    const VcSemanticModel *semantic,
+    const VcSemanticMethod *method,
+    char *output,
+    size_t output_size)
+{
+    if (semantic == NULL || method == NULL || method->node == NULL ||
+        output == NULL || output_size == 0)
+        return false;
+    const VcAstNode *runtime_source =
+        method->node->as.method_declaration.runtime_source_method_node;
+    if (runtime_source != NULL && runtime_source != method->node)
+    {
+        for (size_t i = 0; i < semantic->method_count; i++)
+        {
+            if (semantic->methods[i].node == runtime_source)
+                return runtime_method_display_name(semantic, &semantic->methods[i], output, output_size);
+        }
+    }
+    char owner[640] = {0};
+    if (method->has_owner_struct && method->owner_struct_index < semantic->struct_count)
+    {
+        if (!runtime_struct_display_name(semantic, method->owner_struct_index,
+                owner, sizeof(owner)))
+            return false;
+    }
+    else if (method->type_name != NULL && method->type_name[0] != '\0')
+    {
+        if (method->namespace_name != NULL && method->namespace_name[0] != '\0')
+            snprintf(owner, sizeof(owner), "%s.%s", method->namespace_name, method->type_name);
+        else
+            snprintf(owner, sizeof(owner), "%s", method->type_name);
+    }
+    const char *name = method->node->as.method_declaration.original_generic_name != NULL
+        ? method->node->as.method_declaration.original_generic_name
+        : method->node->as.method_declaration.name;
+    if (owner[0] != '\0')
+        return snprintf(output, output_size, "%s.%s()", owner, name != NULL ? name : "<method>") > 0;
+    return snprintf(output, output_size, "%s()", name != NULL ? name : "<method>") > 0;
+}
+
+static bool runtime_constructor_display_name(
+    const VcSemanticModel *semantic,
+    const VcSemanticConstructor *constructor,
+    char *output,
+    size_t output_size)
+{
+    if (semantic == NULL || constructor == NULL || constructor->node == NULL ||
+        constructor->struct_index >= semantic->struct_count || output == NULL || output_size == 0)
+        return false;
+    char owner[640];
+    if (!runtime_struct_display_name(semantic, constructor->struct_index, owner, sizeof(owner)))
+        return false;
+    const char *name = constructor->node->as.method_declaration.name;
+    return snprintf(output, output_size, "%s.%s()", owner,
+        name != NULL ? name : "<constructor>") > 0;
+}
+
+static bool runtime_property_display_name(
+    const VcSemanticModel *semantic,
+    size_t struct_index,
+    const VcSemanticProperty *property,
+    bool setter,
+    char *output,
+    size_t output_size)
+{
+    if (semantic == NULL || property == NULL || property->node == NULL ||
+        struct_index >= semantic->struct_count || output == NULL || output_size == 0)
+        return false;
+    char owner[640];
+    if (!runtime_struct_display_name(semantic, struct_index, owner, sizeof(owner)))
+        return false;
+    const char *name = property->node->as.property_declaration.name;
+    return snprintf(output, output_size, "%s.%s_%s()", owner,
+        setter ? "set" : "get", name != NULL ? name : "<property>") > 0;
+}
+
+static bool runtime_lambda_display_name(
+    const VcSemanticModel *semantic,
+    const VcSemanticLambda *lambda,
+    char *output,
+    size_t output_size)
+{
+    if (semantic == NULL || lambda == NULL || lambda->owner_method_index >= semantic->method_count ||
+        output == NULL || output_size == 0)
+        return false;
+    char owner[768];
+    if (!runtime_method_display_name(semantic, &semantic->methods[lambda->owner_method_index],
+            owner, sizeof(owner)))
+        return false;
+    size_t length = strlen(owner);
+    if (length >= 2u && owner[length - 2u] == '(' && owner[length - 1u] == ')')
+        owner[length - 2u] = '\0';
+    return snprintf(output, output_size, "%s.<lambda>()", owner) > 0;
+}
+
+static bool runtime_static_initializer_display_name(
+    const VcSemanticModel *semantic,
+    size_t struct_index,
+    char *output,
+    size_t output_size)
+{
+    char owner[640];
+    if (!runtime_struct_display_name(semantic, struct_index, owner, sizeof(owner)))
+        return false;
+    return snprintf(output, output_size, "%s.<static initializer>()", owner) > 0;
+}
+
+static void emit_runtime_call_frame_enter(
+    FILE *file,
+    size_t depth,
+    const char *display_name,
+    const VcSource *source,
+    const VcAstNode *node)
+{
+    if (file == NULL || display_name == NULL)
+        return;
+    emit_indent(file, depth);
+    fputs("VcCallFrame vc_call_frame;\n", file);
+    emit_indent(file, depth);
+    fputs("vc_call_frame_enter(&vc_call_frame, ", file);
+    emit_diagnostic_string(file, display_name);
+    fputs(", ", file);
+    emit_diagnostic_string(file, source != NULL ? source->path : NULL);
+    const size_t line = node != NULL ? node->span.start.line : 0u;
+    const size_t column = node != NULL ? node->span.start.column : 0u;
+    fprintf(file, ", %zuu, %zuu);\n", line, column);
+}
+
+static void emit_runtime_call_frame_leave(VcCodegenContext *context)
+{
+    if (context == NULL || !context->call_frame_active)
+        return;
+    emit_indent(context->file, context->depth);
+    fputs("vc_call_frame_leave(&vc_call_frame);\n", context->file);
+}
+
 static void emit_fault_site(VcCodegenContext *context, const VcAstNode *node)
 {
     FILE *file = context->file;
@@ -1817,46 +2049,37 @@ static void emit_fault_site(VcCodegenContext *context, const VcAstNode *node)
     fputs("(VcFaultSite){", file);
     emit_diagnostic_string(file, context->source->path);
     fputs(", ", file);
-    if (context->method != NULL && context->method->node != NULL)
+    if (context->runtime_display_name != NULL && context->runtime_display_name[0] != '\0')
+        emit_diagnostic_string(file, context->runtime_display_name);
+    else if (context->method != NULL && context->method->node != NULL)
     {
-        const VcSemanticMethod *method = context->method;
-        const char *type_name = method->type_name;
-        if (method->has_owner_struct && method->owner_struct_index < context->semantic->struct_count)
-        {
-            const VcAstNode *type_node = context->semantic->structs[method->owner_struct_index].node;
-            if (type_node != NULL && type_node->kind == VC_AST_TYPE_DECLARATION &&
-                type_node->as.type_declaration.original_generic_name != NULL)
-                type_name = type_node->as.type_declaration.original_generic_name;
-        }
-        const char *parts[] = {method->namespace_name, type_name,
-            method->node->as.method_declaration.original_generic_name != NULL
-                ? method->node->as.method_declaration.original_generic_name
-                : method->node->as.method_declaration.name};
-        fputc('"', file);
-        bool separator = false;
-        for (size_t i = 0; i < 3; ++i)
-        {
-            if (parts[i] == NULL || parts[i][0] == 0) continue;
-            if (separator) fputc('.', file);
-            for (const char *p = parts[i]; *p != 0; ++p)
-            {
-                if (*p == '"' || *p == '\\') fputc('\\', file);
-                fputc(*p, file);
-            }
-            separator = true;
-        }
-        fputs(method->parameter_count == 0 ? "()\"" : "(...)\"", file);
+        char display_name[1024];
+        if (runtime_method_display_name(context->semantic, context->method,
+                display_name, sizeof(display_name)))
+            emit_diagnostic_string(file, display_name);
+        else
+            fputs("NULL", file);
     }
     else
         fputs("NULL", file);
-    fprintf(file, ", %zuu, %zuu}", node->span.start.line, node->span.start.column);
+    const size_t end_line = node->span.end.line != 0u ? node->span.end.line : node->span.start.line;
+    const size_t end_column = node->span.end.column != 0u ? node->span.end.column : node->span.start.column;
+    fprintf(file, ", %zuu, %zuu, %zuu, %zuu}", node->span.start.line, node->span.start.column,
+        end_line, end_column);
 }
 
 /* Guard arguments are values: nested evaluation cannot overwrite a global site. */
 static void emit_object_guard(VcCodegenContext *context)
 {
+    const VcAstNode *site_node = context->diagnostic_node;
+    if (site_node != NULL && site_node->kind == VC_AST_MEMBER_ACCESS_EXPRESSION &&
+        site_node->as.member_access_expression.target != NULL)
+        site_node = site_node->as.member_access_expression.target;
+    else if (site_node != NULL && site_node->kind == VC_AST_INDEX_EXPRESSION &&
+        site_node->as.index_expression.target != NULL)
+        site_node = site_node->as.index_expression.target;
     fputs("vc_object_require_at(", context->file);
-    emit_fault_site(context, context->diagnostic_node);
+    emit_fault_site(context, site_node);
     fputs(", ", context->file);
 }
 
@@ -1941,7 +2164,7 @@ static bool find_codegen_ref_name(
     for (size_t i = context->name_count; i > 0; i--)
     {
         const VcCodegenName *name = &context->names[i - 1];
-        if (strcmp(name->source_name, source_name) != 0)
+        if (name->declaration_node != NULL || strcmp(name->source_name, source_name) != 0)
             continue;
         if (!name->is_ref_local)
             return false;
@@ -1958,7 +2181,8 @@ static const char *find_codegen_name(const VcCodegenContext *context, const char
 {
     for (size_t i = context->name_count; i > 0; i--)
     {
-        if (strcmp(context->names[i - 1].source_name, source_name) == 0)
+        if (context->names[i - 1].declaration_node == NULL &&
+            strcmp(context->names[i - 1].source_name, source_name) == 0)
             return context->names[i - 1].c_name;
     }
     return NULL;
@@ -2567,13 +2791,28 @@ static bool remember_setjmp_scalar_local(VcCodegenContext *context, const VcAstN
         return true;
     storage = unwrap_parenthesized(storage);
     const VcSemanticBinding *binding = vc_semantic_binding(context->semantic, storage);
-    if (binding == NULL || binding->declaration_node == NULL ||
-        binding->type < VC_SEM_TYPE_BOOL || binding->type > VC_SEM_TYPE_CHAR)
+    if (binding == NULL || binding->declaration_node == NULL)
+        return true;
+    bool scalar_type = (binding->type >= VC_SEM_TYPE_BOOL && binding->type <= VC_SEM_TYPE_CHAR) ||
+        vc_semantic_type_is_pointer(binding->type) || vc_semantic_type_is_function_pointer(binding->type);
+    if (vc_semantic_type_is_struct(binding->type))
+    {
+        const size_t index = vc_semantic_struct_index(binding->type);
+        scalar_type = index < context->semantic->struct_count && context->semantic->structs[index].is_enum;
+    }
+    if (!scalar_type)
         return true;
     const VcAstNode *declaration = binding->declaration_node;
     if (declaration->kind == VC_AST_LOCAL_DECLARATION)
     {
         if (declaration->as.local_declaration.is_ref) return true;
+    }
+    else if (declaration->kind == VC_AST_UNARY_EXPRESSION)
+    {
+        if (declaration->as.unary_expression.operator_kind != VC_TOKEN_KW_OUT ||
+            (declaration->as.unary_expression.inline_out_type == NULL &&
+             !declaration->as.unary_expression.inline_out_inferred))
+            return true;
     }
     else if (declaration->kind != VC_AST_PARAMETER || declaration->as.parameter.modifier != VC_TOKEN_EOF)
         return true;
@@ -3155,8 +3394,18 @@ static bool collect_null_temps(VcCodegenContext *context, const VcAstNode *node)
         }
         case VC_AST_UNARY_EXPRESSION:
         {
+            if (node->as.unary_expression.inline_out_discard)
+            {
+                const VcSemanticBinding *discard_binding =
+                    vc_semantic_binding(context->semantic, node);
+                if (discard_binding == NULL ||
+                    !add_null_temp(context, node, discard_binding->type, false))
+                    return false;
+                return true;
+            }
             const VcTokenKind update_kind = node->as.unary_expression.operator_kind;
-            if ((update_kind == VC_TOKEN_PLUS_PLUS || update_kind == VC_TOKEN_MINUS_MINUS) &&
+            if ((update_kind == VC_TOKEN_PLUS_PLUS || update_kind == VC_TOKEN_MINUS_MINUS ||
+                 update_kind == VC_TOKEN_KW_REF || update_kind == VC_TOKEN_KW_OUT) &&
                 !remember_setjmp_scalar_local(context, node->as.unary_expression.operand)) return false;
             if (!collect_null_temps(context, node->as.unary_expression.operand))
                 return false;
@@ -4847,6 +5096,57 @@ static bool emit_ref_owner_expression(VcCodegenContext *context, const VcAstNode
     return true;
 }
 
+static bool emit_reference_argument_storage(
+    VcCodegenContext *context,
+    const VcAstNode *argument,
+    bool carries_owner)
+{
+    if (argument == NULL || argument->kind != VC_AST_UNARY_EXPRESSION)
+        return false;
+
+    if (argument->as.unary_expression.inline_out_discard)
+    {
+        const VcNullTemp *temp = find_null_temp(context, argument);
+        if (temp == NULL)
+            return false;
+        fprintf(context->file, "&(%s)", temp->name);
+        if (carries_owner)
+            fputs(", NULL", context->file);
+        return true;
+    }
+
+    size_t static_field_owner = 0;
+    const VcAstNode *reference_operand = argument->as.unary_expression.operand;
+    const bool initialize_static_field =
+        static_field_owner_for_expression(context, reference_operand, &static_field_owner) &&
+        should_emit_static_type_init(context, static_field_owner);
+    const bool saved_suppress_static_type_init = context->suppress_static_type_init;
+    if (initialize_static_field)
+    {
+        fputc('(', context->file);
+        emit_static_type_init_prefix(context, static_field_owner);
+        context->suppress_static_type_init = true;
+    }
+    const VcSemanticBinding *storage_binding = vc_semantic_binding(context->semantic, reference_operand);
+    if (storage_binding != NULL && storage_binding->declaration_node != NULL &&
+        scalar_local_needs_volatile(context, storage_binding->declaration_node))
+        fprintf(context->file, "(%s *)", c_type(context->semantic, storage_binding->type));
+    fputs("&(", context->file);
+    if (!emit_expression(context, reference_operand))
+        return false;
+    fputc(')', context->file);
+    context->suppress_static_type_init = saved_suppress_static_type_init;
+    if (initialize_static_field)
+        fputc(')', context->file);
+    if (carries_owner)
+    {
+        fputs(", ", context->file);
+        if (!emit_ref_owner_expression(context, reference_operand))
+            return false;
+    }
+    return true;
+}
+
 static const char *span_intrinsic_method_name(
     const VcCodegenContext *context,
     const VcSemanticMethod *method)
@@ -5874,7 +6174,9 @@ emit_regular_call:
         if (target->kind == VC_AST_IDENTIFIER_EXPRESSION &&
             strcmp(target->as.identifier_expression.name, "Runtime") == 0)
         {
-            fputs("vc_runtime_fail_string(", context->file);
+            fputs("vc_runtime_fail_string_at(", context->file);
+            emit_fault_site(context, expression);
+            fputs(", ", context->file);
             if (expression->as.call_expression.arguments.count != 1 ||
                 !emit_expression(context, expression->as.call_expression.arguments.items[0]))
                 return false;
@@ -5963,27 +6265,8 @@ emit_regular_call:
             const VcTokenKind modifier = invoke->parameter_modifiers[i];
             if (modifier == VC_TOKEN_KW_REF || modifier == VC_TOKEN_KW_OUT || modifier == VC_TOKEN_KW_IN)
             {
-                if (argument->kind != VC_AST_UNARY_EXPRESSION)
+                if (!emit_reference_argument_storage(context, argument, false))
                     return false;
-                size_t static_field_owner = 0;
-                const VcAstNode *reference_operand = argument->as.unary_expression.operand;
-                const bool initialize_static_field =
-                    static_field_owner_for_expression(context, reference_operand, &static_field_owner) &&
-                    should_emit_static_type_init(context, static_field_owner);
-                const bool saved_suppress_static_type_init = context->suppress_static_type_init;
-                if (initialize_static_field)
-                {
-                    fputc('(', context->file);
-                    emit_static_type_init_prefix(context, static_field_owner);
-                    context->suppress_static_type_init = true;
-                }
-                fputs("&(", context->file);
-                if (!emit_expression(context, reference_operand))
-                    return false;
-                fputc(')', context->file);
-                context->suppress_static_type_init = saved_suppress_static_type_init;
-                if (initialize_static_field)
-                    fputc(')', context->file);
             }
             else if (!emit_expression_as(context, argument, invoke->parameter_types[i]))
                 return false;
@@ -6244,33 +6527,9 @@ emit_regular_call:
         }
         else if (modifier == VC_TOKEN_KW_REF || modifier == VC_TOKEN_KW_OUT || modifier == VC_TOKEN_KW_IN)
         {
-            if (argument->kind != VC_AST_UNARY_EXPRESSION)
+            if (!emit_reference_argument_storage(context, argument,
+                    method_carries_ref_parameter_owners(context->semantic, target_method)))
                 return false;
-            size_t static_field_owner = 0;
-            const VcAstNode *reference_operand = argument->as.unary_expression.operand;
-            const bool initialize_static_field =
-                static_field_owner_for_expression(context, reference_operand, &static_field_owner) &&
-                should_emit_static_type_init(context, static_field_owner);
-            const bool saved_suppress_static_type_init = context->suppress_static_type_init;
-            if (initialize_static_field)
-            {
-                fputc('(', context->file);
-                emit_static_type_init_prefix(context, static_field_owner);
-                context->suppress_static_type_init = true;
-            }
-            fputs("&(", context->file);
-            if (!emit_expression(context, reference_operand))
-                return false;
-            fputc(')', context->file);
-            context->suppress_static_type_init = saved_suppress_static_type_init;
-            if (initialize_static_field)
-                fputc(')', context->file);
-            if (method_carries_ref_parameter_owners(context->semantic, target_method))
-            {
-                fputs(", ", context->file);
-                if (!emit_ref_owner_expression(context, reference_operand))
-                    return false;
-            }
         }
         else if (!emit_expression_as(context, argument, signature_method->parameter_types[i]))
             return false;
@@ -6416,33 +6675,8 @@ static bool emit_new_construction(
             const VcTokenKind modifier = constructor->parameter_modifiers[i];
             if (modifier == VC_TOKEN_KW_REF || modifier == VC_TOKEN_KW_OUT || modifier == VC_TOKEN_KW_IN)
             {
-                if (argument->kind != VC_AST_UNARY_EXPRESSION)
+                if (!emit_reference_argument_storage(context, argument, constructed_type->is_ref_struct))
                     return false;
-                size_t static_field_owner = 0;
-                const VcAstNode *reference_operand = argument->as.unary_expression.operand;
-                const bool initialize_static_field =
-                    static_field_owner_for_expression(context, reference_operand, &static_field_owner) &&
-                    should_emit_static_type_init(context, static_field_owner);
-                const bool saved_suppress_static_type_init = context->suppress_static_type_init;
-                if (initialize_static_field)
-                {
-                    fputc('(', context->file);
-                    emit_static_type_init_prefix(context, static_field_owner);
-                    context->suppress_static_type_init = true;
-                }
-                fputs("&(", context->file);
-                if (!emit_expression(context, reference_operand))
-                    return false;
-                fputc(')', context->file);
-                context->suppress_static_type_init = saved_suppress_static_type_init;
-                if (initialize_static_field)
-                    fputc(')', context->file);
-                if (constructed_type->is_ref_struct)
-                {
-                    fputs(", ", context->file);
-                    if (!emit_ref_owner_expression(context, reference_operand))
-                        return false;
-                }
             }
             else if (!emit_expression_as(context, argument, constructor->parameter_types[i]))
                 return false;
@@ -7445,8 +7679,9 @@ static bool emit_index_range_consumer(
         if (!emit_index_range_consumer_prefix(context, expression, binding, temp,
                 &receiver_type, receiver_storage, sizeof(receiver_storage)))
             return false;
-        fprintf(context->file, "vc_array_at(%s, %s)",
-            receiver_storage, temp->offset_name);
+        fputs("vc_array_at_at(", context->file);
+        emit_fault_site(context, expression);
+        fprintf(context->file, ", %s, %s)", receiver_storage, temp->offset_name);
         fputc(')', context->file);
         fputc(')', context->file);
         return true;
@@ -8181,7 +8416,19 @@ static bool emit_expression_impl(VcCodegenContext *context, const VcAstNode *exp
                 return true;
             }
 
-            const char *name = find_codegen_name(context, expression->as.identifier_expression.name);
+            const char *name = NULL;
+            if (binding != NULL && binding->declaration_node != NULL &&
+                binding->declaration_node->kind == VC_AST_UNARY_EXPRESSION)
+            {
+                for (size_t i = context->name_count; i > 0; i--)
+                    if (context->names[i - 1].declaration_node == binding->declaration_node)
+                    {
+                        name = context->names[i - 1].c_name;
+                        break;
+                    }
+            }
+            if (name == NULL)
+                name = find_codegen_name(context, expression->as.identifier_expression.name);
             if (name == NULL)
             {
                 set_error(context->error, context->error_size, "%s:%zu:%zu: missing generated name for '%s'",
@@ -9101,7 +9348,9 @@ emit_regular_index:
                 const VcAstNodeList *indices = &expression->as.index_expression.indices;
                 if (indices->count != rank)
                     return false;
-                fputs("vc_array_at_md(", context->file);
+                fputs("vc_array_at_md_at(", context->file);
+                emit_fault_site(context, expression);
+                fputs(", ", context->file);
                 if (!emit_index_target(context, expression))
                     return false;
                 fprintf(context->file, ", %zu, (int32_t[]){", rank);
@@ -9115,7 +9364,9 @@ emit_regular_index:
                 fputc(')', context->file);
                 return true;
             }
-            fputs("vc_array_at(", context->file);
+            fputs("vc_array_at_at(", context->file);
+            emit_fault_site(context, expression);
+            fputs(", ", context->file);
             if (!emit_index_target(context, expression))
                 return false;
             fputs(", ", context->file);
@@ -11693,11 +11944,264 @@ static bool emit_fixed_pinnable_method_call(
 }
 
 static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *statement);
+
+static bool emit_inline_out_local(VcCodegenContext *context, const VcAstNode *argument)
+{
+    if (argument == NULL || argument->kind != VC_AST_UNARY_EXPRESSION ||
+        argument->as.unary_expression.operator_kind != VC_TOKEN_KW_OUT ||
+        (argument->as.unary_expression.inline_out_type == NULL &&
+         !argument->as.unary_expression.inline_out_inferred))
+        return true;
+
+    const VcAstNode *operand = argument->as.unary_expression.operand;
+    if (operand == NULL || operand->kind != VC_AST_IDENTIFIER_EXPRESSION)
+        return false;
+    const VcSemanticBinding *binding = vc_semantic_binding(context->semantic, operand);
+    if (binding == NULL)
+        return false;
+    const char *type = c_type(context->semantic, binding->type);
+    if (type == NULL)
+        return false;
+
+    char generated_name[256];
+    VcSemanticCapture captured_local = {0};
+    const bool captured = context->has_method_index &&
+        find_captured_local(context->semantic, context->method_index, argument,
+            operand->as.identifier_expression.name, &captured_local);
+    if (captured)
+    {
+        if (!capture_storage_name(context, &captured_local, generated_name, sizeof(generated_name)))
+            return false;
+    }
+    else
+        snprintf(generated_name, sizeof(generated_name), "vc_l_%zu", context->next_local++);
+
+    emit_indent(context->file, context->depth);
+    if (!captured)
+        fprintf(context->file, "%s%s %s", type,
+            scalar_local_needs_volatile(context, argument) ? " volatile" : "", generated_name);
+    else
+        fprintf(context->file, "%s", generated_name);
+
+    if (captured)
+    {
+        if (vc_semantic_type_is_nullable(binding->type))
+            fprintf(context->file, " = (%s){0}", type);
+        else if (vc_semantic_type_is_struct(binding->type) &&
+            vc_semantic_struct_index(binding->type) < context->semantic->struct_count &&
+            !context->semantic->structs[vc_semantic_struct_index(binding->type)].is_class &&
+            !context->semantic->structs[vc_semantic_struct_index(binding->type)].is_interface)
+            fprintf(context->file, " = (%s){0}", type);
+        else
+            fputs(" = 0", context->file);
+    }
+    else if (vc_semantic_type_is_nullable(binding->type))
+        fputs(" = {0}", context->file);
+    else if (semantic_type_needs_gc_root(context->semantic, binding->type))
+    {
+        if (vc_semantic_type_is_struct(binding->type) &&
+            !context->semantic->structs[vc_semantic_struct_index(binding->type)].is_class)
+            fputs(" = {0}", context->file);
+        else
+            fputs(" = NULL", context->file);
+    }
+    fputs(";\n", context->file);
+
+    if (!push_codegen_name(context, operand->as.identifier_expression.name, generated_name))
+        return false;
+    /* Hoisted storage follows the bound declaration, including disjoint expression arms. */
+    context->names[context->name_count - 1].declaration_node = argument;
+    if (!captured && !emit_gc_register(context, generated_name, binding->type))
+        return false;
+    emit_indent(context->file, context->depth);
+    fputs("vc_gc_safepoint();\n", context->file);
+    return true;
+}
+
+static bool emit_inline_out_declarations_in_expression(
+    VcCodegenContext *context,
+    const VcAstNode *expression)
+{
+    if (expression == NULL)
+        return true;
+    switch (expression->kind)
+    {
+        case VC_AST_UNARY_EXPRESSION:
+            if (!emit_inline_out_local(context, expression))
+                return false;
+            return emit_inline_out_declarations_in_expression(
+                context, expression->as.unary_expression.operand);
+
+        case VC_AST_CALL_EXPRESSION:
+            if (!emit_inline_out_declarations_in_expression(
+                    context, expression->as.call_expression.callee))
+                return false;
+            for (size_t i = 0; i < expression->as.call_expression.arguments.count; i++)
+                if (!emit_inline_out_declarations_in_expression(
+                        context, expression->as.call_expression.arguments.items[i]))
+                    return false;
+            return true;
+
+        case VC_AST_NEW_EXPRESSION:
+            if (expression->as.new_expression.array_lengths.count == 0 &&
+                !emit_inline_out_declarations_in_expression(
+                    context, expression->as.new_expression.array_length))
+                return false;
+            for (size_t i = 0; i < expression->as.new_expression.array_lengths.count; i++)
+                if (!emit_inline_out_declarations_in_expression(
+                        context, expression->as.new_expression.array_lengths.items[i]))
+                    return false;
+            for (size_t i = 0; i < expression->as.new_expression.initializers.count; i++)
+                if (!emit_inline_out_declarations_in_expression(
+                        context, expression->as.new_expression.initializers.items[i]))
+                    return false;
+            for (size_t i = 0; i < expression->as.new_expression.arguments.count; i++)
+                if (!emit_inline_out_declarations_in_expression(
+                        context, expression->as.new_expression.arguments.items[i]))
+                    return false;
+            return true;
+
+        case VC_AST_OBJECT_INITIALIZER_MEMBER:
+            return emit_inline_out_declarations_in_expression(
+                context, expression->as.object_initializer_member.value);
+
+        case VC_AST_COLLECTION_INITIALIZER_ELEMENT:
+            for (size_t i = 0; i < expression->as.collection_initializer_element.arguments.count; i++)
+                if (!emit_inline_out_declarations_in_expression(
+                        context, expression->as.collection_initializer_element.arguments.items[i]))
+                    return false;
+            return true;
+
+        case VC_AST_INDEX_EXPRESSION:
+            if (!emit_inline_out_declarations_in_expression(
+                    context, expression->as.index_expression.target))
+                return false;
+            if (expression->as.index_expression.indices.count != 0)
+            {
+                for (size_t i = 0; i < expression->as.index_expression.indices.count; i++)
+                    if (!emit_inline_out_declarations_in_expression(
+                            context, expression->as.index_expression.indices.items[i]))
+                        return false;
+                return true;
+            }
+            return emit_inline_out_declarations_in_expression(
+                context, expression->as.index_expression.index);
+
+        case VC_AST_BINARY_EXPRESSION:
+            return emit_inline_out_declarations_in_expression(
+                    context, expression->as.binary_expression.left) &&
+                emit_inline_out_declarations_in_expression(
+                    context, expression->as.binary_expression.right);
+
+        case VC_AST_SWITCH_EXPRESSION:
+            if (!emit_inline_out_declarations_in_expression(
+                    context, expression->as.switch_expression.expression))
+                return false;
+            for (size_t i = 0; i < expression->as.switch_expression.arms.count; i++)
+                if (!emit_inline_out_declarations_in_expression(
+                        context, expression->as.switch_expression.arms.items[i]))
+                    return false;
+            return true;
+
+        case VC_AST_SWITCH_EXPRESSION_ARM:
+            return emit_inline_out_declarations_in_expression(
+                    context, expression->as.switch_expression_arm.guard) &&
+                emit_inline_out_declarations_in_expression(
+                    context, expression->as.switch_expression_arm.result);
+
+        case VC_AST_STACKALLOC_EXPRESSION:
+            return emit_inline_out_declarations_in_expression(
+                context, expression->as.stackalloc_expression.count);
+
+        case VC_AST_TYPE_RELATION_EXPRESSION:
+            return emit_inline_out_declarations_in_expression(
+                context, expression->as.type_relation_expression.expression);
+
+        case VC_AST_CONDITIONAL_EXPRESSION:
+            return emit_inline_out_declarations_in_expression(
+                    context, expression->as.conditional_expression.condition) &&
+                emit_inline_out_declarations_in_expression(
+                    context, expression->as.conditional_expression.when_true) &&
+                emit_inline_out_declarations_in_expression(
+                    context, expression->as.conditional_expression.when_false);
+
+        case VC_AST_MEMBER_ACCESS_EXPRESSION:
+            return emit_inline_out_declarations_in_expression(
+                context, expression->as.member_access_expression.target);
+
+        case VC_AST_CAST_EXPRESSION:
+            return emit_inline_out_declarations_in_expression(
+                context, expression->as.cast_expression.expression);
+
+        case VC_AST_AWAIT_EXPRESSION:
+            return emit_inline_out_declarations_in_expression(
+                context, expression->as.await_expression.operand);
+
+        case VC_AST_RANGE_EXPRESSION:
+            return emit_inline_out_declarations_in_expression(
+                    context, expression->as.range_expression.start) &&
+                emit_inline_out_declarations_in_expression(
+                    context, expression->as.range_expression.end);
+
+        case VC_AST_ASSIGNMENT_EXPRESSION:
+            return emit_inline_out_declarations_in_expression(
+                    context, expression->as.assignment_expression.left) &&
+                emit_inline_out_declarations_in_expression(
+                    context, expression->as.assignment_expression.right);
+
+        case VC_AST_PARENTHESIZED_EXPRESSION:
+            return emit_inline_out_declarations_in_expression(
+                context, expression->as.parenthesized_expression.expression);
+
+        default:
+            return true;
+    }
+}
+
+static bool emit_statement_inline_out_declarations(
+    VcCodegenContext *context,
+    const VcAstNode *statement)
+{
+    switch (statement->kind)
+    {
+        case VC_AST_EXPRESSION_STATEMENT:
+            return emit_inline_out_declarations_in_expression(
+                context, statement->as.expression_statement.expression);
+        case VC_AST_LOCAL_DECLARATION:
+            return emit_inline_out_declarations_in_expression(
+                context, statement->as.local_declaration.initializer);
+        case VC_AST_IF_STATEMENT:
+            return emit_inline_out_declarations_in_expression(
+                context, statement->as.if_statement.condition);
+        case VC_AST_FOREACH_STATEMENT:
+            return emit_inline_out_declarations_in_expression(
+                context, statement->as.foreach_statement.collection);
+        case VC_AST_LOCK_STATEMENT:
+            return emit_inline_out_declarations_in_expression(
+                context, statement->as.lock_statement.expression);
+        case VC_AST_USING_STATEMENT:
+            return emit_inline_out_declarations_in_expression(
+                context, statement->as.using_statement.expression);
+        case VC_AST_SWITCH_STATEMENT:
+            return emit_inline_out_declarations_in_expression(
+                context, statement->as.switch_statement.expression);
+        case VC_AST_THROW_STATEMENT:
+            return emit_inline_out_declarations_in_expression(
+                context, statement->as.throw_statement.expression);
+        case VC_AST_RETURN_STATEMENT:
+            return emit_inline_out_declarations_in_expression(
+                context, statement->as.return_statement.expression);
+        default:
+            return true;
+    }
+}
+
 static bool emit_statement(VcCodegenContext *context, const VcAstNode *statement)
 {
     const VcAstNode *saved = context->diagnostic_node;
     context->diagnostic_node = statement;
-    const bool result = emit_statement_impl(context, statement);
+    const bool result = emit_statement_inline_out_declarations(context, statement) &&
+        emit_statement_impl(context, statement);
     context->diagnostic_node = saved;
     return result;
 }
@@ -11876,6 +12380,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
             {
                 if (statement->as.return_statement.expression != NULL)
                     return false;
+                emit_exception_trace_rewind(context, NULL);
                 emit_exception_handler_restore(context, NULL);
                 emit_gc_pop_to(context, 0, false);
                 emit_indent(context->file, context->depth);
@@ -11900,9 +12405,11 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                     VcFinallyTransferState finally_state;
                     if (!emit_finally_before_ref_transfer(context, NULL, temporary, &finally_state))
                         return false;
+                    emit_exception_trace_rewind(context, NULL);
                     if (!finally_state.active)
                         emit_exception_handler_restore(context, NULL);
                     emit_gc_pop_to(context, 0, false);
+                    emit_runtime_call_frame_leave(context);
                     emit_indent(context->file, context->depth);
                     fprintf(context->file, "return %s;\n", temporary);
                     restore_finally_transfer_state(context, &finally_state);
@@ -11914,8 +12421,10 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                    small leaf helper is inlined into a caller that owns a setjmp-based
                    exception frame. Returns that must survive GC-root, exception, or
                    finally cleanup still use the preservation path below. */
-                if (context->finally_transfer == NULL &&
+                if (!context->call_frame_active &&
+                    context->finally_transfer == NULL &&
                     context->active_exception_handler == NULL &&
+                    context->active_caught_exception == NULL &&
                     context->gc_root_count == 0)
                 {
                     emit_indent(context->file, context->depth);
@@ -11942,9 +12451,11 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 if (!emit_finally_before_transfer(context, NULL, temporary,
                         context->return_type, &finally_state))
                     return false;
+                emit_exception_trace_rewind(context, NULL);
                 if (!finally_state.active)
                     emit_exception_handler_restore(context, NULL);
                 emit_gc_pop_to(context, 0, false);
+                emit_runtime_call_frame_leave(context);
                 emit_indent(context->file, context->depth);
                 fprintf(context->file, "return %s;\n", temporary);
                 restore_finally_transfer_state(context, &finally_state);
@@ -11955,9 +12466,11 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 if (!emit_finally_before_transfer(context, NULL, NULL,
                         VC_SEM_TYPE_VOID, &finally_state))
                     return false;
+                emit_exception_trace_rewind(context, NULL);
                 if (!finally_state.active)
                     emit_exception_handler_restore(context, NULL);
                 emit_gc_pop_to(context, 0, false);
+                emit_runtime_call_frame_leave(context);
                 emit_indent(context->file, context->depth);
                 if (context->constructor_returns_value)
                     fputs("return vc_this;\n", context->file);
@@ -11977,7 +12490,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
             snprintf(handler_name, sizeof(handler_name), "vc_eh_%zu", handler_id);
             VcExceptionHandlerFrame *previous_handler = context->active_exception_handler;
 
-            VcExceptionHandlerFrame handler_frame = { handler_name, previous_handler };
+            VcExceptionHandlerFrame handler_frame = { handler_name, previous_handler, NULL };
 
             emit_indent(context->file, context->depth);
             fprintf(context->file, "VcExceptionHandler %s;\n", handler_name);
@@ -11987,6 +12500,8 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
             fprintf(context->file, "%s.previous = vc_exception_handler_current;\n", handler_name);
             emit_indent(context->file, context->depth);
             fprintf(context->file, "%s.gc_roots = vc_gc_roots;\n", handler_name);
+            fprintf(context->file, "%s.call_frame = vc_call_frame_current;\n", handler_name);
+            emit_exception_trace_handler_init(context, handler_name);
             emit_indent(context->file, context->depth);
             fprintf(context->file, "vc_exception_handler_current = &%s;\n", handler_name);
             emit_indent(context->file, context->depth);
@@ -12047,6 +12562,9 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 context->depth++;
 
                 const char *saved_rethrow_exception = context->active_rethrow_exception_name;
+                VcExceptionHandlerFrame *saved_caught_exception = context->active_caught_exception;
+                handler_frame.caught_previous = saved_caught_exception;
+                context->active_caught_exception = &handler_frame;
                 char rethrow_exception_name[64];
                 snprintf(rethrow_exception_name, sizeof(rethrow_exception_name), "%s.exception", handler_name);
                 context->active_rethrow_exception_name = rethrow_exception_name;
@@ -12073,6 +12591,8 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
 
                 if (!emit_block(context, clause->as.catch_clause.body, false))
                     return false;
+                emit_exception_trace_rewind(context, saved_caught_exception);
+                context->active_caught_exception = saved_caught_exception;
                 context->active_rethrow_exception_name = saved_rethrow_exception;
                 emit_gc_pop_to(context, saved_gc_root_count, true);
                 context->name_count = saved_name_count;
@@ -12089,7 +12609,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 fputs("{\n", context->file);
                 context->depth++;
                 emit_indent(context->file, context->depth);
-                fprintf(context->file, "vc_throw_at(%s.exception, %s.fault_site);\n", handler_name, handler_name);
+                fprintf(context->file, "vc_rethrow_handler(&%s);\n", handler_name);
                 context->depth--;
                 emit_indent(context->file, context->depth);
                 fputs("}\n", context->file);
@@ -12107,7 +12627,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
             char finally_handler_name[48];
             snprintf(finally_handler_name, sizeof(finally_handler_name), "vc_fh_%zu", finally_handler_id);
             VcExceptionHandlerFrame *previous_handler = context->active_exception_handler;
-            VcExceptionHandlerFrame finally_handler_frame = { finally_handler_name, previous_handler };
+            VcExceptionHandlerFrame finally_handler_frame = { finally_handler_name, previous_handler, NULL };
             VcFinallyTransferFrame finally_frame = {0};
             finally_frame.kind = VC_FINALLY_TRANSFER_BLOCK;
             finally_frame.finally_block = statement->as.try_statement.finally_block;
@@ -12124,6 +12644,8 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
             fprintf(context->file, "%s.previous = vc_exception_handler_current;\n", finally_handler_name);
             emit_indent(context->file, context->depth);
             fprintf(context->file, "%s.gc_roots = vc_gc_roots;\n", finally_handler_name);
+            fprintf(context->file, "%s.call_frame = vc_call_frame_current;\n", finally_handler_name);
+            emit_exception_trace_handler_init(context, finally_handler_name);
             emit_indent(context->file, context->depth);
             fprintf(context->file, "vc_exception_handler_current = &%s;\n", finally_handler_name);
             emit_indent(context->file, context->depth);
@@ -12137,7 +12659,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 const size_t catch_handler_id = context->next_local++;
                 char catch_handler_name[48];
                 snprintf(catch_handler_name, sizeof(catch_handler_name), "vc_eh_%zu", catch_handler_id);
-                VcExceptionHandlerFrame catch_handler_frame = { catch_handler_name, &finally_handler_frame };
+                VcExceptionHandlerFrame catch_handler_frame = { catch_handler_name, &finally_handler_frame, NULL };
 
                 emit_indent(context->file, context->depth);
                 fprintf(context->file, "VcExceptionHandler %s;\n", catch_handler_name);
@@ -12147,6 +12669,8 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 fprintf(context->file, "%s.previous = vc_exception_handler_current;\n", catch_handler_name);
                 emit_indent(context->file, context->depth);
                 fprintf(context->file, "%s.gc_roots = vc_gc_roots;\n", catch_handler_name);
+            fprintf(context->file, "%s.call_frame = vc_call_frame_current;\n", catch_handler_name);
+            emit_exception_trace_handler_init(context, catch_handler_name);
                 emit_indent(context->file, context->depth);
                 fprintf(context->file, "vc_exception_handler_current = &%s;\n", catch_handler_name);
                 emit_indent(context->file, context->depth);
@@ -12210,6 +12734,9 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                     context->depth++;
 
                     const char *saved_rethrow_exception = context->active_rethrow_exception_name;
+                    VcExceptionHandlerFrame *saved_caught_exception = context->active_caught_exception;
+                    catch_handler_frame.caught_previous = saved_caught_exception;
+                    context->active_caught_exception = &catch_handler_frame;
                     char rethrow_exception_name[64];
                     snprintf(rethrow_exception_name, sizeof(rethrow_exception_name), "%s.exception", catch_handler_name);
                     context->active_rethrow_exception_name = rethrow_exception_name;
@@ -12236,6 +12763,8 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
 
                     if (!emit_block(context, clause->as.catch_clause.body, false))
                         return false;
+                    emit_exception_trace_rewind(context, saved_caught_exception);
+                    context->active_caught_exception = saved_caught_exception;
                     context->active_rethrow_exception_name = saved_rethrow_exception;
                     emit_gc_pop_to(context, saved_gc_root_count, true);
                     context->name_count = saved_name_count;
@@ -12252,7 +12781,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                     fputs("{\n", context->file);
                     context->depth++;
                     emit_indent(context->file, context->depth);
-                    fprintf(context->file, "vc_throw_at(%s.exception, %s.fault_site);\n", catch_handler_name, catch_handler_name);
+                    fprintf(context->file, "vc_rethrow_handler(&%s);\n", catch_handler_name);
                     context->depth--;
                     emit_indent(context->file, context->depth);
                     fputs("}\n", context->file);
@@ -12303,7 +12832,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
             emit_indent(context->file, context->depth);
             fprintf(context->file, "vc_gc_root_pop(&vc_fr_%zu);\n", pending_root_id);
             emit_indent(context->file, context->depth);
-            fprintf(context->file, "vc_throw_at(%s.exception, %s.fault_site);\n", finally_handler_name, finally_handler_name);
+            fprintf(context->file, "vc_rethrow_handler(&%s);\n", finally_handler_name);
 
             context->depth--;
             emit_indent(context->file, context->depth);
@@ -12325,11 +12854,10 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 if (context->active_rethrow_exception_name == NULL)
                     return false;
                 emit_indent(context->file, context->depth);
-                fputs("vc_throw_at(", context->file);
-                fputs(context->active_rethrow_exception_name, context->file);
                 const char *dot = strrchr(context->active_rethrow_exception_name, '.');
                 if (dot == NULL) return false;
-                fprintf(context->file, ", %.*s.fault_site);\n", (int)(dot - context->active_rethrow_exception_name), context->active_rethrow_exception_name);
+                fprintf(context->file, "vc_rethrow_handler(&%.*s);\n",
+                    (int)(dot - context->active_rethrow_exception_name), context->active_rethrow_exception_name);
                 return true;
             }
 
@@ -12389,7 +12917,9 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
         {
             const size_t saved_name_count = context->name_count;
             const size_t saved_gc_root_count = context->gc_root_count;
-            if (!emit_declaration_pattern_storage(context, statement->as.while_statement.condition))
+            if (!emit_inline_out_declarations_in_expression(
+                    context, statement->as.while_statement.condition) ||
+                !emit_declaration_pattern_storage(context, statement->as.while_statement.condition))
                 return false;
             const size_t loop_root_count = context->gc_root_count;
             if (!push_loop_gc_root_count(context, loop_root_count))
@@ -12411,6 +12941,11 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
 
         case VC_AST_DO_WHILE_STATEMENT:
         {
+            const size_t saved_name_count = context->name_count;
+            const size_t saved_gc_root_count = context->gc_root_count;
+            if (!emit_inline_out_declarations_in_expression(
+                    context, statement->as.while_statement.condition))
+                return false;
             const size_t loop_root_count = context->gc_root_count;
             if (!push_loop_gc_root_count(context, loop_root_count))
                 return false;
@@ -12424,6 +12959,8 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 return false;
             fputs(");\n", context->file);
             pop_loop_gc_root_count(context);
+            emit_gc_pop_to(context, saved_gc_root_count, true);
+            context->name_count = saved_name_count;
             emit_indent(context->file, context->depth);
             fputs("vc_gc_safepoint();\n", context->file);
             return true;
@@ -12439,6 +12976,10 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
 
             if (statement->as.for_statement.initializer != NULL &&
                 !emit_statement(context, statement->as.for_statement.initializer))
+                return false;
+            if (statement->as.for_statement.condition != NULL &&
+                !emit_inline_out_declarations_in_expression(
+                    context, statement->as.for_statement.condition))
                 return false;
 
             const size_t loop_root_count = context->gc_root_count;
@@ -12543,6 +13084,8 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
             fprintf(context->file, "%s.previous = vc_exception_handler_current;\n", handler_name);
             emit_indent(context->file, context->depth);
             fprintf(context->file, "%s.gc_roots = vc_gc_roots;\n", handler_name);
+            fprintf(context->file, "%s.call_frame = vc_call_frame_current;\n", handler_name);
+            emit_exception_trace_handler_init(context, handler_name);
             emit_indent(context->file, context->depth);
             fprintf(context->file, "vc_exception_handler_current = &%s;\n", handler_name);
             emit_indent(context->file, context->depth);
@@ -12583,7 +13126,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 return false;
             emit_gc_pop_to(context, pending_root_count, true);
             emit_indent(context->file, context->depth);
-            fprintf(context->file, "vc_throw_at(%s.exception, %s.fault_site);\n", handler_name, handler_name);
+            fprintf(context->file, "vc_rethrow_handler(&%s);\n", handler_name);
             context->depth--;
             emit_indent(context->file, context->depth);
             fputs("}\n", context->file);
@@ -12645,6 +13188,8 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
             fprintf(context->file, "%s.previous = vc_exception_handler_current;\n", handler_name);
             emit_indent(context->file, context->depth);
             fprintf(context->file, "%s.gc_roots = vc_gc_roots;\n", handler_name);
+            fprintf(context->file, "%s.call_frame = vc_call_frame_current;\n", handler_name);
+            emit_exception_trace_handler_init(context, handler_name);
             emit_indent(context->file, context->depth);
             fprintf(context->file, "vc_exception_handler_current = &%s;\n", handler_name);
             emit_indent(context->file, context->depth);
@@ -12686,7 +13231,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 return false;
             emit_gc_pop_to(context, pending_root_count, true);
             emit_indent(context->file, context->depth);
-            fprintf(context->file, "vc_throw_at(%s.exception, %s.fault_site);\n", handler_name, handler_name);
+            fprintf(context->file, "vc_rethrow_handler(&%s);\n", handler_name);
             context->depth--;
             emit_indent(context->file, context->depth);
             fputs("}\n", context->file);
@@ -12895,6 +13440,8 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
             fprintf(context->file, "%s.previous = vc_exception_handler_current;\n", handler_name);
             emit_indent(context->file, context->depth);
             fprintf(context->file, "%s.gc_roots = vc_gc_roots;\n", handler_name);
+            fprintf(context->file, "%s.call_frame = vc_call_frame_current;\n", handler_name);
+            emit_exception_trace_handler_init(context, handler_name);
             emit_indent(context->file, context->depth);
             fprintf(context->file, "vc_exception_handler_current = &%s;\n", handler_name);
             emit_indent(context->file, context->depth);
@@ -12935,7 +13482,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 return false;
             emit_gc_pop_to(context, pending_root_count, true);
             emit_indent(context->file, context->depth);
-            fprintf(context->file, "vc_throw_at(%s.exception, %s.fault_site);\n", handler_name, handler_name);
+            fprintf(context->file, "vc_rethrow_handler(&%s);\n", handler_name);
             context->depth--;
             emit_indent(context->file, context->depth);
             fputs("}\n", context->file);
@@ -13160,6 +13707,8 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 fprintf(context->file, "%s.previous = vc_exception_handler_current;\n", foreach_handler_name);
                 emit_indent(context->file, context->depth);
                 fprintf(context->file, "%s.gc_roots = vc_gc_roots;\n", foreach_handler_name);
+            fprintf(context->file, "%s.call_frame = vc_call_frame_current;\n", foreach_handler_name);
+            emit_exception_trace_handler_init(context, foreach_handler_name);
                 emit_indent(context->file, context->depth);
                 fprintf(context->file, "vc_exception_handler_current = &%s;\n", foreach_handler_name);
                 emit_indent(context->file, context->depth);
@@ -13277,7 +13826,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                     return false;
                 emit_gc_pop_to(context, pending_root_count, true);
                 emit_indent(context->file, context->depth);
-                fprintf(context->file, "vc_throw_at(%s.exception, %s.fault_site);\n", foreach_handler_name, foreach_handler_name);
+                fprintf(context->file, "vc_rethrow_handler(&%s);\n", foreach_handler_name);
 
                 context->depth--;
                 emit_indent(context->file, context->depth);
@@ -13466,11 +14015,14 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
 
             VcExceptionHandlerFrame *target_handler =
                 context->break_exception_handlers[context->break_depth - 1];
+            VcExceptionHandlerFrame *target_caught =
+                context->break_caught_exceptions[context->break_depth - 1];
             VcFinallyTransferState finally_state;
             if (!emit_finally_before_transfer(context, target_handler, NULL,
                     VC_SEM_TYPE_VOID, &finally_state))
                 return false;
             emit_gc_pop_to(context, context->break_gc_root_counts[context->break_depth - 1], false);
+            emit_exception_trace_rewind(context, target_caught);
             emit_exception_handler_restore(context, target_handler);
             emit_indent(context->file, context->depth);
             fputs("vc_gc_safepoint();\n", context->file);
@@ -13491,11 +14043,14 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
 
             VcExceptionHandlerFrame *target_handler =
                 context->loop_exception_handlers[context->loop_depth - 1];
+            VcExceptionHandlerFrame *target_caught =
+                context->loop_caught_exceptions[context->loop_depth - 1];
             VcFinallyTransferState finally_state;
             if (!emit_finally_before_transfer(context, target_handler, NULL,
                     VC_SEM_TYPE_VOID, &finally_state))
                 return false;
             emit_gc_pop_to(context, context->loop_gc_root_counts[context->loop_depth - 1], false);
+            emit_exception_trace_rewind(context, target_caught);
             emit_exception_handler_restore(context, target_handler);
             emit_indent(context->file, context->depth);
             fputs("vc_gc_safepoint();\n", context->file);
@@ -13827,8 +14382,9 @@ static bool emit_native_call_wrapper(
             fprintf(file, "        vc_string_release_native_owned((void *)vc_native_result, %s);\n",
                 method->native_string_release_c_name);
     }
-    fputs("        void *vc_exception = vc_native_take_pending_exception();\n", file);
-    fputs("        vc_throw(vc_exception);\n", file);
+    fputs("        VcFaultSite vc_pending_site = {0}; size_t vc_pending_start = 0u, vc_pending_count = 0u;\n", file);
+    fputs("        void *vc_exception = vc_native_take_pending_exception(&vc_pending_site, &vc_pending_start, &vc_pending_count);\n", file);
+    fputs("        vc_throw_captured(vc_exception, vc_pending_site, vc_pending_start, vc_pending_count);\n", file);
     fputs("    }\n", file);
     if (method->return_type == VC_SEM_TYPE_STRING)
     {
@@ -13867,8 +14423,9 @@ static bool emit_native_call_wrapper(
                     method->native_string_release_c_name);
             fputs("    if (vc_native_pending_exception != NULL)\n", file);
             fputs("    {\n", file);
-            fputs("        void *vc_exception = vc_native_take_pending_exception();\n", file);
-            fputs("        vc_throw(vc_exception);\n", file);
+            fputs("        VcFaultSite vc_pending_site = {0}; size_t vc_pending_start = 0u, vc_pending_count = 0u;\n", file);
+            fputs("        void *vc_exception = vc_native_take_pending_exception(&vc_pending_site, &vc_pending_start, &vc_pending_count);\n", file);
+            fputs("        vc_throw_captured(vc_exception, vc_pending_site, vc_pending_start, vc_pending_count);\n", file);
             fputs("    }\n", file);
         }
         fputs("    return vc_result;\n", file);
@@ -14017,6 +14574,8 @@ static bool emit_native_callback_wrapper(
     fputs("    vc_boundary.exception = NULL;\n", file);
     fputs("    vc_boundary.previous = vc_exception_handler_current;\n", file);
     fputs("    vc_boundary.gc_roots = vc_gc_roots;\n", file);
+    fputs("    vc_boundary.call_frame = vc_call_frame_current;\n", file);
+    fputs("    vc_boundary.captured_baseline = vc_exception_trace_count; vc_boundary.captured_start = 0u; vc_boundary.captured_count = 0u;\n", file);
     fputs("    vc_exception_handler_current = &vc_boundary;\n", file);
     fputs("    if (setjmp(vc_boundary.jump) == 0)\n", file);
     fputs("    {\n", file);
@@ -14072,7 +14631,7 @@ static bool emit_native_callback_wrapper(
     fputs("    void *vc_exception = (void *)vc_boundary.exception;\n", file);
     fputs("    if (vc_native_call_depth > 0u)\n", file);
     fputs("    {\n", file);
-    fputs("        vc_native_capture_exception(vc_exception);\n", file);
+    fputs("        vc_native_capture_exception(vc_exception, vc_boundary.fault_site, vc_boundary.captured_start, vc_boundary.captured_count);\n", file);
     fputs("        vc_exception_in_flight_clear(vc_exception);\n", file);
     fputs("        vc_gc_managed_reentry_end(vc_callback_restore_native_safe);\n", file);
     fputs("        if (vc_callback_thread_attached && !vc_runtime_thread_detach(&vc_callback_thread_context))\n", file);
@@ -14080,7 +14639,7 @@ static bool emit_native_callback_wrapper(
     if (!emit_native_callback_default_return(file, semantic, invoke->return_type, "        "))
         return false;
     fputs("    }\n", file);
-    fputs("    vc_native_boundary_abort(vc_exception, \"native callback boundary\", vc_boundary.fault_site);\n", file);
+    fputs("    vc_native_boundary_abort(vc_exception, \"native callback boundary\", vc_boundary.fault_site, vc_boundary.captured_start, vc_boundary.captured_count);\n", file);
     fputs("}\n\n", file);
     return true;
 }
@@ -14126,8 +14685,9 @@ static bool emit_native_function_pointer_call_helper(
     fputs("    vc_gc_native_call_end(vc_native_was_safe);\n", file);
     fputs("    if (vc_native_pending_exception != NULL)\n", file);
     fputs("    {\n", file);
-    fputs("        void *vc_exception = vc_native_take_pending_exception();\n", file);
-    fputs("        vc_throw(vc_exception);\n", file);
+    fputs("        VcFaultSite vc_pending_site = {0}; size_t vc_pending_start = 0u, vc_pending_count = 0u;\n", file);
+    fputs("        void *vc_exception = vc_native_take_pending_exception(&vc_pending_site, &vc_pending_start, &vc_pending_count);\n", file);
+    fputs("        vc_throw_captured(vc_exception, vc_pending_site, vc_pending_start, vc_pending_count);\n", file);
     fputs("    }\n", file);
     if (function_pointer->return_type != VC_SEM_TYPE_VOID)
         fputs("    return vc_result;\n", file);
@@ -14343,6 +14903,10 @@ static bool emit_static_initializer(
             ? structure->static_constructor_node->as.method_declaration.body
             : NULL;
     const bool has_early_return = node_contains_return_statement(static_constructor_body);
+    char vc_call_frame_name[1024];
+    if (!runtime_static_initializer_display_name(semantic, struct_index,
+            vc_call_frame_name, sizeof(vc_call_frame_name)))
+        return false;
 
     if (!emit_static_initializer_signature(file, struct_index))
         return false;
@@ -14368,17 +14932,21 @@ static bool emit_static_initializer(
     fputs("    size_t vc_ti_previous = vc_ti_active;\n", file);
     fprintf(file, "    vc_ti_state_%zu = 1u;\n", struct_index);
     fprintf(file, "    vc_ti_active = %zuu;\n", struct_index + 1u);
+    emit_runtime_call_frame_enter(file, 1, vc_call_frame_name, structure->source,
+        structure->static_constructor_node != NULL ? structure->static_constructor_node : structure->node);
     fputs("    VcExceptionHandler vc_ti_handler;\n", file);
     fputs("    vc_ti_handler.exception = NULL;\n", file);
     fputs("    vc_ti_handler.previous = vc_exception_handler_current;\n", file);
     fputs("    vc_ti_handler.gc_roots = vc_gc_roots;\n", file);
+    fputs("    vc_ti_handler.call_frame = vc_call_frame_current;\n", file);
+    fputs("    vc_ti_handler.captured_baseline = vc_exception_trace_count; vc_ti_handler.captured_start = 0u; vc_ti_handler.captured_count = 0u;\n", file);
     fputs("    vc_exception_handler_current = &vc_ti_handler;\n", file);
     fputs("    if (setjmp(vc_ti_handler.jump) != 0)\n", file);
     fputs("    {\n", file);
     fprintf(file, "        vc_ti_state_%zu = 0u;\n", struct_index);
     fputs("        vc_ti_active = vc_ti_previous;\n", file);
     fprintf(file, "        if (!vc_type_initializer_monitor_exit(%zuu)) abort();\n", struct_index);
-    fputs("        vc_throw_at((void *)vc_ti_handler.exception, vc_ti_handler.fault_site);\n", file);
+    fputs("        vc_rethrow_handler(&vc_ti_handler);\n", file);
     fputs("    }\n", file);
 
     if (structure->is_class && structure->has_base_class &&
@@ -14392,10 +14960,12 @@ static bool emit_static_initializer(
         .has_return_type = true,
         .source = structure->source,
         .owner_node = structure->node,
+        .runtime_display_name = vc_call_frame_name,
         .owner_struct_index = struct_index,
         .has_owner_struct = true,
         .in_static_initializer = true,
         .static_initializer_struct_index = struct_index,
+        .call_frame_active = true,
         .depth = 1,
         .error = error,
         .error_size = error_size
@@ -14470,6 +15040,7 @@ static bool emit_static_initializer(
     fprintf(file, "    vc_ti_state_%zu = 2u;\n", struct_index);
     fputs("    vc_ti_active = vc_ti_previous;\n", file);
     fprintf(file, "    if (!vc_type_initializer_monitor_exit(%zuu)) abort();\n", struct_index);
+    emit_runtime_call_frame_leave(&context);
     fputs("}\n\n", file);
     destroy_codegen_context(&context);
     return true;
@@ -14981,27 +15552,8 @@ static bool emit_constructor_init_call(
         const VcTokenKind modifier = constructor->parameter_modifiers[i];
         if (modifier == VC_TOKEN_KW_REF || modifier == VC_TOKEN_KW_OUT || modifier == VC_TOKEN_KW_IN)
         {
-            if (argument->kind != VC_AST_UNARY_EXPRESSION)
+            if (!emit_reference_argument_storage(context, argument, false))
                 return false;
-            size_t static_field_owner = 0;
-            const VcAstNode *reference_operand = argument->as.unary_expression.operand;
-            const bool initialize_static_field =
-                static_field_owner_for_expression(context, reference_operand, &static_field_owner) &&
-                should_emit_static_type_init(context, static_field_owner);
-            const bool saved_suppress_static_type_init = context->suppress_static_type_init;
-            if (initialize_static_field)
-            {
-                fputc('(', context->file);
-                emit_static_type_init_prefix(context, static_field_owner);
-                context->suppress_static_type_init = true;
-            }
-            fputs("&(", context->file);
-            if (!emit_expression(context, reference_operand))
-                return false;
-            fputc(')', context->file);
-            context->suppress_static_type_init = saved_suppress_static_type_init;
-            if (initialize_static_field)
-                fputc(')', context->file);
         }
         else if (!emit_expression_as(context, argument, constructor->parameter_types[i]))
         {
@@ -15066,34 +15618,10 @@ static bool emit_value_constructor_call(
         const VcTokenKind modifier = constructor->parameter_modifiers[i];
         if (modifier == VC_TOKEN_KW_REF || modifier == VC_TOKEN_KW_OUT || modifier == VC_TOKEN_KW_IN)
         {
-            if (argument->kind != VC_AST_UNARY_EXPRESSION)
+            const bool carries_owner = constructor->struct_index < context->semantic->struct_count &&
+                context->semantic->structs[constructor->struct_index].is_ref_struct;
+            if (!emit_reference_argument_storage(context, argument, carries_owner))
                 return false;
-            size_t static_field_owner = 0;
-            const VcAstNode *reference_operand = argument->as.unary_expression.operand;
-            const bool initialize_static_field =
-                static_field_owner_for_expression(context, reference_operand, &static_field_owner) &&
-                should_emit_static_type_init(context, static_field_owner);
-            const bool saved_suppress_static_type_init = context->suppress_static_type_init;
-            if (initialize_static_field)
-            {
-                fputc('(', context->file);
-                emit_static_type_init_prefix(context, static_field_owner);
-                context->suppress_static_type_init = true;
-            }
-            fputs("&(", context->file);
-            if (!emit_expression(context, reference_operand))
-                return false;
-            fputc(')', context->file);
-            context->suppress_static_type_init = saved_suppress_static_type_init;
-            if (initialize_static_field)
-                fputc(')', context->file);
-            if (constructor->struct_index < context->semantic->struct_count &&
-                context->semantic->structs[constructor->struct_index].is_ref_struct)
-            {
-                fputs(", ", context->file);
-                if (!emit_ref_owner_expression(context, reference_operand))
-                    return false;
-            }
         }
         else if (!emit_expression_as(context, argument, constructor->parameter_types[i]))
         {
@@ -15153,6 +15681,16 @@ static bool emit_constructor(
             .error = error,
             .error_size = error_size
         };
+        char vc_call_frame_name[1024];
+        if (!runtime_constructor_display_name(semantic, constructor,
+                vc_call_frame_name, sizeof(vc_call_frame_name)))
+        {
+            destroy_codegen_context(&context);
+            return false;
+        }
+        emit_runtime_call_frame_enter(file, 1, vc_call_frame_name, constructor->source, constructor->node);
+        context.runtime_display_name = vc_call_frame_name;
+        context.call_frame_active = true;
         if (!push_codegen_name(&context, "this", "vc_this") ||
             !emit_gc_register(&context, "vc_this", vc_semantic_struct_type(constructor->struct_index)))
         {
@@ -15267,6 +15805,7 @@ static bool emit_constructor(
             }
         }
         emit_gc_pop_to(&context, 0, true);
+        emit_runtime_call_frame_leave(&context);
         fputs("    return vc_this;\n}\n\n", file);
         destroy_codegen_context(&context);
         return true;
@@ -15301,6 +15840,16 @@ static bool emit_constructor(
         .error = error,
         .error_size = error_size
     };
+    char vc_call_frame_name[1024];
+    if (!runtime_constructor_display_name(semantic, constructor,
+            vc_call_frame_name, sizeof(vc_call_frame_name)))
+    {
+        destroy_codegen_context(&context);
+        return false;
+    }
+    emit_runtime_call_frame_enter(file, 1, vc_call_frame_name, constructor->source, constructor->node);
+    context.runtime_display_name = vc_call_frame_name;
+    context.call_frame_active = true;
     if (!push_codegen_name(&context, "this", "vc_this") ||
         !emit_gc_register(&context, "vc_this", vc_semantic_struct_type(constructor->struct_index)))
     {
@@ -15424,6 +15973,7 @@ static bool emit_constructor(
     }
 
     emit_gc_pop_to(&context, 0, true);
+    emit_runtime_call_frame_leave(&context);
     fputs("}\n\n", file);
     destroy_codegen_context(&context);
     return true;
@@ -15457,6 +16007,19 @@ static bool emit_method(FILE *file, const VcSemanticModel *semantic, size_t meth
         .error = error,
         .error_size = error_size
     };
+
+    char vc_call_frame_name[1024];
+    if (!runtime_method_display_name(semantic, method, vc_call_frame_name, sizeof(vc_call_frame_name)))
+    {
+        destroy_codegen_context(&context);
+        return false;
+    }
+    context.runtime_display_name = vc_call_frame_name;
+    if (!method->node->as.method_declaration.runtime_hide_frame)
+    {
+        emit_runtime_call_frame_enter(file, 1, vc_call_frame_name, method->source, method->node);
+        context.call_frame_active = true;
+    }
 
     const size_t closure_capture_count = method_capture_count(semantic, method_index);
     if (closure_capture_count > 0)
@@ -15589,7 +16152,7 @@ static bool emit_method(FILE *file, const VcSemanticModel *semantic, size_t meth
                     strcmp(mapped->c_name, original) != 0) continue;
                 const char *type = c_type(semantic, method->parameter_types[parameter]);
                 if (type == NULL) { destroy_codegen_context(&context); return false; }
-                fprintf(file, "    volatile %s vc_mp_%zu = %s;\n", type, parameter, original);
+                fprintf(file, "    %s volatile vc_mp_%zu = %s;\n", type, parameter, original);
                 snprintf(mapped->c_name, sizeof(mapped->c_name), "vc_mp_%zu", parameter);
                 break;
             }
@@ -15606,6 +16169,7 @@ static bool emit_method(FILE *file, const VcSemanticModel *semantic, size_t meth
     }
 
     emit_gc_pop_to(&context, 0, true);
+    emit_runtime_call_frame_leave(&context);
     fputs("}\n\n", file);
     destroy_codegen_context(&context);
     return true;
@@ -15721,6 +16285,16 @@ static bool emit_property_getter(
         .error = error,
         .error_size = error_size
     };
+    char vc_call_frame_name[1024];
+    if (!runtime_property_display_name(semantic, struct_index, property, false,
+            vc_call_frame_name, sizeof(vc_call_frame_name)))
+    {
+        destroy_codegen_context(&context);
+        return false;
+    }
+    emit_runtime_call_frame_enter(file, 1, vc_call_frame_name, owner->source, property->node);
+    context.runtime_display_name = vc_call_frame_name;
+    context.call_frame_active = true;
     if (!property->is_static &&
         !push_codegen_name(&context, "this", owner->is_class ? "vc_self" : "(*vc_self)"))
     {
@@ -15753,6 +16327,7 @@ static bool emit_property_getter(
                 return false;
             }
             emit_gc_pop_to(&context, 0, true);
+            emit_runtime_call_frame_leave(&context);
             fputs("    return vc_result;\n", file);
         }
         else
@@ -15772,6 +16347,7 @@ static bool emit_property_getter(
             }
             fputs(";\n", file);
             emit_gc_pop_to(&context, 0, true);
+            emit_runtime_call_frame_leave(&context);
             emit_indent(file, 1);
             fputs("return vc_result;\n", file);
         }
@@ -15789,6 +16365,7 @@ static bool emit_property_getter(
         }
     }
     emit_gc_pop_to(&context, 0, true);
+    emit_runtime_call_frame_leave(&context);
     fputs("}\n\n", file);
     destroy_codegen_context(&context);
     return true;
@@ -15835,6 +16412,16 @@ static bool emit_property_setter(
         .error = error,
         .error_size = error_size
     };
+    char vc_call_frame_name[1024];
+    if (!runtime_property_display_name(semantic, struct_index, property, true,
+            vc_call_frame_name, sizeof(vc_call_frame_name)))
+    {
+        destroy_codegen_context(&context);
+        return false;
+    }
+    emit_runtime_call_frame_enter(file, 1, vc_call_frame_name, owner->source, property->node);
+    context.runtime_display_name = vc_call_frame_name;
+    context.call_frame_active = true;
     if ((!property->is_static &&
             !push_codegen_name(&context, "this", owner->is_class ? "vc_self" : "(*vc_self)")) ||
         !push_codegen_name(&context, "value", "vc_value"))
@@ -15872,6 +16459,7 @@ static bool emit_property_setter(
         }
     }
     emit_gc_pop_to(&context, 0, true);
+    emit_runtime_call_frame_leave(&context);
     fputs("}\n\n", file);
     destroy_codegen_context(&context);
     return true;
@@ -17640,6 +18228,9 @@ static bool emit_managed_thread_helpers(
     fputs("    VcGcRoot owner_root;\n", file);
     fputs("    bool owner_root_active;\n", file);
     fputs("    void *exception;\n", file);
+    fputs("    VcFaultSite exception_fault_site;\n", file);
+    fputs("    VcCapturedCallFrame *exception_frames;\n", file);
+    fputs("    size_t exception_frame_count;\n", file);
     fputs("    VcGcRoot exception_root;\n", file);
     fputs("    bool exception_root_active;\n", file);
     fputs("} VcManagedThreadState;\n\n", file);
@@ -17661,6 +18252,8 @@ static bool emit_managed_thread_helpers(
     fputs("    vc_boundary.exception = NULL;\n", file);
     fputs("    vc_boundary.previous = vc_exception_handler_current;\n", file);
     fputs("    vc_boundary.gc_roots = vc_gc_roots;\n", file);
+    fputs("    vc_boundary.call_frame = vc_call_frame_current;\n", file);
+    fputs("    vc_boundary.captured_baseline = vc_exception_trace_count; vc_boundary.captured_start = 0u; vc_boundary.captured_count = 0u;\n", file);
     fputs("    vc_exception_handler_current = &vc_boundary;\n", file);
     fputs("    if (setjmp(vc_boundary.jump) == 0)\n    {\n", file);
     fprintf(file, "        vc_delegate_call_%zu(vc_start);\n", action_index);
@@ -17668,6 +18261,9 @@ static bool emit_managed_thread_helpers(
     fputs("    }\n", file);
     fputs("    else\n    {\n", file);
     fputs("        vc_state->exception = (void *)vc_boundary.exception;\n", file);
+    fputs("        vc_state->exception_fault_site = vc_boundary.fault_site; vc_state->exception_frame_count = vc_boundary.captured_count;\n", file);
+    fputs("        if (!vc_exception_trace_copy(vc_boundary.captured_start, vc_boundary.captured_count, &vc_state->exception_frames)) vc_runtime_fail(\"out of memory while preserving thread exception stack\");\n", file);
+    fputs("        vc_exception_trace_rewind(vc_boundary.captured_baseline);\n", file);
     fputs("        vc_gc_static_root_push(&vc_state->exception_root, (void *)&vc_state->exception, vc_gc_trace_ref_slot);\n", file);
     fputs("        vc_state->exception_root_active = true;\n", file);
     fputs("        vc_exception_in_flight_clear((void *)vc_boundary.exception);\n", file);
@@ -17717,6 +18313,9 @@ static bool emit_managed_thread_helpers(
     fputs("        vc_state->owner_root_active = false;\n", file);
     fputs("    }\n", file);
     fputs("    void *vc_exception = vc_state->exception;\n", file);
+    fputs("    VcFaultSite vc_exception_site = vc_state->exception_fault_site;\n", file);
+    fputs("    VcCapturedCallFrame *vc_exception_frames = vc_state->exception_frames;\n", file);
+    fputs("    size_t vc_exception_frame_count = vc_state->exception_frame_count;\n", file);
     fputs("    VcGcRoot vc_exception_root;\n", file);
     fputs("    bool vc_exception_root_active = false;\n", file);
     fputs("    if (vc_exception != NULL)\n    {\n", file);
@@ -17730,7 +18329,17 @@ static bool emit_managed_thread_helpers(
     fprintf(file, "    vc_thread->%s = 0;\n", native_state->c_name);
     fprintf(file, "    vc_thread->%s = true;\n", joined->c_name);
     fputs("    free(vc_state);\n", file);
-    fputs("    if (vc_exception_root_active) vc_throw(vc_exception);\n", file);
+    fputs("    if (vc_exception_root_active)\n    {\n", file);
+    fputs("        size_t vc_exception_start = vc_exception_trace_count;\n", file);
+    fputs("        if (!vc_exception_trace_import(vc_exception_frames, vc_exception_frame_count, &vc_exception_start))\n", file);
+    fputs("        {\n", file);
+    fputs("            free(vc_exception_frames);\n", file);
+    fputs("            vc_runtime_fail(\"out of memory while restoring thread exception stack\");\n", file);
+    fputs("        }\n", file);
+    fputs("        free(vc_exception_frames);\n", file);
+    fputs("        vc_throw_captured(vc_exception, vc_exception_site, vc_exception_start, vc_exception_frame_count);\n", file);
+    fputs("    }\n", file);
+    fputs("    free(vc_exception_frames);\n", file);
     fputs("}\n\n", file);
 
     fputs("static VC_MAYBE_UNUSED int64_t vc_managed_monotonic_time_milliseconds(void)\n{\n", file);
@@ -17947,6 +18556,16 @@ static bool emit_lambda_body(
         .error_size = error_size
     };
 
+    char vc_call_frame_name[1024];
+    if (!runtime_lambda_display_name(semantic, lambda, vc_call_frame_name, sizeof(vc_call_frame_name)))
+    {
+        destroy_codegen_context(&context);
+        return false;
+    }
+    emit_runtime_call_frame_enter(file, 1, vc_call_frame_name, lambda->source, lambda->node);
+    context.runtime_display_name = vc_call_frame_name;
+    context.call_frame_active = true;
+
     const size_t local_capture_count = capture_scope_count(
         semantic, VC_SEM_CAPTURE_SCOPE_LAMBDA, lambda_index, NULL);
     if (local_capture_count > 0)
@@ -18069,6 +18688,7 @@ static bool emit_lambda_body(
             }
             fputs(";\n", file);
             emit_gc_pop_to(&context, 0, true);
+            emit_runtime_call_frame_leave(&context);
             fputs("    return;\n", file);
         }
         else
@@ -18087,6 +18707,7 @@ static bool emit_lambda_body(
             }
             fputs(";\n", file);
             emit_gc_pop_to(&context, 0, true);
+            emit_runtime_call_frame_leave(&context);
             fputs("    return vc_result;\n", file);
         }
     }
@@ -18107,6 +18728,7 @@ static bool emit_lambda_body(
             }
         }
         emit_gc_pop_to(&context, 0, true);
+        emit_runtime_call_frame_leave(&context);
         if (lambda->return_type == VC_SEM_TYPE_VOID)
             fputs("    return;\n", file);
     }
@@ -18633,6 +19255,7 @@ static bool write_generated_c(
     const char *path,
     const VcSemanticModel *semantic,
     bool library_output,
+    VcBuildMode mode,
     char *error,
     size_t error_size)
 {
@@ -18700,10 +19323,105 @@ static bool write_generated_c(
     fputs("    void *owner;\n", file);
     fputs("    bool active;\n", file);
     fputs("} VcGcPin;\n\n", file);
-    fputs("typedef struct VcFaultSite { const char *file; const char *method; size_t line; size_t column; } VcFaultSite;\n\n", file);
+    fputs("typedef struct VcFaultSite { const char *file; const char *method; size_t line; size_t column; size_t end_line; size_t end_column; } VcFaultSite;\n", file);
+    fputs("typedef struct VcCallFrame\n{\n", file);
+    fputs("    const char *method;\n", file);
+    fputs("    const char *file;\n", file);
+    fputs("    size_t line;\n", file);
+    fputs("    size_t column;\n", file);
+    fputs("    struct VcCallFrame *previous;\n", file);
+    fputs("} VcCallFrame;\n\n", file);
+    fputs("typedef struct VcCapturedCallFrame\n{\n", file);
+    fputs("    const char *method;\n", file);
+    fputs("    const char *file;\n", file);
+    fputs("    size_t line;\n", file);
+    fputs("    size_t column;\n", file);
+    fputs("} VcCapturedCallFrame;\n\n", file);
+    char vc_runtime_source_root[VC_PATH_MAX] = {0};
+    if (mode != VC_BUILD_PUBLISH)
+    {
+#ifdef _WIN32
+        if (_getcwd(vc_runtime_source_root, (int)sizeof(vc_runtime_source_root)) == NULL)
+            vc_runtime_source_root[0] = '\0';
+#else
+        if (getcwd(vc_runtime_source_root, sizeof(vc_runtime_source_root)) == NULL)
+            vc_runtime_source_root[0] = '\0';
+#endif
+    }
+    fputs("static VC_MAYBE_UNUSED const char *vc_runtime_source_root = ", file);
+    emit_diagnostic_string(file, vc_runtime_source_root);
+    fputs(";\n", file);
+    fprintf(file, "static VC_MAYBE_UNUSED const bool vc_runtime_source_text_enabled = %s;\n\n",
+        mode == VC_BUILD_PUBLISH ? "false" : "true");
+    fputs("static VC_MAYBE_UNUSED size_t vc_runtime_source_display_width(const unsigned char *text, size_t length, size_t column, size_t *bytes)\n{\n", file);
+    fputs("    unsigned c = text[0]; *bytes = 1u;\n", file);
+    fputs("    if (c == '\\t') return 4u - column % 4u;\n", file);
+    fputs("    if (c < 32u || c == 127u) return 1u;\n", file);
+    fputs("    if (c >= 0xc2u && c <= 0xf4u)\n    {\n", file);
+    fputs("        size_t count = c < 0xe0u ? 2u : c < 0xf0u ? 3u : 4u;\n", file);
+    fputs("        unsigned scalar = c & (count == 2u ? 31u : count == 3u ? 15u : 7u);\n", file);
+    fputs("        if (count > length) return 1u;\n", file);
+    fputs("        for (size_t i = 1u; i < count; i++) { if ((text[i] & 0xc0u) != 0x80u) return 1u; scalar = (scalar << 6u) | (text[i] & 63u); }\n", file);
+    fputs("        *bytes = count;\n", file);
+    fputs("        if ((scalar >= 0x300u && scalar <= 0x36fu) || (scalar >= 0xfe00u && scalar <= 0xfe0fu)) return 0u;\n", file);
+    fputs("        if ((scalar >= 0x1100u && scalar <= 0x115fu) || (scalar >= 0x2e80u && scalar <= 0xa4cfu) || (scalar >= 0xac00u && scalar <= 0xd7a3u) || (scalar >= 0xf900u && scalar <= 0xfaffu) || (scalar >= 0xff01u && scalar <= 0xff60u) || (scalar >= 0x1f300u && scalar <= 0x1faffu) || (scalar >= 0x20000u && scalar <= 0x3fffdu)) return 2u;\n", file);
+    fputs("    }\n", file);
+    fputs("    return 1u;\n}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED size_t vc_runtime_source_columns(const char *text, size_t length)\n{\n", file);
+    fputs("    size_t column = 0u;\n", file);
+    fputs("    for (size_t i = 0u; i < length;) { size_t bytes = 1u; column += vc_runtime_source_display_width((const unsigned char *)text + i, length - i, column, &bytes); i += bytes; }\n", file);
+    fputs("    return column;\n}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED bool vc_runtime_source_path_is_absolute(const char *path)\n{\n", file);
+    fputs("    if (path == NULL || path[0] == '\\0') return false;\n", file);
+    fputs("#ifdef _WIN32\n", file);
+    fputs("    bool drive = ((path[0] >= 'A' && path[0] <= 'Z') || (path[0] >= 'a' && path[0] <= 'z')) && path[1] == ':';\n", file);
+    fputs("    bool unc = (path[0] == '\\\\' && path[1] == '\\\\');\n", file);
+    fputs("    return drive || unc || path[0] == '/' || path[0] == '\\\\';\n", file);
+    fputs("#else\n", file);
+    fputs("    return path[0] == '/';\n", file);
+    fputs("#endif\n", file);
+    fputs("}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED bool vc_fault_site_read_line(const char *path, size_t target_line, char **text, size_t *length)\n{\n", file);
+    fputs("    *text = NULL; *length = 0u; if (!vc_runtime_source_text_enabled || path == NULL || target_line == 0u) return false;\n", file);
+    fputs("    FILE *source = NULL; char *resolved = NULL;\n", file);
+    fputs("    if (vc_runtime_source_path_is_absolute(path)) source = fopen(path, \"rb\");\n", file);
+    fputs("    else if (vc_runtime_source_root != NULL && vc_runtime_source_root[0] != '\\0')\n    {\n", file);
+    fputs("        size_t root_length = strlen(vc_runtime_source_root), path_length = strlen(path); bool separator = root_length != 0u && vc_runtime_source_root[root_length - 1u] != '/' && vc_runtime_source_root[root_length - 1u] != '\\\\';\n", file);
+    fputs("        size_t total = root_length + (separator ? 1u : 0u) + path_length + 1u; resolved = (char *)malloc(total);\n", file);
+    fputs("        if (resolved != NULL) { memcpy(resolved, vc_runtime_source_root, root_length); size_t offset = root_length; if (separator) resolved[offset++] = '/'; memcpy(resolved + offset, path, path_length + 1u); source = fopen(resolved, \"rb\"); }\n", file);
+    fputs("    }\n", file);
+    fputs("    free(resolved); if (source == NULL) return false;\n", file);
+    fputs("    size_t line = 1u, used = 0u, capacity = 0u; char *buffer = NULL; int ch = 0;\n", file);
+    fputs("    while ((ch = fgetc(source)) != EOF)\n    {\n", file);
+    fputs("        if (line < target_line) { if (ch == '\\n') line++; continue; }\n", file);
+    fputs("        if (line != target_line || ch == '\\n') break;\n", file);
+    fputs("        if (used == capacity) { size_t next = capacity == 0u ? 256u : capacity * 2u; char *grown = (char *)realloc(buffer, next); if (grown == NULL) { free(buffer); fclose(source); return false; } buffer = grown; capacity = next; }\n", file);
+    fputs("        buffer[used++] = (char)ch;\n", file);
+    fputs("    }\n", file);
+    fputs("    fclose(source);\n", file);
+    fputs("    if (line != target_line) { free(buffer); return false; }\n", file);
+    fputs("    if (used != 0u && buffer[used - 1u] == '\\r') used--;\n", file);
+    fputs("    if (buffer == NULL) { buffer = (char *)malloc(1u); if (buffer == NULL) return false; capacity = 1u; }\n", file);
+    fputs("    if (used == capacity) { char *grown = (char *)realloc(buffer, capacity + 1u); if (grown == NULL) { free(buffer); return false; } buffer = grown; }\n", file);
+    fputs("    buffer[used] = '\\0'; *text = buffer; *length = used; return true;\n}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED void vc_fault_site_source_excerpt(VcFaultSite site)\n{\n", file);
+    fputs("    char *line = NULL; size_t length = 0u; if (!vc_fault_site_read_line(site.file, site.line, &line, &length)) return;\n", file);
+    fputs("    size_t first = site.column > 0u ? site.column - 1u : 0u; if (first > length) first = length;\n", file);
+    fputs("    size_t last = site.end_line == site.line && site.end_column > 0u ? site.end_column - 1u : length; if (last > length) last = length; if (last < first) last = first;\n", file);
+    fputs("    fprintf(stderr, \"\\n%6zu | \", site.line);\n", file);
+    fputs("    size_t column = 0u;\n", file);
+    fputs("    for (size_t i = 0u; i < length;) { size_t bytes = 1u; size_t width = vc_runtime_source_display_width((const unsigned char *)line + i, length - i, column, &bytes); unsigned char c = (unsigned char)line[i]; if (c == '\\t') for (size_t j = 0u; j < width; j++) fputc(' ', stderr); else if (c < 32u || c == 127u) fputc('?', stderr); else fwrite(line + i, 1u, bytes, stderr); i += bytes; column += width; }\n", file);
+    fputs("    fputs(\"\\n       | \", stderr);\n", file);
+    fputs("    size_t before = vc_runtime_source_columns(line, first); size_t after = vc_runtime_source_columns(line, last); if (after <= before) after = before + 1u;\n", file);
+    fputs("    for (size_t i = 0u; i < before; i++) fputc(' ', stderr);\n", file);
+    fputs("    fputc('^', stderr);\n", file);
+    fputs("    for (size_t i = before + 1u; i < after; i++) fputc('~', stderr);\n", file);
+    fputs("    fputc('\\n', stderr);\n", file);
+    fputs("    free(line);\n}\n\n", file);
     fputs("static VC_MAYBE_UNUSED void vc_fault_site_report(VcFaultSite site)\n{\n", file);
     fputs("    if (site.file == NULL || site.line == 0u) return;\n", file);
     fputs("    fprintf(stderr, \"\\n   at %s%s%s:%zu:%zu\\n\", site.method != NULL ? site.method : \"\", site.method != NULL && site.method[0] != 0 ? \" in \" : \"\", site.file, site.line, site.column);\n", file);
+    fputs("    vc_fault_site_source_excerpt(site);\n", file);
     fputs("}\n\n", file);
     fputs("typedef struct VcExceptionHandler\n{\n", file);
     fputs("    jmp_buf jump;\n", file);
@@ -18711,12 +19429,23 @@ static bool write_generated_c(
     fputs("    volatile VcFaultSite fault_site;\n", file);
     fputs("    struct VcExceptionHandler *previous;\n", file);
     fputs("    VcGcRoot *gc_roots;\n", file);
+    fputs("    VcCallFrame *call_frame;\n", file);
+    fputs("    size_t captured_baseline;\n", file);
+    fputs("    volatile size_t captured_start;\n", file);
+    fputs("    volatile size_t captured_count;\n", file);
     fputs("} VcExceptionHandler;\n\n", file);
     fputs("typedef struct VcRuntimeThreadContext\n{\n", file);
     fputs("    VcGcRoot *gc_roots;\n", file);
+    fputs("    VcCallFrame *call_frame;\n", file);
     fputs("    VcExceptionHandler *exception_handler_current;\n", file);
     fputs("    void *exception_in_flight;\n", file);
+    fputs("    VcCapturedCallFrame *captured_call_frames;\n", file);
+    fputs("    size_t captured_call_frame_count;\n", file);
+    fputs("    size_t captured_call_frame_capacity;\n", file);
     fputs("    void *native_pending_exception;\n", file);
+    fputs("    VcFaultSite native_pending_fault_site;\n", file);
+    fputs("    size_t native_pending_captured_start;\n", file);
+    fputs("    size_t native_pending_captured_count;\n", file);
     fputs("    VcGcRoot native_pending_root;\n", file);
     fputs("    bool native_pending_root_active;\n", file);
     fputs("    size_t native_call_depth;\n", file);
@@ -18754,9 +19483,9 @@ static bool write_generated_c(
     fputs("}\n\n", file);
     fputs("static VC_MAYBE_UNUSED bool vc_runtime_thread_detach(VcRuntimeThreadContext *context)\n{\n", file);
     fputs("    if (context == NULL || vc_runtime_thread_current() != context) return false;\n", file);
-    fputs("    if (context->gc_roots != NULL || context->exception_handler_current != NULL ||\n", file);
-    fputs("        context->exception_in_flight != NULL || context->native_pending_exception != NULL ||\n", file);
-    fputs("        context->native_pending_root_active ||\n", file);
+    fputs("    if (context->gc_roots != NULL || context->call_frame != NULL || context->exception_handler_current != NULL ||\n", file);
+    fputs("        context->exception_in_flight != NULL || context->captured_call_frame_count != 0u ||\n", file);
+    fputs("        context->native_pending_exception != NULL || context->native_pending_root_active ||\n", file);
     fputs("        context->native_call_depth != 0u || context->active_type_initializer != 0u) return false;\n", file);
     fputs("    vc_native_thread_runtime_gc_lock();\n", file);
     fputs("    while (vc_gc_stop_requested && vc_gc_collector_context != context)\n    {\n", file);
@@ -18782,6 +19511,8 @@ static bool write_generated_c(
     fputs("    vc_native_thread_runtime_registry_unlock();\n", file);
     fputs("    vc_native_thread_runtime_gc_broadcast();\n", file);
     fputs("    vc_native_thread_runtime_gc_unlock();\n", file);
+    fputs("    free(context->captured_call_frames);\n", file);
+    fputs("    context->captured_call_frames = NULL; context->captured_call_frame_capacity = 0u;\n", file);
     fputs("    return true;\n", file);
     fputs("}\n\n", file);
     fputs("static VC_MAYBE_UNUSED VcRuntimeThreadContext *vc_runtime_thread_require(void)\n{\n", file);
@@ -18794,13 +19525,113 @@ static bool write_generated_c(
     fputs("    return context;\n", file);
     fputs("}\n\n", file);
     fputs("#define vc_gc_roots (vc_runtime_thread_require()->gc_roots)\n", file);
+    fputs("#define vc_call_frame_current (vc_runtime_thread_require()->call_frame)\n", file);
     fputs("#define vc_exception_handler_current (vc_runtime_thread_require()->exception_handler_current)\n", file);
     fputs("#define vc_exception_in_flight (vc_runtime_thread_require()->exception_in_flight)\n", file);
+    fputs("#define vc_exception_trace_count (vc_runtime_thread_require()->captured_call_frame_count)\n", file);
     fputs("#define vc_native_pending_exception (vc_runtime_thread_require()->native_pending_exception)\n", file);
+    fputs("#define vc_native_pending_fault_site (vc_runtime_thread_require()->native_pending_fault_site)\n", file);
+    fputs("#define vc_native_pending_captured_start (vc_runtime_thread_require()->native_pending_captured_start)\n", file);
+    fputs("#define vc_native_pending_captured_count (vc_runtime_thread_require()->native_pending_captured_count)\n", file);
     fputs("#define vc_native_pending_root (vc_runtime_thread_require()->native_pending_root)\n", file);
     fputs("#define vc_native_pending_root_active (vc_runtime_thread_require()->native_pending_root_active)\n", file);
     fputs("#define vc_native_call_depth (vc_runtime_thread_require()->native_call_depth)\n", file);
     fputs("#define vc_ti_active (vc_runtime_thread_require()->active_type_initializer)\n\n", file);
+    fputs("static VC_MAYBE_UNUSED void vc_call_frame_enter(VcCallFrame *frame, const char *method, const char *file, size_t line, size_t column)\n{\n", file);
+    fputs("    frame->method = method; frame->file = file; frame->line = line; frame->column = column; frame->previous = vc_call_frame_current; vc_call_frame_current = frame;\n", file);
+    fputs("}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED void vc_call_frame_leave(VcCallFrame *frame)\n{\n", file);
+    fputs("    if (vc_call_frame_current != frame) abort();\n", file);
+    fputs("    vc_call_frame_current = frame->previous;\n", file);
+    fputs("}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED bool vc_exception_trace_reserve(VcRuntimeThreadContext *context, size_t required)\n{\n", file);
+    fputs("    if (context == NULL) return false;\n", file);
+    fputs("    if (required <= context->captured_call_frame_capacity) return true;\n", file);
+    fputs("    size_t capacity = context->captured_call_frame_capacity == 0u ? 16u : context->captured_call_frame_capacity;\n", file);
+    fputs("    while (capacity < required) { if (capacity > SIZE_MAX / 2u) { capacity = required; break; } capacity *= 2u; }\n", file);
+    fputs("    if (capacity > SIZE_MAX / sizeof(VcCapturedCallFrame)) return false;\n", file);
+    fputs("    VcCapturedCallFrame *grown = (VcCapturedCallFrame *)realloc(context->captured_call_frames, capacity * sizeof(*grown));\n", file);
+    fputs("    if (grown == NULL) return false;\n", file);
+    fputs("    context->captured_call_frames = grown;\n", file);
+    fputs("    context->captured_call_frame_capacity = capacity;\n", file);
+    fputs("    return true;\n", file);
+    fputs("}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED bool vc_exception_trace_capture(size_t *start, size_t *count)\n{\n", file);
+    fputs("    if (start == NULL || count == NULL) return false;\n", file);
+    fputs("    *start = 0u;\n", file);
+    fputs("    *count = 0u;\n", file);
+    fputs("    VcRuntimeThreadContext *context = vc_runtime_thread_require();\n", file);
+    fputs("    size_t frame_count = 0u;\n", file);
+    fputs("    for (VcCallFrame *frame = vc_call_frame_current; frame != NULL; frame = frame->previous) { if (frame_count == SIZE_MAX) return false; frame_count++; }\n", file);
+    fputs("    if (frame_count == 0u) { *start = context->captured_call_frame_count; return true; }\n", file);
+    fputs("    if (context->captured_call_frame_count > SIZE_MAX - frame_count) return false;\n", file);
+    fputs("    size_t required = context->captured_call_frame_count + frame_count;\n", file);
+    fputs("    if (!vc_exception_trace_reserve(context, required)) return false;\n", file);
+    fputs("    size_t index = context->captured_call_frame_count;\n", file);
+    fputs("    *start = index;\n", file);
+    fputs("    *count = frame_count;\n", file);
+    fputs("    for (VcCallFrame *frame = vc_call_frame_current; frame != NULL; frame = frame->previous) { VcCapturedCallFrame *captured = &context->captured_call_frames[index++]; captured->method = frame->method; captured->file = frame->file; captured->line = frame->line; captured->column = frame->column; }\n", file);
+    fputs("    context->captured_call_frame_count = required;\n", file);
+    fputs("    return true;\n", file);
+    fputs("}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED bool vc_exception_trace_copy(size_t start, size_t count, VcCapturedCallFrame **frames)\n{\n", file);
+    fputs("    if (frames == NULL) return false;\n", file);
+    fputs("    *frames = NULL;\n", file);
+    fputs("    if (count == 0u) return true;\n", file);
+    fputs("    VcRuntimeThreadContext *context = vc_runtime_thread_require();\n", file);
+    fputs("    if (start > context->captured_call_frame_count || count > context->captured_call_frame_count - start || count > SIZE_MAX / sizeof(VcCapturedCallFrame)) return false;\n", file);
+    fputs("    VcCapturedCallFrame *copy = (VcCapturedCallFrame *)malloc(count * sizeof(*copy));\n", file);
+    fputs("    if (copy == NULL) return false;\n", file);
+    fputs("    memcpy(copy, context->captured_call_frames + start, count * sizeof(*copy));\n", file);
+    fputs("    *frames = copy;\n", file);
+    fputs("    return true;\n", file);
+    fputs("}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED bool vc_exception_trace_import(const VcCapturedCallFrame *frames, size_t count, size_t *start)\n{\n", file);
+    fputs("    if (start == NULL) return false;\n", file);
+    fputs("    VcRuntimeThreadContext *context = vc_runtime_thread_require();\n", file);
+    fputs("    *start = context->captured_call_frame_count;\n", file);
+    fputs("    if (count == 0u) return true;\n", file);
+    fputs("    if (frames == NULL || context->captured_call_frame_count > SIZE_MAX - count) return false;\n", file);
+    fputs("    size_t required = context->captured_call_frame_count + count;\n", file);
+    fputs("    if (!vc_exception_trace_reserve(context, required)) return false;\n", file);
+    fputs("    memcpy(context->captured_call_frames + context->captured_call_frame_count, frames, count * sizeof(*frames));\n", file);
+    fputs("    context->captured_call_frame_count = required;\n", file);
+    fputs("    return true;\n", file);
+    fputs("}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED void vc_exception_trace_rewind(size_t mark)\n{\n", file);
+    fputs("    VcRuntimeThreadContext *context = vc_runtime_thread_require();\n", file);
+    fputs("    if (mark > context->captured_call_frame_count) abort();\n", file);
+    fputs("    context->captured_call_frame_count = mark;\n", file);
+    fputs("}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED void vc_runtime_frame_report(const char *method, const char *path, size_t line, size_t column)\n{\n", file);
+    fputs("    if (method == NULL || method[0] == 0) method = \"<anonymous>\";\n", file);
+    fputs("    if (path != NULL && line != 0u) fprintf(stderr, \"   at %s in %s:%zu:%zu\\n\", method, path, line, column); else fprintf(stderr, \"   at %s\\n\", method);\n", file);
+    fputs("}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED void vc_exception_trace_report(size_t start, size_t count, VcFaultSite site)\n{\n", file);
+    fputs("    VcRuntimeThreadContext *context = vc_runtime_thread_require();\n", file);
+    fputs("    if (count == 0u || start > context->captured_call_frame_count || count > context->captured_call_frame_count - start) return;\n", file);
+    fputs("    fputs(\"\\nStack trace:\\n\", stderr);\n", file);
+    fputs("    for (size_t i = 0u; i < count; i++)\n    {\n", file);
+    fputs("        VcCapturedCallFrame *frame = &context->captured_call_frames[start + i];\n", file);
+    fputs("        const char *path = frame->file; size_t line = frame->line, column = frame->column;\n", file);
+    fputs("        if (i == 0u && site.file != NULL && site.line != 0u) { path = site.file; line = site.line; column = site.column; }\n", file);
+    fputs("        vc_runtime_frame_report(frame->method, path, line, column);\n", file);
+    fputs("    }\n", file);
+    fputs("}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED void vc_call_stack_report(VcFaultSite site)\n{\n", file);
+    fputs("    VcCallFrame *frame = vc_call_frame_current; if (frame == NULL) return;\n", file);
+    fputs("    fputs(\"\\nStack trace:\\n\", stderr);\n", file);
+    fputs("    bool first = true;\n", file);
+    fputs("    for (; frame != NULL; frame = frame->previous)\n    {\n", file);
+    fputs("        const char *path = frame->file; size_t line = frame->line, column = frame->column;\n", file);
+    fputs("        if (first && site.file != NULL && site.line != 0u) { path = site.file; line = site.line; column = site.column; }\n", file);
+    fputs("        vc_runtime_frame_report(frame->method, path, line, column);\n", file);
+    fputs("        first = false;\n    }\n", file);
+    fputs("}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED void vc_runtime_diagnostic_context_report(VcFaultSite site, size_t captured_start, size_t captured_count)\n{\n", file);
+    fputs("    vc_fault_site_report(site);\n", file);
+    fputs("    if (captured_count != 0u) vc_exception_trace_report(captured_start, captured_count, site); else vc_call_stack_report(site);\n", file);
+    fputs("}\n\n", file);
     fputs("static VC_MAYBE_UNUSED void vc_exception_in_flight_clear(void *exception)\n{\n", file);
     fputs("    VcRuntimeThreadContext *context = vc_runtime_thread_require();\n", file);
     fputs("    if (context->exception_in_flight == exception) context->exception_in_flight = NULL;\n", file);
@@ -19467,9 +20298,11 @@ static bool write_generated_c(
     fputs("    VcRuntimeThreadContext *vc_context = vc_runtime_thread_current();\n", file);
     fputs("    if (vc_context != NULL)\n    {\n", file);
     fputs("        vc_context->gc_roots = NULL;\n", file);
+    fputs("        vc_context->call_frame = NULL;\n", file);
     fputs("        vc_context->exception_handler_current = NULL;\n", file);
     fputs("        vc_context->exception_in_flight = NULL;\n", file);
-    fputs("        vc_context->native_pending_exception = NULL;\n", file);
+    fputs("        free(vc_context->captured_call_frames); vc_context->captured_call_frames = NULL; vc_context->captured_call_frame_count = 0u; vc_context->captured_call_frame_capacity = 0u;\n", file);
+    fputs("        vc_context->native_pending_exception = NULL; vc_context->native_pending_fault_site = (VcFaultSite){0}; vc_context->native_pending_captured_start = 0u; vc_context->native_pending_captured_count = 0u;\n", file);
     fputs("        memset(&vc_context->native_pending_root, 0, sizeof(vc_context->native_pending_root));\n", file);
     fputs("        vc_context->native_pending_root_active = false;\n", file);
     fputs("        vc_context->native_call_depth = 0u;\n", file);
@@ -19478,6 +20311,20 @@ static bool write_generated_c(
     fputs("}\n\n", file);
     fputs("static void vc_runtime_fail(const char *message)\n{\n", file);
     fputs("    fprintf(stderr, \"VOID runtime error: %s\\n\", message);\n", file);
+    fputs("    vc_runtime_cleanup();\n", file);
+    fputs("    exit(1);\n", file);
+    fputs("}\n\n", file);
+    fputs("static _Noreturn VC_MAYBE_UNUSED void vc_runtime_fail_at(VcFaultSite site, const char *message)\n{\n", file);
+    fputs("    fprintf(stderr, \"VOID runtime error: %s\\n\", message);\n", file);
+    fputs("    vc_runtime_diagnostic_context_report(site, 0u, 0u);\n", file);
+    fputs("    vc_runtime_cleanup();\n", file);
+    fputs("    exit(1);\n", file);
+    fputs("}\n\n", file);
+    fputs("static _Noreturn VC_MAYBE_UNUSED void vc_runtime_fail_bounds_at(VcFaultSite site, int32_t index, int32_t length)\n{\n", file);
+    fputs("    fputs(\"VOID runtime error: array index out of range\\n\", stderr);\n", file);
+    fputs("    vc_fault_site_report(site);\n", file);
+    fputs("    fprintf(stderr, \"\\nhelp: index %d is outside the valid range for an array dimension of length %d.\\n\", index, length);\n", file);
+    fputs("    vc_call_stack_report(site);\n", file);
     fputs("    vc_runtime_cleanup();\n", file);
     fputs("    exit(1);\n", file);
     fputs("}\n\n", file);
@@ -19553,12 +20400,14 @@ static bool write_generated_c(
     fputs("    if (isinf(parsed) || (conversion_errno == ERANGE && fabsl(parsed) >= LDBL_MAX)) return 2;\n", file);
     fputs("    *result = parsed; return 0;\n", file);
     fputs("}\n\n", file);
-    fputs("static VC_MAYBE_UNUSED void vc_runtime_fail_string(const VcString *message)\n{\n", file);
+    fputs("static _Noreturn VC_MAYBE_UNUSED void vc_runtime_fail_string_at(VcFaultSite site, const VcString *message)\n{\n", file);
     fputs("    fputs(\"VOID runtime error: \", stderr);\n", file);
     fputs("    vc_string_write_line(stderr, message);\n", file);
+    fputs("    vc_runtime_diagnostic_context_report(site, 0u, 0u);\n", file);
     fputs("    vc_runtime_cleanup();\n", file);
     fputs("    exit(1);\n", file);
     fputs("}\n\n", file);
+    fputs("static _Noreturn VC_MAYBE_UNUSED void vc_runtime_fail_string(const VcString *message) { vc_runtime_fail_string_at((VcFaultSite){0}, message); }\n\n", file);
     fputs("static void *vc_runtime_alloc(size_t size, VcGcTraceFn trace)\n{\n", file);
     fputs("    const size_t actual_size = size == 0u ? 1u : size;\n", file);
     fputs("    void *memory = calloc(1u, actual_size);\n", file);
@@ -20553,10 +21402,7 @@ static bool write_generated_c(
     fputs("    return object;\n", file);
     fputs("}\n\n", file);
     fputs("static VC_MAYBE_UNUSED void *vc_object_require_at(VcFaultSite site, void *object)\n{\n", file);
-    fputs("    if (object == NULL)\n    {\n", file);
-    fputs("        fputs(\"VOID runtime error: object reference is null\\n\", stderr);\n", file);
-    fputs("        vc_fault_site_report(site);\n", file);
-    fputs("        vc_runtime_cleanup();\n        exit(1);\n    }\n", file);
+    fputs("    if (object == NULL) vc_runtime_fail_at(site, \"object reference is null\");\n", file);
     fputs("    return object;\n}\n\n", file);
     fputs("static VcNativeMonitor *vc_monitor_resolve(void *object, bool create)\n{\n", file);
     fputs("    if (object == NULL) vc_runtime_fail(\"monitor object cannot be null\");\n", file);
@@ -20699,21 +21545,23 @@ static bool write_generated_c(
     fputs("    if (dimension < 0 || dimension >= array->rank) vc_runtime_fail(\"array dimension out of range\");\n", file);
     fputs("    return array->lengths[dimension];\n", file);
     fputs("}\n\n", file);
-    fputs("static VC_MAYBE_UNUSED void *vc_array_at(VcArray *array, int32_t index)\n{\n", file);
-    fputs("    if (array == NULL) vc_runtime_fail(\"array reference is null\");\n", file);
-    fputs("    if (index < 0 || index >= array->length) vc_runtime_fail(\"array index out of range\");\n", file);
+    fputs("static VC_MAYBE_UNUSED void *vc_array_at_at(VcFaultSite site, VcArray *array, int32_t index)\n{\n", file);
+    fputs("    if (array == NULL) vc_runtime_fail_at(site, \"array reference is null\");\n", file);
+    fputs("    if (index < 0 || index >= array->length) vc_runtime_fail_bounds_at(site, index, array->length);\n", file);
     fputs("    return (unsigned char *)array->data + ((size_t)index * array->element_size);\n", file);
     fputs("}\n\n", file);
-    fputs("static VC_MAYBE_UNUSED void *vc_array_at_md(VcArray *array, int32_t rank, const int32_t *indices)\n{\n", file);
-    fputs("    if (array == NULL) vc_runtime_fail(\"array reference is null\");\n", file);
-    fputs("    if (rank != array->rank || indices == NULL) vc_runtime_fail(\"array rank mismatch\");\n", file);
+    fputs("static VC_MAYBE_UNUSED void *vc_array_at(VcArray *array, int32_t index) { return vc_array_at_at((VcFaultSite){0}, array, index); }\n\n", file);
+    fputs("static VC_MAYBE_UNUSED void *vc_array_at_md_at(VcFaultSite site, VcArray *array, int32_t rank, const int32_t *indices)\n{\n", file);
+    fputs("    if (array == NULL) vc_runtime_fail_at(site, \"array reference is null\");\n", file);
+    fputs("    if (rank != array->rank || indices == NULL) vc_runtime_fail_at(site, \"array rank mismatch\");\n", file);
     fputs("    size_t offset = 0u;\n", file);
     fputs("    for (int32_t i = 0; i < rank; i++)\n    {\n", file);
-    fputs("        if (indices[i] < 0 || indices[i] >= array->lengths[i]) vc_runtime_fail(\"array index out of range\");\n", file);
+    fputs("        if (indices[i] < 0 || indices[i] >= array->lengths[i]) vc_runtime_fail_bounds_at(site, indices[i], array->lengths[i]);\n", file);
     fputs("        offset = offset * (size_t)array->lengths[i] + (size_t)indices[i];\n", file);
     fputs("    }\n", file);
     fputs("    return (unsigned char *)array->data + (offset * array->element_size);\n", file);
     fputs("}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED void *vc_array_at_md(VcArray *array, int32_t rank, const int32_t *indices) { return vc_array_at_md_at((VcFaultSite){0}, array, rank, indices); }\n\n", file);
     fputs("static VC_MAYBE_UNUSED int32_t vc_utf8_string_copy_to_array(const VcString *value, VcArray *destination, int32_t destination_index)\n{\n", file);
     fputs("    if (value == NULL) vc_runtime_fail(\"UTF-8 string source is null\");\n", file);
     fputs("    if (destination == NULL) vc_runtime_fail(\"UTF-8 destination array is null\");\n", file);
@@ -21661,9 +22509,11 @@ static bool write_generated_c(
             fputs("    vc_boundary.exception = NULL;\n", file);
             fputs("    vc_boundary.previous = vc_exception_handler_current;\n", file);
             fputs("    vc_boundary.gc_roots = vc_gc_roots;\n", file);
+            fputs("    vc_boundary.call_frame = vc_call_frame_current;\n", file);
+    fputs("    vc_boundary.captured_baseline = vc_exception_trace_count; vc_boundary.captured_start = 0u; vc_boundary.captured_count = 0u;\n", file);
             fputs("    vc_exception_handler_current = &vc_boundary;\n", file);
             fputs("    if (setjmp(vc_boundary.jump) != 0)\n", file);
-            fputs("        vc_native_boundary_abort((void *)vc_boundary.exception, \"native library boundary\", vc_boundary.fault_site);\n", file);
+            fputs("        vc_native_boundary_abort((void *)vc_boundary.exception, \"native library boundary\", vc_boundary.fault_site, vc_boundary.captured_start, vc_boundary.captured_count);\n", file);
             if (method->has_owner_struct && method->owner_struct_index < semantic->struct_count &&
                 semantic->structs[method->owner_struct_index].static_initializer_reachable)
                 fprintf(file, "    vc_type_init_%zu();\n", method->owner_struct_index);
@@ -22729,6 +23579,16 @@ static bool query_fill_symbol(
             case VC_AST_FOREACH_STATEMENT:
                 symbol->kind = VC_QUERY_SYMBOL_LOCAL;
                 break;
+            case VC_AST_UNARY_EXPRESSION:
+                if (declaration->as.unary_expression.operator_kind != VC_TOKEN_KW_OUT ||
+                    (declaration->as.unary_expression.inline_out_type == NULL &&
+                     !declaration->as.unary_expression.inline_out_inferred) ||
+                    declaration->as.unary_expression.operand == NULL)
+                    return false;
+                symbol->kind = VC_QUERY_SYMBOL_LOCAL;
+                query_symbol_definition(symbol, &unit->source,
+                    declaration->as.unary_expression.operand);
+                return true;
             default:
                 return false;
         }
@@ -23124,6 +23984,24 @@ static size_t query_append_completion(
     return count + 1;
 }
 
+static size_t query_append_local_completion(
+    VcQueryCompletion *items, size_t capacity, size_t count,
+    const char *name, const char *type_name)
+{
+    /* A deeper visible local shadows the earlier enclosing local/parameter. */
+    for (size_t i = 0; i < count && i < capacity; i++)
+        if ((items[i].kind == VC_QUERY_SYMBOL_LOCAL || items[i].kind == VC_QUERY_SYMBOL_PARAMETER) &&
+            items[i].name != NULL && strcmp(items[i].name, name) == 0)
+        {
+            items[i].kind = VC_QUERY_SYMBOL_LOCAL;
+            items[i].name = name;
+            snprintf(items[i].type_name, sizeof(items[i].type_name), "%s", type_name);
+            return count;
+        }
+    return query_append_completion(items, capacity, count,
+        VC_QUERY_SYMBOL_LOCAL, name, type_name, false, 0);
+}
+
 static size_t query_append_completion_members(
     const VcSemanticModel *model,
     size_t struct_index,
@@ -23304,6 +24182,203 @@ static size_t query_append_parameters(
     return count;
 }
 
+static size_t query_append_inline_out_expression_locals(
+    const VcSemanticModel *model,
+    const VcAstNode *expression,
+    size_t offset,
+    VcQueryCompletion *items,
+    size_t capacity,
+    size_t count)
+{
+    if (expression == NULL || expression->location.offset >= offset)
+        return count;
+
+    if (expression->kind == VC_AST_UNARY_EXPRESSION &&
+        expression->as.unary_expression.operator_kind == VC_TOKEN_KW_OUT &&
+        (expression->as.unary_expression.inline_out_type != NULL ||
+         expression->as.unary_expression.inline_out_inferred) &&
+        expression->as.unary_expression.operand != NULL &&
+        expression->as.unary_expression.operand->kind == VC_AST_IDENTIFIER_EXPRESSION)
+    {
+        const VcAstNode *operand = expression->as.unary_expression.operand;
+        const VcSemanticBinding *binding = vc_semantic_binding(model, operand);
+        char type_display[96];
+        const char *type_name = binding != NULL
+            ? vc_semantic_type_display_name(model, binding->type,
+                type_display, sizeof(type_display))
+            : expression->as.unary_expression.inline_out_type != NULL
+                ? expression->as.unary_expression.inline_out_type->name
+                : "<unknown>";
+        count = query_append_local_completion(items, capacity, count,
+            operand->as.identifier_expression.name,
+            type_name != NULL ? type_name : "<unknown>");
+    }
+
+    switch (expression->kind)
+    {
+        case VC_AST_UNARY_EXPRESSION:
+            return query_append_inline_out_expression_locals(model,
+                expression->as.unary_expression.operand, offset, items, capacity, count);
+        case VC_AST_CALL_EXPRESSION:
+            count = query_append_inline_out_expression_locals(model,
+                expression->as.call_expression.callee, offset, items, capacity, count);
+            for (size_t i = 0; i < expression->as.call_expression.arguments.count; i++)
+                count = query_append_inline_out_expression_locals(model,
+                    expression->as.call_expression.arguments.items[i], offset,
+                    items, capacity, count);
+            return count;
+        case VC_AST_NEW_EXPRESSION:
+            if (expression->as.new_expression.array_lengths.count == 0)
+                count = query_append_inline_out_expression_locals(model,
+                    expression->as.new_expression.array_length, offset, items, capacity, count);
+            for (size_t i = 0; i < expression->as.new_expression.array_lengths.count; i++)
+                count = query_append_inline_out_expression_locals(model,
+                    expression->as.new_expression.array_lengths.items[i], offset, items, capacity, count);
+            for (size_t i = 0; i < expression->as.new_expression.initializers.count; i++)
+                count = query_append_inline_out_expression_locals(model,
+                    expression->as.new_expression.initializers.items[i], offset, items, capacity, count);
+            for (size_t i = 0; i < expression->as.new_expression.arguments.count; i++)
+                count = query_append_inline_out_expression_locals(model,
+                    expression->as.new_expression.arguments.items[i], offset,
+                    items, capacity, count);
+            return count;
+        case VC_AST_OBJECT_INITIALIZER_MEMBER:
+            return query_append_inline_out_expression_locals(model,
+                expression->as.object_initializer_member.value, offset, items, capacity, count);
+        case VC_AST_COLLECTION_INITIALIZER_ELEMENT:
+            for (size_t i = 0; i < expression->as.collection_initializer_element.arguments.count; i++)
+                count = query_append_inline_out_expression_locals(model,
+                    expression->as.collection_initializer_element.arguments.items[i], offset, items, capacity, count);
+            return count;
+        case VC_AST_INDEX_EXPRESSION:
+            count = query_append_inline_out_expression_locals(model,
+                expression->as.index_expression.target, offset, items, capacity, count);
+            for (size_t i = 0; i < expression->as.index_expression.indices.count; i++)
+                count = query_append_inline_out_expression_locals(model,
+                    expression->as.index_expression.indices.items[i], offset, items, capacity, count);
+            return query_append_inline_out_expression_locals(model,
+                expression->as.index_expression.index, offset, items, capacity, count);
+        case VC_AST_CAST_EXPRESSION:
+            return query_append_inline_out_expression_locals(model,
+                expression->as.cast_expression.expression, offset, items, capacity, count);
+        case VC_AST_AWAIT_EXPRESSION:
+            return query_append_inline_out_expression_locals(model,
+                expression->as.await_expression.operand, offset, items, capacity, count);
+        case VC_AST_STACKALLOC_EXPRESSION:
+            return query_append_inline_out_expression_locals(model,
+                expression->as.stackalloc_expression.count, offset, items, capacity, count);
+        case VC_AST_TYPE_RELATION_EXPRESSION:
+            return query_append_inline_out_expression_locals(model,
+                expression->as.type_relation_expression.expression, offset, items, capacity, count);
+        case VC_AST_SWITCH_EXPRESSION:
+            count = query_append_inline_out_expression_locals(model,
+                expression->as.switch_expression.expression, offset, items, capacity, count);
+            for (size_t i = 0; i < expression->as.switch_expression.arms.count; i++)
+            {
+                const VcAstNode *arm = expression->as.switch_expression.arms.items[i];
+                const VcAstNode *result = arm->as.switch_expression_arm.result;
+                if (result != NULL && offset >= arm->location.offset && offset <= result->span.end.offset)
+                {
+                    count = query_append_inline_out_expression_locals(model,
+                        arm->as.switch_expression_arm.guard, offset, items, capacity, count);
+                    count = query_append_inline_out_expression_locals(model,
+                        result, offset, items, capacity, count);
+                }
+            }
+            return count;
+        case VC_AST_BINARY_EXPRESSION:
+            count = query_append_inline_out_expression_locals(model,
+                expression->as.binary_expression.left, offset, items, capacity, count);
+            return query_append_inline_out_expression_locals(model,
+                expression->as.binary_expression.right, offset, items, capacity, count);
+        case VC_AST_CONDITIONAL_EXPRESSION:
+            count = query_append_inline_out_expression_locals(model,
+                expression->as.conditional_expression.condition, offset, items, capacity, count);
+            count = query_append_inline_out_expression_locals(model,
+                expression->as.conditional_expression.when_true, offset, items, capacity, count);
+            return query_append_inline_out_expression_locals(model,
+                expression->as.conditional_expression.when_false, offset, items, capacity, count);
+        case VC_AST_MEMBER_ACCESS_EXPRESSION:
+            return query_append_inline_out_expression_locals(model,
+                expression->as.member_access_expression.target, offset, items, capacity, count);
+        case VC_AST_PARENTHESIZED_EXPRESSION:
+            return query_append_inline_out_expression_locals(model,
+                expression->as.parenthesized_expression.expression, offset, items, capacity, count);
+        default:
+            return count;
+    }
+}
+
+static size_t query_statement_scope_end(const VcAstNode *node)
+{
+    if (node == NULL)
+        return 0;
+    size_t end = node->span.end.offset > node->location.offset
+        ? node->span.end.offset : node->location.offset;
+    switch (node->kind)
+    {
+        case VC_AST_EXPRESSION_STATEMENT:
+            return query_statement_scope_end(node->as.expression_statement.expression);
+        case VC_AST_LOCAL_DECLARATION:
+        {
+            const size_t initializer_end = query_statement_scope_end(node->as.local_declaration.initializer);
+            return initializer_end > end ? initializer_end : end;
+        }
+        case VC_AST_RETURN_STATEMENT:
+            return query_statement_scope_end(node->as.return_statement.expression);
+        case VC_AST_THROW_STATEMENT:
+            return query_statement_scope_end(node->as.throw_statement.expression);
+        case VC_AST_FOREACH_STATEMENT:
+            return query_statement_scope_end(node->as.foreach_statement.body);
+        case VC_AST_USING_STATEMENT:
+            return query_statement_scope_end(node->as.using_statement.body);
+        case VC_AST_LOCK_STATEMENT:
+            return query_statement_scope_end(node->as.lock_statement.body);
+        case VC_AST_BLOCK_STATEMENT:
+            for (size_t i = 0; i < node->as.block_statement.statements.count; i++)
+            {
+                const size_t child_end = query_statement_scope_end(
+                    node->as.block_statement.statements.items[i]);
+                if (child_end > end)
+                    end = child_end;
+            }
+            break;
+        case VC_AST_IF_STATEMENT:
+        {
+            const size_t then_end = query_statement_scope_end(
+                node->as.if_statement.then_statement);
+            const size_t else_end = query_statement_scope_end(
+                node->as.if_statement.else_statement);
+            if (then_end > end) end = then_end;
+            if (else_end > end) end = else_end;
+            break;
+        }
+        case VC_AST_WHILE_STATEMENT:
+        case VC_AST_DO_WHILE_STATEMENT:
+        {
+            const size_t body_end = query_statement_scope_end(
+                node->as.while_statement.body);
+            if (body_end > end) end = body_end;
+            if (node->as.while_statement.condition != NULL &&
+                node->as.while_statement.condition->span.end.offset > end)
+                end = node->as.while_statement.condition->span.end.offset;
+            break;
+        }
+        case VC_AST_FOR_STATEMENT:
+        {
+            const size_t body_end = query_statement_scope_end(node->as.for_statement.body);
+            if (body_end > end) end = body_end;
+            if (node->as.for_statement.increment != NULL &&
+                node->as.for_statement.increment->span.end.offset > end)
+                end = node->as.for_statement.increment->span.end.offset;
+            break;
+        }
+        default:
+            break;
+    }
+    return end;
+}
+
 static size_t query_append_locals(
     const VcSemanticModel *model,
     const VcCompilationSource *unit,
@@ -23332,33 +24407,40 @@ static size_t query_append_locals(
 
         if (node->kind == VC_AST_LOCAL_DECLARATION)
         {
+            count = query_append_inline_out_expression_locals(model,
+                node->as.local_declaration.initializer, offset, items, capacity, count);
+            char type_display[96];
             const char *type_name = "var";
             for (size_t i = 0; i < model->binding_count; i++)
             {
                 const VcSemanticBinding *binding = &model->bindings[i];
                 if (binding->node == node || binding->declaration_node == node)
                 {
-                    type_name = vc_semantic_type_name(model, binding->type);
+                    type_name = vc_semantic_type_display_name(model, binding->type,
+                        type_display, sizeof(type_display));
                     break;
                 }
             }
             if (!node->as.local_declaration.is_var && node->as.local_declaration.type != NULL &&
                 strcmp(type_name, "var") == 0)
                 type_name = node->as.local_declaration.type->name;
-            count = query_append_completion(items, capacity, count,
-                VC_QUERY_SYMBOL_LOCAL, node->as.local_declaration.name,
-                type_name, false, 0);
+            count = query_append_local_completion(items, capacity, count,
+                node->as.local_declaration.name, type_name);
             continue;
         }
 
         if (node->kind == VC_AST_FOREACH_STATEMENT)
         {
+            if (node->as.foreach_statement.body == NULL ||
+                offset > query_statement_scope_end(node->as.foreach_statement.body))
+                continue;
+            count = query_append_inline_out_expression_locals(model,
+                node->as.foreach_statement.collection, offset, items, capacity, count);
             const char *type_name = node->as.foreach_statement.is_var ||
                 node->as.foreach_statement.type == NULL
                 ? "var" : node->as.foreach_statement.type->name;
-            count = query_append_completion(items, capacity, count,
-                VC_QUERY_SYMBOL_LOCAL, node->as.foreach_statement.name,
-                type_name, false, 0);
+            count = query_append_local_completion(items, capacity, count,
+                node->as.foreach_statement.name, type_name);
             if (node->as.foreach_statement.body != NULL && stack_count < 256)
                 stack[stack_count++] = node->as.foreach_statement.body;
             continue;
@@ -23366,28 +24448,64 @@ static size_t query_append_locals(
 
         switch (node->kind)
         {
+            case VC_AST_EXPRESSION_STATEMENT:
+                count = query_append_inline_out_expression_locals(model,
+                    node->as.expression_statement.expression, offset, items, capacity, count);
+                break;
             case VC_AST_BLOCK_STATEMENT:
+                if (node != body && offset > query_statement_scope_end(node))
+                    break;
                 for (size_t i = node->as.block_statement.statements.count; i > 0 && stack_count < 256; i--)
                     stack[stack_count++] = node->as.block_statement.statements.items[i - 1];
                 break;
             case VC_AST_IF_STATEMENT:
-                if (node->as.if_statement.else_statement != NULL && stack_count < 256)
+                count = query_append_inline_out_expression_locals(model,
+                    node->as.if_statement.condition, offset, items, capacity, count);
+                if (node->as.if_statement.else_statement != NULL && stack_count < 256 &&
+                    offset <= query_statement_scope_end(node->as.if_statement.else_statement))
                     stack[stack_count++] = node->as.if_statement.else_statement;
-                if (node->as.if_statement.then_statement != NULL && stack_count < 256)
+                if (node->as.if_statement.then_statement != NULL && stack_count < 256 &&
+                    offset <= query_statement_scope_end(node->as.if_statement.then_statement))
                     stack[stack_count++] = node->as.if_statement.then_statement;
                 break;
             case VC_AST_WHILE_STATEMENT:
+            {
+                const VcAstNode *body_node = node->as.while_statement.body;
+                const bool in_loop_scope = body_node != NULL &&
+                    offset <= query_statement_scope_end(body_node);
+                if (in_loop_scope)
+                    count = query_append_inline_out_expression_locals(model,
+                        node->as.while_statement.condition, offset, items, capacity, count);
+                if (body_node != NULL && stack_count < 256)
+                    stack[stack_count++] = body_node;
+                break;
+            }
             case VC_AST_DO_WHILE_STATEMENT:
+                if (node->as.while_statement.condition != NULL &&
+                    offset >= node->as.while_statement.condition->location.offset &&
+                    offset <= node->as.while_statement.condition->span.end.offset)
+                    count = query_append_inline_out_expression_locals(model,
+                        node->as.while_statement.condition, offset, items, capacity, count);
                 if (node->as.while_statement.body != NULL && stack_count < 256)
                     stack[stack_count++] = node->as.while_statement.body;
                 break;
             case VC_AST_FOR_STATEMENT:
+            {
+                const VcAstNode *body_node = node->as.for_statement.body;
+                const bool in_loop_scope = body_node != NULL &&
+                    offset <= query_statement_scope_end(body_node);
+                if (in_loop_scope)
+                    count = query_append_inline_out_expression_locals(model,
+                        node->as.for_statement.condition, offset, items, capacity, count);
                 if (node->as.for_statement.body != NULL && stack_count < 256)
                     stack[stack_count++] = node->as.for_statement.body;
-                if (node->as.for_statement.initializer != NULL && stack_count < 256)
+                if (in_loop_scope && node->as.for_statement.initializer != NULL && stack_count < 256)
                     stack[stack_count++] = node->as.for_statement.initializer;
                 break;
+            }
             case VC_AST_SWITCH_STATEMENT:
+                count = query_append_inline_out_expression_locals(model,
+                    node->as.switch_statement.expression, offset, items, capacity, count);
                 for (size_t i = node->as.switch_statement.sections.count; i > 0 && stack_count < 256; i--)
                     stack[stack_count++] = node->as.switch_statement.sections.items[i - 1];
                 break;
@@ -23576,8 +24694,14 @@ size_t vc_query_completions_at(
         if (structure->is_builtin_associated_scope ||
             !query_type_name_visible(structure->name))
             continue;
+        const char *name = structure->node != NULL && structure->node->kind == VC_AST_TYPE_DECLARATION &&
+            structure->node->as.type_declaration.original_generic_name != NULL
+            ? structure->node->as.type_declaration.original_generic_name : structure->name;
+        char type_display[96];
         count = query_append_completion(items, capacity, count,
-            VC_QUERY_SYMBOL_TYPE, structure->name, structure->name, true, 0);
+            VC_QUERY_SYMBOL_TYPE, name,
+            vc_semantic_type_display_name(model, vc_semantic_struct_type(i), type_display, sizeof(type_display)),
+            true, 0);
         if (structure->namespace_name != NULL && structure->namespace_name[0] != '\0')
         {
             count = query_append_completion(items, capacity, count,
@@ -23837,6 +24961,8 @@ size_t vc_query_references_at(
             VcQuerySymbol symbol;
             if (!query_fill_symbol(session, unit, token, binding, &symbol) ||
                 !query_same_definition(&symbol, target.definition_path, target.definition_span))
+                continue;
+            if (query_same_definition(&target, unit->source.path, token->span))
                 continue;
             if (count < capacity)
             {
@@ -24504,7 +25630,7 @@ bool vc_compile_project(
     }
 
     if (!write_generated_c(generated_c, &compilation.semantic,
-            project->output == VC_OUTPUT_LIBRARY, error, error_size))
+            project->output == VC_OUTPUT_LIBRARY, mode, error, error_size))
         goto cleanup;
 
     if (project->output == VC_OUTPUT_LIBRARY)
@@ -24551,9 +25677,20 @@ cleanup:
 bool vc_run_executable(const char *path, unsigned long *program_exit_code, char *error, size_t error_size)
 {
     char *arguments[] = {(char *)path, NULL};
-    unsigned long exit_code = 0;
-    if (!vc_host_process_run(arguments, &exit_code, error, error_size))
+    VcHostProcessResult process_result;
+    if (!vc_host_process_run_status(arguments, &process_result, error, error_size))
         return false;
+#ifndef _WIN32
+    if (process_result.termination == VC_HOST_PROCESS_SIGNALED)
+    {
+        fprintf(stderr, "Native process crash: process terminated by signal %d: %s\n",
+            process_result.signal_number,
+            process_result.signal_name != NULL ? process_result.signal_name : "unknown signal");
+        *program_exit_code = 1u;
+        return true;
+    }
+#endif
+    unsigned long exit_code = process_result.exit_code;
 
 #ifdef _WIN32
     /* These are recognizable NT exception statuses, not a managed exception.

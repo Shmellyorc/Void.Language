@@ -1136,7 +1136,84 @@ static VcAstNode *parse_argument(VcParser *parser)
     if (check(parser, VC_TOKEN_KW_REF) || check(parser, VC_TOKEN_KW_OUT) || check(parser, VC_TOKEN_KW_IN))
     {
         const VcToken *modifier = advance_token(parser);
-        VcAstNode *operand = parse_expression(parser);
+        VcAstTypeRef *inline_out_type = NULL;
+        VcSourceSpan inline_out_inference_span = {0};
+        bool inline_out_inferred = false;
+        bool inline_out_discard = false;
+        VcAstNode *operand = NULL;
+
+        if (modifier->kind == VC_TOKEN_KW_OUT &&
+            current_kind(parser) == VC_TOKEN_IDENTIFIER &&
+            token_text_equals(parser, current_token(parser), "_"))
+        {
+            const VcToken *discard = advance_token(parser);
+            inline_out_discard = true;
+            operand = new_node(parser, VC_AST_IDENTIFIER_EXPRESSION, discard->location);
+            if (operand == NULL)
+            {
+                out_of_memory(parser);
+                return NULL;
+            }
+            operand->as.identifier_expression.name = copy_token_text(parser, discard);
+            if (operand->as.identifier_expression.name == NULL)
+            {
+                out_of_memory(parser);
+                return NULL;
+            }
+        }
+        else if (modifier->kind == VC_TOKEN_KW_OUT && current_kind(parser) == VC_TOKEN_KW_VAR)
+        {
+            const VcToken *inference = advance_token(parser);
+            inline_out_inferred = true;
+            inline_out_inference_span = inference->span;
+            const VcToken *name = consume(parser, VC_TOKEN_IDENTIFIER, "out variable name");
+            if (name == NULL)
+                return NULL;
+            operand = new_node(parser, VC_AST_IDENTIFIER_EXPRESSION, name->location);
+            if (operand == NULL)
+            {
+                out_of_memory(parser);
+                return NULL;
+            }
+            operand->as.identifier_expression.name = copy_token_text(parser, name);
+            if (operand->as.identifier_expression.name == NULL)
+            {
+                out_of_memory(parser);
+                return NULL;
+            }
+        }
+        else if (modifier->kind == VC_TOKEN_KW_OUT)
+        {
+            size_t type_end = parser->current;
+            const bool typed_declaration =
+                scan_type_tokens(parser, &type_end, false) &&
+                token_at(parser, type_end)->kind == VC_TOKEN_IDENTIFIER;
+            const bool builtin_missing_name = is_type_keyword(current_kind(parser), false);
+            if (typed_declaration || builtin_missing_name)
+            {
+                inline_out_type = parse_type(parser, false);
+                if (inline_out_type == NULL)
+                    return NULL;
+                const VcToken *name = consume(parser, VC_TOKEN_IDENTIFIER, "out variable name");
+                if (name == NULL)
+                    return NULL;
+                operand = new_node(parser, VC_AST_IDENTIFIER_EXPRESSION, name->location);
+                if (operand == NULL)
+                {
+                    out_of_memory(parser);
+                    return NULL;
+                }
+                operand->as.identifier_expression.name = copy_token_text(parser, name);
+                if (operand->as.identifier_expression.name == NULL)
+                {
+                    out_of_memory(parser);
+                    return NULL;
+                }
+            }
+        }
+
+        if (operand == NULL)
+            operand = parse_expression(parser);
         if (operand == NULL)
             return NULL;
 
@@ -1148,8 +1225,13 @@ static VcAstNode *parse_argument(VcParser *parser)
         }
         node->as.unary_expression.operator_kind = modifier->kind;
         node->as.unary_expression.operand = operand;
+        node->as.unary_expression.inline_out_type = inline_out_type;
+        node->as.unary_expression.inline_out_inference_span = inline_out_inference_span;
+        node->as.unary_expression.inline_out_inferred = inline_out_inferred;
+        node->as.unary_expression.inline_out_discard = inline_out_discard;
         node->as.unary_expression.postfix = false;
         node->argument_name = argument_name;
+        node->span.end = operand->span.end;
         return node;
     }
 
@@ -2947,6 +3029,7 @@ static VcAstNode *parse_block(VcParser *parser)
 
     if (consume(parser, VC_TOKEN_RIGHT_BRACE, "'}'") == NULL)
         return NULL;
+    block->span.end = previous_token(parser)->span.end;
     if (!wrap_using_declarations(parser, &block->as.block_statement.statements))
         return NULL;
     return block;
@@ -3966,6 +4049,7 @@ static VcAstNode *parse_statement(VcParser *parser)
             return NULL;
         }
         node->as.throw_statement.expression = expression;
+        node->span.end = previous_token(parser)->span.end;
         return node;
     }
 

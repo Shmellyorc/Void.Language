@@ -8723,8 +8723,22 @@ static bool pattern_contains_declaration(const VcAstNode *pattern);
 static bool push_declaration_pattern_local(VcSemanticContext *context, const VcAstNode *pattern);
 static bool analyze_statement(VcSemanticContext *context, const VcAstNode *statement);
 static bool all_out_parameters_assigned(VcSemanticContext *context, VcSourceLocation location);
+typedef struct VcConditionFlow
+{
+    bool *when_true;
+    bool *when_false;
+    size_t local_count;
+} VcConditionFlow;
+
 static bool *snapshot_assignments(VcSemanticContext *context, size_t count, VcSourceLocation location);
 static void restore_assignments(VcSemanticContext *context, const bool *values, size_t count);
+static bool analyze_condition_flow(
+    VcSemanticContext *context,
+    const VcAstNode *expression,
+    VcConditionFlow *flow,
+    VcSemanticType *type);
+static void free_condition_flow(VcConditionFlow *flow);
+static void apply_condition_flow_merge(VcSemanticContext *context, const VcConditionFlow *flow);
 static bool analyze_constant_field(
     VcSemanticModel *model,
     size_t struct_index,
@@ -9065,11 +9079,39 @@ static bool append_display_text(
     return true;
 }
 
+static const char *semantic_struct_display_name(
+    const VcSemanticModel *model, const VcSemanticStruct *structure,
+    char *output, size_t output_size);
+
 static bool format_type_ref_display(
+    const VcSemanticModel *model,
     const VcAstTypeRef *type, char *output, size_t output_size, size_t *written)
 {
-    if (type == NULL || type->name == NULL ||
-        !append_display_text(output, output_size, written, type->name))
+    if (type == NULL || type->name == NULL)
+        return false;
+    const char *name = type->name;
+    char nested[1024];
+    if (model != NULL && type->generic_arguments.count == 0)
+    {
+        for (size_t i = 0; i < model->struct_count; i++)
+        {
+            const VcSemanticStruct *structure = &model->structs[i];
+            if (structure->node == NULL || structure->node->kind != VC_AST_TYPE_DECLARATION ||
+                structure->node->as.type_declaration.original_generic_name == NULL)
+                continue;
+            char qualified[1024];
+            if (structure->namespace_name != NULL && structure->namespace_name[0] != '\0')
+                snprintf(qualified, sizeof(qualified), "%s.%s", structure->namespace_name, structure->name);
+            else
+                snprintf(qualified, sizeof(qualified), "%s", structure->name);
+            if (strcmp(type->name, qualified) == 0 || strcmp(type->name, structure->name) == 0)
+            {
+                name = semantic_struct_display_name(model, structure, nested, sizeof(nested));
+                break;
+            }
+        }
+    }
+    if (!append_display_text(output, output_size, written, name))
         return false;
     if (type->generic_arguments.count != 0)
     {
@@ -9079,7 +9121,7 @@ static bool format_type_ref_display(
         {
             if (i != 0 && !append_display_text(output, output_size, written, ", "))
                 return false;
-            if (!format_type_ref_display(type->generic_arguments.items[i],
+            if (!format_type_ref_display(model, type->generic_arguments.items[i],
                     output, output_size, written))
                 return false;
         }
@@ -9108,7 +9150,8 @@ static bool format_type_ref_display(
 }
 
 static const char *semantic_struct_display_name(
-    const VcSemanticStruct *structure, char *output, size_t output_size)
+    const VcSemanticModel *model, const VcSemanticStruct *structure,
+    char *output, size_t output_size)
 {
     if (output != NULL && output_size != 0)
         output[0] = '\0';
@@ -9126,7 +9169,7 @@ static const char *semantic_struct_display_name(
             for (size_t i = 0; i < arguments->count; i++)
             {
                 if ((i != 0 && !append_display_text(output, output_size, &written, ", ")) ||
-                    !format_type_ref_display(arguments->items[i], output, output_size, &written))
+                    !format_type_ref_display(model, arguments->items[i], output, output_size, &written))
                 {
                     valid = false;
                     break;
@@ -9198,7 +9241,7 @@ const char *vc_semantic_type_display_name(
     {
         const size_t index = vc_semantic_struct_index(type);
         if (index < model->struct_count)
-            return semantic_struct_display_name(&model->structs[index], output, output_size);
+            return semantic_struct_display_name(model, &model->structs[index], output, output_size);
     }
     snprintf(output, output_size, "%s", vc_semantic_type_name(model, type));
     return output;
@@ -9212,7 +9255,7 @@ static const char *type_receiver_display(
     if (node != NULL && node->receiver_type != NULL)
     {
         size_t written = 0;
-        if (format_type_ref_display(node->receiver_type, output, output_size, &written))
+        if (format_type_ref_display(NULL, node->receiver_type, output, output_size, &written))
             return output;
     }
     if (node != NULL && vc_ast_receiver_name(node, output, output_size))
@@ -9544,6 +9587,38 @@ static size_t call_conversion_rank(
     return 2;
 }
 
+static bool is_inline_out_declaration(const VcAstNode *argument)
+{
+    return argument != NULL && argument->kind == VC_AST_UNARY_EXPRESSION &&
+        argument->as.unary_expression.operator_kind == VC_TOKEN_KW_OUT &&
+        (argument->as.unary_expression.inline_out_type != NULL ||
+         argument->as.unary_expression.inline_out_inferred);
+}
+
+static bool is_inferred_inline_out_declaration(const VcAstNode *argument)
+{
+    return is_inline_out_declaration(argument) &&
+        argument->as.unary_expression.inline_out_inferred;
+}
+
+static bool is_out_discard(const VcAstNode *argument)
+{
+    return argument != NULL && argument->kind == VC_AST_UNARY_EXPRESSION &&
+        argument->as.unary_expression.operator_kind == VC_TOKEN_KW_OUT &&
+        argument->as.unary_expression.inline_out_discard;
+}
+
+static bool is_untyped_out_argument(const VcAstNode *argument)
+{
+    return is_inferred_inline_out_declaration(argument) || is_out_discard(argument);
+}
+
+static bool local_is_inline_out_variable(const VcLocal *local)
+{
+    return local != NULL && local->declaration_node != NULL &&
+        is_inline_out_declaration(local->declaration_node);
+}
+
 static bool call_parameter_matches(
     const VcSemanticModel *model,
     VcSemanticType parameter_type,
@@ -9555,6 +9630,8 @@ static bool call_parameter_matches(
         return false;
     if (argument_type == VC_SEM_TYPE_UNKNOWN)
         return semantic_type_is_delegate(model, parameter_type);
+    if (parameter_modifier == VC_TOKEN_KW_OUT)
+        return parameter_type == argument_type;
     if (parameter_modifier != VC_TOKEN_EOF)
         return is_standard_assignable(model, parameter_type, argument_type);
     return is_assignable(model, parameter_type, argument_type);
@@ -9861,20 +9938,30 @@ static bool callable_matches_arguments(
         if (parameter_index < fixed_count)
         {
             bound[parameter_index] = true;
+            const bool untyped_out = argument_nodes != NULL && i < argument_nodes->count &&
+                is_untyped_out_argument(argument_nodes->items[i]);
             const bool target_typed = arguments[i] == VC_SEM_TYPE_UNKNOWN &&
                 argument_nodes != NULL && i < argument_nodes->count &&
                 expression_requires_target_type(argument_nodes->items[i]);
-            if ((target_typed &&
+            if ((untyped_out &&
+                    (argument_modifiers[i] != VC_TOKEN_KW_OUT ||
+                     parameter_modifiers[parameter_index] != VC_TOKEN_KW_OUT)) ||
+                (!untyped_out && target_typed &&
                     (parameter_modifiers[parameter_index] != VC_TOKEN_EOF ||
                      !target_typed_lambda_matches_parameter(
                          model, argument_nodes->items[i], parameter_types[parameter_index]))) ||
-                (!target_typed && !call_parameter_matches(model, parameter_types[parameter_index],
+                (!untyped_out && !target_typed && !call_parameter_matches(model, parameter_types[parameter_index],
                     parameter_modifiers[parameter_index], arguments[i], argument_modifiers[i])))
             {
                 matched = false;
                 break;
             }
-            if (target_typed)
+            if (untyped_out)
+            {
+                /* out var and out _ contribute no type/rank information. The
+                   winning out parameter supplies the semantic type later. */
+            }
+            else if (target_typed)
                 *rank += target_typed_lambda_preference_rank(
                     model, argument_nodes->items[i], parameter_types[parameter_index]);
             else if (arguments[i] != VC_SEM_TYPE_UNKNOWN)
@@ -9912,11 +9999,14 @@ static bool callable_matches_arguments(
             *rank += 100u;
         }
         else if (params_argument_count == 1 &&
-            ((arguments[single_params_argument] == VC_SEM_TYPE_UNKNOWN &&
+            (!is_untyped_out_argument(
+                argument_nodes != NULL && single_params_argument < argument_nodes->count
+                    ? argument_nodes->items[single_params_argument] : NULL) &&
+             ((arguments[single_params_argument] == VC_SEM_TYPE_UNKNOWN &&
               argument_nodes != NULL && single_params_argument < argument_nodes->count &&
               expression_requires_target_type(argument_nodes->items[single_params_argument])) ||
              call_parameter_matches(model, parameter_types[parameter_count - 1], VC_TOKEN_EOF,
-                arguments[single_params_argument], argument_modifiers[single_params_argument])))
+                arguments[single_params_argument], argument_modifiers[single_params_argument]))))
         {
             if (arguments[single_params_argument] != VC_SEM_TYPE_UNKNOWN)
                 *rank += call_conversion_rank(
@@ -9937,6 +10027,12 @@ static bool callable_matches_arguments(
                 {
                     if (mapping[i] != parameter_count - 1)
                         continue;
+                    if (argument_nodes != NULL && i < argument_nodes->count &&
+                        is_untyped_out_argument(argument_nodes->items[i]))
+                    {
+                        matched = false;
+                        break;
+                    }
                     const bool target_typed = arguments[i] == VC_SEM_TYPE_UNKNOWN &&
                         argument_nodes != NULL && i < argument_nodes->count &&
                         expression_requires_target_type(argument_nodes->items[i]);
@@ -12754,6 +12850,12 @@ static VcSemanticType analyze_reference_argument(
                     local->name, vc_token_kind_name(modifier));
                 return VC_SEM_TYPE_ERROR;
             }
+            if (modifier != VC_TOKEN_KW_OUT && local_is_inline_out_variable(local) && !local->assigned)
+            {
+                set_diagnostic(context->diagnostic, context->source, operand->location,
+                    "local '%s' cannot be read before it is definitely assigned", local->name);
+                return VC_SEM_TYPE_ERROR;
+            }
             if (modifier != VC_TOKEN_KW_OUT && local->modifier == VC_TOKEN_KW_OUT && !local->assigned)
             {
                 set_diagnostic(context->diagnostic, context->source, operand->location,
@@ -12767,7 +12869,12 @@ static VcSemanticType analyze_reference_argument(
                     "ref local '%s' refers to storage that is not definitely assigned", local->name);
                 return VC_SEM_TYPE_ERROR;
             }
-            if (!annotate(context, operand, local->type))
+            VcSemanticBinding binding = {0};
+            binding.node = operand;
+            binding.declaration_node = local->declaration_node;
+            binding.type = local->type;
+            binding.generic_parameter_origin = local->generic_parameter_origin;
+            if (!push_binding(context->model, binding))
                 return VC_SEM_TYPE_ERROR;
             return local->type;
         }
@@ -12858,6 +12965,86 @@ static bool expression_is_method_group_candidate(
     return false;
 }
 
+static VcSemanticType resolve_explicit_local_type(
+    VcSemanticContext *context,
+    const VcAstTypeRef *type_ref,
+    VcSourceLocation diagnostic_location)
+{
+    if (type_ref == NULL)
+        return VC_SEM_TYPE_UNKNOWN;
+
+    if (type_ref_has_explicit_function_pointer(type_ref) && !type_ref->is_function_pointer &&
+        !context_is_unsafe(context))
+    {
+        set_diagnostic(context->diagnostic, context->source, diagnostic_location,
+            "native function pointer type arguments require an unsafe method");
+        return VC_SEM_TYPE_ERROR;
+    }
+
+    const VcSemanticType declared = resolve_type(
+        context->model, type_ref, context->namespace_name, false);
+    if (declared == VC_SEM_TYPE_UNKNOWN || declared == VC_SEM_TYPE_VOID)
+    {
+        set_diagnostic(context->diagnostic, context->source, diagnostic_location,
+            "type '%s' is not supported as a local type",
+            type_ref->name != NULL ? type_ref->name : "<unknown>");
+        return VC_SEM_TYPE_ERROR;
+    }
+
+    if (vc_semantic_type_is_function_pointer(declared))
+    {
+        if (!context_is_unsafe(context) && !type_ref_has_generic_parameter_origin(type_ref))
+        {
+            set_diagnostic(context->diagnostic, context->source, diagnostic_location,
+                "native function pointer locals require an unsafe method");
+            return VC_SEM_TYPE_ERROR;
+        }
+        if (!native_function_pointer_abi_supported(context->model, declared))
+        {
+            set_diagnostic(context->diagnostic, context->source, diagnostic_location,
+                "native function pointer signature is not supported by the C ABI");
+            return VC_SEM_TYPE_ERROR;
+        }
+    }
+
+    if (vc_semantic_type_is_pointer(declared))
+    {
+        if (!context_is_unsafe(context))
+        {
+            set_diagnostic(context->diagnostic, context->source, diagnostic_location,
+                "pointer locals require an unsafe method");
+            return VC_SEM_TYPE_ERROR;
+        }
+        const char *missing_parameter = NULL;
+        if (!context_generic_type_ref_has_required_unmanaged_constraints(
+                context, type_ref, &missing_parameter))
+        {
+            set_diagnostic(context->diagnostic, context->source, diagnostic_location,
+                "generic pointer local using '%s' requires 'where %s : unmanaged'",
+                missing_parameter != NULL ? missing_parameter : "<generic>",
+                missing_parameter != NULL ? missing_parameter : "T");
+            return VC_SEM_TYPE_ERROR;
+        }
+        if (!pointer_type_ref_element_supported(context->model, declared, type_ref))
+        {
+            set_diagnostic(context->diagnostic, context->source, diagnostic_location,
+                "pointer local type is not supported");
+            return VC_SEM_TYPE_ERROR;
+        }
+    }
+
+    return declared;
+}
+
+static VcSemanticType analyze_inline_out_declaration_type(
+    VcSemanticContext *context,
+    const VcAstNode *argument)
+{
+    const VcAstTypeRef *type_ref = argument->as.unary_expression.inline_out_type;
+    return resolve_explicit_local_type(context, type_ref,
+        type_ref != NULL ? type_ref->location : argument->location);
+}
+
 static bool analyze_arguments(
     VcSemanticContext *context,
     const VcAstNodeList *arguments,
@@ -12868,7 +13055,13 @@ static bool analyze_arguments(
     {
         const VcAstNode *argument = arguments->items[i];
         modifiers[i] = argument_modifier(argument);
-        if (modifiers[i] == VC_TOKEN_EOF &&
+        if (argument->kind == VC_AST_UNARY_EXPRESSION &&
+            argument->as.unary_expression.operator_kind == VC_TOKEN_KW_OUT &&
+            argument->as.unary_expression.inline_out_type != NULL)
+            types[i] = analyze_inline_out_declaration_type(context, argument);
+        else if (is_untyped_out_argument(argument))
+            types[i] = VC_SEM_TYPE_UNKNOWN;
+        else if (modifiers[i] == VC_TOKEN_EOF &&
             (expression_requires_target_type(argument) ||
              expression_is_method_group_candidate(context, argument)))
             types[i] = VC_SEM_TYPE_UNKNOWN;
@@ -13018,21 +13211,141 @@ static const char *first_unknown_named_constructor_argument(
     return NULL;
 }
 
-static void mark_out_arguments_assigned(VcSemanticContext *context, const VcAstNodeList *arguments)
+static bool mark_out_arguments_assigned(
+    VcSemanticContext *context,
+    const VcAstNodeList *arguments,
+    const VcAstNodeList *parameters,
+    const VcSemanticType *parameter_types,
+    const VcTokenKind *parameter_modifiers,
+    size_t parameter_count,
+    const size_t *argument_parameters)
 {
+    const size_t saved_local_count = context->local_count;
+    const size_t saved_binding_count = context->model->binding_count;
     for (size_t i = 0; i < arguments->count; i++)
     {
         const VcAstNode *argument = arguments->items[i];
         if (argument_modifier(argument) != VC_TOKEN_KW_OUT)
             continue;
+
+        if (is_out_discard(argument))
+        {
+            const size_t parameter_index = argument_parameters != NULL
+                ? argument_parameters[i] : i;
+            if (parameter_types == NULL || parameter_modifiers == NULL ||
+                parameter_index >= parameter_count ||
+                parameter_modifiers[parameter_index] != VC_TOKEN_KW_OUT ||
+                parameter_types[parameter_index] == VC_SEM_TYPE_UNKNOWN ||
+                parameter_types[parameter_index] == VC_SEM_TYPE_ERROR ||
+                parameter_types[parameter_index] == VC_SEM_TYPE_VOID)
+            {
+                set_diagnostic(context->diagnostic, context->source, argument->location,
+                    "out discard requires a resolved out parameter");
+                context->local_count = saved_local_count;
+                context->model->binding_count = saved_binding_count;
+                return false;
+            }
+
+            VcSemanticBinding discard_binding = {0};
+            discard_binding.node = argument;
+            discard_binding.type = parameter_types[parameter_index];
+            if (parameters != NULL && parameter_index < parameters->count)
+                discard_binding.generic_parameter_origin = type_ref_generic_parameter_origin(
+                    parameters->items[parameter_index]->as.parameter.type);
+            if (!push_binding(context->model, discard_binding))
+            {
+                context->local_count = saved_local_count;
+                context->model->binding_count = saved_binding_count;
+                set_diagnostic(context->diagnostic, context->source, argument->location,
+                    "out of memory while binding out discard");
+                return false;
+            }
+            continue;
+        }
+
         const VcAstNode *operand = argument_operand(argument);
         if (operand != NULL && operand->kind == VC_AST_IDENTIFIER_EXPRESSION)
         {
+            if (is_inline_out_declaration(argument))
+            {
+                const VcLocal *existing = find_local_entry_const(
+                    context, operand->as.identifier_expression.name);
+                if (existing == NULL || existing->declaration_node != argument)
+                {
+                    VcSemanticType declared = VC_SEM_TYPE_ERROR;
+                    const char *generic_origin = NULL;
+                    if (argument->as.unary_expression.inline_out_inferred)
+                    {
+                        const size_t parameter_index = argument_parameters != NULL
+                            ? argument_parameters[i] : i;
+                        if (parameter_types == NULL || parameter_modifiers == NULL ||
+                            parameter_index >= parameter_count ||
+                            parameter_modifiers[parameter_index] != VC_TOKEN_KW_OUT)
+                        {
+                            set_diagnostic(context->diagnostic, context->source, argument->location,
+                                "inline inferred out variable requires a resolved out parameter");
+                            context->local_count = saved_local_count;
+                            context->model->binding_count = saved_binding_count;
+                            return false;
+                        }
+                        declared = parameter_types[parameter_index];
+                        if (declared == VC_SEM_TYPE_UNKNOWN || declared == VC_SEM_TYPE_ERROR ||
+                            declared == VC_SEM_TYPE_VOID)
+                        {
+                            set_diagnostic(context->diagnostic, context->source,
+                                argument->as.unary_expression.inline_out_inference_span.start,
+                                "out variable type could not be inferred from the selected parameter");
+                            context->local_count = saved_local_count;
+                            context->model->binding_count = saved_binding_count;
+                            return false;
+                        }
+                        if (parameters != NULL && parameter_index < parameters->count)
+                        {
+                            const VcAstNode *parameter = parameters->items[parameter_index];
+                            if (parameter != NULL)
+                                generic_origin = type_ref_generic_parameter_origin(
+                                    parameter->as.parameter.type);
+                        }
+                    }
+                    else
+                    {
+                        declared = analyze_inline_out_declaration_type(context, argument);
+                        generic_origin = type_ref_generic_parameter_origin(
+                            argument->as.unary_expression.inline_out_type);
+                    }
+
+                    if (declared == VC_SEM_TYPE_ERROR ||
+                        !push_local_node_ex_origin(context,
+                            operand->as.identifier_expression.name, declared,
+                            operand->location, VC_TOKEN_EOF, false, argument,
+                            generic_origin))
+                    {
+                        context->local_count = saved_local_count;
+                        context->model->binding_count = saved_binding_count;
+                        return false;
+                    }
+
+                    VcSemanticBinding declaration_binding = {0};
+                    declaration_binding.node = operand;
+                    declaration_binding.declaration_node = argument;
+                    declaration_binding.type = declared;
+                    declaration_binding.generic_parameter_origin = generic_origin;
+                    if (!push_binding(context->model, declaration_binding))
+                    {
+                        context->local_count = saved_local_count;
+                        context->model->binding_count = saved_binding_count;
+                        set_diagnostic(context->diagnostic, context->source, operand->location,
+                            "out of memory while binding inline out variable");
+                        return false;
+                    }
+                }
+            }
             const size_t local_index = find_local_index(context, operand->as.identifier_expression.name);
             if (local_index != (size_t)-1)
                 mark_local_assigned_index(context, local_index);
         }
     }
+    return true;
 }
 
 
@@ -14037,8 +14350,24 @@ static bool evaluate_generic_method_candidate_mode(
         parameter_modifiers[p] = parameter->as.parameter.modifier;
         if (parameter_types[p] == VC_SEM_TYPE_UNKNOWN || parameter_types[p] == VC_SEM_TYPE_ERROR)
         {
-            valid = false;
-            break;
+            bool deferred_inferred_out = false;
+            if (parameter_modifiers[p] == VC_TOKEN_KW_OUT)
+            {
+                for (size_t a = 0; a < argument_nodes->count; a++)
+                {
+                    if (mapping[a] == p &&
+                        is_untyped_out_argument(argument_nodes->items[a]))
+                    {
+                        deferred_inferred_out = true;
+                        break;
+                    }
+                }
+            }
+            if (!deferred_inferred_out)
+            {
+                valid = false;
+                break;
+            }
         }
     }
 
@@ -14738,7 +15067,24 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
     if (existing_call_binding != NULL && existing_call_binding->has_method)
     {
         const VcSemanticType existing_type = existing_call_binding->type;
-        mark_out_arguments_assigned(context, arguments);
+        if (existing_call_binding->method_index >= context->model->method_count)
+        {
+            free(argument_types);
+            free(argument_modifiers);
+            return VC_SEM_TYPE_ERROR;
+        }
+        const VcSemanticMethod *existing_method =
+            &context->model->methods[existing_call_binding->method_index];
+        if (!mark_out_arguments_assigned(context, arguments,
+                &existing_method->node->as.method_declaration.parameters,
+                existing_method->parameter_types, existing_method->parameter_modifiers,
+                existing_method->parameter_count,
+                existing_call_binding->argument_parameters))
+        {
+            free(argument_types);
+            free(argument_modifiers);
+            return VC_SEM_TYPE_ERROR;
+        }
         free(argument_types);
         free(argument_modifiers);
         return existing_type;
@@ -16452,7 +16798,18 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
             const VcTokenKind expected_modifier = (delegate_params_expanded &&
                 parameter_index == invoke->parameter_count - 1) || declared_modifier == VC_TOKEN_KW_PARAMS
                 ? VC_TOKEN_EOF : declared_modifier;
-            if (argument_types[i] == VC_SEM_TYPE_UNKNOWN)
+            if (is_untyped_out_argument(arguments->items[i]))
+            {
+                if (expected_modifier != VC_TOKEN_KW_OUT)
+                {
+                    free(argument_parameters);
+                    free(argument_types);
+                    free(argument_modifiers);
+                    return VC_SEM_TYPE_ERROR;
+                }
+                argument_types[i] = expected;
+            }
+            else if (argument_types[i] == VC_SEM_TYPE_UNKNOWN)
             {
                 if (expected_modifier == VC_TOKEN_EOF &&
                     expression_requires_target_type(arguments->items[i]))
@@ -16482,7 +16839,9 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
             if (argument_modifiers[i] != expected_modifier ||
                 (expected_modifier == VC_TOKEN_EOF
                     ? !is_assignable(context->model, expected, argument_types[i])
-                    : !is_standard_assignable(context->model, expected, argument_types[i])))
+                    : expected_modifier == VC_TOKEN_KW_OUT
+                        ? expected != argument_types[i]
+                        : !is_standard_assignable(context->model, expected, argument_types[i])))
             {
                 const VcSemanticType actual_type = argument_types[i];
                 set_diagnostic(context->diagnostic, context->source,
@@ -16555,7 +16914,11 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                 "out of memory while binding delegate invocation");
             return VC_SEM_TYPE_ERROR;
         }
-        mark_out_arguments_assigned(context, arguments);
+        if (!mark_out_arguments_assigned(context, arguments,
+                &invoke->node->as.method_declaration.parameters,
+                invoke->parameter_types, invoke->parameter_modifiers,
+                invoke->parameter_count, argument_parameters))
+            return VC_SEM_TYPE_ERROR;
         return invoke->return_type;
     }
 
@@ -17241,7 +17604,18 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
             : target_method->parameter_types[parameter_index];
         const char *expected_origin = call_parameter_generic_parameter_origin(
             context, expression, target_method, parameter_index);
-        if (argument_types[i] == VC_SEM_TYPE_UNKNOWN)
+        if (is_untyped_out_argument(arguments->items[i]))
+        {
+            if (target_method->parameter_modifiers[parameter_index] != VC_TOKEN_KW_OUT)
+            {
+                free(argument_parameters);
+                free(argument_types);
+                free(argument_modifiers);
+                return VC_SEM_TYPE_ERROR;
+            }
+            argument_types[i] = expected;
+        }
+        else if (argument_types[i] == VC_SEM_TYPE_UNKNOWN)
         {
             if (expression_requires_target_type(arguments->items[i]))
             {
@@ -17448,7 +17822,14 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
         }
     }
 
-    mark_out_arguments_assigned(context, arguments);
+    if (!mark_out_arguments_assigned(context, arguments,
+            &target_method->node->as.method_declaration.parameters,
+            target_method->parameter_types, target_method->parameter_modifiers,
+            target_method->parameter_count, argument_parameters))
+    {
+        free(argument_parameters);
+        return VC_SEM_TYPE_ERROR;
+    }
 
     if (null_conditional_call && target_method->returns_ref)
     {
@@ -18673,7 +19054,18 @@ static VcSemanticType analyze_new(
                 constructor->node->as.method_declaration.parameters.items[parameter_index]
                     ->as.parameter.type, expression->as.new_expression.type);
         }
-        if (argument_types[i] == VC_SEM_TYPE_UNKNOWN &&
+        if (is_untyped_out_argument(arguments->items[i]))
+        {
+            if (constructor->parameter_modifiers[parameter_index] != VC_TOKEN_KW_OUT)
+            {
+                free(argument_parameters);
+                free(argument_types);
+                free(argument_modifiers);
+                return VC_SEM_TYPE_ERROR;
+            }
+            argument_types[i] = expected;
+        }
+        else if (argument_types[i] == VC_SEM_TYPE_UNKNOWN &&
             expression_requires_target_type(arguments->items[i]))
         {
             argument_types[i] = analyze_expression_with_target_origin(
@@ -18714,7 +19106,14 @@ static VcSemanticType analyze_new(
         return VC_SEM_TYPE_ERROR;
     }
 
-    mark_out_arguments_assigned(context, arguments);
+    if (!mark_out_arguments_assigned(context, arguments,
+            &constructor->node->as.method_declaration.parameters,
+            constructor->parameter_types, constructor->parameter_modifiers,
+            constructor->parameter_count, argument_parameters))
+    {
+        free(argument_parameters);
+        return VC_SEM_TYPE_ERROR;
+    }
     const bool object_initializer = expression->as.new_expression.initializers.count == 0 ||
         expression->as.new_expression.initializers.items[0]->kind == VC_AST_OBJECT_INITIALIZER_MEMBER;
     if (!(object_initializer
@@ -18828,7 +19227,7 @@ static VcSemanticType analyze_delegate_method_group(
     const VcSemanticMethod *invoke = &context->model->methods[delegate_type->delegate_invoke_method_index];
     char delegate_display[1024];
     const char *delegate_display_name = semantic_struct_display_name(
-        delegate_type, delegate_display, sizeof(delegate_display));
+        context->model, delegate_type, delegate_display, sizeof(delegate_display));
 
     size_t method_index = (size_t)-1;
     bool has_target = false;
@@ -19478,21 +19877,23 @@ static VcSemanticType analyze_conditional_expression(
     const VcAstNode *when_true = expression->as.conditional_expression.when_true;
     const VcAstNode *when_false = expression->as.conditional_expression.when_false;
 
-    const VcSemanticType condition_type = analyze_expression(context, condition);
-    if (condition_type == VC_SEM_TYPE_ERROR)
+    VcConditionFlow condition_flow = {0};
+    VcSemanticType condition_type = VC_SEM_TYPE_ERROR;
+    if (!analyze_condition_flow(context, condition, &condition_flow, &condition_type))
         return VC_SEM_TYPE_ERROR;
     if (condition_type != VC_SEM_TYPE_BOOL)
     {
         set_diagnostic(context->diagnostic, context->source, condition->location,
             "conditional expression requires a bool condition, found '%s'",
             context_type_display_name(context, condition_type));
+        free_condition_flow(&condition_flow);
         return VC_SEM_TYPE_ERROR;
     }
 
     const size_t local_count = context->local_count;
-    bool *before = snapshot_assignments(context, local_count, expression->location);
-    if (local_count > 0 && before == NULL)
-        return VC_SEM_TYPE_ERROR;
+    size_t true_count = 0;
+    size_t false_count = 0;
+    restore_assignments(context, condition_flow.when_true, local_count);
 
     VcSemanticType true_type = VC_SEM_TYPE_ERROR;
     VcSemanticType false_type = VC_SEM_TYPE_ERROR;
@@ -19509,7 +19910,7 @@ static VcSemanticType analyze_conditional_expression(
         {
             set_diagnostic(context->diagnostic, context->source, expression->location,
                 "conditional expression requires a known non-void target type");
-            free(before);
+            free_condition_flow(&condition_flow);
             return VC_SEM_TYPE_ERROR;
         }
 
@@ -19522,17 +19923,20 @@ static VcSemanticType analyze_conditional_expression(
                     "conditional branch of type '%s' cannot convert to target type '%s'",
                     context_type_display_name(context, true_type),
                     context_type_display_name(context, target_type));
-            free(before);
+            free_condition_flow(&condition_flow);
             return VC_SEM_TYPE_ERROR;
         }
-        true_assignments = snapshot_assignments(context, local_count, when_true->location);
-        if (local_count > 0 && true_assignments == NULL)
+        true_count = context->local_count;
+        true_assignments = snapshot_assignments(context, true_count, when_true->location);
+        if (true_count > 0 && true_assignments == NULL)
         {
-            free(before);
+            free_condition_flow(&condition_flow);
             return VC_SEM_TYPE_ERROR;
         }
 
-        restore_assignments(context, before, local_count);
+        restore_assignments(context, condition_flow.when_false, local_count);
+        for (size_t i = local_count; i < context->local_count; i++)
+            context->locals[i].assigned = false;
         false_type = analyze_expression_with_target_origin(context, when_false, target_type,
             target_generic_parameter_origin);
         if (false_type == VC_SEM_TYPE_ERROR || !is_assignable(context->model, target_type, false_type))
@@ -19543,22 +19947,24 @@ static VcSemanticType analyze_conditional_expression(
                     context_type_display_name(context, false_type),
                     context_type_display_name(context, target_type));
             free(true_assignments);
-            free(before);
+            free_condition_flow(&condition_flow);
             return VC_SEM_TYPE_ERROR;
         }
-        false_assignments = snapshot_assignments(context, local_count, when_false->location);
-        if (local_count > 0 && false_assignments == NULL)
+        false_count = context->local_count;
+        false_assignments = snapshot_assignments(context, false_count, when_false->location);
+        if (false_count > 0 && false_assignments == NULL)
         {
             free(true_assignments);
-            free(before);
+            free_condition_flow(&condition_flow);
             return VC_SEM_TYPE_ERROR;
         }
 
-        for (size_t i = 0; i < local_count; i++)
-            context->locals[i].assigned = true_assignments[i] && false_assignments[i];
+        for (size_t i = 0; i < context->local_count; i++)
+            context->locals[i].assigned = i < true_count && i < false_count &&
+                true_assignments[i] && false_assignments[i];
         free(false_assignments);
         free(true_assignments);
-        free(before);
+        free_condition_flow(&condition_flow);
 
         VcSemanticBinding binding = {0};
         binding.node = expression;
@@ -19573,13 +19979,15 @@ static VcSemanticType analyze_conditional_expression(
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "conditional expression has no type because both branches require a target type");
-        free(before);
+        free_condition_flow(&condition_flow);
         return VC_SEM_TYPE_ERROR;
     }
 
     if (true_requires_target)
     {
-        restore_assignments(context, before, local_count);
+        restore_assignments(context, condition_flow.when_false, local_count);
+        for (size_t i = local_count; i < context->local_count; i++)
+            context->locals[i].assigned = false;
         false_type = analyze_expression(context, when_false);
         if (false_type == VC_SEM_TYPE_ERROR || false_type == VC_SEM_TYPE_NULL || false_type == VC_SEM_TYPE_VOID)
         {
@@ -19587,16 +19995,19 @@ static VcSemanticType analyze_conditional_expression(
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "conditional expression cannot infer a target type from '%s'",
                     context_type_display_name(context, false_type));
-            free(before);
+            free_condition_flow(&condition_flow);
             return VC_SEM_TYPE_ERROR;
         }
-        false_assignments = snapshot_assignments(context, local_count, when_false->location);
-        if (local_count > 0 && false_assignments == NULL)
+        false_count = context->local_count;
+        false_assignments = snapshot_assignments(context, false_count, when_false->location);
+        if (false_count > 0 && false_assignments == NULL)
         {
-            free(before);
+            free_condition_flow(&condition_flow);
             return VC_SEM_TYPE_ERROR;
         }
-        restore_assignments(context, before, local_count);
+        restore_assignments(context, condition_flow.when_true, local_count);
+        for (size_t i = local_count; i < context->local_count; i++)
+            context->locals[i].assigned = false;
         true_type = analyze_expression_with_target(context, when_true, false_type);
         if (true_type == VC_SEM_TYPE_ERROR || !is_assignable(context->model, false_type, true_type))
         {
@@ -19605,26 +20016,30 @@ static VcSemanticType analyze_conditional_expression(
                     "conditional branch cannot convert to inferred type '%s'",
                     context_type_display_name(context, false_type));
             free(false_assignments);
-            free(before);
+            free_condition_flow(&condition_flow);
             return VC_SEM_TYPE_ERROR;
         }
-        true_assignments = snapshot_assignments(context, local_count, when_true->location);
+        true_count = context->local_count;
+        true_assignments = snapshot_assignments(context, true_count, when_true->location);
     }
     else
     {
         true_type = analyze_expression(context, when_true);
         if (true_type == VC_SEM_TYPE_ERROR)
         {
-            free(before);
+            free_condition_flow(&condition_flow);
             return VC_SEM_TYPE_ERROR;
         }
-        true_assignments = snapshot_assignments(context, local_count, when_true->location);
-        if (local_count > 0 && true_assignments == NULL)
+        true_count = context->local_count;
+        true_assignments = snapshot_assignments(context, true_count, when_true->location);
+        if (true_count > 0 && true_assignments == NULL)
         {
-            free(before);
+            free_condition_flow(&condition_flow);
             return VC_SEM_TYPE_ERROR;
         }
-        restore_assignments(context, before, local_count);
+        restore_assignments(context, condition_flow.when_false, local_count);
+        for (size_t i = local_count; i < context->local_count; i++)
+            context->locals[i].assigned = false;
 
         if (false_requires_target)
         {
@@ -19634,7 +20049,7 @@ static VcSemanticType analyze_conditional_expression(
                     "conditional expression cannot infer a target type from '%s'",
                     context_type_display_name(context, true_type));
                 free(true_assignments);
-                free(before);
+                free_condition_flow(&condition_flow);
                 return VC_SEM_TYPE_ERROR;
             }
             false_type = analyze_expression_with_target(context, when_false, true_type);
@@ -19645,7 +20060,7 @@ static VcSemanticType analyze_conditional_expression(
                         "conditional branch cannot convert to inferred type '%s'",
                         context_type_display_name(context, true_type));
                 free(true_assignments);
-                free(before);
+                free_condition_flow(&condition_flow);
                 return VC_SEM_TYPE_ERROR;
             }
         }
@@ -19654,21 +20069,24 @@ static VcSemanticType analyze_conditional_expression(
         if (false_type == VC_SEM_TYPE_ERROR)
         {
             free(true_assignments);
-            free(before);
+            free_condition_flow(&condition_flow);
             return VC_SEM_TYPE_ERROR;
         }
-        false_assignments = snapshot_assignments(context, local_count, when_false->location);
+        false_count = context->local_count;
+        false_assignments = snapshot_assignments(context, false_count, when_false->location);
     }
 
-    if (local_count > 0 && (true_assignments == NULL || false_assignments == NULL))
+    if ((true_count > 0 && true_assignments == NULL) ||
+        (false_count > 0 && false_assignments == NULL))
     {
         free(false_assignments);
         free(true_assignments);
-        free(before);
+        free_condition_flow(&condition_flow);
         return VC_SEM_TYPE_ERROR;
     }
-    for (size_t i = 0; i < local_count; i++)
-        context->locals[i].assigned = true_assignments[i] && false_assignments[i];
+    for (size_t i = 0; i < context->local_count; i++)
+        context->locals[i].assigned = i < true_count && i < false_count &&
+            true_assignments[i] && false_assignments[i];
 
     VcSemanticType result_type = VC_SEM_TYPE_ERROR;
     if (true_requires_target)
@@ -19708,7 +20126,7 @@ static VcSemanticType analyze_conditional_expression(
 
     free(false_assignments);
     free(true_assignments);
-    free(before);
+    free_condition_flow(&condition_flow);
     if (result_type == VC_SEM_TYPE_ERROR)
         return VC_SEM_TYPE_ERROR;
 
@@ -19730,14 +20148,20 @@ static VcSemanticType analyze_switch_expression(
     VcSemanticType target_type,
     const char *target_generic_parameter_origin)
 {
+    VcConditionFlow arm_flow = {0};
     const VcSemanticType source_type = analyze_expression(context, expression->as.switch_expression.expression);
     if (source_type == VC_SEM_TYPE_ERROR || source_type == VC_SEM_TYPE_VOID)
-        return VC_SEM_TYPE_ERROR;
+        goto failed;
     if (expression->as.switch_expression.arms.count == 0)
-        return VC_SEM_TYPE_ERROR;
+        goto failed;
 
     const size_t saved_count = context->local_count;
     const size_t saved_depth = context->depth;
+    arm_flow.local_count = saved_count;
+    arm_flow.when_true = snapshot_assignments(context, saved_count, expression->location);
+    arm_flow.when_false = snapshot_assignments(context, saved_count, expression->location);
+    if (saved_count > 0 && (arm_flow.when_true == NULL || arm_flow.when_false == NULL))
+        goto failed;
     bool has_discard = false;
     VcSemanticType result_type = has_target ? target_type : VC_SEM_TYPE_UNKNOWN;
 
@@ -19746,6 +20170,7 @@ static VcSemanticType analyze_switch_expression(
         const VcAstNode *arm = expression->as.switch_expression.arms.items[i];
         context->local_count = saved_count;
         context->depth = saved_depth + 1;
+        restore_assignments(context, arm_flow.when_true, saved_count);
 
         if (arm->as.switch_expression_arm.is_discard)
         {
@@ -19753,7 +20178,7 @@ static VcSemanticType analyze_switch_expression(
             {
                 set_diagnostic(context->diagnostic, context->source, arm->location,
                     "switch expression cannot contain more than one discard arm");
-                return VC_SEM_TYPE_ERROR;
+                goto failed;
             }
             if (arm->as.switch_expression_arm.guard == NULL)
             {
@@ -19763,7 +20188,7 @@ static VcSemanticType analyze_switch_expression(
                     set_diagnostic(context->diagnostic, context->source,
                         expression->as.switch_expression.arms.items[i + 1]->location,
                         "unreachable switch expression arm after unguarded discard arm");
-                    return VC_SEM_TYPE_ERROR;
+                    goto failed;
                 }
             }
         }
@@ -19774,24 +20199,28 @@ static VcSemanticType analyze_switch_expression(
             const bool ok = analyze_is_pattern(context, arm->as.switch_expression_arm.pattern, source_type);
             context->allow_declaration_pattern = saved_allow;
             if (!ok)
-                return VC_SEM_TYPE_ERROR;
+                goto failed;
             if (pattern_contains_declaration(arm->as.switch_expression_arm.pattern) &&
                 !push_declaration_pattern_local(context, arm->as.switch_expression_arm.pattern))
-                return VC_SEM_TYPE_ERROR;
+                goto failed;
         }
 
         if (arm->as.switch_expression_arm.guard != NULL)
         {
-            const VcSemanticType guard = analyze_expression(context, arm->as.switch_expression_arm.guard);
-            if (guard == VC_SEM_TYPE_ERROR)
-                return VC_SEM_TYPE_ERROR;
+            VcConditionFlow guard_flow = {0};
+            VcSemanticType guard = VC_SEM_TYPE_ERROR;
+            if (!analyze_condition_flow(context, arm->as.switch_expression_arm.guard,
+                    &guard_flow, &guard))
+                goto failed;
+            restore_assignments(context, guard_flow.when_true, guard_flow.local_count);
+            free_condition_flow(&guard_flow);
             if (guard != VC_SEM_TYPE_BOOL)
             {
                 set_diagnostic(context->diagnostic, context->source,
                     arm->as.switch_expression_arm.guard->location,
                     "switch expression when guard must be bool, got '%s'",
                     context_type_display_name(context, guard));
-                return VC_SEM_TYPE_ERROR;
+                goto failed;
             }
         }
 
@@ -19806,12 +20235,15 @@ static VcSemanticType analyze_switch_expression(
             {
                 set_diagnostic(context->diagnostic, context->source, result->location,
                     "switch expression arm requires a target type");
-                return VC_SEM_TYPE_ERROR;
+                goto failed;
             }
             arm_type = analyze_expression(context, result);
         }
         if (arm_type == VC_SEM_TYPE_ERROR || arm_type == VC_SEM_TYPE_VOID)
-            return VC_SEM_TYPE_ERROR;
+            goto failed;
+        for (size_t local = 0; local < saved_count; local++)
+            arm_flow.when_false[local] = i == 0 ? context->locals[local].assigned :
+                arm_flow.when_false[local] && context->locals[local].assigned;
 
         if (has_target)
         {
@@ -19823,7 +20255,7 @@ static VcSemanticType analyze_switch_expression(
                     "switch expression arm of type '%s' cannot convert to target type '%s'",
                     context_type_display_name(context, arm_type),
                     context_type_display_name(context, target_type));
-                return VC_SEM_TYPE_ERROR;
+                goto failed;
             }
         }
         else if (result_type == VC_SEM_TYPE_UNKNOWN)
@@ -19845,24 +20277,25 @@ static VcSemanticType analyze_switch_expression(
                     "switch expression arms of type '%s' and '%s' do not have a unique implicit result type",
                     context_type_display_name(context, result_type),
                     context_type_display_name(context, arm_type));
-                return VC_SEM_TYPE_ERROR;
+                goto failed;
             }
         }
     }
 
     context->local_count = saved_count;
     context->depth = saved_depth;
+    restore_assignments(context, arm_flow.when_false, saved_count);
     if (!has_discard)
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "switch expression requires a final unguarded discard '_' arm");
-        return VC_SEM_TYPE_ERROR;
+        goto failed;
     }
     if (result_type == VC_SEM_TYPE_UNKNOWN || result_type == VC_SEM_TYPE_NULL)
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "switch expression does not have a usable result type");
-        return VC_SEM_TYPE_ERROR;
+        goto failed;
     }
 
     if (!has_target)
@@ -19880,11 +20313,11 @@ static VcSemanticType analyze_switch_expression(
                     result_binding == NULL ? "<unknown>" :
                         context_type_display_name(context, result_binding->type),
                     context_type_display_name(context, result_type));
-                return VC_SEM_TYPE_ERROR;
+                goto failed;
             }
             if (!ensure_implicit_conversion_reachable(
                     context, result, result_binding->type, result_type))
-                return VC_SEM_TYPE_ERROR;
+                goto failed;
         }
     }
 
@@ -19904,8 +20337,13 @@ static VcSemanticType analyze_switch_expression(
         binding.generic_parameter_origin = origin;
     }
     if (!push_binding(context->model, binding))
-        return VC_SEM_TYPE_ERROR;
+        goto failed;
+    free_condition_flow(&arm_flow);
     return result_type;
+
+failed:
+    free_condition_flow(&arm_flow);
+    return VC_SEM_TYPE_ERROR;
 }
 
 static VcSemanticType analyze_expression_with_target_origin(
@@ -21420,6 +21858,12 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 const size_t local_index = find_local_index(context, expression->as.identifier_expression.name);
                 if (!record_lambda_local_capture(context, local_index))
                     return VC_SEM_TYPE_ERROR;
+                if (local_is_inline_out_variable(local) && !local->assigned)
+                {
+                    set_diagnostic(context->diagnostic, context->source, expression->location,
+                        "local '%s' cannot be read before it is definitely assigned", local->name);
+                    return VC_SEM_TYPE_ERROR;
+                }
                 if (local->modifier == VC_TOKEN_KW_OUT && !local->assigned)
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
@@ -23512,6 +23956,21 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
 
         case VC_AST_BINARY_EXPRESSION:
         {
+            if (expression->as.binary_expression.operator_kind == VC_TOKEN_AMPERSAND_AMPERSAND ||
+                expression->as.binary_expression.operator_kind == VC_TOKEN_PIPE_PIPE)
+            {
+                VcConditionFlow flow = {0};
+                VcSemanticType logical_type = VC_SEM_TYPE_ERROR;
+                if (!analyze_condition_flow(context, expression, &flow, &logical_type))
+                {
+                    free_condition_flow(&flow);
+                    return VC_SEM_TYPE_ERROR;
+                }
+                apply_condition_flow_merge(context, &flow);
+                free_condition_flow(&flow);
+                return logical_type;
+            }
+
             const VcSemanticType left = analyze_expression(context, expression->as.binary_expression.left);
             if (left == VC_SEM_TYPE_ERROR)
                 return VC_SEM_TYPE_ERROR;
@@ -25016,6 +25475,206 @@ static void restore_assignments(VcSemanticContext *context, const bool *values, 
         context->locals[i].assigned = values[i];
 }
 
+static void free_condition_flow(VcConditionFlow *flow)
+{
+    if (flow == NULL)
+        return;
+    free(flow->when_true);
+    free(flow->when_false);
+    flow->when_true = NULL;
+    flow->when_false = NULL;
+    flow->local_count = 0;
+}
+
+static bool condition_flow_capture_current(
+    VcSemanticContext *context,
+    VcConditionFlow *flow,
+    VcSourceLocation location)
+{
+    flow->local_count = context->local_count;
+    flow->when_true = snapshot_assignments(context, flow->local_count, location);
+    if (flow->local_count > 0 && flow->when_true == NULL)
+        return false;
+    if (flow->local_count == 0)
+        return true;
+    flow->when_false = malloc(flow->local_count * sizeof(*flow->when_false));
+    if (flow->when_false == NULL)
+    {
+        set_diagnostic(context->diagnostic, context->source, location,
+            "out of memory while tracking short-circuit flow");
+        free_condition_flow(flow);
+        return false;
+    }
+    memcpy(flow->when_false, flow->when_true,
+        flow->local_count * sizeof(*flow->when_false));
+    return true;
+}
+
+static bool expression_has_short_circuit_flow(const VcAstNode *expression)
+{
+    if (expression == NULL)
+        return false;
+    if (expression->kind == VC_AST_BINARY_EXPRESSION)
+        return expression->as.binary_expression.operator_kind == VC_TOKEN_AMPERSAND_AMPERSAND ||
+            expression->as.binary_expression.operator_kind == VC_TOKEN_PIPE_PIPE;
+    if (expression->kind == VC_AST_PARENTHESIZED_EXPRESSION)
+        return expression_has_short_circuit_flow(
+            expression->as.parenthesized_expression.expression);
+    if (expression->kind == VC_AST_UNARY_EXPRESSION &&
+        expression->as.unary_expression.operator_kind == VC_TOKEN_BANG)
+        return expression_has_short_circuit_flow(expression->as.unary_expression.operand);
+    return false;
+}
+
+static void apply_condition_flow_merge(
+    VcSemanticContext *context,
+    const VcConditionFlow *flow)
+{
+    if (flow == NULL)
+        return;
+    for (size_t i = 0; i < flow->local_count; i++)
+        context->locals[i].assigned = flow->when_true[i] && flow->when_false[i];
+}
+
+static bool analyze_condition_flow(
+    VcSemanticContext *context,
+    const VcAstNode *expression,
+    VcConditionFlow *flow,
+    VcSemanticType *type)
+{
+    if (expression == NULL || flow == NULL || type == NULL)
+        return false;
+
+    if (expression->kind == VC_AST_PARENTHESIZED_EXPRESSION &&
+        expression_has_short_circuit_flow(expression))
+    {
+        if (!analyze_condition_flow(context,
+                expression->as.parenthesized_expression.expression, flow, type))
+            return false;
+        if (!annotate(context, expression, *type))
+        {
+            free_condition_flow(flow);
+            return false;
+        }
+        return true;
+    }
+
+    if (expression->kind == VC_AST_UNARY_EXPRESSION &&
+        expression->as.unary_expression.operator_kind == VC_TOKEN_BANG &&
+        expression_has_short_circuit_flow(expression->as.unary_expression.operand))
+    {
+        if (!analyze_condition_flow(context, expression->as.unary_expression.operand, flow, type))
+            return false;
+        if (*type != VC_SEM_TYPE_BOOL)
+        {
+            set_diagnostic(context->diagnostic, context->source, expression->location,
+                "logical negation requires a bool operand");
+            free_condition_flow(flow);
+            return false;
+        }
+        bool *swap = flow->when_true;
+        flow->when_true = flow->when_false;
+        flow->when_false = swap;
+        if (!annotate(context, expression, VC_SEM_TYPE_BOOL))
+        {
+            free_condition_flow(flow);
+            return false;
+        }
+        *type = VC_SEM_TYPE_BOOL;
+        return true;
+    }
+
+    if (expression->kind == VC_AST_BINARY_EXPRESSION &&
+        (expression->as.binary_expression.operator_kind == VC_TOKEN_AMPERSAND_AMPERSAND ||
+         expression->as.binary_expression.operator_kind == VC_TOKEN_PIPE_PIPE))
+    {
+        const bool is_and = expression->as.binary_expression.operator_kind ==
+            VC_TOKEN_AMPERSAND_AMPERSAND;
+        VcConditionFlow left = {0};
+        VcConditionFlow right = {0};
+        VcSemanticType left_type = VC_SEM_TYPE_ERROR;
+        VcSemanticType right_type = VC_SEM_TYPE_ERROR;
+
+        if (!analyze_condition_flow(context, expression->as.binary_expression.left,
+                &left, &left_type))
+            return false;
+        if (left_type != VC_SEM_TYPE_BOOL)
+        {
+            set_diagnostic(context->diagnostic, context->source, expression->location,
+                "logical operator requires bool operands");
+            free_condition_flow(&left);
+            return false;
+        }
+
+        restore_assignments(context,
+            is_and ? left.when_true : left.when_false, left.local_count);
+        if (!analyze_condition_flow(context, expression->as.binary_expression.right,
+                &right, &right_type))
+        {
+            free_condition_flow(&left);
+            return false;
+        }
+        if (right_type != VC_SEM_TYPE_BOOL)
+        {
+            set_diagnostic(context->diagnostic, context->source, expression->location,
+                "logical operator requires bool operands");
+            free_condition_flow(&left);
+            free_condition_flow(&right);
+            return false;
+        }
+
+        flow->local_count = right.local_count;
+        if (flow->local_count > 0)
+        {
+            flow->when_true = malloc(flow->local_count * sizeof(*flow->when_true));
+            flow->when_false = malloc(flow->local_count * sizeof(*flow->when_false));
+            if (flow->when_true == NULL || flow->when_false == NULL)
+            {
+                set_diagnostic(context->diagnostic, context->source, expression->location,
+                    "out of memory while tracking short-circuit flow");
+                free_condition_flow(&left);
+                free_condition_flow(&right);
+                free_condition_flow(flow);
+                return false;
+            }
+        }
+
+        for (size_t i = 0; i < flow->local_count; i++)
+        {
+            const bool left_true = i < left.local_count ? left.when_true[i] : false;
+            const bool left_false = i < left.local_count ? left.when_false[i] : false;
+            const bool right_true = right.when_true[i];
+            const bool right_false = right.when_false[i];
+            if (is_and)
+            {
+                flow->when_true[i] = right_true;
+                flow->when_false[i] = left_false && right_false;
+            }
+            else
+            {
+                flow->when_true[i] = left_true && right_true;
+                flow->when_false[i] = right_false;
+            }
+        }
+
+        free_condition_flow(&left);
+        free_condition_flow(&right);
+        apply_condition_flow_merge(context, flow);
+        if (!annotate(context, expression, VC_SEM_TYPE_BOOL))
+        {
+            free_condition_flow(flow);
+            return false;
+        }
+        *type = VC_SEM_TYPE_BOOL;
+        return true;
+    }
+
+    *type = analyze_expression(context, expression);
+    if (*type == VC_SEM_TYPE_ERROR)
+        return false;
+    return condition_flow_capture_current(context, flow, expression->location);
+}
+
 static void merge_flow_assignments(
     VcSemanticContext *context,
     bool *values,
@@ -25949,65 +26608,10 @@ static bool analyze_statement(VcSemanticContext *context, const VcAstNode *state
 
             if (!statement->as.local_declaration.is_var)
             {
-                if (type_ref_has_explicit_function_pointer(statement->as.local_declaration.type) &&
-                    !statement->as.local_declaration.type->is_function_pointer &&
-                    !context_is_unsafe(context))
-                {
-                    set_diagnostic(context->diagnostic, context->source, statement->location,
-                        "native function pointer type arguments require an unsafe method");
+                declared = resolve_explicit_local_type(context,
+                    statement->as.local_declaration.type, statement->location);
+                if (declared == VC_SEM_TYPE_ERROR || declared == VC_SEM_TYPE_UNKNOWN)
                     return false;
-                }
-                declared = resolve_type(context->model, statement->as.local_declaration.type,
-                    context->namespace_name, false);
-                if (declared == VC_SEM_TYPE_UNKNOWN || declared == VC_SEM_TYPE_VOID)
-                {
-                    set_diagnostic(context->diagnostic, context->source, statement->location,
-                        "type '%s' is not supported as a local type",
-                        statement->as.local_declaration.type != NULL ? statement->as.local_declaration.type->name : "<unknown>");
-                    return false;
-                }
-                if (vc_semantic_type_is_function_pointer(declared))
-                {
-                    if (!context_is_unsafe(context) &&
-                        !type_ref_has_generic_parameter_origin(statement->as.local_declaration.type))
-                    {
-                        set_diagnostic(context->diagnostic, context->source, statement->location,
-                            "native function pointer locals require an unsafe method");
-                        return false;
-                    }
-                    if (!native_function_pointer_abi_supported(context->model, declared))
-                    {
-                        set_diagnostic(context->diagnostic, context->source, statement->location,
-                            "native function pointer signature is not supported by the C ABI");
-                        return false;
-                    }
-                }
-                if (vc_semantic_type_is_pointer(declared))
-                {
-                    if (!context_is_unsafe(context))
-                    {
-                        set_diagnostic(context->diagnostic, context->source, statement->location,
-                            "pointer locals require an unsafe method");
-                        return false;
-                    }
-                    const char *missing_parameter = NULL;
-                    if (!context_generic_type_ref_has_required_unmanaged_constraints(
-                            context, statement->as.local_declaration.type, &missing_parameter))
-                    {
-                        set_diagnostic(context->diagnostic, context->source, statement->location,
-                            "generic pointer local using '%s' requires 'where %s : unmanaged'",
-                            missing_parameter != NULL ? missing_parameter : "<generic>",
-                            missing_parameter != NULL ? missing_parameter : "T");
-                        return false;
-                    }
-                    if (!pointer_type_ref_element_supported(context->model, declared,
-                            statement->as.local_declaration.type))
-                    {
-                        set_diagnostic(context->diagnostic, context->source, statement->location,
-                            "pointer local type is not supported");
-                        return false;
-                    }
-                }
             }
 
             if (statement->as.local_declaration.is_ref)
@@ -26706,34 +27310,60 @@ try_fail_before:
 
         case VC_AST_IF_STATEMENT:
         {
-            const size_t saved_count = context->local_count;
-            const VcAstNode *pattern = NULL;
-            const VcSemanticType condition = analyze_pattern_condition(
-                context, statement->as.if_statement.condition, &pattern);
+            const size_t entry_count = context->local_count;
+            const VcAstNode *pattern = declaration_pattern_condition(
+                statement->as.if_statement.condition);
+            VcConditionFlow condition_flow = {0};
+            VcSemanticType condition = VC_SEM_TYPE_ERROR;
+
+            if (pattern != NULL)
+            {
+                condition = analyze_pattern_condition(
+                    context, statement->as.if_statement.condition, &pattern);
+                if (condition != VC_SEM_TYPE_ERROR &&
+                    !condition_flow_capture_current(context, &condition_flow, statement->location))
+                    condition = VC_SEM_TYPE_ERROR;
+            }
+            else if (!analyze_condition_flow(context,
+                    statement->as.if_statement.condition, &condition_flow, &condition))
+                condition = VC_SEM_TYPE_ERROR;
+
             if (condition == VC_SEM_TYPE_ERROR)
+            {
+                context->local_count = entry_count;
+                free_condition_flow(&condition_flow);
                 return false;
+            }
             if (condition != VC_SEM_TYPE_BOOL)
             {
-                set_diagnostic(context->diagnostic, context->source, statement->as.if_statement.condition->location,
-                    "if condition must be bool, got '%s'", context_type_display_name(context, condition));
+                set_diagnostic(context->diagnostic, context->source,
+                    statement->as.if_statement.condition->location,
+                    "if condition must be bool, got '%s'",
+                    context_type_display_name(context, condition));
+                context->local_count = entry_count;
+                free_condition_flow(&condition_flow);
                 return false;
             }
 
-            bool *before = snapshot_assignments(context, saved_count, statement->location);
-            VcRefFlowState *before_ref = snapshot_ref_flow(context, saved_count, statement->location);
-            if (saved_count > 0 && (before == NULL || before_ref == NULL))
+            /* Inline out declarations in the condition are ordinary locals in the
+               containing lexical scope. Declaration-pattern locals are still
+               introduced only for the branch below. */
+            const size_t saved_count = context->local_count;
+            VcRefFlowState *condition_ref = snapshot_ref_flow(
+                context, saved_count, statement->location);
+            if (saved_count > 0 && condition_ref == NULL)
             {
-                free(before);
-                free(before_ref);
+                free_condition_flow(&condition_flow);
                 return false;
             }
 
+            restore_assignments(context, condition_flow.when_true, saved_count);
             if (!push_declaration_pattern_local(context, pattern) ||
                 !analyze_statement(context, statement->as.if_statement.then_statement))
             {
                 context->local_count = saved_count;
-                free(before);
-                free(before_ref);
+                free(condition_ref);
+                free_condition_flow(&condition_flow);
                 return false;
             }
             context->local_count = saved_count;
@@ -26741,105 +27371,175 @@ try_fail_before:
             VcRefFlowState *then_ref = snapshot_ref_flow(context, saved_count, statement->location);
             if (saved_count > 0 && (then_values == NULL || then_ref == NULL))
             {
-                free(before);
-                free(before_ref);
+                free(condition_ref);
                 free(then_values);
                 free(then_ref);
+                free_condition_flow(&condition_flow);
                 return false;
             }
 
-            restore_assignments(context, before, saved_count);
-            restore_ref_flow(context, before_ref, saved_count);
+            restore_assignments(context, condition_flow.when_false, saved_count);
+            restore_ref_flow(context, condition_ref, saved_count);
+            bool *else_values = NULL;
+            VcRefFlowState *else_ref = NULL;
             if (statement->as.if_statement.else_statement != NULL)
             {
                 if (!analyze_statement(context, statement->as.if_statement.else_statement))
                 {
-                    free(before);
-                    free(before_ref);
+                    context->local_count = saved_count;
+                    free(condition_ref);
                     free(then_values);
                     free(then_ref);
+                    free_condition_flow(&condition_flow);
                     return false;
                 }
                 context->local_count = saved_count;
+                else_values = snapshot_assignments(context, saved_count, statement->location);
+                else_ref = snapshot_ref_flow(context, saved_count, statement->location);
+                if (saved_count > 0 && (else_values == NULL || else_ref == NULL))
+                {
+                    free(condition_ref);
+                    free(then_values);
+                    free(then_ref);
+                    free(else_values);
+                    free(else_ref);
+                    free_condition_flow(&condition_flow);
+                    return false;
+                }
             }
 
-            VcRefFlowState *else_ref = statement->as.if_statement.else_statement != NULL
-                ? snapshot_ref_flow(context, saved_count, statement->location) : NULL;
-            if (statement->as.if_statement.else_statement != NULL &&
-                saved_count > 0 && else_ref == NULL)
+            const bool then_terminates = switch_section_terminates(
+                statement->as.if_statement.then_statement);
+            const bool else_terminates = statement->as.if_statement.else_statement != NULL &&
+                switch_section_terminates(statement->as.if_statement.else_statement);
+            const bool *false_values = statement->as.if_statement.else_statement != NULL
+                ? else_values : condition_flow.when_false;
+            const VcRefFlowState *false_ref = statement->as.if_statement.else_statement != NULL
+                ? else_ref : condition_ref;
+
+            if (then_terminates && !else_terminates)
             {
-                free(before);
-                free(before_ref);
-                free(then_values);
-                free(then_ref);
-                return false;
+                restore_assignments(context, false_values, saved_count);
+                restore_ref_flow(context, false_ref, saved_count);
             }
-
-            for (size_t i = 0; i < saved_count; i++)
+            else if (!then_terminates && else_terminates)
             {
-                const bool else_assigned = statement->as.if_statement.else_statement != NULL
-                    ? context->locals[i].assigned
-                    : before[i];
-                context->locals[i].assigned = then_values[i] && else_assigned;
+                restore_assignments(context, then_values, saved_count);
+                restore_ref_flow(context, then_ref, saved_count);
             }
-            merge_ref_flow(context, then_ref,
-                statement->as.if_statement.else_statement != NULL ? else_ref : before_ref,
-                saved_count);
+            else
+            {
+                for (size_t i = 0; i < saved_count; i++)
+                    context->locals[i].assigned = then_values[i] && false_values[i];
+                merge_ref_flow(context, then_ref, false_ref, saved_count);
+            }
 
-            free(before);
-            free(before_ref);
+            free(condition_ref);
             free(then_values);
             free(then_ref);
+            free(else_values);
             free(else_ref);
+            free_condition_flow(&condition_flow);
             return true;
         }
 
         case VC_AST_WHILE_STATEMENT:
         {
-            const size_t saved_count = context->local_count;
-            const VcAstNode *pattern = NULL;
-            const VcSemanticType condition = analyze_pattern_condition(
-                context, statement->as.while_statement.condition, &pattern);
+            const size_t entry_count = context->local_count;
+            const VcAstNode *pattern = declaration_pattern_condition(
+                statement->as.while_statement.condition);
+            VcConditionFlow condition_flow = {0};
+            VcSemanticType condition = VC_SEM_TYPE_ERROR;
+
+            if (pattern != NULL)
+            {
+                condition = analyze_pattern_condition(
+                    context, statement->as.while_statement.condition, &pattern);
+                if (condition != VC_SEM_TYPE_ERROR &&
+                    !condition_flow_capture_current(context, &condition_flow, statement->location))
+                    condition = VC_SEM_TYPE_ERROR;
+            }
+            else if (!analyze_condition_flow(context,
+                    statement->as.while_statement.condition, &condition_flow, &condition))
+                condition = VC_SEM_TYPE_ERROR;
+
             if (condition == VC_SEM_TYPE_ERROR)
+            {
+                context->local_count = entry_count;
+                free_condition_flow(&condition_flow);
                 return false;
+            }
             if (condition != VC_SEM_TYPE_BOOL)
             {
-                set_diagnostic(context->diagnostic, context->source, statement->as.while_statement.condition->location,
-                    "while condition must be bool, got '%s'", context_type_display_name(context, condition));
+                set_diagnostic(context->diagnostic, context->source,
+                    statement->as.while_statement.condition->location,
+                    "while condition must be bool, got '%s'",
+                    context_type_display_name(context, condition));
+                context->local_count = entry_count;
+                free_condition_flow(&condition_flow);
                 return false;
             }
 
-            bool *before = snapshot_assignments(context, saved_count, statement->location);
-            VcRefFlowState *before_ref = snapshot_ref_flow(context, saved_count, statement->location);
-            if (saved_count > 0 && (before == NULL || before_ref == NULL))
+            const size_t loop_count = context->local_count;
+            VcRefFlowState *before_ref = snapshot_ref_flow(context, loop_count, statement->location);
+            bool *continue_assignments = loop_count > 0
+                ? malloc(loop_count * sizeof(*continue_assignments)) : NULL;
+            bool *break_assignments = loop_count > 0
+                ? malloc(loop_count * sizeof(*break_assignments)) : NULL;
+            if (loop_count > 0 && (before_ref == NULL ||
+                continue_assignments == NULL || break_assignments == NULL))
             {
-                free(before);
                 free(before_ref);
+                free(continue_assignments);
+                free(break_assignments);
+                context->local_count = entry_count;
+                free_condition_flow(&condition_flow);
+                set_diagnostic(context->diagnostic, context->source, statement->location,
+                    "out of memory while tracking while control flow");
                 return false;
             }
+
+            restore_assignments(context, condition_flow.when_true, loop_count);
             context->loop_depth++;
             context->break_depth++;
-            const bool ok = push_declaration_pattern_local(context, pattern) &&
+            VcLoopFlowCapture flow = {0};
+            flow.continue_assignments = continue_assignments;
+            flow.break_assignments = break_assignments;
+            flow.local_count = loop_count;
+            flow.loop_depth = context->loop_depth;
+            flow.break_depth = context->break_depth;
+            flow.previous = context->loop_flow_capture;
+            context->loop_flow_capture = &flow;
+
+            bool ok = push_declaration_pattern_local(context, pattern) &&
                 analyze_statement(context, statement->as.while_statement.body);
+            context->loop_flow_capture = flow.previous;
             context->break_depth--;
             context->loop_depth--;
-            context->local_count = saved_count;
+            context->local_count = loop_count;
+
             VcRefFlowState *after_ref = ok
-                ? snapshot_ref_flow(context, saved_count, statement->location) : NULL;
-            if (ok && saved_count > 0 && after_ref == NULL)
-            {
-                free(before);
-                free(before_ref);
-                return false;
-            }
-            restore_assignments(context, before, saved_count);
+                ? snapshot_ref_flow(context, loop_count, statement->location) : NULL;
+            if (ok && loop_count > 0 && after_ref == NULL)
+                ok = false;
             if (ok)
-                merge_ref_flow(context, before_ref, after_ref, saved_count);
+            {
+                restore_assignments(context, condition_flow.when_false, loop_count);
+                if (flow.has_break)
+                    for (size_t i = 0; i < loop_count; i++)
+                        context->locals[i].assigned = context->locals[i].assigned &&
+                            break_assignments[i];
+                merge_ref_flow(context, before_ref, after_ref, loop_count);
+            }
             else
-                restore_ref_flow(context, before_ref, saved_count);
+                restore_ref_flow(context, before_ref, loop_count);
+
             free(after_ref);
             free(before_ref);
-            free(before);
+            context->local_count = entry_count;
+            free(continue_assignments);
+            free(break_assignments);
+            free_condition_flow(&condition_flow);
             return ok;
         }
 
@@ -26866,7 +27566,6 @@ try_fail_before:
 
             context->loop_depth++;
             context->break_depth++;
-
             VcLoopFlowCapture flow = {0};
             flow.continue_assignments = continue_assignments;
             flow.break_assignments = break_assignments;
@@ -26900,17 +27599,20 @@ try_fail_before:
                 return false;
             }
             if (flow.has_continue)
-            {
                 for (size_t i = 0; i < saved_count; i++)
                     condition_entry[i] = condition_entry[i] && continue_assignments[i];
-            }
             restore_assignments(context, condition_entry, saved_count);
 
-            const VcSemanticType condition = analyze_expression(
-                context, statement->as.while_statement.condition);
+            VcConditionFlow condition_flow = {0};
+            VcSemanticType condition = VC_SEM_TYPE_ERROR;
+            if (!analyze_condition_flow(context, statement->as.while_statement.condition,
+                    &condition_flow, &condition))
+                condition = VC_SEM_TYPE_ERROR;
             if (condition == VC_SEM_TYPE_ERROR)
             {
+                context->local_count = saved_count;
                 restore_assignments(context, before, saved_count);
+                free_condition_flow(&condition_flow);
                 free(condition_entry);
                 free(continue_assignments);
                 free(break_assignments);
@@ -26923,7 +27625,9 @@ try_fail_before:
                     statement->as.while_statement.condition->location,
                     "do-while condition must be bool, got '%s'",
                     context_type_display_name(context, condition));
+                context->local_count = saved_count;
                 restore_assignments(context, before, saved_count);
+                free_condition_flow(&condition_flow);
                 free(condition_entry);
                 free(continue_assignments);
                 free(break_assignments);
@@ -26931,25 +27635,16 @@ try_fail_before:
                 return false;
             }
 
-            bool *after_condition = snapshot_assignments(context, saved_count, statement->location);
-            if (saved_count > 0 && after_condition == NULL)
+            for (size_t i = 0; i < saved_count; i++)
             {
-                restore_assignments(context, before, saved_count);
-                free(condition_entry);
-                free(continue_assignments);
-                free(break_assignments);
-                free(before);
-                return false;
+                bool assigned = condition_flow.when_false[i];
+                if (flow.has_break)
+                    assigned = assigned && break_assignments[i];
+                context->locals[i].assigned = assigned;
             }
+            context->local_count = saved_count;
 
-            restore_assignments(context, after_condition, saved_count);
-            if (flow.has_break)
-            {
-                for (size_t i = 0; i < saved_count; i++)
-                    context->locals[i].assigned = context->locals[i].assigned && break_assignments[i];
-            }
-
-            free(after_condition);
+            free_condition_flow(&condition_flow);
             free(condition_entry);
             free(continue_assignments);
             free(break_assignments);
@@ -26970,51 +27665,113 @@ try_fail_before:
                 return false;
             }
 
+            VcConditionFlow condition_flow = {0};
+            VcSemanticType condition = VC_SEM_TYPE_BOOL;
             if (statement->as.for_statement.condition != NULL)
             {
-                const VcSemanticType condition = analyze_expression(context, statement->as.for_statement.condition);
+                if (!analyze_condition_flow(context, statement->as.for_statement.condition,
+                        &condition_flow, &condition))
+                    condition = VC_SEM_TYPE_ERROR;
                 if (condition == VC_SEM_TYPE_ERROR)
                 {
                     context->depth--;
                     context->local_count = saved_count;
+                    free_condition_flow(&condition_flow);
                     return false;
                 }
                 if (condition != VC_SEM_TYPE_BOOL)
                 {
-                    set_diagnostic(context->diagnostic, context->source, statement->as.for_statement.condition->location,
-                        "for condition must be bool, got '%s'", context_type_display_name(context, condition));
+                    set_diagnostic(context->diagnostic, context->source,
+                        statement->as.for_statement.condition->location,
+                        "for condition must be bool, got '%s'",
+                        context_type_display_name(context, condition));
                     context->depth--;
                     context->local_count = saved_count;
+                    free_condition_flow(&condition_flow);
                     return false;
                 }
             }
-
-            bool *before_loop = snapshot_assignments(context, context->local_count, statement->location);
-            if (context->local_count > 0 && before_loop == NULL)
+            else if (!condition_flow_capture_current(context, &condition_flow, statement->location))
             {
                 context->depth--;
                 context->local_count = saved_count;
                 return false;
             }
+
             const size_t loop_local_count = context->local_count;
-
-            if (statement->as.for_statement.increment != NULL &&
-                analyze_expression(context, statement->as.for_statement.increment) == VC_SEM_TYPE_ERROR)
+            VcRefFlowState *before_ref = snapshot_ref_flow(context, loop_local_count, statement->location);
+            bool *continue_assignments = loop_local_count > 0
+                ? malloc(loop_local_count * sizeof(*continue_assignments)) : NULL;
+            bool *break_assignments = loop_local_count > 0
+                ? malloc(loop_local_count * sizeof(*break_assignments)) : NULL;
+            if (loop_local_count > 0 && (before_ref == NULL ||
+                continue_assignments == NULL || break_assignments == NULL))
             {
-                free(before_loop);
+                free(before_ref);
+                free(continue_assignments);
+                free(break_assignments);
+                free_condition_flow(&condition_flow);
                 context->depth--;
                 context->local_count = saved_count;
+                set_diagnostic(context->diagnostic, context->source, statement->location,
+                    "out of memory while tracking for control flow");
                 return false;
             }
-
+            restore_assignments(context, condition_flow.when_true, loop_local_count);
             context->loop_depth++;
             context->break_depth++;
-            const bool ok = analyze_statement(context, statement->as.for_statement.body);
+            VcLoopFlowCapture flow = {0};
+            flow.continue_assignments = continue_assignments;
+            flow.break_assignments = break_assignments;
+            flow.local_count = loop_local_count;
+            flow.loop_depth = context->loop_depth;
+            flow.break_depth = context->break_depth;
+            flow.previous = context->loop_flow_capture;
+            context->loop_flow_capture = &flow;
+            bool ok = analyze_statement(context, statement->as.for_statement.body);
+            context->loop_flow_capture = flow.previous;
             context->break_depth--;
             context->loop_depth--;
             context->local_count = loop_local_count;
-            restore_assignments(context, before_loop, loop_local_count);
-            free(before_loop);
+
+            if (ok && statement->as.for_statement.increment != NULL)
+            {
+                /* The increment follows fallthrough and continue, never break.
+                   Reuse the same loop capture used by while/do-while. */
+                if (flow.has_continue)
+                {
+                    if (switch_section_terminates(statement->as.for_statement.body))
+                        restore_assignments(context, continue_assignments, loop_local_count);
+                    else
+                        for (size_t i = 0; i < loop_local_count; i++)
+                            context->locals[i].assigned = context->locals[i].assigned &&
+                                continue_assignments[i];
+                }
+                ok = analyze_expression(context, statement->as.for_statement.increment) !=
+                    VC_SEM_TYPE_ERROR;
+            }
+            VcRefFlowState *after_ref = ok
+                ? snapshot_ref_flow(context, loop_local_count, statement->location) : NULL;
+            if (ok && loop_local_count > 0 && after_ref == NULL)
+                ok = false;
+            if (ok)
+            {
+                restore_assignments(context, condition_flow.when_false, loop_local_count);
+                if (flow.has_break)
+                    for (size_t i = 0; i < loop_local_count; i++)
+                        context->locals[i].assigned = statement->as.for_statement.condition == NULL
+                            ? break_assignments[i]
+                            : context->locals[i].assigned && break_assignments[i];
+                if (statement->as.for_statement.condition != NULL)
+                    merge_ref_flow(context, before_ref, after_ref, loop_local_count);
+            }
+            else
+                restore_ref_flow(context, before_ref, loop_local_count);
+            free(after_ref);
+            free(before_ref);
+            free(continue_assignments);
+            free(break_assignments);
+            free_condition_flow(&condition_flow);
             context->depth--;
             context->local_count = saved_count;
             return ok;
@@ -28693,7 +29450,18 @@ static bool analyze_constructor_initializer_call(
                 target->node->as.method_declaration.parameters.items[parameter_index]
                     ->as.parameter.type);
         }
-        if (argument_types[i] == VC_SEM_TYPE_UNKNOWN &&
+        if (is_untyped_out_argument(arguments->items[i]))
+        {
+            if (target->parameter_modifiers[parameter_index] != VC_TOKEN_KW_OUT)
+            {
+                free(mapped_parameters);
+                free(argument_types);
+                free(argument_modifiers);
+                return false;
+            }
+            argument_types[i] = expected;
+        }
+        else if (argument_types[i] == VC_SEM_TYPE_UNKNOWN &&
             expression_requires_target_type(arguments->items[i]))
         {
             const bool saved_has_this = context->has_this;
@@ -28774,8 +29542,11 @@ static bool analyze_base_constructor_initializer(
     context->model->constructors[base_constructor].reachable = true;
     if (!analyze_constructor(context->model, base_constructor, context->diagnostic))
         return false;
-    mark_out_arguments_assigned(context, arguments);
-    return true;
+    const VcSemanticConstructor *target = &context->model->constructors[base_constructor];
+    return mark_out_arguments_assigned(context, arguments,
+        &target->node->as.method_declaration.parameters,
+        target->parameter_types, target->parameter_modifiers,
+        target->parameter_count, argument_parameters);
 }
 
 static bool analyze_this_constructor_initializer(
@@ -28812,8 +29583,10 @@ static bool analyze_this_constructor_initializer(
     target->reachable = true;
     if (!analyze_constructor(context->model, target_constructor, context->diagnostic))
         return false;
-    mark_out_arguments_assigned(context, arguments);
-    return true;
+    return mark_out_arguments_assigned(context, arguments,
+        &target->node->as.method_declaration.parameters,
+        target->parameter_types, target->parameter_modifiers,
+        target->parameter_count, argument_parameters);
 }
 
 static bool analyze_constructor(VcSemanticModel *model, size_t constructor_index, VcSemanticDiagnostic *diagnostic)

@@ -1,0 +1,50 @@
+using Void;
+
+public interface IRunner { void Run(); }
+public class BaseRunner { public virtual int Index => 0; }
+public sealed class Box<T>
+{
+    private T[] _values;
+    public Box(T[] values) { _values = values; }
+    public T Read(int index) { return _values[index]; }
+}
+public sealed class Resource : IDisposable
+{
+    public void Dispose() { GC.Collect(); }
+}
+public static class Pipeline
+{
+    static void Old(int depth)
+    {
+        if (depth < 0) return;
+        if (depth > 0) { Old(depth - 1); return; }
+        throw new Exception("handled-350");
+    }
+    public static void Recover()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            try { using (Resource resource = new Resource()) { Old(12); } }
+            catch (Exception error) { GC.Collect(); }
+        }
+    }
+    public static void Success(int depth) { if (depth > 0) Success(depth - 1); }
+    public static void Invoke<T>(Box<T> box, int index) { box.Read(index); }
+}
+public sealed class Runner : BaseRunner, IRunner
+{
+    private Box<Box<int>> _items;
+    public override int Index => 8;
+    public Runner() { _items = new Box<Box<int>>(new[] { new Box<int>(new[] { 1, 2 }) }); }
+    public void Run()
+    {
+        int.TryParse("8", out var parsed);
+        Action callback = () => Pipeline.Invoke<Box<int>>(_items, parsed);
+        Pipeline.Recover(); Pipeline.Success(20); Pipeline.Success(20);
+        GC.Collect(); callback();
+    }
+}
+public static class Program
+{
+    public static void Main() { IRunner runner = new Runner(); runner.Run(); }
+}

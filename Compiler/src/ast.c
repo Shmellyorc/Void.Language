@@ -1030,9 +1030,19 @@ static void dump_node(const VcAstNode *node, int depth)
             break;
 
         case VC_AST_UNARY_EXPRESSION:
-            printf("%sUnary %s\n",
+            printf("%sUnary %s",
                 node->as.unary_expression.postfix ? "Postfix" : "",
                 vc_token_kind_name(node->as.unary_expression.operator_kind));
+            if (node->as.unary_expression.inline_out_type != NULL)
+            {
+                fputs(" declare ", stdout);
+                dump_type(node->as.unary_expression.inline_out_type);
+            }
+            else if (node->as.unary_expression.inline_out_inferred)
+                fputs(" declare var", stdout);
+            else if (node->as.unary_expression.inline_out_discard)
+                fputs(" discard", stdout);
+            fputc('\n', stdout);
             dump_node(node->as.unary_expression.operand, depth + 1);
             break;
 
