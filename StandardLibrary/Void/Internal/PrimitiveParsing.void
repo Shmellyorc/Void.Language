@@ -1,0 +1,323 @@
+namespace Void.Internal;
+
+// Shared high-level parsing support for the built-in Parse/TryParse surfaces.
+// This deliberately operates on VOID string scalar indexing and integer
+// arithmetic instead of delegating the public contract to libc.
+internal static class PrimitiveParsing
+{
+    internal const int Success = 0;
+    internal const int Invalid = 1;
+    internal const int Overflow = 2;
+    internal const int Null = 3;
+
+    internal static bool IsAsciiWhitespace(char value)
+    {
+        return value == ' ' || value == '\t' || value == '\n' ||
+               value == '\r' || value == '\f' || value == '\v';
+    }
+
+    internal static int TrimAsciiWhitespace(string value, out int start, out int end)
+    {
+        start = 0;
+        end = 0;
+        if (value == null)
+            return Null;
+
+        end = value.Length;
+        while (start < end && IsAsciiWhitespace(value[start]))
+            start++;
+        while (end > start && IsAsciiWhitespace(value[end - 1]))
+            end--;
+        return Success;
+    }
+
+    // Parses a decimal magnitude without ever overflowing an intermediate.
+    // positiveLimit is the largest allowed positive magnitude; negativeLimit
+    // is the allowed magnitude after '-' for signed targets (e.g. 2147483648
+    // for int so int.MinValue can be represented exactly).
+    internal static int ParseIntegerMagnitude(
+        string value,
+        bool allowNegative,
+        ulong positiveLimit,
+        ulong negativeLimit,
+        out ulong magnitude,
+        out bool negative)
+    {
+        magnitude = 0ul;
+        negative = false;
+
+        int start;
+        int end;
+        int trimStatus = TrimAsciiWhitespace(value, out start, out end);
+        if (trimStatus != Success)
+            return trimStatus;
+        if (start == end)
+            return Invalid;
+
+        char first = value[start];
+        if (first == '+' || first == '-')
+        {
+            negative = first == '-';
+            start++;
+            if (start == end)
+                return Invalid;
+        }
+
+        ulong limit = negative ? negativeLimit : positiveLimit;
+        bool overflow = negative && !allowNegative;
+        while (start < end)
+        {
+            char current = value[start];
+            if (current < '0' || current > '9')
+                return Invalid;
+            ulong digit = (ulong)((int)current - (int)'0');
+            // Continue validating after a range failure so malformed trailing
+            // input remains a format error; never accumulate beyond the limit.
+            if (!overflow)
+            {
+                if (digit > limit || magnitude > (limit - digit) / 10ul)
+                    overflow = true;
+                else
+                    magnitude = magnitude * 10ul + digit;
+            }
+            start++;
+        }
+
+        return overflow ? Overflow : Success;
+    }
+
+    internal static int ParseBoolean(string value, out bool result)
+    {
+        result = false;
+        int start;
+        int end;
+        int status = TrimAsciiWhitespace(value, out start, out end);
+        if (status != Success)
+            return status;
+
+        int length = end - start;
+        if (length == 4 &&
+            EqualsAsciiIgnoreCase(value[start], 't') &&
+            EqualsAsciiIgnoreCase(value[start + 1], 'r') &&
+            EqualsAsciiIgnoreCase(value[start + 2], 'u') &&
+            EqualsAsciiIgnoreCase(value[start + 3], 'e'))
+        {
+            result = true;
+            return Success;
+        }
+        if (length == 5 &&
+            EqualsAsciiIgnoreCase(value[start], 'f') &&
+            EqualsAsciiIgnoreCase(value[start + 1], 'a') &&
+            EqualsAsciiIgnoreCase(value[start + 2], 'l') &&
+            EqualsAsciiIgnoreCase(value[start + 3], 's') &&
+            EqualsAsciiIgnoreCase(value[start + 4], 'e'))
+        {
+            result = false;
+            return Success;
+        }
+        return Invalid;
+    }
+
+    internal static bool EqualsAsciiIgnoreCase(char left, char lower)
+    {
+        if (left == lower)
+            return true;
+        return left >= 'A' && left <= 'Z' && (char)((int)left + 32) == lower;
+    }
+
+    internal static int ParseChar(string value, out char result)
+    {
+        result = char.MinValue;
+        if (value == null)
+            return Null;
+        if (value.Length != 1)
+            return Invalid;
+        result = value[0];
+        return Success;
+    }
+
+    internal const int FloatingSpecialNone = 0;
+    internal const int FloatingSpecialNaN = 1;
+    internal const int FloatingSpecialPositiveInfinity = 2;
+    internal const int FloatingSpecialNegativeInfinity = 3;
+
+    internal static bool MatchAsciiNaN(string value, int start, int end)
+    {
+        return end - start == 3 &&
+               EqualsAsciiIgnoreCase(value[start], 'n') &&
+               EqualsAsciiIgnoreCase(value[start + 1], 'a') &&
+               EqualsAsciiIgnoreCase(value[start + 2], 'n');
+    }
+
+    internal static bool MatchAsciiInfinity(string value, int start, int end)
+    {
+        return end - start == 8 &&
+               EqualsAsciiIgnoreCase(value[start], 'i') &&
+               EqualsAsciiIgnoreCase(value[start + 1], 'n') &&
+               EqualsAsciiIgnoreCase(value[start + 2], 'f') &&
+               EqualsAsciiIgnoreCase(value[start + 3], 'i') &&
+               EqualsAsciiIgnoreCase(value[start + 4], 'n') &&
+               EqualsAsciiIgnoreCase(value[start + 5], 'i') &&
+               EqualsAsciiIgnoreCase(value[start + 6], 't') &&
+               EqualsAsciiIgnoreCase(value[start + 7], 'y');
+    }
+
+    // Validates the culture-independent floating grammar without performing
+    // decimal-to-binary conversion. Exponent digits are scanned but never
+    // accumulated, so arbitrarily large exponent text cannot overflow an
+    // integer accumulator. The returned range is the trimmed scalar range.
+    internal static int ScanFloatingNumber(
+        string value,
+        out int start,
+        out int length,
+        out int special)
+    {
+        start = 0;
+        length = 0;
+        special = FloatingSpecialNone;
+
+        int end;
+        int trimStatus = TrimAsciiWhitespace(value, out start, out end);
+        if (trimStatus != Success)
+            return trimStatus;
+        if (start == end)
+            return Invalid;
+
+        int tokenStart = start;
+        int index = start;
+        bool negative = false;
+        bool explicitSign = false;
+        char first = value[index];
+        if (first == '+' || first == '-')
+        {
+            explicitSign = true;
+            negative = first == '-';
+            index++;
+            if (index == end)
+                return Invalid;
+        }
+
+        if (MatchAsciiNaN(value, index, end))
+        {
+            if (explicitSign)
+                return Invalid;
+            special = FloatingSpecialNaN;
+            start = tokenStart;
+            length = end - tokenStart;
+            return Success;
+        }
+        if (MatchAsciiInfinity(value, index, end))
+        {
+            special = negative ? FloatingSpecialNegativeInfinity : FloatingSpecialPositiveInfinity;
+            start = tokenStart;
+            length = end - tokenStart;
+            return Success;
+        }
+
+        int significandDigits = 0;
+        while (index < end && value[index] >= '0' && value[index] <= '9')
+        {
+            significandDigits++;
+            index++;
+        }
+
+        if (index < end && value[index] == '.')
+        {
+            index++;
+            while (index < end && value[index] >= '0' && value[index] <= '9')
+            {
+                significandDigits++;
+                index++;
+            }
+        }
+
+        if (significandDigits == 0)
+            return Invalid;
+
+        if (index < end && (value[index] == 'e' || value[index] == 'E'))
+        {
+            index++;
+            if (index < end && (value[index] == '+' || value[index] == '-'))
+                index++;
+            int exponentDigits = 0;
+            while (index < end && value[index] >= '0' && value[index] <= '9')
+            {
+                exponentDigits++;
+                index++;
+            }
+            if (exponentDigits == 0)
+                return Invalid;
+        }
+
+        if (index != end)
+            return Invalid;
+
+        start = tokenStart;
+        length = end - tokenStart;
+        return Success;
+    }
+
+    internal static int ConvertInvariantFloat32(string value, int start, int length, out float result)
+    {
+        result = (float)0;
+        return Runtime.InvariantNumericConvertF32(value, start, length, out result);
+    }
+
+    internal static int ConvertInvariantFloat64(string value, int start, int length, out double result)
+    {
+        result = (double)0;
+        return Runtime.InvariantNumericConvertF64(value, start, length, out result);
+    }
+
+    internal static int ConvertInvariantLongDouble(string value, int start, int length, out decimal result)
+    {
+        result = (decimal)0;
+        return Runtime.InvariantNumericConvertLongDouble(value, start, length, out result);
+    }
+
+
+    internal static int ParseFloat32(string value, out float result)
+    {
+        result = (float)0;
+        int start;
+        int length;
+        int special;
+        int status = ScanFloatingNumber(value, out start, out length, out special);
+        if (status != Success)
+            return status;
+        if (special == FloatingSpecialNaN) { result = float.NaN; return Success; }
+        if (special == FloatingSpecialPositiveInfinity) { result = float.PositiveInfinity; return Success; }
+        if (special == FloatingSpecialNegativeInfinity) { result = float.NegativeInfinity; return Success; }
+        return ConvertInvariantFloat32(value, start, length, out result);
+    }
+
+    internal static int ParseFloat64(string value, out double result)
+    {
+        result = (double)0;
+        int start;
+        int length;
+        int special;
+        int status = ScanFloatingNumber(value, out start, out length, out special);
+        if (status != Success)
+            return status;
+        if (special == FloatingSpecialNaN) { result = double.NaN; return Success; }
+        if (special == FloatingSpecialPositiveInfinity) { result = double.PositiveInfinity; return Success; }
+        if (special == FloatingSpecialNegativeInfinity) { result = double.NegativeInfinity; return Success; }
+        return ConvertInvariantFloat64(value, start, length, out result);
+    }
+
+    internal static int ParseLongDouble(string value, out decimal result)
+    {
+        result = (decimal)0;
+        int start;
+        int length;
+        int special;
+        int status = ScanFloatingNumber(value, out start, out length, out special);
+        if (status != Success)
+            return status;
+        if (special != FloatingSpecialNone)
+            return Invalid;
+        return ConvertInvariantLongDouble(value, start, length, out result);
+    }
+
+}

@@ -1,0 +1,58 @@
+using Void;
+
+public class Box335<T>
+{
+    public static int Marker;
+    public static T Echo(T value) { return value; }
+}
+
+public static class Ordinary335
+{
+    public static int Value;
+    public static int Double(int value) { return value * 2; }
+}
+
+public struct StaticStruct335
+{
+    public static int Value;
+    public static int Triple(int value) { return value * 3; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine(string.Empty == "");
+        Console.WriteLine(string.Concat("VO", "ID") == "VOID");
+        Console.WriteLine(string.Equals("VOID", "VOID"));
+        Console.WriteLine(string.CompareOrdinal("A", "B") < 0);
+
+        Func<string, string, string> concat = string.Concat;
+        Func<string, string, bool> equal = string.Equals;
+        Func<string, string, int> compare = string.CompareOrdinal;
+        Console.WriteLine(concat("A", "B") == "AB");
+        Console.WriteLine(equal("same", "same"));
+        Console.WriteLine(compare("B", "A") > 0);
+
+        Ordinary335.Value = 10;
+        StaticStruct335.Value = 11;
+        Console.WriteLine(Ordinary335.Value == 10);
+        Console.WriteLine(Ordinary335.Double(6) == 12);
+        Console.WriteLine(StaticStruct335.Value == 11);
+        Console.WriteLine(StaticStruct335.Triple(4) == 12);
+
+        Box335<int>.Marker = 20;
+        Box335<string>.Marker = 30;
+        Box335<bool>.Marker = 31;
+        Box335<float>.Marker = 32;
+        Console.WriteLine(Box335<int>.Marker == 20);
+        Console.WriteLine(Box335<string>.Marker == 30);
+        Console.WriteLine(Box335<bool>.Marker == 31);
+        Console.WriteLine(Box335<float>.Marker == 32);
+        Console.WriteLine(Box335<int>.Echo(40) == 40);
+        Console.WriteLine(Box335<string>.Echo("text") == "text");
+
+        int value335 = 7;
+        Console.WriteLine(value335 == 7);
+    }
+}

@@ -22,6 +22,24 @@ typedef enum VcSemanticStandardConversionKind
     VC_SEM_CONVERSION_FUNCTION_POINTER
 } VcSemanticStandardConversionKind;
 
+/* Compiler-recognized exact primitive constant categories used by the
+   StandardLibrary built-in associated scopes.  The category is intentionally
+   independent of the public member name: the field's semantic type plus this
+   value determines the exact backend constant representation. */
+typedef enum VcPrimitiveConstantKind
+{
+    VC_PRIMITIVE_CONSTANT_NONE = 0,
+    VC_PRIMITIVE_CONSTANT_MIN,
+    VC_PRIMITIVE_CONSTANT_MAX,
+    VC_PRIMITIVE_CONSTANT_EPSILON,
+    VC_PRIMITIVE_CONSTANT_NAN,
+    VC_PRIMITIVE_CONSTANT_POSITIVE_INFINITY,
+    VC_PRIMITIVE_CONSTANT_NEGATIVE_INFINITY,
+    VC_PRIMITIVE_CONSTANT_ZERO,
+    VC_PRIMITIVE_CONSTANT_ONE,
+    VC_PRIMITIVE_CONSTANT_MINUS_ONE
+} VcPrimitiveConstantKind;
+
 enum
 {
     VC_SEM_TYPE_ERROR = 0,
@@ -68,6 +86,7 @@ typedef struct VcSemanticField
     bool is_event;
     bool is_custom_event;
     bool is_const;
+    VcPrimitiveConstantKind primitive_constant_kind;
     bool is_readonly;
     bool is_ref;
     bool ref_readonly;
@@ -157,6 +176,11 @@ typedef struct VcSemanticStruct
     size_t swizzle_component_count;
     size_t swizzle_component_fields[4];
     size_t delegate_invoke_method_index;
+    /* Compiler-owned declaration scope associated with a canonical built-in
+       semantic type. This is a compile-time member owner, never a runtime
+       wrapper object for the primitive/string/object value itself. */
+    bool is_builtin_associated_scope;
+    VcSemanticType associated_builtin_type;
 } VcSemanticStruct;
 
 typedef struct VcSemanticArray
@@ -335,6 +359,9 @@ typedef struct VcSemanticBinding
     const VcAstNode *declaration_node;
     VcSemanticType type;
     const char *generic_parameter_origin;
+    bool is_type_receiver;
+    /* Source type ref retains constructed arguments; type is the concrete identity. */
+    const VcAstTypeRef *receiver_type_ref;
     size_t method_index;
     size_t constructor_index;
     size_t struct_index;
@@ -522,6 +549,9 @@ typedef struct VcSemanticModel
     bool generic_inference_requested;
     const VcSemanticUnit *units;
     size_t unit_count;
+    /* Canonical semantic type -> ordinary declaration/member owner bridge.
+       SIZE_MAX means that the built-in has no registered associated scope. */
+    size_t builtin_associated_owners[VC_SEM_TYPE_NULL + 1];
 } VcSemanticModel;
 
 typedef VcDiagnostic VcSemanticDiagnostic;
@@ -530,7 +560,13 @@ void vc_semantic_model_init(VcSemanticModel *model);
 void vc_semantic_model_destroy(VcSemanticModel *model);
 
 const char *vc_semantic_type_name(const VcSemanticModel *model, VcSemanticType type);
+const char *vc_semantic_type_display_name(const VcSemanticModel *model, VcSemanticType type,
+    char *output, size_t output_size);
 VcSemanticType vc_semantic_builtin_type_from_ast(const VcAstTypeRef *type);
+bool vc_semantic_builtin_associated_owner(
+    const VcSemanticModel *model,
+    VcSemanticType type,
+    size_t *struct_index);
 bool vc_semantic_type_is_struct(VcSemanticType type);
 size_t vc_semantic_struct_index(VcSemanticType type);
 VcSemanticType vc_semantic_struct_type(size_t struct_index);

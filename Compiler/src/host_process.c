@@ -12,6 +12,7 @@
 #include <windows.h>
 #else
 #include <fcntl.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -192,7 +193,21 @@ bool vc_host_process_run(char *const argv[], unsigned long *exit_code,
         return true;
     }
     if (WIFSIGNALED(status))
-        return fail(error, error_size, "process terminated by signal %d", WTERMSIG(status));
+    {
+        const int signal = WTERMSIG(status);
+        const char *name = "unknown signal";
+        switch (signal)
+        {
+            case SIGSEGV: name = "SIGSEGV (invalid memory access)"; break;
+            case SIGILL: name = "SIGILL (illegal instruction)"; break;
+            case SIGABRT: name = "SIGABRT (abort)"; break;
+            case SIGFPE: name = "SIGFPE (arithmetic fault)"; break;
+            case SIGTERM: name = "SIGTERM (termination request)"; break;
+            case SIGINT: name = "SIGINT (interrupt)"; break;
+            default: break;
+        }
+        return fail(error, error_size, "process terminated by signal %d: %s", signal, name);
+    }
     return fail(error, error_size, "process ended unexpectedly");
 #endif
 }

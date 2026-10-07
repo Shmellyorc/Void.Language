@@ -1,3 +1,4 @@
+#include "../../Runtime/include/vc_utf8.h"
 #include "lsp.h"
 #include "compiler.h"
 #include "query.h"
@@ -214,31 +215,13 @@ static int hex_value(char c)
 
 static bool append_utf8(char *output, size_t output_size, size_t *length, unsigned value)
 {
-    if (value <= 0x7Fu)
-    {
-        if (*length + 1 >= output_size)
-            return false;
-        output[(*length)++] = (char)value;
-        return true;
-    }
-    if (value <= 0x7FFu)
-    {
-        if (*length + 2 >= output_size)
-            return false;
-        output[(*length)++] = (char)(0xC0u | (value >> 6));
-        output[(*length)++] = (char)(0x80u | (value & 0x3Fu));
-        return true;
-    }
-    if (value <= 0xFFFFu)
-    {
-        if (*length + 3 >= output_size)
-            return false;
-        output[(*length)++] = (char)(0xE0u | (value >> 12));
-        output[(*length)++] = (char)(0x80u | ((value >> 6) & 0x3Fu));
-        output[(*length)++] = (char)(0x80u | (value & 0x3Fu));
-        return true;
-    }
-    return false;
+    char encoded[4];
+    const size_t width = vc_utf8_encode_scalar((uint32_t)value, encoded);
+    if (width == 0 || *length + width >= output_size)
+        return false;
+    memcpy(output + *length, encoded, width);
+    *length += width;
+    return true;
 }
 
 static char *json_decode_string(VcLspSlice raw)
@@ -294,6 +277,33 @@ static char *json_decode_string(VcLspSlice raw)
                         return NULL;
                     }
                     value = (value << 4) | (unsigned)digit;
+                }
+                if (value >= 0xD800u && value <= 0xDBFFu)
+                {
+                    if (i + 6 >= raw.length - 1 || raw.start[i + 1] != '\\' ||
+                        raw.start[i + 2] != 'u')
+                    {
+                        free(output);
+                        return NULL;
+                    }
+                    i += 2;
+                    unsigned low = 0;
+                    for (size_t j = 0; j < 4; j++)
+                    {
+                        const int digit = hex_value(raw.start[++i]);
+                        if (digit < 0)
+                        {
+                            free(output);
+                            return NULL;
+                        }
+                        low = (low << 4) | (unsigned)digit;
+                    }
+                    if (low < 0xDC00u || low > 0xDFFFu)
+                    {
+                        free(output);
+                        return NULL;
+                    }
+                    value = 0x10000u + ((value - 0xD800u) << 10) + (low - 0xDC00u);
                 }
                 if (!append_utf8(output, raw.length + 1, &out, value))
                 {
@@ -1162,7 +1172,27 @@ static bool signature_label(
     size_t label_size)
 {
     size_t length = 0;
-    if (!append_format(label, label_size, &length, "%s(", signature->name))
+    if (!append_format(label, label_size, &length, "%s", signature->name))
+        return false;
+    if (signature->generic_parameter_count != 0)
+    {
+        if (!append_format(label, label_size, &length, "<"))
+            return false;
+        for (size_t i = 0; i < signature->generic_parameter_count; i++)
+        {
+            const char *generic_name = NULL;
+            if (!vc_query_signature_generic_parameter_at(
+                    session, path, offset, signature_index, i, &generic_name))
+                return false;
+            if (i != 0 && !append_format(label, label_size, &length, ", "))
+                return false;
+            if (!append_format(label, label_size, &length, "%s", generic_name))
+                return false;
+        }
+        if (!append_format(label, label_size, &length, ">"))
+            return false;
+    }
+    if (!append_format(label, label_size, &length, "("))
         return false;
     for (size_t i = 0; i < signature->parameter_count; i++)
     {

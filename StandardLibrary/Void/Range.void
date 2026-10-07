@@ -11,6 +11,8 @@ public readonly struct Range
         _end = end;
     }
 
+    public static Range All { get { return new Range(Index.Start, Index.End); } }
+
     public static Range StartAt(Index start) { return new Range(start, new Index(0, true)); }
     public static Range EndAt(Index end) { return new Range(new Index(0, false), end); }
     public bool Equals(Range other) { return _start.Equals(other._start) && _end.Equals(other._end); }

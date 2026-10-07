@@ -66,6 +66,6 @@ bool vc_compile_project(
     char *error,
     size_t error_size);
 
-bool vc_run_executable(const char *path, char *error, size_t error_size);
+bool vc_run_executable(const char *path, unsigned long *program_exit_code, char *error, size_t error_size);
 
 #endif

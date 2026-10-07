@@ -1585,8 +1585,18 @@ static VcAstNode *parse_primary(VcParser *parser)
         return node;
     }
 
+    if (is_type_keyword(current_kind(parser), false))
+    {
+        advance_token(parser);
+        VcAstNode *node = new_node(parser, VC_AST_TYPE_RECEIVER_EXPRESSION, token->location);
+        VcAstTypeRef *type = new_type(parser, token->location);
+        if (node == NULL || type == NULL) { out_of_memory(parser); return NULL; }
+        type->name = copy_token_text(parser, token);
+        node->receiver_type = type;
+        return node;
+    }
+
     if (match(parser, VC_TOKEN_IDENTIFIER) ||
-        match(parser, VC_TOKEN_KW_STRING) ||
         match(parser, VC_TOKEN_KW_THIS) ||
         match(parser, VC_TOKEN_KW_BASE))
     {
@@ -1918,7 +1928,7 @@ static bool scan_generic_call_type(
     return true;
 }
 
-static bool looks_like_generic_call(const VcParser *parser)
+static bool looks_like_generic_suffix(const VcParser *parser, VcTokenKind following)
 {
     if (current_kind(parser) != VC_TOKEN_LESS)
         return false;
@@ -1934,7 +1944,7 @@ static bool looks_like_generic_call(const VcParser *parser)
     }
     if (!generic_call_scan_greater(parser, &scan) || scan.pending_greater != 0)
         return false;
-    return token_at(parser, scan.position)->kind == VC_TOKEN_LEFT_PAREN;
+    return token_at(parser, scan.position)->kind == following;
 }
 
 static bool expression_has_null_conditional(const VcAstNode *expression)
@@ -1952,6 +1962,7 @@ static bool expression_has_null_conditional(const VcAstNode *expression)
 
 static VcAstNode *parse_postfix(VcParser *parser)
 {
+    const VcSourceLocation receiver_start = current_token(parser)->span.start;
     VcAstNode *expression = parse_primary(parser);
     if (expression == NULL)
         return NULL;
@@ -1982,8 +1993,34 @@ static VcAstNode *parse_postfix(VcParser *parser)
             continue;
         }
 
+        char receiver_name[512];
+        if (looks_like_generic_suffix(parser, VC_TOKEN_DOT) &&
+            vc_ast_receiver_name(expression, receiver_name, sizeof(receiver_name)))
+        {
+            VcAstNode *receiver = new_node(parser, VC_AST_TYPE_RECEIVER_EXPRESSION, receiver_start);
+            VcAstTypeRef *type = new_type(parser, receiver_start);
+            if (receiver == NULL || type == NULL) { out_of_memory(parser); return NULL; }
+            type->name = vc_ast_copy_text(parser->tree, receiver_name, strlen(receiver_name));
+            if (type->name == NULL) { out_of_memory(parser); return NULL; }
+            advance_token(parser);
+            do
+            {
+                VcAstTypeRef *argument = parse_type(parser, false);
+                if (argument == NULL) return NULL;
+                if (!vc_ast_type_list_push(parser->tree, &type->generic_arguments, argument))
+                { out_of_memory(parser); return NULL; }
+            } while (match(parser, VC_TOKEN_COMMA));
+            if (!consume_type_greater(parser)) return NULL;
+            type->span.start = receiver_start;
+            type->span.end = token_at(parser, parser->current - 1)->span.end;
+            receiver->span = type->span;
+            receiver->receiver_type = type;
+            expression = receiver;
+            continue;
+        }
+
         VcAstTypeList call_generic_arguments = {0};
-        if (looks_like_generic_call(parser))
+        if (looks_like_generic_suffix(parser, VC_TOKEN_LEFT_PAREN))
         {
             advance_token(parser);
             do

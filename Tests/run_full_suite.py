@@ -19,10 +19,10 @@ import tempfile
 import threading
 import time
 
-EXPECTED_TRUE_COUNT = 15421
-EXPECTED_FOCUSED_SUITES = 277
+EXPECTED_TRUE_COUNT = 17460
+EXPECTED_FOCUSED_SUITES = 288
 
-FOCUSED_TARGETS = ['test-host-process-portability', 'test-rich-diagnostics-integration-audit', 'test-machine-readable-diagnostics', 'test-stable-diagnostic-codes', 'test-related-source-locations', 'test-semantic-explanation-diagnostics', 'test-parser-recovery-diagnostics', 'test-actionable-help-diagnostics', 'test-diagnostic-notes', 'test-source-span-rendering', 'test-structured-diagnostic-foundation', 'test-engine-filesystem', 'test-interface-indexer-dispatch', 'test-engine-list-operations', 'test-engine-set-operations', 'test-engine-memory-stream', 'test-console-standard-io-terminal-integration-audit',
+FOCUSED_TARGETS = ['test-type-qualified-static-members-builtins-integration-audit', 'test-static-api-integration', 'test-builtin-floating-decimal-parsing', 'test-builtin-integral-bool-char-parsing', 'test-builtin-static-values', 'test-builtin-associated-member-foundation', 'test-constructed-generic-static-members', 'test-static-callable-type-receivers', 'test-static-value-type-receivers', 'test-type-qualified-member-access-foundation', 'test-runtime-crash-diagnostics', 'test-host-process-portability', 'test-rich-diagnostics-integration-audit', 'test-machine-readable-diagnostics', 'test-stable-diagnostic-codes', 'test-related-source-locations', 'test-semantic-explanation-diagnostics', 'test-parser-recovery-diagnostics', 'test-actionable-help-diagnostics', 'test-diagnostic-notes', 'test-source-span-rendering', 'test-structured-diagnostic-foundation', 'test-engine-filesystem', 'test-interface-indexer-dispatch', 'test-engine-list-operations', 'test-engine-set-operations', 'test-engine-memory-stream', 'test-console-standard-io-terminal-integration-audit',
  'test-console-presentation-basics',
  'test-console-input-control',
  'test-console-key-read-key',

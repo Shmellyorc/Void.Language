@@ -1,0 +1,100 @@
+using Void;
+using Void.Collections;
+
+namespace Audit340 {
+    public sealed class Item { public int Value; public Item(int value) { Value = value; } }
+    public class Cache<T> {
+        public Cache() { }
+        public static int Initialized;
+        public static T Value { get; set; }
+        public static string Text;
+        static Cache() { Initialized = int.Parse("1"); Text = string.Concat("ca", "che"); }
+        public static T Echo(T value) { return value; }
+        public static U Map<U>(U value) { return value; }
+    }
+}
+namespace Other340 {
+    public sealed class Item { }
+    public class Cache<T> { public static int Initialized = int.Parse("2"); }
+}
+public sealed class Audit340_Item { }
+public delegate int Parse340(string value);
+public delegate bool Try340(string value, out int result);
+public delegate string Join340(string left, string right);
+public delegate bool Equals340(string left, string right);
+public delegate int Compare340(string left, string right);
+public delegate Audit340.Item Echo340(Audit340.Item value);
+
+public static class Program {
+    public static void Main() {
+        var closed = new Audit340.Cache<int>();
+        Console.WriteLine(Audit340.Cache<Audit340.Cache<int>>.Echo(closed) == closed);
+        Audit340.Cache<int>[] closedArray = new Audit340.Cache<int>[] { closed };
+        Console.WriteLine(Audit340.Cache<Audit340.Cache<int>[]>.Echo(closedArray)[0] == closed);
+        Parse340 parse = int.Parse;
+        Try340 tryParse = int.TryParse;
+        Join340 join = string.Concat;
+        Equals340 equal = string.Equals;
+        Compare340 compare = string.CompareOrdinal;
+        Console.WriteLine(parse("-2147483648") == int.MinValue);
+        Console.WriteLine(join("4", "2") == "42");
+        Console.WriteLine(equal("é😀", "é😀"));
+        Console.WriteLine(compare("a", "b") < 0);
+        int parsed;
+        if (int.TryParse(join("4", "2"), out parsed)) {
+            Console.WriteLine(EqualityComparer<int>.Default.Equals(parsed, parse("42")));
+            Console.WriteLine(Range.All.Equals(..));
+        }
+        Console.WriteLine(!tryParse("2147483648", out parsed) && parsed == 0);
+        Console.WriteLine(tryParse("2147483647", out parsed) && parsed == int.MaxValue);
+        Console.WriteLine(ulong.Parse("18446744073709551615") == ulong.MaxValue);
+        Console.WriteLine(long.Parse("-9223372036854775808") == long.MinValue);
+        Console.WriteLine(bool.Parse(" TrUe "));
+        Console.WriteLine(char.Parse("😀") == '😀');
+        Console.WriteLine(char.Parse(" ") == ' ');
+        float f;
+        Console.WriteLine(float.TryParse("1.401298464324817e-45", out f) && f == float.Epsilon);
+        double d;
+        Console.WriteLine(double.TryParse("4.9406564584124654e-324", out d) && d == double.Epsilon);
+        Console.WriteLine(double.Parse("Infinity") == double.PositiveInfinity);
+        decimal dec;
+        Console.WriteLine(!decimal.TryParse("Infinity", out dec) && dec == decimal.Zero);
+        Console.WriteLine(decimal.Parse("-1") == decimal.MinusOne);
+        ref int staticAlias = ref Audit340.Cache<int>.Initialized;
+        staticAlias = 4;
+        Console.WriteLine(Audit340.Cache<int>.Initialized == 4);
+        staticAlias = 1;
+        ref string managedAlias = ref Audit340.Cache<string>.Text;
+        GC.Collect();
+        Console.WriteLine(managedAlias == "cache");
+        Audit340.Cache<int>.Value = parsed;
+        Audit340.Cache<string>.Value = string.Empty;
+        Console.WriteLine(Audit340.Cache<int>.Value == int.MaxValue);
+        Console.WriteLine(Audit340.Cache<string>.Value == string.Empty);
+        Console.WriteLine(Audit340.Cache<int>.Initialized == 1);
+        Console.WriteLine(Other340.Cache<int>.Initialized == 2);
+        Audit340.Cache<Audit340.Item>.Value = new Audit340.Item(7);
+        Audit340.Cache<Audit340_Item>.Initialized = 9;
+        Console.WriteLine(Audit340.Cache<Audit340.Item>.Initialized == 1);
+        Console.WriteLine(Audit340.Cache<Audit340_Item>.Initialized == 9);
+        Echo340 echo = Audit340.Cache<Audit340.Item>.Echo;
+        Console.WriteLine(echo(Audit340.Cache<Audit340.Item>.Value).Value == 7);
+        Console.WriteLine(Audit340.Cache<int>.Map<string>("map") == "map");
+        var comparer = EqualityComparer<Audit340.Item>.Default;
+        int hash = Runtime.Hash(comparer);
+        GC.Collect();
+        Console.WriteLine(Runtime.Hash(EqualityComparer<Audit340.Item>.Default) == hash);
+        Console.WriteLine(Audit340.Cache<Audit340.Item>.Value.Value == 7);
+        Console.WriteLine(Audit340.Cache<string>.Text == "cache");
+        int[] values = new int[] { 1, 2, 3 };
+        int[] copy = values[Range.All]; copy[0] = 8;
+        Console.WriteLine(values[0] == 1 && copy[0] == 8);
+        Span<int> span = values; Span<int> view = span[Void.Range.All]; view[1] = 9;
+        Console.WriteLine(values[1] == 9);
+        ReadOnlySpan<int> ro = span; ReadOnlySpan<int> all = ro[Range.All];
+        Console.WriteLine(all.Length == 3 && all[1] == 9);
+        Console.WriteLine("Aé😀Z"[Range.All] == "Aé😀Z");
+        Console.WriteLine(Index.Start.GetOffset(3) == 0 && Index.End.GetOffset(3) == 3);
+        Console.WriteLine(Audit340.Cache<Audit340.Item>.Echo(new Audit340.Item(8)).Value == 8);
+    }
+}

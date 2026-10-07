@@ -65,6 +65,10 @@ typedef struct VcSemanticContext
 {
     VcSemanticModel *model;
     VcSemanticDiagnostic *diagnostic;
+    /* Diagnostic arguments need distinct owned buffers until varargs formatting
+       copies them; semantic/internal type names remain unchanged. */
+    char diagnostic_type_names[4][256];
+    size_t diagnostic_type_name_slot;
     const VcSource *source;
     const char *namespace_name;
     const char *type_name;
@@ -90,6 +94,7 @@ typedef struct VcSemanticContext
     size_t lambda_index;
     size_t lambda_outer_local_count;
     bool allow_event_subscription;
+    const VcAstNode *direct_assignment_target;
     bool allow_declaration_pattern;
     const VcAstNode *allowed_stackalloc_node;
     bool readonly_this;
@@ -112,6 +117,13 @@ typedef struct VcSemanticContext
     VcFinallyBodyBarrier *finally_body_barrier;
     VcLoopFlowCapture *loop_flow_capture;
 } VcSemanticContext;
+
+static const char *context_type_display_name(VcSemanticContext *context, VcSemanticType type)
+{
+    const size_t slot = context->diagnostic_type_name_slot++ % 4;
+    return vc_semantic_type_display_name(context->model, type,
+        context->diagnostic_type_names[slot], sizeof(context->diagnostic_type_names[slot]));
+}
 
 static const VcAstNode *find_original_generic_method_template(
     const VcSemanticModel *model,
@@ -427,6 +439,8 @@ static void related_declaration(VcDiagnostic *diagnostic, const VcSource *source
 void vc_semantic_model_init(VcSemanticModel *model)
 {
     memset(model, 0, sizeof(*model));
+    for (size_t i = 0; i <= VC_SEM_TYPE_NULL; i++)
+        model->builtin_associated_owners[i] = (size_t)-1;
 }
 
 void vc_semantic_model_destroy(VcSemanticModel *model)
@@ -904,6 +918,23 @@ VcSemanticType vc_semantic_builtin_type_from_ast(const VcAstTypeRef *type)
     return VC_SEM_TYPE_UNKNOWN;
 }
 
+bool vc_semantic_builtin_associated_owner(
+    const VcSemanticModel *model,
+    VcSemanticType type,
+    size_t *struct_index)
+{
+    if (model == NULL || struct_index == NULL || type > VC_SEM_TYPE_NULL)
+        return false;
+    const size_t index = model->builtin_associated_owners[type];
+    if (index == (size_t)-1 || index >= model->struct_count)
+        return false;
+    const VcSemanticStruct *scope = &model->structs[index];
+    if (!scope->is_builtin_associated_scope || scope->associated_builtin_type != type)
+        return false;
+    *struct_index = index;
+    return true;
+}
+
 static bool push_struct(VcSemanticModel *model, VcSemanticStruct value)
 {
     if (model->struct_count == model->struct_capacity)
@@ -1322,6 +1353,7 @@ static bool find_struct_by_name(
             continue;
         if (same_namespace(model->structs[i].namespace_name, namespace_name))
         {
+            *ambiguous = false;
             *index = i;
             return true;
         }
@@ -1590,12 +1622,149 @@ static bool nullable_underlying_supported(const VcSemanticModel *model, VcSemant
         (!structure->is_class && !structure->is_interface && !structure->is_delegate);
 }
 
+/* Shared named/constructed lookup for declarations and expression receivers. */
+static bool find_type_declaration(
+    const VcSemanticModel *model, const VcAstTypeRef *type, const char *namespace_name,
+    size_t *index, bool *ambiguous)
+{
+    *ambiguous = false;
+    if (type == NULL || type->name == NULL) return false;
+    const char *last_dot = strrchr(type->name, '.');
+    char qualifier[512];
+    const char *ns = namespace_name;
+    const char *name = type->name;
+    if (last_dot != NULL)
+    {
+        const size_t length = (size_t)(last_dot - type->name);
+        if (length == 0 || length >= sizeof(qualifier) || last_dot[1] == '\0') return false;
+        memcpy(qualifier, type->name, length);
+        qualifier[length] = '\0';
+        ns = qualifier;
+        name = last_dot + 1;
+    }
+    char mangled[256];
+    if (type->generic_arguments.count != 0)
+    {
+        VcAstTypeRef canonical = *type;
+        canonical.name = (char *)name;
+        if (!vc_monomorph_mangle_type_ref(&canonical, mangled, sizeof(mangled))) return false;
+        name = mangled;
+    }
+    if (last_dot != NULL)
+    {
+        for (size_t i = 0; i < model->struct_count; i++)
+        {
+            if (same_namespace(model->structs[i].namespace_name, ns) &&
+                strcmp(model->structs[i].name, name) == 0)
+            { *index = i; return true; }
+        }
+        return false;
+    }
+    return find_struct_by_name(model, ns, name, index, ambiguous);
+}
+
+static VcSemanticType resolve_type(
+    VcSemanticModel *model,
+    const VcAstTypeRef *type,
+    const char *namespace_name,
+    bool allow_void);
+
+static bool constructed_type_arguments_match(
+    VcSemanticModel *model,
+    const VcSemanticStruct *candidate,
+    const VcSemanticType *arguments,
+    size_t argument_count)
+{
+    if (candidate == NULL || candidate->node == NULL ||
+        candidate->node->kind != VC_AST_TYPE_DECLARATION ||
+        candidate->node->as.type_declaration.original_generic_name == NULL ||
+        candidate->node->as.type_declaration.generic_arguments.count != argument_count)
+        return false;
+    for (size_t i = 0; i < argument_count; i++)
+    {
+        const VcSemanticType candidate_argument = resolve_type(model,
+            candidate->node->as.type_declaration.generic_arguments.items[i],
+            candidate->namespace_name, false);
+        if (candidate_argument == VC_SEM_TYPE_UNKNOWN ||
+            candidate_argument == VC_SEM_TYPE_ERROR ||
+            candidate_argument != arguments[i])
+            return false;
+    }
+    return true;
+}
+
+static bool find_constructed_type_declaration(
+    VcSemanticModel *model,
+    const VcAstTypeRef *type,
+    const char *namespace_name,
+    const VcSemanticType *arguments,
+    size_t argument_count,
+    size_t *index,
+    bool *ambiguous)
+{
+    *ambiguous = false;
+    if (model == NULL || type == NULL || type->name == NULL || argument_count == 0)
+        return false;
+
+    const char *last_dot = strrchr(type->name, '.');
+    char qualifier[512];
+    const char *target_namespace = namespace_name;
+    const char *simple_name = type->name;
+    const bool qualified = last_dot != NULL;
+    if (qualified)
+    {
+        const size_t length = (size_t)(last_dot - type->name);
+        if (length == 0 || length >= sizeof(qualifier) || last_dot[1] == '\0')
+            return false;
+        memcpy(qualifier, type->name, length);
+        qualifier[length] = '\0';
+        target_namespace = qualifier;
+        simple_name = last_dot + 1;
+    }
+
+    size_t fallback = (size_t)-1;
+    for (size_t i = 0; i < model->struct_count; i++)
+    {
+        const VcSemanticStruct *candidate = &model->structs[i];
+        if (candidate->node == NULL || candidate->node->kind != VC_AST_TYPE_DECLARATION ||
+            candidate->node->as.type_declaration.original_generic_name == NULL ||
+            strcmp(candidate->node->as.type_declaration.original_generic_name, simple_name) != 0 ||
+            !constructed_type_arguments_match(model, candidate, arguments, argument_count))
+            continue;
+
+        if (qualified)
+        {
+            if (!same_namespace(candidate->namespace_name, target_namespace))
+                continue;
+            *index = i;
+            return true;
+        }
+        if (same_namespace(candidate->namespace_name, target_namespace))
+        {
+            *ambiguous = false;
+            *index = i;
+            return true;
+        }
+        if (fallback != (size_t)-1)
+            *ambiguous = true;
+        else
+            fallback = i;
+    }
+
+    if (*ambiguous || fallback == (size_t)-1)
+        return false;
+    *index = fallback;
+    return true;
+}
+
 static VcSemanticType resolve_type(
     VcSemanticModel *model,
     const VcAstTypeRef *type,
     const char *namespace_name,
     bool allow_void)
 {
+    if (type != NULL && type->is_global_qualified)
+        namespace_name = NULL;
     if (type != NULL && type->array_rank != 0)
     {
         VcAstTypeRef element = *type;
@@ -1701,44 +1870,35 @@ static VcSemanticType resolve_type(
     if (type == NULL || type->name == NULL || type->nullable)
         return VC_SEM_TYPE_UNKNOWN;
 
-    const char *lookup_name = type->name;
-    char generic_name[256];
+    VcSemanticType *resolved_arguments = NULL;
     if (type->generic_arguments.count != 0)
     {
-        for (size_t argument_index = 0; argument_index < type->generic_arguments.count; argument_index++)
-        {
-            const VcSemanticType argument_type = resolve_type(model,
-                type->generic_arguments.items[argument_index], namespace_name, false);
-            if (semantic_type_is_ref_struct(model, argument_type))
-                return VC_SEM_TYPE_UNKNOWN;
-        }
-        if (!vc_monomorph_mangle_type_ref(type, generic_name, sizeof(generic_name)))
-            return VC_SEM_TYPE_UNKNOWN;
-        lookup_name = generic_name;
+        resolved_arguments = calloc(type->generic_arguments.count, sizeof(*resolved_arguments));
+        if (resolved_arguments == NULL)
+            return VC_SEM_TYPE_ERROR;
     }
-
-    const char *lookup_namespace = namespace_name;
-    const char *lookup_simple_name = lookup_name;
-    char qualified_namespace[256];
-    if (type->generic_arguments.count == 0)
+    for (size_t argument_index = 0; argument_index < type->generic_arguments.count; argument_index++)
     {
-        const char *last_dot = strrchr(lookup_name, '.');
-        if (last_dot != NULL)
+        const VcSemanticType argument_type = resolve_type(model,
+            type->generic_arguments.items[argument_index], namespace_name, false);
+        if (argument_type == VC_SEM_TYPE_UNKNOWN || argument_type == VC_SEM_TYPE_ERROR ||
+            semantic_type_is_ref_struct(model, argument_type))
         {
-            const size_t namespace_length = (size_t)(last_dot - lookup_name);
-            if (namespace_length == 0 || namespace_length >= sizeof(qualified_namespace) ||
-                last_dot[1] == '\0')
-                return VC_SEM_TYPE_UNKNOWN;
-            memcpy(qualified_namespace, lookup_name, namespace_length);
-            qualified_namespace[namespace_length] = '\0';
-            lookup_namespace = qualified_namespace;
-            lookup_simple_name = last_dot + 1;
+            free(resolved_arguments);
+            return VC_SEM_TYPE_UNKNOWN;
         }
+        resolved_arguments[argument_index] = argument_type;
     }
-
     size_t index = 0;
     bool ambiguous = false;
-    if (!find_struct_by_name(model, lookup_namespace, lookup_simple_name, &index, &ambiguous))
+    bool found = false;
+    if (type->generic_arguments.count != 0)
+        found = find_constructed_type_declaration(model, type, namespace_name,
+            resolved_arguments, type->generic_arguments.count, &index, &ambiguous);
+    else
+        found = find_type_declaration(model, type, namespace_name, &index, &ambiguous);
+    free(resolved_arguments);
+    if (!found)
         return VC_SEM_TYPE_UNKNOWN;
     return vc_semantic_struct_type(index);
 }
@@ -2093,6 +2253,188 @@ static bool configure_swizzle_struct(VcSemanticStruct *structure, VcSemanticDiag
     return true;
 }
 
+/* StandardLibrary built-in value declarations can request one semantic primitive
+   constant category. The category is independent of the public member name;
+   the field type plus category controls constant folding/backend emission. */
+static bool primitive_constant_kind_from_attribute(
+    const VcAstNode *field_node,
+    const VcSemanticStruct *owner,
+    VcSemanticType field_type,
+    const VcSource *source,
+    VcSemanticDiagnostic *diagnostic,
+    VcPrimitiveConstantKind *kind)
+{
+    *kind = VC_PRIMITIVE_CONSTANT_NONE;
+    const VcAstNode *attribute = find_attribute(field_node, "PrimitiveConstant");
+    if (attribute == NULL)
+        return true;
+
+    if (!source_is_standard_library(source) || owner == NULL ||
+        !owner->is_builtin_associated_scope)
+    {
+        set_diagnostic(diagnostic, source, attribute->location,
+            "[PrimitiveConstant] is reserved for StandardLibrary built-in member scopes");
+        return false;
+    }
+    if (field_node->kind != VC_AST_FIELD_DECLARATION ||
+        (field_node->as.field_declaration.modifiers & VC_AST_MOD_CONST) == 0)
+    {
+        set_diagnostic(diagnostic, source, attribute->location,
+            "[PrimitiveConstant] requires a const field declaration");
+        return false;
+    }
+    if (field_type != owner->associated_builtin_type)
+    {
+        set_diagnostic(diagnostic, source, attribute->location,
+            "[PrimitiveConstant] field type must match its associated built-in type");
+        return false;
+    }
+    if (attribute->as.attribute.arguments.count != 1)
+    {
+        set_diagnostic(diagnostic, source, attribute->location,
+            "[PrimitiveConstant] requires exactly one primitive constant kind");
+        return false;
+    }
+
+    const VcAstNode *argument = attribute->as.attribute.arguments.items[0];
+    if (argument == NULL || argument->kind != VC_AST_LITERAL_EXPRESSION ||
+        argument->as.literal_expression.literal_kind != VC_AST_LITERAL_STRING)
+    {
+        set_diagnostic(diagnostic, source, attribute->location,
+            "[PrimitiveConstant] kind must be a string literal");
+        return false;
+    }
+
+    const char *text = argument->as.literal_expression.text;
+    VcPrimitiveConstantKind parsed = VC_PRIMITIVE_CONSTANT_NONE;
+    if (text != NULL && strcmp(text, "\"min\"") == 0) parsed = VC_PRIMITIVE_CONSTANT_MIN;
+    else if (text != NULL && strcmp(text, "\"max\"") == 0) parsed = VC_PRIMITIVE_CONSTANT_MAX;
+    else if (text != NULL && strcmp(text, "\"epsilon\"") == 0) parsed = VC_PRIMITIVE_CONSTANT_EPSILON;
+    else if (text != NULL && strcmp(text, "\"nan\"") == 0) parsed = VC_PRIMITIVE_CONSTANT_NAN;
+    else if (text != NULL && strcmp(text, "\"positive-infinity\"") == 0) parsed = VC_PRIMITIVE_CONSTANT_POSITIVE_INFINITY;
+    else if (text != NULL && strcmp(text, "\"negative-infinity\"") == 0) parsed = VC_PRIMITIVE_CONSTANT_NEGATIVE_INFINITY;
+    else if (text != NULL && strcmp(text, "\"zero\"") == 0) parsed = VC_PRIMITIVE_CONSTANT_ZERO;
+    else if (text != NULL && strcmp(text, "\"one\"") == 0) parsed = VC_PRIMITIVE_CONSTANT_ONE;
+    else if (text != NULL && strcmp(text, "\"minus-one\"") == 0) parsed = VC_PRIMITIVE_CONSTANT_MINUS_ONE;
+    if (parsed == VC_PRIMITIVE_CONSTANT_NONE)
+    {
+        set_diagnostic(diagnostic, source, argument->location,
+            "[PrimitiveConstant] kind is not supported");
+        return false;
+    }
+
+    bool supported = false;
+    switch (field_type)
+    {
+        case VC_SEM_TYPE_BYTE:
+        case VC_SEM_TYPE_SBYTE:
+        case VC_SEM_TYPE_SHORT:
+        case VC_SEM_TYPE_USHORT:
+        case VC_SEM_TYPE_INT:
+        case VC_SEM_TYPE_UINT:
+        case VC_SEM_TYPE_LONG:
+        case VC_SEM_TYPE_ULONG:
+        case VC_SEM_TYPE_CHAR:
+            supported = parsed == VC_PRIMITIVE_CONSTANT_MIN || parsed == VC_PRIMITIVE_CONSTANT_MAX;
+            break;
+        case VC_SEM_TYPE_FLOAT:
+        case VC_SEM_TYPE_DOUBLE:
+            supported = parsed == VC_PRIMITIVE_CONSTANT_MIN || parsed == VC_PRIMITIVE_CONSTANT_MAX ||
+                parsed == VC_PRIMITIVE_CONSTANT_EPSILON || parsed == VC_PRIMITIVE_CONSTANT_NAN ||
+                parsed == VC_PRIMITIVE_CONSTANT_POSITIVE_INFINITY ||
+                parsed == VC_PRIMITIVE_CONSTANT_NEGATIVE_INFINITY;
+            break;
+        case VC_SEM_TYPE_DECIMAL:
+            supported = parsed == VC_PRIMITIVE_CONSTANT_MIN || parsed == VC_PRIMITIVE_CONSTANT_MAX ||
+                parsed == VC_PRIMITIVE_CONSTANT_ZERO || parsed == VC_PRIMITIVE_CONSTANT_ONE ||
+                parsed == VC_PRIMITIVE_CONSTANT_MINUS_ONE;
+            break;
+        default:
+            break;
+    }
+    if (!supported)
+    {
+        set_diagnostic(diagnostic, source, attribute->location,
+            "[PrimitiveConstant] kind is not valid for built-in type '%s'",
+            vc_semantic_type_name(NULL, field_type));
+        return false;
+    }
+
+    *kind = parsed;
+    return true;
+}
+
+/* [BuiltInAssociated("int")] is a StandardLibrary-only bootstrap bridge from
+   a canonical built-in semantic type to an ordinary declaration/member scope.
+   The scope is never the runtime representation of the built-in value. */
+static bool builtin_associated_type_from_declaration(
+    const VcAstNode *declaration,
+    const VcSource *source,
+    VcSemanticDiagnostic *diagnostic,
+    VcSemanticType *associated_type)
+{
+    *associated_type = VC_SEM_TYPE_UNKNOWN;
+    const VcAstNode *attribute = find_attribute(declaration, "BuiltInAssociated");
+    if (attribute == NULL)
+        return true;
+
+    if (!source_is_standard_library(source))
+    {
+        set_diagnostic(diagnostic, source, attribute->location,
+            "[BuiltInAssociated] is reserved for StandardLibrary built-in member scopes");
+        return false;
+    }
+    if (declaration->kind != VC_AST_TYPE_DECLARATION ||
+        declaration->as.type_declaration.type_kind != VC_AST_TYPE_CLASS ||
+        (declaration->as.type_declaration.modifiers & VC_AST_MOD_STATIC) == 0)
+    {
+        set_diagnostic(diagnostic, source, attribute->location,
+            "[BuiltInAssociated] requires a static class declaration");
+        return false;
+    }
+    if (attribute->as.attribute.arguments.count != 1)
+    {
+        set_diagnostic(diagnostic, source, attribute->location,
+            "[BuiltInAssociated] requires exactly one built-in type name");
+        return false;
+    }
+
+    const VcAstNode *argument = attribute->as.attribute.arguments.items[0];
+    if (argument == NULL || argument->kind != VC_AST_LITERAL_EXPRESSION ||
+        argument->as.literal_expression.literal_kind != VC_AST_LITERAL_STRING)
+    {
+        set_diagnostic(diagnostic, source, attribute->location,
+            "[BuiltInAssociated] type name must be a string literal");
+        return false;
+    }
+
+    const char *text = argument->as.literal_expression.text;
+    const size_t length = text != NULL ? strlen(text) : 0;
+    if (length < 3 || text[0] != '"' || text[length - 1] != '"' || length - 2 >= 32)
+    {
+        set_diagnostic(diagnostic, source, argument->location,
+            "[BuiltInAssociated] type name is invalid");
+        return false;
+    }
+
+    char name[32];
+    memcpy(name, text + 1, length - 2);
+    name[length - 2] = '\0';
+    VcAstTypeRef ref = {0};
+    ref.name = name;
+    const VcSemanticType type = vc_semantic_builtin_type_from_ast(&ref);
+    if (type == VC_SEM_TYPE_UNKNOWN || type == VC_SEM_TYPE_VOID ||
+        type == VC_SEM_TYPE_TYPE || type == VC_SEM_TYPE_NULL)
+    {
+        set_diagnostic(diagnostic, source, argument->location,
+            "[BuiltInAssociated] '%s' is not a supported built-in associated-member type",
+            name);
+        return false;
+    }
+    *associated_type = type;
+    return true;
+}
+
 static bool collect_struct_names(
     const VcAstNodeList *declarations,
     const VcSource *source,
@@ -2100,6 +2442,8 @@ static bool collect_struct_names(
     VcSemanticModel *model,
     VcSemanticDiagnostic *diagnostic)
 {
+    VcSemanticContext diagnostic_display_context = {0};
+    diagnostic_display_context.model = model;
     for (size_t i = 0; i < declarations->count; i++)
     {
         const VcAstNode *declaration = declarations->items[i];
@@ -2140,6 +2484,19 @@ static bool collect_struct_names(
             }
         }
 
+        VcSemanticType associated_builtin_type = VC_SEM_TYPE_UNKNOWN;
+        if (!builtin_associated_type_from_declaration(declaration, source, diagnostic,
+                &associated_builtin_type))
+            return false;
+        if (associated_builtin_type != VC_SEM_TYPE_UNKNOWN &&
+            model->builtin_associated_owners[associated_builtin_type] != (size_t)-1)
+        {
+            set_diagnostic(diagnostic, source, declaration->location,
+                "built-in type '%s' already has an associated member scope",
+                context_type_display_name(&diagnostic_display_context, associated_builtin_type));
+            return false;
+        }
+
         VcSemanticStruct structure = {0};
         structure.node = declaration;
         structure.source = source;
@@ -2155,15 +2512,20 @@ static bool collect_struct_names(
         structure.is_sealed = (declaration->as.type_declaration.modifiers & VC_AST_MOD_SEALED) != 0;
         structure.is_readonly = (declaration->as.type_declaration.modifiers & VC_AST_MOD_READONLY) != 0;
         structure.is_ref_struct = (declaration->as.type_declaration.modifiers & VC_AST_MOD_REF) != 0;
+        structure.is_builtin_associated_scope = associated_builtin_type != VC_SEM_TYPE_UNKNOWN;
+        structure.associated_builtin_type = associated_builtin_type;
         snprintf(structure.c_name, sizeof(structure.c_name), structure.is_delegate ? "vc_d_%zu" :
             (structure.is_enum ? "vc_e_%zu" :
             (structure.is_class ? "vc_c_%zu" : (structure.is_interface ? "vc_i_%zu" : "vc_s_%zu"))),
             model->struct_count);
+        const size_t structure_index = model->struct_count;
         if (!push_struct(model, structure))
         {
             set_diagnostic(diagnostic, source, declaration->location, "out of memory while collecting structs");
             return false;
         }
+        if (associated_builtin_type != VC_SEM_TYPE_UNKNOWN)
+            model->builtin_associated_owners[associated_builtin_type] = structure_index;
     }
     return true;
 }
@@ -2582,6 +2944,8 @@ static bool collect_struct_members(
     bool allow_unsafe,
     VcSemanticDiagnostic *diagnostic)
 {
+    VcSemanticContext diagnostic_display_context = {0};
+    diagnostic_display_context.model = model;
     for (size_t struct_index = 0; struct_index < model->struct_count; struct_index++)
     {
         VcSemanticStruct *structure = &model->structs[struct_index];
@@ -2624,7 +2988,7 @@ static bool collect_struct_members(
                     set_diagnostic(diagnostic, structure->source, member->location,
                         "enum member '%s.%s' value is outside the range of '%s'",
                         structure->name, member->as.enum_member.name,
-                        vc_semantic_type_name(model, structure->enum_underlying_type));
+                        context_type_display_name(&diagnostic_display_context, structure->enum_underlying_type));
                     return false;
                 }
                 if (!push_enum_member(structure, member->as.enum_member.name, value))
@@ -2993,7 +3357,7 @@ static bool collect_struct_members(
                     set_diagnostic(diagnostic, structure->source, member->location,
                         "const field '%s' uses unsupported constant type '%s'",
                         member->as.field_declaration.name,
-                        vc_semantic_type_name(model, field_type));
+                        context_type_display_name(&diagnostic_display_context, field_type));
                     return false;
                 }
                 if (vc_semantic_type_is_pointer(field_type))
@@ -3084,6 +3448,9 @@ static bool collect_struct_members(
                 field.is_abstract = event_abstract;
                 field.is_sealed = event_sealed;
                 field.is_const = field_const;
+                if (!primitive_constant_kind_from_attribute(member, structure, field_type,
+                        structure->source, diagnostic, &field.primitive_constant_kind))
+                    return false;
                 field.is_readonly = field_readonly;
                 field.is_ref = field_ref;
                 field.ref_readonly = field_ref_readonly;
@@ -3208,7 +3575,7 @@ static bool collect_struct_members(
                         member->as.property_declaration.name);
                     return false;
                 }
-                const bool getter_readonly = structure->is_readonly || property_readonly ||
+                const bool getter_readonly = (!property_static && structure->is_readonly) || property_readonly ||
                     (member->as.property_declaration.getter_modifiers & VC_AST_MOD_READONLY) != 0;
                 if (getter_readonly && (property_static || structure->is_class || structure->is_interface))
                 {
@@ -3267,7 +3634,7 @@ static bool collect_struct_members(
                         return false;
                     }
                 }
-                if (structure->is_readonly && setter_auto)
+                if (!property_static && structure->is_readonly && setter_auto)
                 {
                     set_diagnostic(diagnostic, structure->source, member->location,
                         "automatic property '%s' in readonly struct '%s' cannot declare a setter",
@@ -4438,6 +4805,8 @@ static bool collect_methods(
     VcSemanticModel *model,
     VcSemanticDiagnostic *diagnostic)
 {
+    VcSemanticContext diagnostic_display_context = {0};
+    diagnostic_display_context.model = model;
     for (size_t i = 0; i < declarations->count; i++)
     {
         const VcAstNode *declaration = declarations->items[i];
@@ -4753,7 +5122,7 @@ static bool collect_methods(
                         set_diagnostic(diagnostic, source, member->location,
                             "async method '%s' must return Task or Task<T>, got '%s'",
                             member->as.method_declaration.name,
-                            vc_semantic_type_name(model, method.return_type));
+                            context_type_display_name(&diagnostic_display_context, method.return_type));
                         return false;
                     }
                     method.async_returns_value_task = !returns_task;
@@ -5084,7 +5453,7 @@ static bool collect_methods(
                             set_diagnostic(diagnostic, source,
                                 member->as.method_declaration.parameters.items[parameter_index]->location,
                                 "native Span element type '%s' must be unmanaged and supported by the C ABI",
-                                vc_semantic_type_name(model, native_buffer_element));
+                                context_type_display_name(&diagnostic_display_context, native_buffer_element));
                             return false;
                         }
                         (void)native_buffer_readonly;
@@ -5432,8 +5801,8 @@ static bool collect_methods(
                         free(method.parameter_modifiers);
                         set_diagnostic(diagnostic, source, member->location,
                             "conversion from '%s' to '%s' conflicts with an existing standard conversion",
-                            vc_semantic_type_name(model, source_type),
-                            vc_semantic_type_name(model, target_type));
+                            context_type_display_name(&diagnostic_display_context, source_type),
+                            context_type_display_name(&diagnostic_display_context, target_type));
                         return false;
                     }
 
@@ -5452,8 +5821,8 @@ static bool collect_methods(
                         free(method.parameter_modifiers);
                         set_diagnostic(diagnostic, source, member->location,
                             "conversion from '%s' to '%s' is already declared",
-                            vc_semantic_type_name(model, source_type),
-                            vc_semantic_type_name(model, target_type));
+                            context_type_display_name(&diagnostic_display_context, source_type),
+                            context_type_display_name(&diagnostic_display_context, target_type));
                         return false;
                     }
                 }
@@ -5710,6 +6079,8 @@ static size_t find_virtual_implementation_for_class(
 
 static bool validate_inheritance_methods(VcSemanticModel *model, VcSemanticDiagnostic *diagnostic)
 {
+    VcSemanticContext diagnostic_display_context = {0};
+    diagnostic_display_context.model = model;
     for (size_t i = 0; i < model->method_count; i++)
     {
         VcSemanticMethod *method = &model->methods[i];
@@ -5776,7 +6147,7 @@ static bool validate_inheritance_methods(VcSemanticModel *model, VcSemanticDiagn
                 set_diagnostic(diagnostic, method->source, method->node->location,
                     "override '%s' must return '%s'",
                     method->node->as.method_declaration.name,
-                    vc_semantic_type_name(model, base_method->return_type));
+                    context_type_display_name(&diagnostic_display_context, base_method->return_type));
                 vc_diagnostic_set_code(diagnostic, VC_DIAG_OVERRIDE);
                 related_declaration(diagnostic, base_method->source, base_method->node,
                     "Base member contract is declared here.");
@@ -5906,6 +6277,8 @@ static bool find_virtual_property_implementation_for_class(
 
 static bool validate_inheritance_properties(VcSemanticModel *model, VcSemanticDiagnostic *diagnostic)
 {
+    VcSemanticContext diagnostic_display_context = {0};
+    diagnostic_display_context.model = model;
     for (size_t class_index = 0; class_index < model->struct_count; class_index++)
     {
         VcSemanticStruct *structure = &model->structs[class_index];
@@ -5959,7 +6332,7 @@ static bool validate_inheritance_properties(VcSemanticModel *model, VcSemanticDi
                     set_diagnostic(diagnostic, structure->source, property->node->location,
                         "override property '%s' must use type '%s'",
                         property->node->as.property_declaration.name,
-                        vc_semantic_type_name(model, base->type));
+                        context_type_display_name(&diagnostic_display_context, base->type));
                     return false;
                 }
                 if (property->has_getter != base->has_getter ||
@@ -6117,6 +6490,8 @@ static bool find_virtual_event_implementation_for_class(
 
 static bool validate_inheritance_events(VcSemanticModel *model, VcSemanticDiagnostic *diagnostic)
 {
+    VcSemanticContext diagnostic_display_context = {0};
+    diagnostic_display_context.model = model;
     for (size_t class_index = 0; class_index < model->struct_count; class_index++)
     {
         VcSemanticStruct *structure = &model->structs[class_index];
@@ -6161,7 +6536,7 @@ static bool validate_inheritance_events(VcSemanticModel *model, VcSemanticDiagno
                     set_diagnostic(diagnostic, structure->source, event->node->location,
                         "override event '%s' must use type '%s'",
                         event->node->as.field_declaration.name,
-                        vc_semantic_type_name(model, base->type));
+                        context_type_display_name(&diagnostic_display_context, base->type));
                     return false;
                 }
                 event->has_virtual_root = true;
@@ -6420,6 +6795,8 @@ static bool validate_interface_inheritance_contracts(
     VcSemanticModel *model,
     VcSemanticDiagnostic *diagnostic)
 {
+    VcSemanticContext diagnostic_display_context = {0};
+    diagnostic_display_context.model = model;
     for (size_t interface_index = 0; interface_index < model->struct_count; interface_index++)
     {
         const VcSemanticStruct *interface = &model->structs[interface_index];
@@ -6456,8 +6833,8 @@ static bool validate_interface_inheritance_contracts(
                         set_diagnostic(diagnostic, interface->source, interface->node->location,
                             "interface '%s' has conflicting implicit/explicit conversion contracts from '%s' to '%s'",
                             interface->name,
-                            vc_semantic_type_name(model, left->parameter_types[0]),
-                            vc_semantic_type_name(model, left->return_type));
+                            context_type_display_name(&diagnostic_display_context, left->parameter_types[0]),
+                            context_type_display_name(&diagnostic_display_context, left->return_type));
                         return false;
                     }
                 }
@@ -6628,6 +7005,8 @@ static bool validate_interface_inheritance_contracts(
 
 static bool validate_interface_implementations(VcSemanticModel *model, VcSemanticDiagnostic *diagnostic)
 {
+    VcSemanticContext display_context = {0};
+    display_context.model = model;
     for (size_t type_index = 0; type_index < model->struct_count; type_index++)
     {
         const VcSemanticStruct *structure = &model->structs[type_index];
@@ -6656,8 +7035,8 @@ static bool validate_interface_implementations(VcSemanticModel *model, VcSemanti
                     {
                         set_diagnostic(diagnostic, structure->source, structure->node->location,
                             "%s '%s' has ambiguous default interface implementations for '%s.%s'",
-                            structure->is_class ? "class" : "struct", structure->name,
-                            model->structs[interface_index].name,
+                            structure->is_class ? "class" : "struct", context_type_display_name(&display_context, vc_semantic_struct_type(type_index)),
+                            context_type_display_name(&display_context, vc_semantic_struct_type(interface_index)),
                             required->node->as.method_declaration.original_generic_name != NULL
                                 ? required->node->as.method_declaration.original_generic_name
                                 : required->node->as.method_declaration.name);
@@ -6668,8 +7047,8 @@ static bool validate_interface_implementations(VcSemanticModel *model, VcSemanti
                         {
                             set_diagnostic(diagnostic, structure->source, structure->node->location,
                                 "%s '%s' does not implement interface operator '%s.%s'",
-                                structure->is_class ? "class" : "struct", structure->name,
-                                model->structs[interface_index].name,
+                                structure->is_class ? "class" : "struct", context_type_display_name(&display_context, vc_semantic_struct_type(type_index)),
+                                context_type_display_name(&display_context, vc_semantic_struct_type(interface_index)),
                                 vc_token_kind_name(required->operator_kind));
                 vc_diagnostic_set_code(diagnostic, VC_DIAG_INTERFACE);
                         }
@@ -6678,7 +7057,7 @@ static bool validate_interface_implementations(VcSemanticModel *model, VcSemanti
                             set_diagnostic(diagnostic, structure->source, structure->node->location,
                                 "%s '%s' does not implement interface method '%s.%s'",
                                 structure->is_class ? "class" : "struct",
-                                structure->name, model->structs[interface_index].name,
+                                context_type_display_name(&display_context, vc_semantic_struct_type(type_index)), context_type_display_name(&display_context, vc_semantic_struct_type(interface_index)),
                                 required->node->as.method_declaration.original_generic_name != NULL
                                     ? required->node->as.method_declaration.original_generic_name
                                     : required->node->as.method_declaration.name);
@@ -6704,7 +7083,7 @@ static bool validate_interface_implementations(VcSemanticModel *model, VcSemanti
                     set_diagnostic(diagnostic, structure->source, structure->node->location,
                         "%s '%s' does not implement interface property '%s.%s'",
                         structure->is_class ? "class" : "struct",
-                        structure->name, required_interface->name,
+                        context_type_display_name(&display_context, vc_semantic_struct_type(type_index)), context_type_display_name(&display_context, vc_semantic_struct_type(interface_index)),
                         required_interface->properties[property_index].node->as.property_declaration.name);
                 vc_diagnostic_set_code(diagnostic, VC_DIAG_INTERFACE);
                     related_declaration(diagnostic, required_interface->source,
@@ -6727,7 +7106,7 @@ static bool validate_interface_implementations(VcSemanticModel *model, VcSemanti
                     set_diagnostic(diagnostic, structure->source, structure->node->location,
                         "%s '%s' does not implement interface event '%s.%s'",
                         structure->is_class ? "class" : "struct",
-                        structure->name, required_interface->name,
+                        context_type_display_name(&display_context, vc_semantic_struct_type(type_index)), context_type_display_name(&display_context, vc_semantic_struct_type(interface_index)),
                         required_event->node->as.field_declaration.name);
                 vc_diagnostic_set_code(diagnostic, VC_DIAG_INTERFACE);
                     related_declaration(diagnostic, required_interface->source, required_event->node,
@@ -7375,6 +7754,8 @@ static bool validate_instantiated_generic_constraints(
     VcSourceLocation diagnostic_location,
     VcSemanticDiagnostic *diagnostic)
 {
+    VcSemanticContext diagnostic_display_context = {0};
+    diagnostic_display_context.model = model;
     for (size_t i = 0; i < constraints->count; i++)
     {
         const VcAstNode *constraint = constraints->items[i];
@@ -7398,7 +7779,7 @@ static bool validate_instantiated_generic_constraints(
         {
             set_diagnostic(diagnostic, diagnostic_source, diagnostic_location,
                 "type argument '%s' must be a reference type for generic parameter '%s'",
-                vc_semantic_type_name(model, argument), parameter);
+                context_type_display_name(&diagnostic_display_context, argument), parameter);
             return false;
         }
         if (constraint->as.generic_constraint.requires_value_type &&
@@ -7406,7 +7787,7 @@ static bool validate_instantiated_generic_constraints(
         {
             set_diagnostic(diagnostic, diagnostic_source, diagnostic_location,
                 "type argument '%s' must be a non-nullable value type for generic parameter '%s'",
-                vc_semantic_type_name(model, argument), parameter);
+                context_type_display_name(&diagnostic_display_context, argument), parameter);
             return false;
         }
         if (constraint->as.generic_constraint.requires_unmanaged_type &&
@@ -7414,7 +7795,7 @@ static bool validate_instantiated_generic_constraints(
         {
             set_diagnostic(diagnostic, diagnostic_source, diagnostic_location,
                 "type argument '%s' must be an unmanaged type for generic parameter '%s'",
-                vc_semantic_type_name(model, argument), parameter);
+                context_type_display_name(&diagnostic_display_context, argument), parameter);
             return false;
         }
 
@@ -7440,7 +7821,7 @@ static bool validate_instantiated_generic_constraints(
                 {
                     set_diagnostic(diagnostic, diagnostic_source, diagnostic_location,
                         "constraint '%s' for generic parameter '%s' must be a class or interface type",
-                        vc_semantic_type_name(model, required), parameter);
+                        context_type_display_name(&diagnostic_display_context, required), parameter);
                     return false;
                 }
                 if (required_class)
@@ -7450,7 +7831,7 @@ static bool validate_instantiated_generic_constraints(
                     {
                         set_diagnostic(diagnostic, diagnostic_source, diagnostic_location,
                             "sealed class '%s' cannot be used as a generic constraint",
-                            vc_semantic_type_name(model, required));
+                            context_type_display_name(&diagnostic_display_context, required));
                         return false;
                     }
                     if (saw_base_class_constraint || c != 0 ||
@@ -7458,7 +7839,7 @@ static bool validate_instantiated_generic_constraints(
                     {
                         set_diagnostic(diagnostic, diagnostic_source, diagnostic_location,
                             "base class constraint '%s' for '%s' must appear first and cannot be combined with 'class'",
-                            vc_semantic_type_name(model, required), parameter);
+                            context_type_display_name(&diagnostic_display_context, required), parameter);
                         return false;
                     }
                     saw_base_class_constraint = true;
@@ -7473,7 +7854,7 @@ static bool validate_instantiated_generic_constraints(
                 {
                     set_diagnostic(diagnostic, diagnostic_source, diagnostic_location,
                         "generic parameter '%s' contains a duplicate type constraint '%s'",
-                        parameter, vc_semantic_type_name(model, required));
+                        parameter, context_type_display_name(&diagnostic_display_context, required));
                     return false;
                 }
             }
@@ -7481,8 +7862,8 @@ static bool validate_instantiated_generic_constraints(
             {
                 set_diagnostic(diagnostic, diagnostic_source, diagnostic_location,
                     "type argument '%s' does not satisfy constraint '%s' for generic parameter '%s'",
-                    vc_semantic_type_name(model, argument),
-                    vc_semantic_type_name(model, required), parameter);
+                    context_type_display_name(&diagnostic_display_context, argument),
+                    context_type_display_name(&diagnostic_display_context, required), parameter);
                 vc_diagnostic_set_code(diagnostic, VC_DIAG_CONSTRAINT);
                 vc_diagnostic_add_context(diagnostic, VC_DIAGNOSTIC_NOTE, NULL,
                     (VcSourceSpan){0}, "Generic constraints must hold for the supplied type argument before the generic body can be used.");
@@ -7495,7 +7876,7 @@ static bool validate_instantiated_generic_constraints(
         {
             set_diagnostic(diagnostic, diagnostic_source, diagnostic_location,
                 "type argument '%s' must have a public parameterless constructor for generic parameter '%s'",
-                vc_semantic_type_name(model, argument), parameter);
+                context_type_display_name(&diagnostic_display_context, argument), parameter);
             return false;
         }
     }
@@ -7506,6 +7887,8 @@ static bool validate_instantiated_type_constraints(
     VcSemanticModel *model,
     VcSemanticDiagnostic *diagnostic)
 {
+    VcSemanticContext display_context = {0};
+    display_context.model = model;
     for (size_t i = 0; i < model->struct_count; i++)
     {
         VcSemanticStruct *structure = &model->structs[i];
@@ -7523,7 +7906,7 @@ static bool validate_instantiated_type_constraints(
                     continue;
                 set_diagnostic(diagnostic, structure->source, structure->node->location,
                     "ref struct type argument '%s' is not supported by generic type '%s'",
-                    vc_semantic_type_name(model, argument),
+                    context_type_display_name(&display_context, argument),
                     structure->node->as.type_declaration.original_generic_name);
                 return false;
             }
@@ -8348,6 +8731,15 @@ static bool analyze_constant_field(
     size_t field_index,
     VcSemanticDiagnostic *diagnostic);
 
+static size_t call_conversion_rank(
+    const VcSemanticModel *model,
+    VcSemanticType parameter_type,
+    VcSemanticType argument_type);
+
+static bool semantic_methods_same_declaration(
+    const VcSemanticMethod *left,
+    const VcSemanticMethod *right);
+
 static bool same_context(const VcSemanticContext *context, const VcSemanticMethod *candidate)
 {
     return same_namespace(context->namespace_name, candidate->namespace_name) &&
@@ -8406,9 +8798,11 @@ static size_t resolve_method(
     const VcSemanticType *arguments,
     const VcTokenKind *argument_modifiers,
     size_t argument_count,
-    bool *ambiguous)
+    bool *ambiguous,
+    size_t *best_rank_out)
 {
     size_t match = (size_t)-1;
+    size_t best_rank = (size_t)-1;
     *ambiguous = false;
 
     for (size_t i = 0; i < context->model->method_count; i++)
@@ -8420,9 +8814,12 @@ static size_t resolve_method(
             continue;
 
         bool matches = true;
+        size_t rank = 0;
         for (size_t parameter = 0; parameter < argument_count; parameter++)
         {
-            if (!parameter_modifier_matches(candidate->parameter_modifiers[parameter], argument_modifiers[parameter]) ||
+            const VcTokenKind candidate_modifier = candidate->parameter_modifiers[parameter] == VC_TOKEN_KW_PARAMS
+                ? VC_TOKEN_EOF : candidate->parameter_modifiers[parameter];
+            if (!parameter_modifier_matches(candidate_modifier, argument_modifiers[parameter]) ||
                 (arguments[parameter] == VC_SEM_TYPE_UNKNOWN
                     ? !semantic_type_is_delegate(context->model, candidate->parameter_types[parameter])
                     : !is_assignable(context->model, candidate->parameter_types[parameter], arguments[parameter])))
@@ -8430,17 +8827,27 @@ static size_t resolve_method(
                 matches = false;
                 break;
             }
+            if (arguments[parameter] != VC_SEM_TYPE_UNKNOWN)
+                rank += call_conversion_rank(context->model, candidate->parameter_types[parameter], arguments[parameter]);
         }
         if (!matches)
             continue;
 
-        if (match != (size_t)-1)
+        if (match == (size_t)-1 || rank < best_rank)
         {
-            *ambiguous = true;
-            return match;
+            match = i;
+            best_rank = rank;
+            *ambiguous = false;
         }
-        match = i;
+        else if (rank == best_rank)
+        {
+            const VcSemanticMethod *best = &context->model->methods[match];
+            if (!semantic_methods_same_declaration(candidate, best))
+                *ambiguous = true;
+        }
     }
+    if (best_rank_out != NULL)
+        *best_rank_out = best_rank;
     return match;
 }
 
@@ -8451,9 +8858,11 @@ static size_t resolve_static_method(
     const VcSemanticType *arguments,
     const VcTokenKind *argument_modifiers,
     size_t argument_count,
-    bool *ambiguous)
+    bool *ambiguous,
+    size_t *best_rank_out)
 {
     size_t match = (size_t)-1;
+    size_t best_rank = (size_t)-1;
     *ambiguous = false;
 
     for (size_t i = 0; i < context->model->method_count; i++)
@@ -8467,9 +8876,12 @@ static size_t resolve_static_method(
             continue;
 
         bool matches = true;
+        size_t rank = 0;
         for (size_t parameter = 0; parameter < argument_count; parameter++)
         {
-            if (!parameter_modifier_matches(candidate->parameter_modifiers[parameter], argument_modifiers[parameter]) ||
+            const VcTokenKind candidate_modifier = candidate->parameter_modifiers[parameter] == VC_TOKEN_KW_PARAMS
+                ? VC_TOKEN_EOF : candidate->parameter_modifiers[parameter];
+            if (!parameter_modifier_matches(candidate_modifier, argument_modifiers[parameter]) ||
                 (arguments[parameter] == VC_SEM_TYPE_UNKNOWN
                     ? !semantic_type_is_delegate(context->model, candidate->parameter_types[parameter])
                     : !is_assignable(context->model, candidate->parameter_types[parameter], arguments[parameter])))
@@ -8477,18 +8889,61 @@ static size_t resolve_static_method(
                 matches = false;
                 break;
             }
+            if (arguments[parameter] != VC_SEM_TYPE_UNKNOWN)
+                rank += call_conversion_rank(context->model, candidate->parameter_types[parameter], arguments[parameter]);
         }
         if (!matches)
             continue;
 
-        if (match != (size_t)-1)
+        if (match == (size_t)-1 || rank < best_rank)
         {
-            *ambiguous = true;
-            return match;
+            match = i;
+            best_rank = rank;
+            *ambiguous = false;
         }
-        match = i;
+        else if (rank == best_rank)
+        {
+            const VcSemanticMethod *best = &context->model->methods[match];
+            if (!semantic_methods_same_declaration(candidate, best))
+                *ambiguous = true;
+        }
     }
+    if (best_rank_out != NULL)
+        *best_rank_out = best_rank;
     return match;
+}
+
+static bool struct_has_named_method_kind(
+    const VcSemanticContext *context,
+    size_t struct_index,
+    const char *name,
+    bool want_static)
+{
+    for (size_t i = 0; i < context->model->method_count; i++)
+    {
+        const VcSemanticMethod *candidate = &context->model->methods[i];
+        if (candidate->is_operator || candidate->is_static != want_static ||
+            !candidate->has_owner_struct || candidate->owner_struct_index != struct_index ||
+            strcmp(candidate->node->as.method_declaration.name, name) != 0)
+            continue;
+        return true;
+    }
+    if (struct_index >= context->model->struct_count)
+        return false;
+    const VcAstNode *type = context->model->structs[struct_index].node;
+    if (type == NULL || type->kind != VC_AST_TYPE_DECLARATION)
+        return false;
+    for (size_t i = 0; i < type->as.type_declaration.members.count; i++)
+    {
+        const VcAstNode *member = type->as.type_declaration.members.items[i];
+        if (member == NULL || member->kind != VC_AST_METHOD_DECLARATION ||
+            member->as.method_declaration.is_constructor ||
+            (((member->as.method_declaration.modifiers & VC_AST_MOD_STATIC) != 0) != want_static) ||
+            strcmp(member->as.method_declaration.name, name) != 0)
+            continue;
+        return true;
+    }
+    return false;
 }
 
 static bool identifier_is_value(const VcSemanticContext *context, const char *name)
@@ -8518,6 +8973,9 @@ static bool identifier_is_value(const VcSemanticContext *context, const char *na
         resolve_property(context->model, context->this_struct_index, name, &owner, &index);
 }
 
+/* Resolve a source type receiver to the ordinary declaration/member owner used
+   for static lookup. Struct/class/interface receivers own themselves; built-in
+   receivers use their registered StandardLibrary associated-member scope. */
 static bool resolve_static_type_target(
     VcSemanticContext *context,
     const VcAstNode *target,
@@ -8525,14 +8983,277 @@ static bool resolve_static_type_target(
     bool *ambiguous)
 {
     *ambiguous = false;
-    if (target == NULL || target->kind != VC_AST_IDENTIFIER_EXPRESSION)
-        return false;
+    if (target == NULL) return false;
+    const VcSemanticBinding *existing = vc_semantic_binding(context->model, target);
+    if (existing != NULL)
+    {
+        if (!existing->is_type_receiver) return false;
+        if (vc_semantic_type_is_struct(existing->type))
+        {
+            *struct_index = vc_semantic_struct_index(existing->type);
+            return true;
+        }
+        return vc_semantic_builtin_associated_owner(
+            context->model, existing->type, struct_index);
+    }
+    char name[512];
+    if (!vc_ast_receiver_name(target, name, sizeof(name))) return false;
+    char root_name[512];
+    const char *dot = strchr(name, '.');
+    const size_t root_length = dot != NULL ? (size_t)(dot - name) : strlen(name);
+    memcpy(root_name, name, root_length);
+    root_name[root_length] = '\0';
+    if (identifier_is_value(context, root_name)) return false;
 
-    const char *name = target->as.identifier_expression.name;
-    if (identifier_is_value(context, name))
+    VcAstTypeRef plain = {0};
+    plain.name = name;
+    const VcAstTypeRef *ref = target->receiver_type != NULL ? target->receiver_type : &plain;
+    VcSemanticType type = target->kind == VC_AST_TYPE_RECEIVER_EXPRESSION
+        ? vc_semantic_builtin_type_from_ast(ref) : VC_SEM_TYPE_UNKNOWN;
+    if (type == VC_SEM_TYPE_UNKNOWN)
+    {
+        if (ref->generic_arguments.count != 0)
+        {
+            type = resolve_type(context->model, ref, context->namespace_name, false);
+            if (type == VC_SEM_TYPE_UNKNOWN || type == VC_SEM_TYPE_ERROR ||
+                !vc_semantic_type_is_struct(type))
+                return false;
+            *struct_index = vc_semantic_struct_index(type);
+        }
+        else
+        {
+            if (!find_type_declaration(context->model, ref, context->namespace_name,
+                    struct_index, ambiguous)) return false;
+            type = vc_semantic_struct_type(*struct_index);
+        }
+    }
+    VcSemanticBinding binding = {0};
+    binding.node = target;
+    binding.type = type;
+    binding.is_type_receiver = true;
+    binding.receiver_type_ref = target->receiver_type;
+    if (vc_semantic_type_is_struct(type))
+    {
+        binding.struct_index = vc_semantic_struct_index(type);
+        binding.declaration_node = context->model->structs[binding.struct_index].node;
+    }
+    if (!push_binding(context->model, binding))
+    {
+        set_diagnostic(context->diagnostic, context->source, target->location,
+            "out of memory while binding type receiver");
         return false;
+    }
+    if (vc_semantic_type_is_struct(type))
+    {
+        *struct_index = vc_semantic_struct_index(type);
+        return true;
+    }
+    return vc_semantic_builtin_associated_owner(context->model, type, struct_index);
+}
 
-    return find_struct_by_name(context->model, context->namespace_name, name, struct_index, ambiguous);
+static bool append_display_text(
+    char *output, size_t output_size, size_t *written, const char *text)
+{
+    if (output == NULL || output_size == 0 || written == NULL || text == NULL)
+        return false;
+    const size_t length = strlen(text);
+    if (*written + length + 1 > output_size)
+        return false;
+    memcpy(output + *written, text, length);
+    *written += length;
+    output[*written] = '\0';
+    return true;
+}
+
+static bool format_type_ref_display(
+    const VcAstTypeRef *type, char *output, size_t output_size, size_t *written)
+{
+    if (type == NULL || type->name == NULL ||
+        !append_display_text(output, output_size, written, type->name))
+        return false;
+    if (type->generic_arguments.count != 0)
+    {
+        if (!append_display_text(output, output_size, written, "<"))
+            return false;
+        for (size_t i = 0; i < type->generic_arguments.count; i++)
+        {
+            if (i != 0 && !append_display_text(output, output_size, written, ", "))
+                return false;
+            if (!format_type_ref_display(type->generic_arguments.items[i],
+                    output, output_size, written))
+                return false;
+        }
+        if (!append_display_text(output, output_size, written, ">"))
+            return false;
+    }
+    if (type->nullable && !append_display_text(output, output_size, written, "?"))
+        return false;
+    for (size_t i = 0; i < type->pointer_depth; i++)
+        if (!append_display_text(output, output_size, written, "*"))
+            return false;
+    if (type->rectangular_rank > 1)
+    {
+        if (!append_display_text(output, output_size, written, "["))
+            return false;
+        for (size_t i = 1; i < type->rectangular_rank; i++)
+            if (!append_display_text(output, output_size, written, ","))
+                return false;
+        if (!append_display_text(output, output_size, written, "]"))
+            return false;
+    }
+    for (size_t i = 0; i < type->array_rank; i++)
+        if (!append_display_text(output, output_size, written, "[]"))
+            return false;
+    return true;
+}
+
+static const char *semantic_struct_display_name(
+    const VcSemanticStruct *structure, char *output, size_t output_size)
+{
+    if (output != NULL && output_size != 0)
+        output[0] = '\0';
+    if (structure != NULL && structure->node != NULL &&
+        structure->node->kind == VC_AST_TYPE_DECLARATION &&
+        structure->node->as.type_declaration.original_generic_name != NULL)
+    {
+        size_t written = 0;
+        if (append_display_text(output, output_size, &written,
+                structure->node->as.type_declaration.original_generic_name) &&
+            append_display_text(output, output_size, &written, "<"))
+        {
+            bool valid = true;
+            const VcAstTypeList *arguments = &structure->node->as.type_declaration.generic_arguments;
+            for (size_t i = 0; i < arguments->count; i++)
+            {
+                if ((i != 0 && !append_display_text(output, output_size, &written, ", ")) ||
+                    !format_type_ref_display(arguments->items[i], output, output_size, &written))
+                {
+                    valid = false;
+                    break;
+                }
+            }
+            if (valid && append_display_text(output, output_size, &written, ">"))
+                return output;
+        }
+        /* A bounded display may abbreviate source spelling, but must never
+           fall back to a generated specialization identifier. */
+        snprintf(output, output_size, "%s<...>",
+            structure->node->as.type_declaration.original_generic_name);
+        return output;
+    }
+    if (structure != NULL && structure->name != NULL && output != NULL && output_size != 0)
+        snprintf(output, output_size, "%s", structure->name);
+    return output;
+}
+
+const char *vc_semantic_type_display_name(
+    const VcSemanticModel *model,
+    VcSemanticType type,
+    char *output,
+    size_t output_size)
+{
+    if (output == NULL || output_size == 0)
+        return vc_semantic_type_name(model, type);
+    output[0] = '\0';
+    if (model != NULL && (vc_semantic_type_is_array(type) ||
+            vc_semantic_type_is_nullable(type) || vc_semantic_type_is_pointer(type)))
+    {
+        VcSemanticType element = VC_SEM_TYPE_UNKNOWN;
+        const char *suffix = "";
+        size_t rank = 0;
+        if (vc_semantic_type_is_array(type))
+        {
+            const VcSemanticArray *array = &model->arrays[vc_semantic_array_index(type)];
+            element = array->element_type;
+            rank = array->rank;
+        }
+        else if (vc_semantic_type_is_nullable(type))
+        {
+            element = model->nullables[vc_semantic_nullable_index(type)].underlying_type;
+            suffix = "?";
+        }
+        else
+        {
+            element = model->pointers[vc_semantic_pointer_index(type)].element_type;
+            suffix = "*";
+        }
+        char nested[96];
+        vc_semantic_type_display_name(model, element, nested, sizeof(nested));
+        size_t written = 0;
+        if (append_display_text(output, output_size, &written, nested))
+        {
+            if (rank != 0)
+            {
+                if (!append_display_text(output, output_size, &written, "[")) return output;
+                for (size_t i = 1; i < rank; i++)
+                    if (!append_display_text(output, output_size, &written, ",")) return output;
+                append_display_text(output, output_size, &written, "]");
+            }
+            else
+                append_display_text(output, output_size, &written, suffix);
+        }
+        return output;
+    }
+    if (vc_semantic_type_is_struct(type) && model != NULL)
+    {
+        const size_t index = vc_semantic_struct_index(type);
+        if (index < model->struct_count)
+            return semantic_struct_display_name(&model->structs[index], output, output_size);
+    }
+    snprintf(output, output_size, "%s", vc_semantic_type_name(model, type));
+    return output;
+}
+
+static const char *type_receiver_display(
+    const VcAstNode *node, char *output, size_t output_size)
+{
+    if (output != NULL && output_size != 0)
+        output[0] = '\0';
+    if (node != NULL && node->receiver_type != NULL)
+    {
+        size_t written = 0;
+        if (format_type_ref_display(node->receiver_type, output, output_size, &written))
+            return output;
+    }
+    if (node != NULL && vc_ast_receiver_name(node, output, output_size))
+        return output;
+    if (output != NULL && output_size != 0)
+        snprintf(output, output_size, "%s", "<type>");
+    return output;
+}
+
+static const char *type_receiver_display_name(const VcAstNode *node)
+{
+    if (node->receiver_type != NULL) return node->receiver_type->name;
+    if (node->kind == VC_AST_IDENTIFIER_EXPRESSION) return node->as.identifier_expression.name;
+    if (node->kind == VC_AST_MEMBER_ACCESS_EXPRESSION) return node->as.member_access_expression.member;
+    return "<type>";
+}
+
+/* A known namespace followed by an unresolved name is a missing type,
+   whereas a real value root must retain ordinary instance-member lookup. */
+static bool diagnose_unknown_qualified_receiver(VcSemanticContext *context, const VcAstNode *target)
+{
+    char name[512];
+    if (!vc_ast_receiver_name(target, name, sizeof(name))) return false;
+    char *last_dot = strrchr(name, '.');
+    if (last_dot == NULL) return false;
+    char root_name[512];
+    const size_t root_length = (size_t)(strchr(name, '.') - name);
+    memcpy(root_name, name, root_length);
+    root_name[root_length] = '\0';
+    if (identifier_is_value(context, root_name)) return false;
+    const size_t qualifier_length = (size_t)(last_dot - name);
+    for (size_t i = 0; i < context->model->struct_count; i++)
+    {
+        const char *ns = context->model->structs[i].namespace_name;
+        if (ns == NULL || strlen(ns) != qualifier_length || strncmp(ns, name, qualifier_length) != 0) continue;
+        set_diagnostic(context->diagnostic, context->source, target->location,
+            "unknown type receiver '%s'", name);
+        vc_diagnostic_set_code(context->diagnostic, VC_DIAG_NAME);
+        return true;
+    }
+    return false;
 }
 
 static bool resolve_context_constant(
@@ -8911,8 +9632,8 @@ static bool ensure_implicit_conversion_reachable_with_origin(
     {
         set_diagnostic(context->diagnostic, context->source, argument->location,
             "implicit conversion from '%s' to '%s' is ambiguous",
-            vc_semantic_type_name(context->model, source_type),
-            vc_semantic_type_name(context->model, target_type));
+            context_type_display_name(context, source_type),
+            context_type_display_name(context, target_type));
         return false;
     }
     if (conversion_index == (size_t)-1)
@@ -10005,8 +10726,8 @@ static bool validate_constrained_conversion_dispatch(
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "constrained %s conversion from '%s' to '%s' is ambiguous across interface contracts",
             conversion_kind == VC_TOKEN_KW_EXPLICIT ? "explicit" : "implicit",
-            vc_semantic_type_name(context->model, source_type),
-            vc_semantic_type_name(context->model, target_type));
+            context_type_display_name(context, source_type),
+            context_type_display_name(context, target_type));
         return false;
     }
     if (!source_match && !target_match)
@@ -10017,8 +10738,8 @@ static bool validate_constrained_conversion_dispatch(
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "%s conversion from '%s' to '%s' is not required by an applicable interface constraint for '%s'",
             conversion_kind == VC_TOKEN_KW_EXPLICIT ? "explicit" : "implicit",
-            vc_semantic_type_name(context->model, source_type),
-            vc_semantic_type_name(context->model, target_type),
+            context_type_display_name(context, source_type),
+            context_type_display_name(context, target_type),
             parameter_display != NULL ? parameter_display : "<generic>");
         return false;
     }
@@ -10423,9 +11144,9 @@ static bool readonly_assignment_allowed(
         if (target->kind != VC_AST_MEMBER_ACCESS_EXPRESSION)
             return false;
         const VcAstNode *receiver = target->as.member_access_expression.target;
-        return receiver != NULL && receiver->kind == VC_AST_IDENTIFIER_EXPRESSION &&
-            strcmp(receiver->as.identifier_expression.name,
-                context->model->structs[binding->struct_index].name) == 0;
+        const VcSemanticBinding *receiver_binding = vc_semantic_binding(context->model, receiver);
+        return receiver_binding != NULL && receiver_binding->is_type_receiver &&
+            receiver_binding->type == vc_semantic_struct_type(binding->struct_index);
     }
 
     if (!context->has_constructor || operator_kind != VC_TOKEN_EQUAL ||
@@ -13643,6 +14364,194 @@ static VcGenericInferenceStatus request_generic_method_inference(
     return VC_GENERIC_INFERENCE_REQUESTED;
 }
 
+static bool evaluate_generic_delegate_method_template(
+    VcSemanticContext *context,
+    size_t owner_struct_index,
+    const VcAstNode *method,
+    const VcSemanticMethod *invoke,
+    VcSemanticType *inferred,
+    size_t *rank)
+{
+    if (method == NULL || method->kind != VC_AST_METHOD_DECLARATION || invoke == NULL ||
+        method->as.method_declaration.is_constructor ||
+        method->as.method_declaration.generic_parameters.count == 0 ||
+        method->as.method_declaration.parameters.count != invoke->parameter_count ||
+        method->as.method_declaration.returns_ref != invoke->returns_ref ||
+        method->as.method_declaration.returns_ref_readonly != invoke->returns_ref_readonly)
+        return false;
+
+    const size_t generic_count = method->as.method_declaration.generic_parameters.count;
+    for (size_t i = 0; i < generic_count; i++)
+        inferred[i] = VC_SEM_TYPE_UNKNOWN;
+
+    for (size_t i = 0; i < invoke->parameter_count; i++)
+    {
+        const VcAstNode *parameter = method->as.method_declaration.parameters.items[i];
+        const VcTokenKind method_modifier = parameter->as.parameter.modifier == VC_TOKEN_KW_PARAMS
+            ? VC_TOKEN_EOF : parameter->as.parameter.modifier;
+        const VcTokenKind invoke_modifier = invoke->parameter_modifiers[i] == VC_TOKEN_KW_PARAMS
+            ? VC_TOKEN_EOF : invoke->parameter_modifiers[i];
+        if (method_modifier != invoke_modifier)
+            return false;
+        if (!infer_generic_pattern(context, method, parameter->as.parameter.type,
+                invoke->parameter_types[i], inferred, method_modifier != VC_TOKEN_EOF))
+            return false;
+    }
+
+    if (!infer_generic_pattern(context, method, method->as.method_declaration.return_type,
+            invoke->return_type, inferred, invoke->returns_ref))
+        return false;
+    for (size_t i = 0; i < generic_count; i++)
+        if (inferred[i] == VC_SEM_TYPE_UNKNOWN)
+            return false;
+
+    VcAstTree *tree = semantic_tree_for_source(context->model, context->source);
+    if (tree == NULL || owner_struct_index >= context->model->struct_count)
+        return false;
+    const char *namespace_name = context->model->structs[owner_struct_index].namespace_name;
+    size_t candidate_rank = 0;
+    for (size_t i = 0; i < invoke->parameter_count; i++)
+    {
+        const VcAstNode *parameter = method->as.method_declaration.parameters.items[i];
+        VcAstTypeRef *concrete = substitute_inferred_generic_type(context, tree,
+            method, parameter->as.parameter.type, inferred);
+        if (concrete == NULL)
+            return false;
+        const VcSemanticType parameter_type = resolve_type(
+            context->model, concrete, namespace_name, false);
+        if (parameter_type == VC_SEM_TYPE_UNKNOWN || parameter_type == VC_SEM_TYPE_ERROR ||
+            !is_assignable(context->model, parameter_type, invoke->parameter_types[i]))
+            return false;
+        candidate_rank += call_conversion_rank(
+            context->model, parameter_type, invoke->parameter_types[i]);
+    }
+
+    VcAstTypeRef *concrete_return = substitute_inferred_generic_type(context, tree,
+        method, method->as.method_declaration.return_type, inferred);
+    if (concrete_return == NULL)
+        return false;
+    const VcSemanticType return_type = resolve_type(
+        context->model, concrete_return, namespace_name, false);
+    if (return_type == VC_SEM_TYPE_UNKNOWN || return_type == VC_SEM_TYPE_ERROR ||
+        !is_assignable(context->model, invoke->return_type, return_type))
+        return false;
+
+    *rank = candidate_rank;
+    return true;
+}
+
+static VcGenericInferenceStatus request_generic_delegate_method_inference(
+    VcSemanticContext *context,
+    const VcAstNode *expression,
+    size_t owner_struct_index,
+    const char *name,
+    const VcSemanticMethod *invoke,
+    size_t require_better_than_rank)
+{
+    if (expression == NULL || expression->kind != VC_AST_MEMBER_ACCESS_EXPRESSION ||
+        expression->as.member_access_expression.original_generic_name != NULL ||
+        expression->as.member_access_expression.generic_arguments.count != 0 ||
+        owner_struct_index >= context->model->struct_count)
+        return VC_GENERIC_INFERENCE_NONE;
+
+    const VcSemanticStruct *owner = &context->model->structs[owner_struct_index];
+    const VcAstNode *type = owner->node;
+    if (type == NULL || type->kind != VC_AST_TYPE_DECLARATION)
+        return VC_GENERIC_INFERENCE_NONE;
+
+    bool saw_template = false;
+    bool matched = false;
+    bool ambiguous = false;
+    size_t best_rank = (size_t)-1;
+    VcSemanticType *best_arguments = NULL;
+    size_t best_argument_count = 0;
+
+    for (size_t i = 0; i < type->as.type_declaration.members.count; i++)
+    {
+        const VcAstNode *method = type->as.type_declaration.members.items[i];
+        if (method == NULL || method->kind != VC_AST_METHOD_DECLARATION ||
+            method->as.method_declaration.is_constructor ||
+            (method->as.method_declaration.modifiers & VC_AST_MOD_STATIC) == 0 ||
+            method->as.method_declaration.generic_parameters.count == 0 ||
+            strcmp(method->as.method_declaration.name, name) != 0)
+            continue;
+        saw_template = true;
+
+        const size_t generic_count = method->as.method_declaration.generic_parameters.count;
+        VcSemanticType *candidate = calloc(generic_count, sizeof(*candidate));
+        if (candidate == NULL)
+            continue;
+        size_t rank = 0;
+        if (!evaluate_generic_delegate_method_template(context, owner_struct_index,
+                method, invoke, candidate, &rank))
+        {
+            free(candidate);
+            continue;
+        }
+        if (!matched || rank < best_rank)
+        {
+            free(best_arguments);
+            best_arguments = candidate;
+            best_argument_count = generic_count;
+            best_rank = rank;
+            matched = true;
+            ambiguous = false;
+        }
+        else if (rank == best_rank)
+        {
+            ambiguous = true;
+            free(candidate);
+        }
+        else
+        {
+            free(candidate);
+        }
+    }
+
+    if (!saw_template)
+    {
+        free(best_arguments);
+        return VC_GENERIC_INFERENCE_NONE;
+    }
+    if (!matched)
+    {
+        free(best_arguments);
+        return VC_GENERIC_INFERENCE_UNINFERABLE;
+    }
+    if (require_better_than_rank != (size_t)-1 && best_rank >= require_better_than_rank)
+    {
+        free(best_arguments);
+        return VC_GENERIC_INFERENCE_NONE;
+    }
+    if (ambiguous)
+    {
+        free(best_arguments);
+        return VC_GENERIC_INFERENCE_AMBIGUOUS;
+    }
+
+    VcAstTree *tree = semantic_tree_for_source(context->model, context->source);
+    if (tree == NULL)
+    {
+        free(best_arguments);
+        return VC_GENERIC_INFERENCE_UNINFERABLE;
+    }
+    VcAstNode *mutable_member = (VcAstNode *)expression;
+    for (size_t i = 0; i < best_argument_count; i++)
+    {
+        VcAstTypeRef *argument = semantic_type_to_inference_ast(context->model, tree,
+            best_arguments[i], expression->location);
+        if (argument == NULL || !vc_ast_type_list_push(tree,
+                &mutable_member->as.member_access_expression.generic_arguments, argument))
+        {
+            free(best_arguments);
+            return VC_GENERIC_INFERENCE_UNINFERABLE;
+        }
+    }
+    free(best_arguments);
+    context->model->generic_inference_requested = true;
+    return VC_GENERIC_INFERENCE_REQUESTED;
+}
+
 static VcGenericInferenceStatus request_extension_generic_method_inference(
     VcSemanticContext *context,
     const VcAstNode *expression,
@@ -13838,74 +14747,6 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
     if (callee->kind == VC_AST_MEMBER_ACCESS_EXPRESSION)
     {
         const VcAstNode *target = callee->as.member_access_expression.target;
-        if (target->kind == VC_AST_IDENTIFIER_EXPRESSION &&
-            strcmp(target->as.identifier_expression.name, "string") == 0 &&
-            strcmp(callee->as.member_access_expression.member, "Concat") == 0)
-        {
-            const bool modifiers_ok = argument_count == 2 &&
-                argument_modifiers[0] == VC_TOKEN_EOF && argument_modifiers[1] == VC_TOKEN_EOF;
-            const bool left_string = argument_count == 2 &&
-                (argument_types[0] == VC_SEM_TYPE_STRING || argument_types[0] == VC_SEM_TYPE_NULL);
-            const bool right_string = argument_count == 2 &&
-                (argument_types[1] == VC_SEM_TYPE_STRING || argument_types[1] == VC_SEM_TYPE_NULL);
-            const bool left_primitive = argument_count == 2 &&
-                is_primitive_text_formattable(argument_types[0]);
-            const bool right_primitive = argument_count == 2 &&
-                is_primitive_text_formattable(argument_types[1]);
-            if (!modifiers_ok || !((left_string && (right_string || right_primitive)) ||
-                    (right_string && left_primitive)))
-            {
-                set_diagnostic(context->diagnostic, context->source, expression->location,
-                    "string.Concat expects a string operand paired with string, char, or primitive value");
-                free(argument_types);
-                free(argument_modifiers);
-                return VC_SEM_TYPE_ERROR;
-            }
-            VcSemanticBinding binding = {0};
-            binding.node = expression;
-            binding.type = VC_SEM_TYPE_STRING;
-            binding.has_string_concat = true;
-            binding.string_concat_left_type = argument_types[0] == VC_SEM_TYPE_NULL
-                ? VC_SEM_TYPE_STRING : argument_types[0];
-            binding.string_concat_right_type = argument_types[1] == VC_SEM_TYPE_NULL
-                ? VC_SEM_TYPE_STRING : argument_types[1];
-            free(argument_types);
-            free(argument_modifiers);
-            if (!push_binding(context->model, binding))
-                return VC_SEM_TYPE_ERROR;
-            return VC_SEM_TYPE_STRING;
-        }
-        if (target->kind == VC_AST_IDENTIFIER_EXPRESSION &&
-            strcmp(target->as.identifier_expression.name, "string") == 0 &&
-            (strcmp(callee->as.member_access_expression.member, "Equals") == 0 ||
-             strcmp(callee->as.member_access_expression.member, "CompareOrdinal") == 0))
-        {
-            const char *member = callee->as.member_access_expression.member;
-            const bool valid = argument_count == 2 &&
-                argument_modifiers[0] == VC_TOKEN_EOF && argument_modifiers[1] == VC_TOKEN_EOF &&
-                (argument_types[0] == VC_SEM_TYPE_STRING || argument_types[0] == VC_SEM_TYPE_NULL) &&
-                (argument_types[1] == VC_SEM_TYPE_STRING || argument_types[1] == VC_SEM_TYPE_NULL);
-            if (!valid)
-            {
-                set_diagnostic(context->diagnostic, context->source, expression->location,
-                    strcmp(member, "Equals") == 0
-                        ? "string.Equals expects (string left, string right)"
-                        : "string.CompareOrdinal expects (string left, string right)");
-                free(argument_types);
-                free(argument_modifiers);
-                return VC_SEM_TYPE_ERROR;
-            }
-            VcSemanticBinding binding = {0};
-            binding.node = expression;
-            binding.type = strcmp(member, "Equals") == 0 ? VC_SEM_TYPE_BOOL : VC_SEM_TYPE_INT;
-            binding.string_operation = strcmp(member, "Equals") == 0
-                ? VC_SEM_STRING_OP_STATIC_EQUALS : VC_SEM_STRING_OP_COMPARE_ORDINAL;
-            free(argument_types);
-            free(argument_modifiers);
-            if (!push_binding(context->model, binding))
-                return VC_SEM_TYPE_ERROR;
-            return binding.type;
-        }
         if (null_conditional_call && target->kind == VC_AST_IDENTIFIER_EXPRESSION &&
             (strcmp(target->as.identifier_expression.name, "Runtime") == 0 ||
              strcmp(target->as.identifier_expression.name, "GC") == 0))
@@ -14405,6 +15246,43 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                 return VC_SEM_TYPE_BOOL;
             }
 
+            if (strcmp(member, "InvariantNumericConvertF32") == 0 ||
+                strcmp(member, "InvariantNumericConvertF64") == 0 ||
+                strcmp(member, "InvariantNumericConvertLongDouble") == 0)
+            {
+                VcSemanticType output_type = VC_SEM_TYPE_ERROR;
+                if (strcmp(member, "InvariantNumericConvertF32") == 0)
+                    output_type = VC_SEM_TYPE_FLOAT;
+                else if (strcmp(member, "InvariantNumericConvertF64") == 0)
+                    output_type = VC_SEM_TYPE_DOUBLE;
+                else
+                    output_type = VC_SEM_TYPE_DECIMAL;
+
+                const bool valid_owner = source_is_standard_library(context->source) &&
+                    context->type_name != NULL && context->namespace_name != NULL &&
+                    strcmp(context->type_name, "PrimitiveParsing") == 0 &&
+                    strcmp(context->namespace_name, "Void.Internal") == 0;
+                const bool valid_arguments = argument_count == 4 &&
+                    argument_modifiers[0] == VC_TOKEN_EOF && argument_types[0] == VC_SEM_TYPE_STRING &&
+                    argument_modifiers[1] == VC_TOKEN_EOF && argument_types[1] == VC_SEM_TYPE_INT &&
+                    argument_modifiers[2] == VC_TOKEN_EOF && argument_types[2] == VC_SEM_TYPE_INT &&
+                    argument_modifiers[3] == VC_TOKEN_KW_OUT && argument_types[3] == output_type;
+
+                if (!valid_owner || !valid_arguments)
+                {
+                    set_diagnostic(context->diagnostic, context->source, expression->location,
+                        "Runtime.%s is a low-level invariant numeric conversion primitive reserved for Void.Internal.PrimitiveParsing", member);
+                    free(argument_types);
+                    free(argument_modifiers);
+                    return VC_SEM_TYPE_ERROR;
+                }
+                free(argument_types);
+                free(argument_modifiers);
+                if (!annotate(context, expression, VC_SEM_TYPE_INT))
+                    return VC_SEM_TYPE_ERROR;
+                return VC_SEM_TYPE_INT;
+            }
+
             if (strcmp(member, "NativePlatformWindows") == 0)
             {
                 const bool valid = source_is_standard_library(context->source) &&
@@ -14852,7 +15730,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "type '%s' does not define a hash contract",
-                        vc_semantic_type_name(context->model, argument_types[0]));
+                        context_type_display_name(context, argument_types[0]));
                     free(argument_types);
                     free(argument_modifiers);
                     return VC_SEM_TYPE_ERROR;
@@ -14867,7 +15745,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "value type '%s' used as a hash key must define public int GetHashCode()",
-                        vc_semantic_type_name(context->model, argument_types[0]));
+                        context_type_display_name(context, argument_types[0]));
                     free(argument_types);
                     free(argument_modifiers);
                     return VC_SEM_TYPE_ERROR;
@@ -14879,7 +15757,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "value type '%s' used as a hash key must define public int GetHashCode()",
-                        vc_semantic_type_name(context->model, argument_types[0]));
+                        context_type_display_name(context, argument_types[0]));
                     free(argument_types);
                     free(argument_modifiers);
                     return VC_SEM_TYPE_ERROR;
@@ -14930,7 +15808,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "type '%s' does not define an equality contract",
-                        vc_semantic_type_name(context->model, argument_types[0]));
+                        context_type_display_name(context, argument_types[0]));
                     free(argument_types);
                     free(argument_modifiers);
                     return VC_SEM_TYPE_ERROR;
@@ -14946,8 +15824,8 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "value type '%s' used as a hash key must define public bool Equals(%s)",
-                        vc_semantic_type_name(context->model, argument_types[0]),
-                        vc_semantic_type_name(context->model, argument_types[0]));
+                        context_type_display_name(context, argument_types[0]),
+                        context_type_display_name(context, argument_types[0]));
                     free(argument_types);
                     free(argument_modifiers);
                     return VC_SEM_TYPE_ERROR;
@@ -14959,8 +15837,8 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "value type '%s' used as a hash key must define public bool Equals(%s)",
-                        vc_semantic_type_name(context->model, argument_types[0]),
-                        vc_semantic_type_name(context->model, argument_types[0]));
+                        context_type_display_name(context, argument_types[0]),
+                        context_type_display_name(context, argument_types[0]));
                     free(argument_types);
                     free(argument_modifiers);
                     return VC_SEM_TYPE_ERROR;
@@ -15415,7 +16293,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                     set_diagnostic(context->diagnostic, context->source,
                         arguments->items[i]->location,
                         "native function pointer argument %zu requires a value of type '%s'",
-                        i + 1, vc_semantic_type_name(context->model, expected));
+                        i + 1, context_type_display_name(context, expected));
                 vc_diagnostic_set_code(context->diagnostic, VC_DIAG_CALL);
                     free(argument_types);
                     free(argument_modifiers);
@@ -15435,8 +16313,8 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                 set_diagnostic(context->diagnostic, context->source,
                     arguments->items[i]->location,
                     "native function pointer argument %zu expects '%s', got '%s'",
-                    i + 1, vc_semantic_type_name(context->model, expected),
-                    vc_semantic_type_name(context->model, argument_types[i]));
+                    i + 1, context_type_display_name(context, expected),
+                    context_type_display_name(context, argument_types[i]));
                 context->diagnostic->span = arguments->items[i]->span;
                 vc_diagnostic_add_context(context->diagnostic, VC_DIAGNOSTIC_NOTE, NULL,
                     (VcSourceSpan){0}, "Native function pointer calls require the declared signature and argument modifiers.");
@@ -15611,8 +16489,8 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                     arguments->items[i]->location,
                     "delegate argument %zu expects '%s', got '%s'",
                     i + 1,
-                    vc_semantic_type_name(context->model, expected),
-                    vc_semantic_type_name(context->model, actual_type));
+                    context_type_display_name(context, expected),
+                    context_type_display_name(context, actual_type));
                 vc_diagnostic_set_code(context->diagnostic, VC_DIAG_CALL);
                 related_declaration(context->diagnostic, invoke->source,
                     invoke->node->as.method_declaration.parameters.items[parameter_index],
@@ -15700,12 +16578,15 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
         bool static_type_ambiguous = false;
         const bool static_type_target = resolve_static_type_target(
             context, target_node, &static_struct_index, &static_type_ambiguous);
+        char static_receiver_buffer[1024];
+        const char *static_receiver = type_receiver_display(
+            target_node, static_receiver_buffer, sizeof(static_receiver_buffer));
 
         if (static_type_ambiguous)
         {
             set_diagnostic(context->diagnostic, context->source, target_node->location,
                 "type name '%s' is ambiguous",
-                target_node->as.identifier_expression.name);
+                type_receiver_display_name(target_node));
             free(argument_types);
             free(argument_modifiers);
             return VC_SEM_TYPE_ERROR;
@@ -15743,7 +16624,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "call to static method '%s.%s' is ambiguous",
-                    context->model->structs[static_struct_index].name,
+                    static_receiver,
                     member_display_name);
             }
             else if (method_index == (size_t)-1)
@@ -15751,33 +16632,71 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                 if (inference == VC_GENERIC_INFERENCE_AMBIGUOUS)
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "generic method type inference for '%s.%s' is ambiguous",
-                        context->model->structs[static_struct_index].name, member_display_name);
+                        static_receiver, member_display_name);
                 else if (inference == VC_GENERIC_INFERENCE_UNINFERABLE)
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "generic method type arguments for '%s.%s' could not be inferred from the call arguments",
-                        context->model->structs[static_struct_index].name, member_display_name);
+                        static_receiver, member_display_name);
                 else
                 {
+                    const bool associated_scope = static_struct_index < context->model->struct_count &&
+                        context->model->structs[static_struct_index].is_builtin_associated_scope;
+                    if (associated_scope && !struct_has_named_method_kind(context,
+                            static_struct_index, callee->as.member_access_expression.member, true))
+                    {
+                        set_diagnostic(context->diagnostic, context->source, expression->location,
+                            "type '%s' has no static method '%s'",
+                            static_receiver, member_display_name);
+                        vc_diagnostic_set_code(context->diagnostic, VC_DIAG_MEMBER);
+                        free(argument_types);
+                        free(argument_modifiers);
+                        return VC_SEM_TYPE_ERROR;
+                    }
                     const char *unknown_name = first_unknown_named_method_argument(
                         context, arguments, callee->as.member_access_expression.member,
                         true, false, true, static_struct_index, false);
                     if (unknown_name != NULL)
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "static method '%s.%s' has no parameter named '%s'",
-                            context->model->structs[static_struct_index].name,
+                            static_receiver,
                             member_display_name, unknown_name);
-                    else
-                        set_diagnostic(context->diagnostic, context->source, expression->location,
-                            "type '%s' has no matching static method '%s'",
-                            context->model->structs[static_struct_index].name,
+                    else if (!struct_has_named_method_kind(context, static_struct_index,
+                            callee->as.member_access_expression.member, true) &&
+                        struct_has_named_method_kind(context, static_struct_index,
+                            callee->as.member_access_expression.member, false))
+                        set_diagnostic(context->diagnostic, context->source, callee->location,
+                            "instance method '%s.%s' requires an instance receiver",
+                            static_receiver,
                             member_display_name);
+                    else
+                    {
+                        const VcSemanticBinding *static_receiver_binding =
+                            vc_semantic_binding(context->model, target_node);
+                        const bool string_receiver = static_receiver_binding != NULL &&
+                            static_receiver_binding->is_type_receiver &&
+                            static_receiver_binding->type == VC_SEM_TYPE_STRING;
+                        if (string_receiver && strcmp(member_display_name, "Concat") == 0)
+                            set_diagnostic(context->diagnostic, context->source, expression->location,
+                                "string.Concat expects a string operand paired with string, char, or primitive value");
+                        else if (string_receiver && strcmp(member_display_name, "Equals") == 0)
+                            set_diagnostic(context->diagnostic, context->source, expression->location,
+                                "string.Equals expects (string left, string right)");
+                        else if (string_receiver && strcmp(member_display_name, "CompareOrdinal") == 0)
+                            set_diagnostic(context->diagnostic, context->source, expression->location,
+                                "string.CompareOrdinal expects (string left, string right)");
+                        else
+                            set_diagnostic(context->diagnostic, context->source, expression->location,
+                                "type '%s' has no matching static method '%s'",
+                                static_receiver,
+                                member_display_name);
+                    }
                 }
             }
             else if (inference == VC_GENERIC_INFERENCE_AMBIGUOUS)
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "generic method type inference for '%s.%s' is ambiguous",
-                    context->model->structs[static_struct_index].name, member_display_name);
+                    static_receiver, member_display_name);
                 ambiguous = true;
             }
             if (!ambiguous && method_index != (size_t)-1 &&
@@ -15793,6 +16712,22 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
         {
             const VcSemanticBinding *existing_target_binding =
                 vc_semantic_binding(context->model, target_node);
+            if (existing_target_binding != NULL && existing_target_binding->is_type_receiver)
+            {
+                set_diagnostic(context->diagnostic, context->source, callee->location,
+                    "type '%s' has no static method '%s'",
+                    static_receiver, callee->as.member_access_expression.member);
+                vc_diagnostic_set_code(context->diagnostic, VC_DIAG_MEMBER);
+                free(argument_types);
+                free(argument_modifiers);
+                return VC_SEM_TYPE_ERROR;
+            }
+            if (diagnose_unknown_qualified_receiver(context, target_node))
+            {
+                free(argument_types);
+                free(argument_modifiers);
+                return VC_SEM_TYPE_ERROR;
+            }
             const VcSemanticType target_type = existing_target_binding != NULL
                 ? existing_target_binding->type
                 : analyze_expression(context, target_node);
@@ -15809,7 +16744,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
             {
                 set_diagnostic(context->diagnostic, context->source, callee->location,
                     "operator '?.' requires a reference receiver, got '%s'",
-                    vc_semantic_type_name(context->model, receiver_type));
+                    context_type_display_name(context, receiver_type));
                 free(argument_types);
                 free(argument_modifiers);
                 return VC_SEM_TYPE_ERROR;
@@ -16111,19 +17046,19 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                         {
                             set_diagnostic(context->diagnostic, context->source, expression->location,
                                 "type '%s' has no matching instance or extension method '%s'",
-                                vc_semantic_type_name(context->model, receiver_type), member_display_name);
+                                context_type_display_name(context, receiver_type), member_display_name);
                         }
                         else if (vc_semantic_type_is_struct(receiver_type))
                         {
                             set_diagnostic(context->diagnostic, context->source, expression->location,
                                 "type '%s' has no matching instance method '%s'",
-                                vc_semantic_type_name(context->model, receiver_type), member_display_name);
+                                context_type_display_name(context, receiver_type), member_display_name);
                         }
                         else
                         {
                             set_diagnostic(context->diagnostic, context->source, expression->location,
                                 "type '%s' has no instance method '%s'",
-                                vc_semantic_type_name(context->model, receiver_type), member_display_name);
+                                context_type_display_name(context, receiver_type), member_display_name);
                         }
                     }
                 }
@@ -16141,7 +17076,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "type '%s' has no matching instance method '%s'",
-                    vc_semantic_type_name(context->model, receiver_type), member_display_name);
+                    context_type_display_name(context, receiver_type), member_display_name);
             }
         }
     }
@@ -16397,6 +17332,36 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
         }
     }
 
+    bool built_in_string_concat = false;
+    VcSemanticType built_in_string_concat_left = VC_SEM_TYPE_ERROR;
+    VcSemanticType built_in_string_concat_right = VC_SEM_TYPE_ERROR;
+    VcSemanticStringOperation built_in_string_operation = VC_SEM_STRING_OP_NONE;
+    if (target_method->has_owner_struct &&
+        target_method->owner_struct_index < context->model->struct_count)
+    {
+        const VcSemanticStruct *owner =
+            &context->model->structs[target_method->owner_struct_index];
+        if (owner->is_builtin_associated_scope &&
+            owner->associated_builtin_type == VC_SEM_TYPE_STRING)
+        {
+            const char *name = target_method->node->as.method_declaration.original_generic_name != NULL
+                ? target_method->node->as.method_declaration.original_generic_name
+                : target_method->node->as.method_declaration.name;
+            if (strcmp(name, "Concat") == 0 && argument_count == 2)
+            {
+                built_in_string_concat = true;
+                built_in_string_concat_left = argument_types[0] == VC_SEM_TYPE_NULL
+                    ? VC_SEM_TYPE_STRING : argument_types[0];
+                built_in_string_concat_right = argument_types[1] == VC_SEM_TYPE_NULL
+                    ? VC_SEM_TYPE_STRING : argument_types[1];
+            }
+            else if (strcmp(name, "Equals") == 0 && argument_count == 2)
+                built_in_string_operation = VC_SEM_STRING_OP_STATIC_EQUALS;
+            else if (strcmp(name, "CompareOrdinal") == 0 && argument_count == 2)
+                built_in_string_operation = VC_SEM_STRING_OP_COMPARE_ORDINAL;
+        }
+    }
+
     free(argument_types);
     free(argument_modifiers);
 
@@ -16503,7 +17468,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
         {
             set_diagnostic(context->diagnostic, context->source, expression->location,
                 "type '%s' cannot be lifted through null-conditional call",
-                vc_semantic_type_name(context->model, call_type));
+                context_type_display_name(context, call_type));
             free(argument_parameters);
             return VC_SEM_TYPE_ERROR;
         }
@@ -16529,6 +17494,14 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
     binding.argument_count = argument_count;
     binding.null_conditional_lifted = null_conditional_lifted;
     binding.null_conditional_underlying_type = target_method->return_type;
+
+    /* Existing string operations keep their representation-specific lowering,
+       but member discovery/overload binding now comes from the ordinary static
+       method declaration attached to the canonical string associated scope. */
+    binding.has_string_concat = built_in_string_concat;
+    binding.string_concat_left_type = built_in_string_concat_left;
+    binding.string_concat_right_type = built_in_string_concat_right;
+    binding.string_operation = built_in_string_operation;
     if (!push_binding(context->model, binding))
     {
         free(argument_parameters);
@@ -16649,8 +17622,8 @@ static bool analyze_object_initializers(
         {
             set_diagnostic(context->diagnostic, context->source, initializer->location,
                 "cannot assign '%s' to object initializer member '%s' of type '%s'",
-                vc_semantic_type_name(context->model, value_type), name,
-                vc_semantic_type_name(context->model, member_type));
+                context_type_display_name(context, value_type), name,
+                context_type_display_name(context, member_type));
             return false;
         }
         if (!ensure_implicit_conversion_reachable_with_origin(context,
@@ -16699,8 +17672,8 @@ static bool analyze_array_initializer_elements(
         {
             set_diagnostic(context->diagnostic, context->source, value->location,
                 "cannot assign '%s' to array initializer element of type '%s'",
-                vc_semantic_type_name(context->model, actual),
-                vc_semantic_type_name(context->model, element_type));
+                context_type_display_name(context, actual),
+                context_type_display_name(context, element_type));
             return false;
         }
         if (!ensure_implicit_conversion_reachable_with_origin(
@@ -16742,8 +17715,8 @@ static bool analyze_rectangular_initializer_leaves(
         {
             set_diagnostic(context->diagnostic, context->source, item->location,
                 "cannot assign '%s' to rectangular array initializer element of type '%s'",
-                vc_semantic_type_name(context->model, actual),
-                vc_semantic_type_name(context->model, element_type));
+                context_type_display_name(context, actual),
+                context_type_display_name(context, element_type));
             return false;
         }
         if (!ensure_implicit_conversion_reachable_with_origin(
@@ -16833,6 +17806,10 @@ static const VcAstNode *find_rectangular_initializer_first_leaf(
 static bool evaluate_int_constant_expression(
     VcSemanticContext *context,
     const VcAstNode *expression,
+    int64_t *value);
+
+static bool primitive_constant_int64_value(
+    const VcSemanticField *field,
     int64_t *value);
 
 static bool evaluate_bool_constant_expression(
@@ -16954,6 +17931,8 @@ static bool evaluate_int_constant_expression(
             !analyze_constant_field(context->model, binding->struct_index,
                 binding->field_index, context->diagnostic))
             return false;
+        if (field->primitive_constant_kind != VC_PRIMITIVE_CONSTANT_NONE)
+            return primitive_constant_int64_value(field, value);
         return evaluate_int_constant_expression(context,
             field->node->as.field_declaration.initializer, value);
     }
@@ -17181,8 +18160,7 @@ static bool analyze_collection_initializers(
                 ambiguous
                     ? "collection initializer call to 'Add' is ambiguous"
                     : "type '%s' has no matching instance method 'Add' for collection initializer",
-                ambiguous ? "" : vc_semantic_type_name(
-                    context->model, vc_semantic_struct_type(struct_index)));
+                ambiguous ? "" : context_type_display_name(context, vc_semantic_struct_type(struct_index)));
             return false;
         }
 
@@ -17467,7 +18445,7 @@ static VcSemanticType analyze_new(
                     set_diagnostic(context->diagnostic, context->source,
                         length->location,
                         "array length must be 'int', got '%s'",
-                        vc_semantic_type_name(context->model, length_type));
+                        context_type_display_name(context, length_type));
                     return VC_SEM_TYPE_ERROR;
                 }
             }
@@ -17598,7 +18576,7 @@ static VcSemanticType analyze_new(
         free(argument_types);
         free(argument_modifiers);
         set_diagnostic(context->diagnostic, context->source, expression->location,
-            "constructor call for '%s' is ambiguous", vc_semantic_type_name(context->model, type));
+            "constructor call for '%s' is ambiguous", context_type_display_name(context, type));
         return VC_SEM_TYPE_ERROR;
     }
 
@@ -17624,10 +18602,10 @@ static VcSemanticType analyze_new(
             if (unknown_name != NULL)
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "constructor for '%s' has no parameter named '%s'",
-                    vc_semantic_type_name(context->model, type), unknown_name);
+                    context_type_display_name(context, type), unknown_name);
             else
                 set_diagnostic(context->diagnostic, context->source, expression->location,
-                    "no matching constructor for '%s' was found", vc_semantic_type_name(context->model, type));
+                    "no matching constructor for '%s' was found", context_type_display_name(context, type));
             return VC_SEM_TYPE_ERROR;
         }
         free(argument_types);
@@ -17726,7 +18704,7 @@ static VcSemanticType analyze_new(
         free(argument_parameters);
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "unsafe constructor '%s' requires an unsafe method",
-            context->model->structs[struct_index].name);
+            context_type_display_name(context, vc_semantic_struct_type(struct_index)));
         return VC_SEM_TYPE_ERROR;
     }
     constructor->reachable = true;
@@ -17848,12 +18826,16 @@ static VcSemanticType analyze_delegate_method_group(
     if (delegate_type->delegate_invoke_method_index >= context->model->method_count)
         return VC_SEM_TYPE_ERROR;
     const VcSemanticMethod *invoke = &context->model->methods[delegate_type->delegate_invoke_method_index];
+    char delegate_display[1024];
+    const char *delegate_display_name = semantic_struct_display_name(
+        delegate_type, delegate_display, sizeof(delegate_display));
 
     size_t method_index = (size_t)-1;
     bool has_target = false;
     bool ambiguous = false;
     bool interface_dispatch = false;
     bool virtual_dispatch = false;
+    VcGenericInferenceStatus generic_group_inference = VC_GENERIC_INFERENCE_NONE;
     const VcAstNode *target_node = NULL;
 
     VcTokenKind *mods = NULL;
@@ -17876,7 +18858,7 @@ static VcSemanticType analyze_delegate_method_group(
     {
         const char *name = expression->as.identifier_expression.name;
         method_index = resolve_method(context, name, invoke->parameter_types, mods,
-            invoke->parameter_count, &ambiguous);
+            invoke->parameter_count, &ambiguous, NULL);
         if (method_index == (size_t)-1 && !ambiguous && context->has_this)
         {
             method_index = resolve_instance_method(context, context->this_struct_index, name,
@@ -17892,9 +18874,25 @@ static VcSemanticType analyze_delegate_method_group(
         bool static_type_ambiguous = false;
         if (resolve_static_type_target(context, target_node, &static_struct_index, &static_type_ambiguous))
         {
+            size_t method_rank = (size_t)-1;
             method_index = resolve_static_method(context, static_struct_index,
                 expression->as.member_access_expression.member, invoke->parameter_types, mods,
-                invoke->parameter_count, &ambiguous);
+                invoke->parameter_count, &ambiguous, &method_rank);
+            if (!ambiguous)
+            {
+                generic_group_inference = request_generic_delegate_method_inference(
+                    context, expression, static_struct_index,
+                    expression->as.member_access_expression.member, invoke,
+                    method_index == (size_t)-1 ? (size_t)-1 : method_rank);
+                if (generic_group_inference == VC_GENERIC_INFERENCE_REQUESTED)
+                {
+                    free(mods);
+                    *handled = true;
+                    return VC_SEM_TYPE_ERROR;
+                }
+                if (generic_group_inference == VC_GENERIC_INFERENCE_AMBIGUOUS)
+                    ambiguous = true;
+            }
         }
         else
         {
@@ -17944,9 +18942,14 @@ static VcSemanticType analyze_delegate_method_group(
     *handled = true;
     if (ambiguous || method_index == (size_t)-1)
     {
-        set_diagnostic(context->diagnostic, context->source, expression->location,
-            ambiguous ? "delegate method group is ambiguous" : "no method matches delegate signature '%s'",
-            delegate_type->name);
+        if (generic_group_inference == VC_GENERIC_INFERENCE_UNINFERABLE)
+            set_diagnostic(context->diagnostic, context->source, expression->location,
+                "generic method type arguments for delegate method group could not be inferred from '%s'",
+                delegate_display_name);
+        else
+            set_diagnostic(context->diagnostic, context->source, expression->location,
+                ambiguous ? "delegate method group is ambiguous" : "no method matches delegate signature '%s'",
+                delegate_display_name);
         return VC_SEM_TYPE_ERROR;
     }
 
@@ -17961,11 +18964,19 @@ static VcSemanticType analyze_delegate_method_group(
             method->node->as.method_declaration.name);
         return VC_SEM_TYPE_ERROR;
     }
+    if (!validate_instantiated_generic_constraints(context->model,
+            &method->node->as.method_declaration.generic_constraints,
+            method->namespace_name, context->source, expression->location, context->diagnostic))
+    {
+        related_declaration(context->diagnostic, method->source, method->node,
+            "Generic declaration and its constraint contract are here.");
+        return VC_SEM_TYPE_ERROR;
+    }
     if (!delegate_signature_matches_method(context->model, invoke, method))
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "method '%s' does not match delegate signature '%s'",
-            method->node->as.method_declaration.name, delegate_type->name);
+            method->node->as.method_declaration.name, delegate_display_name);
         return VC_SEM_TYPE_ERROR;
     }
     if (method->is_delegate_invoke || method->is_operator)
@@ -18186,7 +19197,7 @@ static VcSemanticType analyze_native_function_pointer_address(
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "native function address target is ambiguous for signature '%s'",
-            vc_semantic_type_name(context->model, target_type));
+            context_type_display_name(context, target_type));
         return VC_SEM_TYPE_ERROR;
     }
     if (invalid_target)
@@ -18199,7 +19210,7 @@ static VcSemanticType analyze_native_function_pointer_address(
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "no static extern method matches native function pointer signature '%s'",
-            vc_semantic_type_name(context->model, target_type));
+            context_type_display_name(context, target_type));
         return VC_SEM_TYPE_ERROR;
     }
 
@@ -18289,7 +19300,7 @@ static VcSemanticType analyze_lambda_expression(
         {
             set_diagnostic(context->diagnostic, context->source, expression->location,
                 "async lambda target delegate must return Task, Task<T>, ValueTask, or ValueTask<T>, got '%s'",
-                vc_semantic_type_name(context->model, invoke->return_type));
+                context_type_display_name(context, invoke->return_type));
             return VC_SEM_TYPE_ERROR;
         }
         async_returns_value_task = !returns_task;
@@ -18412,8 +19423,8 @@ static VcSemanticType analyze_lambda_expression(
                 expression->as.lambda_expression.is_async
                     ? "async lambda returns '%s' but target completion requires '%s'"
                     : "lambda returns '%s' but delegate requires '%s'",
-                vc_semantic_type_name(context->model, body_type),
-                vc_semantic_type_name(context->model, lambda_body_return_type));
+                context_type_display_name(context, body_type),
+                context_type_display_name(context, lambda_body_return_type));
             ok = false;
         }
     }
@@ -18474,7 +19485,7 @@ static VcSemanticType analyze_conditional_expression(
     {
         set_diagnostic(context->diagnostic, context->source, condition->location,
             "conditional expression requires a bool condition, found '%s'",
-            vc_semantic_type_name(context->model, condition_type));
+            context_type_display_name(context, condition_type));
         return VC_SEM_TYPE_ERROR;
     }
 
@@ -18509,8 +19520,8 @@ static VcSemanticType analyze_conditional_expression(
             if (true_type != VC_SEM_TYPE_ERROR)
                 set_diagnostic(context->diagnostic, context->source, when_true->location,
                     "conditional branch of type '%s' cannot convert to target type '%s'",
-                    vc_semantic_type_name(context->model, true_type),
-                    vc_semantic_type_name(context->model, target_type));
+                    context_type_display_name(context, true_type),
+                    context_type_display_name(context, target_type));
             free(before);
             return VC_SEM_TYPE_ERROR;
         }
@@ -18529,8 +19540,8 @@ static VcSemanticType analyze_conditional_expression(
             if (false_type != VC_SEM_TYPE_ERROR)
                 set_diagnostic(context->diagnostic, context->source, when_false->location,
                     "conditional branch of type '%s' cannot convert to target type '%s'",
-                    vc_semantic_type_name(context->model, false_type),
-                    vc_semantic_type_name(context->model, target_type));
+                    context_type_display_name(context, false_type),
+                    context_type_display_name(context, target_type));
             free(true_assignments);
             free(before);
             return VC_SEM_TYPE_ERROR;
@@ -18575,7 +19586,7 @@ static VcSemanticType analyze_conditional_expression(
             if (false_type != VC_SEM_TYPE_ERROR)
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "conditional expression cannot infer a target type from '%s'",
-                    vc_semantic_type_name(context->model, false_type));
+                    context_type_display_name(context, false_type));
             free(before);
             return VC_SEM_TYPE_ERROR;
         }
@@ -18592,7 +19603,7 @@ static VcSemanticType analyze_conditional_expression(
             if (true_type != VC_SEM_TYPE_ERROR)
                 set_diagnostic(context->diagnostic, context->source, when_true->location,
                     "conditional branch cannot convert to inferred type '%s'",
-                    vc_semantic_type_name(context->model, false_type));
+                    context_type_display_name(context, false_type));
             free(false_assignments);
             free(before);
             return VC_SEM_TYPE_ERROR;
@@ -18621,7 +19632,7 @@ static VcSemanticType analyze_conditional_expression(
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "conditional expression cannot infer a target type from '%s'",
-                    vc_semantic_type_name(context->model, true_type));
+                    context_type_display_name(context, true_type));
                 free(true_assignments);
                 free(before);
                 return VC_SEM_TYPE_ERROR;
@@ -18632,7 +19643,7 @@ static VcSemanticType analyze_conditional_expression(
                 if (false_type != VC_SEM_TYPE_ERROR)
                     set_diagnostic(context->diagnostic, context->source, when_false->location,
                         "conditional branch cannot convert to inferred type '%s'",
-                        vc_semantic_type_name(context->model, true_type));
+                        context_type_display_name(context, true_type));
                 free(true_assignments);
                 free(before);
                 return VC_SEM_TYPE_ERROR;
@@ -18690,8 +19701,8 @@ static VcSemanticType analyze_conditional_expression(
         {
             set_diagnostic(context->diagnostic, context->source, expression->location,
                 "conditional branches of type '%s' and '%s' do not have a unique implicit result type",
-                vc_semantic_type_name(context->model, true_type),
-                vc_semantic_type_name(context->model, false_type));
+                context_type_display_name(context, true_type),
+                context_type_display_name(context, false_type));
         }
     }
 
@@ -18779,7 +19790,7 @@ static VcSemanticType analyze_switch_expression(
                 set_diagnostic(context->diagnostic, context->source,
                     arm->as.switch_expression_arm.guard->location,
                     "switch expression when guard must be bool, got '%s'",
-                    vc_semantic_type_name(context->model, guard));
+                    context_type_display_name(context, guard));
                 return VC_SEM_TYPE_ERROR;
             }
         }
@@ -18810,8 +19821,8 @@ static VcSemanticType analyze_switch_expression(
             {
                 set_diagnostic(context->diagnostic, context->source, result->location,
                     "switch expression arm of type '%s' cannot convert to target type '%s'",
-                    vc_semantic_type_name(context->model, arm_type),
-                    vc_semantic_type_name(context->model, target_type));
+                    context_type_display_name(context, arm_type),
+                    context_type_display_name(context, target_type));
                 return VC_SEM_TYPE_ERROR;
             }
         }
@@ -18832,8 +19843,8 @@ static VcSemanticType analyze_switch_expression(
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "switch expression arms of type '%s' and '%s' do not have a unique implicit result type",
-                    vc_semantic_type_name(context->model, result_type),
-                    vc_semantic_type_name(context->model, arm_type));
+                    context_type_display_name(context, result_type),
+                    context_type_display_name(context, arm_type));
                 return VC_SEM_TYPE_ERROR;
             }
         }
@@ -18867,8 +19878,8 @@ static VcSemanticType analyze_switch_expression(
                 set_diagnostic(context->diagnostic, context->source, result->location,
                     "switch expression arm of type '%s' cannot convert to inferred type '%s'",
                     result_binding == NULL ? "<unknown>" :
-                        vc_semantic_type_name(context->model, result_binding->type),
-                    vc_semantic_type_name(context->model, result_type));
+                        context_type_display_name(context, result_binding->type),
+                    context_type_display_name(context, result_type));
                 return VC_SEM_TYPE_ERROR;
             }
             if (!ensure_implicit_conversion_reachable(
@@ -18935,7 +19946,7 @@ static VcSemanticType analyze_expression_with_target_origin(
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "default for native function pointer type '%s' requires an unsafe method",
-                    vc_semantic_type_name(context->model, target_type));
+                    context_type_display_name(context, target_type));
                 return VC_SEM_TYPE_ERROR;
             }
             if (!native_function_pointer_abi_supported(context->model, target_type))
@@ -18949,7 +19960,7 @@ static VcSemanticType analyze_expression_with_target_origin(
         {
             set_diagnostic(context->diagnostic, context->source, expression->location,
                 "default for pointer type '%s' requires an unsafe method",
-                vc_semantic_type_name(context->model, target_type));
+                context_type_display_name(context, target_type));
             return VC_SEM_TYPE_ERROR;
         }
 
@@ -18989,8 +20000,8 @@ static VcSemanticType analyze_expression_with_target_origin(
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "implicit conversion from '%s' to '%s' is ambiguous",
-            vc_semantic_type_name(context->model, source_type),
-            vc_semantic_type_name(context->model, target_type));
+            context_type_display_name(context, source_type),
+            context_type_display_name(context, target_type));
         return VC_SEM_TYPE_ERROR;
     }
     if (conversion_index != (size_t)-1)
@@ -19082,7 +20093,7 @@ static bool analyze_is_pattern(VcSemanticContext *context, const VcAstNode *patt
         {
             set_diagnostic(context->diagnostic, context->source, pattern->location,
                 "property pattern cannot match value of type '%s'",
-                vc_semantic_type_name(context->model, source));
+                context_type_display_name(context, source));
             return false;
         }
         const size_t receiver_index = vc_semantic_struct_index(receiver_type);
@@ -19111,7 +20122,7 @@ static bool analyze_is_pattern(VcSemanticContext *context, const VcAstNode *patt
             {
                 set_diagnostic(context->diagnostic, context->source, member->location,
                     "type '%s' has no readable property '%s' for property pattern",
-                    vc_semantic_type_name(context->model, receiver_type), name);
+                    context_type_display_name(context, receiver_type), name);
                 return false;
             }
             VcSemanticStruct *property_structure = &context->model->structs[property_owner];
@@ -19188,7 +20199,7 @@ static bool analyze_is_pattern(VcSemanticContext *context, const VcAstNode *patt
             {
                 set_diagnostic(context->diagnostic, context->source, pattern->location,
                     "null pattern cannot match value of type '%s'",
-                    vc_semantic_type_name(context->model, source));
+                    context_type_display_name(context, source));
                 return false;
             }
             if (analyze_expression(context, constant_pattern) == VC_SEM_TYPE_ERROR)
@@ -19205,7 +20216,7 @@ static bool analyze_is_pattern(VcSemanticContext *context, const VcAstNode *patt
                 {
                     set_diagnostic(context->diagnostic, context->source, pattern->location,
                         "relational pattern cannot match value of type '%s'",
-                        vc_semantic_type_name(context->model, source));
+                        context_type_display_name(context, source));
                     return false;
                 }
             }
@@ -19215,7 +20226,7 @@ static bool analyze_is_pattern(VcSemanticContext *context, const VcAstNode *patt
             {
                 set_diagnostic(context->diagnostic, context->source, pattern->location,
                     "constant pattern cannot match value of type '%s'",
-                    vc_semantic_type_name(context->model, source));
+                    context_type_display_name(context, source));
                 return false;
             }
             const VcSemanticType constant_type = analyze_expression_with_target(
@@ -19226,8 +20237,8 @@ static bool analyze_is_pattern(VcSemanticContext *context, const VcAstNode *patt
                 if (constant_type != VC_SEM_TYPE_ERROR)
                     set_diagnostic(context->diagnostic, context->source, constant_pattern->location,
                         "constant pattern of type '%s' cannot match '%s'",
-                        vc_semantic_type_name(context->model, constant_type),
-                        vc_semantic_type_name(context->model, source));
+                        context_type_display_name(context, constant_type),
+                        context_type_display_name(context, source));
                 return false;
             }
         }
@@ -19256,8 +20267,8 @@ static bool analyze_is_pattern(VcSemanticContext *context, const VcAstNode *patt
     {
         set_diagnostic(context->diagnostic, context->source, pattern->location,
             "operator 'is' cannot test or convert '%s' as '%s'",
-            vc_semantic_type_name(context->model, source),
-            vc_semantic_type_name(context->model, target));
+            context_type_display_name(context, source),
+            context_type_display_name(context, target));
         return false;
     }
     VcSemanticBinding binding = {0};
@@ -19317,8 +20328,8 @@ static VcSemanticType analyze_stackalloc_span_expression(
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "stackalloc element type '%s' does not match span element type '%s'",
-            vc_semantic_type_name(context->model, element_type),
-            vc_semantic_type_name(context->model, target_element));
+            context_type_display_name(context, element_type),
+            context_type_display_name(context, target_element));
         return VC_SEM_TYPE_ERROR;
     }
 
@@ -19331,7 +20342,7 @@ static VcSemanticType analyze_stackalloc_span_expression(
         set_diagnostic(context->diagnostic, context->source,
             expression->as.stackalloc_expression.count->location,
             "stackalloc element count must be 'int', got '%s'",
-            vc_semantic_type_name(context->model, count_type));
+            context_type_display_name(context, count_type));
         return VC_SEM_TYPE_ERROR;
     }
 
@@ -19799,7 +20810,7 @@ static VcSemanticType analyze_await_protocol(
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "awaitable type '%s' must provide an unambiguous GetAwaiter() method",
-            vc_semantic_type_name(context->model, awaitable_type));
+            context_type_display_name(context, awaitable_type));
         return VC_SEM_TYPE_ERROR;
     }
 
@@ -19813,7 +20824,7 @@ static VcSemanticType analyze_await_protocol(
         {
             set_diagnostic(context->diagnostic, context->source, expression->location,
                 "awaitable type '%s' has ambiguous extension GetAwaiter() methods",
-                vc_semantic_type_name(context->model, awaitable_type));
+                context_type_display_name(context, awaitable_type));
             return VC_SEM_TYPE_ERROR;
         }
         if (get_awaiter == (size_t)-1 && strcmp(get_awaiter_lookup, "GetAwaiter") == 0)
@@ -19835,14 +20846,14 @@ static VcSemanticType analyze_await_protocol(
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "generic extension GetAwaiter() inference is ambiguous for awaitable type '%s'",
-                    vc_semantic_type_name(context->model, awaitable_type));
+                    context_type_display_name(context, awaitable_type));
                 return VC_SEM_TYPE_ERROR;
             }
             if (inference == VC_GENERIC_INFERENCE_UNINFERABLE)
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "generic extension GetAwaiter() type arguments could not be inferred for awaitable type '%s'",
-                    vc_semantic_type_name(context->model, awaitable_type));
+                    context_type_display_name(context, awaitable_type));
                 return VC_SEM_TYPE_ERROR;
             }
         }
@@ -19853,7 +20864,7 @@ static VcSemanticType analyze_await_protocol(
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "awaitable type '%s' must provide an unambiguous GetAwaiter() method",
-            vc_semantic_type_name(context->model, awaitable_type));
+            context_type_display_name(context, awaitable_type));
         return VC_SEM_TYPE_ERROR;
     }
 
@@ -19889,14 +20900,14 @@ static VcSemanticType analyze_await_protocol(
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "GetAwaiter() must return an awaiter type, got '%s'",
-            vc_semantic_type_name(context->model, awaiter_type));
+            context_type_display_name(context, awaiter_type));
         return VC_SEM_TYPE_ERROR;
     }
     if (semantic_type_is_ref_struct(context->model, awaiter_type))
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "ref struct awaiter type '%s' cannot be stored across async suspension",
-            vc_semantic_type_name(context->model, awaiter_type));
+            context_type_display_name(context, awaiter_type));
         return VC_SEM_TYPE_ERROR;
     }
     const size_t awaiter_struct = vc_semantic_struct_index(awaiter_type);
@@ -19908,7 +20919,7 @@ static VcSemanticType analyze_await_protocol(
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "awaiter type '%s' must provide a bool IsCompleted property",
-            vc_semantic_type_name(context->model, awaiter_type));
+            context_type_display_name(context, awaiter_type));
         return VC_SEM_TYPE_ERROR;
     }
     VcSemanticProperty *completed =
@@ -19965,7 +20976,7 @@ static VcSemanticType analyze_await_protocol(
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "awaiter type '%s' must provide an unambiguous void OnCompleted(Action) method",
-            vc_semantic_type_name(context->model, awaiter_type));
+            context_type_display_name(context, awaiter_type));
         return VC_SEM_TYPE_ERROR;
     }
     VcSemanticMethod *on_completed_method = &context->model->methods[on_completed];
@@ -20002,7 +21013,7 @@ static VcSemanticType analyze_await_protocol(
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "awaiter type '%s' must provide an unambiguous GetResult() method",
-            vc_semantic_type_name(context->model, awaiter_type));
+            context_type_display_name(context, awaiter_type));
         return VC_SEM_TYPE_ERROR;
     }
     VcSemanticMethod *get_result_method = &context->model->methods[get_result];
@@ -20060,6 +21071,56 @@ static VcSemanticType analyze_await_protocol(
     return get_result_method->return_type;
 }
 
+/* Static properties use the ordinary accessor analysis and member binding for
+   both contextual names and general type receivers. A direct value assignment
+   needs only its setter; compound writes and ref properties still need a getter. */
+static VcSemanticType bind_static_property(
+    VcSemanticContext *context,
+    const VcAstNode *expression,
+    size_t owner,
+    size_t index,
+    VcSemanticProperty *property)
+{
+    const bool read = context->direct_assignment_target != expression || property->returns_ref;
+    if (read)
+    {
+        if (!property_accessor_is_accessible(context, owner, property,
+                property->node->as.property_declaration.getter_modifiers))
+        {
+            char receiver_buffer[1024];
+            const char *receiver_name = expression->kind == VC_AST_MEMBER_ACCESS_EXPRESSION
+                ? type_receiver_display(expression->as.member_access_expression.target,
+                    receiver_buffer, sizeof(receiver_buffer))
+                : context->model->structs[owner].name;
+            set_diagnostic(context->diagnostic, context->source, expression->location,
+                "getter for static property '%s.%s' is inaccessible",
+                receiver_name, property->node->as.property_declaration.name);
+            vc_diagnostic_set_code(context->diagnostic, VC_DIAG_ACCESSIBILITY);
+            return VC_SEM_TYPE_ERROR;
+        }
+        property->getter_reachable = true;
+        if (!analyze_property_getter(context->model, owner, index, context->diagnostic))
+            return VC_SEM_TYPE_ERROR;
+    }
+    VcSemanticBinding binding = {0};
+    binding.node = expression;
+    binding.type = property->type;
+    binding.struct_index = owner;
+    binding.property_index = index;
+    binding.has_property = true;
+    binding.property_returns_ref = property->returns_ref;
+    binding.property_returns_ref_readonly = property->returns_ref_readonly;
+    if (owner < context->model->struct_count &&
+        context->model->structs[owner].is_builtin_associated_scope &&
+        context->model->structs[owner].associated_builtin_type == VC_SEM_TYPE_STRING &&
+        property->node != NULL && property->node->kind == VC_AST_PROPERTY_DECLARATION &&
+        strcmp(property->node->as.property_declaration.name, "Empty") == 0)
+        binding.has_string_empty = true;
+    if (!push_binding(context->model, binding))
+        return VC_SEM_TYPE_ERROR;
+    return binding.type;
+}
+
 static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAstNode *expression)
 {
     VcSemanticType type = VC_SEM_TYPE_ERROR;
@@ -20068,6 +21129,37 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
 
     switch (expression->kind)
     {
+        case VC_AST_TYPE_RECEIVER_EXPRESSION:
+        {
+            char root_name[512];
+            const char *name = expression->receiver_type->name;
+            const char *dot = strchr(name, '.');
+            const size_t root_length = dot != NULL ? (size_t)(dot - name) : strlen(name);
+            if (root_length < sizeof(root_name))
+            {
+                memcpy(root_name, name, root_length);
+                root_name[root_length] = '\0';
+                if (identifier_is_value(context, root_name))
+                {
+                    set_diagnostic(context->diagnostic, context->source, expression->location,
+                        "value '%s' cannot be used as a type receiver", root_name);
+                    vc_diagnostic_set_code(context->diagnostic, VC_DIAG_GENERIC_ARGUMENT);
+                    return VC_SEM_TYPE_ERROR;
+                }
+            }
+            size_t owner = 0;
+            bool ambiguous = false;
+            resolve_static_type_target(context, expression, &owner, &ambiguous);
+            const VcSemanticBinding *receiver = vc_semantic_binding(context->model, expression);
+            set_diagnostic(context->diagnostic, context->source, expression->location,
+                ambiguous ? "type receiver '%s' is ambiguous" : receiver != NULL && receiver->is_type_receiver
+                    ? "type receiver '%s' cannot be used as a runtime value or unsupported static target"
+                    : "unknown type receiver '%s'",
+                expression->receiver_type->name);
+            vc_diagnostic_set_code(context->diagnostic, receiver != NULL && receiver->is_type_receiver
+                ? VC_DIAG_MEMBER : VC_DIAG_NAME);
+            return VC_SEM_TYPE_ERROR;
+        }
         case VC_AST_LAMBDA_EXPRESSION:
             set_diagnostic(context->diagnostic, context->source, expression->location,
                 "lambda expression requires a target delegate type");
@@ -20164,7 +21256,18 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
             {
                 case VC_AST_LITERAL_NUMBER: type = numeric_literal_type(expression->as.literal_expression.text); break;
                 case VC_AST_LITERAL_STRING: type = VC_SEM_TYPE_STRING; break;
-                case VC_AST_LITERAL_CHARACTER: type = VC_SEM_TYPE_CHAR; break;
+                case VC_AST_LITERAL_CHARACTER:
+                {
+                    uint32_t scalar = 0;
+                    if (!vc_ast_character_scalar(expression->as.literal_expression.text, &scalar))
+                    {
+                        set_diagnostic(context->diagnostic, context->source, expression->location,
+                            "character literal must contain exactly one Unicode scalar");
+                        return VC_SEM_TYPE_ERROR;
+                    }
+                    type = VC_SEM_TYPE_CHAR;
+                    break;
+                }
                 case VC_AST_LITERAL_TRUE:
                 case VC_AST_LITERAL_FALSE: type = VC_SEM_TYPE_BOOL; break;
                 case VC_AST_LITERAL_NULL: type = VC_SEM_TYPE_NULL; break;
@@ -20236,8 +21339,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "explicit conversion from '%s' to '%s' is ambiguous",
-                        vc_semantic_type_name(context->model, source),
-                        vc_semantic_type_name(context->model, target));
+                        context_type_display_name(context, source),
+                        context_type_display_name(context, target));
                     return VC_SEM_TYPE_ERROR;
                 }
                 if (operator_method_index != (size_t)-1)
@@ -20258,8 +21361,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "cannot explicitly cast '%s' to '%s'",
-                        vc_semantic_type_name(context->model, source),
-                        vc_semantic_type_name(context->model, target));
+                        context_type_display_name(context, source),
+                        context_type_display_name(context, target));
                     return VC_SEM_TYPE_ERROR;
                 }
             }
@@ -20295,8 +21398,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "operator '%s' cannot test or convert '%s' as '%s'",
                     vc_token_kind_name(operator_kind),
-                    vc_semantic_type_name(context->model, source),
-                    vc_semantic_type_name(context->model, target));
+                    context_type_display_name(context, source),
+                    context_type_display_name(context, target));
                 return VC_SEM_TYPE_ERROR;
             }
             VcSemanticBinding binding = {0};
@@ -20412,30 +21515,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     VcSemanticProperty *property =
                         &context->model->structs[static_property_owner].properties[static_property_index];
-                    if (!property_accessor_is_accessible(context, static_property_owner, property,
-                            property->node->as.property_declaration.getter_modifiers))
-                    {
-                        set_diagnostic(context->diagnostic, context->source, expression->location,
-                            "getter for static property '%s' is inaccessible",
-                            property->node->as.property_declaration.name);
-                        return VC_SEM_TYPE_ERROR;
-                    }
-                    property->getter_reachable = true;
-                    if (!analyze_property_getter(context->model, static_property_owner,
-                            static_property_index, context->diagnostic))
-                        return VC_SEM_TYPE_ERROR;
-                    type = property->type;
-                    VcSemanticBinding binding = {0};
-                    binding.node = expression;
-                    binding.type = type;
-                    binding.struct_index = static_property_owner;
-                    binding.property_index = static_property_index;
-                    binding.has_property = true;
-                    binding.property_returns_ref = property->returns_ref;
-                    binding.property_returns_ref_readonly = property->returns_ref_readonly;
-                    if (!push_binding(context->model, binding))
-                        return VC_SEM_TYPE_ERROR;
-                    return type;
+                    return bind_static_property(context, expression, static_property_owner,
+                        static_property_index, property);
                 }
                 if (context->has_this && strcmp(expression->as.identifier_expression.name, "this") == 0)
                 {
@@ -20615,7 +21696,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "default('%s') requires an unsafe method",
-                        vc_semantic_type_name(context->model, default_type));
+                        context_type_display_name(context, default_type));
                     return VC_SEM_TYPE_ERROR;
                 }
                 if (!native_function_pointer_abi_supported(context->model, default_type))
@@ -20629,7 +21710,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "default('%s') requires an unsafe method",
-                    vc_semantic_type_name(context->model, default_type));
+                    context_type_display_name(context, default_type));
                 return VC_SEM_TYPE_ERROR;
             }
             if (vc_semantic_type_is_pointer(default_type))
@@ -20681,7 +21762,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "typeof('%s') requires an unsafe method",
-                        vc_semantic_type_name(context->model, reflected_type));
+                        context_type_display_name(context, reflected_type));
                     return VC_SEM_TYPE_ERROR;
                 }
                 if (!native_function_pointer_abi_supported(context->model, reflected_type))
@@ -20695,7 +21776,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "typeof('%s') requires an unsafe method",
-                    vc_semantic_type_name(context->model, reflected_type));
+                    context_type_display_name(context, reflected_type));
                 return VC_SEM_TYPE_ERROR;
             }
             if (vc_semantic_type_is_pointer(reflected_type))
@@ -20769,7 +21850,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "sizeof('%s') requires an unsafe method",
-                    vc_semantic_type_name(context->model, sized_type));
+                    context_type_display_name(context, sized_type));
                 return VC_SEM_TYPE_ERROR;
             }
 
@@ -20842,7 +21923,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 set_diagnostic(context->diagnostic, context->source,
                     expression->as.stackalloc_expression.count->location,
                     "stackalloc element count must be 'int', got '%s'",
-                    vc_semantic_type_name(context->model, count_type));
+                    context_type_display_name(context, count_type));
                 return VC_SEM_TYPE_ERROR;
             }
 
@@ -20878,7 +21959,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "operator '?[]' requires a reference or nullable value receiver, got '%s'",
-                        vc_semantic_type_name(context->model, target));
+                        context_type_display_name(context, target));
                     return VC_SEM_TYPE_ERROR;
                 }
             }
@@ -20963,7 +22044,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         set_diagnostic(context->diagnostic, context->source,
                             expression->as.index_expression.index->location,
                             "string index must be 'int', 'Index', or 'Range', got '%s'",
-                            vc_semantic_type_name(context->model, first_index));
+                            context_type_display_name(context, first_index));
                         return VC_SEM_TYPE_ERROR;
                     }
 
@@ -21052,7 +22133,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     set_diagnostic(context->diagnostic, context->source,
                         expression->location,
                         "array type '%s' requires %zu index(es), got %zu",
-                        vc_semantic_type_name(context->model, resolved_target), rank, index_count);
+                        context_type_display_name(context, resolved_target), rank, index_count);
                     return VC_SEM_TYPE_ERROR;
                 }
                 for (size_t i = 0; i < index_count; i++)
@@ -21067,7 +22148,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         set_diagnostic(context->diagnostic, context->source,
                             index_node->location,
                             "array index must be 'int', got '%s'",
-                            vc_semantic_type_name(context->model, index_type));
+                            context_type_display_name(context, index_type));
                         return VC_SEM_TYPE_ERROR;
                     }
                 }
@@ -21115,7 +22196,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     set_diagnostic(context->diagnostic, context->source,
                         expression->as.index_expression.index->location,
                         "pointer index must be 'int', got '%s'",
-                        vc_semantic_type_name(context->model, first_index));
+                        context_type_display_name(context, first_index));
                     return VC_SEM_TYPE_ERROR;
                 }
                 type = vc_semantic_pointer_element_type(context->model, resolved_target);
@@ -21141,7 +22222,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
             if (!vc_semantic_type_is_struct(resolved_target))
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
-                    "type '%s' cannot be indexed", vc_semantic_type_name(context->model, resolved_target));
+                    "type '%s' cannot be indexed", context_type_display_name(context, resolved_target));
                 return VC_SEM_TYPE_ERROR;
             }
 
@@ -21161,7 +22242,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "index getter is ambiguous for type '%s'",
-                    vc_semantic_type_name(context->model, resolved_target));
+                    context_type_display_name(context, resolved_target));
                 return VC_SEM_TYPE_ERROR;
             }
             if (method_index == (size_t)-1)
@@ -21208,7 +22289,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
 
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "type '%s' does not define an index getter",
-                    vc_semantic_type_name(context->model, resolved_target));
+                    context_type_display_name(context, resolved_target));
                 return VC_SEM_TYPE_ERROR;
             }
 
@@ -21219,7 +22300,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "index getter for type '%s' is inaccessible or invalid",
-                    vc_semantic_type_name(context->model, resolved_target));
+                    context_type_display_name(context, resolved_target));
                 return VC_SEM_TYPE_ERROR;
             }
             bool interface_dispatch = false;
@@ -21268,10 +22349,24 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
         case VC_AST_MEMBER_ACCESS_EXPRESSION:
         {
             const VcAstNode *member_target = expression->as.member_access_expression.target;
-            const bool string_type_target = member_target != NULL &&
-                member_target->kind == VC_AST_IDENTIFIER_EXPRESSION &&
-                strcmp(member_target->as.identifier_expression.name, "string") == 0;
-            if (string_type_target)
+            size_t enum_struct_index = 0;
+            bool enum_type_ambiguous = false;
+            const bool static_type_target = resolve_static_type_target(context,
+                member_target, &enum_struct_index, &enum_type_ambiguous);
+            char static_receiver_buffer[1024];
+            const char *static_receiver = type_receiver_display(
+                member_target, static_receiver_buffer, sizeof(static_receiver_buffer));
+            const VcSemanticBinding *receiver = vc_semantic_binding(context->model, member_target);
+            size_t string_associated_owner = 0;
+            const bool legacy_string_type_target = receiver != NULL && receiver->is_type_receiver &&
+                receiver->type == VC_SEM_TYPE_STRING &&
+                !vc_semantic_builtin_associated_owner(
+                    context->model, VC_SEM_TYPE_STRING, &string_associated_owner);
+            /* Isolated semantic-model tests and explicit no-StandardLibrary analysis
+               historically expose string.Empty. Keep that representation primitive
+               only when no declaration-driven string scope exists; normal compilation
+               resolves Empty through the #335 associated-member owner above. */
+            if (legacy_string_type_target)
             {
                 if (expression->as.member_access_expression.null_conditional)
                 {
@@ -21294,12 +22389,15 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     return VC_SEM_TYPE_ERROR;
                 return binding.type;
             }
-
-            size_t enum_struct_index = 0;
-            bool enum_type_ambiguous = false;
-            const bool static_type_target = resolve_static_type_target(context,
-                expression->as.member_access_expression.target,
-                &enum_struct_index, &enum_type_ambiguous);
+            if (receiver != NULL && receiver->is_type_receiver && !static_type_target)
+            {
+                set_diagnostic(context->diagnostic, context->source, expression->location,
+                    "type '%s' has no static member '%s'",
+                    static_receiver,
+                    expression->as.member_access_expression.member);
+                vc_diagnostic_set_code(context->diagnostic, VC_DIAG_MEMBER);
+                return VC_SEM_TYPE_ERROR;
+            }
             if (expression->as.member_access_expression.null_conditional && static_type_target)
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
@@ -21336,7 +22434,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 set_diagnostic(context->diagnostic, context->source,
                     expression->as.member_access_expression.target->location,
                     "type name '%s' is ambiguous",
-                    expression->as.member_access_expression.target->as.identifier_expression.name);
+                    type_receiver_display_name(expression->as.member_access_expression.target));
                 return VC_SEM_TYPE_ERROR;
             }
             if (static_type_target && enum_struct_index < context->model->struct_count)
@@ -21354,7 +22452,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     {
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "constant '%s.%s' is inaccessible",
-                            context->model->structs[enum_struct_index].name,
+                            static_receiver,
                             expression->as.member_access_expression.member);
                         return VC_SEM_TYPE_ERROR;
                     }
@@ -21391,7 +22489,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     {
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "static field '%s.%s' is inaccessible",
-                            context->model->structs[enum_struct_index].name,
+                            static_receiver,
                             expression->as.member_access_expression.member);
                         return VC_SEM_TYPE_ERROR;
                     }
@@ -21431,33 +22529,40 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                             property->node->as.property_declaration.name);
                         return VC_SEM_TYPE_ERROR;
                     }
-                    if (!property_accessor_is_accessible(context, static_property_owner, property,
-                            property->node->as.property_declaration.getter_modifiers))
-                    {
-                        set_diagnostic(context->diagnostic, context->source, expression->location,
-                            "getter for static property '%s.%s' is inaccessible",
-                            context->model->structs[enum_struct_index].name,
-                            expression->as.member_access_expression.member);
-                        return VC_SEM_TYPE_ERROR;
-                    }
-                    property->getter_reachable = true;
-                    if (!analyze_property_getter(context->model, static_property_owner,
-                            static_property_index, context->diagnostic))
-                        return VC_SEM_TYPE_ERROR;
-                    VcSemanticBinding binding = {0};
-                    binding.node = expression;
-                    binding.type = property->type;
-                    binding.struct_index = static_property_owner;
-                    binding.property_index = static_property_index;
-                    binding.has_property = true;
-                    binding.property_returns_ref = property->returns_ref;
-                    binding.property_returns_ref_readonly = property->returns_ref_readonly;
-                    if (!push_binding(context->model, binding))
-                        return VC_SEM_TYPE_ERROR;
-                    return binding.type;
+                    return bind_static_property(context, expression, static_property_owner,
+                        static_property_index, property);
                 }
+                size_t instance_owner = 0;
+                size_t instance_member = 0;
+                const bool instance = resolve_field(context->model, enum_struct_index,
+                    expression->as.member_access_expression.member, &instance_owner, &instance_member) ||
+                    resolve_property(context->model, enum_struct_index,
+                    expression->as.member_access_expression.member, &instance_owner, &instance_member);
+                if (instance)
+                    set_diagnostic(context->diagnostic, context->source, expression->location,
+                        "instance member '%s.%s' requires a value receiver",
+                        static_receiver, expression->as.member_access_expression.member);
+                else
+                {
+                    const VcSemanticBinding *static_receiver_binding =
+                        vc_semantic_binding(context->model, member_target);
+                    if (static_receiver_binding != NULL &&
+                        static_receiver_binding->is_type_receiver &&
+                        static_receiver_binding->type == VC_SEM_TYPE_STRING)
+                        set_diagnostic(context->diagnostic, context->source, expression->location,
+                            "string has no static member '%s'",
+                            expression->as.member_access_expression.member);
+                    else
+                        set_diagnostic(context->diagnostic, context->source, expression->location,
+                            "type '%s' has no static member '%s'",
+                            static_receiver, expression->as.member_access_expression.member);
+                }
+                vc_diagnostic_set_code(context->diagnostic, VC_DIAG_MEMBER);
+                return VC_SEM_TYPE_ERROR;
             }
 
+            if (diagnose_unknown_qualified_receiver(context, member_target))
+                return VC_SEM_TYPE_ERROR;
             const VcSemanticType target = analyze_expression(context, expression->as.member_access_expression.target);
             if (target == VC_SEM_TYPE_ERROR)
                 return VC_SEM_TYPE_ERROR;
@@ -21490,7 +22595,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     {
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "nullable type '%s' has no member '%s'",
-                            vc_semantic_type_name(context->model, target), member);
+                            context_type_display_name(context, target), member);
                         return VC_SEM_TYPE_ERROR;
                     }
 
@@ -21505,7 +22610,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "operator '?.' requires a reference receiver, got '%s'",
-                    vc_semantic_type_name(context->model, target));
+                    context_type_display_name(context, target));
                 return VC_SEM_TYPE_ERROR;
             }
 
@@ -21596,7 +22701,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "array type '%s' has no member '%s'",
-                        vc_semantic_type_name(context->model, resolved_target),
+                        context_type_display_name(context, resolved_target),
                         expression->as.member_access_expression.member);
                     return VC_SEM_TYPE_ERROR;
                 }
@@ -21623,7 +22728,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
             {
                 set_diagnostic(context->diagnostic, context->source, expression->location,
                     "type '%s' has no member '%s'",
-                    vc_semantic_type_name(context->model, resolved_target), expression->as.member_access_expression.member);
+                    context_type_display_name(context, resolved_target), expression->as.member_access_expression.member);
                 vc_diagnostic_set_code(context->diagnostic, VC_DIAG_MEMBER);
                 vc_diagnostic_add_context(context->diagnostic, VC_DIAGNOSTIC_NOTE, NULL,
                     (VcSourceSpan){0}, "Member lookup uses the compile-time receiver type, not a possible runtime subtype.");
@@ -21936,7 +23041,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 set_diagnostic(context->diagnostic, context->source,
                     expression->as.range_expression.start->location,
                     "range start must be convertible to 'Index', got '%s'",
-                    vc_semantic_type_name(context->model, start_type));
+                    context_type_display_name(context, start_type));
                 return VC_SEM_TYPE_ERROR;
             }
 
@@ -21955,7 +23060,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 set_diagnostic(context->diagnostic, context->source,
                     expression->as.range_expression.end->location,
                     "range end must be convertible to 'Index', got '%s'",
-                    vc_semantic_type_name(context->model, end_type));
+                    context_type_display_name(context, end_type));
                 return VC_SEM_TYPE_ERROR;
             }
 
@@ -21992,7 +23097,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "operator '^' requires an 'int' operand, got '%s'",
-                        vc_semantic_type_name(context->model, operand));
+                        context_type_display_name(context, operand));
                     return VC_SEM_TYPE_ERROR;
                 }
 
@@ -22073,7 +23178,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "cannot take the address of '%s'",
-                        vc_semantic_type_name(context->model, operand));
+                        context_type_display_name(context, operand));
                     return VC_SEM_TYPE_ERROR;
                 }
                 type = intern_pointer_type(context->model, operand);
@@ -22098,7 +23203,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "operator '*' requires a pointer, got '%s'",
-                        vc_semantic_type_name(context->model, operand));
+                        context_type_display_name(context, operand));
                     return VC_SEM_TYPE_ERROR;
                 }
                 type = vc_semantic_pointer_element_type(context->model, operand);
@@ -22137,13 +23242,13 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 if (ambiguous)
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
-                        "operator '!' is ambiguous for '%s'", vc_semantic_type_name(context->model, operand));
+                        "operator '!' is ambiguous for '%s'", context_type_display_name(context, operand));
                     return VC_SEM_TYPE_ERROR;
                 }
                 if (operator_method_index == (size_t)-1)
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
-                        "operator '!' is not defined for '%s'", vc_semantic_type_name(context->model, operand));
+                        "operator '!' is not defined for '%s'", context_type_display_name(context, operand));
                     return VC_SEM_TYPE_ERROR;
                 }
                 context->model->methods[operator_method_index].reachable = true;
@@ -22179,14 +23284,14 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "operator '%s' is ambiguous for nullable '%s'",
-                        vc_token_kind_name(unary_operator), vc_semantic_type_name(context->model, operand));
+                        vc_token_kind_name(unary_operator), context_type_display_name(context, operand));
                     return VC_SEM_TYPE_ERROR;
                 }
                 if (operator_method_index == (size_t)-1)
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "operator '%s' is not defined for nullable '%s'",
-                        vc_token_kind_name(unary_operator), vc_semantic_type_name(context->model, operand));
+                        vc_token_kind_name(unary_operator), context_type_display_name(context, operand));
                     return VC_SEM_TYPE_ERROR;
                 }
                 VcSemanticMethod *method = &context->model->methods[operator_method_index];
@@ -22195,7 +23300,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "operator '%s' returning '%s' cannot be lifted to nullable",
                         vc_token_kind_name(unary_operator),
-                        vc_semantic_type_name(context->model, method->return_type));
+                        context_type_display_name(context, method->return_type));
                     return VC_SEM_TYPE_ERROR;
                 }
                 method->reachable = true;
@@ -22312,7 +23417,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     {
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "operator '%s' is ambiguous for nullable '%s'",
-                            vc_token_kind_name(unary_operator), vc_semantic_type_name(context->model, operand));
+                            vc_token_kind_name(unary_operator), context_type_display_name(context, operand));
                         return VC_SEM_TYPE_ERROR;
                     }
                     if (operator_method_index != (size_t)-1)
@@ -22350,14 +23455,14 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "operator '%s' is ambiguous for '%s'",
-                        vc_token_kind_name(unary_operator), vc_semantic_type_name(context->model, operand));
+                        vc_token_kind_name(unary_operator), context_type_display_name(context, operand));
                     return VC_SEM_TYPE_ERROR;
                 }
                 if (operator_method_index == (size_t)-1)
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "operator '%s' is not defined for '%s'",
-                        vc_token_kind_name(unary_operator), vc_semantic_type_name(context->model, operand));
+                        vc_token_kind_name(unary_operator), context_type_display_name(context, operand));
                     return VC_SEM_TYPE_ERROR;
                 }
                 const VcSemanticBinding *target_binding = vc_semantic_binding(context->model, operand_node);
@@ -22387,14 +23492,14 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "operator '%s' is ambiguous for '%s'",
-                        vc_token_kind_name(unary_operator), vc_semantic_type_name(context->model, operand));
+                        vc_token_kind_name(unary_operator), context_type_display_name(context, operand));
                     return VC_SEM_TYPE_ERROR;
                 }
                 if (operator_method_index == (size_t)-1)
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "operator '%s' is not defined for '%s'",
-                        vc_token_kind_name(unary_operator), vc_semantic_type_name(context->model, operand));
+                        vc_token_kind_name(unary_operator), context_type_display_name(context, operand));
                     return VC_SEM_TYPE_ERROR;
                 }
                 context->model->methods[operator_method_index].reachable = true;
@@ -22437,7 +23542,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         {
                             set_diagnostic(context->diagnostic, context->source, expression->location,
                                 "right operand of '?" "?' must be a reference or nullable value type, got '%s'",
-                                vc_semantic_type_name(context->model, right));
+                                context_type_display_name(context, right));
                             return VC_SEM_TYPE_ERROR;
                         }
                         type = right;
@@ -22467,15 +23572,15 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         }
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "right operand of '?" "?' cannot convert from '%s' to '%s'",
-                            vc_semantic_type_name(context->model, right),
-                            vc_semantic_type_name(context->model, underlying));
+                            context_type_display_name(context, right),
+                            context_type_display_name(context, underlying));
                         return VC_SEM_TYPE_ERROR;
                     }
                     if (!is_reference_type(context->model, left))
                     {
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "left operand of '?" "?' must be a reference type, got '%s'",
-                            vc_semantic_type_name(context->model, left));
+                            context_type_display_name(context, left));
                         return VC_SEM_TYPE_ERROR;
                     }
                     if (is_assignable(context->model, left, right))
@@ -22491,8 +23596,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     }
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "operands of '?" "?' are not compatible: '%s' and '%s'",
-                        vc_semantic_type_name(context->model, left),
-                        vc_semantic_type_name(context->model, right));
+                        context_type_display_name(context, left),
+                        context_type_display_name(context, right));
                     return VC_SEM_TYPE_ERROR;
 
                 case VC_TOKEN_PLUS:
@@ -22553,8 +23658,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                             set_diagnostic(context->diagnostic, context->source, expression->location,
                                 "operator '%s' is ambiguous for lifted nullable operands '%s' and '%s'",
                                 vc_token_kind_name(expression->as.binary_expression.operator_kind),
-                                vc_semantic_type_name(context->model, left),
-                                vc_semantic_type_name(context->model, right));
+                                context_type_display_name(context, left),
+                                context_type_display_name(context, right));
                             return VC_SEM_TYPE_ERROR;
                         }
                         if (lifted_method_index != (size_t)-1)
@@ -22565,7 +23670,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                                 set_diagnostic(context->diagnostic, context->source, expression->location,
                                     "operator '%s' returning '%s' cannot be lifted to nullable",
                                     vc_token_kind_name(expression->as.binary_expression.operator_kind),
-                                    vc_semantic_type_name(context->model, method->return_type));
+                                    context_type_display_name(context, method->return_type));
                                 return VC_SEM_TYPE_ERROR;
                             }
                             method->reachable = true;
@@ -22639,8 +23744,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "operator '%s' is ambiguous for '%s' and '%s'",
                             vc_token_kind_name(expression->as.binary_expression.operator_kind),
-                            vc_semantic_type_name(context->model, left),
-                            vc_semantic_type_name(context->model, right));
+                            context_type_display_name(context, left),
+                            context_type_display_name(context, right));
                         return VC_SEM_TYPE_ERROR;
                     }
                     if (operator_method_index == (size_t)-1)
@@ -22648,8 +23753,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "operator '%s' is not defined for '%s' and '%s'",
                             vc_token_kind_name(expression->as.binary_expression.operator_kind),
-                            vc_semantic_type_name(context->model, left),
-                            vc_semantic_type_name(context->model, right));
+                            context_type_display_name(context, left),
+                            context_type_display_name(context, right));
                         return VC_SEM_TYPE_ERROR;
                     }
 
@@ -22713,8 +23818,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                             set_diagnostic(context->diagnostic, context->source, expression->location,
                                 "operator '%s' is ambiguous for lifted nullable operands '%s' and '%s'",
                                 vc_token_kind_name(expression->as.binary_expression.operator_kind),
-                                vc_semantic_type_name(context->model, left),
-                                vc_semantic_type_name(context->model, right));
+                                context_type_display_name(context, left),
+                                context_type_display_name(context, right));
                             return VC_SEM_TYPE_ERROR;
                         }
                         if (lifted_method_index != (size_t)-1)
@@ -22758,8 +23863,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                             set_diagnostic(context->diagnostic, context->source, expression->location,
                                 "operator '%s' is ambiguous for '%s' and '%s'",
                                 vc_token_kind_name(expression->as.binary_expression.operator_kind),
-                                vc_semantic_type_name(context->model, left),
-                                vc_semantic_type_name(context->model, right));
+                                context_type_display_name(context, left),
+                                context_type_display_name(context, right));
                             return VC_SEM_TYPE_ERROR;
                         }
                         if (overload_index != (size_t)-1)
@@ -22789,8 +23894,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "operator '%s' is ambiguous for '%s' and '%s'",
                             vc_token_kind_name(expression->as.binary_expression.operator_kind),
-                            vc_semantic_type_name(context->model, left),
-                            vc_semantic_type_name(context->model, right));
+                            context_type_display_name(context, left),
+                            context_type_display_name(context, right));
                         return VC_SEM_TYPE_ERROR;
                     }
                     if (operator_method_index == (size_t)-1)
@@ -22798,8 +23903,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "operator '%s' is not defined for '%s' and '%s'",
                             vc_token_kind_name(expression->as.binary_expression.operator_kind),
-                            vc_semantic_type_name(context->model, left),
-                            vc_semantic_type_name(context->model, right));
+                            context_type_display_name(context, left),
+                            context_type_display_name(context, right));
                         return VC_SEM_TYPE_ERROR;
                     }
 
@@ -22847,8 +23952,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                             set_diagnostic(context->diagnostic, context->source, expression->location,
                                 "operator '%s' is ambiguous for lifted nullable operands '%s' and '%s'",
                                 vc_token_kind_name(expression->as.binary_expression.operator_kind),
-                                vc_semantic_type_name(context->model, left),
-                                vc_semantic_type_name(context->model, right));
+                                context_type_display_name(context, left),
+                                context_type_display_name(context, right));
                             return VC_SEM_TYPE_ERROR;
                         }
                         if (lifted_method_index != (size_t)-1)
@@ -22897,8 +24002,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "operator '%s' is ambiguous for '%s' and '%s'",
                             vc_token_kind_name(expression->as.binary_expression.operator_kind),
-                            vc_semantic_type_name(context->model, left),
-                            vc_semantic_type_name(context->model, right));
+                            context_type_display_name(context, left),
+                            context_type_display_name(context, right));
                         return VC_SEM_TYPE_ERROR;
                     }
                     if (operator_method_index == (size_t)-1)
@@ -22906,8 +24011,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "operator '%s' is not defined for '%s' and '%s'",
                             vc_token_kind_name(expression->as.binary_expression.operator_kind),
-                            vc_semantic_type_name(context->model, left),
-                            vc_semantic_type_name(context->model, right));
+                            context_type_display_name(context, left),
+                            context_type_display_name(context, right));
                         return VC_SEM_TYPE_ERROR;
                     }
 
@@ -22982,9 +24087,9 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                             set_diagnostic(context->diagnostic, context->source, expression->location,
                                 "ref assignment to '%s' of type '%s' requires storage of exactly type '%s', got '%s'",
                                 left_local->name,
-                                vc_semantic_type_name(context->model, left_local->type),
-                                vc_semantic_type_name(context->model, left_local->type),
-                                vc_semantic_type_name(context->model, right));
+                                context_type_display_name(context, left_local->type),
+                                context_type_display_name(context, left_local->type),
+                                context_type_display_name(context, right));
                             return VC_SEM_TYPE_ERROR;
                         }
 
@@ -23049,9 +24154,9 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "ref assignment to field '%s' of type '%s' requires storage of exactly type '%s', got '%s'",
                         left_field->node->as.field_declaration.name,
-                        vc_semantic_type_name(context->model, left_field->type),
-                        vc_semantic_type_name(context->model, left_field->type),
-                        vc_semantic_type_name(context->model, right));
+                        context_type_display_name(context, left_field->type),
+                        context_type_display_name(context, left_field->type),
+                        context_type_display_name(context, right));
                     return VC_SEM_TYPE_ERROR;
                 }
                 if (!ref_return_storage_escapes_safely(
@@ -23169,7 +24274,11 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     const bool saved_event_subscription = context->allow_event_subscription;
                     context->allow_event_subscription = event_subscription_operator;
+                    const VcAstNode *saved_assignment_target = context->direct_assignment_target;
+                    context->direct_assignment_target =
+                        expression->as.assignment_expression.operator_kind == VC_TOKEN_EQUAL ? left_node : NULL;
                     left = analyze_expression(context, left_node);
+                    context->direct_assignment_target = saved_assignment_target;
                     context->allow_event_subscription = saved_event_subscription;
                     if (left == VC_SEM_TYPE_ERROR)
                         return VC_SEM_TYPE_ERROR;
@@ -23189,7 +24298,11 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 }
                 const bool saved_event_subscription = context->allow_event_subscription;
                 context->allow_event_subscription = event_subscription_operator;
+                const VcAstNode *saved_assignment_target = context->direct_assignment_target;
+                context->direct_assignment_target =
+                    expression->as.assignment_expression.operator_kind == VC_TOKEN_EQUAL ? left_node : NULL;
                 left = analyze_expression(context, left_node);
+                context->direct_assignment_target = saved_assignment_target;
                 context->allow_event_subscription = saved_event_subscription;
                 if (left == VC_SEM_TYPE_ERROR)
                     return VC_SEM_TYPE_ERROR;
@@ -23289,8 +24402,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     {
                         set_diagnostic(context->diagnostic, context->source, expression->location,
                             "event subscription expects '%s', got '%s'",
-                            vc_semantic_type_name(context->model, left),
-                            vc_semantic_type_name(context->model, right));
+                            context_type_display_name(context, left),
+                            context_type_display_name(context, right));
                         return VC_SEM_TYPE_ERROR;
                     }
                     if (left_binding->struct_index >= context->model->struct_count ||
@@ -23393,7 +24506,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, left_node->location,
                         "type '%s' does not define a matching index setter",
-                        vc_semantic_type_name(context->model, target_type));
+                        context_type_display_name(context, target_type));
                     return VC_SEM_TYPE_ERROR;
                 }
                 VcSemanticMethod *setter = &context->model->methods[setter_index];
@@ -23403,7 +24516,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, left_node->location,
                         "index setter for type '%s' is inaccessible or invalid",
-                        vc_semantic_type_name(context->model, target_type));
+                        context_type_display_name(context, target_type));
                     return VC_SEM_TYPE_ERROR;
                 }
                 if (!context->model->structs[target_struct].is_class &&
@@ -23535,8 +24648,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "cannot assign '%s' to swizzle type '%s'",
-                        vc_semantic_type_name(context->model, right),
-                        vc_semantic_type_name(context->model, left));
+                        context_type_display_name(context, right),
+                        context_type_display_name(context, left));
                     return VC_SEM_TYPE_ERROR;
                 }
 
@@ -23554,15 +24667,15 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "left operand of '?" "?=' must be a reference or nullable value type, got '%s'",
-                        vc_semantic_type_name(context->model, left));
+                        context_type_display_name(context, left));
                     return VC_SEM_TYPE_ERROR;
                 }
                 if (!is_assignable(context->model, left, right))
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "cannot assign '%s' to '%s' with '?" "?='",
-                        vc_semantic_type_name(context->model, right),
-                        vc_semantic_type_name(context->model, left));
+                        context_type_display_name(context, right),
+                        context_type_display_name(context, left));
                     return VC_SEM_TYPE_ERROR;
                 }
                 type = left;
@@ -23573,7 +24686,7 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "cannot assign '%s' to '%s'",
-                        vc_semantic_type_name(context->model, right), vc_semantic_type_name(context->model, left));
+                        context_type_display_name(context, right), context_type_display_name(context, left));
                 vc_diagnostic_set_code(context->diagnostic, VC_DIAG_CONVERSION);
                     context->diagnostic->span = expression->as.assignment_expression.right->span;
                     vc_diagnostic_add_context(context->diagnostic, VC_DIAGNOSTIC_NOTE, NULL,
@@ -23649,8 +24762,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "operator '%s' is not defined for '%s' and '%s'",
                         vc_token_kind_name(binary_kind),
-                        vc_semantic_type_name(context->model, left),
-                        vc_semantic_type_name(context->model, right));
+                        context_type_display_name(context, left),
+                        context_type_display_name(context, right));
                     return VC_SEM_TYPE_ERROR;
                 }
 
@@ -23660,8 +24773,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "operator '%s' returns '%s', which cannot be assigned to '%s'",
                         vc_token_kind_name(binary_kind),
-                        vc_semantic_type_name(context->model, operator_method->return_type),
-                        vc_semantic_type_name(context->model, left));
+                        context_type_display_name(context, operator_method->return_type),
+                        context_type_display_name(context, left));
                     return VC_SEM_TYPE_ERROR;
                 }
                 operator_method->reachable = true;
@@ -23924,28 +25037,11 @@ static void merge_flow_assignments(
 
 static bool parse_switch_character_literal(const char *text, int64_t *value)
 {
-    if (text == NULL || value == NULL)
+    uint32_t scalar = 0;
+    if (value == NULL || !vc_ast_character_scalar(text, &scalar))
         return false;
-    const size_t length = strlen(text);
-    if (length == 3 && text[0] == '\'' && text[2] == '\'')
-    {
-        *value = (unsigned char)text[1];
-        return true;
-    }
-    if (length == 4 && text[0] == '\'' && text[1] == '\\' && text[3] == '\'')
-    {
-        switch (text[2])
-        {
-            case '0': *value = 0; return true;
-            case 'n': *value = '\n'; return true;
-            case 'r': *value = '\r'; return true;
-            case 't': *value = '\t'; return true;
-            case '\\': *value = '\\'; return true;
-            case '\'': *value = '\''; return true;
-            default: return false;
-        }
-    }
-    return false;
+    *value = (int64_t)scalar;
+    return true;
 }
 
 static bool switch_value_fits(VcSemanticType type, int64_t value)
@@ -23961,6 +25057,36 @@ static bool switch_value_fits(VcSemanticType type, int64_t value)
         case VC_SEM_TYPE_LONG: return true;
         case VC_SEM_TYPE_ULONG: return value >= 0;
         case VC_SEM_TYPE_CHAR: return value >= 0 && value <= INT32_MAX;
+        default: return false;
+    }
+}
+
+static bool primitive_constant_int64_value(
+    const VcSemanticField *field,
+    int64_t *value)
+{
+    if (field == NULL || value == NULL ||
+        field->primitive_constant_kind == VC_PRIMITIVE_CONSTANT_NONE)
+        return false;
+
+    const bool want_min = field->primitive_constant_kind == VC_PRIMITIVE_CONSTANT_MIN;
+    const bool want_max = field->primitive_constant_kind == VC_PRIMITIVE_CONSTANT_MAX;
+    if (!want_min && !want_max)
+        return false;
+
+    switch (field->type)
+    {
+        case VC_SEM_TYPE_BYTE: *value = want_min ? 0 : UINT8_MAX; return true;
+        case VC_SEM_TYPE_SBYTE: *value = want_min ? INT8_MIN : INT8_MAX; return true;
+        case VC_SEM_TYPE_SHORT: *value = want_min ? INT16_MIN : INT16_MAX; return true;
+        case VC_SEM_TYPE_USHORT: *value = want_min ? 0 : UINT16_MAX; return true;
+        case VC_SEM_TYPE_INT: *value = want_min ? INT32_MIN : INT32_MAX; return true;
+        case VC_SEM_TYPE_UINT: *value = want_min ? 0 : (int64_t)UINT32_MAX; return true;
+        case VC_SEM_TYPE_LONG: *value = want_min ? INT64_MIN : INT64_MAX; return true;
+        case VC_SEM_TYPE_ULONG:
+            if (want_min) { *value = 0; return true; }
+            return false;
+        case VC_SEM_TYPE_CHAR: *value = want_min ? 0 : INT32_C(0x10FFFF); return true;
         default: return false;
     }
 }
@@ -23986,6 +25112,12 @@ static bool switch_constant_value(
         if (!field->is_const || field->node == NULL ||
             field->node->as.field_declaration.initializer == NULL)
             return false;
+        if (field->primitive_constant_kind != VC_PRIMITIVE_CONSTANT_NONE)
+        {
+            if (!primitive_constant_int64_value(field, value))
+                return false;
+            return switch_value_fits(switch_type, *value);
+        }
         return switch_constant_value(context,
             field->node->as.field_declaration.initializer, switch_type, value);
     }
@@ -24145,7 +25277,7 @@ static bool analyze_switch_statement(VcSemanticContext *context, const VcAstNode
                         set_diagnostic(context->diagnostic, context->source,
                             label->as.switch_label.guard->location,
                             "switch case when guard must be bool, got '%s'",
-                            vc_semantic_type_name(context->model, guard_type));
+                            context_type_display_name(context, guard_type));
                         goto cleanup;
                     }
                 }
@@ -24227,7 +25359,7 @@ static bool analyze_switch_statement(VcSemanticContext *context, const VcAstNode
                 {
                     set_diagnostic(context->diagnostic, context->source, label->location,
                         "case label for enum '%s' must be a member of that enum",
-                        vc_semantic_type_name(context->model, switch_type));
+                        context_type_display_name(context, switch_type));
                     goto cleanup;
                 }
             }
@@ -24236,7 +25368,7 @@ static bool analyze_switch_statement(VcSemanticContext *context, const VcAstNode
             {
                 set_diagnostic(context->diagnostic, context->source, label->location,
                     "case label must be an integral constant that fits '%s'",
-                    vc_semantic_type_name(context->model, switch_type));
+                    context_type_display_name(context, switch_type));
                 goto cleanup;
             }
 
@@ -24251,7 +25383,7 @@ static bool analyze_switch_statement(VcSemanticContext *context, const VcAstNode
                     set_diagnostic(context->diagnostic, context->source,
                         label->as.switch_label.guard->location,
                         "switch case when guard must be bool, got '%s'",
-                        vc_semantic_type_name(context->model, guard_type));
+                        context_type_display_name(context, guard_type));
                     goto cleanup;
                 }
             }
@@ -24529,7 +25661,7 @@ static bool analyze_await_foreach_statement(
     {
         set_diagnostic(context->diagnostic, context->source, statement->location,
             "await foreach source type '%s' is not asynchronously enumerable",
-            vc_semantic_type_name(context->model, collection_type));
+            context_type_display_name(context, collection_type));
         context->depth--;
         return false;
     }
@@ -24543,7 +25675,7 @@ static bool analyze_await_foreach_statement(
     {
         set_diagnostic(context->diagnostic, context->source, statement->location,
             "type '%s' does not provide an unambiguous GetAsyncEnumerator() method",
-            vc_semantic_type_name(context->model, collection_type));
+            context_type_display_name(context, collection_type));
         context->depth--;
         return false;
     }
@@ -24571,7 +25703,7 @@ static bool analyze_await_foreach_statement(
     {
         set_diagnostic(context->diagnostic, context->source, statement->location,
             "GetAsyncEnumerator() must return an async enumerator type, got '%s'",
-            vc_semantic_type_name(context->model, enumerator_type));
+            context_type_display_name(context, enumerator_type));
         context->depth--;
         return false;
     }
@@ -24585,7 +25717,7 @@ static bool analyze_await_foreach_statement(
     {
         set_diagnostic(context->diagnostic, context->source, statement->location,
             "async enumerator type '%s' must provide MoveNextAsync() returning an awaitable whose GetResult() returns bool",
-            vc_semantic_type_name(context->model, enumerator_type));
+            context_type_display_name(context, enumerator_type));
         context->depth--;
         return false;
     }
@@ -24617,7 +25749,7 @@ static bool analyze_await_foreach_statement(
     {
         set_diagnostic(context->diagnostic, context->source, statement->location,
             "MoveNextAsync() awaitable GetResult() must return bool, got '%s'",
-            vc_semantic_type_name(context->model, move_result));
+            context_type_display_name(context, move_result));
         context->depth--;
         return false;
     }
@@ -24637,7 +25769,7 @@ static bool analyze_await_foreach_statement(
     {
         set_diagnostic(context->diagnostic, context->source, statement->location,
             "async enumerator type '%s' must provide a Current property",
-            vc_semantic_type_name(context->model, enumerator_type));
+            context_type_display_name(context, enumerator_type));
         context->depth--;
         return false;
     }
@@ -24677,7 +25809,7 @@ static bool analyze_await_foreach_statement(
     {
         set_diagnostic(context->diagnostic, context->source, statement->location,
             "async enumerator type '%s' must provide DisposeAsync() returning an awaitable whose GetResult() returns void",
-            vc_semantic_type_name(context->model, enumerator_type));
+            context_type_display_name(context, enumerator_type));
         context->depth--;
         return false;
     }
@@ -24709,7 +25841,7 @@ static bool analyze_await_foreach_statement(
     {
         set_diagnostic(context->diagnostic, context->source, statement->location,
             "DisposeAsync() awaitable GetResult() must return void, got '%s'",
-            vc_semantic_type_name(context->model, dispose_result));
+            context_type_display_name(context, dispose_result));
         context->depth--;
         return false;
     }
@@ -24732,9 +25864,9 @@ static bool analyze_await_foreach_statement(
         {
             set_diagnostic(context->diagnostic, context->source, statement->location,
                 "await foreach item of type '%s' cannot be assigned to '%s'",
-                vc_semantic_type_name(context->model, item_type),
+                context_type_display_name(context, item_type),
                 declared == VC_SEM_TYPE_UNKNOWN ? "<unknown>" :
-                    vc_semantic_type_name(context->model, declared));
+                    context_type_display_name(context, declared));
             context->depth--;
             return false;
         }
@@ -24945,9 +26077,9 @@ static bool analyze_statement(VcSemanticContext *context, const VcAstNode *state
                 set_diagnostic(context->diagnostic, context->source, statement->location,
                     "ref local '%s' of type '%s' requires storage of exactly type '%s', got '%s'",
                     statement->as.local_declaration.name,
-                    vc_semantic_type_name(context->model, declared),
-                    vc_semantic_type_name(context->model, declared),
-                    vc_semantic_type_name(context->model, initializer));
+                    context_type_display_name(context, declared),
+                    context_type_display_name(context, declared),
+                    context_type_display_name(context, initializer));
                 return false;
             }
             else if (statement->as.local_declaration.initializer != NULL &&
@@ -24955,8 +26087,8 @@ static bool analyze_statement(VcSemanticContext *context, const VcAstNode *state
             {
                 set_diagnostic(context->diagnostic, context->source, statement->location,
                     "cannot assign '%s' to local '%s' of type '%s'",
-                    vc_semantic_type_name(context->model, initializer), statement->as.local_declaration.name,
-                    vc_semantic_type_name(context->model, declared));
+                    context_type_display_name(context, initializer), statement->as.local_declaration.name,
+                    context_type_display_name(context, declared));
                 vc_diagnostic_set_code(context->diagnostic, VC_DIAG_CONVERSION);
                 vc_diagnostic_add_source_context(context->diagnostic, VC_DIAGNOSTIC_NOTE,
                     context->source, statement->as.local_declaration.type->span,
@@ -25192,7 +26324,7 @@ static bool analyze_statement(VcSemanticContext *context, const VcAstNode *state
                     {
                         set_diagnostic(context->diagnostic, context->source, clause->location,
                             "catch clause is unreachable because an earlier handler catches '%s'",
-                            vc_semantic_type_name(context->model, catch_type));
+                            context_type_display_name(context, catch_type));
                         goto try_fail;
                     }
                 }
@@ -25372,7 +26504,7 @@ try_fail_before:
             {
                 set_diagnostic(context->diagnostic, context->source, statement->location,
                     "throw expression must be Exception or a derived class, got '%s'",
-                    vc_semantic_type_name(context->model, thrown));
+                    context_type_display_name(context, thrown));
                 return false;
             }
             return true;
@@ -25474,13 +26606,13 @@ try_fail_before:
                             context->async_returns_value_task
                                 ? "async ValueTask<T> lambda must return a value of type '%s'"
                                 : "async Task<T> lambda must return a value of type '%s'",
-                            vc_semantic_type_name(context->model, context->return_type));
+                            context_type_display_name(context, context->return_type));
                     else
                         set_diagnostic(context->diagnostic, context->source, statement->location,
                             context->async_returns_value_task
                                 ? "async ValueTask<T> method must return a value of type '%s'"
                                 : "async Task<T> method must return a value of type '%s'",
-                            vc_semantic_type_name(context->model, context->return_type));
+                            context_type_display_name(context, context->return_type));
                 }
                 else
                 {
@@ -25490,8 +26622,8 @@ try_fail_before:
                                 ? "ref-returning method requires storage of exactly type '%s', got '%s'"
                                 : "ref-returning property getter requires storage of exactly type '%s', got '%s'")
                             : "method returns '%s' but return statement provides '%s'",
-                        vc_semantic_type_name(context->model, context->return_type),
-                        vc_semantic_type_name(context->model, returned));
+                        context_type_display_name(context, context->return_type),
+                        context_type_display_name(context, returned));
                 vc_diagnostic_set_code(context->diagnostic, VC_DIAG_RETURN);
                     if (context->has_method)
                     {
@@ -25562,8 +26694,8 @@ try_fail_before:
             {
                 set_diagnostic(context->diagnostic, context->source, statement->location,
                     "yield value of type '%s' cannot be assigned to '%s'",
-                    vc_semantic_type_name(context->model, yielded),
-                    vc_semantic_type_name(context->model, target));
+                    context_type_display_name(context, yielded),
+                    context_type_display_name(context, target));
                 return false;
             }
             return true;
@@ -25583,7 +26715,7 @@ try_fail_before:
             if (condition != VC_SEM_TYPE_BOOL)
             {
                 set_diagnostic(context->diagnostic, context->source, statement->as.if_statement.condition->location,
-                    "if condition must be bool, got '%s'", vc_semantic_type_name(context->model, condition));
+                    "if condition must be bool, got '%s'", context_type_display_name(context, condition));
                 return false;
             }
 
@@ -25673,7 +26805,7 @@ try_fail_before:
             if (condition != VC_SEM_TYPE_BOOL)
             {
                 set_diagnostic(context->diagnostic, context->source, statement->as.while_statement.condition->location,
-                    "while condition must be bool, got '%s'", vc_semantic_type_name(context->model, condition));
+                    "while condition must be bool, got '%s'", context_type_display_name(context, condition));
                 return false;
             }
 
@@ -25790,7 +26922,7 @@ try_fail_before:
                 set_diagnostic(context->diagnostic, context->source,
                     statement->as.while_statement.condition->location,
                     "do-while condition must be bool, got '%s'",
-                    vc_semantic_type_name(context->model, condition));
+                    context_type_display_name(context, condition));
                 restore_assignments(context, before, saved_count);
                 free(condition_entry);
                 free(continue_assignments);
@@ -25850,7 +26982,7 @@ try_fail_before:
                 if (condition != VC_SEM_TYPE_BOOL)
                 {
                     set_diagnostic(context->diagnostic, context->source, statement->as.for_statement.condition->location,
-                        "for condition must be bool, got '%s'", vc_semantic_type_name(context->model, condition));
+                        "for condition must be bool, got '%s'", context_type_display_name(context, condition));
                     context->depth--;
                     context->local_count = saved_count;
                     return false;
@@ -25967,7 +27099,7 @@ try_fail_before:
                     statement->as.using_statement.is_await
                         ? "await using resource type '%s' must provide DisposeAsync() returning an awaitable whose GetResult() returns void"
                         : "using resource type '%s' must implement IDisposable",
-                    vc_semantic_type_name(context->model, resource_type));
+                    context_type_display_name(context, resource_type));
                 context->local_count = saved_count;
                 if (creates_scope) context->depth--;
                 return false;
@@ -25988,7 +27120,7 @@ try_fail_before:
                 {
                     set_diagnostic(context->diagnostic, context->source, statement->location,
                         "await using resource type '%s' must provide DisposeAsync() returning an awaitable whose GetResult() returns void",
-                        vc_semantic_type_name(context->model, resource_type));
+                        context_type_display_name(context, resource_type));
                     context->local_count = saved_count;
                     if (creates_scope) context->depth--;
                     return false;
@@ -26034,7 +27166,7 @@ try_fail_before:
                 {
                     set_diagnostic(context->diagnostic, context->source, statement->location,
                         "DisposeAsync() awaitable GetResult() must return void, got '%s'",
-                        vc_semantic_type_name(context->model, dispose_result));
+                        context_type_display_name(context, dispose_result));
                     context->local_count = saved_count;
                     if (creates_scope) context->depth--;
                     return false;
@@ -26077,7 +27209,7 @@ try_fail_before:
                 {
                     set_diagnostic(context->diagnostic, context->source, statement->location,
                         "using resource type '%s' must implement IDisposable",
-                        vc_semantic_type_name(context->model, resource_type));
+                        context_type_display_name(context, resource_type));
                     context->local_count = saved_count;
                     if (creates_scope) context->depth--;
                     return false;
@@ -26091,7 +27223,7 @@ try_fail_before:
                 {
                     set_diagnostic(context->diagnostic, context->source, statement->location,
                         "IDisposable resource type '%s' does not provide an unambiguous Dispose() method",
-                        vc_semantic_type_name(context->model, resource_type));
+                        context_type_display_name(context, resource_type));
                     context->local_count = saved_count;
                     if (creates_scope) context->depth--;
                     return false;
@@ -26309,8 +27441,8 @@ try_fail_before:
                 {
                     set_diagnostic(context->diagnostic, context->source, statement->location,
                         "fixed array element type '%s' does not match pointer element type '%s'",
-                        vc_semantic_type_name(context->model, element_type),
-                        vc_semantic_type_name(context->model, pointer_element));
+                        context_type_display_name(context, element_type),
+                        context_type_display_name(context, pointer_element));
                     return false;
                 }
                 binding.fixed_owner_type = initializer_type;
@@ -26323,7 +27455,7 @@ try_fail_before:
                 {
                     set_diagnostic(context->diagnostic, context->source, statement->location,
                         "fixed initializer type '%s' is not pinnable: expected pointer storage, one-dimensional array, or GetPinnableReference()",
-                        vc_semantic_type_name(context->model, initializer_type));
+                        context_type_display_name(context, initializer_type));
                     return false;
                 }
 
@@ -26336,7 +27468,7 @@ try_fail_before:
                 {
                     set_diagnostic(context->diagnostic, context->source, statement->location,
                         "type '%s' must provide an unambiguous GetPinnableReference() method",
-                        vc_semantic_type_name(context->model, initializer_type));
+                        context_type_display_name(context, initializer_type));
                     return false;
                 }
 
@@ -26367,8 +27499,8 @@ try_fail_before:
                 {
                     set_diagnostic(context->diagnostic, context->source, statement->location,
                         "GetPinnableReference() returns ref '%s' but fixed pointer element type is '%s'",
-                        vc_semantic_type_name(context->model, method->return_type),
-                        vc_semantic_type_name(context->model, element_type));
+                        context_type_display_name(context, method->return_type),
+                        context_type_display_name(context, element_type));
                     return false;
                 }
                 if (method->returns_ref_readonly)
@@ -26446,7 +27578,7 @@ try_fail_before:
                 set_diagnostic(context->diagnostic, context->source,
                     statement->as.lock_statement.expression->location,
                     "lock expression type '%s' must be a managed object reference",
-                    vc_semantic_type_name(context->model, lock_type));
+                    context_type_display_name(context, lock_type));
                 return false;
             }
 
@@ -26514,7 +27646,7 @@ try_fail_before:
                         set_diagnostic(context->diagnostic, context->source, statement->location,
                             "foreach string character of type 'char' cannot be assigned to '%s'",
                             declared == VC_SEM_TYPE_UNKNOWN ? "<unknown>" :
-                                vc_semantic_type_name(context->model, declared));
+                                context_type_display_name(context, declared));
                         context->depth--;
                         return false;
                     }
@@ -26565,9 +27697,9 @@ try_fail_before:
                     {
                         set_diagnostic(context->diagnostic, context->source, statement->location,
                             "foreach array item of type '%s' cannot be assigned to '%s'",
-                            vc_semantic_type_name(context->model, item_type),
+                            context_type_display_name(context, item_type),
                             declared == VC_SEM_TYPE_UNKNOWN ? "<unknown>" :
-                                vc_semantic_type_name(context->model, declared));
+                                context_type_display_name(context, declared));
                         context->depth--;
                         return false;
                     }
@@ -26602,7 +27734,7 @@ try_fail_before:
             {
                 set_diagnostic(context->diagnostic, context->source, statement->location,
                     "foreach source type '%s' is not enumerable",
-                    vc_semantic_type_name(context->model, collection_type));
+                    context_type_display_name(context, collection_type));
                 context->depth--;
                 return false;
             }
@@ -26615,7 +27747,7 @@ try_fail_before:
             {
                 set_diagnostic(context->diagnostic, context->source, statement->location,
                     "type '%s' does not provide an unambiguous GetEnumerator() method",
-                    vc_semantic_type_name(context->model, collection_type));
+                    context_type_display_name(context, collection_type));
                 context->depth--;
                 return false;
             }
@@ -26664,7 +27796,7 @@ try_fail_before:
             {
                 set_diagnostic(context->diagnostic, context->source, statement->location,
                     "GetEnumerator() must return an enumerator type, got '%s'",
-                    vc_semantic_type_name(context->model, enumerator_type));
+                    context_type_display_name(context, enumerator_type));
                 context->depth--;
                 return false;
             }
@@ -26678,7 +27810,7 @@ try_fail_before:
             {
                 set_diagnostic(context->diagnostic, context->source, statement->location,
                     "enumerator type '%s' must provide bool MoveNext()",
-                    vc_semantic_type_name(context->model, enumerator_type));
+                    context_type_display_name(context, enumerator_type));
                 context->depth--;
                 return false;
             }
@@ -26729,7 +27861,7 @@ try_fail_before:
             {
                 set_diagnostic(context->diagnostic, context->source, statement->location,
                     "enumerator type '%s' must provide a Current property",
-                    vc_semantic_type_name(context->model, enumerator_type));
+                    context_type_display_name(context, enumerator_type));
                 context->depth--;
                 return false;
             }
@@ -26792,7 +27924,7 @@ try_fail_before:
             {
                 set_diagnostic(context->diagnostic, context->source, statement->location,
                     "enumerator type '%s' provides an ambiguous Dispose() method",
-                    vc_semantic_type_name(context->model, enumerator_type));
+                    context_type_display_name(context, enumerator_type));
                 context->depth--;
                 return false;
             }
@@ -26863,9 +27995,9 @@ try_fail_before:
                         statement->as.foreach_statement.is_ref
                             ? "ref foreach item of type '%s' requires exactly type '%s'"
                             : "foreach item of type '%s' cannot be assigned to '%s'",
-                        vc_semantic_type_name(context->model, item_type),
+                        context_type_display_name(context, item_type),
                         declared == VC_SEM_TYPE_UNKNOWN ? "<unknown>" :
-                            vc_semantic_type_name(context->model, declared));
+                            context_type_display_name(context, declared));
                     context->depth--;
                     return false;
                 }
@@ -27045,6 +28177,8 @@ static bool analyze_property_getter(
     size_t property_index,
     VcSemanticDiagnostic *diagnostic)
 {
+    VcSemanticContext diagnostic_display_context = {0};
+    diagnostic_display_context.model = model;
     if (struct_index >= model->struct_count)
         return false;
     VcSemanticStruct *structure = &model->structs[struct_index];
@@ -27090,7 +28224,7 @@ static bool analyze_property_getter(
             set_diagnostic(diagnostic, structure->source,
                 node->as.property_declaration.getter_body->location,
                 "property getter returns '%s', expected '%s'",
-                vc_semantic_type_name(model, value), vc_semantic_type_name(model, property->type));
+                context_type_display_name(&diagnostic_display_context, value), context_type_display_name(&diagnostic_display_context, property->type));
             ok = false;
         }
     }
@@ -27863,9 +28997,9 @@ static bool analyze_constant_field(
     {
         set_diagnostic(diagnostic, structure->source, initializer->location,
             "cannot assign '%s' to const field '%s' of type '%s'",
-            vc_semantic_type_name(model, initializer_type),
+            context_type_display_name(&context, initializer_type),
             field->node->as.field_declaration.name,
-            vc_semantic_type_name(model, field->type));
+            context_type_display_name(&context, field->type));
         field->const_analysis_state = 0;
         free(context.locals);
         return false;
@@ -27964,9 +29098,9 @@ static bool analyze_own_instance_initializers(
         {
             set_diagnostic(diagnostic, structure->source, initializer->location,
                 "cannot assign '%s' to initializer for '%s' of type '%s'",
-                vc_semantic_type_name(model, actual),
+                context_type_display_name(&context, actual),
                 member_name != NULL ? member_name : "<member>",
-                vc_semantic_type_name(model, target_type));
+                context_type_display_name(&context, target_type));
             free(context.locals);
             return false;
         }
@@ -28210,9 +29344,9 @@ static bool analyze_own_static_initialization(
         {
             set_diagnostic(diagnostic, structure->source, initializer->location,
                 "cannot assign '%s' to static initializer for '%s' of type '%s'",
-                vc_semantic_type_name(model, actual),
+                context_type_display_name(&context, actual),
                 member_name != NULL ? member_name : "<member>",
-                vc_semantic_type_name(model, target_type));
+                context_type_display_name(&context, target_type));
             free(context.locals);
             return false;
         }
@@ -28494,6 +29628,8 @@ static bool validate_callable_parameters(
     const char *type_name,
     VcSemanticDiagnostic *diagnostic)
 {
+    VcSemanticContext diagnostic_display_context = {0};
+    diagnostic_display_context.model = model;
     bool saw_optional = false;
 
     for (size_t i = 0; i < parameter_count; i++)
@@ -28571,8 +29707,8 @@ static bool validate_callable_parameters(
             set_diagnostic(diagnostic, source, default_value->location,
                 "default value for parameter '%s' has type '%s', expected '%s'",
                 parameter->as.parameter.name,
-                vc_semantic_type_name(model, actual),
-                vc_semantic_type_name(model, parameter_types[i]));
+                context_type_display_name(&context, actual),
+                context_type_display_name(&diagnostic_display_context, parameter_types[i]));
             free(context.locals);
             return false;
         }
@@ -28629,6 +29765,12 @@ bool vc_semantic_analyze(
     VcSemanticDiagnostic *diagnostic)
 {
     memset(diagnostic, 0, sizeof(*diagnostic));
+    /* Several lowering/inference passes intentionally start from a zeroed
+       temporary semantic model rather than vc_semantic_model_init(). Reset the
+       associated-owner sentinels here so every fresh analysis has identical
+       built-in ownership semantics. */
+    for (size_t i = 0; i <= VC_SEM_TYPE_NULL; i++)
+        model->builtin_associated_owners[i] = (size_t)-1;
     model->units = units;
     model->unit_count = unit_count;
 

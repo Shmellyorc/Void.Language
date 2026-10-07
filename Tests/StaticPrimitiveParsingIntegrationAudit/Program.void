@@ -1,0 +1,65 @@
+using Void;
+public static class Program {
+    public static void Main() {
+        try { sbyte.Parse("999999999999999999999999x"); Console.WriteLine(false); }
+        catch (FormatException) { Console.WriteLine(true); }
+        sbyte v_sbyte;
+        Console.WriteLine(!sbyte.TryParse("999999999999999999999999x", out v_sbyte) && v_sbyte == (sbyte)0);
+        try { byte.Parse("999999999999999999999999x"); Console.WriteLine(false); }
+        catch (FormatException) { Console.WriteLine(true); }
+        byte v_byte;
+        Console.WriteLine(!byte.TryParse("999999999999999999999999x", out v_byte) && v_byte == (byte)0);
+        try { short.Parse("999999999999999999999999x"); Console.WriteLine(false); }
+        catch (FormatException) { Console.WriteLine(true); }
+        short v_short;
+        Console.WriteLine(!short.TryParse("999999999999999999999999x", out v_short) && v_short == (short)0);
+        try { ushort.Parse("999999999999999999999999x"); Console.WriteLine(false); }
+        catch (FormatException) { Console.WriteLine(true); }
+        ushort v_ushort;
+        Console.WriteLine(!ushort.TryParse("999999999999999999999999x", out v_ushort) && v_ushort == (ushort)0);
+        try { int.Parse("999999999999999999999999x"); Console.WriteLine(false); }
+        catch (FormatException) { Console.WriteLine(true); }
+        int v_int;
+        Console.WriteLine(!int.TryParse("999999999999999999999999x", out v_int) && v_int == (int)0);
+        try { uint.Parse("999999999999999999999999x"); Console.WriteLine(false); }
+        catch (FormatException) { Console.WriteLine(true); }
+        uint v_uint;
+        Console.WriteLine(!uint.TryParse("999999999999999999999999x", out v_uint) && v_uint == (uint)0);
+        try { long.Parse("999999999999999999999999x"); Console.WriteLine(false); }
+        catch (FormatException) { Console.WriteLine(true); }
+        long v_long;
+        Console.WriteLine(!long.TryParse("999999999999999999999999x", out v_long) && v_long == (long)0);
+        try { ulong.Parse("999999999999999999999999x"); Console.WriteLine(false); }
+        catch (FormatException) { Console.WriteLine(true); }
+        ulong v_ulong;
+        Console.WriteLine(!ulong.TryParse("999999999999999999999999x", out v_ulong) && v_ulong == (ulong)0);
+        try { byte.Parse("-x"); Console.WriteLine(false); }
+        catch (FormatException) { Console.WriteLine(true); }
+        try { byte.Parse("-1"); Console.WriteLine(false); }
+        catch (OverflowException) { Console.WriteLine(true); }
+        try { ushort.Parse("-x"); Console.WriteLine(false); }
+        catch (FormatException) { Console.WriteLine(true); }
+        try { ushort.Parse("-1"); Console.WriteLine(false); }
+        catch (OverflowException) { Console.WriteLine(true); }
+        try { uint.Parse("-x"); Console.WriteLine(false); }
+        catch (FormatException) { Console.WriteLine(true); }
+        try { uint.Parse("-1"); Console.WriteLine(false); }
+        catch (OverflowException) { Console.WriteLine(true); }
+        try { ulong.Parse("-x"); Console.WriteLine(false); }
+        catch (FormatException) { Console.WriteLine(true); }
+        try { ulong.Parse("-1"); Console.WriteLine(false); }
+        catch (OverflowException) { Console.WriteLine(true); }
+        Console.WriteLine(char.Parse("é") == 'é');
+        Console.WriteLine(char.Parse("中") == '中');
+        Console.WriteLine(char.Parse("😀") == '😀');
+        char c = char.Parse("😀");
+        switch (c) { case '😀': Console.WriteLine(true); break; default: Console.WriteLine(false); break; }
+        Console.WriteLine(char.Parse("\n") == '\n');
+        Console.WriteLine(char.Parse("\v") == '\v');
+        double d;
+        Console.WriteLine(double.TryParse("-0e99999999999999999999999999", out d) && 1.0 / d == double.NegativeInfinity);
+        Console.WriteLine(!double.TryParse("1e99999999999999999999999999", out d) && d == 0.0);
+        Console.WriteLine(double.TryParse("-1e-99999999999999999999999999", out d) && 1.0 / d == double.NegativeInfinity);
+        Console.WriteLine(!double.TryParse("1e99999999999999999999999999x", out d) && d == 0.0);
+    }
+}

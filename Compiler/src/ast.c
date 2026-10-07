@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "../../Runtime/include/vc_utf8.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -847,6 +848,12 @@ static void dump_node(const VcAstNode *node, int depth)
             puts("Continue");
             break;
 
+        case VC_AST_TYPE_RECEIVER_EXPRESSION:
+            printf("TypeReceiver ");
+            dump_type(node->receiver_type);
+            putchar('\n');
+            break;
+
         case VC_AST_IDENTIFIER_EXPRESSION:
             printf("Identifier %s\n", node->as.identifier_expression.name);
             break;
@@ -1133,4 +1140,94 @@ void vc_ast_dump(const VcAstTree *tree, const VcSource *source)
 {
     (void)source;
     dump_node(tree->root, 0);
+}
+
+/* Only a non-conditional dotted name can denote a type. */
+bool vc_ast_receiver_name(const VcAstNode *node, char *name, size_t size)
+{
+    if (node == NULL || size == 0) return false;
+    if (node->kind == VC_AST_TYPE_RECEIVER_EXPRESSION ||
+        node->kind == VC_AST_IDENTIFIER_EXPRESSION)
+    {
+        const char *text = node->kind == VC_AST_TYPE_RECEIVER_EXPRESSION
+            ? node->receiver_type->name : node->as.identifier_expression.name;
+        if (text == NULL || strlen(text) >= size) return false;
+        memcpy(name, text, strlen(text) + 1);
+        return true;
+    }
+    if (node->kind != VC_AST_MEMBER_ACCESS_EXPRESSION ||
+        node->as.member_access_expression.target == NULL ||
+        node->as.member_access_expression.target->kind == VC_AST_TYPE_RECEIVER_EXPRESSION ||
+        node->as.member_access_expression.null_conditional ||
+        !vc_ast_receiver_name(node->as.member_access_expression.target, name, size))
+        return false;
+    const size_t length = strlen(name);
+    const char *member = node->as.member_access_expression.member;
+    if (length + strlen(member) + 2 > size) return false;
+    name[length] = '.';
+    memcpy(name + length + 1, member, strlen(member) + 1);
+    return true;
+}
+
+
+/* Decode the language's scalar value once for constant evaluation and native
+   emission. C multibyte character constants are not Unicode scalar values. */
+bool vc_ast_character_scalar(const char *text, uint32_t *value)
+{
+    if (text == NULL || value == NULL)
+        return false;
+    const size_t length = strlen(text);
+    if (length < 3 || text[0] != '\'' || text[length - 1] != '\'')
+        return false;
+    if (text[1] != '\\')
+    {
+        size_t offset = 1;
+        return vc_utf8_decode_one(text, length - 1, &offset, value) && offset == length - 1;
+    }
+    if (length == 4)
+    {
+        switch (text[2])
+        {
+            case '0': *value = 0; return true;
+            case 'a': *value = 7; return true;
+            case 'b': *value = 8; return true;
+            case 'f': *value = 12; return true;
+            case 'n': *value = 10; return true;
+            case 'r': *value = 13; return true;
+            case 't': *value = 9; return true;
+            case 'v': *value = 11; return true;
+            case '\\': *value = 92; return true;
+            case '\'': *value = 39; return true;
+            case '"': *value = 34; return true;
+            default: break;
+        }
+    }
+    size_t start = 2;
+    unsigned base = 8;
+    if (text[2] == 'x' || text[2] == 'u' || text[2] == 'U')
+    {
+        base = 16;
+        start = 3;
+        if ((text[2] == 'u' && length != 8) ||
+            (text[2] == 'U' && length != 12))
+            return false;
+    }
+    if (start == length - 1)
+        return false;
+    uint32_t scalar = 0;
+    for (size_t i = start; i < length - 1; i++)
+    {
+        unsigned digit;
+        if (text[i] >= '0' && text[i] <= '9') digit = (unsigned)(text[i] - '0');
+        else if (text[i] >= 'a' && text[i] <= 'f') digit = (unsigned)(text[i] - 'a') + 10;
+        else if (text[i] >= 'A' && text[i] <= 'F') digit = (unsigned)(text[i] - 'A') + 10;
+        else return false;
+        if (digit >= base || scalar > (UINT32_C(0x10ffff) - digit) / base)
+            return false;
+        scalar = scalar * base + digit;
+    }
+    if (!vc_utf8_scalar_is_valid(scalar))
+        return false;
+    *value = scalar;
+    return true;
 }

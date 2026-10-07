@@ -322,6 +322,15 @@ $(ASYNC_OBJECT_MODEL_NATIVE_FIXTURE): $(ASYNC_OBJECT_MODEL_NATIVE_OBJECT)
 .PHONY: test-managed-threadpool-work-queue-foundation test-threadpool-worker-lifecycle-gc-coordination test-threadpool-exception-shutdown-completion test-threadpool-exception-shutdown-stress test-task-state-completion-foundation test-generic-task-result-gc-completion test-task-run-threadpool-scheduling-integration test-task-waiting-timeout-fault-propagation test-task-cancellation-integration test-task-continuation-completion-source-foundation test-threadpool-task-integration-audit test-threadpool-task-integration-audit-stress test-async-await-syntax-semantic-foundation test-async-task-state-machine-lowering-foundation test-await-suspension-resumption-completion test-async-exception-catch-finally-integration test-async-cancellation-integration test-async-generics-closures-gc-lifetime-integration test-async-object-model-library-boundary-integration test-async-await-task-runtime-integration-audit test-async-await-task-runtime-integration-audit-stress
 
 clean:
+	rm -rf Tests/StaticApiIntegration/.void Tests/StaticApiIntegration/bin Tests/StaticApiIntegration/publish
+	rm -rf Tests/BuiltInStaticValues/.void Tests/BuiltInStaticValues/bin Tests/BuiltInStaticValues/publish
+	rm -rf Tests/BuiltInIntegralBoolCharParsing/.void Tests/BuiltInIntegralBoolCharParsing/bin Tests/BuiltInIntegralBoolCharParsing/publish
+	rm -rf Tests/BuiltInFloatingDecimalParsing/.void Tests/BuiltInFloatingDecimalParsing/bin Tests/BuiltInFloatingDecimalParsing/publish
+	rm -rf Tests/ConstructedGenericStaticMembers/.void Tests/ConstructedGenericStaticMembers/bin Tests/ConstructedGenericStaticMembers/publish
+	rm -rf Tests/BuiltInAssociatedMemberFoundation/.void Tests/BuiltInAssociatedMemberFoundation/bin Tests/BuiltInAssociatedMemberFoundation/publish
+	rm -rf Tests/StaticCallableTypeReceivers/.void Tests/StaticCallableTypeReceivers/bin Tests/StaticCallableTypeReceivers/publish
+	rm -rf Tests/StaticValueTypeReceivers/.void Tests/StaticValueTypeReceivers/bin Tests/StaticValueTypeReceivers/publish
+	rm -rf Tests/TypeQualifiedMemberAccessFoundation/.void Tests/TypeQualifiedMemberAccessFoundation/bin Tests/TypeQualifiedMemberAccessFoundation/publish
 	rm -rf Tests/EngineTextStreams/.void Tests/EngineTextStreams/bin Tests/EngineNativeFailure/.void Tests/EngineNativeFailure/bin Tests/EngineFilesystemDiagnostics/.void Tests/EngineFilesystemDiagnostics/bin
 	rm -rf Tests/InterfaceIndexerDispatch/.void Tests/InterfaceIndexerDispatch/bin Tests/InterfaceIndexerDispatch/publish Tests/InterfaceIndexerDiagnostics/.void Tests/InterfaceIndexerDiagnostics/bin Tests/InterfaceIndexerDiagnostics/publish
 	rm -rf Tests/EngineMemoryStreamUnusedVirtual/.void Tests/EngineMemoryStreamUnusedVirtual/bin Tests/EngineMemoryStreamUnusedVirtual/publish
@@ -1121,7 +1130,7 @@ test-lsp: $(BIN)
 	output="$$( { printf 'Content-Length: %d\r\n\r\n%s' "$${#msg}" "$$msg"; \
 	msg='{"jsonrpc":"2.0","id":2,"method":"shutdown","params":null}'; printf 'Content-Length: %d\r\n\r\n%s' "$${#msg}" "$$msg"; \
 	msg='{"jsonrpc":"2.0","method":"exit","params":null}'; printf 'Content-Length: %d\r\n\r\n%s' "$${#msg}" "$$msg"; } | ./$(BIN) lsp )"; \
-	printf '%s' "$$output" | grep -Fq '"serverInfo":{"name":"voidc","version":"0.0.330"}'; \
+	printf '%s' "$$output" | grep -Fq '"serverInfo":{"name":"voidc","version":"0.0.340"}'; \
 	echo True
 	@set -e; \
 	msg='{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}'; \
@@ -1329,7 +1338,7 @@ test-tooling-integration: $(BIN)
 	msg="$$(printf '{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"%s","version":3},"contentChanges":[{"text":"%s"}]}}' "$$program_uri" "$$program_v1")"; printf 'Content-Length: %d\r\n\r\n%s' "$${#msg}" "$$msg"; \
 	msg='{"jsonrpc":"2.0","id":15,"method":"shutdown","params":null}'; printf 'Content-Length: %d\r\n\r\n%s' "$${#msg}" "$$msg"; \
 	msg='{"jsonrpc":"2.0","method":"exit","params":null}'; printf 'Content-Length: %d\r\n\r\n%s' "$${#msg}" "$$msg"; } | ./$(BIN) lsp )"; \
-	printf '%s' "$$output" | grep -Fq '"serverInfo":{"name":"voidc","version":"0.0.330"}'; \
+	printf '%s' "$$output" | grep -Fq '"serverInfo":{"name":"voidc","version":"0.0.340"}'; \
 	printf '%s' "$$output" | grep -Fq '"hoverProvider":true'; \
 	printf '%s' "$$output" | grep -Fq '"completionProvider":{"triggerCharacters":["."]}'; \
 	printf '%s' "$$output" | grep -Fq '"definitionProvider":true,"referencesProvider":true,"documentSymbolProvider":true,"workspaceSymbolProvider":true'; \
@@ -1782,7 +1791,7 @@ test-generic-method-calls: $(BIN)
 	@set -e; output="$$(./$(BIN) check Tests/GenericMethodCallDiagnostics/WrongArity 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "generic method 'Echo' with 2 type argument(s) was not found"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/GenericMethodCallDiagnostics/MissingReceiver 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "type 'Plain' has no matching instance method 'Echo'"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/GenericMethodCallDiagnostics/StaticAsInstance 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "type 'Worker' has no matching instance method 'Echo'"; echo True
-	@set -e; output="$$(./$(BIN) check Tests/GenericMethodCallDiagnostics/InstanceAsStatic 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "type 'Worker' has no matching static method 'Echo'"; echo True
+	@set -e; output="$$(./$(BIN) check Tests/GenericMethodCallDiagnostics/InstanceAsStatic 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "instance method 'Worker.Echo' requires an instance receiver"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/GenericMethodCallDiagnostics/ArgumentMismatch 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "type 'Worker' has no matching instance method 'Echo'"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/GenericMethodCallDiagnostics/Ambiguous 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "call to instance method 'Echo' is ambiguous"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/GenericMethodCallDiagnostics/Inaccessible 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "method 'Hidden' is inaccessible"; echo True
@@ -1911,7 +1920,7 @@ test-custom-event-accessors: $(BIN)
 	@set -e; output="$$(./$(BIN) check Tests/CustomEventAccessorDiagnostics/SealedOverride 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "event 'Changed' cannot override a sealed base event"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/CustomEventAccessorDiagnostics/StaticVirtual 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "virtual/override/abstract/sealed events cannot be static"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/CustomEventAccessorDiagnostics/UnknownAccessor 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "expected 'add' or 'remove' event accessor"; echo True
-	@set -e; output="$$(./$(BIN) check Tests/CustomEventAccessorDiagnostics/WrongDelegate 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "event subscription expects 'Action__g1_int', got 'TextHandler'"; echo True
+	@set -e; output="$$(./$(BIN) check Tests/CustomEventAccessorDiagnostics/WrongDelegate 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "event subscription expects 'Action<int>', got 'TextHandler'"; echo True
 
 # Milestone 106: null-conditional array completion
 test-null-conditional-arrays: $(BIN)
@@ -1999,7 +2008,7 @@ test-exception-throw-foundation: $(BIN)
 	@./Tests/ExceptionThrowFoundation/bin/ExceptionThrowFoundation
 	@set -e; ./$(BIN) publish Tests/ExceptionThrowFoundation >/dev/null; test -x Tests/ExceptionThrowFoundation/publish/ExceptionThrowFoundation$(EXE_SUFFIX); echo True
 	@./$(BIN) build Tests/ExceptionThrowUnhandled >/dev/null
-	@set -e; set +e; output="$$(./Tests/ExceptionThrowUnhandled/bin/ExceptionThrowUnhandled 2>&1)"; status=$$?; set -e; test $$status -eq 1; echo True; printf '%s\n' "$$output" | grep -Fxq 'Unhandled exception: FatalGameException: boom'; echo True
+	@set -e; set +e; output="$$(./Tests/ExceptionThrowUnhandled/bin/ExceptionThrowUnhandled 2>&1)"; status=$$?; set -e; test $$status -eq 1; echo True; printf '%s\n' "$$output" | grep -Fxq 'Unhandled FatalGameException: boom'; echo True
 	@set -e; output="$$(./$(BIN) check Tests/ExceptionThrowDiagnostics/ThrowInt 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "throw expression must be Exception or a derived class, got 'int'"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/ExceptionThrowDiagnostics/ThrowObject 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "throw expression must be Exception or a derived class, got 'Node'"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/ExceptionThrowDiagnostics/ThrowNull 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "throw expression must be Exception or a derived class, got 'null'"; echo True
@@ -2014,7 +2023,7 @@ test-try-catch-completion: $(BIN)
 	@./Tests/TryCatchCompletion/bin/TryCatchCompletion
 	@set -e; ./$(BIN) publish Tests/TryCatchCompletion >/dev/null; test -x Tests/TryCatchCompletion/publish/TryCatchCompletion$(EXE_SUFFIX); echo True
 	@./$(BIN) build Tests/TryCatchUnhandled >/dev/null
-	@set -e; set +e; output="$$(./Tests/TryCatchUnhandled/bin/TryCatchUnhandled 2>&1)"; status=$$?; set -e; test $$status -eq 1; echo True; printf '%s\n' "$$output" | grep -Fxq 'Unhandled exception: FatalException: miss'; echo True
+	@set -e; set +e; output="$$(./Tests/TryCatchUnhandled/bin/TryCatchUnhandled 2>&1)"; status=$$?; set -e; test $$status -eq 1; echo True; printf '%s\n' "$$output" | grep -Fxq 'Unhandled FatalException: miss'; echo True
 	@grep -Fq 'setjmp(vc_eh_' Tests/TryCatchCompletion/.void/TryCatchCompletion.c; echo True
 	@grep -Fq 'vc_exception_handler_current = &vc_eh_' Tests/TryCatchCompletion/.void/TryCatchCompletion.c; echo True
 	@set -e; output="$$(./$(BIN) check Tests/TryCatchDiagnostics/InvalidType 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq 'catch type must be Exception or a derived class'; echo True
@@ -2083,7 +2092,7 @@ test-nested-handlers-rethrow: $(BIN)
 	@./$(BIN) build Tests/NestedHandlersRethrow >/dev/null
 	@./Tests/NestedHandlersRethrow/bin/NestedHandlersRethrow
 	@set -e; ./$(BIN) publish Tests/NestedHandlersRethrow >/dev/null; test -x Tests/NestedHandlersRethrow/publish/NestedHandlersRethrow$(EXE_SUFFIX); echo True
-	@grep -Eq 'vc_throw\(vc_eh_[0-9]+\.exception\);' Tests/NestedHandlersRethrow/.void/NestedHandlersRethrow.c; echo True
+	@grep -Eq 'vc_throw_at\(vc_eh_([0-9]+)\.exception, vc_eh_\1\.fault_site\);' Tests/NestedHandlersRethrow/.void/NestedHandlersRethrow.c; echo True
 	@grep -Fq 'vc_gc_trace_ref_slot' Tests/NestedHandlersRethrow/.void/NestedHandlersRethrow.c; echo True
 	@grep -Fq 'vc_gc_unwind_to(vc_fh_' Tests/NestedHandlersRethrow/.void/NestedHandlersRethrow.c; echo True
 	@./$(BIN) check Tests/TryCatchDiagnostics/Nested >/dev/null; echo True
@@ -2102,7 +2111,7 @@ test-iterator-exception-integration: $(BIN)
 	@./Tests/IteratorExceptionIntegration/bin/IteratorExceptionIntegration
 	@set -e; ./$(BIN) publish Tests/IteratorExceptionIntegration >/dev/null; test -x Tests/IteratorExceptionIntegration/publish/IteratorExceptionIntegration$(EXE_SUFFIX); echo True
 	@grep -Fq 'setjmp(vc_eh_' Tests/IteratorExceptionIntegration/.void/IteratorExceptionIntegration.c; echo True
-	@grep -Fq 'vc_throw(vc_eh_' Tests/IteratorExceptionIntegration/.void/IteratorExceptionIntegration.c; echo True
+	@grep -Fq 'vc_throw_at(vc_eh_' Tests/IteratorExceptionIntegration/.void/IteratorExceptionIntegration.c; echo True
 	@./$(BIN) check Tests/ExceptionThrowDiagnostics/IteratorThrow >/dev/null; echo True
 	@./$(BIN) check Tests/FinallyDiagnostics/Iterator >/dev/null; echo True
 	@set -e; output="$$(./$(BIN) check Tests/TryCatchDiagnostics/Iterator 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq 'yield cannot be used in an iterator try block that has catch clauses'; echo True
@@ -2158,7 +2167,7 @@ test-exceptions-runtime-control-flow-integration: $(BIN)
 	@set -e; ./$(BIN) publish Tests/ExceptionsRuntimeControlFlowIntegration >/dev/null; test -x Tests/ExceptionsRuntimeControlFlowIntegration/publish/ExceptionsRuntimeControlFlowIntegration$(EXE_SUFFIX); echo True
 	@grep -Fq 'VcExceptionHandler vc_ti_handler;' Tests/ExceptionsRuntimeControlFlowIntegration/.void/ExceptionsRuntimeControlFlowIntegration.c; echo True
 	@grep -Eq 'vc_ti_state_[0-9]+ = 0u;' Tests/ExceptionsRuntimeControlFlowIntegration/.void/ExceptionsRuntimeControlFlowIntegration.c; echo True
-	@grep -Fq 'vc_throw((void *)vc_ti_handler.exception);' Tests/ExceptionsRuntimeControlFlowIntegration/.void/ExceptionsRuntimeControlFlowIntegration.c; echo True
+	@grep -Fq 'vc_throw_at((void *)vc_ti_handler.exception, vc_ti_handler.fault_site);' Tests/ExceptionsRuntimeControlFlowIntegration/.void/ExceptionsRuntimeControlFlowIntegration.c; echo True
 	@./$(BIN) run Tests/StaticInitialization >/dev/null; echo True
 	@if [ "$$VOID_FULL_SUITE" = "1" ]; then echo True; else $(MAKE) -s test-exception-throw-foundation >/dev/null; echo True; fi
 	@if [ "$$VOID_FULL_SUITE" = "1" ]; then echo True; else $(MAKE) -s test-try-catch-completion >/dev/null; echo True; fi
@@ -2611,15 +2620,15 @@ test-static-interface-operator-contracts: $(BIN)
 	@./Tests/StaticInterfaceOperatorContracts/bin/StaticInterfaceOperatorContracts
 	@set -e; ./$(BIN) publish Tests/StaticInterfaceOperatorContracts >/dev/null; test -x Tests/StaticInterfaceOperatorContracts/publish/StaticInterfaceOperatorContracts$(EXE_SUFFIX); echo True
 	@set -e; output="$$(./$(BIN) parse Tests/StaticInterfaceOperatorContracts/Program.void 2>/dev/null)"; printf '%s\n' "$$output" | grep -Fq 'Operator + : T [static]'; echo True
-	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/Missing 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "does not implement interface operator 'IAdd__g1_Number.+'"; echo True
-	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/WrongReturn 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "does not implement interface operator 'IAdd__g1_Number.+'"; echo True
-	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/NonPublic 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "does not implement interface operator 'IAdd__g1_Number.+'"; echo True
+	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/Missing 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "does not implement interface operator 'IAdd<Number>.+'"; echo True
+	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/WrongReturn 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "does not implement interface operator 'IAdd<Number>.+'"; echo True
+	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/NonPublic 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "does not implement interface operator 'IAdd<Number>.+'"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/InterfaceBody 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "static interface operator '+' must be a signature ending in ';'"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/NonStatic 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "interface operator '+' must be static"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/ConflictReturn 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "inherits conflicting operator '+' return types"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/MissingPair 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "operator overload '==' requires matching '!=' overload with the same parameter types"; echo True
 	@./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/ConversionContract >/dev/null; echo True
-	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/DirectUse 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "operator '+' is not defined for 'IAdd__g1_Number' and 'IAdd__g1_Number'"; echo True
+	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/DirectUse 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "operator '+' is not defined for 'IAdd<Number>' and 'IAdd<Number>'"; echo True
 	@if [ "$$VOID_FULL_SUITE" = "1" ]; then echo True; else $(MAKE) -s test-binary-operator-completion >/dev/null; echo True; fi
 
 # Milestone 149: constrained generic operator dispatch.
@@ -2712,16 +2721,16 @@ test-static-interface-conversion-contracts: $(BIN)
 	@set -e; ./$(BIN) publish Tests/StaticInterfaceConversionContracts >/dev/null; test -x Tests/StaticInterfaceConversionContracts/publish/StaticInterfaceConversionContracts$(EXE_SUFFIX); echo True
 	@set -e; output="$$(./$(BIN) parse Tests/StaticInterfaceConversionContracts/Program.void 2>/dev/null)"; printf '%s\n' "$$output" | grep -Fq 'Operator implicit : int [static]'; echo True
 	@set -e; output="$$(./$(BIN) parse Tests/StaticInterfaceConversionContracts/Program.void 2>/dev/null)"; printf '%s\n' "$$output" | grep -Fq 'Operator explicit : T [static]'; echo True
-	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/MissingImplicit 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "does not implement interface operator 'IConvert__g1_Number.implicit'"; echo True
-	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/WrongKind 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "does not implement interface operator 'IConvert__g1_Number.implicit'"; echo True
-	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/WrongTarget 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "does not implement interface operator 'IConvert__g1_Number.implicit'"; echo True
+	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/MissingImplicit 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "does not implement interface operator 'IConvert<Number>.implicit'"; echo True
+	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/WrongKind 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "does not implement interface operator 'IConvert<Number>.implicit'"; echo True
+	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/WrongTarget 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "does not implement interface operator 'IConvert<Number>.implicit'"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/NonPublicImplementation 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "conversion operator 'implicit' must be public"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/InterfaceBody 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "static interface operator 'implicit' must be a signature ending in ';'"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/NonStatic 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "interface operator 'implicit' must be static"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/ConflictingKind 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "has conflicting implicit/explicit conversion contracts from 'Number' to 'int'"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/StandardConversion 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "conversion from 'int' to 'long' conflicts with an existing standard conversion"; echo True
 	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/WrongArity 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "conversion operator 'implicit' requires exactly one parameter"; echo True
-	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/DirectUse 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "cannot assign 'IConvert__g1_Number' to local 'result' of type 'int'"; echo True
+	@set -e; output="$$(./$(BIN) check Tests/StaticInterfaceConversionContractDiagnostics/DirectUse 2>&1 || true)"; printf '%s\n' "$$output" | grep -Fq "cannot assign 'IConvert<Number>' to local 'result' of type 'int'"; echo True
 	@grep -Fq 'candidate->is_interface_method' Compiler/src/semantic.c; echo True
 	@./$(BIN) check Tests/StaticInterfaceOperatorContractDiagnostics/ConversionContract >/dev/null; echo True
 	@if [ "$$VOID_FULL_SUITE" = "1" ]; then echo True; else $(MAKE) -s test-static-interface-operator-contracts >/dev/null; echo True; fi
@@ -3344,7 +3353,7 @@ test-cancellation-token-source-foundation: $(BIN)
 	@! grep -R -Fq 'CancellationTokenSource' Compiler/src Runtime/include Runtime/src; echo True
 	@grep -Fq 'vc_native_atomic_i32_load' Tests/CancellationTokenSourceFoundation/.void/CancellationTokenSourceFoundation.c && grep -Fq 'VC_NATIVE_MEMORY_ORDER_ACQUIRE' Tests/CancellationTokenSourceFoundation/.void/CancellationTokenSourceFoundation.c && grep -Fq 'vc_native_atomic_i32_exchange' Tests/CancellationTokenSourceFoundation/.void/CancellationTokenSourceFoundation.c && grep -Fq 'VC_NATIVE_MEMORY_ORDER_SEQ_CST' Tests/CancellationTokenSourceFoundation/.void/CancellationTokenSourceFoundation.c; echo True
 	@./$(BIN) build Tests/CancellationTokenSourceRuntime/UnhandledCancellation >/dev/null
-	@set -e; set +e; output="$$(./Tests/CancellationTokenSourceRuntime/UnhandledCancellation/bin/CancellationUnhandled 2>&1)"; status=$$?; set -e; test $$status -eq 1; echo True; printf '%s\n' "$$output" | grep -Fxq 'Unhandled exception: OperationCanceledException: The operation was canceled.'; echo True
+	@set -e; set +e; output="$$(./Tests/CancellationTokenSourceRuntime/UnhandledCancellation/bin/CancellationUnhandled 2>&1)"; status=$$?; set -e; test $$status -eq 1; echo True; printf '%s\n' "$$output" | grep -Fxq 'Unhandled OperationCanceledException: The operation was canceled.'; echo True
 	@./$(BIN) check Tests/SemaphoreCompletion >/dev/null; ./$(BIN) check Tests/AutoResetEventCompletion >/dev/null; ./$(BIN) check Tests/VolatileMemoryOrdering >/dev/null; ./$(BIN) check Tests/InterlockedManagedReferenceOperations >/dev/null; echo True
 
 # Milestone 188: Cancellation Registration & Wakeup Completion
@@ -3821,12 +3830,12 @@ test-async-enumeration-protocol-foundation: $(BIN)
 	@./$(BIN) build Tests/AsyncEnumerationProtocolFoundation >/dev/null
 	@./Tests/AsyncEnumerationProtocolFoundation/bin/AsyncEnumerationProtocolFoundation
 	@set -e; ./$(BIN) publish Tests/AsyncEnumerationProtocolFoundation >/dev/null; test -x Tests/AsyncEnumerationProtocolFoundation/publish/AsyncEnumerationProtocolFoundation$(EXE_SUFFIX); echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/AsyncEnumerationProtocolDiagnostics/MissingMoveNext >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "does not implement interface method 'IAsyncEnumerator__g1_int.MoveNextAsync'" $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/AsyncEnumerationProtocolDiagnostics/WrongMoveNextResult >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "does not implement interface method 'IAsyncEnumerator__g1_int.MoveNextAsync'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/AsyncEnumerationProtocolDiagnostics/MissingMoveNext >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "does not implement interface method 'IAsyncEnumerator<int>.MoveNextAsync'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/AsyncEnumerationProtocolDiagnostics/WrongMoveNextResult >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "does not implement interface method 'IAsyncEnumerator<int>.MoveNextAsync'" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/AsyncEnumerationProtocolDiagnostics/MissingDisposeAsync >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "does not implement interface method 'IAsyncDisposable.DisposeAsync'" $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/AsyncEnumerationProtocolDiagnostics/BadEnumerableReturn >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "does not implement interface method 'IAsyncEnumerable__g1_int.GetAsyncEnumerator'" $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/AsyncEnumerationProtocolDiagnostics/WrongCurrent >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "does not implement interface property 'IAsyncEnumerator__g1_int.Current'" $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/AsyncEnumerationProtocolDiagnostics/MissingCancellationToken >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "does not implement interface method 'IAsyncEnumerable__g1_int.GetAsyncEnumerator'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/AsyncEnumerationProtocolDiagnostics/BadEnumerableReturn >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "does not implement interface method 'IAsyncEnumerable<int>.GetAsyncEnumerator'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/AsyncEnumerationProtocolDiagnostics/WrongCurrent >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "does not implement interface property 'IAsyncEnumerator<int>.Current'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/AsyncEnumerationProtocolDiagnostics/MissingCancellationToken >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "does not implement interface method 'IAsyncEnumerable<int>.GetAsyncEnumerator'" $$out; rm -f $$out; echo True
 	@./$(BIN) check Tests/AsyncEnumerationProtocolDiagnostics/AwaitForeachBoundary >/dev/null && echo True
 	@grep -Fq 'public interface IAsyncDisposable' StandardLibrary/Void/IAsyncDisposable.void && grep -Fq 'Task DisposeAsync();' StandardLibrary/Void/IAsyncDisposable.void && grep -Fq 'public interface IAsyncEnumerator<T> : IAsyncDisposable' StandardLibrary/Void/Collections/AsyncEnumerable.void && grep -Fq 'Task<bool> MoveNextAsync();' StandardLibrary/Void/Collections/AsyncEnumerable.void && grep -Fq 'GetAsyncEnumerator(CancellationToken cancellationToken = default)' StandardLibrary/Void/Collections/AsyncEnumerable.void; echo True
 	@output="$$(VOID_GC_TRACE=1 ./Tests/AsyncEnumerationProtocolFoundation/bin/AsyncEnumerationProtocolFoundation 2>&1 >/dev/null)"; printf '%s' "$$output" | grep -Eq 'VOID GC: collection [0-9]+ freed [1-9][0-9]*, live [0-9]+'; echo True
@@ -4185,15 +4194,15 @@ test-span-foundation: $(BIN)
 	@out=$$(mktemp); if ./$(BIN) check Tests/SpanFoundationDiagnostics/StructField >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "ref struct field 'Value' is allowed only as instance storage inside another ref struct" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/SpanFoundationDiagnostics/StaticField >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "ref struct field 'Value' is allowed only as instance storage inside another ref struct" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/SpanFoundationDiagnostics/ArrayOfSpan >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "type 'Span' is not supported as a local type" $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/SpanFoundationDiagnostics/GenericArgument >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "ref struct type argument 'Span__g1_int' is not supported by generic type 'Box'" $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/SpanFoundationDiagnostics/Boxing >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot assign 'Span__g1_int' to local 'value' of type 'object'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/SpanFoundationDiagnostics/GenericArgument >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "ref struct type argument 'Span<int>' is not supported by generic type 'Box'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/SpanFoundationDiagnostics/Boxing >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot assign 'Span<int>' to local 'value' of type 'object'" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/SpanFoundationDiagnostics/LambdaCapture >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "ref struct local 'span' cannot be captured by a lambda" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/SpanFoundationDiagnostics/AsyncLocal >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "ref struct local 'span' cannot be used in async or iterator methods" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/SpanFoundationDiagnostics/IteratorLocal >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "ref struct local 'span' cannot be used in async or iterator methods" $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/SpanFoundationDiagnostics/WrongArrayType >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "no matching constructor for 'Span__g1_int' was found" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/SpanFoundationRuntime/NegativeIndex >/dev/null; out=$$(mktemp); if ./Tests/SpanFoundationRuntime/NegativeIndex/bin/NegativeIndex >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: IndexOutOfRangeException: Span index out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/SpanFoundationRuntime/UpperBound >/dev/null; out=$$(mktemp); if ./Tests/SpanFoundationRuntime/UpperBound/bin/UpperBound >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: IndexOutOfRangeException: Span index out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/SpanFoundationRuntime/ReadOnlyUpperBound >/dev/null; out=$$(mktemp); if ./Tests/SpanFoundationRuntime/ReadOnlyUpperBound/bin/ReadOnlyUpperBound >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: IndexOutOfRangeException: ReadOnlySpan index out of range" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/SpanFoundationDiagnostics/WrongArrayType >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "no matching constructor for 'Span<int>' was found" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/SpanFoundationRuntime/NegativeIndex >/dev/null; out=$$(mktemp); if ./Tests/SpanFoundationRuntime/NegativeIndex/bin/NegativeIndex >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled IndexOutOfRangeException: Span index out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/SpanFoundationRuntime/UpperBound >/dev/null; out=$$(mktemp); if ./Tests/SpanFoundationRuntime/UpperBound/bin/UpperBound >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled IndexOutOfRangeException: Span index out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/SpanFoundationRuntime/ReadOnlyUpperBound >/dev/null; out=$$(mktemp); if ./Tests/SpanFoundationRuntime/ReadOnlyUpperBound/bin/ReadOnlyUpperBound >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled IndexOutOfRangeException: ReadOnlySpan index out of range" $$out; rm -f $$out; echo True
 	@./$(BIN) parse StandardLibrary/Void/Span.void | grep -Fq 'Struct Span<T> [public ref]'; echo True
 	@./$(BIN) parse StandardLibrary/Void/Span.void | grep -Fq 'Method get_Item : ref T [public]'; echo True
 	@./$(BIN) parse StandardLibrary/Void/Span.void | grep -Fq 'Struct ReadOnlySpan<T> [public readonly ref]'; echo True
@@ -4227,14 +4236,14 @@ test-span-conversion-slicing-stackalloc-completion: $(BIN)
 	@out=$$(mktemp); if ./$(BIN) check Tests/SpanConversionSlicingStackallocDiagnostics/ReturnScopedRef >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot return ref struct value that refers to scoped or local storage" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/SpanConversionSlicingStackallocDiagnostics/ReturnScopedIn >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot return ref struct value that refers to scoped or local storage" $$out; rm -f $$out; echo True
 	@./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/NegativeStackallocLength >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/NegativeStackallocLength/bin/NegativeStackallocLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "VOID runtime error: stackalloc count cannot be negative" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/SpanSegmentBounds >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/SpanSegmentBounds/bin/SpanSegmentBounds >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: Span range out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/ReadOnlySegmentBounds >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/ReadOnlySegmentBounds/bin/ReadOnlySegmentBounds >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: ReadOnlySpan range out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/SliceNegativeStart >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/SliceNegativeStart/bin/SliceNegativeStart >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: Span range out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/SliceNegativeLength >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/SliceNegativeLength/bin/SliceNegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: Span range out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/SliceUpperBound >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/SliceUpperBound/bin/SliceUpperBound >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: Span range out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/ReadOnlySliceUpperBound >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/ReadOnlySliceUpperBound/bin/ReadOnlySliceUpperBound >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: ReadOnlySpan range out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/DirectNegativeLength >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/DirectNegativeLength/bin/DirectNegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: Span length cannot be negative" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/ReadOnlyDirectNegativeLength >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/ReadOnlyDirectNegativeLength/bin/ReadOnlyDirectNegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: ReadOnlySpan length cannot be negative" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/SpanSegmentBounds >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/SpanSegmentBounds/bin/SpanSegmentBounds >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: Span range out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/ReadOnlySegmentBounds >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/ReadOnlySegmentBounds/bin/ReadOnlySegmentBounds >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: ReadOnlySpan range out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/SliceNegativeStart >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/SliceNegativeStart/bin/SliceNegativeStart >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: Span range out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/SliceNegativeLength >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/SliceNegativeLength/bin/SliceNegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: Span range out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/SliceUpperBound >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/SliceUpperBound/bin/SliceUpperBound >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: Span range out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/ReadOnlySliceUpperBound >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/ReadOnlySliceUpperBound/bin/ReadOnlySliceUpperBound >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: ReadOnlySpan range out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/DirectNegativeLength >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/DirectNegativeLength/bin/DirectNegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: Span length cannot be negative" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/SpanConversionSlicingStackallocRuntime/ReadOnlyDirectNegativeLength >/dev/null; out=$$(mktemp); if ./Tests/SpanConversionSlicingStackallocRuntime/ReadOnlyDirectNegativeLength/bin/ReadOnlyDirectNegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: ReadOnlySpan length cannot be negative" $$out; rm -f $$out; echo True
 	@./$(BIN) parse StandardLibrary/Void/Span.void | grep -Fq 'Field _reference : ref T [private]'; echo True
 	@./$(BIN) parse StandardLibrary/Void/Span.void | grep -Fq 'Field _reference : ref readonly T [private]'; echo True
 	@test "$$(./$(BIN) parse StandardLibrary/Void/Span.void | grep -Fc 'Method Slice : Span<T> [public]')" -eq 2; echo True
@@ -4285,7 +4294,7 @@ test-index-from-end-foundation: $(BIN)
 	@out=$$(mktemp); if ./$(BIN) check Tests/IndexFromEndDiagnostics/StringOperand >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "operator '^' requires an 'int' operand, got 'string'" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/IndexFromEndDiagnostics/FloatOperand >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "operator '^' requires an 'int' operand, got 'float'" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/IndexFromEndDiagnostics/IndexOperand >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "operator '^' requires an 'int' operand, got 'Index'" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/IndexFromEndRuntime/NegativeValue >/dev/null; out=$$(mktemp); if ./Tests/IndexFromEndRuntime/NegativeValue/bin/NegativeValue >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: Index value cannot be negative" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/IndexFromEndRuntime/NegativeValue >/dev/null; out=$$(mktemp); if ./Tests/IndexFromEndRuntime/NegativeValue/bin/NegativeValue >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: Index value cannot be negative" $$out; rm -f $$out; echo True
 	@set -e; ./$(BIN) run Tests/IndexFromEndRuntime/NegativeLength | grep -Fxq -- "-2"; echo True
 	@./$(BIN) parse Tests/IndexFromEndSyntax/PrefixCaret.void | grep -Fq 'Unary ^'; echo True
 	@./$(BIN) parse Tests/IndexFromEndSyntax/BinaryCaret.void | grep -Fq 'Binary ^'; echo True
@@ -4314,11 +4323,11 @@ test-range-syntax-value-foundation: $(BIN)
 	@out=$$(mktemp); if ./$(BIN) check Tests/RangeSyntaxDiagnostics/StringEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "range end must be convertible to 'Index', got 'string'" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/RangeSyntaxDiagnostics/Chained >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "range operator '..' cannot be chained" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/RangeSyntaxDiagnostics/IndexOfIndex >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "operator '^' requires an 'int' operand, got 'Index'" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/RangeSyntaxRuntime/NegativeLength >/dev/null; out=$$(mktemp); if ./Tests/RangeSyntaxRuntime/NegativeLength/bin/NegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: Range length cannot be negative" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/RangeSyntaxRuntime/Reverse >/dev/null; out=$$(mktemp); if ./Tests/RangeSyntaxRuntime/Reverse/bin/Reverse >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: Range out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/RangeSyntaxRuntime/StartOutOfRange >/dev/null; out=$$(mktemp); if ./Tests/RangeSyntaxRuntime/StartOutOfRange/bin/StartOutOfRange >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: Range out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/RangeSyntaxRuntime/EndOutOfRange >/dev/null; out=$$(mktemp); if ./Tests/RangeSyntaxRuntime/EndOutOfRange/bin/EndOutOfRange >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: Range out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/RangeSyntaxRuntime/FromEndOutOfRange >/dev/null; out=$$(mktemp); if ./Tests/RangeSyntaxRuntime/FromEndOutOfRange/bin/FromEndOutOfRange >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: Range out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/RangeSyntaxRuntime/NegativeLength >/dev/null; out=$$(mktemp); if ./Tests/RangeSyntaxRuntime/NegativeLength/bin/NegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: Range length cannot be negative" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/RangeSyntaxRuntime/Reverse >/dev/null; out=$$(mktemp); if ./Tests/RangeSyntaxRuntime/Reverse/bin/Reverse >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: Range out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/RangeSyntaxRuntime/StartOutOfRange >/dev/null; out=$$(mktemp); if ./Tests/RangeSyntaxRuntime/StartOutOfRange/bin/StartOutOfRange >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: Range out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/RangeSyntaxRuntime/EndOutOfRange >/dev/null; out=$$(mktemp); if ./Tests/RangeSyntaxRuntime/EndOutOfRange/bin/EndOutOfRange >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: Range out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/RangeSyntaxRuntime/FromEndOutOfRange >/dev/null; out=$$(mktemp); if ./Tests/RangeSyntaxRuntime/FromEndOutOfRange/bin/FromEndOutOfRange >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: Range out of range" $$out; rm -f $$out; echo True
 	@lex="$$(./$(BIN) lex Tests/RangeSyntaxValueSyntax/Forms.void)"; printf '%s' "$$lex" | grep -Fq '..' && printf '%s' "$$lex" | grep -Fq '1.25f'; echo True
 	@parse="$$(./$(BIN) parse Tests/RangeSyntaxValueSyntax/Forms.void)"; printf '%s' "$$parse" | grep -Fq 'Range' && printf '%s' "$$parse" | grep -Fq 'Unary ^'; echo True
 	@./$(BIN) parse StandardLibrary/Void/Range.void | grep -Fq 'Struct Range [public readonly]'; echo True
@@ -4374,10 +4383,10 @@ test-arrays-span-index-range-completion: $(BIN)
 	@out=$$(mktemp); if ./$(BIN) check Tests/ArraysSpanIndexRangeDiagnostics/ReadOnlySpanWrite >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot assign through a readonly receiver" $$out; rm -f $$out; echo True
 	@./$(BIN) build Tests/ArraysSpanIndexRangeRuntime/ArrayIndexEnd >/dev/null; out=$$(mktemp); if ./Tests/ArraysSpanIndexRangeRuntime/ArrayIndexEnd/bin/ArrayIndexEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "VOID runtime error: array index out of range" $$out; rm -f $$out; echo True
 	@./$(BIN) build Tests/ArraysSpanIndexRangeRuntime/ArrayIndexPastStart >/dev/null; out=$$(mktemp); if ./Tests/ArraysSpanIndexRangeRuntime/ArrayIndexPastStart/bin/ArrayIndexPastStart >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "VOID runtime error: array index out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/ArraysSpanIndexRangeRuntime/ArrayRangeReverse >/dev/null; out=$$(mktemp); if ./Tests/ArraysSpanIndexRangeRuntime/ArrayRangeReverse/bin/ArrayRangeReverse >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: Range out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/ArraysSpanIndexRangeRuntime/SpanIndexEnd >/dev/null; out=$$(mktemp); if ./Tests/ArraysSpanIndexRangeRuntime/SpanIndexEnd/bin/SpanIndexEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: IndexOutOfRangeException: Span index out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/ArraysSpanIndexRangeRuntime/SpanRangeReverse >/dev/null; out=$$(mktemp); if ./Tests/ArraysSpanIndexRangeRuntime/SpanRangeReverse/bin/SpanRangeReverse >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: ArgumentOutOfRangeException: Range out of range" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/ArraysSpanIndexRangeRuntime/ReadOnlySpanIndexEnd >/dev/null; out=$$(mktemp); if ./Tests/ArraysSpanIndexRangeRuntime/ReadOnlySpanIndexEnd/bin/ReadOnlySpanIndexEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled exception: IndexOutOfRangeException: ReadOnlySpan index out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/ArraysSpanIndexRangeRuntime/ArrayRangeReverse >/dev/null; out=$$(mktemp); if ./Tests/ArraysSpanIndexRangeRuntime/ArrayRangeReverse/bin/ArrayRangeReverse >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: Range out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/ArraysSpanIndexRangeRuntime/SpanIndexEnd >/dev/null; out=$$(mktemp); if ./Tests/ArraysSpanIndexRangeRuntime/SpanIndexEnd/bin/SpanIndexEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled IndexOutOfRangeException: Span index out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/ArraysSpanIndexRangeRuntime/SpanRangeReverse >/dev/null; out=$$(mktemp); if ./Tests/ArraysSpanIndexRangeRuntime/SpanRangeReverse/bin/SpanRangeReverse >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled ArgumentOutOfRangeException: Range out of range" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/ArraysSpanIndexRangeRuntime/ReadOnlySpanIndexEnd >/dev/null; out=$$(mktemp); if ./Tests/ArraysSpanIndexRangeRuntime/ReadOnlySpanIndexEnd/bin/ReadOnlySpanIndexEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "Unhandled IndexOutOfRangeException: ReadOnlySpan index out of range" $$out; rm -f $$out; echo True
 	@grep -Fq 'vc_array_slice(' Tests/ArraysSpanIndexRangeCompletion/.void/ArraysSpanIndexRangeCompletion.c && grep -Fq 'vc_consumer_offset_' Tests/ArraysSpanIndexRangeCompletion/.void/ArraysSpanIndexRangeCompletion.c; echo True
 	@grep -Fq 'consumer_array' Compiler/include/semantic.h && grep -Fq 'binding->consumer_array' Compiler/src/compiler.c && grep -Fq 'ref_struct_value_escape_depth' Compiler/src/semantic.c; echo True
 	@out=$$(mktemp); $(MAKE) --no-print-directory test-general-index-range-consumer-semantics >$$out; test $$(grep -c '^True$$' $$out) -eq 55; rm -f $$out; echo True
@@ -4399,11 +4408,11 @@ test-managed-array-backed-memory-foundation: $(BIN)
 	@parse="$$(./$(BIN) parse StandardLibrary/Void/Memory.void)"; test "$$(printf '%s' "$$parse" | grep -Fc 'Field _array : T[] [private readonly]')" -eq 2 && test "$$(printf '%s' "$$parse" | grep -Fc 'Field _start : int [private readonly]')" -eq 2 && test "$$(printf '%s' "$$parse" | grep -Fc 'Field _length : int [private readonly]')" -eq 2; echo True
 	@parse="$$(./$(BIN) parse StandardLibrary/Void/Memory.void)"; test "$$(printf '%s' "$$parse" | grep -Fc 'Parameter array : T[]')" -eq 4; echo True
 	@parse="$$(./$(BIN) parse StandardLibrary/Void/Memory.void)"; test "$$(printf '%s' "$$parse" | grep -Fc 'Parameter start : int')" -eq 2 && test "$$(printf '%s' "$$parse" | grep -Fc 'Parameter length : int')" -eq 2; echo True
-	@set -e; ./$(BIN) build Tests/ManagedArrayBackedMemoryFoundationRuntime/NegativeStart >/dev/null; out=$$(mktemp); if ./Tests/ManagedArrayBackedMemoryFoundationRuntime/NegativeStart/bin/NegativeStart >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/ManagedArrayBackedMemoryFoundationRuntime/NegativeLength >/dev/null; out=$$(mktemp); if ./Tests/ManagedArrayBackedMemoryFoundationRuntime/NegativeLength/bin/NegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/ManagedArrayBackedMemoryFoundationRuntime/PastEnd >/dev/null; out=$$(mktemp); if ./Tests/ManagedArrayBackedMemoryFoundationRuntime/PastEnd/bin/PastEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/ManagedArrayBackedMemoryFoundationRuntime/NullNonEmpty >/dev/null; out=$$(mktemp); if ./Tests/ManagedArrayBackedMemoryFoundationRuntime/NullNonEmpty/bin/NullNonEmpty >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/ManagedArrayBackedMemoryFoundationRuntime/ReadOnlyPastEnd >/dev/null; out=$$(mktemp); if ./Tests/ManagedArrayBackedMemoryFoundationRuntime/ReadOnlyPastEnd/bin/ReadOnlyPastEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: ReadOnlyMemory range out of range' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/ManagedArrayBackedMemoryFoundationRuntime/NegativeStart >/dev/null; out=$$(mktemp); if ./Tests/ManagedArrayBackedMemoryFoundationRuntime/NegativeStart/bin/NegativeStart >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/ManagedArrayBackedMemoryFoundationRuntime/NegativeLength >/dev/null; out=$$(mktemp); if ./Tests/ManagedArrayBackedMemoryFoundationRuntime/NegativeLength/bin/NegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/ManagedArrayBackedMemoryFoundationRuntime/PastEnd >/dev/null; out=$$(mktemp); if ./Tests/ManagedArrayBackedMemoryFoundationRuntime/PastEnd/bin/PastEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/ManagedArrayBackedMemoryFoundationRuntime/NullNonEmpty >/dev/null; out=$$(mktemp); if ./Tests/ManagedArrayBackedMemoryFoundationRuntime/NullNonEmpty/bin/NullNonEmpty >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/ManagedArrayBackedMemoryFoundationRuntime/ReadOnlyPastEnd >/dev/null; out=$$(mktemp); if ./Tests/ManagedArrayBackedMemoryFoundationRuntime/ReadOnlyPastEnd/bin/ReadOnlyPastEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: ReadOnlyMemory range out of range' $$out; rm -f $$out; echo True
 	@grep -Fq 'private readonly T[] _array;' StandardLibrary/Void/Memory.void && grep -Fq 'private readonly int _start;' StandardLibrary/Void/Memory.void && grep -Fq 'private readonly int _length;' StandardLibrary/Void/Memory.void; echo True
 	@! grep -R -Fq 'Memory<' Compiler Runtime; echo True
 	@grep -Fq 'Void.Memory__g1_Node' Tests/ManagedArrayBackedMemoryFoundation/.void/ManagedArrayBackedMemoryFoundation.c && grep -Fq 'Void.ReadOnlyMemory__g1_int' Tests/ManagedArrayBackedMemoryFoundation/.void/ManagedArrayBackedMemoryFoundation.c; echo True
@@ -4424,15 +4433,15 @@ test-memory-slicing-conversion-span-bridge: $(BIN)
 	@parse="$$(./$(BIN) parse StandardLibrary/Void/Memory.void)"; test "$$(printf '%s' "$$parse" | grep -Fc 'Property Length : int [public]')" -eq 2 && test "$$(printf '%s' "$$parse" | grep -Fc 'Property IsEmpty : bool [public]')" -eq 2 && printf '%s' "$$parse" | grep -Fq 'Property Span : Span<T> [public]' && printf '%s' "$$parse" | grep -Fq 'Property Span : ReadOnlySpan<T> [public]'; echo True
 	@parse="$$(./$(BIN) parse StandardLibrary/Void/Memory.void)"; test "$$(printf '%s' "$$parse" | grep -Fc 'Method Slice(start:int) -> Memory<T> [public]')" -eq 1 && test "$$(printf '%s' "$$parse" | grep -Fc 'Method Slice(start:int, length:int) -> Memory<T> [public]')" -eq 1 && test "$$(printf '%s' "$$parse" | grep -Fc 'Method Slice(start:int) -> ReadOnlyMemory<T> [public]')" -eq 1 && test "$$(printf '%s' "$$parse" | grep -Fc 'Method Slice(start:int, length:int) -> ReadOnlyMemory<T> [public]')" -eq 1; echo True
 	@grep -Fq 'vc_consumer_offset_' Tests/MemorySlicingConversionSpanBridge/.void/MemorySlicingConversionSpanBridge.c && grep -Fq 'vc_receiver_' Tests/MemorySlicingConversionSpanBridge/.void/MemorySlicingConversionSpanBridge.c; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/MemorySlicingConversionSpanBridgeDiagnostics/ImplicitMemoryToSpan >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot assign 'Memory__g1_int' to local 's' of type 'Span__g1_int'" $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/MemorySlicingConversionSpanBridgeDiagnostics/ImplicitReadOnlyMemoryToSpan >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot assign 'ReadOnlyMemory__g1_int' to local 's' of type 'ReadOnlySpan__g1_int'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/MemorySlicingConversionSpanBridgeDiagnostics/ImplicitMemoryToSpan >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot assign 'Memory<int>' to local 's' of type 'Span<int>'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/MemorySlicingConversionSpanBridgeDiagnostics/ImplicitReadOnlyMemoryToSpan >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot assign 'ReadOnlyMemory<int>' to local 's' of type 'ReadOnlySpan<int>'" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/MemorySlicingConversionSpanBridgeDiagnostics/ReadOnlySpanWrite >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'cannot assign through a readonly receiver' $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/MemorySlicingConversionSpanBridgeDiagnostics/ReadOnlyToWritableMemory >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot assign 'ReadOnlyMemory__g1_int' to local 'm' of type 'Memory__g1_int'" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/MemorySlicingConversionSpanBridgeRuntime/MemorySliceNegativeStart >/dev/null; out=$$(mktemp); if ./Tests/MemorySlicingConversionSpanBridgeRuntime/MemorySliceNegativeStart/bin/MemorySliceNegativeStart >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/MemorySlicingConversionSpanBridgeRuntime/MemorySliceNegativeLength >/dev/null; out=$$(mktemp); if ./Tests/MemorySlicingConversionSpanBridgeRuntime/MemorySliceNegativeLength/bin/MemorySliceNegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/MemorySlicingConversionSpanBridgeRuntime/MemorySlicePastEnd >/dev/null; out=$$(mktemp); if ./Tests/MemorySlicingConversionSpanBridgeRuntime/MemorySlicePastEnd/bin/MemorySlicePastEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/MemorySlicingConversionSpanBridgeRuntime/ReadOnlyMemorySlicePastEnd >/dev/null; out=$$(mktemp); if ./Tests/MemorySlicingConversionSpanBridgeRuntime/ReadOnlyMemorySlicePastEnd/bin/ReadOnlyMemorySlicePastEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: ReadOnlyMemory range out of range' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/MemorySlicingConversionSpanBridgeRuntime/MemoryRangeReverse >/dev/null; out=$$(mktemp); if ./Tests/MemorySlicingConversionSpanBridgeRuntime/MemoryRangeReverse/bin/MemoryRangeReverse >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: Range out of range' $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/MemorySlicingConversionSpanBridgeDiagnostics/ReadOnlyToWritableMemory >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot assign 'ReadOnlyMemory<int>' to local 'm' of type 'Memory<int>'" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/MemorySlicingConversionSpanBridgeRuntime/MemorySliceNegativeStart >/dev/null; out=$$(mktemp); if ./Tests/MemorySlicingConversionSpanBridgeRuntime/MemorySliceNegativeStart/bin/MemorySliceNegativeStart >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/MemorySlicingConversionSpanBridgeRuntime/MemorySliceNegativeLength >/dev/null; out=$$(mktemp); if ./Tests/MemorySlicingConversionSpanBridgeRuntime/MemorySliceNegativeLength/bin/MemorySliceNegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/MemorySlicingConversionSpanBridgeRuntime/MemorySlicePastEnd >/dev/null; out=$$(mktemp); if ./Tests/MemorySlicingConversionSpanBridgeRuntime/MemorySlicePastEnd/bin/MemorySlicePastEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: Memory range out of range' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/MemorySlicingConversionSpanBridgeRuntime/ReadOnlyMemorySlicePastEnd >/dev/null; out=$$(mktemp); if ./Tests/MemorySlicingConversionSpanBridgeRuntime/ReadOnlyMemorySlicePastEnd/bin/ReadOnlyMemorySlicePastEnd >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: ReadOnlyMemory range out of range' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/MemorySlicingConversionSpanBridgeRuntime/MemoryRangeReverse >/dev/null; out=$$(mktemp); if ./Tests/MemorySlicingConversionSpanBridgeRuntime/MemoryRangeReverse/bin/MemoryRangeReverse >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: Range out of range' $$out; rm -f $$out; echo True
 	@grep -Fq 'public static implicit operator Memory<T>(T[] array)' StandardLibrary/Void/Memory.void && grep -Fq 'public static implicit operator ReadOnlyMemory<T>(Memory<T> memory)' StandardLibrary/Void/Memory.void && grep -Fq 'public static implicit operator ReadOnlyMemory<T>(T[] array)' StandardLibrary/Void/Memory.void; echo True
 	@! grep -Eq 'implicit operator (Span|ReadOnlySpan)<T>\(Memory|ReadOnlyMemory' StandardLibrary/Void/Memory.void; echo True
 	@grep -Fq 'emit_value_receiver_pointer' Compiler/src/compiler.c && grep -Fq '!receiver_is_plain_storage(context, target_node)' Compiler/src/compiler.c; echo True
@@ -4499,15 +4508,15 @@ test-contiguous-memory-operations-completion: $(BIN)
 	@./$(BIN) build Tests/ContiguousMemoryOperationsCompletion >/dev/null
 	@./Tests/ContiguousMemoryOperationsCompletion/bin/ContiguousMemoryOperationsCompletion
 	@set -e; ./$(BIN) publish Tests/ContiguousMemoryOperationsCompletion >/dev/null; test -x Tests/ContiguousMemoryOperationsCompletion/publish/ContiguousMemoryOperationsCompletion$(EXE_SUFFIX); echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/ContiguousMemoryOperationsDiagnostics/ReadOnlyFill >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "type 'ReadOnlySpan__g1_int' has no matching instance method 'Fill'" $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/ContiguousMemoryOperationsDiagnostics/ReadOnlyClear >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "type 'ReadOnlySpan__g1_int' has no matching instance method 'Clear'" $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/ContiguousMemoryOperationsDiagnostics/ReadOnlyDestination >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "type 'Span__g1_int' has no matching instance method 'CopyTo'" $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/ContiguousMemoryOperationsDiagnostics/TypeMismatch >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "type 'Span__g1_int' has no matching instance method 'CopyTo'" $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/ContiguousMemoryOperationsDiagnostics/MemoryReadOnlyDestination >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "type 'Memory__g1_int' has no matching instance method 'CopyTo'" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/ContiguousMemoryOperationsRuntime/SpanShort >/dev/null; out=$$(mktemp); if ./Tests/ContiguousMemoryOperationsRuntime/SpanShort/bin/ContiguousMemoryOperationsRuntimeSpanShort >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentException: Destination is too short' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/ContiguousMemoryOperationsRuntime/ReadOnlySpanShort >/dev/null; out=$$(mktemp); if ./Tests/ContiguousMemoryOperationsRuntime/ReadOnlySpanShort/bin/ContiguousMemoryOperationsRuntimeReadOnlySpanShort >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentException: Destination is too short' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/ContiguousMemoryOperationsRuntime/MemoryShort >/dev/null; out=$$(mktemp); if ./Tests/ContiguousMemoryOperationsRuntime/MemoryShort/bin/ContiguousMemoryOperationsRuntimeMemoryShort >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentException: Destination is too short' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/ContiguousMemoryOperationsRuntime/ReadOnlyMemoryShort >/dev/null; out=$$(mktemp); if ./Tests/ContiguousMemoryOperationsRuntime/ReadOnlyMemoryShort/bin/ContiguousMemoryOperationsRuntimeReadOnlyMemoryShort >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentException: Destination is too short' $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/ContiguousMemoryOperationsDiagnostics/ReadOnlyFill >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "type 'ReadOnlySpan<int>' has no matching instance method 'Fill'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/ContiguousMemoryOperationsDiagnostics/ReadOnlyClear >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "type 'ReadOnlySpan<int>' has no matching instance method 'Clear'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/ContiguousMemoryOperationsDiagnostics/ReadOnlyDestination >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "type 'Span<int>' has no matching instance method 'CopyTo'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/ContiguousMemoryOperationsDiagnostics/TypeMismatch >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "type 'Span<int>' has no matching instance method 'CopyTo'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/ContiguousMemoryOperationsDiagnostics/MemoryReadOnlyDestination >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "type 'Memory<int>' has no matching instance method 'CopyTo'" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/ContiguousMemoryOperationsRuntime/SpanShort >/dev/null; out=$$(mktemp); if ./Tests/ContiguousMemoryOperationsRuntime/SpanShort/bin/ContiguousMemoryOperationsRuntimeSpanShort >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentException: Destination is too short' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/ContiguousMemoryOperationsRuntime/ReadOnlySpanShort >/dev/null; out=$$(mktemp); if ./Tests/ContiguousMemoryOperationsRuntime/ReadOnlySpanShort/bin/ContiguousMemoryOperationsRuntimeReadOnlySpanShort >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentException: Destination is too short' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/ContiguousMemoryOperationsRuntime/MemoryShort >/dev/null; out=$$(mktemp); if ./Tests/ContiguousMemoryOperationsRuntime/MemoryShort/bin/ContiguousMemoryOperationsRuntimeMemoryShort >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentException: Destination is too short' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/ContiguousMemoryOperationsRuntime/ReadOnlyMemoryShort >/dev/null; out=$$(mktemp); if ./Tests/ContiguousMemoryOperationsRuntime/ReadOnlyMemoryShort/bin/ContiguousMemoryOperationsRuntimeReadOnlyMemoryShort >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentException: Destination is too short' $$out; rm -f $$out; echo True
 	@grep -Fq 'public readonly void CopyTo(Span<T> destination)' StandardLibrary/Void/Span.void && grep -Fq 'public readonly bool TryCopyTo(Span<T> destination)' StandardLibrary/Void/Span.void && grep -Fq 'public void Fill(T value)' StandardLibrary/Void/Span.void && grep -Fq 'public void Clear()' StandardLibrary/Void/Span.void && grep -Fq 'public void CopyTo(Memory<T> destination)' StandardLibrary/Void/Memory.void; echo True
 	@grep -Fq 'vc_span_copy' Tests/ContiguousMemoryOperationsCompletion/.void/ContiguousMemoryOperationsCompletion.c && grep -Fq 'memmove(destination, source, (size_t)element_count * element_size)' Tests/ContiguousMemoryOperationsCompletion/.void/ContiguousMemoryOperationsCompletion.c; echo True
 	@! grep -Eq 'public .*unsafe .*CopyTo|public .*unsafe .*Fill|public .*unsafe .*Clear' StandardLibrary/Void/Span.void StandardLibrary/Void/Memory.void; echo True
@@ -4528,7 +4537,7 @@ test-index-range-contiguous-memory-integration-audit: $(BIN)
 	@output="$$(VOID_GC_TRACE=1 ./Tests/IndexRangeContiguousMemoryIntegrationAudit/bin/IndexRangeContiguousMemoryIntegrationAudit 2>&1 >/dev/null)"; printf '%s' "$$output" | grep -Eq 'VOID GC: collection [0-9]+ freed [1-9][0-9]*, live [0-9]+'; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/IndexRangeContiguousMemoryIntegrationAuditDiagnostics/ReadOnlyWrite >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'cannot assign through a readonly receiver' $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/IndexRangeContiguousMemoryIntegrationAuditDiagnostics/ReadOnlyRefForeach >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'writable ref foreach cannot bind to ref readonly Current' $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/IndexRangeContiguousMemoryIntegrationAuditDiagnostics/ImplicitMemoryToSpan >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot assign 'Memory__g1_int' to local 'span' of type 'Span__g1_int'" $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/IndexRangeContiguousMemoryIntegrationAuditDiagnostics/ImplicitMemoryToSpan >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot assign 'Memory<int>' to local 'span' of type 'Span<int>'" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/IndexRangeContiguousMemoryIntegrationAuditDiagnostics/ReturnStackRange >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'cannot return ref struct value that refers to scoped or local storage' $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/IndexRangeContiguousMemoryIntegrationAuditDiagnostics/AsyncSpanRangeLocal >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "ref struct local 'span' cannot be used in async or iterator methods" $$out; rm -f $$out; echo True
 	@parse="$$(./$(BIN) parse Tests/IndexRangeContiguousMemoryIntegrationAudit/Program.void)"; printf '%s' "$$parse" | grep -Fq 'Method get_Item : ref int [public]' && printf '%s' "$$parse" | grep -Fq 'Method Slice : Window240 [public]' && printf '%s' "$$parse" | grep -Fq 'Parameter memory : Memory<Node240>'; echo True
@@ -4734,11 +4743,11 @@ test-unmanaged-span-construction-completion: $(BIN)
 	@out=$$(mktemp); if ./$(BIN) check Tests/UnmanagedSpanConstructionDiagnostics/VoidPointerImplicitBack >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot assign 'void*' to local 'typed' of type 'int*'" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/UnmanagedSpanConstructionDiagnostics/FixedEscape >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'cannot return ref struct value that refers to scoped or local storage' $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/UnmanagedSpanConstructionDiagnostics/ReadOnlyWrite >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'cannot assign through a readonly receiver' $$out; rm -f $$out; echo True
-	@out=$$(mktemp); if ./$(BIN) check Tests/UnmanagedSpanConstructionDiagnostics/SafeConstructor >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "unsafe constructor 'Span__g1_int' requires an unsafe method" $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/UnmanagedSpanConstructionRuntime/NegativeLength >/dev/null; out=$$(mktemp); if ./Tests/UnmanagedSpanConstructionRuntime/NegativeLength/bin/UnmanagedSpanConstructionRuntimeNegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: Span length cannot be negative' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/UnmanagedSpanConstructionRuntime/NullNonEmpty >/dev/null; out=$$(mktemp); if ./Tests/UnmanagedSpanConstructionRuntime/NullNonEmpty/bin/UnmanagedSpanConstructionRuntimeNullNonEmpty >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentNullException: Span pointer cannot be null for a non-empty span' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/UnmanagedSpanConstructionRuntime/ReadOnlyNegativeLength >/dev/null; out=$$(mktemp); if ./Tests/UnmanagedSpanConstructionRuntime/ReadOnlyNegativeLength/bin/UnmanagedSpanConstructionRuntimeReadOnlyNegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: ReadOnlySpan length cannot be negative' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/UnmanagedSpanConstructionRuntime/ReadOnlyNullNonEmpty >/dev/null; out=$$(mktemp); if ./Tests/UnmanagedSpanConstructionRuntime/ReadOnlyNullNonEmpty/bin/UnmanagedSpanConstructionRuntimeReadOnlyNullNonEmpty >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentNullException: ReadOnlySpan pointer cannot be null for a non-empty span' $$out; rm -f $$out; echo True
+	@out=$$(mktemp); if ./$(BIN) check Tests/UnmanagedSpanConstructionDiagnostics/SafeConstructor >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "unsafe constructor 'Span<int>' requires an unsafe method" $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/UnmanagedSpanConstructionRuntime/NegativeLength >/dev/null; out=$$(mktemp); if ./Tests/UnmanagedSpanConstructionRuntime/NegativeLength/bin/UnmanagedSpanConstructionRuntimeNegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: Span length cannot be negative' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/UnmanagedSpanConstructionRuntime/NullNonEmpty >/dev/null; out=$$(mktemp); if ./Tests/UnmanagedSpanConstructionRuntime/NullNonEmpty/bin/UnmanagedSpanConstructionRuntimeNullNonEmpty >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentNullException: Span pointer cannot be null for a non-empty span' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/UnmanagedSpanConstructionRuntime/ReadOnlyNegativeLength >/dev/null; out=$$(mktemp); if ./Tests/UnmanagedSpanConstructionRuntime/ReadOnlyNegativeLength/bin/UnmanagedSpanConstructionRuntimeReadOnlyNegativeLength >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: ReadOnlySpan length cannot be negative' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/UnmanagedSpanConstructionRuntime/ReadOnlyNullNonEmpty >/dev/null; out=$$(mktemp); if ./Tests/UnmanagedSpanConstructionRuntime/ReadOnlyNullNonEmpty/bin/UnmanagedSpanConstructionRuntimeReadOnlyNullNonEmpty >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentNullException: ReadOnlySpan pointer cannot be null for a non-empty span' $$out; rm -f $$out; echo True
 	@./$(BIN) check Tests/ArraySpanMemoryPinningCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/ContiguousMemoryOperationsCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/SpanEnumerationRefForeach >/dev/null && echo True
@@ -4834,7 +4843,7 @@ test-unmanaged-memory-native-buffer-integration-audit: $(BIN)
 	@./$(BIN) check Tests/PinningGcThreadsExceptionsNativeBoundaryIntegration/Library >/dev/null && echo True
 	@./$(BIN) check Tests/UnmanagedMemoryNativeBufferIntegrationAudit/AsyncUnsafe >/dev/null && echo True
 	@out=$$(mktemp); $(MAKE) --no-print-directory -s test-async-object-model-library-boundary-integration >$$out; test "$$(grep -c '^True$$' $$out)" -eq 31; rm -f $$out; echo True
-	@grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c && grep -Fq '"version": "0.0.250"' Tests/UnmanagedMemoryNativeBufferIntegrationAudit/Library/UnmanagedMemoryNativeBufferIntegrationAudit.voidproj && grep -Fq '"version": "0.0.250"' Tests/UnmanagedMemoryNativeBufferIntegrationAudit/Surface/UnmanagedMemoryNativeBufferIntegrationAudit.voidproj; echo True
+	@grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c && grep -Fq '"version": "0.0.250"' Tests/UnmanagedMemoryNativeBufferIntegrationAudit/Library/UnmanagedMemoryNativeBufferIntegrationAudit.voidproj && grep -Fq '"version": "0.0.250"' Tests/UnmanagedMemoryNativeBufferIntegrationAudit/Surface/UnmanagedMemoryNativeBufferIntegrationAudit.voidproj; echo True
 	@grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py && grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-native-heap-runtime-foundation
@@ -4854,7 +4863,7 @@ test-native-heap-runtime-foundation: $(BIN)
 	@grep -Fq 'vc_memory.c' Compiler/src/compiler.c && grep -Fq 'vc_memory_runtime.o' Compiler/src/compiler.c && grep -Fq 'runtime_memory_source' Compiler/src/compiler.c; echo True
 	@./$(BIN) build Tests/LibraryOutput/Library >/dev/null; ar t Tests/LibraryOutput/Library/bin/libVoid099Lib.a | grep -Fq 'vc_memory_runtime.o'; echo True
 	@./$(BIN) publish Tests/LibraryOutput/Library >/dev/null; ar t Tests/LibraryOutput/Library/publish/libVoid099Lib.a | grep -Fq 'vc_memory_runtime.o'; echo True
-	@grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c && grep -Fq '"version": "0.0.251"' Tests/NativeHeapRuntimeFoundation/NativeHeapRuntimeFoundation.voidproj; echo True
+	@grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c && grep -Fq '"version": "0.0.251"' Tests/NativeHeapRuntimeFoundation/NativeHeapRuntimeFoundation.voidproj; echo True
 	@./$(BIN) check Tests/NativeThreadRuntimeFoundation >/dev/null && ./$(BIN) check Tests/UnmanagedMemoryNativeBufferIntegrationAudit/Surface >/dev/null && echo True
 	@grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py && grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 .PHONY: test-native-memory-allocation-surface
@@ -4879,7 +4888,7 @@ test-native-memory-allocation-surface: $(BIN)
 	@out=$$(mktemp); $(MAKE) --no-print-directory -s test-native-heap-runtime-foundation >$$out; test "$$(grep -c '^True$$' $$out)" -eq 26; rm -f $$out; echo True
 	@./$(BIN) check Tests/UnmanagedMemoryNativeBufferIntegrationAudit/Surface >/dev/null && echo True
 	@./$(BIN) build Tests/LibraryOutput/Library >/dev/null; ar t Tests/LibraryOutput/Library/bin/libVoid099Lib.a | grep -Fq 'vc_memory_runtime.o'; echo True
-	@grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c && grep -Fq '"version": "0.0.252"' Tests/NativeMemoryAllocationSurface/NativeMemoryAllocationSurface.voidproj && grep -Fq '"version": "0.0.251"' Tests/NativeHeapRuntimeFoundation/NativeHeapRuntimeFoundation.voidproj; echo True
+	@grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c && grep -Fq '"version": "0.0.252"' Tests/NativeMemoryAllocationSurface/NativeMemoryAllocationSurface.voidproj && grep -Fq '"version": "0.0.251"' Tests/NativeHeapRuntimeFoundation/NativeHeapRuntimeFoundation.voidproj; echo True
 	@grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py && grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -4903,11 +4912,11 @@ test-generic-typed-native-allocation-completion: $(BIN)
 	@out=$$(mktemp); if ./$(BIN) check Tests/GenericTypedNativeAllocationDiagnostics/MissingConstraint >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "generic pointer return type using 'T' requires 'where T : unmanaged'" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/GenericTypedNativeAllocationDiagnostics/SafeAllocate >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "unsafe method 'Allocate' requires an unsafe method" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/GenericTypedNativeAllocationDiagnostics/RuntimeBypass >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Runtime.NativeMemoryTryAllocateElements is reserved for unsafe Void.NativeMemory methods' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/GenericTypedNativeAllocationRuntime/Overflow >/dev/null; out=$$(mktemp); if ./Tests/GenericTypedNativeAllocationRuntime/Overflow/bin/GenericTypedNativeAllocationRuntimeOverflow >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: OutOfMemoryException: native typed memory allocation failed' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/GenericTypedNativeAllocationRuntime/Overflow >/dev/null; out=$$(mktemp); if ./Tests/GenericTypedNativeAllocationRuntime/Overflow/bin/GenericTypedNativeAllocationRuntimeOverflow >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled OutOfMemoryException: native typed memory allocation failed' $$out; rm -f $$out; echo True
 	@out=$$(mktemp); $(MAKE) --no-print-directory -s test-native-memory-allocation-surface >$$out; test "$$(grep -c '^True$$' $$out)" -eq 28; rm -f $$out; echo True
 	@./$(BIN) check Tests/UnmanagedGenericConstraintFoundation >/dev/null && ./$(BIN) check Tests/GenericPointerUnmanagedStackStorage >/dev/null && echo True
 	@./$(BIN) check Tests/NativeStructs >/dev/null && ./$(BIN) check Tests/UnmanagedSpanConstructionCompletion >/dev/null && echo True
-	@grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c && grep -Fq '"version": "0.0.253"' Tests/GenericTypedNativeAllocationCompletion/GenericTypedNativeAllocationCompletion.voidproj && grep -Fq '"version": "0.0.252"' Tests/NativeMemoryAllocationSurface/NativeMemoryAllocationSurface.voidproj; echo True
+	@grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c && grep -Fq '"version": "0.0.253"' Tests/GenericTypedNativeAllocationCompletion/GenericTypedNativeAllocationCompletion.voidproj && grep -Fq '"version": "0.0.252"' Tests/NativeMemoryAllocationSurface/NativeMemoryAllocationSurface.voidproj; echo True
 	@grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py && grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -4936,11 +4945,11 @@ test-native-reallocation-alignment-completion: $(BIN)
 	@out=$$(mktemp); if ./$(BIN) check Tests/NativeReallocationAlignmentDiagnostics/SafeReallocate >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'pointer locals require an unsafe method' $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/NativeReallocationAlignmentDiagnostics/ManagedAlignedType >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "type argument 'string' must be an unmanaged type for generic parameter 'T'" $$out; rm -f $$out; echo True
 	@out=$$(mktemp); if ./$(BIN) check Tests/NativeReallocationAlignmentDiagnostics/RuntimeBypass >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Runtime.NativeMemoryTryAllocateAligned is reserved for unsafe Void.NativeMemory methods' $$out; rm -f $$out; echo True
-	@set -e; ./$(BIN) build Tests/NativeReallocationAlignmentRuntime/InvalidAlignment >/dev/null; out=$$(mktemp); if ./Tests/NativeReallocationAlignmentRuntime/InvalidAlignment/bin/NativeReallocationAlignmentRuntimeInvalidAlignment >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentException: Alignment must be a power of two' $$out; rm -f $$out; echo True
+	@set -e; ./$(BIN) build Tests/NativeReallocationAlignmentRuntime/InvalidAlignment >/dev/null; out=$$(mktemp); if ./Tests/NativeReallocationAlignmentRuntime/InvalidAlignment/bin/NativeReallocationAlignmentRuntimeInvalidAlignment >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentException: Alignment must be a power of two' $$out; rm -f $$out; echo True
 	@out=$$(mktemp); $(MAKE) --no-print-directory -s test-generic-typed-native-allocation-completion >$$out; test "$$(grep -c '^True$$' $$out)" -eq 39; rm -f $$out; echo True
 	@out=$$(mktemp); $(MAKE) --no-print-directory -s test-native-memory-allocation-surface >$$out; test "$$(grep -c '^True$$' $$out)" -eq 28; rm -f $$out; echo True
 	@out=$$(mktemp); $(MAKE) --no-print-directory -s test-native-heap-runtime-foundation >$$out; test "$$(grep -c '^True$$' $$out)" -eq 26; rm -f $$out; echo True
-	@grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c && grep -Fq '"version": "0.0.254"' Tests/NativeReallocationAlignmentCompletion/NativeReallocationAlignmentCompletion.voidproj && grep -Fq '"version": "0.0.253"' Tests/GenericTypedNativeAllocationCompletion/GenericTypedNativeAllocationCompletion.voidproj; echo True
+	@grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c && grep -Fq '"version": "0.0.254"' Tests/NativeReallocationAlignmentCompletion/NativeReallocationAlignmentCompletion.voidproj && grep -Fq '"version": "0.0.253"' Tests/GenericTypedNativeAllocationCompletion/GenericTypedNativeAllocationCompletion.voidproj; echo True
 	@grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py && grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -4970,7 +4979,7 @@ test-native-function-pointer-type-foundation: $(BIN)
 	@set -e; out=$$(mktemp); $(MAKE) --no-print-directory -s test-generic-pointer-unmanaged-stack-storage-completion >$$out; test "$$(grep -c '^True$$' $$out)" -eq 55; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); $(MAKE) --no-print-directory -s test-rectangular-array-initializers >$$out; test "$$(grep -c '^True$$' $$out)" -gt 0; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); $(MAKE) --no-print-directory -s test-unsafe-member-completion >$$out; test "$$(grep -c '^True$$' $$out)" -gt 0; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.255"' Tests/NativeFunctionPointerTypeFoundation/NativeFunctionPointerTypeFoundation.voidproj; grep -Fq '"version": "0.0.254"' Tests/NativeReallocationAlignmentCompletion/NativeReallocationAlignmentCompletion.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.255"' Tests/NativeFunctionPointerTypeFoundation/NativeFunctionPointerTypeFoundation.voidproj; grep -Fq '"version": "0.0.254"' Tests/NativeReallocationAlignmentCompletion/NativeReallocationAlignmentCompletion.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -4997,7 +5006,7 @@ test-native-function-address-indirect-call-completion: $(BIN) $(NATIVE_FUNCTION_
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/NativeFunctionAddressIndirectCallDiagnostics/SafeInvoke >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'native function pointer invocation requires an unsafe method' $$out; rm -f $$out; echo True
 	@set -e; grep -Fq 'has_function_pointer_address' Compiler/include/semantic.h; grep -Fq 'has_function_pointer_invoke' Compiler/include/semantic.h; grep -Fq 'vc_native_fn_call_' Compiler/src/compiler.c; grep -Fq 'vc_gc_native_call_begin()' Compiler/src/compiler.c; echo True
 	@set -e; out=$$(mktemp); $(MAKE) --no-print-directory -s test-native-function-pointer-type-foundation >$$out; test "$$(grep -c '^True$$' $$out)" -eq 44; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.256"' Tests/NativeFunctionAddressIndirectCallCompletion/NativeFunctionAddressIndirectCallCompletion.voidproj; grep -Fq '"version": "0.0.255"' Tests/NativeFunctionPointerTypeFoundation/NativeFunctionPointerTypeFoundation.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.256"' Tests/NativeFunctionAddressIndirectCallCompletion/NativeFunctionAddressIndirectCallCompletion.voidproj; grep -Fq '"version": "0.0.255"' Tests/NativeFunctionPointerTypeFoundation/NativeFunctionPointerTypeFoundation.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -5022,7 +5031,7 @@ test-native-function-pointer-abi-integration: $(BIN) $(NATIVE_FUNCTION_ABI_FIXTU
 	@set -e; ./$(BIN) check Tests/NativeFunctionPointerTypeFoundationDiagnostics/ExternParameter >/dev/null; echo True
 	@set -e; ./$(BIN) check Tests/NativeFunctionAddressIndirectCallCompletion >/dev/null; ./$(BIN) build Tests/NativeFunctionAddressIndirectCallCompletion >/dev/null; out=$$(mktemp); ./Tests/NativeFunctionAddressIndirectCallCompletion/bin/NativeFunctionAddressIndirectCallCompletion >$$out; test "$$(grep -c '^True$$' $$out)" -eq 15; rm -f $$out; echo True
 	@set -e; ./$(BIN) check Tests/NativeFunctionPointerTypeFoundation >/dev/null; ./$(BIN) build Tests/NativeFunctionPointerTypeFoundation >/dev/null; out=$$(mktemp); ./Tests/NativeFunctionPointerTypeFoundation/bin/NativeFunctionPointerTypeFoundation >$$out; test "$$(grep -c '^True$$' $$out)" -eq 22; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.257"' Tests/NativeFunctionPointerAbiIntegration/NativeFunctionPointerAbiIntegration.voidproj; grep -Fq '"version": "0.0.256"' Tests/NativeFunctionAddressIndirectCallCompletion/NativeFunctionAddressIndirectCallCompletion.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.257"' Tests/NativeFunctionPointerAbiIntegration/NativeFunctionPointerAbiIntegration.voidproj; grep -Fq '"version": "0.0.256"' Tests/NativeFunctionAddressIndirectCallCompletion/NativeFunctionAddressIndirectCallCompletion.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -5035,7 +5044,7 @@ test-generic-function-pointer-unmanaged-storage-integration: $(BIN) $(NATIVE_FUN
 	@./Tests/GenericFunctionPointerUnmanagedStorageIntegration/bin/GenericFunctionPointerUnmanagedStorageIntegration
 	@set -e; ./$(BIN) publish Tests/GenericFunctionPointerUnmanagedStorageIntegration >/dev/null; test -x Tests/GenericFunctionPointerUnmanagedStorageIntegration/publish/GenericFunctionPointerUnmanagedStorageIntegration$(EXE_SUFFIX); echo True
 	@set -e; c=Tests/GenericFunctionPointerUnmanagedStorageIntegration/.void/GenericFunctionPointerUnmanagedStorageIntegration.c; grep -Fq 'typedef int32_t (*vc_fnptr_0)(int32_t, int32_t);' $$c; grep -Fq 'vc_fnptr_0 * vc_l_' $$c; grep -Fq 'sizeof(vc_fnptr_0)' $$c; grep -Fq 'vc_fnptr_0 vc_sa_' $$c; ! grep -Eq 'vc_fnptr_0[^;]*void ?\*|void ?\*[^;]*vc_fnptr_0' $$c; echo True
-	@set -e; c=Tests/GenericFunctionPointerUnmanagedStorageIntegration/.void/GenericFunctionPointerUnmanagedStorageIntegration.c; grep -Fq 'Span__g1_delegate___g3_int_int_int' $$c; grep -Fq 'ReadOnlySpan__g1_delegate___g3_int_int_int' $$c; grep -Fq 'Span__g1_NativeEntry258' $$c; echo True
+	@set -e; c=Tests/GenericFunctionPointerUnmanagedStorageIntegration/.void/GenericFunctionPointerUnmanagedStorageIntegration.c; grep -Fq 'Span__g1_delegate__x2a__g3_int_int_int' $$c; grep -Fq 'ReadOnlySpan__g1_delegate__x2a__g3_int_int_int' $$c; grep -Fq 'Span__g1_NativeEntry258' $$c; echo True
 	@set -e; grep -Fq 'typedef struct VcTypeScan' Compiler/src/parser.c; grep -Fq 'generic_call_scan_greater' Compiler/src/parser.c; grep -Fq 'if (function_pointer)' Compiler/src/parser.c; echo True
 	@set -e; grep -Fq 'vc_semantic_type_is_function_pointer(type)' Compiler/src/semantic.c; grep -Fq 'generic_function_pointer' Compiler/src/semantic.c; grep -Fq 'native function pointer type arguments require an unsafe method' Compiler/src/semantic.c; echo True
 	@set -e; grep -Fq 'had_explicit_function_pointer_type_argument' Compiler/include/ast.h; grep -Fq 'monomorph_type_ref_has_explicit_function_pointer' Compiler/src/monomorph.c; grep -Fq 'call->as.call_expression.had_explicit_function_pointer_type_argument = true' Compiler/src/monomorph.c; echo True
@@ -5047,7 +5056,7 @@ test-generic-function-pointer-unmanaged-storage-integration: $(BIN) $(NATIVE_FUN
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/NativeFunctionPointerAbiIntegrationDiagnostics/DataPointerConversion >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot explicitly cast 'delegate*<int, int>' to 'void*'" $$out; rm -f $$out; echo True
 	@set -e; ./$(BIN) check Tests/NativeFunctionPointerAbiIntegration >/dev/null; ./$(BIN) build Tests/NativeFunctionPointerAbiIntegration >/dev/null; out=$$(mktemp); ./Tests/NativeFunctionPointerAbiIntegration/bin/NativeFunctionPointerAbiIntegration >$$out; test "$$(grep -c '^True$$' $$out)" -eq 12; rm -f $$out; echo True
 	@set -e; ./$(BIN) check Tests/GenericPointerUnmanagedStackStorage >/dev/null; ./$(BIN) build Tests/GenericPointerUnmanagedStackStorage >/dev/null; out=$$(mktemp); ./Tests/GenericPointerUnmanagedStackStorage/bin/GenericPointerUnmanagedStackStorage >$$out; test "$$(grep -c '^True$$' $$out)" -gt 0; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.258"' Tests/GenericFunctionPointerUnmanagedStorageIntegration/GenericFunctionPointerUnmanagedStorageIntegration.voidproj; grep -Fq '"version": "0.0.257"' Tests/NativeFunctionPointerAbiIntegration/NativeFunctionPointerAbiIntegration.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.258"' Tests/GenericFunctionPointerUnmanagedStorageIntegration/GenericFunctionPointerUnmanagedStorageIntegration.voidproj; grep -Fq '"version": "0.0.257"' Tests/NativeFunctionPointerAbiIntegration/NativeFunctionPointerAbiIntegration.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-native-heap-function-pointers-gc-threads-exception-boundary-integration
@@ -5070,7 +5079,7 @@ test-native-heap-function-pointers-gc-threads-exception-boundary-integration: $(
 	@./$(BIN) check Tests/GenericFunctionPointerUnmanagedStorageIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/PinningGcThreadsExceptionsNativeBoundaryIntegration/Library >/dev/null && echo True
 	@./$(BIN) check Tests/ThreadExceptionNativeBoundaryCleanup >/dev/null && echo True
-	@grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c && grep -Fq '"version": "0.0.259"' Tests/NativeHeapFunctionPointersGcThreadsExceptionBoundaryIntegration/Library/NativeHeapFunctionPointersGcThreadsExceptionBoundaryIntegration.voidproj && grep -Fq '"version": "0.0.258"' Tests/GenericFunctionPointerUnmanagedStorageIntegration/GenericFunctionPointerUnmanagedStorageIntegration.voidproj; echo True
+	@grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c && grep -Fq '"version": "0.0.259"' Tests/NativeHeapFunctionPointersGcThreadsExceptionBoundaryIntegration/Library/NativeHeapFunctionPointersGcThreadsExceptionBoundaryIntegration.voidproj && grep -Fq '"version": "0.0.258"' Tests/GenericFunctionPointerUnmanagedStorageIntegration/GenericFunctionPointerUnmanagedStorageIntegration.voidproj; echo True
 	@grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py && grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -5092,7 +5101,7 @@ test-native-heap-function-pointer-integration-audit: $(BIN) $(NATIVE_HEAP_FUNCTI
 	@./$(NATIVE_HEAP_FUNCTION_POINTER_AUDIT_TEST)
 	@set -e; ./$(BIN) publish Tests/NativeHeapFunctionPointerIntegrationAudit/Library >/dev/null; test -f Tests/NativeHeapFunctionPointerIntegrationAudit/Library/publish/libVoid260NativeHeapFunctionPointerAudit.a; echo True
 	@set -e; c=Tests/NativeHeapFunctionPointerIntegrationAudit/Surface/.void/NativeHeapFunctionPointerIntegrationAudit.c; grep -Fq 'typedef int32_t (*vc_fnptr_0)(int32_t, int32_t);' $$c; grep -Fq 'vc_fnptr_0 * vc_l_' $$c; grep -Fq 'sizeof(vc_fnptr_0)' $$c; ! grep -Eq 'vc_fnptr_0[^;]*void ?\*|void ?\*[^;]*vc_fnptr_0' $$c; echo True
-	@set -e; c=Tests/NativeHeapFunctionPointerIntegrationAudit/Surface/.void/NativeHeapFunctionPointerIntegrationAudit.c; grep -Fq 'Span__g1_delegate___g3_int_int_int' $$c; grep -Fq 'ReadOnlySpan__g1_delegate___g3_int_int_int' $$c; grep -Fq 'Span__g1_AuditEntry260' $$c; echo True
+	@set -e; c=Tests/NativeHeapFunctionPointerIntegrationAudit/Surface/.void/NativeHeapFunctionPointerIntegrationAudit.c; grep -Fq 'Span__g1_delegate__x2a__g3_int_int_int' $$c; grep -Fq 'ReadOnlySpan__g1_delegate__x2a__g3_int_int_int' $$c; grep -Fq 'Span__g1_AuditEntry260' $$c; echo True
 	@set -e; c=Tests/NativeHeapFunctionPointerIntegrationAudit/Library/.void/Void260NativeHeapFunctionPointerAudit.c; grep -Fq 'extern int32_t voidc260_audit_drive(vc_fnptr_0, int32_t (*)(int32_t), int32_t);' $$c; grep -Fq 'extern int32_t voidc260_audit_block_sum(int32_t *, int32_t);' $$c; echo True
 	@set -e; c=Tests/NativeHeapFunctionPointerIntegrationAudit/Library/.void/Void260NativeHeapFunctionPointerAudit.c; grep -Fq 'vc_native_fn_call_' $$c; grep -Fq 'vc_gc_native_call_begin();' $$c; grep -Fq 'vc_gc_native_call_end(vc_native_was_safe);' $$c; echo True
 	@set -e; c=Tests/NativeHeapFunctionPointerIntegrationAudit/Library/.void/Void260NativeHeapFunctionPointerAudit.c; grep -Fq 'vc_native_memory_try_allocate_elements_u64' $$c; grep -Fq 'vc_native_memory_try_allocate_aligned_elements_u64' $$c; grep -Fq 'vc_native_memory_free' $$c; echo True
@@ -5115,7 +5124,7 @@ test-native-heap-function-pointer-integration-audit: $(BIN) $(NATIVE_HEAP_FUNCTI
 	@./$(BIN) check Tests/NativeFunctionPointerAbiIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/GenericFunctionPointerUnmanagedStorageIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/NativeHeapFunctionPointersGcThreadsExceptionBoundaryIntegration/Library >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.260"' Tests/NativeHeapFunctionPointerIntegrationAudit/Surface/NativeHeapFunctionPointerIntegrationAudit.voidproj; grep -Fq '"version": "0.0.260"' Tests/NativeHeapFunctionPointerIntegrationAudit/Library/NativeHeapFunctionPointerIntegrationAudit.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.260"' Tests/NativeHeapFunctionPointerIntegrationAudit/Surface/NativeHeapFunctionPointerIntegrationAudit.voidproj; grep -Fq '"version": "0.0.260"' Tests/NativeHeapFunctionPointerIntegrationAudit/Library/NativeHeapFunctionPointerIntegrationAudit.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -5142,7 +5151,7 @@ test-awaiter-protocol-semantic-foundation: $(BIN)
 	@set -e; grep -Fq 'bool has_await_protocol;' Compiler/include/semantic.h; grep -Fq 'await_get_awaiter_method_index' Compiler/include/semantic.h; grep -Fq 'await_get_result_method_index' Compiler/include/semantic.h; echo True
 	@set -e; grep -Fq 'analyze_await_protocol' Compiler/src/semantic.c; grep -Fq 'GetAwaiter' Compiler/src/semantic.c; grep -Fq 'IsCompleted' Compiler/src/semantic.c; grep -Fq 'OnCompleted' Compiler/src/semantic.c; grep -Fq 'GetResult' Compiler/src/semantic.c; echo True
 	@set -e; ! grep -Fq 'semantic_task_type_info(context->model, awaited' Compiler/src/semantic.c; grep -Fq 'analyze_await_protocol(context, expression, awaited)' Compiler/src/semantic.c; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-general-awaiter-state-machine-lowering
@@ -5160,7 +5169,7 @@ test-general-awaiter-state-machine-lowering: $(BIN)
 	@./$(BIN) run Tests/AwaitSuspensionResumptionCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/AsyncAwaitTaskRuntimeIntegrationAudit >/dev/null && echo True
 	@set -e; ! grep -R -Fq 'AwaitProbe262\|SyncIntAwaiter262\|AsyncIntAwaiter262' Compiler Runtime StandardLibrary; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.262"' Tests/GeneralAwaiterStateMachineLowering/GeneralAwaiterStateMachineLowering.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.262"' Tests/GeneralAwaiterStateMachineLowering/GeneralAwaiterStateMachineLowering.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-task-awaiter-task-de-specialization
@@ -5179,7 +5188,7 @@ test-task-awaiter-task-de-specialization: $(BIN)
 	@./$(BIN) run Tests/AsyncTaskTypedAwaitResults >/dev/null && echo True
 	@./$(BIN) run Tests/AwaitForeachSyntaxLoweringCompletion >/dev/null && echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/AwaiterProtocolSemanticFoundationDiagnostics/MissingOnCompleted >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'must provide an unambiguous void OnCompleted(Action) method' $$out; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.263"' Tests/TaskAwaiterTaskDeSpecialization/TaskAwaiterTaskDeSpecialization.voidproj; grep -Fq '"version": "0.0.262"' Tests/GeneralAwaiterStateMachineLowering/GeneralAwaiterStateMachineLowering.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.263"' Tests/TaskAwaiterTaskDeSpecialization/TaskAwaiterTaskDeSpecialization.voidproj; grep -Fq '"version": "0.0.262"' Tests/GeneralAwaiterStateMachineLowering/GeneralAwaiterStateMachineLowering.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-generic-struct-extension-awaiter-completion
@@ -5205,8 +5214,8 @@ test-generic-struct-extension-awaiter-completion: $(BIN)
 	@./$(BIN) run Tests/ExtensionMethodCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/GenericMethodTypeInference >/dev/null && echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/AwaiterProtocolSemanticFoundationDiagnostics/MissingOnCompleted >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'must provide an unambiguous void OnCompleted(Action) method' $$out; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.264"' Tests/GenericStructExtensionAwaiterCompletion/GenericStructExtensionAwaiterCompletion.voidproj; grep -Fq '"version": "0.0.263"' Tests/TaskAwaiterTaskDeSpecialization/TaskAwaiterTaskDeSpecialization.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.264"' Tests/GenericStructExtensionAwaiterCompletion/GenericStructExtensionAwaiterCompletion.voidproj; grep -Fq '"version": "0.0.263"' Tests/TaskAwaiterTaskDeSpecialization/TaskAwaiterTaskDeSpecialization.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-task-yield-allocation-free-yield-awaitable
@@ -5224,8 +5233,8 @@ test-task-yield-allocation-free-yield-awaitable: $(BIN)
 	@./$(BIN) run Tests/TaskAwaiterTaskDeSpecialization >/dev/null && echo True
 	@./$(BIN) run Tests/GeneralAwaiterStateMachineLowering >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncAwaitTaskRuntimeIntegrationAudit >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.265"' Tests/TaskYieldAllocationFreeYieldAwaitable/TaskYieldAllocationFreeYieldAwaitable.voidproj; grep -Fq '"version": "0.0.264"' Tests/GenericStructExtensionAwaiterCompletion/GenericStructExtensionAwaiterCompletion.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.265"' Tests/TaskYieldAllocationFreeYieldAwaitable/TaskYieldAllocationFreeYieldAwaitable.voidproj; grep -Fq '"version": "0.0.264"' Tests/GenericStructExtensionAwaiterCompletion/GenericStructExtensionAwaiterCompletion.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-value-task-foundation
@@ -5245,8 +5254,8 @@ test-value-task-foundation: $(BIN)
 	@./$(BIN) run Tests/TaskAwaiterTaskDeSpecialization >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncAwaitTaskRuntimeIntegrationAudit >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncCancellationIntegration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.266"' Tests/ValueTaskFoundation/ValueTaskFoundation.voidproj; grep -Fq '"version": "0.0.265"' Tests/TaskYieldAllocationFreeYieldAwaitable/TaskYieldAllocationFreeYieldAwaitable.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.266"' Tests/ValueTaskFoundation/ValueTaskFoundation.voidproj; grep -Fq '"version": "0.0.265"' Tests/TaskYieldAllocationFreeYieldAwaitable/TaskYieldAllocationFreeYieldAwaitable.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-generic-value-task-result-gc-completion
@@ -5266,8 +5275,8 @@ test-generic-value-task-result-gc-completion: $(BIN)
 	@./$(BIN) run Tests/GenericStructExtensionAwaiterCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncAwaitTaskRuntimeIntegrationAudit >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncCancellationIntegration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.267"' Tests/GenericValueTaskResultGcCompletion/GenericValueTaskResultGcCompletion.voidproj; grep -Fq '"version": "0.0.266"' Tests/ValueTaskFoundation/ValueTaskFoundation.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.267"' Tests/GenericValueTaskResultGcCompletion/GenericValueTaskResultGcCompletion.voidproj; grep -Fq '"version": "0.0.266"' Tests/ValueTaskFoundation/ValueTaskFoundation.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-async-value-task-return-integration
 
@@ -5289,8 +5298,8 @@ test-async-value-task-return-integration: $(BIN)
 	@./$(BIN) run Tests/GeneralAwaiterStateMachineLowering >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncAwaitTaskRuntimeIntegrationAudit >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncCancellationIntegration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.268"' Tests/AsyncValueTaskReturnIntegration/AsyncValueTaskReturnIntegration.voidproj; grep -Fq '"version": "0.0.267"' Tests/GenericValueTaskResultGcCompletion/GenericValueTaskResultGcCompletion.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.268"' Tests/AsyncValueTaskReturnIntegration/AsyncValueTaskReturnIntegration.voidproj; grep -Fq '"version": "0.0.267"' Tests/GenericValueTaskResultGcCompletion/GenericValueTaskResultGcCompletion.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-awaiter-valuetask-gc-threads-exceptions-async-iteration-integration
 
@@ -5316,8 +5325,8 @@ test-awaiter-valuetask-gc-threads-exceptions-async-iteration-integration: $(BIN)
 	@./$(BIN) run Tests/AsyncValueTaskReturnIntegration >/dev/null && echo True
 	@./$(BIN) run Tests/GenericValueTaskResultGcCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncCancellationIntegration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.269"' Tests/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration.voidproj; grep -Fq '"version": "0.0.269"' Tests/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration/Library/AwaiterValueTaskGcThreadsExceptionsAsyncIterationLibrary.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.269"' Tests/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration.voidproj; grep -Fq '"version": "0.0.269"' Tests/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration/Library/AwaiterValueTaskGcThreadsExceptionsAsyncIterationLibrary.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-generalized-awaitables-valuetask-integration-audit
@@ -5344,8 +5353,8 @@ test-generalized-awaitables-valuetask-integration-audit: $(BIN)
 	@./$(BIN) run Tests/AsyncIteratorCompositionCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncIteratorCancellationIntegration >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncAwaitTaskRuntimeIntegrationAudit >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.270"' Tests/GeneralizedAwaitablesValueTaskIntegrationAudit/GeneralizedAwaitablesValueTaskIntegrationAudit.voidproj; grep -Fq '"version": "0.0.269"' Tests/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.270"' Tests/GeneralizedAwaitablesValueTaskIntegrationAudit/GeneralizedAwaitablesValueTaskIntegrationAudit.voidproj; grep -Fq '"version": "0.0.269"' Tests/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-async-lambda-syntax-semantic-foundation
@@ -5368,8 +5377,8 @@ test-async-lambda-syntax-semantic-foundation: $(BIN)
 	@./$(BIN) run Tests/Lambdas >/dev/null && echo True
 	@./$(BIN) check Tests/AsyncAwaitSyntaxSemanticFoundation >/dev/null && echo True
 	@./$(BIN) check Tests/GeneralizedAwaitablesValueTaskIntegrationAudit >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.271"' Tests/AsyncLambdaSyntaxSemanticFoundation/AsyncLambdaSyntaxSemanticFoundation.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.271"' Tests/AsyncLambdaSyntaxSemanticFoundation/AsyncLambdaSyntaxSemanticFoundation.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-async-lambda-state-machine-lowering
@@ -5386,8 +5395,8 @@ test-async-lambda-state-machine-lowering: $(BIN)
 	@./$(BIN) run Tests/GeneralAwaiterStateMachineLowering >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncValueTaskReturnIntegration >/dev/null && echo True
 	@./$(BIN) run Tests/Lambdas >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.272"' Tests/AsyncLambdaStateMachineLowering/AsyncLambdaStateMachineLowering.voidproj; grep -Fq '"version": "0.0.271"' Tests/AsyncLambdaSyntaxSemanticFoundation/AsyncLambdaSyntaxSemanticFoundation.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.272"' Tests/AsyncLambdaStateMachineLowering/AsyncLambdaStateMachineLowering.voidproj; grep -Fq '"version": "0.0.271"' Tests/AsyncLambdaSyntaxSemanticFoundation/AsyncLambdaSyntaxSemanticFoundation.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-async-lambda-capture-generic-gc-lifetime-completion
 
@@ -5406,8 +5415,8 @@ test-async-lambda-capture-generic-gc-lifetime-completion: $(BIN)
 	@./$(BIN) run Tests/AsyncLambdaStateMachineLowering >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncGenericsClosuresGcLifetimeIntegration >/dev/null && echo True
 	@./$(BIN) run Tests/Lambdas >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.273"' Tests/AsyncLambdaCaptureGenericGcLifetimeCompletion/AsyncLambdaCaptureGenericGcLifetimeCompletion.voidproj; grep -Fq '"version": "0.0.272"' Tests/AsyncLambdaStateMachineLowering/AsyncLambdaStateMachineLowering.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.273"' Tests/AsyncLambdaCaptureGenericGcLifetimeCompletion/AsyncLambdaCaptureGenericGcLifetimeCompletion.voidproj; grep -Fq '"version": "0.0.272"' Tests/AsyncLambdaStateMachineLowering/AsyncLambdaStateMachineLowering.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-async-lambda-delegate-event-valuetask-integration
 
@@ -5432,8 +5441,8 @@ test-async-lambda-delegate-event-valuetask-integration: $(BIN)
 	@./$(BIN) run Tests/InterfaceEvents >/dev/null && echo True
 	@./$(BIN) run Tests/CustomEventAccessors >/dev/null && echo True
 	@$(MAKE) --no-print-directory test-async-object-model-library-boundary-integration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.274"' Tests/AsyncLambdaDelegateEventValueTaskIntegration/AsyncLambdaDelegateEventValueTaskIntegration.voidproj; grep -Fq '"version": "0.0.273"' Tests/AsyncLambdaCaptureGenericGcLifetimeCompletion/AsyncLambdaCaptureGenericGcLifetimeCompletion.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.274"' Tests/AsyncLambdaDelegateEventValueTaskIntegration/AsyncLambdaDelegateEventValueTaskIntegration.voidproj; grep -Fq '"version": "0.0.273"' Tests/AsyncLambdaCaptureGenericGcLifetimeCompletion/AsyncLambdaCaptureGenericGcLifetimeCompletion.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-await-using-syntax-structural-async-dispose-semantics
 
@@ -5452,7 +5461,7 @@ test-await-using-syntax-structural-async-dispose-semantics: $(BIN)
 	@$(MAKE) --no-print-directory test-using-statement-completion >/dev/null && echo True
 	@$(MAKE) --no-print-directory test-using-declaration-completion >/dev/null && echo True
 	@./$(BIN) check Tests/GeneralizedAwaitablesValueTaskIntegrationAudit >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version":"0.0.275"' Tests/AwaitUsingSyntaxStructuralAsyncDisposeSemantics/AwaitUsingSyntaxStructuralAsyncDisposeSemantics.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.275"' Tests/AwaitUsingSyntaxStructuralAsyncDisposeSemantics/AwaitUsingSyntaxStructuralAsyncDisposeSemantics.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-await-using-state-machine-structured-cleanup-completion
 
@@ -5468,7 +5477,7 @@ test-await-using-state-machine-structured-cleanup-completion: $(BIN)
 	@./$(BIN) run Tests/AsyncExceptionCatchFinallyIntegration >/dev/null && echo True
 	@$(MAKE) --no-print-directory test-using-statement-completion >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncValueTaskReturnIntegration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version":"0.0.276"' Tests/AwaitUsingStateMachineStructuredCleanupCompletion/AwaitUsingStateMachineStructuredCleanupCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.276"' Tests/AwaitUsingStateMachineStructuredCleanupCompletion/AwaitUsingStateMachineStructuredCleanupCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-task-completion-factories-async-task-run-unwrapping
 
@@ -5492,8 +5501,8 @@ test-task-completion-factories-async-task-run-unwrapping: $(BIN) $(TASK_RUN_NATI
 	@./$(BIN) run Tests/AsyncLambdaStateMachineLowering >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncLambdaDelegateEventValueTaskIntegration >/dev/null && echo True
 	@./$(BIN) run Tests/DelegateCompletion >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.277"' Tests/TaskCompletionFactoriesAsyncTaskRunUnwrapping/TaskCompletionFactoriesAsyncTaskRunUnwrapping.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.277"' Tests/TaskCompletionFactoriesAsyncTaskRunUnwrapping/TaskCompletionFactoriesAsyncTaskRunUnwrapping.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-task-when-all-completion
 
@@ -5517,7 +5526,7 @@ test-task-when-all-completion: $(BIN)
 	@./$(BIN) run Tests/AsyncLambdaStateMachineLowering >/dev/null && echo True
 	@./$(BIN) run Tests/TaskCancellationIntegration >/dev/null && echo True
 	@set -e; grep -Fq 'require_better_than_rank' Compiler/src/semantic.c; grep -Fq 'static_match_rank' Compiler/src/semantic.c; ! grep -R -Fq 'Task.WhenAll' Compiler/src Compiler/include; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.278"' Tests/TaskWhenAllCompletion/TaskWhenAllCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.278"' Tests/TaskWhenAllCompletion/TaskWhenAllCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 
@@ -5546,7 +5555,7 @@ test-task-when-any-completion: $(BIN)
 	@./$(BIN) run Tests/TaskCompletionFactoriesAsyncTaskRunUnwrapping >/dev/null && echo True
 	@./$(BIN) run Tests/AwaitUsingStateMachineStructuredCleanupCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncLambdaStateMachineLowering >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.279"' Tests/TaskWhenAnyCompletion/TaskWhenAnyCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.279"' Tests/TaskWhenAnyCompletion/TaskWhenAnyCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-async-lambdas-async-disposal-task-composition-integration-audit
@@ -5571,7 +5580,7 @@ test-async-lambdas-async-disposal-task-composition-integration-audit: $(BIN)
 	@./$(BIN) run Tests/AsyncLambdaDelegateEventValueTaskIntegration >/dev/null && echo True
 	@./$(BIN) run Tests/AwaitUsingStateMachineStructuredCleanupCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/TaskWhenAnyCompletion >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.280"' Tests/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit.voidproj; grep -Fq '"version": "0.0.280"' Tests/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit/Library/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAuditLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.280"' Tests/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit.voidproj; grep -Fq '"version": "0.0.280"' Tests/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit/Library/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAuditLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-shared-monotonic-timer-queue-foundation
@@ -5592,7 +5601,7 @@ test-shared-monotonic-timer-queue-foundation: $(BIN)
 	@./$(BIN) run Tests/ManagedThreadPoolWorkQueueFoundation >/dev/null && echo True
 	@./$(BIN) run Tests/ManagedThreadSleepTimeoutContract >/dev/null && echo True
 	@./$(BIN) check Tests/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.281"' Tests/SharedMonotonicTimerQueueFoundation/SharedMonotonicTimerQueueFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.281"' Tests/SharedMonotonicTimerQueueFoundation/SharedMonotonicTimerQueueFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-task-delay-foundation
 
@@ -5609,7 +5618,7 @@ test-task-delay-foundation: $(BIN)
 	@./$(BIN) run Tests/TaskWhenAllCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit >/dev/null && echo True
 	@set -e; grep -Fq 'public void CancelAfter(int millisecondsDelay)' StandardLibrary/Void/Threading/Cancellation.void; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.282"' Tests/TaskDelayFoundation/TaskDelayFoundation.voidproj; grep -Fq '"version": "0.0.281"' Tests/SharedMonotonicTimerQueueFoundation/SharedMonotonicTimerQueueFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.282"' Tests/TaskDelayFoundation/TaskDelayFoundation.voidproj; grep -Fq '"version": "0.0.281"' Tests/SharedMonotonicTimerQueueFoundation/SharedMonotonicTimerQueueFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 
@@ -5627,7 +5636,7 @@ test-task-delay-cancellation-race-completion: $(BIN)
 	@./$(BIN) run Tests/TaskDelayFoundation >/dev/null && echo True
 	@./$(BIN) run Tests/TaskCancellationIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/SharedMonotonicTimerQueueFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.283"' Tests/TaskDelayCancellationRaceCompletion/TaskDelayCancellationRaceCompletion.voidproj; grep -Fq '"version": "0.0.282"' Tests/TaskDelayFoundation/TaskDelayFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.283"' Tests/TaskDelayCancellationRaceCompletion/TaskDelayCancellationRaceCompletion.voidproj; grep -Fq '"version": "0.0.282"' Tests/TaskDelayFoundation/TaskDelayFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-cancellation-token-source-disposal-registration-lifetime-completion
@@ -5646,7 +5655,7 @@ test-cancellation-token-source-disposal-registration-lifetime-completion: $(BIN)
 	@./$(BIN) run Tests/CancellationRegistrationWakeupCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/TaskDelayCancellationRaceCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/CancellationTokenSourceFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.284"' Tests/CancellationTokenSourceDisposalRegistrationLifetimeCompletion/CancellationTokenSourceDisposalRegistrationLifetimeCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'public void CancelAfter(int millisecondsDelay)' StandardLibrary/Void/Threading/Cancellation.void; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.284"' Tests/CancellationTokenSourceDisposalRegistrationLifetimeCompletion/CancellationTokenSourceDisposalRegistrationLifetimeCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'public void CancelAfter(int millisecondsDelay)' StandardLibrary/Void/Threading/Cancellation.void; echo True
 
 
 .PHONY: test-cancellation-token-source-cancel-after-completion
@@ -5663,7 +5672,7 @@ test-cancellation-token-source-cancel-after-completion: $(BIN)
 	@./$(BIN) run Tests/CancellationTokenSourceDisposalRegistrationLifetimeCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/TaskDelayCancellationRaceCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/SharedMonotonicTimerQueueFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.285"' Tests/CancellationTokenSourceCancelAfterCompletion/CancellationTokenSourceCancelAfterCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.285"' Tests/CancellationTokenSourceCancelAfterCompletion/CancellationTokenSourceCancelAfterCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-linked-cancellation-token-source-completion
@@ -5681,7 +5690,7 @@ test-linked-cancellation-token-source-completion: $(BIN)
 	@./$(BIN) run Tests/CancellationTokenSourceDisposalRegistrationLifetimeCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/CancellationTokenSourceCancelAfterCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/TaskDelayCancellationRaceCompletion >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.286"' Tests/LinkedCancellationTokenSourceCompletion/LinkedCancellationTokenSourceCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.286"' Tests/LinkedCancellationTokenSourceCompletion/LinkedCancellationTokenSourceCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-task-wait-async-cancellation-completion
@@ -5698,7 +5707,7 @@ test-task-wait-async-cancellation-completion: $(BIN)
 	@./$(BIN) run Tests/CancellationTokenSourceCancelAfterCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/TaskDelayCancellationRaceCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/TaskCompletionFactoriesAsyncTaskRunUnwrapping >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.287"' Tests/TaskWaitAsyncCancellationCompletion/TaskWaitAsyncCancellationCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.287"' Tests/TaskWaitAsyncCancellationCompletion/TaskWaitAsyncCancellationCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-task-wait-async-timeout-combined-cancellation-completion
@@ -5715,7 +5724,7 @@ test-task-wait-async-timeout-combined-cancellation-completion: $(BIN)
 	@./$(BIN) run Tests/TaskWaitAsyncCancellationCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/CancellationTokenSourceCancelAfterCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/SharedMonotonicTimerQueueFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.288"' Tests/TaskWaitAsyncTimeoutCombinedCancellationCompletion/TaskWaitAsyncTimeoutCombinedCancellationCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.288"' Tests/TaskWaitAsyncTimeoutCombinedCancellationCompletion/TaskWaitAsyncTimeoutCombinedCancellationCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-async-timing-cancellation-gc-thread-integration
 
@@ -5737,7 +5746,7 @@ test-async-timing-cancellation-gc-thread-integration: $(BIN)
 	@./$(BIN) check Tests/TaskWaitAsyncTimeoutCombinedCancellationCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/AsyncIteratorCancellationIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/AwaitUsingStateMachineStructuredCleanupCompletion >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.289"' Tests/AsyncTimingCancellationGcThreadIntegration/AsyncTimingCancellationGcThreadIntegration.voidproj; grep -Fq '"version": "0.0.289"' Tests/AsyncTimingCancellationGcThreadIntegration/Library/AsyncTimingCancellationGcThreadIntegrationLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.289"' Tests/AsyncTimingCancellationGcThreadIntegration/AsyncTimingCancellationGcThreadIntegration.voidproj; grep -Fq '"version": "0.0.289"' Tests/AsyncTimingCancellationGcThreadIntegration/Library/AsyncTimingCancellationGcThreadIntegrationLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-async-timing-cancellation-integration-audit
 
@@ -5759,7 +5768,7 @@ test-async-timing-cancellation-integration-audit: $(BIN)
 	@./$(BIN) check Tests/AsyncTimingCancellationGcThreadIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/TaskWaitAsyncTimeoutCombinedCancellationCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/LinkedCancellationTokenSourceCompletion >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.290"' Tests/AsyncTimingCancellationIntegrationAudit/AsyncTimingCancellationIntegrationAudit.voidproj; grep -Fq '"version": "0.0.290"' Tests/AsyncTimingCancellationIntegrationAudit/Library/AsyncTimingCancellationIntegrationAuditLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.290"' Tests/AsyncTimingCancellationIntegrationAudit/AsyncTimingCancellationIntegrationAudit.voidproj; grep -Fq '"version": "0.0.290"' Tests/AsyncTimingCancellationIntegrationAudit/Library/AsyncTimingCancellationIntegrationAuditLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; echo True
 
 
 
@@ -5781,7 +5790,7 @@ test-managed-string-representation-foundation: $(BIN)
 	@./$(BIN) run Tests/AsyncLambdaCaptureGenericGcLifetimeCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/ConstReadonly >/dev/null && ./$(BIN) run Tests/ConstantNullPatterns >/dev/null && echo True
 	@./$(BIN) run Tests/OptionalParams >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.291"' Tests/ManagedStringRepresentationFoundation/ManagedStringRepresentationFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.291"' Tests/ManagedStringRepresentationFoundation/ManagedStringRepresentationFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-length-aware-string-semantics
 
@@ -5794,14 +5803,14 @@ test-length-aware-string-semantics: $(BIN)
 	@set -e; out=$$(mktemp); ./$(BIN) run Tests/LengthAwareStringSemanticsOutput >$$out 2>/dev/null; $(PYTHON) -c 'from pathlib import Path; import sys; data=Path(sys.argv[1]).read_bytes(); raise SystemExit(0 if data.endswith(b"OUT\x00PUT" + (b"\r\n" if sys.platform == "win32" else b"\n")) else 1)' $$out; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) run Tests/LengthAwareStringSemanticsDiagnostics/MetadataArgument >$$out 2>&1; then rm -f $$out; exit 1; fi; $(PYTHON) -c 'from pathlib import Path; import sys; data=Path(sys.argv[1]).read_bytes(); raise SystemExit(0 if b"VOID runtime error: attribute argument was not found\n" in data else 1)' $$out; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) run Tests/LengthAwareStringSemanticsDiagnostics/RuntimeFail >$$out 2>&1; then rm -f $$out; exit 1; fi; $(PYTHON) -c 'from pathlib import Path; import sys; data=Path(sys.argv[1]).read_bytes(); raise SystemExit(0 if b"VOID runtime error: FAIL\x00TAIL\n" in data else 1)' $$out; rm -f $$out; echo True
-	@set -e; out=$$(mktemp); if ./$(BIN) run Tests/LengthAwareStringSemanticsDiagnostics/UnhandledException >$$out 2>&1; then rm -f $$out; exit 1; fi; $(PYTHON) -c 'from pathlib import Path; import sys; data=Path(sys.argv[1]).read_bytes(); raise SystemExit(0 if b"Unhandled exception: Exception: BOOM\x00TAIL\n" in data else 1)' $$out; rm -f $$out; echo True
+	@set -e; out=$$(mktemp); if ./$(BIN) run Tests/LengthAwareStringSemanticsDiagnostics/UnhandledException >$$out 2>&1; then rm -f $$out; exit 1; fi; $(PYTHON) -c 'from pathlib import Path; import sys; data=Path(sys.argv[1]).read_bytes(); raise SystemExit(0 if b"Unhandled Exception: BOOM\x00TAIL\n" in data else 1)' $$out; rm -f $$out; echo True
 	@./$(BIN) run Tests/ManagedStringRepresentationFoundation >/dev/null && echo True
 	@./$(BIN) run Tests/DictionaryHashSet >/dev/null && echo True
 	@./$(BIN) run Tests/ConstantNullPatterns >/dev/null && echo True
 	@./$(BIN) run Tests/Attributes >/dev/null && echo True
 	@./$(BIN) run Tests/TypeMetadata >/dev/null && echo True
 	@./$(BIN) run Tests/ExceptionsRuntimeControlFlowIntegration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.292"' Tests/LengthAwareStringSemantics/LengthAwareStringSemantics.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.292"' Tests/LengthAwareStringSemantics/LengthAwareStringSemantics.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 
@@ -5831,7 +5840,7 @@ test-native-string-abi-contract-metadata-foundation: $(BIN)
 	@./$(BIN) run Tests/NativeInterop >/dev/null && echo True
 	@./$(BIN) run Tests/ManagedStringRepresentationFoundation >/dev/null && echo True
 	@./$(BIN) run Tests/LengthAwareStringSemantics >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.293"' Tests/NativeStringAbiContractMetadataFoundation/NativeStringAbiContractMetadataFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.293"' Tests/NativeStringAbiContractMetadataFoundation/NativeStringAbiContractMetadataFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-borrowed-nul-native-string-parameters
 
@@ -5849,7 +5858,7 @@ test-borrowed-nul-native-string-parameters: $(BIN) $(BORROWED_NUL_NATIVE_FIXTURE
 	@./$(BIN) run Tests/ManagedStringRepresentationFoundation >/dev/null && echo True
 	@./$(BIN) run Tests/LengthAwareStringSemantics >/dev/null && echo True
 	@./$(BIN) run Tests/NativeInterop >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.294"' Tests/BorrowedNulNativeStringParameters/BorrowedNulNativeStringParameters.voidproj; grep -Fq 'public enum NativeStringKind' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'BorrowedNul' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.294"' Tests/BorrowedNulNativeStringParameters/BorrowedNulNativeStringParameters.voidproj; grep -Fq 'public enum NativeStringKind' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'BorrowedNul' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-pointer-length-native-string-parameters
 
@@ -5863,7 +5872,7 @@ test-pointer-length-native-string-parameters: $(BIN) $(POINTER_LENGTH_NATIVE_FIX
 	@./$(BIN) run Tests/BorrowedNulNativeStringParameters >/dev/null && echo True
 	@./$(BIN) run Tests/NativeInterop >/dev/null && echo True
 	@./$(BIN) check Tests/NativeStringAbiContractMetadataFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.295"' Tests/PointerLengthNativeStringParameters/PointerLengthNativeStringParameters.voidproj; grep -Fq 'BorrowedPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.295"' Tests/PointerLengthNativeStringParameters/PointerLengthNativeStringParameters.voidproj; grep -Fq 'BorrowedPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-borrowed-static-native-string-returns
 
@@ -5878,7 +5887,7 @@ test-borrowed-static-native-string-returns: $(BIN) $(STRING_RETURN_NATIVE_FIXTUR
 	@./$(BIN) run Tests/PointerLengthNativeStringParameters >/dev/null && echo True
 	@./$(BIN) run Tests/BorrowedNulNativeStringParameters >/dev/null && echo True
 	@./$(BIN) check Tests/NativeStringAbiContractMetadataFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.296"' Tests/BorrowedStaticNativeStringReturns/BorrowedStaticNativeStringReturns.voidproj; grep -Fq 'BorrowedPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'StaticPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.296"' Tests/BorrowedStaticNativeStringReturns/BorrowedStaticNativeStringReturns.voidproj; grep -Fq 'BorrowedPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'StaticPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-owned-native-string-returns
 
@@ -5897,7 +5906,7 @@ test-owned-native-string-returns: $(BIN) $(OWNED_STRING_RETURN_NATIVE_FIXTURE)
 	@./$(BIN) run Tests/PointerLengthNativeStringParameters >/dev/null && echo True
 	@./$(BIN) run Tests/BorrowedNulNativeStringParameters >/dev/null && echo True
 	@./$(BIN) check Tests/NativeStringAbiContractMetadataFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.297"' Tests/OwnedNativeStringReturns/OwnedNativeStringReturns.voidproj; grep -Fq 'OwnedNul' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'OwnedPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'native_string_release_c_name' Compiler/include/semantic.h; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.297"' Tests/OwnedNativeStringReturns/OwnedNativeStringReturns.voidproj; grep -Fq 'OwnedNul' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'OwnedPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'native_string_release_c_name' Compiler/include/semantic.h; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-void-string-export-abi
@@ -5916,7 +5925,7 @@ test-void-string-export-abi: $(BIN)
 	@./$(BIN) publish Tests/VoidStringExportAbi/Library >/dev/null; test -f Tests/VoidStringExportAbi/Library/publish/libVoidStringExportAbi.a; echo True
 	@./$(BIN) check Tests/LibraryOutput/Library >/dev/null && ./$(BIN) build Tests/LibraryOutput/Library >/dev/null && echo True
 	@./$(BIN) check Tests/OwnedNativeStringReturns >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.298"' Tests/VoidStringExportAbi/Library/VoidStringExportAbi.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.298"' Tests/VoidStringExportAbi/Library/VoidStringExportAbi.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-native-string-lifetime-callback-boundary-integration
@@ -5940,7 +5949,7 @@ test-native-string-lifetime-callback-boundary-integration: $(BIN) $(NATIVE_STRIN
 	@./$(BIN) check Tests/VoidStringExportAbi/Library >/dev/null && echo True
 	@./$(BIN) check Tests/OwnedNativeStringReturns >/dev/null && echo True
 	@./$(BIN) check Tests/NativeStringAbiContractMetadataFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.299"' Tests/NativeStringLifetimeCallbackBoundaryIntegration/NativeStringLifetimeCallbackBoundaryIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.299"' Tests/NativeStringLifetimeCallbackBoundaryIntegration/NativeStringLifetimeCallbackBoundaryIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-managed-strings-native-string-abi-integration-audit
@@ -5965,7 +5974,7 @@ test-managed-strings-native-string-abi-integration-audit: $(BIN) $(MANAGED_STRIN
 	@./$(BIN) run Tests/NativeStringLifetimeCallbackBoundaryIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/VoidStringExportAbi/Library >/dev/null && echo True
 	@./$(BIN) check Tests/OwnedNativeStringReturns >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.300"' Tests/ManagedStringsNativeStringAbiIntegrationAudit/ManagedStringsNativeStringAbiIntegrationAudit.voidproj; grep -Fq '"version": "0.0.300"' Tests/ManagedStringsNativeStringAbiIntegrationAudit/Library/ManagedStringsNativeStringAbiIntegrationAuditLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.300"' Tests/ManagedStringsNativeStringAbiIntegrationAudit/ManagedStringsNativeStringAbiIntegrationAudit.voidproj; grep -Fq '"version": "0.0.300"' Tests/ManagedStringsNativeStringAbiIntegrationAudit/Library/ManagedStringsNativeStringAbiIntegrationAuditLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-utf8-validity-unicode-scalar-foundation
@@ -5992,7 +6001,7 @@ test-utf8-validity-unicode-scalar-foundation: $(BIN) $(UTF8_VALIDITY_NATIVE_FIXT
 	@set -e; out=$$(mktemp); if $(UTF8_VALIDITY_EXPORT_CONSUMER) >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'VOID runtime error: string data is not valid UTF-8' $$out; rm -f $$out; echo True
 	@./$(BIN) run Tests/ManagedStringsNativeStringAbiIntegrationAudit >/dev/null; echo True
 	@./$(BIN) check Tests/NativeStringLifetimeCallbackBoundaryIntegration >/dev/null; ./$(BIN) check Tests/OwnedNativeStringReturns >/dev/null; ./$(BIN) check Tests/VoidStringExportAbi/Library >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.301"' Tests/Utf8ValidityUnicodeScalarFoundation/Utf8ValidityUnicodeScalarFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.301"' Tests/Utf8ValidityUnicodeScalarFoundation/Utf8ValidityUnicodeScalarFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-string-core-properties-empty-semantics
@@ -6009,7 +6018,7 @@ test-string-core-properties-empty-semantics: $(BIN)
 	@set -e; ./$(BIN) build Tests/StringCorePropertiesDiagnostics/NullReceiver >/dev/null; out=$$(mktemp); if Tests/StringCorePropertiesDiagnostics/NullReceiver/bin/StringCorePropertiesDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'VOID runtime error: string reference is null' $$out; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/StringCorePropertiesDiagnostics/UnknownStaticMember >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "string has no static member 'NotEmpty'" $$out; rm -f $$out; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.302"' Tests/StringCoreProperties/StringCoreProperties.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.302"' Tests/StringCoreProperties/StringCoreProperties.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-string-character-indexing-enumeration
 
@@ -6028,7 +6037,7 @@ test-string-character-indexing-enumeration: $(BIN)
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/StringCharacterIndexingEnumerationDiagnostics/WrongIndexType >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "string index must be 'int', 'Index', or 'Range', got 'bool'" $$out; rm -f $$out; echo True
 	@./$(BIN) run Tests/StringCoreProperties >/dev/null; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version":"0.0.303"' Tests/StringCharacterIndexingEnumeration/StringCharacterIndexingEnumeration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.303"' Tests/StringCharacterIndexingEnumeration/StringCharacterIndexingEnumeration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-string-range-slicing-substring
 
@@ -6040,8 +6049,8 @@ test-string-range-slicing-substring: $(BIN)
 	@set -e; ./$(BIN) publish Tests/StringRangeSlicingSubstring >/dev/null; test -x Tests/StringRangeSlicingSubstring/publish/StringRangeSlicingSubstring$(EXE_SUFFIX); echo True
 	@set -e; c=Tests/StringRangeSlicingSubstring/.void/StringRangeSlicingSubstring.c; grep -Fq 'vc_string_slice' $$c; grep -Fq 'vc_utf8_byte_offset' $$c; grep -Fq 'vc_string_scalar_length_i32' $$c; echo True
 	@set -e; out=$$(mktemp); ./$(BIN) build Tests/StringRangeSlicingSubstringDiagnostics/NullRangeReceiver >/dev/null; if Tests/StringRangeSlicingSubstringDiagnostics/NullRangeReceiver/bin/StringRangeSlicingSubstringDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'VOID runtime error: string reference is null' $$out; rm -f $$out; echo True
-	@set -e; out=$$(mktemp); ./$(BIN) build Tests/StringRangeSlicingSubstringDiagnostics/ReverseRange >/dev/null; if Tests/StringRangeSlicingSubstringDiagnostics/ReverseRange/bin/StringRangeSlicingSubstringDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: Range out of range' $$out; rm -f $$out; echo True
-	@set -e; out=$$(mktemp); ./$(BIN) build Tests/StringRangeSlicingSubstringDiagnostics/OutOfRangeRange >/dev/null; if Tests/StringRangeSlicingSubstringDiagnostics/OutOfRangeRange/bin/StringRangeSlicingSubstringDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: Range out of range' $$out; rm -f $$out; echo True
+	@set -e; out=$$(mktemp); ./$(BIN) build Tests/StringRangeSlicingSubstringDiagnostics/ReverseRange >/dev/null; if Tests/StringRangeSlicingSubstringDiagnostics/ReverseRange/bin/StringRangeSlicingSubstringDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: Range out of range' $$out; rm -f $$out; echo True
+	@set -e; out=$$(mktemp); ./$(BIN) build Tests/StringRangeSlicingSubstringDiagnostics/OutOfRangeRange >/dev/null; if Tests/StringRangeSlicingSubstringDiagnostics/OutOfRangeRange/bin/StringRangeSlicingSubstringDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: Range out of range' $$out; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); ./$(BIN) build Tests/StringRangeSlicingSubstringDiagnostics/SubstringNegativeStart >/dev/null; if Tests/StringRangeSlicingSubstringDiagnostics/SubstringNegativeStart/bin/StringRangeSlicingSubstringDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'VOID runtime error: string slice out of range' $$out; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); ./$(BIN) build Tests/StringRangeSlicingSubstringDiagnostics/SubstringNegativeLength >/dev/null; if Tests/StringRangeSlicingSubstringDiagnostics/SubstringNegativeLength/bin/StringRangeSlicingSubstringDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'VOID runtime error: string slice out of range' $$out; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); ./$(BIN) build Tests/StringRangeSlicingSubstringDiagnostics/SubstringOutOfRange >/dev/null; if Tests/StringRangeSlicingSubstringDiagnostics/SubstringOutOfRange/bin/StringRangeSlicingSubstringDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'VOID runtime error: string slice out of range' $$out; rm -f $$out; echo True
@@ -6058,7 +6067,7 @@ test-string-range-slicing-substring: $(BIN)
 	@./$(BIN) check Tests/IndexRangeContiguousMemoryIntegrationAudit >/dev/null; echo True
 	@./$(BIN) run Tests/ManagedStringsNativeStringAbiIntegrationAudit >/dev/null; echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/StringCharacterIndexingEnumerationDiagnostics/WrongIndexType >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "string index must be 'int', 'Index', or 'Range', got 'bool'" $$out; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version":"0.0.304"' Tests/StringRangeSlicingSubstring/StringRangeSlicingSubstring.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.304"' Tests/StringRangeSlicingSubstring/StringRangeSlicingSubstring.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-string-concatenation-composition
@@ -6079,7 +6088,7 @@ test-string-concatenation-composition: $(BIN)
 	@./$(BIN) run Tests/StringCharacterIndexingEnumeration >/dev/null; echo True
 	@./$(BIN) run Tests/StringCoreProperties >/dev/null; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version":"0.0.305"' Tests/StringConcatenationComposition/StringConcatenationComposition.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.305"' Tests/StringConcatenationComposition/StringConcatenationComposition.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-ordinal-string-search-comparison
 
@@ -6102,7 +6111,7 @@ test-ordinal-string-search-comparison: $(BIN)
 	@./$(BIN) run Tests/StringCharacterIndexingEnumeration >/dev/null; echo True
 	@./$(BIN) run Tests/StringCoreProperties >/dev/null; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version":"0.0.306"' Tests/OrdinalStringSearchComparison/OrdinalStringSearchComparison.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.306"' Tests/OrdinalStringSearchComparison/OrdinalStringSearchComparison.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 
@@ -6133,7 +6142,7 @@ test-immutable-string-editing: $(BIN)
 	@./$(BIN) run Tests/StringCharacterIndexingEnumeration >/dev/null; echo True
 	@./$(BIN) run Tests/StringCoreProperties >/dev/null; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version":"0.0.307"' Tests/ImmutableStringEditing/ImmutableStringEditing.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.307"' Tests/ImmutableStringEditing/ImmutableStringEditing.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-string-builder-foundation
@@ -6148,7 +6157,7 @@ test-string-builder-foundation: $(BIN)
 	@set -e; f=StandardLibrary/Void/Text/StringBuilder.void; grep -Fq 'namespace Void.Text;' $$f; grep -Fq 'public sealed class StringBuilder' $$f; grep -Fq 'public StringBuilder Append(string value)' $$f; grep -Fq 'public StringBuilder Append(char value)' $$f; grep -Fq 'public StringBuilder AppendLine(string value)' $$f; grep -Fq 'public StringBuilder Clear()' $$f; grep -Fq 'public string ToString()' $$f; grep -Fq 'Runtime.Utf8StringCopy' $$f; grep -Fq 'Runtime.StringFromUtf8' $$f; ! grep -Fq 'Runtime.StringBuilder' $$f; ! grep -Eq 'malloc|realloc|free[(]' $$f; echo True
 	@set -e; ./$(BIN) check Tests/StringBuilderFoundationDiagnostics/AppendPrimitive >/dev/null; echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/StringBuilderFoundationDiagnostics/RuntimeIntrinsicAccess >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Runtime.Utf8StringCopy is a low-level text primitive reserved for Void.Text implementations' $$out; rm -f $$out; echo True
-	@set -e; out=$$(mktemp); ./$(BIN) build Tests/StringBuilderFoundationDiagnostics/NegativeCapacity >/dev/null; if Tests/StringBuilderFoundationDiagnostics/NegativeCapacity/bin/StringBuilderFoundationDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: StringBuilder capacity cannot be negative' $$out; rm -f $$out; echo True
+	@set -e; out=$$(mktemp); ./$(BIN) build Tests/StringBuilderFoundationDiagnostics/NegativeCapacity >/dev/null; if Tests/StringBuilderFoundationDiagnostics/NegativeCapacity/bin/StringBuilderFoundationDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: StringBuilder capacity cannot be negative' $$out; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); ./$(BIN) build Tests/StringBuilderFoundationDiagnostics/InvalidChar >/dev/null; if Tests/StringBuilderFoundationDiagnostics/InvalidChar/bin/StringBuilderFoundationDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'VOID runtime error: char value is not a Unicode scalar value' $$out; rm -f $$out; echo True
 	@./$(BIN) run Tests/ImmutableStringEditing >/dev/null; echo True
 	@./$(BIN) run Tests/OrdinalStringSearchComparison >/dev/null; echo True
@@ -6157,7 +6166,7 @@ test-string-builder-foundation: $(BIN)
 	@./$(BIN) run Tests/StringCharacterIndexingEnumeration >/dev/null; echo True
 	@./$(BIN) run Tests/StringCoreProperties >/dev/null; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version":"0.0.308"' Tests/StringBuilderFoundation/StringBuilderFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; test $$(find StandardLibrary/Void -path '*/StringBuilder.void' -type f | wc -l) -eq 1; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.308"' Tests/StringBuilderFoundation/StringBuilderFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; test $$(find StandardLibrary/Void -path '*/StringBuilder.void' -type f | wc -l) -eq 1; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 
@@ -6180,7 +6189,7 @@ test-interpolated-strings-primitive-formatting: $(BIN)
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/InterpolatedStringsPrimitiveFormattingDiagnostics/UnsupportedValue >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "type 'StringBuilder' has no matching instance method 'Append'" $$out; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/InterpolatedStringsPrimitiveFormattingDiagnostics/RuntimeIntrinsicAccess >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Runtime.Utf8TryFormatInt64 is a low-level UTF-8 formatting primitive reserved for Void.Buffers.Text.Utf8Formatter' $$out; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/InterpolatedStringsPrimitiveFormattingDiagnostics/UnsupportedFormatSpecifier >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "expected '}' after interpolation expression, found ':'" $$out; rm -f $$out; echo True
-	@set -e; out=$$(mktemp); ./$(BIN) build Tests/InterpolatedStringsPrimitiveFormattingDiagnostics/UnsupportedStandardFormat >/dev/null; if Tests/InterpolatedStringsPrimitiveFormattingDiagnostics/UnsupportedStandardFormat/bin/InterpolatedStringsPrimitiveFormattingDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: FormatException: non-default StandardFormat is not implemented yet' $$out; rm -f $$out; echo True
+	@set -e; out=$$(mktemp); ./$(BIN) build Tests/InterpolatedStringsPrimitiveFormattingDiagnostics/UnsupportedStandardFormat >/dev/null; if Tests/InterpolatedStringsPrimitiveFormattingDiagnostics/UnsupportedStandardFormat/bin/InterpolatedStringsPrimitiveFormattingDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled FormatException: non-default StandardFormat is not implemented yet' $$out; rm -f $$out; echo True
 	@./$(BIN) run Tests/StringBuilderFoundation >/dev/null; echo True
 	@./$(BIN) run Tests/ImmutableStringEditing >/dev/null; echo True
 	@./$(BIN) run Tests/OrdinalStringSearchComparison >/dev/null; echo True
@@ -6191,7 +6200,7 @@ test-interpolated-strings-primitive-formatting: $(BIN)
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
 	@./$(BIN) run Tests/GenericMethodCalls >/dev/null; echo True
 	@./$(BIN) run Tests/NamedArguments >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version":"0.0.309"' Tests/InterpolatedStringsPrimitiveFormatting/InterpolatedStringsPrimitiveFormatting.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; test $$(find StandardLibrary/Void -path '*/StringBuilder.void' -type f | wc -l) -eq 1; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.309"' Tests/InterpolatedStringsPrimitiveFormatting/InterpolatedStringsPrimitiveFormatting.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; test $$(find StandardLibrary/Void -path '*/StringBuilder.void' -type f | wc -l) -eq 1; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-core-strings-utf8-text-construction-integration-audit
@@ -6206,9 +6215,9 @@ test-core-strings-utf8-text-construction-integration-audit: $(BIN)
 	@set -e; f=StandardLibrary/Void/Text/Encoding.void; grep -Fq 'public abstract class Encoding' $$f; grep -Fq 'public static Encoding UTF8' $$f; grep -Fq 'public sealed class UTF8Encoding' $$f; grep -Fq 'public override int GetByteCount(string value)' $$f; grep -Fq 'public override byte[] GetBytes(string value)' $$f; grep -Fq 'public override string GetString(byte[] bytes)' $$f; echo True
 	@set -e; f=StandardLibrary/Void/Environment.void; grep -Fq 'public static class Environment' $$f; grep -Fq 'public static string NewLine' $$f; grep -Fq 'Runtime.PlatformNewLine()' $$f; echo True
 	@set -e; grep -Fq 'vc_platform_new_line' Compiler/src/compiler.c; grep -Fq 'Runtime.PlatformNewLine is reserved for Void.Environment' Compiler/src/semantic.c; grep -Fq 'reserved for Void.Text implementations' Compiler/src/semantic.c; ! grep -R -Fq 'Runtime.StringBuilder' Compiler StandardLibrary; ! grep -R -Fq 'vc_string_builder_' Compiler StandardLibrary; echo True
-	@set -e; out=$$(mktemp); ./$(BIN) build Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/CapacityBelowLength >/dev/null; if Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/CapacityBelowLength/bin/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: StringBuilder capacity cannot be less than Length' $$out; rm -f $$out; echo True
-	@set -e; out=$$(mktemp); ./$(BIN) build Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/MaxCapacityExceeded >/dev/null; if Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/MaxCapacityExceeded/bin/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentOutOfRangeException: StringBuilder length exceeds MaxCapacity' $$out; rm -f $$out; echo True
-	@set -e; out=$$(mktemp); ./$(BIN) build Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/EncodingNull >/dev/null; if Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/EncodingNull/bin/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled exception: ArgumentNullException: Encoding.GetBytes value cannot be null' $$out; rm -f $$out; echo True
+	@set -e; out=$$(mktemp); ./$(BIN) build Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/CapacityBelowLength >/dev/null; if Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/CapacityBelowLength/bin/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: StringBuilder capacity cannot be less than Length' $$out; rm -f $$out; echo True
+	@set -e; out=$$(mktemp); ./$(BIN) build Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/MaxCapacityExceeded >/dev/null; if Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/MaxCapacityExceeded/bin/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentOutOfRangeException: StringBuilder length exceeds MaxCapacity' $$out; rm -f $$out; echo True
+	@set -e; out=$$(mktemp); ./$(BIN) build Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/EncodingNull >/dev/null; if Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/EncodingNull/bin/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Unhandled ArgumentNullException: Encoding.GetBytes value cannot be null' $$out; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/RuntimePlatformNewLineAccess >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Runtime.PlatformNewLine is reserved for Void.Environment' $$out; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/CoreStringsUtf8TextConstructionIntegrationAuditDiagnostics/RuntimeUtf8PrimitiveAccess >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'Runtime.Utf8StringByteCount is a low-level text primitive reserved for Void.Text implementations' $$out; rm -f $$out; echo True
 	@./$(BIN) run Tests/InterpolatedStringsPrimitiveFormatting >/dev/null; echo True
@@ -6220,7 +6229,7 @@ test-core-strings-utf8-text-construction-integration-audit: $(BIN)
 	@./$(BIN) run Tests/StringCharacterIndexingEnumeration >/dev/null; echo True
 	@./$(BIN) run Tests/StringCoreProperties >/dev/null; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.310"' Tests/CoreStringsUtf8TextConstructionIntegrationAudit/CoreStringsUtf8TextConstructionIntegrationAudit.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.310"' Tests/CoreStringsUtf8TextConstructionIntegrationAudit/CoreStringsUtf8TextConstructionIntegrationAudit.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-standard-library-compatibility-cleanup
 test-standard-library-compatibility-cleanup: $(BIN)
@@ -6230,7 +6239,7 @@ test-standard-library-compatibility-cleanup: $(BIN)
 test-console-read-line-foundation: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.311"' Tests/ConsoleReadLineFoundation/ConsoleReadLineFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.311"' Tests/ConsoleReadLineFoundation/ConsoleReadLineFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-console-read-shared-input-buffering
 test-console-read-shared-input-buffering: $(BIN)
@@ -6238,7 +6247,7 @@ test-console-read-shared-input-buffering: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.312"' Tests/ConsoleReadSharedInputBuffering/ConsoleReadSharedInputBuffering.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.312"' Tests/ConsoleReadSharedInputBuffering/ConsoleReadSharedInputBuffering.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-console-text-reader-writer
 test-console-text-reader-writer: $(BIN)
@@ -6247,7 +6256,7 @@ test-console-text-reader-writer: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.313"' Tests/ConsoleTextReaderWriter/ConsoleTextReaderWriter.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.313"' Tests/ConsoleTextReaderWriter/ConsoleTextReaderWriter.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-console-redirection
 test-console-redirection: $(BIN)
@@ -6257,7 +6266,7 @@ test-console-redirection: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.314"' Tests/ConsoleRedirection/ConsoleRedirection.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.314"' Tests/ConsoleRedirection/ConsoleRedirection.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 
 .PHONY: test-console-standard-streams
@@ -6269,7 +6278,7 @@ test-console-standard-streams: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.315"' Tests/ConsoleStandardStreams/ConsoleStandardStreams.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.315"' Tests/ConsoleStandardStreams/ConsoleStandardStreams.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 
 .PHONY: test-console-encoding-integration
@@ -6283,7 +6292,7 @@ test-console-encoding-integration: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.316"' Tests/ConsoleEncodingIntegration/ConsoleEncodingIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.316"' Tests/ConsoleEncodingIntegration/ConsoleEncodingIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 
 .PHONY: test-console-key-read-key
@@ -6298,7 +6307,7 @@ test-console-key-read-key: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.317"' Tests/ConsoleKeyReadKey/ConsoleKeyReadKey.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.317"' Tests/ConsoleKeyReadKey/ConsoleKeyReadKey.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-console-input-control
 # Milestone 318: KeyAvailable, Ctrl+C & Console Input Control
@@ -6313,7 +6322,7 @@ test-console-input-control: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.318"' Tests/ConsoleInputControl/ConsoleInputControl.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.318"' Tests/ConsoleInputControl/ConsoleInputControl.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-console-presentation-basics
 # Milestone 319: Interactive Console Presentation Basics
@@ -6329,7 +6338,7 @@ test-console-presentation-basics: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.319"' Tests/ConsolePresentationBasics/ConsolePresentationBasics.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.319"' Tests/ConsolePresentationBasics/ConsolePresentationBasics.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-console-standard-io-terminal-integration-audit
 # Milestone 320: Console, Standard IO & Terminal Integration Audit
@@ -6346,7 +6355,7 @@ test-console-standard-io-terminal-integration-audit: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.330"' Compiler/src/main.c; grep -Fq '"version": "0.0.320"' Tests/ConsoleStandardIoTerminalIntegrationAudit/ConsoleStandardIoTerminalIntegrationAudit.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 15421' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 277' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version": "0.0.320"' Tests/ConsoleStandardIoTerminalIntegrationAudit/ConsoleStandardIoTerminalIntegrationAudit.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-engine-list-operations test-engine-set-operations test-engine-memory-stream test-engine-readiness
 test-engine-list-operations: $(BIN)
@@ -6411,3 +6420,95 @@ test-rich-diagnostics: test-structured-diagnostic-foundation test-source-span-re
 .PHONY: test-host-process-portability
 test-host-process-portability: $(BIN)
 	@$(PYTHON) Tests/HostProcessPortability/test.py
+
+.PHONY: test-runtime-crash-diagnostics
+test-runtime-crash-diagnostics: $(BIN)
+	@$(PYTHON) Tests/RuntimeCrashDiagnostics/test.py
+
+.PHONY: test-type-qualified-member-access-foundation
+TYPE_RECEIVER_MODEL_TEST := Tests/TypeQualifiedMemberAccessFoundation/bin/model-test$(EXE_SUFFIX)
+$(TYPE_RECEIVER_MODEL_TEST): Tests/TypeQualifiedMemberAccessFoundation/model_test.c $(SOURCES) $(HEADERS)
+	@mkdir -p Tests/TypeQualifiedMemberAccessFoundation/bin
+	$(CC) $(CPPFLAGS) $(CFLAGS) Tests/TypeQualifiedMemberAccessFoundation/model_test.c Compiler/src/ast.c Compiler/src/lexer.c Compiler/src/parser.c Compiler/src/monomorph.c Compiler/src/semantic.c Compiler/src/diagnostic.c -o $@
+
+test-type-qualified-member-access-foundation: $(BIN) $(TYPE_RECEIVER_MODEL_TEST)
+	@$(TYPE_RECEIVER_MODEL_TEST)
+	@$(PYTHON) Tests/test_type_qualified_member_access_foundation.py
+
+.PHONY: test-static-value-type-receivers
+STATIC_VALUE_MODEL_TEST := Tests/StaticValueTypeReceivers/bin/model-test$(EXE_SUFFIX)
+$(STATIC_VALUE_MODEL_TEST): Tests/StaticValueTypeReceivers/model_test.c $(SOURCES) $(HEADERS)
+	@mkdir -p Tests/StaticValueTypeReceivers/bin
+	$(CC) $(CPPFLAGS) $(CFLAGS) Tests/StaticValueTypeReceivers/model_test.c Compiler/src/ast.c Compiler/src/lexer.c Compiler/src/parser.c Compiler/src/monomorph.c Compiler/src/semantic.c Compiler/src/diagnostic.c -o $@
+
+test-static-value-type-receivers: $(BIN) $(STATIC_VALUE_MODEL_TEST)
+	@$(STATIC_VALUE_MODEL_TEST)
+	@$(PYTHON) Tests/test_static_value_type_receivers.py
+.PHONY: test-static-api-integration
+# Milestone 339: Static API Integration & Generic Default Surfaces
+test-static-api-integration: $(BIN)
+	@$(PYTHON) Tests/test_static_api_integration.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.339"' Tests/StaticApiIntegration/StaticApiIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+
+.PHONY: test-builtin-floating-decimal-parsing
+# Milestone 338: Floating-Point & Decimal Parsing Completion
+test-builtin-floating-decimal-parsing: $(BIN)
+	@$(PYTHON) Tests/test_builtin_floating_decimal_parsing.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.338"' Tests/BuiltInFloatingDecimalParsing/BuiltInFloatingDecimalParsing.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+
+.PHONY: test-builtin-integral-bool-char-parsing
+# Milestone 337: Integral, Boolean & Character Parsing Foundation
+test-builtin-integral-bool-char-parsing: $(BIN)
+	@$(PYTHON) Tests/test_builtin_integral_bool_char_parsing.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.337"' Tests/BuiltInIntegralBoolCharParsing/BuiltInIntegralBoolCharParsing.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+
+.PHONY: test-builtin-static-values
+BUILTIN_STATIC_VALUES_MODEL_TEST := Tests/BuiltInStaticValues/bin/model-test$(EXE_SUFFIX)
+$(BUILTIN_STATIC_VALUES_MODEL_TEST): Tests/BuiltInStaticValues/model_test.c $(SOURCES) $(HEADERS)
+	@mkdir -p Tests/BuiltInStaticValues/bin
+	$(CC) $(CPPFLAGS) $(CFLAGS) Tests/BuiltInStaticValues/model_test.c Compiler/src/ast.c Compiler/src/lexer.c Compiler/src/parser.c Compiler/src/monomorph.c Compiler/src/semantic.c Compiler/src/diagnostic.c -o $@
+
+
+test-builtin-static-values: $(BIN) $(BUILTIN_STATIC_VALUES_MODEL_TEST)
+	@$(BUILTIN_STATIC_VALUES_MODEL_TEST)
+	@$(PYTHON) Tests/test_builtin_static_values.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.336"' Tests/BuiltInStaticValues/BuiltInStaticValues.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+
+.PHONY: test-builtin-associated-member-foundation
+BUILTIN_ASSOCIATED_MEMBER_MODEL_TEST := Tests/BuiltInAssociatedMemberFoundation/bin/model-test$(EXE_SUFFIX)
+$(BUILTIN_ASSOCIATED_MEMBER_MODEL_TEST): Tests/BuiltInAssociatedMemberFoundation/model_test.c $(SOURCES) $(HEADERS)
+	@mkdir -p Tests/BuiltInAssociatedMemberFoundation/bin
+	$(CC) $(CPPFLAGS) $(CFLAGS) Tests/BuiltInAssociatedMemberFoundation/model_test.c Compiler/src/ast.c Compiler/src/lexer.c Compiler/src/parser.c Compiler/src/monomorph.c Compiler/src/semantic.c Compiler/src/diagnostic.c -o $@
+
+test-builtin-associated-member-foundation: $(BIN) $(BUILTIN_ASSOCIATED_MEMBER_MODEL_TEST)
+	@$(BUILTIN_ASSOCIATED_MEMBER_MODEL_TEST)
+	@$(PYTHON) Tests/test_builtin_associated_member_foundation.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.335"' Tests/BuiltInAssociatedMemberFoundation/BuiltInAssociatedMemberFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+
+.PHONY: test-constructed-generic-static-members
+CONSTRUCTED_GENERIC_STATIC_MODEL_TEST := Tests/ConstructedGenericStaticMembers/bin/model-test$(EXE_SUFFIX)
+$(CONSTRUCTED_GENERIC_STATIC_MODEL_TEST): Tests/ConstructedGenericStaticMembers/model_test.c $(SOURCES) $(HEADERS)
+	@mkdir -p Tests/ConstructedGenericStaticMembers/bin
+	$(CC) $(CPPFLAGS) $(CFLAGS) Tests/ConstructedGenericStaticMembers/model_test.c Compiler/src/ast.c Compiler/src/lexer.c Compiler/src/parser.c Compiler/src/monomorph.c Compiler/src/semantic.c Compiler/src/diagnostic.c -o $@
+
+test-constructed-generic-static-members: $(BIN) $(CONSTRUCTED_GENERIC_STATIC_MODEL_TEST)
+	@$(CONSTRUCTED_GENERIC_STATIC_MODEL_TEST)
+	@$(PYTHON) Tests/test_constructed_generic_static_members.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.334"' Tests/ConstructedGenericStaticMembers/ConstructedGenericStaticMembers.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+
+.PHONY: test-static-callable-type-receivers
+STATIC_CALLABLE_MODEL_TEST := Tests/StaticCallableTypeReceivers/bin/model-test$(EXE_SUFFIX)
+$(STATIC_CALLABLE_MODEL_TEST): Tests/StaticCallableTypeReceivers/model_test.c $(SOURCES) $(HEADERS)
+	@mkdir -p Tests/StaticCallableTypeReceivers/bin
+	$(CC) $(CPPFLAGS) $(CFLAGS) Tests/StaticCallableTypeReceivers/model_test.c Compiler/src/ast.c Compiler/src/lexer.c Compiler/src/parser.c Compiler/src/monomorph.c Compiler/src/semantic.c Compiler/src/diagnostic.c -o $@
+
+test-static-callable-type-receivers: $(BIN) $(STATIC_CALLABLE_MODEL_TEST)
+	@$(STATIC_CALLABLE_MODEL_TEST)
+	@$(PYTHON) Tests/test_static_callable_type_receivers.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq '"version":"0.0.333"' Tests/StaticCallableTypeReceivers/StaticCallableTypeReceivers.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+
+.PHONY: test-type-qualified-static-members-builtins-integration-audit
+# Milestone 340: whole-block composition audit; historical suites remain separate.
+test-type-qualified-static-members-builtins-integration-audit: $(BIN)
+	@$(PYTHON) Tests/test_type_qualified_static_members_builtins_integration_audit.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.340"' Compiler/src/main.c; grep -Fq 'EXPECTED_TRUE_COUNT = 17460' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 288' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; echo True

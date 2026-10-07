@@ -1,0 +1,406 @@
+namespace Void.Internal;
+
+// Compiler-associated declaration scopes for VOID's canonical built-in types.
+// These are compile-time member owners only; built-in values remain native
+// primitive/string/object representations and are never boxed into these types.
+[BuiltInAssociated("bool")]
+internal static class BooleanAssociatedMembers
+{
+    public static bool Parse(string value)
+    {
+        bool result;
+        int status = PrimitiveParsing.ParseBoolean(value, out result);
+        if (status == PrimitiveParsing.Null) throw new ArgumentNullException("value");
+        if (status != PrimitiveParsing.Success) throw new FormatException();
+        return result;
+    }
+
+    public static bool TryParse(string value, out bool result)
+    {
+        int status = PrimitiveParsing.ParseBoolean(value, out result);
+        if (status != PrimitiveParsing.Success) result = false;
+        return status == PrimitiveParsing.Success;
+    }
+}
+
+[BuiltInAssociated("byte")]
+internal static class ByteAssociatedMembers
+{
+    [PrimitiveConstant("min")] public const byte MinValue = default;
+    [PrimitiveConstant("max")] public const byte MaxValue = default;
+
+    public static byte Parse(string value)
+    {
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, false, 255ul, 0ul, out magnitude, out negative);
+        if (status == PrimitiveParsing.Null) throw new ArgumentNullException("value");
+        if (status == PrimitiveParsing.Overflow) throw new OverflowException();
+        if (status != PrimitiveParsing.Success) throw new FormatException();
+        return (byte)magnitude;
+    }
+
+    public static bool TryParse(string value, out byte result)
+    {
+        result = (byte)0;
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, false, 255ul, 0ul, out magnitude, out negative);
+        if (status != PrimitiveParsing.Success) return false;
+        result = (byte)magnitude;
+        return true;
+    }
+}
+
+[BuiltInAssociated("sbyte")]
+internal static class SByteAssociatedMembers
+{
+    [PrimitiveConstant("min")] public const sbyte MinValue = default;
+    [PrimitiveConstant("max")] public const sbyte MaxValue = default;
+
+    public static sbyte Parse(string value)
+    {
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, true, 127ul, 128ul, out magnitude, out negative);
+        if (status == PrimitiveParsing.Null) throw new ArgumentNullException("value");
+        if (status == PrimitiveParsing.Overflow) throw new OverflowException();
+        if (status != PrimitiveParsing.Success) throw new FormatException();
+        return negative && magnitude != 0ul ? (sbyte)(-(long)(magnitude - 1ul) - 1l) : (sbyte)magnitude;
+    }
+
+    public static bool TryParse(string value, out sbyte result)
+    {
+        result = (sbyte)0;
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, true, 127ul, 128ul, out magnitude, out negative);
+        if (status != PrimitiveParsing.Success) return false;
+        result = negative && magnitude != 0ul ? (sbyte)(-(long)(magnitude - 1ul) - 1l) : (sbyte)magnitude;
+        return true;
+    }
+}
+
+[BuiltInAssociated("short")]
+internal static class Int16AssociatedMembers
+{
+    [PrimitiveConstant("min")] public const short MinValue = default;
+    [PrimitiveConstant("max")] public const short MaxValue = default;
+
+    public static short Parse(string value)
+    {
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, true, 32767ul, 32768ul, out magnitude, out negative);
+        if (status == PrimitiveParsing.Null) throw new ArgumentNullException("value");
+        if (status == PrimitiveParsing.Overflow) throw new OverflowException();
+        if (status != PrimitiveParsing.Success) throw new FormatException();
+        return negative && magnitude != 0ul ? (short)(-(long)(magnitude - 1ul) - 1l) : (short)magnitude;
+    }
+
+    public static bool TryParse(string value, out short result)
+    {
+        result = (short)0;
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, true, 32767ul, 32768ul, out magnitude, out negative);
+        if (status != PrimitiveParsing.Success) return false;
+        result = negative && magnitude != 0ul ? (short)(-(long)(magnitude - 1ul) - 1l) : (short)magnitude;
+        return true;
+    }
+}
+
+[BuiltInAssociated("ushort")]
+internal static class UInt16AssociatedMembers
+{
+    [PrimitiveConstant("min")] public const ushort MinValue = default;
+    [PrimitiveConstant("max")] public const ushort MaxValue = default;
+
+    public static ushort Parse(string value)
+    {
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, false, 65535ul, 0ul, out magnitude, out negative);
+        if (status == PrimitiveParsing.Null) throw new ArgumentNullException("value");
+        if (status == PrimitiveParsing.Overflow) throw new OverflowException();
+        if (status != PrimitiveParsing.Success) throw new FormatException();
+        return (ushort)magnitude;
+    }
+
+    public static bool TryParse(string value, out ushort result)
+    {
+        result = (ushort)0;
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, false, 65535ul, 0ul, out magnitude, out negative);
+        if (status != PrimitiveParsing.Success) return false;
+        result = (ushort)magnitude;
+        return true;
+    }
+}
+
+[BuiltInAssociated("int")]
+internal static class Int32AssociatedMembers
+{
+    [PrimitiveConstant("min")] public const int MinValue = default;
+    [PrimitiveConstant("max")] public const int MaxValue = default;
+
+    public static int Parse(string value)
+    {
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, true, 2147483647ul, 2147483648ul, out magnitude, out negative);
+        if (status == PrimitiveParsing.Null) throw new ArgumentNullException("value");
+        if (status == PrimitiveParsing.Overflow) throw new OverflowException();
+        if (status != PrimitiveParsing.Success) throw new FormatException();
+        return negative && magnitude != 0ul ? (int)(-(long)(magnitude - 1ul) - 1l) : (int)magnitude;
+    }
+
+    public static bool TryParse(string value, out int result)
+    {
+        result = (int)0;
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, true, 2147483647ul, 2147483648ul, out magnitude, out negative);
+        if (status != PrimitiveParsing.Success) return false;
+        result = negative && magnitude != 0ul ? (int)(-(long)(magnitude - 1ul) - 1l) : (int)magnitude;
+        return true;
+    }
+}
+
+[BuiltInAssociated("uint")]
+internal static class UInt32AssociatedMembers
+{
+    [PrimitiveConstant("min")] public const uint MinValue = default;
+    [PrimitiveConstant("max")] public const uint MaxValue = default;
+
+    public static uint Parse(string value)
+    {
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, false, 4294967295ul, 0ul, out magnitude, out negative);
+        if (status == PrimitiveParsing.Null) throw new ArgumentNullException("value");
+        if (status == PrimitiveParsing.Overflow) throw new OverflowException();
+        if (status != PrimitiveParsing.Success) throw new FormatException();
+        return (uint)magnitude;
+    }
+
+    public static bool TryParse(string value, out uint result)
+    {
+        result = (uint)0;
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, false, 4294967295ul, 0ul, out magnitude, out negative);
+        if (status != PrimitiveParsing.Success) return false;
+        result = (uint)magnitude;
+        return true;
+    }
+}
+
+[BuiltInAssociated("long")]
+internal static class Int64AssociatedMembers
+{
+    [PrimitiveConstant("min")] public const long MinValue = default;
+    [PrimitiveConstant("max")] public const long MaxValue = default;
+
+    public static long Parse(string value)
+    {
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, true, 9223372036854775807ul, 9223372036854775808ul, out magnitude, out negative);
+        if (status == PrimitiveParsing.Null) throw new ArgumentNullException("value");
+        if (status == PrimitiveParsing.Overflow) throw new OverflowException();
+        if (status != PrimitiveParsing.Success) throw new FormatException();
+        return negative && magnitude != 0ul ? (-(long)(magnitude - 1ul) - 1l) : (long)magnitude;
+    }
+
+    public static bool TryParse(string value, out long result)
+    {
+        result = (long)0;
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, true, 9223372036854775807ul, 9223372036854775808ul, out magnitude, out negative);
+        if (status != PrimitiveParsing.Success) return false;
+        result = negative && magnitude != 0ul ? (-(long)(magnitude - 1ul) - 1l) : (long)magnitude;
+        return true;
+    }
+}
+
+[BuiltInAssociated("ulong")]
+internal static class UInt64AssociatedMembers
+{
+    [PrimitiveConstant("min")] public const ulong MinValue = default;
+    [PrimitiveConstant("max")] public const ulong MaxValue = default;
+
+    public static ulong Parse(string value)
+    {
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, false, 18446744073709551615ul, 0ul, out magnitude, out negative);
+        if (status == PrimitiveParsing.Null) throw new ArgumentNullException("value");
+        if (status == PrimitiveParsing.Overflow) throw new OverflowException();
+        if (status != PrimitiveParsing.Success) throw new FormatException();
+        return magnitude;
+    }
+
+    public static bool TryParse(string value, out ulong result)
+    {
+        result = (ulong)0;
+        ulong magnitude;
+        bool negative;
+        int status = PrimitiveParsing.ParseIntegerMagnitude(value, false, 18446744073709551615ul, 0ul, out magnitude, out negative);
+        if (status != PrimitiveParsing.Success) return false;
+        result = magnitude;
+        return true;
+    }
+}
+
+[BuiltInAssociated("float")]
+internal static class SingleAssociatedMembers
+{
+    [PrimitiveConstant("min")] public const float MinValue = default;
+    [PrimitiveConstant("max")] public const float MaxValue = default;
+    [PrimitiveConstant("epsilon")] public const float Epsilon = default;
+    [PrimitiveConstant("nan")] public const float NaN = default;
+    [PrimitiveConstant("positive-infinity")] public const float PositiveInfinity = default;
+    [PrimitiveConstant("negative-infinity")] public const float NegativeInfinity = default;
+
+    public static float Parse(string value)
+    {
+        float result;
+        int status = PrimitiveParsing.ParseFloat32(value, out result);
+        if (status == PrimitiveParsing.Null) throw new ArgumentNullException("value");
+        if (status == PrimitiveParsing.Overflow) throw new OverflowException();
+        if (status != PrimitiveParsing.Success) throw new FormatException();
+        return result;
+    }
+
+    public static bool TryParse(string value, out float result)
+    {
+        int status = PrimitiveParsing.ParseFloat32(value, out result);
+        if (status != PrimitiveParsing.Success) result = (float)0;
+        return status == PrimitiveParsing.Success;
+    }
+}
+
+[BuiltInAssociated("double")]
+internal static class DoubleAssociatedMembers
+{
+    [PrimitiveConstant("min")] public const double MinValue = default;
+    [PrimitiveConstant("max")] public const double MaxValue = default;
+    [PrimitiveConstant("epsilon")] public const double Epsilon = default;
+    [PrimitiveConstant("nan")] public const double NaN = default;
+    [PrimitiveConstant("positive-infinity")] public const double PositiveInfinity = default;
+    [PrimitiveConstant("negative-infinity")] public const double NegativeInfinity = default;
+
+    public static double Parse(string value)
+    {
+        double result;
+        int status = PrimitiveParsing.ParseFloat64(value, out result);
+        if (status == PrimitiveParsing.Null) throw new ArgumentNullException("value");
+        if (status == PrimitiveParsing.Overflow) throw new OverflowException();
+        if (status != PrimitiveParsing.Success) throw new FormatException();
+        return result;
+    }
+
+    public static bool TryParse(string value, out double result)
+    {
+        int status = PrimitiveParsing.ParseFloat64(value, out result);
+        if (status != PrimitiveParsing.Success) result = (double)0;
+        return status == PrimitiveParsing.Success;
+    }
+}
+
+[BuiltInAssociated("decimal")]
+internal static class DecimalAssociatedMembers
+{
+    [PrimitiveConstant("min")] public const decimal MinValue = default;
+    [PrimitiveConstant("max")] public const decimal MaxValue = default;
+    [PrimitiveConstant("zero")] public const decimal Zero = default;
+    [PrimitiveConstant("one")] public const decimal One = default;
+    [PrimitiveConstant("minus-one")] public const decimal MinusOne = default;
+
+    public static decimal Parse(string value)
+    {
+        decimal result;
+        int status = PrimitiveParsing.ParseLongDouble(value, out result);
+        if (status == PrimitiveParsing.Null) throw new ArgumentNullException("value");
+        if (status == PrimitiveParsing.Overflow) throw new OverflowException();
+        if (status != PrimitiveParsing.Success) throw new FormatException();
+        return result;
+    }
+
+    public static bool TryParse(string value, out decimal result)
+    {
+        int status = PrimitiveParsing.ParseLongDouble(value, out result);
+        if (status != PrimitiveParsing.Success) result = decimal.Zero;
+        return status == PrimitiveParsing.Success;
+    }
+}
+
+[BuiltInAssociated("char")]
+internal static class CharAssociatedMembers
+{
+    [PrimitiveConstant("min")] public const char MinValue = default;
+    [PrimitiveConstant("max")] public const char MaxValue = default;
+
+    public static char Parse(string value)
+    {
+        char result;
+        int status = PrimitiveParsing.ParseChar(value, out result);
+        if (status == PrimitiveParsing.Null) throw new ArgumentNullException("value");
+        if (status != PrimitiveParsing.Success) throw new FormatException();
+        return result;
+    }
+
+    public static bool TryParse(string value, out char result)
+    {
+        int status = PrimitiveParsing.ParseChar(value, out result);
+        if (status != PrimitiveParsing.Success) result = char.MinValue;
+        return status == PrimitiveParsing.Success;
+    }
+}
+
+[BuiltInAssociated("string")]
+internal static class StringAssociatedMembers
+{
+    // Existing string surfaces are declared here so receiver/member identity,
+    // overloads and tooling use the ordinary static binder. Their established
+    // representation-specific lowering remains in the compiler backend.
+    public static string Empty { get { return string.Empty; } }
+
+    public static string Concat(string left, string right) { return string.Concat(left, right); }
+
+    public static string Concat(string left, bool right) { return string.Concat(left, right); }
+    public static string Concat(bool left, string right) { return string.Concat(left, right); }
+    public static string Concat(string left, byte right) { return string.Concat(left, right); }
+    public static string Concat(byte left, string right) { return string.Concat(left, right); }
+    public static string Concat(string left, sbyte right) { return string.Concat(left, right); }
+    public static string Concat(sbyte left, string right) { return string.Concat(left, right); }
+    public static string Concat(string left, short right) { return string.Concat(left, right); }
+    public static string Concat(short left, string right) { return string.Concat(left, right); }
+    public static string Concat(string left, ushort right) { return string.Concat(left, right); }
+    public static string Concat(ushort left, string right) { return string.Concat(left, right); }
+    public static string Concat(string left, int right) { return string.Concat(left, right); }
+    public static string Concat(int left, string right) { return string.Concat(left, right); }
+    public static string Concat(string left, uint right) { return string.Concat(left, right); }
+    public static string Concat(uint left, string right) { return string.Concat(left, right); }
+    public static string Concat(string left, long right) { return string.Concat(left, right); }
+    public static string Concat(long left, string right) { return string.Concat(left, right); }
+    public static string Concat(string left, ulong right) { return string.Concat(left, right); }
+    public static string Concat(ulong left, string right) { return string.Concat(left, right); }
+    public static string Concat(string left, float right) { return string.Concat(left, right); }
+    public static string Concat(float left, string right) { return string.Concat(left, right); }
+    public static string Concat(string left, double right) { return string.Concat(left, right); }
+    public static string Concat(double left, string right) { return string.Concat(left, right); }
+    public static string Concat(string left, decimal right) { return string.Concat(left, right); }
+    public static string Concat(decimal left, string right) { return string.Concat(left, right); }
+    public static string Concat(string left, char right) { return string.Concat(left, right); }
+    public static string Concat(char left, string right) { return string.Concat(left, right); }
+
+    public static bool Equals(string left, string right) { return string.Equals(left, right); }
+    public static int CompareOrdinal(string left, string right) { return string.CompareOrdinal(left, right); }
+}
+
+[BuiltInAssociated("object")]
+internal static class ObjectAssociatedMembers { }

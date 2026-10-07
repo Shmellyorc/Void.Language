@@ -1,0 +1,83 @@
+using Void;
+
+public static class ConstantContexts336
+{
+    public const int MaxCopy = int.MaxValue;
+    public const int MinCopy = int.MinValue;
+
+    public static bool HitMax(int value)
+    {
+        switch (value)
+        {
+            case int.MaxValue: return true;
+            default: return false;
+        }
+    }
+
+    public static bool HitMin(int value)
+    {
+        switch (value)
+        {
+            case int.MinValue: return true;
+            default: return false;
+        }
+    }
+}
+
+public static class UserStatics336
+{
+    public const int Constant = 17;
+    public static int Property { get { return 19; } }
+}
+
+public class Box336<T>
+{
+    public static int Marker;
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine(byte.MinValue == 0);
+        Console.WriteLine(byte.MaxValue == 255);
+        Console.WriteLine((int)(sbyte.MinValue) == -128 && (int)(sbyte.MaxValue) == 127);
+        Console.WriteLine((int)(short.MinValue) == -32768 && (int)(short.MaxValue) == 32767);
+        Console.WriteLine((int)(ushort.MinValue) == 0 && (int)(ushort.MaxValue) == 65535);
+        Console.WriteLine(int.MinValue == ~int.MaxValue && int.MaxValue == 2147483647);
+        Console.WriteLine(uint.MinValue == 0u && uint.MaxValue == 4294967295u);
+        Console.WriteLine(long.MinValue == ~long.MaxValue && long.MaxValue == 9223372036854775807L);
+        Console.WriteLine(ulong.MinValue == 0ul && ulong.MaxValue == 18446744073709551615ul);
+
+        int charMinimum = char.MinValue;
+        int charMaximum = char.MaxValue;
+        Console.WriteLine(charMinimum == 0 && charMaximum == 1114111);
+
+        Console.WriteLine(float.MinValue == -float.MaxValue && float.MaxValue > 0.0f);
+        Console.WriteLine(float.Epsilon > 0.0f && float.Epsilon < 1.0f);
+        Console.WriteLine(float.NaN != float.NaN);
+        Console.WriteLine(float.PositiveInfinity > float.MaxValue);
+        Console.WriteLine(float.NegativeInfinity < float.MinValue);
+
+        Console.WriteLine(double.MinValue == -double.MaxValue && double.MaxValue > 0.0);
+        Console.WriteLine(double.Epsilon > 0.0 && double.Epsilon < 1.0);
+        Console.WriteLine(double.NaN != double.NaN);
+        Console.WriteLine(double.PositiveInfinity > double.MaxValue);
+        Console.WriteLine(double.NegativeInfinity < double.MinValue);
+
+        Console.WriteLine(decimal.MinValue == -decimal.MaxValue && decimal.MaxValue > 0m);
+        Console.WriteLine(decimal.Zero == 0m && decimal.One == 1m && decimal.MinusOne == -1m);
+
+        Console.WriteLine(ConstantContexts336.MaxCopy == int.MaxValue);
+        Console.WriteLine(ConstantContexts336.MinCopy == int.MinValue);
+        Console.WriteLine(ConstantContexts336.HitMax(int.MaxValue));
+        Console.WriteLine(ConstantContexts336.HitMin(int.MinValue));
+        Console.WriteLine(UserStatics336.Constant == 17 && UserStatics336.Property == 19);
+        Console.WriteLine(string.Empty == "");
+
+        Box336<int>.Marker = 31;
+        Box336<float>.Marker = 47;
+        Box336<char>.Marker = 59;
+        Console.WriteLine(Box336<int>.Marker == 31 && Box336<float>.Marker == 47 && Box336<char>.Marker == 59);
+    }
+}

@@ -29,6 +29,7 @@ typedef struct VcQuerySymbol
     VcQuerySymbolKind kind;
     const char *name;
     const char *type_name;
+    char type_name_storage[96];
     const char *path;
     VcSourceSpan span;
     const char *definition_path;
@@ -50,6 +51,7 @@ typedef struct VcQueryParameter
 {
     const char *name;
     const char *type_name;
+    char type_name_storage[96];
     const char *modifier;
     bool is_optional;
     bool is_params;
@@ -60,7 +62,9 @@ typedef struct VcQuerySignature
     VcQuerySymbolKind kind;
     const char *name;
     const char *return_type;
+    char return_type_storage[96];
     bool is_static;
+    size_t generic_parameter_count;
     size_t parameter_count;
 } VcQuerySignature;
 
@@ -161,6 +165,14 @@ bool vc_query_signature_parameter_at(
     size_t signature_index,
     size_t parameter_index,
     VcQueryParameter *parameter);
+
+bool vc_query_signature_generic_parameter_at(
+    const VcQuerySession *session,
+    const char *path,
+    size_t offset,
+    size_t signature_index,
+    size_t generic_parameter_index,
+    const char **name);
 
 size_t vc_query_completions_at(
     const VcQuerySession *session,

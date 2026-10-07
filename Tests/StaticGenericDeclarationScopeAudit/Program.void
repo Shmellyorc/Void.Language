@@ -1,0 +1,45 @@
+using Void;
+public sealed class Arg { }
+public class Box<T> { public static int Marker = 1; }
+public static class GlobalProbe340 {
+    public static bool Run() {
+        Owner340.Box<Arg>.Value = new Arg();
+        return Owner340.Box<Arg>.Value != null;
+    }
+}
+namespace Owner340 {
+    public sealed class Arg { }
+    public class Box<T> {
+        public static T Value;
+        public static T Property { get; set; }
+        public static T Echo(T value) { return value; }
+        public static U Map<U>(U value) { return value; }
+    }
+}
+namespace Caller340 {
+    public sealed class Arg { }
+    public class Box<T> { public static int Marker = 3; }
+    public class Nested<T> { }
+    public delegate Arg Echo(Arg value);
+    public static class Program {
+        public static void Main() {
+            Console.WriteLine(GlobalProbe340.Run());
+            Console.WriteLine(Box<int>.Marker == 3);
+            Console.WriteLine(Caller340.Box<int>.Marker == 3);
+            Arg value = new Arg();
+            Owner340.Box<Arg>.Value = value;
+            Console.WriteLine(Owner340.Box<Caller340.Arg>.Value == value);
+            Owner340.Box<Arg>.Property = value;
+            Console.WriteLine(Owner340.Box<Caller340.Arg>.Property == value);
+            Echo echo = Owner340.Box<Arg>.Echo;
+            Console.WriteLine(echo(value) == value);
+            Console.WriteLine(Owner340.Box<int>.Map<Arg>(value) == value);
+            Console.WriteLine(Owner340.Box<int>.Map<Caller340.Arg>(value) == value);
+            Console.WriteLine(Owner340.Box<Owner340.Arg>.Value == null);
+            Owner340.Box<Nested<Arg>>.Value = new Nested<Arg>();
+            Console.WriteLine(Owner340.Box<Caller340.Nested<Caller340.Arg>>.Value != null);
+            GC.Collect();
+            Console.WriteLine(Owner340.Box<Arg>.Value == value);
+        }
+    }
+}

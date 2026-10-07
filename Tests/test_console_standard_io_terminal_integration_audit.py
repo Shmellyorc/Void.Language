@@ -184,7 +184,7 @@ standard_output = (root / "StandardLibrary/Void/IO/StandardOutput.void").read_te
 standard_streams = (root / "StandardLibrary/Void/IO/StandardStreams.void").read_text()
 compiler_source = (root / "Compiler/src/compiler.c").read_text()
 semantic_source = (root / "Compiler/src/semantic.c").read_text()
-readme = (root / "README.md").read_text()
+readme = (root / "Docs/README.md").read_text()
 
 require(
     "public static int Read()" in console

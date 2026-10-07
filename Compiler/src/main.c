@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define VOIDC_VERSION "0.0.330"
+#define VOIDC_VERSION "0.0.340"
 
 static void print_usage(void)
 {
@@ -147,12 +147,15 @@ static int resolve_command(const char *command, const char *target, const char *
     {
         puts("");
         fflush(stdout);
-        if (!vc_run_executable(output_path, error, sizeof(error)))
+        unsigned long program_exit_code = 0;
+        if (!vc_run_executable(output_path, &program_exit_code, error, sizeof(error)))
         {
             vc_diagnostic_report_error(error);
             vc_project_destroy(&project);
             return 1;
         }
+        vc_project_destroy(&project);
+        return (int)program_exit_code;
     }
 
     vc_project_destroy(&project);

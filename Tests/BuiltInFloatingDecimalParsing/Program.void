@@ -1,0 +1,153 @@
+using Void;
+
+public delegate bool FloatTryParser338(string value, out float result);
+
+public class Box338<T>
+{
+    public static int Marker;
+}
+
+public static class Program
+{
+    private static bool FloatFormatFailure()
+    {
+        try { float.Parse("1e"); } catch (FormatException) { return true; }
+        return false;
+    }
+
+    private static bool FloatOverflowFailure()
+    {
+        try { float.Parse("1e999999"); } catch (OverflowException) { return true; }
+        return false;
+    }
+
+    private static bool FloatNullFailure()
+    {
+        try { float.Parse(null); } catch (ArgumentNullException e) { return e.ParamName == "value"; }
+        return false;
+    }
+
+    private static bool DoubleOverflowFailure()
+    {
+        try { double.Parse("1e999999"); } catch (OverflowException) { return true; }
+        return false;
+    }
+
+    private static bool DecimalFormatFailure()
+    {
+        try { decimal.Parse("NaN"); } catch (FormatException) { return true; }
+        return false;
+    }
+
+    private static bool DecimalOverflowFailure()
+    {
+        try { decimal.Parse("1e999999"); } catch (OverflowException) { return true; }
+        return false;
+    }
+
+    public static void Main()
+    {
+        float f;
+        Console.WriteLine(float.Parse("0") == 0.0f);
+        Console.WriteLine("" + float.Parse("-0") == "-0");
+        Console.WriteLine(float.Parse("+0") == 0.0f);
+        Console.WriteLine(float.Parse("123") == 123.0f);
+        Console.WriteLine(float.Parse("-123") == -123.0f);
+        Console.WriteLine(float.Parse("1.5") == 1.5f);
+        Console.WriteLine(float.Parse(".5") == 0.5f);
+        Console.WriteLine(float.Parse("1.") == 1.0f);
+        Console.WriteLine(float.Parse("0.125") == 0.125f);
+        Console.WriteLine(float.Parse("1e3") == 1000.0f);
+        Console.WriteLine(float.Parse("1E3") == 1000.0f);
+        Console.WriteLine(float.Parse("1e+3") == 1000.0f);
+        Console.WriteLine(float.Parse("1e-3") == 0.001f);
+        Console.WriteLine(float.Parse("-2.5e2") == -250.0f);
+        Console.WriteLine(float.Parse(" \t1.5\r\n") == 1.5f);
+        Console.WriteLine(float.Parse("3.40282346638528859811704183484516925440e+38") == float.MaxValue);
+        f = 9.0f; Console.WriteLine(!float.TryParse("3.4028236e38", out f) && f == 0.0f);
+        Console.WriteLine(float.Parse("1.401298464324817070923729583289916131280e-45") == float.Epsilon);
+        Console.WriteLine(float.Parse("1e-99999") == 0.0f);
+        Console.WriteLine("" + float.Parse("-1e-99999") == "-0");
+        Console.WriteLine(float.Parse("NaN") != float.Parse("NaN"));
+        Console.WriteLine(float.Parse("nan") != float.Parse("NAN"));
+        Console.WriteLine(float.Parse("Infinity") == float.PositiveInfinity);
+        Console.WriteLine(float.Parse("+INFINITY") == float.PositiveInfinity);
+        Console.WriteLine(float.Parse("-infinity") == float.NegativeInfinity);
+        f = 9.0f; Console.WriteLine(!float.TryParse(".", out f) && f == 0.0f);
+        f = 9.0f; Console.WriteLine(!float.TryParse("1e", out f) && f == 0.0f);
+        f = 9.0f; Console.WriteLine(!float.TryParse("1e+", out f) && f == 0.0f);
+        f = 9.0f; Console.WriteLine(!float.TryParse("1.2.3", out f) && f == 0.0f);
+        f = 9.0f; Console.WriteLine(!float.TryParse("12abc", out f) && f == 0.0f);
+        f = 9.0f; Console.WriteLine(!float.TryParse("1 2", out f) && f == 0.0f);
+        f = 9.0f; Console.WriteLine(!float.TryParse("1,5", out f) && f == 0.0f);
+        f = 9.0f; Console.WriteLine(!float.TryParse("1_000", out f) && f == 0.0f);
+        f = 9.0f; Console.WriteLine(!float.TryParse("0x1.0p4", out f) && f == 0.0f);
+        f = 9.0f; Console.WriteLine(!float.TryParse(null, out f) && f == 0.0f);
+
+        double d;
+        Console.WriteLine(double.Parse("0") == 0.0);
+        Console.WriteLine("" + double.Parse("-0") == "-0");
+        Console.WriteLine(double.Parse("+123") == 123.0);
+        Console.WriteLine(double.Parse("-123.5") == -123.5);
+        Console.WriteLine(double.Parse(".5") == 0.5);
+        Console.WriteLine(double.Parse("1.") == 1.0);
+        Console.WriteLine(double.Parse("1e100") > 1e99);
+        Console.WriteLine(double.Parse("1e-3") == 0.001);
+        Console.WriteLine(double.Parse("1.797693134862315708145274237317043567981e+308") == double.MaxValue);
+        d = 9.0; Console.WriteLine(!double.TryParse("1.7976931348623159e308", out d) && d == 0.0);
+        Console.WriteLine(double.Parse("4.940656458412465441765687928682213723651e-324") == double.Epsilon);
+        Console.WriteLine(double.Parse("1e-99999") == 0.0);
+        Console.WriteLine("" + double.Parse("-1e-99999") == "-0");
+        Console.WriteLine(double.Parse("NaN") != double.Parse("nan"));
+        Console.WriteLine(double.Parse("Infinity") == double.PositiveInfinity);
+        Console.WriteLine(double.Parse("-INFINITY") == double.NegativeInfinity);
+        d = 9.0; Console.WriteLine(!double.TryParse("1e", out d) && d == 0.0);
+        d = 9.0; Console.WriteLine(!double.TryParse("1,5", out d) && d == 0.0);
+        d = 9.0; Console.WriteLine(!double.TryParse("12abc", out d) && d == 0.0);
+        d = 9.0; Console.WriteLine(!double.TryParse(null, out d) && d == 0.0);
+
+        decimal m;
+        Console.WriteLine(decimal.Parse("0") == decimal.Zero);
+        Console.WriteLine(decimal.Parse("-1") == decimal.MinusOne);
+        Console.WriteLine(decimal.Parse("1.25") == (decimal)1.25);
+        Console.WriteLine(decimal.Parse(".5") == (decimal)0.5);
+        Console.WriteLine(decimal.Parse("1.") == decimal.One);
+        Console.WriteLine(decimal.Parse("1e3") == (decimal)1000);
+        Console.WriteLine(decimal.Parse("-2.5e-4") == -0.00025m);
+        Console.WriteLine(decimal.Parse("  +1.5\t") == (decimal)1.5);
+        string decimalMaxText = "" + decimal.MaxValue;
+        Console.WriteLine(decimal.Parse(decimalMaxText) == decimal.MaxValue);
+        m = decimal.One; Console.WriteLine(!decimal.TryParse("1e999999", out m) && m == decimal.Zero);
+        m = decimal.One; Console.WriteLine(!decimal.TryParse("NaN", out m) && m == decimal.Zero);
+        m = decimal.One; Console.WriteLine(!decimal.TryParse("Infinity", out m) && m == decimal.Zero);
+        m = decimal.One; Console.WriteLine(!decimal.TryParse("+Infinity", out m) && m == decimal.Zero);
+        m = decimal.One; Console.WriteLine(!decimal.TryParse("-Infinity", out m) && m == decimal.Zero);
+        m = decimal.One; Console.WriteLine(!decimal.TryParse("1,5", out m) && m == decimal.Zero);
+        m = decimal.One; Console.WriteLine(!decimal.TryParse("1.2.3", out m) && m == decimal.Zero);
+        Console.WriteLine(decimal.TryParse("000000000000000000000000000001.25", out m) && m == (decimal)1.25);
+
+        Console.WriteLine(FloatFormatFailure());
+        Console.WriteLine(FloatOverflowFailure());
+        Console.WriteLine(FloatNullFailure());
+        Console.WriteLine(DoubleOverflowFailure());
+        Console.WriteLine(DecimalFormatFailure());
+        Console.WriteLine(DecimalOverflowFailure());
+
+        Func<string, float> parseFloat = float.Parse;
+        Func<string, double> parseDouble = double.Parse;
+        FloatTryParser338 tryFloat = float.TryParse;
+        Console.WriteLine(parseFloat("2.5") == 2.5f);
+        Console.WriteLine(parseDouble("2.5") == 2.5);
+        Console.WriteLine(tryFloat("3.5", out f) && f == 3.5f);
+
+        Console.WriteLine(int.Parse("42") == 42);
+        Console.WriteLine(bool.Parse("true"));
+        Console.WriteLine(char.Parse("😀") == (char)128512);
+        Console.WriteLine(float.Epsilon > 0.0f && double.Epsilon > 0.0 && decimal.MaxValue > decimal.Zero);
+
+        Box338<float>.Marker = 1;
+        Box338<double>.Marker = 2;
+        Box338<decimal>.Marker = 3;
+        Console.WriteLine(Box338<float>.Marker == 1 && Box338<double>.Marker == 2 && Box338<decimal>.Marker == 3);
+    }
+}

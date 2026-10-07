@@ -1,0 +1,96 @@
+using Void;
+
+namespace Example
+{
+    public class Widget
+    {
+        public static int Field;
+        public static Shadow Root;
+        public static Shadow AutoRoot { get; set; }
+        public static string Text;
+        public const int Constant = 7;
+        public static int Property { get; set; }
+        public static int Method(int value) { return value + 1; }
+        public int Instance = 9;
+    }
+    public class Container<T>
+    {
+        public static int Number = 11;
+        public static T Echo(T value) { return value; }
+    }
+}
+public static class Utilities { public static int Number = 3; }
+public struct Packet { public static int Number = 4; }
+public readonly struct Frozen { public const int Number = 5; }
+public enum Choice { First = 6 }
+public delegate int Transform(int value);
+public interface IFactory { static int Create(int value); }
+public class Factory : IFactory { public static int Create(int value) { return value; } }
+public class Box<T> { public static int Number = 12; public static Shadow Root; public static string Text; }
+public class Shadow { public int Number = 13; }
+public class FieldOwner
+{
+    public Shadow Shadow = new Shadow();
+    public int Read() { return Shadow.Number; }
+}
+public class PropertyOwner
+{
+    public Shadow Shadow { get; set; }
+    public int Read() { return Shadow.Number; }
+}
+public class NamespaceValue { public Example.Widget Widget; }
+public static class Program
+{
+    public static void Main()
+    {
+        Example.Widget.Field = 2;
+        Example.Widget.Property = 8;
+        Console.WriteLine(Example.Widget.Field == 2);
+        Console.WriteLine(Example.Widget.Constant == 7);
+        Console.WriteLine(Example.Widget.Property == 8);
+        Example.Widget.Root ??= new Shadow();
+        Example.Widget.AutoRoot ??= new Shadow();
+        Example.Widget.Text = "a";
+        Example.Widget.Text += "b";
+        Console.WriteLine(Example.Widget.Root.Number == 13);
+        Console.WriteLine(Example.Widget.AutoRoot.Number == 13);
+        Console.WriteLine(Example.Widget.Text == "ab");
+        Box<int>.Root ??= new Shadow();
+        Box<int>.Text = "a";
+        Box<int>.Text += "b";
+        Console.WriteLine(Box<int>.Root.Number == 13);
+        Console.WriteLine(Box<int>.Text == "ab");
+        Console.WriteLine(Example.Widget.Method(9) == 10);
+        Transform method = Example.Widget.Method;
+        Console.WriteLine(method(10) == 11);
+        Console.WriteLine(Utilities.Number == 3);
+        Console.WriteLine(Packet.Number == 4);
+        Console.WriteLine(Frozen.Number == 5);
+        Console.WriteLine(Choice.First == (Choice)6);
+        Console.WriteLine(Factory.Create(10) == 10);
+        Console.WriteLine(Box<int>.Number == 12);
+        Console.WriteLine(Box<Box<int>>.Number == 12);
+        Console.WriteLine(Example.Container<int>.Number == 11);
+        Console.WriteLine(Example.Container<int>.Echo(14) == 14);
+        Example.Container<int>.Number = 15;
+        Console.WriteLine(Container<int>.Number == 15);
+        Console.WriteLine(Example.Container<string>.Number == 11);
+        Console.WriteLine(string.Empty.Length == 0);
+        Console.WriteLine(string.Concat("a", "b") == "ab");
+        Console.WriteLine(string.Equals("a", "a"));
+        Console.WriteLine(string.CompareOrdinal("a", "b") < 0);
+        Shadow Shadow = new Shadow();
+        Console.WriteLine(Shadow.Number == 13);
+        Example.Widget widget = new Example.Widget();
+        Console.WriteLine(widget.Instance == 9);
+        FieldOwner fields = new FieldOwner();
+        Console.WriteLine(fields.Read() == 13);
+        PropertyOwner properties = new PropertyOwner { Shadow = new Shadow() };
+        Console.WriteLine(properties.Read() == 13);
+        NamespaceValue Example = new NamespaceValue { Widget = widget };
+        Console.WriteLine(Example.Widget.Instance == 9);
+        int a = 1;
+        int b = 2;
+        Console.WriteLine(a < b && b > a);
+    }
+}

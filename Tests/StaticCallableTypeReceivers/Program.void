@@ -1,0 +1,120 @@
+using Void;
+
+public interface IMarker { int Value { get; } }
+public sealed class Marker : IMarker
+{
+    public int Value { get; set; }
+    public Marker(int value) { Value = value; }
+}
+
+namespace Alpha
+{
+    public class Utility
+    {
+        public static int Add(int left, int right) { return left + right; }
+        public static int Double(int value) { return value * 2; }
+        public static int Pick(int value) { return value + 10; }
+        public static int Pick(long value) { return (int)value + 20; }
+        public static int Ambiguous(long value) { return (int)value + 30; }
+        public static int Ambiguous(float value) { return (int)value + 40; }
+        public static T Identity<T>(T value) { return value; }
+        public static T Keep<T>(T value) where T : IMarker { return value; }
+        public static T Uninferable<T, U>(T value) { return value; }
+        public static int OnlyString(string value) { return value.Length; }
+        private static int Hidden(int value) { return value; }
+        public int Instance(int value) { return value + 100; }
+    }
+
+    public class Same
+    {
+        public static int Resolve() { return 41; }
+    }
+}
+
+namespace Beta
+{
+    public class Same
+    {
+        public static int Resolve() { return 42; }
+    }
+}
+
+namespace Game.Tools
+{
+    public static class MathLike
+    {
+        public static int Clamp(int value, int minimum, int maximum)
+        {
+            if (value < minimum) return minimum;
+            if (value > maximum) return maximum;
+            return value;
+        }
+    }
+}
+
+public static class StaticUtility
+{
+    public static int Add(int left, int right) { return left + right; }
+}
+
+public struct Packet
+{
+    public static int Add(int left, int right) { return left + right; }
+}
+
+public readonly struct Frozen
+{
+    public static int Add(int left, int right) { return left + right; }
+}
+
+public sealed class Container<T>
+{
+    public static T Echo(T value) { return value; }
+    public static U Convert<U>(U value) { return value; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine(Alpha.Utility.Add(1, 2) == 3);
+        Console.WriteLine(StaticUtility.Add(2, 3) == 5);
+        Console.WriteLine(Packet.Add(3, 4) == 7);
+        Console.WriteLine(Frozen.Add(4, 5) == 9);
+        Console.WriteLine(Game.Tools.MathLike.Clamp(12, 0, 10) == 10);
+        Console.WriteLine(Alpha.Utility.Pick(1) == 11);
+        Console.WriteLine(Alpha.Utility.Pick(1L) == 21);
+        Console.WriteLine(Alpha.Utility.Identity<int>(22) == 22);
+        Console.WriteLine(Alpha.Utility.Identity(23) == 23);
+        Marker marker = new Marker(24);
+        Console.WriteLine(Alpha.Utility.Keep(marker).Value == 24);
+
+        Func<int, int> direct = Alpha.Utility.Double;
+        Console.WriteLine(direct(5) == 10);
+        Func<int, int> overload = Alpha.Utility.Pick;
+        Console.WriteLine(overload(6) == 16);
+        Func<int, int> generic = Alpha.Utility.Identity;
+        Console.WriteLine(generic(25) == 25);
+        Func<Marker, Marker> constrained = Alpha.Utility.Keep;
+        Console.WriteLine(constrained(marker).Value == 24);
+        Func<int, int> qualified = Alpha.Utility.Double;
+        Console.WriteLine(qualified(7) == 14);
+
+        Console.WriteLine(Alpha.Same.Resolve() == 41);
+        Console.WriteLine(Beta.Same.Resolve() == 42);
+        Console.WriteLine(Container<int>.Echo(26) == 26);
+        Console.WriteLine(Container<string>.Echo("closed") == "closed");
+        Console.WriteLine(Container<int>.Convert<string>("generic") == "generic");
+
+        Alpha.Utility Utility = new Alpha.Utility();
+        Console.WriteLine(Utility.Instance(8) == 108);
+
+        Console.WriteLine(string.Concat("a", "b") == "ab");
+        Console.WriteLine(string.Equals("same", "same"));
+        Console.WriteLine(string.CompareOrdinal("a", "b") < 0);
+
+        int a = 1;
+        int b = 2;
+        Console.WriteLine(a < b && b > a);
+    }
+}

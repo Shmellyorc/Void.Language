@@ -1,0 +1,165 @@
+using Void;
+
+public delegate bool IntTryParser337(string value, out int result);
+
+public class Box337<T>
+{
+    public static int Marker;
+}
+
+public static class Program
+{
+    private static bool IntFormatFailure()
+    {
+        try { int.Parse("12x"); } catch (FormatException) { return true; }
+        return false;
+    }
+
+    private static bool IntOverflowFailure()
+    {
+        try { int.Parse("2147483648"); } catch (OverflowException) { return true; }
+        return false;
+    }
+
+    private static bool IntNullFailure()
+    {
+        try { int.Parse(null); } catch (ArgumentNullException e) { return e.ParamName == "value"; }
+        return false;
+    }
+
+    private static bool BoolFormatFailure()
+    {
+        try { bool.Parse("1"); } catch (FormatException) { return true; }
+        return false;
+    }
+
+    private static bool CharFormatFailure()
+    {
+        try { char.Parse("AB"); } catch (FormatException) { return true; }
+        return false;
+    }
+
+    public static void Main()
+    {
+        sbyte sb;
+        Console.WriteLine(sbyte.Parse("0") == (sbyte)0);
+        Console.WriteLine((int)(sbyte.Parse("127")) == 127);
+        Console.WriteLine((int)(sbyte.Parse("-128")) == -128);
+        Console.WriteLine((int)(sbyte.Parse("-0")) == 0);
+        Console.WriteLine((int)(sbyte.Parse("+12")) == 12);
+        Console.WriteLine((int)(sbyte.Parse("  -0012\t")) == -12);
+        sb = (sbyte)9; Console.WriteLine(!sbyte.TryParse("-129", out sb) && sb == (sbyte)0);
+        sb = (sbyte)9; Console.WriteLine(!sbyte.TryParse("128", out sb) && sb == (sbyte)0);
+        sb = (sbyte)9; Console.WriteLine(!sbyte.TryParse("-", out sb) && sb == (sbyte)0);
+
+        short sh;
+        Console.WriteLine(short.Parse("0") == (short)0);
+        Console.WriteLine((int)(short.Parse("32767")) == 32767);
+        Console.WriteLine((int)(short.Parse("-32768")) == -32768);
+        Console.WriteLine((int)(short.Parse("-0")) == 0);
+        Console.WriteLine((int)(short.Parse("+123")) == 123);
+        sh = (short)9; Console.WriteLine(!short.TryParse("-32769", out sh) && sh == (short)0);
+        sh = (short)9; Console.WriteLine(!short.TryParse("32768", out sh) && sh == (short)0);
+        sh = (short)9; Console.WriteLine(!short.TryParse("12 3", out sh) && sh == (short)0);
+
+        int i;
+        Console.WriteLine(int.Parse("0") == 0);
+        Console.WriteLine(int.Parse("2147483647") == int.MaxValue);
+        Console.WriteLine(int.Parse("-2147483648") == int.MinValue);
+        Console.WriteLine(int.Parse("-0") == 0);
+        Console.WriteLine(int.Parse("+00042") == 42);
+        Console.WriteLine(int.Parse(" \t42\r\n") == 42);
+        i = 9; Console.WriteLine(!int.TryParse("-2147483649", out i) && i == 0);
+        i = 9; Console.WriteLine(!int.TryParse("2147483648", out i) && i == 0);
+        i = 9; Console.WriteLine(!int.TryParse("123abc", out i) && i == 0);
+        i = 9; Console.WriteLine(!int.TryParse("+", out i) && i == 0);
+        i = 9; Console.WriteLine(!int.TryParse("", out i) && i == 0);
+
+        long l;
+        Console.WriteLine(long.Parse("0") == 0L);
+        Console.WriteLine(long.Parse("9223372036854775807") == long.MaxValue);
+        Console.WriteLine(long.Parse("-9223372036854775808") == long.MinValue);
+        Console.WriteLine(long.Parse("-0") == 0L);
+        Console.WriteLine(long.Parse("+123456789") == 123456789L);
+        l = 9L; Console.WriteLine(!long.TryParse("-9223372036854775809", out l) && l == 0L);
+        l = 9L; Console.WriteLine(!long.TryParse("9223372036854775808", out l) && l == 0L);
+        l = 9L; Console.WriteLine(!long.TryParse("1.0", out l) && l == 0L);
+
+        byte by;
+        Console.WriteLine(byte.Parse("0") == (byte)0);
+        Console.WriteLine((int)(byte.Parse("255")) == 255);
+        Console.WriteLine((int)(byte.Parse("+0007")) == 7);
+        by = (byte)9; Console.WriteLine(!byte.TryParse("256", out by) && by == (byte)0);
+        by = (byte)9; Console.WriteLine(!byte.TryParse("-1", out by) && by == (byte)0);
+        by = (byte)9; Console.WriteLine(!byte.TryParse("x", out by) && by == (byte)0);
+
+        ushort us;
+        Console.WriteLine(ushort.Parse("0") == (ushort)0);
+        Console.WriteLine((int)(ushort.Parse("65535")) == 65535);
+        Console.WriteLine((int)(ushort.Parse("  +12  ")) == 12);
+        us = (ushort)9; Console.WriteLine(!ushort.TryParse("65536", out us) && us == (ushort)0);
+        us = (ushort)9; Console.WriteLine(!ushort.TryParse("-1", out us) && us == (ushort)0);
+        us = (ushort)9; Console.WriteLine(!ushort.TryParse("12x", out us) && us == (ushort)0);
+
+        uint ui;
+        Console.WriteLine(uint.Parse("0") == 0u);
+        Console.WriteLine(uint.Parse("4294967295") == uint.MaxValue);
+        Console.WriteLine(uint.Parse("+42") == 42u);
+        ui = 9u; Console.WriteLine(!uint.TryParse("4294967296", out ui) && ui == 0u);
+        ui = 9u; Console.WriteLine(!uint.TryParse("-1", out ui) && ui == 0u);
+        ui = 9u; Console.WriteLine(!uint.TryParse("12 3", out ui) && ui == 0u);
+
+        ulong ul;
+        Console.WriteLine(ulong.Parse("0") == 0ul);
+        Console.WriteLine(ulong.Parse("18446744073709551615") == ulong.MaxValue);
+        Console.WriteLine(ulong.Parse("+00042") == 42ul);
+        ul = 9ul; Console.WriteLine(!ulong.TryParse("18446744073709551616", out ul) && ul == 0ul);
+        ul = 9ul; Console.WriteLine(!ulong.TryParse("-1", out ul) && ul == 0ul);
+        ul = 9ul; Console.WriteLine(!ulong.TryParse("", out ul) && ul == 0ul);
+
+        Console.WriteLine(bool.Parse("True"));
+        Console.WriteLine(!bool.Parse("False"));
+        Console.WriteLine(bool.Parse("true"));
+        Console.WriteLine(!bool.Parse("FALSE"));
+        Console.WriteLine(bool.Parse(" TrUe\t"));
+        bool b = true; Console.WriteLine(!bool.TryParse("1", out b) && !b);
+        b = true; Console.WriteLine(!bool.TryParse("0", out b) && !b);
+        b = true; Console.WriteLine(!bool.TryParse("truth", out b) && !b);
+        b = true; Console.WriteLine(!bool.TryParse("", out b) && !b);
+        b = true; Console.WriteLine(!bool.TryParse(null, out b) && !b);
+
+        char c;
+        Console.WriteLine(char.TryParse("A", out c) && (int)c == 65);
+        Console.WriteLine(char.TryParse("é", out c) && (int)c == 233);
+        Console.WriteLine(char.TryParse("中", out c) && (int)c == 20013);
+        Console.WriteLine(char.TryParse("😀", out c) && (int)c == 128512);
+        Console.WriteLine(char.Parse(" ") == ' ');
+        c = 'A'; Console.WriteLine(!char.TryParse("", out c) && c == char.MinValue);
+        c = 'A'; Console.WriteLine(!char.TryParse("AB", out c) && c == char.MinValue);
+        c = 'A'; Console.WriteLine(!char.TryParse("éA", out c) && c == char.MinValue);
+        c = 'A'; Console.WriteLine(!char.TryParse("😀A", out c) && c == char.MinValue);
+        c = 'A'; Console.WriteLine(!char.TryParse(null, out c) && c == char.MinValue);
+
+        Console.WriteLine(IntFormatFailure());
+        Console.WriteLine(IntOverflowFailure());
+        Console.WriteLine(IntNullFailure());
+        Console.WriteLine(BoolFormatFailure());
+        Console.WriteLine(CharFormatFailure());
+
+        Func<string, int> parser = int.Parse;
+        Console.WriteLine(parser("42") == 42);
+        IntTryParser337 tryParser = int.TryParse;
+        Console.WriteLine(tryParser("43", out i) && i == 43);
+
+        Box337<int>.Marker = 1;
+        Box337<bool>.Marker = 2;
+        Box337<char>.Marker = 3;
+        Console.WriteLine(Box337<int>.Marker == 1 && Box337<bool>.Marker == 2 && Box337<char>.Marker == 3);
+
+        Console.WriteLine(int.MinValue == ~int.MaxValue);
+        Console.WriteLine(uint.MaxValue == 4294967295u);
+        Console.WriteLine(char.MaxValue > (char)65535);
+        Console.WriteLine(float.NaN != float.NaN);
+        Console.WriteLine(decimal.MaxValue > decimal.Zero);
+    }
+}

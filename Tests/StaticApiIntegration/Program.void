@@ -1,0 +1,135 @@
+using Void;
+using Void.Collections;
+
+public struct Value339
+{
+    public int Number;
+
+    public Value339(int number)
+    {
+        Number = number;
+    }
+
+    public bool Equals(Value339 other)
+    {
+        return Number == other.Number;
+    }
+
+    public int GetHashCode()
+    {
+        return Number * 31;
+    }
+}
+
+public sealed class Reference339
+{
+    public int Number;
+
+    public Reference339(int number)
+    {
+        Number = number;
+    }
+}
+
+public class Closed339<T>
+{
+    public static int Marker;
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        EqualityComparer<int> intDefault = EqualityComparer<int>.Default;
+        EqualityComparer<int> intDefaultAgain = EqualityComparer<int>.Default;
+        EqualityComparer<string> stringDefault = EqualityComparer<string>.Default;
+        EqualityComparer<int> qualifiedDefault = Void.Collections.EqualityComparer<int>.Default;
+
+        Console.WriteLine(intDefault == intDefaultAgain);
+        Console.WriteLine(intDefault == qualifiedDefault);
+        object intObject = intDefault;
+        object stringObject = stringDefault;
+        Console.WriteLine(!Runtime.Equals(intObject, stringObject));
+        Console.WriteLine(intDefault.Equals(42, 42));
+        Console.WriteLine(!intDefault.Equals(42, 43));
+        Console.WriteLine(stringDefault.Equals("same", "same"));
+        Console.WriteLine(!stringDefault.Equals("same", "other"));
+        Console.WriteLine(intDefault.GetHashCode(42) == EqualityComparer<int>.Default.GetHashCode(42));
+
+        EqualityComparer<Value339> valueDefault = EqualityComparer<Value339>.Default;
+        Console.WriteLine(valueDefault.Equals(new Value339(7), new Value339(7)));
+        Console.WriteLine(!valueDefault.Equals(new Value339(7), new Value339(8)));
+        Console.WriteLine(valueDefault.GetHashCode(new Value339(7)) == 217);
+
+        Reference339 first = new Reference339(9);
+        Reference339 second = new Reference339(9);
+        EqualityComparer<Reference339> referenceDefault = EqualityComparer<Reference339>.Default;
+        Console.WriteLine(referenceDefault.Equals(first, first));
+        Console.WriteLine(!referenceDefault.Equals(first, second));
+        Console.WriteLine(referenceDefault.GetHashCode(first) == referenceDefault.GetHashCode(first));
+
+        List<Value339> valuesList = new List<Value339>();
+        valuesList.Add(new Value339(11));
+        Console.WriteLine(valuesList.Contains(new Value339(11)) == valueDefault.Equals(new Value339(11), new Value339(11)));
+
+        int beforeGcHash = Runtime.Hash(EqualityComparer<int>.Default);
+        GC.Collect();
+        Console.WriteLine(EqualityComparer<int>.Default.Equals(5, 5));
+        Console.WriteLine(beforeGcHash == Runtime.Hash(EqualityComparer<int>.Default));
+        Console.WriteLine(EqualityComparer<int>.Default == intDefault);
+
+        Closed339<int>.Marker = 21;
+        Closed339<string>.Marker = 22;
+        Console.WriteLine(Closed339<int>.Marker == 21);
+        Console.WriteLine(Closed339<string>.Marker == 22);
+
+        Index start = Index.Start;
+        Index end = Index.End;
+        Index qualifiedStart = Void.Index.Start;
+        Console.WriteLine(start.Value == 0 && !start.IsFromEnd);
+        Console.WriteLine(end.Value == 0 && end.IsFromEnd);
+        Console.WriteLine(start.Equals(qualifiedStart));
+        Console.WriteLine(start.GetOffset(6) == 0);
+        Console.WriteLine(end.GetOffset(6) == 6);
+
+        Range all = Range.All;
+        Range syntaxAll = ..;
+        Range qualifiedAll = Void.Range.All;
+        Console.WriteLine(all.Equals(syntaxAll));
+        Console.WriteLine(all.Equals(qualifiedAll));
+        Console.WriteLine(all.Start.Equals(Index.Start));
+        Console.WriteLine(all.End.Equals(Index.End));
+        int offset;
+        int rangeLength;
+        all.GetOffsetAndLength(6, out offset, out rangeLength);
+        Console.WriteLine(offset == 0 && rangeLength == 6);
+
+        int[] array = new int[] { 1, 2, 3, 4 };
+        int[] arrayAll = array[Range.All];
+        Console.WriteLine(arrayAll.Length == 4 && arrayAll[0] == 1 && arrayAll[3] == 4);
+        arrayAll[0] = 99;
+        Console.WriteLine(array[0] == 1 && arrayAll[0] == 99);
+
+        Span<int> span = array;
+        Span<int> spanAll = span[Range.All];
+        Console.WriteLine(spanAll.Length == 4 && spanAll[1] == 2);
+        spanAll[1] = 77;
+        Console.WriteLine(array[1] == 77);
+
+        ReadOnlySpan<int> readOnly = span;
+        ReadOnlySpan<int> readOnlyAll = readOnly[Range.All];
+        Console.WriteLine(readOnlyAll.Length == 4 && readOnlyAll[1] == 77 && readOnlyAll[3] == 4);
+
+        string text = "Aé😀Z";
+        string textAll = text[Range.All];
+        Console.WriteLine(textAll == text);
+        Console.WriteLine(textAll.Length == text.Length);
+
+        Console.WriteLine(int.MinValue < int.MaxValue);
+        int parsedInt;
+        Console.WriteLine(int.TryParse("123", out parsedInt) && parsedInt == 123);
+        float parsedFloat;
+        Console.WriteLine(float.TryParse("1.5", out parsedFloat) && parsedFloat == 1.5f);
+        Console.WriteLine(string.Concat("R", "ange") == "Range");
+    }
+}

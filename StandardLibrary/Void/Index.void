@@ -13,6 +13,9 @@ public readonly struct Index
         _fromEnd = fromEnd;
     }
 
+    public static Index Start { get { return new Index(0, false); } }
+    public static Index End { get { return new Index(0, true); } }
+
     public static Index FromStart(int value) { return new Index(value, false); }
     public static Index FromEnd(int value) { return new Index(value, true); }
     public bool Equals(Index other) { return _value == other._value && _fromEnd == other._fromEnd; }

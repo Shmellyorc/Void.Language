@@ -8,12 +8,16 @@ public interface IEqualityComparer<T>
 
 public abstract class EqualityComparer<T> : IEqualityComparer<T>
 {
+    public static EqualityComparer<T> Default { get { return DefaultEqualityComparer<T>.Instance; } }
+
     public abstract bool Equals(T x, T y);
     public abstract int GetHashCode(T obj);
 }
 
 private sealed class DefaultEqualityComparer<T> : EqualityComparer<T>
 {
+    internal static readonly EqualityComparer<T> Instance = new DefaultEqualityComparer<T>();
+
     public override bool Equals(T x, T y) { return Runtime.Equals(x, y); }
     public override int GetHashCode(T obj) { return Runtime.Hash(obj); }
 }

@@ -1,0 +1,150 @@
+using Void;
+
+public class Node { public int Value = 19; }
+public static class Log { public static int Count; }
+namespace Foo
+{
+    public class Widget
+    {
+        public const int Default = 7;
+        public const int Folded = Foo.Widget.Default + 1;
+        public static int Field = 2;
+        public static long Wide;
+        public static long WideProperty { get; set; }
+        public static readonly int Ready;
+        public static Node Root;
+        public static Node AutoRoot { get; set; }
+        private static int stored;
+        private static int HiddenProperty => 5;
+        private const int Hidden = 6;
+        public static int Gets;
+        public static int Sets;
+        public static int Property
+        {
+            get { Gets += 1; return stored; }
+            set { Sets += 1; stored = value * 2; }
+        }
+        public static int Restricted { private get; set; }
+        public static int RestrictedRead() { return Restricted; }
+        public static int ReadOnly => 100;
+        public int Instance = 23;
+        static Widget() { Foo.Widget.Ready = 11; Log.Count += 1; }
+    }
+    public class Box<T>
+    {
+        public static int Field = 3;
+        public const int Constant = 4;
+        public static T Item;
+        public static T Auto { get; set; }
+    }
+}
+namespace Bar { public class Widget { public static int Field = 29; public const int Default = 31; public static int Property => 37; } }
+namespace Game.Core { public static class Settings { public static int Value = 41; public static int Auto { get; set; } } }
+public struct Point { public static int Field = 43; public static int Auto { get; set; } public static int Zero => 0; }
+public readonly struct Limits
+{
+    public static int Maximum => 100;
+    public static int Auto { get; set; }
+    public static int Field = 47;
+    public const int Constant = 53;
+    public static readonly int Ready;
+    static Limits() { Limits.Ready = 59; }
+}
+public enum Choice { First = 61 }
+public class Shadow { public int Field = 67; }
+public class FieldShadow { public Shadow Shadow = new Shadow(); public int Read() { return Shadow.Field; } }
+public class PropertyShadow { public Shadow Shadow { get; set; } public int Read() { return Shadow.Field; } }
+public static class PropertyFirst
+{
+    private static int stored;
+    static PropertyFirst() { Log.Count += 1; stored = 71; }
+    public static int Value { get { return stored; } set { stored = value; } }
+}
+public static class SetterOnly { public static int Value { private get; set; } }
+public static class SetterFirst
+{
+    private static int stored;
+    static SetterFirst() { Log.Count += 1; stored = 11; }
+    public static int Value { get { return stored; } set { stored = value; } }
+}
+public static class ConstantOnly
+{
+    public const int Value = 73;
+    static ConstantOnly() { Log.Count += 100; }
+}
+public static class Program
+{
+    public static int Next() { Log.Count += 1; return 5; }
+    public static int Parameter(Shadow Shadow) { return Shadow.Field; }
+    public static void Main()
+    {
+        Console.WriteLine(Log.Count == 0);
+        Console.WriteLine(Foo.Widget.Folded == 8);
+        Console.WriteLine(ConstantOnly.Value == 73);
+        Console.WriteLine(Log.Count == 0);
+        Console.WriteLine(Foo.Widget.Field == 2);
+        Console.WriteLine(Log.Count == 1);
+        Console.WriteLine(Foo.Widget.Ready == 11);
+        Foo.Widget.Wide = 1;
+        Foo.Widget.WideProperty = 2;
+        Console.WriteLine(Foo.Widget.Wide == 1L && Foo.Widget.WideProperty == 2L);
+        Foo.Widget.Field = 79;
+        Console.WriteLine(Foo.Widget.Field == 79);
+        Console.WriteLine(Bar.Widget.Field == 29);
+        Console.WriteLine(Bar.Widget.Default == 31);
+        Console.WriteLine(Bar.Widget.Property == 37);
+        Foo.Widget.Property = Next();
+        Console.WriteLine(Foo.Widget.Gets == 0);
+        Console.WriteLine(Foo.Widget.Sets == 1);
+        Console.WriteLine(Foo.Widget.Property == 10);
+        Foo.Widget.Property += 2;
+        Console.WriteLine(Foo.Widget.Gets == 2);
+        Console.WriteLine(Foo.Widget.Sets == 2);
+        Console.WriteLine(Foo.Widget.Property == 24);
+        Foo.Widget.Restricted = 83;
+        Console.WriteLine(Foo.Widget.RestrictedRead() == 83);
+        Console.WriteLine(Foo.Widget.ReadOnly == 100);
+        Game.Core.Settings.Auto = 89;
+        Console.WriteLine(Game.Core.Settings.Value == 41);
+        Console.WriteLine(Game.Core.Settings.Auto == 89);
+        Point.Auto = 97;
+        Console.WriteLine(Point.Auto == 97 && Point.Zero == 0 && Point.Field == 43);
+        Limits.Auto = 101;
+        Console.WriteLine(Limits.Auto == 101);
+        Console.WriteLine(Limits.Maximum == 100);
+        Console.WriteLine(Limits.Field == 47 && Limits.Constant == 53 && Limits.Ready == 59);
+        Console.WriteLine(Choice.First == (Choice)61);
+        Console.WriteLine(PropertyFirst.Value == 71);
+        PropertyFirst.Value = 103;
+        Console.WriteLine(PropertyFirst.Value == 103);
+        Console.WriteLine(Log.Count == 3);
+        Foo.Widget.Root = new Node();
+        Foo.Widget.AutoRoot = new Node();
+        GC.Collect();
+        Console.WriteLine(Foo.Widget.Root.Value == 19 && Foo.Widget.AutoRoot.Value == 19);
+        Console.WriteLine(string.Empty.Length == 0);
+        Foo.Box<int>.Field = 107;
+        Console.WriteLine(Foo.Box<string>.Field == 3);
+        Console.WriteLine(Box<int>.Field == 107);
+        Foo.Box<int>.Item = 109;
+        Foo.Box<int>.Auto = 113;
+        Console.WriteLine(Foo.Box<int>.Item == 109 && Foo.Box<int>.Auto == 113);
+        Foo.Box<string>.Item = "value";
+        Foo.Box<string>.Auto = "property";
+        GC.Collect();
+        Console.WriteLine(Foo.Box<string>.Item == "value" && Foo.Box<string>.Auto == "property");
+        Console.WriteLine(Foo.Box<int>.Constant == 4);
+        Shadow Shadow = new Shadow();
+        Console.WriteLine(Shadow.Field == 67 && Parameter(Shadow) == 67);
+        FieldShadow field = new FieldShadow();
+        Console.WriteLine(field.Read() == 67);
+        PropertyShadow property = new PropertyShadow { Shadow = Shadow };
+        Console.WriteLine(property.Read() == 67);
+        Foo.Widget value = new Foo.Widget();
+        Console.WriteLine(value.Instance == 23);
+        SetterOnly.Value = 127;
+        SetterFirst.Value = 131;
+        Console.WriteLine(SetterFirst.Value == 131);
+        Console.WriteLine(Log.Count == 4);
+    }
+}

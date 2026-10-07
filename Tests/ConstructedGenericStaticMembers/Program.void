@@ -1,0 +1,146 @@
+using Void;
+using Example;
+
+public sealed class Node334
+{
+    public int Value { get; set; }
+    public Node334(int value) { Value = value; }
+}
+
+public struct Point334
+{
+    public int Value;
+    public Point334(int value) { Value = value; }
+}
+
+public class Counter334<T>
+{
+    public static int Value;
+}
+
+public class Box334<T>
+{
+    public static T Current;
+    public static T Value { get; set; }
+    public static T Echo(T value) { return value; }
+    public static U Pair<U>(T first, U second) { return second; }
+}
+
+public class Init334<T>
+{
+    public static int Value;
+    static Init334() { Value = 100; }
+}
+
+public class Holder334<T>
+{
+    public static Node334 Value;
+}
+
+public class Mapper334<T>
+{
+    public static T Echo(T value) { return value; }
+}
+
+public class Picker334<T>
+{
+    public static int Pick(T value) { return 1; }
+    public static int Pick(string value) { return 2; }
+}
+
+public class StructOnly334<T> where T : struct
+{
+    public static int Read() { return 7; }
+}
+
+public class Recursive334<T>
+{
+    public static int Value;
+}
+
+namespace Example
+{
+    public sealed class Arg334 { }
+    public class Generic334<T> { public static int Value; }
+}
+
+namespace Foo334
+{
+    public class Same334<T> { public static int Value; }
+}
+
+namespace Bar334
+{
+    public class Same334<T> { public static int Value; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Counter334<int>.Value = 10;
+        Counter334<string>.Value = 20;
+        Console.WriteLine(Counter334<int>.Value == 10);
+        Console.WriteLine(Counter334<string>.Value == 20);
+
+        Box334<int>.Current = 30;
+        Box334<string>.Current = "text";
+        Console.WriteLine(Box334<int>.Current == 30);
+        Console.WriteLine(Box334<string>.Current == "text");
+        Box334<int>.Value = 40;
+        Box334<string>.Value = "prop";
+        Console.WriteLine(Box334<int>.Value == 40);
+        Console.WriteLine(Box334<string>.Value == "prop");
+        Console.WriteLine(Box334<int>.Echo(50) == 50);
+        Console.WriteLine(Box334<string>.Echo("echo") == "echo");
+        Console.WriteLine(Box334<int>.Pair<string>(1, "pair") == "pair");
+
+        Arg334 argument = new Arg334();
+        Console.WriteLine(Box334<int>.Pair<Arg334>(1, argument) == argument);
+        Console.WriteLine(Box334<int>.Pair<Example.Arg334>(1, argument) == argument);
+
+        Func<int, int> map = Mapper334<int>.Echo;
+        Console.WriteLine(map(60) == 60);
+        Func<int, int> pick = Picker334<int>.Pick;
+        Console.WriteLine(pick(61) == 1);
+
+        Console.WriteLine(Init334<int>.Value == 100);
+        Init334<int>.Value = 101;
+        Console.WriteLine(Init334<string>.Value == 100);
+        Console.WriteLine(Init334<int>.Value == 101);
+
+        Holder334<int>.Value = new Node334(70);
+        Holder334<string>.Value = new Node334(80);
+        GC.Collect();
+        Console.WriteLine(Holder334<int>.Value.Value == 70);
+        Console.WriteLine(Holder334<string>.Value.Value == 80);
+
+        Generic334<Arg334>.Value = 90;
+        Console.WriteLine(Example.Generic334<Example.Arg334>.Value == 90);
+        Example.Generic334<Example.Arg334>.Value = 91;
+        Console.WriteLine(Generic334<Arg334>.Value == 91);
+
+        Foo334.Same334<int>.Value = 1;
+        Bar334.Same334<int>.Value = 2;
+        Console.WriteLine(Foo334.Same334<int>.Value == 1);
+        Console.WriteLine(Bar334.Same334<int>.Value == 2);
+
+        Counter334<uint>.Value = 3;
+        Counter334<bool>.Value = 4;
+        Counter334<Point334>.Value = 5;
+        Counter334<Node334>.Value = 6;
+        Console.WriteLine(Counter334<uint>.Value == 3);
+        Console.WriteLine(Counter334<bool>.Value == 4);
+        Console.WriteLine(Counter334<Point334>.Value == 5);
+        Console.WriteLine(Counter334<Node334>.Value == 6);
+
+        Recursive334<Box334<int>>.Value = 7;
+        Recursive334<Box334<string>>.Value = 8;
+        Console.WriteLine(Recursive334<Box334<int>>.Value == 7);
+        Console.WriteLine(Recursive334<Box334<string>>.Value == 8);
+        Recursive334<Box334<Arg334>>.Value = 9;
+        Console.WriteLine(Recursive334<Box334<Example.Arg334>>.Value == 9);
+
+        Console.WriteLine(StructOnly334<int>.Read() == 7);
+    }
+}

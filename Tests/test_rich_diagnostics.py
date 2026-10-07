@@ -319,4 +319,4 @@ public static class Program {
         result = subprocess.run(['./bin/voidc', 'build', str(path), '--diagnostics=json'], cwd=ROOT, env=env, text=True, capture_output=True)
         check(result.returncode == 1 and json.loads(result.stderr)['code'] == 'VOID4000', result.stderr)
     result = run('./bin/voidc', 'version')
-    check(result.returncode == 0 and result.stdout.strip() == 'voidc 0.0.330', result.stdout)
+    check(result.returncode == 0 and result.stdout.strip() == 'voidc 0.0.340', result.stdout)

@@ -51,6 +51,7 @@ typedef enum VcAstKind
     VC_AST_BREAK_STATEMENT,
     VC_AST_CONTINUE_STATEMENT,
 
+    VC_AST_TYPE_RECEIVER_EXPRESSION,
     VC_AST_IDENTIFIER_EXPRESSION,
     VC_AST_LITERAL_EXPRESSION,
     VC_AST_MEMBER_ACCESS_EXPRESSION,
@@ -154,6 +155,9 @@ struct VcAstTypeRef
     size_t rectangular_rank;
     bool nullable;
     bool generic_constraint_parameter;
+    /* Internal canonical argument provenance: the global namespace must not
+       be rebound in a template's namespace after substitution. */
+    bool is_global_qualified;
     const char *generic_parameter_origin;
 };
 
@@ -164,6 +168,10 @@ struct VcAstNode
     VcSourceSpan span;
     VcAstNodeList attributes;
     char *argument_name;
+
+    /* Explicit type syntax; never a runtime value. Named dotted expressions
+       remain unresolved syntax until value-first semantic lookup. */
+    VcAstTypeRef *receiver_type;
 
     union
     {
@@ -435,6 +443,11 @@ struct VcAstNode
             VcAstNode *target;
             char *member;
             char *constrained_static_parameter;
+            /* Target-typed generic method-group inference reuses the ordinary
+               monomorphizer by recording requested arguments on this member. */
+            VcAstTypeList generic_arguments;
+            VcAstTypeList specialized_generic_arguments;
+            char *original_generic_name;
             bool null_conditional;
             bool null_conditional_direct;
         } member_access_expression;
@@ -666,5 +679,9 @@ bool vc_ast_rectangular_initializer_shape(
     VcAstRectangularInitializerIssue *issue);
 
 void vc_ast_dump(const VcAstTree *tree, const VcSource *source);
+
+bool vc_ast_character_scalar(const char *text, uint32_t *value);
+
+bool vc_ast_receiver_name(const VcAstNode *node, char *name, size_t size);
 
 #endif
