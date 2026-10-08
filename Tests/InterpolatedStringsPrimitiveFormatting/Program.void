@@ -42,9 +42,9 @@ public static class Program
         Console.WriteLine($"short={(short)-1234}".Equals("short=-1234"));
         Console.WriteLine($"ushort={(ushort)65000}".Equals("ushort=65000"));
         Console.WriteLine($"int={-123456}".Equals("int=-123456"));
-        Console.WriteLine($"uint={(uint)4000000000}".Equals("uint=4000000000"));
-        Console.WriteLine($"long={(long)-9000000000}".Equals("long=-9000000000"));
-        Console.WriteLine($"ulong={(ulong)18000000000}".Equals("ulong=18000000000"));
+        Console.WriteLine($"uint={(uint)4000000000u}".Equals("uint=4000000000"));
+        Console.WriteLine($"long={(long)-9000000000L}".Equals("long=-9000000000"));
+        Console.WriteLine($"ulong={(ulong)18000000000ul}".Equals("ulong=18000000000"));
         Console.WriteLine($"float={(float)1.25}".Equals("float=1.25"));
         Console.WriteLine($"double={2.5}".Equals("double=2.5"));
         Console.WriteLine($"decimal={(decimal)3.75}".Equals("decimal=3.75"));
@@ -56,9 +56,9 @@ public static class Program
             .Append((short)-1234).Append('|')
             .Append((ushort)65000).Append('|')
             .Append(-123456).Append('|')
-            .Append((uint)4000000000).Append('|')
-            .Append((long)-9000000000).Append('|')
-            .Append((ulong)18000000000).Append('|')
+            .Append((uint)4000000000u).Append('|')
+            .Append((long)-9000000000L).Append('|')
+            .Append((ulong)18000000000ul).Append('|')
             .Append((float)1.25).Append('|')
             .Append(2.5).Append('|')
             .Append((decimal)3.75);
@@ -84,7 +84,7 @@ public static class Program
 
         string concatA = "score=" + count;
         string concatB = false + ":ready";
-        string concatC = "u=" + (uint)4000000000;
+        string concatC = "u=" + (uint)4000000000u;
         string concatD = "f=" + (float)1.25;
         string concatE = "d=" + 2.5;
         string concatF = "m=" + (decimal)3.75;
@@ -103,8 +103,8 @@ public static class Program
         compound += -12;
         Console.WriteLine(compound.Equals("value=-12"));
 
-        Console.WriteLine(string.Concat("n=", (long)-9000000000).Equals("n=-9000000000"));
-        Console.WriteLine(string.Concat((ulong)18000000000, "!").Equals("18000000000!"));
+        Console.WriteLine(string.Concat("n=", (long)-9000000000L).Equals("n=-9000000000"));
+        Console.WriteLine(string.Concat((ulong)18000000000ul, "!").Equals("18000000000!"));
         Console.WriteLine(string.Concat("b=", true).Equals("b=True"));
 
         byte[] utf8 = new byte[32];
@@ -116,9 +116,9 @@ public static class Program
         Console.WriteLine(Utf8Formatter.TryFormat((short)-1234, utf8Destination, out bytesWritten) && bytesWritten == 5 && utf8[0] == (byte)45 && utf8[4] == (byte)52);
         Console.WriteLine(Utf8Formatter.TryFormat((ushort)65000, utf8Destination, out bytesWritten) && bytesWritten == 5 && utf8[0] == (byte)54 && utf8[4] == (byte)48);
         Console.WriteLine(Utf8Formatter.TryFormat(-123456, utf8Destination, out bytesWritten) && bytesWritten == 7 && utf8[0] == (byte)45 && utf8[6] == (byte)54);
-        Console.WriteLine(Utf8Formatter.TryFormat((uint)4000000000, utf8Destination, out bytesWritten) && bytesWritten == 10 && utf8[0] == (byte)52 && utf8[9] == (byte)48);
-        Console.WriteLine(Utf8Formatter.TryFormat((long)-9000000000, utf8Destination, out bytesWritten) && bytesWritten == 11 && utf8[0] == (byte)45 && utf8[10] == (byte)48);
-        Console.WriteLine(Utf8Formatter.TryFormat((ulong)18000000000, utf8Destination, out bytesWritten) && bytesWritten == 11 && utf8[0] == (byte)49 && utf8[10] == (byte)48);
+        Console.WriteLine(Utf8Formatter.TryFormat((uint)4000000000u, utf8Destination, out bytesWritten) && bytesWritten == 10 && utf8[0] == (byte)52 && utf8[9] == (byte)48);
+        Console.WriteLine(Utf8Formatter.TryFormat((long)-9000000000L, utf8Destination, out bytesWritten) && bytesWritten == 11 && utf8[0] == (byte)45 && utf8[10] == (byte)48);
+        Console.WriteLine(Utf8Formatter.TryFormat((ulong)18000000000ul, utf8Destination, out bytesWritten) && bytesWritten == 11 && utf8[0] == (byte)49 && utf8[10] == (byte)48);
         Console.WriteLine(Utf8Formatter.TryFormat((float)1.25, utf8Destination, out bytesWritten) && bytesWritten == 4 && utf8[0] == (byte)49 && utf8[3] == (byte)53);
         Console.WriteLine(Utf8Formatter.TryFormat(2.5, utf8Destination, out bytesWritten) && bytesWritten == 3 && utf8[0] == (byte)50 && utf8[2] == (byte)53);
         Console.WriteLine(Utf8Formatter.TryFormat((decimal)3.75, utf8Destination, out bytesWritten) && bytesWritten == 4 && utf8[0] == (byte)51 && utf8[3] == (byte)53);

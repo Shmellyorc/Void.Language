@@ -10797,6 +10797,8 @@ emit_regular_index:
                     if (!emit_expression_as(context, expression->as.assignment_expression.right,
                             left_binding->type))
                         return false;
+                    if (builtin)
+                        fputc(')', context->file);
                     fputc(')', context->file);
                     return true;
                 }

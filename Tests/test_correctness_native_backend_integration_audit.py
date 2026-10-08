@@ -15,7 +15,7 @@ VOIDC = ROOT / 'bin' / ('voidc.exe' if os.name == 'nt' else 'voidc')
 NAME = 'CorrectnessNativeBackendIntegrationAudit'
 FIXTURE = ROOT / 'Tests' / NAME
 GENERATED = FIXTURE / '.void' / (NAME + '.c')
-EXPECTED = 'True\n' * 31
+EXPECTED = 'True\n' * 32
 COUNT = 0
 
 

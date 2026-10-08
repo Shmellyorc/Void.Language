@@ -73,6 +73,13 @@ namespace Audit360 {
         public Box(T value) { Value = value; Count++; }
     }
 }
+public sealed class RefWindow360 {
+    public int[] Values;
+    public int LengthCalls;
+    public RefWindow360(int[] values) { Values = values; }
+    public int Length { get { LengthCalls++; return Values.Length; } }
+    public ref int get_Item(int index) { return ref Values[index]; }
+}
 public static class Native360 {
     [Native("abs")] public static unsafe extern int Abs(int value);
 }
@@ -127,6 +134,11 @@ public static class Program {
         Span<int> span = new Span<int>(values);
         span[0] += 1;
         Console.WriteLine(values[0] == int.MinValue);
+        RefWindow360 window = new RefWindow360(values);
+        window[^2] -= 1;
+        window[^2] *= 2;
+        window[^2] >>= 33;
+        Console.WriteLine(values[0] == -1 && window.LengthCalls == 3);
         Console.WriteLine(Native360.Abs(-19) == 19);
         Console.WriteLine((sbyte)(uint)255 == (sbyte)-1);
         Console.WriteLine((long)(ulong.MaxValue) == -1L);
