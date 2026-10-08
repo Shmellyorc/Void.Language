@@ -1,0 +1,53 @@
+VOID Language - Current Issues and Deferred Features
+===================================================
+Recorded baseline: voidc 0.0.370
+Last reviewed: 2026-10-08
+
+CORRECTNESS ISSUES (DEFERRED)
+-----------------------------
+1. Open generic definition validation
+   Unreferenced open generic method/type bodies can defer errors that do not
+   depend on type arguments until a concrete specialization is used. Detect
+   declaration-independent errors earlier through the existing semantic
+   analyzer, without introducing a second binder or flow-analysis system.
+
+2. Floating-point to integer conversion boundaries
+   Conversion of NaN, infinity, or out-of-range float/double values to
+   integer types can currently reach undefined native C conversion behavior.
+   Define and implement portable, deterministic VOID semantics across
+   supported destination integer types. This is separate from normal,
+   in-range conversions.
+
+INTENTIONALLY UNSUPPORTED COLLECTION FEATURES
+---------------------------------------------
+3. General enumerable spreads
+   Collection-expression spreads do not yet expand arbitrary IEnumerable<T>
+   sources. Existing supported array/span sources remain supported.
+
+4. Expanded params-form Add calls for spread insertion
+   Some expanded params-argument forms of Add are not supported when
+   inserting spread elements into constructed collections. Ordinary
+   supported Add binding should remain unchanged.
+
+5. Interface or abstract collection targets without construction path
+   A collection expression cannot instantiate an interface or abstract type
+   unless a defined concrete construction mechanism exists. No arbitrary
+   default to List<T> is implied.
+
+6. Collection builder/factory protocols
+   Dedicated custom builder and factory-based collection-expression
+   construction contracts are not implemented. Concrete constructor-plus-Add
+   collection construction is already supported.
+
+PLANNING NOTES
+--------------
+- Issues 1-2 are genuine correctness gaps. Items 3-6 are deferred feature
+  limitations, not defects in the already supported collection behavior.
+- These items are NOT blockers for unrelated milestones. Revisit only when
+  a new milestone directly depends on one, or new technical evidence shows
+  a defect in existing supported behavior.
+- #371-#380 is the locked planning roadmap: Core Math, Random & Timing
+  Foundations. The roadmap lock is a planning decision, not completed work.
+- The #361-#370 collection-expression block is technically validated at
+  voidc 0.0.370. The user controls any administrative LOCK decision.
+- Update this file when an issue is resolved or a new verified issue is found.
