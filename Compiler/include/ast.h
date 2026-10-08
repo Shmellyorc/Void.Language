@@ -673,6 +673,16 @@ VcAstNode *vc_ast_new_node(VcAstTree *tree, VcAstKind kind, VcSourceLocation loc
 VcAstTypeRef *vc_ast_new_type(VcAstTree *tree, VcSourceLocation location);
 bool vc_ast_tree_contains(const VcAstTree *tree, const void *pointer);
 
+/* Source-scoped using-alias lookup shared by semantic binding and generic
+   specialization. Root using directives and directives in the current
+   namespace follow the same visibility model as existing using imports. */
+size_t vc_ast_find_using_alias(
+    const VcAstTree *tree,
+    const char *namespace_name,
+    const char *alias,
+    const VcAstNode **declaration,
+    const char **declaration_namespace);
+
 bool vc_ast_node_list_push(VcAstTree *tree, VcAstNodeList *list, VcAstNode *node);
 bool vc_ast_type_list_push(VcAstTree *tree, VcAstTypeList *list, VcAstTypeRef *type);
 bool vc_ast_string_list_push(VcAstTree *tree, VcAstStringList *list, char *value);
@@ -686,7 +696,24 @@ bool vc_ast_rectangular_initializer_shape(
 
 void vc_ast_dump(const VcAstTree *tree, const VcSource *source);
 
+typedef enum VcAstNumericKind
+{
+    VC_AST_NUM_INT, VC_AST_NUM_UINT, VC_AST_NUM_LONG, VC_AST_NUM_ULONG,
+    VC_AST_NUM_FLOAT, VC_AST_NUM_DOUBLE, VC_AST_NUM_DECIMAL
+} VcAstNumericKind;
+
+typedef struct VcAstNumericLiteral
+{
+    VcAstNumericKind kind;
+    char *c_text; /* Owned, canonical ISO C11 representation. */
+} VcAstNumericLiteral;
+
+bool vc_ast_numeric_literal(const char *text, VcAstNumericLiteral *literal);
+
 bool vc_ast_character_scalar(const char *text, uint32_t *value);
+/* Decode a quoted VOID UTF-8 string into its exact byte sequence. Caller frees *bytes. */
+bool vc_ast_string_bytes(const char *text, unsigned char **bytes, size_t *byte_length);
+
 
 bool vc_ast_receiver_name(const VcAstNode *node, char *name, size_t size);
 

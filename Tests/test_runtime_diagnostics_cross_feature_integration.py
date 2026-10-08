@@ -323,7 +323,7 @@ def main():
         check(compile_result.returncode == 0, compile_result.stderr)
 
     version = invoke('version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.350', version.stdout)
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.360', version.stdout)
 
     compiler = (ROOT / 'Compiler' / 'src' / 'compiler.c').read_text(encoding='utf-8')
     monomorph = (ROOT / 'Compiler' / 'src' / 'monomorph.c').read_text(encoding='utf-8')

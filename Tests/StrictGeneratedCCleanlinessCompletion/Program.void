@@ -1,0 +1,40 @@
+using Void;
+
+public readonly struct UnusedReceiver356
+{
+    public int Value => 7;
+}
+
+public static class Program
+{
+    private static int _calls;
+
+    private static int Pure()
+    {
+        return 21;
+    }
+
+    private static int Effect()
+    {
+        _calls += 1;
+        return _calls;
+    }
+
+    private static T Echo<T>(T value)
+    {
+        return value;
+    }
+
+    public static void Main()
+    {
+        Pure();
+        Effect();
+        Console.WriteLine(_calls == 1);
+        UnusedReceiver356 value = new UnusedReceiver356();
+        Console.WriteLine(value.Value == 7);
+        Console.WriteLine(Echo<int>(42) == 42);
+        Func<int> callback = Effect;
+        callback();
+        Console.WriteLine(_calls == 2);
+    }
+}

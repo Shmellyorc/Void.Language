@@ -394,9 +394,17 @@ static bool lex_number(VcLexer *lexer, VcSourceLocation start)
         }
     }
 
-    while (strchr("uUlLfFdDmM", current(lexer)) != NULL && current(lexer) != '\0')
+    while (current(lexer) != '\0' && strchr("uUlLfFdDmM", current(lexer)) != NULL)
         advance(lexer);
 
+    /* Do not turn malformed numeric text into adjacent valid tokens. The
+       semantic numeric reader verifies digit separators, suffixes and ranges. */
+    if (is_identifier_continue((unsigned char)current(lexer)))
+    {
+        while (is_identifier_continue((unsigned char)current(lexer))) advance(lexer);
+        fail(lexer, start, "invalid numeric literal");
+        return false;
+    }
     return push_token(lexer, VC_TOKEN_NUMBER, start);
 }
 

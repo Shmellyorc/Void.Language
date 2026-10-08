@@ -1,0 +1,10 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        uint denominator = 0u;
+        uint numerator = 5u;
+        Console.WriteLine(numerator / denominator);
+    }
+}

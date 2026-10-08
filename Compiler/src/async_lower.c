@@ -1060,19 +1060,30 @@ static bool binding_is_instance_owner_member(
         return false;
 
     const size_t owner_index = context->semantic_method->owner_struct_index;
-    if (binding->has_method && binding->method_index < context->semantic->method_count)
+    if (binding->has_method || binding->has_delegate_create)
     {
-        const VcSemanticMethod *method = &context->semantic->methods[binding->method_index];
-        return method->has_owner_struct && method->owner_struct_index == owner_index &&
-            !method->is_static;
+        const size_t index = binding->has_delegate_create
+            ? binding->delegate_method_index : binding->method_index;
+        if (index >= context->semantic->method_count)
+            return false;
+        const VcSemanticMethod *method = &context->semantic->methods[index];
+        return method->has_owner_struct && !method->is_static;
     }
 
-    if (binding->has_field && binding->struct_index == owner_index &&
-        owner_index < context->semantic->struct_count)
+    /* The semantic binding may name a base declaration. Unqualified member
+       identifiers still refer to the original receiver after suspension. */
+    if (binding->has_field && binding->struct_index < context->semantic->struct_count)
     {
-        const VcSemanticStruct *owner = &context->semantic->structs[owner_index];
+        const VcSemanticStruct *owner = &context->semantic->structs[binding->struct_index];
         return binding->field_index < owner->field_count &&
             !owner->fields[binding->field_index].is_static;
+    }
+
+    if (binding->has_property && binding->struct_index < context->semantic->struct_count)
+    {
+        const VcSemanticStruct *owner = &context->semantic->structs[binding->struct_index];
+        return binding->property_index < owner->property_count &&
+            !owner->properties[binding->property_index].is_static;
     }
 
     if (declaration_is_instance_member(binding->declaration_node))
@@ -1097,9 +1108,13 @@ static bool binding_is_static_owner_member(
         return false;
 
     const size_t owner_index = context->semantic_method->owner_struct_index;
-    if (binding->has_method && binding->method_index < context->semantic->method_count)
+    if (binding->has_method || binding->has_delegate_create)
     {
-        const VcSemanticMethod *method = &context->semantic->methods[binding->method_index];
+        const size_t index = binding->has_delegate_create
+            ? binding->delegate_method_index : binding->method_index;
+        if (index >= context->semantic->method_count)
+            return false;
+        const VcSemanticMethod *method = &context->semantic->methods[index];
         return method->has_owner_struct && method->owner_struct_index == owner_index &&
             method->is_static;
     }

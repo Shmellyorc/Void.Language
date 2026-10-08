@@ -1,0 +1,9 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        float value = 1.0f;
+        Console.WriteLine(value << 1);
+    }
+}

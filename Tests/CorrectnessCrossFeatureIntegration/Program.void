@@ -1,0 +1,244 @@
+using Void;
+using Void.Threading.Tasks;
+using Void.Threading;
+using Void.Collections;
+using Void.Text;
+using AliasLedger358 = Finance358.Ledger;
+using AliasNamespace358 = Finance358;
+using AliasContract358 = Finance358.IScore;
+using AliasBox358 = Finance358.Holder;
+using AliasIndex358 = Void.Index;
+
+namespace Finance358
+{
+    public interface IScore
+    {
+        int Score();
+    }
+
+    public class Ledger : IScore
+    {
+        protected int _value;
+
+        public Ledger(int value)
+        {
+            _value = Normalize(value);
+        }
+
+        private int Normalize(int value) { return value; }
+        public virtual int Score() { return _value; }
+        public int VirtualScore() { return Score(); }
+
+        private void Store(out int result) { result = Score(); }
+        private T Echo<T>(T value) { return value; }
+
+        public int ReadWithOut(int delta)
+        {
+            int value;
+            Store(out value);
+            value += delta;
+            return Echo<int>(value);
+        }
+
+        public int ReadViaProperty { get { return VirtualScore(); } }
+        public int Accumulator { get; set; }
+
+        public Func<int> MakeReader()
+        {
+            return () => VirtualScore();
+        }
+
+        public IEnumerator<int> Enumerate()
+        {
+            int result;
+            Store(out result);
+            yield return result;
+            yield return VirtualScore() + 1;
+        }
+
+        public async Task<int> ReadAsync()
+        {
+            int result;
+            Store(out result);
+            await Task.Yield();
+            GC.Collect();
+            return Echo<int>(result + 1);
+        }
+    }
+
+    public sealed class SpecialLedger : Ledger
+    {
+        public SpecialLedger(int value) : base(value) {}
+        public override int Score() { return _value + 1; }
+    }
+
+    public sealed class Holder<T>
+    {
+        public T Value;
+        public static int Allocations;
+        public Holder(T value) { Value = value; Allocations++; }
+    }
+}
+
+public static class NativeOperations358
+{
+    [Native("abs")]
+    public static unsafe extern int Absolute(int value);
+}
+
+public static class Program
+{
+    private static void Check(bool condition) { Console.WriteLine(condition); }
+
+    private static T Identity<T>(T value) { return value; }
+
+    private static int ConstrainedScore<T>(T value) where T : AliasContract358
+    {
+        return value.Score();
+    }
+
+    private static void Parse(out int value)
+    {
+        value = int.MaxValue;
+    }
+
+    private static int DefiniteFlow(bool choose)
+    {
+        int value;
+        if (choose)
+            Parse(out value);
+        else
+            value = int.MaxValue;
+        return value + 1;
+    }
+
+    private static int ShortCircuitFlow(bool choose)
+    {
+        int value;
+        if (!(choose && ((value = 9) > 0)))
+            return 0;
+        Func<int> captured = () => value + 1;
+        return captured();
+    }
+
+    private static int SwitchFlow(bool branch)
+    {
+        int value;
+        int selection = branch switch
+        {
+            true => (value = 11),
+            _ => (value = 12)
+        };
+        return value + selection;
+    }
+
+    private static int ParseCaptured(string text)
+    {
+        if (int.TryParse(text, out var result) && result > 0)
+        {
+            Func<int> read = () => result;
+            return read();
+        }
+        return 0;
+    }
+
+    private static int RefAndWrap()
+    {
+        int value = int.MaxValue;
+        ref int alias = ref value;
+        alias += 1;
+        return value;
+    }
+
+    private static int ExceptionFlow(bool fail)
+    {
+        int value;
+        try
+        {
+            if (fail)
+                throw new Exception("flow-358");
+            value = 13;
+        }
+        catch (Exception error)
+        {
+            value = 14;
+        }
+        return value;
+    }
+
+    public static unsafe void Main()
+    {
+        AliasLedger358 account = new AliasNamespace358.SpecialLedger(int.MaxValue);
+        AliasContract358 contract = (AliasContract358)account;
+        Check(account.VirtualScore() == int.MinValue);
+        Check(account.ReadWithOut(1) == int.MinValue + 1);
+        Check(account.ReadViaProperty == int.MinValue);
+        Check(contract.Score() == int.MinValue);
+        Check(ConstrainedScore<AliasNamespace358.SpecialLedger>((AliasNamespace358.SpecialLedger)account) == int.MinValue);
+
+        AliasBox358<AliasLedger358> wrapped = new AliasBox358<AliasLedger358>(account);
+        Finance358.Holder<Finance358.Ledger> canonical = wrapped;
+        Check(Identity<AliasLedger358>(canonical.Value) == account);
+        Check(AliasBox358<AliasLedger358>.Allocations == 1);
+        Check(Finance358.Holder<Finance358.Ledger>.Allocations == 1);
+        account.Accumulator = int.MaxValue;
+        account.Accumulator += 1;
+        Check(account.Accumulator == int.MinValue);
+
+        Func<int> captured = account.MakeReader();
+        IEnumerator<int> iterator = account.Enumerate();
+        Task<int> pending = account.ReadAsync();
+        account = null;
+        GC.Collect();
+        Check(captured() == int.MinValue);
+        Check(iterator.MoveNext() && iterator.Current == int.MinValue);
+        Check(iterator.MoveNext() && iterator.Current == int.MinValue + 1);
+        pending.Wait();
+        Check(pending.Result == int.MinValue + 1);
+
+        Check(DefiniteFlow(true) == int.MinValue);
+        Check(DefiniteFlow(false) == int.MinValue);
+        Check(ShortCircuitFlow(true) == 10);
+        Check(ShortCircuitFlow(false) == 0);
+        Check(SwitchFlow(true) == 22);
+        Check(SwitchFlow(false) == 24);
+        Check(ExceptionFlow(false) == 13);
+        Check(ExceptionFlow(true) == 14);
+        Check(ParseCaptured("42") == 42);
+        Check(ParseCaptured("nope") == 0);
+        Check(RefAndWrap() == int.MinValue);
+        int? nullable = int.MaxValue;
+        int? increment = nullable + (int?)1;
+        Check(increment.Value == int.MinValue);
+        int[] buffer = new int[1];
+        buffer[0] = int.MaxValue;
+        buffer[0] += 1;
+        Check(buffer[0] == int.MinValue);
+        Check((short)(uint.MaxValue) == (short)-1);
+        Check(NativeOperations358.Absolute(-1) == 1);
+
+        string literal = "é😀\0Z";
+        Check(literal == "\u00E9\U0001F600\0Z");
+        byte[] bytes = Encoding.UTF8.GetBytes(literal);
+        Check(bytes.Length == 8 && bytes[0] == (byte)195 && bytes[1] == (byte)169 && bytes[2] == (byte)240);
+        Check(bytes[3] == (byte)159 && bytes[4] == (byte)152 && bytes[5] == (byte)128 && bytes[6] == (byte)0 && bytes[7] == (byte)90);
+        Check('\U0001F600' == '😀');
+        Check(0xDEAD_BEEFu == 3735928559u);
+        AliasIndex358 valueStruct = new AliasIndex358(9);
+        Check(valueStruct.Value == 9);
+
+        AliasNamespace358.SpecialLedger threadOwner = new AliasNamespace358.SpecialLedger(5);
+        Thread worker = new Thread(() =>
+        {
+            GC.Collect();
+            threadOwner.Accumulator = threadOwner.ReadWithOut(1);
+        });
+        worker.Start();
+        worker.Join();
+        Check(threadOwner.Accumulator == 7);
+
+        Task<int> threaded = Task.Run<int>(() => NativeOperations358.Absolute(-4) + 5);
+        threaded.Wait();
+        Check(threaded.Result == 9);
+    }
+}

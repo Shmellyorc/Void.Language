@@ -1,0 +1,142 @@
+using Void;
+using Void.Collections;
+using Void.Threading.Tasks;
+using N = Audit360;
+using Box = Audit360.Box;
+using Contract = Audit360.IReading;
+
+public delegate void Produce(out int value);
+
+namespace Audit360 {
+    public interface IReading { int Read(); }
+    public class Reader : IReading {
+        protected int _value;
+        public Reader(int value) { Set(value); }
+        private void Set(int value) { _value = value; }
+        public virtual int Read() { return _value; }
+        protected virtual int BaseRead() { return Read(); }
+        private T Echo<T>(T value) { return value; }
+        private int Pick(int value) { return value + 1; }
+        private static int Pick(string value) { return value.Length; }
+        private void Assign(out int value) { value = Read(); }
+        public int Current { get { return Read(); } }
+        public int ViaDelegate() {
+            Produce produce = Assign;
+            int value;
+            produce(out value);
+            return value;
+        }
+        public Func<int> Capture() { return () => Echo<int>(Read()); }
+        public int Flow(bool first) {
+            int result;
+            if (first && int.TryParse("2147483647", out int parsed)) result = parsed;
+            else result = Read();
+            switch (first) { case true: result += 1; break; default: result -= 1; break; }
+            return result;
+        }
+        public async Task<int> Later() {
+            int value;
+            Assign(out value);
+            Func<int> instanceGroup = Read;
+            Func<string, int> staticGroup = Pick;
+            await Task.Yield();
+            GC.Collect();
+            return Echo<int>(value + instanceGroup() - value + staticGroup("x"));
+        }
+        private static int Seed = 4;
+        private static int SeedValue { get { return Seed + 1; } }
+        public static IEnumerator<int> StaticStream() {
+            Func<string, int> group = Pick;
+            yield return Pick("abc");
+            yield return group("abcd");
+            yield return SeedValue;
+        }
+        public IEnumerator<int> Stream() {
+            int value;
+            Assign(out value);
+            try { yield return value; yield return Echo<int>(value + 1); yield return Pick("abc"); }
+            finally { Console.WriteLine(true); }
+        }
+    }
+    public sealed class Derived : Reader {
+        public Derived(int value) : base(value) {}
+        public override int Read() { return _value + 1; }
+        public async Task<int> InheritedLater() {
+            Func<int> inherited = BaseRead;
+            await Task.Yield();
+            return BaseRead() + inherited() + _value + Current;
+        }
+    }
+    public sealed class Box<T> {
+        public static int Count;
+        public T Value;
+        public Box(T value) { Value = value; Count++; }
+    }
+}
+public static class Native360 {
+    [Native("abs")] public static unsafe extern int Abs(int value);
+}
+public static class Dead360 {
+    public static int Value = Initialize();
+    private static int Initialize() { Console.WriteLine(false); return 1; }
+    // Validating this body must neither emit it nor run its static dependency.
+    public static Func<int> Unused() { int value = Value; return () => value; }
+}
+public static class Program {
+    private static int Score<T>(T value) where T : Contract { return value.Read(); }
+    private static ushort ProtectedMultiply() {
+        ushort value = (ushort)65535;
+        try { value *= (ushort)65535; }
+        finally { value += (ushort)1; }
+        return value;
+    }
+    public static unsafe void Main() {
+        N.Derived reader = new N.Derived(int.MaxValue);
+        Contract contract = reader;
+        Console.WriteLine(contract.Read() == int.MinValue);
+        Console.WriteLine(reader.Current == int.MinValue);
+        Console.WriteLine(reader.ViaDelegate() == int.MinValue);
+        Console.WriteLine(Score<N.Derived>(reader) == int.MinValue);
+        Task<int> inherited = new N.Derived(6).InheritedLater();
+        inherited.Wait();
+        Console.WriteLine(inherited.Result == 27);
+        Box<N.Reader> box = new Box<N.Reader>(reader);
+        N.Box<Audit360.Reader> same = box;
+        Console.WriteLine(same.Value == reader);
+        Console.WriteLine(N.Box<N.Reader>.Count == 1 && Box<N.Reader>.Count == 1);
+        Console.WriteLine(reader.Flow(true) == int.MinValue);
+        Console.WriteLine(reader.Flow(false) == int.MaxValue);
+        Func<int> capture = reader.Capture();
+        Task<int> later = reader.Later();
+        IEnumerator<int> stream = reader.Stream();
+        reader = null;
+        GC.Collect();
+        Console.WriteLine(capture() == int.MinValue);
+        later.Wait();
+        Console.WriteLine(later.Result == int.MinValue + 1);
+        Console.WriteLine(stream.MoveNext() && stream.Current == int.MinValue);
+        Console.WriteLine(stream.MoveNext() && stream.Current == int.MinValue + 1);
+        Console.WriteLine(stream.MoveNext() && stream.Current == 3);
+        Console.WriteLine(!stream.MoveNext());
+        IEnumerator<int> staticStream = N.Reader.StaticStream();
+        Console.WriteLine(staticStream.MoveNext() && staticStream.Current == 3);
+        Console.WriteLine(staticStream.MoveNext() && staticStream.Current == 4);
+        Console.WriteLine(staticStream.MoveNext() && staticStream.Current == 5);
+        Console.WriteLine(!staticStream.MoveNext());
+        int[] values = new int[] { int.MaxValue, -1 };
+        Span<int> span = new Span<int>(values);
+        span[0] += 1;
+        Console.WriteLine(values[0] == int.MinValue);
+        Console.WriteLine(Native360.Abs(-19) == 19);
+        Console.WriteLine((sbyte)(uint)255 == (sbyte)-1);
+        Console.WriteLine((long)(ulong.MaxValue) == -1L);
+        Console.WriteLine(int.MinValue / -1 == int.MinValue && int.MinValue % -1 == 0);
+        Console.WriteLine((int.MinValue >> -1) == -1);
+        Console.WriteLine((1 << 32) == 1);
+        int? nullable = int.MaxValue;
+        Console.WriteLine((nullable + 1).Value == int.MinValue);
+        Console.WriteLine(ProtectedMultiply() == (ushort)2);
+        Console.WriteLine("é\0😀" == "\u00E9\0\U0001F600");
+        Console.WriteLine('\U0001F600' == '😀');
+    }
+}

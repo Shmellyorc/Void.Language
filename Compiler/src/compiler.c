@@ -383,6 +383,128 @@ static bool structure_needs_implicit_construction(
     const VcSemanticModel *semantic,
     size_t struct_index);
 
+static bool signed_wrapping_arithmetic_type(VcSemanticType type)
+{
+    return type == VC_SEM_TYPE_SBYTE || type == VC_SEM_TYPE_SHORT ||
+        type == VC_SEM_TYPE_INT || type == VC_SEM_TYPE_LONG;
+}
+
+static const char *signed_wrapping_arithmetic_helper(
+    VcSemanticType type, VcTokenKind operator_kind)
+{
+    switch (type)
+    {
+        case VC_SEM_TYPE_SBYTE:
+            if (operator_kind == VC_TOKEN_PLUS) return "vc_wrap_i8_add";
+            if (operator_kind == VC_TOKEN_MINUS) return "vc_wrap_i8_sub";
+            if (operator_kind == VC_TOKEN_STAR) return "vc_wrap_i8_mul";
+            if (operator_kind == VC_TOKEN_SLASH) return "vc_wrap_i8_div";
+            if (operator_kind == VC_TOKEN_PERCENT) return "vc_wrap_i8_rem";
+            return NULL;
+        case VC_SEM_TYPE_SHORT:
+            if (operator_kind == VC_TOKEN_PLUS) return "vc_wrap_i16_add";
+            if (operator_kind == VC_TOKEN_MINUS) return "vc_wrap_i16_sub";
+            if (operator_kind == VC_TOKEN_STAR) return "vc_wrap_i16_mul";
+            if (operator_kind == VC_TOKEN_SLASH) return "vc_wrap_i16_div";
+            if (operator_kind == VC_TOKEN_PERCENT) return "vc_wrap_i16_rem";
+            return NULL;
+        case VC_SEM_TYPE_INT:
+            if (operator_kind == VC_TOKEN_PLUS) return "vc_wrap_i32_add";
+            if (operator_kind == VC_TOKEN_MINUS) return "vc_wrap_i32_sub";
+            if (operator_kind == VC_TOKEN_STAR) return "vc_wrap_i32_mul";
+            if (operator_kind == VC_TOKEN_SLASH) return "vc_wrap_i32_div";
+            if (operator_kind == VC_TOKEN_PERCENT) return "vc_wrap_i32_rem";
+            return NULL;
+        case VC_SEM_TYPE_LONG:
+            if (operator_kind == VC_TOKEN_PLUS) return "vc_wrap_i64_add";
+            if (operator_kind == VC_TOKEN_MINUS) return "vc_wrap_i64_sub";
+            if (operator_kind == VC_TOKEN_STAR) return "vc_wrap_i64_mul";
+            if (operator_kind == VC_TOKEN_SLASH) return "vc_wrap_i64_div";
+            if (operator_kind == VC_TOKEN_PERCENT) return "vc_wrap_i64_rem";
+            return NULL;
+        default:
+            return NULL;
+    }
+}
+
+/* Unsigned division and remainder still require a defined zero-divisor path.
+   Narrow unsigned multiplication must avoid C's signed-int promotions. */
+static const char *unsigned_arithmetic_helper(VcSemanticType type, VcTokenKind kind)
+{
+    const char *operation = kind == VC_TOKEN_SLASH ? "div" :
+        kind == VC_TOKEN_PERCENT ? "rem" :
+        kind == VC_TOKEN_STAR && type == VC_SEM_TYPE_USHORT ? "mul" : NULL;
+    if (operation == NULL) return NULL;
+    switch (type)
+    {
+        case VC_SEM_TYPE_BYTE:
+            return kind == VC_TOKEN_SLASH ? "vc_safe_u8_div" :
+                kind == VC_TOKEN_PERCENT ? "vc_safe_u8_rem" : NULL;
+        case VC_SEM_TYPE_USHORT:
+            return kind == VC_TOKEN_SLASH ? "vc_safe_u16_div" :
+                kind == VC_TOKEN_PERCENT ? "vc_safe_u16_rem" : "vc_safe_u16_mul";
+        case VC_SEM_TYPE_UINT:
+            return kind == VC_TOKEN_SLASH ? "vc_safe_u32_div" : "vc_safe_u32_rem";
+        case VC_SEM_TYPE_ULONG:
+            return kind == VC_TOKEN_SLASH ? "vc_safe_u64_div" : "vc_safe_u64_rem";
+        default:
+            return NULL;
+    }
+}
+
+static const char *integral_shift_helper(VcSemanticType type, VcTokenKind operator_kind)
+{
+    const bool left = operator_kind == VC_TOKEN_LESS_LESS;
+    if (!left && operator_kind != VC_TOKEN_GREATER_GREATER) return NULL;
+    switch (type)
+    {
+        case VC_SEM_TYPE_BYTE: return left ? "vc_shift_u8_left" : "vc_shift_u8_right";
+        case VC_SEM_TYPE_SBYTE: return left ? "vc_shift_i8_left" : "vc_shift_i8_right";
+        case VC_SEM_TYPE_SHORT: return left ? "vc_shift_i16_left" : "vc_shift_i16_right";
+        case VC_SEM_TYPE_USHORT: return left ? "vc_shift_u16_left" : "vc_shift_u16_right";
+        case VC_SEM_TYPE_INT: return left ? "vc_shift_i32_left" : "vc_shift_i32_right";
+        case VC_SEM_TYPE_UINT: return left ? "vc_shift_u32_left" : "vc_shift_u32_right";
+        case VC_SEM_TYPE_LONG: return left ? "vc_shift_i64_left" : "vc_shift_i64_right";
+        case VC_SEM_TYPE_ULONG: return left ? "vc_shift_u64_left" : "vc_shift_u64_right";
+        default: return NULL;
+    }
+}
+
+static bool integral_numeric_type(VcSemanticType type)
+{
+    return type == VC_SEM_TYPE_BYTE || type == VC_SEM_TYPE_SBYTE ||
+        type == VC_SEM_TYPE_SHORT || type == VC_SEM_TYPE_USHORT ||
+        type == VC_SEM_TYPE_INT || type == VC_SEM_TYPE_UINT ||
+        type == VC_SEM_TYPE_LONG || type == VC_SEM_TYPE_ULONG;
+}
+
+/* This is the same signed-bit restoration used by #354's arithmetic helpers.
+   No out-of-range unsigned value is ever cast to a signed type. */
+static const char *signed_bits_helper(VcSemanticType target, VcSemanticType source)
+{
+    if (!integral_numeric_type(source)) return NULL;
+    switch (target)
+    {
+        case VC_SEM_TYPE_SBYTE: return "vc_signed_i8_from_bits";
+        case VC_SEM_TYPE_SHORT: return "vc_signed_i16_from_bits";
+        case VC_SEM_TYPE_INT: return "vc_signed_i32_from_bits";
+        case VC_SEM_TYPE_LONG: return "vc_signed_i64_from_bits";
+        default: return NULL;
+    }
+}
+
+static const char *signed_unsigned_type(VcSemanticType type)
+{
+    switch (type)
+    {
+        case VC_SEM_TYPE_SBYTE: return "uint8_t";
+        case VC_SEM_TYPE_SHORT: return "uint16_t";
+        case VC_SEM_TYPE_INT: return "uint32_t";
+        case VC_SEM_TYPE_LONG: return "uint64_t";
+        default: return NULL;
+    }
+}
+
 static const char *c_type(const VcSemanticModel *semantic, VcSemanticType type)
 {
     switch (type)
@@ -2305,6 +2427,8 @@ static const char *operator_text(VcTokenKind kind)
         case VC_TOKEN_STAR: return "*";
         case VC_TOKEN_SLASH: return "/";
         case VC_TOKEN_PERCENT: return "%";
+        case VC_TOKEN_LESS_LESS: return "<<";
+        case VC_TOKEN_GREATER_GREATER: return ">>";
         case VC_TOKEN_EQUAL_EQUAL: return "==";
         case VC_TOKEN_BANG_EQUAL: return "!=";
         case VC_TOKEN_LESS: return "<";
@@ -2319,6 +2443,8 @@ static const char *operator_text(VcTokenKind kind)
         case VC_TOKEN_STAR_EQUAL: return "*=";
         case VC_TOKEN_SLASH_EQUAL: return "/=";
         case VC_TOKEN_PERCENT_EQUAL: return "%=";
+        case VC_TOKEN_LESS_LESS_EQUAL: return "<<=";
+        case VC_TOKEN_GREATER_GREATER_EQUAL: return ">>=";
         case VC_TOKEN_BANG: return "!";
         case VC_TOKEN_TILDE: return "~";
         case VC_TOKEN_PLUS_PLUS: return "++";
@@ -2337,48 +2463,36 @@ static VcTokenKind compound_binary_kind(VcTokenKind kind)
         case VC_TOKEN_STAR_EQUAL: return VC_TOKEN_STAR;
         case VC_TOKEN_SLASH_EQUAL: return VC_TOKEN_SLASH;
         case VC_TOKEN_PERCENT_EQUAL: return VC_TOKEN_PERCENT;
+        case VC_TOKEN_LESS_LESS_EQUAL: return VC_TOKEN_LESS_LESS;
+        case VC_TOKEN_GREATER_GREATER_EQUAL: return VC_TOKEN_GREATER_GREATER;
         default: return VC_TOKEN_EOF;
     }
 }
 
-static void emit_numeric_literal(FILE *file, const char *text, VcSemanticType type)
+static bool emit_numeric_literal(FILE *file, const char *text)
 {
-    const size_t length = strlen(text);
-    bool has_fraction_or_exponent = false;
+    VcAstNumericLiteral literal;
+    if (!vc_ast_numeric_literal(text, &literal)) return false;
+    fputs(literal.c_text, file);
+    free(literal.c_text);
+    return true;
+}
+
+/* Emit explicit byte values so host escape greediness and execution charset
+   cannot change managed UTF-8 or embedded-NUL literal contents. */
+static bool emit_void_string_bytes(FILE *file, const char *text, size_t *byte_length)
+{
+    unsigned char *bytes = NULL;
+    size_t length = 0;
+    if (!vc_ast_string_bytes(text, &bytes, &length))
+        return false;
+    fputc('"', file);
     for (size_t i = 0; i < length; i++)
-    {
-        const char c = text[i];
-        if (c == '_')
-            continue;
-
-        if (c == '.' || c == 'e' || c == 'E')
-            has_fraction_or_exponent = true;
-
-        if ((type == VC_SEM_TYPE_FLOAT && (c == 'f' || c == 'F')) ||
-            (type == VC_SEM_TYPE_DOUBLE && (c == 'd' || c == 'D')) ||
-            (type == VC_SEM_TYPE_DECIMAL && (c == 'm' || c == 'M')))
-            continue;
-
-        fputc(c, file);
-    }
-
-    if (type == VC_SEM_TYPE_FLOAT)
-    {
-        if (!has_fraction_or_exponent)
-            fputs(".0", file);
-        fputc('f', file);
-    }
-    else if (type == VC_SEM_TYPE_DOUBLE)
-    {
-        if (!has_fraction_or_exponent)
-            fputs(".0", file);
-    }
-    else if (type == VC_SEM_TYPE_DECIMAL)
-    {
-        if (!has_fraction_or_exponent)
-            fputs(".0", file);
-        fputc('L', file);
-    }
+        fprintf(file, "\\%03o", (unsigned)bytes[i]);
+    fputc('"', file);
+    free(bytes);
+    if (byte_length != NULL) *byte_length = length;
+    return true;
 }
 
 static bool emit_expression(VcCodegenContext *context, const VcAstNode *expression);
@@ -3540,7 +3654,10 @@ static bool collect_null_temps(VcCodegenContext *context, const VcAstNode *node)
             if (compound_binary_kind(assignment_kind) != VC_TOKEN_EOF && left_binding != NULL)
             {
                 const VcAstNode *left = node->as.assignment_expression.left;
-                if (left_binding->has_indexer_get && left->kind == VC_AST_INDEX_EXPRESSION)
+                /* Ref-returning indexers update their underlying storage directly.
+                   They do not need the get/set compound-assignment snapshots. */
+                if (left_binding->has_indexer_get && !left_binding->method_returns_ref &&
+                    left->kind == VC_AST_INDEX_EXPRESSION)
                 {
                     if (left_binding->method_index >= context->semantic->method_count)
                         return false;
@@ -3560,7 +3677,7 @@ static bool collect_null_temps(VcCodegenContext *context, const VcAstNode *node)
                         !add_null_temp(context, node, left_binding->type, false))
                         return false;
                 }
-                else if (left_binding->has_property)
+                else if (left_binding->has_property && !left_binding->property_returns_ref)
                 {
                     if (!add_null_temp(context, node, left_binding->type, false))
                         return false;
@@ -3787,6 +3904,35 @@ static bool emit_receiver_temp_prefix(
     return true;
 }
 
+/* Reuse the #354/#355 numeric compound helpers for both ordinary lvalues
+   and ref-returning property/indexer storage. A resolved operator method is
+   never lowered as builtin arithmetic. */
+static bool integral_compound_helper_parts(
+    VcSemanticType type, VcTokenKind assignment_kind,
+    const char **width, const char **operation)
+{
+    const VcTokenKind binary = compound_binary_kind(assignment_kind);
+    if (binary == VC_TOKEN_EOF ||
+        (signed_wrapping_arithmetic_helper(type, binary) == NULL &&
+         unsigned_arithmetic_helper(type, binary) == NULL &&
+         integral_shift_helper(type, binary) == NULL))
+        return false;
+    *width = type == VC_SEM_TYPE_SBYTE ? "i8" :
+        type == VC_SEM_TYPE_SHORT ? "i16" :
+        type == VC_SEM_TYPE_INT ? "i32" :
+        type == VC_SEM_TYPE_LONG ? "i64" :
+        type == VC_SEM_TYPE_BYTE ? "u8" :
+        type == VC_SEM_TYPE_USHORT ? "u16" :
+        type == VC_SEM_TYPE_UINT ? "u32" : "u64";
+    *operation = binary == VC_TOKEN_PLUS ? "add" :
+        binary == VC_TOKEN_MINUS ? "sub" :
+        binary == VC_TOKEN_STAR ? "mul" :
+        binary == VC_TOKEN_SLASH ? "div" :
+        binary == VC_TOKEN_PERCENT ? "rem" :
+        binary == VC_TOKEN_LESS_LESS ? "left" : "right";
+    return true;
+}
+
 static bool emit_index_target(VcCodegenContext *context, const VcAstNode *index_expression)
 {
     if (index_expression == NULL || index_expression->kind != VC_AST_INDEX_EXPRESSION)
@@ -3837,7 +3983,21 @@ static bool emit_compound_value(
         return true;
     }
 
-    const char *op = operator_text(compound_binary_kind(assignment_kind));
+    const VcTokenKind binary = compound_binary_kind(assignment_kind);
+    const char *wrap = assignment_binding != NULL
+        ? signed_wrapping_arithmetic_helper(assignment_binding->type, binary) : NULL;
+    if (wrap == NULL && assignment_binding != NULL)
+        wrap = unsigned_arithmetic_helper(assignment_binding->type, binary);
+    if (wrap == NULL && assignment_binding != NULL)
+        wrap = integral_shift_helper(assignment_binding->type, binary);
+    if (wrap != NULL)
+    {
+        fprintf(context->file, "%s(%s, ", wrap, left_name);
+        if (!emit_expression(context, right)) return false;
+        fputc(')', context->file);
+        return true;
+    }
+    const char *op = operator_text(binary);
     if (op == NULL)
         return false;
     fprintf(context->file, "(%s %s ", left_name, op);
@@ -4263,6 +4423,21 @@ static bool emit_standard_conversion_open(
         case VC_CODEGEN_CONVERSION_C_CAST:
             if (target_c_type == NULL)
                 return false;
+            if (signed_bits_helper(target, source) != NULL &&
+                !(target == VC_SEM_TYPE_LONG && (source == VC_SEM_TYPE_INT ||
+                    source == VC_SEM_TYPE_SHORT || source == VC_SEM_TYPE_SBYTE ||
+                    source == VC_SEM_TYPE_BYTE || source == VC_SEM_TYPE_USHORT ||
+                    source == VC_SEM_TYPE_UINT)) &&
+                !(target == VC_SEM_TYPE_INT && (source == VC_SEM_TYPE_SHORT ||
+                    source == VC_SEM_TYPE_SBYTE || source == VC_SEM_TYPE_BYTE ||
+                    source == VC_SEM_TYPE_USHORT)) &&
+                !(target == VC_SEM_TYPE_SHORT && (source == VC_SEM_TYPE_SBYTE ||
+                    source == VC_SEM_TYPE_BYTE)))
+            {
+                fprintf(context->file, "%s((%s)(", signed_bits_helper(target, source),
+                    signed_unsigned_type(target));
+                return true;
+            }
             fprintf(context->file, "((%s)(", target_c_type);
             return true;
         case VC_CODEGEN_CONVERSION_NULLABLE_WRAP:
@@ -4278,7 +4453,11 @@ static bool emit_standard_conversion_open(
                 const char *underlying_c_type = c_type(context->semantic, underlying);
                 if (underlying_c_type == NULL)
                     return false;
-                fprintf(context->file, "((%s)(", underlying_c_type);
+                const char *bits = signed_bits_helper(underlying, source);
+                if (bits != NULL)
+                    fprintf(context->file, "%s((%s)(", bits, signed_unsigned_type(underlying));
+                else
+                    fprintf(context->file, "((%s)(", underlying_c_type);
             }
             return true;
         }
@@ -4290,7 +4469,12 @@ static bool emit_standard_conversion_open(
             {
                 if (target_c_type == NULL)
                     return false;
-                fprintf(context->file, "((%s)(", target_c_type);
+                const VcSemanticType underlying = vc_semantic_nullable_underlying_type(context->semantic, source);
+                const char *bits = signed_bits_helper(target, underlying);
+                if (bits != NULL)
+                    fprintf(context->file, "%s((%s)(", bits, signed_unsigned_type(target));
+                else
+                    fprintf(context->file, "((%s)(", target_c_type);
             }
             fprintf(context->file, "vc_nullable_value_%zu(", nullable_index);
             return true;
@@ -4552,6 +4736,10 @@ static bool emit_expression_as(
         return true;
     }
 
+    if (source_type != target_type && integral_numeric_type(source_type) &&
+        integral_numeric_type(target_type))
+        return emit_standard_converted_expression(context, expression,
+            target_type, source_type, false);
     return emit_expression(context, expression);
 }
 
@@ -4656,6 +4844,8 @@ static const char *ref_assignment_operator_text(VcTokenKind kind)
         case VC_TOKEN_STAR_EQUAL: return "*=";
         case VC_TOKEN_SLASH_EQUAL: return "/=";
         case VC_TOKEN_PERCENT_EQUAL: return "%=";
+        case VC_TOKEN_LESS_LESS_EQUAL: return "<<=";
+        case VC_TOKEN_GREATER_GREATER_EQUAL: return ">>=";
         case VC_TOKEN_AMPERSAND_EQUAL: return "&=";
         case VC_TOKEN_PIPE_EQUAL: return "|=";
         case VC_TOKEN_CARET_EQUAL: return "^=";
@@ -6315,6 +6505,11 @@ emit_regular_call:
     }
 
     const VcSemanticMethod *target_method = &context->semantic->methods[binding->method_index];
+    const bool implicit_receiver = binding->implicit_receiver;
+    const char *implicit_receiver_name = implicit_receiver
+        ? find_codegen_name(context, "this") : NULL;
+    if (implicit_receiver && implicit_receiver_name == NULL)
+        return false;
     if (method_is_span_ref_add_intrinsic(context, target_method))
         return emit_span_ref_add_intrinsic(context, expression, target_method);
     if (method_is_span_array_pinnable_ref_intrinsic(context, target_method))
@@ -6441,7 +6636,9 @@ emit_regular_call:
     }
     else if (!target_method->is_static)
     {
-        if (callee->kind != VC_AST_MEMBER_ACCESS_EXPRESSION ||
+        const bool explicit_receiver = callee->kind == VC_AST_MEMBER_ACCESS_EXPRESSION;
+        if ((!explicit_receiver && !implicit_receiver) ||
+            (implicit_receiver && callee->kind != VC_AST_IDENTIFIER_EXPRESSION) ||
             !signature_method->has_owner_struct ||
             receiver_owner_index >= context->semantic->struct_count)
             return false;
@@ -6452,6 +6649,8 @@ emit_regular_call:
             emit_guard_text(context, "(void *)vc_object_require((void *)(");
             if (receiver_temp != NULL)
                 fputs(receiver_temp->name, context->file);
+            else if (implicit_receiver)
+                fputs(implicit_receiver_name, context->file);
             else if (!emit_member_target(context, callee))
                 return false;
             fputs("))", context->file);
@@ -6461,6 +6660,8 @@ emit_regular_call:
             emit_guard_text(context, "(%s *)vc_object_require((void *)(", owner->c_name);
             if (receiver_temp != NULL)
                 fputs(receiver_temp->name, context->file);
+            else if (implicit_receiver)
+                fputs(implicit_receiver_name, context->file);
             else if (!emit_member_target(context, callee))
                 return false;
             fputs("))", context->file);
@@ -6474,6 +6675,8 @@ emit_regular_call:
                 else
                     fprintf(context->file, "&(%s)", receiver_temp->name);
             }
+            else if (implicit_receiver)
+                fprintf(context->file, "&(%s)", implicit_receiver_name);
             else
             {
                 fputs("&(", context->file);
@@ -6487,10 +6690,20 @@ emit_regular_call:
             fputs(", ", context->file);
             if ((owner->is_class || owner->is_interface) && receiver_temp != NULL)
                 fputs(receiver_temp->name, context->file);
+            else if ((owner->is_class || owner->is_interface) && implicit_receiver)
+                fputs(implicit_receiver_name, context->file);
             else if (owner->is_class || owner->is_interface)
             {
                 if (!emit_member_target(context, callee))
                     return false;
+            }
+            else if (implicit_receiver)
+            {
+                if (context->method != NULL && !context->method->is_static &&
+                    context->method->returns_ref)
+                    fputs("vc_ref_self_owner", context->file);
+                else
+                    fputs("NULL", context->file);
             }
             else if (!emit_ref_owner_expression(context, target))
                 return false;
@@ -8308,15 +8521,17 @@ static bool emit_expression_impl(VcCodegenContext *context, const VcAstNode *exp
                 case VC_AST_LITERAL_NUMBER:
                     if (binding == NULL)
                         return false;
-                    emit_numeric_literal(context->file, expression->as.literal_expression.text, binding->type);
-                    return true;
+                    return emit_numeric_literal(context->file, expression->as.literal_expression.text);
                 case VC_AST_LITERAL_STRING:
+                {
+                    size_t byte_length = 0;
                     fputs("vc_string_literal(", context->file);
-                    fputs(expression->as.literal_expression.text, context->file);
-                    fputs(", sizeof(", context->file);
-                    fputs(expression->as.literal_expression.text, context->file);
-                    fputs(") - 1u)", context->file);
+                    if (!emit_void_string_bytes(context->file,
+                            expression->as.literal_expression.text, &byte_length))
+                        return false;
+                    fprintf(context->file, ", %zuu)", byte_length);
                     return true;
+                }
                 case VC_AST_LITERAL_CHARACTER:
                 {
                     uint32_t scalar = 0;
@@ -8837,6 +9052,17 @@ emit_regular_member:
                     return true;
                 }
                 if (!vc_semantic_type_is_nullable(source) &&
+                    integral_numeric_type(underlying) && integral_numeric_type(source) &&
+                    vc_semantic_classify_standard_conversion(
+                        context->semantic, underlying, source, true) != VC_SEM_CONVERSION_NONE)
+                {
+                    fprintf(context->file, "((%s){ .has_value = true, .value = ", target_c_type);
+                    if (!emit_standard_converted_expression(context, operand, underlying, source, true))
+                        return false;
+                    fputs(" })", context->file);
+                    return true;
+                }
+                if (!vc_semantic_type_is_nullable(source) &&
                     vc_semantic_classify_standard_conversion(
                         context->semantic, underlying, source, true) != VC_SEM_CONVERSION_NONE)
                 {
@@ -8860,7 +9086,12 @@ emit_regular_member:
                         context->semantic, target, underlying, true) != VC_SEM_CONVERSION_NONE)
                 {
                     const size_t nullable_index = vc_semantic_nullable_index(source);
-                    fprintf(context->file, "((%s)(vc_nullable_value_%zu(", target_c_type, nullable_index);
+                    const char *bits = signed_bits_helper(target, underlying);
+                    if (bits != NULL)
+                        fprintf(context->file, "%s((%s)(vc_nullable_value_%zu(",
+                            bits, signed_unsigned_type(target), nullable_index);
+                    else
+                        fprintf(context->file, "((%s)(vc_nullable_value_%zu(", target_c_type, nullable_index);
                     if (!emit_expression(context, operand))
                         return false;
                     fputs(")))", context->file);
@@ -8924,6 +9155,8 @@ emit_regular_member:
                 return true;
             }
 
+            if (integral_numeric_type(source) && integral_numeric_type(target))
+                return emit_standard_converted_expression(context, operand, target, source, true);
             fprintf(context->file, "((%s)(", target_c_type);
             if (!emit_expression(context, operand))
                 return false;
@@ -9537,9 +9770,17 @@ emit_regular_index:
                     const char *op = operator_text(unary_kind);
                     if (op == NULL)
                         return false;
-                    fprintf(context->file,
-                        ", !%s.has_value ? ((%s){0}) : ((%s){ .has_value = true, .value = %s(%s.value) }))",
-                        temp->name, result_type, result_type, op, temp->name);
+                    const char *signed_helper = unary_kind == VC_TOKEN_MINUS
+                        ? signed_wrapping_arithmetic_helper(binding->lifted_underlying_type, VC_TOKEN_MINUS)
+                        : NULL;
+                    if (signed_helper != NULL)
+                        fprintf(context->file,
+                            ", !%s.has_value ? ((%s){0}) : ((%s){ .has_value = true, .value = %s(0, %s.value) }))",
+                            temp->name, result_type, result_type, signed_helper, temp->name);
+                    else
+                        fprintf(context->file,
+                            ", !%s.has_value ? ((%s){0}) : ((%s){ .has_value = true, .value = %s(%s.value) }))",
+                            temp->name, result_type, result_type, op, temp->name);
                 }
                 return true;
             }
@@ -9581,6 +9822,31 @@ emit_regular_index:
 
             const char *op = operator_text(unary_kind);
             if (op == NULL) return false;
+            const bool signed_builtin = binding != NULL &&
+                signed_wrapping_arithmetic_type(binding->type);
+            const char *update_helper = NULL;
+            if (signed_builtin &&
+                (unary_kind == VC_TOKEN_PLUS_PLUS || unary_kind == VC_TOKEN_MINUS_MINUS))
+            {
+                static const char *const names[4][2][2] = {
+                    {{"vc_update_i8_inc_pre", "vc_update_i8_inc_post"}, {"vc_update_i8_dec_pre", "vc_update_i8_dec_post"}},
+                    {{"vc_update_i16_inc_pre", "vc_update_i16_inc_post"}, {"vc_update_i16_dec_pre", "vc_update_i16_dec_post"}},
+                    {{"vc_update_i32_inc_pre", "vc_update_i32_inc_post"}, {"vc_update_i32_dec_pre", "vc_update_i32_dec_post"}},
+                    {{"vc_update_i64_inc_pre", "vc_update_i64_inc_post"}, {"vc_update_i64_dec_pre", "vc_update_i64_dec_post"}}
+                };
+                const size_t idx = binding->type == VC_SEM_TYPE_SBYTE ? 0u :
+                    binding->type == VC_SEM_TYPE_SHORT ? 1u : binding->type == VC_SEM_TYPE_INT ? 2u : 3u;
+                update_helper = names[idx][unary_kind == VC_TOKEN_PLUS_PLUS ? 0u : 1u]
+                    [expression->as.unary_expression.postfix ? 1u : 0u];
+            }
+            if (signed_builtin && unary_kind == VC_TOKEN_MINUS)
+            {
+                const char *helper = signed_wrapping_arithmetic_helper(binding->type, VC_TOKEN_MINUS);
+                fprintf(context->file, "%s(0, ", helper);
+                if (!emit_expression(context, expression->as.unary_expression.operand)) return false;
+                fputc(')', context->file);
+                return true;
+            }
             size_t static_owner = 0;
             const bool initialize_static_lvalue =
                 (unary_kind == VC_TOKEN_PLUS_PLUS || unary_kind == VC_TOKEN_MINUS_MINUS) &&
@@ -9593,15 +9859,21 @@ emit_regular_index:
                 emit_static_type_init_prefix(context, static_owner);
                 context->suppress_static_type_init = true;
             }
-            if (!expression->as.unary_expression.postfix) fputs(op, context->file);
-            fputc('(', context->file);
+            if (update_helper != NULL)
+                fprintf(context->file, "%s(&(", update_helper);
+            else
+            {
+                if (!expression->as.unary_expression.postfix) fputs(op, context->file);
+                fputc('(', context->file);
+            }
             if (!emit_expression(context, expression->as.unary_expression.operand))
             {
                 context->suppress_static_type_init = false;
                 return false;
             }
             fputc(')', context->file);
-            if (expression->as.unary_expression.postfix) fputs(op, context->file);
+            if (update_helper != NULL) fputc(')', context->file);
+            else if (expression->as.unary_expression.postfix) fputs(op, context->file);
             if (initialize_static_lvalue)
             {
                 context->suppress_static_type_init = false;
@@ -9750,9 +10022,24 @@ emit_regular_index:
                 }
                 else
                 {
-                    fprintf(context->file, "%s%s %s %s%s",
-                        left_temp->name, left_nullable ? ".value" : "", op,
-                        right_temp->name, right_nullable ? ".value" : "");
+                    const char *wrap_helper = signed_wrapping_arithmetic_helper(
+                        binding->lifted_underlying_type,
+                        expression->as.binary_expression.operator_kind);
+                    if (wrap_helper == NULL)
+                        wrap_helper = unsigned_arithmetic_helper(binding->lifted_underlying_type,
+                            expression->as.binary_expression.operator_kind);
+                    if (wrap_helper != NULL)
+                    {
+                        fprintf(context->file, "%s(%s%s, %s%s)", wrap_helper,
+                            left_temp->name, left_nullable ? ".value" : "",
+                            right_temp->name, right_nullable ? ".value" : "");
+                    }
+                    else
+                    {
+                        fprintf(context->file, "%s%s %s %s%s",
+                            left_temp->name, left_nullable ? ".value" : "", op,
+                            right_temp->name, right_nullable ? ".value" : "");
+                    }
                 }
                 fprintf(context->file, " }) : ((%s){0}))", result_type);
                 return true;
@@ -9929,6 +10216,40 @@ emit_regular_index:
                     context->semantic->structs[left_index].is_class &&
                     context->semantic->structs[right_index].is_class &&
                     left_index != right_index;
+            }
+
+            const char *wrap_helper = NULL;
+            if (binding != NULL && left_binding != NULL && right_binding != NULL &&
+                left_binding->type == binding->type && right_binding->type == binding->type &&
+                signed_wrapping_arithmetic_type(binding->type))
+            {
+                wrap_helper = signed_wrapping_arithmetic_helper(
+                    binding->type, expression->as.binary_expression.operator_kind);
+            }
+            if (wrap_helper == NULL && binding != NULL && left_binding != NULL &&
+                left_binding->type == binding->type && right_binding != NULL &&
+                right_binding->type == binding->type)
+                wrap_helper = unsigned_arithmetic_helper(binding->type,
+                    expression->as.binary_expression.operator_kind);
+            if (wrap_helper == NULL && binding != NULL && left_binding != NULL &&
+                integral_numeric_type(left_binding->type))
+                wrap_helper = integral_shift_helper(left_binding->type,
+                    expression->as.binary_expression.operator_kind);
+            if (wrap_helper != NULL)
+            {
+                fprintf(context->file, "%s(", wrap_helper);
+                if (!emit_expression_as(context, expression->as.binary_expression.left, binding->type))
+                    return false;
+                fputs(", ", context->file);
+                if (expression->as.binary_expression.operator_kind == VC_TOKEN_LESS_LESS ||
+                    expression->as.binary_expression.operator_kind == VC_TOKEN_GREATER_GREATER)
+                {
+                    if (!emit_expression(context, expression->as.binary_expression.right)) return false;
+                }
+                else if (!emit_expression_as(context, expression->as.binary_expression.right, binding->type))
+                    return false;
+                fputc(')', context->file);
+                return true;
             }
 
             fputc('(', context->file);
@@ -10430,9 +10751,17 @@ emit_regular_index:
                 if (type == NULL || op == NULL) return false;
                 const VcAstNode *member_expression =
                     left_node->kind == VC_AST_MEMBER_ACCESS_EXPRESSION ? left_node : NULL;
+                const char *width = NULL;
+                const char *operation = NULL;
+                const bool builtin = (binding == NULL || !binding->has_method) &&
+                    integral_compound_helper_parts(property->type,
+                        expression->as.assignment_expression.operator_kind, &width, &operation);
+                if (builtin)
+                    fprintf(context->file, "vc_compound_%s_%s(&", width, operation);
                 fprintf(context->file, "(*((%s *)((", type);
                 if (!emit_property_get(context, left_binding, member_expression)) return false;
-                fprintf(context->file, ").ptr)) %s ", op);
+                if (builtin) fputs(").ptr))), ", context->file);
+                else fprintf(context->file, ").ptr)) %s ", op);
                 if (!emit_expression_as(context, expression->as.assignment_expression.right, property->type)) return false;
                 fputc(')', context->file);
                 return true;
@@ -10441,6 +10770,11 @@ emit_regular_index:
             if (left_binding != NULL && left_node->kind == VC_AST_INDEX_EXPRESSION &&
                 left_binding->has_indexer_get && left_binding->method_returns_ref)
             {
+                const char *width = NULL;
+                const char *operation = NULL;
+                const bool builtin = (binding == NULL || !binding->has_method) &&
+                    integral_compound_helper_parts(left_binding->type,
+                        expression->as.assignment_expression.operator_kind, &width, &operation);
                 if (left_binding->has_index_consumer)
                 {
                     const char *op = ref_assignment_operator_text(
@@ -10453,10 +10787,13 @@ emit_regular_index:
                         !emit_index_range_consumer_prefix(context, left_node, left_binding, temp,
                             &receiver_type, receiver_storage, sizeof(receiver_storage)))
                         return false;
+                    if (builtin)
+                        fprintf(context->file, "vc_compound_%s_%s(&", width, operation);
                     if (!emit_index_range_consumer_access(context, left_node, left_binding, temp,
                             receiver_type, receiver_storage, true))
                         return false;
-                    fprintf(context->file, " %s ", op);
+                    if (builtin) fputs(", ", context->file);
+                    else fprintf(context->file, " %s ", op);
                     if (!emit_expression_as(context, expression->as.assignment_expression.right,
                             left_binding->type))
                         return false;
@@ -10473,6 +10810,8 @@ emit_regular_index:
                 const char *type = c_type(context->semantic, method->return_type);
                 const char *op = ref_assignment_operator_text(expression->as.assignment_expression.operator_kind);
                 if (type == NULL || op == NULL) return false;
+                if (builtin)
+                    fprintf(context->file, "vc_compound_%s_%s(&", width, operation);
                 fprintf(context->file, "(*((%s *)((", type);
                 if (!emit_indexer_call_start(context, left_binding, method)) return false;
                 if (left_binding->interface_dispatch)
@@ -10498,7 +10837,8 @@ emit_regular_index:
                 else if (!emit_ref_owner_expression(context, left_node->as.index_expression.target)) return false;
                 fputs(", ", context->file);
                 if (!emit_expression_as(context, left_node->as.index_expression.index, method->parameter_types[0])) return false;
-                fprintf(context->file, ")).ptr)) %s ", op);
+                if (builtin) fputs(")).ptr))), ", context->file);
+                else fprintf(context->file, ")).ptr)) %s ", op);
                 if (!emit_expression_as(context, expression->as.assignment_expression.right, method->return_type)) return false;
                 fputc(')', context->file);
                 return true;
@@ -10869,6 +11209,12 @@ emit_regular_index:
                 return true;
             }
 
+            const VcSemanticType left_type = left_binding != NULL ? left_binding->type : VC_SEM_TYPE_UNKNOWN;
+            const char *width = NULL;
+            const char *operation = NULL;
+            const bool wrap = binding != NULL && !binding->has_method &&
+                integral_compound_helper_parts(left_type,
+                    expression->as.assignment_expression.operator_kind, &width, &operation);
             const char *op = operator_text(expression->as.assignment_expression.operator_kind);
             if (op == NULL) return false;
             size_t static_field_owner = 0;
@@ -10882,13 +11228,18 @@ emit_regular_index:
                 emit_static_type_init_prefix(context, static_field_owner);
                 context->suppress_static_type_init = true;
             }
+            if (wrap)
+                fprintf(context->file, "vc_compound_%s_%s(&(", width, operation);
             if (!emit_expression(context, expression->as.assignment_expression.left))
             {
                 context->suppress_static_type_init = saved_suppress_static_type_init;
                 return false;
             }
             context->suppress_static_type_init = saved_suppress_static_type_init;
-            fprintf(context->file, " %s ", op);
+            if (wrap)
+                fputs("), ", context->file);
+            else
+                fprintf(context->file, " %s ", op);
             if (expression->as.assignment_expression.operator_kind == VC_TOKEN_EQUAL)
             {
                 const VcSemanticType target_type = left_binding != NULL ? left_binding->type :
@@ -10896,6 +11247,7 @@ emit_regular_index:
                 if (!emit_expression_as(context, expression->as.assignment_expression.right, target_type)) return false;
             }
             else if (!emit_expression(context, expression->as.assignment_expression.right)) return false;
+            if (wrap) fputc(')', context->file);
             fputc(')', context->file);
             return true;
         }
@@ -13858,9 +14210,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
             const size_t outer_root_count = context->gc_root_count;
             const size_t switch_id = context->next_local++;
             char switch_name[64];
-            char matched_name[64];
             snprintf(switch_name, sizeof(switch_name), "vc_switch_%zu", switch_id);
-            snprintf(matched_name, sizeof(matched_name), "vc_switch_matched_%zu", switch_id);
 
             emit_indent(context->file, context->depth);
             fputs("{\n", context->file);
@@ -13873,8 +14223,6 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
             if (!emit_gc_register(context, switch_name, switch_type))
                 return false;
             const size_t switch_root_count = context->gc_root_count;
-            emit_indent(context->file, context->depth);
-            fprintf(context->file, "bool %s = false;\n", matched_name);
 
             if (!push_break_gc_root_count(context, switch_root_count))
                 return false;
@@ -13882,6 +14230,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
             context->break_label_ids[context->break_depth - 1] = switch_id;
 
             const VcAstNode *default_section = NULL;
+            size_t conditional_sections = 0;
             for (size_t section_index = 0;
                 section_index < statement->as.switch_statement.sections.count; section_index++)
             {
@@ -13900,6 +14249,10 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                     default_section = section;
                 if (!has_non_default)
                     continue;
+                size_t label_count = 0;
+                for (size_t i = 0; i < section->as.switch_section.labels.count; i++)
+                    if (!section->as.switch_section.labels.items[i]->as.switch_label.is_default)
+                        label_count++;
 
                 const size_t saved_name_count = context->name_count;
                 const size_t saved_gc_root_count = context->gc_root_count;
@@ -13920,7 +14273,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 const size_t condition_gc_root_count = context->gc_root_count;
 
                 emit_indent(context->file, context->depth);
-                fprintf(context->file, "if (!%s && (", matched_name);
+                fprintf(context->file, "bool vc_switch_condition_%zu_%zu = (", switch_id, section_index);
                 bool wrote_label = false;
                 for (size_t label_index = 0; label_index < section->as.switch_section.labels.count; label_index++)
                 {
@@ -13929,7 +14282,9 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                         continue;
                     if (wrote_label)
                         fputs(" || ", context->file);
-                    fputc('(', context->file);
+                    const bool needs_group = label_count > 1 ||
+                        label->as.switch_label.is_pattern || label->as.switch_label.guard != NULL;
+                    if (needs_group) fputc('(', context->file);
                     if (label->as.switch_label.is_pattern)
                     {
                         if (!emit_pattern_against_storage(context,
@@ -13949,28 +14304,42 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                             return false;
                         fputc(')', context->file);
                     }
-                    fputc(')', context->file);
+                    if (needs_group) fputc(')', context->file);
                     wrote_label = true;
                 }
                 if (!wrote_label)
                     fputs("false", context->file);
-                fputs("))\n", context->file);
+                fputs(");\n", context->file);
+                emit_indent(context->file, context->depth);
+                fprintf(context->file, "if (vc_switch_condition_%zu_%zu)\n", switch_id, section_index);
                 emit_indent(context->file, context->depth);
                 fputs("{\n", context->file);
                 context->depth++;
                 emit_indent(context->file, context->depth);
-                fprintf(context->file, "%s = true;\n", matched_name);
                 for (size_t i = 0; i < section->as.switch_section.statements.count; i++)
                 {
                     if (!emit_statement(context, section->as.switch_section.statements.items[i]))
                         return false;
                 }
+                /* Pattern checks may install GC roots. Release them on both
+                   arms of the C conditional, not between `if` and `else`;
+                   otherwise the generated `else` is invalid C, and the
+                   unmatched path can carry stale pattern roots. */
+                context->gc_root_count = condition_gc_root_count;
+                emit_gc_pop_to(context, saved_gc_root_count, true);
                 context->depth--;
                 emit_indent(context->file, context->depth);
                 fputs("}\n", context->file);
+                context->name_count = saved_name_count;
+                /* The next arm runs only when this one did not match. */
+                emit_indent(context->file, context->depth);
+                fputs("else\n", context->file);
+                emit_indent(context->file, context->depth);
+                fputs("{\n", context->file);
+                context->depth++;
                 context->gc_root_count = condition_gc_root_count;
                 emit_gc_pop_to(context, saved_gc_root_count, true);
-                context->name_count = saved_name_count;
+                conditional_sections++;
             }
 
             if (default_section != NULL)
@@ -13978,12 +14347,9 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 const size_t saved_name_count = context->name_count;
                 const size_t saved_gc_root_count = context->gc_root_count;
                 emit_indent(context->file, context->depth);
-                fprintf(context->file, "if (!%s)\n", matched_name);
-                emit_indent(context->file, context->depth);
                 fputs("{\n", context->file);
                 context->depth++;
                 emit_indent(context->file, context->depth);
-                fprintf(context->file, "%s = true;\n", matched_name);
                 for (size_t i = 0; i < default_section->as.switch_section.statements.count; i++)
                 {
                     if (!emit_statement(context, default_section->as.switch_section.statements.items[i]))
@@ -13996,6 +14362,12 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                 context->name_count = saved_name_count;
             }
 
+            for (size_t arm = 0; arm < conditional_sections; arm++)
+            {
+                context->depth--;
+                emit_indent(context->file, context->depth);
+                fputs("}\n", context->file);
+            }
             emit_indent(context->file, context->depth);
             fprintf(context->file, "vc_switch_end_%zu: ;\n", switch_id);
             pop_break_gc_root_count(context);
@@ -16200,8 +16572,10 @@ static bool emit_property_getter_signature(
             fprintf(file, "static VC_MAYBE_UNUSED %s %s(const %s *", type, property->getter_c_name, owner->c_name);
         else
             fprintf(file, "static VC_MAYBE_UNUSED %s %s(%s *", type, property->getter_c_name, owner->c_name);
+        /* The receiver is part of the established getter ABI even when a
+           value-type accessor's body does not reference this. */
         if (names)
-            fputs("vc_self", file);
+            fputs("vc_self VC_MAYBE_UNUSED", file);
         if (property->returns_ref && !owner->is_class && !owner->is_interface &&
             !owner->is_delegate && !owner->is_enum)
         {
@@ -19130,7 +19504,7 @@ static void emit_runtime_attribute_metadata(FILE *file, const VcSemanticModel *s
                         const VcAstNode *right = argument->as.assignment_expression.right;
                         emit_c_metadata_string(file, left->as.identifier_expression.name);
                         fputs(", ", file);
-                        fputs(right->as.literal_expression.text, file);
+                        if (!emit_void_string_bytes(file, right->as.literal_expression.text, NULL)) return;
                     }
                     else
                     {
@@ -19138,7 +19512,7 @@ static void emit_runtime_attribute_metadata(FILE *file, const VcSemanticModel *s
                         snprintf(index_name, sizeof(index_name), "%zu", arg);
                         emit_c_metadata_string(file, index_name);
                         fputs(", ", file);
-                        fputs(argument->as.literal_expression.text, file);
+                        if (!emit_void_string_bytes(file, argument->as.literal_expression.text, NULL)) return;
                     }
                     fputs("},\n", file);
                 }
@@ -19251,6 +19625,97 @@ static void emit_runtime_attribute_metadata(FILE *file, const VcSemanticModel *s
     fputs("    return \"\";\n}\n\n", file);
 }
 
+static void emit_signed_wrapping_arithmetic_helpers(FILE *file)
+{
+    fputs("static void vc_runtime_fail(const char *message);\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int8_t vc_signed_i8_from_bits(uint8_t value)\n{\n", file);
+    fputs("    if (value <= (uint8_t)INT8_MAX) return (int8_t)value;\n", file);
+    fputs("    return (int8_t)(-1 - (int16_t)(UINT8_MAX - value));\n}\n\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int16_t vc_signed_i16_from_bits(uint16_t value)\n{\n", file);
+    fputs("    if (value <= (uint16_t)INT16_MAX) return (int16_t)value;\n", file);
+    fputs("    return (int16_t)(-1 - (int32_t)(UINT16_MAX - value));\n}\n\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int32_t vc_signed_i32_from_bits(uint32_t value)\n{\n", file);
+    fputs("    if (value <= (uint32_t)INT32_MAX) return (int32_t)value;\n", file);
+    fputs("    return -1 - (int32_t)(UINT32_MAX - value);\n}\n\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int64_t vc_signed_i64_from_bits(uint64_t value)\n{\n", file);
+    fputs("    if (value <= (uint64_t)INT64_MAX) return (int64_t)value;\n", file);
+    fputs("    return -1 - (int64_t)(UINT64_MAX - value);\n}\n\n", file);
+
+    fputs("static inline VC_MAYBE_UNUSED int8_t vc_wrap_i8_add(int8_t left, int8_t right) { return vc_signed_i8_from_bits((uint8_t)((uint32_t)(uint8_t)left + (uint32_t)(uint8_t)right)); }\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int8_t vc_wrap_i8_sub(int8_t left, int8_t right) { return vc_signed_i8_from_bits((uint8_t)((uint32_t)(uint8_t)left - (uint32_t)(uint8_t)right)); }\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int8_t vc_wrap_i8_mul(int8_t left, int8_t right) { return vc_signed_i8_from_bits((uint8_t)((uint32_t)(uint8_t)left * (uint32_t)(uint8_t)right)); }\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int16_t vc_wrap_i16_add(int16_t left, int16_t right) { return vc_signed_i16_from_bits((uint16_t)((uint32_t)(uint16_t)left + (uint32_t)(uint16_t)right)); }\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int16_t vc_wrap_i16_sub(int16_t left, int16_t right) { return vc_signed_i16_from_bits((uint16_t)((uint32_t)(uint16_t)left - (uint32_t)(uint16_t)right)); }\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int16_t vc_wrap_i16_mul(int16_t left, int16_t right) { return vc_signed_i16_from_bits((uint16_t)((uint32_t)(uint16_t)left * (uint32_t)(uint16_t)right)); }\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int32_t vc_wrap_i32_add(int32_t left, int32_t right) { return vc_signed_i32_from_bits((uint32_t)left + (uint32_t)right); }\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int32_t vc_wrap_i32_sub(int32_t left, int32_t right) { return vc_signed_i32_from_bits((uint32_t)left - (uint32_t)right); }\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int32_t vc_wrap_i32_mul(int32_t left, int32_t right) { return vc_signed_i32_from_bits((uint32_t)left * (uint32_t)right); }\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int64_t vc_wrap_i64_add(int64_t left, int64_t right) { return vc_signed_i64_from_bits((uint64_t)left + (uint64_t)right); }\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int64_t vc_wrap_i64_sub(int64_t left, int64_t right) { return vc_signed_i64_from_bits((uint64_t)left - (uint64_t)right); }\n", file);
+    fputs("static inline VC_MAYBE_UNUSED int64_t vc_wrap_i64_mul(int64_t left, int64_t right) { return vc_signed_i64_from_bits((uint64_t)left * (uint64_t)right); }\n\n", file);
+    /* Signed division avoids both zero divisors and MinValue / -1; remainder's
+       corresponding boundary is exactly zero under VOID wrapping semantics. */
+    static const char *const bits[] = {"8", "16", "32", "64"};
+    for (size_t i = 0; i < 4u; i++)
+    {
+        const char *w = bits[i];
+        fprintf(file, "static inline VC_MAYBE_UNUSED int%s_t vc_wrap_i%s_div(int%s_t a, int%s_t b) { if (b == 0) vc_runtime_fail(\"integer division by zero\"); if (a == INT%s_MIN && b == -1) return INT%s_MIN; return (int%s_t)(a / b); }\n", w, w, w, w, w, w, w);
+        fprintf(file, "static inline VC_MAYBE_UNUSED int%s_t vc_wrap_i%s_rem(int%s_t a, int%s_t b) { if (b == 0) vc_runtime_fail(\"integer remainder by zero\"); if (a == INT%s_MIN && b == -1) return 0; return (int%s_t)(a %% b); }\n", w, w, w, w, w, w);
+        for (size_t j = 0; j < 2u; j++)
+        {
+            const char *operation = j == 0u ? "inc" : "dec";
+            const char *binary = j == 0u ? "add" : "sub";
+            fprintf(file, "static inline VC_MAYBE_UNUSED int%s_t vc_update_i%s_%s_pre(int%s_t volatile *p) { *p = vc_wrap_i%s_%s(*p, 1); return *p; }\n", w, w, operation, w, w, binary);
+            fprintf(file, "static inline VC_MAYBE_UNUSED int%s_t vc_update_i%s_%s_post(int%s_t volatile *p) { int%s_t old = *p; *p = vc_wrap_i%s_%s(old, 1); return old; }\n", w, w, operation, w, w, w, binary);
+        }
+        static const char *const ops[] = {"add", "sub", "mul", "div", "rem"};
+        for (size_t j = 0; j < sizeof ops / sizeof ops[0]; j++)
+            fprintf(file, "static inline VC_MAYBE_UNUSED int%s_t vc_compound_i%s_%s(int%s_t volatile *p, int%s_t b) { return *p = vc_wrap_i%s_%s(*p, b); }\n", w, w, ops[j], w, w, w, ops[j]);
+        fputc('\n', file);
+    }
+    for (size_t i = 0; i < 4u; i++)
+    {
+        const char *w = bits[i];
+        for (size_t j = 0; j < 2u; j++)
+        {
+            const char *operation = j == 0u ? "div" : "rem";
+            const char *symbol = j == 0u ? "/" : "%";
+            fprintf(file, "static inline VC_MAYBE_UNUSED uint%s_t vc_safe_u%s_%s(uint%s_t a, uint%s_t b) { if (b == 0) vc_runtime_fail(\"integer %s by zero\"); return (uint%s_t)(a %s b); }\n",
+                w, w, operation, w, w, j == 0u ? "division" : "remainder", w, symbol);
+            fprintf(file, "static inline VC_MAYBE_UNUSED uint%s_t vc_compound_u%s_%s(uint%s_t volatile *p, uint%s_t b) { return *p = vc_safe_u%s_%s(*p, b); }\n",
+                w, w, operation, w, w, w, operation);
+        }
+    }
+    fputs("static inline VC_MAYBE_UNUSED uint16_t vc_safe_u16_mul(uint16_t a, uint16_t b) { return (uint16_t)((uint32_t)a * (uint32_t)b); }\n", file);
+    fputs("static inline VC_MAYBE_UNUSED uint16_t vc_compound_u16_mul(uint16_t volatile *p, uint16_t b) { return *p = vc_safe_u16_mul(*p, b); }\n", file);
+
+    for (size_t i = 0; i < 4u; i++)
+    {
+        const char *w = bits[i];
+        const unsigned bit_count = (unsigned)(8u << i);
+        const char *intermediate = bit_count < 32u ? "uint32_t" :
+            bit_count == 32u ? "uint32_t" : "uint64_t";
+        for (size_t signedness = 0; signedness < 2u; signedness++)
+        {
+            const bool is_signed = signedness == 0u;
+            const char letter = is_signed ? 'i' : 'u';
+            const char *prefix = is_signed ? "int" : "uint";
+            fprintf(file, "static inline VC_MAYBE_UNUSED %s%s_t vc_shift_%c%s_left(%s%s_t value, uint64_t count) { return ", prefix, w, letter, w, prefix, w);
+            if (is_signed) fprintf(file, "vc_signed_i%s_from_bits(", w);
+            else fprintf(file, "(uint%s_t)(", w);
+            fprintf(file, "(%s)(uint%s_t)value << (count & %uu)); }\n", intermediate, w, bit_count - 1u);
+            if (is_signed)
+            {
+                fprintf(file, "static inline VC_MAYBE_UNUSED int%s_t vc_shift_i%s_right(int%s_t value, uint64_t count) { uint64_t n = count & %uu; uint%s_t bits = (uint%s_t)value; uint%s_t out = (uint%s_t)(bits >> n); if (value < 0 && n != 0) out = (uint%s_t)(out | (UINT%s_MAX << (%uu - n))); return vc_signed_i%s_from_bits(out); }\n", w, w, w, bit_count - 1u, w, w, w, w, w, w, bit_count, w);
+            }
+            else
+                fprintf(file, "static inline VC_MAYBE_UNUSED uint%s_t vc_shift_u%s_right(uint%s_t value, uint64_t count) { return (uint%s_t)(((%s)value) >> (count & %uu)); }\n", w, w, w, w, intermediate, bit_count - 1u);
+            fprintf(file, "static inline VC_MAYBE_UNUSED %s%s_t vc_compound_%c%s_left(%s%s_t volatile *p, uint64_t count) { return *p = vc_shift_%c%s_left(*p, count); }\n", prefix, w, letter, w, prefix, w, letter, w);
+            fprintf(file, "static inline VC_MAYBE_UNUSED %s%s_t vc_compound_%c%s_right(%s%s_t volatile *p, uint64_t count) { return *p = vc_shift_%c%s_right(*p, count); }\n", prefix, w, letter, w, prefix, w, letter, w);
+        }
+    }
+}
+
 static bool write_generated_c(
     const char *path,
     const VcSemanticModel *semantic,
@@ -19299,6 +19764,8 @@ static bool write_generated_c(
     fputs("#else\n", file);
     fputs("#define VC_MAYBE_UNUSED\n", file);
     fputs("#endif\n\n", file);
+
+    emit_signed_wrapping_arithmetic_helpers(file);
 
     fputs("typedef void (*VcGcTraceFn)(void *);\n\n", file);
     fputs("typedef struct VcRefReturn\n{\n    void *ptr;\n    void *owner;\n} VcRefReturn;\n\n", file);
@@ -24686,6 +25153,23 @@ size_t vc_query_completions_at(
             static_context = (method_node->as.method_declaration.modifiers & VC_AST_MOD_STATIC) != 0;
         count = query_append_completion_members(model, current_struct, true, current_struct,
             static_context ? 1 : 2, items, capacity, count);
+    }
+
+    const char *current_namespace = has_current_struct && current_struct < model->struct_count
+        ? model->structs[current_struct].namespace_name : NULL;
+    for (size_t i = 0; i < model->using_alias_count; i++)
+    {
+        const VcSemanticUsingAlias *alias = &model->using_aliases[i];
+        if (alias->source != &unit->source || alias->resolution_state != 2 ||
+            (alias->namespace_name != NULL &&
+             (current_namespace == NULL || strcmp(alias->namespace_name, current_namespace) != 0)))
+            continue;
+        const VcQuerySymbolKind kind = alias->target_kind == VC_SEM_USING_ALIAS_NAMESPACE
+            ? VC_QUERY_SYMBOL_NAMESPACE : VC_QUERY_SYMBOL_TYPE;
+        count = query_append_completion(items, capacity, count,
+            kind, alias->name,
+            alias->target_kind == VC_SEM_USING_ALIAS_NAMESPACE ? "namespace" : alias->canonical_name,
+            true, 0);
     }
 
     for (size_t i = 0; i < model->struct_count; i++)

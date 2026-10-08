@@ -893,40 +893,6 @@ static bool collect_locals(VcIteratorContext *context, VcAstNode *node)
     }
 }
 
-static bool owner_has_instance_member(const VcAstNode *owner, const char *name)
-{
-    if (owner == NULL || owner->kind != VC_AST_TYPE_DECLARATION || name == NULL)
-        return false;
-    for (size_t i = 0; i < owner->as.type_declaration.members.count; i++)
-    {
-        const VcAstNode *member = owner->as.type_declaration.members.items[i];
-        const char *member_name = NULL;
-        uint32_t modifiers = 0;
-        switch (member->kind)
-        {
-            case VC_AST_FIELD_DECLARATION:
-                member_name = member->as.field_declaration.name;
-                modifiers = member->as.field_declaration.modifiers;
-                break;
-            case VC_AST_PROPERTY_DECLARATION:
-                member_name = member->as.property_declaration.name;
-                modifiers = member->as.property_declaration.modifiers;
-                break;
-            case VC_AST_METHOD_DECLARATION:
-                if (member->as.method_declaration.is_constructor) continue;
-                member_name = member->as.method_declaration.name;
-                modifiers = member->as.method_declaration.modifiers;
-                break;
-            default:
-                continue;
-        }
-        if (member_name != NULL && strcmp(member_name, name) == 0 &&
-            (modifiers & VC_AST_MOD_STATIC) == 0)
-            return true;
-    }
-    return false;
-}
-
 static bool semantic_binding_is_instance_member(
     const VcIteratorContext *context,
     const VcSemanticBinding *binding)
@@ -934,8 +900,13 @@ static bool semantic_binding_is_instance_member(
     if (context->semantic == NULL || binding == NULL)
         return false;
 
-    if (binding->has_method && binding->method_index < context->semantic->method_count)
-        return !context->semantic->methods[binding->method_index].is_static;
+    if (binding->has_method || binding->has_delegate_create)
+    {
+        const size_t index = binding->has_delegate_create
+            ? binding->delegate_method_index : binding->method_index;
+        return index < context->semantic->method_count &&
+            !context->semantic->methods[index].is_static;
+    }
 
     if (binding->has_field && binding->struct_index < context->semantic->struct_count)
     {
@@ -952,6 +923,34 @@ static bool semantic_binding_is_instance_member(
     }
 
     return false;
+}
+
+static const char *semantic_binding_static_owner(
+    const VcIteratorContext *context,
+    const VcSemanticBinding *binding)
+{
+    if (context->semantic == NULL || binding == NULL)
+        return NULL;
+    if (binding->has_method || binding->has_delegate_create)
+    {
+        const size_t index = binding->has_delegate_create
+            ? binding->delegate_method_index : binding->method_index;
+        if (index < context->semantic->method_count)
+        {
+            const VcSemanticMethod *method = &context->semantic->methods[index];
+            return method->is_static ? method->type_name : NULL;
+        }
+    }
+    if (binding->struct_index >= context->semantic->struct_count)
+        return NULL;
+    const VcSemanticStruct *owner = &context->semantic->structs[binding->struct_index];
+    if (binding->has_field && binding->field_index < owner->field_count &&
+        owner->fields[binding->field_index].is_static)
+        return owner->name;
+    if (binding->has_property && binding->property_index < owner->property_count &&
+        owner->properties[binding->property_index].is_static)
+        return owner->name;
+    return NULL;
 }
 
 static bool rewrite_expression(VcIteratorContext *context, VcAstNode *node)
@@ -987,11 +986,14 @@ static bool rewrite_expression(VcIteratorContext *context, VcAstNode *node)
             const VcSemanticBinding *binding = context->semantic != NULL
                 ? vc_semantic_binding(context->semantic, node)
                 : NULL;
-            if ((context->method->as.method_declaration.modifiers & VC_AST_MOD_STATIC) == 0 &&
-                (owner_has_instance_member(context->owner, name) ||
-                 semantic_binding_is_instance_member(context, binding)))
+            const char *receiver = semantic_binding_static_owner(context, binding);
+            if (receiver == NULL &&
+                (context->method->as.method_declaration.modifiers & VC_AST_MOD_STATIC) == 0 &&
+                semantic_binding_is_instance_member(context, binding))
+                receiver = "_this";
+            if (receiver != NULL)
             {
-                VcAstNode *target = identifier(context->tree, node->location, "_this");
+                VcAstNode *target = identifier(context->tree, node->location, receiver);
                 char *member = copy_text(context->tree, name);
                 if (target == NULL || member == NULL)
                 {
@@ -1010,15 +1012,18 @@ static bool rewrite_expression(VcIteratorContext *context, VcAstNode *node)
         {
             VcAstNode *callee = node->as.call_expression.callee;
             bool rewritten_callee = false;
-            if (callee != NULL && callee->kind == VC_AST_IDENTIFIER_EXPRESSION &&
-                (context->method->as.method_declaration.modifiers & VC_AST_MOD_STATIC) == 0)
+            if (callee != NULL && callee->kind == VC_AST_IDENTIFIER_EXPRESSION)
             {
                 const VcSemanticBinding *binding = context->semantic != NULL
                     ? vc_semantic_binding(context->semantic, node)
                     : NULL;
-                if (semantic_binding_is_instance_member(context, binding))
+                if (binding != NULL && binding->has_method && context->semantic != NULL &&
+                    binding->method_index < context->semantic->method_count)
                 {
-                    VcAstNode *target = identifier(context->tree, callee->location, "_this");
+                    const char *receiver = semantic_binding_static_owner(context, binding);
+                    if (receiver == NULL)
+                        receiver = "_this";
+                    VcAstNode *target = identifier(context->tree, callee->location, receiver);
                     char *member = copy_text(context->tree,
                         callee->as.identifier_expression.name);
                     if (target == NULL || member == NULL)
@@ -2490,13 +2495,12 @@ static bool lower_method(VcAstTree *tree, VcAstNodeList *parent_declarations,
         goto oom;
 
     const bool captures_this = (method->as.method_declaration.modifiers & VC_AST_MOD_STATIC) == 0;
-    VcAstTypeRef *owner_type = NULL;
-    if (captures_this || async_iterator)
-    {
-        owner_type = named_type(tree, location, owner->as.type_declaration.name);
-        if (owner_type == NULL || !add_field(&context, iterator, location, "_this", owner_type))
-            goto oom;
-    }
+    /* Match async lowering: the owner-typed field also preserves lexical
+       private/protected access for static state machines, without capturing an
+       instance. Only instance iterator constructors initialize this field. */
+    VcAstTypeRef *owner_type = named_type(tree, location, owner->as.type_declaration.name);
+    if (owner_type == NULL || !add_field(&context, iterator, location, "_this", owner_type))
+        goto oom;
 
     for (size_t i = 0; i < context.capture_count; i++)
         if (!add_field(&context, iterator, location,

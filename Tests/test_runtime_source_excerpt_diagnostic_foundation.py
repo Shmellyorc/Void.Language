@@ -218,7 +218,7 @@ def main():
 
     # Version and architecture guardrails.
     version = invoke('version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.350', version.stdout)
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.360', version.stdout)
     compiler = (ROOT / 'Compiler' / 'src' / 'compiler.c').read_text(encoding='utf-8')
     check('size_t end_line; size_t end_column;' in compiler, 'fault site span missing')
     check('vc_fault_site_source_excerpt' in compiler and 'vc_fault_site_read_line' in compiler, 'source renderer missing')

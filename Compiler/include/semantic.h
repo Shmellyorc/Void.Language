@@ -76,6 +76,26 @@ typedef struct VcSemanticUnit
     VcAstTree *tree;
 } VcSemanticUnit;
 
+typedef enum VcSemanticUsingAliasTargetKind
+{
+    VC_SEM_USING_ALIAS_UNRESOLVED = 0,
+    VC_SEM_USING_ALIAS_TYPE,
+    VC_SEM_USING_ALIAS_NAMESPACE
+} VcSemanticUsingAliasTargetKind;
+
+typedef struct VcSemanticUsingAlias
+{
+    const VcAstNode *node;
+    const VcSource *source;
+    const char *namespace_name;
+    const char *name;
+    VcSemanticUsingAliasTargetKind target_kind;
+    const VcAstNode *target_node;
+    const VcSource *target_source;
+    char canonical_name[768];
+    unsigned char resolution_state;
+} VcSemanticUsingAlias;
+
 typedef struct VcSemanticField
 {
     const VcAstNode *node;
@@ -368,6 +388,7 @@ typedef struct VcSemanticBinding
     size_t field_index;
     size_t conversion_method_index;
     bool has_method;
+    bool implicit_receiver;
     bool method_returns_ref;
     bool method_returns_ref_readonly;
     bool has_constructor;
@@ -515,6 +536,9 @@ typedef struct VcSemanticBinding
 
 typedef struct VcSemanticModel
 {
+    VcSemanticUsingAlias *using_aliases;
+    size_t using_alias_count;
+    size_t using_alias_capacity;
     VcSemanticStruct *structs;
     size_t struct_count;
     size_t struct_capacity;

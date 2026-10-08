@@ -79,6 +79,168 @@ static void generic_diagnostic(VcMonomorphContext *context, VcAstTree *tree, VcS
         (VcSourceSpan){0}, "Explicit generic argument count and type names must match an available generic declaration.");
 }
 
+static void using_alias_diagnostic(
+    VcMonomorphContext *context,
+    VcAstTree *tree,
+    const VcAstNode *alias,
+    const char *message)
+{
+    if (context->diagnostic == NULL || context->diagnostic->message[0] != '\0')
+        return;
+    const VcSource *source = source_for_tree(context, tree);
+    const VcSourceSpan span = alias != NULL ? alias->span : (VcSourceSpan){0};
+    vc_diagnostic_init(context->diagnostic, source != NULL ? source->path : NULL, span);
+    context->diagnostic->source = source;
+    vc_diagnostic_set_code(context->diagnostic, VC_DIAG_NAME);
+    snprintf(context->diagnostic->message, sizeof(context->diagnostic->message), "%s", message);
+}
+
+static size_t count_using_aliases_in_list(const VcAstNodeList *declarations)
+{
+    if (declarations == NULL)
+        return 0;
+    size_t count = 0;
+    for (size_t i = 0; i < declarations->count; i++)
+    {
+        const VcAstNode *node = declarations->items[i];
+        if (node == NULL)
+            continue;
+        if (node->kind == VC_AST_USING_DECLARATION &&
+            node->as.using_declaration.alias != NULL)
+            count++;
+        else if (node->kind == VC_AST_NAMESPACE_DECLARATION)
+            count += count_using_aliases_in_list(
+                &node->as.namespace_declaration.declarations);
+    }
+    return count;
+}
+
+static bool expand_using_alias_name_recursive(
+    VcMonomorphContext *context,
+    VcAstTree *tree,
+    const char *namespace_name,
+    const char *name,
+    char *output,
+    size_t output_size,
+    const char **lookup_namespace,
+    const VcAstNode **stack,
+    size_t stack_capacity,
+    size_t depth,
+    bool *expanded)
+{
+    if (output == NULL || output_size == 0 || name == NULL)
+        return false;
+
+    const char *dot = strchr(name, '.');
+    const size_t root_length = dot != NULL ? (size_t)(dot - name) : strlen(name);
+    if (root_length == 0 || root_length >= 256)
+        return false;
+    char root[256];
+    memcpy(root, name, root_length);
+    root[root_length] = '\0';
+
+    const VcAstNode *alias = NULL;
+    const char *alias_namespace = NULL;
+    const size_t matches = vc_ast_find_using_alias(
+        tree, namespace_name, root, &alias, &alias_namespace);
+    if (matches == 0)
+    {
+        const int written = snprintf(output, output_size, "%s", name);
+        if (written < 0 || (size_t)written >= output_size)
+            return false;
+        if (lookup_namespace != NULL)
+            *lookup_namespace = namespace_name;
+        return true;
+    }
+    if (matches > 1)
+    {
+        char message[256];
+        snprintf(message, sizeof(message),
+            "using alias '%.128s' is declared more than once in this source scope", root);
+        set_error(context, "%s", message);
+        using_alias_diagnostic(context, tree, alias, message);
+        return false;
+    }
+    for (size_t i = 0; i < depth; i++)
+    {
+        if (stack[i] == alias)
+        {
+            char message[256];
+            snprintf(message, sizeof(message),
+                "using alias '%.128s' participates in a cyclic alias declaration", root);
+            set_error(context, "%s", message);
+            using_alias_diagnostic(context, tree, alias, message);
+            return false;
+        }
+    }
+
+    if (depth >= stack_capacity)
+    {
+        set_error(context, "using alias resolution exceeded the source alias declarations");
+        using_alias_diagnostic(context, tree, alias,
+            "using alias resolution exceeded the source alias declarations");
+        return false;
+    }
+
+    stack[depth] = alias;
+    char target[768];
+    const char *target_namespace = alias_namespace;
+    bool target_expanded = false;
+    if (!expand_using_alias_name_recursive(context, tree, alias_namespace,
+            alias->as.using_declaration.name, target, sizeof(target),
+            &target_namespace, stack, stack_capacity, depth + 1, &target_expanded))
+        return false;
+
+    const int written = snprintf(output, output_size, "%s%s",
+        target, dot != NULL ? dot : "");
+    if (written < 0 || (size_t)written >= output_size)
+        return false;
+    if (lookup_namespace != NULL)
+        *lookup_namespace = dot != NULL ? namespace_name : target_namespace;
+    if (expanded != NULL)
+        *expanded = true;
+    (void)target_expanded;
+    return true;
+}
+
+static bool expand_using_alias_name(
+    VcMonomorphContext *context,
+    VcAstTree *tree,
+    const char *namespace_name,
+    const char *name,
+    char *output,
+    size_t output_size,
+    const char **lookup_namespace,
+    bool *expanded)
+{
+    if (expanded != NULL)
+        *expanded = false;
+    size_t alias_count = 0;
+    if (tree != NULL && tree->root != NULL && tree->root->kind == VC_AST_COMPILATION_UNIT)
+        alias_count = count_using_aliases_in_list(
+            &tree->root->as.compilation_unit.declarations);
+    if (alias_count == 0)
+    {
+        const int written = snprintf(output, output_size, "%s", name);
+        if (written < 0 || (size_t)written >= output_size)
+            return false;
+        if (lookup_namespace != NULL)
+            *lookup_namespace = namespace_name;
+        return true;
+    }
+    const size_t stack_capacity = alias_count != 0 ? alias_count : 1;
+    const VcAstNode **stack = calloc(stack_capacity, sizeof(*stack));
+    if (stack == NULL)
+    {
+        set_error(context, "out of memory while resolving using aliases");
+        return false;
+    }
+    const bool result = expand_using_alias_name_recursive(context, tree, namespace_name,
+        name, output, output_size, lookup_namespace, stack, stack_capacity, 0, expanded);
+    free(stack);
+    return result;
+}
+
 static bool append_text(char *output, size_t output_size, size_t *written, const char *text)
 {
     const size_t length = strlen(text);
@@ -1230,45 +1392,78 @@ static bool find_declared_type_identity(
 }
 
 /* Arguments move from the use site into a template's declaration scope.
-   Preserve their resolved names before substitution, including nested arguments. */
+   Preserve their resolved names before substitution, including source-scoped
+   using aliases and nested arguments. */
 static bool canonicalize_argument(
-    VcMonomorphContext *context, VcAstTree *tree,
-    VcAstTypeRef *type, const char *namespace_name)
+    VcMonomorphContext *context,
+    VcAstTree *alias_tree,
+    VcAstTree *storage_tree,
+    VcAstTypeRef *type,
+    const char *namespace_name)
 {
+    if (type == NULL)
+        return true;
+
+    char alias_name[768];
+    const char *lookup_namespace = namespace_name;
+    bool alias_expanded = false;
+    const char *lookup_name = type->name;
+    if (!type->is_global_qualified && type->name != NULL)
+    {
+        if (!expand_using_alias_name(context, alias_tree, namespace_name,
+                type->name, alias_name, sizeof(alias_name),
+                &lookup_namespace, &alias_expanded))
+            return false;
+        if (alias_expanded)
+            lookup_name = alias_name;
+    }
+
+    VcAstTypeRef lookup = *type;
+    lookup.name = (char *)lookup_name;
     const char *resolved_namespace = NULL;
     const char *resolved_name = NULL;
-    if (find_declared_type_identity(context, namespace_name, type,
+    if (find_declared_type_identity(context, lookup_namespace, &lookup,
             &resolved_namespace, &resolved_name))
     {
         type->is_global_qualified = resolved_namespace == NULL;
-        if (resolved_namespace != NULL)
-        {
-            char name[768];
-            const int written = snprintf(name, sizeof(name), "%s.%s",
-                resolved_namespace, resolved_name);
-            if (written < 0 || (size_t)written >= sizeof(name))
-                return false;
-            type->name = vc_ast_copy_text(tree, name, (size_t)written);
-            if (type->name == NULL)
-                return false;
-        }
+        char name[768];
+        const int written = resolved_namespace != NULL
+            ? snprintf(name, sizeof(name), "%s.%s", resolved_namespace, resolved_name)
+            : snprintf(name, sizeof(name), "%s", resolved_name);
+        if (written < 0 || (size_t)written >= sizeof(name))
+            return false;
+        type->name = vc_ast_copy_text(storage_tree, name, (size_t)written);
+        if (type->name == NULL)
+            return false;
     }
+    else if (alias_expanded)
+    {
+        const size_t length = strlen(alias_name);
+        type->name = vc_ast_copy_text(storage_tree, alias_name, length);
+        if (type->name == NULL)
+            return false;
+    }
+
     for (size_t i = 0; i < type->generic_arguments.count; i++)
-        if (!canonicalize_argument(context, tree,
+        if (!canonicalize_argument(context, alias_tree, storage_tree,
                 type->generic_arguments.items[i], namespace_name))
             return false;
     return true;
 }
 
 static bool clone_canonical_arguments(
-    VcMonomorphContext *context, VcAstTree *tree,
-    const VcAstTypeList *source, VcAstTypeList *target,
+    VcMonomorphContext *context,
+    VcAstTree *alias_tree,
+    VcAstTree *storage_tree,
+    const VcAstTypeList *source,
+    VcAstTypeList *target,
     const char *namespace_name)
 {
-    if (!clone_type_list(context, tree, source, target, NULL))
+    if (!clone_type_list(context, storage_tree, source, target, NULL))
         return false;
     for (size_t i = 0; i < target->count; i++)
-        if (!canonicalize_argument(context, tree, target->items[i], namespace_name))
+        if (!canonicalize_argument(context, alias_tree, storage_tree,
+                target->items[i], namespace_name))
         {
             set_error(context, "could not preserve resolved generic argument identity");
             return false;
@@ -1395,19 +1590,36 @@ static bool ensure_type_specialization(
     VcAstTypeRef *type,
     const char *namespace_name)
 {
-    VcGenericTemplate *template = find_type_template(context, namespace_name, type);
+    VcAstTypeRef resolved = *type;
+    char alias_name[768];
+    const char *lookup_namespace = namespace_name;
+    bool alias_expanded = false;
+    if (!type->is_global_qualified && type->name != NULL)
+    {
+        if (!expand_using_alias_name(context, use_tree, namespace_name,
+                type->name, alias_name, sizeof(alias_name),
+                &lookup_namespace, &alias_expanded))
+            return false;
+        if (alias_expanded)
+            resolved.name = alias_name;
+    }
+
+    VcGenericTemplate *template = find_type_template(context, lookup_namespace, &resolved);
     if (template == NULL)
     {
         set_error(context, "generic type '%s' with %zu argument(s) was not found",
-            type->name, type->generic_arguments.count);
+            resolved.name, type->generic_arguments.count);
         generic_diagnostic(context, use_tree, type->span);
         if (context->diagnostic != NULL)
         {
+            const char *simple = strrchr(resolved.name, '.');
+            simple = simple != NULL ? simple + 1 : resolved.name;
             for (size_t i = 0; i < context->template_count; i++)
             {
                 const VcGenericTemplate *candidate = &context->templates[i];
-                if (strcmp(candidate->node->as.type_declaration.name, type->name) != 0 ||
-                    !same_namespace(candidate->namespace_name, namespace_name)) continue;
+                if (strcmp(candidate->node->as.type_declaration.name, simple) != 0 ||
+                    (strchr(resolved.name, '.') == NULL &&
+                     !same_namespace(candidate->namespace_name, lookup_namespace))) continue;
                 const VcSource *candidate_source = source_for_tree(context, candidate->tree);
                 if (candidate_source == NULL) continue;
                 char note[160];
@@ -1420,10 +1632,16 @@ static bool ensure_type_specialization(
         return false;
     }
 
+    VcAstTypeList arguments = {0};
+    if (!clone_canonical_arguments(context, use_tree, template->tree,
+            &type->generic_arguments, &arguments, namespace_name))
+        return false;
+
     char specialized_name[256];
-    VcAstTypeRef canonical = *type;
+    VcAstTypeRef canonical = resolved;
     canonical.name = template->node->as.type_declaration.name;
-    if (!mangle_canonical_type_ref(context, &canonical, namespace_name, false,
+    canonical.generic_arguments = arguments;
+    if (!mangle_canonical_type_ref(context, &canonical, lookup_namespace, false,
             specialized_name, sizeof(specialized_name)))
     {
         set_error(context, "generic specialization name for '%s' is too long", type->name);
@@ -1431,11 +1649,6 @@ static bool ensure_type_specialization(
     }
     if (list_has_named_type(template->parent, specialized_name))
         return true;
-
-    VcAstTypeList arguments = {0};
-    if (!clone_canonical_arguments(context, template->tree,
-            &type->generic_arguments, &arguments, namespace_name))
-        return false;
     const VcAstNode *source = template->node;
     VcGenericSubstitution substitution = {
         &source->as.type_declaration.generic_parameters,
@@ -1667,17 +1880,18 @@ static bool register_generic_method_specialization(
     char *specialized_name,
     size_t specialized_name_size)
 {
-    if (!mangle_method_name(context, name, arguments, namespace_name,
+    VcAstTypeList canonical_arguments = {0};
+    if (!clone_canonical_arguments(context, tree, tree, arguments,
+            &canonical_arguments, namespace_name))
+        return false;
+
+    if (!mangle_method_name(context, name, &canonical_arguments, namespace_name,
             specialized_name, specialized_name_size))
     {
         set_error(context, "generic method specialization name for '%s' is too long", name);
         return false;
     }
 
-    VcAstTypeList canonical_arguments = {0};
-    if (!clone_canonical_arguments(context, tree, arguments,
-            &canonical_arguments, namespace_name))
-        return false;
     VcGenericMethodRequest *request = register_method_request(context, name,
         &canonical_arguments, specialized_name);
     if (request == NULL)

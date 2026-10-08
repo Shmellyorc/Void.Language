@@ -1,6 +1,9 @@
 #include "ast.h"
 #include "../../Runtime/include/vc_utf8.h"
 
+#include <errno.h>
+#include <float.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -130,6 +133,80 @@ bool vc_ast_tree_contains(const VcAstTree *tree, const void *pointer)
             return true;
     }
     return false;
+}
+
+static size_t find_using_alias_in_list(
+    const VcAstNodeList *declarations,
+    const char *scope_namespace,
+    const char *alias,
+    const VcAstNode **declaration,
+    const char **declaration_namespace)
+{
+    if (declarations == NULL || alias == NULL)
+        return 0;
+    size_t count = 0;
+    for (size_t i = 0; i < declarations->count; i++)
+    {
+        const VcAstNode *node = declarations->items[i];
+        if (node == NULL || node->kind != VC_AST_USING_DECLARATION ||
+            node->as.using_declaration.alias == NULL ||
+            strcmp(node->as.using_declaration.alias, alias) != 0)
+            continue;
+        if (count == 0)
+        {
+            if (declaration != NULL)
+                *declaration = node;
+            if (declaration_namespace != NULL)
+                *declaration_namespace = scope_namespace;
+        }
+        count++;
+    }
+    return count;
+}
+
+size_t vc_ast_find_using_alias(
+    const VcAstTree *tree,
+    const char *namespace_name,
+    const char *alias,
+    const VcAstNode **declaration,
+    const char **declaration_namespace)
+{
+    if (declaration != NULL)
+        *declaration = NULL;
+    if (declaration_namespace != NULL)
+        *declaration_namespace = NULL;
+    if (tree == NULL || tree->root == NULL ||
+        tree->root->kind != VC_AST_COMPILATION_UNIT || alias == NULL)
+        return 0;
+
+    const VcAstNodeList *root = &tree->root->as.compilation_unit.declarations;
+    size_t count = find_using_alias_in_list(
+        root, NULL, alias, declaration, declaration_namespace);
+
+    for (size_t i = 0; i < root->count; i++)
+    {
+        const VcAstNode *node = root->items[i];
+        if (node == NULL || node->kind != VC_AST_NAMESPACE_DECLARATION ||
+            !((node->as.namespace_declaration.name == NULL && namespace_name == NULL) ||
+              (node->as.namespace_declaration.name != NULL && namespace_name != NULL &&
+               strcmp(node->as.namespace_declaration.name, namespace_name) == 0)))
+            continue;
+        const VcAstNode *nested = NULL;
+        const char *nested_namespace = NULL;
+        const size_t nested_count = find_using_alias_in_list(
+            &node->as.namespace_declaration.declarations,
+            node->as.namespace_declaration.name, alias,
+            &nested, &nested_namespace);
+        if (nested_count != 0 && count == 0)
+        {
+            if (declaration != NULL)
+                *declaration = nested;
+            if (declaration_namespace != NULL)
+                *declaration_namespace = nested_namespace;
+        }
+        count += nested_count;
+    }
+    return count;
 }
 
 static bool grow_pointer_array(VcAstTree *tree, void ***items, size_t *capacity, size_t count)
@@ -1240,4 +1317,323 @@ bool vc_ast_character_scalar(const char *text, uint32_t *value)
         return false;
     *value = scalar;
     return true;
+}
+
+/* One language-owned numeric reader for semantic typing and C emission.
+   Integer digits and suffixes are parsed separately (hex A-F are never suffixes).
+   A base-2 literal is rendered as ISO C11 decimal, not as a C extension. */
+static int vc_numeric_digit(unsigned char c)
+{
+    if (c >= '0' && c <= '9') return (int)(c - '0');
+    if (c >= 'a' && c <= 'f') return (int)(c - 'a') + 10;
+    if (c >= 'A' && c <= 'F') return (int)(c - 'A') + 10;
+    return -1;
+}
+
+bool vc_ast_numeric_literal(const char *text, VcAstNumericLiteral *literal)
+{
+    if (text == NULL || literal == NULL) return false;
+    memset(literal, 0, sizeof(*literal));
+    const size_t length = strlen(text);
+    if (length == 0) return false;
+    /* Lowering may create signed integer AST values directly, whereas source
+       negative numbers are represented as unary minus over a positive token. */
+    const bool negative = text[0] == '-';
+    const size_t beginning = negative ? 1u : 0u;
+    if (beginning == length) return false;
+    const bool hexadecimal = length > beginning + 2 && text[beginning] == '0' &&
+        (text[beginning + 1] == 'x' || text[beginning + 1] == 'X');
+    const bool binary = length > beginning + 2 && text[beginning] == '0' &&
+        (text[beginning + 1] == 'b' || text[beginning + 1] == 'B');
+    const unsigned base = hexadecimal ? 16u : binary ? 2u : 10u;
+    size_t pos = beginning + ((hexadecimal || binary) ? 2u : 0u);
+    char *clean = malloc(length + 8u);
+    if (clean == NULL) return false;
+    size_t clean_length = 0;
+    uint64_t integer = 0;
+    bool any_digit = false;
+    bool last_digit = false;
+    bool fractional = false;
+    bool exponent = false;
+    bool integer_overflow = false;
+    for (; pos < length; pos++)
+    {
+        unsigned char c = (unsigned char)text[pos];
+        const int digit = vc_numeric_digit(c);
+        if (digit >= 0 && (unsigned)digit < base)
+        {
+            if (!integer_overflow && integer > (UINT64_MAX - (unsigned)digit) / base)
+                integer_overflow = true;
+            if (!integer_overflow) integer = integer * base + (unsigned)digit;
+            clean[clean_length++] = (char)c;
+            any_digit = last_digit = true;
+        }
+        else if (c == '_')
+        {
+            const int next = pos + 1 < length
+                ? vc_numeric_digit((unsigned char)text[pos + 1]) : -1;
+            if (!last_digit || next < 0 || (unsigned)next >= base) goto invalid;
+            last_digit = false;
+        }
+        else break;
+    }
+    if (!any_digit || !last_digit) goto invalid;
+    if (base == 10u && pos < length && text[pos] == '.')
+    {
+        fractional = true;
+        clean[clean_length++] = text[pos++];
+        bool digit_seen = false;
+        last_digit = false;
+        while (pos < length)
+        {
+            const int digit = vc_numeric_digit((unsigned char)text[pos]);
+            if (digit >= 0 && digit < 10)
+            {
+                clean[clean_length++] = text[pos++];
+                digit_seen = last_digit = true;
+            }
+            else if (text[pos] == '_' && last_digit && pos + 1 < length &&
+                     text[pos + 1] >= '0' && text[pos + 1] <= '9')
+            {
+                last_digit = false;
+                pos++;
+            }
+            else break;
+        }
+        if (!digit_seen || !last_digit) goto invalid;
+    }
+    if (base == 10u && pos < length && (text[pos] == 'e' || text[pos] == 'E'))
+    {
+        exponent = true;
+        clean[clean_length++] = 'e';
+        pos++;
+        if (pos < length && (text[pos] == '+' || text[pos] == '-'))
+            clean[clean_length++] = text[pos++];
+        bool digit_seen = false;
+        last_digit = false;
+        while (pos < length)
+        {
+            if (text[pos] >= '0' && text[pos] <= '9')
+            {
+                clean[clean_length++] = text[pos++];
+                digit_seen = last_digit = true;
+            }
+            else if (text[pos] == '_' && last_digit && pos + 1 < length &&
+                     text[pos + 1] >= '0' && text[pos + 1] <= '9')
+            {
+                last_digit = false;
+                pos++;
+            }
+            else break;
+        }
+        if (!digit_seen || !last_digit) goto invalid;
+    }
+    const char *suffix = text + pos;
+    const bool is_u = strcmp(suffix, "u") == 0 || strcmp(suffix, "U") == 0;
+    const bool is_l = strcmp(suffix, "l") == 0 || strcmp(suffix, "L") == 0;
+    const bool is_ul = (strlen(suffix) == 2 &&
+        (suffix[0] == 'u' || suffix[0] == 'U') &&
+        (suffix[1] == 'l' || suffix[1] == 'L')) ||
+        (strlen(suffix) == 2 &&
+        (suffix[0] == 'l' || suffix[0] == 'L') &&
+        (suffix[1] == 'u' || suffix[1] == 'U'));
+    const bool is_f = strcmp(suffix, "f") == 0 || strcmp(suffix, "F") == 0;
+    const bool is_d = strcmp(suffix, "d") == 0 || strcmp(suffix, "D") == 0;
+    const bool is_m = strcmp(suffix, "m") == 0 || strcmp(suffix, "M") == 0;
+    if (!(suffix[0] == '\0' || is_u || is_l || is_ul || is_f || is_d || is_m))
+        goto invalid;
+    if ((base != 10u && (is_f || is_d || is_m)) ||
+        ((fractional || exponent) && (is_u || is_l || is_ul)))
+        goto invalid;
+    if (negative && (is_u || is_ul || is_f || is_d || is_m ||
+                     (base != 10u) || fractional || exponent)) goto invalid;
+    const bool floating = fractional || exponent || is_f || is_d || is_m;
+    if (floating)
+    {
+        literal->kind = is_f ? VC_AST_NUM_FLOAT :
+            is_m ? VC_AST_NUM_DECIMAL : VC_AST_NUM_DOUBLE;
+        /* C needs a decimal point on whole floating values. */
+        if (!fractional && !exponent)
+        {
+            clean[clean_length++] = '.';
+            clean[clean_length++] = '0';
+        }
+        const size_t number_length = clean_length;
+        if (literal->kind == VC_AST_NUM_FLOAT) clean[clean_length++] = 'f';
+        if (literal->kind == VC_AST_NUM_DECIMAL) clean[clean_length++] = 'L';
+        clean[clean_length] = '\0';
+        /* Reject out-of-range native floating spellings before C sees them.
+           decimal retains the established host long double representation. */
+        errno = 0;
+        char *end = NULL;
+        const char suffix_char = clean[number_length];
+        clean[number_length] = '\0';
+        const long double value = strtold(clean, &end);
+        const bool valid_end = end != clean && *end == '\0';
+        clean[number_length] = suffix_char;
+        const long double magnitude = fabsl(value);
+        const long double maximum = literal->kind == VC_AST_NUM_FLOAT ? FLT_MAX :
+            literal->kind == VC_AST_NUM_DOUBLE ? DBL_MAX : LDBL_MAX;
+        const long double minimum = literal->kind == VC_AST_NUM_FLOAT ? FLT_TRUE_MIN :
+            literal->kind == VC_AST_NUM_DOUBLE ? DBL_TRUE_MIN : LDBL_TRUE_MIN;
+        if (!valid_end || !isfinite(value) || magnitude > maximum ||
+            (magnitude > 0 && magnitude < minimum) ||
+            (errno == ERANGE && magnitude == 0))
+            goto invalid;
+        literal->c_text = clean;
+        return true;
+    }
+    literal->kind = is_ul ? VC_AST_NUM_ULONG : is_l ? VC_AST_NUM_LONG :
+        is_u ? VC_AST_NUM_UINT : VC_AST_NUM_INT;
+    const uint64_t max = negative && literal->kind == VC_AST_NUM_INT
+        ? (uint64_t)INT32_MAX + 1u :
+        negative && literal->kind == VC_AST_NUM_LONG
+        ? (uint64_t)INT64_MAX + 1u :
+        literal->kind == VC_AST_NUM_ULONG ? UINT64_MAX :
+        literal->kind == VC_AST_NUM_LONG ?
+            (base == 10u ? (uint64_t)INT64_MAX : UINT64_MAX) :
+        literal->kind == VC_AST_NUM_UINT ? (uint64_t)UINT32_MAX :
+            (base == 10u ? (uint64_t)INT32_MAX : (uint64_t)UINT32_MAX);
+    if (integer_overflow || integer > max) goto invalid;
+    /* Convert a fixed-width bit pattern to a signed mathematical value only
+       with representable operands; no C unsigned-to-signed overflow casts. */
+    if (literal->kind == VC_AST_NUM_INT || literal->kind == VC_AST_NUM_LONG)
+    {
+        const bool narrow = literal->kind == VC_AST_NUM_INT;
+        const uint64_t mask = narrow ? UINT32_MAX : UINT64_MAX;
+        const uint64_t positive_max = narrow ? INT32_MAX : INT64_MAX;
+        if (negative && integer == positive_max + 1u)
+            snprintf(clean, length + 8u, "(-%llu-1)", (unsigned long long)positive_max);
+        else if (integer <= positive_max)
+            snprintf(clean, length + 8u, "%s%llu", negative ? "-" : "", (unsigned long long)integer);
+        else
+            snprintf(clean, length + 8u, "(-1-%llu)",
+                (unsigned long long)(mask - integer));
+    }
+    else snprintf(clean, length + 8u, "%llu%s", (unsigned long long)integer,
+                  literal->kind == VC_AST_NUM_ULONG ? "ULL" : "U");
+    literal->c_text = clean;
+    return true;
+invalid:
+    free(clean);
+    return false;
+}
+
+/* The lexer preserves spelling. Decode it independently of C character and
+   escape rules, with the same Unicode scalar validation used for char. The
+   established string \x escape denotes one byte (up to two hex digits),
+   while \u and \U denote Unicode scalar values encoded as UTF-8. */
+static int vc_literal_hex_digit(unsigned char c)
+{
+    if (c >= '0' && c <= '9') return (int)(c - '0');
+    if (c >= 'a' && c <= 'f') return (int)(c - 'a') + 10;
+    if (c >= 'A' && c <= 'F') return (int)(c - 'A') + 10;
+    return -1;
+}
+
+bool vc_ast_string_bytes(const char *text, unsigned char **bytes, size_t *byte_length)
+{
+    if (text == NULL || bytes == NULL || byte_length == NULL)
+        return false;
+    const size_t length = strlen(text);
+    if (length < 2 || text[0] != '"' || text[length - 1] != '"')
+        return false;
+    unsigned char *result = malloc(length * 4u + 1u);
+    if (result == NULL)
+        return false;
+    size_t used = 0;
+    for (size_t i = 1; i < length - 1;)
+    {
+        uint32_t scalar = 0;
+        bool escaped_scalar = false;
+        if (text[i] != '\\')
+        {
+            size_t offset = i;
+            if (!vc_utf8_decode_one(text, length - 1, &offset, &scalar))
+                goto invalid;
+            memcpy(result + used, text + i, offset - i);
+            used += offset - i;
+            i = offset;
+            continue;
+        }
+        i++;
+        if (i >= length - 1)
+            goto invalid;
+        switch (text[i])
+        {
+            case '0': scalar = 0; i++; break;
+            case 'a': scalar = 7; i++; break;
+            case 'b': scalar = 8; i++; break;
+            case 'f': scalar = 12; i++; break;
+            case 'n': scalar = 10; i++; break;
+            case 'r': scalar = 13; i++; break;
+            case 't': scalar = 9; i++; break;
+            case 'v': scalar = 11; i++; break;
+            case '\\': scalar = '\\'; i++; break;
+            case '\'': scalar = '\''; i++; break;
+            case '"': scalar = '"'; i++; break;
+            case 'u':
+            case 'U':
+            {
+                const size_t digits = text[i] == 'u' ? 4u : 8u;
+                i++;
+                if (length - 1 - i < digits) goto invalid;
+                for (size_t k = 0; k < digits; k++)
+                {
+                    const int digit = vc_literal_hex_digit((unsigned char)text[i++]);
+                    if (digit < 0) goto invalid;
+                    scalar = scalar * 16u + (unsigned)digit;
+                }
+                if (!vc_utf8_scalar_is_valid(scalar)) goto invalid;
+                escaped_scalar = true;
+                break;
+            }
+            case 'x':
+            {
+                i++;
+                const int first = i < length - 1
+                    ? vc_literal_hex_digit((unsigned char)text[i]) : -1;
+                if (first < 0) goto invalid;
+                scalar = (uint32_t)first;
+                i++;
+                const int second = i < length - 1
+                    ? vc_literal_hex_digit((unsigned char)text[i]) : -1;
+                if (second >= 0)
+                {
+                    scalar = scalar * 16u + (unsigned)second;
+                    i++;
+                }
+                break;
+            }
+            default:
+                if (text[i] >= '1' && text[i] <= '7')
+                {
+                    size_t digits = 0;
+                    while (i < length - 1 && digits < 3 &&
+                           text[i] >= '0' && text[i] <= '7')
+                    {
+                        scalar = scalar * 8u + (unsigned)(text[i++] - '0');
+                        digits++;
+                    }
+                    if (scalar > 255u) goto invalid;
+                }
+                else goto invalid;
+        }
+        if (escaped_scalar)
+        {
+            char encoded[4];
+            const size_t width = vc_utf8_encode_scalar(scalar, encoded);
+            if (width == 0) goto invalid;
+            memcpy(result + used, encoded, width);
+            used += width;
+        }
+        else result[used++] = (unsigned char)scalar;
+    }
+    result[used] = 0;
+    *bytes = result;
+    *byte_length = used;
+    return true;
+invalid:
+    free(result);
+    return false;
 }

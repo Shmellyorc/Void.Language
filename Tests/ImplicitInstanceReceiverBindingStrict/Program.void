@@ -1,0 +1,18 @@
+using Void;
+
+public sealed class StrictProbe351
+{
+    private int _value;
+    public StrictProbe351(int value) { _value = value; }
+    private int Read() { return _value; }
+    public int Run() { return Read(); }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        StrictProbe351 probe = new StrictProbe351(351);
+        Console.WriteLine(probe.Run() == 351);
+    }
+}

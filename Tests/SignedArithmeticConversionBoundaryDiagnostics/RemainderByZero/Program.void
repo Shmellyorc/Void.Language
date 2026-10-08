@@ -1,0 +1,10 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        long divisor = 0L;
+        long dividend = 1L;
+        Console.WriteLine(dividend % divisor);
+    }
+}

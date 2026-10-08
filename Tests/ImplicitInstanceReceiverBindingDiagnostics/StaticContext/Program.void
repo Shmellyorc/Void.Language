@@ -1,0 +1,6 @@
+public class C
+{
+    private int Get() { return 7; }
+    public static int Bad() { return Get(); }
+}
+public static class Program { public static void Main() { int value = C.Bad(); } }

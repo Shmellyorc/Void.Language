@@ -1,0 +1,141 @@
+using Void;
+
+public sealed class ArithmeticHolder355
+{
+    public int Value { get; set; }
+    public ushort Small { get; set; }
+}
+
+public static class NumericConstants355
+{
+    public const int Division = int.MinValue / -1;
+    public const int Shifted = int.MinValue >> 31;
+}
+
+public struct CustomNumber355
+{
+    public int Value;
+    public CustomNumber355(int value) { Value = value; }
+    public static CustomNumber355 operator +(CustomNumber355 left, CustomNumber355 right)
+    {
+        return new CustomNumber355(left.Value + right.Value);
+    }
+    public static CustomNumber355 operator ++(CustomNumber355 value)
+    {
+        return new CustomNumber355(value.Value + 1);
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        int minimum = int.MinValue;
+        long largeMinimum = long.MinValue;
+        short smallMinimum = short.MinValue;
+        sbyte tinyMinimum = sbyte.MinValue;
+        Console.WriteLine(-minimum == int.MinValue);
+        Console.WriteLine(-largeMinimum == long.MinValue);
+        Console.WriteLine(-smallMinimum == short.MinValue);
+        Console.WriteLine(-tinyMinimum == sbyte.MinValue);
+        int max = int.MaxValue;
+        Console.WriteLine(max++ == int.MaxValue && max == int.MinValue);
+        Console.WriteLine(++max == int.MinValue + 1);
+        Console.WriteLine(--max == int.MinValue);
+        Console.WriteLine(max-- == int.MinValue && max == int.MaxValue);
+        max += 1;
+        Console.WriteLine(max == int.MinValue);
+        max -= 1;
+        Console.WriteLine(max == int.MaxValue);
+        max *= 2;
+        Console.WriteLine(max == -2);
+        long longest = long.MaxValue;
+        longest += 1L;
+        Console.WriteLine(longest == long.MinValue);
+        short shorter = short.MaxValue;
+        shorter += (short)1;
+        Console.WriteLine(shorter == short.MinValue);
+        sbyte narrow = sbyte.MinValue;
+        narrow--;
+        Console.WriteLine(narrow == sbyte.MaxValue);
+        Console.WriteLine(minimum / -1 == int.MinValue);
+        Console.WriteLine(minimum % -1 == 0);
+        Console.WriteLine(largeMinimum / -1L == long.MinValue);
+        Console.WriteLine(largeMinimum % -1L == 0L);
+        Console.WriteLine((int)(uint.MaxValue) == -1);
+        Console.WriteLine((short)(uint.MaxValue) == (short)-1);
+        Console.WriteLine((sbyte)(byte)255 == (sbyte)-1);
+        Console.WriteLine((long)(ulong.MaxValue) == -1L);
+        Console.WriteLine((uint)-1 == uint.MaxValue);
+        Console.WriteLine((ulong)-1L == ulong.MaxValue);
+        Console.WriteLine((int)(long.MaxValue) == -1);
+        Console.WriteLine((short)(int.MaxValue) == (short)-1);
+        Console.WriteLine((long)(int.MinValue) == -2147483648L);
+        Console.WriteLine((uint)(ushort)65535 == 65535u);
+        Console.WriteLine((int.MinValue << 1) == 0);
+        Console.WriteLine((int.MinValue >> 1) == -1073741824);
+        Console.WriteLine((-1 >> 1) == -1);
+        Console.WriteLine((-1 << 31) == int.MinValue);
+        Console.WriteLine((1 << 32) == 1);
+        Console.WriteLine((1 << -1) == int.MinValue);
+        Console.WriteLine(((uint)1 << 32) == 1u);
+        Console.WriteLine((uint.MaxValue >> 31) == 1u);
+        Console.WriteLine((long.MinValue >> 63) == -1L);
+        Console.WriteLine((long.MinValue << 1) == 0L);
+        int shift = -1;
+        shift <<= 31;
+        Console.WriteLine(shift == int.MinValue);
+        shift >>= 31;
+        Console.WriteLine(shift == -1);
+        uint ushift = uint.MaxValue;
+        ushift >>= 31;
+        Console.WriteLine(ushift == 1u);
+        int? nullMinimum = int.MinValue;
+        int? nullNegated = -nullMinimum;
+        Console.WriteLine(nullNegated.Value == int.MinValue);
+        int? nullDivided = nullMinimum / (int?)-1;
+        Console.WriteLine(nullDivided.Value == int.MinValue);
+        int? noNumber = null;
+        Console.WriteLine((-noNumber) == null);
+        long? nullableLong = long.MaxValue;
+        int convertedNullable = (int)nullableLong;
+        Console.WriteLine(convertedNullable == -1);
+        int? narrowedNullable = (int)(long.MaxValue);
+        Console.WriteLine(narrowedNullable.Value == -1);
+        ArithmeticHolder355 holder = new ArithmeticHolder355();
+        holder.Value = int.MaxValue;
+        holder.Value += 1;
+        Console.WriteLine(holder.Value == int.MinValue);
+        holder.Value /= -1;
+        Console.WriteLine(holder.Value == int.MinValue);
+        holder.Value %= -1;
+        Console.WriteLine(holder.Value == 0);
+        int[,] dimension = new int[(int.MinValue >> 31 == -1) ? 1 : 2, 1] { { 9 } };
+        Console.WriteLine(dimension.GetLength(0) == 1 && dimension[0, 0] == 9);
+        ushort ushortMax = ushort.MaxValue;
+        Console.WriteLine(ushortMax * ushortMax == (ushort)1);
+        ushortMax *= ushortMax;
+        Console.WriteLine(ushortMax == (ushort)1);
+        uint uintMax = uint.MaxValue;
+        Console.WriteLine(uintMax / 1u == uint.MaxValue);
+        ulong ulongMax = ulong.MaxValue;
+        Console.WriteLine(ulongMax % (ulong)2 == (ulong)1);
+        byte byteMax = byte.MaxValue;
+        byteMax <<= 8;
+        Console.WriteLine(byteMax == byte.MaxValue);
+        ushort? liftedUnsignedA = ushort.MaxValue;
+        ushort? liftedUnsignedB = ushort.MaxValue;
+        ushort? liftedUnsignedResult = liftedUnsignedA * liftedUnsignedB;
+        Console.WriteLine(liftedUnsignedResult.Value == (ushort)1);
+        holder.Small = ushort.MaxValue;
+        holder.Small *= ushort.MaxValue;
+        Console.WriteLine(holder.Small == (ushort)1);
+        Console.WriteLine(NumericConstants355.Division == int.MinValue);
+        Console.WriteLine(NumericConstants355.Shifted == -1);
+        CustomNumber355 custom = new CustomNumber355(4);
+        CustomNumber355 other = new CustomNumber355(3);
+        Console.WriteLine((custom + other).Value == 7);
+        Console.WriteLine((custom++).Value == 4 && custom.Value == 5);
+        Console.WriteLine((++custom).Value == 6);
+    }
+}

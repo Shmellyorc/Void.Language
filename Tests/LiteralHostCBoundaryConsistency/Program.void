@@ -1,0 +1,42 @@
+using Void;
+using Void.Text;
+
+public static class Program
+{
+    public static void Main()
+    {
+        Console.WriteLine("A\\\"B" == "A\x5c\"B");
+        Console.WriteLine("\\" == "\u005c");
+        Console.WriteLine("line\nnext" == "line\u000anext");
+        Console.WriteLine("\t\r\b\f\v\a".Length == 6);
+        Console.WriteLine("A\0B".Length == 3 && "A\0B"[1] == (char)0);
+        Console.WriteLine("\x41F" == "AF");
+        Console.WriteLine("\101F" == "AF");
+        Console.WriteLine("\x0A7" == "\n7");
+        Console.WriteLine("é" == "\u00e9");
+        Console.WriteLine("😀" == "\U0001f600");
+        Console.WriteLine("Aé😀\0Z" == "A\u00e9\U0001F600\0Z");
+        byte[] bytes = Encoding.UTF8.GetBytes("Aé😀\0Z");
+        Console.WriteLine(bytes.Length == 9 && bytes[0] == (byte)65 && bytes[1] == (byte)195 && bytes[2] == (byte)169);
+        Console.WriteLine(bytes[3] == (byte)240 && bytes[4] == (byte)159 && bytes[5] == (byte)152 && bytes[6] == (byte)128);
+        Console.WriteLine(bytes[7] == (byte)0 && bytes[8] == (byte)90);
+        char face = '\U0001F600';
+        Console.WriteLine((int)face == 128512 && face == '😀');
+        Console.WriteLine('\n' == (char)10 && '\\' == (char)92 && '\'' == (char)39);
+        Console.WriteLine('\u00e9' == 'é');
+        Console.WriteLine(0xF == 15 && 0xDEAD == 57005);
+        Console.WriteLine(0xDead_BeefU == 3735928559u);
+        Console.WriteLine(0b1010_1010 == 170);
+        Console.WriteLine(12_345 == 12345);
+        Console.WriteLine(0xFFFFFFFF == -1);
+        Console.WriteLine(0xFFFFFFFFFFFFFFFFL == -1L);
+        Console.WriteLine(0xFFFFFFFFu == uint.MaxValue);
+        Console.WriteLine(0b1111_1111ul == 255ul);
+        Console.WriteLine(2147483647 == int.MaxValue && 9223372036854775807L == long.MaxValue);
+        Console.WriteLine(4294967295u == uint.MaxValue && 18446744073709551615ul == ulong.MaxValue);
+        Console.WriteLine(1.25f == 1.25f && 2.0 == 2.0);
+        Console.WriteLine(1.25m == 1.25m);
+        Console.WriteLine(1e+2 == 100.0 && 1e-2 == 0.01);
+        Console.WriteLine(123456789123456789123456789.0d > 1e20);
+    }
+}

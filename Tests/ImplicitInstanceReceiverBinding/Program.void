@@ -1,0 +1,147 @@
+using Void;
+using Void.Collections;
+using Void.Threading.Tasks;
+
+public class VirtualBase351
+{
+    public virtual int Value() { return 5; }
+    public int Invoke() { return Value(); }
+    public int InheritedOnly() { return 31; }
+}
+
+public sealed class VirtualDerived351 : VirtualBase351
+{
+    public override int Value() { return 17; }
+    public int ReadInherited() { return InheritedOnly(); }
+}
+
+public sealed class Probe351
+{
+    private int _base;
+
+    public Probe351(int value)
+    {
+        _base = Normalize(value);
+    }
+
+    private int Normalize(int value) { return value; }
+    private int Helper() { return _base + 7; }
+    private int Pick(int value) { return _base + value; }
+    private string Pick(string value) { return value; }
+    private static int Select(string value) { return value.Length; }
+    private int Select(int value) { return _base + value; }
+    private T Echo<T>(T value) { return value; }
+    private int Configure(int value, int bonus = 2) { return _base + value + bonus; }
+    private int Bump(ref int value) { value += _base; return value; }
+    private int ReadIn(in int value) { return _base + value; }
+    private void Set(out int value) { value = _base; }
+
+    public int Property { get { return Helper(); } }
+    public int Direct() { return Helper(); }
+    public int Explicit() { return this.Helper(); }
+    public int Overloads() { return Pick(2) + Pick("abc").Length; }
+    public int MixedStaticInstance() { return Select(2) + Select("abcd"); }
+    public int GenericExplicit() { return Echo<int>(13); }
+    public int GenericInferred() { return Echo(14); }
+    public int Optional() { return Configure(4); }
+    public int Named() { return Configure(bonus: 3, value: 4); }
+    public int RefCall() { int value = 2; return Bump(ref value); }
+    public int InCall() { int value = 3; return ReadIn(in value); }
+    public int OutCall() { int value = 0; Set(out value); return value; }
+
+    public Func<int> MakeLambda()
+    {
+        return () => Helper();
+    }
+
+    public IEnumerator<int> Iterate()
+    {
+        yield return Helper();
+    }
+
+    public async Task<int> AsyncRead()
+    {
+        await Task.Yield();
+        return Helper();
+    }
+
+    public int LexicalShadow()
+    {
+        Func<int, int> Pick = x => x + 100;
+        return Pick(1);
+    }
+}
+
+public interface IBaseReceiver351
+{
+    int Raw();
+    int Helper() { return this.Raw() + 1; }
+}
+
+public interface IChildReceiver351 : IBaseReceiver351
+{
+    int Run() { return Helper(); }
+}
+
+public sealed class InterfaceReceiver351 : IChildReceiver351
+{
+    public int Raw() { return 8; }
+}
+
+public struct ValueProbe351
+{
+    private int _value;
+    public ValueProbe351(int value) { _value = value; }
+    private int Read() { return _value; }
+    public int Run() { return Read(); }
+}
+
+public static class Program
+{
+    private static void Check(bool value) { Console.WriteLine(value); }
+
+    public static void Main()
+    {
+        Probe351 probe = new Probe351(10);
+        Check(probe.Direct() == 17);
+        Check(probe.Explicit() == 17);
+        Check(probe.Property == 17);
+        Check(probe.Overloads() == 15);
+        Check(probe.MixedStaticInstance() == 16);
+        Check(probe.GenericExplicit() == 13);
+        Check(probe.GenericInferred() == 14);
+        Check(probe.Optional() == 16);
+        Check(probe.Named() == 17);
+        Check(probe.RefCall() == 12);
+        Check(probe.InCall() == 13);
+        Check(probe.OutCall() == 10);
+        Check(probe.LexicalShadow() == 101);
+        ValueProbe351 valueProbe = new ValueProbe351(21);
+        Check(valueProbe.Run() == 21);
+        IChildReceiver351 interfaceReceiver = new InterfaceReceiver351();
+        Check(interfaceReceiver.Run() == 9);
+
+        VirtualBase351 baseView = new VirtualDerived351();
+        Check(baseView.Invoke() == 17);
+        VirtualDerived351 derived = new VirtualDerived351();
+        Check(derived.ReadInherited() == 31);
+
+        Func<int> captured = probe.MakeLambda();
+        probe = null;
+        GC.Collect();
+        Check(captured() == 17);
+
+        Probe351 iteratorOwner = new Probe351(20);
+        IEnumerator<int> values = iteratorOwner.Iterate();
+        iteratorOwner = null;
+        GC.Collect();
+        Check(values.MoveNext() && values.Current == 27);
+
+        Probe351 asyncOwner = new Probe351(30);
+        Task<int> pending = asyncOwner.AsyncRead();
+        asyncOwner = null;
+        GC.Collect();
+        pending.Wait();
+        Check(pending.Result == 37);
+    }
+}

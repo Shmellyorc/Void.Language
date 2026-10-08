@@ -1,0 +1,7 @@
+public class C
+{
+    public static int Choose(long value) { return 1; }
+    public int Choose(float value) { return 2; }
+    public int Bad() { return Choose(1); }
+}
+public static class Program { public static void Main() { C c = new C(); int value = c.Bad(); } }

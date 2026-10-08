@@ -61,6 +61,26 @@ typedef struct VcFinallyBodyBarrier
     struct VcFinallyBodyBarrier *previous;
 } VcFinallyBodyBarrier;
 
+typedef struct VcSwitchFlowCapture
+{
+    bool *break_assignments;
+    size_t local_count;
+    size_t break_depth;
+    bool has_break;
+    struct VcSwitchFlowCapture *previous;
+} VcSwitchFlowCapture;
+
+typedef struct VcFinallyControlFlowCapture
+{
+    VcLoopFlowCapture loop;
+    VcSwitchFlowCapture switch_flow;
+    VcLoopFlowCapture *outer_loop;
+    VcSwitchFlowCapture *outer_switch;
+    bool *loop_continue_assignments;
+    bool *loop_break_assignments;
+    bool *switch_break_assignments;
+} VcFinallyControlFlowCapture;
+
 typedef struct VcSemanticContext
 {
     VcSemanticModel *model;
@@ -116,6 +136,7 @@ typedef struct VcSemanticContext
     VcSourceLocation finally_return_location;
     VcFinallyBodyBarrier *finally_body_barrier;
     VcLoopFlowCapture *loop_flow_capture;
+    VcSwitchFlowCapture *switch_flow_capture;
 } VcSemanticContext;
 
 static const char *context_type_display_name(VcSemanticContext *context, VcSemanticType type)
@@ -480,6 +501,7 @@ void vc_semantic_model_destroy(VcSemanticModel *model)
     for (size_t i = 0; i < model->binding_count; i++)
         free(model->bindings[i].argument_parameters);
 
+    free(model->using_aliases);
     free(model->structs);
     free(model->arrays);
     free(model->nullables);
@@ -935,6 +957,21 @@ bool vc_semantic_builtin_associated_owner(
     return true;
 }
 
+static bool push_using_alias(VcSemanticModel *model, VcSemanticUsingAlias value)
+{
+    if (model->using_alias_count == model->using_alias_capacity)
+    {
+        const size_t capacity = model->using_alias_capacity == 0 ? 8 : model->using_alias_capacity * 2;
+        VcSemanticUsingAlias *items = realloc(model->using_aliases, capacity * sizeof(*items));
+        if (items == NULL)
+            return false;
+        model->using_aliases = items;
+        model->using_alias_capacity = capacity;
+    }
+    model->using_aliases[model->using_alias_count++] = value;
+    return true;
+}
+
 static bool push_struct(VcSemanticModel *model, VcSemanticStruct value)
 {
     if (model->struct_count == model->struct_capacity)
@@ -1335,6 +1372,595 @@ static bool same_namespace(const char *left, const char *right)
     if (left == NULL || right == NULL)
         return left == right;
     return strcmp(left, right) == 0;
+}
+
+static const VcSource *semantic_source_for_ast_pointer(
+    const VcSemanticModel *model,
+    const void *pointer)
+{
+    if (model == NULL || pointer == NULL)
+        return NULL;
+    for (size_t i = 0; i < model->unit_count; i++)
+    {
+        if (model->units[i].tree != NULL &&
+            vc_ast_tree_contains(model->units[i].tree, pointer))
+            return model->units[i].source;
+    }
+    return NULL;
+}
+
+static bool collect_using_alias_nodes(
+    const VcAstNodeList *declarations,
+    const VcSource *source,
+    const char *namespace_name,
+    VcSemanticModel *model,
+    VcSemanticDiagnostic *diagnostic)
+{
+    if (declarations == NULL)
+        return true;
+    for (size_t i = 0; i < declarations->count; i++)
+    {
+        const VcAstNode *node = declarations->items[i];
+        if (node == NULL)
+            continue;
+        if (node->kind == VC_AST_NAMESPACE_DECLARATION)
+        {
+            if (!collect_using_alias_nodes(&node->as.namespace_declaration.declarations,
+                    source, node->as.namespace_declaration.name, model, diagnostic))
+                return false;
+            continue;
+        }
+        if (node->kind != VC_AST_USING_DECLARATION ||
+            node->as.using_declaration.alias == NULL)
+            continue;
+        VcSemanticUsingAlias alias = {0};
+        alias.node = node;
+        alias.source = source;
+        alias.namespace_name = namespace_name;
+        alias.name = node->as.using_declaration.alias;
+        if (!push_using_alias(model, alias))
+        {
+            set_diagnostic(diagnostic, source, node->location,
+                "out of memory while binding using alias '%s'", alias.name);
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool using_alias_scopes_overlap(
+    const VcSemanticUsingAlias *left,
+    const VcSemanticUsingAlias *right)
+{
+    if (left == NULL || right == NULL || left->source != right->source)
+        return false;
+    if (same_namespace(left->namespace_name, right->namespace_name))
+        return true;
+    return left->namespace_name == NULL || right->namespace_name == NULL;
+}
+
+static bool validate_using_alias_duplicates(
+    VcSemanticModel *model,
+    VcSemanticDiagnostic *diagnostic)
+{
+    for (size_t i = 0; i < model->using_alias_count; i++)
+    {
+        for (size_t j = i + 1; j < model->using_alias_count; j++)
+        {
+            const VcSemanticUsingAlias *left = &model->using_aliases[i];
+            const VcSemanticUsingAlias *right = &model->using_aliases[j];
+            if (strcmp(left->name, right->name) != 0 ||
+                !using_alias_scopes_overlap(left, right))
+                continue;
+            set_diagnostic(diagnostic, right->source, right->node->location,
+                "using alias '%s' is already declared in this source scope",
+                right->name);
+            vc_diagnostic_set_code(diagnostic, VC_DIAG_DUPLICATE);
+            related_declaration(diagnostic, left->source, left->node,
+                "Previous using alias declaration is here.");
+            return false;
+        }
+    }
+    return true;
+}
+
+static size_t find_visible_using_alias_index(
+    const VcSemanticModel *model,
+    const VcSource *source,
+    const char *namespace_name,
+    const char *name)
+{
+    size_t result = (size_t)-1;
+    for (size_t i = 0; i < model->using_alias_count; i++)
+    {
+        const VcSemanticUsingAlias *alias = &model->using_aliases[i];
+        if (alias->source != source || strcmp(alias->name, name) != 0)
+            continue;
+        if (alias->namespace_name != NULL &&
+            !same_namespace(alias->namespace_name, namespace_name))
+            continue;
+        if (result != (size_t)-1)
+            return (size_t)-2;
+        result = i;
+    }
+    return result;
+}
+
+typedef struct VcAliasDeclaredTarget
+{
+    VcSemanticUsingAliasTargetKind kind;
+    const VcAstNode *node;
+    const VcSource *source;
+    char canonical_name[768];
+    bool ambiguous;
+} VcAliasDeclaredTarget;
+
+static void scan_alias_target_declarations(
+    const VcAstNodeList *declarations,
+    const VcSource *source,
+    const char *namespace_name,
+    const char *target_namespace,
+    const char *target_name,
+    size_t *type_count,
+    const VcAstNode **type_node,
+    const VcSource **type_source,
+    bool *namespace_found,
+    const VcAstNode **namespace_node,
+    const VcSource **namespace_source)
+{
+    if (declarations == NULL)
+        return;
+    for (size_t i = 0; i < declarations->count; i++)
+    {
+        const VcAstNode *node = declarations->items[i];
+        if (node == NULL)
+            continue;
+        if (node->kind == VC_AST_NAMESPACE_DECLARATION)
+        {
+            if (target_name == NULL && node->as.namespace_declaration.name != NULL &&
+                strcmp(node->as.namespace_declaration.name, target_namespace) == 0)
+            {
+                if (!*namespace_found)
+                {
+                    *namespace_node = node;
+                    *namespace_source = source;
+                }
+                *namespace_found = true;
+            }
+            scan_alias_target_declarations(
+                &node->as.namespace_declaration.declarations,
+                source, node->as.namespace_declaration.name,
+                target_namespace, target_name,
+                type_count, type_node, type_source,
+                namespace_found, namespace_node, namespace_source);
+            continue;
+        }
+        if (target_name == NULL || node->kind != VC_AST_TYPE_DECLARATION ||
+            node->as.type_declaration.original_generic_name != NULL ||
+            !same_namespace(namespace_name, target_namespace) ||
+            strcmp(node->as.type_declaration.name, target_name) != 0)
+            continue;
+        if (*type_count == 0)
+        {
+            *type_node = node;
+            *type_source = source;
+        }
+        (*type_count)++;
+    }
+}
+
+static bool model_namespace_declared(
+    const VcSemanticModel *model,
+    const char *name,
+    const VcAstNode **node,
+    const VcSource **source)
+{
+    bool found = false;
+    size_t ignored_count = 0;
+    const VcAstNode *ignored_node = NULL;
+    const VcSource *ignored_source = NULL;
+    for (size_t i = 0; i < model->unit_count; i++)
+    {
+        const VcAstTree *tree = model->units[i].tree;
+        if (tree == NULL || tree->root == NULL ||
+            tree->root->kind != VC_AST_COMPILATION_UNIT)
+            continue;
+        scan_alias_target_declarations(
+            &tree->root->as.compilation_unit.declarations,
+            model->units[i].source, NULL,
+            name, NULL,
+            &ignored_count, &ignored_node, &ignored_source,
+            &found, node, source);
+    }
+    return found;
+}
+
+static size_t model_type_declaration_matches(
+    const VcSemanticModel *model,
+    const char *namespace_name,
+    const char *name,
+    const VcAstNode **node,
+    const VcSource **source)
+{
+    size_t count = 0;
+    bool ignored_namespace = false;
+    const VcAstNode *ignored_namespace_node = NULL;
+    const VcSource *ignored_namespace_source = NULL;
+    for (size_t i = 0; i < model->unit_count; i++)
+    {
+        const VcAstTree *tree = model->units[i].tree;
+        if (tree == NULL || tree->root == NULL ||
+            tree->root->kind != VC_AST_COMPILATION_UNIT)
+            continue;
+        scan_alias_target_declarations(
+            &tree->root->as.compilation_unit.declarations,
+            model->units[i].source, NULL,
+            namespace_name, name,
+            &count, node, source,
+            &ignored_namespace, &ignored_namespace_node, &ignored_namespace_source);
+    }
+    return count;
+}
+
+static bool validate_using_alias_name_collisions(
+    VcSemanticModel *model,
+    VcSemanticDiagnostic *diagnostic)
+{
+    for (size_t i = 0; i < model->using_alias_count; i++)
+    {
+        const VcSemanticUsingAlias *alias = &model->using_aliases[i];
+        const VcAstNode *conflict_node = NULL;
+        const VcSource *conflict_source = NULL;
+        if (model_type_declaration_matches(
+                model, alias->namespace_name, alias->name,
+                &conflict_node, &conflict_source) != 0)
+        {
+            set_diagnostic(diagnostic, alias->source, alias->node->location,
+                "using alias '%s' conflicts with a type declared in the same scope",
+                alias->name);
+            vc_diagnostic_set_code(diagnostic, VC_DIAG_DUPLICATE);
+            related_declaration(diagnostic, conflict_source, conflict_node,
+                "Conflicting type declaration is here.");
+            return false;
+        }
+
+        char namespace_name[768];
+        if (alias->namespace_name != NULL && alias->namespace_name[0] != '\0')
+        {
+            const int written = snprintf(namespace_name, sizeof(namespace_name),
+                "%s.%s", alias->namespace_name, alias->name);
+            if (written < 0 || (size_t)written >= sizeof(namespace_name))
+                continue;
+        }
+        else
+        {
+            snprintf(namespace_name, sizeof(namespace_name), "%s", alias->name);
+        }
+        conflict_node = NULL;
+        conflict_source = NULL;
+        if (model_namespace_declared(
+                model, namespace_name, &conflict_node, &conflict_source))
+        {
+            set_diagnostic(diagnostic, alias->source, alias->node->location,
+                "using alias '%s' conflicts with a namespace declared in the same scope",
+                alias->name);
+            vc_diagnostic_set_code(diagnostic, VC_DIAG_DUPLICATE);
+            related_declaration(diagnostic, conflict_source, conflict_node,
+                "Conflicting namespace declaration is here.");
+            return false;
+        }
+    }
+    return true;
+}
+
+static void scan_unqualified_alias_type_declarations(
+    const VcAstNodeList *declarations,
+    const VcSource *source,
+    const char *namespace_name,
+    const char *simple_name,
+    size_t *count,
+    const VcAstNode **node,
+    const VcSource **target_source,
+    const char **target_namespace)
+{
+    if (declarations == NULL)
+        return;
+    for (size_t i = 0; i < declarations->count; i++)
+    {
+        const VcAstNode *declaration = declarations->items[i];
+        if (declaration == NULL)
+            continue;
+        if (declaration->kind == VC_AST_NAMESPACE_DECLARATION)
+        {
+            scan_unqualified_alias_type_declarations(
+                &declaration->as.namespace_declaration.declarations,
+                source, declaration->as.namespace_declaration.name,
+                simple_name, count, node, target_source, target_namespace);
+            continue;
+        }
+        if (declaration->kind != VC_AST_TYPE_DECLARATION ||
+            declaration->as.type_declaration.original_generic_name != NULL ||
+            strcmp(declaration->as.type_declaration.name, simple_name) != 0)
+            continue;
+        if (*count == 0)
+        {
+            *node = declaration;
+            *target_source = source;
+            *target_namespace = namespace_name;
+        }
+        (*count)++;
+    }
+}
+
+static size_t model_unqualified_type_declaration_matches(
+    const VcSemanticModel *model,
+    const char *simple_name,
+    const VcAstNode **node,
+    const VcSource **source,
+    const char **namespace_name)
+{
+    size_t count = 0;
+    for (size_t i = 0; i < model->unit_count; i++)
+    {
+        const VcAstTree *tree = model->units[i].tree;
+        if (tree == NULL || tree->root == NULL ||
+            tree->root->kind != VC_AST_COMPILATION_UNIT)
+            continue;
+        scan_unqualified_alias_type_declarations(
+            &tree->root->as.compilation_unit.declarations,
+            model->units[i].source, NULL, simple_name,
+            &count, node, source, namespace_name);
+    }
+    return count;
+}
+
+static bool resolve_declared_alias_target(
+    const VcSemanticModel *model,
+    const char *scope_namespace,
+    const char *name,
+    VcAliasDeclaredTarget *target)
+{
+    memset(target, 0, sizeof(*target));
+    if (name == NULL || name[0] == '\0')
+        return false;
+
+    const char *last_dot = strrchr(name, '.');
+    char qualifier[512];
+    const char *type_namespace = scope_namespace;
+    const char *simple_name = name;
+    bool qualified = last_dot != NULL;
+    if (qualified)
+    {
+        const size_t length = (size_t)(last_dot - name);
+        if (length == 0 || length >= sizeof(qualifier) || last_dot[1] == '\0')
+            return false;
+        memcpy(qualifier, name, length);
+        qualifier[length] = '\0';
+        type_namespace = qualifier;
+        simple_name = last_dot + 1;
+    }
+
+    const VcAstNode *type_node = NULL;
+    const VcSource *type_source = NULL;
+    size_t type_count = model_type_declaration_matches(
+        model, type_namespace, simple_name, &type_node, &type_source);
+    if (!qualified && type_count == 0)
+    {
+        const char *fallback_namespace = NULL;
+        type_count = model_unqualified_type_declaration_matches(
+            model, simple_name, &type_node, &type_source, &fallback_namespace);
+        type_namespace = fallback_namespace;
+    }
+
+    const VcAstNode *namespace_node = NULL;
+    const VcSource *namespace_source = NULL;
+    const bool namespace_found = model_namespace_declared(
+        model, name, &namespace_node, &namespace_source);
+
+    if (type_count > 1 || (type_count != 0 && namespace_found))
+    {
+        target->ambiguous = true;
+        return false;
+    }
+    if (type_count == 1)
+    {
+        target->kind = VC_SEM_USING_ALIAS_TYPE;
+        target->node = type_node;
+        target->source = type_source;
+        if (type_namespace != NULL && type_namespace[0] != '\0')
+            snprintf(target->canonical_name, sizeof(target->canonical_name),
+                "%s.%s", type_namespace, simple_name);
+        else
+            snprintf(target->canonical_name, sizeof(target->canonical_name),
+                "%s", simple_name);
+        return true;
+    }
+    if (namespace_found)
+    {
+        target->kind = VC_SEM_USING_ALIAS_NAMESPACE;
+        target->node = namespace_node;
+        target->source = namespace_source;
+        snprintf(target->canonical_name, sizeof(target->canonical_name), "%s", name);
+        return true;
+    }
+    return false;
+}
+
+static bool resolve_using_alias_entry(
+    VcSemanticModel *model,
+    size_t index,
+    VcSemanticDiagnostic *diagnostic)
+{
+    if (index >= model->using_alias_count)
+        return false;
+    VcSemanticUsingAlias *alias = &model->using_aliases[index];
+    if (alias->resolution_state == 2)
+        return true;
+    if (alias->resolution_state == 1)
+    {
+        set_diagnostic(diagnostic, alias->source, alias->node->location,
+            "using alias '%s' participates in a cyclic alias declaration",
+            alias->name);
+        vc_diagnostic_set_code(diagnostic, VC_DIAG_NAME);
+        return false;
+    }
+    alias->resolution_state = 1;
+
+    const char *raw = alias->node->as.using_declaration.name;
+    const char *dot = raw != NULL ? strchr(raw, '.') : NULL;
+    const size_t root_length = dot != NULL ? (size_t)(dot - raw) : (raw != NULL ? strlen(raw) : 0);
+    if (root_length == 0 || root_length >= 256)
+    {
+        set_diagnostic(diagnostic, alias->source, alias->node->location,
+            "using alias '%s' has an invalid target", alias->name);
+        return false;
+    }
+    char root[256];
+    memcpy(root, raw, root_length);
+    root[root_length] = '\0';
+
+    const size_t chained = find_visible_using_alias_index(
+        model, alias->source, alias->namespace_name, root);
+    if (chained == (size_t)-2)
+    {
+        set_diagnostic(diagnostic, alias->source, alias->node->location,
+            "using alias target '%s' is ambiguous", raw);
+        vc_diagnostic_set_code(diagnostic, VC_DIAG_NAME);
+        return false;
+    }
+
+    VcAliasDeclaredTarget target = {0};
+    if (chained != (size_t)-1)
+    {
+        if (!resolve_using_alias_entry(model, chained, diagnostic))
+            return false;
+        const VcSemanticUsingAlias *base = &model->using_aliases[chained];
+        if (dot == NULL)
+        {
+            alias->target_kind = base->target_kind;
+            alias->target_node = base->target_node;
+            alias->target_source = base->target_source;
+            snprintf(alias->canonical_name, sizeof(alias->canonical_name), "%s",
+                base->canonical_name);
+            alias->resolution_state = 2;
+            return true;
+        }
+        if (base->target_kind != VC_SEM_USING_ALIAS_NAMESPACE)
+        {
+            set_diagnostic(diagnostic, alias->source, alias->node->location,
+                "using alias target '%s' cannot qualify through type alias '%s'",
+                raw, root);
+            vc_diagnostic_set_code(diagnostic, VC_DIAG_NAME);
+            return false;
+        }
+        char expanded[768];
+        const int written = snprintf(expanded, sizeof(expanded), "%s%s",
+            base->canonical_name, dot);
+        if (written < 0 || (size_t)written >= sizeof(expanded) ||
+            !resolve_declared_alias_target(model, alias->namespace_name, expanded, &target))
+        {
+            if (target.ambiguous)
+                set_diagnostic(diagnostic, alias->source, alias->node->location,
+                    "using alias target '%s' is ambiguous", raw);
+            else
+                set_diagnostic(diagnostic, alias->source, alias->node->location,
+                    "using alias '%s' target '%s' could not be resolved",
+                    alias->name, raw);
+            vc_diagnostic_set_code(diagnostic, VC_DIAG_NAME);
+            return false;
+        }
+    }
+    else if (!resolve_declared_alias_target(model, alias->namespace_name, raw, &target))
+    {
+        if (target.ambiguous)
+            set_diagnostic(diagnostic, alias->source, alias->node->location,
+                "using alias target '%s' is ambiguous", raw);
+        else
+            set_diagnostic(diagnostic, alias->source, alias->node->location,
+                "using alias '%s' target '%s' could not be resolved",
+                alias->name, raw != NULL ? raw : "<missing>");
+        vc_diagnostic_set_code(diagnostic, VC_DIAG_NAME);
+        return false;
+    }
+
+    alias->target_kind = target.kind;
+    alias->target_node = target.node;
+    alias->target_source = target.source;
+    snprintf(alias->canonical_name, sizeof(alias->canonical_name), "%s",
+        target.canonical_name);
+    alias->resolution_state = 2;
+    return true;
+}
+
+static bool collect_and_resolve_using_aliases(
+    VcSemanticModel *model,
+    VcSemanticDiagnostic *diagnostic)
+{
+    for (size_t i = 0; i < model->unit_count; i++)
+    {
+        const VcAstTree *tree = model->units[i].tree;
+        if (tree == NULL || tree->root == NULL ||
+            tree->root->kind != VC_AST_COMPILATION_UNIT)
+            continue;
+        if (!collect_using_alias_nodes(&tree->root->as.compilation_unit.declarations,
+                model->units[i].source, NULL, model, diagnostic))
+            return false;
+    }
+    if (!validate_using_alias_duplicates(model, diagnostic))
+        return false;
+    if (!validate_using_alias_name_collisions(model, diagnostic))
+        return false;
+    for (size_t i = 0; i < model->using_alias_count; i++)
+        if (!resolve_using_alias_entry(model, i, diagnostic))
+            return false;
+    return true;
+}
+
+static const VcSemanticUsingAlias *visible_using_alias(
+    const VcSemanticModel *model,
+    const VcSource *source,
+    const char *namespace_name,
+    const char *name)
+{
+    const size_t index = find_visible_using_alias_index(model, source, namespace_name, name);
+    if (index == (size_t)-1 || index == (size_t)-2)
+        return NULL;
+    return &model->using_aliases[index];
+}
+
+static bool expand_semantic_alias_name(
+    const VcSemanticModel *model,
+    const VcSource *source,
+    const char *namespace_name,
+    const char *name,
+    char *output,
+    size_t output_size,
+    const VcSemanticUsingAlias **resolved_alias)
+{
+    if (resolved_alias != NULL)
+        *resolved_alias = NULL;
+    if (model == NULL || source == NULL || name == NULL || output == NULL || output_size == 0)
+        return false;
+    const char *dot = strchr(name, '.');
+    const size_t root_length = dot != NULL ? (size_t)(dot - name) : strlen(name);
+    if (root_length == 0 || root_length >= 256)
+        return false;
+    char root[256];
+    memcpy(root, name, root_length);
+    root[root_length] = '\0';
+    const VcSemanticUsingAlias *alias = visible_using_alias(
+        model, source, namespace_name, root);
+    if (alias == NULL || alias->resolution_state != 2)
+        return false;
+    if (dot != NULL && alias->target_kind != VC_SEM_USING_ALIAS_NAMESPACE)
+        return false;
+    const int written = snprintf(output, output_size, "%s%s",
+        alias->canonical_name, dot != NULL ? dot : "");
+    if (written < 0 || (size_t)written >= output_size)
+        return false;
+    if (resolved_alias != NULL)
+        *resolved_alias = alias;
+    return true;
 }
 
 static bool find_struct_by_name(
@@ -1757,19 +2383,34 @@ static bool find_constructed_type_declaration(
     return true;
 }
 
-static VcSemanticType resolve_type(
+static VcSemanticType resolve_type_with_source(
     VcSemanticModel *model,
     const VcAstTypeRef *type,
     const char *namespace_name,
-    bool allow_void)
+    bool allow_void,
+    const VcSource *source)
 {
     if (type != NULL && type->is_global_qualified)
+    {
         namespace_name = NULL;
+        source = NULL;
+    }
+
+    char alias_name[768];
+    VcAstTypeRef aliased_type;
+    if (type != NULL && type->name != NULL && source != NULL &&
+        expand_semantic_alias_name(model, source, namespace_name, type->name,
+            alias_name, sizeof(alias_name), NULL))
+    {
+        aliased_type = *type;
+        aliased_type.name = alias_name;
+        type = &aliased_type;
+    }
     if (type != NULL && type->array_rank != 0)
     {
         VcAstTypeRef element = *type;
         element.array_rank--;
-        const VcSemanticType element_type = resolve_type(model, &element, namespace_name, false);
+        const VcSemanticType element_type = resolve_type_with_source(model, &element, namespace_name, false, source);
         if (element_type == VC_SEM_TYPE_UNKNOWN || element_type == VC_SEM_TYPE_ERROR ||
             element_type == VC_SEM_TYPE_VOID || semantic_type_is_ref_struct(model, element_type))
             return VC_SEM_TYPE_UNKNOWN;
@@ -1781,7 +2422,7 @@ static VcSemanticType resolve_type(
         VcAstTypeRef element = *type;
         const size_t rank = element.rectangular_rank;
         element.rectangular_rank = 0;
-        const VcSemanticType element_type = resolve_type(model, &element, namespace_name, false);
+        const VcSemanticType element_type = resolve_type_with_source(model, &element, namespace_name, false, source);
         if (element_type == VC_SEM_TYPE_UNKNOWN || element_type == VC_SEM_TYPE_ERROR ||
             element_type == VC_SEM_TYPE_VOID || semantic_type_is_ref_struct(model, element_type))
             return VC_SEM_TYPE_UNKNOWN;
@@ -1799,7 +2440,7 @@ static VcSemanticType resolve_type(
         VcAstTypeRef element = *type;
         element.pointer_depth--;
         element.nullable = false;
-        const VcSemanticType element_type = resolve_type(model, &element, namespace_name, true);
+        const VcSemanticType element_type = resolve_type_with_source(model, &element, namespace_name, true, source);
         if (element_type == VC_SEM_TYPE_UNKNOWN || element_type == VC_SEM_TYPE_ERROR)
             return VC_SEM_TYPE_UNKNOWN;
         return intern_pointer_type(model, element_type);
@@ -1817,8 +2458,8 @@ static VcSemanticType resolve_type(
             return VC_SEM_TYPE_ERROR;
         for (size_t i = 0; i < parameter_count; i++)
         {
-            parameter_types[i] = resolve_type(model, type->generic_arguments.items[i],
-                namespace_name, false);
+            parameter_types[i] = resolve_type_with_source(model, type->generic_arguments.items[i],
+                namespace_name, false, source);
             if (parameter_types[i] == VC_SEM_TYPE_UNKNOWN || parameter_types[i] == VC_SEM_TYPE_ERROR ||
                 parameter_types[i] == VC_SEM_TYPE_VOID)
             {
@@ -1826,8 +2467,8 @@ static VcSemanticType resolve_type(
                 return VC_SEM_TYPE_UNKNOWN;
             }
         }
-        const VcSemanticType return_type = resolve_type(model,
-            type->generic_arguments.items[signature_count - 1u], namespace_name, true);
+        const VcSemanticType return_type = resolve_type_with_source(model,
+            type->generic_arguments.items[signature_count - 1u], namespace_name, true, source);
         if (return_type == VC_SEM_TYPE_UNKNOWN || return_type == VC_SEM_TYPE_ERROR)
         {
             free(parameter_types);
@@ -1846,7 +2487,7 @@ static VcSemanticType resolve_type(
         VcAstTypeRef element = *type;
         element.pointer_depth--;
         element.nullable = false;
-        const VcSemanticType element_type = resolve_type(model, &element, namespace_name, true);
+        const VcSemanticType element_type = resolve_type_with_source(model, &element, namespace_name, true, source);
         if (element_type == VC_SEM_TYPE_UNKNOWN || element_type == VC_SEM_TYPE_ERROR)
             return VC_SEM_TYPE_UNKNOWN;
         return intern_pointer_type(model, element_type);
@@ -1856,7 +2497,7 @@ static VcSemanticType resolve_type(
     {
         VcAstTypeRef underlying = *type;
         underlying.nullable = false;
-        const VcSemanticType underlying_type = resolve_type(model, &underlying, namespace_name, false);
+        const VcSemanticType underlying_type = resolve_type_with_source(model, &underlying, namespace_name, false, source);
         if (underlying_type == VC_SEM_TYPE_UNKNOWN || underlying_type == VC_SEM_TYPE_ERROR ||
             !nullable_underlying_supported(model, underlying_type))
             return VC_SEM_TYPE_UNKNOWN;
@@ -1879,8 +2520,8 @@ static VcSemanticType resolve_type(
     }
     for (size_t argument_index = 0; argument_index < type->generic_arguments.count; argument_index++)
     {
-        const VcSemanticType argument_type = resolve_type(model,
-            type->generic_arguments.items[argument_index], namespace_name, false);
+        const VcSemanticType argument_type = resolve_type_with_source(model,
+            type->generic_arguments.items[argument_index], namespace_name, false, source);
         if (argument_type == VC_SEM_TYPE_UNKNOWN || argument_type == VC_SEM_TYPE_ERROR ||
             semantic_type_is_ref_struct(model, argument_type))
         {
@@ -1901,6 +2542,16 @@ static VcSemanticType resolve_type(
     if (!found)
         return VC_SEM_TYPE_UNKNOWN;
     return vc_semantic_struct_type(index);
+}
+
+static VcSemanticType resolve_type(
+    VcSemanticModel *model,
+    const VcAstTypeRef *type,
+    const char *namespace_name,
+    bool allow_void)
+{
+    return resolve_type_with_source(model, type, namespace_name, allow_void,
+        semantic_source_for_ast_pointer(model, type));
 }
 
 static bool semantic_async_completion_type_info(
@@ -8031,29 +8682,19 @@ static bool declaration_pattern_relation_is_allowed(
     return false;
 }
 
-static VcSemanticType numeric_literal_type(const char *text)
+static VcSemanticType numeric_literal_type(VcAstNumericKind kind)
 {
-    const size_t length = strlen(text);
-    bool has_dot_or_exponent = false;
-    bool has_u = false;
-    bool has_l = false;
-
-    for (size_t i = 0; i < length; i++)
+    switch (kind)
     {
-        const char c = text[i];
-        if (c == '.' || c == 'e' || c == 'E') has_dot_or_exponent = true;
-        if (c == 'f' || c == 'F') return VC_SEM_TYPE_FLOAT;
-        if (c == 'd' || c == 'D') return VC_SEM_TYPE_DOUBLE;
-        if (c == 'm' || c == 'M') return VC_SEM_TYPE_DECIMAL;
-        if (c == 'u' || c == 'U') has_u = true;
-        if (c == 'l' || c == 'L') has_l = true;
+        case VC_AST_NUM_INT: return VC_SEM_TYPE_INT;
+        case VC_AST_NUM_UINT: return VC_SEM_TYPE_UINT;
+        case VC_AST_NUM_LONG: return VC_SEM_TYPE_LONG;
+        case VC_AST_NUM_ULONG: return VC_SEM_TYPE_ULONG;
+        case VC_AST_NUM_FLOAT: return VC_SEM_TYPE_FLOAT;
+        case VC_AST_NUM_DOUBLE: return VC_SEM_TYPE_DOUBLE;
+        case VC_AST_NUM_DECIMAL: return VC_SEM_TYPE_DECIMAL;
     }
-
-    if (has_dot_or_exponent) return VC_SEM_TYPE_DOUBLE;
-    if (has_u && has_l) return VC_SEM_TYPE_ULONG;
-    if (has_l) return VC_SEM_TYPE_LONG;
-    if (has_u) return VC_SEM_TYPE_UINT;
-    return VC_SEM_TYPE_INT;
+    return VC_SEM_TYPE_ERROR;
 }
 
 static bool push_local_node_ex_origin(
@@ -9026,9 +9667,14 @@ static bool resolve_static_type_target(
         ? vc_semantic_builtin_type_from_ast(ref) : VC_SEM_TYPE_UNKNOWN;
     if (type == VC_SEM_TYPE_UNKNOWN)
     {
-        if (ref->generic_arguments.count != 0)
+        char expanded_alias[768];
+        const bool uses_alias = ref->name != NULL && expand_semantic_alias_name(
+            context->model, context->source, context->namespace_name, ref->name,
+            expanded_alias, sizeof(expanded_alias), NULL);
+        if (ref->generic_arguments.count != 0 || uses_alias)
         {
-            type = resolve_type(context->model, ref, context->namespace_name, false);
+            type = resolve_type_with_source(context->model, ref, context->namespace_name,
+                false, context->source);
             if (type == VC_SEM_TYPE_UNKNOWN || type == VC_SEM_TYPE_ERROR ||
                 !vc_semantic_type_is_struct(type))
                 return false;
@@ -9503,6 +10149,8 @@ static VcTokenKind compound_binary_operator(VcTokenKind kind)
         case VC_TOKEN_STAR_EQUAL: return VC_TOKEN_STAR;
         case VC_TOKEN_SLASH_EQUAL: return VC_TOKEN_SLASH;
         case VC_TOKEN_PERCENT_EQUAL: return VC_TOKEN_PERCENT;
+        case VC_TOKEN_LESS_LESS_EQUAL: return VC_TOKEN_LESS_LESS;
+        case VC_TOKEN_GREATER_GREATER_EQUAL: return VC_TOKEN_GREATER_GREATER;
         default: return VC_TOKEN_EOF;
     }
 }
@@ -10057,6 +10705,20 @@ static bool callable_matches_arguments(
     return matched;
 }
 
+static void resolve_interface_instance_method_call(
+    VcSemanticContext *context,
+    size_t interface_index,
+    const char *name,
+    const VcAstNodeList *argument_nodes,
+    const VcSemanticType *arguments,
+    const VcTokenKind *argument_modifiers,
+    size_t argument_count,
+    size_t depth,
+    size_t *match,
+    size_t *best_rank,
+    bool *best_params,
+    bool *ambiguous);
+
 static size_t resolve_method_call(
     VcSemanticContext *context,
     const char *name,
@@ -10065,45 +10727,81 @@ static size_t resolve_method_call(
     const VcTokenKind *argument_modifiers,
     size_t argument_count,
     bool *ambiguous,
-    bool *params_expanded)
+    bool *params_expanded,
+    bool *implicit_receiver)
 {
     size_t match = (size_t)-1;
     size_t best_rank = (size_t)-1;
     bool best_params = false;
     *ambiguous = false;
     *params_expanded = false;
+    *implicit_receiver = false;
 
-    for (size_t i = 0; i < context->model->method_count; i++)
+    size_t instance_owner = context->has_this ? context->this_struct_index : (size_t)-1;
+    for (size_t level = 0; level <= context->model->struct_count; level++)
     {
-        const VcSemanticMethod *candidate = &context->model->methods[i];
-        if (!candidate->is_static || candidate->is_operator || !same_context(context, candidate) ||
-            strcmp(candidate->node->as.method_declaration.name, name) != 0)
-            continue;
-
-        bool expanded = false;
-        size_t rank = 0;
-        if (!callable_matches_arguments(context->model,
-                &candidate->node->as.method_declaration.parameters,
-                candidate->parameter_types, candidate->parameter_modifiers, candidate->parameter_count,
-                argument_nodes, arguments, argument_modifiers, argument_count, &expanded, &rank, NULL))
-            continue;
-
-        if (match == (size_t)-1 || rank < best_rank)
+        for (size_t i = 0; i < context->model->method_count; i++)
         {
-            match = i;
-            best_rank = rank;
-            best_params = expanded;
-            *ambiguous = false;
+            const VcSemanticMethod *candidate = &context->model->methods[i];
+            if (candidate->is_operator ||
+                strcmp(candidate->node->as.method_declaration.name, name) != 0)
+                continue;
+
+            const bool static_candidate = level == 0 && candidate->is_static &&
+                same_context(context, candidate);
+            const bool instance_candidate = context->has_this && !candidate->is_static &&
+                candidate->has_owner_struct && candidate->owner_struct_index == instance_owner &&
+                !context->model->structs[instance_owner].is_interface;
+            if (!static_candidate && !instance_candidate)
+                continue;
+
+            bool expanded = false;
+            size_t rank = 0;
+            if (!callable_matches_arguments(context->model,
+                    &candidate->node->as.method_declaration.parameters,
+                    candidate->parameter_types, candidate->parameter_modifiers,
+                    candidate->parameter_count, argument_nodes, arguments,
+                    argument_modifiers, argument_count, &expanded, &rank, NULL))
+                continue;
+
+            if (match == (size_t)-1 || rank < best_rank)
+            {
+                match = i;
+                best_rank = rank;
+                best_params = expanded;
+                *ambiguous = false;
+            }
+            else if (rank == best_rank)
+            {
+                const VcSemanticMethod *best = &context->model->methods[match];
+                if (!semantic_methods_same_declaration(candidate, best))
+                    *ambiguous = true;
+            }
         }
-        else if (rank == best_rank)
+
+        if (level == 0 && context->has_this &&
+            instance_owner < context->model->struct_count &&
+            context->model->structs[instance_owner].is_interface)
         {
-            const VcSemanticMethod *best = &context->model->methods[match];
-            if (!semantic_methods_same_declaration(candidate, best))
-                *ambiguous = true;
+            resolve_interface_instance_method_call(context, instance_owner, name,
+                argument_nodes, arguments, argument_modifiers, argument_count, 0,
+                &match, &best_rank, &best_params, ambiguous);
         }
+
+        /* Simple-name lookup resolves the current type's static and instance
+           candidates as one overload set. Only when that level has no applicable
+           member do inherited instance candidates participate, preserving the
+           established instance lookup/hiding behavior. */
+        if (match != (size_t)-1 || *ambiguous || !context->has_this ||
+            instance_owner >= context->model->struct_count ||
+            !context->model->structs[instance_owner].has_base_class)
+            break;
+        instance_owner = context->model->structs[instance_owner].base_class_index;
     }
 
     *params_expanded = best_params;
+    *implicit_receiver = match != (size_t)-1 &&
+        !context->model->methods[match].is_static;
     return match;
 }
 
@@ -12869,6 +13567,15 @@ static VcSemanticType analyze_reference_argument(
                     "ref local '%s' refers to storage that is not definitely assigned", local->name);
                 return VC_SEM_TYPE_ERROR;
             }
+            if (modifier != VC_TOKEN_KW_OUT && local->modifier != VC_TOKEN_KW_REF && !local->assigned)
+            {
+                set_diagnostic(context->diagnostic, context->source, operand->location,
+                    context->iterator_prelower_method
+                        ? "iterator local '%s' cannot be read before it is assigned"
+                        : "local '%s' cannot be read before it is definitely assigned",
+                    local->name);
+                return VC_SEM_TYPE_ERROR;
+            }
             VcSemanticBinding binding = {0};
             binding.node = operand;
             binding.declaration_node = local->declaration_node;
@@ -13182,6 +13889,55 @@ static const char *first_unknown_named_method_argument(
             return name;
     }
     return NULL;
+}
+
+static const char *first_unknown_named_unqualified_method_argument(
+    const VcSemanticContext *context,
+    const VcAstNodeList *arguments,
+    const char *method_name)
+{
+    size_t current_type = 0;
+    const bool has_current_type = context_type_index(context, &current_type);
+    for (size_t i = 0; i < arguments->count; i++)
+    {
+        const char *name = arguments->items[i]->argument_name;
+        if (name == NULL)
+            continue;
+        const bool known_static = method_group_has_parameter_name(
+            context, method_name, name, true, true, false, 0, false);
+        const size_t instance_type = context->has_this
+            ? context->this_struct_index : current_type;
+        const bool known_instance = has_current_type &&
+            instance_type < context->model->struct_count &&
+            method_group_has_parameter_name(
+                context, method_name, name, false, false, true, instance_type, true);
+        if (!known_static && !known_instance)
+            return name;
+    }
+    return NULL;
+}
+
+static bool context_has_instance_method_group(
+    const VcSemanticContext *context,
+    const char *method_name)
+{
+    size_t current_type = 0;
+    if (!context_type_index(context, &current_type))
+        return false;
+    for (size_t i = 0; i < context->model->method_count; i++)
+    {
+        const VcSemanticMethod *candidate = &context->model->methods[i];
+        if (candidate->is_static || candidate->is_operator || !candidate->has_owner_struct ||
+            strcmp(candidate->node->as.method_declaration.name, method_name) != 0)
+            continue;
+        if (candidate->owner_struct_index == current_type ||
+            (current_type < context->model->struct_count &&
+             context->model->structs[current_type].is_class &&
+             class_is_same_or_derived(context->model, current_type,
+                 candidate->owner_struct_index)))
+            return true;
+    }
+    return false;
 }
 
 static const char *first_unknown_named_constructor_argument(
@@ -14592,6 +15348,67 @@ static const char *inferred_generic_argument_origin(
     return origin;
 }
 
+static VcGenericInferenceStatus finish_generic_method_inference(
+    VcSemanticContext *context,
+    const VcAstNode *expression,
+    const VcAstNodeList *argument_nodes,
+    VcGenericInferenceBest *best,
+    size_t require_better_than_rank)
+{
+    if (!best->saw_template)
+    {
+        free(best->arguments);
+        best->arguments = NULL;
+        return VC_GENERIC_INFERENCE_NONE;
+    }
+    if (!best->matched)
+    {
+        free(best->arguments);
+        best->arguments = NULL;
+        return VC_GENERIC_INFERENCE_UNINFERABLE;
+    }
+    if (require_better_than_rank != (size_t)-1 && best->rank >= require_better_than_rank)
+    {
+        free(best->arguments);
+        best->arguments = NULL;
+        return VC_GENERIC_INFERENCE_NONE;
+    }
+    if (best->ambiguous)
+    {
+        free(best->arguments);
+        best->arguments = NULL;
+        return VC_GENERIC_INFERENCE_AMBIGUOUS;
+    }
+
+    VcAstTree *tree = semantic_tree_for_source(context->model, context->source);
+    if (tree == NULL)
+    {
+        free(best->arguments);
+        best->arguments = NULL;
+        return VC_GENERIC_INFERENCE_UNINFERABLE;
+    }
+    VcAstNode *mutable_call = (VcAstNode *)expression;
+    for (size_t i = 0; i < best->argument_count; i++)
+    {
+        VcAstTypeRef *type = semantic_type_to_inference_ast(context->model, tree,
+            best->arguments[i], expression->location);
+        if (type != NULL && best->method != NULL)
+            type->generic_parameter_origin = inferred_generic_argument_origin(
+                context, best->method, argument_nodes, best->expanded, i);
+        if (type == NULL || !vc_ast_type_list_push(tree,
+                &mutable_call->as.call_expression.generic_arguments, type))
+        {
+            free(best->arguments);
+            best->arguments = NULL;
+            return VC_GENERIC_INFERENCE_UNINFERABLE;
+        }
+    }
+    free(best->arguments);
+    best->arguments = NULL;
+    context->model->generic_inference_requested = true;
+    return VC_GENERIC_INFERENCE_REQUESTED;
+}
+
 static VcGenericInferenceStatus request_generic_method_inference(
     VcSemanticContext *context,
     const VcAstNode *expression,
@@ -14646,51 +15463,67 @@ static VcGenericInferenceStatus request_generic_method_inference(
             argument_nodes, argument_types, argument_modifiers, &best);
     }
 
-    if (!best.saw_template)
-    {
-        free(best.arguments);
-        return VC_GENERIC_INFERENCE_NONE;
-    }
-    if (!best.matched)
-    {
-        free(best.arguments);
-        return VC_GENERIC_INFERENCE_UNINFERABLE;
-    }
-    if (require_better_than_rank != (size_t)-1 && best.rank >= require_better_than_rank)
-    {
-        free(best.arguments);
-        return VC_GENERIC_INFERENCE_NONE;
-    }
-    if (best.ambiguous)
-    {
-        free(best.arguments);
-        return VC_GENERIC_INFERENCE_AMBIGUOUS;
-    }
+    return finish_generic_method_inference(context, expression, argument_nodes,
+        &best, require_better_than_rank);
+}
 
-    VcAstTree *tree = semantic_tree_for_source(context->model, context->source);
-    if (tree == NULL)
+static VcGenericInferenceStatus request_unqualified_generic_method_inference(
+    VcSemanticContext *context,
+    const VcAstNode *expression,
+    const char *name,
+    const VcAstNodeList *argument_nodes,
+    const VcSemanticType *argument_types,
+    const VcTokenKind *argument_modifiers)
+{
+    if (expression->as.call_expression.original_generic_name != NULL ||
+        expression->as.call_expression.generic_arguments.count != 0)
+        return VC_GENERIC_INFERENCE_NONE;
+
+    size_t current_type = 0;
+    if (!context_type_index(context, &current_type) ||
+        current_type >= context->model->struct_count)
+        return VC_GENERIC_INFERENCE_NONE;
+
+    VcGenericInferenceBest best = {0};
+    best.rank = (size_t)-1;
+    consider_generic_methods_on_struct(context, current_type, name, true,
+        argument_nodes, argument_types, argument_modifiers, &best);
+
+    if (context->has_this && context->this_struct_index < context->model->struct_count)
     {
-        free(best.arguments);
-        return VC_GENERIC_INFERENCE_UNINFERABLE;
-    }
-    VcAstNode *mutable_call = (VcAstNode *)expression;
-    for (size_t i = 0; i < best.argument_count; i++)
-    {
-        VcAstTypeRef *type = semantic_type_to_inference_ast(context->model, tree,
-            best.arguments[i], expression->location);
-        if (type != NULL && best.method != NULL)
-            type->generic_parameter_origin = inferred_generic_argument_origin(
-                context, best.method, argument_nodes, best.expanded, i);
-        if (type == NULL || !vc_ast_type_list_push(tree,
-                &mutable_call->as.call_expression.generic_arguments, type))
+        size_t current = context->this_struct_index;
+        if (context->model->structs[current].is_interface)
         {
-            free(best.arguments);
-            return VC_GENERIC_INFERENCE_UNINFERABLE;
+            consider_interface_generic_methods(context, current, name,
+                argument_nodes, argument_types, argument_modifiers, 0, &best);
+        }
+        else
+        {
+            consider_generic_methods_on_struct(context, current, name, false,
+                argument_nodes, argument_types, argument_modifiers, &best);
+            for (size_t guard = 0; !best.matched &&
+                    guard <= context->model->struct_count &&
+                    context->model->structs[current].has_base_class; guard++)
+            {
+                current = context->model->structs[current].base_class_index;
+                VcGenericInferenceBest level = {0};
+                level.rank = (size_t)-1;
+                consider_generic_methods_on_struct(context, current, name, false,
+                    argument_nodes, argument_types, argument_modifiers, &level);
+                best.saw_template = best.saw_template || level.saw_template;
+                if (level.matched)
+                {
+                    free(best.arguments);
+                    best = level;
+                    break;
+                }
+                free(level.arguments);
+            }
         }
     }
-    free(best.arguments);
-    context->model->generic_inference_requested = true;
-    return VC_GENERIC_INFERENCE_REQUESTED;
+
+    return finish_generic_method_inference(context, expression, argument_nodes,
+        &best, (size_t)-1);
 }
 
 static bool evaluate_generic_delegate_method_template(
@@ -16929,6 +17762,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
     bool params_expanded = false;
     bool readonly_value_receiver = false;
     bool extension_method = false;
+    bool implicit_receiver_call = false;
     VcSemanticType extension_receiver_type = VC_SEM_TYPE_UNKNOWN;
     const VcAstNode *extension_receiver_node = NULL;
 
@@ -17448,29 +18282,15 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
         const char *name = callee->as.identifier_expression.name;
         const char *display_name = generic_display_name != NULL ? generic_display_name : name;
         method_index = resolve_method_call(context, name, arguments, argument_types, argument_modifiers,
-            argument_count, &ambiguous, &params_expanded);
-        if (method_index == (size_t)-1 && !ambiguous &&
-            context->model->iterator_prelower && context->has_this)
-        {
-            method_index = resolve_instance_method_call(context, context->this_struct_index,
-                name, arguments, argument_types, argument_modifiers,
-                argument_count, &ambiguous, &params_expanded);
-        }
+            argument_count, &ambiguous, &params_expanded, &implicit_receiver_call);
         if (ambiguous)
             set_diagnostic(context->diagnostic, context->source, expression->location,
                 "call to '%s' is ambiguous", display_name);
         else if (method_index == (size_t)-1)
         {
-            size_t current_type = 0;
-            VcGenericInferenceStatus inference = VC_GENERIC_INFERENCE_NONE;
-            if (context_type_index(context, &current_type))
-                inference = request_generic_method_inference(context, expression, name,
-                    current_type, true, false, arguments, argument_types, argument_modifiers,
-                    (size_t)-1);
-            if (inference == VC_GENERIC_INFERENCE_NONE && context->model->iterator_prelower && context->has_this)
-                inference = request_generic_method_inference(context, expression, name,
-                    context->this_struct_index, false, true, arguments, argument_types, argument_modifiers,
-                    (size_t)-1);
+            const VcGenericInferenceStatus inference =
+                request_unqualified_generic_method_inference(context, expression, name,
+                    arguments, argument_types, argument_modifiers);
             if (inference == VC_GENERIC_INFERENCE_REQUESTED)
             {
                 free(argument_types);
@@ -17486,14 +18306,18 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
                     display_name);
             else
             {
-                const char *unknown_name = first_unknown_named_method_argument(
-                    context, arguments, name, true, true, false, 0, false);
+                const char *unknown_name = first_unknown_named_unqualified_method_argument(
+                    context, arguments, name);
                 if (unknown_name != NULL)
                     set_diagnostic(context->diagnostic, context->source, expression->location,
                         "method '%s' has no parameter named '%s'", display_name, unknown_name);
+                else if (!context->has_this && context_has_instance_method_group(context, name))
+                    set_diagnostic(context->diagnostic, context->source, expression->location,
+                        "instance method '%s' requires an object receiver in a static context",
+                        display_name);
                 else
                     set_diagnostic(context->diagnostic, context->source, expression->location,
-                        "no matching static method '%s' was found", display_name);
+                        "no matching method '%s' was found", display_name);
             }
         }
     }
@@ -17794,6 +18618,11 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
         return VC_SEM_TYPE_ERROR;
     }
 
+    if (implicit_receiver_call && target_method->has_owner_struct &&
+        target_method->owner_struct_index < context->model->struct_count &&
+        context->model->structs[target_method->owner_struct_index].is_interface)
+        interface_call = true;
+
     const bool interface_dispatch = interface_call && target_method->is_interface_method;
     const bool virtual_dispatch = !interface_dispatch && !base_call && target_method->has_virtual_root;
     if (interface_dispatch)
@@ -17864,6 +18693,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
         call_result_generic_parameter_origin(context, expression, target_method);
     binding.method_index = method_index;
     binding.has_method = true;
+    binding.implicit_receiver = implicit_receiver_call;
     binding.method_returns_ref = target_method->returns_ref;
     binding.method_returns_ref_readonly = target_method->returns_ref_readonly;
     binding.virtual_dispatch = virtual_dispatch;
@@ -18189,6 +19019,13 @@ static bool evaluate_int_constant_expression(
     const VcAstNode *expression,
     int64_t *value);
 
+static int32_t signed_i32_from_bits(uint32_t value)
+{
+    if (value <= (uint32_t)INT32_MAX)
+        return (int32_t)value;
+    return -1 - (int32_t)(UINT32_MAX - value);
+}
+
 static bool primitive_constant_int64_value(
     const VcSemanticField *field,
     int64_t *value);
@@ -18377,23 +19214,35 @@ static bool evaluate_int_constant_expression(
             int64_t result = 0;
             switch (expression->as.binary_expression.operator_kind)
             {
-                case VC_TOKEN_PLUS: result = left + right; break;
-                case VC_TOKEN_MINUS: result = left - right; break;
-                case VC_TOKEN_STAR: result = left * right; break;
+                case VC_TOKEN_PLUS:
+                    result = signed_i32_from_bits((uint32_t)left + (uint32_t)right);
+                    break;
+                case VC_TOKEN_MINUS:
+                    result = signed_i32_from_bits((uint32_t)left - (uint32_t)right);
+                    break;
+                case VC_TOKEN_STAR:
+                    result = signed_i32_from_bits((uint32_t)left * (uint32_t)right);
+                    break;
                 case VC_TOKEN_SLASH:
-                    if (right == 0 || (left == INT32_MIN && right == -1)) return false;
-                    result = left / right;
+                    if (right == 0) return false;
+                    result = left == INT32_MIN && right == -1 ? INT32_MIN : left / right;
                     break;
                 case VC_TOKEN_PERCENT:
-                    if (right == 0 || (left == INT32_MIN && right == -1)) return false;
-                    result = left % right;
+                    if (right == 0) return false;
+                    result = left == INT32_MIN && right == -1 ? 0 : left % right;
                     break;
                 case VC_TOKEN_LESS_LESS:
-                    result = (int32_t)left << ((uint32_t)right & 31u);
+                    result = signed_i32_from_bits((uint32_t)left << ((uint32_t)right & 31u));
                     break;
                 case VC_TOKEN_GREATER_GREATER:
-                    result = (int32_t)left >> ((uint32_t)right & 31u);
+                {
+                    const uint32_t count = (uint32_t)right & 31u;
+                    uint32_t shifted = (uint32_t)left >> count;
+                    if (left < 0 && count != 0u)
+                        shifted |= UINT32_MAX << (32u - count);
+                    result = signed_i32_from_bits(shifted);
                     break;
+                }
                 case VC_TOKEN_AMPERSAND: result = (int32_t)left & (int32_t)right; break;
                 case VC_TOKEN_PIPE: result = (int32_t)left | (int32_t)right; break;
                 case VC_TOKEN_CARET: result = (int32_t)left ^ (int32_t)right; break;
@@ -21692,8 +22541,34 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
         case VC_AST_LITERAL_EXPRESSION:
             switch (expression->as.literal_expression.literal_kind)
             {
-                case VC_AST_LITERAL_NUMBER: type = numeric_literal_type(expression->as.literal_expression.text); break;
-                case VC_AST_LITERAL_STRING: type = VC_SEM_TYPE_STRING; break;
+                case VC_AST_LITERAL_NUMBER:
+                {
+                    VcAstNumericLiteral numeric;
+                    if (!vc_ast_numeric_literal(expression->as.literal_expression.text, &numeric))
+                    {
+                        set_diagnostic(context->diagnostic, context->source, expression->location,
+                            "invalid, unsupported or out-of-range numeric literal");
+                        return VC_SEM_TYPE_ERROR;
+                    }
+                    type = numeric_literal_type(numeric.kind);
+                    free(numeric.c_text);
+                    break;
+                }
+                case VC_AST_LITERAL_STRING:
+                {
+                    unsigned char *bytes = NULL;
+                    size_t byte_length = 0;
+                    if (!vc_ast_string_bytes(expression->as.literal_expression.text,
+                            &bytes, &byte_length))
+                    {
+                        set_diagnostic(context->diagnostic, context->source, expression->location,
+                            "invalid or unsupported string literal escape or Unicode scalar");
+                        return VC_SEM_TYPE_ERROR;
+                    }
+                    free(bytes);
+                    type = VC_SEM_TYPE_STRING;
+                    break;
+                }
                 case VC_AST_LITERAL_CHARACTER:
                 {
                     uint32_t scalar = 0;
@@ -21876,10 +22751,13 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         "ref local '%s' refers to storage that is not definitely assigned", local->name);
                     return VC_SEM_TYPE_ERROR;
                 }
-                if (context->iterator_prelower_method && !local->assigned)
+                if (local->modifier != VC_TOKEN_KW_REF && !local->assigned)
                 {
                     set_diagnostic(context->diagnostic, context->source, expression->location,
-                        "iterator local '%s' cannot be read before it is assigned", local->name);
+                        context->iterator_prelower_method
+                            ? "iterator local '%s' cannot be read before it is assigned"
+                            : "local '%s' cannot be read before it is definitely assigned",
+                        local->name);
                     return VC_SEM_TYPE_ERROR;
                 }
                 type = local->type;
@@ -24059,6 +24937,41 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         context_type_display_name(context, right));
                     return VC_SEM_TYPE_ERROR;
 
+                case VC_TOKEN_LESS_LESS:
+                case VC_TOKEN_GREATER_GREATER:
+                    if ((left == VC_SEM_TYPE_BYTE || left == VC_SEM_TYPE_SBYTE ||
+                         left == VC_SEM_TYPE_SHORT || left == VC_SEM_TYPE_USHORT ||
+                         left == VC_SEM_TYPE_INT || left == VC_SEM_TYPE_UINT ||
+                         left == VC_SEM_TYPE_LONG || left == VC_SEM_TYPE_ULONG) &&
+                        (right == VC_SEM_TYPE_BYTE || right == VC_SEM_TYPE_SBYTE ||
+                         right == VC_SEM_TYPE_SHORT || right == VC_SEM_TYPE_USHORT ||
+                         right == VC_SEM_TYPE_INT || right == VC_SEM_TYPE_UINT ||
+                         right == VC_SEM_TYPE_LONG || right == VC_SEM_TYPE_ULONG))
+                    {
+                        type = left;
+                        break;
+                    }
+                    {
+                        bool ambiguous = false;
+                        operator_method_index = resolve_operator(context,
+                            expression->as.binary_expression.operator_kind, left, right, &ambiguous);
+                        if (ambiguous || operator_method_index == (size_t)-1)
+                        {
+                            set_diagnostic(context->diagnostic, context->source, expression->location,
+                                "operator '%s' is %s for '%s' and '%s'",
+                                vc_token_kind_name(expression->as.binary_expression.operator_kind),
+                                ambiguous ? "ambiguous" : "not defined",
+                                context_type_display_name(context, left),
+                                context_type_display_name(context, right));
+                            return VC_SEM_TYPE_ERROR;
+                        }
+                        context->model->methods[operator_method_index].reachable = true;
+                        if (!analyze_method(context->model, operator_method_index, context->diagnostic))
+                            return VC_SEM_TYPE_ERROR;
+                        type = context->model->methods[operator_method_index].return_type;
+                    }
+                    break;
+
                 case VC_TOKEN_PLUS:
                 case VC_TOKEN_MINUS:
                 case VC_TOKEN_STAR:
@@ -24541,6 +25454,9 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         if (right == VC_SEM_TYPE_ERROR)
                             return VC_SEM_TYPE_ERROR;
 
+                        /* Inline out declarations in the RHS can reallocate
+                           locals. The declaration's index remains stable. */
+                        left_local = &context->locals[left_index];
                         if (right != left_local->type)
                         {
                             set_diagnostic(context->diagnostic, context->source, expression->location,
@@ -24581,13 +25497,17 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     return VC_SEM_TYPE_ERROR;
                 }
 
+                /* RHS ref analysis can grow the binding array. Keep declaration
+                   identities, not a borrowed pointer into reallocatable storage. */
+                const size_t left_struct_index = left_binding->struct_index;
+                const size_t left_field_index = left_binding->field_index;
                 bool readonly_rebind_allowed = false;
                 if (left_field->ref_readonly && context->has_constructor &&
                     context->constructor_index < context->model->constructor_count)
                 {
                     readonly_rebind_allowed =
                         context->model->constructors[context->constructor_index].struct_index ==
-                        left_binding->struct_index;
+                        left_struct_index;
                 }
                 if (left_field->ref_readonly && !readonly_rebind_allowed)
                 {
@@ -24631,8 +25551,8 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 binding.node = expression;
                 binding.type = left_field->type;
                 binding.has_field = true;
-                binding.struct_index = left_binding->struct_index;
-                binding.field_index = left_binding->field_index;
+                binding.struct_index = left_struct_index;
+                binding.field_index = left_field_index;
                 if (!push_binding(context->model, binding))
                     return VC_SEM_TYPE_ERROR;
                 return left_field->type;
@@ -24709,18 +25629,16 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         local->name);
                     return VC_SEM_TYPE_ERROR;
                 }
-                if (local != NULL && context->iterator_prelower_method && !local->assigned &&
+                if (local != NULL && local->modifier != VC_TOKEN_KW_REF && !local->assigned &&
                     expression->as.assignment_expression.operator_kind != VC_TOKEN_EQUAL)
                 {
-                    set_diagnostic(context->diagnostic, context->source, left_node->location,
-                        "iterator local '%s' must be assigned before compound assignment", local->name);
-                    return VC_SEM_TYPE_ERROR;
-                }
-                if (local != NULL && !local->assigned &&
-                    expression->as.assignment_expression.operator_kind == VC_TOKEN_QUESTION_QUESTION_EQUAL)
-                {
-                    set_diagnostic(context->diagnostic, context->source, left_node->location,
-                        "local '%s' must be assigned before '?" "?='", local->name);
+                    const char *message =
+                        expression->as.assignment_expression.operator_kind == VC_TOKEN_QUESTION_QUESTION_EQUAL
+                            ? "local '%s' must be assigned before '?" "?='"
+                            : context->iterator_prelower_method
+                                ? "iterator local '%s' must be assigned before compound assignment"
+                                : "local '%s' must be definitely assigned before compound assignment";
+                    set_diagnostic(context->diagnostic, context->source, left_node->location, message, local->name);
                     return VC_SEM_TYPE_ERROR;
                 }
                 if (strcmp(left_node->as.identifier_expression.name, "this") == 0)
@@ -25168,7 +26086,17 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                     return VC_SEM_TYPE_ERROR;
                 type = VC_SEM_TYPE_STRING;
             }
-            else if (left == right && is_numeric(left))
+            else if (left != VC_SEM_TYPE_CHAR && right != VC_SEM_TYPE_CHAR &&
+                is_integral(left) && is_integral(right) &&
+                (expression->as.assignment_expression.operator_kind == VC_TOKEN_LESS_LESS_EQUAL ||
+                 expression->as.assignment_expression.operator_kind == VC_TOKEN_GREATER_GREATER_EQUAL))
+            {
+                type = left;
+            }
+            else if (left == right && is_numeric(left) &&
+                ((expression->as.assignment_expression.operator_kind != VC_TOKEN_LESS_LESS_EQUAL &&
+                  expression->as.assignment_expression.operator_kind != VC_TOKEN_GREATER_GREATER_EQUAL) ||
+                 (left != VC_SEM_TYPE_CHAR && is_integral(left))))
             {
                 type = left;
             }
@@ -25694,6 +26622,140 @@ static void merge_flow_assignments(
         values[i] = values[i] && context->locals[i].assigned;
 }
 
+static void merge_assignment_snapshot(
+    bool *values,
+    bool *has_values,
+    const bool *snapshot,
+    size_t count)
+{
+    if (values == NULL || has_values == NULL || snapshot == NULL)
+        return;
+    if (!*has_values)
+    {
+        memcpy(values, snapshot, count * sizeof(*values));
+        *has_values = true;
+        return;
+    }
+    for (size_t i = 0; i < count; i++)
+        values[i] = values[i] && snapshot[i];
+}
+
+static bool begin_finally_control_flow_capture(
+    VcSemanticContext *context,
+    VcFinallyControlFlowCapture *capture,
+    VcSourceLocation location)
+{
+    memset(capture, 0, sizeof(*capture));
+
+    capture->outer_loop = context->loop_flow_capture;
+    if (capture->outer_loop != NULL && capture->outer_loop->local_count > 0)
+    {
+        const size_t count = capture->outer_loop->local_count;
+        capture->loop_continue_assignments = malloc(count * sizeof(*capture->loop_continue_assignments));
+        capture->loop_break_assignments = malloc(count * sizeof(*capture->loop_break_assignments));
+        if (capture->loop_continue_assignments == NULL || capture->loop_break_assignments == NULL)
+            goto fail;
+
+        capture->loop.continue_assignments = capture->loop_continue_assignments;
+        capture->loop.break_assignments = capture->loop_break_assignments;
+        capture->loop.local_count = count;
+        capture->loop.loop_depth = capture->outer_loop->loop_depth;
+        capture->loop.break_depth = capture->outer_loop->break_depth;
+        capture->loop.previous = capture->outer_loop;
+        context->loop_flow_capture = &capture->loop;
+    }
+
+    capture->outer_switch = context->switch_flow_capture;
+    if (capture->outer_switch != NULL && capture->outer_switch->local_count > 0)
+    {
+        const size_t count = capture->outer_switch->local_count;
+        capture->switch_break_assignments = malloc(count * sizeof(*capture->switch_break_assignments));
+        if (capture->switch_break_assignments == NULL)
+            goto fail;
+
+        capture->switch_flow.break_assignments = capture->switch_break_assignments;
+        capture->switch_flow.local_count = count;
+        capture->switch_flow.break_depth = capture->outer_switch->break_depth;
+        capture->switch_flow.previous = capture->outer_switch;
+        context->switch_flow_capture = &capture->switch_flow;
+    }
+
+    return true;
+
+fail:
+    context->loop_flow_capture = capture->outer_loop;
+    context->switch_flow_capture = capture->outer_switch;
+    free(capture->loop_continue_assignments);
+    free(capture->loop_break_assignments);
+    free(capture->switch_break_assignments);
+    memset(capture, 0, sizeof(*capture));
+    set_diagnostic(context->diagnostic, context->source, location,
+        "out of memory while tracking control flow through finally");
+    return false;
+}
+
+static void end_finally_control_flow_capture(
+    VcSemanticContext *context,
+    VcFinallyControlFlowCapture *capture,
+    const bool *finally_after,
+    size_t finally_count,
+    bool commit)
+{
+    context->loop_flow_capture = capture->outer_loop;
+    context->switch_flow_capture = capture->outer_switch;
+
+    if (commit && finally_after != NULL)
+    {
+        if (capture->outer_loop != NULL && capture->loop_continue_assignments != NULL)
+        {
+            const size_t count = capture->loop.local_count < finally_count
+                ? capture->loop.local_count : finally_count;
+            if (capture->loop.has_continue)
+            {
+                for (size_t i = 0; i < count; i++)
+                    capture->loop_continue_assignments[i] =
+                        capture->loop_continue_assignments[i] || finally_after[i];
+                merge_assignment_snapshot(
+                    capture->outer_loop->continue_assignments,
+                    &capture->outer_loop->has_continue,
+                    capture->loop_continue_assignments,
+                    capture->loop.local_count);
+            }
+            if (capture->loop.has_break)
+            {
+                for (size_t i = 0; i < count; i++)
+                    capture->loop_break_assignments[i] =
+                        capture->loop_break_assignments[i] || finally_after[i];
+                merge_assignment_snapshot(
+                    capture->outer_loop->break_assignments,
+                    &capture->outer_loop->has_break,
+                    capture->loop_break_assignments,
+                    capture->loop.local_count);
+            }
+        }
+
+        if (capture->outer_switch != NULL && capture->switch_break_assignments != NULL &&
+            capture->switch_flow.has_break)
+        {
+            const size_t count = capture->switch_flow.local_count < finally_count
+                ? capture->switch_flow.local_count : finally_count;
+            for (size_t i = 0; i < count; i++)
+                capture->switch_break_assignments[i] =
+                    capture->switch_break_assignments[i] || finally_after[i];
+            merge_assignment_snapshot(
+                capture->outer_switch->break_assignments,
+                &capture->outer_switch->has_break,
+                capture->switch_break_assignments,
+                capture->switch_flow.local_count);
+        }
+    }
+
+    free(capture->loop_continue_assignments);
+    free(capture->loop_break_assignments);
+    free(capture->switch_break_assignments);
+    memset(capture, 0, sizeof(*capture));
+}
+
 static bool parse_switch_character_literal(const char *text, int64_t *value)
 {
     uint32_t scalar = 0;
@@ -25862,8 +26924,16 @@ static bool analyze_switch_statement(VcSemanticContext *context, const VcAstNode
     const size_t saved_count = context->local_count;
     const size_t saved_depth = context->depth;
     bool *before = snapshot_assignments(context, saved_count, statement->location);
-    if (saved_count > 0 && before == NULL)
+    bool *break_assignments = saved_count > 0
+        ? malloc(saved_count * sizeof(*break_assignments)) : NULL;
+    if (saved_count > 0 && (before == NULL || break_assignments == NULL))
+    {
+        free(before);
+        free(break_assignments);
+        set_diagnostic(context->diagnostic, context->source, statement->location,
+            "out of memory while tracking switch control flow");
         return false;
+    }
 
     int64_t *case_values = NULL;
     size_t case_count = 0;
@@ -25873,6 +26943,12 @@ static bool analyze_switch_statement(VcSemanticContext *context, const VcAstNode
     bool ok = false;
 
     context->break_depth++;
+    VcSwitchFlowCapture switch_flow = {0};
+    switch_flow.break_assignments = break_assignments;
+    switch_flow.local_count = saved_count;
+    switch_flow.break_depth = context->break_depth;
+    switch_flow.previous = context->switch_flow_capture;
+    context->switch_flow_capture = &switch_flow;
     for (size_t section_index = 0;
         section_index < statement->as.switch_statement.sections.count; section_index++)
     {
@@ -26096,11 +27172,21 @@ static bool analyze_switch_statement(VcSemanticContext *context, const VcAstNode
     ok = true;
 
 cleanup:
+    context->switch_flow_capture = switch_flow.previous;
     context->break_depth--;
     context->local_count = saved_count;
     context->depth = saved_depth;
-    restore_assignments(context, before, saved_count);
+    if (ok && has_default && switch_flow.has_break)
+        restore_assignments(context, break_assignments, saved_count);
+    else
+    {
+        restore_assignments(context, before, saved_count);
+        if (ok && switch_flow.has_break)
+            for (size_t i = 0; i < saved_count; i++)
+                context->locals[i].assigned = context->locals[i].assigned && break_assignments[i];
+    }
     free(before);
+    free(break_assignments);
     free(case_values);
     return ok;
 }
@@ -26785,7 +27871,7 @@ static bool analyze_statement(VcSemanticContext *context, const VcAstNode *state
             if (!push_local_node_ex(context, statement->as.local_declaration.name, declared,
                     statement->location, modifier,
                     statement->as.local_declaration.is_ref ||
-                        !context->iterator_prelower_method || statement->as.local_declaration.initializer != NULL,
+                        statement->as.local_declaration.initializer != NULL,
                     statement))
                 return false;
             VcLocal *declared_local = &context->locals[context->local_count - 1];
@@ -26860,6 +27946,8 @@ static bool analyze_statement(VcSemanticContext *context, const VcAstNode *state
             bool saved_has_finally_return = context->has_finally_return;
             VcSourceLocation saved_finally_return_location = context->finally_return_location;
             bool *finally_return_missing_out = NULL;
+            VcFinallyControlFlowCapture finally_flow_capture = {0};
+            bool finally_flow_capture_active = false;
             if (has_finally)
             {
                 if (saved_count > 0)
@@ -26883,6 +27971,13 @@ static bool analyze_statement(VcSemanticContext *context, const VcAstNode *state
             }
 
             context->exception_handler_depth++;
+            if (has_finally)
+            {
+                if (!begin_finally_control_flow_capture(
+                        context, &finally_flow_capture, statement->location))
+                    goto try_fail_before;
+                finally_flow_capture_active = true;
+            }
             if (!analyze_statement(context, statement->as.try_statement.try_block))
                 goto try_fail_before;
 
@@ -27037,6 +28132,12 @@ static bool analyze_statement(VcSemanticContext *context, const VcAstNode *state
                 }
                 for (size_t i = 0; i < saved_count; i++)
                     merged[i] = merged[i] || finally_after[i];
+                if (finally_flow_capture_active)
+                {
+                    end_finally_control_flow_capture(
+                        context, &finally_flow_capture, finally_after, saved_count, true);
+                    finally_flow_capture_active = false;
+                }
                 free(finally_after);
             }
 
@@ -27058,6 +28159,9 @@ static bool analyze_statement(VcSemanticContext *context, const VcAstNode *state
 try_fail:
             free(merged);
 try_fail_before:
+            if (finally_flow_capture_active)
+                end_finally_control_flow_capture(
+                    context, &finally_flow_capture, NULL, 0, false);
             context->local_count = saved_count;
             context->exception_handler_depth--;
             context->finally_barrier_active = saved_finally_barrier_active;
@@ -28827,7 +29931,15 @@ try_fail_before:
                     "break cannot leave a finally block");
                 return false;
             }
-            if (context->loop_flow_capture != NULL &&
+            if (context->switch_flow_capture != NULL &&
+                context->break_depth == context->switch_flow_capture->break_depth)
+            {
+                merge_flow_assignments(context,
+                    context->switch_flow_capture->break_assignments,
+                    &context->switch_flow_capture->has_break,
+                    context->switch_flow_capture->local_count);
+            }
+            else if (context->loop_flow_capture != NULL &&
                 context->break_depth == context->loop_flow_capture->break_depth)
             {
                 merge_flow_assignments(context,
@@ -29919,6 +31031,13 @@ static bool analyze_reachable_instance_initializers(
     return true;
 }
 
+typedef struct VcInitializerStructSnapshot
+{
+    unsigned char initializer_analysis_state;
+    unsigned char static_initializer_analysis_state;
+    bool static_initializer_reachable;
+} VcInitializerStructSnapshot;
+
 typedef struct VcInitializerPropertySnapshot
 {
     bool getter_reachable;
@@ -30177,9 +31296,10 @@ static bool analyze_reachable_static_initialization(
     return true;
 }
 
-static bool validate_static_initializers(
+static bool validate_static_initializers_and_bodies(
     VcSemanticModel *model,
-    VcSemanticDiagnostic *diagnostic)
+    VcSemanticDiagnostic *diagnostic,
+    bool validate_bodies)
 {
     const size_t binding_start = model->binding_count;
     const size_t lambda_start = model->lambda_count;
@@ -30189,6 +31309,9 @@ static bool validate_static_initializers(
     bool *constructor_reachable = model->constructor_count == 0 ? NULL : calloc(model->constructor_count, sizeof(*constructor_reachable));
     unsigned char *constructor_state = model->constructor_count == 0 ? NULL : calloc(model->constructor_count, sizeof(*constructor_state));
 
+    VcInitializerStructSnapshot *structures = model->struct_count == 0 ? NULL :
+        calloc(model->struct_count, sizeof(*structures));
+
     size_t property_count = 0;
     for (size_t i = 0; i < model->struct_count; i++)
         property_count += model->structs[i].property_count;
@@ -30197,15 +31320,17 @@ static bool validate_static_initializers(
 
     if ((model->method_count != 0 && (method_reachable == NULL || method_state == NULL)) ||
         (model->constructor_count != 0 && (constructor_reachable == NULL || constructor_state == NULL)) ||
-        (property_count != 0 && properties == NULL))
+        (property_count != 0 && properties == NULL) ||
+        (model->struct_count != 0 && structures == NULL))
     {
         free(method_reachable);
         free(method_state);
         free(constructor_reachable);
         free(constructor_state);
         free(properties);
+        free(structures);
         set_diagnostic(diagnostic, NULL, (VcSourceLocation){0},
-            "out of memory while validating static initializers");
+            "out of memory while validating declarations");
         return false;
     }
 
@@ -30222,6 +31347,9 @@ static bool validate_static_initializers(
     size_t property_offset = 0;
     for (size_t s = 0; s < model->struct_count; s++)
     {
+        structures[s].initializer_analysis_state = model->structs[s].initializer_analysis_state;
+        structures[s].static_initializer_analysis_state = model->structs[s].static_initializer_analysis_state;
+        structures[s].static_initializer_reachable = model->structs[s].static_initializer_reachable;
         for (size_t p = 0; p < model->structs[s].property_count; p++)
         {
             const VcSemanticProperty *property = &model->structs[s].properties[p];
@@ -30234,7 +31362,7 @@ static bool validate_static_initializers(
     }
 
     bool ok = true;
-    for (size_t struct_index = 0; struct_index < model->struct_count; struct_index++)
+    for (size_t struct_index = 0; !validate_bodies && struct_index < model->struct_count; struct_index++)
     {
         if (!analyze_own_static_initialization(model, struct_index, diagnostic))
         {
@@ -30243,18 +31371,67 @@ static bool validate_static_initializers(
         }
     }
 
-    for (size_t i = binding_start; i < model->binding_count; i++)
-        free(model->bindings[i].argument_parameters);
-    model->binding_count = binding_start;
-
-    for (size_t i = lambda_start; i < model->lambda_count; i++)
+    /* Validate concrete bodies independently of emission reachability. Reuse
+       the initializer validation snapshot so calls in unused bodies cannot
+       activate static initialization, retain closures, or emit dead methods.
+       Open generic definitions are absent from model->methods and continue
+       through the existing specialization path. */
+    for (size_t i = 0; validate_bodies && ok && i < model->method_count; i++)
     {
-        free(model->lambdas[i].parameter_types);
-        free(model->lambdas[i].parameter_modifiers);
-        free(model->lambdas[i].captures);
-        memset(&model->lambdas[i], 0, sizeof(model->lambdas[i]));
+        const VcSemanticMethod *method = &model->methods[i];
+        /* Delegate Invoke and abstract/extern signatures have no body to
+           validate and do not owe an implementation's out-assignment proof. */
+        if (method->node->as.method_declaration.body == NULL)
+            continue;
+        /* Monomorphization also creates speculative overload candidates. Their
+           type-dependent bodies are validatable only after callable selection,
+           not merely because a concrete clone exists in the model. */
+        if (method->node->as.method_declaration.original_generic_name != NULL ||
+            (method->has_owner_struct && model->structs[method->owner_struct_index]
+                .node->as.type_declaration.original_generic_name != NULL))
+            continue;
+        ok = analyze_method(model, i, diagnostic);
     }
-    model->lambda_count = lambda_start;
+    for (size_t i = 0; validate_bodies && ok && i < model->constructor_count; i++)
+    {
+        if (model->structs[model->constructors[i].struct_index]
+                .node->as.type_declaration.original_generic_name != NULL)
+            continue;
+        ok = analyze_constructor(model, i, diagnostic);
+    }
+    for (size_t s = 0; validate_bodies && ok && s < model->struct_count; s++)
+    {
+        const VcSemanticStruct *structure = &model->structs[s];
+        if (structure->node->as.type_declaration.original_generic_name != NULL)
+            continue;
+        for (size_t p = 0; ok && p < structure->property_count; p++)
+        {
+            const VcSemanticProperty *property = &structure->properties[p];
+            if (property->has_getter)
+                ok = analyze_property_getter(model, s, p, diagnostic);
+            if (ok && property->has_setter)
+                ok = analyze_property_setter(model, s, p, diagnostic);
+        }
+    }
+
+    /* Successful validation is speculative for emission. On failure retain
+       the partial semantic model, just as direct body analysis does, so tooling
+       can still query the declarations and receivers preceding the error. */
+    if (ok)
+    {
+        for (size_t i = binding_start; i < model->binding_count; i++)
+            free(model->bindings[i].argument_parameters);
+        model->binding_count = binding_start;
+
+        for (size_t i = lambda_start; i < model->lambda_count; i++)
+        {
+            free(model->lambdas[i].parameter_types);
+            free(model->lambdas[i].parameter_modifiers);
+            free(model->lambdas[i].captures);
+            memset(&model->lambdas[i], 0, sizeof(model->lambdas[i]));
+        }
+        model->lambda_count = lambda_start;
+    }
 
     for (size_t i = 0; i < model->method_count; i++)
     {
@@ -30269,9 +31446,9 @@ static bool validate_static_initializers(
     property_offset = 0;
     for (size_t s = 0; s < model->struct_count; s++)
     {
-        model->structs[s].initializer_analysis_state = 0;
-        model->structs[s].static_initializer_analysis_state = 0;
-        model->structs[s].static_initializer_reachable = false;
+        model->structs[s].initializer_analysis_state = structures[s].initializer_analysis_state;
+        model->structs[s].static_initializer_analysis_state = structures[s].static_initializer_analysis_state;
+        model->structs[s].static_initializer_reachable = structures[s].static_initializer_reachable;
         for (size_t p = 0; p < model->structs[s].property_count; p++)
         {
             VcSemanticProperty *property = &model->structs[s].properties[p];
@@ -30288,6 +31465,7 @@ static bool validate_static_initializers(
     free(constructor_reachable);
     free(constructor_state);
     free(properties);
+    free(structures);
     return ok;
 }
 
@@ -30557,6 +31735,9 @@ bool vc_semantic_analyze(
             return false;
     }
 
+    if (!collect_and_resolve_using_aliases(model, diagnostic))
+        return false;
+
     if (!resolve_base_classes(model, diagnostic))
         return false;
 
@@ -30632,7 +31813,7 @@ bool vc_semantic_analyze(
     if (!validate_instance_initializers(model, diagnostic))
         return false;
 
-    if (!validate_static_initializers(model, diagnostic))
+    if (!validate_static_initializers_and_bodies(model, diagnostic, false))
         return false;
 
     if (library_output)
@@ -30658,6 +31839,8 @@ bool vc_semantic_analyze(
                     return false;
             }
         }
+        if (!validate_static_initializers_and_bodies(model, diagnostic, true))
+            return false;
         return activate_reachable_static_initializers(model, diagnostic);
     }
 
@@ -30709,5 +31892,9 @@ bool vc_semantic_analyze(
                 return false;
         }
     }
+    /* Keep root diagnostics first, then validate the remaining ordinary bodies
+       without adding their references to the emission graph. */
+    if (!validate_static_initializers_and_bodies(model, diagnostic, true))
+        return false;
     return activate_reachable_static_initializers(model, diagnostic);
 }

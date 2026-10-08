@@ -1,0 +1,186 @@
+using Void;
+using Void.Text;
+using Void.Threading;
+using Void.Threading.Tasks;
+using P = Pipeline359;
+using Reader359 = Pipeline359.IReading359;
+using Box359 = Pipeline359.Bucket359;
+
+public static class Native359
+{
+    [Native("abs")]
+    public static unsafe extern int Magnitude(int number);
+}
+
+public static class Program
+{
+    private static void Verify(bool value) { Console.WriteLine(value); }
+
+    private static int Select(bool first, int left, int right)
+    {
+        int result;
+        if (first) result = left;
+        else result = right;
+        return result;
+    }
+
+    private static int SpanWindow(int[] samples)
+    {
+        Span<int> window = new Span<int>(samples, 1, 3);
+        for (int i = 0; i < window.Length; i++)
+            window[i] += 1;
+        int total = 0;
+        for (int i = 0; i < window.Length; i++)
+            total += window[i];
+        return total;
+    }
+
+    private static int CleanupBreak(bool first)
+    {
+        int result = -1;
+        int[] values = new int[] { 1, 2, 3 };
+        for (int i = 0; i < values.Length; i++)
+        {
+            try
+            {
+                if (first || i == 2)
+                    break;
+            }
+            finally
+            {
+                result = values[i] + 10;
+            }
+        }
+        return result;
+    }
+
+    private static int ProtectedNumericUpdates()
+    {
+        int value = int.MaxValue;
+        try
+        {
+            value++;
+            value += 2;
+            value <<= 1;
+        }
+        finally
+        {
+            value -= 3;
+        }
+        return value;
+    }
+
+    private static long ProtectedLongUpdates()
+    {
+        long value = long.MaxValue;
+        try
+        {
+            ++value;
+            value += 1L;
+            value >>= 1;
+        }
+        finally
+        {
+            value -= 2L;
+        }
+        return value;
+    }
+
+    private static uint ProtectedUnsignedUpdates()
+    {
+        uint value = uint.MaxValue;
+        try
+        {
+            value <<= 1;
+            value /= 3u;
+        }
+        finally
+        {
+            value += 2u;
+        }
+        return value;
+    }
+
+    private static int ParseThenCapture(string input)
+    {
+        int parsed;
+        if (!int.TryParse(input, out parsed)) return -1;
+        Func<int> snapshot = () => parsed;
+        return snapshot();
+    }
+
+    private static int SwitchNumeric(int selector)
+    {
+        int result;
+        switch (selector)
+        {
+            case 0: result = int.MaxValue + 1; break;
+            default: result = int.MinValue - 1; break;
+        }
+        return result;
+    }
+
+    public static unsafe void Main()
+    {
+        P.OffsetSource359 concrete = new P.OffsetSource359(int.MaxValue);
+        Reader359 abstraction = concrete;
+        Verify(concrete.Read() == int.MinValue);
+        Verify(abstraction.Current() == int.MinValue);
+        Verify(concrete.ReadViaOut() == int.MinValue);
+        Func<int> group = concrete.Reader();
+        Verify(group() == int.MinValue);
+
+        Box359<P.Source359> one = new Box359<P.Source359>(concrete);
+        P.Bucket359<Pipeline359.Source359> same = one;
+        Verify(same.Content == concrete);
+        Verify(Box359<P.Source359>.Created == 1);
+        Verify(P.Bucket359<Pipeline359.Source359>.Created == 1);
+
+        int[] values = new int[] { -3, 4, int.MaxValue, 8, 10 };
+        Verify(SpanWindow(values) == int.MinValue + 14);
+        Verify(values[0] == -3 && values[1] == 5 && values[2] == int.MinValue && values[3] == 9);
+        P.RefBox359 refBox = new P.RefBox359(int.MaxValue);
+        refBox.RefValue += 1;
+        Verify(refBox.Value == int.MinValue);
+        refBox[0] += 1;
+        Verify(refBox.Items[0] == int.MinValue);
+        refBox.RefValue <<= 1;
+        Verify(refBox.Value == 0);
+        Verify(Select(true, 9, 10) == 9);
+        Verify(Select(false, 9, 10) == 10);
+        Verify(CleanupBreak(true) == 11);
+        Verify(CleanupBreak(false) == 13);
+        Verify(ProtectedNumericUpdates() == 1);
+        Verify(ProtectedLongUpdates() == ((long.MinValue + 1L) >> 1) - 2L);
+        Verify(ProtectedUnsignedUpdates() == 1431655766u);
+        Verify(ParseThenCapture("27") == 27);
+        Verify(ParseThenCapture("nan") == -1);
+        Verify(SwitchNumeric(0) == int.MinValue);
+        Verify(SwitchNumeric(7) == int.MaxValue);
+
+        IEnumerator<int> enumerator = concrete.Stream();
+        Task<int> delayed = concrete.ReadDelayed();
+        concrete = null;
+        GC.Collect();
+        Verify(group() == int.MinValue);
+        Verify(enumerator.MoveNext() && enumerator.Current == int.MinValue);
+        Verify(enumerator.MoveNext() && enumerator.Current == int.MinValue + 1);
+        delayed.Wait();
+        Verify(delayed.Result == int.MinValue + 2);
+
+        int fromNative = Native359.Magnitude(-17);
+        Verify(fromNative == 17);
+        Verify((sbyte)(uint)255 == (sbyte)-1);
+        Verify((int)(uint.MaxValue) == -1);
+        Verify(int.MinValue / -1 == int.MinValue);
+        Verify(int.MinValue % -1 == 0);
+        Verify((int.MinValue >> 31) == -1);
+
+        string message = "Run\0é😀\\end";
+        byte[] utf8 = Encoding.UTF8.GetBytes(message);
+        Verify(utf8.Length == 14);
+        Verify(utf8[3] == (byte)0 && utf8[4] == (byte)195 && utf8[5] == (byte)169);
+        Verify(utf8[6] == (byte)240 && utf8[7] == (byte)159 && utf8[8] == (byte)152 && utf8[9] == (byte)128);
+        Verify(message == "Run\0\u00E9\U0001F600\\end");
+    }
+}

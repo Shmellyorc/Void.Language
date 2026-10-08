@@ -1,0 +1,304 @@
+using Void;
+using Void.Collections;
+
+public sealed class AssignmentResource352 : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}
+
+public struct AssignmentPair352
+{
+    public int Value;
+}
+
+public static class Program
+{
+    private static void Set(out int value)
+    {
+        value = 17;
+    }
+
+    private static T Copy<T>(T input)
+    {
+        T value;
+        value = input;
+        return value;
+    }
+
+    private static int AssignmentBeforeRead()
+    {
+        int value;
+        value = 10;
+        return value;
+    }
+
+    private static int InitializedDeclaration()
+    {
+        int value = 11;
+        return value;
+    }
+
+    private static int CompleteIfElse(bool condition)
+    {
+        int value;
+        if (condition)
+            value = 12;
+        else
+            value = 13;
+        return value;
+    }
+
+    private static int EarlyReturn(bool condition)
+    {
+        int value;
+        if (condition)
+            value = 14;
+        else
+            return 0;
+        return value;
+    }
+
+    private static int Conditional(bool condition)
+    {
+        int value;
+        int ignored = condition ? (value = 15) : (value = 16);
+        return value + ignored - ignored;
+    }
+
+    private static int NegatedShortCircuit(bool condition)
+    {
+        int value;
+        if (!(condition && ((value = 18) > 0)))
+            return 0;
+        return value;
+    }
+
+    private static int SwitchValue(int input, bool choose)
+    {
+        int value;
+        switch (input)
+        {
+            case 0:
+                if (choose)
+                {
+                    value = 19;
+                    break;
+                }
+                else
+                    return 0;
+            default:
+                value = 20;
+                break;
+        }
+        return value;
+    }
+
+    private static int SwitchExpression(bool condition)
+    {
+        int value;
+        int ignored = condition switch
+        {
+            true => (value = 21),
+            _ => (value = 22)
+        };
+        return value + ignored - ignored;
+    }
+
+    private static int DoLoop()
+    {
+        int value;
+        do
+        {
+            value = 23;
+        }
+        while (false);
+        return value;
+    }
+
+    private static int DoContinue()
+    {
+        int value;
+        do
+        {
+            value = 24;
+            continue;
+        }
+        while (false);
+        return value;
+    }
+
+    private static int ForBreak()
+    {
+        int value;
+        for (;;)
+        {
+            value = 25;
+            break;
+        }
+        return value;
+    }
+
+    private static int OutAssignment()
+    {
+        int value;
+        Set(out value);
+        return value;
+    }
+
+    private static int CaptureAssignment()
+    {
+        int value;
+        value = 26;
+        Func<int> read = () => value;
+        return read();
+    }
+
+    private static int TryCatch(bool fail)
+    {
+        int value;
+        try
+        {
+            if (fail)
+                throw new Exception("assignment-352");
+            value = 27;
+        }
+        catch (Exception error)
+        {
+            value = 28;
+        }
+        return value;
+    }
+
+    private static int FinallyAssignment()
+    {
+        int value;
+        try
+        {
+        }
+        finally
+        {
+            value = 29;
+        }
+        return value;
+    }
+
+    private static int UsingAssignment()
+    {
+        int value;
+        using (AssignmentResource352 resource = new AssignmentResource352())
+        {
+            value = 30;
+        }
+        return value;
+    }
+
+    private static bool FinallyAbruptFlowAssignment()
+    {
+        int breakValue;
+        do
+        {
+            try
+            {
+                break;
+            }
+            finally
+            {
+                breakValue = 36;
+            }
+        }
+        while (false);
+
+        int continueValue;
+        do
+        {
+            try
+            {
+                continue;
+            }
+            finally
+            {
+                continueValue = 37;
+            }
+        }
+        while (false);
+
+        int switchValue;
+        switch (0)
+        {
+            case 0:
+                if (breakValue == 36)
+                {
+                    try
+                    {
+                        break;
+                    }
+                    finally
+                    {
+                        switchValue = 38;
+                    }
+                }
+                switchValue = 39;
+                break;
+            default:
+                switchValue = 40;
+                break;
+        }
+
+        return breakValue == 36 && continueValue == 37 && switchValue == 38;
+    }
+
+    private static IEnumerator<int> IteratorAssignment()
+    {
+        int value;
+        value = 31;
+        yield return 0;
+        yield return value;
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(AssignmentBeforeRead() == 10);
+        Console.WriteLine(InitializedDeclaration() == 11);
+        Console.WriteLine(CompleteIfElse(true) == 12 && CompleteIfElse(false) == 13);
+        Console.WriteLine(EarlyReturn(true) == 14 && EarlyReturn(false) == 0);
+        Console.WriteLine(Conditional(true) == 15 && Conditional(false) == 16);
+        Console.WriteLine(NegatedShortCircuit(true) == 18 && NegatedShortCircuit(false) == 0);
+        Console.WriteLine(SwitchValue(0, true) == 19 && SwitchValue(1, false) == 20);
+        Console.WriteLine(SwitchExpression(true) == 21 && SwitchExpression(false) == 22);
+        Console.WriteLine(DoLoop() == 23);
+        Console.WriteLine(DoContinue() == 24);
+        Console.WriteLine(ForBreak() == 25);
+        Console.WriteLine(OutAssignment() == 17);
+        Console.WriteLine(CaptureAssignment() == 26);
+        Console.WriteLine(Copy<int>(32) == 32);
+
+        string text;
+        text = "assigned";
+        Console.WriteLine(text == "assigned");
+
+        AssignmentPair352 pair;
+        pair = new AssignmentPair352();
+        pair.Value = 33;
+        Console.WriteLine(pair.Value == 33);
+
+        Console.WriteLine(TryCatch(false) == 27 && TryCatch(true) == 28);
+        Console.WriteLine(FinallyAssignment() == 29);
+        Console.WriteLine(UsingAssignment() == 30);
+        Console.WriteLine(FinallyAbruptFlowAssignment());
+
+        int outer;
+        outer = 34;
+        {
+            int outer = 35;
+            Console.WriteLine(outer == 35);
+        }
+        Console.WriteLine(outer == 34);
+
+        IEnumerator<int> iterator = IteratorAssignment();
+        bool first = iterator.MoveNext() && iterator.Current == 0;
+        bool second = iterator.MoveNext() && iterator.Current == 31;
+        Console.WriteLine(first && second);
+    }
+}

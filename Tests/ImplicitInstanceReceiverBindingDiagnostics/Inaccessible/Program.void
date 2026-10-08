@@ -1,0 +1,3 @@
+public class A { private int Hidden(int value) { return value; } }
+public class B : A { public int Bad() { return Hidden(1); } }
+public static class Program { public static void Main() { B b = new B(); int value = b.Bad(); } }

@@ -1,0 +1,69 @@
+using Void;
+using Void.Threading.Tasks;
+
+namespace Pipeline359
+{
+    public interface IReading359
+    {
+        int Current();
+    }
+
+    public class Source359 : IReading359
+    {
+        protected int _reading;
+        public Source359(int reading) { _reading = reading; }
+        private int Normalize(int reading) { return reading; }
+        public virtual int Current() { return Normalize(_reading); }
+        public int Read() { return Current(); }
+        public Func<int> Reader() { return Current; }
+        public int Value
+        {
+            get { return Current(); }
+            set { _reading = value; }
+        }
+        public int ReadViaOut()
+        {
+            int reading;
+            ReadInto(out reading);
+            return reading;
+        }
+        private void ReadInto(out int reading) { reading = Read(); }
+        public IEnumerator<int> Stream()
+        {
+            int reading;
+            ReadInto(out reading);
+            yield return reading;
+            yield return reading + 1;
+        }
+        public async Task<int> ReadDelayed()
+        {
+            int reading;
+            ReadInto(out reading);
+            await Task.Yield();
+            GC.Collect();
+            return reading + 2;
+        }
+    }
+
+    public sealed class OffsetSource359 : Source359
+    {
+        public OffsetSource359(int reading) : base(reading) {}
+        public override int Current() { return base.Current() + 1; }
+    }
+
+    public sealed class RefBox359
+    {
+        public int Value;
+        public int[] Items;
+        public RefBox359(int value) { Value = value; Items = new int[] { value }; }
+        public ref int RefValue { get { return ref Value; } }
+        public ref int get_Item(int index) { return ref Items[index]; }
+    }
+
+    public sealed class Bucket359<T>
+    {
+        public static int Created;
+        public T Content;
+        public Bucket359(T value) { Content = value; Created++; }
+    }
+}

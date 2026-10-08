@@ -1,0 +1,84 @@
+using Void;
+
+public struct UserNumber354
+{
+    public int Value;
+
+    public UserNumber354(int value)
+    {
+        Value = value;
+    }
+
+    public static UserNumber354 operator +(UserNumber354 left, UserNumber354 right)
+    {
+        return new UserNumber354(left.Value + right.Value);
+    }
+}
+
+public static class Constants354
+{
+    public const int Wrapped = int.MaxValue + 1;
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        int one = 1;
+        int minusOne = -1;
+        int two = 2;
+        int max = int.MaxValue;
+        int min = int.MinValue;
+        Console.WriteLine(max + one == int.MinValue);
+        Console.WriteLine(min + minusOne == int.MaxValue);
+        Console.WriteLine(min - one == int.MaxValue);
+        Console.WriteLine(max - minusOne == int.MinValue);
+        Console.WriteLine(max * two == -2);
+        Console.WriteLine(min * minusOne == int.MinValue);
+        Console.WriteLine(20 + 22 == 42);
+        Console.WriteLine(20 - 22 == -2);
+        Console.WriteLine(6 * 7 == 42);
+
+        sbyte sone = (sbyte)1;
+        sbyte stwo = (sbyte)2;
+        sbyte smax = sbyte.MaxValue;
+        sbyte smin = sbyte.MinValue;
+        Console.WriteLine(smax + sone == smin);
+        Console.WriteLine(smin - sone == smax);
+        Console.WriteLine(smax * stwo == (sbyte)-2);
+
+        short hone = (short)1;
+        short htwo = (short)2;
+        short hmax = short.MaxValue;
+        short hmin = short.MinValue;
+        Console.WriteLine(hmax + hone == hmin);
+        Console.WriteLine(hmin - hone == hmax);
+        Console.WriteLine(hmax * htwo == (short)-2);
+
+        long lone = 1L;
+        long lminusOne = -1L;
+        long ltwo = 2L;
+        long lmax = long.MaxValue;
+        long lmin = long.MinValue;
+        Console.WriteLine(lmax + lone == long.MinValue);
+        Console.WriteLine(lmin + lminusOne == long.MaxValue);
+        Console.WriteLine(lmin - lone == long.MaxValue);
+        Console.WriteLine(lmax * ltwo == -2L);
+        Console.WriteLine(lmin * lminusOne == long.MinValue);
+
+        int? nullableMax = int.MaxValue;
+        int? nullableOne = 1;
+        int? nullableWrapped = nullableMax + nullableOne;
+        Console.WriteLine(nullableWrapped.Value == int.MinValue);
+
+        Console.WriteLine(Constants354.Wrapped == int.MinValue);
+
+        int[,] folded = new int[(int.MaxValue + 1 == int.MinValue) ? 1 : 2, 1] { { 7 } };
+        Console.WriteLine(folded.GetLength(0) == 1 && folded[0, 0] == 7);
+
+        UserNumber354 left = new UserNumber354(20);
+        UserNumber354 right = new UserNumber354(22);
+        UserNumber354 result = left + right;
+        Console.WriteLine(result.Value == 42);
+    }
+}
