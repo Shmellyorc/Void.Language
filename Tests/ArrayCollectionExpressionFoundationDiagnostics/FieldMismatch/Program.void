@@ -1,0 +1,1 @@
+using Void; public sealed class A { private string[] a = [1]; } public static class Program { public static void Main() {} }

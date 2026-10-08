@@ -1,0 +1,1 @@
+using Void; public sealed class Holder { public Span<int> Value = [1, 2]; } public static class Program { public static void Main() { Console.WriteLine(1); } }

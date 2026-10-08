@@ -1,0 +1,1 @@
+public static class Program { private static int[] Make() { return ["bad"]; } public static void Main() {} }

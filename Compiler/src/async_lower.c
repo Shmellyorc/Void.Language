@@ -570,6 +570,12 @@ static bool expression_contains_kind(const VcAstNode *node, VcAstKind kind)
             return false;
         case VC_AST_OBJECT_INITIALIZER_MEMBER:
             return expression_contains_kind(node->as.object_initializer_member.value, kind);
+        case VC_AST_COLLECTION_EXPRESSION:
+            for (size_t i = 0; i < node->as.collection_expression.elements.count; i++)
+                if (expression_contains_kind(node->as.collection_expression.elements.items[i], kind)) return true;
+            return false;
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            return expression_contains_kind(node->as.collection_spread_element.value, kind);
         case VC_AST_COLLECTION_INITIALIZER_ELEMENT:
             for (size_t i = 0; i < node->as.collection_initializer_element.arguments.count; i++)
                 if (expression_contains_kind(node->as.collection_initializer_element.arguments.items[i], kind)) return true;
@@ -741,6 +747,12 @@ static bool expression_contains_node(const VcAstNode *node, const VcAstNode *wan
             return false;
         case VC_AST_OBJECT_INITIALIZER_MEMBER:
             return expression_contains_node(node->as.object_initializer_member.value, wanted);
+        case VC_AST_COLLECTION_EXPRESSION:
+            for (size_t i = 0; i < node->as.collection_expression.elements.count; i++)
+                if (expression_contains_node(node->as.collection_expression.elements.items[i], wanted)) return true;
+            return false;
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            return expression_contains_node(node->as.collection_spread_element.value, wanted);
         case VC_AST_COLLECTION_INITIALIZER_ELEMENT:
             for (size_t i = 0; i < node->as.collection_initializer_element.arguments.count; i++)
                 if (expression_contains_node(node->as.collection_initializer_element.arguments.items[i], wanted)) return true;
@@ -921,6 +933,12 @@ static bool expression_contains_identifier(const VcAstNode *node, const char *na
             return false;
         case VC_AST_OBJECT_INITIALIZER_MEMBER:
             return expression_contains_identifier(node->as.object_initializer_member.value, name);
+        case VC_AST_COLLECTION_EXPRESSION:
+            for (size_t i = 0; i < node->as.collection_expression.elements.count; i++)
+                if (expression_contains_identifier(node->as.collection_expression.elements.items[i], name)) return true;
+            return false;
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            return expression_contains_identifier(node->as.collection_spread_element.value, name);
         case VC_AST_COLLECTION_INITIALIZER_ELEMENT:
             for (size_t i = 0; i < node->as.collection_initializer_element.arguments.count; i++)
                 if (expression_contains_identifier(node->as.collection_initializer_element.arguments.items[i], name)) return true;
@@ -1428,6 +1446,12 @@ static bool rewrite_expression(VcAsyncContext *context, VcAstNode *node)
             return true;
         case VC_AST_OBJECT_INITIALIZER_MEMBER:
             return rewrite_expression(context, node->as.object_initializer_member.value);
+        case VC_AST_COLLECTION_EXPRESSION:
+            for (size_t i = 0; i < node->as.collection_expression.elements.count; i++)
+                if (!rewrite_expression(context, node->as.collection_expression.elements.items[i])) return false;
+            return true;
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            return rewrite_expression(context, node->as.collection_spread_element.value);
         case VC_AST_COLLECTION_INITIALIZER_ELEMENT:
             for (size_t i = 0; i < node->as.collection_initializer_element.arguments.count; i++)
                 if (!rewrite_expression(context, node->as.collection_initializer_element.arguments.items[i])) return false;
@@ -2794,6 +2818,15 @@ static bool normalize_async_foundation_expression(VcAsyncContext *context,
                 return false;
             return true;
         }
+
+        case VC_AST_COLLECTION_EXPRESSION:
+            for (size_t i = 0; i < node->as.collection_expression.elements.count; i++)
+                if (!normalize_async_foundation_expression(context,
+                    &node->as.collection_expression.elements.items[i], prefix)) return false;
+            return true;
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            return normalize_async_foundation_expression(context,
+                &node->as.collection_spread_element.value, prefix);
 
         case VC_AST_NEW_EXPRESSION:
             return async_normalize_new(context, node, prefix);
@@ -4530,6 +4563,12 @@ static bool expression_uses_local(const VcAsyncContext *context, const VcAstNode
             return false;
         case VC_AST_OBJECT_INITIALIZER_MEMBER:
             return expression_uses_local(context, node->as.object_initializer_member.value, declaration);
+        case VC_AST_COLLECTION_EXPRESSION:
+            for (size_t i = 0; i < node->as.collection_expression.elements.count; i++)
+                if (expression_uses_local(context, node->as.collection_expression.elements.items[i], declaration)) return true;
+            return false;
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            return expression_uses_local(context, node->as.collection_spread_element.value, declaration);
         case VC_AST_COLLECTION_INITIALIZER_ELEMENT:
             for (size_t i = 0; i < node->as.collection_initializer_element.arguments.count; i++)
                 if (expression_uses_local(context, node->as.collection_initializer_element.arguments.items[i], declaration)) return true;
@@ -6217,6 +6256,12 @@ static bool rewrite_async_lambda_capture_expression(
         case VC_AST_OBJECT_INITIALIZER_MEMBER:
             return rewrite_async_lambda_capture_expression(
                 rewrite, node->as.object_initializer_member.value);
+        case VC_AST_COLLECTION_EXPRESSION:
+            for (size_t i = 0; i < node->as.collection_expression.elements.count; i++)
+                if (!rewrite_async_lambda_capture_expression(rewrite, node->as.collection_expression.elements.items[i])) return false;
+            return true;
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            return rewrite_async_lambda_capture_expression(rewrite, node->as.collection_spread_element.value);
         case VC_AST_COLLECTION_INITIALIZER_ELEMENT:
             for (size_t i = 0; i < node->as.collection_initializer_element.arguments.count; i++)
                 if (!rewrite_async_lambda_capture_expression(

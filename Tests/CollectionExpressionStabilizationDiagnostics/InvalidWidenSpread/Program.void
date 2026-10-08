@@ -1,0 +1,2 @@
+using Void;
+public static class Program { public static void Main() { string[] names = ["a"]; int[] values = [1, ..names]; } }

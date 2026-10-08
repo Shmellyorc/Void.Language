@@ -1,0 +1,129 @@
+using Void;
+using Void.Collections;
+using Void.Threading.Tasks;
+
+public sealed class Node369<T>
+{
+    public T Value;
+    public Node369(T value) { Value = value; }
+}
+public sealed class NestedBag369
+{
+    public List<int[]> Values = new List<int[]>();
+    public void Add(int[] group) { GC.Collect(); Values.Add(group); }
+}
+public sealed class WidenBag369
+{
+    public List<long> Values = new List<long>();
+    public void Add(long value) { GC.Collect(); Values.Add(value); }
+}
+public sealed class ThrowingBag369
+{
+    public static int Constructed;
+    public static int Added;
+    public ThrowingBag369() { Constructed++; }
+    public void Add(int value)
+    {
+        Added++;
+        GC.Collect();
+        if (value == 2) throw new Exception("add369");
+    }
+}
+public static class Program
+{
+    private static int _step;
+    private static int Next() { _step++; return _step; }
+    private static int[] Values() { _step++; return [20, 21]; }
+    private static T[] Extend<T>(T[] source, T extra) { return [..source, extra]; }
+    private static int Choose(List<string> arg) { return 100; }
+    private static int Choose(int[] arg) { return arg[0] + arg[1]; }
+    private static int Choose(List<int> arg) { return 200; }
+    private static int Pick(NestedBag369 arg) { return arg.Values[0][0]; }
+    private static int Sum(ReadOnlySpan<int> numbers)
+    {
+        int result = 0;
+        for (int i = 0; i < numbers.Length; i++) result += numbers[i];
+        return result;
+    }
+    private static int _finallyCount;
+    private static int Explode() { throw new Exception("element369"); }
+    private static int Failure()
+    {
+        _step = 0;
+        _finallyCount = 0;
+        try
+        {
+            int[] result = [Next(), ..Values(), Explode(), Next()];
+            return result.Length;
+        }
+        catch (Exception ex) { return ex.Message == "element369" ? _step : -1; }
+        finally { _finallyCount++; }
+    }
+    private static async Task<int> AfterAwait(int[] source, Task<int> gate)
+    {
+        int[] left = [1, ..source];
+        int n = await gate;
+        GC.Collect();
+        WidenBag369 bag = [n, ..left];
+        return (int)bag.Values[0] + (int)bag.Values[2];
+    }
+    private static IEnumerator<int> Iterate(int[] source)
+    {
+        int[] a = [..source];
+        yield return a[0];
+        List<int> b = [3, ..source];
+        yield return b[2];
+    }
+    public static void Main()
+    {
+        int[] explicitValues = new[] {1, 2};
+        int[] contextual = {1, 2};
+        int[] modern = [1, 2];
+        Console.WriteLine(explicitValues[0] == contextual[0] && modern[1] == contextual[1]);
+        int[] empty = [];
+        Console.WriteLine(empty.Length == 0 && empty != null);
+        int[] source = [4, 5];
+        int[] copy = [..source];
+        source[0] = 9;
+        Console.WriteLine(copy[0] == 4 && copy != source);
+        int[][] nested = [[1,2], [], [3,4]];
+        Console.WriteLine(nested.Length == 3 && nested[0][1] == 2 && nested[1].Length == 0);
+        nested[0][0] = 30;
+        Console.WriteLine(nested[2][0] == 3 && nested[0][0] == 30);
+        NestedBag369 bag = [[8,9], [], [10]];
+        Console.WriteLine(bag.Values.Count == 3 && bag.Values[0][1] == 9 && bag.Values[1].Length == 0);
+        Console.WriteLine(Pick([[77]]) == 77);
+        WidenBag369 longs = [1, ..copy, 8];
+        Console.WriteLine(longs.Values.Count == 4 && longs.Values[1] == 4L && longs.Values[3] == 8L);
+        Node369<int>[] nodes = Extend<Node369<int>>([new Node369<int>(11)], new Node369<int>(12));
+        GC.Collect();
+        Console.WriteLine(nodes.Length == 2 && nodes[0].Value == 11 && nodes[1].Value == 12);
+        Console.WriteLine(Choose([3,4]) == 7 && Choose(["s"]) == 100);
+        _step = 0;
+        int[] ordered = [Next(), ..Values(), Next()];
+        Console.WriteLine(_step == 3 && ordered[0] == 1 && ordered[1] == 20 && ordered[3] == 3);
+        Console.WriteLine(Failure() == 2 && _step == 2 && _finallyCount == 1);
+        ThrowingBag369.Constructed = 0;
+        ThrowingBag369.Added = 0;
+        _step = 0;
+        bool caught = false;
+        try { ThrowingBag369 ignored = [Next(), 2, Next()]; }
+        catch (Exception ex) { caught = ex.Message == "add369"; }
+        Console.WriteLine(caught && _step == 1 && ThrowingBag369.Constructed == 1 && ThrowingBag369.Added == 2);
+        ReadOnlySpan<int> readonlySpan = [..copy, 1];
+        GC.Collect();
+        Console.WriteLine(Sum(readonlySpan) == 10 && Sum([3, 4]) == 7);
+        Span<int> mutable = [10,11];
+        mutable[0] = 12;
+        Console.WriteLine(mutable[0] == 12 && mutable[1] == 11);
+        TaskCompletionSource<int> gate = new TaskCompletionSource<int>();
+        Task<int> suspended = AfterAwait([5, 6], gate.Task);
+        Console.WriteLine(!suspended.IsCompleted);
+        gate.SetResult(7);
+        Console.WriteLine(suspended.Result == 12);
+        IEnumerator<int> iter = Iterate([17,18]);
+        Console.WriteLine(iter.MoveNext() && iter.Current == 17);
+        Console.WriteLine(iter.MoveNext() && iter.Current == 18 && !iter.MoveNext());
+        iter.Dispose();
+    }
+}

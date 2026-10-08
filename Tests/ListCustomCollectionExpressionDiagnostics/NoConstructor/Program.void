@@ -1,0 +1,1 @@
+public sealed class Required366 { public Required366(int x) {} public void Add(int item) {} } public static class Program { public static void Main() { Required366 value = [1]; } }

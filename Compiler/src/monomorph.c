@@ -1030,6 +1030,8 @@ static VcAstNode *clone_node(
                         &copy->as.new_expression.array_lengths, length))
                     return NULL;
             }
+            copy->as.new_expression.has_spread_initializers =
+                source->as.new_expression.has_spread_initializers;
             copy->as.new_expression.array_length = copy->as.new_expression.array_lengths.count != 0
                 ? copy->as.new_expression.array_lengths.items[0]
                 : clone_node(context, tree, source->as.new_expression.array_length, substitution);
@@ -1037,6 +1039,15 @@ static VcAstNode *clone_node(
                     &copy->as.new_expression.arguments, substitution) ||
                 !clone_node_list(context, tree, &source->as.new_expression.initializers,
                     &copy->as.new_expression.initializers, substitution)) return NULL;
+            break;
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            copy->as.collection_spread_element.value = clone_node(context, tree,
+                source->as.collection_spread_element.value, substitution);
+            if (copy->as.collection_spread_element.value == NULL) return NULL;
+            break;
+        case VC_AST_COLLECTION_EXPRESSION:
+            if (!clone_node_list(context, tree, &source->as.collection_expression.elements,
+                    &copy->as.collection_expression.elements, substitution)) return NULL;
             break;
         case VC_AST_OBJECT_INITIALIZER_MEMBER:
             copy->as.object_initializer_member.member = source->as.object_initializer_member.member;
@@ -2158,6 +2169,12 @@ static bool process_node(
                     : process_node(context, tree, node->as.new_expression.array_length, namespace_name, current_type)) &&
                 process_node_list(context, tree, &node->as.new_expression.arguments, namespace_name, current_type) &&
                 process_node_list(context, tree, &node->as.new_expression.initializers, namespace_name, current_type);
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            return process_node(context, tree, node->as.collection_spread_element.value,
+                namespace_name, current_type);
+        case VC_AST_COLLECTION_EXPRESSION:
+            return process_node_list(context, tree, &node->as.collection_expression.elements,
+                namespace_name, current_type);
         case VC_AST_OBJECT_INITIALIZER_MEMBER:
             return process_node(context, tree, node->as.object_initializer_member.value,
                 namespace_name, current_type);

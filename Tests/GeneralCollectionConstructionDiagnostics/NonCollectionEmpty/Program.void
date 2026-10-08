@@ -1,0 +1,1 @@
+public sealed class Empty367 {} public static class Program { public static void Main() { Empty367 value = []; } }

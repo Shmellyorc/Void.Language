@@ -1,0 +1,1 @@
+using Void; public sealed class Box<T> { public Box(T v) {} } public static class Program { public static void Main() { Box<int>[] values = { new Box<string>("bad") }; } }

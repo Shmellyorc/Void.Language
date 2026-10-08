@@ -265,7 +265,7 @@ def main():
               'publish source-text policy missing')
 
     version = invoke('version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.360', version.stdout)
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.370', version.stdout)
     compiler = (ROOT / 'Compiler' / 'src' / 'compiler.c').read_text(encoding='utf-8')
     host_header = (ROOT / 'Compiler' / 'include' / 'host_process.h').read_text(encoding='utf-8')
     host_source = (ROOT / 'Compiler' / 'src' / 'host_process.c').read_text(encoding='utf-8')

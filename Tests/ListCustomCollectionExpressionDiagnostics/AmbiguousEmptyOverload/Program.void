@@ -1,0 +1,1 @@
+using Void.Collections; public static class Program { static void Accept(List<int> a) {} static void Accept(List<long> a) {} public static void Main() { Accept([]); } }

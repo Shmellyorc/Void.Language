@@ -1,0 +1,6 @@
+using Void;
+public static class Program {
+    private static void Pick(int[] x) { }
+    private static void Pick(string[] x) { }
+    public static void Main() { Pick([]); }
+}

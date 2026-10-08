@@ -1,0 +1,1 @@
+public sealed class Choice366 { public void Add(long item) {} public void Add(double item) {} } public static class Program { public static void Main() { Choice366 value = [1]; } }

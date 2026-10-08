@@ -1,0 +1,1 @@
+using Void; using Void.Collections; public sealed class Bag { public void Add(int value) {} } public static class Program { public static void Main() { Bag a = [1, "bad"]; Console.WriteLine(a != null); } }

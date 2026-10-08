@@ -2964,7 +2964,8 @@ static bool collect_null_temps(VcCodegenContext *context, const VcAstNode *node)
         return true;
 
     const VcSemanticBinding *conversion_binding = vc_semantic_binding(context->semantic, node);
-    if (conversion_binding != NULL && conversion_binding->has_conversion &&
+    if (node->kind != VC_AST_COLLECTION_SPREAD_ELEMENT &&
+        conversion_binding != NULL && conversion_binding->has_conversion &&
         conversion_binding->lifted_nullable_conversion)
     {
         const VcAstNode *source_node = node;
@@ -3405,6 +3406,17 @@ static bool collect_null_temps(VcCodegenContext *context, const VcAstNode *node)
             }
             return add_null_temp(context, node, target->type, false);
         }
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            return collect_null_temps(context, node->as.collection_spread_element.value);
+        case VC_AST_COLLECTION_EXPRESSION:
+        {
+            const VcSemanticBinding *binding = vc_semantic_binding(context->semantic, node);
+            if (binding == NULL) return false;
+            if (binding->lowered_collection_construction == NULL)
+                return node->as.collection_expression.elements.count == 0 &&
+                    vc_semantic_span_type_info(context->semantic, binding->type, NULL, NULL);
+            return collect_null_temps(context, binding->lowered_collection_construction);
+        }
         case VC_AST_NEW_EXPRESSION:
             if (node->as.new_expression.array_lengths.count != 0)
             {
@@ -3427,6 +3439,43 @@ static bool collect_null_temps(VcCodegenContext *context, const VcAstNode *node)
                         return false;
                     if (!add_params_temp(context, node,
                             constructor->parameter_types[constructor->parameter_count - 1]))
+                        return false;
+                }
+                if (binding != NULL && node->as.new_expression.has_spread_initializers &&
+                    !vc_semantic_type_is_array(binding->type))
+                {
+                    for (size_t i = 0; i < node->as.new_expression.initializers.count; i++)
+                    {
+                        const VcAstNode *initializer = node->as.new_expression.initializers.items[i];
+                        const VcAstNode *item = initializer->as.collection_initializer_element.arguments.items[0];
+                        if (item->kind != VC_AST_COLLECTION_SPREAD_ELEMENT) continue;
+                        const VcSemanticBinding *source = vc_semantic_binding(context->semantic,
+                            item->as.collection_spread_element.value);
+                        if (source == NULL || !add_null_temp(context, item, source->type, false))
+                            return false;
+                    }
+                }
+                else if (binding != NULL && node->as.new_expression.has_spread_initializers)
+                {
+                    /* Root every staged value/source before any array allocation. */
+                    for (size_t i = 0; i < node->as.new_expression.initializers.count; i++)
+                    {
+                        const VcAstNode *init = node->as.new_expression.initializers.items[i];
+                        if (init->kind != VC_AST_COLLECTION_INITIALIZER_ELEMENT ||
+                            init->as.collection_initializer_element.arguments.count != 1)
+                            return false;
+                        const VcAstNode *value = init->as.collection_initializer_element.arguments.items[0];
+                        const bool spread = value->kind == VC_AST_COLLECTION_SPREAD_ELEMENT;
+                        const VcAstNode *source = spread
+                            ? value->as.collection_spread_element.value : value;
+                        const VcSemanticBinding *source_binding =
+                            vc_semantic_binding(context->semantic, source);
+                        if (source_binding == NULL ||
+                            !add_null_temp(context, value, spread ? source_binding->type :
+                                vc_semantic_array_element_type(context->semantic, binding->type), false))
+                            return false;
+                    }
+                    if (!add_null_temp(context, node, VC_SEM_TYPE_INT, false))
                         return false;
                 }
                 if (binding != NULL && node->as.new_expression.initializers.count > 0 &&
@@ -4554,6 +4603,176 @@ static bool emit_standard_converted_expression(
     if (!emit_expression(context, expression))
         return false;
     emit_standard_conversion_close(context, target, wrap);
+    return true;
+}
+
+/* Emit the normal classified element conversion for both array copying and
+   concrete collection insertion. Sources are already evaluated and rooted. */
+static bool emit_spread_converted_value(VcCodegenContext *context,
+    const VcSemanticBinding *binding, VcSemanticType from, VcSemanticType to,
+    const char *value)
+{
+    const VcSemanticModel *semantic = context->semantic;
+    FILE *file = context->file;
+    VcCodegenStandardConversionWrap result_wrap = VC_CODEGEN_CONVERSION_INVALID;
+    if (!binding->has_conversion)
+    {
+        if (!emit_standard_conversion_open(context, to, from, false, &result_wrap))
+            return false;
+        fputs(value, file);
+        emit_standard_conversion_close(context, to, result_wrap);
+        return true;
+    }
+    if (binding->conversion_method_index >= semantic->method_count)
+        return false;
+    const VcSemanticMethod *conversion = &semantic->methods[binding->conversion_method_index];
+    const bool lifted = binding->lifted_nullable_conversion;
+    if (lifted && (!vc_semantic_type_is_nullable(from) || !vc_semantic_type_is_nullable(to)))
+        return false;
+    const VcSemanticType source_value = lifted
+        ? vc_semantic_nullable_underlying_type(semantic, from) : from;
+    const VcSemanticType target_value = lifted
+        ? vc_semantic_nullable_underlying_type(semantic, to) : to;
+    const char *to_c = c_type(semantic, to);
+    if (to_c == NULL) return false;
+    if (lifted)
+        fprintf(file, "(%s).has_value ? ((%s){ .has_value = true, .value = ", value, to_c);
+    if (!emit_standard_conversion_open(context, target_value, conversion->return_type,
+            false, &result_wrap))
+        return false;
+    const bool static_init = conversion->is_static && conversion->has_owner_struct &&
+        semantic->structs[conversion->owner_struct_index].static_initializer_reachable;
+    if (static_init)
+        fprintf(file, "(vc_type_init_%zu(), ", conversion->owner_struct_index);
+    fprintf(file, "%s(", conversion->c_name);
+    VcCodegenStandardConversionWrap parameter_wrap = VC_CODEGEN_CONVERSION_INVALID;
+    if (!emit_standard_conversion_open(context, conversion->parameter_types[0],
+            source_value, false, &parameter_wrap))
+        return false;
+    fprintf(file, "%s%s", value, lifted ? ".value" : "");
+    emit_standard_conversion_close(context, conversion->parameter_types[0], parameter_wrap);
+    fputc(')', file);
+    if (static_init) fputc(')', file);
+    emit_standard_conversion_close(context, target_value, result_wrap);
+    if (lifted) fprintf(file, " }) : ((%s){0})", to_c);
+    return true;
+}
+
+/* The copy loop is a reusable array-element operation. A conversion adapter
+   is emitted for each bound spread, using the same conversion classification
+   as ordinary array initializers. No iterable protocol or new allocator. */
+static bool emit_collection_spread_helpers(FILE *file, const VcSemanticModel *semantic)
+{
+    VcCodegenContext context = {0};
+    context.file = file;
+    context.semantic = semantic;
+    for (size_t index = 0; index < semantic->binding_count; index++)
+    {
+        const VcSemanticBinding *binding = &semantic->bindings[index];
+        if (binding->node == NULL ||
+            binding->node->kind != VC_AST_COLLECTION_SPREAD_ELEMENT ||
+            !vc_semantic_type_is_array(binding->type))
+            continue;
+        const VcAstNode *source = binding->node->as.collection_spread_element.value;
+        const VcSemanticBinding *source_binding = vc_semantic_binding(semantic, source);
+        if (source_binding == NULL || !vc_semantic_type_is_array(source_binding->type))
+            return false;
+        const VcSemanticType from = vc_semantic_array_element_type(semantic, source_binding->type);
+        const VcSemanticType to = vc_semantic_array_element_type(semantic, binding->type);
+        /* c_type reuses its class-name buffer; preserve the source spelling
+           before asking for a distinct class destination. */
+        const char *from_type = c_type(semantic, from);
+        if (from_type == NULL) return false;
+        char from_c[160];
+        snprintf(from_c, sizeof(from_c), "%s", from_type);
+        const char *to_c = c_type(semantic, to);
+        if (to_c == NULL)
+            return false;
+        fprintf(file, "static VC_MAYBE_UNUSED void vc_spread_copy_%zu(VcArray *dst, int32_t start, VcArray *src)\n{\n", index);
+        fputs("    for (int32_t j = 0; j < src->length; j++)\n    {\n", file);
+        fprintf(file, "        ((%s *)dst->data)[start + j] = ", to_c);
+        char source_value[256];
+        snprintf(source_value, sizeof(source_value), "((%s *)src->data)[j]", from_c);
+        if (!emit_spread_converted_value(&context, binding, from, to, source_value))
+            return false;
+        fputs(";\n    }\n}\n\n", file);
+    }
+    for (size_t index = 0; index < semantic->binding_count; index++)
+    {
+        const VcSemanticBinding *binding = &semantic->bindings[index];
+        if (binding->node == NULL ||
+            binding->node->kind != VC_AST_COLLECTION_SPREAD_ELEMENT ||
+            !vc_semantic_type_is_struct(binding->type) || !binding->has_method ||
+            binding->method_index >= semantic->method_count)
+            continue;
+        const VcSemanticMethod *method = &semantic->methods[binding->method_index];
+        const VcAstNode *source = binding->node->as.collection_spread_element.value;
+        const VcSemanticBinding *source_binding = vc_semantic_binding(semantic, source);
+        if (source_binding == NULL) return false;
+        const VcSemanticType source_type = source_binding->type;
+        const bool array_source = vc_semantic_type_is_array(source_type) &&
+            vc_semantic_array_rank(semantic, source_type) == 1;
+        VcSemanticType from = VC_SEM_TYPE_ERROR;
+        size_t ref_index = 0, length_index = 0;
+        if (array_source)
+            from = vc_semantic_array_element_type(semantic, source_type);
+        else if (!codegen_span_type_info(semantic, source_type, NULL, &from,
+                &ref_index, &length_index))
+            return false;
+        from = binding->spread_element_type;
+        const VcSemanticType to = method->parameter_types[0];
+        const char *from_type = c_type(semantic, from);
+        if (from_type == NULL) return false;
+        char from_c[128];
+        snprintf(from_c, sizeof(from_c), "%s", from_type);
+        const char *source_type_name = c_type(semantic, source_type);
+        if (source_type_name == NULL) return false;
+        char source_c[128];
+        snprintf(source_c, sizeof(source_c), "%s", source_type_name);
+        const char *collection_type_name = c_type(semantic, binding->type);
+        if (collection_type_name == NULL) return false;
+        char collection_c[128];
+        snprintf(collection_c, sizeof(collection_c), "%s", collection_type_name);
+        if (!method->has_owner_struct) return false;
+        const bool is_class = semantic->structs[vc_semantic_struct_index(binding->type)].is_class;
+        const size_t dispatch_index = binding->virtual_dispatch
+            ? method->virtual_root_index : binding->method_index;
+        const VcSemanticMethod *dispatch = &semantic->methods[dispatch_index];
+        const char *owner_c = semantic->structs[dispatch->owner_struct_index].c_name;
+        fprintf(file, "static VC_MAYBE_UNUSED void vc_collection_spread_%zu(%s%s dst, %s src)\n{\n",
+            index, collection_c, is_class ? "" : " *", source_c);
+        if (array_source)
+            fputs("    int32_t count = vc_array_length(src);\n", file);
+        else
+            fprintf(file, "    int32_t count = src.%s;\n",
+                semantic->structs[vc_semantic_struct_index(source_type)].fields[length_index].c_name);
+        fputs("    for (int32_t j = 0; j < count; j++)\n    {\n        (void)", file);
+        if (binding->virtual_dispatch)
+            fprintf(file, "vc_vcall_%zu(", method->virtual_root_index);
+        else
+            fprintf(file, "%s(", method->c_name);
+        fprintf(file, "(%s *)dst, ", owner_c);
+        char value[256];
+        if (array_source)
+            snprintf(value, sizeof(value), "((%s *)src->data)[j]", from_c);
+        else
+        {
+            const char *ref_field = semantic->structs[vc_semantic_struct_index(source_type)]
+                .fields[ref_index].c_name;
+            snprintf(value, sizeof(value), "((%s *)src.%s.ptr)[j]", from_c, ref_field);
+        }
+        if (!emit_spread_converted_value(&context, binding, from, to, value)) return false;
+        for (size_t j = 1; j < method->parameter_count; j++)
+        {
+            const VcAstNode *parameter = method->node->as.method_declaration.parameters.items[j];
+            const VcAstNode *default_value = parameter->as.parameter.default_value;
+            if (default_value == NULL) return false;
+            fputs(", ", file);
+            if (!emit_expression_as(&context, default_value, method->parameter_types[j]))
+                return false;
+        }
+        fputs(");\n    }\n}\n\n", file);
+    }
     return true;
 }
 
@@ -7009,6 +7228,88 @@ static bool emit_array_initializer_element(
         initializer->as.collection_initializer_element.arguments.items[0], element_type);
 }
 
+/* Spreads extend the normal bound array initializer. Stage each expression
+   exactly once, accumulate checked lengths, allocate via vc_array_new, then
+   copy in source order. Staged references use ordinary method-local GC roots. */
+static bool emit_spread_array_initializer(VcCodegenContext *context,
+    const VcAstNode *expression, const VcSemanticBinding *binding)
+{
+    const VcAstNodeList *initializers = &expression->as.new_expression.initializers;
+    const VcSemanticType element_type = vc_semantic_array_element_type(context->semantic, binding->type);
+    const char *element_type_name = c_type(context->semantic, element_type);
+    if (element_type_name == NULL) return false;
+    /* Emitting a staged conversion can request another class's C spelling. */
+    char element_c[160];
+    snprintf(element_c, sizeof(element_c), "%s", element_type_name);
+    const VcNullTemp *output = find_typed_null_temp(context, expression, binding->type, false);
+    const VcNullTemp *length = find_typed_null_temp(context, expression, VC_SEM_TYPE_INT, false);
+    if (output == NULL || length == NULL)
+        return false;
+    fprintf(context->file, "(%s = 0", length->name);
+    for (size_t i = 0; i < initializers->count; i++)
+    {
+        const VcAstNode *item = initializers->items[i]
+            ->as.collection_initializer_element.arguments.items[0];
+        const bool spread = item->kind == VC_AST_COLLECTION_SPREAD_ELEMENT;
+        const VcAstNode *source = spread ? item->as.collection_spread_element.value : item;
+        const VcSemanticBinding *source_binding = vc_semantic_binding(context->semantic, source);
+        if (source_binding == NULL)
+            return false;
+        const VcNullTemp *staged = find_typed_null_temp(context, item,
+            spread ? source_binding->type : element_type, false);
+        if (staged == NULL)
+            return false;
+        fprintf(context->file, ", %s = ", staged->name);
+        if (spread)
+        {
+            if (!emit_expression(context, source)) return false;
+            fprintf(context->file, ", %s = vc_array_checked_add_length(%s, vc_array_length(%s))",
+                length->name, length->name, staged->name);
+        }
+        else
+        {
+            if (!emit_expression_as(context, source, element_type)) return false;
+            fprintf(context->file, ", %s = vc_array_checked_add_length(%s, 1)",
+                length->name, length->name);
+        }
+    }
+    fprintf(context->file, ", %s = vc_array_new(sizeof(%s), %s, ",
+        output->name, element_c, length->name);
+    emit_gc_trace_function(context->file, context->semantic, element_type);
+    fputc(')', context->file);
+    /* A position local reuses the checked-length temporary after allocation. */
+    fprintf(context->file, ", %s = 0", length->name);
+    for (size_t i = 0; i < initializers->count; i++)
+    {
+        const VcAstNode *item = initializers->items[i]
+            ->as.collection_initializer_element.arguments.items[0];
+        const bool spread = item->kind == VC_AST_COLLECTION_SPREAD_ELEMENT;
+        const VcAstNode *source = spread ? item->as.collection_spread_element.value : item;
+        const VcSemanticBinding *source_binding = vc_semantic_binding(context->semantic, source);
+        if (source_binding == NULL) return false;
+        const VcNullTemp *staged = find_typed_null_temp(context, item,
+            spread ? source_binding->type : element_type, false);
+        if (staged == NULL) return false;
+        if (spread)
+        {
+            size_t index = 0;
+            for (; index < context->semantic->binding_count; index++)
+                if (context->semantic->bindings[index].node == item) break;
+            if (index == context->semantic->binding_count) return false;
+            fprintf(context->file, ", vc_spread_copy_%zu(%s, %s, %s)",
+                index, output->name, length->name, staged->name);
+            fprintf(context->file, ", %s += %s->length", length->name, staged->name);
+        }
+        else
+        {
+            fprintf(context->file, ", ((%s *)%s->data)[%s++] = %s",
+                element_c, output->name, length->name, staged->name);
+        }
+    }
+    fprintf(context->file, ", %s)", output->name);
+    return true;
+}
+
 static bool emit_rectangular_initializer_values(
     VcCodegenContext *context,
     const VcAstNodeList *items,
@@ -9378,8 +9679,25 @@ emit_regular_member:
             return true;
         }
 
+        case VC_AST_COLLECTION_EXPRESSION:
+            if (binding == NULL) return false;
+            if (binding->lowered_collection_construction == NULL)
+            {
+                if (expression->as.collection_expression.elements.count != 0 ||
+                    !vc_semantic_span_type_info(context->semantic, binding->type, NULL, NULL))
+                    return false;
+                const char *span_type = c_type(context->semantic, binding->type);
+                if (span_type == NULL) return false;
+                fprintf(context->file, "((%s){0})", span_type);
+                return true;
+            }
+            return emit_expression(context, binding->lowered_collection_construction);
+
         case VC_AST_NEW_EXPRESSION:
         {
+            if (expression->as.new_expression.has_spread_initializers &&
+                binding != NULL && vc_semantic_type_is_array(binding->type))
+                return emit_spread_array_initializer(context, expression, binding);
             if (expression->as.new_expression.initializers.count == 0)
                 return emit_new_construction(context, expression, binding);
             if (binding == NULL)
@@ -9421,6 +9739,27 @@ emit_regular_member:
                         if (!emit_object_initializer_member(context, initializer,
                                 temp->name, binding->type))
                             return false;
+                    }
+                    else if (initializer->kind == VC_AST_COLLECTION_INITIALIZER_ELEMENT &&
+                        initializer->as.collection_initializer_element.arguments.count == 1 &&
+                        initializer->as.collection_initializer_element.arguments.items[0]->kind ==
+                            VC_AST_COLLECTION_SPREAD_ELEMENT)
+                    {
+                        const VcAstNode *spread = initializer->as.collection_initializer_element.arguments.items[0];
+                        const VcSemanticBinding *spread_binding = vc_semantic_binding(context->semantic, spread);
+                        const VcAstNode *source = spread->as.collection_spread_element.value;
+                        const VcSemanticBinding *source_binding = vc_semantic_binding(context->semantic, source);
+                        const VcNullTemp *stage = source_binding == NULL ? NULL :
+                            find_typed_null_temp(context, spread, source_binding->type, false);
+                        if (spread_binding == NULL || stage == NULL) return false;
+                        size_t spread_index = 0;
+                        for (; spread_index < context->semantic->binding_count; spread_index++)
+                            if (&context->semantic->bindings[spread_index] == spread_binding) break;
+                        if (spread_index == context->semantic->binding_count) return false;
+                        fprintf(context->file, "(%s = ", stage->name);
+                        if (!emit_expression(context, source)) return false;
+                        fprintf(context->file, ", vc_collection_spread_%zu(%s, %s))",
+                            spread_index, temp->name, stage->name);
                     }
                     else if (!emit_collection_initializer_element(context, initializer,
                             temp->name, binding->type))
@@ -12393,6 +12732,16 @@ static bool emit_inline_out_declarations_in_expression(
             for (size_t i = 0; i < expression->as.call_expression.arguments.count; i++)
                 if (!emit_inline_out_declarations_in_expression(
                         context, expression->as.call_expression.arguments.items[i]))
+                    return false;
+            return true;
+
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            return emit_inline_out_declarations_in_expression(context,
+                expression->as.collection_spread_element.value);
+        case VC_AST_COLLECTION_EXPRESSION:
+            for (size_t i = 0; i < expression->as.collection_expression.elements.count; i++)
+                if (!emit_inline_out_declarations_in_expression(context,
+                        expression->as.collection_expression.elements.items[i]))
                     return false;
             return true;
 
@@ -22001,6 +22350,9 @@ static bool write_generated_c(
     fputs("    if (length > 0) memcpy(result->data, (unsigned char *)array->data + ((size_t)offset * array->element_size), (size_t)length * array->element_size);\n", file);
     fputs("    return result;\n", file);
     fputs("}\n\n", file);
+    fputs("static VC_MAYBE_UNUSED int32_t vc_array_checked_add_length(int32_t length, int32_t addition)\n{\n", file);
+    fputs("    if (length < 0 || addition < 0 || length > INT32_MAX - addition) vc_runtime_fail(\"array is too large\");\n", file);
+    fputs("    return length + addition;\n}\n\n", file);
     fputs("static VC_MAYBE_UNUSED int32_t vc_array_length(VcArray *array)\n{\n", file);
     fputs("    if (array == NULL) vc_runtime_fail(\"array reference is null\");\n", file);
     fputs("    return array->length;\n", file);
@@ -22677,6 +23029,13 @@ static bool write_generated_c(
         }
     }
     fputc('\n', file);
+
+    if (!emit_collection_spread_helpers(file, semantic))
+    {
+        fclose(file);
+        set_error(error, error_size, "internal error: collection spread conversion lowering failed");
+        return false;
+    }
 
     if (!emit_native_boundary_wrappers(file, semantic))
     {
@@ -24694,6 +25053,15 @@ static size_t query_append_inline_out_expression_locals(
             for (size_t i = 0; i < expression->as.call_expression.arguments.count; i++)
                 count = query_append_inline_out_expression_locals(model,
                     expression->as.call_expression.arguments.items[i], offset,
+                    items, capacity, count);
+            return count;
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            return query_append_inline_out_expression_locals(model,
+                expression->as.collection_spread_element.value, offset, items, capacity, count);
+        case VC_AST_COLLECTION_EXPRESSION:
+            for (size_t i = 0; i < expression->as.collection_expression.elements.count; i++)
+                count = query_append_inline_out_expression_locals(model,
+                    expression->as.collection_expression.elements.items[i], offset,
                     items, capacity, count);
             return count;
         case VC_AST_NEW_EXPRESSION:

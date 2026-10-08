@@ -1,0 +1,157 @@
+using Void;
+using Void.Collections;
+
+public sealed class Ref366 { public int Value; public Ref366(int n) { Value = n; } }
+public sealed class NumberBag366
+{
+    public long Sum;
+    public void Add(long value) { Sum += value; }
+}
+public sealed class GenericBag366<T>
+{
+    public List<T> Values = new List<T>();
+    public void Add(T value) { Values.Add(value); }
+}
+public sealed class OverloadBag366
+{
+    public int NumberSum;
+    public int StringCount;
+    public void Add(int value) { NumberSum += value; }
+    public void Add(string value) { StringCount += value.Length; }
+}
+public sealed class LifetimeBag366
+{
+    public static int Constructors;
+    public static int Calls;
+    public static int Order;
+    public List<Ref366> Values = new List<Ref366>();
+    public LifetimeBag366() { Constructors++; }
+    public void Add(Ref366 value)
+    {
+        Calls++;
+        Order = Order * 10 + value.Value;
+        GC.Collect();
+        Values.Add(value);
+    }
+}
+public sealed class FailBag366
+{
+    public static int Calls;
+    public static int Last;
+    public void Add(int value)
+    {
+        Calls++;
+        Last = value;
+        if (value == 2) throw new Exception("add-failure");
+    }
+}
+public struct Damage366
+{
+    public int Value;
+    public Damage366(int value) { Value = value; }
+    public static implicit operator Damage366(int value) { return new Damage366(value); }
+}
+public sealed class DefaultBag366
+{
+    public int Sum;
+    public void Add(int value, int bonus = 1) { Sum += value + bonus; }
+}
+public sealed class CtorFail366
+{
+    public CtorFail366() { throw new Exception("ctor-failure"); }
+    public void Add(int value) {}
+}
+public struct StructBag366
+{
+    public int Total;
+    public void Add(int value) { Total += value; }
+}
+public sealed class FieldOwner366
+{
+    public List<int> Items = [6, 7];
+    public static List<string> Names = ["A", "B"];
+}
+public static class Program
+{
+    private static int _next;
+    static int Next() { _next++; return _next; }
+    static Ref366 NextRef() { _next++; GC.Collect(); return new Ref366(_next); }
+    static int FailElement() { _next++; return 3; }
+    static List<int> Build() { return [1, 2, 3]; }
+    static int Count(List<int> values) { return values.Count; }
+    static int Select(int[] values) { return 1; }
+    static int Select(Span<int> values) { return 2; }
+    static int Select(List<int> values) { return 3; }
+    static int Select(List<string> values) { return 4; }
+    static int Numeric(List<int> values) { return 5; }
+    static int Numeric(List<long> values) { return 6; }
+    static int CountEmpty(NumberBag366 values) { return values.Sum == 0 ? 1 : 0; }
+    public static void Main()
+    {
+        List<int> a = [1, 2, 3];
+        Console.WriteLine(a.Count == 3 && a[0] == 1 && a[2] == 3);
+        List<string> words = ["Alice", "Bob"];
+        Console.WriteLine(words.Count == 2 && words[1] == "Bob");
+        List<int> empty = [];
+        Console.WriteLine(empty != null && empty.Count == 0);
+        NumberBag366 bag = [1, 2, 3];
+        Console.WriteLine(bag.Sum == 6);
+        NumberBag366 blank = [];
+        Console.WriteLine(blank != null && blank.Sum == 0);
+        GenericBag366<int> generics = [4, 5];
+        Console.WriteLine(generics.Values.Count == 2 && generics.Values[0] == 4);
+        GenericBag366<string> strings = ["X", "Y"];
+        Console.WriteLine(strings.Values[1] == "Y");
+        OverloadBag366 overloaded = [1, "two", 3];
+        Console.WriteLine(overloaded.NumberSum == 4 && overloaded.StringCount == 3);
+        Console.WriteLine(Build().Count == 3 && Count([7,8]) == 2 && CountEmpty([]) == 1);
+        a = [8, 9];
+        Console.WriteLine(a.Count == 2 && a[0] == 8 && a[1] == 9);
+        FieldOwner366 fields = new FieldOwner366();
+        Console.WriteLine(fields.Items.Count == 2 && fields.Items[0] == 6);
+        Console.WriteLine(FieldOwner366.Names.Count == 2 && FieldOwner366.Names[1] == "B");
+        Console.WriteLine(Select([1,2]) == 1 && Select(["a"]) == 4);
+        Console.WriteLine(Numeric([1,2]) == 5);
+        _next = 0;
+        LifetimeBag366.Constructors = 0;
+        LifetimeBag366.Calls = 0;
+        LifetimeBag366.Order = 0;
+        LifetimeBag366 life = [NextRef(), NextRef(), NextRef()];
+        Console.WriteLine(LifetimeBag366.Constructors == 1 && LifetimeBag366.Calls == 3 && _next == 3);
+        Console.WriteLine(LifetimeBag366.Order == 123);
+        GC.Collect();
+        Console.WriteLine(life.Values[0].Value == 1 && life.Values[2].Value == 3);
+        _next = 0;
+        FailBag366.Calls = 0;
+        FailBag366.Last = 0;
+        bool caught = false;
+        try
+        {
+            FailBag366 unused = [Next(), Next(), FailElement()];
+            Console.WriteLine(unused != null);
+        }
+        catch (Exception ex) { caught = ex.Message == "add-failure"; }
+        Console.WriteLine(caught && _next == 2 && FailBag366.Calls == 2 && FailBag366.Last == 2);
+        List<Damage366> converted = [4, 9];
+        Console.WriteLine(converted.Count == 2 && converted[0].Value == 4 && converted[1].Value == 9);
+        DefaultBag366 defaults = [1, 2];
+        Console.WriteLine(defaults.Sum == 5);
+        StructBag366 structure = [3, 4];
+        Console.WriteLine(structure.Total == 7);
+        _next = 0;
+        bool ctorCaught = false;
+        try
+        {
+            CtorFail366 never = [Next()];
+            Console.WriteLine(never == null);
+        }
+        catch (Exception ex) { ctorCaught = ex.Message == "ctor-failure"; }
+        Console.WriteLine(ctorCaught && _next == 0);
+        int[] array = [1, 2];
+        Console.WriteLine(array.Length == 2 && array[1] == 2);
+        Span<int> span = [3, 4];
+        Console.WriteLine(span.Length == 2 && span[1] == 4);
+        List<int> old = new List<int> { 4, 5 };
+        Console.WriteLine(old.Count == 2 && old[1] == 5);
+    }
+}

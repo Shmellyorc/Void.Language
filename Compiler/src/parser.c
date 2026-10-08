@@ -1413,6 +1413,75 @@ static bool parse_initializer(VcParser *parser, VcAstNode *new_expression)
     return finish_list(parser, VC_TOKEN_RIGHT_BRACE, "'}'");
 }
 
+/* Declaration-only array braces share the ordinary array-new AST and lowering.
+   Keep them out of the general expression grammar (including var and assignments). */
+static VcAstNode *parse_declared_initializer(VcParser *parser, const VcAstTypeRef *type)
+{
+    /* Array declarations adapt generic collection syntax to the established
+       array-new initializer; all binding, conversions and codegen stay shared. */
+    if (check(parser, VC_TOKEN_LEFT_BRACKET))
+    {
+        VcAstNode *collection = parse_expression(parser);
+        if (collection == NULL || collection->kind != VC_AST_COLLECTION_EXPRESSION ||
+            type == NULL || (type->array_rank == 0 && type->rectangular_rank <= 1))
+            return collection;
+        if (type->rectangular_rank > 1 && type->array_rank == 0)
+        {
+            parser_error_at(parser, collection->location,
+                "collection expressions require a one-dimensional array target");
+            return NULL;
+        }
+        VcAstNode *array = new_node(parser, VC_AST_NEW_EXPRESSION, collection->location);
+        if (array == NULL)
+        {
+            out_of_memory(parser);
+            return NULL;
+        }
+        array->span = collection->span;
+        array->as.new_expression.is_array = true;
+        array->as.new_expression.target_typed = true;
+        array->as.new_expression.has_initializer = true;
+        for (size_t i = 0; i < collection->as.collection_expression.elements.count; i++)
+        {
+            VcAstNode *element = collection->as.collection_expression.elements.items[i];
+            VcAstNode *initializer = new_node(parser,
+                VC_AST_COLLECTION_INITIALIZER_ELEMENT, element->location);
+            if (initializer == NULL ||
+                !vc_ast_node_list_push(parser->tree,
+                    &initializer->as.collection_initializer_element.arguments, element) ||
+                !vc_ast_node_list_push(parser->tree,
+                    &array->as.new_expression.initializers, initializer))
+            {
+                out_of_memory(parser);
+                return NULL;
+            }
+            initializer->span = element->span;
+            if (element->kind == VC_AST_COLLECTION_SPREAD_ELEMENT)
+                array->as.new_expression.has_spread_initializers = true;
+        }
+        return array;
+    }
+
+    if (!check(parser, VC_TOKEN_LEFT_BRACE) || type == NULL ||
+        (type->array_rank == 0 && type->rectangular_rank <= 1))
+        return parse_expression(parser);
+
+    VcAstNode *array = new_node(parser, VC_AST_NEW_EXPRESSION, current_token(parser)->location);
+    if (array == NULL)
+    {
+        out_of_memory(parser);
+        return NULL;
+    }
+    array->as.new_expression.is_array = true;
+    array->as.new_expression.target_typed = true;
+    const bool rectangular = type->rectangular_rank > 1 && type->array_rank == 0;
+    if (!(rectangular ? parse_rectangular_initializer(parser, array)
+                     : parse_initializer(parser, array)))
+        return NULL;
+    array->span.end = previous_token(parser)->span.end;
+    return array;
+}
+
 static VcAstNode *synthetic_interpolation_string_literal(
     VcParser *parser,
     const VcToken *token)
@@ -1580,6 +1649,50 @@ static VcAstNode *parse_primary(VcParser *parser)
 
     if (check(parser, VC_TOKEN_INTERPOLATED_START))
         return parse_interpolated_string(parser);
+
+    if (match(parser, VC_TOKEN_LEFT_BRACKET))
+    {
+        VcAstNode *collection = new_node(parser, VC_AST_COLLECTION_EXPRESSION, token->location);
+        if (collection == NULL)
+        {
+            out_of_memory(parser);
+            return NULL;
+        }
+        if (!check(parser, VC_TOKEN_RIGHT_BRACKET))
+        {
+            do
+            {
+                const VcToken *spread = check(parser, VC_TOKEN_DOT_DOT)
+                    ? advance_token(parser) : NULL;
+                VcAstNode *value = parse_expression(parser);
+                if (value == NULL)
+                    return NULL;
+                VcAstNode *element = value;
+                if (spread != NULL)
+                {
+                    element = new_node(parser, VC_AST_COLLECTION_SPREAD_ELEMENT,
+                        spread->location);
+                    if (element == NULL)
+                    {
+                        out_of_memory(parser);
+                        return NULL;
+                    }
+                    element->as.collection_spread_element.value = value;
+                    element->span.end = value->span.end;
+                }
+                if (!vc_ast_node_list_push(parser->tree,
+                        &collection->as.collection_expression.elements, element))
+                {
+                    out_of_memory(parser);
+                    return NULL;
+                }
+            } while (match(parser, VC_TOKEN_COMMA) && !check(parser, VC_TOKEN_RIGHT_BRACKET));
+        }
+        if (consume(parser, VC_TOKEN_RIGHT_BRACKET, "']'") == NULL)
+            return NULL;
+        collection->span.end = previous_token(parser)->span.end;
+        return collection;
+    }
 
     if (match(parser, VC_TOKEN_KW_DEFAULT))
     {
@@ -3074,7 +3187,7 @@ static VcAstNode *parse_typed_local_ex(VcParser *parser, bool scoped, const VcTo
 
     if (match(parser, VC_TOKEN_EQUAL))
     {
-        node->as.local_declaration.initializer = parse_expression(parser);
+        node->as.local_declaration.initializer = parse_declared_initializer(parser, type);
         if (node->as.local_declaration.initializer == NULL)
             return NULL;
     }
@@ -4668,7 +4781,7 @@ static VcAstNode *parse_member(VcParser *parser, const char *containing_type_nam
 
     if (match(parser, VC_TOKEN_EQUAL))
     {
-        field->as.field_declaration.initializer = parse_expression(parser);
+        field->as.field_declaration.initializer = parse_declared_initializer(parser, type);
         if (field->as.field_declaration.initializer == NULL)
             return NULL;
     }

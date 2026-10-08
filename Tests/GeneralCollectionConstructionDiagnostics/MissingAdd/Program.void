@@ -1,0 +1,1 @@
+public sealed class NoAdd367 { public NoAdd367() {} } public static class Program { public static void Main() { NoAdd367 value = [1]; } }

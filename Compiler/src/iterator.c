@@ -1069,6 +1069,13 @@ static bool rewrite_expression(VcIteratorContext *context, VcAstNode *node)
             return true;
         case VC_AST_OBJECT_INITIALIZER_MEMBER:
             return rewrite_expression(context, node->as.object_initializer_member.value);
+        case VC_AST_COLLECTION_EXPRESSION:
+            for (size_t i = 0; i < node->as.collection_expression.elements.count; i++)
+                if (!rewrite_expression(context,
+                        node->as.collection_expression.elements.items[i])) return false;
+            return true;
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            return rewrite_expression(context, node->as.collection_spread_element.value);
         case VC_AST_COLLECTION_INITIALIZER_ELEMENT:
             for (size_t i = 0; i < node->as.collection_initializer_element.arguments.count; i++)
                 if (!rewrite_expression(context,

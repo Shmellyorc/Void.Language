@@ -1,0 +1,1 @@
+public sealed class Cell<T> { } public static class Program { public static void Main() { Cell<int>[] x = [new Cell<string>()]; } }

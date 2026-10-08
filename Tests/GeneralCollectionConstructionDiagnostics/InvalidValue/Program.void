@@ -1,0 +1,1 @@
+public sealed class Bag367 { public void Add(long v) {} } public static class Program { public static void Main() { Bag367 value = ["bad"]; } }

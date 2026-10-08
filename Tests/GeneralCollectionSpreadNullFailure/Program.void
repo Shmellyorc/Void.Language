@@ -1,0 +1,11 @@
+using Void;
+using Void.Collections;
+public static class Program
+{
+    public static void Main()
+    {
+        int[] source = null;
+        List<int> values = [1, ..source, 2];
+        Console.WriteLine(values.Count);
+    }
+}

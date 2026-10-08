@@ -1,0 +1,1 @@
+public sealed class SecretAdd366 { private void Add(int item) {} } public static class Program { public static void Main() { SecretAdd366 value = [1]; } }

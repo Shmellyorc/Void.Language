@@ -1007,6 +1007,17 @@ static void dump_node(const VcAstNode *node, int depth)
                 dump_node(node->as.new_expression.initializers.items[i], depth + 1);
             break;
 
+        case VC_AST_COLLECTION_SPREAD_ELEMENT:
+            fputs("SpreadElement\n", stdout);
+            dump_node(node->as.collection_spread_element.value, depth + 1);
+            break;
+
+        case VC_AST_COLLECTION_EXPRESSION:
+            fputs("CollectionExpression\n", stdout);
+            for (size_t i = 0; i < node->as.collection_expression.elements.count; i++)
+                dump_node(node->as.collection_expression.elements.items[i], depth + 1);
+            break;
+
         case VC_AST_OBJECT_INITIALIZER_MEMBER:
             printf("ObjectInit %s\n", node->as.object_initializer_member.member);
             dump_node(node->as.object_initializer_member.value, depth + 1);

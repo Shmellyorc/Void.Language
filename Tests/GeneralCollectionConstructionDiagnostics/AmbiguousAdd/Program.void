@@ -1,0 +1,1 @@
+public sealed class Ambiguous367 { public void Add(long x) {} public void Add(double x) {} } public static class Program { public static void Main() { int[] source = [1,2]; Ambiguous367 bag = [..source]; } }

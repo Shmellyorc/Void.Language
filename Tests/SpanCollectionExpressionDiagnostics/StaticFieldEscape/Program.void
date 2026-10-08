@@ -1,0 +1,1 @@
+using Void; public ref struct Owner { public static Span<int> Items = [1, 2]; } public static class Program { public static void Main() {} }

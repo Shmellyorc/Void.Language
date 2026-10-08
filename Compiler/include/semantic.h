@@ -376,6 +376,10 @@ typedef enum VcSemanticStringOperation
 typedef struct VcSemanticBinding
 {
     const VcAstNode *node;
+    /* Collection syntax retains its own AST; target-bound arrays reuse new[]. */
+    const VcAstNode *lowered_collection_construction;
+    /* Bound source element identity for constructed collection spreads. */
+    VcSemanticType spread_element_type;
     const VcAstNode *declaration_node;
     VcSemanticType type;
     const char *generic_parameter_origin;

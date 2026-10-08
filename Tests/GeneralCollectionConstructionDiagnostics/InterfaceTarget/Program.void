@@ -1,0 +1,1 @@
+public interface IBag367 { void Add(int x); } public static class Program { public static void Main() { IBag367 value = [1]; } }

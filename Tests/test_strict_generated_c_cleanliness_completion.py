@@ -57,7 +57,7 @@ def strict_command(compiler: str, source: Path, output: Path, *, link: bool) -> 
 
 def main() -> None:
     version = run(VOIDC, 'version')
-    expect(require_success(version, 'version') and version.stdout.strip() == 'voidc 0.0.360',
+    expect(require_success(version, 'version') and version.stdout.strip() == 'voidc 0.0.370',
            'wrong compiler version')
 
     c_compiler = os.environ.get('CC', 'cc')

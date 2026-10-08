@@ -1,0 +1,1 @@
+using Void.Collections.Generic; public static class Program { public static void Main() { List<int> x = [1, 2]; } }

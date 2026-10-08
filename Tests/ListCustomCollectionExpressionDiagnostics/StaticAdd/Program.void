@@ -1,0 +1,1 @@
+public sealed class StaticOnly366 { public static void Add(int item) {} } public static class Program { public static void Main() { StaticOnly366 value = [1]; } }

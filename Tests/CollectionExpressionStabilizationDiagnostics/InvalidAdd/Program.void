@@ -1,0 +1,3 @@
+using Void;
+public sealed class Bag369 { public void Add(long x) { } }
+public static class Program { public static void Main() { Bag369 bag = ["invalid"]; } }

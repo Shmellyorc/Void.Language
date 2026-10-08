@@ -1,0 +1,1 @@
+using Void; public static class Program { private static void Use(int[] values) {} public static void Main() { Use({ 1, 2 }); } }

@@ -1,0 +1,1 @@
+using Void; public class Owner { public Span<int> Items = [1, 2]; } public static class Program { public static void Main() {} }

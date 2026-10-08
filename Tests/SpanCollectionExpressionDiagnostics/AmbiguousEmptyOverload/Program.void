@@ -1,0 +1,1 @@
+using Void; public static class Program { static void Accept(Span<int> values) {} static void Accept(Span<long> values) {} public static void Main() { Accept([]); } }

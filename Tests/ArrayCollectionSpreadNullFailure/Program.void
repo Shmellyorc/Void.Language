@@ -1,0 +1,10 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        int[] empty = null;
+        int[] result = [1, ..empty, 2];
+        Console.WriteLine(result.Length);
+    }
+}

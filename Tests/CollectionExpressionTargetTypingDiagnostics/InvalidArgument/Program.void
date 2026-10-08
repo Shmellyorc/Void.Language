@@ -1,0 +1,1 @@
+public static class Program { private static void Accept(int[] values) {} public static void Main() { Accept([true]); } }

@@ -58,6 +58,8 @@ typedef enum VcAstKind
     VC_AST_CALL_EXPRESSION,
     VC_AST_INDEX_EXPRESSION,
     VC_AST_NEW_EXPRESSION,
+    VC_AST_COLLECTION_EXPRESSION,
+    VC_AST_COLLECTION_SPREAD_ELEMENT,
     VC_AST_OBJECT_INITIALIZER_MEMBER,
     VC_AST_COLLECTION_INITIALIZER_ELEMENT,
     VC_AST_DEFAULT_EXPRESSION,
@@ -479,6 +481,7 @@ struct VcAstNode
             bool target_typed;
             bool is_array;
             bool has_initializer;
+            bool has_spread_initializers;
             size_t implicit_array_rank;
             VcAstNode *array_length;
             VcAstNodeList array_lengths;
@@ -496,6 +499,17 @@ struct VcAstNode
         {
             VcAstNodeList arguments;
         } collection_initializer_element;
+
+        /* Target-independent syntax; contextual consumers decide when to lower. */
+        struct
+        {
+            VcAstNodeList elements;
+        } collection_expression;
+
+        struct
+        {
+            VcAstNode *value;
+        } collection_spread_element;
 
         struct
         {

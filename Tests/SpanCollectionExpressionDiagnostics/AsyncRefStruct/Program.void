@@ -1,0 +1,1 @@
+using Void; using Void.Threading.Tasks; public static class Program { public static async Task Do() { Span<int> items = [1, 2]; await Task.CompletedTask; } public static void Main() {} }

@@ -1,0 +1,1 @@
+using Void; using Void.Collections; public static class Program { static void Pick(List<long> values) {} static void Pick(List<double> values) {} public static void Main() { Pick([]); } }

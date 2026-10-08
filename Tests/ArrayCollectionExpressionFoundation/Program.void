@@ -1,0 +1,78 @@
+using Void;
+
+public struct Meter362
+{
+    public int Value;
+    public Meter362(int value) { Value = value; }
+    public static implicit operator Meter362(int value) { return new Meter362(value); }
+}
+
+public sealed class Box362<T>
+{
+    public T Value;
+    public Box362(T value) { Value = value; }
+}
+
+public sealed class Store362
+{
+    private int[] _items = [4, 5, 6];
+    private string[] _labels = ["first", "second"];
+    private static long[] _static = [7, 8];
+    public bool Check()
+    {
+        return _items.Length == 3 && _items[1] == 5 &&
+            _labels[0] == "first" && _static[1] == 8L;
+    }
+}
+
+public static class Program
+{
+    private static int _counter;
+    private static string[] _staticWords = ["zero", "one"];
+
+    private static int Next()
+    {
+        _counter++;
+        return _counter;
+    }
+    private static Box362<int> NewBox(int value)
+    {
+        GC.Collect();
+        return new Box362<int>(value);
+    }
+
+    public static void Main()
+    {
+        int[] numbers = [1, 2, 3];
+        Console.WriteLine(numbers.Length == 3 && numbers[0] == 1 && numbers[2] == 3);
+        string[] words = ["Alice", "Bob"];
+        Console.WriteLine(words.Length == 2 && words[1] == "Bob");
+        bool[] flags = [true, false, true];
+        Console.WriteLine(flags[0] && !flags[1] && flags[2]);
+        long[] widened = [1, 2, 3];
+        Console.WriteLine(widened[0] == 1L && widened[2] == 3L);
+        Meter362[] meters = [10, 11];
+        Console.WriteLine(meters[0].Value == 10 && meters[1].Value == 11);
+        Box362<int>[] boxed = [new Box362<int>(21), NewBox(22)];
+        GC.Collect();
+        Console.WriteLine(boxed.Length == 2 && boxed[0].Value == 21 && boxed[1].Value == 22);
+        int[][] jagged = [new[] { 5, 6 }, new int[] { 7 }];
+        Console.WriteLine(jagged[0][1] == 6 && jagged[1][0] == 7);
+        _counter = 0;
+        int[] ordered = [Next(), (10 + 20), Next()];
+        Console.WriteLine(ordered[0] == 1 && ordered[1] == 30 && ordered[2] == 2 && _counter == 2);
+        Console.WriteLine(new Store362().Check());
+        Console.WriteLine(_staticWords[1] == "one");
+        int[] braces = { 1, 2, 3 };
+        int[] explicitArray = new[] { 1, 2, 3 };
+        Console.WriteLine(braces[2] == numbers[2] && explicitArray[1] == numbers[1]);
+        int[] middle = numbers[1..3];
+        Console.WriteLine(middle.Length == 2 && middle[0] == 2 && middle[1] == 3);
+        Console.WriteLine(numbers[^1] == 3 && numbers[0] == 1);
+        Box362<string>[] refs = [new Box362<string>("v")];
+        GC.Collect();
+        Console.WriteLine(refs[0].Value == "v");
+        int[] nested = [(1 + (2 * 3)), (4 + 5)];
+        Console.WriteLine(nested[0] == 7 && nested[1] == 9);
+    }
+}

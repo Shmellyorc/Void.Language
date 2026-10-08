@@ -1,0 +1,141 @@
+using Void;
+using Void.Collections;
+using Void.Threading.Tasks;
+
+public sealed class Input370 { public int Value; public Input370(int n) { Value = n; } }
+public sealed class Holder370<T> { public T[] Values; public Holder370(T[] items) { Values = items; } }
+public sealed class Output370
+{
+    public int Value;
+    public Output370(int n) { Value = n; }
+    public static implicit operator Output370(Input370 item)
+    {
+        GC.Collect();
+        return new Output370(item.Value + 10);
+    }
+}
+public class Parent370<T>
+{
+    public List<T> Values = new List<T>();
+    public virtual void Add(T item, int bonus = 0) { GC.Collect(); Values.Add(item); }
+}
+public sealed class Child370<T> : Parent370<T>
+{
+    public override void Add(T item, int bonus = 0) { GC.Collect(); Values.Add(item); }
+}
+public sealed class Nested370
+{
+    public int Sum;
+    public void Add(int[] items, int bonus = 3) { Sum += items[0] + bonus; }
+}
+public sealed class Throw370
+{
+    public static int Calls;
+    public void Add(int n) { Calls++; GC.Collect(); if (n == 2) throw new Exception("insert"); }
+}
+public static class Program
+{
+    private static int _order;
+    private static int Mark() { _order = _order * 10 + 1; return 1; }
+    private static int[] Source() { _order = _order * 10 + 2; GC.Collect(); return [2,3]; }
+    private static int[] FailSource() { throw new Exception("source"); }
+    private static Input370 Make(int n) { GC.Collect(); return new Input370(n); }
+    private static int Pick(Nested370 b) { return b.Sum; }
+    private static int Pick(string[][] b) { return 100; }
+    private static int Pick(ReadOnlySpan<string> b) { return 200; }
+    private static int Create(Input370[] b) { return b[0].Value; }
+    private static int Create(int[] b) { return 100; }
+    private static int Create(List<string> b) { return 200; }
+    private static int CreateOne(Input370 item) { return item.Value; }
+    private static int CreateOne(string item) { return 100; }
+    private static int Call(Func<int>[] f) { return f[0](); }
+    private static int Call(int[] f) { return 100; }
+    private static int Rank(int[] b) { return 1; }
+    private static int Rank(Span<int> b) { return 2; }
+    private static int Rank(Child370<int> b) { return 3; }
+    private static T[][] Nest<T>(T value) { return [[value], []]; }
+    private static Func<int> Capture(Input370[] source)
+    {
+        Output370[] converted = [..source];
+        return () => converted[0].Value + converted[1].Value;
+    }
+    private static async Task<int> Suspended(Input370[] source, Task<int> gate)
+    {
+        Output370[] before = [..source];
+        int n = await gate;
+        GC.Collect();
+        Child370<Output370> after = [..before, new Output370(n)];
+        return after.Values[0].Value + after.Values[2].Value;
+    }
+    private static IEnumerator<int> Sequence(Input370[] source)
+    {
+        Output370[] before = [..source];
+        yield return before[0].Value;
+        GC.Collect();
+        Child370<Output370> after = [..before];
+        yield return after.Values[1].Value;
+    }
+    private static async IAsyncEnumerable<int> AsyncSequence(Input370[] source, Task<int> gate)
+    {
+        Output370[] before = [..source];
+        yield return before[0].Value;
+        int n = await gate;
+        GC.Collect();
+        Child370<Output370> after = [..before];
+        yield return after.Values[1].Value + n;
+    }
+    public static void Main()
+    {
+        Input370[] source = [Make(1), Make(2)];
+        Output370[] copy = [..source, new Output370(99), ..source];
+        GC.Collect();
+        Console.WriteLine(copy.Length == 5 && copy[0].Value == 11 && copy[4].Value == 12);
+        Console.WriteLine(copy[0] != copy[3] && copy[2].Value == 99);
+        Output370[] assigned = []; assigned = [..source, Make(3)];
+        Console.WriteLine(assigned.Length == 3 && assigned[1].Value == 12 && assigned[2].Value == 13);
+        ReadOnlySpan<Output370> view = [..source];
+        GC.Collect(); Console.WriteLine(view[0].Value == 11 && view.Length == 2);
+        Child370<Output370> inherited = [..source];
+        Console.WriteLine(inherited.Values.Count == 2 && inherited.Values[1].Value == 12);
+        Nested370 direct = [[4]];
+        Console.WriteLine(direct.Sum == 7 && Pick([[4]]) == 7);
+        Console.WriteLine(Create([new(5)]) == 5 && CreateOne(new(6)) == 6);
+        Console.WriteLine(Call([() => 6]) == 6);
+        Console.WriteLine(Rank([1,2]) == 1 && Rank([]) == 1);
+        List<Input370[]> nested = [new[] { source[0] }, []];
+        Holder370<Input370> holder = new Holder370<Input370>(new[] { source[0] });
+        GC.Collect(); Console.WriteLine(nested[0][0].Value == 1 && nested[1].Length == 0 && holder.Values[0].Value == 1);
+        int[][] generic = Nest<int>(9);
+        Console.WriteLine(generic[0][0] == 9 && generic[1].Length == 0);
+        _order = 0;
+        int[] ordered = [Mark(), ..Source(), Mark(), ..Source(), Mark()];
+        Console.WriteLine(_order == 12121 && ordered.Length == 7 && ordered[5] == 3);
+        _order = 0;
+        bool caught = false; int final = 0;
+        try { int[] unused = [Mark(), ..FailSource(), Mark()]; }
+        catch (Exception ex) { caught = ex.Message == "source"; }
+        finally { final++; }
+        Console.WriteLine(caught && _order == 1 && final == 1);
+        Throw370.Calls = 0; _order = 0; caught = false;
+        try { Throw370 unused = [..Source(), Mark()]; }
+        catch (Exception ex) { caught = ex.Message == "insert"; }
+        Console.WriteLine(caught && Throw370.Calls == 1 && _order == 2);
+        Func<int> closure = Capture(source); GC.Collect(); Console.WriteLine(closure() == 23);
+        TaskCompletionSource<int> gate = new TaskCompletionSource<int>();
+        Task<int> pending = Suspended(source, gate.Task);
+        GC.Collect(); Console.WriteLine(!pending.IsCompleted);
+        gate.SetResult(7); Console.WriteLine(pending.Result == 18);
+        IEnumerator<int> iter = Sequence(source);
+        Console.WriteLine(iter.MoveNext() && iter.Current == 11);
+        GC.Collect(); Console.WriteLine(iter.MoveNext() && iter.Current == 12 && !iter.MoveNext()); iter.Dispose();
+        TaskCompletionSource<int> next = new TaskCompletionSource<int>();
+        IAsyncEnumerator<int> ai = AsyncSequence(source, next.Task).GetAsyncEnumerator();
+        Console.WriteLine(ai.MoveNextAsync().Result && ai.Current == 11);
+        Task<bool> move = ai.MoveNextAsync(); GC.Collect(); Console.WriteLine(!move.IsCompleted);
+        next.SetResult(8); Console.WriteLine(move.Result && ai.Current == 20);
+        Console.WriteLine(!ai.MoveNextAsync().Result); ai.DisposeAsync().Wait();
+        Span<Input370> refs = [Make(3), Make(4)];
+        Child370<Output370> fromSpan = [..refs]; GC.Collect();
+        Console.WriteLine(fromSpan.Values[0].Value == 13 && fromSpan.Values[1].Value == 14);
+    }
+}

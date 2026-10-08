@@ -1,0 +1,1 @@
+public sealed class Bare366 { public int Value; } public static class Program { public static void Main() { Bare366 value = []; } }

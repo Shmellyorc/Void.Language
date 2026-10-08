@@ -1,0 +1,1 @@
+public static class Program { private static void Pick(int[] values) {} private static void Pick(string[] values) {} public static void Main() { Pick([]); } }

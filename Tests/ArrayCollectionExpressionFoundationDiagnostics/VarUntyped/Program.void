@@ -1,0 +1,1 @@
+using Void; public static class Program { public static void Main() { var x = [1, 2]; } }

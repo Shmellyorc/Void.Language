@@ -328,7 +328,7 @@ public static class Program
         check(compile_result.returncode == 0, compile_result.stderr)
 
     version = invoke('version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.360', version.stdout)
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.370', version.stdout)
     compiler = (ROOT / 'Compiler' / 'src' / 'compiler.c').read_text(encoding='utf-8')
     check('VcCallFrame *call_frame;' in compiler, 'per-thread call-frame state missing')
     check('vc_handler->call_frame' in compiler and 'vc_call_frame_current = vc_handler->call_frame' in compiler,

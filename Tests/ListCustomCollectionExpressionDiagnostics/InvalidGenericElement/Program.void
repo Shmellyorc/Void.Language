@@ -1,0 +1,1 @@
+using Void.Collections; public sealed class Generic366<T> { public void Add(T item) {} } public static class Program { public static void Main() { Generic366<int> value = ["bad"]; } }

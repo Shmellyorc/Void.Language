@@ -1,0 +1,90 @@
+using Void;
+
+public sealed class Cell363<T>
+{
+    public T Value;
+    public Cell363(T value) { Value = value; }
+}
+
+public sealed class Store363
+{
+    private int[] _items = [2, 3, 4];
+    private static string[] _empty = [];
+    private static int[] _static = [8, 9];
+    public bool Check() { return _items[1] == 3 && _empty.Length == 0 && _static[0] == 8; }
+}
+
+public static class Program
+{
+    private static int _counter;
+    private static int Next() { _counter++; return _counter; }
+    private static Cell363<int> Allocate(int value)
+    {
+        GC.Collect();
+        return new Cell363<int>(value);
+    }
+    private static int ThrowOnElement()
+    {
+        _counter++;
+        throw new Exception("array-element");
+    }
+    private static int[] Create() { return [7, 8, 9]; }
+    private static int[] Empty() { return []; }
+    private static int Process(int[] values) { return 10 + values[0]; }
+    private static int Process(string[] values) { return 20 + values.Length; }
+    private static int Numeric(int[] values) { return 100; }
+    private static int Numeric(long[] values) { return 200; }
+    private static int EmptyOnly(int[] values) { return values.Length; }
+    private static int Generic(Cell363<int>[] values) { return values[0].Value; }
+    private static int Sequence(int[] values) { return values[0] * 100 + values[1]; }
+    private static bool Nested(int[][] values)
+    {
+        return values.Length == 2 && values[0].Length == 0 && values[1][1] == 12;
+    }
+
+    public static void Main()
+    {
+        int[] empty = [];
+        string[] strings = [];
+        Console.WriteLine(empty.Length == 0 && strings.Length == 0);
+        Console.WriteLine(new Store363().Check());
+        int[] values = [1, 2, 3];
+        values = [4, 5, 6];
+        Console.WriteLine(values.Length == 3 && values[0] == 4 && values[2] == 6);
+        values = [];
+        Console.WriteLine(values.Length == 0);
+        Console.WriteLine(Create()[1] == 8 && Empty().Length == 0);
+        Console.WriteLine(Process([1, 2, 3]) == 11);
+        Console.WriteLine(Process(["a", "b"]) == 22);
+        Console.WriteLine(Numeric([1, 2]) == 100);
+        Console.WriteLine(EmptyOnly([]) == 0);
+        Console.WriteLine(Generic([new Cell363<int>(31)]) == 31);
+        _counter = 0;
+        Console.WriteLine(Sequence([Next(), Next()]) == 102 && _counter == 2);
+        Cell363<int>[] refs = [new Cell363<int>(12), Allocate(13)];
+        GC.Collect();
+        Console.WriteLine(refs[0].Value == 12 && refs[1].Value == 13);
+        int[] old = {1, 2};
+        int[] explicitNew = new[] {1, 2};
+        int[] bracket = [1, 2];
+        Console.WriteLine(old[1] == bracket[1] && explicitNew[0] == bracket[0]);
+        Console.WriteLine(bracket[^1] == 2 && bracket[0..1][0] == 1);
+        Console.WriteLine(Sequence([(1 + 2), (3 * 4)]) == 312);
+        _counter = 0;
+        bool caught = false;
+        try
+        {
+            int[] neverCompleted = [Next(), ThrowOnElement(), Next()];
+            Console.WriteLine(neverCompleted.Length == 0);
+        }
+        catch (Exception error)
+        {
+            caught = error.Message == "array-element" && _counter == 2;
+        }
+        Console.WriteLine(caught && _counter == 2);
+        int[][] nested = [[], [9, 10]];
+        Console.WriteLine(nested[0].Length == 0 && nested[1][1] == 10);
+        Console.WriteLine(Nested([[], [11, 12]]));
+        Console.WriteLine(EmptyOnly([default]) == 1);
+    }
+}

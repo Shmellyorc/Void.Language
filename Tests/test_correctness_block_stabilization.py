@@ -76,7 +76,7 @@ def unassigned_read(folder: Path, source: str, name: str) -> None:
 
 def main() -> None:
     version = invoke(VOIDC, 'version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.360',
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.370',
           f'version: {version.stdout} {version.stderr}')
     built = invoke(VOIDC, 'build', FIXTURE)
     check(built.returncode == 0 and not built.stderr,

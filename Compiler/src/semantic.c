@@ -10297,6 +10297,8 @@ static bool expression_requires_target_type(const VcAstNode *expression)
         return false;
     if (expression_is_target_typed_default(expression))
         return true;
+    if (expression->kind == VC_AST_COLLECTION_EXPRESSION)
+        return true;
     if (expression->kind == VC_AST_NEW_EXPRESSION && expression->as.new_expression.target_typed)
         return true;
     if (expression->kind == VC_AST_CONDITIONAL_EXPRESSION)
@@ -10435,6 +10437,297 @@ static bool target_typed_lambda_matches_parameter(
     return true;
 }
 
+/* Candidate selection is read-only: array/span elements use ordinary
+   conversions, while concrete targets reuse constructor and instance Add
+   resolution without committing candidate-specific semantic state. */
+static size_t resolve_instance_method_call(
+    VcSemanticContext *context, size_t struct_index, const char *name,
+    const VcAstNodeList *argument_nodes, const VcSemanticType *arguments,
+    const VcTokenKind *argument_modifiers, size_t argument_count,
+    bool *ambiguous, bool *params_expanded);
+static size_t resolve_constructor_call(
+    VcSemanticContext *context, size_t struct_index,
+    const VcAstNodeList *argument_nodes, const VcSemanticType *arguments,
+    const VcTokenKind *argument_modifiers, size_t argument_count,
+    bool *ambiguous, bool *params_expanded);
+static bool member_is_accessible(
+    const VcSemanticContext *context, size_t declaring_index, uint32_t modifiers);
+
+/* Concrete collection expressions have the same parameterless constructor and
+   instance Add contract as ordinary collection initializers. This check is
+   deliberately read-only, including during speculative overload matching. */
+static bool concrete_type_constructible(
+    VcSemanticContext *context, size_t struct_index)
+{
+    const VcSemanticModel *model = context->model;
+    if (struct_index >= model->struct_count) return false;
+    const VcSemanticStruct *structure = &model->structs[struct_index];
+    if (structure->is_interface || structure->is_delegate || structure->is_abstract ||
+        (structure->node->as.type_declaration.modifiers & VC_AST_MOD_STATIC) != 0)
+        return false;
+    bool ambiguous = false;
+    bool expanded = false;
+    VcAstNodeList no_arguments = {0};
+    const size_t constructor = resolve_constructor_call(context, struct_index,
+        &no_arguments, NULL, NULL, 0, &ambiguous, &expanded);
+    if (ambiguous) return false;
+    if (constructor != (size_t)-1)
+    {
+        const uint32_t modifiers =
+            model->constructors[constructor].node->as.method_declaration.modifiers;
+        if (!member_is_accessible(context, struct_index, modifiers) ||
+            ((modifiers & VC_AST_MOD_UNSAFE) != 0 && !context_is_unsafe(context)))
+            return false;
+    }
+    else if (structure->is_class)
+        for (size_t i = 0; i < model->constructor_count; i++)
+            if (model->constructors[i].struct_index == struct_index)
+                return false;
+    return true;
+}
+
+static bool concrete_collection_constructible(
+    VcSemanticContext *context, size_t struct_index)
+{
+    return struct_index < context->model->struct_count &&
+        !context->model->structs[struct_index].is_ref_struct &&
+        concrete_type_constructible(context, struct_index);
+}
+
+static bool concrete_collection_has_add(
+    const VcSemanticContext *context, size_t struct_index)
+{
+    const VcSemanticModel *model = context->model;
+    for (size_t guard = 0; guard <= model->struct_count; guard++)
+    {
+        for (size_t i = 0; i < model->method_count; i++)
+        {
+            const VcSemanticMethod *method = &model->methods[i];
+            if (method->is_static || method->is_operator || !method->has_owner_struct ||
+                method->owner_struct_index != struct_index ||
+                strcmp(method->node->as.method_declaration.name, "Add") != 0 ||
+                method->parameter_count == 0 ||
+                !member_is_accessible(context, method->owner_struct_index,
+                    method->node->as.method_declaration.modifiers) ||
+                method->parameter_modifiers[0] == VC_TOKEN_KW_REF ||
+                method->parameter_modifiers[0] == VC_TOKEN_KW_OUT ||
+                method->parameter_modifiers[0] == VC_TOKEN_KW_IN)
+                continue;
+            bool usable = true;
+            for (size_t j = 1; j < method->parameter_count; j++)
+                if (method->parameter_modifiers[j] != VC_TOKEN_KW_PARAMS &&
+                    method->node->as.method_declaration.parameters.items[j]
+                        ->as.parameter.default_value == NULL)
+                    usable = false;
+            if (usable) return true;
+        }
+        if (!model->structs[struct_index].has_base_class) break;
+        struct_index = model->structs[struct_index].base_class_index;
+    }
+    return false;
+}
+
+static VcTokenKind argument_modifier(const VcAstNode *argument);
+
+static bool target_typed_expression_matches_parameter(
+    VcSemanticContext *context, const VcAstNode *expression,
+    VcSemanticType parameter_type, size_t *rank);
+
+static bool collection_candidate(
+    VcSemanticContext *context, const VcAstNode *expression,
+    VcSemanticType parameter_type, size_t *rank)
+{
+    const VcSemanticModel *model = context->model;
+    VcSemanticType element_type = VC_SEM_TYPE_ERROR;
+    bool readonly_span = false;
+    bool concrete = false;
+    size_t collection_index = (size_t)-1;
+    if (vc_semantic_type_is_array(parameter_type) &&
+        vc_semantic_array_rank(model, parameter_type) == 1)
+        element_type = vc_semantic_array_element_type(model, parameter_type);
+    else if (vc_semantic_span_type_info(model, parameter_type,
+            &readonly_span, &element_type))
+    {
+        if (rank != NULL)
+            *rank += readonly_span ? 2u : 1u;
+    }
+    else if (vc_semantic_type_is_struct(parameter_type))
+    {
+        collection_index = vc_semantic_struct_index(parameter_type);
+        if (collection_index >= model->struct_count)
+            return false;
+        if (!concrete_collection_constructible(context, collection_index) ||
+            !concrete_collection_has_add(context, collection_index))
+            return false;
+        concrete = true;
+        /* A structural constructed target is less direct than an array/span.
+           Equal structural targets remain ambiguous under existing resolution. */
+        if (rank != NULL)
+            *rank += 3u;
+    }
+    else
+        return false;
+
+    for (size_t i = 0; i < expression->as.collection_expression.elements.count; i++)
+    {
+        const VcAstNode *element = expression->as.collection_expression.elements.items[i];
+        if (element->kind == VC_AST_COLLECTION_SPREAD_ELEMENT)
+        {
+            const VcSemanticBinding *source = vc_semantic_binding(model,
+                element->as.collection_spread_element.value);
+            if (source == NULL) return false;
+            VcSemanticType source_element = VC_SEM_TYPE_ERROR;
+            if (vc_semantic_type_is_array(source->type) &&
+                vc_semantic_array_rank(model, source->type) == 1)
+                source_element = vc_semantic_array_element_type(model, source->type);
+            else if (concrete)
+                (void)vc_semantic_span_type_info(model, source->type, NULL, &source_element);
+            if (source_element == VC_SEM_TYPE_ERROR) return false;
+            if (concrete)
+            {
+                VcAstNode *argument_node = (VcAstNode *)element;
+                VcAstNodeList argument_nodes = {0};
+                argument_nodes.items = &argument_node;
+                argument_nodes.count = 1;
+                VcTokenKind modifier = VC_TOKEN_EOF;
+                bool ambiguous = false;
+                bool expanded = false;
+                const size_t method_index = resolve_instance_method_call(context,
+                    collection_index, "Add", &argument_nodes, &source_element,
+                    &modifier, 1, &ambiguous, &expanded);
+                if (ambiguous || method_index == (size_t)-1) return false;
+                const VcSemanticMethod *method = &model->methods[method_index];
+                if (!member_is_accessible(context, method->owner_struct_index,
+                        method->node->as.method_declaration.modifiers) || expanded)
+                    return false;
+                if (rank != NULL)
+                    *rank += call_conversion_rank(model, method->parameter_types[0], source_element);
+            }
+            else
+            {
+                if (!is_assignable(model, element_type, source_element)) return false;
+                if (rank != NULL)
+                    *rank += call_conversion_rank(model, element_type, source_element);
+            }
+            continue;
+        }
+        if (concrete)
+        {
+            const bool is_default = expression_is_target_typed_default(element);
+            const bool is_nested = element->kind == VC_AST_COLLECTION_EXPRESSION;
+            const bool target_typed = expression_requires_target_type(element);
+            const VcSemanticBinding *binding = vc_semantic_binding(model, element);
+            VcSemanticType argument_type = target_typed
+                ? VC_SEM_TYPE_UNKNOWN : (binding != NULL ? binding->type : VC_SEM_TYPE_ERROR);
+            if (argument_type == VC_SEM_TYPE_ERROR)
+                return false;
+            VcAstNode *argument_node = (VcAstNode *)element;
+            VcAstNodeList argument_nodes = {0};
+            argument_nodes.items = &argument_node;
+            argument_nodes.count = 1;
+            VcTokenKind modifier = VC_TOKEN_EOF;
+            bool ambiguous = false;
+            bool expanded = false;
+            const size_t method_index = resolve_instance_method_call(context,
+                collection_index, "Add", &argument_nodes, &argument_type, &modifier,
+                1, &ambiguous, &expanded);
+            if (ambiguous || method_index == (size_t)-1)
+                return false;
+            const VcSemanticMethod *method = &model->methods[method_index];
+            if (!member_is_accessible(context, method->owner_struct_index,
+                    method->node->as.method_declaration.modifiers))
+                return false;
+            if (rank != NULL && !is_default)
+            {
+                if (is_nested)
+                {
+                    /* The ordinary Add resolver already validated trailing
+                       optional parameters and params form. Rank the actual
+                       first argument against that form's element target. */
+                    VcSemanticType target = method->parameter_types[0];
+                    if (expanded && method->parameter_modifiers[0] == VC_TOKEN_KW_PARAMS)
+                        target = vc_semantic_array_element_type(model, target);
+                    if (!collection_candidate(context, element, target, rank))
+                        return false;
+                }
+                else if (method->parameter_count == 1)
+                    *rank += call_conversion_rank(model, method->parameter_types[0], argument_type);
+            }
+            continue;
+        }
+        if (element->kind == VC_AST_COLLECTION_EXPRESSION)
+        {
+            if (!collection_candidate(context, element, element_type, rank))
+                return false;
+            continue;
+        }
+        if (expression_requires_target_type(element))
+        {
+            if (!target_typed_expression_matches_parameter(context, element, element_type, rank))
+                return false;
+            continue;
+        }
+        const VcSemanticBinding *binding = vc_semantic_binding(model, element);
+        if (binding == NULL || !is_assignable(model, element_type, binding->type))
+            return false;
+        if (rank != NULL)
+            *rank += call_conversion_rank(model, element_type, binding->type);
+    }
+    return true;
+}
+
+static bool target_typed_expression_matches_parameter(
+    VcSemanticContext *context, const VcAstNode *expression,
+    VcSemanticType parameter_type, size_t *rank)
+{
+    if (expression != NULL && expression->kind == VC_AST_COLLECTION_EXPRESSION)
+        return collection_candidate(context, expression, parameter_type, rank);
+    if (expression != NULL && expression->kind == VC_AST_NEW_EXPRESSION &&
+        expression->as.new_expression.target_typed &&
+        !expression->as.new_expression.is_array)
+    {
+        /* Implicit/contextual arrays retain their existing array inference path.
+           Use ordinary constructor applicability without binding a speculative
+           target. Collection argument preparation has already bound its leaves. */
+        const VcSemanticModel *model = context->model;
+        if (!vc_semantic_type_is_struct(parameter_type)) return false;
+        const size_t index = vc_semantic_struct_index(parameter_type);
+        if (index >= model->struct_count) return false;
+        const VcSemanticStruct *type = &model->structs[index];
+        if (type->is_interface || type->is_delegate || type->is_abstract ||
+            (type->node->as.type_declaration.modifiers & VC_AST_MOD_STATIC) != 0)
+            return false;
+        const VcAstNodeList *arguments = &expression->as.new_expression.arguments;
+        if (arguments->count == 0)
+            return concrete_type_constructible(context, index);
+        VcSemanticType *types = calloc(arguments->count, sizeof(*types));
+        VcTokenKind *modifiers = calloc(arguments->count, sizeof(*modifiers));
+        if (types == NULL || modifiers == NULL)
+        {
+            free(types);
+            free(modifiers);
+            return false;
+        }
+        for (size_t i = 0; i < arguments->count; i++)
+        {
+            const VcAstNode *argument = arguments->items[i];
+            const VcSemanticBinding *binding = vc_semantic_binding(model, argument);
+            modifiers[i] = argument_modifier(argument);
+            types[i] = expression_requires_target_type(argument) ? VC_SEM_TYPE_UNKNOWN
+                : binding != NULL ? binding->type : VC_SEM_TYPE_UNKNOWN;
+        }
+        bool ambiguous = false, expanded = false;
+        const size_t constructor = resolve_constructor_call(context, index, arguments,
+            types, modifiers, arguments->count, &ambiguous, &expanded);
+        free(types);
+        free(modifiers);
+        return !ambiguous && constructor != (size_t)-1 &&
+            member_is_accessible(context, index,
+                model->constructors[constructor].node->as.method_declaration.modifiers);
+    }
+    return target_typed_lambda_matches_parameter(context->model, expression, parameter_type);
+}
+
 static size_t target_typed_lambda_preference_rank(
     const VcSemanticModel *model,
     const VcAstNode *expression,
@@ -10478,7 +10771,7 @@ static bool semantic_methods_same_declaration(
 }
 
 static bool callable_matches_arguments(
-    const VcSemanticModel *model,
+    VcSemanticContext *context,
     const VcAstNodeList *parameters,
     const VcSemanticType *parameter_types,
     const VcTokenKind *parameter_modifiers,
@@ -10491,6 +10784,7 @@ static bool callable_matches_arguments(
     size_t *rank,
     size_t *argument_parameters)
 {
+    const VcSemanticModel *model = context->model;
     *params_expanded = false;
     *rank = 0;
 
@@ -10596,8 +10890,8 @@ static bool callable_matches_arguments(
                      parameter_modifiers[parameter_index] != VC_TOKEN_KW_OUT)) ||
                 (!untyped_out && target_typed &&
                     (parameter_modifiers[parameter_index] != VC_TOKEN_EOF ||
-                     !target_typed_lambda_matches_parameter(
-                         model, argument_nodes->items[i], parameter_types[parameter_index]))) ||
+                     !target_typed_expression_matches_parameter(
+                         context, argument_nodes->items[i], parameter_types[parameter_index], rank))) ||
                 (!untyped_out && !target_typed && !call_parameter_matches(model, parameter_types[parameter_index],
                     parameter_modifiers[parameter_index], arguments[i], argument_modifiers[i])))
             {
@@ -10652,7 +10946,10 @@ static bool callable_matches_arguments(
                     ? argument_nodes->items[single_params_argument] : NULL) &&
              ((arguments[single_params_argument] == VC_SEM_TYPE_UNKNOWN &&
               argument_nodes != NULL && single_params_argument < argument_nodes->count &&
-              expression_requires_target_type(argument_nodes->items[single_params_argument])) ||
+              expression_requires_target_type(argument_nodes->items[single_params_argument]) &&
+              target_typed_expression_matches_parameter(context,
+                  argument_nodes->items[single_params_argument],
+                  parameter_types[parameter_count - 1], rank)) ||
              call_parameter_matches(model, parameter_types[parameter_count - 1], VC_TOKEN_EOF,
                 arguments[single_params_argument], argument_modifiers[single_params_argument]))))
         {
@@ -10684,7 +10981,10 @@ static bool callable_matches_arguments(
                     const bool target_typed = arguments[i] == VC_SEM_TYPE_UNKNOWN &&
                         argument_nodes != NULL && i < argument_nodes->count &&
                         expression_requires_target_type(argument_nodes->items[i]);
-                    if (!target_typed && !call_parameter_matches(model, element_type, VC_TOKEN_EOF,
+                    if (target_typed && !target_typed_expression_matches_parameter(context,
+                            argument_nodes->items[i], element_type, rank))
+                        matched = false;
+                    else if (!target_typed && !call_parameter_matches(model, element_type, VC_TOKEN_EOF,
                             arguments[i], argument_modifiers[i]))
                         matched = false;
                     else if (arguments[i] != VC_SEM_TYPE_UNKNOWN)
@@ -10757,7 +11057,7 @@ static size_t resolve_method_call(
 
             bool expanded = false;
             size_t rank = 0;
-            if (!callable_matches_arguments(context->model,
+            if (!callable_matches_arguments(context,
                     &candidate->node->as.method_declaration.parameters,
                     candidate->parameter_types, candidate->parameter_modifiers,
                     candidate->parameter_count, argument_nodes, arguments,
@@ -10833,7 +11133,7 @@ static size_t resolve_static_method_call(
 
         bool expanded = false;
         size_t rank = 0;
-        if (!callable_matches_arguments(context->model,
+        if (!callable_matches_arguments(context,
                 &candidate->node->as.method_declaration.parameters,
                 candidate->parameter_types, candidate->parameter_modifiers, candidate->parameter_count,
                 argument_nodes, arguments, argument_modifiers, argument_count, &expanded, &rank, NULL))
@@ -10904,7 +11204,7 @@ static void resolve_interface_static_method_call(
 
         bool expanded = false;
         size_t rank = 0;
-        if (!callable_matches_arguments(context->model,
+        if (!callable_matches_arguments(context,
                 &candidate->node->as.method_declaration.parameters,
                 candidate->parameter_types, candidate->parameter_modifiers, candidate->parameter_count,
                 argument_nodes, arguments, argument_modifiers, argument_count, &expanded, &rank, NULL))
@@ -11670,7 +11970,7 @@ static void resolve_interface_instance_method_call(
 
         bool expanded = false;
         size_t rank = 0;
-        if (!callable_matches_arguments(context->model,
+        if (!callable_matches_arguments(context,
                 &candidate->node->as.method_declaration.parameters,
                 candidate->parameter_types, candidate->parameter_modifiers, candidate->parameter_count,
                 argument_nodes, arguments, argument_modifiers, argument_count, &expanded, &rank, NULL))
@@ -11743,7 +12043,7 @@ static size_t resolve_instance_method_call(
 
             bool expanded = false;
             size_t rank = 0;
-            if (!callable_matches_arguments(context->model,
+            if (!callable_matches_arguments(context,
                     &candidate->node->as.method_declaration.parameters,
                     candidate->parameter_types, candidate->parameter_modifiers, candidate->parameter_count,
                     argument_nodes, arguments, argument_modifiers, argument_count, &expanded, &rank, NULL))
@@ -11798,7 +12098,7 @@ static size_t resolve_constructor_call(
 
         bool expanded = false;
         size_t rank = 0;
-        if (!callable_matches_arguments(context->model,
+        if (!callable_matches_arguments(context,
                 &candidate->node->as.method_declaration.parameters,
                 candidate->parameter_types, candidate->parameter_modifiers, candidate->parameter_count,
                 argument_nodes, arguments, argument_modifiers, argument_count, &expanded, &rank, NULL))
@@ -13167,7 +13467,10 @@ static size_t ref_struct_value_escape_depth_core(
             return ref_struct_value_escape_depth_core(context, expression, true);
         return 0;
     }
-    if (expression->kind == VC_AST_DEFAULT_EXPRESSION)
+    if (expression->kind == VC_AST_DEFAULT_EXPRESSION ||
+        (expression->kind == VC_AST_COLLECTION_EXPRESSION && binding != NULL &&
+         expression->as.collection_expression.elements.count == 0 &&
+         vc_semantic_span_type_info(context->model, binding->type, NULL, NULL)))
         return 0;
     if (expression->kind == VC_AST_STACKALLOC_EXPRESSION && binding != NULL &&
         semantic_type_is_ref_struct(context->model, binding->type))
@@ -13752,6 +14055,58 @@ static VcSemanticType analyze_inline_out_declaration_type(
         type_ref != NULL ? type_ref->location : argument->location);
 }
 
+/* Bind candidate-independent leaves once, including those nested inside an
+   array-target collection argument. Candidate-specific conversions are deferred
+   until overload selection has a winning target type. */
+static bool analyze_arguments(VcSemanticContext *context,
+    const VcAstNodeList *arguments, VcSemanticType *types, VcTokenKind *modifiers);
+
+/* Constructor arguments are independent of the contextual result type. */
+static bool analyze_contextual_new_arguments(
+    VcSemanticContext *context, const VcAstNode *expression)
+{
+    const VcAstNodeList *arguments = &expression->as.new_expression.arguments;
+    if (arguments->count == 0) return true;
+    VcSemanticType *types = calloc(arguments->count, sizeof(*types));
+    VcTokenKind *modifiers = calloc(arguments->count, sizeof(*modifiers));
+    const bool ok = types != NULL && modifiers != NULL &&
+        analyze_arguments(context, arguments, types, modifiers);
+    free(types);
+    free(modifiers);
+    return ok;
+}
+
+static bool analyze_collection_argument_elements(
+    VcSemanticContext *context, const VcAstNode *collection)
+{
+    for (size_t i = 0; i < collection->as.collection_expression.elements.count; i++)
+    {
+        const VcAstNode *element = collection->as.collection_expression.elements.items[i];
+        if (element->kind == VC_AST_COLLECTION_SPREAD_ELEMENT)
+        {
+            const VcSemanticType source = analyze_expression(context,
+                element->as.collection_spread_element.value);
+            if (source == VC_SEM_TYPE_ERROR)
+                return false;
+            continue;
+        }
+        if (element->kind == VC_AST_COLLECTION_EXPRESSION)
+        {
+            if (!analyze_collection_argument_elements(context, element))
+                return false;
+        }
+        else if (element->kind == VC_AST_NEW_EXPRESSION &&
+            element->as.new_expression.target_typed)
+        {
+            if (!analyze_contextual_new_arguments(context, element)) return false;
+        }
+        else if (!expression_requires_target_type(element) &&
+            analyze_expression(context, element) == VC_SEM_TYPE_ERROR)
+            return false;
+    }
+    return true;
+}
+
 static bool analyze_arguments(
     VcSemanticContext *context,
     const VcAstNodeList *arguments,
@@ -13771,7 +14126,18 @@ static bool analyze_arguments(
         else if (modifiers[i] == VC_TOKEN_EOF &&
             (expression_requires_target_type(argument) ||
              expression_is_method_group_candidate(context, argument)))
-            types[i] = VC_SEM_TYPE_UNKNOWN;
+        {
+            const VcSemanticBinding *existing = vc_semantic_binding(context->model, argument);
+            types[i] = argument->kind == VC_AST_NEW_EXPRESSION && existing != NULL
+                ? existing->type : VC_SEM_TYPE_UNKNOWN;
+            if (argument->kind == VC_AST_COLLECTION_EXPRESSION &&
+                !analyze_collection_argument_elements(context, argument))
+                return false;
+            if (argument->kind == VC_AST_NEW_EXPRESSION &&
+                argument->as.new_expression.target_typed &&
+                !analyze_contextual_new_arguments(context, argument))
+                return false;
+        }
         else if (modifiers[i] == VC_TOKEN_EOF)
             types[i] = analyze_expression(context, argument);
         else
@@ -14446,7 +14812,7 @@ static bool extension_candidate_matches(
         modifiers[i + 1] = argument_modifiers[i];
     }
     VcAstNodeList synthetic = { .items = nodes, .count = total_count, .capacity = total_count };
-    const bool matched = callable_matches_arguments(context->model,
+    const bool matched = callable_matches_arguments(context,
         &candidate->node->as.method_declaration.parameters,
         candidate->parameter_types, candidate->parameter_modifiers, candidate->parameter_count,
         &synthetic, types, modifiers, total_count, params_expanded, rank, mapping);
@@ -15130,7 +15496,7 @@ static bool evaluate_generic_method_candidate_mode(
     bool expanded = false;
     size_t candidate_rank = 0;
     if (valid)
-        valid = callable_matches_arguments(context->model,
+        valid = callable_matches_arguments(context,
             &method->as.method_declaration.parameters,
             parameter_types, parameter_modifiers, parameter_count,
             argument_nodes, argument_types, argument_modifiers, argument_nodes->count,
@@ -17565,7 +17931,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
         }
         bool delegate_params_expanded = false;
         size_t delegate_rank = 0;
-        if (!callable_matches_arguments(context->model,
+        if (!callable_matches_arguments(context,
                 &invoke->node->as.method_declaration.parameters,
                 invoke->parameter_types, invoke->parameter_modifiers, invoke->parameter_count,
                 arguments, argument_types, argument_modifiers, argument_count,
@@ -17592,7 +17958,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
         }
         bool mapped_expanded = false;
         size_t mapped_rank = 0;
-        if (!callable_matches_arguments(context->model,
+        if (!callable_matches_arguments(context,
                 &invoke->node->as.method_declaration.parameters,
                 invoke->parameter_types, invoke->parameter_modifiers, invoke->parameter_count,
                 arguments, argument_types, argument_modifiers, argument_count,
@@ -18398,7 +18764,7 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
         ? extension_candidate_matches(context, target_method, extension_receiver_node,
             extension_receiver_type, arguments, argument_types, argument_modifiers,
             &mapped_expanded, &mapped_rank, argument_parameters)
-        : callable_matches_arguments(context->model,
+        : callable_matches_arguments(context,
             &target_method->node->as.method_declaration.parameters,
             target_method->parameter_types, target_method->parameter_modifiers,
             target_method->parameter_count, arguments, argument_types, argument_modifiers,
@@ -18875,6 +19241,38 @@ static bool analyze_array_initializer_elements(
         }
 
         const VcAstNode *value = initializer->as.collection_initializer_element.arguments.items[0];
+        if (value->kind == VC_AST_COLLECTION_SPREAD_ELEMENT)
+        {
+            const VcAstNode *source = value->as.collection_spread_element.value;
+            const VcSemanticType source_type = analyze_expression(context, source);
+            if (source_type == VC_SEM_TYPE_ERROR)
+                return false;
+            if (!vc_semantic_type_is_array(source_type) ||
+                vc_semantic_array_rank(context->model, source_type) != 1)
+            {
+                set_diagnostic(context->diagnostic, context->source, value->location,
+                    "spread source must be a one-dimensional array");
+                return false;
+            }
+            const VcSemanticType source_element = vc_semantic_array_element_type(
+                context->model, source_type);
+            if (!is_assignable(context->model, element_type, source_element))
+            {
+                set_diagnostic(context->diagnostic, context->source, value->location,
+                    "cannot convert spread array element '%s' to '%s'",
+                    context_type_display_name(context, source_element),
+                    context_type_display_name(context, element_type));
+                return false;
+            }
+            VcSemanticBinding spread_binding = {0};
+            spread_binding.node = value;
+            spread_binding.type = array_type;
+            if (!push_binding(context->model, spread_binding) ||
+                !ensure_implicit_conversion_reachable_with_origin(context,
+                    value, source_element, element_type, element_generic_parameter_origin))
+                return false;
+            continue;
+        }
         const VcSemanticType actual = analyze_expression_with_target_origin(
             context, value, element_type, element_generic_parameter_origin);
         if (actual == VC_SEM_TYPE_ERROR)
@@ -19370,7 +19768,38 @@ static bool analyze_collection_initializers(
                 "out of memory while binding collection initializer");
             return false;
         }
-        if (!analyze_arguments(context, arguments, argument_types, argument_modifiers))
+        const VcAstNode *spread = argument_count == 1 &&
+            arguments->items[0]->kind == VC_AST_COLLECTION_SPREAD_ELEMENT
+            ? arguments->items[0] : NULL;
+        VcSemanticType spread_element_type = VC_SEM_TYPE_ERROR;
+        if (spread != NULL)
+        {
+            const VcAstNode *source = spread->as.collection_spread_element.value;
+            const VcSemanticType source_type = analyze_expression(context, source);
+            if (source_type == VC_SEM_TYPE_ERROR)
+            {
+                free(argument_types);
+                free(argument_modifiers);
+                return false;
+            }
+            if (vc_semantic_type_is_array(source_type) &&
+                vc_semantic_array_rank(context->model, source_type) == 1)
+                spread_element_type = vc_semantic_array_element_type(context->model, source_type);
+            else
+                (void)vc_semantic_span_type_info(context->model,
+                    source_type, NULL, &spread_element_type);
+            if (spread_element_type == VC_SEM_TYPE_ERROR)
+            {
+                set_diagnostic(context->diagnostic, context->source, spread->location,
+                    "collection spread source must be a one-dimensional array or Span/ReadOnlySpan");
+                free(argument_types);
+                free(argument_modifiers);
+                return false;
+            }
+            argument_types[0] = spread_element_type;
+            argument_modifiers[0] = VC_TOKEN_EOF;
+        }
+        else if (!analyze_arguments(context, arguments, argument_types, argument_modifiers))
         {
             free(argument_types);
             free(argument_modifiers);
@@ -19406,7 +19835,7 @@ static bool analyze_collection_initializers(
         }
         bool mapped_expanded = false;
         size_t mapped_rank = 0;
-        if (!callable_matches_arguments(context->model,
+        if (!callable_matches_arguments(context,
                 &method->node->as.method_declaration.parameters,
                 method->parameter_types, method->parameter_modifiers, method->parameter_count,
                 arguments, argument_types, argument_modifiers, argument_count,
@@ -19418,6 +19847,15 @@ static bool analyze_collection_initializers(
             return false;
         }
         params_expanded = mapped_expanded;
+        if (spread != NULL && params_expanded)
+        {
+            set_diagnostic(context->diagnostic, context->source, spread->location,
+                "spread insertion requires a compatible non-expanded Add method");
+            free(argument_parameters);
+            free(argument_types);
+            free(argument_modifiers);
+            return false;
+        }
 
         const bool has_params = method->parameter_count > 0 &&
             method->parameter_modifiers[method->parameter_count - 1] == VC_TOKEN_KW_PARAMS;
@@ -19458,6 +19896,20 @@ static bool analyze_collection_initializers(
                     return false;
                 }
             }
+            if (spread != NULL)
+            {
+                VcSemanticBinding spread_binding = {0};
+                spread_binding.node = spread;
+                spread_binding.type = vc_semantic_struct_type(struct_index);
+                spread_binding.spread_element_type = spread_element_type;
+                if (!push_binding(context->model, spread_binding))
+                {
+                    free(argument_parameters);
+                    free(argument_types);
+                    free(argument_modifiers);
+                    return false;
+                }
+            }
             if (argument_types[i] != VC_SEM_TYPE_UNKNOWN &&
                 argument_modifiers[i] == VC_TOKEN_EOF &&
                 !ensure_implicit_conversion_reachable_with_origin(
@@ -19482,6 +19934,24 @@ static bool analyze_collection_initializers(
         }
 
         const bool virtual_dispatch = method->has_virtual_root;
+        if (spread != NULL)
+        {
+            VcSemanticBinding *spread_bound = NULL;
+            for (size_t i = 0; i < context->model->binding_count; i++)
+                if (context->model->bindings[i].node == spread)
+                {
+                    spread_bound = &context->model->bindings[i];
+                    break;
+                }
+            if (spread_bound == NULL)
+            {
+                free(argument_parameters);
+                return false;
+            }
+            spread_bound->has_method = true;
+            spread_bound->method_index = method_index;
+            spread_bound->virtual_dispatch = virtual_dispatch;
+        }
         if (virtual_dispatch)
         {
             if (!mark_virtual_dispatch_reachable(context->model,
@@ -19868,7 +20338,7 @@ static VcSemanticType analyze_new(
     }
     bool mapped_expanded = false;
     size_t mapped_rank = 0;
-    if (!callable_matches_arguments(context->model,
+    if (!callable_matches_arguments(context,
             &constructor->node->as.method_declaration.parameters,
             constructor->parameter_types, constructor->parameter_modifiers,
             constructor->parameter_count, arguments, argument_types, argument_modifiers,
@@ -21217,6 +21687,152 @@ static VcSemanticType analyze_expression_with_target_origin(
         return analyze_switch_expression(context, expression, has_target, target_type,
             target_generic_parameter_origin);
     }
+    if (expression->kind == VC_AST_COLLECTION_EXPRESSION)
+    {
+        VcSemanticType array_target = target_type;
+        VcSemanticType span_element = VC_SEM_TYPE_ERROR;
+        if (vc_semantic_span_type_info(context->model, target_type, NULL, &span_element))
+            array_target = intern_array_type(context->model, span_element);
+        const bool array_targeted = vc_semantic_type_is_array(array_target) &&
+            vc_semantic_array_rank(context->model, array_target) == 1;
+        const bool concrete_targeted = !array_targeted &&
+            vc_semantic_type_is_struct(target_type) &&
+            !vc_semantic_span_type_info(context->model, target_type, NULL, NULL);
+        if (!array_targeted && !concrete_targeted)
+        {
+            set_diagnostic(context->diagnostic, context->source, expression->location,
+                "collection expression requires a one-dimensional array target type (or Span/ReadOnlySpan), or a concrete collection target type");
+            return VC_SEM_TYPE_ERROR;
+        }
+        if (concrete_targeted)
+        {
+            const size_t index = vc_semantic_struct_index(target_type);
+            const VcSemanticStruct *structure = index < context->model->struct_count
+                ? &context->model->structs[index] : NULL;
+            if (structure == NULL || structure->is_interface || structure->is_delegate ||
+                structure->is_ref_struct || structure->is_abstract ||
+                (structure->node->as.type_declaration.modifiers & VC_AST_MOD_STATIC) != 0)
+            {
+                set_diagnostic(context->diagnostic, context->source, expression->location,
+                    "collection expression requires an instantiable concrete collection target");
+                return VC_SEM_TYPE_ERROR;
+            }
+            if (!concrete_collection_constructible(context, index))
+            {
+                set_diagnostic(context->diagnostic, context->source, expression->location,
+                    "collection target '%s' requires an accessible parameterless constructor",
+                    context_type_display_name(context, target_type));
+                return VC_SEM_TYPE_ERROR;
+            }
+            if (!concrete_collection_has_add(context, index))
+            {
+                set_diagnostic(context->diagnostic, context->source, expression->location,
+                    "collection target '%s' requires an accessible instance Add method",
+                    context_type_display_name(context, target_type));
+                return VC_SEM_TYPE_ERROR;
+            }
+        }
+        /* The existing default span has valid zero-length semantics without
+           backing allocation. Nonempty spans still use array-backed storage. */
+        if (array_target != target_type &&
+            expression->as.collection_expression.elements.count == 0)
+        {
+            VcSemanticBinding empty = {0};
+            empty.node = expression;
+            empty.type = target_type;
+            if (!push_binding(context->model, empty))
+            {
+                set_diagnostic(context->diagnostic, context->source, expression->location,
+                    "out of memory while binding empty span collection");
+                return VC_SEM_TYPE_ERROR;
+            }
+            return target_type;
+        }
+        /* Contextual lowering happens only after the target is known. Reuse the
+           existing new-array AST so backend rooting and expression generation
+           are identical to braces/new[]. Parser AST remains target-neutral. */
+        VcAstTree *tree = NULL;
+        for (size_t i = 0; i < context->model->unit_count; i++)
+        {
+            if (vc_ast_tree_contains(context->model->units[i].tree, expression))
+            {
+                tree = context->model->units[i].tree;
+                break;
+            }
+        }
+        if (tree == NULL)
+        {
+            for (size_t i = 0; i < context->model->unit_count; i++)
+                if (context->model->units[i].source == context->source)
+                {
+                    tree = context->model->units[i].tree;
+                    break;
+                }
+        }
+        if (tree == NULL)
+        {
+            set_diagnostic(context->diagnostic, context->source, expression->location,
+                "cannot find syntax storage for collection expression");
+            return VC_SEM_TYPE_ERROR;
+        }
+        VcAstNode *lowered = vc_ast_new_node(tree, VC_AST_NEW_EXPRESSION, expression->location);
+        if (lowered == NULL)
+        {
+            set_diagnostic(context->diagnostic, context->source, expression->location,
+                "out of memory while lowering collection expression");
+            return VC_SEM_TYPE_ERROR;
+        }
+        lowered->span = expression->span;
+        lowered->as.new_expression.is_array = array_targeted;
+        lowered->as.new_expression.target_typed = true;
+        lowered->as.new_expression.has_initializer = true;
+        const VcAstNodeList *elements = &expression->as.collection_expression.elements;
+        for (size_t i = 0; i < elements->count; i++)
+        {
+            VcAstNode *element = elements->items[i];
+            VcAstNode *initializer = vc_ast_new_node(tree,
+                VC_AST_COLLECTION_INITIALIZER_ELEMENT, element->location);
+            if (initializer == NULL ||
+                !vc_ast_node_list_push(tree,
+                    &initializer->as.collection_initializer_element.arguments, element) ||
+                !vc_ast_node_list_push(tree,
+                    &lowered->as.new_expression.initializers, initializer))
+            {
+                set_diagnostic(context->diagnostic, context->source, expression->location,
+                    "out of memory while lowering collection expression");
+                return VC_SEM_TYPE_ERROR;
+            }
+            initializer->span = element->span;
+            if (element->kind == VC_AST_COLLECTION_SPREAD_ELEMENT)
+                lowered->as.new_expression.has_spread_initializers = true;
+        }
+        const VcSemanticType type = analyze_new(context, lowered, array_target,
+            target_generic_parameter_origin);
+        if (type == VC_SEM_TYPE_ERROR)
+            return type;
+        VcSemanticBinding binding = {0};
+        binding.node = expression;
+        binding.type = type;
+        binding.lowered_collection_construction = lowered;
+        if (!push_binding(context->model, binding))
+        {
+            set_diagnostic(context->diagnostic, context->source, expression->location,
+                "out of memory while binding collection expression");
+            return VC_SEM_TYPE_ERROR;
+        }
+        /* A span uses the ordinary array-backed implicit conversion. The
+           existing ref owner carried by Span's reference keeps the allocated
+           array reachable; the collection expression itself owns no storage. */
+        if (array_target != target_type &&
+            !ensure_implicit_conversion_reachable_with_origin(context, expression,
+                type, target_type, target_generic_parameter_origin))
+        {
+            set_diagnostic(context->diagnostic, context->source, expression->location,
+                "collection expression cannot convert its array backing to the span target");
+            return VC_SEM_TYPE_ERROR;
+        }
+        return type;
+    }
     if (expression->kind == VC_AST_DEFAULT_EXPRESSION &&
         expression->as.default_expression.type == NULL)
     {
@@ -22447,6 +23063,11 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 ? VC_DIAG_MEMBER : VC_DIAG_NAME);
             return VC_SEM_TYPE_ERROR;
         }
+        case VC_AST_COLLECTION_EXPRESSION:
+            set_diagnostic(context->diagnostic, context->source, expression->location,
+                "collection expression requires a target array type");
+            return VC_SEM_TYPE_ERROR;
+
         case VC_AST_LAMBDA_EXPRESSION:
             set_diagnostic(context->diagnostic, context->source, expression->location,
                 "lambda expression requires a target delegate type");
@@ -30529,7 +31150,7 @@ static bool analyze_constructor_initializer_call(
     }
     bool mapped_expanded = false;
     size_t mapped_rank = 0;
-    if (!callable_matches_arguments(context->model,
+    if (!callable_matches_arguments(context,
             &target->node->as.method_declaration.parameters,
             target->parameter_types, target->parameter_modifiers, target->parameter_count,
             arguments, argument_types, argument_modifiers, arguments->count,

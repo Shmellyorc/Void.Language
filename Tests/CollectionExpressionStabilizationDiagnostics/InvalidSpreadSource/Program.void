@@ -1,0 +1,3 @@
+using Void;
+using Void.Collections;
+public static class Program { public static void Main() { List<int> values = [1,2]; int[] result = [..values]; } }

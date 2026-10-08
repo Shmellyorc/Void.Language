@@ -1,0 +1,1 @@
+using Void; using Void.Collections; public static class Program { public static void Main() { List<int> original = [1,2]; List<int> copy = [..original]; Console.WriteLine(copy.Count); } }

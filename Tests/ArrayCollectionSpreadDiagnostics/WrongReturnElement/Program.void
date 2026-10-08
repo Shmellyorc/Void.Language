@@ -1,0 +1,1 @@
+using Void; public static class Program { public static int[] Create() { string[] source = ["bad"]; return [..source]; } public static void Main() { int[] values = Create(); Console.WriteLine(values.Length); } }

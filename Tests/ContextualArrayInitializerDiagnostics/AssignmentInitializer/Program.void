@@ -1,0 +1,1 @@
+using Void; public static class Program { public static void Main() { int[] values = new int[2]; values = { 1, 2 }; } }

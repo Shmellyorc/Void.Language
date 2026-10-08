@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define VOIDC_VERSION "0.0.360"
+#define VOIDC_VERSION "0.0.370"
 
 static void print_usage(void)
 {

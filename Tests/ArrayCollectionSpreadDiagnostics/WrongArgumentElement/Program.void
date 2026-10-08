@@ -1,0 +1,1 @@
+using Void; public static class Program { public static void Accept(int[] values) {} public static void Main() { string[] source = ["bad"]; Accept([..source]); } }
