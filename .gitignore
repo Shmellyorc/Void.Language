@@ -3,6 +3,9 @@
 **/bin/
 **/publish/
 /Docs/
+/.agents/
+/.aws/
+/.codex/
 
 # Test output
 Tests/.test-logs/
