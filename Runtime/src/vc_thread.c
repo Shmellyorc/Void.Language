@@ -36,7 +36,55 @@ bool vc_native_thread_context_detach(void *context)
 }
 
 
+static bool vc_native_clock_combine_ns(uint64_t seconds, uint64_t fraction, uint64_t *out)
+{
+    const uint64_t scale = UINT64_C(1000000000);
+    if (seconds > UINT64_MAX / scale)
+        return false;
+    const uint64_t whole = seconds * scale;
+    if (fraction > UINT64_MAX - whole)
+        return false;
+    *out = whole + fraction;
+    return true;
+}
+
+
 #if defined(_WIN32)
+
+/* Convert a proper fraction of a second without overflowing its product.
+   The fast path covers ordinary QPC frequencies. Binary long multiplication
+   keeps both the remainder and quotient bounded for full-width inputs. */
+static inline uint64_t vc_native_clock_fraction_ns(uint64_t remainder, uint64_t frequency)
+{
+    const uint64_t scale = UINT64_C(1000000000);
+    if (remainder <= UINT64_MAX / scale)
+        return remainder * scale / frequency;
+    uint64_t quotient = 0;
+    uint64_t residue = 0;
+    for (uint64_t bit = UINT64_C(1) << 29; bit != 0; bit >>= 1)
+    {
+        quotient *= 2;
+        if (residue >= frequency - residue)
+        {
+            residue -= frequency - residue;
+            quotient++;
+        }
+        else
+            residue += residue;
+        if ((scale & bit) != 0)
+        {
+            if (residue >= frequency - remainder)
+            {
+                residue -= frequency - remainder;
+                quotient++;
+            }
+            else
+                residue += remainder;
+        }
+    }
+    return quotient;
+}
+
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -106,11 +154,8 @@ bool vc_native_monotonic_time_ns(uint64_t *nanoseconds)
     const uint64_t freq = (uint64_t)frequency.QuadPart;
     const uint64_t seconds = count / freq;
     const uint64_t remainder = count % freq;
-    if (seconds > UINT64_MAX / UINT64_C(1000000000))
-        return false;
-    *nanoseconds = seconds * UINT64_C(1000000000) +
-        (remainder * UINT64_C(1000000000)) / freq;
-    return true;
+    return vc_native_clock_combine_ns(seconds,
+        vc_native_clock_fraction_ns(remainder, freq), nanoseconds);
 }
 
 bool vc_native_sleep_ms(uint32_t milliseconds)
@@ -493,13 +538,11 @@ bool vc_native_monotonic_time_ns(uint64_t *nanoseconds)
     if (nanoseconds == NULL)
         return false;
     struct timespec now;
-    if (clock_gettime(CLOCK_MONOTONIC, &now) != 0 || now.tv_sec < 0 || now.tv_nsec < 0)
+    if (clock_gettime(CLOCK_MONOTONIC, &now) != 0 || now.tv_sec < 0 ||
+        now.tv_nsec < 0 || now.tv_nsec >= 1000000000L)
         return false;
     const uint64_t seconds = (uint64_t)now.tv_sec;
-    if (seconds > UINT64_MAX / UINT64_C(1000000000))
-        return false;
-    *nanoseconds = seconds * UINT64_C(1000000000) + (uint64_t)now.tv_nsec;
-    return true;
+    return vc_native_clock_combine_ns(seconds, (uint64_t)now.tv_nsec, nanoseconds);
 }
 
 bool vc_native_sleep_ms(uint32_t milliseconds)

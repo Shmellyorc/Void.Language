@@ -100,7 +100,7 @@ def check_diagnostic(name: str, code: str, message: str) -> None:
 
 def main() -> None:
     version = run(VOIDC, 'version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.370',
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.380',
           f'version: {version.stdout} {version.stderr}')
     result = run(VOIDC, 'build', FIXTURE)
     check(result.returncode == 0 and not result.stderr,

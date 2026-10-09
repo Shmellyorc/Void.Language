@@ -55,7 +55,7 @@ def main() -> None:
         support.EXPECTED_OUTPUT = 'True\n' * 24
         check, run = support.check, support.run
         version = run(support.COMPILER, 'version')
-        check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.370', version.stdout)
+        check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.380', version.stdout)
         built = run(support.COMPILER, 'build', fixture)
         check(built.returncode == 0 and not built.stderr, built.stdout + built.stderr)
         executable = fixture / 'bin' / (NAME + ('.exe' if os.name == 'nt' else ''))

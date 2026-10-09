@@ -1,0 +1,139 @@
+namespace Void;
+
+// PCG-XSH-RR 32 (PCG32): 64-bit LCG state, xorshift/rotate 32-bit output.
+// Fixed PCG default stream (increment 1442695040888963407). An explicit
+// signed seed is interpreted as its uint bit pattern, zero-extended to ulong.
+// Seeding follows PCG's two-step initialization: advance from zero, add the
+// seed, and advance again. Only this instance owns and mutates its state.
+// Unsigned overflow is modulo 2^64 / 2^32; rotates shift by 0..31 only.
+// Suitable for simulation and games, NOT cryptographic security.
+public sealed class Random
+{
+    private ulong _state;
+
+    // A single OS entropy request initializes each new instance. No entropy
+    // reads take place after construction; deterministic Next methods are shared.
+    [Native("vc_native_entropy_seed")]
+    private static unsafe extern bool NativeEntropySeed(out ulong seed);
+
+    public Random()
+    {
+        ulong seed = 0ul;
+        if (!NativeEntropySeed(out seed))
+            throw new InvalidOperationException("Operating-system entropy is unavailable.");
+        Initialize(seed);
+    }
+
+    public Random(int seed)
+    {
+        // Preserve the locked #374 signed-to-unsigned seed mapping.
+        Initialize((ulong)(uint)seed);
+    }
+
+    private void Initialize(ulong seed)
+    {
+        _state = 0ul;
+        NextBits();
+        _state += seed;
+        NextBits();
+    }
+
+    // Full-width 32-bit output shared by future bounded and floating APIs.
+    // All intermediates are unsigned. The left shift is always in [0, 31].
+    private uint NextBits()
+    {
+        ulong oldState = _state;
+        _state = oldState * 6364136223846793005ul + 1442695040888963407ul;
+        uint xorshifted = (uint)(((oldState >> 18) ^ oldState) >> 27);
+        uint rotation = (uint)(oldState >> 59);
+        return (xorshifted >> (int)rotation) |
+               (xorshifted << (int)((0u - rotation) & 31u));
+    }
+
+    // Bounded PCG32 output. Reject the low tail before taking a remainder
+    // so each residue has the same number of possible uint source values.
+    // Callers guarantee bound != 0; every accepted bit pattern advances
+    // this instance's same PCG stream, with retries when necessary.
+    private uint NextBounded(uint bound)
+    {
+        uint threshold = (0u - bound) % bound;
+        uint bits = NextBits();
+        while (bits < threshold)
+        {
+            bits = NextBits();
+        }
+        return bits % bound;
+    }
+
+    // Exclusive int.MaxValue bound, unchanged from #374.
+    public int Next()
+    {
+        return (int)NextBounded((uint)(int.MaxValue));
+    }
+
+    public int Next(int maxExclusive)
+    {
+        if (maxExclusive < 0)
+            throw new ArgumentOutOfRangeException("maxExclusive");
+        if (maxExclusive == 0)
+            return 0;
+        return (int)NextBounded((uint)maxExclusive);
+    }
+
+    public int Next(int minInclusive, int maxExclusive)
+    {
+        if (minInclusive > maxExclusive)
+            throw new ArgumentOutOfRangeException("minInclusive");
+        if (minInclusive == maxExclusive)
+            return minInclusive;
+
+        // The half-open interval can contain up to 2^32 - 1 values.
+        // Widen BEFORE subtraction, then add the unsigned offset in long:
+        // neither signed 32-bit overflow nor out-of-range int conversion.
+        uint width = (uint)((long)maxExclusive - (long)minInclusive);
+        uint offset = NextBounded(width);
+        return (int)((long)minInclusive + (long)offset);
+    }
+
+    // Combine 27 then 26 PCG32 high bits into one exactly representable
+    // 53-bit integer. Sequential calls preserve the shared stream order.
+    public double NextDouble()
+    {
+        uint high27 = NextBits() >> 5;
+        uint low26 = NextBits() >> 6;
+        double bits53 = (double)high27 * 67108864.0 + (double)low26;
+        return bits53 * (1.0 / 9007199254740992.0);
+    }
+
+    // Exactly 24 random mantissa bits, with float-only scaling. Casting a
+    // NextDouble result could round up to 1.0f, so use fresh PCG bits.
+    public float NextSingle()
+    {
+        uint bits24 = NextBits() >> 8;
+        return (float)bits24 * (1.0f / 16777216.0f);
+    }
+
+    // Explicit little-endian extraction from each raw PCG32 output word.
+    // A partial final word is discarded (no byte cache): a nonempty call
+    // consumes ceil(buffer.Length / 4) words, including when interleaved
+    // with Next, NextDouble and NextSingle. Empty arrays consume none.
+    public void NextBytes(byte[] buffer)
+    {
+        if (buffer == null)
+            throw new ArgumentNullException("buffer");
+        int index = 0;
+        while (index < buffer.Length)
+        {
+            uint bits = NextBits();
+            int consumed = 0;
+            while (consumed < 4 && index < buffer.Length)
+            {
+                buffer[index] = (byte)(bits & 255u);
+                bits = bits >> 8;
+                consumed++;
+                index++;
+            }
+        }
+    }
+
+}

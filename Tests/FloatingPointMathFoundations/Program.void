@@ -1,0 +1,100 @@
+using Void;
+
+public static class MathHelpers372<T>
+{
+    public static double Root(T ignored, double value)
+    {
+        return Math.Sqrt(value);
+    }
+
+    public static float Angle(T ignored, float y, float x)
+    {
+        return MathF.Atan2(y, x);
+    }
+}
+
+public static class Program
+{
+    private static bool Near(double actual, double expected, double tolerance)
+    {
+        return actual >= expected - tolerance && actual <= expected + tolerance;
+    }
+
+    private static bool NearF(float actual, float expected, float tolerance)
+    {
+        return actual >= expected - tolerance && actual <= expected + tolerance;
+    }
+
+    public static double Distance(double value)
+    {
+        return Math.Sqrt(value);
+    }
+
+    public static float Length(float value)
+    {
+        return MathF.Sqrt(value);
+    }
+
+    public static void Main()
+    {
+        double root = Math.Sqrt(144.0);
+        float length = MathF.Sqrt(25.0f);
+        Console.WriteLine(root == 12.0 && length == 5.0f);
+        Console.WriteLine(Math.Pow(2.0, 8.0) == 256.0 && MathF.Pow(2.0f, 8.0f) == 256.0f);
+        Console.WriteLine(Math.Sqrt(0.0) == 0.0 && MathF.Sqrt(0.0f) == 0.0f);
+        Console.WriteLine(Near(Math.Sqrt(2.0), 1.4142135623730951, 0.00000000000001));
+        Console.WriteLine(NearF(MathF.Sqrt(2.0f), 1.4142135f, 0.000001f));
+        Console.WriteLine(Near(Math.Sin(1.0), 0.8414709848078965, 0.000000000001));
+        Console.WriteLine(NearF(MathF.Sin(1.0f), 0.84147096f, 0.00001f));
+        Console.WriteLine(Near(Math.Cos(1.0), 0.5403023058681398, 0.000000000001));
+        Console.WriteLine(NearF(MathF.Cos(1.0f), 0.5403023f, 0.00001f));
+        Console.WriteLine(Near(Math.Tan(0.5), 0.5463024898437905, 0.000000000001));
+        Console.WriteLine(NearF(MathF.Tan(0.5f), 0.5463025f, 0.00001f));
+        Console.WriteLine(Near(Math.Atan2(1.0, 0.0), 1.5707963267948966, 0.000000000001));
+        Console.WriteLine(NearF(MathF.Atan2(1.0f, 0.0f), 1.5707964f, 0.00001f));
+        Console.WriteLine(Near(Math.Atan2(-1.0, -1.0), -2.356194490192345, 0.000000000001));
+        Console.WriteLine(NearF(MathF.Atan2(-1.0f, -1.0f), -2.3561945f, 0.00001f));
+        Console.WriteLine(Near(Math.Exp(1.0), 2.718281828459045, 0.000000000001));
+        Console.WriteLine(NearF(MathF.Exp(1.0f), 2.7182817f, 0.00001f));
+        Console.WriteLine(Near(Math.Log(2.718281828459045), 1.0, 0.000000000001));
+        Console.WriteLine(NearF(MathF.Log(2.7182817f), 1.0f, 0.00001f));
+        Console.WriteLine(Near(Math.Log10(1000.0), 3.0, 0.000000000001));
+        Console.WriteLine(NearF(MathF.Log10(1000.0f), 3.0f, 0.00001f));
+        Console.WriteLine(Math.Sin(0.0) == 0.0 && MathF.Cos(0.0f) == 1.0f);
+        Console.WriteLine(Near(Math.Pow(9.0, -0.5), 1.0 / 3.0, 0.000000000001));
+        Console.WriteLine(NearF(MathF.Pow(9.0f, -0.5f), 1.0f / 3.0f, 0.00001f));
+        Console.WriteLine(Math.Sqrt(-1.0) != Math.Sqrt(-1.0));
+        Console.WriteLine(MathF.Sqrt(-1.0f) != MathF.Sqrt(-1.0f));
+        double neglog = Math.Log(-1.0);
+        float neglogf = MathF.Log(-1.0f);
+        Console.WriteLine(neglog != neglog && neglogf != neglogf);
+        Console.WriteLine(Math.Log(0.0) == double.NegativeInfinity && MathF.Log(0.0f) == float.NegativeInfinity);
+        Console.WriteLine(Math.Sqrt(double.PositiveInfinity) == double.PositiveInfinity);
+        Console.WriteLine(MathF.Sqrt(float.PositiveInfinity) == float.PositiveInfinity);
+        Console.WriteLine(Math.Exp(double.NegativeInfinity) == 0.0 && MathF.Exp(float.NegativeInfinity) == 0.0f);
+        Console.WriteLine(Math.Log(double.PositiveInfinity) == double.PositiveInfinity && MathF.Log(float.PositiveInfinity) == float.PositiveInfinity);
+        double nan = Math.Sin(double.PositiveInfinity);
+        float nanf = MathF.Sin(float.PositiveInfinity);
+        Console.WriteLine(nan != nan && nanf != nanf);
+        Console.WriteLine(Math.Sqrt(double.NaN) != Math.Sqrt(double.NaN));
+        Console.WriteLine(MathF.Sqrt(float.NaN) != MathF.Sqrt(float.NaN));
+        double negativeZero = -0.0;
+        float negativeZeroF = -0.0f;
+        Console.WriteLine(1.0 / Math.Sqrt(negativeZero) == double.NegativeInfinity);
+        Console.WriteLine(1.0f / MathF.Sqrt(negativeZeroF) == float.NegativeInfinity);
+        Console.WriteLine(Math.Atan2(0.0, -1.0) > 3.14 && MathF.Atan2(0.0f, -1.0f) > 3.14f);
+        Console.WriteLine(Math.Atan2(-0.0, -1.0) < -3.14 && MathF.Atan2(-0.0f, -1.0f) < -3.14f);
+        Console.WriteLine(Near(Math.Sqrt(1.0e-200), 1.0e-100, 1.0e-110));
+        Console.WriteLine(NearF(MathF.Sqrt(1.0e-30f), 1.0e-15f, 1.0e-20f));
+        Console.WriteLine(Math.Sqrt(1.0e200) > 1.0e99 && MathF.Sqrt(1.0e30f) > 1.0e14f);
+        Console.WriteLine(Distance(81.0) == 9.0 && Length(36.0f) == 6.0f);
+        Console.WriteLine(MathHelpers372<int>.Root(1, 169.0) == 13.0);
+        Console.WriteLine(NearF(MathHelpers372<string>.Angle("hello", 1.0f, 0.0f), 1.5707964f, 0.00001f));
+        int minimum = Math.Min(10, 20);
+        Console.WriteLine(minimum == 10 && Math.Max(30, 20) == 30);
+        Console.WriteLine(Math.Abs(-42) == 42 && Math.Clamp(15, 0, 10) == 10 && Math.Sign(-9) == -1);
+        Console.WriteLine(Math.Min(long.MinValue, long.MaxValue) == long.MinValue);
+        Console.WriteLine(Math.Sqrt(4.0f) == 2.0); // ordinary widening to Math(double)
+        Console.WriteLine(MathF.Sqrt(4.0f) == 2.0f);
+    }
+}

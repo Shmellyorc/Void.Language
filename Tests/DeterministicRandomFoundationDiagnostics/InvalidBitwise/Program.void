@@ -1,0 +1,1 @@
+using Void; public static class Program { public static void Main() { uint a = 5u; int b = 3; uint c = a ^ b; } }

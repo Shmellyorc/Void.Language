@@ -4654,6 +4654,28 @@ static bool native_struct_abi_supported(const VcSemanticModel *model, size_t str
     return true;
 }
 
+static bool safe_native_scalar_type(VcSemanticType type)
+{
+    switch (type)
+    {
+        case VC_SEM_TYPE_BOOL:
+        case VC_SEM_TYPE_BYTE:
+        case VC_SEM_TYPE_SBYTE:
+        case VC_SEM_TYPE_SHORT:
+        case VC_SEM_TYPE_USHORT:
+        case VC_SEM_TYPE_INT:
+        case VC_SEM_TYPE_UINT:
+        case VC_SEM_TYPE_LONG:
+        case VC_SEM_TYPE_ULONG:
+        case VC_SEM_TYPE_FLOAT:
+        case VC_SEM_TYPE_DOUBLE:
+        case VC_SEM_TYPE_CHAR:
+            return true;
+        default:
+            return false;
+    }
+}
+
 static bool extern_abi_type_supported(
     const VcSemanticModel *model,
     VcSemanticType type,
@@ -5443,6 +5465,31 @@ static bool validate_extension_method_declaration(
         set_diagnostic(diagnostic, source, receiver->location,
             "extension receiver cannot have a default value");
         return false;
+    }
+    return true;
+}
+
+/* C allows repeated extern declarations for the same symbol when their ABI
+   contracts agree. Projects may import a symbol already used by the library. */
+static bool native_symbol_declarations_compatible(
+    const VcSemanticMethod *left, const VcSemanticMethod *right)
+{
+    if (left->return_type != right->return_type ||
+        left->returns_ref != right->returns_ref ||
+        left->returns_ref_readonly != right->returns_ref_readonly ||
+        left->parameter_count != right->parameter_count ||
+        left->native_string_return_contract != right->native_string_return_contract ||
+        strcmp(left->native_string_release_c_name, right->native_string_release_c_name) != 0)
+        return false;
+    for (size_t i = 0; i < left->parameter_count; i++)
+    {
+        if (left->parameter_types[i] != right->parameter_types[i] ||
+            left->parameter_modifiers[i] != right->parameter_modifiers[i] ||
+            (left->native_string_parameter_contracts != NULL
+                ? left->native_string_parameter_contracts[i] : VC_NATIVE_STRING_CONTRACT_NONE) !=
+            (right->native_string_parameter_contracts != NULL
+                ? right->native_string_parameter_contracts[i] : VC_NATIVE_STRING_CONTRACT_NONE))
+            return false;
     }
     return true;
 }
@@ -6595,7 +6642,8 @@ static bool collect_methods(
                 for (size_t existing_index = 0; existing_index < model->method_count; existing_index++)
                 {
                     const VcSemanticMethod *existing = &model->methods[existing_index];
-                    if (existing->is_extern && strcmp(existing->c_name, method.c_name) == 0)
+                    if (existing->is_extern && strcmp(existing->c_name, method.c_name) == 0 &&
+                        !native_symbol_declarations_compatible(existing, &method))
                     {
                         free(method.parameter_types);
                         free(method.parameter_modifiers);
@@ -10144,6 +10192,9 @@ static VcTokenKind compound_binary_operator(VcTokenKind kind)
 {
     switch (kind)
     {
+        case VC_TOKEN_AMPERSAND_EQUAL: return VC_TOKEN_AMPERSAND;
+        case VC_TOKEN_PIPE_EQUAL: return VC_TOKEN_PIPE;
+        case VC_TOKEN_CARET_EQUAL: return VC_TOKEN_CARET;
         case VC_TOKEN_PLUS_EQUAL: return VC_TOKEN_PLUS;
         case VC_TOKEN_MINUS_EQUAL: return VC_TOKEN_MINUS;
         case VC_TOKEN_STAR_EQUAL: return VC_TOKEN_STAR;
@@ -18949,7 +19000,22 @@ static VcSemanticType analyze_call(VcSemanticContext *context, const VcAstNode *
         return VC_SEM_TYPE_ERROR;
     }
 
-    if (target_method->is_unsafe && !context_is_unsafe(context))
+    /* The trusted StandardLibrary can safely wrap scalar-only native ABI calls.
+       User source still requires unsafe; pointers, managed references and ref/in parameters never qualify for this bridge; primitive out is safe. */
+    bool safe_standard_native_call = source_is_standard_library(context->source) &&
+        source_is_standard_library(target_method->source) && target_method->is_extern &&
+        safe_native_scalar_type(target_method->return_type);
+    /* Trusted StandardLibrary wrappers may also receive primitive out values:
+       the compiler supplies the owned scalar slot and no managed pointer or
+       reference can escape. User native calls remain unsafe. */
+    for (size_t i = 0; safe_standard_native_call && i < target_method->parameter_count; i++)
+    {
+        if (!safe_native_scalar_type(target_method->parameter_types[i]) ||
+            (target_method->parameter_modifiers[i] != VC_TOKEN_EOF &&
+             target_method->parameter_modifiers[i] != VC_TOKEN_KW_OUT))
+            safe_standard_native_call = false;
+    }
+    if (target_method->is_unsafe && !context_is_unsafe(context) && !safe_standard_native_call)
     {
         set_diagnostic(context->diagnostic, context->source, expression->location,
             "unsafe method '%s' requires an unsafe method",
@@ -25558,6 +25624,21 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                         context_type_display_name(context, right));
                     return VC_SEM_TYPE_ERROR;
 
+                // Unsigned bitwise operations used by portable PRNG algorithms
+                // compile directly to the defined C11 unsigned operators.
+                case VC_TOKEN_AMPERSAND:
+                case VC_TOKEN_PIPE:
+                case VC_TOKEN_CARET:
+                    if (left == right &&
+                        (left == VC_SEM_TYPE_UINT || left == VC_SEM_TYPE_ULONG))
+                    {
+                        type = left;
+                        break;
+                    }
+                    set_diagnostic(context->diagnostic, context->source, expression->location,
+                        "bitwise operator requires matching unsigned operands");
+                    return VC_SEM_TYPE_ERROR;
+
                 case VC_TOKEN_LESS_LESS:
                 case VC_TOKEN_GREATER_GREATER:
                     if ((left == VC_SEM_TYPE_BYTE || left == VC_SEM_TYPE_SBYTE ||
@@ -26715,6 +26796,10 @@ static VcSemanticType analyze_expression(VcSemanticContext *context, const VcAst
                 type = left;
             }
             else if (left == right && is_numeric(left) &&
+                ((expression->as.assignment_expression.operator_kind != VC_TOKEN_AMPERSAND_EQUAL &&
+                  expression->as.assignment_expression.operator_kind != VC_TOKEN_PIPE_EQUAL &&
+                  expression->as.assignment_expression.operator_kind != VC_TOKEN_CARET_EQUAL) ||
+                 is_integral(left)) &&
                 ((expression->as.assignment_expression.operator_kind != VC_TOKEN_LESS_LESS_EQUAL &&
                   expression->as.assignment_expression.operator_kind != VC_TOKEN_GREATER_GREATER_EQUAL) ||
                  (left != VC_SEM_TYPE_CHAR && is_integral(left))))

@@ -1,0 +1,169 @@
+using Void;
+using Void.Collections;
+using Void.Diagnostics;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class AuditBox<T>
+{
+    public T Value;
+    public Random Random;
+    public Stopwatch Watch;
+    public AuditBox(T value, int seed)
+    {
+        Value = value;
+        Random = new Random(seed);
+        Watch = new Stopwatch();
+    }
+}
+
+public static class Program
+{
+    [Native("audit_rounding_mode")]
+    private static unsafe extern bool RoundingMode(int mode);
+
+    private static int _bits;
+    public static int Bits { get { return _bits; } set { _bits = value; } }
+
+    private static IEnumerator<int> Samples(Random random, Stopwatch watch)
+    {
+        watch.Start();
+        try
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                GC.Collect();
+                yield return Math.Clamp(random.Next(int.MinValue, 1), -100, 0);
+            }
+        }
+        finally { watch.Stop(); }
+    }
+
+    private static async Task<int> AwaitDraw(AuditBox<string> box)
+    {
+        await Task.Delay(1);
+        GC.Collect();
+        int result = box.Random.Next(int.MinValue, 1);
+        box.Watch.Stop();
+        return result;
+    }
+
+    public static unsafe void Main()
+    {
+        AuditReference.Run();
+        int local = -1;
+        local &= 15; local |= 16; local ^= 3;
+        Console.WriteLine(local == 28);
+        Bits = -1;
+        Bits &= 15; Bits |= 16; Bits ^= 3;
+        Console.WriteLine(Bits == 28);
+        int[] bitArray = new int[1];
+        bitArray[0] = -1;
+        bitArray[0] &= 15; bitArray[0] |= 16; bitArray[0] ^= 3;
+        Console.WriteLine(bitArray[0] == 28);
+        Console.WriteLine(Math.Min(sbyte.MinValue, sbyte.MaxValue) == sbyte.MinValue);
+        Console.WriteLine(Math.Max(byte.MinValue, byte.MaxValue) == byte.MaxValue);
+        Console.WriteLine(Math.Clamp(short.MinValue, short.MinValue, short.MaxValue) == short.MinValue);
+        Console.WriteLine(Math.Clamp(ushort.MaxValue, ushort.MinValue, ushort.MaxValue) == ushort.MaxValue);
+        Console.WriteLine(Math.Max(uint.MinValue, uint.MaxValue) == uint.MaxValue);
+        Console.WriteLine(Math.Clamp(ulong.MaxValue, 0ul, ulong.MaxValue) == ulong.MaxValue);
+        Console.WriteLine(Math.Sign(sbyte.MinValue) == -1 && Math.Sign(short.MinValue) == -1);
+        Console.WriteLine(Math.Sign(int.MinValue) == -1 && Math.Sign(long.MinValue) == -1);
+        bool a = false;
+        bool b = false;
+        bool c = false;
+        bool d = false;
+        try { Math.Abs(sbyte.MinValue); } catch (OverflowException) { a = true; }
+        try { Math.Abs(short.MinValue); } catch (OverflowException) { b = true; }
+        try { Math.Abs(int.MinValue); } catch (OverflowException) { c = true; }
+        try { Math.Abs(long.MinValue); } catch (OverflowException) { d = true; }
+        Console.WriteLine(a && b && c && d);
+        bool clamp = false;
+        try { Math.Clamp(1ul, ulong.MaxValue, 0ul); }
+        catch (ArgumentException) { clamp = true; }
+        Console.WriteLine(clamp);
+        Console.WriteLine(Math.Abs(-127) == 127 && Math.Abs(0l) == 0l && Math.Abs(long.MaxValue) == long.MaxValue);
+
+        // Native fenv modes are restored before subsequent workloads. Results
+        // are exact here; transcendental results below use tolerances.
+        for (int mode = 0; mode < 4; mode++)
+        {
+            Console.WriteLine(RoundingMode(mode));
+            Console.WriteLine(Math.Round(0.5) == 0.0 && Math.Round(1.5) == 2.0 && Math.Round(2.5) == 2.0);
+            Console.WriteLine(Math.Round(-1.5) == -2.0 && Math.Round(-2.5) == -2.0);
+            Console.WriteLine(MathF.Round(0.5f) == 0.0f && MathF.Round(1.5f) == 2.0f && MathF.Round(2.5f) == 2.0f);
+            Console.WriteLine(1.0 / Math.Round(-0.5) == double.NegativeInfinity);
+            Console.WriteLine(1.0f / MathF.Round(-0.0f) == float.NegativeInfinity);
+            Console.WriteLine(Math.Round(4503599627370495.5) == 4503599627370496.0);
+            Console.WriteLine(MathF.Round(8388607.5f) == 8388608.0f);
+        }
+        Console.WriteLine(RoundingMode(0));
+        double identity = Math.Sin(0.7) * Math.Sin(0.7) + Math.Cos(0.7) * Math.Cos(0.7);
+        Console.WriteLine(identity > 0.999999999999 && identity < 1.000000000001);
+        float identityF = MathF.Log(MathF.Exp(0.7f));
+        Console.WriteLine(identityF > 0.69999f && identityF < 0.70001f);
+        Console.WriteLine(Math.Log(0.0) == double.NegativeInfinity && MathF.Sqrt(-1.0f) != MathF.Sqrt(-1.0f));
+        Console.WriteLine(Math.Round(double.NaN) != Math.Round(double.NaN));
+        Console.WriteLine(MathF.Round(float.PositiveInfinity) == float.PositiveInfinity);
+        Console.WriteLine(1.0 / Math.Sqrt(-0.0) == double.NegativeInfinity);
+        double angle = Math.Atan2(-0.0, -1.0);
+        Console.WriteLine(angle > -3.141593 && angle < -3.141592);
+
+        AuditBox<string> box = new AuditBox<string>("rooted", -17);
+        Random reference = new Random(-17);
+        IEnumerator<int> iterator = Samples(box.Random, box.Watch);
+        bool same = true;
+        for (int i = 0; i < 8; i++)
+        {
+            if (!iterator.MoveNext()) same = false;
+            int expected = Math.Clamp(reference.Next(int.MinValue, 1), -100, 0);
+            if (iterator.Current != expected) same = false;
+        }
+        Console.WriteLine(same && !iterator.MoveNext() && !box.Watch.IsRunning);
+        Console.WriteLine(box.Random.Next() == reference.Next());
+        box.Watch.Restart();
+        Task<int> task = AwaitDraw(box);
+        int asyncValue = task.Result;
+        int referenceValue = reference.Next(int.MinValue, 1);
+        Console.WriteLine(asyncValue == referenceValue && !box.Watch.IsRunning && box.Value == "rooted");
+        iterator.Dispose();
+
+        Random left = new Random(91);
+        Random right = new Random(91);
+        int x = 0;
+        int y = 0;
+        Thread first = new Thread(() => {
+            for (int i = 0; i < 50; i++) x ^= left.Next(int.MinValue, 1);
+        });
+        Thread second = new Thread(() => {
+            for (int i = 0; i < 50; i++) y ^= right.Next(int.MinValue, 1);
+        });
+        first.Start(); second.Start(); first.Join(); second.Join();
+        Console.WriteLine(x == y);
+        Console.WriteLine(left.Next() == right.Next());
+
+        Stopwatch watch = new Stopwatch();
+        Console.WriteLine(!watch.IsRunning && watch.ElapsedTicks == 0l);
+        for (int i = 0; i < 20; i++)
+        {
+            long previous = watch.ElapsedTicks;
+            watch.Start(); watch.Start();
+            left.NextDouble(); Math.Sqrt(2.0);
+            watch.Stop(); watch.Stop();
+            if (watch.ElapsedTicks < previous) same = false;
+        }
+        Console.WriteLine(same && watch.ElapsedMilliseconds == watch.ElapsedTicks / 1000000l);
+        watch.Reset();
+        Console.WriteLine(!watch.IsRunning && watch.ElapsedTicks == 0l);
+        Random automatic = new Random();
+        double autoValue = automatic.NextDouble();
+        Console.WriteLine(autoValue >= 0.0 && autoValue < 1.0);
+        bool caught = false;
+        int cleanups = 0;
+        watch.Start();
+        try { automatic.NextBytes(null); }
+        catch (ArgumentNullException) { caught = true; }
+        finally { watch.Stop(); cleanups++; GC.Collect(); }
+        Console.WriteLine(caught && cleanups == 1 && !watch.IsRunning);
+    }
+}

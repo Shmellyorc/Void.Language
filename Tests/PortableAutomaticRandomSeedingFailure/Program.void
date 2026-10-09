@@ -1,0 +1,14 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        bool failed = false;
+        try { Random r = new Random(); Console.WriteLine(false); }
+        catch (InvalidOperationException error)
+        {
+            failed = error.Message == "Operating-system entropy is unavailable.";
+        }
+        Console.WriteLine(failed);
+    }
+}

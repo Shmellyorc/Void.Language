@@ -1,0 +1,116 @@
+namespace Void;
+
+// Float math is performed through native C float signatures (never double).
+public static class MathF
+{
+    [Native("sqrtf")]
+    private static unsafe extern float NativeSqrt(float value);
+    [Native("floorf")]
+    private static unsafe extern float NativeFloor(float value);
+    public static float Floor(float value)
+    {
+        return NativeFloor(value);
+    }
+
+    [Native("ceilf")]
+    private static unsafe extern float NativeCeiling(float value);
+    public static float Ceiling(float value)
+    {
+        return NativeCeiling(value);
+    }
+
+    [Native("truncf")]
+    private static unsafe extern float NativeTruncate(float value);
+    public static float Truncate(float value)
+    {
+        return NativeTruncate(value);
+    }
+
+    [Native("fmodf")]
+    private static unsafe extern float NativeRemainder(float value, float divisor);
+
+    // Nearest integral value with midpoint-to-even, independent of the C fenv
+    // rounding-mode setting. No intermediate integer conversion is needed.
+    public static float Round(float value)
+    {
+        if (value == 0.0f || value != value) return value;
+        bool negative = value < 0.0f;
+        float magnitude = negative ? -value : value;
+        float whole = NativeFloor(magnitude);
+        // Includes both infinities and values beyond the fractional precision.
+        if (whole == magnitude) return value;
+        float fraction = magnitude - whole;
+        float rounded = whole;
+        if (fraction > 0.5f ||
+            (fraction == 0.5f && NativeRemainder(whole, 2.0f) != 0.0f))
+        {
+            rounded = whole + 1.0f;
+        }
+        // Directed host rounding can give an intermediate zero either sign.
+        // The result's zero sign follows the original input explicitly.
+        if (rounded == 0.0f) return negative ? -0.0f : 0.0f;
+        return negative ? -rounded : rounded;
+    }
+
+    public static float Sqrt(float value)
+    {
+        return NativeSqrt(value);
+    }
+
+    [Native("powf")]
+    private static unsafe extern float NativePow(float x, float y);
+    public static float Pow(float x, float y)
+    {
+        return NativePow(x, y);
+    }
+
+    [Native("sinf")]
+    private static unsafe extern float NativeSin(float value);
+    public static float Sin(float value)
+    {
+        return NativeSin(value);
+    }
+
+    [Native("cosf")]
+    private static unsafe extern float NativeCos(float value);
+    public static float Cos(float value)
+    {
+        return NativeCos(value);
+    }
+
+    [Native("tanf")]
+    private static unsafe extern float NativeTan(float value);
+    public static float Tan(float value)
+    {
+        return NativeTan(value);
+    }
+
+    [Native("atan2f")]
+    private static unsafe extern float NativeAtan2(float y, float x);
+    public static float Atan2(float y, float x)
+    {
+        return NativeAtan2(y, x);
+    }
+
+    [Native("expf")]
+    private static unsafe extern float NativeExp(float value);
+    public static float Exp(float value)
+    {
+        return NativeExp(value);
+    }
+
+    [Native("logf")]
+    private static unsafe extern float NativeLog(float value);
+    public static float Log(float value)
+    {
+        return NativeLog(value);
+    }
+
+    [Native("log10f")]
+    private static unsafe extern float NativeLog10(float value);
+    public static float Log10(float value)
+    {
+        return NativeLog10(value);
+    }
+
+}

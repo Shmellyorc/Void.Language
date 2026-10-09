@@ -34,7 +34,7 @@ while remaining:
     messages.append(json.loads(content[:length].decode('utf-8')))
     remaining = content[length:]
 assert len(messages) == 2, messages
-assert messages[0]['id'] == 1 and messages[0]['result']['serverInfo']['version'] == '0.0.370', messages
+assert messages[0]['id'] == 1 and messages[0]['result']['serverInfo']['version'] == '0.0.380', messages
 capabilities = messages[0]['result']['capabilities']
 assert capabilities == dict(textDocumentSync=1, hoverProvider=True,
     signatureHelpProvider=dict(triggerCharacters=['(', ',']),

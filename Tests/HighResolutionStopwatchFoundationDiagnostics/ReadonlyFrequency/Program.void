@@ -1,0 +1,2 @@
+using Void.Diagnostics;
+public static class Program { public static void Main() { Stopwatch.Frequency = 42l; } }

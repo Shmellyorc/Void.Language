@@ -1,0 +1,10 @@
+using Void;
+using Void.Diagnostics;
+public static class Program
+{
+    public static void Main()
+    {
+        Stopwatch timer = Stopwatch.StartNew();
+        timer.ElapsedTicks = 17l;
+    }
+}

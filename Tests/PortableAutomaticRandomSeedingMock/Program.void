@@ -1,0 +1,20 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        Random r = new Random();
+        Console.WriteLine(r.Next());
+        Console.WriteLine(r.Next());
+        Console.WriteLine(r.Next(1000));
+        Console.WriteLine(r.Next(-500, 500));
+        Console.WriteLine((int)(r.NextSingle() * 16777216.0f));
+        byte[] data = new byte[5];
+        r.NextBytes(data);
+        Console.WriteLine((int)data[0]);
+        Console.WriteLine((int)data[1]);
+        Console.WriteLine((int)data[2]);
+        Console.WriteLine((int)data[3]);
+        Console.WriteLine((int)data[4]);
+    }
+}

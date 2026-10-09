@@ -1,0 +1,54 @@
+using Void;
+using Void.Diagnostics;
+
+public static class Program
+{
+    public static void Main()
+    {
+        Stopwatch watch = new Stopwatch();
+        watch.Start();                   // clock 100
+        watch.Start();                   // no clock read
+        Console.WriteLine(watch.ElapsedTicks == 1000000000l); // clock 1000000100
+        Console.WriteLine(watch.ElapsedMilliseconds == 2000l); // clock 2000000100
+        watch.Stop();                    // clock 3000000100
+        Console.WriteLine(watch.ElapsedTicks == 3000000000l);
+        watch.Stop();                    // no clock read
+        watch.Start();                   // clock 4000000100
+        watch.Stop();                    // clock 5000000100
+        Console.WriteLine(watch.ElapsedTicks == 4000000000l);
+        watch.Reset();
+        Console.WriteLine(!watch.IsRunning && watch.ElapsedTicks == 0l);
+        watch.Restart();                 // clock 6000000100
+        Console.WriteLine(watch.ElapsedTicks == 1000000l);     // clock 6001000100
+        watch.Stop();                    // clock 6002000100
+        Console.WriteLine(watch.ElapsedMilliseconds == 2l);
+        Console.WriteLine(Stopwatch.GetTimestamp() == 6003000100l); // clock 6003000100
+        Console.WriteLine(Stopwatch.Frequency == 1000000000l);
+        bool failed = false;
+        try { Stopwatch.GetTimestamp(); } // clock failure
+        catch (InvalidOperationException) { failed = true; }
+        Console.WriteLine(failed);
+        bool overflow = false;
+        try { Stopwatch.GetTimestamp(); } // UINT64_MAX
+        catch (OverflowException) { overflow = true; }
+        Console.WriteLine(overflow);
+        // Verify a stalled/incorrect host clock can never yield negative time.
+        Stopwatch backwards = new Stopwatch();
+        backwards.Start();              // clock 1000
+        Console.WriteLine(backwards.ElapsedTicks == 0l); // clock 500
+        backwards.Stop();               // clock 800
+        Console.WriteLine(backwards.ElapsedTicks == 0l);
+        // Accumulated nanoseconds must throw instead of silently wrapping.
+        Stopwatch big = new Stopwatch();
+        big.Start();                    // clock 0
+        big.Stop();                     // clock LONG_MAX-1
+        big.Start();                    // clock LONG_MAX-1
+        big.Stop();                     // clock LONG_MAX (accumulated exactly MAX)
+        big.Start();                    // clock 0, simulated epoch rollover
+        bool totalOverflow = false;
+        try { big.Stop(); }             // clock 1, beyond representable total
+        catch (OverflowException) { totalOverflow = true; }
+        Console.WriteLine(totalOverflow);
+        Console.WriteLine(big.IsRunning);
+    }
+}

@@ -1,0 +1,2 @@
+using Void.Diagnostics;
+public static class Program { public static void Main() { Stopwatch timer = new Stopwatch(3); } }

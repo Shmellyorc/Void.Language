@@ -1157,7 +1157,7 @@ test-lsp: $(BIN)
 	output="$$( { printf 'Content-Length: %d\r\n\r\n%s' "$${#msg}" "$$msg"; \
 	msg='{"jsonrpc":"2.0","id":2,"method":"shutdown","params":null}'; printf 'Content-Length: %d\r\n\r\n%s' "$${#msg}" "$$msg"; \
 	msg='{"jsonrpc":"2.0","method":"exit","params":null}'; printf 'Content-Length: %d\r\n\r\n%s' "$${#msg}" "$$msg"; } | ./$(BIN) lsp )"; \
-	printf '%s' "$$output" | grep -Fq '"serverInfo":{"name":"voidc","version":"0.0.370"}'; \
+	printf '%s' "$$output" | grep -Fq '"serverInfo":{"name":"voidc","version":"0.0.380"}'; \
 	echo True
 	@set -e; \
 	msg='{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}'; \
@@ -1365,7 +1365,7 @@ test-tooling-integration: $(BIN)
 	msg="$$(printf '{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"textDocument":{"uri":"%s","version":3},"contentChanges":[{"text":"%s"}]}}' "$$program_uri" "$$program_v1")"; printf 'Content-Length: %d\r\n\r\n%s' "$${#msg}" "$$msg"; \
 	msg='{"jsonrpc":"2.0","id":15,"method":"shutdown","params":null}'; printf 'Content-Length: %d\r\n\r\n%s' "$${#msg}" "$$msg"; \
 	msg='{"jsonrpc":"2.0","method":"exit","params":null}'; printf 'Content-Length: %d\r\n\r\n%s' "$${#msg}" "$$msg"; } | ./$(BIN) lsp )"; \
-	printf '%s' "$$output" | grep -Fq '"serverInfo":{"name":"voidc","version":"0.0.370"}'; \
+	printf '%s' "$$output" | grep -Fq '"serverInfo":{"name":"voidc","version":"0.0.380"}'; \
 	printf '%s' "$$output" | grep -Fq '"hoverProvider":true'; \
 	printf '%s' "$$output" | grep -Fq '"completionProvider":{"triggerCharacters":["."]}'; \
 	printf '%s' "$$output" | grep -Fq '"definitionProvider":true,"referencesProvider":true,"documentSymbolProvider":true,"workspaceSymbolProvider":true'; \
@@ -4870,7 +4870,7 @@ test-unmanaged-memory-native-buffer-integration-audit: $(BIN)
 	@./$(BIN) check Tests/PinningGcThreadsExceptionsNativeBoundaryIntegration/Library >/dev/null && echo True
 	@./$(BIN) check Tests/UnmanagedMemoryNativeBufferIntegrationAudit/AsyncUnsafe >/dev/null && echo True
 	@out=$$(mktemp); $(MAKE) --no-print-directory -s test-async-object-model-library-boundary-integration >$$out; test "$$(grep -c '^True$$' $$out)" -eq 31; rm -f $$out; echo True
-	@grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c && grep -Fq '"version": "0.0.250"' Tests/UnmanagedMemoryNativeBufferIntegrationAudit/Library/UnmanagedMemoryNativeBufferIntegrationAudit.voidproj && grep -Fq '"version": "0.0.250"' Tests/UnmanagedMemoryNativeBufferIntegrationAudit/Surface/UnmanagedMemoryNativeBufferIntegrationAudit.voidproj; echo True
+	@grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c && grep -Fq '"version": "0.0.250"' Tests/UnmanagedMemoryNativeBufferIntegrationAudit/Library/UnmanagedMemoryNativeBufferIntegrationAudit.voidproj && grep -Fq '"version": "0.0.250"' Tests/UnmanagedMemoryNativeBufferIntegrationAudit/Surface/UnmanagedMemoryNativeBufferIntegrationAudit.voidproj; echo True
 	@grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py && grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-native-heap-runtime-foundation
@@ -4890,7 +4890,7 @@ test-native-heap-runtime-foundation: $(BIN)
 	@grep -Fq 'vc_memory.c' Compiler/src/compiler.c && grep -Fq 'vc_memory_runtime.o' Compiler/src/compiler.c && grep -Fq 'runtime_memory_source' Compiler/src/compiler.c; echo True
 	@./$(BIN) build Tests/LibraryOutput/Library >/dev/null; ar t Tests/LibraryOutput/Library/bin/libVoid099Lib.a | grep -Fq 'vc_memory_runtime.o'; echo True
 	@./$(BIN) publish Tests/LibraryOutput/Library >/dev/null; ar t Tests/LibraryOutput/Library/publish/libVoid099Lib.a | grep -Fq 'vc_memory_runtime.o'; echo True
-	@grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c && grep -Fq '"version": "0.0.251"' Tests/NativeHeapRuntimeFoundation/NativeHeapRuntimeFoundation.voidproj; echo True
+	@grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c && grep -Fq '"version": "0.0.251"' Tests/NativeHeapRuntimeFoundation/NativeHeapRuntimeFoundation.voidproj; echo True
 	@./$(BIN) check Tests/NativeThreadRuntimeFoundation >/dev/null && ./$(BIN) check Tests/UnmanagedMemoryNativeBufferIntegrationAudit/Surface >/dev/null && echo True
 	@grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py && grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 .PHONY: test-native-memory-allocation-surface
@@ -4915,7 +4915,7 @@ test-native-memory-allocation-surface: $(BIN)
 	@out=$$(mktemp); $(MAKE) --no-print-directory -s test-native-heap-runtime-foundation >$$out; test "$$(grep -c '^True$$' $$out)" -eq 26; rm -f $$out; echo True
 	@./$(BIN) check Tests/UnmanagedMemoryNativeBufferIntegrationAudit/Surface >/dev/null && echo True
 	@./$(BIN) build Tests/LibraryOutput/Library >/dev/null; ar t Tests/LibraryOutput/Library/bin/libVoid099Lib.a | grep -Fq 'vc_memory_runtime.o'; echo True
-	@grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c && grep -Fq '"version": "0.0.252"' Tests/NativeMemoryAllocationSurface/NativeMemoryAllocationSurface.voidproj && grep -Fq '"version": "0.0.251"' Tests/NativeHeapRuntimeFoundation/NativeHeapRuntimeFoundation.voidproj; echo True
+	@grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c && grep -Fq '"version": "0.0.252"' Tests/NativeMemoryAllocationSurface/NativeMemoryAllocationSurface.voidproj && grep -Fq '"version": "0.0.251"' Tests/NativeHeapRuntimeFoundation/NativeHeapRuntimeFoundation.voidproj; echo True
 	@grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py && grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -4943,7 +4943,7 @@ test-generic-typed-native-allocation-completion: $(BIN)
 	@out=$$(mktemp); $(MAKE) --no-print-directory -s test-native-memory-allocation-surface >$$out; test "$$(grep -c '^True$$' $$out)" -eq 28; rm -f $$out; echo True
 	@./$(BIN) check Tests/UnmanagedGenericConstraintFoundation >/dev/null && ./$(BIN) check Tests/GenericPointerUnmanagedStackStorage >/dev/null && echo True
 	@./$(BIN) check Tests/NativeStructs >/dev/null && ./$(BIN) check Tests/UnmanagedSpanConstructionCompletion >/dev/null && echo True
-	@grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c && grep -Fq '"version": "0.0.253"' Tests/GenericTypedNativeAllocationCompletion/GenericTypedNativeAllocationCompletion.voidproj && grep -Fq '"version": "0.0.252"' Tests/NativeMemoryAllocationSurface/NativeMemoryAllocationSurface.voidproj; echo True
+	@grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c && grep -Fq '"version": "0.0.253"' Tests/GenericTypedNativeAllocationCompletion/GenericTypedNativeAllocationCompletion.voidproj && grep -Fq '"version": "0.0.252"' Tests/NativeMemoryAllocationSurface/NativeMemoryAllocationSurface.voidproj; echo True
 	@grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py && grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -4976,7 +4976,7 @@ test-native-reallocation-alignment-completion: $(BIN)
 	@out=$$(mktemp); $(MAKE) --no-print-directory -s test-generic-typed-native-allocation-completion >$$out; test "$$(grep -c '^True$$' $$out)" -eq 39; rm -f $$out; echo True
 	@out=$$(mktemp); $(MAKE) --no-print-directory -s test-native-memory-allocation-surface >$$out; test "$$(grep -c '^True$$' $$out)" -eq 28; rm -f $$out; echo True
 	@out=$$(mktemp); $(MAKE) --no-print-directory -s test-native-heap-runtime-foundation >$$out; test "$$(grep -c '^True$$' $$out)" -eq 26; rm -f $$out; echo True
-	@grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c && grep -Fq '"version": "0.0.254"' Tests/NativeReallocationAlignmentCompletion/NativeReallocationAlignmentCompletion.voidproj && grep -Fq '"version": "0.0.253"' Tests/GenericTypedNativeAllocationCompletion/GenericTypedNativeAllocationCompletion.voidproj; echo True
+	@grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c && grep -Fq '"version": "0.0.254"' Tests/NativeReallocationAlignmentCompletion/NativeReallocationAlignmentCompletion.voidproj && grep -Fq '"version": "0.0.253"' Tests/GenericTypedNativeAllocationCompletion/GenericTypedNativeAllocationCompletion.voidproj; echo True
 	@grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py && grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -5006,7 +5006,7 @@ test-native-function-pointer-type-foundation: $(BIN)
 	@set -e; out=$$(mktemp); $(MAKE) --no-print-directory -s test-generic-pointer-unmanaged-stack-storage-completion >$$out; test "$$(grep -c '^True$$' $$out)" -eq 55; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); $(MAKE) --no-print-directory -s test-rectangular-array-initializers >$$out; test "$$(grep -c '^True$$' $$out)" -gt 0; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); $(MAKE) --no-print-directory -s test-unsafe-member-completion >$$out; test "$$(grep -c '^True$$' $$out)" -gt 0; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.255"' Tests/NativeFunctionPointerTypeFoundation/NativeFunctionPointerTypeFoundation.voidproj; grep -Fq '"version": "0.0.254"' Tests/NativeReallocationAlignmentCompletion/NativeReallocationAlignmentCompletion.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.255"' Tests/NativeFunctionPointerTypeFoundation/NativeFunctionPointerTypeFoundation.voidproj; grep -Fq '"version": "0.0.254"' Tests/NativeReallocationAlignmentCompletion/NativeReallocationAlignmentCompletion.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -5033,7 +5033,7 @@ test-native-function-address-indirect-call-completion: $(BIN) $(NATIVE_FUNCTION_
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/NativeFunctionAddressIndirectCallDiagnostics/SafeInvoke >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'native function pointer invocation requires an unsafe method' $$out; rm -f $$out; echo True
 	@set -e; grep -Fq 'has_function_pointer_address' Compiler/include/semantic.h; grep -Fq 'has_function_pointer_invoke' Compiler/include/semantic.h; grep -Fq 'vc_native_fn_call_' Compiler/src/compiler.c; grep -Fq 'vc_gc_native_call_begin()' Compiler/src/compiler.c; echo True
 	@set -e; out=$$(mktemp); $(MAKE) --no-print-directory -s test-native-function-pointer-type-foundation >$$out; test "$$(grep -c '^True$$' $$out)" -eq 44; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.256"' Tests/NativeFunctionAddressIndirectCallCompletion/NativeFunctionAddressIndirectCallCompletion.voidproj; grep -Fq '"version": "0.0.255"' Tests/NativeFunctionPointerTypeFoundation/NativeFunctionPointerTypeFoundation.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.256"' Tests/NativeFunctionAddressIndirectCallCompletion/NativeFunctionAddressIndirectCallCompletion.voidproj; grep -Fq '"version": "0.0.255"' Tests/NativeFunctionPointerTypeFoundation/NativeFunctionPointerTypeFoundation.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -5058,7 +5058,7 @@ test-native-function-pointer-abi-integration: $(BIN) $(NATIVE_FUNCTION_ABI_FIXTU
 	@set -e; ./$(BIN) check Tests/NativeFunctionPointerTypeFoundationDiagnostics/ExternParameter >/dev/null; echo True
 	@set -e; ./$(BIN) check Tests/NativeFunctionAddressIndirectCallCompletion >/dev/null; ./$(BIN) build Tests/NativeFunctionAddressIndirectCallCompletion >/dev/null; out=$$(mktemp); ./Tests/NativeFunctionAddressIndirectCallCompletion/bin/NativeFunctionAddressIndirectCallCompletion >$$out; test "$$(grep -c '^True$$' $$out)" -eq 15; rm -f $$out; echo True
 	@set -e; ./$(BIN) check Tests/NativeFunctionPointerTypeFoundation >/dev/null; ./$(BIN) build Tests/NativeFunctionPointerTypeFoundation >/dev/null; out=$$(mktemp); ./Tests/NativeFunctionPointerTypeFoundation/bin/NativeFunctionPointerTypeFoundation >$$out; test "$$(grep -c '^True$$' $$out)" -eq 22; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.257"' Tests/NativeFunctionPointerAbiIntegration/NativeFunctionPointerAbiIntegration.voidproj; grep -Fq '"version": "0.0.256"' Tests/NativeFunctionAddressIndirectCallCompletion/NativeFunctionAddressIndirectCallCompletion.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.257"' Tests/NativeFunctionPointerAbiIntegration/NativeFunctionPointerAbiIntegration.voidproj; grep -Fq '"version": "0.0.256"' Tests/NativeFunctionAddressIndirectCallCompletion/NativeFunctionAddressIndirectCallCompletion.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -5083,7 +5083,7 @@ test-generic-function-pointer-unmanaged-storage-integration: $(BIN) $(NATIVE_FUN
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/NativeFunctionPointerAbiIntegrationDiagnostics/DataPointerConversion >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "cannot explicitly cast 'delegate*<int, int>' to 'void*'" $$out; rm -f $$out; echo True
 	@set -e; ./$(BIN) check Tests/NativeFunctionPointerAbiIntegration >/dev/null; ./$(BIN) build Tests/NativeFunctionPointerAbiIntegration >/dev/null; out=$$(mktemp); ./Tests/NativeFunctionPointerAbiIntegration/bin/NativeFunctionPointerAbiIntegration >$$out; test "$$(grep -c '^True$$' $$out)" -eq 12; rm -f $$out; echo True
 	@set -e; ./$(BIN) check Tests/GenericPointerUnmanagedStackStorage >/dev/null; ./$(BIN) build Tests/GenericPointerUnmanagedStackStorage >/dev/null; out=$$(mktemp); ./Tests/GenericPointerUnmanagedStackStorage/bin/GenericPointerUnmanagedStackStorage >$$out; test "$$(grep -c '^True$$' $$out)" -gt 0; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.258"' Tests/GenericFunctionPointerUnmanagedStorageIntegration/GenericFunctionPointerUnmanagedStorageIntegration.voidproj; grep -Fq '"version": "0.0.257"' Tests/NativeFunctionPointerAbiIntegration/NativeFunctionPointerAbiIntegration.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.258"' Tests/GenericFunctionPointerUnmanagedStorageIntegration/GenericFunctionPointerUnmanagedStorageIntegration.voidproj; grep -Fq '"version": "0.0.257"' Tests/NativeFunctionPointerAbiIntegration/NativeFunctionPointerAbiIntegration.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-native-heap-function-pointers-gc-threads-exception-boundary-integration
@@ -5106,7 +5106,7 @@ test-native-heap-function-pointers-gc-threads-exception-boundary-integration: $(
 	@./$(BIN) check Tests/GenericFunctionPointerUnmanagedStorageIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/PinningGcThreadsExceptionsNativeBoundaryIntegration/Library >/dev/null && echo True
 	@./$(BIN) check Tests/ThreadExceptionNativeBoundaryCleanup >/dev/null && echo True
-	@grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c && grep -Fq '"version": "0.0.259"' Tests/NativeHeapFunctionPointersGcThreadsExceptionBoundaryIntegration/Library/NativeHeapFunctionPointersGcThreadsExceptionBoundaryIntegration.voidproj && grep -Fq '"version": "0.0.258"' Tests/GenericFunctionPointerUnmanagedStorageIntegration/GenericFunctionPointerUnmanagedStorageIntegration.voidproj; echo True
+	@grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c && grep -Fq '"version": "0.0.259"' Tests/NativeHeapFunctionPointersGcThreadsExceptionBoundaryIntegration/Library/NativeHeapFunctionPointersGcThreadsExceptionBoundaryIntegration.voidproj && grep -Fq '"version": "0.0.258"' Tests/GenericFunctionPointerUnmanagedStorageIntegration/GenericFunctionPointerUnmanagedStorageIntegration.voidproj; echo True
 	@grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py && grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -5151,7 +5151,7 @@ test-native-heap-function-pointer-integration-audit: $(BIN) $(NATIVE_HEAP_FUNCTI
 	@./$(BIN) check Tests/NativeFunctionPointerAbiIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/GenericFunctionPointerUnmanagedStorageIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/NativeHeapFunctionPointersGcThreadsExceptionBoundaryIntegration/Library >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.260"' Tests/NativeHeapFunctionPointerIntegrationAudit/Surface/NativeHeapFunctionPointerIntegrationAudit.voidproj; grep -Fq '"version": "0.0.260"' Tests/NativeHeapFunctionPointerIntegrationAudit/Library/NativeHeapFunctionPointerIntegrationAudit.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.260"' Tests/NativeHeapFunctionPointerIntegrationAudit/Surface/NativeHeapFunctionPointerIntegrationAudit.voidproj; grep -Fq '"version": "0.0.260"' Tests/NativeHeapFunctionPointerIntegrationAudit/Library/NativeHeapFunctionPointerIntegrationAudit.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
@@ -5178,7 +5178,7 @@ test-awaiter-protocol-semantic-foundation: $(BIN)
 	@set -e; grep -Fq 'bool has_await_protocol;' Compiler/include/semantic.h; grep -Fq 'await_get_awaiter_method_index' Compiler/include/semantic.h; grep -Fq 'await_get_result_method_index' Compiler/include/semantic.h; echo True
 	@set -e; grep -Fq 'analyze_await_protocol' Compiler/src/semantic.c; grep -Fq 'GetAwaiter' Compiler/src/semantic.c; grep -Fq 'IsCompleted' Compiler/src/semantic.c; grep -Fq 'OnCompleted' Compiler/src/semantic.c; grep -Fq 'GetResult' Compiler/src/semantic.c; echo True
 	@set -e; ! grep -Fq 'semantic_task_type_info(context->model, awaited' Compiler/src/semantic.c; grep -Fq 'analyze_await_protocol(context, expression, awaited)' Compiler/src/semantic.c; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-general-awaiter-state-machine-lowering
@@ -5196,7 +5196,7 @@ test-general-awaiter-state-machine-lowering: $(BIN)
 	@./$(BIN) run Tests/AwaitSuspensionResumptionCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/AsyncAwaitTaskRuntimeIntegrationAudit >/dev/null && echo True
 	@set -e; ! grep -R -Fq 'AwaitProbe262\|SyncIntAwaiter262\|AsyncIntAwaiter262' Compiler Runtime StandardLibrary; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.262"' Tests/GeneralAwaiterStateMachineLowering/GeneralAwaiterStateMachineLowering.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.262"' Tests/GeneralAwaiterStateMachineLowering/GeneralAwaiterStateMachineLowering.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-task-awaiter-task-de-specialization
@@ -5215,7 +5215,7 @@ test-task-awaiter-task-de-specialization: $(BIN)
 	@./$(BIN) run Tests/AsyncTaskTypedAwaitResults >/dev/null && echo True
 	@./$(BIN) run Tests/AwaitForeachSyntaxLoweringCompletion >/dev/null && echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/AwaiterProtocolSemanticFoundationDiagnostics/MissingOnCompleted >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'must provide an unambiguous void OnCompleted(Action) method' $$out; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.263"' Tests/TaskAwaiterTaskDeSpecialization/TaskAwaiterTaskDeSpecialization.voidproj; grep -Fq '"version": "0.0.262"' Tests/GeneralAwaiterStateMachineLowering/GeneralAwaiterStateMachineLowering.voidproj; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.263"' Tests/TaskAwaiterTaskDeSpecialization/TaskAwaiterTaskDeSpecialization.voidproj; grep -Fq '"version": "0.0.262"' Tests/GeneralAwaiterStateMachineLowering/GeneralAwaiterStateMachineLowering.voidproj; echo True
 	@set -e; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-generic-struct-extension-awaiter-completion
@@ -5241,8 +5241,8 @@ test-generic-struct-extension-awaiter-completion: $(BIN)
 	@./$(BIN) run Tests/ExtensionMethodCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/GenericMethodTypeInference >/dev/null && echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/AwaiterProtocolSemanticFoundationDiagnostics/MissingOnCompleted >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'must provide an unambiguous void OnCompleted(Action) method' $$out; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.264"' Tests/GenericStructExtensionAwaiterCompletion/GenericStructExtensionAwaiterCompletion.voidproj; grep -Fq '"version": "0.0.263"' Tests/TaskAwaiterTaskDeSpecialization/TaskAwaiterTaskDeSpecialization.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.264"' Tests/GenericStructExtensionAwaiterCompletion/GenericStructExtensionAwaiterCompletion.voidproj; grep -Fq '"version": "0.0.263"' Tests/TaskAwaiterTaskDeSpecialization/TaskAwaiterTaskDeSpecialization.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-task-yield-allocation-free-yield-awaitable
@@ -5260,8 +5260,8 @@ test-task-yield-allocation-free-yield-awaitable: $(BIN)
 	@./$(BIN) run Tests/TaskAwaiterTaskDeSpecialization >/dev/null && echo True
 	@./$(BIN) run Tests/GeneralAwaiterStateMachineLowering >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncAwaitTaskRuntimeIntegrationAudit >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.265"' Tests/TaskYieldAllocationFreeYieldAwaitable/TaskYieldAllocationFreeYieldAwaitable.voidproj; grep -Fq '"version": "0.0.264"' Tests/GenericStructExtensionAwaiterCompletion/GenericStructExtensionAwaiterCompletion.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.265"' Tests/TaskYieldAllocationFreeYieldAwaitable/TaskYieldAllocationFreeYieldAwaitable.voidproj; grep -Fq '"version": "0.0.264"' Tests/GenericStructExtensionAwaiterCompletion/GenericStructExtensionAwaiterCompletion.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-value-task-foundation
@@ -5281,8 +5281,8 @@ test-value-task-foundation: $(BIN)
 	@./$(BIN) run Tests/TaskAwaiterTaskDeSpecialization >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncAwaitTaskRuntimeIntegrationAudit >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncCancellationIntegration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.266"' Tests/ValueTaskFoundation/ValueTaskFoundation.voidproj; grep -Fq '"version": "0.0.265"' Tests/TaskYieldAllocationFreeYieldAwaitable/TaskYieldAllocationFreeYieldAwaitable.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.266"' Tests/ValueTaskFoundation/ValueTaskFoundation.voidproj; grep -Fq '"version": "0.0.265"' Tests/TaskYieldAllocationFreeYieldAwaitable/TaskYieldAllocationFreeYieldAwaitable.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-generic-value-task-result-gc-completion
@@ -5302,8 +5302,8 @@ test-generic-value-task-result-gc-completion: $(BIN)
 	@./$(BIN) run Tests/GenericStructExtensionAwaiterCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncAwaitTaskRuntimeIntegrationAudit >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncCancellationIntegration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.267"' Tests/GenericValueTaskResultGcCompletion/GenericValueTaskResultGcCompletion.voidproj; grep -Fq '"version": "0.0.266"' Tests/ValueTaskFoundation/ValueTaskFoundation.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.267"' Tests/GenericValueTaskResultGcCompletion/GenericValueTaskResultGcCompletion.voidproj; grep -Fq '"version": "0.0.266"' Tests/ValueTaskFoundation/ValueTaskFoundation.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-async-value-task-return-integration
 
@@ -5325,8 +5325,8 @@ test-async-value-task-return-integration: $(BIN)
 	@./$(BIN) run Tests/GeneralAwaiterStateMachineLowering >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncAwaitTaskRuntimeIntegrationAudit >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncCancellationIntegration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.268"' Tests/AsyncValueTaskReturnIntegration/AsyncValueTaskReturnIntegration.voidproj; grep -Fq '"version": "0.0.267"' Tests/GenericValueTaskResultGcCompletion/GenericValueTaskResultGcCompletion.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.268"' Tests/AsyncValueTaskReturnIntegration/AsyncValueTaskReturnIntegration.voidproj; grep -Fq '"version": "0.0.267"' Tests/GenericValueTaskResultGcCompletion/GenericValueTaskResultGcCompletion.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-awaiter-valuetask-gc-threads-exceptions-async-iteration-integration
 
@@ -5352,8 +5352,8 @@ test-awaiter-valuetask-gc-threads-exceptions-async-iteration-integration: $(BIN)
 	@./$(BIN) run Tests/AsyncValueTaskReturnIntegration >/dev/null && echo True
 	@./$(BIN) run Tests/GenericValueTaskResultGcCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncCancellationIntegration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.269"' Tests/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration.voidproj; grep -Fq '"version": "0.0.269"' Tests/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration/Library/AwaiterValueTaskGcThreadsExceptionsAsyncIterationLibrary.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.269"' Tests/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration.voidproj; grep -Fq '"version": "0.0.269"' Tests/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration/Library/AwaiterValueTaskGcThreadsExceptionsAsyncIterationLibrary.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-generalized-awaitables-valuetask-integration-audit
@@ -5380,8 +5380,8 @@ test-generalized-awaitables-valuetask-integration-audit: $(BIN)
 	@./$(BIN) run Tests/AsyncIteratorCompositionCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncIteratorCancellationIntegration >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncAwaitTaskRuntimeIntegrationAudit >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.270"' Tests/GeneralizedAwaitablesValueTaskIntegrationAudit/GeneralizedAwaitablesValueTaskIntegrationAudit.voidproj; grep -Fq '"version": "0.0.269"' Tests/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.270"' Tests/GeneralizedAwaitablesValueTaskIntegrationAudit/GeneralizedAwaitablesValueTaskIntegrationAudit.voidproj; grep -Fq '"version": "0.0.269"' Tests/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration/AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-async-lambda-syntax-semantic-foundation
@@ -5404,8 +5404,8 @@ test-async-lambda-syntax-semantic-foundation: $(BIN)
 	@./$(BIN) run Tests/Lambdas >/dev/null && echo True
 	@./$(BIN) check Tests/AsyncAwaitSyntaxSemanticFoundation >/dev/null && echo True
 	@./$(BIN) check Tests/GeneralizedAwaitablesValueTaskIntegrationAudit >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.271"' Tests/AsyncLambdaSyntaxSemanticFoundation/AsyncLambdaSyntaxSemanticFoundation.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.271"' Tests/AsyncLambdaSyntaxSemanticFoundation/AsyncLambdaSyntaxSemanticFoundation.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-async-lambda-state-machine-lowering
@@ -5422,8 +5422,8 @@ test-async-lambda-state-machine-lowering: $(BIN)
 	@./$(BIN) run Tests/GeneralAwaiterStateMachineLowering >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncValueTaskReturnIntegration >/dev/null && echo True
 	@./$(BIN) run Tests/Lambdas >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.272"' Tests/AsyncLambdaStateMachineLowering/AsyncLambdaStateMachineLowering.voidproj; grep -Fq '"version": "0.0.271"' Tests/AsyncLambdaSyntaxSemanticFoundation/AsyncLambdaSyntaxSemanticFoundation.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.272"' Tests/AsyncLambdaStateMachineLowering/AsyncLambdaStateMachineLowering.voidproj; grep -Fq '"version": "0.0.271"' Tests/AsyncLambdaSyntaxSemanticFoundation/AsyncLambdaSyntaxSemanticFoundation.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-async-lambda-capture-generic-gc-lifetime-completion
 
@@ -5442,8 +5442,8 @@ test-async-lambda-capture-generic-gc-lifetime-completion: $(BIN)
 	@./$(BIN) run Tests/AsyncLambdaStateMachineLowering >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncGenericsClosuresGcLifetimeIntegration >/dev/null && echo True
 	@./$(BIN) run Tests/Lambdas >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.273"' Tests/AsyncLambdaCaptureGenericGcLifetimeCompletion/AsyncLambdaCaptureGenericGcLifetimeCompletion.voidproj; grep -Fq '"version": "0.0.272"' Tests/AsyncLambdaStateMachineLowering/AsyncLambdaStateMachineLowering.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.273"' Tests/AsyncLambdaCaptureGenericGcLifetimeCompletion/AsyncLambdaCaptureGenericGcLifetimeCompletion.voidproj; grep -Fq '"version": "0.0.272"' Tests/AsyncLambdaStateMachineLowering/AsyncLambdaStateMachineLowering.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-async-lambda-delegate-event-valuetask-integration
 
@@ -5468,8 +5468,8 @@ test-async-lambda-delegate-event-valuetask-integration: $(BIN)
 	@./$(BIN) run Tests/InterfaceEvents >/dev/null && echo True
 	@./$(BIN) run Tests/CustomEventAccessors >/dev/null && echo True
 	@$(MAKE) --no-print-directory test-async-object-model-library-boundary-integration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.274"' Tests/AsyncLambdaDelegateEventValueTaskIntegration/AsyncLambdaDelegateEventValueTaskIntegration.voidproj; grep -Fq '"version": "0.0.273"' Tests/AsyncLambdaCaptureGenericGcLifetimeCompletion/AsyncLambdaCaptureGenericGcLifetimeCompletion.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.274"' Tests/AsyncLambdaDelegateEventValueTaskIntegration/AsyncLambdaDelegateEventValueTaskIntegration.voidproj; grep -Fq '"version": "0.0.273"' Tests/AsyncLambdaCaptureGenericGcLifetimeCompletion/AsyncLambdaCaptureGenericGcLifetimeCompletion.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-await-using-syntax-structural-async-dispose-semantics
 
@@ -5488,7 +5488,7 @@ test-await-using-syntax-structural-async-dispose-semantics: $(BIN)
 	@$(MAKE) --no-print-directory test-using-statement-completion >/dev/null && echo True
 	@$(MAKE) --no-print-directory test-using-declaration-completion >/dev/null && echo True
 	@./$(BIN) check Tests/GeneralizedAwaitablesValueTaskIntegrationAudit >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.275"' Tests/AwaitUsingSyntaxStructuralAsyncDisposeSemantics/AwaitUsingSyntaxStructuralAsyncDisposeSemantics.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.275"' Tests/AwaitUsingSyntaxStructuralAsyncDisposeSemantics/AwaitUsingSyntaxStructuralAsyncDisposeSemantics.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-await-using-state-machine-structured-cleanup-completion
 
@@ -5504,7 +5504,7 @@ test-await-using-state-machine-structured-cleanup-completion: $(BIN)
 	@./$(BIN) run Tests/AsyncExceptionCatchFinallyIntegration >/dev/null && echo True
 	@$(MAKE) --no-print-directory test-using-statement-completion >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncValueTaskReturnIntegration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.276"' Tests/AwaitUsingStateMachineStructuredCleanupCompletion/AwaitUsingStateMachineStructuredCleanupCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.276"' Tests/AwaitUsingStateMachineStructuredCleanupCompletion/AwaitUsingStateMachineStructuredCleanupCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-task-completion-factories-async-task-run-unwrapping
 
@@ -5528,8 +5528,8 @@ test-task-completion-factories-async-task-run-unwrapping: $(BIN) $(TASK_RUN_NATI
 	@./$(BIN) run Tests/AsyncLambdaStateMachineLowering >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncLambdaDelegateEventValueTaskIntegration >/dev/null && echo True
 	@./$(BIN) run Tests/DelegateCompletion >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.277"' Tests/TaskCompletionFactoriesAsyncTaskRunUnwrapping/TaskCompletionFactoriesAsyncTaskRunUnwrapping.voidproj; echo True
-	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.277"' Tests/TaskCompletionFactoriesAsyncTaskRunUnwrapping/TaskCompletionFactoriesAsyncTaskRunUnwrapping.voidproj; echo True
+	@set -e; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-task-when-all-completion
 
@@ -5553,7 +5553,7 @@ test-task-when-all-completion: $(BIN)
 	@./$(BIN) run Tests/AsyncLambdaStateMachineLowering >/dev/null && echo True
 	@./$(BIN) run Tests/TaskCancellationIntegration >/dev/null && echo True
 	@set -e; grep -Fq 'require_better_than_rank' Compiler/src/semantic.c; grep -Fq 'static_match_rank' Compiler/src/semantic.c; ! grep -R -Fq 'Task.WhenAll' Compiler/src Compiler/include; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.278"' Tests/TaskWhenAllCompletion/TaskWhenAllCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.278"' Tests/TaskWhenAllCompletion/TaskWhenAllCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 
@@ -5582,7 +5582,7 @@ test-task-when-any-completion: $(BIN)
 	@./$(BIN) run Tests/TaskCompletionFactoriesAsyncTaskRunUnwrapping >/dev/null && echo True
 	@./$(BIN) run Tests/AwaitUsingStateMachineStructuredCleanupCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/AsyncLambdaStateMachineLowering >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.279"' Tests/TaskWhenAnyCompletion/TaskWhenAnyCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.279"' Tests/TaskWhenAnyCompletion/TaskWhenAnyCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-async-lambdas-async-disposal-task-composition-integration-audit
@@ -5607,7 +5607,7 @@ test-async-lambdas-async-disposal-task-composition-integration-audit: $(BIN)
 	@./$(BIN) run Tests/AsyncLambdaDelegateEventValueTaskIntegration >/dev/null && echo True
 	@./$(BIN) run Tests/AwaitUsingStateMachineStructuredCleanupCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/TaskWhenAnyCompletion >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.280"' Tests/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit.voidproj; grep -Fq '"version": "0.0.280"' Tests/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit/Library/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAuditLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.280"' Tests/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit.voidproj; grep -Fq '"version": "0.0.280"' Tests/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit/Library/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAuditLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-shared-monotonic-timer-queue-foundation
@@ -5628,7 +5628,7 @@ test-shared-monotonic-timer-queue-foundation: $(BIN)
 	@./$(BIN) run Tests/ManagedThreadPoolWorkQueueFoundation >/dev/null && echo True
 	@./$(BIN) run Tests/ManagedThreadSleepTimeoutContract >/dev/null && echo True
 	@./$(BIN) check Tests/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.281"' Tests/SharedMonotonicTimerQueueFoundation/SharedMonotonicTimerQueueFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.281"' Tests/SharedMonotonicTimerQueueFoundation/SharedMonotonicTimerQueueFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-task-delay-foundation
 
@@ -5645,7 +5645,7 @@ test-task-delay-foundation: $(BIN)
 	@./$(BIN) run Tests/TaskWhenAllCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/AsyncLambdasAsyncDisposalTaskCompositionIntegrationAudit >/dev/null && echo True
 	@set -e; grep -Fq 'public void CancelAfter(int millisecondsDelay)' StandardLibrary/Void/Threading/Cancellation.void; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.282"' Tests/TaskDelayFoundation/TaskDelayFoundation.voidproj; grep -Fq '"version": "0.0.281"' Tests/SharedMonotonicTimerQueueFoundation/SharedMonotonicTimerQueueFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.282"' Tests/TaskDelayFoundation/TaskDelayFoundation.voidproj; grep -Fq '"version": "0.0.281"' Tests/SharedMonotonicTimerQueueFoundation/SharedMonotonicTimerQueueFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 
@@ -5663,7 +5663,7 @@ test-task-delay-cancellation-race-completion: $(BIN)
 	@./$(BIN) run Tests/TaskDelayFoundation >/dev/null && echo True
 	@./$(BIN) run Tests/TaskCancellationIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/SharedMonotonicTimerQueueFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.283"' Tests/TaskDelayCancellationRaceCompletion/TaskDelayCancellationRaceCompletion.voidproj; grep -Fq '"version": "0.0.282"' Tests/TaskDelayFoundation/TaskDelayFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.283"' Tests/TaskDelayCancellationRaceCompletion/TaskDelayCancellationRaceCompletion.voidproj; grep -Fq '"version": "0.0.282"' Tests/TaskDelayFoundation/TaskDelayFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-cancellation-token-source-disposal-registration-lifetime-completion
@@ -5682,7 +5682,7 @@ test-cancellation-token-source-disposal-registration-lifetime-completion: $(BIN)
 	@./$(BIN) run Tests/CancellationRegistrationWakeupCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/TaskDelayCancellationRaceCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/CancellationTokenSourceFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.284"' Tests/CancellationTokenSourceDisposalRegistrationLifetimeCompletion/CancellationTokenSourceDisposalRegistrationLifetimeCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'public void CancelAfter(int millisecondsDelay)' StandardLibrary/Void/Threading/Cancellation.void; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.284"' Tests/CancellationTokenSourceDisposalRegistrationLifetimeCompletion/CancellationTokenSourceDisposalRegistrationLifetimeCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'public void CancelAfter(int millisecondsDelay)' StandardLibrary/Void/Threading/Cancellation.void; echo True
 
 
 .PHONY: test-cancellation-token-source-cancel-after-completion
@@ -5699,7 +5699,7 @@ test-cancellation-token-source-cancel-after-completion: $(BIN)
 	@./$(BIN) run Tests/CancellationTokenSourceDisposalRegistrationLifetimeCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/TaskDelayCancellationRaceCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/SharedMonotonicTimerQueueFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.285"' Tests/CancellationTokenSourceCancelAfterCompletion/CancellationTokenSourceCancelAfterCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.285"' Tests/CancellationTokenSourceCancelAfterCompletion/CancellationTokenSourceCancelAfterCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-linked-cancellation-token-source-completion
@@ -5717,7 +5717,7 @@ test-linked-cancellation-token-source-completion: $(BIN)
 	@./$(BIN) run Tests/CancellationTokenSourceDisposalRegistrationLifetimeCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/CancellationTokenSourceCancelAfterCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/TaskDelayCancellationRaceCompletion >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.286"' Tests/LinkedCancellationTokenSourceCompletion/LinkedCancellationTokenSourceCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.286"' Tests/LinkedCancellationTokenSourceCompletion/LinkedCancellationTokenSourceCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-task-wait-async-cancellation-completion
@@ -5734,7 +5734,7 @@ test-task-wait-async-cancellation-completion: $(BIN)
 	@./$(BIN) run Tests/CancellationTokenSourceCancelAfterCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/TaskDelayCancellationRaceCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/TaskCompletionFactoriesAsyncTaskRunUnwrapping >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.287"' Tests/TaskWaitAsyncCancellationCompletion/TaskWaitAsyncCancellationCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.287"' Tests/TaskWaitAsyncCancellationCompletion/TaskWaitAsyncCancellationCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 
 .PHONY: test-task-wait-async-timeout-combined-cancellation-completion
@@ -5751,7 +5751,7 @@ test-task-wait-async-timeout-combined-cancellation-completion: $(BIN)
 	@./$(BIN) run Tests/TaskWaitAsyncCancellationCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/CancellationTokenSourceCancelAfterCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/SharedMonotonicTimerQueueFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.288"' Tests/TaskWaitAsyncTimeoutCombinedCancellationCompletion/TaskWaitAsyncTimeoutCombinedCancellationCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.288"' Tests/TaskWaitAsyncTimeoutCombinedCancellationCompletion/TaskWaitAsyncTimeoutCombinedCancellationCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-async-timing-cancellation-gc-thread-integration
 
@@ -5773,7 +5773,7 @@ test-async-timing-cancellation-gc-thread-integration: $(BIN)
 	@./$(BIN) check Tests/TaskWaitAsyncTimeoutCombinedCancellationCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/AsyncIteratorCancellationIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/AwaitUsingStateMachineStructuredCleanupCompletion >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.289"' Tests/AsyncTimingCancellationGcThreadIntegration/AsyncTimingCancellationGcThreadIntegration.voidproj; grep -Fq '"version": "0.0.289"' Tests/AsyncTimingCancellationGcThreadIntegration/Library/AsyncTimingCancellationGcThreadIntegrationLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.289"' Tests/AsyncTimingCancellationGcThreadIntegration/AsyncTimingCancellationGcThreadIntegration.voidproj; grep -Fq '"version": "0.0.289"' Tests/AsyncTimingCancellationGcThreadIntegration/Library/AsyncTimingCancellationGcThreadIntegrationLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-async-timing-cancellation-integration-audit
 
@@ -5795,7 +5795,7 @@ test-async-timing-cancellation-integration-audit: $(BIN)
 	@./$(BIN) check Tests/AsyncTimingCancellationGcThreadIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/TaskWaitAsyncTimeoutCombinedCancellationCompletion >/dev/null && echo True
 	@./$(BIN) check Tests/LinkedCancellationTokenSourceCompletion >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.290"' Tests/AsyncTimingCancellationIntegrationAudit/AsyncTimingCancellationIntegrationAudit.voidproj; grep -Fq '"version": "0.0.290"' Tests/AsyncTimingCancellationIntegrationAudit/Library/AsyncTimingCancellationIntegrationAuditLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.290"' Tests/AsyncTimingCancellationIntegrationAudit/AsyncTimingCancellationIntegrationAudit.voidproj; grep -Fq '"version": "0.0.290"' Tests/AsyncTimingCancellationIntegrationAudit/Library/AsyncTimingCancellationIntegrationAuditLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; echo True
 
 
 
@@ -5817,7 +5817,7 @@ test-managed-string-representation-foundation: $(BIN)
 	@./$(BIN) run Tests/AsyncLambdaCaptureGenericGcLifetimeCompletion >/dev/null && echo True
 	@./$(BIN) run Tests/ConstReadonly >/dev/null && ./$(BIN) run Tests/ConstantNullPatterns >/dev/null && echo True
 	@./$(BIN) run Tests/OptionalParams >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.291"' Tests/ManagedStringRepresentationFoundation/ManagedStringRepresentationFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.291"' Tests/ManagedStringRepresentationFoundation/ManagedStringRepresentationFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-length-aware-string-semantics
 
@@ -5837,7 +5837,7 @@ test-length-aware-string-semantics: $(BIN)
 	@./$(BIN) run Tests/Attributes >/dev/null && echo True
 	@./$(BIN) run Tests/TypeMetadata >/dev/null && echo True
 	@./$(BIN) run Tests/ExceptionsRuntimeControlFlowIntegration >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.292"' Tests/LengthAwareStringSemantics/LengthAwareStringSemantics.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.292"' Tests/LengthAwareStringSemantics/LengthAwareStringSemantics.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 
@@ -5867,7 +5867,7 @@ test-native-string-abi-contract-metadata-foundation: $(BIN)
 	@./$(BIN) run Tests/NativeInterop >/dev/null && echo True
 	@./$(BIN) run Tests/ManagedStringRepresentationFoundation >/dev/null && echo True
 	@./$(BIN) run Tests/LengthAwareStringSemantics >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.293"' Tests/NativeStringAbiContractMetadataFoundation/NativeStringAbiContractMetadataFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.293"' Tests/NativeStringAbiContractMetadataFoundation/NativeStringAbiContractMetadataFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-borrowed-nul-native-string-parameters
 
@@ -5885,7 +5885,7 @@ test-borrowed-nul-native-string-parameters: $(BIN) $(BORROWED_NUL_NATIVE_FIXTURE
 	@./$(BIN) run Tests/ManagedStringRepresentationFoundation >/dev/null && echo True
 	@./$(BIN) run Tests/LengthAwareStringSemantics >/dev/null && echo True
 	@./$(BIN) run Tests/NativeInterop >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.294"' Tests/BorrowedNulNativeStringParameters/BorrowedNulNativeStringParameters.voidproj; grep -Fq 'public enum NativeStringKind' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'BorrowedNul' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.294"' Tests/BorrowedNulNativeStringParameters/BorrowedNulNativeStringParameters.voidproj; grep -Fq 'public enum NativeStringKind' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'BorrowedNul' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-pointer-length-native-string-parameters
 
@@ -5899,7 +5899,7 @@ test-pointer-length-native-string-parameters: $(BIN) $(POINTER_LENGTH_NATIVE_FIX
 	@./$(BIN) run Tests/BorrowedNulNativeStringParameters >/dev/null && echo True
 	@./$(BIN) run Tests/NativeInterop >/dev/null && echo True
 	@./$(BIN) check Tests/NativeStringAbiContractMetadataFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.295"' Tests/PointerLengthNativeStringParameters/PointerLengthNativeStringParameters.voidproj; grep -Fq 'BorrowedPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.295"' Tests/PointerLengthNativeStringParameters/PointerLengthNativeStringParameters.voidproj; grep -Fq 'BorrowedPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-borrowed-static-native-string-returns
 
@@ -5914,7 +5914,7 @@ test-borrowed-static-native-string-returns: $(BIN) $(STRING_RETURN_NATIVE_FIXTUR
 	@./$(BIN) run Tests/PointerLengthNativeStringParameters >/dev/null && echo True
 	@./$(BIN) run Tests/BorrowedNulNativeStringParameters >/dev/null && echo True
 	@./$(BIN) check Tests/NativeStringAbiContractMetadataFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.296"' Tests/BorrowedStaticNativeStringReturns/BorrowedStaticNativeStringReturns.voidproj; grep -Fq 'BorrowedPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'StaticPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.296"' Tests/BorrowedStaticNativeStringReturns/BorrowedStaticNativeStringReturns.voidproj; grep -Fq 'BorrowedPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'StaticPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-owned-native-string-returns
 
@@ -5933,7 +5933,7 @@ test-owned-native-string-returns: $(BIN) $(OWNED_STRING_RETURN_NATIVE_FIXTURE)
 	@./$(BIN) run Tests/PointerLengthNativeStringParameters >/dev/null && echo True
 	@./$(BIN) run Tests/BorrowedNulNativeStringParameters >/dev/null && echo True
 	@./$(BIN) check Tests/NativeStringAbiContractMetadataFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.297"' Tests/OwnedNativeStringReturns/OwnedNativeStringReturns.voidproj; grep -Fq 'OwnedNul' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'OwnedPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'native_string_release_c_name' Compiler/include/semantic.h; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.297"' Tests/OwnedNativeStringReturns/OwnedNativeStringReturns.voidproj; grep -Fq 'OwnedNul' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'OwnedPointerLength' StandardLibrary/Void/NativeStringKind.void; grep -Fq 'native_string_release_c_name' Compiler/include/semantic.h; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-void-string-export-abi
@@ -5952,7 +5952,7 @@ test-void-string-export-abi: $(BIN)
 	@./$(BIN) publish Tests/VoidStringExportAbi/Library >/dev/null; test -f Tests/VoidStringExportAbi/Library/publish/libVoidStringExportAbi.a; echo True
 	@./$(BIN) check Tests/LibraryOutput/Library >/dev/null && ./$(BIN) build Tests/LibraryOutput/Library >/dev/null && echo True
 	@./$(BIN) check Tests/OwnedNativeStringReturns >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.298"' Tests/VoidStringExportAbi/Library/VoidStringExportAbi.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.298"' Tests/VoidStringExportAbi/Library/VoidStringExportAbi.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-native-string-lifetime-callback-boundary-integration
@@ -5976,7 +5976,7 @@ test-native-string-lifetime-callback-boundary-integration: $(BIN) $(NATIVE_STRIN
 	@./$(BIN) check Tests/VoidStringExportAbi/Library >/dev/null && echo True
 	@./$(BIN) check Tests/OwnedNativeStringReturns >/dev/null && echo True
 	@./$(BIN) check Tests/NativeStringAbiContractMetadataFoundation >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.299"' Tests/NativeStringLifetimeCallbackBoundaryIntegration/NativeStringLifetimeCallbackBoundaryIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.299"' Tests/NativeStringLifetimeCallbackBoundaryIntegration/NativeStringLifetimeCallbackBoundaryIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-managed-strings-native-string-abi-integration-audit
@@ -6001,7 +6001,7 @@ test-managed-strings-native-string-abi-integration-audit: $(BIN) $(MANAGED_STRIN
 	@./$(BIN) run Tests/NativeStringLifetimeCallbackBoundaryIntegration >/dev/null && echo True
 	@./$(BIN) check Tests/VoidStringExportAbi/Library >/dev/null && echo True
 	@./$(BIN) check Tests/OwnedNativeStringReturns >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.300"' Tests/ManagedStringsNativeStringAbiIntegrationAudit/ManagedStringsNativeStringAbiIntegrationAudit.voidproj; grep -Fq '"version": "0.0.300"' Tests/ManagedStringsNativeStringAbiIntegrationAudit/Library/ManagedStringsNativeStringAbiIntegrationAuditLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.300"' Tests/ManagedStringsNativeStringAbiIntegrationAudit/ManagedStringsNativeStringAbiIntegrationAudit.voidproj; grep -Fq '"version": "0.0.300"' Tests/ManagedStringsNativeStringAbiIntegrationAudit/Library/ManagedStringsNativeStringAbiIntegrationAuditLibrary.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-utf8-validity-unicode-scalar-foundation
@@ -6028,7 +6028,7 @@ test-utf8-validity-unicode-scalar-foundation: $(BIN) $(UTF8_VALIDITY_NATIVE_FIXT
 	@set -e; out=$$(mktemp); if $(UTF8_VALIDITY_EXPORT_CONSUMER) >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'VOID runtime error: string data is not valid UTF-8' $$out; rm -f $$out; echo True
 	@./$(BIN) run Tests/ManagedStringsNativeStringAbiIntegrationAudit >/dev/null; echo True
 	@./$(BIN) check Tests/NativeStringLifetimeCallbackBoundaryIntegration >/dev/null; ./$(BIN) check Tests/OwnedNativeStringReturns >/dev/null; ./$(BIN) check Tests/VoidStringExportAbi/Library >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.301"' Tests/Utf8ValidityUnicodeScalarFoundation/Utf8ValidityUnicodeScalarFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.301"' Tests/Utf8ValidityUnicodeScalarFoundation/Utf8ValidityUnicodeScalarFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-string-core-properties-empty-semantics
@@ -6045,7 +6045,7 @@ test-string-core-properties-empty-semantics: $(BIN)
 	@set -e; ./$(BIN) build Tests/StringCorePropertiesDiagnostics/NullReceiver >/dev/null; out=$$(mktemp); if Tests/StringCorePropertiesDiagnostics/NullReceiver/bin/StringCorePropertiesDiagnostics >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq 'VOID runtime error: string reference is null' $$out; rm -f $$out; echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/StringCorePropertiesDiagnostics/UnknownStaticMember >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "string has no static member 'NotEmpty'" $$out; rm -f $$out; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.302"' Tests/StringCoreProperties/StringCoreProperties.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.302"' Tests/StringCoreProperties/StringCoreProperties.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-string-character-indexing-enumeration
 
@@ -6064,7 +6064,7 @@ test-string-character-indexing-enumeration: $(BIN)
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/StringCharacterIndexingEnumerationDiagnostics/WrongIndexType >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "string index must be 'int', 'Index', or 'Range', got 'bool'" $$out; rm -f $$out; echo True
 	@./$(BIN) run Tests/StringCoreProperties >/dev/null; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.303"' Tests/StringCharacterIndexingEnumeration/StringCharacterIndexingEnumeration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.303"' Tests/StringCharacterIndexingEnumeration/StringCharacterIndexingEnumeration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-string-range-slicing-substring
 
@@ -6094,7 +6094,7 @@ test-string-range-slicing-substring: $(BIN)
 	@./$(BIN) check Tests/IndexRangeContiguousMemoryIntegrationAudit >/dev/null; echo True
 	@./$(BIN) run Tests/ManagedStringsNativeStringAbiIntegrationAudit >/dev/null; echo True
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/StringCharacterIndexingEnumerationDiagnostics/WrongIndexType >$$out 2>&1; then rm -f $$out; exit 1; fi; grep -Fq "string index must be 'int', 'Index', or 'Range', got 'bool'" $$out; rm -f $$out; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.304"' Tests/StringRangeSlicingSubstring/StringRangeSlicingSubstring.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.304"' Tests/StringRangeSlicingSubstring/StringRangeSlicingSubstring.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-string-concatenation-composition
@@ -6115,7 +6115,7 @@ test-string-concatenation-composition: $(BIN)
 	@./$(BIN) run Tests/StringCharacterIndexingEnumeration >/dev/null; echo True
 	@./$(BIN) run Tests/StringCoreProperties >/dev/null; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.305"' Tests/StringConcatenationComposition/StringConcatenationComposition.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.305"' Tests/StringConcatenationComposition/StringConcatenationComposition.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-ordinal-string-search-comparison
 
@@ -6138,7 +6138,7 @@ test-ordinal-string-search-comparison: $(BIN)
 	@./$(BIN) run Tests/StringCharacterIndexingEnumeration >/dev/null; echo True
 	@./$(BIN) run Tests/StringCoreProperties >/dev/null; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.306"' Tests/OrdinalStringSearchComparison/OrdinalStringSearchComparison.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.306"' Tests/OrdinalStringSearchComparison/OrdinalStringSearchComparison.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 
@@ -6169,7 +6169,7 @@ test-immutable-string-editing: $(BIN)
 	@./$(BIN) run Tests/StringCharacterIndexingEnumeration >/dev/null; echo True
 	@./$(BIN) run Tests/StringCoreProperties >/dev/null; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.307"' Tests/ImmutableStringEditing/ImmutableStringEditing.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.307"' Tests/ImmutableStringEditing/ImmutableStringEditing.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-string-builder-foundation
@@ -6193,7 +6193,7 @@ test-string-builder-foundation: $(BIN)
 	@./$(BIN) run Tests/StringCharacterIndexingEnumeration >/dev/null; echo True
 	@./$(BIN) run Tests/StringCoreProperties >/dev/null; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.308"' Tests/StringBuilderFoundation/StringBuilderFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; test $$(find StandardLibrary/Void -path '*/StringBuilder.void' -type f | wc -l) -eq 1; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.308"' Tests/StringBuilderFoundation/StringBuilderFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; test $$(find StandardLibrary/Void -path '*/StringBuilder.void' -type f | wc -l) -eq 1; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 
@@ -6227,7 +6227,7 @@ test-interpolated-strings-primitive-formatting: $(BIN)
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
 	@./$(BIN) run Tests/GenericMethodCalls >/dev/null; echo True
 	@./$(BIN) run Tests/NamedArguments >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.309"' Tests/InterpolatedStringsPrimitiveFormatting/InterpolatedStringsPrimitiveFormatting.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; test $$(find StandardLibrary/Void -path '*/StringBuilder.void' -type f | wc -l) -eq 1; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.309"' Tests/InterpolatedStringsPrimitiveFormatting/InterpolatedStringsPrimitiveFormatting.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; test $$(find StandardLibrary/Void -path '*/StringBuilder.void' -type f | wc -l) -eq 1; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 
 .PHONY: test-core-strings-utf8-text-construction-integration-audit
@@ -6256,7 +6256,7 @@ test-core-strings-utf8-text-construction-integration-audit: $(BIN)
 	@./$(BIN) run Tests/StringCharacterIndexingEnumeration >/dev/null; echo True
 	@./$(BIN) run Tests/StringCoreProperties >/dev/null; echo True
 	@./$(BIN) check Tests/Utf8ValidityUnicodeScalarFoundation >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.310"' Tests/CoreStringsUtf8TextConstructionIntegrationAudit/CoreStringsUtf8TextConstructionIntegrationAudit.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.310"' Tests/CoreStringsUtf8TextConstructionIntegrationAudit/CoreStringsUtf8TextConstructionIntegrationAudit.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; ! grep -R -Fq 'cstring' Compiler StandardLibrary; echo True
 
 .PHONY: test-standard-library-compatibility-cleanup
 test-standard-library-compatibility-cleanup: $(BIN)
@@ -6266,7 +6266,7 @@ test-standard-library-compatibility-cleanup: $(BIN)
 test-console-read-line-foundation: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.311"' Tests/ConsoleReadLineFoundation/ConsoleReadLineFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.311"' Tests/ConsoleReadLineFoundation/ConsoleReadLineFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-console-read-shared-input-buffering
 test-console-read-shared-input-buffering: $(BIN)
@@ -6274,7 +6274,7 @@ test-console-read-shared-input-buffering: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.312"' Tests/ConsoleReadSharedInputBuffering/ConsoleReadSharedInputBuffering.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.312"' Tests/ConsoleReadSharedInputBuffering/ConsoleReadSharedInputBuffering.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-console-text-reader-writer
 test-console-text-reader-writer: $(BIN)
@@ -6283,7 +6283,7 @@ test-console-text-reader-writer: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.313"' Tests/ConsoleTextReaderWriter/ConsoleTextReaderWriter.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.313"' Tests/ConsoleTextReaderWriter/ConsoleTextReaderWriter.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-console-redirection
 test-console-redirection: $(BIN)
@@ -6293,7 +6293,7 @@ test-console-redirection: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.314"' Tests/ConsoleRedirection/ConsoleRedirection.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.314"' Tests/ConsoleRedirection/ConsoleRedirection.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 
 .PHONY: test-console-standard-streams
@@ -6305,7 +6305,7 @@ test-console-standard-streams: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.315"' Tests/ConsoleStandardStreams/ConsoleStandardStreams.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.315"' Tests/ConsoleStandardStreams/ConsoleStandardStreams.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 
 .PHONY: test-console-encoding-integration
@@ -6319,7 +6319,7 @@ test-console-encoding-integration: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.316"' Tests/ConsoleEncodingIntegration/ConsoleEncodingIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.316"' Tests/ConsoleEncodingIntegration/ConsoleEncodingIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 
 .PHONY: test-console-key-read-key
@@ -6334,7 +6334,7 @@ test-console-key-read-key: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.317"' Tests/ConsoleKeyReadKey/ConsoleKeyReadKey.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.317"' Tests/ConsoleKeyReadKey/ConsoleKeyReadKey.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-console-input-control
 # Milestone 318: KeyAvailable, Ctrl+C & Console Input Control
@@ -6349,7 +6349,7 @@ test-console-input-control: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.318"' Tests/ConsoleInputControl/ConsoleInputControl.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.318"' Tests/ConsoleInputControl/ConsoleInputControl.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-console-presentation-basics
 # Milestone 319: Interactive Console Presentation Basics
@@ -6365,7 +6365,7 @@ test-console-presentation-basics: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.319"' Tests/ConsolePresentationBasics/ConsolePresentationBasics.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.319"' Tests/ConsolePresentationBasics/ConsolePresentationBasics.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-console-standard-io-terminal-integration-audit
 # Milestone 320: Console, Standard IO & Terminal Integration Audit
@@ -6382,7 +6382,7 @@ test-console-standard-io-terminal-integration-audit: $(BIN)
 	@$(PYTHON) Tests/test_console_read_line_foundation.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_namespace_layout.py >/dev/null && echo True
 	@$(PYTHON) Tests/test_standard_library_cleanup.py >/dev/null && echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.320"' Tests/ConsoleStandardIoTerminalIntegrationAudit/ConsoleStandardIoTerminalIntegrationAudit.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.320"' Tests/ConsoleStandardIoTerminalIntegrationAudit/ConsoleStandardIoTerminalIntegrationAudit.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-engine-list-operations test-engine-set-operations test-engine-memory-stream test-engine-readiness
 test-engine-list-operations: $(BIN)
@@ -6475,19 +6475,19 @@ test-static-value-type-receivers: $(BIN) $(STATIC_VALUE_MODEL_TEST)
 # Milestone 339: Static API Integration & Generic Default Surfaces
 test-static-api-integration: $(BIN)
 	@$(PYTHON) Tests/test_static_api_integration.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.339"' Tests/StaticApiIntegration/StaticApiIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.339"' Tests/StaticApiIntegration/StaticApiIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-builtin-floating-decimal-parsing
 # Milestone 338: Floating-Point & Decimal Parsing Completion
 test-builtin-floating-decimal-parsing: $(BIN)
 	@$(PYTHON) Tests/test_builtin_floating_decimal_parsing.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.338"' Tests/BuiltInFloatingDecimalParsing/BuiltInFloatingDecimalParsing.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.338"' Tests/BuiltInFloatingDecimalParsing/BuiltInFloatingDecimalParsing.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-builtin-integral-bool-char-parsing
 # Milestone 337: Integral, Boolean & Character Parsing Foundation
 test-builtin-integral-bool-char-parsing: $(BIN)
 	@$(PYTHON) Tests/test_builtin_integral_bool_char_parsing.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.337"' Tests/BuiltInIntegralBoolCharParsing/BuiltInIntegralBoolCharParsing.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.337"' Tests/BuiltInIntegralBoolCharParsing/BuiltInIntegralBoolCharParsing.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-builtin-static-values
 BUILTIN_STATIC_VALUES_MODEL_TEST := Tests/BuiltInStaticValues/bin/model-test$(EXE_SUFFIX)
@@ -6499,7 +6499,7 @@ $(BUILTIN_STATIC_VALUES_MODEL_TEST): Tests/BuiltInStaticValues/model_test.c $(SO
 test-builtin-static-values: $(BIN) $(BUILTIN_STATIC_VALUES_MODEL_TEST)
 	@$(BUILTIN_STATIC_VALUES_MODEL_TEST)
 	@$(PYTHON) Tests/test_builtin_static_values.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.336"' Tests/BuiltInStaticValues/BuiltInStaticValues.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.336"' Tests/BuiltInStaticValues/BuiltInStaticValues.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-builtin-associated-member-foundation
 BUILTIN_ASSOCIATED_MEMBER_MODEL_TEST := Tests/BuiltInAssociatedMemberFoundation/bin/model-test$(EXE_SUFFIX)
@@ -6510,7 +6510,7 @@ $(BUILTIN_ASSOCIATED_MEMBER_MODEL_TEST): Tests/BuiltInAssociatedMemberFoundation
 test-builtin-associated-member-foundation: $(BIN) $(BUILTIN_ASSOCIATED_MEMBER_MODEL_TEST)
 	@$(BUILTIN_ASSOCIATED_MEMBER_MODEL_TEST)
 	@$(PYTHON) Tests/test_builtin_associated_member_foundation.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.335"' Tests/BuiltInAssociatedMemberFoundation/BuiltInAssociatedMemberFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.335"' Tests/BuiltInAssociatedMemberFoundation/BuiltInAssociatedMemberFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-constructed-generic-static-members
 CONSTRUCTED_GENERIC_STATIC_MODEL_TEST := Tests/ConstructedGenericStaticMembers/bin/model-test$(EXE_SUFFIX)
@@ -6521,7 +6521,7 @@ $(CONSTRUCTED_GENERIC_STATIC_MODEL_TEST): Tests/ConstructedGenericStaticMembers/
 test-constructed-generic-static-members: $(BIN) $(CONSTRUCTED_GENERIC_STATIC_MODEL_TEST)
 	@$(CONSTRUCTED_GENERIC_STATIC_MODEL_TEST)
 	@$(PYTHON) Tests/test_constructed_generic_static_members.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.334"' Tests/ConstructedGenericStaticMembers/ConstructedGenericStaticMembers.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.334"' Tests/ConstructedGenericStaticMembers/ConstructedGenericStaticMembers.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-static-callable-type-receivers
 STATIC_CALLABLE_MODEL_TEST := Tests/StaticCallableTypeReceivers/bin/model-test$(EXE_SUFFIX)
@@ -6532,70 +6532,70 @@ $(STATIC_CALLABLE_MODEL_TEST): Tests/StaticCallableTypeReceivers/model_test.c $(
 test-static-callable-type-receivers: $(BIN) $(STATIC_CALLABLE_MODEL_TEST)
 	@$(STATIC_CALLABLE_MODEL_TEST)
 	@$(PYTHON) Tests/test_static_callable_type_receivers.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.333"' Tests/StaticCallableTypeReceivers/StaticCallableTypeReceivers.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.333"' Tests/StaticCallableTypeReceivers/StaticCallableTypeReceivers.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; echo True
 
 .PHONY: test-type-qualified-static-members-builtins-integration-audit
 # Milestone 340: whole-block composition audit; historical suites remain separate.
 test-type-qualified-static-members-builtins-integration-audit: $(BIN)
 	@$(PYTHON) Tests/test_type_qualified_static_members_builtins_integration_audit.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; echo True
 
 .PHONY: test-inline-typed-out-variable-declarations
 # Milestone 341: inline typed out-variable declarations with ordinary local/out integration.
 test-inline-typed-out-variable-declarations: $(BIN)
 	@$(PYTHON) Tests/test_inline_typed_out_variable_declarations.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.341"' Tests/InlineTypedOutVariableDeclarations/InlineTypedOutVariableDeclarations.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.341"' Tests/InlineTypedOutVariableDeclarations/InlineTypedOutVariableDeclarations.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 .PHONY: test-out-var-type-inference-overload-integration
 # Milestone 342: out var type inference and overload integration.
 test-out-var-type-inference-overload-integration: $(BIN)
 	@$(PYTHON) Tests/test_out_var_type_inference_overload_integration.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.342"' Tests/OutVarTypeInferenceOverloadIntegration/OutVarTypeInferenceOverloadIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.342"' Tests/OutVarTypeInferenceOverloadIntegration/OutVarTypeInferenceOverloadIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 .PHONY: test-out-variable-scope-flow-discard-completion
 # Milestone 343: inline out-variable scope/flow completion and context-specific out discard.
 test-out-variable-scope-flow-discard-completion: $(BIN)
 	@$(PYTHON) Tests/test_out_variable_scope_flow_discard_completion.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.343"' Tests/OutVariableScopeFlowDiscardCompletion/OutVariableScopeFlowDiscardCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.343"' Tests/OutVariableScopeFlowDiscardCompletion/OutVariableScopeFlowDiscardCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 
 .PHONY: test-runtime-source-excerpt-diagnostic-foundation
 # Milestone 344: runtime source-excerpt diagnostic foundation.
 test-runtime-source-excerpt-diagnostic-foundation: $(BIN)
 	@$(PYTHON) Tests/test_runtime_source_excerpt_diagnostic_foundation.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.344"' Tests/RuntimeSourceExcerptDiagnosticFoundation/RuntimeSourceExcerptDiagnosticFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.344"' Tests/RuntimeSourceExcerptDiagnosticFoundation/RuntimeSourceExcerptDiagnosticFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 .PHONY: test-synchronous-void-call-stack-foundation
 # Milestone 345: truthful per-thread synchronous VOID call-stack foundation.
 test-synchronous-void-call-stack-foundation: $(BIN)
 	@$(PYTHON) Tests/test_synchronous_void_call_stack_foundation.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.345"' Tests/SynchronousVoidCallStackFoundation/SynchronousVoidCallStackFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.345"' Tests/SynchronousVoidCallStackFoundation/SynchronousVoidCallStackFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 .PHONY: test-exception-rethrow-runtime-failure-stack-preservation
 # Milestone 346: exception/rethrow/runtime-failure captured stack preservation.
 test-exception-rethrow-runtime-failure-stack-preservation: $(BIN)
 	@$(PYTHON) Tests/test_exception_rethrow_runtime_failure_stack_preservation.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.346"' Tests/ExceptionRethrowRuntimeFailureStackPreservation/ExceptionRethrowRuntimeFailureStackPreservation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.346"' Tests/ExceptionRethrowRuntimeFailureStackPreservation/ExceptionRethrowRuntimeFailureStackPreservation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-unified-runtime-diagnostic-presentation
 # Milestone 347: unified runtime diagnostic presentation over source excerpts and truthful stacks.
 test-unified-runtime-diagnostic-presentation: $(BIN)
 	@$(PYTHON) Tests/test_unified_runtime_diagnostic_presentation.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.347"' Tests/UnifiedRuntimeDiagnosticPresentation/UnifiedRuntimeDiagnosticPresentation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.347"' Tests/UnifiedRuntimeDiagnosticPresentation/UnifiedRuntimeDiagnosticPresentation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-source-availability-publish-native-boundary-fallbacks
 # Milestone 348: truthful source availability/publish/native-boundary fallbacks.
 test-source-availability-publish-native-boundary-fallbacks: $(BIN)
 	@$(PYTHON) Tests/test_source_availability_publish_native_boundary_fallbacks.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.348"' Tests/SourceAvailabilityPublishNativeBoundaryFallbacks/SourceAvailabilityPublishNativeBoundaryFallbacks.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.348"' Tests/SourceAvailabilityPublishNativeBoundaryFallbacks/SourceAvailabilityPublishNativeBoundaryFallbacks.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-runtime-diagnostics-cross-feature-integration
 # Milestone 349: cross-feature integration of runtime diagnostics across language/runtime systems.
 test-runtime-diagnostics-cross-feature-integration: $(BIN)
 	@$(PYTHON) Tests/test_runtime_diagnostics_cross_feature_integration.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.349"' Tests/RuntimeDiagnosticsCrossFeatureIntegration/RuntimeDiagnosticsCrossFeatureIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.349"' Tests/RuntimeDiagnosticsCrossFeatureIntegration/RuntimeDiagnosticsCrossFeatureIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'parser.add_argument("--jobs"' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; grep -Fq 'CPPFLAGS ?= -ICompiler/include' Makefile; echo True
 
 .PHONY: test-out-variables-runtime-diagnostics-integration-audit
 # Milestone 350: permanent whole-block application/flow/tooling/runtime audit.
 test-out-variables-runtime-diagnostics-integration-audit: $(BIN)
 	@$(PYTHON) Tests/test_out_variables_runtime_diagnostics_integration_audit.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.350"' Tests/OutVariableIntegrationAudit/OutVariableIntegrationAudit.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.350"' Tests/OutVariableIntegrationAudit/OutVariableIntegrationAudit.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -Werror -O2' Makefile; echo True
 
 .PHONY: test-implicit-instance-receiver-binding
 # Milestone 351: unqualified instance calls share ordinary overload resolution and receiver binding.
@@ -6614,55 +6614,55 @@ test-implicit-instance-receiver-binding: $(BIN) $(IMPLICIT_RECEIVER_MODEL_TEST)
 	@set -e; out=$$(mktemp); if ./$(BIN) check Tests/ImplicitInstanceReceiverBindingDiagnostics/Ambiguous >$$out 2>&1; then cat $$out; rm -f $$out; exit 1; fi; grep -Fq "call to 'Choose' is ambiguous" $$out; grep -Fq 'code: VOID3003' $$out; rm -f $$out; echo True
 	@./$(BIN) build Tests/ImplicitInstanceReceiverBindingStrict >/dev/null
 	@set -e; thread_flags='-pthread'; if [ "$(OS)" = "Windows_NT" ]; then thread_flags=''; fi; $(CC) $(CFLAGS) -IRuntime/include $$thread_flags Tests/ImplicitInstanceReceiverBindingStrict/.void/ImplicitInstanceReceiverBindingStrict.c Runtime/src/vc_thread.c Runtime/src/vc_atomic.c Runtime/src/vc_memory.c Runtime/src/vc_filesystem.c -o Tests/ImplicitInstanceReceiverBindingStrict/bin/strict-check$(EXE_SUFFIX); ./Tests/ImplicitInstanceReceiverBindingStrict/bin/strict-check$(EXE_SUFFIX) >/dev/null; echo True
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.351"' Tests/ImplicitInstanceReceiverBinding/ImplicitInstanceReceiverBinding.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.351"' Tests/ImplicitInstanceReceiverBinding/ImplicitInstanceReceiverBinding.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; echo True
 
 .PHONY: test-ordinary-local-definite-assignment
 # Milestone 352: ordinary locals participate in the shared definite-assignment flow state.
 test-ordinary-local-definite-assignment: $(BIN)
 	@$(PYTHON) Tests/test_ordinary_local_definite_assignment.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.352"' Tests/OrdinaryLocalDefiniteAssignment/OrdinaryLocalDefiniteAssignment.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-ordinary-local-definite-assignment' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.352"' Tests/OrdinaryLocalDefiniteAssignment/OrdinaryLocalDefiniteAssignment.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-ordinary-local-definite-assignment' Tests/run_full_suite.py; echo True
 
 .PHONY: test-using-alias-semantic-binding
 # Milestone 353: parsed using aliases bind through canonical namespace/type semantics.
 test-using-alias-semantic-binding: $(BIN)
 	@$(PYTHON) Tests/test_using_alias_semantic_binding.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.353"' Tests/UsingAliasSemanticBinding/UsingAliasSemanticBinding.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-using-alias-semantic-binding' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.353"' Tests/UsingAliasSemanticBinding/UsingAliasSemanticBinding.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-using-alias-semantic-binding' Tests/run_full_suite.py; echo True
 
 .PHONY: test-defined-signed-integer-arithmetic-foundation
 
 test-defined-signed-integer-arithmetic-foundation: $(BIN)
 	@$(PYTHON) Tests/test_defined_signed_integer_arithmetic_foundation.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.354"' Tests/DefinedSignedIntegerArithmeticFoundation/DefinedSignedIntegerArithmeticFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-defined-signed-integer-arithmetic-foundation' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.354"' Tests/DefinedSignedIntegerArithmeticFoundation/DefinedSignedIntegerArithmeticFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-defined-signed-integer-arithmetic-foundation' Tests/run_full_suite.py; echo True
 
 .PHONY: test-signed-arithmetic-conversion-boundary-completion
 # Milestone 355: defined signed operations, shifts and integral conversions.
 test-signed-arithmetic-conversion-boundary-completion: $(BIN)
 	@$(PYTHON) Tests/test_signed_arithmetic_conversion_boundary_completion.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.355"' Tests/SignedArithmeticConversionBoundaryCompletion/SignedArithmeticConversionBoundaryCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-signed-arithmetic-conversion-boundary-completion' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.355"' Tests/SignedArithmeticConversionBoundaryCompletion/SignedArithmeticConversionBoundaryCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-signed-arithmetic-conversion-boundary-completion' Tests/run_full_suite.py; echo True
 
 .PHONY: test-strict-generated-c-cleanliness-completion
 # Milestone 356: independently strict-compile and run actual generated C.
 test-strict-generated-c-cleanliness-completion: $(BIN)
 	@$(PYTHON) Tests/test_strict_generated_c_cleanliness_completion.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.356"' Tests/StrictGeneratedCCleanlinessCompletion/StrictGeneratedCCleanlinessCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-strict-generated-c-cleanliness-completion' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.356"' Tests/StrictGeneratedCCleanlinessCompletion/StrictGeneratedCCleanlinessCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-strict-generated-c-cleanliness-completion' Tests/run_full_suite.py; echo True
 
 .PHONY: test-literal-host-c-boundary-consistency
 # Milestone 357: VOID-owned literal decoding, numeric validation and strict host-C representation.
 test-literal-host-c-boundary-consistency: $(BIN)
 	@$(PYTHON) Tests/test_literal_host_c_boundary_consistency.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-literal-host-c-boundary-consistency' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-literal-host-c-boundary-consistency' Tests/run_full_suite.py; echo True
 
 .PHONY: test-correctness-cross-feature-integration
 # Milestone 358: composed binding, flow, numeric, native, async/iterator, GC and UTF-8 behavior.
 test-correctness-cross-feature-integration: $(BIN)
 	@$(PYTHON) Tests/test_correctness_cross_feature_integration.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.358"' Tests/CorrectnessCrossFeatureIntegration/CorrectnessCrossFeatureIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-correctness-cross-feature-integration' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.358"' Tests/CorrectnessCrossFeatureIntegration/CorrectnessCrossFeatureIntegration.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-correctness-cross-feature-integration' Tests/run_full_suite.py; echo True
 
 .PHONY: test-correctness-block-stabilization
 # Milestone 359: app-style cross-feature stabilization and protected volatile numeric updates.
 test-correctness-block-stabilization: $(BIN)
 	@$(PYTHON) Tests/test_correctness_block_stabilization.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version": "0.0.359"' Tests/CorrectnessBlockStabilization/CorrectnessBlockStabilization.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-correctness-block-stabilization' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version": "0.0.359"' Tests/CorrectnessBlockStabilization/CorrectnessBlockStabilization.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-correctness-block-stabilization' Tests/run_full_suite.py; echo True
 
 .PHONY: test-correctness-native-backend-integration-audit
 # Milestone 360: unused-body validation and strict native cross-feature audit.
@@ -6673,56 +6673,154 @@ test-correctness-native-backend-integration-audit: $(BIN)
 # Milestone 361: declaration-only contextual braces reuse array construction and shape validation.
 test-contextual-array-initializer-completion: $(BIN)
 	@$(PYTHON) Tests/test_contextual_array_initializer_completion.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.361"' Tests/ContextualArrayInitializerCompletion/ContextualArrayInitializerCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'test-contextual-array-initializer-completion' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.361"' Tests/ContextualArrayInitializerCompletion/ContextualArrayInitializerCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'test-contextual-array-initializer-completion' Tests/run_full_suite.py; echo True
 
 .PHONY: test-array-collection-expression-foundation
 # Milestone 362: bracket collection expressions lower through existing declaration-typed arrays.
 test-array-collection-expression-foundation: $(BIN)
 	@$(PYTHON) Tests/test_array_collection_expression_foundation.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.362"' Tests/ArrayCollectionExpressionFoundation/ArrayCollectionExpressionFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'test-array-collection-expression-foundation' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.362"' Tests/ArrayCollectionExpressionFoundation/ArrayCollectionExpressionFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'test-array-collection-expression-foundation' Tests/run_full_suite.py; echo True
 
 .PHONY: test-collection-expression-target-typing-conversion-integration
 # Milestone 363: empty collections, array target typing, and overload ranking.
 test-collection-expression-target-typing-conversion-integration: $(BIN)
 	@$(PYTHON) Tests/test_collection_expression_target_typing_conversion_integration.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.363"' Tests/CollectionExpressionTargetTyping/CollectionExpressionTargetTyping.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-collection-expression-target-typing-conversion-integration' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.363"' Tests/CollectionExpressionTargetTyping/CollectionExpressionTargetTyping.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-collection-expression-target-typing-conversion-integration' Tests/run_full_suite.py; echo True
 
 .PHONY: test-array-collection-spread-expressions
 # Milestone 364: checked array spread staging/copying with existing array binding.
 test-array-collection-spread-expressions: $(BIN)
 	@$(PYTHON) Tests/test_array_collection_spread_expressions.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.364"' Tests/ArrayCollectionSpreadExpressions/ArrayCollectionSpreadExpressions.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-array-collection-spread-expressions' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.364"' Tests/ArrayCollectionSpreadExpressions/ArrayCollectionSpreadExpressions.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-array-collection-spread-expressions' Tests/run_full_suite.py; echo True
 
 .PHONY: test-span-collection-expression-targets
 # Milestone 365: collection expressions targeting array-backed span views.
 test-span-collection-expression-targets: $(BIN)
 	@$(PYTHON) Tests/test_span_collection_expression_targets.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.365"' Tests/SpanCollectionExpressionTargets/SpanCollectionExpressionTargets.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-span-collection-expression-targets' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.365"' Tests/SpanCollectionExpressionTargets/SpanCollectionExpressionTargets.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-span-collection-expression-targets' Tests/run_full_suite.py; echo True
 
 .PHONY: test-list-custom-collection-expression-construction
 # Milestone 366: concrete collection expressions reuse existing new/instance Add binding.
 test-list-custom-collection-expression-construction: $(BIN)
 	@$(PYTHON) Tests/test_list_custom_collection_expression_construction.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.366"' Tests/ListCustomCollectionExpressionConstruction/ListCustomCollectionExpressionConstruction.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-list-custom-collection-expression-construction' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.366"' Tests/ListCustomCollectionExpressionConstruction/ListCustomCollectionExpressionConstruction.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-list-custom-collection-expression-construction' Tests/run_full_suite.py; echo True
 
 .PHONY: test-general-collection-construction-extensibility
 # Milestone 367: structural new/Add and array/span spread construction.
 test-general-collection-construction-extensibility: $(BIN)
 	@$(PYTHON) Tests/test_general_collection_construction_extensibility.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.367"' Tests/GeneralCollectionConstructionExtensibility/GeneralCollectionConstructionExtensibility.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-general-collection-construction-extensibility' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.367"' Tests/GeneralCollectionConstructionExtensibility/GeneralCollectionConstructionExtensibility.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-general-collection-construction-extensibility' Tests/run_full_suite.py; echo True
 
 .PHONY: test-collection-expression-cross-feature-integration
 test-collection-expression-cross-feature-integration: $(BIN)
 	@$(PYTHON) Tests/test_collection_expression_cross_feature_integration.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'test-collection-expression-cross-feature-integration' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'test-collection-expression-cross-feature-integration' Tests/run_full_suite.py; echo True
 
 .PHONY: test-collection-expression-stabilization
 # Milestone 369: application-focused collection expression correctness gate.
 test-collection-expression-stabilization: $(BIN)
 	@$(PYTHON) Tests/test_collection_expression_stabilization.py
-	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.370"' Compiler/src/main.c; grep -Fq '"version":"0.0.369"' Tests/CollectionExpressionStabilization/CollectionExpressionStabilization.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19246' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 318' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-collection-expression-stabilization' Tests/run_full_suite.py; echo True
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.369"' Tests/CollectionExpressionStabilization/CollectionExpressionStabilization.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-collection-expression-stabilization' Tests/run_full_suite.py; echo True
 
 .PHONY: test-collection-expression-integration-audit
 # Milestone 370: independent collection expression integration and correctness audit.
 test-collection-expression-integration-audit: $(BIN)
 	@$(PYTHON) Tests/test_collection_expression_integration_audit.py
+
+.PHONY: test-integer-math-foundations
+# Milestone 371: source-visible integral Math API and boundary diagnostics.
+test-integer-math-foundations: $(BIN)
+	@$(PYTHON) Tests/test_integer_math_foundations.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.371"' Tests/IntegerMathFoundations/IntegerMathFoundations.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-integer-math-foundations' Tests/run_full_suite.py; echo True
+
+# #371 generated project outputs are never source artifacts.
+clean-integer-math-foundations:
+	@rm -rf Tests/IntegerMathFoundations/.void Tests/IntegerMathFoundations/bin Tests/IntegerMathFoundations/publish
+clean: clean-integer-math-foundations
+.PHONY: clean-integer-math-foundations
+
+.PHONY: test-floating-point-math-foundations clean-floating-point-math-foundations
+# Milestone 372: public double Math and float MathF native C mathematics.
+test-floating-point-math-foundations: $(BIN)
+	@$(PYTHON) Tests/test_floating_point_math_foundations.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-floating-point-math-foundations' Tests/run_full_suite.py; echo True
+
+clean-floating-point-math-foundations:
+	@rm -rf Tests/FloatingPointMathFoundations/.void Tests/FloatingPointMathFoundations/bin Tests/FloatingPointMathFoundations/publish
+clean: clean-floating-point-math-foundations
+
+.PHONY: test-floating-point-rounding-completion clean-floating-point-rounding-completion
+# Milestone 373: midpoint-to-even floating-point rounding and native C11 boundaries.
+test-floating-point-rounding-completion: $(BIN)
+	@$(PYTHON) Tests/test_floating_point_rounding_completion.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.373"' Tests/FloatingPointRoundingCompletion/FloatingPointRoundingCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-floating-point-rounding-completion' Tests/run_full_suite.py; echo True
+
+clean-floating-point-rounding-completion:
+	@rm -rf Tests/FloatingPointRoundingCompletion/.void Tests/FloatingPointRoundingCompletion/bin Tests/FloatingPointRoundingCompletion/publish
+clean: clean-floating-point-rounding-completion
+
+.PHONY: test-deterministic-random-foundation clean-deterministic-random-foundation
+# Milestone 374: PCG32 seeded deterministic StandardLibrary Random foundation.
+test-deterministic-random-foundation: $(BIN)
+	@$(PYTHON) Tests/test_deterministic_random_foundation.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.374"' Tests/DeterministicRandomFoundation/DeterministicRandomFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-deterministic-random-foundation' Tests/run_full_suite.py; echo True
+
+clean-deterministic-random-foundation:
+	@rm -rf Tests/DeterministicRandomFoundation/.void Tests/DeterministicRandomFoundation/bin Tests/DeterministicRandomFoundation/publish
+clean: clean-deterministic-random-foundation
+
+.PHONY: test-unbiased-random-integer-ranges clean-unbiased-random-integer-ranges
+# Milestone 375: rejection-sampled integer intervals on the locked PCG32 stream.
+test-unbiased-random-integer-ranges: $(BIN)
+	@$(PYTHON) Tests/test_unbiased_random_integer_ranges.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.375"' Tests/UnbiasedRandomIntegerRanges/UnbiasedRandomIntegerRanges.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-unbiased-random-integer-ranges' Tests/run_full_suite.py; echo True
+
+clean-unbiased-random-integer-ranges:
+	@rm -rf Tests/UnbiasedRandomIntegerRanges/.void Tests/UnbiasedRandomIntegerRanges/bin Tests/UnbiasedRandomIntegerRanges/publish
+clean: clean-unbiased-random-integer-ranges
+
+.PHONY: test-random-floating-byte-buffer-completion clean-random-floating-byte-buffer-completion
+# Milestone 376: PCG32 floating-point and byte-buffer APIs on the shared stream.
+test-random-floating-byte-buffer-completion: $(BIN)
+	@$(PYTHON) Tests/test_random_floating_byte_buffer_completion.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.376"' Tests/RandomFloatingByteBufferCompletion/RandomFloatingByteBufferCompletion.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-random-floating-byte-buffer-completion' Tests/run_full_suite.py; echo True
+
+clean-random-floating-byte-buffer-completion:
+	@rm -rf Tests/RandomFloatingByteBufferCompletion/.void Tests/RandomFloatingByteBufferCompletion/bin Tests/RandomFloatingByteBufferCompletion/publish
+clean: clean-random-floating-byte-buffer-completion
+
+.PHONY: test-portable-automatic-random-seeding clean-portable-automatic-random-seeding
+# Milestone 377: portable OS entropy seeding without changing the locked PCG stream.
+test-portable-automatic-random-seeding: $(BIN)
+	@$(PYTHON) Tests/test_portable_automatic_random_seeding.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.377"' Tests/PortableAutomaticRandomSeeding/PortableAutomaticRandomSeeding.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-portable-automatic-random-seeding' Tests/run_full_suite.py; echo True
+
+clean-portable-automatic-random-seeding:
+	@rm -rf Tests/PortableAutomaticRandomSeeding/.void Tests/PortableAutomaticRandomSeeding/bin Tests/PortableAutomaticRandomSeeding/publish Tests/PortableAutomaticRandomSeedingMock/.void Tests/PortableAutomaticRandomSeedingMock/bin Tests/PortableAutomaticRandomSeedingMock/publish Tests/PortableAutomaticRandomSeedingFailure/.void Tests/PortableAutomaticRandomSeedingFailure/bin Tests/PortableAutomaticRandomSeedingFailure/publish
+clean: clean-portable-automatic-random-seeding
+
+.PHONY: test-high-resolution-stopwatch-foundation clean-high-resolution-stopwatch-foundation
+# Milestone 378: nanosecond monotonic Stopwatch and deterministic clock edge contracts.
+test-high-resolution-stopwatch-foundation: $(BIN)
+	@$(PYTHON) Tests/test_high_resolution_stopwatch_foundation.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.378"' Tests/HighResolutionStopwatchFoundation/HighResolutionStopwatchFoundation.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-high-resolution-stopwatch-foundation' Tests/run_full_suite.py; echo True
+
+clean-high-resolution-stopwatch-foundation:
+	@rm -rf Tests/HighResolutionStopwatchFoundation/.void Tests/HighResolutionStopwatchFoundation/bin Tests/HighResolutionStopwatchFoundation/publish Tests/HighResolutionStopwatchFoundationMock/.void Tests/HighResolutionStopwatchFoundationMock/bin Tests/HighResolutionStopwatchFoundationMock/publish
+clean: clean-high-resolution-stopwatch-foundation
+
+.PHONY: test-math-random-timing-stabilization clean-math-random-timing-stabilization
+# Milestone 379: cross-feature correctness and stabilization of Math, Random and Stopwatch.
+test-math-random-timing-stabilization: $(BIN)
+	@$(PYTHON) Tests/test_math_random_timing_stabilization.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq '"version":"0.0.379"' Tests/MathRandomTimingStabilization/MathRandomTimingStabilization.voidproj; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'DEFAULT_WORKER_COUNT = 3' Tests/run_full_suite.py; grep -Fq 'test-math-random-timing-stabilization' Tests/run_full_suite.py; echo True
+
+clean-math-random-timing-stabilization:
+	@rm -rf Tests/MathRandomTimingStabilization/.void Tests/MathRandomTimingStabilization/bin Tests/MathRandomTimingStabilization/publish
+clean: clean-math-random-timing-stabilization
+
+.PHONY: test-math-random-timing-integration-audit
+
+test-math-random-timing-integration-audit: $(BIN)
+	@$(PYTHON) Tests/test_math_random_timing_integration_audit.py
+	@set -e; grep -Fq '#define VOIDC_VERSION "0.0.380"' Compiler/src/main.c; grep -Fq 'EXPECTED_TRUE_COUNT = 19537' Tests/run_full_suite.py; grep -Fq 'EXPECTED_FOCUSED_SUITES = 328' Tests/run_full_suite.py; grep -Fq 'test-math-random-timing-integration-audit' Tests/run_full_suite.py; echo True

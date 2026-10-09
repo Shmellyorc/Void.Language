@@ -1,0 +1,1 @@
+using Void; public static class Program { public static void Main() { float x = MathF.Sqrt(25.0); } }

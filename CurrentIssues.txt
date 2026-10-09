@@ -1,7 +1,7 @@
 VOID Language - Current Issues and Deferred Features
 ===================================================
-Recorded baseline: voidc 0.0.370
-Last reviewed: 2026-10-08
+Recorded baseline: voidc 0.0.380 (locally validated; administrative LOCK pending)
+Last reviewed: 2026-10-08 (#371-#380 integration and correctness audit)
 
 CORRECTNESS ISSUES (DEFERRED)
 -----------------------------
@@ -17,6 +17,16 @@ CORRECTNESS ISSUES (DEFERRED)
    Define and implement portable, deterministic VOID semantics across
    supported destination integer types. This is separate from normal,
    in-range conversions.
+
+7. Native C call-argument sequencing
+   Ordinary function/method calls with multiple side-effecting arguments can
+   emit C function arguments as separate expressions without a sequencing
+   boundary. C11 does not specify argument evaluation order; updates to the
+   same scalar across those arguments can have undefined behavior. Verified
+   with a Math.Clamp(++n, ++n, ++n) probe: emitted C contained three updates
+   of n in one call. This is pre-existing shared call lowering, not specific
+   to Math. Repair requires sequencing through the common call-emission path,
+   retaining overload/ref/params/GC behavior; no Math-only workaround.
 
 INTENTIONALLY UNSUPPORTED COLLECTION FEATURES
 ---------------------------------------------
@@ -39,15 +49,42 @@ INTENTIONALLY UNSUPPORTED COLLECTION FEATURES
    construction contracts are not implemented. Concrete constructor-plus-Add
    collection construction is already supported.
 
+#380 AUDIT REVIEW
+-----------------
+- Full isolated cumulative validation: 332/332 suites, 19,537 checks, with
+  TEST_JOBS=8. Dedicated #380 target: 32 harness checks covering 424 program
+  assertions and 261 exact clock-fraction vectors plus native clock edges.
+- GCC and Clang strict C11 at -O0/-O2 passed. UBSan and ASan passed; ASan
+  leak detection is disabled because LeakSanitizer cannot run under the
+  desktop host's tracing environment. No Windows/macOS execution is claimed.
+- #371-#380 is technically ready for LOCK within the documented deferred
+  scope. The user makes the final administrative LOCK decision.
+- Issues 1, 2 and 7 remain deferred; none is claimed resolved or partially
+  resolved by this audit. Unused open generic validation and common call
+  sequencing were independently reproduced. Unchecked native floating-to-
+  integer casts remain; Math rounding uses no such casts.
+- Fixed shared monotonic-clock nanosecond overflow (including final addition
+  and full-width Windows counter fractions), with permanent native regressions.
+- Fixed common bitwise compound emission discovered in a threaded Random
+  workload; reject floating operands through the existing semantic binder.
+  This does not repair or narrow the separate call-argument sequencing issue 7.
+- Math/MathF Round now explicitly preserve the input sign when the rounded
+  result is zero, including under directed host rounding and optimization.
+- No changes to the PCG32 algorithm, explicit-seed sequences, entropy policy,
+  integer wrapping semantics, timing subsystem, or collection feature scope.
+- Permanent target: test-math-random-timing-integration-audit. Native platform
+  execution is Linux; Windows fraction arithmetic is unit-tested on Linux,
+  and Windows/macOS OS paths are inspected, not claimed executed.
+
 PLANNING NOTES
 --------------
-- Issues 1-2 are genuine correctness gaps. Items 3-6 are deferred feature
+- Issues 1, 2 and 7 are genuine correctness gaps. Items 3-6 are deferred feature
   limitations, not defects in the already supported collection behavior.
 - These items are NOT blockers for unrelated milestones. Revisit only when
   a new milestone directly depends on one, or new technical evidence shows
   a defect in existing supported behavior.
-- #371-#380 is the locked planning roadmap: Core Math, Random & Timing
-  Foundations. The roadmap lock is a planning decision, not completed work.
+- #371-#380 is the Core Math, Random & Timing Foundations roadmap. The
+  #380 technical audit is separate from the user's administrative LOCK decision.
 - The #361-#370 collection-expression block is technically validated at
   voidc 0.0.370. The user controls any administrative LOCK decision.
 - Update this file when an issue is resolved or a new verified issue is found.

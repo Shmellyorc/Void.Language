@@ -339,7 +339,7 @@ public static class Program
         check(compile_result.returncode == 0, compile_result.stderr)
 
     version = invoke('version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.370', version.stdout)
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.380', version.stdout)
     compiler = (ROOT / 'Compiler' / 'src' / 'compiler.c').read_text(encoding='utf-8')
     check('VcCapturedCallFrame *captured_call_frames;' in compiler, 'captured stack is not thread-owned')
     check('vc_rethrow_handler(&' in compiler, 'bare rethrow does not preserve captured range')

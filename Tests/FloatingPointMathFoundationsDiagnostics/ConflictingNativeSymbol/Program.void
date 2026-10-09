@@ -1,0 +1,14 @@
+public static class NativeOne
+{
+    [Native("void372_conflict")]
+    public static unsafe extern float First(float value);
+}
+public static class NativeTwo
+{
+    [Native("void372_conflict")]
+    public static unsafe extern double Second(double value);
+}
+public static class Program
+{
+    public static void Main() { }
+}

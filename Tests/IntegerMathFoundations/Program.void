@@ -1,0 +1,130 @@
+using Void;
+
+public static class NestedMath371<T>
+{
+    public static long Execute(T ignored)
+    {
+        return Math.Max(Math.Min(45L, 42L), Math.Clamp(90L, 0L, 42L));
+    }
+}
+
+public static class Program
+{
+    public static int ViaMethod(int value)
+    {
+        return Math.Clamp(Math.Abs(value), 0, 100);
+    }
+
+    public static void Main()
+    {
+        int a = Math.Min(10, 20);
+        int b = Math.Max(10, 20);
+        Console.WriteLine(a == 10 && b == 20);
+        Console.WriteLine(Math.Min(-10, 0) == -10 && Math.Max(-10, 0) == 0);
+        Console.WriteLine(Math.Min(int.MinValue, int.MaxValue) == int.MinValue);
+        Console.WriteLine(Math.Max(int.MinValue, int.MaxValue) == int.MaxValue);
+        Console.WriteLine(Math.Min(7, 7) == 7 && Math.Max(7, 7) == 7);
+        long lmin = Math.Min(long.MinValue, long.MaxValue);
+        long lmax = Math.Max(long.MinValue, long.MaxValue);
+        Console.WriteLine(lmin == long.MinValue && lmax == long.MaxValue);
+
+        sbyte sa = (sbyte)-7;
+        sbyte sb = (sbyte)4;
+        sbyte sm = Math.Min(sa, sb);
+        sbyte sx = Math.Max(sa, sb);
+        Console.WriteLine(sm == sa && sx == sb);
+        byte ba = (byte)255;
+        byte bb = (byte)1;
+        byte bm = Math.Max(ba, bb);
+        byte bn = Math.Min(ba, bb);
+        Console.WriteLine(bm == byte.MaxValue && bn == bb);
+        short ha = (short)-32000;
+        short hb = (short)32000;
+        short hm = Math.Min(ha, hb);
+        short hx = Math.Max(ha, hb);
+        Console.WriteLine(hm == ha && hx == hb);
+        ushort ua = ushort.MaxValue;
+        ushort ub = (ushort)1;
+        ushort um = Math.Max(ua, ub);
+        ushort un = Math.Min(ua, ub);
+        Console.WriteLine(um == ushort.MaxValue && un == ub);
+        uint ia = uint.MaxValue;
+        uint ib = (uint)1;
+        uint im = Math.Max(ia, ib);
+        uint ix = Math.Min(ia, ib);
+        Console.WriteLine(im == uint.MaxValue && ix == ib);
+        ulong la = ulong.MaxValue;
+        ulong lb = 1UL;
+        ulong lm = Math.Max(la, lb);
+        ulong ln = Math.Min(la, lb);
+        Console.WriteLine(lm == ulong.MaxValue && ln == lb);
+
+        Console.WriteLine(Math.Abs(-10) == 10 && Math.Abs(0) == 0 && Math.Abs(10) == 10);
+        Console.WriteLine(Math.Abs(int.MaxValue) == int.MaxValue);
+        Console.WriteLine(Math.Abs(-42L) == 42L && Math.Abs(long.MaxValue) == long.MaxValue);
+        sbyte absS = Math.Abs((sbyte)-127);
+        short absH = Math.Abs((short)-32767);
+        Console.WriteLine(absS == (sbyte)127 && absH == (short)32767);
+        bool intOverflow = false;
+        try { Math.Abs(int.MinValue); }
+        catch (OverflowException) { intOverflow = true; }
+        Console.WriteLine(intOverflow);
+        bool longOverflow = false;
+        try { Math.Abs(long.MinValue); }
+        catch (OverflowException) { longOverflow = true; }
+        Console.WriteLine(longOverflow);
+        bool sbyteOverflow = false;
+        try { Math.Abs(sbyte.MinValue); }
+        catch (OverflowException) { sbyteOverflow = true; }
+        Console.WriteLine(sbyteOverflow);
+        bool shortOverflow = false;
+        try { Math.Abs(short.MinValue); }
+        catch (OverflowException) { shortOverflow = true; }
+        Console.WriteLine(shortOverflow);
+
+        Console.WriteLine(Math.Clamp(-20, 0, 100) == 0);
+        Console.WriteLine(Math.Clamp(80, 0, 100) == 80);
+        Console.WriteLine(Math.Clamp(120, 0, 100) == 100);
+        Console.WriteLine(Math.Clamp(0, 0, 100) == 0 && Math.Clamp(100, 0, 100) == 100);
+        Console.WriteLine(Math.Clamp(-7, -7, -7) == -7);
+        Console.WriteLine(Math.Clamp(long.MinValue, long.MinValue, long.MaxValue) == long.MinValue);
+        Console.WriteLine(Math.Clamp(long.MaxValue, long.MinValue, long.MaxValue) == long.MaxValue);
+        byte cb = Math.Clamp((byte)220, (byte)5, (byte)100);
+        short ch = Math.Clamp((short)-10, (short)-5, (short)10);
+        ushort cuh = Math.Clamp(ushort.MaxValue, (ushort)2, (ushort)80);
+        uint cui = Math.Clamp(uint.MaxValue, (uint)0, (uint)77);
+        ulong cul = Math.Clamp(ulong.MaxValue, 0UL, 99UL);
+        sbyte cs = Math.Clamp((sbyte)-40, (sbyte)-9, (sbyte)9);
+        Console.WriteLine(cb == (byte)100 && ch == (short)-5 && cuh == (ushort)80);
+        Console.WriteLine(cui == (uint)77 && cul == 99UL && cs == (sbyte)-9);
+        bool invalid = false;
+        try { Math.Clamp(1, 7, 6); }
+        catch (ArgumentException) { invalid = true; }
+        Console.WriteLine(invalid);
+        bool invalidUnsigned = false;
+        try { Math.Clamp(1UL, 7UL, 6UL); }
+        catch (ArgumentException) { invalidUnsigned = true; }
+        Console.WriteLine(invalidUnsigned);
+
+        Console.WriteLine(Math.Sign(-10) == -1 && Math.Sign(0) == 0 && Math.Sign(10) == 1);
+        Console.WriteLine(Math.Sign(int.MinValue) == -1 && Math.Sign(long.MinValue) == -1);
+        Console.WriteLine(Math.Sign(sbyte.MinValue) == -1 && Math.Sign(short.MinValue) == -1);
+        int signS = Math.Sign((sbyte)-1);
+        int signH = Math.Sign((short)2);
+        int signL = Math.Sign(0L);
+        Console.WriteLine(signS == -1 && signH == 1 && signL == 0);
+        Console.WriteLine(ViaMethod(-40) == 40 && ViaMethod(int.MaxValue) == 100);
+        Console.WriteLine(NestedMath371<string>.Execute("generic") == 42L);
+        long mixed = Math.Min((int)5, 7L);
+        Console.WriteLine(mixed == 5L);
+        short mixedSmall = Math.Max((byte)5, (short)-2);
+        Console.WriteLine(mixedSmall == (short)5);
+        int changes = 0;
+        int evaluatedOnce = Math.Min(++changes, 2);
+        Console.WriteLine(changes == 1 && evaluatedOnce == 1);
+        int clampChanges = 0;
+        int clampedOnce = Math.Clamp(++clampChanges, 0, 2);
+        Console.WriteLine(clampChanges == 1 && clampedOnce == 1);
+        Console.WriteLine(Math.Max(int.MaxValue, int.MinValue) + 1 == int.MinValue);
+    }
+}

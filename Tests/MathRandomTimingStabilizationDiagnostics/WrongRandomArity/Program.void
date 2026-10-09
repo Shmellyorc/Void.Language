@@ -1,0 +1,9 @@
+using Void;
+public static class Program
+{
+    public static void Main()
+    {
+        Random random = new Random(42);
+        random.Next(1, 2, 3);
+    }
+}

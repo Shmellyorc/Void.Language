@@ -1,0 +1,81 @@
+using Void;
+using Void.Diagnostics;
+using Void.Threading;
+
+public static class StopwatchGeneric378<T>
+{
+    public static long Read(T unused, Stopwatch watch) { return watch.ElapsedTicks; }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Stopwatch watch = new Stopwatch();
+        Console.WriteLine(!watch.IsRunning);
+        Console.WriteLine(watch.ElapsedTicks == 0l);
+        Console.WriteLine(watch.ElapsedMilliseconds == 0l);
+        Console.WriteLine(Stopwatch.Frequency == 1000000000l);
+        long before = Stopwatch.GetTimestamp();
+        long later = Stopwatch.GetTimestamp();
+        Console.WriteLine(before >= 0l && later >= before);
+
+        watch.Stop();
+        Console.WriteLine(!watch.IsRunning && watch.ElapsedTicks == 0l);
+        watch.Start();
+        Console.WriteLine(watch.IsRunning);
+        long first = watch.ElapsedTicks;
+        watch.Start();
+        long second = watch.ElapsedTicks;
+        Console.WriteLine(second >= first);
+        long tickBeforeMilliseconds = watch.ElapsedTicks;
+        long runningMilliseconds = watch.ElapsedMilliseconds;
+        long tickAfterMilliseconds = watch.ElapsedTicks;
+        Console.WriteLine(runningMilliseconds >= tickBeforeMilliseconds / 1000000l &&
+                          runningMilliseconds <= tickAfterMilliseconds / 1000000l);
+        Thread.Sleep(2);
+        long during = watch.ElapsedTicks;
+        Console.WriteLine(during > 0l);
+        Console.WriteLine(during >= second);
+        watch.Stop();
+        long stopped = watch.ElapsedTicks;
+        Console.WriteLine(!watch.IsRunning);
+        Console.WriteLine(stopped >= during);
+        watch.Stop();
+        Console.WriteLine(watch.ElapsedTicks == stopped);
+        Console.WriteLine(watch.ElapsedMilliseconds == stopped / 1000000l);
+        watch.Start();
+        Thread.Sleep(1);
+        watch.Stop();
+        Console.WriteLine(watch.ElapsedTicks >= stopped);
+        Console.WriteLine(StopwatchGeneric378<int>.Read(5, watch) == watch.ElapsedTicks);
+        watch.Reset();
+        Console.WriteLine(!watch.IsRunning && watch.ElapsedTicks == 0l && watch.ElapsedMilliseconds == 0l);
+        watch.Restart();
+        Console.WriteLine(watch.IsRunning);
+        Thread.Sleep(2);
+        Console.WriteLine(watch.ElapsedTicks > 0l);
+        watch.Stop();
+        Console.WriteLine(watch.ElapsedTicks > 0l);
+
+        Stopwatch fresh = Stopwatch.StartNew();
+        Console.WriteLine(fresh.IsRunning);
+        Console.WriteLine(fresh.ElapsedTicks >= 0l);
+        fresh.Reset();
+        Console.WriteLine(!fresh.IsRunning && fresh.ElapsedTicks == 0l);
+        Console.WriteLine(new Random(42).Next(10) >= 0);
+        Console.WriteLine(Math.Abs(-7) == 7 && Math.Round(2.5) == 2.0);
+        Console.WriteLine(MathF.Sqrt(25.0f) == 5.0f);
+        Stopwatch held = Stopwatch.StartNew();
+        for (int i = 0; i < 64; i++)
+        {
+            Stopwatch temp = Stopwatch.StartNew();
+            temp.Stop();
+            byte[] buffer = new byte[64];
+            buffer[0] = (byte)i;
+        }
+        Console.WriteLine(held.ElapsedTicks >= 0l);
+        held.Stop();
+        Console.WriteLine(held.ElapsedTicks >= 0l);
+    }
+}

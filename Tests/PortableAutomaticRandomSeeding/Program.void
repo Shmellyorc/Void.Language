@@ -1,0 +1,51 @@
+using Void;
+
+public static class AutomaticRandomGeneric377<T>
+{
+    public static int Draw(T unused, Random random) { return random.Next(1000); }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        Random automatic = new Random();
+        Console.WriteLine(automatic.Next() >= 0 && automatic.Next() < int.MaxValue);
+        Console.WriteLine(automatic.Next(0) == 0);
+        Console.WriteLine(automatic.Next(10) < 10);
+        int between = automatic.Next(-20, 20);
+        Console.WriteLine(between >= -20 && between < 20);
+        double fraction = automatic.NextDouble();
+        Console.WriteLine(fraction >= 0.0 && fraction < 1.0);
+        float single = automatic.NextSingle();
+        Console.WriteLine(single >= 0.0f && single < 1.0f);
+        byte[] bytes = new byte[17];
+        automatic.NextBytes(bytes);
+        Console.WriteLine(bytes.Length == 17);
+        Console.WriteLine(AutomaticRandomGeneric377<int>.Draw(3, automatic) < 1000);
+
+        Random a = new Random(42);
+        Random b = new Random(42);
+        bool deterministic = true;
+        for (int i = 0; i < 4096; i++)
+            if (a.Next() != b.Next()) deterministic = false;
+        Console.WriteLine(deterministic);
+
+        // Distinct objects hold separate state, even after many allocations.
+        Random held = new Random(17);
+        Random control = new Random(17);
+        for (int i = 0; i < 64; i++)
+        {
+            Random other = new Random();
+            other.Next();
+            other.NextDouble();
+            other.NextSingle();
+            other.NextBytes(new byte[6]);
+            if (held.Next() != control.Next()) deterministic = false;
+        }
+        Console.WriteLine(deterministic);
+        Console.WriteLine(new Random().Next(int.MinValue, int.MaxValue) >= int.MinValue);
+        Console.WriteLine(new Random().Next(9, 9) == 9);
+        Random empty = new Random(); empty.NextBytes(new byte[0]); Console.WriteLine(empty.Next() >= 0);
+    }
+}

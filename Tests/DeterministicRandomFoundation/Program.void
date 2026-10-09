@@ -1,0 +1,123 @@
+using Void;
+
+public static class RandomConsumer374<T>
+{
+    public static int Draw(T ignored, Random generator)
+    {
+        return generator.Next();
+    }
+}
+
+public static class Program
+{
+    private static uint SequenceHash(int seed, int count)
+    {
+        Random generator = new Random(seed);
+        uint hash = 2166136261u;
+        for (int i = 0; i < count; i++)
+        {
+            int sample = generator.Next();
+            hash = (hash ^ (uint)sample) * 16777619u;
+        }
+        return hash;
+    }
+
+    public static int DrawViaMethod(Random generator)
+    {
+        return generator.Next();
+    }
+
+    public static void Main()
+    {
+        Random reference = new Random(12345);
+        int[] expected = new int[] {
+            1411482639, 1017708956, 1213308536, 285554700,
+            628889468, 1631147903, 283047574, 357275135,
+            1116223725, 866116730, 1421996083, 1466704544
+        };
+        bool matchesReference = true;
+        for (int i = 0; i < expected.Length; i++)
+            if (reference.Next() != expected[i]) matchesReference = false;
+        Console.WriteLine(matchesReference);
+
+        // Independently computed PCG32 seed/reference checkpoints, not sampled
+        // statistically and not derived from the compiler under test.
+        Console.WriteLine(new Random(0).Next() == 1747165775);
+        Console.WriteLine(new Random(1).Next() == 1412771199);
+        Console.WriteLine(new Random(-1).Next() == 1690806306);
+        Console.WriteLine(new Random(int.MinValue).Next() == 1941413130);
+        Console.WriteLine(new Random(int.MaxValue).Next() == 2060452259);
+        Console.WriteLine(new Random(200).Next() == 1212080091);
+        Console.WriteLine(SequenceHash(0, 1024) == 371537182u);
+        Console.WriteLine(SequenceHash(1, 1024) == 3368197236u);
+        Console.WriteLine(SequenceHash(-1, 1024) == 2794245448u);
+        Console.WriteLine(SequenceHash(12345, 1024) == 3484220724u);
+        Console.WriteLine(SequenceHash(int.MinValue, 1024) == 1939131815u);
+        Console.WriteLine(SequenceHash(int.MaxValue, 1024) == 410496018u);
+
+        Random a = new Random(100);
+        Random b = new Random(100);
+        Random c = new Random(200);
+        bool same = true;
+        bool different = false;
+        bool bounded = true;
+        for (int i = 0; i < 4096; i++)
+        {
+            int x = a.Next();
+            int y = b.Next();
+            int z = c.Next();
+            if (x != y) same = false;
+            if (x != z) different = true;
+            if (x < 0 || x >= int.MaxValue || z < 0 || z >= int.MaxValue)
+                bounded = false;
+        }
+        Console.WriteLine(same);
+        Console.WriteLine(different);
+        Console.WriteLine(bounded);
+
+        // Calls on one object must not consume the state of another.
+        Random left = new Random(42);
+        Random right = new Random(42);
+        int left0 = left.Next();
+        int left1 = left.Next();
+        int right0 = right.Next();
+        int right1 = right.Next();
+        Console.WriteLine(left0 == right0 && left1 == right1);
+        Console.WriteLine(left0 != left1);
+        Random spare = new Random(900);
+        for (int i = 0; i < 256; i++) spare.Next();
+        Console.WriteLine(left.Next() == right.Next());
+        Console.WriteLine(spare.Next() >= 0);
+
+        // GC-managed instance state survives incidental allocations and
+        // continues the same stream even when referenced through an array.
+        Random[] keep = new Random[] { new Random(314), new Random(314) };
+        bool stable = true;
+        for (int i = 0; i < 512; i++)
+        {
+            int[] disposable = new int[64];
+            disposable[0] = i;
+            int x = keep[0].Next();
+            int y = keep[1].Next();
+            if (x != y || disposable[0] != i) stable = false;
+        }
+        Console.WriteLine(stable);
+        Console.WriteLine(keep[0] != keep[1]);
+        Console.WriteLine(keep[0].Next() == keep[1].Next());
+
+        Random method = new Random(777);
+        Random baseline = new Random(777);
+        int throughMethod = DrawViaMethod(method);
+        Console.WriteLine(throughMethod == baseline.Next());
+        int throughGeneric = RandomConsumer374<string>.Draw("generic", method);
+        Console.WriteLine(throughGeneric == baseline.Next());
+        Console.WriteLine(method.Next() == baseline.Next());
+
+        // Existing integer and floating-point Math methods are unaffected.
+        Console.WriteLine(Math.Min(2, 3) == 2 && Math.Clamp(10, 0, 6) == 6);
+        Console.WriteLine(Math.Abs(-9L) == 9L && Math.Sign(int.MinValue) == -1);
+        Console.WriteLine(Math.Sqrt(81.0) == 9.0 && MathF.Sqrt(25.0f) == 5.0f);
+        Console.WriteLine(Math.Round(2.5) == 2.0 && MathF.Round(3.5f) == 4.0f);
+        Console.WriteLine(Math.Floor(-1.2) == -2.0 && MathF.Ceiling(1.2f) == 2.0f);
+    }
+}

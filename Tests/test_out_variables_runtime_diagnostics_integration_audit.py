@@ -388,7 +388,7 @@ def main():
             result = invoke('run', ordinary)
             check(result.returncode == 7 and not result.stderr, result)
 
-    check(invoke('version').stdout.strip() == 'voidc 0.0.370')
+    check(invoke('version').stdout.strip() == 'voidc 0.0.380')
     print(f'#350 focused assertions: {COUNT}')
 
 

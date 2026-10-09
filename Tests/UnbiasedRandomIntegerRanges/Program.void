@@ -1,0 +1,218 @@
+using Void;
+
+public static class RandomRangeConsumer375<T>
+{
+    public static int Draw(T unused, Random generator)
+    {
+        return generator.Next(-17, 23);
+    }
+}
+
+public static class Program
+{
+    // Reference values are from an independent Python PCG32 implementation,
+    // with uint64 state masking after each LCG update and threshold rejection.
+    private static uint MixedHash(int seed)
+    {
+        Random r = new Random(seed);
+        uint hash = 2166136261u;
+        for (int i = 0; i < 4096; i++)
+        {
+            int value = 0;
+            int choice = i % 7;
+            if (choice == 0) value = r.Next();
+            else if (choice == 1) value = r.Next(100);
+            else if (choice == 2) value = r.Next(-20, 20);
+            else if (choice == 3) value = r.Next(int.MinValue, int.MaxValue);
+            else if (choice == 4) value = r.Next(int.MinValue, 1);
+            else if (choice == 5) value = r.Next(1);
+            else value = r.Next(0, int.MaxValue);
+            hash = (hash ^ (uint)value) * 16777619u;
+        }
+        return hash;
+    }
+
+    public static void Main()
+    {
+        Random original = new Random(12345);
+        int[] originalExpected = new int[] {
+            1411482639, 1017708956, 1213308536, 285554700,
+            628889468, 1631147903, 283047574, 357275135,
+            1116223725, 866116730, 1421996083, 1466704544
+        };
+        bool originalUnchanged = true;
+        for (int i = 0; i < originalExpected.Length; i++)
+            if (original.Next() != originalExpected[i]) originalUnchanged = false;
+        Console.WriteLine(originalUnchanged);
+
+        Random minBounded = new Random(42);
+        int[] expectedBounded = new int[] { 4, 3, 3, 9, 3, 2, 8, 1, 4, 13, 13, 11 };
+        bool boundedReference = true;
+        for (int i = 0; i < expectedBounded.Length; i++)
+            if (minBounded.Next(14) != expectedBounded[i]) boundedReference = false;
+        Console.WriteLine(boundedReference);
+
+        Random maxBounded = new Random(100);
+        bool maxBounds = true;
+        for (int i = 0; i < 4096; i++)
+        {
+            int value = maxBounded.Next(7);
+            if (value < 0 || value >= 7) maxBounds = false;
+        }
+        Console.WriteLine(maxBounds);
+        Console.WriteLine(new Random(10).Next(0) == 0);
+        Console.WriteLine(new Random(10).Next(1) == 0);
+        Console.WriteLine(new Random(10).Next(int.MaxValue) >= 0);
+
+        Random sameAfterZero = new Random(42);
+        Random zeroBaseline = new Random(42);
+        Console.WriteLine(sameAfterZero.Next(0) == 0 && sameAfterZero.Next() == zeroBaseline.Next());
+
+        Random sameAfterEqual = new Random(42);
+        Random equalBaseline = new Random(42);
+        Console.WriteLine(sameAfterEqual.Next(4, 4) == 4 && sameAfterEqual.Next() == equalBaseline.Next());
+        Console.WriteLine(new Random(5).Next(int.MinValue, int.MinValue) == int.MinValue);
+        Console.WriteLine(new Random(5).Next(int.MaxValue, int.MaxValue) == int.MaxValue);
+        Console.WriteLine(new Random(5).Next(-5, -4) == -5);
+        Console.WriteLine(new Random(5).Next(int.MaxValue - 1, int.MaxValue) == int.MaxValue - 1);
+        Console.WriteLine(new Random(5).Next(int.MinValue, int.MinValue + 1) == int.MinValue);
+        Console.WriteLine(new Random(5).Next(-1, 0) == -1);
+
+        Random full = new Random(42);
+        int[] expectedFull = new int[] {
+            1123384278, -351812439, -222842213, -1004448893,
+            1974427309, -390154702, 1271345452, 1441777623
+        };
+        bool fullReference = true;
+        for (int i = 0; i < expectedFull.Length; i++)
+            if (full.Next(int.MinValue, int.MaxValue) != expectedFull[i]) fullReference = false;
+        Console.WriteLine(fullReference);
+
+        Random wide = new Random(42);
+        int[] expectedWide = new int[] {
+            -1024099371, -173056340, -876138197, -705706026,
+            -15517004, -1249239592, -120267883, -453576624
+        };
+        bool wideReference = true;
+        for (int i = 0; i < expectedWide.Length; i++)
+            if (wide.Next(int.MinValue, 1) != expectedWide[i]) wideReference = false;
+        Console.WriteLine(wideReference);
+
+        Random negative = new Random(27);
+        bool negativeRange = true;
+        for (int i = 0; i < 1024; i++)
+        {
+            int value = negative.Next(-100, -10);
+            if (value < -100 || value >= -10) negativeRange = false;
+        }
+        Console.WriteLine(negativeRange);
+        Random mixed = new Random(27);
+        bool mixedRange = true;
+        for (int i = 0; i < 1024; i++)
+        {
+            int value = mixed.Next(-20, 20);
+            if (value < -20 || value >= 20) mixedRange = false;
+        }
+        Console.WriteLine(mixedRange);
+        Random extreme = new Random(27);
+        bool extremeRange = true;
+        for (int i = 0; i < 1024; i++)
+        {
+            int value = extreme.Next(int.MinValue, int.MaxValue);
+            if (value == int.MaxValue) extremeRange = false;
+        }
+        Console.WriteLine(extremeRange);
+
+        bool negativeMaximum = false;
+        try { new Random(5).Next(-1); }
+        catch (ArgumentOutOfRangeException e) { negativeMaximum = e.ParamName == "maxExclusive"; }
+        Console.WriteLine(negativeMaximum);
+        bool reversed = false;
+        try { new Random(5).Next(20, 10); }
+        catch (ArgumentOutOfRangeException e) { reversed = e.ParamName == "minInclusive"; }
+        Console.WriteLine(reversed);
+        bool extremeReversed = false;
+        try { new Random(5).Next(int.MaxValue, int.MinValue); }
+        catch (ArgumentOutOfRangeException) { extremeReversed = true; }
+        Console.WriteLine(extremeReversed);
+        bool reversedSameNegative = false;
+        try { new Random(5).Next(-1, -2); }
+        catch (ArgumentOutOfRangeException) { reversedSameNegative = true; }
+        Console.WriteLine(reversedSameNegative);
+        Random invalidState = new Random(42);
+        Random invalidBaseline = new Random(42);
+        try { invalidState.Next(-20); }
+        catch (ArgumentOutOfRangeException) { }
+        try { invalidState.Next(10, 0); }
+        catch (ArgumentOutOfRangeException) { }
+        Console.WriteLine(invalidState.Next() == invalidBaseline.Next());
+
+        // Mixed seed-42 reference forces rejection of an initial raw PCG32
+        // value for the width 2^31+1 case, then verifies subsequent state.
+        Random interleaved = new Random(42);
+        int[] expectedMixed = new int[] {
+            1123384279, 9, 15, 0, 1974427309, -876138197, 0,
+            2147483647, 2147483646, 2062288904, 2131966646,
+            -1249239591, 1731076225
+        };
+        int[] actualMixed = new int[13];
+        actualMixed[0] = interleaved.Next();
+        actualMixed[1] = interleaved.Next(10);
+        actualMixed[2] = interleaved.Next(-20, 20);
+        actualMixed[3] = interleaved.Next(1);
+        actualMixed[4] = interleaved.Next(int.MinValue, int.MaxValue);
+        actualMixed[5] = interleaved.Next(int.MinValue, 1);
+        actualMixed[6] = interleaved.Next(0);
+        actualMixed[7] = interleaved.Next(int.MaxValue, int.MaxValue);
+        actualMixed[8] = interleaved.Next(int.MaxValue - 1, int.MaxValue);
+        actualMixed[9] = interleaved.Next();
+        actualMixed[10] = interleaved.Next(int.MaxValue);
+        actualMixed[11] = interleaved.Next(int.MinValue, 0);
+        actualMixed[12] = interleaved.Next(0, int.MaxValue);
+        bool mixedReference = true;
+        for (int i = 0; i < expectedMixed.Length; i++)
+            if (actualMixed[i] != expectedMixed[i]) mixedReference = false;
+        Console.WriteLine(mixedReference);
+        Console.WriteLine(MixedHash(0) == 4228090880u);
+        Console.WriteLine(MixedHash(-1) == 3242142870u);
+        Console.WriteLine(MixedHash(42) == 3113349835u);
+        Console.WriteLine(MixedHash(12345) == 604645141u);
+        Console.WriteLine(MixedHash(0) != MixedHash(42));
+
+        Random first = new Random(201);
+        Random second = new Random(201);
+        Random distractor = new Random(-1);
+        bool same = true;
+        for (int i = 0; i < 1024; i++)
+        {
+            if (first.Next(5) != second.Next(5)) same = false;
+            if (first.Next(-1000, 1000) != second.Next(-1000, 1000)) same = false;
+            distractor.Next();
+        }
+        Console.WriteLine(same);
+        Console.WriteLine(first.Next() == second.Next());
+        Console.WriteLine(distractor.Next(-3, 4) >= -3);
+
+        Random[] rooted = new Random[] { new Random(int.MinValue), new Random(int.MinValue) };
+        bool retained = true;
+        for (int i = 0; i < 128; i++)
+        {
+            int[] allocation = new int[32];
+            allocation[0] = i;
+            if (rooted[0].Next(-200, 200) != rooted[1].Next(-200, 200)) retained = false;
+            if (allocation[0] != i) retained = false;
+        }
+        Console.WriteLine(retained);
+        Console.WriteLine(rooted[0].Next() == rooted[1].Next());
+        Random generic = new Random(99);
+        Random genericBaseline = new Random(99);
+        int genericValue = RandomRangeConsumer375<string>.Draw("payload", generic);
+        Console.WriteLine(genericValue == genericBaseline.Next(-17, 23));
+        Console.WriteLine(generic.Next() == genericBaseline.Next());
+
+        Console.WriteLine(Math.Min(10, 20) == 10 && Math.Clamp(-10, -5, 5) == -5);
+        Console.WriteLine(Math.Abs(-17) == 17 && Math.Sign(int.MinValue) == -1);
+        Console.WriteLine(Math.Sqrt(144.0) == 12.0 && MathF.Sqrt(25.0f) == 5.0f);
+        Console.WriteLine(Math.Round(2.5) == 2.0 && MathF.Round(3.5f) == 4.0f);
+    }
+}

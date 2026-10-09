@@ -1,0 +1,5 @@
+using Void;
+public static class Program
+{
+    public static void Main() { Math.Clamp(3, 1); }
+}

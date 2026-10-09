@@ -1,0 +1,176 @@
+using Void;
+using Void.Diagnostics;
+using Void.Threading;
+using Void.Threading.Tasks;
+
+public sealed class LiveSample379
+{
+    public Random Generator;
+    public Stopwatch Watch;
+    public LiveSample379(int seed)
+    {
+        Generator = new Random(seed);
+        Watch = Stopwatch.StartNew();
+    }
+
+    public int Draw()
+    {
+        int value = Generator.Next(-12, 22);
+        return Math.Clamp(value, -5, 15);
+    }
+}
+
+public static class GenericMath379<T>
+{
+    public static int Draw(T unused, Random generator)
+    {
+        int value = generator.Next(-20, 20);
+        return Math.Clamp(value, -8, 8);
+    }
+}
+
+public static class Program
+{
+    private static async Task<int> DrawAfterAwait(Random generator, Stopwatch watch)
+    {
+        await Task.Delay(1);
+        GC.Collect();
+        int value = generator.Next(5, 16);
+        return Math.Min(15, value) + (watch.ElapsedTicks >= 0l ? 0 : 1000);
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(Math.Min(int.MinValue, int.MaxValue) == int.MinValue);
+        Console.WriteLine(Math.Max(long.MinValue, long.MaxValue) == long.MaxValue);
+        Console.WriteLine(Math.Min(1u, uint.MaxValue) == 1u);
+        Console.WriteLine(Math.Clamp(int.MinValue, -9, 9) == -9);
+        Console.WriteLine(Math.Clamp(int.MaxValue, -9, 9) == 9);
+        Console.WriteLine(Math.Sign(long.MinValue) == -1);
+        bool absOverflow = false;
+        try { Math.Abs(int.MinValue); }
+        catch (OverflowException) { absOverflow = true; }
+        Console.WriteLine(absOverflow);
+        bool clampBounds = false;
+        try { Math.Clamp(5, 9, 2); }
+        catch (ArgumentException) { clampBounds = true; }
+        Console.WriteLine(clampBounds);
+
+        Console.WriteLine(Math.Round(2.5) == 2.0 && Math.Round(-3.5) == -4.0);
+        Console.WriteLine(MathF.Round(2.5f) == 2.0f && MathF.Round(-3.5f) == -4.0f);
+        Console.WriteLine(Math.Floor(-3.2) == -4.0 && Math.Ceiling(3.2) == 4.0);
+        Console.WriteLine(MathF.Truncate(-3.9f) == -3.0f && Math.Truncate(3.9) == 3.0);
+        Console.WriteLine(Math.Sqrt(81.0) == 9.0 && MathF.Sqrt(25.0f) == 5.0f);
+        Console.WriteLine(Math.Pow(2.0, 8.0) == 256.0 && MathF.Pow(2.0f, 8.0f) == 256.0f);
+        Console.WriteLine(Math.Sin(0.0) == 0.0 && MathF.Sin(0.0f) == 0.0f);
+        Console.WriteLine(Math.Log(Math.Exp(1.0)) > 0.9999999999 && Math.Log(Math.Exp(1.0)) < 1.0000000001);
+        double nan = Math.Sqrt(-1.0);
+        Console.WriteLine(nan != nan && Math.Round(double.PositiveInfinity) == double.PositiveInfinity);
+        Console.WriteLine(1.0 / Math.Round(-0.5) == double.NegativeInfinity);
+        Console.WriteLine(1.0f / MathF.Round(-0.5f) == float.NegativeInfinity);
+
+        Random sequence = new Random(12345);
+        Console.WriteLine(sequence.Next() == 1411482639);
+        Random first = new Random(42);
+        Random control = new Random(42);
+        Stopwatch timing = Stopwatch.StartNew();
+        int total = 0;
+        bool same = true;
+        for (int i = 0; i < 1000; i++)
+        {
+            int value = first.Next(5, 16);
+            int expected = control.Next(5, 16);
+            if (value != expected) same = false;
+            total += Math.Clamp(value, 0, 20);
+            if (i % 127 == 0) GC.Collect();
+        }
+        timing.Stop();
+        Console.WriteLine(same && total >= 5000 && total < 16000);
+        Console.WriteLine(timing.ElapsedTicks >= 0l && timing.ElapsedMilliseconds == timing.ElapsedTicks / 1000000l);
+        Console.WriteLine(!timing.IsRunning);
+        timing.Restart();
+        Console.WriteLine(timing.IsRunning && timing.ElapsedTicks >= 0l);
+        timing.Reset();
+        Console.WriteLine(!timing.IsRunning && timing.ElapsedTicks == 0l);
+        Console.WriteLine(Stopwatch.Frequency == 1000000000l && Stopwatch.GetTimestamp() >= 0l);
+
+        Random mixedA = new Random(-99);
+        Random mixedB = new Random(-99);
+        int wideA = mixedA.Next(int.MinValue, int.MaxValue);
+        int wideB = mixedB.Next(int.MinValue, int.MaxValue);
+        Console.WriteLine(wideA == wideB && wideA < int.MaxValue);
+        double doubleA = mixedA.NextDouble();
+        double doubleB = mixedB.NextDouble();
+        Console.WriteLine(doubleA == doubleB && doubleA >= 0.0 && doubleA < 1.0);
+        float singleA = mixedA.NextSingle();
+        float singleB = mixedB.NextSingle();
+        Console.WriteLine(singleA == singleB && singleA >= 0.0f && singleA < 1.0f);
+        byte[] bytesA = new byte[11];
+        byte[] bytesB = new byte[11];
+        mixedA.NextBytes(bytesA);
+        mixedB.NextBytes(bytesB);
+        bool bytesEqual = true;
+        for (int i = 0; i < bytesA.Length; i++)
+            if (bytesA[i] != bytesB[i]) bytesEqual = false;
+        Console.WriteLine(bytesEqual);
+        Console.WriteLine(mixedA.Next() == mixedB.Next());
+        bool invalidBound = false;
+        try { mixedA.Next(-7); }
+        catch (ArgumentOutOfRangeException) { invalidBound = true; }
+        Console.WriteLine(invalidBound);
+        Console.WriteLine(mixedA.Next(0) == 0 && mixedA.Next(7, 7) == 7);
+        Random genericA = new Random(100);
+        Random genericB = new Random(100);
+        Console.WriteLine(GenericMath379<string>.Draw("x", genericA) == GenericMath379<int>.Draw(1, genericB));
+
+        LiveSample379 live = new LiveSample379(97);
+        LiveSample379 reference = new LiveSample379(97);
+        Action drawAction = () => { live.Draw(); };
+        drawAction();
+        // The delegate must advance exactly one draw in the held instance.
+        int firstReference = reference.Draw();
+        Console.WriteLine(firstReference >= -5 && firstReference <= 15 && live.Watch.IsRunning);
+        Console.WriteLine(live.Draw() == reference.Draw());
+        GC.Collect();
+        Console.WriteLine(live.Watch.IsRunning && live.Generator.Next(3) >= 0);
+        live.Watch.Stop();
+        Console.WriteLine(live.Watch.ElapsedTicks >= 0l);
+
+        Random asyncA = new Random(314);
+        Random asyncB = new Random(314);
+        Stopwatch asyncWatch = Stopwatch.StartNew();
+        Task<int> pending = DrawAfterAwait(asyncA, asyncWatch);
+        int asyncResult = pending.Result;
+        int expectedAsync = asyncB.Next(5, 16);
+        Console.WriteLine(asyncResult == expectedAsync);
+        Console.WriteLine(asyncA.Next() == asyncB.Next());
+        asyncWatch.Stop();
+        Console.WriteLine(asyncWatch.ElapsedTicks >= 0l);
+
+        Random parallelA = new Random(17);
+        Random parallelB = new Random(17);
+        Random parallelReference = new Random(17);
+        int threadA = 0;
+        int threadB = 0;
+        int threadExpected = 0;
+        Thread workerA = new Thread(() => {
+            for (int i = 0; i < 128; i++) threadA += parallelA.Next(10);
+        });
+        Thread workerB = new Thread(() => {
+            for (int i = 0; i < 128; i++) threadB += parallelB.Next(10);
+        });
+        for (int i = 0; i < 128; i++) threadExpected += parallelReference.Next(10);
+        workerA.Start();
+        workerB.Start();
+        workerA.Join();
+        workerB.Join();
+        Console.WriteLine(threadA == threadExpected && threadB == threadExpected);
+        int nextReference = parallelReference.Next();
+        Console.WriteLine(parallelA.Next() == nextReference && parallelB.Next() == nextReference);
+
+        Random auto = new Random();
+        int automatic = auto.Next(-25, 25);
+        Console.WriteLine(automatic >= -25 && automatic < 25);
+        Console.WriteLine(auto.NextDouble() >= 0.0 && auto.NextSingle() < 1.0f);
+    }
+}

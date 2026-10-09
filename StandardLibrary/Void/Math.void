@@ -1,0 +1,316 @@
+namespace Void;
+
+// Integer mathematics uses the ordinary VOID integral overload and comparison rules.
+public static class Math
+{
+    // Typed native C math imports are private; public wrappers are safe VOID calls.
+    [Native("sqrt")]
+    private static unsafe extern double NativeSqrt(double value);
+    [Native("floor")]
+    private static unsafe extern double NativeFloor(double value);
+    public static double Floor(double value)
+    {
+        return NativeFloor(value);
+    }
+
+    [Native("ceil")]
+    private static unsafe extern double NativeCeiling(double value);
+    public static double Ceiling(double value)
+    {
+        return NativeCeiling(value);
+    }
+
+    [Native("trunc")]
+    private static unsafe extern double NativeTruncate(double value);
+    public static double Truncate(double value)
+    {
+        return NativeTruncate(value);
+    }
+
+    [Native("fmod")]
+    private static unsafe extern double NativeRemainder(double value, double divisor);
+
+    // Nearest integral value with midpoint-to-even, independent of the C fenv
+    // rounding-mode setting. No intermediate integer conversion is needed.
+    public static double Round(double value)
+    {
+        if (value == 0.0 || value != value) return value;
+        bool negative = value < 0.0;
+        double magnitude = negative ? -value : value;
+        double whole = NativeFloor(magnitude);
+        // Includes both infinities and values beyond the fractional precision.
+        if (whole == magnitude) return value;
+        double fraction = magnitude - whole;
+        double rounded = whole;
+        if (fraction > 0.5 ||
+            (fraction == 0.5 && NativeRemainder(whole, 2.0) != 0.0))
+        {
+            rounded = whole + 1.0;
+        }
+        // Directed host rounding can give an intermediate zero either sign.
+        // The result's zero sign follows the original input explicitly.
+        if (rounded == 0.0) return negative ? -0.0 : 0.0;
+        return negative ? -rounded : rounded;
+    }
+
+    public static double Sqrt(double value)
+    {
+        return NativeSqrt(value);
+    }
+
+    [Native("pow")]
+    private static unsafe extern double NativePow(double x, double y);
+    public static double Pow(double x, double y)
+    {
+        return NativePow(x, y);
+    }
+
+    [Native("sin")]
+    private static unsafe extern double NativeSin(double value);
+    public static double Sin(double value)
+    {
+        return NativeSin(value);
+    }
+
+    [Native("cos")]
+    private static unsafe extern double NativeCos(double value);
+    public static double Cos(double value)
+    {
+        return NativeCos(value);
+    }
+
+    [Native("tan")]
+    private static unsafe extern double NativeTan(double value);
+    public static double Tan(double value)
+    {
+        return NativeTan(value);
+    }
+
+    [Native("atan2")]
+    private static unsafe extern double NativeAtan2(double y, double x);
+    public static double Atan2(double y, double x)
+    {
+        return NativeAtan2(y, x);
+    }
+
+    [Native("exp")]
+    private static unsafe extern double NativeExp(double value);
+    public static double Exp(double value)
+    {
+        return NativeExp(value);
+    }
+
+    [Native("log")]
+    private static unsafe extern double NativeLog(double value);
+    public static double Log(double value)
+    {
+        return NativeLog(value);
+    }
+
+    [Native("log10")]
+    private static unsafe extern double NativeLog10(double value);
+    public static double Log10(double value)
+    {
+        return NativeLog10(value);
+    }
+
+    public static sbyte Min(sbyte a, sbyte b)
+    {
+        return a < b ? a : b;
+    }
+
+    public static sbyte Max(sbyte a, sbyte b)
+    {
+        return a > b ? a : b;
+    }
+
+    public static byte Min(byte a, byte b)
+    {
+        return a < b ? a : b;
+    }
+
+    public static byte Max(byte a, byte b)
+    {
+        return a > b ? a : b;
+    }
+
+    public static short Min(short a, short b)
+    {
+        return a < b ? a : b;
+    }
+
+    public static short Max(short a, short b)
+    {
+        return a > b ? a : b;
+    }
+
+    public static ushort Min(ushort a, ushort b)
+    {
+        return a < b ? a : b;
+    }
+
+    public static ushort Max(ushort a, ushort b)
+    {
+        return a > b ? a : b;
+    }
+
+    public static int Min(int a, int b)
+    {
+        return a < b ? a : b;
+    }
+
+    public static int Max(int a, int b)
+    {
+        return a > b ? a : b;
+    }
+
+    public static uint Min(uint a, uint b)
+    {
+        return a < b ? a : b;
+    }
+
+    public static uint Max(uint a, uint b)
+    {
+        return a > b ? a : b;
+    }
+
+    public static long Min(long a, long b)
+    {
+        return a < b ? a : b;
+    }
+
+    public static long Max(long a, long b)
+    {
+        return a > b ? a : b;
+    }
+
+    public static ulong Min(ulong a, ulong b)
+    {
+        return a < b ? a : b;
+    }
+
+    public static ulong Max(ulong a, ulong b)
+    {
+        return a > b ? a : b;
+    }
+
+    public static sbyte Abs(sbyte value)
+    {
+        if (value == sbyte.MinValue) throw new OverflowException();
+        return value < (sbyte)0 ? -value : value;
+    }
+
+    public static short Abs(short value)
+    {
+        if (value == short.MinValue) throw new OverflowException();
+        return value < (short)0 ? -value : value;
+    }
+
+    public static int Abs(int value)
+    {
+        if (value == int.MinValue) throw new OverflowException();
+        return value < (int)0 ? -value : value;
+    }
+
+    public static long Abs(long value)
+    {
+        if (value == long.MinValue) throw new OverflowException();
+        return value < 0L ? -value : value;
+    }
+
+    public static sbyte Clamp(sbyte value, sbyte min, sbyte max)
+    {
+        if (min > max) throw new ArgumentException("Minimum must not exceed maximum.", "min");
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    }
+
+    public static byte Clamp(byte value, byte min, byte max)
+    {
+        if (min > max) throw new ArgumentException("Minimum must not exceed maximum.", "min");
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    }
+
+    public static short Clamp(short value, short min, short max)
+    {
+        if (min > max) throw new ArgumentException("Minimum must not exceed maximum.", "min");
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    }
+
+    public static ushort Clamp(ushort value, ushort min, ushort max)
+    {
+        if (min > max) throw new ArgumentException("Minimum must not exceed maximum.", "min");
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    }
+
+    public static int Clamp(int value, int min, int max)
+    {
+        if (min > max) throw new ArgumentException("Minimum must not exceed maximum.", "min");
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    }
+
+    public static uint Clamp(uint value, uint min, uint max)
+    {
+        if (min > max) throw new ArgumentException("Minimum must not exceed maximum.", "min");
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    }
+
+    public static long Clamp(long value, long min, long max)
+    {
+        if (min > max) throw new ArgumentException("Minimum must not exceed maximum.", "min");
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    }
+
+    public static ulong Clamp(ulong value, ulong min, ulong max)
+    {
+        if (min > max) throw new ArgumentException("Minimum must not exceed maximum.", "min");
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    }
+
+    public static int Sign(sbyte value)
+    {
+        if (value < (sbyte)0) return -1;
+        if (value > (sbyte)0) return 1;
+        return 0;
+    }
+
+    public static int Sign(short value)
+    {
+        if (value < (short)0) return -1;
+        if (value > (short)0) return 1;
+        return 0;
+    }
+
+    public static int Sign(int value)
+    {
+        if (value < (int)0) return -1;
+        if (value > (int)0) return 1;
+        return 0;
+    }
+
+    public static int Sign(long value)
+    {
+        if (value < 0L) return -1;
+        if (value > 0L) return 1;
+        return 0;
+    }
+
+}
+
+// Native libm imports stay private; the ordinary managed-looking API is safe.
+// These signatures must match the C99/C11 <math.h> declarations.

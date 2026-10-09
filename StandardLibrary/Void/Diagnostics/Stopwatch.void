@@ -1,0 +1,103 @@
+namespace Void.Diagnostics;
+
+using Void;
+
+// Stopwatch ticks are monotonic nanoseconds; this is a unit, not a promise
+// that the clock has nanosecond accuracy or resolution.
+public sealed class Stopwatch
+{
+    private long _elapsedTicks;
+    private long _startedAt;
+    private bool _running;
+
+    [Native("vc_native_monotonic_time_ns")]
+    private static unsafe extern bool NativeTimestamp(out ulong nanoseconds);
+
+    public Stopwatch()
+    {
+        _elapsedTicks = 0l;
+        _startedAt = 0l;
+        _running = false;
+    }
+
+    // Reuse the clock backing Void.Threading.TimerQueue, but retain its ns
+    // precision. Clock failure and unrepresentable signed timestamps fail
+    // explicitly rather than silently wrapping or reverting to wall time.
+    public static long GetTimestamp()
+    {
+        ulong nanoseconds = 0ul;
+        if (!NativeTimestamp(out nanoseconds))
+            throw new InvalidOperationException("Monotonic clock is unavailable.");
+        if (nanoseconds > (ulong)(long.MaxValue))
+            throw new OverflowException("Monotonic timestamp exceeds long.MaxValue.");
+        return (long)nanoseconds;
+    }
+
+    public static long Frequency { get { return 1000000000l; } }
+    public bool IsRunning { get { return _running; } }
+
+    // Guard the elapsed accumulator against wraparound. The monotonic clock
+    // must not yield negative elapsed time even if the underlying host fails
+    // to maintain ordering, and accumulated overflows throw explicitly.
+    private static long AddElapsed(long accumulated, long interval)
+    {
+        if (interval > long.MaxValue - accumulated)
+            throw new OverflowException("Stopwatch elapsed time exceeds long.MaxValue.");
+        return accumulated + interval;
+    }
+
+    public long ElapsedTicks
+    {
+        get
+        {
+            if (!_running)
+                return _elapsedTicks;
+            long now = GetTimestamp();
+            long interval = now >= _startedAt ? now - _startedAt : 0l;
+            return AddElapsed(_elapsedTicks, interval);
+        }
+    }
+
+    public long ElapsedMilliseconds { get { return ElapsedTicks / 1000000l; } }
+
+    public void Start()
+    {
+        if (_running)
+            return;
+        long now = GetTimestamp();
+        _startedAt = now;
+        _running = true;
+    }
+
+    public void Stop()
+    {
+        if (!_running)
+            return;
+        long now = GetTimestamp();
+        long interval = now >= _startedAt ? now - _startedAt : 0l;
+        _elapsedTicks = AddElapsed(_elapsedTicks, interval);
+        _running = false;
+    }
+
+    public void Reset()
+    {
+        _elapsedTicks = 0l;
+        _startedAt = 0l;
+        _running = false;
+    }
+
+    public void Restart()
+    {
+        long now = GetTimestamp();
+        _elapsedTicks = 0l;
+        _startedAt = now;
+        _running = true;
+    }
+
+    public static Stopwatch StartNew()
+    {
+        Stopwatch result = new Stopwatch();
+        result.Start();
+        return result;
+    }
+}

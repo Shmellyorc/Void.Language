@@ -2438,6 +2438,9 @@ static const char *operator_text(VcTokenKind kind)
         case VC_TOKEN_AMPERSAND_AMPERSAND: return "&&";
         case VC_TOKEN_PIPE_PIPE: return "||";
         case VC_TOKEN_EQUAL: return "=";
+        case VC_TOKEN_AMPERSAND_EQUAL: return "&=";
+        case VC_TOKEN_PIPE_EQUAL: return "|=";
+        case VC_TOKEN_CARET_EQUAL: return "^=";
         case VC_TOKEN_PLUS_EQUAL: return "+=";
         case VC_TOKEN_MINUS_EQUAL: return "-=";
         case VC_TOKEN_STAR_EQUAL: return "*=";
@@ -2450,6 +2453,8 @@ static const char *operator_text(VcTokenKind kind)
         case VC_TOKEN_PLUS_PLUS: return "++";
         case VC_TOKEN_MINUS_MINUS: return "--";
         case VC_TOKEN_AMPERSAND: return "&";
+        case VC_TOKEN_PIPE: return "|";
+        case VC_TOKEN_CARET: return "^";
         default: return NULL;
     }
 }
@@ -2458,6 +2463,9 @@ static VcTokenKind compound_binary_kind(VcTokenKind kind)
 {
     switch (kind)
     {
+        case VC_TOKEN_AMPERSAND_EQUAL: return VC_TOKEN_AMPERSAND;
+        case VC_TOKEN_PIPE_EQUAL: return VC_TOKEN_PIPE;
+        case VC_TOKEN_CARET_EQUAL: return VC_TOKEN_CARET;
         case VC_TOKEN_PLUS_EQUAL: return VC_TOKEN_PLUS;
         case VC_TOKEN_MINUS_EQUAL: return VC_TOKEN_MINUS;
         case VC_TOKEN_STAR_EQUAL: return VC_TOKEN_STAR;
@@ -23488,6 +23496,7 @@ static bool invoke_c_compiler(
     const char *runtime_atomic_source,
     const char *runtime_memory_source,
     const char *runtime_filesystem_source,
+    const char *runtime_entropy_source,
     char *error,
     size_t error_size)
 {
@@ -23495,7 +23504,13 @@ static bool invoke_c_compiler(
     if (compiler == NULL || compiler[0] == '\0')
         compiler = "cc";
 
-    const size_t argument_capacity = 15 + project->library_path_count + project->library_count;
+    /* Public StandardLibrary math bindings depend on the C math library.
+       Keep the dependency in the existing native link path, not in user projects. */
+    bool has_math_library = false;
+    for (size_t i = 0; i < project->library_count; i++)
+        if (strcmp(project->libraries[i], "m") == 0)
+            has_math_library = true;
+    const size_t argument_capacity = 18 + project->library_path_count + project->library_count;
     char **arguments = calloc(argument_capacity, sizeof(*arguments));
     char **library_arguments = calloc(project->library_count, sizeof(*library_arguments));
     char **library_path_arguments = calloc(project->library_path_count, sizeof(*library_path_arguments));
@@ -23540,6 +23555,7 @@ static bool invoke_c_compiler(
     arguments[index++] = (char *)runtime_atomic_source;
     arguments[index++] = (char *)runtime_memory_source;
     arguments[index++] = (char *)runtime_filesystem_source;
+    arguments[index++] = (char *)runtime_entropy_source;
     arguments[index++] = "-o";
     arguments[index++] = (char *)output;
 
@@ -23601,6 +23617,12 @@ static bool invoke_c_compiler(
         memcpy(library_arguments[i] + 2, project->libraries[i], length + 1);
         arguments[index++] = library_arguments[i];
     }
+    if (!has_math_library)
+        arguments[index++] = "-lm";
+#ifdef _WIN32
+    /* BCryptGenRandom is supplied by the supported Windows OS API. */
+    arguments[index++] = "-lbcrypt";
+#endif
     arguments[index] = NULL;
 
     unsigned long exit_code = 0;
@@ -23641,6 +23663,8 @@ static bool invoke_c_library_compiler(
     const char *runtime_filesystem_source,
     const char *runtime_memory_object_path,
     const char *runtime_filesystem_object_path,
+    const char *runtime_entropy_source,
+    const char *runtime_entropy_object_path,
     char *error,
     size_t error_size)
 {
@@ -23747,6 +23771,14 @@ static bool invoke_c_library_compiler(
         set_error(error, error_size, "filesystem runtime C compilation failed");
         return false;
     }
+    compile_arguments[source_index] = (char *)runtime_entropy_source;
+    compile_arguments[object_index] = (char *)runtime_entropy_object_path;
+    if (!vc_host_process_run(compile_arguments, &exit_code, error, error_size) || exit_code != 0)
+    {
+        free(runtime_include_argument);
+        set_error(error, error_size, "entropy runtime C compilation failed");
+        return false;
+    }
     free(runtime_include_argument);
 
     const char *archiver = getenv("AR");
@@ -23761,6 +23793,7 @@ static bool invoke_c_library_compiler(
         (char *)runtime_atomic_object_path,
         (char *)runtime_memory_object_path,
         (char *)runtime_filesystem_object_path,
+        (char *)runtime_entropy_object_path,
         NULL
     };
     if (!vc_host_process_run(archive_arguments, &exit_code, error, error_size))
@@ -26419,13 +26452,15 @@ bool vc_compile_project(
     char runtime_atomic_source[VC_PATH_MAX];
     char runtime_memory_source[VC_PATH_MAX];
     char runtime_filesystem_source[VC_PATH_MAX];
+    char runtime_entropy_source[VC_PATH_MAX];
     if (!path_join(tool_root, "Runtime", runtime_directory, sizeof(runtime_directory)) ||
         !path_join(runtime_directory, "include", runtime_include_directory, sizeof(runtime_include_directory)) ||
         !path_join(runtime_directory, "src", runtime_source_directory, sizeof(runtime_source_directory)) ||
         !path_join(runtime_source_directory, "vc_thread.c", runtime_thread_source, sizeof(runtime_thread_source)) ||
         !path_join(runtime_source_directory, "vc_atomic.c", runtime_atomic_source, sizeof(runtime_atomic_source)) ||
         !path_join(runtime_source_directory, "vc_memory.c", runtime_memory_source, sizeof(runtime_memory_source)) ||
-        !path_join(runtime_source_directory, "vc_filesystem.c", runtime_filesystem_source, sizeof(runtime_filesystem_source)))
+        !path_join(runtime_source_directory, "vc_filesystem.c", runtime_filesystem_source, sizeof(runtime_filesystem_source)) ||
+        !path_join(runtime_source_directory, "vc_entropy.c", runtime_entropy_source, sizeof(runtime_entropy_source)))
     {
         set_error(error, error_size, "could not resolve VOID runtime support paths");
         goto cleanup;
@@ -26501,11 +26536,13 @@ bool vc_compile_project(
         char runtime_atomic_object_path[VC_PATH_MAX];
         char runtime_memory_object_path[VC_PATH_MAX];
         char runtime_filesystem_object_path[VC_PATH_MAX];
+        char runtime_entropy_object_path[VC_PATH_MAX];
         if (!path_join(generated_directory, object_filename, object_path, sizeof(object_path)) ||
             !path_join(generated_directory, "vc_thread_runtime.o", runtime_thread_object_path, sizeof(runtime_thread_object_path)) ||
             !path_join(generated_directory, "vc_atomic_runtime.o", runtime_atomic_object_path, sizeof(runtime_atomic_object_path)) ||
             !path_join(generated_directory, "vc_memory_runtime.o", runtime_memory_object_path, sizeof(runtime_memory_object_path)) ||
-            !path_join(generated_directory, "vc_filesystem_runtime.o", runtime_filesystem_object_path, sizeof(runtime_filesystem_object_path)))
+            !path_join(generated_directory, "vc_filesystem_runtime.o", runtime_filesystem_object_path, sizeof(runtime_filesystem_object_path)) ||
+            !path_join(generated_directory, "vc_entropy_runtime.o", runtime_entropy_object_path, sizeof(runtime_entropy_object_path)))
         {
             set_error(error, error_size, "generated object path is too long");
             goto cleanup;
@@ -26513,12 +26550,13 @@ bool vc_compile_project(
         if (!invoke_c_library_compiler(generated_c, object_path, output_path, mode,
                 runtime_include_directory, runtime_thread_source, runtime_thread_object_path,
                 runtime_atomic_source, runtime_atomic_object_path,
-                runtime_memory_source, runtime_filesystem_source, runtime_memory_object_path, runtime_filesystem_object_path, error, error_size))
+                runtime_memory_source, runtime_filesystem_source, runtime_memory_object_path, runtime_filesystem_object_path,
+                runtime_entropy_source, runtime_entropy_object_path, error, error_size))
             goto cleanup;
     }
     else if (!invoke_c_compiler(generated_c, output_path, mode, project,
             runtime_include_directory, runtime_thread_source, runtime_atomic_source,
-            runtime_memory_source, runtime_filesystem_source, error, error_size))
+            runtime_memory_source, runtime_filesystem_source, runtime_entropy_source, error, error_size))
         goto cleanup;
 
     success = true;

@@ -1,0 +1,199 @@
+using Void;
+
+public static class RandomConsumer376<T>
+{
+    public static double Draw(T unused, Random generator)
+    {
+        return generator.NextDouble();
+    }
+
+    public static void Fill(T unused, Random generator, byte[] bytes)
+    {
+        generator.NextBytes(bytes);
+    }
+}
+
+public static class Program
+{
+    // Reference vectors are independently calculated from PCG-XSH-RR 32:
+    // 53 bits: (NextBits() >> 5) << 26 | (NextBits() >> 6)
+    // 24 bits: NextBits() >> 8; bytes are low byte first per 32-bit word.
+    private static bool VerifyReferenceSeed(int seed, double first, double second,
+                                             float third, float fourth)
+    {
+        Random r = new Random(seed);
+        double d1 = r.NextDouble() * 9007199254740992.0;
+        double d2 = r.NextDouble() * 9007199254740992.0;
+        float s1 = r.NextSingle() * 16777216.0f;
+        float s2 = r.NextSingle() * 16777216.0f;
+        return d1 == first && d2 == second && s1 == third && s2 == fourth;
+    }
+
+    private static bool CheckBytes(byte[] actual, byte[] expected)
+    {
+        if (actual.Length != expected.Length) return false;
+        for (int i = 0; i < actual.Length; i++)
+            if (actual[i] != expected[i]) return false;
+        return true;
+    }
+
+    public static void Main()
+    {
+        Console.WriteLine(VerifyReferenceSeed(42, 6859507194666770.0,
+            4036265595929934.0, 16101214.0f, 6864566.0f));
+        Console.WriteLine(VerifyReferenceSeed(12345, 2960093657342982.0,
+            7048092037944544.0, 2456599.0f, 14760279.0f));
+        Console.WriteLine(VerifyReferenceSeed(0, 8167671827397423.0,
+            4855089059172778.0, 13450489.0f, 6423731.0f));
+        Console.WriteLine(VerifyReferenceSeed(-1, 3545877840416000.0,
+            1261885305056849.0, 10386720.0f, 16681347.0f));
+        Console.WriteLine(VerifyReferenceSeed(int.MinValue, 4071438451446715.0,
+            1209775940287108.0, 7430474.0f, 7586142.0f));
+        Console.WriteLine(VerifyReferenceSeed(int.MaxValue, 4321081603571061.0,
+            1249990607389433.0, 8276646.0f, 7103302.0f));
+
+        Random ranges = new Random(99);
+        bool doubleRange = true;
+        bool singleRange = true;
+        bool exactDoubleGrid = true;
+        bool exactSingleGrid = true;
+        for (int i = 0; i < 4096; i++)
+        {
+            double d = ranges.NextDouble();
+            float f = ranges.NextSingle();
+            if (!(d >= 0.0 && d < 1.0)) doubleRange = false;
+            if (!(f >= 0.0f && f < 1.0f)) singleRange = false;
+            double d53 = d * 9007199254740992.0;
+            float f24 = f * 16777216.0f;
+            if (d53 != Math.Truncate(d53)) exactDoubleGrid = false;
+            if (f24 != MathF.Truncate(f24)) exactSingleGrid = false;
+        }
+        Console.WriteLine(doubleRange);
+        Console.WriteLine(singleRange);
+        Console.WriteLine(exactDoubleGrid);
+        Console.WriteLine(exactSingleGrid);
+
+        Random afterEmpty = new Random(42);
+        Random beforeEmpty = new Random(42);
+        afterEmpty.NextBytes(new byte[0]);
+        Console.WriteLine(afterEmpty.Next() == beforeEmpty.Next());
+        bool caughtNull = false;
+        Random afterNull = new Random(42);
+        Random beforeNull = new Random(42);
+        try { afterNull.NextBytes(null); }
+        catch (ArgumentNullException error) { caughtNull = error.ParamName == "buffer"; }
+        Console.WriteLine(caughtNull);
+        Console.WriteLine(afterNull.Next() == beforeNull.Next());
+
+        // Every buffer size checks both byte order and exact next-word
+        // consumption. The remainder of the last word must be discarded.
+        byte[] referenceBytes = new byte[] {(byte)49, (byte)232, (byte)1, (byte)165, (byte)30, (byte)156, (byte)144, (byte)242, (byte)55};
+        int[] nextAfterBytes = new int[] {
+            1922079775, 1922079775, 1922079775, 1922079775,
+            809361976, 809361976, 809361976, 809361976, 1786267143
+        };
+        bool byteReference = true;
+        bool noByteCache = true;
+        for (int length = 1; length <= 9; length++)
+        {
+            Random current = new Random(100);
+            byte[] bytes = new byte[length];
+            current.NextBytes(bytes);
+            for (int index = 0; index < length; index++)
+                if (bytes[index] != referenceBytes[index]) byteReference = false;
+            if (current.Next() != nextAfterBytes[length - 1]) noByteCache = false;
+        }
+        Console.WriteLine(byteReference);
+        Console.WriteLine(noByteCache);
+        byte[] fourBytes = new byte[4];
+        new Random(100).NextBytes(fourBytes);
+        Console.WriteLine(CheckBytes(fourBytes, new byte[] {(byte)49, (byte)232, (byte)1, (byte)165}));
+
+        Random mixed = new Random(42);
+        int first = mixed.Next(10);
+        double second = mixed.NextDouble();
+        float third = mixed.NextSingle();
+        byte[] seven = new byte[7];
+        mixed.NextBytes(seven);
+        int fourth = mixed.Next();
+        byte[] one = new byte[1];
+        mixed.NextBytes(one);
+        double fifth = mixed.NextDouble();
+        float sixth = mixed.NextSingle();
+        byte[] eight = new byte[8];
+        mixed.NextBytes(eight);
+        int seventh = mixed.Next();
+        Console.WriteLine(first == 6 && fourth == 1271345453 && seventh == 2027215767);
+        Console.WriteLine(second * 9007199254740992.0 == 3765795478494922.0 &&
+                          fifth * 9007199254740992.0 == 4324933349690602.0);
+        Console.WriteLine(third * 16777216.0f == 4464979.0f &&
+                          sixth * 16777216.0f == 11897373.0f);
+        Console.WriteLine(CheckBytes(seven, new byte[] {(byte)173, (byte)94, (byte)175, (byte)245, (byte)50, (byte)182, (byte)190}));
+        Console.WriteLine(CheckBytes(one, new byte[] {(byte)215}));
+        Console.WriteLine(CheckBytes(eight, new byte[] {(byte)129, (byte)32, (byte)46, (byte)103, (byte)220, (byte)77, (byte)90, (byte)6}));
+
+        // Original #374 reference must remain identical after the extension.
+        Random original = new Random(12345);
+        int[] expected = new int[] {
+            1411482639, 1017708956, 1213308536, 285554700,
+            628889468, 1631147903, 283047574, 357275135,
+            1116223725, 866116730, 1421996083, 1466704544
+        };
+        bool originalReference = true;
+        for (int i = 0; i < expected.Length; i++)
+            if (original.Next() != expected[i]) originalReference = false;
+        Console.WriteLine(originalReference);
+
+        Random a = new Random(-199);
+        Random b = new Random(-199);
+        Random unrelated = new Random(100);
+        bool independent = true;
+        for (int i = 0; i < 1024; i++)
+        {
+            double da = a.NextDouble();
+            double db = b.NextDouble();
+            float fa = a.NextSingle();
+            float fb = b.NextSingle();
+            int ra = a.Next(-100, 100);
+            int rb = b.Next(-100, 100);
+            byte[] ba = new byte[i % 9];
+            byte[] bb = new byte[i % 9];
+            a.NextBytes(ba);
+            b.NextBytes(bb);
+            unrelated.Next();
+            if (da != db || fa != fb || ra != rb || !CheckBytes(ba, bb)) independent = false;
+        }
+        Console.WriteLine(independent);
+        Console.WriteLine(a.Next() == b.Next());
+        Console.WriteLine(a.Next(13) == b.Next(13));
+
+        Random[] retained = new Random[] { new Random(17), new Random(17) };
+        bool retainedState = true;
+        for (int i = 0; i < 256; i++)
+        {
+            byte[] x = new byte[i % 11];
+            byte[] y = new byte[i % 11];
+            retained[0].NextBytes(x);
+            retained[1].NextBytes(y);
+            if (!CheckBytes(x, y)) retainedState = false;
+            if (retained[0].NextDouble() != retained[1].NextDouble()) retainedState = false;
+        }
+        Console.WriteLine(retainedState);
+        Console.WriteLine(retained[0].Next() == retained[1].Next());
+
+        Random generic = new Random(42);
+        Random genericExpected = new Random(42);
+        double actualGeneric = RandomConsumer376<string>.Draw("example", generic);
+        Console.WriteLine(actualGeneric == genericExpected.NextDouble());
+        byte[] genericBytes = new byte[5];
+        byte[] expectedGenericBytes = new byte[5];
+        RandomConsumer376<int>.Fill(11, generic, genericBytes);
+        genericExpected.NextBytes(expectedGenericBytes);
+        Console.WriteLine(CheckBytes(genericBytes, expectedGenericBytes));
+        Console.WriteLine(generic.Next() == genericExpected.Next());
+
+        Console.WriteLine(Math.Min(10, 20) == 10 && Math.Clamp(8, 0, 10) == 8);
+        Console.WriteLine(Math.Sqrt(144.0) == 12.0 && MathF.Sqrt(25.0f) == 5.0f);
+        Console.WriteLine(Math.Round(2.5) == 2.0 && MathF.Round(-3.5f) == -4.0f);
+    }
+}

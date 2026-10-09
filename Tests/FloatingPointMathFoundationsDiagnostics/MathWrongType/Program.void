@@ -1,0 +1,1 @@
+using Void; public static class Program { public static void Main() { double x = Math.Sqrt("not numeric"); } }

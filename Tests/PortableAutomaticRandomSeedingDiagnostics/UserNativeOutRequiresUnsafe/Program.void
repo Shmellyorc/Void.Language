@@ -1,0 +1,14 @@
+using Void;
+public static class EntropyNative377
+{
+    [Native("vc_native_entropy_seed")]
+    public static unsafe extern bool Read(out ulong seed);
+}
+public static class Program
+{
+    public static void Main()
+    {
+        ulong seed = 0ul;
+        EntropyNative377.Read(out seed);
+    }
+}

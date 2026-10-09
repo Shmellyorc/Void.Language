@@ -1,0 +1,2 @@
+using Void.Diagnostics;
+public static class Program { public static void Main() { ulong x = 0ul; bool ok = Stopwatch.NativeTimestamp(out x); } }

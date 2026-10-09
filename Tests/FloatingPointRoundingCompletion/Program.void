@@ -1,0 +1,145 @@
+using Void;
+
+public static class GenericRounding373<T>
+{
+    public static double Nearest(T ignored, double input)
+    {
+        return Math.Round(input);
+    }
+
+    public static float NearestF(T ignored, float input)
+    {
+        return MathF.Round(input);
+    }
+}
+
+public static class Program
+{
+    private static int calls = 0;
+
+    private static double Once()
+    {
+        calls += 1;
+        return 2.5;
+    }
+
+    public static double InMethod(double input)
+    {
+        return Math.Ceiling(input) + Math.Truncate(input);
+    }
+
+    public static void Main()
+    {
+        // Double: basic fractional and negative cases, return types, and integrals.
+        double floorValue = Math.Floor(3.8);
+        double ceilValue = Math.Ceiling(3.2);
+        double truncValue = Math.Truncate(-3.8);
+        double roundValue = Math.Round(2.5);
+        Console.WriteLine(floorValue == 3.0 && ceilValue == 4.0);
+        Console.WriteLine(truncValue == -3.0 && roundValue == 2.0);
+        Console.WriteLine(Math.Floor(-3.2) == -4.0 && Math.Ceiling(-3.8) == -3.0);
+        Console.WriteLine(Math.Truncate(3.8) == 3.0 && Math.Truncate(-3.8) == -3.0);
+        Console.WriteLine(Math.Round(2.5) == 2.0 && Math.Round(3.5) == 4.0);
+        Console.WriteLine(Math.Round(-2.5) == -2.0 && Math.Round(-3.5) == -4.0);
+        Console.WriteLine(Math.Round(0.5) == 0.0 && Math.Round(1.5) == 2.0);
+        Console.WriteLine(Math.Round(-0.5) == 0.0 && Math.Round(-1.5) == -2.0);
+        Console.WriteLine(Math.Round(2.49) == 2.0 && Math.Round(2.51) == 3.0);
+        Console.WriteLine(Math.Round(-2.49) == -2.0 && Math.Round(-2.51) == -3.0);
+        Console.WriteLine(Math.Floor(4.0) == 4.0 && Math.Ceiling(-4.0) == -4.0);
+        Console.WriteLine(Math.Truncate(4.0) == 4.0 && Math.Round(-4.0) == -4.0);
+        Console.WriteLine(Math.Floor(0.0) == 0.0 && Math.Ceiling(0.0) == 0.0);
+        Console.WriteLine(Math.Truncate(0.0) == 0.0 && Math.Round(0.0) == 0.0);
+
+        // Float returns float and uses float-native functions, not double arithmetic.
+        float floorF = MathF.Floor(3.8f);
+        float ceilF = MathF.Ceiling(3.2f);
+        float truncF = MathF.Truncate(-3.8f);
+        float roundF = MathF.Round(3.5f);
+        Console.WriteLine(floorF == 3.0f && ceilF == 4.0f);
+        Console.WriteLine(truncF == -3.0f && roundF == 4.0f);
+        Console.WriteLine(MathF.Floor(-3.2f) == -4.0f && MathF.Ceiling(-3.8f) == -3.0f);
+        Console.WriteLine(MathF.Truncate(3.8f) == 3.0f && MathF.Truncate(-3.8f) == -3.0f);
+        Console.WriteLine(MathF.Round(2.5f) == 2.0f && MathF.Round(3.5f) == 4.0f);
+        Console.WriteLine(MathF.Round(-2.5f) == -2.0f && MathF.Round(-3.5f) == -4.0f);
+        Console.WriteLine(MathF.Round(0.5f) == 0.0f && MathF.Round(-0.5f) == 0.0f);
+        Console.WriteLine(MathF.Round(2.49f) == 2.0f && MathF.Round(2.51f) == 3.0f);
+        Console.WriteLine(MathF.Round(-2.49f) == -2.0f && MathF.Round(-2.51f) == -3.0f);
+        Console.WriteLine(MathF.Floor(4.0f) == 4.0f && MathF.Ceiling(-4.0f) == -4.0f);
+        Console.WriteLine(MathF.Truncate(-4.0f) == -4.0f && MathF.Round(4.0f) == 4.0f);
+
+        // Signed zero, including negative values that round to zero.
+        double negZero = -0.0;
+        float negZeroF = -0.0f;
+        Console.WriteLine(1.0 / Math.Floor(negZero) == double.NegativeInfinity);
+        Console.WriteLine(1.0 / Math.Ceiling(negZero) == double.NegativeInfinity);
+        Console.WriteLine(1.0 / Math.Truncate(negZero) == double.NegativeInfinity);
+        Console.WriteLine(1.0 / Math.Round(negZero) == double.NegativeInfinity);
+        Console.WriteLine(1.0 / Math.Ceiling(-0.2) == double.NegativeInfinity);
+        Console.WriteLine(1.0 / Math.Truncate(-0.2) == double.NegativeInfinity);
+        Console.WriteLine(1.0 / Math.Round(-0.2) == double.NegativeInfinity);
+        Console.WriteLine(1.0 / Math.Round(-0.5) == double.NegativeInfinity);
+        Console.WriteLine(1.0f / MathF.Floor(negZeroF) == float.NegativeInfinity);
+        Console.WriteLine(1.0f / MathF.Ceiling(negZeroF) == float.NegativeInfinity);
+        Console.WriteLine(1.0f / MathF.Truncate(negZeroF) == float.NegativeInfinity);
+        Console.WriteLine(1.0f / MathF.Round(negZeroF) == float.NegativeInfinity);
+        Console.WriteLine(1.0f / MathF.Ceiling(-0.2f) == float.NegativeInfinity);
+        Console.WriteLine(1.0f / MathF.Truncate(-0.2f) == float.NegativeInfinity);
+        Console.WriteLine(1.0f / MathF.Round(-0.5f) == float.NegativeInfinity);
+
+        // NaN and infinities: no integral casts, no NaN equality assumptions.
+        double nan = double.NaN;
+        float nanF = float.NaN;
+        double n = Math.Floor(nan);
+        Console.WriteLine(n != n);
+        n = Math.Ceiling(nan);
+        Console.WriteLine(n != n);
+        n = Math.Truncate(nan);
+        Console.WriteLine(n != n);
+        n = Math.Round(nan);
+        Console.WriteLine(n != n);
+        float nf = MathF.Floor(nanF);
+        Console.WriteLine(nf != nf);
+        nf = MathF.Ceiling(nanF);
+        Console.WriteLine(nf != nf);
+        nf = MathF.Truncate(nanF);
+        Console.WriteLine(nf != nf);
+        nf = MathF.Round(nanF);
+        Console.WriteLine(nf != nf);
+        Console.WriteLine(Math.Floor(double.PositiveInfinity) == double.PositiveInfinity);
+        Console.WriteLine(Math.Ceiling(double.NegativeInfinity) == double.NegativeInfinity);
+        Console.WriteLine(Math.Truncate(double.PositiveInfinity) == double.PositiveInfinity);
+        Console.WriteLine(Math.Round(double.NegativeInfinity) == double.NegativeInfinity);
+        Console.WriteLine(MathF.Floor(float.NegativeInfinity) == float.NegativeInfinity);
+        Console.WriteLine(MathF.Ceiling(float.PositiveInfinity) == float.PositiveInfinity);
+        Console.WriteLine(MathF.Truncate(float.NegativeInfinity) == float.NegativeInfinity);
+        Console.WriteLine(MathF.Round(float.PositiveInfinity) == float.PositiveInfinity);
+
+        // Precision boundaries, including ties at large exactly representable halves.
+        Console.WriteLine(Math.Round(4503599627370494.5) == 4503599627370494.0);
+        Console.WriteLine(Math.Round(4503599627370495.5) == 4503599627370496.0);
+        Console.WriteLine(Math.Round(9007199254740992.0) == 9007199254740992.0);
+        Console.WriteLine(Math.Round(double.MaxValue) == double.MaxValue);
+        Console.WriteLine(Math.Floor(double.MaxValue) == double.MaxValue);
+        Console.WriteLine(Math.Round(-double.MaxValue) == -double.MaxValue);
+        Console.WriteLine(Math.Round(double.Epsilon) == 0.0);
+        Console.WriteLine(1.0 / Math.Round(-double.Epsilon) == double.NegativeInfinity);
+        Console.WriteLine(MathF.Round(4194302.5f) == 4194302.0f);
+        Console.WriteLine(MathF.Round(4194303.5f) == 4194304.0f);
+        Console.WriteLine(MathF.Round(16777216.0f) == 16777216.0f);
+        Console.WriteLine(MathF.Round(float.MaxValue) == float.MaxValue);
+        Console.WriteLine(MathF.Round(-float.MaxValue) == -float.MaxValue);
+        Console.WriteLine(MathF.Round(float.Epsilon) == 0.0f);
+        Console.WriteLine(1.0f / MathF.Round(-float.Epsilon) == float.NegativeInfinity);
+
+        // Ordinary methods, generic specialization, and preserving prior Math APIs.
+        Console.WriteLine(InMethod(-3.8) == -6.0);
+        Console.WriteLine(GenericRounding373<int>.Nearest(1, 2.5) == 2.0);
+        Console.WriteLine(GenericRounding373<string>.Nearest("x", -3.5) == -4.0);
+        Console.WriteLine(GenericRounding373<int>.NearestF(1, 2.5f) == 2.0f);
+        Console.WriteLine(Math.Min(10, 20) == 10 && Math.Clamp(110, 0, 100) == 100);
+        Console.WriteLine(Math.Abs(-9L) == 9L && Math.Sign(-4) == -1);
+        Console.WriteLine(Math.Sqrt(81.0) == 9.0 && MathF.Sqrt(16.0f) == 4.0f);
+        Console.WriteLine(Math.Pow(2.0, 8.0) == 256.0 && MathF.Pow(2.0f, 3.0f) == 8.0f);
+        Console.WriteLine(Math.Round(Once()) == 2.0 && calls == 1);
+    }
+}
