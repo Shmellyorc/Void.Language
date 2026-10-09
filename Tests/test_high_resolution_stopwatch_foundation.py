@@ -48,7 +48,7 @@ def compile_c(cc: list[str], source: Path, target: Path, *, opt: str = '-O2',
 
 def main() -> None:
     version = run(BIN, 'version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.380', 'version')
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.381', 'version')
     src = (ROOT / 'StandardLibrary/Void/Diagnostics/Stopwatch.void').read_text()
     check(src.count('[Native(') == 1 and 'vc_native_monotonic_time_ns' in src
           and 'public static long Frequency' in src and 'public static long GetTimestamp()' in src,

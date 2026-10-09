@@ -1,0 +1,23 @@
+using Void;
+using Void.Threading.Tasks;
+
+public struct Counter
+{
+    public int Value;
+    public int Run(int a, int b) { Value += a + b; return Value; }
+}
+
+public static class Program
+{
+    public static async Task<int> Probe(Counter[] values, Task<int> gate)
+    {
+        return values[0].Run(await gate, 2);
+    }
+
+    public static void Main()
+    {
+        TaskCompletionSource<int> pending = new TaskCompletionSource<int>();
+        Probe(new Counter[0], pending.Task);
+        Console.WriteLine("False");
+    }
+}

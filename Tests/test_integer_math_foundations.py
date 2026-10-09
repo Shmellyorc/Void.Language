@@ -82,7 +82,7 @@ def verify_negative(name: str, member: str) -> None:
 
 def main() -> None:
     version = invoke(COMPILER, 'version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.380',
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.381',
           f'version: {version.stdout} {version.stderr}')
     built = invoke(COMPILER, 'build', FIXTURE)
     check(built.returncode == 0 and not built.stderr,

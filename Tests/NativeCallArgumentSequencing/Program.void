@@ -1,0 +1,233 @@
+using Void;
+using Void.Threading.Tasks;
+using Void.Collections;
+public delegate int Pair(int a, int b);
+public delegate int RefPair(ref int a, ref int b);
+public delegate int Variadic(int a = 9, params int[] rest);
+public class Packed {
+ public int Value;
+ public Packed(int a = 9, params int[] rest) { Value = a * 100 + rest[0] * 10 + rest[1]; }
+}
+public class ConversionHolder {
+ public int Value;
+ public ConversionHolder(Converted a, Converted b) { Value = a.Value * 10 + b.Value; }
+}
+public struct Chained {
+ public int Value;
+ public Chained(int a, int b) { Value = a * 10 + b; }
+ public Chained(int ignored) : this(Program.Mark(1), Program.Mark(2)) {}
+}
+public ref struct HoldingRef {
+ public ref int Value;
+ public HoldingRef(ref int value, int ignored) { Value = ref value; }
+ public ref int Get() { return ref Value; }
+}
+public static class InitializingExtension {
+ public static int Ready = Program.Mark(9);
+ public static int Touch(this Probe receiver, int a, int b) { return receiver.Value + a + b + Ready; }
+}
+public class Indexed {
+ public int Value = 70;
+ public ref int get_Item(int index) { return ref Value; }
+}
+public class Holder { public Counter Counter; }
+public class Bag {
+ public int Value;
+ public void Add(int a, int b) { Value = a * 10 + b; }
+}
+public interface IProbe { int Run(int a, int b); }
+public class Probe : IProbe {
+ public int Value;
+ public Probe(int a, int b) { Value = a * 10 + b; }
+ public void Void(int a, int b) { Value = a * 10 + b; }
+ public int Identity(int a, int b) { return Value * 100 + a * 10 + b; }
+ public virtual int Run(int a, int b) { return a * 10 + b; }
+}
+public class Derived : Probe { public Derived() : base(Program.Mark(1), Program.Mark(2)) {} }
+public struct Counter {
+ public int Value;
+ public ref int RefValue { get { return ref Value; } }
+ public int Run(int a, int b) { Value += a + b; return Value; }
+}
+public struct Converted {
+ public int Value;
+ public static implicit operator Converted(int value) { Program.Mark(value); Program.ConversionReached(value); Converted c = default(Converted); c.Value = value; return c; }
+}
+public static class Extensions {
+ public static int Ext(this Probe p, int a, int b) { return p.Value + a * 10 + b; }
+ public static int Mutate(this ref Counter p, int a, int b) { p.Value += a + b; return p.Value; }
+}
+public static class Native {
+ [Native("vc_sequence_read")] public static unsafe extern int Read(int* pointer, int ignored);
+ [Native("vc_sequence_pair")] public static unsafe extern int Pair(int a, int b);
+}
+public static class Program {
+ public static int Trace;
+ public static Probe Current;
+ public static Pair Callback;
+ public static TaskCompletionSource<int> ConversionSignal;
+ public static void ConversionReached(int value) {
+  TaskCompletionSource<int> signal = ConversionSignal;
+  if (signal != null) { ConversionSignal = null; signal.SetResult(value); }
+ }
+
+ public static int Creates;
+ public static Probe Fresh() { Creates++; Mark(1); return new Probe(7, 0); }
+ public static int SwapReceiver() { Current = new Probe(9, 0); Mark(1); return 1; }
+ public static int OtherMix(int a, int b) { return 100 + a * 10 + b; }
+ public static int SwapDelegate() { Callback = OtherMix; Mark(1); return 1; }
+ public static int ConvertedPair(Converted a, Converted b) { return a.Value * 10 + b.Value; }
+ public static int AliasPair(ref int a, ref int b) { a = 5; b += 2; return a; }
+ public static int GcObject(Probe a, int b) { return a.Value + b; }
+ public static Probe ObjectValue() { Mark(1); return new Probe(4, 2); }
+ public static int NamedParams(int a = 9, params int[] values) { return a * 10 + values[0]; }
+ public static int RefGc(ref int a, int b) { a += b; return a; }
+ public static int FailSecond() { Mark(2); throw new InvalidOperationException("second"); }
+ public static int ConsumeThree(int a, int b, int c) { return a+b+c; }
+
+ public static int Mark(int n) { Trace = Trace * 10 + n; return n; }
+ public static Probe Receiver() { Mark(1); return Current; }
+ public static int Mix(int a, int b = 9) { return a * 10 + b; }
+ public static int PackConverted(int a, params Converted[] rest) { return a * 100 + rest[0].Value * 10 + rest[1].Value; }
+ public static int Pack(int a, params int[] rest) { return a + rest.Length; }
+ public static int[] Array() { Mark(2); return new int[1]; }
+ public static T Generic<T>(T a, T b) { return a; }
+ public static int Ref(ref int a, int b) { a += b; return a; }
+ public static int Out(out int a, int b) { a = b; return b; }
+ public static int In(in int a, int b) { return a + b; }
+ public static ref int Alias(ref int a) { return ref a; }
+ public static Probe GcReceiver() { Mark(1); GC.Collect(); return Current; }
+ public static int Collect() { Mark(2); GC.Collect(); return 2; }
+ public static int Throw() { Mark(1); throw new InvalidOperationException("probe"); }
+ public static async Task<int> AsyncOrdinary(Task<int> ready) { int v = await ready; return Mix(Mark(1), Mark(2)) + v; }
+ public static async Task<int> AsyncSpilled(Task<int> ready) { return Mix(Mark(1), await ready); }
+ public static async Task<int> AsyncStructReceiver(Holder holder, Task<int> gate) { return holder.Counter.Run(await gate, 2); }
+ public static async Task<int> AsyncArrayReceiver(Counter[] counters, Task<int> gate) { return counters[Mark(1) - 1].Run(await gate, 2); }
+ public static async Task<int?> AsyncNullableCounter(Counter? receiver, Task<int> gate) { return receiver?.Run(await gate, 2); }
+ public static async Task<int?> AsyncConditional(Probe receiver, Task<int> gate) { return receiver?.Run(Mark(1), await gate); }
+ public static async Task AsyncConditionalVoid(Probe receiver, Task<int> gate) { receiver?.Void(Mark(1), await gate); }
+ public static async Task<int> AsyncReceiver(Task<int> gate) { return Current.Identity(await gate, Mark(2)); }
+ public static async Task<int> AsyncDelegate(Task<int> gate) { return Callback(await gate, Mark(2)); }
+ public static async Task<int> AsyncTwoConversions(Task<int> first, Task<int> second) { return ConvertedPair(await first, await second); }
+ public static async Task<ConversionHolder> AsyncConstructor(Task<int> gate) { return new ConversionHolder(1, await gate); }
+ public static async Task<int> AsyncConversion(Task<int> gate) { return ConvertedPair(1, await gate); }
+ public static IEnumerator<int> Iterate() { yield return Mix(Mark(1), Mark(2)); }
+ public static string Text(int n) { Mark(n); return "x"; }
+ public static void Report(string name, int expected) { Console.WriteLine(Trace == expected); Trace = 0; }
+ public static Holder LastHolder;
+ public static Holder MakeHolder() { Mark(1); Holder holder = new Holder(); holder.Counter.Value = 42; LastHolder = holder; return holder; }
+ public static Indexed MakeIndexed() { Mark(1); return new Indexed(); }
+ public static unsafe void Main() {
+  Current = new Probe(0, 0);
+  Mix(Mark(1), Mark(2)); Report("static", 12);
+  Mix(Mix(Mark(1), Mark(2)), Mark(3)); Report("nested", 123);
+  Receiver().Run(Mark(2), Mark(3)); Report("complex receiver", 123);
+  Mix(b: Mark(1), a: Mark(2)); Report("named source order", 12);
+  Mix(Mark(1)); Report("optional", 1);
+  Pack(Mark(1), Mark(2), Mark(3)); Report("expanded params", 123);
+  Pack(Mark(1), Array()); Report("normal params", 12);
+  Probe p = new Probe(Mark(1), Mark(2)); Report("constructor", 12);
+  Derived d = new Derived(); Report("base initializer", 12);
+  Pair call = Mix; call(Mark(1), Mark(2)); Report("delegate", 12);
+  Current.Run(Mark(1), Mark(2)); Report("virtual", 12);
+  IProbe iface = Current; iface.Run(Mark(1), Mark(2)); Report("interface", 12);
+  Generic<int>(Mark(1), Mark(2)); Report("generic", 12);
+  Ref(ref Receiver().Value, Mark(2)); Report("ref field", 12);
+  Out(out Receiver().Value, Mark(2)); Report("out field", 12);
+  In(in Receiver().Value, Mark(2)); Report("in field", 12);
+  ref int alias = ref Alias(ref Receiver().Value); Report("ref return owner", 1);
+  Mix(GcReceiver().Value, Collect()); Report("GC in arguments", 12);
+  try { Mix(Throw(), Mark(2)); } catch (InvalidOperationException) { Mark(3); } finally { Mark(4); }
+  Report("exception and finally", 134);
+  TaskCompletionSource<int> ready = new TaskCompletionSource<int>(); ready.SetResult(2);
+  Task<int> asyncOrdinary = AsyncOrdinary(ready.Task); Console.WriteLine(asyncOrdinary.Result == 14); Report("async ordinary call", 12);
+  Task<int> asyncSpilled = AsyncSpilled(ready.Task); Console.WriteLine(asyncSpilled.Result == 12); Report("async spilled first argument", 1);
+  IEnumerator<int> iterator = Iterate(); iterator.MoveNext(); Report("iterator call", 12); iterator.Dispose();
+  string.Concat(Text(1), Text(2)); Report("string concat already staged", 12);
+  string.CompareOrdinal(Text(1), Text(2)); Report("string comparison already staged", 12);
+  int n = 0; Console.WriteLine(Math.Clamp(++n, ++n, ++n) == 2 && n == 3);
+  n = 1; Console.WriteLine(Mix(n, n = 2) == 12);
+  Console.WriteLine(Mix(n = 1, n = 2) == 12);
+  Current = new Probe(1, 0); Console.WriteLine(Current.Identity(SwapReceiver(), Mark(2)) == 1012); Report("plain receiver snapshot", 12);
+  Callback = Mix; Console.WriteLine(Callback(SwapDelegate(), Mark(2)) == 12); Report("delegate identity", 12);
+  Counter counter = default(Counter); Console.WriteLine(counter.Run(Mark(1), Mark(2)) == 3 && counter.Value == 3); Report("struct alias", 12);
+  Console.WriteLine(counter.Mutate(Mark(1), Mark(2)) == 6 && counter.Value == 6); Report("extension ref alias", 12);
+  Console.WriteLine(Receiver().Ext(Mark(2), Mark(3)) == Current.Value + 23); Report("extension receiver", 123);
+  Console.WriteLine(ConvertedPair(1, 2) == 12); Report("conversion order", 12);
+  n = 1; Console.WriteLine(AliasPair(ref n, ref n) == 7 && n == 7);
+  Out(out int typed, Mark(1)); Console.WriteLine(typed == 1); Report("typed out", 1);
+  Out(out var inferred, Mark(1)); Console.WriteLine(inferred == 1); Report("out var", 1);
+  Out(out _, Mark(1)); Report("out discard", 1);
+  Creates = 0; ref int fresh = ref Alias(ref Fresh().Value); GC.Collect(); Console.WriteLine(fresh == 70 && Creates == 1); Report("ref owner single evaluation", 1);
+  Creates = 0; Console.WriteLine(RefGc(ref Fresh().Value, Collect()) == 72 && Creates == 1); Report("ref owner GC", 12);
+  Console.WriteLine(GcObject(ObjectValue(), Collect()) == 44); Report("managed argument GC", 12);
+  Console.WriteLine(NamedParams(values: Array(), a: Mark(1)) == 10); Report("normal named params", 21);
+  try { ConsumeThree(Mark(1), FailSecond(), Mark(3)); } catch (InvalidOperationException) { Mark(4); } finally { Mark(5); }
+  Report("stop after second throws", 1245);
+  Probe missing = null; missing?.Run(Mark(1), Mark(2)); Report("null skips arguments", 0);
+  Receiver()?.Run(Mark(2), Mark(3)); Report("conditional call", 123);
+  Console.WriteLine(Native.Pair(Mark(1), Mark(2)) == 12); Report("native direct", 12);
+  int[] pinned = new int[] { 42 };
+  fixed (int* pointer = pinned) { Console.WriteLine(Native.Read(pointer, Collect()) == 42); }
+  Report("native pinned arguments", 2);
+  delegate*<int, int, int> fp = &Native.Pair; Console.WriteLine(fp(Mark(1), Mark(2)) == 12); Report("function pointer", 12);
+  TaskCompletionSource<int> pause = new TaskCompletionSource<int>();
+  Current = new Probe(1, 0); Task<int> capturedReceiver = AsyncReceiver(pause.Task); Current = new Probe(9, 0);
+  pause.SetResult(1); Console.WriteLine(capturedReceiver.Result == 1012); Report("async receiver identity", 2);
+  pause = new TaskCompletionSource<int>(); Callback = Mix; Task<int> capturedDelegate = AsyncDelegate(pause.Task); Callback = OtherMix;
+  pause.SetResult(1); Console.WriteLine(capturedDelegate.Result == 12); Report("async delegate identity", 2);
+  pause = new TaskCompletionSource<int>(); Task<int> convertedBeforeAwait = AsyncConversion(pause.Task);
+  Console.WriteLine(Trace == 1 && !convertedBeforeAwait.IsCompleted); pause.SetResult(2);
+  Console.WriteLine(convertedBeforeAwait.Result == 12); Report("conversion before await", 12);
+  pause = new TaskCompletionSource<int>(); TaskCompletionSource<int> pause2 = new TaskCompletionSource<int>();
+  Task<int> convertedTwice = AsyncTwoConversions(pause.Task, pause2.Task);
+  ConversionSignal = new TaskCompletionSource<int>(); Task<int> conversionReached = ConversionSignal.Task; pause.SetResult(1);
+  Console.WriteLine(conversionReached.Result == 1 && Trace == 1 && !convertedTwice.IsCompleted); pause2.SetResult(2);
+  Console.WriteLine(convertedTwice.Result == 12); Report("conversion between awaits", 12);
+  pause = new TaskCompletionSource<int>(); Task<ConversionHolder> constructedAfterAwait = AsyncConstructor(pause.Task);
+  Console.WriteLine(Trace == 1 && !constructedAfterAwait.IsCompleted); pause.SetResult(2);
+  Console.WriteLine(constructedAfterAwait.Result.Value == 12); Report("constructor conversion before await", 12);
+  Variadic variadic = Pack; variadic(Mark(1), Mark(2), Mark(3)); Report("delegate expanded params", 123);
+  variadic(rest: Array(), a: Mark(1)); Report("delegate named normal params", 21);
+  Pair namedDelegate = Mix; Console.WriteLine(namedDelegate(b: Mark(1), a: Mark(2)) == 21); Report("delegate named", 12);
+  Packed packedCtor = new Packed(Mark(1), Mark(2), Mark(3)); Console.WriteLine(packedCtor.Value == 123); Report("constructor expanded params", 123);
+  Probe namedCtor = new Probe(b: Mark(1), a: Mark(2)); Console.WriteLine(namedCtor.Value == 21); Report("constructor named", 12);
+  Chained chained = new Chained(0); Console.WriteLine(chained.Value == 12); Report("value constructor chain", 12);
+  Bag bag = new Bag { { Mark(1), Mark(2) } }; Console.WriteLine(bag.Value == 12); Report("collection Add", 12);
+  n = 1; Console.WriteLine(In(in n, n = 5) == 10);
+  Current = new Probe(1, 0); Probe old = Current; Console.WriteLine(Ref(ref Current.Value, SwapReceiver()) == 11 && old.Value == 11 && Current.Value == 90); Report("ref identity during later argument", 1);
+  Callback = Mix; Pair copyImplicit = Callback; Pair copyExplicit = Program.Callback;
+  Console.WriteLine(copyImplicit(1, 2) == 12); Console.WriteLine(copyExplicit(1, 2) == 12);
+  pause = new TaskCompletionSource<int>(); Holder holder = new Holder(); Task<int> changedStruct = AsyncStructReceiver(holder, pause.Task);
+  pause.SetResult(1); Console.WriteLine(changedStruct.Result == 3 && holder.Counter.Value == 3);
+  pause = new TaskCompletionSource<int>(); Counter[] counters = new Counter[1]; Task<int> changedElement = AsyncArrayReceiver(counters, pause.Task);
+  Console.WriteLine(Trace == 1); pause.SetResult(1); Console.WriteLine(changedElement.Result == 3 && counters[0].Value == 3); Report("async array receiver once", 1);
+  pause = new TaskCompletionSource<int>(); Task<int?> skipped = AsyncConditional(null, pause.Task);
+  Console.WriteLine(skipped.IsCompleted && !skipped.Result.HasValue); Report("async conditional skip", 0);
+  Task skippedVoid = AsyncConditionalVoid(null, pause.Task); Console.WriteLine(skippedVoid.IsCompleted); Report("async conditional void skip", 0);
+  Probe conditionReceiver = new Probe(0, 0); Task<int?> pendingConditional = AsyncConditional(conditionReceiver, pause.Task);
+  Console.WriteLine(Trace == 1 && !pendingConditional.IsCompleted); pause.SetResult(2); Console.WriteLine(pendingConditional.Result.Value == 12); Report("async conditional invoke", 1);
+  pause = new TaskCompletionSource<int>();
+  Task<int?> skippedNullable = AsyncNullableCounter(null, pause.Task); Console.WriteLine(skippedNullable.IsCompleted && !skippedNullable.Result.HasValue);
+  Counter? optionalCounter = default(Counter); Task<int?> nullablePending = AsyncNullableCounter(optionalCounter, pause.Task);
+  Console.WriteLine(!nullablePending.IsCompleted); pause.SetResult(1);
+  Console.WriteLine(nullablePending.Result.Value == 3 && optionalCounter.Value.Value == 0);
+  pause = new TaskCompletionSource<int>(); Probe changedVoid = new Probe(0, 0); Task pendingVoid = AsyncConditionalVoid(changedVoid, pause.Task);
+  Console.WriteLine(!pendingVoid.IsCompleted && Trace == 1); pause.SetResult(2); pendingVoid.Wait(); Console.WriteLine(changedVoid.Value == 12); Report("async void conditional invoke", 1);
+  Console.WriteLine(Receiver().Touch(Mark(2), Mark(3)) == Current.Value + 14); Report("extension initialization boundary", 1923);
+  Creates = 0; HoldingRef holding = new HoldingRef(ref Fresh().Value, Collect()); GC.Collect(); Console.WriteLine(holding.Value == 70 && Creates == 1); Report("constructor ref owner", 12);
+  ref int held = ref holding.Get(); GC.Collect(); Console.WriteLine(held == 70);
+  RefPair refDelegate = AliasPair; n = 1; Console.WriteLine(refDelegate(ref n, ref n) == 7 && n == 7);
+  Console.WriteLine(PackConverted(Mark(1), 2, 3) == 123); Report("params conversions", 123);
+  Trace = 0;
+  ref int property = ref MakeHolder().Counter.RefValue; GC.Collect(); Console.WriteLine(property == 42); Report("struct ref property owner", 1);
+  property = 43; Console.WriteLine(LastHolder.Counter.Value == 43); LastHolder = null; GC.Collect(); Console.WriteLine(property == 43);
+  ref int indexed = ref MakeIndexed()[Mark(2)]; GC.Collect();
+  Console.WriteLine(indexed == 70); Report("ref index owner capture", 12);
+  Console.WriteLine(MakeIndexed()[Mark(2)] == 70); Report("ref index read", 12);
+  MakeIndexed()[Mark(2)] += 5; Report("ref index update", 12);
+  Console.WriteLine(RefGc(ref indexed, Collect()) == 72); Report("ref index alias argument", 2);
+  Console.WriteLine(p.Value == 12 && d.Value == 12);
+  Console.WriteLine(alias == 2);
+ }
+}

@@ -66,6 +66,11 @@ typedef struct VcNullTemp
     const VcAstNode *node;
     VcSemanticType type;
     bool address;
+    /* Call operands share the existing expression-temporary allocation, rooting
+       and cleanup paths. A call key distinguishes converted operand snapshots
+       from the expression's own null/conversion scratch storage. */
+    const VcAstNode *call;
+    bool ref_carrier;
     char name[32];
 } VcNullTemp;
 
@@ -164,6 +169,7 @@ typedef struct VcCodegenContext
     size_t consumer_temp_capacity;
     const VcAstNode *active_null_receiver;
     const char *active_null_receiver_name;
+    const VcAstNode *active_call;
     const VcAstNode *active_storage_expression;
     const char *active_storage_name;
     bool in_static_initializer;
@@ -2548,13 +2554,19 @@ static bool emit_ref_field_carrier_expression(
     return false;
 }
 
+static bool emit_ref_storage_capture_expression(VcCodegenContext *context,
+    const VcAstNode *storage, const char *carrier);
+static bool emit_call_operand_prefix(VcCodegenContext *context, const VcAstNode *call);
+static bool has_call_operands(const VcCodegenContext *context, const VcAstNode *call);
+static bool emit_call_operand_value(VcCodegenContext *context, const VcNullTemp *temp);
+
 static const VcAstNode *ref_local_managed_owner_expression(
     const VcCodegenContext *context, const VcAstNode *storage);
 
 static const VcNullTemp *find_null_temp(const VcCodegenContext *context, const VcAstNode *node)
 {
     for (size_t i = 0; i < context->null_temp_count; i++)
-        if (context->null_temps[i].node == node)
+        if (context->null_temps[i].node == node && context->null_temps[i].call == NULL)
             return &context->null_temps[i];
     return NULL;
 }
@@ -2565,6 +2577,7 @@ static const VcNullTemp *find_typed_null_temp(
 {
     for (size_t i = 0; i < context->null_temp_count; i++)
         if (context->null_temps[i].node == node &&
+            context->null_temps[i].call == NULL &&
             context->null_temps[i].type == type &&
             context->null_temps[i].address == address)
             return &context->null_temps[i];
@@ -2848,13 +2861,39 @@ static bool emit_active_null_receiver(VcCodegenContext *context, const VcAstNode
     return true;
 }
 
-static bool add_null_temp(
-    VcCodegenContext *context,
-    const VcAstNode *node,
-    VcSemanticType type,
-    bool address)
+static const VcNullTemp *find_call_temp(
+    const VcCodegenContext *context, const VcAstNode *call, const VcAstNode *node)
 {
-    if (find_typed_null_temp(context, node, type, address) != NULL)
+    if (call == NULL || node == NULL) return NULL;
+    for (size_t i = 0; i < context->null_temp_count; i++)
+        if (context->null_temps[i].call == call && context->null_temps[i].node == node)
+            return &context->null_temps[i];
+    return NULL;
+}
+
+static const VcNullTemp *active_call_temp(
+    const VcCodegenContext *context, const VcAstNode *node)
+{
+    const VcNullTemp *temp = find_call_temp(context, context->active_call, node);
+    if (temp != NULL) return temp;
+    /* Intrinsics sometimes consume the operand of ref/out/in directly. */
+    for (size_t i = 0; context->active_call != NULL && i < context->null_temp_count; i++)
+    {
+        temp = &context->null_temps[i];
+        if (temp->call == context->active_call && temp->ref_carrier &&
+            temp->node->kind == VC_AST_UNARY_EXPRESSION &&
+            temp->node->as.unary_expression.operand == node)
+            return temp;
+    }
+    return NULL;
+}
+
+static bool add_expression_temp(
+    VcCodegenContext *context, const VcAstNode *node, VcSemanticType type,
+    bool address, const VcAstNode *call, bool ref_carrier)
+{
+    if ((call == NULL && find_typed_null_temp(context, node, type, address) != NULL) ||
+        (call != NULL && find_call_temp(context, call, node) != NULL))
         return true;
     if (context->null_temp_count == context->null_temp_capacity)
     {
@@ -2863,19 +2902,195 @@ static bool add_null_temp(
         if (temps == NULL)
         {
             set_error(context->error, context->error_size,
-                "out of memory while preparing null-operator temporaries");
+                "out of memory while preparing expression temporaries");
             return false;
         }
         context->null_temps = temps;
         context->null_temp_capacity = capacity;
     }
-
     VcNullTemp *temp = &context->null_temps[context->null_temp_count++];
     temp->node = node;
     temp->type = type;
     temp->address = address;
-    snprintf(temp->name, sizeof(temp->name), "vc_null_%zu", context->next_local++);
+    temp->call = call;
+    temp->ref_carrier = ref_carrier;
+    snprintf(temp->name, sizeof(temp->name), call != NULL ? "vc_arg_%zu" : "vc_null_%zu", context->next_local++);
     return true;
+}
+
+static bool add_null_temp(VcCodegenContext *context, const VcAstNode *node,
+    VcSemanticType type, bool address)
+{
+    return add_expression_temp(context, node, type, address, NULL, false);
+}
+
+static bool collect_call_operand_temps(VcCodegenContext *context,
+    const VcAstNode *node, const VcAstNodeList *arguments,
+    const VcSemanticBinding *binding, const VcSemanticType *types,
+    const VcTokenKind *modifiers, size_t parameter_count,
+    const VcAstNode *receiver, VcSemanticType receiver_type, bool receiver_address,
+    bool native_callbacks)
+{
+    if (receiver != NULL && !add_expression_temp(context, receiver,
+            receiver_type, false, node, receiver_address)) return false;
+    for (size_t i = 0; i < arguments->count; i++)
+    {
+        const VcAstNode *argument = arguments->items[i];
+        const VcSemanticBinding *value = vc_semantic_binding(context->semantic, argument);
+        size_t parameter = binding != NULL && i < binding->argument_count
+            ? binding->argument_parameters[i] : i;
+        VcSemanticType type = value != NULL ? value->type : VC_SEM_TYPE_UNKNOWN;
+        VcTokenKind modifier = VC_TOKEN_EOF;
+        if (types != NULL)
+        {
+            if (parameter >= parameter_count) return false;
+            type = types[parameter];
+            if (modifiers != NULL) modifier = modifiers[parameter];
+            if (binding != NULL && binding->params_expanded && parameter + 1 == parameter_count)
+            {
+                type = vc_semantic_array_element_type(context->semantic, type);
+                modifier = VC_TOKEN_EOF;
+            }
+        }
+        const bool reference = modifier == VC_TOKEN_KW_REF || modifier == VC_TOKEN_KW_OUT || modifier == VC_TOKEN_KW_IN ||
+            (argument->kind == VC_AST_UNARY_EXPRESSION &&
+             (argument->as.unary_expression.operator_kind == VC_TOKEN_KW_REF ||
+              argument->as.unary_expression.operator_kind == VC_TOKEN_KW_OUT ||
+              argument->as.unary_expression.operator_kind == VC_TOKEN_KW_IN));
+        if (reference && types == NULL && argument->as.unary_expression.operand != NULL)
+        {
+            value = vc_semantic_binding(context->semantic, argument->as.unary_expression.operand);
+            if (value != NULL) type = value->type;
+        }
+        /* Native callback method groups are emitted as C wrapper symbols, not
+           managed delegate allocations. Type operands/null literals have no
+           evaluation to preserve and sometimes have no native value type. */
+        if ((native_callbacks && codegen_type_is_delegate(context->semantic, type)) ||
+            (value != NULL && value->is_type_receiver) || type == VC_SEM_TYPE_NULL ||
+            type == VC_SEM_TYPE_UNKNOWN || type == VC_SEM_TYPE_ERROR)
+            continue;
+        if (!add_expression_temp(context, argument, type, false, node, reference)) return false;
+    }
+    return true;
+}
+
+static bool collect_bound_call_temps(VcCodegenContext *context, const VcAstNode *node)
+{
+    const VcSemanticBinding *binding = vc_semantic_binding(context->semantic, node);
+    if (binding == NULL) return true;
+    if (node->kind == VC_AST_COLLECTION_INITIALIZER_ELEMENT)
+        for (size_t i = 0; i < node->as.collection_initializer_element.arguments.count; i++)
+            if (node->as.collection_initializer_element.arguments.items[i]->kind == VC_AST_COLLECTION_SPREAD_ELEMENT)
+                return true; /* Spread insertion has its own staged source/loop. */
+    if (node->kind == VC_AST_CALL_EXPRESSION &&
+        node->as.call_expression.callee->kind == VC_AST_MEMBER_ACCESS_EXPRESSION &&
+        node->as.call_expression.callee->as.member_access_expression.null_conditional &&
+        vc_semantic_type_is_nullable(binding->type) &&
+        !add_null_temp(context, node, binding->type, false)) return false;
+    VcAstNodeList index_arguments = {0};
+    const VcAstNodeList *arguments = NULL;
+    const VcSemanticType *types = NULL;
+    const VcTokenKind *modifiers = NULL;
+    size_t count = 0;
+    const VcSemanticMethod *method = NULL;
+    const VcAstNode *receiver = NULL;
+    VcSemanticType receiver_type = VC_SEM_TYPE_UNKNOWN;
+    bool receiver_address = false;
+    bool native_callbacks = false;
+    if (node->kind == VC_AST_CALL_EXPRESSION)
+    {
+        /* These established paths already stage every operand. */
+        if (binding->has_string_concat || binding->has_string_substring ||
+            binding->string_operation != VC_SEM_STRING_OP_NONE) return true;
+        arguments = &node->as.call_expression.arguments;
+        const VcAstNode *callee = node->as.call_expression.callee;
+        if (binding->has_delegate_invoke)
+        {
+            const VcSemanticStruct *delegate = &context->semantic->structs[binding->delegate_type_index];
+            method = &context->semantic->methods[delegate->delegate_invoke_method_index];
+            receiver = callee;
+        }
+        else if (binding->has_function_pointer_invoke)
+        {
+            const VcSemanticFunctionPointer *pointer = &context->semantic->function_pointers[
+                vc_semantic_function_pointer_index(binding->function_pointer_type)];
+            types = pointer->parameter_types;
+            count = pointer->parameter_count;
+            receiver = callee;
+        }
+        else if (binding->has_method)
+        {
+            method = &context->semantic->methods[binding->method_index];
+            native_callbacks = method->is_extern;
+            if ((!method->is_static || binding->extension_method) &&
+                callee->kind == VC_AST_MEMBER_ACCESS_EXPRESSION &&
+                !callee->as.member_access_expression.null_conditional)
+                receiver = callee->as.member_access_expression.target;
+        }
+        else if (callee->kind == VC_AST_MEMBER_ACCESS_EXPRESSION &&
+                 (binding->has_array_get_length))
+            receiver = callee->as.member_access_expression.target;
+    }
+    else if (node->kind == VC_AST_MEMBER_ACCESS_EXPRESSION && binding->has_property &&
+             binding->property_returns_ref && !node->as.member_access_expression.null_conditional)
+    {
+        const VcSemanticProperty *property =
+            &context->semantic->structs[binding->struct_index].properties[binding->property_index];
+        if (property->is_static) return true;
+        arguments = &index_arguments; /* A property getter has only its receiver. */
+        receiver = node->as.member_access_expression.target;
+        const VcSemanticBinding *value = vc_semantic_binding(context->semantic, receiver);
+        if (value == NULL) return false;
+        return collect_call_operand_temps(context, node, arguments, binding, NULL, NULL, 0,
+            receiver, value->type, !semantic_type_is_reference(context->semantic, value->type) &&
+                receiver_is_addressable_storage(context, receiver), false);
+    }
+    else if (node->kind == VC_AST_INDEX_EXPRESSION && binding->has_indexer_get &&
+             binding->method_returns_ref && !binding->has_index_consumer)
+    {
+        method = &context->semantic->methods[binding->method_index];
+        index_arguments.items = (VcAstNode **)&node->as.index_expression.index;
+        index_arguments.count = 1;
+        arguments = &index_arguments;
+        if (!node->as.index_expression.null_conditional)
+            receiver = node->as.index_expression.target;
+    }
+    else if (node->kind == VC_AST_NEW_EXPRESSION && binding->has_constructor)
+    {
+        const VcSemanticConstructor *constructor = &context->semantic->constructors[binding->constructor_index];
+        arguments = &node->as.new_expression.arguments;
+        types = constructor->parameter_types;
+        modifiers = constructor->parameter_modifiers;
+        count = constructor->parameter_count;
+    }
+    else if (node->kind == VC_AST_COLLECTION_INITIALIZER_ELEMENT && binding->has_method)
+    {
+        arguments = &node->as.collection_initializer_element.arguments;
+        method = &context->semantic->methods[binding->method_index];
+    }
+    else return true;
+    if (method != NULL)
+    {
+        types = method->parameter_types;
+        modifiers = method->parameter_modifiers;
+        count = method->parameter_count;
+    }
+    if (receiver != NULL)
+    {
+        const VcSemanticBinding *value = vc_semantic_binding(context->semantic, receiver);
+        if (value == NULL) return false;
+        receiver_type = value->type;
+        if (method != NULL && binding->extension_method)
+        {
+            receiver_address = modifiers[0] == VC_TOKEN_KW_REF || modifiers[0] == VC_TOKEN_KW_IN;
+            if (!receiver_address) receiver_type = types[0];
+        }
+        else if (method != NULL && !binding->has_delegate_invoke)
+            receiver_address = !semantic_type_is_reference(context->semantic, receiver_type) &&
+                receiver_is_addressable_storage(context, receiver);
+    }
+    return collect_call_operand_temps(context, node, arguments, binding, types,
+        modifiers, count, receiver, receiver_type, receiver_address, native_callbacks);
 }
 
 static bool collect_switch_pattern_declaration_temps(
@@ -2903,6 +3118,15 @@ static bool collect_switch_pattern_declaration_temps(
     return true;
 }
 
+static bool codegen_type_is_setjmp_scalar(const VcCodegenContext *context, VcSemanticType type)
+{
+    if ((type >= VC_SEM_TYPE_BOOL && type <= VC_SEM_TYPE_CHAR) ||
+        vc_semantic_type_is_pointer(type) || vc_semantic_type_is_function_pointer(type)) return true;
+    if (!vc_semantic_type_is_struct(type)) return false;
+    const size_t index = vc_semantic_struct_index(type);
+    return index < context->semantic->struct_count && context->semantic->structs[index].is_enum;
+}
+
 /* Automatic scalar locals modified under setjmp must be volatile if their
    values are observed after longjmp. Use declaration identity, not spelling,
    so shadowed locals remain independent. Managed/captured storage and runtime
@@ -2915,15 +3139,7 @@ static bool remember_setjmp_scalar_local(VcCodegenContext *context, const VcAstN
     const VcSemanticBinding *binding = vc_semantic_binding(context->semantic, storage);
     if (binding == NULL || binding->declaration_node == NULL)
         return true;
-    bool scalar_type = (binding->type >= VC_SEM_TYPE_BOOL && binding->type <= VC_SEM_TYPE_CHAR) ||
-        vc_semantic_type_is_pointer(binding->type) || vc_semantic_type_is_function_pointer(binding->type);
-    if (vc_semantic_type_is_struct(binding->type))
-    {
-        const size_t index = vc_semantic_struct_index(binding->type);
-        scalar_type = index < context->semantic->struct_count && context->semantic->structs[index].is_enum;
-    }
-    if (!scalar_type)
-        return true;
+    if (!codegen_type_is_setjmp_scalar(context, binding->type)) return true;
     const VcAstNode *declaration = binding->declaration_node;
     if (declaration->kind == VC_AST_LOCAL_DECLARATION)
     {
@@ -2971,6 +3187,7 @@ static bool collect_null_temps(VcCodegenContext *context, const VcAstNode *node)
     if (node == NULL)
         return true;
 
+    if (!collect_bound_call_temps(context, node)) return false;
     const VcSemanticBinding *conversion_binding = vc_semantic_binding(context->semantic, node);
     if (node->kind != VC_AST_COLLECTION_SPREAD_ELEMENT &&
         conversion_binding != NULL && conversion_binding->has_conversion &&
@@ -3082,7 +3299,8 @@ static bool collect_null_temps(VcCodegenContext *context, const VcAstNode *node)
                     !semantic_type_is_reference(context->semantic, target_binding->type) &&
                     !receiver_is_plain_storage(context, target_node) &&
                     !node->as.member_access_expression.null_conditional_direct &&
-                    !add_receiver_temp(context, target_node, target_binding->type, false))
+                    !add_receiver_temp(context, target_node, target_binding->type,
+                        property->returns_ref && receiver_is_addressable_storage(context, target_node)))
                     return false;
             }
 
@@ -3826,6 +4044,15 @@ static bool emit_collected_temp_declarations(VcCodegenContext *context)
     for (size_t i = 0; i < context->null_temp_count; i++)
     {
         const VcNullTemp *temp = &context->null_temps[i];
+        if (temp->ref_carrier)
+        {
+            emit_indent(context->file, context->depth);
+            fprintf(context->file, "VcRefReturn %s = {0};\n", temp->name);
+            char owner[64];
+            snprintf(owner, sizeof(owner), "%s.owner", temp->name);
+            if (!emit_gc_register_raw_ref(context, owner)) return false;
+            continue;
+        }
         const char *type = c_type(context->semantic, temp->type);
         if (type == NULL)
             return false;
@@ -3833,7 +4060,9 @@ static bool emit_collected_temp_declarations(VcCodegenContext *context)
         if (temp->address)
             fprintf(context->file, "%s *%s = NULL;\n", type, temp->name);
         else
-            fprintf(context->file, "%s %s = {0};\n", type, temp->name);
+            fprintf(context->file, "%s%s %s = {0};\n", type,
+                temp->call != NULL && context->setjmp_used && codegen_type_is_setjmp_scalar(context, temp->type)
+                    ? " volatile" : "", temp->name);
         if (!temp->address && !emit_gc_register(context, temp->name, temp->type))
             return false;
     }
@@ -3911,6 +4140,7 @@ static bool emit_receiver_temp_prefix(
     if (context == NULL || receiver == NULL || temp == NULL)
         return false;
 
+    if (active_call_temp(context, receiver) != NULL) return true;
     const VcAstNode *storage = unwrap_parenthesized(receiver);
     const VcAstNode *owner = NULL;
     if (storage != NULL && storage->kind == VC_AST_MEMBER_ACCESS_EXPRESSION)
@@ -4880,6 +5110,9 @@ static bool emit_expression_as(
     const VcAstNode *expression,
     VcSemanticType target_type)
 {
+    const VcNullTemp *snapshot = active_call_temp(context, expression);
+    if (snapshot != NULL && snapshot->type == target_type)
+        return emit_call_operand_value(context, snapshot);
     const VcSemanticBinding *binding = vc_semantic_binding(context->semantic, expression);
     const VcSemanticType source_type = binding != NULL ? binding->type : VC_SEM_TYPE_UNKNOWN;
 
@@ -5080,11 +5313,78 @@ static const char *ref_assignment_operator_text(VcTokenKind kind)
     }
 }
 
+static bool emit_bound_indexer_get(VcCodegenContext *context,
+    const VcAstNode *expression, const VcSemanticBinding *binding)
+{
+    if (context->active_call != expression && has_call_operands(context, expression))
+    {
+        const VcAstNode *saved_call = context->active_call;
+        fputc('(', context->file);
+        if (!emit_call_operand_prefix(context, expression)) return false;
+        context->active_call = expression;
+        const bool result = emit_bound_indexer_get(context, expression, binding);
+        context->active_call = saved_call;
+        fputc(')', context->file);
+        return result;
+    }
+    if (binding->method_index >= context->semantic->method_count) return false;
+    const VcSemanticMethod *method = &context->semantic->methods[binding->method_index];
+    if (!method->has_owner_struct || method->owner_struct_index >= context->semantic->struct_count ||
+        method->parameter_count != 1) return false;
+    const VcSemanticMethod *signature = binding->virtual_dispatch
+        ? &context->semantic->methods[method->virtual_root_index] : method;
+    const VcSemanticStruct *owner = &context->semantic->structs[signature->owner_struct_index];
+    if (!emit_indexer_call_start(context, binding, method)) return false;
+    if (binding->interface_dispatch)
+    {
+        emit_guard_text(context, "(void *)vc_object_require((void *)(");
+        if (!emit_index_target(context, expression)) return false;
+        fputs("))", context->file);
+    }
+    else if (owner->is_class)
+    {
+        emit_guard_text(context, "(%s *)vc_object_require((void *)(", owner->c_name);
+        if (!emit_index_target(context, expression))
+            return false;
+        fputs("))", context->file);
+    }
+    else if (!emit_value_receiver_pointer(
+        context, expression->as.index_expression.target))
+        return false;
+    if (method->returns_ref)
+    {
+        fputs(", ", context->file);
+        if (owner->is_class || owner->is_interface)
+        {
+            if (!emit_index_target(context, expression)) return false;
+        }
+        else if (!emit_ref_owner_expression(context, expression->as.index_expression.target))
+            return false;
+    }
+    fputs(", ", context->file);
+    if (!emit_expression_as(context, expression->as.index_expression.index, method->parameter_types[0]))
+        return false;
+    fputc(')', context->file);
+    return true;
+}
+
 static bool emit_property_get(
     VcCodegenContext *context,
     const VcSemanticBinding *binding,
     const VcAstNode *member_expression)
 {
+    if (member_expression != NULL && context->active_call != member_expression &&
+        has_call_operands(context, member_expression))
+    {
+        const VcAstNode *saved_call = context->active_call;
+        fputc('(', context->file);
+        if (!emit_call_operand_prefix(context, member_expression)) return false;
+        context->active_call = member_expression;
+        const bool result = emit_property_get(context, binding, member_expression);
+        context->active_call = saved_call;
+        fputc(')', context->file);
+        return result;
+    }
     if (binding == NULL || !binding->has_property ||
         binding->struct_index >= context->semantic->struct_count)
         return false;
@@ -5409,6 +5709,14 @@ static bool emit_ref_owner_expression(VcCodegenContext *context, const VcAstNode
     storage = unwrap_parenthesized(storage);
     if (context == NULL || storage == NULL)
         return false;
+    const VcNullTemp *snapshot = active_call_temp(context, storage);
+    if (snapshot != NULL)
+    {
+        if (snapshot->ref_carrier) fprintf(context->file, "%s.owner", snapshot->name);
+        else if (semantic_type_is_reference(context->semantic, snapshot->type)) fputs(snapshot->name, context->file);
+        else fputs("NULL", context->file);
+        return true;
+    }
 
     if (storage->kind == VC_AST_IDENTIFIER_EXPRESSION)
     {
@@ -5520,6 +5828,13 @@ static bool emit_reference_argument_storage(
 {
     if (argument == NULL || argument->kind != VC_AST_UNARY_EXPRESSION)
         return false;
+    const VcNullTemp *snapshot = active_call_temp(context, argument);
+    if (snapshot != NULL && snapshot->ref_carrier)
+    {
+        fprintf(context->file, "(%s *)%s.ptr", c_type(context->semantic, snapshot->type), snapshot->name);
+        if (carries_owner) fprintf(context->file, ", %s.owner", snapshot->name);
+        return true;
+    }
 
     if (argument->as.unary_expression.inline_out_discard)
     {
@@ -5724,6 +6039,94 @@ static bool emit_string_operation(
     const VcAstNode *expression,
     const VcSemanticBinding *binding);
 
+/* A comma expression is a C11 sequencing boundary. Evaluate receiver first,
+   then explicitly supplied operands in source order, including conversions.
+   The existing emitter subsequently sees only snapshots, so parameter-order
+   mapping and params packing cannot move or repeat user evaluation. */
+static bool emit_call_operand_value(VcCodegenContext *context, const VcNullTemp *temp)
+{
+    if (temp->ref_carrier)
+        fprintf(context->file, "(*((%s *)%s.ptr))", c_type(context->semantic, temp->type), temp->name);
+    else fputs(temp->name, context->file);
+    return true;
+}
+
+static bool has_call_operands(const VcCodegenContext *context, const VcAstNode *call)
+{
+    for (size_t i = 0; i < context->null_temp_count; i++)
+        if (context->null_temps[i].call == call) return true;
+    return false;
+}
+
+static bool emit_call_operand_prefix(VcCodegenContext *context, const VcAstNode *call)
+{
+    const VcSemanticBinding *binding = vc_semantic_binding(context->semantic, call);
+    const VcAstNode *initialize_after = NULL;
+    size_t static_owner = 0;
+    if (binding != NULL && call->kind == VC_AST_CALL_EXPRESSION && binding->has_method)
+    {
+        const VcSemanticMethod *method = &context->semantic->methods[binding->method_index];
+        if (method->is_static && method->has_owner_struct)
+        {
+            static_owner = method->owner_struct_index;
+            const VcAstNode *callee = call->as.call_expression.callee;
+            if (binding->extension_method && callee->kind == VC_AST_MEMBER_ACCESS_EXPRESSION &&
+                !callee->as.member_access_expression.null_conditional)
+                initialize_after = callee->as.member_access_expression.target;
+            else
+                (void)emit_static_type_init_prefix(context, static_owner);
+        }
+    }
+    else if (binding != NULL && call->kind == VC_AST_NEW_EXPRESSION &&
+             vc_semantic_type_is_struct(binding->type))
+        (void)emit_static_type_init_prefix(context, vc_semantic_struct_index(binding->type));
+    for (size_t i = 0; i < context->null_temp_count; i++)
+    {
+        const VcNullTemp *temp = &context->null_temps[i];
+        if (temp->call != call) continue;
+        if (temp->ref_carrier)
+        {
+            const VcAstNode *storage = temp->node;
+            if (storage->kind == VC_AST_UNARY_EXPRESSION)
+            {
+                if (storage->as.unary_expression.inline_out_discard)
+                {
+                    const VcNullTemp *discard = find_null_temp(context, storage);
+                    if (discard == NULL) return false;
+                    fprintf(context->file, "%s.ptr = &%s, %s.owner = NULL, ",
+                        temp->name, discard->name, temp->name);
+                    continue;
+                }
+                storage = storage->as.unary_expression.operand;
+            }
+            fputs("(void)", context->file);
+            if (!emit_ref_storage_capture_expression(context, storage, temp->name)) return false;
+        }
+        else
+        {
+            fprintf(context->file, "%s = ", temp->name);
+            if (!emit_expression_as(context, temp->node, temp->type)) return false;
+        }
+        fputs(", ", context->file);
+        const VcReceiverTemp *receiver = find_receiver_temp(context, temp->node);
+        if (receiver != NULL)
+        {
+            if (temp->ref_carrier)
+            {
+                fprintf(context->file, "%s = ", receiver->name);
+                if (!receiver->address) fputs("*(", context->file);
+                fprintf(context->file, "(%s *)%s.ptr", c_type(context->semantic, temp->type), temp->name);
+                if (!receiver->address) fputc(')', context->file);
+                fputs(", ", context->file);
+            }
+            else fprintf(context->file, "%s = %s, ", receiver->name, temp->name);
+        }
+        if (temp->node == initialize_after)
+            (void)emit_static_type_init_prefix(context, static_owner);
+    }
+    return true;
+}
+
 static bool emit_call(VcCodegenContext *context, const VcAstNode *expression)
 {
     const VcAstNode *callee = expression->as.call_expression.callee;
@@ -5757,7 +6160,9 @@ static bool emit_call(VcCodegenContext *context, const VcAstNode *expression)
             const char *result_type = c_type(context->semantic, call_binding->type);
             if (result_type == NULL)
                 return false;
-            fprintf(context->file, "((%s){0})", result_type);
+            const VcNullTemp *result_temp = find_typed_null_temp(context, expression, call_binding->type, false);
+            if (result_temp == NULL) return false;
+            fprintf(context->file, "(%s.has_value = false, %s)", result_temp->name, result_temp->name);
         }
         else
             fputs("NULL", context->file);
@@ -5769,7 +6174,9 @@ static bool emit_call(VcCodegenContext *context, const VcAstNode *expression)
             lifted_type = c_type(context->semantic, call_binding->type);
             if (lifted_type == NULL)
                 return false;
-            fprintf(context->file, "((%s){ .has_value = true, .value = ", lifted_type);
+            const VcNullTemp *result_temp = find_typed_null_temp(context, expression, call_binding->type, false);
+            if (result_temp == NULL) return false;
+            fprintf(context->file, "(%s.has_value = true, %s.value = ", result_temp->name, result_temp->name);
         }
 
         const VcAstNode *saved_receiver = context->active_null_receiver;
@@ -5782,13 +6189,28 @@ static bool emit_call(VcCodegenContext *context, const VcAstNode *expression)
         if (!result)
             return false;
         if (call_binding->null_conditional_lifted)
-            fputs(" })", context->file);
+        {
+            const VcNullTemp *result_temp = find_typed_null_temp(context, expression, call_binding->type, false);
+            fprintf(context->file, ", %s)", result_temp->name);
+        }
         fputc(')', context->file);
         return true;
     }
 
 emit_regular_call:
     ;
+    if (context->active_call != expression && has_call_operands(context, expression))
+    {
+        fputc('(', context->file);
+        const VcAstNode *saved_call = context->active_call;
+        context->active_call = NULL;
+        if (!emit_call_operand_prefix(context, expression)) return false;
+        context->active_call = expression;
+        const bool result = emit_call(context, expression);
+        context->active_call = saved_call;
+        fputc(')', context->file);
+        return result;
+    }
     const VcAstNode *target = callee->kind == VC_AST_MEMBER_ACCESS_EXPRESSION
         ? callee->as.member_access_expression.target
         : NULL;
@@ -6752,7 +7174,8 @@ emit_regular_call:
     const VcParamsTemp *params_temp = NULL;
     const VcReceiverTemp *receiver_temp = (!target_method->is_static || binding->extension_method) && target != NULL
         ? find_receiver_temp(context, target) : NULL;
-    const bool initialize_static_owner = target_method->is_static && target_method->has_owner_struct &&
+    const bool initialize_static_owner = context->active_call != expression &&
+        target_method->is_static && target_method->has_owner_struct &&
         should_emit_static_type_init(context, target_method->owner_struct_index);
 
     if (receiver_temp != NULL)
@@ -6999,6 +7422,19 @@ static bool emit_new_construction(
     const VcAstNode *expression,
     const VcSemanticBinding *binding)
 {
+    if (context->active_call != expression && has_call_operands(context, expression))
+    {
+        fputc('(', context->file);
+        const VcAstNode *saved_call = context->active_call;
+        context->active_call = NULL;
+        if (!emit_call_operand_prefix(context, expression)) return false;
+        context->active_call = expression;
+        const bool result = emit_new_construction(context, expression, binding);
+        context->active_call = saved_call;
+        fputc(')', context->file);
+        return result;
+    }
+
     if (binding != NULL && vc_semantic_type_is_array(binding->type))
     {
         const VcSemanticType element_type = vc_semantic_array_element_type(context->semantic, binding->type);
@@ -7075,7 +7511,8 @@ static bool emit_new_construction(
     if (struct_index >= context->semantic->struct_count)
         return false;
     const VcSemanticStruct *constructed_type = &context->semantic->structs[struct_index];
-    const bool initialize_type = should_emit_static_type_init(context, struct_index);
+    const bool initialize_type = context->active_call != expression &&
+        should_emit_static_type_init(context, struct_index);
 
     if (binding->has_constructor)
     {
@@ -7364,6 +7801,19 @@ static bool emit_collection_initializer_element(
     const char *temp_name,
     VcSemanticType constructed_type)
 {
+    if (context->active_call != initializer && has_call_operands(context, initializer))
+    {
+        fputc('(', context->file);
+        const VcAstNode *saved_call = context->active_call;
+        context->active_call = NULL;
+        if (!emit_call_operand_prefix(context, initializer)) return false;
+        context->active_call = initializer;
+        const bool result = emit_collection_initializer_element(context, initializer, temp_name, constructed_type);
+        context->active_call = saved_call;
+        fputc(')', context->file);
+        return result;
+    }
+
     const VcSemanticBinding *binding = vc_semantic_binding(context->semantic, initializer);
     if (binding == NULL || !binding->has_method ||
         binding->method_index >= context->semantic->method_count ||
@@ -8736,6 +9186,8 @@ static bool emit_expression(VcCodegenContext *context, const VcAstNode *expressi
 
 static bool emit_expression_impl(VcCodegenContext *context, const VcAstNode *expression)
 {
+    const VcNullTemp *snapshot = active_call_temp(context, expression);
+    if (snapshot != NULL) return emit_call_operand_value(context, snapshot);
     if (context->active_storage_expression == expression && context->active_storage_name != NULL)
     {
         fputs(context->active_storage_name, context->file);
@@ -9867,46 +10319,13 @@ emit_regular_index:
                 if (!method->has_owner_struct || method->owner_struct_index >= context->semantic->struct_count ||
                     method->parameter_count != 1)
                     return false;
-                const VcSemanticMethod *signature = binding->virtual_dispatch
-                    ? &context->semantic->methods[method->virtual_root_index] : method;
-                const VcSemanticStruct *owner = &context->semantic->structs[signature->owner_struct_index];
                 if (method->returns_ref)
                 {
                     const char *type = c_type(context->semantic, binding->type);
                     if (type == NULL) return false;
                     fprintf(context->file, "(*((%s *)((", type);
                 }
-                if (!emit_indexer_call_start(context, binding, method)) return false;
-                if (binding->interface_dispatch)
-                {
-                    emit_guard_text(context, "(void *)vc_object_require((void *)(");
-                    if (!emit_index_target(context, expression)) return false;
-                    fputs("))", context->file);
-                }
-                else if (owner->is_class)
-                {
-                    emit_guard_text(context, "(%s *)vc_object_require((void *)(", owner->c_name);
-                    if (!emit_index_target(context, expression))
-                        return false;
-                    fputs("))", context->file);
-                }
-                else if (!emit_value_receiver_pointer(
-                    context, expression->as.index_expression.target))
-                    return false;
-                if (method->returns_ref)
-                {
-                    fputs(", ", context->file);
-                    if (owner->is_class || owner->is_interface)
-                    {
-                        if (!emit_index_target(context, expression)) return false;
-                    }
-                    else if (!emit_ref_owner_expression(context, expression->as.index_expression.target))
-                        return false;
-                }
-                fputs(", ", context->file);
-                if (!emit_expression_as(context, expression->as.index_expression.index, method->parameter_types[0]))
-                    return false;
-                fputc(')', context->file);
+                if (!emit_bound_indexer_get(context, expression, binding)) return false;
                 if (method->returns_ref)
                     fputs(").ptr)))", context->file);
                 return true;
@@ -11149,46 +11568,14 @@ emit_regular_index:
                     fputc(')', context->file);
                     return true;
                 }
-                if (left_binding->method_index >= context->semantic->method_count) return false;
-                const VcSemanticMethod *method = &context->semantic->methods[left_binding->method_index];
-                if (!method->has_owner_struct || method->owner_struct_index >= context->semantic->struct_count ||
-                    method->parameter_count != 1) return false;
-                const VcSemanticMethod *signature = left_binding->virtual_dispatch
-                    ? &context->semantic->methods[method->virtual_root_index] : method;
-                const VcSemanticStruct *owner = &context->semantic->structs[signature->owner_struct_index];
-                const char *type = c_type(context->semantic, method->return_type);
                 const char *op = ref_assignment_operator_text(expression->as.assignment_expression.operator_kind);
-                if (type == NULL || op == NULL) return false;
-                if (builtin)
-                    fprintf(context->file, "vc_compound_%s_%s(&", width, operation);
-                fprintf(context->file, "(*((%s *)((", type);
-                if (!emit_indexer_call_start(context, left_binding, method)) return false;
-                if (left_binding->interface_dispatch)
-                {
-                    emit_guard_text(context, "(void *)vc_object_require((void *)(");
-                    if (!emit_expression(context, left_node->as.index_expression.target)) return false;
-                    fputs("))", context->file);
-                }
-                else if (owner->is_class)
-                {
-                    emit_guard_text(context, "(%s *)vc_object_require((void *)(", owner->c_name);
-                    if (!emit_expression(context, left_node->as.index_expression.target)) return false;
-                    fputs("))", context->file);
-                }
-                else if (!emit_value_receiver_pointer(
-                    context, left_node->as.index_expression.target))
-                    return false;
-                fputs(", ", context->file);
-                if (owner->is_class || owner->is_interface)
-                {
-                    if (!emit_expression(context, left_node->as.index_expression.target)) return false;
-                }
-                else if (!emit_ref_owner_expression(context, left_node->as.index_expression.target)) return false;
-                fputs(", ", context->file);
-                if (!emit_expression_as(context, left_node->as.index_expression.index, method->parameter_types[0])) return false;
-                if (builtin) fputs(")).ptr))), ", context->file);
-                else fprintf(context->file, ")).ptr)) %s ", op);
-                if (!emit_expression_as(context, expression->as.assignment_expression.right, method->return_type)) return false;
+                if (op == NULL) return false;
+                if (builtin) fprintf(context->file, "vc_compound_%s_%s(&", width, operation);
+                else fputc('(', context->file);
+                if (!emit_expression(context, left_node)) return false;
+                if (builtin) fputs(", ", context->file);
+                else fprintf(context->file, " %s ", op);
+                if (!emit_expression_as(context, expression->as.assignment_expression.right, left_binding->type)) return false;
                 fputc(')', context->file);
                 return true;
             }
@@ -12390,13 +12777,14 @@ static bool emit_ref_local_declaration(
     return true;
 }
 
-static bool emit_ref_return_capture(
+static bool emit_ref_storage_capture_expression(
     VcCodegenContext *context,
     const VcAstNode *storage,
     const char *carrier)
 {
     if (context == NULL || storage == NULL || carrier == NULL)
         return false;
+    fputc('(', context->file);
     const VcAstNode *unwrapped = unwrap_parenthesized(storage);
     const VcSemanticBinding *binding = vc_semantic_binding(context->semantic, unwrapped);
 
@@ -12407,10 +12795,10 @@ static bool emit_ref_return_capture(
         if (find_codegen_ref_name(context, unwrapped->as.identifier_expression.name,
                 &source_pointer, &source_owner))
         {
-            emit_indent(context->file, context->depth);
-            fprintf(context->file, "%s.ptr = (void *)%s;\n", carrier, source_pointer);
-            emit_indent(context->file, context->depth);
-            fprintf(context->file, "%s.owner = %s;\n", carrier, source_owner);
+            fprintf(context->file, "%s.ptr = (void *)%s, ", carrier, source_pointer);
+            fprintf(context->file, "%s.owner = %s, ", carrier, source_owner);
+            fputs(carrier, context->file);
+            fputc(')', context->file);
             return true;
         }
     }
@@ -12420,21 +12808,23 @@ static bool emit_ref_return_capture(
         binding->field_index < context->semantic->structs[binding->struct_index].field_count &&
         context->semantic->structs[binding->struct_index].fields[binding->field_index].is_ref)
     {
-        emit_indent(context->file, context->depth);
         fprintf(context->file, "%s = ", carrier);
         if (!emit_ref_field_carrier_expression(context, unwrapped, binding)) return false;
-        fputs(";\n", context->file);
+        fputs(", ", context->file);
+        fputs(carrier, context->file);
+        fputc(')', context->file);
         return true;
     }
 
     if (unwrapped != NULL && binding != NULL && binding->has_property &&
         binding->property_returns_ref)
     {
-        emit_indent(context->file, context->depth);
         fprintf(context->file, "%s = ", carrier);
         if (!emit_property_get(context, binding,
                 unwrapped->kind == VC_AST_MEMBER_ACCESS_EXPRESSION ? unwrapped : NULL)) return false;
-        fputs(";\n", context->file);
+        fputs(", ", context->file);
+        fputs(carrier, context->file);
+        fputc(')', context->file);
         return true;
     }
 
@@ -12448,7 +12838,6 @@ static bool emit_ref_return_capture(
             char receiver_storage[96];
             VcSemanticType receiver_type = VC_SEM_TYPE_ERROR;
             if (temp == NULL) return false;
-            emit_indent(context->file, context->depth);
             fprintf(context->file, "%s = ", carrier);
             if (!emit_index_range_consumer_prefix(context, unwrapped, binding, temp,
                     &receiver_type, receiver_storage, sizeof(receiver_storage)))
@@ -12456,59 +12845,27 @@ static bool emit_ref_return_capture(
             if (!emit_index_range_consumer_access(context, unwrapped, binding, temp,
                     receiver_type, receiver_storage, false))
                 return false;
-            fputs(");\n", context->file);
+            fputs("), ", context->file);
+            fputs(carrier, context->file);
+            fputc(')', context->file);
             return true;
         }
-        if (binding->method_index >= context->semantic->method_count) return false;
-        const VcSemanticMethod *method = &context->semantic->methods[binding->method_index];
-        if (!method->has_owner_struct || method->owner_struct_index >= context->semantic->struct_count ||
-            method->parameter_count != 1) return false;
-        const VcSemanticMethod *signature = binding->virtual_dispatch
-            ? &context->semantic->methods[method->virtual_root_index] : method;
-        const VcSemanticStruct *owner = &context->semantic->structs[signature->owner_struct_index];
-        emit_indent(context->file, context->depth);
         fprintf(context->file, "%s = ", carrier);
-        if (!emit_indexer_call_start(context, binding, method)) return false;
-        if (binding->interface_dispatch)
-        {
-            emit_guard_text(context, "(void *)vc_object_require((void *)(");
-            if (!emit_index_target(context, unwrapped)) return false;
-            fputs("))", context->file);
-        }
-        else if (owner->is_class)
-        {
-            emit_guard_text(context, "(%s *)vc_object_require((void *)(", owner->c_name);
-            if (!emit_index_target(context, unwrapped)) return false;
-            fputs("))", context->file);
-        }
-        else
-        {
-            fputs("&(", context->file);
-            if (!emit_index_target(context, unwrapped)) return false;
-            fputc(')', context->file);
-        }
-        if (method->returns_ref)
-        {
-            fputs(", ", context->file);
-            if (owner->is_class || owner->is_interface)
-            {
-                if (!emit_index_target(context, unwrapped)) return false;
-            }
-            else if (!emit_ref_owner_expression(context, unwrapped->as.index_expression.target)) return false;
-        }
+        if (!emit_bound_indexer_get(context, unwrapped, binding)) return false;
         fputs(", ", context->file);
-        if (!emit_expression_as(context, unwrapped->as.index_expression.index, method->parameter_types[0])) return false;
-        fputs(");\n", context->file);
+        fputs(carrier, context->file);
+        fputc(')', context->file);
         return true;
     }
 
     if (unwrapped != NULL && unwrapped->kind == VC_AST_CALL_EXPRESSION &&
         binding != NULL && binding->method_returns_ref)
     {
-        emit_indent(context->file, context->depth);
         fprintf(context->file, "%s = ", carrier);
         if (!emit_call(context, unwrapped)) return false;
-        fputs(";\n", context->file);
+        fputs(", ", context->file);
+        fputs(carrier, context->file);
+        fputc(')', context->file);
         return true;
     }
 
@@ -12524,10 +12881,9 @@ static bool emit_ref_return_capture(
         if (owner_type_shared == NULL) return false;
         char owner_type[256];
         snprintf(owner_type, sizeof(owner_type), "%s", owner_type_shared);
-        emit_indent(context->file, context->depth);
         fprintf(context->file, "%s.owner = (void *)(", carrier);
         if (!emit_expression_as(context, owner_expression, owner_binding->type)) return false;
-        fputs(");\n", context->file);
+        fputs("), ", context->file);
         snprintf(replacement_storage, sizeof(replacement_storage),
             "((%s)%s.owner)", owner_type, carrier);
         replacement_name = replacement_storage;
@@ -12542,21 +12898,19 @@ static bool emit_ref_return_capture(
                 ((context->method != NULL && !context->method->is_static) ||
                  (context->method == NULL && context->receiver_name != NULL)))
             {
-                emit_indent(context->file, context->depth);
                 if (owner->is_class || owner->is_interface)
-                    fprintf(context->file, "%s.owner = (void *)%s;\n", carrier,
+                    fprintf(context->file, "%s.owner = (void *)%s, ", carrier,
                         context->receiver_name != NULL ? context->receiver_name : "vc_self");
                 else if (context->return_ref)
-                    fprintf(context->file, "%s.owner = vc_ref_self_owner;\n", carrier);
+                    fprintf(context->file, "%s.owner = vc_ref_self_owner, ", carrier);
                 else
-                    fprintf(context->file, "%s.owner = NULL;\n", carrier);
+                    fprintf(context->file, "%s.owner = NULL, ", carrier);
                 used_this_owner = true;
             }
         }
         if (!used_this_owner)
         {
-            emit_indent(context->file, context->depth);
-            fprintf(context->file, "%s.owner = NULL;\n", carrier);
+            fprintf(context->file, "%s.owner = NULL, ", carrier);
         }
     }
 
@@ -12565,7 +12919,6 @@ static bool emit_ref_return_capture(
         static_field_owner_for_expression(context, unwrapped, &static_field_owner) &&
         should_emit_static_type_init(context, static_field_owner);
     const bool saved_suppress_static_type_init = context->suppress_static_type_init;
-    emit_indent(context->file, context->depth);
     if (initialize_static_field)
     {
         fprintf(context->file, "%s.ptr = (", carrier);
@@ -12589,6 +12942,18 @@ static bool emit_ref_return_capture(
     if (!emitted) return false;
     fputc(')', context->file);
     if (initialize_static_field) fputc(')', context->file);
+    fputs(", ", context->file);
+    fputs(carrier, context->file);
+    fputc(')', context->file);
+    return true;
+}
+
+static bool emit_ref_return_capture(VcCodegenContext *context,
+    const VcAstNode *storage, const char *carrier)
+{
+    emit_indent(context->file, context->depth);
+    fputs("(void)", context->file);
+    if (!emit_ref_storage_capture_expression(context, storage, carrier)) return false;
     fputs(";\n", context->file);
     return true;
 }
@@ -14014,7 +14379,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                     "if (!vc_gc_pin_acquire(&%s, (void *)%s)) vc_runtime_fail(\"fixed pin acquisition failed\");\n",
                     pin_name, owner_name);
                 emit_indent(context->file, context->depth);
-                fprintf(context->file, "%s %s = (%s != NULL && %s->length > 0) ? (%s)%s->data : NULL;\n",
+                fprintf(context->file, "%s volatile %s = (%s != NULL && %s->length > 0) ? (%s)%s->data : NULL;\n",
                     pointer_type, pointer_name, owner_name, owner_name, pointer_type, owner_name);
             }
             else if (binding->fixed_pinnable_protocol)
@@ -14084,7 +14449,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                     "if (!vc_gc_pin_acquire(&%s, %s.owner)) vc_runtime_fail(\"fixed pin acquisition failed\");\n",
                     pin_name, pinnable_ref_name);
                 emit_indent(context->file, context->depth);
-                fprintf(context->file, "%s %s = (%s)%s.ptr;\n",
+                fprintf(context->file, "%s volatile %s = (%s)%s.ptr;\n",
                     pointer_type, pointer_name, pointer_type, pinnable_ref_name);
             }
             else
@@ -14111,7 +14476,7 @@ static bool emit_statement_impl(VcCodegenContext *context, const VcAstNode *stat
                     pin_name, owner_name);
 
                 emit_indent(context->file, context->depth);
-                fprintf(context->file, "%s %s = ", pointer_type, pointer_name);
+                fprintf(context->file, "%s volatile %s = ", pointer_type, pointer_name);
                 const VcAstNode *saved_storage_expression = context->active_storage_expression;
                 const char *saved_storage_name = context->active_storage_name;
                 context->active_storage_expression = binding->fixed_owner_expression;
@@ -16238,6 +16603,27 @@ static bool emit_constructor_init_signature(
     return true;
 }
 
+static bool collect_constructor_initializer_temps(VcCodegenContext *context,
+    const VcSemanticConstructor *constructor)
+{
+    if (!constructor->has_this_constructor && !constructor->has_base_constructor) return true;
+    const size_t index = constructor->has_this_constructor
+        ? constructor->this_constructor_index : constructor->base_constructor_index;
+    if (index >= context->semantic->constructor_count) return false;
+    const VcSemanticConstructor *target = &context->semantic->constructors[index];
+    VcSemanticBinding binding = {0};
+    binding.argument_parameters = constructor->has_this_constructor
+        ? constructor->this_argument_parameters : constructor->base_argument_parameters;
+    binding.argument_count = constructor->has_this_constructor
+        ? constructor->this_argument_count : constructor->base_argument_count;
+    binding.params_expanded = constructor->has_this_constructor
+        ? constructor->this_params_expanded : constructor->base_params_expanded;
+    return collect_call_operand_temps(context, constructor->node,
+        &constructor->node->as.method_declaration.constructor_initializer_arguments,
+        &binding, target->parameter_types, target->parameter_modifiers,
+        target->parameter_count, NULL, VC_SEM_TYPE_UNKNOWN, false, false);
+}
+
 static bool emit_constructor_init_call(
     VcCodegenContext *context,
     size_t constructor_index,
@@ -16248,6 +16634,19 @@ static bool emit_constructor_init_call(
     size_t argument_count,
     bool params_expanded)
 {
+    if (context->active_call != temp_key && has_call_operands(context, temp_key))
+    {
+        fputc('(', context->file);
+        const VcAstNode *saved_call = context->active_call;
+        context->active_call = NULL;
+        if (!emit_call_operand_prefix(context, temp_key)) return false;
+        context->active_call = temp_key;
+        const bool result = emit_constructor_init_call(context, constructor_index, receiver, temp_key, arguments, argument_parameters, argument_count, params_expanded);
+        context->active_call = saved_call;
+        fputc(')', context->file);
+        return result;
+    }
+
     if (constructor_index >= context->semantic->constructor_count)
         return false;
     const VcSemanticConstructor *constructor = &context->semantic->constructors[constructor_index];
@@ -16313,6 +16712,19 @@ static bool emit_value_constructor_call(
     size_t argument_count,
     bool params_expanded)
 {
+    if (context->active_call != temp_key && has_call_operands(context, temp_key))
+    {
+        fputc('(', context->file);
+        const VcAstNode *saved_call = context->active_call;
+        context->active_call = NULL;
+        if (!emit_call_operand_prefix(context, temp_key)) return false;
+        context->active_call = temp_key;
+        const bool result = emit_value_constructor_call(context, constructor_index, temp_key, arguments, argument_parameters, argument_count, params_expanded);
+        context->active_call = saved_call;
+        fputc(')', context->file);
+        return result;
+    }
+
     if (constructor_index >= context->semantic->constructor_count)
         return false;
     const VcSemanticConstructor *constructor = &context->semantic->constructors[constructor_index];
@@ -16467,6 +16879,11 @@ static bool emit_constructor(
         const VcAstNode *body = constructor->node->as.method_declaration.body;
         const VcAstNodeList *initializer_arguments =
             &constructor->node->as.method_declaration.constructor_initializer_arguments;
+        if (!collect_constructor_initializer_temps(&context, constructor))
+        {
+            destroy_codegen_context(&context);
+            return false;
+        }
         if (constructor->has_this_constructor)
         {
             for (size_t i = 0; i < initializer_arguments->count; i++)
@@ -16616,6 +17033,11 @@ static bool emit_constructor(
     const VcAstNode *body = constructor->node->as.method_declaration.body;
     const VcAstNodeList *initializer_arguments =
         &constructor->node->as.method_declaration.constructor_initializer_arguments;
+    if (!collect_constructor_initializer_temps(&context, constructor))
+    {
+        destroy_codegen_context(&context);
+        return false;
+    }
     for (size_t i = 0; i < initializer_arguments->count; i++)
     {
         if (!collect_null_temps(&context, initializer_arguments->items[i]))

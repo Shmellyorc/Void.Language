@@ -1,7 +1,7 @@
 VOID Language - Current Issues and Deferred Features
 ===================================================
-Recorded baseline: voidc 0.0.380 (locally validated; administrative LOCK pending)
-Last reviewed: 2026-10-08 (#371-#380 integration and correctness audit)
+Recorded baseline: voidc 0.0.381 (standalone issue #7 repair; locally validated)
+Last reviewed: 2026-10-08 (post-audit issue #7 correctness repair)
 
 CORRECTNESS ISSUES (DEFERRED)
 -----------------------------
@@ -17,16 +17,6 @@ CORRECTNESS ISSUES (DEFERRED)
    Define and implement portable, deterministic VOID semantics across
    supported destination integer types. This is separate from normal,
    in-range conversions.
-
-7. Native C call-argument sequencing
-   Ordinary function/method calls with multiple side-effecting arguments can
-   emit C function arguments as separate expressions without a sequencing
-   boundary. C11 does not specify argument evaluation order; updates to the
-   same scalar across those arguments can have undefined behavior. Verified
-   with a Math.Clamp(++n, ++n, ++n) probe: emitted C contained three updates
-   of n in one call. This is pre-existing shared call lowering, not specific
-   to Math. Repair requires sequencing through the common call-emission path,
-   retaining overload/ref/params/GC behavior; no Math-only workaround.
 
 INTENTIONALLY UNSUPPORTED COLLECTION FEATURES
 ---------------------------------------------
@@ -49,8 +39,8 @@ INTENTIONALLY UNSUPPORTED COLLECTION FEATURES
    construction contracts are not implemented. Concrete constructor-plus-Add
    collection construction is already supported.
 
-#380 AUDIT REVIEW
------------------
+#380 AUDIT REVIEW (HISTORICAL)
+------------------------------
 - Full isolated cumulative validation: 332/332 suites, 19,537 checks, with
   TEST_JOBS=8. Dedicated #380 target: 32 harness checks covering 424 program
   assertions and 261 exact clock-fraction vectors plus native clock edges.
@@ -76,9 +66,35 @@ INTENTIONALLY UNSUPPORTED COLLECTION FEATURES
   execution is Linux; Windows fraction arithmetic is unit-tested on Linux,
   and Windows/macOS OS paths are inspected, not claimed executed.
 
+POST-AUDIT CORRECTION: voidc 0.0.381
+----------------------------------
+- Issue #7 is resolved through the existing shared call-emission and temporary
+  mechanisms. Receivers and supplied arguments are captured once in source
+  order before formal-parameter mapping and params packing. Ref/out/in storage
+  retains its pointer, alias identity and managed owner through existing roots.
+- Covers ordinary/native/builtin, constructor/chaining, delegate/function-pointer,
+  virtual/interface/generic and collection Add calls. Async spills preserve
+  receiver storage, contextual conversions and null-conditional laziness.
+  Existing string and spread sequencing remains shared with its prior paths.
+- Corrected dependent defects exposed by the repair: repeated managed-owner/ref
+  indexer receivers, copied struct ref-property storage, static delegate-value
+  recognition, null/bounds receiver storage faults deferred past an await, and strict
+  exception/pinning temporary declarations.
+  No new unresolved correctness defect was verified within this repair.
+- Clean compiler build, focused regressions, affected existing regressions and
+  the complete isolated cumulative suite passed. Final clean rebuild and focused
+  rerun passed after the last production correction.
+- GCC/Clang strict C11 at -O0/-O2 and GCC UBSan/ASan passed. LeakSanitizer is
+  unavailable under the desktop tracing host; ASan leak detection is disabled.
+  Clang sanitizer runtime libraries are unavailable. Native execution is Linux.
+- Permanent target: test-native-call-argument-sequencing.
+  Detailed report: Docs/NativeCallArgumentSequencingRepair381.md.
+- This is a standalone post-audit correction, not a new roadmap. Issues 1-6
+  remain deferred; the user's administrative LOCK decision remains separate.
+
 PLANNING NOTES
 --------------
-- Issues 1, 2 and 7 are genuine correctness gaps. Items 3-6 are deferred feature
+- Issues 1 and 2 are genuine correctness gaps. Items 3-6 are deferred feature
   limitations, not defects in the already supported collection behavior.
 - These items are NOT blockers for unrelated milestones. Revisit only when
   a new milestone directly depends on one, or new technical evidence shows

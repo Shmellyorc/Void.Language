@@ -88,7 +88,7 @@ def check_diagnostic(name: str, code: str, message: str) -> None:
 
 def main() -> None:
     version = invoke(VOIDC, 'version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.380',
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.381',
           f'version: {version.stdout} {version.stderr}')
     built = invoke(VOIDC, 'build', FIXTURE)
     check(built.returncode == 0 and not built.stderr, f'build: {built.stdout}\n{built.stderr}')

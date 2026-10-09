@@ -94,7 +94,7 @@ def invalid(name: str, code: str, message: str, excerpt: str) -> None:
 
 def main() -> None:
     version = run(COMPILER, 'version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.380',
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.381',
           f'version: {version.stdout}\n{version.stderr}')
     built = run(COMPILER, 'build', FIXTURE)
     check(built.returncode == 0 and not built.stderr,

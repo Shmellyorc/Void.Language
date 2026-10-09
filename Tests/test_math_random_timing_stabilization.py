@@ -48,7 +48,7 @@ def native_compile(compiler: list[str], source: Path, exe: Path, *, sanitize: bo
 
 def main() -> None:
     version = invoke(BIN, 'version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.380',
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.381',
           'compiler version')
     # Ensure no new generator/clock source or native math subsystem was installed.
     random_source = (ROOT / 'StandardLibrary/Void/Random.void').read_text()

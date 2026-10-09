@@ -75,7 +75,7 @@ def unassigned_case(folder: Path, source: str, local: str) -> None:
 
 def main() -> None:
     result = invoke(VOIDC, 'version')
-    expect(result.returncode == 0 and result.stdout.strip() == 'voidc 0.0.380',
+    expect(result.returncode == 0 and result.stdout.strip() == 'voidc 0.0.381',
            result.stdout + result.stderr)
     built = invoke(VOIDC, 'build', FIXTURE)
     expect(built.returncode == 0, built.stdout + built.stderr)

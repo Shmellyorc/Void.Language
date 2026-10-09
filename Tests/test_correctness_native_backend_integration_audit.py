@@ -74,7 +74,7 @@ def lsp(path, source, methods):
 
 def main():
     result = invoke(VOIDC, 'version', text=True)
-    expect(result.returncode == 0 and result.stdout.strip() == 'voidc 0.0.380', result.stdout)
+    expect(result.returncode == 0 and result.stdout.strip() == 'voidc 0.0.381', result.stdout)
     built = invoke(VOIDC, 'build', FIXTURE, text=True)
     expect(built.returncode == 0 and not built.stderr, built.stdout + built.stderr)
     exe = FIXTURE / 'bin' / (NAME + ('.exe' if os.name == 'nt' else ''))

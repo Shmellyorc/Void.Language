@@ -57,7 +57,7 @@ def strict_command(compiler: str, source: Path, output: Path, *, link: bool) -> 
 
 def main() -> None:
     version = run(VOIDC, 'version')
-    expect(require_success(version, 'version') and version.stdout.strip() == 'voidc 0.0.380',
+    expect(require_success(version, 'version') and version.stdout.strip() == 'voidc 0.0.381',
            'wrong compiler version')
 
     c_compiler = os.environ.get('CC', 'cc')
@@ -88,8 +88,16 @@ def main() -> None:
         span_c = baseline['SpanConversionSlicingStackallocCompletion']
         awaiter_c = baseline['AwaiterValueTaskGcThreadsExceptionsAsyncIterationIntegration']
         focused_c = baseline['StrictGeneratedCCleanlinessCompletion']
-        expect(not re.search(r'\b(?:vc_s_10 \*vc_null_3|int32_t vc_null_4|int32_t vc_null_5)\b', span_c),
-               'ref-indexer compound assignment still emits unused snapshot temporaries')
+        # Temporary numbering changes when a caller needs additional snapshots.
+        # Check actual use, excluding GC registration, rather than particular IDs.
+        unused_temporaries = []
+        for function in span_c.split('\n}\n'):
+            temporary_names = re.findall(r'\b(vc_null_[0-9]+)\s*=\s*(?:NULL|\{0\});', function)
+            executable_c = '\n'.join(line for line in function.splitlines() if 'vc_gc_root_push(' not in line)
+            unused_temporaries.extend(name for name in temporary_names
+                                      if len(re.findall(r'\b' + name + r'\b', executable_c)) <= 1)
+        expect(not unused_temporaries,
+               'ref-indexer compound assignment still emits unused snapshot temporaries: ' + str(unused_temporaries))
         expect(re.search(r'vc_self VC_MAYBE_UNUSED\)', awaiter_c) is not None,
                'unused property receiver must retain its ABI and be annotated narrowly')
         expect('vc_m_' in focused_c and '(void)((' in focused_c,

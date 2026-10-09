@@ -20559,20 +20559,29 @@ static bool expression_is_existing_delegate_value(
     if (expression->kind == VC_AST_IDENTIFIER_EXPRESSION)
     {
         const char *name = expression->as.identifier_expression.name;
-        const VcLocal *local = find_local_entry_const(context, name);
-        if (local != NULL)
-            return is_assignable(context->model, target_type, local->type);
-        if (context->has_this)
+        /* Implicit static fields/properties are values too. Async call
+           sequencing spills delegate callees through ordinary assignments. */
+        if (identifier_is_value(context, name))
         {
-            size_t owner = 0, index = 0;
-            if (resolve_field(context->model, context->this_struct_index, name, &owner, &index))
-                return is_assignable(context->model, target_type, context->model->structs[owner].fields[index].type);
-            if (resolve_property(context->model, context->this_struct_index, name, &owner, &index))
-                return is_assignable(context->model, target_type, context->model->structs[owner].properties[index].type);
+            const VcSemanticType type = analyze_expression(context, expression);
+            return type == VC_SEM_TYPE_ERROR || is_assignable(context->model, target_type, type);
         }
     }
     else if (expression->kind == VC_AST_MEMBER_ACCESS_EXPRESSION)
     {
+        size_t static_owner = 0;
+        bool ambiguous = false;
+        if (resolve_static_type_target(context, expression->as.member_access_expression.target,
+                &static_owner, &ambiguous) && !ambiguous)
+        {
+            size_t owner = 0, index = 0;
+            const char *name = expression->as.member_access_expression.member;
+            if (resolve_static_field(context->model, static_owner, name, &owner, &index))
+                return is_assignable(context->model, target_type, context->model->structs[owner].fields[index].type);
+            if (resolve_static_property(context->model, static_owner, name, &owner, &index))
+                return is_assignable(context->model, target_type, context->model->structs[owner].properties[index].type);
+            return false;
+        }
         const VcSemanticType receiver = analyze_expression(context, expression->as.member_access_expression.target);
         if (vc_semantic_type_is_struct(receiver))
         {

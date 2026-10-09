@@ -84,7 +84,7 @@ def strict_compile(cc: list[str], binary: Path, *extra: str) -> None:
 
 def main() -> None:
     version = invoke(COMPILER, 'version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.380',
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.381',
           f'version: {version.stdout}\n{version.stderr}')
     project = (FIXTURE / 'FloatingPointMathFoundations.voidproj').read_text(encoding='utf-8')
     check('"version":"0.0.372"' in project and '"libraries"' not in project,

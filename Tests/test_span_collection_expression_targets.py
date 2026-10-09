@@ -100,7 +100,7 @@ def negative(name: str, code: str, message: str) -> None:
 
 def main() -> None:
     result = run(VOIDC, 'version')
-    check(result.returncode == 0 and result.stdout.strip() == 'voidc 0.0.380',
+    check(result.returncode == 0 and result.stdout.strip() == 'voidc 0.0.381',
           f'compiler version: {result.stdout}\n{result.stderr}')
     result = run(VOIDC, 'build', FIXTURE, timeout=240)
     check(result.returncode == 0 and not result.stderr,

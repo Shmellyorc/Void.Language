@@ -2203,15 +2203,17 @@ static bool async_expression_is_generated_spill(const VcAstNode *expression)
         member != NULL && strncmp(member, "__voidc_async_spill_", 20) == 0;
 }
 
-static bool async_spill_expression(VcAsyncContext *context, VcAstNode **expression,
-    VcAstNodeList *prefix)
+static bool async_spill_expression_as(VcAsyncContext *context, VcAstNode **expression,
+    VcAstNodeList *prefix, VcSemanticType target_type)
 {
     if (expression == NULL || *expression == NULL || prefix == NULL)
         return false;
-    if (async_expression_is_generated_spill(*expression))
+    if (async_expression_is_generated_spill(*expression) && target_type == VC_SEM_TYPE_UNKNOWN)
         return true;
 
-    VcAstTypeRef *type = async_expression_type(context, *expression);
+    VcAstTypeRef *type = target_type != VC_SEM_TYPE_UNKNOWN
+        ? type_from_semantic(context, target_type, (*expression)->location)
+        : async_expression_type(context, *expression);
     if (type == NULL)
     {
         context_error(context, "async expression spill type could not be resolved");
@@ -2235,6 +2237,54 @@ static bool async_spill_expression(VcAsyncContext *context, VcAstNode **expressi
         return false;
     *expression = replacement;
     return true;
+}
+
+static bool async_spill_expression(VcAsyncContext *context, VcAstNode **expression,
+    VcAstNodeList *prefix)
+{
+    return async_spill_expression_as(context, expression, prefix, VC_SEM_TYPE_UNKNOWN);
+}
+
+/* A preceding argument includes its contextual conversion. Materializing only
+   the source value would defer user conversions/boxing until after the await. */
+static VcSemanticType async_call_argument_type(VcAsyncContext *context,
+    const VcAstNode *call_node, size_t argument)
+{
+    const VcSemanticBinding *binding = vc_semantic_binding(context->semantic, call_node);
+    if (binding == NULL) return VC_SEM_TYPE_UNKNOWN;
+    const VcSemanticMethod *method = NULL;
+    if (binding->has_method) method = &context->semantic->methods[binding->method_index];
+    else if (binding->has_delegate_invoke)
+    {
+        const VcSemanticStruct *delegate = &context->semantic->structs[binding->delegate_type_index];
+        method = &context->semantic->methods[delegate->delegate_invoke_method_index];
+    }
+    const size_t parameter = argument < binding->argument_count
+        ? binding->argument_parameters[argument] : argument;
+    VcSemanticType type = VC_SEM_TYPE_UNKNOWN;
+    if (method != NULL && parameter < method->parameter_count)
+    {
+        type = method->parameter_types[parameter];
+        if (binding->params_expanded && parameter + 1 == method->parameter_count)
+            type = vc_semantic_array_element_type(context->semantic, type);
+    }
+    else if (binding->has_constructor)
+    {
+        const VcSemanticConstructor *constructor = &context->semantic->constructors[binding->constructor_index];
+        if (parameter < constructor->parameter_count)
+        {
+            type = constructor->parameter_types[parameter];
+            if (binding->params_expanded && parameter + 1 == constructor->parameter_count)
+                type = vc_semantic_array_element_type(context->semantic, type);
+        }
+    }
+    else if (binding->has_function_pointer_invoke)
+    {
+        const VcSemanticFunctionPointer *pointer = &context->semantic->function_pointers[
+            vc_semantic_function_pointer_index(binding->function_pointer_type)];
+        if (parameter < pointer->parameter_count) type = pointer->parameter_types[parameter];
+    }
+    return type;
 }
 
 static bool async_expression_is_simple_value(const VcAstNode *expression)
@@ -2561,13 +2611,116 @@ static bool async_make_switch_expression(VcAsyncContext *context,
     return true;
 }
 
-static bool async_normalize_call(VcAsyncContext *context, VcAstNode *node,
+/* Capture a value receiver's location, rather than copying a mutable struct.
+   Class/array owners and indices use the existing state-machine spills. */
+static bool async_capture_call_receiver(VcAsyncContext *context,
+    VcAstNode **receiver, VcAstNodeList *prefix)
+{
+    VcAstNode *node = *receiver;
+    const VcSemanticBinding *value = vc_semantic_binding(context->semantic, node);
+    if (value != NULL && value->is_type_receiver) return true;
+    bool reference = value != NULL && (value->type == VC_SEM_TYPE_OBJECT ||
+        value->type == VC_SEM_TYPE_STRING || vc_semantic_type_is_array(value->type));
+    if (value != NULL && vc_semantic_type_is_struct(value->type))
+    {
+        const VcSemanticStruct *owner = &context->semantic->structs[vc_semantic_struct_index(value->type)];
+        reference = owner->is_class || owner->is_interface || owner->is_delegate;
+    }
+    if (reference) return async_spill_expression(context, receiver, prefix);
+    if (node->kind == VC_AST_MEMBER_ACCESS_EXPRESSION && value == NULL &&
+        async_expression_is_generated_spill(node->as.member_access_expression.target) &&
+        strcmp(node->as.member_access_expression.member, "Value") == 0)
+        return true; /* A nullable receiver already captured for a lazy call. */
+    if (node->kind == VC_AST_IDENTIFIER_EXPRESSION || async_expression_is_generated_spill(node))
+        return true; /* Promoted local/parameter storage keeps its identity. */
+    if (node->kind == VC_AST_MEMBER_ACCESS_EXPRESSION && value != NULL && value->has_field)
+    {
+        if (!async_capture_call_receiver(context, &node->as.member_access_expression.target, prefix)) return false;
+        /* Taking the field's storage faults now if its captured owner is null.
+           Keep the final receiver at that storage, rather than at this copy. */
+        VcAstNode *checked_value = node;
+        return async_spill_expression(context, &checked_value, prefix);
+    }
+    if (node->kind == VC_AST_INDEX_EXPRESSION && value != NULL && !value->has_indexer_get)
+    {
+        if (!async_spill_expression(context, &node->as.index_expression.target, prefix)) return false;
+        if (node->as.index_expression.indices.count != 0)
+        {
+            for (size_t i = 0; i < node->as.index_expression.indices.count; i++)
+                if (!async_spill_expression(context, &node->as.index_expression.indices.items[i], prefix)) return false;
+            node->as.index_expression.index = node->as.index_expression.indices.items[0];
+        }
+        else if (!async_spill_expression(context, &node->as.index_expression.index, prefix)) return false;
+        /* Preserve null/bounds faults before suspension. The final receiver
+           still addresses the captured array element, not this checked value. */
+        VcAstNode *checked_value = node;
+        return async_spill_expression(context, &checked_value, prefix);
+    }
+    return async_spill_expression(context, receiver, prefix);
+}
+
+static bool async_normalize_call(VcAsyncContext *context, VcAstNode **expression,
     VcAstNodeList *prefix)
 {
+    VcAstNode *node = *expression;
     bool argument_has_await = false;
     for (size_t i = 0; i < node->as.call_expression.arguments.count; i++)
         argument_has_await = argument_has_await || expression_contains_kind(
             node->as.call_expression.arguments.items[i], VC_AST_AWAIT_EXPRESSION);
+
+    VcAstNode *conditional_callee = node->as.call_expression.callee;
+    if (argument_has_await && conditional_callee != NULL &&
+        conditional_callee->kind == VC_AST_MEMBER_ACCESS_EXPRESSION &&
+        conditional_callee->as.member_access_expression.null_conditional_direct)
+    {
+        /* Await prefixes belong inside the non-null branch. Hoisting them
+           outside it would evaluate skipped arguments and could suspend. */
+        const VcSemanticBinding *binding = vc_semantic_binding(context->semantic, node);
+        if (binding == NULL) return false;
+        const bool returns_void = binding->type == VC_SEM_TYPE_VOID;
+        VcAstTypeRef *result_type = returns_void ? NULL : async_expression_type(context, node);
+        VcAsyncSpill *result = returns_void ? NULL : add_async_spill(context, result_type, node->location);
+        if (!returns_void && (result_type == NULL || result == NULL)) return false;
+        const char *result_field = result != NULL ? result->field_name : NULL;
+        VcAstNode **receiver = &conditional_callee->as.member_access_expression.target;
+        const VcSemanticBinding *receiver_binding = vc_semantic_binding(context->semantic, *receiver);
+        const bool nullable = receiver_binding != NULL && vc_semantic_type_is_nullable(receiver_binding->type);
+        if (!normalize_async_foundation_expression(context, receiver, prefix) ||
+            !async_spill_expression(context, receiver, prefix)) return false;
+        VcAstNode *condition = nullable
+            ? member_access(context->tree, node->location, *receiver, "HasValue")
+            : binary(context->tree, node->location, VC_TOKEN_BANG_EQUAL, *receiver,
+                async_null_literal(context->tree, node->location));
+        if (nullable)
+            *receiver = member_access(context->tree, node->location, *receiver, "Value");
+        conditional_callee->as.member_access_expression.null_conditional = false;
+        conditional_callee->as.member_access_expression.null_conditional_direct = false;
+        VcAstNodeList body_prefix = {0};
+        VcAstNode *call_value = node;
+        if (!async_normalize_call(context, &call_value, &body_prefix)) return false;
+        VcAstNode *body = block(context->tree, node->location);
+        VcAstNode *otherwise = block(context->tree, node->location);
+        if (body == NULL || otherwise == NULL || condition == NULL) return false;
+        for (size_t i = 0; i < body_prefix.count; i++)
+            if (!block_push(context->tree, body, body_prefix.items[i])) return false;
+        VcAstNode *invoke = returns_void
+            ? expression_statement(context->tree, node->location, call_value)
+            : async_assignment_statement(context, node->location,
+                async_state_member(context, node->location, result_field), call_value);
+        if (invoke == NULL || !block_push(context->tree, body, invoke)) return false;
+        if (!returns_void)
+        {
+            VcAstNode *empty = async_assignment_statement(context, node->location,
+                async_state_member(context, node->location, result_field),
+                default_expression(context->tree, node->location, result_type));
+            if (empty == NULL || !block_push(context->tree, otherwise, empty)) return false;
+        }
+        VcAstNode *branch = async_if_statement(context, node->location, condition, body, otherwise);
+        if (branch == NULL || !vc_ast_node_list_push(context->tree, prefix, branch)) return false;
+        *expression = returns_void ? number_literal(context->tree, node->location, 0)
+            : async_state_member(context, node->location, result_field);
+        return *expression != NULL;
+    }
 
     if (!normalize_async_foundation_expression(context,
             &node->as.call_expression.callee, prefix))
@@ -2576,19 +2729,20 @@ static bool async_normalize_call(VcAsyncContext *context, VcAstNode *node,
     if (argument_has_await)
     {
         VcAstNode *callee = node->as.call_expression.callee;
-        if (callee != NULL && callee->kind == VC_AST_MEMBER_ACCESS_EXPRESSION &&
-            !async_expression_is_simple_value(callee->as.member_access_expression.target))
+        const VcSemanticBinding *binding = vc_semantic_binding(context->semantic, node);
+        if (binding != NULL && (binding->has_delegate_invoke || binding->has_function_pointer_invoke))
         {
-            if (!async_spill_expression(context,
-                    &callee->as.member_access_expression.target, prefix))
-                return false;
+            if (!async_spill_expression(context, &node->as.call_expression.callee, prefix)) return false;
+        }
+        else if (callee != NULL && callee->kind == VC_AST_MEMBER_ACCESS_EXPRESSION)
+        {
+            if (!async_capture_call_receiver(context,
+                    &callee->as.member_access_expression.target, prefix)) return false;
         }
         else if (callee != NULL && callee->kind != VC_AST_IDENTIFIER_EXPRESSION &&
-            callee->kind != VC_AST_MEMBER_ACCESS_EXPRESSION &&
-            !async_expression_is_generated_spill(callee))
+                 !async_expression_is_generated_spill(callee))
         {
-            if (!async_spill_expression(context, &node->as.call_expression.callee, prefix))
-                return false;
+            if (!async_spill_expression(context, &node->as.call_expression.callee, prefix)) return false;
         }
     }
 
@@ -2599,10 +2753,9 @@ static bool async_normalize_call(VcAsyncContext *context, VcAstNode *node,
         if (current_has_await)
         {
             for (size_t j = 0; j < i; j++)
-                if (!async_expression_is_generated_spill(
-                        node->as.call_expression.arguments.items[j]) &&
-                    !async_spill_expression(context,
-                        &node->as.call_expression.arguments.items[j], prefix))
+                if (!async_spill_expression_as(context,
+                        &node->as.call_expression.arguments.items[j], prefix,
+                        async_call_argument_type(context, node, j)))
                     return false;
         }
         if (!normalize_async_foundation_expression(context,
@@ -2642,9 +2795,9 @@ static bool async_normalize_new(VcAsyncContext *context, VcAstNode *node,
         if (current_has_await)
         {
             for (size_t j = 0; j < i; j++)
-                if (!async_expression_is_generated_spill(node->as.new_expression.arguments.items[j]) &&
-                    !async_spill_expression(context,
-                        &node->as.new_expression.arguments.items[j], prefix))
+                if (!async_spill_expression_as(context,
+                        &node->as.new_expression.arguments.items[j], prefix,
+                        async_call_argument_type(context, node, j)))
                     return false;
         }
         if (!normalize_async_foundation_expression(context,
@@ -2774,7 +2927,7 @@ static bool normalize_async_foundation_expression(VcAsyncContext *context,
                 &node->as.member_access_expression.target, prefix);
 
         case VC_AST_CALL_EXPRESSION:
-            return async_normalize_call(context, node, prefix);
+            return async_normalize_call(context, expression, prefix);
 
         case VC_AST_INDEX_EXPRESSION:
         {

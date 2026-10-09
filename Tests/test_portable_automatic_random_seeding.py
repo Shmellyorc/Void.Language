@@ -94,7 +94,7 @@ def neg(name: str, code: str, message: str) -> None:
 
 def main():
     version = run(BIN, 'version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.380', 'compiler version')
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.381', 'compiler version')
     project = (FIX / 'PortableAutomaticRandomSeeding.voidproj').read_text()
     check('"version":"0.0.377"' in project and '"libraries"' not in project, 'no project deps')
     src = (ROOT / 'StandardLibrary/Void/Random.void').read_text()

@@ -124,7 +124,7 @@ def main():
     check = harness.check
     run = harness.run
     version = run(harness.BIN, 'version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.380', 'version')
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.381', 'version')
     with tempfile.TemporaryDirectory(prefix='void380-') as temporary:
         dest = Path(temporary)
         clock_checks(dest)
@@ -157,7 +157,7 @@ def main():
         result = run('ar', 'rcs', project / 'native/libauditfenv.a', native)
         check(result.returncode == 0 and not result.stderr, result.stderr)
         (project / 'Audit.voidproj').write_text(json.dumps({
-            'format': 1, 'name': 'Audit', 'output': 'exe', 'version': '0.0.380',
+            'format': 1, 'name': 'Audit', 'output': 'exe', 'version': '0.0.381',
             'sources': ['Program.void', 'Reference.void'],
             'compiler': {'unsafe': True, 'libraryPaths': ['native'],
                          'libraries': ['auditfenv']}}))

@@ -323,7 +323,7 @@ def main():
         check(compile_result.returncode == 0, compile_result.stderr)
 
     version = invoke('version')
-    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.380', version.stdout)
+    check(version.returncode == 0 and version.stdout.strip() == 'voidc 0.0.381', version.stdout)
     compiler = (ROOT / 'Compiler' / 'src' / 'compiler.c').read_text(encoding='utf-8')
     check('vc_runtime_frame_report' in compiler and 'vc_runtime_diagnostic_context_report' in compiler, 'unified renderer missing')
     check('vc_exception_trace_report' in compiler and 'vc_call_stack_report' in compiler, 'locked stack systems missing')
