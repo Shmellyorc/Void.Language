@@ -390,3 +390,26 @@ changes. Add a validated-source JIT preflight publication API while preserving
 legacy IR proofs and one-slot whole-module leases. Host source metadata cannot
 override compiler-derived safety. No LSP, incremental compiler, watcher, automatic
 restart or multi-slot transaction is introduced. See ANALYSIS_COMPATIBILITY.md.
+
+## Phase 8 in-process tooling and invalidation planning
+
+The user reports Phase 7 commit `04768bf` passed Actions run #10 on all three
+platforms. Consume its successful records through a small owned read-only index.
+Return copied declaration/reference records retaining immutable source spans;
+index only the supported function and constant categories, using UTF-8 byte
+offsets and canonical VFS identities. No mutable-local/member information is
+invented. Keep declarations and references deterministically ordered.
+
+Plan invalidation from reverse imports/references and local-constant containment
+with finite iterative traversal. Old-only plans require complete discovery and
+validation; unknown modules and implicit root namespace edits conservatively
+include all known modules. Two successful snapshots permit exact source/module
+differences and confirmed declaration/binding summaries; union both dependency
+graphs to retain removed/rebound dependents. Source changes still seed every
+declaration in a changed file because function-body extents are not collected.
+
+Use the existing exact compiler source contract for the source compatibility
+classification. Tooling plans never publish code or replace host ABI contracts.
+Snapshot comparisons cannot certify filesystem revisions edited afterward.
+No incremental compiler, second frontend, watcher, LSP/JSON-RPC transport or
+persistent cache is added. TOOLING_FOUNDATIONS.md documents API and boundaries.

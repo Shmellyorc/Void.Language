@@ -217,3 +217,9 @@ changes that to 61 beside unchanged constants while retaining the old generation
 actual constant edits require manual restart. These source tests supplement the
 original hand-built IR architectural proofs. The suite now contains fourteen
 CTest suites, including all twelve from Phase 6.
+
+[TOOLING_FOUNDATIONS.md](docs/TOOLING_FOUNDATIONS.md) describes read-only symbol
+queries and conservative dependency invalidation over validated source snapshots.
+The `tooling_demo` CTest runs the standalone in-process consumer in
+`examples/tooling.cpp` against a disposable copied source project. All fourteen
+Phase 7 suites remain; tooling/tooling_demo bring the total to sixteen.

@@ -1,6 +1,6 @@
 # Known issues and deferred work
 
-Updated 11 October 2026, Phase 7 analysis and compatibility.
+Updated 11 October 2026, Phase 8 tooling foundations.
 
 ## Platform verification
 
@@ -148,10 +148,17 @@ Updated 11 October 2026, Phase 7 analysis and compatibility.
 
 ## Current phase and subsequent work
 
-The user reports Phase 6 commit `9b9fdac` passed run #9 on all three platforms.
-Phase 7 adds analysis and analysis_cli while preserving all twelve preceding
-suites. Local validation is recorded in WORK_LOG.md. Hosted Phase 7 verification
-requires the user's next push; no new hosted result is claimed. Next evaluate
-an in-process tooling consumer and invalidation planning before incremental
-compilation or LSP transport. Managed types still need the GC/root/thread gate.
-Keep the original VOIDC backup untouched.
+The user reports Phase 7 commit `04768bf` passed hosted run #10 on Linux, Windows
+and macOS. Phase 8 adds tooling/tooling_demo while preserving all fourteen prior
+suites. TOOLING_FOUNDATIONS.md describes source byte-offset query boundaries and
+conservative invalidation. Mutable locals, member completion and expression
+hover records are absent. Changed files seed all declarations; function-body
+extents are not collected. Snapshot comparison cannot certify later edits, and
+old/invalid/missing graphs cannot authorize publication. There is no incremental
+compiler, watcher, LSP transport or persistent cache.
+
+Actual local validation is in WORK_LOG.md. Hosted Phase 8 verification requires
+the user's push; no new hosted result is claimed. Next establish explicit client
+revision handling and invalidation orchestration before partial compilation/LSP.
+Managed types still need the GC/root/thread gate; external packages need their
+identity policy. Keep the original VOIDC backup untouched.

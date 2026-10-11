@@ -1,0 +1,7 @@
+file(MAKE_DIRECTORY "${OUTPUT}")
+file(COPY "${ROOT}/examples/analysis/" DESTINATION "${OUTPUT}/project")
+execute_process(COMMAND "${DEMO}" "${OUTPUT}/project" RESULT_VARIABLE status OUTPUT_VARIABLE result ERROR_VARIABLE errors)
+if(NOT status EQUAL 0 OR NOT result MATCHES "/worker.void::calculate declared in /worker.void; references: 1" OR NOT result MATCHES "fresh body source contract: exact match" OR NOT result MATCHES "fresh constant source contract: restart required")
+  message(FATAL_ERROR "Tooling demonstration failed: ${result}; ${errors}")
+endif()
+message(STATUS "${result}")

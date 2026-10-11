@@ -1407,3 +1407,165 @@ user's next push. The workflow already runs every CTest suite; no platform skips
 sanitizer suppressions or weakened requirements were added. Next recommended work:
 an in-process tooling consumer and explicit invalidation planning before incremental
 compilation/LSP transport; keep the separate managed-runtime integration gate.
+
+## Phase 8: in-process tooling foundations — 11 October 2026
+
+The user reports Phase 7 commit `04768bf` passed hosted Actions run #10 on Linux,
+Windows and macOS. Continued directly from that clean local tree. Reviewed the
+actual frontend records, validation/lowering boundary, native comparison/publication
+API and current analysis, diagnostics, module, strategy, decision and issue records.
+The Language Bible and Phase 7 compiler-derived compatibility machinery are unchanged.
+No branch, commit, push, publication or remote modification was performed.
+
+### Implementation
+
+Added `include/void/tooling.hpp` and `src/frontend/tooling.cpp` as a small consumer
+of the successful immutable analysis, linked into void_core. ToolingIndex retains
+shared ownership and indexes stable declaration identities, declarations by module,
+incoming resolved references and per-module byte positions. Queries return copied
+structured records with owning SourceSpans. Optional/empty results represent absent
+or unsupported symbols. No AST, token or declaration pointers escape. No parsing,
+semantic checking, LLVM code generation, symbol scanning or global registry occurs.
+Canonical declaring ownership survives aliases and root-constant references. Types,
+visibility, function signatures, constant values and spans come directly from the
+compiler. Only the compiler-collected function/module/local-readonly categories
+are supported; mutable locals, parameters, import qualifier tokens, member completion
+and arbitrary expression hover are not invented. UTF-8 offsets remain byte offsets.
+
+Added a deterministic invalidation planner over reverse imports and resolved
+reference edges, with explicit local-constant-to-containing-function dependencies.
+Finite iterative traversal handles cycles. An old graph plus changed VFS hints
+requires fresh complete graph discovery and validation. Namespace changes include
+reverse importers; unknown module names and unknown root edits conservatively
+include the whole known graph. Missing/invalid candidates expose no successful
+comparison. New/removed modules are confirmed only between successful graphs.
+
+Two successful snapshots provide actual source-byte differences, added/removed
+reachable modules, declaration/constant metadata differences, changed resolved
+bindings and exact source-contract classification. Both dependency graphs are
+traversed as a union, preserving old dependents after deletion/rebinding. Physical
+relocation does not count as a source edit. Changed files still seed every contained
+declaration because Phase 7 does not collect function-body extents; no hidden second
+parser is used to pretend otherwise. These are potential reanalysis sets, not a
+partial compiler or a proof that a body/comment delta was identified exactly.
+
+The planner compares the authoritative Phase 7 compiler contract verbatim. It
+cannot publish code, substitute metadata summaries for that comparison, override
+host ABI/layout/capture contracts or certify that snapshots match later disk edits.
+The public flag is `has_validated_comparison`, deliberately not a claim of current
+filesystem freshness. Work-required flags refer to unresolved work between the
+supplied snapshots. Unknown hinted identities restore conservative unknown status.
+
+### Real-source tests and executable example
+
+Added `tooling` and `tooling_demo`, retaining all fourteen previous CTest suites and
+assertions, total sixteen. Real filesystem projects test direct/aliased definitions,
+multiple callers, same-named declarations, root and readonly local constants,
+typed/visible records, exact identifier byte ranges, a UTF-8 comment containing
+an accented scalar and emoji, changed line positions, forward references, cycles,
+transitive invalidation, imported constants, signature/visibility changes, rebinding,
+added/removed/renamed/missing/invalid modules and duplicate normalized imports.
+
+Owned records survive original analysis/index destruction, source file deletion,
+new analysis creation and native replacement. An independent u64 constant result
+outlives both its index and analysis with the full 64-bit value intact. An unused
+local const initializer still invalidates its containing function. Repeated queries
+and plans compare deterministically, including equivalent physical relocations;
+cycles perform 100 traversals per suite and relocation queries 30 comparisons.
+The actual source JIT proof remains 53 -> 61, while the old lease stays 53 and
+constant/signature changes cannot publish. No architectural regression was replaced
+with a mock. Normal/O2 native AOT/JIT and numeric parity remain exercised by all
+fourteen existing suites, including the Phase 7 normal/O2 publication proof.
+
+`examples/tooling.cpp` builds as `void_tooling_example`, linked only to void_core.
+It analyzes the actual three-file analysis example, looks up a declaration and its
+resolved references, edits a disposable copy, plans invalidation, completely
+reanalyzes, and distinguishes body/constant source contracts. CTest copies its
+fixture before each run, so repeated execution never edits checked-in sources.
+The example deliberately edits its argument directory; documentation requires a
+copied disposable project. Actual recorded output:
+
+```text
+/worker.void::calculate declared in /worker.void; references: 1
+edit plan: full validation required; fresh body source contract: exact match
+fresh constant source contract: restart required; no native generation modified
+```
+
+The focused native/tooling test additionally recorded:
+
+```text
+queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots
+plan: /leaf.void -> /middle.void::wrapper -> /main.void::entry; validated 53 -> 61, const restart required
+```
+
+See `build/phase8-verification/demonstration.log`. TOOLING_FOUNDATIONS.md documents
+the API, lifetime contracts, supported categories, conservative outcomes and future
+LSP/incremental boundaries. Updated decisions, strategy, known issues, README and
+the Phase 7 analysis document. No watcher, JSON-RPC, extension, background compiler,
+persistent cache or partial validation pipeline was introduced.
+
+### Actual local verification
+
+Reused installed `/usr/lib/llvm-19/lib/cmake/llvm` and complete official
+`.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64` SDK configurations. CMake changes
+rerun the established actual ORC configure/link/execute probe. RTTI stays on for
+installed SDK targets and off throughout official SDK targets. LLVM, Clang and
+LLD remain 19.1.7. Official builds use their existing local ThinLTO linker cache;
+no SDK files or dependency/build requirements were modified.
+
+```sh
+cmake --build build/ci-debug -j2
+ctest --test-dir build/ci-debug --output-on-failure
+cmake --build build/ci-release -j2
+ctest --test-dir build/ci-release --output-on-failure
+cmake --build build/ci-sanitizers -j2
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers --output-on-failure
+cmake --build build/ci-official-debug -j1
+ctest --test-dir build/ci-official-debug --output-on-failure
+cmake --build build/ci-official-release -j1
+ctest --test-dir build/ci-official-release --output-on-failure
+cmake --build build/ci-official-san -j1
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-official-san --output-on-failure
+```
+
+Strict sanitizer execution runs outside the tracing sandbox so LeakSanitizer
+process inspection works. Leak detection and halt-on-report remain enabled. The
+no-RTTI official ABI still cannot provide vptr checking; the installed RTTI-enabled
+lane retains that coverage. All prior numerical, diagnostics, native bindings, GC
+root and leased-generation tests execute unchanged.
+
+| Configuration | Actual result | CTest wall time |
+|---|---|---|
+| Installed Debug | 16/16 passed | 36.34 s |
+| Installed Release | 16/16 passed | 30.91 s |
+| Installed strict ASan/UBSan | 16/16 passed | 58.65 s |
+| Official Debug | 16/16 passed | 28.03 s |
+| Official Release | 16/16 passed | 25.81 s |
+| Official strict ASan/UBSan | 16/16 passed | 49.51 s |
+
+Installed strict sanitizer repeats of `tooling`, `tooling_demo`, `analysis`, `reload`
+with `--repeat until-fail:5` passed all twenty executions in 10.72 seconds. This
+includes actual cycle/relocation queries, source lifetime checks, compiler recovery
+and concurrent generation replacement. The same complete-official-SDK strict
+sanitizer repeats passed all twenty executions in 9.68 seconds. Together these
+are forty additional stress executions, including 1,000 cycle traversals and
+4,800 malformed compiler-recovery inputs in the repeated tooling/analysis suites.
+All retained source/query/index/native lifetime assertions executed under both
+SDK sanitizer ABIs.
+
+Final audit confirms all six compiler/test/example binaries are newer than their
+frozen source/fixture inputs, and the SHA-256 manifest is unchanged. Each complete
+configuration passed 16/16. Recorded build/test logs contain no sanitizer report,
+LLVM backtrace or new project warning. Both LLD tools report 19.1.7; headers,
+OrcJIT/Support libraries, LLVMConfig.cmake and Clang versions were checked in all
+six configurations. The standalone example's six actual link lines include no
+void_llvm, LLVMOrcJIT or void_runtime, confirming its frontend-only boundary.
+Markdown links and diff whitespace pass. No SDK, runtime, backend, frontend
+validation/compatibility code, sanitizer requirement or workflow was weakened.
+The manifest is a verification artifact, never reload authorization. Local logs
+and manifests are ignored artifacts in `build/phase8-verification/`. Hosted Phase 8
+Windows/Linux/macOS verification requires the user's push; no hosted result for
+these changes is claimed. The existing workflow automatically executes all suites.
+Next establish explicit document/project revision handling and client invalidation
+orchestration before partial compilation or LSP transport. Keep the separate GC/
+thread-root integration and external-package identity gates.

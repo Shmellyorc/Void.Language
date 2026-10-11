@@ -593,3 +593,13 @@ source compatibility through the same frontend. See ANALYSIS_COMPATIBILITY.md.
 Next evaluate an in-process tooling consumer and invalidation planning before
 incremental compilation or LSP transport. The GC/thread-root integration gate,
 external package identity policy and arbitrary native ABI work remain separate.
+
+### Phase 8 in-process tooling foundations
+
+The user reports Phase 7 commit `04768bf` passed hosted run #10 on all platforms.
+TOOLING_FOUNDATIONS.md documents the owned symbol-query index and deterministic
+invalidation planner consuming existing validated analysis records. Old graph
+plans remain conservative; exact source compatibility remains compiler-owned.
+Next establish explicit client document/project revisions and invalidation
+orchestration before partial/incremental analysis or LSP transport. Preserve the
+managed-runtime/root integration and external-library identity gates separately.

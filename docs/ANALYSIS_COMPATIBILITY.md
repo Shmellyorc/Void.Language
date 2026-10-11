@@ -173,3 +173,10 @@ build, sanitizer and stress results; hosted Phase 7 results await the user's pus
 Next: build a small in-process tooling consumer around these validated records and
 explicit invalidation planning before choosing incremental compilation or LSP
 transport. Managed types still require the separate GC/thread-root integration gate.
+
+## Phase 8 tooling consumer
+
+The user reports Phase 7 passed hosted run #10 at commit `04768bf`.
+[TOOLING_FOUNDATIONS.md](TOOLING_FOUNDATIONS.md) documents the read-only symbol
+index and invalidation planner consuming these records. Exact compatibility,
+source ownership and complete validation gates above remain authoritative.
