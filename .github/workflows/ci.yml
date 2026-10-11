@@ -1,0 +1,64 @@
+name: Compiler foundation
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Linux development dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
+      - name: Windows native SDK environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Cache complete official LLVM SDK
+        uses: actions/cache@v4
+        with:
+          path: .toolchains/llvm-19.1.7
+          key: llvm-sdk-19.1.7-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Install and verify LLVM development SDK
+        run: python tools/ci/llvm_sdk.py
+      - name: Configure Debug
+        run: cmake -S . -B build/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}"
+      - name: Build Debug
+        run: cmake --build build/debug --parallel 3
+      - name: Execute Debug tests
+        run: ctest --test-dir build/debug --output-on-failure
+      - name: Configure Release
+        run: cmake -S . -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}"
+      - name: Build Release
+        run: cmake --build build/release --parallel 3
+      - name: Execute Release tests
+        run: ctest --test-dir build/release --output-on-failure
+      - name: Configure sanitizers
+        if: runner.os == 'Linux'
+        run: cmake -S . -B build/sanitizers -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVOID_SANITIZERS=ON -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}"
+      - name: Build and execute sanitizer tests
+        if: runner.os == 'Linux'
+        run: |
+          cmake --build build/sanitizers --parallel 3
+          ctest --test-dir build/sanitizers --output-on-failure
+      - name: Preserve test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-${{ runner.os }}-${{ runner.arch }}
+          path: build/**/Testing/Temporary/LastTest.log
+          if-no-files-found: ignore

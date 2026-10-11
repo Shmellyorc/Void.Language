@@ -1,0 +1,8 @@
+# Design equivalent of the hand-built proof IR; no source parser exists yet.
+func calculate(value: i32) -> i32:
+    return value + 42
+
+func entry(value: i32) -> i32:
+    if value < 0:
+        return 7
+    return calculate(value)
