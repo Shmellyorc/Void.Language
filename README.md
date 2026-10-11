@@ -223,3 +223,12 @@ queries and conservative dependency invalidation over validated source snapshots
 The `tooling_demo` CTest runs the standalone in-process consumer in
 `examples/tooling.cpp` against a disposable copied source project. All fourteen
 Phase 7 suites remain; tooling/tooling_demo bring the total to sixteen.
+
+
+Phase 9 adds [document revisions and tooling sessions](docs/TOOLING_SESSIONS.md).
+Run `build/ci-debug/void_sessions_example examples/analysis` for an in-process
+unsaved-edit, stale-query, failure/repair and compatibility demonstration using real
+compiler records. It never writes the example files or publishes native code.
+The original sixteen suites remain; sessions/sessions_demo bring the total to
+eighteen. This is complete reanalysis with revision tracking; editor protocol,
+file watching and partial compilation remain future work.

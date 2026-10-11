@@ -1,0 +1,5 @@
+execute_process(COMMAND "${DEMO}" "${ROOT}/examples/analysis" RESULT_VARIABLE status OUTPUT_VARIABLE result ERROR_VARIABLE errors)
+if(NOT status EQUAL 0 OR NOT result MATCHES "previous analysis stale" OR NOT result MATCHES "body exact match" OR NOT result MATCHES "repair: fresh successful" OR NOT result MATCHES "constant edit: restart required")
+  message(FATAL_ERROR "Session demonstration failed: ${result}; ${errors}")
+endif()
+message(STATUS "${result}")

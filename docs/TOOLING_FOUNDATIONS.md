@@ -184,3 +184,11 @@ orchestration before introducing partial analysis or LSP position adapters. A fu
 LSP can consume these records directly; an incremental compiler must still discover
 new dependencies and validate complete candidate graphs. This phase adds no watcher,
 JSON-RPC, extension, persistent cache, partial pipeline or background compiler.
+
+
+## Phase 9 revision integration
+
+[TOOLING_SESSIONS.md](TOOLING_SESSIONS.md) adds immutable unsaved project overlays
+through the shared loader and an explicit revision-safe session acceptance boundary.
+Its diagnostic/query wrappers retain the analyzed project revision. Existing disk
+APIs, complete-validation gates, byte spans and exact native contracts remain.

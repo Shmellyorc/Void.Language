@@ -1072,44 +1072,74 @@ class SourceGraph {
     std::filesystem::path root;
     Diagnostics& diagnostics;
     unsigned depth = 0;
+    const SourceOverrides& overrides;
 public:
     std::map<std::string, std::unique_ptr<Unit>> units;
-    explicit SourceGraph(std::filesystem::path project_root, Diagnostics& d) : root(std::move(project_root)), diagnostics(d) {}
+    explicit SourceGraph(std::filesystem::path project_root, Diagnostics& d, const SourceOverrides& o) : root(std::move(project_root)), diagnostics(d), overrides(o) {}
     Unit& load(const Unit& from, const Token& path) {
         auto id = normalize(from, path);
         if (auto found = units.find(id); found != units.end()) return *found->second;
         Depth guard(depth, from.source, path);
+        auto overlay = overrides.find(id);
+        if (overlay != overrides.end() && !overlay->second)
+            error(from.source, path, Code::import_read, "Source is explicitly unavailable: '" + id + "'.", "Restore the document or close its override to return to disk.");
         auto physical = root;
+        std::string prefix;
         std::error_code ec;
         for (const auto& part : std::filesystem::path(id).relative_path()) {
             auto spelling = part.generic_string();
-            std::vector<std::string> matches;
+            std::set<std::string> matches;
             for (std::filesystem::directory_iterator it(physical, ec), end; !ec && it != end; it.increment(ec)) {
                 auto candidate = it->path().filename().generic_string();
-                if (folded(candidate) == folded(spelling)) matches.push_back(candidate);
+                if (folded(candidate) == folded(spelling)) matches.insert(candidate);
+            }
+            // Merge virtual children into the same exact-case namespace. Missing
+            // virtual parents are permitted; existing unreadable parents are not.
+            if (ec == std::errc::no_such_file_or_directory) ec.clear();
+            for (const auto& [key, value] : overrides) {
+                (void)value;
+                if (!key.starts_with(prefix + "/")) continue;
+                auto child = key.substr(prefix.size()+1);
+                child = child.substr(0, child.find('/'));
+                if (folded(child) == folded(spelling)) matches.insert(child);
             }
             if (ec) error(from.source, path, Code::import_read, "Cannot inspect import directory for '" + id + "'.", "Check that each parent exists, is a readable directory and uses the exact filename case.");
             if (matches.size() > 1) error(from.source, path, Code::import_path, "Filesystem case collision for '" + spelling + "'.", "Rename case-only siblings so this project has the same identity on every platform.");
             if (matches.empty()) error(from.source, path, Code::import_read, "Cannot find imported file '" + id + "'.", "Check this path relative to the importing file or virtual project root.");
-            if (matches.front() != spelling) error(from.source, path, Code::import_path, "Import path case mismatch: requested '" + spelling + "', found '" + matches.front() + "'.", "Use the exact on-disk spelling on every platform.");
+            if (*matches.begin() != spelling) error(from.source, path, Code::import_path, "Import path case mismatch: requested '" + spelling + "', found '" + *matches.begin() + "'.", "Use the exact on-disk spelling on every platform.");
             physical /= part;
+            prefix += "/" + spelling;
+            if (prefix != id && overrides.contains(prefix))
+                error(from.source, path, Code::import_path, "An overridden source cannot also be a virtual directory: '" + prefix + "'.");
             auto status = std::filesystem::symlink_status(physical, ec);
+            if (ec == std::errc::no_such_file_or_directory && overlay != overrides.end()) ec.clear();
             if (ec) error(from.source, path, Code::import_read, "Cannot inspect imported path '" + id + "'.");
             if (std::filesystem::is_symlink(status)) error(from.source, path, Code::import_path, "Symbolic links are not supported in module paths.", "Import a regular project file; symlink identity and external permissions are deferred.");
+            if (std::filesystem::exists(status)) {
+                auto resolved_part = std::filesystem::canonical(physical, ec);
+                if (ec || resolved_part != physical) error(from.source, path, Code::import_path, "Module path contains a filesystem alias.");
+            }
         }
-        if (!std::filesystem::is_regular_file(physical, ec) || ec)
-            error(from.source, path, Code::import_read, "Imported path is not a regular .void source file.");
-        auto resolved = std::filesystem::canonical(physical, ec);
-        if (ec || resolved != physical)
-            error(from.source, path, Code::import_path, "Module path contains a symbolic link or filesystem alias.", "Use regular project paths; junctions and redirected module paths are not supported.");
-        for (const auto& [other_id, other] : units) {
-            if (std::filesystem::equivalent(physical, other->source.path(), ec) && !ec)
-                error(from.source, path, Code::import_path, "Hard-link aliases have conflicting module identities: '" + id + "' and '" + other_id + "'.", "Use one VFS filename for this physical source.");
-            ec.clear();
+        if (overlay == overrides.end()) {
+            if (!std::filesystem::is_regular_file(physical, ec) || ec)
+                error(from.source, path, Code::import_read, "Imported path is not a regular .void source file.");
+        }
+        // Existing host files retain alias restrictions even when overlaid. New
+        // virtual files have no host identity; their owned bytes are authoritative.
+        if (std::filesystem::exists(physical, ec)) {
+            if (!std::filesystem::is_regular_file(physical, ec) || ec)
+                error(from.source, path, Code::import_path, "Module path names a non-file host object.");
+            for (const auto& [other_id, other] : units) {
+                (void)other;
+                auto other_path = root / std::filesystem::path(other_id).relative_path();
+                if (std::filesystem::equivalent(physical, other_path, ec) && !ec)
+                    error(from.source, path, Code::import_path, "Hard-link aliases have conflicting module identities: '" + id + "' and '" + other_id + "'.", "Use one VFS filename for this physical source.");
+                ec.clear();
+            }
         }
         // Publish before traversing imports: function-only declaration cycles are safe.
         std::unique_ptr<Unit> unit;
-        try { unit = std::make_unique<Unit>(read_source(physical), id); }
+        try { unit = std::make_unique<Unit>(overlay == overrides.end() ? read_source(physical) : *overlay->second, id); }
         catch (const SourceReadError&) { error(from.source, path, Code::import_read, "Cannot read imported file '" + id + "'.", "Check source file permissions and storage availability."); }
         catch (const CompilationError& failure) {
             auto records = failure.diagnostics();
@@ -1250,7 +1280,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
 
 }
 std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile&);
-std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&);
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false);
 // This factory is the only way to construct a successful result.
 struct AnalysisAccess {
     static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry) {
@@ -1363,7 +1393,8 @@ std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile& sour
     validate_graph(units, identity, diagnostics);
     return AnalysisAccess::build(std::move(units), identity);
 }
-std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path& entry) {
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path& entry, const SourceOverrides& overrides, bool verify_disk) {
+    for (const auto& [id, source] : overrides) { (void)source; require_module_identity(id); }
     std::error_code ec;
     auto absolute = std::filesystem::absolute(entry, ec);
     if (ec) error(SourceFile(entry.generic_string(), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the entry source path.");
@@ -1372,14 +1403,36 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
     // A diagnostic anchor is needed even before the entry file can be opened.
     Unit anchor(SourceFile(absolute.generic_string(), ""), "/");
     Diagnostics diagnostics; diagnostics.bind(anchor.source, "/" + absolute.filename().generic_string());
-    SourceGraph graph(root, diagnostics);
+    SourceGraph graph(root, diagnostics, overrides);
     auto& first = [&]() -> Unit& {
         try { return graph.load(anchor, {TokenKind::path, "/" + absolute.filename().generic_string(), 0}); }
         catch (const CompilationError& failure) { diagnostics.add(failure); diagnostics.finish(); throw; }
     }();
+    // A disk read is not an atomic filesystem transaction. Re-discover paths and
+    // compare exact bytes before accepting this captured graph. Overlays are frozen.
+    if (verify_disk) {
+        Diagnostics check; SourceGraph again(root, check, overrides);
+        again.load(anchor, {TokenKind::path, first.identity, 0});
+        bool same = graph.units.size() == again.units.size();
+        for (const auto& [id, unit] : graph.units) {
+            auto next = again.units.find(id);
+            same &= next != again.units.end() && unit->source.text() == next->second->source.text();
+        }
+        if (!same) error(anchor.source, {TokenKind::end, "", 0}, Code::import_read,
+            "Project sources changed during analysis.", "Retry analysis with a stable filesystem or open document overlays.");
+    }
     validate_graph(graph.units, first.identity, diagnostics);
     auto identity = first.identity;
     return AnalysisAccess::build(std::move(graph.units), identity);
+}
+void require_module_identity(const std::string& identity) {
+    Unit anchor(SourceFile("<document identity>", ""), "/");
+    if (identity.empty() || identity[0] != '/' || normalize(anchor, {TokenKind::path, identity, 0}) != identity)
+        throw std::invalid_argument("Document identity must be an exact canonical root-relative .void path");
+}
+AnalysisResult analyze_project(const std::filesystem::path& entry, const SourceOverrides& overrides) {
+    try { return {validated_project(entry, overrides, true), {}}; }
+    catch (const CompilationError& failure) { return {{}, failure.diagnostics()}; }
 }
 ir::Module compile_source(const SourceFile& source) {
     auto result = analyze_source(source);

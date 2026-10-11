@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <thread>
 #include <vector>
+void session_tests(const std::filesystem::path& root);
 void tooling_tests(const std::filesystem::path& root);
 void analysis_tests(const std::filesystem::path& root);
 void numeric_tests(const std::filesystem::path& root);
@@ -266,7 +267,8 @@ int main(int argc, char** argv) {
     try {
         if (argc < 2) throw std::runtime_error("test suite required");
         std::string suite = argv[1];
-        if (suite == "tooling" && argc == 3) tooling_tests(argv[2]);
+        if (suite == "sessions" && argc == 3) session_tests(argv[2]);
+        else if (suite == "tooling" && argc == 3) tooling_tests(argv[2]);
         else if (suite == "analysis" && argc == 3) analysis_tests(argv[2]);
         else if (suite == "numeric" && argc == 3) numeric_tests(argv[2]);
         else if (suite == "frontend" && argc == 3) frontend_tests(argv[2]);

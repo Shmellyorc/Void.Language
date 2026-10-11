@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <functional>
 #include <optional>
+#include <map>
 namespace vd {
 // Records are owned by an immutable successful analysis, never by parser storage.
 struct AnalyzedModule { std::string identity; SourceFile source; std::vector<std::string> imports; };
@@ -47,7 +48,11 @@ struct AnalysisResult {
     bool succeeded() const { return bool(program); }
 };
 AnalysisResult analyze_source(const SourceFile& source);
+// Exact canonical VFS keys. nullopt is an explicit unavailable/deleted source.
+using SourceOverrides = std::map<std::string, std::optional<SourceFile>>;
+void require_module_identity(const std::string& identity);
 AnalysisResult analyze_project(const std::filesystem::path& entry);
+AnalysisResult analyze_project(const std::filesystem::path& entry, const SourceOverrides& overrides);
 // One source pipeline shared by checking, JIT and AOT. Errors contain rendered
 // source diagnostics and are raised before invoking any backend.
 ir::Module compile_source(const SourceFile& source);

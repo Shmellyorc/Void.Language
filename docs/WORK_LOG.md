@@ -1569,3 +1569,149 @@ these changes is claimed. The existing workflow automatically executes all suite
 Next establish explicit document/project revision handling and client invalidation
 orchestration before partial compilation or LSP transport. Keep the separate GC/
 thread-root integration and external-package identity gates.
+
+## Phase 9 document revisions and tooling sessions, 11 October 2026
+
+The user reports Phase 8 commit `f25b268` passed hosted run #11 on Linux,
+Windows and macOS. Read the existing frontend/tooling and relevant documentation;
+continued locally without branches, commits, pushes or remote changes.
+
+Added owned ProjectSnapshot/SessionAnalysis and a noncopyable single-threaded
+ToolingSession. Logical project identity is a retained unique token, with a numeric
+revision for display; per-document nonzero revisions strictly increase even across
+close/delete/reopen. Equal bytes do not imply equal revisions. Open, whole-text
+replace, explicit unavailable/tombstone, close-to-disk and explicit disk refresh
+are distinct transitions. The absolute entry is fixed at session construction.
+
+Selected overlay maps share immutable SourceFile bytes and remain stable through
+subsequent edits. Analysis execution and acceptance are separate: delayed, foreign
+and duplicate results cannot update current diagnostics, queries, success or plans.
+Current queries return absence after edits or failed validation, while explicit
+historical handles retain owned records and the last successful baseline.
+
+Extended the existing SourceGraph loader, not the parser/resolver/type checker,
+with exact VFS overrides and virtual directory children. Existing path portability,
+case, root-escape, symlink/redirect and hard-link restrictions remain. Virtual
+file/directory conflicts reject. Tombstones never read old disk bytes. The overlay
+analysis overload re-discovers through the same loader and compares exact bytes
+and reachable modules before semantic acceptance. Documented its non-atomic disk
+boundary, ABA/concurrent mutation limitations and caller refresh responsibility.
+Original disk compile_project/CLI/JIT/AOT interfaces remain unchanged.
+
+Session invalidation delegates to Phase 8 plan_invalidation, comparing a successful
+candidate against the prior successful baseline before advancing it. Invalid,
+stale and unvalidated candidates cannot produce a refined safe classification.
+The Phase 7 exact source contract and separate native publication remain intact.
+
+Added sessions and sessions_demo, preserving all sixteen prior suites/assertions.
+Tests use real .void filesystem projects and shared analysis: entry/import/multiple
+unsaved edits, virtual entry/nested imports, normalized paths/cycles, deletion and
+close fallback, exact-case/file-directory collisions, overlay alias restrictions,
+strict logical revisions, reordered execution/acceptance, equal bytes/new identity,
+foreign session rejection, failed/repair transitions, UTF-8/CRLF byte diagnostics,
+retained snapshots/queries, body/constant/signature/binding compatibility and forty
+repeated transitions per session suite. Relative entry selection survives working-
+directory changes. Historical session analysis lowers through the actual JIT;
+existing normal/O2 native source tests retain 53 -> 61 and old lease 53, constant
+restart and all architectural numeric/GC/native proofs.
+
+The standalone void_sessions_example links only void_core and consumes the real
+examples/analysis project without writing disk. Actual output is retained at
+build/phase9-verification/demonstration.log:
+
+```text
+revision 1: /worker.void::calculate; references 1
+unsaved edit: previous analysis stale; full validation required
+fresh query: /worker.void::calculate; body exact match; affected dependencies: /main.void
+revision 3 diagnostics:
+/worker.void:2:12: error: Unknown identifier 'missing'.
+    code: VOID2002
+repair: fresh successful analysis
+constant edit: restart required; no native publication
+```
+
+TOOLING_SESSIONS.md describes public APIs, ownership, revision semantics, freshness,
+disk consistency, diagnostic positions, dependency planning and remaining scope.
+Updated decisions, strategy, known issues, analysis/module/diagnostic/tooling docs
+and README. No LSP, JSON-RPC, watcher, worker, cache, partial AST reuse, incremental
+LLVM generation, new language syntax or automatic publication/restart is added.
+
+During verification the existing module regression caught a changed symlink
+message; restored the established diagnostic without weakening its assertion.
+Review added tests/corrections for fixed relative entry roots and virtual
+file/directory conflicts. All final results below use the frozen final sources,
+not earlier interim successful binaries.
+
+### Final local validation
+
+Reused the installed `/usr/lib/llvm-19/lib/cmake/llvm` SDK (RTTI on) and complete
+`.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64` official archive (RTTI off).
+Verified both SDKs' ORC/APFloat headers, Support/OrcJIT libraries, LLVMConfig.cmake,
+Clang and LLD 19.1.7. CMake retains its actual ORC configure/link/execute probe.
+Official builds are serial and use the existing ThinLTO cache; no SDK components,
+requirements, sanitizer settings or RTTI correction were changed.
+
+Actual final commands (existing configured build directories):
+
+```sh
+cmake --build build/ci-debug -j2
+ctest --test-dir build/ci-debug --output-on-failure
+cmake --build build/ci-release -j2
+ctest --test-dir build/ci-release --output-on-failure
+cmake --build build/ci-sanitizers -j2
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers --output-on-failure
+cmake --build build/ci-official-debug -j1
+ctest --test-dir build/ci-official-debug --output-on-failure
+cmake --build build/ci-official-release -j1
+ctest --test-dir build/ci-official-release --output-on-failure
+cmake --build build/ci-official-san -j1
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-official-san --output-on-failure
+```
+
+Strict sanitizers run outside the tracing sandbox, retaining leak detection and
+halt-on-error. Installed RTTI-on validation retains vptr coverage; the official
+archive's RTTI-off ABI still cannot provide that check. All supported ASan/UBSan
+instrumentation remains active. The official build's existing third-party
+ciso646 deprecation warning remains visible; no project warning or LLVM backtrace
+was found in final logs.
+
+| Configuration | Actual result | CTest wall time |
+|---|---|---|
+| Installed Debug | 18/18 passed | 38.57 s |
+| Installed Release | 18/18 passed | 34.39 s |
+| Installed strict ASan/UBSan | 18/18 passed | 57.27 s |
+| Official Debug | 18/18 passed | 32.21 s |
+| Official Release | 18/18 passed | 26.23 s |
+| Official strict ASan/UBSan | 18/18 passed | 49.99 s |
+
+
+Repeated sessions, sessions_demo, tooling, tooling_demo, analysis and reload ten
+times per strict sanitizer SDK (the same leak/halt settings):
+
+```sh
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers --output-on-failure -R '^(sessions|sessions_demo|tooling|tooling_demo|analysis|reload)$' --repeat until-fail:10
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-official-san --output-on-failure -R '^(sessions|sessions_demo|tooling|tooling_demo|analysis|reload)$' --repeat until-fail:10
+```
+
+Installed: **60/60 executions**, 22.26 s. Official: **60/60 executions**, 19.98 s.
+Together the additional 120 executions include 800 repeated session body-edit
+transitions, reordered acceptance and snapshot-lifetime cases, and 9,600 malformed
+analysis recovery inputs. No sanitizer/leak report occurred.
+
+Final audit verifies all six binaries are newer than the frozen source/fixture
+manifest and each full test log is newer than its final binaries. All C++ compile
+commands match their SDK RTTI setting; sanitizer compile commands retain ASan/UBSan.
+Both standalone examples' six actual link lines exclude void_llvm, void_runtime
+and LLVMOrcJIT. Exact SDK/compiler/linker checks, source manifest, build/test/stress
+logs, demo output and audit scripts are ignored local artifacts under
+build/phase9-verification/. Markdown links and git diff whitespace pass.
+
+Phase 9 is complete locally and ready for hosted CI. Another user-triggered
+Linux/Windows/macOS run is required to verify these new filesystem/overlay and
+session cases on hosted systems; no new hosted result is claimed. Existing CI
+already builds all targets and runs all eighteen suites, with no workflow skips
+or requirement changes. The non-atomic disk-read boundary and explicit refresh
+obligation remain documented limitations. Next consider protocol position adapters
+and a minimal client transport before partial compilation; managed-runtime and
+external-package identity gates remain separate. No commit, branch, push,
+publication or remote modification was performed.

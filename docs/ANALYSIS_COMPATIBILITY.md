@@ -180,3 +180,11 @@ The user reports Phase 7 passed hosted run #10 at commit `04768bf`.
 [TOOLING_FOUNDATIONS.md](TOOLING_FOUNDATIONS.md) documents the read-only symbol
 index and invalidation planner consuming these records. Exact compatibility,
 source ownership and complete validation gates above remain authoritative.
+
+
+## Phase 9 revision integration
+
+[TOOLING_SESSIONS.md](TOOLING_SESSIONS.md) adds immutable unsaved project overlays
+through the shared loader and an explicit revision-safe session acceptance boundary.
+Its diagnostic/query wrappers retain the analyzed project revision. Existing disk
+APIs, complete-validation gates, byte spans and exact native contracts remain.

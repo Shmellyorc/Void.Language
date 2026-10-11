@@ -172,3 +172,70 @@ InvalidationPlan plan_invalidation(const ValidatedAnalysis& before,const std::ve
     return plan;
 }
 }
+
+namespace vd {
+ToolingSession::ToolingSession(std::filesystem::path entry) {
+    current_.entry_ = std::filesystem::absolute(entry);
+    refresh();
+}
+void ToolingSession::refresh() {
+    if (current_.revision_ == UINT64_MAX) throw std::overflow_error("Project revision exhausted");
+    if (last_success_) for (const auto& m : last_success_->result().program->modules())
+        if (std::find(changed_.begin(),changed_.end(),m.identity) == changed_.end()) changed_.push_back(m.identity);
+    current_.identity_ = std::make_shared<const ProjectSnapshot::Identity>();
+    ++current_.revision_;
+}
+void ToolingSession::change(const std::string& id, DocumentRevision revision, std::optional<SourceFile> source, bool closing) {
+    require_module_identity(id);
+    auto previous = current_.documents_.find(id);
+    if (!revision || (previous != current_.documents_.end() && revision <= previous->second))
+        throw std::invalid_argument("Document revision must strictly increase, including close/delete/reopen");
+    if (current_.revision_ == UINT64_MAX) throw std::overflow_error("Project revision exhausted");
+    current_.documents_[id] = revision;
+    if (closing) current_.overrides_.erase(id);
+    else current_.overrides_.insert_or_assign(id, std::move(source));
+    if (std::find(changed_.begin(),changed_.end(),id) == changed_.end()) changed_.push_back(id);
+    current_.identity_ = std::make_shared<const ProjectSnapshot::Identity>();
+    ++current_.revision_;
+}
+void ToolingSession::open(const std::string& id, DocumentRevision revision, std::string text) {
+    if (current_.overrides_.contains(id)) throw std::invalid_argument("Document already open or unavailable; replace or close it first");
+    change(id, revision, SourceFile(id,std::move(text)), false);
+}
+void ToolingSession::replace(const std::string& id, DocumentRevision revision, std::string text) {
+    if (!current_.overrides_.contains(id)) throw std::invalid_argument("Document must be open or unavailable before replacement");
+    change(id, revision, SourceFile(id,std::move(text)), false);
+}
+void ToolingSession::unavailable(const std::string& id, DocumentRevision revision) { change(id,revision,{},false); }
+void ToolingSession::close(const std::string& id, DocumentRevision revision) {
+    if (!current_.overrides_.contains(id)) throw std::invalid_argument("No override to close");
+    change(id,revision,{},true);
+}
+std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot snapshot) {
+    if (!snapshot.identity_) throw std::invalid_argument("Select a project snapshot before analysis");
+    auto result = std::make_shared<SessionAnalysis>();
+    result->snapshot_ = std::move(snapshot);
+    result->result_ = analyze_project(result->snapshot_.entry_,result->snapshot_.overrides_);
+    if (result->result_.succeeded()) result->index_ = std::make_shared<ToolingIndex>(result->result_.program);
+    return result;
+}
+bool ToolingSession::accept(std::shared_ptr<const SessionAnalysis> result) {
+    if (!result || !is_current(*result) || (latest_ && latest_->snapshot().same_revision(result->snapshot()))) return false;
+    accepted_plan_ = last_success_ ? plan_invalidation(*last_success_->result().program, changed_, result->result().program.get()) : InvalidationPlan{};
+    latest_ = std::move(result);
+    if (latest_->result().succeeded()) { last_success_ = latest_; changed_.clear(); }
+    return true;
+}
+std::shared_ptr<const SessionAnalysis> ToolingSession::current_analysis() const {
+    return latest_ && is_current(*latest_) ? latest_ : nullptr;
+}
+std::shared_ptr<const ToolingIndex> ToolingSession::current_index() const {
+    auto current = current_analysis(); return current ? current->index() : nullptr;
+}
+InvalidationPlan ToolingSession::invalidation() const {
+    auto fresh = current_analysis();
+    if (fresh) return accepted_plan_;
+    if (!last_success_) return {};
+    return plan_invalidation(*last_success_->result().program, changed_);
+}
+}

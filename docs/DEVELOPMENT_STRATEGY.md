@@ -603,3 +603,21 @@ plans remain conservative; exact source compatibility remains compiler-owned.
 Next establish explicit client document/project revisions and invalidation
 orchestration before partial/incremental analysis or LSP transport. Preserve the
 managed-runtime/root integration and external-library identity gates separately.
+
+
+## Phase 9 document revisions and tooling sessions
+
+The user reports Phase 8 commit `f25b268` passed hosted run #11 on all platforms.
+[TOOLING_SESSIONS.md](TOOLING_SESSIONS.md) defines owned whole-document overlays,
+strict per-document logical revisions, project identity tokens, explicit close versus
+unavailable transitions, complete analysis selection and stale-result acceptance.
+Current queries never fall back to historical success after edits/failures. Dependency
+orchestration reuses Phase 8 and the exact Phase 7 compiler contract; native
+publication remains separate. Disk fallbacks are reread and checked during analysis,
+but are not an atomic filesystem image; clients explicitly refresh for observed
+disk changes. All sixteen preceding suites remain, with sessions/sessions_demo
+bringing the total to eighteen. Actual local results are recorded in WORK_LOG.md.
+Hosted Phase 9 verification remains pending. No LSP, watcher, worker, persistent
+cache, partial compiler, new language feature or automatic native reload is added.
+Next consider protocol position adaptation and a minimal tooling client/transport
+before partial compilation; retain the separate managed-runtime and package gates.
