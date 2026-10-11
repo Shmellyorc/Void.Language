@@ -1,0 +1,5 @@
+func convert(value: f64) -> i16:
+    return value as i16
+func entry(value: i32) -> i32:
+    var result = convert(-32769.0)
+    return 99

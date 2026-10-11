@@ -1,4 +1,5 @@
 #include "void/frontend.hpp"
+#include "void/numeric.hpp"
 #include <algorithm>
 #include <charconv>
 #include <fstream>
@@ -105,7 +106,7 @@ public:
 bool letter(char c) { return (c >= 'a' && c <= 'z') || c == '_'; }
 bool digit(char c) { return c >= '0' && c <= '9'; }
 const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue",
-    "and", "or", "not", "true", "false", "while", "const", "use", "struct", "in", "reverse", "i32", "bool", "as", "private", "public", "internal"};
+    "and", "or", "not", "true", "false", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "as", "private", "public", "internal"};
 std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     const auto& text = source.text();
     std::vector<Token> tokens;
@@ -153,8 +154,12 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
         }
         if (digit(c)) {
             while (p < text.size() && digit(text[p])) ++p;
+            if (p + 1 < text.size() && text[p] == '.' && digit(text[p + 1])) {
+                ++p; while (p < text.size() && digit(text[p])) ++p;
+            }
+            if (p < text.size() && (text[p] == 'f' || text[p] == 'd')) ++p;
             if (p < text.size() && (letter(text[p]) || text[p] == '.' || (text[p] >= 'A' && text[p] <= 'Z')))
-                error(source, {TokenKind::number, "", start}, Code::numeric_literal, "Unsupported numeric literal.", "This subset accepts decimal i32 integers without suffixes or separators; ranges and floating values are not implemented.");
+                error(source, {TokenKind::number, "", start}, Code::numeric_literal, "Unsupported numeric literal.", "Use decimal digits, an optional fractional part, and optional f or d suffix; separators, exponents and ranges are not implemented.");
             emit(TokenKind::number, text.substr(start, p - start), start); continue;
         }
         std::string pair = text.substr(p, 2);
@@ -164,7 +169,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
         }
         if (std::string("():,.+-*/%=<>").find(c) != std::string::npos) { ++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
         error(source, {TokenKind::symbol, "", p}, Code::character, "Unexpected character in source.",
-              c == '\t' ? "Use spaces instead of tabs." : "Use the supported i32/bool syntax and lowercase ASCII identifiers; Unicode identifiers and strings are not implemented yet.");
+              c == '\t' ? "Use spaces instead of tabs." : "Use the supported numeric/bool syntax and lowercase ASCII identifiers; Unicode identifiers and strings are not implemented yet.");
         } catch (const CompilationError& e) {
             diagnostics.add(e);
             auto line = source.location(p).line;
@@ -181,11 +186,12 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     return tokens;
 }
 struct Expr {
-    enum class Kind { literal, name, call, unary, binary } kind;
+    enum class Kind { literal, name, call, unary, binary, conversion } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::string op, qualifier, target;
-    std::int64_t value = 0;
+    std::uint64_t value = 0;
+    std::string literal_text;
     std::vector<std::unique_ptr<Expr>> parts;
     Type type = Type::none;
     unsigned slot = 0;
@@ -217,7 +223,7 @@ struct Constant {
     bool file_private = false;
     unsigned state = 0;
     Type type = Type::none;
-    std::int32_t value = 0;
+    std::uint64_t value = 0;
 };
 struct Import {
     Token path, alias;
@@ -288,9 +294,13 @@ class Parser {
         return take();
     }
     Type type() {
-        if (accept("i32")) return Type::i32;
-        if (accept("bool")) return Type::boolean;
-        error(source, peek(), Code::unsupported_type, "Unsupported type '" + peek().text + "'.", "Use i32 or bool in this compiler subset; omit the return annotation for no result.");
+        static const std::map<std::string, Type> types = {
+            {"i8",Type::i8},{"i16",Type::i16},{"i32",Type::i32},{"i64",Type::i64},
+            {"u8",Type::u8},{"u16",Type::u16},{"u32",Type::u32},{"u64",Type::u64},
+            {"f32",Type::f32},{"f64",Type::f64},{"bool",Type::boolean}};
+        auto found = types.find(peek().text);
+        if (found != types.end()) { take(); return found->second; }
+        error(source, peek(), Code::unsupported_type, "Unsupported type '" + peek().text + "'.", "Use an exact-width numeric type or bool; omit the return annotation for no result.");
     }
     void newline() { need("<newline>"); }
     std::vector<Statement> block() {
@@ -331,9 +341,7 @@ class Parser {
         if (token.kind == TokenKind::number || token.text == "true" || token.text == "false") {
             auto e = std::make_unique<Expr>(Expr::Kind::literal, token);
             if (token.kind == TokenKind::number) {
-                auto result = std::from_chars(token.text.data(), token.text.data() + token.text.size(), e->value);
-                if (result.ec != std::errc{}) error(source, token, Code::integer_range, "Integer literal is too large.", "Use a value in the i32 range.");
-                e->type = Type::i32;
+                e->literal_text = token.text;
             } else { e->type = Type::boolean; e->value = token.text == "true"; }
             return e;
         }
@@ -361,8 +369,9 @@ class Parser {
             auto token = take(); auto e = std::make_unique<Expr>(Expr::Kind::unary, token); e->op = token.text;
             // not binds below comparisons: not a < b means not (a < b).
             e->parts.push_back(token.text == "not" ? expression(3) : unary());
-            if (token.text == "-" && e->parts[0]->kind == Expr::Kind::literal && e->parts[0]->type == Type::i32 && e->parts[0]->value >= 0) {
-                e->kind = Expr::Kind::literal; e->type = Type::i32; e->value = -e->parts[0]->value; e->parts.clear();
+            if ((token.text == "-" || token.text == "+") && e->parts[0]->kind == Expr::Kind::literal && !e->parts[0]->literal_text.empty() &&
+                e->parts[0]->literal_text.front() != '-' && e->parts[0]->literal_text.front() != '+') {
+                e->kind = Expr::Kind::literal; e->literal_text = token.text + e->parts[0]->literal_text; e->parts.clear();
             }
             return e;
         }
@@ -371,7 +380,12 @@ class Parser {
     std::unique_ptr<Expr> expression(int minimum = 1) {
         Depth guard(depth, source, peek());
         auto left = unary();
-        while (precedence(peek().text) >= minimum) {
+        while (precedence(peek().text) >= minimum || (at("as") && minimum <= 6)) {
+            if (at("as")) {
+                if (++nodes > 512) error(source, peek(), Code::nesting, "Expression size limit exceeded.", "Split this expression into smaller local values.");
+                auto token = take(); auto e = std::make_unique<Expr>(Expr::Kind::conversion, token);
+                e->parts.push_back(std::move(left)); e->type = type(); left = std::move(e); continue;
+            }
             auto token = take(); auto e = std::make_unique<Expr>(Expr::Kind::binary, token); e->op = token.text;
             e->parts.push_back(std::move(left)); e->parts.push_back(expression(precedence(token.text) + 1));
             left = std::move(e);
@@ -420,7 +434,7 @@ class Parser {
             if (op == "=" || op == "+=" || op == "-=" || op == "*=" || op == "/=" || op == "%=" || op == "++" || op == "--") {
                 Statement s(Statement::Kind::assignment, name()); s.name = s.token.text; s.op = take().text;
                 if (op == "++" || op == "--") {
-                    s.expression = std::make_unique<Expr>(Expr::Kind::literal, s.token); s.expression->value = 1; s.expression->type = Type::i32;
+                    s.expression = std::make_unique<Expr>(Expr::Kind::literal, s.token); s.expression->literal_text = "1";
                 } else s.expression = expression();
                 newline(); return s;
             }
@@ -603,10 +617,38 @@ class Semantics {
         auto slot = static_cast<unsigned>(current->locals.size()); current->locals.push_back(type);
         scopes.back().emplace(token.text, Variable{type, slot, readonly, token}); return slot;
     }
-    Type expression(Expr& e) {
+    // Hints resolve typed anchors without prematurely defaulting untyped literals.
+    std::optional<Type> anchor(Expr& e) {
+        try {
+        using K = Expr::Kind;
+        if (e.kind == K::literal) {
+            if (e.literal_text.empty()) return e.type;
+            if (e.literal_text.back() == 'f') return Type::f32;
+            if (e.literal_text.back() == 'd') return Type::f64;
+            return {};
+        }
+        if (e.kind == K::conversion) return e.type;
+        if (e.kind == K::name) {
+            if (auto* v = e.qualifier.empty() ? lookup(e.token.text) : nullptr) return v->type;
+            auto [owner,c] = constant(e); if (c) { evaluate(*owner,*c); return c->type; }
+            return {};
+        }
+        if (e.kind == K::call) return resolve(e).result;
+        if (e.op == "not" || e.op == "and" || e.op == "or" || e.op == "==" || e.op == "!=" || e.op == "<" || e.op == "<=" || e.op == ">" || e.op == ">=") return Type::boolean;
+        for (auto& part : e.parts) if (auto t = anchor(*part)) return t;
+        return {};
+        } catch (const CompilationError&) { return {}; }
+          catch (const Poison&) { return {}; }
+    }
+    bool decimal(const Expr& e) {
+        if (e.kind == Expr::Kind::literal && e.literal_text.find('.') != std::string::npos) return true;
+        for (auto& part : e.parts) if (decimal(*part)) return true;
+        return false;
+    }
+    Type expression(Expr& e, std::optional<Type> expected = {}) {
         try {
             Depth guard(diagnostics.semantic_depth(), source, e.token, 256);
-            auto type = expression_impl(e);
+            auto type = expression_impl(e, expected);
             if (type == error_type) { e.type = error_type; invalid_function = true; }
             return type;
         } catch (const CompilationError& failure) { diagnostics.add(failure); }
@@ -614,12 +656,14 @@ class Semantics {
         invalid_function = true;
         return e.type = error_type;
     }
-    Type expression_impl(Expr& e) {
+    Type expression_impl(Expr& e, std::optional<Type> expected) {
         using K = Expr::Kind;
         if (e.kind == K::literal) {
-            if (e.type == Type::i32 && (e.value < std::numeric_limits<std::int32_t>::min() || e.value > std::numeric_limits<std::int32_t>::max()))
-                error(source, e.token, Code::integer_range, "Integer literal is outside the i32 range.", "Use a value from -2147483648 through 2147483647.");
-            return e.type;
+            if (e.literal_text.empty()) return e.type;
+            Type target = anchor(e).value_or(expected && numeric::number(*expected) && (!decimal(e) || numeric::floating(*expected)) ? *expected : decimal(e) ? Type::f32 : Type::i32);
+            try { e.value = numeric::literal(e.literal_text,target); }
+            catch (const std::invalid_argument& failure) { error(source,e.token,numeric::floating(target) ? Code::numeric_representability : Code::integer_range,failure.what()); }
+            return e.type = target;
         }
         if (e.kind == K::name) {
             auto* v = e.qualifier.empty() ? lookup(e.token.text) : nullptr;
@@ -640,10 +684,15 @@ class Semantics {
                 if (value->type == error_type) throw Poison{};
                 error(source, e.token, Code::not_callable, "A local value is not callable.");
             }
-            std::vector<Type> arguments;
-            for (auto& argument : e.parts) arguments.push_back(expression(*argument));
-            const auto& target = resolve(e);
+            const auto& target = [&]() -> const Function& {
+                auto check_arguments = [&] { for (auto& argument : e.parts) expression(*argument); };
+                try { return resolve(e); }
+                catch (const CompilationError&) { check_arguments(); throw; }
+                catch (const Poison&) { check_arguments(); throw; }
+            }();
             e.target = target.symbol;
+            std::vector<Type> arguments;
+            for (std::size_t i=0; i<e.parts.size(); ++i) arguments.push_back(expression(*e.parts[i], i<target.parameters.size() ? std::optional<Type>(target.parameters[i].type) : std::nullopt));
             if (e.parts.size() != target.parameters.size()) error(source, e.token, Code::argument_count, "Incorrect argument count for '" + e.token.text + "': expected " + std::to_string(target.parameters.size()) + ", received " + std::to_string(e.parts.size()) + ".");
             bool invalid = false;
             for (std::size_t i = 0; i < e.parts.size(); ++i) {
@@ -653,26 +702,62 @@ class Semantics {
             }
             return e.type = invalid ? error_type : target.result;
         }
-        auto left = expression(*e.parts[0]);
-        if (e.kind == K::unary) {
-            expect(left, e.op == "not" ? Type::boolean : Type::i32, e.token); return e.type = left;
+        if (e.kind == K::conversion) {
+            Type target = e.type;
+            auto& operand = *e.parts[0];
+            if (operand.kind == K::literal && !operand.literal_text.empty() && !anchor(operand)) {
+                if (!numeric::number(target)) error(source,e.token,Code::numeric_conversion,"Numeric as requires numeric source and destination types.");
+                if (!decimal(operand) || numeric::floating(target)) {
+                    try { operand.value = numeric::literal(operand.literal_text,target,true); }
+                    catch (const std::invalid_argument& failure) {
+                        // A checked operation in an unevaluated constant branch must
+                        // remain typed, without executing its range check eagerly.
+                        if ((!current || suppress_zero) && numeric::integer(target)) {
+                            for (auto candidate : {Type::i32,Type::i64,Type::u64}) {
+                                try { operand.value = numeric::literal(operand.literal_text,candidate); operand.type = candidate; operand.literal_text.clear(); return target; }
+                                catch (const std::invalid_argument&) {}
+                            }
+                        }
+                        error(source,e.token,Code::numeric_conversion,failure.what());
+                    }
+                    operand.type = target; operand.literal_text.clear(); return target;
+                }
+            }
+            auto from = expression(operand);
+            if (from == error_type) return error_type;
+            if (!numeric::number(from) || !numeric::number(target)) error(source,e.token,Code::numeric_conversion,"Numeric as requires numeric source and destination types.");
+            return target;
         }
+        if (e.kind == K::unary) {
+            auto left = expression(*e.parts[0], e.op == "not" ? std::optional<Type>(Type::boolean) : expected);
+            if (left == error_type) return error_type;
+            if (e.op == "not") expect(left,Type::boolean,e.token);
+            else if (!numeric::number(left)) error(source,e.token,Code::numeric_operator,"Type mismatch: unary arithmetic requires a numeric operand.");
+            return e.type = left;
+        }
+        bool logical = e.op == "and" || e.op == "or";
+        auto left_hint = anchor(*e.parts[0]), right_hint = anchor(*e.parts[1]);
+        auto context = logical ? std::optional<Type>(Type::boolean) : left_hint ? left_hint : right_hint ? right_hint :
+            expected && numeric::number(*expected) ? expected : std::optional<Type>(decimal(e) ? Type::f32 : Type::i32);
+        auto left = expression(*e.parts[0],context);
         bool previous = suppress_zero;
         if (e.parts[0]->kind == K::literal && ((e.op == "and" && !e.parts[0]->value) || (e.op == "or" && e.parts[0]->value))) suppress_zero = true;
-        auto right = expression(*e.parts[1]);
-        suppress_zero = previous;
+        auto right = expression(*e.parts[1],context); suppress_zero = previous;
         if (left == error_type || right == error_type) return error_type;
-        if (e.op == "and" || e.op == "or") {
-            expect(left, Type::boolean, e.parts[0]->token); expect(right, Type::boolean, e.parts[1]->token); return e.type = Type::boolean;
+        if (logical) {
+            expect(left,Type::boolean,e.parts[0]->token); expect(right,Type::boolean,e.parts[1]->token); return e.type = Type::boolean;
         }
+        if (e.op != "==" && e.op != "!=" && !numeric::number(left)) expect(left,Type::i32,e.parts[0]->token);
+        expect(right,left,e.token);
         if (e.op == "==" || e.op == "!=") {
-            if (left == Type::none) error(source, e.token, Code::invalid_value, "Cannot compare a no-result call.");
-            expect(right, left, e.token); return e.type = Type::boolean;
+            if (left == Type::none) error(source,e.token,Code::invalid_value,"Cannot compare a no-result call.");
+            return e.type = Type::boolean;
         }
-        expect(left, Type::i32, e.parts[0]->token); expect(right, Type::i32, e.parts[1]->token);
-        if (current && !suppress_zero && (e.op == "/" || e.op == "%") && e.parts[1]->kind == K::literal && e.parts[1]->value == 0)
-            error(source, e.parts[1]->token, Code::zero_divisor, "Division or remainder by zero.", "Use a nonzero divisor.");
-        return e.type = (e.op == "<" || e.op == "<=" || e.op == ">" || e.op == ">=") ? Type::boolean : Type::i32;
+        if (!numeric::number(left)) expect(left,Type::i32,e.parts[0]->token);
+        if (!numeric::supports(operation(e.op),left)) error(source,e.token,Code::numeric_operator,"Illegal numeric operator % for " + std::string(ir::type_name(left)) + ".");
+        if (current && !suppress_zero && numeric::integer(left) && (e.op == "/" || e.op == "%") && e.parts[1]->kind == K::literal && e.parts[1]->value == 0)
+            error(source,e.parts[1]->token,Code::zero_divisor,"Division or remainder by zero.","Use a nonzero divisor.");
+        return e.type = (e.op == "<" || e.op == "<=" || e.op == ">" || e.op == ">=") ? Type::boolean : left;
     }
     unsigned sequence(std::vector<Statement>& body, bool nested = true) {
         if (nested) scopes.emplace_back();
@@ -698,10 +783,10 @@ class Semantics {
         switch (s.kind) {
         case K::variable: {
             if (s.invalid) { s.slot = declare(s.token, error_type); invalid_function = true; break; }
-            Type t = s.expression ? expression(*s.expression) : s.annotation.value_or(Type::none);
+            Type t = s.expression ? expression(*s.expression, s.annotation) : s.annotation.value_or(Type::none);
             if (t == Type::none) {
                 s.slot = declare(s.token, error_type, s.readonly);
-                error(source, s.token, Code::invalid_value, "Variable requires a value type.", "Supply an i32/bool annotation or a value-producing initializer.");
+                error(source, s.token, Code::invalid_value, "Variable requires a value type.", "Supply a numeric/bool annotation or a value-producing initializer.");
             }
             if (s.annotation) {
                 try { expect(t, *s.annotation, s.expression ? s.expression->token : s.token); }
@@ -715,9 +800,10 @@ class Semantics {
                 error(source, s.token, Code::readonly, "Cannot mutate readonly const or declaration '" + s.name + "'.", "Use var for a mutable local binding.");
             if (!variable) error(source, s.token, Code::unknown_identifier, "Unknown identifier '" + s.name + "'.", "Declare it with var before assignment.");
             auto t = variable->type; s.slot = variable->slot;
-            expect(expression(*s.expression), t, s.expression->token);
-            if (s.op != "=") expect(t, Type::i32, s.token);
-            if ((s.op == "/=" || s.op == "%=") && s.expression->kind == Expr::Kind::literal && s.expression->value == 0)
+            expect(expression(*s.expression, t), t, s.expression->token);
+            if (s.op != "=" && t != error_type && !numeric::number(t)) expect(t,Type::i32,s.token);
+            if (s.op == "%=" && numeric::floating(t)) error(source,s.token,Code::numeric_operator,"Illegal compound floating remainder operator.");
+            if (numeric::integer(t) && (s.op == "/=" || s.op == "%=") && s.expression->kind == Expr::Kind::literal && s.expression->value == 0)
                 error(source, s.expression->token, Code::zero_divisor, "Division or remainder by zero.");
             break;
         }
@@ -727,7 +813,7 @@ class Semantics {
             break;
         case K::returned:
             if (s.expression) {
-                auto result = expression(*s.expression);
+                auto result = expression(*s.expression, current->result);
                 if (result == error_type) { flow = return_flow; break; }
                 expect(result, current->result, s.token);
             } else expect(Type::none, current->result, s.token);
@@ -769,7 +855,7 @@ public:
                 if (!f->file_private) visible_names.insert(name);
     }
     void analyze_constant(Constant& c) {
-        c.type = expression(*c.declaration.expression);
+        c.type = expression(*c.declaration.expression, c.declaration.annotation);
         if (c.type == error_type) throw Poison{};
         if (c.declaration.annotation) expect(c.type, *c.declaration.annotation, c.declaration.token);
     }
@@ -802,7 +888,7 @@ class Lowering {
     void jump(unsigned to) { terminate({ir::Terminator::Kind::jump, 0, to}); }
     unsigned emit(ir::Instruction i, const Token& token) {
         i.source = source.location(token.offset);
-        if (i.op == ir::Op::call || i.op == ir::Op::divide || i.op == ir::Op::remainder)
+        if (i.op == ir::Op::call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert)
             i.source_excerpt = source.excerpt(token.offset);
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
@@ -811,7 +897,7 @@ class Lowering {
         using K = Expr::Kind;
         switch (e.kind) {
         case K::literal: {
-            ir::Instruction i{ir::Op::constant}; i.immediate = static_cast<std::int32_t>(e.value); i.type = e.type; return emit(i, e.token);
+            ir::Instruction i{ir::Op::constant}; i.immediate = std::bit_cast<std::int64_t>(e.value); i.type = e.type; return emit(i, e.token);
         }
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
         case K::call: {
@@ -826,11 +912,14 @@ class Lowering {
             for (auto slot : slots) i.arguments.push_back(emit({ir::Op::load, slot}, e.token));
             return emit(i, e.token);
         }
+        case K::conversion: {
+            auto value = expression(*e.parts[0]); ir::Instruction i{ir::Op::convert,value}; i.type = e.type; return emit(i,e.token);
+        }
         case K::unary: {
             auto value = expression(*e.parts[0]);
             if (e.op == "not") return emit({ir::Op::logical_not, value}, e.token);
             if (e.op == "+") return value;
-            auto zero = emit({ir::Op::constant}, e.token); return emit({ir::Op::subtract, zero, value}, e.token);
+            return emit({ir::Op::negate,value},e.token);
         }
         case K::binary: {
             auto left = expression(*e.parts[0]);
@@ -861,7 +950,7 @@ class Lowering {
             // Load compound-assignment LHS before evaluating its RHS.
             std::optional<unsigned> old_slot;
             if (s.op != "=") {
-                auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(Type::i32); old_slot = slot;
+                auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(output.locals[s.slot]); old_slot = slot;
                 auto old = emit({ir::Op::load, s.slot}, s.token); emit({ir::Op::store, slot, old}, s.token);
             }
             auto value = expression(*s.expression);
@@ -1041,35 +1130,22 @@ public:
         return *result;
     }
 };
-// Only typed, pure ASTs reach this evaluator. Unsigned arithmetic preserves
-// the same modulo-2^32 contract as the IR operations without C++ signed overflow.
-std::int32_t constant_value(const SourceFile& source, const Expr& e) {
-    if (e.kind == Expr::Kind::literal) return static_cast<std::int32_t>(e.value);
-    auto a = constant_value(source, *e.parts[0]);
-    auto wrap = [](std::uint32_t v) { return std::bit_cast<std::int32_t>(v); };
-    if (e.kind == Expr::Kind::unary) {
-        if (e.op == "not") return !a;
-        return e.op == "-" ? wrap(0u - static_cast<std::uint32_t>(a)) : a;
-    }
-    if (e.op == "and" && !a) return 0;
-    if (e.op == "or" && a) return 1;
-    auto b = constant_value(source, *e.parts[1]);
-    if (e.op == "and" || e.op == "or") return b;
-    auto x = static_cast<std::uint32_t>(a), y = static_cast<std::uint32_t>(b);
-    switch (operation(e.op)) {
-    case ir::Op::add: return wrap(x + y);
-    case ir::Op::subtract: return wrap(x - y);
-    case ir::Op::multiply: return wrap(x * y);
-    case ir::Op::divide: case ir::Op::remainder:
-        if (!b) error(source, e.token, Code::zero_divisor, "Division or remainder by zero in a compile-time constant.", "Use a nonzero divisor.");
-        return wrap(static_cast<std::uint32_t>(e.op == "/" ? std::int64_t(a) / b : std::int64_t(a) % b));
-    case ir::Op::less: return a < b;
-    case ir::Op::less_equal: return a <= b;
-    case ir::Op::greater: return a > b;
-    case ir::Op::greater_equal: return a >= b;
-    case ir::Op::equal: return a == b;
-    case ir::Op::not_equal: return a != b;
-    default: throw std::logic_error("invalid constant operation");
+// Only typed, pure ASTs reach this evaluator. The shared software kernel
+// preserves declared precision and wrapping independently of host arithmetic.
+std::uint64_t constant_value(const SourceFile& source, const Expr& e) {
+    if (e.kind == Expr::Kind::literal) return e.value;
+    auto a = constant_value(source,*e.parts[0]);
+    try {
+        if (e.kind == Expr::Kind::conversion) return numeric::convert(a,e.parts[0]->type,e.type);
+        if (e.kind == Expr::Kind::unary) return e.op == "not" ? !a : e.op == "-" ? numeric::negate(a,e.type) : a;
+        if (e.op == "and" && !a) return 0;
+        if (e.op == "or" && a) return 1;
+        auto b = constant_value(source,*e.parts[1]);
+        if (e.op == "and" || e.op == "or") return b;
+        return numeric::binary(operation(e.op),a,b,e.parts[0]->type);
+    } catch (const CompilationError&) { throw; }
+      catch (const std::invalid_argument& failure) {
+        error(source,e.token,e.kind == Expr::Kind::conversion ? Code::numeric_conversion : Code::zero_divisor,failure.what());
     }
 }
 ir::Module compile_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics) {

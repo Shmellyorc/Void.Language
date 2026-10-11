@@ -1,0 +1,602 @@
+const folded_0_0: i8 = (31 as i8) as i8
+func convert_0_0(a: i8) -> i8:
+    return a as i8
+
+const folded_0_1: i16 = (31 as i8) as i16
+func convert_0_1(a: i8) -> i16:
+    return a as i16
+
+const folded_0_2: i32 = (31 as i8) as i32
+func convert_0_2(a: i8) -> i32:
+    return a as i32
+
+const folded_0_3: i64 = (31 as i8) as i64
+func convert_0_3(a: i8) -> i64:
+    return a as i64
+
+const folded_0_4: u8 = (31 as i8) as u8
+func convert_0_4(a: i8) -> u8:
+    return a as u8
+
+const folded_0_5: u16 = (31 as i8) as u16
+func convert_0_5(a: i8) -> u16:
+    return a as u16
+
+const folded_0_6: u32 = (31 as i8) as u32
+func convert_0_6(a: i8) -> u32:
+    return a as u32
+
+const folded_0_7: u64 = (31 as i8) as u64
+func convert_0_7(a: i8) -> u64:
+    return a as u64
+
+const folded_0_8: f32 = (31 as i8) as f32
+func convert_0_8(a: i8) -> f32:
+    return a as f32
+
+const folded_0_9: f64 = (31 as i8) as f64
+func convert_0_9(a: i8) -> f64:
+    return a as f64
+
+const folded_1_0: i8 = (31 as i16) as i8
+func convert_1_0(a: i16) -> i8:
+    return a as i8
+
+const folded_1_1: i16 = (31 as i16) as i16
+func convert_1_1(a: i16) -> i16:
+    return a as i16
+
+const folded_1_2: i32 = (31 as i16) as i32
+func convert_1_2(a: i16) -> i32:
+    return a as i32
+
+const folded_1_3: i64 = (31 as i16) as i64
+func convert_1_3(a: i16) -> i64:
+    return a as i64
+
+const folded_1_4: u8 = (31 as i16) as u8
+func convert_1_4(a: i16) -> u8:
+    return a as u8
+
+const folded_1_5: u16 = (31 as i16) as u16
+func convert_1_5(a: i16) -> u16:
+    return a as u16
+
+const folded_1_6: u32 = (31 as i16) as u32
+func convert_1_6(a: i16) -> u32:
+    return a as u32
+
+const folded_1_7: u64 = (31 as i16) as u64
+func convert_1_7(a: i16) -> u64:
+    return a as u64
+
+const folded_1_8: f32 = (31 as i16) as f32
+func convert_1_8(a: i16) -> f32:
+    return a as f32
+
+const folded_1_9: f64 = (31 as i16) as f64
+func convert_1_9(a: i16) -> f64:
+    return a as f64
+
+const folded_2_0: i8 = (31 as i32) as i8
+func convert_2_0(a: i32) -> i8:
+    return a as i8
+
+const folded_2_1: i16 = (31 as i32) as i16
+func convert_2_1(a: i32) -> i16:
+    return a as i16
+
+const folded_2_2: i32 = (31 as i32) as i32
+func convert_2_2(a: i32) -> i32:
+    return a as i32
+
+const folded_2_3: i64 = (31 as i32) as i64
+func convert_2_3(a: i32) -> i64:
+    return a as i64
+
+const folded_2_4: u8 = (31 as i32) as u8
+func convert_2_4(a: i32) -> u8:
+    return a as u8
+
+const folded_2_5: u16 = (31 as i32) as u16
+func convert_2_5(a: i32) -> u16:
+    return a as u16
+
+const folded_2_6: u32 = (31 as i32) as u32
+func convert_2_6(a: i32) -> u32:
+    return a as u32
+
+const folded_2_7: u64 = (31 as i32) as u64
+func convert_2_7(a: i32) -> u64:
+    return a as u64
+
+const folded_2_8: f32 = (31 as i32) as f32
+func convert_2_8(a: i32) -> f32:
+    return a as f32
+
+const folded_2_9: f64 = (31 as i32) as f64
+func convert_2_9(a: i32) -> f64:
+    return a as f64
+
+const folded_3_0: i8 = (31 as i64) as i8
+func convert_3_0(a: i64) -> i8:
+    return a as i8
+
+const folded_3_1: i16 = (31 as i64) as i16
+func convert_3_1(a: i64) -> i16:
+    return a as i16
+
+const folded_3_2: i32 = (31 as i64) as i32
+func convert_3_2(a: i64) -> i32:
+    return a as i32
+
+const folded_3_3: i64 = (31 as i64) as i64
+func convert_3_3(a: i64) -> i64:
+    return a as i64
+
+const folded_3_4: u8 = (31 as i64) as u8
+func convert_3_4(a: i64) -> u8:
+    return a as u8
+
+const folded_3_5: u16 = (31 as i64) as u16
+func convert_3_5(a: i64) -> u16:
+    return a as u16
+
+const folded_3_6: u32 = (31 as i64) as u32
+func convert_3_6(a: i64) -> u32:
+    return a as u32
+
+const folded_3_7: u64 = (31 as i64) as u64
+func convert_3_7(a: i64) -> u64:
+    return a as u64
+
+const folded_3_8: f32 = (31 as i64) as f32
+func convert_3_8(a: i64) -> f32:
+    return a as f32
+
+const folded_3_9: f64 = (31 as i64) as f64
+func convert_3_9(a: i64) -> f64:
+    return a as f64
+
+const folded_4_0: i8 = (31 as u8) as i8
+func convert_4_0(a: u8) -> i8:
+    return a as i8
+
+const folded_4_1: i16 = (31 as u8) as i16
+func convert_4_1(a: u8) -> i16:
+    return a as i16
+
+const folded_4_2: i32 = (31 as u8) as i32
+func convert_4_2(a: u8) -> i32:
+    return a as i32
+
+const folded_4_3: i64 = (31 as u8) as i64
+func convert_4_3(a: u8) -> i64:
+    return a as i64
+
+const folded_4_4: u8 = (31 as u8) as u8
+func convert_4_4(a: u8) -> u8:
+    return a as u8
+
+const folded_4_5: u16 = (31 as u8) as u16
+func convert_4_5(a: u8) -> u16:
+    return a as u16
+
+const folded_4_6: u32 = (31 as u8) as u32
+func convert_4_6(a: u8) -> u32:
+    return a as u32
+
+const folded_4_7: u64 = (31 as u8) as u64
+func convert_4_7(a: u8) -> u64:
+    return a as u64
+
+const folded_4_8: f32 = (31 as u8) as f32
+func convert_4_8(a: u8) -> f32:
+    return a as f32
+
+const folded_4_9: f64 = (31 as u8) as f64
+func convert_4_9(a: u8) -> f64:
+    return a as f64
+
+const folded_5_0: i8 = (31 as u16) as i8
+func convert_5_0(a: u16) -> i8:
+    return a as i8
+
+const folded_5_1: i16 = (31 as u16) as i16
+func convert_5_1(a: u16) -> i16:
+    return a as i16
+
+const folded_5_2: i32 = (31 as u16) as i32
+func convert_5_2(a: u16) -> i32:
+    return a as i32
+
+const folded_5_3: i64 = (31 as u16) as i64
+func convert_5_3(a: u16) -> i64:
+    return a as i64
+
+const folded_5_4: u8 = (31 as u16) as u8
+func convert_5_4(a: u16) -> u8:
+    return a as u8
+
+const folded_5_5: u16 = (31 as u16) as u16
+func convert_5_5(a: u16) -> u16:
+    return a as u16
+
+const folded_5_6: u32 = (31 as u16) as u32
+func convert_5_6(a: u16) -> u32:
+    return a as u32
+
+const folded_5_7: u64 = (31 as u16) as u64
+func convert_5_7(a: u16) -> u64:
+    return a as u64
+
+const folded_5_8: f32 = (31 as u16) as f32
+func convert_5_8(a: u16) -> f32:
+    return a as f32
+
+const folded_5_9: f64 = (31 as u16) as f64
+func convert_5_9(a: u16) -> f64:
+    return a as f64
+
+const folded_6_0: i8 = (31 as u32) as i8
+func convert_6_0(a: u32) -> i8:
+    return a as i8
+
+const folded_6_1: i16 = (31 as u32) as i16
+func convert_6_1(a: u32) -> i16:
+    return a as i16
+
+const folded_6_2: i32 = (31 as u32) as i32
+func convert_6_2(a: u32) -> i32:
+    return a as i32
+
+const folded_6_3: i64 = (31 as u32) as i64
+func convert_6_3(a: u32) -> i64:
+    return a as i64
+
+const folded_6_4: u8 = (31 as u32) as u8
+func convert_6_4(a: u32) -> u8:
+    return a as u8
+
+const folded_6_5: u16 = (31 as u32) as u16
+func convert_6_5(a: u32) -> u16:
+    return a as u16
+
+const folded_6_6: u32 = (31 as u32) as u32
+func convert_6_6(a: u32) -> u32:
+    return a as u32
+
+const folded_6_7: u64 = (31 as u32) as u64
+func convert_6_7(a: u32) -> u64:
+    return a as u64
+
+const folded_6_8: f32 = (31 as u32) as f32
+func convert_6_8(a: u32) -> f32:
+    return a as f32
+
+const folded_6_9: f64 = (31 as u32) as f64
+func convert_6_9(a: u32) -> f64:
+    return a as f64
+
+const folded_7_0: i8 = (31 as u64) as i8
+func convert_7_0(a: u64) -> i8:
+    return a as i8
+
+const folded_7_1: i16 = (31 as u64) as i16
+func convert_7_1(a: u64) -> i16:
+    return a as i16
+
+const folded_7_2: i32 = (31 as u64) as i32
+func convert_7_2(a: u64) -> i32:
+    return a as i32
+
+const folded_7_3: i64 = (31 as u64) as i64
+func convert_7_3(a: u64) -> i64:
+    return a as i64
+
+const folded_7_4: u8 = (31 as u64) as u8
+func convert_7_4(a: u64) -> u8:
+    return a as u8
+
+const folded_7_5: u16 = (31 as u64) as u16
+func convert_7_5(a: u64) -> u16:
+    return a as u16
+
+const folded_7_6: u32 = (31 as u64) as u32
+func convert_7_6(a: u64) -> u32:
+    return a as u32
+
+const folded_7_7: u64 = (31 as u64) as u64
+func convert_7_7(a: u64) -> u64:
+    return a as u64
+
+const folded_7_8: f32 = (31 as u64) as f32
+func convert_7_8(a: u64) -> f32:
+    return a as f32
+
+const folded_7_9: f64 = (31 as u64) as f64
+func convert_7_9(a: u64) -> f64:
+    return a as f64
+
+const folded_8_0: i8 = (31 as f32) as i8
+func convert_8_0(a: f32) -> i8:
+    return a as i8
+
+const folded_8_1: i16 = (31 as f32) as i16
+func convert_8_1(a: f32) -> i16:
+    return a as i16
+
+const folded_8_2: i32 = (31 as f32) as i32
+func convert_8_2(a: f32) -> i32:
+    return a as i32
+
+const folded_8_3: i64 = (31 as f32) as i64
+func convert_8_3(a: f32) -> i64:
+    return a as i64
+
+const folded_8_4: u8 = (31 as f32) as u8
+func convert_8_4(a: f32) -> u8:
+    return a as u8
+
+const folded_8_5: u16 = (31 as f32) as u16
+func convert_8_5(a: f32) -> u16:
+    return a as u16
+
+const folded_8_6: u32 = (31 as f32) as u32
+func convert_8_6(a: f32) -> u32:
+    return a as u32
+
+const folded_8_7: u64 = (31 as f32) as u64
+func convert_8_7(a: f32) -> u64:
+    return a as u64
+
+const folded_8_8: f32 = (31 as f32) as f32
+func convert_8_8(a: f32) -> f32:
+    return a as f32
+
+const folded_8_9: f64 = (31 as f32) as f64
+func convert_8_9(a: f32) -> f64:
+    return a as f64
+
+const folded_9_0: i8 = (31 as f64) as i8
+func convert_9_0(a: f64) -> i8:
+    return a as i8
+
+const folded_9_1: i16 = (31 as f64) as i16
+func convert_9_1(a: f64) -> i16:
+    return a as i16
+
+const folded_9_2: i32 = (31 as f64) as i32
+func convert_9_2(a: f64) -> i32:
+    return a as i32
+
+const folded_9_3: i64 = (31 as f64) as i64
+func convert_9_3(a: f64) -> i64:
+    return a as i64
+
+const folded_9_4: u8 = (31 as f64) as u8
+func convert_9_4(a: f64) -> u8:
+    return a as u8
+
+const folded_9_5: u16 = (31 as f64) as u16
+func convert_9_5(a: f64) -> u16:
+    return a as u16
+
+const folded_9_6: u32 = (31 as f64) as u32
+func convert_9_6(a: f64) -> u32:
+    return a as u32
+
+const folded_9_7: u64 = (31 as f64) as u64
+func convert_9_7(a: f64) -> u64:
+    return a as u64
+
+const folded_9_8: f32 = (31 as f64) as f32
+func convert_9_8(a: f64) -> f32:
+    return a as f32
+
+const folded_9_9: f64 = (31 as f64) as f64
+func convert_9_9(a: f64) -> f64:
+    return a as f64
+
+func entry(value: i32) -> i32:
+    if convert_0_0(value as i8) != value as i8 or folded_0_0 != 31:
+        return 2
+    if convert_0_1(value as i8) != value as i16 or folded_0_1 != 31:
+        return 3
+    if convert_0_2(value as i8) != value as i32 or folded_0_2 != 31:
+        return 4
+    if convert_0_3(value as i8) != value as i64 or folded_0_3 != 31:
+        return 5
+    if convert_0_4(value as i8) != value as u8 or folded_0_4 != 31:
+        return 6
+    if convert_0_5(value as i8) != value as u16 or folded_0_5 != 31:
+        return 7
+    if convert_0_6(value as i8) != value as u32 or folded_0_6 != 31:
+        return 8
+    if convert_0_7(value as i8) != value as u64 or folded_0_7 != 31:
+        return 9
+    if convert_0_8(value as i8) != value as f32 or folded_0_8 != 31:
+        return 10
+    if convert_0_9(value as i8) != value as f64 or folded_0_9 != 31:
+        return 11
+    if convert_1_0(value as i16) != value as i8 or folded_1_0 != 31:
+        return 12
+    if convert_1_1(value as i16) != value as i16 or folded_1_1 != 31:
+        return 13
+    if convert_1_2(value as i16) != value as i32 or folded_1_2 != 31:
+        return 14
+    if convert_1_3(value as i16) != value as i64 or folded_1_3 != 31:
+        return 15
+    if convert_1_4(value as i16) != value as u8 or folded_1_4 != 31:
+        return 16
+    if convert_1_5(value as i16) != value as u16 or folded_1_5 != 31:
+        return 17
+    if convert_1_6(value as i16) != value as u32 or folded_1_6 != 31:
+        return 18
+    if convert_1_7(value as i16) != value as u64 or folded_1_7 != 31:
+        return 19
+    if convert_1_8(value as i16) != value as f32 or folded_1_8 != 31:
+        return 20
+    if convert_1_9(value as i16) != value as f64 or folded_1_9 != 31:
+        return 21
+    if convert_2_0(value as i32) != value as i8 or folded_2_0 != 31:
+        return 22
+    if convert_2_1(value as i32) != value as i16 or folded_2_1 != 31:
+        return 23
+    if convert_2_2(value as i32) != value as i32 or folded_2_2 != 31:
+        return 24
+    if convert_2_3(value as i32) != value as i64 or folded_2_3 != 31:
+        return 25
+    if convert_2_4(value as i32) != value as u8 or folded_2_4 != 31:
+        return 26
+    if convert_2_5(value as i32) != value as u16 or folded_2_5 != 31:
+        return 27
+    if convert_2_6(value as i32) != value as u32 or folded_2_6 != 31:
+        return 28
+    if convert_2_7(value as i32) != value as u64 or folded_2_7 != 31:
+        return 29
+    if convert_2_8(value as i32) != value as f32 or folded_2_8 != 31:
+        return 30
+    if convert_2_9(value as i32) != value as f64 or folded_2_9 != 31:
+        return 31
+    if convert_3_0(value as i64) != value as i8 or folded_3_0 != 31:
+        return 32
+    if convert_3_1(value as i64) != value as i16 or folded_3_1 != 31:
+        return 33
+    if convert_3_2(value as i64) != value as i32 or folded_3_2 != 31:
+        return 34
+    if convert_3_3(value as i64) != value as i64 or folded_3_3 != 31:
+        return 35
+    if convert_3_4(value as i64) != value as u8 or folded_3_4 != 31:
+        return 36
+    if convert_3_5(value as i64) != value as u16 or folded_3_5 != 31:
+        return 37
+    if convert_3_6(value as i64) != value as u32 or folded_3_6 != 31:
+        return 38
+    if convert_3_7(value as i64) != value as u64 or folded_3_7 != 31:
+        return 39
+    if convert_3_8(value as i64) != value as f32 or folded_3_8 != 31:
+        return 40
+    if convert_3_9(value as i64) != value as f64 or folded_3_9 != 31:
+        return 41
+    if convert_4_0(value as u8) != value as i8 or folded_4_0 != 31:
+        return 42
+    if convert_4_1(value as u8) != value as i16 or folded_4_1 != 31:
+        return 43
+    if convert_4_2(value as u8) != value as i32 or folded_4_2 != 31:
+        return 44
+    if convert_4_3(value as u8) != value as i64 or folded_4_3 != 31:
+        return 45
+    if convert_4_4(value as u8) != value as u8 or folded_4_4 != 31:
+        return 46
+    if convert_4_5(value as u8) != value as u16 or folded_4_5 != 31:
+        return 47
+    if convert_4_6(value as u8) != value as u32 or folded_4_6 != 31:
+        return 48
+    if convert_4_7(value as u8) != value as u64 or folded_4_7 != 31:
+        return 49
+    if convert_4_8(value as u8) != value as f32 or folded_4_8 != 31:
+        return 50
+    if convert_4_9(value as u8) != value as f64 or folded_4_9 != 31:
+        return 51
+    if convert_5_0(value as u16) != value as i8 or folded_5_0 != 31:
+        return 52
+    if convert_5_1(value as u16) != value as i16 or folded_5_1 != 31:
+        return 53
+    if convert_5_2(value as u16) != value as i32 or folded_5_2 != 31:
+        return 54
+    if convert_5_3(value as u16) != value as i64 or folded_5_3 != 31:
+        return 55
+    if convert_5_4(value as u16) != value as u8 or folded_5_4 != 31:
+        return 56
+    if convert_5_5(value as u16) != value as u16 or folded_5_5 != 31:
+        return 57
+    if convert_5_6(value as u16) != value as u32 or folded_5_6 != 31:
+        return 58
+    if convert_5_7(value as u16) != value as u64 or folded_5_7 != 31:
+        return 59
+    if convert_5_8(value as u16) != value as f32 or folded_5_8 != 31:
+        return 60
+    if convert_5_9(value as u16) != value as f64 or folded_5_9 != 31:
+        return 61
+    if convert_6_0(value as u32) != value as i8 or folded_6_0 != 31:
+        return 62
+    if convert_6_1(value as u32) != value as i16 or folded_6_1 != 31:
+        return 63
+    if convert_6_2(value as u32) != value as i32 or folded_6_2 != 31:
+        return 64
+    if convert_6_3(value as u32) != value as i64 or folded_6_3 != 31:
+        return 65
+    if convert_6_4(value as u32) != value as u8 or folded_6_4 != 31:
+        return 66
+    if convert_6_5(value as u32) != value as u16 or folded_6_5 != 31:
+        return 67
+    if convert_6_6(value as u32) != value as u32 or folded_6_6 != 31:
+        return 68
+    if convert_6_7(value as u32) != value as u64 or folded_6_7 != 31:
+        return 69
+    if convert_6_8(value as u32) != value as f32 or folded_6_8 != 31:
+        return 70
+    if convert_6_9(value as u32) != value as f64 or folded_6_9 != 31:
+        return 71
+    if convert_7_0(value as u64) != value as i8 or folded_7_0 != 31:
+        return 72
+    if convert_7_1(value as u64) != value as i16 or folded_7_1 != 31:
+        return 73
+    if convert_7_2(value as u64) != value as i32 or folded_7_2 != 31:
+        return 74
+    if convert_7_3(value as u64) != value as i64 or folded_7_3 != 31:
+        return 75
+    if convert_7_4(value as u64) != value as u8 or folded_7_4 != 31:
+        return 76
+    if convert_7_5(value as u64) != value as u16 or folded_7_5 != 31:
+        return 77
+    if convert_7_6(value as u64) != value as u32 or folded_7_6 != 31:
+        return 78
+    if convert_7_7(value as u64) != value as u64 or folded_7_7 != 31:
+        return 79
+    if convert_7_8(value as u64) != value as f32 or folded_7_8 != 31:
+        return 80
+    if convert_7_9(value as u64) != value as f64 or folded_7_9 != 31:
+        return 81
+    if convert_8_0(value as f32) != value as i8 or folded_8_0 != 31:
+        return 82
+    if convert_8_1(value as f32) != value as i16 or folded_8_1 != 31:
+        return 83
+    if convert_8_2(value as f32) != value as i32 or folded_8_2 != 31:
+        return 84
+    if convert_8_3(value as f32) != value as i64 or folded_8_3 != 31:
+        return 85
+    if convert_8_4(value as f32) != value as u8 or folded_8_4 != 31:
+        return 86
+    if convert_8_5(value as f32) != value as u16 or folded_8_5 != 31:
+        return 87
+    if convert_8_6(value as f32) != value as u32 or folded_8_6 != 31:
+        return 88
+    if convert_8_7(value as f32) != value as u64 or folded_8_7 != 31:
+        return 89
+    if convert_8_8(value as f32) != value as f32 or folded_8_8 != 31:
+        return 90
+    if convert_8_9(value as f32) != value as f64 or folded_8_9 != 31:
+        return 91
+    if convert_9_0(value as f64) != value as i8 or folded_9_0 != 31:
+        return 92
+    if convert_9_1(value as f64) != value as i16 or folded_9_1 != 31:
+        return 93
+    if convert_9_2(value as f64) != value as i32 or folded_9_2 != 31:
+        return 94
+    if convert_9_3(value as f64) != value as i64 or folded_9_3 != 31:
+        return 95
+    if convert_9_4(value as f64) != value as u8 or folded_9_4 != 31:
+        return 96
+    if convert_9_5(value as f64) != value as u16 or folded_9_5 != 31:
+        return 97
+    if convert_9_6(value as f64) != value as u32 or folded_9_6 != 31:
+        return 98
+    if convert_9_7(value as f64) != value as u64 or folded_9_7 != 31:
+        return 99
+    if convert_9_8(value as f64) != value as f32 or folded_9_8 != 31:
+        return 100
+    if convert_9_9(value as f64) != value as f64 or folded_9_9 != 31:
+        return 101
+    return 1

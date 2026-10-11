@@ -1,0 +1,5 @@
+func narrow(value: f64) -> f32:
+    return value as f32
+func entry(value: i32) -> i32:
+    var result = narrow(340282356779733661637539395458142568448.0)
+    return 99

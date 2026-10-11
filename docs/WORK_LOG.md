@@ -1051,3 +1051,204 @@ Recommend the next cohesive phase design precise validated source/dependency
 compatibility and a reusable analysis-result API before incremental IDE integration.
 Keep one parser/type checker. Numeric contextual literals/conversions still require
 deliberate policy approval; managed types still require the GC/root/thread gate.
+
+## Phase 6: numeric types and contextual literals, 11 October 2026
+
+The user confirmed Phase 5 commit `4f3688d` passed hosted run #8 across Linux,
+Windows and macOS, including the SDK RTTI correction. Read the current Bible
+sections 6/30, VALUE_SEMANTICS, DIAGNOSTICS, DECISIONS, KNOWN_ISSUES,
+CI_SANITIZER_ABI and DEVELOPMENT_STRATEGY. Presented the requested numeric policy
+table and paused before compiler changes. The user explicitly approved the full
+ten-type contract, then authorized implementation and complete local verification.
+
+### Implemented contract and shared pipeline
+
+All i8/i16/i32/i64/u8/u16/u32/u64/f32/f64 types now work throughout the existing
+source compiler. Unsuffixed literals receive expected context; named/typed values
+retain exact types. Integers wrap at their width and preserve the prior i32
+MIN/-1 and zero-divisor behavior. Decimal literals construct their selected IEEE
+precision directly; integral literal adaptation to float must be exact. Explicit
+numeric as permits the approved rounding/truncation with runtime range/non-finite
+checks. No bool promotions, as?, managed types or public ABI expansion were added.
+NUMERIC_TYPES.md records the full approved contract and remaining syntax limits;
+LANGUAGE_BIBLE.md was not edited.
+
+A private LLVM Support APInt/APFloat kernel supplies reliable magnitude parsing
+and deterministic declared-precision constant arithmetic/conversion. This is a
+narrow new implementation dependency of void_core, with no LLVM types in public
+frontend/IR APIs and no second AST evaluator/code generator. IR constants carry
+64-bit scalar patterns; conversion/negation are explicit operations. Shared legal
+operation helpers serve semantic analysis and IR validation. AOT and ORC still
+use one lowering and optional O2 pipeline.
+
+Checked casts guard exact integer ranges and ordered floating bounds before
+FPToSI/UI. Float-to-integer lower bounds account for truncation and source
+precision, including MIN-1 rounding to MIN at large widths. This removed an
+initial trunc/truncf intrinsic approach that would have required native math
+library linkage. MIN/-1 division selects a safe divisor before executing the
+LLVM operation. Floating negation uses FNeg to preserve signed zero. A boundary
+audit added directly signed integer zero in floating context; it now agrees with
+floating unary negation, while conversion of an existing integer zero yields +0.
+The initial new magnitude parser sign-extension bug was caught by unchanged i32
+regressions and corrected before final verification.
+
+### Acceptance coverage and independent calculations
+
+Keep all ten original suite names and architectural assertions. Two negative
+frontend fixtures now reject malformed `1.5q` and unsupported string types,
+instead of rejecting the newly approved float syntax/types. Add numeric and
+numeric_cli: 64 real top-level VOID programs, plus their imported helper.
+The numeric suite performs 192 normal/O2 native JIT invocations; numeric_cli
+performs 384 normal/O2 JIT/native AOT invocations and 128 actual object/link steps.
+Their expressions additionally check compile-time results against explicit
+independent expected values. Wider functions are called from source through the
+unchanged i32 CLI/host adapter.
+
+Coverage includes 96 signed/unsigned boundary arithmetic cases, all 100 numeric
+conversion pairs, 64 valid float-to-integer boundary cases, both invalid boundary
+sides for every integer destination in both floating precisions, integer zero
+failures, cast failures and caller traces, exact literal adaptation, f32/f64
+rounding differences, NaN comparison, signed zero, subnormals, finite overflow,
+underflow, non-fused multiply/subtract, per-operation rounding, imports and numeric
+constant restart tokens. Source errors preserve snapshots/spans, collect multiple
+independent failures, and never return invalid IR. Numeric type context probing
+is tested not to hide independent unknown calls in sibling operands. Same-width
+incompatible entry signatures are rejected; failed edits preserve the old lease.
+
+The developer-only `tests/numeric/generate_fixtures.py` uses independent Python
+unlimited-precision integer formulas and explicit IEEE neighbors, importing no
+compiler arithmetic. Regeneration matched every checked-in fixture byte.
+The runtime-dependent dynamic_widths program returns 47, -7, 48 for inputs
+0, 1, 10; its optimized arithmetic cannot be replaced by a single known result.
+Separate handwritten floating fixtures check IEEE edge behavior. No test suite
+or sanitizer assertion was disabled.
+
+### Actual source-to-native demonstration
+
+```sh
+build/ci-debug/voidc check examples/numeric_types/main.void
+build/ci-debug/voidc run examples/numeric_types/main.void 10
+# 52
+build/ci-debug/voidc emit examples/numeric_types/main.void -o build/phase6-verification/numeric-types.o
+clang-19 --ld-path=/usr/lib/llvm-19/bin/ld.lld build/phase6-verification/numeric-types.o -o build/phase6-verification/numeric-types
+build/phase6-verification/numeric-types 10
+# 52
+```
+
+The imported example uses i64 arithmetic, contextual f32/f64 parameters, u64
+wrapping and a checked result conversion. A recorded demonstration additionally
+verified architecture inputs -1/0/1/10 -> 7/42/43/52, numeric example inputs
+0/1/10 -> 42/43/52, and dynamic_widths inputs 0/1/10 -> 47/-7/48 in normal/O2
+JIT and linked normal/O2 AOT. Logs and JSON are in build/phase6-verification.
+These are parsed files, not reconstructed proof IR.
+
+### Final local commands and measured results
+
+Both SDKs' LLJIT/APFloat headers, OrcJIT library and LLVMConfig.cmake were checked,
+and matching Clang 19.1.7 was executed. The installed SDK is `/usr/lib/llvm-19`;
+the complete official SDK is `.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64`.
+All six build directories retain their matching Clang/LLD, exact SDK and original
+build-type/sanitizer settings. Every C++ compile command was checked for SDK-matched
+RTTI; sanitizer commands retain `-fsanitize=address,undefined`. No toolchain
+requirements, exported dependencies, test assertions or sanitizer flags were removed.
+
+```sh
+cmake --build build/ci-debug -j2
+ctest --test-dir build/ci-debug --output-on-failure
+cmake --build build/ci-release -j2
+ctest --test-dir build/ci-release --output-on-failure
+cmake --build build/ci-sanitizers -j2
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+  UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+  ctest --test-dir build/ci-sanitizers --output-on-failure
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+  UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+  ctest --test-dir build/ci-sanitizers --output-on-failure \
+  -R '^(numeric|numeric_cli|frontend|reload|gc|native)$' --repeat until-fail:3
+```
+
+Official archive members contain ThinLTO summaries. Final local SDK configurations
+use LLD's standard content-keyed ThinLTO cache to reuse expensive SDK compilation.
+This is only a local link-cache setting, not a replacement SDK, changed ABI,
+optimization policy or test result cache. Native programs are emitted, linked and
+executed afresh. Existing directories were reconfigured as follows (their explicit
+SDK/compiler paths remain the ones recorded in CI_SANITIZER_ABI.md):
+
+```sh
+cmake -S . -B build/ci-official-release \
+  -DCMAKE_EXE_LINKER_FLAGS=-Wl,--thinlto-cache-dir="$PWD/build/phase6-verification/lto-cache"
+cmake --build build/ci-official-release -j1
+ctest --test-dir build/ci-official-release --output-on-failure
+cmake -S . -B build/ci-official-debug \
+  -DCMAKE_EXE_LINKER_FLAGS=-Wl,--thinlto-cache-dir="$PWD/build/phase6-verification/lto-cache"
+cmake --build build/ci-official-debug -j1
+ctest --test-dir build/ci-official-debug --output-on-failure
+cmake -S . -B build/ci-official-san \
+  -DCMAKE_EXE_LINKER_FLAGS=-Wl,--thinlto-cache-dir="$PWD/build/phase6-verification/lto-cache"
+cmake --build build/ci-official-san -j1
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+  UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+  ctest --test-dir build/ci-official-san --output-on-failure
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+  UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+  ctest --test-dir build/ci-official-san --output-on-failure --repeat until-fail:3
+```
+
+| Final configuration | Result | CTest wall time |
+|---|---|---|
+| Installed LLVM 19.1.7 Debug | 12/12 passed | 39.59 s |
+| Installed LLVM 19.1.7 Release | 12/12 passed | 30.07 s |
+| Installed LLVM 19.1.7 ASan/UBSan, RTTI enabled | 12/12 passed | 75.04 s |
+| Complete official LLVM 19.1.7 Debug | 12/12 passed | 26.69 s |
+| Complete official LLVM 19.1.7 Release | 12/12 passed | 24.33 s |
+| Complete official LLVM 19.1.7 ASan/UBSan, RTTI disabled | 12/12 passed | 47.89 s |
+| Installed sanitizer repeats | Six suites × three, all 18 passed | 162.60 s |
+| Official sanitizer repeats | Twelve suites × three, all 36 passed | 144.88 s |
+
+Timings reflect local concurrent work and cache state; they are observations,
+not compiler-performance benchmarks. LeakSanitizer runs outside the desktop
+tracing restriction. The installed SDK retains vptr coverage; the official no-RTTI
+SDK cannot provide that check. Both retain supported UBSan checks, ASan, leak
+detection, fatal report handling and the existing UBSan JIT entry type metadata.
+LLVM itself and generated application instructions remain uninstrumented, as
+explicitly documented before this phase. No sanitizer coverage equivalence is claimed.
+
+Re-executed the seven existing standalone sanitizer fault controls: heap overflow,
+signed overflow and wrong indirect-call type in both RTTI modes, plus invalid
+vptr in RTTI mode. All emitted the expected report and exited 86 under the strict
+combined runtime settings. These reuse the previously compiled control binaries,
+not intentionally faulty VOID programs. The shared sanitizer runtime's exit behavior
+remains the one documented in CI_SANITIZER_ABI.md.
+
+Additional final recovery stress used seed 60019: 300 malformed real numeric files,
+including excessive cast chains, each retained a later independent missing-name
+error, exited 1 within a three-second timeout, and exposed no raw LLVM diagnostic.
+New as nodes count toward the existing expression-size guard. Unknown callees
+still permit independent argument diagnostics; nested constant failures preserve
+their original structured code/span rather than being rewrapped at a parent operator.
+
+Final source/fixture hashes and relevant object timestamps were checked in all six
+directories, so stale intermediate builds are not counted. Final logs were scanned
+for sanitizer reports, LLVM errors/backtraces and project warnings; none were found.
+Only the already documented GCC 16/LLVM ciso646 deprecation warning remains.
+Local Markdown links and git diff whitespace checks passed. Evidence is retained
+under ignored `build/phase6-verification/`: final configuration/build/test/repeat
+logs, toolchain information, source manifest, independent oracle/regeneration,
+recovery cases, cast failure trace and source/native demonstration.
+
+### Remaining limitations and next phase
+
+NUMERIC_TYPES.md documents deferred exponent/base/separator literal spellings,
+float remainder, nullable as?, platform-sized aliases, numeric hashing/formatting,
+foreign floating-control-state management and arbitrary public native entry ABIs.
+The current CLI remains i32(i32), bool remains separate, and no managed/runtime
+systems were expanded. No numeric family members are deferred.
+
+The existing workflow automatically includes both new suites on Linux, Windows
+and macOS. Phase 6 still requires a new user-published Actions run for actual
+hosted Debug/Release on all platforms and Linux sanitizers. Local Linux results
+cannot substitute for Windows/macOS executable verification. No hosted Phase 6
+success is claimed. No commit, push, branch change, publication or remote mutation
+was performed. Recommended next cohesive phase: validated analysis/dependency
+APIs and compatibility metadata before incremental tooling; managed types still
+require their separate GC root/thread integration gate.

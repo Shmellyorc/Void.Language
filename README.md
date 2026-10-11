@@ -3,7 +3,8 @@
 VOID 2.0 is a new language, independent of the earlier C#-compatible VOIDC.
 This repository now compiles graphs of actual `.void` files through one frontend, typed
 semantic model, backend-independent IR, and shared LLVM 19.1.7 AOT/JIT lowering.
-The initial subset supports typed functions, i32/bool expressions, local variables,
+The implemented subset supports typed functions, all ten exact-width numeric types,
+contextual literals, checked numeric `as`, bool expressions, local variables,
 conditionals, `for` loops, readonly/compile-time constants, and source-first
 compile/runtime diagnostics. Compile-time errors now include stable codes, ranges,
 related declarations and recovery across independent errors. Experimental GC, leased function
@@ -69,15 +70,33 @@ exits with status 2. The compiler does not launch a shell or linker itself.
 
 `run` and the AOT executable accept one optional decimal i32 input, defaulting to
 zero. They require `func entry(value: i32) -> i32`; internal functions can use
-multiple typed parameters, bool results, or no result. `check` accepts library
+multiple typed parameters, any supported numeric/bool result, or no result. `check` accepts library
 files without an entry. Append `--no-opt` to `run` or `emit` to disable LLVM O2.
 Try [loops](examples/loops.void) and [recursive functions](examples/functions.void).
 
 The older `--jit-proof` and `--emit-proof OBJECT` commands intentionally retain
 their hand-built IR architecture harness. Their AOT adapter derives its input
 from argument count; it is separate from the working source commands above.
-The ten CTest suites preserve those native, GC and hot-reload proofs and add
+The twelve CTest suites preserve those native, GC and hot-reload proofs and add
 frontend diagnostics and real source JIT/AOT integration tests.
+
+## Numeric source compilation
+
+All `i8/i16/i32/i64`, `u8/u16/u32/u64`, `f32/f64` types work through the same source
+pipeline. Integer arithmetic wraps; numeric `as` is checked. Existing typed values
+require explicit conversion, while compatible literals receive their expected type.
+See [the approved numeric contract](docs/NUMERIC_TYPES.md).
+
+```sh
+build/debug/voidc run examples/numeric_types/main.void 10  # 52
+build/debug/voidc emit examples/numeric_types/main.void -o build/debug/numeric-types.o
+clang-19 build/debug/numeric-types.o -o build/debug/numeric-types
+build/debug/numeric-types 10                            # 52
+```
+
+This example uses imported i64 functions, f32/f64 literals and calls, u64 wrapping,
+and a checked i64-to-i32 result. These are parsed `.void` programs, distinct from
+the older hand-built IR proofs. The CLI entry adapter remains i32(i32).
 
 ## Multi-file programs
 

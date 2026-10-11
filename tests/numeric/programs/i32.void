@@ -1,0 +1,102 @@
+const folded_0: i32 = (2147483647) + (1)
+const folded_1: i32 = (-2147483648) - (1)
+const folded_2: i32 = (2147483647) * (3)
+const folded_3: i32 = (-2147483648) * (-1)
+const folded_4: i32 = (7) / (3)
+const folded_5: i32 = (7) % (3)
+const folded_6: i32 = (2147483647) / (3)
+const folded_7: i32 = (2147483647) % (3)
+const folded_8: i32 = (-2147483648) / (-1)
+const folded_9: i32 = (-2147483648) % (-1)
+const folded_10: i32 = (-7) / (3)
+const folded_11: i32 = (-7) % (3)
+const folded_12: i32 = (7) / (-3)
+const folded_13: i32 = (7) % (-3)
+
+func compute_0(a: i32, b: i32) -> i32:
+    return a + b
+
+func compute_1(a: i32, b: i32) -> i32:
+    return a - b
+
+func compute_2(a: i32, b: i32) -> i32:
+    return a * b
+
+func compute_3(a: i32, b: i32) -> i32:
+    return a * b
+
+func compute_4(a: i32, b: i32) -> i32:
+    return a / b
+
+func compute_5(a: i32, b: i32) -> i32:
+    return a % b
+
+func compute_6(a: i32, b: i32) -> i32:
+    return a / b
+
+func compute_7(a: i32, b: i32) -> i32:
+    return a % b
+
+func compute_8(a: i32, b: i32) -> i32:
+    return a / b
+
+func compute_9(a: i32, b: i32) -> i32:
+    return a % b
+
+func compute_10(a: i32, b: i32) -> i32:
+    return a / b
+
+func compute_11(a: i32, b: i32) -> i32:
+    return a % b
+
+func compute_12(a: i32, b: i32) -> i32:
+    return a / b
+
+func compute_13(a: i32, b: i32) -> i32:
+    return a % b
+
+func entry(value: i32) -> i32:
+    var seed: i32 = value as i32
+    if folded_0 != -2147483648 or compute_0((2147483647) + seed - seed, 1) != -2147483648:
+        return 2
+    if folded_1 != 2147483647 or compute_1((-2147483648) + seed - seed, 1) != 2147483647:
+        return 3
+    if folded_2 != 2147483645 or compute_2((2147483647) + seed - seed, 3) != 2147483645:
+        return 4
+    if folded_3 != -2147483648 or compute_3((-2147483648) + seed - seed, -1) != -2147483648:
+        return 5
+    if folded_4 != 2 or compute_4((7) + seed - seed, 3) != 2:
+        return 6
+    if folded_5 != 1 or compute_5((7) + seed - seed, 3) != 1:
+        return 7
+    if folded_6 != 715827882 or compute_6((2147483647) + seed - seed, 3) != 715827882:
+        return 8
+    if folded_7 != 1 or compute_7((2147483647) + seed - seed, 3) != 1:
+        return 9
+    if folded_8 != -2147483648 or compute_8((-2147483648) + seed - seed, -1) != -2147483648:
+        return 10
+    if folded_9 != 0 or compute_9((-2147483648) + seed - seed, -1) != 0:
+        return 11
+    if folded_10 != -2 or compute_10((-7) + seed - seed, 3) != -2:
+        return 12
+    if folded_11 != -1 or compute_11((-7) + seed - seed, 3) != -1:
+        return 13
+    if folded_12 != -2 or compute_12((7) + seed - seed, -3) != -2:
+        return 14
+    if folded_13 != 1 or compute_13((7) + seed - seed, -3) != 1:
+        return 15
+    var default_value: i32
+    if default_value != 0:
+        return 99
+    var counter: i32 = 0
+    for counter < 3:
+        counter++
+    counter *= 2
+    counter /= 3
+    counter %= 2
+    if counter != 0:
+        return 98
+    var negated: i32 = -seed
+    if negated + seed != 0:
+        return 97
+    return 1

@@ -1,0 +1,28 @@
+func calculate_i8(value: i8) -> i8:
+    return (value * 7 + 127) / 3 % 11
+
+func calculate_i16(value: i16) -> i16:
+    return (value * 7 + 32767) / 3 % 11
+
+func calculate_i32(value: i32) -> i32:
+    return (value * 7 + 2147483647) / 3 % 11
+
+func calculate_i64(value: i64) -> i64:
+    return (value * 7 + 9223372036854775807) / 3 % 11
+
+func calculate_u8(value: u8) -> u8:
+    return (value * 7 + 255) / 3 % 11
+
+func calculate_u16(value: u16) -> u16:
+    return (value * 7 + 65535) / 3 % 11
+
+func calculate_u32(value: u32) -> u32:
+    return (value * 7 + 4294967295) / 3 % 11
+
+func calculate_u64(value: u64) -> u64:
+    return (value * 7 + 18446744073709551615) / 3 % 11
+
+func floating(value: f32, wide: f64) -> i32:
+    return ((value + 0.5) * 3) as i32 + ((wide + 0.25) * 4) as i32
+func entry(value: i32) -> i32:
+    return (calculate_i8(value as i8) as i32) + (calculate_i16(value as i16) as i32) + (calculate_i32(value as i32) as i32) + (calculate_i64(value as i64) as i32) + (calculate_u8(value as u8) as i32) + (calculate_u16(value as u16) as i32) + (calculate_u32(value as u32) as i32) + (calculate_u64(value as u64) as i32) + floating(value as f32, value as f64)

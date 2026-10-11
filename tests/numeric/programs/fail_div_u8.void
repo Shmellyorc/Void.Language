@@ -1,0 +1,6 @@
+func divide(x: u8, y: u8) -> u8:
+    return x / y
+
+func entry(value: i32) -> i32:
+    var result = divide(7, value as u8)
+    return 99

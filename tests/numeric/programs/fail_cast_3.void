@@ -1,0 +1,6 @@
+func convert(x: f64) -> i32:
+    return x as i32
+
+func entry(value: i32) -> i32:
+    var result: i32 = convert(0.0 / 0.0)
+    return 99

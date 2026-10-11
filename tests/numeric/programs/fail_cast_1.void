@@ -1,0 +1,6 @@
+func convert(x: i64) -> u64:
+    return x as u64
+
+func entry(value: i32) -> i32:
+    var result: u64 = convert(-1)
+    return 99

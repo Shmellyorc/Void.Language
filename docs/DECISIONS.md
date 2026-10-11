@@ -335,3 +335,38 @@ sanitizer validation; do not claim these configurations have identical coverage.
 CI_SANITIZER_ABI.md records the actual logs, archive bitcode, isolated reproduction
 and coverage evidence. Any hosted vptr lane needs a complete RTTI-enabled 19.1.7
 SDK. No frontend changes belong in this CI correction.
+
+## Phase 6 numeric policy and implementation, 11 October 2026
+
+The user reports Phase 5 commit `4f3688d` passed hosted run #8 on all platforms.
+Before implementation, the user approved the complete numeric policy table,
+including all ten exact-width types, modulo integer arithmetic, IEEE ordinary
+floating arithmetic, contextual literal construction, identity-only implicit
+conversion of existing values, and explicit checked numeric as. NUMERIC_TYPES.md
+records the approved contract; the Language Bible is unchanged.
+
+Extend the existing parser/semantic AST, typed IR and single LLVM lowering.
+Public IR constants use 64-bit bit patterns and explicit conversion/negation ops.
+A small software numeric kernel privately uses LLVM Support APInt/APFloat for
+arbitrary-precision parsing and exact declared-precision constant operations.
+This adds a narrow Support dependency to void_core, superseding the earlier
+implementation statement that the core has no LLVM dependency. Public frontend
+and IR APIs remain LLVM-free; LLVM never defines the language rules. No second
+source evaluator or code generator is added. Shared operation/type helpers are
+used by semantic analysis and independent IR validation.
+
+Runtime casts guard ranges/NaN/infinity before FPToSI/UI or narrowing integer
+conversion. Float-to-integer checks use representable original-value bounds,
+accounting for truncation at signed minima; no native trunc/truncf library or new
+runtime subsystem is required. Signed MIN/-1 uses a safe divisor selection before
+division. Negation uses FNeg for floating signed-zero correctness. Keep the existing
+failure context, exact const restart tokens, generation ownership, CLI entry ABI,
+SDK RTTI flags, sanitizer checks and all prior suite assertions.
+
+Numeric fixtures use independent unlimited-precision integer calculations and
+IEEE neighbor boundaries. Runtime-input checks supplement constant comparisons;
+normal/O2 JIT and native AOT use the same files. Existing tests that previously
+rejected all floats now reject malformed float suffixes and unsupported string
+types, preserving their negative-test purpose while admitting the approved feature.
+No unrelated grammar, nullable casts, managed types or public native ABI is added.
+See WORK_LOG.md for actual verification and remaining hosted requirements.

@@ -1,0 +1,56 @@
+const rounded: f32 = 16777216.0 + 1
+const precise: f64 = 16777216.0 + 1
+const decimal: f64 = 0.1
+const subnormal: f32 = 0.00000000000000000000000000000000000000000000140129846432481707092372958328991613128026194187651577175706828388979108268586060148663818836212158203125
+const tiny: f32 = 0.0000000000000000000000000000000000000000000000000000000000000000001
+const negative_integer_zero: f64 = -0
+const negative_zero: f64 = -0.0
+const positive_inf: f64 = 1.0 / 0.0
+const negative_inf: f64 = 1.0 / negative_zero
+const nan: f64 = 0.0 / 0.0
+const cast_fraction: i32 = -3.9d as i32
+const cast_negative_fraction: u64 = -0.9d as u64
+func arithmetic(a: f32, b: f32) -> f32:
+    return a + b
+func wide(a: f64, b: f64) -> f64:
+    return a + b
+func unfused(a: f32, b: f32) -> f32:
+    return a * b - 1
+func rounded_each_step(a: f32) -> f32:
+    return (a + 1) - a
+func entry(value: i32) -> i32:
+    var seed = value as f32
+    var large: f32 = 16777216
+    large += seed
+    large -= seed
+    if arithmetic(large, 1) != rounded or rounded != 16777216:
+        return 2
+    if wide(16777216, 1) != precise or precise != 16777217:
+        return 3
+    var zero: f64 = value as f64
+    zero *= 0
+    var dynamic_nan: f64 = zero / zero
+    var dynamic_inf: f64 = 1.0 / zero
+    var dynamic_negative_zero: f64 = -zero
+    if nan == nan or nan < 0 or nan <= 0 or nan > 0 or nan >= 0:
+        return 4
+    if not dynamic_nan != dynamic_nan or not dynamic_inf == positive_inf:
+        return 5
+    if negative_zero != zero or 1.0 / dynamic_negative_zero != negative_inf or 1.0 / negative_integer_zero != negative_inf:
+        return 6
+    if subnormal <= 0 or subnormal * 1 != subnormal or tiny != 0:
+        return 7
+    if cast_fraction != -3 or cast_negative_fraction != 0:
+        return 8
+    var truncated: i32 = (-3.9d + zero) as i32
+    var narrowed: f32 = (9.81d + zero) as f32
+    if truncated != -3 or narrowed != 9.81f or decimal == (0.1f as f64):
+        return 9
+    if unfused(1.00000011920928955078125, 0.99999988079071044921875) != 0:
+        return 10
+    if rounded_each_step(16777216) != 0:
+        return 11
+    var dynamic_subnormal: f32 = subnormal + (value as f32) * 0
+    if dynamic_subnormal * 1 != subnormal:
+        return 12
+    return 1

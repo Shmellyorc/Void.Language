@@ -1,0 +1,6 @@
+func convert(x: f64) -> f32:
+    return x as f32
+
+func entry(value: i32) -> i32:
+    var result: f32 = convert(999999999999999999999999999999999999999999999999999999999999999999.0)
+    return 99

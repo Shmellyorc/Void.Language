@@ -1,0 +1,78 @@
+const folded_0: u8 = (255) + (1)
+const folded_1: u8 = (0) - (1)
+const folded_2: u8 = (255) * (3)
+const folded_3: u8 = (0) * (255)
+const folded_4: u8 = (7) / (3)
+const folded_5: u8 = (7) % (3)
+const folded_6: u8 = (255) / (3)
+const folded_7: u8 = (255) % (3)
+const folded_8: u8 = (255) + (255)
+const folded_9: u8 = (0) - (255)
+
+func compute_0(a: u8, b: u8) -> u8:
+    return a + b
+
+func compute_1(a: u8, b: u8) -> u8:
+    return a - b
+
+func compute_2(a: u8, b: u8) -> u8:
+    return a * b
+
+func compute_3(a: u8, b: u8) -> u8:
+    return a * b
+
+func compute_4(a: u8, b: u8) -> u8:
+    return a / b
+
+func compute_5(a: u8, b: u8) -> u8:
+    return a % b
+
+func compute_6(a: u8, b: u8) -> u8:
+    return a / b
+
+func compute_7(a: u8, b: u8) -> u8:
+    return a % b
+
+func compute_8(a: u8, b: u8) -> u8:
+    return a + b
+
+func compute_9(a: u8, b: u8) -> u8:
+    return a - b
+
+func entry(value: i32) -> i32:
+    var seed: u8 = value as u8
+    if folded_0 != 0 or compute_0((255) + seed - seed, 1) != 0:
+        return 2
+    if folded_1 != 255 or compute_1((0) + seed - seed, 1) != 255:
+        return 3
+    if folded_2 != 253 or compute_2((255) + seed - seed, 3) != 253:
+        return 4
+    if folded_3 != 0 or compute_3((0) + seed - seed, 255) != 0:
+        return 5
+    if folded_4 != 2 or compute_4((7) + seed - seed, 3) != 2:
+        return 6
+    if folded_5 != 1 or compute_5((7) + seed - seed, 3) != 1:
+        return 7
+    if folded_6 != 85 or compute_6((255) + seed - seed, 3) != 85:
+        return 8
+    if folded_7 != 0 or compute_7((255) + seed - seed, 3) != 0:
+        return 9
+    if folded_8 != 254 or compute_8((255) + seed - seed, 255) != 254:
+        return 10
+    if folded_9 != 1 or compute_9((0) + seed - seed, 255) != 1:
+        return 11
+    var default_value: u8
+    if default_value != 0:
+        return 99
+    var counter: u8 = 0
+    for counter < 3:
+        counter++
+    counter *= 2
+    counter /= 3
+    counter %= 2
+    if counter != 0:
+        return 98
+    var negated: u8 = -seed
+    if negated + seed != 0:
+        return 97
+    return 1

@@ -1,0 +1,5 @@
+func convert(value: f32) -> u16:
+    return value as u16
+func entry(value: i32) -> i32:
+    var result = convert(65536.0)
+    return 99

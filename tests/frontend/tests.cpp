@@ -64,8 +64,8 @@ void diagnostics() {
     rejects("func f():\n    var x = 999999999999999999999999999\n", "too large");
     rejects("func f():\n    var x = 1 / 0\n", "by zero");
     rejects("func f():\n    var x = 1\n    x %= 0\n", "by zero");
-    rejects("func f():\n    var x = 1.5\n", "Unsupported numeric literal");
-    rejects("func f(x: f32):\n    return\n", "Unsupported type");
+    rejects("func f():\n    var x = 1.5q\n", "Unsupported numeric literal");
+    rejects("func f(x: string):\n    return\n", "Unsupported type");
     rejects("func f():\n    if true:\n        var local = 1\n    var value = local\n", "Unknown identifier");
     rejects("func f():\n    var x = 0\n    var y = x++\n", "end of statement");
     rejects("func f():\n    var x = 0\n    ++x\n", "Expected an expression");

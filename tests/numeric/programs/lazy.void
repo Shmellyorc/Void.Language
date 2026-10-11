@@ -1,0 +1,8 @@
+const skipped = false and (300 as i8) == 0
+const skipped_float = true or ((0.0 / 0.0) as i32) == 0
+func entry(value: i32) -> i32:
+    if false and (300 as i8) == 0:
+        return 2
+    if skipped or not skipped_float:
+        return 3
+    return 1

@@ -1,0 +1,10 @@
+const precise: f64 = 0.1
+const unsigned_max: u64 = 18446744073709551615
+func narrow(value: i32) -> i8:
+    return value as i8
+func precise_add(value: f64, increment: f64) -> f64:
+    return value + increment
+func contextual() -> i64:
+    return 2147483647 + 1
+func accepts(value: f32) -> f32:
+    return value

@@ -1,0 +1,6 @@
+func convert(x: f64) -> u64:
+    return x as u64
+
+func entry(value: i32) -> i32:
+    var result: u64 = convert(18446744073709551616.0)
+    return 99

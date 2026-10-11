@@ -1,0 +1,387 @@
+const folded_0: i8 = (-128.0 as f32) as i8
+const folded_1: i8 = (127.99999237060546875 as f32) as i8
+const folded_2: i8 = (-0.75 as f32) as i8
+const folded_3: i8 = (-128.0 as f32) as i8
+const folded_4: i16 = (-32768.0 as f32) as i16
+const folded_5: i16 = (32767.998046875 as f32) as i16
+const folded_6: i16 = (-0.75 as f32) as i16
+const folded_7: i16 = (-32768.0 as f32) as i16
+const folded_8: i32 = (-2147483648.0 as f32) as i32
+const folded_9: i32 = (2147483520.0 as f32) as i32
+const folded_10: i32 = (-0.75 as f32) as i32
+const folded_11: i32 = (-2147483648.0 as f32) as i32
+const folded_12: i64 = (-9223372036854775808.0 as f32) as i64
+const folded_13: i64 = (9223371487098961920.0 as f32) as i64
+const folded_14: i64 = (-0.75 as f32) as i64
+const folded_15: i64 = (-9223372036854775808.0 as f32) as i64
+const folded_16: u8 = (0.0 as f32) as u8
+const folded_17: u8 = (255.9999847412109375 as f32) as u8
+const folded_18: u8 = (-0.75 as f32) as u8
+const folded_19: u8 = (0.0 as f32) as u8
+const folded_20: u16 = (0.0 as f32) as u16
+const folded_21: u16 = (65535.99609375 as f32) as u16
+const folded_22: u16 = (-0.75 as f32) as u16
+const folded_23: u16 = (0.0 as f32) as u16
+const folded_24: u32 = (0.0 as f32) as u32
+const folded_25: u32 = (4294967040.0 as f32) as u32
+const folded_26: u32 = (-0.75 as f32) as u32
+const folded_27: u32 = (0.0 as f32) as u32
+const folded_28: u64 = (0.0 as f32) as u64
+const folded_29: u64 = (18446742974197923840.0 as f32) as u64
+const folded_30: u64 = (-0.75 as f32) as u64
+const folded_31: u64 = (0.0 as f32) as u64
+const folded_32: i8 = (-128.0 as f64) as i8
+const folded_33: i8 = (127.9999999999999857891452847979962825775146484375 as f64) as i8
+const folded_34: i8 = (-0.75 as f64) as i8
+const folded_35: i8 = (-128.5 as f64) as i8
+const folded_36: i16 = (-32768.0 as f64) as i16
+const folded_37: i16 = (32767.99999999999636202119290828704833984375 as f64) as i16
+const folded_38: i16 = (-0.75 as f64) as i16
+const folded_39: i16 = (-32768.5 as f64) as i16
+const folded_40: i32 = (-2147483648.0 as f64) as i32
+const folded_41: i32 = (2147483647.9999997615814208984375 as f64) as i32
+const folded_42: i32 = (-0.75 as f64) as i32
+const folded_43: i32 = (-2147483648.5 as f64) as i32
+const folded_44: i64 = (-9223372036854775808.0 as f64) as i64
+const folded_45: i64 = (9223372036854774784.0 as f64) as i64
+const folded_46: i64 = (-0.75 as f64) as i64
+const folded_47: i64 = (-9223372036854775808.0 as f64) as i64
+const folded_48: u8 = (0.0 as f64) as u8
+const folded_49: u8 = (255.999999999999971578290569595992565155029296875 as f64) as u8
+const folded_50: u8 = (-0.75 as f64) as u8
+const folded_51: u8 = (0.0 as f64) as u8
+const folded_52: u16 = (0.0 as f64) as u16
+const folded_53: u16 = (65535.9999999999927240423858165740966796875 as f64) as u16
+const folded_54: u16 = (-0.75 as f64) as u16
+const folded_55: u16 = (0.0 as f64) as u16
+const folded_56: u32 = (0.0 as f64) as u32
+const folded_57: u32 = (4294967295.999999523162841796875 as f64) as u32
+const folded_58: u32 = (-0.75 as f64) as u32
+const folded_59: u32 = (0.0 as f64) as u32
+const folded_60: u64 = (0.0 as f64) as u64
+const folded_61: u64 = (18446744073709549568.0 as f64) as u64
+const folded_62: u64 = (-0.75 as f64) as u64
+const folded_63: u64 = (0.0 as f64) as u64
+
+func convert_0(value: f32) -> i8:
+    return value as i8
+
+func convert_1(value: f32) -> i8:
+    return value as i8
+
+func convert_2(value: f32) -> i8:
+    return value as i8
+
+func convert_3(value: f32) -> i8:
+    return value as i8
+
+func convert_4(value: f32) -> i16:
+    return value as i16
+
+func convert_5(value: f32) -> i16:
+    return value as i16
+
+func convert_6(value: f32) -> i16:
+    return value as i16
+
+func convert_7(value: f32) -> i16:
+    return value as i16
+
+func convert_8(value: f32) -> i32:
+    return value as i32
+
+func convert_9(value: f32) -> i32:
+    return value as i32
+
+func convert_10(value: f32) -> i32:
+    return value as i32
+
+func convert_11(value: f32) -> i32:
+    return value as i32
+
+func convert_12(value: f32) -> i64:
+    return value as i64
+
+func convert_13(value: f32) -> i64:
+    return value as i64
+
+func convert_14(value: f32) -> i64:
+    return value as i64
+
+func convert_15(value: f32) -> i64:
+    return value as i64
+
+func convert_16(value: f32) -> u8:
+    return value as u8
+
+func convert_17(value: f32) -> u8:
+    return value as u8
+
+func convert_18(value: f32) -> u8:
+    return value as u8
+
+func convert_19(value: f32) -> u8:
+    return value as u8
+
+func convert_20(value: f32) -> u16:
+    return value as u16
+
+func convert_21(value: f32) -> u16:
+    return value as u16
+
+func convert_22(value: f32) -> u16:
+    return value as u16
+
+func convert_23(value: f32) -> u16:
+    return value as u16
+
+func convert_24(value: f32) -> u32:
+    return value as u32
+
+func convert_25(value: f32) -> u32:
+    return value as u32
+
+func convert_26(value: f32) -> u32:
+    return value as u32
+
+func convert_27(value: f32) -> u32:
+    return value as u32
+
+func convert_28(value: f32) -> u64:
+    return value as u64
+
+func convert_29(value: f32) -> u64:
+    return value as u64
+
+func convert_30(value: f32) -> u64:
+    return value as u64
+
+func convert_31(value: f32) -> u64:
+    return value as u64
+
+func convert_32(value: f64) -> i8:
+    return value as i8
+
+func convert_33(value: f64) -> i8:
+    return value as i8
+
+func convert_34(value: f64) -> i8:
+    return value as i8
+
+func convert_35(value: f64) -> i8:
+    return value as i8
+
+func convert_36(value: f64) -> i16:
+    return value as i16
+
+func convert_37(value: f64) -> i16:
+    return value as i16
+
+func convert_38(value: f64) -> i16:
+    return value as i16
+
+func convert_39(value: f64) -> i16:
+    return value as i16
+
+func convert_40(value: f64) -> i32:
+    return value as i32
+
+func convert_41(value: f64) -> i32:
+    return value as i32
+
+func convert_42(value: f64) -> i32:
+    return value as i32
+
+func convert_43(value: f64) -> i32:
+    return value as i32
+
+func convert_44(value: f64) -> i64:
+    return value as i64
+
+func convert_45(value: f64) -> i64:
+    return value as i64
+
+func convert_46(value: f64) -> i64:
+    return value as i64
+
+func convert_47(value: f64) -> i64:
+    return value as i64
+
+func convert_48(value: f64) -> u8:
+    return value as u8
+
+func convert_49(value: f64) -> u8:
+    return value as u8
+
+func convert_50(value: f64) -> u8:
+    return value as u8
+
+func convert_51(value: f64) -> u8:
+    return value as u8
+
+func convert_52(value: f64) -> u16:
+    return value as u16
+
+func convert_53(value: f64) -> u16:
+    return value as u16
+
+func convert_54(value: f64) -> u16:
+    return value as u16
+
+func convert_55(value: f64) -> u16:
+    return value as u16
+
+func convert_56(value: f64) -> u32:
+    return value as u32
+
+func convert_57(value: f64) -> u32:
+    return value as u32
+
+func convert_58(value: f64) -> u32:
+    return value as u32
+
+func convert_59(value: f64) -> u32:
+    return value as u32
+
+func convert_60(value: f64) -> u64:
+    return value as u64
+
+func convert_61(value: f64) -> u64:
+    return value as u64
+
+func convert_62(value: f64) -> u64:
+    return value as u64
+
+func convert_63(value: f64) -> u64:
+    return value as u64
+
+func entry(value: i32) -> i32:
+    if convert_0(-128.0) != -128 or folded_0 != -128:
+        return 2
+    if convert_1(127.99999237060546875) != 127 or folded_1 != 127:
+        return 3
+    if convert_2(-0.75) != 0 or folded_2 != 0:
+        return 4
+    if convert_3(-128.0) != -128 or folded_3 != -128:
+        return 5
+    if convert_4(-32768.0) != -32768 or folded_4 != -32768:
+        return 6
+    if convert_5(32767.998046875) != 32767 or folded_5 != 32767:
+        return 7
+    if convert_6(-0.75) != 0 or folded_6 != 0:
+        return 8
+    if convert_7(-32768.0) != -32768 or folded_7 != -32768:
+        return 9
+    if convert_8(-2147483648.0) != -2147483648 or folded_8 != -2147483648:
+        return 10
+    if convert_9(2147483520.0) != 2147483520 or folded_9 != 2147483520:
+        return 11
+    if convert_10(-0.75) != 0 or folded_10 != 0:
+        return 12
+    if convert_11(-2147483648.0) != -2147483648 or folded_11 != -2147483648:
+        return 13
+    if convert_12(-9223372036854775808.0) != -9223372036854775808 or folded_12 != -9223372036854775808:
+        return 14
+    if convert_13(9223371487098961920.0) != 9223371487098961920 or folded_13 != 9223371487098961920:
+        return 15
+    if convert_14(-0.75) != 0 or folded_14 != 0:
+        return 16
+    if convert_15(-9223372036854775808.0) != -9223372036854775808 or folded_15 != -9223372036854775808:
+        return 17
+    if convert_16(0.0) != 0 or folded_16 != 0:
+        return 18
+    if convert_17(255.9999847412109375) != 255 or folded_17 != 255:
+        return 19
+    if convert_18(-0.75) != 0 or folded_18 != 0:
+        return 20
+    if convert_19(0.0) != 0 or folded_19 != 0:
+        return 21
+    if convert_20(0.0) != 0 or folded_20 != 0:
+        return 22
+    if convert_21(65535.99609375) != 65535 or folded_21 != 65535:
+        return 23
+    if convert_22(-0.75) != 0 or folded_22 != 0:
+        return 24
+    if convert_23(0.0) != 0 or folded_23 != 0:
+        return 25
+    if convert_24(0.0) != 0 or folded_24 != 0:
+        return 26
+    if convert_25(4294967040.0) != 4294967040 or folded_25 != 4294967040:
+        return 27
+    if convert_26(-0.75) != 0 or folded_26 != 0:
+        return 28
+    if convert_27(0.0) != 0 or folded_27 != 0:
+        return 29
+    if convert_28(0.0) != 0 or folded_28 != 0:
+        return 30
+    if convert_29(18446742974197923840.0) != 18446742974197923840 or folded_29 != 18446742974197923840:
+        return 31
+    if convert_30(-0.75) != 0 or folded_30 != 0:
+        return 32
+    if convert_31(0.0) != 0 or folded_31 != 0:
+        return 33
+    if convert_32(-128.0) != -128 or folded_32 != -128:
+        return 34
+    if convert_33(127.9999999999999857891452847979962825775146484375) != 127 or folded_33 != 127:
+        return 35
+    if convert_34(-0.75) != 0 or folded_34 != 0:
+        return 36
+    if convert_35(-128.5) != -128 or folded_35 != -128:
+        return 37
+    if convert_36(-32768.0) != -32768 or folded_36 != -32768:
+        return 38
+    if convert_37(32767.99999999999636202119290828704833984375) != 32767 or folded_37 != 32767:
+        return 39
+    if convert_38(-0.75) != 0 or folded_38 != 0:
+        return 40
+    if convert_39(-32768.5) != -32768 or folded_39 != -32768:
+        return 41
+    if convert_40(-2147483648.0) != -2147483648 or folded_40 != -2147483648:
+        return 42
+    if convert_41(2147483647.9999997615814208984375) != 2147483647 or folded_41 != 2147483647:
+        return 43
+    if convert_42(-0.75) != 0 or folded_42 != 0:
+        return 44
+    if convert_43(-2147483648.5) != -2147483648 or folded_43 != -2147483648:
+        return 45
+    if convert_44(-9223372036854775808.0) != -9223372036854775808 or folded_44 != -9223372036854775808:
+        return 46
+    if convert_45(9223372036854774784.0) != 9223372036854774784 or folded_45 != 9223372036854774784:
+        return 47
+    if convert_46(-0.75) != 0 or folded_46 != 0:
+        return 48
+    if convert_47(-9223372036854775808.0) != -9223372036854775808 or folded_47 != -9223372036854775808:
+        return 49
+    if convert_48(0.0) != 0 or folded_48 != 0:
+        return 50
+    if convert_49(255.999999999999971578290569595992565155029296875) != 255 or folded_49 != 255:
+        return 51
+    if convert_50(-0.75) != 0 or folded_50 != 0:
+        return 52
+    if convert_51(0.0) != 0 or folded_51 != 0:
+        return 53
+    if convert_52(0.0) != 0 or folded_52 != 0:
+        return 54
+    if convert_53(65535.9999999999927240423858165740966796875) != 65535 or folded_53 != 65535:
+        return 55
+    if convert_54(-0.75) != 0 or folded_54 != 0:
+        return 56
+    if convert_55(0.0) != 0 or folded_55 != 0:
+        return 57
+    if convert_56(0.0) != 0 or folded_56 != 0:
+        return 58
+    if convert_57(4294967295.999999523162841796875) != 4294967295 or folded_57 != 4294967295:
+        return 59
+    if convert_58(-0.75) != 0 or folded_58 != 0:
+        return 60
+    if convert_59(0.0) != 0 or folded_59 != 0:
+        return 61
+    if convert_60(0.0) != 0 or folded_60 != 0:
+        return 62
+    if convert_61(18446744073709549568.0) != 18446744073709549568 or folded_61 != 18446744073709549568:
+        return 63
+    if convert_62(-0.75) != 0 or folded_62 != 0:
+        return 64
+    if convert_63(0.0) != 0 or folded_63 != 0:
+        return 65
+    return 1

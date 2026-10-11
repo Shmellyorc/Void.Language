@@ -77,6 +77,9 @@ are implemented.
 | VOID2012 | Structural constant dependency cycle |
 | VOID2013 | Known division/remainder by zero |
 | VOID2014 | Integer literal magnitude outside the supported range |
+| VOID2015 | Invalid checked numeric conversion |
+| VOID2016 | Illegal numeric operator |
+| VOID2017 | Floating literal range or exact-representability failure |
 | VOID3001 | Invalid/unsupported/nonportable VFS import path or identity |
 | VOID3002 | Source/import file discovery, reading or directory access failure |
 | VOID3003 | Private/inaccessible export or unresolved qualifier |
@@ -226,3 +229,15 @@ Next: design precise validated source/dependency compatibility and a successful
 analysis-result interface before incremental IDE integration. Do not build a second
 parser/type checker. Contextual literals/conversion rules still need approval
 before numeric expansion; managed types still require the GC/root/thread gate.
+
+## Phase 6 numeric extension
+
+The approved contract in NUMERIC_TYPES.md extends the same collector/recovery path.
+VOID2014 retains integer literal range errors. Added VOID2015 for checked numeric
+conversion failures, VOID2016 for illegal numeric operators (including floating
+remainder), and VOID2017 for floating literal overflow/exact-representability
+failures. VOID2001 still reports mismatched existing types and suffix/context
+conflicts. Numeric snapshots/ranges, deterministic ordering and multiple independent
+errors are tested; context probing does not hide errors in sibling operands.
+Checked numeric runtime failures use the existing source/caller failure boundary.
+No LLVM poison-producing conversion is reached before its guards.

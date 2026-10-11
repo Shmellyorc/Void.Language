@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <thread>
 #include <vector>
+void numeric_tests(const std::filesystem::path& root);
 void frontend_tests(const std::filesystem::path& root);
 void module_tests(const std::filesystem::path& output);
 namespace {
@@ -263,7 +264,8 @@ int main(int argc, char** argv) {
     try {
         if (argc < 2) throw std::runtime_error("test suite required");
         std::string suite = argv[1];
-        if (suite == "frontend" && argc == 3) frontend_tests(argv[2]);
+        if (suite == "numeric" && argc == 3) numeric_tests(argv[2]);
+        else if (suite == "frontend" && argc == 3) frontend_tests(argv[2]);
         else if (suite == "modules" && argc == 3) module_tests(argv[2]);
         else if (argc != 2) throw std::runtime_error("unexpected suite arguments");
         else if (suite == "core") core(); else if (suite == "jit") jit();

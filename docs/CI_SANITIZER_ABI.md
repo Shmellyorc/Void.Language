@@ -139,3 +139,11 @@ backtrace or sanitizer report occurred in the positive verification runs.
 The Ubuntu 24.04/GCC 14 runner and Windows/macOS still require a new hosted run
 of this correction after the user commits and pushes. No remote run was started
 or remote repository changed during this investigation.
+
+## Hosted confirmation and Phase 6
+
+The user reports commit `4f3688d` passed Actions run #8 across Linux, Windows and
+macOS. The SDK RTTI correction above remains intact during Phase 6. Numeric
+expansion adds two suites without changing sanitizer flags, report handling or
+coverage claims. Both complete SDK configurations are revalidated locally; see
+WORK_LOG.md. Phase 6 hosted verification still requires a subsequent user push.

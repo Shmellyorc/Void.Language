@@ -4,8 +4,8 @@ Implemented locally on 10 October 2026, using LLVM 19.1.7. LANGUAGE_BIBLE.md
 remains the language-design source of truth; this document describes the working
 subset and explicitly provisional choices. Multi-file compilation is now implemented;
 see [MODULE_SYSTEM.md](MODULE_SYSTEM.md) for current import and ownership rules.
-Earlier foundation-only status in
-historical documents predates this phase.
+Phase 6 updates the numeric subset on 11 October 2026; see NUMERIC_TYPES.md.
+Earlier foundation-only status in historical documents predates source compilation.
 
 ## Working pipeline
 
@@ -48,9 +48,9 @@ func entry(value: i32) -> i32:
   `private`, `public` and `internal` modifiers are supported; see MODULE_SYSTEM.md. Parameters require
   types. Omit the return annotation for no result. Empty `return` or fallthrough
   is valid only for a no-result function. Recursive and forward calls work.
-- Types are `i32` and `bool`. Literals are decimal integers, `true`, and `false`.
-  Literal values must fit i32, including `-2147483648`. No implicit bool/integer
-  conversion occurs. Calls check positional argument counts and exact types.
+- All ten exact-width numeric types plus bool work. Contextual literals and
+  explicit checked numeric `as` follow [NUMERIC_TYPES.md](NUMERIC_TYPES.md).
+  Calls check positional argument counts and exact types after literal adaptation.
 - `var x = expression`, `var x: i32 = expression`, and `var x: i32` work.
   Annotated variables without an initializer default to zero/false. Parameters
   and var locals are mutable. Local readonly const and module compile-time
@@ -60,11 +60,11 @@ func entry(value: i32) -> i32:
 - Assignment `=`, arithmetic compounds `+= -= *= /= %=`, and standalone postfix
   `++`/`--` work. Increment/decrement cannot be used as expression values.
 - Arithmetic uses unary `+`/`-`, `+ - * / %`; comparisons use `< <= > >= == !=`.
-  Equality accepts matching i32 or bool operands; ordering requires i32.
+  Equality accepts matching numeric or bool operands; ordering requires matching numeric types.
 - Boolean operators are `not`, `and`, `or`. `and`/`or` short-circuit at runtime.
   Arguments and binary operands evaluate left to right. From weakest to strongest:
   `or`, `and`, `not`, comparisons, addition/subtraction, multiplication/division/
-  remainder, unary arithmetic. Parentheses override precedence. Comparisons do
+  remainder, numeric `as`, unary arithmetic. Parentheses override precedence. Comparisons do
   not implement chained-comparison semantics; write `a < b and b < c`.
 - `if condition:`, `else if condition:`, and `else:` nest normally. Conditions
   require bool. Every reachable end of a value-returning function needs a return.
@@ -110,20 +110,14 @@ Invalid indentation/tokens, unresolved names, duplicate declarations, argument
 counts, type mismatches, invalid returns and missing return paths are rejected
 before LLVM. Malformed UTF-8 is rejected even in comments.
 
-## Provisional numeric behavior
+## Approved numeric behavior
 
-This slice makes inherited i32 proof arithmetic explicit rather than leaving LLVM
-undefined behavior exposed: addition, subtraction, multiplication and negation
-wrap modulo 2^32. Signed division truncates toward zero, with remainder having
-the dividend's sign. Division is widened to i64 before truncating back to i32;
-`-2147483648 / -1` therefore wraps to `-2147483648` and its remainder is zero.
-A directly literal zero divisor is a source error except on a statically
-short-circuited right operand. Dynamic zero divisors now return structured VOID
-runtime diagnostics; see [VALUE_SEMANTICS.md](VALUE_SEMANTICS.md).
-This is a provisional implementation contract, not a final decision for every
-numeric type, checked arithmetic or release/debug overflow policy. Resolve that
-broader policy before extending numeric types. No Language Bible rule was changed
-to accommodate backend convenience.
+Phase 6 extends the existing i32 wrapping/division contract to the exact-width
+integer family and adds IEEE f32/f64 arithmetic, contextual literals and checked
+numeric casts. See [NUMERIC_TYPES.md](NUMERIC_TYPES.md) for the approved rules,
+shared software arithmetic, LLVM guards, diagnostics and precise remaining limits.
+Integer division guards zero and MIN/-1 before dangerous LLVM operations;
+float division by zero follows IEEE. No Language Bible text was changed.
 
 ## CLI and native executable boundary
 

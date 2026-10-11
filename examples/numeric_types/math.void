@@ -1,0 +1,5 @@
+const wide_bonus: i64 = 2147483648
+func calculate(value: i64) -> i64:
+    return value + wide_bonus + 42
+func scale(value: f64, factor: f64) -> f64:
+    return value * factor

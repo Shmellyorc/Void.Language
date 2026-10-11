@@ -573,3 +573,14 @@ contracts, measured local verification and the pending Phase 5 hosted run.
 Next design precise validated source/dependency compatibility and analysis-result
 APIs before incremental IDE integration. Numeric expansion still needs deliberate
 contextual literal/conversion decisions; managed types still require the GC gate.
+
+### Phase 6 approved numeric language
+
+The user reports Phase 5 commit 4f3688d passed hosted run #8, then approved the
+numeric policy table before implementation. The full ten-type numeric family,
+contextual literals, strict existing-value conversions and checked numeric as
+extend the same compiler pipeline. See NUMERIC_TYPES.md, DECISIONS.md and
+WORK_LOG.md. Preserve the separate GC integration gate and defer nullable casts,
+managed types and arbitrary public ABIs. The next recommended cohesive phase is
+validated analysis/dependency APIs and compatibility metadata for incremental
+tooling. Phase 6 platform claims must come from its own hosted executable runs.

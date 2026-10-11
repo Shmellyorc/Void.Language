@@ -1,0 +1,12 @@
+const maximum: f32 = 340282346638528859811704183484516925440.0
+const rounded: f32 = 340282356779733623858607532500980858880.0d as f32
+func narrow(value: f64) -> f32:
+    return value as f32
+func entry(value: i32) -> i32:
+    if narrow(340282356779733623858607532500980858880.0) != maximum or rounded != maximum:
+        return 2
+    var tiny: f64 = -0.00000000000000000000000000000000000000000000000000000000000001
+    var underflow = tiny as f32
+    if 1.0f / underflow >= 0:
+        return 3
+    return 1

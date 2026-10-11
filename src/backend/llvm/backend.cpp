@@ -1,4 +1,6 @@
 #include "void/backend.hpp"
+#include "void/numeric.hpp"
+#include <cmath>
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/ExecutionEngine/Orc/LLJIT.h>
 #include <llvm/IR/DIBuilder.h>
@@ -74,7 +76,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
     auto type = [&](ir::Type t) -> llvm::Type* {
         if (t == ir::Type::boolean) return b.getInt1Ty();
         if (t == ir::Type::none) return b.getVoidTy();
-        return b.getInt32Ty();
+        if (t == ir::Type::f32) return b.getFloatTy();
+        if (t == ir::Type::f64) return b.getDoubleTy();
+        return b.getIntNTy(numeric::width(t));
     };
     auto* signature = llvm::FunctionType::get(b.getInt32Ty(), {b.getInt32Ty()}, false);
     std::map<std::string, llvm::Function*> functions;
@@ -91,11 +95,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
     auto module_path = std::filesystem::path(input.source_path.empty() ? input.identity : input.source_path);
     auto* file = debug.createFile(module_path.filename().generic_string(), module_path.parent_path().generic_string());
     debug.createCompileUnit(llvm::dwarf::DW_LANG_C, file, "VOID source compiler", false, "", 0);
-    auto* int_type = debug.createBasicType("i32", 32, llvm::dwarf::DW_ATE_signed);
-    auto* bool_type = debug.createBasicType("bool", 1, llvm::dwarf::DW_ATE_boolean);
     auto debug_value_type = [&](ir::Type t) -> llvm::Metadata* {
         if (t == ir::Type::none) return nullptr;
-        return t == ir::Type::boolean ? bool_type : int_type;
+        return debug.createBasicType(ir::type_name(t),numeric::width(t), t == ir::Type::boolean ? llvm::dwarf::DW_ATE_boolean : numeric::floating(t) ? llvm::dwarf::DW_ATE_float : numeric::signed_integer(t) ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned);
     };
     module->addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
     for (const auto& f : input.functions) {
@@ -127,44 +129,102 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         for (std::size_t n = 0; n < f.blocks.size(); ++n) {
             b.SetInsertPoint(blocks[n]);
             std::vector<llvm::Value*> values;
+            std::vector<ir::Type> value_types;
             for (const auto& instruction : f.blocks[n].instructions) {
                 const auto& loc = instruction.source.path.empty() ? f.source : instruction.source;
                 b.SetCurrentDebugLocation(llvm::DILocation::get(context, loc.line, loc.column, subprogram));
                 llvm::Value* v = nullptr;
                 using ir::Op;
+                auto fail_if = [&](llvm::Value* invalid_value, const std::string& description) {
+                    auto* invalid = llvm::BasicBlock::Create(context,"numeric_error",fn);
+                    auto* valid = llvm::BasicBlock::Create(context,"numeric_valid",fn);
+                    b.CreateCondBr(invalid_value,invalid,valid); b.SetInsertPoint(invalid);
+                    if (failure) {
+                        auto message = source_message(loc,instruction.source_excerpt,"runtime error: " + description);
+                        message += "In function " + f.module_identity + "::" + f.source_name + "\n";
+                        b.CreateStore(b.CreateGlobalStringPtr(message),b.CreateStructGEP(failure_type,failure,0)); return_failure();
+                    } else { b.CreateCall(llvm::Intrinsic::getDeclaration(module.get(),llvm::Intrinsic::trap)); b.CreateUnreachable(); }
+                    b.SetInsertPoint(valid);
+                };
+                // IR operand types preserve signedness, even when native widths coincide.
+                auto operand_type = [&](unsigned id) { return value_types.at(id); };
                 switch (instruction.op) {
                 case Op::argument: v = fn->getArg(instruction.a); break;
-                case Op::constant: v = llvm::ConstantInt::get(type(instruction.type), instruction.immediate, true); break;
-                case Op::add: v = b.CreateAdd(values[instruction.a], values[instruction.b]); break;
-                case Op::multiply: v = b.CreateMul(values[instruction.a], values[instruction.b]); break;
-                case Op::less: v = b.CreateICmpSLT(values[instruction.a], values[instruction.b]); break;
-                case Op::subtract: v = b.CreateSub(values[instruction.a], values[instruction.b]); break;
-                case Op::divide: case Op::remainder: {
-                    auto* valid = llvm::BasicBlock::Create(context, "division", fn);
-                    auto* invalid = llvm::BasicBlock::Create(context, "zero_divisor", fn);
-                    b.CreateCondBr(b.CreateICmpEQ(values[instruction.b], b.getInt32(0)), invalid, valid);
-                    b.SetInsertPoint(invalid);
-                    if (failure) {
-                        auto message = source_message(loc, instruction.source_excerpt,
-                            instruction.op == Op::divide ? "runtime error: Division by zero" : "runtime error: Remainder by zero");
-                        message += "In function " + f.module_identity + "::" + f.source_name + "\n";
-                        b.CreateStore(b.CreateGlobalStringPtr(message), b.CreateStructGEP(failure_type, failure, 0));
-                        return_failure();
+                case Op::constant:
+                    if (numeric::floating(instruction.type)) v = llvm::ConstantFP::get(context,llvm::APFloat(instruction.type == ir::Type::f32 ? llvm::APFloat::IEEEsingle() : llvm::APFloat::IEEEdouble(),llvm::APInt(numeric::width(instruction.type),static_cast<std::uint64_t>(instruction.immediate))));
+                    else v = llvm::ConstantInt::get(type(instruction.type),instruction.immediate,true);
+                    break;
+                case Op::negate: v = values[instruction.a]->getType()->isFloatingPointTy() ? b.CreateFNeg(values[instruction.a]) : b.CreateNeg(values[instruction.a]); break;
+                case Op::convert: {
+                    auto* a = values[instruction.a]; auto from = operand_type(instruction.a), to = instruction.type;
+                    if (from == to) { v = a; break; }
+                    if (numeric::integer(from) && numeric::integer(to)) {
+                        auto* wide = numeric::signed_integer(from) ? b.CreateSExt(a,b.getIntNTy(128)) : b.CreateZExt(a,b.getIntNTy(128));
+                        auto low = numeric::signed_integer(to) ? llvm::APInt::getSignedMinValue(numeric::width(to)).sext(128) : llvm::APInt(128,0);
+                        auto high = numeric::signed_integer(to) ? llvm::APInt::getSignedMaxValue(numeric::width(to)).sext(128) : llvm::APInt::getMaxValue(numeric::width(to)).zext(128);
+                        fail_if(b.CreateOr(b.CreateICmpSLT(wide,llvm::ConstantInt::get(context,low)),b.CreateICmpSGT(wide,llvm::ConstantInt::get(context,high))),"Checked numeric conversion is out of range");
+                        v = b.CreateTrunc(wide,type(to));
+                    } else if (numeric::integer(from)) {
+                        v = numeric::signed_integer(from) ? b.CreateSIToFP(a,type(to)) : b.CreateUIToFP(a,type(to));
+                    } else if (numeric::integer(to)) {
+                        // FPToSI/UI truncates toward zero. Check the ORIGINAL float
+                        // against exact representable bounds before executing it.
+                        // For large signed widths, MIN-1 rounds to MIN: MIN is then
+                        // the first valid representable float, so use >= MIN.
+                        unsigned exponent = numeric::width(to) - (numeric::signed_integer(to) ? 1 : 0);
+                        unsigned precision = from == ir::Type::f32 ? 24 : 53;
+                        double minimum = numeric::signed_integer(to) ? -std::ldexp(1.0,static_cast<int>(exponent)) : 0.0;
+                        bool inclusive = numeric::signed_integer(to) && exponent >= precision;
+                        auto* lower = llvm::ConstantFP::get(a->getType(), inclusive ? minimum : minimum - 1.0);
+                        auto* upper = llvm::ConstantFP::get(a->getType(),std::ldexp(1.0,static_cast<int>(exponent)));
+                        auto* above = inclusive ? b.CreateFCmpOGE(a,lower) : b.CreateFCmpOGT(a,lower);
+                        auto* valid = b.CreateAnd(above,b.CreateFCmpOLT(a,upper));
+                        fail_if(b.CreateNot(valid),"Checked numeric conversion is out of range or non-finite");
+                        v = numeric::signed_integer(to) ? b.CreateFPToSI(a,type(to)) : b.CreateFPToUI(a,type(to));
                     } else {
-                        b.CreateCall(llvm::Intrinsic::getDeclaration(module.get(), llvm::Intrinsic::trap)); b.CreateUnreachable();
+                        v = numeric::width(to) > numeric::width(from) ? b.CreateFPExt(a,type(to)) : b.CreateFPTrunc(a,type(to));
+                        if (numeric::width(to) < numeric::width(from)) {
+                            auto* abs_a = b.CreateUnaryIntrinsic(llvm::Intrinsic::fabs,a);
+                            auto* abs_v = b.CreateUnaryIntrinsic(llvm::Intrinsic::fabs,v);
+                            auto* inf_a = llvm::ConstantFP::getInfinity(a->getType());
+                            auto* inf_v = llvm::ConstantFP::getInfinity(v->getType());
+                            fail_if(b.CreateAnd(b.CreateFCmpOLT(abs_a,inf_a),b.CreateFCmpOEQ(abs_v,inf_v)),"Checked numeric conversion overflows to infinity");
+                        }
                     }
-                    b.SetInsertPoint(valid);
-                    // Widen before signed division so INT32_MIN / -1 is defined;
-                    // truncation restores the provisional wrapping i32 contract.
-                    auto* a = b.CreateSExt(values[instruction.a], b.getInt64Ty());
-                    auto* divisor = b.CreateSExt(values[instruction.b], b.getInt64Ty());
-                    v = b.CreateTrunc(instruction.op == Op::divide ? b.CreateSDiv(a, divisor) : b.CreateSRem(a, divisor), b.getInt32Ty()); break;
+                    break;
                 }
-                case Op::equal: v = b.CreateICmpEQ(values[instruction.a], values[instruction.b]); break;
-                case Op::not_equal: v = b.CreateICmpNE(values[instruction.a], values[instruction.b]); break;
-                case Op::less_equal: v = b.CreateICmpSLE(values[instruction.a], values[instruction.b]); break;
-                case Op::greater: v = b.CreateICmpSGT(values[instruction.a], values[instruction.b]); break;
-                case Op::greater_equal: v = b.CreateICmpSGE(values[instruction.a], values[instruction.b]); break;
+                case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:
+                case Op::equal: case Op::not_equal: case Op::less: case Op::less_equal: case Op::greater: case Op::greater_equal: {
+                    auto* a = values[instruction.a]; auto* divisor = values[instruction.b];
+                    bool floating = a->getType()->isFloatingPointTy();
+                    bool sign = numeric::signed_integer(operand_type(instruction.a));
+                    switch (instruction.op) {
+                    case Op::add: v = floating ? b.CreateFAdd(a,divisor) : b.CreateAdd(a,divisor); break;
+                    case Op::subtract: v = floating ? b.CreateFSub(a,divisor) : b.CreateSub(a,divisor); break;
+                    case Op::multiply: v = floating ? b.CreateFMul(a,divisor) : b.CreateMul(a,divisor); break;
+                    case Op::divide: case Op::remainder: {
+                        if (floating) { v = b.CreateFDiv(a,divisor); break; }
+                        fail_if(b.CreateICmpEQ(divisor,llvm::Constant::getNullValue(divisor->getType())),instruction.op == Op::divide ? "Division by zero" : "Remainder by zero");
+                        if (sign) {
+                            auto* minimum = llvm::ConstantInt::get(context,llvm::APInt::getSignedMinValue(a->getType()->getIntegerBitWidth()));
+                            auto* minus_one = llvm::ConstantInt::getSigned(a->getType(),-1);
+                            auto* special = b.CreateAnd(b.CreateICmpEQ(a,minimum),b.CreateICmpEQ(divisor,minus_one));
+                            auto* safe = b.CreateSelect(special,llvm::ConstantInt::get(a->getType(),1),divisor);
+                            auto* result = instruction.op == Op::divide ? b.CreateSDiv(a,safe) : b.CreateSRem(a,safe);
+                            v = b.CreateSelect(special,instruction.op == Op::divide ? minimum : llvm::Constant::getNullValue(a->getType()),result);
+                        } else v = instruction.op == Op::divide ? b.CreateUDiv(a,divisor) : b.CreateURem(a,divisor);
+                        break;
+                    }
+                    case Op::equal: v = floating ? b.CreateFCmpOEQ(a,divisor) : b.CreateICmpEQ(a,divisor); break;
+                    case Op::not_equal: v = floating ? b.CreateFCmpUNE(a,divisor) : b.CreateICmpNE(a,divisor); break;
+                    case Op::less: v = floating ? b.CreateFCmpOLT(a,divisor) : sign ? b.CreateICmpSLT(a,divisor) : b.CreateICmpULT(a,divisor); break;
+                    case Op::less_equal: v = floating ? b.CreateFCmpOLE(a,divisor) : sign ? b.CreateICmpSLE(a,divisor) : b.CreateICmpULE(a,divisor); break;
+                    case Op::greater: v = floating ? b.CreateFCmpOGT(a,divisor) : sign ? b.CreateICmpSGT(a,divisor) : b.CreateICmpUGT(a,divisor); break;
+                    case Op::greater_equal: v = floating ? b.CreateFCmpOGE(a,divisor) : sign ? b.CreateICmpSGE(a,divisor) : b.CreateICmpUGE(a,divisor); break;
+                    default: break;
+                    }
+                    break;
+                }
                 case Op::logical_not: v = b.CreateNot(values[instruction.a]); break;
                 case Op::load: v = b.CreateLoad(type(f.locals[instruction.a]), slots[instruction.a]); break;
                 case Op::store: v = b.CreateStore(values[instruction.b], slots[instruction.a]); break;
@@ -204,6 +264,20 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 }
 
                 }
+                auto result_type = instruction.type;
+                switch (instruction.op) {
+                case Op::argument: result_type = f.parameters[instruction.a]; break;
+                case Op::load: result_type = f.locals[instruction.a]; break;
+                case Op::store: result_type = ir::Type::none; break;
+                case Op::call:
+                    result_type = ir::Type::i32;
+                    for (const auto& target : input.functions) if (target.name == instruction.callee) result_type = target.result;
+                    break;
+                case Op::equal: case Op::not_equal: case Op::less: case Op::less_equal: case Op::greater: case Op::greater_equal: case Op::logical_not: result_type = ir::Type::boolean; break;
+                case Op::constant: case Op::convert: break;
+                default: result_type = operand_type(instruction.a); break;
+                }
+                value_types.push_back(result_type);
                 values.push_back(v);
             }
             const auto& end = f.blocks[n].end;

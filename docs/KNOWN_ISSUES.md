@@ -1,6 +1,6 @@
 # Known issues and deferred work
 
-Updated 11 October 2026, Phase 5 diagnostics and SDK RTTI compatibility.
+Updated 11 October 2026, Phase 6 numeric implementation.
 
 ## Platform verification
 
@@ -12,7 +12,8 @@ Updated 11 October 2026, Phase 5 diagnostics and SDK RTTI compatibility.
   but Ubuntu sanitizers failed eight suites. The actual job logs and unchanged
   local official-archive build reproduce mixed RTTI metadata in C++ template
   ownership/future cleanup. The local correction matches SDK RTTI throughout
-  the linked program; a new hosted run is required. See CI_SANITIZER_ABI.md and
+  the linked program. The user reports commit `4f3688d` passed run #8 on all
+  platforms; those earlier failures are resolved. Phase 6 needs its own hosted run. See CI_SANITIZER_ABI.md and
   WORK_LOG.md for evidence and validation.
 - CI retains complete official LLVM 19.1.7 archives, Linux LLD and required
   development dependencies, Windows SDK/DIA discovery and native printf support,
@@ -46,7 +47,7 @@ Updated 11 October 2026, Phase 5 diagnostics and SDK RTTI compatibility.
   rejected. Runtime module variables/initialization remain absent. Internal
   visibility currently operates inside one compiled project;
   external library export/visibility boundaries remain deferred.
-- Supported value types are i32/bool. Strings, floats,
+- Supported value types are all ten exact-width numeric types and bool. Strings,
   collections/ranges, structs, generics, closures, async, named/default arguments,
   multiple return values and full managed types are not implemented. Unsupported
   syntax is rejected rather than simulated.
@@ -58,9 +59,12 @@ Updated 11 October 2026, Phase 5 diagnostics and SDK RTTI compatibility.
   slots across CFG blocks. Instruction results remain block-local, with temporary
   slots carrying values across blocks; LLVM optimizes those slots. General SSA
   phi construction is not required for this slice.
-- Numeric overflow policy is provisional: current i32 operations wrap, signed
-  division truncates toward zero, and dynamic zero divisors report source-first
-  runtime errors. Broader numeric conversion/overflow decisions remain open.
+- Phase 6 implements the explicitly approved numeric contract in NUMERIC_TYPES.md:
+  wrapping integers, IEEE floats, contextual literals and checked numeric as.
+  Exponent/base/separator syntax, float remainder, nullable as?, platform-sized
+  aliases, hashing and arbitrary public native numeric ABIs remain deferred.
+  Native bindings that change host rounding/flush-to-zero state need a future
+  environment boundary contract; current hosts use the standard IEEE environment.
   Compiler recovery now bounds parser/semantic/dependency/import recursion; see
   DIAGNOSTICS.md. Application execution recursion remains unbounded.
 - Diagnostics now collect independent errors with codes, byte ranges, immutable
@@ -143,9 +147,9 @@ Updated 11 October 2026, Phase 5 diagnostics and SDK RTTI compatibility.
 
 ## Current phase and subsequent work
 
-Run the corrected ten-suite hosted matrix after the user publishes these local
-changes. See VALUE_SEMANTICS.md for implemented constants, numeric semantics,
-runtime diagnostics and explicit limitations. Next refine validated source/dependency compatibility and analysis-result APIs; approve contextual literal/conversion
-details before numeric type expansion. Preserve the shared semantic model and
-IR/LLVM implementation. Resolve managed root lowering/thread coordination before
-managed types. Keep the original VOIDC backup untouched.
+The user reports the corrected Phase 5 hosted matrix passed. Phase 6 preserves
+those ten suites and adds numeric/numeric_cli. Its local validation is recorded in
+WORK_LOG.md; hosted Linux/Windows/macOS verification requires the user's next push.
+No remote verification is claimed for Phase 6. Next refine validated analysis and
+dependency compatibility APIs before incremental IDE integration. Managed types
+still need the GC/root/thread gate. Keep the original VOIDC backup untouched.

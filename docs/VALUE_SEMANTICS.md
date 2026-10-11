@@ -1,9 +1,10 @@
 # Constants, numeric correctness and runtime diagnostics
 
-Implemented subset, 10 October 2026. The Language Bible remains authoritative and
+Implemented subset, updated 11 October 2026 for Phase 6. The Language Bible remains authoritative and
 unchanged. The user reports the preceding ten-suite module phase passed Linux,
 Windows and macOS Actions. The user reports these Phase 4 changes passed all three platforms in Actions
-run #6 (commit `d78b6b8`). Phase 5 recovery now requires its own hosted run.
+run #6 (commit `d78b6b8`). The user reports Phase 5 commit `4f3688d` passed all platforms in run #8.
+Phase 6 adds the approved numeric family; see NUMERIC_TYPES.md.
 
 ## Readonly and compile-time values
 
@@ -19,8 +20,8 @@ func calculate(value: i32) -> i32:
     return copy * 2
 ```
 
-Both declaration forms accept optional `: i32` or `: bool` annotations, with exact
-type checking. Every const needs an initializer. Local const bindings evaluate
+Both declaration forms accept optional supported numeric/bool annotations, with
+contextual literal adaptation and exact checking of existing typed values. Every const needs an initializer. Local const bindings evaluate
 at runtime at their declaration, may call functions, and follow existing lexical
 scope rules. Their slots are initialized each time the declaration executes.
 Assignment, all arithmetic compounds and postfix increment/decrement reject
@@ -73,40 +74,27 @@ this subset; external project export rules remain open.
 
 ## Implemented numeric contract
 
-Only i32 and bool are implemented. Decimal literal magnitudes must fit i32, with
-unary minus accepting the boundary `-2147483648`. Negation of an already valid
-minimum value, including `-(-2147483648)`, wraps to itself. Values do not implicitly
-convert between bool and i32.
+All ten exact-width numeric types and bool are implemented. The approved Phase 6
+contract is [NUMERIC_TYPES.md](NUMERIC_TYPES.md), including literal construction,
+strict implicit conversions, checked numeric `as`, and constant/native parity.
 
-Addition, subtraction, multiplication and negation wrap modulo 2^32 in compile-time
-evaluation, unoptimized native code and O2. The evaluator uses unsigned arithmetic
-and bit-preserving conversion; LLVM operations carry no signed-overflow promises.
-Signed division truncates toward zero; remainder has the dividend's sign.
-Division/remainder widen to i64 before the signed operation and truncate afterward:
-minimum / -1 wraps to minimum, and minimum % -1 is zero. Compounds use the same IR
-operations. No division instruction executes with a zero divisor.
+The established i32 behavior is unchanged: integer arithmetic wraps, signed division
+truncates toward zero, MIN/-1 wraps to MIN, and MIN%-1 is zero. This now applies at
+each integer width. The evaluator uses software APInt/APFloat operations, not host
+signed overflow or host floating rounding. LLVM arithmetic has no overflow promises
+or fast-math flags. Division selects a safe divisor before the MIN/-1 operation,
+avoiding both poison and a need for native 128-bit division support.
 
-A directly known literal zero divisor in an ordinarily evaluated function expression
-retains its earlier source error. Statically decisive and/or operands suppress
-that zero check on their unexecuted right side while preserving type checks.
-Module constant evaluation diagnoses zero only when executing the expression.
-Other dynamic zero divisors produce the runtime boundary described below.
-General path-sensitive constant propagation is not implemented.
+Directly known integer literal zero divisors in evaluated function expressions
+retain source errors. Statically decisive and/or operands suppress checks on their
+unexecuted right side while preserving type checks. Module constant evaluation
+checks arithmetic/conversions only when executing the expression. Dynamic failures
+use the boundary below. Float division by zero follows IEEE rather than integer
+failure rules. No general path-sensitive constant propagation is added.
 
-### Future numeric policy recommendation, requiring approval
-
-Preserve this slice's i32 compatibility until a deliberate language decision changes
-it. Before wider integers/floats, introduce arbitrary-precision literal magnitudes,
-expected-type propagation through annotations/calls/operators, and a single typed
-operation/conversion specification covering compile-time and native behavior.
-Representability must be checked before converting contextual literals. Existing
-variables should never silently lose precision. Implement explicit checked `as`
-and nullable checked `as?` only after nullable/result representations exist.
-Recommend float-to-integer truncation toward zero with range/NaN/infinity rejection,
-and explicit tables for signed/unsigned and integer/float conversions. These details,
-checked-versus-wrapping overflow for additional types, rounding, float equality/hash,
-and platform-sized types remain unapproved. No such syntax or types are implemented
-by this phase, and Debug and Release have the same current i32 semantics.
+The previously proposed contextual typing/conversion policy was explicitly approved
+for Phase 6. Nullable `as?`, platform-sized aliases and numeric hashing remain
+separate future decisions, not simulated features.
 
 ## Runtime boundary and native diagnostics
 
@@ -180,8 +168,10 @@ unoptimized and O2 JIT/AOT modes. An independent widened-integer oracle checks
 the full 304-case program in normal/O2 JIT and AOT. See WORK_LOG.md for measured local results.
 
 Structured recovery is now implemented in [DIAGNOSTICS.md](DIAGNOSTICS.md).
-Recommended next phase: refine source/dependency compatibility metadata before
-broader numeric types and checked conversions. Define literal contextual typing and conversion tables deliberately.
+Phase 6 adds numeric and numeric_cli alongside these ten preserved suites.
+Recommended next phase: refine validated analysis/dependency APIs and compatibility
+metadata before incremental tooling. Wider numbers and checked numeric conversions
+are now implemented under the approved contract.
 Managed language types still require the separate GC root/thread integration gate.
 
 ## Phase 5 preservation audit

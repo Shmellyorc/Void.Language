@@ -6,14 +6,14 @@
 namespace vd::ir {
 // Values are block-local instruction indexes; typed slots carry mutable state
 // across control-flow edges. The defaults retain the original proof ABI.
-enum class Type { i32, boolean, none };
+enum class Type { i32, boolean, none, i8, i16, i64, u8, u16, u32, u64, f32, f64 };
 const char* type_name(Type type);
 enum class Op { argument, constant, add, multiply, less, call, subtract, divide,
-    remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store };
+    remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate };
 struct Instruction {
     Op op;
     std::uint32_t a = 0, b = 0;
-    std::int32_t immediate = 0;
+    std::int64_t immediate = 0;
     std::string callee = {};
     SourceLocation source = {};
     Type type = Type::i32; // Literal type; other result types derive from operands/signatures.

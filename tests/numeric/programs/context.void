@@ -1,0 +1,26 @@
+use "./lib/values.void" as numbers
+const expected: i64 = 2147483648
+const exact: f32 = 16777216
+const rounded: f32 = 16777217 as f32
+const high: u64 = 18446744073709551615 as u64
+const negzero: u8 = -0
+func entry(value: i32) -> i32:
+    var health = 100
+    var speed = 0.5
+    var gravity = 9.81f
+    var precision = 9.81d
+    var exact_speed: f32 = 100
+    var distance: f64 = 0.1
+    const local: i64 = expected
+    var small: i8 = numbers.narrow(value)
+    if small != value as i8 or local != numbers.contextual():
+        return 2
+    if rounded != exact or high != numbers.unsigned_max:
+        return 3
+    if numbers.accepts(100) != exact_speed or numbers.accepts(0.5) != speed:
+        return 4
+    if distance != numbers.precise or numbers.precise_add(1, 0.5) != 1.5:
+        return 5
+    if health != 100 or gravity != 9.81f or precision != 9.81d:
+        return 6
+    return 1

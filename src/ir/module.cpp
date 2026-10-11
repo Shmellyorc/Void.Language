@@ -1,9 +1,10 @@
 #include "void/ir.hpp"
+#include "void/numeric.hpp"
 #include <map>
 #include <stdexcept>
 namespace vd::ir {
 const char* type_name(Type t) {
-    switch (t) { case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; }
+    switch (t) { case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; }
     throw std::invalid_argument("VOID IR: unknown type");
 }
 void validate(const Module& m) {
@@ -44,12 +45,20 @@ void validate(const Module& m) {
                     if (i.type == Type::none || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1)) fail("invalid literal");
                     type_name(i.type); result = i.type; break;
                 case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:
-                    expect(i.a, Type::i32); expect(i.b, Type::i32); break;
+                    result = operand(i.a);
+                    if (!numeric::supports(i.op,result)) fail("illegal numeric operation");
+                    expect(i.b,result); break;
                 case Op::less: case Op::less_equal: case Op::greater: case Op::greater_equal:
-                    expect(i.a, Type::i32); expect(i.b, Type::i32); result = Type::boolean; break;
+                    if (!numeric::supports(i.op,operand(i.a))) fail("non-numeric ordering");
+                    expect(i.b,operand(i.a)); result = Type::boolean; break;
                 case Op::equal: case Op::not_equal:
-                    if (operand(i.a) != operand(i.b)) fail("comparison type mismatch");
+                    if (!numeric::supports(i.op,operand(i.a)) || operand(i.a) != operand(i.b)) fail("comparison type mismatch");
                     result = Type::boolean; break;
+                case Op::convert:
+                    if (!numeric::number(operand(i.a)) || !numeric::number(i.type)) fail("invalid numeric conversion");
+                    result = i.type; break;
+                case Op::negate:
+                    result = operand(i.a); if (!numeric::number(result)) fail("non-numeric negation"); break;
                 case Op::logical_not: expect(i.a, Type::boolean); result = Type::boolean; break;
                 case Op::load: result = slot(i.a); break;
                 case Op::store: expect(i.b, slot(i.a)); result = Type::none; break;
