@@ -63,6 +63,14 @@ def main() -> None:
     cc = destination / ("bin/clang-cl.exe" if os.name == "nt" else "bin/clang")
     cxx = destination / ("bin/clang-cl.exe" if os.name == "nt" else "bin/clang++")
     values = {"LLVM_DIR": destination / "lib/cmake/llvm", "CC": cc, "CXX": cxx, "VOID_CLANG": clang}
+    values["VOID_LINKER"] = ""
+    if platform.system() == "Linux":
+        linker = destination / "bin/ld.lld"
+        result = subprocess.check_output([linker, "--version"], text=True)
+        if f"LLD {VERSION}" not in result:
+            raise RuntimeError(f"Mismatched LLD: {result}")
+        print(result)
+        values["VOID_LINKER"] = linker
     if platform.system() == "Darwin":
         values["SDKROOT"] = subprocess.check_output(["xcrun", "--show-sdk-path"], text=True).strip()
     with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env:

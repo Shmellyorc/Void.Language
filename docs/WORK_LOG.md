@@ -170,3 +170,112 @@ source diagnostics, lower parsed functions into the current IR, and test their
 AOT/JIT agreement. Resolve open grammar/numeric choices deliberately. Complete
 optimized root lowering and thread-coordination proofs before adding managed
 language types. Run hosted platform jobs once the user publishes the repository.
+
+## CI stabilization phase: first hosted run, 10 October 2026
+
+User request: fix actual CI failures before expanding the frontend, keep LLVM
+19.1.7 and all architectural tests, work locally without commits or pushes.
+
+### Hosted evidence inspected
+
+Read the actual job logs of
+[run 38098620186](https://github.com/Shmellyorc/Void.Language/actions/runs/38098620186),
+commit `8ed7e395bd4789f4cb82c61a346794f37a435077`:
+
+| Host/job | Observed failure |
+|---|---|
+| Ubuntu 24.04 / 114349692845 | Clang invoked GNU ld, which rejected `libLLVMOrcJIT.a` as an unrecognized file format |
+| Windows 2022 / 114349692876 | Ninja required the producer's absent VS2019 Professional DIA SDK `diaguids.lib`, despite the runner having VS2022 |
+| macOS / 114349692735 | libc++ did not provide `std::jthread` or `std::stop_token` in the selected configuration |
+
+All three configured successfully, then failed Build Debug; none executed the
+architectural tests. Earlier sections above describe the earlier local phase,
+not successful hosted verification.
+
+### Corrections
+
+- The SDK helper verifies and exports the Linux archive's LLD 19.1.7. All CI
+  configurations pass it explicitly to CMake; both host executables and the AOT
+  integration link use that exact linker. GNU ld is not given LLVM bitcode.
+- CMake resolves only missing imported LLVM DIA dependencies to a real library
+  in the active Visual Studio SDK, with the selected target architecture. It
+  retains the dependency and fails if it cannot be found. No SDK files are edited.
+- The reload test uses standard threads, an atomic stop flag and a scope guard
+  that joins successfully created readers even on exceptions. Four concurrent
+  callers and 100 publications remain, and exception cleanup is exercised.
+- Configuration now builds and executes a minimal ORC host against the selected
+  SDK. Testing the exact Linux archive found an additional undefined LLVM RTTI
+  symbol: that SDK has `LLVM_ENABLE_RTTI=OFF`. The backend and probe now match
+  this setting while retaining exceptions, C++20 and other targets' RTTI.
+- CI preserves CMake configure diagnostics as well as CTest logs on failure.
+
+### Local evidence
+
+The installed `/usr/lib/llvm-19` SDK, Clang and LLD are 19.1.7. After the linker,
+DIA and thread changes: Debug 6/6 passed (0.55 s), Release 6/6 (0.54 s), and
+RelWithDebInfo ASan/UBSan 6/6 (1.41 s), with leak detection enabled outside the
+sandbox tracing restriction. Ten repetitions each of reload/GC/native passed
+(30 suite executions, 3.56 s). These SDK libraries are native ELF archives.
+
+A synthetic imported LLVM target on Linux reproduced a stale DIA path. The
+resolver replaced it with an existing compiled fixture library, and an executable
+linked and called that fixture successfully. This checks CMake property repair,
+not the Windows SDK, architecture or ABI; Windows hosted execution is pending.
+
+Downloaded and extracted the exact official `LLVM-19.1.7-Linux-X64.tar.xz` used
+by CI into the ignored `.toolchains/ci-investigation/` directory. Its static
+archive member magic is LLVM bitcode (`BC c0 de`). A configuration using this
+archive and the default GNU linker failed with the same unrecognized-format
+error (at `libLLVMCore.a` in the SDK probe). The matching archive's LLD passed
+that error and exposed the RTTI mismatch; after matching `LLVM_ENABLE_RTTI`,
+the configure-time ORC executable linked and ran successfully.
+
+Reproduction for the official archive (substitute its extracted root):
+
+```sh
+void_sdk="$PWD/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64"
+cmake -S . -B build/ci-official-debug \
+  -DLLVM_DIR="$void_sdk/lib/cmake/llvm" \
+  -DCMAKE_C_COMPILER="$void_sdk/bin/clang" \
+  -DCMAKE_CXX_COMPILER="$void_sdk/bin/clang++" \
+  -DVOID_CLANG="$void_sdk/bin/clang" \
+  -DVOID_DWARFDUMP="$void_sdk/bin/llvm-dwarfdump" \
+  -DVOID_LINKER="$void_sdk/bin/ld.lld" -DCMAKE_BUILD_TYPE=Debug
+cmake --build build/ci-official-debug --parallel 3
+ctest --test-dir build/ci-official-debug --output-on-failure
+```
+
+Linux CI installs `ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev
+zlib1g-dev libtinfo-dev`; the complete SDK provides LLVM/Clang/LLD. Distribution
+SDK users additionally install the exact `llvm-19-dev clang-19 lld-19` versions
+and the SDK's exported dependencies (including `libz3-dev` on the verified host).
+No required dependencies or architectural tests are removed.
+
+### Final verification after the SDK ABI correction
+
+| Local configuration/check | Result |
+|---|---|
+| Exact official Linux CI archive + matching Clang/LLD, Debug | Full build and 6/6 executable suites passed, 0.52 s |
+| Exact archive standalone ORC harness | Printed `42` |
+| Installed SDK + matching Clang/LLD, Debug, final CMake | Configure probe, build and 6/6 passed, 1.27 s |
+| Installed SDK + matching Clang/LLD, Release, final CMake | Configure probe, build and 6/6 passed, 1.82 s |
+| Installed SDK ASan/UBSan | 6/6 passed with leak detection, as recorded above |
+| Installed SDK repeated Release reload/GC/native | All 30 executions passed, as recorded above |
+| SDK helper syntax and whitespace checks | Passed |
+
+The final installed-SDK checks ran while the archive's LTO links were active;
+these timings are observations, not performance comparisons. The official SDK
+configure probe took 85 seconds and full executable linking took several minutes.
+Only Debug was rebuilt locally against the exact archive; the hosted gate must
+also confirm that archive's Release and sanitizer configurations. The distribution
+SDK's Debug/Release/sanitizer results do not replace that hosted verification.
+
+### Hosted gate still pending
+
+After the user commits/pushes these changes, run all three jobs again. Required
+results are Debug and Release builds plus all six executable suites on each
+platform, and Linux ASan/UBSan. Specifically verify Windows DIA discovery,
+release CRT/iterator ABI, native C/AOT/debug metadata and JIT execution; verify
+macOS portable thread cleanup and native ORC/AOT execution with the Xcode SDK.
+Linux runner memory, LTO link time and system dependency compatibility also need
+hosted confirmation. No hosted green result is claimed from local tests.

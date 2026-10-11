@@ -4,15 +4,20 @@ Updated 10 October 2026, foundation phase.
 
 ## Platform verification
 
-- Linux x86_64 on PikaOS 4 is the only executed platform. Windows, macOS and
-  GitHub Actions have not run. Workflow configuration is not passing evidence.
-- Work is local only. No repository was created, initialized, committed, pushed
-  or published. The protected `.git` directory is not a usable Git checkout in
-  this session. The user will create the public repository and push it.
-- CI uses complete official release archives on all three hosts. Archive layout,
-  distribution dependencies, Windows CRT ABI, Darwin SDK and runner availability
-  still require actual hosted execution. Downloads use pinned version URLs over
-  HTTPS; an independent archive checksum/signature verification step is future work.
+- The initial hosted run [38098620186](https://github.com/Shmellyorc/Void.Language/actions/runs/38098620186)
+  configured all three platforms but failed Build Debug; no architectural suite
+  executed there. Local corrections remain uncommitted and unpushed. A new hosted
+  run must verify Windows and macOS execution and the Linux runner environment.
+- The exact official Linux archive now builds and executes all six Debug suites
+  locally. Its Release/sanitizer configurations and the hosted Linux environment
+  still require verification. Installed-SDK Debug/Release/sanitizer suites pass.
+- Windows DIA dependency resolution has been tested with a synthetic imported
+  target on Linux; this does not validate the Windows SDK or native ABI.
+- CI uses complete official LLVM 19.1.7 archives. The Linux archive contains
+  bitcode and requires the matching LLD, plus an SDK-compatible RTTI setting.
+  CMake now links and runs an ORC host before the normal build. Archive downloads
+  use pinned HTTPS URLs; independent checksum/signature verification remains
+  future work.
 
 ## Compiler scope
 
@@ -79,12 +84,14 @@ Updated 10 October 2026, foundation phase.
   inspection. Running outside the sandbox tracing restriction passed with leak
   detection enabled. This is a host execution constraint, not a skipped leak check.
 
-## Recommended next development phase
+## Current phase and subsequent work
 
-Build a precise frontend slice around source management, indentation, function
-signatures, primitive expressions, local bindings and source diagnostics. Lower
-it into the existing IR and test identical AOT/JIT behavior. Formalize open
-numeric and grammar rules before exposing them as language behavior. In parallel
-with that phase's normal work, run the pending hosted-platform tests after the
-user publishes the repository and resolve root lowering/thread coordination
-before introducing managed language types. Keep the original VOIDC backup untouched.
+Stabilize hosted CI before expanding the language frontend. All three runners
+must build and execute Debug and Release, with Linux ASan/UBSan, using LLVM
+19.1.7 and the existing architectural tests. See WORK_LOG.md for local evidence.
+
+After that gate, build a precise frontend slice around source management,
+indentation, function signatures, primitive expressions, local bindings and
+source diagnostics. Formalize open numeric/grammar rules first, and resolve
+root lowering/thread coordination before adding managed language types. Keep
+the original VOIDC backup untouched.

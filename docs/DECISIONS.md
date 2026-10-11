@@ -98,3 +98,26 @@ The user owns repository creation and initial publication.
 
 References: [LLVM ORC design](https://releases.llvm.org/19.1.0/docs/ORCv2.html),
 [official 19.1.7 releases](https://github.com/llvm/llvm-project/releases/tag/llvmorg-19.1.7).
+
+## CI stabilization phase, 10 October 2026
+
+The first hosted run exposed SDK integration failures. Keep LLVM 19.1.7 exact
+and retain the complete archives and architectural suites.
+
+- Linux explicitly uses the archive's LLD 19.1.7 for compiler and AOT links.
+  Its LLVM static archive members are bitcode; the default GNU linker rejected
+  them. Match `LLVM_ENABLE_RTTI` in the LLVM backend and configure probe, without
+  disabling exceptions or changing the other compiler/runtime targets.
+- Repair only missing exported `diaguids.lib` paths on imported LLVM targets,
+  resolving the actual target-architecture DIA library from the active Visual
+  Studio SDK. Preserve this required dependency and fail if it is unavailable.
+  The pinned Windows release embeds its producer's VS2019 installation path;
+  the runner has VS2022. See [upstream issue](https://github.com/llvm/llvm-project/issues/111829).
+- Replace unavailable libc++ `jthread`/`stop_token` usage with `std::thread`, an
+  atomic stop flag and exception-safe joining. Keep four concurrent callers and
+  100 publications, and check the exception cleanup path. C++20 remains required.
+- Configuration links and executes an ORC host against the selected SDK to catch
+  linker, ABI and exported-dependency errors before the project build.
+
+CI stability precedes frontend expansion. Hosted success must come from a new
+run after the user publishes these local changes; no remote mutation is made.

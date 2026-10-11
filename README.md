@@ -22,6 +22,7 @@ sudo apt-get install build-essential cmake ninja-build llvm-19-dev clang-19 lld-
 cmake -S . -B build/debug -G Ninja \
   -DLLVM_DIR=/usr/lib/llvm-19/lib/cmake/llvm \
   -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19 \
+  -DVOID_LINKER=/usr/lib/llvm-19/bin/ld.lld \
   -DCMAKE_BUILD_TYPE=Debug
 cmake --build build/debug --parallel 4
 ctest --test-dir build/debug --output-on-failure
@@ -67,18 +68,25 @@ Windows uses the MSVC/Windows SDK environment and `clang-cl`, with the release
 MSVC dynamic runtime and iterator ABI matching the prebuilt LLVM libraries in
 both build configurations. The native AOT link uses the SDK's `clang` driver.
 macOS selects the official archive matching the runner architecture and uses
-the Xcode SDK. Linux installs development dependencies explicitly.
+the Xcode SDK. Linux installs development dependencies explicitly and selects
+the same archive's LLD 19.1.7 because its static LLVM libraries contain bitcode.
+CMake matches the LLVM backend's RTTI setting to the selected SDK, retaining
+exception support. Configuration links and executes an ORC host as an SDK check.
+On Windows, stale exported DIA library paths are resolved against the active
+Visual Studio DIA SDK (`VSINSTALLDIR`); an explicit real
+`-DVOID_DIA_GUIDS_LIBRARY=.../diaguids.lib` can also be supplied.
 
 All jobs build and execute the same Debug and Release tests; Linux also runs
-ASan/UBSan. This workflow has **not run on GitHub**. Windows and macOS are
-**unverified**. No repository, commit, push or remote change was made.
+ASan/UBSan. The first hosted run failed during Build Debug on all three platforms.
+The local corrections and verification are recorded in [the work log](docs/WORK_LOG.md).
+A new hosted run is still required, especially for Windows and macOS execution.
+These corrections are uncommitted and unpushed.
 
 ## Continue development
 
 Read [the Language Bible](docs/LANGUAGE_BIBLE.md),
 [development strategy](docs/DEVELOPMENT_STRATEGY.md),
 [architectural decisions](docs/DECISIONS.md), and
-[the work log](docs/WORK_LOG.md). The next phase should formalize the small
-frontend grammar and diagnostics, then connect source functions to the existing
-IR and both execution paths. Resolve optimized root lowering before adding
-managed language types.
+[the work log](docs/WORK_LOG.md). CI stability is the current phase: confirm Debug and Release on all three
+hosted platforms and Linux sanitizers before expanding the frontend. Resolve
+optimized root lowering before adding managed language types.

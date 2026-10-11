@@ -36,20 +36,20 @@ jobs:
       - name: Install and verify LLVM development SDK
         run: python tools/ci/llvm_sdk.py
       - name: Configure Debug
-        run: cmake -S . -B build/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}"
+        run: cmake -S . -B build/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}" -DVOID_LINKER="${{ env.VOID_LINKER }}"
       - name: Build Debug
         run: cmake --build build/debug --parallel 3
       - name: Execute Debug tests
         run: ctest --test-dir build/debug --output-on-failure
       - name: Configure Release
-        run: cmake -S . -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}"
+        run: cmake -S . -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}" -DVOID_LINKER="${{ env.VOID_LINKER }}"
       - name: Build Release
         run: cmake --build build/release --parallel 3
       - name: Execute Release tests
         run: ctest --test-dir build/release --output-on-failure
       - name: Configure sanitizers
         if: runner.os == 'Linux'
-        run: cmake -S . -B build/sanitizers -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVOID_SANITIZERS=ON -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}"
+        run: cmake -S . -B build/sanitizers -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVOID_SANITIZERS=ON -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}" -DVOID_LINKER="${{ env.VOID_LINKER }}"
       - name: Build and execute sanitizer tests
         if: runner.os == 'Linux'
         run: |
@@ -60,5 +60,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tests-${{ runner.os }}-${{ runner.arch }}
-          path: build/**/Testing/Temporary/LastTest.log
+          path: |
+            build/**/Testing/Temporary/LastTest.log
+            build/**/CMakeFiles/CMakeConfigureLog.yaml
+            build/**/CMakeFiles/CMakeError.log
+            build/**/CMakeFiles/CMakeOutput.log
           if-no-files-found: ignore

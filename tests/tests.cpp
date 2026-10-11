@@ -108,9 +108,21 @@ void reload() {
     next.reset();
     std::atomic<bool> bad_result = false;
     std::atomic<unsigned> calls = 0;
-    std::vector<std::jthread> readers;
-    for (int i = 0; i < 4; ++i) readers.emplace_back([&](std::stop_token token) {
-        while (!token.stop_requested()) {
+    std::atomic<bool> stop = false;
+    std::vector<std::thread> readers;
+    // Declare the guard before spawning: exceptions during either thread creation
+    // or JIT compilation must stop and join every successfully started caller.
+    struct JoinReaders {
+        std::atomic<bool>& stop;
+        std::vector<std::thread>& readers;
+        void finish() {
+            stop.store(true);
+            for (auto& reader : readers) if (reader.joinable()) reader.join();
+        }
+        ~JoinReaders() { finish(); }
+    } join_readers{stop, readers};
+    for (int i = 0; i < 4; ++i) readers.emplace_back([&] {
+        while (!stop.load()) {
             int answer = slot.invoke(0);
             ++calls;
             if (answer != 100 && answer != 42 && answer != 43) bad_result = true;
@@ -118,9 +130,18 @@ void reload() {
     });
     for (int i = 0; i < 100; ++i)
         require(slot.replace(engine.compile(vd::ir::architecture_proof(42 + i % 2), "entry")), "stress replacement rejected");
-    for (auto& reader : readers) reader.request_stop();
-    for (auto& reader : readers) reader.join();
+    join_readers.finish();
     require(calls > 0 && !bad_result && engine.live_generations() == 1, "reload stress failure");
+    // Exercise the same cleanup path when compilation fails mid-stress.
+    stop = false;
+    readers.clear();
+    bool injected_failure = false;
+    try {
+        JoinReaders cleanup{stop, readers};
+        readers.emplace_back([&] { while (!stop.load()) std::this_thread::yield(); });
+        throw std::runtime_error("injected development compile failure");
+    } catch (const std::runtime_error&) { injected_failure = true; }
+    require(injected_failure && stop.load() && !readers.front().joinable(), "reader exception cleanup failed");
 }
 thread_local vd::Heap* probe_heap = nullptr;
 struct Node { void* child; std::int32_t payload; };

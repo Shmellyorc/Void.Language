@@ -11,10 +11,28 @@ find_package(LLVM 19.1.7 EXACT REQUIRED CONFIG)
 if(NOT LLVM_PACKAGE_VERSION VERSION_EQUAL "19.1.7")
   message(FATAL_ERROR "VOID requires the tested LLVM 19.1.7 SDK")
 endif()
+include(cmake/LLVMPlatform.cmake)
+void_resolve_llvm_dia()
 message(STATUS "VOID LLVM: ${LLVM_PACKAGE_VERSION} at ${LLVM_DIR}")
 find_package(Threads REQUIRED)
+# Official Linux SDK archives can contain LLVM bitcode. GNU ld cannot read
+# those members without an LTO plugin; the matching LLD supports them directly.
+set(VOID_LINKER "" CACHE FILEPATH "Matching LLVM 19.1.7 LLD executable for ELF links")
+if(VOID_LINKER)
+  if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux" OR NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    message(FATAL_ERROR "VOID_LINKER currently requires Clang on Linux")
+  endif()
+  execute_process(COMMAND "${VOID_LINKER}" --version
+    OUTPUT_VARIABLE VOID_LINKER_VERSION RESULT_VARIABLE VOID_LINKER_STATUS)
+  if(NOT VOID_LINKER_STATUS EQUAL 0 OR NOT VOID_LINKER_VERSION MATCHES "LLD 19\\.1\\.7([^0-9]|$)")
+    message(FATAL_ERROR "VOID_LINKER must be LLD 19.1.7")
+  endif()
+endif()
 option(VOID_SANITIZERS "Instrument compiler/runtime with ASan and UBSan" OFF)
 add_library(void_options INTERFACE)
+if(VOID_LINKER)
+  target_link_options(void_options INTERFACE "--ld-path=${VOID_LINKER}")
+endif()
 target_include_directories(void_options INTERFACE "${PROJECT_SOURCE_DIR}/include")
 if(MSVC)
   target_compile_options(void_options INTERFACE /W4 /permissive- /EHsc)
@@ -34,7 +52,45 @@ add_library(void_llvm src/backend/llvm/backend.cpp)
 target_include_directories(void_llvm SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 separate_arguments(VOID_LLVM_DEFINITIONS NATIVE_COMMAND "${LLVM_DEFINITIONS}")
 target_compile_options(void_llvm PRIVATE ${VOID_LLVM_DEFINITIONS})
+# Match the SDK's RTTI ABI only in the translation unit using LLVM headers.
+# Exception support remains enabled for VOID diagnostics and cleanup.
+if(NOT LLVM_ENABLE_RTTI)
+  if(MSVC)
+    set(VOID_LLVM_RTTI_FLAG /GR-)
+  else()
+    set(VOID_LLVM_RTTI_FLAG -fno-rtti)
+  endif()
+  target_compile_options(void_llvm PRIVATE ${VOID_LLVM_RTTI_FLAG})
+endif()
 llvm_map_components_to_libnames(VOID_LLVM_LIBS Core Support native OrcJIT Passes Target MC CodeGen)
+# Validate the selected SDK by linking and executing a real ORC host before
+# building the project. Header/library presence alone missed the first CI errors.
+include(CMakePushCheckState)
+include(CheckCXXSourceRuns)
+cmake_push_check_state(RESET)
+set(CMAKE_REQUIRED_INCLUDES ${LLVM_INCLUDE_DIRS})
+set(CMAKE_REQUIRED_LIBRARIES ${VOID_LLVM_LIBS})
+set(CMAKE_REQUIRED_FLAGS "${VOID_LLVM_RTTI_FLAG}")
+if(VOID_LINKER)
+  set(CMAKE_REQUIRED_LINK_OPTIONS "--ld-path=${VOID_LINKER}")
+endif()
+if(MSVC)
+  set(CMAKE_REQUIRED_DEFINITIONS -D_ITERATOR_DEBUG_LEVEL=0)
+endif()
+# Recheck when changing SDK, toolchain or platform dependency resolution.
+unset(VOID_LLVM_ORC_RUNS CACHE)
+check_cxx_source_runs("#include <llvm/ExecutionEngine/Orc/LLJIT.h>
+#include <llvm/Support/TargetSelect.h>
+int main() {
+  if (llvm::InitializeNativeTarget() || llvm::InitializeNativeTargetAsmPrinter()) return 1;
+  auto jit = llvm::orc::LLJITBuilder().create();
+  if (!jit) { llvm::consumeError(jit.takeError()); return 2; }
+  return 0;
+}" VOID_LLVM_ORC_RUNS)
+cmake_pop_check_state()
+if(NOT VOID_LLVM_ORC_RUNS)
+  message(FATAL_ERROR "The LLVM 19.1.7 SDK could not link and execute an ORC host. Check the linker, SDK ABI and exported dependencies in the CMakeFiles configure logs.")
+endif()
 target_link_libraries(void_llvm PUBLIC void_core void_runtime PRIVATE ${VOID_LLVM_LIBS})
 add_executable(voidc src/main.cpp examples/proof.cpp)
 target_link_libraries(voidc PRIVATE void_llvm)
@@ -56,7 +112,7 @@ if(BUILD_TESTING)
     message(FATAL_ERROR "AOT tests require matching clang 19.1.7; set VOID_CLANG")
   endif()
   add_test(NAME aot COMMAND "${CMAKE_COMMAND}"
-    "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
+    "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
     "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/aot proof" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/aot.cmake")
 endif()
