@@ -1,39 +1,83 @@
 #include "void/ir.hpp"
-#include <set>
+#include <map>
 #include <stdexcept>
 namespace vd::ir {
+const char* type_name(Type t) {
+    switch (t) { case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; }
+    throw std::invalid_argument("VOID IR: unknown type");
+}
 void validate(const Module& m) {
     auto fail = [](const std::string& text) { throw std::invalid_argument("VOID IR: " + text); };
     if (m.identity.empty()) fail("missing module identity");
-    std::set<std::string> names;
+    struct Signature { std::vector<Type> parameters; Type result; };
+    std::map<std::string, Signature> names;
     for (const auto& name : m.imports)
-        if (name.empty() || !names.insert(name).second) fail("duplicate or empty import");
-    for (const auto& f : m.functions)
-        if (f.name.empty() || !names.insert(f.name).second) fail("duplicate or empty function");
+        if (name.empty() || !names.emplace(name, Signature{{Type::i32}, Type::i32}).second) fail("duplicate or empty import");
+    for (const auto& f : m.functions) {
+        if (f.name.empty() || !names.emplace(f.name, Signature{f.parameters, f.result}).second) fail("duplicate or empty function");
+        type_name(f.result);
+        for (auto t : f.parameters) if (t == Type::none) fail("no-result parameter"); else type_name(t);
+        for (auto t : f.locals) if (t == Type::none) fail("no-result slot"); else type_name(t);
+    }
     for (const auto& f : m.functions) {
         if (f.blocks.empty()) fail("function has no blocks");
         for (const auto& b : f.blocks) {
-            std::vector<bool> booleans;
-            auto operand = [&](unsigned id, bool boolean = false) {
-                if (id >= booleans.size() || booleans[id] != boolean) fail("invalid or mistyped operand in " + f.name);
+            std::vector<Type> types;
+            auto operand = [&](unsigned id) {
+                if (id >= types.size() || types[id] == Type::none) fail("invalid operand in " + f.name);
+                return types[id];
+            };
+            auto expect = [&](unsigned id, Type t) { if (operand(id) != t) fail("mistyped operand in " + f.name); };
+            auto slot = [&](unsigned id) {
+                if (id >= f.locals.size()) fail("invalid slot in " + f.name);
+                return f.locals[id];
             };
             for (const auto& i : b.instructions) {
+                Type result = Type::i32;
                 switch (i.op) {
-                case Op::argument: case Op::constant: break;
-                case Op::add: case Op::multiply: case Op::less: operand(i.a); operand(i.b); break;
-                case Op::call:
-                    operand(i.a);
-                    if (!names.contains(i.callee)) fail("unknown callee " + i.callee);
-                    break;
+                case Op::argument:
+                    if (i.a >= f.parameters.size()) fail("invalid argument index");
+                    result = f.parameters[i.a]; break;
+                case Op::constant:
+                    if (i.type == Type::none || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1)) fail("invalid literal");
+                    type_name(i.type); result = i.type; break;
+                case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:
+                    expect(i.a, Type::i32); expect(i.b, Type::i32); break;
+                case Op::less: case Op::less_equal: case Op::greater: case Op::greater_equal:
+                    expect(i.a, Type::i32); expect(i.b, Type::i32); result = Type::boolean; break;
+                case Op::equal: case Op::not_equal:
+                    if (operand(i.a) != operand(i.b)) fail("comparison type mismatch");
+                    result = Type::boolean; break;
+                case Op::logical_not: expect(i.a, Type::boolean); result = Type::boolean; break;
+                case Op::load: result = slot(i.a); break;
+                case Op::store: expect(i.b, slot(i.a)); result = Type::none; break;
+                case Op::call: {
+                    auto target = names.find(i.callee);
+                    if (target == names.end()) fail("unknown callee " + i.callee);
+                    auto args = i.arguments;
+                    // Original proof instructions use a for their single operand.
+                    if (args.empty() && target->second.parameters.size() == 1) args.push_back(i.a);
+                    if (args.size() != target->second.parameters.size()) fail("call argument count mismatch");
+                    for (std::size_t n = 0; n < args.size(); ++n) expect(args[n], target->second.parameters[n]);
+                    result = target->second.result; break;
+                }
                 default: fail("unknown operation");
                 }
-                booleans.push_back(i.op == Op::less);
+                types.push_back(result);
             }
-            if (b.end.kind == Terminator::Kind::return_value) operand(b.end.value);
-            else if (b.end.kind == Terminator::Kind::branch) {
-                operand(b.end.value, true);
-                if (b.end.yes >= f.blocks.size() || b.end.no >= f.blocks.size()) fail("invalid branch destination");
-            } else fail("unknown terminator");
+            auto destination = [&](unsigned id) { if (id >= f.blocks.size()) fail("invalid branch destination"); };
+            switch (b.end.kind) {
+            case Terminator::Kind::return_value:
+                if (f.result == Type::none) fail("value returned from no-result function");
+                expect(b.end.value, f.result); break;
+            case Terminator::Kind::return_void:
+                if (f.result != Type::none) fail("missing return value"); break;
+            case Terminator::Kind::branch:
+                expect(b.end.value, Type::boolean); destination(b.end.yes); destination(b.end.no); break;
+            case Terminator::Kind::jump: destination(b.end.yes); break;
+            case Terminator::Kind::unreachable: break;
+            default: fail("unknown terminator");
+            }
         }
     }
 }

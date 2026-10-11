@@ -4,22 +4,32 @@
 #include <string>
 #include <vector>
 namespace vd::ir {
-// Architecture-proof IR: every function has signature i32(i32).
-// Local IDs are instruction indexes. Values may only be used in their block.
-enum class Op { argument, constant, add, multiply, less, call };
+// Values are block-local instruction indexes; typed slots carry mutable state
+// across control-flow edges. The defaults retain the original proof ABI.
+enum class Type { i32, boolean, none };
+const char* type_name(Type type);
+enum class Op { argument, constant, add, multiply, less, call, subtract, divide,
+    remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store };
 struct Instruction {
     Op op;
     std::uint32_t a = 0, b = 0;
     std::int32_t immediate = 0;
     std::string callee = {};
     SourceLocation source = {};
+    Type type = Type::i32; // Literal type; other result types derive from operands/signatures.
+    std::vector<std::uint32_t> arguments = {};
 };
 struct Terminator {
-    enum class Kind { return_value, branch } kind = Kind::return_value;
+    enum class Kind { return_value, branch, jump, return_void, unreachable } kind = Kind::return_value;
     std::uint32_t value = 0, yes = 0, no = 0;
 };
 struct Block { std::vector<Instruction> instructions; Terminator end; };
-struct Function { std::string name; SourceLocation source = {}; std::vector<Block> blocks; };
+struct Function {
+    std::string name; SourceLocation source = {}; std::vector<Block> blocks;
+    std::vector<Type> parameters = {Type::i32};
+    Type result = Type::i32;
+    std::vector<Type> locals = {};
+};
 struct Module {
     std::string identity;
     std::vector<std::string> imports; // Trusted C functions with i32(i32) ABI.

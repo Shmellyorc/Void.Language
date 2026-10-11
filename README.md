@@ -1,15 +1,12 @@
 # Void.Language
 
 VOID 2.0 is a new language, independent of the earlier C#-compatible VOIDC.
-This repository currently provides a **compiler architecture foundation**:
-validated, backend-independent proof IR; shared LLVM AOT/JIT lowering;
-leased function replacement; an experimental precise managed heap; and a C ABI
-fixture with UTF-8, owned resources and callbacks.
-
-**There is no `.void` parser or usable application language yet.**
-`examples/architecture.void` documents the equivalent of the hand-built IR;
-it is not read by the compiler. Full GC and automatic source hot reload are
-not implemented. See [known issues](docs/KNOWN_ISSUES.md).
+This repository now compiles actual `.void` files through one frontend, typed
+semantic model, backend-independent IR, and shared LLVM 19.1.7 AOT/JIT lowering.
+The initial subset supports typed functions, i32/bool expressions, local variables,
+conditionals, `for` loops, and source diagnostics. Experimental GC, leased function
+replacement, and native C interoperability remain separate architectural proofs.
+See [source compiler scope and decisions](docs/SOURCE_COMPILER.md).
 
 ## Build on Linux
 
@@ -40,25 +37,39 @@ For optimized and instrumented builds, use separate directories with
 LeakSanitizer requires a host that permits process inspection; the Codex sandbox
 on the verified host required running sanitizer tests outside its tracing restriction.
 
-## Execute the architecture harness
+## Compile and execute real source
 
 ```sh
-build/debug/voidc --jit-proof
-# Prints 42 from native ORC-generated code.
-build/debug/voidc --emit-proof build/debug/proof.o
-clang-19 build/debug/proof.o -o build/debug/proof
-build/debug/proof
-# Prints 7 for runtime input -1.
-build/debug/proof first
-# Prints 42 for runtime input 0.
-build/debug/proof first second
-# Prints 43 for runtime input 1.
+build/debug/voidc check examples/architecture.void
+build/debug/voidc run examples/architecture.void -1  # 7, native ORC JIT
+build/debug/voidc run examples/architecture.void 0   # 42
+build/debug/voidc run examples/architecture.void 1   # 43
+build/debug/voidc run examples/architecture.void 10  # 52
+build/debug/voidc emit examples/architecture.void -o build/debug/architecture.o
+clang-19 build/debug/architecture.o -o build/debug/architecture
+build/debug/architecture 10                        # 52, native AOT executable
 ```
 
-The AOT harness derives its input from the argument count. LLVM emits the object
-through `TargetMachine`; Clang invokes the platform linker. No shell command is
-constructed inside the compiler. The integration test uses paths containing spaces
-and checks all three outputs and the object's debug information.
+Use matching LLD for the final link when required by your SDK:
+`clang-19 -fuse-ld=/usr/lib/llvm-19/bin/ld.lld ...`.
+On Windows, from the Visual Studio developer environment, link with
+`clang architecture.o -llegacy_stdio_definitions -o architecture.exe`.
+On macOS, use the pinned SDK's `clang architecture.o -o architecture`.
+The object includes a native `main` adapter and actual source line information.
+The executable prints its i32 result and exits successfully; an invalid argument
+exits with status 2. The compiler does not launch a shell or linker itself.
+
+`run` and the AOT executable accept one optional decimal i32 input, defaulting to
+zero. They require `func entry(value: i32) -> i32`; internal functions can use
+multiple typed parameters, bool results, or no result. `check` accepts library
+files without an entry. Append `--no-opt` to `run` or `emit` to disable LLVM O2.
+Try [loops](examples/loops.void) and [recursive functions](examples/functions.void).
+
+The older `--jit-proof` and `--emit-proof OBJECT` commands intentionally retain
+their hand-built IR architecture harness. Their AOT adapter derives its input
+from argument count; it is separate from the working source commands above.
+The eight CTest suites preserve those native, GC and hot-reload proofs and add
+frontend diagnostics and real source JIT/AOT integration tests.
 
 ## Windows and macOS
 
@@ -80,16 +91,18 @@ Visual Studio DIA SDK (`VSINSTALLDIR`); an explicit real
 `-DVOID_DIA_GUIDS_LIBRARY=.../diaguids.lib` can also be supplied.
 
 All jobs build and execute the same Debug and Release tests; Linux also runs
-ASan/UBSan. The second hosted run passed Linux and macOS completely. Windows
-built Debug and passed five suites; AOT failed because a bare `.lib` argument
-was treated as a local file. The local library-request correction still needs
-Windows Debug and Release hosted verification. See [the work log](docs/WORK_LOG.md).
+ASan/UBSan. The user confirmed the previous foundation passed on all three
+platforms. This source compiler phase has passed local Linux checks; the expanded
+eight-suite matrix still needs a hosted run after the user commits and pushes.
+See [verified commands and results](docs/WORK_LOG.md).
 
 ## Continue development
 
 Read [the Language Bible](docs/LANGUAGE_BIBLE.md),
 [development strategy](docs/DEVELOPMENT_STRATEGY.md),
-[architectural decisions](docs/DECISIONS.md), and
-[the work log](docs/WORK_LOG.md). CI stability is the current phase: confirm Debug and Release on all three
-hosted platforms and Linux sanitizers before expanding the frontend. Resolve
-optimized root lowering before adding managed language types.
+[architectural decisions](docs/DECISIONS.md),
+[source compiler scope](docs/SOURCE_COMPILER.md), and
+[known issues](docs/KNOWN_ISSUES.md).
+The next phase should establish module/import identity and a broader executable
+interface around this frontend, with deliberate numeric and grammar decisions.
+Resolve runtime/root integration before introducing managed language types.

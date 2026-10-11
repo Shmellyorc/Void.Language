@@ -44,7 +44,7 @@ else()
     target_link_options(void_options INTERFACE -fsanitize=address,undefined)
   endif()
 endif()
-add_library(void_core src/frontend/source.cpp src/ir/module.cpp)
+add_library(void_core src/frontend/source.cpp src/frontend/compiler.cpp src/ir/module.cpp)
 target_link_libraries(void_core PUBLIC void_options)
 add_library(void_runtime src/runtime/heap.cpp src/runtime/reload.cpp src/runtime/native.cpp)
 target_link_libraries(void_runtime PUBLIC void_options Threads::Threads)
@@ -52,6 +52,27 @@ add_library(void_llvm src/backend/llvm/backend.cpp)
 target_include_directories(void_llvm SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 separate_arguments(VOID_LLVM_DEFINITIONS NATIVE_COMMAND "${LLVM_DEFINITIONS}")
 target_compile_options(void_llvm PRIVATE ${VOID_LLVM_DEFINITIONS})
+# Clang's UBSan function check reads two metadata words before an indirect
+# target. Generate the ABI metadata with the actual host compiler, then attach
+# it to published ORC entries; otherwise a page-aligned JIT entry can fault
+# before the checker can discover that the function is uninstrumented.
+if(VOID_SANITIZERS AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT MSVC)
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/jit-entry-type.cpp"
+    "#include <cstdint>\nstd::int32_t vd_entry_type(std::int32_t x) { return x; }\n")
+  execute_process(COMMAND "${CMAKE_CXX_COMPILER}" -std=c++20 -fsanitize=undefined -S -emit-llvm
+    "${CMAKE_CURRENT_BINARY_DIR}/jit-entry-type.cpp" -o "${CMAKE_CURRENT_BINARY_DIR}/jit-entry-type.ll"
+    RESULT_VARIABLE entry_type_status ERROR_VARIABLE entry_type_errors)
+  if(NOT entry_type_status EQUAL 0)
+    message(FATAL_ERROR "Cannot generate host UBSan function metadata: ${entry_type_errors}")
+  endif()
+  file(READ "${CMAKE_CURRENT_BINARY_DIR}/jit-entry-type.ll" entry_type_ir)
+  string(REGEX MATCH "!\\{i32 (-?[0-9]+), i32 (-?[0-9]+)\\}" entry_type_metadata "${entry_type_ir}")
+  if(NOT entry_type_metadata)
+    message(FATAL_ERROR "Host compiler did not emit the expected UBSan function metadata")
+  endif()
+  target_compile_definitions(void_llvm PRIVATE
+    "VOID_FUNCTION_SANITIZER_MAGIC=${CMAKE_MATCH_1}" "VOID_FUNCTION_SANITIZER_HASH=${CMAKE_MATCH_2}")
+endif()
 # Match the SDK's RTTI ABI only in the translation unit using LLVM headers.
 # Exception support remains enabled for VOID diagnostics and cleanup.
 if(NOT LLVM_ENABLE_RTTI)
@@ -99,12 +120,14 @@ if(BUILD_TESTING)
   add_library(native_fixture STATIC tests/integration/native_fixture.c)
   target_include_directories(native_fixture PUBLIC tests/integration)
   target_link_libraries(native_fixture PRIVATE void_options)
-  add_executable(void_tests tests/tests.cpp examples/proof.cpp)
+  add_executable(void_tests tests/tests.cpp tests/frontend/tests.cpp examples/proof.cpp)
   target_link_libraries(void_tests PRIVATE void_llvm void_runtime native_fixture)
   foreach(suite core jit reload gc native)
     add_test(NAME ${suite} COMMAND void_tests ${suite})
     set_tests_properties(${suite} PROPERTIES TIMEOUT 90)
   endforeach()
+  add_test(NAME frontend COMMAND void_tests frontend "${PROJECT_SOURCE_DIR}")
+  set_tests_properties(frontend PROPERTIES TIMEOUT 90)
   find_program(VOID_CLANG NAMES clang-19 clang HINTS "${LLVM_TOOLS_BINARY_DIR}" REQUIRED)
   find_program(VOID_DWARFDUMP NAMES llvm-dwarfdump-19 llvm-dwarfdump HINTS "${LLVM_TOOLS_BINARY_DIR}" REQUIRED)
   execute_process(COMMAND "${VOID_CLANG}" --version OUTPUT_VARIABLE VOID_CLANG_VERSION RESULT_VARIABLE VOID_CLANG_STATUS)
@@ -115,4 +138,10 @@ if(BUILD_TESTING)
     "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
     "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/aot proof" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/aot.cmake")
+  add_test(NAME source_cli COMMAND "${CMAKE_COMMAND}"
+    "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
+    "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DROOT=${PROJECT_SOURCE_DIR}"
+    "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/source programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+    -P "${PROJECT_SOURCE_DIR}/tests/integration/source.cmake")
+  set_tests_properties(source_cli PROPERTIES TIMEOUT 180)
 endif()

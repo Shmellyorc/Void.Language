@@ -23,5 +23,5 @@ private:
     struct Impl;
     std::shared_ptr<Impl> impl_;
 };
-void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize);
+void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize, bool source_program = false);
 }

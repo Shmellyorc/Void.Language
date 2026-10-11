@@ -5,19 +5,8 @@ execute_process(COMMAND "${COMPILER}" --emit-proof "${object}" RESULT_VARIABLE s
 if(NOT status EQUAL 0)
   message(FATAL_ERROR "Object generation failed: ${status}")
 endif()
-if(WINDOWS)
-  # Hand-built IR calls the C printf symbol directly, bypassing UCRT header inlines.
-  # A bare .lib is validated by the clang driver as a local input file. Use -l
-  # so the MSVC linker searches the active SDK/toolset paths (including LIB).
-  set(native_libraries -llegacy_stdio_definitions)
-endif()
-if(LINKER)
-  set(native_linker "--ld-path=${LINKER}")
-endif()
-execute_process(COMMAND "${CLANG}" ${native_linker} "${object}" ${native_libraries} -o "${executable}" RESULT_VARIABLE status)
-if(NOT status EQUAL 0)
-  message(FATAL_ERROR "Native link failed: ${status}")
-endif()
+include("${CMAKE_CURRENT_LIST_DIR}/native_link.cmake")
+void_native_link("${object}" "${executable}")
 execute_process(COMMAND "${DWARFDUMP}" --verify "${object}" RESULT_VARIABLE status)
 if(NOT status EQUAL 0)
   message(FATAL_ERROR "Object debug information is invalid: ${status}")

@@ -139,3 +139,65 @@ initializes the developer environment and does not need a discovery workaround.
 
 References: [Clang 19 linker options](https://releases.llvm.org/19.1.0/tools/clang/docs/ClangCommandLineReference.html#linker-options),
 [Microsoft CRT compatibility library](https://learn.microsoft.com/en-us/cpp/porting/overview-of-potential-upgrade-issues-visual-cpp?view=msvc-170).
+
+
+## First real source compiler phase, 10 October 2026
+
+The user confirmed the three-platform foundation gate passed before this phase.
+Keep that foundation and its six architectural suites. Add one source pipeline:
+UTF-8 source -> indentation tokens -> AST -> typed semantic model -> VOID IR ->
+shared LLVM lowering for ORC and native object emission. The frontend has no LLVM
+dependency, and normal source mistakes fail before any LLVM compilation.
+
+Extend IR function signatures to typed multiple parameters/results, including no
+result, and introduce typed mutable local slots plus general jumps. Preserve
+aggregate defaults used by hand-built proofs. Instruction values remain local to
+a block; frontend temporaries carry values across short-circuit blocks, keeping
+left-to-right evaluation correct even in multi-argument calls. LLVM performs
+promotion/optimization. This avoids encoding the old one-parameter proof ABI
+into language design and avoids a second code generator or type checker.
+
+SourceFile retains byte offsets but reports one-based Unicode-scalar columns;
+validate UTF-8, accept a leading BOM and LF/CRLF/CR. Space indentation must match
+enclosing levels; four spaces are recommended, not mandatory. Names are initially
+lowercase ASCII/underscore/digits, and expressions are single-line. Neither rule
+settles the broader Unicode/multiline grammar. No existing Bible text is replaced.
+
+Use signature-first resolution for recursion, exact i32/bool types without
+coercion, lexical mutable bindings and default-zero/false typed declarations.
+Reject shadowing visible bindings/function names. Omitted return annotation means
+no result. Analyze possible control-flow exits independently of LLVM, conservatively
+requiring all reachable ends of value functions to return. Literal `for true:`
+and `for:` are non-fallthrough unless a reachable break exits them. Continue and
+break target the nearest loop. Reject while with an explicit for replacement hint.
+
+Resolve this slice's Boolean precedence explicitly: `not` binds below comparisons
+and above `and`, with `or` weakest. Arithmetic unary operators bind above products.
+Arguments and operands evaluate left to right; and/or short-circuit. Increment
+and decrement are standalone postfix statements. No collection/range grammar,
+chained comparisons or broader grammar is silently accepted.
+
+Make the inherited i32 wrapping arithmetic contract explicit for this provisional
+slice, including i64-widened signed division to avoid LLVM MIN/-1 poison. Direct
+literal zero divisors are source errors; dynamic zero divisors trap. The final
+language policy for checked arithmetic and all numeric types remains unresolved;
+this is documented behavior rather than a change to the Bible for convenience.
+
+The CLI checks library files and runs/emits an i32(i32) entry adapter. Internal
+functions have arbitrary supported parameter lists. Source AOT symbols are
+suffixed before adding the native C main/printf/strtoll adapter, avoiding collisions.
+Actual source filenames and instruction locations reach LLVM debug metadata.
+Stable export/module mangling and full debugger support remain later work.
+
+Clang UBSan's function check reads a two-word type prefix before an indirect-call
+entry. ORC functions previously lacked that prefix, and the new source executions
+exposed a page-boundary read failure under ASan. Sanitizer configuration now asks
+the actual host Clang to emit i32(i32) type metadata and attaches that metadata as
+`func_sanitize` to JIT entry functions before native code generation. The host ABI
+is checked first. Keep function checks, ASan, UBSan and leak detection enabled;
+do not suppress the boundary check. See [LLVM function-check metadata change](https://reviews.llvm.org/D148785).
+The generated LLVM application body is still not ASan/UBSan-instrumented; the
+C++ compiler/runtime and JIT host call boundary are instrumented.
+
+See SOURCE_COMPILER.md for the implemented subset, known design questions and
+next phase, and WORK_LOG.md for actual commands/results. All changes remain local.

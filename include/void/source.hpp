@@ -9,6 +9,8 @@ class SourceFile {
 public:
     SourceFile(std::string path, std::string text);
     SourceLocation location(std::size_t offset) const;
+    const std::string& text() const { return text_; }
+    const std::string& path() const { return path_; }
     std::string diagnostic(std::size_t offset, std::string_view message) const;
 private:
     std::string path_, text_;

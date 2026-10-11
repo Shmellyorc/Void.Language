@@ -1,4 +1,4 @@
-# Design equivalent of the hand-built proof IR; no source parser exists yet.
+# Compiled from source through the shared VOID frontend and LLVM backend.
 func calculate(value: i32) -> i32:
     return value + 42
 

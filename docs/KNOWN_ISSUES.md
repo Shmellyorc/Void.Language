@@ -1,43 +1,51 @@
 # Known issues and deferred work
 
-Updated 10 October 2026, foundation phase.
+Updated 10 October 2026, first real source compiler phase.
 
 ## Platform verification
 
-- In [hosted run 38099707063](https://github.com/Shmellyorc/Void.Language/actions/runs/38099707063),
-  Linux passed Debug, Release and ASan/UBSan, and macOS passed Debug and Release.
-  Windows built Debug and passed core/JIT/reload/GC/native (5/6); AOT failed in
-  Clang's input-file validation for bare `legacy_stdio_definitions.lib`.
-- The AOT script now requests `-llegacy_stdio_definitions`, allowing the native
-  Windows linker to search the active MSVC/Windows SDK environment. The existing
-  `printf` call, debug metadata verification and three executable outputs remain.
-  This local correction is uncommitted/unpushed and needs hosted Windows execution.
-- Windows Release configure/build/tests were skipped after the Debug test failure;
-  they must also pass in the next run. Linux/macOS should remain green.
-- Local Clang/LLD 19.1.7 checks reproduced the input-file error and verified real
-  COFF library discovery through `LIB`, including a path with spaces and failure
-  when that search path was removed. They do not replace Windows SDK/runtime tests.
-- CI uses complete official LLVM 19.1.7 archives. The Linux archive contains
-  bitcode and requires the matching LLD, plus an SDK-compatible RTTI setting.
-  CMake now links and runs an ORC host before the normal build. Archive downloads
-  use pinned HTTPS URLs; independent checksum/signature verification remains
-  future work.
+- The user confirmed the foundation now passes all three hosted platforms.
+  Earlier failed-run descriptions in WORK_LOG.md are historical evidence.
+- This frontend phase is locally verified on Linux with exact LLVM 19.1.7,
+  including the complete official Linux archive. Windows/macOS execution of the
+  expanded eight-suite Debug/Release matrix still requires a hosted run after
+  the user commits and pushes. Linux hosted ASan/UBSan also needs that run.
+- CI retains complete official LLVM 19.1.7 archives, Linux LLD and required
+  development dependencies, Windows SDK/DIA discovery and native printf support,
+  and the portable thread implementation. All new suites run automatically in
+  the existing workflow; none are skipped by platform.
+- Pinned archive URLs lack independent checksum/signature verification, which
+  remains future supply-chain work.
 
 ## Compiler scope
 
-- `voidc` is an IR architecture harness, not a source language compiler yet.
-  There is no lexer/parser, module resolver, full type checker, import discovery,
-  LSP, package manager or source watcher. The example `.void` file is a design
-  equivalent of hand-built IR, not compiled input.
-- The proof IR supports only one i32 parameter/result, block-local values,
-  arithmetic, comparisons, calls, branches and returns. No full language
-  overflow, Unicode identifiers or indentation rules have been finalized.
-- Source diagnostics use byte columns. Debug metadata is deliberately basic;
-  there is no variable debug information, optimized source stack trace or
-  backend-error translation suitable for application developers.
-- AOT emits a native-host object with a proof-specific `main` wrapper.
-  General executable/project compilation, cross-compilation, linker discovery,
-  deployment and arbitrary native library loading are not implemented.
+- Actual single-file `.void` compilation now works. See SOURCE_COMPILER.md for
+  supported grammar and deliberately provisional choices. There is no module
+  resolver, import discovery, VFS/canonical module identity, LSP, package manager,
+  source watcher or incremental compilation yet.
+- Supported value types are i32/bool. Strings, floats, const declarations,
+  collections/ranges, structs, generics, closures, async, named/default arguments,
+  multiple return values and full managed types are not implemented. Unsupported
+  syntax is rejected rather than simulated.
+- UTF-8 source validation and scalar columns work; identifiers currently use
+  lowercase ASCII/underscore/digits. Unicode identifier policy remains open.
+  Multiline expressions, visual-width carets and non-ASCII Windows filesystem
+  paths have not been established as supported behavior.
+- The IR supports typed multiple parameters, no-result functions and typed local
+  slots across CFG blocks. Instruction results remain block-local, with temporary
+  slots carrying values across blocks; LLVM optimizes those slots. General SSA
+  phi construction is not required for this slice.
+- Numeric overflow policy is provisional: current i32 operations wrap, signed
+  division truncates toward zero, and dynamic zero divisors trap. There are no
+  structured runtime arithmetic errors or resource limits for recursive source
+  programs/parser nesting. Broader checked arithmetic decisions remain open.
+- Diagnostics report the first error with source location/line/caret. Recovery,
+  stable error codes, ranges, variable debug information, optimized source stack
+  traces and translation of internal/backend failures remain future work.
+- AOT emits a host-native object with a simple i32 entry adapter; JIT uses the
+  same host ABI. General executable/project compilation, arbitrary entry ABIs,
+  cross-compilation, export/mangling policy, linker orchestration, deployment and
+  source-level native bindings remain deferred.
 
 ## Managed memory
 
@@ -90,12 +98,9 @@ Updated 10 October 2026, foundation phase.
 
 ## Current phase and subsequent work
 
-Stabilize hosted CI before expanding the language frontend. All three runners
-must build and execute Debug and Release, with Linux ASan/UBSan, using LLVM
-19.1.7 and the existing architectural tests. See WORK_LOG.md for local evidence.
-
-After that gate, build a precise frontend slice around source management,
-indentation, function signatures, primitive expressions, local bindings and
-source diagnostics. Formalize open numeric/grammar rules first, and resolve
-root lowering/thread coordination before adding managed language types. Keep
-the original VOIDC backup untouched.
+Run the expanded hosted matrix after the user publishes these local changes.
+Then build module/import identity and multi-file source diagnostics around this
+frontend; resolve numeric and executable/export conventions deliberately.
+Preserve one semantic model and shared IR/LLVM lowering. Resolve managed root
+lowering/thread coordination before adding managed language types. Keep the
+original VOIDC backup untouched.

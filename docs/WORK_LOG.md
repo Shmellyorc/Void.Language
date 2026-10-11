@@ -350,3 +350,157 @@ cannot establish Windows SDK availability or native execution success.
 
 No commits, pushes, hosted reruns or other remote mutations were performed. The
 pre-existing user edit to `docs/LANGUAGE_BIBLE.md` was left untouched.
+
+
+## First real source compiler — 10 October 2026
+
+### Scope and foundation
+
+The user confirmed all three GitHub Actions platforms passed the previous
+foundation before authorizing this cohesive compiler phase. Read the current
+Language Bible, strategy, decisions and known issues, and preserve those design
+sources. The Language Bible was not edited. No commits, pushes, hosted reruns or
+other remote changes were made.
+
+Actual files now pass through UTF-8 source handling, indentation tokenization,
+AST parsing, signature/binding/type/control-flow analysis and lowering to the
+existing backend-independent IR. Shared LLVM lowering generates both ORC code
+and native objects. The implementation supports multiple typed parameters,
+i32/bool, recursive/forward calls, arithmetic/comparison/short-circuit Boolean
+expressions, mutable/default-initialized locals, assignment/compound/postfix
+updates, return, nested conditionals, conditional/unbounded for and nearest-loop
+break/continue. It diagnoses while with the correct for replacement.
+
+Extend IR signatures, typed slots and jumps without changing the old proof
+contracts. Preserve all six architectural suites and their assertions, including
+native printf, generated roots under optimization, concurrent replacement and
+safe retirement. The new frontend suite shares the existing test runner, avoiding
+another expensive static LLVM link in CI. Native-link script setup is shared by
+the old AOT proof and new source integration test; required Windows libraries
+remain intact. The existing workflow automatically executes all eight suites.
+
+Documented provisional choices include indentation/identifier scope, expression
+precedence, flow analysis, left-to-right evaluation and initial wrapping i32
+arithmetic. No broader language grammar or numeric policy is silently finalized.
+See SOURCE_COMPILER.md and DECISIONS.md for details and remaining questions.
+
+### Actual source acceptance
+
+`examples/architecture.void` is read by the compiler, not reconstructed as proof
+IR. Both normal and O2 JIT/AOT execution produced:
+
+| Input | Source ORC JIT | Linked native AOT |
+| --- | --- | --- |
+| -1 | 7 | 7 |
+| 0 | 42 | 42 |
+| 1 | 43 | 43 |
+| 10 | 52 | 52 |
+
+The source integration suite compiles three real files (`architecture`, `loops`,
+`functions`) with and without O2, verifies actual source filenames in valid DWARF,
+links native executables and compares 56 JIT/AOT results. It uses source/output
+paths with spaces and rejects malformed/out-of-range native CLI arguments.
+An edited copy changes 42 to 13 and renames calculate to main; both engines return
+23 for input 10, checking real source behavior and native adapter symbol isolation.
+Thirteen additional independent programs cover all arithmetic, bool types,
+short circuiting around dangerous dynamic division, multi-argument short-circuit
+CFGs, recursive/mutual calls, loop nesting/exits and local reinitialization.
+
+Over fifty diagnostic/boundary checks cover indentation/tabs, unexpected tokens,
+unresolved names, duplicates/shadowing, argument counts, exact types, invalid and
+missing returns, loop misuse, unsupported iteration/numbers, overflow literals,
+zero literals, malformed UTF-8 and source locations/carets. BOM, Unicode comments,
+scalar columns, CRLF/CR and missing EOF newline receive positive checks. The JIT
+host rejects incompatible entry ABIs before invoking generated code.
+
+### Sanitizer finding and correction
+
+The expanded executions exposed a Clang UBSan indirect-call metadata read before
+a page-aligned ORC entry. This was an actual JIT host boundary fault under ASan.
+The fix obtains the i32(i32) function metadata from the actual host compiler at
+configuration and attaches LLVM func_sanitize metadata before ORC code generation.
+No sanitizer check or architectural assertion is suppressed. Application-generated
+instructions remain outside sanitizer instrumentation, as in the original proofs;
+the compiler/runtime, native fixture and host boundary retain instrumentation.
+
+LeakSanitizer requires process inspection unavailable under this desktop's tracing
+sandbox. Sanitizer CTest executions ran outside that sandbox with leak detection
+and all checks enabled.
+
+### Reproduction and local verification
+
+The installed SDK is `/usr/lib/llvm-19/lib/cmake/llvm`, with Clang and LLD 19.1.7.
+The required Linux packages remain documented in README; official-archive CI
+installs ninja-build, libffi-dev, libedit-dev, libxml2-dev, libzstd-dev, zlib1g-dev
+and libtinfo-dev. SDK-specific development dependencies must remain installed.
+
+```sh
+cmake -S . -B build/ci-debug \
+  -DLLVM_DIR=/usr/lib/llvm-19/lib/cmake/llvm \
+  -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19 \
+  -DVOID_LINKER=/usr/lib/llvm-19/bin/ld.lld -DCMAKE_BUILD_TYPE=Debug
+cmake --build build/ci-debug -j3
+ctest --test-dir build/ci-debug --output-on-failure
+
+cmake -S . -B build/ci-release \
+  -DLLVM_DIR=/usr/lib/llvm-19/lib/cmake/llvm \
+  -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19 \
+  -DVOID_LINKER=/usr/lib/llvm-19/bin/ld.lld -DCMAKE_BUILD_TYPE=Release
+cmake --build build/ci-release -j3
+ctest --test-dir build/ci-release --output-on-failure
+
+cmake -S . -B build/ci-sanitizers \
+  -DLLVM_DIR=/usr/lib/llvm-19/lib/cmake/llvm \
+  -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19 \
+  -DVOID_LINKER=/usr/lib/llvm-19/bin/ld.lld \
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVOID_SANITIZERS=ON
+cmake --build build/ci-sanitizers -j3
+ctest --test-dir build/ci-sanitizers --output-on-failure
+ctest --test-dir build/ci-sanitizers --output-on-failure --repeat until-fail:5
+```
+
+Debug: 8/8 passed (3.19 s). Release: 8/8 passed (1.91 s).
+ASan/UBSan: all eight suites passed five consecutive executions after the final
+changes (40 suite executions, 65.56 s while the official SDK linked concurrently).
+ASan, UBSan function checks and leak detection remained enabled.
+
+The complete official Linux CI archive is also configured locally:
+
+```sh
+cmake -S . -B build/ci-official-debug \
+  -DLLVM_DIR="$PWD/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm" \
+  -DCMAKE_C_COMPILER="$PWD/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang" \
+  -DCMAKE_CXX_COMPILER="$PWD/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/clang++" \
+  -DVOID_LINKER="$PWD/.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/ld.lld" \
+  -DCMAKE_BUILD_TYPE=Debug
+cmake --build build/ci-official-debug -j3
+ctest --test-dir build/ci-official-debug --output-on-failure
+```
+
+The official SDK configuration links/runs the ORC probe, uses its bitcode archives
+through matching LLD, and matches its disabled RTTI ABI. The final rebuild passed
+all eight suites (1.70 s), including native source compilation/link/execution and
+all preserved architectural regressions. Whitespace checks and local documentation
+links passed. The source entry ABI diagnostic was also checked manually at its
+function-name location (line 1, column 6).
+
+Native source demonstration (after the integration tests create the executable):
+
+```sh
+build/ci-debug/voidc run examples/architecture.void 10
+# 52
+"build/ci-debug/source programs with spaces/architecture-optimized" 10
+# 52
+```
+
+### Remaining verification and next phase
+
+The expanded Windows/macOS Debug/Release and hosted Linux sanitizer runs remain
+unverified until the user commits/pushes and runs Actions. The prior foundation
+passes do not establish these new frontend results on those hosts. Keep LLVM
+19.1.7 pinned, the required SDK libraries and every architectural suite intact.
+
+Next, after that hosted gate: module/import resolution with stable identity and
+multi-file diagnostics, deliberate numeric and executable/export conventions,
+and diagnostic/runtime error improvements. Managed-language types must wait for
+root/thread integration; structs, generics, collections and async remain deferred.
