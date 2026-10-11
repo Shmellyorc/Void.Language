@@ -1,6 +1,6 @@
 # Known issues and deferred work
 
-Updated 11 October 2026, Phase 6 numeric implementation.
+Updated 11 October 2026, Phase 7 analysis and compatibility.
 
 ## Platform verification
 
@@ -13,7 +13,7 @@ Updated 11 October 2026, Phase 6 numeric implementation.
   local official-archive build reproduce mixed RTTI metadata in C++ template
   ownership/future cleanup. The local correction matches SDK RTTI throughout
   the linked program. The user reports commit `4f3688d` passed run #8 on all
-  platforms; those earlier failures are resolved. Phase 6 needs its own hosted run. See CI_SANITIZER_ABI.md and
+  platforms; those earlier failures are resolved. The user reports Phase 6 commit `9b9fdac` passed run #9 on all three platforms. See CI_SANITIZER_ABI.md and
   WORK_LOG.md for evidence and validation.
 - CI retains complete official LLVM 19.1.7 archives, Linux LLD and required
   development dependencies, Windows SDK/DIA discovery and native printf support,
@@ -105,9 +105,10 @@ Updated 11 October 2026, Phase 6 numeric implementation.
 ## Reload and native boundaries
 
 - Layout/capture compatibility metadata is supplied by the host. The frontend now
-  supplies an exact constant restart token covering complete snapshots of every
-  const-containing file. It conservatively rejects unrelated edits in those files
-  too. Precise AST/dependency compatibility remains future work.
+  supplies exact constant declaration tokens and validated dependency contracts.
+  Ordinary body/trivia edits beside unchanged constants can reload. Declaration
+  and reference ordering remain conservative restart conditions; see
+  ANALYSIS_COMPATIBILITY.md.
 - A single slot publishes an entire module generation. There is no atomic
   transaction across independently published slots, file monitoring, incremental
   recompilation, suspended-task tracking or capture-layout migration.
@@ -147,9 +148,10 @@ Updated 11 October 2026, Phase 6 numeric implementation.
 
 ## Current phase and subsequent work
 
-The user reports the corrected Phase 5 hosted matrix passed. Phase 6 preserves
-those ten suites and adds numeric/numeric_cli. Its local validation is recorded in
-WORK_LOG.md; hosted Linux/Windows/macOS verification requires the user's next push.
-No remote verification is claimed for Phase 6. Next refine validated analysis and
-dependency compatibility APIs before incremental IDE integration. Managed types
-still need the GC/root/thread gate. Keep the original VOIDC backup untouched.
+The user reports Phase 6 commit `9b9fdac` passed run #9 on all three platforms.
+Phase 7 adds analysis and analysis_cli while preserving all twelve preceding
+suites. Local validation is recorded in WORK_LOG.md. Hosted Phase 7 verification
+requires the user's next push; no new hosted result is claimed. Next evaluate
+an in-process tooling consumer and invalidation planning before incremental
+compilation or LSP transport. Managed types still need the GC/root/thread gate.
+Keep the original VOIDC backup untouched.

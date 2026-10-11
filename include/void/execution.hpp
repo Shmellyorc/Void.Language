@@ -4,6 +4,7 @@
 #include <mutex>
 #include <string>
 namespace vd {
+class ValidatedAnalysis;
 // Per-invocation storage: generated code only borrows it until normal return.
 struct RuntimeFailure {
     const char* message = nullptr;
@@ -15,7 +16,13 @@ struct Compatibility {
     std::string signature = "c:i32(i32)";
     std::uint64_t layout = 0, captures = 0, constants = 0;
     std::string constant_contract = {};
-    bool operator==(const Compatibility&) const = default;
+    std::string source_contract = {};
+    std::shared_ptr<const ValidatedAnalysis> analysis = {};
+    bool operator==(const Compatibility& other) const {
+        return function_id == other.function_id && signature == other.signature &&
+            layout == other.layout && captures == other.captures && constants == other.constants &&
+            constant_contract == other.constant_contract && source_contract == other.source_contract;
+    }
 };
 class NativeCode {
 public:

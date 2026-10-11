@@ -200,7 +200,7 @@ struct Expr {
 struct Statement {
     enum class Kind { variable, assignment, expression, returned, conditional, loop, broken, continued } kind;
     Token token;
-    std::string name, op;
+    std::string name, op, constant_syntax;
     std::optional<Type> annotation;
     std::unique_ptr<Expr> expression;
     std::vector<Statement> body, otherwise;
@@ -212,7 +212,7 @@ struct Parameter { Token token; Type type; unsigned slot = 0; };
 struct Function {
     Token token;
     bool file_private = false, parse_failed = false;
-    std::string symbol;
+    std::string symbol, visibility = "public";
     std::vector<Parameter> parameters;
     Type result = Type::none;
     std::vector<Statement> body;
@@ -221,6 +221,7 @@ struct Function {
 struct Constant {
     Statement declaration;
     bool file_private = false;
+    std::string visibility = "public";
     unsigned state = 0;
     Type type = Type::none;
     std::uint64_t value = 0;
@@ -413,11 +414,14 @@ class Parser {
             s.body = block(); return s;
         }
         if (at("var") || at("const")) {
+            auto start = p;
             bool readonly = at("const");
             Statement s(Statement::Kind::variable, take()); s.readonly = readonly; auto n = name(); s.name = n.text; s.token = n;
             if (accept(":")) s.annotation = type();
             if (accept("=")) s.expression = expression();
             if (readonly && !s.expression) error(source, s.token, Code::initializer, "A const requires an initializer.");
+            if (readonly) for (auto i = start; i < p; ++i)
+                s.constant_syntax += std::to_string(tokens[i].text.size()) + ":" + tokens[i].text;
             newline(); return s;
         }
         if (at("return")) {
@@ -460,11 +464,11 @@ public:
                 newline(); unit.imports.push_back(std::move(import)); continue;
             }
             Function f;
-            if (accept("private")) f.file_private = true;
-            else if (!accept("public")) accept("internal"); // All graph files belong to this project.
+            if (accept("private")) { f.file_private = true; f.visibility = "private"; }
+            else if (!accept("public") && accept("internal")) f.visibility = "internal"; // All graph files belong to this project.
             if (at("const")) {
                 auto declaration = statement();
-                unit.constants.push_back({std::move(declaration), f.file_private}); continue;
+                unit.constants.push_back({std::move(declaration), f.file_private, f.visibility}); continue;
             }
             need("func"); f.token = name(); need("(");
             if (!at(")")) do { auto token = name(); need(":"); f.parameters.push_back({token, type()}); } while (accept(","));
@@ -670,7 +674,7 @@ class Semantics {
             if (!v) {
                 auto [owner, c] = constant(e);
                 if (c) {
-                    evaluate(*owner, *c); e.kind = K::literal; e.value = c->value;
+                    evaluate(*owner, *c); e.target = owner->identity + "::" + c->declaration.name; e.kind = K::literal; e.value = c->value;
                     return e.type = c->type;
                 }
             }
@@ -1148,7 +1152,7 @@ std::uint64_t constant_value(const SourceFile& source, const Expr& e) {
         error(source,e.token,e.kind == Expr::Kind::conversion ? Code::numeric_conversion : Code::zero_divisor,failure.what());
     }
 }
-ir::Module compile_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics) {
+void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics) {
     // Discover every signature before checking any body, including cyclic imports.
     for (auto& [id, unit] : units) for (auto& f : unit->functions) {
         f.symbol = id + "::" + f.token.text;
@@ -1230,15 +1234,11 @@ ir::Module compile_graph(std::map<std::string, std::unique_ptr<Unit>>& units, co
     for (auto& [id, unit] : units) Semantics(*unit, units, root, evaluate, diagnostics).analyze();
     // Recovered trees and AST-only poisoned types can never enter validated IR.
     diagnostics.finish();
+}
+ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
     ir::Module module; module.identity = entry; module.entry_symbol = entry + "::entry";
     module.source_path = units.at(entry)->source.path();
     for (auto& [id, unit] : units) {
-        if (!unit->constants.empty() || std::any_of(unit->functions.begin(), unit->functions.end(), [](const Function& f) {
-            std::function<bool(const std::vector<Statement>&)> has = [&](const auto& body) {
-                for (const auto& s : body) if (s.readonly || has(s.body) || has(s.otherwise)) return true;
-                return false;
-            }; return has(f.body);
-        })) module.constant_contract += std::to_string(id.size()) + ":" + id + std::to_string(unit->source.text().size()) + ":" + unit->source.text();
         Lowering lowering(unit->source);
         for (const auto& f : unit->functions) {
             auto lowered = lowering.lower(f); lowered.module_identity = id;
@@ -1249,6 +1249,98 @@ ir::Module compile_graph(std::map<std::string, std::unique_ptr<Unit>>& units, co
 }
 
 }
+std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile&);
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&);
+// This factory is the only way to construct a successful result.
+struct AnalysisAccess {
+    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry) {
+        auto result = std::shared_ptr<ValidatedAnalysis>(new ValidatedAnalysis);
+        result->entry_ = entry;
+        auto graph = std::make_shared<const std::map<std::string, std::unique_ptr<Unit>>>(std::move(units));
+        auto field = [](std::string& out, const std::string& value) { out += std::to_string(value.size()) + ":" + value; };
+        auto declaration = [&](AnalyzedDeclaration d) {
+            if (d.owner.empty()) d.owner = d.module;
+            field(result->contract_, "declaration"); field(result->contract_, d.identity); field(result->contract_, d.visibility);
+            field(result->contract_, std::to_string(static_cast<int>(d.kind)));
+            field(result->contract_, ir::type_name(d.type));
+            field(result->contract_, std::to_string(d.parameters.size()));
+            for (auto t : d.parameters) field(result->contract_, ir::type_name(t));
+            if (d.kind != AnalyzedDeclaration::Kind::function) {
+                field(result->constants_, d.identity); field(result->constants_, d.visibility);
+                field(result->constants_, ir::type_name(d.type)); field(result->constants_, d.constant_syntax);
+            }
+            result->declarations_.push_back(std::move(d));
+        };
+        auto reference = [&](const std::string& from, const std::string& to, const Expr& e, const Unit& u) {
+            auto location = span(u.source,e.token); location.module_identity = u.identity;
+            auto spelling = e.qualifier + "::" + e.token.text;
+            result->references_.push_back({from,to,spelling,std::move(location)});
+            field(result->contract_,"reference"); field(result->contract_,from); field(result->contract_,to);
+        };
+        for (const auto& [id, unit] : *graph) {
+            AnalyzedModule module{id,unit->source,{}};
+            field(result->contract_,"module"); field(result->contract_,id);
+            // Canonical binding records: offsets and written path normalization are irrelevant.
+            std::set<std::string> imports;
+            for (const auto& i : unit->imports) {
+                module.imports.push_back(i.target);
+                std::string binding; field(binding,i.target);
+                imports.insert(std::move(binding));
+            }
+            std::sort(module.imports.begin(),module.imports.end());
+            module.imports.erase(std::unique(module.imports.begin(),module.imports.end()),module.imports.end());
+            field(result->contract_,std::to_string(imports.size()));
+            for (const auto& i : imports) field(result->contract_,i);
+            result->modules_.push_back(std::move(module));
+            auto location = [&](const Token& t) { auto l = span(unit->source,t); l.module_identity=id; return l; };
+            std::function<void(const Expr&,const std::string&,const std::map<unsigned,std::string>&)> expression;
+            expression = [&](const Expr& e, const std::string& owner, const auto& locals) {
+                if (!e.target.empty()) reference(owner,e.target,e,*unit);
+                else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit);
+                for (const auto& part : e.parts) expression(*part,owner,locals);
+            };
+            for (const auto& c : unit->constants) {
+                auto key = id + "::" + c.declaration.name;
+                declaration({AnalyzedDeclaration::Kind::module_constant,key,id,c.visibility,location(c.declaration.token),{},c.type,c.declaration.constant_syntax,c.value});
+                expression(*c.declaration.expression,key,{});
+            }
+            for (const auto& f : unit->functions) {
+                std::vector<Type> parameters; for (const auto& p : f.parameters) parameters.push_back(p.type);
+                declaration({AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}});
+                std::map<unsigned,std::string> locals;
+                std::map<std::string,unsigned> names;
+                std::function<void(const std::vector<Statement>&)> body;
+                body = [&](const auto& statements) {
+                    for (const auto& s : statements) {
+                        auto owner = f.symbol;
+                        if (s.readonly) {
+                            owner += "::const::" + s.name + "::" + std::to_string(names[s.name]++);
+                            declaration({AnalyzedDeclaration::Kind::local_constant,owner,id,"local",location(s.token),{},f.locals.at(s.slot),s.constant_syntax,{},f.symbol});
+                        }
+                        if (s.expression) expression(*s.expression,owner,locals);
+                        if (s.readonly) locals.emplace(s.slot,owner);
+                        body(s.body); body(s.otherwise);
+                    }
+                };
+                body(f.body);
+            }
+        }
+        field(result->contract_,result->constants_);
+        result->lower_ = [graph,entry] { return lower_graph(*graph,entry); };
+        return result;
+    }
+};
+ir::Module ValidatedAnalysis::lower() const {
+    auto module = lower_(); module.constant_contract = constants_; module.analysis = shared_from_this(); return module;
+}
+AnalysisResult analyze_source(const SourceFile& source) {
+    try { return {validated_source(source),{}}; }
+    catch (const CompilationError& e) { return {nullptr,e.diagnostics()}; }
+}
+AnalysisResult analyze_project(const std::filesystem::path& entry) {
+    try { return {validated_project(entry),{}}; }
+    catch (const CompilationError& e) { return {nullptr,e.diagnostics()}; }
+}
 SourceFile read_source(const std::filesystem::path& path) {
     std::ifstream stream(path, std::ios::binary);
     if (!stream) throw SourceReadError(path.generic_string(), "Cannot read source file.");
@@ -1256,7 +1348,7 @@ SourceFile read_source(const std::filesystem::path& path) {
     if (stream.bad()) throw SourceReadError(path.generic_string(), "Cannot finish reading source file.");
     return {path.generic_string(), std::move(text)};
 }
-ir::Module compile_source(const SourceFile& source) {
+std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile& source) {
     std::map<std::string, std::unique_ptr<Unit>> units;
     auto identity = source.path().empty() ? std::string("<source>") : source.path();
     auto unit = std::make_unique<Unit>(source, identity);
@@ -1268,9 +1360,10 @@ ir::Module compile_source(const SourceFile& source) {
         unit->failed_import = true;
     }
     units.emplace(identity, std::move(unit));
-    return compile_graph(units, identity, diagnostics);
+    validate_graph(units, identity, diagnostics);
+    return AnalysisAccess::build(std::move(units), identity);
 }
-SourceProgram compile_project(const std::filesystem::path& entry) {
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path& entry) {
     std::error_code ec;
     auto absolute = std::filesystem::absolute(entry, ec);
     if (ec) error(SourceFile(entry.generic_string(), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the entry source path.");
@@ -1284,8 +1377,21 @@ SourceProgram compile_project(const std::filesystem::path& entry) {
         try { return graph.load(anchor, {TokenKind::path, "/" + absolute.filename().generic_string(), 0}); }
         catch (const CompilationError& failure) { diagnostics.add(failure); diagnostics.finish(); throw; }
     }();
-    auto module = compile_graph(graph.units, first.identity, diagnostics);
-    return {first.source, std::move(module)};
+    validate_graph(graph.units, first.identity, diagnostics);
+    auto identity = first.identity;
+    return AnalysisAccess::build(std::move(graph.units), identity);
+}
+ir::Module compile_source(const SourceFile& source) {
+    auto result = analyze_source(source);
+    if (!result.succeeded()) throw CompilationError(std::move(result.diagnostics));
+    return result.program->lower();
+}
+SourceProgram compile_project(const std::filesystem::path& entry) {
+    auto result = analyze_project(entry);
+    if (!result.succeeded()) throw CompilationError(std::move(result.diagnostics));
+    auto module = result.program->lower();
+    for (const auto& m : result.program->modules()) if (m.identity == module.identity) return {m.source,std::move(module)};
+    throw std::logic_error("Validated entry absent");
 }
 void require_source_entry(const SourceFile& source, const ir::Module& module) {
     Diagnostics diagnostics; diagnostics.bind(source, module.identity);

@@ -209,3 +209,11 @@ above; normal and O2 tests execute both native modes. Invalid source never execu
 or replaces an existing object. See [diagnostic codes, recovery and snapshots](docs/DIAGNOSTICS.md)
 and [verified commands/results](docs/WORK_LOG.md). The user reports Phase 4 passed
 all hosted platforms; Phase 5 requires another user-published Actions run.
+
+Validated project analysis and native reload APIs are documented in
+[ANALYSIS_COMPATIBILITY.md](docs/ANALYSIS_COMPATIBILITY.md). The real three-file
+`examples/analysis/main.void` returns 53 at input 10. Its body-edit/reload test
+changes that to 61 beside unchanged constants while retaining the old generation;
+actual constant edits require manual restart. These source tests supplement the
+original hand-built IR architectural proofs. The suite now contains fourteen
+CTest suites, including all twelve from Phase 6.

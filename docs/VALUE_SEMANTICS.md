@@ -182,3 +182,14 @@ caller traces and exact conservative const restart token are unchanged. Invalid
 source edits cannot produce IR or publish a native generation. Tests retain the old
 lease and active slot across failures and continue rejecting changed const tokens.
 Precise dependency compatibility remains a separate recommended design phase.
+
+## Phase 7 analysis and compatibility update
+
+The earlier whole-file constant-token and analysis-API limitations above describe
+the preceding phases. They are superseded by [ANALYSIS_COMPATIBILITY.md](ANALYSIS_COMPATIBILITY.md):
+one validated, owning analysis result now supplies declarations, snapshots and
+resolved dependencies without IR/machine-code generation. Exact declaration tokens
+and compiler-derived bindings replace whole const-containing source files in
+reload compatibility. Ordinary body/trivia edits beside unchanged constants can
+reload; actual constant changes require manual restart. Language rules, numeric
+semantics and structured recovery remain unchanged.

@@ -370,3 +370,23 @@ rejected all floats now reject malformed float suffixes and unsupported string
 types, preserving their negative-test purpose while admitting the approved feature.
 No unrelated grammar, nullable casts, managed types or public native ABI is added.
 See WORK_LOG.md for actual verification and remaining hosted requirements.
+
+## Phase 7 validated analysis and exact dependency compatibility
+
+The user reports Phase 6 commit `9b9fdac` passed hosted run #9 on all platforms.
+Expose one immutable successful analysis result from the existing full-graph
+validation pipeline, retaining owned typed trees and snapshots. Lower on demand;
+compilation adapters never repeat full analysis. Failed results expose diagnostics
+only. Public records contain VFS identities, typed/visible declarations, constant
+bit patterns and resolved dependency references.
+
+Replace the conservative full-file const token with exact parser-token declarations
+and resolved binding/type/visibility/import records. Exclude trivia and physical
+locations; compare exact length-delimited data, never hashes alone. Preserve
+unused-alias renaming when owners remain unchanged. Retain conservative declaration
+and reference ordering restrictions for this phase. All reachable constants,
+including runtime local readonly declarations, still require restart after actual
+changes. Add a validated-source JIT preflight publication API while preserving
+legacy IR proofs and one-slot whole-module leases. Host source metadata cannot
+override compiler-derived safety. No LSP, incremental compiler, watcher, automatic
+restart or multi-slot transaction is introduced. See ANALYSIS_COMPATIBILITY.md.

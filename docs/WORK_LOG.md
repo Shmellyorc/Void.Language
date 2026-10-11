@@ -1252,3 +1252,158 @@ success is claimed. No commit, push, branch change, publication or remote mutati
 was performed. Recommended next cohesive phase: validated analysis/dependency
 APIs and compatibility metadata before incremental tooling; managed types still
 require their separate GC root/thread integration gate.
+
+## Phase 7: validated analysis and dependency compatibility — 11 October 2026
+
+The user reports Phase 6 commit `9b9fdac` passed Actions run #9 on Ubuntu,
+Windows and macOS. This phase proceeded locally from that clean tree. No branch,
+commit, push, publication or remote mutation was performed. LLVM/Clang/LLD remain
+19.1.7; the shared SDK RTTI policy, numerical semantics, twelve existing CTest
+suites and architectural assertions remain intact. The Language Bible is unchanged.
+
+### Implementation and safety decisions
+
+Reviewed the current frontend, source graph, semantic/constant evaluator, lowering,
+IR, JIT publication contract and project documentation. Split the existing graph
+pipeline at its complete validation gate. `analyze_source`/`analyze_project` return
+explicit success with an immutable owning ValidatedAnalysis, or diagnostics with
+no program. Existing compilation adapters analyze once and lower the retained
+validated tree. Analysis itself generates neither VOID IR nor native code.
+
+The result owns canonical VFS modules and immutable source snapshots, typed/visible
+function/module/local-constant declarations, source spans, module constant bit
+patterns, containing owners and real resolved call/constant references. Module
+constants retain their declaring identity when semantics substitutes literal bits.
+Local readonly references use typed slot ownership to identify the declaration.
+Function-only import cycles require no acyclic assumption or duplicate analysis.
+
+Exact tagged length-delimited comparison data now covers the graph, declarations,
+types/visibility and resolved references, plus parser-captured constant tokens.
+Trivia, physical paths and source offsets are excluded. Constants include unused,
+root, imported, transitive and runtime local readonly declarations. Equal evaluated
+values do not hide changed declaration syntax. No finite hash authorizes reload.
+Local constant IDs use function/name/lexical same-name occurrence, not raw lines.
+
+Added validated-source JIT compilation and preflight replacement. Compiler-owned
+source records override caller-supplied source compatibility fields; host layout,
+capture and legacy contracts are additional requirements. Incompatible candidates
+return false before native generation. Slot publication rechecks compatibility
+under the existing mutex, and old code retains its resource tracker and source
+analysis through leases. No automatic restart, watcher, incremental cache, LSP or
+unproven multi-slot transaction was introduced. Legacy hand-built IR proofs remain
+available; manually constructed IR/native code is a trusted host interface.
+
+An initial focused run correctly exposed a preserved architectural requirement:
+unused alias renaming across physical relocation must remain compatible. Canonical
+imports now compare actual VFS targets and references compare resolved owners,
+while tooling records still retain written spellings. The original module test
+then passed unchanged. This was a correction to the new comparison, not a relaxed
+architectural assertion. The preliminary failure is not included in final pass claims.
+
+Conservative restrictions remain: declaration order and reference traversal order/
+multiplicity participate, so some declaration moves or added calls require restart.
+The new convenience replacement helper selects the project entry. Arbitrary host
+entries still use the legacy IR interface and retain exact i32(i32) checking.
+All ten numeric source types remain distinct in declaration contracts even when
+LLVM uses equal storage widths. ANALYSIS_COMPATIBILITY.md documents the full API,
+ownership model, classification and tooling boundaries.
+
+### New source tests and observed native behavior
+
+Added `analysis` and `analysis_cli`; all twelve prior suites remain, total fourteen.
+The real three-file `examples/analysis/` includes project-root/module/local consts.
+Normal and optimized JIT both observed:
+
+```text
+input 10, initial source: 53
+edit only return stable + 1 -> return stable + 9: compatible, new slot returns 61
+old native lease: 53
+edit imported const base = 40 -> 41: incompatible, slot remains 61
+```
+
+The incompatible preflight does not allocate another native generation. A second
+path deliberately compiles the incompatible candidate and proves direct slot
+replacement still rejects it even when host metadata attempts to copy old tokens.
+Comment/blank-line/constant-spacing edits remain compatible, updating spans without
+changing symbol identities. Retained analysis lowers and executes after deletion of
+all source files; old runtime failures still show their original source line.
+
+Other focused coverage includes module/local/transitive constants, unchanged-value
+constant syntax edits, visibility/signature changes, declaration addition/removal,
+module graph changes, imported rename/rebinding, distinct same-named owners, cycles,
+relocation, all ten numeric types, host layout/capture guards and multiple structured
+errors. Each analysis run executes 480 malformed-source cases across the two JIT
+modes, checking recovery retains a following independent diagnostic. Concurrent
+callers acquire leases during 24 actual compatible native publications per suite
+run; returned results must belong entirely to one generation. Existing deterministic
+native-call retirement/GC/C-binding proofs also execute unchanged.
+
+A recorded verbose Debug demonstration observed 229,310 normal-mode calls and
+266,992 O2-mode calls during the source publication exercise; these are correctness
+stress counts, not performance measurements. `analysis_cli` independently checks
+53 -> 61 -> 62 through fresh real-source normal/O2 JIT and linked native AOT.
+The final constant edit is legal in a fresh executable; live publication remains
+forbidden. Six real object files are linked in each analysis_cli run.
+
+### Actual local validation
+
+Reused six established build directories, triggering the unchanged actual ORC
+configure/link/execute SDK probe after CMake changed. SDK headers, APFloat header,
+OrcJIT/Support libraries, LLVMConfig.cmake and Clang version were checked for each
+configuration; metadata is in `build/phase7-verification/toolchains.json`.
+
+```sh
+cmake --build build/ci-debug -j2
+ctest --test-dir build/ci-debug --output-on-failure
+cmake --build build/ci-release -j2
+ctest --test-dir build/ci-release --output-on-failure
+cmake --build build/ci-sanitizers -j2
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers --output-on-failure
+cmake --build build/ci-official-debug -j1
+ctest --test-dir build/ci-official-debug --output-on-failure
+cmake --build build/ci-official-release -j1
+ctest --test-dir build/ci-official-release --output-on-failure
+cmake --build build/ci-official-san -j1
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-official-san --output-on-failure
+```
+
+Installed SDK: `/usr/lib/llvm-19/lib/cmake/llvm`, matching installed Clang/LLD19.1.7,
+RTTI on. Complete official SDK: `.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64`,
+its matching tools, RTTI off. The official builds retain the existing local ThinLTO
+cache under `build/phase6-verification/lto-cache`; no SDK files are changed.
+Strict sanitizer tests execute outside the tracing sandbox so LeakSanitizer process
+inspection works, retaining leak detection and halt-on-error. The official no-RTTI
+ABI cannot check vptr; the separate installed RTTI-enabled SDK supplies that coverage.
+
+| Configuration | Actual result | CTest wall time |
+|---|---|---|
+| Installed Debug | 14/14 passed | 39.45 s |
+| Installed Release | 14/14 passed | 32.01 s |
+| Installed strict ASan/UBSan | 14/14 passed | 60.52 s |
+| Official Debug | 14/14 passed | 28.53 s |
+| Official Release | 14/14 passed | 25.22 s |
+| Official strict ASan/UBSan | 14/14 passed | 49.71 s |
+
+Additional installed strict sanitizer stress ran `analysis`, `reload`, `modules`
+with `--repeat until-fail:5`: all fifteen executions passed, 13.09 seconds.
+The normal test output's three named suites represents fifteen actual repeats.
+The complete official SDK ran the same three suites five times under strict
+sanitizers: all fifteen executions passed in 11.77 seconds. Together these are
+thirty additional compatibility/reload/module stress executions, including 4,800
+malformed analysis inputs in the ten repeated analysis suite executions.
+
+The complete official strict ASan/UBSan run passed all fourteen suites, including
+the original native/GC/generation proofs and Phase 5/6 diagnostics/numerics. The
+final audit verified all six compiler/test binaries are newer than the frozen
+source/fixture inputs, the SHA-256 source manifest is unchanged, and all six
+complete test logs contain 14/14 passes. Final build/test logs contain no sanitizer
+reports, LLVM backtraces or new project warnings; only the established LLVM/GCC16
+third-party `<ciso646>` warning remains. Markdown links and diff whitespace pass.
+Both installed and official LLD report 19.1.7. No SDK or workflow requirements
+were changed. The manifest is an audit artifact, not reload authorization.
+Logs and source manifests are local ignored artifacts under
+`build/phase7-verification/`. Windows/macOS Phase 7 hosted execution requires the
+user's next push. The workflow already runs every CTest suite; no platform skips,
+sanitizer suppressions or weakened requirements were added. Next recommended work:
+an in-process tooling consumer and explicit invalidation planning before incremental
+compilation/LSP transport; keep the separate managed-runtime integration gate.

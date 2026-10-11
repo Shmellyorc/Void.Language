@@ -16,6 +16,9 @@ public:
     }
     std::shared_ptr<const NativeCode> compile(const ir::Module&, const std::string& entry,
                                              bool optimize = true, Compatibility contract = {});
+    std::shared_ptr<const NativeCode> compile(const ValidatedAnalysis&, bool optimize = true, Compatibility contract = {});
+    // Preflight complete validated source safety before code generation; publication rechecks.
+    bool replace(ReloadSlot&, const ValidatedAnalysis&, bool optimize = true, Compatibility contract = {});
     // A generated optimized loop registers a stack root around native safepoints.
     std::shared_ptr<const NativeCode> compile_root_probe(bool optimize);
     std::size_t live_generations() const;

@@ -192,3 +192,14 @@ immutable source snapshots, with cross-file related declarations. All module
 validation finishes before any AST lowering. See [DIAGNOSTICS.md](DIAGNOSTICS.md)
 for recovery, deterministic ordering, deduplication and suppression limits.
 Function-only cycles, visibility, path policy and exact const restart tokens are unchanged.
+
+## Phase 7 analysis and compatibility update
+
+The earlier whole-file constant-token and analysis-API limitations above describe
+the preceding phases. They are superseded by [ANALYSIS_COMPATIBILITY.md](ANALYSIS_COMPATIBILITY.md):
+one validated, owning analysis result now supplies declarations, snapshots and
+resolved dependencies without IR/machine-code generation. Exact declaration tokens
+and compiler-derived bindings replace whole const-containing source files in
+reload compatibility. Ordinary body/trivia edits beside unchanged constants can
+reload; actual constant changes require manual restart. Language rules, numeric
+semantics and structured recovery remain unchanged.

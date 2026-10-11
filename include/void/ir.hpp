@@ -1,6 +1,8 @@
 #pragma once
 #include "void/source.hpp"
 #include <cstdint>
+#include <memory>
+namespace vd { class ValidatedAnalysis; }
 #include <string>
 #include <vector>
 namespace vd::ir {
@@ -38,7 +40,8 @@ struct Module {
     std::vector<Function> functions;
     std::string entry_symbol = "entry";
     std::string source_path = {}; // Physical debug source; not part of stable identity.
-    std::string constant_contract = {}; // Exact conservative restart token for source const changes.
+    std::shared_ptr<const ValidatedAnalysis> analysis = {};
+    std::string constant_contract = {}; // Exact canonical const declarations.
 };
 void validate(const Module& module);
 Module architecture_proof(std::int32_t answer = 42);

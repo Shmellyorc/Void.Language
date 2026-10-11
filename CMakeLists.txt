@@ -144,12 +144,14 @@ if(BUILD_TESTING)
   add_library(native_fixture STATIC tests/integration/native_fixture.c)
   target_include_directories(native_fixture PUBLIC tests/integration)
   target_link_libraries(native_fixture PRIVATE void_options)
-  add_executable(void_tests tests/tests.cpp tests/frontend/tests.cpp tests/frontend/values.cpp tests/numeric/tests.cpp tests/modules/tests.cpp examples/proof.cpp)
+  add_executable(void_tests tests/analysis/tests.cpp tests/tests.cpp tests/frontend/tests.cpp tests/frontend/values.cpp tests/numeric/tests.cpp tests/modules/tests.cpp examples/proof.cpp)
   target_link_libraries(void_tests PRIVATE void_llvm void_runtime native_fixture)
   foreach(suite core jit reload gc native)
     add_test(NAME ${suite} COMMAND void_tests ${suite})
     set_tests_properties(${suite} PROPERTIES TIMEOUT 90)
   endforeach()
+  add_test(NAME analysis COMMAND void_tests analysis "${CMAKE_CURRENT_BINARY_DIR}/analysis fixtures")
+  set_tests_properties(analysis PROPERTIES TIMEOUT 180)
   add_test(NAME numeric COMMAND void_tests numeric "${PROJECT_SOURCE_DIR}")
   set_tests_properties(numeric PROPERTIES TIMEOUT 120)
   add_test(NAME frontend COMMAND void_tests frontend "${PROJECT_SOURCE_DIR}")
@@ -178,6 +180,12 @@ if(BUILD_TESTING)
     "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/module native programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/modules.cmake")
   set_tests_properties(modules_cli PROPERTIES TIMEOUT 180)
+  add_test(NAME analysis_cli COMMAND "${CMAKE_COMMAND}"
+    "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
+    "-DWINDOWS=${WIN32}" "-DROOT=${PROJECT_SOURCE_DIR}"
+    "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/analysis native programs" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+    -P "${PROJECT_SOURCE_DIR}/tests/integration/analysis.cmake")
+  set_tests_properties(analysis_cli PROPERTIES TIMEOUT 180)
   add_test(NAME numeric_cli COMMAND "${CMAKE_COMMAND}"
     "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
     "-DWINDOWS=${WIN32}" "-DROOT=${PROJECT_SOURCE_DIR}"

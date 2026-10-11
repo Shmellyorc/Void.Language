@@ -1,4 +1,5 @@
 #include "void/backend.hpp"
+#include "void/frontend.hpp"
 #include "void/numeric.hpp"
 #include <cmath>
 #include <llvm/ADT/SmallVector.h>
@@ -359,7 +360,10 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     if (contract.function_id.empty()) contract.function_id = expected_id;
     if (contract.function_id != expected_id || contract.signature != "c:i32(i32)")
         throw std::invalid_argument("code identity or signature does not match IR");
-    if (!selected->module_identity.empty()) contract.constant_contract = input.constant_contract;
+    // Compiler records always override host-supplied source safety metadata.
+    contract.analysis = input.analysis;
+    contract.source_contract = input.analysis ? input.analysis->compatibility_contract() : std::string{};
+    if (!selected->module_identity.empty()) contract.constant_contract = input.analysis ? input.analysis->constant_contract() : input.constant_contract;
     auto suffix = "__v" + std::to_string(++impl_->serial);
     auto context = std::make_unique<llvm::LLVMContext>();
     auto module = lower(input, *context, suffix);
@@ -367,6 +371,19 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     module->setTargetTriple(impl_->jit->getTargetTriple().str());
     finish(*module, optimize);
     return impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty());
+}
+std::shared_ptr<const NativeCode> Jit::compile(const ValidatedAnalysis& analysis, bool optimize, Compatibility contract) {
+    auto module = analysis.lower();
+    return compile(module,module.entry_symbol,optimize,std::move(contract));
+}
+bool Jit::replace(ReloadSlot& slot, const ValidatedAnalysis& analysis, bool optimize, Compatibility contract) {
+    auto current = slot.acquire();
+    if (contract.function_id.empty()) contract.function_id = analysis.entry_identity() + "::entry";
+    contract.constant_contract = analysis.constant_contract();
+    contract.source_contract = analysis.compatibility_contract();
+    contract.analysis = analysis.shared_from_this();
+    if (!(current->compatibility() == contract)) return false;
+    return slot.replace(compile(analysis,optimize,std::move(contract)));
 }
 std::size_t Jit::live_generations() const { return impl_->live.load(); }
 std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
