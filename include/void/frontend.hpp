@@ -1,5 +1,6 @@
 #pragma once
 #include "void/ir.hpp"
+#include "void/diagnostic.hpp"
 #include <filesystem>
 namespace vd {
 // One source pipeline shared by checking, JIT and AOT. Errors contain rendered

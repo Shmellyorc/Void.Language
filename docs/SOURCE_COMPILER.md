@@ -92,15 +92,18 @@ and underscores. This does not settle future Unicode identifiers or the full
 language naming policy. Unsupported characters and types are diagnosed.
 Locations are one-based file/line/Unicode-scalar column positions, with the actual
 source line and a caret. Scalar columns are not terminal display widths for wide
-or combining characters. Diagnostics stop after the first error; ranges, error
-codes and recovery are future work.
+or combining characters. Diagnostics now collect independent errors with stable codes, ranges, related
+declarations and bounded recovery; see [DIAGNOSTICS.md](DIAGNOSTICS.md).
 
 For example, `while value > 0:` produces a VOID diagnostic at that keyword:
 
 ```text
-example.void:2:5: error: VOID uses 'for' for all loops. Hint: Replace 'while condition:' with 'for condition:'.
-    while value > 0:
-    ^
+example.void:2:5: error: VOID uses 'for' for all loops.
+    code: VOID1104
+
+ 2 |     while value > 0:
+   |     ^^^^^
+    Hint: Replace 'while condition:' with 'for condition:'.
 ```
 
 Invalid indentation/tokens, unresolved names, duplicate declarations, argument
@@ -158,9 +161,10 @@ See WORK_LOG.md for actual configuration commands and results.
 The user confirmed this original eight-suite frontend phase passed Linux,
 Windows and macOS Actions. The next module phase adds two suites and is documented
 in MODULE_SYSTEM.md and WORK_LOG.md. The user reports that ten-suite phase also
-passed all three hosted platforms. The current value-semantics changes need a new run.
+passed all three hosted platforms. The user reports Phase 4 value semantics passed Actions run #6 across all three
+platforms. Phase 5 diagnostic recovery requires another hosted run.
 
 Current constants, arithmetic and runtime errors are documented in
-[VALUE_SEMANTICS.md](VALUE_SEMANTICS.md). Next improve diagnostic structure/recovery
-and dependency compatibility, then contextual numeric literals/conversions after
+[VALUE_SEMANTICS.md](VALUE_SEMANTICS.md). Structured diagnostic recovery is now implemented in [DIAGNOSTICS.md](DIAGNOSTICS.md).
+Next refine source/dependency compatibility, then contextual numeric literals/conversions after
 approving their detailed policies. Managed types remain behind the GC/root/thread gate.

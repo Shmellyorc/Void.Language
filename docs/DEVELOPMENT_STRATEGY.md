@@ -561,3 +561,15 @@ See VALUE_SEMANTICS.md and WORK_LOG.md for scope, exact verification and limits.
 Recommended next work: diagnostic structure/recovery and dependency compatibility,
 then deliberate contextual literal/conversion policy before wider numeric types.
 Managed types still require the separate GC root/thread integration gate.
+
+### Phase 5 diagnostic recovery, 10–11 October 2026
+
+The user reports Phase 4 commit `d78b6b8`, Actions run #6, passed Linux, Windows
+and macOS. Structured codes, byte spans, immutable snapshots, related declarations
+and bounded lexer/parser/semantic recovery now extend that foundation. The complete
+graph is validated before lowering, with invalid source excluded from native
+execution, object publication and reload. See DIAGNOSTICS.md and WORK_LOG.md for
+contracts, measured local verification and the pending Phase 5 hosted run.
+Next design precise validated source/dependency compatibility and analysis-result
+APIs before incremental IDE integration. Numeric expansion still needs deliberate
+contextual literal/conversion decisions; managed types still require the GC gate.

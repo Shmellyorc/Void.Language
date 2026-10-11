@@ -1,20 +1,22 @@
 # Known issues and deferred work
 
-Updated 10 October 2026, constants/numeric/runtime diagnostics phase.
+Updated 11 October 2026, Phase 5 structured diagnostics and recovery.
 
 ## Platform verification
 
 - The user confirmed the source compiler and subsequent ten-suite module phase
   passed all three hosted platforms, including Debug/Release and Linux sanitizers. Earlier failed-run descriptions
   in WORK_LOG.md are historical evidence.
-- The value-semantics phase has local Linux verification with exact LLVM 19.1.7.
-  Windows/macOS execution of the expanded ten-suite Debug/Release matrix still
+- The user reports Phase 4 commit `d78b6b8`, Actions run #6, passed all three
+  platforms. Phase 5 has local Linux verification with exact LLVM 19.1.7.
+  Windows/macOS execution of this expanded ten-suite Debug/Release matrix still
   requires a hosted run after the user commits and pushes. Linux hosted
   ASan/UBSan also needs that run. See WORK_LOG.md for final local evidence.
 - CI retains complete official LLVM 19.1.7 archives, Linux LLD and required
   development dependencies, Windows SDK/DIA discovery and native printf support,
   and the portable thread implementation. All new suites run automatically in
-  the existing workflow; none are skipped by platform.
+  the existing workflow; none are skipped by platform. Linux sanitizers now halt
+  on reports with distinct failure codes, preserving leak detection.
 - Pinned archive URLs lack independent checksum/signature verification, which
   remains future supply-chain work.
 
@@ -56,13 +58,16 @@ Updated 10 October 2026, constants/numeric/runtime diagnostics phase.
   phi construction is not required for this slice.
 - Numeric overflow policy is provisional: current i32 operations wrap, signed
   division truncates toward zero, and dynamic zero divisors report source-first
-  runtime errors. Broader numeric conversion/overflow decisions remain open. There
-  are no resource limits for recursive source programs/parser nesting or import
-  graph depth.
-- Diagnostics report the first error with source location/line/caret. Recovery,
-  stable error codes, ranges, variable debug information, foreign/native stack
-  traces and translation of
-  internal/backend failures remain future work. Arithmetic failures now propagate
+  runtime errors. Broader numeric conversion/overflow decisions remain open.
+  Compiler recovery now bounds parser/semantic/dependency/import recursion; see
+  DIAGNOSTICS.md. Application execution recursion remains unbounded.
+- Diagnostics now collect independent errors with codes, byte ranges, immutable
+  snapshots and related declarations. DIAGNOSTICS.md documents recovery boundaries,
+  the 100-diagnostic budget and conservative suppression when a direct dependency
+  fails. Lexically unreadable declarations can still cause later unresolved-name
+  errors. Successful-compilation warning results, variable debug information,
+  foreign/native stack traces and translation of internal/backend failures remain
+  future work. Arithmetic failures now propagate
   actual source caller locations even under O2, bounded to 32 callers with explicit
   truncation. AOT diagnostics currently print to stdout, while JIT CLI uses stderr.
   This boundary is not general language exceptions or panic/defer cleanup.
@@ -132,8 +137,7 @@ Updated 10 October 2026, constants/numeric/runtime diagnostics phase.
 
 Run the expanded ten-suite hosted matrix after the user publishes these local
 changes. See VALUE_SEMANTICS.md for implemented constants, numeric semantics,
-runtime diagnostics and explicit limitations. Next improve diagnostic structure/
-recovery and source dependency compatibility; approve contextual literal/conversion
+runtime diagnostics and explicit limitations. Next refine validated source/dependency compatibility and analysis-result APIs; approve contextual literal/conversion
 details before numeric type expansion. Preserve the shared semantic model and
 IR/LLVM implementation. Resolve managed root lowering/thread coordination before
 managed types. Keep the original VOIDC backup untouched.

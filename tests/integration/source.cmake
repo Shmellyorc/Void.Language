@@ -97,3 +97,4 @@ if(NOT status EQUAL 1 OR NOT diagnostic MATCHES "invalid source.void:2:5: error:
   message(FATAL_ERROR "CLI did not render a useful source diagnostic: ${diagnostic}")
 endif()
 message(STATUS "Actual source compiled, linked, debug-verified and executed with normal/O2 JIT and AOT")
+include("${CMAKE_CURRENT_LIST_DIR}/diagnostics.cmake")

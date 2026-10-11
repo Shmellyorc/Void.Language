@@ -11,20 +11,102 @@
 #include <optional>
 #include <set>
 #include <stdexcept>
+#include <tuple>
 namespace vd {
 namespace {
 using Type = ir::Type;
-enum class TokenKind { name, number, path, symbol, newline, indent, dedent, end };
+enum class TokenKind { invalid, name, number, path, symbol, newline, indent, dedent, end };
 struct Token { TokenKind kind; std::string text; std::size_t offset; };
-[[noreturn]] void error(const SourceFile& source, const Token& token, const std::string& message,
-                        const std::string& hint = {}) {
-    throw std::invalid_argument(source.diagnostic(token.offset, message + (hint.empty() ? "" : " Hint: " + hint)));
+using Code = DiagnosticCode;
+SourceSpan span(const SourceFile& source, const Token& token) {
+    auto begin = std::min(token.offset, source.text().size());
+    auto length = token.kind == TokenKind::path ? token.text.size() + 2 :
+        (token.kind == TokenKind::name || token.kind == TokenKind::number || token.kind == TokenKind::symbol) ? token.text.size() : 0;
+    if (token.text.empty() && begin < source.text().size()) {
+        if (token.kind == TokenKind::symbol && source.text()[begin] != '\r' && source.text()[begin] != '\n') {
+            length = 1;
+            while (begin + length < source.text().size() && (static_cast<unsigned char>(source.text()[begin + length]) & 0xc0) == 0x80) ++length;
+        } else if (token.kind == TokenKind::number || token.kind == TokenKind::path) {
+            auto end = source.text().find_first_of(token.kind == TokenKind::path ? "\r\n" : " ():,\r\n", begin);
+            length = (end == std::string::npos ? source.text().size() : end) - begin;
+        }
+    }
+    return {std::make_shared<const SourceFile>(source), {}, begin, std::min(begin + length, source.text().size())};
 }
+[[noreturn]] void error(const SourceFile& source, const Token& token, Code code, const std::string& message,
+                        const std::string& hint = {}, std::vector<RelatedLocation> related = {},
+                        std::string expected = {}, std::string received = {}) {
+    Diagnostic d{code}; d.description = message; d.primary = span(source, token);
+    d.hint = hint; d.related = std::move(related);
+    d.expected_type = std::move(expected); d.received_type = std::move(received);
+    throw CompilationError({std::move(d)});
+}
+// A poisoned dependency has already produced a primary error. It is never a value.
+struct Poison {};
+constexpr Type error_type = static_cast<Type>(255); // AST-only; the lowering gate excludes it.
+class Diagnostics {
+    std::vector<Diagnostic> items;
+    std::map<std::string, std::pair<std::string, std::shared_ptr<const SourceFile>>> snapshots;
+    std::set<std::tuple<std::string, std::size_t, std::size_t, int, std::string>> seen;
+    bool suppressed = false;
+    unsigned expression_depth = 0;
+public:
+    void bind(const SourceFile& source, const std::string& identity) {
+        snapshots.insert_or_assign(source.path(), std::make_pair(identity, std::make_shared<const SourceFile>(source)));
+    }
+    void add(const CompilationError& failure) {
+        for (auto d : failure.diagnostics()) {
+            auto own = [&](SourceSpan& location) {
+                auto found = snapshots.find(location.source->path());
+                if (found != snapshots.end() && (&found->second.second->text() == &location.source->text() || found->second.second->text() == location.source->text())) {
+                    location.module_identity = found->second.first; location.source = found->second.second;
+                }
+            };
+            own(d.primary); for (auto& related : d.related) own(related.span);
+            std::set<std::tuple<std::string, std::size_t, std::size_t, std::string>> related_seen;
+            std::erase_if(d.related, [&](const auto& related) {
+                return !related_seen.emplace(related.span.source->path(), related.span.begin, related.span.end, related.description).second;
+            });
+            auto key = std::make_tuple(d.primary.source->path(), d.primary.begin, d.primary.end, static_cast<int>(d.code), d.description);
+            if (seen.contains(key)) continue;
+            if (items.size() == 100) { suppressed = true; continue; }
+            seen.insert(std::move(key));
+            items.push_back(std::move(d));
+        }
+    }
+    bool failed() const { return std::any_of(items.begin(), items.end(), [](const auto& d) { return d.severity == Severity::error; }); }
+    unsigned& semantic_depth() { return expression_depth; }
+    bool full() { if (items.size() < 100) return false; suppressed = true; return true; }
+    bool within(const SourceFile& source, std::size_t begin, std::size_t end) const {
+        return std::any_of(items.begin(), items.end(), [&](const auto& d) {
+            return d.primary.source->path() == source.path() && d.primary.begin >= begin && (d.primary.begin < end || (end == source.text().size() && d.primary.begin == end));
+        });
+    }
+    std::size_t size() const { return seen.size(); }
+    void finish() {
+        if (!failed()) return;
+        // VFS owner, byte offset, then code: independent of discovery and host enumeration.
+        std::stable_sort(items.begin(), items.end(), [](const auto& a, const auto& b) {
+            return std::tie(a.primary.module_identity, a.primary.begin, a.code) < std::tie(b.primary.module_identity, b.primary.begin, b.code);
+        });
+        if (suppressed) { auto d = items.back(); d.code = Code::limit; d.description = "Diagnostic limit of 100 reached; further diagnostic analysis stopped."; d.related.clear(); d.expected_type.clear(); d.received_type.clear(); d.hint = "Fix the reported errors and check again."; items.push_back(std::move(d)); }
+        throw CompilationError(std::move(items));
+    }
+};
+class Depth {
+    unsigned& depth;
+public:
+    Depth(unsigned& d, const SourceFile& source, const Token& token, unsigned limit = 128) : depth(d) {
+        if (depth >= limit) error(source, token, Code::nesting, "Source nesting limit exceeded.", "Split deeply nested expressions or blocks into smaller functions.");
+        ++depth;
+    }
+    ~Depth() { --depth; }
+};
 bool letter(char c) { return (c >= 'a' && c <= 'z') || c == '_'; }
 bool digit(char c) { return c >= '0' && c <= '9'; }
 const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue",
     "and", "or", "not", "true", "false", "while", "const", "use", "struct", "in", "reverse", "i32", "bool", "as", "private", "public", "internal"};
-std::vector<Token> lex(const SourceFile& source) {
+std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     const auto& text = source.text();
     std::vector<Token> tokens;
     std::vector<std::size_t> indents{0};
@@ -32,17 +114,19 @@ std::vector<Token> lex(const SourceFile& source) {
     bool beginning = true;
     auto emit = [&](TokenKind kind, std::string value, std::size_t offset) { tokens.push_back({kind, std::move(value), offset}); };
     while (p < text.size()) {
+        if (diagnostics.full()) break;
+        try {
         if (beginning) {
             auto start = p;
             while (p < text.size() && text[p] == ' ') ++p;
-            if (p < text.size() && text[p] == '\t') error(source, {TokenKind::symbol, "", p}, "Tabs are not supported in source indentation.", "Use spaces consistently (four spaces recommended).");
+            if (p < text.size() && text[p] == '\t') error(source, {TokenKind::symbol, "", p}, Code::indentation, "Tabs are not supported in source indentation.", "Use spaces consistently (four spaces recommended).");
             bool blank = p == text.size() || text[p] == '#' || text[p] == '\r' || text[p] == '\n';
             if (!blank) {
                 auto width = p - start;
                 if (width > indents.back()) { indents.push_back(width); emit(TokenKind::indent, "<indent>", p); }
                 else if (width < indents.back()) {
                     while (width < indents.back()) { indents.pop_back(); emit(TokenKind::dedent, "<dedent>", p); }
-                    if (width != indents.back()) error(source, {TokenKind::symbol, "", p}, "Indentation does not match an enclosing block.", "Align this statement with an earlier block level.");
+                    if (width != indents.back()) error(source, {TokenKind::symbol, "", p}, Code::indentation, "Indentation does not match an enclosing block.", "Align this statement with an earlier block level.");
                 }
             }
             beginning = false;
@@ -60,7 +144,7 @@ std::vector<Token> lex(const SourceFile& source) {
         if (c == '"') {
             ++p;
             while (p < text.size() && text[p] != '"' && text[p] != '\r' && text[p] != '\n') ++p;
-            if (p == text.size() || text[p] != '"') error(source, {TokenKind::path, "", start}, "Unterminated import path.", "Close the path with a double quote on this line.");
+            if (p == text.size() || text[p] != '"') error(source, {TokenKind::path, "", start}, Code::import_quote, "Unterminated import path.", "Close the path with a double quote on this line.");
             emit(TokenKind::path, text.substr(start + 1, p - start - 1), start); ++p; continue;
         }
         if (letter(c)) {
@@ -70,7 +154,7 @@ std::vector<Token> lex(const SourceFile& source) {
         if (digit(c)) {
             while (p < text.size() && digit(text[p])) ++p;
             if (p < text.size() && (letter(text[p]) || text[p] == '.' || (text[p] >= 'A' && text[p] <= 'Z')))
-                error(source, {TokenKind::number, "", start}, "Unsupported numeric literal.", "This subset accepts decimal i32 integers without suffixes or separators; ranges and floating values are not implemented.");
+                error(source, {TokenKind::number, "", start}, Code::numeric_literal, "Unsupported numeric literal.", "This subset accepts decimal i32 integers without suffixes or separators; ranges and floating values are not implemented.");
             emit(TokenKind::number, text.substr(start, p - start), start); continue;
         }
         std::string pair = text.substr(p, 2);
@@ -79,8 +163,17 @@ std::vector<Token> lex(const SourceFile& source) {
             p += 2; emit(TokenKind::symbol, pair, start); continue;
         }
         if (std::string("():,.+-*/%=<>").find(c) != std::string::npos) { ++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
-        error(source, {TokenKind::symbol, "", p}, "Unexpected character in source.",
+        error(source, {TokenKind::symbol, "", p}, Code::character, "Unexpected character in source.",
               c == '\t' ? "Use spaces instead of tabs." : "Use the supported i32/bool syntax and lowercase ASCII identifiers; Unicode identifiers and strings are not implemented yet.");
+        } catch (const CompilationError& e) {
+            diagnostics.add(e);
+            auto line = source.location(p).line;
+            while (!tokens.empty() && tokens.back().kind != TokenKind::indent && tokens.back().kind != TokenKind::dedent && tokens.back().kind != TokenKind::newline && source.location(tokens.back().offset).line == line) tokens.pop_back();
+            emit(TokenKind::invalid, "<invalid source line>", p);
+            // Consume the bad line, leaving its newline to the ordinary lexer.
+            while (p < text.size() && text[p] != '\r' && text[p] != '\n') ++p;
+            beginning = false;
+        }
     }
     if (!tokens.empty() && tokens.back().kind != TokenKind::newline) emit(TokenKind::newline, "<newline>", p);
     while (indents.size() > 1) { indents.pop_back(); emit(TokenKind::dedent, "<dedent>", p); }
@@ -106,13 +199,13 @@ struct Statement {
     std::unique_ptr<Expr> expression;
     std::vector<Statement> body, otherwise;
     unsigned slot = 0, flow = 0;
-    bool readonly = false;
+    bool readonly = false, invalid = false;
     Statement(Kind k, Token t) : kind(k), token(std::move(t)) {}
 };
 struct Parameter { Token token; Type type; unsigned slot = 0; };
 struct Function {
     Token token;
-    bool file_private = false;
+    bool file_private = false, parse_failed = false;
     std::string symbol;
     std::vector<Parameter> parameters;
     Type result = Type::none;
@@ -141,40 +234,86 @@ struct Unit {
     std::map<std::string, Function*> declarations;
     std::map<std::string, std::vector<Unit*>> qualifiers;
     std::set<std::string> explicit_qualifiers;
+    std::set<std::string> failed_qualifiers, invalid_declarations;
+    bool failed_import = false;
+    bool parse_failed = false;
     Unit(SourceFile s, std::string id) : source(std::move(s)), identity(std::move(id)) {}
 };
 class Parser {
     const SourceFile& source;
     std::vector<Token> tokens;
     std::size_t p = 0;
-    const Token& peek() const { return tokens[p]; }
+    Diagnostics& diagnostics;
+    unsigned depth = 0, nodes = 0;
+    const Token& peek() const { return tokens[std::min(p, tokens.size() - 1)]; }
+    void synchronize(std::size_t start, bool declaration) {
+        // Reconstruct indentation at the failure and its safe boundary.
+        int baseline = 0, current_depth = 0;
+        for (std::size_t i = 0; i < start; ++i) {
+            if (tokens[i].kind == TokenKind::indent) ++baseline;
+            if (tokens[i].kind == TokenKind::dedent) --baseline;
+        }
+        current_depth = baseline;
+        for (std::size_t i = start; i < p && i < tokens.size(); ++i) {
+            if (tokens[i].kind == TokenKind::indent) ++current_depth;
+            if (tokens[i].kind == TokenKind::dedent) --current_depth;
+        }
+        bool line_start = p == 0 || tokens[std::min(p, tokens.size()) - 1].kind == TokenKind::newline;
+        while (peek().kind != TokenKind::end) {
+            if (declaration && current_depth == 0 && line_start && (at("func") || at("const") || at("use") || at("private") || at("public") || at("internal"))) return;
+            if (!declaration && current_depth <= baseline) {
+                if (peek().kind == TokenKind::dedent) return;
+                if (line_start && p > start) return;
+            }
+            auto token = take();
+            if (token.kind == TokenKind::indent) ++current_depth;
+            if (token.kind == TokenKind::dedent) --current_depth;
+            line_start = token.kind == TokenKind::newline || token.kind == TokenKind::dedent;
+        }
+    }
     bool at(const std::string& text) const { return peek().text == text; }
-    Token take() { return tokens[p++]; }
+    Token take() { auto result = peek(); if (p + 1 < tokens.size()) ++p; return result; }
     bool accept(const std::string& text) { if (!at(text)) return false; ++p; return true; }
     Token need(const std::string& text) {
         if (!at(text)) {
-            if (text == "<indent>") error(source, peek(), "Expected an indented block.", "Indent the body with spaces beneath its declaration or control-flow statement.");
-            if (text == "<newline>") error(source, peek(), "Expected end of statement, found '" + peek().text + "'.", "Put each statement on its own line; postfix ++/-- cannot be used as values.");
-            error(source, peek(), "Expected '" + text + "', found '" + peek().text + "'.");
+            if (text == "<indent>") error(source, peek(), Code::syntax, "Expected an indented block.", "Indent the body with spaces beneath its declaration or control-flow statement.");
+            if (text == "<newline>") error(source, peek(), Code::syntax, "Expected end of statement, found '" + peek().text + "'.", "Put each statement on its own line; postfix ++/-- cannot be used as values.");
+            error(source, peek(), Code::syntax, "Expected '" + text + "', found '" + peek().text + "'.");
         }
         return take();
     }
     Token name() {
         if (peek().kind != TokenKind::name || reserved.contains(peek().text))
-            error(source, peek(), "Expected a lowercase identifier.");
+            error(source, peek(), Code::identifier, "Expected a lowercase identifier.");
         return take();
     }
     Type type() {
         if (accept("i32")) return Type::i32;
         if (accept("bool")) return Type::boolean;
-        error(source, peek(), "Unsupported type '" + peek().text + "'.", "Use i32 or bool in this compiler subset; omit the return annotation for no result.");
+        error(source, peek(), Code::unsupported_type, "Unsupported type '" + peek().text + "'.", "Use i32 or bool in this compiler subset; omit the return annotation for no result.");
     }
     void newline() { need("<newline>"); }
     std::vector<Statement> block() {
+        Depth guard(depth, source, peek(), 64);
         need(":"); newline(); need("<indent>");
         std::vector<Statement> body;
-        while (peek().kind != TokenKind::dedent && peek().kind != TokenKind::end) body.push_back(statement());
-        if (body.empty()) error(source, peek(), "Expected an indented statement.");
+        bool recovered = false;
+        while (peek().kind != TokenKind::dedent && peek().kind != TokenKind::end) {
+            if (diagnostics.full()) { p = tokens.size() - 1; break; }
+            auto start = p;
+            try { body.push_back(statement()); }
+            catch (const CompilationError& e) {
+                diagnostics.add(e); recovered = true;
+                if ((tokens[start].text == "var" || tokens[start].text == "const") && start + 1 < tokens.size() && tokens[start + 1].kind == TokenKind::name && !reserved.contains(tokens[start + 1].text)) {
+                    Statement invalid(Statement::Kind::variable, tokens[start + 1]);
+                    invalid.name = invalid.token.text; invalid.invalid = true; body.push_back(std::move(invalid));
+                }
+                synchronize(start, false);
+            }
+            catch (const Poison&) { recovered = true; synchronize(start, false); }
+            if (p == start && peek().kind != TokenKind::dedent && peek().kind != TokenKind::end) take();
+        }
+        if (body.empty() && !recovered) error(source, peek(), Code::syntax, "Expected an indented statement.");
         need("<dedent>"); return body;
     }
     static int precedence(const std::string& op) {
@@ -186,12 +325,14 @@ class Parser {
         return 0;
     }
     std::unique_ptr<Expr> primary() {
+        if (++nodes > 512) error(source, peek(), Code::nesting, "Expression size limit exceeded.", "Split this expression into smaller local values.");
         auto token = take();
+        if (token.kind == TokenKind::invalid) throw Poison{};
         if (token.kind == TokenKind::number || token.text == "true" || token.text == "false") {
             auto e = std::make_unique<Expr>(Expr::Kind::literal, token);
             if (token.kind == TokenKind::number) {
                 auto result = std::from_chars(token.text.data(), token.text.data() + token.text.size(), e->value);
-                if (result.ec != std::errc{}) error(source, token, "Integer literal is too large.", "Use a value in the i32 range.");
+                if (result.ec != std::errc{}) error(source, token, Code::integer_range, "Integer literal is too large.", "Use a value in the i32 range.");
                 e->type = Type::i32;
             } else { e->type = Type::boolean; e->value = token.text == "true"; }
             return e;
@@ -212,9 +353,10 @@ class Parser {
             }
             return e;
         }
-        error(source, token, "Expected an expression, found '" + token.text + "'.");
+        error(source, token, Code::syntax, "Expected an expression, found '" + token.text + "'.");
     }
     std::unique_ptr<Expr> unary() {
+        Depth guard(depth, source, peek());
         if (at("not") || at("-") || at("+")) {
             auto token = take(); auto e = std::make_unique<Expr>(Expr::Kind::unary, token); e->op = token.text;
             // not binds below comparisons: not a < b means not (a < b).
@@ -227,6 +369,7 @@ class Parser {
         return primary();
     }
     std::unique_ptr<Expr> expression(int minimum = 1) {
+        Depth guard(depth, source, peek());
         auto left = unary();
         while (precedence(peek().text) >= minimum) {
             auto token = take(); auto e = std::make_unique<Expr>(Expr::Kind::binary, token); e->op = token.text;
@@ -236,6 +379,7 @@ class Parser {
         return left;
     }
     Statement conditional(Token token) {
+        Depth guard(depth, source, token, 64);
         Statement s(Statement::Kind::conditional, std::move(token));
         s.expression = expression(); s.body = block();
         if (accept("else")) {
@@ -245,12 +389,13 @@ class Parser {
         return s;
     }
     Statement statement() {
-        if (at("while")) error(source, peek(), "VOID uses 'for' for all loops.", "Replace 'while condition:' with 'for condition:'.");
+        nodes = 0;
+        if (at("while")) error(source, peek(), Code::while_loop, "VOID uses 'for' for all loops.", "Replace 'while condition:' with 'for condition:'.");
         if (at("if")) return conditional(take());
         if (at("for")) {
             Statement s(Statement::Kind::loop, take());
             if (!at(":")) s.expression = expression();
-            if (at("in") || at(",")) error(source, peek(), "Collection/range iteration is not implemented.", "Use 'for condition:' or 'for:' for this subset.");
+            if (at("in") || at(",")) error(source, peek(), Code::unsupported_iteration, "Collection/range iteration is not implemented.", "Use 'for condition:' or 'for:' for this subset.");
             s.body = block(); return s;
         }
         if (at("var") || at("const")) {
@@ -258,7 +403,7 @@ class Parser {
             Statement s(Statement::Kind::variable, take()); s.readonly = readonly; auto n = name(); s.name = n.text; s.token = n;
             if (accept(":")) s.annotation = type();
             if (accept("=")) s.expression = expression();
-            if (readonly && !s.expression) error(source, s.token, "A const requires an initializer.");
+            if (readonly && !s.expression) error(source, s.token, Code::initializer, "A const requires an initializer.");
             newline(); return s;
         }
         if (at("return")) {
@@ -283,14 +428,19 @@ class Parser {
         Statement s(Statement::Kind::expression, peek()); s.expression = expression(); newline(); return s;
     }
 public:
-    explicit Parser(const SourceFile& s) : source(s), tokens(lex(s)) {}
+    explicit Parser(const SourceFile& s, Diagnostics& d) : source(s), tokens(lex(s, d)), diagnostics(d) {}
     void parse(Unit& unit) {
+        auto before = diagnostics.size();
         while (peek().kind != TokenKind::end) {
+            if (diagnostics.full()) { unit.parse_failed = true; break; }
+            auto start = p;
+            try {
             if (accept("<newline>")) continue;
-            if (at("while")) error(source, peek(), "VOID uses 'for' for all loops.", "Replace 'while condition:' with 'for condition:' inside a function.");
+            if (peek().kind == TokenKind::invalid) throw Poison{};
+            if (at("while")) error(source, peek(), Code::while_loop, "VOID uses 'for' for all loops.", "Replace 'while condition:' with 'for condition:' inside a function.");
             if (accept("use")) {
-                if (!unit.functions.empty() || !unit.constants.empty()) error(source, peek(), "Imports must precede constant and function declarations.", "Move use declarations to the start of this file.");
-                if (peek().kind != TokenKind::path) error(source, peek(), "Expected a quoted import path.", "Use \"/folder/file.void\" or \"./file.void\".");
+                if (!unit.functions.empty() || !unit.constants.empty()) error(source, peek(), Code::syntax, "Imports must precede constant and function declarations.", "Move use declarations to the start of this file.");
+                if (peek().kind != TokenKind::path) error(source, peek(), Code::import_path, "Expected a quoted import path.", "Use \"/folder/file.void\" or \"./file.void\".");
                 Import import; import.path = take(); import.alias = import.path;
                 if (accept("as")) { import.alias = name(); import.explicit_alias = true; }
                 newline(); unit.imports.push_back(std::move(import)); continue;
@@ -304,8 +454,19 @@ public:
             }
             need("func"); f.token = name(); need("(");
             if (!at(")")) do { auto token = name(); need(":"); f.parameters.push_back({token, type()}); } while (accept(","));
-            need(")"); if (accept("->")) f.result = type(); f.body = block(); unit.functions.push_back(std::move(f));
+            need(")"); if (accept("->")) f.result = type(); f.body = block(); f.parse_failed = diagnostics.within(source, f.token.offset, peek().offset); unit.functions.push_back(std::move(f));
+            } catch (const CompilationError& e) {
+                diagnostics.add(e); unit.parse_failed = true;
+                auto declaration = start;
+                if (tokens[declaration].text == "private" || tokens[declaration].text == "public" || tokens[declaration].text == "internal") ++declaration;
+                if (declaration + 1 < tokens.size() && (tokens[declaration].text == "func" || tokens[declaration].text == "const") && tokens[declaration + 1].kind == TokenKind::name && !reserved.contains(tokens[declaration + 1].text))
+                    unit.invalid_declarations.insert(tokens[declaration + 1].text);
+                synchronize(start, true);
+            }
+            catch (const Poison&) { unit.parse_failed = true; synchronize(start, true); }
+            if (p == start && peek().kind != TokenKind::end) take();
         }
+        unit.parse_failed |= diagnostics.size() != before;
     }
 };
 ir::Op operation(const std::string& op) {
@@ -325,7 +486,9 @@ class Semantics {
     std::set<std::string> visible_names;
     Unit& root;
     std::function<void(Unit&, Constant&)> evaluate;
-    struct Variable { Type type; unsigned slot; bool readonly; };
+    Diagnostics& diagnostics;
+    bool invalid_function = false;
+    struct Variable { Type type; unsigned slot; bool readonly; Token declaration; };
     std::vector<std::map<std::string, Variable>> scopes;
     Function* current = nullptr;
     unsigned loops = 0;
@@ -337,8 +500,10 @@ class Semantics {
         return nullptr;
     }
     std::pair<Unit*, Constant*> constant(const Expr& e) {
+        if (e.qualifier.empty() && unit.invalid_declarations.contains(e.token.text)) throw Poison{};
         std::map<std::string, std::pair<Unit*, Constant*>> candidates;
         auto add = [&](Unit* owner, bool own = false) {
+            if (owner->invalid_declarations.contains(e.token.text)) throw Poison{};
             auto found = owner->constant_names.find(e.token.text);
             if (found != owner->constant_names.end()) {
                 if (found->second->file_private && !own)
@@ -348,47 +513,54 @@ class Semantics {
         };
         if (!e.qualifier.empty()) {
             auto q = unit.qualifiers.find(e.qualifier);
-            if (q == unit.qualifiers.end()) error(source, e.qualifier_token, "Unknown import qualifier '" + e.qualifier + "'.");
-            if (q->second.size() != 1) error(source, e.qualifier_token, "Ambiguous import qualifier '" + e.qualifier + "'.");
+            if (unit.failed_qualifiers.contains(e.qualifier)) throw Poison{};
+            if (q == unit.qualifiers.end()) error(source, e.qualifier_token, Code::visibility, "Unknown import qualifier '" + e.qualifier + "'.");
+            if (q->second.size() != 1) error(source, e.qualifier_token, Code::ambiguous, "Ambiguous import qualifier '" + e.qualifier + "'.");
             add(q->second.front(), q->second.front() == &unit);
-            if (candidates.empty()) error(source, e.token, "Unknown or private imported constant '" + e.token.text + "'.");
+            if (candidates.empty() && q->second.front()->parse_failed) throw Poison{};
+            if (candidates.empty()) error(source, e.token, Code::visibility, "Unknown or private imported constant '" + e.token.text + "'.");
         } else {
             add(&unit, true);
             if (!candidates.empty()) return candidates.begin()->second;
             if (unit.declarations.contains(e.token.text)) return {nullptr, nullptr};
             add(&root, &root == &unit);
-            for (const auto& import : unit.imports) if (!import.explicit_alias) add(units.at(import.target).get());
+            for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty()) add(units.at(import.target).get());
             // A value and a function cannot silently compete for an imported binding.
-            for (const auto& import : unit.imports) if (!import.explicit_alias) {
+            for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty()) {
                 auto* owner = units.at(import.target).get();
                 auto f = owner->declarations.find(e.token.text);
                 if (!candidates.empty() && f != owner->declarations.end() && !f->second->file_private)
-                    error(source, e.token, "Ambiguous imported declaration '" + e.token.text + "'.", "Use explicit aliases.");
+                    error(source, e.token, Code::ambiguous, "Ambiguous imported declaration '" + e.token.text + "'.", "Use explicit aliases.");
             }
         }
-        if (candidates.size() > 1) error(source, e.token, "Ambiguous imported constant '" + e.token.text + "'.", "Use explicit aliases.");
+        if (candidates.size() > 1) error(source, e.token, Code::ambiguous, "Ambiguous imported constant '" + e.token.text + "'.", "Use explicit aliases.");
         return candidates.empty() ? std::pair<Unit*, Constant*>{nullptr, nullptr} : candidates.begin()->second;
     }
     const Function& resolve(const Expr& e) {
+        if (e.qualifier.empty() && unit.invalid_declarations.contains(e.token.text)) throw Poison{};
         if (!e.qualifier.empty()) {
             auto module = unit.qualifiers.find(e.qualifier);
-            if (module == unit.qualifiers.end()) error(source, e.qualifier_token, "Unknown import qualifier '" + e.qualifier + "'.", "Import the module with this alias before calling it.");
-            if (module->second.size() != 1) error(source, e.qualifier_token, "Ambiguous import qualifier '" + e.qualifier + "'.", "Assign distinct explicit aliases with as to modules sharing a filename stem.");
+            if (unit.failed_qualifiers.contains(e.qualifier)) throw Poison{};
+            if (module == unit.qualifiers.end()) error(source, e.qualifier_token, Code::visibility, "Unknown import qualifier '" + e.qualifier + "'.", "Import the module with this alias before calling it.");
+            if (module->second.size() != 1) error(source, e.qualifier_token, Code::ambiguous, "Ambiguous import qualifier '" + e.qualifier + "'.", "Assign distinct explicit aliases with as to modules sharing a filename stem.");
             auto* target = module->second.front();
-            if (target->constant_names.contains(e.token.text)) error(source, e.token, "A const value is not callable.");
+            if (target->invalid_declarations.contains(e.token.text)) throw Poison{};
+            if (target->constant_names.contains(e.token.text)) error(source, e.token, Code::not_callable, "A const value is not callable.");
             auto found = target->declarations.find(e.token.text);
-            if (found == target->declarations.end()) error(source, e.token, "Unknown imported function '" + e.qualifier + "." + e.token.text + "'.");
+            if (found == target->declarations.end() && target->parse_failed) throw Poison{};
+            if (found == target->declarations.end()) error(source, e.token, Code::unknown_function, "Unknown imported function '" + e.qualifier + "." + e.token.text + "'.");
             if (found->second->file_private && target != &unit)
-                error(source, e.token, "Function '" + e.token.text + "' is private to " + target->identity + ".", "Call a public function from that file instead.");
+                error(source, e.token, Code::visibility, "Function '" + e.token.text + "' is private to " + target->identity + ".", "Call a public function from that file instead.");
             return *found->second;
         }
-        if (unit.constant_names.contains(e.token.text)) error(source, e.token, "A const value is not callable.");
+        if (unit.constant_names.contains(e.token.text)) error(source, e.token, Code::not_callable, "A const value is not callable.");
         auto own = unit.declarations.find(e.token.text);
         if (own != unit.declarations.end()) return *own->second;
-        if (constant(e).second) error(source, e.token, "A const value is not callable.");
+        if (constant(e).second) error(source, e.token, Code::not_callable, "A const value is not callable.");
         std::map<std::string, Function*> candidates;
         bool hidden = false;
-        for (const auto& import : unit.imports) if (!import.explicit_alias) {
+        for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty()) {
+            if (units.at(import.target)->invalid_declarations.contains(e.token.text)) throw Poison{};
             auto found = units.at(import.target)->declarations.find(e.token.text);
             if (found != units.at(import.target)->declarations.end()) {
                 if (found->second->file_private) hidden = true;
@@ -398,25 +570,55 @@ class Semantics {
         if (candidates.size() > 1) {
             std::string owners;
             for (const auto& [id, f] : candidates) { (void)f; if (!owners.empty()) owners += ", "; owners += id.substr(0, id.rfind("::")); }
-            error(source, e.token, "Ambiguous imported function '" + e.token.text + "' from " + owners + ".", "Use a module qualifier or import as an explicit alias.");
+            error(source, e.token, Code::ambiguous, "Ambiguous imported function '" + e.token.text + "' from " + owners + ".", "Use a module qualifier or import as an explicit alias.");
         }
         if (!candidates.empty()) return *candidates.begin()->second;
-        if (hidden) error(source, e.token, "Function '" + e.token.text + "' is private to its declaring file.", "Call a public function instead.");
-        error(source, e.token, "Unknown function '" + e.token.text + "'.", "Declare it here or import its declaring file; imports are not transitive exports.");
+        if (hidden) error(source, e.token, Code::visibility, "Function '" + e.token.text + "' is private to its declaring file.", "Call a public function instead.");
+        if (unit.failed_import) throw Poison{};
+        error(source, e.token, Code::unknown_function, "Unknown function '" + e.token.text + "'.", "Declare it here or import its declaring file; imports are not transitive exports.");
     }
     void expect(Type actual, Type expected, const Token& token) {
-        if (actual != expected) error(source, token, "Type mismatch: expected " + std::string(ir::type_name(expected)) + ", received " + ir::type_name(actual) + ".");
+        if (actual == error_type || expected == error_type) return;
+        if (actual != expected) error(source, token, Code::type_mismatch, "Type mismatch: expected " + std::string(ir::type_name(expected)) + ", received " + ir::type_name(actual) + ".", {}, {}, ir::type_name(expected), ir::type_name(actual));
     }
     unsigned declare(const Token& token, Type type, bool readonly = false) {
-        if (lookup(token.text) || visible_names.contains(token.text)) error(source, token, "Duplicate declaration or shadowing of '" + token.text + "'.", "Assign to the existing variable, or choose a distinct name.");
+        if (lookup(token.text) || visible_names.contains(token.text)) {
+            std::vector<RelatedLocation> related;
+            if (auto* previous = lookup(token.text)) {
+                related.push_back({span(source, previous->declaration), "Previously declared"});
+                previous->type = error_type;
+            }
+            else {
+                auto add = [&](const Unit& owner) {
+                    if (auto c = owner.constant_names.find(token.text); c != owner.constant_names.end() && (!c->second->file_private || &owner == &unit))
+                        related.push_back({span(owner.source, c->second->declaration.token), "Previously declared"});
+                    if (auto f = owner.declarations.find(token.text); f != owner.declarations.end() && (!f->second->file_private || &owner == &unit))
+                        related.push_back({span(owner.source, f->second->token), "Previously declared"});
+                };
+                add(unit); if (&root != &unit) add(root);
+                for (const auto& import : unit.imports) if (!import.target.empty() && !import.explicit_alias) add(*units.at(import.target));
+            }
+            error(source, token, Code::duplicate, "Duplicate declaration or shadowing of '" + token.text + "'.", "Assign to the existing variable, or choose a distinct name.", std::move(related));
+        }
         auto slot = static_cast<unsigned>(current->locals.size()); current->locals.push_back(type);
-        scopes.back().emplace(token.text, Variable{type, slot, readonly}); return slot;
+        scopes.back().emplace(token.text, Variable{type, slot, readonly, token}); return slot;
     }
     Type expression(Expr& e) {
+        try {
+            Depth guard(diagnostics.semantic_depth(), source, e.token, 256);
+            auto type = expression_impl(e);
+            if (type == error_type) { e.type = error_type; invalid_function = true; }
+            return type;
+        } catch (const CompilationError& failure) { diagnostics.add(failure); }
+          catch (const Poison&) {}
+        invalid_function = true;
+        return e.type = error_type;
+    }
+    Type expression_impl(Expr& e) {
         using K = Expr::Kind;
         if (e.kind == K::literal) {
             if (e.type == Type::i32 && (e.value < std::numeric_limits<std::int32_t>::min() || e.value > std::numeric_limits<std::int32_t>::max()))
-                error(source, e.token, "Integer literal is outside the i32 range.", "Use a value from -2147483648 through 2147483647.");
+                error(source, e.token, Code::integer_range, "Integer literal is outside the i32 range.", "Use a value from -2147483648 through 2147483647.");
             return e.type;
         }
         if (e.kind == K::name) {
@@ -428,17 +630,28 @@ class Semantics {
                     return e.type = c->type;
                 }
             }
-            if (!v) error(source, e.token, "Unknown identifier '" + e.token.text + "'.", "Declare it with var before use.");
+            if (!v && unit.failed_import) throw Poison{};
+            if (!v) error(source, e.token, Code::unknown_identifier, "Unknown identifier '" + e.token.text + "'.", "Declare it with var before use.");
             e.slot = v->slot; return e.type = v->type;
         }
         if (e.kind == K::call) {
-            if (!current) error(source, e.token, "A compile-time constant cannot call a function.", "Use a local const for runtime values.");
-            if (e.qualifier.empty() && lookup(e.token.text)) error(source, e.token, "A local value is not callable.");
+            if (!current) error(source, e.token, Code::constant_call, "A compile-time constant cannot call a function.", "Use a local const for runtime values.");
+            if (auto* value = e.qualifier.empty() ? lookup(e.token.text) : nullptr) {
+                if (value->type == error_type) throw Poison{};
+                error(source, e.token, Code::not_callable, "A local value is not callable.");
+            }
+            std::vector<Type> arguments;
+            for (auto& argument : e.parts) arguments.push_back(expression(*argument));
             const auto& target = resolve(e);
             e.target = target.symbol;
-            if (e.parts.size() != target.parameters.size()) error(source, e.token, "Incorrect argument count for '" + e.token.text + "': expected " + std::to_string(target.parameters.size()) + ", received " + std::to_string(e.parts.size()) + ".");
-            for (std::size_t i = 0; i < e.parts.size(); ++i) expect(expression(*e.parts[i]), target.parameters[i].type, e.parts[i]->token);
-            return e.type = target.result;
+            if (e.parts.size() != target.parameters.size()) error(source, e.token, Code::argument_count, "Incorrect argument count for '" + e.token.text + "': expected " + std::to_string(target.parameters.size()) + ", received " + std::to_string(e.parts.size()) + ".");
+            bool invalid = false;
+            for (std::size_t i = 0; i < e.parts.size(); ++i) {
+                try { expect(arguments[i], target.parameters[i].type, e.parts[i]->token); }
+                catch (const CompilationError& failure) { diagnostics.add(failure); invalid = true; }
+                invalid |= arguments[i] == error_type;
+            }
+            return e.type = invalid ? error_type : target.result;
         }
         auto left = expression(*e.parts[0]);
         if (e.kind == K::unary) {
@@ -448,23 +661,32 @@ class Semantics {
         if (e.parts[0]->kind == K::literal && ((e.op == "and" && !e.parts[0]->value) || (e.op == "or" && e.parts[0]->value))) suppress_zero = true;
         auto right = expression(*e.parts[1]);
         suppress_zero = previous;
+        if (left == error_type || right == error_type) return error_type;
         if (e.op == "and" || e.op == "or") {
             expect(left, Type::boolean, e.parts[0]->token); expect(right, Type::boolean, e.parts[1]->token); return e.type = Type::boolean;
         }
         if (e.op == "==" || e.op == "!=") {
-            if (left == Type::none) error(source, e.token, "Cannot compare a no-result call.");
+            if (left == Type::none) error(source, e.token, Code::invalid_value, "Cannot compare a no-result call.");
             expect(right, left, e.token); return e.type = Type::boolean;
         }
         expect(left, Type::i32, e.parts[0]->token); expect(right, Type::i32, e.parts[1]->token);
         if (current && !suppress_zero && (e.op == "/" || e.op == "%") && e.parts[1]->kind == K::literal && e.parts[1]->value == 0)
-            error(source, e.parts[1]->token, "Division or remainder by zero.", "Use a nonzero divisor.");
+            error(source, e.parts[1]->token, Code::zero_divisor, "Division or remainder by zero.", "Use a nonzero divisor.");
         return e.type = (e.op == "<" || e.op == "<=" || e.op == ">" || e.op == ">=") ? Type::boolean : Type::i32;
     }
     unsigned sequence(std::vector<Statement>& body, bool nested = true) {
         if (nested) scopes.emplace_back();
         unsigned flow = next_flow;
         for (auto& s : body) {
-            auto result = statement(s);
+            if (diagnostics.full()) break;
+            unsigned result = next_flow;
+            auto old_zero = suppress_zero;
+            try { result = statement(s); }
+            catch (const CompilationError& failure) { diagnostics.add(failure); }
+            catch (const Poison&) {}
+            suppress_zero = old_zero;
+            // An invalid return remains a return for flow recovery, never valid IR.
+            if (s.kind == Statement::Kind::returned) result = return_flow;
             if (flow & next_flow) flow = (flow & ~next_flow) | result;
         }
         if (nested) scopes.pop_back();
@@ -475,72 +697,95 @@ class Semantics {
         unsigned flow = next_flow;
         switch (s.kind) {
         case K::variable: {
+            if (s.invalid) { s.slot = declare(s.token, error_type); invalid_function = true; break; }
             Type t = s.expression ? expression(*s.expression) : s.annotation.value_or(Type::none);
-            if (t == Type::none) error(source, s.token, "Variable requires a value type.", "Supply an i32/bool annotation or a value-producing initializer.");
-            if (s.annotation) expect(t, *s.annotation, s.token);
+            if (t == Type::none) {
+                s.slot = declare(s.token, error_type, s.readonly);
+                error(source, s.token, Code::invalid_value, "Variable requires a value type.", "Supply an i32/bool annotation or a value-producing initializer.");
+            }
+            if (s.annotation) {
+                try { expect(t, *s.annotation, s.expression ? s.expression->token : s.token); }
+                catch (const CompilationError& failure) { diagnostics.add(failure); t = error_type; }
+            }
             s.slot = declare(s.token, t, s.readonly); break;
         }
         case K::assignment: {
             auto* variable = lookup(s.name);
             if ((variable && variable->readonly) || (!variable && visible_names.contains(s.name)))
-                error(source, s.token, "Cannot mutate readonly const or declaration '" + s.name + "'.", "Use var for a mutable local binding.");
-            if (!variable) error(source, s.token, "Unknown identifier '" + s.name + "'.", "Declare it with var before assignment.");
+                error(source, s.token, Code::readonly, "Cannot mutate readonly const or declaration '" + s.name + "'.", "Use var for a mutable local binding.");
+            if (!variable) error(source, s.token, Code::unknown_identifier, "Unknown identifier '" + s.name + "'.", "Declare it with var before assignment.");
             auto t = variable->type; s.slot = variable->slot;
             expect(expression(*s.expression), t, s.expression->token);
             if (s.op != "=") expect(t, Type::i32, s.token);
             if ((s.op == "/=" || s.op == "%=") && s.expression->kind == Expr::Kind::literal && s.expression->value == 0)
-                error(source, s.expression->token, "Division or remainder by zero.");
+                error(source, s.expression->token, Code::zero_divisor, "Division or remainder by zero.");
             break;
         }
         case K::expression:
-            expression(*s.expression);
-            if (s.expression->kind != Expr::Kind::call) error(source, s.token, "Only function calls can be standalone expressions.", "Assign this value with var or return it.");
+            if (expression(*s.expression) == error_type) break;
+            if (s.expression->kind != Expr::Kind::call) error(source, s.token, Code::invalid_value, "Only function calls can be standalone expressions.", "Assign this value with var or return it.");
             break;
         case K::returned:
-            expect(s.expression ? expression(*s.expression) : Type::none, current->result, s.token);
+            if (s.expression) {
+                auto result = expression(*s.expression);
+                if (result == error_type) { flow = return_flow; break; }
+                expect(result, current->result, s.token);
+            } else expect(Type::none, current->result, s.token);
             // A no-result call is a statement, not a return value.
-            if (s.expression && current->result == Type::none) error(source, s.token, "A no-result function cannot return an expression.", "Call the function, then use an empty return.");
+            if (s.expression && current->result == Type::none) error(source, s.token, Code::invalid_value, "A no-result function cannot return an expression.", "Call the function, then use an empty return.");
             flow = return_flow; break;
         case K::conditional:
-            expect(expression(*s.expression), Type::boolean, s.expression->token);
+            try { expect(expression(*s.expression), Type::boolean, s.expression->token); }
+            catch (const CompilationError& failure) { diagnostics.add(failure); }
             flow = sequence(s.body) | (s.otherwise.empty() ? next_flow : sequence(s.otherwise)); break;
         case K::loop: {
-            if (s.expression) expect(expression(*s.expression), Type::boolean, s.expression->token);
+            if (s.expression) {
+                try { expect(expression(*s.expression), Type::boolean, s.expression->token); }
+                catch (const CompilationError& failure) { diagnostics.add(failure); }
+            }
             ++loops; auto body = sequence(s.body); --loops;
             flow = body & return_flow;
             if (!always(s.expression.get()) || (body & break_flow)) flow |= next_flow;
             break;
         }
         case K::broken: case K::continued:
-            if (!loops) error(source, s.token, s.token.text + " is only valid inside a for loop.");
+            if (!loops) error(source, s.token, Code::loop_control, s.token.text + " is only valid inside a for loop.");
             flow = s.kind == K::broken ? break_flow : continue_flow; break;
         }
         return s.flow = flow;
     }
 public:
     Semantics(Unit& u, const std::map<std::string, std::unique_ptr<Unit>>& graph, Unit& r,
-        std::function<void(Unit&, Constant&)> eval)
-        : source(u.source), unit(u), units(graph), root(r), evaluate(std::move(eval)) {
+        std::function<void(Unit&, Constant&)> eval, Diagnostics& d)
+        : source(u.source), unit(u), units(graph), root(r), evaluate(std::move(eval)), diagnostics(d) {
         for (const auto& [name, c] : root.constant_names) if (!c->file_private || &root == &unit) visible_names.insert(name);
         for (const auto& [name, c] : unit.constant_names) { (void)c; visible_names.insert(name); }
-        for (const auto& import : unit.imports) if (!import.explicit_alias)
+        for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty())
             for (const auto& [name, c] : units.at(import.target)->constant_names) if (!c->file_private) visible_names.insert(name);
         for (const auto& [name, f] : unit.declarations) { (void)f; visible_names.insert(name); }
         for (const auto& [name, target] : unit.qualifiers) { (void)target; visible_names.insert(name); }
-        for (const auto& import : unit.imports) if (!import.explicit_alias)
+        for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty())
             for (const auto& [name, f] : units.at(import.target)->declarations)
                 if (!f->file_private) visible_names.insert(name);
     }
     void analyze_constant(Constant& c) {
         c.type = expression(*c.declaration.expression);
+        if (c.type == error_type) throw Poison{};
         if (c.declaration.annotation) expect(c.type, *c.declaration.annotation, c.declaration.token);
     }
     void analyze() {
         for (auto& f : unit.functions) {
-            current = &f; scopes = {{}};
-            for (auto& p : f.parameters) p.slot = declare(p.token, p.type);
+            if (diagnostics.full()) break;
+            current = &f; scopes = {{}}; invalid_function = false;
+            auto before = diagnostics.size();
+            for (auto& p : f.parameters) {
+                try { p.slot = declare(p.token, p.type); }
+                catch (const CompilationError& failure) { diagnostics.add(failure); }
+            }
             auto flow = sequence(f.body, false);
-            if (f.result != Type::none && (flow & next_flow)) error(source, f.token, "Missing return path in '" + f.token.text + "'.", "Return a " + std::string(ir::type_name(f.result)) + " on every path that reaches the end.");
+            if (f.result != Type::none && (flow & next_flow) && diagnostics.size() == before && !f.parse_failed && !invalid_function)
+                try { error(source, f.token, Code::missing_return, "Missing return path in '" + f.token.text + "'.", "Return a " + std::string(ir::type_name(f.result)) + " on every path that reaches the end."); }
+                catch (const CompilationError& failure) { diagnostics.add(failure); }
         }
     }
 };
@@ -683,19 +928,19 @@ void portable_component(const SourceFile& source, const Token& at, const std::st
     auto base = folded(component.substr(0, component.find('.')));
     invalid |= base == "con" || base == "prn" || base == "aux" || base == "nul" ||
         (base.size() == 4 && (base.starts_with("com") || base.starts_with("lpt")) && base[3] >= '1' && base[3] <= '9');
-    if (invalid) error(source, at, "Non-portable module path component '" + component + "'.",
+    if (invalid) error(source, at, Code::import_path, "Non-portable module path component '" + component + "'.",
         "Use printable ASCII filenames without Windows-reserved characters/names or trailing dots/spaces; Unicode module filenames are deferred.");
 }
 std::string normalize(const Unit& from, const Token& path) {
     const auto& text = path.text;
     if (text.empty() || text.find('\\') != std::string::npos)
-        error(from.source, path, "Invalid import path.", "Use a nonempty VFS path with / separators on every platform.");
+        error(from.source, path, Code::import_path, "Invalid import path.", "Use a nonempty VFS path with / separators on every platform.");
     bool absolute = text[0] == '/';
-    if (text.starts_with("//")) error(from.source, path, "Invalid root-relative import path.", "A single leading / denotes the virtual project root, not an OS or network path.");
+    if (text.starts_with("//")) error(from.source, path, Code::import_path, "Invalid root-relative import path.", "A single leading / denotes the virtual project root, not an OS or network path.");
     if (!absolute && !text.starts_with("./") && !text.starts_with("../") && text.find(':') != std::string::npos)
-        error(from.source, path, "OS filesystem paths are not valid VOID imports.", "Use a project-root /path.void or importer-relative ./path.void instead of a drive path.");
+        error(from.source, path, Code::import_path, "OS filesystem paths are not valid VOID imports.", "Use a project-root /path.void or importer-relative ./path.void instead of a drive path.");
     if (!absolute && !text.starts_with("./") && !text.starts_with("../"))
-        error(from.source, path, "Package imports are not implemented.", "Use /project/file.void, ./file.void or ../file.void; OS drive paths are not VFS paths.");
+        error(from.source, path, Code::import_path, "Package imports are not implemented.", "Use /project/file.void, ./file.void or ../file.void; OS drive paths are not VFS paths.");
     std::vector<std::string> parts;
     if (!absolute) {
         auto parent = std::filesystem::path(from.identity).parent_path();
@@ -706,7 +951,7 @@ std::string normalize(const Unit& from, const Token& path) {
         auto end = text.find('/', begin); if (end == std::string::npos) end = text.size();
         auto component = text.substr(begin, end - begin);
         if (component == "..") {
-            if (parts.empty()) error(from.source, path, "Import escapes the project root.", "External imports require an explicit permission/identity contract and are not enabled in this phase.");
+            if (parts.empty()) error(from.source, path, Code::import_path, "Import escapes the project root.", "External imports require an explicit permission/identity contract and are not enabled in this phase.");
             parts.pop_back();
         } else if (!component.empty() && component != ".") {
             portable_component(from.source, path, component); parts.push_back(std::move(component));
@@ -715,23 +960,32 @@ std::string normalize(const Unit& from, const Token& path) {
         begin = end + 1;
     }
     if (parts.empty() || text.back() == '/' || !parts.back().ends_with(".void"))
-        error(from.source, path, "Import must name a .void source file.", "Supply an exact-case filename, not a directory.");
+        error(from.source, path, Code::import_path, "Import must name a .void source file.", "Supply an exact-case filename, not a directory.");
     std::string id;
     for (const auto& component : parts) id += "/" + component;
     return id;
 }
-class SourceReadError : public std::invalid_argument {
+class SourceReadError : public CompilationError {
+    static Diagnostic record(const std::string& path, const std::string& message) {
+        Diagnostic d{Code::import_read}; d.description = message;
+        d.primary = {std::make_shared<const SourceFile>(path, ""), {}, 0, 0};
+        d.hint = "Check the source path, permissions and storage availability.";
+        return d;
+    }
 public:
-    using std::invalid_argument::invalid_argument;
+    SourceReadError(const std::string& path, const std::string& message) : CompilationError({record(path, message)}) {}
 };
 class SourceGraph {
     std::filesystem::path root;
+    Diagnostics& diagnostics;
+    unsigned depth = 0;
 public:
     std::map<std::string, std::unique_ptr<Unit>> units;
-    explicit SourceGraph(std::filesystem::path project_root) : root(std::move(project_root)) {}
+    explicit SourceGraph(std::filesystem::path project_root, Diagnostics& d) : root(std::move(project_root)), diagnostics(d) {}
     Unit& load(const Unit& from, const Token& path) {
         auto id = normalize(from, path);
         if (auto found = units.find(id); found != units.end()) return *found->second;
+        Depth guard(depth, from.source, path);
         auto physical = root;
         std::error_code ec;
         for (const auto& part : std::filesystem::path(id).relative_path()) {
@@ -741,32 +995,49 @@ public:
                 auto candidate = it->path().filename().generic_string();
                 if (folded(candidate) == folded(spelling)) matches.push_back(candidate);
             }
-            if (ec) error(from.source, path, "Cannot inspect import directory for '" + id + "'.", "Check that each parent exists, is a readable directory and uses the exact filename case.");
-            if (matches.size() > 1) error(from.source, path, "Filesystem case collision for '" + spelling + "'.", "Rename case-only siblings so this project has the same identity on every platform.");
-            if (matches.empty()) error(from.source, path, "Cannot find imported file '" + id + "'.", "Check this path relative to the importing file or virtual project root.");
-            if (matches.front() != spelling) error(from.source, path, "Import path case mismatch: requested '" + spelling + "', found '" + matches.front() + "'.", "Use the exact on-disk spelling on every platform.");
+            if (ec) error(from.source, path, Code::import_read, "Cannot inspect import directory for '" + id + "'.", "Check that each parent exists, is a readable directory and uses the exact filename case.");
+            if (matches.size() > 1) error(from.source, path, Code::import_path, "Filesystem case collision for '" + spelling + "'.", "Rename case-only siblings so this project has the same identity on every platform.");
+            if (matches.empty()) error(from.source, path, Code::import_read, "Cannot find imported file '" + id + "'.", "Check this path relative to the importing file or virtual project root.");
+            if (matches.front() != spelling) error(from.source, path, Code::import_path, "Import path case mismatch: requested '" + spelling + "', found '" + matches.front() + "'.", "Use the exact on-disk spelling on every platform.");
             physical /= part;
             auto status = std::filesystem::symlink_status(physical, ec);
-            if (ec) error(from.source, path, "Cannot inspect imported path '" + id + "'.");
-            if (std::filesystem::is_symlink(status)) error(from.source, path, "Symbolic links are not supported in module paths.", "Import a regular project file; symlink identity and external permissions are deferred.");
+            if (ec) error(from.source, path, Code::import_read, "Cannot inspect imported path '" + id + "'.");
+            if (std::filesystem::is_symlink(status)) error(from.source, path, Code::import_path, "Symbolic links are not supported in module paths.", "Import a regular project file; symlink identity and external permissions are deferred.");
         }
         if (!std::filesystem::is_regular_file(physical, ec) || ec)
-            error(from.source, path, "Imported path is not a regular .void source file.");
+            error(from.source, path, Code::import_read, "Imported path is not a regular .void source file.");
         auto resolved = std::filesystem::canonical(physical, ec);
         if (ec || resolved != physical)
-            error(from.source, path, "Module path contains a symbolic link or filesystem alias.", "Use regular project paths; junctions and redirected module paths are not supported.");
+            error(from.source, path, Code::import_path, "Module path contains a symbolic link or filesystem alias.", "Use regular project paths; junctions and redirected module paths are not supported.");
         for (const auto& [other_id, other] : units) {
             if (std::filesystem::equivalent(physical, other->source.path(), ec) && !ec)
-                error(from.source, path, "Hard-link aliases have conflicting module identities: '" + id + "' and '" + other_id + "'.", "Use one VFS filename for this physical source.");
+                error(from.source, path, Code::import_path, "Hard-link aliases have conflicting module identities: '" + id + "' and '" + other_id + "'.", "Use one VFS filename for this physical source.");
             ec.clear();
         }
         // Publish before traversing imports: function-only declaration cycles are safe.
         std::unique_ptr<Unit> unit;
         try { unit = std::make_unique<Unit>(read_source(physical), id); }
-        catch (const SourceReadError&) { error(from.source, path, "Cannot read imported file '" + id + "'.", "Check source file permissions and storage availability."); }
+        catch (const SourceReadError&) { error(from.source, path, Code::import_read, "Cannot read imported file '" + id + "'.", "Check source file permissions and storage availability."); }
+        catch (const CompilationError& failure) {
+            auto records = failure.diagnostics();
+            for (auto& record : records) record.primary.module_identity = id;
+            throw CompilationError(std::move(records));
+        }
         auto* result = unit.get(); units.emplace(id, std::move(unit));
-        Parser(result->source).parse(*result);
-        for (auto& import : result->imports) import.target = load(*result, import.path).identity;
+        diagnostics.bind(result->source, id);
+        auto before = diagnostics.size();
+        Parser(result->source, diagnostics).parse(*result);
+        result->parse_failed |= diagnostics.size() != before;
+        for (auto& import : result->imports) {
+            try {
+                auto& target = load(*result, import.path);
+                import.target = target.identity;
+            } catch (const CompilationError& failure) {
+                diagnostics.add(failure); result->failed_import = true;
+                auto qualifier = import.explicit_alias ? import.alias.text : std::filesystem::path(import.path.text).stem().generic_string();
+                result->failed_qualifiers.insert(qualifier);
+            }
+        }
         return *result;
     }
 };
@@ -790,7 +1061,7 @@ std::int32_t constant_value(const SourceFile& source, const Expr& e) {
     case ir::Op::subtract: return wrap(x - y);
     case ir::Op::multiply: return wrap(x * y);
     case ir::Op::divide: case ir::Op::remainder:
-        if (!b) error(source, e.token, "Division or remainder by zero in a compile-time constant.", "Use a nonzero divisor.");
+        if (!b) error(source, e.token, Code::zero_divisor, "Division or remainder by zero in a compile-time constant.", "Use a nonzero divisor.");
         return wrap(static_cast<std::uint32_t>(e.op == "/" ? std::int64_t(a) / b : std::int64_t(a) % b));
     case ir::Op::less: return a < b;
     case ir::Op::less_equal: return a <= b;
@@ -801,58 +1072,91 @@ std::int32_t constant_value(const SourceFile& source, const Expr& e) {
     default: throw std::logic_error("invalid constant operation");
     }
 }
-ir::Module compile_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
+ir::Module compile_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics) {
     // Discover every signature before checking any body, including cyclic imports.
     for (auto& [id, unit] : units) for (auto& f : unit->functions) {
         f.symbol = id + "::" + f.token.text;
-        if (!unit->declarations.emplace(f.token.text, &f).second)
-            error(unit->source, f.token, "Duplicate function '" + f.token.text + "'.");
+        auto [previous, inserted] = unit->declarations.emplace(f.token.text, &f);
+        if (!inserted) {
+            unit->invalid_declarations.insert(f.token.text);
+            try { error(unit->source, f.token, Code::duplicate, "Duplicate function '" + f.token.text + "'.", {}, {{span(unit->source, previous->second->token), "Previously declared"}}); }
+            catch (const CompilationError& failure) { diagnostics.add(failure); }
+        }
     }
     auto& root = *units.at(entry);
     for (auto& [id, unit] : units) for (auto& c : unit->constants) {
         auto& token = c.declaration.token;
-        if (unit->declarations.contains(token.text) || !unit->constant_names.emplace(token.text, &c).second)
-            error(unit->source, token, "Duplicate declaration '" + token.text + "'.");
+        auto previous = unit->constant_names.find(token.text);
+        if (unit->declarations.contains(token.text) || previous != unit->constant_names.end()) {
+            auto location = unit->declarations.contains(token.text) ? unit->declarations.at(token.text)->token : previous->second->declaration.token;
+            try { error(unit->source, token, Code::duplicate, "Duplicate declaration '" + token.text + "'.", {}, {{span(unit->source, location), "Previously declared"}}); }
+            catch (const CompilationError& failure) { diagnostics.add(failure); }
+            c.state = 3; unit->invalid_declarations.insert(token.text);
+        } else unit->constant_names.emplace(token.text, &c);
     }
     for (auto& [id, unit] : units) {
         if (unit.get() != &root) for (const auto& [name, c] : root.constant_names) if (!c->file_private) {
-            if (unit->constant_names.contains(name)) error(unit->source, unit->constant_names.at(name)->declaration.token, "Declaration shadows project-root constant '" + name + "'.");
-            if (unit->declarations.contains(name)) error(unit->source, unit->declarations.at(name)->token, "Declaration shadows project-root constant '" + name + "'.");
+            try {
+            if (unit->constant_names.contains(name)) error(unit->source, unit->constant_names.at(name)->declaration.token, Code::duplicate, "Declaration shadows project-root constant '" + name + "'.", {}, {{span(root.source, c->declaration.token), "Previously declared"}});
+            if (unit->declarations.contains(name)) error(unit->source, unit->declarations.at(name)->token, Code::duplicate, "Declaration shadows project-root constant '" + name + "'.", {}, {{span(root.source, c->declaration.token), "Previously declared"}});
+            } catch (const CompilationError& failure) { diagnostics.add(failure); unit->invalid_declarations.insert(name); }
         }
         for (const auto& import : unit->imports) {
+            if (import.target.empty()) continue;
+            if (units.at(import.target)->parse_failed) unit->failed_import = true;
             auto alias = import.explicit_alias ? import.alias.text : std::filesystem::path(import.target).stem().generic_string();
+            try {
             if (!import.explicit_alias && !identifier(alias)) continue;
             if ((import.explicit_alias && unit->declarations.contains(alias)) || unit->constant_names.contains(alias) || (root.constant_names.contains(alias) && !root.constant_names.at(alias)->file_private))
-                error(unit->source, import.alias, "Import alias '" + alias + "' conflicts with " + (unit->declarations.contains(alias) ? "a function declaration." : "a constant declaration."), "Choose a distinct explicit alias with as.");
+                error(unit->source, import.alias, Code::alias_conflict, "Import alias '" + alias + "' conflicts with " + (unit->declarations.contains(alias) ? "a function declaration." : "a constant declaration."), "Choose a distinct explicit alias with as.");
             auto* target = units.at(import.target).get();
             auto& targets = unit->qualifiers[alias];
             bool repeated = std::find(targets.begin(), targets.end(), target) != targets.end();
             bool different = std::any_of(targets.begin(), targets.end(), [&](Unit* previous) { return previous != target; });
-            if (different && (import.explicit_alias || unit->explicit_qualifiers.contains(alias)))
-                error(unit->source, import.alias, "Conflicting import alias '" + alias + "'.", "Give these modules different aliases using as.");
+            if (different && (import.explicit_alias || unit->explicit_qualifiers.contains(alias))) {
+                std::vector<RelatedLocation> related;
+                for (const auto& previous : unit->imports) {
+                    if (&previous == &import) break;
+                    auto previous_alias = previous.explicit_alias ? previous.alias.text : std::filesystem::path(previous.target).stem().generic_string();
+                    if (previous_alias == alias && !previous.target.empty()) { related.push_back({span(unit->source, previous.alias), "Previously imported"}); break; }
+                }
+                error(unit->source, import.alias, Code::alias_conflict, "Conflicting import alias '" + alias + "'.", "Give these modules different aliases using as.", std::move(related));
+            }
             if (import.explicit_alias) unit->explicit_qualifiers.insert(alias);
             if (!repeated) targets.push_back(target);
+            } catch (const CompilationError& failure) { diagnostics.add(failure); unit->failed_qualifiers.insert(alias); }
         }
     }
     std::vector<std::string> dependency;
     std::function<void(Unit&, Constant&)> evaluate = [&](Unit& owner, Constant& c) {
         if (c.state == 2) return;
+        if (c.state == 3) throw Poison{};
+        if (dependency.size() >= 128) error(owner.source, c.declaration.token, Code::nesting, "Constant dependency depth limit exceeded.", "Reduce the dependency chain between constants.");
         auto key = owner.identity + "::" + c.declaration.name;
         if (c.state == 1) {
             std::string chain;
             for (const auto& item : dependency) chain += item + " -> ";
-            error(owner.source, c.declaration.token, "Circular constant dependency: " + chain + key + ".");
+            error(owner.source, c.declaration.token, Code::constant_cycle, "Circular constant dependency: " + chain + key + ".");
         }
         c.state = 1; dependency.push_back(key);
-        Semantics(owner, units, root, evaluate).analyze_constant(c);
-        c.value = constant_value(owner.source, *c.declaration.expression);
-        c.state = 2; dependency.pop_back();
+        try {
+            Semantics(owner, units, root, evaluate, diagnostics).analyze_constant(c);
+            c.value = constant_value(owner.source, *c.declaration.expression);
+            c.state = 2; dependency.pop_back();
+        } catch (...) { c.state = 3; dependency.pop_back(); throw; }
     };
-    for (auto& [id, unit] : units) for (auto& c : unit->constants) evaluate(*unit, c);
+    for (auto& [id, unit] : units) for (auto& c : unit->constants) {
+        if (diagnostics.full()) break;
+        try { evaluate(*unit, c); }
+        catch (const CompilationError& failure) { diagnostics.add(failure); }
+        catch (const Poison&) {}
+    }
+    for (auto& [id, unit] : units) Semantics(*unit, units, root, evaluate, diagnostics).analyze();
+    // Recovered trees and AST-only poisoned types can never enter validated IR.
+    diagnostics.finish();
     ir::Module module; module.identity = entry; module.entry_symbol = entry + "::entry";
     module.source_path = units.at(entry)->source.path();
     for (auto& [id, unit] : units) {
-        Semantics(*unit, units, root, evaluate).analyze();
         if (!unit->constants.empty() || std::any_of(unit->functions.begin(), unit->functions.end(), [](const Function& f) {
             std::function<bool(const std::vector<Statement>&)> has = [&](const auto& body) {
                 for (const auto& s : body) if (s.readonly || has(s.body) || has(s.otherwise)) return true;
@@ -871,41 +1175,53 @@ ir::Module compile_graph(std::map<std::string, std::unique_ptr<Unit>>& units, co
 }
 SourceFile read_source(const std::filesystem::path& path) {
     std::ifstream stream(path, std::ios::binary);
-    if (!stream) throw SourceReadError(path.generic_string() + ": error: Cannot read source file.\n");
+    if (!stream) throw SourceReadError(path.generic_string(), "Cannot read source file.");
     std::string text{std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>()};
-    if (stream.bad()) throw SourceReadError(path.generic_string() + ": error: Cannot finish reading source file.\n");
+    if (stream.bad()) throw SourceReadError(path.generic_string(), "Cannot finish reading source file.");
     return {path.generic_string(), std::move(text)};
 }
 ir::Module compile_source(const SourceFile& source) {
     std::map<std::string, std::unique_ptr<Unit>> units;
     auto identity = source.path().empty() ? std::string("<source>") : source.path();
     auto unit = std::make_unique<Unit>(source, identity);
-    Parser(source).parse(*unit);
-    if (!unit->imports.empty()) error(source, unit->imports.front().path, "Imports need a filesystem project context.", "Use compile_project or the check/run/emit CLI with a source filename.");
+    Diagnostics diagnostics; diagnostics.bind(source, identity);
+    Parser(source, diagnostics).parse(*unit);
+    if (!unit->imports.empty()) {
+        try { error(source, unit->imports.front().path, Code::import_context, "Imports need a filesystem project context.", "Use compile_project or the check/run/emit CLI with a source filename."); }
+        catch (const CompilationError& failure) { diagnostics.add(failure); }
+        unit->failed_import = true;
+    }
     units.emplace(identity, std::move(unit));
-    return compile_graph(units, identity);
+    return compile_graph(units, identity, diagnostics);
 }
 SourceProgram compile_project(const std::filesystem::path& entry) {
     std::error_code ec;
     auto absolute = std::filesystem::absolute(entry, ec);
-    if (ec) throw std::invalid_argument("Cannot resolve the entry source path.");
+    if (ec) error(SourceFile(entry.generic_string(), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the entry source path.");
     auto root = std::filesystem::canonical(absolute.parent_path(), ec);
-    if (ec) throw std::invalid_argument(entry.generic_string() + ": error: Cannot resolve the project root directory.\n");
+    if (ec) error(SourceFile(entry.generic_string(), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the project root directory.", "Check that the entry's parent directory exists and is readable.");
     // A diagnostic anchor is needed even before the entry file can be opened.
     Unit anchor(SourceFile(absolute.generic_string(), ""), "/");
-    SourceGraph graph(root);
-    auto& first = graph.load(anchor, {TokenKind::path, "/" + absolute.filename().generic_string(), 0});
-    auto module = compile_graph(graph.units, first.identity);
+    Diagnostics diagnostics; diagnostics.bind(anchor.source, "/" + absolute.filename().generic_string());
+    SourceGraph graph(root, diagnostics);
+    auto& first = [&]() -> Unit& {
+        try { return graph.load(anchor, {TokenKind::path, "/" + absolute.filename().generic_string(), 0}); }
+        catch (const CompilationError& failure) { diagnostics.add(failure); diagnostics.finish(); throw; }
+    }();
+    auto module = compile_graph(graph.units, first.identity, diagnostics);
     return {first.source, std::move(module)};
 }
 void require_source_entry(const SourceFile& source, const ir::Module& module) {
+    Diagnostics diagnostics; diagnostics.bind(source, module.identity);
+    try {
     for (const auto& f : module.functions) if (f.name == module.entry_symbol) {
         if (f.parameters == std::vector<Type>{Type::i32} && f.result == Type::i32) return;
         std::size_t offset = 0;
         while (offset < source.text().size() && source.location(offset).line < f.source.line) ++offset;
         while (offset < source.text().size() && source.location(offset).column < f.source.column) ++offset;
-        error(source, {TokenKind::name, "entry", offset}, "The CLI entry point must have signature entry(value: i32) -> i32.", "Other functions can have any supported parameter list; choose an i32 adapter for the CLI.");
+        error(source, {TokenKind::name, "entry", offset}, Code::entry, "The CLI entry point must have signature entry(value: i32) -> i32.", "Other functions can have any supported parameter list; choose an i32 adapter for the CLI.");
     }
-    error(source, {TokenKind::end, "", 0}, "No entry function found.", "Define func entry(value: i32) -> i32 to run or emit this file; check accepts libraries without an entry.");
+    error(source, {TokenKind::end, "", 0}, Code::entry, "No entry function found.", "Define func entry(value: i32) -> i32 to run or emit this file; check accepts libraries without an entry.");
+    } catch (const CompilationError& failure) { diagnostics.add(failure); diagnostics.finish(); }
 }
 }

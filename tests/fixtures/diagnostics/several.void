@@ -1,0 +1,22 @@
+func pair(left: i32, right: bool) -> i32:
+    return left
+
+func first() -> i32:
+    var broken = missing + true
+    var wrong: bool = 1
+    const locked = 2
+    locked += 1
+    pair()
+    return false
+
+func second() -> i32:
+    missing_function()
+
+func path(value: i32) -> i32:
+    if value > 0:
+        return 1
+
+func duplicate():
+    var item = 1
+    var item = 2
+    return

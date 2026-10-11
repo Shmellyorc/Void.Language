@@ -1,0 +1,7 @@
+use "./a.void"
+use "./a.void"
+use "./b.void"
+use "./missing.void" as absent
+const shared = 3
+func entry(value: i32) -> i32:
+    return absent.calculate(value)

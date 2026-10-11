@@ -1,0 +1,3 @@
+func alpha():
+    var shared = 1
+    var unknown = absent_value

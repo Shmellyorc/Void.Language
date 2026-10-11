@@ -52,6 +52,9 @@ jobs:
         run: cmake -S . -B build/sanitizers -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVOID_SANITIZERS=ON -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}" -DVOID_LINKER="${{ env.VOID_LINKER }}"
       - name: Build and execute sanitizer tests
         if: runner.os == 'Linux'
+        env:
+          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
         run: |
           cmake --build build/sanitizers --parallel 3
           ctest --test-dir build/sanitizers --output-on-failure

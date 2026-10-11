@@ -2,7 +2,8 @@
 
 Implemented subset, 10 October 2026. The Language Bible remains authoritative and
 unchanged. The user reports the preceding ten-suite module phase passed Linux,
-Windows and macOS Actions. The changes described here require a new hosted run.
+Windows and macOS Actions. The user reports these Phase 4 changes passed all three platforms in Actions
+run #6 (commit `d78b6b8`). Phase 5 recovery now requires its own hosted run.
 
 ## Readonly and compile-time values
 
@@ -142,7 +143,8 @@ returned. No C++ exception unwinds through generated functions. The CLI reports
 that error and exits 1. AOT allocates the same storage in its native main, prints
 the recorded diagnostics using CRT puts and exits 1. Its diagnostic stream is
 currently stdout; JIT CLI diagnostics use stderr. Results are printed only on
-success. Invalid CLI input still exits 2. No extra runtime library is required
+success. The emitted native adapter's invalid input exits 2; existing JIT CLI input
+validation failures exit 1, while usage errors exit 2. No extra runtime library is required
 when linking an emitted object.
 
 This is a small arithmetic-failure boundary, not generalized language exceptions,
@@ -177,7 +179,16 @@ unoptimized and O2 JIT/AOT modes. An independent widened-integer oracle checks
 304 operand/operator combinations: 1,216 constant/normal/O2 JIT comparisons, plus
 the full 304-case program in normal/O2 JIT and AOT. See WORK_LOG.md for measured local results.
 
-Recommended next phase: improve diagnostic structure and recovery and refine
-source/dependency compatibility metadata before broader numeric types and checked
-conversions. Define literal contextual typing and conversion tables deliberately.
+Structured recovery is now implemented in [DIAGNOSTICS.md](DIAGNOSTICS.md).
+Recommended next phase: refine source/dependency compatibility metadata before
+broader numeric types and checked conversions. Define literal contextual typing and conversion tables deliberately.
 Managed language types still require the separate GC root/thread integration gate.
+
+## Phase 5 preservation audit
+
+Structured compile-time diagnostics/recovery now live in [DIAGNOSTICS.md](DIAGNOSTICS.md).
+The arithmetic implementation, runtime failure ABI, original snapshots, bounded
+caller traces and exact conservative const restart token are unchanged. Invalid
+source edits cannot produce IR or publish a native generation. Tests retain the old
+lease and active slot across failures and continue rejecting changed const tokens.
+Precise dependency compatibility remains a separate recommended design phase.

@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -9,12 +10,13 @@ class SourceFile {
 public:
     SourceFile(std::string path, std::string text);
     SourceLocation location(std::size_t offset) const;
-    const std::string& text() const { return text_; }
+    const std::string& text() const { return snapshot_->text; }
     const std::string& path() const { return path_; }
     std::string excerpt(std::size_t offset) const;
     std::string diagnostic(std::size_t offset, std::string_view message) const;
 private:
-    std::string path_, text_;
-    std::vector<std::size_t> lines_;
+    struct Snapshot { std::string text; std::vector<std::size_t> lines; };
+    std::string path_;
+    std::shared_ptr<const Snapshot> snapshot_;
 };
 }

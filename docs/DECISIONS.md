@@ -292,3 +292,28 @@ compiler-derived compatibility token. This conservative restart rule rejects any
 edit to those files, including imported/local const edits, rather than risking an
 undetected constant update or a finite-hash collision. More precise dependency
 fingerprints are deferred. See VALUE_SEMANTICS.md for explicit limits and lookup rules.
+
+## Phase 5 structured diagnostics and recovery, 10–11 October 2026
+
+Use one compiler-owned Diagnostic record, stable explicit codes, immutable shared
+source snapshots and half-open byte ranges. CompilationError preserves the old
+invalid_argument catch boundary while exposing structured records; the CLI renders
+them without rebuilding semantic information. Unicode-scalar columns are separate
+from future LSP UTF-16 conversion and terminal display width. The Bible is unchanged.
+
+Keep recovery in the existing lexer/parser/type checker. Synchronize by indentation
+at statement/declaration boundaries, explicitly poison failed values/declarations,
+and retain failed constant states. Continue unrelated imports/functions. Conservative
+failed-dependency suppression trades some early spelling diagnostics for fewer
+misleading cascades; document that tradeoff rather than guessing an i32 type.
+Use per-compilation collection, deterministic VFS/span/code ordering, deduplication,
+a 100-record budget and explicit recursion guards. Semantic depth is shared across
+constant evaluation so nested expressions cannot multiply a per-constant limit.
+
+Validate the complete graph before lowering any AST. Invalid source returns no IR,
+never invokes LLVM or native code and cannot replace an object or reload generation.
+Keep runtime checked-entry propagation and its ABI separate; share source utilities
+and immutable storage. The exact const restart token is unchanged. No automatic
+restart or watcher is added. DIAGNOSTICS.md assigns codes and documents the API,
+limits, recovery and acceptance cases. Next design precise dependency compatibility
+and analysis-result APIs before incremental IDE work or broader language expansion.

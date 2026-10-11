@@ -818,3 +818,173 @@ oracle. No current hosted success is claimed. CI still uses the complete pinned
 Next improve structured diagnostics/recovery and precise source dependency
 compatibility, then approve contextual literal/conversion tables before wider
 numeric types. Managed types remain behind the separate GC root/thread gate.
+
+## Phase 5: Structured diagnostics and compiler recovery, 10–11 October 2026
+
+### Baseline and scope
+
+The user reports Phase 4 commit `d78b6b8`, GitHub Actions run #6, passed Linux,
+Windows and macOS. Read the current Bible/Strategy and source/module/value,
+decision, issue and work-log documentation. The Bible's unified-diagnostic IDs
+are explicitly illustrative; Phase 5 now assigns 34 stable compiler categories.
+No language grammar, LLVM version, runtime failure ABI, const restart contract,
+workflow requirements or existing architectural assertions were relaxed.
+All work remains local: no branch, commit, push, publication or remote change.
+
+### Implemented and audited
+
+- One Diagnostic/SourceSpan/RelatedLocation representation with severity, assigned
+  codes, description, owned original snapshot, physical path/VFS owner, half-open
+  byte ranges, related declarations, expected/received types and hints.
+  CompilationError preserves invalid_argument compatibility and exposes structured
+  records. SourceFile copies now share immutable bytes/line indexes.
+- Numbered compiler snippets, scalar-counted ranges, related source snippets and
+  code/type/hint rendering. Runtime excerpts and generated checked-entry ABI remain
+  unchanged. DIAGNOSTICS.md documents all assigned codes, byte/column rules and
+  display-width/multiline/long-line limits.
+- Lexer line recovery and indentation-aware parser statement/declaration recovery,
+  permanent EOF sentinel and explicit progress/recursion/size guards. Malformed
+  named declarations leave invalid bindings rather than fabricated values.
+- Semantic error accumulation across statements/functions/constants/modules,
+  AST-only poisoned types, failed constant states and poisoned duplicate names.
+  Failed imports continue unrelated discovery; uncertain dependent lookups are
+  conservatively suppressed. Stable VFS/span/code ordering, equivalent-record
+  deduplication, 100-record budget plus a notice and bounded registry/analysis.
+- A complete validation gate before AST-to-IR lowering. Invalid check/run/emit
+  returns 1 with no native execution, new object or overwritten existing output.
+  Valid source still uses the original IR and shared LLVM implementation.
+- Failed edits retain active/leased native generations. Exact conservative const
+  tokens are unchanged; changed valid const generations still require restart.
+  Tests verify an old native division failure retains its original source line
+  after an invalid edit, and compile-time snapshots survive file changes/deletion.
+
+Development checks caught and corrected lexer-line recovery producing a secondary
+return mismatch, EOF recovery producing a secondary missing-return error, and a
+malformed entry UTF-8 snapshot being confused with an empty file-opening anchor.
+Snapshot interning now checks that the bytes agree before substituting an owner.
+A recursion audit added one semantic depth budget shared across constant analysis,
+preventing nested expressions from multiplying separate per-constant limits.
+Duplicate declarations/parameters no longer select an arbitrary type for dependent
+uses. Failed local calls and implicit alias conflicts preserve poison state, and
+related declaration notes are deduplicated even through repeated imports. A recursion fixture originally contained postfix `--` tokens; it now uses
+spaced unary minus to test the actual recursive grammar. No old assertion was removed.
+
+### Acceptance and executable evidence
+
+Checked-in real fixtures under `tests/fixtures/diagnostics/` cover eight independent
+primary errors in one file, malformed statements between functions and errors in
+multiple imported files, including a cross-file previous declaration. Generated
+real `.void` fixtures cover malformed signatures/expressions/if-else/for/use,
+indentation/tabs, EOF, UTF-8/BOM/LF/CRLF/CR/no-final-newline, spaces in paths,
+long lines, scalar ranges, repeated imports, alias conflicts, duplicate-name
+poisoning, constant cycles, 100-diagnostic exhaustion, deeply nested/large
+expressions, combined expression/constant depth and a 130-file import chain.
+Fifteen deterministic multi-file repeats and three repeats of every malformed
+fragment assert stable order, termination and retention of later independent errors.
+
+`source_cli` checks invalid check/run/emit in both normal and O2 modes, verifies
+empty success output and failure status, compares existing output SHA-256 before/
+after failed emission, and requires that no fresh partial object appears. It then
+compiles corrected source through both JIT and linked AOT in both modes. Existing
+architecture, numeric oracle, runtime propagation, GC, reload and real native
+printf proofs remain in the original ten suites.
+
+Actual final demonstration:
+
+```sh
+build/ci-debug/voidc check examples/diagnostics/errors.void
+# exit 1; all three in one invocation:
+# errors.void:2:23 VOID2001 (bool/i32 mismatch)
+# errors.void:4:5  VOID2007 (readonly bonus mutation)
+# errors.void:5:12 VOID2003 (unknown missing function)
+build/ci-debug/voidc run examples/diagnostics/corrected.void 10 --no-opt
+# 52
+build/ci-debug/voidc run examples/diagnostics/corrected.void 10
+# 52
+build/ci-debug/voidc emit examples/diagnostics/corrected.void -o build/ci-debug/diagnostic-demo.o
+clang-19 --ld-path=/usr/lib/llvm-19/bin/ld.lld build/ci-debug/diagnostic-demo.o -o build/ci-debug/diagnostic-demo
+build/ci-debug/diagnostic-demo 10
+# 52
+```
+
+The multi-file check reports `/a.void` shadowing/unknown identifier, `/b.void`
+return mismatch and `/main.void` missing import, with the original root declaration
+as a related location. The failed qualifier adds no downstream unknown-call noise.
+DIAGNOSTICS.md includes actual formatted snippets and the correction example.
+CLI behavior remains: source/runtime failures 1, usage errors 2; invalid JIT input
+retains its existing status 1, while the emitted native adapter rejects bad input
+with status 2. Verified these directly; this phase does not change those exits.
+
+An additional deterministic mutation run (seed 50019) wrote 300 malformed real
+files, each with a later independent unknown identifier. Every compiler process
+terminated within its three-second per-process timeout, returned 1, retained that
+later diagnostic and exposed no LLVM errors. This is local robustness evidence,
+not a claim of exhaustive fuzz coverage. Its log is retained with final build logs.
+
+### Commands, exact toolchains and measured final results
+
+Verified LLJIT.h, libLLVMOrcJIT.a and LLVMConfig.cmake in both the installed
+`/usr/lib/llvm-19` SDK and complete official
+`.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64` SDK. Existing CMake configurations
+retain exact 19.1.7, matching Clang/LLD and their SDK RTTI settings. No dependencies
+or probes were removed. The official archive build links serially, preserving the
+previous phase's unexplained concurrent-link observation for reference.
+
+```sh
+cmake --build build/ci-debug -j2
+ctest --test-dir build/ci-debug --output-on-failure
+cmake --build build/ci-release -j2
+ctest --test-dir build/ci-release --output-on-failure
+cmake --build build/ci-sanitizers -j2
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+  UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+  ctest --test-dir build/ci-sanitizers --output-on-failure
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+  UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+  ctest --test-dir build/ci-sanitizers --output-on-failure \
+  -R '^(frontend|modules|modules_cli|reload|gc|native)$' --repeat until-fail:5
+cmake --build build/ci-official-debug -j1
+ctest --test-dir build/ci-official-debug --output-on-failure
+```
+
+| Final configuration | Result | CTest wall time |
+|---|---|---|
+| Installed LLVM 19.1.7 Debug | 10/10 passed | 11.85 s |
+| Installed LLVM 19.1.7 Release | 10/10 passed | 14.16 s |
+| Installed LLVM 19.1.7 ASan/UBSan | 10/10 passed | 19.41 s |
+| Complete official LLVM 19.1.7 SDK Debug, serial build | 10/10 passed | 9.82 s |
+| ASan/UBSan repeated stress | Six suites × five runs, all 30 passed | 82.70 s |
+
+Full-build timings vary with concurrent local SDK linking; these are observations,
+not performance benchmarks. Checked object timestamps against final source and
+acceptance-test timestamps in all four directories so stale intermediate builds
+are not counted as final verification. Sanitizer execution runs outside the desktop
+tracing restriction for LeakSanitizer inspection; leak detection, UBSan function
+checking and assertions remain enabled. Linux CI and final local sanitizer runs
+use halt-on-error with distinct ASan/UBSan exit codes 87/86, so an ordinary expected
+source-failure exit 1 cannot hide a sanitizer failure in a child compiler process. Generated native instructions and LLVM
+itself are not sanitizer-instrumented. Final logs were scanned for sanitizer
+reports and LLVM backtraces, in addition to checking CTest status. No such reports
+were found. Unique-ID/catalog consistency, local Markdown links and whitespace
+checks passed. Final local logs are retained under `build/phase5-verification/`.
+
+### Remaining limitations and hosted verification
+
+DIAGNOSTICS.md records conservative suppression for failed dependencies, recovery
+boundaries and resource limits. Lexically unreadable declarations may still cause
+later unresolved-name messages. Terminal display width, UTF-16 protocol conversion,
+successful-analysis warning/result APIs, incremental parsing/analysis and an LSP
+remain future work. Runtime source failure behavior and conservative const restart
+compatibility are preserved, not replaced with an inferred dependency hash.
+
+The current workflow automatically runs these expanded ten suites on Linux,
+Windows and macOS, including Linux ASan/UBSan. A new user-published Actions run is
+still required for Phase 5: hosted Debug/Release on all platforms and hosted Linux
+sanitizers, especially filesystem recovery, related ranges, CRT/native output
+protection and retained snapshots. No current hosted success is claimed and no
+remote operation was performed.
+
+Recommend the next cohesive phase design precise validated source/dependency
+compatibility and a reusable analysis-result API before incremental IDE integration.
+Keep one parser/type checker. Numeric contextual literals/conversions still require
+deliberate policy approval; managed types still require the GC/root/thread gate.

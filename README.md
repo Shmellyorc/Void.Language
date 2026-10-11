@@ -5,7 +5,8 @@ This repository now compiles graphs of actual `.void` files through one frontend
 semantic model, backend-independent IR, and shared LLVM 19.1.7 AOT/JIT lowering.
 The initial subset supports typed functions, i32/bool expressions, local variables,
 conditionals, `for` loops, readonly/compile-time constants, and source-first
-compile/runtime diagnostics. Experimental GC, leased function
+compile/runtime diagnostics. Compile-time errors now include stable codes, ranges,
+related declarations and recovery across independent errors. Experimental GC, leased function
 replacement, and native C interoperability remain separate architectural proofs.
 See [source compiler scope and decisions](docs/SOURCE_COMPILER.md).
 
@@ -151,8 +152,9 @@ Visual Studio DIA SDK (`VSINSTALLDIR`); an explicit real
 
 All jobs build and execute the same Debug and Release tests; Linux also runs
 ASan/UBSan. The user confirmed the previous ten-suite module phase passed on all three
-platforms. The current constants/numeric/runtime changes need a new hosted run
-after the user commits and pushes.
+platforms. The user reports Phase 4 value semantics also passed all platforms
+(commit `d78b6b8`, Actions run #6). Phase 5 diagnostic recovery requires another
+hosted run after the user commits and pushes.
 See [verified commands and results](docs/WORK_LOG.md).
 
 ## Continue development
@@ -164,6 +166,21 @@ Read [the Language Bible](docs/LANGUAGE_BIBLE.md),
 [module system](docs/MODULE_SYSTEM.md),
 [value semantics](docs/VALUE_SEMANTICS.md), and
 [known issues](docs/KNOWN_ISSUES.md).
-The next phase should improve diagnostic structure/recovery and source dependency
+Structured diagnostics/recovery are now implemented. The next phase should refine source dependency
 compatibility, then introduce contextual literals/conversions after detailed policy approval.
 Resolve runtime/root integration before introducing managed language types.
+
+## Structured compiler diagnostics
+
+```sh
+build/debug/voidc check examples/diagnostics/errors.void
+# One failure reports VOID2001 (type), VOID2007 (readonly), VOID2003 (unknown function).
+build/debug/voidc run examples/diagnostics/corrected.void 10
+# 52; this is actual parsed-source native execution.
+```
+
+The same corrected source can be emitted and linked using the AOT instructions
+above; normal and O2 tests execute both native modes. Invalid source never executes
+or replaces an existing object. See [diagnostic codes, recovery and snapshots](docs/DIAGNOSTICS.md)
+and [verified commands/results](docs/WORK_LOG.md). The user reports Phase 4 passed
+all hosted platforms; Phase 5 requires another user-published Actions run.

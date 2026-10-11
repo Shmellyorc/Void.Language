@@ -1,0 +1,11 @@
+func before() -> i32:
+    return 3
+
+var malformed =
+
+func middle() -> i32:
+    var invalid = (1 + )
+    return 4
+
+func after() -> i32:
+    return unresolved

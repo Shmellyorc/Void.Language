@@ -118,6 +118,7 @@ void programs(const std::filesystem::path& root) {
 }
 }
 void value_tests(const std::filesystem::path& root);
+#include "diagnostics.hpp"
 void frontend_tests(const std::filesystem::path& root) {
-    diagnostics(); programs(root); value_tests(root);
+    diagnostics(); programs(root); value_tests(root); diagnostic_acceptance::run(root);
 }

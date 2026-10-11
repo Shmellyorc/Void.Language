@@ -2,8 +2,8 @@
 
 Implemented locally on 10 October 2026. The user confirmed the preceding source
 compiler passed Linux, Windows and macOS Actions. The user reports this ten-suite
-module phase passed all three hosted platforms. The subsequent value-semantics
-phase requires its own run. The Language Bible remains unchanged and authoritative; policies
+module phase passed all three hosted platforms. The user also reports Phase 4 value semantics (commit `d78b6b8`, run #6) passed
+all three platforms. Phase 5 recovery requires another hosted run. The Language Bible remains unchanged and authoritative; policies
 marked provisional below settle this implementation slice, not the full language.
 
 ## Working imports
@@ -180,6 +180,15 @@ file, line and column. Existing GC/native/hot-reload regressions remain intact.
 See WORK_LOG.md for actual Linux commands, results and hosted verification gaps.
 
 Constants, numeric correctness and runtime diagnostics now extend this foundation;
-see [VALUE_SEMANTICS.md](VALUE_SEMANTICS.md) and WORK_LOG.md. Next improve diagnostic
-structure/recovery and dependency compatibility. External imports/packages still
+see [VALUE_SEMANTICS.md](VALUE_SEMANTICS.md) and WORK_LOG.md. Structured recovery is
+now implemented in [DIAGNOSTICS.md](DIAGNOSTICS.md); next refine source/dependency compatibility. External imports/packages still
 need explicit identity/permission contracts, and managed types need the GC gate.
+
+## Phase 5 diagnostic collection
+
+Discovery now continues after individual import failures and checks unrelated
+reachable units. Structured diagnostics retain physical paths, VFS identities and
+immutable source snapshots, with cross-file related declarations. All module
+validation finishes before any AST lowering. See [DIAGNOSTICS.md](DIAGNOSTICS.md)
+for recovery, deterministic ordering, deduplication and suppression limits.
+Function-only cycles, visibility, path policy and exact const restart tokens are unchanged.
