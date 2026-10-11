@@ -1715,3 +1715,161 @@ obligation remain documented limitations. Next consider protocol position adapte
 and a minimal client transport before partial compilation; managed-runtime and
 external-package identity gates remain separate. No commit, branch, push,
 publication or remote modification was performed.
+
+## Phase 10: minimal language server, 11 October 2026
+
+Baseline: the user reports Phase 9 commit `02a9aa7`, Actions run #12, passed Linux,
+Windows and macOS. Implemented this phase locally without branches, commits,
+pushes, publication or remote changes. The original eighteen suites and assertions
+are unchanged; lsp_positions, lsp_protocol and lsp_demo bring the total to **21**.
+
+### Implementation and evidence
+
+Added a real synchronous, single-threaded `voidls --entry <path>` executable.
+It speaks framed stdio JSON-RPC/LSP 3.17: initialize/initialized/shutdown/exit,
+full didOpen/didChange/didClose, publishDiagnostics, definition and references.
+Only implemented capabilities are advertised. LLVM Support JSON handles parsing
+and serialization; framing, lifecycle/errors and resource bounds are explicit.
+Numeric/string IDs, negative/zero versions, stale/duplicate rejection, reopening,
+multiple full-change events and empty change arrays are exercised through pipes.
+
+The adapter retains exact SourceFile snapshots, reuses the compiler line index
+and UTF-8 scalar validator, converts to UTF-16, handles LF/CRLF/CR and rejects split
+scalar/surrogate positions. URI conversion handles escaped UTF-8 physical paths,
+spaces, `#`, `%`, Windows drive notation and wide argv/binary streams. Another
+Windows drive and malformed UTF-8 URI paths reject as parameters. The compiler's
+physical-path labels and LLVM debug filenames now use explicit UTF-8 conversion;
+portable ASCII VFS module-name restrictions are unchanged. No numeric/syntax,
+compatibility, frontend resolver or runtime publication behavior was replaced.
+
+Every accepted transition uses ToolingSession selection/full analysis/acceptance.
+Invalid/currently stale graphs have no navigation fallback. Diagnostics preserve
+compiler codes, severity, hints, ranges, related locations and negotiated open-file
+versions; repair, graph removal and close publish empty arrays where needed.
+Navigation consumes existing declarations/resolved references, including imported
+functions, root/import/local readonly constants, forward/cyclic calls and multiple
+callers. Unsupported mutable locals/parameters/expressions have empty results.
+
+The portable Python harness launches actual subprocesses with binary pipes and
+real `.void` fixtures. Tests cover fragmented/coalesced messages, malformed JSON,
+invalid IDs, invalid UTF-8, excessive nesting, header/length/truncation errors,
+UTF-16 emoji, CRLF/CR, zero-width EOF diagnostics, Unicode physical roots, aliases,
+related locations, virtual modules, multi-file unsaved edits, stale/duplicate
+versions, invalid/repair, close/reopen, graph changes and clean lifecycle/EOF.
+The demo resolves its temporary root (macOS `/var` may alias `/private/var`) so
+canonical output URIs compare correctly. No POSIX-only process API is required.
+
+Actual demonstration command/output:
+
+```sh
+python3 tools/lsp_demo.py build/ci-debug/voidls
+```
+
+```text
+initialized: full synchronization, UTF-16, definition and references
+open: no diagnostics
+definition: worker.void:1:6
+references: declaration and one source call
+unsaved edit: VOID2002 at worker.void:2:12
+invalid revision: navigation returns null
+repair: old diagnostics cleared; fresh navigation restored
+shutdown and exit: clean protocol streams
+```
+
+### Final verification
+
+Reused and regenerated the six existing CMake configurations. Installed SDK:
+`/usr/lib/llvm-19/lib/cmake/llvm`, Clang/LLD 19.1.7, RTTI on. Complete official SDK:
+`.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64`, its own Clang/LLD 19.1.7,
+RTTI off. Verified actual headers (LLJIT/APFloat), static libraries
+(LLVMOrcJIT/LLVMSupport), LLVMConfig.cmake and compiler/linker versions. Required
+LLVM development dependencies remain intact. Official archive builds ran serially
+with the existing ThinLTO cache; the installed builds used two jobs.
+
+```sh
+cmake --build build/ci-debug -j2
+ctest --test-dir build/ci-debug --output-on-failure
+cmake --build build/ci-release -j2
+ctest --test-dir build/ci-release --output-on-failure
+cmake --build build/ci-sanitizers -j2
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers --output-on-failure
+cmake --build build/ci-official-debug -j1
+ctest --test-dir build/ci-official-debug --output-on-failure
+cmake --build build/ci-official-release -j1
+ctest --test-dir build/ci-official-release --output-on-failure
+cmake --build build/ci-official-san -j1
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-official-san --output-on-failure
+```
+
+All full suites were rerun after the final demo/client revision. Final measured
+results (Linux host, not new hosted-platform claims):
+
+| Configuration | Result | CTest wall time |
+|---|---|---|
+| Installed Debug | 21/21 passed | 34.45 s |
+| Installed Release | 21/21 passed | 31.18 s |
+| Installed strict ASan/UBSan | 21/21 passed | 56.58 s |
+| Official Debug | 21/21 passed | 28.58 s |
+| Official Release | 21/21 passed | 26.10 s |
+| Official strict ASan/UBSan | 21/21 passed | 51.23 s |
+
+Repeated six suites ten times per SDK with the same strict settings:
+
+```sh
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers --output-on-failure -R '^(lsp_positions|lsp_protocol|lsp_demo|sessions|analysis|reload)$' --repeat until-fail:10
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-official-san --output-on-failure -R '^(lsp_positions|lsp_protocol|lsp_demo|sessions|analysis|reload)$' --repeat until-fail:10
+```
+
+Installed **60/60 executions**, 26.10 s; official **60/60**, 24.51 s.
+No sanitizer/leak findings occurred. LeakSanitizer ran outside the tracing sandbox;
+no checks or tests were disabled. Installed RTTI-on coverage retains vptr;
+the official archive's no-RTTI ABI still cannot provide that check. All supported
+ASan/UBSan checks and the previous RTTI correction remain active.
+
+The existing analysis tests still assert native 53 -> 61, an old lease returning
+53, constant-edit rejection requiring restart, invalid-source rejection and
+concurrent native lease safety in normal/O2 modes. All original GC/native/AOT/JIT
+architectural regressions passed. The actual voidls link lines for all six builds
+exclude void_llvm, LLVMOrcJIT and void_runtime; LLVMSupport remains linked for JSON
+and the existing frontend's numeric support. No second compiler was added.
+
+One initial official Clang attempt crashed in Lexer::SkipWhitespace while its
+source file was being rewritten during build preparation. That attempt is retained
+in `build/phase10-verification/initial-compiler-interruption.log`. The source was
+then frozen before validation. The serial retry, all six final builds and three
+additional identical official Clang compilations of the frozen server source
+succeeded without a backtrace. Concurrent rewriting is consistent with the lexer
+failure; a standalone toolchain defect was not reproduced. Do not treat that initial
+attempt as clean or modify sources while the compiler reads them. The unrelated
+historical LLD scheduler observation remains documented in KNOWN_ISSUES.md.
+
+Final audit checks frozen source/fixture/client hashes (excluding generated pyc),
+relevant binary freshness, full test-log freshness, all C++ RTTI compile flags,
+sanitizer instrumentation, exact LLD version and the server's link boundary.
+Final build/test logs contain no LLVM backtrace, sanitizer finding or new project
+warning. The known third-party ciso646 warning remains visible. Markdown links and
+git diff whitespace pass. Ignored evidence lives in build/phase10-verification/:
+source-manifest.json, toolchains.json, six build/test logs, stress logs/summaries,
+demonstration.log, frozen-compiler-check.log and audit scripts/results.
+
+### Delivery and next work
+
+[LANGUAGE_SERVER.md](LANGUAGE_SERVER.md) documents startup, methods, UTF-16/version
+contracts, URI/security limits, compiler dependency boundaries and current gaps.
+README, decisions, strategy and known issues are updated. Full graph analysis is
+synchronous; only entry-reachable source is semantically validated. Disk reads
+remain non-atomic and there is no watcher/save handler/refresh extension. Unsupported
+symbol categories return empty results. No broad IDE functionality, new language
+features, caches, workers or automatic native publication were introduced.
+
+**Phase 10 is complete locally and ready for hosted GitHub CI.** The existing
+workflow already installs Python 3.12, builds all targets and runs all tests with
+strict Linux sanitizer settings; no workflow/test skip is needed. The user's next
+run must verify the new 21-suite Debug/Release matrix on Linux/Windows/macOS and
+Linux sanitizers, especially Windows drive/wide-argument/Unicode filesystem handling
+and macOS temporary-root behavior. No new hosted outcome is claimed.
+
+Next consider small editor packaging and explicit disk refresh/cancellation
+contracts before workers or partial compilation, retaining exact compatibility and
+snapshot ownership. Managed-runtime and package identity gates remain separate.
+All version-control and remote publication steps remain with the user.

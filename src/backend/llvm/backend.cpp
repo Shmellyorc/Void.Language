@@ -1,3 +1,4 @@
+#include "void/path.hpp"
 #include "void/backend.hpp"
 #include "void/frontend.hpp"
 #include "void/numeric.hpp"
@@ -93,8 +94,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         functions[f.name] = llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, native_symbol(f, suffix), *module);
     }
     llvm::DIBuilder debug(*module);
-    auto module_path = std::filesystem::path(input.source_path.empty() ? input.identity : input.source_path);
-    auto* file = debug.createFile(module_path.filename().generic_string(), module_path.parent_path().generic_string());
+    auto module_path = vd::utf8_path(input.source_path.empty() ? input.identity : input.source_path);
+    auto* file = debug.createFile(vd::path_utf8(module_path.filename()), vd::path_utf8(module_path.parent_path()));
     debug.createCompileUnit(llvm::dwarf::DW_LANG_C, file, "VOID source compiler", false, "", 0);
     auto debug_value_type = [&](ir::Type t) -> llvm::Metadata* {
         if (t == ir::Type::none) return nullptr;
@@ -103,8 +104,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
     module->addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
     for (const auto& f : input.functions) {
         auto* fn = functions.at(f.name);
-        auto path = std::filesystem::path(f.source.path);
-        auto* source_file = debug.createFile(path.filename().generic_string(), path.parent_path().generic_string());
+        auto path = vd::utf8_path(f.source.path);
+        auto* source_file = debug.createFile(vd::path_utf8(path.filename()), vd::path_utf8(path.parent_path()));
         std::vector<llvm::Metadata*> debug_types{debug_value_type(f.result)};
         for (auto t : f.parameters) debug_types.push_back(debug_value_type(t));
         auto* debug_type = debug.createSubroutineType(debug.getOrCreateTypeArray(debug_types));

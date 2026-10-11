@@ -621,3 +621,23 @@ Hosted Phase 9 verification remains pending. No LSP, watcher, worker, persistent
 cache, partial compiler, new language feature or automatic native reload is added.
 Next consider protocol position adaptation and a minimal tooling client/transport
 before partial compilation; retain the separate managed-runtime and package gates.
+
+
+## Phase 10 minimal language server
+
+The user reports Phase 9 commit `02a9aa7` passed hosted Actions run #12 on Linux,
+Windows and macOS. Phase 10 connects that immutable session foundation to real
+stdio LSP clients: full-document edits, current diagnostics, definition and
+references, using exact UTF-16 snapshot ranges. [LANGUAGE_SERVER.md](LANGUAGE_SERVER.md)
+documents its actual scope. Three portable position/process suites bring CTest
+to twenty-one without changing the eighteen existing suites or language semantics.
+See WORK_LOG.md for local Debug/Release/strict sanitizer evidence from both SDKs;
+a new user-triggered hosted run is still required.
+
+Next validate hosted integration, then consider a small editor client/extension
+and an explicit disk refresh/cancellation policy before asynchronous or partial
+analysis. Preserve exact compatibility and source ownership when designing workers;
+do not mistake dependency planning for an implemented incremental compiler.
+Completion/hover/rename, caches, watchers and automatic native reload remain
+deferred. Managed-runtime integration and package identity remain separate gates.
+The user retains control of all commits, branches, pushes and publication.

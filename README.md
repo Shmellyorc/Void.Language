@@ -14,11 +14,11 @@ See [source compiler scope and decisions](docs/SOURCE_COMPILER.md).
 ## Build on Linux
 
 Requires CMake 3.24+, a C++20 compiler, and the complete **LLVM 19.1.7** development
-SDK. The tests also require matching Clang 19.1.7 and `llvm-dwarfdump`.
+SDK. The tests also require Python 3.9+, matching Clang 19.1.7 and `llvm-dwarfdump`.
 On Debian-family distributions that provide these versions:
 
 ```sh
-sudo apt-get install build-essential cmake ninja-build llvm-19-dev clang-19 lld-19 libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libz3-dev
+sudo apt-get install build-essential cmake ninja-build python3 llvm-19-dev clang-19 lld-19 libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libz3-dev
 cmake -S . -B build/debug -G Ninja \
   -DLLVM_DIR=/usr/lib/llvm-19/lib/cmake/llvm \
   -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19 \
@@ -77,7 +77,7 @@ Try [loops](examples/loops.void) and [recursive functions](examples/functions.vo
 The older `--jit-proof` and `--emit-proof OBJECT` commands intentionally retain
 their hand-built IR architecture harness. Their AOT adapter derives its input
 from argument count; it is separate from the working source commands above.
-The twelve CTest suites preserve those native, GC and hot-reload proofs and add
+The CTest suites preserve those native, GC and hot-reload proofs and add
 frontend diagnostics and real source JIT/AOT integration tests.
 
 ## Numeric source compilation
@@ -176,10 +176,9 @@ Visual Studio DIA SDK (`VSINSTALLDIR`); an explicit real
 `-DVOID_DIA_GUIDS_LIBRARY=.../diaguids.lib` can also be supplied.
 
 All jobs build and execute the same Debug and Release tests; Linux also runs
-ASan/UBSan. The user confirmed the previous ten-suite module phase passed on all three
-platforms. The user reports Phase 4 value semantics also passed all platforms
-(commit `d78b6b8`, Actions run #6). Phase 5 diagnostic recovery requires another
-hosted run after the user commits and pushes.
+ASan/UBSan. The user reports Phase 9 passed all three platforms at commit `02a9aa7`,
+Actions run #12. Phase 10 requires another hosted run after the user commits
+and pushes.
 See [verified commands and results](docs/WORK_LOG.md).
 
 ## Continue development
@@ -191,8 +190,9 @@ Read [the Language Bible](docs/LANGUAGE_BIBLE.md),
 [module system](docs/MODULE_SYSTEM.md),
 [value semantics](docs/VALUE_SEMANTICS.md), and
 [known issues](docs/KNOWN_ISSUES.md).
-Structured diagnostics/recovery are now implemented. The next phase should refine source dependency
-compatibility, then introduce contextual literals/conversions after detailed policy approval.
+The minimal language server now connects immutable document sessions to real LSP
+clients. Next validate hosted integration, then consider editor packaging and
+explicit disk refresh/cancellation before partial compilation.
 Resolve runtime/root integration before introducing managed language types.
 
 ## Structured compiler diagnostics
@@ -207,8 +207,7 @@ build/debug/voidc run examples/diagnostics/corrected.void 10
 The same corrected source can be emitted and linked using the AOT instructions
 above; normal and O2 tests execute both native modes. Invalid source never executes
 or replaces an existing object. See [diagnostic codes, recovery and snapshots](docs/DIAGNOSTICS.md)
-and [verified commands/results](docs/WORK_LOG.md). The user reports Phase 4 passed
-all hosted platforms; Phase 5 requires another user-published Actions run.
+and [verified commands/results](docs/WORK_LOG.md). The user reports the Phase 9 baseline passed all hosted platforms.
 
 Validated project analysis and native reload APIs are documented in
 [ANALYSIS_COMPATIBILITY.md](docs/ANALYSIS_COMPATIBILITY.md). The real three-file
@@ -230,5 +229,28 @@ Run `build/ci-debug/void_sessions_example examples/analysis` for an in-process
 unsaved-edit, stale-query, failure/repair and compatibility demonstration using real
 compiler records. It never writes the example files or publishes native code.
 The original sixteen suites remain; sessions/sessions_demo bring the total to
-eighteen. This is complete reanalysis with revision tracking; editor protocol,
-file watching and partial compilation remain future work.
+eighteen. This is complete reanalysis with revision tracking; file watching and
+partial compilation remain future work.
+
+
+## Minimal language server
+
+Phase 10 adds `voidls`, a single-threaded stdio LSP 3.17 server with full-document
+synchronization, compiler diagnostics, go to definition and find references.
+
+```sh
+build/ci-debug/voidls --entry examples/analysis/main.void
+# Waits for framed JSON-RPC input from an LSP client.
+python3 tools/lsp_demo.py build/ci-debug/voidls
+ctest --test-dir build/ci-debug -R '^lsp_' --output-on-failure
+```
+
+The demonstration launches the actual executable, opens a two-file source project,
+navigates, edits an import without saving, observes an error and unavailable
+navigation, repairs it, and verifies cleared diagnostics/fresh navigation before
+shutdown. See [LANGUAGE_SERVER.md](docs/LANGUAGE_SERVER.md) for setup, UTF-16
+positions, signed document versions, protocol limits and disk-refresh limitations.
+All eighteen previous suites remain; lsp_positions/lsp_protocol/lsp_demo bring
+the total to twenty-one. The server performs complete compiler analysis and
+never executes source or publishes native replacements. Phase 10 is awaiting
+its own hosted Linux/Windows/macOS verification; see WORK_LOG.md for local results.

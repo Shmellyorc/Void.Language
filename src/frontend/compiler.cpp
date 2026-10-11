@@ -1,4 +1,5 @@
 #include "void/frontend.hpp"
+#include "void/path.hpp"
 #include "void/numeric.hpp"
 #include <algorithm>
 #include <charconv>
@@ -1036,8 +1037,8 @@ std::string normalize(const Unit& from, const Token& path) {
         error(from.source, path, Code::import_path, "Package imports are not implemented.", "Use /project/file.void, ./file.void or ../file.void; OS drive paths are not VFS paths.");
     std::vector<std::string> parts;
     if (!absolute) {
-        auto parent = std::filesystem::path(from.identity).parent_path();
-        for (const auto& component : parent.relative_path()) parts.push_back(component.generic_string());
+        auto parent = utf8_path(from.identity).parent_path();
+        for (const auto& component : parent.relative_path()) parts.push_back(path_utf8(component));
     }
     std::size_t begin = absolute ? 1 : 0;
     while (begin <= text.size()) {
@@ -1086,11 +1087,11 @@ public:
         auto physical = root;
         std::string prefix;
         std::error_code ec;
-        for (const auto& part : std::filesystem::path(id).relative_path()) {
-            auto spelling = part.generic_string();
+        for (const auto& part : utf8_path(id).relative_path()) {
+            auto spelling = path_utf8(part);
             std::set<std::string> matches;
             for (std::filesystem::directory_iterator it(physical, ec), end; !ec && it != end; it.increment(ec)) {
-                auto candidate = it->path().filename().generic_string();
+                auto candidate = path_utf8(it->path().filename());
                 if (folded(candidate) == folded(spelling)) matches.insert(candidate);
             }
             // Merge virtual children into the same exact-case namespace. Missing
@@ -1131,7 +1132,7 @@ public:
                 error(from.source, path, Code::import_path, "Module path names a non-file host object.");
             for (const auto& [other_id, other] : units) {
                 (void)other;
-                auto other_path = root / std::filesystem::path(other_id).relative_path();
+                auto other_path = root / utf8_path(other_id).relative_path();
                 if (std::filesystem::equivalent(physical, other_path, ec) && !ec)
                     error(from.source, path, Code::import_path, "Hard-link aliases have conflicting module identities: '" + id + "' and '" + other_id + "'.", "Use one VFS filename for this physical source.");
                 ec.clear();
@@ -1157,7 +1158,7 @@ public:
                 import.target = target.identity;
             } catch (const CompilationError& failure) {
                 diagnostics.add(failure); result->failed_import = true;
-                auto qualifier = import.explicit_alias ? import.alias.text : std::filesystem::path(import.path.text).stem().generic_string();
+                auto qualifier = import.explicit_alias ? import.alias.text : path_utf8(utf8_path(import.path.text).stem());
                 result->failed_qualifiers.insert(qualifier);
             }
         }
@@ -1214,7 +1215,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         for (const auto& import : unit->imports) {
             if (import.target.empty()) continue;
             if (units.at(import.target)->parse_failed) unit->failed_import = true;
-            auto alias = import.explicit_alias ? import.alias.text : std::filesystem::path(import.target).stem().generic_string();
+            auto alias = import.explicit_alias ? import.alias.text : path_utf8(utf8_path(import.target).stem());
             try {
             if (!import.explicit_alias && !identifier(alias)) continue;
             if ((import.explicit_alias && unit->declarations.contains(alias)) || unit->constant_names.contains(alias) || (root.constant_names.contains(alias) && !root.constant_names.at(alias)->file_private))
@@ -1227,7 +1228,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 std::vector<RelatedLocation> related;
                 for (const auto& previous : unit->imports) {
                     if (&previous == &import) break;
-                    auto previous_alias = previous.explicit_alias ? previous.alias.text : std::filesystem::path(previous.target).stem().generic_string();
+                    auto previous_alias = previous.explicit_alias ? previous.alias.text : path_utf8(utf8_path(previous.target).stem());
                     if (previous_alias == alias && !previous.target.empty()) { related.push_back({span(unit->source, previous.alias), "Previously imported"}); break; }
                 }
                 error(unit->source, import.alias, Code::alias_conflict, "Conflicting import alias '" + alias + "'.", "Give these modules different aliases using as.", std::move(related));
@@ -1373,10 +1374,10 @@ AnalysisResult analyze_project(const std::filesystem::path& entry) {
 }
 SourceFile read_source(const std::filesystem::path& path) {
     std::ifstream stream(path, std::ios::binary);
-    if (!stream) throw SourceReadError(path.generic_string(), "Cannot read source file.");
+    if (!stream) throw SourceReadError(path_utf8(path), "Cannot read source file.");
     std::string text{std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>()};
-    if (stream.bad()) throw SourceReadError(path.generic_string(), "Cannot finish reading source file.");
-    return {path.generic_string(), std::move(text)};
+    if (stream.bad()) throw SourceReadError(path_utf8(path), "Cannot finish reading source file.");
+    return {path_utf8(path), std::move(text)};
 }
 std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile& source) {
     std::map<std::string, std::unique_ptr<Unit>> units;
@@ -1397,15 +1398,15 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
     for (const auto& [id, source] : overrides) { (void)source; require_module_identity(id); }
     std::error_code ec;
     auto absolute = std::filesystem::absolute(entry, ec);
-    if (ec) error(SourceFile(entry.generic_string(), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the entry source path.");
+    if (ec) error(SourceFile(path_utf8(entry), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the entry source path.");
     auto root = std::filesystem::canonical(absolute.parent_path(), ec);
-    if (ec) error(SourceFile(entry.generic_string(), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the project root directory.", "Check that the entry's parent directory exists and is readable.");
+    if (ec) error(SourceFile(path_utf8(entry), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the project root directory.", "Check that the entry's parent directory exists and is readable.");
     // A diagnostic anchor is needed even before the entry file can be opened.
-    Unit anchor(SourceFile(absolute.generic_string(), ""), "/");
-    Diagnostics diagnostics; diagnostics.bind(anchor.source, "/" + absolute.filename().generic_string());
+    Unit anchor(SourceFile(path_utf8(absolute), ""), "/");
+    Diagnostics diagnostics; diagnostics.bind(anchor.source, "/" + path_utf8(absolute.filename()));
     SourceGraph graph(root, diagnostics, overrides);
     auto& first = [&]() -> Unit& {
-        try { return graph.load(anchor, {TokenKind::path, "/" + absolute.filename().generic_string(), 0}); }
+        try { return graph.load(anchor, {TokenKind::path, "/" + path_utf8(absolute.filename()), 0}); }
         catch (const CompilationError& failure) { diagnostics.add(failure); diagnostics.finish(); throw; }
     }();
     // A disk read is not an atomic filesystem transaction. Re-discover paths and

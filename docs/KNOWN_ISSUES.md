@@ -180,3 +180,29 @@ Hosted Phase 9 verification remains pending. No LSP, watcher, worker, persistent
 cache, partial compiler, new language feature or automatic native reload is added.
 Next consider protocol position adaptation and a minimal tooling client/transport
 before partial compilation; retain the separate managed-runtime and package gates.
+
+
+## Phase 10 language server boundaries
+
+The user reports Phase 9 commit `02a9aa7` passed hosted run #12 on all platforms.
+Phase 10 local evidence is in WORK_LOG.md; its own hosted Linux/Windows/macOS run
+is still required, especially Windows wide argv/drive paths and Unicode roots.
+
+[LANGUAGE_SERVER.md](LANGUAGE_SERVER.md) documents the implemented stdio protocol
+and limits. Analysis is synchronous/full graph; only entry-reachable modules are
+semantically validated. Open unreachable overlays receive empty diagnostics until
+imported. There is no watcher, save handler or refresh extension: restart or an
+accepted document transition is needed to observe independent disk edits. Reads
+retain inconsistency checks, but do not constitute an atomic filesystem image.
+
+UTF-16 only; local normalized file URIs only; output uses the canonical root URI.
+Unicode physical roots work locally; Unicode VFS module components remain outside
+the existing portable filename policy. UNC/network/multi-workspace roots are
+unsupported. Body/header/depth/open-document bounds do not impose a total project
+memory/time quota. Revision history grows with distinct document identities.
+Mutable locals/parameters and unsupported expression locations have no symbol data.
+
+Completion, hover, rename, formatting, tokens, actions, packages, watchers, workers,
+persistent caches, partial compilation and automatic native publication/restart
+remain deferred. LLVM Support/numeric support is still a frontend dependency.
+Existing RTTI and managed-runtime/package design gates remain unchanged.

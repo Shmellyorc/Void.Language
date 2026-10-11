@@ -431,3 +431,27 @@ Hosted Phase 9 verification remains pending. No LSP, watcher, worker, persistent
 cache, partial compiler, new language feature or automatic native reload is added.
 Next consider protocol position adaptation and a minimal tooling client/transport
 before partial compilation; retain the separate managed-runtime and package gates.
+
+
+## Phase 10 minimal language server
+
+The user reports Phase 9 commit `02a9aa7` passed hosted run #12 on all platforms.
+Implement `voidls` as a synchronous stdio adapter around the existing owning
+ToolingSession/ToolingIndex/frontend, with full-document synchronization only.
+Map signed LSP client versions separately onto increasing positive session
+revisions, including close/reopen. Analyze and accept selected snapshots before
+publishing; query only current valid analysis. Use compiler declaration/reference
+records, including declaration-name queries, rather than a separate symbol scanner.
+
+Compute UTF-16 positions from retained exact source bytes and existing line indexes.
+Share the existing UTF-8 scalar validator; never split a scalar/surrogate pair.
+Use explicit UTF-8 filesystem conversion for physical paths and Windows wide argv
+and binary streams. Keep portable VFS module-name restrictions unchanged. Use LLVM
+Support JSON, with bounded framing and nesting, rather than another parser/framework.
+The executable links frontend/numeric support, but no LLVM backend, ORC or runtime.
+
+[LANGUAGE_SERVER.md](LANGUAGE_SERVER.md) defines protocol, URI, freshness and
+resource contracts. Three new suites bring CTest to twenty-one, preserving all
+eighteen old suites/assertions. No language/ABI/reload semantics change. Full graph
+analysis and non-atomic disk reads remain; watchers and partial compilation are
+separate future decisions. Actual results and pending hosted checks are in WORK_LOG.md.
