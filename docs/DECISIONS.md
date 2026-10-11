@@ -201,3 +201,66 @@ C++ compiler/runtime and JIT host call boundary are instrumented.
 
 See SOURCE_COMPILER.md for the implemented subset, known design questions and
 next phase, and WORK_LOG.md for actual commands/results. All changes remain local.
+
+
+## Module system phase, 10 October 2026
+
+The user confirmed the original source compiler's eight suites passed on all
+three hosted platforms before this phase. Keep LLVM 19.1.7, all eight suites and
+the existing workflow; add module and module-native suites to the same test runner.
+Do not introduce a second parser, semantic model or LLVM lowering path.
+
+`compile_project(entry)` establishes the entry parent's VFS root, loads each
+reachable file once, builds imports, and registers every function signature before
+checking any body. Both the in-memory source API and filesystem project API call
+one graph/type/lowering implementation. Return the entry snapshot with IR so CLI
+diagnostics do not reread source after compilation. There is no automatic entry
+selection or root override in this phase.
+
+Canonical keys are normalized, exact-case VFS paths plus declared function names,
+scoped to the current project. Relative imports use the importing file's parent;
+leading / always means virtual root. Aliases, physical relocation, native addresses
+and JIT generations do not alter ownership. The IR carries module identity and
+friendly source name; its validator checks that the function key matches them.
+LLVM alone injectively encodes those keys into portable native symbols. Debug
+names remain source names. Keep the physical compilation-unit source path separate
+from its virtual identity, preventing /main.void from becoming a bogus debugger path. Root entry selection cannot select an imported entry.
+Future independent project/library composition needs persistent project identity;
+these keys are not globally unique project IDs.
+
+Function-only import cycles, self-imports and cross-file mutual recursion are safe
+because this subset has no top-level initialization. Register signatures across
+the full graph, then check bodies. This is not a decision about constant/global
+initialization cycles. Repeated normalized imports are idempotent, including
+multiple aliases; do not duplicate declaration owners or create false ambiguity.
+
+Unaliased direct imports expose accessible simple function names and a filename
+stem qualifier when valid. Own-file declarations take precedence. Explicit aliases
+provide qualified access only, keeping conflicting functions out of simple-name
+lookup. Identical filename stems need no aliases for unambiguous simple calls;
+ambiguous qualified calls require aliases. Explicit alias conflicts diagnose at
+use declarations. Imports do not transitively reexport names. These scope/order
+choices are provisional grammar detail, not a namespace hierarchy. Use declarations
+precede functions. No local variable/parameter may shadow visible functions or
+qualifiers. Qualified syntax currently applies to function calls only.
+
+Public is default; explicit public is accepted. Private functions are file-private,
+including in cycles and through qualified imports. Internal functions are usable
+through imports anywhere in this project, never folder-private. External library
+exports are not implemented and must later preserve that project/library boundary.
+
+Filesystem policy is deliberately conservative and portable: printable ASCII VFS
+components (internal spaces allowed), exact spelling on all hosts, no reserved
+Windows names/characters or trailing dots/spaces. Enumerate referenced directories
+to diagnose case mismatches/collisions, rather than inheriting host case sensitivity.
+Normalize dot/repeated separator paths before host lookup; reject root escapes.
+Canonicalize physical root ancestors once; reject symlinks/redirected components
+inside the graph and distinct hard-link aliases for one physical source. This is
+not a concurrent-filesystem security sandbox. Unicode filename normalization,
+installed packages and explicitly permitted external module identities are deferred.
+Do not follow OS absolute paths or silently fall back to package discovery.
+
+No Language Bible semantics were edited. MODULE_SYSTEM.md records the full working
+contract and remaining questions; WORK_LOG.md records actual verification. Automatic
+file watching/live source replacement remains outside this phase; one graph's ORC
+resource tracker and existing leases continue to retire native code safely.

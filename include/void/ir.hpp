@@ -29,11 +29,14 @@ struct Function {
     std::vector<Type> parameters = {Type::i32};
     Type result = Type::i32;
     std::vector<Type> locals = {};
+    std::string source_name = {}, module_identity = {}; // Empty for legacy hand-built proofs.
 };
 struct Module {
     std::string identity;
     std::vector<std::string> imports; // Trusted C functions with i32(i32) ABI.
     std::vector<Function> functions;
+    std::string entry_symbol = "entry";
+    std::string source_path = {}; // Physical debug source; not part of stable identity.
 };
 void validate(const Module& module);
 Module architecture_proof(std::int32_t answer = 42);

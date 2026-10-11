@@ -1,7 +1,7 @@
 # Void.Language
 
 VOID 2.0 is a new language, independent of the earlier C#-compatible VOIDC.
-This repository now compiles actual `.void` files through one frontend, typed
+This repository now compiles graphs of actual `.void` files through one frontend, typed
 semantic model, backend-independent IR, and shared LLVM 19.1.7 AOT/JIT lowering.
 The initial subset supports typed functions, i32/bool expressions, local variables,
 conditionals, `for` loops, and source diagnostics. Experimental GC, leased function
@@ -68,8 +68,37 @@ Try [loops](examples/loops.void) and [recursive functions](examples/functions.vo
 The older `--jit-proof` and `--emit-proof OBJECT` commands intentionally retain
 their hand-built IR architecture harness. Their AOT adapter derives its input
 from argument count; it is separate from the working source commands above.
-The eight CTest suites preserve those native, GC and hot-reload proofs and add
+The ten CTest suites preserve those native, GC and hot-reload proofs and add
 frontend diagnostics and real source JIT/AOT integration tests.
+
+## Multi-file programs
+
+```python
+use "/math/calculator.void" as calculator
+use "/helpers/numbers.void"
+
+func entry(value: i32) -> i32:
+    return calculator.double(value) + increment(value)
+```
+
+This complete project is in [examples/modules](examples/modules/main.void):
+
+```sh
+build/debug/voidc run examples/modules/main.void 10  # 31
+build/debug/voidc emit examples/modules/main.void -o build/debug/modules.o
+clang-19 build/debug/modules.o -o build/debug/modules
+build/debug/modules 10                           # 31
+```
+
+The entry file's directory is the virtual root: `/` in source means that root,
+and `./` or `../` resolves from the importing file. Imports use `/` on every OS
+and exact filename case. Repeated normalized imports compile once. Simple names
+work for unambiguous direct unaliased imports; explicit aliases provide qualified
+calls. Functions are public by default, `private func` is file-private, and
+`internal func` is available throughout this project through imports. Function-only
+cycles and cross-file recursion work. Package imports, external root escapes and
+imported symlinks are deferred with clear diagnostics. See
+[module rules and provisional filesystem policies](docs/MODULE_SYSTEM.md).
 
 ## Windows and macOS
 
@@ -91,9 +120,9 @@ Visual Studio DIA SDK (`VSINSTALLDIR`); an explicit real
 `-DVOID_DIA_GUIDS_LIBRARY=.../diaguids.lib` can also be supplied.
 
 All jobs build and execute the same Debug and Release tests; Linux also runs
-ASan/UBSan. The user confirmed the previous foundation passed on all three
-platforms. This source compiler phase has passed local Linux checks; the expanded
-eight-suite matrix still needs a hosted run after the user commits and pushes.
+ASan/UBSan. The user confirmed the first source compiler passed on all three
+platforms. This module phase has passed local Linux Debug/Release and sanitizer checks; the
+expanded ten-suite matrix still needs a hosted run after the user commits and pushes.
 See [verified commands and results](docs/WORK_LOG.md).
 
 ## Continue development
@@ -101,8 +130,9 @@ See [verified commands and results](docs/WORK_LOG.md).
 Read [the Language Bible](docs/LANGUAGE_BIBLE.md),
 [development strategy](docs/DEVELOPMENT_STRATEGY.md),
 [architectural decisions](docs/DECISIONS.md),
-[source compiler scope](docs/SOURCE_COMPILER.md), and
+[source compiler scope](docs/SOURCE_COMPILER.md),
+[module system](docs/MODULE_SYSTEM.md), and
 [known issues](docs/KNOWN_ISSUES.md).
-The next phase should establish module/import identity and a broader executable
-interface around this frontend, with deliberate numeric and grammar decisions.
+The next phase should establish const/project-root compile-time constants,
+precise numeric policy and source-first runtime errors on this module foundation.
 Resolve runtime/root integration before introducing managed language types.

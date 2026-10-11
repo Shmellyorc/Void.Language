@@ -1,4 +1,5 @@
 #include "void/frontend.hpp"
+#include <algorithm>
 #include <charconv>
 #include <fstream>
 #include <iterator>
@@ -11,7 +12,7 @@
 namespace vd {
 namespace {
 using Type = ir::Type;
-enum class TokenKind { name, number, symbol, newline, indent, dedent, end };
+enum class TokenKind { name, number, path, symbol, newline, indent, dedent, end };
 struct Token { TokenKind kind; std::string text; std::size_t offset; };
 [[noreturn]] void error(const SourceFile& source, const Token& token, const std::string& message,
                         const std::string& hint = {}) {
@@ -20,7 +21,7 @@ struct Token { TokenKind kind; std::string text; std::size_t offset; };
 bool letter(char c) { return (c >= 'a' && c <= 'z') || c == '_'; }
 bool digit(char c) { return c >= '0' && c <= '9'; }
 const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue",
-    "and", "or", "not", "true", "false", "while", "const", "use", "struct", "in", "reverse", "i32", "bool"};
+    "and", "or", "not", "true", "false", "while", "const", "use", "struct", "in", "reverse", "i32", "bool", "as", "private", "public", "internal"};
 std::vector<Token> lex(const SourceFile& source) {
     const auto& text = source.text();
     std::vector<Token> tokens;
@@ -54,6 +55,12 @@ std::vector<Token> lex(const SourceFile& source) {
             if (!tokens.empty() && tokens.back().kind != TokenKind::newline) emit(TokenKind::newline, "<newline>", start);
             beginning = true; continue;
         }
+        if (c == '"') {
+            ++p;
+            while (p < text.size() && text[p] != '"' && text[p] != '\r' && text[p] != '\n') ++p;
+            if (p == text.size() || text[p] != '"') error(source, {TokenKind::path, "", start}, "Unterminated import path.", "Close the path with a double quote on this line.");
+            emit(TokenKind::path, text.substr(start + 1, p - start - 1), start); ++p; continue;
+        }
         if (letter(c)) {
             while (p < text.size() && (letter(text[p]) || digit(text[p]))) ++p;
             emit(TokenKind::name, text.substr(start, p - start), start); continue;
@@ -69,7 +76,7 @@ std::vector<Token> lex(const SourceFile& source) {
             pair == "-=" || pair == "*=" || pair == "/=" || pair == "%=" || pair == "++" || pair == "--") {
             p += 2; emit(TokenKind::symbol, pair, start); continue;
         }
-        if (std::string("():,+-*/%=<>").find(c) != std::string::npos) { ++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
+        if (std::string("():,.+-*/%=<>").find(c) != std::string::npos) { ++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
         error(source, {TokenKind::symbol, "", p}, "Unexpected character in source.",
               c == '\t' ? "Use spaces instead of tabs." : "Use the supported i32/bool syntax and lowercase ASCII identifiers; Unicode identifiers and strings are not implemented yet.");
     }
@@ -81,7 +88,8 @@ std::vector<Token> lex(const SourceFile& source) {
 struct Expr {
     enum class Kind { literal, name, call, unary, binary } kind;
     Token token;
-    std::string op;
+    Token qualifier_token{TokenKind::name, "", 0};
+    std::string op, qualifier, target;
     std::int64_t value = 0;
     std::vector<std::unique_ptr<Expr>> parts;
     Type type = Type::none;
@@ -101,10 +109,27 @@ struct Statement {
 struct Parameter { Token token; Type type; unsigned slot = 0; };
 struct Function {
     Token token;
+    bool file_private = false;
+    std::string symbol;
     std::vector<Parameter> parameters;
     Type result = Type::none;
     std::vector<Statement> body;
     std::vector<Type> locals;
+};
+struct Import {
+    Token path, alias;
+    std::string target;
+    bool explicit_alias = false;
+};
+struct Unit {
+    SourceFile source;
+    std::string identity;
+    std::vector<Import> imports;
+    std::vector<Function> functions;
+    std::map<std::string, Function*> declarations;
+    std::map<std::string, std::vector<Unit*>> qualifiers;
+    std::set<std::string> explicit_qualifiers;
+    Unit(SourceFile s, std::string id) : source(std::move(s)), identity(std::move(id)) {}
 };
 class Parser {
     const SourceFile& source;
@@ -162,6 +187,12 @@ class Parser {
         if (token.text == "(" ) { auto e = expression(); need(")"); return e; }
         if (token.kind == TokenKind::name && !reserved.contains(token.text)) {
             auto e = std::make_unique<Expr>(Expr::Kind::name, token);
+            if (accept(".")) {
+                e->qualifier = token.text;
+                e->qualifier_token = token;
+                e->token = name();
+                if (!at("(")) error(source, e->token, "Only module-qualified function calls are supported.");
+            }
             if (accept("(")) {
                 e->kind = Expr::Kind::call;
                 if (!at(")")) do { e->parts.push_back(expression()); } while (accept(","));
@@ -239,16 +270,24 @@ class Parser {
     }
 public:
     explicit Parser(const SourceFile& s) : source(s), tokens(lex(s)) {}
-    std::vector<Function> parse() {
-        std::vector<Function> functions;
+    void parse(Unit& unit) {
         while (peek().kind != TokenKind::end) {
             if (accept("<newline>")) continue;
             if (at("while")) error(source, peek(), "VOID uses 'for' for all loops.", "Replace 'while condition:' with 'for condition:' inside a function.");
-            need("func"); Function f; f.token = name(); need("(");
+            if (accept("use")) {
+                if (!unit.functions.empty()) error(source, peek(), "Imports must precede function declarations.", "Move use declarations to the start of this file.");
+                if (peek().kind != TokenKind::path) error(source, peek(), "Expected a quoted import path.", "Use \"/folder/file.void\" or \"./file.void\".");
+                Import import; import.path = take(); import.alias = import.path;
+                if (accept("as")) { import.alias = name(); import.explicit_alias = true; }
+                newline(); unit.imports.push_back(std::move(import)); continue;
+            }
+            Function f;
+            if (accept("private")) f.file_private = true;
+            else if (!accept("public")) accept("internal"); // All graph files belong to this project.
+            need("func"); f.token = name(); need("(");
             if (!at(")")) do { auto token = name(); need(":"); f.parameters.push_back({token, type()}); } while (accept(","));
-            need(")"); if (accept("->")) f.result = type(); f.body = block(); functions.push_back(std::move(f));
+            need(")"); if (accept("->")) f.result = type(); f.body = block(); unit.functions.push_back(std::move(f));
         }
-        return functions;
     }
 };
 // Flow sets describe possible exits from a statement, independently of LLVM.
@@ -256,7 +295,9 @@ constexpr unsigned next_flow = 1, return_flow = 2, break_flow = 4, continue_flow
 bool always(const Expr* e) { return !e || (e->kind == Expr::Kind::literal && e->type == Type::boolean && e->value == 1); }
 class Semantics {
     const SourceFile& source;
-    std::map<std::string, Function*> functions;
+    Unit& unit;
+    const std::map<std::string, std::unique_ptr<Unit>>& units;
+    std::set<std::string> visible_names;
     struct Variable { Type type; unsigned slot; };
     std::vector<std::map<std::string, Variable>> scopes;
     Function* current = nullptr;
@@ -267,11 +308,43 @@ class Semantics {
         }
         return nullptr;
     }
+    const Function& resolve(const Expr& e) {
+        if (!e.qualifier.empty()) {
+            auto module = unit.qualifiers.find(e.qualifier);
+            if (module == unit.qualifiers.end()) error(source, e.qualifier_token, "Unknown import qualifier '" + e.qualifier + "'.", "Import the module with this alias before calling it.");
+            if (module->second.size() != 1) error(source, e.qualifier_token, "Ambiguous import qualifier '" + e.qualifier + "'.", "Assign distinct explicit aliases with as to modules sharing a filename stem.");
+            auto* target = module->second.front();
+            auto found = target->declarations.find(e.token.text);
+            if (found == target->declarations.end()) error(source, e.token, "Unknown imported function '" + e.qualifier + "." + e.token.text + "'.");
+            if (found->second->file_private && target != &unit)
+                error(source, e.token, "Function '" + e.token.text + "' is private to " + target->identity + ".", "Call a public function from that file instead.");
+            return *found->second;
+        }
+        auto own = unit.declarations.find(e.token.text);
+        if (own != unit.declarations.end()) return *own->second;
+        std::map<std::string, Function*> candidates;
+        bool hidden = false;
+        for (const auto& import : unit.imports) if (!import.explicit_alias) {
+            auto found = units.at(import.target)->declarations.find(e.token.text);
+            if (found != units.at(import.target)->declarations.end()) {
+                if (found->second->file_private) hidden = true;
+                else candidates.emplace(found->second->symbol, found->second);
+            }
+        }
+        if (candidates.size() > 1) {
+            std::string owners;
+            for (const auto& [id, f] : candidates) { (void)f; if (!owners.empty()) owners += ", "; owners += id.substr(0, id.rfind("::")); }
+            error(source, e.token, "Ambiguous imported function '" + e.token.text + "' from " + owners + ".", "Use a module qualifier or import as an explicit alias.");
+        }
+        if (!candidates.empty()) return *candidates.begin()->second;
+        if (hidden) error(source, e.token, "Function '" + e.token.text + "' is private to its declaring file.", "Call a public function instead.");
+        error(source, e.token, "Unknown function '" + e.token.text + "'.", "Declare it here or import its declaring file; imports are not transitive exports.");
+    }
     void expect(Type actual, Type expected, const Token& token) {
         if (actual != expected) error(source, token, "Type mismatch: expected " + std::string(ir::type_name(expected)) + ", received " + ir::type_name(actual) + ".");
     }
     unsigned declare(const Token& token, Type type) {
-        if (lookup(token.text) || functions.contains(token.text)) error(source, token, "Duplicate declaration or shadowing of '" + token.text + "'.", "Assign to the existing variable, or choose a distinct name.");
+        if (lookup(token.text) || visible_names.contains(token.text)) error(source, token, "Duplicate declaration or shadowing of '" + token.text + "'.", "Assign to the existing variable, or choose a distinct name.");
         auto slot = static_cast<unsigned>(current->locals.size()); current->locals.push_back(type);
         scopes.back().emplace(token.text, Variable{type, slot}); return slot;
     }
@@ -288,9 +361,8 @@ class Semantics {
             e.slot = v->slot; return e.type = v->type;
         }
         if (e.kind == K::call) {
-            auto found = functions.find(e.token.text);
-            if (found == functions.end()) error(source, e.token, "Unknown function '" + e.token.text + "'.");
-            const auto& target = *found->second;
+            const auto& target = resolve(e);
+            e.target = target.symbol;
             if (e.parts.size() != target.parameters.size()) error(source, e.token, "Incorrect argument count for '" + e.token.text + "': expected " + std::to_string(target.parameters.size()) + ", received " + std::to_string(e.parts.size()) + ".");
             for (std::size_t i = 0; i < e.parts.size(); ++i) expect(expression(*e.parts[i]), target.parameters[i].type, e.parts[i]->token);
             return e.type = target.result;
@@ -368,11 +440,16 @@ class Semantics {
         return s.flow = flow;
     }
 public:
-    explicit Semantics(const SourceFile& s) : source(s) {}
-    void analyze(std::vector<Function>& input) {
-        for (auto& f : input)
-            if (!functions.emplace(f.token.text, &f).second) error(source, f.token, "Duplicate function '" + f.token.text + "'.");
-        for (auto& f : input) {
+    Semantics(Unit& u, const std::map<std::string, std::unique_ptr<Unit>>& graph)
+        : source(u.source), unit(u), units(graph) {
+        for (const auto& [name, f] : unit.declarations) { (void)f; visible_names.insert(name); }
+        for (const auto& [name, target] : unit.qualifiers) { (void)target; visible_names.insert(name); }
+        for (const auto& import : unit.imports) if (!import.explicit_alias)
+            for (const auto& [name, f] : units.at(import.target)->declarations)
+                if (!f->file_private) visible_names.insert(name);
+    }
+    void analyze() {
+        for (auto& f : unit.functions) {
             current = &f; scopes = {{}};
             for (auto& p : f.parameters) p.slot = declare(p.token, p.type);
             auto flow = sequence(f.body, false);
@@ -417,7 +494,7 @@ class Lowering {
                 auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(arg->type);
                 auto value = expression(*arg); emit({ir::Op::store, slot, value}, arg->token); slots.push_back(slot);
             }
-            ir::Instruction i{ir::Op::call}; i.callee = e.token.text;
+            ir::Instruction i{ir::Op::call}; i.callee = e.target;
             for (auto slot : slots) i.arguments.push_back(emit({ir::Op::load, slot}, e.token));
             return emit(i, e.token);
         }
@@ -495,7 +572,7 @@ class Lowering {
 public:
     explicit Lowering(const SourceFile& s) : source(s) {}
     ir::Function lower(const Function& f) {
-        output = {}; output.name = f.token.text; output.source = source.location(f.token.offset);
+        output = {}; output.name = f.symbol; output.source_name = f.token.text; output.source = source.location(f.token.offset);
         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
         for (std::size_t n = 0; n < f.parameters.size(); ++n) {
             const auto& p = f.parameters[n]; output.parameters.push_back(p.type);
@@ -506,22 +583,178 @@ public:
         return std::move(output);
     }
 };
+// VFS paths are normalized before touching the host filesystem. Physical root
+// spelling never participates in language identity or native symbol identity.
+std::string folded(std::string text) {
+    for (auto& c : text) if (c >= 'A' && c <= 'Z') c += 'a' - 'A';
+    return text;
 }
-ir::Module compile_source(const SourceFile& source) {
-    auto functions = Parser(source).parse(); Semantics(source).analyze(functions);
-    ir::Module module; module.identity = source.path();
-    Lowering lowering(source); for (const auto& f : functions) module.functions.push_back(lowering.lower(f));
+bool identifier(const std::string& text) {
+    return !text.empty() && letter(text[0]) && !reserved.contains(text) &&
+        std::all_of(text.begin(), text.end(), [](char c) { return letter(c) || digit(c); });
+}
+void portable_component(const SourceFile& source, const Token& at, const std::string& component) {
+    bool invalid = component.empty() || component.back() == ' ' || component.back() == '.';
+    for (unsigned char c : component)
+        invalid |= c < 32 || c >= 127 || std::string("<>:\"|?*\\").find(static_cast<char>(c)) != std::string::npos;
+    auto base = folded(component.substr(0, component.find('.')));
+    invalid |= base == "con" || base == "prn" || base == "aux" || base == "nul" ||
+        (base.size() == 4 && (base.starts_with("com") || base.starts_with("lpt")) && base[3] >= '1' && base[3] <= '9');
+    if (invalid) error(source, at, "Non-portable module path component '" + component + "'.",
+        "Use printable ASCII filenames without Windows-reserved characters/names or trailing dots/spaces; Unicode module filenames are deferred.");
+}
+std::string normalize(const Unit& from, const Token& path) {
+    const auto& text = path.text;
+    if (text.empty() || text.find('\\') != std::string::npos)
+        error(from.source, path, "Invalid import path.", "Use a nonempty VFS path with / separators on every platform.");
+    bool absolute = text[0] == '/';
+    if (text.starts_with("//")) error(from.source, path, "Invalid root-relative import path.", "A single leading / denotes the virtual project root, not an OS or network path.");
+    if (!absolute && !text.starts_with("./") && !text.starts_with("../") && text.find(':') != std::string::npos)
+        error(from.source, path, "OS filesystem paths are not valid VOID imports.", "Use a project-root /path.void or importer-relative ./path.void instead of a drive path.");
+    if (!absolute && !text.starts_with("./") && !text.starts_with("../"))
+        error(from.source, path, "Package imports are not implemented.", "Use /project/file.void, ./file.void or ../file.void; OS drive paths are not VFS paths.");
+    std::vector<std::string> parts;
+    if (!absolute) {
+        auto parent = std::filesystem::path(from.identity).parent_path();
+        for (const auto& component : parent.relative_path()) parts.push_back(component.generic_string());
+    }
+    std::size_t begin = absolute ? 1 : 0;
+    while (begin <= text.size()) {
+        auto end = text.find('/', begin); if (end == std::string::npos) end = text.size();
+        auto component = text.substr(begin, end - begin);
+        if (component == "..") {
+            if (parts.empty()) error(from.source, path, "Import escapes the project root.", "External imports require an explicit permission/identity contract and are not enabled in this phase.");
+            parts.pop_back();
+        } else if (!component.empty() && component != ".") {
+            portable_component(from.source, path, component); parts.push_back(std::move(component));
+        }
+        if (end == text.size()) break;
+        begin = end + 1;
+    }
+    if (parts.empty() || text.back() == '/' || !parts.back().ends_with(".void"))
+        error(from.source, path, "Import must name a .void source file.", "Supply an exact-case filename, not a directory.");
+    std::string id;
+    for (const auto& component : parts) id += "/" + component;
+    return id;
+}
+class SourceReadError : public std::invalid_argument {
+public:
+    using std::invalid_argument::invalid_argument;
+};
+class SourceGraph {
+    std::filesystem::path root;
+public:
+    std::map<std::string, std::unique_ptr<Unit>> units;
+    explicit SourceGraph(std::filesystem::path project_root) : root(std::move(project_root)) {}
+    Unit& load(const Unit& from, const Token& path) {
+        auto id = normalize(from, path);
+        if (auto found = units.find(id); found != units.end()) return *found->second;
+        auto physical = root;
+        std::error_code ec;
+        for (const auto& part : std::filesystem::path(id).relative_path()) {
+            auto spelling = part.generic_string();
+            std::vector<std::string> matches;
+            for (std::filesystem::directory_iterator it(physical, ec), end; !ec && it != end; it.increment(ec)) {
+                auto candidate = it->path().filename().generic_string();
+                if (folded(candidate) == folded(spelling)) matches.push_back(candidate);
+            }
+            if (ec) error(from.source, path, "Cannot inspect import directory for '" + id + "'.", "Check that each parent exists, is a readable directory and uses the exact filename case.");
+            if (matches.size() > 1) error(from.source, path, "Filesystem case collision for '" + spelling + "'.", "Rename case-only siblings so this project has the same identity on every platform.");
+            if (matches.empty()) error(from.source, path, "Cannot find imported file '" + id + "'.", "Check this path relative to the importing file or virtual project root.");
+            if (matches.front() != spelling) error(from.source, path, "Import path case mismatch: requested '" + spelling + "', found '" + matches.front() + "'.", "Use the exact on-disk spelling on every platform.");
+            physical /= part;
+            auto status = std::filesystem::symlink_status(physical, ec);
+            if (ec) error(from.source, path, "Cannot inspect imported path '" + id + "'.");
+            if (std::filesystem::is_symlink(status)) error(from.source, path, "Symbolic links are not supported in module paths.", "Import a regular project file; symlink identity and external permissions are deferred.");
+        }
+        if (!std::filesystem::is_regular_file(physical, ec) || ec)
+            error(from.source, path, "Imported path is not a regular .void source file.");
+        auto resolved = std::filesystem::canonical(physical, ec);
+        if (ec || resolved != physical)
+            error(from.source, path, "Module path contains a symbolic link or filesystem alias.", "Use regular project paths; junctions and redirected module paths are not supported.");
+        for (const auto& [other_id, other] : units) {
+            if (std::filesystem::equivalent(physical, other->source.path(), ec) && !ec)
+                error(from.source, path, "Hard-link aliases have conflicting module identities: '" + id + "' and '" + other_id + "'.", "Use one VFS filename for this physical source.");
+            ec.clear();
+        }
+        // Publish before traversing imports: function-only declaration cycles are safe.
+        std::unique_ptr<Unit> unit;
+        try { unit = std::make_unique<Unit>(read_source(physical), id); }
+        catch (const SourceReadError&) { error(from.source, path, "Cannot read imported file '" + id + "'.", "Check source file permissions and storage availability."); }
+        auto* result = unit.get(); units.emplace(id, std::move(unit));
+        Parser(result->source).parse(*result);
+        for (auto& import : result->imports) import.target = load(*result, import.path).identity;
+        return *result;
+    }
+};
+ir::Module compile_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
+    // Discover every signature before checking any body, including cyclic imports.
+    for (auto& [id, unit] : units) for (auto& f : unit->functions) {
+        f.symbol = id + "::" + f.token.text;
+        if (!unit->declarations.emplace(f.token.text, &f).second)
+            error(unit->source, f.token, "Duplicate function '" + f.token.text + "'.");
+    }
+    for (auto& [id, unit] : units) {
+        (void)id;
+        for (const auto& import : unit->imports) {
+            auto alias = import.explicit_alias ? import.alias.text : std::filesystem::path(import.target).stem().generic_string();
+            if (!import.explicit_alias && !identifier(alias)) continue;
+            if (import.explicit_alias && unit->declarations.contains(alias))
+                error(unit->source, import.alias, "Import alias '" + alias + "' conflicts with a function declaration.", "Choose a distinct explicit alias with as.");
+            auto* target = units.at(import.target).get();
+            auto& targets = unit->qualifiers[alias];
+            bool repeated = std::find(targets.begin(), targets.end(), target) != targets.end();
+            bool different = std::any_of(targets.begin(), targets.end(), [&](Unit* previous) { return previous != target; });
+            if (different && (import.explicit_alias || unit->explicit_qualifiers.contains(alias)))
+                error(unit->source, import.alias, "Conflicting import alias '" + alias + "'.", "Give these modules different aliases using as.");
+            if (import.explicit_alias) unit->explicit_qualifiers.insert(alias);
+            if (!repeated) targets.push_back(target);
+        }
+    }
+    ir::Module module; module.identity = entry; module.entry_symbol = entry + "::entry";
+    module.source_path = units.at(entry)->source.path();
+    for (auto& [id, unit] : units) {
+        Semantics(*unit, units).analyze();
+        Lowering lowering(unit->source);
+        for (const auto& f : unit->functions) {
+            auto lowered = lowering.lower(f); lowered.module_identity = id;
+            module.functions.push_back(std::move(lowered));
+        }
+    }
     ir::validate(module); return module;
+}
+
 }
 SourceFile read_source(const std::filesystem::path& path) {
     std::ifstream stream(path, std::ios::binary);
-    if (!stream) throw std::invalid_argument(path.generic_string() + ": error: Cannot read source file.\n");
+    if (!stream) throw SourceReadError(path.generic_string() + ": error: Cannot read source file.\n");
     std::string text{std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>()};
-    if (stream.bad()) throw std::invalid_argument(path.generic_string() + ": error: Cannot finish reading source file.\n");
+    if (stream.bad()) throw SourceReadError(path.generic_string() + ": error: Cannot finish reading source file.\n");
     return {path.generic_string(), std::move(text)};
 }
+ir::Module compile_source(const SourceFile& source) {
+    std::map<std::string, std::unique_ptr<Unit>> units;
+    auto unit = std::make_unique<Unit>(source, source.path());
+    Parser(source).parse(*unit);
+    if (!unit->imports.empty()) error(source, unit->imports.front().path, "Imports need a filesystem project context.", "Use compile_project or the check/run/emit CLI with a source filename.");
+    units.emplace(source.path(), std::move(unit));
+    return compile_graph(units, source.path());
+}
+SourceProgram compile_project(const std::filesystem::path& entry) {
+    std::error_code ec;
+    auto absolute = std::filesystem::absolute(entry, ec);
+    if (ec) throw std::invalid_argument("Cannot resolve the entry source path.");
+    auto root = std::filesystem::canonical(absolute.parent_path(), ec);
+    if (ec) throw std::invalid_argument(entry.generic_string() + ": error: Cannot resolve the project root directory.\n");
+    // A diagnostic anchor is needed even before the entry file can be opened.
+    Unit anchor(SourceFile(absolute.generic_string(), ""), "/");
+    SourceGraph graph(root);
+    auto& first = graph.load(anchor, {TokenKind::path, "/" + absolute.filename().generic_string(), 0});
+    auto module = compile_graph(graph.units, first.identity);
+    return {first.source, std::move(module)};
+}
 void require_source_entry(const SourceFile& source, const ir::Module& module) {
-    for (const auto& f : module.functions) if (f.name == "entry") {
+    for (const auto& f : module.functions) if (f.name == module.entry_symbol) {
         if (f.parameters == std::vector<Type>{Type::i32} && f.result == Type::i32) return;
         std::size_t offset = 0;
         while (offset < source.text().size() && source.location(offset).line < f.source.line) ++offset;

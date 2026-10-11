@@ -504,3 +504,164 @@ Next, after that hosted gate: module/import resolution with stable identity and
 multi-file diagnostics, deliberate numeric and executable/export conventions,
 and diagnostic/runtime error improvements. Managed-language types must wait for
 root/thread integration; structs, generics, collections and async remain deferred.
+
+
+## Module system and multi-file compilation — 10 October 2026
+
+### Starting point and delivered architecture
+
+The user confirmed the first real source compiler passed Linux/Windows/macOS
+Actions Debug/Release and Linux sanitizers. Started from the clean existing local
+project, read the Bible/strategy/source/compiler decision and issue records, and
+kept LLVM 19.1.7 and the original eight suites. No Language Bible edits, commits,
+pushes, hosted reruns or other remote mutations were made.
+
+The CLI now calls compile_project for check/run/emit. A source graph establishes
+its root at the entry file's parent, normalizes VFS imports, retains one source
+snapshot per canonical module, parses the reachable graph and registers every
+function signature before checking bodies. The in-memory source API shares the
+same graph/type/lowering implementation, with an explicit diagnostic for imports
+without a filesystem project context. One validated IR compilation unit feeds the
+existing shared LLVM JIT/AOT implementation.
+
+Implemented root-relative, importer-relative and aliased use declarations;
+canonical deduplication; deterministic simple/qualified call resolution; default
+public, explicit public/internal and file-private functions; function-only cycles
+and cross-file recursion. Source function ownership carries the VFS module key
+and source name into IR; native symbols encode those keys injectively. LLVM debug
+names remain friendly, with imported source filenames/locations retained. The
+entry adapter selects only the entry file's own function, never an imported entry.
+Final review separated the physical compilation-unit debug path from virtual
+module identity; the native suite reads DW_AT_comp_dir and verifies the actual
+source directory rather than merely matching a filename in line tables.
+
+Documented deliberate initial policies in MODULE_SYSTEM.md and DECISIONS.md:
+exact-case portable filenames, space-containing paths, dot/separator normalization,
+no root escapes/packages, and rejection of imported symlinks/redirects or hard-link
+aliases. Project-scoped identities survive physical relocation and alias changes;
+persistent identities for independent projects/external libraries remain deferred.
+Explicit aliases expose qualified functions only; direct unaliased imports expose
+simple names and optional filename-stem qualification. Ambiguous simple calls
+require qualification/aliasing, and implicit qualifier ambiguity is diagnosed only
+when used. Repeated identical imports are idempotent, not duplicate declarations.
+
+No namespace hierarchy, folder-based visibility, global initialization or second
+compiler/backend path was introduced. Existing arithmetic, Boolean short circuit,
+control-flow/for rules and architectural GC/native/reload proofs remain intact.
+
+### Actual multi-file source acceptance
+
+Created the requested real source files:
+
+```text
+examples/modules/main.void
+examples/modules/math/calculator.void
+examples/modules/helpers/numbers.void
+```
+
+The unchanged acceptance program calls calculator.double(value) and
+increment(value) from their declaring files. Normal and O2 source JIT/native AOT
+results matched:
+
+| Input | Multi-file ORC JIT | Linked native AOT |
+| --- | --- | --- |
+| 0 | 1 | 1 |
+| 1 | 4 | 4 |
+| 10 | 31 | 31 |
+| -1 | -2 | -2 |
+
+The module native integration suite copies that actual project into paths with
+spaces, checks/emits/links/verifies DWARF, and executes it from an unrelated cwd.
+It verifies line tables for main.void, calculator.void and numbers.void. Independent
+nested and cyclic projects run through the same normal/O2 JIT/AOT sequence.
+Changing only calculator.void from multiplication by 2 to multiplication by 3
+changes results to 1, 5, 41 and -3 for the same inputs in both engines. This is
+actual imported-source compilation, not reconstructed IR or a resolver-only proof.
+The four graph variants provide 64 native result comparisons, plus relative-entry
+cwd and imported-error diagnostic checks.
+
+### New tests and preserved regressions
+
+`modules` and `modules_cli` bring CTest to ten suites; the original eight names,
+assertions and architectural behaviors remain. Both suites are part of every
+existing workflow configuration; no workflow or LLVM dependency was weakened.
+
+The module runner executes twelve positive graph scenarios with normal/O2 ORC:
+nested/relative/normalized/repeated imports, multiple aliases to one owner,
+identical stems with distinct simple functions, same-name functions in different
+files, private helpers, public/internal visibility across folders, mutual recursion,
+self-imports, local declaration precedence, for mutation, space-containing paths,
+multiple typed arguments/short-circuiting and imported entry isolation. Additional
+relocation/replacement checks preserve the compatibility key and old native leases.
+
+More than forty negative graph cases check missing files, invalid paths/root
+escapes, packages/OS drives, aliases/ambiguity, private access, counts/types,
+non-transitive exports, duplicate declarations, imported semantic/syntax/UTF-8
+errors, directories, exact filename case, case collisions, symlinks and hard-link
+aliases. Diagnostics assert the actual originating filename, line, column and
+source caret, without LLVM/internal symbol noise. This Linux filesystem supported
+real distinct case-only files, symlinks and hard links, so those negative fixtures
+executed. On hosts unable to create those filesystem objects, the runner reports
+the capability explicitly; normal source graph and exact-case tests still execute.
+
+### Commands and local results
+
+Retained build caches use Clang/LLD/LLVM 19.1.7. Installed SDK:
+`/usr/lib/llvm-19/lib/cmake/llvm`. Fresh configuration commands and Linux development
+packages remain in README and the previous phase's reproduction section.
+Actual rebuild/test commands for this phase:
+
+```sh
+cmake --build build/ci-debug -j3
+ctest --test-dir build/ci-debug --output-on-failure
+cmake --build build/ci-release -j3
+ctest --test-dir build/ci-release --output-on-failure
+cmake --build build/ci-sanitizers -j3
+ctest --test-dir build/ci-sanitizers --output-on-failure
+ctest --test-dir build/ci-sanitizers --output-on-failure \
+  -R '^(modules|modules_cli|reload|gc|native)$' --repeat until-fail:5
+# Repeat module suites after the final debug-source-path correction.
+ctest --test-dir build/ci-sanitizers --output-on-failure \
+  -R '^(modules|modules_cli)$' --repeat until-fail:5
+cmake --build build/ci-official-debug -j3
+ctest --test-dir build/ci-official-debug --output-on-failure
+```
+
+Debug: 10/10 passed (3.79 s). Release: 10/10 passed (9.19 s, concurrent SDK builds).
+An initial sanitizer run passed 10/10 (17.72 s); modules/module-native/reload/GC/
+native then passed five consecutive runs each (25 suite executions, 66.93 s).
+After the final debug-source-path correction, ASan/UBSan passed 10/10 (7.16 s);
+both module suites passed five consecutive runs each (10 suite executions, 15.97 s).
+The final complete official LLVM SDK Debug build passed 10/10 (2.80 s), including
+the physical compilation-unit directory check, native graph execution and all
+architectural regressions. Whitespace and documentation-link checks passed.
+Sanitizer CTest runs outside this desktop's tracing sandbox so LeakSanitizer can
+inspect processes. ASan, UBSan function checks and leak detection stay enabled.
+The complete official CI SDK build uses its own Clang/LLD 19.1.7 and bitcode
+libraries, preserving its RTTI ABI and the executable ORC configuration probe.
+
+For a standalone native demonstration using the built compiler:
+
+```sh
+build/ci-debug/voidc run examples/modules/main.void 10
+# 31
+build/ci-debug/voidc emit examples/modules/main.void -o build/ci-debug/modules-demo.o
+clang-19 -fuse-ld=/usr/lib/llvm-19/bin/ld.lld \
+  build/ci-debug/modules-demo.o -o build/ci-debug/modules-demo
+build/ci-debug/modules-demo 10
+# 31
+```
+
+### Remaining hosted verification and next phase
+
+Windows/macOS Debug/Release and hosted Linux ASan/UBSan execution of the ten-suite
+matrix remain unverified until the user commits/pushes and runs Actions. The prior
+eight-suite hosted success does not establish these new changes. Check actual
+Windows SDK linking, cross-platform owned native symbols, exact-case handling,
+filesystem capability reporting and multi-file DWARF on those runners.
+
+Next, after that gate: const/project-root compile-time constants, precise numeric
+policy/conversions and source-first runtime diagnostics, with deliberate constant
+dependency/initialization semantics. Project/export configuration and diagnostic
+recovery can build on these identities. Packages and external imports need explicit
+identity/permission contracts; managed types still require the GC root/thread gate.

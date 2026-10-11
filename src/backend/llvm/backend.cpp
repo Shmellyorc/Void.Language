@@ -52,6 +52,15 @@ void finish(llvm::Module& module, bool optimize) {
         if (llvm::verifyModule(module, &stream)) throw std::runtime_error("invalid optimized LLVM IR: " + message);
     }
 }
+std::string native_symbol(const ir::Function& function, const std::string& suffix) {
+    if (function.module_identity.empty()) return function.name + suffix;
+    // Injective ASCII encoding, independent of host paths, aliases and addresses.
+    // Keep arbitrary VFS punctuation out of platform assembler/linker grammars.
+    const char* hex = "0123456789abcdef";
+    std::string symbol = "__vd_";
+    for (unsigned char c : function.name) { symbol += hex[c >> 4]; symbol += hex[c & 15]; }
+    return symbol + suffix;
+}
 std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& context,
                                   const std::string& suffix) {
     ir::validate(input);
@@ -70,10 +79,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         std::vector<llvm::Type*> parameters;
         for (auto t : f.parameters) parameters.push_back(type(t));
         auto* function_type = llvm::FunctionType::get(type(f.result), parameters, false);
-        functions[f.name] = llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, f.name + suffix, *module);
+        functions[f.name] = llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, native_symbol(f, suffix), *module);
     }
     llvm::DIBuilder debug(*module);
-    auto module_path = std::filesystem::path(input.identity);
+    auto module_path = std::filesystem::path(input.source_path.empty() ? input.identity : input.source_path);
     auto* file = debug.createFile(module_path.filename().generic_string(), module_path.parent_path().generic_string());
     debug.createCompileUnit(llvm::dwarf::DW_LANG_C, file, "VOID source compiler", false, "", 0);
     auto* int_type = debug.createBasicType("i32", 32, llvm::dwarf::DW_ATE_signed);
@@ -90,7 +99,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         std::vector<llvm::Metadata*> debug_types{debug_value_type(f.result)};
         for (auto t : f.parameters) debug_types.push_back(debug_value_type(t));
         auto* debug_type = debug.createSubroutineType(debug.getOrCreateTypeArray(debug_types));
-        auto* subprogram = debug.createFunction(source_file, f.name, fn->getName(), source_file,
+        auto* subprogram = debug.createFunction(source_file, f.source_name.empty() ? f.name : f.source_name, fn->getName(), source_file,
             f.source.line, debug_type, f.source.line, llvm::DINode::FlagPrototyped, llvm::DISubprogram::SPFlagDefinition);
         fn->setSubprogram(subprogram);
         std::vector<llvm::BasicBlock*> blocks;
@@ -213,14 +222,16 @@ void Jit::bind_address(std::string name, std::uintptr_t entry) {
 std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const std::string& entry,
                                               bool optimize, Compatibility contract) {
     ir::validate(input);
-    bool found = false;
-    for (const auto& f : input.functions) if (f.name == entry) {
-        if (f.parameters != std::vector<ir::Type>{ir::Type::i32} || f.result != ir::Type::i32)
-            throw std::invalid_argument("host invocation requires i32(i32), not the selected function signature");
-        found = true;
-    }
-    if (!found) throw std::invalid_argument("entry function does not exist");
-    auto expected_id = input.identity + "::" + entry;
+    const ir::Function* selected = nullptr;
+    for (const auto& f : input.functions) if (f.name == entry) selected = &f;
+    // Retain the source API's convenient entry-file lookup, never searching
+    // imported functions by simple name. Proof IR continues to use exact names.
+    if (!selected) for (const auto& f : input.functions)
+        if (f.name == input.identity + "::" + entry && !f.module_identity.empty()) selected = &f;
+    if (!selected) throw std::invalid_argument("entry function does not exist");
+    if (selected->parameters != std::vector<ir::Type>{ir::Type::i32} || selected->result != ir::Type::i32)
+        throw std::invalid_argument("host invocation requires i32(i32), not the selected function signature");
+    auto expected_id = selected->module_identity.empty() ? input.identity + "::" + entry : selected->name;
     if (contract.function_id.empty()) contract.function_id = expected_id;
     if (contract.function_id != expected_id || contract.signature != "c:i32(i32)")
         throw std::invalid_argument("code identity or signature does not match IR");
@@ -230,7 +241,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     module->setDataLayout(impl_->jit->getDataLayout());
     module->setTargetTriple(impl_->jit->getTargetTriple().str());
     finish(*module, optimize);
-    return impl_->load(std::move(module), std::move(context), entry + suffix, std::move(contract), impl_);
+    return impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_);
 }
 std::size_t Jit::live_generations() const { return impl_->live.load(); }
 std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
@@ -277,7 +288,7 @@ void emit_object(const ir::Module& input, const std::filesystem::path& output, b
     initialize();
     llvm::LLVMContext context;
     bool entry_valid = false;
-    for (const auto& f : input.functions) if (f.name == "entry")
+    for (const auto& f : input.functions) if (f.name == input.entry_symbol)
         entry_valid = f.parameters == std::vector<ir::Type>{ir::Type::i32} && f.result == ir::Type::i32;
     if (!entry_valid) throw std::invalid_argument("AOT CLI adapter requires entry: i32(i32)");
     auto module = lower(input, context, source_program ? "__void" : "");
@@ -290,7 +301,9 @@ void emit_object(const ir::Module& input, const std::filesystem::path& output, b
     if (!machine) throw std::runtime_error("cannot create native target machine");
     module->setTargetTriple(triple);
     module->setDataLayout(machine->createDataLayout());
-    auto* entry = module->getFunction(source_program ? "entry__void" : "entry");
+    const ir::Function* entry_function = nullptr;
+    for (const auto& f : input.functions) if (f.name == input.entry_symbol) entry_function = &f;
+    auto* entry = module->getFunction(native_symbol(*entry_function, source_program ? "__void" : ""));
     if (!entry || module->getFunction("main")) throw std::invalid_argument("AOT proof requires entry and no main");
     llvm::IRBuilder<> b(context);
     auto* main = llvm::Function::Create(llvm::FunctionType::get(b.getInt32Ty(), {b.getInt32Ty(), b.getPtrTy()}, false),

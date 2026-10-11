@@ -32,12 +32,13 @@ int main(int argc, char** argv) {
             bool run = command == "run" && (argc == 3 || argc == 4);
             bool emit = command == "emit" && argc == 5 && std::string(argv[3]) == "-o";
             if (check || run || emit) {
-                auto source = vd::read_source(argv[2]); auto module = vd::compile_source(source);
+                auto program = vd::compile_project(argv[2]);
+                const auto& source = program.entry; const auto& module = program.module;
                 if (check) { std::cout << "Source checked successfully\n"; return 0; }
                 vd::require_source_entry(source, module);
                 if (run) {
                     auto value = argc == 4 ? input(argv[3]) : 0;
-                    vd::Jit jit; auto code = jit.compile(module, "entry", optimize);
+                    vd::Jit jit; auto code = jit.compile(module, module.entry_symbol, optimize);
                     std::cout << code->invoke(value) << '\n';
                 } else {
                     vd::emit_object(module, argv[4], optimize, true);

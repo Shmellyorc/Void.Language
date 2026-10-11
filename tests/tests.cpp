@@ -11,6 +11,7 @@
 #include <thread>
 #include <vector>
 void frontend_tests(const std::filesystem::path& root);
+void module_tests(const std::filesystem::path& output);
 namespace {
 void require(bool condition, const char* message) {
     if (!condition) throw std::runtime_error(message);
@@ -263,6 +264,7 @@ int main(int argc, char** argv) {
         if (argc < 2) throw std::runtime_error("test suite required");
         std::string suite = argv[1];
         if (suite == "frontend" && argc == 3) frontend_tests(argv[2]);
+        else if (suite == "modules" && argc == 3) module_tests(argv[2]);
         else if (argc != 2) throw std::runtime_error("unexpected suite arguments");
         else if (suite == "core") core(); else if (suite == "jit") jit();
         else if (suite == "reload") reload(); else if (suite == "gc") gc();

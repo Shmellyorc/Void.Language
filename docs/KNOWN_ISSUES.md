@@ -1,15 +1,16 @@
 # Known issues and deferred work
 
-Updated 10 October 2026, first real source compiler phase.
+Updated 10 October 2026, module system phase.
 
 ## Platform verification
 
-- The user confirmed the foundation now passes all three hosted platforms.
-  Earlier failed-run descriptions in WORK_LOG.md are historical evidence.
-- This frontend phase is locally verified on Linux with exact LLVM 19.1.7,
-  including the complete official Linux archive. Windows/macOS execution of the
-  expanded eight-suite Debug/Release matrix still requires a hosted run after
-  the user commits and pushes. Linux hosted ASan/UBSan also needs that run.
+- The user confirmed the first source compiler passed all three hosted platforms,
+  including Debug/Release and Linux sanitizers. Earlier failed-run descriptions
+  in WORK_LOG.md are historical evidence.
+- This module phase has local Linux verification with exact LLVM 19.1.7.
+  Windows/macOS execution of the expanded ten-suite Debug/Release matrix still
+  requires a hosted run after the user commits and pushes. Linux hosted
+  ASan/UBSan also needs that run. See WORK_LOG.md for final local evidence.
 - CI retains complete official LLVM 19.1.7 archives, Linux LLD and required
   development dependencies, Windows SDK/DIA discovery and native printf support,
   and the portable thread implementation. All new suites run automatically in
@@ -19,10 +20,27 @@ Updated 10 October 2026, first real source compiler phase.
 
 ## Compiler scope
 
-- Actual single-file `.void` compilation now works. See SOURCE_COMPILER.md for
-  supported grammar and deliberately provisional choices. There is no module
-  resolver, import discovery, VFS/canonical module identity, LSP, package manager,
-  source watcher or incremental compilation yet.
+- Actual single- and multi-file `.void` compilation now works. SOURCE_COMPILER.md
+  and MODULE_SYSTEM.md describe the implemented grammar, resolver and provisional
+  choices. There is no LSP, package manager, source watcher or incremental compiler.
+- Canonical VFS/function identities are project-scoped. Persistent identity across
+  independent projects/libraries, external-import permissions and installed package
+  resolution are deferred. No root override or automatic entry discovery exists;
+  the selected entry file's parent is the root.
+- Module filenames currently use a portable printable-ASCII subset with exact-case
+  checking, excluding Windows-reserved names and trailing dots/spaces. Unicode
+  filename/case normalization remains open. Entry/imported symlinks and redirected
+  VFS components are rejected. Distinct hard-link filenames to one source in the
+  graph are rejected. This resolver is not a sandbox for concurrent filesystem
+  mutation. Physical-root aliases are canonicalized before selecting VFS identities.
+- Repeated identical imports are idempotent. Explicit aliases expose qualified
+  calls only; direct unaliased imports expose simple names. Implicit filename
+  qualifiers can be ambiguous, and imports do not transitively reexport names.
+  These scope choices are documented rather than implying a complete export model.
+- Function-only cycles work through signature-first analysis. Globals, project-wide
+  constants and runtime initialization are absent; their cycles need separate
+  semantics. Internal visibility currently operates inside one compiled project;
+  external library export/visibility boundaries remain deferred.
 - Supported value types are i32/bool. Strings, floats, const declarations,
   collections/ranges, structs, generics, closures, async, named/default arguments,
   multiple return values and full managed types are not implemented. Unsupported
@@ -38,13 +56,13 @@ Updated 10 October 2026, first real source compiler phase.
 - Numeric overflow policy is provisional: current i32 operations wrap, signed
   division truncates toward zero, and dynamic zero divisors trap. There are no
   structured runtime arithmetic errors or resource limits for recursive source
-  programs/parser nesting. Broader checked arithmetic decisions remain open.
+  programs/parser nesting or import graph depth. Broader checked arithmetic decisions remain open.
 - Diagnostics report the first error with source location/line/caret. Recovery,
   stable error codes, ranges, variable debug information, optimized source stack
   traces and translation of internal/backend failures remain future work.
 - AOT emits a host-native object with a simple i32 entry adapter; JIT uses the
   same host ABI. General executable/project compilation, arbitrary entry ABIs,
-  cross-compilation, export/mangling policy, linker orchestration, deployment and
+  cross-compilation, public library/export ABI, linker orchestration, deployment and
   source-level native bindings remain deferred.
 
 ## Managed memory
@@ -98,9 +116,9 @@ Updated 10 October 2026, first real source compiler phase.
 
 ## Current phase and subsequent work
 
-Run the expanded hosted matrix after the user publishes these local changes.
-Then build module/import identity and multi-file source diagnostics around this
-frontend; resolve numeric and executable/export conventions deliberately.
-Preserve one semantic model and shared IR/LLVM lowering. Resolve managed root
-lowering/thread coordination before adding managed language types. Keep the
-original VOIDC backup untouched.
+Run the expanded ten-suite hosted matrix after the user publishes these local
+changes. Next build const/project-root compile-time constants, precise numeric
+policy/conversions and source-first runtime errors; specify constant dependency
+cycles before runtime initialization. Preserve the shared semantic model and
+IR/LLVM implementation. Resolve managed root lowering/thread coordination before
+managed types. Keep the original VOIDC backup untouched.

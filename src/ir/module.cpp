@@ -15,6 +15,8 @@ void validate(const Module& m) {
         if (name.empty() || !names.emplace(name, Signature{{Type::i32}, Type::i32}).second) fail("duplicate or empty import");
     for (const auto& f : m.functions) {
         if (f.name.empty() || !names.emplace(f.name, Signature{f.parameters, f.result}).second) fail("duplicate or empty function");
+        if (!f.module_identity.empty() && (f.source_name.empty() || f.name != f.module_identity + "::" + f.source_name))
+            fail("inconsistent function ownership");
         type_name(f.result);
         for (auto t : f.parameters) if (t == Type::none) fail("no-result parameter"); else type_name(t);
         for (auto t : f.locals) if (t == Type::none) fail("no-result slot"); else type_name(t);

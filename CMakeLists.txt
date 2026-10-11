@@ -120,7 +120,7 @@ if(BUILD_TESTING)
   add_library(native_fixture STATIC tests/integration/native_fixture.c)
   target_include_directories(native_fixture PUBLIC tests/integration)
   target_link_libraries(native_fixture PRIVATE void_options)
-  add_executable(void_tests tests/tests.cpp tests/frontend/tests.cpp examples/proof.cpp)
+  add_executable(void_tests tests/tests.cpp tests/frontend/tests.cpp tests/modules/tests.cpp examples/proof.cpp)
   target_link_libraries(void_tests PRIVATE void_llvm void_runtime native_fixture)
   foreach(suite core jit reload gc native)
     add_test(NAME ${suite} COMMAND void_tests ${suite})
@@ -128,6 +128,8 @@ if(BUILD_TESTING)
   endforeach()
   add_test(NAME frontend COMMAND void_tests frontend "${PROJECT_SOURCE_DIR}")
   set_tests_properties(frontend PROPERTIES TIMEOUT 90)
+  add_test(NAME modules COMMAND void_tests modules "${CMAKE_CURRENT_BINARY_DIR}/module fixtures with spaces")
+  set_tests_properties(modules PROPERTIES TIMEOUT 90)
   find_program(VOID_CLANG NAMES clang-19 clang HINTS "${LLVM_TOOLS_BINARY_DIR}" REQUIRED)
   find_program(VOID_DWARFDUMP NAMES llvm-dwarfdump-19 llvm-dwarfdump HINTS "${LLVM_TOOLS_BINARY_DIR}" REQUIRED)
   execute_process(COMMAND "${VOID_CLANG}" --version OUTPUT_VARIABLE VOID_CLANG_VERSION RESULT_VARIABLE VOID_CLANG_STATUS)
@@ -144,4 +146,10 @@ if(BUILD_TESTING)
     "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/source programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/source.cmake")
   set_tests_properties(source_cli PROPERTIES TIMEOUT 180)
+  add_test(NAME modules_cli COMMAND "${CMAKE_COMMAND}"
+    "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
+    "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DROOT=${PROJECT_SOURCE_DIR}"
+    "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/module native programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+    -P "${PROJECT_SOURCE_DIR}/tests/integration/modules.cmake")
+  set_tests_properties(modules_cli PROPERTIES TIMEOUT 180)
 endif()

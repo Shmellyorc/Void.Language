@@ -535,3 +535,19 @@ and [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
 Work remains local. The user will create the public GitHub repository and make
 the initial push. The local workflow targets standard Linux, Windows and macOS
 hosts; no hosted platform result can be claimed until its executable tests run.
+
+
+## Progress after source compiler and module phases
+
+The user reports the first real source compiler passed Linux/Windows/macOS
+Debug/Release and Linux sanitizers. The next cohesive phase implements a real
+VFS/import graph, function ownership/visibility and multi-file native JIT/AOT;
+see MODULE_SYSTEM.md, DECISIONS.md and WORK_LOG.md for its current evidence and
+provisional path policies. Its expanded hosted matrix remains pending. The user
+owns commits/pushes and hosted runs; compiler work remains local unless authorized.
+
+The next recommended language phase strengthens const/project-root constants,
+numeric policy/conversions and source-first runtime diagnostics. Module cycles
+for functions do not settle constant initialization. Managed types still require
+the separate runtime root/thread integration gate; packages and external imports
+need deliberate identity/permission contracts.

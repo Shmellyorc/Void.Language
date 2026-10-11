@@ -2,14 +2,17 @@
 
 Implemented locally on 10 October 2026, using LLVM 19.1.7. LANGUAGE_BIBLE.md
 remains the language-design source of truth; this document describes the working
-subset and explicitly provisional choices. Earlier foundation-only status in
+subset and explicitly provisional choices. Multi-file compilation is now implemented;
+see [MODULE_SYSTEM.md](MODULE_SYSTEM.md) for current import and ownership rules.
+Earlier foundation-only status in
 historical documents predates this phase.
 
 ## Working pipeline
 
 `SourceFile` validates UTF-8 and retains original byte offsets. The indentation
 lexer emits tokens, newlines and block boundaries. The recursive-descent parser
-builds an AST. Semantic analysis resolves all function signatures first, checks
+builds an AST per file. The module graph resolves all function signatures first, then
+semantic analysis checks
 lexical bindings and exact types, annotates expressions and determines possible
 control-flow exits. Only validated ASTs lower into the shared VOID IR. The IR
 validator checks its independent invariants before LLVM lowering.
@@ -41,7 +44,8 @@ func entry(value: i32) -> i32:
     return total
 ```
 
-- Functions use `func name(parameter: type, ...) -> type:`. Parameters require
+- Functions use `func name(parameter: type, ...) -> type:`. Module-level
+  `private`, `public` and `internal` modifiers are supported; see MODULE_SYSTEM.md. Parameters require
   types. Omit the return annotation for no result. Empty `return` or fallthrough
   is valid only for a no-result function. Recursive and forward calls work.
 - Types are `i32` and `bool`. Literals are decimal integers, `true`, and `false`.
@@ -132,9 +136,10 @@ host-native object; a matching Clang driver links it (see README). Its native
 `main` accepts the same optional input, prints the result and exits with status
 zero; malformed/out-of-range input or extra arguments exit with status 2.
 
-Source AOT symbols receive a private compiler suffix before the C adapter is
-added, allowing source helpers named `main`, `printf` or `strtoll` without native
-adapter collisions. Stable module/export mangling is deferred. Generated line
+Source symbols encode their declaring module and function identity before the C
+adapter is added, allowing same-named functions in different modules and helpers
+named `main`, `printf` or `strtoll` without native adapter collisions. Stable
+module identity is implemented; public library/export ABI remains deferred. Generated line
 tables refer to the real input file. Variable debug records are not implemented.
 
 ## Validation and next phase
@@ -148,9 +153,12 @@ architecture source changes `42` to `13` and renames its helper to `main`; both
 engines then return 23 for input 10. Tests retain the native `printf` proof.
 See WORK_LOG.md for actual configuration commands and results.
 
-Next: verify the expanded hosted matrix, then build module/import resolution and
-stable identity with source maps and multi-file diagnostics. Decide executable
-entry/export conventions and numeric policy before expanding their public
-surface. Improve diagnostic recovery and runtime failures alongside that work.
-Managed types must wait for the existing GC/root/thread integration questions;
-collections/ranges, structs, generics and async remain outside this phase.
+The user confirmed this original eight-suite frontend phase passed Linux,
+Windows and macOS Actions. The next module phase adds two suites and is documented
+in MODULE_SYSTEM.md and WORK_LOG.md. Its hosted matrix remains pending.
+
+Next: strengthen const/project-root constants, numeric policy and source-first
+runtime errors around the multi-file compiler, defining constant dependency
+cycles before initialization. Managed types must wait for the existing
+GC/root/thread integration questions; structs, collections/ranges, generics and
+async remain outside these phases.
