@@ -38,13 +38,17 @@ SourceLocation SourceFile::location(std::size_t offset) const {
         if ((static_cast<unsigned char>(text_[i]) & 0xc0) != 0x80) ++column;
     return {path_, static_cast<unsigned>(line + 1), column};
 }
-std::string SourceFile::diagnostic(std::size_t offset, std::string_view message) const {
+std::string SourceFile::excerpt(std::size_t offset) const {
     auto pos = location(offset);
     auto begin = lines_[pos.line - 1];
     if (begin == 0 && text_.starts_with("\xef\xbb\xbf")) begin = 3;
     auto end = text_.find_first_of("\r\n", begin);
     auto line = text_.substr(begin, end == std::string::npos ? end : end - begin);
+    return line + "\n" + std::string(pos.column - 1, ' ') + "^\n";
+}
+std::string SourceFile::diagnostic(std::size_t offset, std::string_view message) const {
+    auto pos = location(offset);
     return path_ + ":" + std::to_string(pos.line) + ":" + std::to_string(pos.column) +
-        ": error: " + std::string(message) + "\n" + line + "\n" + std::string(pos.column - 1, ' ') + "^\n";
+        ": error: " + std::string(message) + "\n" + excerpt(offset);
 }
 }

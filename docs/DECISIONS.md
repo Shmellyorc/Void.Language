@@ -264,3 +264,31 @@ No Language Bible semantics were edited. MODULE_SYSTEM.md records the full worki
 contract and remaining questions; WORK_LOG.md records actual verification. Automatic
 file watching/live source replacement remains outside this phase; one graph's ORC
 resource tracker and existing leases continue to retire native code safely.
+
+## Constants and runtime diagnostic phase, 10 October 2026
+
+The user reports the preceding ten-suite module matrix passed on all platforms.
+Keep one parser, one expression type checker and the shared IR/LLVM pipeline.
+Local const means runtime readonly; module const means pure compile-time i32/bool.
+Register declarations before dependency analysis, reject structural constant cycles,
+and preserve function-only import cycles. Public/internal entry constants are
+project-wide, private entry constants stay file-private, and root names cannot
+be shadowed. Qualified expressions now also resolve imported constants.
+
+The typed evaluator shares operator definitions with IR lowering, uses unsigned
+wrapping arithmetic and widened signed division, and executes and/or lazily.
+Type checking still checks all branches. No wider numeric or conversion policy is
+silently approved. VALUE_SEMANTICS.md separates current behavior from recommendations.
+
+Generated source functions use a hidden per-invocation diagnostic pointer. Failure
+returns normally and source callers propagate a bounded, actual call trace. JIT
+host exceptions occur only after native return; AOT main prints the same metadata
+and exits 1. Embedded source snapshots and generation leases preserve metadata
+lifetime. Preserve UBSan function checking by generating both actual host entry
+ABI type hashes with the configured compiler. The legacy proof ABI remains intact.
+
+Exact length-delimited source snapshots of all const-containing files become a
+compiler-derived compatibility token. This conservative restart rule rejects any
+edit to those files, including imported/local const edits, rather than risking an
+undetected constant update or a finite-hash collision. More precise dependency
+fingerprints are deferred. See VALUE_SEMANTICS.md for explicit limits and lookup rules.

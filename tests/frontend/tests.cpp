@@ -117,6 +117,7 @@ void programs(const std::filesystem::path& root) {
     std::cout << "Real .void files and independent programs executed through normal/O2 JIT\n";
 }
 }
+void value_tests(const std::filesystem::path& root);
 void frontend_tests(const std::filesystem::path& root) {
-    diagnostics(); programs(root);
+    diagnostics(); programs(root); value_tests(root);
 }

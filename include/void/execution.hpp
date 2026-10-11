@@ -4,20 +4,30 @@
 #include <mutex>
 #include <string>
 namespace vd {
+// Per-invocation storage: generated code only borrows it until normal return.
+struct RuntimeFailure {
+    const char* message = nullptr;
+    std::uint32_t count = 0;
+    const char* frames[32] = {};
+};
 struct Compatibility {
     std::string function_id;
     std::string signature = "c:i32(i32)";
     std::uint64_t layout = 0, captures = 0, constants = 0;
+    std::string constant_contract = {};
     bool operator==(const Compatibility&) const = default;
 };
 class NativeCode {
 public:
+    using CheckedEntry = std::int32_t (*)(std::int32_t, RuntimeFailure*);
     using Entry = std::int32_t (*)(std::int32_t);
     NativeCode(Entry entry, std::shared_ptr<void> owner, Compatibility compatibility);
+    NativeCode(CheckedEntry entry, std::shared_ptr<void> owner, Compatibility compatibility);
     std::int32_t invoke(std::int32_t value) const;
     const Compatibility& compatibility() const { return compatibility_; }
 private:
-    Entry entry_;
+    Entry entry_ = nullptr;
+    CheckedEntry checked_ = nullptr;
     std::shared_ptr<void> owner_;
     Compatibility compatibility_;
 };

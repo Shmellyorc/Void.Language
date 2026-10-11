@@ -1,0 +1,7 @@
+use "/arithmetic.void" as arithmetic
+
+func bridge(value: i32) -> i32:
+    return arithmetic.calculate(value)
+
+func entry(value: i32) -> i32:
+    return bridge(value)

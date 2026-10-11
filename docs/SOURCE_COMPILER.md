@@ -53,8 +53,9 @@ func entry(value: i32) -> i32:
   conversion occurs. Calls check positional argument counts and exact types.
 - `var x = expression`, `var x: i32 = expression`, and `var x: i32` work.
   Annotated variables without an initializer default to zero/false. Parameters
-  and locals are mutable. Bindings are visible after declaration and only within
-  their lexical scope. Shadowing visible locals, parameters or function names is
+  and var locals are mutable. Local readonly const and module compile-time
+  constants are now implemented; see VALUE_SEMANTICS.md. Local bindings are visible
+  after declaration and only within their lexical scope. Shadowing visible locals, parameters or function names is
   rejected; sibling scopes can reuse names.
 - Assignment `=`, arithmetic compounds `+= -= *= /= %=`, and standalone postfix
   `++`/`--` work. Increment/decrement cannot be used as expression values.
@@ -113,8 +114,9 @@ undefined behavior exposed: addition, subtraction, multiplication and negation
 wrap modulo 2^32. Signed division truncates toward zero, with remainder having
 the dividend's sign. Division is widened to i64 before truncating back to i32;
 `-2147483648 / -1` therefore wraps to `-2147483648` and its remainder is zero.
-A directly literal zero divisor is a source error. Dynamic zero divisors trap
-through `llvm.trap`; a structured VOID runtime diagnostic is not implemented.
+A directly literal zero divisor is a source error except on a statically
+short-circuited right operand. Dynamic zero divisors now return structured VOID
+runtime diagnostics; see [VALUE_SEMANTICS.md](VALUE_SEMANTICS.md).
 This is a provisional implementation contract, not a final decision for every
 numeric type, checked arithmetic or release/debug overflow policy. Resolve that
 broader policy before extending numeric types. No Language Bible rule was changed
@@ -155,10 +157,10 @@ See WORK_LOG.md for actual configuration commands and results.
 
 The user confirmed this original eight-suite frontend phase passed Linux,
 Windows and macOS Actions. The next module phase adds two suites and is documented
-in MODULE_SYSTEM.md and WORK_LOG.md. Its hosted matrix remains pending.
+in MODULE_SYSTEM.md and WORK_LOG.md. The user reports that ten-suite phase also
+passed all three hosted platforms. The current value-semantics changes need a new run.
 
-Next: strengthen const/project-root constants, numeric policy and source-first
-runtime errors around the multi-file compiler, defining constant dependency
-cycles before initialization. Managed types must wait for the existing
-GC/root/thread integration questions; structs, collections/ranges, generics and
-async remain outside these phases.
+Current constants, arithmetic and runtime errors are documented in
+[VALUE_SEMANTICS.md](VALUE_SEMANTICS.md). Next improve diagnostic structure/recovery
+and dependency compatibility, then contextual numeric literals/conversions after
+approving their detailed policies. Managed types remain behind the GC/root/thread gate.

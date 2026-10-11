@@ -1,8 +1,9 @@
 # Module system and multi-file native compilation
 
 Implemented locally on 10 October 2026. The user confirmed the preceding source
-compiler passed Linux, Windows and macOS Actions. This phase's hosted results
-remain pending. The Language Bible remains unchanged and authoritative; policies
+compiler passed Linux, Windows and macOS Actions. The user reports this ten-suite
+module phase passed all three hosted platforms. The subsequent value-semantics
+phase requires its own run. The Language Bible remains unchanged and authoritative; policies
 marked provisional below settle this implementation slice, not the full language.
 
 ## Working imports
@@ -138,9 +139,10 @@ evaluation order and `for` semantics remain shared with single-file compilation.
 All discovered bodies are validated, including unused functions.
 
 Function-only cycles and cross-file mutual recursion are supported, including
-forward references and self-imports. This makes no promise about future globals,
-project constants or runtime initialization cycles: those features do not exist
-in this subset. Unsupported top-level declarations still receive diagnostics.
+forward references and self-imports. Module and project constants now use a
+separate compile-time dependency walk; see VALUE_SEMANTICS.md. Runtime global
+initialization remains unsupported. Unsupported top-level declarations still
+receive diagnostics.
 
 The same AST lowering emits one validated VOID IR unit containing the reachable
 graph. Each function carries its declaring module identity and source name; calls
@@ -157,7 +159,8 @@ rejects imports without a filesystem project context. `compile_project` returns
 the entry snapshot and IR, so CLI entry diagnostics need not reread changed files.
 
 This phase does not implement file watching, incremental recompilation, automatic
-source hot reload, inferred compatibility fingerprints or global initialization.
+source hot reload, incremental dependency fingerprints or global initialization.
+Const-containing source files now carry an exact conservative restart contract (VALUE_SEMANTICS.md).
 The module replacement proof checks stable identities and active old leases;
 it is not a claim of a live source-reload product.
 
@@ -176,10 +179,7 @@ both native engines' results. A nested invalid body reports its actual imported
 file, line and column. Existing GC/native/hot-reload regressions remain intact.
 See WORK_LOG.md for actual Linux commands, results and hosted verification gaps.
 
-Next: verify the expanded hosted matrix, then strengthen core language value
-semantics: const/project-root compile-time constants, deliberate checked numeric
-policy/conversions and source-first runtime errors. Define constant dependency
-cycles before adding initialization. Project/export configuration and diagnostic
-recovery can build on these module identities. Managed types still require the
-separate GC root/thread integration gate; packages and external imports need
-explicit identity/permission contracts before implementation.
+Constants, numeric correctness and runtime diagnostics now extend this foundation;
+see [VALUE_SEMANTICS.md](VALUE_SEMANTICS.md) and WORK_LOG.md. Next improve diagnostic
+structure/recovery and dependency compatibility. External imports/packages still
+need explicit identity/permission contracts, and managed types need the GC gate.

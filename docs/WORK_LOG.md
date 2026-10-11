@@ -665,3 +665,156 @@ policy/conversions and source-first runtime diagnostics, with deliberate constan
 dependency/initialization semantics. Project/export configuration and diagnostic
 recovery can build on these identities. Packages and external imports need explicit
 identity/permission contracts; managed types still require the GC root/thread gate.
+
+## Constants, numeric correctness and runtime diagnostics, 10 October 2026
+
+The user reports the preceding ten-suite module phase passed GitHub Actions on
+Linux, Windows and macOS. That is the starting gate for this phase, not hosted
+verification of the following local changes. No commits, pushes, publications or
+remote mutations were made. LLVM remains exactly 19.1.7; the Bible is unchanged.
+
+### Implementation and architecture
+
+Added i32/bool local readonly const with runtime initializers and module-level
+pure compile-time constants, optional exact annotations, safe forward references,
+dependency-cycle diagnostics, direct/qualified import lookup, visibility and
+project-root constant access without importing the entry. Constants/functions share
+file declaration ownership. Root-name collisions and local shadowing diagnose
+before LLVM. Assignments, compounds and increment/decrement reject readonly values.
+
+The existing expression type checker annotates constant initializers. A small
+pure evaluator shares operation-to-IR definitions, short-circuits execution and
+uses unsigned wrapping arithmetic plus widened signed division. Every declaration
+and expression operand remains validated; structural dependency cycles and impure
+initializers fail even behind lazy operators. No runtime module initialization,
+second type checker, wider numeric types or managed readonly system was added.
+Unary negation of an already valid negative boundary literal now lowers as an
+operation instead of constructing an out-of-range positive literal.
+
+Source IR retains source locations and relevant source-line/caret snapshots.
+Shared LLVM lowering supplies a hidden per-invocation failure pointer to source
+functions. Division/remainder by zero record a source diagnostic and return
+normally; actual callers propagate failure and append their source call sites.
+The trace includes at most 32 callers and explicitly reports omitted callers.
+The JIT copies generation-owned strings and raises a host exception only after
+native return. AOT's native main prints the same diagnostic metadata and exits 1.
+There is no C++ unwind through generated code, TLS/global error state or foreign
+stack guessing. Const-containing source snapshots form an exact conservative
+restart compatibility token, including imported files and local runtime const.
+
+VALUE_SEMANTICS.md documents lookup/cycle rules, current arithmetic, the boundary,
+AOT stdout/JIT stderr difference, conservative restart restrictions, unimplemented
+exceptions/cleanup and unapproved future literal/conversion recommendations.
+SOURCE_COMPILER, MODULE_SYSTEM, DECISIONS, KNOWN_ISSUES, strategy and README were
+updated without replacing the source-of-truth design snapshots.
+
+### Actual native acceptance results
+
+Compiled the real examples/constants/main.void and game/scoring.void using forward
+root constants and runtime local const. No special-case IR was reconstructed.
+Both normal and O2 compilation produced these results in both native engines:
+
+| Input | JIT | Linked AOT executable |
+|---:|---:|---:|
+| 0 | 50 | 50 |
+| 1 | 52 | 52 |
+| 10 | 70 | 70 |
+| -1 | 48 | 48 |
+
+The standalone demo emitted `build/ci-debug/values-demo-normal.o` and
+`values-demo-O2.o`, linked them with matching Clang/LLD 19.1.7, and ran all inputs.
+The runtime-error example's JIT and linked `values-demo-error` both exited 1 with:
+
+```text
+.../examples/runtime_errors/arithmetic.void:2:16: runtime error: Division by zero
+    return 100 / value
+               ^
+In function /arithmetic.void::calculate
+Called from /main.void::bridge
+.../examples/runtime_errors/main.void:4:23: source call
+    return arithmetic.calculate(value)
+                      ^
+Called from /main.void::entry
+.../examples/runtime_errors/main.void:7:12: source call
+    return bridge(value)
+           ^
+```
+
+### Expanded tests, with all ten suites preserved
+
+Existing core/JIT/reload/GC/native/AOT assertions and frontend/module tests remain.
+Extended frontend, modules and modules_cli rather than disabling or replacing any
+suite. New tests exercise readonly mutations, initialization/types, forward and
+cyclic constants, root/private/internal/direct/aliased lookup, name collisions,
+function-only cycles with safe constants and restart rejection for root/imported
+local const edits. Concurrent failure tests use four callers, with repeated failing
+and successful invocations to verify per-call isolation.
+
+An independent widened-integer oracle covers eight boundary/signed operands per
+side and five operators, excluding zero divisors for division/remainder: 304 cases.
+Frontend tests make 1,216 comparisons against constant and normal/O2 JIT results.
+A generated real `.void` matrix tests all 304 against native runtime arithmetic and
+constant values in normal/O2 JIT and linked AOT. Real numeric.void independently
+checks compounds, negation, MIN/-1, wraparound, signed division/remainder and lazy
+constant arithmetic. Real-source native integration covers division, remainder,
+both compounds, bool/no-result propagation, recursive trace truncation and imported
+caller positions. AOT tests edit the source after object emission and still require
+the original snapshot. Unexecuted branches and and/or expressions remain safe.
+
+### Commands and local verification
+
+Both installed and complete official SDKs were checked for LLJIT.h,
+libLLVMOrcJIT.a and LLVMConfig.cmake. Both configuration link/run probes passed.
+Installed SDK: `/usr/lib/llvm-19/lib/cmake/llvm`. Complete archive:
+`.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64`, using its own matching
+Clang/LLD and RTTI settings. Required dependency and platform setup remains intact.
+
+```sh
+cmake --build build/ci-debug -j3
+ctest --test-dir build/ci-debug --output-on-failure
+cmake --build build/ci-release -j3
+ctest --test-dir build/ci-release --output-on-failure
+cmake --build build/ci-sanitizers -j3
+ctest --test-dir build/ci-sanitizers --output-on-failure
+ctest --test-dir build/ci-sanitizers --output-on-failure \
+  -R '^(frontend|modules|modules_cli|reload|gc|native)$' --repeat until-fail:5
+cmake --build build/ci-official-debug -j3
+# Final verification uses serial linking after the observation below.
+cmake --build build/ci-official-debug -j1
+ctest --test-dir build/ci-official-debug --output-on-failure
+```
+
+Final installed-SDK Debug: 10/10 passed (28.07 s while SDK builds ran).
+Final Release: 10/10 passed (10.87 s). Final ASan/UBSan: 10/10 passed (25.77 s).
+ASan, UBSan including both plain/checked entry ABI function checks, and leak detection
+remain enabled. Sanitizer CTest runs outside the desktop tracing sandbox for
+LeakSanitizer process inspection; generated application instructions and LLVM
+itself are not sanitizer-instrumented. Earlier intermediate runs also passed;
+a new module diagnostic assertion initially expected alias column 23 instead of
+the actual 18 and was corrected to the source position.
+
+Final repeated ASan/UBSan stress: all six selected suites passed five consecutive
+runs each, 30 suite executions (192.58 s, concurrent official LLVM bitcode linking).
+An intermediate concurrent official-SDK LLD link emitted a Machine Instruction
+Scheduler backtrace in LLVMGlobalISel despite reporting build exit status 0.
+A final serial build with the same pinned SDK completed cleanly, without another
+backtrace. Its cause remains unconfirmed; compare the next hosted Linux link. No libraries, LLVM version or build requirements were substituted.
+After final diagnostic wording corrections, Debug again passed 10/10 (17.67 s),
+Release 10/10 (16.41 s), and ASan/UBSan 10/10 (27.01 s), with concurrent SDK linking.
+Retained logs contain no AddressSanitizer, UndefinedBehaviorSanitizer, LeakSanitizer
+or runtime-error warning lines. Final complete official SDK Debug: 10/10 passed (9.58 s), including all
+architectural regressions, the numeric oracle and normal/O2 native diagnostics.
+Its final serial build and retained test log contain no linker backtrace or
+sanitizer reports. Whitespace and local documentation-link checks passed.
+
+### Hosted verification and next phase
+
+This phase needs a new user-published GitHub Actions run: Windows/macOS Debug and
+Release, hosted Linux Debug/Release/ASan/UBSan, especially checked source entry ABI,
+CRT diagnostic printing, optimized propagation/call traces and the full numeric
+oracle. No current hosted success is claimed. CI still uses the complete pinned
+19.1.7 SDK and preserved Linux LLD, Windows SDK/DIA/legacy stdio and macOS settings.
+
+Next improve structured diagnostics/recovery and precise source dependency
+compatibility, then approve contextual literal/conversion tables before wider
+numeric types. Managed types remain behind the separate GC root/thread gate.

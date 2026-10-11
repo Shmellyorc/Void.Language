@@ -18,6 +18,7 @@ struct Instruction {
     SourceLocation source = {};
     Type type = Type::i32; // Literal type; other result types derive from operands/signatures.
     std::vector<std::uint32_t> arguments = {};
+    std::string source_excerpt = {}; // Snapshot of the source line and caret.
 };
 struct Terminator {
     enum class Kind { return_value, branch, jump, return_void, unreachable } kind = Kind::return_value;
@@ -37,6 +38,7 @@ struct Module {
     std::vector<Function> functions;
     std::string entry_symbol = "entry";
     std::string source_path = {}; // Physical debug source; not part of stable identity.
+    std::string constant_contract = {}; // Exact conservative restart token for source const changes.
 };
 void validate(const Module& module);
 Module architecture_proof(std::int32_t answer = 42);

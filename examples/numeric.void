@@ -1,0 +1,26 @@
+const minimum = -2147483648
+const maximum = 2147483647
+const folded = (maximum + 1) / -1
+const safe = false and 1 / 0 > 0
+const valid = true or 1 % 0 > 0
+
+func entry(value: i32) -> i32:
+    const runtime_minimum = maximum + value
+    var result = runtime_minimum
+    result /= -1
+    if value == 1 and result == folded and -minimum == minimum and not safe and valid:
+        return (-7 / 3) * 10 + (-7 % 3)
+    if value == 0:
+        result = minimum
+        result -= 1
+        result++
+        result--
+        result *= 2
+        result += 1
+        result %= -3
+        return result
+    if value == -1:
+        return 7 / -3 * 10 + 7 % -3
+    if value == -2147483648:
+        return -value
+    return value

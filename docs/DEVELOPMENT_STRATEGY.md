@@ -551,3 +551,13 @@ numeric policy/conversions and source-first runtime diagnostics. Module cycles
 for functions do not settle constant initialization. Managed types still require
 the separate runtime root/thread integration gate; packages and external imports
 need deliberate identity/permission contracts.
+
+### Current value-semantics phase, 10 October 2026
+
+The user reports the preceding ten-suite module phase passed Linux, Windows and
+macOS Actions. Constants, compile-time dependency analysis, numeric parity and
+source-first native arithmetic diagnostics now extend the same frontend/IR/backend.
+See VALUE_SEMANTICS.md and WORK_LOG.md for scope, exact verification and limits.
+Recommended next work: diagnostic structure/recovery and dependency compatibility,
+then deliberate contextual literal/conversion policy before wider numeric types.
+Managed types still require the separate GC root/thread integration gate.

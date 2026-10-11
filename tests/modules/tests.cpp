@@ -185,8 +185,47 @@ void negatives(const fs::path& output) {
     }
     throw std::runtime_error("Imported entry used as CLI entry");
 }
+void constants(const fs::path& output) {
+    Fixture f{output / "constant project"};
+    f.file("game/scoring.void", "func calculate(value: i32) -> i32:\n    const score = bonus + value\n    return score * 2\n");
+    const std::string main = "use \"/game/scoring.void\" as scoring\nconst bonus = base + 5\nconst base = 20\n" + entry_start + "scoring.calculate(x)\n";
+    f.file("main.void", main); f.run({{0,50},{1,52},{10,70},{-1,48}});
+    vd::Jit jit;
+    auto old = jit.compile(f.compile().module, "entry"); vd::ReloadSlot slot(old);
+    auto changed_root = main; changed_root.replace(changed_root.find("base = 20"), 9, "base = 30");
+    f.file("main.void", changed_root);
+    auto updated_root = jit.compile(f.compile().module, "entry");
+    require(!slot.replace(updated_root) && slot.invoke(0) == 50 && updated_root->invoke(0) == 70, "Project constant change escaped restart contract");
+    f.file("main.void", main);
+    f.file("game/scoring.void", "func calculate(value: i32) -> i32:\n    const score = bonus + value + 1\n    return score * 2\n");
+    require(!slot.replace(jit.compile(f.compile().module, "entry")) && slot.invoke(0) == 50, "Imported local const change escaped restart contract");
+    f.file("a.void", "private const hidden = 3\ninternal const amount = other + hidden\nconst other = 4\n");
+    f.file("main.void", "use \"/a.void\" as math\n" + entry_start + "math.amount + x\n"); f.run({{0,7},{2,9}});
+    f.rejects("use \"/a.void\" as math\n" + entry_start + "math.hidden\n", "private imported constant", "main.void", "3:17");
+    f.file("main.void", "use \"/a.void\"\nuse \"./a.void\"\nconst derived = amount * 2\n" + entry_start + "derived + amount\n"); f.run({{0,21}});
+    f.file("b.void", "const amount = 10\n");
+    f.rejects("use \"/a.void\"\nuse \"/b.void\"\n" + entry_start + "amount\n", "Ambiguous imported constant", "main.void", "4:12");
+    f.file("b.void", "func amount() -> i32:\n    return 1\n");
+    f.rejects("use \"/a.void\"\nuse \"/b.void\"\n" + entry_start + "amount\n", "Ambiguous imported declaration", "main.void", "4:12");
+    f.file("b.void", "use \"/a.void\"\n");
+    f.rejects("use \"/b.void\"\n" + entry_start + "amount\n", "Unknown identifier", "main.void", "3:12");
+    f.rejects("use \"/a.void\" as math\nconst math = 1\n", "conflicts with a constant declaration", "main.void", "1:18");
+    f.file("a.void", "const base = 4\n");
+    f.rejects("use \"/a.void\"\nconst base = 3\n", "shadows project-root constant", "a.void", "1:7");
+    f.file("a.void", "func base() -> i32:\n    return 4\n");
+    f.rejects("use \"/a.void\"\nconst base = 3\n", "shadows project-root constant", "a.void", "1:6");
+    f.file("a.void", "func get() -> i32:\n    return hidden\n");
+    f.rejects("use \"/a.void\"\nprivate const hidden = 3\n", "Unknown identifier", "a.void", "2:12");
+    f.file("a.void", "use \"/main.void\" as main\nconst other = main.base + 1\n");
+    f.rejects("use \"/a.void\" as math\nconst base = math.other + 1\n", "Circular constant dependency", "a.void", "2:7");
+    f.file("a.void", "use \"/b.void\" as second\nconst amount = second.base + 2\nfunc get(x: i32) -> i32:\n    return amount + x\n");
+    f.file("b.void", "use \"/a.void\" as first\nconst base = 7\nfunc other(x: i32) -> i32:\n    return first.get(x)\n");
+    f.file("main.void", "use \"/b.void\" as second\n" + entry_start + "second.other(x)\n"); f.run({{0,9},{2,11}});
+    std::cout << "Project constants, forwards, visibility, cycles, imports and restart checks passed\n";
+}
+
 }
 void module_tests(const std::filesystem::path& output) {
-    positives(output); negatives(output);
+    positives(output); negatives(output); constants(output);
     std::cout << "Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed\n";
 }

@@ -61,6 +61,11 @@ std::string native_symbol(const ir::Function& function, const std::string& suffi
     for (unsigned char c : function.name) { symbol += hex[c >> 4]; symbol += hex[c & 15]; }
     return symbol + suffix;
 }
+std::string source_message(const SourceLocation& location, const std::string& excerpt,
+                           const std::string& description) {
+    return location.path + ":" + std::to_string(location.line) + ":" + std::to_string(location.column) +
+        ": " + description + "\n" + excerpt;
+}
 std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& context,
                                   const std::string& suffix) {
     ir::validate(input);
@@ -78,6 +83,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
     for (const auto& f : input.functions) {
         std::vector<llvm::Type*> parameters;
         for (auto t : f.parameters) parameters.push_back(type(t));
+        if (!f.module_identity.empty()) parameters.push_back(b.getPtrTy());
         auto* function_type = llvm::FunctionType::get(type(f.result), parameters, false);
         functions[f.name] = llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, native_symbol(f, suffix), *module);
     }
@@ -105,6 +111,12 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         std::vector<llvm::BasicBlock*> blocks;
         for (std::size_t i = 0; i < f.blocks.size(); ++i)
             blocks.push_back(llvm::BasicBlock::Create(context, "block" + std::to_string(i), fn));
+        auto* failure_type = llvm::StructType::get(b.getPtrTy(), b.getInt32Ty(), llvm::ArrayType::get(b.getPtrTy(), 32));
+        llvm::Value* failure = f.module_identity.empty() ? nullptr : fn->getArg(static_cast<unsigned>(f.parameters.size()));
+        auto return_failure = [&] {
+            if (f.result == ir::Type::none) b.CreateRetVoid();
+            else b.CreateRet(llvm::Constant::getNullValue(type(f.result)));
+        };
         std::vector<llvm::AllocaInst*> slots;
         b.SetInsertPoint(blocks.front());
         b.SetCurrentDebugLocation(llvm::DebugLoc());
@@ -132,7 +144,15 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     auto* invalid = llvm::BasicBlock::Create(context, "zero_divisor", fn);
                     b.CreateCondBr(b.CreateICmpEQ(values[instruction.b], b.getInt32(0)), invalid, valid);
                     b.SetInsertPoint(invalid);
-                    b.CreateCall(llvm::Intrinsic::getDeclaration(module.get(), llvm::Intrinsic::trap)); b.CreateUnreachable();
+                    if (failure) {
+                        auto message = source_message(loc, instruction.source_excerpt,
+                            instruction.op == Op::divide ? "runtime error: Division by zero" : "runtime error: Remainder by zero");
+                        message += "In function " + f.module_identity + "::" + f.source_name + "\n";
+                        b.CreateStore(b.CreateGlobalStringPtr(message), b.CreateStructGEP(failure_type, failure, 0));
+                        return_failure();
+                    } else {
+                        b.CreateCall(llvm::Intrinsic::getDeclaration(module.get(), llvm::Intrinsic::trap)); b.CreateUnreachable();
+                    }
                     b.SetInsertPoint(valid);
                     // Widen before signed division so INT32_MIN / -1 is defined;
                     // truncation restores the provisional wrapping i32 contract.
@@ -151,8 +171,36 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 case Op::call: {
                     std::vector<llvm::Value*> arguments;
                     for (auto id : instruction.arguments) arguments.push_back(values[id]);
-                    if (arguments.empty() && functions.at(instruction.callee)->arg_size() == 1) arguments.push_back(values[instruction.a]);
-                    v = b.CreateCall(functions.at(instruction.callee), arguments); break;
+                    if (arguments.empty() && !failure && functions.at(instruction.callee)->arg_size() == 1) arguments.push_back(values[instruction.a]);
+                    auto* callee = functions.at(instruction.callee);
+                    bool checked = callee->arg_size() == arguments.size() + 1;
+                    if (checked && !failure) throw std::invalid_argument("Checked source calls require a source diagnostic context");
+                    if (checked) arguments.push_back(failure);
+                    v = b.CreateCall(callee, arguments);
+                    if (checked) {
+                        auto* failed = llvm::BasicBlock::Create(context, "propagate_error", fn);
+                        auto* resume = llvm::BasicBlock::Create(context, "call_success", fn);
+                        auto* message = b.CreateLoad(b.getPtrTy(), b.CreateStructGEP(failure_type, failure, 0));
+                        b.CreateCondBr(b.CreateIsNotNull(message), failed, resume);
+                        b.SetInsertPoint(failed);
+                        auto* count_address = b.CreateStructGEP(failure_type, failure, 1);
+                        auto* count = b.CreateLoad(b.getInt32Ty(), count_address);
+                        auto* append = llvm::BasicBlock::Create(context, "trace_caller", fn);
+                        auto* done = llvm::BasicBlock::Create(context, "error_return", fn);
+                        auto* limit = llvm::BasicBlock::Create(context, "trace_limit", fn);
+                        b.CreateCondBr(b.CreateICmpULT(count, b.getInt32(32)), append, limit);
+                        b.SetInsertPoint(limit); b.CreateStore(b.getInt32(33), count_address); b.CreateBr(done);
+                        b.SetInsertPoint(append);
+                        auto trace = "Called from " + f.module_identity + "::" + f.source_name + "\n" +
+                            source_message(loc, instruction.source_excerpt, "source call");
+                        auto* frames = b.CreateStructGEP(failure_type, failure, 2);
+                        auto* address = b.CreateGEP(llvm::ArrayType::get(b.getPtrTy(), 32), frames, {b.getInt32(0), count});
+                        b.CreateStore(b.CreateGlobalStringPtr(trace), address);
+                        b.CreateStore(b.CreateAdd(count, b.getInt32(1)), count_address);
+                        b.CreateBr(done); b.SetInsertPoint(done); return_failure();
+                        b.SetInsertPoint(resume);
+                    }
+                    break;
                 }
 
                 }
@@ -187,15 +235,15 @@ struct Jit::Impl {
     };
     std::shared_ptr<const NativeCode> load(std::unique_ptr<llvm::Module> module,
         std::unique_ptr<llvm::LLVMContext> context, const std::string& symbol,
-        Compatibility contract, const std::shared_ptr<Impl>& self) {
+        Compatibility contract, const std::shared_ptr<Impl>& self, bool checked = false) {
 #ifdef VOID_FUNCTION_SANITIZER_HASH
         // The host ABI is checked before reaching this boundary. Match the
-        // compiler-generated i32(i32) type metadata without disabling UBSan.
+        // compiler-generated plain/checked entry metadata without disabling UBSan.
         auto* function = module->getFunction(symbol);
         llvm::IRBuilder<> builder(*context);
         function->setMetadata("func_sanitize", llvm::MDNode::get(*context, {
             llvm::ConstantAsMetadata::get(builder.getInt32(VOID_FUNCTION_SANITIZER_MAGIC)),
-            llvm::ConstantAsMetadata::get(builder.getInt32(VOID_FUNCTION_SANITIZER_HASH))}));
+            llvm::ConstantAsMetadata::get(builder.getInt32(checked ? VOID_CHECKED_SANITIZER_HASH : VOID_FUNCTION_SANITIZER_HASH))}));
 #endif
         auto tracker = jit->getMainJITDylib().createResourceTracker();
         auto generation = std::make_shared<Generation>();
@@ -203,7 +251,9 @@ struct Jit::Impl {
         generation->tracker = tracker;
         ++live;
         check(jit->addIRModule(tracker, llvm::orc::ThreadSafeModule(std::move(module), std::move(context))));
-        auto entry = unwrap(jit->lookup(symbol)).toPtr<NativeCode::Entry>();
+        auto address = unwrap(jit->lookup(symbol));
+        if (checked) return std::make_shared<NativeCode>(address.toPtr<NativeCode::CheckedEntry>(), generation, std::move(contract));
+        auto entry = address.toPtr<NativeCode::Entry>();
         return std::make_shared<NativeCode>(entry, generation, std::move(contract));
     }
 };
@@ -235,13 +285,14 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     if (contract.function_id.empty()) contract.function_id = expected_id;
     if (contract.function_id != expected_id || contract.signature != "c:i32(i32)")
         throw std::invalid_argument("code identity or signature does not match IR");
+    if (!selected->module_identity.empty()) contract.constant_contract = input.constant_contract;
     auto suffix = "__v" + std::to_string(++impl_->serial);
     auto context = std::make_unique<llvm::LLVMContext>();
     auto module = lower(input, *context, suffix);
     module->setDataLayout(impl_->jit->getDataLayout());
     module->setTargetTriple(impl_->jit->getTargetTriple().str());
     finish(*module, optimize);
-    return impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_);
+    return impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty());
 }
 std::size_t Jit::live_generations() const { return impl_->live.load(); }
 std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
@@ -339,7 +390,44 @@ void emit_object(const ir::Module& input, const std::filesystem::path& output, b
         auto* truncated = llvm::CastInst::CreateTruncOrBitCast(parsed, b.getInt32Ty(), "input", parse->getTerminator());
         selected->addIncoming(truncated, parse); input_value = selected;
     }
-    auto* result = b.CreateCall(entry, {input_value});
+    std::vector<llvm::Value*> arguments{input_value};
+    llvm::Value* failure = nullptr;
+    auto* failure_type = llvm::StructType::get(b.getPtrTy(), b.getInt32Ty(), llvm::ArrayType::get(b.getPtrTy(), 32));
+    if (!entry_function->module_identity.empty()) {
+        failure = b.CreateAlloca(failure_type);
+        b.CreateStore(llvm::Constant::getNullValue(failure_type), failure);
+        arguments.push_back(failure);
+    }
+    auto* result = b.CreateCall(entry, arguments);
+    if (failure) {
+        auto* failed = llvm::BasicBlock::Create(context, "runtime_error", main);
+        auto* success = llvm::BasicBlock::Create(context, "success", main);
+        auto* message = b.CreateLoad(b.getPtrTy(), b.CreateStructGEP(failure_type, failure, 0));
+        b.CreateCondBr(b.CreateIsNotNull(message), failed, success);
+        b.SetInsertPoint(failed);
+        auto puts = module->getOrInsertFunction("puts", llvm::FunctionType::get(b.getInt32Ty(), {b.getPtrTy()}, false));
+        b.CreateCall(puts, {message});
+        auto* count = b.CreateLoad(b.getInt32Ty(), b.CreateStructGEP(failure_type, failure, 1));
+        auto* start = b.GetInsertBlock();
+        auto* test = llvm::BasicBlock::Create(context, "trace", main);
+        auto* body = llvm::BasicBlock::Create(context, "print_caller", main);
+        auto* done = llvm::BasicBlock::Create(context, "failure_exit", main);
+        b.CreateBr(test); b.SetInsertPoint(test);
+        auto* index = b.CreatePHI(b.getInt32Ty(), 2); index->addIncoming(b.getInt32(0), start);
+        b.CreateCondBr(b.CreateAnd(b.CreateICmpULT(index, count), b.CreateICmpULT(index, b.getInt32(32))), body, done);
+        b.SetInsertPoint(body);
+        auto* frames = b.CreateStructGEP(failure_type, failure, 2);
+        auto* address = b.CreateGEP(llvm::ArrayType::get(b.getPtrTy(), 32), frames, {b.getInt32(0), index});
+        b.CreateCall(puts, {b.CreateLoad(b.getPtrTy(), address)});
+        auto* next = b.CreateAdd(index, b.getInt32(1)); index->addIncoming(next, body);
+        b.CreateBr(test); b.SetInsertPoint(done);
+        auto* truncated = llvm::BasicBlock::Create(context, "trace_limit", main);
+        auto* exit = llvm::BasicBlock::Create(context, "exit", main);
+        b.CreateCondBr(b.CreateICmpUGT(count, b.getInt32(32)), truncated, exit);
+        b.SetInsertPoint(truncated);
+        b.CreateCall(puts, {b.CreateGlobalStringPtr("Source call trace limited to 32 callers.")}); b.CreateBr(exit);
+        b.SetInsertPoint(exit); b.CreateRet(b.getInt32(1)); b.SetInsertPoint(success);
+    }
     auto print = module->getOrInsertFunction("printf",
         llvm::FunctionType::get(b.getInt32Ty(), {b.getPtrTy()}, true));
     b.CreateCall(print, {b.CreateGlobalStringPtr("%d\n"), result});

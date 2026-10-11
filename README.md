@@ -4,7 +4,8 @@ VOID 2.0 is a new language, independent of the earlier C#-compatible VOIDC.
 This repository now compiles graphs of actual `.void` files through one frontend, typed
 semantic model, backend-independent IR, and shared LLVM 19.1.7 AOT/JIT lowering.
 The initial subset supports typed functions, i32/bool expressions, local variables,
-conditionals, `for` loops, and source diagnostics. Experimental GC, leased function
+conditionals, `for` loops, readonly/compile-time constants, and source-first
+compile/runtime diagnostics. Experimental GC, leased function
 replacement, and native C interoperability remain separate architectural proofs.
 See [source compiler scope and decisions](docs/SOURCE_COMPILER.md).
 
@@ -100,6 +101,35 @@ cycles and cross-file recursion work. Package imports, external root escapes and
 imported symlinks are deferred with clear diagnostics. See
 [module rules and provisional filesystem policies](docs/MODULE_SYSTEM.md).
 
+## Constants and runtime diagnostics
+
+The entry file's public/internal compile-time constants are visible throughout the
+reachable project without importing the entry. Module constants support typed pure
+expressions, forward references and cycle diagnostics. Local `const` can depend on
+runtime values and cannot be reassigned; `var` copies remain mutable.
+
+```sh
+build/debug/voidc run examples/constants/main.void 0    # 50
+build/debug/voidc run examples/constants/main.void 1    # 52
+build/debug/voidc run examples/constants/main.void 10   # 70
+build/debug/voidc run examples/constants/main.void -1   # 48
+build/debug/voidc emit examples/constants/main.void -o build/debug/constants.o
+clang-19 build/debug/constants.o -o build/debug/constants
+build/debug/constants 10                             # 70
+build/debug/voidc run examples/runtime_errors/main.void 0
+# arithmetic.void:2:16: runtime error: Division by zero
+# Original source line/caret, failing function, and actual source callers; exit 1.
+```
+
+The same native link options described above apply. Both JIT and AOT preserve
+wrapping i32 arithmetic, widened signed division and safe zero checks. Runtime
+errors return normally through native functions, preserve imported source locations,
+and include up to 32 actual source callers with explicit truncation. AOT currently
+prints diagnostics to stdout, JIT CLI to stderr. Changes to const-containing source
+files conservatively require restart; old reload leases remain usable.
+See [value semantics, policies and limitations](docs/VALUE_SEMANTICS.md), including
+recommendations for future numeric conversions that still require approval.
+
 ## Windows and macOS
 
 The local workflow in `.github/workflows/ci.yml` downloads complete official
@@ -120,9 +150,9 @@ Visual Studio DIA SDK (`VSINSTALLDIR`); an explicit real
 `-DVOID_DIA_GUIDS_LIBRARY=.../diaguids.lib` can also be supplied.
 
 All jobs build and execute the same Debug and Release tests; Linux also runs
-ASan/UBSan. The user confirmed the first source compiler passed on all three
-platforms. This module phase has passed local Linux Debug/Release and sanitizer checks; the
-expanded ten-suite matrix still needs a hosted run after the user commits and pushes.
+ASan/UBSan. The user confirmed the previous ten-suite module phase passed on all three
+platforms. The current constants/numeric/runtime changes need a new hosted run
+after the user commits and pushes.
 See [verified commands and results](docs/WORK_LOG.md).
 
 ## Continue development
@@ -131,8 +161,9 @@ Read [the Language Bible](docs/LANGUAGE_BIBLE.md),
 [development strategy](docs/DEVELOPMENT_STRATEGY.md),
 [architectural decisions](docs/DECISIONS.md),
 [source compiler scope](docs/SOURCE_COMPILER.md),
-[module system](docs/MODULE_SYSTEM.md), and
+[module system](docs/MODULE_SYSTEM.md),
+[value semantics](docs/VALUE_SEMANTICS.md), and
 [known issues](docs/KNOWN_ISSUES.md).
-The next phase should establish const/project-root compile-time constants,
-precise numeric policy and source-first runtime errors on this module foundation.
+The next phase should improve diagnostic structure/recovery and source dependency
+compatibility, then introduce contextual literals/conversions after detailed policy approval.
 Resolve runtime/root integration before introducing managed language types.

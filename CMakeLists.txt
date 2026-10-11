@@ -57,21 +57,28 @@ target_compile_options(void_llvm PRIVATE ${VOID_LLVM_DEFINITIONS})
 # it to published ORC entries; otherwise a page-aligned JIT entry can fault
 # before the checker can discover that the function is uninstrumented.
 if(VOID_SANITIZERS AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT MSVC)
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/jit-entry-type.cpp"
-    "#include <cstdint>\nstd::int32_t vd_entry_type(std::int32_t x) { return x; }\n")
-  execute_process(COMMAND "${CMAKE_CXX_COMPILER}" -std=c++20 -fsanitize=undefined -S -emit-llvm
-    "${CMAKE_CURRENT_BINARY_DIR}/jit-entry-type.cpp" -o "${CMAKE_CURRENT_BINARY_DIR}/jit-entry-type.ll"
-    RESULT_VARIABLE entry_type_status ERROR_VARIABLE entry_type_errors)
-  if(NOT entry_type_status EQUAL 0)
-    message(FATAL_ERROR "Cannot generate host UBSan function metadata: ${entry_type_errors}")
-  endif()
-  file(READ "${CMAKE_CURRENT_BINARY_DIR}/jit-entry-type.ll" entry_type_ir)
-  string(REGEX MATCH "!\\{i32 (-?[0-9]+), i32 (-?[0-9]+)\\}" entry_type_metadata "${entry_type_ir}")
-  if(NOT entry_type_metadata)
-    message(FATAL_ERROR "Host compiler did not emit the expected UBSan function metadata")
-  endif()
-  target_compile_definitions(void_llvm PRIVATE
-    "VOID_FUNCTION_SANITIZER_MAGIC=${CMAKE_MATCH_1}" "VOID_FUNCTION_SANITIZER_HASH=${CMAKE_MATCH_2}")
+  foreach(entry_kind IN ITEMS FUNCTION CHECKED)
+    if(entry_kind STREQUAL "CHECKED")
+      set(entry_parameters "std::int32_t x, vd::RuntimeFailure*")
+    else()
+      set(entry_parameters "std::int32_t x")
+    endif()
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/jit-entry-type.cpp"
+      "#include <cstdint>\nnamespace vd { struct RuntimeFailure; }\nstd::int32_t vd_entry_type(${entry_parameters}) { return x; }\n")
+    execute_process(COMMAND "${CMAKE_CXX_COMPILER}" -std=c++20 -fsanitize=undefined -S -emit-llvm
+      "${CMAKE_CURRENT_BINARY_DIR}/jit-entry-type.cpp" -o "${CMAKE_CURRENT_BINARY_DIR}/jit-entry-type.ll"
+      RESULT_VARIABLE entry_type_status ERROR_VARIABLE entry_type_errors)
+    if(NOT entry_type_status EQUAL 0)
+      message(FATAL_ERROR "Cannot generate host UBSan function metadata: ${entry_type_errors}")
+    endif()
+    file(READ "${CMAKE_CURRENT_BINARY_DIR}/jit-entry-type.ll" entry_type_ir)
+    string(REGEX MATCH "!\\{i32 (-?[0-9]+), i32 (-?[0-9]+)\\}" entry_type_metadata "${entry_type_ir}")
+    if(NOT entry_type_metadata)
+      message(FATAL_ERROR "Host compiler did not emit the expected UBSan function metadata")
+    endif()
+    target_compile_definitions(void_llvm PRIVATE
+      "VOID_${entry_kind}_SANITIZER_MAGIC=${CMAKE_MATCH_1}" "VOID_${entry_kind}_SANITIZER_HASH=${CMAKE_MATCH_2}")
+  endforeach()
 endif()
 # Match the SDK's RTTI ABI only in the translation unit using LLVM headers.
 # Exception support remains enabled for VOID diagnostics and cleanup.
@@ -120,7 +127,7 @@ if(BUILD_TESTING)
   add_library(native_fixture STATIC tests/integration/native_fixture.c)
   target_include_directories(native_fixture PUBLIC tests/integration)
   target_link_libraries(native_fixture PRIVATE void_options)
-  add_executable(void_tests tests/tests.cpp tests/frontend/tests.cpp tests/modules/tests.cpp examples/proof.cpp)
+  add_executable(void_tests tests/tests.cpp tests/frontend/tests.cpp tests/frontend/values.cpp tests/modules/tests.cpp examples/proof.cpp)
   target_link_libraries(void_tests PRIVATE void_llvm void_runtime native_fixture)
   foreach(suite core jit reload gc native)
     add_test(NAME ${suite} COMMAND void_tests ${suite})
