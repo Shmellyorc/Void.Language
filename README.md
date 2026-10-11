@@ -66,7 +66,10 @@ The local workflow in `.github/workflows/ci.yml` downloads complete official
 LLVM 19.1.7 development archives, including headers and static libraries.
 Windows uses the MSVC/Windows SDK environment and `clang-cl`, with the release
 MSVC dynamic runtime and iterator ABI matching the prebuilt LLVM libraries in
-both build configurations. The native AOT link uses the SDK's `clang` driver.
+both build configurations. The native AOT link uses the SDK's `clang` driver,
+with `-llegacy_stdio_definitions` to resolve the direct native `printf` symbol
+through the active MSVC library search paths. Use a Visual Studio developer
+environment (CI initializes it before configuration and testing).
 macOS selects the official archive matching the runner architecture and uses
 the Xcode SDK. Linux installs development dependencies explicitly and selects
 the same archive's LLD 19.1.7 because its static LLVM libraries contain bitcode.
@@ -77,10 +80,10 @@ Visual Studio DIA SDK (`VSINSTALLDIR`); an explicit real
 `-DVOID_DIA_GUIDS_LIBRARY=.../diaguids.lib` can also be supplied.
 
 All jobs build and execute the same Debug and Release tests; Linux also runs
-ASan/UBSan. The first hosted run failed during Build Debug on all three platforms.
-The local corrections and verification are recorded in [the work log](docs/WORK_LOG.md).
-A new hosted run is still required, especially for Windows and macOS execution.
-These corrections are uncommitted and unpushed.
+ASan/UBSan. The second hosted run passed Linux and macOS completely. Windows
+built Debug and passed five suites; AOT failed because a bare `.lib` argument
+was treated as a local file. The local library-request correction still needs
+Windows Debug and Release hosted verification. See [the work log](docs/WORK_LOG.md).
 
 ## Continue development
 

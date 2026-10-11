@@ -4,15 +4,19 @@ Updated 10 October 2026, foundation phase.
 
 ## Platform verification
 
-- The initial hosted run [38098620186](https://github.com/Shmellyorc/Void.Language/actions/runs/38098620186)
-  configured all three platforms but failed Build Debug; no architectural suite
-  executed there. Local corrections remain uncommitted and unpushed. A new hosted
-  run must verify Windows and macOS execution and the Linux runner environment.
-- The exact official Linux archive now builds and executes all six Debug suites
-  locally. Its Release/sanitizer configurations and the hosted Linux environment
-  still require verification. Installed-SDK Debug/Release/sanitizer suites pass.
-- Windows DIA dependency resolution has been tested with a synthetic imported
-  target on Linux; this does not validate the Windows SDK or native ABI.
+- In [hosted run 38099707063](https://github.com/Shmellyorc/Void.Language/actions/runs/38099707063),
+  Linux passed Debug, Release and ASan/UBSan, and macOS passed Debug and Release.
+  Windows built Debug and passed core/JIT/reload/GC/native (5/6); AOT failed in
+  Clang's input-file validation for bare `legacy_stdio_definitions.lib`.
+- The AOT script now requests `-llegacy_stdio_definitions`, allowing the native
+  Windows linker to search the active MSVC/Windows SDK environment. The existing
+  `printf` call, debug metadata verification and three executable outputs remain.
+  This local correction is uncommitted/unpushed and needs hosted Windows execution.
+- Windows Release configure/build/tests were skipped after the Debug test failure;
+  they must also pass in the next run. Linux/macOS should remain green.
+- Local Clang/LLD 19.1.7 checks reproduced the input-file error and verified real
+  COFF library discovery through `LIB`, including a path with spaces and failure
+  when that search path was removed. They do not replace Windows SDK/runtime tests.
 - CI uses complete official LLVM 19.1.7 archives. The Linux archive contains
   bitcode and requires the matching LLD, plus an SDK-compatible RTTI setting.
   CMake now links and runs an ORC host before the normal build. Archive downloads

@@ -7,7 +7,9 @@ if(NOT status EQUAL 0)
 endif()
 if(WINDOWS)
   # Hand-built IR calls the C printf symbol directly, bypassing UCRT header inlines.
-  set(native_libraries legacy_stdio_definitions.lib)
+  # A bare .lib is validated by the clang driver as a local input file. Use -l
+  # so the MSVC linker searches the active SDK/toolset paths (including LIB).
+  set(native_libraries -llegacy_stdio_definitions)
 endif()
 if(LINKER)
   set(native_linker "--ld-path=${LINKER}")

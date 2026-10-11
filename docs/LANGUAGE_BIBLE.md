@@ -40,7 +40,7 @@ If an implementation exposes a contradiction between agreed features, prefer a s
 
 ### 0.1 Quick handoff for a fresh conversation
 
-VOID 2.0 is a proposed, compact, statically typed, garbage-collected, natively compiled language drawing ideas from Python, Go, Lua, PICO-8, GDScript, and useful C# features. It is **not** intended to reproduce C# or become an Odin clone. The developer wants all identifiers in lowercase `snake_case` (with the accepted special patterns `Ok`/`Err`), indentation-based syntax, `func`, receiver methods, `struct` reference objects and `value struct` value types, automatic type inference, simple `var`/readonly `const`, explicit `private`/`internal` and public-by-default, optional properties, method `init()`/`deinit()`, `call()`-callable structs, closures and events, `if`/`else if`/`match`/`is`, `Ok`/`Err`/`result`, `for` iteration and optional index/key, reverse iteration, `while`, `defer` with optional `{ ... }` block, arrays `[]` (growable or fixed-size) and dictionaries `{}`, UTF-8 strings with automatic interpolation, native C libraries through safe bindings, no exposed pointers in ordinary code, and excellent IDE diagnostics. LLVM AOT release builds are planned; LLVM ORC is the leading design for development-mode hot reload of compatible function bodies without restarting. GC is planned as precise, non-moving tracing, initially stop-the-world with thread-local small-object allocation and carefully chosen safepoints. **Compiler/runtime complexity must never be pushed onto ordinary application developers.**
+VOID 2.0 is a proposed, compact, statically typed, garbage-collected, natively compiled language drawing ideas from Python, Go, Lua, PICO-8, GDScript, and useful C# features. It is **not** intended to reproduce C# or become an Odin clone. The developer wants all identifiers in lowercase `snake_case` (with the accepted special patterns `Ok`/`Err`), indentation-based syntax, `func`, receiver methods, `struct` reference objects and `value struct` value types, automatic type inference, simple `var`/readonly `const`, explicit `private`/`internal` and public-by-default, optional properties, method `init()`/`deinit()`, `call()`-callable structs, closures and events, `if`/`else if`/`match`/`is`, `Ok`/`Err`/`result`, `for` for all loops (iteration, Boolean conditions, and unbounded repetition), optional index/key, reverse iteration, `defer` with optional `{ ... }` block, arrays `[]` (growable or fixed-size) and dictionaries `{}`, UTF-8 strings with automatic interpolation, native C libraries through safe bindings, no exposed pointers in ordinary code, and excellent IDE diagnostics. LLVM AOT release builds are planned; LLVM ORC is the leading design for development-mode hot reload of compatible function bodies without restarting. GC is planned as precise, non-moving tracing, initially stop-the-world with thread-local small-object allocation and carefully chosen safepoints. **Compiler/runtime complexity must never be pushed onto ordinary application developers.**
 
 ### 0.2 Not yet implemented
 
@@ -1001,13 +1001,13 @@ for i in 10..<0:    # 10 through 1, excluding 0
 
 Direction follows the endpoint ordering. **OPEN:** Range steps, empty ranges, mixed signedness, non-integral endpoints, and overflow behavior. Plain C-style three-part `for` is intentionally omitted.
 
-## 27. `while`, `break`, `continue`, `return` [AGREED]
+## 27. `for`, `break`, `continue`, `return` [AGREED]
 
-We chose clarity over removing one more keyword: `for` for iteration and `while` for Boolean-controlled repetition.
+VOID uses **one loop keyword: `for`**. The separate `while` loop keyword was removed at the designer's request. Use `for` for Boolean-controlled repetition, iterable/range traversal, and unbounded loops. A `for condition:` condition must be `bool` and is checked before each iteration; `for:` has no condition and repeats until control flow exits it.
 
 ```python
 func update():
-    while player.health > 0:
+    for player.health > 0:
         player.update()
 
         if player.paused:
@@ -1021,10 +1021,28 @@ func stop_if_needed():
         return
 ```
 
+```python
+# Iterate over items or numeric ranges with the same keyword.
+for enemy in enemies:
+    enemy.update()
+
+for i in 0..<10:
+    print(i)
+
+# Unbounded repetition, exited explicitly.
+for:
+    update_world()
+    if should_exit:
+        break
+```
+
+- `for condition:`: repeat as long as a Boolean condition remains true.
+- `for item in iterable:`: iterate a collection or numeric range (see Section 26).
+- `for:`: repeat indefinitely until `break`, `return`, or another exit.
 - `break`: exit the innermost loop.
-- `continue`: begin its next iteration.
+- `continue`: begin the next iteration, rechecking a conditional `for` before entering its body again.
 - `return`: exit a no-result function; `return value` returns results.
-- `while true:` is a simple unlimited loop.
+- `while` is **not** a VOID loop keyword. A `while condition:` statement should produce a clear source diagnostic suggesting `for condition:`.
 
 ### 27.1 Assignment operators and increments
 
@@ -1552,7 +1570,7 @@ func main() -> result<bool, error>:
     var window = sdl.create_window("My Game", 800, 600)?
     defer window.deinit()
 
-    while window.is_open:
+    for window.is_open:
         window.update()
 
     return Ok(true)
@@ -2500,7 +2518,7 @@ The built-in game API is optional. This is intended to feel PICO-8-like without 
 | Patterns | `is`, `match`, `Ok`/`Err`, typed captures, ranges and tagged enums |
 | Match omissions | Statement warns/no-op; expression warns/runtime error if unmatched |
 | Errors | `result<t,e>`, `Ok`, `Err`, propagation `?`, panic distinct from errors |
-| Iteration | `for item`, optional index/key, `reverse`, ranges, `while`, `break`, `continue` |
+| Iteration | Only `for`: iterable/range traversal, Boolean condition, or unbounded `for:`; optional index/key, `reverse`, `break`, `continue` |
 | Operators | `and`/`or`/`not`; arithmetic compound assignments; postfix statement-only `++`/`--` |
 | Generics | `<>`, inference, interface constraints, no arbitrary parameter-count cap |
 | Collections | `[]` growable/fixed arrays, `{}` dictionaries, no compiler-special stack/queue |
@@ -2562,6 +2580,7 @@ To avoid future context drift, here are ideas explicitly changed or clarified:
 - **GC `deinit` behavior:** `deinit` is deterministic resource cleanup via explicit scope mechanisms, not a guaranteed GC finalizer.
 - **File as a scene:** The user preferred retaining the straightforward `scene` struct with callback fields referencing private functions. A special compiler-provided file-scene adapter is not confirmed.
 - **Default floating literal `0.5`:** Accepted as `f32` by default, but type context can request `f64`; don't reject everyday unsuffixed decimal literals.
+- **One loop keyword:** Earlier drafts used `while` for Boolean-controlled repetition. The designer explicitly corrected this: all loops use `for` (`for condition:`, `for item in collection:`, or `for:`). `while` is not a language loop keyword.
 - **Full property sugar or constructor overload forests:** Intentionally avoided pending a concrete need.
 
 ## 68. Compact vocabulary for continuing the project
@@ -2610,7 +2629,7 @@ Developer goals:
 
 Syntax:
   snake_case, func, var, const, struct, value struct,
-  interface, property, if, match, is, for, reverse, while,
+  interface, property, if, match, is, for, reverse,
   result<>, Ok/Err, defer, with, init/deinit,
   [] growable/fixed, {} dictionary, string interpolation,
   event, async func, await, spawn

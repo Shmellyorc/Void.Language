@@ -279,3 +279,74 @@ release CRT/iterator ABI, native C/AOT/debug metadata and JIT execution; verify
 macOS portable thread cleanup and native ORC/AOT execution with the Xcode SDK.
 Linux runner memory, LTO link time and system dependency compatibility also need
 hosted confirmation. No hosted green result is claimed from local tests.
+
+## Windows AOT library discovery: second hosted run
+
+Inspected [run 38099707063](https://github.com/Shmellyorc/Void.Language/actions/runs/38099707063),
+commit `dc158ccc488436eb08044566ecd71cd68bd67b07`, including the actual logs of
+Windows job `114352920880`, Linux job `114352921025` and macOS job `114352921035`.
+
+| Hosted result | Evidence |
+|---|---|
+| Linux Debug / Release / ASan+UBSan | All 6/6 passed in each configuration (0.54 / 0.39 / 1.16 s) |
+| macOS Debug / Release | All 6/6 passed in each configuration (0.85 / 0.78 s) |
+| Windows Debug build | Passed, including DIA resolution and the executable SDK probe |
+| Windows Debug tests | core/JIT/reload/GC/native passed; AOT failed before invoking the native linker |
+| Windows Release | Configure, build and tests skipped after Debug AOT failure |
+
+The Windows test emitted its object, then Clang reported:
+`no such file or directory: 'legacy_stdio_definitions.lib'`. The job's `LIB`
+already contained MSVC `14.44.35207/lib/x64`, UCRT and Windows SDK x64 library
+directories. This was a driver argument error, not evidence of an absent SDK.
+The GNU-style Clang driver validates a bare `.lib` as a local input file before
+native linker library discovery can run.
+
+Changed only the Windows library argument in `tests/integration/aot.cmake` to
+`-llegacy_stdio_definitions`. Clang translates this library request for the MSVC
+target, and the native linker searches the active developer environment. No
+hardcoded SDK paths, copied libraries, dropped dependencies or skipped tests.
+The direct generated-code `printf` call and the executable outputs `7`, `42`,
+`43`, paths containing spaces and object debug checks remain intact. LLVM is
+still exactly 19.1.7. The existing workflow already establishes the MSVC/Windows
+SDK environment; it needs no change for this correction.
+
+### Local verification
+
+- Clang 19.1.7 targeting `x86_64-pc-windows-msvc` reproduced the bare-library
+  diagnostic. With `-### -llegacy_stdio_definitions`, it instead produced a
+  Windows linker invocation containing `legacy_stdio_definitions.lib`, with no
+  input-file error.
+- Compiled two small C sources into real x64 COFF objects, archived one as
+  `sdk_probe.lib`, and linked a PE executable using Clang/LLD 19.1.7 with
+  `-lsdk_probe` and `LIB` pointing to a temporary directory containing spaces.
+  Removing that `LIB` path made linking fail for the required library. This
+  checks library discovery and missing-dependency behavior, not Windows runtime
+  execution. This separate fixture does not replace or modify the AOT proof.
+- Linux Debug against the exact official CI archive: 6/6 suites passed, 0.52 s.
+- Linux Release against the installed LLVM 19.1.7 SDK: 6/6 passed, 0.50 s.
+  Both include actual native AOT linking, debug verification and execution.
+- Whitespace/diff checks passed. The change is an integration script argument;
+  the local compiled sources are unchanged and needed no rebuild.
+
+Driver-check reproduction, using an existing object:
+
+```sh
+clang-19 --target=x86_64-pc-windows-msvc -fuse-ld=lld -### \
+  proof.obj legacy_stdio_definitions.lib
+# Reproduces the local input-file error when no such file exists in this directory.
+clang-19 --target=x86_64-pc-windows-msvc -fuse-ld=lld -### \
+  proof.obj -llegacy_stdio_definitions
+# Forwards the required .lib to the Windows linker instead.
+```
+
+### Remaining hosted verification
+
+A new run after the user commits/pushes must verify Windows Debug AOT discovery
+of the actual MSVC compatibility library, native `printf` resolution, debug
+metadata and all three executable outputs. Windows Release configure/build and
+all six suites must then execute successfully for the first time. Linux/macOS
+should continue passing the full matrix. Local cross-target driver/linker tests
+cannot establish Windows SDK availability or native execution success.
+
+No commits, pushes, hosted reruns or other remote mutations were performed. The
+pre-existing user edit to `docs/LANGUAGE_BIBLE.md` was left untouched.

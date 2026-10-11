@@ -121,3 +121,21 @@ and retain the complete archives and architectural suites.
 
 CI stability precedes frontend expansion. Hosted success must come from a new
 run after the user publishes these local changes; no remote mutation is made.
+
+### Windows native AOT library search, second hosted run
+
+Pass `-llegacy_stdio_definitions` to the SDK's GNU-style Clang driver instead of
+bare `legacy_stdio_definitions.lib`. The latter is an input file that Clang
+requires to exist relative to the working directory; it never reaches native
+linker search. The library request is translated to the MSVC `.lib` name and
+resolved by the native linker using the developer environment's `LIB` paths.
+The failing job already exported the correct x64 MSVC, UCRT and Windows SDK
+paths, so no hardcoded Visual Studio version/path or copied library is needed.
+
+Retain the required library, direct generated-code `printf` interoperability,
+object debug verification and all three executable output assertions. Missing
+libraries still fail the test. LLVM stays pinned to 19.1.7; the workflow already
+initializes the developer environment and does not need a discovery workaround.
+
+References: [Clang 19 linker options](https://releases.llvm.org/19.1.0/tools/clang/docs/ClangCommandLineReference.html#linker-options),
+[Microsoft CRT compatibility library](https://learn.microsoft.com/en-us/cpp/porting/overview-of-potential-upgrade-issues-visual-cpp?view=msvc-170).
