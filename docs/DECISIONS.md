@@ -107,7 +107,9 @@ and retain the complete archives and architectural suites.
 - Linux explicitly uses the archive's LLD 19.1.7 for compiler and AOT links.
   Its LLVM static archive members are bitcode; the default GNU linker rejected
   them. Match `LLVM_ENABLE_RTTI` in the LLVM backend and configure probe, without
-  disabling exceptions or changing the other compiler/runtime targets.
+  disabling exceptions or changing the other compiler/runtime targets. This
+  backend-only RTTI scope was superseded by the 11 October SDK RTTI consistency
+  correction below, after the official-archive sanitizer reproduction.
 - Repair only missing exported `diaguids.lib` paths on imported LLVM targets,
   resolving the actual target-architecture DIA library from the active Visual
   Studio SDK. Preserve this required dependency and fail if it is unavailable.
@@ -317,3 +319,19 @@ and immutable storage. The exact const restart token is unchanged. No automatic
 restart or watcher is added. DIAGNOSTICS.md assigns codes and documents the API,
 limits, recovery and acceptance cases. Next design precise dependency compatibility
 and analysis-result APIs before incremental IDE work or broader language expansion.
+
+## SDK RTTI consistency, 11 October 2026
+
+Run #7 exposed standard-library template ownership and future cleanup crossing
+the backend-only no-RTTI boundary. Match `LLVM_ENABLE_RTTI` across all linked C++
+targets through `void_options`, including the CLI and tests, in every build type.
+Retain exceptions for diagnostics, exact LLVM 19.1.7, sanitizer instrumentation,
+strict report exits and all architectural assertions. C++ RTTI policy is unrelated
+to managed VOID runtime type information.
+
+The official Linux archive's no-RTTI ABI cannot supply Clang vptr coverage. Report
+that limitation at configure time and retain separate RTTI-enabled installed-SDK
+sanitizer validation; do not claim these configurations have identical coverage.
+CI_SANITIZER_ABI.md records the actual logs, archive bitcode, isolated reproduction
+and coverage evidence. Any hosted vptr lane needs a complete RTTI-enabled 19.1.7
+SDK. No frontend changes belong in this CI correction.

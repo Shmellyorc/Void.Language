@@ -1,5 +1,68 @@
 # Work log
 
+## Phase 5 run #7 sanitizer ABI correction, 11 October 2026
+
+Inspected the actual Ubuntu job `114414960372` in run `38120807013`, at commit
+`384307dcdb65b476de587c4681e047b9f7dc3acc`, also the local unchanged baseline.
+Windows/macOS and Ubuntu Debug/Release passed according to the user and job log;
+Ubuntu sanitizers failed eight of ten suites with invalid-vptr reports in ORC
+promise/future cleanup and shared code ownership cleanup.
+
+Before editing, configured, built and ran the complete official Linux 19.1.7
+archive with its own matching Clang/LLD and CI's RelWithDebInfo/ASan/UBSan settings.
+The unchanged full suite reproduced the same eight failures: **2/10 passed in
+2.42 seconds**. The host uses GCC 16 libstdc++ headers; CI uses GCC 14. Prior local
+sanitizer validation used the installed RTTI-enabled SDK, whereas the official
+archive has RTTI disabled. Earlier official-archive Debug validation did not
+exercise this sanitizer/RTTI combination.
+
+The archive's actual `LLJIT.cpp.o` bitcode contains a promise-result vtable with
+null RTTI metadata. A separate two-file shared_ptr factory/consumer reproducer
+fails cleanup with exit 86 when only the factory disables RTTI; consistent RTTI
+passes with leak detection. Inspecting the emitted factory vtable confirms the
+same absent metadata without relying on a corrupt allocation. CI_SANITIZER_ABI.md
+records the mechanism, actual log link, commands and precise coverage limits.
+
+Moved SDK RTTI selection from the backend-only target to shared C++ build options
+for all linked targets, in every build type. The SDK configure probe uses the same
+flag. The configure output discloses the no-RTTI ABI's unavailable vptr check.
+LLVM 19.1.7, complete SDKs, dependencies, exceptions, sanitizer flags, strict
+failure settings, entry function-type metadata and all ten tests are preserved.
+No frontend, runtime implementation, IR lowering, test assertion or workflow
+was changed. Separate installed-SDK validation retains RTTI/vptr coverage; no
+equivalence of vptr coverage with the no-RTTI archive is claimed.
+
+Completed local verification:
+
+| SDK / configuration | Result | Full-suite elapsed |
+|---|---|---|
+| Installed 19.1.7, RTTI ON, Debug | 10/10 | 27.68 s |
+| Installed 19.1.7, RTTI ON, Release | 10/10 | 25.35 s |
+| Installed 19.1.7, RTTI ON, strict ASan/UBSan | 10/10 | 25.15 s |
+| Complete official archive, RTTI OFF, Debug | 10/10 | 10.78 s |
+| Complete official archive, RTTI OFF, Release | 10/10 | 9.01 s |
+| Complete official archive, RTTI OFF, strict ASan/UBSan | 10/10 | 29.51 s |
+| Complete official archive, strict sanitizer repeat, all suites three times | 30/30 executions | 89.26 s |
+
+All 14 C++ translation units in each sanitizer configuration were checked against
+their SDK RTTI setting; every C/C++ source command retains ASan/UBSan. The installed
+CLI object retains dynamic-type/vptr handlers and the archive-based runtime object
+retains indirect-function-type handlers. Seven deliberate fault controls verified
+fatal ASan heap overflow, UBSan signed overflow and incorrect function calls in
+both modes, plus an invalid downcast with RTTI. Combined runtime options yield
+exit 86 for these controls, including the address report; this remains distinct
+from expected source-error exit 1. Sanitizers ran outside the tracing sandbox
+with leak detection enabled. Build/test/reproducer/control evidence is retained
+under ignored `build/ci7-verification/`.
+
+All six configurations completed actual builds and the full ten-suite execution.
+The complete-archive builds were serial and produced no new linker backtrace;
+positive build/test logs contain no ASan/UBSan/LeakSanitizer report. The existing
+third-party `<ciso646>` deprecation warning remains visible where emitted.
+A new hosted run is still required for Ubuntu 24.04/GCC 14 and the changed shared
+C++ flags on Windows/macOS. A hosted vptr lane would require a complete
+RTTI-enabled LLVM 19.1.7 SDK. No commit, push or remote modification was performed.
+
 ## Compiler foundation and architectural proofs, 10 October 2026
 
 ### Inputs and scope

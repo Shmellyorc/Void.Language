@@ -30,6 +30,29 @@ if(VOID_LINKER)
 endif()
 option(VOID_SANITIZERS "Instrument compiler/runtime with ASan and UBSan" OFF)
 add_library(void_options INTERFACE)
+# C++ standard-library template objects cross the LLVM/backend/runtime boundary.
+# A backend-only -fno-rtti produces control-block vtables without typeinfo while
+# RTTI-enabled callers (including UBSan) expect it. ORC also instantiates futures
+# in the SDK itself. Match the SDK throughout the linked C++ program, not just
+# where LLVM headers are included. Keep exception handling enabled for diagnostics.
+if(MSVC)
+  if(LLVM_ENABLE_RTTI)
+    set(VOID_LLVM_RTTI_FLAG /GR)
+  else()
+    set(VOID_LLVM_RTTI_FLAG /GR-)
+  endif()
+else()
+  if(LLVM_ENABLE_RTTI)
+    set(VOID_LLVM_RTTI_FLAG -frtti)
+  else()
+    set(VOID_LLVM_RTTI_FLAG -fno-rtti)
+  endif()
+endif()
+target_compile_options(void_options INTERFACE "$<$<COMPILE_LANGUAGE:CXX>:${VOID_LLVM_RTTI_FLAG}>")
+message(STATUS "VOID C++ RTTI: ${LLVM_ENABLE_RTTI} (matches LLVM SDK across all targets)")
+if(VOID_SANITIZERS AND NOT LLVM_ENABLE_RTTI)
+  message(STATUS "ASan/UBSan enabled; vptr checking requires an RTTI-enabled LLVM SDK and is unavailable in this ABI")
+endif()
 if(VOID_LINKER)
   target_link_options(void_options INTERFACE "--ld-path=${VOID_LINKER}")
 endif()
@@ -79,16 +102,6 @@ if(VOID_SANITIZERS AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT MSVC)
     target_compile_definitions(void_llvm PRIVATE
       "VOID_${entry_kind}_SANITIZER_MAGIC=${CMAKE_MATCH_1}" "VOID_${entry_kind}_SANITIZER_HASH=${CMAKE_MATCH_2}")
   endforeach()
-endif()
-# Match the SDK's RTTI ABI only in the translation unit using LLVM headers.
-# Exception support remains enabled for VOID diagnostics and cleanup.
-if(NOT LLVM_ENABLE_RTTI)
-  if(MSVC)
-    set(VOID_LLVM_RTTI_FLAG /GR-)
-  else()
-    set(VOID_LLVM_RTTI_FLAG -fno-rtti)
-  endif()
-  target_compile_options(void_llvm PRIVATE ${VOID_LLVM_RTTI_FLAG})
 endif()
 llvm_map_components_to_libnames(VOID_LLVM_LIBS Core Support native OrcJIT Passes Target MC CodeGen)
 # Validate the selected SDK by linking and executing a real ORC host before

@@ -39,6 +39,12 @@ For optimized and instrumented builds, use separate directories with
 LeakSanitizer requires a host that permits process inspection; the Codex sandbox
 on the verified host required running sanitizer tests outside its tracing restriction.
 
+CMake matches the selected SDK's RTTI setting across all linked C++ targets.
+The complete official Linux archive has RTTI disabled; ASan/UBSan remain enabled,
+but Clang's RTTI-dependent vptr check is unavailable in that ABI. A complete
+RTTI-enabled LLVM 19.1.7 SDK supplies the separate vptr validation configuration.
+See [the CI sanitizer investigation and coverage limits](docs/CI_SANITIZER_ABI.md).
+
 ## Compile and execute real source
 
 ```sh

@@ -1,6 +1,6 @@
 # Known issues and deferred work
 
-Updated 11 October 2026, Phase 5 structured diagnostics and recovery.
+Updated 11 October 2026, Phase 5 diagnostics and SDK RTTI compatibility.
 
 ## Platform verification
 
@@ -8,10 +8,12 @@ Updated 11 October 2026, Phase 5 structured diagnostics and recovery.
   passed all three hosted platforms, including Debug/Release and Linux sanitizers. Earlier failed-run descriptions
   in WORK_LOG.md are historical evidence.
 - The user reports Phase 4 commit `d78b6b8`, Actions run #6, passed all three
-  platforms. Phase 5 has local Linux verification with exact LLVM 19.1.7.
-  Windows/macOS execution of this expanded ten-suite Debug/Release matrix still
-  requires a hosted run after the user commits and pushes. Linux hosted
-  ASan/UBSan also needs that run. See WORK_LOG.md for final local evidence.
+  platforms. Phase 5 run #7 passed Windows/macOS and Ubuntu Debug/Release 10/10,
+  but Ubuntu sanitizers failed eight suites. The actual job logs and unchanged
+  local official-archive build reproduce mixed RTTI metadata in C++ template
+  ownership/future cleanup. The local correction matches SDK RTTI throughout
+  the linked program; a new hosted run is required. See CI_SANITIZER_ABI.md and
+  WORK_LOG.md for evidence and validation.
 - CI retains complete official LLVM 19.1.7 archives, Linux LLD and required
   development dependencies, Windows SDK/DIA discovery and native printf support,
   and the portable thread implementation. All new suites run automatically in
@@ -118,6 +120,12 @@ Updated 11 October 2026, Phase 5 structured diagnostics and recovery.
 
 ## Toolchain observations
 
+- The official Linux LLVM 19.1.7 archive has RTTI disabled, whereas the installed
+  SDK used for earlier local sanitizer tests enables RTTI. Clang vptr checking
+  cannot run in the archive's no-RTTI ABI. ASan, supported UBSan checks, leak
+  detection and all ten suites remain enabled. The separate RTTI-enabled installed
+  SDK retains local vptr coverage; hosted vptr coverage would need a complete
+  RTTI-enabled 19.1.7 SDK. CMake reports the selected ABI and coverage limit.
 - LLVM 19 headers include `<ciso646>`, and this host's GCC 16 standard-library
   header emits a C++20 deprecation warning. It originates in third-party headers;
   project warnings are not globally suppressed to hide it.
@@ -135,7 +143,7 @@ Updated 11 October 2026, Phase 5 structured diagnostics and recovery.
 
 ## Current phase and subsequent work
 
-Run the expanded ten-suite hosted matrix after the user publishes these local
+Run the corrected ten-suite hosted matrix after the user publishes these local
 changes. See VALUE_SEMANTICS.md for implemented constants, numeric semantics,
 runtime diagnostics and explicit limitations. Next refine validated source/dependency compatibility and analysis-result APIs; approve contextual literal/conversion
 details before numeric type expansion. Preserve the shared semantic model and
