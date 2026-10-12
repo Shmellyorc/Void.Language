@@ -12,6 +12,18 @@ async function until<T>(read: () => T | PromiseLike<T>, valid: (value:T) => bool
 function code(d: vscode.Diagnostic): unknown { return typeof d.code === 'object' ? d.code.value : d.code; }
 export async function run(): Promise<void> {
     const root = process.env.VOID_TEST_ROOT!;
+    // Real editor URI conversion normalizes only the Windows drive here; it
+    // must not erase differences in directories, basenames or other drives.
+    const driveUri = (drive:string, folder='CaseSensitive é😀', file='worker space.void') =>
+        vscode.Uri.from({scheme:'file', path:`/${drive}:/${folder}/${file}`});
+    assert.equal(driveUri('C').fsPath, driveUri('c').fsPath);
+    assert.notEqual(driveUri('C').fsPath, driveUri('D').fsPath);
+    assert.notEqual(driveUri('C').fsPath, driveUri('C', 'casesensitive é😀').fsPath);
+    assert.notEqual(driveUri('C').fsPath, driveUri('C', undefined, 'other.void').fsPath);
+    // runHost supplies the actual filesystem-canonical fixture root. Native
+    // status paths use that root; editor URI.fsPath may spell its drive differently.
+    const workerEntry = path.join(root, 'worker space.void');
+    const mainEntry = path.join(root, 'main.void');
     const log = path.resolve(__dirname, '../../../../build/phase11-verification/host-details.log');
     await fs.mkdir(path.dirname(log), {recursive:true});
     const record = (message:string) => { console.log(message); appendFileSync(log, message + '\n'); };
@@ -166,12 +178,20 @@ export async function run(): Promise<void> {
         await vscode.commands.executeCommand('void.restartLanguageServer'); assert.equal(api!.status().state, 'running');
         // No entry discovery: fallback is fixed until explicitly restarted.
         await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(workerUri));
+        const mainDocument = await vscode.workspace.openTextDocument(mainUri);
+        await vscode.languages.setTextDocumentLanguage(mainDocument, 'plaintext');
+        assert.equal(vscode.workspace.textDocuments.filter(d => d.languageId === 'void').length, 1);
+        const outsideWarnings = () => messages.filter(m => m.includes('outside the selected project')).length;
+        const beforeFallbackWarnings = outsideWarnings();
+        assert.equal(beforeFallbackWarnings, 0, 'Warning deduplication must not mask the selected-file check');
         await config.update('project.entry', '', vscode.ConfigurationTarget.Workspace);
-        await api!.ready(); assert.equal(api!.status().entry, workerUri.fsPath);
+        await api!.ready(); assert.equal(api!.status().entry, workerEntry);
+        assert.equal(outsideWarnings(), beforeFallbackWarnings, 'The selected fallback file must not warn about itself');
+        await vscode.languages.setTextDocumentLanguage(mainDocument, 'void');
         await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(mainUri));
-        await api!.ready(); assert.equal(api!.status().entry, workerUri.fsPath);
+        await api!.ready(); assert.equal(api!.status().entry, workerEntry);
         await vscode.commands.executeCommand('void.restartLanguageServer');
-        assert.equal(api!.status().entry, mainUri.fsPath);
+        assert.equal(api!.status().entry, mainEntry);
         await config.update('project.entry', 'main.void', vscode.ConfigurationTarget.Workspace); await api!.ready();
         // Calling the actual extension deactivation hook tests clean child shutdown.
         await api?.deactivate();

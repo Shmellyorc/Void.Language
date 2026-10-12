@@ -2185,3 +2185,80 @@ Linux/Xvfb, Windows and macOS runners. Exact Windows pipe behavior remains unava
 locally. This review changes WORK_LOG.md only; the existing lifecycle correction,
 all strict tests, native code, LLVM settings and workflow are left intact. No
 commits, pushes, branches or remote modifications were performed.
+
+
+## Phase 11 run #15 Windows entry-path correction (2026-10-11 local)
+
+### Actual hosted evidence
+
+Read [run #15](https://github.com/Shmellyorc/Void.Language/actions/runs/38209988399)
+and [Windows job 114681780204](https://github.com/Shmellyorc/Void.Language/actions/runs/38209988399/job/114681780204)
+through the read-only GitHub API. Commit is
+`6142383e584d5803ea9a20f1de60b3b69204ef5b`. Native Debug/Release each passed 21/21
+and extension unit tests passed 4/4. Both real native process-kill scenarios
+produced the expected termination notifications (05:58:04.007 and .240 UTC),
+confirming progress past the previous termination timeout on Windows.
+
+The new failure at out/test/host.js:256 is exact string inequality in the fallback
+entry assertion: actual `C:\Users\runneradmin\...\worker space.void`, expected
+`c:\Users\runneradmin\...\worker space.void`. Every other character, including
+Unicode root, spaces, escaped punctuation and filename, matches. The native child
+was launched successfully with the canonical worker entry and published worker
+file diagnostics immediately before this assertion. Evidence is retained in
+ignored build/phase11-verification/run15-windows-excerpt.log.
+
+### Contract and minimal correction
+
+This assertion compared two representations of the same entry. The existing
+resolveProject contract uses the filesystem-canonical parent (fs.realpath) joined
+with the selected basename, retaining a native filesystem path for --entry and
+status. VS Code Uri.fsPath lowercases a Windows drive letter. The test fixture
+already supplies its filesystem-canonical root independently via VOID_TEST_ROOT;
+assertions now compare status against exact path.join(root, 'worker space.void')
+and path.join(root, 'main.void'). They still require the precise expected root and
+filename, fixed fallback after switching tabs, and new entry after explicit restart.
+No generic case-insensitive comparator or whole-path lowercasing was introduced.
+No native entry selection, project root, resolver or compiler identity is changed.
+
+Inspection also found a real editor-facing warning defect adjacent to the assertion:
+the single-file exclusion check compared doc.uri.fsPath directly against native
+project.entry. On Windows it could falsely warn that the selected file itself was
+outside its session because of C:/c: spelling. That one comparison now converts
+the native entry through vscode.Uri.file(entry).fsPath before comparing editor
+paths. This uses the established editor representation without folding directory
+or basename case, changing filesystem identity rules or widening project scope.
+The native entry/status representation remains unchanged.
+
+Added real-editor API checks, portable across hosts, proving upper/lower Windows
+drive URI spellings yield the same fsPath while different drives, directory case
+and filenames remain distinct. The real fallback scenario temporarily closes the
+main VOID document via language reassignment, leaving only the selected worker
+VOID document. Selecting fallback must add no outside-project warning. Reopening
+main as VOID restores the existing tab-switch/restart checks. These additions keep
+actual source, Unicode/space paths, native children, strict notification counts,
+clean deactivation and every previous compiler/lifecycle assertion intact. They
+are actual URI API tests, not a claim of running Windows filesystem APIs on Linux.
+
+### Local verification and pending hosted results
+
+- `npm test`: strict type-check/build and all 4 unit tests passed.
+- Real installed VS Code 1.141.0 against the LLVM 19.1.7-built native voidls:
+  trusted, restricted and multi-root profiles passed, including URI checks,
+  selected-file warning regression, both process kills, exact notifications,
+  fallback selection, explicit restart and final child cleanup.
+- Debug CTest rerun: 21/21 passed, 34.40 seconds. Native C++/tests, sanitizer
+  configuration and LLVM/Clang/LLD 19.1.7 were not modified. The preceding local
+  Release/sanitizer validation remains applicable to those unchanged sources.
+- `npm run package`: succeeded, eight-file VSIX, 145.41 KB. ZIP audit confirms
+  the shipped JavaScript equals the tested build; source/package hashes are in
+  build/phase11-verification/run15-audit.json. Informational bundle-size warning
+  remains visible. git diff whitespace check passed.
+
+Local evidence is in build/phase11-verification/run15-{unit,editor,native-debug,package}.log.
+At the latest run #15 job review, macOS job 114681780024 was still building Release;
+Linux job 114681780334 was configuring Release. Neither completed result was yet
+available, so neither platform is claimed green for run #15. Windows is unavailable
+locally; the drive URI behavior is exercised through actual VS Code APIs, while the
+full native Windows fallback/warning sequence requires the next hosted run. The
+correction is ready for that attempt. No workflow/dependency/compiler/runtime
+changes, commits, branches, pushes or remote modifications were performed.
