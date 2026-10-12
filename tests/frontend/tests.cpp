@@ -121,5 +121,14 @@ void struct_tests(const std::filesystem::path& root);
 void value_tests(const std::filesystem::path& root);
 #include "diagnostics.hpp"
 void frontend_tests(const std::filesystem::path& root) {
-    diagnostics(); programs(root); value_tests(root); diagnostic_acceptance::run(root); struct_tests(root);
+    auto group = [](const char* name, auto run) {
+        std::cerr << "Frontend begin: " << name << std::endl;
+        run();
+        std::cerr << "Frontend passed: " << name << std::endl;
+    };
+    group("diagnostics", [] { diagnostics(); });
+    group("programs", [&] { programs(root); });
+    group("numeric values", [&] { value_tests(root); });
+    group("diagnostic recovery/resource limits", [&] { diagnostic_acceptance::run(root); });
+    group("value structs", [&] { struct_tests(root); });
 }

@@ -1,5 +1,102 @@
 # Work log
 
+## Phase 12 run #17 Windows frontend crash correction, 12 October 2026
+
+Read the actual [Windows job 114735091143](https://github.com/Shmellyorc/Void.Language/actions/runs/38226468142/job/114735091143)
+at `f9d9f3bf68828c9e46671e157cb165fa46407651` and downloaded its
+`tests-Windows-X64` artifact, ID `11736648542` (ZIP SHA256
+`d472dfed34e714cc50b46adcde408cb0fcdc5f62a96a79a79be39f58af7eaae5`).
+Windows Server 2022 used Clang/clang-cl 19.1.7, the official SDK and matching
+RTTI OFF. Debug passed 21/22, including `value_structs_cli`; `frontend` ended
+with CTest's generic SegFault classification after 0.86 seconds. Its archived
+LastTest.log has **empty frontend output**. The artifact contains only that
+test log and CMakeConfigureLog.yaml: no executable, exception code or crash dump.
+Consequently that artifact alone cannot establish the failing subgroup or
+distinguish Windows stack overflow from an access violation.
+
+Before changing production code, the unchanged local Debug frontend reproduced
+SIGSEGV (exit 139) with a 1 MiB process stack. GDB located it at entry to
+`Semantics::expression_impl`, compiler.cpp:772 in that commit, recursively
+called from the unary handler at line 879. The originating test is
+`diagnostic_acceptance::run`, tests/frontend/diagnostics.hpp:141: nine constants,
+each with forty unary operators, referencing the next constant. It expects
+the combined semantic depth guard and an independent later-function diagnostic.
+It is reached **before** `struct_tests`; the new bounded recursive/expanded
+value-layout case therefore does not cause this reproduced crash.
+
+Disassembly of the unmodified Clang 19 Debug object shows an 8,416-byte
+`expression_impl` stack allocation (`sub rsp, 0x20e0`). Phase 12's construction,
+field and expanded Type handling enlarged this single function's collection of
+temporaries. Every recursive unary step reserved that whole frame, exhausting
+the stack before the existing 256-level guard. This is a production resource
+safety defect, not a reason to remove a depth test. The debugger's unreadable
+arguments at the fault are at the exhausted function prologue, not evidence
+that a null Semantics object was deliberately called.
+
+Extracted literal, name, field, call, conversion, unary and binary checking into
+small member handlers behind the same dispatcher, semantic model and guard.
+No typing/evaluation order/diagnostic logic changed; a comparison against HEAD
+confirmed all six extracted branch bodies match apart from whitespace and local
+type aliases. The dispatch frame now reserves 288 bytes; the unary handler
+reserves 496 bytes. The formerly crashing complete frontend suite now passes
+on a 1 MiB stack with **both** installed and official SDK Debug builds, including
+the combined-depth check and bounded expanded-layout check. No stack reserve,
+resource limit, LLVM version, RTTI policy, sanitizer flag or assertion changed.
+
+Added flushed stderr begin/pass records for each frontend group and markers for
+the combined-depth and expanded-layout cases. Future Windows artifacts will
+identify the last active group/case even on abrupt termination. Linux CI now
+also repeats its existing Debug frontend suite under `ulimit -s 1024`; all 22
+normal suites and platform jobs remain intact.
+
+Verification (all builds completed without warnings):
+
+| LLVM 19.1.7 SDK | Debug | Release | RelWithDebInfo ASan/UBSan |
+| --- | --- | --- | --- |
+| Installed `/usr/lib/llvm-19`, RTTI ON | 22/22, 24.74s | 22/22, 28.33s | 22/22, 40.72s |
+| Complete official Linux archive, RTTI OFF | 22/22, 17.19s | 22/22, 24.64s | 22/22, 34.82s |
+
+These are 132 suite executions, covering native/JIT/AOT normal and optimized
+paths, value structs, GC/reload, diagnostics, shared analysis/tooling and LSP.
+Both SDKs retain their headers, `libLLVMOrcJIT.a` and `LLVMConfig.cmake`;
+llvm-config reports 19.1.7. Fresh configure runs linked and executed the real
+ORC probe successfully against both. Installed-SDK sanitizers retain RTTI/vptr
+coverage; the official no-RTTI SDK preserves the previously documented ABI
+correction and coverage boundary.
+
+Commands (from repository root; each tree was rebuilt with `-j 2`):
+
+```sh
+cmake --build build/ci-debug -j 2
+ctest --test-dir build/ci-debug --output-on-failure -j 4
+# Repeat for ci-release, ci-official-debug and ci-official-release.
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+    UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+    ctest --test-dir build/ci-sanitizers --output-on-failure -j 4
+# Same strict environment for ci-official-san, outside the tracing sandbox.
+bash -c 'ulimit -s 1024; ctest --test-dir build/ci-debug -R "^frontend$" -V'
+bash -c 'ulimit -s 1024; ctest --test-dir build/ci-official-debug -R "^frontend$" -V'
+cmake -S . -B build/ci-debug
+cmake -S . -B build/ci-official-debug
+git diff --check
+```
+
+The pre-fix reproduction used `ulimit -s 1024` followed by
+`gdb -batch -ex run -ex bt --args build/ci-debug/void_tests frontend "$PWD"`.
+Artifacts, original Windows job log/ZIP, full pre-fix backtrace, fresh configure
+logs, six build/test logs, SDK checks and verbose small-stack results are saved
+under `build/phase12-windows-investigation/` (ignored local evidence).
+
+Windows attribution is strongly supported by the matching small-stack failure,
+Debug-specific oversized frame and successful correction, but **is not a
+Windows-native backtrace or verified Windows success**. This machine lacks the
+Windows SDK/MSVC libraries and the Windows executable was not uploaded. Linux
+small-stack execution does not reproduce the MSVC standard-library ABI. Another
+hosted run must confirm Windows Debug/Release 22/22 and the remaining matrix
+and editor steps. The added progress output will localize any remaining failure.
+Ready for the owner's next CI attempt; no commits, branches, pushes or remote
+modifications were made. The owner's untracked WRENCH_CLANKER.md was preserved.
+
 ## Phase 5 run #7 sanitizer ABI correction, 11 October 2026
 
 Inspected the actual Ubuntu job `114414960372` in run `38120807013`, at commit

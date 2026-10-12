@@ -131,6 +131,7 @@ void run(const std::filesystem::path& root) {
         write(source, "func f() -> i32:\n    return " + expression + "\nfunc later():\n    unknown()\n");
         auto nesting = errors(source); check(has(nesting, Code::nesting) && has(nesting, Code::unknown_function), "bounded expression recursion");
     }
+    std::cerr << "Frontend resource case: combined expression/constant depth" << std::endl;
     std::string dependencies;
     for (int i = 0; i < 9; ++i) {
         dependencies += "const chain_" + std::to_string(i) + " = ";

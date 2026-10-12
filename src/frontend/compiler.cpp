@@ -769,119 +769,136 @@ class Semantics {
         invalid_function = true;
         return e.type = error_type;
     }
+    // Keep the recursive dispatch frame small: reserving every handler's
+    // temporaries here exhausts a 1 MiB Debug stack before the depth guard.
     Type expression_impl(Expr& e, std::optional<Type> expected) {
+        switch (e.kind) {
+        case Expr::Kind::literal: return literal_expression(e, expected);
+        case Expr::Kind::name: return name_expression(e);
+        case Expr::Kind::field: return field_expression(e, expected);
+        case Expr::Kind::call: return call_expression(e);
+        case Expr::Kind::conversion: return conversion_expression(e);
+        case Expr::Kind::unary: return unary_expression(e, expected);
+        default: return binary_expression(e, expected);
+        }
+    }
+    Type literal_expression(Expr& e, std::optional<Type> expected) {
+        if (e.literal_text.empty()) return e.type;
+        Type target = anchor(e).value_or(expected && numeric::number(*expected) && (!decimal(e) || numeric::floating(*expected)) ? *expected : decimal(e) ? Type::f32 : Type::i32);
+        try { e.value = numeric::literal(e.literal_text,target); }
+        catch (const std::invalid_argument& failure) { error(source,e.token,numeric::floating(target) ? Code::numeric_representability : Code::integer_range,failure.what()); }
+        return e.type = target;
+    }
+    Type name_expression(Expr& e) {
         using K = Expr::Kind;
-        if (e.kind == K::literal) {
-            if (e.literal_text.empty()) return e.type;
-            Type target = anchor(e).value_or(expected && numeric::number(*expected) && (!decimal(e) || numeric::floating(*expected)) ? *expected : decimal(e) ? Type::f32 : Type::i32);
-            try { e.value = numeric::literal(e.literal_text,target); }
-            catch (const std::invalid_argument& failure) { error(source,e.token,numeric::floating(target) ? Code::numeric_representability : Code::integer_range,failure.what()); }
-            return e.type = target;
+        auto* v = e.qualifier.empty() ? lookup(e.token.text) : nullptr;
+        if (!v) {
+            auto [owner, c] = constant(e);
+            if (c) {
+                evaluate(*owner, *c); e.target = owner->identity + "::" + c->declaration.name; e.kind = K::literal; e.value = c->value;
+                e.aggregate_value = c->aggregate_value;
+                return e.type = c->type;
+            }
         }
-        if (e.kind == K::name) {
-            auto* v = e.qualifier.empty() ? lookup(e.token.text) : nullptr;
-            if (!v) {
-                auto [owner, c] = constant(e);
-                if (c) {
-                    evaluate(*owner, *c); e.target = owner->identity + "::" + c->declaration.name; e.kind = K::literal; e.value = c->value;
-                    e.aggregate_value = c->aggregate_value;
-                    return e.type = c->type;
-                }
-            }
-            if (!v && unit.failed_import) throw Poison{};
-            if (!v) error(source, e.token, Code::unknown_identifier, "Unknown identifier '" + e.token.text + "'.", "Declare it with var before use.");
-            e.slot = v->slot; return e.type = v->type;
+        if (!v && unit.failed_import) throw Poison{};
+        if (!v) error(source, e.token, Code::unknown_identifier, "Unknown identifier '" + e.token.text + "'.", "Declare it with var before use.");
+        e.slot = v->slot; return e.type = v->type;
+    }
+    Type field_expression(Expr& e, std::optional<Type> expected) {
+        using K = Expr::Kind;
+        auto& base = *e.parts[0];
+        if (base.kind == K::name && !lookup(base.token.text) && unit.qualifiers.contains(base.token.text)) {
+            e.qualifier = base.token.text; e.qualifier_token = base.token; e.kind = K::name; e.parts.clear();
+            return expression_impl(e,expected);
         }
-        if (e.kind == K::field) {
-            auto& base = *e.parts[0];
-            if (base.kind == K::name && !lookup(base.token.text) && unit.qualifiers.contains(base.token.text)) {
-                e.qualifier = base.token.text; e.qualifier_token = base.token; e.kind = K::name; e.parts.clear();
-                return expression_impl(e,expected);
-            }
-            auto t = expression(base);
-            if (t == error_type) return error_type;
-            if (t.kind != Type::aggregate) error(source,e.token,Code::type_mismatch,"Field access requires a value struct.");
-            for (unsigned n = 0; n < t.definition->fields.size(); ++n) if (t.definition->fields[n].name == e.token.text) {
-                e.slot = n; e.target = t.definition->identity + "::field::" + e.token.text; return e.type = t.definition->fields[n].type;
-            }
-            error(source,e.token,Code::unknown_identifier,"Unknown field '" + e.token.text + "' in " + ir::type_name(t) + ".");
+        auto t = expression(base);
+        if (t == error_type) return error_type;
+        if (t.kind != Type::aggregate) error(source,e.token,Code::type_mismatch,"Field access requires a value struct.");
+        for (unsigned n = 0; n < t.definition->fields.size(); ++n) if (t.definition->fields[n].name == e.token.text) {
+            e.slot = n; e.target = t.definition->identity + "::field::" + e.token.text; return e.type = t.definition->fields[n].type;
         }
-        if (e.kind == K::call) {
-            auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
-            if (structure && !(e.qualifier.empty() && lookup(e.token.text))) {
-                defaults(*owner,*structure);
-                e.kind = K::construction; e.type = Type(structure->definition); e.target = structure->definition->identity;
-                e.aggregate_value = structure->defaults;
-                std::set<unsigned> initialized;
-                for (unsigned n = 0; n < e.parts.size(); ++n) {
-                    if (e.names[n].text.empty()) error(source,e.parts[n]->token,Code::argument_count,"Value construction requires named fields.","Use field = expression; positional constructors are not implemented yet.");
-                    auto& fields = structure->definition->fields;
-                    auto field = std::find_if(fields.begin(),fields.end(),[&](const auto& f) { return f.name == e.names[n].text; });
-                    if (field == fields.end()) error(source,e.names[n],Code::unknown_identifier,"Unknown constructor field '" + e.names[n].text + "'.");
-                    auto index = static_cast<unsigned>(field-fields.begin());
-                    if (!initialized.insert(index).second) error(source,e.names[n],Code::duplicate,"Duplicate initializer for field '" + field->name + "'.");
-                    e.field_indexes.push_back(index);
-                    expect(expression(*e.parts[n],field->type),field->type,e.parts[n]->token);
-                }
-                return e.type;
+        error(source,e.token,Code::unknown_identifier,"Unknown field '" + e.token.text + "' in " + ir::type_name(t) + ".");
+    }
+    Type call_expression(Expr& e) {
+        using K = Expr::Kind;
+        auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
+        if (structure && !(e.qualifier.empty() && lookup(e.token.text))) {
+            defaults(*owner,*structure);
+            e.kind = K::construction; e.type = Type(structure->definition); e.target = structure->definition->identity;
+            e.aggregate_value = structure->defaults;
+            std::set<unsigned> initialized;
+            for (unsigned n = 0; n < e.parts.size(); ++n) {
+                if (e.names[n].text.empty()) error(source,e.parts[n]->token,Code::argument_count,"Value construction requires named fields.","Use field = expression; positional constructors are not implemented yet.");
+                auto& fields = structure->definition->fields;
+                auto field = std::find_if(fields.begin(),fields.end(),[&](const auto& f) { return f.name == e.names[n].text; });
+                if (field == fields.end()) error(source,e.names[n],Code::unknown_identifier,"Unknown constructor field '" + e.names[n].text + "'.");
+                auto index = static_cast<unsigned>(field-fields.begin());
+                if (!initialized.insert(index).second) error(source,e.names[n],Code::duplicate,"Duplicate initializer for field '" + field->name + "'.");
+                e.field_indexes.push_back(index);
+                expect(expression(*e.parts[n],field->type),field->type,e.parts[n]->token);
             }
-            if (std::any_of(e.names.begin(),e.names.end(),[](const auto& t) { return !t.text.empty(); })) error(source,e.token,Code::argument_count,"Named arguments are currently supported only for value construction.");
-            if (!current) error(source, e.token, Code::constant_call, "A compile-time constant cannot call a function.", "Use a local const for runtime values.");
-            if (auto* value = e.qualifier.empty() ? lookup(e.token.text) : nullptr) {
-                if (value->type == error_type) throw Poison{};
-                error(source, e.token, Code::not_callable, "A local value is not callable.");
-            }
-            const auto& target = [&]() -> const Function& {
-                auto check_arguments = [&] { for (auto& argument : e.parts) expression(*argument); };
-                try { return resolve(e); }
-                catch (const CompilationError&) { check_arguments(); throw; }
-                catch (const Poison&) { check_arguments(); throw; }
-            }();
-            e.target = target.symbol;
-            std::vector<Type> arguments;
-            for (std::size_t i=0; i<e.parts.size(); ++i) arguments.push_back(expression(*e.parts[i], i<target.parameters.size() ? std::optional<Type>(target.parameters[i].type) : std::nullopt));
-            if (e.parts.size() != target.parameters.size()) error(source, e.token, Code::argument_count, "Incorrect argument count for '" + e.token.text + "': expected " + std::to_string(target.parameters.size()) + ", received " + std::to_string(e.parts.size()) + ".");
-            bool invalid = false;
-            for (std::size_t i = 0; i < e.parts.size(); ++i) {
-                try { expect(arguments[i], target.parameters[i].type, e.parts[i]->token); }
-                catch (const CompilationError& failure) { diagnostics.add(failure); invalid = true; }
-                invalid |= arguments[i] == error_type;
-            }
-            return e.type = invalid ? error_type : target.result;
+            return e.type;
         }
-        if (e.kind == K::conversion) {
-            Type target = e.type = resolve_type(e.type,unit,root,units,e.token);
-            auto& operand = *e.parts[0];
-            if (operand.kind == K::literal && !operand.literal_text.empty() && !anchor(operand)) {
-                if (!numeric::number(target)) error(source,e.token,Code::numeric_conversion,"Numeric as requires numeric source and destination types.");
-                if (!decimal(operand) || numeric::floating(target)) {
-                    try { operand.value = numeric::literal(operand.literal_text,target,true); }
-                    catch (const std::invalid_argument& failure) {
-                        // A checked operation in an unevaluated constant branch must
-                        // remain typed, without executing its range check eagerly.
-                        if ((!current || suppress_zero) && numeric::integer(target)) {
-                            for (auto candidate : {Type::i32,Type::i64,Type::u64}) {
-                                try { operand.value = numeric::literal(operand.literal_text,candidate); operand.type = candidate; operand.literal_text.clear(); return target; }
-                                catch (const std::invalid_argument&) {}
-                            }
+        if (std::any_of(e.names.begin(),e.names.end(),[](const auto& t) { return !t.text.empty(); })) error(source,e.token,Code::argument_count,"Named arguments are currently supported only for value construction.");
+        if (!current) error(source, e.token, Code::constant_call, "A compile-time constant cannot call a function.", "Use a local const for runtime values.");
+        if (auto* value = e.qualifier.empty() ? lookup(e.token.text) : nullptr) {
+            if (value->type == error_type) throw Poison{};
+            error(source, e.token, Code::not_callable, "A local value is not callable.");
+        }
+        const auto& target = [&]() -> const Function& {
+            auto check_arguments = [&] { for (auto& argument : e.parts) expression(*argument); };
+            try { return resolve(e); }
+            catch (const CompilationError&) { check_arguments(); throw; }
+            catch (const Poison&) { check_arguments(); throw; }
+        }();
+        e.target = target.symbol;
+        std::vector<Type> arguments;
+        for (std::size_t i=0; i<e.parts.size(); ++i) arguments.push_back(expression(*e.parts[i], i<target.parameters.size() ? std::optional<Type>(target.parameters[i].type) : std::nullopt));
+        if (e.parts.size() != target.parameters.size()) error(source, e.token, Code::argument_count, "Incorrect argument count for '" + e.token.text + "': expected " + std::to_string(target.parameters.size()) + ", received " + std::to_string(e.parts.size()) + ".");
+        bool invalid = false;
+        for (std::size_t i = 0; i < e.parts.size(); ++i) {
+            try { expect(arguments[i], target.parameters[i].type, e.parts[i]->token); }
+            catch (const CompilationError& failure) { diagnostics.add(failure); invalid = true; }
+            invalid |= arguments[i] == error_type;
+        }
+        return e.type = invalid ? error_type : target.result;
+    }
+    Type conversion_expression(Expr& e) {
+        using K = Expr::Kind;
+        Type target = e.type = resolve_type(e.type,unit,root,units,e.token);
+        auto& operand = *e.parts[0];
+        if (operand.kind == K::literal && !operand.literal_text.empty() && !anchor(operand)) {
+            if (!numeric::number(target)) error(source,e.token,Code::numeric_conversion,"Numeric as requires numeric source and destination types.");
+            if (!decimal(operand) || numeric::floating(target)) {
+                try { operand.value = numeric::literal(operand.literal_text,target,true); }
+                catch (const std::invalid_argument& failure) {
+                    // A checked operation in an unevaluated constant branch must
+                    // remain typed, without executing its range check eagerly.
+                    if ((!current || suppress_zero) && numeric::integer(target)) {
+                        for (auto candidate : {Type::i32,Type::i64,Type::u64}) {
+                            try { operand.value = numeric::literal(operand.literal_text,candidate); operand.type = candidate; operand.literal_text.clear(); return target; }
+                            catch (const std::invalid_argument&) {}
                         }
-                        error(source,e.token,Code::numeric_conversion,failure.what());
                     }
-                    operand.type = target; operand.literal_text.clear(); return target;
+                    error(source,e.token,Code::numeric_conversion,failure.what());
                 }
+                operand.type = target; operand.literal_text.clear(); return target;
             }
-            auto from = expression(operand);
-            if (from == error_type) return error_type;
-            if (!numeric::number(from) || !numeric::number(target)) error(source,e.token,Code::numeric_conversion,"Numeric as requires numeric source and destination types.");
-            return target;
         }
-        if (e.kind == K::unary) {
-            auto left = expression(*e.parts[0], e.op == "not" ? std::optional<Type>(Type::boolean) : expected);
-            if (left == error_type) return error_type;
-            if (e.op == "not") expect(left,Type::boolean,e.token);
-            else if (!numeric::number(left)) error(source,e.token,Code::numeric_operator,"Type mismatch: unary arithmetic requires a numeric operand.");
-            return e.type = left;
-        }
+        auto from = expression(operand);
+        if (from == error_type) return error_type;
+        if (!numeric::number(from) || !numeric::number(target)) error(source,e.token,Code::numeric_conversion,"Numeric as requires numeric source and destination types.");
+        return target;
+    }
+    Type unary_expression(Expr& e, std::optional<Type> expected) {
+        auto left = expression(*e.parts[0], e.op == "not" ? std::optional<Type>(Type::boolean) : expected);
+        if (left == error_type) return error_type;
+        if (e.op == "not") expect(left,Type::boolean,e.token);
+        else if (!numeric::number(left)) error(source,e.token,Code::numeric_operator,"Type mismatch: unary arithmetic requires a numeric operand.");
+        return e.type = left;
+    }
+    Type binary_expression(Expr& e, std::optional<Type> expected) {
+        using K = Expr::Kind;
         bool logical = e.op == "and" || e.op == "or";
         auto left_hint = anchor(*e.parts[0]), right_hint = anchor(*e.parts[1]);
         auto context = logical ? std::optional<Type>(Type::boolean) : left_hint ? left_hint : right_hint ? right_hint :

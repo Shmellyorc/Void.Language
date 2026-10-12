@@ -6,6 +6,13 @@ Phase 11 run #16 at `1b32151` passed Linux, Windows and macOS according to the
 project owner. Phase 12 local results are recorded in WORK_LOG.md; hosted
 Windows/macOS verification remains required.
 
+Run #17 (`f9d9f3b`) failed Windows Debug `frontend` (21/22); the artifact
+contained no frontend output or crash dump. A local 1 MiB stack reproduced
+stack exhaustion in combined expression/constant semantic analysis before
+the value-struct group. The expression-handler split and small-stack regression
+now pass locally with both LLVM SDKs. Windows confirmation remains pending;
+see WORK_LOG.md for the evidence and limits of this diagnosis.
+
 Numeric/bool/acyclic nested value structs now work; see VALUE_STRUCTS.md. Runtime
 field defaults, custom init, positional constructors, field modifiers, aggregate
 equality and external aggregate ABI bindings remain deferred. Layout is compiler

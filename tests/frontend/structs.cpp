@@ -120,6 +120,7 @@ void struct_tests(const std::filesystem::path& root) {
     // Struct declaration recovery must retain independent later source errors.
     auto recovered = vd::analyze_source({"/recover.void","value struct damaged:\n    field i32\nfunc later() -> i32:\n    return missing\n"});
     check(!recovered.succeeded() && recovered.diagnostics.size()==2,"struct parser recovery lost later declaration");
+    std::cerr << "Frontend resource case: bounded expanded value layouts" << std::endl;
     std::string excessive = "value struct t_0:\n    x: i32\n";
     for (unsigned n=1;n<18;++n) excessive += "value struct t_"+std::to_string(n)+":\n    a: t_"+std::to_string(n-1)+"\n    b: t_"+std::to_string(n-1)+"\n";
     check(!vd::analyze_source({"/large.void",excessive}).succeeded(),"unbounded expanded layout accepted");

@@ -41,6 +41,12 @@ jobs:
         run: cmake --build build/debug --parallel 3
       - name: Execute Debug tests
         run: ctest --test-dir build/debug --output-on-failure
+      - name: Frontend Debug small-stack regression
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          ulimit -s 1024
+          ctest --test-dir build/debug -R '^frontend$' --output-on-failure
       - name: Configure Release
         run: cmake -S . -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}" -DVOID_LINKER="${{ env.VOID_LINKER }}"
       - name: Build Release
