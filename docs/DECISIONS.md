@@ -64,8 +64,9 @@ and unregisters it on normal exit. External calls intentionally retain ordinary
 memory side-effect semantics. LLVM O2 cannot discard a registered live slot.
 No pointer is hidden from LLVM through integer casts or blanket volatile loads.
 
-This establishes a basic reference contract, not a production collector. The heap
-is single-threaded. There is no allocator cache, concurrent collection, interior
+This original proof established a basic reference contract, not a production collector.
+Phase 15 adds a coordinated wrapper around the same single tracer (see below).
+There is no allocator cache, concurrent tracing, interior
 pointer support, weak references or unwind cleanup. Stack/register discovery,
 `gc.statepoint` and stack-map decoding remain deferred. LLVM 19.1.7's
 `IR/Statepoint.h`, `IR/GCStrategy.h`, and IRBuilder statepoint API were reviewed;
@@ -547,3 +548,29 @@ closure. Shared tooling records initializer/default spans and separates implicit
 dependency edges from written navigation. INITIALIZATION.md describes the implemented
 contract. The owner authorized only the identified obsolete Phase 13 init rejection
 updates; all prior suites and lifecycle/output-protection assertions remain.
+
+
+## Phase 15: approved GC/runtime foundation (G1–G6)
+
+Use one noncopyable runtime owner, the existing heap/tracer, one metadata mutex/CV,
+cooperative Managed/Parked/NativeSafe records and elected requesting collectors.
+No sweep occurs after a failed rendezvous or before every participant freezes.
+Waiters observe the current epoch under the mutex; losing collectors preserve their
+original result. Partial mark failure rolls back before sweep. Detectable corrupt
+root/frame invariants are fatal, rather than resuming unsafe Managed execution.
+
+Use per-thread explicit root frames in the existing typed IR/shared lowerer, with
+module-owned target layout offsets, real receiver storage, parameter/local/temporary
+roots, fixed loop slots and all checked exit cleanup. Publish allocation into an
+already registered slot and preserve no-GC argument/return handoffs. Statepoints,
+stack maps, minimal liveness and LTO auditing remain deferred, not prohibited.
+
+Require verified native-provider quiescence before freeing callback contexts or
+persistent handles. Closing denies new admission; admitted callbacks may finish.
+Self-drain is rejected. NativeSafe host boundaries cover blocking, joins, callback
+reentry, dispatch and diagnostic copying. Keep GC object descriptors independent of
+LLVM contexts; keep existing code-generation leases authoritative for retirement.
+
+These are internal runtime/IR capabilities, not managed source syntax or a new CLI
+entry model. GC_RUNTIME.md specifies interfaces, invariants and deferred work;
+WORK_LOG.md records local evidence and pending hosted validation.

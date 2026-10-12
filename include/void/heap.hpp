@@ -1,6 +1,7 @@
 #pragma once
 #include <cstddef>
 #include <memory>
+#include <span>
 #include <unordered_map>
 #include <vector>
 namespace vd {
@@ -9,9 +10,13 @@ namespace vd {
 struct TypeLayout { std::size_t size; std::vector<std::size_t> references; };
 class Heap {
 public:
+    Heap() = default;
+    Heap(const Heap&) = delete;
+    Heap& operator=(const Heap&) = delete;
     ~Heap();
     void* allocate(const TypeLayout&);
     void collect();
+    void collect(std::span<void* const> additional_roots);
     bool contains(void* object) const;
     std::size_t size() const { return objects_.size(); }
     void add_root(void** slot);

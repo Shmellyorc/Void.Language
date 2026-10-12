@@ -697,3 +697,15 @@ defines the surface. Validate all 24 suites with both SDKs, strict sanitizers,
 small-stack and actual editor checks. Future fallible/resource/managed construction
 still requires separate design approval; runtime field defaults and general function
 named/default parameters are not implied by this phase.
+
+
+## Phase 15 runtime integration progress
+
+The owner approved G1–G6 in GC_RUNTIME_PROPOSAL.md. Implement the foundation as one
+cooperative runtime over the existing tracer and shared IR/LLVM path. Preserve the
+24 prior suites and add seven focused runtime suites covering coordination, failures,
+callbacks, optimized roots and separately linked AOT. GC_RUNTIME.md describes the
+contracts. Source managed structs and broader runtime features remain a later design
+phase; explicit root success does not claim completion of the separate statepoint/
+stack-map experiment or production latency/throughput goals. Hosted Windows/macOS
+must validate this phase after the owner's push.

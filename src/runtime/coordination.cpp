@@ -1,0 +1,222 @@
+#include "void/runtime.hpp"
+#include <algorithm>
+#include <cstring>
+#include <limits>
+#include <stdexcept>
+
+namespace vd {
+thread_local Runtime* Runtime::current_runtime_ = nullptr;
+thread_local Runtime::Thread* Runtime::current_thread_ = nullptr;
+Runtime::~Runtime() {
+    if (!threads_.empty() || !handles_.empty() || requested_ || callbacks_) std::terminate();
+}
+Runtime::Thread& Runtime::thread() const {
+    if (current_runtime_ != this || !current_thread_ || current_thread_->owner != std::this_thread::get_id())
+        throw std::logic_error("thread is not attached to this runtime");
+    return *current_thread_;
+}
+void Runtime::require_managed() const {
+    if (thread().state != State::managed) throw std::logic_error("operation requires Managed state");
+}
+Runtime::Attachment::Attachment(Runtime& r) : Attachment(r, false) {}
+Runtime::Attachment::Attachment(Runtime& r, bool admitted_callback) : runtime_(r), callback_(admitted_callback) {
+    if (current_runtime_) {
+        if (current_runtime_ != &r) throw std::logic_error("cross-runtime attachment");
+        ++current_thread_->depth;
+        if (callback_) ++current_thread_->admissions;
+        return;
+    }
+    std::unique_lock lock(r.mutex_);
+    r.changed_.wait(lock, [&] { return !r.requested_; });
+    if (r.closing_ && !admitted_callback) throw std::logic_error("runtime is closing");
+    r.threads_.push_back(&record_);
+    record_.depth = 1;
+    record_.admissions = callback_ ? 1 : 0;
+    current_runtime_ = &r;
+    current_thread_ = &record_;
+    outer_ = true;
+}
+Runtime::Attachment::~Attachment() {
+    auto& t = runtime_.thread();
+    if (callback_) { if (!t.admissions) std::terminate(); --t.admissions; }
+    if (!outer_) { if (t.depth < 2) std::terminate(); --t.depth; return; }
+    if (t.depth != 1 || t.frames || t.managed_depth || t.admissions || t.state != State::native_safe) std::terminate();
+    std::unique_lock lock(runtime_.mutex_);
+    runtime_.changed_.wait(lock, [&] { return !runtime_.requested_; });
+    auto& records = runtime_.threads_;
+    records.erase(std::find(records.begin(), records.end(), &t));
+    current_thread_ = nullptr;
+    current_runtime_ = nullptr;
+}
+void Runtime::enter(Thread& t) {
+    std::unique_lock lock(mutex_);
+    changed_.wait(lock, [&] { return !requested_; });
+    t.state = State::managed;
+}
+Runtime::Managed::Managed(Runtime& r) : runtime_(r), previous_(r.thread().state) {
+    if (previous_ == State::parked) throw std::logic_error("cannot enter from Parked state");
+    std::unique_lock lock(r.mutex_);
+    if (previous_ == State::native_safe) r.changed_.wait(lock,[&] { return !r.requested_; });
+    auto& t = r.thread();
+    if (r.closing_ && !t.managed_depth && !t.admissions) throw std::logic_error("runtime rejects new Managed entries while closing");
+    ++t.managed_depth;
+    t.state = State::managed;
+}
+Runtime::Managed::~Managed() {
+    std::lock_guard lock(runtime_.mutex_);
+    auto& t = runtime_.thread();
+    if (!t.managed_depth || t.state != State::managed) std::terminate();
+    --t.managed_depth;
+    if (previous_ == State::native_safe) {
+        t.state = State::native_safe;
+        runtime_.changed_.notify_all();
+    }
+}
+Runtime::Native::Native(Runtime& r) : runtime_(r) {
+    r.require_managed();
+    std::lock_guard lock(r.mutex_);
+    r.thread().state = State::native_safe;
+    r.changed_.notify_all();
+}
+Runtime::Native::~Native() { runtime_.enter(runtime_.thread()); }
+void Runtime::park(Thread& t, std::unique_lock<std::mutex>& lock) {
+    ++cooperative_parks_;
+    // The lock is released by wait. A new epoch may start before this waiter
+    // wakes: it must remain frozen until the CURRENT request is also complete.
+    t.state = State::parked;
+    while (requested_) {
+        t.epoch = epoch_;
+        changed_.notify_all();
+        changed_.wait(lock);
+    }
+    t.state = State::managed;
+}
+void Runtime::poll() {
+    require_managed();
+    std::unique_lock lock(mutex_);
+    if (requested_) park(thread(), lock);
+}
+Runtime::Collection Runtime::collect(std::chrono::milliseconds timeout) {
+    require_managed();
+    if (timeout.count() < 0) throw std::invalid_argument("negative collection timeout");
+    std::unique_lock lock(mutex_);
+    auto& self = thread();
+    if (requested_) {
+        self.collecting_epoch = epoch_;
+        park(self, lock);
+        self.collecting_epoch = 0;
+        return self.result;
+    }
+    if (epoch_ == std::numeric_limits<std::uint64_t>::max()) throw std::overflow_error("collection epoch exhausted");
+    requested_ = true;
+    ++epoch_;
+    self.state = State::parked;
+    self.epoch = epoch_;
+    changed_.notify_all();
+    const auto safe = [&] {
+        return std::all_of(threads_.begin(), threads_.end(), [](auto* t) { return t->state != State::managed; });
+    };
+    bool ready = true;
+    if (timeout == std::chrono::milliseconds::max()) changed_.wait(lock, safe);
+    else ready = changed_.wait_for(lock, timeout, safe);
+    Collection result = ready ? Collection::completed : Collection::timed_out;
+    if (ready) {
+        try {
+            std::vector<void*> roots;
+            for (auto* t : threads_) for (auto* f = t->frames; f; f = f->previous_)
+                for (std::size_t i = 0; i < f->count_; ++i) {
+                    const auto& slot = f->slots_[i];
+                    for (std::size_t j = 0; j < slot.count; ++j) {
+                        void* value = nullptr;
+                        std::memcpy(&value, static_cast<const char*>(slot.storage) + slot.offsets[j], sizeof(value));
+                        if (value) roots.push_back(value);
+                    }
+                }
+            for (auto* h : handles_) if (h->value_) roots.push_back(h->value_);
+            heap_.collect(roots);
+        } catch (const std::bad_alloc&) { result = Collection::allocation_failure; }
+        catch (...) { std::terminate(); } // Invalid precise roots are a broken compiler/runtime invariant.
+    }
+    for (auto* t : threads_) if (t->collecting_epoch == epoch_) t->result = result;
+    completed_epoch_ = epoch_;
+    requested_ = false;
+    self.state = State::managed;
+    changed_.notify_all();
+    return result;
+}
+void Runtime::allocate_into(void** slot, const TypeLayout& layout) {
+    require_managed();
+    if (!slot) throw std::invalid_argument("null allocation output");
+    bool rooted = false;
+    for (auto* f = thread().frames; f; f = f->previous_)
+        for (std::size_t i = 0; i < f->count_; ++i)
+            for (std::size_t j = 0; j < f->slots_[i].count; ++j)
+                if (static_cast<const char*>(f->slots_[i].storage) + f->slots_[i].offsets[j] == reinterpret_cast<const char*>(slot)) rooted = true;
+    if (!rooted) throw std::invalid_argument("allocation output is not a registered precise root");
+    // Before allocation, the caller's registered slot contains null/its old
+    // value. There is no safepoint between allocation and publication.
+    poll();
+    std::lock_guard lock(mutex_);
+    *slot = heap_.allocate(layout);
+}
+void Runtime::store(void* object, std::size_t offset, void* value) {
+    require_managed();
+    std::lock_guard lock(mutex_);
+    heap_.store(object, offset, value);
+}
+bool Runtime::contains(void* p) const { std::lock_guard lock(mutex_); return heap_.contains(p); }
+Runtime::Snapshot Runtime::snapshot() const {
+    std::lock_guard lock(mutex_);
+    return {epoch_, completed_epoch_, threads_.size(), static_cast<std::size_t>(std::count_if(threads_.begin(), threads_.end(), [](auto* t) { return t->state == State::parked; })), heap_.size(), requested_, cooperative_parks_};
+}
+bool Runtime::wait_for_request(std::chrono::milliseconds timeout) {
+    if (current_runtime_ == this && thread().state == State::managed) throw std::logic_error("Managed thread cannot wait for a request");
+    std::unique_lock lock(mutex_);
+    return changed_.wait_for(lock, timeout, [&] { return requested_; });
+}
+void Runtime::close() {
+    if (current_runtime_ == this && thread().state == State::managed) throw std::logic_error("close requires NativeSafe state");
+    std::lock_guard lock(mutex_);
+    closing_ = true;
+    changed_.notify_all();
+}
+Runtime::Frame::Frame(Runtime& r, const Slot* slots, std::size_t count)
+    : runtime_(r), previous_(nullptr), slots_(slots), count_(count) {
+    r.require_managed();
+    if (count && !slots) throw std::invalid_argument("null root frame slots");
+    for (std::size_t i = 0; i < count; ++i) {
+        const auto& s = slots[i];
+        if (!s.storage || (s.count && !s.offsets)) throw std::invalid_argument("invalid root storage");
+        for (std::size_t j = 0; j < s.count; ++j)
+            if (s.offsets[j] > s.size || s.size - s.offsets[j] < sizeof(void*)) throw std::invalid_argument("invalid root offset");
+    }
+    previous_ = r.thread().frames;
+    r.thread().frames = this;
+}
+Runtime::Frame::~Frame() {
+    runtime_.require_managed();
+    auto& t = runtime_.thread();
+    if (t.frames != this) std::terminate();
+    t.frames = previous_;
+}
+Runtime::Handle::Handle(Runtime& r, void* value) : runtime_(r), value_(value) {
+    std::lock_guard lock(r.mutex_);
+    if (r.closing_ || (value && !r.heap_.contains(value))) throw std::invalid_argument("invalid persistent handle");
+    r.handles_.push_back(this);
+}
+Runtime::Handle::~Handle() {
+    std::lock_guard lock(runtime_.mutex_);
+    auto& handles = runtime_.handles_;
+    handles.erase(std::find(handles.begin(), handles.end(), this));
+}
+void Runtime::Handle::reset(void* value) {
+    std::lock_guard lock(runtime_.mutex_);
+    if (value && !runtime_.heap_.contains(value)) throw std::invalid_argument("invalid persistent handle value");
+    value_ = value;
+}
+void* Runtime::Handle::get() const {
+    runtime_.require_managed();
+    std::lock_guard lock(runtime_.mutex_);
+    return value_;
+}
+}

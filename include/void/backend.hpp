@@ -15,7 +15,7 @@ public:
         bind_address(std::move(name), reinterpret_cast<std::uintptr_t>(entry));
     }
     std::shared_ptr<const NativeCode> compile(const ir::Module&, const std::string& entry,
-                                             bool optimize = true, Compatibility contract = {});
+                                             bool optimize = true, Compatibility contract = {}, std::shared_ptr<Runtime> runtime = {});
     std::shared_ptr<const NativeCode> compile(const ValidatedAnalysis&, bool optimize = true, Compatibility contract = {});
     // Preflight complete validated source safety before code generation; publication rechecks.
     bool replace(ReloadSlot&, const ValidatedAnalysis&, bool optimize = true, Compatibility contract = {});
@@ -27,4 +27,6 @@ private:
     std::shared_ptr<Impl> impl_;
 };
 void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize, bool source_program = false);
+// Internal architectural harness supplies its own runtime entry guard/main.
+void emit_runtime_object(const ir::Module&, const std::filesystem::path&, bool optimize);
 }

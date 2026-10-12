@@ -3158,3 +3158,263 @@ failing platform. Windows/macOS hosted regressions remain necessary; previous
 Windows success is baseline evidence, not a test of these local changes. The
 existing workflow and all 24 suites remain enabled. No language features, LLVM
 version changes, commits, pushes, branches or remote modifications were made.
+
+## Phase 15 investigation and GC runtime proposal, 12 October 2026
+
+**Design only. Implementation is not authorized and has not started.** The owner
+states Phase 14 is complete. Inspected current clean baseline `c1b4a66` and the
+required Language Bible, Development Strategy, DECISIONS, KNOWN_ISSUES,
+INITIALIZATION and prior WORK_LOG evidence. In particular, preserved the approved
+non-moving/precise direction, value-copy and C1 initialization rules, separate GC
+and code lifetimes, and the open top-level/entry-point discussion. Older pending
+hosted statements remain historical; no new hosted result was inferred.
+
+Inspected actual Heap/Root definitions and allocation/tracing, native/reload
+runtime, NativeCode/ReloadSlot and compatibility, shared IR types/validation,
+LLVM lowering/O2/checked failure paths, root probe, ORC contexts/resource trackers,
+AOT adapter/link driver, CLI, real C fixture, concurrent invocation tests and CI.
+Relevant implementation is in include/void/{heap,execution,native,backend,ir}.hpp,
+src/runtime/, src/backend/llvm/backend.cpp, src/main.cpp, tests/tests.cpp and
+tests/integration/. No managed source types or thread registry were found.
+
+### Findings and recommended design
+
+- Heap and explicit Root are single-threaded proofs. The test's thread-local
+  probe_heap selector is not collector thread registration. Optimized generated
+  root tests cover one stack slot, not general managed source/nested stack roots.
+- Normal source IR supports numeric/Boolean and inline value types; it does not
+  yet contain managed-reference allocation or safepoint operations. Native imports
+  are still trusted i32(i32) proofs. AOT success does not establish GC linkage.
+- Graph validation, copied layouts, iterative tracing and rollback before sweep
+  are reusable. The current allocation helpers depend on collection occurring
+  only at explicit probe polls: their unrooted intermediate allocations must not
+  silently become an automatic-GC implementation.
+- Existing leases safely retain code through active/native invocations. Preserve
+  that scheme; neither GC completion nor replacement publication authorizes
+  unloading an active generation. Object tracing descriptors must outlive the
+  allocating generation independently; frame maps remain covered by call leases.
+- The current C fixture verifies same-thread callbacks only. Its callback fields
+  and resource counter do not establish foreign-thread/racing teardown support.
+
+Created [GC_RUNTIME_PROPOSAL.md](GC_RUNTIME_PROPOSAL.md), explicitly awaiting
+owner approval. It recommends per-thread explicit root frames, cooperative
+Managed/Parked/NativeSafe transitions, an elected requesting collector and one
+runtime metadata mutex/CV. Frozen roots and synchronized state transitions permit
+tracing only when no mutator is Managed. Old-epoch notifications cannot resume a
+thread during a newer request. Native waits/reentry, persistent handles, callback
+provider quiescence, scoped code leases, failure cleanup and shutdown have explicit
+proposed contracts. No forced suspension, background collector, alternate code
+reclamation scheme, managed source syntax or speculative allocator was added.
+
+The proposal compares explicit frames with statepoints and LLVM's built-in shadow
+stack. Reviewed versioned LLVM 19 GC/Statepoints/ORCv2/LangRef documentation and
+checked exact 19.1.7 installed/official SDK headers for IRBuilder statepoint/result/
+relocate APIs, GCStrategy and RewriteStatepointsForGC. API presence is verified;
+new statepoint lowering, stack-map consumption and thread protocols are not.
+Official documentation links and the six owner decisions G1–G6 are in the proposal.
+
+### Actual verification of the unchanged baseline
+
+Existing build trees were used; no compiler/runtime/editor source, tests, build
+configuration, sanitizer settings or workflow was edited or rebuilt for this
+investigation. Both llvm-config binaries report 19.1.7. Reran only the following
+existing architecture/regression suites to verify the inspected baseline:
+
+```sh
+ctest --test-dir build/ci-debug \
+  -R '^(core|jit|reload|gc|native|aot|frontend)$' --output-on-failure
+ctest --test-dir build/ci-official-debug \
+  -R '^(core|jit|reload|gc|native|aot|frontend)$' --output-on-failure
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+    UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+    ctest --test-dir build/ci-sanitizers \
+    -R '^(gc|reload|native)$' --output-on-failure
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+    UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+    ctest --test-dir build/ci-official-san \
+    -R '^(gc|reload|native)$' --output-on-failure
+```
+
+| Existing configuration | Selected tests | Result | Wall time |
+| --- | --- | --- | --- |
+| Installed SDK, Debug | core/jit/reload/gc/native/aot/frontend | 7/7 | 5.42s |
+| Complete official SDK, Debug | same | 7/7 | 4.98s |
+| Installed SDK, strict ASan/UBSan | gc/reload/native | 3/3 | 1.14s |
+| Complete official SDK, strict ASan/UBSan | same | 3/3 | 0.98s |
+
+Twenty selected suite executions passed. Sanitizers ran outside the sandbox's
+tracing restriction with leak detection intact; installed RTTI/vptr and official
+no-RTTI coverage policies remain unchanged. Logs are under ignored
+build/phase15-investigation/. These are Linux x86-64 checks of existing behavior,
+not evidence for the proposed GC protocol, new foreign-thread callbacks, TSan,
+performance, or new Windows/macOS execution. All 24 existing suites remain intact;
+no full Phase 15 implementation matrix, small-stack or editor rerun is claimed.
+
+### Stop for owner review
+
+Only GC_RUNTIME_PROPOSAL.md and this log were changed. The proposal includes
+acceptance tests, risks and one cohesive implementation sequence, separating the
+internal typed JIT/AOT proofs from future managed-language work. Approval is needed
+for G1 root representation, G2 coordination/allocation staging, G3 retention,
+G4 native/callback contracts, G5 failure policy and G6 bounded implementation scope.
+No implementation, commits, pushes, branches or remote modifications were made.
+
+
+## 2026-10-12 — Phase 15 implementation (owner-approved G1–G6)
+
+Implemented the six-stage sequence in GC_RUNTIME_PROPOSAL.md. This phase adds no
+source managed struct, strings, async, finalizers, new CLI entry behavior or native
+language feature. No commits, pushes, branches or remote changes were made.
+
+### Runtime and safety invariants
+
+- Added one noncopyable Runtime around the existing noncopyable Heap, one registry,
+  coordinator mutex/CV, TLS attachments, Managed/NativeSafe guards, parked epochs,
+  persistent handles and explicit closing. Frame publication/removal is allocation-
+  free owner-thread work. Runtime allocation requires an already registered output
+  root, polls before taking the heap lock, then allocates/publishes without a GC gap.
+- Requesting collectors freeze themselves; competing requesters park instead of
+  waiting while Managed. Tracing/sweeping holds the coordinator lock only after
+  every participant is frozen. CV waits release the lock; collector code calls no
+  provider, callback, ORC or application code. A waiter checks the current request
+  under the lock and remains frozen if a new epoch starts before it wakes. Joining
+  collectors retain the outcome/deadline of their original elected attempt.
+- Deadline abort precedes tracing/sweep and releases all waiters. Root enumeration
+  or worklist bad_alloc restores idle without sweeping; the existing tracer resets
+  partial marks. Deterministic allocator fault injection exercises enumeration and
+  partial-mark failures followed by successful recovery. Detectable corrupt roots
+  or out-of-order frames terminate; isolated child tests require the terminate
+  handler's exit 79 and reject ordinary continuation or sanitizer failures.
+- New idle Managed entries are rejected during closing. Existing active scopes,
+  NativeSafe continuations and already-admitted callbacks may finish. Cross-runtime
+  attachment and Managed-only operations from NativeSafe are rejected before the
+  relevant mutation. Destruction with live threads/handles/registrations is fatal.
+
+### Shared compiler, native calls and code lifetime
+
+- Added private nominal managed_ref and validated allocation/field/collection/poll/
+  reachability operations to the existing IR. The one IR validator exposes result
+  types to the one LLVM lowerer; removed the lowerer's duplicated result-type switch.
+  Managed references/operations require coordinated IR; public parsing/analysis does
+  not expose them. Internal schemas are bounded, nonempty and acyclic; this does
+  not decide future managed source type recursion or empty-object layout.
+- Generated root frames describe actual local/receiver storage and fixed parameter/
+  expression spill slots. Flattened nested reference maps use the module-owned
+  DataLayout, preserving the macOS correction. Slots are initialized before frame
+  publication, parameters before polling, and checked exits always unlink frames.
+  Entry/block polls preserve numeric-only and managed loop cooperation under O2.
+  Allocation and argument/return publication use Managed no-GC handoff windows.
+- JIT NativeCode retains an explicit Runtime owner plus its existing generation
+  lease. Host dispatch/diagnostic copying runs NativeSafe, including reentry. Exact
+  analysis contracts remain intact and are extended with conservative internal
+  nominal layouts/runtime identity; changed layout/runtime bindings reject reload.
+  Heap descriptors are copied numeric data independent of LLVM contexts/generations.
+- Added a same-lowerer runtime object emitter for private AOT proofs; CMake links
+  normal/O2 objects with the actual C++ runtime/Threads requirements. ldd on the
+  installed Debug AOT executable shows libc, libstdc++, libm and libgcc, no LLVM/ORC.
+  The existing CLI adapter/entry behavior is unchanged.
+- Added CallbackRegistration with explicit provider unregister-and-quiesce, closing
+  admission, in-flight drain, self-drain rejection, same/foreign-thread attachments
+  and binding-specific failure translation. Fixture providers own/join all native
+  dispatch threads, including dispatch delayed before admission. No arbitrary
+  provider's teardown guarantee is assumed. Persistent captures are released only
+  after quiescence. Real generated calls block in a native fixture, reenter via an
+  actual callback, and retain roots/old leases while collection and reload proceed.
+
+### Full verification — completed stable tree
+
+Both SDKs were rechecked for exact 19.1.7, ORC headers, libLLVMOrcJIT.a and
+LLVMConfig.cmake. Every configuration reran the existing real ORC configure probe.
+Installed SDK: /usr/lib/llvm-19 (RTTI YES). Official complete archive:
+.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64 (RTTI NO). Project-wide RTTI matching
+is preserved. ASan/UBSan remain enabled in both sanitizer trees; RTTI-dependent vptr
+coverage is available in the installed configuration, unavailable in the archive ABI.
+
+| SDK | Configuration/tree | Final CTest result | Test time |
+| --- | --- | --- | --- |
+| Installed | Debug / ci-debug | 31/31 | 20.50 s |
+| Installed | Release / ci-release | 31/31 | 17.42 s |
+| Installed | RelWithDebInfo + ASan/UBSan / ci-sanitizers | 31/31 | 33.82 s |
+| Official archive | Debug / ci-official-debug | 31/31 | 18.21 s |
+| Official archive | Release / ci-official-release | 31/31 | 13.31 s |
+| Official archive | RelWithDebInfo + ASan/UBSan / ci-official-san | 31/31 | 27.23 s |
+
+The original 24 suites and their assertions remain. Seven added suites are
+runtime_coordination, runtime_generated, runtime_callbacks, runtime_failures,
+runtime_aot_normal, runtime_aot_optimized and runtime_invariants. Shared normal/O2
+JIT and separately linked AOT test nested aggregates, expression temporaries across
+allocation, argument/return handoffs, method-created references surviving through
+actual nested receiver storage, copy independence, checked failure cleanup and loop
+safepoints. AOT also runs four concurrent generated callers. Numeric-only optimized
+JIT loops must record actual cooperative parking. The original root/GC, reload,
+native, constructor, diagnostics, tooling and frontend assertions all still run.
+
+Commands for each of the six cached SDK/configuration trees:
+
+```sh
+cmake -S . -B build/<tree>
+cmake --build build/<tree> -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+ctest --test-dir build/<tree> --output-on-failure -j4
+```
+
+The stable-tree final run is build/phase15-verification/validate.py; results.json,
+sdk.json and per-tree configure/build/test logs preserve commands/status/timings.
+An earlier in-progress build was invalidated while receiver proof sources evolved
+(a stale generated AOT object lacked entry_receiver). It was rebuilt; all six final
+stable-tree configurations above passed. Earlier logs remain in preliminary/ and
+before-native-stress/ rather than being treated as final evidence.
+
+Additional completed checks:
+
+- Both Debug SDKs: ctest -R '^runtime_' --repeat until-fail:10 -j4 — seven suites,
+  ten executions each, all passed (20.47 s each).
+- Both Debug SDKs: ulimit -s 1024; frontend repeated until-fail:5 — all five passed
+  per SDK (24.40 s installed, 22.42 s official). Existing bounded-layout small-stack
+  regression remains intact.
+- Both strict sanitizer SDKs: ctest -R '^(runtime_.*|frontend|reload|gc|native)$'
+  --repeat until-fail:3 -j4 — all 11 suites passed three times, leaks enabled
+  (24.28 s installed, 22.88 s official). No sanitizer suppressions or disabled tests.
+- Separate runtime-only ThreadSanitizer: clang++-19 -std=c++20 -g -O1
+  -fsanitize=thread -fno-omit-frame-pointer -Iinclude tests/runtime/coordination.cpp
+  src/runtime/coordination.cpp src/runtime/heap.cpp -pthread; run with
+  TSAN_OPTIONS=halt_on_error=1:exitcode=85 — passed, no reported races. This check
+  does not instrument the prebuilt LLVM SDK or generated application instructions.
+- Release diagnostic baseline, 1000 collections with one already-NativeSafe thread
+  holding one frozen object: installed mean 0.201559 us / maximum 2.28 us; official
+  mean 0.135120 us / maximum 1.61 us. These fixture measurements are not production
+  pause guarantees or a measure of arbitrary Managed rendezvous latency. TSan's
+  separate instrumented fixture measured mean 1.62557 us / maximum 34.4 us.
+- Extension npm test outside the tracing sandbox: 4/4 individual cases passed.
+  npm run package: VSIX produced, eight files / 145.44 KB. A sandbox-only Node run
+  reported only a file-level case; the authoritative host run executed all four.
+- Real installed VS Code 1.141 Linux integration: trusted, restricted and multi-root
+  modes passed; actual native-process termination, notification counts, navigation,
+  diagnostics, restart and clean deactivation assertions remain intact. Expected
+  injected lifecycle errors appear in its successful test log.
+- git diff --check passed. AOT dependency and all extra test outputs are under
+  build/phase15-verification; extra.py and extra-results.json record repetitions.
+
+Strict sanitizer and real editor checks ran outside the tracing sandbox so leak
+inspection and native editor child processes could execute normally. Requirements
+and sanitizer settings were not relaxed. No hosted checks were run or remote state
+changed in this phase.
+
+### Remaining limits and next gate
+
+Implementation is complete locally and ready for owner review/hosted CI. Windows
+x64 and macOS ARM64 ABI, private root-frame calling conventions, thread scheduling
+and native/editor behavior still require the owner's hosted run; Linux results do
+not establish those outcomes. VSCodium/minimum-editor-version checks were not run.
+Generated application instructions and prebuilt LLVM remain outside C++ sanitizer
+instrumentation; architectural observations exercise those roots explicitly.
+
+This is cooperative, nonmoving tracing with serialized allocation, frame-lifetime
+retention, no allocation-triggered thresholds and no hard pause bounds. The
+coordinator makes tracing safe, not arbitrary simultaneous application field writes.
+General source threading/shared-mutation semantics, managed structs/construction,
+provider bindings without strong quiescence, strings, async, finalizers, allocator
+optimizations, tighter liveness, LTO and statepoints/stack maps remain deferred.
+After hosted validation, propose the smallest managed-source type/allocation slice
+using these contracts; do not infer approval of new managed language rules.

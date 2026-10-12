@@ -37,8 +37,10 @@ void Heap::store(void* object, std::size_t offset, void* value) {
         throw std::invalid_argument("invalid managed reference store");
     std::memcpy(static_cast<char*>(object) + offset, &value, sizeof(value));
 }
-void Heap::collect() {
+void Heap::collect() { collect({}); }
+void Heap::collect(std::span<void* const> additional_roots) {
     std::vector<void*> pending;
+    for (auto* root : additional_roots) if (root) pending.push_back(root);
     for (auto* root : roots_) if (*root) pending.push_back(*root);
     // Validate the entire graph before sweeping. A bad slot cannot silently
     // turn a reachable object into reclaimed memory.

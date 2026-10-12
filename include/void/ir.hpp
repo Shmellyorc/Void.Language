@@ -11,7 +11,7 @@ namespace vd::ir {
 // across control-flow edges. The defaults retain the original proof ABI.
 struct ValueType;
 struct Type {
-    enum Kind { i32, boolean, none, i8, i16, i64, u8, u16, u32, u64, f32, f64, aggregate, unresolved, invalid };
+    enum Kind { i32, boolean, none, i8, i16, i64, u8, u16, u32, u64, f32, f64, aggregate, unresolved, invalid, managed_ref };
     Kind kind = i32;
     std::shared_ptr<const ValueType> definition;
     Type(Kind k = i32) : kind(k) {}
@@ -27,13 +27,14 @@ struct ValueField { std::string name; Type type; };
 struct ValueType { std::string identity, name; std::vector<ValueField> fields; std::size_t source_offset = 0; };
 inline std::string Type::key(const Type& t) { return t.definition ? t.definition->identity : std::string{}; }
 inline bool operator==(const Type& a, const Type& b) {
-    return a.kind == b.kind && (a.kind != Type::aggregate && a.kind != Type::unresolved ? true :
+    return a.kind == b.kind && (a.kind != Type::aggregate && a.kind != Type::unresolved && a.kind != Type::managed_ref ? true :
         a.definition && b.definition && a.definition->identity == b.definition->identity);
 }
 struct ConstantValue { std::uint64_t bits = 0; std::vector<ConstantValue> fields; };
 const char* type_name(Type type);
 enum class Op { argument, constant, add, multiply, less, call, subtract, divide,
-    remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert };
+    remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
+    gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive };
 // A validated local aggregate storage path; never a source-visible reference.
 struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
 struct Instruction {
@@ -70,7 +71,9 @@ struct Module {
     std::string source_path = {}; // Physical debug source; not part of stable identity.
     std::shared_ptr<const ValidatedAnalysis> analysis = {};
     std::string constant_contract = {}; // Exact canonical const declarations.
+    bool coordinated = false; // Internal runtime proofs only; never source syntax.
 };
-void validate(const Module& module);
+using InstructionTypes = std::vector<std::vector<std::vector<Type>>>;
+void validate(const Module& module, InstructionTypes* results = nullptr);
 Module architecture_proof(std::int32_t answer = 42);
 }

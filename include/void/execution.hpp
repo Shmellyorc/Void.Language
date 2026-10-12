@@ -5,6 +5,7 @@
 #include <string>
 namespace vd {
 class ValidatedAnalysis;
+class Runtime;
 // Per-invocation storage: generated code only borrows it until normal return.
 struct RuntimeFailure {
     const char* message = nullptr;
@@ -18,10 +19,11 @@ struct Compatibility {
     std::string constant_contract = {};
     std::string source_contract = {};
     std::shared_ptr<const ValidatedAnalysis> analysis = {};
+    std::uintptr_t runtime_identity = 0;
     bool operator==(const Compatibility& other) const {
         return function_id == other.function_id && signature == other.signature &&
             layout == other.layout && captures == other.captures && constants == other.constants &&
-            constant_contract == other.constant_contract && source_contract == other.source_contract;
+            constant_contract == other.constant_contract && source_contract == other.source_contract && runtime_identity == other.runtime_identity;
     }
 };
 class NativeCode {
@@ -29,7 +31,7 @@ public:
     using CheckedEntry = std::int32_t (*)(std::int32_t, RuntimeFailure*);
     using Entry = std::int32_t (*)(std::int32_t);
     NativeCode(Entry entry, std::shared_ptr<void> owner, Compatibility compatibility);
-    NativeCode(CheckedEntry entry, std::shared_ptr<void> owner, Compatibility compatibility);
+    NativeCode(CheckedEntry entry, std::shared_ptr<void> owner, Compatibility compatibility, std::shared_ptr<Runtime> runtime = {});
     std::int32_t invoke(std::int32_t value) const;
     const Compatibility& compatibility() const { return compatibility_; }
 private:
@@ -37,6 +39,7 @@ private:
     CheckedEntry checked_ = nullptr;
     std::shared_ptr<void> owner_;
     Compatibility compatibility_;
+    std::shared_ptr<Runtime> runtime_;
 };
 // A lease keeps its generation alive through the entire call, including native reentry.
 class ReloadSlot {

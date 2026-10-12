@@ -6,17 +6,21 @@
 #include <stdexcept>
 namespace vd::ir {
 const char* type_name(Type t) {
+    if (t.kind == Type::managed_ref && t.definition) return t.definition->identity.c_str();
     switch (t.kind) { case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
     throw std::invalid_argument("VOID IR: unknown type");
 }
-void validate(const Module& m) {
+void validate(const Module& m, InstructionTypes* results) {
+    if (results) results->clear();
     auto fail = [](const std::string& text) { throw std::invalid_argument("VOID IR: " + text); };
     if (m.identity.empty()) fail("missing module identity");
     std::map<std::string,const ValueType*> definitions;
     std::set<const ValueType*> visiting, checked;
     std::function<void(Type)> valid_type = [&](Type t) {
-        if (t.kind != Type::aggregate) { if (t.kind == Type::unresolved || t.kind == Type::invalid) fail("unresolved type"); type_name(t); return; }
+        if (t.kind == Type::managed_ref && !m.coordinated) fail("managed references require coordinated runtime");
+        if (t.kind != Type::aggregate && t.kind != Type::managed_ref) { if (t.kind == Type::unresolved || t.kind == Type::invalid) fail("unresolved type"); type_name(t); return; }
         if (!t.definition || t.definition->identity.empty() || t.definition->name.empty()) fail("missing value type identity");
+        if (t.kind == Type::managed_ref && t.definition->fields.empty()) fail("empty internal managed object layout; source object layout is deferred");
         auto* d = t.definition.get();
         if (checked.contains(d)) return;
         if (visiting.size() >= 128 || !visiting.insert(d).second) fail("recursive or excessive value layout");
@@ -47,6 +51,7 @@ void validate(const Module& m) {
     }
     for (const auto& f : m.functions) {
         if (f.blocks.empty()) fail("function has no blocks");
+        if (results) results->emplace_back();
         for (const auto& b : f.blocks) {
             std::vector<Type> types;
             auto operand = [&](unsigned id) {
@@ -61,6 +66,24 @@ void validate(const Module& m) {
             for (const auto& i : b.instructions) {
                 Type result = Type::i32;
                 switch (i.op) {
+                case Op::gc_allocate:
+                    valid_type(i.type);
+                    if (!m.coordinated || i.type.kind != Type::managed_ref) fail("invalid managed allocation");
+                    result = i.type; break;
+                case Op::gc_read: case Op::gc_write: {
+                    auto object = operand(i.a);
+                    if (!m.coordinated || object.kind != Type::managed_ref || i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= object.definition->fields.size()) fail("invalid managed field");
+                    auto field = object.definition->fields[static_cast<std::size_t>(i.immediate)].type;
+                    if (i.op == Op::gc_write) { expect(i.b, field); result = Type::none; }
+                    else result = field;
+                    break;
+                }
+                case Op::gc_alive:
+                    if (!m.coordinated || operand(i.a).kind != Type::managed_ref) fail("invalid managed inspection");
+                    result = Type::boolean; break;
+                case Op::gc_collect: case Op::gc_poll:
+                    if (!m.coordinated) fail("runtime operation outside coordinated module");
+                    result = Type::none; break;
                 case Op::aggregate:
                     valid_type(i.type);
                     if (i.type.kind != Type::aggregate || !i.type.definition || i.arguments.size() != i.type.definition->fields.size()) fail("invalid aggregate construction");
@@ -78,7 +101,7 @@ void validate(const Module& m) {
                     if (i.a >= f.parameters.size()) fail("invalid argument index");
                     result = f.parameters[i.a]; break;
                 case Op::constant:
-                    if (i.type.kind == Type::aggregate || i.type == Type::none || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1)) fail("invalid literal");
+                    if (i.type.kind == Type::aggregate || i.type == Type::none || (i.type.kind == Type::managed_ref && i.immediate != 0) || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1)) fail("invalid literal");
                     valid_type(i.type); result = i.type; break;
                 case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:
                     result = operand(i.a);
@@ -129,6 +152,7 @@ void validate(const Module& m) {
                 }
                 types.push_back(result);
             }
+            if (results) results->back().push_back(types);
             auto destination = [&](unsigned id) { if (id >= f.blocks.size()) fail("invalid branch destination"); };
             switch (b.end.kind) {
             case Terminator::Kind::return_value:

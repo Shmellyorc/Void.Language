@@ -7,8 +7,10 @@ The implemented subset supports typed functions, all ten exact-width numeric typ
 contextual literals, checked numeric `as`, bool expressions, local variables,
 conditionals, `for` loops, readonly/compile-time constants, numeric/bool value structs with receiver methods, and source-first
 compile/runtime diagnostics. Compile-time errors now include stable codes, ranges,
-related declarations and recovery across independent errors. Experimental GC, leased function
-replacement, and native C interoperability remain separate architectural proofs.
+related declarations and recovery across independent errors. Cooperative GC roots/thread coordination, leased function
+replacement, and native C interoperability remain internal architectural proofs.
+The [runtime foundation](docs/GC_RUNTIME.md) uses shared optimized JIT/AOT lowering;
+source-level managed structs are not implemented.
 See [source compiler scope and decisions](docs/SOURCE_COMPILER.md).
 
 ## Build on Linux

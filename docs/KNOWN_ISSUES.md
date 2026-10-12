@@ -1,13 +1,14 @@
 # Known issues and deferred work
 
-Updated for Phase 14 custom value initialization.
+Updated for Phase 15 GC roots and thread coordination.
 
 The owner reports Phase 13 `c72e62a` passed hosted run #19 on Windows, Linux and
 macOS. Phase 14 run #21 (`424cacb`) passed Windows/Ubuntu but macOS ARM64 Debug
 aborted in frontend aggregate debug layout generation (23/24 suites passed).
-A local reproducer confirms a context-lifetime bug in the shared LLJIT DataLayout
+A local reproducer confirmed a context-lifetime bug in the shared LLJIT DataLayout
 cache; lowering now queries the module-owned copy. WORK_LOG.md records the
-backtrace, regression and validation. Another hosted ARM64 run is required.
+backtrace, regression and validation. The owner subsequently declared Phase 14
+complete. Phase 15 still requires its own hosted Windows/macOS validation.
 Approved C1 initialization is described in INITIALIZATION.md; Phase 13 I2 remains
 an unapproved historical alternative. Owner-module methods and custom value
 initializers use the existing shared types/IR/LLVM path.
@@ -104,17 +105,19 @@ Layout remains compiler-private with 128-level/65536-expanded-field bounds.
 
 ## Managed memory
 
-- The heap is a single-threaded experimental non-moving mark/sweep collector
-  with explicit roots, copied layouts and iterative tracing. It is not a
-  production managed runtime. No thread registry, world-stop protocol, allocator
-  caches, weak references, barriers, async roots or finalization exists.
-- Generated roots have been exercised through LLVM O2 calls and loops. They are
-  explicitly registered stack slots, not discovered stack/register roots.
-  LLVM statepoint lowering, stack-map decoding and real multi-thread safepoints
-  remain unresolved. Their integration gate is not complete.
-- Root registration requires balanced normal-exit unregistering. Generated unwind
-  cleanup and native exception translation are absent. Native callbacks used by
-  these proofs must not throw across generated code.
+- The existing experimental non-moving tracer now has a runtime-owned registry,
+  cooperative epochs, frozen per-thread frames and persistent handles. It is not
+  a production managed runtime. Allocator caches, weak references, async roots,
+  finalization and source managed types remain deferred. See GC_RUNTIME.md.
+- Shared normal/O2 JIT/AOT lowering publishes exact reference storage, including
+  nested aggregates and temporaries, and polls coordinated loops/calls. There is
+  no conservative stack/register discovery. LLVM statepoints/stack-map decoding,
+  tighter liveness and LTO auditing remain separate deferred work.
+- Checked generated failure/normal returns unlink frames. Callback bridges catch
+  host exceptions and return binding-specific failure status; native exceptions
+  must never unwind through generated code. Corrupt precise roots/frame ordering
+  are fatal. Uncooperative Managed threads prevent collection; an optional host
+  deadline aborts without sweeping rather than forcing suspension.
 - Objects have max-align allocation and whole-object references only. Over-aligned
   types and interior pointers are not supported. Descriptors are trusted compiler
   metadata; the prototype validates offsets but does not infer language layouts.
@@ -136,8 +139,10 @@ Layout remains compiler-private with 128-level/65536-expanded-field bounds.
   overhead and scalability have not been benchmarked. ORC retirement errors are
   reported to stderr, not recovered by a production development host.
 - Trusted symbol addresses assume matching C ABI and host process lifetime.
-  Foreign-thread callbacks, callback/unregister races, native dynamic-library
-  ownership and asynchronous native calls remain unsupported.
+  Phase 15 provides same/foreign-thread callback admission and teardown only for
+  bindings with a verified provider-quiescence barrier, including dispatched
+  pre-admission calls. Arbitrary providers, native dynamic-library ownership and
+  generalized asynchronous native bindings remain unsupported.
 - The UTF-8 helper implements borrowing of terminated UTF-8 with a temporary
   owned copy. Retained string storage, returned buffers, UTF-16 and native binding
   metadata syntax are not implemented. NUL rejection is specific to this bridge,
