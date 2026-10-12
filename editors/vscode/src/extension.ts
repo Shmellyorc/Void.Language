@@ -12,9 +12,9 @@ class ServerManager {
     private warned = new Set<string>();
     private fallback?: string;
     constructor(private readonly output: vscode.LogOutputChannel) {}
-    private report(message: string): void {
+    private report(message: string, repeat = false): void {
         this.output.appendLine(message);
-        if (!this.warned.has(message)) { this.warned.add(message); void vscode.window.showErrorMessage(message + ' See Output → VOID.'); }
+        if (repeat || !this.warned.has(message)) { this.warned.add(message); void vscode.window.showErrorMessage(message + ' See Output → VOID.'); }
     }
     private documents(): vscode.TextDocument[] {
         return vscode.workspace.textDocuments.filter(d => d.languageId === 'void' && d.uri.scheme === 'file');
@@ -53,17 +53,32 @@ class ServerManager {
             pattern: project.singleFile ? basename(project.entry).replace(/[*?()[\]{}!+@,]/g, c => '[' + c + ']') : '**/*.void'}};
         const serverOptions: ServerOptions = {command: project.server, args: ['--entry', project.entry],
             options: {cwd: project.root, shell: false}};
+        let initialized = false;
+        let failureReported = false;
+        const reportUnexpected = (reason: string): void => {
+            const intentional = this.disposed || this.client !== client;
+            this.output.appendLine(`VOID connection ${reason}; initialized=${initialized}, intentional=${intentional}, state=${client.state}`);
+            if (!initialized || intentional || failureReported) return;
+            failureReported = true;
+            // Deduplicate error/close callbacks for this session, not later crashes.
+            this.report('VOID language server terminated unexpectedly. Use VOID: Restart Language Server after checking the log.', true);
+        };
         const clientOptions: LanguageClientOptions = {
             documentSelector: [selector], outputChannel: this.output, traceOutputChannel: this.output,
             revealOutputChannelOn: RevealOutputChannelOn.Never, // Never steal focus; explicit errors include the channel location.
-            errorHandler: {error: () => ({action: ErrorAction.Shutdown}), closed: () => {
-                this.report('VOID language server terminated unexpectedly. Use VOID: Restart Language Server after checking the log.');
+            errorHandler: {error: (error, _message, count) => {
+                // Do not enter Stopping here: it skips closed() and its handled result.
+                // A transport error alone is not proof of process termination.
+                this.output.appendLine(`VOID connection error (${count}): ${error.message}; state=${client.state}`);
+                return {action: ErrorAction.Continue, handled: true};
+            }, closed: () => {
+                reportUnexpected('closed');
                 return {action: CloseAction.DoNotRestart, handled: true};
             }}
         };
         const client = new LanguageClient('void', 'VOID', serverOptions, clientOptions);
         this.client = client; this.project = project;
-        try { await client.start(); await client.setTrace(project.trace === 'verbose' ? Trace.Verbose : project.trace === 'messages' ? Trace.Messages : Trace.Off); }
+        try { await client.start(); initialized = true; await client.setTrace(project.trace === 'verbose' ? Trace.Verbose : project.trace === 'messages' ? Trace.Messages : Trace.Off); }
         catch (e) { this.report(`VOID language server failed to start: ${String(e)}`); await this.stop(); }
     }
     async dispose(): Promise<void> { this.disposed = true; await this.serial; await this.stop(); }

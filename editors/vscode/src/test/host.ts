@@ -26,6 +26,9 @@ export async function run(): Promise<void> {
         const child = original(...args);
         if (String(args[0]) === process.env.VOIDLS_PATH || String(args[0]).includes('voidls')) {
             children.push(child); record('Native server launched: ' + JSON.stringify(args));
+            child.once('exit', (code, signal) => record(`Native exit: code=${code}, signal=${signal}`));
+            for (const [name, stream] of [['stdin', child.stdin], ['stdout', child.stdout]] as const)
+                stream?.on('error', error => record(`Native ${name} error: ${String(error)}`));
             let chunks = 0; child.stdout?.on('data', data => { if(chunks++ < 20) record('Native stdout: ' + String(data)); });
             child.stderr?.on('data', data => console.log('Native stderr:', String(data)));
         }
@@ -37,7 +40,7 @@ export async function run(): Promise<void> {
     const originalError = vscode.window.showErrorMessage;
     // Capture UI error reporting without modal notifications obstructing the test.
     (vscode.window as {showErrorMessage: typeof originalError}).showErrorMessage = ((message: string) => {
-        messages.push(message); return Promise.resolve(undefined);
+        messages.push(message); record('Error notification: ' + message); return Promise.resolve(undefined);
     }) as typeof originalError;
     const config = vscode.workspace.getConfiguration('void');
     const extension = vscode.extensions.getExtension('void-language.void-language'); assert(extension);
@@ -111,6 +114,7 @@ export async function run(): Promise<void> {
         await config.update('project.entry', 'second.void', vscode.ConfigurationTarget.Workspace);
         await until(() => api!.status().entry, e => !!e?.endsWith('second.void'), 'configured entry change');
         await until(() => gone(children[1]), Boolean, 'entry change cleanup');
+        assert.equal(messages.length, 0, 'Normal initialization/restart/entry switch must not warn');
         const beforeMissing = children.length;
         await config.update('server.path', path.join(root, 'missing-voidls'), vscode.ConfigurationTarget.Workspace);
         await until(() => api!.status().state, s => s === 'stopped', 'missing executable');
@@ -130,10 +134,35 @@ export async function run(): Promise<void> {
         assert.equal(api!.status().state, 'stopped');
         await config.update('server.path', process.env.VOIDLS_PATH, vscode.ConfigurationTarget.Workspace);
         await api!.ready(); assert.equal(api!.status().state, 'running');
+        // Exercise error-before-close deterministically on every OS using the
+        // actual child's transport and the real language client/native server.
+        // This is a controlled stream error, not a Windows OS reproduction.
+        const transportChild = children[children.length - 1];
+        const terminationCount = () => messages.filter(m => m.includes('terminated unexpectedly')).length;
+        assert.equal(terminationCount(), 0, 'Intentional stops/startup failures must not report termination');
+        const beforeTransportMessages = messages.length;
+        const streamError = Object.assign(new Error('Focused transport failure before close'), {code:'EPIPE'});
+        assert(transportChild.stdin); transportChild.stdin.emit('error', streamError);
+        transportChild.stdin.emit('error', streamError); // Repeated errors still notify once.
+        await new Promise(r => setTimeout(r, 50));
+        assert.equal(api!.status().state, 'running', 'A stream error alone is not termination');
+        assert.equal(messages.length, beforeTransportMessages, 'Transport errors should log without false termination popups');
+        transportChild.kill(); // Actual process termination closes the real transport.
+        await until(() => api!.status().state, s => s === 'stopped', 'transport error shutdown');
+        await until(() => terminationCount(), n => n === 1, 'transport error termination report');
+        await until(() => gone(transportChild), Boolean, 'transport error child cleanup');
+        const transportCount = children.length;
+        await new Promise(r => setTimeout(r, 200)); assert.equal(children.length, transportCount);
+        assert.equal(messages.length, beforeTransportMessages + 1, 'Transport failure must notify exactly once');
+        await vscode.commands.executeCommand('void.restartLanguageServer');
+        assert.equal(api!.status().state, 'running');
+        const beforeKillMessages = messages.length;
         const active = children[children.length - 1]; active.kill();
         await until(() => api!.status().state, s => s === 'stopped', 'unexpected termination');
-        await until(() => messages.some(m => m.includes('terminated unexpectedly')), Boolean, 'termination report');
+        await until(() => terminationCount(), n => n === 2, 'termination report');
         const count = children.length; await new Promise(r => setTimeout(r, 200)); assert.equal(children.length, count);
+        assert.equal(messages.length, beforeKillMessages + 1, 'Killed process must notify exactly once');
+        const afterKillMessages = messages.length;
         await vscode.commands.executeCommand('void.restartLanguageServer'); assert.equal(api!.status().state, 'running');
         // No entry discovery: fallback is fixed until explicitly restarted.
         await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(workerUri));
@@ -148,6 +177,10 @@ export async function run(): Promise<void> {
         await api?.deactivate();
         await until(() => children.every(gone), Boolean, 'deactivation cleanup');
         assert.equal(children[children.length - 1].exitCode, 0);
+        assert.equal(terminationCount(), 2, 'Exactly one report per unexpected failure; none for intentional shutdown');
+        // Single-file fallback can legitimately warn about other open documents.
+        assert(messages.slice(afterKillMessages).every(m => m.includes('outside the selected project')),
+            'Intentional restart/configuration/deactivation must not emit failure notifications');
         assert.equal(unhandled.length, 0, 'Unhandled client rejection');
         console.log('PASS real editor: VOID2002 unsaved repair/ranges, definition/references, no stale queries, close/reopen, restart/configuration/failure/deactivation cleanup');
     } catch (error) { record('Editor test failure: ' + String(error) + (error instanceof Error ? '\n' + error.stack : '')); throw error; } finally {

@@ -2026,3 +2026,162 @@ Recommended next phase: expanded hosted/editor compatibility checks, followed by
 explicit disk-refresh/cancellation and client usability contracts before workers,
 partial compilation or broader IDE features. Keep the compiler analysis/reload
 contracts and separate managed-runtime/package design gates intact.
+
+
+## Phase 11 Windows termination-report correction (2026-10-11 local)
+
+### Hosted evidence and root cause
+
+Read the actual GitHub Actions logs for [run #14, Windows job 114668718372](https://github.com/Shmellyorc/Void.Language/actions/runs/38205742510/job/114668718372),
+commit `7fa9893d3aadc2cab5d1588f8cafefa21754860f`, using the read-only GitHub
+job-log API. Windows Server 2022 native Debug and Release passed 21/21 each;
+extension unit tests passed 4/4. The editor test reached stopped after killing
+the actual native process, then failed with `Timed out: termination report` at
+04:59:04 UTC. The logs did not capture the client output channel/underlying Windows
+pipe error. Consequently an exact Windows errno or event timeline cannot be
+asserted from this log alone. Focused stream/exit/notification instrumentation now
+prints these events in the integration test for the next hosted run.
+
+The pinned vscode-languageclient 10.1.2 implementation establishes the lifecycle
+hole: common/client.js handleConnectionError awaits error(), then ErrorAction.Shutdown
+calls stop(). shutdown() enters Stopping before asynchronously awaiting shutdown/exit.
+handleConnectionClosed skips errorHandler.closed() while Stopping and returns early
+when Stopped. VOID's old error() returned Shutdown without reporting, while only
+closed() reported unexpected termination. A transport error before close therefore
+stopped the client without the promised VOID notification. Windows terminated pipes
+can exercise this ordering, unlike the close-first path observed locally. This
+ordering explains the hosted symptom; its precise Windows OS event remains to be
+confirmed by the added instrumentation on the next run.
+
+Before editing extension lifecycle code, reproduced this exact reporting hole in
+an actual Linux VS Code host with the real built voidls: emit a controlled EPIPE
+error on the actual child stdin transport, allowing the standard language client's
+real error handler to stop the native server. The unmodified extension reached
+stopped and failed `Timed out: transport error termination report`. This is a
+controlled transport-event regression, not a claimed Windows OS reproduction,
+fake server, replacement transport or compiler simulation. The original real
+process-kill assertion remains and is strengthened to count reports per failure.
+
+### Exact correction and regression coverage
+
+The final error() policy returns Continue with handled=true and logs the transport
+error; an error alone is not proof of native termination. It leaves the standard
+client eligible to invoke closed() when the actual connection closes. closed()
+reports through a per-client guarded reporter and returns DoNotRestart/handled=true,
+so the standard client cleans up without restarting or a duplicate generic popup.
+A successfully initialized current session reports once; later independently failed
+sessions still notify. Startup failures retain their existing startup-error path.
+Intentional shutdown is identified by manager disposal or clearing/replacing the
+active client before stop(), suppressing false termination warnings for explicit
+restart/configuration/deactivation. The normal asynchronous stop/dispose lifecycle
+remains unchanged. No separate process supervisor/transport is introduced.
+
+A first correction reported from error() as well as closed() while retaining
+Shutdown. Stronger assertions exposed a generic duplicate popup during an actual
+local process kill: handleConnectionClosed uses a default unhandled DoNotRestart
+result when Stopping, bypassing our closed() result. Thus reporting from both
+callbacks was insufficient. The final Continue policy avoids entering Stopping
+from an error and preserves the handled close path. The intermediate attempt is
+not counted as passing final verification; its output-channel evidence is retained
+in windows-fix-duplicate-warning.log.
+
+The real editor suite additionally injects two controlled stream errors on the
+actual native child's stdin, verifies that a transport error alone neither stops
+the client nor falsely reports termination, then kills that actual process to
+force error-before-close ordering. It requires exactly one notification, real
+child cleanup and no automatic restart. After explicit restart, the original
+independent native process-kill test remains and must produce the second report.
+Exactly one UI notification per failure is asserted, including generic client
+popups; normal initialization/restart/entry changes must not warn. Subsequent
+single-file selection may legitimately warn about other open project documents,
+but no failure notification is permitted during intentional restart/deactivation.
+Existing diagnostics, unsaved repair, navigation, startup-failure, trust, multi-root,
+cleanup and unhandled rejection assertions remain. Instrumentation logs real stream
+errors, native exit status and captured error notifications to stdout/evidence;
+the VOID channel logs connection reasons and lifecycle state.
+
+### Local results and remaining hosted check
+
+Using Node 24.19.0, VS Code 1.141.0 and the installed LLVM 19.1.7-built real voidls:
+
+- `npm test`: strict type-check/build and 4/4 unit tests passed.
+- `VOIDLS_PATH=.../build/ci-debug/voidls VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:host`:
+  trusted (controlled error-before-close and independent process kill), restricted and multi-root profiles passed.
+  Exactly one report per unexpected failure, no termination warning for intentional
+  shutdown, no automatic restart, no unhandled rejection and no leaked child.
+- `ctest --test-dir build/ci-debug --output-on-failure`: 21/21, 34.85 seconds.
+- `ctest --test-dir build/ci-release --output-on-failure`: 21/21, 30.45 seconds.
+- Strict installed-SDK ASan/UBSan CTest: 21/21, 54.21 seconds, with leak detection
+  and halt-on-error settings unchanged, outside the tracing sandbox.
+- `npm run package`: succeeded; eight-file local VSIX includes dependency notices
+  and the exact built bundle. Package/source hashes are recorded in
+  build/phase11-verification/windows-fix-audit.json. The informational bundle-size
+  warning remains visible.
+
+Ignored evidence is in build/phase11-verification/windows-job-excerpt.log and
+windows-fix-{before,after,unit,package,native-debug,native-release,native-sanitizers}.log.
+The before log is an intentional failing reproduction, not a passing result.
+No compiler/native-server/LLVM/configuration/workflow/dependency changes were made.
+All existing tests remain intact. Windows is unavailable locally: the actual Windows
+process termination/pipe behavior still requires another user-triggered hosted run;
+macOS was not rerun locally either. No hosted success is claimed for this correction.
+No commits, branches, pushes, remote edits or publication were performed.
+
+
+## Phase 11 run #14 Linux evidence review (2026-10-11 local)
+
+Reviewed the actual read-only GitHub job logs and completed run metadata for
+[run #14](https://github.com/Shmellyorc/Void.Language/actions/runs/38205742510),
+commit `7fa9893d3aadc2cab5d1588f8cafefa21754860f`:
+
+- [Linux job 114668718282](https://github.com/Shmellyorc/Void.Language/actions/runs/38205742510/job/114668718282):
+  Debug, Release and strict ASan/UBSan each passed 21/21; extension unit tests
+  passed 4/4. The real editor test failed `Timed out: termination report`.
+- [Windows job 114668718372](https://github.com/Shmellyorc/Void.Language/actions/runs/38205742510/job/114668718372):
+  rechecked Debug/Release 21/21 and unit 4/4 passes, with the same editor timeout.
+- macOS job 114668718102 completed successfully, including real editor integration
+  and VSIX packaging, as confirmed by the run job/step metadata.
+
+Both failing jobs exercised the original committed lifecycle, not the existing
+uncommitted correction. Linux restored and initialized the real server at
+05:34:48.393–.398 UTC, logged `Error: Unexpected SIGPIPE` at 05:34:48.402,
+then remained alive until the termination-report assertion timed out at
+05:35:08.454. Its stack is process.<anonymous> in the editor's
+resources/app/out/bootstrap-fork.js:4:1710 followed by process.emit, not a native
+VOID/LLVM backtrace. The original test awaited the client reaching stopped before
+waiting for the notification. This matches the same error-before-close reporting
+hole investigated above; neither log captures the exact transport errno/callback
+sequence, so that fine-grained Windows/Linux event order remains an inference
+supported by the pinned client source and deterministic local reproduction.
+
+Inspected the installed matching VS Code 1.141.0 bootstrap-fork.js. Its SIGPIPE
+handler uses process.on('SIGPIPE', ...) and console.error(new Error('Unexpected
+SIGPIPE')), once per process. It does not throw that Error or terminate the host.
+A write to a killed child's closed pipe is consistent with the test timing; the
+log does not identify the individual write. The host continuing for twenty seconds
+and failing the notification assertion confirms this message was not itself the
+fatal assertion or an extension-host crash. No native sanitizer issue is indicated.
+
+Crucially, the final corrected local real-editor run already recorded the same
+`Unexpected SIGPIPE` once in windows-fix-after.log and still passed the trusted,
+restricted and multi-root profiles. The real kill, exact notification counts,
+no-automatic-restart, intentional-shutdown and child-cleanup assertions all passed
+with that signal log present. No signal handler, environment flag, suppression,
+weakened assertion or test skip was added. Hashes of extension.ts and host.ts still
+match the verified windows-fix-audit.json. The earlier local 4/4 unit, three 21/21
+native configurations and package results remain applicable because code is
+unchanged. No redundant native or editor rerun was needed for this evidence-only
+review. The Linux CI excerpt is retained in ignored
+build/phase11-verification/linux-run14-excerpt.log.
+
+**The existing correction covers the lifecycle hole behind both failures and is
+ready for the next hosted CI attempt.** ErrorAction.Continue logs a transport error
+without prematurely entering Stopping, allowing actual connection closure to run
+the guarded reporting handler and DoNotRestart cleanup. macOS close-first behavior
+continues to use that same handler. SIGPIPE may still be logged during deliberate
+process-kill testing; current evidence does not justify a separate product change.
+A new hosted run is still required to verify the corrected code on the actual
+Linux/Xvfb, Windows and macOS runners. Exact Windows pipe behavior remains unavailable
+locally. This review changes WORK_LOG.md only; the existing lifecycle correction,
+all strict tests, native code, LLVM settings and workflow are left intact. No
+commits, pushes, branches or remote modifications were performed.
