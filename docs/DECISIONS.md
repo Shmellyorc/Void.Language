@@ -494,7 +494,12 @@ LLVM lowering in JIT and AOT; no heap or reference aliasing mechanism is added.
 
 Use target-native, declaration-order LLVM aggregate layout and matching private
 source-function signatures. Supply DataLayout before lowering debug member
-metadata. This does not define a public C aggregate ABI or stable packed layout.
+metadata. Layout queries must use the module-owned DataLayout copy: LLVM caches
+StructLayout by raw, context-owned StructType pointers, so the longer-lived LLJIT
+DataLayout must not cache types from disposable compilation contexts. Recycled
+addresses can otherwise return an earlier generation's field offsets/count.
+The target layout specification is unchanged; only cache ownership is bounded.
+This does not define a public C aggregate ABI or stable packed layout.
 The existing i32 host adapter remains enforced. Exact safety contracts include
 ordered fields, nominal identities and default syntax; incompatible edits require
 manual restart. Shared analysis now owns type/field declarations and references,

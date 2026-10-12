@@ -23,6 +23,32 @@ void run(const std::string& text,int expected) {
     auto analysis=analyze(text); vd::Jit jit;
     for (bool optimized : {false,true}) check(jit.compile(*analysis,optimized)->invoke(0)==expected,"value/order/copy result");
 }
+// Retire each native generation/context while retaining one JIT. LLVM layout
+// caches must not confuse recycled Type addresses with earlier aggregate shapes.
+void layout_retirement() {
+    vd::Jit jit;
+    for (int generation=0; generation<64; ++generation) {
+        const int fields=1+(generation*7)%17;
+        std::string source="value struct cell:\n";
+        for (int field=0; field<fields; ++field) source+="    f"+std::to_string(field)+": i32 = "+std::to_string(field)+"\n";
+        source+="func (c cell) init(value: i32):\n    c.f"+std::to_string(fields-1)+" += value\nfunc entry(value: i32) -> i32:\n    return cell(value).f"+std::to_string(fields-1)+"\n";
+        auto analysis=analyze(source);
+        std::cerr << "Initialization layout generation " << generation << " fields=" << fields << std::endl;
+        for (bool optimized : {false,true}) check(jit.compile(*analysis,optimized)->invoke(10)==fields+9,"layout generation result");
+    }
+    for (int generation=0; generation<16; ++generation) {
+        auto wide=generation%2 ? "i64" : "i8";
+        std::cerr << "Initialization nested layout generation " << generation << " padding=" << wide << std::endl;
+        auto analysis=analyze(std::string("value struct cell:\n    flag: bool = true\n    padding: ")+wide+" = 3\n    value: i32\n"
+            "func (c cell) init(value: i32 = 0):\n    c.value = value\n"
+            "value struct wrapper:\n    tag: bool\n    child: cell\n    tail: f64 = 1.5\n"
+            "func (w wrapper) init(value: i32):\n    w.child = cell(value)\n"
+            "func copied(w: wrapper) -> wrapper:\n    w.child.value++\n    return w\n"
+            "func entry(value: i32) -> i32:\n    var original = wrapper(value)\n    var copy = copied(original)\n    return original.child.value + copy.child.value\n");
+        for (bool optimized : {false,true}) check(jit.compile(*analysis,optimized)->invoke(10)==21,"nested layout retirement/copy/return");
+    }
+    std::cout << "80 aggregate layout generations retired through normal/O2 JIT\n";
+}
 }
 void initialization_tests(const std::filesystem::path& root) {
     vd::Jit jit;
@@ -30,6 +56,7 @@ void initialization_tests(const std::filesystem::path& root) {
         auto result=vd::analyze_project(root/"examples/initialization"/(std::string(name)+".void"));
         if (!result.succeeded()) throw vd::CompilationError(result.diagnostics);
         for (bool optimized : {false,true}) {
+            std::cerr << "Initialization project " << name << " optimized=" << optimized << std::endl;
             auto code=jit.compile(*result.program,optimized);
             for (int input : {1,2,10}) {
                 int expected=std::string(name)=="main" ? 146+2*input : std::string(name)=="order" ? 14603+211*input : std::string(name)=="required" ? 2*input+2 : std::string(name)=="numeric" ? input-4 : std::string(name)=="copies" ? 3*input+213 : 100/input;
@@ -44,6 +71,8 @@ void initialization_tests(const std::filesystem::path& root) {
             }
         }
     }
+    std::cerr << "Initialization begin: layout retirement" << std::endl;
+    layout_retirement();
     using C=vd::DiagnosticCode;
     auto entry=[](const std::string& expression) { return "func entry(value: i32) -> i32:\n    return "+expression+"\n"; };
     run(type+init+entry("point(y = 2, x = 5).x + point(1).y"),19);

@@ -71,10 +71,13 @@ std::string source_message(const SourceLocation& location, const std::string& ex
         ": " + description + "\n" + excerpt;
 }
 std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& context,
-                                  const std::string& suffix, const llvm::DataLayout& layout) {
+                                  const std::string& suffix, const llvm::DataLayout& target_layout) {
     ir::validate(input);
     auto module = std::make_unique<llvm::Module>(input.identity, context);
-    module->setDataLayout(layout);
+    module->setDataLayout(target_layout);
+    // StructLayout caches use raw context-owned Type pointers as keys. Query
+    // the module-owned copy, never the LLJIT layout that outlives these types.
+    const auto& layout = module->getDataLayout();
     llvm::IRBuilder<> b(context);
     std::map<std::string,llvm::StructType*> aggregates;
     std::function<llvm::Type*(ir::Type)> type = [&](ir::Type t) -> llvm::Type* {

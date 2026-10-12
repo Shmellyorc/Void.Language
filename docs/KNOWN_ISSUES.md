@@ -3,7 +3,11 @@
 Updated for Phase 14 custom value initialization.
 
 The owner reports Phase 13 `c72e62a` passed hosted run #19 on Windows, Linux and
-macOS. Phase 14 local evidence and pending hosted checks are in WORK_LOG.md.
+macOS. Phase 14 run #21 (`424cacb`) passed Windows/Ubuntu but macOS ARM64 Debug
+aborted in frontend aggregate debug layout generation (23/24 suites passed).
+A local reproducer confirms a context-lifetime bug in the shared LLJIT DataLayout
+cache; lowering now queries the module-owned copy. WORK_LOG.md records the
+backtrace, regression and validation. Another hosted ARM64 run is required.
 Approved C1 initialization is described in INITIALIZATION.md; Phase 13 I2 remains
 an unapproved historical alternative. Owner-module methods and custom value
 initializers use the existing shared types/IR/LLVM path.

@@ -2984,3 +2984,177 @@ all hosted matrices and the corrected Windows editor test still require another
 Actions run; Linux success is not substituted for those results. The existing
 workflow discovers all 24 suites automatically. No commits, pushes, branches,
 publishing or remote modifications were performed.
+
+## Phase 14 run #21: macOS ARM64 Debug layout-cache correction (12 October 2026)
+
+### Hosted evidence and investigation before the fix
+
+Read-only GitHub API retrieval inspected run 38252680475 at `424cacb`, macOS job
+114822713822 and artifact 11748844018 (`tests-macOS-ARM64`). The job log and
+artifact's debug/Testing/Temporary/LastTest.log agree: Debug built; frontend passed
+all groups through receiver methods, then aborted after `Frontend begin:
+initialization` at DataLayout.h:652, `Idx < NumElements`. The other 23 suites,
+including initialization_cli, passed. The run API reports Windows and Ubuntu
+success. The artifact contains configuration and CTest logs, **no core/backtrace
+or individual initialization-program marker**. It does not identify which of the
+six original project examples was active; that hosted source cannot be recovered
+from this artifact alone.
+
+Before changing production behavior, temporarily instrumented debug_value_type
+with a comparison of native->getNumElements() against
+layout.getStructLayout(native)->getMemberOffsets().size(). Linux Debug caught a
+real mismatch: /order.void::pair had two current fields but a cached three-field
+layout. An isolated run of the original initialization group, including twenty
+repetitions, passed locally; the original hosted allocation sequence was not
+reproduced by that experiment.
+
+A focused real-source reproducer retained one vd::Jit while compiling and retiring
+successive init-bearing cell types through normal/O2 JIT. Field counts follow
+1 + (generation * 7) % 17. The first three types have 1, 8 and 15 i32 fields.
+Generation 2 constructs cell(value), whose initializer increments f14 and whose
+entry returns f14. At input 10 the expected result is 24. The diagnostic caught
+**native=15, cached=8** for /initialization.void::cell before execution.
+
+Removed the temporary production guard and captured the original assertion under
+GDB, before applying the fix. The unmodified lowering aborted at index 8:
+
+```text
+StructLayout::getElementOffset(Idx=8), DataLayout.h:652
+StructLayout::getElementOffsetInBits, DataLayout.h:657
+lower(...)::debug_value_type, backend.cpp:118
+lower(... suffix="__v5"), backend.cpp:133
+Jit::compile(... optimize=false), backend.cpp:417
+initialization_tests
+```
+
+The debugger invocation used the temporarily isolated initialization group:
+
+```sh
+gdb -batch -ex run -ex 'bt 22' --args \
+  build/ci-debug/void_tests frontend /home/shmellyorc/Documents/Void.Language
+```
+
+[LLVM 19.1.7 DataLayout.cpp](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/IR/DataLayout.cpp#L720-L739) confirms the mechanism: getStructLayout caches
+by raw StructType* and returns a previous entry immediately for an existing key.
+The DataLayout copy operation copies target specifications, not the layout cache.
+VOID passed the persistent LLJIT DataLayout into lowering, but creates disposable
+LLVMContexts per compilation. Once types are destroyed, allocator reuse can give
+a new type an old pointer key and retrieve the previous type's field count,
+offsets and size. A smaller cached count triggers this exact assertion; a larger
+one can silently generate incorrect debug offsets. ASan need not detect this:
+the cached StructLayout allocation itself is still live.
+
+This confirms the proposed debug_value_type call site with an actual Linux
+assertion/backtrace and specific source/lowering operation. It is a context/cache
+lifetime defect, not an ARM64 alignment rule or a collision in VOID nominal names.
+All fields in the minimal reproducer are i32; nesting and custom initialization
+are not necessary for the cache defect. ARM64's allocation sequence exposes it in
+a different original test group. No local macOS execution/backtrace is claimed.
+
+### Small correction and regression coverage
+
+Shared lowering now sets the module's target DataLayout as before, then performs
+all layout queries through **module->getDataLayout()**, rather than the borrowed
+LLJIT layout. This fresh cache is bounded by the module/context lifetime and
+retains the identical target specification. JIT and AOT still share lowering.
+No fields, indices, assertions, metadata, compiler semantics, sanitizer settings
+or existing tests were removed or bypassed. Temporary production instrumentation
+and the isolated-suite shortcut were removed.
+
+The frontend initialization suite adds 64 changing field-count generations and
+16 nested mixed-alignment generations, each normal/O2: 160 real source-to-native
+compilations/executions on retained JITs. Nested cases alternate i8/i64 beside bool,
+i32 and f64, use child/parent initializers and exercise independent copies and
+aggregate parameters/returns. Existing AOT integration and DWARF verification are
+retained. Program/mode and layout-generation markers now make a future hosted
+abort more precise. All 24 suites and the small-stack semantic regression remain.
+
+Evidence is retained under ignored build/phase14-macos-verification/: downloaded
+hosted logs, layout-generations-before.log, assertion-backtrace.log, isolated
+experiments, focused/full test logs, SDK checks and editor results. The temporary
+isolation/instrumentation is not part of the delivered source changes.
+
+### Completed local validation
+
+Focused tests ran first after the cache correction:
+
+```sh
+cmake --build build/ci-debug -j2
+ctest --test-dir build/ci-debug -R '^(frontend|initialization_cli)$' --output-on-failure
+```
+
+Both passed (frontend 4.95s; initialization_cli 2.52s). An initial version of the
+new nested fixture correctly failed semantic analysis because its child initializer
+required an argument; the fixture now supplies a declared parameter default, as
+required by the approved recursive construction contract. No compiler rule was
+changed to accommodate the test.
+
+Then reconfigured each existing tree, rerunning the actual LLVM ORC SDK link/run
+probe, built it to completion, and ran all 24 suites:
+
+| Build tree | LLVM 19.1.7 SDK / configuration | CTest result | CTest wall time |
+| --- | --- | --- | --- |
+| ci-debug | installed / Debug | 24/24 | 20.05s |
+| ci-release | installed / Release | 24/24 | 17.52s |
+| ci-sanitizers | installed / RelWithDebInfo ASan+UBSan | 24/24 | 33.51s |
+| ci-official-debug | complete official archive / Debug | 24/24 | 17.99s |
+| ci-official-release | complete official archive / Release | 24/24 | 14.16s |
+| ci-official-san | complete official archive / RelWithDebInfo ASan+UBSan | 24/24 | 27.20s |
+
+Actual commands per tree were cmake -S . -B build/<tree>,
+cmake --build build/<tree> -j2, then
+ctest --test-dir build/<tree> --output-on-failure -j4.
+Installed SDK root: /usr/lib/llvm-19 (RTTI YES). Official root:
+.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64 (RTTI NO). Matching 19.1.7 Clang/LLD
+and complete headers, ORC library and LLVMConfig.cmake were verified; each configure
+log records VOID_LLVM_ORC_RUNS success. SDK RTTI matching remains unchanged across
+all linked code. Strict runs used the existing sanitizer instrumentation with:
+
+```sh
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86
+```
+
+No sanitizer exclusions or assertion suppression were added. The installed SDK
+retains UBSan vptr checks; the official SDK retains its existing no-RTTI ABI policy.
+Full suites include normal/O2 separately linked AOT, object debug verification,
+source diagnostics, GC/native/hot-reload proofs and LSP/tooling tests.
+
+Both Debug SDK builds passed frontend --repeat until-fail:5 with ulimit -s 1024
+(ten executions total; 27.54s installed, 26.23s official). This preserves the
+small-stack expanded-layout/resource-limit regression. The command was:
+
+```sh
+(ulimit -s 1024; ctest --test-dir build/<debug-tree> -R '^frontend$' --repeat until-fail:5 --output-on-failure)
+```
+
+Editor verification used the existing Node runtime and local VS Code:
+
+```sh
+cd editors/vscode
+npm test
+npm run package
+VOIDLS_PATH=/home/shmellyorc/Documents/Void.Language/build/ci-debug/voidls \
+VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:host
+```
+
+All four extension unit tests passed. Local VSIX packaging succeeded (8 files,
+145.44 KB). Real editor trusted, restricted-trust and multi-root scenarios passed,
+including actual native process termination, notification counts, restart and
+clean deactivation. No editor production/test code changed for this correction.
+
+Both sanitizer SDK builds additionally passed
+ctest --test-dir build/<sanitizer-tree> -R '^(frontend|reload)$'
+--repeat until-fail:3 --output-on-failure under the same strict environment:
+three repetitions of each of two suites per SDK (twelve suite executions total;
+25.41s installed, 24.71s official). No leaks or sanitizer failures were reported.
+
+The correction is ready for the next hosted CI attempt. All new execution evidence
+is Linux x86-64. The original macOS artifact cannot identify its exact source
+example, and no macOS ARM64 execution is available locally; the identical assertion
+was instead reproduced and backtraced on Linux with the focused source sequence.
+The next macOS ARM64 Debug frontend run must confirm the repair on the originally
+failing platform. Windows/macOS hosted regressions remain necessary; previous
+Windows success is baseline evidence, not a test of these local changes. The
+existing workflow and all 24 suites remain enabled. No language features, LLVM
+version changes, commits, pushes, branches or remote modifications were made.
