@@ -476,3 +476,27 @@ never native binaries/LLVM. Keep package licensing UNLICENSED pending the owner'
 choice; local VSIX packaging does not authorize publication. Real editor tests use
 actual source/children and include a separate trust-enabled CLI launch because the
 official test runner disables trust. No native semantics/CMake/test assertions change.
+
+## Phase 12: value struct foundations, 12 October 2026
+
+The owner approved Option A in VALUE_STRUCTS_PROPOSAL.md: declared field defaults
+are pure, typed compile-time expressions; omitted fields use recursive safe
+defaults. Explicit named fields evaluate once in source order. Runtime defaults,
+custom init and positional constructors remain future features, not permanent
+prohibitions. No Language Bible change was required.
+
+Extend the shared ir::Type with owned nominal descriptors used by frontend,
+validated analysis, IR and tools. Keep aggregate compile-time values recursive
+and delegate scalar computation to the established numeric kernel. Resolve and
+validate acyclic layouts before defaults/bodies. Aggregate construct/extract/insert
+operations plus typed slots implement copying and nested updates through the same
+LLVM lowering in JIT and AOT; no heap or reference aliasing mechanism is added.
+
+Use target-native, declaration-order LLVM aggregate layout and matching private
+source-function signatures. Supply DataLayout before lowering debug member
+metadata. This does not define a public C aggregate ABI or stable packed layout.
+The existing i32 host adapter remains enforced. Exact safety contracts include
+ordered fields, nominal identities and default syntax; incompatible edits require
+manual restart. Shared analysis now owns type/field declarations and references,
+so LSP/editor integration does not need a second type model. VALUE_STRUCTS.md
+records the working syntax, limits and next recommended design phase.

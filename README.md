@@ -5,7 +5,7 @@ This repository now compiles graphs of actual `.void` files through one frontend
 semantic model, backend-independent IR, and shared LLVM 19.1.7 AOT/JIT lowering.
 The implemented subset supports typed functions, all ten exact-width numeric types,
 contextual literals, checked numeric `as`, bool expressions, local variables,
-conditionals, `for` loops, readonly/compile-time constants, and source-first
+conditionals, `for` loops, readonly/compile-time constants, numeric/bool value structs, and source-first
 compile/runtime diagnostics. Compile-time errors now include stable codes, ranges,
 related declarations and recovery across independent errors. Experimental GC, leased function
 replacement, and native C interoperability remain separate architectural proofs.
@@ -70,7 +70,7 @@ exits with status 2. The compiler does not launch a shell or linker itself.
 
 `run` and the AOT executable accept one optional decimal i32 input, defaulting to
 zero. They require `func entry(value: i32) -> i32`; internal functions can use
-multiple typed parameters, any supported numeric/bool result, or no result. `check` accepts library
+multiple typed parameters, any supported numeric/bool/value struct result, or no result. `check` accepts library
 files without an entry. Append `--no-opt` to `run` or `emit` to disable LLVM O2.
 Try [loops](examples/loops.void) and [recursive functions](examples/functions.void).
 
@@ -278,3 +278,21 @@ Server** and **Output → VOID** for lifecycle/logging. Native execution require
 workspace trust; only one project is managed per window. No server binary is bundled.
 See [EDITOR_INTEGRATION.md](docs/EDITOR_INTEGRATION.md) for a complete real multi-file
 example, development-host/test commands, restrictions and troubleshooting.
+
+## Value structs (Phase 12)
+
+Real source compilation now supports nested numeric/bool value structs with safe
+and compile-time defaults, named-field construction, independent copies, field
+mutation, parameters and returns. For example:
+
+```sh
+build/debug/voidc run examples/value_structs/main.void 10 --no-opt
+build/debug/voidc run examples/value_structs/main.void 10
+# Both print 46.
+```
+
+These commands compile the actual multi-file source project. The existing GC,
+reload and C interoperability proofs remain separate examples. See
+[the value struct contract and examples](docs/VALUE_STRUCTS.md) for native AOT
+commands, shared lowering, compiler-private aggregate calling conventions and
+current limitations.

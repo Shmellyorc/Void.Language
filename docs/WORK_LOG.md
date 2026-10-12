@@ -2262,3 +2262,176 @@ locally; the drive URI behavior is exercised through actual VS Code APIs, while 
 full native Windows fallback/warning sequence requires the next hosted run. The
 correction is ready for that attempt. No workflow/dependency/compiler/runtime
 changes, commits, branches, pushes or remote modifications were performed.
+# Phase 12 review — 12 October 2026
+
+The project owner reports Phase 11 Actions run #16 at `1b32151` passed Linux,
+Windows and macOS. Phase 12 begins from that completed foundation with a clean
+working tree. Reviewed the language/value-semantics contracts and traced the
+existing frontend, immutable validated analysis, module resolution, scalar VOID
+IR, shared LLVM lowering, tooling and strict SDK/sanitizer configuration.
+
+Value structs require extending the shared type representation, resolving named
+types, aggregate IR operations and aggregate debug metadata; primitive-only types
+currently flow through all these layers. No parallel type checker/backend is
+needed. The existing i32 host adapter can stay intact while source functions
+exchange aggregates internally.
+
+Recorded the bounded proposal in VALUE_STRUCTS_PROPOSAL.md. Approval is pending
+for pure compile-time declared field defaults versus runtime defaults with an
+explicit observable construction sequence. The Bible establishes safe defaults
+and named construction, but does not settle runtime default expressions; §16 also
+leaves custom initializer interaction open. This is a design gate requested by
+the owner, not an implementation failure. No compiler/runtime/editor changes,
+Phase 12 builds or tests, commits, branches or remote modifications have been
+made during this review.
+
+## Phase 12 implementation and final local validation — 12 October 2026
+
+The owner approved Option A in VALUE_STRUCTS_PROPOSAL.md after the design review.
+Implemented pure, typed compile-time declared field defaults, recursive safe
+fallbacks and source-order runtime named arguments. Runtime defaults, custom init
+and positional constructors remain deferred; none is permanently prohibited.
+Phase 11 run #16 at `1b32151` passed all hosted platforms according to the owner.
+Phase 12 hosted results are not yet available.
+
+### Implemented surface and architecture
+
+- Numeric/bool and acyclic nested value structs; forward and imported type names;
+  public/internal/file-private type declarations; exact nominal module identity.
+- Optional named-field construction, compile-time aggregate constants, recursive
+  defaults, field reads, nested writes/compounds/increment/decrement, local copies,
+  mutable copied parameters and independent aggregate returns. Readonly binding
+  roots protect all nested fields. Named arguments evaluate once in written order.
+- One shared nominal descriptor model extends ir::Type through frontend, validated
+  analysis, independent IR and LLVM. ConstantValue carries recursive values, while
+  scalar evaluation retains the original numeric kernel. Layout/default dependency
+  gates reject cycles and unsupported types before lowering. Limits bound layout
+  depth/default dependency recursion and expanded layout size; expression limits
+  reset for each declared field default.
+- Aggregate construct/extract/insert IR operations and typed slots implement copy
+  semantics with no heap/reference aliasing mechanism. Shared LLVM lowering uses
+  target-aligned declaration-order structs and matching private source signatures.
+  Target DataLayout is available before aggregate debug member sizes/offsets are
+  built. Ordinary runtime failures propagate through aggregate-returning functions
+  before callers consume their result. The host adapter remains i32(i32).
+- Validated analysis owns type/field declarations and references. Qualified type
+  annotation navigation points at the type identifier; annotation dependency edges
+  identify their enclosing declaration, preserving tooling invalidation contracts.
+  Constructor names/field initializers and field reads/writes navigate through the
+  existing LSP index. Layout/type/default changes reject reload before publication;
+  compatible function-body changes still reload and preserve old leases.
+- Editor grammar/indentation recognizes contextual `value struct`; ordinary `value`
+  parameters remain valid. Extension lifecycle code, compiler/runtime boundaries,
+  LLVM version/SDK requirements, RTTI correction and native printf proof are intact.
+
+During implementation, existing regressions exposed contextual-keyword and import
+lookup/recovery mistakes. These were corrected in the compiler rather than by
+changing their assertions. Final runs preserve malformed signature recovery,
+failed-import poisoning, ambiguity locations, independent diagnostics, and numeric
+context from qualified constants. Added struct tests also check parser recovery,
+invalid defaults/fields/types/returns, recursion/resource limits and malformed IR.
+
+### Exact final commands and results
+
+Existing build trees retain their strict LLVM 19.1.7 configurations: installed SDK
+at `/usr/lib/llvm-19/lib/cmake/llvm`, matching `/usr/bin/clang++-19`; official SDK
+at `.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/lib/cmake/llvm`, with its own
+matching Clang/LLD. CMake reconfiguration during this phase passed the required
+ORC link-and-run probe. SDK headers, libLLVMOrcJIT.a and LLVMConfig.cmake were
+checked for both installations; llvm-config reports 19.1.7 for both, RTTI YES
+for installed and NO for official. No mismatched components or relaxed SDK
+requirements were introduced. See build/phase12-verification/sdk.json.
+
+For each Debug/Release tree below, executed:
+
+```sh
+cmake --build build/<tree> -j 2
+ctest --test-dir build/<tree> --output-on-failure -j 4
+```
+
+For each sanitizer tree, built with the same command, then executed outside the
+tracing sandbox so LeakSanitizer can operate:
+
+```sh
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+    UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+    ctest --test-dir build/<tree> --output-on-failure -j 4
+```
+
+| SDK | Build tree / configuration | Final result | CTest elapsed |
+| --- | --- | --- | --- |
+| Installed, RTTI on | ci-debug / Debug | 22/22 passed | 26.91 s |
+| Installed, RTTI on | ci-release / Release | 22/22 passed | 19.83 s |
+| Installed, RTTI on | ci-sanitizers / RelWithDebInfo ASan/UBSan | 22/22 passed | 30.98 s |
+| Official, RTTI off | ci-official-debug / Debug | 22/22 passed | 22.71 s |
+| Official, RTTI off | ci-official-release / Release | 22/22 passed | 15.97 s |
+| Official, RTTI off | ci-official-san / RelWithDebInfo ASan/UBSan | 22/22 passed | 26.81 s |
+
+These are 132 passing suite executions. All original 21 suites remain; the new
+value_structs_cli suite adds normal/O2 JIT/AOT execution, actual native linking and
+DWARF verification for three source programs. The frontend suite adds struct
+semantics, diagnostics, nominal module lookup, readonly, tooling, compatibility,
+resource and IR validation cases. Existing numeric/GC/reload/native and Phase 5
+recovery assertions remain enabled. Sanitizer instrumentation retains the existing
+SDK-compatible RTTI policy; C++ compiler/runtime checks do not imply that generated
+LLVM/JIT application code is sanitizer-instrumented (the existing limitation).
+
+Extension verification, with Node 24.19.0 and existing pinned dependencies:
+
+```sh
+cd editors/vscode
+npm test
+node --test --test-reporter=tap out/test/config.test.js
+VOIDLS_PATH=/home/shmellyorc/Documents/Void.Language/build/ci-debug/voidls \
+VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:host
+```
+
+Strict TypeScript checking/build passed. All four registered unit tests passed
+(the detailed TAP rerun outside the sandbox confirms their individual execution).
+Real installed VS Code 1.141.0 passed trusted, restricted-trust and multi-root
+profiles against the final native voidls, including actual process kills, strict
+notification counts, no automatic restart, fallback paths, explicit restart and
+clean child shutdown. The existing intentional-kill SIGPIPE message remains visible
+in the passing trusted-host log; no lifecycle change or suppression was added.
+The native LSP protocol suite additionally passed type/constructor/field navigation,
+references, readonly diagnostics and invalid-to-valid revision recovery.
+
+### Actual source-to-native demonstration
+
+Executed the documented check/run/emit commands on
+examples/value_structs/main.void, linked its emitted object with the matching
+Clang/LLD 19.1.7, then ran the resulting Linux ELF executable:
+
+```text
+Source checked successfully
+46                          # normal JIT, input 10
+46                          # optimized JIT, input 10
+Wrote native source object: build/phase12-verification/value-structs.o
+46                          # separately linked native executable, input 10
+```
+
+The object/executable and native-demo.log are retained under
+build/phase12-verification/. `file` identifies the executable as an x86-64 ELF PIE
+with debug_info. This compiles the actual imported .void declarations, fields,
+functions and expressions; no manually reconstructed example IR is used.
+
+Final per-tree build/test logs, extension/unit/editor logs, SDK evidence, source
+hashes and results.json are retained in build/phase12-verification/. git diff
+whitespace validation passed. Build artifacts are local ignored outputs.
+
+### Remaining limitations and hosted readiness
+
+VALUE_STRUCTS.md, SOURCE_COMPILER.md, VALUE_SEMANTICS.md, DECISIONS.md,
+KNOWN_ISSUES.md, DEVELOPMENT_STRATEGY.md and README now describe the implemented
+surface and limits. The Language Bible was not altered. No public C aggregate ABI,
+stable offsets/serialization, managed reference types, runtime field defaults,
+custom init, positional constructors, field modifiers or aggregate equality was
+introduced. The GC remains experimental. The recommended next phase is receiver
+methods and initialization policy, including readonly receiver semantics and the
+observable construction sequence, before custom init or managed fields.
+
+Phase 12 is ready for the next hosted CI attempt. All verification above ran on
+Linux x86-64; Windows and macOS aggregate calling/layout behavior and their real
+editor scenarios still require hosted execution. The unchanged workflow runs the
+new 22nd suite automatically in its Debug/Release and Linux sanitizer matrices.
+No commits, pushes, branches, publishing or remote modifications were performed.

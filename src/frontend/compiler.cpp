@@ -45,7 +45,7 @@ SourceSpan span(const SourceFile& source, const Token& token) {
 }
 // A poisoned dependency has already produced a primary error. It is never a value.
 struct Poison {};
-constexpr Type error_type = static_cast<Type>(255); // AST-only; the lowering gate excludes it.
+const Type error_type = Type::invalid; // AST-only; the lowering gate excludes it.
 class Diagnostics {
     std::vector<Diagnostic> items;
     std::map<std::string, std::pair<std::string, std::shared_ptr<const SourceFile>>> snapshots;
@@ -187,11 +187,14 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     return tokens;
 }
 struct Expr {
-    enum class Kind { literal, name, call, unary, binary, conversion } kind;
+    enum class Kind { literal, name, call, unary, binary, conversion, field, construction } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::string op, qualifier, target;
     std::uint64_t value = 0;
+    ir::ConstantValue aggregate_value;
+    std::vector<Token> names;
+    std::vector<unsigned> field_indexes;
     std::string literal_text;
     std::vector<std::unique_ptr<Expr>> parts;
     Type type = Type::none;
@@ -204,6 +207,9 @@ struct Statement {
     std::string name, op, constant_syntax;
     std::optional<Type> annotation;
     std::unique_ptr<Expr> expression;
+    std::vector<Token> fields;
+    std::vector<unsigned> field_indexes;
+    Type assigned_type = Type::none;
     std::vector<Statement> body, otherwise;
     unsigned slot = 0, flow = 0;
     bool readonly = false, invalid = false;
@@ -226,6 +232,16 @@ struct Constant {
     unsigned state = 0;
     Type type = Type::none;
     std::uint64_t value = 0;
+    ir::ConstantValue aggregate_value;
+};
+struct Structure {
+    Token token;
+    std::shared_ptr<ir::ValueType> definition;
+    std::string visibility = "public";
+    std::vector<Statement> fields;
+    ir::ConstantValue defaults;
+    unsigned layout_state = 0, default_state = 0;
+    std::size_t expanded_fields = 0;
 };
 struct Import {
     Token path, alias;
@@ -238,6 +254,9 @@ struct Unit {
     std::vector<Import> imports;
     std::vector<Function> functions;
     std::vector<Constant> constants;
+    std::vector<Structure> structures;
+    std::vector<std::pair<Token,Type>> type_uses;
+    std::map<std::string, Structure*> structure_names;
     std::map<std::string, Constant*> constant_names;
     std::map<std::string, Function*> declarations;
     std::map<std::string, std::vector<Unit*>> qualifiers;
@@ -253,6 +272,7 @@ class Parser {
     std::size_t p = 0;
     Diagnostics& diagnostics;
     unsigned depth = 0, nodes = 0;
+    std::vector<std::pair<Token,Type>> type_uses;
     const Token& peek() const { return tokens[std::min(p, tokens.size() - 1)]; }
     void synchronize(std::size_t start, bool declaration) {
         // Reconstruct indentation at the failure and its safe boundary.
@@ -268,7 +288,7 @@ class Parser {
         }
         bool line_start = p == 0 || tokens[std::min(p, tokens.size()) - 1].kind == TokenKind::newline;
         while (peek().kind != TokenKind::end) {
-            if (declaration && current_depth == 0 && line_start && (at("func") || at("const") || at("use") || at("private") || at("public") || at("internal"))) return;
+            if (declaration && current_depth == 0 && line_start && (at("func") || at("const") || at("value") || at("use") || at("private") || at("public") || at("internal"))) return;
             if (!declaration && current_depth <= baseline) {
                 if (peek().kind == TokenKind::dedent) return;
                 if (line_start && p > start) return;
@@ -302,7 +322,13 @@ class Parser {
             {"f32",Type::f32},{"f64",Type::f64},{"bool",Type::boolean}};
         auto found = types.find(peek().text);
         if (found != types.end()) { take(); return found->second; }
-        error(source, peek(), Code::unsupported_type, "Unsupported type '" + peek().text + "'.", "Use an exact-width numeric type or bool; omit the return annotation for no result.");
+        if (peek().kind != TokenKind::name || reserved.contains(peek().text)) error(source,peek(),Code::unsupported_type,"Unsupported type '" + peek().text + "'.","Use a numeric type, bool or a visible value struct.");
+        auto token = name();
+        std::string spelling = token.text;
+        auto reference_token = token;
+        if (accept(".")) { reference_token = name(); spelling += "." + reference_token.text; }
+        auto d = std::make_shared<ir::ValueType>(); d->name = spelling; d->identity = spelling; d->source_offset = token.offset;
+        Type result(d,Type::unresolved); type_uses.emplace_back(reference_token,result); return result;
     }
     void newline() { need("<newline>"); }
     std::vector<Statement> block() {
@@ -347,19 +373,26 @@ class Parser {
             } else { e->type = Type::boolean; e->value = token.text == "true"; }
             return e;
         }
-        if (token.text == "(" ) { auto e = expression(); need(")"); return e; }
-        if (token.kind == TokenKind::name && !reserved.contains(token.text)) {
-            auto e = std::make_unique<Expr>(Expr::Kind::name, token);
-            if (accept(".")) {
-                e->qualifier = token.text;
-                e->qualifier_token = token;
-                e->token = name();
-
-            }
-            if (accept("(")) {
-                e->kind = Expr::Kind::call;
-                if (!at(")")) do { e->parts.push_back(expression()); } while (accept(","));
-                need(")");
+        if (token.text == "(" || (token.kind == TokenKind::name && !reserved.contains(token.text))) {
+            std::unique_ptr<Expr> e;
+            if (token.text == "(") { e = expression(); need(")"); }
+            else e = std::make_unique<Expr>(Expr::Kind::name, token);
+            while (true) {
+                if (accept(".")) {
+                    auto member = std::make_unique<Expr>(Expr::Kind::field, name());
+                    member->parts.push_back(std::move(e)); e = std::move(member);
+                } else if (accept("(")) {
+                    if (e->kind == Expr::Kind::field && e->parts[0]->kind == Expr::Kind::name) {
+                        e->qualifier = e->parts[0]->token.text; e->qualifier_token = e->parts[0]->token; e->parts.clear();
+                    } else if (e->kind != Expr::Kind::name) error(source,e->token,Code::not_callable,"Only named functions and value types are callable.");
+                    e->kind = Expr::Kind::call;
+                    if (!at(")")) do {
+                        Token named{TokenKind::name,"",peek().offset};
+                        if (p + 1 < tokens.size() && tokens[p+1].text == "=") { named = name(); need("="); }
+                        e->names.push_back(named); e->parts.push_back(expression());
+                    } while (accept(","));
+                    need(")");
+                } else break;
             }
             return e;
         }
@@ -435,9 +468,11 @@ class Parser {
             newline(); return s;
         }
         if (peek().kind == TokenKind::name && p + 1 < tokens.size()) {
-            auto op = tokens[p + 1].text;
+            auto end = p + 1;
+            while (end + 1 < tokens.size() && tokens[end].text == "." && tokens[end+1].kind == TokenKind::name) end += 2;
+            auto op = tokens[end].text;
             if (op == "=" || op == "+=" || op == "-=" || op == "*=" || op == "/=" || op == "%=" || op == "++" || op == "--") {
-                Statement s(Statement::Kind::assignment, name()); s.name = s.token.text; s.op = take().text;
+                Statement s(Statement::Kind::assignment, name()); s.name = s.token.text; while (accept(".")) s.fields.push_back(name()); s.op = take().text;
                 if (op == "++" || op == "--") {
                     s.expression = std::make_unique<Expr>(Expr::Kind::literal, s.token); s.expression->literal_text = "1";
                 } else s.expression = expression();
@@ -458,7 +493,7 @@ public:
             if (peek().kind == TokenKind::invalid) throw Poison{};
             if (at("while")) error(source, peek(), Code::while_loop, "VOID uses 'for' for all loops.", "Replace 'while condition:' with 'for condition:' inside a function.");
             if (accept("use")) {
-                if (!unit.functions.empty() || !unit.constants.empty()) error(source, peek(), Code::syntax, "Imports must precede constant and function declarations.", "Move use declarations to the start of this file.");
+                if (!unit.functions.empty() || !unit.constants.empty() || !unit.structures.empty()) error(source, peek(), Code::syntax, "Imports must precede constant and function declarations.", "Move use declarations to the start of this file.");
                 if (peek().kind != TokenKind::path) error(source, peek(), Code::import_path, "Expected a quoted import path.", "Use \"/folder/file.void\" or \"./file.void\".");
                 Import import; import.path = take(); import.alias = import.path;
                 if (accept("as")) { import.alias = name(); import.explicit_alias = true; }
@@ -469,7 +504,21 @@ public:
             else if (!accept("public") && accept("internal")) f.visibility = "internal"; // All graph files belong to this project.
             if (at("const")) {
                 auto declaration = statement();
-                unit.constants.push_back({std::move(declaration), f.file_private, f.visibility}); continue;
+                unit.constants.push_back({std::move(declaration), f.file_private, f.visibility,0,Type::none,0,{}}); continue;
+            }
+            if (accept("value")) {
+                need("struct"); Structure structure; structure.token = name(); structure.visibility = f.visibility;
+                structure.definition = std::make_shared<ir::ValueType>(); structure.definition->name = structure.token.text;
+                need(":"); newline(); need("<indent>");
+                while (!at("<dedent>") && !at("<end of file>")) {
+                    Statement field(Statement::Kind::variable, name()); field.name = field.token.text;
+                    need(":"); field.annotation = type();
+                    auto begin = p; nodes = 0;
+                    if (accept("=")) field.expression = expression();
+                    for (auto n = begin; n < p; ++n) field.constant_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
+                    newline(); structure.fields.push_back(std::move(field));
+                }
+                need("<dedent>"); unit.structures.push_back(std::move(structure)); continue;
             }
             need("func"); f.token = name(); need("(");
             if (!at(")")) do { auto token = name(); need(":"); f.parameters.push_back({token, type()}); } while (accept(","));
@@ -486,6 +535,7 @@ public:
             if (p == start && peek().kind != TokenKind::end) take();
         }
         unit.parse_failed |= diagnostics.size() != before;
+        unit.type_uses = std::move(type_uses);
     }
 };
 ir::Op operation(const std::string& op) {
@@ -498,6 +548,48 @@ ir::Op operation(const std::string& op) {
 // Flow sets describe possible exits from a statement, independently of LLVM.
 constexpr unsigned next_flow = 1, return_flow = 2, break_flow = 4, continue_flow = 8;
 bool always(const Expr* e) { return !e || (e->kind == Expr::Kind::literal && e->type == Type::boolean && e->value == 1); }
+// Type lookup follows the same owned graph and direct-import boundary as values.
+std::pair<Unit*, Structure*> structure_lookup(Unit& unit, Unit& root,
+    const std::map<std::string,std::unique_ptr<Unit>>& units, const std::string& spelling, const Token& token) {
+    auto dot = spelling.find('.'); auto name = spelling.substr(dot == std::string::npos ? 0 : dot + 1);
+    if (dot == std::string::npos && unit.invalid_declarations.contains(name)) throw Poison{};
+    std::map<std::string,std::pair<Unit*,Structure*>> candidates;
+    auto add = [&](Unit* owner) {
+        auto found = owner->structure_names.find(name);
+        if (found != owner->structure_names.end() && (owner == &unit || found->second->visibility != "private"))
+            candidates.emplace(owner->identity,std::make_pair(owner,found->second));
+    };
+    if (dot != std::string::npos) {
+        auto qualifier = spelling.substr(0,dot); auto found = unit.qualifiers.find(qualifier);
+        if (unit.failed_qualifiers.contains(qualifier)) throw Poison{};
+        if (found == unit.qualifiers.end()) return {nullptr,nullptr};
+        if (found->second.size() != 1) error(unit.source,token,Code::ambiguous,"Ambiguous import qualifier '" + qualifier + "'.");
+        add(found->second.front());
+    } else {
+        add(&unit);
+        if (!candidates.empty()) return candidates.begin()->second;
+        if (unit.constant_names.contains(name) || unit.declarations.contains(name)) return {nullptr,nullptr};
+        add(&root);
+        for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty()) add(units.at(import.target).get());
+        for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty()) {
+            auto& owner = *units.at(import.target);
+            if (!candidates.empty() && ((owner.declarations.contains(name) && !owner.declarations.at(name)->file_private) ||
+                (owner.constant_names.contains(name) && !owner.constant_names.at(name)->file_private)))
+                error(unit.source,token,Code::ambiguous,"Ambiguous imported declaration '" + name + "'.","Use explicit aliases.");
+        }
+    }
+    if (candidates.size() > 1) error(unit.source,token,Code::ambiguous,"Ambiguous imported type '" + name + "'.","Use explicit aliases.");
+    return candidates.empty() ? std::pair<Unit*,Structure*>{nullptr,nullptr} : candidates.begin()->second;
+}
+Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std::unique_ptr<Unit>>& units, const Token& token) {
+    if (t.kind != Type::unresolved) return t;
+    auto [owner, structure] = structure_lookup(unit,root,units,t.definition->name,token); (void)owner;
+    auto location = token; location.offset = t.definition->source_offset; location.text = t.definition->name;
+    if (!structure) error(unit.source,location,Code::unsupported_type,"Unsupported type '" + t.definition->name + "'.","Use a numeric type, bool or a visible value struct.");
+    if (structure->layout_state == 3) throw Poison{};
+    return Type(structure->definition);
+}
+ir::ConstantValue constant_value(const SourceFile&, const Expr&);
 class Semantics {
     const SourceFile& source;
     Unit& unit;
@@ -505,6 +597,7 @@ class Semantics {
     std::set<std::string> visible_names;
     Unit& root;
     std::function<void(Unit&, Constant&)> evaluate;
+    std::function<void(Unit&, Structure&)> defaults;
     Diagnostics& diagnostics;
     bool invalid_function = false;
     struct Variable { Type type; unsigned slot; bool readonly; Token declaration; };
@@ -638,7 +731,22 @@ class Semantics {
             auto [owner,c] = constant(e); if (c) { evaluate(*owner,*c); return c->type; }
             return {};
         }
-        if (e.kind == K::call) return resolve(e).result;
+        if (e.kind == K::call) {
+            auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
+            if (structure) return Type(structure->definition);
+            return resolve(e).result;
+        }
+        if (e.kind == K::field) {
+            const auto& operand = *e.parts[0];
+            if (operand.kind == K::name && !lookup(operand.token.text) && unit.qualifiers.contains(operand.token.text)) {
+                Expr qualified(K::name,e.token); qualified.qualifier = operand.token.text; qualified.qualifier_token = operand.token;
+                auto [owner,c] = constant(qualified); if (c) { evaluate(*owner,*c); return c->type; }
+                return {};
+            }
+            auto base = anchor(*e.parts[0]);
+            if (base && base->kind == Type::aggregate) for (const auto& field : base->definition->fields) if (field.name == e.token.text) return field.type;
+            return {};
+        }
         if (e.op == "not" || e.op == "and" || e.op == "or" || e.op == "==" || e.op == "!=" || e.op == "<" || e.op == "<=" || e.op == ">" || e.op == ">=") return Type::boolean;
         for (auto& part : e.parts) if (auto t = anchor(*part)) return t;
         return {};
@@ -676,6 +784,7 @@ class Semantics {
                 auto [owner, c] = constant(e);
                 if (c) {
                     evaluate(*owner, *c); e.target = owner->identity + "::" + c->declaration.name; e.kind = K::literal; e.value = c->value;
+                    e.aggregate_value = c->aggregate_value;
                     return e.type = c->type;
                 }
             }
@@ -683,7 +792,40 @@ class Semantics {
             if (!v) error(source, e.token, Code::unknown_identifier, "Unknown identifier '" + e.token.text + "'.", "Declare it with var before use.");
             e.slot = v->slot; return e.type = v->type;
         }
+        if (e.kind == K::field) {
+            auto& base = *e.parts[0];
+            if (base.kind == K::name && !lookup(base.token.text) && unit.qualifiers.contains(base.token.text)) {
+                e.qualifier = base.token.text; e.qualifier_token = base.token; e.kind = K::name; e.parts.clear();
+                return expression_impl(e,expected);
+            }
+            auto t = expression(base);
+            if (t == error_type) return error_type;
+            if (t.kind != Type::aggregate) error(source,e.token,Code::type_mismatch,"Field access requires a value struct.");
+            for (unsigned n = 0; n < t.definition->fields.size(); ++n) if (t.definition->fields[n].name == e.token.text) {
+                e.slot = n; e.target = t.definition->identity + "::field::" + e.token.text; return e.type = t.definition->fields[n].type;
+            }
+            error(source,e.token,Code::unknown_identifier,"Unknown field '" + e.token.text + "' in " + ir::type_name(t) + ".");
+        }
         if (e.kind == K::call) {
+            auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
+            if (structure && !(e.qualifier.empty() && lookup(e.token.text))) {
+                defaults(*owner,*structure);
+                e.kind = K::construction; e.type = Type(structure->definition); e.target = structure->definition->identity;
+                e.aggregate_value = structure->defaults;
+                std::set<unsigned> initialized;
+                for (unsigned n = 0; n < e.parts.size(); ++n) {
+                    if (e.names[n].text.empty()) error(source,e.parts[n]->token,Code::argument_count,"Value construction requires named fields.","Use field = expression; positional constructors are not implemented yet.");
+                    auto& fields = structure->definition->fields;
+                    auto field = std::find_if(fields.begin(),fields.end(),[&](const auto& f) { return f.name == e.names[n].text; });
+                    if (field == fields.end()) error(source,e.names[n],Code::unknown_identifier,"Unknown constructor field '" + e.names[n].text + "'.");
+                    auto index = static_cast<unsigned>(field-fields.begin());
+                    if (!initialized.insert(index).second) error(source,e.names[n],Code::duplicate,"Duplicate initializer for field '" + field->name + "'.");
+                    e.field_indexes.push_back(index);
+                    expect(expression(*e.parts[n],field->type),field->type,e.parts[n]->token);
+                }
+                return e.type;
+            }
+            if (std::any_of(e.names.begin(),e.names.end(),[](const auto& t) { return !t.text.empty(); })) error(source,e.token,Code::argument_count,"Named arguments are currently supported only for value construction.");
             if (!current) error(source, e.token, Code::constant_call, "A compile-time constant cannot call a function.", "Use a local const for runtime values.");
             if (auto* value = e.qualifier.empty() ? lookup(e.token.text) : nullptr) {
                 if (value->type == error_type) throw Poison{};
@@ -708,7 +850,7 @@ class Semantics {
             return e.type = invalid ? error_type : target.result;
         }
         if (e.kind == K::conversion) {
-            Type target = e.type;
+            Type target = e.type = resolve_type(e.type,unit,root,units,e.token);
             auto& operand = *e.parts[0];
             if (operand.kind == K::literal && !operand.literal_text.empty() && !anchor(operand)) {
                 if (!numeric::number(target)) error(source,e.token,Code::numeric_conversion,"Numeric as requires numeric source and destination types.");
@@ -755,6 +897,7 @@ class Semantics {
         if (e.op != "==" && e.op != "!=" && !numeric::number(left)) expect(left,Type::i32,e.parts[0]->token);
         expect(right,left,e.token);
         if (e.op == "==" || e.op == "!=") {
+            if (left.kind == Type::aggregate) error(source,e.token,Code::numeric_operator,"Value struct equality is not implemented.");
             if (left == Type::none) error(source,e.token,Code::invalid_value,"Cannot compare a no-result call.");
             return e.type = Type::boolean;
         }
@@ -788,6 +931,7 @@ class Semantics {
         switch (s.kind) {
         case K::variable: {
             if (s.invalid) { s.slot = declare(s.token, error_type); invalid_function = true; break; }
+            if (s.annotation) s.annotation = resolve_type(*s.annotation,unit,root,units,s.token);
             Type t = s.expression ? expression(*s.expression, s.annotation) : s.annotation.value_or(Type::none);
             if (t == Type::none) {
                 s.slot = declare(s.token, error_type, s.readonly);
@@ -797,6 +941,12 @@ class Semantics {
                 try { expect(t, *s.annotation, s.expression ? s.expression->token : s.token); }
                 catch (const CompilationError& failure) { diagnostics.add(failure); t = error_type; }
             }
+            if (!s.expression && t.kind == Type::aggregate) {
+                for (const auto& [id,owner] : units) for (auto& structure : owner->structures) if (structure.definition == t.definition) {
+                    defaults(*owner,structure);
+                    s.expression = std::make_unique<Expr>(Expr::Kind::literal,s.token); s.expression->type = t; s.expression->aggregate_value = structure.defaults;
+                }
+            }
             s.slot = declare(s.token, t, s.readonly); break;
         }
         case K::assignment: {
@@ -805,6 +955,14 @@ class Semantics {
                 error(source, s.token, Code::readonly, "Cannot mutate readonly const or declaration '" + s.name + "'.", "Use var for a mutable local binding.");
             if (!variable) error(source, s.token, Code::unknown_identifier, "Unknown identifier '" + s.name + "'.", "Declare it with var before assignment.");
             auto t = variable->type; s.slot = variable->slot;
+            for (const auto& field : s.fields) {
+                if (t == error_type) throw Poison{};
+                if (t.kind != Type::aggregate) error(source,field,Code::type_mismatch,"Field assignment requires a value struct.");
+                auto found = std::find_if(t.definition->fields.begin(),t.definition->fields.end(),[&](const auto& f) { return f.name == field.text; });
+                if (found == t.definition->fields.end()) error(source,field,Code::unknown_identifier,"Unknown field '" + field.text + "'.");
+                s.field_indexes.push_back(static_cast<unsigned>(found-t.definition->fields.begin())); t = found->type;
+            }
+            s.assigned_type = t;
             expect(expression(*s.expression, t), t, s.expression->token);
             if (s.op != "=" && t != error_type && !numeric::number(t)) expect(t,Type::i32,s.token);
             if (s.op == "%=" && numeric::floating(t)) error(source,s.token,Code::numeric_operator,"Illegal compound floating remainder operator.");
@@ -847,8 +1005,10 @@ class Semantics {
     }
 public:
     Semantics(Unit& u, const std::map<std::string, std::unique_ptr<Unit>>& graph, Unit& r,
-        std::function<void(Unit&, Constant&)> eval, Diagnostics& d)
-        : source(u.source), unit(u), units(graph), root(r), evaluate(std::move(eval)), diagnostics(d) {
+        std::function<void(Unit&, Constant&)> eval, Diagnostics& d, std::function<void(Unit&,Structure&)> defs)
+        : source(u.source), unit(u), units(graph), root(r), evaluate(std::move(eval)), defaults(std::move(defs)), diagnostics(d) {
+        for (const auto& [id,owner] : units) for (const auto& [name,structure] : owner->structure_names)
+            if (owner.get() == &unit || (structure->visibility != "private" && (owner.get() == &root || std::any_of(unit.imports.begin(),unit.imports.end(),[&](const auto& i) { return !i.explicit_alias && i.target == id; })))) visible_names.insert(name);
         for (const auto& [name, c] : root.constant_names) if (!c->file_private || &root == &unit) visible_names.insert(name);
         for (const auto& [name, c] : unit.constant_names) { (void)c; visible_names.insert(name); }
         for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty())
@@ -860,9 +1020,23 @@ public:
                 if (!f->file_private) visible_names.insert(name);
     }
     void analyze_constant(Constant& c) {
+        if (c.declaration.annotation) c.declaration.annotation = resolve_type(*c.declaration.annotation,unit,root,units,c.declaration.token);
         c.type = expression(*c.declaration.expression, c.declaration.annotation);
         if (c.type == error_type) throw Poison{};
         if (c.declaration.annotation) expect(c.type, *c.declaration.annotation, c.declaration.token);
+    }
+    ir::ConstantValue field_default(Statement& field) {
+        auto t = *field.annotation;
+        if (field.expression) {
+            expect(expression(*field.expression,t),t,field.token);
+            if (field.expression->type == error_type) throw Poison{};
+            return constant_value(source,*field.expression);
+        }
+        if (t.kind != Type::aggregate) return {};
+        for (const auto& [id,owner] : units) for (auto& nested : owner->structures) if (nested.definition == t.definition) {
+            defaults(*owner,nested); return nested.defaults;
+        }
+        throw std::logic_error("Missing owned value type");
     }
     void analyze() {
         for (auto& f : unit.functions) {
@@ -898,11 +1072,39 @@ class Lowering {
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
     }
+    unsigned constant(Type t, const ir::ConstantValue& value, const Token& token) {
+        ir::Instruction i{t.kind == Type::aggregate ? ir::Op::aggregate : ir::Op::constant}; i.type = t;
+        if (t.kind == Type::aggregate) for (unsigned n = 0; n < t.definition->fields.size(); ++n)
+            i.arguments.push_back(constant(t.definition->fields[n].type,value.fields.at(n),token));
+        else i.immediate = std::bit_cast<std::int64_t>(value.bits);
+        return emit(i,token);
+    }
+    unsigned extract(unsigned value, unsigned field, const Token& token) {
+        ir::Instruction i{ir::Op::extract,value}; i.immediate = field; return emit(i,token);
+    }
+    unsigned insert(unsigned aggregate, unsigned value, unsigned field, const Token& token) {
+        ir::Instruction i{ir::Op::insert,aggregate,value}; i.immediate = field; return emit(i,token);
+    }
+    unsigned replace_path(unsigned aggregate, unsigned value, const std::vector<unsigned>& path, unsigned depth, const Token& token) {
+        if (depth == path.size()) return value;
+        auto child = extract(aggregate,path[depth],token);
+        return insert(aggregate,replace_path(child,value,path,depth+1,token),path[depth],token);
+    }
     unsigned expression(const Expr& e) {
         using K = Expr::Kind;
         switch (e.kind) {
         case K::literal: {
-            ir::Instruction i{ir::Op::constant}; i.immediate = std::bit_cast<std::int64_t>(e.value); i.type = e.type; return emit(i, e.token);
+            return constant(e.type,e.type.kind == Type::aggregate ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
+        }
+        case K::field: { auto value = expression(*e.parts[0]); return extract(value,e.slot,e.token); }
+        case K::construction: {
+            auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(e.type);
+            auto initial = constant(e.type,e.aggregate_value,e.token); emit({ir::Op::store,slot,initial},e.token);
+            for (unsigned n = 0; n < e.parts.size(); ++n) {
+                auto value = expression(*e.parts[n]); auto aggregate = emit({ir::Op::load,slot},e.token);
+                auto updated = insert(aggregate,value,e.field_indexes[n],e.names[n]); emit({ir::Op::store,slot,updated},e.token);
+            }
+            return emit({ir::Op::load,slot},e.token);
         }
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
         case K::call: {
@@ -955,13 +1157,19 @@ class Lowering {
             // Load compound-assignment LHS before evaluating its RHS.
             std::optional<unsigned> old_slot;
             if (s.op != "=") {
-                auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(output.locals[s.slot]); old_slot = slot;
-                auto old = emit({ir::Op::load, s.slot}, s.token); emit({ir::Op::store, slot, old}, s.token);
+                auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(s.assigned_type); old_slot = slot;
+                auto old = emit({ir::Op::load, s.slot}, s.token);
+                for (auto field : s.field_indexes) old = extract(old,field,s.token);
+                emit({ir::Op::store, slot, old}, s.token);
             }
             auto value = expression(*s.expression);
             if (old_slot) {
                 auto old = emit({ir::Op::load, *old_slot}, s.token);
                 value = emit({operation(s.op.substr(0, 1)), old, value}, s.token);
+            }
+            if (!s.field_indexes.empty()) {
+                auto aggregate = emit({ir::Op::load,s.slot},s.token);
+                value = replace_path(aggregate,value,s.field_indexes,0,s.token);
             }
             emit({ir::Op::store, s.slot, value}, s.token); break;
         }
@@ -1167,17 +1375,23 @@ public:
 };
 // Only typed, pure ASTs reach this evaluator. The shared software kernel
 // preserves declared precision and wrapping independently of host arithmetic.
-std::uint64_t constant_value(const SourceFile& source, const Expr& e) {
-    if (e.kind == Expr::Kind::literal) return e.value;
-    auto a = constant_value(source,*e.parts[0]);
+ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
+    if (e.kind == Expr::Kind::literal) return e.type.kind == Type::aggregate ? e.aggregate_value : ir::ConstantValue{e.value,{}};
+    if (e.kind == Expr::Kind::construction) {
+        auto result = e.aggregate_value;
+        for (unsigned n = 0; n < e.parts.size(); ++n) result.fields[e.field_indexes[n]] = constant_value(source,*e.parts[n]);
+        return result;
+    }
+    if (e.kind == Expr::Kind::field) return constant_value(source,*e.parts[0]).fields.at(e.slot);
+    auto a = constant_value(source,*e.parts[0]).bits;
     try {
-        if (e.kind == Expr::Kind::conversion) return numeric::convert(a,e.parts[0]->type,e.type);
-        if (e.kind == Expr::Kind::unary) return e.op == "not" ? !a : e.op == "-" ? numeric::negate(a,e.type) : a;
-        if (e.op == "and" && !a) return 0;
-        if (e.op == "or" && a) return 1;
-        auto b = constant_value(source,*e.parts[1]);
-        if (e.op == "and" || e.op == "or") return b;
-        return numeric::binary(operation(e.op),a,b,e.parts[0]->type);
+        if (e.kind == Expr::Kind::conversion) return {numeric::convert(a,e.parts[0]->type,e.type),{}};
+        if (e.kind == Expr::Kind::unary) return {e.op == "not" ? !a : e.op == "-" ? numeric::negate(a,e.type) : a,{}};
+        if (e.op == "and" && !a) return {};
+        if (e.op == "or" && a) return {1,{}};
+        auto b = constant_value(source,*e.parts[1]).bits;
+        if (e.op == "and" || e.op == "or") return {b,{}};
+        return {numeric::binary(operation(e.op),a,b,e.parts[0]->type),{}};
     } catch (const CompilationError&) { throw; }
       catch (const std::invalid_argument& failure) {
         error(source,e.token,e.kind == Expr::Kind::conversion ? Code::numeric_conversion : Code::zero_divisor,failure.what());
@@ -1195,11 +1409,19 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         }
     }
     auto& root = *units.at(entry);
+    for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
+        auto name = structure.token.text; structure.definition->identity = id + "::" + name;
+        if (unit->declarations.contains(name) || !unit->structure_names.emplace(name,&structure).second) {
+            unit->invalid_declarations.insert(name);
+            try { error(unit->source,structure.token,Code::duplicate,"Duplicate declaration '" + name + "'."); }
+            catch (const CompilationError& failure) { diagnostics.add(failure); }
+        }
+    }
     for (auto& [id, unit] : units) for (auto& c : unit->constants) {
         auto& token = c.declaration.token;
         auto previous = unit->constant_names.find(token.text);
-        if (unit->declarations.contains(token.text) || previous != unit->constant_names.end()) {
-            auto location = unit->declarations.contains(token.text) ? unit->declarations.at(token.text)->token : previous->second->declaration.token;
+        if (unit->structure_names.contains(token.text) || unit->declarations.contains(token.text) || previous != unit->constant_names.end()) {
+            auto location = unit->structure_names.contains(token.text) ? unit->structure_names.at(token.text)->token : unit->declarations.contains(token.text) ? unit->declarations.at(token.text)->token : previous->second->declaration.token;
             try { error(unit->source, token, Code::duplicate, "Duplicate declaration '" + token.text + "'.", {}, {{span(unit->source, location), "Previously declared"}}); }
             catch (const CompilationError& failure) { diagnostics.add(failure); }
             c.state = 3; unit->invalid_declarations.insert(token.text);
@@ -1212,13 +1434,26 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             if (unit->declarations.contains(name)) error(unit->source, unit->declarations.at(name)->token, Code::duplicate, "Declaration shadows project-root constant '" + name + "'.", {}, {{span(root.source, c->declaration.token), "Previously declared"}});
             } catch (const CompilationError& failure) { diagnostics.add(failure); unit->invalid_declarations.insert(name); }
         }
+        if (unit.get() != &root) for (const auto& [name,type] : root.structure_names) if (type->visibility != "private") {
+            auto duplicate = [&](const Token& token) {
+                try { error(unit->source,token,Code::duplicate,"Declaration shadows project-root value type '" + name + "'.",{},{{span(root.source,type->token),"Previously declared"}}); }
+                catch (const CompilationError& failure) { diagnostics.add(failure); unit->invalid_declarations.insert(name); }
+            };
+            if (unit->structure_names.contains(name)) duplicate(unit->structure_names.at(name)->token);
+            if (unit->constant_names.contains(name)) duplicate(unit->constant_names.at(name)->declaration.token);
+            if (unit->declarations.contains(name)) duplicate(unit->declarations.at(name)->token);
+        }
+        if (unit.get() != &root) for (const auto& [name,c] : root.constant_names) if (!c->file_private && unit->structure_names.contains(name)) {
+            try { error(unit->source,unit->structure_names.at(name)->token,Code::duplicate,"Declaration shadows project-root constant '" + name + "'.",{},{{span(root.source,c->declaration.token),"Previously declared"}}); }
+            catch (const CompilationError& failure) { diagnostics.add(failure); unit->invalid_declarations.insert(name); }
+        }
         for (const auto& import : unit->imports) {
             if (import.target.empty()) continue;
             if (units.at(import.target)->parse_failed) unit->failed_import = true;
             auto alias = import.explicit_alias ? import.alias.text : path_utf8(utf8_path(import.target).stem());
             try {
             if (!import.explicit_alias && !identifier(alias)) continue;
-            if ((import.explicit_alias && unit->declarations.contains(alias)) || unit->constant_names.contains(alias) || (root.constant_names.contains(alias) && !root.constant_names.at(alias)->file_private))
+            if (unit->structure_names.contains(alias) || (root.structure_names.contains(alias) && root.structure_names.at(alias)->visibility != "private") || (import.explicit_alias && unit->declarations.contains(alias)) || unit->constant_names.contains(alias) || (root.constant_names.contains(alias) && !root.constant_names.at(alias)->file_private))
                 error(unit->source, import.alias, Code::alias_conflict, "Import alias '" + alias + "' conflicts with " + (unit->declarations.contains(alias) ? "a function declaration." : "a constant declaration."), "Choose a distinct explicit alias with as.");
             auto* target = units.at(import.target).get();
             auto& targets = unit->qualifiers[alias];
@@ -1238,6 +1473,42 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             } catch (const CompilationError& failure) { diagnostics.add(failure); unit->failed_qualifiers.insert(alias); }
         }
     }
+    std::function<void(Unit&,Structure&)> layout = [&](Unit& owner, Structure& structure) {
+        if (structure.layout_state == 2) return;
+        if (structure.layout_state == 1) error(owner.source,structure.token,Code::unsupported_type,"Recursive value layout for '" + structure.token.text + "'.","Use an acyclic nesting of value types.");
+        if (structure.layout_state == 3) throw Poison{};
+        Depth guard(diagnostics.semantic_depth(),owner.source,structure.token,128);
+        structure.layout_state = 1;
+        try {
+            std::set<std::string> names;
+            for (auto& field : structure.fields) {
+                if (!names.insert(field.name).second) error(owner.source,field.token,Code::duplicate,"Duplicate field '" + field.name + "'.");
+                auto t = resolve_type(*field.annotation,owner,root,units,field.token);
+                std::size_t expanded = 1;
+                if (t.kind == Type::aggregate) for (auto& [id,u] : units) for (auto& child : u->structures) if (child.definition == t.definition) { layout(*u,child); expanded += child.expanded_fields; }
+                if (expanded > 65536 - structure.expanded_fields) error(owner.source,field.token,Code::nesting,"Expanded value layout limit exceeded.","Reduce nested value duplication; the compiler currently permits 65536 expanded fields per value.");
+                structure.expanded_fields += expanded;
+                field.annotation = t; structure.definition->fields.push_back({field.name,t});
+            }
+            structure.layout_state = 2;
+        } catch (...) { structure.layout_state = 3; throw; }
+    };
+    for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
+        try { layout(*unit,structure); }
+        catch (const CompilationError& failure) { diagnostics.add(failure); }
+        catch (const Poison&) {}
+    }
+    for (auto& [id,unit] : units) for (auto& f : unit->functions) {
+        auto resolve = [&](Type& t, const Token& token) {
+            try { t = resolve_type(t,*unit,root,units,token); }
+            catch (const CompilationError& failure) { diagnostics.add(failure); t = error_type; f.parse_failed = true; }
+            catch (const Poison&) { t = error_type; f.parse_failed = true; }
+        };
+        resolve(f.result,f.token);
+        for (auto& parameter : f.parameters) resolve(parameter.type,parameter.token);
+    }
+    // Failed layouts are poisoned and never form owning descriptor cycles.
+    std::function<void(Unit&, Structure&)> defaults;
     std::vector<std::string> dependency;
     std::function<void(Unit&, Constant&)> evaluate = [&](Unit& owner, Constant& c) {
         if (c.state == 2) return;
@@ -1251,18 +1522,36 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         }
         c.state = 1; dependency.push_back(key);
         try {
-            Semantics(owner, units, root, evaluate, diagnostics).analyze_constant(c);
-            c.value = constant_value(owner.source, *c.declaration.expression);
+            Semantics(owner, units, root, evaluate, diagnostics, defaults).analyze_constant(c);
+            c.aggregate_value = constant_value(owner.source, *c.declaration.expression); c.value = c.aggregate_value.bits;
             c.state = 2; dependency.pop_back();
         } catch (...) { c.state = 3; dependency.pop_back(); throw; }
     };
+    defaults = [&](Unit& owner, Structure& structure) {
+        if (structure.layout_state != 2) throw Poison{};
+        if (structure.default_state == 2) return;
+        if (structure.default_state == 3) throw Poison{};
+        if (structure.default_state == 1) error(owner.source,structure.token,Code::constant_cycle,"Circular field default dependency for '" + structure.token.text + "'.");
+        Depth guard(diagnostics.semantic_depth(),owner.source,structure.token,128);
+        structure.default_state = 1;
+        try {
+            Semantics semantics(owner,units,root,evaluate,diagnostics,defaults);
+            for (auto& field : structure.fields) structure.defaults.fields.push_back(semantics.field_default(field));
+            structure.default_state = 2;
+        } catch (...) { structure.default_state = 3; throw; }
+    };
+    for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
+        try { defaults(*unit,structure); }
+        catch (const CompilationError& failure) { diagnostics.add(failure); }
+        catch (const Poison&) {}
+    }
     for (auto& [id, unit] : units) for (auto& c : unit->constants) {
         if (diagnostics.full()) break;
         try { evaluate(*unit, c); }
         catch (const CompilationError& failure) { diagnostics.add(failure); }
         catch (const Poison&) {}
     }
-    for (auto& [id, unit] : units) Semantics(*unit, units, root, evaluate, diagnostics).analyze();
+    for (auto& [id, unit] : units) Semantics(*unit, units, root, evaluate, diagnostics, defaults).analyze();
     // Recovered trees and AST-only poisoned types can never enter validated IR.
     diagnostics.finish();
 }
@@ -1293,12 +1582,12 @@ struct AnalysisAccess {
             if (d.owner.empty()) d.owner = d.module;
             field(result->contract_, "declaration"); field(result->contract_, d.identity); field(result->contract_, d.visibility);
             field(result->contract_, std::to_string(static_cast<int>(d.kind)));
-            field(result->contract_, ir::type_name(d.type));
+            field(result->contract_, d.type.kind == Type::aggregate ? d.type.definition->identity : ir::type_name(d.type));
             field(result->contract_, std::to_string(d.parameters.size()));
-            for (auto t : d.parameters) field(result->contract_, ir::type_name(t));
+            for (auto t : d.parameters) field(result->contract_, t.kind == Type::aggregate ? t.definition->identity : ir::type_name(t));
             if (d.kind != AnalyzedDeclaration::Kind::function) {
                 field(result->constants_, d.identity); field(result->constants_, d.visibility);
-                field(result->constants_, ir::type_name(d.type)); field(result->constants_, d.constant_syntax);
+                field(result->constants_, d.type.kind == Type::aggregate ? d.type.definition->identity : ir::type_name(d.type)); field(result->constants_, d.constant_syntax);
             }
             result->declarations_.push_back(std::move(d));
         };
@@ -1328,11 +1617,41 @@ struct AnalysisAccess {
             expression = [&](const Expr& e, const std::string& owner, const auto& locals) {
                 if (!e.target.empty()) reference(owner,e.target,e,*unit);
                 else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit);
+                if (e.kind == Expr::Kind::construction) for (unsigned n = 0; n < e.names.size(); ++n) {
+                    Expr use(Expr::Kind::name,e.names[n]); reference(owner,e.type.definition->identity + "::field::" + e.names[n].text,use,*unit);
+                }
                 for (const auto& part : e.parts) expression(*part,owner,locals);
             };
+            for (const auto& [token,raw] : unit->type_uses) {
+                auto t = resolve_type(raw,*unit,*graph->at(entry),*graph,token);
+                // Attribute annotation dependencies to their enclosing declaration,
+                // keeping invalidation edges between owned declaration identities.
+                std::string owner = id; std::size_t nearest = 0;
+                auto consider = [&](const Token& declaration, const std::string& key) {
+                    if (declaration.offset <= token.offset && (owner == id || declaration.offset >= nearest)) { nearest = declaration.offset; owner = key; }
+                };
+                for (const auto& f : unit->functions) consider(f.token,f.symbol);
+                for (const auto& c : unit->constants) consider(c.declaration.token,id + "::" + c.declaration.name);
+                for (const auto& structure : unit->structures) {
+                    consider(structure.token,structure.definition->identity);
+                    for (const auto& member : structure.fields) consider(member.token,structure.definition->identity + "::field::" + member.name);
+                }
+                Expr use(Expr::Kind::name,token); reference(owner,t.definition->identity,use,*unit);
+            }
+            for (const auto& structure : unit->structures) {
+                auto key = structure.definition->identity;
+                std::string layout;
+                for (const auto& member : structure.fields) {
+                    auto t = *member.annotation; auto identity = key + "::field::" + member.name;
+                    field(layout,member.name); field(layout,t.kind == Type::aggregate ? t.definition->identity : ir::type_name(t)); field(layout,member.constant_syntax);
+                    declaration({AnalyzedDeclaration::Kind::value_field,identity,id,structure.visibility,location(member.token),{},t,member.constant_syntax,{},key});
+                    if (member.expression) expression(*member.expression,identity,{});
+                }
+                declaration({AnalyzedDeclaration::Kind::value_structure,key,id,structure.visibility,location(structure.token),{},Type(structure.definition),layout,{},id});
+            }
             for (const auto& c : unit->constants) {
                 auto key = id + "::" + c.declaration.name;
-                declaration({AnalyzedDeclaration::Kind::module_constant,key,id,c.visibility,location(c.declaration.token),{},c.type,c.declaration.constant_syntax,c.value});
+                declaration({AnalyzedDeclaration::Kind::module_constant,key,id,c.visibility,location(c.declaration.token),{},c.type,c.declaration.constant_syntax,c.type.kind == Type::aggregate ? std::optional<std::uint64_t>{} : std::optional<std::uint64_t>{c.value}});
                 expression(*c.declaration.expression,key,{});
             }
             for (const auto& f : unit->functions) {
@@ -1347,6 +1666,13 @@ struct AnalysisAccess {
                         if (s.readonly) {
                             owner += "::const::" + s.name + "::" + std::to_string(names[s.name]++);
                             declaration({AnalyzedDeclaration::Kind::local_constant,owner,id,"local",location(s.token),{},f.locals.at(s.slot),s.constant_syntax,{},f.symbol});
+                        }
+                        if (s.kind == Statement::Kind::assignment && !s.fields.empty()) {
+                            auto t = f.locals.at(s.slot);
+                            for (unsigned n = 0; n < s.fields.size(); ++n) {
+                                Expr use(Expr::Kind::name,s.fields[n]); reference(owner,t.definition->identity + "::field::" + s.fields[n].text,use,*unit);
+                                t = t.definition->fields.at(s.field_indexes[n]).type;
+                            }
                         }
                         if (s.expression) expression(*s.expression,owner,locals);
                         if (s.readonly) locals.emplace(s.slot,owner);

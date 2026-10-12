@@ -10,7 +10,7 @@ bool signed_integer(Type t) { return t == Type::i8 || t == Type::i16 || t == Typ
 bool integer(Type t) { return signed_integer(t) || t == Type::u8 || t == Type::u16 || t == Type::u32 || t == Type::u64; }
 bool number(Type t) { return integer(t) || floating(t); }
 unsigned width(Type t) {
-    switch(t) {
+    switch(t.kind) {
     case Type::i8: case Type::u8: return 8;
     case Type::i16: case Type::u16: return 16;
     case Type::i32: case Type::u32: case Type::f32: return 32;

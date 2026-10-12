@@ -188,3 +188,15 @@ source ownership and complete validation gates above remain authoritative.
 through the shared loader and an explicit revision-safe session acceptance boundary.
 Its diagnostic/query wrappers retain the analyzed project revision. Existing disk
 APIs, complete-validation gates, byte spans and exact native contracts remain.
+
+## Phase 12 shared value types
+
+Successful analysis now also exposes value_structure and value_field declarations
+with owned nominal ir::Type descriptors. Aggregate module constants retain exact
+syntax and types; the legacy optional 64-bit evaluated value is scalar-only.
+Type annotations, constructors, named fields and field access contribute references
+between owned declarations, including qualified type-name spans. The existing
+index/session/LSP uses these records directly. Compatibility includes nominal
+identities, ordered field types/names and declared default syntax; no independently
+approximated aggregate compatibility policy is added to tools. See VALUE_STRUCTS.md
+for implementation boundaries, limits and native verification.

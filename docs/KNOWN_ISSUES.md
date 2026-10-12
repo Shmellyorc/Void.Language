@@ -1,6 +1,17 @@
 # Known issues and deferred work
 
-Updated 11 October 2026, Phase 11 editor integration.
+Updated 12 October 2026, Phase 12 value struct foundations.
+
+Phase 11 run #16 at `1b32151` passed Linux, Windows and macOS according to the
+project owner. Phase 12 local results are recorded in WORK_LOG.md; hosted
+Windows/macOS verification remains required.
+
+Numeric/bool/acyclic nested value structs now work; see VALUE_STRUCTS.md. Runtime
+field defaults, custom init, positional constructors, field modifiers, aggregate
+equality and external aggregate ABI bindings remain deferred. Layout is compiler
+private, target-aligned and conservative under hot reload. Resource bounds are
+128 layout levels and 65536 expanded fields per type. Managed structs and the full
+runtime remain outside this phase.
 
 ## Platform verification
 
@@ -48,8 +59,9 @@ Updated 11 October 2026, Phase 11 editor integration.
   rejected. Runtime module variables/initialization remain absent. Internal
   visibility currently operates inside one compiled project;
   external library export/visibility boundaries remain deferred.
-- Supported value types are all ten exact-width numeric types and bool. Strings,
-  collections/ranges, structs, generics, closures, async, named/default arguments,
+- Supported value types are all ten exact-width numeric types, bool and acyclic
+  numeric/bool value structs. Strings, collections/ranges, managed structs,
+  generics, closures, async, named/default function arguments,
   multiple return values and full managed types are not implemented. Unsupported
   syntax is rejected rather than simulated.
 - UTF-8 source validation and scalar columns work; identifiers currently use

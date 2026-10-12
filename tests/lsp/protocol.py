@@ -242,9 +242,38 @@ def transport(executable, root):
     print("transport: fragmented/coalesced frames, IDs, malformed messages, bounded framing, lifecycle and EOF passed")
 
 
+def value_structs(executable, root):
+    root.mkdir(parents=True, exist_ok=True)
+    entry = root / "main.void"
+    text = "value struct point:\n    x: i32 = 4\nfunc entry(value: i32) -> i32:\n    var p: point = point(x = value)\n    p.x += 1\n    return p.x\n"
+    entry.write_bytes(text.encode("utf-8"))
+    uri = entry.as_uri()
+    with Client(executable, entry) as c:
+        assert all(not n["diagnostics"] for n in c.initialize())
+        for needle, expected_line, expected_column in [("point =", 0, 13), ("point(x", 0, 13),
+                                                       ("x = value", 1, 4), ("x +=", 1, 4), ("x\n", 1, 4)]:
+            response, _ = c.request("textDocument/definition", {"textDocument": {"uri": uri}, "position": source_position(text, needle)})
+            assert response["result"]["uri"] == uri, response
+            assert response["result"]["range"]["start"] == {"line": expected_line, "character": expected_column}, response
+        response, _ = c.request("textDocument/references", {"textDocument": {"uri": uri},
+            "position": {"line": 1, "character": 4}, "context": {"includeDeclaration": False}})
+        assert len(response["result"]) == 3, response
+        bad = text.replace("var p: point", "const p: point")
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": uri, "languageId": "void", "version": 1, "text": bad}})
+        notes = diagnostics(c.sync())
+        assert len(notes[uri]["diagnostics"]) == 1, notes
+        assert "readonly" in notes[uri]["diagnostics"][0]["message"], notes
+        assert c.request("textDocument/definition", {"textDocument": {"uri": uri}, "position": source_position(text,"x +=")})[0]["result"] is None
+        c.notify("textDocument/didChange", {"textDocument": {"uri": uri, "version": 2}, "contentChanges": [{"text": text}]})
+        assert not diagnostics(c.sync())[uri]["diagnostics"]
+        c.shutdown()
+    print("value structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed")
+
+
 if __name__ == "__main__":
     executable = pathlib.Path(sys.argv[1]).resolve()
     # Unicode physical root names work without changing the ASCII VFS policy.
     root = pathlib.Path(sys.argv[2]).resolve() / "project space é😀 # %"
     editor(executable, root)
     transport(executable, root)
+    value_structs(executable, root / "value struct project")

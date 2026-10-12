@@ -5,6 +5,8 @@ remains the language-design source of truth; this document describes the working
 subset and explicitly provisional choices. Multi-file compilation is now implemented;
 see [MODULE_SYSTEM.md](MODULE_SYSTEM.md) for current import and ownership rules.
 Phase 6 updates the numeric subset on 11 October 2026; see NUMERIC_TYPES.md.
+Phase 12 adds numeric/bool/nested value structs; see [VALUE_STRUCTS.md](VALUE_STRUCTS.md)
+for approved defaults, source syntax, shared aggregate IR and private ABI boundaries.
 Earlier foundation-only status in historical documents predates source compilation.
 
 ## Working pipeline
@@ -48,11 +50,13 @@ func entry(value: i32) -> i32:
   `private`, `public` and `internal` modifiers are supported; see MODULE_SYSTEM.md. Parameters require
   types. Omit the return annotation for no result. Empty `return` or fallthrough
   is valid only for a no-result function. Recursive and forward calls work.
-- All ten exact-width numeric types plus bool work. Contextual literals and
+- All ten exact-width numeric types plus bool and the value structs described in
+  VALUE_STRUCTS.md work. Contextual literals and
   explicit checked numeric `as` follow [NUMERIC_TYPES.md](NUMERIC_TYPES.md).
   Calls check positional argument counts and exact types after literal adaptation.
 - `var x = expression`, `var x: i32 = expression`, and `var x: i32` work.
-  Annotated variables without an initializer default to zero/false. Parameters
+  Annotated variables without an initializer receive safe defaults (including
+  declared/recursive value struct defaults). Parameters
   and var locals are mutable. Local readonly const and module compile-time
   constants are now implemented; see VALUE_SEMANTICS.md. Local bindings are visible
   after declaration and only within their lexical scope. Shadowing visible locals, parameters or function names is
@@ -160,5 +164,9 @@ platforms. Phase 5 diagnostic recovery requires another hosted run.
 
 Current constants, arithmetic and runtime errors are documented in
 [VALUE_SEMANTICS.md](VALUE_SEMANTICS.md). Structured diagnostic recovery is now implemented in [DIAGNOSTICS.md](DIAGNOSTICS.md).
-Next refine source/dependency compatibility, then contextual numeric literals/conversions after
-approving their detailed policies. Managed types remain behind the GC/root/thread gate.
+Phases 6–11 subsequently completed numeric types, validated analysis, tooling
+sessions, LSP and editor integration. Phase 11 run #16 passed all three hosted
+platforms according to the owner. Phase 12 adds VALUE_STRUCTS.md and the
+value_structs_cli suite, preserving all 21 previous suites. The recommended next
+phase is receiver/initialization design; managed types remain behind the
+GC/root/thread gate.

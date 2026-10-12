@@ -9,7 +9,7 @@ namespace vd {
 // Records are owned by an immutable successful analysis, never by parser storage.
 struct AnalyzedModule { std::string identity; SourceFile source; std::vector<std::string> imports; };
 struct AnalyzedDeclaration {
-    enum class Kind { function, module_constant, local_constant } kind;
+    enum class Kind { function, module_constant, local_constant, value_structure, value_field } kind;
     std::string identity, module, visibility;
     SourceSpan source;
     std::vector<ir::Type> parameters;

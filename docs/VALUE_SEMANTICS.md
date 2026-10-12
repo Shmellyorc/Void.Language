@@ -1,6 +1,11 @@
 # Constants, numeric correctness and runtime diagnostics
 
-Implemented subset, updated 11 October 2026 for Phase 6. The Language Bible remains authoritative and
+Phase 12 adds numeric/bool value structs with recursive defaults, independent
+copies, deep readonly paths and aggregate parameters/returns. See
+[VALUE_STRUCTS.md](VALUE_STRUCTS.md) for the approved contract. The scalar rules
+below remain applicable.
+
+Scalar subset, updated 11 October 2026 for Phase 6. The Language Bible remains authoritative and
 unchanged. The user reports the preceding ten-suite module phase passed Linux,
 Windows and macOS Actions. The user reports these Phase 4 changes passed all three platforms in Actions
 run #6 (commit `d78b6b8`). The user reports Phase 5 commit `4f3688d` passed all platforms in run #8.
@@ -20,7 +25,8 @@ func calculate(value: i32) -> i32:
     return copy * 2
 ```
 
-Both declaration forms accept optional supported numeric/bool annotations, with
+Both declaration forms also accept supported value struct annotations in Phase 12.
+The scalar behavior remains: optional numeric/bool annotations, with
 contextual literal adaptation and exact checking of existing typed values. Every const needs an initializer. Local const bindings evaluate
 at runtime at their declaration, may call functions, and follow existing lexical
 scope rules. Their slots are initialized each time the declaration executes.
@@ -29,7 +35,9 @@ readonly bindings. Copying a value into `var` produces an ordinary mutable local
 Parameters remain mutable; readonly parameters and managed readonly access paths
 are outside this subset.
 
-Module constants must be pure compile-time expressions. Literals, constant
+Module constants must be pure compile-time expressions. Phase 12 additionally
+supports value construction and field reads in these expressions; aggregate
+constants still undergo the same checker, purity and dependency gates. Literals, constant
 references, unary arithmetic/not, arithmetic, comparisons, equality, parentheses,
 and short-circuit and/or work. Calls are forbidden even in unevaluated operands.
 The ordinary expression type checker validates every operand and resolves its

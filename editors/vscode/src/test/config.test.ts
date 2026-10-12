@@ -60,4 +60,7 @@ test('presentation only covers implemented tokens and space indentation', async 
     const indent = new RegExp(config.indentationRules.increaseIndentPattern);
     assert(indent.test('    else if value < 0: # branch'));
     assert(indent.test('for:')); assert(!indent.test('# for:'));
+    assert(indent.test('value struct point:')); assert(!indent.test('struct point:'));
+    const aggregate = new RegExp(grammar.patterns.find((p:{match?:string}) => p.match?.includes('value')).match);
+    assert(aggregate.test('value struct point:')); assert(!aggregate.test('value: i32'));
 });

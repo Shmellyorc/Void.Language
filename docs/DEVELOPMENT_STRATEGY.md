@@ -657,3 +657,16 @@ Then consider explicit disk refresh/cancellation and client usability before
 workers, partial analysis or wider IDE features. Preserve exact analysis/reload
 contracts and owned revisions. Managed-runtime and external-package design gates
 remain separate; no language expansion or automatic native publication is implied.
+
+## Phase 12 local implementation: value struct foundations
+
+The owner reports Phase 11 run #16 at `1b32151` passed all three hosted platforms.
+Phase 12 returns to source language work with numeric/bool/acyclic nested value
+structs, shared nominal types, aggregate IR, copy semantics, pure defaults and
+internal aggregate parameters/returns. The owner approved Option A in
+VALUE_STRUCTS_PROPOSAL.md. VALUE_STRUCTS.md describes the implementation and
+provisional layout/ABI boundaries; WORK_LOG.md records actual verification.
+
+The next recommended cohesive phase is receiver methods and initialization
+policy, settling readonly receivers and observable initialization ordering before
+custom init or managed reference fields. No production-GC readiness is implied.

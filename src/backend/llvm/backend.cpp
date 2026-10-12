@@ -71,11 +71,19 @@ std::string source_message(const SourceLocation& location, const std::string& ex
         ": " + description + "\n" + excerpt;
 }
 std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& context,
-                                  const std::string& suffix) {
+                                  const std::string& suffix, const llvm::DataLayout& layout) {
     ir::validate(input);
     auto module = std::make_unique<llvm::Module>(input.identity, context);
+    module->setDataLayout(layout);
     llvm::IRBuilder<> b(context);
-    auto type = [&](ir::Type t) -> llvm::Type* {
+    std::map<std::string,llvm::StructType*> aggregates;
+    std::function<llvm::Type*(ir::Type)> type = [&](ir::Type t) -> llvm::Type* {
+        if (t.kind == ir::Type::aggregate) {
+            if (auto found = aggregates.find(t.definition->identity); found != aggregates.end()) return found->second;
+            auto* result = llvm::StructType::create(context,t.definition->identity); aggregates.emplace(t.definition->identity,result);
+            std::vector<llvm::Type*> fields; for (const auto& field : t.definition->fields) fields.push_back(type(field.type));
+            result->setBody(fields,false); return result;
+        }
         if (t == ir::Type::boolean) return b.getInt1Ty();
         if (t == ir::Type::none) return b.getVoidTy();
         if (t == ir::Type::f32) return b.getFloatTy();
@@ -97,8 +105,22 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
     auto module_path = vd::utf8_path(input.source_path.empty() ? input.identity : input.source_path);
     auto* file = debug.createFile(vd::path_utf8(module_path.filename()), vd::path_utf8(module_path.parent_path()));
     debug.createCompileUnit(llvm::dwarf::DW_LANG_C, file, "VOID source compiler", false, "", 0);
-    auto debug_value_type = [&](ir::Type t) -> llvm::Metadata* {
+    std::map<std::string,llvm::DIType*> debug_aggregates;
+    std::function<llvm::DIType*(ir::Type)> debug_value_type = [&](ir::Type t) -> llvm::DIType* {
         if (t == ir::Type::none) return nullptr;
+        if (t.kind == ir::Type::aggregate) {
+            if (auto found = debug_aggregates.find(t.definition->identity); found != debug_aggregates.end()) return found->second;
+            auto* native = llvm::cast<llvm::StructType>(type(t)); auto* offsets = layout.getStructLayout(native);
+            std::vector<llvm::Metadata*> members;
+            for (unsigned n = 0; n < t.definition->fields.size(); ++n) {
+                const auto& field = t.definition->fields[n]; auto* native_field = type(field.type);
+                members.push_back(debug.createMemberType(file,field.name,file,0,layout.getTypeSizeInBits(native_field),
+                    layout.getABITypeAlign(native_field).value()*8,offsets->getElementOffsetInBits(n),llvm::DINode::FlagZero,debug_value_type(field.type)));
+            }
+            auto* result = debug.createStructType(file,ir::type_name(t),file,0,offsets->getSizeInBits(),
+                layout.getABITypeAlign(native).value()*8,llvm::DINode::FlagZero,nullptr,debug.getOrCreateArray(members));
+            debug_aggregates.emplace(t.definition->identity,result); return result;
+        }
         return debug.createBasicType(ir::type_name(t),numeric::width(t), t == ir::Type::boolean ? llvm::dwarf::DW_ATE_boolean : numeric::floating(t) ? llvm::dwarf::DW_ATE_float : numeric::signed_integer(t) ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned);
     };
     module->addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
@@ -151,6 +173,12 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 // IR operand types preserve signedness, even when native widths coincide.
                 auto operand_type = [&](unsigned id) { return value_types.at(id); };
                 switch (instruction.op) {
+                case Op::aggregate:
+                    v = llvm::Constant::getNullValue(type(instruction.type));
+                    for (unsigned n = 0; n < instruction.arguments.size(); ++n) v = b.CreateInsertValue(v,values[instruction.arguments[n]],{n});
+                    break;
+                case Op::extract: v = b.CreateExtractValue(values[instruction.a],{static_cast<unsigned>(instruction.immediate)}); break;
+                case Op::insert: v = b.CreateInsertValue(values[instruction.a],values[instruction.b],{static_cast<unsigned>(instruction.immediate)}); break;
                 case Op::argument: v = fn->getArg(instruction.a); break;
                 case Op::constant:
                     if (numeric::floating(instruction.type)) v = llvm::ConstantFP::get(context,llvm::APFloat(instruction.type == ir::Type::f32 ? llvm::APFloat::IEEEsingle() : llvm::APFloat::IEEEdouble(),llvm::APInt(numeric::width(instruction.type),static_cast<std::uint64_t>(instruction.immediate))));
@@ -276,7 +304,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     for (const auto& target : input.functions) if (target.name == instruction.callee) result_type = target.result;
                     break;
                 case Op::equal: case Op::not_equal: case Op::less: case Op::less_equal: case Op::greater: case Op::greater_equal: case Op::logical_not: result_type = ir::Type::boolean; break;
-                case Op::constant: case Op::convert: break;
+                case Op::constant: case Op::convert: case Op::aggregate: break;
+                case Op::extract: result_type = operand_type(instruction.a).definition->fields.at(static_cast<std::size_t>(instruction.immediate)).type; break;
                 default: result_type = operand_type(instruction.a); break;
                 }
                 value_types.push_back(result_type);
@@ -367,7 +396,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     if (!selected->module_identity.empty()) contract.constant_contract = input.analysis ? input.analysis->constant_contract() : input.constant_contract;
     auto suffix = "__v" + std::to_string(++impl_->serial);
     auto context = std::make_unique<llvm::LLVMContext>();
-    auto module = lower(input, *context, suffix);
+    auto module = lower(input, *context, suffix, impl_->jit->getDataLayout());
     module->setDataLayout(impl_->jit->getDataLayout());
     module->setTargetTriple(impl_->jit->getTargetTriple().str());
     finish(*module, optimize);
@@ -434,7 +463,6 @@ void emit_object(const ir::Module& input, const std::filesystem::path& output, b
     for (const auto& f : input.functions) if (f.name == input.entry_symbol)
         entry_valid = f.parameters == std::vector<ir::Type>{ir::Type::i32} && f.result == ir::Type::i32;
     if (!entry_valid) throw std::invalid_argument("AOT CLI adapter requires entry: i32(i32)");
-    auto module = lower(input, context, source_program ? "__void" : "");
     auto triple = llvm::sys::getDefaultTargetTriple();
     std::string error;
     auto* target = llvm::TargetRegistry::lookupTarget(triple, error);
@@ -442,6 +470,7 @@ void emit_object(const ir::Module& input, const std::filesystem::path& output, b
     std::unique_ptr<llvm::TargetMachine> machine(target->createTargetMachine(triple, "generic", "",
         llvm::TargetOptions(), llvm::Reloc::PIC_));
     if (!machine) throw std::runtime_error("cannot create native target machine");
+    auto module = lower(input, context, source_program ? "__void" : "", machine->createDataLayout());
     module->setTargetTriple(triple);
     module->setDataLayout(machine->createDataLayout());
     const ir::Function* entry_function = nullptr;

@@ -1,0 +1,13 @@
+value struct pair:
+    first: u8
+    second: i32
+
+func narrow(value: i32) -> u8:
+    return value as u8
+
+func construct(value: i32) -> pair:
+    return pair(second = 10 / value, first = narrow(value - 2))
+
+func entry(value: i32) -> i32:
+    var constructed = construct(value)
+    return constructed.second + constructed.first as i32
