@@ -271,3 +271,13 @@ constants still reject method execution with VOID2011. Receiver parsing, body
 checking and deferred effect permission checks use the existing owned collector,
 source spans, budget and successful-analysis gate. A 400-link method-expression
 chain must diagnose VOID1107 and recover to an independent later-function error.
+
+
+## Phase 14 custom value initialization
+
+Phase 14 retains VOID2020 for invalid/direct lifecycle execution and deferred
+deinit/default ordinary parameters, replacing only the old valid-init-declaration
+rejection. Constructor binding uses existing VOID2004/2005 and type errors, pure
+initialization uses VOID2011, and access uses VOID3003. Unavailable nested defaults
+identify the field and required initializer parameter. Existing source snapshots,
+bounded recovery and backend-before-publication gates remain.

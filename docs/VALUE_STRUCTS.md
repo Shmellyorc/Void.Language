@@ -1,5 +1,9 @@
 # Phase 12: value struct foundations
 
+Current Phase 14 update: approved custom value initialization is documented in
+[INITIALIZATION.md](INITIALIZATION.md). It supersedes the historical init deferral
+below; Phase 12 construction remains unchanged for types without custom init.
+
 Implemented locally using the Option A contract approved by the project owner on
 12 October 2026. The Language Bible remains authoritative. Runtime field defaults,
 custom `init` and positional constructors are deferred, not permanently forbidden.

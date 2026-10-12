@@ -1,5 +1,9 @@
 # Phase 13: receiver methods and initialization groundwork
 
+Current Phase 14 update: approved custom value initialization is documented in
+[INITIALIZATION.md](INITIALIZATION.md). It supersedes the historical init deferral
+below; Phase 12 construction remains unchanged for types without custom init.
+
 The owner approved M1 + I1 in RECEIVER_METHODS_PROPOSAL.md: methods belong to their
 nominal type's owning source module, and public custom initializer execution stays
 deferred. This extends Phase 12 value structs without introducing managed types,

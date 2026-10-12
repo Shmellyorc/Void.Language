@@ -90,8 +90,9 @@ func (p point) move(dx: i32, dy: i32):
 
 Owner-module methods update mutable local/nested receivers; readonly values can
 call methods proven non-mutating. Ordinary arguments, assignment and returns still
-copy. Imported types retain nominal identity and method visibility. Custom `init`
-execution is deferred; safe defaults and named-field construction remain unchanged.
+copy. Imported types retain nominal identity and method visibility. Phase 14 custom
+`init` execution follows [C1 construction](docs/INITIALIZATION.md); types without
+custom initializers retain safe defaults and named-field construction.
 
 ```sh
 build/debug/voidc run examples/receiver_methods/main.void 10 --no-opt  # 301
@@ -320,3 +321,14 @@ reload and C interoperability proofs remain separate examples. See
 [the value struct contract and examples](docs/VALUE_STRUCTS.md) for native AOT
 commands, shared lowering, compiler-private aggregate calling conventions and
 current limitations.
+
+
+Custom value initialization now supports owner-module `init` parameters, named and
+positional arguments, pure defaults and recursive nested construction. Copies do
+not rerun initialization. See [INITIALIZATION.md](docs/INITIALIZATION.md).
+
+```sh
+build/ci-debug/voidc run examples/initialization/main.void 10 --no-opt
+build/ci-debug/voidc run examples/initialization/main.void 10
+# Both return 166 from real imported source; native object/link commands are documented.
+```

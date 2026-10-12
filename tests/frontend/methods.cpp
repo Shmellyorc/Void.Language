@@ -59,7 +59,7 @@ void method_tests(const std::filesystem::path& root) {
     invalid("func (p i32) inspect() -> i32:\n    return p\n",Code::receiver,"p i32");
     invalid(point+"func (p point) x():\n    return\n",Code::duplicate,"x():");
     invalid(point+methods+"func (p point) inspect() -> i32:\n    return 1\n",Code::duplicate,"inspect()");
-    invalid(point+"func (p point) init():\n    return\n",Code::initializer_deferred,"init()");
+    run(point+"func (p point) init():\n    p.x = 17\nfunc entry(value: i32) -> i32:\n    return point().x\n",17);
     invalid(point+methods+"func entry(value: i32) -> i32:\n    var p = point()\n    p.init()\n    return value\n",Code::initializer_deferred,"init()");
     invalid(point+methods+"const answer = point().inspect()\n",Code::constant_call,"inspect()");
     invalid(point+methods+"func (p point) bad() -> i32:\n    if p.x > 0:\n        return p.x\n",Code::missing_return,"bad()");

@@ -1,20 +1,20 @@
 # Known issues and deferred work
 
-Updated 12 October 2026, Phase 13 receiver methods.
+Updated for Phase 14 custom value initialization.
 
-The owner reports Phase 12 commit `acf7355` passed hosted run #18 on Windows,
-Linux and macOS, including the run #17 semantic-checker stack correction.
-Phase 13 local results and pending hosted verification are recorded in WORK_LOG.md.
-Owner-module receiver methods now extend supported value structs; see
-RECEIVER_METHODS.md. Extension methods, named/default method arguments and public
-custom initializer execution remain deferred. M1 + I1 is approved; I2 is not.
+The owner reports Phase 13 `c72e62a` passed hosted run #19 on Windows, Linux and
+macOS. Phase 14 local evidence and pending hosted checks are in WORK_LOG.md.
+Approved C1 initialization is described in INITIALIZATION.md; Phase 13 I2 remains
+an unapproved historical alternative. Owner-module methods and custom value
+initializers use the existing shared types/IR/LLVM path.
 
-Numeric/bool/acyclic nested value structs now work; see VALUE_STRUCTS.md. Runtime
-field defaults, custom init, positional constructors, field modifiers, aggregate
-equality and external aggregate ABI bindings remain deferred. Layout is compiler
-private, target-aligned and conservative under hot reload. Resource bounds are
-128 layout levels and 65536 expanded fields per type. Managed structs and the full
-runtime remain outside this phase.
+Runtime declared field defaults, inferred/default/named ordinary function/method
+parameters, constructor overloads, managed structs, fallible constructor results,
+resource deinit, foreign extensions and external aggregate ABI remain deferred.
+An enclosing custom initializer requires default-constructible fields; required
+children can be explicitly supplied to no-init wrappers. Compile-time contexts
+cannot execute init. Initialization body/helper changes require manual restart.
+Layout remains compiler-private with 128-level/65536-expanded-field bounds.
 
 ## Platform verification
 

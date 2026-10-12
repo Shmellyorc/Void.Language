@@ -176,5 +176,16 @@ GC/root/thread gate.
 Supported value structs now have owner-module receiver declarations and ordinary
 value.method calls, including imported/nested receivers, inferred readonly effects,
 normal/O2 JIT/AOT and owned tooling references. See RECEIVER_METHODS.md. Custom
-init execution is explicitly deferred under approved I1; safe defaults and named
-construction are unchanged. The CLI remains check/run/emit with the i32 entry adapter.
+init execution was deferred under Phase 13 I1; Phase 14 approved C1 now implements
+it as documented in INITIALIZATION.md. No-init named construction and the CLI
+check/run/emit i32 entry adapter remain available.
+
+
+## Phase 14 custom value initialization
+
+INITIALIZATION.md documents approved C1 custom value constructors, typed
+positional/named arguments, pure defaults, recursive availability/access checks and
+lifecycle diagnostics. Fresh construction uses shared receiver Places and explicit IR
+invocation metadata; source execution and optimized/unoptimized JIT/AOT share the same
+lowering. Required-child wrappers, pure contexts, readonly publication and conservative
+initializer/helper reload contracts remain explicit boundaries.

@@ -214,3 +214,14 @@ signature/visibility/binding/layout/default data. Compatible method body edits c
 reload; changing inferred mutation, including through a recursive/transitive callee,
 requires restart. Tooling compares these fields and retains containment edges.
 Invalid init/method source never publishes analysis or code. See RECEIVER_METHODS.md.
+
+
+## Phase 14 custom value initialization
+
+Phase 14 adds initializer declaration kind, parameter/default source metadata and exact
+initialization policy syntax. Init presence/identity/access/parameter
+labels/types/defaults/effects and bodies require restart when changed. Transitive
+initializer helper bodies are frozen by iterative call-graph closure, including cycles.
+Implicit construction edges are retained for invalidation but excluded from written
+reference/navigation positions. Compatible unrelated bodies retain generation
+replacement and old-lease safety.

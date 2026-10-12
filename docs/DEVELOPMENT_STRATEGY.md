@@ -686,3 +686,14 @@ actual local results and pending hosted checks. The next language design phase
 should resolve initializer/named-field/parameter/nested-default/purity interactions
 coherently before custom construction. Managed types still require the separate
 GC/root/thread/runtime gate. No further phase is authorized by this recommendation.
+
+
+## Phase 14 custom value initialization
+
+Phase 14 implements owner-approved C1 value initialization through the existing semantic
+model, typed construction plans and receiver-place calls. Preserve required-child and
+pure-context boundaries; do not bypass init through implicit zeroing. INITIALIZATION.md
+defines the surface. Validate all 24 suites with both SDKs, strict sanitizers,
+small-stack and actual editor checks. Future fallible/resource/managed construction
+still requires separate design approval; runtime field defaults and general function
+named/default parameters are not implied by this phase.

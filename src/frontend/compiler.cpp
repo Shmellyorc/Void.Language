@@ -194,6 +194,8 @@ struct Expr {
     std::uint64_t value = 0;
     ir::ConstantValue aggregate_value;
     std::vector<Token> names;
+    std::vector<std::unique_ptr<Expr>> omitted;
+    std::string initializer;
     std::vector<unsigned> field_indexes;
     std::string literal_text;
     std::vector<std::unique_ptr<Expr>> parts;
@@ -216,14 +218,21 @@ struct Statement {
     bool readonly = false, invalid = false;
     Statement(Kind k, Token t) : kind(k), token(std::move(t)) {}
 };
-struct Parameter { Token token; Type type; unsigned slot = 0; };
+struct Parameter {
+    Token token; Type type; unsigned slot = 0;
+    std::unique_ptr<Expr> default_expression = {};
+    std::optional<ir::ConstantValue> default_value = {};
+    std::string default_syntax = {};
+    std::size_t default_begin = 0, default_end = 0;
+};
 struct Function {
     Token token;
     bool file_private = false, parse_failed = false;
     std::string symbol, visibility = "public";
     std::vector<Parameter> parameters;
     std::optional<Parameter> receiver;
-    bool receiver_mutates = false;
+    bool receiver_mutates = false, initializer = false;
+    std::string body_syntax, initialization_contract;
     Type result = Type::none;
     std::vector<Statement> body;
     std::vector<Type> locals;
@@ -245,6 +254,7 @@ struct Structure {
     ir::ConstantValue defaults;
     unsigned layout_state = 0, default_state = 0;
     std::size_t expanded_fields = 0;
+    Function* initializer = nullptr;
 };
 struct Import {
     Token path, alias;
@@ -528,8 +538,19 @@ public:
                 f.receiver = Parameter{receiver,receiver_type};
             }
             f.token = name(); need("(");
-            if (!at(")")) do { auto token = name(); need(":"); f.parameters.push_back({token, type()}); } while (accept(","));
-            need(")"); if (accept("->")) f.result = type(); f.body = block(); f.parse_failed = diagnostics.within(source, f.token.offset, peek().offset); unit.functions.push_back(std::move(f));
+            if (!at(")")) do {
+                auto token = name(); need(":"); Parameter parameter{token,type()};
+                if (accept("=")) {
+                    auto begin = p; parameter.default_begin = peek().offset; nodes = 0; parameter.default_expression = expression();
+                    parameter.default_end = peek().offset;
+                    for (auto n = begin; n < p; ++n) parameter.default_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
+                }
+                f.parameters.push_back(std::move(parameter));
+            } while (accept(","));
+            need(")"); if (accept("->")) f.result = type();
+            auto body_begin = p; f.body = block();
+            for (auto n = body_begin; n < p; ++n) f.body_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
+            f.parse_failed = diagnostics.within(source, f.token.offset, peek().offset); unit.functions.push_back(std::move(f));
             } catch (const CompilationError& e) {
                 diagnostics.add(e); unit.parse_failed = true;
                 auto declaration = start;
@@ -718,6 +739,8 @@ class Semantics {
         return !constant(base).second;
     }
     Type method_expression(Expr& e, std::optional<Type> expected) {
+        if ((e.token.text == "init" || e.token.text == "deinit") && !(e.parts[0]->kind==Expr::Kind::name && unit.qualifiers.contains(e.parts[0]->token.text)))
+            error(source,e.token,Code::initializer_deferred,"Lifecycle methods cannot be called directly; construct a new value using its type.");
         if (module_call(e)) {
             e.qualifier = e.parts[0]->token.text; e.qualifier_token = e.parts[0]->token;
             e.parts.erase(e.parts.begin()); e.kind = Expr::Kind::call;
@@ -726,7 +749,7 @@ class Semantics {
         auto receiver = expression(*e.parts[0]);
         if (!current) error(source,e.token,Code::constant_call,"A compile-time constant cannot call a method.","Use a local const for runtime values.");
         if (e.token.text == "init" || e.token.text == "deinit")
-            error(source,e.token,Code::initializer_deferred,"Lifecycle methods are not ordinary callable methods; custom initialization is deferred.");
+            error(source,e.token,Code::initializer_deferred,"Lifecycle methods cannot be called directly; construct a new value using its type.");
         const auto& target = [&]() -> const Function& {
             auto check_arguments = [&] { for (std::size_t n=1; n<e.parts.size(); ++n) expression(*e.parts[n]); };
             try { return method(receiver,e.token); }
@@ -750,20 +773,87 @@ class Semantics {
         (void)expected;
         return e.type = call_arguments(e,target,1);
     }
-    Type call_arguments(Expr& e, const Function& target, std::size_t first) {
-        std::vector<Type> arguments;
+    Type call_arguments(Expr& e, const Function& target, std::size_t first, bool constructor = false) {
+        std::vector<bool> bound(target.parameters.size());
+        std::vector<unsigned> mapping;
+        bool named = false, invalid = false;
+        unsigned positional = 0;
         for (std::size_t n = first; n < e.parts.size(); ++n) {
-            auto parameter = n-first;
-            arguments.push_back(expression(*e.parts[n],parameter < target.parameters.size() ? std::optional<Type>(target.parameters[parameter].type) : std::nullopt));
-        }
-        if (arguments.size() != target.parameters.size()) error(source,e.token,Code::argument_count,"Incorrect argument count for '" + e.token.text + "': expected " + std::to_string(target.parameters.size()) + ", received " + std::to_string(arguments.size()) + ".");
-        bool invalid = false;
-        for (std::size_t n = 0; n < arguments.size(); ++n) {
-            try { expect(arguments[n],target.parameters[n].type,e.parts[n+first]->token); }
+            auto index = positional++;
+            const auto& label = e.names[n-first];
+            if (constructor && !label.text.empty()) {
+                named = true;
+                auto found = std::find_if(target.parameters.begin(),target.parameters.end(),[&](const auto& p) { return p.token.text == label.text; });
+                if (found == target.parameters.end()) error(source,label,Code::argument_count,"Unknown initializer parameter '" + label.text + "'.");
+                index = static_cast<unsigned>(found-target.parameters.begin());
+            } else if (constructor && named) error(source,e.parts[n]->token,Code::argument_count,"Positional arguments must precede named arguments.");
+            if (index >= bound.size()) error(source,e.token,Code::argument_count,"Incorrect argument count for '" + e.token.text + "'.");
+            if (bound[index]) error(source,label.text.empty() ? e.parts[n]->token : label,Code::duplicate,"Initializer parameter is supplied more than once.");
+            bound[index] = true; mapping.push_back(index);
+            auto actual = expression(*e.parts[n],target.parameters[index].type);
+            try { expect(actual,target.parameters[index].type,e.parts[n]->token); }
             catch (const CompilationError& failure) { diagnostics.add(failure); invalid = true; }
-            invalid |= arguments[n] == error_type;
+            invalid |= actual == error_type;
         }
+        for (unsigned n=0;n<bound.size();++n) if (!bound[n]) {
+            const auto& parameter = target.parameters[n];
+            if (!constructor || !parameter.default_value) {
+                std::vector<RelatedLocation> related;
+                if (constructor) { auto [owner,structure] = owned_structure(target.receiver->type); (void)structure; related.push_back({span(owner->source,parameter.token),"Required initializer parameter declared here."}); }
+                error(source,e.token,Code::argument_count,"Incorrect argument count: missing required argument '" + parameter.token.text + "'.","Supply an explicit constructed value or every required argument.",std::move(related));
+            }
+            auto value = std::make_unique<Expr>(Expr::Kind::literal,e.token); value->type = parameter.type;
+            value->aggregate_value = *parameter.default_value; value->value = parameter.default_value->bits;
+            e.parts.push_back(std::move(value)); mapping.push_back(n);
+        }
+        if (constructor) e.field_indexes = std::move(mapping);
         return invalid ? error_type : target.result;
+    }
+    std::pair<Unit*,Structure*> owned_structure(Type type) {
+        for (const auto& [id,owner] : units) for (auto& structure : owner->structures)
+            if (structure.definition == type.definition) return {owner.get(),&structure};
+        throw std::logic_error("Missing owned value type");
+    }
+    void construction_fields(Expr& e, Unit& owner, Structure& structure, bool runtime, bool initializer_declaration = false) {
+        Depth guard(diagnostics.semantic_depth(),source,e.token,128);
+        for (unsigned n=0;n<structure.fields.size();++n) {
+            if (!e.initializer.empty() || std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end()) {
+                const auto& field = structure.fields[n];
+                if (field.expression || field.annotation->kind != Type::aggregate) continue;
+                auto [child_owner,child] = owned_structure(*field.annotation);
+                auto value = std::make_unique<Expr>(Expr::Kind::construction,initializer_declaration ? field.token : e.token); value->slot = n;
+                try { construction(*value,*child_owner,*child,runtime,owner); }
+                catch (CompilationError& failure) {
+                    auto errors = failure.diagnostics();
+                    for (auto& d : errors) d.related.push_back({span(owner.source,field.token),"Default construction required for this field."});
+                    throw CompilationError(std::move(errors));
+                }
+                e.omitted.push_back(std::move(value));
+            }
+        }
+    }
+    void construction(Expr& e, Unit& owner, Structure& structure, bool runtime, Unit& access) {
+        defaults(owner,structure);
+        e.kind = Expr::Kind::construction; e.type = Type(structure.definition); e.target = structure.definition->identity;
+        e.aggregate_value = structure.defaults;
+        if (auto* init = structure.initializer) {
+            if (!runtime) error(source,e.token,Code::constant_call,"Compile-time expressions cannot execute custom initialization.","Construct this value in a function or local const.",{{span(owner.source,init->token),"Runtime initializer declared here."}});
+            if (init->file_private && &access != &owner) error(source,e.token,Code::visibility,"Initializer is private to " + owner.identity + ".");
+            e.initializer = init->symbol;
+            if (call_arguments(e,*init,0,true) == error_type) e.type = error_type;
+        } else {
+            std::set<unsigned> initialized;
+            for (unsigned n=0;n<e.parts.size();++n) {
+                if (e.names[n].text.empty()) error(source,e.parts[n]->token,Code::argument_count,"Value construction requires named fields.","Use field = expression for a type without init.");
+                auto& fields = structure.definition->fields;
+                auto field = std::find_if(fields.begin(),fields.end(),[&](const auto& f) { return f.name == e.names[n].text; });
+                if (field == fields.end()) error(source,e.names[n],Code::unknown_identifier,"Unknown constructor field '" + e.names[n].text + "'.");
+                auto index = static_cast<unsigned>(field-fields.begin());
+                if (!initialized.insert(index).second) error(source,e.names[n],Code::duplicate,"Duplicate initializer for field '" + field->name + "'.");
+                e.field_indexes.push_back(index); expect(expression(*e.parts[n],field->type),field->type,e.parts[n]->token);
+            }
+        }
+        construction_fields(e,owner,structure,runtime);
     }
     void expect(Type actual, Type expected, const Token& token) {
         if (actual == error_type || expected == error_type) return;
@@ -905,23 +995,9 @@ class Semantics {
         error(source,e.token,Code::unknown_identifier,"Unknown field '" + e.token.text + "' in " + ir::type_name(t) + ".");
     }
     Type call_expression(Expr& e) {
-        using K = Expr::Kind;
         auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
         if (structure && !(e.qualifier.empty() && lookup(e.token.text))) {
-            defaults(*owner,*structure);
-            e.kind = K::construction; e.type = Type(structure->definition); e.target = structure->definition->identity;
-            e.aggregate_value = structure->defaults;
-            std::set<unsigned> initialized;
-            for (unsigned n = 0; n < e.parts.size(); ++n) {
-                if (e.names[n].text.empty()) error(source,e.parts[n]->token,Code::argument_count,"Value construction requires named fields.","Use field = expression; positional constructors are not implemented yet.");
-                auto& fields = structure->definition->fields;
-                auto field = std::find_if(fields.begin(),fields.end(),[&](const auto& f) { return f.name == e.names[n].text; });
-                if (field == fields.end()) error(source,e.names[n],Code::unknown_identifier,"Unknown constructor field '" + e.names[n].text + "'.");
-                auto index = static_cast<unsigned>(field-fields.begin());
-                if (!initialized.insert(index).second) error(source,e.names[n],Code::duplicate,"Duplicate initializer for field '" + field->name + "'.");
-                e.field_indexes.push_back(index);
-                expect(expression(*e.parts[n],field->type),field->type,e.parts[n]->token);
-            }
+            construction(e,*owner,*structure,current != nullptr,unit);
             return e.type;
         }
         if (std::any_of(e.names.begin(),e.names.end(),[](const auto& t) { return !t.text.empty(); })) error(source,e.token,Code::argument_count,"Named arguments are currently supported only for value construction.");
@@ -1035,10 +1111,10 @@ class Semantics {
                 catch (const CompilationError& failure) { diagnostics.add(failure); t = error_type; }
             }
             if (!s.expression && t.kind == Type::aggregate) {
-                for (const auto& [id,owner] : units) for (auto& structure : owner->structures) if (structure.definition == t.definition) {
-                    defaults(*owner,structure);
-                    s.expression = std::make_unique<Expr>(Expr::Kind::literal,s.token); s.expression->type = t; s.expression->aggregate_value = structure.defaults;
-                }
+                auto [owner,structure] = owned_structure(t);
+                s.expression = std::make_unique<Expr>(Expr::Kind::construction,s.token);
+                construction(*s.expression,*owner,*structure,true,unit);
+
             }
             s.slot = declare(s.token, t, s.readonly); break;
         }
@@ -1119,6 +1195,23 @@ public:
         if (c.type == error_type) throw Poison{};
         if (c.declaration.annotation) expect(c.type, *c.declaration.annotation, c.declaration.token);
     }
+    void parameter_defaults(Function& f) {
+        bool optional = false;
+        for (auto& p : f.parameters) {
+            if (p.default_expression) {
+                if (!f.initializer) error(source,p.token,Code::initializer_deferred,"Default parameters are supported on initializers only in this phase.");
+                optional = true; expect(expression(*p.default_expression,p.type),p.type,p.token);
+                if (p.default_expression->type == error_type) throw Poison{};
+                p.default_value = constant_value(source,*p.default_expression);
+            } else if (optional) error(source,p.token,Code::argument_count,"Required parameters must precede defaulted parameters.");
+        }
+    }
+    void initializer_fields(Function& f) {
+        if (!f.initializer) return;
+        auto [owner,structure] = owned_structure(f.receiver->type);
+        Expr plan(Expr::Kind::construction,f.token); plan.initializer=f.symbol;
+        construction_fields(plan,*owner,*structure,true,true);
+    }
     ir::ConstantValue field_default(Statement& field) {
         auto t = *field.annotation;
         if (field.expression) {
@@ -1196,11 +1289,28 @@ class Lowering {
         }
         case K::field: { auto value = expression(*e.parts[0]); return extract(value,e.slot,e.token); }
         case K::construction: {
+            std::vector<unsigned> arguments;
+            for (const auto& part : e.parts) {
+                auto argument = static_cast<unsigned>(output.locals.size()); output.locals.push_back(part->type);
+                auto value = expression(*part); emit({ir::Op::store,argument,value},part->token); arguments.push_back(argument);
+            }
             auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(e.type);
             auto initial = constant(e.type,e.aggregate_value,e.token); emit({ir::Op::store,slot,initial},e.token);
-            for (unsigned n = 0; n < e.parts.size(); ++n) {
-                auto value = expression(*e.parts[n]); auto aggregate = emit({ir::Op::load,slot},e.token);
-                auto updated = insert(aggregate,value,e.field_indexes[n],e.names[n]); emit({ir::Op::store,slot,updated},e.token);
+            for (unsigned field=0;field<e.type.definition->fields.size();++field) {
+                std::optional<unsigned> value;
+                if (e.initializer.empty()) for (unsigned n=0;n<arguments.size();++n)
+                    if (e.field_indexes[n]==field) value = emit({ir::Op::load,arguments[n]},e.token);
+                for (const auto& child : e.omitted) if (child->slot==field) value = expression(*child);
+                if (value) {
+                    auto aggregate = emit({ir::Op::load,slot},e.token);
+                    auto updated = insert(aggregate,*value,field,e.token); emit({ir::Op::store,slot,updated},e.token);
+                }
+            }
+            if (!e.initializer.empty()) {
+                ir::Instruction call{ir::Op::call}; call.callee=e.initializer; call.receiver=ir::Place{slot,{}}; call.initialization=true;
+                call.arguments.resize(arguments.size());
+                for (unsigned n=0;n<arguments.size();++n) call.arguments[e.field_indexes[n]]=emit({ir::Op::load,arguments[n]},e.token);
+                emit(call,e.token);
             }
             return emit({ir::Op::load,slot},e.token);
         }
@@ -1314,7 +1424,7 @@ public:
     ir::Function lower(const Function& f) {
         output = {}; output.name = f.symbol; output.source_name = f.token.text; output.source = source.location(f.token.offset);
         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
-        output.receiver = f.receiver.has_value(); output.receiver_mutates = f.receiver_mutates;
+        output.receiver = f.receiver.has_value(); output.receiver_mutates = f.receiver_mutates; output.initializer = f.initializer;
         if (f.receiver) {
             output.source_name = f.receiver->type.definition->name + "::method::" + f.token.text;
             output.parameters.push_back(f.receiver->type);
@@ -1495,6 +1605,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
     if (e.kind == Expr::Kind::construction) {
         auto result = e.aggregate_value;
         for (unsigned n = 0; n < e.parts.size(); ++n) result.fields[e.field_indexes[n]] = constant_value(source,*e.parts[n]);
+        for (const auto& child : e.omitted) result.fields[child->slot] = constant_value(source,*child);
         return result;
     }
     if (e.kind == Expr::Kind::field) return constant_value(source,*e.parts[0]).fields.at(e.slot);
@@ -1630,12 +1741,14 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 if (t.kind != Type::aggregate) error(unit->source,f.receiver->token,Code::receiver,"Receiver declarations require a value struct type.");
                 if (!unit->structure_names.contains(t.definition->name) || unit->structure_names.at(t.definition->name)->definition != t.definition)
                     error(unit->source,f.receiver->token,Code::receiver,"Methods must be declared in their value type's owning module; extension methods are deferred.");
-                if (f.token.text == "init" || f.token.text == "deinit")
-                    error(unit->source,f.token,Code::initializer_deferred,"Custom lifecycle initialization is deferred pending an approved construction contract.","Use the existing safe defaults and named-field construction; init is reserved for a future phase.");
+                f.initializer = f.token.text == "init";
+                if (f.token.text == "deinit") error(unit->source,f.token,Code::initializer_deferred,"Resource lifecycle deinit is not implemented.");
+                if (f.initializer && f.result != Type::none) error(unit->source,f.token,Code::type_mismatch,"An initializer must not declare a result; fallible construction is deferred.");
                 for (const auto& field : t.definition->fields) if (field.name == f.token.text)
                     error(unit->source,f.token,Code::duplicate,"Method name conflicts with field '" + f.token.text + "'.");
                 f.symbol = t.definition->identity + "::method::" + f.token.text;
                 if (!unit->methods.emplace(f.symbol,&f).second) error(unit->source,f.token,Code::duplicate,"Duplicate receiver method '" + f.token.text + "'.");
+                if (f.initializer) unit->structure_names.at(t.definition->name)->initializer = &f;
             } catch (const CompilationError& failure) { diagnostics.add(failure); f.parse_failed = true; }
               catch (const Poison&) { f.parse_failed = true; }
         }
@@ -1684,6 +1797,18 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         catch (const CompilationError& failure) { diagnostics.add(failure); }
         catch (const Poison&) {}
     }
+    for (auto& [id,unit] : units) for (auto& f : unit->functions) {
+        if (f.parse_failed) continue;
+        try { Semantics(*unit,units,root,evaluate,diagnostics,defaults).parameter_defaults(f); }
+        catch (const CompilationError& failure) { diagnostics.add(failure); }
+        catch (const Poison&) {}
+    }
+    for (auto& [id,unit] : units) for (auto& f : unit->functions) {
+        if (f.parse_failed) continue;
+        try { Semantics(*unit,units,root,evaluate,diagnostics,defaults).initializer_fields(f); }
+        catch (const CompilationError& failure) { diagnostics.add(failure); }
+        catch (const Poison&) {}
+    }
     for (auto& [id, unit] : units) Semantics(*unit, units, root, evaluate, diagnostics, defaults).analyze();
     std::map<std::string,Function*> methods;
     for (auto& [id,u] : units) for (auto& [key,f] : u->methods) methods.emplace(key,f);
@@ -1700,6 +1825,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             while (!expressions.empty()) {
                 auto* e = expressions.back(); expressions.pop_back();
                 for (auto& child : e->parts) expressions.push_back(child.get());
+                for (auto& child : e->omitted) expressions.push_back(child.get());
                 if (e->kind != Expr::Kind::method_call || !methods.contains(e->target)) continue;
                 calls.push_back({u.get(),e});
                 if (f.receiver && e->receiver_addressable && e->slot == f.receiver->slot)
@@ -1721,6 +1847,36 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             if (!e->receiver_addressable) error(owner->source,e->token,Code::receiver,"A mutating method requires mutable receiver storage.","Bind the value to var before calling this method.");
         } catch (const CompilationError& failure) { diagnostics.add(failure); }
     }
+    std::map<std::string,Function*> functions;
+    std::map<std::string,std::set<std::string>> dependencies;
+    std::vector<std::string> pending;
+    for (auto& [id,u] : units) for (auto& f : u->functions) {
+        functions.emplace(f.symbol,&f);
+        if (f.initializer) pending.push_back(f.symbol);
+        std::vector<const Statement*> statements; for (const auto& s : f.body) statements.push_back(&s);
+        while (!statements.empty()) {
+            auto* statement=statements.back(); statements.pop_back();
+            for (const auto& child : statement->body) statements.push_back(&child);
+            for (const auto& child : statement->otherwise) statements.push_back(&child);
+            std::vector<const Expr*> expressions; if (statement->expression) expressions.push_back(statement->expression.get());
+            while (!expressions.empty()) {
+                auto* e=expressions.back(); expressions.pop_back();
+                for (const auto& part : e->parts) expressions.push_back(part.get());
+                for (const auto& part : e->omitted) expressions.push_back(part.get());
+                if (e->kind==Expr::Kind::call || e->kind==Expr::Kind::method_call) dependencies[f.symbol].insert(e->target);
+                if (!e->initializer.empty()) dependencies[f.symbol].insert(e->initializer);
+            }
+        }
+    }
+    std::set<std::string> frozen;
+    while (!pending.empty()) {
+        auto key=pending.back(); pending.pop_back();
+        if (!functions.contains(key) || !frozen.insert(key).second) continue;
+        auto& f=*functions.at(key); f.initialization_contract=f.body_syntax;
+        for (const auto& dependency : dependencies[key]) pending.push_back(dependency);
+    }
+    for (auto& [id,f] : functions) if (f->initializer) for (const auto& p : f->parameters)
+        f->initialization_contract += std::to_string(p.token.text.size()) + ":" + p.token.text + std::to_string(p.default_syntax.size()) + ":" + p.default_syntax;
     // Recovered trees and AST-only poisoned types can never enter validated IR.
     diagnostics.finish();
 }
@@ -1756,16 +1912,17 @@ struct AnalysisAccess {
             for (auto t : d.parameters) field(result->contract_, t.kind == Type::aggregate ? t.definition->identity : ir::type_name(t));
             field(result->contract_,d.receiver.kind == Type::none ? "" : ir::type_name(d.receiver));
             field(result->contract_,d.receiver_mutates ? "mutating" : "nonmutating");
-            if (d.kind != AnalyzedDeclaration::Kind::function && d.kind != AnalyzedDeclaration::Kind::receiver_method) {
+            field(result->contract_,d.initialization_contract);
+            if (d.kind != AnalyzedDeclaration::Kind::function && d.kind != AnalyzedDeclaration::Kind::receiver_method && d.kind != AnalyzedDeclaration::Kind::initializer) {
                 field(result->constants_, d.identity); field(result->constants_, d.visibility);
                 field(result->constants_, d.type.kind == Type::aggregate ? d.type.definition->identity : ir::type_name(d.type)); field(result->constants_, d.constant_syntax);
             }
             result->declarations_.push_back(std::move(d));
         };
-        auto reference = [&](const std::string& from, const std::string& to, const Expr& e, const Unit& u) {
+        auto reference = [&](const std::string& from, const std::string& to, const Expr& e, const Unit& u, bool implicit = false) {
             auto location = span(u.source,e.token); location.module_identity = u.identity;
             auto spelling = e.qualifier + "::" + e.token.text;
-            result->references_.push_back({from,to,spelling,std::move(location)});
+            result->references_.push_back({from,to,spelling,std::move(location),implicit});
             field(result->contract_,"reference"); field(result->contract_,from); field(result->contract_,to);
         };
         for (const auto& [id, unit] : *graph) {
@@ -1784,14 +1941,17 @@ struct AnalysisAccess {
             for (const auto& i : imports) field(result->contract_,i);
             result->modules_.push_back(std::move(module));
             auto location = [&](const Token& t) { auto l = span(unit->source,t); l.module_identity=id; return l; };
-            std::function<void(const Expr&,const std::string&,const std::map<unsigned,std::string>&)> expression;
-            expression = [&](const Expr& e, const std::string& owner, const auto& locals) {
-                if (!e.target.empty()) reference(owner,e.target,e,*unit);
+            std::function<void(const Expr&,const std::string&,const std::map<unsigned,std::string>&,bool)> visit_expression;
+            auto expression = [&](const Expr& e, const std::string& owner, const std::map<unsigned,std::string>& locals) { visit_expression(e,owner,locals,false); };
+            visit_expression = [&](const Expr& e, const std::string& owner, const auto& locals, bool implicit) {
+                if (!e.target.empty()) reference(owner,e.target,e,*unit,implicit);
                 else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit);
-                if (e.kind == Expr::Kind::construction) for (unsigned n = 0; n < e.names.size(); ++n) {
+                if (!e.initializer.empty()) reference(owner,e.initializer,e,*unit,implicit);
+                if (e.kind == Expr::Kind::construction && e.initializer.empty()) for (unsigned n = 0; n < e.names.size(); ++n) {
                     Expr use(Expr::Kind::name,e.names[n]); reference(owner,e.type.definition->identity + "::field::" + e.names[n].text,use,*unit);
                 }
-                for (const auto& part : e.parts) expression(*part,owner,locals);
+                for (const auto& part : e.parts) visit_expression(*part,owner,locals,implicit);
+                for (const auto& part : e.omitted) visit_expression(*part,owner,locals,true);
             };
             for (const auto& [token,raw] : unit->type_uses) {
                 auto t = resolve_type(raw,*unit,*graph->at(entry),*graph,token);
@@ -1827,9 +1987,16 @@ struct AnalysisAccess {
             }
             for (const auto& f : unit->functions) {
                 std::vector<Type> parameters; for (const auto& p : f.parameters) parameters.push_back(p.type);
-                AnalyzedDeclaration method_record{f.receiver ? AnalyzedDeclaration::Kind::receiver_method : AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}};
+                AnalyzedDeclaration method_record{f.initializer ? AnalyzedDeclaration::Kind::initializer : f.receiver ? AnalyzedDeclaration::Kind::receiver_method : AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}};
                 if (f.receiver) { method_record.owner = f.receiver->type.definition->identity; method_record.receiver = f.receiver->type; method_record.receiver_mutates = f.receiver_mutates; }
+                method_record.initialization_contract=f.initialization_contract;
+                if (f.initializer) for (const auto& p : f.parameters) {
+                    AnalyzedParameter parameter{p.token.text,p.type,location(p.token)};
+                    if (p.default_expression) { auto range=location(p.default_expression->token); range.begin=p.default_begin; range.end=p.default_end; parameter.default_source=std::move(range); }
+                    method_record.initializer_parameters.push_back(std::move(parameter));
+                }
                 declaration(std::move(method_record));
+                for (const auto& p : f.parameters) if (p.default_expression) expression(*p.default_expression,f.symbol,{});
                 std::map<unsigned,std::string> locals;
                 std::map<std::string,unsigned> names;
                 std::function<void(const std::vector<Statement>&)> body;

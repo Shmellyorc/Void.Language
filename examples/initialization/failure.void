@@ -1,0 +1,12 @@
+value struct child:
+    x: i32
+
+func (c child) init(seed: i32 = 0):
+    c.x = 100 / seed
+
+value struct wrapper:
+    child: child
+
+func entry(value: i32) -> i32:
+    const supplied = wrapper(child = child(value))
+    return supplied.child.x

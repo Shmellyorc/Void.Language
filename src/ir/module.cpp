@@ -29,17 +29,18 @@ void validate(const Module& m) {
         }
         visiting.erase(d); checked.insert(d);
     };
-    struct Signature { std::vector<Type> parameters; Type result; bool receiver = false, mutates = false; };
+    struct Signature { std::vector<Type> parameters; Type result; bool receiver = false, mutates = false, initializer = false; };
     std::map<std::string, Signature> names;
     for (const auto& name : m.imports)
         if (name.empty() || !names.emplace(name, Signature{{Type::i32}, Type::i32}).second) fail("duplicate or empty import");
     for (const auto& f : m.functions) {
-        if (f.name.empty() || !names.emplace(f.name, Signature{f.parameters, f.result,f.receiver,f.receiver_mutates}).second) fail("duplicate or empty function");
+        if (f.name.empty() || !names.emplace(f.name, Signature{f.parameters, f.result,f.receiver,f.receiver_mutates,f.initializer}).second) fail("duplicate or empty function");
         if (!f.module_identity.empty() && (f.source_name.empty() || f.name != f.module_identity + "::" + f.source_name))
             fail("inconsistent function ownership");
         if (f.receiver) {
             if (f.parameters.empty() || f.parameters[0].kind != Type::aggregate || f.locals.empty() || f.locals[0] != f.parameters[0]) fail("invalid receiver signature/storage");
         } else if (f.receiver_mutates) fail("receiver effect without receiver");
+        if (f.initializer && (!f.receiver || f.result != Type::none)) fail("invalid initializer signature");
         valid_type(f.result);
         for (auto t : f.parameters) if (t == Type::none) fail("no-result parameter"); else valid_type(t);
         for (auto t : f.locals) if (t == Type::none) fail("no-result slot"); else valid_type(t);
@@ -103,6 +104,8 @@ void validate(const Module& m) {
                     auto target = names.find(i.callee);
                     if (target == names.end()) fail("unknown callee " + i.callee);
                     const auto& signature = target->second;
+                    if (i.initialization != signature.initializer) fail("initializer invocation kind mismatch");
+                    if (i.initialization && (!i.receiver || !i.receiver->fields.empty() || (f.receiver && i.receiver->slot==0))) fail("initializer requires fresh construction storage");
                     if (i.receiver.has_value() != signature.receiver) fail("call receiver mismatch");
                     std::size_t first = 0;
                     if (i.receiver) {

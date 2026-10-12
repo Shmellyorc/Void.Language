@@ -45,6 +45,7 @@ struct Instruction {
     Type type = Type::i32; // Literal type; other result types derive from operands/signatures.
     std::vector<std::uint32_t> arguments = {};
     std::optional<Place> receiver = {};
+    bool initialization = false; // Only compiler-validated construction invokes init.
     std::string source_excerpt = {}; // Snapshot of the source line and caret.
 };
 struct Terminator {
@@ -57,6 +58,7 @@ struct Function {
     std::vector<Type> parameters = {Type::i32};
     Type result = Type::i32;
     std::vector<Type> locals = {};
+    bool initializer = false;
     bool receiver = false, receiver_mutates = false; // First parameter aliases local slot zero.
     std::string source_name = {}, module_identity = {}; // Empty for legacy hand-built proofs.
 };

@@ -202,3 +202,12 @@ imported call/receiver-type definitions, references, unsaved changes to receiver
 effects, invalid query suppression and revision recovery. The local-variable
 navigation boundary remains unchanged. Exact compiler contracts still authorize
 reload separately from metadata summaries. See RECEIVER_METHODS.md.
+
+
+## Phase 14 custom value initialization
+
+Phase 14 exposes initializer declarations, parameter/default spans and constructor
+references using existing nominal types. Implicit nested construction dependency edges
+are marked implicit and do not occupy written navigation/reference positions.
+Initializer/helper policy changes update declaration metadata and require restart; tools
+do not independently authorize native publication.

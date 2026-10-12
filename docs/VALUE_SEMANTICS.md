@@ -212,3 +212,13 @@ aggregate arguments capture their value at their own evaluation point.
 RECEIVER_METHODS.md records transitive effect analysis, runtime traces and exact
 restart rules. Phase 12 defaults/construction and the numeric kernel are unchanged;
 custom init execution remains deferred, not prohibited by the language.
+
+
+## Phase 14 custom value initialization
+
+Phase 14 approved C1 initializes fresh values recursively, then invokes init once
+through the existing receiver-place strategy. Copies, arguments, assignments and returns
+never repeat initialization. Supplied values snapshot before default construction;
+explicit named child fields avoid redundant initialization. Readonly applies after
+successful completion. Failure does not publish a partially completed destination.
+INITIALIZATION.md records visibility, required-child and purity boundaries.

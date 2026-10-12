@@ -18,8 +18,10 @@ ToolingIndex::ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis) : 
     }
     const auto& references = analysis_->references();
     for (std::size_t i=0; i<references.size(); ++i) {
-        incoming_[references[i].to].push_back(i);
-        positions_[references[i].source.module_identity].push_back(i);
+        if (!references[i].implicit) {
+            incoming_[references[i].to].push_back(i);
+            positions_[references[i].source.module_identity].push_back(i);
+        }
     }
     auto less = [&](auto a,auto b) {
         const auto& x=references[a]; const auto& y=references[b];
@@ -83,7 +85,7 @@ struct Graph {
         }
         for(const auto& d:analysis.declarations()) {
             declarations.emplace(d.identity,&d);
-            if(d.kind==AnalyzedDeclaration::Kind::local_constant || d.kind==AnalyzedDeclaration::Kind::value_field || d.kind==AnalyzedDeclaration::Kind::receiver_method) references[d.identity].insert(d.owner);
+            if(d.kind==AnalyzedDeclaration::Kind::local_constant || d.kind==AnalyzedDeclaration::Kind::value_field || d.kind==AnalyzedDeclaration::Kind::receiver_method || d.kind==AnalyzedDeclaration::Kind::initializer) references[d.identity].insert(d.owner);
         }
         for(const auto& r:analysis.references()) {
             references[r.to].insert(r.from); bindings[r.from].push_back(r.to);
@@ -92,7 +94,7 @@ struct Graph {
 };
 bool metadata_equal(const AnalyzedDeclaration& a,const AnalyzedDeclaration& b) {
     return a.kind==b.kind && a.module==b.module && a.owner==b.owner && a.visibility==b.visibility &&
-        a.parameters==b.parameters && a.type==b.type && a.constant_syntax==b.constant_syntax && a.value==b.value && a.receiver==b.receiver && a.receiver_mutates==b.receiver_mutates;
+        a.parameters==b.parameters && a.type==b.type && a.constant_syntax==b.constant_syntax && a.value==b.value && a.receiver==b.receiver && a.receiver_mutates==b.receiver_mutates && a.initialization_contract==b.initialization_contract;
 }
 void merge(Edges& into,const Edges& from) {
     for(const auto& [key,values]:from) into[key].insert(values.begin(),values.end());

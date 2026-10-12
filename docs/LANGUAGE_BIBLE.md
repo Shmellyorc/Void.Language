@@ -596,11 +596,13 @@ match player("Hero"):
 
 **OPEN:** Formal rules for constructor result rewriting, errors during parent initialization, ownership of native resources initialized before failure, interaction between named-field construction and custom `init`, and whether `init` should return `result<bool, error>` or a simpler `result<void, error>` equivalent without introducing a `void` keyword. The example is illustrative, not a finalized ABI.
 
-Phase 13 approval selects receiver methods and initializer groundwork (I1), while
-public custom `init` execution remains deferred. Existing safe defaults and
-named-field construction continue unchanged. No temporary constructor order,
-parameter-binding rule or nested initialization behavior is selected by this phase;
-those open rules still require approval before implementation.
+Phase 13 approved receiver methods and initializer groundwork (I1), deferring
+custom execution at that time. Phase 14 now approves C1 in
+INITIALIZATION_PROPOSAL.md, superseding that deferral for supported value structs.
+See INITIALIZATION.md for parameter-only constructor binding, pure defaults,
+recursive nested construction, visibility, successful publication and reload
+contracts. No-init types retain Phase 12 named-field construction. Fallible,
+resource and managed construction remain separate design gates.
 
 ## 17. Predictable resource cleanup: `deinit()`, `with`, and `defer` [AGREED]
 
@@ -2712,3 +2714,17 @@ source syntax is compiled yet, and no language semantics were changed.
 The compiler implementation uses C++20 and the LLVM C++ API. See
 [DECISIONS.md](DECISIONS.md), [WORK_LOG.md](WORK_LOG.md), and
 [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for implementation scope and actual evidence.
+
+
+## Phase 14 custom value initialization
+
+The owner approved Phase 14 C1 in INITIALIZATION_PROPOSAL.md. For the supported
+value-struct subset, constructor arguments bind exclusively to init parameters; no-init
+types retain named fields. Typed positional/named arguments and pure defaults preserve
+supplied source order before recursive field construction and once-only init. Typed
+local defaults execute the same construction; unavailable required-child defaults and
+runtime initialization in pure contexts diagnose. Existing visibility applies; direct
+lifecycle calls are rejected. Initialization bodies and transitive helpers are
+conservative restart contracts. See INITIALIZATION.md for the bounded implementation and
+deferred fallible/resource/managed rules. This supersedes Phase 13 I1 deferral, not the
+unapproved I2 alternative.

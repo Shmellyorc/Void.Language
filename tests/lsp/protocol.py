@@ -305,6 +305,33 @@ def receiver_methods(executable, root):
     print("receiver methods: imported native LSP navigation, references, effect changes and revision recovery passed")
 
 
+def initialization(executable, root):
+    root.mkdir(parents=True, exist_ok=True)
+    entry, worker = root / "main.void", root / "types.void"
+    types = "value struct point:\n    x: i32\nfunc (p point) init(x: i32 = 4):\n    p.x = x\n"
+    text = 'use "./types.void" as types\nfunc entry(value: i32) -> i32:\n    const p = types.point(x = value)\n    return p.x\n'
+    entry.write_bytes(text.encode("utf-8")); worker.write_bytes(types.encode("utf-8"))
+    uri, wuri = entry.as_uri(), worker.as_uri()
+    query = {"textDocument": {"uri": uri}, "position": source_position(text, "point(x")}
+    with Client(executable, entry) as c:
+        assert all(not n["diagnostics"] for n in c.initialize())
+        response, _ = c.request("textDocument/definition", query)
+        assert response["result"]["uri"] == wuri and response["result"]["range"]["start"] == {"line": 2, "character": 15}, response
+        response, _ = c.request("textDocument/references", {**query, "context": {"includeDeclaration": False}})
+        assert len(response["result"]) == 1 and response["result"][0]["uri"] == uri, response
+        bad = text.replace("x = value", "missing = value")
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": uri, "languageId": "void", "version": 1, "text": bad}})
+        notes = diagnostics(c.sync())
+        assert notes[uri]["diagnostics"][0]["code"] == "VOID2004", notes
+        assert notes[uri]["diagnostics"][0]["range"]["start"] == {"line": 2, "character": 26}, notes
+        assert c.request("textDocument/definition", query)[0]["result"] is None
+        c.notify("textDocument/didChange", {"textDocument": {"uri": uri, "version": 2}, "contentChanges": [{"text": text}]})
+        assert all(not n["diagnostics"] for n in c.sync())
+        assert c.request("textDocument/definition", query)[0]["result"]["uri"] == wuri
+        c.shutdown()
+    print("initialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed")
+
+
 if __name__ == "__main__":
     executable = pathlib.Path(sys.argv[1]).resolve()
     # Unicode physical root names work without changing the ASCII VFS policy.
@@ -313,3 +340,5 @@ if __name__ == "__main__":
     transport(executable, root)
     value_structs(executable, root / "value struct project")
     receiver_methods(executable, root / "receiver method project")
+
+    initialization(executable, root / "initialization project")

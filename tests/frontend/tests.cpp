@@ -117,6 +117,7 @@ void programs(const std::filesystem::path& root) {
     std::cout << "Real .void files and independent programs executed through normal/O2 JIT\n";
 }
 }
+void initialization_tests(const std::filesystem::path& root);
 void method_tests(const std::filesystem::path& root);
 void struct_tests(const std::filesystem::path& root);
 void value_tests(const std::filesystem::path& root);
@@ -133,4 +134,5 @@ void frontend_tests(const std::filesystem::path& root) {
     group("diagnostic recovery/resource limits", [&] { diagnostic_acceptance::run(root); });
     group("value structs", [&] { struct_tests(root); });
     group("receiver methods", [&] { method_tests(root); });
+    group("initialization", [&] { initialization_tests(root); });
 }

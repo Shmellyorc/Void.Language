@@ -49,12 +49,17 @@ test('validate executable and deterministic canonical project selection', async 
     } finally { await fs.rm(directory, {recursive: true, force: true}); }
 });
 
-test('presentation only covers implemented tokens and space indentation', async () => {
+test('presentation covers approved keyword colors and space indentation', async () => {
     const root = path.resolve(__dirname, '../..');
     const grammar = JSON.parse(await fs.readFile(path.join(root, 'syntaxes/void.tmLanguage.json'), 'utf8'));
-    const keyword = new RegExp(grammar.patterns.find((p:{name?:string}) => p.name === 'keyword.control.void').match);
-    for (const word of ['func','const','for','break','continue','as']) assert(keyword.test(word));
-    for (const word of ['while','struct','async','match','defer']) assert(!keyword.test(word));
+    const keywords = grammar.patterns.filter((p:{name?:string}) => p.name === 'keyword.control.void')
+        .map((p:{match:string}) => new RegExp(p.match));
+    assert(keywords.length > 0);
+    const highlighted = (text:string) => keywords.some((rule:RegExp) => rule.test(text));
+    for (const word of ['func','return','const','for','break','continue','as','struct','value struct'])
+        assert(highlighted(word), `Missing keyword highlighting: ${word}`);
+    for (const word of ['while','async','match','defer','structure','function','returning','value'])
+        assert(!highlighted(word), `Unexpected keyword highlighting: ${word}`);
     const config = JSON.parse(await fs.readFile(path.join(root, 'language-configuration.json'), 'utf8'));
     assert.equal(config.comments.lineComment, '#');
     const indent = new RegExp(config.indentationRules.increaseIndentPattern);
@@ -62,6 +67,7 @@ test('presentation only covers implemented tokens and space indentation', async 
     assert(indent.test('func (p point) move(dx: i32, dy: i32):'));
     assert(indent.test('for:')); assert(!indent.test('# for:'));
     assert(indent.test('value struct point:')); assert(!indent.test('struct point:'));
-    const aggregate = new RegExp(grammar.patterns.find((p:{match?:string}) => p.match?.includes('value')).match);
-    assert(aggregate.test('value struct point:')); assert(!aggregate.test('value: i32'));
+    assert(keywords.some((rule:RegExp) => rule.exec('value struct point:')?.[0] === 'value struct'));
+    assert(keywords.some((rule:RegExp) => rule.exec('struct point:')?.[0] === 'struct'));
+    assert(!highlighted('value: i32'));
 });

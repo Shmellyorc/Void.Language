@@ -2729,3 +2729,258 @@ Debug/Release matrices and real editor scenarios still require hosted execution;
 Linux hosted sanitizers must also confirm the official archive environment. The
 existing workflow discovers all 23 suites automatically. No commits, pushes,
 branches, publishing or remote modifications were performed.
+
+## Phase 14 construction contract proposal — awaiting approval (2026-10-12)
+
+The owner reports Phase 13 `c72e62a` passed hosted run #19 on Windows, Linux and
+macOS. The current local HEAD is its subsequent syntax-highlighting correction
+`ffa9cdf`; the working tree was clean. Reviewed the current design/technical
+documents and the actual parser, parameter/call checker, structural-default
+evaluation, typed-local construction, receiver lowering and analysis contracts.
+
+Created INITIALIZATION_PROPOSAL.md, explicitly unapproved. Recommended C1 binds
+custom constructor arguments only to initializer parameters, supports typed
+positional/named arguments and pure defaults, evaluates supplied expressions
+before recursive field construction, and completes child initializers before the
+parent body. It describes missing-required-child/default availability, typed local
+construction, pure-context rejection, visibility/private factories, once-only
+publication/failure propagation and conservative initialization/helper reload
+dependencies. Alternatives and limitations are stated for owner selection.
+
+Identified a direct conflict with preserving every historical assertion: one
+frontend test and the CLI check/run/emit case expressly reject a valid init
+declaration because Phase 13 deferred the feature. The proposal requests explicit
+approval for those narrowly scoped expectation updates while retaining direct
+lifecycle-call rejection, strict failures and existing-output preservation.
+
+Stopped before compiler behavior changes as explicitly requested for consequential
+public construction rules. Only the proposal and this log entry changed. Git
+whitespace validation passed; no build/test rerun is claimed for this documentation
+gate, and the six Phase 13 matrices are not Phase 14 evidence. Implementation,
+INITIALIZATION.md and full Phase 14 validation follow approval. No commits, pushes,
+branches or remote modifications were performed.
+
+
+## Phase 14 — approved custom value initialization and editor correction (2026-10-12)
+
+### Approval, baseline and implemented contract
+
+The owner approved **C1** in INITIALIZATION_PROPOSAL.md, explicitly including
+recursive nested construction, required-child default availability, constructor
+visibility, conservative initialization/helper reload dependencies and the specific
+obsolete Phase 13 rejection-test updates. No I2 alternative was adopted. The owner
+reports baseline Phase 13 `c72e62a` passed hosted run #19 on all platforms; this
+checkout also includes the owner's subsequent `ffa9cdf` syntax-highlighting change.
+
+INITIALIZATION.md records the working contract. Owner-module custom initializers
+accept explicit typed positional/named parameters and pure defaults, with required
+parameters before optional ones. Constructor arguments exclusively bind parameters;
+no-init types retain named fields. Duplicate/unknown/double binding, order, count,
+type, lifecycle result/declaration and access mistakes diagnose before lowering.
+Supplied expressions snapshot once in source order before any nested initialization.
+Fresh fields construct in declaration order, then init runs once on prepared storage.
+Readonly applies on successful completion. Copies/ordinary arguments/returns never
+repeat init, and failures do not publish the fresh result or overwrite its destination.
+
+Omitted nested values recursively run available default construction; explicitly
+supplied children do not first execute a discarded default initializer. Required
+children can be supplied to no-init wrappers. Custom parents must have safe defaults
+for all fields before their bodies; invalid declarations identify the field and
+required child parameter. Merely declaring/using a required-argument type does not
+poison its layout. Typed locals use the same zero-argument construction/access rules.
+Pure module/field/parameter defaults cannot execute init, directly or implicitly;
+local runtime const construction is valid. Private factories and owner-encapsulated
+nested construction work without granting callers private initializer access.
+
+The parser/Function/Parameter/shared nominal Type model owns these rules. One
+argument checker performs contextual typing for functions/methods/initializers;
+bounded construction plans distinguish pure structural storage from runtime default
+availability. Typed slot snapshots, aggregate operations and Phase 13 receiver Places
+lower through the unchanged shared LLVM backend. IR initializer signatures and calls
+carry explicit invocation metadata and reject ordinary invocation or inappropriate
+receiver paths. Existing failure checks guard use of constructed results. No second
+frontend, type system, constructor code generator, heap or managed runtime was added.
+
+Shared owned analysis adds initializer kind, parameter/default source metadata,
+constructor references and implicit construction dependencies. Implicit edges do
+not obscure written navigation/references. Exact compatibility freezes init
+presence/signature/labels/defaults/access/effects/body and transitive helper bodies,
+using an iterative closure including cycles. Unrelated compatible bodies still
+reload, retaining old leases; changes to construction policy require explicit restart.
+Existing default/layout/constant/binding rules and source resource guards remain.
+
+### Windows run #20: actual log and isolated correction
+
+Read the completed Windows job **114796125401** through the GitHub API for run
+**38244868927**. The whole run was initially still in progress, so run-level logs
+were unavailable; the completed job log was retrieved separately and is retained
+as ci20-windows.log. At 2026-10-12T11:50:38Z, the presentation unit test failed at
+compiled out/test/config.test.js:98 with `keyword.test(word)` false. Three of four
+unit tests passed. The first keyword.control.void rule is now the intentionally
+approved optional-value/struct rule; `.find()` therefore never examined func/return.
+The original negative struct assertion also contradicted intentional highlighting.
+
+Only editors/vscode/src/test/config.test.ts changed for this correction. It filters
+all applicable keyword rules, checks func/return and prior working keywords, and
+requires exact complete matches for both struct and value struct. Unsupported
+while/async/match/defer and misleading prefixes/standalone value remain excluded.
+No grammar rules/colors, indentation rules, extension lifecycle or compiler semantics
+were changed to resolve the editor regression. The actual native process-kill tests,
+notification counts and shutdown/restart behavior remain intact.
+
+### Regression coverage and actual native source programs
+
+All **23 existing suites remain enabled**, plus initialization_cli: **24 total**.
+The specifically approved valid-init rejection in frontend/methods.cpp is now
+positive source execution. The old CLI deferral fixture now defines a valid init
+and attempts an invalid direct p.init() call. Its check/run/emit status/VOID2020 and
+protected-output assertions remain, as does direct-call rejection in frontend tests.
+No other historical assertion was removed or relaxed.
+
+Seven actual projects under examples/initialization exercise:
+
+- main: imported nested defaults/initializers, named arguments, typed locals,
+  readonly/copies, methods, owner-private nested construction and public factories.
+- order: source-order side effects, named reordering, once-only argument evaluation
+  and omitted pure parameter defaults.
+- required: explicit construction of required children in a no-init wrapper.
+- numeric: all ten numeric types and Boolean defaults, boundary values and float precision.
+- failure: actual initializer-body failure with source/caller trace.
+- stages: argument failure before initialization, omitted-child failure and explicit
+  child construction that must not execute a redundant failing default.
+- copies: aggregate initializer parameters, caller independence, field assignment,
+  function parameters and aggregate returns without reinitialization.
+
+initialization_cli runs all seven in normal/O2 JIT and separately linked AOT,
+three successful inputs per program (84 success comparisons/configuration), emitted
+object DWARF validation and twelve failure/source-order comparisons. Existing native
+value/receiver integration cases remain. Frontend checks add precise diagnostics,
+required/default/private boundaries, nominal copying, pure contexts, invalid lifecycle
+calls/returns, independent recovery, initializer/default navigation metadata, direct
+and cyclic helper reload rejection, changed default/access contracts, trivia-safe
+and unrelated-body reload and malformed initializer IR rejection.
+The actual native LSP protocol suite tests imported initializer definition/references,
+exact named-argument diagnostics, stale-query suppression and unsaved repair.
+
+### Final native build/test matrices
+
+Each final matrix below was run only after its own build completed successfully.
+These include the final required-child/default/access and aggregate-copy tests.
+
+| SDK | Tree / configuration | Result | CTest elapsed |
+| --- | --- | --- | --- |
+| Installed, RTTI on | ci-debug / Debug | 24/24 | 34.83 s |
+| Installed, RTTI on | ci-release / Release | 24/24 | 31.31 s |
+| Installed, RTTI on | ci-sanitizers / RelWithDebInfo, strict ASan/UBSan | 24/24 | 35.72 s |
+| Official archive, RTTI off | ci-official-debug / Debug | 24/24 | 29.66 s |
+| Official archive, RTTI off | ci-official-release / Release | 24/24 | 25.47 s |
+| Official archive, RTTI off | ci-official-san / RelWithDebInfo, strict ASan/UBSan | 24/24 | 31.33 s |
+
+The six final matrices passed **144 suite executions**. Initial concurrent runs
+were slower; timings here are verification evidence, not performance benchmarks.
+One earlier official Release test invocation overlapped the tail of its build:
+three CLI tests encountered a temporarily absent executable during replacement.
+That failed harness run is preserved in ci-official-release-overlapped-build.log;
+a complete post-build rerun passed, and final build/test orchestration always
+awaited a successful build before starting its own matrix. No production workaround
+or test weakening was used for that scheduling mistake.
+
+Actual commands, for each installed/official configured tree:
+
+```sh
+cmake --build build/ci-debug -j2
+ctest --test-dir build/ci-debug --output-on-failure -j4
+# Also ci-release, ci-official-debug and ci-official-release.
+cmake --build build/ci-sanitizers -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+ctest --test-dir build/ci-sanitizers --output-on-failure -j4
+# Same strict environment/build/test for ci-official-san.
+```
+
+Verified LLJIT headers, LLVMOrcJIT library, LLVMConfig.cmake and llvm-config 19.1.7
+for both /usr/lib/llvm-19 and the complete official archive under
+.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64. Matching Clang/LLD versions and
+SDK-wide RTTI policies remain unchanged (installed YES, official NO). Fresh Debug
+configuration of both SDKs passed the actual compile/link/execute ORC probe.
+No LLVM version, dependency, sanitizer or leak requirement was weakened. Strict
+sanitizers ran outside the filesystem sandbox so LeakSanitizer could inspect
+processes. The no-RTTI archive retains its established instrumentation policy;
+this does not claim unavailable vptr checks. Generated application machine code
+is not itself ASan/UBSan-instrumented by the compiler/runtime sanitizer builds.
+Earlier full rebuilds emitted the existing SDK ciso646/header deprecation warning;
+no suppression was added. Final incremental builds had no new source warnings.
+
+Both final Debug SDKs passed **five consecutive frontend repetitions with a 1 MiB
+stack** (ten additional executions). This retains the original Phase 12 layout/
+combined-expression regression, Phase 13 deep receiver/SCC guards and the new
+initializer checks; limits were not raised. Both strict sanitizer SDKs passed
+frontend and reload **three repetitions each** (twelve additional executions).
+
+```sh
+(ulimit -s 1024; ctest --test-dir build/ci-debug -R '^frontend$' --repeat until-fail:5 --output-on-failure)
+# Same command for ci-official-debug.
+# With the strict sanitizer environment above, for both sanitizer trees:
+ctest --test-dir build/ci-sanitizers -R '^frontend$|^reload$' --repeat until-fail:3 --output-on-failure
+```
+
+### Extension, real editor and native executable evidence
+
+With Node 24.19.0 and existing pinned dependencies, final `npm test` passed strict
+TypeScript/build and **4/4 individually executed tests**, including the corrected
+keyword assertions. A detailed TAP unit log is also retained. `npm run package`
+passed and produced editors/vscode/dist/void-language-0.1.0.vsix (8 files, 145.44 KB).
+No publication or native binary bundling was performed.
+
+Real installed VS Code **1.141.0** passed trusted, restricted-trust and multi-root
+profiles against native voidls, retaining actual child termination, strict
+notification counts, Unicode paths, restart/configuration/fallback behavior,
+no automatic restart, no child in restricted/multi-root contexts and clean shutdown.
+Compiler-owned constructor navigation/revision checks additionally passed the native
+LSP process suite. VSCodium and Windows/macOS editor execution were not available locally.
+
+```sh
+cd editors/vscode
+npm test
+node --test --test-reporter=tap out/test/config.test.js
+npm run package
+VOIDLS_PATH=/home/shmellyorc/Documents/Void.Language/build/ci-debug/voidls \
+VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:host
+```
+
+Actual source-to-native demonstration from examples/initialization/main.void,
+linked with matching Clang/LLD 19.1.7:
+
+```text
+Source checked successfully
+166                          # normal JIT, input 10
+166                          # optimized JIT, input 10
+Wrote native source object: build/phase14-verification/initialization.o
+166                          # separately linked native executable, input 10
+```
+
+The result is a Linux x86-64 ELF PIE with debug_info. Commands are in
+INITIALIZATION.md. These results compile real imported source, not hand-built IR.
+Final build/test/stress/SDK/editor/CI logs, object/executable, source hashes and
+results.json are retained under ignored build/phase14-verification/ outputs.
+Git whitespace validation passed.
+
+### Remaining limits and hosted readiness
+
+INITIALIZATION.md, the approved proposal, Bible constructor notes, README,
+DECISIONS, KNOWN_ISSUES and related analysis/value/compiler docs now distinguish
+working C1 from deferred features. Required-child availability and pure default
+rules are deliberate approved boundaries. Runtime field defaults, general function/
+method named/default parameters, initializer inference/overloads, fallible results,
+resource cleanup/deinit, managed reference structs, inheritance/interfaces,
+collections/strings and public aggregate ABI remain future work. The experimental
+GC has not been presented as a production runtime. A coherent runtime-field-default
+or fallible/resource construction design can be considered next, with owner approval;
+this phase does not finalize those policies.
+
+Phase 14 and the isolated editor assertion correction are **ready for hosted CI**.
+All execution above was Linux x86-64. Windows/macOS native calling/layout behavior,
+all hosted matrices and the corrected Windows editor test still require another
+Actions run; Linux success is not substituted for those results. The existing
+workflow discovers all 24 suites automatically. No commits, pushes, branches,
+publishing or remote modifications were performed.

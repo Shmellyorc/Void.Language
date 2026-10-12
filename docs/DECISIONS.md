@@ -527,3 +527,18 @@ restart contracts. Compatible bodies can reload; changed effects/signatures/type
 visibility/layout/defaults/bindings require restart. Reserve lifecycle receiver
 syntax with an explicit deferred diagnostic, keeping Phase 12 construction intact.
 RECEIVER_METHODS.md documents scope, tests and the remaining constructor gate.
+
+
+## Phase 14 custom value initialization
+
+Phase 14 approves C1 in INITIALIZATION_PROPOSAL.md. Constructor arguments bind only to
+initializer parameters on custom types; positional/named binding and pure typed defaults
+share checking. Recursive default construction runs children before the parent;
+required-child availability and owner visibility are validated without exposing
+uninitialized fields. Fresh receiver storage and explicit IR initialization flags use
+shared LLVM lowering and existing failure propagation. Initializer body/default policy
+and transitive helper bodies participate in exact restart contracts through an iterative
+closure. Shared tooling records initializer/default spans and separates implicit
+dependency edges from written navigation. INITIALIZATION.md describes the implemented
+contract. The owner authorized only the identified obsolete Phase 13 init rejection
+updates; all prior suites and lifecycle/output-protection assertions remain.
