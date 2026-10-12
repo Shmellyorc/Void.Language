@@ -500,3 +500,30 @@ ordered fields, nominal identities and default syntax; incompatible edits requir
 manual restart. Shared analysis now owns type/field declarations and references,
 so LSP/editor integration does not need a second type model. VALUE_STRUCTS.md
 records the working syntax, limits and next recommended design phase.
+
+## Phase 13 receiver methods: approved M1 + I1, 12 October 2026
+
+The owner reports Phase 12 `acf7355` passed hosted run #18 on all three platforms.
+Approved owner-module receiver declarations and initializer groundwork, with
+extension methods and public custom init execution deferred. I2's constructor
+alternatives were not approved and must not be treated as implementation policy.
+
+Use the existing Function/Type/checker/analysis model. Resolve nominal owned method
+signatures before bodies, infer receiver mutation from validated writes and a finite
+reverse call graph, then check readonly/addressability at every method call. Mutating
+methods update actual local/nested storage; non-mutating methods permit readonly
+values and temporaries. Ordinary parameters remain copies. Receiver storage is
+selected once before arguments, which evaluate once left to right; aggregate
+arguments snapshot their value at their evaluation position.
+
+Represent internal storage with a typed IR Place on shared calls. The receiver
+aliases slot zero through the existing shared LLVM lowering, rather than delayed
+copy-back or another generator. Validate paths/types and non-mutating IR writes.
+Preserve native failure contexts and private target layouts; add no external ABI,
+heap/runtime system, LLVM alias promises or source references.
+
+Owned method declarations/references and inferred effects feed tools/LSP and exact
+restart contracts. Compatible bodies can reload; changed effects/signatures/types/
+visibility/layout/defaults/bindings require restart. Reserve lifecycle receiver
+syntax with an explicit deferred diagnostic, keeping Phase 12 construction intact.
+RECEIVER_METHODS.md documents scope, tests and the remaining constructor gate.

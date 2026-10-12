@@ -2532,3 +2532,200 @@ Linux x86-64; Windows and macOS aggregate calling/layout behavior and their real
 editor scenarios still require hosted execution. The unchanged workflow runs the
 new 22nd suite automatically in its Debug/Release and Linux sanitizer matrices.
 No commits, pushes, branches, publishing or remote modifications were performed.
+
+
+## Phase 13 — receiver methods and initialization groundwork (2026-10-12)
+
+### Approved scope and implementation
+
+The owner approved **M1 + I1** from RECEIVER_METHODS_PROPOSAL.md. The owner reports
+Phase 12 hosted run #18 passed Windows, Linux and macOS at baseline `acf7355`.
+This phase implements methods on supported nominal value structs in their owning
+source module/file, including calls through direct/aliased imports and project-root
+types. Foreign-type extension declarations remain deferred. The implemented
+contract is documented in RECEIVER_METHODS.md and the approved additions to Bible
+sections 14.2 and 16; M2/I2 alternatives were not silently adopted.
+
+Working syntax is `func (p point) move(dx: i32):` and `p.move(1)`. Ordinary
+parameters keep their existing `name: type` syntax and exact contextual argument
+checking. Methods support all existing numeric/Boolean/nested value types,
+ordinary statements, recursion, aggregate arguments and aggregate returns.
+
+The parser retains receiver expressions until semantic resolution distinguishes
+module-qualified calls from value access. Methods share function registration,
+argument checking, nominal types, validated bodies and the existing small
+expression handlers. Owner/type identity determines lookup; duplicate methods,
+field collisions, invalid owners, visibility, receiver/argument/return mistakes
+produce structured source-located diagnostics. Unknown methods still analyze
+arguments for independent errors. New codes VOID2018–2020 describe invalid
+receiver storage, unknown methods and deferred initialization respectively.
+
+Validated receiver-rooted writes seed a finite reverse-call-graph effect analysis.
+Indirect nested calls and mutually recursive methods propagate mutability;
+independent local and ordinary parameter copies do not alias. Readonly receivers
+accept non-mutating calls and reject direct/indirect mutating calls. Non-mutating
+calls can materialize temporaries once; mutating calls require actual mutable
+local/parameter-rooted storage. Receiver evaluation precedes arguments, which
+execute exactly once left to right. Ordinary aggregate arguments remain snapshots.
+
+The one backend-independent IR adds a typed receiver Place (slot plus checked
+nested field indexes) and method receiver/effect metadata. The validator checks
+signatures, ownership paths and non-mutating receiver writes/calls. Shared LLVM
+lowering aliases receiver slot zero to an internal storage pointer; remaining
+parameters retain value copies. This avoids delayed copy-back overwriting
+argument-side mutations, including replacement of a containing aggregate. JIT
+and AOT use the same code and DataLayout, including mixed padded nested values.
+No external aggregate C ABI, escaping receiver reference, alias promise, new runtime
+system or GC claim was introduced. Existing failure-context checks include method
+source locations and caller traces.
+
+Owned analysis/tooling declarations expose receiver kind/type, nominal owner and
+inferred effect. Navigation/references, unsaved revisions and LSP diagnostics use
+that shared representation. Exact hot-reload compatibility includes method identity,
+receiver type/effect and existing signature/visibility/layout/default contracts.
+Compatible body edits reload while old leases retain their code/source. Effect
+changes require restart and cannot publish. Extension production/lifecycle code
+was unchanged; its indentation test now also covers receiver declaration syntax.
+
+### Initialization decisions explicitly deferred
+
+Phase 12 safe defaults, pure declared defaults and runtime named-field construction
+remain unchanged. Receiver `init` declarations and `.init()` calls diagnose the
+unimplemented lifecycle feature rather than execute as ordinary methods. Custom
+`deinit` is also outside this slice. This does not permanently prohibit lifecycle
+methods. Compiler checks reject invalid initialization before object output and
+preserve an existing output file.
+
+RECEIVER_METHODS.md records the remaining approval gate: named overrides versus
+initializer order, initializer parameters versus fields, nested construction/default
+rules, typed uninitialized bindings, pure constant/default contexts, lifecycle
+visibility, exactly-once publication and initializer compatibility. I2 is an
+unapproved proposal only. The recommended next phase is a coherent construction
+contract before custom initializer execution; runtime field defaults, managed
+reference types and allocation remain future work.
+
+### Final local native validation
+
+All results below are from the final production/test sources, including shared
+function/method argument validation and independent unknown-argument recovery.
+All **22 original suites remain enabled**, plus receiver_methods_cli, for **23**.
+Each complete build succeeded before its full test matrix:
+
+| SDK | Build configuration | Full result | Elapsed test time |
+| --- | --- | --- | --- |
+| Installed LLVM 19.1.7 | Debug | 23/23 | 18.03 s |
+| Installed LLVM 19.1.7 | Release | 23/23 | 34.25 s |
+| Installed LLVM 19.1.7 | RelWithDebInfo, ASan/UBSan | 23/23 | 46.50 s |
+| Complete official LLVM 19.1.7 archive | Debug | 23/23 | 32.06 s |
+| Complete official LLVM 19.1.7 archive | Release | 23/23 | 28.96 s |
+| Complete official LLVM 19.1.7 archive | RelWithDebInfo, ASan/UBSan | 23/23 | 38.59 s |
+
+Thus the six complete matrices passed **138 suite executions**. Both SDKs have
+verified LLJIT headers, LLVMOrcJIT library and LLVMConfig.cmake, and report version
+19.1.7. The installed SDK reports RTTI YES; the complete official archive reports
+RTTI NO. The existing consistent SDK-wide RTTI correction was preserved. Fresh
+configuration in both Debug trees passed the real `VOID_LLVM_ORC_RUNS` compile/link/
+execution probe. Official builds use their matching archive Clang/LLD; installed
+builds use installed Clang/LLD 19.1.7. No dependency requirement was weakened.
+
+Build/test commands (the six configured trees retain reproducible CMake caches):
+
+```sh
+cmake --build build/ci-debug -j 4
+ctest --test-dir build/ci-debug --output-on-failure -j 4
+# Repeat build/test for ci-release, ci-official-debug and ci-official-release.
+cmake --build build/ci-sanitizers -j 4
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+ctest --test-dir build/ci-sanitizers --output-on-failure -j 4
+# Repeat the strict sanitizer build/test for ci-official-san.
+```
+
+ASan, UBSan and leak checks stayed strict, without new suppressions or exclusions.
+Sanitizer processes ran outside the filesystem sandbox so LeakSanitizer can inspect
+processes. The installed RTTI-enabled SDK retains vptr instrumentation; the official
+no-RTTI SDK retains the established matching configuration, without pretending
+vptr checks exist there. Compiler/runtime instrumentation does not imply generated
+application machine code is sanitizer-instrumented. Initial LLVM header compilation
+emitted its existing `ciso646` deprecation warning with host standard-library headers;
+no warning suppression was added.
+
+Both Debug frontend tests ran under the unchanged **1 MiB stack** requirement,
+then each passed **five consecutive repetitions** (ten additional suite executions).
+This includes the existing Phase 12 recursive layout/resource guards, plus a
+180-method effect SCC and a 400-link receiver expression rejected at the nesting
+limit with independent later recovery. No resource or stack limits were raised.
+Both sanitizer SDKs additionally passed frontend and reload **three consecutive
+repetitions each** (twelve additional suite executions). Commands:
+
+```sh
+# Run in each of ci-debug and ci-official-debug:
+(ulimit -s 1024; ctest --test-dir build/ci-debug -R '^frontend$' --repeat until-fail:5 --output-on-failure)
+# Run with the strict sanitizer environment above in both sanitizer trees:
+ctest --test-dir build/ci-sanitizers -R '^frontend$|^reload$' --repeat until-fail:3 --output-on-failure
+```
+
+The frontend method group checks actual storage, whole/nested replacement, readonly
+locals/nested fields/module constants, temporary snapshots, contextual arguments,
+parameter/copy independence, evaluation order, owner imports, private/transitive
+visibility, same-spelling nominal methods, recursion/effects, parser recovery,
+source diagnostics, method navigation, compatible reload/old leases, effect-change
+rejection and malformed receiver IR. Existing numeric/diagnostic/GC/native/reload
+assertions remain intact.
+
+The new real-source CLI suite reuses the existing native value-source driver.
+Five independent projects cover imported nested point/box values, side effects and
+snapshots, recursive methods, all ten numeric types plus Boolean/padded aggregates,
+and runtime failure traces. It exercises normal/O2 JIT and actual linked AOT,
+multiple inputs, emitted-object DWARF validation and rejected custom initialization.
+The native LSP suite additionally verifies imported receiver/type definitions,
+references, exact readonly ranges, unsaved effect changes and invalid/valid recovery.
+
+### Editor and packaging validation
+
+With Node 24.19.0 and existing pinned dependencies, strict TypeScript checking/build
+and **all four extension unit tests passed**. The detailed TAP rerun confirms
+individual execution. Local VSIX packaging succeeded:
+`editors/vscode/dist/void-language-0.1.0.vsix` (8 files, 145.43 KB).
+
+```sh
+cd editors/vscode
+npm test
+node --test --test-reporter=tap out/test/config.test.js
+VOIDLS_PATH=/home/shmellyorc/Documents/Void.Language/build/ci-debug/voidls \
+VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:host
+npm run package
+```
+
+Real installed VS Code **1.141.0** passed trusted, restricted-trust and multi-root
+profiles using the final native voidls. Actual child-process kills, strict
+notification counts, no automatic restart, explicit restart, Unicode/fallback
+paths and clean deactivation remain exercised. No fake server or relaxed lifecycle
+assertion was substituted.
+
+### Actual source-to-native demonstration and hosted readiness
+
+Executed check, normal JIT, optimized JIT, object emission and matching Clang/LLD
+linking against the final compiler, on `examples/receiver_methods/main.void`:
+
+```text
+Source checked successfully
+301                          # normal JIT, input 10
+301                          # optimized JIT, input 10
+Wrote native source object: build/phase13-verification/receiver-methods.o
+301                          # separately linked native executable, input 10
+```
+
+`file` identifies the result as an x86-64 ELF PIE with debug_info. This compiles
+real imported .void types, methods, mutation, copies, functions and expressions;
+no special-case example IR was reconstructed. Commands are in RECEIVER_METHODS.md.
+Final per-tree logs, SDK checks, stress/editor/package evidence, native outputs and
+source hashes/results.json are retained locally under build/phase13-verification/.
+Git whitespace validation passed; generated evidence/artifacts are ignored outputs.
+
+Phase 13 is **ready for hosted CI**, with approval limited to M1 + I1. All execution
+above was Linux x86-64. Windows and macOS receiver pointer/layout/calling conventions,
+Debug/Release matrices and real editor scenarios still require hosted execution;
+Linux hosted sanitizers must also confirm the official archive environment. The
+existing workflow discovers all 23 suites automatically. No commits, pushes,
+branches, publishing or remote modifications were performed.

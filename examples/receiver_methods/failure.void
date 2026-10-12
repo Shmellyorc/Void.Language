@@ -1,0 +1,13 @@
+value struct number:
+    value: i32 = 10
+
+func (n number) divide(divisor: i32) -> i32:
+    n.value += 1
+    return n.value / divisor
+
+func (n number) forward(divisor: i32) -> i32:
+    return n.divide(divisor)
+
+func entry(value: i32) -> i32:
+    var n = number()
+    return n.forward(value)

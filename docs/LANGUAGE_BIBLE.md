@@ -505,6 +505,23 @@ func adjust(speed = 0.5):
 
 A parameter without a type or default is **not** silently dynamic. The current recommendation is to require a type unless a default makes the type unambiguous, and revisit generic inference deliberately. Default values and positional/named calls are supported; argument evaluation order must be specified and preserved across native lowering.
 
+### 14.2 Phase 13 value receiver contract [APPROVED, bounded implementation]
+
+For the numeric/Boolean value-struct subset, methods belong to the nominal type's
+owning source module; calls from direct importers and project-root type users
+respect public/internal/file-private visibility. Foreign-type extension methods
+remain deferred. Receiver mutation is inferred from validated writes and transitive
+receiver calls, including cycles. Readonly paths allow only proven non-mutating
+methods. Mutating calls require mutable local/parameter storage or a nested field
+rooted there; non-mutating calls may use temporaries. Ordinary arguments, assignment
+and returns still copy values.
+
+Receiver storage is selected once before arguments; arguments evaluate once left
+to right. The method observes argument effects on that storage. Aggregate arguments
+are copies taken at their own evaluation point. Changed receiver mutation contracts
+require conservative hot-reload restart. See RECEIVER_METHODS.md for the approved
+M1 + I1 implementation boundary. No source pointer/reference syntax is added.
+
 ## 15. Multiple return values, not first-class tuples [AGREED]
 
 Inspired by Odin: functions can return multiple distinct values without requiring a tuple object. Parentheses group the return type list. Named components improve IntelliSense.
@@ -578,6 +595,12 @@ match player("Hero"):
 ```
 
 **OPEN:** Formal rules for constructor result rewriting, errors during parent initialization, ownership of native resources initialized before failure, interaction between named-field construction and custom `init`, and whether `init` should return `result<bool, error>` or a simpler `result<void, error>` equivalent without introducing a `void` keyword. The example is illustrative, not a finalized ABI.
+
+Phase 13 approval selects receiver methods and initializer groundwork (I1), while
+public custom `init` execution remains deferred. Existing safe defaults and
+named-field construction continue unchanged. No temporary constructor order,
+parameter-binding rule or nested initialization behavior is selected by this phase;
+those open rules still require approval before implementation.
 
 ## 17. Predictable resource cleanup: `deinit()`, `with`, and `defer` [AGREED]
 

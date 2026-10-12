@@ -1,17 +1,13 @@
 # Known issues and deferred work
 
-Updated 12 October 2026, Phase 12 value struct foundations.
+Updated 12 October 2026, Phase 13 receiver methods.
 
-Phase 11 run #16 at `1b32151` passed Linux, Windows and macOS according to the
-project owner. Phase 12 local results are recorded in WORK_LOG.md; hosted
-Windows/macOS verification remains required.
-
-Run #17 (`f9d9f3b`) failed Windows Debug `frontend` (21/22); the artifact
-contained no frontend output or crash dump. A local 1 MiB stack reproduced
-stack exhaustion in combined expression/constant semantic analysis before
-the value-struct group. The expression-handler split and small-stack regression
-now pass locally with both LLVM SDKs. Windows confirmation remains pending;
-see WORK_LOG.md for the evidence and limits of this diagnosis.
+The owner reports Phase 12 commit `acf7355` passed hosted run #18 on Windows,
+Linux and macOS, including the run #17 semantic-checker stack correction.
+Phase 13 local results and pending hosted verification are recorded in WORK_LOG.md.
+Owner-module receiver methods now extend supported value structs; see
+RECEIVER_METHODS.md. Extension methods, named/default method arguments and public
+custom initializer execution remain deferred. M1 + I1 is approved; I2 is not.
 
 Numeric/bool/acyclic nested value structs now work; see VALUE_STRUCTS.md. Runtime
 field defaults, custom init, positional constructors, field modifiers, aggregate

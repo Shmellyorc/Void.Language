@@ -57,7 +57,8 @@ constants, and cannot be redeclared by imported files. Functions, constants and
 types share a file declaration namespace. Imported same-name types require aliases;
 matching fields do not make differently owned types interchangeable. Diagnostics
 identify nominal types by their module-qualified identities. Fields in this slice
-are public; field modifiers and methods are diagnosed as unsupported syntax.
+are public; field modifiers remain unsupported. Phase 13 adds owner-module
+receiver methods; see RECEIVER_METHODS.md.
 `value` is contextual in `value struct`, so existing `value` parameter names work.
 
 ## Shared representation and lowering
@@ -138,13 +139,12 @@ WORK_LOG.md for exact completed build/test commands and SDK/platform evidence.
 
 ## Deferred work and next phase
 
-No managed structs, strings, collections, generics, methods, interfaces, inheritance,
+No managed structs, strings, collections, generics, interfaces, inheritance,
 custom init, positional construction, runtime field defaults, field visibility
 modifiers, aggregate equality/conversions, field references or external aggregate
 bindings are implemented. The default/initializer interaction remains open for a
 future phase. This phase does not promise persistent identity across projects or
 incremental code generation.
 
-Recommended next phase: design receiver methods and initialization together,
-including readonly receiver behavior and the observable construction sequence,
-before extending value structs with custom logic or managed reference fields.
+Phase 13 implements receiver methods under approved M1 + I1. Custom initialization
+remains a separate construction-design gate; see RECEIVER_METHODS.md.

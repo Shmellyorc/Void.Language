@@ -200,3 +200,17 @@ index/session/LSP uses these records directly. Compatibility includes nominal
 identities, ordered field types/names and declared default syntax; no independently
 approximated aggregate compatibility policy is added to tools. See VALUE_STRUCTS.md
 for implementation boundaries, limits and native verification.
+
+## Phase 13 receiver contracts
+
+AnalyzedDeclaration appends receiver_method without renumbering earlier kinds.
+Records own the receiver Type, inferred receiver_mutates flag and containing nominal
+type identity; parameters remain the explicit language parameters. Method identities
+are `type_identity::method::name`. Receiver annotations and call/field spans join
+the existing reference graph. Method metadata does not masquerade as constant syntax.
+
+Exact compatibility serializes receiver kind/type and effect alongside existing
+signature/visibility/binding/layout/default data. Compatible method body edits can
+reload; changing inferred mutation, including through a recursive/transitive callee,
+requires restart. Tooling compares these fields and retains containment edges.
+Invalid init/method source never publishes analysis or code. See RECEIVER_METHODS.md.

@@ -201,3 +201,14 @@ and compiler-derived bindings replace whole const-containing source files in
 reload compatibility. Ordinary body/trivia edits beside unchanged constants can
 reload; actual constant changes require manual restart. Language rules, numeric
 semantics and structured recovery remain unchanged.
+
+## Phase 13 receiver values
+
+The owner approved M1 + I1 in RECEIVER_METHODS_PROPOSAL.md. Receiver methods
+operate on validated local/nested storage when mutating; readonly and temporary
+values permit only inferred non-mutating methods. Ordinary parameters, assignment
+and returns still copy. Receivers select storage once before left-to-right arguments;
+aggregate arguments capture their value at their own evaluation point.
+RECEIVER_METHODS.md records transitive effect analysis, runtime traces and exact
+restart rules. Phase 12 defaults/construction and the numeric kernel are unchanged;
+custom init execution remains deferred, not prohibited by the language.

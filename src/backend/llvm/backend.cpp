@@ -96,7 +96,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         functions[name] = llvm::Function::Create(signature, llvm::Function::ExternalLinkage, name, *module);
     for (const auto& f : input.functions) {
         std::vector<llvm::Type*> parameters;
-        for (auto t : f.parameters) parameters.push_back(type(t));
+        for (unsigned n = 0; n < f.parameters.size(); ++n) parameters.push_back(f.receiver && n == 0 ? b.getPtrTy() : type(f.parameters[n]));
         if (!f.module_identity.empty()) parameters.push_back(b.getPtrTy());
         auto* function_type = llvm::FunctionType::get(type(f.result), parameters, false);
         functions[f.name] = llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, native_symbol(f, suffix), *module);
@@ -129,7 +129,11 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         auto path = vd::utf8_path(f.source.path);
         auto* source_file = debug.createFile(vd::path_utf8(path.filename()), vd::path_utf8(path.parent_path()));
         std::vector<llvm::Metadata*> debug_types{debug_value_type(f.result)};
-        for (auto t : f.parameters) debug_types.push_back(debug_value_type(t));
+        for (unsigned n = 0; n < f.parameters.size(); ++n) {
+            auto* logical = debug_value_type(f.parameters[n]);
+            if (f.receiver && n == 0) logical = debug.createReferenceType(llvm::dwarf::DW_TAG_reference_type,logical,layout.getPointerSizeInBits(),layout.getPointerABIAlignment(0).value()*8);
+            debug_types.push_back(logical);
+        }
         auto* debug_type = debug.createSubroutineType(debug.getOrCreateTypeArray(debug_types));
         auto* subprogram = debug.createFunction(source_file, f.source_name.empty() ? f.name : f.source_name, fn->getName(), source_file,
             f.source.line, debug_type, f.source.line, llvm::DINode::FlagPrototyped, llvm::DISubprogram::SPFlagDefinition);
@@ -143,10 +147,12 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
             if (f.result == ir::Type::none) b.CreateRetVoid();
             else b.CreateRet(llvm::Constant::getNullValue(type(f.result)));
         };
-        std::vector<llvm::AllocaInst*> slots;
+        std::vector<llvm::Value*> slots;
         b.SetInsertPoint(blocks.front());
         b.SetCurrentDebugLocation(llvm::DebugLoc());
-        for (auto t : f.locals) {
+        for (unsigned n = 0; n < f.locals.size(); ++n) {
+            auto t = f.locals[n];
+            if (f.receiver && n == 0) { slots.push_back(fn->getArg(0)); continue; }
             auto* slot = b.CreateAlloca(type(t)); slots.push_back(slot);
             b.CreateStore(llvm::Constant::getNullValue(type(t)), slot);
         }
@@ -179,7 +185,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     break;
                 case Op::extract: v = b.CreateExtractValue(values[instruction.a],{static_cast<unsigned>(instruction.immediate)}); break;
                 case Op::insert: v = b.CreateInsertValue(values[instruction.a],values[instruction.b],{static_cast<unsigned>(instruction.immediate)}); break;
-                case Op::argument: v = fn->getArg(instruction.a); break;
+                case Op::argument:
+                    if (f.receiver && instruction.a == 0) v = b.CreateLoad(type(f.parameters[0]),fn->getArg(0));
+                    else v = fn->getArg(instruction.a);
+                    break;
                 case Op::constant:
                     if (numeric::floating(instruction.type)) v = llvm::ConstantFP::get(context,llvm::APFloat(instruction.type == ir::Type::f32 ? llvm::APFloat::IEEEsingle() : llvm::APFloat::IEEEdouble(),llvm::APInt(numeric::width(instruction.type),static_cast<std::uint64_t>(instruction.immediate))));
                     else v = llvm::ConstantInt::get(type(instruction.type),instruction.immediate,true);
@@ -260,6 +269,15 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 case Op::store: v = b.CreateStore(values[instruction.b], slots[instruction.a]); break;
                 case Op::call: {
                     std::vector<llvm::Value*> arguments;
+                    if (instruction.receiver) {
+                        auto* address = slots.at(instruction.receiver->slot);
+                        auto t = f.locals.at(instruction.receiver->slot);
+                        for (auto field : instruction.receiver->fields) {
+                            address = b.CreateStructGEP(type(t),address,field);
+                            t = t.definition->fields.at(field).type;
+                        }
+                        arguments.push_back(address);
+                    }
                     for (auto id : instruction.arguments) arguments.push_back(values[id]);
                     if (arguments.empty() && !failure && functions.at(instruction.callee)->arg_size() == 1) arguments.push_back(values[instruction.a]);
                     auto* callee = functions.at(instruction.callee);

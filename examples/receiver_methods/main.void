@@ -1,0 +1,16 @@
+use "./geometry.void" as geometry
+
+func independent(p: geometry.point) -> i32:
+    p.move(100, 100)
+    return p.x
+
+func entry(value: i32) -> i32:
+    var original = geometry.box()
+    var copy = original
+    copy.position.move(value, 1)
+    copy.translate(1)
+    var shifted = copy.position.shifted(2)
+    shifted.walk(2)
+    const fixed = original
+    var ignored = independent(original.position)
+    return shifted.distance_squared() - fixed.squared()

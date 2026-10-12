@@ -192,3 +192,13 @@ JSON-RPC, extension, persistent cache, partial pipeline or background compiler.
 through the shared loader and an explicit revision-safe session acceptance boundary.
 Its diagnostic/query wrappers retain the analyzed project revision. Existing disk
 APIs, complete-validation gates, byte spans and exact native contracts remain.
+
+## Phase 13 receiver methods
+
+The existing index consumes receiver_method declarations and resolved method-call
+references, with type containment, nominal receiver type and inferred mutation
+metadata. No tooling parser or effect scanner is added. Native LSP tests verify
+imported call/receiver-type definitions, references, unsaved changes to receiver
+effects, invalid query suppression and revision recovery. The local-variable
+navigation boundary remains unchanged. Exact compiler contracts still authorize
+reload separately from metadata summaries. See RECEIVER_METHODS.md.

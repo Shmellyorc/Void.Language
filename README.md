@@ -5,7 +5,7 @@ This repository now compiles graphs of actual `.void` files through one frontend
 semantic model, backend-independent IR, and shared LLVM 19.1.7 AOT/JIT lowering.
 The implemented subset supports typed functions, all ten exact-width numeric types,
 contextual literals, checked numeric `as`, bool expressions, local variables,
-conditionals, `for` loops, readonly/compile-time constants, numeric/bool value structs, and source-first
+conditionals, `for` loops, readonly/compile-time constants, numeric/bool value structs with receiver methods, and source-first
 compile/runtime diagnostics. Compile-time errors now include stable codes, ranges,
 related declarations and recovery across independent errors. Experimental GC, leased function
 replacement, and native C interoperability remain separate architectural proofs.
@@ -79,6 +79,30 @@ their hand-built IR architecture harness. Their AOT adapter derives its input
 from argument count; it is separate from the working source commands above.
 The CTest suites preserve those native, GC and hot-reload proofs and add
 frontend diagnostics and real source JIT/AOT integration tests.
+
+## Value receiver methods
+
+```python
+func (p point) move(dx: i32, dy: i32):
+    p.x += dx
+    p.y += dy
+```
+
+Owner-module methods update mutable local/nested receivers; readonly values can
+call methods proven non-mutating. Ordinary arguments, assignment and returns still
+copy. Imported types retain nominal identity and method visibility. Custom `init`
+execution is deferred; safe defaults and named-field construction remain unchanged.
+
+```sh
+build/debug/voidc run examples/receiver_methods/main.void 10 --no-opt  # 301
+build/debug/voidc run examples/receiver_methods/main.void 10           # 301
+build/debug/voidc emit examples/receiver_methods/main.void -o build/debug/methods.o
+clang-19 build/debug/methods.o -o build/debug/methods
+build/debug/methods 10                                               # 301
+```
+
+These compile actual source through shared JIT/AOT lowering. See
+[receiver semantics and limitations](docs/RECEIVER_METHODS.md).
 
 ## Numeric source compilation
 

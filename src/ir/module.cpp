@@ -29,14 +29,17 @@ void validate(const Module& m) {
         }
         visiting.erase(d); checked.insert(d);
     };
-    struct Signature { std::vector<Type> parameters; Type result; };
+    struct Signature { std::vector<Type> parameters; Type result; bool receiver = false, mutates = false; };
     std::map<std::string, Signature> names;
     for (const auto& name : m.imports)
         if (name.empty() || !names.emplace(name, Signature{{Type::i32}, Type::i32}).second) fail("duplicate or empty import");
     for (const auto& f : m.functions) {
-        if (f.name.empty() || !names.emplace(f.name, Signature{f.parameters, f.result}).second) fail("duplicate or empty function");
+        if (f.name.empty() || !names.emplace(f.name, Signature{f.parameters, f.result,f.receiver,f.receiver_mutates}).second) fail("duplicate or empty function");
         if (!f.module_identity.empty() && (f.source_name.empty() || f.name != f.module_identity + "::" + f.source_name))
             fail("inconsistent function ownership");
+        if (f.receiver) {
+            if (f.parameters.empty() || f.parameters[0].kind != Type::aggregate || f.locals.empty() || f.locals[0] != f.parameters[0]) fail("invalid receiver signature/storage");
+        } else if (f.receiver_mutates) fail("receiver effect without receiver");
         valid_type(f.result);
         for (auto t : f.parameters) if (t == Type::none) fail("no-result parameter"); else valid_type(t);
         for (auto t : f.locals) if (t == Type::none) fail("no-result slot"); else valid_type(t);
@@ -93,15 +96,30 @@ void validate(const Module& m) {
                     result = operand(i.a); if (!numeric::number(result)) fail("non-numeric negation"); break;
                 case Op::logical_not: expect(i.a, Type::boolean); result = Type::boolean; break;
                 case Op::load: result = slot(i.a); break;
-                case Op::store: expect(i.b, slot(i.a)); result = Type::none; break;
+                case Op::store:
+                    if (f.receiver && !f.receiver_mutates && i.a == 0) fail("non-mutating method writes receiver");
+                    expect(i.b, slot(i.a)); result = Type::none; break;
                 case Op::call: {
                     auto target = names.find(i.callee);
                     if (target == names.end()) fail("unknown callee " + i.callee);
+                    const auto& signature = target->second;
+                    if (i.receiver.has_value() != signature.receiver) fail("call receiver mismatch");
+                    std::size_t first = 0;
+                    if (i.receiver) {
+                        auto t = slot(i.receiver->slot);
+                        for (auto field : i.receiver->fields) {
+                            if (t.kind != Type::aggregate || field >= t.definition->fields.size()) fail("invalid receiver field path");
+                            t = t.definition->fields[field].type;
+                        }
+                        if (t != signature.parameters[0]) fail("receiver type mismatch");
+                        if (f.receiver && !f.receiver_mutates && i.receiver->slot == 0 && signature.mutates) fail("non-mutating method calls mutating receiver");
+                        first = 1;
+                    }
                     auto args = i.arguments;
                     // Original proof instructions use a for their single operand.
-                    if (args.empty() && target->second.parameters.size() == 1) args.push_back(i.a);
-                    if (args.size() != target->second.parameters.size()) fail("call argument count mismatch");
-                    for (std::size_t n = 0; n < args.size(); ++n) expect(args[n], target->second.parameters[n]);
+                    if (!signature.receiver && args.empty() && signature.parameters.size() == 1) args.push_back(i.a);
+                    if (args.size()+first != signature.parameters.size()) fail("call argument count mismatch");
+                    for (std::size_t n = 0; n < args.size(); ++n) expect(args[n], signature.parameters[n+first]);
                     result = target->second.result; break;
                 }
                 default: fail("unknown operation");

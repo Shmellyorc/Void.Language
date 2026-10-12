@@ -270,6 +270,41 @@ def value_structs(executable, root):
     print("value structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed")
 
 
+def receiver_methods(executable, root):
+    root.mkdir(parents=True, exist_ok=True)
+    entry, worker = root / "main.void", root / "geometry.void"
+    geometry = "value struct point:\n    x: i32\nfunc (p point) move(amount: i32):\n    p.x += amount\nfunc (p point) read() -> i32:\n    return p.x\n"
+    text = 'use "./geometry.void" as geometry\nfunc entry(value: i32) -> i32:\n    var p = geometry.point()\n    p.move(value)\n    const copy = p\n    return copy.read()\n'
+    entry.write_bytes(text.encode("utf-8")); worker.write_bytes(geometry.encode("utf-8"))
+    uri, wuri = entry.as_uri(), worker.as_uri()
+    query = {"textDocument": {"uri": uri}, "position": source_position(text, "move(value)")}
+    with Client(executable, entry) as c:
+        assert all(not n["diagnostics"] for n in c.initialize())
+        response, _ = c.request("textDocument/definition", query)
+        assert response["result"]["uri"] == wuri and response["result"]["range"]["start"] == {"line": 2, "character": 15}, response
+        receiver = {"textDocument": {"uri": wuri}, "position": source_position(geometry, "point) move")}
+        response, _ = c.request("textDocument/definition", receiver)
+        assert response["result"]["range"]["start"] == {"line": 0, "character": 13}, response
+        response, _ = c.request("textDocument/references", {**query, "context": {"includeDeclaration": False}})
+        assert len(response["result"]) == 1 and response["result"][0]["uri"] == uri, response
+        bad = text.replace("var p", "const p")
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": uri, "languageId": "void", "version": 1, "text": bad}})
+        notes = diagnostics(c.sync())
+        assert len(notes[uri]["diagnostics"]) == 1 and notes[uri]["diagnostics"][0]["code"] == "VOID2007", notes
+        assert notes[uri]["diagnostics"][0]["range"]["start"] == {"line": 3, "character": 6}, notes
+        assert c.request("textDocument/definition", query)[0]["result"] is None
+        pure = geometry.replace("p.x += amount", "return")
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": wuri, "languageId": "void", "version": 1, "text": pure}})
+        assert all(not n["diagnostics"] for n in c.sync())
+        assert c.request("textDocument/definition", query)[0]["result"]["uri"] == wuri
+        c.notify("textDocument/didChange", {"textDocument": {"uri": wuri, "version": 2}, "contentChanges": [{"text": geometry}]})
+        assert diagnostics(c.sync())[uri]["diagnostics"][0]["code"] == "VOID2007"
+        c.notify("textDocument/didChange", {"textDocument": {"uri": uri, "version": 2}, "contentChanges": [{"text": text}]})
+        assert all(not n["diagnostics"] for n in c.sync())
+        c.shutdown()
+    print("receiver methods: imported native LSP navigation, references, effect changes and revision recovery passed")
+
+
 if __name__ == "__main__":
     executable = pathlib.Path(sys.argv[1]).resolve()
     # Unicode physical root names work without changing the ASCII VFS policy.
@@ -277,3 +312,4 @@ if __name__ == "__main__":
     editor(executable, root)
     transport(executable, root)
     value_structs(executable, root / "value struct project")
+    receiver_methods(executable, root / "receiver method project")

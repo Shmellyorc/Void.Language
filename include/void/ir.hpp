@@ -2,6 +2,7 @@
 #include "void/source.hpp"
 #include <cstdint>
 #include <memory>
+#include <optional>
 namespace vd { class ValidatedAnalysis; }
 #include <string>
 #include <vector>
@@ -33,6 +34,8 @@ struct ConstantValue { std::uint64_t bits = 0; std::vector<ConstantValue> fields
 const char* type_name(Type type);
 enum class Op { argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert };
+// A validated local aggregate storage path; never a source-visible reference.
+struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
 struct Instruction {
     Op op;
     std::uint32_t a = 0, b = 0;
@@ -41,6 +44,7 @@ struct Instruction {
     SourceLocation source = {};
     Type type = Type::i32; // Literal type; other result types derive from operands/signatures.
     std::vector<std::uint32_t> arguments = {};
+    std::optional<Place> receiver = {};
     std::string source_excerpt = {}; // Snapshot of the source line and caret.
 };
 struct Terminator {
@@ -53,6 +57,7 @@ struct Function {
     std::vector<Type> parameters = {Type::i32};
     Type result = Type::i32;
     std::vector<Type> locals = {};
+    bool receiver = false, receiver_mutates = false; // First parameter aliases local slot zero.
     std::string source_name = {}, module_identity = {}; // Empty for legacy hand-built proofs.
 };
 struct Module {

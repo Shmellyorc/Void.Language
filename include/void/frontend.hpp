@@ -9,14 +9,16 @@ namespace vd {
 // Records are owned by an immutable successful analysis, never by parser storage.
 struct AnalyzedModule { std::string identity; SourceFile source; std::vector<std::string> imports; };
 struct AnalyzedDeclaration {
-    enum class Kind { function, module_constant, local_constant, value_structure, value_field } kind;
+    enum class Kind { function, module_constant, local_constant, value_structure, value_field, receiver_method } kind;
     std::string identity, module, visibility;
     SourceSpan source;
     std::vector<ir::Type> parameters;
     ir::Type type = ir::Type::none;
     std::string constant_syntax; // Exact length-delimited tokens, excluding trivia.
     std::optional<std::uint64_t> value = {}; // Module constants only: typed bit pattern.
-    std::string owner = {}; // Containing function for local constants; module otherwise.
+    std::string owner = {}; // Containing declaration, or module.
+    ir::Type receiver = ir::Type::none;
+    bool receiver_mutates = false;
 };
 struct AnalyzedReference {
     std::string from, to, spelling;

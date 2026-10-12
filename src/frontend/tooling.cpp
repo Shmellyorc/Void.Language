@@ -83,7 +83,7 @@ struct Graph {
         }
         for(const auto& d:analysis.declarations()) {
             declarations.emplace(d.identity,&d);
-            if(d.kind==AnalyzedDeclaration::Kind::local_constant || d.kind==AnalyzedDeclaration::Kind::value_field) references[d.identity].insert(d.owner);
+            if(d.kind==AnalyzedDeclaration::Kind::local_constant || d.kind==AnalyzedDeclaration::Kind::value_field || d.kind==AnalyzedDeclaration::Kind::receiver_method) references[d.identity].insert(d.owner);
         }
         for(const auto& r:analysis.references()) {
             references[r.to].insert(r.from); bindings[r.from].push_back(r.to);
@@ -92,7 +92,7 @@ struct Graph {
 };
 bool metadata_equal(const AnalyzedDeclaration& a,const AnalyzedDeclaration& b) {
     return a.kind==b.kind && a.module==b.module && a.owner==b.owner && a.visibility==b.visibility &&
-        a.parameters==b.parameters && a.type==b.type && a.constant_syntax==b.constant_syntax && a.value==b.value;
+        a.parameters==b.parameters && a.type==b.type && a.constant_syntax==b.constant_syntax && a.value==b.value && a.receiver==b.receiver && a.receiver_mutates==b.receiver_mutates;
 }
 void merge(Edges& into,const Edges& from) {
     for(const auto& [key,values]:from) into[key].insert(values.begin(),values.end());

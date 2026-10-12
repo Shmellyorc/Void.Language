@@ -670,3 +670,19 @@ provisional layout/ABI boundaries; WORK_LOG.md records actual verification.
 The next recommended cohesive phase is receiver methods and initialization
 policy, settling readonly receivers and observable initialization ordering before
 custom init or managed reference fields. No production-GC readiness is implied.
+
+## Phase 13: owner-module receiver methods and initializer groundwork
+
+Phase 12 `acf7355` passed hosted run #18 on all platforms according to the owner.
+The owner approved M1 + I1: real methods for supported value structs and validated
+receiver storage/effects, with public custom init execution deferred. Shared typed
+analysis, IR calls and LLVM lowering preserve copies and native failure propagation.
+Tooling and exact reload contracts consume the same inferred method metadata.
+
+All 22 previous suites remain, plus receiver_methods_cli (23 total). Preserve both
+SDK/RTTI validation configurations, strict sanitizers, small-stack regression and
+real editor/package checks. RECEIVER_METHODS.md describes scope; WORK_LOG.md records
+actual local results and pending hosted checks. The next language design phase
+should resolve initializer/named-field/parameter/nested-default/purity interactions
+coherently before custom construction. Managed types still require the separate
+GC/root/thread/runtime gate. No further phase is authorized by this recommendation.

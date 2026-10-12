@@ -260,3 +260,14 @@ semantics and structured recovery remain unchanged.
 through the shared loader and an explicit revision-safe session acceptance boundary.
 Its diagnostic/query wrappers retain the analyzed project revision. Existing disk
 APIs, complete-validation gates, byte spans and exact native contracts remain.
+
+## Phase 13 receiver diagnostics
+
+New assigned categories: VOID2018 invalid receiver declaration/storage; VOID2019
+unknown nominal receiver method; VOID2020 deferred custom lifecycle initialization.
+Method calls reuse VOID2001/2004 for type/arity, VOID2005 for duplicates/collisions,
+VOID2007 for readonly mutation and VOID3003 for visibility/import access. Pure
+constants still reject method execution with VOID2011. Receiver parsing, body
+checking and deferred effect permission checks use the existing owned collector,
+source spans, budget and successful-analysis gate. A 400-link method-expression
+chain must diagnose VOID1107 and recover to an independent later-function error.

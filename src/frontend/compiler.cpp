@@ -187,7 +187,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     return tokens;
 }
 struct Expr {
-    enum class Kind { literal, name, call, unary, binary, conversion, field, construction } kind;
+    enum class Kind { literal, name, call, unary, binary, conversion, field, construction, method_call } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::string op, qualifier, target;
@@ -199,6 +199,7 @@ struct Expr {
     std::vector<std::unique_ptr<Expr>> parts;
     Type type = Type::none;
     unsigned slot = 0;
+    bool receiver_addressable = false, receiver_readonly = false;
     Expr(Kind k, Token t) : kind(k), token(std::move(t)) {}
 };
 struct Statement {
@@ -221,6 +222,8 @@ struct Function {
     bool file_private = false, parse_failed = false;
     std::string symbol, visibility = "public";
     std::vector<Parameter> parameters;
+    std::optional<Parameter> receiver;
+    bool receiver_mutates = false;
     Type result = Type::none;
     std::vector<Statement> body;
     std::vector<Type> locals;
@@ -258,7 +261,7 @@ struct Unit {
     std::vector<std::pair<Token,Type>> type_uses;
     std::map<std::string, Structure*> structure_names;
     std::map<std::string, Constant*> constant_names;
-    std::map<std::string, Function*> declarations;
+    std::map<std::string, Function*> declarations, methods;
     std::map<std::string, std::vector<Unit*>> qualifiers;
     std::set<std::string> explicit_qualifiers;
     std::set<std::string> failed_qualifiers, invalid_declarations;
@@ -382,10 +385,9 @@ class Parser {
                     auto member = std::make_unique<Expr>(Expr::Kind::field, name());
                     member->parts.push_back(std::move(e)); e = std::move(member);
                 } else if (accept("(")) {
-                    if (e->kind == Expr::Kind::field && e->parts[0]->kind == Expr::Kind::name) {
-                        e->qualifier = e->parts[0]->token.text; e->qualifier_token = e->parts[0]->token; e->parts.clear();
-                    } else if (e->kind != Expr::Kind::name) error(source,e->token,Code::not_callable,"Only named functions and value types are callable.");
-                    e->kind = Expr::Kind::call;
+                    if (e->kind == Expr::Kind::field) e->kind = Expr::Kind::method_call;
+                    else if (e->kind == Expr::Kind::name) e->kind = Expr::Kind::call;
+                    else error(source,e->token,Code::not_callable,"Only named functions, value types and receiver methods are callable.");
                     if (!at(")")) do {
                         Token named{TokenKind::name,"",peek().offset};
                         if (p + 1 < tokens.size() && tokens[p+1].text == "=") { named = name(); need("="); }
@@ -520,7 +522,12 @@ public:
                 }
                 need("<dedent>"); unit.structures.push_back(std::move(structure)); continue;
             }
-            need("func"); f.token = name(); need("(");
+            need("func");
+            if (accept("(")) {
+                auto receiver = name(); auto receiver_type = type(); need(")");
+                f.receiver = Parameter{receiver,receiver_type};
+            }
+            f.token = name(); need("(");
             if (!at(")")) do { auto token = name(); need(":"); f.parameters.push_back({token, type()}); } while (accept(","));
             need(")"); if (accept("->")) f.result = type(); f.body = block(); f.parse_failed = diagnostics.within(source, f.token.offset, peek().offset); unit.functions.push_back(std::move(f));
             } catch (const CompilationError& e) {
@@ -689,6 +696,75 @@ class Semantics {
         if (unit.failed_import) throw Poison{};
         error(source, e.token, Code::unknown_function, "Unknown function '" + e.token.text + "'.", "Declare it here or import its declaring file; imports are not transitive exports.");
     }
+    const Function& method(Type receiver, const Token& token) {
+        if (receiver == error_type) throw Poison{};
+        if (receiver.kind != Type::aggregate)
+            error(source,token,Code::receiver,"A receiver method requires a value struct.");
+        auto key = receiver.definition->identity + "::method::" + token.text;
+        for (const auto& [id,owner] : units) if (auto found = owner->methods.find(key); found != owner->methods.end()) {
+            bool accessible = owner.get() == &unit || owner.get() == &root ||
+                std::any_of(unit.imports.begin(),unit.imports.end(),[&](const auto& i) { return i.target == id; });
+            if (!accessible || (found->second->file_private && owner.get() != &unit))
+                error(source,token,Code::visibility,"Method '" + token.text + "' is not accessible from this module.","Import its owning module and use a public method.");
+            return *found->second;
+        }
+        error(source,token,Code::unknown_method,"Unknown method '" + token.text + "' on " + ir::type_name(receiver) + ".");
+    }
+    bool module_call(const Expr& e) {
+        const auto& base = *e.parts[0];
+        if (base.kind != Expr::Kind::name || lookup(base.token.text)) return false;
+        if (unit.qualifiers.contains(base.token.text) || unit.failed_qualifiers.contains(base.token.text)) return true;
+        // Retain the established unknown-qualifier diagnostics for a.b().
+        return !constant(base).second;
+    }
+    Type method_expression(Expr& e, std::optional<Type> expected) {
+        if (module_call(e)) {
+            e.qualifier = e.parts[0]->token.text; e.qualifier_token = e.parts[0]->token;
+            e.parts.erase(e.parts.begin()); e.kind = Expr::Kind::call;
+            return call_expression(e);
+        }
+        auto receiver = expression(*e.parts[0]);
+        if (!current) error(source,e.token,Code::constant_call,"A compile-time constant cannot call a method.","Use a local const for runtime values.");
+        if (e.token.text == "init" || e.token.text == "deinit")
+            error(source,e.token,Code::initializer_deferred,"Lifecycle methods are not ordinary callable methods; custom initialization is deferred.");
+        const auto& target = [&]() -> const Function& {
+            auto check_arguments = [&] { for (std::size_t n=1; n<e.parts.size(); ++n) expression(*e.parts[n]); };
+            try { return method(receiver,e.token); }
+            catch (const CompilationError&) { check_arguments(); throw; }
+            catch (const Poison&) { check_arguments(); throw; }
+        }();
+        e.target = target.symbol;
+        // Record the resolved place now, then check its permission after the
+        // complete method graph has reached its receiver-effect fixed point.
+        const Expr* base = e.parts[0].get(); std::vector<unsigned> path;
+        while (base->kind == Expr::Kind::field) { path.push_back(base->slot); base = base->parts[0].get(); }
+        if (base->kind == Expr::Kind::literal && !base->target.empty()) e.receiver_readonly = true;
+        if (base->kind == Expr::Kind::name) {
+            if (auto* v = lookup(base->token.text)) {
+                e.receiver_addressable = true; e.receiver_readonly = v->readonly; e.slot = v->slot;
+                e.field_indexes.assign(path.rbegin(),path.rend());
+            }
+        }
+        if (std::any_of(e.names.begin(),e.names.end(),[](const auto& t) { return !t.text.empty(); }))
+            error(source,e.token,Code::argument_count,"Named method arguments are not implemented; use positional arguments.");
+        (void)expected;
+        return e.type = call_arguments(e,target,1);
+    }
+    Type call_arguments(Expr& e, const Function& target, std::size_t first) {
+        std::vector<Type> arguments;
+        for (std::size_t n = first; n < e.parts.size(); ++n) {
+            auto parameter = n-first;
+            arguments.push_back(expression(*e.parts[n],parameter < target.parameters.size() ? std::optional<Type>(target.parameters[parameter].type) : std::nullopt));
+        }
+        if (arguments.size() != target.parameters.size()) error(source,e.token,Code::argument_count,"Incorrect argument count for '" + e.token.text + "': expected " + std::to_string(target.parameters.size()) + ", received " + std::to_string(arguments.size()) + ".");
+        bool invalid = false;
+        for (std::size_t n = 0; n < arguments.size(); ++n) {
+            try { expect(arguments[n],target.parameters[n].type,e.parts[n+first]->token); }
+            catch (const CompilationError& failure) { diagnostics.add(failure); invalid = true; }
+            invalid |= arguments[n] == error_type;
+        }
+        return invalid ? error_type : target.result;
+    }
     void expect(Type actual, Type expected, const Token& token) {
         if (actual == error_type || expected == error_type) return;
         if (actual != expected) error(source, token, Code::type_mismatch, "Type mismatch: expected " + std::string(ir::type_name(expected)) + ", received " + ir::type_name(actual) + ".", {}, {}, ir::type_name(expected), ir::type_name(actual));
@@ -730,6 +806,14 @@ class Semantics {
             if (auto* v = e.qualifier.empty() ? lookup(e.token.text) : nullptr) return v->type;
             auto [owner,c] = constant(e); if (c) { evaluate(*owner,*c); return c->type; }
             return {};
+        }
+        if (e.kind == K::method_call) {
+            if (module_call(e)) {
+                Expr qualified(K::call,e.token); qualified.qualifier = e.parts[0]->token.text; qualified.qualifier_token = e.parts[0]->token;
+                return anchor(qualified);
+            }
+            auto receiver = anchor(*e.parts[0]);
+            return receiver ? std::optional<Type>(method(*receiver,e.token).result) : std::nullopt;
         }
         if (e.kind == K::call) {
             auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
@@ -777,6 +861,7 @@ class Semantics {
         case Expr::Kind::name: return name_expression(e);
         case Expr::Kind::field: return field_expression(e, expected);
         case Expr::Kind::call: return call_expression(e);
+        case Expr::Kind::method_call: return method_expression(e, expected);
         case Expr::Kind::conversion: return conversion_expression(e);
         case Expr::Kind::unary: return unary_expression(e, expected);
         default: return binary_expression(e, expected);
@@ -852,16 +937,7 @@ class Semantics {
             catch (const Poison&) { check_arguments(); throw; }
         }();
         e.target = target.symbol;
-        std::vector<Type> arguments;
-        for (std::size_t i=0; i<e.parts.size(); ++i) arguments.push_back(expression(*e.parts[i], i<target.parameters.size() ? std::optional<Type>(target.parameters[i].type) : std::nullopt));
-        if (e.parts.size() != target.parameters.size()) error(source, e.token, Code::argument_count, "Incorrect argument count for '" + e.token.text + "': expected " + std::to_string(target.parameters.size()) + ", received " + std::to_string(e.parts.size()) + ".");
-        bool invalid = false;
-        for (std::size_t i = 0; i < e.parts.size(); ++i) {
-            try { expect(arguments[i], target.parameters[i].type, e.parts[i]->token); }
-            catch (const CompilationError& failure) { diagnostics.add(failure); invalid = true; }
-            invalid |= arguments[i] == error_type;
-        }
-        return e.type = invalid ? error_type : target.result;
+        return e.type = call_arguments(e,target,0);
     }
     Type conversion_expression(Expr& e) {
         using K = Expr::Kind;
@@ -972,6 +1048,7 @@ class Semantics {
                 error(source, s.token, Code::readonly, "Cannot mutate readonly const or declaration '" + s.name + "'.", "Use var for a mutable local binding.");
             if (!variable) error(source, s.token, Code::unknown_identifier, "Unknown identifier '" + s.name + "'.", "Declare it with var before assignment.");
             auto t = variable->type; s.slot = variable->slot;
+            if (current->receiver && s.slot == current->receiver->slot) current->receiver_mutates = true;
             for (const auto& field : s.fields) {
                 if (t == error_type) throw Poison{};
                 if (t.kind != Type::aggregate) error(source,field,Code::type_mismatch,"Field assignment requires a value struct.");
@@ -989,7 +1066,7 @@ class Semantics {
         }
         case K::expression:
             if (expression(*s.expression) == error_type) break;
-            if (s.expression->kind != Expr::Kind::call) error(source, s.token, Code::invalid_value, "Only function calls can be standalone expressions.", "Assign this value with var or return it.");
+            if (s.expression->kind != Expr::Kind::call && s.expression->kind != Expr::Kind::method_call) error(source, s.token, Code::invalid_value, "Only function calls can be standalone expressions.", "Assign this value with var or return it.");
             break;
         case K::returned:
             if (s.expression) {
@@ -1060,6 +1137,10 @@ public:
             if (diagnostics.full()) break;
             current = &f; scopes = {{}}; invalid_function = false;
             auto before = diagnostics.size();
+            if (f.receiver) {
+                try { f.receiver->slot = declare(f.receiver->token,f.receiver->type); }
+                catch (const CompilationError& failure) { diagnostics.add(failure); }
+            }
             for (auto& p : f.parameters) {
                 try { p.slot = declare(p.token, p.type); }
                 catch (const CompilationError& failure) { diagnostics.add(failure); }
@@ -1124,15 +1205,27 @@ class Lowering {
             return emit({ir::Op::load,slot},e.token);
         }
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
-        case K::call: {
+        case K::method_call: case K::call: {
+            std::optional<ir::Place> receiver;
+            std::size_t first = 0;
+            if (e.kind == K::method_call) {
+                first = 1;
+                if (e.receiver_addressable) receiver = ir::Place{e.slot,e.field_indexes};
+                else {
+                    auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(e.parts[0]->type);
+                    auto value = expression(*e.parts[0]); emit({ir::Op::store,slot,value},e.parts[0]->token);
+                    receiver = ir::Place{slot,{}};
+                }
+            }
             // Materialize each argument in a slot: later short-circuit arguments
             // may create new blocks, while IR instruction values stay block-local.
             std::vector<unsigned> slots;
-            for (const auto& arg : e.parts) {
+            for (std::size_t n = first; n < e.parts.size(); ++n) {
+                const auto& arg = e.parts[n];
                 auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(arg->type);
                 auto value = expression(*arg); emit({ir::Op::store, slot, value}, arg->token); slots.push_back(slot);
             }
-            ir::Instruction i{ir::Op::call}; i.callee = e.target;
+            ir::Instruction i{ir::Op::call}; i.callee = e.target; i.receiver = receiver;
             for (auto slot : slots) i.arguments.push_back(emit({ir::Op::load, slot}, e.token));
             return emit(i, e.token);
         }
@@ -1221,9 +1314,14 @@ public:
     ir::Function lower(const Function& f) {
         output = {}; output.name = f.symbol; output.source_name = f.token.text; output.source = source.location(f.token.offset);
         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
+        output.receiver = f.receiver.has_value(); output.receiver_mutates = f.receiver_mutates;
+        if (f.receiver) {
+            output.source_name = f.receiver->type.definition->name + "::method::" + f.token.text;
+            output.parameters.push_back(f.receiver->type);
+        }
         for (std::size_t n = 0; n < f.parameters.size(); ++n) {
             const auto& p = f.parameters[n]; output.parameters.push_back(p.type);
-            auto value = emit({ir::Op::argument, static_cast<unsigned>(n)}, p.token); emit({ir::Op::store, p.slot, value}, p.token);
+            auto value = emit({ir::Op::argument, static_cast<unsigned>(n + (f.receiver ? 1 : 0))}, p.token); emit({ir::Op::store, p.slot, value}, p.token);
         }
         sequence(f.body);
         if (current) terminate({ir::Terminator::Kind::return_void}); // Only reachable for checked no-result functions.
@@ -1417,6 +1515,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
 void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics) {
     // Discover every signature before checking any body, including cyclic imports.
     for (auto& [id, unit] : units) for (auto& f : unit->functions) {
+        if (f.receiver) continue;
         f.symbol = id + "::" + f.token.text;
         auto [previous, inserted] = unit->declarations.emplace(f.token.text, &f);
         if (!inserted) {
@@ -1523,6 +1622,23 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         };
         resolve(f.result,f.token);
         for (auto& parameter : f.parameters) resolve(parameter.type,parameter.token);
+        if (f.receiver) {
+            resolve(f.receiver->type,f.receiver->token);
+            try {
+                auto t = f.receiver->type;
+                if (t == error_type) throw Poison{};
+                if (t.kind != Type::aggregate) error(unit->source,f.receiver->token,Code::receiver,"Receiver declarations require a value struct type.");
+                if (!unit->structure_names.contains(t.definition->name) || unit->structure_names.at(t.definition->name)->definition != t.definition)
+                    error(unit->source,f.receiver->token,Code::receiver,"Methods must be declared in their value type's owning module; extension methods are deferred.");
+                if (f.token.text == "init" || f.token.text == "deinit")
+                    error(unit->source,f.token,Code::initializer_deferred,"Custom lifecycle initialization is deferred pending an approved construction contract.","Use the existing safe defaults and named-field construction; init is reserved for a future phase.");
+                for (const auto& field : t.definition->fields) if (field.name == f.token.text)
+                    error(unit->source,f.token,Code::duplicate,"Method name conflicts with field '" + f.token.text + "'.");
+                f.symbol = t.definition->identity + "::method::" + f.token.text;
+                if (!unit->methods.emplace(f.symbol,&f).second) error(unit->source,f.token,Code::duplicate,"Duplicate receiver method '" + f.token.text + "'.");
+            } catch (const CompilationError& failure) { diagnostics.add(failure); f.parse_failed = true; }
+              catch (const Poison&) { f.parse_failed = true; }
+        }
     }
     // Failed layouts are poisoned and never form owning descriptor cycles.
     std::function<void(Unit&, Structure&)> defaults;
@@ -1569,6 +1685,42 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         catch (const Poison&) {}
     }
     for (auto& [id, unit] : units) Semantics(*unit, units, root, evaluate, diagnostics, defaults).analyze();
+    std::map<std::string,Function*> methods;
+    for (auto& [id,u] : units) for (auto& [key,f] : u->methods) methods.emplace(key,f);
+    std::map<std::string,std::set<Function*>> dependents;
+    struct Call { Unit* unit; Expr* expression; };
+    std::vector<Call> calls;
+    for (auto& [id,u] : units) for (auto& f : u->functions) {
+        std::vector<Statement*> statements; for (auto& s : f.body) statements.push_back(&s);
+        while (!statements.empty()) {
+            auto* s = statements.back(); statements.pop_back();
+            for (auto& child : s->body) statements.push_back(&child);
+            for (auto& child : s->otherwise) statements.push_back(&child);
+            std::vector<Expr*> expressions; if (s->expression) expressions.push_back(s->expression.get());
+            while (!expressions.empty()) {
+                auto* e = expressions.back(); expressions.pop_back();
+                for (auto& child : e->parts) expressions.push_back(child.get());
+                if (e->kind != Expr::Kind::method_call || !methods.contains(e->target)) continue;
+                calls.push_back({u.get(),e});
+                if (f.receiver && e->receiver_addressable && e->slot == f.receiver->slot)
+                    dependents[e->target].insert(&f);
+            }
+        }
+    }
+    std::vector<Function*> work;
+    for (auto& [id,f] : methods) if (f->receiver_mutates) work.push_back(f);
+    while (!work.empty()) {
+        auto* f = work.back(); work.pop_back();
+        for (auto* dependent : dependents[f->symbol]) if (!dependent->receiver_mutates) {
+            dependent->receiver_mutates = true; work.push_back(dependent);
+        }
+    }
+    for (auto [owner,e] : calls) if (methods.at(e->target)->receiver_mutates) {
+        try {
+            if (e->receiver_readonly) error(owner->source,e->token,Code::readonly,"Cannot call a mutating method through a readonly receiver.","Copy it to var to mutate an independent value.");
+            if (!e->receiver_addressable) error(owner->source,e->token,Code::receiver,"A mutating method requires mutable receiver storage.","Bind the value to var before calling this method.");
+        } catch (const CompilationError& failure) { diagnostics.add(failure); }
+    }
     // Recovered trees and AST-only poisoned types can never enter validated IR.
     diagnostics.finish();
 }
@@ -1602,7 +1754,9 @@ struct AnalysisAccess {
             field(result->contract_, d.type.kind == Type::aggregate ? d.type.definition->identity : ir::type_name(d.type));
             field(result->contract_, std::to_string(d.parameters.size()));
             for (auto t : d.parameters) field(result->contract_, t.kind == Type::aggregate ? t.definition->identity : ir::type_name(t));
-            if (d.kind != AnalyzedDeclaration::Kind::function) {
+            field(result->contract_,d.receiver.kind == Type::none ? "" : ir::type_name(d.receiver));
+            field(result->contract_,d.receiver_mutates ? "mutating" : "nonmutating");
+            if (d.kind != AnalyzedDeclaration::Kind::function && d.kind != AnalyzedDeclaration::Kind::receiver_method) {
                 field(result->constants_, d.identity); field(result->constants_, d.visibility);
                 field(result->constants_, d.type.kind == Type::aggregate ? d.type.definition->identity : ir::type_name(d.type)); field(result->constants_, d.constant_syntax);
             }
@@ -1647,7 +1801,7 @@ struct AnalysisAccess {
                 auto consider = [&](const Token& declaration, const std::string& key) {
                     if (declaration.offset <= token.offset && (owner == id || declaration.offset >= nearest)) { nearest = declaration.offset; owner = key; }
                 };
-                for (const auto& f : unit->functions) consider(f.token,f.symbol);
+                for (const auto& f : unit->functions) consider(f.receiver ? f.receiver->token : f.token,f.symbol);
                 for (const auto& c : unit->constants) consider(c.declaration.token,id + "::" + c.declaration.name);
                 for (const auto& structure : unit->structures) {
                     consider(structure.token,structure.definition->identity);
@@ -1673,7 +1827,9 @@ struct AnalysisAccess {
             }
             for (const auto& f : unit->functions) {
                 std::vector<Type> parameters; for (const auto& p : f.parameters) parameters.push_back(p.type);
-                declaration({AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}});
+                AnalyzedDeclaration method_record{f.receiver ? AnalyzedDeclaration::Kind::receiver_method : AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}};
+                if (f.receiver) { method_record.owner = f.receiver->type.definition->identity; method_record.receiver = f.receiver->type; method_record.receiver_mutates = f.receiver_mutates; }
+                declaration(std::move(method_record));
                 std::map<unsigned,std::string> locals;
                 std::map<std::string,unsigned> names;
                 std::function<void(const std::vector<Statement>&)> body;

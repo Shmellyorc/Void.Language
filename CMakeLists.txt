@@ -160,7 +160,7 @@ if(BUILD_TESTING)
   add_library(native_fixture STATIC tests/integration/native_fixture.c)
   target_include_directories(native_fixture PUBLIC tests/integration)
   target_link_libraries(native_fixture PRIVATE void_options)
-  add_executable(void_tests tests/sessions/tests.cpp tests/tooling/tests.cpp tests/analysis/tests.cpp tests/tests.cpp tests/frontend/tests.cpp tests/frontend/values.cpp tests/frontend/structs.cpp tests/numeric/tests.cpp tests/modules/tests.cpp examples/proof.cpp)
+  add_executable(void_tests tests/sessions/tests.cpp tests/tooling/tests.cpp tests/analysis/tests.cpp tests/tests.cpp tests/frontend/tests.cpp tests/frontend/values.cpp tests/frontend/structs.cpp tests/frontend/methods.cpp tests/numeric/tests.cpp tests/modules/tests.cpp examples/proof.cpp)
   target_link_libraries(void_tests PRIVATE void_llvm void_runtime native_fixture)
   foreach(suite core jit reload gc native)
     add_test(NAME ${suite} COMMAND void_tests ${suite})
@@ -213,6 +213,12 @@ if(BUILD_TESTING)
     "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/value struct programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/structs.cmake")
   set_tests_properties(value_structs_cli PROPERTIES TIMEOUT 180)
+  add_test(NAME receiver_methods_cli COMMAND "${CMAKE_COMMAND}"
+    "-DMETHODS=ON" "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
+    "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DROOT=${PROJECT_SOURCE_DIR}"
+    "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/receiver method programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+    -P "${PROJECT_SOURCE_DIR}/tests/integration/structs.cmake")
+  set_tests_properties(receiver_methods_cli PROPERTIES TIMEOUT 180)
   add_test(NAME modules_cli COMMAND "${CMAKE_COMMAND}"
     "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
     "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DROOT=${PROJECT_SOURCE_DIR}"

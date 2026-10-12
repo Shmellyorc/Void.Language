@@ -170,3 +170,11 @@ platforms according to the owner. Phase 12 adds VALUE_STRUCTS.md and the
 value_structs_cli suite, preserving all 21 previous suites. The recommended next
 phase is receiver/initialization design; managed types remain behind the
 GC/root/thread gate.
+
+## Phase 13 receiver methods
+
+Supported value structs now have owner-module receiver declarations and ordinary
+value.method calls, including imported/nested receivers, inferred readonly effects,
+normal/O2 JIT/AOT and owned tooling references. See RECEIVER_METHODS.md. Custom
+init execution is explicitly deferred under approved I1; safe defaults and named
+construction are unchanged. The CLI remains check/run/emit with the i32 entry adapter.
