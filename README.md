@@ -252,5 +252,29 @@ shutdown. See [LANGUAGE_SERVER.md](docs/LANGUAGE_SERVER.md) for setup, UTF-16
 positions, signed document versions, protocol limits and disk-refresh limitations.
 All eighteen previous suites remain; lsp_positions/lsp_protocol/lsp_demo bring
 the total to twenty-one. The server performs complete compiler analysis and
-never executes source or publishes native replacements. Phase 10 is awaiting
-its own hosted Linux/Windows/macOS verification; see WORK_LOG.md for local results.
+never executes source or publishes native replacements. The user reports Phase 10 passed hosted run #13 on Linux, Windows and macOS
+(commit `ccfea79`); Phase 11 editor integration awaits its own hosted verification.
+
+
+## VS Code and VSCodium
+
+Phase 11 adds a local extension in [editors/vscode](editors/vscode/README.md).
+Build `voidls` separately, then build/install the extension:
+
+```sh
+cd editors/vscode
+npm ci
+npm test
+npm run package
+code --install-extension dist/void-language-0.1.0.vsix
+# Or: codium --install-extension dist/void-language-0.1.0.vsix
+```
+
+Development uses pinned Node.js 24.19.0. Configure `void.server.path` and
+`void.project.entry` as absolute or single-workspace-relative paths; on Windows
+select `voidls.exe`. Open `.void` source for compiler diagnostics, F12 definitions
+and Shift+F12 references, including unsaved edits. Use **VOID: Restart Language
+Server** and **Output → VOID** for lifecycle/logging. Native execution requires
+workspace trust; only one project is managed per window. No server binary is bundled.
+See [EDITOR_INTEGRATION.md](docs/EDITOR_INTEGRATION.md) for a complete real multi-file
+example, development-host/test commands, restrictions and troubleshooting.

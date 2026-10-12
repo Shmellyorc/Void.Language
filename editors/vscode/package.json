@@ -1,0 +1,42 @@
+{
+  "name": "void-language",
+  "displayName": "VOID Language",
+  "description": "VOID source highlighting and native voidls diagnostics and navigation.",
+  "version": "0.1.0",
+  "publisher": "void-language",
+  "license": "UNLICENSED",
+  "engines": { "vscode": "^1.91.0", "node": ">=24.19.0 <25" },
+  "categories": ["Programming Languages"],
+  "extensionKind": ["workspace"],
+  "main": "./dist/extension.js",
+  "activationEvents": ["onLanguage:void"],
+  "capabilities": {
+    "untrustedWorkspaces": { "supported": "limited", "description": "Syntax highlighting works; native server execution requires workspace trust." },
+    "virtualWorkspaces": { "supported": false, "description": "voidls requires a local filesystem project on the extension host." }
+  },
+  "contributes": {
+    "languages": [{ "id": "void", "aliases": ["VOID", "void"], "extensions": [".void"], "configuration": "./language-configuration.json" }],
+    "grammars": [{ "language": "void", "scopeName": "source.void", "path": "./syntaxes/void.tmLanguage.json" }],
+    "commands": [{ "command": "void.restartLanguageServer", "title": "VOID: Restart Language Server" }],
+    "configuration": {
+      "title": "VOID",
+      "properties": {
+        "void.server.path": { "type": "string", "default": "", "scope": "window", "description": "Native voidls executable. Absolute or relative to the single workspace folder; no PATH lookup or shell expansion." },
+        "void.project.entry": { "type": "string", "default": "", "scope": "window", "description": "Project entry .void file. Absolute or workspace-relative. Its parent is the project root. Empty selects the first active local VOID file as a single-file project." },
+        "void.trace.server": { "type": "string", "enum": ["off", "messages", "verbose"], "default": "off", "scope": "window", "description": "Optional LSP trace in the VOID output channel. Verbose logs can include source text." }
+      }
+    },
+    "configurationDefaults": { "[void]": { "editor.insertSpaces": true, "editor.tabSize": 4, "editor.detectIndentation": false } }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "compile": "tsc && node build.cjs",
+    "build": "npm run typecheck && npm run compile",
+    "test": "npm run build && node --test out/test/config.test.js",
+    "test:host": "node out/test/runHost.js",
+    "package": "npm run build && vsce package --no-dependencies --allow-missing-repository --skip-license --out dist/void-language-0.1.0.vsix",
+    "vscode:prepublish": "npm run build"
+  },
+  "dependencies": { "vscode-languageclient": "10.1.2" },
+  "devDependencies": { "@types/node": "22.10.2", "@types/vscode": "1.91.0", "@vscode/test-electron": "3.1.0", "@vscode/vsce": "4.0.0", "esbuild": "0.25.12", "typescript": "5.9.3" }
+}

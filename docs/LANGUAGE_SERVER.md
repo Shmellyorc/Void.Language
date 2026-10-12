@@ -17,7 +17,8 @@ build/ci-debug/voidls --entry examples/analysis/main.void
 
 The second command waits for framed protocol input. Configure an LSP client with
 that executable and arguments `--entry` and the absolute project entry filename.
-There is no VS Code extension or project discovery yet. On Windows use
+The optional Phase 11 extension is documented in [EDITOR_INTEGRATION.md](EDITOR_INTEGRATION.md).
+There is no project discovery. On Windows use
 `build/debug/voidls.exe` (or the executable in your chosen build directory).
 The entry's parent directory selects the project VFS root. Initialization's
 workspace/root fields do not select or expand that root.

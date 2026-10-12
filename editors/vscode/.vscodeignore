@@ -1,0 +1,7 @@
+**
+!package.json
+!README.md
+!language-configuration.json
+!syntaxes/**
+!dist/extension.js
+!dist/THIRD_PARTY_NOTICES.txt

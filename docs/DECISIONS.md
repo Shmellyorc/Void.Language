@@ -455,3 +455,24 @@ resource contracts. Three new suites bring CTest to twenty-one, preserving all
 eighteen old suites/assertions. No language/ABI/reload semantics change. Full graph
 analysis and non-atomic disk reads remain; watchers and partial compilation are
 separate future decisions. Actual results and pending hosted checks are in WORK_LOG.md.
+
+
+## Phase 11 editor client
+
+The user reports Phase 10 commit `ccfea79` passed hosted run #13 on all platforms.
+The isolated TypeScript extension uses vscode-languageclient and standard editor
+APIs over the unchanged native stdio server. Select one explicit entry/root per
+window; empty entry supports a fixed active-file fallback, not discovery. Relative
+settings resolve literally against one workspace folder. Reject multi-root sessions
+and gate every native startup on Workspace Trust. Serialize stop/start/configuration
+work, report unexpected termination and require an explicit restart rather than
+creating crash loops. The extension contributes presentation only; the compiler
+owns diagnostics/resolution and the client owns UTF-16/protocol conversion.
+
+[EDITOR_INTEGRATION.md](EDITOR_INTEGRATION.md) documents commands and architecture.
+Use the standard executable transport default so the client does not append --stdio.
+Dependencies and Node are pinned; the JS bundle includes runtime license notices,
+never native binaries/LLVM. Keep package licensing UNLICENSED pending the owner's
+choice; local VSIX packaging does not authorize publication. Real editor tests use
+actual source/children and include a separate trust-enabled CLI launch because the
+official test runner disables trust. No native semantics/CMake/test assertions change.

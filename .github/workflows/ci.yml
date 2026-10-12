@@ -58,6 +58,43 @@ jobs:
         run: |
           cmake --build build/sanitizers --parallel 3
           ctest --test-dir build/sanitizers --output-on-failure
+      - name: Extension Node.js toolchain
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.19.0'
+          cache: npm
+          cache-dependency-path: editors/vscode/package-lock.json
+      - name: Linux editor display dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libgtk-3-0 libnss3 libgbm1 libasound2t64
+      - name: Install extension dependencies
+        working-directory: editors/vscode
+        run: npm ci
+      - name: Type-check, build and test extension
+        working-directory: editors/vscode
+        run: npm test
+      - name: Real editor integration (Linux)
+        if: runner.os == 'Linux'
+        working-directory: editors/vscode
+        env:
+          VOIDLS_PATH: ${{ github.workspace }}/build/debug/voidls
+        run: xvfb-run -a npm run test:host
+      - name: Real editor integration (Windows and macOS)
+        if: runner.os != 'Linux'
+        working-directory: editors/vscode
+        env:
+          VOIDLS_PATH: ${{ github.workspace }}/build/debug/voidls${{ runner.os == 'Windows' && '.exe' || '' }}
+        run: npm run test:host
+      - name: Package local editor extension
+        working-directory: editors/vscode
+        run: npm run package
+      - name: Preserve local editor package
+        uses: actions/upload-artifact@v4
+        with:
+          name: void-editor-${{ runner.os }}-${{ runner.arch }}
+          path: editors/vscode/dist/*.vsix
       - name: Preserve test results
         if: always()
         uses: actions/upload-artifact@v4

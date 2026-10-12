@@ -641,3 +641,19 @@ do not mistake dependency planning for an implemented incremental compiler.
 Completion/hover/rename, caches, watchers and automatic native reload remain
 deferred. Managed-runtime integration and package identity remain separate gates.
 The user retains control of all commits, branches, pushes and publication.
+
+
+## Phase 11 editor integration
+
+The user reports Phase 10 commit `ccfea79` passed hosted run #13 on Linux, Windows
+and macOS. Phase 11 adds an isolated TypeScript VS Code/VSCodium client over voidls,
+real editor API integration tests and local VSIX packaging. The native compiler
+still builds/tests without Node.js. [EDITOR_INTEGRATION.md](EDITOR_INTEGRATION.md)
+explains configuration and use; WORK_LOG.md records actual evidence. Hosted CI
+retains the 21 native suites and adds pinned Node, editor tests and packaging.
+
+Next verify the expanded hosted matrix and VSCodium/minimum-editor compatibility.
+Then consider explicit disk refresh/cancellation and client usability before
+workers, partial analysis or wider IDE features. Preserve exact analysis/reload
+contracts and owned revisions. Managed-runtime and external-package design gates
+remain separate; no language expansion or automatic native publication is implied.

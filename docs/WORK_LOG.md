@@ -1873,3 +1873,156 @@ Next consider small editor packaging and explicit disk refresh/cancellation
 contracts before workers or partial compilation, retaining exact compatibility and
 snapshot ownership. Managed-runtime and package identity gates remain separate.
 All version-control and remote publication steps remain with the user.
+
+
+## Phase 11 — VS Code and VSCodium extension (2026-10-11 local)
+
+Baseline: the user reports Phase 10 commit `ccfea79` passed hosted run #13 on
+Linux, Windows and macOS. This phase changes only editor integration, documentation
+and additional CI steps. No native C++/CMake source, native test, LLVM version,
+language semantics, RTTI correction or reload contract was changed. No commits,
+branches, pushes, remote changes or publication were performed.
+
+### Implementation and boundaries
+
+`editors/vscode/` is an isolated strict TypeScript project using pinned
+vscode-languageclient 10.1.2, Node.js 24.19.0 and a checked-in-ready npm lockfile.
+The native build does not depend on Node. One standard language client owns
+stdio, document synchronization, diagnostics and navigation; the existing compiler
+owns analysis and UTF-16 ranges. It launches the actual executable directly as
+`voidls --entry absolute-entry` with argument arrays and `shell: false`.
+The executable transport default is intentional: explicit TransportKind.stdio
+would add --stdio, which the existing native CLI does not accept.
+
+Configuration is explicit: void.server.path, void.project.entry and
+void.trace.server. Literal relative paths resolve against one workspace folder;
+ambiguous Windows drive/root-relative paths are rejected. Entry's parent remains
+the canonical compiler root. Empty entry selects a fixed single-file fallback;
+switching tabs does not guess a new project, while explicit restart can select
+the active file. Multi-root and unrelated documents are explained/rejected or
+excluded from synchronization. Native launch is gated on actual Workspace Trust.
+Serialized lifecycle work handles restart/configuration changes, preflight errors,
+actual spawn failure, unexpected termination and asynchronous shutdown. There is
+no crash/restart loop, shell, native download or extension telemetry.
+
+Presentation registers .void, # comments, four-space indentation and a small
+TextMate grammar for implemented tokens. It is not another semantic parser.
+Completion, hover, rename, formatting, code actions, watchers, workers, new language
+syntax and native hot reload remain outside this phase.
+
+### Actual extension verification
+
+Local host: Linux PikaOS, installed VS Code **1.141.0**, Node **24.19.0**, npm
+11.6.2. Pinned dependencies installed successfully with ordinary lifecycle scripts
+(`npm ci --offline --no-audit`, cached after the initial dependency installation).
+Initial dependency audit reported zero vulnerabilities. The final `npm test`
+strict type-check, TypeScript/esbuild build and **4/4** configuration/presentation
+unit tests passed with zero skipped tests.
+
+The final real editor test command was equivalent to:
+
+```sh
+cd editors/vscode
+npm ci
+npm test
+VOIDLS_PATH=/absolute/project/build/ci-debug/voidls \
+VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:host
+npm run package
+```
+
+The installed editor ran on the local graphical display, using disposable profiles
+and a real multi-file project under a Unicode root containing spaces, # and %.
+UTF-8 comments and an imported `worker space.void` were included. All three final
+editor profiles passed:
+
+- Trusted: real native initialization and clean initial diagnostics; definition
+  in the imported module and two resolved references; unsaved VOID2002 with exact
+  error severity/range and unchanged disk content; no stale definition/reference
+  results for invalid source; repair clears diagnostics and restores navigation.
+- Trusted lifecycle: tab close/reopen plus actual TextDocument close/open events;
+  clean restart and configured entry/executable switches; missing executable;
+  actual OS spawn failure when a copied real binary disappears after validation;
+  unexpected child termination with no restart loop; fixed single-file fallback
+  and explicit restart selection; deactivation and final child cleanup. No
+  unhandled client rejection occurred. Normal restart/final shutdown exited zero.
+- Restricted: actual workspace.isTrusted was false, explanatory reporting and
+  zero native children, including an explicit restart attempt.
+- Multi-root: two actual workspace roots, explanatory reporting and zero children.
+
+These are VS Code editor API tests against the built real voidls, not a mocked
+LSP server. Test instrumentation observes real child creation and captures error
+notification calls; it does not replace native execution or compiler analysis.
+The official test runner disables Workspace Trust unconditionally, so the
+restricted case launches the same editor through its documented test CLI without
+that flag. VS Code may retain text models after tabs close; a documented language
+reassignment triggers actual TextDocument close/open events for synchronization.
+
+Earlier attempts exposed the unwanted --stdio argument, retained editor models,
+and the official runner's trust flag. Those were investigated and corrected;
+initial failing logs remain in ignored evidence. A final npm-ci attempt inside
+the execution sandbox was blocked by esbuild's native execution validation
+(EPERM); the unchanged pinned installation/build/tests succeeded outside that
+sandbox with lifecycle scripts intact. GUI tests also require execution outside
+that sandbox. These initial attempts are not counted as passing verification.
+
+### Native regression verification
+
+All existing **21 CTest suites** passed in every configuration, with no skips:
+
+| LLVM 19.1.7 SDK | Build | Passed | Test time |
+| --- | --- | --- | --- |
+| Installed | Debug | 21/21 | 35.03 s |
+| Installed | Release | 21/21 | 30.35 s |
+| Installed | ASan/UBSan | 21/21 | 57.20 s |
+| Official archive | Debug | 21/21 | 29.33 s |
+| Official archive | Release | 21/21 | 25.09 s |
+| Official archive | ASan/UBSan | 21/21 | 52.00 s |
+
+Builds used the existing build/ci-debug, ci-release, ci-sanitizers,
+ci-official-debug, ci-official-release and ci-official-san configurations.
+Debug/Release targets were built before ctest; sanitizer binaries retain the
+unchanged native source/configuration. Strict sanitizer execution used
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 and
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 outside the tracing
+sandbox. The existing SDK-dependent RTTI/vptr correction remains intact.
+All native AOT/JIT, GC, reload and Phase 5–10 regressions remain present.
+
+### Package and delivery
+
+`npm run package` succeeded using vsce and the normal prepublish build hook.
+The resulting ignored `editors/vscode/dist/void-language-0.1.0.vsix` contains eight
+files and is **148706 bytes**. SHA-256:
+`313d323ba091fe262e90b3cf1b1cb65e0a86b40b56780a56699714d538375680`.
+ZIP inspection verified the packaged JavaScript equals the built bundle and
+includes full runtime dependency license notices. No LLVM/native binaries, tests,
+node_modules, source maps or lockfile are packaged. The 957.84 KB unminified bundle
+produces an informational size warning; the compressed VSIX is 145.22 KB. No
+license was invented for the repository: metadata remains UNLICENSED and local
+packaging explicitly skips the absent owner license/repository metadata checks.
+
+The actual VS Code CLI installed this VSIX successfully in isolated temporary
+extension/profile directories. The user's normal editor installation was not
+changed. The editor CLI emitted its own url.parse deprecation warning; installation
+succeeded, and the warning remains visible in package-install.log. Build/package/test
+output and evidence remain ignored under
+build/phase11-verification/, including final dependency/unit/editor/package logs,
+native logs, package-audit.json and source-manifest.json.
+
+[EDITOR_INTEGRATION.md](EDITOR_INTEGRATION.md) and the extension README document
+native build, explicit settings, real existing source example, development host,
+local installation, logging/troubleshooting and limits. Repository README,
+DECISIONS, KNOWN_ISSUES, LANGUAGE_SERVER and DEVELOPMENT_STRATEGY are updated.
+
+**Phase 11 is complete locally and ready for hosted CI.** The workflow preserves
+the native three-platform matrix and strict Linux sanitizers, then adds pinned
+Node dependency installation, type-check/build/unit tests, real editor tests
+(Linux xvfb-run), VSIX packaging and per-platform package artifacts. The next
+user-triggered run must validate these added steps on all three hosted platforms;
+local Linux success does not establish Windows/macOS GUI or hosted download/display
+compatibility. VSCodium is not installed locally, and editor 1.91 API compatibility
+was type-checked but not exercised in an actual minimum-version host.
+
+Recommended next phase: expanded hosted/editor compatibility checks, followed by
+explicit disk-refresh/cancellation and client usability contracts before workers,
+partial compilation or broader IDE features. Keep the compiler analysis/reload
+contracts and separate managed-runtime/package design gates intact.

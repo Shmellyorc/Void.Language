@@ -1,6 +1,6 @@
 # Known issues and deferred work
 
-Updated 11 October 2026, Phase 8 tooling foundations.
+Updated 11 October 2026, Phase 11 editor integration.
 
 ## Platform verification
 
@@ -27,7 +27,8 @@ Updated 11 October 2026, Phase 8 tooling foundations.
 
 - Actual single- and multi-file `.void` compilation now works. SOURCE_COMPILER.md
   and MODULE_SYSTEM.md describe the implemented grammar, resolver and provisional
-  choices. There is no LSP, package manager, source watcher or incremental compiler.
+  choices. LSP and a local editor client now exist; package management, source watching and
+  incremental compilation remain absent.
 - Canonical VFS/function identities are project-scoped. Persistent identity across
   independent projects/libraries, external-import permissions and installed package
   resolution are deferred. No root override or automatic entry discovery exists;
@@ -206,3 +207,31 @@ Completion, hover, rename, formatting, tokens, actions, packages, watchers, work
 persistent caches, partial compilation and automatic native publication/restart
 remain deferred. LLVM Support/numeric support is still a frontend dependency.
 Existing RTTI and managed-runtime/package design gates remain unchanged.
+
+
+## Phase 11 editor integration
+
+The user reports Phase 10 commit `ccfea79` passed hosted run #13 on all platforms.
+Phase 11 provides the local editor extension described in
+[EDITOR_INTEGRATION.md](EDITOR_INTEGRATION.md); its own hosted run is still needed.
+Local actual-editor results and package evidence are recorded in WORK_LOG.md.
+VSCodium is API-compatible by design but not installed/tested on this host.
+The declared editor API minimum is 1.91; actual local testing uses VS Code 1.141.0.
+
+Single local filesystem project/window only. Explicit entry is required for imports;
+fallback selects one local VOID file and excludes other documents. Multi-root and
+network/UNC workspaces, untitled/virtual documents and discovery are unsupported.
+Use canonical physical project paths when opening filesystem aliases. Entry-reachable
+analysis, non-atomic disk reads, portable VFS components and absent mutable-local
+symbol records remain existing server limits. Restart explicitly to observe external
+disk changes. Editor text models may outlive closed tabs; synchronization follows
+actual TextDocument lifetime, not tab visibility. There are no watchers, partial
+analysis, completion/hover, rename/formatting, debugger or automatic native reload.
+
+The standard client can send optional $/setTrace notifications; the minimal server
+logs them as unsupported. Protocol navigation/diagnostics remain valid. Verbose trace
+can include source. Native initialization uses the standard language-client lifecycle;
+configure an actual working voidls, not a compiler driver or arbitrary program.
+A separate minimum-editor-version run, VSCodium smoke test and hosted platform
+matrix remain useful follow-up verification. No repository license is chosen by
+this phase; public redistribution/publishing remains with the owner.
