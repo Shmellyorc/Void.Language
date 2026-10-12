@@ -2728,3 +2728,82 @@ lifecycle calls are rejected. Initialization bodies and transitive helpers are
 conservative restart contracts. See INITIALIZATION.md for the bounded implementation and
 deferred fallible/resource/managed rules. This supersedes Phase 13 I1 deferral, not the
 unapproved I2 alternative.
+
+
+## Entry-point and top-level execution discussion: 12 October 2026 [PROPOSED, NOT LOCKED]
+
+This records a developer-simplicity discussion for future executable/project work.
+It is an **open alternative** to the discovery choices in Section 10, not an
+implementation claim or an approved replacement of that older agreed direction.
+Do not silently change CLI behavior or source semantics based on this section.
+
+**Shared preference:** A `.void` file is valid without `main()`, `init()` or
+`deinit()`. Ordinary libraries and the future standard library can consist only
+of types, functions and constants. `public` means callable/accessible, **not**
+automatically executed. Importing a file must not run its executable statements.
+
+Preferred entry model to evaluate:
+
+1. A normal executable project defaults to `main.void`. That file may contain
+   either `func main()` or executable top-level statements. The latter are
+   lowered to an internal entry function by the compiler. A project should not
+   require developers to write boilerplate `main()` when the file itself can
+   clearly supply the program body.
+2. An explicitly selected alternate entry file, such as `tools/build_assets.void`,
+   may likewise run top-level statements without defining `main()` or `init()`.
+   This is intended for small tools, scripts, examples and one-off utilities.
+3. An explicitly selected entry function should also be possible, provisionally
+   illustrated by `voidc run tools.void --entry launch`. This is **illustrative
+   CLI syntax**, not a fixed interface. The compiler must not guess which public
+   function to call. Only `main.void` gets automatic `main()` discovery under
+   this proposal; a `main()` in another file is otherwise an ordinary function.
+4. The selected entry file may contain declarations alongside its executable
+   body. An explicit selected entry function and top-level executable statements
+   in the same file would be rejected as competing entry styles, subject to
+   final design approval. The rules for module declarations, constant defaults
+   and file-level instances remain separate from executable statement execution.
+5. An imported file is a library/module in that compilation: declarations do
+   not run on import. Whether importing a file containing top-level executable
+   statements is diagnosed or handled by a more explicit module design remains
+   to be specified; no implicit import-time execution is intended.
+6. `init()` and `deinit()` remain **optional lifecycle methods**, not required
+   program entry or exit hooks. A receiver `init()` participates in object
+   construction only when that object is constructed, as in Phase 14's supported
+   value-struct contract. The future `deinit()` is for explicitly defined
+   resource cleanup, not a GC destructor or automatic file-unload hook. The
+   earlier idea of treating a top-level free `init()` as a non-`main.void` default
+   entry was considered but is **not currently preferred**.
+7. Checking a library file must not require an entry point. Attempting to run
+   a selected file with no executable body or selected entry function should
+   produce a source-facing diagnostic, rather than executing arbitrary exports.
+
+Illustrative future syntax, **not currently executable as written**:
+
+```python
+# main.void: top-level program style
+use "./game.void"
+var session = game()
+session.start()
+```
+
+```python
+# main.void: alternative explicit-function style
+func main():
+    print("Hello from VOID")
+```
+
+```python
+# tools/build_assets.void: explicitly chosen script-style entry
+print("Building assets")
+process_assets()
+```
+
+**Still OPEN before implementation:** Default entry-file discovery and project
+configuration, function signature and arguments, return values/exit codes,
+explicit-entry CLI spelling and visibility, declarations versus executable
+statements at module scope, imported-script diagnostics, interaction with root
+constants and file-level instances, error cleanup, hot-reload compatibility,
+and how to migrate the currently implemented `entry(i32) -> i32` test/CLI
+adapter without breaking existing proof suites. Do not implement this as an
+incidental side effect of the GC/runtime phase. Approve the coherent contract
+in a dedicated executable/project phase.
