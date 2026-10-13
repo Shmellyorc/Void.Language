@@ -201,3 +201,13 @@ Phase 18 implements owner-approved reference-containing value structs, per-leaf
 readonly capability/effect checking, complete construction and precise roots through
 normal/O2 JIT and native AOT. See [REFERENCE_VALUE_STRUCTS.md](REFERENCE_VALUE_STRUCTS.md);
 earlier phase-only type exclusions in this historical guide are superseded there.
+
+
+## Phase 19 composition
+
+Owner-approved stored `using name: type` and `using type` composition, one-hop
+member promotion and original embedded receiver mutation are implemented through
+the existing paths. See [COMPOSITION.md](COMPOSITION.md) for exact lookup, access,
+readonly, initialization, tooling and reload behavior. This adds neither subtyping
+nor stateless reuse and does not change C1/S1/P3/P4/RV1–RV7. Inheritance, interfaces,
+virtual dispatch, transitive promotion and has remain deferred.

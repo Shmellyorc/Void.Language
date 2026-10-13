@@ -188,3 +188,13 @@ execution cannot be inferred from Linux results.
 Phase 17 implements approved custom managed initialization without incomplete
 parent identity or roots; see MANAGED_INITIALIZATION.md. Phase 18 adds approved
 reference-containing values; see REFERENCE_VALUE_STRUCTS.md for the current boundary.
+
+
+## Phase 19 composition
+
+Owner-approved stored `using name: type` and `using type` composition, one-hop
+member promotion and original embedded receiver mutation are implemented through
+the existing paths. See [COMPOSITION.md](COMPOSITION.md) for exact lookup, access,
+readonly, initialization, tooling and reload behavior. This adds neither subtyping
+nor stateless reuse and does not change C1/S1/P3/P4/RV1–RV7. Inheritance, interfaces,
+virtual dispatch, transitive promotion and has remain deferred.

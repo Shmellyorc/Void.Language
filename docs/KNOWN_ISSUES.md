@@ -287,3 +287,13 @@ configure an actual working voidls, not a compiler driver or arbitrary program.
 A separate minimum-editor-version run, VSCodium smoke test and hosted platform
 matrix remain useful follow-up verification. No repository license is chosen by
 this phase; public redistribution/publishing remains with the owner.
+
+
+## Phase 19 composition boundary
+
+Both stored using forms and one-hop field/method promotion are implemented; see
+COMPOSITION.md. Automatic transitive promotion, nullable using targets, stateless
+method-only reuse and new field access modifiers remain deferred. Embedded methods
+retain existing explicit owner-import requirements. Composition grants no subtype
+or implicit conversion. Hosted seven-job validation remains necessary for this
+phase; Linux local evidence is not Windows/macOS execution.

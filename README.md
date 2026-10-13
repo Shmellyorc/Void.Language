@@ -390,3 +390,15 @@ exercise nested cycles with aggregate-only precise roots, padding, optimized
 handoffs, failure/recovery and selected heap owners. See
 [the approved source contract](docs/REFERENCE_VALUE_STRUCTS.md) for C1 defaults,
 fixed initializer profiles, all-null templates, readonly limits and verification.
+
+
+Stored composition supports `using motion: movement` and `using combat`, qualified
+access and unique one-hop field/method promotion. Both forms retain real storage
+and existing value/reference/readonly semantics. See [COMPOSITION.md](docs/COMPOSITION.md).
+
+```sh
+build/ci-debug/voidc run examples/composition/main.void 10 # 111
+```
+
+This compiles real source through the shared frontend/IR/LLVM path. Inheritance,
+interfaces, virtual dispatch, transitive promotion and stateless mixins remain deferred.

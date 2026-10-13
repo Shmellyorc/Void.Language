@@ -23,6 +23,7 @@ struct AnalyzedDeclaration {
     std::string owner = {}; // Containing declaration, or module.
     ir::Type receiver = ir::Type::none;
     bool receiver_mutates = false;
+    bool using_field = false; // Stored composition field; does not affect native layout.
     std::string initialization_contract = {};
     std::vector<AnalyzedParameter> initializer_parameters = {};
     std::string capability_contract = {};

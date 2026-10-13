@@ -4,6 +4,7 @@
     {"name":"comment.line.number-sign.void", "match":"#.*$"},
     {"begin":"\\b(use)\\s+(\")", "beginCaptures":{"1":{"name":"keyword.control.import.void"},"2":{"name":"punctuation.definition.string.begin.void"}}, "end":"\"|$", "name":"string.quoted.double.import.void"},
     {"name":"keyword.control.void", "match":"\\b(?:value[ \\t]+)?struct\\b"},
+    {"name":"keyword.control.void", "match":"^\\s*using(?=[ \\t]+[a-z_])"},
     {"name":"storage.type.void", "match":"\\b(?:i8|i16|i32|i64|u8|u16|u32|u64|f32|f64|bool)\\b"},
     {"name":"keyword.control.void", "match":"\\b(?:func|var|const|return|if|else|for|break|continue|as|public|private|internal)\\b"},
     {"name":"keyword.operator.logical.void", "match":"\\b(?:and|or|not)\\b"},

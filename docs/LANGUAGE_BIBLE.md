@@ -384,7 +384,7 @@ static func player.create(name: string) -> player:
 
 The language has **one object-oriented struct family**, with an explicit distinction between reference and value semantics:
 
-The table describes the approved language design, not a compiler feature checklist. Reference/value semantics, construction and readonly capabilities have implemented boundaries documented in `MANAGED_STRUCTS.md`, `MANAGED_INITIALIZATION.md` and `REFERENCE_VALUE_STRUCTS.md`. Inheritance, `using` member promotion, interfaces and virtual dispatch below are approved design intentions, **not currently implemented source features**.
+The table describes the approved language design, not a compiler feature checklist. Reference/value semantics, construction and readonly capabilities have implemented boundaries documented in `MANAGED_STRUCTS.md`, `MANAGED_INITIALIZATION.md` and `REFERENCE_VALUE_STRUCTS.md`. Inheritance, interfaces and virtual dispatch below remain approved but unimplemented design intentions. Phase 19 implements stored `using` composition and one-hop promotion as documented in `COMPOSITION.md`.
 
 | | `struct` | `value struct` |
 |---|---|---|
@@ -419,7 +419,7 @@ print(a.x)          # 10, copied value
 
 Initializers and default field values don't force an object onto the stack or heap. The compiler may use stack allocation, registers, inline storage, or allocation elimination whenever it preserves semantics. Ordinary reference structs are managed objects conceptually, regardless of storage optimization.
 
-### 12.1 Inheritance and composition [APPROVED DESIGN, NOT IMPLEMENTED]
+### 12.1 Inheritance and composition [APPROVED; COMPOSITION IMPLEMENTED]
 
 The three relationships have distinct meanings:
 
@@ -456,7 +456,7 @@ override func (p player) take_damage(amount: i32):
 
 **OPEN implementation design:** Exact visibility and inherited access rules, overriding signature requirements, runtime dispatch representation, inherited construction, GC layout and reload compatibility must be designed before implementation. The approved spellings and explicit virtual/nonvirtual distinction do not settle those details.
 
-**Composition through `using`:** Multiple `using` fields inside structs provide Odin/Go-inspired embedding and member promotion:
+**Composition through `using`:** Multiple named or unnamed `using` fields inside managed and value structs provide Odin/Go-inspired embedding and member promotion. Both forms have ordinary physical storage:
 
 ```cpp
 struct player extends base_user:
@@ -465,11 +465,29 @@ struct player extends base_user:
     using inventory: inventory
 ```
 
-Members are accessible through their qualified field (for example, `player_value.motion.move(...)`) or an unambiguous promoted name (`player_value.move(...)`). Ambiguous promoted access must produce a diagnostic; explicit qualified access remains possible.
+`using motion: movement` stores a field named `motion`. The unnamed shorthand `using movement` stores a field named `movement`, with qualified access through `object.movement`. Both forms promote fields and methods identically; neither is stateless reuse.
+
+```cpp
+struct composed_player:
+    using movement
+    using combat
+
+struct two_motions:
+    using left: movement
+    using right: movement
+```
+
+Duplicate stored names, including two implicit `movement` names or an implicit/explicit collision, diagnose at declaration time. Explicit names distinguish multiple embeddings of the same type, as in `two_motions`.
+
+Members are accessible through their qualified field (for example, `player_value.motion.move(...)`) or an unambiguous promoted name (`player_value.move(...)`). Multiple components may legally define the same member name. An ambiguous promoted access diagnoses **at compile time at the access, not at the containing struct declaration**. Member types, argument signatures and expected result types must never guess the intended component: `x: i32` versus `x: f32` is still ambiguous. Explicit qualification selects the intended component, subject to normal visibility and typing.
+
+**Approved Phase 19 lookup boundary:** Direct fields and owner methods take precedence over promoted members in one member-selection namespace. There is no signature-based or field-versus-method fallback. Initially promotion is one-hop, considering only direct ordinary fields/methods of each using component; nested explicit qualification remains available. Automatic transitive promotion is deferred, not permanently prohibited. Targets are nonnullable nominal managed/value structs; nullable fields retain ordinary explicit checked access without promotion. Methods keep their exact type/module ownership and existing visibility/direct-owner import rules; composition grants no access or transitive method export.
+
+A using field retains ordinary defaults, stored-field constructor labels and declaration-order preparation. Custom-init arguments still bind exclusively to initializer parameters. Promoted names do not become constructor labels; lifecycle methods are not promoted. C1/S1/P4 construction/publication and P3/RV1–RV7 capability rules remain unchanged. `COMPOSITION_PROPOSAL.md` records the owner-approved U1–U7 contract. Phase 19 implements both stored forms and one-hop promotion; `COMPOSITION.md` defines the implemented boundary. Inheritance, interfaces and virtual dispatch remain unimplemented.
 
 `using` is composition, not inheritance. It does not make `player` a subtype of `movement`, `combat` or `inventory`, and grants no implicit conversion to those types. Embedding preserves actual field storage and its existing semantics: inline values copy independently, managed references retain target identity, readonly reference capabilities cannot be laundered, and embedded references remain precisely GC-tracked. Member promotion must preserve these guarantees rather than invent multiple-inheritance semantics.
 
-**OPEN implementation design:** Lookup precedence, nested promotion, initialization order and integration with method/interface dispatch require architectural design. These rules must preserve the approved C1/S1 construction contracts, P3 deep readonly views, P4 complete-object publication and Phase 16–18 reference/value semantics.
+**Deferred design:** Automatic transitive promotion and future interface/virtual-dispatch integration require separate design; they are outside Phase 19. Method-only reuse without embedded state remains a separate OPEN question, with no accepted trait/mixin syntax or behavior. The approved Phase 19 contract preserves existing initialization order, C1/S1 construction, P3 deep readonly, P4 complete-object publication and Phase 16–18 reference/value semantics.
 
 **Deferred idea — `has` [OPEN, NOT AN ACCEPTED KEYWORD]:** A possible future operator could inspect composition or embedded capabilities. Its exact meaning, grammar, type checking and necessity remain undecided. No syntax or compiler requirement is established by this idea.
 
@@ -2577,7 +2595,7 @@ The built-in game API is optional. This is intended to feel PICO-8-like without 
 | Strings | One UTF-8 `string`, auto interpolation, C#-like formatting and triple-quoted text |
 | Print | One `print()` with optional `end` |
 | Objects | `struct` reference semantics, `value struct` value semantics, no classes needed |
-| OOP | Single managed-struct inheritance via `extends`; explicit `virtual func`/`override func`/`super`; multiple `using` fields for composition and unambiguous promotion; structural interfaces without mandatory `implements`; properties |
+| OOP | Single managed-struct inheritance via `extends`; explicit `virtual func`/`override func`/`super`; named/unnamed stored `using` composition, direct-member precedence and one-hop unambiguous promotion; ambiguity diagnosed at access without type/signature guessing; structural interfaces without mandatory `implements`; properties |
 | Constructor/lifecycle | `init()`, `deinit()`, `with`, `defer`; GC memory separate from native cleanup |
 | Visibility | Public by default, optional `public`, `private`, `internal`, `static` |
 | Callable values | `func()` fields, anonymous funcs, closures, callable structs with `call()` |
@@ -2632,8 +2650,9 @@ This section matters especially when an AI assistant inherits this file without 
 28. **Operator overloading:** No general user-defined operator suite has been agreed. Avoid treating one as required just because structs and generics exist.
 29. **Error diagnostics codes:** Code examples use illustrative `VOID...` IDs. The real diagnostic catalog is not yet allocated.
 30. **Compiler implementation language and LLVM integration:** Not yet chosen. The C API and C++ API each have costs; evaluate concretely against hot reload and GC requirements.
-31. **`using` implementation details:** Multiple embedded fields, qualified access and unambiguous member promotion are approved; composition grants neither subtyping nor implicit conversions. Lookup precedence, nested promotion, initialization order and dispatch integration remain open. Preserve embedded storage, value/reference identity, readonly capabilities and precise GC; do not introduce multiple inheritance.
+31. **`using` remaining design scope:** Named `using motion: movement` and unnamed `using movement` (stored name `movement`) are approved directions. Duplicate stored names diagnose at declaration; overlapping promoted member names are legal until ambiguous access. No member/argument/result type disambiguation is allowed. Direct-member precedence, initial one-hop promotion, ordinary stored-field initialization and exact method ownership/imports are approved; Phase 19 implements the owner-approved revised U1–U7 contract; see `COMPOSITION.md`. Automatic transitive promotion and future interface/virtual-dispatch integration remain deferred. Preserve C1/S1/P3/P4/RV1–RV7, physical storage, identity, readonly capabilities and precise GC; no subtyping or implicit composition conversion. See Section 12.1 and `COMPOSITION_PROPOSAL.md`.
 32. **Possible `has` operator:** OPEN future idea for inspecting composition or embedded capabilities, not an accepted keyword or implemented feature. Meaning, grammar, type checking and necessity remain undecided; no compiler requirement is established.
+33. **Method-only reuse without embedded state:** Separate OPEN future design question. Phase 19 `using` always embeds ordinary stored fields; it introduces no trait/mixin behavior or syntax.
 
 ## 67. Resolved changes and corrections from the discussion
 

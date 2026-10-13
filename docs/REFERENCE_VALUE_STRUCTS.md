@@ -176,3 +176,13 @@ All four execution commands print 32. The native executables link source-emitted
 objects against void_runtime, without linking LLVM. The new family adds source,
 normal AOT, optimized AOT and CLI suites while retaining the preceding 39 suites.
 See WORK_LOG.md for the final SDK/configuration matrix and hosted verification gates.
+
+
+## Phase 19 composition
+
+Owner-approved stored `using name: type` and `using type` composition, one-hop
+member promotion and original embedded receiver mutation are implemented through
+the existing paths. See [COMPOSITION.md](COMPOSITION.md) for exact lookup, access,
+readonly, initialization, tooling and reload behavior. This adds neither subtyping
+nor stateless reuse and does not change C1/S1/P3/P4/RV1–RV7. Inheritance, interfaces,
+virtual dispatch, transitive promotion and has remain deferred.

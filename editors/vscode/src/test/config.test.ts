@@ -70,6 +70,8 @@ test('presentation covers approved keyword colors and space indentation', async 
     assert(keywords.some((rule:RegExp) => rule.exec('value struct point:')?.[0] === 'value struct'));
     assert(keywords.some((rule:RegExp) => rule.exec('struct point:')?.[0] === 'struct'));
     assert(!highlighted('value: i32'));
+    for (const text of ['    using movement', '    using motion: movement']) assert(highlighted(text));
+    for (const text of ['using: movement', 'p.using', 'has', 'extends', 'interface', 'virtual', 'override']) assert(!highlighted(text));
     const literals = grammar.patterns.filter((p:{name?:string}) => p.name === 'constant.language.void')
         .map((p:{match:string}) => new RegExp(p.match));
     for (const word of ['true','false','null']) assert(literals.some((r:RegExp) => r.test(word)));

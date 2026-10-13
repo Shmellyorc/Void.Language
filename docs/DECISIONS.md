@@ -691,3 +691,16 @@ The independent IR proof derives initial capacities from stores/default observat
 preserves explicit output weakening and separately enforces private-stage place
 readonly. Null/default leaves retain authority even when they have no origins.
 Named leaf paths and field/formal declaration links accompany source diagnostics.
+
+
+## Phase 19 — stored composition (U1–U7, owner approved)
+
+Both named/unnamed using declarations denote ordinary stored fields on managed/value
+owners; shorthand derives its field name from the type. Direct-member precedence
+and one-hop accessible promotion use one member namespace. Overlapping names are
+legal until ambiguous access; types/signatures/results never disambiguate.
+Promotion elaborates to existing typed paths before effects/readiness/lowering,
+without forwarding methods, new IR/LLVM representation or runtime changes.
+Shared analysis records using markers and implicit dependencies; marker changes
+require restart. Exact ownership/imports, C1/S1/P3/P4 and RV1–RV7 are preserved.
+See COMPOSITION.md and the approved COMPOSITION_PROPOSAL.md.

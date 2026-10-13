@@ -4659,3 +4659,277 @@ requested design statements and examples, and passed `git diff --check`. Only
 `docs/LANGUAGE_BIBLE.md` and `docs/WORK_LOG.md` changed. No compiler, runtime, test,
 build or workflow files changed; no executable tests were needed or run for this
 documentation-only update. No commit, push, branch or remote modification.
+
+## 13 October 2026 — Phase 19 composition investigation (design only)
+
+Owner baseline: Phase 18 is LOCKED; GitHub Actions run #30, attempt #2 passed all
+seven configurations with 43/43 suites each. This hosted evidence is owner-reported,
+not a new hosted run inspected or performed during this investigation.
+
+Created COMPOSITION_PROPOSAL.md for approval, following canonical Bible Sections
+12.1/13 and current Phase 16–18 implementation guides. No Phase 19 implementation
+is authorized or included. Recommended U1–U7: multiple named nonnullable nominal
+using fields on managed/value owners; direct-member precedence in one selection
+namespace; ambiguity rather than signature-based selection; initially one-hop
+promotion with nested qualified access; unchanged declaration ownership, access and
+method import rules; ordinary stored-field construction/defaults; resolved-path
+reuse with shared capability, initialization, tooling and compatibility analysis.
+Automatic transitive promotion is explicitly proposed for deferral, not prohibited
+permanently. These details require owner approval and do not silently amend the Bible.
+
+Actual source investigation traced Parser fields, nominal layout/method registration,
+Semantics field_expression/method/assignment, receiver-place lowering, capabilities.inc,
+construction.inc, independent IR path/capability checks, target-layout root offsets,
+GC runtime contracts, shared analyzed references and tooling comparison. Concrete
+gaps: no using marker or shared promotion selector; separate read/write/call lookups;
+assignment navigation assumes one written field token per physical field index.
+Existing receiver-place and selected heap-owner snapshots support qualified mutation;
+promotion must elaborate to those paths before readonly/effect/readiness analysis.
+No extra runtime object, forwarding method, IR opcode, GC root system or backend is
+recommended. C1/S1/P3/P4 and RV1–RV7 remain authoritative. The proposal covers required
+negative cases, realistic proposed source examples with expected results, alternatives,
+implementation stages and full future implementation/hosted acceptance gates.
+
+Focused unchanged-baseline verification (existing Debug build artifacts; no rebuild):
+
+```sh
+ctest --test-dir build/ci-debug -N
+ctest --test-dir build/ci-debug -R '^(reference_values_source|managed_initialization_source|receiver_methods_cli|lsp_protocol)$' --output-on-failure
+ctest --test-dir build/ci-official-debug -R '^(reference_values_source|managed_initialization_source|receiver_methods_cli|lsp_protocol)$' --output-on-failure
+```
+
+Inventory: **43 suites**. Installed SDK Debug: **4/4 passed**, 11.76 seconds.
+Official SDK Debug: **4/4 passed**, 10.90 seconds. Both runs exercised real existing
+source, receiver CLI and LSP tests. Installed cache uses /usr/bin/clang++-19 and
+/usr/lib/llvm-19/lib/cmake/llvm; official cache uses the matching compiler/LLVM
+package in .toolchains/ci-investigation/LLVM-19.1.7-Linux-X64. These are baseline
+mechanism checks, not proof of Phase 19 syntax, promotion or new runtime behavior.
+No Release/sanitizer/full matrix/editor packaging run was necessary for this design
+investigation. No Windows/macOS execution is claimed.
+
+Documentation validation: reviewed proposal consistency, Markdown fences and local
+source/document references; git diff --check passed. Only COMPOSITION_PROPOSAL.md
+and WORK_LOG.md changed. Compiler/runtime/tests/build/workflows and locked Bible
+semantics remain unchanged. No commit, push, new branch or remote modification.
+Stop here for architectural review and owner approval before implementation.
+
+
+## 13 October 2026 — Phase 19 named/unnamed composition design amendment
+
+The owner approved the direction of U2–U7 and amended U1 before final implementation
+approval. Updated COMPOSITION_PROPOSAL.md and canonical LANGUAGE_BIBLE.md Sections
+12.1, 65 and 66 consistently. Both `using motion: movement` and `using movement`
+embed ordinary storage; the latter derives stored name movement and qualified
+access object.movement. Both forms promote identically. Duplicate stored names,
+including implicit/explicit collisions, diagnose at declaration; explicitly named
+fields distinguish repeated embeddings of one type.
+
+Confirmed the owner-approved distinction: components may legally share member
+names, while ambiguous promoted access diagnoses at compile time at the access.
+Member types (including i32 versus f32), argument signatures and expected result
+types cannot guess a component. Qualification selects the intended component
+subject to ordinary access/type checks. Direct-member precedence and one-hop
+promotion remain unchanged. Method-only reuse is a separate deferred question;
+no stateless trait/mixin behavior is introduced. Updated examples, parser/analysis
+approach and future acceptance cases for shorthand and ambiguity accordingly.
+
+Preserved exact method ownership/imports, C1/S1/P3/P4/RV1–RV7 and all locked phases.
+U1–U7 now reflect the amendment and are returned for final implementation approval;
+this task grants no implementation authorization. Historical investigation results
+above remain baseline evidence, not proof of new syntax. No executable tests or
+build matrix were run for this documentation-only amendment. Documentation/fence
+and consistency checks plus git diff --check passed. Only the three requested
+documents changed during this amendment; preexisting proposal/work-log investigation
+changes were preserved. No compiler/runtime/tests/build/editor/CI changes, commits,
+pushes, new branches or remote modifications.
+
+## 13 October 2026 — Phase 19 approved composition implementation
+
+The owner approved revised U1–U7, including named/unnamed stored composition,
+following the investigation/amendment above. Phase 18 remains locked at the
+owner-reported run #30 attempt #2 (seven jobs, 43/43 suites). Implemented through
+the existing frontend and shared pipeline; no inheritance/interface/virtual,
+transitive promotion, has or stateless mixin behavior was added.
+
+Parser fields now carry a using marker. Both `using motion: movement` and
+`using movement` resolve to ordinary named physical fields, including imported
+qualified type shorthand. Contextual `using: movement` remains an ordinary field.
+Nonnullable nominal managed/value targets retain original layout/default rules;
+primitives/nullable targets diagnose. Duplicate physical names diagnose at declaration.
+
+One member selector supplies direct-first lookup, owner/import/private checks,
+one-hop candidates and ambiguity independently of member/argument/result typing.
+Overlapping promoted names remain legal until access. Related diagnostics identify
+qualified routes and actual declarations. Field reads and receiver calls elaborate
+to existing typed field chains; assignment paths expand separately from written
+reference spans. Contextual numeric anchors use the same selector. Receiver calls
+select the original embedded storage; original owner snapshots and source order
+are retained through allocations and RHS/argument replacement effects.
+
+Existing reference-leaf effects and staged construction analysis consume these
+physical paths unchanged. C1/S1/P3/P4/RV1–RV7 remain authoritative. Added using-field
+metadata and implicit dependencies to shared validated analysis, navigation and
+exact compatibility/constant/layout records; tooling compares the marker. Marker
+changes reject reload even with identical physical layout. Compatible ordinary
+body edits still reload. No IR opcode, verifier exemption, LLVM storage/GC path,
+allocator, runtime API or forwarding method was introduced. Production runtime,
+independent IR validator, LLVM backend and seven-job CI workflow are unchanged.
+
+Four new suites (composition_source, composition_aot_normal,
+composition_aot_optimized, composition_cli) extend **43 to 47**, retaining all old
+suites/assertions. New source checks cover both forms, qualification, one-hop depth,
+direct precedence, duplicate names, field-type/method-signature ambiguity, exact
+imports/private methods, copies, readonly returns/storage, required staged fields,
+custom init, contextual wide literals, real navigation and reload. Independent IR
+negative tests forge receiver paths/effects, readonly selected-owner authority and
+initializer markings. Six actual source fixtures plus imported modules cover main,
+stress, imports, order, staged and receiver_order in normal/O2 JIT and linked AOT.
+GC proofs inspect aggregate-only roots without host handles, force budget-one and
+pre-allocation collection, test deterministic rendezvous/no-sweep timeout, allocation
+failure cleanup/recovery and selected old owners after containing-reference replacement.
+
+The real LSP protocol retains old assertions and adds imported promoted read/write/
+method navigation, ambiguity with related locations, invalid-query suppression and
+unsaved repair. Editor grammar adds contextual using with existing keyword colors;
+new assertions preserve ordinary using identifiers and excluded future keywords.
+Extension lifecycle code is unchanged. Implementation guide COMPOSITION.md and
+proposal/Bible/source/value/managed/reference guides, decisions, limitations and
+README distinguish the working source surface from deferred scope.
+
+Initial focused checks passed, including original frontend regressions. Two new
+test-fixture issues were corrected without changing production semantics: a string
+replacement accidentally qualified an already qualified path twice, and an LSP
+query selected a local argument rather than the intended field. Unknown-method
+lookup retains the original diagnostic code. New IR mutations target the actual
+owned method source name, ensuring the negative proof really changes its effect.
+
+During initial sandboxed sanitizer builds, both SDKs stopped when generated-source
+compiler processes reached LeakSanitizer: "LeakSanitizer does not work under ptrace".
+This is an execution-environment limitation, not a diagnosed source memory failure.
+Reran strict sanitizer build/test commands outside the traced sandbox with leak
+detection intact; final results below supersede those incomplete attempts. No ASan,
+UBSan, vptr, leak setting, assertion or required test was disabled or suppressed.
+
+Final review retained the original type-mismatch diagnostic category for nullable
+field assignment after consolidating lookup; a new regression explicitly checks
+it. The final six-configuration acceptance run includes that correction and the
+additional independent readonly/initializer IR negative proofs. The shared source
+test helper now recursively tracks imported example .void dependencies; all six
+build trees are audited so changing lib/movement.void or lib/wrapper.void cannot
+leave a stale linked AOT fixture. This dependency-only adjustment changes no LLVM
+optimization or runtime configuration. Separate dependency-audit logs record
+reconfiguration/builds for trees configured before the helper adjustment.
+
+### Final Phase 19 acceptance evidence
+
+Final source/test/tooling inputs were frozen and checked across validation:
+**251 files**, recorded in build/phase19-verification/frozen-source.json. SDK
+headers, libLLVMOrcJIT.a and LLVMConfig.cmake exist; LLVM, Clang and LLD are all
+**19.1.7** in both installed and official SDKs. Installed SDK reports RTTI YES;
+official archive reports RTTI NO. Existing matching compilation/RTTI policy remains
+intact. Sanitizer configurations retain RelWithDebInfo plus VOID_SANITIZERS=ON,
+strict ASan/UBSan and leak detection, without exemptions.
+
+Final six-configuration matrix, all **47/47**:
+
+| SDK | Configuration / build tree | CTest seconds |
+|---|---|---:|
+| Installed | Debug / ci-debug | 63.73 |
+| Installed | Release / ci-release | 22.68 |
+| Installed | Strict sanitizers / ci-sanitizers | 100.63 |
+| Official archive | Debug / ci-official-debug | 60.79 |
+| Official archive | Release / ci-official-release | 19.30 |
+| Official archive | Strict sanitizers / ci-official-san | 99.24 |
+
+Actual final matrix commands, run for each tree with its existing matching cache:
+
+```sh
+cmake -S . -B build/TREE
+cmake --build build/TREE -j2
+ctest --test-dir build/TREE --output-on-failure -j4
+```
+
+The orchestrator is build/phase19-verification/accepted-validate.py; per-tree
+configure/build/test logs and result JSON files are under accepted/. The final
+run executed outside the traced sandbox so LeakSanitizer could enumerate threads.
+Environment for sanitizer build-time compiler execution, CTest and repetitions:
+
+```sh
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86
+```
+
+No tested assertion changed to accommodate failures. Initial/intermediate results
+in the top-level and final/ directories, and pre-final-extras/, are historical;
+they are not substituted for accepted/ and the final extra-result files. Additional
+dependency-audit reconfigure/build logs verify the recursive imported-source graph;
+all six native import targets depend on both lib/movement.void and lib/wrapper.void.
+
+Final repeat commands (build/phase19-verification/extra.py):
+
+```sh
+ctest --test-dir build/TREE -R '^(runtime_.*|composition_.*|managed_source|managed_initialization_source|reference_values_source|reload|gc)$' --repeat until-fail:5 --output-on-failure -j2
+# Both sanitizer trees use until-fail:3, with the strict environment above.
+ulimit -s 1024
+ctest --test-dir build/DEBUG_TREE -R '^(frontend|managed_source|managed_initialization_source|reference_values_source|composition_source)$' --repeat until-fail:3 --output-on-failure
+```
+
+Each Debug/Release SDK run passed **80/80** repeated executions (16 suites x 5);
+each sanitizer SDK passed **48/48** (16 x 3). Each Debug SDK passed **15/15**
+1 MiB-stack executions (5 suites x 3), including the original bounded frontend
+semantic regression. Total additional final executions: **446**. Full matrices
+contribute 282; final CTest acceptance total is **728**, all passed. GC repetition
+covers genuine deterministic collection overlap, no-sweep timeout, callbacks,
+failure/recovery, cycle reclamation, aggregate-only roots and selected owners.
+
+Editor/tooling acceptance using Node **24.19.0**, npm **11.6.2**, VS Code **1.141.0**:
+
+```sh
+cd editors/vscode
+npm test
+node out/test/config.test.js
+npm run package
+VOIDLS_PATH=/home/shmellyorc/Documents/Void.Language/build/ci-debug/voidls VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:host
+```
+
+The local Node/npm locations were added to PATH; no dependency/version changes.
+npm test passed; direct individual unit execution passed **4/4**. Packaging passed:
+**8 files, 145.46 KB**. Actual editor integration was rerun against the final built
+server and passed all **three** scenarios: trusted diagnostics/navigation with
+unsaved repair, strict process-kill notifications, restart/configuration and clean
+deactivation; restricted trust without native spawn; multi-root rejection without
+native spawn. Existing lifecycle assertions remain intact. Evidence: editor-unit.log,
+editor-individual-unit.log, editor-package.log and editor-host-final.log. Native
+LSP composition navigation/ambiguity/repair passed in each full matrix. VSCodium
+is not installed and was not executed locally.
+
+Final real source demonstration (demonstration.json):
+
+```sh
+build/ci-debug/voidc run examples/composition/main.void 10 --no-opt
+build/ci-debug/voidc run examples/composition/main.void 10
+build/ci-debug/void_composition_cli_main_normal 10
+build/ci-debug/void_composition_cli_main_optimized 10
+```
+
+All four print **111**. These compile actual source: the last two execute separately
+linked native objects with void_runtime and platform dependencies, without LLVM
+linkage. Source fixtures also prove result 103 for receiver replacement/selection
+and 2024 for aggregate-carried cycles with 1002 constructions at input 10.
+
+build/phase19-verification/summary.json aggregates exact commands/results/counts;
+inventory.json proves every original 43 suite remains and exactly four were added.
+preserved.json verifies production runtime, runtime tests, independent IR verifier,
+LLVM backend, seven-job workflow and extension lifecycle sources are unchanged.
+Final source hashes and Markdown/diff checks pass. No commit, push, branch or remote
+modification occurred. Build evidence/scripts are local ignored artifacts.
+
+Phase 19 is ready for owner review and the next **seven-job hosted CI** gate:
+Ubuntu Debug/Release/Sanitizers, Windows Debug/Release and macOS ARM64 Debug/Release,
+with 47 suites per job and Debug editor/package gates. No hosted result or local
+Windows/macOS execution is claimed. Remaining scope is deliberate: one-hop only;
+nonnullable nominal using targets; existing owner imports and visibility; no
+inheritance, interfaces, virtual dispatch, transitive promotion, has or stateless
+mixins. C1/S1/P3/P4/RV1–RV7 and all locked phases remain authoritative. Follow-up
+should first review hosted acceptance, then design any additional composition or
+dispatch behavior separately rather than silently expanding this phase.

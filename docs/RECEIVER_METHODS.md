@@ -186,3 +186,12 @@ readonly and temporary rules, whole/nested replacement, evaluation order, effect
 cycles, a 180-method SCC, a 400-link depth failure/recovery, reload and malformed
 receiver IR. Both small-stack Debug regressions remain. WORK_LOG.md records actual
 results and remaining hosted verification.
+
+## Phase 19 composition
+
+Stored using fields promote unique direct component methods one hop while retaining
+those methods' original nominal/module ownership, access and import requirements.
+Promoted calls elaborate to actual embedded receiver Places, with the same selected
+storage, source evaluation order, capability effects and precise roots as qualified
+calls. No forwarding methods or stateless mixins are generated. See COMPOSITION.md
+for the implemented contract and deferred transitive/dispatch integration.

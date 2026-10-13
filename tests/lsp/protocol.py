@@ -417,6 +417,35 @@ def reference_values(executable, root):
     print("reference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed")
 
 
+def composition(executable, root):
+    root.mkdir(parents=True, exist_ok=True)
+    types = 'value struct movement:\n    x: i32\n\nfunc (m movement) move(n: i32):\n    m.x += n\n'
+    text = 'use "/types.void" as t\nvalue struct wrapper:\n    using t.movement\n\nfunc entry(x: i32) -> i32:\n    var p = wrapper()\n    p.x = x\n    p.move(1)\n    return p.x\n'
+    entry = root / "main.void"
+    entry.write_text(text, encoding="utf-8")
+    (root / "types.void").write_text(types, encoding="utf-8")
+    uri, target = entry.as_uri(), (root / "types.void").as_uri()
+    with Client(executable, entry) as c:
+        assert all(not n["diagnostics"] for n in c.initialize())
+        for token, declaration in [("x = x", "x:"), ("move(1)", "move(n:"), ("return p.x", "x:")]:
+            query = {"textDocument": {"uri": uri}, "position": source_position(text, token, text.index("func entry"))}
+            if token == "return p.x":
+                query["position"]["character"] += len("return p.")
+            response, _ = c.request("textDocument/definition", query)
+            assert response["result"]["uri"] == target and response["result"]["range"]["start"] == source_position(types, declaration), response
+        bad = text.replace("    using t.movement", "    using left: t.movement\n    using right: t.movement")
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": uri, "languageId": "void", "version": 1, "text": bad}})
+        notes = diagnostics(c.sync())
+        errors = [d for d in notes[uri]["diagnostics"] if "Ambiguous promoted member" in d["message"]]
+        assert len(errors) == 3 and all(len(d["relatedInformation"]) >= 2 for d in errors), notes
+        assert c.request("textDocument/definition", query)[0]["result"] is None
+        c.notify("textDocument/didChange", {"textDocument": {"uri": uri, "version": 2}, "contentChanges": [{"text": text}]})
+        assert all(not n["diagnostics"] for n in c.sync())
+        assert c.request("textDocument/definition", query)[0]["result"]["uri"] == target
+        c.shutdown()
+    print("composition: imported promoted navigation, ambiguity and unsaved repair passed")
+
+
 if __name__ == "__main__":
     executable = pathlib.Path(sys.argv[1]).resolve()
     # Unicode physical root names work without changing the ASCII VFS policy.
@@ -433,3 +462,5 @@ if __name__ == "__main__":
     managed_initialization(executable, root / "managed initialization project")
 
     reference_values(executable, root / "reference value project")
+
+    composition(executable, root / "composition project")

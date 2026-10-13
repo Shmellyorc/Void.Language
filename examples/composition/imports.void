@@ -1,0 +1,7 @@
+use "/lib/movement.void" as geometry
+use "/lib/wrapper.void" as library
+
+func entry(value: i32) -> i32:
+    var p = library.wrapper(movement = geometry.movement(x = value))
+    p.move(2)
+    return p.x
