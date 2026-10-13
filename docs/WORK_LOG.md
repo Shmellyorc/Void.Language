@@ -4631,3 +4631,31 @@ editor/package gates. No hosted result, Windows/macOS execution or VSCodium exec
 is claimed from this Linux work. Follow-up work should review hosted acceptance and
 analysis/frame pressure before separately designing broader initialization or
 readonly heap-field contracts; C1/S1/P3/P4 and the documented deferred scope remain.
+
+
+## 13 October 2026 — Owner-approved object-model direction (documentation only)
+
+Updated the canonical Language Bible Section 12 to distinguish approved design
+from current implementation; Section 12.1 now records single managed-struct
+inheritance, explicit `virtual func` / `override func` / `super.method()`, base
+substitutability, and multiple `using` fields with qualified or unambiguous
+promoted access. Composition grants neither subtyping nor implicit conversion.
+Section 13 records structural interface conformance through accessible methods,
+including unambiguous promoted methods, with polymorphic interface calls and no
+mandatory `implements`. Added the owner's inheritance/composition examples and
+the three distinct intended `is` relationships.
+
+Updated Section 65's accepted OOP decision and Section 66's open-decision summary
+to separate approved rules from unresolved architectural details. `has` remains
+only an OPEN future idea, not an accepted keyword or compiler requirement.
+Visibility/signature rules, dispatch representation, inherited construction, GC
+layout, reload compatibility, promotion precedence/nesting and initialization
+order still require implementation design. All newly approved object-model
+features are explicitly marked unimplemented; existing C1/S1/P3/P4 and locked
+Phase 16–18 semantics are unchanged.
+
+Validation: reviewed the documentation diff and Markdown fences, checked the
+requested design statements and examples, and passed `git diff --check`. Only
+`docs/LANGUAGE_BIBLE.md` and `docs/WORK_LOG.md` changed. No compiler, runtime, test,
+build or workflow files changed; no executable tests were needed or run for this
+documentation-only update. No commit, push, branch or remote modification.

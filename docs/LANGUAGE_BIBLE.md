@@ -384,6 +384,8 @@ static func player.create(name: string) -> player:
 
 The language has **one object-oriented struct family**, with an explicit distinction between reference and value semantics:
 
+The table describes the approved language design, not a compiler feature checklist. Reference/value semantics, construction and readonly capabilities have implemented boundaries documented in `MANAGED_STRUCTS.md`, `MANAGED_INITIALIZATION.md` and `REFERENCE_VALUE_STRUCTS.md`. Inheritance, `using` member promotion, interfaces and virtual dispatch below are approved design intentions, **not currently implemented source features**.
+
 | | `struct` | `value struct` |
 |---|---|---|
 | Semantics | Reference identity | Value/copy semantics |
@@ -417,41 +419,65 @@ print(a.x)          # 10, copied value
 
 Initializers and default field values don't force an object onto the stack or heap. The compiler may use stack allocation, registers, inline storage, or allocation elimination whenever it preserves semantics. Ordinary reference structs are managed objects conceptually, regardless of storage optimization.
 
-### 12.1 Inheritance and composition
+### 12.1 Inheritance and composition [APPROVED DESIGN, NOT IMPLEMENTED]
 
-```python
-struct base_unit:
-    health: i32 = 100
-    position: vector2
+The three relationships have distinct meanings:
 
-func (u base_unit) move(dx: f32, dy: f32):
-    u.position.x += dx
-    u.position.y += dy
+| Form | Meaning |
+|---|---|
+| `extends` | I am this type. |
+| `using` | I have this functionality. |
+| `interface` | I support this behavior. |
 
-struct player extends base_unit:
-    name: string = "Hero"
+Ordinary managed `struct` types support **single inheritance** in the approved design. A derived instance can be used as its base type. Multiple inheritance is excluded; `value struct` does not gain struct inheritance.
 
-struct enemy extends base_unit:
-    damage: i32 = 10
-```
+Virtual dispatch is explicit:
 
-Agreed: single struct inheritance and interfaces; composition is encouraged. The exact virtual/override method dispatch policy should be defined before emitting object layouts. A proposed `override` keyword explicitly marks overriding, and `super` invokes a parent implementation:
+- `virtual func` declares an overridable method.
+- `override func` explicitly overrides an inherited virtual method.
+- `super.method()` calls the parent implementation directly.
+- Ordinary nonvirtual methods do not automatically become virtual.
 
-```python
-func (u base_unit) take_damage(amount: i32):
+Approved intended syntax (including the future `string` field):
+
+```yaml
+struct base_user:
+    health: i32
+
+virtual func (u base_user) take_damage(amount: i32):
     u.health -= amount
 
-# Proposed override spelling; not yet independently locked
-# override func (p player) take_damage(amount: i32):
-#     super.take_damage(amount)
-#     print("Damage: {amount}")
+struct player extends base_user:
+    name: string
+
+override func (p player) take_damage(amount: i32):
+    super.take_damage(amount)
 ```
 
-The `super`/`override` mechanism is **RECOMMENDED**, but its full grammar, visibility checks, and virtual dispatch semantics remain **OPEN**.
+**OPEN implementation design:** Exact visibility and inherited access rules, overriding signature requirements, runtime dispatch representation, inherited construction, GC layout and reload compatibility must be designed before implementation. The approved spellings and explicit virtual/nonvirtual distinction do not settle those details.
 
-## 13. Interfaces [AGREED]
+**Composition through `using`:** Multiple `using` fields inside structs provide Odin/Go-inspired embedding and member promotion:
 
-Interfaces provide polymorphism without forcing everything into inheritance chains. Structural conformance, as inspired by Go, is the current preferred model: matching method signatures satisfy an interface automatically.
+```cpp
+struct player extends base_user:
+    using motion: movement
+    using combat: combat
+    using inventory: inventory
+```
+
+Members are accessible through their qualified field (for example, `player_value.motion.move(...)`) or an unambiguous promoted name (`player_value.move(...)`). Ambiguous promoted access must produce a diagnostic; explicit qualified access remains possible.
+
+`using` is composition, not inheritance. It does not make `player` a subtype of `movement`, `combat` or `inventory`, and grants no implicit conversion to those types. Embedding preserves actual field storage and its existing semantics: inline values copy independently, managed references retain target identity, readonly reference capabilities cannot be laundered, and embedded references remain precisely GC-tracked. Member promotion must preserve these guarantees rather than invent multiple-inheritance semantics.
+
+**OPEN implementation design:** Lookup precedence, nested promotion, initialization order and integration with method/interface dispatch require architectural design. These rules must preserve the approved C1/S1 construction contracts, P3 deep readonly views, P4 complete-object publication and Phase 16–18 reference/value semantics.
+
+**Deferred idea — `has` [OPEN, NOT AN ACCEPTED KEYWORD]:** A possible future operator could inspect composition or embedded capabilities. Its exact meaning, grammar, type checking and necessity remain undecided. No syntax or compiler requirement is established by this idea.
+
+## 13. Interfaces [APPROVED DESIGN, NOT IMPLEMENTED]
+
+Interfaces specify required behavior and provide polymorphism without forcing inheritance chains. **Conformance is structural:** a struct satisfies an interface when its accessible method set fulfills the interface's requirements, including unambiguous methods promoted through `using`. No mandatory `implements` keyword is required. An interface injects no storage and does not automatically supply implementations.
+
+Interface method calls are polymorphic and must work with qualifying structs. Intended syntax:
 
 ```python
 interface damageable:
@@ -467,7 +493,13 @@ func attack(target: damageable):
     target.take_damage(10)
 ```
 
-**OPEN:** Whether conformance is strictly structural for all interfaces, how conflicting method names and generic constraints are resolved, and whether an explicit conformance declaration is ever useful. Interface conversion must not silently box small values if a specialized implementation can avoid it.
+The intended type-test distinctions are:
+
+- `player is base_user` can be true through inheritance.
+- `player is movement` is not made true merely by embedding `movement`.
+- `player is movable` can be true through structural interface conformance.
+
+These describe future language semantics, not currently supported source execution. **OPEN implementation design:** Exact interface signature/accessibility checks, conflicting method requirements, generic constraints, conversion/dispatch representation and readonly compatibility need architectural specification. Interface conversion must not silently box small values if a specialized implementation can avoid it. None of these open details reopens structural conformance or permits ambiguous promoted methods to satisfy a requirement.
 
 ## 14. Ordinary functions and receiver methods [AGREED]
 
@@ -2545,7 +2577,7 @@ The built-in game API is optional. This is intended to feel PICO-8-like without 
 | Strings | One UTF-8 `string`, auto interpolation, C#-like formatting and triple-quoted text |
 | Print | One `print()` with optional `end` |
 | Objects | `struct` reference semantics, `value struct` value semantics, no classes needed |
-| OOP | Methods, interfaces, single inheritance, composition, properties |
+| OOP | Single managed-struct inheritance via `extends`; explicit `virtual func`/`override func`/`super`; multiple `using` fields for composition and unambiguous promotion; structural interfaces without mandatory `implements`; properties |
 | Constructor/lifecycle | `init()`, `deinit()`, `with`, `defer`; GC memory separate from native cleanup |
 | Visibility | Public by default, optional `public`, `private`, `internal`, `static` |
 | Callable values | `func()` fields, anonymous funcs, closures, callable structs with `call()` |
@@ -2574,7 +2606,7 @@ This section matters especially when an AI assistant inherits this file without 
 2. **File/module import identity:** External `../` imports, symlinks, versioned packages, duplicate paths, case sensitivity on physical filesystems, and cross-project access need formal semantics.
 3. **Exact grammar for module scopes:** Project-wide root constants are agreed; file-level mutable global initialization order, collisions, and cyclic dependencies are not complete.
 4. **Static syntax:** The concept is accepted; `static func type.method()` grammar and visibility combinations need a parser contract.
-5. **Overrides and polymorphism:** `extends` and interfaces are accepted. `override` and `super` are recommended; dispatch, override protection, and inheritance access rules need finalization.
+5. **Inheritance and interface implementation details:** Single managed-struct inheritance, base substitutability, explicit `virtual func`/`override func`/`super.method()` and structural interfaces are approved design intentions, not implemented features. Visibility, exact overriding/interface signatures, runtime dispatch representation, inherited construction, GC layout and reload compatibility require architectural design; ordinary methods remain nonvirtual unless declared virtual. See Sections 12.1 and 13.
 6. **Construction:** `init()` is accepted. Named-field/custom-init interactions, fallible init return form, parent errors, and rollback cleanup need specification.
 7. **`value struct` native ownership:** Ensure copying cannot double-release a native handle; initially restrict resource-owning value types or introduce an explicit safe transfer contract.
 8. **Closures:** Mutable capture behavior is accepted; syntax/ABI of closure returns, lifetime, and hot-reload capture-layout compatibility need proof.
@@ -2600,6 +2632,8 @@ This section matters especially when an AI assistant inherits this file without 
 28. **Operator overloading:** No general user-defined operator suite has been agreed. Avoid treating one as required just because structs and generics exist.
 29. **Error diagnostics codes:** Code examples use illustrative `VOID...` IDs. The real diagnostic catalog is not yet allocated.
 30. **Compiler implementation language and LLVM integration:** Not yet chosen. The C API and C++ API each have costs; evaluate concretely against hot reload and GC requirements.
+31. **`using` implementation details:** Multiple embedded fields, qualified access and unambiguous member promotion are approved; composition grants neither subtyping nor implicit conversions. Lookup precedence, nested promotion, initialization order and dispatch integration remain open. Preserve embedded storage, value/reference identity, readonly capabilities and precise GC; do not introduce multiple inheritance.
+32. **Possible `has` operator:** OPEN future idea for inspecting composition or embedded capabilities, not an accepted keyword or implemented feature. Meaning, grammar, type checking and necessity remain undecided; no compiler requirement is established.
 
 ## 67. Resolved changes and corrections from the discussion
 
