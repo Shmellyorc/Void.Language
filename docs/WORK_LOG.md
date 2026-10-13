@@ -3418,3 +3418,130 @@ provider bindings without strong quiescence, strings, async, finalizers, allocat
 optimizations, tighter liveness, LTO and statepoints/stack maps remain deferred.
 After hosted validation, propose the smallest managed-source type/allocation slice
 using these contracts; do not infer approval of new managed language rules.
+
+
+## Phase 15 run #24 macOS Release numeric-loop correction, 12 October 2026
+
+Inspected the actual [macOS ARM64 job 115048678810](https://github.com/Shmellyorc/Void.Language/actions/runs/38320961702/job/115048678810)
+logs through the GitHub read-only connector. The checkout is
+`844ce7d201470e83bf6e29a2cc17dc88c41d7e21`, using the cached complete official
+LLVM/Clang 19.1.7 macOS ARM64 SDK. Debug passed 31/31 (`runtime_generated`
+0.65 s). Release passed 30/31: `runtime_generated` failed after 0.21 s with
+`numeric loop never acknowledged a collection`. There was no rendezvous timeout
+or LLVM assertion. The subsequent macOS editor steps were skipped. Windows
+completed successfully; Ubuntu was still running when job status was retrieved.
+
+### Investigation before tracked edits
+
+The numeric-loop latch only establishes that `signal_running()` ran. The shared
+lowerer wraps that import in NativeSafe guards. It establishes neither that the
+worker has reentered Managed execution nor that it remains in the numeric loop
+when any of the 100 collections starts. All collections can legally complete
+while the worker is NativeSafe, or after it finishes. Neither requires a poll to
+park. The final cumulative zero-parks assertion therefore has an invalid premise.
+
+A scratch copy of the unchanged test, delaying collection with `worker.wait()`
+after the latch, deterministically reproduced the **exact** diagnostic in both
+normal and O2 modes, with no production changes. This models a legal preemption
+of the collector until worker completion; it does not add a sleep or change the
+iteration count. The hosted log does not identify normal versus O2 or capture
+the exact interleaving, so those details cannot be claimed for macOS.
+
+Emitted the same numeric IR with `emit_runtime_object` and examined its LLVM
+19.1.7 native disassembly. In the Linux x86-64 O2 object, the backedge targets
+0x50, containing calls to `vd_gc_poll` at 0x50 and 0x55, followed by the decrement,
+comparison and branch back at 0x5f. Entry, initial header and return polls also
+remain. Runtime polls are opaque calls with memory effects; the O2 pipeline
+retains them. No missing-safepoint compiler/runtime defect was found.
+Scratch reproducer, disassemblies and evidence are under `build/phase15-run24/`.
+These Linux observations are not macOS ARM64 execution verification.
+
+### Correction and regression strength
+
+Only the test fixture and its build wiring change. The numeric loop has no native
+import. A test-local poll wrapper gates the fourth generated poll (the header
+reached through the first numeric backedge), while the worker is demonstrably
+Managed and before the real poll acquires any coordinator lock. A separate
+collector publishes its request; the observer verifies one elected collector is
+Parked and both participants are attached before releasing the gate. The real
+production poll must then acknowledge the pending rendezvous. The gate is
+released on failure too, so joining the worker cannot strand it in test code.
+
+CMake compiles the **existing** `src/runtime/abi.cpp` into this test executable
+with only `vd_gc_poll` renamed to `vd_gc_real_poll`. The test wrapper forwards to
+that identical implementation. Its ABI definitions satisfy the linker without
+extracting the archive ABI object. `llvm-nm` confirms one wrapper, one real poll
+and one `Runtime::current` definition. There is no fake collector, alternative
+lowerer, production hook or production API change. Other executables, including
+both separately linked native AOT tests, retain the uninstrumented ABI.
+The test ABI object uses the same `void_options` RTTI/sanitizer requirements.
+
+Both modes retain the original million numeric iterations, result check, 100
+successful collections and positive cooperative-parks assertion. Additional
+checks require exactly **2,000,003** generated polls, 100 completed epochs,
+no pending request and no attached thread leaks. Per-mode evidence makes
+future hosted failures distinguishable. A scratch negative control that drops
+real polling from the backedge onward fails with the zero-parks diagnostic;
+the gate/counting instrumentation cannot substitute for the real GC safety path.
+No compiler, runtime algorithm, resource limit, assertion or sanitizer was weakened.
+
+### Local verification after the correction
+
+Fresh configure/build/test runs completed, with all **31/31** existing suites in
+all six configurations (186 suite executions):
+
+| LLVM 19.1.7 SDK | Debug | Release | RelWithDebInfo ASan/UBSan |
+| --- | --- | --- | --- |
+| Installed, RTTI ON | 31/31, 20.48 s | 31/31, 18.26 s | 31/31, 34.71 s |
+| Complete official Linux archive, RTTI OFF | 31/31, 19.11 s | 31/31, 13.31 s | 31/31, 27.91 s |
+
+For each of `ci-debug`, `ci-release`, `ci-sanitizers`, `ci-official-debug`,
+`ci-official-release`, `ci-official-san`:
+
+```sh
+cmake -S . -B build/<tree>
+cmake --build build/<tree> -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+ctest --test-dir build/<tree> --output-on-failure -j4
+```
+
+Both SDKs' headers, `libLLVMOrcJIT.a`, `LLVMConfig.cmake`, exact version and RTTI
+settings were rechecked; each configure executed the real ORC SDK probe.
+Installed sanitizers retain vptr coverage; official sanitizers retain the matching
+no-RTTI ABI correction. Leak detection and all strict error settings remain enabled.
+`build/phase15-run24/validate.py`, `sdk.json`, `results.json` and the individual
+configure/build/test logs preserve these results.
+
+- Focused first: installed Release `runtime_generated` passed, then
+  `ctest --test-dir build/ci-release -R '^runtime_generated$' --repeat until-fail:100
+  --output-on-failure` passed all 100 (55.07 s). Official Release passed the same
+  100 repetitions (51.85 s). Each execution exercises both normal and O2 JIT.
+- Both Debug SDKs: all seven `runtime_` suites passed ten repetitions each.
+- Both Debug SDKs: `ulimit -s 1024; ctest --test-dir build/<tree> -R '^frontend$'
+  --repeat until-fail:5 --output-on-failure` passed all five per SDK.
+- Extension `npm test`: 4/4 individual tests passed. Real installed Linux VS Code
+  integration passed trusted, restricted and multi-root modes, including native
+  child-process lifecycle assertions. `npm run package` produced the eight-file,
+  145.44 KB VSIX. No extension files changed. Host/package logs are in the same
+  evidence directory. Native editor and strict sanitizer checks ran outside the
+  tracing sandbox; their requirements were preserved.
+
+- Both strict sanitizer SDKs: `ctest --test-dir build/<tree> -R
+  '^(runtime_.*|frontend|reload|gc|native)$' --repeat until-fail:3
+  --output-on-failure -j4` passed all 11 suites three times, including leaks
+  (26.48 s installed, 24.75 s official). Both Release coordination/stress fixture
+  executables also passed. `extra.py`, `extra-results.json` and per-check logs
+  record these additional checks.
+- Final `git diff --check` passed. Only CMake test wiring,
+  `tests/runtime/generated.cpp`, `docs/GC_RUNTIME.md` and this work log changed.
+
+The correction is ready for the owner's next hosted CI attempt. Local execution
+was Linux x86-64; no local macOS ARM64 or Windows execution was available. Their
+build/link behavior for the test ABI object, optimized poll counts, deterministic
+rendezvous and complete 31-suite matrix still require hosted confirmation. The
+actual macOS failure is explained by a confirmed test synchronization defect;
+its precise normal/O2 interleaving was not logged. The new test directly checks
+that generated loop safepoints execute the real coordinator on those hosts.
+No production compiler/runtime behavior, LLVM version, GC contract, source
+language feature, commit, branch or remote state changed.

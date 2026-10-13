@@ -1,39 +1,93 @@
 #include "void/backend.hpp"
 #include "void/runtime.hpp"
+#include "void/runtime_abi.hpp"
 #include "proof.hpp"
 #include <future>
-#include <latch>
+#include <semaphore>
 #include <iostream>
 #include <stdexcept>
 namespace {
-std::latch* signalled;
-extern "C" std::int32_t signal_running(std::int32_t value) { signalled->count_down(); return value; }
+struct PollGate {
+    std::binary_semaphore reached{0}, release{0};
+    std::size_t polls = 0;
+};
+thread_local PollGate* poll_gate = nullptr;
+}
+// The test ABI object is the production abi.cpp, with ONLY this symbol renamed.
+// No fake poll, native transition or substitute collector is used here.
+extern "C" void vd_gc_real_poll() noexcept;
+extern "C" void vd_gc_poll() noexcept {
+    if (poll_gate) {
+        ++poll_gate->polls;
+        // Entry=1, first header=2, first body=3, backedge header=4.
+        if (poll_gate->polls == 4) {
+            if (!vd::Runtime::current().is_managed()) std::terminate();
+            poll_gate->reached.release();
+            // Outside every runtime lock. The observer releases us only after
+            // the elected collector has published its request.
+            poll_gate->release.acquire();
+        }
+    }
+    vd_gc_real_poll();
+}
+namespace {
 void numeric_loop(bool optimized) {
     auto runtime = std::make_shared<vd::Runtime>();
     vd::ir::Module module;
-    module.identity = "numeric_runtime_loop"; module.imports = {"signal_running"};
+    module.identity = "numeric_runtime_loop";
     using namespace vd::ir;
     Function f; f.name = "entry"; f.locals = {Type::i32};
     f.blocks = {
-        {{{Op::argument}, {Op::call,0,0,0,"signal_running"}, {Op::store,0,1}}, {Terminator::Kind::jump,0,1}},
+        {{{Op::argument}, {Op::store,0,0}}, {Terminator::Kind::jump,0,1}},
         {{{Op::load,0}, {Op::constant,0,0,0}, {Op::greater,0,1}}, {Terminator::Kind::branch,2,2,3}},
         {{{Op::load,0}, {Op::constant,0,0,1}, {Op::subtract,0,1}, {Op::store,0,2}}, {Terminator::Kind::jump,0,1}},
         {{{Op::load,0}}, {Terminator::Kind::return_value,0}}
     };
     module.functions.push_back(f);
-    vd::Jit jit; jit.bind("signal_running",signal_running);
+    vd::Jit jit;
     auto code = jit.compile(module,"entry",optimized,{},runtime);
-    std::latch entered(1); signalled = &entered;
-    auto worker = std::async(std::launch::async,[&] { return code->invoke(1000000); });
-    entered.wait();
+    PollGate gate;
+    constexpr std::int32_t iterations = 1000000;
+    auto worker = std::async(std::launch::async,[&] {
+        poll_gate = &gate;
+        struct Clear { ~Clear() { poll_gate = nullptr; } } clear;
+        return code->invoke(iterations);
+    });
+    // Release even on a failed assertion, before either future joins. This gate
+    // deliberately holds a Managed participant, not a NativeSafe import.
+    struct Release {
+        PollGate& gate;
+        bool released = false;
+        void now() { if (!released) { released = true; gate.release.release(); } }
+        ~Release() { now(); }
+    } release{gate};
+    if (!gate.reached.try_acquire_for(std::chrono::seconds(2)))
+        throw std::runtime_error("numeric loop did not execute its backedge poll");
+    auto collector = std::async(std::launch::async,[&] {
+        vd::Runtime::Attachment a(*runtime); vd::Runtime::Managed m(*runtime);
+        return runtime->collect(std::chrono::seconds(2));
+    });
+    const bool requested = runtime->wait_for_request(std::chrono::seconds(2));
+    const auto pending = runtime->snapshot();
+    release.now();
+    if (collector.get() != vd::Runtime::Collection::completed || !requested ||
+        !pending.requested || pending.threads != 2 || pending.parked != 1)
+        throw std::runtime_error("numeric loop rendezvous did not overlap Managed execution");
     {
         vd::Runtime::Attachment a(*runtime); vd::Runtime::Managed m(*runtime);
-        for (int i = 0; i < 100; ++i) if (runtime->collect(std::chrono::seconds(2)) != vd::Runtime::Collection::completed)
+        for (int i = 1; i < 100; ++i) if (runtime->collect(std::chrono::seconds(2)) != vd::Runtime::Collection::completed)
             throw std::runtime_error("numeric-only generated loop did not cooperate");
         vd::Runtime::Native n(*runtime);
         if (worker.get() != 0) throw std::runtime_error("numeric loop result");
     }
-    if (runtime->snapshot().cooperative_parks == 0) throw std::runtime_error("numeric loop never acknowledged a collection");
+    const auto finished = runtime->snapshot();
+    if (finished.cooperative_parks == 0) throw std::runtime_error("numeric loop never acknowledged a collection");
+    if (finished.completed_epoch != 100 || finished.threads != 0 || finished.requested ||
+        gate.polls != 2 * static_cast<std::size_t>(iterations) + 3)
+        throw std::runtime_error("numeric loop poll coverage or rendezvous cleanup");
+    std::cout << "numeric loop " << (optimized ? "O2" : "normal")
+              << ": " << gate.polls << " polls, " << finished.completed_epoch
+              << " collections, " << finished.cooperative_parks << " parks\n";
 }
 }
 int main(int argc, char** argv) {

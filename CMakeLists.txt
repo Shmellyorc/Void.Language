@@ -152,6 +152,14 @@ if(BUILD_TESTING)
   add_test(NAME runtime_coordination COMMAND void_runtime_tests)
   set_tests_properties(runtime_coordination PROPERTIES TIMEOUT 90)
   add_executable(void_runtime_generated tests/runtime/generated.cpp)
+  # Instrument only this executable's poll entry. Compile the SAME ABI source
+  # with its poll symbol renamed; the test forwards to it after its rendezvous
+  # gate. All ABI symbols are supplied here, so the archive's ABI object is not
+  # extracted. Production executables and separately linked AOT retain the ABI.
+  add_library(void_runtime_generated_abi OBJECT src/runtime/abi.cpp)
+  target_link_libraries(void_runtime_generated_abi PRIVATE void_options Threads::Threads)
+  target_compile_definitions(void_runtime_generated_abi PRIVATE vd_gc_poll=vd_gc_real_poll)
+  target_sources(void_runtime_generated PRIVATE $<TARGET_OBJECTS:void_runtime_generated_abi>)
   target_link_libraries(void_runtime_generated PRIVATE void_llvm)
   add_test(NAME runtime_generated COMMAND void_runtime_generated)
   set_tests_properties(runtime_generated PROPERTIES TIMEOUT 180)

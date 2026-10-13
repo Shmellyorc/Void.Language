@@ -148,6 +148,12 @@ foreign/same-thread callbacks, capture handles, reload leases and ordinary check
 failure cleanup. Shared normal/O2 JIT and separately linked AOT proofs cover nested
 aggregates, temporaries, argument/return handoffs, repeated loop collections and
 concurrent AOT callers. Numeric-only optimized JIT loops must demonstrably park.
+Their test executable instruments the existing runtime ABI poll entry, gates a
+generated backedge poll in Managed state until a collection request is pending,
+then forwards to the real poll. Normal/O2 runs check every loop poll, successful
+collection, actual parking and balanced thread cleanup. This avoids assuming a
+finite worker still runs after a NativeSafe signal. The gate is outside runtime
+locks and is absent from production and separately linked AOT executables.
 See `WORK_LOG.md` for actual configuration/test results and commands.
 
 Still deferred: managed source syntax/types and initialization, general native
