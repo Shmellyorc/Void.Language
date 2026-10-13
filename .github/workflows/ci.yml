@@ -7,12 +7,23 @@ permissions:
   contents: read
 jobs:
   build:
+    name: ${{ matrix.platform }} / ${{ matrix.configuration }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, windows-2022, macos-latest]
+        include:
+          - {os: ubuntu-24.04, platform: Ubuntu 24.04, configuration: Debug}
+          - {os: ubuntu-24.04, platform: Ubuntu 24.04, configuration: Release}
+          - {os: ubuntu-24.04, platform: Ubuntu 24.04, configuration: Sanitizers}
+          - {os: windows-2022, platform: Windows 2022, configuration: Debug}
+          - {os: windows-2022, platform: Windows 2022, configuration: Release}
+          - {os: macos-latest, platform: macOS ARM64, configuration: Debug}
+          - {os: macos-latest, platform: macOS ARM64, configuration: Release}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
+    env:
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,6 +39,9 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
+      - name: Verify macOS ARM64 runner
+        if: runner.os == 'macOS'
+        run: python -c "import platform; assert platform.machine().lower() in ('arm64', 'aarch64'), 'macOS CI requires ARM64'"
       - name: Cache complete official LLVM SDK
         uses: actions/cache@v4
         with:
@@ -35,77 +49,65 @@ jobs:
           key: llvm-sdk-19.1.7-${{ runner.os }}-${{ runner.arch }}-v1
       - name: Install and verify LLVM development SDK
         run: python tools/ci/llvm_sdk.py
-      - name: Configure Debug
-        run: cmake -S . -B build/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}" -DVOID_LINKER="${{ env.VOID_LINKER }}"
-      - name: Build Debug
-        run: cmake --build build/debug --parallel 3
-      - name: Execute Debug tests
-        run: ctest --test-dir build/debug --output-on-failure
+      - name: Configure ${{ matrix.configuration }}
+        run: cmake -S . -B build/${{ matrix.configuration }} -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration == 'Sanitizers' && 'RelWithDebInfo' || matrix.configuration }} -DVOID_SANITIZERS=${{ matrix.configuration == 'Sanitizers' && 'ON' || 'OFF' }} -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}" -DVOID_LINKER="${{ env.VOID_LINKER }}"
+      - name: Build ${{ matrix.configuration }}
+        run: cmake --build build/${{ matrix.configuration }} --parallel 3
+      - name: Execute ${{ matrix.configuration }} tests
+        run: ctest --test-dir build/${{ matrix.configuration }} --output-on-failure
       - name: Frontend Debug small-stack regression
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && matrix.configuration == 'Debug'
         shell: bash
         run: |
           ulimit -s 1024
-          ctest --test-dir build/debug -R '^frontend$' --output-on-failure
-      - name: Configure Release
-        run: cmake -S . -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}" -DVOID_LINKER="${{ env.VOID_LINKER }}"
-      - name: Build Release
-        run: cmake --build build/release --parallel 3
-      - name: Execute Release tests
-        run: ctest --test-dir build/release --output-on-failure
-      - name: Configure sanitizers
-        if: runner.os == 'Linux'
-        run: cmake -S . -B build/sanitizers -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVOID_SANITIZERS=ON -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}" -DVOID_LINKER="${{ env.VOID_LINKER }}"
-      - name: Build and execute sanitizer tests
-        if: runner.os == 'Linux'
-        env:
-          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
-          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
-        run: |
-          cmake --build build/sanitizers --parallel 3
-          ctest --test-dir build/sanitizers --output-on-failure
+          ctest --test-dir build/Debug -R '^frontend$' --output-on-failure
       - name: Extension Node.js toolchain
+        if: matrix.configuration == 'Debug'
         uses: actions/setup-node@v4
         with:
           node-version: '24.19.0'
           cache: npm
           cache-dependency-path: editors/vscode/package-lock.json
       - name: Linux editor display dependencies
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && matrix.configuration == 'Debug'
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb libgtk-3-0 libnss3 libgbm1 libasound2t64
       - name: Install extension dependencies
+        if: matrix.configuration == 'Debug'
         working-directory: editors/vscode
         run: npm ci
       - name: Type-check, build and test extension
+        if: matrix.configuration == 'Debug'
         working-directory: editors/vscode
         run: npm test
       - name: Real editor integration (Linux)
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && matrix.configuration == 'Debug'
         working-directory: editors/vscode
         env:
-          VOIDLS_PATH: ${{ github.workspace }}/build/debug/voidls
+          VOIDLS_PATH: ${{ github.workspace }}/build/Debug/voidls
         run: xvfb-run -a npm run test:host
       - name: Real editor integration (Windows and macOS)
-        if: runner.os != 'Linux'
+        if: runner.os != 'Linux' && matrix.configuration == 'Debug'
         working-directory: editors/vscode
         env:
-          VOIDLS_PATH: ${{ github.workspace }}/build/debug/voidls${{ runner.os == 'Windows' && '.exe' || '' }}
+          VOIDLS_PATH: ${{ github.workspace }}/build/Debug/voidls${{ runner.os == 'Windows' && '.exe' || '' }}
         run: npm run test:host
       - name: Package local editor extension
+        if: matrix.configuration == 'Debug'
         working-directory: editors/vscode
         run: npm run package
       - name: Preserve local editor package
+        if: matrix.configuration == 'Debug'
         uses: actions/upload-artifact@v4
         with:
-          name: void-editor-${{ runner.os }}-${{ runner.arch }}
+          name: void-editor-${{ runner.os }}-${{ runner.arch }}-${{ matrix.configuration }}
           path: editors/vscode/dist/*.vsix
       - name: Preserve test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: tests-${{ runner.os }}-${{ runner.arch }}
+          name: tests-${{ runner.os }}-${{ runner.arch }}-${{ matrix.configuration }}
           path: |
             build/**/Testing/Temporary/LastTest.log
             build/**/CMakeFiles/CMakeConfigureLog.yaml

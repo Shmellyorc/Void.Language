@@ -1,5 +1,99 @@
 # Work log
 
+## CI architecture: seven parallel configurations, 12 October 2026
+
+Phase 15 remains locked. Inspected the existing workflow and retrieved the actual
+[run #26](https://github.com/Shmellyorc/Void.Language/actions/runs/38331602313)
+metadata, job timestamps and all three job logs through read-only GitHub tools.
+Commit `7813040149acb42a9c1b7873935587db13a631d7`, attempt 1, passed completely.
+The logs confirm 31/31 for all seven native configurations, strict Ubuntu
+sanitizers, the Linux small-stack regression, real editor integration in all three
+workspace modes on each OS, and VSIX packaging on each OS.
+
+### Original timing baseline
+
+Run start: `2026-10-13T01:19:47Z`; final job completion:
+`2026-10-13T02:33:18Z`. Overall elapsed time was **73m31s**, including initial
+scheduling. Job durations below use actual job start/completion; configuration
+columns measure configure through test-step completion, excluding platform setup,
+editor work, artifact upload and the separate Linux small-stack step.
+
+| Platform job | Job elapsed | Debug configure/build/tests | Release configure/build/tests | Sanitizers configure/build/tests |
+| --- | --- | --- | --- | --- |
+| Ubuntu 24.04, job 115082343730 | 73m29s | 23m06s | 23m16s | 25m23s |
+| Windows 2022, job 115082343660 | 5m28s | 1m50s | 1m41s | — |
+| macOS ARM64, job 115082343490 | 41m20s | 20m50s | 17m48s | — |
+
+Raw run/job timing metadata is retained locally in
+`build/ci-seven-runners-run26.json`. These are observed hosted timings, not
+estimates of the new workflow's performance.
+
+### Workflow change
+
+Replaced the three OS entries and sequential per-configuration blocks with one
+explicit seven-entry `include` matrix and shared configure/build/CTest steps:
+Ubuntu Debug, Release and Sanitizers; Windows Debug and Release; macOS ARM64
+Debug and Release. Each matrix expansion is its own hosted job with a readable
+platform/configuration name. There are no `needs`, `max-parallel` or concurrency
+restrictions introduced. All seven are eligible to run concurrently, subject to
+GitHub account capacity and runner availability. Every job retains 90 minutes and
+`fail-fast: false`; push, pull request, manual triggers and read-only permissions
+are unchanged.
+
+Complete official LLVM 19.1.7 installation, verification, SDK cache keys, Linux
+development packages, Windows SDK environment and macOS SDKROOT setup are retained.
+A macOS-only architecture assertion verifies ARM64 while preserving the existing
+`macos-latest` runner label. Normal jobs use their original Debug/Release build
+types; Sanitizers uses RelWithDebInfo plus `VOID_SANITIZERS=ON` on Ubuntu only.
+The normal jobs explicitly pass OFF, matching the existing default. Ninja,
+build parallelism 3 and LLVM optimization settings are unchanged.
+
+Strict ASan/UBSan environment settings now live at job scope so they cover both
+build-time generated-code helpers and CTest in the sanitizer runner:
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. They do not enable
+instrumentation on ordinary jobs. Full CTest execution is unconditional for all
+seven configurations: **217 required suite executions**. Ubuntu Debug additionally
+runs the existing frontend test with a 1 MiB stack.
+
+Each platform's Debug job retains Node setup, npm ci, extension tests, real native
+editor integration and VSIX packaging/upload. The existing editor harness and
+VS Code/VSCodium-compatible extension are unchanged; this does not add or claim
+separate hosted VSCodium binary coverage. `VOIDLS_PATH` points to the Debug build
+on the same runner, preserving `.exe` on Windows and Xvfb on Linux. Release and
+Sanitizers jobs do not run editor-only steps. Every test artifact includes OS,
+architecture and configuration; Debug VSIX artifact names also include Debug.
+Seven test artifacts and three editor artifacts have unique names. Failure-time
+test/configuration log uploads retain `always()` and their original paths.
+The shared SDK cache deliberately remains identical across configurations because
+its complete SDK contents are identical; no compiled build outputs are shared.
+
+### Local validation and remaining hosted gate
+
+- Official `actionlint` 1.7.7 checked `.github/workflows/ci.yml` successfully,
+  including GitHub Actions expressions and matrix contexts.
+- Parsed YAML and expanded every matrix row/step condition with the local
+  `build/ci-seven-runners/validate.py` checker. Confirmed exactly the requested
+  combinations, unique readable names, independent scheduling, all seven full
+  unfiltered CTest commands, correct build types/sanitizer flags, strict environment
+  for build and tests, one small-stack job, exactly three editor/packaging jobs,
+  correct native server paths and ten noncolliding artifact names. Trigger,
+  permission, timeout, fail-fast and unchanged SDK setup comparisons against HEAD
+  passed. `expanded-validation.json` preserves expanded commands/artifact names.
+- Local CTest discovery found the unchanged 31-suite inventory. No native rebuild
+  or test-source modification was needed for this workflow-only restructuring.
+- `git diff --check` passed; only `.github/workflows/ci.yml` and this log changed.
+
+The owner must push and verify all seven hosted jobs, each with 31/31, Linux strict
+sanitizers, the Ubuntu Debug small-stack check and all three Debug editor/packages.
+Compare the next run's start-to-final-job-completion elapsed time with **73m31s**
+from run #26, and record per-job duration plus queue/cache differences. Local static
+validation does not establish seven-runner scheduling or a wall-clock improvement.
+Retain the 90-minute timeout until those hosted measurements justify reconsidering
+it. No compiler/runtime/GC changes, test changes, commits, branches, pushes or
+remote modifications were made.
+
+
 ## Phase 15 run #25 CI timeout adjustment, 12 October 2026
 
 Owner-reported hosted evidence: run #25 passed Windows and macOS completely.
