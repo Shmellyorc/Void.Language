@@ -1,5 +1,22 @@
 # Work log
 
+## Phase 15 run #25 CI timeout adjustment, 12 October 2026
+
+Owner-reported hosted evidence: run #25 passed Windows and macOS completely.
+Ubuntu passed Debug and Release, 31/31 suites each, but was cancelled during
+sanitizer linking when the build job reached its 60-minute timeout. This leaves
+that run's Ubuntu sanitizer execution and subsequent steps unverified; it is
+not evidence of a sanitizer test failure.
+
+Changed only the build job's `timeout-minutes` from 60 to 90 in
+`.github/workflows/ci.yml`. The platform matrix, LLVM 19.1.7 pin, build commands,
+tests, assertions, strict ASan/UBSan options and leak detection remain unchanged.
+Validated that the workflow differs from HEAD by exactly this one replacement,
+checked the parsed job timeout, and ran `git diff --check`. No compiler/runtime
+changes or native rebuilds were needed for this CI-only adjustment. The next
+hosted run must confirm Ubuntu completes sanitizers and the remaining steps
+within the extended timeout. No commits, pushes or remote changes were made.
+
 ## Phase 12 run #17 Windows frontend crash correction, 12 October 2026
 
 Read the actual [Windows job 114735091143](https://github.com/Shmellyorc/Void.Language/actions/runs/38226468142/job/114735091143)
