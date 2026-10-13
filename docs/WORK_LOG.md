@@ -1,5 +1,288 @@
 # Work log
 
+## Phase 17 managed custom initialization: implementation, 13 October 2026
+
+The owner approved **S1 + MI1–MI7 exactly**, including the narrow replacement of
+Phase 16's obsolete valid-managed-init deferral assertion. This supersedes the
+design-only stop entry below. Phase 16 is locked with owner-reported run #28,
+all seven jobs and 35 suites/configuration. No GitHub/remote action was performed.
+
+### Implemented contract and architecture
+
+- Ordinary managed init now executes through the existing source compiler. C1
+  positional/named/default argument binding, exact typing, written evaluation
+  order, private-owner factories, nested reference-free value defaults and direct
+  lifecycle rejection are preserved. No-init managed named-field construction,
+  explicit nonnullable managed bindings and null nullable defaults are unchanged.
+- The receiver is a compiler-checked staged construction view, never an incomplete
+  managed reference. Parent identity appears only after body success and final
+  gc_construct commit. Required direct reference fields need definite assignment
+  before read/subfield/compound use and on every normal exit. Branch/loop/break/
+  early-return readiness is checked. Required value children retain C1's earlier
+  default-construction boundary; no implicit managed child allocation was added.
+- A bounded worklist over the already nominally typed AST proves local aliases,
+  safe helper/method calls, recursive contexts and multiple parameters aliasing
+  one place. All fields must be ready before whole-view calls. Whole-self identity,
+  nullable injection/casts, retention, constructor arguments, returns and rebinding
+  reject with source diagnostics; unsafe helpers relate their prohibited use.
+  Contexts are declaration/parameter masks, capped at 1024/project and reused
+  recursively. A mask-explosion source test proves diagnosed exhaustion.
+- P3 deep readonly remains compile-time capability: const views/formals cannot
+  thaw via var/type annotations/casts/returns. Completed child aliases and
+  independent reference-free value copies retain their existing semantics.
+- Shared IR Type/Places carry private construction capability/origins and
+  stage_begin storage. An independent must-dataflow CFG proof checks formal/owner
+  storage, active scope, readiness, helper calls, once-only marked initialization,
+  final field reads and commit. Malformed IR tests reject missing initialization,
+  unavailable reads, omitted stage, invalid origins/formals and attempts to replace
+  custom construction with legacy allocation. Existing internal allocation proofs
+  remain valid; no source path bypasses initialization.
+- Shared LLVM lowering uses target-aligned private payload storage, zeroed before
+  frame entry and each new loop construction. Precise roots describe actual mutable
+  staged field storage, including helper formals; staging pointers are never heap
+  roots. Existing expression/argument/return roots, O2 polls, failure cleanup and
+  module-owned DataLayout/debug fixes remain. Existing Runtime::construct_into,
+  Heap, ABI/bootstrap and hot-reload leases are reused without runtime changes.
+- Shared analyzed declarations expose construction masks and required field names,
+  retaining existing initializer/default spans and references. Compatibility and
+  tooling invalidation compare these facts. LSP constructor/helper navigation uses
+  original source identities; unsaved readiness errors invalidate stale queries,
+  and repair restores them. C1 conservative init/helper closure reload policy is
+  preserved; an unrelated compatible body can still reload with the same runtime.
+
+Added examples/managed_initialization and four suites: managed_initialization_source,
+managed_initialization_aot_normal, managed_initialization_aot_optimized and
+managed_initialization_cli. Inventory is **39**; all 35 prior suites remain. Only
+one obsolete feature-deferral assertion was replaced, with positive constructor
+execution. Existing direct-init, readonly, lifecycle, failure, native, GC, reload,
+small-stack and editor assertions remain. CMake factors the existing managed source
+AOT/CLI wiring into one reusable family function, preserving Phase 16 target names,
+runtime-only native links and Windows legacy_stdio_definitions dependency.
+
+The test-only ABI probe now optionally inspects actual Frame/Slot leaf storage at
+entry/leave/poll/commit, forwarding to the real ABI. It checks every nonnull leaf
+belongs to the actual heap, not staging bytes. Source stress observes 303 completed
+constructions and counter 213 before parent publication; budget-1 and forced GC
+are independent checks. Captured complete parent/child graphs survive analysis/code
+retirement then reclaim after handle release. No synthetic source IR or replacement
+collector/allocator was used. Completed child temporaries/returns survive recursive
+helpers, loops and O2. Body/default/argument/child failures, injected final commit
+OOM/bookkeeping failures and bootstrap failures preserve publication/output and
+balance roots; prior body effects remain, as approved.
+
+Deterministic source safepoint tests gate a worker after completed child allocation,
+request a real collection while the parent still has no identity, then release it
+into the actual poll. A separate final-commit gate admits a noncooperating Managed
+participant after body collections; the source's budget-1 allocation joins the
+collector and parks. The deliberate one-second rendezvous timeout must release
+both participants, report allocation failure, leave object count unchanged (no
+sweep/parent publication), unlink frames and recover on a subsequent invocation.
+No sleeps or iteration inflation establish overlap; cooperative park and epoch/
+request outcomes are asserted.
+
+### Corrections during focused verification
+
+An early build required the standard algorithm include for std::none_of. Initial
+new-harness checks exposed handle reads outside an Attachment/Managed scope and
+an overbroad caller-frame expectation for argument failure raised directly in entry.
+Those fixture issues were corrected without runtime/compiler changes or weakening
+meaningful source/frame assertions. The first deliberate-timeout fixture used the
+default source allocation budget, so its final commit was not a collecting caller;
+setting the explicit test runtime to budget 1 proves the intended joined-collection
+failure path. A normal poll alone is not asserted to propagate collector failure.
+Focused suites passed before full validation. Final independent-IR review added
+legacy-allocation and missing-formal-storage guards plus negative regressions; the
+**entire six-configuration matrix was rerun on those final sources**.
+
+### Final full Linux validation
+
+Fresh configure/build/test completed with **39/39 in every configuration**, 234
+suite executions in this final matrix:
+
+| LLVM 19.1.7 SDK | Debug | Release | RelWithDebInfo ASan/UBSan |
+| --- | --- | --- | --- |
+| Installed, RTTI ON | 39/39, 23.04 s | 39/39, 17.44 s | 39/39, 35.71 s |
+| Complete official Linux archive, RTTI OFF | 39/39, 18.50 s | 39/39, 13.75 s | 39/39, 34.65 s |
+
+Both SDKs were verified for exact llvm-config version 19.1.7, headers,
+libLLVMOrcJIT.a, LLVMConfig.cmake and RTTI. Every configure executes the real ORC
+SDK link/execution probe. Matching toolchains and the existing official no-RTTI ABI
+correction are intact; installed vptr instrumentation, ASan/UBSan error halting and
+leak detection remain. No sanitizer suppression or disabled assertion/test was added.
+
+For ci-debug, ci-release, ci-sanitizers, ci-official-debug, ci-official-release and
+ci-official-san, the actual commands were:
+
+```sh
+cmake -S . -B build/<tree>
+cmake --build build/<tree> -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+ctest --test-dir build/<tree> --output-on-failure -j4
+```
+
+Evidence: build/phase17-verification/validate.py, sdk.json, results.json, matrix.log
+and individual configure/build/test logs. initial-results.json and initial-matrix.log
+retain the earlier six green runs before final IR-proof refinements; final results
+above supersede those timings. Strict sanitizer execution ran outside the tracing
+sandbox so LeakSanitizer can perform its normal check.
+
+Additional final-source verification:
+
+- Both Debug SDKs: ctest -R '^(runtime_.*|managed_.*)$' --repeat until-fail:10
+  --output-on-failure -j4 passed all 15 selected suites ten times each
+  (50.08/42.97 s installed/official).
+- Both Debug SDKs: ulimit -s 1024; ctest -R
+  '^(frontend|managed_source|managed_initialization_source)$'
+  --repeat until-fail:5 --output-on-failure passed all three suites five times each
+  (69.40/59.25 s). Includes the unchanged bounded-layout semantic regression and
+  the new context-exhaustion and source construction proofs at a real 1 MiB limit.
+- Both strict sanitizer SDKs: ctest -R
+  '^(runtime_.*|managed_.*|frontend|reload|gc|native)$'
+  --repeat until-fail:3 --output-on-failure -j4 passed all 19 selected suites three
+  times each (37.65/28.93 s), including leaks and old architectural assertions.
+- Both Release SDKs: ctest -R '^(managed_source|managed_initialization_source)$'
+  --repeat until-fail:30 --output-on-failure passed both suites all 30 times
+  (154.58/143.77 s). These run normal/O2 JIT, deterministic overlap/timeout, roots,
+  failure injection and reload on every execution. extra.py, extra-results.json
+  and individual logs retain all 564 additional repeated suite executions.
+- Existing Release coordinator fixtures passed both SDKs. NativeSafe baseline
+  (1000 collections, one frozen object) mean/max: installed 0.129469/14.78 us,
+  official 0.168578/1.61 us. These fixture values are not production pause claims.
+- Runtime-only TSan: clang++-19 -std=c++20 -g -O1 -fsanitize=thread
+  -fno-omit-frame-pointer -Iinclude tests/runtime/coordination.cpp
+  src/runtime/coordination.cpp src/runtime/heap.cpp -pthread; run with
+  TSAN_OPTIONS=halt_on_error=1:exitcode=85 passed with no race report. This does
+  not instrument prebuilt LLVM/generated instructions or claim full JIT TSan.
+- Extension npm test passed; an explicit Node 24.19.0 spec-reporter run confirms
+  all four individual unit tests. npm run package passed, producing the eight-file
+  145.44 KB VSIX. Actual installed VS Code 1.141.0 integration passed trusted,
+  restricted and multi-root modes, native unsaved diagnostics/navigation, real
+  process termination/notification counts, restart and deactivation cleanup.
+  A final host run after the final native rebuild also passed. editor-unit.log,
+  editor-unit-detail.log, editor-package.log and editor-host-final.log retain evidence.
+  No extension files changed. VSCodium is unavailable locally; no VSCodium run is claimed.
+
+### Actual native source demonstration and delivery
+
+```sh
+build/ci-debug/voidc run examples/managed_initialization/main.void 10 --no-opt # 26
+build/ci-debug/voidc run examples/managed_initialization/main.void 10          # 26
+build/ci-debug/voidc emit examples/managed_initialization/main.void -o build/phase17-verification/managed-init.o
+clang++-19 build/phase17-verification/managed-init.o build/ci-debug/libvoid_runtime.a -pthread \
+  --ld-path=/usr/lib/llvm-19/bin/ld.lld -o build/phase17-verification/managed-init
+build/phase17-verification/managed-init 10                                  # 26
+build/ci-debug/voidc run examples/managed_initialization/stress.void 10       # 246
+```
+
+file identifies managed-init as a real x86-64 ELF executable with debug info;
+ldd shows only system C/C++ libraries, no LLVM dependency. This is actual parsed
+source emitted to a native object and independently linked, using the same shared
+lowering as ORC JIT. CLI suite separately executes eight fixtures × three inputs ×
+normal/O2 × JIT/AOT (96 executions) per configuration, including accurate failure
+traces without synthetic construction variant names. Additional local check:
+imported private managed init diagnoses VOID3003 at the constructor token, while
+an omitted numeric parameter default plus an independent value-field copy through
+a const staging alias returns 16 under normal/O2 JIT (visibility.log/defaults-results.json).
+
+Updated MANAGED_INITIALIZATION.md, approved proposal status/implementation record,
+INITIALIZATION, MANAGED_STRUCTS, VALUE_STRUCTS, GC_RUNTIME, shared analysis compatibility, source
+compiler, DECISIONS, KNOWN_ISSUES, Development Strategy, README and focused Bible
+clarification of the owner-approved managed contract. No broader language policy
+was finalized. Self-identity/self-links/escape in init, borrowed returns/rebinding,
+helper-assisted first initialization, reference-containing values, runtime defaults,
+fallible results/resources/deinit and unrelated features remain deferred. Next
+recommend designing reference-containing value capabilities/copy/readonly/root rules.
+
+The implementation is ready for owner review and hosted CI. All seven jobs must
+validate the 39-suite inventory after the owner pushes, particularly Windows
+MSVC/SDK linking and macOS ARM64 target layout/debug/O2 behavior, plus Debug editor
+runs on each platform. Local execution is Linux x86-64 only; hosted success is not
+claimed. The seven-job workflow, LLVM 19.1.7, runtime/GC implementation and strict
+settings are unchanged. No commits, pushes, branches or remote modifications.
+Final git diff --check and explicit whitespace checks of all new files passed.
+A parsed comparison with the Phase 16 CTest log confirms all 35 original names
+remain and exactly the four Phase 17 names were added. .github/workflows/ci.yml,
+src/runtime and editors/vscode have no diff.
+
+
+## Phase 17 managed custom initialization: design only, 13 October 2026
+
+The owner declares Phase 16 locked and reports Actions run #28 passed all seven
+jobs with 35 suites per configuration. This is owner-reported hosted evidence;
+no GitHub action was performed in this session. It supersedes older Phase 16
+pending-hosted wording below and in historical scope documents. No implementation
+of Phase 17 is authorized or included.
+
+Read the relevant Language Bible safe-default/identity/init rules, current
+initialization/managed/runtime guides and proposals, Development Strategy,
+DECISIONS, KNOWN_ISSUES and Work Log. Inspected the actual nominal/typed AST,
+constructor binding/default planning, readonly/effect analysis, Places/shared IR
+validation, LLVM root/layout/call/failure lowering, Heap/construct_into/ABI/bootstrap,
+reload dependencies, native/callback contracts and existing source/AOT tests.
+
+Key findings:
+
+- Managed init is deliberately rejected in validate_graph. Managed lowering stages
+  field operands then gc_construct; only the value branch invokes init. Removing
+  the diagnostic would not create a safe managed initializer path.
+- Value init aliases aggregate storage; ordinary managed receiver ABI/root slots
+  represent heap references. Passing staging bytes through that ABI or changing a
+  managed nominal to a source aggregate defeats actual IR/root invariants.
+- Runtime::construct_into already provides a reusable final commit: collect/poll
+  before the lock, complete fallible Heap work, copy prepared bytes, root publication
+  last. It must not execute initializer code under its lock or accept a partial
+  parent reference. The existing runtime has no pending-object identity registry.
+- Existing readonly retained/returned origins flow through child fields. They
+  preserve deep readonly but cannot alone distinguish escaping a staged parent
+  from returning a completed child. Construction eligibility also needs identity,
+  rebinding, whole-view escape and passing-category facts in the same semantic model.
+- Safe defaults exist for scalar/value/nullable fields. Non-nullable managed fields
+  have no implicit allocation/default. C1's all-fields-defaultable rule cannot simply
+  be copied to useful managed init with required reference fields.
+- A private root containing a real unfinished parent still violates literal P4.
+  Calling a default-filled parent complete before init or suppressing GC is not a fix.
+
+Created MANAGED_INITIALIZATION_PROPOSAL.md recommending S1: compiler-only staged
+construction views, precise roots for completed child references, inferred safe
+helper/method contexts, then existing complete-object commit. No parent managed
+identity exists during the body. The proposal evaluates privately rooted identity
+(which requires explicit P4 revision) and symbolic self-links/graph commit (larger
+work), plus unsafe shortcut alternatives.
+
+MI1–MI7 identify the approval package. Major compromises: whole-self identity,
+self-links/escape, borrowed returns and construction-view rebinding are unavailable
+in this slice; helper calls need full field readiness; non-nullable fields may be
+privately unavailable until their first proven assignment, with all normal exits
+checked. This is an explicit proposed managed-only rule, not a silent C1 change.
+Parameter-only binding/order/default rules extend C1; explicit managed construction,
+P3 readonly, nested value construction and existing failure/side-effect semantics
+remain. Final allocation follows the body; prior effects are not transactional.
+
+The document specifies shared storage/passing categories, independently verified
+IR lifecycle/readiness, current-field root mapping, finite private helper contexts
+through one lowering pipeline, failure cleanup, native boundaries, code leases,
+reload/tooling contracts, implementation order and seven-platform-job acceptance
+gates. It explicitly requests eventual replacement only of the obsolete managed-init
+feature-deferred assertion with positive execution; no test was changed now.
+
+Focused baseline verification (unchanged existing binaries, no configure/build):
+
+    ctest --test-dir build/ci-debug -R '^(managed_.*|frontend|runtime_generated|runtime_failures|reload|lsp_protocol|initialization_cli)$' --output-on-failure -j2
+    ctest --test-dir build/ci-official-debug -R '^(managed_.*|frontend|runtime_generated|runtime_failures|reload|lsp_protocol|initialization_cli)$' --output-on-failure -j2
+
+Both passed 10/10 selected suites: installed 9.14 s, official 8.32 s. This includes
+normal/O2 parsed managed source/private linked AOT/CLI, value initializer CLI/frontend,
+generated runtime roots, deterministic allocation failures, reload and LSP.
+Both SDK llvm-config executables still report 19.1.7. CTest inventory remains 35.
+These are focused Phase 16 baseline checks, not verification of unimplemented S1;
+no new full Release/sanitizer/editor or hosted run is claimed for design-only work.
+
+Only this Work Log and the new proposal changed. Compiler/runtime/LLVM configuration,
+tests, Language Bible and the seven-runner/90-minute CI workflow remain untouched.
+git diff --check passed. No commits, pushes, branches or remote modifications.
+Stop here for architectural review/approval before any Phase 17 implementation.
+
 ## Phase 16 managed source implementation, 12 October 2026
 
 The owner approved the recommended P1–P7 scope, explicitly P3 deep readonly views

@@ -362,6 +362,35 @@ def managed_structs(executable, root):
     print("managed structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed")
 
 
+def managed_initialization(executable, root):
+    root.mkdir(parents=True, exist_ok=True)
+    entry, worker = root / "main.void", root / "types.void"
+    types = "struct child:\n    value: i32\nstruct parent:\n    child: child\nfunc helper(p: parent) -> i32:\n    return p.child.value\nfunc (p parent) init(c: child):\n    p.child = c\n    p.child.value += helper(p)\n"
+    text = 'use "./types.void" as types\nfunc entry(value: i32) -> i32:\n    const p = types.parent(c = types.child(value = value))\n    return p.child.value\n'
+    entry.write_bytes(text.encode("utf-8")); worker.write_bytes(types.encode("utf-8"))
+    uri, wuri = entry.as_uri(), worker.as_uri()
+    query = {"textDocument": {"uri": uri}, "position": source_position(text, "parent(c")}
+    with Client(executable, entry) as c:
+        assert all(not n["diagnostics"] for n in c.initialize())
+        response, _ = c.request("textDocument/definition", query)
+        assert response["result"]["uri"] == wuri and response["result"]["range"]["start"] == source_position(types, "init(c"), response
+        response, _ = c.request("textDocument/references", {**query, "context": {"includeDeclaration": False}})
+        assert len(response["result"]) == 1 and response["result"][0]["uri"] == uri, response
+        helper = {"textDocument": {"uri": wuri}, "position": source_position(types, "helper(p)")}
+        assert c.request("textDocument/definition", helper)[0]["result"]["range"]["start"] == source_position(types, "helper(p:"), "synthetic helper variant leaked into navigation"
+        bad = types.replace("    p.child = c\n", "")
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": wuri, "languageId": "void", "version": 1, "text": bad}})
+        notes = diagnostics(c.sync())
+        assert any("initialized" in d["message"] for d in notes[wuri]["diagnostics"]), notes
+        assert c.request("textDocument/definition", query)[0]["result"] is None
+        assert c.request("textDocument/references", {**query, "context": {"includeDeclaration": True}})[0]["result"] == []
+        c.notify("textDocument/didChange", {"textDocument": {"uri": wuri, "version": 2}, "contentChanges": [{"text": types}]})
+        assert all(not n["diagnostics"] for n in c.sync())
+        assert c.request("textDocument/definition", query)[0]["result"]["uri"] == wuri
+        c.shutdown()
+    print("managed initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed")
+
+
 if __name__ == "__main__":
     executable = pathlib.Path(sys.argv[1]).resolve()
     # Unicode physical root names work without changing the ASCII VFS policy.
@@ -374,3 +403,5 @@ if __name__ == "__main__":
     initialization(executable, root / "initialization project")
 
     managed_structs(executable, root / "managed struct project")
+
+    managed_initialization(executable, root / "managed initialization project")

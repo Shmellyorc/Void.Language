@@ -602,7 +602,17 @@ INITIALIZATION_PROPOSAL.md, superseding that deferral for supported value struct
 See INITIALIZATION.md for parameter-only constructor binding, pure defaults,
 recursive nested construction, visibility, successful publication and reload
 contracts. No-init types retain Phase 12 named-field construction. Fallible,
-resource and managed construction remain separate design gates.
+resource and managed construction remain separate design gates at Phase 14.
+Phase 17 subsequently approved S1 + MI1–MI7 for managed custom initialization:
+private construction views have no parent identity until successful complete commit;
+direct required references need definite assignment before use/normal exit, and
+whole-view helper calls require all fields ready plus proven nonescape. C1 argument/
+default/visibility rules and P3 readonly views remain. Whole-self identity, self-links,
+rebinding and escape inside init are deferred, not permanently prohibited. Effects
+on completed objects are not rolled back if body/final allocation fails. Managed
+nonnullable bindings still require explicit construction. See
+[MANAGED_INITIALIZATION.md](MANAGED_INITIALIZATION.md) for the approved implemented
+boundary; broader fallible/resource behavior remains a separate design gate.
 
 ## 17. Predictable resource cleanup: `deinit()`, `with`, and `defer` [AGREED]
 

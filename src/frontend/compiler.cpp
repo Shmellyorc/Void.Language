@@ -225,7 +225,14 @@ struct Parameter {
     std::string default_syntax = {};
     std::size_t default_begin = 0, default_end = 0;
 };
+struct ConstructionContext {
+    std::set<unsigned> parameters;
+    std::map<unsigned,unsigned> aliases;
+    std::map<const Expr*,std::set<unsigned>> calls;
+};
 struct Function {
+    std::map<std::set<unsigned>,ConstructionContext> construction_contexts;
+    std::string construction_contract;
     Token token;
     bool file_private = false, parse_failed = false;
     std::string symbol, visibility = "public";
@@ -872,7 +879,7 @@ class Semantics {
                 e.field_indexes.push_back(index); expect(expression(*e.parts[n],field->type),field->type,e.parts[n]->token);
             }
         }
-        if (structure.definition->managed) for (unsigned n=0;n<structure.fields.size();++n) {
+        if (structure.definition->managed && !structure.initializer) for (unsigned n=0;n<structure.fields.size();++n) {
             Type t = *structure.fields[n].annotation;
             if (t.kind == Type::managed_ref && !t.nullable && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end())
                 error(source,e.token,Code::argument_count,"A non-nullable reference field requires an explicit value: " + structure.fields[n].name + ".",{},{{span(owner.source,structure.fields[n].token),"Required field declared here."}});
@@ -1288,6 +1295,7 @@ class Lowering {
     const SourceFile& source;
     ir::Function output;
     std::optional<unsigned> current;
+    const ConstructionContext* context=nullptr;
     std::vector<std::pair<unsigned, unsigned>> loops; // continue, break destinations
     unsigned block() {
         auto id = static_cast<unsigned>(output.blocks.size());
@@ -1320,8 +1328,16 @@ class Lowering {
         auto child = extract(aggregate,path[depth],token);
         return insert(aggregate,replace_path(child,value,path,depth+1,token),path[depth],token);
     }
+    Type expression_type(const Expr& e) const {
+        return e.kind==Expr::Kind::name ? output.locals.at(e.slot) : e.type;
+    }
     unsigned snapshot(unsigned value, Type t, const Token& token) {
         auto slot=static_cast<unsigned>(output.locals.size()); output.locals.push_back(t);
+        if (t.construction) {
+            const auto& instruction=output.blocks[*current].instructions.at(value);
+            if (instruction.op!=ir::Op::load) throw std::logic_error("construction snapshot requires a selected view");
+            output.construction_origins[slot]=output.construction_origins.at(instruction.a);
+        }
         emit({ir::Op::store,slot,value},token); return slot;
     }
     unsigned read_place(const ir::Place& place, const Token& token) {
@@ -1346,12 +1362,12 @@ class Lowering {
         if (e.kind==Expr::Kind::name) return {e.slot,{}};
         if (e.kind==Expr::Kind::field) {
             if (e.parts[0]->type.kind==Type::managed_ref) {
-                auto slot=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);
+                auto slot=snapshot(expression(*e.parts[0]),expression_type(*e.parts[0]),e.token);
                 return {slot,{e.slot}};
             }
             auto parent=place(*e.parts[0]); parent.fields.push_back(e.slot); return parent;
         }
-        auto slot=snapshot(expression(e),e.type,e.token); return {slot,{}};
+        auto slot=snapshot(expression(e),expression_type(e),e.token); return {slot,{}};
     }
     void write_place(const ir::Place& place, unsigned value, const Token& token) {
         auto t=output.locals.at(place.slot);
@@ -1382,7 +1398,7 @@ class Lowering {
                 auto argument = static_cast<unsigned>(output.locals.size()); output.locals.push_back(part->type);
                 auto value = expression(*part); emit({ir::Op::store,argument,value},part->token); arguments.push_back(argument);
             }
-            if (e.type.kind==Type::managed_ref) {
+            if (e.type.kind==Type::managed_ref && e.initializer.empty()) {
                 std::vector<unsigned> fields;
                 for (unsigned field=0;field<e.type.definition->fields.size();++field) {
                     Type t=e.type.definition->fields[field].type;
@@ -1395,16 +1411,29 @@ class Lowering {
                 for (auto field:fields) i.arguments.push_back(emit({ir::Op::load,field},e.token));
                 return emit(i,e.token);
             }
-            auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(e.type);
-            auto initial = constant(e.type,e.aggregate_value,e.token); emit({ir::Op::store,slot,initial},e.token);
+            bool staged=e.type.kind==Type::managed_ref;
+            auto storage_type=e.type; storage_type.construction=staged;
+            auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(storage_type);
+            unsigned initial;
+            if (staged) {
+                output.construction_origins[slot]=slot;
+                ir::Instruction begin{ir::Op::stage_begin,slot}; begin.type=storage_type; initial=emit(begin,e.token);
+            } else initial=constant(e.type,e.aggregate_value,e.token);
+            emit({ir::Op::store,slot,initial},e.token);
             for (unsigned field=0;field<e.type.definition->fields.size();++field) {
                 std::optional<unsigned> value;
+                if (staged) {
+                    Type field_type=e.type.definition->fields[field].type;
+                    if (field_type.kind==Type::managed_ref && !field_type.nullable) continue;
+                    value=constant(field_type,e.aggregate_value.fields.at(field),e.token);
+                }
                 if (e.initializer.empty()) for (unsigned n=0;n<arguments.size();++n)
                     if (e.field_indexes[n]==field) value = emit({ir::Op::load,arguments[n]},e.token);
                 for (const auto& child : e.omitted) if (child->slot==field) value = expression(*child);
                 if (value) {
                     auto aggregate = emit({ir::Op::load,slot},e.token);
-                    auto updated = insert(aggregate,*value,field,e.token); emit({ir::Op::store,slot,updated},e.token);
+                    if (staged) { ir::Instruction write{ir::Op::gc_write,aggregate,*value}; write.immediate=field; emit(write,e.token); }
+                    else { auto updated = insert(aggregate,*value,field,e.token); emit({ir::Op::store,slot,updated},e.token); }
                 }
             }
             if (!e.initializer.empty()) {
@@ -1412,6 +1441,15 @@ class Lowering {
                 call.arguments.resize(arguments.size());
                 for (unsigned n=0;n<arguments.size();++n) call.arguments[e.field_indexes[n]]=emit({ir::Op::load,arguments[n]},e.token);
                 emit(call,e.token);
+            }
+            if (staged) {
+                ir::Instruction commit{ir::Op::gc_construct}; commit.type=e.type; commit.receiver=ir::Place{slot,{}};
+                for (unsigned field=0;field<e.type.definition->fields.size();++field) {
+                    auto view=emit({ir::Op::load,slot},e.token);
+                    ir::Instruction read{ir::Op::gc_read,view}; read.immediate=field;
+                    commit.arguments.push_back(emit(read,e.token));
+                }
+                return emit(commit,e.token);
             }
             return emit({ir::Op::load,slot},e.token);
         }
@@ -1422,9 +1460,9 @@ class Lowering {
             if (e.kind == K::method_call) {
                 first = 1;
                 if (e.parts[0]->type.kind==Type::managed_ref) {
-                    auto slot=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token); receiver=ir::Place{slot,{}};
+                    auto slot=snapshot(expression(*e.parts[0]),expression_type(*e.parts[0]),e.token); receiver=ir::Place{slot,{}};
                 } else if (e.receiver_addressable) receiver=place(*e.parts[0]);
-                else { auto slot=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token); receiver=ir::Place{slot,{}}; }
+                else { auto slot=snapshot(expression(*e.parts[0]),expression_type(*e.parts[0]),e.token); receiver=ir::Place{slot,{}}; }
 
             }
             // Materialize each argument in a slot: later short-circuit arguments
@@ -1432,10 +1470,17 @@ class Lowering {
             std::vector<unsigned> slots;
             for (std::size_t n = first; n < e.parts.size(); ++n) {
                 const auto& arg = e.parts[n];
-                auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(arg->type);
-                auto value = expression(*arg); emit({ir::Op::store, slot, value}, arg->token); slots.push_back(slot);
+                auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(expression_type(*arg));
+                auto value = expression(*arg);
+                if (expression_type(*arg).construction) {
+                    const auto& from=output.blocks[*current].instructions.at(value);
+                    output.construction_origins[slot]=output.construction_origins.at(from.a);
+                }
+                emit({ir::Op::store, slot, value}, arg->token); slots.push_back(slot);
             }
             ir::Instruction i{ir::Op::call}; i.callee = e.target; i.receiver = receiver;
+            if (context) if (auto found=context->calls.find(&e);found!=context->calls.end())
+                i.callee=ir::construction_name(e.target,{found->second.begin(),found->second.end()});
             for (auto slot : slots) i.arguments.push_back(emit({ir::Op::load, slot}, e.token));
             return emit(i, e.token);
         }
@@ -1517,7 +1562,8 @@ class Lowering {
     }
 public:
     explicit Lowering(const SourceFile& s) : source(s) {}
-    ir::Function lower(const Function& f) {
+    ir::Function lower(const Function& f, const ConstructionContext* construction=nullptr) {
+        context=construction;
         output = {}; output.name = f.symbol; output.source_name = f.token.text; output.source = source.location(f.token.offset);
         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
         output.receiver = f.receiver.has_value(); output.receiver_mutates = f.receiver_mutates; output.initializer = f.initializer;
@@ -1528,6 +1574,12 @@ public:
         for (std::size_t n = 0; n < f.parameters.size(); ++n) {
             const auto& p = f.parameters[n]; output.parameters.push_back(p.type);
             auto value = emit({ir::Op::argument, static_cast<unsigned>(n + (f.receiver ? 1 : 0))}, p.token); emit({ir::Op::store, p.slot, value}, p.token);
+        }
+        if (context) {
+            output.construction_origins=context->aliases;
+            for (const auto& [slot,origin]:context->aliases) output.locals.at(slot).construction=true;
+            for (auto index:context->parameters) output.parameters.at(index).construction=true;
+            if (!f.initializer) output.name=ir::construction_name(f.symbol,{context->parameters.begin(),context->parameters.end()});
         }
         sequence(f.body);
         if (current) terminate({ir::Terminator::Kind::return_void}); // Only reachable for checked no-result functions.
@@ -1724,6 +1776,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
     }
 }
 #include "capabilities.inc"
+#include "construction.inc"
 void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics) {
     auto arena = std::make_shared<ir::TypeArena>();
     for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
@@ -1852,7 +1905,6 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 if (!unit->structure_names.contains(t.definition->name) || unit->structure_names.at(t.definition->name)->definition != t.definition)
                     error(unit->source,f.receiver->token,Code::receiver,"Methods must be declared in their value type's owning module; extension methods are deferred.");
                 f.initializer = f.token.text == "init";
-                if (f.initializer && t.kind==Type::managed_ref) error(unit->source,f.token,Code::initializer_deferred,"Custom managed initialization is deferred; use named-field construction.");
                 if (f.token.text == "deinit") error(unit->source,f.token,Code::initializer_deferred,"Resource lifecycle deinit is not implemented.");
                 if (f.initializer && f.result != Type::none) error(unit->source,f.token,Code::type_mismatch,"An initializer must not declare a result; fallible construction is deferred.");
                 for (const auto& field : t.definition->fields) if (field.name == f.token.text)
@@ -1992,6 +2044,8 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     diagnostics.finish();
     analyze_capabilities(units,diagnostics);
     diagnostics.finish();
+    analyze_construction(units,diagnostics);
+    diagnostics.finish();
 }
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
     ir::Module module;
@@ -2001,8 +2055,14 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
     for (auto& [id, unit] : units) {
         Lowering lowering(unit->source);
         for (const auto& f : unit->functions) {
-            auto lowered = lowering.lower(f); lowered.module_identity = id;
-            module.functions.push_back(std::move(lowered));
+            if (!f.initializer || f.receiver->type.kind!=Type::managed_ref) {
+                auto lowered = lowering.lower(f); lowered.module_identity = id;
+                module.functions.push_back(std::move(lowered));
+            }
+            for (const auto& [mask,context]:f.construction_contexts) {
+                auto lowered=lowering.lower(f,&context); lowered.module_identity=id;
+                module.functions.push_back(std::move(lowered));
+            }
         }
     }
     ir::validate(module); return module;
@@ -2027,6 +2087,11 @@ struct AnalysisAccess {
             for (auto t : d.parameters) field(result->contract_, t.kind == Type::aggregate ? t.definition->identity : ir::type_name(t));
             field(result->contract_,d.receiver.kind == Type::none ? "" : ir::type_name(d.receiver));
             field(result->contract_,d.capability_contract);
+            for (const auto& mask:d.construction_parameters) {
+                field(result->contract_,"construction-context");
+                for (auto parameter:mask) field(result->contract_,std::to_string(parameter));
+            }
+            for (const auto& name:d.required_initialization_fields) field(result->contract_,name);
             field(result->contract_,d.receiver_mutates ? "mutating" : "nonmutating");
             field(result->contract_,d.initialization_contract);
             if (d.kind != AnalyzedDeclaration::Kind::function && d.kind != AnalyzedDeclaration::Kind::receiver_method && d.kind != AnalyzedDeclaration::Kind::initializer) {
@@ -2107,6 +2172,13 @@ struct AnalysisAccess {
                 if (f.receiver) { method_record.owner = f.receiver->type.definition->identity; method_record.receiver = f.receiver->type; method_record.receiver_mutates = f.receiver_mutates; }
                 method_record.initialization_contract=f.initialization_contract;
                 method_record.capability_contract=f.capability_contract;
+                for (const auto& [mask,context]:f.construction_contexts)
+                    method_record.construction_parameters.emplace_back(mask.begin(),mask.end());
+                if (f.initializer && f.receiver->type.kind==Type::managed_ref)
+                    for (const auto& member:f.receiver->type.definition->fields) {
+                        Type t=member.type;
+                        if (t.kind==Type::managed_ref && !t.nullable) method_record.required_initialization_fields.push_back(member.name);
+                    }
                 if (f.initializer) for (const auto& p : f.parameters) {
                     AnalyzedParameter parameter{p.token.text,p.type,location(p.token)};
                     if (p.default_expression) { auto range=location(p.default_expression->token); range.begin=p.default_begin; range.end=p.default_end; parameter.default_source=std::move(range); }

@@ -167,47 +167,49 @@ if(BUILD_TESTING)
   # boundaries, with no production hooks or alternate allocator/code generator.
   add_library(void_managed_test_abi OBJECT src/runtime/abi.cpp)
   target_link_libraries(void_managed_test_abi PRIVATE void_options Threads::Threads)
-  target_compile_definitions(void_managed_test_abi PRIVATE vd_gc_poll=vd_gc_real_poll vd_gc_construct=vd_gc_real_construct)
-  add_executable(void_managed_tests tests/managed/tests.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
-  target_link_libraries(void_managed_tests PRIVATE void_llvm)
-  add_test(NAME managed_source COMMAND void_managed_tests "${PROJECT_SOURCE_DIR}")
-  set_tests_properties(managed_source PROPERTIES TIMEOUT 180)
-  file(GLOB managed_sources CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/examples/managed_structs/*.void")
-  foreach(mode normal optimized)
-    set(flags)
-    if(mode STREQUAL "normal")
-      set(flags --no-opt)
-    endif()
-    set(managed_library "${CMAKE_CURRENT_BINARY_DIR}/managed-library-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
-    add_custom_command(OUTPUT "${managed_library}"
-      COMMAND void_managed_tests --emit-library "${PROJECT_SOURCE_DIR}/examples/managed_structs/main.void" "${managed_library}" "${mode}"
-      DEPENDS void_managed_tests ${managed_sources} VERBATIM)
-    set_source_files_properties("${managed_library}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
-    add_executable(void_managed_aot_${mode} tests/managed/aot.cpp tests/managed/probe.cpp "${managed_library}" $<TARGET_OBJECTS:void_managed_test_abi>)
-    target_link_libraries(void_managed_aot_${mode} PRIVATE void_runtime)
-    add_test(NAME managed_aot_${mode} COMMAND void_managed_aot_${mode})
-    set_tests_properties(managed_aot_${mode} PROPERTIES TIMEOUT 180)
-    foreach(program main handoffs order imports numeric null_failure)
-      set(managed_object "${CMAKE_CURRENT_BINARY_DIR}/managed-cli-${program}-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
-      add_custom_command(OUTPUT "${managed_object}"
-        COMMAND voidc emit "${PROJECT_SOURCE_DIR}/examples/managed_structs/${program}.void" -o "${managed_object}" ${flags}
-        DEPENDS voidc ${managed_sources} VERBATIM)
-      set_source_files_properties("${managed_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
-      add_executable(void_managed_cli_${program}_${mode} "${managed_object}")
-      set_target_properties(void_managed_cli_${program}_${mode} PROPERTIES LINKER_LANGUAGE CXX)
-      target_link_libraries(void_managed_cli_${program}_${mode} PRIVATE void_runtime)
-      if(WIN32)
-        # LLVM's CLI adapter calls the real printf symbol, just like the existing
-        # native_link.cmake proofs. Use the configured MSVC SDK LIB environment.
-        target_link_libraries(void_managed_cli_${program}_${mode} PRIVATE legacy_stdio_definitions)
+  target_compile_definitions(void_managed_test_abi PRIVATE vd_gc_poll=vd_gc_real_poll vd_gc_construct=vd_gc_real_construct vd_gc_frame_enter=vd_gc_real_frame_enter vd_gc_frame_leave=vd_gc_real_frame_leave)
+  function(void_managed_source_tests family folder fixture programs)
+    add_executable(void_${family}_tests tests/${family}/tests.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+    target_link_libraries(void_${family}_tests PRIVATE void_llvm)
+    add_test(NAME ${family}_source COMMAND void_${family}_tests "${PROJECT_SOURCE_DIR}")
+    set_tests_properties(${family}_source PROPERTIES TIMEOUT 180)
+    file(GLOB source_files CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/examples/${folder}/*.void")
+    foreach(mode normal optimized)
+      set(flags)
+      if(mode STREQUAL "normal")
+        set(flags --no-opt)
       endif()
+      set(library_object "${CMAKE_CURRENT_BINARY_DIR}/${family}-library-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+      add_custom_command(OUTPUT "${library_object}"
+        COMMAND void_${family}_tests --emit-library "${PROJECT_SOURCE_DIR}/examples/${folder}/${fixture}.void" "${library_object}" "${mode}"
+        DEPENDS void_${family}_tests ${source_files} VERBATIM)
+      set_source_files_properties("${library_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+      add_executable(void_${family}_aot_${mode} tests/${family}/aot.cpp tests/managed/probe.cpp "${library_object}" $<TARGET_OBJECTS:void_managed_test_abi>)
+      target_link_libraries(void_${family}_aot_${mode} PRIVATE void_runtime)
+      add_test(NAME ${family}_aot_${mode} COMMAND void_${family}_aot_${mode})
+      set_tests_properties(${family}_aot_${mode} PROPERTIES TIMEOUT 180)
+      foreach(program ${programs})
+        set(object "${CMAKE_CURRENT_BINARY_DIR}/${family}-cli-${program}-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+        add_custom_command(OUTPUT "${object}"
+          COMMAND voidc emit "${PROJECT_SOURCE_DIR}/examples/${folder}/${program}.void" -o "${object}" ${flags}
+          DEPENDS voidc ${source_files} VERBATIM)
+        set_source_files_properties("${object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+        add_executable(void_${family}_cli_${program}_${mode} "${object}")
+        set_target_properties(void_${family}_cli_${program}_${mode} PROPERTIES LINKER_LANGUAGE CXX)
+        target_link_libraries(void_${family}_cli_${program}_${mode} PRIVATE void_runtime)
+        if(WIN32)
+          target_link_libraries(void_${family}_cli_${program}_${mode} PRIVATE legacy_stdio_definitions)
+        endif()
+      endforeach()
     endforeach()
-  endforeach()
-  add_test(NAME managed_cli COMMAND "${CMAKE_COMMAND}"
-    "-DCOMPILER=$<TARGET_FILE:voidc>" "-DROOT=${PROJECT_SOURCE_DIR}"
-    "-DBIN=$<TARGET_FILE_DIR:voidc>" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
-    -P "${PROJECT_SOURCE_DIR}/tests/integration/managed.cmake")
-  set_tests_properties(managed_cli PROPERTIES TIMEOUT 180)
+    add_test(NAME ${family}_cli COMMAND "${CMAKE_COMMAND}"
+      "-DCOMPILER=$<TARGET_FILE:voidc>" "-DROOT=${PROJECT_SOURCE_DIR}"
+      "-DBIN=$<TARGET_FILE_DIR:voidc>" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
+      -P "${PROJECT_SOURCE_DIR}/tests/integration/${family}.cmake")
+    set_tests_properties(${family}_cli PROPERTIES TIMEOUT 180)
+  endfunction()
+  void_managed_source_tests(managed managed_structs main "main;handoffs;order;imports;numeric;null_failure")
+  void_managed_source_tests(managed_initialization managed_initialization stress "main;stress;numeric;imports;failure;fail_default;fail_argument;fail_child")
   add_executable(void_runtime_callbacks tests/runtime/callbacks.cpp)
   target_link_libraries(void_runtime_callbacks PRIVATE void_llvm)
   add_test(NAME runtime_callbacks COMMAND void_runtime_callbacks)

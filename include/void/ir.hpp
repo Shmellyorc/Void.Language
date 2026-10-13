@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <memory>
 #include <optional>
+#include <map>
 namespace vd { class ValidatedAnalysis; }
 #include <string>
 #include <vector>
@@ -15,6 +16,7 @@ struct Type {
     enum Kind { i32, boolean, none, i8, i16, i64, u8, u16, u32, u64, f32, f64, aggregate, unresolved, invalid, managed_ref, null_value };
     Kind kind = i32;
     bool nullable = false, readonly = false;
+    bool construction = false; // Private place capability; never a managed reference value.
     std::shared_ptr<const ValueType> definition;
     Type(Kind k = i32) : kind(k) {}
     explicit Type(std::shared_ptr<const ValueType> d, Kind k = aggregate);
@@ -22,6 +24,7 @@ struct Type {
     friend bool operator<(const Type& a, const Type& b) {
         if (a.kind != b.kind) return a.kind < b.kind;
         if (a.nullable!=b.nullable) return a.nullable<b.nullable;
+        if (a.construction!=b.construction) return a.construction<b.construction;
         return key(a) < key(b);
     }
     static std::string key(const Type&);
@@ -48,14 +51,14 @@ struct ValueType {
 struct TypeArena { std::vector<std::shared_ptr<const ValueType>> definitions; };
 inline std::string Type::key(const Type& t) { return t.definition ? t.definition->identity : std::string{}; }
 inline bool operator==(const Type& a, const Type& b) {
-    return a.kind == b.kind && a.nullable == b.nullable && (a.kind != Type::aggregate && a.kind != Type::unresolved && a.kind != Type::managed_ref ? true :
+    return a.kind == b.kind && a.nullable == b.nullable && a.construction == b.construction && (a.kind != Type::aggregate && a.kind != Type::unresolved && a.kind != Type::managed_ref ? true :
         a.definition && b.definition && a.definition->identity == b.definition->identity);
 }
 struct ConstantValue { std::uint64_t bits = 0; std::vector<ConstantValue> fields; };
 std::string type_name(Type type);
 enum class Op { argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
-    gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive };
+    stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive };
 // A validated local aggregate storage path; never a source-visible reference.
 struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
 struct Instruction {
@@ -82,6 +85,7 @@ struct Function {
     std::vector<Type> locals = {};
     bool initializer = false;
     bool receiver = false, receiver_mutates = false; // First parameter aliases local slot zero.
+    std::map<unsigned,unsigned> construction_origins = {}; // View slot -> owning slot/formal.
     std::string source_name = {}, module_identity = {}; // Empty for legacy hand-built proofs.
 };
 struct Module {
@@ -94,6 +98,7 @@ struct Module {
     std::string constant_contract = {}; // Exact canonical const declarations.
     bool coordinated = false; // Requires a runtime owner; inferred for managed source.
 };
+std::string construction_name(const std::string& symbol, const std::vector<unsigned>& parameters);
 using InstructionTypes = std::vector<std::vector<std::vector<Type>>>;
 void validate(const Module& module, InstructionTypes* results = nullptr);
 Module architecture_proof(std::int32_t answer = 42);

@@ -1,0 +1,34 @@
+struct record:
+    a: i8 = -8
+    b: u8 = 250
+    c: i16 = -1000
+    d: u16 = 65000
+    e: i32
+    f: u32 = 1000
+    g: i64 = 123
+    h: u64 = 18446744073709551615
+    i: f32 = 0.5
+    j: f64 = 2.5
+    enabled: bool = true
+    next: record?
+
+func identity(r: record) -> record:
+    return r
+
+func (r record) init(value: i32):
+    r.a += 1
+    r.b += 10
+    r.c += 1
+    r.d += 1000
+    r.e = value
+    r.f += 1
+    r.h += 1
+    r.i += 0.5
+    r.j += 0.5
+
+func entry(value: i32) -> i32:
+    var r = record(value)
+    var alias = identity(r)
+    if alias == r and alias.enabled:
+        return (r.a as i32) + (r.b as i32) + (r.c as i32) + (r.d as i32) + r.e + (r.f as i32) + (r.g as i32) + (r.h as i32) + (r.i as i32) + (r.j as i32)
+    return -999

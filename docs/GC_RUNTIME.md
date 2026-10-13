@@ -2,7 +2,9 @@
 
 Phase 16 integration: [MANAGED_STRUCTS.md](MANAGED_STRUCTS.md) describes the now
 implemented managed-source boundary. Earlier phase-only exclusions below remain
-historical; custom managed init and reference-containing source values are deferred.
+historical. Phase 17 [managed initialization](MANAGED_INITIALIZATION.md) uses
+compiler-checked staged field roots and the existing complete-object commit; the
+runtime implementation is unchanged. Reference-containing source values remain deferred.
 
 This implements the owner-approved G1–G6 in `GC_RUNTIME_PROPOSAL.md`. It is an
 internal runtime/compiler foundation, not source-level managed `struct` support

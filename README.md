@@ -5,7 +5,7 @@ This repository now compiles graphs of actual `.void` files through one frontend
 semantic model, backend-independent IR, and shared LLVM 19.1.7 AOT/JIT lowering.
 The implemented subset supports typed functions, all ten exact-width numeric types,
 contextual literals, checked numeric `as`, bool expressions, local variables,
-conditionals, `for` loops, readonly/compile-time constants, numeric/bool value structs with custom initialization, managed structs with receiver methods, and source-first
+conditionals, `for` loops, readonly/compile-time constants, numeric/bool value structs with custom initialization, managed structs with receiver methods and custom initialization, and source-first
 compile/runtime diagnostics. Compile-time errors now include stable codes, ranges,
 related declarations and recovery across independent errors. Cooperative GC roots/thread coordination, leased function
 replacement, and native C interoperability retain their architectural regression proofs.
@@ -213,8 +213,8 @@ Visual Studio DIA SDK (`VSINSTALLDIR`); an explicit real
 Seven independent runners execute Ubuntu Debug/Release/Sanitizers, Windows
 Debug/Release and macOS ARM64 Debug/Release. Each runs the full CTest inventory;
 Debug jobs also test/package the extension and run real editor integration. The
-owner reports Phase 15 and the seven-runner refactor passed run #27. Phase 16
-requires a new hosted run after owner review and push.
+owner reports Phase 16 passed all seven jobs in run #28. Phase 17 extends the
+inventory to 39 suites and requires a new hosted run after owner review and push.
 See [verified commands and results](docs/WORK_LOG.md).
 
 ## Continue development
@@ -228,8 +228,9 @@ Read [the Language Bible](docs/LANGUAGE_BIBLE.md),
 [known issues](docs/KNOWN_ISSUES.md).
 The language server and extension connect immutable document sessions to real LSP
 clients. Managed source now uses the coordinated runtime. The next recommended
-language design work is managed custom initialization and reference-containing
-value capabilities; see the approved managed-source scope before extending either.
+language design work is reference-containing value capabilities. Custom managed
+initialization now uses the approved staged construction contract; see
+[managed initialization](docs/MANAGED_INITIALIZATION.md) before extending it.
 
 ## Structured compiler diagnostics
 
@@ -343,3 +344,26 @@ build/ci-debug/voidc run examples/initialization/main.void 10 --no-opt
 build/ci-debug/voidc run examples/initialization/main.void 10
 # Both return 166 from real imported source; native object/link commands are documented.
 ```
+
+
+## Managed custom initialization
+
+Actual source in `examples/managed_initialization/main.void` uses initializer
+arguments/defaults, a required managed child, nested value initialization and
+safe receiver helpers. Both normal and optimized JIT return 26 for input 10:
+
+```sh
+build/ci-debug/voidc run examples/managed_initialization/main.void 10 --no-opt
+build/ci-debug/voidc run examples/managed_initialization/main.void 10
+build/ci-debug/voidc emit examples/managed_initialization/main.void -o build/managed-init.o
+clang++-19 build/managed-init.o build/ci-debug/libvoid_runtime.a -pthread \
+  --ld-path=/usr/lib/llvm-19/bin/ld.lld -o build/managed-init
+build/managed-init 10 # 26, separately linked native executable
+```
+
+The parent gains identity only after successful initializer execution and complete
+commit. Construction views cannot escape or compare identity; readonly views and
+ordinary reference aliases retain their established rules. These are parsed source
+programs, distinct from the older hand-built IR architectural proofs.
+See [the source contract](docs/MANAGED_INITIALIZATION.md) for failure behavior,
+required-field/helper restrictions, platform linking and deferred features.

@@ -2,8 +2,10 @@
 
 Implemented locally using the owner-approved P1–P7 contract in
 [MANAGED_STRUCTS_PROPOSAL.md](MANAGED_STRUCTS_PROPOSAL.md), including P3 deep
-readonly views and P4 complete-object publication. Hosted validation of this
-implementation remains necessary. Phase 15's coordinator remains the runtime
+readonly views and P4 complete-object publication. The owner reports hosted run #28
+passed all seven jobs (35 suites), locking Phase 16. Phase 17 adds approved
+[managed initialization](MANAGED_INITIALIZATION.md); its hosted validation remains
+separate. Phase 15's coordinator remains the runtime
 foundation; ordinary source programs now use it through the shared compiler path.
 
 ## Working source surface
@@ -45,15 +47,15 @@ same-nominal nullable reference before use and reports a source runtime failure
 for null. Nullable field/method access requires explicit unwrap. There are no
 implicit nullable dereferences, unrelated reference casts or nullable primitives.
 
-Managed construction uses named fields, without a custom managed `init` in this
-phase. Supplied expressions run once in source order. Omitted numeric/bool fields
+Types without custom init use named-field construction. Supplied expressions run once in source order. Omitted numeric/bool fields
 use established safe/pure declared defaults; nested value fields use the existing
 Phase 14 construction plan, including approved value `init` execution. Nullable
 reference fields default to null. Non-nullable reference fields must be explicitly
 supplied: neither an omitted field nor `var object: node` silently allocates an
 object. Value initializers may accept reference arguments without storing references
-in their value layout. Managed custom initializers and reference-containing value
-structs remain deferred, rather than permanently prohibited. Compile-time constants
+in their value layout. Phase 17 custom initializers instead bind arguments to init parameters and use
+compiler-checked staged construction views before complete commit. Reference-containing
+value structs remain deferred, rather than permanently prohibited. Compile-time constants
 and pure declared defaults cannot allocate managed objects or execute initializers.
 
 Owner-module methods, imports, nested inline field access, compound assignment,
@@ -176,8 +178,7 @@ methods/self-types, readonly edit diagnostics and repaired/stale navigation.
 Editor presentation adds the implemented `null` literal and managed indentation.
 Colors and extension lifecycle are unchanged. WORK_LOG.md records actual runs.
 
-Still deferred: managed custom init/publication during user init; source
-reference-containing value structs; managed compile-time allocations; broader
+Still deferred: source reference-containing value structs; managed compile-time allocations; broader
 nullable patterns/flow narrowing; managed FFI; weak refs/finalizers/deinit;
 inheritance/interfaces/generics; strings/collections; async/thread APIs; production
 collector tuning. Managed debug metadata currently describes opaque reference
@@ -185,6 +186,6 @@ pointers, rather than a rich object inspector. Phase 15 callback-provider quiesc
 and native-safety contracts remain in force. Windows/macOS hosting and VSCodium
 execution cannot be inferred from Linux results.
 
-Recommended next design phase: managed custom initialization and safe publication
-of user-initialized objects, followed by reference-containing value capabilities;
-resolve escape/failure rules before extending constructor behavior.
+Phase 17 implements approved custom managed initialization without incomplete
+parent identity or roots; see MANAGED_INITIALIZATION.md. Recommended next design
+work is reference-containing value capabilities and their copy/readonly/root rules.

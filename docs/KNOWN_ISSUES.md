@@ -1,14 +1,23 @@
 # Known issues and deferred work
 
-Updated for Phase 16 managed source. The owner declares Phase 15 locked and reports
-run #27 green on all seven runners. Phase 16 adds four suites (35 total); its
-Windows/macOS hosted verification remains pending. See MANAGED_STRUCTS.md.
+Updated for Phase 17 managed custom initialization. The owner declares Phase 16
+locked and reports run #28 green on all seven jobs (35 suites/configuration).
+Phase 17 adds four suites (39 total); hosted Windows/macOS and seven-job verification
+remain necessary after the owner pushes. See MANAGED_INITIALIZATION.md and WORK_LOG.md.
 
-Managed custom init, reference-containing value structs, richer nullable patterns,
-managed FFI and production GC tuning remain deferred. Readonly/effect analysis is
-conservative across control-flow/rebinding joins and may reject cases requiring
-path-sensitive alias reasoning. Managed debug metadata is currently opaque-pointer
-metadata. Linux source/JIT/AOT results are not Windows/macOS verification.
+S1 construction views have no precommit identity: whole-view escape, self-links,
+casts/nullable injection, rebinding, constructor arguments and returns are rejected.
+Helpers require all fields ready and a bounded compatible context; helpers cannot
+perform first required-field initialization. Contexts are declaration/parameter
+masks, capped at 1024/project. Required value children still complete before the
+body. Effects on completed objects are not rolled back on body/commit failure.
+These approved limits do not permanently prohibit broader future initialization.
+
+Reference-containing value structs, richer nullable patterns, managed FFI and
+production GC tuning remain deferred. Readonly/effect analysis is conservative
+across control-flow/rebinding joins and may reject cases requiring path-sensitive
+alias reasoning. Managed debug metadata is currently opaque-pointer metadata.
+Linux source/JIT/AOT results are not Windows/macOS verification.
 
 The owner reports Phase 13 `c72e62a` passed hosted run #19 on Windows, Linux and
 macOS. Phase 14 run #21 (`424cacb`) passed Windows/Ubuntu but macOS ARM64 Debug
@@ -22,10 +31,11 @@ an unapproved historical alternative. Owner-module methods and custom value
 initializers use the existing shared types/IR/LLVM path.
 
 Runtime declared field defaults, inferred/default/named ordinary function/method
-parameters, constructor overloads, custom managed init, fallible constructor results,
+parameters, constructor overloads, fallible constructor results,
 resource deinit, foreign extensions and external aggregate ABI remain deferred.
-An enclosing custom initializer requires default-constructible fields; required
-children can be explicitly supplied to no-init wrappers. Compile-time contexts
+An enclosing value initializer requires default-constructible fields; required
+value children can be explicitly supplied to no-init wrappers. Managed init uses
+required-reference definite initialization as documented for Phase 17. Compile-time contexts
 cannot execute init. Initialization body/helper changes require manual restart.
 Layout remains compiler-private with 128-level/65536-expanded-field bounds.
 

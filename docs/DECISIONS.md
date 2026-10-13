@@ -610,3 +610,41 @@ Selected heap targets are rooted snapshots before arguments/RHS; reference recei
 rebinding is local, inline value receivers retain place semantics. Managed source
 does not establish an arbitrary C ABI. See MANAGED_STRUCTS.md for exact semantics,
 regressions, conservative limitations and pending hosted gates.
+
+## Phase 17: managed custom initialization, 13 October 2026
+
+The owner approved S1 + MI1–MI7 from MANAGED_INITIALIZATION_PROPOSAL.md, including
+replacement of the obsolete managed-init deferral assertion with execution coverage.
+Managed init runs on compiler-checked staged construction views; parent reference
+identity begins only at successful complete-object commit. No P3/P4 exception,
+incomplete managed root, pending-object heap or runtime allocator was introduced.
+
+Reuse C1 parameter binding, pure defaults, source order, visibility and conservative
+initialization dependency/reload rules. Types without init keep named fields.
+Nonnullable managed bindings require explicit construction. Direct required managed
+fields use definite readiness on every successful path; reference-free value fields
+still finish their default construction before the body. No implicit managed child
+allocation occurs. Effects on completed objects precede commit and are not rolled
+back on body/allocation/collection failure; output publication remains last.
+
+The already typed AST receives a bounded construction-use/readiness worklist.
+Local aliases share origin/readiness; whole-view rebind/identity/cast/nullable
+injection/return/retention/constructor arguments are rejected. All fields must be
+ready before whole-view helper calls. Known source helpers/methods have private
+passing contexts keyed by declaration and parameter mask, including recursive
+calls and multiple aliases; 1024 contexts/project is a diagnosed resource bound.
+No new ownership annotations, separate nominal checker or constructor backend.
+
+The shared Type/Place/IR carry private construction capability and storage origins.
+Independent CFG validation proves active scopes, reads, compatible calls, once-only
+marked init and final commit. LLVM roots actual target-aligned staged field storage,
+including helper formals, never the staging pointer. Existing gc_construct,
+Runtime::construct_into, failure frames, module DataLayout and code leases remain
+authoritative. Shared analyzed declarations expose context masks/required fields;
+LSP and reload retain original source identities and conservative contracts.
+
+Whole-self identity/escape, self-links inside init, borrowed returns/rebinding,
+helper-assisted first initialization, reference-containing values, fallible results,
+resources/deinit, runtime defaults and broader source features remain deferred.
+MANAGED_INITIALIZATION.md defines the implemented boundary; WORK_LOG.md records
+actual verification and pending seven-job hosted acceptance.

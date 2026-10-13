@@ -11,6 +11,9 @@ Earlier foundation-only status in historical documents predates source compilati
 
 Phase 16 adds ordinary managed source structs, nullable references, deep readonly
 views and runtime-backed JIT/linked AOT; see [MANAGED_STRUCTS.md](MANAGED_STRUCTS.md).
+Phase 17 adds custom managed initialization with checked construction views,
+required-reference readiness, safe helper contexts and complete-object commit; see
+[MANAGED_INITIALIZATION.md](MANAGED_INITIALIZATION.md).
 
 ## Working pipeline
 

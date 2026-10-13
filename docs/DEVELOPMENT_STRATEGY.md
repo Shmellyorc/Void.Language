@@ -718,3 +718,20 @@ IR, LLVM and coordinated runtime. Complete-object publication is reusable runtim
 work, not a source-specific incomplete-object exception. MANAGED_STRUCTS.md records
 implementation and deferred managed init/reference-containing value work. The
 seven-runner workflow remains unchanged; four additional suites extend coverage.
+
+## Phase 17 managed custom initialization
+
+Owner-approved S1 + MI1–MI7 is implemented through the existing typed AST, validated
+analysis, shared IR/LLVM and unchanged coordinated runtime. Staged construction
+views, required-reference readiness and bounded safe-helper contexts precede the
+existing complete-object commit. P3 deep readonly and P4 publication remain intact;
+no parent identity or managed root exists before successful commit. See
+MANAGED_INITIALIZATION.md for source behavior, restrictions, failures and reload.
+
+The owner reports Phase 16 run #28 passed all seven jobs, locking its 35 suites.
+Four additive Phase 17 source/normal-AOT/optimized-AOT/CLI suites bring coverage to
+39. Preserve six Linux SDK configurations, strict sanitizers/leaks, small-stack,
+repeated GC/coordination stress, real editors and VSIX, then all seven hosted jobs.
+Do not infer Windows/macOS ARM64 results from Linux. Next investigate reference-
+containing value capabilities; broader construction identity/escape, fallible
+results or resource lifetime require their own approved contract.

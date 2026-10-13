@@ -225,3 +225,18 @@ initializer helper bodies are frozen by iterative call-graph closure, including 
 Implicit construction edges are retained for invalidation but excluded from written
 reference/navigation positions. Compatible unrelated bodies retain generation
 replacement and old-lease safety.
+
+## Phase 17 construction contexts
+
+Managed initializer declarations retain construction-parameter masks and the names
+of direct required reference fields unavailable at body entry. A successful analysis
+proves them ready on every normal exit. Private typed-AST contexts retain aliases and
+resolved compatible calls; context identity is declaration plus passing mask, bounded
+at 1024/project. The IR independently checks these origins and readiness.
+
+Shared declaration metadata/compatibility and tooling invalidation compare these
+facts alongside P3 effects and C1 initialization closure/default policy. Synthetic
+helper variants preserve source declaration/navigation identities. Invalid unsaved
+required-field source suppresses stale queries; repair restores them. Init/helper
+body changes require restart while compatible unrelated bodies may reload. No
+separate editor checker or managed constructor ABI is introduced.

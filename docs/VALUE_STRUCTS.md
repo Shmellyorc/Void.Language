@@ -2,7 +2,10 @@
 
 Phase 16 integration: [MANAGED_STRUCTS.md](MANAGED_STRUCTS.md) describes the now
 implemented managed-source boundary. Earlier phase-only exclusions below remain
-historical; custom managed init and reference-containing source values are deferred.
+historical. Phase 17 [managed custom initialization](MANAGED_INITIALIZATION.md)
+adds construction views and direct required-reference readiness without changing
+reference-free value copy/default rules. Reference-containing source values remain
+deferred.
 
 Current Phase 14 update: approved custom value initialization is documented in
 [INITIALIZATION.md](INITIALIZATION.md). It supersedes the historical init deferral

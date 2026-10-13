@@ -1,15 +1,18 @@
 # Phase 14: custom initialization for value structs
 
-Phase 16 integration: [MANAGED_STRUCTS.md](MANAGED_STRUCTS.md) describes the now
-implemented managed-source boundary. Earlier phase-only exclusions below remain
-historical; custom managed init and reference-containing source values are deferred.
+Phase 16 managed source is described in [MANAGED_STRUCTS.md](MANAGED_STRUCTS.md).
+Phase 17 custom managed init follows approved S1 + MI1–MI7; see
+[MANAGED_INITIALIZATION.md](MANAGED_INITIALIZATION.md). The value-specific rules
+below remain unchanged: required value children complete before the body, and
+`var p: point` performs value default construction. Managed nonnullable bindings
+still require explicit construction; direct required managed fields use Phase 17
+readiness proof instead. Reference-containing source values remain deferred.
 
 The owner approved C1 in INITIALIZATION_PROPOSAL.md, including recursive nested
 construction, required-child availability, visibility, conservative initialization
 reload dependencies and the specific obsolete Phase 13 test updates. This document
 describes implemented source behavior; final verification is recorded in WORK_LOG.md.
-Managed reference structs, fallible constructors and resource lifetimes are separate
-future work. LLVM remains pinned to 19.1.7 with the existing SDK-wide RTTI policy.
+Fallible constructors and resource lifetimes remain separate future work. LLVM remains pinned to 19.1.7 with the existing SDK-wide RTTI policy.
 
 ## Source interface
 

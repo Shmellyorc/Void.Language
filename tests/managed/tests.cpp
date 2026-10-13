@@ -38,7 +38,6 @@ void diagnostics() {
     invalid(node+"struct holder:\n    child: node\n\nfunc entry(x: i32) -> i32:\n    return holder().child.value\n","non-nullable");
     invalid(node+"func entry(x: i32) -> i32:\n    var a: node?\n    return a.value\n","nullable");
     invalid(node+"func entry(x: i32) -> i32:\n    var a = null\n    return 0\n","nullable");
-    invalid(node+"func (n node) init():\n    n.value = 1\n","deferred");
     invalid(node+"value struct unsupported:\n    reference: node?\n","deferred");
     invalid(node+"const a = node()\n","compile-time");
     invalid(node+"func entry(x: i32) -> i32:\n    return node(value = true).value\n","Type mismatch");
@@ -116,6 +115,8 @@ void concurrent_source(const std::filesystem::path& root,bool optimized) {
     runtime->collect(); require(runtime->snapshot().objects==0,"concurrent source roots leaked");
 }
 void language_edges(bool optimized) {
+    vd::Jit constructors;
+    require(constructors.compile(*analyze(node+"func (n node) init():\n    n.value = 1\n\nfunc entry(x: i32) -> i32:\n    return node().value\n"),optimized)->invoke(0)==1,"managed init positive execution replaces obsolete deferral");
     auto text=node+"func readonly_identity(const n: node) -> node:\n    return n\n\nfunc entry(x: i32) -> i32:\n    var original = node(value = x)\n    const view = original\n    original.value += 1\n    var alias: node = readonly_identity(view)\n    var optional: node? = original\n    optional = null\n    if optional == null:\n        return alias.value\n    return -999\n";
     vd::Jit jit; require(jit.compile(*analyze(text),optimized)->invoke(10)==11,"readonly parameter/return and nullable annotation");
     auto empty=analyze("struct empty:\n\nfunc entry(x: i32) -> i32:\n    var a = empty()\n    var b = empty()\n    if a != b:\n        return 1\n    return 0\n");

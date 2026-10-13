@@ -1,0 +1,21 @@
+struct counter:
+    value: i32
+
+value struct point:
+    value: i32
+
+func (p point) init(divisor: i32 = 0):
+    p.value = 100 / divisor
+
+struct parent:
+    point: point
+    owner: counter
+
+func (p parent) init(c: counter):
+    p.owner = c
+    c.value++
+
+func entry(value: i32) -> i32:
+    var c = counter(value = 7)
+    var p = parent(c)
+    return p.point.value

@@ -1,0 +1,56 @@
+value struct position:
+    x: i32 = 4
+
+func (p position) init():
+    p.x++
+
+struct counter:
+    value: i32
+
+func record(c: counter, digit: i32) -> i32:
+    c.value = c.value * 10 + digit
+    return digit
+
+struct child:
+    value: i32
+
+func (c child) init(value: i32 = 0):
+    c.value = value
+
+struct parent:
+    child: child
+    position: position
+    last: child?
+    sum: i32
+
+func child_of(p: parent) -> child:
+    var original = p.child
+    var i = 0
+    for i < 300:
+        var garbage = child(i)
+        i++
+    return original
+
+func pair(left: parent, right: parent, count: i32) -> i32:
+    if count > 0:
+        return pair(left, right, count - 1)
+    left.sum += right.child.value
+    return left.sum
+
+func read(const p: parent) -> i32:
+    return p.child.value
+
+func (p parent) init(c: counter, second: i32 = 2, first: i32 = 1):
+    p.child = child(first + second)
+    p.sum = record(c, 3)
+    p.last = child_of(p)
+    p.sum += pair(p, p, 3)
+    const view = p
+    p.sum += read(view)
+
+func entry(value: i32) -> i32:
+    var c = counter()
+    var p = parent(c, first = record(c, 2), second = record(c, 1))
+    if p.child == (p.last as child):
+        return p.sum + p.child.value + (p.last as child).value + p.position.x + c.value + value
+    return -999

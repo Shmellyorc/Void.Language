@@ -1,6 +1,7 @@
 #include "void/ir.hpp"
 #include "void/numeric.hpp"
 #include <map>
+#include <algorithm>
 #include <set>
 #include <functional>
 #include <stdexcept>
@@ -26,6 +27,7 @@ Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
     definition = std::shared_ptr<const ValueType>(std::move(owner),d.get());
 }
 FieldType::FieldType(Type t) : kind(t.kind), nullable(t.nullable), readonly(t.readonly) {
+    if (t.construction) throw std::invalid_argument("construction view cannot be a field type");
     if (t.definition) target = t.definition->self;
 }
 FieldType::operator Type() const {
@@ -35,12 +37,20 @@ FieldType::operator Type() const {
     Type t(std::move(d),kind); t.nullable=nullable; t.readonly=readonly; return t;
 }
 
+std::string construction_name(const std::string& symbol,const std::vector<unsigned>& parameters) {
+    if (parameters.empty()) return symbol;
+    std::string result=symbol+"::construction";
+    for (auto p:parameters) result+="::"+std::to_string(p);
+    return result;
+}
 std::string type_name(Type t) {
+    if (t.construction) { t.construction=false; return "construction view " + type_name(t); }
     if (t.readonly && t.kind!=Type::managed_ref) { t.readonly=false; return "readonly " + type_name(t); }
     if (t.kind == Type::managed_ref && t.definition) return std::string(t.readonly ? "readonly " : "") + t.definition->identity + (t.nullable ? "?" : "");
     switch (t.kind) { case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
     throw std::invalid_argument("VOID IR: unknown type");
 }
+#include "construction.inc"
 void validate(const Module& m, InstructionTypes* results) {
     if (results) results->clear();
     auto fail = [](const std::string& text) { throw std::invalid_argument("VOID IR: " + text); };
@@ -58,6 +68,7 @@ void validate(const Module& m, InstructionTypes* results) {
         std::vector<Type> pending{root};
         for (std::size_t n=0;n<pending.size();++n) {
             auto t=pending[n];
+            if (t.construction && (t.kind!=Type::managed_ref || t.nullable)) fail("invalid construction view type");
             if (t.nullable && t.kind!=Type::managed_ref) fail("nullable non-reference type");
             if (t.kind==Type::managed_ref && !m.coordinated) fail("managed references require coordinated runtime");
             if (t.kind!=Type::aggregate && t.kind!=Type::managed_ref) {
@@ -66,6 +77,7 @@ void validate(const Module& m, InstructionTypes* results) {
             }
             if (!t.definition || t.definition->identity.empty() || t.definition->name.empty()) fail("missing value type identity");
             auto* d=t.definition.get();
+            if (t.construction && !d->managed) fail("construction view requires a managed nominal");
             if (t.kind==Type::aggregate && d->managed) fail("managed nominal cannot be an inline value");
             auto [found,added]=definitions.emplace(d->identity,d);
             if (!added && found->second!=d) fail("conflicting owned value type definitions");
@@ -80,7 +92,7 @@ void validate(const Module& m, InstructionTypes* results) {
         }
     };
     auto assignable = [](Type actual,Type expected) {
-        return actual==expected || (actual.kind==Type::managed_ref && expected.kind==Type::managed_ref && Type::key(actual)==Type::key(expected) && (!actual.nullable || expected.nullable));
+        return actual==expected || (actual.kind==Type::managed_ref && expected.kind==Type::managed_ref && Type::key(actual)==Type::key(expected) && actual.construction==expected.construction && (!actual.nullable || expected.nullable));
     };
     struct Signature { std::vector<Type> parameters; Type result; bool receiver = false, mutates = false, initializer = false; };
     std::map<std::string, Signature> names;
@@ -88,12 +100,18 @@ void validate(const Module& m, InstructionTypes* results) {
         if (name.empty() || !names.emplace(name, Signature{{Type::i32}, Type::i32}).second) fail("duplicate or empty import");
     for (const auto& f : m.functions) {
         if (f.name.empty() || !names.emplace(f.name, Signature{f.parameters, f.result,f.receiver,f.receiver_mutates,f.initializer}).second) fail("duplicate or empty function");
-        if (!f.module_identity.empty() && (f.source_name.empty() || f.name != f.module_identity + "::" + f.source_name))
+        std::vector<unsigned> context_parameters;
+        for (unsigned n=0;n<f.parameters.size();++n) if (f.parameters[n].construction) context_parameters.push_back(n);
+        auto expected_name=f.module_identity+"::"+f.source_name;
+        if (!f.initializer) expected_name=construction_name(expected_name,context_parameters);
+        if (!f.module_identity.empty() && (f.source_name.empty() || f.name != expected_name))
             fail("inconsistent function ownership");
         if (f.receiver) {
             if (f.parameters.empty() || (f.parameters[0].kind != Type::aggregate && f.parameters[0].kind != Type::managed_ref) || f.locals.empty() || f.locals[0] != f.parameters[0]) fail("invalid receiver signature/storage");
         } else if (f.receiver_mutates) fail("receiver effect without receiver");
         if (f.initializer && (!f.receiver || f.result != Type::none)) fail("invalid initializer signature");
+        if (f.result.construction) fail("construction view returned from function");
+        if (f.initializer && f.parameters[0].kind==Type::managed_ref && (!f.parameters[0].construction || context_parameters!=std::vector<unsigned>{0})) fail("managed init requires a private construction receiver");
         valid_type(f.result);
         for (auto t : f.parameters) if (t == Type::none) fail("no-result parameter"); else valid_type(t);
         for (auto t : f.locals) if (t == Type::none) fail("no-result slot"); else valid_type(t);
@@ -101,6 +119,7 @@ void validate(const Module& m, InstructionTypes* results) {
     for (const auto& f : m.functions) {
         if (f.blocks.empty()) fail("function has no blocks");
         if (results) results->emplace_back();
+        std::vector<std::vector<Type>> body_types;
         for (const auto& b : f.blocks) {
             std::vector<Type> types;
             auto operand = [&](unsigned id) {
@@ -115,14 +134,19 @@ void validate(const Module& m, InstructionTypes* results) {
             for (const auto& i : b.instructions) {
                 Type result = Type::i32;
                 switch (i.op) {
+                case Op::stage_begin:
+                    valid_type(i.type);
+                    if (!i.type.construction || !i.type.definition->managed || slot(i.a)!=i.type) fail("invalid construction storage");
+                    result=i.type; break;
                 case Op::gc_construct:
                     valid_type(i.type);
-                    if (!m.coordinated || i.type.kind!=Type::managed_ref || i.type.nullable || i.arguments.size()!=i.type.definition->fields.size()) fail("invalid complete managed construction");
+                    if (!m.coordinated || i.type.kind!=Type::managed_ref || i.type.nullable || i.type.construction || i.arguments.size()!=i.type.definition->fields.size()) fail("invalid complete managed construction");
                     for (unsigned n=0;n<i.arguments.size();++n) expect(i.arguments[n],i.type.definition->fields[n].type);
+                    if (i.receiver && (!i.receiver->fields.empty() || !slot(i.receiver->slot).construction || Type::key(slot(i.receiver->slot))!=Type::key(i.type))) fail("invalid construction commit place");
                     result=i.type; break;
                 case Op::gc_allocate:
                     valid_type(i.type);
-                    if (!m.coordinated || i.type.kind != Type::managed_ref || i.type.definition->fields.empty()) fail("invalid managed allocation");
+                    if (!m.coordinated || i.type.kind != Type::managed_ref || i.type.construction || i.type.definition->fields.empty()) fail("invalid managed allocation");
                     result = i.type; break;
                 case Op::gc_read: case Op::gc_write: {
                     auto object = operand(i.a);
@@ -133,7 +157,7 @@ void validate(const Module& m, InstructionTypes* results) {
                     break;
                 }
                 case Op::gc_alive:
-                    if (!m.coordinated || operand(i.a).kind != Type::managed_ref) fail("invalid managed inspection");
+                    if (!m.coordinated || (operand(i.a).kind != Type::managed_ref || operand(i.a).construction)) fail("invalid managed inspection");
                     result = Type::boolean; break;
                 case Op::gc_collect: case Op::gc_poll:
                     if (!m.coordinated) fail("runtime operation outside coordinated module");
@@ -155,7 +179,7 @@ void validate(const Module& m, InstructionTypes* results) {
                     if (i.a >= f.parameters.size()) fail("invalid argument index");
                     result = f.parameters[i.a]; break;
                 case Op::constant:
-                    if (i.type.kind == Type::aggregate || i.type == Type::none || (i.type.kind == Type::managed_ref && i.immediate != 0) || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1)) fail("invalid literal");
+                    if (i.type.construction || i.type.kind == Type::aggregate || i.type == Type::none || (i.type.kind == Type::managed_ref && i.immediate != 0) || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1)) fail("invalid literal");
                     valid_type(i.type); result = i.type; break;
                 case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:
                     result = operand(i.a);
@@ -165,10 +189,10 @@ void validate(const Module& m, InstructionTypes* results) {
                     if (!numeric::supports(i.op,operand(i.a))) fail("non-numeric ordering");
                     expect(i.b,operand(i.a)); result = Type::boolean; break;
                 case Op::equal: case Op::not_equal:
-                    if (!((operand(i.a).kind==Type::managed_ref && operand(i.b).kind==Type::managed_ref && Type::key(operand(i.a))==Type::key(operand(i.b))) || (numeric::supports(i.op,operand(i.a)) && operand(i.a)==operand(i.b)))) fail("comparison type mismatch");
+                    if (!((operand(i.a).kind==Type::managed_ref && !operand(i.a).construction && operand(i.b).kind==Type::managed_ref && !operand(i.b).construction && Type::key(operand(i.a))==Type::key(operand(i.b))) || (numeric::supports(i.op,operand(i.a)) && operand(i.a)==operand(i.b)))) fail("comparison type mismatch");
                     result = Type::boolean; break;
                 case Op::convert:
-                    if (!((operand(i.a).kind==Type::managed_ref && i.type.kind==Type::managed_ref && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)))) fail("invalid conversion");
+                    if (!((operand(i.a).kind==Type::managed_ref && !operand(i.a).construction && i.type.kind==Type::managed_ref && !i.type.construction && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)))) fail("invalid conversion");
                     result = i.type; break;
                 case Op::negate:
                     result = operand(i.a); if (!numeric::number(result)) fail("non-numeric negation"); break;
@@ -206,6 +230,7 @@ void validate(const Module& m, InstructionTypes* results) {
                 }
                 types.push_back(result);
             }
+            body_types.push_back(types);
             if (results) results->back().push_back(types);
             auto destination = [&](unsigned id) { if (id >= f.blocks.size()) fail("invalid branch destination"); };
             switch (b.end.kind) {
@@ -221,6 +246,7 @@ void validate(const Module& m, InstructionTypes* results) {
             default: fail("unknown terminator");
             }
         }
+        validate_construction(f,m,body_types);
     }
 }
 }

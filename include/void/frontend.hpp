@@ -26,6 +26,11 @@ struct AnalyzedDeclaration {
     std::string initialization_contract = {};
     std::vector<AnalyzedParameter> initializer_parameters = {};
     std::string capability_contract = {};
+    // Private passing contexts, indexed over receiver then ordinary parameters.
+    // Required fields are unavailable at managed initializer entry, but proved
+    // ready on every successful exit before complete-object publication.
+    std::vector<std::vector<unsigned>> construction_parameters = {};
+    std::vector<std::string> required_initialization_fields = {};
 };
 struct AnalyzedReference {
     std::string from, to, spelling;

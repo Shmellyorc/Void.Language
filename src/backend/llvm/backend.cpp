@@ -170,7 +170,17 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
             auto* slot = b.CreateAlloca(type(t)); slots.push_back(slot);
             b.CreateStore(f.receiver && n==0 && t.kind==ir::Type::managed_ref ? static_cast<llvm::Value*>(fn->getArg(0)) : llvm::Constant::getNullValue(type(t)), slot);
         }
+        std::map<unsigned,llvm::Value*> stage_storage;
+        for (const auto& block:f.blocks) for (const auto& instruction:block.instructions) if (instruction.op==ir::Op::stage_begin) {
+            auto* native=type(ir::Type(instruction.type.definition));
+            auto bytes=std::max<std::uint64_t>(1,layout.getTypeAllocSize(native));
+            auto* storage=b.CreateAlloca(b.getInt8Ty(),b.getInt64(bytes));
+            storage->setAlignment(layout.getABITypeAlign(native));
+            b.CreateMemSet(storage,b.getInt8(0),bytes,layout.getABITypeAlign(native));
+            stage_storage.emplace(instruction.a,storage);
+        }
         std::function<void(ir::Type,std::uint64_t,std::vector<std::uint64_t>&)> reference_offsets = [&](ir::Type t, std::uint64_t offset, auto& result) {
+            if (t.construction) return; // A view points to stack storage, never a heap root.
             if (t.kind == ir::Type::managed_ref) result.push_back(offset);
             else if (t.kind == ir::Type::aggregate) {
                 auto* native = llvm::cast<llvm::StructType>(type(t));
@@ -209,7 +219,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 entries.push_back(entry);
             };
             for (unsigned i = 0; i < slots.size(); ++i) add_root(f.locals[i],slots[i]);
+            for (auto [slot,storage]:stage_storage) add_root(ir::Type(f.locals[slot].definition),storage);
             for (unsigned i = 0; i < f.parameters.size(); ++i) {
+                if (f.parameters[i].construction) { add_root(ir::Type(f.parameters[i].definition),fn->getArg(i)); continue; }
                 if (f.receiver && i == 0) continue;
                 std::vector<std::uint64_t> offsets; reference_offsets(f.parameters[i],0,offsets);
                 if (offsets.empty()) continue;
@@ -270,6 +282,12 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 }
                 case Op::gc_alive:
                     v = b.CreateCall(module->getOrInsertFunction("vd_gc_alive",b.getInt1Ty(),b.getPtrTy()),{values[instruction.a]}); break;
+                case Op::stage_begin: {
+                    auto* native=type(ir::Type(instruction.type.definition));
+                    v=stage_storage.at(instruction.a);
+                    b.CreateMemSet(v,b.getInt8(0),std::max<std::uint64_t>(1,layout.getTypeAllocSize(native)),layout.getABITypeAlign(native));
+                    break;
+                }
                 case Op::gc_construct: {
                     auto object=ir::Type(instruction.type.definition);
                     auto* native=type(object);
@@ -302,7 +320,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 }
                 case Op::gc_read: case Op::gc_write: {
                     auto object = operand_type(instruction.a);
-                    fail_if(b.CreateIsNull(values[instruction.a]),"Null managed reference");
+                    if (!object.construction) fail_if(b.CreateIsNull(values[instruction.a]),"Null managed reference");
+                    ir::Type field=object.definition->fields.at(static_cast<std::size_t>(instruction.immediate)).type;
+                    if (object.construction && instruction.op==Op::gc_write && field.kind==ir::Type::managed_ref && !field.nullable)
+                        fail_if(b.CreateIsNull(values[instruction.b]),"Null supplied for required construction field");
                     auto* address = b.CreateStructGEP(type(ir::Type(object.definition)),values[instruction.a],static_cast<unsigned>(instruction.immediate));
                     if (instruction.op == Op::gc_read) v = b.CreateLoad(type(object.definition->fields.at(static_cast<std::size_t>(instruction.immediate)).type),address);
                     else v = b.CreateStore(values[instruction.b],address);
