@@ -195,7 +195,9 @@ int main(int argc,char** argv) {
         if(argc==5 && std::string(argv[1])=="--emit-library") {auto p=vd::compile_project(argv[2]);vd::emit_runtime_object(p.module,argv[3],std::string(argv[4])=="optimized");return 0;}
         require(argc==2,"composition project root required");diagnostics();programs();tooling();imports(argv[1]);
         for(bool opt:{false,true}) {
-            auto imports=vd::compile_project(std::filesystem::path(argv[1])/"examples/composition/imports.void");vd::Jit jit;require(jit.compile(imports.module,imports.module.entry_symbol,opt)->invoke(10)==12,"imported promoted call");
+            auto imports=vd::compile_project(std::filesystem::path(argv[1])/"examples/composition/imports.void");
+            require(!imports.module.coordinated,"CRT-link regression must remain runtime-free and not pull a managed runtime archive member");
+            vd::Jit jit;require(jit.compile(imports.module,imports.module.entry_symbol,opt)->invoke(10)==12,"imported promoted call");
             selected_and_ir(argv[1],opt);roots(argv[1],opt);parked(argv[1],opt);timeout(argv[1],opt);}
         std::cout<<"composition: lookup, storage, readonly, readiness, GC, tooling and reload passed\n";
     }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}

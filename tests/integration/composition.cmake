@@ -32,3 +32,22 @@ foreach(mode normal optimized)
     endforeach()
   endforeach()
 endforeach()
+
+# This value-only executable must link its CRT without extracting void_runtime.
+# Test the generated main/strtoll/puts/printf paths in both LLVM modes; valid inputs
+# above and this default/error coverage must also pass on Windows Debug/Release.
+foreach(mode normal optimized)
+  set(executable "${BIN}/void_composition_cli_imports_${mode}${EXE_SUFFIX}")
+  execute_process(COMMAND "${executable}" RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE errors)
+  string(STRIP "${output}" output)
+  if(NOT status EQUAL 0 OR NOT output STREQUAL "2")
+    message(FATAL_ERROR "Runtime-free CRT default input ${mode}: ${status}, ${output}, ${errors}")
+  endif()
+  foreach(input not_a_number 2147483648)
+    execute_process(COMMAND "${executable}" "${input}" RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE errors)
+    string(STRIP "${output}" output)
+    if(NOT status EQUAL 2 OR NOT output STREQUAL "VOID: expected one optional decimal i32 input")
+      message(FATAL_ERROR "Runtime-free CRT input rejection ${mode}/${input}: ${status}, ${output}, ${errors}")
+    endif()
+  endforeach()
+endforeach()

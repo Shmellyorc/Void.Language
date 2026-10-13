@@ -4933,3 +4933,175 @@ inheritance, interfaces, virtual dispatch, transitive promotion, has or stateles
 mixins. C1/S1/P3/P4/RV1–RV7 and all locked phases remain authoritative. Follow-up
 should first review hosted acceptance, then design any additional composition or
 dispatch behavior separately rather than silently expanding this phase.
+
+## 13 October 2026 — Phase 19 run #32 Windows CRT linkage correction
+
+Investigated immediately without waiting for the other five jobs. Retrieved the
+actual logs for [run #32](https://github.com/Shmellyorc/Void.Language/actions/runs/38445187406):
+Windows Debug job **115461612050**, Windows Release job **115461611926**.
+Local baseline commit: **f14724b**, Phase 19 composition implementation. Both jobs
+successfully configured and failed during Build while linking
+void_composition_cli_imports_normal.exe, before CTest could run. Log copies are in
+build/phase19-windows-crt/windows-debug.log and windows-release.log.
+
+### Diagnosis and evidence
+
+Both real link commands invoke LLVM 19.1.7 lld-link directly through CMake's
+vs_link_exe. Direct inputs are composition-cli-imports-normal.obj, void_runtime.lib,
+legacy_stdio_definitions.lib and standard Windows system import libraries. The
+command contains no CRT library, and the generated object has no host C/C++ compiler
+runtime-selection directives. Errors include mainCRTStartup, __chkstk, strtoll,
+puts and legacy_stdio_definitions' __acrt_iob_func/UCRT dependencies. The legacy
+library itself was found; these are undefined symbols, not missing SDK file paths.
+Debug adds /debug /INCREMENTAL; Release uses /INCREMENTAL:NO. Neither difference
+supplies CRT selection.
+
+Compared the failing target with successful native targets from the SAME Windows
+logs: managed/reference-value CLI executables had already linked; composition main,
+stress and normal AOT harness targets also linked. They use the same helper/runtime
+policy. The distinguishing property is that imports.void and both imported modules
+contain only value structs. Shared frontend lowering marks a project coordinated
+when it contains a managed declaration; this project remains uncoordinated. Its
+native object therefore needs no vd_runtime_entry/GC function. No member of the
+static void_runtime archive is extracted to satisfy those functions, so none of
+that archive's host-compiled /MD directives contributes CRT selection. A static
+library's presence on a link command does not load every member/directive.
+
+Corroborating actual local object inspection with LLVM 19.1.7 llvm-nm:
+composition-cli-imports-normal.o has exactly printf, puts and strtoll undefined;
+composition-cli-main-normal.o additionally needs vd_runtime_entry, vd_gc_construct,
+frame enter/leave and polling. Existing successful managed executables incidentally
+obtained CRT directives through extracted runtime members. Native AOT harnesses
+also have directly compiled C++ sources. The new runtime-free CLI exposed a latent
+shared CMake executable-model problem, not a need to make value programs managed.
+CMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL correctly selects /MD for compilations
+in both Windows configurations; LINKER_LANGUAGE=CXX alone does not synthesize an
+MSVC object's directives when an executable contains only an external object.
+
+Primary references supporting the toolchain behavior:
+[CMake MSVC_RUNTIME_LIBRARY](https://cmake.org/cmake/help/latest/prop_tgt/MSVC_RUNTIME_LIBRARY.html),
+[Microsoft /MD runtime selection](https://learn.microsoft.com/en-us/cpp/build/reference/md-mt-ld-use-run-time-library?view=msvc-170).
+The diagnosis also rests on actual logs and the independent object-format experiment,
+not documentation alone.
+
+Ran a focused cross-target COFF experiment with the complete official Linux-hosted
+LLVM **19.1.7** llc, clang-cl, llvm-lib, llvm-readobj and lld-link, without changing
+production compiler/runtime code. A minimal generated-style Windows main referencing
+puts/strtoll and a stack frame produces mainCRTStartup/__chkstk/puts/strtoll failures
+when paired only with an UNUSED /MD-compiled archive. Its COFF object has no runtime
+directives. Making an archive member needed selects MSVCRT. Compiling the actual
+new host translation unit with /MD and Debug (/Od /Zi) or Release (/O2) flags emits
+**/DEFAULTLIB:msvcrt.lib /DEFAULTLIB:oldnames.lib** in both cases; directly linking
+that object also selects MSVCRT independently of archive extraction.
+
+This is a real COFF/directive/archive-extraction reproduction, **not a successful
+Windows CRT link or Windows execution**. The Linux host has no Microsoft Windows
+SDK/CRT import libraries; the after-selection experiment consequently stops at
+missing msvcrt.lib/oldnames.lib. No fake CRT implementation or Wine execution is
+substituted for hosted Windows validation. Script, exact commands, outputs and
+assertions are in build/phase19-windows-crt/reproduce.py and coff/results.json.
+
+### Small shared correction and regression coverage
+
+The existing void_managed_source_tests CMake helper now adds
+**tests/integration/native_link.cpp** as a directly compiled source to every
+source-generated CLI executable in all four test families and both LLVM modes.
+It intentionally defines no symbols or entry point. CMake compiles it with the
+executable's existing runtime/ABI/usage requirements, letting the real host compiler
+supply the configured CRT directives. Generated VOID main remains authoritative.
+There is no hardcoded CRT library/runner path, forced archive extraction, custom
+entry point, linker flag workaround, runtime bootstrap change or alternate compiler.
+The existing release dynamic MSVC runtime policy remains the same in Debug and
+Release, matching LLVM's SDK; legacy_stdio_definitions remains required.
+
+Regression coverage stays within the existing **47 suites**:
+
+- composition_source explicitly asserts imports.void remains runtime-free. This
+  prevents future managed declarations/bootstrap dependencies from accidentally
+  masking the linker regression by extracting a runtime archive member.
+- composition_cli keeps all existing normal/O2 JIT/AOT assertions and additionally
+  runs both pure-value native imports executables with default input (stdout 2)
+  and malformed/out-of-i32-range input (exit 2 and the exact expected puts message).
+  Alongside existing valid argument/printf cases, these exercise generated main,
+  strtoll, puts and printf with no managed runtime dependency. The same native
+  targets/tests must build and execute under both Windows Debug and Release.
+
+No compiler, runtime, frontend, IR/LLVM behavior, source fixture, editor or workflow
+was changed. U1–U7, C1/S1/P3/P4/RV1–RV7 and all existing assertions remain intact.
+Only the common test-build helper, host link translation unit, two regression files
+and this work-log entry are changed.
+
+Focused configure/build passed first for composition_source and the imports normal/
+optimized plus managed main native targets. Focused CTest passed **2/2**, 5.91 sec.
+Full six-configuration and applicable regression results follow below; local Linux
+success will not be described as verified Windows linking.
+
+### Final local validation of the CRT correction
+
+Both complete LLVM/Clang/LLD **19.1.7** SDKs were verified, including ORC headers,
+libLLVMOrcJIT.a and LLVMConfig.cmake; installed RTTI YES and official archive RTTI
+NO retain their existing matching policy. The complete six-configuration Linux
+configure/build/CTest matrix passed, with every original suite retained:
+
+| SDK | Configuration / tree | Result | CTest seconds |
+|---|---|---|---:|
+| Installed | Debug / ci-debug | 47/47 | 67.21 |
+| Installed | Release / ci-release | 47/47 | 24.50 |
+| Installed | Strict sanitizers / ci-sanitizers | 47/47 | 83.64 |
+| Official archive | Debug / ci-official-debug | 47/47 | 61.09 |
+| Official archive | Release / ci-official-release | 47/47 | 21.12 |
+| Official archive | Strict sanitizers / ci-official-san | 47/47 | 77.43 |
+
+Actual commands for each existing matching build cache:
+
+```sh
+cmake -S . -B build/TREE
+cmake --build build/TREE -j2
+ctest --test-dir build/TREE --output-on-failure -j4
+```
+
+The matrix ran outside the tracing sandbox so LeakSanitizer could enumerate threads;
+strict settings were preserved for build-time compiler invocations and tests:
+
+```sh
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86
+```
+
+No sanitizer failure was suppressed. All 282 full-matrix CTest executions passed,
+including GC coordination/callback/failure, hot reload, frontend initialization/
+capabilities, native/JIT/AOT and real LSP protocol regressions. Both normal/O2 native
+imports executables built and passed the new default/malformed/range CRT checks in
+every configuration. The existing native printf interoperability tests remain.
+
+Additional focused repetition passed on both Debug SDKs:
+
+```sh
+ctest --test-dir build/DEBUG_TREE -R '^composition_cli$' --repeat until-fail:10 --output-on-failure
+ulimit -s 1024
+ctest --test-dir build/DEBUG_TREE -R '^(frontend|composition_source)$' --repeat until-fail:3 --output-on-failure
+```
+
+Results: **20/20** native-CLI repetitions and **12/12** 1 MiB-stack executions.
+These retain the original bounded frontend regression and Phase 19 source/GC proofs.
+Extension sources, lifecycle code, compiler/server and workflows did not change;
+no extra editor packaging/GUI rerun was necessary for this test-build-only correction.
+The real LSP suite was rerun in all six matrices.
+
+Evidence is under build/phase19-windows-crt: actual Windows logs; object-comparison.json;
+coff/ and reproduce.py; focused configure/build/test logs; matrix/ per-tree logs and
+result files; native-CLI repetition results; small-stack logs; inventory.json,
+frozen-source.json and summary.json. Final hashes verify the tested implementation/
+regression inputs. git diff --check passed. Diff inspection confirms no changes
+under src, include, examples, editors, cmake or .github, and no existing test/suite
+was removed or relaxed. Only CMakeLists.txt, tests/integration/native_link.cpp,
+tests/composition/tests.cpp, tests/integration/composition.cmake and WORK_LOG.md changed.
+
+**Windows Debug/Release success remains unverified.** The next owner-pushed commit
+must build the corrected imports normal AND optimized executables with the official
+Windows LLVM SDK and real MSVC/Windows CRT libraries, then pass all 47 suites in
+both Windows jobs. The other five hosted jobs should retain their usual gates;
+none was awaited or used as a substitute for the Windows investigation. The local
+COFF selection proof is not a Windows execution result. No commit, push, branch or
+remote modification occurred. The correction and local validation are complete
+and ready for owner review/push.

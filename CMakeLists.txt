@@ -194,7 +194,10 @@ if(BUILD_TESTING)
           COMMAND voidc emit "${PROJECT_SOURCE_DIR}/examples/${folder}/${program}.void" -o "${object}" ${flags}
           DEPENDS voidc ${source_files} VERBATIM)
         set_source_files_properties("${object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
-        add_executable(void_${family}_cli_${program}_${mode} "${object}")
+        # A generated object has no host compiler CRT-selection directives.
+        # Compile a direct input under the target's configured runtime policy;
+        # a runtime archive may contribute no members for a value-only program.
+        add_executable(void_${family}_cli_${program}_${mode} tests/integration/native_link.cpp "${object}")
         set_target_properties(void_${family}_cli_${program}_${mode} PROPERTIES LINKER_LANGUAGE CXX)
         target_link_libraries(void_${family}_cli_${program}_${mode} PRIVATE void_runtime)
         if(WIN32)
