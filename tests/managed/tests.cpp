@@ -38,7 +38,7 @@ void diagnostics() {
     invalid(node+"struct holder:\n    child: node\n\nfunc entry(x: i32) -> i32:\n    return holder().child.value\n","non-nullable");
     invalid(node+"func entry(x: i32) -> i32:\n    var a: node?\n    return a.value\n","nullable");
     invalid(node+"func entry(x: i32) -> i32:\n    var a = null\n    return 0\n","nullable");
-    invalid(node+"value struct unsupported:\n    reference: node?\n","deferred");
+    require(vd::analyze_source({"/managed.void",node+"value struct supported:\n    reference: node?\n"}).succeeded(),"nullable reference value field rejected");
     invalid(node+"const a = node()\n","compile-time");
     invalid(node+"func entry(x: i32) -> i32:\n    return node(value = true).value\n","Type mismatch");
     invalid(node+"func entry(x: i32) -> i32:\n    return node(value = 1, value = 2).value\n","Duplicate");

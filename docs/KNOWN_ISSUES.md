@@ -1,9 +1,17 @@
 # Known issues and deferred work
 
-Updated for Phase 17 managed custom initialization. The owner declares Phase 16
-locked and reports run #28 green on all seven jobs (35 suites/configuration).
-Phase 17 adds four suites (39 total); hosted Windows/macOS and seven-job verification
-remain necessary after the owner pushes. See MANAGED_INITIALIZATION.md and WORK_LOG.md.
+Updated for Phase 18 reference-containing values. The owner locks Phase 17 and
+reports run #29 green on all seven jobs (39 suites/configuration). Phase 18 adds
+four suites (43 total); hosted Windows/macOS and seven-job verification remain
+necessary after the owner pushes. REFERENCE_VALUE_STRUCTS.md and WORK_LOG.md record
+the supported contract and actual local verification.
+
+Value init retains C1 all-fields-valid entry; required-reference value fields use
+explicit no-init construction. Fresh initializer profiles and existing binding
+capacities are fixed and conservative. Readonly nominal heap fields, richer value
+readiness, flow-sensitive authority upgrades and managed aggregate FFI are deferred.
+Fixed aggregate root homes can increase native frame pressure and retain dead values
+until return; the 1 MiB semantic checks are not an arbitrary native frame guarantee.
 
 S1 construction views have no precommit identity: whole-view escape, self-links,
 casts/nullable injection, rebinding, constructor arguments and returns are rejected.
@@ -13,7 +21,7 @@ masks, capped at 1024/project. Required value children still complete before the
 body. Effects on completed objects are not rolled back on body/commit failure.
 These approved limits do not permanently prohibit broader future initialization.
 
-Reference-containing value structs, richer nullable patterns, managed FFI and
+Richer nullable patterns, managed FFI and
 production GC tuning remain deferred. Readonly/effect analysis is conservative
 across control-flow/rebinding joins and may reject cases requiring path-sensitive
 alias reasoning. Managed debug metadata is currently opaque-pointer metadata.

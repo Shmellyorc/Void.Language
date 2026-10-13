@@ -1,0 +1,25 @@
+struct node:
+    value: i32
+
+value struct payload:
+    child: node
+
+value struct wrapper:
+    item: payload
+
+struct owner:
+    value: wrapper
+
+func make(value: i32) -> wrapper:
+    return wrapper(item = payload(child = node(value = value)))
+
+func entry(value: i32) -> i32:
+    # The current CLI budget is 256: collect at the parent publication boundary.
+    var i = 0
+    for i < 255:
+        var garbage = node(value = i)
+        i++
+    var o = owner(value = make(value))
+    var copy = o.value
+    copy.item.child.value++
+    return o.value.item.child.value

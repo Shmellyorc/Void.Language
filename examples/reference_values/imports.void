@@ -1,0 +1,7 @@
+use "./types.void" as model
+
+func entry(value: i32) -> i32:
+    var w = model.make(value)
+    w.count++
+    var c = w.get() as model.cell
+    return c.value + w.count

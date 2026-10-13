@@ -1,0 +1,18 @@
+struct node:
+    value: i32
+
+value struct packet:
+    owner: node?
+    count: i32
+
+value struct outer:
+    nested: packet
+
+const empty = outer()
+
+func entry(value: i32) -> i32:
+    var a = empty
+    a.nested.owner = node(value = value)
+    var n = a.nested.owner as node
+    n.value++
+    return n.value

@@ -179,14 +179,17 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
             b.CreateMemSet(storage,b.getInt8(0),bytes,layout.getABITypeAlign(native));
             stage_storage.emplace(instruction.a,storage);
         }
-        std::function<void(ir::Type,std::uint64_t,std::vector<std::uint64_t>&)> reference_offsets = [&](ir::Type t, std::uint64_t offset, auto& result) {
-            if (t.construction) return; // A view points to stack storage, never a heap root.
-            if (t.kind == ir::Type::managed_ref) result.push_back(offset);
-            else if (t.kind == ir::Type::aggregate) {
-                auto* native = llvm::cast<llvm::StructType>(type(t));
-                auto* offsets = layout.getStructLayout(native);
-                for (unsigned i = 0; i < t.definition->fields.size(); ++i)
-                    reference_offsets(t.definition->fields[i].type, offset + offsets->getElementOffset(i), result);
+        auto reference_offsets = [&](ir::Type t, std::uint64_t base, auto& result) {
+            // Translate the shared logical shape into this module's target
+            // offsets. Qualifiers never change native layout or root identity.
+            for (const auto& path:ir::reference_paths(t)) {
+                auto current=t; auto offset=base;
+                for (auto field:path) {
+                    auto* native=llvm::cast<llvm::StructType>(type(current));
+                    offset+=layout.getStructLayout(native)->getElementOffset(field);
+                    current=ir::field_type(current,field);
+                }
+                result.push_back(offset);
             }
         };
         auto* size_type = b.getIntNTy(layout.getPointerSizeInBits());
@@ -271,6 +274,15 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 };
                 // IR operand types preserve signedness, even when native widths coincide.
                 auto operand_type = [&](unsigned id) { return value_types.at(id); };
+                auto guard_complete = [&](ir::Type value_type,llvm::Value* value) {
+                    for (const auto& path:ir::reference_paths(value_type)) {
+                        auto leaf=value_type;
+                        for (auto field:path) leaf=ir::field_type(leaf,field);
+                        if (leaf.nullable) continue;
+                        auto* reference=path.empty() ? value : b.CreateExtractValue(value,path);
+                        fail_if(b.CreateIsNull(reference),"Null supplied for non-nullable field");
+                    }
+                };
                 switch (instruction.op) {
                 case Op::gc_poll: case Op::gc_collect: {
                     if (instruction.op == Op::gc_poll) v = b.CreateCall(module->getOrInsertFunction("vd_gc_poll",b.getVoidTy()));
@@ -299,7 +311,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     for (unsigned field=0;field<instruction.arguments.size();++field) {
                         auto* value=values[instruction.arguments[field]];
                         ir::Type field_type=instruction.type.definition->fields[field].type;
-                        if (field_type.kind==ir::Type::managed_ref && !field_type.nullable) fail_if(b.CreateIsNull(value),"Null supplied for non-nullable field");
+                        guard_complete(field_type,value);
                         b.CreateStore(value,b.CreateStructGEP(native,payload,field));
                     }
                     std::vector<std::uint64_t> offsets; reference_offsets(object,0,offsets);
@@ -322,8 +334,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     auto object = operand_type(instruction.a);
                     if (!object.construction) fail_if(b.CreateIsNull(values[instruction.a]),"Null managed reference");
                     ir::Type field=object.definition->fields.at(static_cast<std::size_t>(instruction.immediate)).type;
-                    if (object.construction && instruction.op==Op::gc_write && field.kind==ir::Type::managed_ref && !field.nullable)
-                        fail_if(b.CreateIsNull(values[instruction.b]),"Null supplied for required construction field");
+                    if (instruction.op==Op::gc_write) guard_complete(field,values[instruction.b]);
                     auto* address = b.CreateStructGEP(type(ir::Type(object.definition)),values[instruction.a],static_cast<unsigned>(instruction.immediate));
                     if (instruction.op == Op::gc_read) v = b.CreateLoad(type(object.definition->fields.at(static_cast<std::size_t>(instruction.immediate)).type),address);
                     else v = b.CreateStore(values[instruction.b],address);

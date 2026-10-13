@@ -648,3 +648,46 @@ helper-assisted first initialization, reference-containing values, fallible resu
 resources/deinit, runtime defaults and broader source features remain deferred.
 MANAGED_INITIALIZATION.md defines the implemented boundary; WORK_LOG.md records
 actual verification and pending seven-job hosted acceptance.
+
+## Phase 18: reference-containing values, approved RV1–RV7
+
+The owner approved per-reference-leaf readonly capabilities, fixed fresh-value-init
+profiles, authority-neutral pure all-null templates, fixed existing storage capacity
+and the C1/S1 boundary. REFERENCE_VALUE_STRUCTS.md records implemented behavior.
+Inline copies retain object identity without cloning. Plain/const value formals and
+receiver/return effects use finite inline reference paths and formal-leaf origins;
+managed edges stop the shape. Selected heap-owner mutation is distinct from inline
+storage mutation and from embedded-reference effects, including reference-free
+inline receivers. No runtime permission state is introduced.
+
+Type retains nominal identity independently of leaf qualifications. Shared logical
+paths drive frontend facts, independent IR proof and target root offsets. The IR
+checker derives effects and call/return capabilities rather than trusting frontend
+summaries; a CFG must-proof rejects required-reference slot reads before valid
+initialization. Private staged-view readonly places survive separately from managed
+leaves. S1 view boxing/escape remains prohibited.
+
+No-init construction shares one complete-field plan for aggregate and managed
+results. Custom value init still begins with complete defaults; managed staged init
+still commits identity last. Nested nonnullable publication guards precede commit.
+The existing Frame/Slot roots, heap descriptors, runtime and generation leases are
+reused. Source argument/return snapshots and selected owners remain rooted through
+optimized calls, loops, collection and failure. Root homes may retain dead values
+until return. Reference profiles, effects and initialization dependencies join exact
+analysis/tooling/reload contracts. No public aggregate C ABI is asserted.
+
+The sole obsolete managed-source field-deferral assertion becomes positive coverage.
+Four additive source/AOT/CLI suites retain all 39 preceding suites; the seven-job CI
+workflow is unchanged. Final commands/results and hosted limitations are recorded
+in WORK_LOG.md. Richer unavailable-value initialization, readonly nominal heap fields,
+managed FFI and broader lifetime/source features require separate design approval.
+
+Phase 18's final capability audit adds explicit mutable-authority requirements to
+finite effect summaries. Plain helper signatures require mutable leaves even when
+their current body only reads. Inferred receiver/local alias origins remain
+polymorphic; independent mutable capacities do not. Origin/profile closure precedes
+requirement closure, avoiding premature assumptions about recursive helper results.
+The independent IR proof derives initial capacities from stores/default observations,
+preserves explicit output weakening and separately enforces private-stage place
+readonly. Null/default leaves retain authority even when they have no origins.
+Named leaf paths and field/formal declaration links accompany source diagnostics.

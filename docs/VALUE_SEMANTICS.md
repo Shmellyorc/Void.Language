@@ -222,3 +222,11 @@ never repeat initialization. Supplied values snapshot before default constructio
 explicit named child fields avoid redundant initialization. Readonly applies after
 successful completion. Failure does not publish a partially completed destination.
 INITIALIZATION.md records visibility, required-child and purity boundaries.
+
+## Phase 18 reference-containing values
+
+REFERENCE_VALUE_STRUCTS.md extends these rules to managed references inside values.
+Copies retain independent inline storage and embedded object identity. Const-to-var
+copies preserve each referent capability; pure all-null templates remain neutral.
+C1 defaults/init, S1 complete fields and P4 publication are preserved. Historical
+reference-free restrictions above do not exclude the approved RV1–RV7 subset.

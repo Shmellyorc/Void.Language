@@ -391,6 +391,32 @@ def managed_initialization(executable, root):
     print("managed initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed")
 
 
+def reference_values(executable, root):
+    root.mkdir(parents=True, exist_ok=True)
+    entry, worker = root / "main.void", root / "types.void"
+    types = "struct cell:\n    value: i32\nvalue struct wrapper:\n    reference: cell?\n    count: i32\nfunc (w wrapper) init(const child: cell):\n    w.reference = child\nfunc make(value: i32) -> wrapper:\n    return wrapper(cell(value = value))\n"
+    text = '# é😀 reference carriers\nuse "./types.void" as types\nfunc entry(value: i32) -> i32:\n    var w = types.make(value)\n    var copy = w\n    copy.count++\n    var r = copy.reference as types.cell\n    return r.value + copy.count\n'
+    entry.write_bytes(text.encode("utf-8")); worker.write_bytes(types.encode("utf-8"))
+    uri, wuri = entry.as_uri(), worker.as_uri()
+    query = {"textDocument": {"uri": uri}, "position": source_position(text, "reference as")}
+    with Client(executable, entry) as c:
+        assert all(not n["diagnostics"] for n in c.initialize())
+        response, _ = c.request("textDocument/definition", query)
+        assert response["result"]["uri"] == wuri and response["result"]["range"]["start"] == source_position(types, "reference:"), response
+        bad = text.replace("    return r.value", "    r.value++\n    return r.value")
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": uri, "languageId": "void", "version": 1, "text": bad}})
+        notes = diagnostics(c.sync())
+        errors = [d for d in notes[uri]["diagnostics"] if "readonly" in d["message"]]
+        assert len(errors) == 1 and errors[0]["range"]["start"] == source_position(bad, "r.value++"), notes
+        assert c.request("textDocument/definition", query)[0]["result"] is None
+        assert c.request("textDocument/references", {**query, "context": {"includeDeclaration": True}})[0]["result"] == []
+        c.notify("textDocument/didChange", {"textDocument": {"uri": uri, "version": 2}, "contentChanges": [{"text": text}]})
+        assert all(not n["diagnostics"] for n in c.sync())
+        assert c.request("textDocument/definition", query)[0]["result"]["uri"] == wuri
+        c.shutdown()
+    print("reference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed")
+
+
 if __name__ == "__main__":
     executable = pathlib.Path(sys.argv[1]).resolve()
     # Unicode physical root names work without changing the ASCII VFS policy.
@@ -405,3 +431,5 @@ if __name__ == "__main__":
     managed_structs(executable, root / "managed struct project")
 
     managed_initialization(executable, root / "managed initialization project")
+
+    reference_values(executable, root / "reference value project")

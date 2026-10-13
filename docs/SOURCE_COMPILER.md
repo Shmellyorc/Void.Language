@@ -196,3 +196,8 @@ lifecycle diagnostics. Fresh construction uses shared receiver Places and explic
 invocation metadata; source execution and optimized/unoptimized JIT/AOT share the same
 lowering. Required-child wrappers, pure contexts, readonly publication and conservative
 initializer/helper reload contracts remain explicit boundaries.
+
+Phase 18 implements owner-approved reference-containing value structs, per-leaf
+readonly capability/effect checking, complete construction and precise roots through
+normal/O2 JIT and native AOT. See [REFERENCE_VALUE_STRUCTS.md](REFERENCE_VALUE_STRUCTS.md);
+earlier phase-only type exclusions in this historical guide are superseded there.

@@ -1,0 +1,24 @@
+struct node:
+    value: i32
+
+value struct packet:
+    owner: node
+    count: i32
+
+func (p packet) bump() -> i32:
+    p.owner.value++
+    return p.owner.value
+
+func (p packet) get() -> node:
+    var alias = p.owner
+    return alias
+
+func entry(value: i32) -> i32:
+    var n = node(value = value)
+    const p = packet(owner = n)
+    var copy = p
+    copy.count = 3
+    var view = copy.get()
+    var fresh = packet(owner = node(value = 5)).bump()
+    n.value++
+    return view.value + copy.count + fresh

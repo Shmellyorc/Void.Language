@@ -5,7 +5,7 @@ This repository now compiles graphs of actual `.void` files through one frontend
 semantic model, backend-independent IR, and shared LLVM 19.1.7 AOT/JIT lowering.
 The implemented subset supports typed functions, all ten exact-width numeric types,
 contextual literals, checked numeric `as`, bool expressions, local variables,
-conditionals, `for` loops, readonly/compile-time constants, numeric/bool value structs with custom initialization, managed structs with receiver methods and custom initialization, and source-first
+conditionals, `for` loops, readonly/compile-time constants, numeric/bool/nested value structs carrying managed references with custom initialization, managed structs with receiver methods and custom initialization, and source-first
 compile/runtime diagnostics. Compile-time errors now include stable codes, ranges,
 related declarations and recovery across independent errors. Cooperative GC roots/thread coordination, leased function
 replacement, and native C interoperability retain their architectural regression proofs.
@@ -213,8 +213,9 @@ Visual Studio DIA SDK (`VSINSTALLDIR`); an explicit real
 Seven independent runners execute Ubuntu Debug/Release/Sanitizers, Windows
 Debug/Release and macOS ARM64 Debug/Release. Each runs the full CTest inventory;
 Debug jobs also test/package the extension and run real editor integration. The
-owner reports Phase 16 passed all seven jobs in run #28. Phase 17 extends the
-inventory to 39 suites and requires a new hosted run after owner review and push.
+owner reports Phase 17 passed all seven jobs in run #29, locking its 39 suites.
+Phase 18 adds four reference-value suites (43 total) and requires a new hosted run
+after owner review and push.
 See [verified commands and results](docs/WORK_LOG.md).
 
 ## Continue development
@@ -227,9 +228,10 @@ Read [the Language Bible](docs/LANGUAGE_BIBLE.md),
 [value semantics](docs/VALUE_SEMANTICS.md), and
 [known issues](docs/KNOWN_ISSUES.md).
 The language server and extension connect immutable document sessions to real LSP
-clients. Managed source now uses the coordinated runtime. The next recommended
-language design work is reference-containing value capabilities. Custom managed
-initialization now uses the approved staged construction contract; see
+clients. Managed source and reference-containing values use the coordinated runtime.
+Review [reference-value semantics](docs/REFERENCE_VALUE_STRUCTS.md) before expanding
+initialization or readonly field policies. Custom managed initialization uses the
+approved staged construction contract; see
 [managed initialization](docs/MANAGED_INITIALIZATION.md) before extending it.
 
 ## Structured compiler diagnostics
@@ -367,3 +369,24 @@ ordinary reference aliases retain their established rules. These are parsed sour
 programs, distinct from the older hand-built IR architectural proofs.
 See [the source contract](docs/MANAGED_INITIALIZATION.md) for failure behavior,
 required-field/helper restrictions, platform linking and deferred features.
+
+
+## Reference-containing values (Phase 18)
+
+Value copies duplicate inline storage while retaining embedded managed identities.
+Readonly authority follows each reference leaf through copies, calls and nested
+fields. A var copy can change its scalar fields without thawing readonly referents.
+
+```sh
+build/ci-debug/voidc run examples/reference_values/copies.void 10 --no-opt
+build/ci-debug/voidc run examples/reference_values/copies.void 10
+build/ci-debug/void_reference_values_cli_copies_normal 10
+build/ci-debug/void_reference_values_cli_copies_optimized 10
+```
+
+Each prints 32. The latter two are separately linked native executables from actual
+source-emitted objects, not hand-built IR proofs. The new source/AOT tests also
+exercise nested cycles with aggregate-only precise roots, padding, optimized
+handoffs, failure/recovery and selected heap owners. See
+[the approved source contract](docs/REFERENCE_VALUE_STRUCTS.md) for C1 defaults,
+fixed initializer profiles, all-null templates, readonly limits and verification.

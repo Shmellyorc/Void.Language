@@ -4,6 +4,7 @@
 #include <memory>
 #include <optional>
 #include <map>
+#include <set>
 namespace vd { class ValidatedAnalysis; }
 #include <string>
 #include <vector>
@@ -12,11 +13,16 @@ namespace vd::ir {
 // across control-flow edges. The defaults retain the original proof ABI.
 struct ValueType;
 struct TypeArena;
+using ReferencePath = std::vector<unsigned>;
+using ReferencePaths = std::set<ReferencePath>;
 struct Type {
     enum Kind { i32, boolean, none, i8, i16, i64, u8, u16, u32, u64, f32, f64, aggregate, unresolved, invalid, managed_ref, null_value };
     Kind kind = i32;
     bool nullable = false, readonly = false;
     bool construction = false; // Private place capability; never a managed reference value.
+    // Compile-time authority only. Paths cross inline fields and stop at the
+    // first managed reference. They never affect nominal identity or layout.
+    ReferencePaths readonly_references;
     std::shared_ptr<const ValueType> definition;
     Type(Kind k = i32) : kind(k) {}
     explicit Type(std::shared_ptr<const ValueType> d, Kind k = aggregate);
@@ -55,6 +61,15 @@ inline bool operator==(const Type& a, const Type& b) {
         a.definition && b.definition && a.definition->identity == b.definition->identity);
 }
 struct ConstantValue { std::uint64_t bits = 0; std::vector<ConstantValue> fields; };
+ReferencePaths reference_paths(Type type);
+ReferencePaths readonly_paths(Type type);
+Type with_readonly_paths(Type type, const ReferencePaths& paths);
+Type readonly_view(Type type);
+Type field_type(Type owner, unsigned field);
+Type with_field_type(Type owner, unsigned field, Type value);
+bool capability_assignable(Type actual, Type expected);
+std::string capability_key(Type type);
+std::string reference_path_name(Type type,const ReferencePath& path);
 std::string type_name(Type type);
 enum class Op { argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,

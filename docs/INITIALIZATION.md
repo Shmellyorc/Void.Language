@@ -6,7 +6,8 @@ Phase 17 custom managed init follows approved S1 + MI1–MI7; see
 below remain unchanged: required value children complete before the body, and
 `var p: point` performs value default construction. Managed nonnullable bindings
 still require explicit construction; direct required managed fields use Phase 17
-readiness proof instead. Reference-containing source values remain deferred.
+readiness proof instead. Phase 18 reference-containing values preserve C1 and infer
+fixed fresh-initializer leaf profiles; see REFERENCE_VALUE_STRUCTS.md.
 
 The owner approved C1 in INITIALIZATION_PROPOSAL.md, including recursive nested
 construction, required-child availability, visibility, conservative initialization

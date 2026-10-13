@@ -735,3 +735,14 @@ repeated GC/coordination stress, real editors and VSIX, then all seven hosted jo
 Do not infer Windows/macOS ARM64 results from Linux. Next investigate reference-
 containing value capabilities; broader construction identity/escape, fallible
 results or resource lifetime require their own approved contract.
+
+## Phase 18: reference-containing values
+
+The owner locks Phase 17 at seven-job run #29 (39 suites) and approves RV1–RV7.
+REFERENCE_VALUE_STRUCTS.md documents the extension through shared semantic facts,
+IR capability/readiness validation and existing Frame/Slot/heap publication. Four
+additive suites bring the inventory to 43. Preserve both LLVM 19.1.7 SDKs across
+Debug/Release/strict sanitizers, stress/small-stack and real editor gates, then all
+seven hosted jobs. Review hosted acceptance and frame/analysis pressure before
+selecting a separately designed language expansion. C1, S1 and P3/P4 remain
+authoritative; broader initialization and heap-field capabilities are deferred.

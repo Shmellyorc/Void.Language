@@ -2834,3 +2834,37 @@ non-nullable field values. No implicit non-nullable allocation occurs. Complete
 objects alone are published. Custom managed `init` and reference-containing value
 structs are deferred, not prohibited. Existing value `init` semantics are unchanged.
 MANAGED_STRUCTS.md distinguishes working source from this Bible's broader proposals.
+
+## Approved Phase 18 clarification: references inside values
+
+RV1–RV7 in REFERENCE_VALUE_STRUCTS_PROPOSAL.md are owner-approved. Value copies
+retain independent inline storage and embedded managed target identity. Nested
+values may contain nullable/nonnullable managed references; reference edges break
+inline layout recursion. No object clone or source storage-placement distinction
+is introduced.
+
+Readonly authority follows each inline reference leaf. Const bindings/formals give
+deep readonly views; var copies regain writable independent storage without
+regaining authority over readonly referents. Plain value formals require mutable
+reference leaves. Mixed profiles remain distinct, receiver effects are inferred,
+and returned/aliased references retain their authority. Existing binding capacities
+are fixed: readonly carriers cannot be installed into mutable-reference storage,
+including nested managed payloads. Independently held mutable aliases remain valid.
+
+C1 still requires all value fields valid before value init. Nullable leaves default
+null; nonnullable references require supplied complete values and are never silently
+allocated or represented by a zero source default. Required-reference value types
+use explicit no-init construction in this slice. Do not extend S1 unavailable-field
+rules into value initialization. S1's direct managed-field readiness and P4's final
+complete-object commit remain unchanged.
+
+Fresh value initialization infers one conservative reference profile for the whole
+body/result, including const inputs, defaults, helper results and branch joins.
+There are no runtime-dependent permissions or mandatory ownership annotations.
+Pure, init-free all-null templates remain authority-neutral when materialized;
+runtime readonly views and const formal qualification remain readonly even if null.
+Live objects and init execution remain outside compile-time pure expressions.
+
+REFERENCE_VALUE_STRUCTS.md defines the implemented boundary and deferred richer
+initialization/readonly-field policies. This clarification supersedes earlier
+phase-only reference-containing-value deferrals, not the broader language design.

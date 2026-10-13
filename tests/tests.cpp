@@ -1,6 +1,7 @@
 #include "void/backend.hpp"
 #include "void/heap.hpp"
 #include "void/native.hpp"
+#include "void/reference_capabilities.hpp"
 #include "native_fixture.h"
 #include <atomic>
 #include <condition_variable>
@@ -26,6 +27,98 @@ template<class F> void rejects(F operation) {
     require(rejected, "invalid input accepted");
 }
 void core() {
+    // Logical reference paths cross inline values but stop at heap identity.
+    // Self-referential managed graphs must not recursively expand the shape.
+    using namespace vd::ir;
+    auto node=std::make_shared<ValueType>(); node->identity="shape::node"; node->name="node"; node->managed=true;
+    Type ref(node,Type::managed_ref); ref.nullable=true;
+    node->fields={{"next",ref},{"scalar",Type::i32}};
+    auto pair=std::make_shared<ValueType>(); pair->identity="shape::pair"; pair->name="pair";
+    pair->fields={{"left",ref},{"right",ref},{"scalar",Type::i32}};
+    Type pair_type(pair);
+    auto outer=std::make_shared<ValueType>(); outer->identity="shape::outer"; outer->name="outer";
+    outer->fields={{"nested",pair_type},{"direct",ref}};
+    Type outer_type(outer);
+    require(reference_paths(outer_type)==ReferencePaths{{0,0},{0,1},{1}},"finite nested reference shape");
+    auto mixed=with_readonly_paths(outer_type,{{0,1}});
+    require(mixed==outer_type && !(mixed<outer_type) && !(outer_type<mixed),"capabilities changed nominal identity");
+    require(readonly_paths(field_type(field_type(mixed,0),1))==ReferencePaths{{}},"nested readonly projection");
+    require(readonly_paths(field_type(field_type(mixed,0),0)).empty(),"unrelated reference authority lost");
+    require(!capability_assignable(mixed,outer_type) && capability_assignable(outer_type,mixed),"readonly capability assignability");
+    auto replaced=with_field_type(mixed,0,pair_type);
+    require(readonly_paths(replaced).empty(),"aggregate reference profile replacement");
+    auto deep=readonly_view(outer_type);
+    require(readonly_paths(deep)==reference_paths(outer_type),"deep readonly aggregate view");
+    require(readonly_paths(field_type(readonly_view(ref),0))==ReferencePaths{{}},"deep readonly heap edge");
+    auto stage=ref; stage.nullable=false; stage.construction=true;
+    require(reference_paths(stage).empty(),"construction view became managed reference leaf");
+    require(fact_type(readonly_view(stage),{}).readonly && !capability_assignable(readonly_view(stage),stage),"construction-place readonly capability was discarded");
+    Module capability_ir; capability_ir.identity="capability-proof"; capability_ir.coordinated=true;
+    Function pack; pack.name="pack"; pack.parameters={readonly_view(ref)}; pack.result=pair_type;
+    pack.blocks={{{{Op::argument},{Op::constant,0,0,0,{}, {},ref},{Op::constant,0,0,1},
+        {Op::aggregate,0,0,0,{}, {},pair_type,{0,1,2}}},{Terminator::Kind::return_value,3}}};
+    capability_ir.functions={pack};
+    rejects([&] { validate(capability_ir); }); // Aggregate result cannot launder its first leaf.
+    capability_ir.functions[0].result=with_readonly_paths(pair_type,{{0}});
+    InstructionTypes capability_types; validate(capability_ir,&capability_types);
+    require(readonly_paths(capability_types[0][0][3])==ReferencePaths{{0}},"IR aggregate failed to derive leaf capabilities");
+    auto forged=capability_ir;
+    forged.functions[0].locals={pair_type};
+    forged.functions[0].blocks[0].instructions.push_back({Op::store,0,3});
+    rejects([&] { validate(forged); }); // A declared mutable slot cannot accept the carrier.
+    Function select; select.name="select"; select.parameters={pair_type}; select.locals={pair_type};
+    select.receiver=true; select.result=ref;
+    select.blocks={{{{Op::load,0},{Op::extract,0}},{Terminator::Kind::return_value,1}}};
+    Function caller; caller.name="caller"; caller.parameters={readonly_view(pair_type)};
+    caller.locals={readonly_view(pair_type),ref}; caller.result=Type::i32;
+    Instruction invocation{Op::call}; invocation.callee="select"; invocation.receiver=Place{0,{}};
+    caller.blocks={{{{Op::argument},{Op::store,0,0},invocation,{Op::store,1,2},{Op::constant,0,0,1}},
+        {Terminator::Kind::return_value,4}}};
+    capability_ir.functions={select,caller};
+    rejects([&] { validate(capability_ir); }); // A readonly receiver must qualify a method's returned reference.
+    capability_ir.functions[1].locals[1]=readonly_view(ref);
+    validate(capability_ir);
+    Function weaken;weaken.name="weaken";weaken.parameters={ref};weaken.result=readonly_view(ref);
+    weaken.blocks={{{{Op::argument}},{Terminator::Kind::return_value,0}}};
+    Function dropped;dropped.name="dropped";dropped.parameters={ref};dropped.locals={ref};dropped.result=Type::i32;
+    dropped.blocks={{{{Op::argument},{Op::call,0,0,0,"weaken",{}, {},{0}},{Op::store,0,1},{Op::constant,0,0,0}},
+        {Terminator::Kind::return_value,3}}};
+    auto interface_ir=capability_ir;interface_ir.functions={weaken,dropped};
+    rejects([&] {validate(interface_ir);});
+    interface_ir.functions[1].locals[0]=readonly_view(ref);validate(interface_ir);
+    auto invalid_shape=capability_ir;
+    invalid_shape.functions[1].locals[0].readonly_references.insert({9});
+    rejects([&] { validate(invalid_shape); });
+    auto heap_shape=std::make_shared<ValueType>();heap_shape->identity="shape::heap";heap_shape->name="heap";heap_shape->managed=true;
+    heap_shape->fields={{"payload",pair_type}};
+    Type heap_ref(heap_shape,Type::managed_ref);
+    Function publish;publish.name="publish";publish.parameters={readonly_view(pair_type)};publish.result=heap_ref;
+    publish.blocks={{{{Op::argument},{Op::gc_construct,0,0,0,{}, {},heap_ref,{0}}},{Terminator::Kind::return_value,1}}};
+    capability_ir.functions={publish};
+    rejects([&] { validate(capability_ir); }); // Qualification cannot be hidden in a heap payload.
+    publish.parameters={heap_ref,readonly_view(pair_type)};publish.result=Type::i32;
+    publish.blocks={{{{Op::argument},{Op::argument,1},{Op::gc_write,0,1},{Op::constant,0,0,0}},
+        {Terminator::Kind::return_value,3}}};capability_ir.functions={publish};
+    rejects([&] { validate(capability_ir); });
+    Function read;read.name="read";read.parameters={readonly_view(heap_ref)};read.result=ref;
+    read.blocks={{{{Op::argument},{Op::gc_read,0},{Op::extract,1}},{Terminator::Kind::return_value,2}}};
+    capability_ir.functions={read};
+    rejects([&] { validate(capability_ir); }); // Readonly must cross the heap -> inline -> reference path.
+    capability_ir.functions[0].result=readonly_view(ref);validate(capability_ir);
+    auto required_ref=ref;required_ref.nullable=false;
+    auto required_value=std::make_shared<ValueType>();required_value->identity="shape::required";required_value->name="required";
+    required_value->fields={{"child",required_ref}};
+    Function null_nested;null_nested.name="null_nested";null_nested.parameters={};null_nested.result=Type(required_value);
+    null_nested.blocks={{{{Op::constant,0,0,0,{}, {},required_ref},{Op::aggregate,0,0,0,{}, {},Type(required_value),{0}}},
+        {Terminator::Kind::return_value,1}}};capability_ir.functions={null_nested};
+    rejects([&] { validate(capability_ir); });
+    null_nested.locals={required_ref};
+    null_nested.blocks[0].instructions[0]={Op::load,0};capability_ir.functions={null_nested};
+    rejects([&] { validate(capability_ir); }); // Zeroed root storage is not a valid nonnullable default.
+    Function boxed_stage;boxed_stage.name="boxed_stage";boxed_stage.parameters={stage};boxed_stage.locals={stage};boxed_stage.construction_origins={{0,0}};boxed_stage.result=pair_type;
+    boxed_stage.blocks={{{{Op::argument},{Op::constant,0,0,0,{}, {},ref},{Op::constant,0,0,0},
+        {Op::aggregate,0,0,0,{}, {},pair_type,{0,1,2}}},{Terminator::Kind::return_value,3}}};capability_ir.functions={boxed_stage};
+    rejects([&] { validate(capability_ir); });
     vd::SourceFile source("/main.void", "func main():\r\n    return 42\r\n");
     auto pos = source.location(18);
     require(pos.line == 2 && pos.column == 5, "CRLF source coordinates");

@@ -1,5 +1,6 @@
 #include "void/ir.hpp"
 #include "void/numeric.hpp"
+#include "void/reference_capabilities.hpp"
 #include <map>
 #include <algorithm>
 #include <set>
@@ -28,6 +29,7 @@ Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
 }
 FieldType::FieldType(Type t) : kind(t.kind), nullable(t.nullable), readonly(t.readonly) {
     if (t.construction) throw std::invalid_argument("construction view cannot be a field type");
+    if (!t.readonly_references.empty()) throw std::invalid_argument("qualified reference leaves cannot be nominal field declarations");
     if (t.definition) target = t.definition->self;
 }
 FieldType::operator Type() const {
@@ -35,6 +37,84 @@ FieldType::operator Type() const {
     auto d = target.lock();
     if (!d) throw std::logic_error("nominal type edge outlived its definition table");
     Type t(std::move(d),kind); t.nullable=nullable; t.readonly=readonly; return t;
+}
+
+ReferencePaths reference_paths(Type root) {
+    ReferencePaths result;
+    struct Pending { Type type; ReferencePath path; };
+    std::vector<Pending> pending{{root,{}}};
+    std::size_t expanded=0;
+    while (!pending.empty()) {
+        auto [type,path]=std::move(pending.back()); pending.pop_back();
+        if (type.construction) continue; // A stage is a place, never a heap root.
+        if (type.kind==Type::managed_ref) { result.insert(std::move(path)); continue; }
+        if (type.kind!=Type::aggregate) continue;
+        if (!type.definition || path.size()>=128 || ++expanded>65536)
+            throw std::invalid_argument("VOID IR: recursive or excessive reference shape");
+        for (unsigned n=0;n<type.definition->fields.size();++n) {
+            auto child=path; child.push_back(n);
+            pending.push_back({type.definition->fields[n].type,std::move(child)});
+        }
+    }
+    return result;
+}
+ReferencePaths readonly_paths(Type type) {
+    if (type.readonly) return reference_paths(type);
+    return type.readonly_references;
+}
+Type with_readonly_paths(Type type,const ReferencePaths& paths) {
+    // A private construction view is a place capability, not a managed leaf.
+    // Its readonly place permission must survive ordinary fact propagation.
+    if (type.construction) { type.readonly_references=paths; return type; }
+    type.readonly=false; type.readonly_references=paths;
+    if (type.kind==Type::managed_ref && !type.construction) {
+        type.readonly=paths.contains(ReferencePath{});
+        type.readonly_references.clear();
+    }
+    return type;
+}
+Type readonly_view(Type type) {
+    if (type.construction) { type.readonly=true; return type; }
+    return with_readonly_paths(type,reference_paths(type));
+}
+Type field_type(Type owner,unsigned field) {
+    auto result=Type(owner.definition->fields.at(field).type);
+    if (owner.kind==Type::managed_ref) return owner.readonly ? readonly_view(result) : result;
+    ReferencePaths projected=readonly_paths(result);
+    for (const auto& path:readonly_paths(owner)) if (!path.empty() && path[0]==field)
+        projected.insert(ReferencePath(path.begin()+1,path.end()));
+    return with_readonly_paths(result,projected);
+}
+Type with_field_type(Type owner,unsigned field,Type value) {
+    ReferencePaths paths=readonly_paths(owner);
+    for (auto p=paths.begin();p!=paths.end();) {
+        if (!p->empty() && (*p)[0]==field) p=paths.erase(p); else ++p;
+    }
+    for (auto path:readonly_paths(value)) { path.insert(path.begin(),field); paths.insert(std::move(path)); }
+    return with_readonly_paths(owner,paths);
+}
+bool capability_assignable(Type actual,Type expected) {
+    if (actual.construction && actual.readonly && !expected.readonly) return false;
+    const auto allowed=readonly_paths(expected);
+    for (const auto& path:readonly_paths(actual)) if (!allowed.contains(path)) return false;
+    return true;
+}
+std::string capability_key(Type type) {
+    std::string result;
+    for (const auto& path:readonly_paths(type)) {
+        result+='[';
+        for (auto field:path) result+=std::to_string(field)+',';
+        result+=']';
+    }
+    return result;
+}
+std::string reference_path_name(Type type,const ReferencePath& path) {
+    std::string result=type.definition ? type.definition->name : type_name(type);
+    for (auto field:path) {
+        result+='.'+type.definition->fields.at(field).name;
+        type=field_type(type,field);
+    }
+    return result;
 }
 
 std::string construction_name(const std::string& symbol,const std::vector<unsigned>& parameters) {
@@ -51,8 +131,10 @@ std::string type_name(Type t) {
     throw std::invalid_argument("VOID IR: unknown type");
 }
 #include "construction.inc"
+#include "reference_capabilities.inc"
 void validate(const Module& m, InstructionTypes* results) {
     if (results) results->clear();
+    InstructionTypes qualified_types;
     auto fail = [](const std::string& text) { throw std::invalid_argument("VOID IR: " + text); };
     if (m.identity.empty()) fail("missing module identity");
     std::map<std::string,const ValueType*> definitions;
@@ -85,11 +167,14 @@ void validate(const Module& m, InstructionTypes* results) {
             std::set<std::string> fields;
             for (const auto& field:d->fields) {
                 if (field.name.empty() || !fields.insert(field.name).second || Type(field.type)==Type::none) fail("invalid value field");
+                if (field.type.readonly) fail("readonly nominal field declarations are not supported");
                 pending.push_back(field.type);
             }
             // References break physical layout recursion, not graph validation.
             for (const auto& field:d->fields) inline_layout(field.type);
         }
+        const auto shape=reference_paths(root);
+        for (const auto& path:root.readonly_references) if (!shape.contains(path)) fail("invalid readonly reference path");
     };
     auto assignable = [](Type actual,Type expected) {
         return actual==expected || (actual.kind==Type::managed_ref && expected.kind==Type::managed_ref && Type::key(actual)==Type::key(expected) && actual.construction==expected.construction && (!actual.nullable || expected.nullable));
@@ -118,7 +203,7 @@ void validate(const Module& m, InstructionTypes* results) {
     }
     for (const auto& f : m.functions) {
         if (f.blocks.empty()) fail("function has no blocks");
-        if (results) results->emplace_back();
+        qualified_types.emplace_back();
         std::vector<std::vector<Type>> body_types;
         for (const auto& b : f.blocks) {
             std::vector<Type> types;
@@ -180,6 +265,7 @@ void validate(const Module& m, InstructionTypes* results) {
                     result = f.parameters[i.a]; break;
                 case Op::constant:
                     if (i.type.construction || i.type.kind == Type::aggregate || i.type == Type::none || (i.type.kind == Type::managed_ref && i.immediate != 0) || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1)) fail("invalid literal");
+                    if (i.type.kind==Type::managed_ref && !i.type.nullable) fail("null literal requires a nullable reference type");
                     valid_type(i.type); result = i.type; break;
                 case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:
                     result = operand(i.a);
@@ -216,7 +302,6 @@ void validate(const Module& m, InstructionTypes* results) {
                             t = t.definition->fields[field].type;
                         }
                         if (t != signature.parameters[0]) fail("receiver type mismatch");
-                        if (f.receiver && !f.receiver_mutates && i.receiver->slot == 0 && signature.mutates) fail("non-mutating method calls mutating receiver");
                         first = 1;
                     }
                     auto args = i.arguments;
@@ -231,7 +316,7 @@ void validate(const Module& m, InstructionTypes* results) {
                 types.push_back(result);
             }
             body_types.push_back(types);
-            if (results) results->back().push_back(types);
+            qualified_types.back().push_back(types);
             auto destination = [&](unsigned id) { if (id >= f.blocks.size()) fail("invalid branch destination"); };
             switch (b.end.kind) {
             case Terminator::Kind::return_value:
@@ -248,5 +333,7 @@ void validate(const Module& m, InstructionTypes* results) {
         }
         validate_construction(f,m,body_types);
     }
+    validate_reference_capabilities(m,qualified_types);
+    if (results) *results=std::move(qualified_types);
 }
 }

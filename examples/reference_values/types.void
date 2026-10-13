@@ -1,0 +1,16 @@
+struct cell:
+    value: i32
+
+value struct wrapper:
+    reference: cell?
+    count: i32
+
+func (w wrapper) init(const child: cell):
+    w.reference = child
+    w.count = 1
+
+func (w wrapper) get() -> cell?:
+    return w.reference
+
+func make(value: i32) -> wrapper:
+    return wrapper(cell(value = value))

@@ -3,7 +3,9 @@
 Implements owner-approved **S1 + MI1–MI7** from
 [MANAGED_INITIALIZATION_PROPOSAL.md](MANAGED_INITIALIZATION_PROPOSAL.md).
 Phase 16 is locked: the owner reports run #28 passed all seven jobs, 35 suites
-per configuration. Phase 17 preserves P3 deep readonly capabilities and P4
+per configuration. The owner subsequently locks Phase 17 at run #29, all seven jobs
+with 39 suites. Phase 18 adds reference-containing values without changing S1;
+see REFERENCE_VALUE_STRUCTS.md. Phase 17 preserves P3 deep readonly capabilities and P4
 complete-object publication. Local verification and pending hosted gates are in
 [WORK_LOG.md](WORK_LOG.md).
 
@@ -188,13 +190,13 @@ ARM64 ABI/layout/O2 execution and Debug editor runs; Linux cannot certify these.
 ## Deferred work
 
 Self identity/self-links during construction, borrowed view returns/rebinding,
-helper-assisted first initialization, reference-containing value structs, required
+helper-assisted first initialization, required
 value-field definite initialization, runtime defaults, ordinary named/default calls,
 fallible constructor results, resources/deinit/finalizers, native managed exports,
 strings/collections, generics/inheritance/interfaces and source threading remain
 future design work. These are current boundaries, not permanent language bans.
 No production GC readiness or arbitrary native-provider teardown guarantee is claimed.
 
-Recommended next phase: design reference-containing value capabilities and their
-copy/readonly/root contracts before implementing them. Broader construction-view
+Phase 18 implements approved reference-containing value capabilities through the
+same staging/publication machinery; see REFERENCE_VALUE_STRUCTS.md. Broader construction-view
 escape or identity support requires its own approved publication/lifetime design.

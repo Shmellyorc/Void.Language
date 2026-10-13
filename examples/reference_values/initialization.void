@@ -1,0 +1,18 @@
+struct node:
+    value: i32
+
+value struct packet:
+    owner: node?
+    count: i32
+
+func (p packet) init(const child: node, count: i32 = 2):
+    p.owner = child
+    p.count = count
+
+func entry(value: i32) -> i32:
+    var child = node(value = value)
+    var a = packet(child, 3)
+    var b = a
+    b.count++
+    child.value++
+    return (b.owner as node).value + a.count + b.count

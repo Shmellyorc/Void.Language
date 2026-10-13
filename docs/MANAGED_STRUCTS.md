@@ -52,10 +52,9 @@ use established safe/pure declared defaults; nested value fields use the existin
 Phase 14 construction plan, including approved value `init` execution. Nullable
 reference fields default to null. Non-nullable reference fields must be explicitly
 supplied: neither an omitted field nor `var object: node` silently allocates an
-object. Value initializers may accept reference arguments without storing references
-in their value layout. Phase 17 custom initializers instead bind arguments to init parameters and use
-compiler-checked staged construction views before complete commit. Reference-containing
-value structs remain deferred, rather than permanently prohibited. Compile-time constants
+object. Phase 18 value layouts may contain managed references with per-leaf readonly
+capabilities; see REFERENCE_VALUE_STRUCTS.md. Phase 17 custom initializers instead bind arguments to init parameters and use
+compiler-checked staged construction views before complete commit. Compile-time constants
 and pure declared defaults cannot allocate managed objects or execute initializers.
 
 Owner-module methods, imports, nested inline field access, compound assignment,
@@ -178,7 +177,7 @@ methods/self-types, readonly edit diagnostics and repaired/stale navigation.
 Editor presentation adds the implemented `null` literal and managed indentation.
 Colors and extension lifecycle are unchanged. WORK_LOG.md records actual runs.
 
-Still deferred: source reference-containing value structs; managed compile-time allocations; broader
+Still deferred: managed compile-time allocations; broader
 nullable patterns/flow narrowing; managed FFI; weak refs/finalizers/deinit;
 inheritance/interfaces/generics; strings/collections; async/thread APIs; production
 collector tuning. Managed debug metadata currently describes opaque reference
@@ -187,5 +186,5 @@ and native-safety contracts remain in force. Windows/macOS hosting and VSCodium
 execution cannot be inferred from Linux results.
 
 Phase 17 implements approved custom managed initialization without incomplete
-parent identity or roots; see MANAGED_INITIALIZATION.md. Recommended next design
-work is reference-containing value capabilities and their copy/readonly/root rules.
+parent identity or roots; see MANAGED_INITIALIZATION.md. Phase 18 adds approved
+reference-containing values; see REFERENCE_VALUE_STRUCTS.md for the current boundary.

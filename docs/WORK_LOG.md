@@ -1,5 +1,134 @@
 # Work log
 
+## Phase 18 reference-containing value structs: design only, 13 October 2026
+
+The owner declares Phase 17 locked and reports Actions run #29 passed all seven
+jobs with 39 suites per configuration. This is owner-reported hosted evidence;
+no remote run/repository was accessed or modified. It supersedes historical pending
+Phase 17 hosted wording below. Phase 18 implementation is **not authorized**.
+
+Reviewed the relevant Language Bible value/reference identity, readonly, defaults,
+initialization, GC, reload and compiler contracts; Development Strategy and its
+current-phase addenda; VALUE_SEMANTICS, VALUE_STRUCTS, INITIALIZATION,
+MANAGED_STRUCTS, MANAGED_INITIALIZATION, GC_RUNTIME, shared analysis compatibility,
+receiver/module guides, decisions/known issues and recent work log. Inspected the
+actual nominal/typed AST, capability effects, C1 default/argument plans, S1 views,
+Place selection, IR validation, LLVM layout/root/debug/call/return/failure lowering,
+Heap/Frame/Slot/publication/ABI/bootstrap, callbacks/provider quiescence, leases,
+analysis/invalidation/LSP and existing native/source tests. Initial worktree was clean.
+
+### Findings and proposed contract
+
+Created docs/REFERENCE_VALUE_STRUCTS_PROPOSAL.md, recommending inline value copies
+with identity-preserving managed reference leaves, one shared access/leaf model,
+existing aggregate lowering and precise Frame/Slot/TypeLayout infrastructure.
+
+Concrete gaps, not assumed completed facilities:
+
+- Frontend layout registration explicitly rejects reference-containing value fields.
+  Removing that line alone is unsafe. Required-reference omission checks currently
+  apply only to direct fields of no-init managed construction; zero-shaped default
+  metadata is not a valid default for nonnullable references.
+- Current capability analysis clears origins/readonly on aggregate variables and
+  results, tracks only direct managed parameters/returns, and can lose authority
+  through nested value copies. Current aggregate IR nominal equality/field extraction
+  is not a per-reference capability verifier.
+- Existing selected-target lowering and shared LLVM reference_offsets already
+  traverse nested inline aggregates. Private Phase 15 IR proofs exercise aggregate
+  copies, actual receiver storage, argument/return handoffs, loops and JIT/AOT GC.
+  They do not prove Phase 18 source typing/readonly/construction semantics.
+- One receiver_mutates flag conflates inline storage writes and referent effects.
+  Copies of value parameters are independent, but their embedded references would
+  still mutate original targets; summaries cannot drop that origin at a value copy.
+- S1 field readiness is deliberately whole-field for complete nested values. C1
+  requires valid value fields before custom value init; no partially initialized
+  value-child borrowing or leaf definite-initialization contract is already approved.
+- Heap descriptors/frames support numeric nested pointer offsets and completed
+  references, not source readonly/nonnullable policy. LLVM currently guards direct
+  nonnullable publication fields; nested required leaves need explicit review.
+- Shared analysis/tooling compatibility currently compares one readonly flag and
+  aggregate identity. New leaf/effect facts must be serialized/compared by the
+  compiler-owned model, including result capability substitution at readonly calls.
+
+RV1–RV7 in the proposal identify recommended choices and alternatives:
+
+- Per-reference-leaf readonly profiles preserve mixed authority without tainting
+  unrelated references. Var copies can edit independent scalars/reference slots;
+  copied readonly referents remain readonly. Existing binding profiles remain fixed;
+  mutable managed fields cannot receive readonly carriers and launder access.
+- Reuse plain/const formals and inferred effects. Distinguish inline storage writes
+  from referent mutation/retention; permit referent-only calls on suitable temporaries
+  without granting mutable inline storage or adding ownership syntax.
+- Preserve C1's all-fields-valid-before-value-init rule. No-init values can require
+  explicitly supplied nonnullable references; custom value init uses safely
+  defaultable fields (including nullable refs). S1 managed required-reference rules
+  do not silently expand to unavailable nested values. Richer value readiness is
+  an explicit alternative needing additional design/approval.
+- Infer fixed fresh value-init receiver/result capability profiles, allowing const
+  inputs to populate readonly leaves without granting mutation. Check the whole
+  body under that profile, conservatively, without per-object specialization.
+- Permit pure init-free all-null templates. Preserve the existing compile-time
+  literal versus runtime readonly-view distinction described below. Runtime const
+  copies/const formals retain their readonly profile even when currently null.
+- Reuse the same nominal/IR/LLVM/GC path, with bounded inline leaf enumeration,
+  independent IR capability checks, actual receiver roots and original selection/
+  evaluation order. Preserve S1/P3/P4, code leases, provider quiescence, entry and
+  native ABI boundaries. No production GC or aggregate FFI claim.
+
+The proposal includes complete/fragment source examples, valid and rejected cases,
+constructor/publication/failure rules, a concrete implementation sequence, risks,
+resource bounds and acceptance gates for all 39 prior suites, six Linux SDK
+configurations, strict sanitizers/leaks, repeated GC stress, 1 MiB stack, normal/O2
+JIT, runtime-only linked AOT, LSP/editor/VSIX and all seven hosted configurations.
+It explicitly requests narrow replacement of obsolete feature-deferred assertions
+only after implementation approval; no assertion changed in this design phase.
+
+### Focused unchanged-baseline verification
+
+Used existing **Debug Phase 17 binaries**; no configure or rebuild. Verified both
+SDK llvm-config version 19.1.7, RTTI YES installed / NO official, and presence of
+LLJIT.h, libLLVMOrcJIT.a and LLVMConfig.cmake. Existing cache LLVM_DIR paths match
+the respective installed and complete official SDKs. Actual commands:
+
+```sh
+ctest --test-dir build/ci-debug -R '^(managed_.*|frontend|runtime_generated|runtime_failures|reload|lsp_protocol|initialization_cli|analysis)$' --output-on-failure -j2
+ctest --test-dir build/ci-official-debug -R '^(managed_.*|frontend|runtime_generated|runtime_failures|reload|lsp_protocol|initialization_cli|analysis)$' --output-on-failure -j2
+ctest --test-dir build/ci-debug -R '^runtime_aot_.*$' --output-on-failure
+ctest --test-dir build/ci-official-debug -R '^runtime_aot_.*$' --output-on-failure
+```
+
+- Broad selections: 15/15 passed for each SDK, 12.43 s installed / 12.14 s official.
+- Additional private aggregate AOT selections: 2/2 passed for each, 0.12 s each.
+  Total 34 selected baseline suite executions. Both normal/O2 modes are exercised
+  by existing source/runtime proofs; this is not 39-suite/full-matrix verification.
+- An unchanged installed voidc check of a temporary source containing
+  `value struct packet` with `owner: node?` rejected at line 5 column 5 with
+  VOID1103, "Reference-containing value structs are deferred." This confirms
+  source support remains absent, despite private aggregate-root IR proofs.
+- An existing-source probe of module `const absent: node? = null`, copied to var,
+  replaced with a fresh node then mutated, returned 11 for input 10. Current pure
+  constants materialize as literals; no object identity/readonly target exists
+  in compile-time data. RV5 recommends retaining this for all-null templates while
+  preserving runtime readonly views. A uniform readonly rule even for compile-time
+  templates would narrow this locked case and needs explicit approval; it must not
+  be silently inferred from new aggregate handling.
+
+Evidence is in /tmp/void-phase18-investigation: sdk.json, installed-baseline.log,
+official-baseline.log, installed-aot-baseline.log, official-aot-baseline.log,
+source-boundary.log and null-module-constant.json, with temporary .void probes.
+These are local temporary investigation files, not durable CI artifacts.
+No new full Release/sanitizer/stress/editor or hosted run is claimed. Baseline
+success is **not Phase 18 implementation proof**; future source/root/readonly and
+actual Windows/macOS ARM64 acceptance remain required after approval/implementation.
+
+Only the new proposal and this work log changed. The Language Bible, compiler,
+runtime, tests, extension, LLVM requirements and seven-job workflow are untouched.
+git diff --check, proposal fence/whitespace checks and final change-scope review
+passed. CTest inventory remains 39. No commits, pushes, branches or remotes changed.
+Stop here for architectural review and explicit owner approval of the proposal
+before Phase 18 implementation.
+
+
 ## Phase 17 managed custom initialization: implementation, 13 October 2026
 
 The owner approved **S1 + MI1–MI7 exactly**, including the narrow replacement of
@@ -4206,3 +4335,299 @@ its precise normal/O2 interleaving was not logged. The new test directly checks
 that generated loop safepoints execute the real coordinator on those hosts.
 No production compiler/runtime behavior, LLVM version, GC contract, source
 language feature, commit, branch or remote state changed.
+
+## Phase 18 implementation: approved RV1–RV7 (13 October 2026)
+
+The owner locks Phase 17 and reports Actions run #29 passed all seven jobs with
+39 suites/configuration. This is owner-reported hosted evidence, not a new remote
+inspection. RV1–RV7 are explicitly approved. Work remains local: no commit, push,
+branch creation or remote mutation. The seven-job workflow is unchanged.
+
+Implemented source reference-containing value fields through the existing nominal
+Type/TypeArena, typed AST, validated analysis, shared IR/LLVM and coordinated runtime.
+Copies duplicate inline storage and preserve embedded object identities. Shared
+finite reference paths stop at heap edges and carry per-leaf readonly facts/formal
+origins. Plain/const value parameters, copies, nested fields, conversions, calls,
+returns, fresh constructor profiles and receiver/storage effects preserve authority.
+Inline storage writes are distinguished from referent mutation/retention. Managed
+field payloads keep their declared mutable-reference capacity recursively; no
+readonly laundering through existing bindings or nested storage is permitted.
+
+C1 stays authoritative. Required references have no zero source default or implicit
+allocation; no-init construction requires complete supplied fields/children. Value
+init requires valid defaults before the body and infers one fixed conservative
+receiver/result profile, including defaults, const inputs, helper results and joins.
+S1's direct managed readiness does not extend into partial value construction.
+No-init value/managed lowering shares final complete field operands. S1 staging,
+once-only init, argument snapshots, checked failure and final publication remain
+on the existing paths. Pure all-null templates remain authority-neutral; runtime
+const views and const formals remain readonly even when null.
+
+Independent IR checking derives leaf effects/call results and checks aggregate
+build/extract/insert/store/return, receiver authority, managed storage and private
+construction-place qualifiers. A CFG must-proof rejects required-reference slot
+reads before initialization; null literals cannot claim nonnullable type. Existing
+S1 scope/readiness/commit checks remain. LLVM translates the same logical leaf
+shape into module-owned target layout offsets and checks nested nonnullable leaves
+before heap commit/write. Frame/Slot homes, heap descriptors, automatic collector,
+failure frames, bootstrap and hot-reload leases are reused without runtime changes.
+Analysis metadata and conservative compatibility now include exact profiles/effects.
+
+### Investigation and corrections during implementation
+
+- The old source field gate could not simply be removed: capability analysis
+  explicitly discarded aggregate reference provenance. The replacement uses the
+  shared logical shape, preserving mixed leaves and constructor/helper origins.
+- New invalid-source coverage exposed a real recovered-AST crash: a module constant
+  `packet(owner = node())` reported the forbidden allocation but allowed the
+  enclosing aggregate into constant_value. A real debugger backtrace stopped at
+  compiler.cpp's evaluator indexing an empty call operand vector (then line 1767).
+  Construction now propagates poisoned child types before pure evaluation. The
+  negative test retains source-span and compile-time diagnostic assertions.
+- Review reproduced an unsafe acceptance in the initial split-effect implementation:
+  a copied readonly carrier could invoke a scalar-mutating value method on an inline
+  field of its referent. Such a receiver can contain no reference leaves itself.
+  Frontend and independent IR analysis now record the selected heap owner's effect
+  and authority separately. Mutable execution and forged-IR/readonly-source rejection
+  are both tested. No blanket readonly downgrade or runtime permission tag was used.
+- S1 staging pointers correctly have no managed-reference leaf, but their private
+  readonly place permission must survive fact propagation and store/call validation.
+  That distinction is now explicit; whole-stage boxing/escape remains rejected.
+- A new timeout test initially assumed completed_epoch counted successful sweeps.
+  Inspection of Runtime::collect showed it acknowledges settled epochs, including
+  aborts. The test now asserts the defined settled-epoch protocol and preserves an
+  intentionally unreachable object after timeout, proving no sweep, then verifies
+  worker and collector recovery. Runtime code and existing assertions were unchanged.
+
+### New acceptance coverage
+
+All 39 prior suite names remain. Only the obsolete managed-source assertion that
+reference-containing values are deferred becomes positive acceptance. Four additive
+suites bring the inventory to 43: reference_values_source, reference_values_aot_normal,
+reference_values_aot_optimized and reference_values_cli.
+
+Real examples cover copies/identity, mixed readonly leaves, fixed custom init,
+pure templates, temporary referent methods, S1 aggregate fields/helpers, imports,
+named argument order, compound assignments with replaced selected heap owners,
+nullable failure and cyclic stress. JIT tests force collection before every
+construction and also use allocation budget one. Normal/O2 source execution and
+separately linked native objects use the same compiler. The native library tests
+link void_runtime, not LLVM.
+
+The stress factory returns two cyclic nodes solely through a padded nested value.
+At allocation three the factory frame is gone: every live pointer slot must be an
+aggregate with exactly two registered leaves, correct host-target size and independent
+C++ offsetof expectations. There are no host Handles or live direct-reference slots
+masking this proof. Each execution performs 1002 constructions and at least 1000
+collection epochs. Failure preserves output and removes all frames, then recovery
+runs on the same runtime. Deterministic semaphore/request overlap proves cooperative
+parking; a separate timeout proves no sweep and recovery. A deliberately separate
+host-handle test retires all code/analysis, traces the retained nested cycle using
+copied descriptors, then releases it and verifies reclamation.
+
+Source negatives cover laundering via copies/annotations/casts/parameters/returns,
+existing bindings, nested/implicit managed payloads, constructor profiles and earlier
+copies, required nested defaults, C1/S1 boundaries, staging-view boxing, recursive
+layouts, duplicate fields and mismatches. Independent IR negatives cover discarded
+aggregate qualifications, heap payload stores, receiver-dependent returns, selected
+heap effects, invalid shape claims, zero nonnullable literals/storage and stage boxing.
+LSP process coverage adds imported reference fields, exact UTF-16 readonly locations,
+invalid-snapshot query rejection and unsaved repair. Actual JIT replacement rejects
+changed aggregate capability contracts and accepts an unrelated body change.
+
+Final focused installed-SDK Debug verification passed 8/8 (11.93 s):
+`ctest --test-dir build/ci-debug -R '^(reference_values_.*|core|lsp_protocol|frontend|managed_initialization_source)$' --output-on-failure -j2`.
+
+Both SDK checks found exact 19.1.7, headers, libLLVMOrcJIT.a and LLVMConfig.cmake.
+Installed RTTI YES and official-archive RTTI NO remain matched across all targets.
+Strict sanitizer flags remain address,undefined with frame pointers and no new
+suppression. A first complete six-configuration 43-suite run passed during review;
+its logs are archived under build/phase18-verification/pre-review. It is intermediate
+evidence, not final acceptance: final code was rebuilt and the full matrix restarted
+after the selected-owner/private-place audit and padded-layout regression additions.
+Final matrix/stress results are recorded below when completed.
+
+Editor verification already passed: npm test/typecheck/build, an explicit individual
+unit-test run (4/4), npm run package (8 files, 145.44 KB VSIX), and real VS Code 1.141.0
+integration against the built voidls (trusted, untrusted and multi-root scenarios,
+including real native process termination and strict notification assertions).
+VSCodium is not installed locally; Linux editor success is not hosted Windows/macOS
+verification. No extension source, grammar colors or lifecycle assertions changed.
+
+Implementation guides, approved Bible clarifications, decisions, known issues and
+README now describe the implemented boundary. Richer unavailable-value initialization,
+readonly nominal heap fields, managed aggregate FFI, resources/fallible construction
+and unrelated language features remain deferred. Fixed root-home retention and
+conservative capability joins are documented. Hosted acceptance must run all seven
+configurations after owner review/push; no Windows/macOS result is inferred here.
+
+A focused extra proof compiled a real nested required-reference value into a managed
+payload (`owner(value = make(value))`), after its factory frame returned. Normal/O2
+JIT and independently linked AOT passed in all six configurations (12/12 mode/build
+combinations). The native harness used Runtime(1), asserted automatic collection,
+result 11, and zero objects after cleanup. Exact source/harness/commands/results are
+in build/phase18-verification/required.{void,cpp,py} and required-results.json;
+each log's JIT stdout and native assertions were checked, not just process exit.
+
+Promoted this source to examples/reference_values/required.void and the regular
+source/CLI family. Its 257 constructions deterministically cross the current CLI
+runtime budget (256) at parent publication, so future normal/O2 native CLI runs
+exercise collection with the child held by the returned aggregate. This is a test
+of current embedding configuration, not a new source allocation/entry policy.
+The selected-owner example was also strengthened: creation homes retire in a
+factory, the RHS replaces the parent edge, then 256 allocations force collection
+before the caller writes its previously selected owner. Its 262 constructions and
+budget-one JIT epochs are asserted. No unrelated creation frame or host handle
+masks the old owner's lifetime. These are permanent regression refinements; no
+compiler/runtime code changed after the completed six-configuration run. The full
+matrix was rebuilt/rerun once more for the final fixture/assertion versions.
+
+Repeated checks against the completed compiler passed before those fixture refinements:
+
+- Each Debug SDK: 19 runtime/managed/reference-value suites repeated 10 times.
+- Each Debug SDK: frontend, managed_source, managed_initialization_source and
+  reference_values_source repeated 5 times with a 1024 KiB stack.
+- Each strict sanitizer SDK: 23 runtime/managed/reference-value/frontend/reload/GC/
+  native suites repeated 3 times, with leak detection and halt-on-error intact.
+- Each Release SDK: all three managed/reference-value source suites repeated 30
+  times; coordinator/latency executable also passed.
+The final refined family and 1 MiB checks are reverified below; previous stress
+logs remain valid evidence for unchanged compiler/runtime code and the unchanged
+1002-construction cyclic carrier/overlap/failure tests.
+
+
+### Final RV2/RV5/RV6/IR contract audit
+
+Before delivery, the contract audit added explicit mutable-authority requirements
+alongside mutation/retention summaries. A readonly receiver must not enter a plain
+mutable helper contract merely because that helper currently reads only. The same
+requirement protects independent existing mutable local capacities. Finite formal-
+leaf origins stabilize first; then requirements propagate to a fixed point. Aliases
+inferred from the same receiver origin, readonly getters/returns and scalar-only
+methods on var copies remain valid. No readonly-mask specialization, runtime tag,
+new ownership syntax or permissive plain-parameter borrow context was added.
+
+Independent IR derives the same constraints, distinguishing initializing stores
+from existing capacities/default observations. Source and forged-IR tests reject
+indirect mutable helper calls; positive const-helper, local getter, same-origin
+assignment and scalar-copy method tests preserve ergonomics. Return/aggregate/cast
+qualification weakening is retained at IR interfaces instead of being discarded.
+A separate IR test checks that an explicitly readonly result cannot become mutable.
+
+The audit also found the absence-of-origin/null distinction: a default nullable
+binding previously had an empty fact map, which could lose const-view authority.
+Every nominal reference leaf now remains present even for null/default values.
+Runtime const-null aliases remain readonly after var-copy and replacement; pure
+nullable module templates remain authority-neutral. Both cases have regressions.
+
+Source diagnostics now name paths such as outer.nested.owner and link the relevant
+field/formal declarations, with const-helper or independent-mutable-alias hints.
+The indirect-boundary regression checks that the named path and related location
+are present. Ordinary source failures are diagnosed before lowering.
+
+The earlier successful matrix/stress/editor evidence above predates this final
+compile-time audit. Final acceptance rebuilds both SDKs in all configurations and
+repeats the complete requested stress/small-stack/editor checks below. No runtime,
+LLVM version/flags, entry policy, workflow or existing assertion was changed.
+
+### Final acceptance results (frozen implementation)
+
+All six final LLVM 19.1.7 configurations reconfigured, built and passed **43/43**
+CTest suites, retaining all 39 previous suites and their applicable assertions.
+The final focused preflight passed 8/8 in 13.05 s. No source/test/workflow input
+changed between acceptance and completion: frozen-source.json verifies 228 SHA-256
+inputs. Only documentation/evidence was edited afterward.
+
+| SDK / build tree | Build configuration | Full CTest result | Test time |
+| --- | --- | --- | --- |
+| Installed / ci-debug | Debug | 43/43 | 63.14 s |
+| Installed / ci-release | Release | 43/43 | 21.23 s |
+| Installed / ci-sanitizers | RelWithDebInfo, strict ASan/UBSan | 43/43 | 82.49 s |
+| Official / ci-official-debug | Debug | 43/43 | 59.20 s |
+| Official / ci-official-release | Release | 43/43 | 20.37 s |
+| Official / ci-official-san | RelWithDebInfo, strict ASan/UBSan | 43/43 | 76.49 s |
+
+These are local elapsed test times under concurrent verification, not predictions
+of hosted wall time. Installed SDK: /usr/lib/llvm-19 (RTTI YES). Official complete
+archive: .toolchains/ci-investigation/LLVM-19.1.7-Linux-X64 (RTTI NO). Both llvm-config
+report exactly 19.1.7; required LLJIT headers, libLLVMOrcJIT.a and LLVMConfig.cmake
+are present, and each CMake ORC smoke check succeeds. Clang and LLD come from the
+matching SDK. Sanitizer compile flags remain -fsanitize=address,undefined and
+-fno-omit-frame-pointer, with SDK-matched -frtti/-fno-rtti. No suppression or reduced
+sanitizer/test requirement was introduced.
+
+The actual six-tree sequence, repeated for each tree, was:
+
+```sh
+cmake -S . -B build/TREE
+cmake --build build/TREE -j2
+ctest --test-dir build/TREE --output-on-failure -j4
+```
+
+Strict sanitizer environments throughout final matrix, stress and additional native
+checks were:
+
+```sh
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86
+```
+
+Final repeated acceptance also passed, counted from individual Passed records:
+
+| Gate | Installed | Official |
+| --- | --- | --- |
+| 19 runtime/managed/reference-value suites ×10, Debug | 190/190, 86.61 s | 190/190, 77.11 s |
+| 4 semantic/source suites ×5, 1024 KiB stack | 20/20, 90.31 s | 20/20, 86.81 s |
+| 23 strict sanitizer regressions ×3 | 69/69, 56.71 s | 69/69, 50.12 s |
+| 3 managed/reference-value source suites ×30, Release | 90/90, 212.18 s | 90/90, 198.50 s |
+| Coordinator/latency executable, Release | Passed, 2.03 s | Passed, 2.03 s |
+
+That is **258 full-matrix suite executions plus 738 repeated CTest executions**,
+and both extra coordinator runs. Repeated selections/commands are recorded in
+all-extra-results.json and extra.py. Stack checks execute ulimit -s 1024 before
+CTest; they are actual constrained processes, not an inferred limit. Repeated tests
+include deterministic overlap/no-sweep timeout, GC callbacks/provider quiescence,
+hot reload, failure cleanup/recovery, ordinary/O2 source compilation and linked AOT.
+The additional required-publication harness was rerun against the final compiler:
+**12/12** mode/build combinations passed, with exact JIT stdout 11, native budget-one
+automatic GC and zero retained objects after cleanup.
+
+Final native editor integration passed all three real VS Code 1.141.0 scenarios:
+trusted (unsaved diagnostics/navigation, restart/configuration, actual process-kill
+notifications and deactivation cleanup), restricted trust (no native child), and
+multi-root rejection (no native child). Evidence: editor-host.log. Earlier npm test,
+explicit 4/4 individual unit tests and npm run package remain current for unchanged
+extension sources; the VSIX contains 8 files, 145.44 KB. VSCodium remains unavailable
+locally. The extension is not bundled with the compiler/native server.
+
+Final source demonstration, captured in demonstration.json:
+
+```sh
+build/ci-debug/voidc run examples/reference_values/copies.void 10 --no-opt
+build/ci-debug/voidc run examples/reference_values/copies.void 10
+build/ci-debug/void_reference_values_cli_copies_normal 10
+build/ci-debug/void_reference_values_cli_copies_optimized 10
+```
+
+Every command printed **32**. The last two are actual separately linked executables
+from the parsed/validated source, using void_runtime without LLVM linkage. The
+cyclic aggregate-carrier test returns 2024 in normal/O2 JIT and native AOT, with
+1002 constructions and no unrelated host roots masking reachability.
+
+Final evidence is under build/phase18-verification: summary.json, results.json,
+sdk.json, inventory.json, frozen-source.json, all-extra-results.json, required-results.json,
+demonstration.json and per-command logs. Earlier intermediate passes are explicitly
+archived in pre-review/pre-required/pre-selected-owner/pre-boundary-audit and are
+not substituted for final acceptance. Verification scripts/evidence are local build
+artifacts; source regressions and documentation are repository changes.
+
+Final diff checks pass. src/runtime, tests/runtime, .github/workflows/ci.yml and
+editors/vscode/src are unchanged. No commit, push, branch or remote modification.
+
+Phase 18 is ready for architectural review and the owner's next hosted CI attempt.
+All seven jobs must verify the final 43-suite inventory on Ubuntu Debug/Release/
+Sanitizers, Windows Debug/Release and macOS ARM64 Debug/Release, including Debug
+editor/package gates. No hosted result, Windows/macOS execution or VSCodium execution
+is claimed from this Linux work. Follow-up work should review hosted acceptance and
+analysis/frame pressure before separately designing broader initialization or
+readonly heap-field contracts; C1/S1/P3/P4 and the documented deferred scope remain.
