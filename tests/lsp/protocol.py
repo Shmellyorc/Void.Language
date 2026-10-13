@@ -332,6 +332,36 @@ def initialization(executable, root):
     print("initialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed")
 
 
+def managed_structs(executable, root):
+    root.mkdir(parents=True, exist_ok=True)
+    entry, worker = root / "main.void", root / "types.void"
+    types = "struct node:\n    value: i32\n    next: node?\nfunc (n node) read() -> i32:\n    return n.value\n"
+    text = 'use "./types.void" as types\nfunc entry(value: i32) -> i32:\n    var n = types.node(value = value)\n    var alias = n\n    alias.value += 1\n    const view = n\n    return view.read()\n'
+    entry.write_bytes(text.encode("utf-8")); worker.write_bytes(types.encode("utf-8"))
+    uri, wuri = entry.as_uri(), worker.as_uri()
+    field = {"textDocument": {"uri": uri}, "position": source_position(text, "value +=")}
+    method = {"textDocument": {"uri": uri}, "position": source_position(text, "read()")}
+    with Client(executable, entry) as c:
+        assert all(not n["diagnostics"] for n in c.initialize())
+        response, _ = c.request("textDocument/definition", field)
+        assert response["result"]["uri"] == wuri and response["result"]["range"]["start"] == source_position(types, "value: i32"), response
+        response, _ = c.request("textDocument/definition", method)
+        assert response["result"]["uri"] == wuri and response["result"]["range"]["start"] == source_position(types, "read()"), response
+        recursive = {"textDocument": {"uri": wuri}, "position": source_position(types, "node?")}
+        response, _ = c.request("textDocument/definition", recursive)
+        assert response["result"]["range"]["start"] == source_position(types, "node:"), response
+        bad = text.replace("var n =", "const n =")
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": uri, "languageId": "void", "version": 1, "text": bad}})
+        notes = diagnostics(c.sync())
+        assert len(notes[uri]["diagnostics"]) == 1 and notes[uri]["diagnostics"][0]["code"] == "VOID2007", notes
+        assert c.request("textDocument/definition", field)[0]["result"] is None
+        c.notify("textDocument/didChange", {"textDocument": {"uri": uri, "version": 2}, "contentChanges": [{"text": text}]})
+        assert all(not n["diagnostics"] for n in c.sync())
+        assert c.request("textDocument/definition", field)[0]["result"]["uri"] == wuri
+        c.shutdown()
+    print("managed structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed")
+
+
 if __name__ == "__main__":
     executable = pathlib.Path(sys.argv[1]).resolve()
     # Unicode physical root names work without changing the ASCII VFS policy.
@@ -342,3 +372,5 @@ if __name__ == "__main__":
     receiver_methods(executable, root / "receiver method project")
 
     initialization(executable, root / "initialization project")
+
+    managed_structs(executable, root / "managed struct project")

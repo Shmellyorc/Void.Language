@@ -1,0 +1,36 @@
+value struct position:
+    x: i32 = 7
+
+func (p position) bump(amount: i32) -> i32:
+    p.x += amount
+    return p.x
+
+struct node:
+    number: i32
+    position: position
+    next: node?
+
+func change(parent: node, replacement: node) -> i32:
+    parent.next = replacement
+    var i = 0
+    for i < 600:
+        var garbage = node(number = i)
+        i++
+    return 1
+
+func identity(n: node) -> node:
+    return n
+
+func entry(value: i32) -> i32:
+    var parent = node(next = node())
+    var replacement = node(number = value)
+    var observed = (parent.next as node).position.bump(change(parent, replacement))
+    var alias = identity(parent)
+    alias.number = 3
+    var copy = parent.position
+    copy.x += 20
+    const view = parent
+    var child = view.next as node
+    if parent == alias and parent != replacement:
+        return observed + parent.number + copy.x + child.number
+    return -999

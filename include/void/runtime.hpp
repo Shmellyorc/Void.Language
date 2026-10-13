@@ -21,7 +21,7 @@ public:
     class Native;
     class Frame;
     class Handle;
-    Runtime() = default;
+    explicit Runtime(std::size_t allocation_budget = 0) : allocation_budget_(allocation_budget) {}
     ~Runtime();
     Runtime(const Runtime&) = delete;
     Runtime& operator=(const Runtime&) = delete;
@@ -31,6 +31,7 @@ public:
     void poll();
     Collection collect(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
     void allocate_into(void** rooted_slot, const TypeLayout&);
+    void construct_into(void** rooted_slot, const TypeLayout&, const void* prepared_payload);
     void store(void* object, std::size_t offset, void* value);
     bool contains(void*) const;
     Snapshot snapshot() const;
@@ -62,6 +63,7 @@ private:
     bool closing_ = false;
     bool requested_ = false;
     std::size_t callbacks_ = 0;
+    std::size_t allocation_budget_ = 0, allocations_ = 0;
     std::uint64_t epoch_ = 0, completed_epoch_ = 0;
     std::uint64_t cooperative_parks_ = 0;
 };

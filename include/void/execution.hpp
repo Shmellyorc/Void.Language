@@ -33,6 +33,7 @@ public:
     NativeCode(Entry entry, std::shared_ptr<void> owner, Compatibility compatibility);
     NativeCode(CheckedEntry entry, std::shared_ptr<void> owner, Compatibility compatibility, std::shared_ptr<Runtime> runtime = {});
     std::int32_t invoke(std::int32_t value) const;
+    const std::shared_ptr<Runtime>& runtime_owner() const { return runtime_; }
     const Compatibility& compatibility() const { return compatibility_; }
 private:
     Entry entry_ = nullptr;

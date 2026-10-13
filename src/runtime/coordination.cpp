@@ -137,6 +137,7 @@ Runtime::Collection Runtime::collect(std::chrono::milliseconds timeout) {
         } catch (const std::bad_alloc&) { result = Collection::allocation_failure; }
         catch (...) { std::terminate(); } // Invalid precise roots are a broken compiler/runtime invariant.
     }
+    if (result == Collection::completed) allocations_ = 0;
     for (auto* t : threads_) if (t->collecting_epoch == epoch_) t->result = result;
     completed_epoch_ = epoch_;
     requested_ = false;
@@ -158,6 +159,32 @@ void Runtime::allocate_into(void** slot, const TypeLayout& layout) {
     poll();
     std::lock_guard lock(mutex_);
     *slot = heap_.allocate(layout);
+}
+void Runtime::construct_into(void** slot, const TypeLayout& layout, const void* payload) {
+    require_managed();
+    if (!payload || !slot) throw std::invalid_argument("missing prepared object");
+    bool rooted=false;
+    for (auto* f=thread().frames;f;f=f->previous_)
+        for (std::size_t i=0;i<f->count_;++i) for (std::size_t j=0;j<f->slots_[i].count;++j)
+            if (static_cast<const char*>(f->slots_[i].storage)+f->slots_[i].offsets[j]==reinterpret_cast<const char*>(slot)) rooted=true;
+    if (!rooted) throw std::invalid_argument("construction output is not a precise root");
+    bool due;
+    { std::lock_guard lock(mutex_); due=allocation_budget_ && allocations_>=allocation_budget_; }
+    // Neither collection nor parking occurs with a collector-required lock held.
+    if (due && collect()!=Collection::completed) throw std::bad_alloc();
+    poll();
+    std::lock_guard lock(mutex_);
+    for (auto offset:layout.references) {
+        if (offset>layout.size || layout.size-offset<sizeof(void*)) throw std::invalid_argument("invalid prepared reference offset");
+        void* value=nullptr; std::memcpy(&value,static_cast<const char*>(payload)+offset,sizeof(value));
+        if (value && !heap_.contains(value)) throw std::logic_error("prepared reference belongs to another heap");
+    }
+    // Heap::allocate completes every fallible descriptor/map operation. The
+    // copy and final root publication cannot throw or invoke user code/GC.
+    void* object=heap_.allocate(layout);
+    std::memcpy(object,payload,layout.size);
+    *slot=object;
+    if (allocations_ != static_cast<std::size_t>(-1)) ++allocations_;
 }
 void Runtime::store(void* object, std::size_t offset, void* value) {
     require_managed();

@@ -107,7 +107,7 @@ public:
 bool letter(char c) { return (c >= 'a' && c <= 'z') || c == '_'; }
 bool digit(char c) { return c >= '0' && c <= '9'; }
 const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue",
-    "and", "or", "not", "true", "false", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "as", "private", "public", "internal"};
+    "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "as", "private", "public", "internal"};
 std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     const auto& text = source.text();
     std::vector<Token> tokens;
@@ -168,7 +168,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
             pair == "-=" || pair == "*=" || pair == "/=" || pair == "%=" || pair == "++" || pair == "--") {
             p += 2; emit(TokenKind::symbol, pair, start); continue;
         }
-        if (std::string("():,.+-*/%=<>").find(c) != std::string::npos) { ++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
+        if (std::string("():,.+-*/%=<>?").find(c) != std::string::npos) { ++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
         error(source, {TokenKind::symbol, "", p}, Code::character, "Unexpected character in source.",
               c == '\t' ? "Use spaces instead of tabs." : "Use the supported numeric/bool syntax and lowercase ASCII identifiers; Unicode identifiers and strings are not implemented yet.");
         } catch (const CompilationError& e) {
@@ -232,7 +232,9 @@ struct Function {
     std::vector<Parameter> parameters;
     std::optional<Parameter> receiver;
     bool receiver_mutates = false, initializer = false;
-    std::string body_syntax, initialization_contract;
+    std::string body_syntax, initialization_contract, capability_contract;
+    std::set<unsigned> mutations, retained, returned_origins;
+    bool returns_readonly = false;
     Type result = Type::none;
     std::vector<Statement> body;
     std::vector<Type> locals;
@@ -334,14 +336,14 @@ class Parser {
             {"u8",Type::u8},{"u16",Type::u16},{"u32",Type::u32},{"u64",Type::u64},
             {"f32",Type::f32},{"f64",Type::f64},{"bool",Type::boolean}};
         auto found = types.find(peek().text);
-        if (found != types.end()) { take(); return found->second; }
-        if (peek().kind != TokenKind::name || reserved.contains(peek().text)) error(source,peek(),Code::unsupported_type,"Unsupported type '" + peek().text + "'.","Use a numeric type, bool or a visible value struct.");
+        if (found != types.end()) { take(); if (at("?")) error(source,take(),Code::unsupported_type,"Only managed references can be nullable in this phase."); return found->second; }
+        if (peek().kind != TokenKind::name || reserved.contains(peek().text)) error(source,peek(),Code::unsupported_type,"Unsupported type '" + peek().text + "'.","Use a numeric type, bool or a visible value/managed struct.");
         auto token = name();
         std::string spelling = token.text;
         auto reference_token = token;
         if (accept(".")) { reference_token = name(); spelling += "." + reference_token.text; }
         auto d = std::make_shared<ir::ValueType>(); d->name = spelling; d->identity = spelling; d->source_offset = token.offset;
-        Type result(d,Type::unresolved); type_uses.emplace_back(reference_token,result); return result;
+        Type result(d,Type::unresolved); result.nullable = accept("?"); type_uses.emplace_back(reference_token,result); return result;
     }
     void newline() { need("<newline>"); }
     std::vector<Statement> block() {
@@ -379,11 +381,11 @@ class Parser {
         if (++nodes > 512) error(source, peek(), Code::nesting, "Expression size limit exceeded.", "Split this expression into smaller local values.");
         auto token = take();
         if (token.kind == TokenKind::invalid) throw Poison{};
-        if (token.kind == TokenKind::number || token.text == "true" || token.text == "false") {
+        if (token.kind == TokenKind::number || token.text == "true" || token.text == "false" || token.text == "null") {
             auto e = std::make_unique<Expr>(Expr::Kind::literal, token);
             if (token.kind == TokenKind::number) {
                 e->literal_text = token.text;
-            } else { e->type = Type::boolean; e->value = token.text == "true"; }
+            } else { e->type = token.text == "null" ? Type::null_value : Type::boolean; e->value = token.text == "true"; }
             return e;
         }
         if (token.text == "(" || (token.kind == TokenKind::name && !reserved.contains(token.text))) {
@@ -430,7 +432,9 @@ class Parser {
         while (precedence(peek().text) >= minimum || (at("as") && minimum <= 6)) {
             if (at("as")) {
                 if (++nodes > 512) error(source, peek(), Code::nesting, "Expression size limit exceeded.", "Split this expression into smaller local values.");
-                auto token = take(); auto e = std::make_unique<Expr>(Expr::Kind::conversion, token);
+                auto token = take();
+                if (at("?")) error(source,peek(),Code::character,"The as? conversion is not supported.","Use a checked as conversion; fallible conversion syntax is deferred.");
+                auto e = std::make_unique<Expr>(Expr::Kind::conversion, token);
                 e->parts.push_back(std::move(left)); e->type = type(); left = std::move(e); continue;
             }
             auto token = take(); auto e = std::make_unique<Expr>(Expr::Kind::binary, token); e->op = token.text;
@@ -518,11 +522,14 @@ public:
                 auto declaration = statement();
                 unit.constants.push_back({std::move(declaration), f.file_private, f.visibility,0,Type::none,0,{}}); continue;
             }
-            if (accept("value")) {
+            bool value_declaration = accept("value");
+            if (value_declaration || at("struct")) {
                 need("struct"); Structure structure; structure.token = name(); structure.visibility = f.visibility;
-                structure.definition = std::make_shared<ir::ValueType>(); structure.definition->name = structure.token.text;
-                need(":"); newline(); need("<indent>");
-                while (!at("<dedent>") && !at("<end of file>")) {
+                structure.definition = std::make_shared<ir::ValueType>(); structure.definition->name = structure.token.text; structure.definition->managed = !value_declaration;
+                need(":"); newline();
+                bool fields=accept("<indent>");
+                if (!fields && !structure.definition->managed) need("<indent>");
+                while (fields && !at("<dedent>") && !at("<end of file>")) {
                     Statement field(Statement::Kind::variable, name()); field.name = field.token.text;
                     need(":"); field.annotation = type();
                     auto begin = p; nodes = 0;
@@ -530,7 +537,7 @@ public:
                     for (auto n = begin; n < p; ++n) field.constant_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
                     newline(); structure.fields.push_back(std::move(field));
                 }
-                need("<dedent>"); unit.structures.push_back(std::move(structure)); continue;
+                if (fields) need("<dedent>"); unit.structures.push_back(std::move(structure)); continue;
             }
             need("func");
             if (accept("(")) {
@@ -539,7 +546,8 @@ public:
             }
             f.token = name(); need("(");
             if (!at(")")) do {
-                auto token = name(); need(":"); Parameter parameter{token,type()};
+                bool readonly_parameter=accept("const");
+                auto token = name(); need(":"); Parameter parameter{token,type()}; parameter.type.readonly=readonly_parameter;
                 if (accept("=")) {
                     auto begin = p; parameter.default_begin = peek().offset; nodes = 0; parameter.default_expression = expression();
                     parameter.default_end = peek().offset;
@@ -613,9 +621,12 @@ Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std
     if (t.kind != Type::unresolved) return t;
     auto [owner, structure] = structure_lookup(unit,root,units,t.definition->name,token); (void)owner;
     auto location = token; location.offset = t.definition->source_offset; location.text = t.definition->name;
-    if (!structure) error(unit.source,location,Code::unsupported_type,"Unsupported type '" + t.definition->name + "'.","Use a numeric type, bool or a visible value struct.");
+    if (!structure) error(unit.source,location,Code::unsupported_type,"Unsupported type '" + t.definition->name + "'.","Use a numeric type, bool or a visible value/managed struct.");
     if (structure->layout_state == 3) throw Poison{};
-    return Type(structure->definition);
+    Type result(structure->definition, structure->definition->managed ? Type::managed_ref : Type::aggregate);
+    result.nullable = t.nullable; result.readonly=t.readonly;
+    if (result.nullable && result.kind != Type::managed_ref) error(unit.source,token,Code::unsupported_type,"Only managed references can be nullable in this phase.");
+    return result;
 }
 ir::ConstantValue constant_value(const SourceFile&, const Expr&);
 class Semantics {
@@ -719,8 +730,9 @@ class Semantics {
     }
     const Function& method(Type receiver, const Token& token) {
         if (receiver == error_type) throw Poison{};
-        if (receiver.kind != Type::aggregate)
-            error(source,token,Code::receiver,"A receiver method requires a value struct.");
+        if (receiver.nullable) error(source,token,Code::receiver,"Unwrap a nullable reference before calling a method.","Use a checked as conversion to its non-nullable type.");
+        if (receiver.kind != Type::aggregate && receiver.kind != Type::managed_ref)
+            error(source,token,Code::receiver,"A receiver method requires a struct.");
         auto key = receiver.definition->identity + "::method::" + token.text;
         for (const auto& [id,owner] : units) if (auto found = owner->methods.find(key); found != owner->methods.end()) {
             bool accessible = owner.get() == &unit || owner.get() == &root ||
@@ -767,6 +779,12 @@ class Semantics {
                 e.receiver_addressable = true; e.receiver_readonly = v->readonly; e.slot = v->slot;
                 e.field_indexes.assign(path.rbegin(),path.rend());
             }
+        }
+        if (receiver.kind==Type::managed_ref) e.receiver_addressable=true;
+        const Expr* candidate=e.parts[0].get();
+        while (candidate->kind==Expr::Kind::field) {
+            if (candidate->parts[0]->type.kind==Type::managed_ref) e.receiver_addressable=true;
+            candidate=candidate->parts[0].get();
         }
         if (std::any_of(e.names.begin(),e.names.end(),[](const auto& t) { return !t.text.empty(); }))
             error(source,e.token,Code::argument_count,"Named method arguments are not implemented; use positional arguments.");
@@ -834,7 +852,8 @@ class Semantics {
     }
     void construction(Expr& e, Unit& owner, Structure& structure, bool runtime, Unit& access) {
         defaults(owner,structure);
-        e.kind = Expr::Kind::construction; e.type = Type(structure.definition); e.target = structure.definition->identity;
+        if (structure.definition->managed && !runtime) error(source,e.token,Code::constant_call,"Managed allocation is not a compile-time expression.");
+        e.kind = Expr::Kind::construction; e.type = Type(structure.definition,structure.definition->managed ? Type::managed_ref : Type::aggregate); e.target = structure.definition->identity;
         e.aggregate_value = structure.defaults;
         if (auto* init = structure.initializer) {
             if (!runtime) error(source,e.token,Code::constant_call,"Compile-time expressions cannot execute custom initialization.","Construct this value in a function or local const.",{{span(owner.source,init->token),"Runtime initializer declared here."}});
@@ -844,7 +863,7 @@ class Semantics {
         } else {
             std::set<unsigned> initialized;
             for (unsigned n=0;n<e.parts.size();++n) {
-                if (e.names[n].text.empty()) error(source,e.parts[n]->token,Code::argument_count,"Value construction requires named fields.","Use field = expression for a type without init.");
+                if (e.names[n].text.empty()) error(source,e.parts[n]->token,Code::argument_count,"Construction requires named fields.","Use field = expression for a type without init.");
                 auto& fields = structure.definition->fields;
                 auto field = std::find_if(fields.begin(),fields.end(),[&](const auto& f) { return f.name == e.names[n].text; });
                 if (field == fields.end()) error(source,e.names[n],Code::unknown_identifier,"Unknown constructor field '" + e.names[n].text + "'.");
@@ -853,10 +872,16 @@ class Semantics {
                 e.field_indexes.push_back(index); expect(expression(*e.parts[n],field->type),field->type,e.parts[n]->token);
             }
         }
+        if (structure.definition->managed) for (unsigned n=0;n<structure.fields.size();++n) {
+            Type t = *structure.fields[n].annotation;
+            if (t.kind == Type::managed_ref && !t.nullable && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end())
+                error(source,e.token,Code::argument_count,"A non-nullable reference field requires an explicit value: " + structure.fields[n].name + ".",{},{{span(owner.source,structure.fields[n].token),"Required field declared here."}});
+        }
         construction_fields(e,owner,structure,runtime);
     }
     void expect(Type actual, Type expected, const Token& token) {
         if (actual == error_type || expected == error_type) return;
+        if (actual.kind == Type::managed_ref && expected.kind == Type::managed_ref && Type::key(actual)==Type::key(expected) && (!actual.nullable || expected.nullable)) return;
         if (actual != expected) error(source, token, Code::type_mismatch, "Type mismatch: expected " + std::string(ir::type_name(expected)) + ", received " + ir::type_name(actual) + ".", {}, {}, ir::type_name(expected), ir::type_name(actual));
     }
     unsigned declare(const Token& token, Type type, bool readonly = false) {
@@ -886,6 +911,7 @@ class Semantics {
         try {
         using K = Expr::Kind;
         if (e.kind == K::literal) {
+            if (e.token.text == "null") return {};
             if (e.literal_text.empty()) return e.type;
             if (e.literal_text.back() == 'f') return Type::f32;
             if (e.literal_text.back() == 'd') return Type::f64;
@@ -907,7 +933,7 @@ class Semantics {
         }
         if (e.kind == K::call) {
             auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
-            if (structure) return Type(structure->definition);
+            if (structure) return Type(structure->definition,structure->definition->managed ? Type::managed_ref : Type::aggregate);
             return resolve(e).result;
         }
         if (e.kind == K::field) {
@@ -918,7 +944,7 @@ class Semantics {
                 return {};
             }
             auto base = anchor(*e.parts[0]);
-            if (base && base->kind == Type::aggregate) for (const auto& field : base->definition->fields) if (field.name == e.token.text) return field.type;
+            if (base && (base->kind == Type::aggregate || base->kind == Type::managed_ref)) for (const auto& field : base->definition->fields) if (field.name == e.token.text) return field.type;
             return {};
         }
         if (e.op == "not" || e.op == "and" || e.op == "or" || e.op == "==" || e.op == "!=" || e.op == "<" || e.op == "<=" || e.op == ">" || e.op == ">=") return Type::boolean;
@@ -958,6 +984,10 @@ class Semantics {
         }
     }
     Type literal_expression(Expr& e, std::optional<Type> expected) {
+        if (e.token.text == "null") {
+            if (!expected || expected->kind != Type::managed_ref || !expected->nullable) error(source,e.token,Code::type_mismatch,"null requires a nullable managed-reference context.","Use a type annotation such as node?.");
+            return e.type = *expected;
+        }
         if (e.literal_text.empty()) return e.type;
         Type target = anchor(e).value_or(expected && numeric::number(*expected) && (!decimal(e) || numeric::floating(*expected)) ? *expected : decimal(e) ? Type::f32 : Type::i32);
         try { e.value = numeric::literal(e.literal_text,target); }
@@ -988,7 +1018,8 @@ class Semantics {
         }
         auto t = expression(base);
         if (t == error_type) return error_type;
-        if (t.kind != Type::aggregate) error(source,e.token,Code::type_mismatch,"Field access requires a value struct.");
+        if (t.nullable) error(source,e.token,Code::type_mismatch,"Unwrap the nullable reference before field access.");
+        if (t.kind != Type::aggregate && t.kind != Type::managed_ref) error(source,e.token,Code::type_mismatch,"Field access requires a struct.");
         for (unsigned n = 0; n < t.definition->fields.size(); ++n) if (t.definition->fields[n].name == e.token.text) {
             e.slot = n; e.target = t.definition->identity + "::field::" + e.token.text; return e.type = t.definition->fields[n].type;
         }
@@ -1039,6 +1070,10 @@ class Semantics {
         }
         auto from = expression(operand);
         if (from == error_type) return error_type;
+        if (from.kind == Type::managed_ref && target.kind == Type::managed_ref && Type::key(from)==Type::key(target) && !target.nullable) {
+            target.readonly=from.readonly; return e.type=target;
+        }
+        if (from.kind==Type::managed_ref || target.kind==Type::managed_ref) error(source,e.token,Code::numeric_conversion,"Checked reference conversion requires the same non-nullable nominal target.","Use assignment for nullable injection; inheritance and unrelated reference casts are deferred.");
         if (!numeric::number(from) || !numeric::number(target)) error(source,e.token,Code::numeric_conversion,"Numeric as requires numeric source and destination types.");
         return target;
     }
@@ -1055,6 +1090,7 @@ class Semantics {
         auto left_hint = anchor(*e.parts[0]), right_hint = anchor(*e.parts[1]);
         auto context = logical ? std::optional<Type>(Type::boolean) : left_hint ? left_hint : right_hint ? right_hint :
             expected && numeric::number(*expected) ? expected : std::optional<Type>(decimal(e) ? Type::f32 : Type::i32);
+        if (context && context->kind == Type::managed_ref && (e.op=="==" || e.op=="!=")) context->nullable=true;
         auto left = expression(*e.parts[0],context);
         bool previous = suppress_zero;
         if (e.parts[0]->kind == K::literal && ((e.op == "and" && !e.parts[0]->value) || (e.op == "or" && e.parts[0]->value))) suppress_zero = true;
@@ -1064,7 +1100,7 @@ class Semantics {
             expect(left,Type::boolean,e.parts[0]->token); expect(right,Type::boolean,e.parts[1]->token); return e.type = Type::boolean;
         }
         if (e.op != "==" && e.op != "!=" && !numeric::number(left)) expect(left,Type::i32,e.parts[0]->token);
-        expect(right,left,e.token);
+        if (!(left.kind==Type::managed_ref && right.kind==Type::managed_ref && Type::key(left)==Type::key(right))) expect(right,left,e.token);
         if (e.op == "==" || e.op == "!=") {
             if (left.kind == Type::aggregate) error(source,e.token,Code::numeric_operator,"Value struct equality is not implemented.");
             if (left == Type::none) error(source,e.token,Code::invalid_value,"Cannot compare a no-result call.");
@@ -1107,15 +1143,17 @@ class Semantics {
                 error(source, s.token, Code::invalid_value, "Variable requires a value type.", "Supply a numeric/bool annotation or a value-producing initializer.");
             }
             if (s.annotation) {
-                try { expect(t, *s.annotation, s.expression ? s.expression->token : s.token); }
+                try { expect(t, *s.annotation, s.expression ? s.expression->token : s.token); if (t!=error_type) t=*s.annotation; }
                 catch (const CompilationError& failure) { diagnostics.add(failure); t = error_type; }
             }
+            if (!s.expression && t.kind == Type::managed_ref && !t.nullable) error(source,s.token,Code::initializer,"A non-nullable reference requires an initializer.","Construct the object explicitly using its type.");
             if (!s.expression && t.kind == Type::aggregate) {
                 auto [owner,structure] = owned_structure(t);
                 s.expression = std::make_unique<Expr>(Expr::Kind::construction,s.token);
                 construction(*s.expression,*owner,*structure,true,unit);
 
             }
+            if (t.kind!=Type::managed_ref) t.readonly=false;
             s.slot = declare(s.token, t, s.readonly); break;
         }
         case K::assignment: {
@@ -1124,10 +1162,11 @@ class Semantics {
                 error(source, s.token, Code::readonly, "Cannot mutate readonly const or declaration '" + s.name + "'.", "Use var for a mutable local binding.");
             if (!variable) error(source, s.token, Code::unknown_identifier, "Unknown identifier '" + s.name + "'.", "Declare it with var before assignment.");
             auto t = variable->type; s.slot = variable->slot;
-            if (current->receiver && s.slot == current->receiver->slot) current->receiver_mutates = true;
+            if (current->receiver && s.slot == current->receiver->slot && (current->receiver->type.kind==Type::aggregate || !s.fields.empty())) current->receiver_mutates = true;
             for (const auto& field : s.fields) {
                 if (t == error_type) throw Poison{};
-                if (t.kind != Type::aggregate) error(source,field,Code::type_mismatch,"Field assignment requires a value struct.");
+                if (t.nullable) error(source,field,Code::type_mismatch,"Unwrap the nullable reference before field assignment.");
+                if (t.kind != Type::aggregate && t.kind != Type::managed_ref) error(source,field,Code::type_mismatch,"Field assignment requires a struct.");
                 auto found = std::find_if(t.definition->fields.begin(),t.definition->fields.end(),[&](const auto& f) { return f.name == field.text; });
                 if (found == t.definition->fields.end()) error(source,field,Code::unknown_identifier,"Unknown field '" + field.text + "'.");
                 s.field_indexes.push_back(static_cast<unsigned>(found-t.definition->fields.begin())); t = found->type;
@@ -1235,7 +1274,7 @@ public:
                 catch (const CompilationError& failure) { diagnostics.add(failure); }
             }
             for (auto& p : f.parameters) {
-                try { p.slot = declare(p.token, p.type); }
+                try { p.slot = declare(p.token, p.type, p.type.readonly); }
                 catch (const CompilationError& failure) { diagnostics.add(failure); }
             }
             auto flow = sequence(f.body, false);
@@ -1258,7 +1297,7 @@ class Lowering {
     void jump(unsigned to) { terminate({ir::Terminator::Kind::jump, 0, to}); }
     unsigned emit(ir::Instruction i, const Token& token) {
         i.source = source.location(token.offset);
-        if (i.op == ir::Op::call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert)
+        if (i.op == ir::Op::call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
             i.source_excerpt = source.excerpt(token.offset);
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
@@ -1281,18 +1320,80 @@ class Lowering {
         auto child = extract(aggregate,path[depth],token);
         return insert(aggregate,replace_path(child,value,path,depth+1,token),path[depth],token);
     }
+    unsigned snapshot(unsigned value, Type t, const Token& token) {
+        auto slot=static_cast<unsigned>(output.locals.size()); output.locals.push_back(t);
+        emit({ir::Op::store,slot,value},token); return slot;
+    }
+    unsigned read_place(const ir::Place& place, const Token& token) {
+        auto t=output.locals.at(place.slot); auto value=emit({ir::Op::load,place.slot},token);
+        for (auto field:place.fields) {
+            ir::Instruction i{t.kind==Type::managed_ref ? ir::Op::gc_read : ir::Op::extract,value}; i.immediate=field;
+            value=emit(i,token); t=t.definition->fields.at(field).type;
+        }
+        return value;
+    }
+    ir::Place select_place(ir::Place place, const std::vector<unsigned>& path, const Token& token) {
+        auto t=output.locals.at(place.slot);
+        for (auto field:path) {
+            if (t.kind==Type::managed_ref) {
+                auto slot=snapshot(read_place(place,token),t,token); place={slot,{}};
+            }
+            place.fields.push_back(field); t=t.definition->fields.at(field).type;
+        }
+        return place;
+    }
+    ir::Place place(const Expr& e) {
+        if (e.kind==Expr::Kind::name) return {e.slot,{}};
+        if (e.kind==Expr::Kind::field) {
+            if (e.parts[0]->type.kind==Type::managed_ref) {
+                auto slot=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);
+                return {slot,{e.slot}};
+            }
+            auto parent=place(*e.parts[0]); parent.fields.push_back(e.slot); return parent;
+        }
+        auto slot=snapshot(expression(e),e.type,e.token); return {slot,{}};
+    }
+    void write_place(const ir::Place& place, unsigned value, const Token& token) {
+        auto t=output.locals.at(place.slot);
+        if (place.fields.empty()) { emit({ir::Op::store,place.slot,value},token); return; }
+        auto root=emit({ir::Op::load,place.slot},token);
+        if (t.kind==Type::managed_ref) {
+            auto field=place.fields.front();
+            if (place.fields.size()>1) {
+                ir::Instruction read{ir::Op::gc_read,root}; read.immediate=field;
+                auto aggregate=emit(read,token);
+                value=replace_path(aggregate,value,place.fields,1,token);
+            }
+            ir::Instruction write{ir::Op::gc_write,root,value}; write.immediate=field; emit(write,token);
+        } else {
+            value=replace_path(root,value,place.fields,0,token); emit({ir::Op::store,place.slot,value},token);
+        }
+    }
     unsigned expression(const Expr& e) {
         using K = Expr::Kind;
         switch (e.kind) {
         case K::literal: {
             return constant(e.type,e.type.kind == Type::aggregate ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
         }
-        case K::field: { auto value = expression(*e.parts[0]); return extract(value,e.slot,e.token); }
+        case K::field: { auto value=expression(*e.parts[0]); ir::Instruction i{e.parts[0]->type.kind==Type::managed_ref ? ir::Op::gc_read : ir::Op::extract,value}; i.immediate=e.slot; return emit(i,e.token); }
         case K::construction: {
             std::vector<unsigned> arguments;
             for (const auto& part : e.parts) {
                 auto argument = static_cast<unsigned>(output.locals.size()); output.locals.push_back(part->type);
                 auto value = expression(*part); emit({ir::Op::store,argument,value},part->token); arguments.push_back(argument);
+            }
+            if (e.type.kind==Type::managed_ref) {
+                std::vector<unsigned> fields;
+                for (unsigned field=0;field<e.type.definition->fields.size();++field) {
+                    Type t=e.type.definition->fields[field].type;
+                    auto value=constant(t,e.aggregate_value.fields.at(field),e.token);
+                    for (unsigned n=0;n<arguments.size();++n) if (e.field_indexes[n]==field) value=emit({ir::Op::load,arguments[n]},e.token);
+                    for (const auto& child:e.omitted) if (child->slot==field) value=expression(*child);
+                    fields.push_back(snapshot(value,t,e.token));
+                }
+                ir::Instruction i{ir::Op::gc_construct}; i.type=e.type;
+                for (auto field:fields) i.arguments.push_back(emit({ir::Op::load,field},e.token));
+                return emit(i,e.token);
             }
             auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(e.type);
             auto initial = constant(e.type,e.aggregate_value,e.token); emit({ir::Op::store,slot,initial},e.token);
@@ -1320,12 +1421,11 @@ class Lowering {
             std::size_t first = 0;
             if (e.kind == K::method_call) {
                 first = 1;
-                if (e.receiver_addressable) receiver = ir::Place{e.slot,e.field_indexes};
-                else {
-                    auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(e.parts[0]->type);
-                    auto value = expression(*e.parts[0]); emit({ir::Op::store,slot,value},e.parts[0]->token);
-                    receiver = ir::Place{slot,{}};
-                }
+                if (e.parts[0]->type.kind==Type::managed_ref) {
+                    auto slot=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token); receiver=ir::Place{slot,{}};
+                } else if (e.receiver_addressable) receiver=place(*e.parts[0]);
+                else { auto slot=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token); receiver=ir::Place{slot,{}}; }
+
             }
             // Materialize each argument in a slot: later short-circuit arguments
             // may create new blocks, while IR instruction values stay block-local.
@@ -1374,12 +1474,12 @@ class Lowering {
             emit({ir::Op::store, s.slot, value}, s.token); break;
         }
         case K::assignment: {
+            auto selected=select_place({s.slot,{}},s.field_indexes,s.token);
             // Load compound-assignment LHS before evaluating its RHS.
             std::optional<unsigned> old_slot;
             if (s.op != "=") {
                 auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(s.assigned_type); old_slot = slot;
-                auto old = emit({ir::Op::load, s.slot}, s.token);
-                for (auto field : s.field_indexes) old = extract(old,field,s.token);
+                auto old = read_place(selected,s.token);
                 emit({ir::Op::store, slot, old}, s.token);
             }
             auto value = expression(*s.expression);
@@ -1387,11 +1487,7 @@ class Lowering {
                 auto old = emit({ir::Op::load, *old_slot}, s.token);
                 value = emit({operation(s.op.substr(0, 1)), old, value}, s.token);
             }
-            if (!s.field_indexes.empty()) {
-                auto aggregate = emit({ir::Op::load,s.slot},s.token);
-                value = replace_path(aggregate,value,s.field_indexes,0,s.token);
-            }
-            emit({ir::Op::store, s.slot, value}, s.token); break;
+            write_place(selected,value,s.token); break;
         }
         case K::expression: expression(*s.expression); break;
         case K::returned:
@@ -1611,19 +1707,32 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
     if (e.kind == Expr::Kind::field) return constant_value(source,*e.parts[0]).fields.at(e.slot);
     auto a = constant_value(source,*e.parts[0]).bits;
     try {
-        if (e.kind == Expr::Kind::conversion) return {numeric::convert(a,e.parts[0]->type,e.type),{}};
+        if (e.kind == Expr::Kind::conversion) {
+            if (e.type.kind==Type::managed_ref) { if (!a) throw std::invalid_argument("Cannot unwrap null in a compile-time expression"); return {a,{}}; }
+            return {numeric::convert(a,e.parts[0]->type,e.type),{}};
+        }
         if (e.kind == Expr::Kind::unary) return {e.op == "not" ? !a : e.op == "-" ? numeric::negate(a,e.type) : a,{}};
         if (e.op == "and" && !a) return {};
         if (e.op == "or" && a) return {1,{}};
         auto b = constant_value(source,*e.parts[1]).bits;
         if (e.op == "and" || e.op == "or") return {b,{}};
+        if (e.parts[0]->type.kind==Type::managed_ref) return {static_cast<std::uint64_t>(e.op=="==" ? a==b : a!=b),{}};
         return {numeric::binary(operation(e.op),a,b,e.parts[0]->type),{}};
     } catch (const CompilationError&) { throw; }
       catch (const std::invalid_argument& failure) {
         error(source,e.token,e.kind == Expr::Kind::conversion ? Code::numeric_conversion : Code::zero_divisor,failure.what());
     }
 }
+#include "capabilities.inc"
 void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics) {
+    auto arena = std::make_shared<ir::TypeArena>();
+    for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
+        structure.definition->self = structure.definition;
+        structure.definition->arena = arena;
+        arena->definitions.push_back(structure.definition);
+    }
+    // Every external resolved Type aliases this table; field edges are nonowning.
+
     // Discover every signature before checking any body, including cyclic imports.
     for (auto& [id, unit] : units) for (auto& f : unit->functions) {
         if (f.receiver) continue;
@@ -1711,6 +1820,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             for (auto& field : structure.fields) {
                 if (!names.insert(field.name).second) error(owner.source,field.token,Code::duplicate,"Duplicate field '" + field.name + "'.");
                 auto t = resolve_type(*field.annotation,owner,root,units,field.token);
+                if (!structure.definition->managed && t.kind==Type::managed_ref) error(owner.source,field.token,Code::unsupported_type,"Reference-containing value structs are deferred.");
                 std::size_t expanded = 1;
                 if (t.kind == Type::aggregate) for (auto& [id,u] : units) for (auto& child : u->structures) if (child.definition == t.definition) { layout(*u,child); expanded += child.expanded_fields; }
                 if (expanded > 65536 - structure.expanded_fields) error(owner.source,field.token,Code::nesting,"Expanded value layout limit exceeded.","Reduce nested value duplication; the compiler currently permits 65536 expanded fields per value.");
@@ -1738,10 +1848,11 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             try {
                 auto t = f.receiver->type;
                 if (t == error_type) throw Poison{};
-                if (t.kind != Type::aggregate) error(unit->source,f.receiver->token,Code::receiver,"Receiver declarations require a value struct type.");
+                if ((t.kind != Type::aggregate && t.kind != Type::managed_ref) || t.nullable) error(unit->source,f.receiver->token,Code::receiver,"Receiver declarations require a non-nullable struct type.");
                 if (!unit->structure_names.contains(t.definition->name) || unit->structure_names.at(t.definition->name)->definition != t.definition)
                     error(unit->source,f.receiver->token,Code::receiver,"Methods must be declared in their value type's owning module; extension methods are deferred.");
                 f.initializer = f.token.text == "init";
+                if (f.initializer && t.kind==Type::managed_ref) error(unit->source,f.token,Code::initializer_deferred,"Custom managed initialization is deferred; use named-field construction.");
                 if (f.token.text == "deinit") error(unit->source,f.token,Code::initializer_deferred,"Resource lifecycle deinit is not implemented.");
                 if (f.initializer && f.result != Type::none) error(unit->source,f.token,Code::type_mismatch,"An initializer must not declare a result; fallible construction is deferred.");
                 for (const auto& field : t.definition->fields) if (field.name == f.token.text)
@@ -1843,7 +1954,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     }
     for (auto [owner,e] : calls) if (methods.at(e->target)->receiver_mutates) {
         try {
-            if (e->receiver_readonly) error(owner->source,e->token,Code::readonly,"Cannot call a mutating method through a readonly receiver.","Copy it to var to mutate an independent value.");
+            if (e->receiver_readonly) error(owner->source,e->token,Code::readonly,"Cannot call a mutating method through a readonly receiver.","Use mutable storage for an independent value or an independently held mutable reference.");
             if (!e->receiver_addressable) error(owner->source,e->token,Code::receiver,"A mutating method requires mutable receiver storage.","Bind the value to var before calling this method.");
         } catch (const CompilationError& failure) { diagnostics.add(failure); }
     }
@@ -1877,11 +1988,15 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     }
     for (auto& [id,f] : functions) if (f->initializer) for (const auto& p : f->parameters)
         f->initialization_contract += std::to_string(p.token.text.size()) + ":" + p.token.text + std::to_string(p.default_syntax.size()) + ":" + p.default_syntax;
-    // Recovered trees and AST-only poisoned types can never enter validated IR.
+    // Recovered trees and AST-only poisoned types can never enter capability analysis or IR.
+    diagnostics.finish();
+    analyze_capabilities(units,diagnostics);
     diagnostics.finish();
 }
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
-    ir::Module module; module.identity = entry; module.entry_symbol = entry + "::entry";
+    ir::Module module;
+    for (const auto& [id,unit] : units) for (const auto& structure : unit->structures) if (structure.definition->managed) module.coordinated=true;
+    module.identity = entry; module.entry_symbol = entry + "::entry";
     module.source_path = units.at(entry)->source.path();
     for (auto& [id, unit] : units) {
         Lowering lowering(unit->source);
@@ -1911,6 +2026,7 @@ struct AnalysisAccess {
             field(result->contract_, std::to_string(d.parameters.size()));
             for (auto t : d.parameters) field(result->contract_, t.kind == Type::aggregate ? t.definition->identity : ir::type_name(t));
             field(result->contract_,d.receiver.kind == Type::none ? "" : ir::type_name(d.receiver));
+            field(result->contract_,d.capability_contract);
             field(result->contract_,d.receiver_mutates ? "mutating" : "nonmutating");
             field(result->contract_,d.initialization_contract);
             if (d.kind != AnalyzedDeclaration::Kind::function && d.kind != AnalyzedDeclaration::Kind::receiver_method && d.kind != AnalyzedDeclaration::Kind::initializer) {
@@ -1975,10 +2091,10 @@ struct AnalysisAccess {
                 for (const auto& member : structure.fields) {
                     auto t = *member.annotation; auto identity = key + "::field::" + member.name;
                     field(layout,member.name); field(layout,t.kind == Type::aggregate ? t.definition->identity : ir::type_name(t)); field(layout,member.constant_syntax);
-                    declaration({AnalyzedDeclaration::Kind::value_field,identity,id,structure.visibility,location(member.token),{},t,member.constant_syntax,{},key});
+                    declaration({structure.definition->managed ? AnalyzedDeclaration::Kind::managed_field : AnalyzedDeclaration::Kind::value_field,identity,id,structure.visibility,location(member.token),{},t,member.constant_syntax,{},key});
                     if (member.expression) expression(*member.expression,identity,{});
                 }
-                declaration({AnalyzedDeclaration::Kind::value_structure,key,id,structure.visibility,location(structure.token),{},Type(structure.definition),layout,{},id});
+                declaration({structure.definition->managed ? AnalyzedDeclaration::Kind::managed_structure : AnalyzedDeclaration::Kind::value_structure,key,id,structure.visibility,location(structure.token),{},Type(structure.definition,structure.definition->managed ? Type::managed_ref : Type::aggregate),layout,{},id});
             }
             for (const auto& c : unit->constants) {
                 auto key = id + "::" + c.declaration.name;
@@ -1990,6 +2106,7 @@ struct AnalysisAccess {
                 AnalyzedDeclaration method_record{f.initializer ? AnalyzedDeclaration::Kind::initializer : f.receiver ? AnalyzedDeclaration::Kind::receiver_method : AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}};
                 if (f.receiver) { method_record.owner = f.receiver->type.definition->identity; method_record.receiver = f.receiver->type; method_record.receiver_mutates = f.receiver_mutates; }
                 method_record.initialization_contract=f.initialization_contract;
+                method_record.capability_contract=f.capability_contract;
                 if (f.initializer) for (const auto& p : f.parameters) {
                     AnalyzedParameter parameter{p.token.text,p.type,location(p.token)};
                     if (p.default_expression) { auto range=location(p.default_expression->token); range.begin=p.default_begin; range.end=p.default_end; parameter.default_source=std::move(range); }

@@ -1,5 +1,272 @@
 # Work log
 
+## Phase 16 managed source implementation, 12 October 2026
+
+The owner approved the recommended P1–P7 scope, explicitly P3 deep readonly views
+and P4 reusable complete-object publication. Phase 15 remains locked; owner-reported
+run #27 passed all seven jobs with 31 suites per configuration. This entry supersedes
+the investigation-only status below. No hosted Phase 16 execution is claimed.
+
+### Implemented contract and architecture
+
+- Ordinary managed structs now compile from real source: all ten numeric/bool
+  fields, reference-free nested values, nullable/non-nullable direct references,
+  cyclic nominal graphs, named-field construction, identity comparisons, alias
+  assignment/parameters/returns and owner-module receiver methods/imports.
+- Nullable `t?`, contextual null, safe injection and checked same-nominal `as t`
+  unwrap use existing diagnostics/failure propagation. Non-nullable fields require
+  explicit valid values. Numeric/bool/pure field defaults, nullable null defaults
+  and existing nested value init plans remain intact. Managed custom init and
+  reference-containing source values remain deferred.
+- Deep readonly capabilities follow aliases, casts, returned aliases, parameters
+  and nested references. Existing const formals express readonly parameters;
+  receiver mutation/retention/returned-origin effects are inferred on the typed
+  AST. Independent mutable aliases remain valid; reference-free values copy
+  independently. Existing mutable bindings reject readonly assignment; inferred
+  readonly bindings retain their capability on rebinding. Monotone joins are
+  deliberately conservative, not path-sensitive ownership inference.
+- One nominal type table owns descriptors; weak field edges permit recursive
+  reference metadata without C++ ownership cycles. Retained query Types preserve
+  table lifetime. Reference graph validation is iterative; bounded inline value
+  layout expansion and the small-stack protection remain in place.
+- Shared gc_construct stages complete rooted fields. Shared LLVM lowering prepares
+  target-layout bytes and reference offsets. Runtime::construct_into validates the
+  output root/references, polls/collects before acquiring the commit lock, completes
+  fallible Heap work, copies the full payload and publishes the output root last.
+  No incomplete parent reaches a GC root or user code. Old outputs survive failure.
+- The existing Heap, coordinator, frames, native/callback contracts, checked failure
+  cleanup and hot-reload leases are reused. Source runtimes use a 256-allocation
+  trigger; tests use budgets 1/8. A failed rendezvous never sweeps. Source replacement
+  reuses its runtime; objects/descriptors can outlive retired code independently.
+- Heap receiver/assignment targets are rooted snapshots selected before arguments/
+  RHS. Reference receiver rebinding is local; nested inline receiver mutation keeps
+  value-place semantics and unrelated RHS changes.
+- JIT owns a runtime for managed source. Separately emitted source executables use
+  the runtime bootstrap with the unchanged entry(i32)->i32 interface, linking
+  void_runtime and platform C++/thread dependencies. Windows CLI targets retain
+  legacy_stdio_definitions for real printf linkage. No public managed C ABI added.
+
+The analysis/tooling model includes managed declarations/fields, nullable types,
+capabilities/effects and corresponding invalidation/reload dependencies. The real
+LSP protocol checks imported fields, self-types, methods, readonly edit diagnostics,
+stale queries and repair. Editor presentation adds null and managed indentation;
+colors/lifecycle are unchanged. Its obsolete assertion that ordinary struct should
+not indent was replaced by the now-correct positive assertion, with additional
+null/nullify and structure-boundary checks. Original native assertions remain intact.
+
+### Real source and regression evidence
+
+Added examples/managed_structs/{main,handoffs,order,imports,types,numeric,null_failure}.void.
+Main builds a cycle, mutates through an alias, calls functions and allocates 1000
+objects. Normal/O2 JIT and actual linked AOT all returned 23 for input 10. Independently
+linked handoffs/order/numeric/imports returned 48/221/600/12. These results come
+from parsing/lowering source, not reconstructed proof IR. Null unwrap fails with
+its real source location and caller context in both execution modes.
+
+Four additional suites extend 31 to 35: managed_source, managed_aot_normal,
+managed_aot_optimized and managed_cli. Source tests separately establish automatic
+budget-triggered collection and forced collections; complete payload observation;
+cyclic reachability/reclamation; selected-receiver temporaries across allocations;
+argument/return handoffs; readonly laundering diagnostics; concurrency; retained
+metadata; live-object compatible reload and wrong-runtime rejection. Deterministic
+poll gates require actual overlap/parking in optimized numeric loops. Allocation
+failure injection exercises allocation/map/collection failure cleanup, protected
+outputs and recovery. Separately linked parsed-source AOT also injects failure,
+checks zero success output, unchanged live objects/frame cleanup and recovery.
+AOT bootstrap tests also inject the first startup allocation failure, verify no
+success output, then enter the actual compiled source again through fresh balanced
+attachment/shutdown. Readonly const-parameter retention into mutable fields has
+its own invalid-source assertion.
+The probe forwards to the production ABI/Heap rather than replacing allocation/GC.
+
+Two defects found during complete validation were corrected before the final run:
+
+1. Recognizing '?' for nullable types changed the existing unsupported numeric as?
+   error to an unsupported-type code. The parser now explicitly reports its prior
+   character diagnostic with a checked-as hint. The old numeric assertion is intact.
+2. The new test harness initially replaced ordinary new/delete but not nothrow new.
+   ASan correctly reported allocation-family mismatch during LLVM SROA/machine
+   sinking (installed/official SDKs). The fixture now consistently replaces ordinary,
+   array and nothrow allocation/deallocation pairs. No sanitizer option/suppression,
+   LLVM requirement, compiler optimization or production allocation was relaxed.
+
+Pre-correction evidence is retained in initial-*-test.log, initial-*-build.log and
+pre-probe-fix-matrix.log under build/phase16-verification. It is not final pass evidence.
+
+### Complete stable-tree Linux matrix
+
+Both complete LLVM SDKs verified 19.1.7, LLJIT headers, libLLVMOrcJIT.a and
+LLVMConfig.cmake. Installed /usr/lib/llvm-19 reports RTTI YES; the complete official
+.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64 archive reports RTTI NO. CMake
+continues matching each ABI throughout; strict ASan/UBSan and RTTI-compatible vptr
+coverage remain as documented in CI_SANITIZER_ABI.md.
+
+For each existing tree: cmake -S . -B build/<tree>; cmake --build build/<tree> -j2;
+ctest --test-dir build/<tree> --output-on-failure -j4. Debug/Release and instrumented
+RelWithDebInfo use the existing SDK/compiler/linker/cache settings. Final results:
+
+| Build tree | CTest result | Test elapsed |
+| --- | --- | --- |
+| `ci-debug` | 35/35 | 23.08 s |
+| `ci-release` | 35/35 | 19.98 s |
+| `ci-sanitizers` | 35/35 | 37.17 s |
+| `ci-official-debug` | 35/35 | 19.86 s |
+| `ci-official-release` | 35/35 | 15.24 s |
+| `ci-official-san` | 35/35 | 29.61 s |
+
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 and
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 remained enabled in
+both sanitizer configurations. No tests skipped or disabled. These checks ran
+outside the tracing sandbox so LeakSanitizer could inspect processes. Full configure,
+build and test commands/status/timings are in build/phase16-verification/validate.py,
+results.json, sdk.json and per-tree logs. The unchanged seven-job workflow runs
+unfiltered CTest and will discover all 35 suites; LLVM pin, assertions, permissions,
+timeout and editor Debug jobs are unchanged.
+
+### Repetition, stack, editor and final checks
+
+- Both Debug SDKs: ctest -R '^(runtime_.*|managed_.*)$' --repeat until-fail:10
+  --output-on-failure -j4 passed all 11 selected suites ten times per SDK
+  (26.96/23.71 s installed/official).
+- Both Debug SDKs: ulimit -s 1024; ctest -R '^(frontend|managed_source)$'
+  --repeat until-fail:5 --output-on-failure passed both suites five times per SDK
+  (36.96/32.65 s). This includes the unchanged bounded-layout regression and the
+  new recursive managed metadata/source tests at the actual 1 MiB stack limit.
+- Both strict sanitizer SDKs: ctest -R
+  '^(runtime_.*|managed_.*|frontend|reload|gc|native)$' --repeat until-fail:3
+  --output-on-failure -j4 passed all 15 selected suites three times per SDK
+  (25.11/24.72 s), including leak detection and all original runtime regressions.
+- Both Release SDKs: managed_source repeated until-fail:30 passed every execution
+  (39.41/35.52 s), including optimized generated roots and deterministic overlap.
+- Runtime-only TSan: clang++-19 -std=c++20 -g -O1 -fsanitize=thread
+  -fno-omit-frame-pointer -Iinclude tests/runtime/coordination.cpp
+  src/runtime/coordination.cpp src/runtime/heap.cpp -pthread; executable ran with
+  TSAN_OPTIONS=halt_on_error=1:exitcode=85 and passed, no races reported. This does
+  not instrument prebuilt LLVM/generated instructions or claim a full JIT TSan run.
+- Existing Release coordinator diagnostic passed for both SDKs (1000 collections,
+  one already-NativeSafe frozen object): mean/max 0.204379/1.53 us installed and
+  0.160529/1.05 us official. These fixture values are not general pause guarantees.
+- Extension npm test: 4/4 cases passed; npm run package produced the eight-file
+  145.44 KB VSIX. Existing local Node runtime was used; no dependency changes.
+- Real installed Linux VS Code 1.141 integration passed trusted, restricted and
+  multi-root modes against the rebuilt voidls. Both actual child-process kill
+  scenarios retained strict notification assertions, along with unsaved diagnostics,
+  navigation, repair, restart/configuration and clean deactivation. Expected
+  injected lifecycle errors appear in successful logs. No VSCodium execution claim.
+- ldd on the separately linked managed AOT harness showed only normal C++/C/math/
+  loader dependencies, no LLVM/ORC dependency. CLI native programs also use the
+  runtime-only link. An additional source check executed nullable module constants,
+  a declared null field default and constant reference equality successfully.
+- git diff --check passed; .github/workflows/ci.yml is unchanged. No commits,
+  branches, pushes, remote modifications or test suppression occurred.
+
+Exact repetitions/statuses are in build/phase16-verification/extra.py,
+extra-results.json and per-check logs; editor-unit.log, editor-package.log,
+editor-host-final.log and runtime-tsan.log record their respective checks.
+Native editor/leak/TSan checks ran outside the tracing sandbox as required.
+
+### Remaining limitations and hosted gate
+
+MANAGED_STRUCTS.md, the approved proposal, DECISIONS, KNOWN_ISSUES, SOURCE_COMPILER,
+related runtime/value/initialization guides, the Bible's approved clarification and
+README now distinguish implemented managed source from deferred work. The readonly
+analysis is conservative; rich managed debugger inspection, managed custom init,
+reference-containing source value structs, generalized nullable patterns, FFI and
+production collector policy remain future work. No GC production-readiness claim.
+
+Phase 16 is ready for owner review and a hosted CI attempt, not locked. The owner
+must push to verify all seven jobs with 35 suites each, particularly Windows runtime/
+CRT linkage and macOS ARM64 object layout, roots and Debug/Release execution, plus
+all three platform Debug editor/package integrations. Linux cannot certify those
+platforms. No new hosted run or remote action was performed here. Recommended next
+design work is managed custom init and its user-code publication/failure boundary,
+then reference-containing value capabilities; retain the same shared pipeline.
+
+## Phase 16 managed structs: investigation and proposal only, 12 October 2026
+
+The owner declares Phase 15 locked and reports seven-runner hosted run #27 green,
+31 suites per configuration. That is owner-reported hosted evidence; this design
+session did not rerun or modify GitHub. Older GC/known-issue documents contain
+historical pending-hosted wording and must not be mistaken for current source
+feature support or a reason to reopen Phase 15.
+
+Read the Language Bible, Development Strategy, GC_RUNTIME, INITIALIZATION,
+VALUE_STRUCTS, relevant decisions/known issues and existing implementation/tests.
+Traced the shared nominal/frontend/constructor/receiver pipeline, IR validator,
+LLVM root/layout/allocation/failure lowering, Heap/coordinator/ABI, source CLI,
+NativeCode/reload ownership, AOT adapter, analysis/tooling and runtime proof fixtures.
+Created `MANAGED_STRUCTS_PROPOSAL.md`; no Phase 16 behavior was implemented.
+
+Concrete findings:
+
+- Source parser, fields and receivers still admit value structs only. Private
+  `managed_ref` IR and nested roots do not constitute managed source compilation.
+- IR validation rejects recursive/empty managed descriptors. Simply permitting
+  cycles in current strongly owning Type/field descriptors would create C++
+  ownership leaks. Reference type-graph validation and inline layout recursion
+  must be separated, with owning immutable tables and nonowning nominal edges.
+- Receiver Places describe local aggregate paths; heap projections and reference
+  receivers need shared representation updates. Existing receiver-slot mutation
+  effects do not account for aliasing through copied references/helper calls.
+- Phase 15 allocation deposits a zeroed object into a precise root before field
+  writes. It is a valid private architectural mechanism, not proof of the stronger
+  complete-publication boundary requested for source constructors.
+- `allocate_into` polls but does not initiate automatic collection. Heap cycles
+  are reclaimed in existing tests, but source allocation-triggered reachability
+  and cyclic nominal source fields have not been implemented.
+- Source JIT compile/run supplies no runtime owner. Its replacement preflight is
+  runtime-free. Public source AOT rejects coordinated IR; only the private native
+  harness establishes the required runtime/attachment/Managed bootstrap.
+- Runtime numeric descriptor copies and code leases already have separate lifetimes;
+  preserve this. Source contract/tooling records need the new nominal, nullable,
+  access/effect and reference-dependency metadata, with cyclic-safe ownership.
+
+Recommended owner-review boundary: no-init managed named-field construction,
+nullable/non-nullable direct reference graphs, reference identity/alias semantics,
+owner-module methods, numeric/bool/reference-free nested value fields, atomic
+complete-object allocation and automatic collection through the shared runtime.
+Defer managed custom init and reference-containing source value structs rather than
+silently permitting self escape or weakening readonly semantics. Existing custom
+value init stays supported and runs once in nested value construction. The proposal
+includes alternatives if the owner prefers the larger scope.
+
+Approval requests P1-P7 cover the slice, nullable checked unwrap/injection, deep
+readonly view propagation, explicit non-null initialization and publication,
+automatic GC policy, unchanged-entry runtime bootstrap/reload ownership and managed
+receiver/target evaluation. Deep readonly alias transfer and custom managed self
+publication are genuine language decisions, not approved by Phase 14 C1 or Phase 15.
+The proposal explicitly distinguishes private construction roots from published
+source values; its recommended allocation path never roots an incomplete parent.
+
+Focused baseline verification using existing binaries, without source/build changes:
+
+```sh
+ctest --test-dir build/ci-debug \
+  -R '^(runtime_.*|frontend|gc|reload)$' --output-on-failure -j2
+ctest --test-dir build/ci-official-debug \
+  -R '^(runtime_.*|frontend|gc|reload)$' --output-on-failure -j2
+build/ci-debug/voidc check examples/initialization/main.void
+build/ci-debug/voidc run examples/initialization/main.void 10 --no-opt
+build/ci-debug/voidc run examples/initialization/main.void 10
+```
+
+Installed SDK Debug passed **10/10, 5.89s**; complete official SDK Debug passed
+**10/10, 5.57s**. These include all seven runtime suites plus frontend, GC and
+reload, including real normal/O2 JIT and separately linked private AOT proofs.
+The existing initialization source checked successfully and returned **166** in
+both normal and O2 JIT. llvm-config verified **19.1.7 / RTTI YES** installed and
+**19.1.7 / RTTI NO** official. CTest JSON discovery found **31 suites** in each tree.
+This was a focused baseline, not a fresh six-configuration rebuild, sanitizer run,
+Phase 16 source execution or local Windows/macOS verification.
+
+The proposal specifies future full six-configuration local/strict-sanitizer gates,
+small-stack/alias/constructor/GC failure stress, source JIT/real linked AOT reachability,
+LSP/editor/reload tests and all seven hosted jobs. No new source feature, custom
+initializer, runtime hook, test, workflow, LLVM setting or executable-entry policy
+was implemented. Only the proposal and this work log changed. Owner approval is
+required before implementation; no commits, pushes, branches or remote changes.
+
+
 ## CI architecture: seven parallel configurations, 12 October 2026
 
 Phase 15 remains locked. Inspected the existing workflow and retrieved the actual

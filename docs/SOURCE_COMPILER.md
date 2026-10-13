@@ -9,6 +9,9 @@ Phase 12 adds numeric/bool/nested value structs; see [VALUE_STRUCTS.md](VALUE_ST
 for approved defaults, source syntax, shared aggregate IR and private ABI boundaries.
 Earlier foundation-only status in historical documents predates source compilation.
 
+Phase 16 adds ordinary managed source structs, nullable references, deep readonly
+views and runtime-backed JIT/linked AOT; see [MANAGED_STRUCTS.md](MANAGED_STRUCTS.md).
+
 ## Working pipeline
 
 `SourceFile` validates UTF-8 and retains original byte offsets. The indentation
@@ -23,7 +26,8 @@ The LLVM backend compiles that same IR for both ORC JIT and TargetMachine object
 emission. There is no architecture-example recognizer or second source code
 generator. Changing a source literal or function name changes both native outputs.
 Compiler responsibilities stop at code generation; the existing experimental
-heap, reload leases and C bridge remain separate runtime/host responsibilities.
+heap and thread coordinator serve managed source through explicit runtime ownership
+and AOT bootstrap; reload leases and the C bridge remain runtime/host responsibilities.
 
 ## Syntax and supported semantics
 
@@ -167,9 +171,9 @@ Current constants, arithmetic and runtime errors are documented in
 Phases 6–11 subsequently completed numeric types, validated analysis, tooling
 sessions, LSP and editor integration. Phase 11 run #16 passed all three hosted
 platforms according to the owner. Phase 12 adds VALUE_STRUCTS.md and the
-value_structs_cli suite, preserving all 21 previous suites. The recommended next
-phase is receiver/initialization design; managed types remain behind the
-GC/root/thread gate.
+value_structs_cli suite, preserving all 21 previous suites. The subsequent
+receiver/initialization and GC phases completed that gate. Current managed source
+and the next deferred initialization decisions are documented in MANAGED_STRUCTS.md.
 
 ## Phase 13 receiver methods
 

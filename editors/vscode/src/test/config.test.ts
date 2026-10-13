@@ -66,8 +66,13 @@ test('presentation covers approved keyword colors and space indentation', async 
     assert(indent.test('    else if value < 0: # branch'));
     assert(indent.test('func (p point) move(dx: i32, dy: i32):'));
     assert(indent.test('for:')); assert(!indent.test('# for:'));
-    assert(indent.test('value struct point:')); assert(!indent.test('struct point:'));
+    assert(indent.test('value struct point:')); assert(indent.test('struct point:'));
     assert(keywords.some((rule:RegExp) => rule.exec('value struct point:')?.[0] === 'value struct'));
     assert(keywords.some((rule:RegExp) => rule.exec('struct point:')?.[0] === 'struct'));
     assert(!highlighted('value: i32'));
+    const literals = grammar.patterns.filter((p:{name?:string}) => p.name === 'constant.language.void')
+        .map((p:{match:string}) => new RegExp(p.match));
+    for (const word of ['true','false','null']) assert(literals.some((r:RegExp) => r.test(word)));
+    assert(!literals.some((r:RegExp) => r.test('nullify')));
+    assert(!indent.test('structure node:'));
 });

@@ -5,8 +5,39 @@
 #include <functional>
 #include <stdexcept>
 namespace vd::ir {
-const char* type_name(Type t) {
-    if (t.kind == Type::managed_ref && t.definition) return t.definition->identity.c_str();
+Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
+    if (!d) return;
+    if (d->self.expired()) d->self = d;
+    auto owner = d->arena.lock();
+    if (!owner) {
+        owner = std::make_shared<TypeArena>();
+        std::vector<std::shared_ptr<const ValueType>> pending{d};
+        std::set<const ValueType*> seen;
+        for (std::size_t n=0; n<pending.size(); ++n) {
+            auto current = pending[n];
+            if (!seen.insert(current.get()).second) continue;
+            if (current->self.expired()) current->self = current;
+            current->arena = owner;
+            owner->definitions.push_back(current);
+            for (const auto& field : current->fields)
+                if (auto child = field.type.target.lock()) pending.push_back(std::move(child));
+        }
+    }
+    definition = std::shared_ptr<const ValueType>(std::move(owner),d.get());
+}
+FieldType::FieldType(Type t) : kind(t.kind), nullable(t.nullable), readonly(t.readonly) {
+    if (t.definition) target = t.definition->self;
+}
+FieldType::operator Type() const {
+    if (kind != Type::aggregate && kind != Type::unresolved && kind != Type::managed_ref) { Type t(kind); t.nullable=nullable; t.readonly=readonly; return t; }
+    auto d = target.lock();
+    if (!d) throw std::logic_error("nominal type edge outlived its definition table");
+    Type t(std::move(d),kind); t.nullable=nullable; t.readonly=readonly; return t;
+}
+
+std::string type_name(Type t) {
+    if (t.readonly && t.kind!=Type::managed_ref) { t.readonly=false; return "readonly " + type_name(t); }
+    if (t.kind == Type::managed_ref && t.definition) return std::string(t.readonly ? "readonly " : "") + t.definition->identity + (t.nullable ? "?" : "");
     switch (t.kind) { case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
     throw std::invalid_argument("VOID IR: unknown type");
 }
@@ -16,22 +47,40 @@ void validate(const Module& m, InstructionTypes* results) {
     if (m.identity.empty()) fail("missing module identity");
     std::map<std::string,const ValueType*> definitions;
     std::set<const ValueType*> visiting, checked;
-    std::function<void(Type)> valid_type = [&](Type t) {
-        if (t.kind == Type::managed_ref && !m.coordinated) fail("managed references require coordinated runtime");
-        if (t.kind != Type::aggregate && t.kind != Type::managed_ref) { if (t.kind == Type::unresolved || t.kind == Type::invalid) fail("unresolved type"); type_name(t); return; }
-        if (!t.definition || t.definition->identity.empty() || t.definition->name.empty()) fail("missing value type identity");
-        if (t.kind == Type::managed_ref && t.definition->fields.empty()) fail("empty internal managed object layout; source object layout is deferred");
-        auto* d = t.definition.get();
-        if (checked.contains(d)) return;
+    std::function<void(Type)> inline_layout = [&](Type t) {
+        if (t.kind != Type::aggregate) return;
+        auto* d=t.definition.get();
         if (visiting.size() >= 128 || !visiting.insert(d).second) fail("recursive or excessive value layout");
-        auto [found,added] = definitions.emplace(d->identity,d);
-        if (!added && found->second != d) fail("conflicting owned value type definitions");
-        std::set<std::string> fields;
-        for (const auto& field : d->fields) {
-            if (field.name.empty() || !fields.insert(field.name).second || field.type == Type::none) fail("invalid value field");
-            valid_type(field.type);
+        for (const auto& field : d->fields) inline_layout(field.type);
+        visiting.erase(d);
+    };
+    auto valid_type = [&](Type root) {
+        std::vector<Type> pending{root};
+        for (std::size_t n=0;n<pending.size();++n) {
+            auto t=pending[n];
+            if (t.nullable && t.kind!=Type::managed_ref) fail("nullable non-reference type");
+            if (t.kind==Type::managed_ref && !m.coordinated) fail("managed references require coordinated runtime");
+            if (t.kind!=Type::aggregate && t.kind!=Type::managed_ref) {
+                if (t.kind==Type::unresolved || t.kind==Type::invalid || t.kind==Type::null_value) fail("unresolved type");
+                type_name(t); continue;
+            }
+            if (!t.definition || t.definition->identity.empty() || t.definition->name.empty()) fail("missing value type identity");
+            auto* d=t.definition.get();
+            if (t.kind==Type::aggregate && d->managed) fail("managed nominal cannot be an inline value");
+            auto [found,added]=definitions.emplace(d->identity,d);
+            if (!added && found->second!=d) fail("conflicting owned value type definitions");
+            if (!checked.insert(d).second) continue;
+            std::set<std::string> fields;
+            for (const auto& field:d->fields) {
+                if (field.name.empty() || !fields.insert(field.name).second || Type(field.type)==Type::none) fail("invalid value field");
+                pending.push_back(field.type);
+            }
+            // References break physical layout recursion, not graph validation.
+            for (const auto& field:d->fields) inline_layout(field.type);
         }
-        visiting.erase(d); checked.insert(d);
+    };
+    auto assignable = [](Type actual,Type expected) {
+        return actual==expected || (actual.kind==Type::managed_ref && expected.kind==Type::managed_ref && Type::key(actual)==Type::key(expected) && (!actual.nullable || expected.nullable));
     };
     struct Signature { std::vector<Type> parameters; Type result; bool receiver = false, mutates = false, initializer = false; };
     std::map<std::string, Signature> names;
@@ -42,7 +91,7 @@ void validate(const Module& m, InstructionTypes* results) {
         if (!f.module_identity.empty() && (f.source_name.empty() || f.name != f.module_identity + "::" + f.source_name))
             fail("inconsistent function ownership");
         if (f.receiver) {
-            if (f.parameters.empty() || f.parameters[0].kind != Type::aggregate || f.locals.empty() || f.locals[0] != f.parameters[0]) fail("invalid receiver signature/storage");
+            if (f.parameters.empty() || (f.parameters[0].kind != Type::aggregate && f.parameters[0].kind != Type::managed_ref) || f.locals.empty() || f.locals[0] != f.parameters[0]) fail("invalid receiver signature/storage");
         } else if (f.receiver_mutates) fail("receiver effect without receiver");
         if (f.initializer && (!f.receiver || f.result != Type::none)) fail("invalid initializer signature");
         valid_type(f.result);
@@ -58,7 +107,7 @@ void validate(const Module& m, InstructionTypes* results) {
                 if (id >= types.size() || types[id] == Type::none) fail("invalid operand in " + f.name);
                 return types[id];
             };
-            auto expect = [&](unsigned id, Type t) { if (operand(id) != t) fail("mistyped operand in " + f.name); };
+            auto expect = [&](unsigned id, Type t) { if (!assignable(operand(id),t)) fail("mistyped operand in " + f.name); };
             auto slot = [&](unsigned id) {
                 if (id >= f.locals.size()) fail("invalid slot in " + f.name);
                 return f.locals[id];
@@ -66,16 +115,21 @@ void validate(const Module& m, InstructionTypes* results) {
             for (const auto& i : b.instructions) {
                 Type result = Type::i32;
                 switch (i.op) {
+                case Op::gc_construct:
+                    valid_type(i.type);
+                    if (!m.coordinated || i.type.kind!=Type::managed_ref || i.type.nullable || i.arguments.size()!=i.type.definition->fields.size()) fail("invalid complete managed construction");
+                    for (unsigned n=0;n<i.arguments.size();++n) expect(i.arguments[n],i.type.definition->fields[n].type);
+                    result=i.type; break;
                 case Op::gc_allocate:
                     valid_type(i.type);
-                    if (!m.coordinated || i.type.kind != Type::managed_ref) fail("invalid managed allocation");
+                    if (!m.coordinated || i.type.kind != Type::managed_ref || i.type.definition->fields.empty()) fail("invalid managed allocation");
                     result = i.type; break;
                 case Op::gc_read: case Op::gc_write: {
                     auto object = operand(i.a);
                     if (!m.coordinated || object.kind != Type::managed_ref || i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= object.definition->fields.size()) fail("invalid managed field");
                     auto field = object.definition->fields[static_cast<std::size_t>(i.immediate)].type;
-                    if (i.op == Op::gc_write) { expect(i.b, field); result = Type::none; }
-                    else result = field;
+                    if (i.op == Op::gc_write) { if (object.readonly) fail("write through readonly reference"); expect(i.b, field); result = Type::none; }
+                    else { result = field; if (result.kind==Type::managed_ref) result.readonly=object.readonly; }
                     break;
                 }
                 case Op::gc_alive:
@@ -111,17 +165,17 @@ void validate(const Module& m, InstructionTypes* results) {
                     if (!numeric::supports(i.op,operand(i.a))) fail("non-numeric ordering");
                     expect(i.b,operand(i.a)); result = Type::boolean; break;
                 case Op::equal: case Op::not_equal:
-                    if (!numeric::supports(i.op,operand(i.a)) || operand(i.a) != operand(i.b)) fail("comparison type mismatch");
+                    if (!((operand(i.a).kind==Type::managed_ref && operand(i.b).kind==Type::managed_ref && Type::key(operand(i.a))==Type::key(operand(i.b))) || (numeric::supports(i.op,operand(i.a)) && operand(i.a)==operand(i.b)))) fail("comparison type mismatch");
                     result = Type::boolean; break;
                 case Op::convert:
-                    if (!numeric::number(operand(i.a)) || !numeric::number(i.type)) fail("invalid numeric conversion");
+                    if (!((operand(i.a).kind==Type::managed_ref && i.type.kind==Type::managed_ref && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)))) fail("invalid conversion");
                     result = i.type; break;
                 case Op::negate:
                     result = operand(i.a); if (!numeric::number(result)) fail("non-numeric negation"); break;
                 case Op::logical_not: expect(i.a, Type::boolean); result = Type::boolean; break;
                 case Op::load: result = slot(i.a); break;
                 case Op::store:
-                    if (f.receiver && !f.receiver_mutates && i.a == 0) fail("non-mutating method writes receiver");
+                    if (f.receiver && f.parameters[0].kind==Type::aggregate && !f.receiver_mutates && i.a == 0) fail("non-mutating method writes receiver");
                     expect(i.b, slot(i.a)); result = Type::none; break;
                 case Op::call: {
                     auto target = names.find(i.callee);
@@ -134,7 +188,7 @@ void validate(const Module& m, InstructionTypes* results) {
                     if (i.receiver) {
                         auto t = slot(i.receiver->slot);
                         for (auto field : i.receiver->fields) {
-                            if (t.kind != Type::aggregate || field >= t.definition->fields.size()) fail("invalid receiver field path");
+                            if ((t.kind != Type::aggregate && t.kind!=Type::managed_ref) || field >= t.definition->fields.size()) fail("invalid receiver field path");
                             t = t.definition->fields[field].type;
                         }
                         if (t != signature.parameters[0]) fail("receiver type mismatch");

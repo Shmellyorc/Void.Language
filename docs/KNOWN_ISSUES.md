@@ -1,6 +1,14 @@
 # Known issues and deferred work
 
-Updated for Phase 15 GC roots and thread coordination.
+Updated for Phase 16 managed source. The owner declares Phase 15 locked and reports
+run #27 green on all seven runners. Phase 16 adds four suites (35 total); its
+Windows/macOS hosted verification remains pending. See MANAGED_STRUCTS.md.
+
+Managed custom init, reference-containing value structs, richer nullable patterns,
+managed FFI and production GC tuning remain deferred. Readonly/effect analysis is
+conservative across control-flow/rebinding joins and may reject cases requiring
+path-sensitive alias reasoning. Managed debug metadata is currently opaque-pointer
+metadata. Linux source/JIT/AOT results are not Windows/macOS verification.
 
 The owner reports Phase 13 `c72e62a` passed hosted run #19 on Windows, Linux and
 macOS. Phase 14 run #21 (`424cacb`) passed Windows/Ubuntu but macOS ARM64 Debug
@@ -8,13 +16,13 @@ aborted in frontend aggregate debug layout generation (23/24 suites passed).
 A local reproducer confirmed a context-lifetime bug in the shared LLJIT DataLayout
 cache; lowering now queries the module-owned copy. WORK_LOG.md records the
 backtrace, regression and validation. The owner subsequently declared Phase 14
-complete. Phase 15 still requires its own hosted Windows/macOS validation.
+complete. The later owner-reported Phase 15/CI successes supersede that historical hosted gate.
 Approved C1 initialization is described in INITIALIZATION.md; Phase 13 I2 remains
 an unapproved historical alternative. Owner-module methods and custom value
 initializers use the existing shared types/IR/LLVM path.
 
 Runtime declared field defaults, inferred/default/named ordinary function/method
-parameters, constructor overloads, managed structs, fallible constructor results,
+parameters, constructor overloads, custom managed init, fallible constructor results,
 resource deinit, foreign extensions and external aggregate ABI remain deferred.
 An enclosing custom initializer requires default-constructible fields; required
 children can be explicitly supplied to no-init wrappers. Compile-time contexts
@@ -68,9 +76,10 @@ Layout remains compiler-private with 128-level/65536-expanded-field bounds.
   visibility currently operates inside one compiled project;
   external library export/visibility boundaries remain deferred.
 - Supported value types are all ten exact-width numeric types, bool and acyclic
-  numeric/bool value structs. Strings, collections/ranges, managed structs,
+  numeric/bool value structs, plus the bounded managed family in MANAGED_STRUCTS.md.
+  Strings, collections/ranges, custom managed init,
   generics, closures, async, named/default function arguments,
-  multiple return values and full managed types are not implemented. Unsupported
+  multiple return values and broader managed features are not implemented. Unsupported
   syntax is rejected rather than simulated.
 - UTF-8 source validation and scalar columns work; identifiers currently use
   lowercase ASCII/underscore/digits. Unicode identifier policy remains open.
@@ -108,7 +117,8 @@ Layout remains compiler-private with 128-level/65536-expanded-field bounds.
 - The existing experimental non-moving tracer now has a runtime-owned registry,
   cooperative epochs, frozen per-thread frames and persistent handles. It is not
   a production managed runtime. Allocator caches, weak references, async roots,
-  finalization and source managed types remain deferred. See GC_RUNTIME.md.
+  finalization and broader managed features remain deferred. Phase 16 source uses
+  this foundation; see GC_RUNTIME.md and MANAGED_STRUCTS.md.
 - Shared normal/O2 JIT/AOT lowering publishes exact reference storage, including
   nested aggregates and temporaries, and polls coordinated loops/calls. There is
   no conservative stack/register discovery. LLVM statepoints/stack-map decoding,

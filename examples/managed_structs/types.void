@@ -1,0 +1,12 @@
+struct node:
+    value: i32
+    next: node?
+
+func (n node) link(child: node):
+    n.next = child
+
+func (n node) child() -> node:
+    return n.next as node
+
+func make(value: i32) -> node:
+    return node(value = value)

@@ -1,0 +1,22 @@
+value struct position:
+    x: i32 = 4
+
+func (p position) init(counter: node? = null):
+    p.x += 1
+    if counter != null:
+        var c = counter as node
+        c.left = c.left * 10 + 3
+
+struct node:
+    left: i32
+    right: i32
+    position: position
+
+func record(counter: node, digit: i32) -> i32:
+    counter.left = counter.left * 10 + digit
+    return digit
+
+func entry(value: i32) -> i32:
+    var counter = node()
+    var result = node(right = record(counter, 2), left = record(counter, 1), position = position(counter))
+    return counter.left + result.left + result.right + result.position.x

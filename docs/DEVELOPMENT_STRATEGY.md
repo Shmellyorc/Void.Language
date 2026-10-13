@@ -709,3 +709,12 @@ contracts. Source managed structs and broader runtime features remain a later de
 phase; explicit root success does not claim completion of the separate statepoint/
 stack-map experiment or production latency/throughput goals. Hosted Windows/macOS
 must validate this phase after the owner's push.
+
+## Phase 16 managed source integration
+
+Owner-approved P1–P7 now connect managed source construction, reference identity,
+nullable cyclic graphs and deep readonly views to the existing shared frontend,
+IR, LLVM and coordinated runtime. Complete-object publication is reusable runtime
+work, not a source-specific incomplete-object exception. MANAGED_STRUCTS.md records
+implementation and deferred managed init/reference-containing value work. The
+seven-runner workflow remains unchanged; four additional suites extend coverage.

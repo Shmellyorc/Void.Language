@@ -574,3 +574,39 @@ LLVM contexts; keep existing code-generation leases authoritative for retirement
 These are internal runtime/IR capabilities, not managed source syntax or a new CLI
 entry model. GC_RUNTIME.md specifies interfaces, invariants and deferred work;
 WORK_LOG.md records local evidence and pending hosted validation.
+
+## Phase 16: managed structs and deep readonly views, 12 October 2026
+
+The owner approved MANAGED_STRUCTS_PROPOSAL P1–P7, explicitly P3 deep readonly
+capabilities and P4 reusable complete-object publication. Ordinary managed structs
+now have identity/alias semantics, direct nullable/non-nullable references, cyclic
+graphs, numeric/bool/reference-free value fields and owner-module methods. Custom
+managed init and source reference-containing values remain deferred. Safe nullable
+injection and checked same-nominal unwrap preserve capabilities.
+
+One nominal model carries access metadata; machine type equality ignores readonly
+but compatibility/tooling contracts compare it explicitly. A monotone capability/
+effect pass operates on the validated AST, conservatively tracking returned aliases,
+mutation and retention. Existing const formals express readonly parameters. It
+does not duplicate nominal checking or freeze objects; independent mutable aliases
+remain usable. Existing mutable bindings cannot acquire readonly references by
+assignment; inferred readonly bindings remain readonly through rebinding.
+
+One owning immutable type table plus nonowning descriptor edges permits recursive
+managed layouts without C++ ownership cycles. Reference graph validation is distinct
+from bounded inline-value layout expansion. Target layout/root flattening stays in
+the shared LLVM implementation.
+
+The new gc_construct operation stages complete fields and uses the existing Heap
+under Runtime::construct_into. Budget collection and polling precede the lock; all
+fallible allocation work precedes copying and last-step root publication. No
+incomplete object is exposed. Existing private allocate proofs remain intact.
+Source runtimes use a 256-allocation budget; tests force budgets 1/8 and allocation
+failures. Failed rendezvous never sweeps. Runtime ownership is independent of code
+leases; source replacement reuses the current runtime. AOT uses the runtime's
+checked bootstrap with the existing entry signature and separately linked runtime.
+
+Selected heap targets are rooted snapshots before arguments/RHS; reference receiver
+rebinding is local, inline value receivers retain place semantics. Managed source
+does not establish an arbitrary C ABI. See MANAGED_STRUCTS.md for exact semantics,
+regressions, conservative limitations and pending hosted gates.

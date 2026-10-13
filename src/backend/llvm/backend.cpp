@@ -166,9 +166,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         b.SetCurrentDebugLocation(llvm::DebugLoc());
         for (unsigned n = 0; n < f.locals.size(); ++n) {
             auto t = f.locals[n];
-            if (f.receiver && n == 0) { slots.push_back(fn->getArg(0)); continue; }
+            if (f.receiver && n == 0 && t.kind==ir::Type::aggregate) { slots.push_back(fn->getArg(0)); continue; }
             auto* slot = b.CreateAlloca(type(t)); slots.push_back(slot);
-            b.CreateStore(llvm::Constant::getNullValue(type(t)), slot);
+            b.CreateStore(f.receiver && n==0 && t.kind==ir::Type::managed_ref ? static_cast<llvm::Value*>(fn->getArg(0)) : llvm::Constant::getNullValue(type(t)), slot);
         }
         std::function<void(ir::Type,std::uint64_t,std::vector<std::uint64_t>&)> reference_offsets = [&](ir::Type t, std::uint64_t offset, auto& result) {
             if (t.kind == ir::Type::managed_ref) result.push_back(offset);
@@ -270,6 +270,27 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 }
                 case Op::gc_alive:
                     v = b.CreateCall(module->getOrInsertFunction("vd_gc_alive",b.getInt1Ty(),b.getPtrTy()),{values[instruction.a]}); break;
+                case Op::gc_construct: {
+                    auto object=ir::Type(instruction.type.definition);
+                    auto* native=type(object);
+                    auto bytes=std::max<std::uint64_t>(1,layout.getTypeAllocSize(native));
+                    llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
+                    auto* payload=allocations.CreateAlloca(b.getInt8Ty(),b.getInt64(bytes));
+                    payload->setAlignment(layout.getABITypeAlign(native));
+                    b.CreateMemSet(payload,b.getInt8(0),bytes,layout.getABITypeAlign(native));
+                    for (unsigned field=0;field<instruction.arguments.size();++field) {
+                        auto* value=values[instruction.arguments[field]];
+                        ir::Type field_type=instruction.type.definition->fields[field].type;
+                        if (field_type.kind==ir::Type::managed_ref && !field_type.nullable) fail_if(b.CreateIsNull(value),"Null supplied for non-nullable field");
+                        b.CreateStore(value,b.CreateStructGEP(native,payload,field));
+                    }
+                    std::vector<std::uint64_t> offsets; reference_offsets(object,0,offsets);
+                    auto* storage=value_roots[n].at(values.size());
+                    b.CreateCall(module->getOrInsertFunction("vd_gc_construct",b.getVoidTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type,b.getPtrTy(),b.getPtrTy()),
+                        {storage,llvm::ConstantInt::get(size_type,bytes),offset_map(offsets),llvm::ConstantInt::get(size_type,offsets.size()),payload,failure});
+                    fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),b.CreateStructGEP(failure_type,failure,0))),"Managed construction allocation failed");
+                    v=b.CreateLoad(type(instruction.type),storage); break;
+                }
                 case Op::gc_allocate: {
                     auto object = ir::Type(instruction.type.definition);
                     std::vector<std::uint64_t> offsets; reference_offsets(object,0,offsets);
@@ -294,7 +315,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 case Op::extract: v = b.CreateExtractValue(values[instruction.a],{static_cast<unsigned>(instruction.immediate)}); break;
                 case Op::insert: v = b.CreateInsertValue(values[instruction.a],values[instruction.b],{static_cast<unsigned>(instruction.immediate)}); break;
                 case Op::argument:
-                    if (f.receiver && instruction.a == 0) v = b.CreateLoad(type(f.parameters[0]),fn->getArg(0));
+                    if (f.receiver && f.parameters[0].kind==ir::Type::aggregate && instruction.a == 0) v = b.CreateLoad(type(f.parameters[0]),fn->getArg(0));
                     else v = fn->getArg(instruction.a);
                     break;
                 case Op::constant:
@@ -305,6 +326,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 case Op::negate: v = values[instruction.a]->getType()->isFloatingPointTy() ? b.CreateFNeg(values[instruction.a]) : b.CreateNeg(values[instruction.a]); break;
                 case Op::convert: {
                     auto* a = values[instruction.a]; auto from = operand_type(instruction.a), to = instruction.type;
+                    if (from.kind==ir::Type::managed_ref) { fail_if(b.CreateIsNull(a),"Null managed reference in checked conversion"); v=a; break; }
                     if (from == to) { v = a; break; }
                     if (numeric::integer(from) && numeric::integer(to)) {
                         auto* wide = numeric::signed_integer(from) ? b.CreateSExt(a,b.getIntNTy(128)) : b.CreateZExt(a,b.getIntNTy(128));
@@ -382,10 +404,11 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                         auto* address = slots.at(instruction.receiver->slot);
                         auto t = f.locals.at(instruction.receiver->slot);
                         for (auto field : instruction.receiver->fields) {
+                            if (t.kind==ir::Type::managed_ref) { address=b.CreateLoad(type(t),address); t=ir::Type(t.definition); }
                             address = b.CreateStructGEP(type(t),address,field);
                             t = t.definition->fields.at(field).type;
                         }
-                        arguments.push_back(address);
+                        arguments.push_back(t.kind==ir::Type::managed_ref ? b.CreateLoad(type(t),address) : address);
                     }
                     for (auto id : instruction.arguments) arguments.push_back(values[id]);
                     bool imported = std::find(input.imports.begin(),input.imports.end(),instruction.callee) != input.imports.end();
@@ -455,6 +478,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
 struct Jit::Impl {
     std::unique_ptr<llvm::orc::LLJIT> jit;
     std::uint64_t serial = 0;
+    std::shared_ptr<Runtime> source_runtime;
     std::atomic<std::size_t> live{0};
     struct Generation {
         std::shared_ptr<Impl> owner;
@@ -493,6 +517,7 @@ Jit::Jit() : impl_(std::make_shared<Impl>()) {
     initialize();
     impl_->jit = unwrap(llvm::orc::LLJITBuilder().create());
     bind("vd_gc_frame_enter",vd_gc_frame_enter); bind("vd_gc_frame_leave",vd_gc_frame_leave);
+    bind("vd_gc_construct",vd_gc_construct);
     bind("vd_gc_poll",vd_gc_poll); bind("vd_gc_collect",vd_gc_collect); bind("vd_gc_allocate",vd_gc_allocate);
     bind("vd_gc_alive",vd_gc_alive); bind("vd_gc_native_enter",vd_gc_native_enter); bind("vd_gc_native_leave",vd_gc_native_leave);
 }
@@ -510,6 +535,10 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
         auto coordinated = input;
         coordinated.coordinated = true;
         return compile(coordinated,entry,optimize,std::move(contract),std::move(runtime));
+    }
+    if (input.coordinated && input.analysis && !runtime) {
+        if (!impl_->source_runtime) impl_->source_runtime=std::make_shared<Runtime>(256);
+        runtime=impl_->source_runtime;
     }
     ir::validate(input);
     if (input.coordinated != static_cast<bool>(runtime)) throw std::invalid_argument("coordinated IR requires an explicit runtime owner");
@@ -530,7 +559,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     contract.analysis = input.analysis;
     contract.source_contract = input.analysis ? input.analysis->compatibility_contract() : std::string{};
     contract.runtime_identity = reinterpret_cast<std::uintptr_t>(runtime.get());
-    if (input.coordinated) {
+    if (input.coordinated && !input.analysis) {
         std::map<std::string,std::string> layouts;
         auto encoded = [](const std::string& text) { return std::to_string(text.size()) + ":" + text; };
         std::function<void(ir::Type)> record = [&](ir::Type t) {
@@ -566,8 +595,10 @@ bool Jit::replace(ReloadSlot& slot, const ValidatedAnalysis& analysis, bool opti
     contract.constant_contract = analysis.constant_contract();
     contract.source_contract = analysis.compatibility_contract();
     contract.analysis = analysis.shared_from_this();
+    contract.runtime_identity=current->compatibility().runtime_identity;
     if (!(current->compatibility() == contract)) return false;
-    return slot.replace(compile(analysis,optimize,std::move(contract)));
+    auto module=analysis.lower();
+    return slot.replace(compile(module,module.entry_symbol,optimize,std::move(contract),current->runtime_owner()));
 }
 std::size_t Jit::live_generations() const { return impl_->live.load(); }
 std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
@@ -611,7 +642,7 @@ std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
     return impl_->load(std::move(module), std::move(context), name, {"/proof::root_probe"}, impl_);
 }
 static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object) {
-    if (input.coordinated != runtime_object) throw std::invalid_argument("coordinated AOT requires the runtime proof bootstrap");
+    if ((runtime_object && !input.coordinated) || (input.coordinated && !runtime_object && !source_program)) throw std::invalid_argument("coordinated AOT requires the runtime proof bootstrap");
     initialize();
     llvm::LLVMContext context;
     bool entry_valid = false;
@@ -675,7 +706,9 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         b.CreateStore(llvm::Constant::getNullValue(failure_type), failure);
         arguments.push_back(failure);
     }
-    auto* result = b.CreateCall(entry, arguments);
+    llvm::CallInst* result;
+    if (input.coordinated) result=b.CreateCall(module->getOrInsertFunction("vd_runtime_entry",b.getInt32Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{entry,input_value,failure});
+    else result=b.CreateCall(entry, arguments);
     if (failure) {
         auto* failed = llvm::BasicBlock::Create(context, "runtime_error", main);
         auto* success = llvm::BasicBlock::Create(context, "success", main);

@@ -1,5 +1,9 @@
 # Phase 14: custom initialization for value structs
 
+Phase 16 integration: [MANAGED_STRUCTS.md](MANAGED_STRUCTS.md) describes the now
+implemented managed-source boundary. Earlier phase-only exclusions below remain
+historical; custom managed init and reference-containing source values are deferred.
+
 The owner approved C1 in INITIALIZATION_PROPOSAL.md, including recursive nested
 construction, required-child availability, visibility, conservative initialization
 reload dependencies and the specific obsolete Phase 13 test updates. This document

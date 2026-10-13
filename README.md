@@ -5,13 +5,21 @@ This repository now compiles graphs of actual `.void` files through one frontend
 semantic model, backend-independent IR, and shared LLVM 19.1.7 AOT/JIT lowering.
 The implemented subset supports typed functions, all ten exact-width numeric types,
 contextual literals, checked numeric `as`, bool expressions, local variables,
-conditionals, `for` loops, readonly/compile-time constants, numeric/bool value structs with receiver methods, and source-first
+conditionals, `for` loops, readonly/compile-time constants, numeric/bool value structs with custom initialization, managed structs with receiver methods, and source-first
 compile/runtime diagnostics. Compile-time errors now include stable codes, ranges,
 related declarations and recovery across independent errors. Cooperative GC roots/thread coordination, leased function
-replacement, and native C interoperability remain internal architectural proofs.
+replacement, and native C interoperability retain their architectural regression proofs.
 The [runtime foundation](docs/GC_RUNTIME.md) uses shared optimized JIT/AOT lowering;
-source-level managed structs are not implemented.
+source-level managed structs now use that same runtime, including reference identity,
+nullable cyclic graphs and deep readonly views. See [managed source](docs/MANAGED_STRUCTS.md)
+for the supported contract and linked-AOT runtime dependency.
 See [source compiler scope and decisions](docs/SOURCE_COMPILER.md).
+
+Managed source example: `voidc run examples/managed_structs/main.void 10` returns
+`23` after alias mutation, cyclic references and allocation-triggered collection.
+The managed CLI tests also emit and separately link this source into native
+executables, with and without LLVM optimization; these are distinct from the older
+hand-built IR proofs. See the managed-source guide for complete link commands.
 
 ## Build on Linux
 
@@ -202,10 +210,11 @@ On Windows, stale exported DIA library paths are resolved against the active
 Visual Studio DIA SDK (`VSINSTALLDIR`); an explicit real
 `-DVOID_DIA_GUIDS_LIBRARY=.../diaguids.lib` can also be supplied.
 
-All jobs build and execute the same Debug and Release tests; Linux also runs
-ASan/UBSan. The user reports Phase 9 passed all three platforms at commit `02a9aa7`,
-Actions run #12. Phase 10 requires another hosted run after the user commits
-and pushes.
+Seven independent runners execute Ubuntu Debug/Release/Sanitizers, Windows
+Debug/Release and macOS ARM64 Debug/Release. Each runs the full CTest inventory;
+Debug jobs also test/package the extension and run real editor integration. The
+owner reports Phase 15 and the seven-runner refactor passed run #27. Phase 16
+requires a new hosted run after owner review and push.
 See [verified commands and results](docs/WORK_LOG.md).
 
 ## Continue development
@@ -217,10 +226,10 @@ Read [the Language Bible](docs/LANGUAGE_BIBLE.md),
 [module system](docs/MODULE_SYSTEM.md),
 [value semantics](docs/VALUE_SEMANTICS.md), and
 [known issues](docs/KNOWN_ISSUES.md).
-The minimal language server now connects immutable document sessions to real LSP
-clients. Next validate hosted integration, then consider editor packaging and
-explicit disk refresh/cancellation before partial compilation.
-Resolve runtime/root integration before introducing managed language types.
+The language server and extension connect immutable document sessions to real LSP
+clients. Managed source now uses the coordinated runtime. The next recommended
+language design work is managed custom initialization and reference-containing
+value capabilities; see the approved managed-source scope before extending either.
 
 ## Structured compiler diagnostics
 

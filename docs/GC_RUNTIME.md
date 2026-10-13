@@ -1,5 +1,9 @@
 # Phase 15 runtime foundation
 
+Phase 16 integration: [MANAGED_STRUCTS.md](MANAGED_STRUCTS.md) describes the now
+implemented managed-source boundary. Earlier phase-only exclusions below remain
+historical; custom managed init and reference-containing source values are deferred.
+
 This implements the owner-approved G1–G6 in `GC_RUNTIME_PROPOSAL.md`. It is an
 internal runtime/compiler foundation, not source-level managed `struct` support
 or a production managed runtime. Existing source syntax, entry behavior, value

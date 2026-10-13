@@ -2807,3 +2807,20 @@ and how to migrate the currently implemented `entry(i32) -> i32` test/CLI
 adapter without breaking existing proof suites. Do not implement this as an
 incidental side effect of the GC/runtime phase. Approve the coherent contract
 in a dedicated executable/project phase.
+
+## Approved Phase 16 clarification: managed readonly views
+
+The owner approved deep readonly reference capabilities (P3) and complete-object
+publication (P4) in MANAGED_STRUCTS_PROPOSAL.md. `const` on a managed reference
+provides a deep readonly view, not object-wide freezing. Copies/casts/returned
+aliases/nested reference access preserve it; copying to `var` cannot restore write
+permission. Independently held mutable aliases remain valid. Reference-free values
+still copy independently. Existing `const parameter: type` syntax accepts readonly
+reference arguments; receiver effects are inferred.
+
+The bounded Phase 16 implementation uses named-field managed construction, direct
+managed `t?` fields/contextual `null`, checked same-nominal `as t` unwrap and explicit
+non-nullable field values. No implicit non-nullable allocation occurs. Complete
+objects alone are published. Custom managed `init` and reference-containing value
+structs are deferred, not prohibited. Existing value `init` semantics are unchanged.
+MANAGED_STRUCTS.md distinguishes working source from this Bible's broader proposals.
