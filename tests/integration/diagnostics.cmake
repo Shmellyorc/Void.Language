@@ -4,6 +4,11 @@ execute_process(COMMAND "${PYTHON}" "${ROOT}/tests/integration/utf8_diagnostics.
 if(NOT utf8_status EQUAL 0)
   message(FATAL_ERROR "Strict UTF-8 diagnostic output regression failed: ${utf8_status}")
 endif()
+execute_process(COMMAND "${PYTHON}" "${ROOT}/tests/integration/semantic_depth.py" "${COMPILER}"
+  RESULT_VARIABLE depth_status)
+if(NOT depth_status EQUAL 0)
+  message(FATAL_ERROR "Bounded semantic stack regression failed: ${depth_status}")
+endif()
 foreach(mode normal optimized)
   set(flags)
   if(mode STREQUAL "normal")

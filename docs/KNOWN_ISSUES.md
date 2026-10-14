@@ -1,5 +1,16 @@
 # Known issues and deferred work
 
+## Deep valid receiver chains in small-stack IR lowering
+
+The run #38 investigation separately found that a valid 120-call inline-value
+receiver chain can exhaust a 1 MiB Linux Release stack in `Lowering::expression`.
+Both parent 5b75d87 and Phase 22 reproduce it. This is distinct from the malformed
+400-call semantic-analysis crash corrected for run #38, which must stop before IR
+lowering. The lowering case remains unresolved and is not a claim about a captured
+Windows stack. Its fixture and GDB trace are retained under build/phase22-crash;
+WORK_LOG.md records the evidence. A lowering change requires separately scoped
+work; no limit, test assertion or optimization level was reduced to hide it.
+
 ## Phase 22 approved diagnostic amendment
 
 The recorded VOID1001 malformed-source output defect is fixed locally. The shared

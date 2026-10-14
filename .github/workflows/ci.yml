@@ -55,12 +55,12 @@ jobs:
         run: cmake --build build/${{ matrix.configuration }} --parallel 3
       - name: Execute ${{ matrix.configuration }} tests
         run: ctest --test-dir build/${{ matrix.configuration }} --output-on-failure
-      - name: Frontend Debug small-stack regression
-        if: runner.os == 'Linux' && matrix.configuration == 'Debug'
+      - name: Frontend Debug and Release small-stack regression
+        if: runner.os == 'Linux' && (matrix.configuration == 'Debug' || matrix.configuration == 'Release')
         shell: bash
         run: |
           ulimit -s 1024
-          ctest --test-dir build/Debug -R '^frontend$' --output-on-failure
+          ctest --test-dir build/${{ matrix.configuration }} -R '^frontend$' --output-on-failure
       - name: Extension Node.js toolchain
         if: matrix.configuration == 'Debug'
         uses: actions/setup-node@v4

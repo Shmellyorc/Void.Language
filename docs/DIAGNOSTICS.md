@@ -165,6 +165,13 @@ loaded import frames. Function execution recursion remains an application/runtim
 concern. A limit diagnostic asks for smaller expressions/functions/dependency
 chains; it never silently accepts or lowers truncated input.
 
+Semantic expression handlers and contextual conversion retain out-of-line call
+boundaries in optimized compiler builds. This keeps unrelated handler temporaries
+out of recursively nested dispatcher frames so the existing 256-frame guard can
+report VOID1107 within a 1 MiB stack. The CLI regression checks deep receiver
+chains, source location and later-error recovery; Linux children explicitly use
+1 MiB. Hosted Linux frontend small-stack checks cover both Debug and Release.
+
 All reachable units finish validation **before any AST-to-IR lowering**. Any error
 throws the structured collection, so check/run/emit return 1, no JIT invocation
 occurs, and emission neither creates a partial object nor overwrites an existing

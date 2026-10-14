@@ -6243,3 +6243,124 @@ Logs are retained under build/phase22-investigation/utf8-diagnostics/. The fix i
 verified locally and is no longer recorded as an unresolved renderer defect.
 String implementation, Language Bible, LLVM version, runtime memory semantics
 and the hosted workflow are unchanged. No Git mutations were performed.
+
+
+## Phase 22 hosted run #38: optimized frontend stack investigation (14 October 2026)
+
+Owner requested evidence before changing code, preservation of assertions,
+optimization and architecture, focused regression coverage, and a stop before any
+owner-controlled push. No Git mutation or hosted run was initiated.
+
+### Evidence and comparison
+
+Read the actual Windows Release job 116036122476 for run 38617462093, commit
+24f6a718e0ed6877042db7a2bd6ef43d0ae54277. It configured and built with official
+Clang 19.1.7 and failed only frontend, 58/59, after 1.84 seconds. The flushed log
+shows structured diagnostics AND value structs completed, followed by
+`Frontend begin: receiver methods`. This narrows the failure beyond the initial
+summary. Windows Debug passed and all four new string suites passed Release.
+
+Before modifying compiler code, reproduced frontend's same final progress and
+SIGSEGV with the existing official-SDK Linux Release binary under exactly 1048576
+stack bytes. The standalone `voidc check` reproducer uses the existing 400-call
+`point().same()...inspect() + 1` fixture from the earlier Phase 21 investigation.
+It also exits 139 under 1 MiB, independently of JIT, GC and other frontend tests.
+GDB captured repeating `Semantics::expression -> expression_impl ->
+method_expression -> expression` frames. A separate -O3/-DNDEBUG build with debug
+information shows failure at compiler.cpp:1156, the next Depth guard construction,
+with semantic depth 232, token `same`, offset 1448, and an actual 0x100000-byte
+stack mapping. The existing guard is 256, so the native stack runs out first.
+
+Read-only `git archive HEAD^` extracted parent 5b75d87 into the ignored build tree.
+Built its actual CLI with the same official LLVM 19.1.7 Release toolchain. The
+parent CLI also exits 139 on the same 1 MiB reproducer; with the ordinary larger
+Linux stack it returns 1 with exactly VOID1107 and later VOID2003. The new focused
+regression likewise fails against that parent CLI with subprocess return -11.
+This establishes a pre-existing optimized small-stack defect. Phase 22 increases
+some semantic frame sizes and exposes it in the hosted Windows Release job; it
+is not evidence that string execution or optimized AOT failed. The earlier Phase
+21 hint-recursion correction did not guarantee small optimized dispatcher frames,
+and previous local repeated stack gates covered Debug only.
+
+Clang -fstack-usage and disassembly show optimized inlining reintroducing heavy
+handler/contextual-conversion temporaries into recursive frames. Before correction,
+expression, dispatcher and method frames are 1416, 1576 and 1416 bytes respectively,
+about 4.4 KiB per receiver level. Parent figures are 1288, 1576 and 1416. After
+correction the current figures are 408, 632 and 1416, about 2.5 KiB per level.
+These are Linux compiler measurements, not Windows stack measurements. Run #38
+retained no Windows native backtrace or dump; the matching local failure and fix
+are actionable evidence, while hosted Windows confirmation remains outstanding.
+
+### Narrow correction and regression
+
+Preserved the existing separate semantic handlers with explicit noinline call
+boundaries, including contextual conversion, using the compiler's platform
+attribute spelling. The functions remain optimized at the original build level;
+no compiler/JIT/AOT optimization level, stack reserve, depth limit, assertion,
+recovery rule or language contract changed. No new frontend or rendering path
+was introduced. This makes the existing small-dispatch-frame design survive
+Release inlining rather than reducing accepted source depth.
+
+Added tests/integration/semantic_depth.py to the existing source_cli suite. An ordinary 16-call chain must still compile. Two
+400-call receiver chains, with and without binary contextual hints, must exit 1,
+produce exactly one VOID1107 at a `same` token on the correct line, and retain the
+independent later VOID2003 at line 10, column 5. Linux compiler children use an
+explicit 1 MiB stack; Windows uses its ordinary executable stack. Strict UTF-8
+output decoding is retained. Both cases pass with the corrected official Release
+CLI and the regression fails with the parent CLI. Existing frontend depth
+assertions remain intact, with a flushed checkpoint immediately before the chain.
+The hosted Linux frontend small-stack step now covers Release as well as Debug.
+DIAGNOSTICS.md records the optimized handler-boundary requirement.
+
+### Separate lowering finding and intermediate test correction
+
+While strengthening the new regression, a proposed valid 240-call constructor
+chain correctly hit the existing combined construction-depth guard; it was never
+an accepted valid boundary. A 120-call chain passed semantics but then crashed in
+`Lowering::expression` under 1 MiB. GDB identified repeated lowering frames, and
+the actual parent Release CLI also exits 139 on that valid fixture. This separate
+existing defect does not execute in the original malformed 400-call case, which
+must fail before lowering. It remains documented in KNOWN_ISSUES.md rather than
+expanding this correction into a lowering refactor. The final focused test uses
+an ordinary valid 16-call chain plus both original malformed 400-call cases. No
+existing test or assertion was removed or relaxed. The candidate-test failure in
+the intermediate official Debug/Release and installed sanitizer source_cli runs
+is retained, not reported as a pass.
+
+### Local verification
+
+Rebuilt all six existing configured trees successfully with LLVM 19.1.7,
+without changing their optimization, SDK layout or RTTI settings. Final full CTest
+results use the frozen implementation and finalized regression:
+
+| SDK/configuration | Build seconds | Full CTest | Test seconds |
+| --- | --- | --- | --- |
+| Installed SDK Debug | 27.99 | 59/59 | 135.25 |
+| Installed SDK Release | 56.64 | 59/59 | 72.04 |
+| Installed SDK strict sanitizers | 113.70 | 59/59 | 166.90 |
+| Official SDK Debug | 31.21 | 59/59 | 110.55 |
+| Official SDK Release | 20.16 | 59/59 | 52.07 |
+| Official SDK strict sanitizers | 113.31 | 59/59 | 138.52 |
+
+Total: 354/354 suites. Both SDKs' Debug AND Release frontend tests additionally
+passed three repetitions each under RLIMIT_STACK soft/hard 1048576, 12/12 runs.
+Strict sanitizer settings remained
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`, executed outside the
+sandbox so leak detection was not blocked by ptrace. No sanitizer was disabled.
+The focused CLI regression also passed directly with the strict installed-SDK
+sanitizer CLI. Existing normal/O2 JIT, linked AOT, strings, diagnostics, LSP and
+runtime checks are included in the 59 suites. GUI editor integration and VSIX
+packaging were not repeated for this compiler-stack-only correction.
+
+Final logs, commands, statuses and unchanged source hashes are retained in
+`build/phase22-crash/final-validation/`. The preceding `validation/` directory
+retains build evidence and intermediate candidate-test failures. Reproduction,
+parent comparison, stack-usage reports and GDB logs are under build/phase22-crash,
+including release-1mib-gdb.log, analyze-before-gdb.log, compiler-evidence.su,
+compiler-after.su and valid120-gdb.log. `git diff --check` passes.
+
+Stopped for owner review. No commit, push, branch change or hosted workflow run
+was performed. The correction is locally verified; Windows Release must still
+confirm it in the next owner-controlled hosted run. The separate valid-chain IR
+lowering issue remains explicitly unresolved.

@@ -134,6 +134,7 @@ void method_tests(const std::filesystem::path& root) {
     for (int n=0;n<180;++n) graph += "func (p point) m_"+std::to_string(n)+"(left: i32) -> i32:\n    if left > 0:\n        return p.m_"+std::to_string((n+1)%180)+"(left - 1)\n    return p.x\n";
     graph += "func entry(value: i32) -> i32:\n    const p = point()\n    return p.m_0(2)\n";
     run(graph,4);
+    std::cerr << "Frontend resource case: bounded receiver-chain semantics" << std::endl;
     std::string deep = point + "func (p point) same() -> point:\n    return p\nfunc entry(value: i32) -> i32:\n    return point()";
     for (int n=0;n<400;++n) deep += ".same()";
     deep += ".inspect() + 1\nfunc later():\n    missing()\n";

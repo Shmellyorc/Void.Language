@@ -16,6 +16,13 @@
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
+// These handler boundaries keep unrelated temporaries out of recursive semantic
+// frames even in Release. The existing depth budget must fit a 1 MiB stack.
+#if defined(_MSC_VER)
+#define VOID_SEMANTIC_HANDLER __declspec(noinline)
+#else
+#define VOID_SEMANTIC_HANDLER __attribute__((noinline))
+#endif
 namespace vd {
 namespace {
 using Type = ir::Type;
@@ -888,7 +895,7 @@ class Semantics {
         if (std::any_of(e.names.begin(),e.names.end(),[](const auto& t){return !t.text.empty();})) error(source,e.token,Code::argument_count,"Use positional method arguments.");
         return e.type=call_arguments(e,*selected,1);
     }
-    Type method_expression(Expr& e, std::optional<Type> expected) {
+    VOID_SEMANTIC_HANDLER Type method_expression(Expr& e, std::optional<Type> expected) {
         bool super=e.parts[0]->kind==Expr::Kind::name && e.parts[0]->token.text=="super" && !lookup("super") && !unit.qualifiers.contains("super") && !unit.failed_qualifiers.contains("super");
         if (super) return super_expression(e);
         if ((e.token.text == "init" || e.token.text == "deinit") && !(e.parts[0]->kind==Expr::Kind::name && unit.qualifiers.contains(e.parts[0]->token.text)))
@@ -1142,7 +1149,7 @@ class Semantics {
         e=Expr(Expr::Kind::conversion,operand->token);e.op="interface";e.target=binding.key;e.implicit=true;
         e.type=target;e.type.readonly=from.readonly;e.parts.push_back(std::move(operand));return e.type;
     }
-    Type contextual_conversion(Expr& e, Type type, const std::optional<Type>& expected) {
+    VOID_SEMANTIC_HANDLER Type contextual_conversion(Expr& e, Type type, const std::optional<Type>& expected) {
         if(expected && expected->kind==Type::interface_ref && type!=error_type && type.kind!=Type::interface_ref) return interface_conversion(e,type,*expected);
         if (expected && type!=error_type && ir::subtype(type,*expected) && (!type.nullable || expected->nullable) && Type::key(type)!=Type::key(*expected)) {
             auto operand=std::make_unique<Expr>(std::move(e));
@@ -1177,7 +1184,7 @@ class Semantics {
         default: return binary_expression(e, expected);
         }
     }
-    Type literal_expression(Expr& e, std::optional<Type> expected) {
+    VOID_SEMANTIC_HANDLER Type literal_expression(Expr& e, std::optional<Type> expected) {
         if (e.token.text == "null") {
             if (!expected || !ir::reference_value(*expected) || !expected->nullable) error(source,e.token,Code::type_mismatch,"null requires a nullable managed-reference context.","Use a type annotation such as node?.");
             return e.type = *expected;
@@ -1188,7 +1195,7 @@ class Semantics {
         catch (const std::invalid_argument& failure) { error(source,e.token,numeric::floating(target) ? Code::numeric_representability : Code::integer_range,failure.what()); }
         return e.type = target;
     }
-    Type name_expression(Expr& e) {
+    VOID_SEMANTIC_HANDLER Type name_expression(Expr& e) {
         using K = Expr::Kind;
         auto* v = e.qualifier.empty() ? lookup(e.token.text) : nullptr;
         if (!v) {
@@ -1203,7 +1210,7 @@ class Semantics {
         if (!v) error(source, e.token, Code::unknown_identifier, "Unknown identifier '" + e.token.text + "'.", "Declare it with var before use.");
         e.slot = v->slot; return e.type = v->type;
     }
-    Type field_expression(Expr& e, std::optional<Type> expected) {
+    VOID_SEMANTIC_HANDLER Type field_expression(Expr& e, std::optional<Type> expected) {
         using K = Expr::Kind;
         auto& base = *e.parts[0];
         if (base.kind == K::name && !lookup(base.token.text) && unit.qualifiers.contains(base.token.text)) {
@@ -1221,7 +1228,7 @@ class Semantics {
         e.slot=selected.path.back(); e.target=owner.definition->fields[e.slot].owner+"::field::"+e.token.text;
         return e.type=ir::field_type(owner,e.slot);
     }
-    Type call_expression(Expr& e) {
+    VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
         auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
         if (structure && !(e.qualifier.empty() && lookup(e.token.text))) {
             construction(e,*owner,*structure,current != nullptr,unit);
@@ -1242,7 +1249,7 @@ class Semantics {
         e.target = target.symbol;
         return e.type = call_arguments(e,target,0);
     }
-    Type conversion_expression(Expr& e) {
+    VOID_SEMANTIC_HANDLER Type conversion_expression(Expr& e) {
         using K = Expr::Kind;
         Type target = e.type = resolve_type(e.type,unit,root,units,e.token);
         auto& operand = *e.parts[0];
@@ -1283,14 +1290,14 @@ class Semantics {
         if (!numeric::number(from) || !numeric::number(target)) error(source,e.token,Code::numeric_conversion,"Numeric as requires numeric source and destination types.");
         return target;
     }
-    Type unary_expression(Expr& e, std::optional<Type> expected) {
+    VOID_SEMANTIC_HANDLER Type unary_expression(Expr& e, std::optional<Type> expected) {
         auto left = expression(*e.parts[0], e.op == "not" ? std::optional<Type>(Type::boolean) : expected);
         if (left == error_type) return error_type;
         if (e.op == "not") expect(left,Type::boolean,e.token);
         else if (!numeric::number(left)) error(source,e.token,Code::numeric_operator,"Type mismatch: unary arithmetic requires a numeric operand.");
         return e.type = left;
     }
-    Type binary_expression(Expr& e, std::optional<Type> expected) {
+    VOID_SEMANTIC_HANDLER Type binary_expression(Expr& e, std::optional<Type> expected) {
         using K = Expr::Kind;
         bool logical = e.op == "and" || e.op == "or";
         auto left_hint = anchor(*e.parts[0]), right_hint = anchor(*e.parts[1]);
@@ -2758,3 +2765,5 @@ void require_source_entry(const SourceFile& source, const ir::Module& module) {
     } catch (const CompilationError& failure) { diagnostics.add(failure); diagnostics.finish(); }
 }
 }
+
+#undef VOID_SEMANTIC_HANDLER
