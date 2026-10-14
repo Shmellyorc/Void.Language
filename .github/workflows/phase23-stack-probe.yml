@@ -1,0 +1,54 @@
+name: Phase 23 native stack probe
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    name: Stack probe / ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-24.04, platform: Ubuntu x64}
+          - {os: windows-2022, platform: Windows x64}
+          - {os: macos-latest, platform: macOS ARM64}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify crash evidence classification
+        run: python -m unittest discover -s tools/ci/stack_probe -p test_runner.py
+      - name: Windows native SDK environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Cache pinned LLVM SDK
+        uses: actions/cache@v4
+        with:
+          path: .toolchains/llvm-19.1.7
+          key: llvm-sdk-19.1.7-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Install and verify LLVM 19.1.7
+        run: python tools/ci/llvm_sdk.py
+      - name: Execute native guarded stack probes
+        run: python tools/ci/stack_probe/run.py --llvm-bin .toolchains/llvm-19.1.7/bin --output build/phase23-stack-probe
+      - name: Publish concise job summary
+        if: always()
+        shell: python
+        run: |
+          import os, pathlib
+          path = pathlib.Path('build/phase23-stack-probe/artifacts/summary.md')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as stream:
+              stream.write(path.read_text(encoding='utf-8') if path.exists() else 'Probe did not reach execution; inspect setup logs.\n')
+      - name: Preserve native measurements and isolated failure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase23-stack-probe-${{ runner.os }}-${{ runner.arch }}
+          path: build/phase23-stack-probe/artifacts/
+          if-no-files-found: warn
+          retention-days: 14

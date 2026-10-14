@@ -6364,3 +6364,270 @@ Stopped for owner review. No commit, push, branch change or hosted workflow run
 was performed. The correction is locally verified; Windows Release must still
 confirm it in the next owner-controlled hosted run. The separate valid-chain IR
 lowering issue remains explicitly unresolved.
+
+## Phase 23 architecture investigation: typed arrays and iteration (14 October 2026)
+
+**Design only. No Phase 23 implementation authorized or performed.** The owner
+reports Phase 22 LOCKED after Actions run #39 passed all seven hosted jobs, with
+59 suites per configuration. This supersedes the pending Windows confirmation
+at the end of the preceding entry. Verified the actual workspace and clean Git
+state at `95e79ff` before beginning. No Git mutation, push or hosted workflow was
+performed during this investigation.
+
+Created `docs/ARRAYS_PROPOSAL.md` for owner and wrench-clanker architectural review.
+Read the current Bible, especially Sections 5, 7, 8.1, 26, 31, 32, 34, 35, 36-40,
+59 and the P3/RV clarifications, alongside the current value/reference, managed
+construction, GC, strings, analysis/tooling and reload contracts. Read the actual
+Type/FieldType/arena, reference-shape/capability helpers, parser/semantic/place
+model, IR validation, LLVM layout/root/failure paths, heap maps, construct_into
+publication and coordinator contracts. Historical phase-guide exclusions are not
+assumed to describe current code.
+
+### Findings and recommendation
+
+The Bible commits to growable and fixed arrays, independent empty defaults,
+negative indexing, checked direct lookup, element-first/original-index iteration,
+and reverse traversal without copying/reordering. It leaves precise negative
+bounds, ranges at equal/extreme endpoints, safe resizable borrows, iterator
+invalidation timing, API finalization and the reverse remove-current exception
+open or recommended rather than locked. Empty-list later-statement inference is
+illustrated but not implemented; the proposal explicitly marks a contextual-only
+first slice as a bounded recommendation needing review.
+
+The implementation has no source arrays, indexing or collection/range loops.
+Existing lexer/type/postfix/assignment logic handles scalar/nominal types and
+static fields; bracket source rejects and iteration has an explicit unsupported
+path. TypeLayout currently has flat reference offsets, not a repeated-element
+layout. ir::Place cannot safely hold an unknown list element as an ordinary field
+index. Existing reference facts, precise roots, complete publication, source
+failure channel, shared LLVM lowering and generation ownership are reusable;
+arrays require deliberate extensions of these same paths.
+
+Recommended Phase 23 endpoint: structural `[t]`/`[t, n]` types, contextual literals
+and defaults, checked value reads and selected writes, count/push/remove_at,
+array for/reverse and a bounded i32 range slice. Start scalar proofs, then require
+strings, managed/interface and reference-bearing values/nested arrays before
+completion. Fixed arrays copy inline values; recommend growable aliases share a
+stable GC header with replaceable contiguous GC backing. Recommend compact
+repeated reference metadata in the current TypeLayout/tracer over a distinct
+collector or unbounded per-capacity offset vectors. Header/buffer commit,
+zeroed spare slots, exact size arithmetic, allocation failure and old-generation
+independence are explicit proof obligations.
+
+A1-A10 identify recommendations requiring approval: structural identity/extents,
+zero-length and default behavior, pure owned templates, inference boundaries,
+readonly element profiles, safe fixed const-formal borrowing, index/count types
+and negative bounds, selected-owner/version checks, iteration item copies and
+mutation timing, range edge cases, repeated GC metadata, APIs and resource policy.
+A candidate 256 KiB native array-storage budget is explicitly unmeasured and not
+approved; stack and constant-template budgets require review/proof. No arbitrary
+runtime capacity limit or string resource policy is silently imposed on arrays.
+
+Escaping element references, in-place inline-element mutating method borrows,
+reverse current deletion, slicing/get/pop results, predicate/search operations,
+nullable arrays and generic/user iteration protocols are deferred or separately
+gated, with reasons and alternatives. Existing referenced-object methods and
+checked element/subfield writes are distinct from unsafe interior borrows. String
+scalar indexing and length APIs retain their previously approved future-only
+contract and are not implemented or redefined by array indexing. Phase 24 generics
+and Phase 25 collections are compatibility boundaries, not approval to invent
+result, hashing or iterator protocols now.
+
+The proposal includes P23-0 through P23-6 implementation checkpoints, independent
+IR validation and capability obligations, GC/OOM/resize/reload tests, shared LSP
+integration and eventual six local configurations plus seven-job hosted acceptance.
+All 59 existing suites/assertions remain required. The known valid receiver-chain
+Lowering::expression stack issue stays a separately scoped hardening task; no
+correction is folded into this design. If it blocks eventual array acceptance,
+report that blocker rather than weakening or excluding new tests.
+
+### Focused baseline verification only
+
+- `ctest --test-dir build/ci-debug -N`: 59 tests.
+- `ctest --test-dir build/ci-debug -R '^(frontend|strings_source|reference_values_source|runtime_coordination|analysis|tooling)$' --output-on-failure`:
+  6/6 passed, 26.97 seconds. Existing Debug binaries were used without rebuilding
+  or modifying implementation. Includes the unchanged frontend semantic stack
+  regression and string/reference/runtime/analysis/tooling coverage.
+- Six standalone `voidc check` probes for growable/fixed annotations, array literals,
+  indexing, iterable loops and ranges each exit 1 with source diagnostics. Bracket
+  forms currently report unexpected character, iteration reports not implemented,
+  and the range probe encounters unsupported numeric literal lexing. These confirm
+  missing syntax, not newly passing array functionality.
+- Copied the actual focused LastTest.log and wrote command/result metadata to
+  `build/phase23-investigation/focused-baseline.{log,json}`. Probe fixtures/logs and
+  `unsupported-baseline.json` are retained in the same ignored directory.
+
+No full matrix, stress rerun, editor packaging or hosted CI was needed for this
+documentation-only investigation. No compiler/runtime/tests/build/grammar files
+were edited. Stopped for owner and wrench-clanker architectural review before any
+Phase 23 implementation.
+
+### Phase 23 proposal refinements after wrench review (14 October 2026)
+
+The owner relayed wrench support for the overall A1-A10 architecture and requested
+focused proposal refinements before implementation approval. Updated only
+ARRAYS_PROPOSAL.md and this work log. Phase 23 remains design-only; no implementation
+approval is inferred from architectural support or recommended choices.
+
+The revised proposal now requires both i32 and i64 numeric ranges at final Phase 23
+acceptance. An i32-only checkpoint remains valid temporarily. Contextual literals
+make `0..<items.count` an i64 range with an i64 binder; differing already-typed
+endpoint widths still require explicit conversion. Tests must cover both widths,
+reverse exclusive membership and extreme endpoints without subtracting a cardinality
+that may not fit either i64 or u64. Numeric range endpoints are captured once;
+resizing items does not change the captured count or create a list iterator.
+
+Fixed-array arguments retain value snapshot semantics at their ordinary argument
+evaluation point, before later arguments. Readonly storage may be borrowed only
+when alias writes and owner relocation/resize are proved absent; otherwise copy.
+Explicit test requirements include later-argument writes, callee writes through a
+second owner alias, and a fixed array in backing storage resized during argument
+evaluation. Snapshotting inline bytes never deep-clones referenced objects.
+
+Nested selections must reacquire storage from rooted owners after possible resize
+or safepoints, then revalidate dependent versions/bounds before descending or
+committing. Cached interior addresses cannot cross these boundaries. Invalidated
+selections fail rather than silently retargeting or reevaluating source expressions.
+An independently captured nested list header keeps its own identity; an obsolete
+outer storage dependency must not spuriously invalidate that reference value.
+
+Clarified that every live element in [0, count) is complete and valid, including
+all required-reference leaves in nested values/arrays. Zeroed unused GC capacity
+is private, inaccessible storage, not a source default for nonnullable references.
+Every newly live element must be populated and validated before visible count is
+increased; shifts, spare-slot clearing and count changes commit without an
+observable or safepoint-visible invalid intermediate source element.
+
+Recorded the remaining recommended choices together for owner approval: permit
+zero-length fixed arrays, require contextual empty-literal typing initially, use
+homogeneous element capability profiles, detect iterator invalidation at next
+access, and extend the existing collector with repeated reference metadata. The
+reverse-deletion table now consistently describes next-access invalidation rather
+than an eager mutation ban; the special reverse remove-current exception stays
+deferred.
+
+The proposed 256 KiB native storage limit is explicitly UNAPPROVED. It must not
+be imposed as a compiler limit or acceptance threshold without target-aware sizing
+of parameters, returns, copies, alignment, roots and staging, plus relevant ABI and
+Debug/Release small-stack evidence and owner review. The plan approves no numeric
+cap by implication; the separate receiver-chain lowering issue remains outside scope.
+
+Verification was limited to document consistency, the requested decision/test-plan
+cross-checks and `git diff --check`. No compiler tests, full matrix, build, hosted
+run, Git mutation or implementation change was performed. Ready for owner review
+of the revised decisions before implementation approval.
+
+### Phase 23 implementation authorization and storage preflight (14 October 2026)
+
+The owner approved revised A1-A10 and implementation checkpoints P23-1 through
+P23-6. Updated ARRAYS_PROPOSAL.md to record that approval and selected homogeneous
+profiles, contextual empty literals, zero-length fixed arrays, next-access
+invalidation and repeated collector metadata. Deferred features stay deferred;
+future string indexing and the receiver-chain hardening defect remain separate.
+The owner explicitly withheld numerical native-storage limits until evidence and
+approval, so the former 256 KiB estimate has not been adopted.
+
+Inspected actual backend.cpp root/storage allocation sites before enabling native
+fixed arrays. The native lowerer creates separate locals, construction stages,
+reference-containing parameter copies and reference-containing instruction homes,
+plus Slot and Frame storage. This means element-count bounds alone cannot prevent
+stack exhaustion. The source analysis/LSP APIs also lack a common target-native
+frame plan; a budget cannot be imposed honestly using an element-size guess.
+
+Built a scratch LLVM 19.1.7 investigation under build/phase23-storage. It emits
+actual LLVM pointer-array allocas, root descriptors and Frame storage, and compiles
+for Linux x64, Windows x64 and macOS ARM64 at O0 and O2. Target DataLayouts are
+queried from the matching Clang. Native Linux executables link the existing Debug
+void_runtime and use actual vd_gc_frame_enter/leave/poll plus coordinated collection
+while all frames are active. No optimizer disabling, volatile substitute roots,
+new collector, array language syntax or receiver-chain fix was introduced. Null
+pointer elements model valid nullable root payloads, not unfilled required-reference
+source values. Native Slot and Frame size/alignment are confirmed as 32/8 each.
+
+The 24 final target/mode/layout measurements cover total planned static storage
+of 64, 128, 256 and 512 KiB across four simultaneous payload homes plus roots/frame.
+LLVM-reported frame sizes exceed those planned totals by 24-96 bytes in these
+models, with distinct target/mode costs; proposal Section 9 retains the full table.
+Windows/macOS were cross-compiled, not executed. These are native frame probes,
+not completed array code generation or C++ aggregate-ABI assumptions.
+
+Executed 32 Linux child runs with hard/soft stack limits both 1048576 bytes at live
+frame depths 1, 2, 4 and 8 in both generated-code modes. 64 KiB passes all four
+depths; 128 KiB first fails at tested depth 8, 256 KiB at depth 4, and 512 KiB at
+depth 2. There are 20 passing cases with balanced cleanup and 12 deliberate
+SIGSEGV exhaustion cases. The latter are evidence against oversized per-frame
+policies, not passing assertions or newly discovered frontend defects. Logs,
+IR, native target assembly, exact commands, layouts and result JSON are retained.
+
+Returned a new candidate of 64 KiB total pre-optimization static storage per
+array-carrying function for owner approval, including all known homes, roots,
+staging/copies and target ABI scratch. It is NOT adopted and is not a recursion or
+cross-platform stack-safety guarantee. Any approved policy must be implemented
+through a common target-aware storage plan for analysis/LSP/shared lowering and
+validated with real array parameter/return ABI and borrow-copy cases. The scratch
+probe does not prove those integration obligations. Array-free functions must not
+receive an incidental new restriction.
+
+This is the explicitly required numerical-budget decision handoff before enabling
+fixed-array feature lowering. P23-1 is not complete and Phase 23 is not delivered.
+No production compiler/runtime/tests/build configuration was changed, no Git
+mutation or hosted run occurred, and no numerical budget was silently substituted.
+The full six-configuration, strict sanitizer, stress, native AOT, Debug/Release
+1 MiB and editor acceptance remains required after implementation; this preflight
+does not claim or replace that verification.
+
+Focused existing-runtime check after the probes:
+`ctest --test-dir build/ci-debug -R '^(runtime_coordination|runtime_generated|runtime_aot_normal|runtime_aot_optimized)$' --output-on-failure`
+passed 4/4 in 3.29 seconds. Inventory remains 59. Document consistency and
+`git diff --check` pass. No full-matrix acceptance result is claimed at this gate.
+
+### 2026-10-14: Phase 23 manual native stack-probe workflow
+
+Owner requested investigation only before any numerical storage decision or array
+implementation. Added `phase23-stack-probe.yml` with only workflow_dispatch and
+native Ubuntu x64, Windows x64 and macOS ARM64 jobs using LLVM 19.1.7. Reused the
+existing pinned SDK installer/cache. Normal seven-job `ci.yml` remains byte-for-byte
+unchanged. No Git mutation, push or hosted dispatch occurred.
+
+Added reproducible files under `tools/ci/stack_probe/`. The isolated CMake project
+builds only six existing runtime files plus the native harness, with generated LLVM
+objects at O0/O2; it never configures the compiler root or invokes CTest. Probes
+retain the earlier four live pointer-array homes and real root/collection ABI for
+64/128/256 KiB, with nested depths 1/2/4/8/16. Null elements represent valid nullable
+roots, not incomplete required-reference values. Native ABI checks guard execution.
+
+Each child runs under explicit worker-stack controls: POSIX 1 MiB supplied mapping
+with 512 KiB low guard, high guard page and separate 64 KiB signal stack; Windows
+1 MiB reservation checked through VirtualQuery and 64 KiB requested exception
+headroom. README and proposal explain that these are not equivalent usable stack
+conditions or main-thread RLIMIT_STACK. Only recorded guard faults or actual Windows
+stack-overflow exceptions qualify as expected failure. Six unrelated-fault controls
+must be rejected as overflow. Other faults/setup errors/timeouts fail the experiment.
+
+Final local native command:
+`python3 tools/ci/stack_probe/run.py --llvm-bin /usr/lib/llvm-19/bin --output build/phase23-stack-probe-final`
+passes all 30 depth cases: 18 successful collections/cleanups, 12 verified low-guard
+exhaustions and six successful unrelated-fault controls. At both modes 64 KiB passes
+through depth 8 and exhausts at 16; 128 KiB passes through 4 and exhausts at 8/16;
+256 KiB passes through 2 and exhausts at 4/8/16. Linux O0 frame/stride measurements
+are 65560/65568, 131096/131104 and 262168/262176 bytes. O2 values are 65576/65584,
+131112/131120 and 262184/262192. The external observer records consistent frame
+spacing without disabling optimization. Local artifacts retain exact native evidence.
+
+`python3 -m unittest discover -s tools/ci/stack_probe -p test_runner.py` passes four
+focused evidence checks, including rejection of outside-guard addresses, Windows
+access violations, bare exit/signal claims, missing/malformed evidence and wrong
+stack extents. The manual workflow runs these checks before the native experiment.
+Artifacts retain commands, source/header hashes, version/target, frame diagnostics,
+assembly, stack bounds, per-child JSON/logs and concise summaries for 14 days.
+
+Windows/macOS execution remains pending owner push/dispatch. Earlier cross-target
+compilation is not execution. No compiler limit, array feature, receiver-chain fix,
+full compiler build or full 59-suite verification is included. All existing suites
+and normal CI are preserved. Proposal Section 10 records the Linux results and
+remaining platform evidence. Stopped for owner review before any hosted action.
+
+Workflow YAML parses successfully; inspection confirms only workflow_dispatch and
+three native runner entries. Compared normal CI bytes against HEAD, SHA-256
+`a571baeb838fea17b3baa3d80f759739cd2d2295313357a75ed5eae6a5cb5400`, unchanged.
+`git diff --check` passes. No full compiler matrix was run for this experiment.
