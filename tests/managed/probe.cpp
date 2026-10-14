@@ -61,6 +61,7 @@ extern "C" void vd_gc_frame_leave(void* address) noexcept {
     vd_gc_real_frame_leave(address);
 }
 extern "C" void vd_gc_real_poll() noexcept;
+extern "C" void vd_gc_real_construct_typed(void**,std::size_t,const std::size_t*,std::size_t,const void*,const char*,vd::RuntimeFailure*) noexcept;
 extern "C" void vd_gc_real_construct(void**,std::size_t,const std::size_t*,std::size_t,const void*,vd::RuntimeFailure*) noexcept;
 extern "C" void vd_gc_poll() noexcept {
     if (auto* p=managed_test::active) {
@@ -70,7 +71,7 @@ extern "C" void vd_gc_poll() noexcept {
     }
     vd_gc_real_poll();
 }
-extern "C" void vd_gc_construct(void** slot,std::size_t size,const std::size_t* offsets,std::size_t count,const void* payload,vd::RuntimeFailure* failure) noexcept {
+template<class Commit> void observe_construct(void** slot,std::size_t size,const std::size_t*,std::size_t,const void* payload,vd::RuntimeFailure* failure,Commit commit) noexcept {
     auto* p=managed_test::active;
     auto* previous=*slot;
     if (p) {
@@ -80,7 +81,7 @@ extern "C" void vd_gc_construct(void** slot,std::size_t size,const std::size_t* 
         if (p->collect_before && vd::Runtime::current().collect()!=vd::Runtime::Collection::completed) std::terminate();
         if (p->constructions==p->fail_construction) fail_after=p->fail_allocation;
     }
-    vd_gc_real_construct(slot,size,offsets,count,payload,failure);
+    commit();
     fail_after=-1;
     if (p) {
         if (failure->message) p->commits_valid &= *slot==previous;
@@ -91,4 +92,11 @@ extern "C" void vd_gc_construct(void** slot,std::size_t size,const std::size_t* 
             if (p->capture && p->constructions==p->capture_at && !p->retained) p->retained=std::make_unique<vd::Runtime::Handle>(vd::Runtime::current(),*slot);
         }
     }
+}
+
+extern "C" void vd_gc_construct(void** slot,std::size_t size,const std::size_t* offsets,std::size_t count,const void* payload,vd::RuntimeFailure* failure) noexcept {
+    observe_construct(slot,size,offsets,count,payload,failure,[&]{vd_gc_real_construct(slot,size,offsets,count,payload,failure);});
+}
+extern "C" void vd_gc_construct_typed(void** slot,std::size_t size,const std::size_t* offsets,std::size_t count,const void* payload,const char* key,vd::RuntimeFailure* failure) noexcept {
+    observe_construct(slot,size,offsets,count,payload,failure,[&]{vd_gc_real_construct_typed(slot,size,offsets,count,payload,key,failure);});
 }

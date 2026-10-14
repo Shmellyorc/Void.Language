@@ -5,7 +5,7 @@ This repository now compiles graphs of actual `.void` files through one frontend
 semantic model, backend-independent IR, and shared LLVM 19.1.7 AOT/JIT lowering.
 The implemented subset supports typed functions, all ten exact-width numeric types,
 contextual literals, checked numeric `as`, bool expressions, local variables,
-conditionals, `for` loops, readonly/compile-time constants, numeric/bool/nested value structs carrying managed references with custom initialization, managed structs with receiver methods and custom initialization, and source-first
+conditionals, `for` loops, readonly/compile-time constants, numeric/bool/nested value structs carrying managed references with custom initialization, managed structs with receiver methods, custom initialization, single inheritance and explicit virtual dispatch, and source-first
 compile/runtime diagnostics. Compile-time errors now include stable codes, ranges,
 related declarations and recovery across independent errors. Cooperative GC roots/thread coordination, leased function
 replacement, and native C interoperability retain their architectural regression proofs.
@@ -20,6 +20,15 @@ Managed source example: `voidc run examples/managed_structs/main.void 10` return
 The managed CLI tests also emit and separately link this source into native
 executables, with and without LLVM optimization; these are distinct from the older
 hand-built IR proofs. See the managed-source guide for complete link commands.
+
+Managed inheritance example: `voidc run examples/inheritance/main.void 10` returns
+`108` through an identity-preserving Base view and a derived override. Parameterized
+base construction and source evaluation order are demonstrated by
+`examples/inheritance/initialization.void` and `examples/inheritance/order.void`.
+These run through the shared normal/O2 JIT and separately linked AOT, with precise
+GC and code-independent object descriptors. See [inheritance scope](docs/INHERITANCE.md)
+and [actual validation evidence](docs/WORK_LOG.md). Interfaces and source downcasts
+remain deferred; no public managed-reference ABI is promised.
 
 ## Build on Linux
 
@@ -400,5 +409,6 @@ and existing value/reference/readonly semantics. See [COMPOSITION.md](docs/COMPO
 build/ci-debug/voidc run examples/composition/main.void 10 # 111
 ```
 
-This compiles real source through the shared frontend/IR/LLVM path. Inheritance,
-interfaces, virtual dispatch, transitive promotion and stateless mixins remain deferred.
+This compiles real source through the shared frontend/IR/LLVM path. Phase 20 adds
+managed inheritance and component virtual dispatch; interfaces, transitive promotion
+and stateless mixins remain deferred.

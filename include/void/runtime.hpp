@@ -6,6 +6,7 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <map>
 
 namespace vd {
 class CallbackRegistration;
@@ -34,6 +35,9 @@ public:
     void construct_into(void** rooted_slot, const TypeLayout&, const void* prepared_payload);
     void store(void* object, std::size_t offset, void* value);
     bool contains(void*) const;
+    void admit_types(std::span<const NominalDescriptor>);
+    std::shared_ptr<const NominalDescriptor> descriptor(std::string_view) const;
+    std::int64_t dynamic_type(void*,std::span<const char* const>) const;
     Snapshot snapshot() const;
     bool wait_for_request(std::chrono::milliseconds);
     void close(); // Reject new attachments; existing participants must drain.
@@ -53,11 +57,14 @@ private:
     static thread_local Thread* current_thread_;
     Thread& thread() const;
     void require_managed() const;
+    void validate_descriptor(const TypeLayout&) const; // Caller holds mutex_.
     void park(Thread&, std::unique_lock<std::mutex>&);
     void enter(Thread&);
     mutable std::mutex mutex_;
     std::condition_variable changed_;
     Heap heap_;
+    using TypeCatalog=std::map<std::string,std::shared_ptr<const NominalDescriptor>,std::less<>>;
+    std::shared_ptr<const TypeCatalog> types_ = {};
     std::vector<Thread*> threads_;
     std::vector<Handle*> handles_;
     bool closing_ = false;

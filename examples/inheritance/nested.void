@@ -1,0 +1,32 @@
+struct leaf:
+    value: i32
+
+value struct links:
+    tag: i8
+    child: leaf?
+
+struct base:
+    head: i8
+    links: links
+
+virtual func (b base) read() -> i32:
+    return (b.links.child as leaf).value
+
+struct derived extends base:
+    other: leaf?
+
+override func (d derived) read() -> i32:
+    return super.read() + (d.other as leaf).value
+
+func factory(value: i32) -> base:
+    return derived(links = links(child = leaf(value = value)), other = leaf(value = 7))
+
+func consume(const b: base) -> i32:
+    var count = 0
+    for count < 256:
+        var garbage = leaf(value = count)
+        count++
+    return b.read()
+
+func entry(value: i32) -> i32:
+    return consume(factory(value))

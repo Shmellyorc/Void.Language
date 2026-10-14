@@ -23,11 +23,11 @@ void validate_construction(const Function& f,const Module& module,const std::vec
     for (unsigned slot=0;slot<f.locals.size();++slot)
         if (f.locals[slot].construction!=f.construction_origins.contains(slot)) fail("missing construction origin metadata");
     for (auto [slot,origin]:f.construction_origins) {
-        if (slot>=f.locals.size() || origin>=f.locals.size() || !f.locals[origin].construction || !f.construction_origins.contains(origin) || f.construction_origins.at(origin)!=origin || Type::key(f.locals[slot])!=Type::key(f.locals[origin])) fail("invalid construction alias origin");
+        if (slot>=f.locals.size() || origin>=f.locals.size() || !f.locals[origin].construction || !f.construction_origins.contains(origin) || f.construction_origins.at(origin)!=origin || !([](Type a,Type b){a.construction=b.construction=false;return subtype(b,a);})(f.locals[slot],f.locals[origin])) fail("invalid construction alias origin");
         if (!owned.contains(origin) && (origin>=f.parameters.size() || !f.parameters[origin].construction)) fail("unowned construction storage");
     }
     enum Phase { inactive=1, preparing=2, initialized=4, committed=8 };
-    struct Region { unsigned phase=inactive; std::set<unsigned> ready; bool operator==(const Region&) const=default; };
+    struct Region { unsigned phase=inactive; std::set<unsigned> ready; unsigned base_phase=2; bool operator==(const Region&) const=default; };
     struct State { std::map<unsigned,Region> regions; std::set<unsigned> bound; bool operator==(const State&) const=default; };
     State entry;
     auto fields=[&](unsigned root)->const auto& { return f.locals.at(root).definition->fields; };
@@ -35,16 +35,16 @@ void validate_construction(const Function& f,const Module& module,const std::vec
         auto& region=entry.regions[origin];
         if (owned.contains(origin)) continue;
         region.phase=f.initializer ? preparing : initialized;
+        region.base_phase=(!f.initializer || f.parameters[0].definition->base.expired()) ? 2u : 1u;
         for (unsigned n=0;n<fields(origin).size();++n) {
-            Type t=fields(origin)[n].type;
-            if (!f.initializer || t.kind!=Type::managed_ref || t.nullable) region.ready.insert(n);
+            if (!f.initializer) region.ready.insert(n);
         }
     }
     if (f.receiver && f.parameters[0].construction) entry.bound.insert(0);
     auto intersection=[](auto a,const auto& b) { std::erase_if(a,[&](const auto& value){return !b.contains(value);}); return a; };
     auto join=[&](State a,const State& b) {
         a.bound=intersection(a.bound,b.bound);
-        for (auto& [root,region]:a.regions) { region.phase|=b.regions.at(root).phase; region.ready=intersection(region.ready,b.regions.at(root).ready); }
+        for (auto& [root,region]:a.regions) { region.phase|=b.regions.at(root).phase; region.base_phase|=b.regions.at(root).base_phase; region.ready=intersection(region.ready,b.regions.at(root).ready); }
         return a;
     };
     std::vector<std::optional<State>> inputs(f.blocks.size()); inputs[0]=entry;
@@ -57,7 +57,7 @@ void validate_construction(const Function& f,const Module& module,const std::vec
         };
         auto require_all=[&](unsigned root) {
             active(root);
-            if (state.regions.at(root).ready.size()!=fields(root).size()) fail("uninitialized construction field at call/exit/commit");
+            if (state.regions.at(root).base_phase!=2 || state.regions.at(root).ready.size()!=fields(root).size()) fail("uninitialized construction field at call/exit/commit");
         };
         auto value_origin=[&](unsigned value) {
             if (value>=origins.size() || !origins[value]) fail("missing construction operand origin");
@@ -72,8 +72,17 @@ void validate_construction(const Function& f,const Module& module,const std::vec
             const auto& i=f.blocks[block].instructions[index]; std::optional<unsigned> origin;
             if (i.op==Op::stage_begin) {
                 if (f.construction_origins.at(i.a)!=i.a || state.regions.at(i.a).phase & (preparing|initialized)) fail("staging restarted before commit");
-                state.regions.at(i.a)={preparing,{}};
+                state.regions.at(i.a)={preparing,{},f.locals[i.a].definition->base.expired() ? 2u : 1u};
                 std::erase_if(state.bound,[&](auto slot){return f.construction_origins.at(slot)==i.a;}); origin=i.a;
+            } else if (i.op==Op::base_init) {
+                auto root=place_origin(*i.receiver); auto& region=state.regions.at(root);
+                if(root!=0 || owned.contains(root) || region.base_phase!=1 || region.phase!=preparing || !region.ready.empty()) fail("base initialization out of order or repeated");
+                auto base=f.parameters[0].definition->base.lock();
+                for(unsigned n=0;n<base->fields.size();++n) region.ready.insert(n);
+                region.base_phase=2;
+            } else if (i.op==Op::stage_prefix) {
+                origin=value_origin(i.a);
+                if(state.regions.at(*origin).base_phase!=2) fail("base projection before base initialization");
             } else if (i.op==Op::argument && types[block][index].construction) {
                 origin=i.a; active(*origin);
             } else if (i.op==Op::load && types[block][index].construction) {
@@ -85,41 +94,47 @@ void validate_construction(const Function& f,const Module& module,const std::vec
                 state.bound.insert(i.a);
             } else if ((i.op==Op::gc_read || i.op==Op::gc_write) && types[block][i.a].construction) {
                 auto root=value_origin(i.a); auto field=static_cast<unsigned>(i.immediate);
+                if(state.regions.at(root).base_phase!=2) fail("derived storage accessed before base initialization");
                 if (i.op==Op::gc_read && !state.regions.at(root).ready.contains(field)) fail("uninitialized construction field read");
                 if (i.op==Op::gc_write) {
                     if (owned.contains(root) && state.regions.at(root).phase!=preparing) fail("construction fields changed after initializer completion");
                     state.regions.at(root).ready.insert(field);
                 }
-            } else if (i.op==Op::call) {
+            } else if (i.op==Op::call || i.op==Op::virtual_call) {
                 auto found=functions.find(i.callee);
                 if (found!=functions.end()) {
                     const auto& target=*found->second;
-                    std::vector<unsigned> roots;
+                    std::vector<std::pair<unsigned,Type>> roots;
                     if (i.receiver && f.locals.at(i.receiver->slot).construction) {
                         auto root=place_origin(*i.receiver);
-                        if (i.receiver->fields.empty()) roots.push_back(root);
+                        if (i.receiver->fields.empty()) roots.emplace_back(root,f.locals.at(i.receiver->slot));
                         else {
                             if (!state.regions.at(root).ready.contains(i.receiver->fields.front())) fail("uninitialized projected receiver");
                         }
                     }
                     auto arguments=i.arguments;
                     if (!target.receiver && arguments.empty() && target.parameters.size()==1) arguments.push_back(i.a);
-                    for (auto arg:arguments) if (types[block][arg].construction) roots.push_back(value_origin(arg));
+                    for (auto arg:arguments) if (types[block][arg].construction) roots.emplace_back(value_origin(arg),types[block][arg]);
+                    if(i.op==Op::virtual_call && !roots.empty()) fail("virtual dispatch on unfinished construction receiver");
                     if (i.initialization && target.parameters[0].construction) {
                         if (roots.size()!=1 || !i.receiver || !i.receiver->fields.empty()) fail("invalid initializer construction operands");
-                        auto root=roots[0];
+                        auto root=roots[0].first;
                         if (!owned.contains(root) || state.regions.at(root).phase!=preparing || Type::key(f.locals[root])!=Type::key(target.parameters[0])) fail("initializer called twice or on borrowed storage");
                         for (unsigned field=0;field<fields(root).size();++field) {
-                            Type t=fields(root)[field].type;
-                            if ((t.kind!=Type::managed_ref || t.nullable) && !state.regions.at(root).ready.contains(field)) fail("initializer missing safe field defaults");
                             state.regions.at(root).ready.insert(field);
                         }
-                        state.regions.at(root).phase=initialized;
-                    } else for (auto root:roots) require_all(root);
+                        state.regions.at(root).phase=initialized; state.regions.at(root).base_phase=2;
+                    } else for (auto [root,view]:roots) {
+                        active(root);
+                        if(owned.contains(root) && state.regions.at(root).phase!=initialized) fail("construction helper before initializer completion");
+                        if(state.regions.at(root).base_phase!=2) fail("helper called before base initialization");
+                        for(unsigned field=0;field<view.definition->fields.size();++field) if(!state.regions.at(root).ready.contains(field)) fail("uninitialized projected construction field at helper call");
+                    }
                 }
             } else if (i.op==Op::gc_construct && i.receiver) {
                 auto root=place_origin(*i.receiver); require_all(root);
                 if (!owned.contains(root) || state.regions.at(root).phase!=initialized) fail("construction commit before initializer completion");
+                if(Type::key(f.locals.at(root))!=Type::key(i.type)) fail("construction prefix cannot publish a separate identity");
                 for (unsigned field=0;field<i.arguments.size();++field) {
                     const auto& read=f.blocks[block].instructions.at(i.arguments[field]);
                     if (read.op!=Op::gc_read || read.immediate!=field || value_origin(read.a)!=root) fail("commit fields do not come from the initialized storage");

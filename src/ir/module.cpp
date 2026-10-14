@@ -21,6 +21,7 @@ Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
             if (current->self.expired()) current->self = current;
             current->arena = owner;
             owner->definitions.push_back(current);
+            if (auto base=current->base.lock()) pending.push_back(std::move(base));
             for (const auto& field : current->fields)
                 if (auto child = field.type.target.lock()) pending.push_back(std::move(child));
         }
@@ -59,13 +60,17 @@ ReferencePaths reference_paths(Type root) {
     return result;
 }
 ReferencePaths readonly_paths(Type type) {
+    if(type.construction) return type.readonly ? ReferencePaths{ReferencePath{}} : type.readonly_references;
     if (type.readonly) return reference_paths(type);
     return type.readonly_references;
 }
 Type with_readonly_paths(Type type,const ReferencePaths& paths) {
     // A private construction view is a place capability, not a managed leaf.
     // Its readonly place permission must survive ordinary fact propagation.
-    if (type.construction) { type.readonly_references=paths; return type; }
+    if (type.construction) {
+        if(!paths.empty() && paths!=ReferencePaths{ReferencePath{}}) throw std::invalid_argument("VOID IR: invalid construction authority path");
+        type.readonly|=paths.contains(ReferencePath{});type.readonly_references.clear();return type;
+    }
     type.readonly=false; type.readonly_references=paths;
     if (type.kind==Type::managed_ref && !type.construction) {
         type.readonly=paths.contains(ReferencePath{});
@@ -99,6 +104,29 @@ bool capability_assignable(Type actual,Type expected) {
     for (const auto& path:readonly_paths(actual)) if (!allowed.contains(path)) return false;
     return true;
 }
+bool subtype(Type actual,Type expected) {
+    if (actual.kind!=Type::managed_ref || expected.kind!=Type::managed_ref ||
+        actual.construction || expected.construction || !actual.definition || !expected.definition || !actual.definition->managed || !expected.definition->managed) return false;
+    auto current=actual.definition;
+    std::set<const ValueType*> seen;
+    while (current && seen.size()<128 && seen.insert(current.get()).second) {
+        if (current->identity==expected.definition->identity) return true;
+        current=current->base.lock();
+    }
+    return false;
+}
+std::vector<unsigned> physical_field_path(Type owner,unsigned field) {
+    if (!owner.definition || field>=owner.definition->fields.size()) throw std::invalid_argument("VOID IR: invalid logical field");
+    std::vector<unsigned> result;
+    auto current=owner.definition;
+    std::set<const ValueType*> seen;
+    while (auto base=current->base.lock()) {
+        if (seen.size()>=128 || !seen.insert(current.get()).second) throw std::invalid_argument("VOID IR: recursive base layout");
+        if (field>=base->fields.size()) { result.push_back(1+field-static_cast<unsigned>(base->fields.size())); return result; }
+        result.push_back(0); current=std::move(base);
+    }
+    result.push_back(field); return result;
+}
 std::string capability_key(Type type) {
     std::string result;
     for (const auto& path:readonly_paths(type)) {
@@ -130,6 +158,23 @@ std::string type_name(Type t) {
     switch (t.kind) { case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
     throw std::invalid_argument("VOID IR: unknown type");
 }
+std::vector<VirtualTarget> virtual_targets(const Module& module,const Function& root) {
+    std::vector<VirtualTarget> result;
+    if(root.virtual_slot.empty()) throw std::invalid_argument("VOID IR: missing virtual family");
+    std::set<std::string> identities;
+    for(auto t:module.nominal_types) {
+        if(t.kind!=Type::managed_ref) continue;
+        if(!identities.insert(Type::key(t)).second) throw std::invalid_argument("VOID IR: duplicate nominal catalog identity");
+        if(!subtype(t,root.parameters.at(0))) continue;
+        const Function* selected=nullptr;
+        for(auto ancestor=t.definition;ancestor && !selected;ancestor=ancestor->base.lock())
+            for(const auto& candidate:module.functions) if(candidate.virtual_slot==root.virtual_slot && candidate.parameters.at(0).definition==ancestor) {selected=&candidate;break;}
+        if(!selected) throw std::invalid_argument("VOID IR: missing virtual dispatch implementation");
+        result.push_back({t,selected->name});
+    }
+    if(result.empty()) throw std::invalid_argument("VOID IR: virtual family absent from nominal catalog");
+    return result;
+}
 #include "construction.inc"
 #include "reference_capabilities.inc"
 void validate(const Module& m, InstructionTypes* results) {
@@ -139,12 +184,23 @@ void validate(const Module& m, InstructionTypes* results) {
     if (m.identity.empty()) fail("missing module identity");
     std::map<std::string,const ValueType*> definitions;
     std::set<const ValueType*> visiting, checked;
-    std::function<void(Type)> inline_layout = [&](Type t) {
-        if (t.kind != Type::aggregate) return;
+    using LayoutExtent=std::pair<unsigned,std::size_t>;
+    std::map<const ValueType*,LayoutExtent> extents;
+    std::function<LayoutExtent(Type)> inline_layout = [&](Type t)->LayoutExtent {
+        if(t.kind!=Type::aggregate) return {0,0};
         auto* d=t.definition.get();
-        if (visiting.size() >= 128 || !visiting.insert(d).second) fail("recursive or excessive value layout");
-        for (const auto& field : d->fields) inline_layout(field.type);
+        if(auto found=extents.find(d);found!=extents.end()) return found->second;
+        if(visiting.size()>=128 || !visiting.insert(d).second) fail("recursive or excessive value layout");
+        unsigned depth=1;std::size_t expanded=0;auto base=d->base.lock();
+        if(base) {auto parent=inline_layout(Type(base));depth=parent.first+1;expanded=parent.second;}
+        for(unsigned n=base ? static_cast<unsigned>(base->fields.size()) : 0;n<d->fields.size();++n) {
+            auto child=inline_layout(d->fields[n].type);depth=std::max(depth,child.first+1);
+            if(child.second>=65536 || expanded>=65536-child.second) fail("excessive expanded value layout");
+            expanded+=child.second+1;
+        }
         visiting.erase(d);
+        if(depth>128) fail("excessive physical layout depth");
+        extents.emplace(d,LayoutExtent{depth,expanded});return {depth,expanded};
     };
     auto valid_type = [&](Type root) {
         std::vector<Type> pending{root};
@@ -157,21 +213,34 @@ void validate(const Module& m, InstructionTypes* results) {
                 if (t.kind==Type::unresolved || t.kind==Type::invalid || t.kind==Type::null_value) fail("unresolved type");
                 type_name(t); continue;
             }
-            if (!t.definition || t.definition->identity.empty() || t.definition->name.empty()) fail("missing value type identity");
+            if (!t.definition || t.definition->identity.empty() || t.definition->identity.find('\0')!=std::string::npos || t.definition->name.empty()) fail("missing value type identity");
             auto* d=t.definition.get();
             if (t.construction && !d->managed) fail("construction view requires a managed nominal");
             if (t.kind==Type::aggregate && d->managed) fail("managed nominal cannot be an inline value");
             auto [found,added]=definitions.emplace(d->identity,d);
             if (!added && found->second!=d) fail("conflicting owned value type definitions");
             if (!checked.insert(d).second) continue;
+            if (auto base=d->base.lock()) {
+                if (!d->managed || !base->managed) fail("inheritance requires managed nominal types");
+                std::set<const ValueType*> ancestry{d};
+                for(auto parent=base;parent;parent=parent->base.lock()) {
+                    if (ancestry.size()>=128 || !ancestry.insert(parent.get()).second) fail("recursive or excessive inheritance");
+                }
+                if (d->fields.size()<base->fields.size()) fail("missing inherited field prefix");
+                for(unsigned n=0;n<base->fields.size();++n) {
+                    const auto& a=d->fields[n];const auto& b=base->fields[n];
+                    if(a.name!=b.name || Type(a.type)!=Type(b.type) || a.owner!=b.owner) fail("inconsistent inherited field ownership/type");
+                }
+                pending.emplace_back(base,Type::managed_ref);
+            }
             std::set<std::string> fields;
             for (const auto& field:d->fields) {
-                if (field.name.empty() || !fields.insert(field.name).second || Type(field.type)==Type::none) fail("invalid value field");
+                if (field.name.empty() || field.name.find('\0')!=std::string::npos || !fields.insert(field.name).second || Type(field.type)==Type::none) fail("invalid value field");
                 if (field.type.readonly) fail("readonly nominal field declarations are not supported");
                 pending.push_back(field.type);
             }
             // References break physical layout recursion, not graph validation.
-            for (const auto& field:d->fields) inline_layout(field.type);
+            inline_layout(Type(t.definition));
         }
         const auto shape=reference_paths(root);
         for (const auto& path:root.readonly_references) if (!shape.contains(path)) fail("invalid readonly reference path");
@@ -179,6 +248,13 @@ void validate(const Module& m, InstructionTypes* results) {
     auto assignable = [](Type actual,Type expected) {
         return actual==expected || (actual.kind==Type::managed_ref && expected.kind==Type::managed_ref && Type::key(actual)==Type::key(expected) && actual.construction==expected.construction && (!actual.nullable || expected.nullable));
     };
+    for(auto t:m.nominal_types) {
+        valid_type(t);
+        if(t.kind==Type::managed_ref && !t.definition->managed) fail("nominal catalog requires a managed class");
+        auto base=t.definition->base.lock();
+        for(unsigned n=base ? static_cast<unsigned>(base->fields.size()) : 0;n<t.definition->fields.size();++n)
+            if(t.definition->fields[n].owner!=t.definition->identity) fail("nominal catalog field belongs to another owner");
+    }
     struct Signature { std::vector<Type> parameters; Type result; bool receiver = false, mutates = false, initializer = false; };
     std::map<std::string, Signature> names;
     for (const auto& name : m.imports)
@@ -192,14 +268,57 @@ void validate(const Module& m, InstructionTypes* results) {
         if (!f.module_identity.empty() && (f.source_name.empty() || f.name != expected_name))
             fail("inconsistent function ownership");
         if (f.receiver) {
-            if (f.parameters.empty() || (f.parameters[0].kind != Type::aggregate && f.parameters[0].kind != Type::managed_ref) || f.locals.empty() || f.locals[0] != f.parameters[0]) fail("invalid receiver signature/storage");
+            if (f.parameters.empty() || (f.parameters[0].kind != Type::aggregate && f.parameters[0].kind != Type::managed_ref) || f.locals.empty() || f.locals[0] != f.parameters[0] || readonly_paths(f.locals[0])!=readonly_paths(f.parameters[0])) fail("invalid receiver signature/storage");
         } else if (f.receiver_mutates) fail("receiver effect without receiver");
         if (f.initializer && (!f.receiver || f.result != Type::none)) fail("invalid initializer signature");
+        if(f.initializer && f.parameters[0].construction && f.parameters[0].readonly) fail("initializer requires mutable construction storage");
         if (f.result.construction) fail("construction view returned from function");
         if (f.initializer && f.parameters[0].kind==Type::managed_ref && (!f.parameters[0].construction || context_parameters!=std::vector<unsigned>{0})) fail("managed init requires a private construction receiver");
         valid_type(f.result);
         for (auto t : f.parameters) if (t == Type::none) fail("no-result parameter"); else valid_type(t);
         for (auto t : f.locals) if (t == Type::none) fail("no-result slot"); else valid_type(t);
+    }
+    std::map<std::string,const Function*> functions;
+    std::set<std::string> initializer_types;
+    for(const auto& f:m.functions) {
+        functions.emplace(f.name,&f);
+        if(f.initializer && !initializer_types.insert(Type::key(f.parameters[0])).second) fail("duplicate nominal initializer");
+    }
+    for(const auto& f:m.functions) {
+        if(!f.method_name.empty()) {
+            if(f.visibility!="public" && f.visibility!="private" && f.visibility!="internal") fail("invalid method visibility");
+            if(f.initializer && f.method_name!="init") fail("invalid initializer lifecycle name");
+            if(!f.receiver) fail("method ownership requires a receiver");
+            auto expected=Type::key(f.parameters[0])+"::method::"+f.method_name;
+            std::vector<unsigned> context;
+            for(unsigned n=0;n<f.parameters.size();++n) if(f.parameters[n].construction) context.push_back(n);
+            if(!f.initializer) expected=construction_name(expected,context);
+            if(f.name!=expected) fail("method belongs to another nominal owner");
+            for(const auto& field:f.parameters[0].definition->fields) if(field.name==f.method_name) fail("method conflicts with stored field");
+            if(!f.initializer) for(auto base=f.parameters[0].definition->base.lock();base;base=base->base.lock()) {
+                for(const auto& inherited:m.functions) if(inherited.receiver && !inherited.initializer && inherited.method_name==f.method_name && inherited.parameters[0].definition==base) {
+                    if(!f.overriding || inherited.virtual_slot.empty() || inherited.virtual_slot!=f.virtual_slot) fail("inherited method hiding or wrong override family");
+                }
+            }
+        }
+        if (f.virtual_slot.empty()) { if(f.overriding) fail("override without virtual slot"); continue; }
+        if (f.method_name.empty() || f.visibility=="private" || !f.receiver || f.initializer || f.parameters[0].kind!=Type::managed_ref || !f.parameters[0].definition->managed || f.parameters[0].construction) fail("invalid virtual receiver");
+        auto root=functions.find(f.virtual_slot);
+        if(root==functions.end() || root->second->virtual_slot!=f.virtual_slot || root->second->overriding) fail("invalid virtual family root");
+        const auto& original=*root->second;
+        if (f.method_name!=original.method_name || f.visibility!=original.visibility || f.overriding!=(f.name!=f.virtual_slot) || f.parameters.size()!=original.parameters.size() || f.result!=original.result || !subtype(f.parameters[0],original.parameters[0])) fail("invalid override signature");
+        for(unsigned n=1;n<f.parameters.size();++n) if(f.parameters[n]!=original.parameters[n] || (f.parameters[n].readonly!=original.parameters[n].readonly || readonly_paths(f.parameters[n])!=readonly_paths(original.parameters[n]))) fail("inexact override parameter");
+        if(std::none_of(m.nominal_types.begin(),m.nominal_types.end(),[&](auto t){return t.kind==Type::managed_ref && Type::key(t)==Type::key(f.parameters[0]);})) fail("virtual receiver absent from nominal catalog");
+        if(f.name==f.virtual_slot) virtual_targets(m,f);
+        if(f.overriding && Type::key(f.parameters[0])==Type::key(original.parameters[0])) fail("override requires a descendant receiver");
+        for(const auto& other:m.functions) if(other.name!=f.name && other.virtual_slot==f.virtual_slot && Type::key(other.parameters[0])==Type::key(f.parameters[0])) fail("duplicate virtual implementation");
+    }
+    for(auto t:m.nominal_types) if(t.kind==Type::managed_ref) {
+        bool own=false,ancestor=false;
+        for(const auto& f:m.functions) if(f.initializer && Type::key(f.parameters[0])==Type::key(t)) own=true;
+        for(auto base=t.definition->base.lock();base;base=base->base.lock()) for(const auto& f:m.functions)
+            if(f.initializer && Type::key(f.parameters[0])==base->identity) ancestor=true;
+        if(ancestor && !own) fail("derived type omitted required initializer");
     }
     for (const auto& f : m.functions) {
         if (f.blocks.empty()) fail("function has no blocks");
@@ -231,6 +350,7 @@ void validate(const Module& m, InstructionTypes* results) {
                     result=i.type; break;
                 case Op::gc_allocate:
                     valid_type(i.type);
+                    if(std::any_of(m.nominal_types.begin(),m.nominal_types.end(),[&](auto t){return t.kind==Type::managed_ref && Type::key(t)==Type::key(i.type);})) fail("nominal source objects require complete construction");
                     if (!m.coordinated || i.type.kind != Type::managed_ref || i.type.construction || i.type.definition->fields.empty()) fail("invalid managed allocation");
                     result = i.type; break;
                 case Op::gc_read: case Op::gc_write: {
@@ -277,6 +397,33 @@ void validate(const Module& m, InstructionTypes* results) {
                 case Op::equal: case Op::not_equal:
                     if (!((operand(i.a).kind==Type::managed_ref && !operand(i.a).construction && operand(i.b).kind==Type::managed_ref && !operand(i.b).construction && Type::key(operand(i.a))==Type::key(operand(i.b))) || (numeric::supports(i.op,operand(i.a)) && operand(i.a)==operand(i.b)))) fail("comparison type mismatch");
                     result = Type::boolean; break;
+                case Op::stage_prefix: {
+                    auto from=operand(i.a),to=i.type;
+                    if(!from.construction || !to.construction) fail("base projection requires construction views");
+                    from.construction=to.construction=false;
+                    if(!subtype(from,to) || from.nullable || to.nullable || !capability_assignable(operand(i.a),i.type)) fail("invalid construction base projection");
+                    result=i.type; break;
+                }
+                case Op::upcast:
+                    valid_type(i.type);
+                    if(!subtype(operand(i.a),i.type) || (operand(i.a).nullable && !i.type.nullable) || !capability_assignable(operand(i.a),i.type)) fail("invalid managed upcast");
+                    result=i.type; break;
+                case Op::base_init: {
+                    valid_type(i.type);
+                    if(!f.initializer || !f.parameters[0].construction || !i.receiver || i.receiver->slot!=0 || !i.receiver->fields.empty()) fail("base initialization requires its derived initializer receiver");
+                    auto base=f.parameters[0].definition->base.lock();
+                    if(!base || i.type.kind!=Type::managed_ref || i.type.nullable || i.type.construction || i.type.definition!=base) fail("base initializer type mismatch");
+                    if(i.callee.empty()) {
+                        if(i.arguments.size()!=base->fields.size()) fail("base fields argument count mismatch");
+                        for(unsigned n=0;n<i.arguments.size();++n) expect(i.arguments[n],base->fields[n].type);
+                        for(const auto& target:m.functions) if(target.initializer && Type::key(target.parameters[0])==base->identity) fail("base field construction bypasses initializer");
+                    } else {
+                        auto found=functions.find(i.callee);
+                        if(found==functions.end() || !found->second->initializer || Type::key(found->second->parameters[0])!=base->identity || i.arguments.size()+1!=found->second->parameters.size()) fail("invalid base initializer target");
+                        for(unsigned n=0;n<i.arguments.size();++n) expect(i.arguments[n],found->second->parameters[n+1]);
+                    }
+                    result=Type::none; break;
+                }
                 case Op::convert:
                     if (!((operand(i.a).kind==Type::managed_ref && !operand(i.a).construction && i.type.kind==Type::managed_ref && !i.type.construction && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)))) fail("invalid conversion");
                     result = i.type; break;
@@ -287,7 +434,9 @@ void validate(const Module& m, InstructionTypes* results) {
                 case Op::store:
                     if (f.receiver && f.parameters[0].kind==Type::aggregate && !f.receiver_mutates && i.a == 0) fail("non-mutating method writes receiver");
                     expect(i.b, slot(i.a)); result = Type::none; break;
-                case Op::call: {
+                case Op::call: case Op::virtual_call: {
+                    auto declaration=functions.find(i.callee);
+                    if(i.op==Op::virtual_call && (declaration==functions.end() || declaration->second->virtual_slot.empty() || i.initialization)) fail("invalid virtual call target");
                     auto target = names.find(i.callee);
                     if (target == names.end()) fail("unknown callee " + i.callee);
                     const auto& signature = target->second;

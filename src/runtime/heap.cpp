@@ -20,6 +20,11 @@ void* Heap::allocate(const TypeLayout& layout) {
     return p;
 }
 bool Heap::contains(void* p) const { return p && objects_.contains(p); }
+std::string_view Heap::nominal_identity(void* p) const {
+    auto found=objects_.find(p);
+    if(found==objects_.end() || !found->second.layout.descriptor) return {};
+    return found->second.layout.descriptor->identity;
+}
 void Heap::add_root(void** slot) {
     if (!slot || std::find(roots_.begin(), roots_.end(), slot) != roots_.end())
         throw std::invalid_argument("invalid or duplicate root slot");

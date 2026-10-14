@@ -1,10 +1,21 @@
 # Known issues and deferred work
 
-Updated for Phase 18 reference-containing values. The owner locks Phase 17 and
-reports run #29 green on all seven jobs (39 suites/configuration). Phase 18 adds
-four suites (43 total); hosted Windows/macOS and seven-job verification remain
-necessary after the owner pushes. REFERENCE_VALUE_STRUCTS.md and WORK_LOG.md record
-the supported contract and actual local verification.
+Updated for Phase 20. The owner reports Phase 19 locked at run #33, attempt #2,
+all seven jobs (47 suites). Phase 20 adds four suites (51 total); INHERITANCE.md
+and WORK_LOG.md describe actual local verification. Hosted Windows/macOS and all
+seven configurations remain required after owner review/push.
+
+Single managed inheritance, explicit virtual/override/super, complete base prefixes
+and staged constructor chaining now use the shared compiler/IR/runtime. Source
+casts to descendants, type-pattern expansion, protected/richer field access,
+inherited hiding, covariance, abstract/final, interfaces, open-world type loading,
+implicit constructor forwarding/chaining and external managed aggregate ABI remain
+deferred. Physical layout depth combines inheritance and inline nesting (128);
+expanded fields remain capped at 65536 and construction contexts at 1024.
+Guarded exact-key dispatch prioritizes correctness over cache/table optimization;
+preliminary dispatch timing is not a production benchmark. Objects own no code
+pointers and do not pin their allocating generation. The runtime remains a tested
+foundation, not a production-ready GC or resource/finalizer system.
 
 Value init retains C1 all-fields-valid entry; required-reference value fields use
 explicit no-init construction. Fresh initializer profiles and existing binding

@@ -1,0 +1,23 @@
+struct base_user:
+    health: i32 = 100
+
+virtual func (u base_user) take_damage(amount: i32):
+    u.health -= amount
+
+struct player extends base_user:
+    armor: i32
+
+override func (p player) take_damage(amount: i32):
+    super.take_damage(amount)
+    p.armor++
+
+func apply(u: base_user):
+    u.take_damage(3)
+
+func entry(value: i32) -> i32:
+    var p = player(armor = value)
+    var b: base_user = p
+    apply(b)
+    if b == p:
+        return b.health + p.armor
+    return 0

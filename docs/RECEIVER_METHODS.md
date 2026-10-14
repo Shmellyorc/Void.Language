@@ -1,5 +1,7 @@
 # Phase 13: receiver methods and initialization groundwork
 
+Phase 20 implements managed virtual/override methods and direct super calls, retaining exact ownership/imports and conservative family effects. Virtual methods on inline values remain excluded. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.
+
 Current Phase 14 update: approved custom value initialization is documented in
 [INITIALIZATION.md](INITIALIZATION.md). It supersedes the historical init deferral
 below; Phase 12 construction remains unchanged for types without custom init.

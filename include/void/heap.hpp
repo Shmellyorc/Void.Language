@@ -4,10 +4,22 @@
 #include <span>
 #include <unordered_map>
 #include <vector>
+#include <string>
+#include <string_view>
 namespace vd {
 // Single-threaded proof. Type descriptors list every pointer field, including
 // references nested inside inline values. Objects contain zeroed payload bytes.
-struct TypeLayout { std::size_t size; std::vector<std::size_t> references; };
+struct NominalDescriptor;
+struct TypeLayout {
+    std::size_t size;
+    std::vector<std::size_t> references;
+    std::shared_ptr<const NominalDescriptor> descriptor = {};
+};
+// Runtime-owned data only: no code pointers, LLVM types, or generation leases.
+struct NominalDescriptor {
+    std::string identity, base, shape;
+    TypeLayout layout;
+};
 class Heap {
 public:
     Heap() = default;
@@ -18,6 +30,7 @@ public:
     void collect();
     void collect(std::span<void* const> additional_roots);
     bool contains(void* object) const;
+    std::string_view nominal_identity(void* object) const;
     std::size_t size() const { return objects_.size(); }
     void add_root(void** slot);
     void remove_root(void** slot);

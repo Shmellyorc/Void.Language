@@ -45,12 +45,15 @@ struct FieldType {
     FieldType(Type t);
     operator Type() const;
 };
-struct ValueField { std::string name; FieldType type; };
+struct ValueField { std::string name; FieldType type; std::string owner = {}; };
 struct ValueType {
     std::string identity, name;
     std::vector<ValueField> fields;
     std::size_t source_offset = 0;
     bool managed = false;
+    // Effective logical fields retain ancestor indexes. The native payload is
+    // { complete BasePayload, own fields... }; this edge never owns the arena.
+    std::weak_ptr<const ValueType> base = {};
     mutable std::weak_ptr<const ValueType> self = {};
     mutable std::weak_ptr<TypeArena> arena = {};
 };
@@ -68,12 +71,15 @@ Type readonly_view(Type type);
 Type field_type(Type owner, unsigned field);
 Type with_field_type(Type owner, unsigned field, Type value);
 bool capability_assignable(Type actual, Type expected);
+bool subtype(Type actual, Type expected);
+std::vector<unsigned> physical_field_path(Type owner, unsigned field);
 std::string capability_key(Type type);
 std::string reference_path_name(Type type,const ReferencePath& path);
 std::string type_name(Type type);
 enum class Op { argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
-    stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive };
+    stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
+    upcast, virtual_call, base_init, stage_prefix };
 // A validated local aggregate storage path; never a source-visible reference.
 struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
 struct Instruction {
@@ -102,6 +108,9 @@ struct Function {
     bool receiver = false, receiver_mutates = false; // First parameter aliases local slot zero.
     std::map<unsigned,unsigned> construction_origins = {}; // View slot -> owning slot/formal.
     std::string source_name = {}, module_identity = {}; // Empty for legacy hand-built proofs.
+    std::string virtual_slot = {}; // Root declaration identity, shared by overrides.
+    bool overriding = false;
+    std::string method_name = {}, visibility = "public";
 };
 struct Module {
     std::string identity;
@@ -112,7 +121,10 @@ struct Module {
     std::shared_ptr<const ValidatedAnalysis> analysis = {};
     std::string constant_contract = {}; // Exact canonical const declarations.
     bool coordinated = false; // Requires a runtime owner; inferred for managed source.
+    std::vector<Type> nominal_types = {}; // Complete validated generation universe.
 };
+struct VirtualTarget { Type dynamic_type; std::string implementation; };
+std::vector<VirtualTarget> virtual_targets(const Module&,const Function&);
 std::string construction_name(const std::string& symbol, const std::vector<unsigned>& parameters);
 using InstructionTypes = std::vector<std::vector<std::vector<Type>>>;
 void validate(const Module& module, InstructionTypes* results = nullptr);

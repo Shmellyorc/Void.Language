@@ -1,5 +1,7 @@
 # Phase 19: stored composition and member promotion
 
+Phase 20 preserves U1–U7 while adding static ancestry precedence, inherited using fields, original storage paths and virtual dispatch on component identity. Component promotion still considers directly declared members only. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.
+
 The owner approved U1–U7 in [COMPOSITION_PROPOSAL.md](COMPOSITION_PROPOSAL.md),
 including named and unnamed embeddings. This guide describes the implementation;
 actual validation results and hosted limitations are recorded in WORK_LOG.md.
@@ -146,8 +148,9 @@ adds imported promoted read/write/method definitions, ambiguity and unsaved repa
 Editor presentation highlights contextual using with existing keyword colors;
 lifecycle behavior is unchanged.
 
-Deferred: automatic transitive promotion, inheritance/virtual dispatch, structural
-interface execution, has, method-only mixins, nullable promotion and new field
+Phase 20 implements the approved inheritance and component virtual-dispatch
+interactions described in INHERITANCE.md. Deferred: automatic transitive promotion,
+structural interface execution, has, method-only mixins, nullable promotion and new field
 visibility syntax. No subtype/conversion is conferred by composition. All existing
 source resource limits, native-provider safety and C1/S1/P3/P4/RV contracts remain.
 The seven hosted jobs must verify this phase after the owner pushes; Linux local

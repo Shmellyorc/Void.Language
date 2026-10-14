@@ -72,7 +72,8 @@ std::string source_message(const SourceLocation& location, const std::string& ex
         ": " + description + "\n" + excerpt;
 }
 std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& context,
-                                  const std::string& suffix, const llvm::DataLayout& target_layout) {
+                                  const std::string& suffix, const llvm::DataLayout& target_layout,
+                                  std::vector<NominalDescriptor>* host_catalog=nullptr) {
     ir::InstructionTypes checked_types;
     ir::validate(input, &checked_types);
     auto module = std::make_unique<llvm::Module>(input.identity, context);
@@ -87,7 +88,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         if (t.kind == ir::Type::aggregate) {
             if (auto found = aggregates.find(t.definition->identity); found != aggregates.end()) return found->second;
             auto* result = llvm::StructType::create(context,t.definition->identity); aggregates.emplace(t.definition->identity,result);
-            std::vector<llvm::Type*> fields; for (const auto& field : t.definition->fields) fields.push_back(type(field.type));
+            std::vector<llvm::Type*> fields;
+            auto base=t.definition->base.lock();
+            if(base) fields.push_back(type(ir::Type(base)));
+            for(unsigned n=base ? static_cast<unsigned>(base->fields.size()) : 0;n<t.definition->fields.size();++n) fields.push_back(type(t.definition->fields[n].type));
             result->setBody(fields,false); return result;
         }
         if (t == ir::Type::boolean) return b.getInt1Ty();
@@ -96,6 +100,39 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         if (t == ir::Type::f64) return b.getDoubleTy();
         return b.getIntNTy(numeric::width(t));
     };
+    auto field_offset=[&](ir::Type owner,unsigned field) {
+        std::uint64_t offset=0; auto* native=type(ir::Type(owner.definition));
+        for(auto index:ir::physical_field_path(owner,field)) {
+            auto* aggregate=llvm::cast<llvm::StructType>(native);
+            offset+=layout.getStructLayout(aggregate)->getElementOffset(index); native=aggregate->getElementType(index);
+        }
+        return offset;
+    };
+    auto field_address=[&](ir::Type owner,llvm::Value* address,unsigned field) {
+        std::vector<llvm::Value*> path{b.getInt32(0)};
+        for(auto index:ir::physical_field_path(owner,field)) path.push_back(b.getInt32(index));
+        return b.CreateGEP(type(ir::Type(owner.definition)),address,path);
+    };
+        auto reference_offsets = [&](ir::Type t, std::uint64_t base, auto& result) {
+            // Translate the shared logical shape into this module's target
+            // offsets. Qualifiers never change native layout or root identity.
+            for (const auto& path:ir::reference_paths(t)) {
+                auto current=t; auto offset=base;
+                for (auto field:path) {
+                    offset+=field_offset(current,field);
+                    current=ir::field_type(current,field);
+                }
+                result.push_back(offset);
+            }
+        };
+        auto* size_type = b.getIntNTy(layout.getPointerSizeInBits());
+        auto offset_map = [&](const std::vector<std::uint64_t>& offsets) -> llvm::Constant* {
+            std::vector<llvm::Constant*> constants;
+            for (auto offset : offsets) constants.push_back(llvm::ConstantInt::get(size_type, offset));
+            auto* array_type = llvm::ArrayType::get(size_type, constants.size());
+            return new llvm::GlobalVariable(*module, array_type, true, llvm::GlobalValue::PrivateLinkage,
+                llvm::ConstantArray::get(array_type, constants), "gc.offsets");
+        };
     auto* signature = llvm::FunctionType::get(b.getInt32Ty(), {b.getInt32Ty()}, false);
     std::map<std::string, llvm::Function*> functions;
     for (const auto& name : input.imports)
@@ -106,6 +143,55 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         if (!f.module_identity.empty() || input.coordinated) parameters.push_back(b.getPtrTy());
         auto* function_type = llvm::FunctionType::get(type(f.result), parameters, false);
         functions[f.name] = llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, native_symbol(f, suffix), *module);
+    }
+    std::map<std::string,ir::Type> nominal_types;
+    for(auto t:input.nominal_types) if(t.kind==ir::Type::managed_ref) nominal_types.emplace(t.definition->identity,t);
+    auto* record_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type);
+    const auto* record_layout=layout.getStructLayout(record_type);
+    if(record_layout->getSizeInBytes()!=sizeof(RuntimeTypeRecord) || record_layout->getElementOffset(3)!=offsetof(RuntimeTypeRecord,size) || record_layout->getElementOffset(5)!=offsetof(RuntimeTypeRecord,count))
+        throw std::invalid_argument("runtime nominal descriptor ABI mismatch");
+    auto string=[&](const std::string& text) {return b.CreateGlobalStringPtr(text,"",0,module.get());};
+    std::vector<llvm::Constant*> records,keys;
+    for(const auto& [key,t]:nominal_types) {
+        std::vector<std::uint64_t> offsets; reference_offsets(ir::Type(t.definition),0,offsets);
+        auto bytes=std::max<std::uint64_t>(1,layout.getTypeAllocSize(type(ir::Type(t.definition))));
+        auto base=t.definition->base.lock();
+        std::string shape=std::to_string(bytes)+":"+std::to_string(layout.getABITypeAlign(type(ir::Type(t.definition))).value());
+        for(unsigned n=0;n<t.definition->fields.size();++n) {
+            const auto& field=t.definition->fields[n];
+            for(const auto& part:{field.name,field.owner,ir::type_name(field.type),std::to_string(field_offset(t,n))}) shape+="|"+std::to_string(part.size())+":"+part;
+        }
+        if(host_catalog) { NominalDescriptor d{key,base ? base->identity : "",shape,{bytes,{}}};d.layout.references.assign(offsets.begin(),offsets.end());host_catalog->push_back(std::move(d)); }
+        auto* identity=string(key); keys.push_back(identity);
+        records.push_back(llvm::ConstantStruct::get(record_type,{identity,string(base ? base->identity : ""),string(shape),llvm::ConstantInt::get(size_type,bytes),offset_map(offsets),llvm::ConstantInt::get(size_type,offsets.size())}));
+    }
+    auto* catalog_type=llvm::ArrayType::get(record_type,records.size());
+    new llvm::GlobalVariable(*module,catalog_type,true,llvm::GlobalValue::ExternalLinkage,llvm::ConstantArray::get(catalog_type,records),"__vd_types"+suffix);
+    new llvm::GlobalVariable(*module,size_type,true,llvm::GlobalValue::ExternalLinkage,llvm::ConstantInt::get(size_type,records.size()),"__vd_type_count"+suffix);
+    auto* keys_type=llvm::ArrayType::get(b.getPtrTy(),keys.size());
+    auto* dynamic_keys=new llvm::GlobalVariable(*module,keys_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantArray::get(keys_type,keys),"dynamic_type_keys");
+    std::map<std::string,llvm::Function*> dispatchers;
+    for(const auto& root:input.functions) if(!root.virtual_slot.empty() && root.virtual_slot==root.name) {
+        auto* dispatcher=llvm::Function::Create(functions.at(root.name)->getFunctionType(),llvm::GlobalValue::InternalLinkage,"virtual_"+native_symbol(root,suffix),*module);
+        dispatchers.emplace(root.virtual_slot,dispatcher);
+        b.SetInsertPoint(llvm::BasicBlock::Create(context,"select_type",dispatcher));
+        auto* selected=b.CreateCall(module->getOrInsertFunction("vd_gc_dynamic_type",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),size_type),{dispatcher->getArg(0),dynamic_keys,llvm::ConstantInt::get(size_type,keys.size())});
+        auto* invalid=llvm::BasicBlock::Create(context,"invalid_receiver",dispatcher);
+        auto* cases=b.CreateSwitch(selected,invalid,static_cast<unsigned>(keys.size()));
+        std::map<std::string,std::string> targets;
+        for(const auto& target:ir::virtual_targets(input,root)) targets.emplace(ir::Type::key(target.dynamic_type),target.implementation);
+        unsigned index=0;
+        for(const auto& [key,t]:nominal_types) {
+            auto case_index=index++;
+            auto target=targets.find(key);if(target==targets.end()) continue;
+            auto* invoke=llvm::BasicBlock::Create(context,"invoke_override",dispatcher);cases->addCase(b.getInt64(case_index),invoke);b.SetInsertPoint(invoke);
+            std::vector<llvm::Value*> args;for(auto& arg:dispatcher->args()) args.push_back(&arg);
+            auto* result=b.CreateCall(functions.at(target->second),args);
+            if(root.result==ir::Type::none) b.CreateRetVoid();else b.CreateRet(result);
+        }
+        b.SetInsertPoint(invalid);
+        b.CreateStore(b.CreateGlobalStringPtr("Invalid managed virtual receiver or generation type catalog"),dispatcher->getArg(dispatcher->arg_size()-1));
+        if(root.result==ir::Type::none) b.CreateRetVoid();else b.CreateRet(llvm::Constant::getNullValue(type(root.result)));
     }
     llvm::DIBuilder debug(*module);
     auto module_path = vd::utf8_path(input.source_path.empty() ? input.identity : input.source_path);
@@ -122,7 +208,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
             for (unsigned n = 0; n < t.definition->fields.size(); ++n) {
                 const auto& field = t.definition->fields[n]; auto* native_field = type(field.type);
                 members.push_back(debug.createMemberType(file,field.name,file,0,layout.getTypeSizeInBits(native_field),
-                    layout.getABITypeAlign(native_field).value()*8,offsets->getElementOffsetInBits(n),llvm::DINode::FlagZero,debug_value_type(field.type)));
+                    layout.getABITypeAlign(native_field).value()*8,field_offset(t,n)*8,llvm::DINode::FlagZero,debug_value_type(field.type)));
             }
             auto* result = debug.createStructType(file,ir::type_name(t),file,0,offsets->getSizeInBits(),
                 layout.getABITypeAlign(native).value()*8,llvm::DINode::FlagZero,nullptr,debug.getOrCreateArray(members));
@@ -179,27 +265,6 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
             b.CreateMemSet(storage,b.getInt8(0),bytes,layout.getABITypeAlign(native));
             stage_storage.emplace(instruction.a,storage);
         }
-        auto reference_offsets = [&](ir::Type t, std::uint64_t base, auto& result) {
-            // Translate the shared logical shape into this module's target
-            // offsets. Qualifiers never change native layout or root identity.
-            for (const auto& path:ir::reference_paths(t)) {
-                auto current=t; auto offset=base;
-                for (auto field:path) {
-                    auto* native=llvm::cast<llvm::StructType>(type(current));
-                    offset+=layout.getStructLayout(native)->getElementOffset(field);
-                    current=ir::field_type(current,field);
-                }
-                result.push_back(offset);
-            }
-        };
-        auto* size_type = b.getIntNTy(layout.getPointerSizeInBits());
-        auto offset_map = [&](const std::vector<std::uint64_t>& offsets) -> llvm::Constant* {
-            std::vector<llvm::Constant*> constants;
-            for (auto offset : offsets) constants.push_back(llvm::ConstantInt::get(size_type, offset));
-            auto* array_type = llvm::ArrayType::get(size_type, constants.size());
-            return new llvm::GlobalVariable(*module, array_type, true, llvm::GlobalValue::PrivateLinkage,
-                llvm::ConstantArray::get(array_type, constants), "gc.offsets");
-        };
         std::vector<std::vector<llvm::Value*>> value_roots(f.blocks.size());
         if (input.coordinated) {
             auto* slot_type = llvm::StructType::get(b.getPtrTy(), size_type, b.getPtrTy(), size_type);
@@ -312,12 +377,16 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                         auto* value=values[instruction.arguments[field]];
                         ir::Type field_type=instruction.type.definition->fields[field].type;
                         guard_complete(field_type,value);
-                        b.CreateStore(value,b.CreateStructGEP(native,payload,field));
+                        b.CreateStore(value,field_address(object,payload,field));
                     }
                     std::vector<std::uint64_t> offsets; reference_offsets(object,0,offsets);
                     auto* storage=value_roots[n].at(values.size());
-                    b.CreateCall(module->getOrInsertFunction("vd_gc_construct",b.getVoidTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type,b.getPtrTy(),b.getPtrTy()),
-                        {storage,llvm::ConstantInt::get(size_type,bytes),offset_map(offsets),llvm::ConstantInt::get(size_type,offsets.size()),payload,failure});
+                    std::vector<llvm::Value*> arguments{storage,llvm::ConstantInt::get(size_type,bytes),offset_map(offsets),llvm::ConstantInt::get(size_type,offsets.size()),payload};
+                    if(nominal_types.contains(instruction.type.definition->identity)) arguments.push_back(b.CreateGlobalStringPtr(instruction.type.definition->identity));
+                    arguments.push_back(failure);
+                    std::vector<llvm::Type*> parameter_types;for(auto* arg:arguments) parameter_types.push_back(arg->getType());
+                    auto abi=module->getOrInsertFunction(nominal_types.contains(instruction.type.definition->identity) ? "vd_gc_construct_typed" : "vd_gc_construct",llvm::FunctionType::get(b.getVoidTy(),parameter_types,false));
+                    b.CreateCall(abi,arguments);
                     fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),b.CreateStructGEP(failure_type,failure,0))),"Managed construction allocation failed");
                     v=b.CreateLoad(type(instruction.type),storage); break;
                 }
@@ -335,7 +404,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     if (!object.construction) fail_if(b.CreateIsNull(values[instruction.a]),"Null managed reference");
                     ir::Type field=object.definition->fields.at(static_cast<std::size_t>(instruction.immediate)).type;
                     if (instruction.op==Op::gc_write) guard_complete(field,values[instruction.b]);
-                    auto* address = b.CreateStructGEP(type(ir::Type(object.definition)),values[instruction.a],static_cast<unsigned>(instruction.immediate));
+                    auto* address = field_address(object,values[instruction.a],static_cast<unsigned>(instruction.immediate));
                     if (instruction.op == Op::gc_read) v = b.CreateLoad(type(object.definition->fields.at(static_cast<std::size_t>(instruction.immediate)).type),address);
                     else v = b.CreateStore(values[instruction.b],address);
                     break;
@@ -356,6 +425,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     else v = llvm::ConstantInt::get(type(instruction.type),instruction.immediate,true);
                     break;
                 case Op::negate: v = values[instruction.a]->getType()->isFloatingPointTy() ? b.CreateFNeg(values[instruction.a]) : b.CreateNeg(values[instruction.a]); break;
+                case Op::upcast: case Op::stage_prefix: v=values[instruction.a]; break;
                 case Op::convert: {
                     auto* a = values[instruction.a]; auto from = operand_type(instruction.a), to = instruction.type;
                     if (from.kind==ir::Type::managed_ref) { fail_if(b.CreateIsNull(a),"Null managed reference in checked conversion"); v=a; break; }
@@ -430,14 +500,23 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 case Op::logical_not: v = b.CreateNot(values[instruction.a]); break;
                 case Op::load: v = b.CreateLoad(type(f.locals[instruction.a]), slots[instruction.a]); break;
                 case Op::store: v = b.CreateStore(values[instruction.b], slots[instruction.a]); break;
-                case Op::call: {
+                case Op::call: case Op::virtual_call: case Op::base_init: {
+                    if(instruction.op==Op::base_init && instruction.callee.empty()) {
+                        auto* address=b.CreateLoad(b.getPtrTy(),slots[0]);
+                        for(unsigned field=0;field<instruction.arguments.size();++field) {
+                            auto value=values[instruction.arguments[field]];
+                            guard_complete(instruction.type.definition->fields[field].type,value);
+                            b.CreateStore(value,field_address(instruction.type,address,field));
+                        }
+                        break;
+                    }
                     std::vector<llvm::Value*> arguments;
                     if (instruction.receiver) {
                         auto* address = slots.at(instruction.receiver->slot);
                         auto t = f.locals.at(instruction.receiver->slot);
                         for (auto field : instruction.receiver->fields) {
                             if (t.kind==ir::Type::managed_ref) { address=b.CreateLoad(type(t),address); t=ir::Type(t.definition); }
-                            address = b.CreateStructGEP(type(t),address,field);
+                            address = field_address(t,address,field);
                             t = t.definition->fields.at(field).type;
                         }
                         arguments.push_back(t.kind==ir::Type::managed_ref ? b.CreateLoad(type(t),address) : address);
@@ -448,6 +527,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     for (const auto& target : input.functions) if (target.name == instruction.callee) legacy_single = !target.receiver && target.parameters.size() == 1;
                     if (arguments.empty() && legacy_single) arguments.push_back(values[instruction.a]);
                     auto* callee = functions.at(instruction.callee);
+                    if(instruction.op==Op::virtual_call) {
+                        for(const auto& target:input.functions) if(target.name==instruction.callee) callee=dispatchers.at(target.virtual_slot);
+                    }
                     bool checked = callee->arg_size() == arguments.size() + 1;
                     if (checked && !failure) throw std::invalid_argument("Checked source calls require a source diagnostic context");
                     if (checked) arguments.push_back(failure);
@@ -523,7 +605,7 @@ struct Jit::Impl {
     };
     std::shared_ptr<const NativeCode> load(std::unique_ptr<llvm::Module> module,
         std::unique_ptr<llvm::LLVMContext> context, const std::string& symbol,
-        Compatibility contract, const std::shared_ptr<Impl>& self, bool checked = false, std::shared_ptr<Runtime> runtime = {}) {
+        Compatibility contract, const std::shared_ptr<Impl>& self, bool checked = false, std::shared_ptr<Runtime> runtime = {}, std::span<const NominalDescriptor> catalog = {}) {
 #ifdef VOID_FUNCTION_SANITIZER_HASH
         // The host ABI is checked before reaching this boundary. Match the
         // compiler-generated plain/checked entry metadata without disabling UBSan.
@@ -540,7 +622,11 @@ struct Jit::Impl {
         ++live;
         check(jit->addIRModule(tracker, llvm::orc::ThreadSafeModule(std::move(module), std::move(context))));
         auto address = unwrap(jit->lookup(symbol));
-        if (checked) return std::make_shared<NativeCode>(address.toPtr<NativeCode::CheckedEntry>(), generation, std::move(contract), std::move(runtime));
+        if (checked) {
+            auto result=std::make_shared<NativeCode>(address.toPtr<NativeCode::CheckedEntry>(),generation,std::move(contract),runtime);
+            if(runtime) runtime->admit_types(catalog);
+            return result;
+        }
         auto entry = address.toPtr<NativeCode::Entry>();
         return std::make_shared<NativeCode>(entry, generation, std::move(contract));
     }
@@ -550,6 +636,8 @@ Jit::Jit() : impl_(std::make_shared<Impl>()) {
     impl_->jit = unwrap(llvm::orc::LLJITBuilder().create());
     bind("vd_gc_frame_enter",vd_gc_frame_enter); bind("vd_gc_frame_leave",vd_gc_frame_leave);
     bind("vd_gc_construct",vd_gc_construct);
+    bind("vd_gc_construct_typed",vd_gc_construct_typed);
+    bind("vd_gc_dynamic_type",vd_gc_dynamic_type);
     bind("vd_gc_poll",vd_gc_poll); bind("vd_gc_collect",vd_gc_collect); bind("vd_gc_allocate",vd_gc_allocate);
     bind("vd_gc_alive",vd_gc_alive); bind("vd_gc_native_enter",vd_gc_native_enter); bind("vd_gc_native_leave",vd_gc_native_leave);
 }
@@ -563,6 +651,10 @@ void Jit::bind_address(std::string name, std::uintptr_t entry) {
 }
 std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const std::string& entry,
                                               bool optimize, Compatibility contract, std::shared_ptr<Runtime> runtime) {
+    if(auto* attached=Runtime::attached();attached && attached->is_managed()) {
+        Runtime::Native native(*attached);
+        return compile(input,entry,optimize,std::move(contract),std::move(runtime));
+    }
     if (runtime && !input.coordinated) {
         auto coordinated = input;
         coordinated.coordinated = true;
@@ -596,12 +688,18 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
         auto encoded = [](const std::string& text) { return std::to_string(text.size()) + ":" + text; };
         std::function<void(ir::Type)> record = [&](ir::Type t) {
             if (!t.definition || layouts.contains(t.definition->identity)) return;
-            std::string text = encoded(t.definition->identity) + "{";
-            for (const auto& field : t.definition->fields) text += encoded(field.name) + ":" + std::to_string(field.type.kind) + ":" + encoded(ir::Type::key(field.type)) + ";";
+            auto base=t.definition->base.lock();
+            std::string text = encoded(t.definition->identity) + "base:"+encoded(base ? base->identity : "")+"{";
+            for (const auto& field : t.definition->fields) text += encoded(field.name) + ":"+encoded(field.owner)+":"+encoded(ir::type_name(field.type))+";";
             layouts.emplace(t.definition->identity,text + "}");
             for (const auto& field : t.definition->fields) record(field.type);
         };
+        for(auto t:input.nominal_types) record(t);
         for (const auto& f : input.functions) {
+            contract.source_contract+="virtual:"+encoded(f.name)+encoded(f.virtual_slot)+encoded(f.method_name)+encoded(f.visibility);
+            contract.source_contract+=encoded(ir::type_name(f.result))+encoded(ir::capability_key(f.result))+std::to_string(f.parameters.size())+":";
+            for(auto t:f.parameters) contract.source_contract+=encoded(ir::type_name(t))+encoded(ir::capability_key(t));
+            contract.source_contract+=f.receiver_mutates ? "mutating;" : "nonmutating;";
             record(f.result); for (auto t : f.parameters) record(t); for (auto t : f.locals) record(t);
             for (const auto& block : f.blocks) for (const auto& i : block.instructions) record(i.type);
         }
@@ -611,11 +709,12 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     if (!selected->module_identity.empty()) contract.constant_contract = input.analysis ? input.analysis->constant_contract() : input.constant_contract;
     auto suffix = "__v" + std::to_string(++impl_->serial);
     auto context = std::make_unique<llvm::LLVMContext>();
-    auto module = lower(input, *context, suffix, impl_->jit->getDataLayout());
+    std::vector<NominalDescriptor> catalog;
+    auto module = lower(input, *context, suffix, impl_->jit->getDataLayout(),&catalog);
     module->setDataLayout(impl_->jit->getDataLayout());
     module->setTargetTriple(impl_->jit->getTargetTriple().str());
     finish(*module, optimize);
-    return impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, std::move(runtime));
+    return impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, std::move(runtime),catalog);
 }
 std::shared_ptr<const NativeCode> Jit::compile(const ValidatedAnalysis& analysis, bool optimize, Compatibility contract) {
     auto module = analysis.lower();
@@ -673,7 +772,7 @@ std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
     finish(*module, optimize);
     return impl_->load(std::move(module), std::move(context), name, {"/proof::root_probe"}, impl_);
 }
-static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object) {
+static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object, const std::string& generation_suffix = {}) {
     if ((runtime_object && !input.coordinated) || (input.coordinated && !runtime_object && !source_program)) throw std::invalid_argument("coordinated AOT requires the runtime proof bootstrap");
     initialize();
     llvm::LLVMContext context;
@@ -688,7 +787,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     std::unique_ptr<llvm::TargetMachine> machine(target->createTargetMachine(triple, "generic", "",
         llvm::TargetOptions(), llvm::Reloc::PIC_));
     if (!machine) throw std::runtime_error("cannot create native target machine");
-    auto module = lower(input, context, source_program ? "__void" : "", machine->createDataLayout());
+    auto module = lower(input, context, source_program ? "__void" : generation_suffix, machine->createDataLayout());
     module->setTargetTriple(triple);
     module->setDataLayout(machine->createDataLayout());
     if (!runtime_object) {
@@ -739,7 +838,12 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         arguments.push_back(failure);
     }
     llvm::CallInst* result;
-    if (input.coordinated) result=b.CreateCall(module->getOrInsertFunction("vd_runtime_entry",b.getInt32Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{entry,input_value,failure});
+    if (input.coordinated) {
+        auto* catalog=module->getNamedGlobal("__vd_types"+(source_program ? std::string("__void") : std::string{}));
+        auto* count=module->getNamedGlobal("__vd_type_count"+(source_program ? std::string("__void") : std::string{}));
+        auto* size_type=b.getIntNTy(module->getDataLayout().getPointerSizeInBits());
+        result=b.CreateCall(module->getOrInsertFunction("vd_runtime_entry_typed",b.getInt32Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),size_type),{entry,input_value,failure,catalog,b.CreateLoad(size_type,count)});
+    }
     else result=b.CreateCall(entry, arguments);
     if (failure) {
         auto* failed = llvm::BasicBlock::Create(context, "runtime_error", main);
@@ -789,7 +893,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
 void emit_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program) {
     emit_impl(input,output,optimize,source_program,false);
 }
-void emit_runtime_object(const ir::Module& input, const std::filesystem::path& output, bool optimize) {
-    emit_impl(input,output,optimize,false,true);
+void emit_runtime_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, const std::string& generation_suffix) {
+    emit_impl(input,output,optimize,false,true,generation_suffix);
 }
 }

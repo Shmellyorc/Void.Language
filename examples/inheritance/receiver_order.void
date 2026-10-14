@@ -1,0 +1,27 @@
+struct base:
+    value: i32
+
+virtual func (b base) read(n: i32) -> i32:
+    return b.value + n
+
+struct derived extends base:
+    own: i32
+
+override func (d derived) read(n: i32) -> i32:
+    return d.own + n
+
+struct holder:
+    root: base
+    other: base
+
+func update(h: holder) -> i32:
+    h.root = h.other
+    var count = 0
+    for count < 256:
+        var garbage = derived()
+        count++
+    return 3
+
+func entry(value: i32) -> i32:
+    var h = holder(root = derived(own = value), other = derived(own = 100))
+    return h.root.read(update(h)) + h.root.read(0)

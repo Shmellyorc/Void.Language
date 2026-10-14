@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cstring>
 #include <limits>
+#include <set>
 #include <stdexcept>
 
 namespace vd {
@@ -158,6 +159,7 @@ void Runtime::allocate_into(void** slot, const TypeLayout& layout) {
     // value. There is no safepoint between allocation and publication.
     poll();
     std::lock_guard lock(mutex_);
+    validate_descriptor(layout);
     *slot = heap_.allocate(layout);
 }
 void Runtime::construct_into(void** slot, const TypeLayout& layout, const void* payload) {
@@ -181,6 +183,7 @@ void Runtime::construct_into(void** slot, const TypeLayout& layout, const void* 
     }
     // Heap::allocate completes every fallible descriptor/map operation. The
     // copy and final root publication cannot throw or invoke user code/GC.
+    validate_descriptor(layout);
     void* object=heap_.allocate(layout);
     std::memcpy(object,payload,layout.size);
     *slot=object;
@@ -245,5 +248,82 @@ void* Runtime::Handle::get() const {
     runtime_.require_managed();
     std::lock_guard lock(runtime_.mutex_);
     return value_;
+}
+}
+
+namespace vd {
+void Runtime::admit_types(std::span<const NominalDescriptor> incoming) {
+    if(current_thread_ && current_thread_->state!=State::native_safe)
+        throw std::logic_error("type admission requires NativeSafe state");
+    if(incoming.empty()) return;
+    TypeCatalog candidates;
+    for(const auto& input:incoming) {
+        if(input.identity.empty() || input.shape.empty() || !input.layout.size || input.layout.descriptor)
+            throw std::invalid_argument("invalid nominal descriptor");
+        auto value=std::make_shared<NominalDescriptor>(input);
+        auto& offsets=value->layout.references;
+        std::sort(offsets.begin(),offsets.end());
+        for(unsigned n=0;n<offsets.size();++n) if(offsets[n]>value->layout.size || value->layout.size-offsets[n]<sizeof(void*) || (n && offsets[n]-offsets[n-1]<sizeof(void*)))
+            throw std::invalid_argument("invalid nominal tracing layout");
+        if(!candidates.emplace(value->identity,std::move(value)).second) throw std::invalid_argument("duplicate nominal descriptor");
+    }
+    for(;;) {
+        std::shared_ptr<const TypeCatalog> snapshot;
+        {std::lock_guard lock(mutex_); if(closing_) throw std::logic_error("runtime is closing"); snapshot=types_;}
+        auto prepared=std::make_shared<TypeCatalog>(snapshot ? *snapshot : TypeCatalog{});
+        for(const auto& [key,value]:candidates) {
+            auto [found,added]=prepared->emplace(key,value);
+            if(!added) {
+                const auto& a=*found->second;const auto& b=*value;
+                if(a.base!=b.base || a.shape!=b.shape || a.layout.size!=b.layout.size || a.layout.references!=b.layout.references)
+                    throw std::invalid_argument("incompatible nominal descriptor admission");
+            }
+        }
+        for(const auto& [key,value]:*prepared) {
+            std::set<std::string_view> seen{key};auto current=value;
+            while(!current->base.empty()) {
+                auto found=prepared->find(current->base);
+                if(found==prepared->end() || seen.size()>=128 || !seen.insert(current->base).second)
+                    throw std::invalid_argument("missing, recursive or excessive nominal ancestry");
+                const auto& parent=found->second;
+                if(current->layout.size<parent->layout.size || !std::includes(current->layout.references.begin(),current->layout.references.end(),parent->layout.references.begin(),parent->layout.references.end()))
+                    throw std::invalid_argument("incompatible base payload prefix");
+                current=parent;
+            }
+        }
+        {std::lock_guard lock(mutex_);
+            if(closing_) throw std::logic_error("runtime is closing");
+            if(types_!=snapshot) continue;
+            types_=std::move(prepared); // All allocations/validation precede publication.
+            return;
+        }
+    }
+}
+std::shared_ptr<const NominalDescriptor> Runtime::descriptor(std::string_view key) const {
+    std::lock_guard lock(mutex_);
+    if(!types_) throw std::invalid_argument("nominal type is not admitted");
+    auto found=types_->find(key);
+    if(found==types_->end()) throw std::invalid_argument("nominal type is not admitted");
+    return found->second;
+}
+std::int64_t Runtime::dynamic_type(void* object,std::span<const char* const> catalog) const {
+    require_managed();
+    std::lock_guard lock(mutex_);
+    const auto key=heap_.nominal_identity(object);
+    if(key.empty()) return -1;
+    auto found=std::lower_bound(catalog.begin(),catalog.end(),key,[](const char* a,std::string_view b){return std::string_view(a)<b;});
+    if(found==catalog.end() || std::string_view(*found)!=key) return -1;
+    return found-catalog.begin();
+}
+}
+
+namespace vd {
+void Runtime::validate_descriptor(const TypeLayout& layout) const {
+    if(!layout.descriptor) return;
+    if(!types_) throw std::invalid_argument("unadmitted nominal layout");
+    const auto& descriptor=*layout.descriptor;
+    auto found=types_->find(descriptor.identity);
+    if(found==types_->end() || found->second!=layout.descriptor || descriptor.layout.size!=layout.size || descriptor.layout.references!=layout.references)
+        throw std::invalid_argument("nominal layout does not match admitted descriptor");
 }
 }

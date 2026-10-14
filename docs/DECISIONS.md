@@ -704,3 +704,43 @@ without forwarding methods, new IR/LLVM representation or runtime changes.
 Shared analysis records using markers and implicit dependencies; marker changes
 require restart. Exact ownership/imports, C1/S1/P3/P4 and RV1–RV7 are preserved.
 See COMPOSITION.md and the approved COMPOSITION_PROPOSAL.md.
+
+
+## Phase 20 — managed inheritance and guarded virtual dispatch (I1–I8)
+
+The owner approved I1–I8 in INHERITANCE_PROPOSAL.md. One managed base, exact
+nominal equality with explicit ancestor assignability, original member ownership,
+no inherited hiding/protected access, exact override signatures/visibility and
+conservative family-wide reference effects extend the existing semantic model.
+Ancestry real members outrank using; direct component promotion remains one-hop.
+
+Physical storage embeds the full base payload at offset zero. Shared logical paths
+map to actual nested indexes for fields, roots, stages, tracing and debug metadata.
+Cached layout validation bounds combined inheritance/inline depth at 128, including
+base tail padding and expanded-field limits. Legacy untyped IR proofs remain;
+registered nominal source objects require complete construction, and every virtual
+receiver must appear in its generation catalog.
+
+A derived init has a mandatory first super.init prelude even for defaultable bases.
+Caller/prelude snapshots precede oldest-base defaults/body, then each child phase.
+One identity-free stage commits once as its most-derived type. Base completion uses
+may/must dataflow, rejecting repeated backedge initialization and prefix publication
+through aliases. Safe bounded prefix helpers are supported; unfinished virtual calls,
+identity/escape/explicit casts/rebinding/self-links remain rejected. C1/S1/P3/P4 and
+RV1–RV7 are preserved, including all-fields-valid-before-value-init.
+
+The existing runtime interns immutable exact-key descriptors via transactional
+NativeSafe admission. Heap records retain only code-independent identity/ancestry/
+tracing metadata. Generation-owned guarded switch functions query the heap and call
+verified implementations after releasing its short metadata lock. No object vptr,
+per-method patch cells, hidden mutable AOT ID table or second allocator/root system
+is introduced. AOT admits the same records before Managed entry; user entry behavior
+is unchanged. Internal AOT symbol suffixes let the native harness link two versions
+and prove new-code dispatch on an old object without inventing a public managed ABI.
+
+Whole-generation leases remain authoritative. Hierarchy/layout/slot/signature/
+access/effect/default/construction changes require restart; compatible body-only
+override changes can reload. Constructor dependency closure includes all possible
+completed-child virtual targets. Shared analysis records bases/slots/owners and
+implicit target edges; navigation uses static/original declarations. Deferred public
+features and acceptance evidence are in INHERITANCE.md and WORK_LOG.md.

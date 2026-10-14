@@ -1,3 +1,4 @@
+#include "../managed/catalog.hpp"
 #include "probe.hpp"
 #include <cstring>
 #include <iostream>
@@ -7,7 +8,7 @@ extern "C" std::int32_t __vd_2f6d61696e2e766f69643a3a656e747279(std::int32_t,vd:
 int main() {
     using namespace managed_test;
     try {
-        vd::Runtime runtime(1);
+        vd::Runtime runtime(1); managed_test::admit(runtime);
         for (bool capture:{false,true}) {
             Probe p; p.collect_before=capture; p.capture=capture;
             vd::Runtime::Attachment attachment(runtime); vd::Runtime::Managed managed(runtime);
@@ -36,10 +37,10 @@ int main() {
         }
         {
             vd::RuntimeFailure failure; std::int32_t result=-1;
-            { AllocationFailure inject(0); result=vd_runtime_entry(__vd_2f6d61696e2e766f69643a3a656e747279,10,&failure); }
+            { AllocationFailure inject(0); result=vd_runtime_entry_typed(__vd_2f6d61696e2e766f69643a3a656e747279,10,&failure,__vd_types,__vd_type_count); }
             require(result==0 && failure.message && std::strstr(failure.message,"Runtime startup allocation failed"),"source AOT bootstrap allocation protection");
             failure={};
-            require(vd_runtime_entry(__vd_2f6d61696e2e766f69643a3a656e747279,10,&failure)==23 && !failure.message,"source AOT bootstrap attachment/shutdown recovery");
+            require(vd_runtime_entry_typed(__vd_2f6d61696e2e766f69643a3a656e747279,10,&failure,__vd_types,__vd_type_count)==23 && !failure.message,"source AOT bootstrap attachment/shutdown recovery");
         }
         std::cout << "parsed source AOT: roots, cyclic graphs, complete publication, automatic/forced GC and startup/failure recovery passed\n";
     } catch (const std::exception& e) { std::cerr<<e.what()<<'\n'; return 1; }

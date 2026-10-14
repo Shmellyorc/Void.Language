@@ -1,5 +1,7 @@
 # First real source compiler
 
+Phase 20 adds managed single inheritance, identity-preserving ancestor conversions, explicit virtual/override/super dispatch and staged base initialization. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.
+
 Implemented locally on 10 October 2026, using LLVM 19.1.7. LANGUAGE_BIBLE.md
 remains the language-design source of truth; this document describes the working
 subset and explicitly provisional choices. Multi-file compilation is now implemented;
@@ -209,5 +211,6 @@ Owner-approved stored `using name: type` and `using type` composition, one-hop
 member promotion and original embedded receiver mutation are implemented through
 the existing paths. See [COMPOSITION.md](COMPOSITION.md) for exact lookup, access,
 readonly, initialization, tooling and reload behavior. This adds neither subtyping
-nor stateless reuse and does not change C1/S1/P3/P4/RV1–RV7. Inheritance, interfaces,
-virtual dispatch, transitive promotion and has remain deferred.
+nor stateless reuse and does not change C1/S1/P3/P4/RV1–RV7. Phase 20 adds managed
+inheritance and component virtual dispatch as described in INHERITANCE.md. Interfaces,
+transitive promotion and has remain deferred.

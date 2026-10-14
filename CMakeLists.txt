@@ -167,7 +167,7 @@ if(BUILD_TESTING)
   # boundaries, with no production hooks or alternate allocator/code generator.
   add_library(void_managed_test_abi OBJECT src/runtime/abi.cpp)
   target_link_libraries(void_managed_test_abi PRIVATE void_options Threads::Threads)
-  target_compile_definitions(void_managed_test_abi PRIVATE vd_gc_poll=vd_gc_real_poll vd_gc_construct=vd_gc_real_construct vd_gc_frame_enter=vd_gc_real_frame_enter vd_gc_frame_leave=vd_gc_real_frame_leave)
+  target_compile_definitions(void_managed_test_abi PRIVATE vd_gc_poll=vd_gc_real_poll vd_gc_construct=vd_gc_real_construct vd_gc_construct_typed=vd_gc_real_construct_typed vd_gc_frame_enter=vd_gc_real_frame_enter vd_gc_frame_leave=vd_gc_real_frame_leave)
   function(void_managed_source_tests family folder fixture programs)
     add_executable(void_${family}_tests tests/${family}/tests.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
     target_link_libraries(void_${family}_tests PRIVATE void_llvm)
@@ -215,6 +215,17 @@ if(BUILD_TESTING)
   void_managed_source_tests(managed_initialization managed_initialization stress "main;stress;numeric;imports;failure;fail_default;fail_argument;fail_child")
   void_managed_source_tests(reference_values reference_values stress "copies;readonly;initialization;templates;methods;staged;order;imports;required;stress;null_failure")
   void_managed_source_tests(composition composition stress "main;stress;imports;order;staged;receiver_order")
+  void_managed_source_tests(inheritance inheritance stress "main;initialization;stress;order;imports;receiver_order;nested;results;failure")
+  # Two independently lowered generations share exact nominal descriptors.
+  # This remains a same-build native harness, not a source entry/FFI policy.
+  foreach(mode normal optimized)
+    set(reloaded_object "${CMAKE_CURRENT_BINARY_DIR}/inheritance-reloaded-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${reloaded_object}"
+      COMMAND void_inheritance_tests --emit-reload "${PROJECT_SOURCE_DIR}/examples/inheritance/stress.void" "${reloaded_object}" "${mode}"
+      DEPENDS void_inheritance_tests "${PROJECT_SOURCE_DIR}/examples/inheritance/stress.void" VERBATIM)
+    set_source_files_properties("${reloaded_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    target_sources(void_inheritance_aot_${mode} PRIVATE "${reloaded_object}")
+  endforeach()
   add_executable(void_runtime_callbacks tests/runtime/callbacks.cpp)
   target_link_libraries(void_runtime_callbacks PRIVATE void_llvm)
   add_test(NAME runtime_callbacks COMMAND void_runtime_callbacks)

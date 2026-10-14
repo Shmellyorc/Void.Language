@@ -5105,3 +5105,331 @@ none was awaited or used as a substitute for the Windows investigation. The loca
 COFF selection proof is not a Windows execution result. No commit, push, branch or
 remote modification occurred. The correction and local validation are complete
 and ready for owner review/push.
+
+## 13 October 2026 — Phase 20 inheritance/virtual dispatch investigation only
+
+The owner reports Phase 19 LOCKED: Actions run #33, attempt #2 passed all seven
+jobs. This supersedes the preceding pending Windows gate for the CRT correction;
+it is owner-reported hosted evidence, not an independently fetched run in this
+design task. All **47 suites**, the shared native link input and U1–U7 remain intact.
+
+Read canonical Bible Sections 12/12.1/13 and relevant visibility/construction/
+readonly decisions, strategy, composition and Phase 14/16–18 implementation guides,
+GC runtime, decisions, limitations and current work-log evidence. Inspected actual
+Type/ValueType/FieldType/Place/Instruction representations; frontend declaration,
+member lookup, construction and reference-capability analysis; independent IR
+verification; LLVM payload layout, roots, receiver calls, debug metadata, JIT/AOT
+bootstrap and generation ownership; Heap/Runtime descriptors, publication/locks,
+ABI entry helpers, reload leases and shared tooling/navigation comparisons.
+
+Concrete gaps: no base edge/subtyping, inherited field ownership, virtual slot,
+dynamic object identity or descriptor-admission bootstrap. Heap metadata currently
+copies size/reference offsets only. Calls/effects and constructor plans assume one
+nominal callee/field set. The source AOT helper creates Runtime and enters Managed
+without class admission. JIT replacement retains a whole coherent generation and
+reuses Runtime; there is no proven per-method patching/vptr lifetime mechanism.
+These existing facts guide the proposal rather than assuming planned features exist.
+
+Created **INHERITANCE_PROPOSAL.md**, recommendations **I1–I8**, for owner review.
+Recommended architecture: one complete managed identity/payload, full base payload
+at offset zero without tail-padding reuse; original owned logical fields plus one
+shared physical-layout mapper; authority-preserving explicit IR upcasts; immutable
+code-independent runtime nominal/tracing metadata; generation-owned guarded slot
+dispatch functions using the existing direct call/failure/root pipeline. The
+readonly/effect contract conservatively joins all possible overrides. Objects hold
+no method pointers or code-generation leases. Existing NativeCode/resource trackers
+remain authoritative; new entries use new dispatch on old objects while old active
+calls retain their coherent old graph. Exact-key generation catalogs avoid mutable
+per-runtime IDs in shared AOT globals. The design extends existing runtime/IR
+structures, not the heap, tracer or language type system in parallel.
+
+New public decisions are explicitly recommendations, NOT approved/implemented:
+managed upcast/nullability/equality scope; inherited visibility/imports and name
+hiding; exact override signatures and inferred family effects; lookup relative to
+using; mandatory explicit super.init prelude and own derived init for init-bearing
+ancestry; base/default/body order; and rejection of virtual-family calls on staged
+self/aliases. Proposed base-prefix construction views retain no managed identity,
+use bounded existing helper contexts and preserve S1 required-field readiness.
+Every initializer runs once in its phase; one most-derived commit follows success.
+The prelude is clearly flagged as a new owner-level exception to direct-init
+rejection. Completed child objects may dispatch during init; unfinished self may
+not. All C1/S1/P3/P4/RV1–RV7 invariants remain mandatory, with alternatives recorded
+instead of silently fixing new source semantics.
+
+The proposal compares object-held vptrs, stable runtime cells, generation-local
+function tables and guarded switches, plus prefix/flat/separate-object layouts.
+It includes prospective source/results, rejected cases, source/independent IR
+negative tests, descriptor/bootstrap/failure and lease proofs, LSP/reload contracts,
+a cohesive incremental sequence and complete six-Linux/seven-hosted acceptance
+gates after approval. Protected access, downcast/pattern expansion, covariance,
+constructor inheritance, open-world loading, interfaces, value/multiple inheritance,
+transitive promotion and stateless mixins remain outside the recommended slice.
+
+Useful unchanged-baseline checks only (existing builds, no production rebuild):
+
+```sh
+ctest --test-dir build/ci-debug -R '^(composition_source|managed_initialization_source|reference_values_source|reload|lsp_protocol)$' --output-on-failure
+ctest --test-dir build/ci-official-debug -R '^(composition_source|managed_initialization_source|reference_values_source|reload|lsp_protocol)$' --output-on-failure
+ctest --test-dir build/ci-debug -N
+```
+
+Installed LLVM 19.1.7 Debug: **5/5**, 12.00 sec. Official LLVM 19.1.7 Debug:
+**5/5**, 11.58 sec. Inventory: **47 suites**. These prove existing mechanisms still
+pass; they do not prove inheritance/virtual implementation. Logs are under
+build/phase20-investigation/{installed,official}-baseline.log and inventory.log.
+No full build matrix, strict-sanitizer run or GUI packaging rerun was necessary
+for this documentation-only investigation.
+
+A focused target-layout experiment used the official **LLVM 19.1.7 llc**:
+
+```sh
+.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64/bin/llc -mtriple=TRIPLE build/phase20-investigation/layout.ll -o build/phase20-investigation/TRIPLE.s
+```
+
+For x86_64-pc-linux-gnu, x86_64-pc-windows-msvc and aarch64-apple-darwin alike,
+base {i64,i8} size is **16**, flat appended child byte offset is **9**, embedded
+base-prefix child byte offset is **16**. This validates the tail-padding concern
+and motivates the full-prefix recommendation. Initial assembly-value extraction
+read the leading zero in llc's `0+16` expression; the evidence extractor was
+corrected to parse the complete constant, with no production change. Final assembly
+and layout-results.json retain the real emitted constants. Cross-target layout
+emission is NOT Windows/macOS execution or VOID inheritance acceptance.
+
+Documentation/fence/diff checks pass. Only docs/INHERITANCE_PROPOSAL.md and this
+work log changed; compiler/runtime/tests/build/editor/workflows and Bible are
+unchanged. No commit, push, branch or remote modification occurred. Implementation
+is not authorized by this task: STOP for owner review/approval of I1–I8.
+
+## Phase 20 implementation — managed inheritance and explicit dispatch (13 October 2026)
+
+The owner approved I1–I8 after the investigation above. Implemented through the
+existing frontend, nominal model, capability/readiness analysis, shared IR and LLVM
+backend. No commits, pushes, branches or remote changes were made. The seven-job
+workflow, LLVM 19.1.7 pins, RTTI correction, strict sanitizer options and Phase 19
+Windows direct-input CRT correction remain intact.
+
+The source surface includes managed-only single extends, identity-preserving
+ancestor conversions/related equality, exact virtual/override families, direct
+super calls, inherited storage/member ownership and approved using precedence.
+Initializers are not inherited: a derived init has a dedicated first super.init
+prelude. Init-free ancestry keeps named inherited/own fields. One private full stage
+prepares base-to-derived and publishes once. Required-reference readiness, C1 value
+entry validity, readonly leaf capabilities and nonescaping helpers remain binding;
+unfinished virtual dispatch/identity/escape/rebinding and prefix publication reject.
+INHERITANCE.md records the implemented contract; the Bible/decisions and relevant
+implementation guides distinguish it from deferred interfaces/downcasts/etc.
+
+One physical field mapper preserves the complete base payload, including padding,
+for field accesses, root offsets, stage storage, descriptors and debug layout.
+Runtime descriptors own exact nominal keys, ancestry and complete tracing shape,
+with transactional NativeSafe admission. Heap objects contain no code addresses or
+LLVM type/catalog pointers. Generation-owned guarded switch dispatch queries the
+existing heap, releases its short lock, then calls a verified implementation. AOT
+admits the same immutable metadata before Managed entry. No source entry policy,
+second allocator, conservative tracer, forwarding-method subsystem or per-method
+patch mechanism was introduced.
+
+Review strengthened independent invariants with targeted regressions:
+
+- Base completion tracks may/must state across joins, rejecting repeated preludes
+  on backedges. An alias to a Base prefix cannot publish a separate Base identity;
+  final commit must match the owning most-derived stage.
+- Cached layouts cannot bypass the combined inheritance/inline physical depth of
+  128; expanded fields remain capped at 65536. Declaration-order-independent and
+  mixed inheritance/value-depth source cases diagnose before LLVM lowering.
+- Every virtual receiver belongs to its nominal catalog; registered nominal source
+  objects cannot bypass complete construction through legacy raw allocation.
+  Legacy untyped experimental IR proofs remain unchanged and untyped receivers
+  cannot authorize virtual dispatch.
+- Private construction places now have abstract compile-time authority/provenance
+  facts, while reference_paths still excludes unfinished parents from GC roots.
+  A forged readonly private alias passed to an inferred-reader getter could
+  otherwise lose readonly child provenance in independent IR analysis. The new
+  negative requires a readonly rejection; a positive readonly getter remains usable.
+  Constructor preparation retains its distinct mutable-storage role; ordinary
+  nonmutating helper effects remain independently checked.
+- Typed descriptor errors use protected failure outputs, while legacy invalid-root/
+  invalid-state ABI invariant handling remains fatal as before. Descriptor OOM,
+  conflicts, exact interning, invalid ancestry and failed-batch rollback are tested.
+- Contextual super recognition preserves existing variable/module bindings,
+  including a qualified imported module named super; no global reserved-word policy
+  was silently imposed.
+
+The four new inheritance suites bring inventory from 47 to 51. They cover source
+positives/negatives, forged IR, padding/empty classes, nested reference values,
+readonly/copy semantics, exact signatures, constructor order and failure recovery,
+selected receiver snapshots across allocating arguments, imports, LSP navigation,
+restart contracts and old active calls retaining their virtual graph during reload.
+An imported factory separates the caller from the dynamic override's owner module.
+
+GC tests retain a derived object and its derived-only child through sole Base
+carriers after factory return, with no masking host roots. Budget-one and forced
+collections exercise cycles, loops, argument/return homes and failure cleanup.
+Allocating JIT generations retire while retained object descriptors remain usable.
+The native harness links two independently emitted generations using the shared
+lowerer's symbol suffix, then calls the NEW override on an OLD object. It removes
+the host handle after the new Base parameter roots register, forces deterministic
+collection overlap, and requires 111 (old override: 110; base body: 100). This is a
+private same-build test ABI, not a public managed-reference/aggregate C ABI.
+
+Focused execution returned 108 in normal/O2 JIT for main, 92 for initialization,
+123602 for argument/base/body order, and 113 for selected receiver preservation.
+The focused nine-suite Debug pass included frontend, managed_initialization_source,
+reference_values_source, composition_source, inheritance_source, both inheritance
+AOT modes, runtime_generated and native lsp_protocol: 9/9, 12.34 seconds.
+
+Exploratory builds preceded final acceptance. One early CLI attempt lacked newly
+added executables while CMake/test inputs were still being edited. One exploratory
+official-sanitizer link lacked the subsequently added second-generation objects;
+a fresh configure included them. These were development sequencing issues, not
+accepted verification. Preliminary/intermediate/candidate logs are retained under
+build/phase20-verification. Final acceptance below is tied to frozen source hashes;
+late changed inputs were explicitly rebuilt rather than relying on stale objects.
+
+The first 1 MiB Debug repetition exposed a genuine semantic-stack regression in
+both SDKs: frontend passed earlier groups and crashed in receiver methods. A gdb
+backtrace showed repeated expression → expression_impl → method_expression frames
+while checking the existing 400-call resource-limit case. Phase 20's contextual
+upcast rewrite reserved an Expr temporary in every guarded recursive frame, and
+parent-only handling enlarged ordinary method frames. Moved contextual rewrites
+and parent-only handling into focused helpers, keeping the 256-depth guard and
+all existing recovery assertions unchanged. No limit, test or stack requirement
+was relaxed. The failed logs/backtrace remain in build/phase20-verification; the
+acceptance matrix and stack repetitions below were rerun after this correction.
+
+### Final acceptance evidence
+
+Acceptance was rerun after the semantic-stack correction against 260 frozen
+implementation/test/editor inputs (SHA-256 inventory in
+build/phase20-verification/frozen-source.json). All hashes remained unchanged
+through the final matrix, stress, stack, editor and measurement checks. All six
+inventories contain the original 47 suites plus four inheritance suites: 51.
+
+Both SDKs report LLVM 19.1.7 and contain LLJIT.h, libLLVMOrcJIT.a and
+LLVMConfig.cmake. Installed SDK: /usr/lib/llvm-19, RTTI YES; complete official
+archive: .toolchains/ci-investigation/LLVM-19.1.7-Linux-X64, RTTI NO. Configured
+Clang/LLD 19.1.7 and existing target-wide RTTI matching are preserved. Debug and
+Release use their named build types; sanitizer trees use RelWithDebInfo with
+VOID_SANITIZERS=ON. No sanitizer exclusions or LLVM optimization changes were
+introduced. Vptr instrumentation remains dependent on the SDK's RTTI ABI as
+already established in Phase 5.
+
+Final configure/build/CTest commands for each configured tree:
+
+```sh
+cmake -S . -B build/<tree>
+cmake --build build/<tree> -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+ctest --test-dir build/<tree> --output-on-failure -j4
+```
+
+The existing CMake caches retain the exact SDK/compiler/linker paths; fresh-build
+configuration follows the documented Linux SDK instructions. Two independent
+trees ran concurrently, never overlapping CTest executions within a tree. Strict
+LeakSanitizer runs used untraced execution because ptrace/sandbox tracing prevents
+LSan from functioning; leak detection remained enabled.
+
+| Configuration | Final CTest | Test elapsed |
+| --- | --- | --- |
+| ci-debug | 51/51 | 67.68 s |
+| ci-release | 51/51 | 21.96 s |
+| ci-sanitizers | 51/51 | 88.94 s |
+| ci-official-debug | 51/51 | 60.45 s |
+| ci-official-release | 51/51 | 21.64 s |
+| ci-official-san | 51/51 | 82.94 s |
+
+This is 306 passing final suite executions. Every configure/build also returned
+zero. Normal/O2 ORC, separately linked AOT, precise GC, callbacks, timeout/no-sweep,
+failure cleanup, reload, diagnostic/tooling and all prior architectural assertions
+remain in those suites. The inheritance CLI exercises nine source programs across
+three inputs, normal/O2 and JIT/native AOT: 104 successful comparisons and four
+expected constructor failures per configuration. Failures require exit 1, division
+by zero and both base/derived initializer frames. Virtual result coverage includes
+bool, f64, nullable references and reference-containing aggregate returns.
+
+Targeted stress repeated eleven suites three times per configuration:
+runtime_generated, runtime_callbacks, runtime_invariants, runtime_failures,
+managed_source, managed_initialization_source, reference_values_source,
+composition_source, inheritance_source and both inheritance AOT suites. Command:
+`ctest --test-dir build/<tree> --output-on-failure -j2 -R '<anchored eleven-suite expression>' --repeat until-fail:3`.
+The exact expression/commands are in build/phase20-verification/stress/results.json.
+Strict sanitizer/leak settings were identical to the full matrix.
+
+| Configuration | Stress executions | Elapsed |
+| --- | --- | --- |
+| ci-debug | 33/33 | 30.53 s |
+| ci-release | 33/33 | 19.87 s |
+| ci-sanitizers | 33/33 | 35.98 s |
+| ci-official-debug | 33/33 | 28.43 s |
+| ci-official-release | 33/33 | 16.72 s |
+| ci-official-san | 33/33 | 31.46 s |
+
+All 198 repetitions passed, including deterministic rendezvous, generation/root
+handoffs, failures/recovery and sole-carrier collection proofs. Tests keep their
+existing strict overlap/timeout assertions; no sleeps or larger workloads replace
+synchronization.
+
+Both Debug SDKs ran frontend, managed_initialization_source,
+reference_values_source, composition_source and inheritance_source three times
+under a 1,048,576-byte soft/hard stack limit, with CTest -j2. Installed: 15/15,
+43.94 s; official: 15/15, 37.58 s. This is 30 passing executions, preserving the
+existing large SCC, expanded layouts, combined depth and 400-method-chain diagnostic
+recovery checks. The focused corrected 1 MiB frontend/inheritance run also passed
+2/2 in 9.28 s before final matrix acceptance.
+
+Editor verification used Node 24.19.0/npm 11.6.2:
+
+- `npm test`: typecheck/build and unit test entry passed; a direct run of
+  out/test/config.test.js confirms all four individual tests passed, including
+  contextual keyword colors, indentation and existing Windows path assertions.
+- `npm run package`: passed; dist/void-language-0.1.0.vsix contains 8 files,
+  145.51 KB. The existing large-bundle advisory remains, without a packaging error.
+- `VOIDLS_PATH=<repo>/build/ci-debug/voidls VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:host`:
+  real VS Code 1.141.0 passed against the corrected native server. Normal,
+  restricted-trust and multi-root scenarios passed; unsaved diagnostics/repair,
+  navigation/stale-query checks, Unicode paths, restart/configuration/deactivation,
+  two real child-process kills and strict notification counts remain exercised.
+  Actual GUI execution required access outside the GUI sandbox. Native LSP protocol
+  and positions tests also passed in every CTest configuration. VSCodium was not
+  installed and was not claimed as verified.
+
+Focused preliminary dispatch measurement ran only after other validation work
+finished, on Linux x86_64 / AMD Ryzen 7 1700X, using both Release builds:
+`build/<release-tree>/void_inheritance_tests --measure <repo>`.
+The same source, storage, loop count and result are used for direct and virtual
+branches. Each branch executes 100,000 calls, with three warmups and seven timed
+samples; all invocations require result 1,700,000. Values below are median elapsed
+microseconds for the whole invocation (including required runtime entry/poll work),
+not isolated instruction latency or a production benchmark.
+
+| SDK build | Lowering | Direct median µs | Virtual median µs |
+| --- | --- | --- | --- |
+| ci-release | normal | 11031 | 16143.9 |
+| ci-release | O2 | 10763.9 | 16175.8 |
+| ci-official-release | normal | 12566.5 | 17732.9 |
+| ci-official-release | O2 | 13117.5 | 17274.7 |
+
+Guarded virtual dispatch incurs the expected exact-type query/selection overhead
+in this fixture. No timing threshold, production performance claim or correctness
+relaxation was introduced. JSON/log samples remain in build/phase20-verification.
+
+Final native demonstration: main(10)=108, initialization(10)=92,
+order(10)=123602, receiver_order(10)=113, imported factory(10)=13 and polymorphic
+results(10)=28 through real source in normal/O2 JIT and native linked AOT. The native
+cross-generation harness requires new-code dispatch on an old object to return 111,
+with only the new Base parameter roots retaining the old derived object and child.
+
+`git diff --check` passed; the seven-runner workflow and LLVM/RTTI/sanitizer policies
+are unchanged. The shared generated-executable family still compiles native_link.cpp
+as a direct input under the configured Windows CRT policy. No commits, pushes,
+branches or remote modifications were made.
+
+Phase 20 is ready for owner review and the seven hosted jobs, not yet hosted-verified.
+Windows Debug/Release and macOS ARM64 Debug/Release remain unverified locally; the
+hosted Ubuntu Debug/Release/Sanitizers jobs must also validate the pushed revision.
+Linux results do not prove those target layouts/toolchains. The experimental runtime
+is not presented as production-ready. Interfaces, source downcasts/type patterns,
+protected access, hiding, covariance, abstract/final, open-world loading, implicit
+constructor chaining and external managed ABI remain outside this phase. After
+hosted acceptance, structural interfaces are a separate design/approval task.

@@ -111,7 +111,7 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                             value=replaced_facts(std::move(value),field,values[i.arguments[field]]);
                         join_facts(value,reference_facts(i.type));
                         break;
-                    case Op::convert: value=values[i.a];join_facts(value,reference_facts(i.type));break;
+                    case Op::convert: case Op::upcast: case Op::stage_prefix: value=values[i.a];join_facts(value,reference_facts(i.type));break;
                     case Op::gc_construct:
                         for(auto argument:i.arguments) retain(values[argument]);
                         break;
@@ -121,10 +121,13 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                             if (found->second.readonly) fail("write through readonly reference");
                         }
                         retain(values[i.b]); value={}; break;
-                    case Op::call: {
+                    case Op::call: case Op::virtual_call: case Op::base_init: {
+                        if(i.op==Op::base_init && i.callee.empty()) { for(auto argument:i.arguments) retain(values[argument]); break; }
                         auto found=indexes.find(i.callee);
                         if (found==indexes.end()) break; // Existing trusted scalar ABI.
-                        const auto& target=module.functions[found->second]; const auto& effects=summaries[found->second];
+                        const auto& target=module.functions[found->second]; auto effects=summaries[found->second];
+                        if(i.op==Op::virtual_call) for(unsigned n=0;n<module.functions.size();++n)
+                            if(module.functions[n].virtual_slot==target.virtual_slot) join_effects(effects,summaries[n]);
                         std::vector<ReferenceFacts> arguments;
                         Type receiver_type; bool inline_place=false;
                         std::optional<ReferenceFact> heap_owner;
@@ -190,7 +193,7 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
         } while(local_changed);
         if(f.receiver && f.parameters[0].kind==Type::aggregate)
             changed|=join_facts(summary.receiver_after,locals[0]);
-        if(f.receiver && f.parameters[0].kind==Type::managed_ref && !f.receiver_mutates)
+        if(f.receiver && !f.initializer && f.parameters[0].kind==Type::managed_ref && !f.receiver_mutates)
             for(const auto& origin:summary.mutations) if(origin.parameter==0) fail("non-mutating receiver has a referent mutation effect");
         return changed;
     };

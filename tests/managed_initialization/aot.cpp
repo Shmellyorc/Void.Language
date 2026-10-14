@@ -1,3 +1,4 @@
+#include "../managed/catalog.hpp"
 #include "../managed/probe.hpp"
 #include <cstring>
 #include <iostream>
@@ -5,7 +6,7 @@ extern "C" std::int32_t __vd_2f7374726573732e766f69643a3a656e747279(std::int32_t
 int main() {
     using namespace managed_test;
     try {
-        vd::Runtime runtime(1);
+        vd::Runtime runtime(1); managed_test::admit(runtime);
         for(bool forced:{false,true}) {
             Probe p; p.inspect_roots=true; p.capture=true; p.collect_before=forced; p.capture_at=forced ? 303 : 1;
             bool body_completed=forced;
@@ -27,9 +28,9 @@ int main() {
             failure={};require(__vd_2f7374726573732e766f69643a3a656e747279(10,&failure)==246 && !failure.message,"native constructor recovery");
         }
         vd::RuntimeFailure failure;std::int32_t result=-1;
-        {AllocationFailure fault(0);result=vd_runtime_entry(__vd_2f7374726573732e766f69643a3a656e747279,10,&failure);}
+        {AllocationFailure fault(0);result=vd_runtime_entry_typed(__vd_2f7374726573732e766f69643a3a656e747279,10,&failure,__vd_types,__vd_type_count);}
         require(result==0 && failure.message,"native constructor bootstrap failure");failure={};
-        require(vd_runtime_entry(__vd_2f7374726573732e766f69643a3a656e747279,10,&failure)==246 && !failure.message,"native constructor bootstrap recovery");
+        require(vd_runtime_entry_typed(__vd_2f7374726573732e766f69643a3a656e747279,10,&failure,__vd_types,__vd_type_count)==246 && !failure.message,"native constructor bootstrap recovery");
         std::cout<<"native managed init: staged roots, commit, GC, failures and bootstrap passed\n";
     }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
 }

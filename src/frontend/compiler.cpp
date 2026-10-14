@@ -188,7 +188,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     return tokens;
 }
 struct Expr {
-    enum class Kind { literal, name, call, unary, binary, conversion, field, construction, method_call } kind;
+    enum class Kind { literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::string op, qualifier, target;
@@ -203,6 +203,8 @@ struct Expr {
     Type type = Type::none;
     unsigned slot = 0;
     bool receiver_addressable = false, receiver_readonly = false, implicit = false;
+    std::string virtual_slot;
+    bool super_call = false;
     Expr(Kind k, Token t) : kind(k), token(std::move(t)) {}
 };
 struct Statement {
@@ -241,9 +243,14 @@ struct Function {
     std::vector<Parameter> parameters;
     std::optional<Parameter> receiver;
     bool receiver_mutates = false, initializer = false;
+    bool virtual_method = false, overriding = false;
+    std::string virtual_slot;
+    std::unique_ptr<Expr> base_prelude;
     std::string body_syntax, initialization_contract, capability_contract;
-    ir::ReferenceEffects reference_effects;
+    ir::ReferenceEffects reference_effects, virtual_effects;
+    bool virtual_mutates=false;
     std::vector<std::unique_ptr<Expr>> initialization_defaults;
+    ir::ConstantValue initialization_value;
     Type result = Type::none;
     std::vector<Statement> body;
     std::vector<Type> locals;
@@ -257,13 +264,17 @@ struct Constant {
     std::uint64_t value = 0;
     ir::ConstantValue aggregate_value;
 };
+struct Unit;
 struct Structure {
     Token token;
     std::shared_ptr<ir::ValueType> definition;
     std::string visibility = "public";
     std::vector<Statement> fields;
+    std::optional<Type> base_type;
+    Token base_token{TokenKind::name,"",0};
+    std::vector<std::pair<Unit*,Statement*>> effective_fields;
     ir::ConstantValue defaults;
-    unsigned layout_state = 0, default_state = 0;
+    unsigned layout_state = 0, default_state = 0, layout_depth = 1;
     std::size_t expanded_fields = 0;
     Function* initializer = nullptr;
 };
@@ -312,7 +323,7 @@ class Parser {
         }
         bool line_start = p == 0 || tokens[std::min(p, tokens.size()) - 1].kind == TokenKind::newline;
         while (peek().kind != TokenKind::end) {
-            if (declaration && current_depth == 0 && line_start && (at("func") || at("const") || at("value") || at("use") || at("private") || at("public") || at("internal"))) return;
+            if (declaration && current_depth == 0 && line_start && (at("func") || at("const") || at("value") || at("struct") || at("virtual") || at("override") || at("use") || at("private") || at("public") || at("internal"))) return;
             if (!declaration && current_depth <= baseline) {
                 if (peek().kind == TokenKind::dedent) return;
                 if (line_start && p > start) return;
@@ -535,6 +546,7 @@ public:
             if (value_declaration || at("struct")) {
                 need("struct"); Structure structure; structure.token = name(); structure.visibility = f.visibility;
                 structure.definition = std::make_shared<ir::ValueType>(); structure.definition->name = structure.token.text; structure.definition->managed = !value_declaration;
+                if (accept("extends")) { structure.base_token=peek(); structure.base_type=type(); }
                 need(":"); newline();
                 bool fields=accept("<indent>");
                 if (!fields && !structure.definition->managed) need("<indent>");
@@ -556,6 +568,8 @@ public:
                 }
                 if (fields) need("<dedent>"); unit.structures.push_back(std::move(structure)); continue;
             }
+            f.virtual_method=accept("virtual");
+            f.overriding=!f.virtual_method && accept("override");
             need("func");
             if (accept("(")) {
                 auto receiver = name(); auto receiver_type = type(); need(")");
@@ -762,7 +776,8 @@ class Semantics {
         return false;
     }
     std::optional<Member> direct_member(Type t,const Token& token) {
-        for (unsigned n=0;n<t.definition->fields.size();++n)
+        auto base=t.definition->base.lock();
+        for (unsigned n=base ? static_cast<unsigned>(base->fields.size()) : 0;n<t.definition->fields.size();++n)
             if (t.definition->fields[n].name==token.text) return Member{{n},nullptr};
         if (auto* f=direct_method(t,token)) return Member{{},f};
         return {};
@@ -773,23 +788,29 @@ class Semantics {
         if (t.kind!=Type::aggregate && t.kind!=Type::managed_ref)
             error(source,token,calling ? Code::receiver : Code::type_mismatch,"Member access requires a struct.");
         auto visibility=[&] { error(source,token,Code::visibility,"Member '"+token.text+"' is not accessible from this module.","Import its owning module and use a public method."); };
-        if (auto found=direct_member(t,token)) {
-            if (found->function && !accessible(*found->function)) visibility();
-            return *found;
+        // All real fields/methods on the static ancestry outrank composition.
+        for (unsigned n=0;n<t.definition->fields.size();++n)
+            if (t.definition->fields[n].name==token.text) return Member{{n},nullptr};
+        for (auto current=t.definition;current;current=current->base.lock()) {
+            if (auto* f=direct_method(Type(current,t.kind),token)) {
+                if (!accessible(*f)) visibility();
+                return Member{{},f};
+            }
         }
         auto [owner,structure]=owned_structure(t);
         std::vector<Member> candidates; std::vector<RelatedLocation> related;
         std::string routes; bool hidden=false;
-        for (unsigned n=0;n<structure->fields.size();++n) if (structure->fields[n].using_field) {
+        for (unsigned n=0;n<structure->effective_fields.size();++n) if (structure->effective_fields[n].second->using_field) {
+            auto& embedded=*structure->effective_fields[n].second; auto& embedded_owner=*structure->effective_fields[n].first;
             auto child=ir::field_type(t,n);
             if (auto found=direct_member(child,token)) {
                 if (found->function && !accessible(*found->function)) { hidden=true; continue; }
                 found->path.insert(found->path.begin(),n); candidates.push_back(*found);
-                auto route=structure->fields[n].name+"."+token.text;
+                auto route=embedded.name+"."+token.text;
                 if (!routes.empty()) routes+=", "; routes+=route;
-                related.push_back({span(owner->source,structure->fields[n].token),"Candidate through '"+route+"'."});
+                related.push_back({span(embedded_owner.source,embedded.token),"Candidate through '"+route+"'."});
                 auto [child_owner,child_structure]=owned_structure(child);
-                const auto& declaration=found->function ? found->function->token : child_structure->fields.at(found->path.back()).token;
+                const auto& declaration=found->function ? found->function->token : child_structure->effective_fields.at(found->path.back()).second->token;
                 related.push_back({span(child_owner->source,declaration),"Promoted member declared here."});
             }
         }
@@ -803,7 +824,7 @@ class Semantics {
         auto projected=std::make_unique<Expr>(Expr::Kind::field,written);
         projected->token.text=t.definition->fields[index].name;
         projected->slot=index; projected->type=ir::field_type(t,index);
-        projected->target=t.definition->identity+"::field::"+projected->token.text;
+        projected->target=t.definition->fields[index].owner+"::field::"+projected->token.text;
         projected->implicit=true; projected->parts.push_back(std::move(base)); base=std::move(projected);
     }
     bool module_call(const Expr& e) {
@@ -813,7 +834,27 @@ class Semantics {
         // Retain the established unknown-qualifier diagnostics for a.b().
         return !constant(base).second;
     }
+    // Keep parent-only temporaries off recursively nested ordinary call frames.
+    Type super_expression(Expr& e) {
+        if (!current || !current->receiver || current->receiver->type.definition->base.expired())
+            error(source,e.parts[0]->token,Code::receiver,"super requires a method on a derived managed struct.");
+        if (e.token.text=="init") error(source,e.token,Code::initializer,"super.init(...) is permitted only as the first derived initializer prelude.");
+        if (e.token.text=="deinit") error(source,e.token,Code::initializer_deferred,"Resource lifecycle deinit is not implemented.");
+        const Function* selected=nullptr;
+        for (auto base=current->receiver->type.definition->base.lock();base && !selected;base=base->base.lock()) selected=direct_method(Type(base,Type::managed_ref),e.token);
+        if (!selected) error(source,e.token,Code::unknown_method,"No real parent method named '"+e.token.text+"'; super does not promote using members.");
+        if (!accessible(*selected)) error(source,e.token,Code::visibility,"Parent method is not accessible from this module.");
+        e.parts[0]=std::make_unique<Expr>(Expr::Kind::name,current->receiver->token); expression(*e.parts[0]); e.parts[0]->implicit=true;
+        e.target=selected->symbol; e.super_call=true; e.virtual_slot=selected->virtual_slot;
+        e.receiver_addressable=true; e.slot=current->receiver->slot;
+        auto original=std::move(e.parts[0]);
+        e.parts[0]=std::make_unique<Expr>(Expr::Kind::conversion,original->token); e.parts[0]->op="upcast"; e.parts[0]->implicit=true; e.parts[0]->type=selected->receiver->type; e.parts[0]->parts.push_back(std::move(original));
+        if (std::any_of(e.names.begin(),e.names.end(),[](const auto& t){return !t.text.empty();})) error(source,e.token,Code::argument_count,"Use positional method arguments.");
+        return e.type=call_arguments(e,*selected,1);
+    }
     Type method_expression(Expr& e, std::optional<Type> expected) {
+        bool super=e.parts[0]->kind==Expr::Kind::name && e.parts[0]->token.text=="super" && !lookup("super") && !unit.qualifiers.contains("super") && !unit.failed_qualifiers.contains("super");
+        if (super) return super_expression(e);
         if ((e.token.text == "init" || e.token.text == "deinit") && !(e.parts[0]->kind==Expr::Kind::name && unit.qualifiers.contains(e.parts[0]->token.text)))
             error(source,e.token,Code::initializer_deferred,"Lifecycle methods cannot be called directly; construct a new value using its type.");
         if (module_call(e)) {
@@ -837,7 +878,7 @@ class Semantics {
             catch (const CompilationError&) { check_arguments(); throw; }
             catch (const Poison&) { check_arguments(); throw; }
         }();
-        e.target = target.symbol;
+        e.target = target.symbol; e.virtual_slot=target.virtual_slot;
         // Record the resolved place now, then check its permission after the
         // complete method graph has reached its receiver-effect fixed point.
         const Expr* base = e.parts[0].get(); std::vector<unsigned> path;
@@ -857,6 +898,11 @@ class Semantics {
         }
         if (std::any_of(e.names.begin(),e.names.end(),[](const auto& t) { return !t.text.empty(); }))
             error(source,e.token,Code::argument_count,"Named method arguments are not implemented; use positional arguments.");
+        if (receiver.kind==Type::managed_ref && Type::key(receiver)!=Type::key(target.receiver->type)) {
+            auto original=std::move(e.parts[0]);
+            e.parts[0]=std::make_unique<Expr>(Expr::Kind::conversion,original->token); e.parts[0]->op="upcast"; e.parts[0]->implicit=true;
+            e.parts[0]->type=target.receiver->type; e.parts[0]->type.readonly=receiver.readonly; e.parts[0]->parts.push_back(std::move(original));
+        }
         (void)expected;
         return e.type = call_arguments(e,target,1);
     }
@@ -901,18 +947,20 @@ class Semantics {
             if (structure.definition == type.definition) return {owner.get(),&structure};
         throw std::logic_error("Missing owned value type");
     }
-    void construction_fields(Expr& e, Unit& owner, Structure& structure, bool runtime, bool initializer_declaration = false) {
+    void construction_fields(Expr& e, Unit&, Structure& structure, bool runtime, bool initializer_declaration = false) {
         Depth guard(diagnostics.semantic_depth(),source,e.token,128);
-        for (unsigned n=0;n<structure.fields.size();++n) {
+        for (unsigned n=0;n<structure.effective_fields.size();++n) {
+            if (initializer_declaration && structure.base_type && n<structure.base_type->definition->fields.size()) continue;
             if (!e.initializer.empty() || std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end()) {
-                const auto& field = structure.fields[n];
+                const auto& field = *structure.effective_fields[n].second;
+                auto& field_owner=*structure.effective_fields[n].first;
                 if (field.expression || field.annotation->kind != Type::aggregate) continue;
                 auto [child_owner,child] = owned_structure(*field.annotation);
                 auto value = std::make_unique<Expr>(Expr::Kind::construction,initializer_declaration ? field.token : e.token); value->slot = n;
-                try { construction(*value,*child_owner,*child,runtime,owner); }
+                try { construction(*value,*child_owner,*child,runtime,field_owner); }
                 catch (CompilationError& failure) {
                     auto errors = failure.diagnostics();
-                    for (auto& d : errors) d.related.push_back({span(owner.source,field.token),"Default construction required for this field."});
+                    for (auto& d : errors) d.related.push_back({span(field_owner.source,field.token),"Default construction required for this field."});
                     throw CompilationError(std::move(errors));
                 }
                 e.omitted.push_back(std::move(value));
@@ -946,16 +994,17 @@ class Semantics {
             }
             if (invalid) throw Poison{};
         }
-        if (!structure.initializer) for (unsigned n=0;n<structure.fields.size();++n) {
-            Type t = *structure.fields[n].annotation;
+        if (!structure.initializer) for (unsigned n=0;n<structure.effective_fields.size();++n) {
+            const auto& field=*structure.effective_fields[n].second; auto& field_owner=*structure.effective_fields[n].first;
+            Type t = *field.annotation;
             if (t.kind == Type::managed_ref && !t.nullable && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end())
-                error(source,e.token,Code::argument_count,"A non-nullable reference field requires an explicit value: " + structure.fields[n].name + ".",{},{{span(owner.source,structure.fields[n].token),"Required field declared here."}});
+                error(source,e.token,Code::argument_count,"A non-nullable reference field requires an explicit value: " + field.name + ".",{},{{span(field_owner.source,field.token),"Required field declared here."}});
         }
-        construction_fields(e,owner,structure,runtime);
+        if (!structure.initializer || !structure.definition->managed) construction_fields(e,owner,structure,runtime);
     }
     void expect(Type actual, Type expected, const Token& token) {
         if (actual == error_type || expected == error_type) return;
-        if (actual.kind == Type::managed_ref && expected.kind == Type::managed_ref && Type::key(actual)==Type::key(expected) && (!actual.nullable || expected.nullable)) return;
+        if (actual.kind == Type::managed_ref && expected.kind == Type::managed_ref && ir::subtype(actual,expected) && (!actual.nullable || expected.nullable)) return;
         if (actual != expected) error(source, token, Code::type_mismatch, "Type mismatch: expected " + std::string(ir::type_name(expected)) + ", received " + ir::type_name(actual) + ".", {}, {}, ir::type_name(expected), ir::type_name(actual));
     }
     unsigned declare(const Token& token, Type type, bool readonly = false) {
@@ -1037,10 +1086,20 @@ class Semantics {
         for (auto& part : e.parts) if (decimal(*part)) return true;
         return false;
     }
+    // Apply contextual rewrites only after the recursive handler has returned.
+    Type contextual_conversion(Expr& e, Type type, const std::optional<Type>& expected) {
+        if (expected && type!=error_type && ir::subtype(type,*expected) && (!type.nullable || expected->nullable) && Type::key(type)!=Type::key(*expected)) {
+            auto operand=std::make_unique<Expr>(std::move(e));
+            e=Expr(Expr::Kind::conversion,operand->token); e.op="upcast"; e.implicit=true;
+            e.type=*expected; e.type.readonly=type.readonly; e.parts.push_back(std::move(operand)); type=e.type;
+        }
+        return type;
+    }
     Type expression(Expr& e, std::optional<Type> expected = {}) {
         try {
             Depth guard(diagnostics.semantic_depth(), source, e.token, 256);
             auto type = expression_impl(e, expected);
+            type = contextual_conversion(e,type,expected);
             if (type == error_type) { e.type = error_type; invalid_function = true; }
             return type;
         } catch (const CompilationError& failure) { diagnostics.add(failure); }
@@ -1103,7 +1162,7 @@ class Semantics {
         if (selected.function) error(source,e.token,Code::not_callable,"Method '"+e.token.text+"' requires a call.");
         for (unsigned n=0;n+1<selected.path.size();++n) embedded_receiver(e.parts[0],selected.path[n],e.token);
         auto owner=e.parts[0]->type;
-        e.slot=selected.path.back(); e.target=owner.definition->identity+"::field::"+e.token.text;
+        e.slot=selected.path.back(); e.target=owner.definition->fields[e.slot].owner+"::field::"+e.token.text;
         return e.type=ir::field_type(owner,e.slot);
     }
     Type call_expression(Expr& e) {
@@ -1154,7 +1213,10 @@ class Semantics {
         if (from.kind == Type::managed_ref && target.kind == Type::managed_ref && Type::key(from)==Type::key(target) && !target.nullable) {
             target.readonly=from.readonly; return e.type=target;
         }
-        if (from.kind==Type::managed_ref || target.kind==Type::managed_ref) error(source,e.token,Code::numeric_conversion,"Checked reference conversion requires the same non-nullable nominal target.","Use assignment for nullable injection; inheritance and unrelated reference casts are deferred.");
+        if (ir::subtype(from,target) && (!from.nullable || target.nullable)) {
+            e.op="upcast"; target.readonly=from.readonly; return e.type=target;
+        }
+        if (from.kind==Type::managed_ref || target.kind==Type::managed_ref) error(source,e.token,Code::numeric_conversion,"Checked reference conversion requires the same nominal type or an ancestor without nullability strengthening.","Unwrap nullable references before upcasting; source downcasts and unrelated reference casts are not supported.");
         if (!numeric::number(from) || !numeric::number(target)) error(source,e.token,Code::numeric_conversion,"Numeric as requires numeric source and destination types.");
         return target;
     }
@@ -1181,7 +1243,17 @@ class Semantics {
             expect(left,Type::boolean,e.parts[0]->token); expect(right,Type::boolean,e.parts[1]->token); return e.type = Type::boolean;
         }
         if (e.op != "==" && e.op != "!=" && !numeric::number(left)) expect(left,Type::i32,e.parts[0]->token);
-        if (!(left.kind==Type::managed_ref && right.kind==Type::managed_ref && Type::key(left)==Type::key(right))) expect(right,left,e.token);
+        if ((e.op=="==" || e.op=="!=") && left.kind==Type::managed_ref && right.kind==Type::managed_ref) {
+            auto normalize=[&](std::unique_ptr<Expr>& operand,Type target) {
+                auto original=std::move(operand); target.nullable=original->type.nullable; target.readonly=original->type.readonly;
+                operand=std::make_unique<Expr>(K::conversion,original->token); operand->op="upcast"; operand->type=target; operand->parts.push_back(std::move(original));
+            };
+            if (Type::key(left)!=Type::key(right)) {
+                if (ir::subtype(right,left)) { normalize(e.parts[1],left); right=e.parts[1]->type; }
+                else if (ir::subtype(left,right)) { normalize(e.parts[0],right); left=e.parts[0]->type; }
+                else error(source,e.token,Code::type_mismatch,"Reference equality requires related nominal types or explicit common-base views.");
+            }
+        } else expect(right,left,e.token);
         if (e.op == "==" || e.op == "!=") {
             if (left.kind == Type::aggregate) error(source,e.token,Code::numeric_operator,"Value struct equality is not implemented.");
             if (left == Type::none) error(source,e.token,Code::invalid_value,"Cannot compare a no-result call.");
@@ -1339,7 +1411,7 @@ public:
         }
         Expr plan(Expr::Kind::construction,f.token); plan.initializer=f.symbol;
         construction_fields(plan,*owner,*structure,true,true);
-        f.initialization_defaults=std::move(plan.omitted);
+        f.initialization_defaults=std::move(plan.omitted); f.initialization_value=structure->defaults;
     }
     ir::ConstantValue field_default(Statement& field) {
         auto t = *field.annotation;
@@ -1366,6 +1438,14 @@ public:
             for (auto& p : f.parameters) {
                 try { p.slot = declare(p.token, p.type, p.type.readonly); }
                 catch (const CompilationError& failure) { diagnostics.add(failure); }
+            }
+            if (f.base_prelude) {
+                try {
+                    auto [base_owner,base]=owned_structure(*owned_structure(f.receiver->type).second->base_type);
+                    construction(*f.base_prelude,*base_owner,*base,true,unit);
+                    f.base_prelude->kind=Expr::Kind::base_initialization;
+                } catch (const CompilationError& failure) { diagnostics.add(failure); }
+                  catch (const Poison&) {}
             }
             auto flow = sequence(f.body, false);
             if (f.result != Type::none && (flow & next_flow) && diagnostics.size() == before && !f.parse_failed && !invalid_function)
@@ -1412,14 +1492,21 @@ class Lowering {
         return insert(aggregate,replace_path(child,value,path,depth+1,token),path[depth],token);
     }
     Type expression_type(const Expr& e) const {
-        return e.kind==Expr::Kind::name ? output.locals.at(e.slot) : e.type;
+        if (e.kind==Expr::Kind::name) return output.locals.at(e.slot);
+        auto t=e.type;
+        if (e.kind==Expr::Kind::conversion && e.op=="upcast" && expression_type(*e.parts[0]).construction) t.construction=true;
+        return t;
+    }
+    unsigned view_origin(unsigned value) const {
+        const auto& instruction=output.blocks[*current].instructions.at(value);
+        if (instruction.op==ir::Op::stage_prefix) return view_origin(instruction.a);
+        if (instruction.op!=ir::Op::load) throw std::logic_error("construction snapshot requires a selected view");
+        return output.construction_origins.at(instruction.a);
     }
     unsigned snapshot(unsigned value, Type t, const Token& token) {
         auto slot=static_cast<unsigned>(output.locals.size()); output.locals.push_back(t);
         if (t.construction) {
-            const auto& instruction=output.blocks[*current].instructions.at(value);
-            if (instruction.op!=ir::Op::load) throw std::logic_error("construction snapshot requires a selected view");
-            output.construction_origins[slot]=output.construction_origins.at(instruction.a);
+            output.construction_origins[slot]=view_origin(value);
         }
         emit({ir::Op::store,slot,value},token); return slot;
     }
@@ -1471,6 +1558,7 @@ class Lowering {
     unsigned expression(const Expr& e) {
         using K = Expr::Kind;
         switch (e.kind) {
+        case K::base_initialization: throw std::logic_error("base initialization is a dedicated prelude");
         case K::literal: {
             return constant(e.type,e.type.kind == Type::aggregate ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
         }
@@ -1504,7 +1592,7 @@ class Lowering {
                 ir::Instruction begin{ir::Op::stage_begin,slot}; begin.type=storage_type; initial=emit(begin,e.token);
             } else initial=constant(e.type,e.aggregate_value,e.token);
             emit({ir::Op::store,slot,initial},e.token);
-            for (unsigned field=0;field<e.type.definition->fields.size();++field) {
+            for (unsigned field=0;!staged && field<e.type.definition->fields.size();++field) {
                 std::optional<unsigned> value;
                 if (staged) {
                     Type field_type=e.type.definition->fields[field].type;
@@ -1557,19 +1645,18 @@ class Lowering {
                 auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(expression_type(*arg));
                 auto value = expression(*arg);
                 if (expression_type(*arg).construction) {
-                    const auto& from=output.blocks[*current].instructions.at(value);
-                    output.construction_origins[slot]=output.construction_origins.at(from.a);
+                    output.construction_origins[slot]=view_origin(value);
                 }
                 emit({ir::Op::store, slot, value}, arg->token); slots.push_back(slot);
             }
-            ir::Instruction i{ir::Op::call}; i.callee = e.target; i.receiver = receiver;
+            ir::Instruction i{!e.virtual_slot.empty() && !e.super_call ? ir::Op::virtual_call : ir::Op::call}; i.callee = e.target; i.receiver = receiver;
             if (context) if (auto found=context->calls.find(&e);found!=context->calls.end())
                 i.callee=ir::construction_name(e.target,{found->second.begin(),found->second.end()});
             for (auto slot : slots) i.arguments.push_back(emit({ir::Op::load, slot}, e.token));
             return emit(i, e.token);
         }
         case K::conversion: {
-            auto value = expression(*e.parts[0]); ir::Instruction i{ir::Op::convert,value}; i.type = e.type; return emit(i,e.token);
+            auto value = expression(*e.parts[0]); ir::Instruction i{e.op=="upcast" ? (expression_type(e).construction ? ir::Op::stage_prefix : ir::Op::upcast) : ir::Op::convert,value}; i.type = expression_type(e); return emit(i,e.token);
         }
         case K::unary: {
             auto value = expression(*e.parts[0]);
@@ -1592,6 +1679,27 @@ class Lowering {
         }
         }
         throw std::logic_error("unknown typed expression");
+    }
+    void initialize_base(const Expr& e) {
+        std::vector<unsigned> arguments;
+        for (const auto& part:e.parts) arguments.push_back(snapshot(expression(*part),expression_type(*part),part->token));
+        ir::Instruction call{ir::Op::base_init}; call.type=e.type; call.callee=e.initializer;
+        call.receiver=ir::Place{0,{}};
+        if (!e.initializer.empty()) {
+            call.arguments.resize(arguments.size());
+            for (unsigned n=0;n<arguments.size();++n) call.arguments[e.field_indexes[n]]=emit({ir::Op::load,arguments[n]},e.token);
+        } else {
+            std::vector<unsigned> fields;
+            for (unsigned field=0;field<e.type.definition->fields.size();++field) {
+                std::optional<unsigned> selected;
+                for(unsigned n=0;n<arguments.size();++n) if(e.field_indexes[n]==field) selected=emit({ir::Op::load,arguments[n]},e.token);
+                for(const auto& child:e.omitted) if(child->slot==field) selected=expression(*child);
+                Type t=e.type.definition->fields[field].type;
+                fields.push_back(snapshot(selected ? *selected : constant(t,e.aggregate_value.fields.at(field),e.token),t,e.token));
+            }
+            for(auto field:fields) call.arguments.push_back(emit({ir::Op::load,field},e.token));
+        }
+        emit(call,e.token);
     }
     void sequence(const std::vector<Statement>& body) { for (const auto& s : body) if (current) statement(s); }
     void statement(const Statement& s) {
@@ -1650,6 +1758,8 @@ public:
         context=construction;
         output = {}; output.name = f.symbol; output.source_name = f.token.text; output.source = source.location(f.token.offset);
         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
+        output.virtual_slot=f.virtual_slot; output.overriding=f.overriding; output.visibility=f.visibility;
+        if(f.receiver) output.method_name=f.token.text;
         output.receiver = f.receiver.has_value(); output.receiver_mutates = f.receiver_mutates; output.initializer = f.initializer;
         if (f.receiver) {
             output.source_name = f.receiver->type.definition->name + "::method::" + f.token.text;
@@ -1664,6 +1774,19 @@ public:
             for (const auto& [slot,origin]:context->aliases) output.locals.at(slot).construction=true;
             for (auto index:context->parameters) output.parameters.at(index).construction=true;
             if (!f.initializer) output.name=ir::construction_name(f.symbol,{context->parameters.begin(),context->parameters.end()});
+        }
+        if (f.base_prelude) initialize_base(*f.base_prelude);
+        if (f.initializer && f.receiver->type.kind==Type::managed_ref) {
+            auto base=f.receiver->type.definition->base.lock();
+            for (unsigned field=base ? static_cast<unsigned>(base->fields.size()) : 0;field<f.receiver->type.definition->fields.size();++field) {
+                Type t=f.receiver->type.definition->fields[field].type;
+                if (t.kind==Type::managed_ref && !t.nullable) continue;
+                std::optional<unsigned> selected;
+                for(const auto& child:f.initialization_defaults) if(child->slot==field) selected=expression(*child);
+                auto value=selected ? *selected : constant(t,f.initialization_value.fields.at(field),f.token);
+                auto view=emit({ir::Op::load,0},f.token);
+                ir::Instruction write{ir::Op::gc_write,view,value}; write.immediate=field; emit(write,f.token);
+            }
         }
         sequence(f.body);
         if (current) terminate({ir::Terminator::Kind::return_void}); // Only reachable for checked no-result functions.
@@ -1861,6 +1984,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
 }
 #include "capabilities.inc"
 #include "construction.inc"
+#include "inheritance.inc"
 void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics) {
     auto arena = std::make_shared<ir::TypeArena>();
     for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
@@ -1948,22 +2072,44 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     }
     std::function<void(Unit&,Structure&)> layout = [&](Unit& owner, Structure& structure) {
         if (structure.layout_state == 2) return;
-        if (structure.layout_state == 1) error(owner.source,structure.token,Code::unsupported_type,"Recursive value layout for '" + structure.token.text + "'.","Use an acyclic nesting of value types.");
+        if (structure.layout_state == 1) error(owner.source,structure.token,Code::unsupported_type,"Recursive value layout or inheritance for '" + structure.token.text + "'.","Use an acyclic nesting of value types.");
         if (structure.layout_state == 3) throw Poison{};
         Depth guard(diagnostics.semantic_depth(),owner.source,structure.token,128);
         structure.layout_state = 1;
         try {
             std::set<std::string> names;
+            if (structure.base_type) {
+                auto t=resolve_type(*structure.base_type,owner,root,units,structure.base_token);
+                if (!structure.definition->managed || t.kind!=Type::managed_ref || t.nullable)
+                    error(owner.source,structure.base_token,Code::unsupported_type,"Only a managed struct may extend a non-nullable managed struct.");
+                Structure* parent=nullptr; Unit* parent_owner=nullptr;
+                for (auto& [id,u]:units) for (auto& candidate:u->structures) if (candidate.definition==t.definition) { parent=&candidate; parent_owner=u.get(); }
+                if (!parent) throw Poison{};
+                if ((structure.visibility=="public" && parent->visibility!="public") || (structure.visibility=="internal" && parent->visibility=="private"))
+                    error(owner.source,structure.base_token,Code::visibility,"A derived type cannot expose a less-visible base type.",{},{{span(parent_owner->source,parent->token),"Base type declared here."}});
+                layout(*parent_owner,*parent);
+                structure.base_type=t; structure.definition->base=parent->definition;
+                structure.definition->fields=parent->definition->fields;
+                structure.effective_fields=parent->effective_fields;
+                structure.expanded_fields=parent->expanded_fields;
+                structure.layout_depth=parent->layout_depth+1;
+                if(structure.layout_depth>128) error(owner.source,structure.base_token,Code::nesting,"Physical layout depth limit exceeded.","Reduce the combined inheritance and inline-value depth; the current limit is 128.");
+                for (const auto& field:structure.definition->fields) names.insert(field.name);
+            }
             for (auto& field : structure.fields) {
                 if (!names.insert(field.name).second) error(owner.source,field.token,Code::duplicate,"Duplicate field '" + field.name + "'.");
                 auto t = resolve_type(*field.annotation,owner,root,units,field.token);
                 if (field.using_field && ((t.kind!=Type::aggregate && t.kind!=Type::managed_ref) || t.nullable))
                     error(owner.source,field.token,Code::unsupported_type,"A using field requires a non-nullable nominal struct type.","Use an ordinary field for primitives or nullable references.");
                 std::size_t expanded = 1;
-                if (t.kind == Type::aggregate) for (auto& [id,u] : units) for (auto& child : u->structures) if (child.definition == t.definition) { layout(*u,child); expanded += child.expanded_fields; }
+                if (t.kind == Type::aggregate) for (auto& [id,u] : units) for (auto& child : u->structures) if (child.definition == t.definition) {
+                    layout(*u,child); expanded += child.expanded_fields; structure.layout_depth=std::max(structure.layout_depth,child.layout_depth+1);
+                    if(structure.layout_depth>128) error(owner.source,field.token,Code::nesting,"Physical layout depth limit exceeded.","Reduce the combined inheritance and inline-value depth; the current limit is 128.");
+                }
                 if (expanded > 65536 - structure.expanded_fields) error(owner.source,field.token,Code::nesting,"Expanded value layout limit exceeded.","Reduce nested value duplication; the compiler currently permits 65536 expanded fields per value.");
                 structure.expanded_fields += expanded;
-                field.annotation = t; structure.definition->fields.push_back({field.name,t});
+                field.annotation = t; structure.definition->fields.push_back({field.name,t,structure.definition->identity});
+                structure.effective_fields.emplace_back(&owner,&field);
             }
             structure.layout_state = 2;
         } catch (...) { structure.layout_state = 3; throw; }
@@ -2001,6 +2147,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
               catch (const Poison&) { f.parse_failed = true; }
         }
     }
+    validate_inheritance(units,root,diagnostics);
     // Failed layouts are poisoned and never form owning descriptor cycles.
     std::function<void(Unit&, Structure&)> defaults;
     std::vector<std::string> dependency;
@@ -2030,6 +2177,9 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         structure.default_state = 1;
         try {
             Semantics semantics(owner,units,root,evaluate,diagnostics,defaults);
+            if (auto base=structure.definition->base.lock()) for (auto& [id,u]:units) for (auto& parent:u->structures) if (parent.definition==base) {
+                defaults(*u,parent); structure.defaults.fields=parent.defaults.fields;
+            }
             for (auto& field : structure.fields) structure.defaults.fields.push_back(semantics.field_default(field));
             structure.default_state = 2;
         } catch (...) { structure.default_state = 3; throw; }
@@ -2075,8 +2225,24 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 for (const auto& part : e->parts) expressions.push_back(part.get());
                 for (const auto& part : e->omitted) expressions.push_back(part.get());
                 if (e->kind==Expr::Kind::call || e->kind==Expr::Kind::method_call) dependencies[f.symbol].insert(e->target);
+                if(!e->virtual_slot.empty() && !e->super_call) for(const auto& [id,owner]:units) for(const auto& target:owner->functions)
+                    if(target.virtual_slot==e->virtual_slot) dependencies[f.symbol].insert(target.symbol);
                 if (!e->initializer.empty()) dependencies[f.symbol].insert(e->initializer);
             }
+        }
+    }
+    for(auto& [id,u]:units) for(auto& f:u->functions) {
+        std::vector<const Expr*> expressions;
+        if(f.base_prelude) expressions.push_back(f.base_prelude.get());
+        for(const auto& child:f.initialization_defaults) expressions.push_back(child.get());
+        while(!expressions.empty()) {
+            const auto* e=expressions.back();expressions.pop_back();
+            for(const auto& child:e->parts) expressions.push_back(child.get());
+            for(const auto& child:e->omitted) expressions.push_back(child.get());
+            if(!e->target.empty()) dependencies[f.symbol].insert(e->target);
+            if(!e->initializer.empty()) dependencies[f.symbol].insert(e->initializer);
+            if(!e->virtual_slot.empty() && !e->super_call) for(const auto& [id,owner]:units) for(const auto& target:owner->functions)
+                if(target.virtual_slot==e->virtual_slot) dependencies[f.symbol].insert(target.symbol);
         }
     }
     std::set<std::string> frozen;
@@ -2097,7 +2263,10 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
 }
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
     ir::Module module;
-    for (const auto& [id,unit] : units) for (const auto& structure : unit->structures) if (structure.definition->managed) module.coordinated=true;
+    for (const auto& [id,unit] : units) for (const auto& structure : unit->structures) {
+        module.nominal_types.emplace_back(structure.definition,structure.definition->managed ? Type::managed_ref : Type::aggregate);
+        if (structure.definition->managed) module.coordinated=true;
+    }
     module.identity = entry; module.entry_symbol = entry + "::entry";
     module.source_path = units.at(entry)->source.path();
     for (auto& [id, unit] : units) {
@@ -2141,6 +2310,7 @@ struct AnalysisAccess {
             field(result->contract_,ir::capability_key(d.receiver));
             field(result->contract_,d.capability_contract);
             field(result->contract_,d.using_field ? "using" : "ordinary-field");
+            field(result->contract_,d.base_identity);field(result->contract_,d.virtual_slot);field(result->contract_,d.override_target);
             for (const auto& mask:d.construction_parameters) {
                 field(result->contract_,"construction-context");
                 for (auto parameter:mask) field(result->contract_,std::to_string(parameter));
@@ -2181,10 +2351,12 @@ struct AnalysisAccess {
             auto expression = [&](const Expr& e, const std::string& owner, const std::map<unsigned,std::string>& locals) { visit_expression(e,owner,locals,false); };
             visit_expression = [&](const Expr& e, const std::string& owner, const auto& locals, bool implicit) {
                 if (!e.target.empty()) reference(owner,e.target,e,*unit,implicit || e.implicit);
-                else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit);
+                else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit || e.implicit);
+                if(!e.virtual_slot.empty() && !e.super_call) for(const auto& [id,target_unit]:*graph) for(const auto& target:target_unit->functions)
+                    if(target.virtual_slot==e.virtual_slot) reference(owner,target.symbol,e,*unit,true);
                 if (!e.initializer.empty()) reference(owner,e.initializer,e,*unit,implicit);
-                if (e.kind == Expr::Kind::construction && e.initializer.empty()) for (unsigned n = 0; n < e.names.size(); ++n) {
-                    Expr use(Expr::Kind::name,e.names[n]); reference(owner,e.type.definition->identity + "::field::" + e.names[n].text,use,*unit);
+                if ((e.kind == Expr::Kind::construction || e.kind==Expr::Kind::base_initialization) && e.initializer.empty()) for (unsigned n = 0; n < e.names.size(); ++n) {
+                    Expr use(Expr::Kind::name,e.names[n]); reference(owner,e.type.definition->fields.at(e.field_indexes[n]).owner + "::field::" + e.names[n].text,use,*unit);
                 }
                 for (const auto& part : e.parts) visit_expression(*part,owner,locals,implicit);
                 for (const auto& part : e.omitted) visit_expression(*part,owner,locals,true);
@@ -2215,7 +2387,9 @@ struct AnalysisAccess {
                     record.using_field=member.using_field; declaration(std::move(record));
                     if (member.expression) expression(*member.expression,identity,{});
                 }
-                declaration({structure.definition->managed ? AnalyzedDeclaration::Kind::managed_structure : AnalyzedDeclaration::Kind::value_structure,key,id,structure.visibility,location(structure.token),{},Type(structure.definition,structure.definition->managed ? Type::managed_ref : Type::aggregate),layout,{},id});
+                AnalyzedDeclaration record{structure.definition->managed ? AnalyzedDeclaration::Kind::managed_structure : AnalyzedDeclaration::Kind::value_structure,key,id,structure.visibility,location(structure.token),{},Type(structure.definition,structure.definition->managed ? Type::managed_ref : Type::aggregate),layout,{},id};
+                if(auto base=structure.definition->base.lock()) record.base_identity=base->identity;
+                declaration(std::move(record));
             }
             for (const auto& c : unit->constants) {
                 auto key = id + "::" + c.declaration.name;
@@ -2227,6 +2401,8 @@ struct AnalysisAccess {
                 AnalyzedDeclaration method_record{f.initializer ? AnalyzedDeclaration::Kind::initializer : f.receiver ? AnalyzedDeclaration::Kind::receiver_method : AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}};
                 if (f.receiver) { method_record.owner = f.receiver->type.definition->identity; method_record.receiver = f.receiver->type; method_record.receiver_mutates = f.receiver_mutates; }
                 method_record.initialization_contract=f.initialization_contract;
+                method_record.virtual_slot=f.virtual_slot;
+                if(f.overriding) method_record.override_target=f.virtual_slot;
                 method_record.capability_contract=f.capability_contract;
                 for (const auto& [mask,context]:f.construction_contexts)
                     method_record.construction_parameters.emplace_back(mask.begin(),mask.end());
@@ -2241,6 +2417,7 @@ struct AnalysisAccess {
                     method_record.initializer_parameters.push_back(std::move(parameter));
                 }
                 declaration(std::move(method_record));
+                if(f.overriding) {Expr use(Expr::Kind::name,f.token);reference(f.symbol,f.virtual_slot,use,*unit,true);}
                 for (const auto& p : f.parameters) if (p.default_expression) expression(*p.default_expression,f.symbol,{});
                 std::map<unsigned,std::string> locals;
                 std::map<std::string,unsigned> names;
@@ -2255,7 +2432,7 @@ struct AnalysisAccess {
                         if (s.kind == Statement::Kind::assignment && !s.fields.empty()) {
                             auto t = f.locals.at(s.slot);
                             for (unsigned n = 0; n < s.fields.size(); ++n) {
-                                Expr use(Expr::Kind::name,s.fields[n]); reference(owner,t.definition->identity + "::field::" + s.fields[n].text,use,*unit,s.implicit_fields[n]);
+                                Expr use(Expr::Kind::name,s.fields[n]); reference(owner,t.definition->fields.at(s.field_indexes[n]).owner + "::field::" + s.fields[n].text,use,*unit,s.implicit_fields[n]);
                                 t = t.definition->fields.at(s.field_indexes[n]).type;
                             }
                         }
@@ -2264,6 +2441,8 @@ struct AnalysisAccess {
                         body(s.body); body(s.otherwise);
                     }
                 };
+                if(f.base_prelude) expression(*f.base_prelude,f.symbol,locals);
+                for(const auto& child:f.initialization_defaults) visit_expression(*child,f.symbol,locals,true);
                 body(f.body);
             }
         }

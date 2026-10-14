@@ -1,5 +1,7 @@
 # Phase 16: managed structs
 
+Phase 20 implements managed inheritance and explicit virtual dispatch under I1–I8. Earlier phase-only exclusions below are historical; P3/P4 remain unchanged. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.
+
 Implemented locally using the owner-approved P1–P7 contract in
 [MANAGED_STRUCTS_PROPOSAL.md](MANAGED_STRUCTS_PROPOSAL.md), including P3 deep
 readonly views and P4 complete-object publication. The owner reports hosted run #28
@@ -196,5 +198,6 @@ Owner-approved stored `using name: type` and `using type` composition, one-hop
 member promotion and original embedded receiver mutation are implemented through
 the existing paths. See [COMPOSITION.md](COMPOSITION.md) for exact lookup, access,
 readonly, initialization, tooling and reload behavior. This adds neither subtyping
-nor stateless reuse and does not change C1/S1/P3/P4/RV1–RV7. Inheritance, interfaces,
-virtual dispatch, transitive promotion and has remain deferred.
+nor stateless reuse and does not change C1/S1/P3/P4/RV1–RV7. Phase 20 adds managed
+inheritance and component virtual dispatch as described in INHERITANCE.md. Interfaces,
+transitive promotion and has remain deferred.

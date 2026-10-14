@@ -30,6 +30,9 @@ inline bool join_facts(ReferenceFacts& into,const ReferenceFacts& from) {
 }
 inline ReferenceFacts reference_facts(Type type) {
     ReferenceFacts result;
+    // Private places carry abstract authority/provenance, not managed identity.
+    // reference_paths still excludes them from every actual GC root shape.
+    if(type.construction) {result[{}].readonly=type.readonly;return result;}
     auto readonly=readonly_paths(type);
     for (const auto& path:reference_paths(type)) result[path].readonly=readonly.contains(path);
     return result;
@@ -64,6 +67,15 @@ struct ReferenceEffects {
     std::set<ReferenceOrigin> mutations,retained,required_mutable;
     ReferenceFacts returned,receiver_after;
 };
+inline bool join_effects(ReferenceEffects& into,const ReferenceEffects& from) {
+    bool changed=false;
+    for(auto origin:from.mutations) changed|=into.mutations.insert(origin).second;
+    for(auto origin:from.retained) changed|=into.retained.insert(origin).second;
+    for(auto origin:from.required_mutable) changed|=into.required_mutable.insert(origin).second;
+    changed|=join_facts(into.returned,from.returned);
+    changed|=join_facts(into.receiver_after,from.receiver_after);
+    return changed;
+}
 inline std::set<ReferenceOrigin> mutable_requirements(const ReferenceFacts& actual,Type expected,const ReferenceFacts* capacity=nullptr) {
     std::set<ReferenceOrigin> result;
     const auto readonly=readonly_paths(expected);

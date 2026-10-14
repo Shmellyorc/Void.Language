@@ -1,0 +1,34 @@
+struct counter:
+    value: i32
+
+func mark(c: counter, digit: i32) -> i32:
+    c.value = c.value * 10 + digit
+    return c.value
+
+struct root:
+    r: i32
+
+func (r root) init(c: counter, n: i32):
+    r.r = n
+    mark(c, 4)
+
+struct middle extends root:
+    m: i32
+
+func (m middle) init(c: counter, n: i32):
+    super.init(c, mark(c, 3))
+    m.m = n
+    mark(c, 5)
+
+struct derived extends middle:
+    d: i32
+
+func (d derived) init(c: counter, n: i32):
+    super.init(c, mark(c, 2))
+    d.d = n
+    mark(c, 6)
+
+func entry(value: i32) -> i32:
+    var c = counter()
+    var d = derived(c, mark(c, 1))
+    return c.value + d.r + d.m + d.d + value

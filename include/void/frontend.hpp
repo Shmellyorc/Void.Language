@@ -32,6 +32,7 @@ struct AnalyzedDeclaration {
     // ready on every successful exit before complete-object publication.
     std::vector<std::vector<unsigned>> construction_parameters = {};
     std::vector<std::string> required_initialization_fields = {};
+    std::string base_identity = {}, virtual_slot = {}, override_target = {};
 };
 struct AnalyzedReference {
     std::string from, to, spelling;

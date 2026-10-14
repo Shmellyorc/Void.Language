@@ -378,13 +378,13 @@ static func player.create(name: string) -> player:
 
 `private func enter_town()` at file scope is callable from the same file, including when attached to a public callback. An imported application can call the public callback but cannot import the private function name directly. IDE completions should show only accessible symbols while source navigation inside the defining file still works normally.
 
-**OPEN:** Exact rules for subclass access to `private` versus `internal` members, and whether a `protected` feature is ever genuinely needed. No `protected` keyword is currently required.
+**Phase 20 I2, owner approved:** Existing receiver methods retain public/internal/file-private ownership and direct-owner imports. Derived types gain no privileged private access; protected access and field visibility modifiers remain deferred. Virtual declarations are public/internal and overrides retain exact visibility. Public derived types require public bases; internal derived types cannot expose private bases. Broader protected/access design remains OPEN. See INHERITANCE.md.
 
 ## 12. Ordinary `struct` and `value struct` [AGREED]
 
 The language has **one object-oriented struct family**, with an explicit distinction between reference and value semantics:
 
-The table describes the approved language design, not a compiler feature checklist. Reference/value semantics, construction and readonly capabilities have implemented boundaries documented in `MANAGED_STRUCTS.md`, `MANAGED_INITIALIZATION.md` and `REFERENCE_VALUE_STRUCTS.md`. Inheritance, interfaces and virtual dispatch below remain approved but unimplemented design intentions. Phase 19 implements stored `using` composition and one-hop promotion as documented in `COMPOSITION.md`.
+The table describes the approved language design, not a compiler feature checklist. Reference/value semantics, construction and readonly capabilities have implemented boundaries documented in `MANAGED_STRUCTS.md`, `MANAGED_INITIALIZATION.md` and `REFERENCE_VALUE_STRUCTS.md`. Phase 20 implements managed inheritance and explicit virtual dispatch within INHERITANCE.md; interfaces remain approved but unimplemented. Phase 19 implements stored `using` composition and one-hop promotion as documented in `COMPOSITION.md`.
 
 | | `struct` | `value struct` |
 |---|---|---|
@@ -419,7 +419,7 @@ print(a.x)          # 10, copied value
 
 Initializers and default field values don't force an object onto the stack or heap. The compiler may use stack allocation, registers, inline storage, or allocation elimination whenever it preserves semantics. Ordinary reference structs are managed objects conceptually, regardless of storage optimization.
 
-### 12.1 Inheritance and composition [APPROVED; COMPOSITION IMPLEMENTED]
+### 12.1 Inheritance and composition [APPROVED; PHASE 19–20 IMPLEMENTED]
 
 The three relationships have distinct meanings:
 
@@ -454,7 +454,11 @@ override func (p player) take_damage(amount: i32):
     super.take_damage(amount)
 ```
 
-**OPEN implementation design:** Exact visibility and inherited access rules, overriding signature requirements, runtime dispatch representation, inherited construction, GC layout and reload compatibility must be designed before implementation. The approved spellings and explicit virtual/nonvirtual distinction do not settle those details.
+**Phase 20 I1–I8, owner approved and implemented locally:** Managed-only acyclic single inheritance preserves complete identity on ancestor conversions. Overrides require exact declared signatures, const-parameter qualifications and visibility; no protected access, inherited hiding, overloads or covariance are added. Virtual effects/result capabilities conservatively join the whole validated family. Real members along the static ancestry outrank using promotion; components still promote only directly declared members. Full base-payload prefixes preserve storage and precise tracing. Runtime-owned descriptors contain no code pointers; guarded dispatch belongs to the currently leased generation. Hierarchy/layout/slot/signature/effect/construction changes require restart, while compatible ordinary/override bodies can replace a whole generation. INHERITANCE_PROPOSAL.md records the approval; INHERITANCE.md and WORK_LOG.md distinguish the implemented boundary from verified results.
+
+Initializers are not inherited. Init-free ancestry retains named inherited/own field construction. Any init-bearing ancestor requires each descendant to declare its own init, beginning with explicit `super.init(...)`, including defaultable bases. Prelude arguments cannot access self. Caller/prelude arguments run before oldest-base defaults/body, followed by each child's own defaults/body. One private stage gains managed identity only at final complete commit. Virtual-family calls on unfinished self/aliases, including through helpers or super, are rejected; completed children may dispatch. C1/S1/P3/P4/RV1–RV7 remain binding. See INITIALIZATION.md and INHERITANCE.md.
+
+**Deferred implementation design:** Protected/richer field access, member hiding, covariance, abstract/final, source downcasts/type patterns, implicit constructor chaining and open-world loading require separate review. No arbitrary external managed ABI is promised.
 
 **Composition through `using`:** Multiple named or unnamed `using` fields inside managed and value structs provide Odin/Go-inspired embedding and member promotion. Both forms have ordinary physical storage:
 
@@ -483,11 +487,11 @@ Members are accessible through their qualified field (for example, `player_value
 
 **Approved Phase 19 lookup boundary:** Direct fields and owner methods take precedence over promoted members in one member-selection namespace. There is no signature-based or field-versus-method fallback. Initially promotion is one-hop, considering only direct ordinary fields/methods of each using component; nested explicit qualification remains available. Automatic transitive promotion is deferred, not permanently prohibited. Targets are nonnullable nominal managed/value structs; nullable fields retain ordinary explicit checked access without promotion. Methods keep their exact type/module ownership and existing visibility/direct-owner import rules; composition grants no access or transitive method export.
 
-A using field retains ordinary defaults, stored-field constructor labels and declaration-order preparation. Custom-init arguments still bind exclusively to initializer parameters. Promoted names do not become constructor labels; lifecycle methods are not promoted. C1/S1/P4 construction/publication and P3/RV1–RV7 capability rules remain unchanged. `COMPOSITION_PROPOSAL.md` records the owner-approved U1–U7 contract. Phase 19 implements both stored forms and one-hop promotion; `COMPOSITION.md` defines the implemented boundary. Inheritance, interfaces and virtual dispatch remain unimplemented.
+A using field retains ordinary defaults, stored-field constructor labels and declaration-order preparation. Custom-init arguments still bind exclusively to initializer parameters. Promoted names do not become constructor labels; lifecycle methods are not promoted. C1/S1/P4 construction/publication and P3/RV1–RV7 capability rules remain unchanged. `COMPOSITION_PROPOSAL.md` records the owner-approved U1–U7 contract. Phase 19 implements both stored forms and one-hop promotion; `COMPOSITION.md` defines the implemented boundary. Phase 20 implements the inheritance/virtual interactions documented above; interfaces remain unimplemented.
 
 `using` is composition, not inheritance. It does not make `player` a subtype of `movement`, `combat` or `inventory`, and grants no implicit conversion to those types. Embedding preserves actual field storage and its existing semantics: inline values copy independently, managed references retain target identity, readonly reference capabilities cannot be laundered, and embedded references remain precisely GC-tracked. Member promotion must preserve these guarantees rather than invent multiple-inheritance semantics.
 
-**Deferred design:** Automatic transitive promotion and future interface/virtual-dispatch integration require separate design; they are outside Phase 19. Method-only reuse without embedded state remains a separate OPEN question, with no accepted trait/mixin syntax or behavior. The approved Phase 19 contract preserves existing initialization order, C1/S1 construction, P3 deep readonly, P4 complete-object publication and Phase 16–18 reference/value semantics.
+**Deferred design:** Automatic transitive promotion and future interface integration require separate design. Phase 20 adds inherited real-member precedence, inherited using fields and component-identity virtual dispatch while preserving one-hop promotion. Method-only reuse without embedded state remains a separate OPEN question, with no accepted trait/mixin syntax or behavior. The approved Phase 19 contract preserves existing initialization order, C1/S1 construction, P3 deep readonly, P4 complete-object publication and Phase 16–18 reference/value semantics.
 
 **Deferred idea — `has` [OPEN, NOT AN ACCEPTED KEYWORD]:** A possible future operator could inspect composition or embedded capabilities. Its exact meaning, grammar, type checking and necessity remain undecided. No syntax or compiler requirement is established by this idea.
 
@@ -623,7 +627,7 @@ Agreed intent:
 
 - Fields receive valid defaults before initializer logic uses them.
 - `init()` runs once during successful construction and cannot be casually called a second time as an ordinary public method.
-- Parent initialization happens once before child-specific initialization. An explicit `super.init(...)` supplies required parent arguments; an available parameterless parent initializer can be automatic.
+- Parent initialization happens once before child-specific initialization. Phase 20 I5 requires explicit `super.init(...)` as the first derived initializer prelude, even when parent arguments are defaultable. Automatic chaining is deferred and requires separate approval; it is not implemented behavior.
 - Start with **one initializer per struct**, using optional/default parameters rather than a forest of constructor overloads.
 - If construction can fail, support `result` and avoid leaking partially initialized objects.
 
@@ -2624,7 +2628,7 @@ This section matters especially when an AI assistant inherits this file without 
 2. **File/module import identity:** External `../` imports, symlinks, versioned packages, duplicate paths, case sensitivity on physical filesystems, and cross-project access need formal semantics.
 3. **Exact grammar for module scopes:** Project-wide root constants are agreed; file-level mutable global initialization order, collisions, and cyclic dependencies are not complete.
 4. **Static syntax:** The concept is accepted; `static func type.method()` grammar and visibility combinations need a parser contract.
-5. **Inheritance and interface implementation details:** Single managed-struct inheritance, base substitutability, explicit `virtual func`/`override func`/`super.method()` and structural interfaces are approved design intentions, not implemented features. Visibility, exact overriding/interface signatures, runtime dispatch representation, inherited construction, GC layout and reload compatibility require architectural design; ordinary methods remain nonvirtual unless declared virtual. See Sections 12.1 and 13.
+5. **Object-model boundary:** Phase 20 implements owner-approved I1–I8 for managed inheritance, substitutability, exact overrides, explicit super preludes, prefix layouts, guarded leased dispatch and conservative reload. Ordinary methods remain nonvirtual. Protected/richer visibility, hiding, variance/covariance, abstract/final, source downcasts/type patterns, automatic constructor chaining and open-world loading remain deferred. Structural interface implementation still needs separate architectural design; no mandatory implements keyword is introduced. See Sections 12.1 and 13 and INHERITANCE.md.
 6. **Construction:** `init()` is accepted. Named-field/custom-init interactions, fallible init return form, parent errors, and rollback cleanup need specification.
 7. **`value struct` native ownership:** Ensure copying cannot double-release a native handle; initially restrict resource-owning value types or introduce an explicit safe transfer contract.
 8. **Closures:** Mutable capture behavior is accepted; syntax/ABI of closure returns, lifetime, and hot-reload capture-layout compatibility need proof.
@@ -2650,7 +2654,7 @@ This section matters especially when an AI assistant inherits this file without 
 28. **Operator overloading:** No general user-defined operator suite has been agreed. Avoid treating one as required just because structs and generics exist.
 29. **Error diagnostics codes:** Code examples use illustrative `VOID...` IDs. The real diagnostic catalog is not yet allocated.
 30. **Compiler implementation language and LLVM integration:** Not yet chosen. The C API and C++ API each have costs; evaluate concretely against hot reload and GC requirements.
-31. **`using` remaining design scope:** Named `using motion: movement` and unnamed `using movement` (stored name `movement`) are approved directions. Duplicate stored names diagnose at declaration; overlapping promoted member names are legal until ambiguous access. No member/argument/result type disambiguation is allowed. Direct-member precedence, initial one-hop promotion, ordinary stored-field initialization and exact method ownership/imports are approved; Phase 19 implements the owner-approved revised U1–U7 contract; see `COMPOSITION.md`. Automatic transitive promotion and future interface/virtual-dispatch integration remain deferred. Preserve C1/S1/P3/P4/RV1–RV7, physical storage, identity, readonly capabilities and precise GC; no subtyping or implicit composition conversion. See Section 12.1 and `COMPOSITION_PROPOSAL.md`.
+31. **`using` remaining design scope:** Named `using motion: movement` and unnamed `using movement` (stored name `movement`) are approved directions. Duplicate stored names diagnose at declaration; overlapping promoted member names are legal until ambiguous access. No member/argument/result type disambiguation is allowed. Direct-member precedence, initial one-hop promotion, ordinary stored-field initialization and exact method ownership/imports are approved; Phase 19 implements the owner-approved revised U1–U7 contract; see `COMPOSITION.md`. Automatic transitive promotion and future interface integration remain deferred; Phase 20 implements the approved inheritance and component virtual-dispatch interactions. Preserve C1/S1/P3/P4/RV1–RV7, physical storage, identity, readonly capabilities and precise GC; no subtyping or implicit composition conversion. See Section 12.1 and `COMPOSITION_PROPOSAL.md`.
 32. **Possible `has` operator:** OPEN future idea for inspecting composition or embedded capabilities, not an accepted keyword or implemented feature. Meaning, grammar, type checking and necessity remain undecided; no compiler requirement is established.
 33. **Method-only reuse without embedded state:** Separate OPEN future design question. Phase 19 `using` always embeds ordinary stored fields; it introduces no trait/mixin behavior or syntax.
 

@@ -1,5 +1,7 @@
 # Phase 15 runtime foundation
 
+Phase 20 extends existing heap layouts with runtime-owned immutable nominal descriptors and transactional NativeSafe admission. Generation-owned guarded dispatch uses the same precise roots and collector; objects never retain JIT code pointers. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.
+
 Phase 16 integration: [MANAGED_STRUCTS.md](MANAGED_STRUCTS.md) describes the now
 implemented managed-source boundary. Earlier phase-only exclusions below remain
 historical. Phase 17 [managed initialization](MANAGED_INITIALIZATION.md) uses

@@ -446,6 +446,35 @@ def composition(executable, root):
     print("composition: imported promoted navigation, ambiguity and unsaved repair passed")
 
 
+def inheritance(executable, root):
+    root.mkdir(parents=True, exist_ok=True)
+    types = 'struct base:\n    n: i32\nvirtual func (b base) read() -> i32:\n    return b.n\nfunc (b base) init(n: i32):\n    b.n = n\nstruct derived extends base:\n    own: i32\noverride func (d derived) read() -> i32:\n    return super.read() + d.own\nfunc (d derived) init(n: i32):\n    super.init(n)\n    d.own = 1\n'
+    text = '# é😀 inherited members\nuse "./types.void" as t\nfunc entry(value: i32) -> i32:\n    var d = t.derived(value)\n    d.n = value\n    var b: t.base = d\n    return b.read()\n'
+    entry, worker = root / "main.void", root / "types.void"
+    entry.write_text(text, encoding="utf-8"); worker.write_text(types, encoding="utf-8")
+    uri, target = entry.as_uri(), worker.as_uri()
+    with Client(executable, entry) as c:
+        assert all(not n["diagnostics"] for n in c.initialize())
+        field = {"textDocument": {"uri": uri}, "position": source_position(text, "n = value")}
+        virtual = {"textDocument": {"uri": uri}, "position": source_position(text, "read()")}
+        for query, declaration in [(field, "n:"), (virtual, "read()")]:
+            response, _ = c.request("textDocument/definition", query)
+            assert response["result"]["uri"] == target and response["result"]["range"]["start"] == source_position(types, declaration), response
+        super_query = {"textDocument": {"uri": target}, "position": source_position(types, "read()", types.index("super.read"))}
+        response, _ = c.request("textDocument/definition", super_query)
+        assert response["result"]["range"]["start"] == source_position(types, "read()"), response
+        bad = types.replace("override func (d derived) read()", "override func (d derived) read(flag: bool)")
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": target, "languageId": "void", "version": 1, "text": bad}})
+        notes = diagnostics(c.sync())
+        assert any("match the inherited" in d["message"] and d["relatedInformation"] for d in notes[target]["diagnostics"]), notes
+        assert c.request("textDocument/definition", field)[0]["result"] is None
+        c.notify("textDocument/didChange", {"textDocument": {"uri": target, "version": 2}, "contentChanges": [{"text": types}]})
+        assert all(not n["diagnostics"] for n in c.sync())
+        assert c.request("textDocument/definition", field)[0]["result"]["uri"] == target
+        c.shutdown()
+    print("inheritance: original owners, static virtual/super navigation, exact override diagnostics and unsaved repair passed")
+
+
 if __name__ == "__main__":
     executable = pathlib.Path(sys.argv[1]).resolve()
     # Unicode physical root names work without changing the ASCII VFS policy.
@@ -464,3 +493,5 @@ if __name__ == "__main__":
     reference_values(executable, root / "reference value project")
 
     composition(executable, root / "composition project")
+
+    inheritance(executable, root / "inheritance project")

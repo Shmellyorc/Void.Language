@@ -1,5 +1,5 @@
 // Capability/effect analysis consumes the nominally checked AST. Logical leaf
-// operations are shared with the independent IR verifier; no runtime tags exist.
+// operations are shared with the independent IR verifier; no runtime permission tags exist.
 void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Diagnostics& diagnostics) {
     using ir::ReferenceFacts;
     using ir::ReferenceFact;
@@ -17,8 +17,10 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             result.push_back({span(found->second.first->source,found->second.second->token),"Reference type declared here."});
         const auto name=ir::reference_path_name(type,path);
         for (auto field:path) {
-            if (auto found=structures.find(type.definition->identity);found!=structures.end())
-                result={{span(found->second.first->source,found->second.second->fields.at(field).token),"Reference leaf '"+name+"' declared here."}};
+            if (auto found=structures.find(type.definition->identity);found!=structures.end()) {
+                const auto [owner,declaration]=found->second.second->effective_fields.at(field);
+                result={{span(owner->source,declaration->token),"Reference leaf '"+name+"' declared here."}};
+            }
             type=ir::field_type(type,field);
         }
         return result;
@@ -55,7 +57,8 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 break;
             }
         };
-        auto call=[&](Function& target,const std::vector<ReferenceFacts>& arguments,const Token& token) {
+        auto call=[&](Function& target,const std::vector<ReferenceFacts>& arguments,const Token& token,bool dynamic=false) {
+            const auto& target_effects=dynamic ? target.virtual_effects : target.reference_effects;
             unsigned first=target.receiver ? 1u : 0u;
             auto formal=[&](unsigned n) { return n<first ? target.receiver->type : target.parameters.at(n-first).type; };
             auto declaration=[&](unsigned n) { return span(function_units.at(target.symbol)->source,n<first ? target.receiver->token : target.parameters.at(n-first).token); };
@@ -65,13 +68,13 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     related.push_back({declaration(n),"Parameter declared here; const accepts readonly reference leaves."});
                 compatible(arguments[n],formal(n),token,nullptr,std::move(related));
             }
-            for (auto [effects,kind]:{std::pair{&target.reference_effects.mutations,'M'},std::pair{&target.reference_effects.retained,'H'},std::pair{&target.reference_effects.required_mutable,'Q'}}) {
+            for (auto [effects,kind]:{std::pair{&target_effects.mutations,'M'},std::pair{&target_effects.retained,'H'},std::pair{&target_effects.required_mutable,'Q'}}) {
                 if(kind=='Q' && !requirements) continue;
                 for (const auto& origin:*effects) if (origin.parameter<arguments.size()) {
                     if (auto found=arguments[origin.parameter].find(origin.path);found!=arguments[origin.parameter].end()) {
                         effect(kind=='H' ? f.reference_effects.retained : kind=='Q' ? f.reference_effects.required_mutable : f.reference_effects.mutations,found->second);
                         bool boundary=origin.parameter>=first && !ir::capability_assignable(ir::fact_type(formal(origin.parameter),arguments[origin.parameter]),formal(origin.parameter));
-                        bool stronger=kind=='Q' && (target.reference_effects.mutations.contains(origin) || target.reference_effects.retained.contains(origin));
+                        bool stronger=kind=='Q' && (target_effects.mutations.contains(origin) || target_effects.retained.contains(origin));
                         if (report && found->second.readonly && !boundary && !stronger) {
                             auto type=formal(origin.parameter);auto related=leaf_related(type,origin.path);related.push_back({declaration(origin.parameter),"Reference authority enters this declaration here."});
                             const auto path=ir::reference_path_name(type,origin.path);
@@ -80,7 +83,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     }
                 }
             }
-            return ir::instantiate_result(target.reference_effects.returned,arguments);
+            return ir::instantiate_result(target_effects.returned,arguments);
         };
         std::function<ReferenceFacts(Expr&)> expression;
         expression=[&](Expr& e)->ReferenceFacts {
@@ -96,7 +99,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 for (auto& part:e.parts) arguments.push_back(expression(*part));
                 if (auto found=functions.find(e.target);found!=functions.end()) {
                     auto& target=*found->second;
-                    view=call(target,arguments,e.token);
+                    view=call(target,arguments,e.token,!e.virtual_slot.empty() && !e.super_call);
                     if (e.kind==K::method_call && target.receiver->type.kind==Type::aggregate && e.receiver_addressable) {
                         auto after=ir::instantiate_result(target.reference_effects.receiver_after,arguments);
                         ReferenceFacts prefixed;
@@ -141,7 +144,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                         if (inline_place && !f.receiver_mutates) { f.receiver_mutates=true; changed=true; }
                     }
                 }
-            } else if (e.kind==K::construction) {
+            } else if (e.kind==K::construction || e.kind==K::base_initialization) {
                 view=ir::reference_facts(e.type);
                 if (e.initializer.empty()) {
                     for (unsigned n=0;n<e.parts.size();++n) {
@@ -237,6 +240,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 sequence(s.body); sequence(s.otherwise);
             }
         };
+        if(f.base_prelude) expression(*f.base_prelude);
         for (auto& child:f.initialization_defaults) {
             auto facts=expression(*child);
             if (f.receiver->type.kind==Type::managed_ref) retain(facts,child->type,child->token);
@@ -270,6 +274,11 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
     for(bool requirements:{false,true}) do {
         changed=false;
         for (auto& [id,u]:units) for (auto& f:u->functions) changed|=run(*u,f,false,requirements);
+        std::map<std::string,ir::ReferenceEffects> families;
+        for(auto& [id,u]:units) for(auto& f:u->functions) if(!f.virtual_slot.empty()) ir::join_effects(families[f.virtual_slot],f.reference_effects);
+        for(auto& [id,u]:units) for(auto& f:u->functions) if(!f.virtual_slot.empty()) {
+            changed|=ir::join_effects(f.virtual_effects,families.at(f.virtual_slot));
+        }
     } while (changed);
     for (auto& [id,u]:units) for (auto& f:u->functions) {
         run(*u,f,true,true);

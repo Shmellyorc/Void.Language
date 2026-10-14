@@ -1,10 +1,11 @@
+#include "../managed/catalog.hpp"
 #include "proof.hpp"
 #include <iostream>
 extern "C" std::int32_t __vd_2f7374726573732e766f69643a3a656e747279(std::int32_t,vd::RuntimeFailure*);
 int main() {
     using namespace managed_test;
     try {
-        vd::Runtime runtime(1);
+        vd::Runtime runtime(1); managed_test::admit(runtime);
         for(bool forced:{false,true}) {
             Probe p;p.inspect_roots=true;p.collect_before=forced;bool witnessed=false;
             p.before_construct=[&](auto n,const void*,auto) {reference_value_test::inspect_carriers(p,witnessed,n);};

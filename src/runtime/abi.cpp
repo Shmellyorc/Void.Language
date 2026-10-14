@@ -7,6 +7,34 @@ Runtime& Runtime::current() {
     return *current_runtime_;
 }
 }
+namespace {
+std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count) noexcept {
+    try {
+        vd::Runtime runtime(256);
+        vd::Runtime::Attachment attachment(runtime);
+        if(count) {vd_runtime_admit(&runtime,records,count,failure);if(failure->message) return 0;}
+        vd::Runtime::Managed managed(runtime);
+        return entry(value,failure);
+    } catch (const std::bad_alloc&) {failure->message="Runtime startup allocation failed";}
+      catch (...) {std::terminate();}
+    return 0;
+}
+void construct(void** slot,std::size_t size,const std::size_t* offsets,std::size_t count,const void* payload,const char* key,vd::RuntimeFailure* failure) noexcept {
+    try {
+        vd::TypeLayout layout{size,{}};
+        if(count) layout.references.assign(offsets,offsets+count);
+        if(key) {
+            try {
+                layout.descriptor=vd::Runtime::current().descriptor(key);
+                if(layout.size!=layout.descriptor->layout.size || layout.references!=layout.descriptor->layout.references)
+                    throw std::invalid_argument("typed construction layout mismatch");
+            } catch(const std::invalid_argument&) {failure->message="Invalid managed construction descriptor";return;}
+        }
+        vd::Runtime::current().construct_into(slot,layout,payload);
+    } catch(const std::bad_alloc&) {failure->message="Managed construction allocation failed";}
+      catch(...) {std::terminate();}
+}
+}
 extern "C" {
 void vd_gc_frame_enter(void* frame, const vd::Runtime::Slot* slots, std::size_t count) noexcept {
     try { new (frame) vd::Runtime::Frame(vd::Runtime::current(), slots, count); }
@@ -23,22 +51,36 @@ void vd_gc_collect(vd::RuntimeFailure* failure) noexcept {
     } catch (...) { std::terminate(); }
 }
 std::int32_t vd_runtime_entry(vd::NativeCode::CheckedEntry entry, std::int32_t value, vd::RuntimeFailure* failure) noexcept {
-    try {
-        vd::Runtime runtime(256);
-        vd::Runtime::Attachment attachment(runtime);
-        vd::Runtime::Managed managed(runtime);
-        return entry(value,failure);
-    } catch (const std::bad_alloc&) { failure->message="Runtime startup allocation failed"; }
-      catch (...) { std::terminate(); }
-    return 0;
+    return runtime_entry(entry,value,failure,nullptr,0);
 }
-void vd_gc_construct(void** slot, std::size_t size, const std::size_t* offsets, std::size_t count, const void* payload, vd::RuntimeFailure* failure) noexcept {
+std::int32_t vd_runtime_entry_typed(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count) noexcept {
+    return runtime_entry(entry,value,failure,records,count);
+}
+void vd_gc_construct(void** slot,std::size_t size,const std::size_t* offsets,std::size_t count,const void* payload,vd::RuntimeFailure* failure) noexcept {
+    construct(slot,size,offsets,count,payload,nullptr,failure);
+}
+void vd_gc_construct_typed(void** slot,std::size_t size,const std::size_t* offsets,std::size_t count,const void* payload,const char* key,vd::RuntimeFailure* failure) noexcept {
+    construct(slot,size,offsets,count,payload,key,failure);
+}
+void vd_runtime_admit(vd::Runtime* runtime,const vd::RuntimeTypeRecord* records,std::size_t count,vd::RuntimeFailure* failure) noexcept {
     try {
-        vd::TypeLayout layout{size,{}};
-        if (count) layout.references.assign(offsets,offsets+count);
-        vd::Runtime::current().construct_into(slot,layout,payload);
-    } catch (const std::bad_alloc&) { failure->message="Managed construction allocation failed"; }
-      catch (...) { std::terminate(); }
+        std::vector<vd::NominalDescriptor> types;
+        types.reserve(count);
+        for(std::size_t n=0;n<count;++n) {
+            const auto& r=records[n];
+            if(!r.identity || !r.base || !r.shape || (r.count && !r.references)) throw std::invalid_argument("invalid runtime catalog");
+            vd::NominalDescriptor d{r.identity,r.base,r.shape,{r.size,{}}};
+            if(r.count) d.layout.references.assign(r.references,r.references+r.count);
+            types.push_back(std::move(d));
+        }
+        runtime->admit_types(types);
+    } catch(const std::bad_alloc&) {failure->message="Runtime descriptor admission allocation failed";}
+      catch(const std::invalid_argument&) {failure->message="Incompatible runtime descriptor admission";}
+      catch(...) {std::terminate();}
+}
+std::int64_t vd_gc_dynamic_type(void* object,const char* const* catalog,std::size_t count) noexcept {
+    try {return vd::Runtime::current().dynamic_type(object,{catalog,count});}
+    catch(...) {std::terminate();}
 }
 void vd_gc_allocate(void** slot, std::size_t size, const std::size_t* offsets, std::size_t count, vd::RuntimeFailure* failure) noexcept {
     try {

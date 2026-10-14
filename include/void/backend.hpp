@@ -28,5 +28,5 @@ private:
 };
 void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize, bool source_program = false);
 // Internal architectural harness supplies its own runtime entry guard/main.
-void emit_runtime_object(const ir::Module&, const std::filesystem::path&, bool optimize);
+void emit_runtime_object(const ir::Module&, const std::filesystem::path&, bool optimize, const std::string& generation_suffix = {});
 }

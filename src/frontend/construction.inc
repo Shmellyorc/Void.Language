@@ -54,10 +54,13 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 if (auto origin=expression(*e.parts[0],ready)) require_field(*origin,e.slot,ready,e.token);
                 return {}; // A field is a complete child reference or independent value.
             }
+            if(e.kind==K::conversion && e.op=="upcast" && e.implicit) return expression(*e.parts[0],ready);
             if (e.kind==K::call || e.kind==K::method_call) {
                 Mask mask;
-                for (unsigned i=0;i<e.parts.size();++i) if (auto origin=expression(*e.parts[i],ready)) {
-                    require_all(*origin,ready,e.parts[i]->token); mask.insert(i);
+                for (unsigned i=0;i<e.parts.size();++i) if(auto origin=expression(*e.parts[i],ready)) {
+                    if (!e.virtual_slot.empty()) issue(e.token,"Virtual-family calls are prohibited on unfinished self or its aliases, including direct super calls.");
+                    for(unsigned field=0;field<e.parts[i]->type.definition->fields.size();++field) require_field(*origin,field,ready,e.token);
+                    mask.insert(i);
                 }
                 if (!mask.empty()) {
                     auto target=functions.find(e.target);
@@ -78,6 +81,19 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             for (const auto& child:e.omitted) expression(*child,ready);
             return {};
         };
+        if (f.base_prelude) {
+            for(const auto& argument:f.base_prelude->parts) if(expression(*argument,initial))
+                issue(argument->token,"A super.init prelude argument cannot access unfinished self or its aliases.");
+            // Field access through self is also forbidden here, even for safe
+            // defaults: arguments precede all base/default preparation.
+            std::vector<const Expr*> scan; for(const auto& e:f.base_prelude->parts) scan.push_back(e.get());
+            while(!scan.empty()) {
+                auto e=scan.back();scan.pop_back();
+                if(e->kind==Expr::Kind::name && context.aliases.contains(e->slot)) issue(e->token,"super.init arguments cannot access self or its fields.");
+                for(const auto& child:e->parts) scan.push_back(child.get());
+            }
+            for(unsigned field=0;field<f.base_prelude->type.definition->fields.size();++field) initial.emplace(0,field);
+        }
         struct Flow { std::optional<Ready> next; std::vector<Ready> breaks,continues; };
         auto merge=[](std::optional<Ready> a,const std::optional<Ready>& b) {
             if (!a) return b;
