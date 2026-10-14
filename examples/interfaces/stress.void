@@ -1,0 +1,52 @@
+interface readable:
+    func read() -> i32
+struct cell:
+    n: i32
+func (c cell) read() -> i32:
+    return c.n
+struct holder:
+    view: readable
+func inspect(h: holder) -> i32:
+    return h.view.read()
+func entry(value: i32) -> i32:
+    var h = holder(view = cell(n = value))
+    var n = 0
+    for n < 1500:
+        var garbage = cell(n = n)
+        n++
+    return inspect(h) + n
+value struct part:
+    tag: u8
+    view: readable?
+    wide: i64
+value struct parcel:
+    prefix: bool
+    nested: part
+func make(value: i32) -> parcel:
+    return parcel(nested = part(view = cell(n = value)))
+func consume(p: parcel) -> i32:
+    var n = 0
+    for n < 100:
+        var garbage = cell(n = n)
+        n++
+    return (p.nested.view as readable).read() + n
+func handoff(value: i32) -> i32:
+    return consume(make(value))
+interface sampleable:
+    func sample(amount: i32) -> i32
+func (c cell) sample(amount: i32) -> i32:
+    c.n += amount
+    return c.n
+struct owner:
+    using child: cell
+func (o owner) replace() -> i32:
+    o.child = cell(n = 90)
+    var garbage = cell(n = 91)
+    return 1
+func create() -> owner:
+    return owner(child = cell(n = 10))
+func ordering(value: i32) -> i32:
+    var o = create()
+    var view: sampleable = o
+    var result = view.sample(o.replace())
+    return result * 100 + o.child.n + value

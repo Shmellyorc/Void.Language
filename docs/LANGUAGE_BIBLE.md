@@ -384,7 +384,7 @@ static func player.create(name: string) -> player:
 
 The language has **one object-oriented struct family**, with an explicit distinction between reference and value semantics:
 
-The table describes the approved language design, not a compiler feature checklist. Reference/value semantics, construction and readonly capabilities have implemented boundaries documented in `MANAGED_STRUCTS.md`, `MANAGED_INITIALIZATION.md` and `REFERENCE_VALUE_STRUCTS.md`. Phase 20 implements managed inheritance and explicit virtual dispatch within INHERITANCE.md; interfaces remain approved but unimplemented. Phase 19 implements stored `using` composition and one-hop promotion as documented in `COMPOSITION.md`.
+The table describes the approved language design, not a compiler feature checklist. Reference/value semantics, construction and readonly capabilities have implemented boundaries documented in `MANAGED_STRUCTS.md`, `MANAGED_INITIALIZATION.md` and `REFERENCE_VALUE_STRUCTS.md`. Phase 20 implements managed inheritance and explicit virtual dispatch within INHERITANCE.md; Phase 21 implements managed-backed structural interface views within INTERFACES.md. Phase 19 implements stored `using` composition and one-hop promotion as documented in `COMPOSITION.md`.
 
 | | `struct` | `value struct` |
 |---|---|---|
@@ -487,19 +487,19 @@ Members are accessible through their qualified field (for example, `player_value
 
 **Approved Phase 19 lookup boundary:** Direct fields and owner methods take precedence over promoted members in one member-selection namespace. There is no signature-based or field-versus-method fallback. Initially promotion is one-hop, considering only direct ordinary fields/methods of each using component; nested explicit qualification remains available. Automatic transitive promotion is deferred, not permanently prohibited. Targets are nonnullable nominal managed/value structs; nullable fields retain ordinary explicit checked access without promotion. Methods keep their exact type/module ownership and existing visibility/direct-owner import rules; composition grants no access or transitive method export.
 
-A using field retains ordinary defaults, stored-field constructor labels and declaration-order preparation. Custom-init arguments still bind exclusively to initializer parameters. Promoted names do not become constructor labels; lifecycle methods are not promoted. C1/S1/P4 construction/publication and P3/RV1–RV7 capability rules remain unchanged. `COMPOSITION_PROPOSAL.md` records the owner-approved U1–U7 contract. Phase 19 implements both stored forms and one-hop promotion; `COMPOSITION.md` defines the implemented boundary. Phase 20 implements the inheritance/virtual interactions documented above; interfaces remain unimplemented.
+A using field retains ordinary defaults, stored-field constructor labels and declaration-order preparation. Custom-init arguments still bind exclusively to initializer parameters. Promoted names do not become constructor labels; lifecycle methods are not promoted. C1/S1/P4 construction/publication and P3/RV1–RV7 capability rules remain unchanged. `COMPOSITION_PROPOSAL.md` records the owner-approved U1–U7 contract. Phase 19 implements both stored forms and one-hop promotion; `COMPOSITION.md` defines the implemented boundary. Phase 20 implements the inheritance/virtual interactions documented above; Phase 21 implements interface conformance through these original, unambiguous member routes.
 
 `using` is composition, not inheritance. It does not make `player` a subtype of `movement`, `combat` or `inventory`, and grants no implicit conversion to those types. Embedding preserves actual field storage and its existing semantics: inline values copy independently, managed references retain target identity, readonly reference capabilities cannot be laundered, and embedded references remain precisely GC-tracked. Member promotion must preserve these guarantees rather than invent multiple-inheritance semantics.
 
-**Deferred design:** Automatic transitive promotion and future interface integration require separate design. Phase 20 adds inherited real-member precedence, inherited using fields and component-identity virtual dispatch while preserving one-hop promotion. Method-only reuse without embedded state remains a separate OPEN question, with no accepted trait/mixin syntax or behavior. The approved Phase 19 contract preserves existing initialization order, C1/S1 construction, P3 deep readonly, P4 complete-object publication and Phase 16–18 reference/value semantics.
+**Deferred design:** Automatic transitive promotion requires separate design; Phase 21 integrates structural interfaces without changing one-hop selection. Phase 20 adds inherited real-member precedence, inherited using fields and component-identity virtual dispatch while preserving one-hop promotion. Method-only reuse without embedded state remains a separate OPEN question, with no accepted trait/mixin syntax or behavior. The approved Phase 19 contract preserves existing initialization order, C1/S1 construction, P3 deep readonly, P4 complete-object publication and Phase 16–18 reference/value semantics.
 
 **Deferred idea — `has` [OPEN, NOT AN ACCEPTED KEYWORD]:** A possible future operator could inspect composition or embedded capabilities. Its exact meaning, grammar, type checking and necessity remain undecided. No syntax or compiler requirement is established by this idea.
 
-## 13. Interfaces [APPROVED DESIGN, NOT IMPLEMENTED]
+## 13. Interfaces [AGREED; PHASE 21 BOUNDED IMPLEMENTATION]
 
 Interfaces specify required behavior and provide polymorphism without forcing inheritance chains. **Conformance is structural:** a struct satisfies an interface when its accessible method set fulfills the interface's requirements, including unambiguous methods promoted through `using`. No mandatory `implements` keyword is required. An interface injects no storage and does not automatically supply implementations.
 
-Interface method calls are polymorphic and must work with qualifying structs. Intended syntax:
+Interface method calls are polymorphic. Phase 21 supports managed-backed views of qualifying managed structs, including inherited and promoted implementations:
 
 ```python
 interface damageable:
@@ -521,7 +521,36 @@ The intended type-test distinctions are:
 - `player is movement` is not made true merely by embedding `movement`.
 - `player is movable` can be true through structural interface conformance.
 
-These describe future language semantics, not currently supported source execution. **OPEN implementation design:** Exact interface signature/accessibility checks, conflicting method requirements, generic constraints, conversion/dispatch representation and readonly compatibility need architectural specification. Interface conversion must not silently box small values if a specialized implementation can avoid it. None of these open details reopens structural conformance or permits ambiguous promoted methods to satisfy a requirement.
+The `is` examples remain future type-test semantics; Phase 21 does not implement
+source type tests. The owner approved IF1–IF8 in INTERFACES_PROPOSAL.md: nonempty
+owner-module interfaces have bodyless `func` requirements with exact ordered types,
+nullability and const qualifications. Conformance uses the converting static managed
+view's accessible original methods; ambiguity diagnoses before signature matching.
+Authorized factories can expose private implementations through accessible interfaces.
+Consumers retain interface-owner imports.
+
+Completed managed references convert contextually or with `as`; nullable lifting
+preserves canonical null. Views contain complete-object identity and a stable,
+code-independent binding witness. Same-interface equality compares object identity;
+Base/Derived bindings can preserve distinct ordinary member selection. Virtual calls
+reuse guarded generation-owned dispatch. Standalone value erasure/boxing, different
+interface conversions/downcasts and dynamic discovery remain deferred. Inline value
+components of managed owners can satisfy requirements by original-storage borrowing;
+reference-containing values can copy interface leaves without copying their targets.
+
+P3/RV readonly authority survives aliases/casts/copies/parameters/returns. Fixed,
+conservative effects are inferred per requirement across eligible providers, with
+explicit argument origins preserved. Unrelated mutating providers can restrict
+readonly calls; independent mutable aliases remain valid. C1/S1/P4 rules remain
+unchanged: safe all-null templates are allowed, nonnullable fields require valid
+values, unfinished self cannot erase/escape, and publication remains once-only and
+complete. Receivers are selected and rooted before arguments. Witnesses contain no
+JIT pointers, generation leases or runtime permission tags.
+
+INTERFACES.md defines the implemented boundary and WORK_LOG.md records verification.
+Generic constraints, interface inheritance, default bodies, overloads, Self, value
+interface representation, public managed FFI and richer conversions remain OPEN or
+deferred; no implicit boxing or mandatory implements keyword is introduced.
 
 ## 14. Ordinary functions and receiver methods [AGREED]
 
@@ -2628,7 +2657,7 @@ This section matters especially when an AI assistant inherits this file without 
 2. **File/module import identity:** External `../` imports, symlinks, versioned packages, duplicate paths, case sensitivity on physical filesystems, and cross-project access need formal semantics.
 3. **Exact grammar for module scopes:** Project-wide root constants are agreed; file-level mutable global initialization order, collisions, and cyclic dependencies are not complete.
 4. **Static syntax:** The concept is accepted; `static func type.method()` grammar and visibility combinations need a parser contract.
-5. **Object-model boundary:** Phase 20 implements owner-approved I1–I8 for managed inheritance, substitutability, exact overrides, explicit super preludes, prefix layouts, guarded leased dispatch and conservative reload. Ordinary methods remain nonvirtual. Protected/richer visibility, hiding, variance/covariance, abstract/final, source downcasts/type patterns, automatic constructor chaining and open-world loading remain deferred. Structural interface implementation still needs separate architectural design; no mandatory implements keyword is introduced. See Sections 12.1 and 13 and INHERITANCE.md.
+5. **Object-model boundary:** Phase 20 implements owner-approved I1–I8 for managed inheritance, substitutability, exact overrides, explicit super preludes, prefix layouts, guarded leased dispatch and conservative reload. Ordinary methods remain nonvirtual. Protected/richer visibility, hiding, variance/covariance, abstract/final, source downcasts/type patterns, automatic constructor chaining and open-world loading remain deferred. Phase 21 implements owner-approved IF1–IF8 for managed-backed structural views with exact conformance, original ownership, readonly effects, precise roots and guarded leased dispatch. Standalone value erasure, interface inheritance/defaults, generic constraints, dynamic type tests and richer conversions remain deferred; no mandatory implements keyword is introduced. See Sections 12.1 and 13 and INHERITANCE.md.
 6. **Construction:** `init()` is accepted. Named-field/custom-init interactions, fallible init return form, parent errors, and rollback cleanup need specification.
 7. **`value struct` native ownership:** Ensure copying cannot double-release a native handle; initially restrict resource-owning value types or introduce an explicit safe transfer contract.
 8. **Closures:** Mutable capture behavior is accepted; syntax/ABI of closure returns, lifetime, and hot-reload capture-layout compatibility need proof.
@@ -2654,7 +2683,7 @@ This section matters especially when an AI assistant inherits this file without 
 28. **Operator overloading:** No general user-defined operator suite has been agreed. Avoid treating one as required just because structs and generics exist.
 29. **Error diagnostics codes:** Code examples use illustrative `VOID...` IDs. The real diagnostic catalog is not yet allocated.
 30. **Compiler implementation language and LLVM integration:** Not yet chosen. The C API and C++ API each have costs; evaluate concretely against hot reload and GC requirements.
-31. **`using` remaining design scope:** Named `using motion: movement` and unnamed `using movement` (stored name `movement`) are approved directions. Duplicate stored names diagnose at declaration; overlapping promoted member names are legal until ambiguous access. No member/argument/result type disambiguation is allowed. Direct-member precedence, initial one-hop promotion, ordinary stored-field initialization and exact method ownership/imports are approved; Phase 19 implements the owner-approved revised U1–U7 contract; see `COMPOSITION.md`. Automatic transitive promotion and future interface integration remain deferred; Phase 20 implements the approved inheritance and component virtual-dispatch interactions. Preserve C1/S1/P3/P4/RV1–RV7, physical storage, identity, readonly capabilities and precise GC; no subtyping or implicit composition conversion. See Section 12.1 and `COMPOSITION_PROPOSAL.md`.
+31. **`using` remaining design scope:** Named `using motion: movement` and unnamed `using movement` (stored name `movement`) are approved directions. Duplicate stored names diagnose at declaration; overlapping promoted member names are legal until ambiguous access. No member/argument/result type disambiguation is allowed. Direct-member precedence, initial one-hop promotion, ordinary stored-field initialization and exact method ownership/imports are approved; Phase 19 implements the owner-approved revised U1–U7 contract; see `COMPOSITION.md`. Automatic transitive promotion remains deferred; Phase 21 integrates structural interfaces without transitive promotion; Phase 20 implements the approved inheritance and component virtual-dispatch interactions. Preserve C1/S1/P3/P4/RV1–RV7, physical storage, identity, readonly capabilities and precise GC; no subtyping or implicit composition conversion. See Section 12.1 and `COMPOSITION_PROPOSAL.md`.
 32. **Possible `has` operator:** OPEN future idea for inspecting composition or embedded capabilities, not an accepted keyword or implemented feature. Meaning, grammar, type checking and necessity remain undecided; no compiler requirement is established.
 33. **Method-only reuse without embedded state:** Separate OPEN future design question. Phase 19 `using` always embeds ordinary stored fields; it introduces no trait/mixin behavior or syntax.
 

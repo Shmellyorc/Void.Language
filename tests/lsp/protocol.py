@@ -475,6 +475,41 @@ def inheritance(executable, root):
     print("inheritance: original owners, static virtual/super navigation, exact override diagnostics and unsaved repair passed")
 
 
+def interfaces(executable, root):
+    root.mkdir(parents=True, exist_ok=True)
+    entry, worker = root / "main.void", root / "types.void"
+    types = 'interface readable:\n    func read() -> i32\nstruct cell:\n    n: i32\nfunc (c cell) read() -> i32:\n    return c.n\n'
+    text = '# é😀 interface requirements\nuse "./types.void" as t\nfunc entry(value: i32) -> i32:\n    const r: t.readable = t.cell(n = value)\n    return r.read()\n'
+    entry.write_bytes(text.encode("utf-8")); worker.write_bytes(types.encode("utf-8"))
+    uri, target = entry.as_uri(), worker.as_uri()
+    query = {"textDocument": {"uri": uri}, "position": source_position(text, "read()")}
+    with Client(executable, entry) as c:
+        assert all(not n["diagnostics"] for n in c.initialize())
+        response, _ = c.request("textDocument/definition", query)
+        assert response["result"]["uri"] == target and response["result"]["range"]["start"] == source_position(types, "read()"), response
+        annotation = {"textDocument": {"uri": uri}, "position": source_position(text, "readable =")}
+        response, _ = c.request("textDocument/definition", annotation)
+        assert response["result"]["range"]["start"] == source_position(types, "readable:"), response
+        bad = types.replace("func read() -> i32", "func read() -> bool", 1)
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": target, "languageId": "void", "version": 1, "text": bad}})
+        notes = diagnostics(c.sync())
+        assert any("signature mismatch" in d["message"] for d in notes[uri]["diagnostics"]), notes
+        assert c.request("textDocument/definition", query)[0]["result"] is None
+        c.notify("textDocument/didChange", {"textDocument": {"uri": target, "version": 2}, "contentChanges": [{"text": types}]})
+        assert all(not n["diagnostics"] for n in c.sync())
+        assert c.request("textDocument/definition", query)[0]["result"]["uri"] == target
+        mutating = types.replace("    return c.n", "    c.n++\n    return c.n")
+        c.notify("textDocument/didChange", {"textDocument": {"uri": target, "version": 3}, "contentChanges": [{"text": mutating}]})
+        notes = diagnostics(c.sync())
+        assert any(d["code"] == "VOID2007" for d in notes[uri]["diagnostics"]), notes
+        assert c.request("textDocument/definition", query)[0]["result"] is None
+        c.notify("textDocument/didChange", {"textDocument": {"uri": target, "version": 4}, "contentChanges": [{"text": types}]})
+        assert all(not n["diagnostics"] for n in c.sync())
+        assert c.request("textDocument/definition", query)[0]["result"]["range"]["start"] == source_position(types, "read()")
+        c.shutdown()
+    print("interfaces: original requirement navigation, imported signatures/effects and unsaved revision repair passed")
+
+
 if __name__ == "__main__":
     executable = pathlib.Path(sys.argv[1]).resolve()
     # Unicode physical root names work without changing the ASCII VFS policy.
@@ -495,3 +530,4 @@ if __name__ == "__main__":
     composition(executable, root / "composition project")
 
     inheritance(executable, root / "inheritance project")
+    interfaces(executable, root / "interface project")

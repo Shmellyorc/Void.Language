@@ -216,6 +216,15 @@ if(BUILD_TESTING)
   void_managed_source_tests(reference_values reference_values stress "copies;readonly;initialization;templates;methods;staged;order;imports;required;stress;null_failure")
   void_managed_source_tests(composition composition stress "main;stress;imports;order;staged;receiver_order")
   void_managed_source_tests(inheritance inheritance stress "main;initialization;stress;order;imports;receiver_order;nested;results;failure")
+  void_managed_source_tests(interfaces interfaces stress "main;stress;nullable;selection;handoffs;imports;cycles;static")
+  foreach(mode normal optimized)
+    set(interface_reloaded_object "${CMAKE_CURRENT_BINARY_DIR}/interfaces-reloaded-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${interface_reloaded_object}"
+      COMMAND void_interfaces_tests --emit-reload "${PROJECT_SOURCE_DIR}/examples/interfaces/stress.void" "${interface_reloaded_object}" "${mode}"
+      DEPENDS void_interfaces_tests "${PROJECT_SOURCE_DIR}/examples/interfaces/stress.void" VERBATIM)
+    set_source_files_properties("${interface_reloaded_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    target_sources(void_interfaces_aot_${mode} PRIVATE "${interface_reloaded_object}")
+  endforeach()
   # Two independently lowered generations share exact nominal descriptors.
   # This remains a same-build native harness, not a source entry/FFI policy.
   foreach(mode normal optimized)

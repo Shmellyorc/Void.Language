@@ -212,5 +212,17 @@ member promotion and original embedded receiver mutation are implemented through
 the existing paths. See [COMPOSITION.md](COMPOSITION.md) for exact lookup, access,
 readonly, initialization, tooling and reload behavior. This adds neither subtyping
 nor stateless reuse and does not change C1/S1/P3/P4/RV1–RV7. Phase 20 adds managed
-inheritance and component virtual dispatch as described in INHERITANCE.md. Interfaces,
-transitive promotion and has remain deferred.
+inheritance and component virtual dispatch as described in INHERITANCE.md. Phase 21 adds managed-backed structural interfaces as documented in INTERFACES.md.
+Transitive promotion, stateless reuse and has remain deferred.
+
+
+## Phase 21 structural interfaces
+
+Owner-approved IF1–IF8 implement bodyless interface requirements, implicit exact
+structural conformance, managed-backed identity views, nullable values, readonly
+capabilities and original-storage receiver dispatch. Locals, fields, copied values,
+arguments and returns share the same frontend/IR/LLVM pipeline and precise roots.
+Private factory exposure retains conversion-scope access proof; calls navigate to
+requirements. Independent IR validation recomputes complete nominal/binding universes
+and effects. See [INTERFACES.md](INTERFACES.md) for the source contract, budgets,
+publication, reload policy, deferred value erasure/boxing and private ABI boundaries.

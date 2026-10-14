@@ -5544,3 +5544,249 @@ Windows Debug/Release remain unverified until hosted CI compiles and executes th
 corrected revision. Local Linux tests and STL-source analysis establish the cause
 and portability correction, not Windows success. Ready for owner review and the
 next seven-job hosted gate.
+
+
+## Phase 21 investigation — structural interfaces (design only)
+
+Owner reports Phase 20 LOCKED at GitHub Actions run #35: all seven jobs passed
+51/51 suites. This entry records local investigation, not independent retrieval
+of those hosted logs or authorization to implement Phase 21.
+
+Read the canonical Bible's interface/object-model, conversion/generic/readonly
+boundaries, Strategy, decisions/issues and Phase 16–20 implementation contracts.
+Inspected the actual declaration/resolver/member selector, inheritance and staged
+construction checks, nominal Type/FieldType arena and independent IR validation,
+reference-origin/effect fixed point, LLVM receiver/virtual dispatch/root lowering,
+Runtime descriptor admission/query/publication and shared analysis/tooling/reload
+records. Interfaces are not implemented: current reference checks explicitly use
+managed_ref; IR lacks requirement/witness/prepared-erased-receiver facts; runtime
+nominal records contain layout/identity but no method/code binding.
+
+Produced INTERFACES_PROPOSAL.md with IF1–IF8 recommendations awaiting approval.
+Recommend managed-backed views first, capturing complete owner identity plus an
+immutable runtime-owned data witness for the converting static view and selected
+accessible method routes. Existing generation-owned guarded dispatch plans consume
+that binding and reuse direct/virtual calls. Witnesses contain no code addresses,
+generation-local indexes, capability tags or code leases; metadata extends the
+existing Runtime admission snapshot, not a second heap/runtime/root system.
+Standalone value erasure/boxing remains deferred. Managed owners can satisfy
+requirements through embedded value methods borrowing original storage. Interface
+views may be reference leaves in existing copied values, with unchanged RV/P3 rules.
+
+Two concrete Phase 20 constraints were reproduced rather than assumed:
+
+- Base promoting meter.read and Derived declaring a real read give different
+  results on the same complete object: 7 versus 20 (combined 720). Dynamic-type-only
+  interface binding would lose static-view lookup semantics.
+- A promoted managed child call whose argument replaces that child selects the
+  old child before arguments (combined 1190, not late-projection 9190). Interface
+  dispatch cannot defer component projection until after argument evaluation.
+
+Temporary .void reproducers and command/result JSON are in
+build/phase21-investigation. Both programs ran through each unchanged Debug SDK's
+voidc in normal/O2 JIT: eight executions, all expected results. They prove existing
+lookup/evaluation contracts, not Phase 21 interface code generation or AOT support.
+
+Focused unchanged CTest baseline on each installed/official LLVM 19.1.7 Debug tree:
+
+```sh
+ctest --test-dir build/<debug-tree> --output-on-failure -j2 \
+  -R '^(inheritance_source|composition_source|reference_values_source|managed_initialization_source|lsp_protocol)$'
+```
+
+Installed build/ci-debug: 5/5 in 7.99 s. Official build/ci-official-debug: 5/5 in
+7.53 s. Logs are installed-baseline.log and official-baseline.log under the same
+investigation directory. No full matrix, sanitizer/stack/editor rerun was needed
+for documentation-only work; those remain implementation acceptance gates along
+with all 51 suites, GC stress, normal/O2 JIT, real linked AOT and seven hosted jobs.
+
+Approval questions include exact requirements/access and factory exposure,
+contextual conversions, static-view witness/equality policy, deferred standalone
+value representation, conservative project-wide per-requirement effect precision,
+pre-argument receiver preparation and metadata/reload policy. Signature matching
+must not guess among ambiguous promoted candidates. Shared IR needs minimal logical
+using/access/import facts so independent validation can reject forged conformance;
+the runtime must not grow a duplicate source type checker. Required interface leaves
+must integrate C1/S1/P4 readiness/publication, rather than erasing unfinished self.
+
+No compiler, runtime, editor, tests, build or workflow changes. No commits, pushes,
+branches or remote modifications. Stop for owner review of IF1–IF8; only the proposal
+and this work-log entry are changed. Language Bible/locked phase decisions are not
+amended by recommendations awaiting approval.
+
+## 14 October 2026 — Phase 21 structural interfaces, approved implementation
+
+The owner approved IF1–IF8 in INTERFACES_PROPOSAL.md. Phase 20 remains locked at
+owner-reported hosted run #35, seven jobs with 51/51 suites. Work is local only:
+no commits, pushes, branches, remote changes or workflow changes.
+
+Implemented managed-backed structural views through the existing pipeline:
+
+- Bodyless nominal interface requirements; exact ordered signatures/const formals,
+  original ownership/imports and conversion-scope access, including private factories.
+- One shared real/inherited/one-hop member selector for source and IR binding. Direct
+  precedence and ambiguity are decided before signatures. Standalone value erasure,
+  interface width/downcasts, boxing and broader syntax are explicitly deferred.
+- Identity-preserving concrete-to-interface conversions, nullable canonical pairs,
+  locals/fields/value carriers/arguments/results, same-interface identity equality,
+  source static Base/Derived selection, and ordinary/virtual/promoted calls.
+- Per-requirement effect/provenance fixed points over every eligible provider and
+  virtual family, preserving receiver versus explicit argument origins. P3/RV
+  capabilities survive copies/casts/returns; scalar value storage remains independent.
+  Empty families are conservatively unknown. C1/S1/P4 are retained for interface
+  defaults, required fields, complete children and unfinished-self rejection.
+- Independent IR validates complete nominal/binding universes, scopes, signatures,
+  routes, access, capabilities and preparation identity/definite initialization.
+  Prepared tokens cannot escape through fields, formals or results. Omitting an
+  eligible nominal/provider cannot certify an optimistic readonly call.
+- Shared LLVM pair layout and precise object-word offsets, including nested values;
+  original receivers are prepared before argument evaluation/control flow. Private
+  tokens root the complete owner and selected managed component, excluding metadata
+  and interior addresses. Existing module-owned DataLayout caching remains intact.
+- Atomic NativeSafe Runtime metadata admission now includes immutable witnesses in
+  the existing snapshot. OOM/conflicts roll back; opaque membership/domain checks
+  precede use. Witnesses own data only, with no code/AST/LLVM pointers, leases,
+  generation indexes or runtime permission flags. Dispatch uses generation plans and
+  existing ordinary/virtual functions/whole-call leases. JIT and AOT share lowering.
+- Source/tooling records interface/requirement categories and provider dependencies.
+  Constructor closure freezes every eligible interface/virtual provider. Compatible
+  provider-body reload remains possible. The extension uses existing keyword colors
+  and adds interface declaration indentation without lifecycle changes.
+
+New source, normal/optimized native AOT and CLI suites bring the total to 55,
+preserving all 51 existing suites and assertions. CMake reuses the managed-source
+family and its direct native CRT-selection input; no Windows linker workaround.
+Actual `.void` fixtures cover promotion, nullable copies, private factories, static
+binding/identity, receiver replacement, cycles, nested handoffs and allocation stress.
+The native harness links two independent generations and passes an old typed holder
+pointer; it does not assume a two-pointer C++ interface calling ABI.
+
+Focused verification established:
+
+- The six unchanged baseline focus suites passed 6/6 (13.72 seconds) after initial
+  declaration/type foundations. This was baseline preservation, not interface proof.
+- New interface source and both native AOT suites passed 3/3 during focused work.
+  Later expanded source checks passed, including actual active-call/new-body leases,
+  metadata conflict/allocation rollback, deterministic collection overlap, timeout
+  no-sweep/recovery, failure cleanup, retirement and stable witness reuse.
+- Nested handoff probes find the intended object only in aggregate roots after its
+  concrete factory returns; unrelated loop garbage is not counted as its root.
+  Selected-component probes use a separate owner factory, replace its child during
+  arguments, allocate again, and require the original child solely in the prepared
+  snapshot's second root word. No host Handle masks either proof. Both normal/O2
+  JIT and linked native AOT exercise these cases.
+- Native LSP protocol coverage for imported interface declaration/requirement
+  navigation, unsaved signature mismatch, readonly provider-effect changes,
+  stale-query rejection and repaired revisions passed (0.39 seconds).
+- Source resource tests exercise both hard analysis ceilings: 65536 scope/view/
+  interface combinations and 8388608 member-inventory visits. Neither limit truncates
+  candidates. Existing layout/expansion/S1 limits and small-stack guards are retained.
+
+The first full matrix pass found a diagnostic wording regression introduced here:
+managed null conversion used a generic message. Strict managed_cli and
+reference_values_cli assertions caught it. Restored the exact existing `Null managed
+reference in checked conversion` wording, with a separate interface message. No
+existing assertion changed. An initial new template fixture also shadowed receiver
+`c`; renamed the module constants to respect the existing no-shadowing rule. These
+first-pass logs remain under build/phase21-verification/first-matrix-pass.
+
+The corrected source is frozen for the final six-configuration matrix. Final matrix,
+stress, 1 MiB stack, editor/package results and outstanding hosted status follow
+below; earlier intermediate passes are not represented as final acceptance.
+
+### Verification corrections: stale build objects and small-stack hint traversal
+
+An incremental installed-SDK sanitizer run failed the new null-interface diagnostic
+assertion, without an ASan/UBSan report. The sanitized CLI reproduced the correct
+checked error in normal/O2 modes. `strings` on the test object still showed the old
+`Null reference` comparison; the source already compared `Null interface reference`.
+Its timestamp was newer than the edited source, so CMake had correctly considered
+that stale object current. Clean builds of all six configurations then passed
+55/55 with strict leak detection unchanged. Retain the incremental failure logs;
+they are not accepted as final evidence. Final dependency timestamps are refreshed
+and frozen-input hashes checked to prevent stale-object claims.
+
+The 1 MiB repeated test gate subsequently found the existing 400-call receiver-chain
+regression crashing in frontend on both SDKs. A separate `voidc check` reproducer
+and GDB backtrace under exactly 1048576 bytes identified repeated
+`Semantics::anchor` frames at compiler.cpp:1084 before the semantic expression
+nesting guard. Phase 21 increased type/frame size and exposed that unbounded hint
+traversal. Added the same existing 256-depth semantic budget to hints; exhaustion
+falls back to ordinary checking, which retains the original source nesting error.
+No stack limit, expression limit, assertion or test changed. The reproducer now
+reports VOID1107 and the independent later VOID2003 rather than crashing. The
+unchanged full frontend CTest passes under 1 MiB (7.95 seconds). Final six-configuration
+and repeated small-stack/stress results below include this correction.
+
+### Final Phase 21 acceptance evidence
+
+The final frozen 275 source/test/editor/build inputs match their SHA-256 snapshot.
+Both complete SDKs report LLVM 19.1.7 and contain ORC headers, libraries and
+LLVMConfig.cmake. Installed SDK RTTI is YES; official archive RTTI is NO. Existing
+per-SDK RTTI correction and all strict sanitizer settings remain intact.
+
+| SDK/configuration | Configure | Build | Full CTest | Test seconds |
+| --- | --- | --- | --- | --- |
+| ci-debug | pass | pass | 55/55 | 66.34 |
+| ci-release | pass | pass | 55/55 | 25.63 |
+| ci-sanitizers | pass | pass | 55/55 | 83.40 |
+| ci-official-debug | pass | pass | 55/55 | 62.80 |
+| ci-official-release | pass | pass | 55/55 | 23.06 |
+| ci-official-san | pass | pass | 55/55 | 83.95 |
+
+Commands: `cmake -S . -B build/<tree>`, `cmake --build build/<tree> -j2`,
+`ctest --test-dir build/<tree> --output-on-failure -j4`. Full clean builds first
+established every configuration; the final three-line hint-budget correction was
+rebuilt in all six after refreshing its dependency timestamp. The table is the
+final post-correction result, not an earlier intermediate pass.
+
+Strict runs used `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. They ran outside the
+sandbox to permit LeakSanitizer; no sanitizer or assertion was disabled.
+
+Repeated stress used CTest `--repeat until-fail:3 -j2` over 14 suites: generated
+runtime, callbacks, invariants, failures, managed/managed-init/reference-value/
+composition/inheritance source, both inheritance AOT and interface source/AOT.
+All six configurations passed: 252 repeated suite executions.
+
+| Stress tree | Status | Seconds |
+| --- | --- | --- |
+| ci-debug | 14/14, three repeats | 40.30 |
+| ci-release | 14/14, three repeats | 22.93 |
+| ci-sanitizers | 14/14, three repeats | 47.41 |
+| ci-official-debug | 14/14, three repeats | 38.64 |
+| ci-official-release | 14/14, three repeats | 20.66 |
+| ci-official-san | 14/14, three repeats | 45.35 |
+
+`RLIMIT_STACK` soft/hard limits were exactly 1048576 bytes. Frontend, managed-init,
+reference-value, composition, inheritance and interface source suites passed three
+times on each Debug SDK: 36 executions, ci-debug 53.93s, ci-official-debug 55.53s.
+Existing stack/nesting assertions remain intact.
+
+Extension: `npm test`, explicit `node --test --test-isolation=none` (4/4 unit cases),
+`npm run package` (149020-byte local VSIX), and real VS Code 1.141.0 integration
+passed. Native-process kill notifications, strict lifecycle counts, unsaved repair/
+navigation, close/reopen, restart/configuration/failure/deactivation, trust and
+multi-root assertions remain. Final host integration uses the post-stack-fix native
+Debug voidls. VSCodium is not installed locally; do not claim a separate VSCodium
+host execution. Node remains 24.19.0; no package dependency versions changed.
+
+Actual native demonstration: JIT main(10) = 28; static-view/identity JIT = 720;
+separately linked selection executables in normal and optimized modes = 1200.
+The CLI suite checks all eight real interface fixtures with -1/0/10 through normal/
+O2 JIT and linked AOT. Interface-bearing value argument/return handoffs and old
+interface fields/new-code dispatch also execute in the independent native harness.
+
+Artifacts/logs: `build/phase21-verification/{matrix,stress,stack}/`, SDK verification,
+frozen-source.json, focused source/AOT/CLI evidence, small-stack backtrace/reproducer
+and editor unit/package/host logs. Initial diagnostic/stale-object failures and the
+clean pre-stack-fix matrix are retained separately.
+
+No owner-level contract contradiction was needed. Deferred behavior is documented
+in INTERFACES.md and KNOWN_ISSUES.md; no boxing, width/downcasts, interface inheritance,
+generic/Self/default bodies, open-world providers, new entry policy, allocator/root
+registry or runtime permission system was added. Phase 21 is ready for owner review
+and the unchanged seven-job hosted CI gate. Windows/macOS and the hosted Linux SDK/
+runner matrix remain unverified until the owner pushes and runs CI. Linux success
+is not reported as Windows/macOS verification. No commits, pushes, branches or
+remote modifications were made.

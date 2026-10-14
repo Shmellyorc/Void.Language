@@ -1,0 +1,7 @@
+use "./api.void"
+private struct secret:
+    n: i32
+private func (s secret) read() -> i32:
+    return s.n
+func create(value: i32) -> readable:
+    return secret(n = value)

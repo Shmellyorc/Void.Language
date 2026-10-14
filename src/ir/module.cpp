@@ -7,6 +7,7 @@
 #include <functional>
 #include <stdexcept>
 namespace vd::ir {
+bool reference_value(Type t) { return t.kind==Type::managed_ref || t.kind==Type::interface_ref; }
 Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
     if (!d) return;
     if (d->self.expired()) d->self = d;
@@ -34,7 +35,7 @@ FieldType::FieldType(Type t) : kind(t.kind), nullable(t.nullable), readonly(t.re
     if (t.definition) target = t.definition->self;
 }
 FieldType::operator Type() const {
-    if (kind != Type::aggregate && kind != Type::unresolved && kind != Type::managed_ref) { Type t(kind); t.nullable=nullable; t.readonly=readonly; return t; }
+    if (kind != Type::aggregate && kind != Type::unresolved && kind != Type::managed_ref && kind != Type::interface_ref) { Type t(kind); t.nullable=nullable; t.readonly=readonly; return t; }
     auto d = target.lock();
     if (!d) throw std::logic_error("nominal type edge outlived its definition table");
     Type t(std::move(d),kind); t.nullable=nullable; t.readonly=readonly; return t;
@@ -48,7 +49,7 @@ ReferencePaths reference_paths(Type root) {
     while (!pending.empty()) {
         auto [type,path]=std::move(pending.back()); pending.pop_back();
         if (type.construction) continue; // A stage is a place, never a heap root.
-        if (type.kind==Type::managed_ref) { result.insert(std::move(path)); continue; }
+        if (reference_value(type) || type.kind==Type::prepared_receiver) { result.insert(std::move(path)); continue; }
         if (type.kind!=Type::aggregate) continue;
         if (!type.definition || path.size()>=128 || ++expanded>65536)
             throw std::invalid_argument("VOID IR: recursive or excessive reference shape");
@@ -72,7 +73,7 @@ Type with_readonly_paths(Type type,const ReferencePaths& paths) {
         type.readonly|=paths.contains(ReferencePath{});type.readonly_references.clear();return type;
     }
     type.readonly=false; type.readonly_references=paths;
-    if (type.kind==Type::managed_ref && !type.construction) {
+    if ((reference_value(type) || type.kind==Type::prepared_receiver) && !type.construction) {
         type.readonly=paths.contains(ReferencePath{});
         type.readonly_references.clear();
     }
@@ -153,6 +154,8 @@ std::string construction_name(const std::string& symbol,const std::vector<unsign
 }
 std::string type_name(Type t) {
     if (t.construction) { t.construction=false; return "construction view " + type_name(t); }
+    if(t.kind==Type::interface_ref && t.definition) return std::string(t.readonly ? "readonly " : "")+t.definition->identity+(t.nullable ? "?" : "");
+    if(t.kind==Type::prepared_receiver && t.definition) return "prepared receiver "+t.definition->identity;
     if (t.readonly && t.kind!=Type::managed_ref) { t.readonly=false; return "readonly " + type_name(t); }
     if (t.kind == Type::managed_ref && t.definition) return std::string(t.readonly ? "readonly " : "") + t.definition->identity + (t.nullable ? "?" : "");
     switch (t.kind) { case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
@@ -175,13 +178,15 @@ std::vector<VirtualTarget> virtual_targets(const Module& module,const Function& 
     if(result.empty()) throw std::invalid_argument("VOID IR: virtual family absent from nominal catalog");
     return result;
 }
+#include "interfaces.inc"
 #include "construction.inc"
 #include "reference_capabilities.inc"
-void validate(const Module& m, InstructionTypes* results) {
+void validate(const Module& m, InstructionTypes* results,std::map<std::string,ReferenceEffects>* verified_effects) {
     if (results) results->clear();
     InstructionTypes qualified_types;
     auto fail = [](const std::string& text) { throw std::invalid_argument("VOID IR: " + text); };
     if (m.identity.empty()) fail("missing module identity");
+    if(!m.interface_requirements.empty() && (m.root_identity!=m.identity || !m.source_imports.contains(m.root_identity))) fail("invalid interface source scope graph");
     std::map<std::string,const ValueType*> definitions;
     std::set<const ValueType*> visiting, checked;
     using LayoutExtent=std::pair<unsigned,std::size_t>;
@@ -207,14 +212,29 @@ void validate(const Module& m, InstructionTypes* results) {
         for (std::size_t n=0;n<pending.size();++n) {
             auto t=pending[n];
             if (t.construction && (t.kind!=Type::managed_ref || t.nullable)) fail("invalid construction view type");
-            if (t.nullable && t.kind!=Type::managed_ref) fail("nullable non-reference type");
-            if (t.kind==Type::managed_ref && !m.coordinated) fail("managed references require coordinated runtime");
+            if (t.nullable && !reference_value(t)) fail("nullable non-reference type");
+            if ((reference_value(t) || t.kind==Type::prepared_receiver) && !m.coordinated) fail("managed references require coordinated runtime");
+            if(t.kind==Type::interface_ref || t.kind==Type::prepared_receiver) {
+                if(!t.definition || !t.definition->interface_type || t.definition->managed || t.definition->identity.empty() || !t.definition->fields.empty() || !t.definition->base.expired()) fail("invalid interface definition");
+                if(t.definition->visibility!="public" && t.definition->visibility!="internal" && t.definition->visibility!="private") fail("invalid interface visibility");
+                if(t.definition->module_identity.empty() || t.definition->identity!=t.definition->module_identity+"::"+t.definition->name || !m.source_imports.contains(t.definition->module_identity)) fail("invalid nominal interface ownership");
+                if(t.kind==Type::prepared_receiver) {
+                    auto requirement=std::find_if(m.interface_requirements.begin(),m.interface_requirements.end(),[&](const auto& r){return r.name==t.preparation;});
+                    if(t.preparation.empty() || requirement==m.interface_requirements.end() || requirement->parameters.empty() || requirement->parameters[0].definition!=t.definition) fail("invalid prepared requirement identity");
+                }
+                auto [found,added]=definitions.emplace(t.definition->identity,t.definition.get());
+                if(!added && found->second!=t.definition.get()) fail("duplicate nominal interface identity");
+                continue;
+            }
+            if(t.definition && t.definition->interface_type) fail("interface used as an ordinary concrete nominal");
             if (t.kind!=Type::aggregate && t.kind!=Type::managed_ref) {
                 if (t.kind==Type::unresolved || t.kind==Type::invalid || t.kind==Type::null_value) fail("unresolved type");
                 type_name(t); continue;
             }
             if (!t.definition || t.definition->identity.empty() || t.definition->identity.find('\0')!=std::string::npos || t.definition->name.empty()) fail("missing value type identity");
             auto* d=t.definition.get();
+            if(!m.interface_requirements.empty() && d->visibility!="public" && d->visibility!="internal" && d->visibility!="private") fail("invalid concrete nominal visibility");
+            if(!m.interface_requirements.empty() && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
             if (t.construction && !d->managed) fail("construction view requires a managed nominal");
             if (t.kind==Type::aggregate && d->managed) fail("managed nominal cannot be an inline value");
             auto [found,added]=definitions.emplace(d->identity,d);
@@ -229,13 +249,15 @@ void validate(const Module& m, InstructionTypes* results) {
                 if (d->fields.size()<base->fields.size()) fail("missing inherited field prefix");
                 for(unsigned n=0;n<base->fields.size();++n) {
                     const auto& a=d->fields[n];const auto& b=base->fields[n];
-                    if(a.name!=b.name || Type(a.type)!=Type(b.type) || a.owner!=b.owner) fail("inconsistent inherited field ownership/type");
+                    if(a.name!=b.name || Type(a.type)!=Type(b.type) || a.owner!=b.owner || a.using_field!=b.using_field) fail("inconsistent inherited field ownership/type");
                 }
                 pending.emplace_back(base,Type::managed_ref);
             }
             std::set<std::string> fields;
             for (const auto& field:d->fields) {
                 if (field.name.empty() || field.name.find('\0')!=std::string::npos || !fields.insert(field.name).second || Type(field.type)==Type::none) fail("invalid value field");
+                if(field.using_field && ((Type(field.type).kind!=Type::aggregate && Type(field.type).kind!=Type::managed_ref) || field.type.nullable)) fail("invalid using component type");
+                if(Type(field.type).kind==Type::prepared_receiver) fail("prepared receiver cannot be stored in a field");
                 if (field.type.readonly) fail("readonly nominal field declarations are not supported");
                 pending.push_back(field.type);
             }
@@ -246,9 +268,11 @@ void validate(const Module& m, InstructionTypes* results) {
         for (const auto& path:root.readonly_references) if (!shape.contains(path)) fail("invalid readonly reference path");
     };
     auto assignable = [](Type actual,Type expected) {
-        return actual==expected || (actual.kind==Type::managed_ref && expected.kind==Type::managed_ref && Type::key(actual)==Type::key(expected) && actual.construction==expected.construction && (!actual.nullable || expected.nullable));
+        return actual==expected || (reference_value(actual) && actual.kind==expected.kind && Type::key(actual)==Type::key(expected) && actual.construction==expected.construction && (!actual.nullable || expected.nullable));
     };
+    std::set<const ValueType*> catalog_definitions;
     for(auto t:m.nominal_types) {
+        if((t.kind!=Type::aggregate && t.kind!=Type::managed_ref && t.kind!=Type::interface_ref) || !t.definition || !catalog_definitions.insert(t.definition.get()).second) fail("invalid or duplicate nominal catalog entry");
         valid_type(t);
         if(t.kind==Type::managed_ref && !t.definition->managed) fail("nominal catalog requires a managed class");
         auto base=t.definition->base.lock();
@@ -259,7 +283,26 @@ void validate(const Module& m, InstructionTypes* results) {
     std::map<std::string, Signature> names;
     for (const auto& name : m.imports)
         if (name.empty() || !names.emplace(name, Signature{{Type::i32}, Type::i32}).second) fail("duplicate or empty import");
+    std::map<std::string,const Function*> requirements;
+    for(const auto& requirement:m.interface_requirements) {
+        if(requirement.parameters.empty() || requirement.parameters[0].kind!=Type::interface_ref || requirement.parameters[0].nullable || requirement.parameters[0].construction ||
+            !requirement.receiver || requirement.initializer || requirement.overriding || !requirement.virtual_slot.empty() || !requirement.blocks.empty() || !requirement.locals.empty() ||
+            requirement.method_name.empty() || requirement.method_name=="init" || requirement.method_name=="deinit") fail("invalid interface requirement header");
+        auto owner=requirement.parameters[0].definition;
+        if(!owner || requirement.name!=owner->identity+"::method::"+requirement.method_name || requirement.module_identity!=owner->module_identity || requirement.visibility!=owner->visibility)
+            fail("invalid interface requirement ownership");
+        if(!requirements.emplace(requirement.name,&requirement).second || !names.emplace(requirement.name,Signature{requirement.parameters,requirement.result,true}).second) fail("duplicate interface requirement");
+        for(auto t:requirement.parameters) {valid_type(t);if(t==Type::none || t.construction || t.kind==Type::prepared_receiver) fail("invalid interface requirement parameter");}
+        for(auto t:requirement.parameters) if(t.definition && ((requirement.visibility=="public" && t.definition->visibility!="public") || (requirement.visibility=="internal" && t.definition->visibility=="private"))) fail("interface requirement exposes a less-visible parameter type");
+        if(requirement.result.definition && ((requirement.visibility=="public" && requirement.result.definition->visibility!="public") || (requirement.visibility=="internal" && requirement.result.definition->visibility=="private"))) fail("interface requirement exposes a less-visible result type");
+        valid_type(requirement.result);if(requirement.result.construction || requirement.result.kind==Type::prepared_receiver) fail("invalid interface requirement result");
+    }
+    for(auto t:m.nominal_types) if(t.kind==Type::interface_ref) {
+        bool found=false;for(const auto& [name,r]:requirements) found|=r->parameters[0].definition==t.definition;
+        if(!found) fail("interface has no requirements");
+    }
     for (const auto& f : m.functions) {
+        if(!m.interface_requirements.empty() && !m.source_imports.contains(f.module_identity)) fail("function has no source access scope");
         if (f.name.empty() || !names.emplace(f.name, Signature{f.parameters, f.result,f.receiver,f.receiver_mutates,f.initializer}).second) fail("duplicate or empty function");
         std::vector<unsigned> context_parameters;
         for (unsigned n=0;n<f.parameters.size();++n) if (f.parameters[n].construction) context_parameters.push_back(n);
@@ -272,6 +315,8 @@ void validate(const Module& m, InstructionTypes* results) {
         } else if (f.receiver_mutates) fail("receiver effect without receiver");
         if (f.initializer && (!f.receiver || f.result != Type::none)) fail("invalid initializer signature");
         if(f.initializer && f.parameters[0].construction && f.parameters[0].readonly) fail("initializer requires mutable construction storage");
+        if(f.result.kind==Type::prepared_receiver) fail("prepared receiver cannot be returned");
+        for(auto t:f.parameters) if(t.kind==Type::prepared_receiver) fail("prepared receiver cannot be a formal parameter");
         if (f.result.construction) fail("construction view returned from function");
         if (f.initializer && f.parameters[0].kind==Type::managed_ref && (!f.parameters[0].construction || context_parameters!=std::vector<unsigned>{0})) fail("managed init requires a private construction receiver");
         valid_type(f.result);
@@ -320,6 +365,17 @@ void validate(const Module& m, InstructionTypes* results) {
             if(f.initializer && Type::key(f.parameters[0])==base->identity) ancestor=true;
         if(ancestor && !own) fail("derived type omitted required initializer");
     }
+    std::map<std::string,Module::Binding> expected_bindings,bindings;
+    try {for(auto binding:interface_universe(m)) expected_bindings.emplace(binding.key,std::move(binding));}
+    catch(const std::length_error& failure) {fail(failure.what());}
+    for(const auto& binding:m.interface_bindings) {
+        valid_type(binding.view);valid_type(binding.interface);
+        if(binding.key!=binding_key(binding) || !bindings.emplace(binding.key,binding).second) fail("invalid or duplicate interface binding key");
+        auto expected=expected_bindings.find(binding.key);
+        if(expected==expected_bindings.end() || expected->second.methods!=binding.methods || expected->second.view!=binding.view || expected->second.interface!=binding.interface)
+            fail("interface binding is not independently accessible and structurally valid");
+    }
+    if(bindings.size()!=expected_bindings.size()) fail("incomplete interface binding universe");
     for (const auto& f : m.functions) {
         if (f.blocks.empty()) fail("function has no blocks");
         qualified_types.emplace_back();
@@ -338,6 +394,27 @@ void validate(const Module& m, InstructionTypes* results) {
             for (const auto& i : b.instructions) {
                 Type result = Type::i32;
                 switch (i.op) {
+                case Op::interface_pack: {
+                    valid_type(i.type);auto from=operand(i.a);auto concrete=from;concrete.nullable=false;
+                    if(from.construction || i.type.kind!=Type::interface_ref || (from.nullable && !i.type.nullable) || !capability_assignable(from,i.type)) fail("invalid interface erasure");
+                    auto proof=structural_binding(m,concrete,i.type,f.module_identity);
+                    if(i.callee!=proof.key || !bindings.contains(proof.key)) fail("interface pack bypasses scoped binding/access proof");
+                    result=i.type;break;
+                }
+                case Op::interface_prepare: {
+                    auto from=operand(i.a);auto requirement=requirements.find(i.callee);
+                    if(from.kind!=Type::interface_ref || from.nullable || from.construction || requirement==requirements.end() || !method_accessible(m,*requirement->second,f.module_identity) || requirement->second->parameters[0].definition!=from.definition ||
+                        i.type.kind!=Type::prepared_receiver || i.type.nullable || i.type.definition!=from.definition || i.type.preparation!=i.callee || !capability_assignable(from,i.type)) fail("invalid interface receiver preparation");
+                    valid_type(i.type);result=i.type;break;
+                }
+                case Op::interface_call: {
+                    auto found=requirements.find(i.callee);
+                    if(found==requirements.end() || !i.receiver || !i.receiver->fields.empty() || i.initialization) fail("invalid interface invocation");
+                    auto prepared=slot(i.receiver->slot);const auto& requirement=*found->second;
+                    if(prepared.kind!=Type::prepared_receiver || prepared.preparation!=i.callee || prepared.definition!=requirement.parameters[0].definition || i.arguments.size()+1!=requirement.parameters.size()) fail("interface call does not match prepared receiver");
+                    for(unsigned n=0;n<i.arguments.size();++n) expect(i.arguments[n],requirement.parameters[n+1]);
+                    result=requirement.result;break;
+                }
                 case Op::stage_begin:
                     valid_type(i.type);
                     if (!i.type.construction || !i.type.definition->managed || slot(i.a)!=i.type) fail("invalid construction storage");
@@ -384,8 +461,8 @@ void validate(const Module& m, InstructionTypes* results) {
                     if (i.a >= f.parameters.size()) fail("invalid argument index");
                     result = f.parameters[i.a]; break;
                 case Op::constant:
-                    if (i.type.construction || i.type.kind == Type::aggregate || i.type == Type::none || (i.type.kind == Type::managed_ref && i.immediate != 0) || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1)) fail("invalid literal");
-                    if (i.type.kind==Type::managed_ref && !i.type.nullable) fail("null literal requires a nullable reference type");
+                    if (i.type.construction || i.type.kind == Type::aggregate || i.type.kind==Type::prepared_receiver || i.type == Type::none || (reference_value(i.type) && i.immediate != 0) || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1)) fail("invalid literal");
+                    if (reference_value(i.type) && !i.type.nullable) fail("null literal requires a nullable reference type");
                     valid_type(i.type); result = i.type; break;
                 case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:
                     result = operand(i.a);
@@ -395,7 +472,7 @@ void validate(const Module& m, InstructionTypes* results) {
                     if (!numeric::supports(i.op,operand(i.a))) fail("non-numeric ordering");
                     expect(i.b,operand(i.a)); result = Type::boolean; break;
                 case Op::equal: case Op::not_equal:
-                    if (!((operand(i.a).kind==Type::managed_ref && !operand(i.a).construction && operand(i.b).kind==Type::managed_ref && !operand(i.b).construction && Type::key(operand(i.a))==Type::key(operand(i.b))) || (numeric::supports(i.op,operand(i.a)) && operand(i.a)==operand(i.b)))) fail("comparison type mismatch");
+                    if (!((reference_value(operand(i.a)) && !operand(i.a).construction && operand(i.b).kind==operand(i.a).kind && !operand(i.b).construction && Type::key(operand(i.a))==Type::key(operand(i.b))) || (numeric::supports(i.op,operand(i.a)) && operand(i.a)==operand(i.b)))) fail("comparison type mismatch");
                     result = Type::boolean; break;
                 case Op::stage_prefix: {
                     auto from=operand(i.a),to=i.type;
@@ -406,7 +483,7 @@ void validate(const Module& m, InstructionTypes* results) {
                 }
                 case Op::upcast:
                     valid_type(i.type);
-                    if(!subtype(operand(i.a),i.type) || (operand(i.a).nullable && !i.type.nullable) || !capability_assignable(operand(i.a),i.type)) fail("invalid managed upcast");
+                    if(!(subtype(operand(i.a),i.type) || (operand(i.a).kind==Type::interface_ref && i.type.kind==Type::interface_ref && Type::key(operand(i.a))==Type::key(i.type))) || (operand(i.a).nullable && !i.type.nullable) || !capability_assignable(operand(i.a),i.type)) fail("invalid managed upcast");
                     result=i.type; break;
                 case Op::base_init: {
                     valid_type(i.type);
@@ -425,7 +502,8 @@ void validate(const Module& m, InstructionTypes* results) {
                     result=Type::none; break;
                 }
                 case Op::convert:
-                    if (!((operand(i.a).kind==Type::managed_ref && !operand(i.a).construction && i.type.kind==Type::managed_ref && !i.type.construction && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)))) fail("invalid conversion");
+                    valid_type(i.type);
+                    if (!((reference_value(operand(i.a)) && !operand(i.a).construction && i.type.kind==operand(i.a).kind && !i.type.construction && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)))) fail("invalid conversion");
                     result = i.type; break;
                 case Op::negate:
                     result = operand(i.a); if (!numeric::number(result)) fail("non-numeric negation"); break;
@@ -436,6 +514,7 @@ void validate(const Module& m, InstructionTypes* results) {
                     expect(i.b, slot(i.a)); result = Type::none; break;
                 case Op::call: case Op::virtual_call: {
                     auto declaration=functions.find(i.callee);
+                    if(requirements.contains(i.callee)) fail("ordinary call cannot bypass interface receiver preparation");
                     if(i.op==Op::virtual_call && (declaration==functions.end() || declaration->second->virtual_slot.empty() || i.initialization)) fail("invalid virtual call target");
                     auto target = names.find(i.callee);
                     if (target == names.end()) fail("unknown callee " + i.callee);
@@ -482,7 +561,8 @@ void validate(const Module& m, InstructionTypes* results) {
         }
         validate_construction(f,m,body_types);
     }
-    validate_reference_capabilities(m,qualified_types);
+    if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition)) fail("incomplete nominal universe for structural interfaces");
+    validate_reference_capabilities(m,qualified_types,verified_effects);
     if (results) *results=std::move(qualified_types);
 }
 }

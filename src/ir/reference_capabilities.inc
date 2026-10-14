@@ -50,12 +50,13 @@ std::set<unsigned> validate_reference_initialization(const Function& f) {
     }
     return observed_defaults;
 }
-void validate_reference_capabilities(const Module& module,InstructionTypes& types) {
+void validate_reference_capabilities(const Module& module,InstructionTypes& types,std::map<std::string,ReferenceEffects>* verified) {
     std::vector<std::set<unsigned>> observed_defaults;
     for(const auto& f:module.functions) observed_defaults.push_back(validate_reference_initialization(f));
     std::map<std::string,unsigned> indexes;
     for (unsigned n=0;n<module.functions.size();++n) indexes.emplace(module.functions[n].name,n);
-    std::vector<ReferenceEffects> summaries(module.functions.size());
+    std::vector<ReferenceEffects> summaries(module.functions.size()+module.interface_requirements.size());
+    for(unsigned n=0;n<module.interface_requirements.size();++n) indexes.emplace(module.interface_requirements[n].name,static_cast<unsigned>(module.functions.size())+n);
     auto run=[&](unsigned function,bool report,bool requirements) {
         const auto& f=module.functions[function]; auto& summary=summaries[function];
         bool changed=false,local_changed=false;
@@ -111,7 +112,7 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                             value=replaced_facts(std::move(value),field,values[i.arguments[field]]);
                         join_facts(value,reference_facts(i.type));
                         break;
-                    case Op::convert: case Op::upcast: case Op::stage_prefix: value=values[i.a];join_facts(value,reference_facts(i.type));break;
+                    case Op::interface_pack: case Op::interface_prepare: case Op::convert: case Op::upcast: case Op::stage_prefix: value=values[i.a];join_facts(value,reference_facts(i.type));break;
                     case Op::gc_construct:
                         for(auto argument:i.arguments) retain(values[argument]);
                         break;
@@ -121,11 +122,11 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                             if (found->second.readonly) fail("write through readonly reference");
                         }
                         retain(values[i.b]); value={}; break;
-                    case Op::call: case Op::virtual_call: case Op::base_init: {
+                    case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
                         if(i.op==Op::base_init && i.callee.empty()) { for(auto argument:i.arguments) retain(values[argument]); break; }
                         auto found=indexes.find(i.callee);
                         if (found==indexes.end()) break; // Existing trusted scalar ABI.
-                        const auto& target=module.functions[found->second]; auto effects=summaries[found->second];
+                        const auto& target=found->second<module.functions.size() ? module.functions[found->second] : module.interface_requirements[found->second-module.functions.size()]; auto effects=summaries[found->second];
                         if(i.op==Op::virtual_call) for(unsigned n=0;n<module.functions.size();++n)
                             if(module.functions[n].virtual_slot==target.virtual_slot) join_effects(effects,summaries[n]);
                         std::vector<ReferenceFacts> arguments;
@@ -201,6 +202,19 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
     for(bool requirements:{false,true}) do {
         changed=false;
         for(unsigned n=0;n<module.functions.size();++n) changed|=run(n,false,requirements);
+        for(unsigned n=0;n<module.interface_requirements.size();++n) {
+            const auto& requirement=module.interface_requirements[n];bool provider=false;
+            auto& family=summaries[module.functions.size()+n];
+            for(const auto& binding:module.interface_bindings) if(auto selected=binding.methods.find(requirement.name);selected!=binding.methods.end()) {
+                auto method=indexes.at(selected->second.second);const auto& target=module.functions[method];provider=true;
+                auto effects=summaries[method];
+                if(!target.virtual_slot.empty()) for(unsigned t=0;t<module.functions.size();++t) if(module.functions[t].virtual_slot==target.virtual_slot) join_effects(effects,summaries[t]);
+                changed|=join_effects(family,abstract_interface_effects(effects,target.receiver_mutates));
+            }
+            if(!provider) changed|=join_effects(family,unknown_interface_effects(requirement));
+        }
+
     } while(changed);
     for(unsigned n=0;n<module.functions.size();++n) run(n,true,true);
+    if(verified) for(const auto& [name,index]:indexes) verified->emplace(name,summaries[index]);
 }

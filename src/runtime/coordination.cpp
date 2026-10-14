@@ -252,11 +252,21 @@ void* Runtime::Handle::get() const {
 }
 
 namespace vd {
-void Runtime::admit_types(std::span<const NominalDescriptor> incoming) {
+void Runtime::admit_types(std::span<const NominalDescriptor> incoming) {admit_metadata(incoming,{});}
+void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::span<const InterfaceWitness> incoming_witnesses) {
     if(current_thread_ && current_thread_->state!=State::native_safe)
         throw std::logic_error("type admission requires NativeSafe state");
-    if(incoming.empty()) return;
-    TypeCatalog candidates;
+    if(incoming.empty() && incoming_witnesses.empty()) return;
+    NominalCatalog candidates;
+    std::map<std::string,std::shared_ptr<const InterfaceWitness>,std::less<>> witness_candidates;
+    for(const auto& input:incoming_witnesses) {
+        if(input.key.empty() || input.interface_identity.empty() || input.view_identity.empty() || input.contract.empty() ||
+            input.key.find('\0')!=std::string::npos || input.interface_identity.find('\0')!=std::string::npos || input.view_identity.find('\0')!=std::string::npos || input.contract.find('\0')!=std::string::npos)
+            throw std::invalid_argument("invalid interface witness");
+        const auto encoded=[](std::string_view value){return std::to_string(value.size())+":"+std::string(value);};
+        if(!input.key.starts_with("interface:"+encoded(input.interface_identity)+encoded(input.view_identity))) throw std::invalid_argument("witness key/domain mismatch");
+        if(!witness_candidates.emplace(input.key,std::make_shared<InterfaceWitness>(input)).second) throw std::invalid_argument("duplicate interface witness");
+    }
     for(const auto& input:incoming) {
         if(input.identity.empty() || input.shape.empty() || !input.layout.size || input.layout.descriptor)
             throw std::invalid_argument("invalid nominal descriptor");
@@ -272,23 +282,32 @@ void Runtime::admit_types(std::span<const NominalDescriptor> incoming) {
         {std::lock_guard lock(mutex_); if(closing_) throw std::logic_error("runtime is closing"); snapshot=types_;}
         auto prepared=std::make_shared<TypeCatalog>(snapshot ? *snapshot : TypeCatalog{});
         for(const auto& [key,value]:candidates) {
-            auto [found,added]=prepared->emplace(key,value);
+            auto [found,added]=prepared->types.emplace(key,value);
             if(!added) {
                 const auto& a=*found->second;const auto& b=*value;
                 if(a.base!=b.base || a.shape!=b.shape || a.layout.size!=b.layout.size || a.layout.references!=b.layout.references)
                     throw std::invalid_argument("incompatible nominal descriptor admission");
             }
         }
-        for(const auto& [key,value]:*prepared) {
+        for(const auto& [key,value]:prepared->types) {
             std::set<std::string_view> seen{key};auto current=value;
             while(!current->base.empty()) {
-                auto found=prepared->find(current->base);
-                if(found==prepared->end() || seen.size()>=128 || !seen.insert(current->base).second)
+                auto found=prepared->types.find(current->base);
+                if(found==prepared->types.end() || seen.size()>=128 || !seen.insert(current->base).second)
                     throw std::invalid_argument("missing, recursive or excessive nominal ancestry");
                 const auto& parent=found->second;
                 if(current->layout.size<parent->layout.size || !std::includes(current->layout.references.begin(),current->layout.references.end(),parent->layout.references.begin(),parent->layout.references.end()))
                     throw std::invalid_argument("incompatible base payload prefix");
                 current=parent;
+            }
+        }
+        for(const auto& [key,value]:witness_candidates) {
+            if(!prepared->types.contains(value->view_identity)) throw std::invalid_argument("unadmitted witness static view");
+            auto [found,added]=prepared->witnesses.emplace(key,value);
+            if(!added) {
+                const auto& old=*found->second;
+                if(old.interface_identity!=value->interface_identity || old.view_identity!=value->view_identity || old.contract!=value->contract)
+                    throw std::invalid_argument("incompatible interface witness admission");
             }
         }
         {std::lock_guard lock(mutex_);
@@ -302,9 +321,33 @@ void Runtime::admit_types(std::span<const NominalDescriptor> incoming) {
 std::shared_ptr<const NominalDescriptor> Runtime::descriptor(std::string_view key) const {
     std::lock_guard lock(mutex_);
     if(!types_) throw std::invalid_argument("nominal type is not admitted");
-    auto found=types_->find(key);
-    if(found==types_->end()) throw std::invalid_argument("nominal type is not admitted");
+    auto found=types_->types.find(key);
+    if(found==types_->types.end()) throw std::invalid_argument("nominal type is not admitted");
     return found->second;
+}
+const InterfaceWitness* Runtime::witness(std::string_view key) const {
+    require_managed();std::lock_guard lock(mutex_);
+    if(!types_) return nullptr;
+    auto found=types_->witnesses.find(key);return found==types_->witnesses.end() ? nullptr : found->second.get();
+}
+std::int64_t Runtime::interface_binding(void* object,const void* pointer,std::span<const char* const> keys) const {
+    require_managed();std::lock_guard lock(mutex_);
+    if(!object || !pointer || !types_) return -1;
+    // Validate opaque membership before dereferencing; metadata is not a GC root.
+    const InterfaceWitness* admitted=nullptr;
+    for(const auto& [key,value]:types_->witnesses) if(value.get()==pointer) {admitted=value.get();break;}
+    if(!admitted) return -1;
+    auto key=heap_.nominal_identity(object);if(key.empty()) return -1;
+    auto current=types_->types.find(key);
+    bool matches=false;
+    for(unsigned depth=0;current!=types_->types.end() && depth<128;++depth) {
+        if(current->first==admitted->view_identity) {matches=true;break;}
+        if(current->second->base.empty()) break;
+        current=types_->types.find(current->second->base);
+    }
+    if(!matches) return -1;
+    auto found=std::lower_bound(keys.begin(),keys.end(),admitted->key,[](const char* a,std::string_view b){return std::string_view(a)<b;});
+    return found==keys.end() || std::string_view(*found)!=admitted->key ? -1 : found-keys.begin();
 }
 std::int64_t Runtime::dynamic_type(void* object,std::span<const char* const> catalog) const {
     require_managed();
@@ -322,8 +365,8 @@ void Runtime::validate_descriptor(const TypeLayout& layout) const {
     if(!layout.descriptor) return;
     if(!types_) throw std::invalid_argument("unadmitted nominal layout");
     const auto& descriptor=*layout.descriptor;
-    auto found=types_->find(descriptor.identity);
-    if(found==types_->end() || found->second!=layout.descriptor || descriptor.layout.size!=layout.size || descriptor.layout.references!=layout.references)
+    auto found=types_->types.find(descriptor.identity);
+    if(found==types_->types.end() || found->second!=layout.descriptor || descriptor.layout.size!=layout.size || descriptor.layout.references!=layout.references)
         throw std::invalid_argument("nominal layout does not match admitted descriptor");
 }
 }

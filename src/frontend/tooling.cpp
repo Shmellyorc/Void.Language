@@ -85,7 +85,7 @@ struct Graph {
         }
         for(const auto& d:analysis.declarations()) {
             declarations.emplace(d.identity,&d);
-            if(d.kind==AnalyzedDeclaration::Kind::local_constant || d.kind==AnalyzedDeclaration::Kind::value_field || d.kind==AnalyzedDeclaration::Kind::managed_field || d.kind==AnalyzedDeclaration::Kind::receiver_method || d.kind==AnalyzedDeclaration::Kind::initializer) references[d.identity].insert(d.owner);
+            if(d.kind==AnalyzedDeclaration::Kind::local_constant || d.kind==AnalyzedDeclaration::Kind::value_field || d.kind==AnalyzedDeclaration::Kind::managed_field || d.kind==AnalyzedDeclaration::Kind::interface_requirement || d.kind==AnalyzedDeclaration::Kind::receiver_method || d.kind==AnalyzedDeclaration::Kind::initializer) references[d.identity].insert(d.owner);
         }
         for(const auto& r:analysis.references()) {
             references[r.to].insert(r.from); bindings[r.from].push_back(r.to);

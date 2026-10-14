@@ -76,6 +76,27 @@ inline bool join_effects(ReferenceEffects& into,const ReferenceEffects& from) {
     changed|=join_facts(into.receiver_after,from.receiver_after);
     return changed;
 }
+inline ReferenceEffects abstract_interface_effects(const ReferenceEffects& concrete,bool receiver_mutates) {
+    ReferenceEffects result;
+    auto rebase=[](ReferenceOrigin origin) {if(origin.parameter==0) origin.path.clear();return origin;};
+    for(auto origin:concrete.mutations) result.mutations.insert(rebase(origin));
+    for(auto origin:concrete.retained) result.retained.insert(rebase(origin));
+    for(auto origin:concrete.required_mutable) result.required_mutable.insert(rebase(origin));
+    if(receiver_mutates) result.mutations.insert(ReferenceOrigin{0,{}});
+    for(const auto& [path,fact]:concrete.returned) {
+        auto& out=result.returned[path];out.readonly=fact.readonly;
+        for(auto origin:fact.origins) out.origins.insert(rebase(origin));
+    }
+    return result;
+}
+inline ReferenceEffects unknown_interface_effects(const Function& requirement) {
+    ReferenceEffects result;result.mutations.insert(ReferenceOrigin{0,{}});result.retained.insert(ReferenceOrigin{0,{}});result.required_mutable.insert(ReferenceOrigin{0,{}});
+    for(auto path:reference_paths(requirement.result)) {
+        auto& fact=result.returned[path];fact.readonly=true;
+        for(unsigned n=0;n<requirement.parameters.size();++n) for(auto leaf:reference_paths(requirement.parameters[n])) fact.origins.insert({n,leaf});
+    }
+    return result;
+}
 inline std::set<ReferenceOrigin> mutable_requirements(const ReferenceFacts& actual,Type expected,const ReferenceFacts* capacity=nullptr) {
     std::set<ReferenceOrigin> result;
     const auto readonly=readonly_paths(expected);

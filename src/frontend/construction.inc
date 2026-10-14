@@ -33,7 +33,7 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             const auto& fields=parameters.at(origin).definition->fields;
             for (unsigned field=0;field<fields.size();++field) {
                 Type t=fields[field].type;
-                if (!f.initializer || t.kind!=Type::managed_ref || t.nullable) initial.emplace(origin,field);
+                if (!f.initializer || !ir::reference_value(t) || t.nullable) initial.emplace(origin,field);
             }
         }
         auto require_field=[&](unsigned origin,unsigned field,const Ready& ready,const Token& token) {
@@ -58,6 +58,7 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             if (e.kind==K::call || e.kind==K::method_call) {
                 Mask mask;
                 for (unsigned i=0;i<e.parts.size();++i) if(auto origin=expression(*e.parts[i],ready)) {
+                    if(e.interface_call) issue(e.token,"Interface dispatch is prohibited on unfinished self or its aliases.");
                     if (!e.virtual_slot.empty()) issue(e.token,"Virtual-family calls are prohibited on unfinished self or its aliases, including direct super calls.");
                     for(unsigned field=0;field<e.parts[i]->type.definition->fields.size();++field) require_field(*origin,field,ready,e.token);
                     mask.insert(i);

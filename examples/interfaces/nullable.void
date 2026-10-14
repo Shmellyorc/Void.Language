@@ -1,0 +1,24 @@
+interface readable:
+    func read() -> i32
+struct cell:
+    n: i32
+func (c cell) read() -> i32:
+    return c.n
+value struct carrier:
+    target: readable?
+    count: i32
+func pass(const r: readable?) -> readable?:
+    return r
+func entry(value: i32) -> i32:
+    var absent: cell?
+    var nothing: readable? = absent
+    if nothing != null:
+        return -1
+    var c = cell(n = value)
+    var a = carrier(target = c)
+    var b = a
+    b.count = 5
+    var r = pass(b.target) as readable
+    if a.target == b.target:
+        return r.read() + a.count + b.count
+    return -2

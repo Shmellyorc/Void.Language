@@ -1,0 +1,2 @@
+interface readable:
+    func read() -> i32

@@ -1,6 +1,10 @@
 # Known issues and deferred work
 
-Updated for Phase 20. The owner reports Phase 19 locked at run #33, attempt #2,
+Updated for Phase 21. Phase 20 is owner-locked at run #35 (51/51 in all seven jobs).
+Phase 21 adds four suites (55 total); INTERFACES.md and WORK_LOG.md record the local
+implementation and validation. Its seven-job hosted Windows/macOS/Linux gate is pending.
+
+Historical Phase 20 status follows; the Phase 20 hosted gate is complete. The owner reports Phase 19 locked at run #33, attempt #2,
 all seven jobs (47 suites). Phase 20 adds four suites (51 total); INHERITANCE.md
 and WORK_LOG.md describe actual local verification. Hosted Windows/macOS and all
 seven configurations remain required after owner review/push.
@@ -8,7 +12,7 @@ seven configurations remain required after owner review/push.
 Single managed inheritance, explicit virtual/override/super, complete base prefixes
 and staged constructor chaining now use the shared compiler/IR/runtime. Source
 casts to descendants, type-pattern expansion, protected/richer field access,
-inherited hiding, covariance, abstract/final, interfaces, open-world type loading,
+inherited hiding, covariance, abstract/final, richer interface features, open-world type loading,
 implicit constructor forwarding/chaining and external managed aggregate ABI remain
 deferred. Physical layout depth combines inheritance and inline nesting (128);
 expanded fields remain capped at 65536 and construction contexts at 1024.
@@ -308,3 +312,14 @@ method-only reuse and new field access modifiers remain deferred. Embedded metho
 retain existing explicit owner-import requirements. Composition grants no subtype
 or implicit conversion. Hosted seven-job validation remains necessary for this
 phase; Linux local evidence is not Windows/macOS execution.
+
+
+Phase 21 supports managed-backed interface views, including reference-containing
+values and original inline component receivers. Standalone value erasure/boxing,
+interface inheritance, defaults/bodies, overloads, Self/generics, width/downcasts,
+dynamic discovery/type tests, managed/interface FFI and open-world loading remain
+unimplemented. Per-requirement provider-family effects are conservative: an unrelated
+mutating provider can reject a readonly reader; empty families are unknown, not
+optimistically pure. Consumers need the interface owner's import. Runtime witnesses
+are immutable data, not permissions or retained code. Root homes retain dead values
+until return as before; no new liveness optimizer or production-GC claim is made.

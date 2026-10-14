@@ -3,6 +3,7 @@
 #include "void/frontend.hpp"
 #include "void/numeric.hpp"
 #include "void/runtime_abi.hpp"
+#include "void/reference_capabilities.hpp"
 #include <cmath>
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/ExecutionEngine/Orc/LLJIT.h>
@@ -73,9 +74,10 @@ std::string source_message(const SourceLocation& location, const std::string& ex
 }
 std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& context,
                                   const std::string& suffix, const llvm::DataLayout& target_layout,
-                                  std::vector<NominalDescriptor>* host_catalog=nullptr) {
+                                  std::vector<NominalDescriptor>* host_catalog=nullptr,std::vector<InterfaceWitness>* host_witnesses=nullptr) {
     ir::InstructionTypes checked_types;
-    ir::validate(input, &checked_types);
+    std::map<std::string,ir::ReferenceEffects> verified_effects;
+    ir::validate(input, &checked_types,&verified_effects);
     auto module = std::make_unique<llvm::Module>(input.identity, context);
     module->setDataLayout(target_layout);
     // StructLayout caches use raw context-owned Type pointers as keys. Query
@@ -83,7 +85,11 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
     const auto& layout = module->getDataLayout();
     llvm::IRBuilder<> b(context);
     std::map<std::string,llvm::StructType*> aggregates;
+    auto* interface_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy());
+    auto* prepared_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty());
     std::function<llvm::Type*(ir::Type)> type = [&](ir::Type t) -> llvm::Type* {
+        if(t.kind==ir::Type::interface_ref) return interface_type;
+        if(t.kind==ir::Type::prepared_receiver) return prepared_type;
         if (t.kind == ir::Type::managed_ref) return b.getPtrTy();
         if (t.kind == ir::Type::aggregate) {
             if (auto found = aggregates.find(t.definition->identity); found != aggregates.end()) return found->second;
@@ -123,6 +129,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     current=ir::field_type(current,field);
                 }
                 result.push_back(offset);
+                if(current.kind==ir::Type::prepared_receiver) result.push_back(offset+layout.getPointerSize());
             }
         };
         auto* size_type = b.getIntNTy(layout.getPointerSizeInBits());
@@ -193,6 +200,80 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         b.CreateStore(b.CreateGlobalStringPtr("Invalid managed virtual receiver or generation type catalog"),dispatcher->getArg(dispatcher->arg_size()-1));
         if(root.result==ir::Type::none) b.CreateRetVoid();else b.CreateRet(llvm::Constant::getNullValue(type(root.result)));
     }
+    // Canonical data-only contracts use independently inferred effects, including
+    // the complete eligible family. Body-only edits retain old witness addresses.
+    auto encoded=[](std::string_view value){return std::to_string(value.size())+":"+std::string(value);};
+    auto effect_contract=[&](const ir::ReferenceEffects& effects) {
+        std::string text;auto origin=[&](const ir::ReferenceOrigin& value) {std::string out=std::to_string(value.parameter)+":";for(auto n:value.path) out+=std::to_string(n)+",";return out+";";};
+        for(auto [set,tag]:{std::pair{&effects.mutations,'M'},std::pair{&effects.retained,'H'},std::pair{&effects.required_mutable,'Q'}}) for(const auto& o:*set) text+=tag+origin(o);
+        for(const auto& [path,fact]:effects.returned) {text+="R[";for(auto n:path) text+=std::to_string(n)+",";text+=fact.readonly ? "]C" : "]V";for(const auto& o:fact.origins) text+=origin(o);}
+        return text;
+    };
+    std::map<std::string,std::string> interface_contracts;
+    const auto source_contract=input.analysis ? input.analysis->compatibility_contract() : input.constant_contract;
+    std::string access_contract=encoded(source_contract)+encoded(input.root_identity);
+    for(const auto& [scope,imports]:input.source_imports) {access_contract+=encoded(scope);for(const auto& imported:imports) access_contract+=encoded(imported);}
+    for(auto t:input.nominal_types) {
+        access_contract+=encoded(ir::type_name(t))+encoded(std::to_string(t.kind))+encoded(t.definition->module_identity)+encoded(t.definition->visibility);auto base=t.definition->base.lock();access_contract+=encoded(base ? base->identity : "");
+        for(const auto& field:t.definition->fields) access_contract+=encoded(field.name)+encoded(field.owner)+encoded(ir::type_name(field.type))+(field.using_field ? "U;" : "F;");
+    }
+    for(const auto& f:input.functions) {access_contract+=encoded(f.name)+encoded(f.visibility)+encoded(f.virtual_slot);for(auto t:f.parameters) access_contract+=encoded(ir::type_name(t))+encoded(ir::capability_key(t));access_contract+=encoded(ir::type_name(f.result))+encoded(ir::capability_key(f.result));}
+    for(const auto& r:input.interface_requirements) {
+        auto& text=interface_contracts[ir::Type::key(r.parameters[0])];text+=encoded(r.name)+encoded(ir::type_name(r.result))+encoded(ir::capability_key(r.result));
+        for(auto t:r.parameters) text+=encoded(ir::type_name(t))+encoded(ir::capability_key(t));
+        text+=encoded(effect_contract(verified_effects.at(r.name)));
+    }
+    std::vector<const ir::Module::Binding*> bindings;
+    for(const auto& binding:input.interface_bindings) bindings.push_back(&binding);
+    std::sort(bindings.begin(),bindings.end(),[](auto* a,auto* c){return a->key<c->key;});
+    for(auto* binding:bindings) interface_contracts[ir::Type::key(binding->interface)]+=encoded(binding->key);
+    auto* witness_record_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy());
+    if(layout.getTypeAllocSize(witness_record_type)!=sizeof(RuntimeWitnessRecord)) throw std::invalid_argument("runtime witness record ABI mismatch");
+    std::vector<llvm::Constant*> witness_records,witness_keys;
+    for(auto* binding:bindings) {
+        InterfaceWitness data{binding->key,ir::Type::key(binding->interface),ir::Type::key(binding->view),interface_contracts.at(ir::Type::key(binding->interface))+access_contract};
+        if(host_witnesses) host_witnesses->push_back(data);
+        auto* key=string(data.key);witness_keys.push_back(key);
+        witness_records.push_back(llvm::ConstantStruct::get(witness_record_type,{key,string(data.interface_identity),string(data.view_identity),string(data.contract)}));
+    }
+    auto* witness_catalog_type=llvm::ArrayType::get(witness_record_type,witness_records.size());
+    new llvm::GlobalVariable(*module,witness_catalog_type,true,llvm::GlobalValue::ExternalLinkage,llvm::ConstantArray::get(witness_catalog_type,witness_records),"__vd_witnesses"+suffix);
+    new llvm::GlobalVariable(*module,size_type,true,llvm::GlobalValue::ExternalLinkage,llvm::ConstantInt::get(size_type,witness_records.size()),"__vd_witness_count"+suffix);
+    auto* witness_keys_type=llvm::ArrayType::get(b.getPtrTy(),witness_keys.size());
+    auto* binding_keys=new llvm::GlobalVariable(*module,witness_keys_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantArray::get(witness_keys_type,witness_keys),"interface_binding_keys");
+    auto binding_index=[&](llvm::Value* view) {return b.CreateCall(module->getOrInsertFunction("vd_gc_interface_binding",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),size_type),{b.CreateExtractValue(view,0),b.CreateExtractValue(view,1),binding_keys,llvm::ConstantInt::get(size_type,bindings.size())});};
+    std::map<std::string,llvm::Function*> preparations,interface_dispatchers;
+    for(const auto& requirement:input.interface_requirements) {
+        auto* prepare=llvm::Function::Create(llvm::FunctionType::get(prepared_type,{interface_type,b.getPtrTy()},false),llvm::GlobalValue::InternalLinkage,"prepare_"+native_symbol(requirement,suffix),*module);
+        preparations.emplace(requirement.name,prepare);
+        std::vector<llvm::Type*> parameters{prepared_type};for(unsigned n=1;n<requirement.parameters.size();++n) parameters.push_back(type(requirement.parameters[n]));parameters.push_back(b.getPtrTy());
+        auto* invoke=llvm::Function::Create(llvm::FunctionType::get(type(requirement.result),parameters,false),llvm::GlobalValue::InternalLinkage,"interface_"+native_symbol(requirement,suffix),*module);
+        interface_dispatchers.emplace(requirement.name,invoke);
+        b.SetInsertPoint(llvm::BasicBlock::Create(context,"binding",prepare));
+        auto* invalid=llvm::BasicBlock::Create(context,"invalid_binding",prepare);auto* selected=b.CreateSwitch(binding_index(prepare->getArg(0)),invalid,static_cast<unsigned>(bindings.size()));
+        b.SetInsertPoint(llvm::BasicBlock::Create(context,"prepared",invoke));
+        auto* bad_call=llvm::BasicBlock::Create(context,"invalid_prepared_receiver",invoke);auto* called=b.CreateSwitch(b.CreateExtractValue(invoke->getArg(0),3),bad_call,static_cast<unsigned>(bindings.size()));
+        for(unsigned n=0;n<bindings.size();++n) {
+            auto method=bindings[n]->methods.find(requirement.name);if(method==bindings[n]->methods.end()) continue;
+            const auto& [path,name]=method->second;
+            auto target=std::find_if(input.functions.begin(),input.functions.end(),[&](const auto& f){return f.name==name;});
+            auto* project=llvm::BasicBlock::Create(context,"select_receiver",prepare);selected->addCase(b.getInt64(n),project);b.SetInsertPoint(project);
+            auto* owner=b.CreateExtractValue(prepare->getArg(0),0);llvm::Value* address=owner;auto current=bindings[n]->view;
+            for(auto field:path) {
+                address=field_address(current,address,field);current=ir::field_type(current,field);
+                if(current.kind==ir::Type::managed_ref) address=b.CreateLoad(b.getPtrTy(),address);
+            }
+            auto* zero=llvm::ConstantPointerNull::get(b.getPtrTy());llvm::Value* token=llvm::Constant::getNullValue(prepared_type);
+            token=b.CreateInsertValue(token,owner,0);token=b.CreateInsertValue(token,current.kind==ir::Type::managed_ref ? address : zero,1);token=b.CreateInsertValue(token,current.kind==ir::Type::managed_ref ? zero : address,2);token=b.CreateInsertValue(token,b.getInt64(n),3);b.CreateRet(token);
+            auto* call=llvm::BasicBlock::Create(context,"invoke_binding",invoke);called->addCase(b.getInt64(n),call);b.SetInsertPoint(call);
+            std::vector<llvm::Value*> arguments{b.CreateExtractValue(invoke->getArg(0),target->parameters[0].kind==ir::Type::managed_ref ? 1 : 2)};
+            for(unsigned k=1;k<invoke->arg_size();++k) arguments.push_back(invoke->getArg(k));
+            auto* callee=target->virtual_slot.empty() ? functions.at(name) : dispatchers.at(target->virtual_slot);
+            auto* result=b.CreateCall(callee,arguments);if(requirement.result==ir::Type::none) b.CreateRetVoid();else b.CreateRet(result);
+        }
+        b.SetInsertPoint(invalid);b.CreateStore(string("Invalid interface binding, domain or generation catalog"),prepare->getArg(1));b.CreateRet(llvm::Constant::getNullValue(prepared_type));
+        b.SetInsertPoint(bad_call);b.CreateStore(string("Invalid prepared interface receiver"),invoke->getArg(invoke->arg_size()-1));if(requirement.result==ir::Type::none) b.CreateRetVoid();else b.CreateRet(llvm::Constant::getNullValue(type(requirement.result)));
+    }
     llvm::DIBuilder debug(*module);
     auto module_path = vd::utf8_path(input.source_path.empty() ? input.identity : input.source_path);
     auto* file = debug.createFile(vd::path_utf8(module_path.filename()), vd::path_utf8(module_path.parent_path()));
@@ -200,6 +281,12 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
     std::map<std::string,llvm::DIType*> debug_aggregates;
     std::function<llvm::DIType*(ir::Type)> debug_value_type = [&](ir::Type t) -> llvm::DIType* {
         if (t.kind == ir::Type::managed_ref) return debug.createPointerType(nullptr, layout.getPointerSizeInBits());
+        if(t.kind==ir::Type::interface_ref || t.kind==ir::Type::prepared_receiver) {
+            auto* native=llvm::cast<llvm::StructType>(type(t));auto* offsets=layout.getStructLayout(native);std::vector<llvm::Metadata*> members;
+            for(unsigned n=0;n<native->getNumElements();++n) {auto* part=native->getElementType(n);llvm::DIType* debug_part=n< (t.kind==ir::Type::interface_ref ? 2u : 3u) ? static_cast<llvm::DIType*>(debug.createPointerType(nullptr,layout.getPointerSizeInBits())) : debug.createBasicType("binding selector",64,llvm::dwarf::DW_ATE_unsigned);
+                members.push_back(debug.createMemberType(file,std::to_string(n),file,0,layout.getTypeSizeInBits(part),layout.getABITypeAlign(part).value()*8,offsets->getElementOffsetInBits(n),llvm::DINode::FlagZero,debug_part));}
+            return debug.createStructType(file,ir::type_name(t),file,0,offsets->getSizeInBits(),layout.getABITypeAlign(native).value()*8,llvm::DINode::FlagZero,nullptr,debug.getOrCreateArray(members));
+        }
         if (t == ir::Type::none) return nullptr;
         if (t.kind == ir::Type::aggregate) {
             if (auto found = debug_aggregates.find(t.definition->identity); found != debug_aggregates.end()) return found->second;
@@ -343,12 +430,31 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     for (const auto& path:ir::reference_paths(value_type)) {
                         auto leaf=value_type;
                         for (auto field:path) leaf=ir::field_type(leaf,field);
-                        if (leaf.nullable) continue;
                         auto* reference=path.empty() ? value : b.CreateExtractValue(value,path);
-                        fail_if(b.CreateIsNull(reference),"Null supplied for non-nullable field");
+                        if(leaf.kind==ir::Type::interface_ref) {
+                            auto* object=b.CreateExtractValue(reference,0);auto* witness=b.CreateExtractValue(reference,1);
+                            auto* selected=binding_index(reference);auto* bad=b.CreateICmpSLT(selected,b.getInt64(0));
+                            // A witness for a different nominal interface is not valid storage.
+                            llvm::Value* known=b.getFalse();
+                            for(unsigned n=0;n<bindings.size();++n) if(bindings[n]->interface.definition==leaf.definition) known=b.CreateOr(known,b.CreateICmpEQ(selected,b.getInt64(n)));
+                            bad=b.CreateOr(bad,b.CreateNot(known));
+                            if(leaf.nullable) bad=b.CreateAnd(bad,b.CreateNot(b.CreateAnd(b.CreateIsNull(object),b.CreateIsNull(witness))));
+                            fail_if(bad,"Invalid interface field binding");
+                        } else if(!leaf.nullable) fail_if(b.CreateIsNull(reference),"Null supplied for non-nullable field");
                     }
                 };
                 switch (instruction.op) {
+                case Op::interface_pack: {
+                    auto* object=values[instruction.a];auto* nonnull=llvm::BasicBlock::Create(context,"bind_interface",fn);auto* joined=llvm::BasicBlock::Create(context,"interface_view",fn);auto* start=b.GetInsertBlock();
+                    b.CreateCondBr(b.CreateIsNull(object),joined,nonnull);b.SetInsertPoint(nonnull);
+                    auto* witness=b.CreateCall(module->getOrInsertFunction("vd_gc_witness",b.getPtrTy(),b.getPtrTy()),{string(instruction.callee)});
+                    fail_if(b.CreateIsNull(witness),"Interface binding is not admitted");
+                    llvm::Value* pair=llvm::Constant::getNullValue(interface_type);pair=b.CreateInsertValue(pair,object,0);pair=b.CreateInsertValue(pair,witness,1);auto* bound=b.GetInsertBlock();b.CreateBr(joined);b.SetInsertPoint(joined);
+                    auto* phi=b.CreatePHI(interface_type,2);phi->addIncoming(llvm::Constant::getNullValue(interface_type),start);phi->addIncoming(pair,bound);v=phi;break;
+                }
+                case Op::interface_prepare:
+                    v=b.CreateCall(preparations.at(instruction.callee),{values[instruction.a],failure});
+                    fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),b.CreateStructGEP(failure_type,failure,0))),"Interface receiver preparation failed");break;
                 case Op::gc_poll: case Op::gc_collect: {
                     if (instruction.op == Op::gc_poll) v = b.CreateCall(module->getOrInsertFunction("vd_gc_poll",b.getVoidTy()));
                     else {
@@ -420,7 +526,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     else v = fn->getArg(instruction.a);
                     break;
                 case Op::constant:
-                    if (instruction.type.kind == ir::Type::managed_ref) v = llvm::ConstantPointerNull::get(b.getPtrTy());
+                    if(ir::reference_value(instruction.type)) v=llvm::Constant::getNullValue(type(instruction.type));
                     else if (numeric::floating(instruction.type)) v = llvm::ConstantFP::get(context,llvm::APFloat(instruction.type == ir::Type::f32 ? llvm::APFloat::IEEEsingle() : llvm::APFloat::IEEEdouble(),llvm::APInt(numeric::width(instruction.type),static_cast<std::uint64_t>(instruction.immediate))));
                     else v = llvm::ConstantInt::get(type(instruction.type),instruction.immediate,true);
                     break;
@@ -428,7 +534,11 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 case Op::upcast: case Op::stage_prefix: v=values[instruction.a]; break;
                 case Op::convert: {
                     auto* a = values[instruction.a]; auto from = operand_type(instruction.a), to = instruction.type;
-                    if (from.kind==ir::Type::managed_ref) { fail_if(b.CreateIsNull(a),"Null managed reference in checked conversion"); v=a; break; }
+                    if(ir::reference_value(from)) {
+                        if(!to.nullable) fail_if(b.CreateIsNull(from.kind==ir::Type::interface_ref ? b.CreateExtractValue(a,0) : a),from.kind==ir::Type::interface_ref ? "Null interface reference in checked conversion" : "Null managed reference in checked conversion");
+                        if(from.kind==ir::Type::interface_ref) guard_complete(to,a);
+                        v=a;break;
+                    }
                     if (from == to) { v = a; break; }
                     if (numeric::integer(from) && numeric::integer(to)) {
                         auto* wide = numeric::signed_integer(from) ? b.CreateSExt(a,b.getIntNTy(128)) : b.CreateZExt(a,b.getIntNTy(128));
@@ -468,6 +578,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:
                 case Op::equal: case Op::not_equal: case Op::less: case Op::less_equal: case Op::greater: case Op::greater_equal: {
                     auto* a = values[instruction.a]; auto* divisor = values[instruction.b];
+                    if(operand_type(instruction.a).kind==ir::Type::interface_ref) {a=b.CreateExtractValue(a,0);divisor=b.CreateExtractValue(divisor,0);}
                     bool floating = a->getType()->isFloatingPointTy();
                     bool sign = numeric::signed_integer(operand_type(instruction.a));
                     switch (instruction.op) {
@@ -500,7 +611,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 case Op::logical_not: v = b.CreateNot(values[instruction.a]); break;
                 case Op::load: v = b.CreateLoad(type(f.locals[instruction.a]), slots[instruction.a]); break;
                 case Op::store: v = b.CreateStore(values[instruction.b], slots[instruction.a]); break;
-                case Op::call: case Op::virtual_call: case Op::base_init: {
+                case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
                     if(instruction.op==Op::base_init && instruction.callee.empty()) {
                         auto* address=b.CreateLoad(b.getPtrTy(),slots[0]);
                         for(unsigned field=0;field<instruction.arguments.size();++field) {
@@ -519,14 +630,14 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                             address = field_address(t,address,field);
                             t = t.definition->fields.at(field).type;
                         }
-                        arguments.push_back(t.kind==ir::Type::managed_ref ? b.CreateLoad(type(t),address) : address);
+                        arguments.push_back(t.kind==ir::Type::managed_ref || t.kind==ir::Type::prepared_receiver ? b.CreateLoad(type(t),address) : address);
                     }
                     for (auto id : instruction.arguments) arguments.push_back(values[id]);
                     bool imported = std::find(input.imports.begin(),input.imports.end(),instruction.callee) != input.imports.end();
                     bool legacy_single = imported;
                     for (const auto& target : input.functions) if (target.name == instruction.callee) legacy_single = !target.receiver && target.parameters.size() == 1;
                     if (arguments.empty() && legacy_single) arguments.push_back(values[instruction.a]);
-                    auto* callee = functions.at(instruction.callee);
+                    auto* callee = instruction.op==Op::interface_call ? interface_dispatchers.at(instruction.callee) : functions.at(instruction.callee);
                     if(instruction.op==Op::virtual_call) {
                         for(const auto& target:input.functions) if(target.name==instruction.callee) callee=dispatchers.at(target.virtual_slot);
                     }
@@ -605,7 +716,7 @@ struct Jit::Impl {
     };
     std::shared_ptr<const NativeCode> load(std::unique_ptr<llvm::Module> module,
         std::unique_ptr<llvm::LLVMContext> context, const std::string& symbol,
-        Compatibility contract, const std::shared_ptr<Impl>& self, bool checked = false, std::shared_ptr<Runtime> runtime = {}, std::span<const NominalDescriptor> catalog = {}) {
+        Compatibility contract, const std::shared_ptr<Impl>& self, bool checked = false, std::shared_ptr<Runtime> runtime = {}, std::span<const NominalDescriptor> catalog = {},std::span<const InterfaceWitness> witnesses = {}) {
 #ifdef VOID_FUNCTION_SANITIZER_HASH
         // The host ABI is checked before reaching this boundary. Match the
         // compiler-generated plain/checked entry metadata without disabling UBSan.
@@ -624,7 +735,7 @@ struct Jit::Impl {
         auto address = unwrap(jit->lookup(symbol));
         if (checked) {
             auto result=std::make_shared<NativeCode>(address.toPtr<NativeCode::CheckedEntry>(),generation,std::move(contract),runtime);
-            if(runtime) runtime->admit_types(catalog);
+            if(runtime) runtime->admit_metadata(catalog,witnesses);
             return result;
         }
         auto entry = address.toPtr<NativeCode::Entry>();
@@ -638,6 +749,8 @@ Jit::Jit() : impl_(std::make_shared<Impl>()) {
     bind("vd_gc_construct",vd_gc_construct);
     bind("vd_gc_construct_typed",vd_gc_construct_typed);
     bind("vd_gc_dynamic_type",vd_gc_dynamic_type);
+    bind("vd_gc_witness",vd_gc_witness);
+    bind("vd_gc_interface_binding",vd_gc_interface_binding);
     bind("vd_gc_poll",vd_gc_poll); bind("vd_gc_collect",vd_gc_collect); bind("vd_gc_allocate",vd_gc_allocate);
     bind("vd_gc_alive",vd_gc_alive); bind("vd_gc_native_enter",vd_gc_native_enter); bind("vd_gc_native_leave",vd_gc_native_leave);
 }
@@ -664,7 +777,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
         if (!impl_->source_runtime) impl_->source_runtime=std::make_shared<Runtime>(256);
         runtime=impl_->source_runtime;
     }
-    ir::validate(input);
+    std::map<std::string,ir::ReferenceEffects> checked_effects;ir::validate(input,nullptr,&checked_effects);
     if (input.coordinated != static_cast<bool>(runtime)) throw std::invalid_argument("coordinated IR requires an explicit runtime owner");
     const ir::Function* selected = nullptr;
     for (const auto& f : input.functions) if (f.name == entry) selected = &f;
@@ -703,18 +816,32 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
             record(f.result); for (auto t : f.parameters) record(t); for (auto t : f.locals) record(t);
             for (const auto& block : f.blocks) for (const auto& i : block.instructions) record(i.type);
         }
+        for(const auto& r:input.interface_requirements) {
+            contract.source_contract+="interface:"+encoded(r.name)+encoded(r.visibility)+encoded(ir::type_name(r.result))+encoded(ir::capability_key(r.result));
+            for(auto t:r.parameters) contract.source_contract+=encoded(ir::type_name(t))+encoded(ir::capability_key(t));
+            const auto& effect=checked_effects.at(r.name);
+            for(auto [set,tag]:{std::pair{&effect.mutations,'M'},std::pair{&effect.retained,'H'},std::pair{&effect.required_mutable,'Q'}}) for(const auto& origin:*set) {
+                contract.source_contract+=tag+std::to_string(origin.parameter)+":";for(auto field:origin.path) contract.source_contract+=std::to_string(field)+",";contract.source_contract+=';';
+            }
+            for(const auto& [path,fact]:effect.returned) {
+                contract.source_contract+="R[";for(auto field:path) contract.source_contract+=std::to_string(field)+",";contract.source_contract+=fact.readonly ? "]C" : "]V";
+                for(const auto& origin:fact.origins) {contract.source_contract+=std::to_string(origin.parameter)+":";for(auto field:origin.path) contract.source_contract+=std::to_string(field)+",";contract.source_contract+=';';}
+            }
+        }
+        for(const auto& binding:input.interface_bindings) contract.source_contract+=encoded(binding.key);
+        for(const auto& [scope,imports]:input.source_imports) {contract.source_contract+=encoded(scope);for(const auto& imported:imports) contract.source_contract+=encoded(imported);}
         contract.source_contract += "\nphase15-runtime-layouts:";
         for (const auto& [name,text] : layouts) { (void)name; contract.source_contract += std::to_string(text.size()) + ":" + text; }
     }
     if (!selected->module_identity.empty()) contract.constant_contract = input.analysis ? input.analysis->constant_contract() : input.constant_contract;
     auto suffix = "__v" + std::to_string(++impl_->serial);
     auto context = std::make_unique<llvm::LLVMContext>();
-    std::vector<NominalDescriptor> catalog;
-    auto module = lower(input, *context, suffix, impl_->jit->getDataLayout(),&catalog);
+    std::vector<NominalDescriptor> catalog;std::vector<InterfaceWitness> witnesses;
+    auto module = lower(input, *context, suffix, impl_->jit->getDataLayout(),&catalog,&witnesses);
     module->setDataLayout(impl_->jit->getDataLayout());
     module->setTargetTriple(impl_->jit->getTargetTriple().str());
     finish(*module, optimize);
-    return impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, std::move(runtime),catalog);
+    return impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, std::move(runtime),catalog,witnesses);
 }
 std::shared_ptr<const NativeCode> Jit::compile(const ValidatedAnalysis& analysis, bool optimize, Compatibility contract) {
     auto module = analysis.lower();
@@ -842,7 +969,8 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         auto* catalog=module->getNamedGlobal("__vd_types"+(source_program ? std::string("__void") : std::string{}));
         auto* count=module->getNamedGlobal("__vd_type_count"+(source_program ? std::string("__void") : std::string{}));
         auto* size_type=b.getIntNTy(module->getDataLayout().getPointerSizeInBits());
-        result=b.CreateCall(module->getOrInsertFunction("vd_runtime_entry_typed",b.getInt32Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),size_type),{entry,input_value,failure,catalog,b.CreateLoad(size_type,count)});
+        auto* witnesses=module->getNamedGlobal("__vd_witnesses"+(source_program ? std::string("__void") : std::string{}));auto* witness_count=module->getNamedGlobal("__vd_witness_count"+(source_program ? std::string("__void") : std::string{}));
+        result=b.CreateCall(module->getOrInsertFunction("vd_runtime_entry_metadata",b.getInt32Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type),{entry,input_value,failure,catalog,b.CreateLoad(size_type,count),witnesses,b.CreateLoad(size_type,witness_count)});
     }
     else result=b.CreateCall(entry, arguments);
     if (failure) {

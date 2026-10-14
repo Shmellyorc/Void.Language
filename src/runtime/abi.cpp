@@ -8,11 +8,11 @@ Runtime& Runtime::current() {
 }
 }
 namespace {
-std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count) noexcept {
+std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses=nullptr,std::size_t witness_count=0) noexcept {
     try {
         vd::Runtime runtime(256);
         vd::Runtime::Attachment attachment(runtime);
-        if(count) {vd_runtime_admit(&runtime,records,count,failure);if(failure->message) return 0;}
+        if(count || witness_count) {vd_runtime_admit_metadata(&runtime,records,count,witnesses,witness_count,failure);if(failure->message) return 0;}
         vd::Runtime::Managed managed(runtime);
         return entry(value,failure);
     } catch (const std::bad_alloc&) {failure->message="Runtime startup allocation failed";}
@@ -62,7 +62,8 @@ void vd_gc_construct(void** slot,std::size_t size,const std::size_t* offsets,std
 void vd_gc_construct_typed(void** slot,std::size_t size,const std::size_t* offsets,std::size_t count,const void* payload,const char* key,vd::RuntimeFailure* failure) noexcept {
     construct(slot,size,offsets,count,payload,key,failure);
 }
-void vd_runtime_admit(vd::Runtime* runtime,const vd::RuntimeTypeRecord* records,std::size_t count,vd::RuntimeFailure* failure) noexcept {
+void vd_runtime_admit(vd::Runtime* runtime,const vd::RuntimeTypeRecord* records,std::size_t count,vd::RuntimeFailure* failure) noexcept {vd_runtime_admit_metadata(runtime,records,count,nullptr,0,failure);}
+void vd_runtime_admit_metadata(vd::Runtime* runtime,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* records_w,std::size_t count_w,vd::RuntimeFailure* failure) noexcept {
     try {
         std::vector<vd::NominalDescriptor> types;
         types.reserve(count);
@@ -73,10 +74,24 @@ void vd_runtime_admit(vd::Runtime* runtime,const vd::RuntimeTypeRecord* records,
             if(r.count) d.layout.references.assign(r.references,r.references+r.count);
             types.push_back(std::move(d));
         }
-        runtime->admit_types(types);
+        std::vector<vd::InterfaceWitness> witnesses;witnesses.reserve(count_w);
+        for(std::size_t n=0;n<count_w;++n) {
+            const auto& r=records_w[n];if(!r.key || !r.interface_identity || !r.view_identity || !r.contract) throw std::invalid_argument("invalid runtime witness catalog");
+            witnesses.push_back({r.key,r.interface_identity,r.view_identity,r.contract});
+        }
+        runtime->admit_metadata(types,witnesses);
     } catch(const std::bad_alloc&) {failure->message="Runtime descriptor admission allocation failed";}
       catch(const std::invalid_argument&) {failure->message="Incompatible runtime descriptor admission";}
       catch(...) {std::terminate();}
+}
+const void* vd_gc_witness(const char* key) noexcept {
+    try {return vd::Runtime::current().witness(key);}catch(...) {std::terminate();}
+}
+std::int64_t vd_gc_interface_binding(void* object,const void* witness,const char* const* keys,std::size_t count) noexcept {
+    try {return vd::Runtime::current().interface_binding(object,witness,{keys,count});}catch(...) {std::terminate();}
+}
+std::int32_t vd_runtime_entry_metadata(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses,std::size_t witness_count) noexcept {
+    return runtime_entry(entry,value,failure,records,count,witnesses,witness_count);
 }
 std::int64_t vd_gc_dynamic_type(void* object,const char* const* catalog,std::size_t count) noexcept {
     try {return vd::Runtime::current().dynamic_type(object,{catalog,count});}

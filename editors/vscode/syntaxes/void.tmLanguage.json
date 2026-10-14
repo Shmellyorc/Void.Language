@@ -3,6 +3,7 @@
   "patterns": [
     {"name":"comment.line.number-sign.void", "match":"#.*$"},
     {"begin":"\\b(use)\\s+(\")", "beginCaptures":{"1":{"name":"keyword.control.import.void"},"2":{"name":"punctuation.definition.string.begin.void"}}, "end":"\"|$", "name":"string.quoted.double.import.void"},
+    {"name":"keyword.control.void", "match":"\\binterface(?=[ \\t]+[a-z_])"},
     {"name":"keyword.control.void", "match":"\\b(?:value[ \\t]+)?struct\\b"},
     {"name":"keyword.control.void", "match":"^\\s*using(?=[ \\t]+[a-z_])"},
     {"name":"keyword.control.void","match":"\\bextends(?=[ \\t]+[a-z_])"},

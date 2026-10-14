@@ -744,3 +744,33 @@ override changes can reload. Constructor dependency closure includes all possibl
 completed-child virtual targets. Shared analysis records bases/slots/owners and
 implicit target edges; navigation uses static/original declarations. Deferred public
 features and acceptance evidence are in INHERITANCE.md and WORK_LOG.md.
+
+
+## Phase 21 — structural interfaces (IF1–IF8)
+
+The owner explicitly approved the managed-backed view architecture. Interface
+identity is nominal; conformance is implicit, accessible and exact through static
+real/inherited/one-hop promoted methods. Conversion captures original ownership and
+route, including authorized private factory implementations. Same-interface equality
+compares complete object identity. Nullable pairs are canonical; value-only erasure,
+boxing and cross-interface discovery/conversions remain deferred.
+
+Per-requirement conservative effects preserve receiver/argument provenance and P3/RV
+capabilities without runtime permission tags. Shared member selection, complete
+nominal/binding-universe recomputation and independent IR effects reject forged or
+omitted evidence. C1/S1/P4 still exclude unfinished erasure/publication and require
+valid fields; complete children can be used during initialization.
+
+A private rooted receiver token selects managed snapshots/inline storage before
+arguments. Shared Frame/Slot/heap maps trace object words, never witnesses/interior
+addresses. Immutable witnesses extend the existing atomic Runtime metadata snapshot,
+contain no code/AST pointers or leases, and survive allocating-generation retirement.
+Generation plans reuse ordinary/virtual lowering and whole-call leases. Requirement,
+access, binding, effect, layout, defaults and construction changes require restart;
+constructor closure includes every eligible interface provider. Matching body-only
+provider changes can reload. The native aggregate ABI remains compiler private.
+
+Discovery limits are 65536 scope/view/interface combinations and 8388608 member
+inventory visits; violations diagnose without truncating candidates. Existing layout,
+stack and construction-context limits remain. INTERFACES.md documents the implemented
+boundary; WORK_LOG.md distinguishes local results from the pending hosted gate.

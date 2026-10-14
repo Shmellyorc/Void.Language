@@ -205,7 +205,7 @@ struct Expr {
     unsigned slot = 0;
     bool receiver_addressable = false, receiver_readonly = false, implicit = false;
     std::string virtual_slot;
-    bool super_call = false;
+    bool super_call = false, interface_call = false;
     Expr(Kind k, Token t) : kind(k), token(std::move(t)) {}
 };
 struct Statement {
@@ -244,7 +244,7 @@ struct Function {
     std::vector<Parameter> parameters;
     std::optional<Parameter> receiver;
     bool receiver_mutates = false, initializer = false;
-    bool virtual_method = false, overriding = false;
+    bool virtual_method = false, overriding = false, interface_requirement = false;
     std::string virtual_slot;
     std::unique_ptr<Expr> base_prelude;
     std::string body_syntax, initialization_contract, capability_contract;
@@ -310,6 +310,7 @@ struct Unit {
     std::set<std::string> failed_qualifiers, invalid_declarations;
     bool failed_import = false;
     bool parse_failed = false;
+    std::shared_ptr<ir::Module> member_catalog;
     Unit(SourceFile s, std::string id) : source(std::move(s)), identity(std::move(id)) {}
 };
 class Parser {
@@ -334,7 +335,7 @@ class Parser {
         }
         bool line_start = p == 0 || tokens[std::min(p, tokens.size()) - 1].kind == TokenKind::newline;
         while (peek().kind != TokenKind::end) {
-            if (declaration && current_depth == 0 && line_start && (at("func") || at("const") || at("value") || at("struct") || at("virtual") || at("override") || at("use") || at("private") || at("public") || at("internal"))) return;
+            if (declaration && current_depth == 0 && line_start && (at("func") || at("interface") || at("const") || at("value") || at("struct") || at("virtual") || at("override") || at("use") || at("private") || at("public") || at("internal"))) return;
             if (!declaration && current_depth <= baseline) {
                 if (peek().kind == TokenKind::dedent) return;
                 if (line_start && p > start) return;
@@ -344,6 +345,21 @@ class Parser {
             if (token.kind == TokenKind::dedent) --current_depth;
             line_start = token.kind == TokenKind::newline || token.kind == TokenKind::dedent;
         }
+    }
+    void parameters(Function& f, bool defaults = true) {
+        need("(");
+        if (!at(")")) do {
+            bool readonly_parameter=accept("const");
+            auto token = name(); need(":"); Parameter parameter{token,type()}; parameter.type.readonly=readonly_parameter;
+            if (accept("=")) {
+                if(!defaults) error(source,tokens[p-1],Code::argument_count,"Interface requirements cannot declare parameter defaults.");
+                auto begin = p; parameter.default_begin = peek().offset; nodes = 0; parameter.default_expression = expression();
+                parameter.default_end = peek().offset;
+                for (auto n = begin; n < p; ++n) parameter.default_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
+            }
+            f.parameters.push_back(std::move(parameter));
+        } while (accept(","));
+        need(")"); if (accept("->")) f.result = type();
     }
     bool at(const std::string& text) const { return peek().text == text; }
     Token take() { auto result = peek(); if (p + 1 < tokens.size()) ++p; return result; }
@@ -553,6 +569,22 @@ public:
                 auto declaration = statement();
                 unit.constants.push_back({std::move(declaration), f.file_private, f.visibility,0,Type::none,0,{}}); continue;
             }
+            if (accept("interface")) {
+                Structure structure; structure.token=name(); structure.visibility=f.visibility;
+                structure.definition=std::make_shared<ir::ValueType>(); structure.definition->name=structure.token.text; structure.definition->interface_type=true;
+                need(":");newline();need("<indent>");unsigned count=0;
+                while(!at("<dedent>") && !at("<end of file>")) {
+                    need("func");Function requirement;requirement.interface_requirement=true;
+                    requirement.visibility=f.visibility;requirement.file_private=f.file_private;
+                    requirement.token=name();
+                    if(requirement.token.text=="init" || requirement.token.text=="deinit") error(source,requirement.token,Code::initializer_deferred,"Lifecycle methods are not interface requirements.");
+                    auto unresolved=std::make_shared<ir::ValueType>();unresolved->name=structure.token.text;unresolved->source_offset=structure.token.offset;
+                    requirement.receiver=Parameter{structure.token,Type(unresolved,Type::unresolved)};
+                    parameters(requirement,false);newline();unit.functions.push_back(std::move(requirement));++count;
+                }
+                if(!count) error(source,structure.token,Code::syntax,"An interface requires at least one method; marker interfaces are deferred.");
+                need("<dedent>");unit.structures.push_back(std::move(structure));continue;
+            }
             bool value_declaration = accept("value");
             if (value_declaration || at("struct")) {
                 need("struct"); Structure structure; structure.token = name(); structure.visibility = f.visibility;
@@ -586,18 +618,8 @@ public:
                 auto receiver = name(); auto receiver_type = type(); need(")");
                 f.receiver = Parameter{receiver,receiver_type};
             }
-            f.token = name(); need("(");
-            if (!at(")")) do {
-                bool readonly_parameter=accept("const");
-                auto token = name(); need(":"); Parameter parameter{token,type()}; parameter.type.readonly=readonly_parameter;
-                if (accept("=")) {
-                    auto begin = p; parameter.default_begin = peek().offset; nodes = 0; parameter.default_expression = expression();
-                    parameter.default_end = peek().offset;
-                    for (auto n = begin; n < p; ++n) parameter.default_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
-                }
-                f.parameters.push_back(std::move(parameter));
-            } while (accept(","));
-            need(")"); if (accept("->")) f.result = type();
+            f.token = name();
+            parameters(f);
             auto body_begin = p; f.body = block();
             for (auto n = body_begin; n < p; ++n) f.body_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
             f.parse_failed = diagnostics.within(source, f.token.offset, peek().offset); unit.functions.push_back(std::move(f));
@@ -665,9 +687,9 @@ Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std
     auto location = token; location.offset = t.definition->source_offset; location.text = t.definition->name;
     if (!structure) error(unit.source,location,Code::unsupported_type,"Unsupported type '" + t.definition->name + "'.","Use a numeric type, bool or a visible value/managed struct.");
     if (structure->layout_state == 3) throw Poison{};
-    Type result(structure->definition, structure->definition->managed ? Type::managed_ref : Type::aggregate);
+    Type result(structure->definition, structure->definition->interface_type ? Type::interface_ref : structure->definition->managed ? Type::managed_ref : Type::aggregate);
     result.nullable = t.nullable; result.readonly=t.readonly;
-    if (result.nullable && result.kind != Type::managed_ref) error(unit.source,token,Code::unsupported_type,"Only managed references can be nullable in this phase.");
+    if (result.nullable && !ir::reference_value(result)) error(unit.source,token,Code::unsupported_type,"Only managed references can be nullable in this phase.");
     return result;
 }
 ir::ConstantValue constant_value(const SourceFile&, const Expr&);
@@ -796,38 +818,33 @@ class Semantics {
     Member member(Type t,const Token& token,bool calling = false) {
         if (t==error_type) throw Poison{};
         if (t.nullable) error(source,token,calling ? Code::receiver : Code::type_mismatch,"Unwrap a nullable reference before member access.","Use a checked as conversion to its non-nullable type.");
+        if(t.kind==Type::interface_ref) {
+            if(auto* requirement=direct_method(t,token)) {if(!accessible(*requirement)) error(source,token,Code::visibility,"Interface requirement is not accessible; import its original interface module.");return Member{{},requirement};}
+            error(source,token,calling ? Code::unknown_method : Code::unknown_identifier,"Interface views expose only their declared method requirements.");
+        }
         if (t.kind!=Type::aggregate && t.kind!=Type::managed_ref)
             error(source,token,calling ? Code::receiver : Code::type_mismatch,"Member access requires a struct.");
-        auto visibility=[&] { error(source,token,Code::visibility,"Member '"+token.text+"' is not accessible from this module.","Import its owning module and use a public method."); };
-        // All real fields/methods on the static ancestry outrank composition.
-        for (unsigned n=0;n<t.definition->fields.size();++n)
-            if (t.definition->fields[n].name==token.text) return Member{{n},nullptr};
-        for (auto current=t.definition;current;current=current->base.lock()) {
-            if (auto* f=direct_method(Type(current,t.kind),token)) {
-                if (!accessible(*f)) visibility();
-                return Member{{},f};
-            }
-        }
-        auto [owner,structure]=owned_structure(t);
-        std::vector<Member> candidates; std::vector<RelatedLocation> related;
-        std::string routes; bool hidden=false;
-        for (unsigned n=0;n<structure->effective_fields.size();++n) if (structure->effective_fields[n].second->using_field) {
-            auto& embedded=*structure->effective_fields[n].second; auto& embedded_owner=*structure->effective_fields[n].first;
-            auto child=ir::field_type(t,n);
-            if (auto found=direct_member(child,token)) {
-                if (found->function && !accessible(*found->function)) { hidden=true; continue; }
-                found->path.insert(found->path.begin(),n); candidates.push_back(*found);
-                auto route=embedded.name+"."+token.text;
-                if (!routes.empty()) routes+=", "; routes+=route;
-                related.push_back({span(embedded_owner.source,embedded.token),"Candidate through '"+route+"'."});
-                auto [child_owner,child_structure]=owned_structure(child);
-                const auto& declaration=found->function ? found->function->token : child_structure->effective_fields.at(found->path.back()).second->token;
+        auto selected=ir::select_member(*root.member_catalog,t,token.text,unit.identity);
+        if(selected.status==ir::MemberSelection::inaccessible)
+            error(source,token,Code::visibility,"Member '"+token.text+"' is not accessible from this module.","Import its owning module and use a public method.");
+        if(selected.status==ir::MemberSelection::ambiguous) {
+            std::vector<RelatedLocation> related;std::string routes;
+            auto [owner,structure]=owned_structure(t);
+            for(const auto& [path,method]:selected.candidates) {
+                auto [embedded_owner,embedded]=structure->effective_fields.at(path.front());
+                auto route=embedded->name+"."+token.text;if(!routes.empty()) routes+=", ";routes+=route;
+                related.push_back({span(embedded_owner->source,embedded->token),"Candidate through '"+route+"'."});
+                auto child=ir::field_type(t,path.front());auto [child_owner,child_structure]=owned_structure(child);
+                auto declaration=method.empty() ? child_structure->effective_fields.at(path.back()).second->token : direct_method(child,token)->token;
                 related.push_back({span(child_owner->source,declaration),"Promoted member declared here."});
             }
+            error(source,token,Code::ambiguous,"Ambiguous promoted member '"+token.text+"': "+routes+".","Qualify the intended embedded field explicitly; types and signatures do not select a component.",std::move(related));
         }
-        if (candidates.size()>1) error(source,token,Code::ambiguous,"Ambiguous promoted member '"+token.text+"': "+routes+".","Qualify the intended embedded field explicitly; types and signatures do not select a component.",std::move(related));
-        if (!candidates.empty()) return candidates.front();
-        if (hidden) visibility();
+        if(selected.status==ir::MemberSelection::found) {
+            const Function* target=nullptr;
+            if(!selected.method.empty()) for(const auto& [id,u]:units) for(const auto& f:u->functions) if(f.symbol==selected.method) target=&f;
+            return {selected.path,target};
+        }
         error(source,token,calling ? Code::unknown_method : Code::unknown_identifier,std::string(calling ? "Unknown method '" : "Unknown field '")+token.text+"' in "+ir::type_name(t)+".");
     }
     void embedded_receiver(std::unique_ptr<Expr>& base,unsigned index,const Token& written) {
@@ -889,7 +906,7 @@ class Semantics {
             catch (const CompilationError&) { check_arguments(); throw; }
             catch (const Poison&) { check_arguments(); throw; }
         }();
-        e.target = target.symbol; e.virtual_slot=target.virtual_slot;
+        e.target = target.symbol; e.virtual_slot=target.virtual_slot; e.interface_call=target.interface_requirement;
         // Record the resolved place now, then check its permission after the
         // complete method graph has reached its receiver-effect fixed point.
         const Expr* base = e.parts[0].get(); std::vector<unsigned> path;
@@ -901,7 +918,7 @@ class Semantics {
                 e.field_indexes.assign(path.rbegin(),path.rend());
             }
         }
-        if (receiver.kind==Type::managed_ref) e.receiver_addressable=true;
+        if (ir::reference_value(receiver)) e.receiver_addressable=true;
         const Expr* candidate=e.parts[0].get();
         while (candidate->kind==Expr::Kind::field) {
             if (candidate->parts[0]->type.kind==Type::managed_ref) e.receiver_addressable=true;
@@ -979,9 +996,10 @@ class Semantics {
         }
     }
     void construction(Expr& e, Unit& owner, Structure& structure, bool runtime, Unit& access) {
+        if(structure.definition->interface_type) error(source,e.token,Code::initializer,"An interface cannot be constructed; convert a complete conforming managed value.");
         defaults(owner,structure);
         if (structure.definition->managed && !runtime) error(source,e.token,Code::constant_call,"Managed allocation is not a compile-time expression.");
-        e.kind = Expr::Kind::construction; e.type = Type(structure.definition,structure.definition->managed ? Type::managed_ref : Type::aggregate); e.target = structure.definition->identity;
+        e.kind = Expr::Kind::construction; e.type = Type(structure.definition,structure.definition->interface_type ? Type::interface_ref : structure.definition->managed ? Type::managed_ref : Type::aggregate); e.target = structure.definition->identity;
         e.aggregate_value = structure.defaults;
         if (auto* init = structure.initializer) {
             if (!runtime) error(source,e.token,Code::constant_call,"Compile-time expressions cannot execute custom initialization.","Construct this value in a function or local const.",{{span(owner.source,init->token),"Runtime initializer declared here."}});
@@ -1008,7 +1026,7 @@ class Semantics {
         if (!structure.initializer) for (unsigned n=0;n<structure.effective_fields.size();++n) {
             const auto& field=*structure.effective_fields[n].second; auto& field_owner=*structure.effective_fields[n].first;
             Type t = *field.annotation;
-            if (t.kind == Type::managed_ref && !t.nullable && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end())
+            if (ir::reference_value(t) && !t.nullable && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end())
                 error(source,e.token,Code::argument_count,"A non-nullable reference field requires an explicit value: " + field.name + ".",{},{{span(field_owner.source,field.token),"Required field declared here."}});
         }
         if (!structure.initializer || !structure.definition->managed) construction_fields(e,owner,structure,runtime);
@@ -1016,6 +1034,7 @@ class Semantics {
     void expect(Type actual, Type expected, const Token& token) {
         if (actual == error_type || expected == error_type) return;
         if (actual.kind == Type::managed_ref && expected.kind == Type::managed_ref && ir::subtype(actual,expected) && (!actual.nullable || expected.nullable)) return;
+        if(actual.kind==Type::interface_ref && expected.kind==Type::interface_ref && Type::key(actual)==Type::key(expected) && (!actual.nullable || expected.nullable)) return;
         if (actual != expected) error(source, token, Code::type_mismatch, "Type mismatch: expected " + std::string(ir::type_name(expected)) + ", received " + ir::type_name(actual) + ".", {}, {}, ir::type_name(expected), ir::type_name(actual));
     }
     unsigned declare(const Token& token, Type type, bool readonly = false) {
@@ -1043,6 +1062,9 @@ class Semantics {
     // Hints resolve typed anchors without prematurely defaulting untyped literals.
     std::optional<Type> anchor(Expr& e) {
         try {
+        // Hints share the semantic budget; an exhausted hint falls back to
+        // ordinary checking, which reports the existing nesting diagnostic.
+        Depth guard(diagnostics.semantic_depth(),source,e.token,256);
         using K = Expr::Kind;
         if (e.kind == K::literal) {
             if (e.token.text == "null") return {};
@@ -1069,7 +1091,7 @@ class Semantics {
         }
         if (e.kind == K::call) {
             auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
-            if (structure) return Type(structure->definition,structure->definition->managed ? Type::managed_ref : Type::aggregate);
+            if (structure) return Type(structure->definition,structure->definition->interface_type ? Type::interface_ref : structure->definition->managed ? Type::managed_ref : Type::aggregate);
             return resolve(e).result;
         }
         if (e.kind == K::field) {
@@ -1098,7 +1120,22 @@ class Semantics {
         return false;
     }
     // Apply contextual rewrites only after the recursive handler has returned.
+    Type interface_conversion(Expr& e,Type from,Type target) {
+        if(from.nullable && !target.nullable) error(source,e.token,Code::type_mismatch,"Unwrap the concrete nullable reference before converting to a non-nullable interface.");
+        auto concrete=from;concrete.nullable=false;
+        ir::Module::Binding binding;
+        try { binding=ir::structural_binding(*root.member_catalog,concrete,target,unit.identity); }
+        catch(const std::invalid_argument& failure) {error(source,e.token,Code::type_mismatch,failure.what());}
+        catch(const std::length_error& failure) {error(source,e.token,Code::limit,failure.what());}
+        if(!current && !(from.nullable && target.nullable && constant_value(source,e).bits==0)) error(source,e.token,Code::constant_call,"Interface bindings are runtime views; only nullable all-null templates are compile-time values.");
+        auto& bindings=root.member_catalog->interface_bindings;
+        if(std::none_of(bindings.begin(),bindings.end(),[&](const auto& b){return b.key==binding.key;})) bindings.push_back(binding);
+        auto operand=std::make_unique<Expr>(std::move(e));
+        e=Expr(Expr::Kind::conversion,operand->token);e.op="interface";e.target=binding.key;e.implicit=true;
+        e.type=target;e.type.readonly=from.readonly;e.parts.push_back(std::move(operand));return e.type;
+    }
     Type contextual_conversion(Expr& e, Type type, const std::optional<Type>& expected) {
+        if(expected && expected->kind==Type::interface_ref && type!=error_type && type.kind!=Type::interface_ref) return interface_conversion(e,type,*expected);
         if (expected && type!=error_type && ir::subtype(type,*expected) && (!type.nullable || expected->nullable) && Type::key(type)!=Type::key(*expected)) {
             auto operand=std::make_unique<Expr>(std::move(e));
             e=Expr(Expr::Kind::conversion,operand->token); e.op="upcast"; e.implicit=true;
@@ -1134,7 +1171,7 @@ class Semantics {
     }
     Type literal_expression(Expr& e, std::optional<Type> expected) {
         if (e.token.text == "null") {
-            if (!expected || expected->kind != Type::managed_ref || !expected->nullable) error(source,e.token,Code::type_mismatch,"null requires a nullable managed-reference context.","Use a type annotation such as node?.");
+            if (!expected || !ir::reference_value(*expected) || !expected->nullable) error(source,e.token,Code::type_mismatch,"null requires a nullable managed-reference context.","Use a type annotation such as node?.");
             return e.type = *expected;
         }
         if (e.literal_text.empty()) return e.type;
@@ -1219,15 +1256,22 @@ class Semantics {
                 operand.type = target; operand.literal_text.clear(); return target;
             }
         }
-        auto from = expression(operand);
+        auto from = expression(operand,operand.token.text=="null" && target.kind==Type::interface_ref && target.nullable ? std::optional<Type>(target) : std::nullopt);
         if (from == error_type) return error_type;
-        if (from.kind == Type::managed_ref && target.kind == Type::managed_ref && Type::key(from)==Type::key(target) && !target.nullable) {
-            target.readonly=from.readonly; return e.type=target;
+        if(target.kind==Type::interface_ref && from.kind!=Type::interface_ref) {
+            auto converted=interface_conversion(operand,from,target);e.op="identity";return e.type=converted;
+        }
+        if(from.kind==Type::interface_ref && target.kind==Type::interface_ref && Type::key(from)==Type::key(target)) {
+            if(!from.nullable || target.nullable) e.op="upcast";
+            target.readonly=from.readonly;return e.type=target;
+        }
+        if (from.kind==Type::managed_ref && target.kind==Type::managed_ref && Type::key(from)==Type::key(target) && !target.nullable) {
+            target.readonly=from.readonly;return e.type=target;
         }
         if (ir::subtype(from,target) && (!from.nullable || target.nullable)) {
             e.op="upcast"; target.readonly=from.readonly; return e.type=target;
         }
-        if (from.kind==Type::managed_ref || target.kind==Type::managed_ref) error(source,e.token,Code::numeric_conversion,"Checked reference conversion requires the same nominal type or an ancestor without nullability strengthening.","Unwrap nullable references before upcasting; source downcasts and unrelated reference casts are not supported.");
+        if (ir::reference_value(from) || ir::reference_value(target)) error(source,e.token,Code::numeric_conversion,"Checked reference conversion requires the same nominal type or an ancestor without nullability strengthening.","Unwrap nullable references before upcasting; source downcasts and unrelated reference casts are not supported.");
         if (!numeric::number(from) || !numeric::number(target)) error(source,e.token,Code::numeric_conversion,"Numeric as requires numeric source and destination types.");
         return target;
     }
@@ -1244,7 +1288,7 @@ class Semantics {
         auto left_hint = anchor(*e.parts[0]), right_hint = anchor(*e.parts[1]);
         auto context = logical ? std::optional<Type>(Type::boolean) : left_hint ? left_hint : right_hint ? right_hint :
             expected && numeric::number(*expected) ? expected : std::optional<Type>(decimal(e) ? Type::f32 : Type::i32);
-        if (context && context->kind == Type::managed_ref && (e.op=="==" || e.op=="!=")) context->nullable=true;
+        if (context && ir::reference_value(*context) && (e.op=="==" || e.op=="!=")) context->nullable=true;
         auto left = expression(*e.parts[0],context);
         bool previous = suppress_zero;
         if (e.parts[0]->kind == K::literal && ((e.op == "and" && !e.parts[0]->value) || (e.op == "or" && e.parts[0]->value))) suppress_zero = true;
@@ -1310,14 +1354,14 @@ class Semantics {
                 try { expect(t, *s.annotation, s.expression ? s.expression->token : s.token); if (t!=error_type) t=*s.annotation; }
                 catch (const CompilationError& failure) { diagnostics.add(failure); t = error_type; }
             }
-            if (!s.expression && t.kind == Type::managed_ref && !t.nullable) error(source,s.token,Code::initializer,"A non-nullable reference requires an initializer.","Construct the object explicitly using its type.");
+            if (!s.expression && ir::reference_value(t) && !t.nullable) error(source,s.token,Code::initializer,"A non-nullable reference requires an initializer.","Construct the object explicitly using its type.");
             if (!s.expression && t.kind == Type::aggregate) {
                 auto [owner,structure] = owned_structure(t);
                 s.expression = std::make_unique<Expr>(Expr::Kind::construction,s.token);
                 construction(*s.expression,*owner,*structure,true,unit);
 
             }
-            if (t.kind!=Type::managed_ref) t.readonly=false;
+            if (!ir::reference_value(t)) t.readonly=false;
             s.slot = declare(s.token, t, s.readonly); break;
         }
         case K::assignment: {
@@ -1417,7 +1461,7 @@ public:
         auto [owner,structure] = owned_structure(f.receiver->type);
         if (f.receiver->type.kind==Type::aggregate) for (const auto& field:structure->fields) {
             auto type=*field.annotation;
-            if (type.kind==Type::managed_ref && !type.nullable)
+            if (ir::reference_value(type) && !type.nullable)
                 error(source,f.token,Code::initializer,"Value init requires every field to be valid before its body; a non-nullable reference has no safe default.","Use named-field construction without init for a value with required reference fields.",{{span(owner->source,field.token),"Required reference field declared here."}});
         }
         Expr plan(Expr::Kind::construction,f.token); plan.initializer=f.symbol;
@@ -1439,6 +1483,11 @@ public:
     }
     void analyze() {
         for (auto& f : unit.functions) {
+            if(f.interface_requirement) {
+                f.locals={f.receiver->type};f.receiver->slot=0;
+                for(auto& p:f.parameters) {p.slot=static_cast<unsigned>(f.locals.size());f.locals.push_back(p.type);}
+                continue;
+            }
             if (diagnostics.full()) break;
             current = &f; scopes = {{}}; invalid_function = false;
             auto before = diagnostics.size();
@@ -1479,7 +1528,7 @@ class Lowering {
     void jump(unsigned to) { terminate({ir::Terminator::Kind::jump, 0, to}); }
     unsigned emit(ir::Instruction i, const Token& token) {
         i.source = source.location(token.offset);
-        if (i.op == ir::Op::call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
+        if (i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
             i.source_excerpt = source.excerpt(token.offset);
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
@@ -1607,7 +1656,7 @@ class Lowering {
                 std::optional<unsigned> value;
                 if (staged) {
                     Type field_type=e.type.definition->fields[field].type;
-                    if (field_type.kind==Type::managed_ref && !field_type.nullable) continue;
+                    if (ir::reference_value(field_type) && !field_type.nullable) continue;
                     value=constant(field_type,e.aggregate_value.fields.at(field),e.token);
                 }
                 if (e.initializer.empty()) for (unsigned n=0;n<arguments.size();++n)
@@ -1642,6 +1691,11 @@ class Lowering {
             std::size_t first = 0;
             if (e.kind == K::method_call) {
                 first = 1;
+                if(e.interface_call) {
+                    ir::Instruction prepare{ir::Op::interface_prepare,expression(*e.parts[0])};prepare.callee=e.target;
+                    auto prepared=expression_type(*e.parts[0]);prepared.kind=Type::prepared_receiver;prepared.nullable=false;prepared.preparation=e.target;
+                    prepare.type=prepared;auto slot=snapshot(emit(prepare,e.token),prepared,e.token);receiver=ir::Place{slot,{}};
+                } else
                 if (e.parts[0]->type.kind==Type::managed_ref) {
                     auto slot=snapshot(expression(*e.parts[0]),expression_type(*e.parts[0]),e.token); receiver=ir::Place{slot,{}};
                 } else if (e.receiver_addressable) receiver=place(*e.parts[0]);
@@ -1660,14 +1714,14 @@ class Lowering {
                 }
                 emit({ir::Op::store, slot, value}, arg->token); slots.push_back(slot);
             }
-            ir::Instruction i{!e.virtual_slot.empty() && !e.super_call ? ir::Op::virtual_call : ir::Op::call}; i.callee = e.target; i.receiver = receiver;
+            ir::Instruction i{e.interface_call ? ir::Op::interface_call : !e.virtual_slot.empty() && !e.super_call ? ir::Op::virtual_call : ir::Op::call}; i.callee = e.target; i.receiver = receiver;
             if (context) if (auto found=context->calls.find(&e);found!=context->calls.end())
                 i.callee=ir::construction_name(e.target,{found->second.begin(),found->second.end()});
             for (auto slot : slots) i.arguments.push_back(emit({ir::Op::load, slot}, e.token));
             return emit(i, e.token);
         }
         case K::conversion: {
-            auto value = expression(*e.parts[0]); ir::Instruction i{e.op=="upcast" ? (expression_type(e).construction ? ir::Op::stage_prefix : ir::Op::upcast) : ir::Op::convert,value}; i.type = expression_type(e); return emit(i,e.token);
+            auto value = expression(*e.parts[0]); if(e.op=="identity" && expression_type(e)==expression_type(*e.parts[0])) return value; ir::Instruction i{e.op=="interface" ? ir::Op::interface_pack : e.op=="upcast" ? (expression_type(e).construction ? ir::Op::stage_prefix : ir::Op::upcast) : ir::Op::convert,value}; i.type = expression_type(e);i.callee=e.target; return emit(i,e.token);
         }
         case K::unary: {
             auto value = expression(*e.parts[0]);
@@ -1791,7 +1845,7 @@ public:
             auto base=f.receiver->type.definition->base.lock();
             for (unsigned field=base ? static_cast<unsigned>(base->fields.size()) : 0;field<f.receiver->type.definition->fields.size();++field) {
                 Type t=f.receiver->type.definition->fields[field].type;
-                if (t.kind==Type::managed_ref && !t.nullable) continue;
+                if (ir::reference_value(t) && !t.nullable) continue;
                 std::optional<unsigned> selected;
                 for(const auto& child:f.initialization_defaults) if(child->slot==field) selected=expression(*child);
                 auto value=selected ? *selected : constant(t,f.initialization_value.fields.at(field),f.token);
@@ -1978,7 +2032,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
     auto a = constant_value(source,*e.parts[0]).bits;
     try {
         if (e.kind == Expr::Kind::conversion) {
-            if (e.type.kind==Type::managed_ref) { if (!a) throw std::invalid_argument("Cannot unwrap null in a compile-time expression"); return {a,{}}; }
+            if (ir::reference_value(e.type)) { if (!a && !e.type.nullable) throw std::invalid_argument("Cannot unwrap null in a compile-time expression"); return {a,{}}; }
             return {numeric::convert(a,e.parts[0]->type,e.type),{}};
         }
         if (e.kind == Expr::Kind::unary) return {e.op == "not" ? !a : e.op == "-" ? numeric::negate(a,e.type) : a,{}};
@@ -1986,7 +2040,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
         if (e.op == "or" && a) return {1,{}};
         auto b = constant_value(source,*e.parts[1]).bits;
         if (e.op == "and" || e.op == "or") return {b,{}};
-        if (e.parts[0]->type.kind==Type::managed_ref) return {static_cast<std::uint64_t>(e.op=="==" ? a==b : a!=b),{}};
+        if (ir::reference_value(e.parts[0]->type)) return {static_cast<std::uint64_t>(e.op=="==" ? a==b : a!=b),{}};
         return {numeric::binary(operation(e.op),a,b,e.parts[0]->type),{}};
     } catch (const CompilationError&) { throw; }
       catch (const std::invalid_argument& failure) {
@@ -1996,6 +2050,21 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
 #include "capabilities.inc"
 #include "construction.inc"
 #include "inheritance.inc"
+ir::Module member_catalog(const std::map<std::string,std::unique_ptr<Unit>>& units,const std::string& entry) {
+    ir::Module m;m.root_identity=entry;
+    for(const auto& [id,u]:units) {
+        auto& imports=m.source_imports[id];for(const auto& i:u->imports) if(!i.target.empty()) imports.insert(i.target);
+        for(const auto& s:u->structures) m.nominal_types.emplace_back(s.definition,s.definition->interface_type ? Type::interface_ref : s.definition->managed ? Type::managed_ref : Type::aggregate);
+        for(const auto& f:u->functions) if(!f.parse_failed) {
+            ir::Function header;header.name=f.symbol;header.module_identity=id;header.method_name=f.token.text;
+            header.receiver=static_cast<bool>(f.receiver);header.initializer=f.initializer;header.visibility=f.visibility;header.result=f.result;header.virtual_slot=f.virtual_slot;header.receiver_mutates=f.receiver_mutates;
+            header.parameters.clear();if(f.receiver) header.parameters.push_back(f.receiver->type);
+            for(const auto& p:f.parameters) header.parameters.push_back(p.type);
+            if(f.interface_requirement) m.interface_requirements.push_back(std::move(header));else m.functions.push_back(std::move(header));
+        }
+    }
+    return m;
+}
 void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics) {
     auto arena = std::make_shared<ir::TypeArena>();
     for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
@@ -2019,6 +2088,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     auto& root = *units.at(entry);
     for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
         auto name = structure.token.text; structure.definition->identity = id + "::" + name;
+        structure.definition->source_offset=structure.token.offset;structure.definition->module_identity=id;structure.definition->visibility=structure.visibility;
         if (unit->declarations.contains(name) || !unit->structure_names.emplace(name,&structure).second) {
             unit->invalid_declarations.insert(name);
             try { error(unit->source,structure.token,Code::duplicate,"Duplicate declaration '" + name + "'."); }
@@ -2082,6 +2152,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         }
     }
     std::function<void(Unit&,Structure&)> layout = [&](Unit& owner, Structure& structure) {
+        if (structure.definition->interface_type) {structure.layout_state=2;return;}
         if (structure.layout_state == 2) return;
         if (structure.layout_state == 1) error(owner.source,structure.token,Code::unsupported_type,"Recursive value layout or inheritance for '" + structure.token.text + "'.","Use an acyclic nesting of value types.");
         if (structure.layout_state == 3) throw Poison{};
@@ -2119,7 +2190,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 }
                 if (expanded > 65536 - structure.expanded_fields) error(owner.source,field.token,Code::nesting,"Expanded value layout limit exceeded.","Reduce nested value duplication; the compiler currently permits 65536 expanded fields per value.");
                 structure.expanded_fields += expanded;
-                field.annotation = t; structure.definition->fields.push_back({field.name,t,structure.definition->identity});
+                field.annotation = t; structure.definition->fields.push_back({field.name,t,structure.definition->identity,field.using_field});
                 structure.effective_fields.emplace_back(&owner,&field);
             }
             structure.layout_state = 2;
@@ -2143,14 +2214,18 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             try {
                 auto t = f.receiver->type;
                 if (t == error_type) throw Poison{};
-                if ((t.kind != Type::aggregate && t.kind != Type::managed_ref) || t.nullable) error(unit->source,f.receiver->token,Code::receiver,"Receiver declarations require a non-nullable struct type.");
+                if (((t.kind != Type::aggregate && t.kind != Type::managed_ref) && !(f.interface_requirement && t.kind==Type::interface_ref)) || t.nullable) error(unit->source,f.receiver->token,Code::receiver,"Receiver declarations require a non-nullable struct type.");
                 if (!unit->structure_names.contains(t.definition->name) || unit->structure_names.at(t.definition->name)->definition != t.definition)
                     error(unit->source,f.receiver->token,Code::receiver,"Methods must be declared in their value type's owning module; extension methods are deferred.");
+                if(t.kind==Type::interface_ref && !f.interface_requirement) error(unit->source,f.token,Code::receiver,"Interfaces declare requirements, not receiver implementations.");
                 f.initializer = f.token.text == "init";
                 if (f.token.text == "deinit") error(unit->source,f.token,Code::initializer_deferred,"Resource lifecycle deinit is not implemented.");
                 if (f.initializer && f.result != Type::none) error(unit->source,f.token,Code::type_mismatch,"An initializer must not declare a result; fallible construction is deferred.");
                 for (const auto& field : t.definition->fields) if (field.name == f.token.text)
                     error(unit->source,f.token,Code::duplicate,"Method name conflicts with field '" + f.token.text + "'.");
+                if(f.interface_requirement) for(const auto& check:[&] {std::vector<Type> types{f.result};for(const auto& p:f.parameters) types.push_back(p.type);return types;}())
+                    if(check.definition && ((f.visibility=="public" && check.definition->visibility!="public") || (f.visibility=="internal" && check.definition->visibility=="private")))
+                        error(unit->source,f.token,Code::visibility,"An interface requirement cannot expose a less-visible type.");
                 f.symbol = t.definition->identity + "::method::" + f.token.text;
                 if (!unit->methods.emplace(f.symbol,&f).second) error(unit->source,f.token,Code::duplicate,"Duplicate receiver method '" + f.token.text + "'.");
                 if (f.initializer) unit->structure_names.at(t.definition->name)->initializer = &f;
@@ -2159,6 +2234,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         }
     }
     validate_inheritance(units,root,diagnostics);
+    root.member_catalog=std::make_shared<ir::Module>(member_catalog(units,entry));
     // Failed layouts are poisoned and never form owning descriptor cycles.
     std::function<void(Unit&, Structure&)> defaults;
     std::vector<std::string> dependency;
@@ -2180,6 +2256,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         } catch (...) { c.state = 3; dependency.pop_back(); throw; }
     };
     defaults = [&](Unit& owner, Structure& structure) {
+        if (structure.definition->interface_type) {structure.default_state=2;return;}
         if (structure.layout_state != 2) throw Poison{};
         if (structure.default_state == 2) return;
         if (structure.default_state == 3) throw Poison{};
@@ -2219,6 +2296,9 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         catch (const Poison&) {}
     }
     for (auto& [id, unit] : units) Semantics(*unit, units, root, evaluate, diagnostics, defaults).analyze();
+    diagnostics.finish();
+    try {root.member_catalog->interface_bindings=ir::interface_universe(*root.member_catalog);}
+    catch(const std::length_error& failure) {error(root.source,root.structures.front().token,Code::limit,failure.what(),"Split unrelated providers into separately compiled projects.");}
     std::map<std::string,Function*> functions;
     std::map<std::string,std::set<std::string>> dependencies;
     std::vector<std::string> pending;
@@ -2256,6 +2336,11 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 if(target.virtual_slot==e->virtual_slot) dependencies[f.symbol].insert(target.symbol);
         }
     }
+    for(const auto& binding:root.member_catalog->interface_bindings) for(const auto& [requirement,route]:binding.methods) {
+        dependencies[requirement].insert(route.second);
+        const auto& selected=*functions.at(route.second);
+        if(!selected.virtual_slot.empty()) for(const auto& [name,target]:functions) if(target->virtual_slot==selected.virtual_slot) dependencies[requirement].insert(name);
+    }
     std::set<std::string> frozen;
     while (!pending.empty()) {
         auto key=pending.back(); pending.pop_back();
@@ -2275,14 +2360,21 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
     ir::Module module;
     for (const auto& [id,unit] : units) for (const auto& structure : unit->structures) {
-        module.nominal_types.emplace_back(structure.definition,structure.definition->managed ? Type::managed_ref : Type::aggregate);
-        if (structure.definition->managed) module.coordinated=true;
+        module.nominal_types.emplace_back(structure.definition,structure.definition->interface_type ? Type::interface_ref : structure.definition->managed ? Type::managed_ref : Type::aggregate);
+        if (structure.definition->managed || structure.definition->interface_type) module.coordinated=true;
     }
-    module.identity = entry; module.entry_symbol = entry + "::entry";
+    module.identity = entry; module.entry_symbol = entry + "::entry";module.root_identity=entry;
+    for(const auto& [id,u]:units) {auto& imports=module.source_imports[id];for(const auto& i:u->imports) if(!i.target.empty()) imports.insert(i.target);}
     module.source_path = units.at(entry)->source.path();
     for (auto& [id, unit] : units) {
         Lowering lowering(unit->source);
         for (const auto& f : unit->functions) {
+            if(f.interface_requirement) {
+                ir::Function requirement;requirement.name=f.symbol;requirement.parameters={f.receiver->type};
+                for(const auto& p:f.parameters) requirement.parameters.push_back(p.type);
+                requirement.result=f.result;requirement.receiver=true;requirement.method_name=f.token.text;requirement.visibility=f.visibility;requirement.module_identity=id;
+                module.interface_requirements.push_back(std::move(requirement));continue;
+            }
             if (!f.initializer || f.receiver->type.kind!=Type::managed_ref) {
                 auto lowered = lowering.lower(f); lowered.module_identity = id;
                 module.functions.push_back(std::move(lowered));
@@ -2293,6 +2385,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
             }
         }
     }
+    module.interface_bindings=units.at(entry)->member_catalog->interface_bindings;
     ir::validate(module); return module;
 }
 
@@ -2329,7 +2422,7 @@ struct AnalysisAccess {
             for (const auto& name:d.required_initialization_fields) field(result->contract_,name);
             field(result->contract_,d.receiver_mutates ? "mutating" : "nonmutating");
             field(result->contract_,d.initialization_contract);
-            if (d.kind != AnalyzedDeclaration::Kind::function && d.kind != AnalyzedDeclaration::Kind::receiver_method && d.kind != AnalyzedDeclaration::Kind::initializer) {
+            if (d.kind != AnalyzedDeclaration::Kind::function && d.kind != AnalyzedDeclaration::Kind::receiver_method && d.kind!=AnalyzedDeclaration::Kind::interface_requirement && d.kind != AnalyzedDeclaration::Kind::initializer) {
                 field(result->constants_, d.identity); field(result->constants_, d.visibility);
                 field(result->constants_,d.using_field ? "using" : "ordinary-field");
                 field(result->constants_, d.type.kind == Type::aggregate ? d.type.definition->identity : ir::type_name(d.type)); field(result->constants_, d.constant_syntax);
@@ -2361,7 +2454,11 @@ struct AnalysisAccess {
             std::function<void(const Expr&,const std::string&,const std::map<unsigned,std::string>&,bool)> visit_expression;
             auto expression = [&](const Expr& e, const std::string& owner, const std::map<unsigned,std::string>& locals) { visit_expression(e,owner,locals,false); };
             visit_expression = [&](const Expr& e, const std::string& owner, const auto& locals, bool implicit) {
-                if (!e.target.empty()) reference(owner,e.target,e,*unit,implicit || e.implicit);
+                if(e.kind==Expr::Kind::conversion && e.op=="interface") {
+                    reference(owner,e.type.definition->identity,e,*unit,true);
+                    for(const auto& binding:graph->at(entry)->member_catalog->interface_bindings) if(binding.key==e.target)
+                        for(const auto& [requirement,route]:binding.methods) {reference(owner,requirement,e,*unit,true);reference(owner,route.second,e,*unit,true);}
+                } else if (!e.target.empty()) reference(owner,e.target,e,*unit,implicit || e.implicit);
                 else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit || e.implicit);
                 if(!e.virtual_slot.empty() && !e.super_call) for(const auto& [id,target_unit]:*graph) for(const auto& target:target_unit->functions)
                     if(target.virtual_slot==e.virtual_slot) reference(owner,target.symbol,e,*unit,true);
@@ -2398,7 +2495,7 @@ struct AnalysisAccess {
                     record.using_field=member.using_field; declaration(std::move(record));
                     if (member.expression) expression(*member.expression,identity,{});
                 }
-                AnalyzedDeclaration record{structure.definition->managed ? AnalyzedDeclaration::Kind::managed_structure : AnalyzedDeclaration::Kind::value_structure,key,id,structure.visibility,location(structure.token),{},Type(structure.definition,structure.definition->managed ? Type::managed_ref : Type::aggregate),layout,{},id};
+                AnalyzedDeclaration record{structure.definition->interface_type ? AnalyzedDeclaration::Kind::interface_type : structure.definition->managed ? AnalyzedDeclaration::Kind::managed_structure : AnalyzedDeclaration::Kind::value_structure,key,id,structure.visibility,location(structure.token),{},Type(structure.definition,structure.definition->interface_type ? Type::interface_ref : structure.definition->managed ? Type::managed_ref : Type::aggregate),layout,{},id};
                 if(auto base=structure.definition->base.lock()) record.base_identity=base->identity;
                 declaration(std::move(record));
             }
@@ -2409,7 +2506,7 @@ struct AnalysisAccess {
             }
             for (const auto& f : unit->functions) {
                 std::vector<Type> parameters; for (const auto& p : f.parameters) parameters.push_back(p.type);
-                AnalyzedDeclaration method_record{f.initializer ? AnalyzedDeclaration::Kind::initializer : f.receiver ? AnalyzedDeclaration::Kind::receiver_method : AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}};
+                AnalyzedDeclaration method_record{f.interface_requirement ? AnalyzedDeclaration::Kind::interface_requirement : f.initializer ? AnalyzedDeclaration::Kind::initializer : f.receiver ? AnalyzedDeclaration::Kind::receiver_method : AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}};
                 if (f.receiver) { method_record.owner = f.receiver->type.definition->identity; method_record.receiver = f.receiver->type; method_record.receiver_mutates = f.receiver_mutates; }
                 method_record.initialization_contract=f.initialization_contract;
                 method_record.virtual_slot=f.virtual_slot;
@@ -2420,7 +2517,7 @@ struct AnalysisAccess {
                 if (f.initializer && f.receiver->type.kind==Type::managed_ref)
                     for (const auto& member:f.receiver->type.definition->fields) {
                         Type t=member.type;
-                        if (t.kind==Type::managed_ref && !t.nullable) method_record.required_initialization_fields.push_back(member.name);
+                        if (ir::reference_value(t) && !t.nullable) method_record.required_initialization_fields.push_back(member.name);
                     }
                 if (f.initializer) for (const auto& p : f.parameters) {
                     AnalyzedParameter parameter{p.token.text,p.type,location(p.token)};
@@ -2455,6 +2552,14 @@ struct AnalysisAccess {
                 if(f.base_prelude) expression(*f.base_prelude,f.symbol,locals);
                 for(const auto& child:f.initialization_defaults) visit_expression(*child,f.symbol,locals,true);
                 body(f.body);
+            }
+        }
+        for(const auto& binding:graph->at(entry)->member_catalog->interface_bindings) {
+            field(result->contract_,"interface-binding");field(result->contract_,binding.key);
+            for(const auto& [requirement,route]:binding.methods) {
+                const auto& owner=*graph->at(binding.interface.definition->module_identity);
+                Expr use(Expr::Kind::name,Token{TokenKind::name,binding.interface.definition->name,binding.interface.definition->source_offset});
+                reference(requirement,route.second,use,owner,true);
             }
         }
         field(result->contract_,result->constants_);

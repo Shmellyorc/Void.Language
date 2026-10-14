@@ -10,6 +10,10 @@
 
 namespace vd {
 class CallbackRegistration;
+// Immutable binding data: no executable addresses, generation leases or permissions.
+struct InterfaceWitness {
+    std::string key, interface_identity, view_identity, contract;
+};
 // These are runtime embedding interfaces, not source-language thread features.
 class Runtime {
 public:
@@ -36,6 +40,9 @@ public:
     void store(void* object, std::size_t offset, void* value);
     bool contains(void*) const;
     void admit_types(std::span<const NominalDescriptor>);
+    void admit_metadata(std::span<const NominalDescriptor>,std::span<const InterfaceWitness>);
+    const InterfaceWitness* witness(std::string_view) const;
+    std::int64_t interface_binding(void* object,const void* witness,std::span<const char* const> keys) const;
     std::shared_ptr<const NominalDescriptor> descriptor(std::string_view) const;
     std::int64_t dynamic_type(void*,std::span<const char* const>) const;
     Snapshot snapshot() const;
@@ -63,7 +70,11 @@ private:
     mutable std::mutex mutex_;
     std::condition_variable changed_;
     Heap heap_;
-    using TypeCatalog=std::map<std::string,std::shared_ptr<const NominalDescriptor>,std::less<>>;
+    using NominalCatalog=std::map<std::string,std::shared_ptr<const NominalDescriptor>,std::less<>>;
+    struct TypeCatalog {
+        NominalCatalog types;
+        std::map<std::string,std::shared_ptr<const InterfaceWitness>,std::less<>> witnesses;
+    };
     std::shared_ptr<const TypeCatalog> types_ = {};
     std::vector<Thread*> threads_;
     std::vector<Handle*> handles_;

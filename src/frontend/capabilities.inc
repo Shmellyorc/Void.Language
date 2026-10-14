@@ -26,6 +26,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         return result;
     };
     auto run=[&](Unit& unit,Function& f,bool report,bool requirements) {
+        if(f.interface_requirement) return false;
         bool changed=false,local_changed=false;
         std::vector<ReferenceFacts> locals(f.locals.size());
         std::map<const Expr*,ReferenceFacts> evaluated;
@@ -258,7 +259,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         do { local_changed=false; sequence(f.body); } while (local_changed);
         if (f.receiver && f.receiver->type.kind==Type::aggregate)
             changed|=ir::join_facts(f.reference_effects.receiver_after,locals[f.receiver->slot]);
-        if (f.receiver && f.receiver->type.kind==Type::managed_ref && !f.receiver_mutates) {
+        if (f.receiver && ir::reference_value(f.receiver->type) && !f.receiver_mutates) {
             for (const auto& origin:f.reference_effects.mutations) if (origin.parameter==0) { f.receiver_mutates=true; changed=true; }
         }
         if (report) {
@@ -274,6 +275,21 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
     for(bool requirements:{false,true}) do {
         changed=false;
         for (auto& [id,u]:units) for (auto& f:u->functions) changed|=run(*u,f,false,requirements);
+        for(auto& [id,u]:units) for(auto& requirement:u->functions) if(requirement.interface_requirement) {
+            bool provider=false;
+            for(const auto& [root_id,root]:units) if(root->member_catalog) {
+                for(const auto& binding:root->member_catalog->interface_bindings) if(auto selected=binding.methods.find(requirement.symbol);selected!=binding.methods.end()) {
+                    auto& method=*functions.at(selected->second.second);provider=true;
+                    auto effects=!method.virtual_slot.empty() ? method.virtual_effects : method.reference_effects;
+                    changed|=ir::join_effects(requirement.reference_effects,ir::abstract_interface_effects(effects,method.receiver_mutates));
+                }
+                break;
+            }
+            if(!provider) {
+                ir::Function header;header.parameters={requirement.receiver->type};for(const auto& p:requirement.parameters) header.parameters.push_back(p.type);header.result=requirement.result;
+                changed|=ir::join_effects(requirement.reference_effects,ir::unknown_interface_effects(header));
+            }
+        }
         std::map<std::string,ir::ReferenceEffects> families;
         for(auto& [id,u]:units) for(auto& f:u->functions) if(!f.virtual_slot.empty()) ir::join_effects(families[f.virtual_slot],f.reference_effects);
         for(auto& [id,u]:units) for(auto& f:u->functions) if(!f.virtual_slot.empty()) {
@@ -282,6 +298,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
     } while (changed);
     for (auto& [id,u]:units) for (auto& f:u->functions) {
         run(*u,f,true,true);
+        if(f.interface_requirement) {f.result=ir::fact_type(f.result,f.reference_effects.returned);f.receiver_mutates=std::any_of(f.reference_effects.mutations.begin(),f.reference_effects.mutations.end(),[](const auto& origin){return origin.parameter==0;});}
         auto origin=[](const ReferenceOrigin& value) {
             std::string out=std::to_string(value.parameter)+":";
             for(auto field:value.path) out+=std::to_string(field)+",";

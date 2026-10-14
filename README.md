@@ -410,5 +410,27 @@ build/ci-debug/voidc run examples/composition/main.void 10 # 111
 ```
 
 This compiles real source through the shared frontend/IR/LLVM path. Phase 20 adds
-managed inheritance and component virtual dispatch; interfaces, transitive promotion
-and stateless mixins remain deferred.
+managed inheritance and component virtual dispatch. Phase 21 adds managed-backed
+structural interface views; transitive promotion, stateless mixins and standalone
+value-interface erasure remain deferred.
+
+
+Structural interfaces use real source compilation, with no `implements` declaration:
+
+```swift
+interface readable:
+    func read() -> i32
+```
+
+Completed managed values satisfying accessible exact method requirements convert
+in arguments, assignments, returns and `as`. Interface calls preserve target identity,
+readonly capabilities and selected embedded storage. See
+[INTERFACES.md](docs/INTERFACES.md) for the implemented scope and deferred features.
+
+```sh
+build/ci-debug/voidc run examples/interfaces/main.void 10 # 28
+build/ci-debug/voidc run examples/interfaces/static.void 10 # 720
+```
+
+These exercise the source frontend and shared native backend, separately from the
+older hand-built architectural IR proofs. WORK_LOG.md records local/hosted validation.

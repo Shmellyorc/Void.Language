@@ -1,0 +1,23 @@
+interface readable:
+    func read() -> i32
+struct cell:
+    n: i32
+func (c cell) read() -> i32:
+    return c.n
+value struct part:
+    tag: u8
+    view: readable?
+    wide: i64
+value struct parcel:
+    prefix: bool
+    nested: part
+func make(value: i32) -> parcel:
+    return parcel(nested = part(view = cell(n = value)))
+func consume(p: parcel) -> i32:
+    var n = 0
+    for n < 100:
+        var garbage = cell(n = n)
+        n++
+    return (p.nested.view as readable).read() + n
+func entry(value: i32) -> i32:
+    return consume(make(value))

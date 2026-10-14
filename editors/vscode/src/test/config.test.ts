@@ -75,6 +75,9 @@ test('presentation covers approved keyword colors and space indentation', async 
     for (const [text, token] of [['struct derived extends base:', 'extends'], ['virtual func (b base) read():', 'virtual'], ['override func (d derived) read():', 'override'], ['super.read()', 'super'], ['super .read()', 'super']])
         assert(keywords.some((rule:RegExp) => rule.exec(text)?.[0] === token), `Missing contextual keyword: ${token}`);
     assert(indent.test('struct derived extends module.base:'));
+    assert(indent.test('interface readable:'));
+    assert(keywords.some((rule:RegExp) => rule.exec('interface readable:')?.[0] === 'interface'));
+    assert(!highlighted('p.interface')); assert(!highlighted('interface: i32'));
     assert(indent.test('public virtual func (b base) read():'));
     assert(indent.test('override func (d derived) read():'));
     const literals = grammar.patterns.filter((p:{name?:string}) => p.name === 'constant.language.void')

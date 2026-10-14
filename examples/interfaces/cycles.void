@@ -1,0 +1,22 @@
+interface link:
+    func read() -> i32
+    func next() -> link?
+value struct edge:
+    target: link?
+struct node:
+    data: i32
+    edge: edge
+func (n node) read() -> i32:
+    return n.data
+func (n node) next() -> link?:
+    return n.edge.target
+func entry(value: i32) -> i32:
+    var n = node(data = value)
+    var view: link = n
+    n.edge.target = view
+    var copy = n.edge
+    copy.target = null
+    var next = view.next() as link
+    if next == view:
+        return next.read()
+    return -99
