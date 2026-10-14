@@ -15,6 +15,7 @@
 #include <set>
 #include <stdexcept>
 #include <tuple>
+#include <type_traits>
 namespace vd {
 namespace {
 using Type = ir::Type;
@@ -266,6 +267,13 @@ struct Constant {
 };
 struct Unit;
 struct Structure {
+    Structure() = default;
+    // Fields own noncopyable AST nodes. Container copy traits do not inspect
+    // vector<Statement>'s copy body; never let reallocation select that path.
+    Structure(const Structure&) = delete;
+    Structure& operator=(const Structure&) = delete;
+    Structure(Structure&&) = default;
+    Structure& operator=(Structure&&) = default;
     Token token;
     std::shared_ptr<ir::ValueType> definition;
     std::string visibility = "public";
@@ -278,6 +286,9 @@ struct Structure {
     std::size_t expanded_fields = 0;
     Function* initializer = nullptr;
 };
+static_assert(!std::is_copy_constructible_v<Statement> && !std::is_copy_assignable_v<Statement>);
+static_assert(!std::is_copy_constructible_v<Structure> && !std::is_copy_assignable_v<Structure>);
+static_assert(std::is_move_constructible_v<Structure> && std::is_move_assignable_v<Structure>);
 struct Import {
     Token path, alias;
     std::string target;

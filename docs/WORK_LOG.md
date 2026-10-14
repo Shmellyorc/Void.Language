@@ -5433,3 +5433,114 @@ is not presented as production-ready. Interfaces, source downcasts/type patterns
 protected access, hiding, covariance, abstract/final, open-world loading, implicit
 constructor chaining and external managed ABI remain outside this phase. After
 hosted acceptance, structural interfaces are a separate design/approval task.
+
+
+## Phase 20 Windows AST relocation correction — run #34 (13 October 2026)
+
+Investigated the actual completed Windows job logs for run 38514742460,
+commit d8f7a2e6cc577f2c926525b229d0325dcce87330. Windows Debug job
+115690896295 and Release job 115690896246 both fail compiling compiler.cpp,
+before linking or test execution. Retrieved individual job logs through the
+GitHub read-only job-log API while the other five jobs were still running;
+the overall run was not yet complete. Logs are retained locally under
+build/phase20-windows-move-verification/windows-{debug,release}.log.
+
+Both logs use the official Clang-cl 19.1.7 toolchain with MSVC STL
+14.44.35207. The instantiation chain is Structure-vector reallocation →
+uninitialized COPY of Structure → copy of vector<Statement> → construct_at
+with Statement& → implicitly deleted Statement copy constructor (unique_ptr<Expr>).
+The failing push_back(std::move(structure)) is at hosted compiler.cpp:569.
+It moves the new argument; the invalid copy is relocation of existing elements.
+
+Structure's implicit copy trait was misleading: vector<Statement>'s copy constructor
+is declared even though its body cannot copy Statement. Phase 20 adds
+optional<Type> base_type; Type owns a std::set of readonly reference paths.
+MSVC tree moves allocate a sentinel and can throw, so this member prevents
+Structure's implicit move from being noexcept. Vector therefore selects the
+apparently available copy. Linux libstdc++/libc++ instead report a nonthrowing
+Structure move and never instantiate that latent invalid copy. Microsoft's
+[VS 2022 STL tree implementation](https://github.com/microsoft/STL/blob/vs-2022-17.14/stl/inc/xtree)
+and [vector reallocation selection](https://github.com/microsoft/STL/blob/vs-2022-17.14/stl/inc/vector)
+confirm the throwing tree move and move-if-nothrow-or-noncopyable policy;
+the hosted logs confirm the selected copy path on the actual runner.
+
+Small correction: explicitly delete Structure copy construction/assignment,
+default its default/move construction and move assignment, with no explicit
+noexcept. Member-derived exception specifications remain truthful. Statement
+and Expr ownership are unchanged; no AST clone, forced noexcept, capacity/reserve
+workaround, allocator change, compiler-semantic change or build-policy change.
+Compile-time assertions on the actual internal types require noncopyable
+Statement/Structure and movable Structure on every compiler/STL build.
+
+Added a normal/O2 source regression to the existing inheritance_source suite:
+32 value payloads, 32 managed roots and 32 derived structs force repeated
+Structure-vector growth with engaged base Types and unique expression defaults.
+All 32 constructors preserve their own nested/default values; entry(10) must
+return 1530. No existing assertions or suites were removed (51 remain).
+Six standalone syntax probes include the actual pre-fix/fixed compiler translation
+units, using Clang 19.1.7/libstdc++, Clang 19.1.7/libc++ and GCC 16.2/libstdc++.
+Each verifies the pre-fix false-positive copy/nonthrowing-move traits and corrected
+noncopyable/movable contract. All six passed; these are Linux compile probes,
+not a Windows/MSVC execution claim. Focused Debug tests passed 9/9 in 16.24 s:
+frontend, inheritance source/CLI/both native AOT modes, managed initialization,
+reference values, composition and native LSP protocol.
+
+Final post-correction validation completed against unchanged frozen source/test
+hashes (260 inputs). All six configure/build/CTest sequences returned zero:
+
+| Configuration | CTest | Test elapsed |
+| --- | --- | --- |
+| ci-debug | 51/51 | 66.84 s |
+| ci-release | 51/51 | 22.47 s |
+| ci-sanitizers | 51/51 | 90.66 s |
+| ci-official-debug | 51/51 | 62.79 s |
+| ci-official-release | 51/51 | 24.46 s |
+| ci-official-san | 51/51 | 78.23 s |
+
+This is 306 passing suite executions, preserving all 51 suites and their prior
+assertions, including runtime/GC stress proofs, normal/O2 ORC JIT, separately linked
+AOT, constructor/failure handling, readonly, reload, diagnostics and LSP checks.
+Both SDKs are complete LLVM 19.1.7 installations with headers, OrcJIT library and
+LLVMConfig.cmake verified. Installed RTTI YES / official RTTI NO still match all
+project targets. Sanitizer trees retain RelWithDebInfo, VOID_SANITIZERS=ON,
+-fsanitize=address,undefined and frame pointers; no exclusions were added.
+
+Commands for each existing pinned/configured tree were:
+
+```sh
+cmake -S . -B build/<tree>
+cmake --build build/<tree> -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+ctest --test-dir build/<tree> --output-on-failure -j4
+```
+
+Strict sanitizer execution used the same untraced mode needed for LeakSanitizer;
+leak detection was never disabled. Commands, SDK checks and per-step logs are in
+build/phase20-windows-move-verification/matrix. The six actual-AST syntax probes
+and exact compiler arguments are recorded in traits-results.json. These Linux
+probes include libc++ only for source syntax/traits, not a claim that the prebuilt
+LLVM SDK was relinked against another standard-library ABI.
+
+Both Debug SDKs reran frontend, managed_initialization_source,
+reference_values_source, composition_source and inheritance_source under a 1 MiB
+soft/hard stack limit, -j2, --repeat until-fail:3: installed 15/15 in 47.40 s,
+official 15/15 in 38.94 s (30 executions). Existing bounded-recursion/recovery
+assertions and the new relocation program all remain active.
+
+Editor checks: npm test passed typecheck/build/unit entry; direct execution of
+out/test/config.test.js confirmed all four individual tests. npm run package
+passed, producing the unchanged 8-file / 145.51 KB local VSIX. Real VS Code 1.141.0
+with the corrected Debug voidls passed normal, restricted-trust and multi-root
+integration scenarios, including actual native process kills, exactly two expected
+termination notifications, restart/deactivation and stale-query protections.
+Native LSP coverage passed in all six matrices. No extension code or grammar was
+changed. VSCodium remains unavailable locally and is not claimed verified.
+
+Final git diff --check passed. Only compiler.cpp, the inheritance regression and
+WORK_LOG.md changed. Runtime/backend/CMake/workflow and the Windows CRT correction
+are untouched. No commits, pushes, branches or remote modifications were made.
+Windows Debug/Release remain unverified until hosted CI compiles and executes this
+corrected revision. Local Linux tests and STL-source analysis establish the cause
+and portability correction, not Windows success. Ready for owner review and the
+next seven-job hosted gate.

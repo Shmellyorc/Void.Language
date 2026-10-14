@@ -64,6 +64,22 @@ void diagnostics() {
     rejects("private struct base:\n    n: i32\nstruct derived extends base:\n    m: i32\n","less-visible");
 }
 void programs() {
+    // Exercise repeated Structure-vector relocation with engaged base Types and
+    // uniquely owned field defaults; no declaration may copy or lose its AST.
+    std::string relocated;
+    for (unsigned n=0;n<32;++n) {
+        auto suffix=std::to_string(n);
+        relocated += "value struct payload_"+suffix+":\n    value: i32 = "+suffix+" + 1\n";
+        relocated += "struct root_"+suffix+":\n    stored: payload_"+suffix+"\n";
+        relocated += "struct leaf_"+suffix+" extends root_"+suffix+":\n    own: i32 = "+suffix+" * 2\n";
+    }
+    relocated += entry+"    var total = v\n";
+    for (unsigned n=0;n<32;++n) {
+        auto suffix=std::to_string(n);
+        relocated += "    var node_"+suffix+" = leaf_"+suffix+"()\n";
+        relocated += "    total += node_"+suffix+".stored.value + node_"+suffix+".own\n";
+    }
+    run(relocated+"    return total\n",1530);
     run("struct cell:\n    value: i32\nstruct owner:\n    child: cell\n    value: i32\nfunc (o owner) get() -> cell:\n    return o.child\nfunc (o owner) init(c: cell):\n    o.child = c\n    const alias = o\n    var child = alias.get()\n    o.value = child.value\n"+entry+"    return owner(cell(value = v)).value\n",10);
     run("struct empty:\n\nstruct derived extends empty:\n    own: i8\nvirtual func (e empty) read() -> i32:\n    return 0\noverride func (d derived) read() -> i32:\n    return d.own as i32\n"+entry+"    var a = empty()\n    var b: empty = derived(own = v as i8)\n    if a != b:\n        return b.read()\n    return 0\n",10);
     run(chain+"func helper(b: base):\n    b.n++\nfunc (d derived) init():\n    super.init(n = 4)\n    var alias: base = d\n    helper(alias)\n    d.own = 2\n"+entry+"    return derived().n\n",5);
