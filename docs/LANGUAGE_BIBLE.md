@@ -1119,7 +1119,7 @@ for i in 10..<0:    # 10 through 1, excluding 0
 
 Direction follows the endpoint ordering. **OPEN:** Range steps, empty ranges, mixed signedness, non-integral endpoints, and overflow behavior. Plain C-style three-part `for` is intentionally omitted.
 
-## 27. `for`, `break`, `continue`, `return` [AGREED]
+## 27. `for`, `break`, `continue`, `return`, `pass` [AGREED]
 
 VOID uses **one loop keyword: `for`**. The separate `while` loop keyword was removed at the designer's request. Use `for` for Boolean-controlled repetition, iterable/range traversal, and unbounded loops. A `for condition:` condition must be `bool` and is checked before each iteration; `for:` has no condition and repeats until control flow exits it.
 
@@ -1177,6 +1177,66 @@ score--
 ```
 
 This retains convenience without complex C/C++ sequencing semantics.
+
+### 27.2 Intentional placeholder: `pass` [APPROVED, IMPLEMENTED VOID 2.0]
+
+`pass` is an explicit no-op statement for an intentionally unfilled body or a
+placeholder within a larger block. Its exact syntax is `pass` on its own statement
+line, optionally followed by a comment. It is a reserved statement keyword, never
+an expression, value, call or declaration name. It is legal in ordinary statement
+blocks: functions, receiver methods, initializers, conditionals and loops.
+
+It performs no operation and has no special runtime behavior. Execution continues
+with the following statement. Unlike `return`, it does not exit a function; unlike
+`break`, it does not exit a loop; unlike `continue`, it does not advance to the next
+iteration. It does not satisfy a required return path or initialize a required
+field. A no-result function containing only `pass` falls through normally.
+
+```swift
+func update():
+    pass
+
+func check(ready: bool):
+    if ready:
+        pass
+    else:
+        update()
+
+func repeat():
+    var i = 0
+    for i < 10:
+        pass
+        i++ # Executes normally after pass.
+```
+
+Conditional and unbounded `for` loops are implemented. Range/collection iteration
+in Section 26 remains deferred; `pass` does not enable those iteration forms.
+An unbounded `for:` containing only `pass` continues indefinitely.
+
+Empty ordinary statement blocks, including comment-only bodies, remain invalid:
+
+```swift
+# Invalid: no indented statement body.
+func missing():
+    # A comment is not a statement.
+
+# Invalid: pass does not provide an i32 return value.
+func missing_result() -> i32:
+    pass
+
+# Invalid: the else path falls through without returning.
+func choose(ready: bool) -> i32:
+    if ready:
+        return 1
+    else:
+        pass
+```
+
+`return pass`, `var value = pass`, `pass()`, `pass 1` and `pass:` are invalid.
+Interface requirements remain bodyless signature declarations (`func update()`);
+adding `:` and a `pass` body is invalid and does not create a default implementation.
+Struct field declarations are not statement blocks; `pass` is not a field or an
+alternative to an interface requirement.
 
 ## 28. `defer` and failure handling [AGREED / failure policy RECOMMENDED]
 
@@ -2622,6 +2682,7 @@ The built-in game API is optional. This is intended to feel PICO-8-like without 
 | Naming | `snake_case` across all ordinary declarations |
 | Block syntax | Python-like indentation; `defer { ... }` also available |
 | Functions | `func`, receiver methods, no `this` |
+| Placeholder statement | `pass` is an implemented standalone no-op; ordinary bodies remain nonempty and required return paths still apply (Section 27.2) |
 | Scope | `var` declaration explicit, accidental shadowing is compile error |
 | Constants | `const` readonly, usable to initialize/reassign mutable variables, manual restart after source edit |
 | Numeric defaults | `i32` for common ints; `f32` for unsuffixed floating literals; `f` and `d` suffixes |
@@ -2679,7 +2740,7 @@ This section matters especially when an AI assistant inherits this file without 
 24. **FFI details:** No user-facing pointers/C strings is agreed; trusted native binding grammar, ownership metadata, foreign threads, and callback trampoline semantics are not finished.
 25. **Tooling/packaging:** LSP, docs and extension discovery are goals; registry protocol, package manifests, trust verification, and compiler CLI spelling remain proposals.
 26. **Module-as-scene adapter:** A module directly satisfying a scene interface and `func call()` at file level was explored, but the user corrected the discussion to favor **struct callback fields wired to private module functions**. Do not implement module-callable semantics as a locked feature without explicit reapproval.
-27. **Empty function bodies:** The exact placeholder syntax is not settled; no need to invent a `pass` or `...` statement until parser design requires it.
+27. **Empty function bodies — resolved:** `pass` is the approved, implemented intentional no-op placeholder (Section 27.2). Empty ordinary statement bodies remain invalid; interface requirements remain bodyless.
 28. **Operator overloading:** No general user-defined operator suite has been agreed. Avoid treating one as required just because structs and generics exist.
 29. **Error diagnostics codes:** Code examples use illustrative `VOID...` IDs. The real diagnostic catalog is not yet allocated.
 30. **Compiler implementation language and LLVM integration:** Not yet chosen. The C API and C++ API each have costs; evaluate concretely against hot reload and GC requirements.

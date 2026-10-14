@@ -85,7 +85,7 @@ void programs() {
     run(chain+"func helper(b: base):\n    b.n++\nfunc (d derived) init():\n    super.init(n = 4)\n    var alias: base = d\n    helper(alias)\n    d.own = 2\n"+entry+"    return derived().n\n",5);
     run(chain+"func view(const d: derived) -> base:\n    return d\n"+entry+"    var d = derived(n = v)\n    var b = view(d)\n    d.n++\n    return b.n\n",11);
     run(chain+entry+"    var d = derived(n = v, own = 2)\n    var b: base = d\n    b.n++\n    if b == d:\n        return d.n + d.own\n    return 0\n",13);
-    run(chain+"func pass(b: base) -> base?:\n    return b\n"+entry+"    var d = derived(n = v)\n    var b = pass(d) as base\n    return b.n\n",10);
+    run(chain+"func forward(b: base) -> base?:\n    return b\n"+entry+"    var d = derived(n = v)\n    var b = forward(d) as base\n    return b.n\n",10);
     run(chain+"value struct box:\n    root: base\n    count: i32\n"+entry+"    var d = derived(n = v)\n    var b = box(root = d)\n    var c = b\n    c.count = 3\n    c.root.n++\n    return b.root.n + b.count + c.count\n",14);
     run(chain+"func (b base) init(n: i32):\n    b.n = n\nfunc (d derived) init(n: i32):\n    super.init(n)\n    d.own = 4\n"+entry+"    return derived(v).n + derived(2).own\n",14);
     run(chain+"func (b base) bump():\n    b.n++\nfunc (d derived) init():\n    super.init(n = 5)\n    super.bump()\n    d.own = 3\n"+entry+"    return derived().n + derived().own\n",9);

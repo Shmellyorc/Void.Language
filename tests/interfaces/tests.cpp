@@ -62,7 +62,7 @@ void diagnostics() {
 
 }
 void programs() {
-    run(declaration+"func pass(const r: readable) -> readable:\n    return r\n"+entry+"    const c = cell(n = v)\n    var x = pass(c)\n    return x.read()\n",10);
+    run(declaration+"func forward(const r: readable) -> readable:\n    return r\n"+entry+"    const c = cell(n = v)\n    var x = forward(c)\n    return x.read()\n",10);
     run(declaration+entry+"    var c = cell(n = v)\n    var x: readable = c\n    var y = c as readable\n    if x == y:\n        return y.read()\n    return 0\n",10);
     run("interface readable:\n    func read() -> i32\nvalue struct meter:\n    n: i32 = 7\nfunc (m meter) read() -> i32:\n    return m.n\nstruct base:\n    using meter\nstruct derived extends base:\n    n: i32 = 20\nfunc (d derived) read() -> i32:\n    return d.n\n"+entry+"    var d = derived()\n    var b: base = d\n    var x: readable = b\n    var y: readable = d\n    if x == y:\n        return x.read() * 100 + y.read()\n    return 0\n",720);
     run("interface readable:\n    func read() -> i32\nstruct base:\n    n: i32\nstruct derived extends base:\n    extra: i32\nvirtual func (b base) read() -> i32:\n    return b.n\noverride func (d derived) read() -> i32:\n    return super.read() + d.extra\n"+entry+"    var d = derived(n = v, extra = 4)\n    var b: base = d\n    var x: readable = b\n    return x.read()\n",14);

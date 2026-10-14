@@ -108,7 +108,7 @@ public:
 };
 bool letter(char c) { return (c >= 'a' && c <= 'z') || c == '_'; }
 bool digit(char c) { return c >= '0' && c <= '9'; }
-const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue",
+const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue", "pass",
     "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "as", "private", "public", "internal"};
 std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     const auto& text = source.text();
@@ -209,7 +209,7 @@ struct Expr {
     Expr(Kind k, Token t) : kind(k), token(std::move(t)) {}
 };
 struct Statement {
-    enum class Kind { variable, assignment, expression, returned, conditional, loop, broken, continued } kind;
+    enum class Kind { variable, assignment, expression, returned, conditional, loop, broken, continued, no_op } kind;
     Token token;
     std::string name, op, constant_syntax;
     std::optional<Type> annotation;
@@ -502,6 +502,10 @@ class Parser {
     }
     Statement statement() {
         nodes = 0;
+        if (at("pass")) {
+            Statement s(Statement::Kind::no_op, take());
+            newline(); return s;
+        }
         if (at("while")) error(source, peek(), Code::while_loop, "VOID uses 'for' for all loops.", "Replace 'while condition:' with 'for condition:'.");
         if (at("if")) return conditional(take());
         if (at("for")) {
@@ -1342,6 +1346,7 @@ class Semantics {
         using K = Statement::Kind;
         unsigned flow = next_flow;
         switch (s.kind) {
+        case K::no_op: break;
         case K::variable: {
             if (s.invalid) { s.slot = declare(s.token, error_type); invalid_function = true; break; }
             if (s.annotation) s.annotation = resolve_type(*s.annotation,unit,root,units,s.token);
@@ -1770,6 +1775,7 @@ class Lowering {
     void statement(const Statement& s) {
         using K = Statement::Kind;
         switch (s.kind) {
+        case K::no_op: break;
         case K::variable: {
             ir::Instruction zero{ir::Op::constant}; zero.type = output.locals[s.slot];
             auto value = s.expression ? expression(*s.expression) : emit(zero, s.token);

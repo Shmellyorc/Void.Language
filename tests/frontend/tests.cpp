@@ -26,6 +26,27 @@ void rejects(const std::string& text, const std::string& reason, const std::stri
     throw std::runtime_error("invalid source accepted\n" + text);
 }
 void diagnostics() {
+    rejects("func f() -> i32:\n    pass\n", "Missing return path", "1:6");
+    rejects("func f(x: bool) -> i32:\n    if x:\n        return 1\n    else:\n        pass\n", "Missing return path");
+    rejects("func f() -> i32:\n    for false:\n        pass\n", "Missing return path");
+    rejects("func f():\n    # Still no statement.\n", "indented block");
+    rejects("func f():\n    if true:\n        # Missing conditional body.\n    pass\n", "indented block");
+    rejects("func f():\n    for false:\n        # Missing loop body.\n    pass\n", "indented block");
+    for (const auto& suffix : {" 1", "()", " = 1", ":"})
+        rejects(std::string("func f():\n    pass") + suffix + "\n", "end of statement");
+    rejects("func f() -> i32:\n    return pass\n", "Expected an expression", "2:12");
+    rejects("func f():\n    var x = pass\n", "Expected an expression", "2:13");
+    rejects("func f():\n    var pass = 1\n", "Expected a lowercase identifier");
+    rejects("pass\n", "func");
+    rejects("struct child:\nstruct owner:\n    child: child\nfunc (o owner) init():\n    pass\n", "initialized");
+    auto recovered = vd::analyze_source({"/pass-recovery.void", "func f():\n    pass 1\n    pass\nfunc g() -> i32:\n    return missing\n"});
+    require(!recovered.succeeded() && recovered.diagnostics.size() == 2, "pass syntax recovery diagnostic count");
+    require(recovered.diagnostics[0].primary.source->location(recovered.diagnostics[0].primary.begin).line == 2 &&
+        recovered.diagnostics[1].description.find("Unknown identifier") != std::string::npos &&
+        recovered.diagnostics[1].primary.source->location(recovered.diagnostics[1].primary.begin).line == 5,
+        "pass syntax recovery lost later function or location");
+    rejects("interface idle:\n    func wait():\n        pass\n", "end of statement");
+    rejects("interface idle:\n    pass\n", "func");
     rejects("func entry(x: i32) -> i32:\n    return x\n  return 2\n", "Indentation", "3:3");
     rejects("func entry(x: i32) -> i32:\n\treturn x\n", "Tabs", "2:1");
     rejects("func entry(x: i32) -> i32:\nreturn x\n", "indented block", "2:1");
@@ -87,8 +108,9 @@ void diagnostics() {
     std::cout << "50+ source diagnostic cases and UTF-8/ABI checks passed\n";
 }
 void programs(const std::filesystem::path& root) {
+    run("interface idle:\n    func wait()\nstruct worker:\nfunc (w worker) init():\n    pass\nfunc (w worker) wait():\n    pass\nfunc entry(x: i32) -> i32:\n    var w = worker()\n    var i: idle = w\n    i.wait()\n    pass\n    return x\n", {{0,0},{9,9}});
     vd::Jit jit;
-    for (auto file : {"architecture.void", "loops.void", "functions.void"}) {
+    for (auto file : {"architecture.void", "loops.void", "functions.void", "pass.void"}) {
         auto source = vd::read_source(root / "examples" / file); auto module = vd::compile_source(source);
         vd::require_source_entry(source, module);
         for (bool optimized : {false, true}) {
@@ -97,6 +119,8 @@ void programs(const std::filesystem::path& root) {
                 for (auto [input, expected] : std::vector<std::pair<int,int>>{{-1,7},{0,42},{1,43},{10,52}}) require(code->invoke(input) == expected, "real architecture source");
             else if (std::string(file) == "loops.void")
                 for (auto [input, expected] : std::vector<std::pair<int,int>>{{-1,21},{0,21},{1,22},{10,25}}) require(code->invoke(input) == expected, "loop file");
+            else if (std::string(file) == "pass.void")
+                for (int input : {-1,0,1,10}) require(code->invoke(input) == input + 8, "pass source fallthrough");
             else
                 for (auto [input, expected] : std::vector<std::pair<int,int>>{{-1,9},{0,1},{1,1},{5,120},{10,3628800},{11,0}}) require(code->invoke(input) == expected, "recursive function file");
         }

@@ -34,6 +34,15 @@ Compiler responsibilities stop at code generation; the existing experimental
 heap and thread coordinator serve managed source through explicit runtime ownership
 and AOT bootstrap; reload leases and the C bridge remain runtime/host responsibilities.
 
+`pass` is supported as a standalone no-op in every ordinary statement block,
+including methods and initializers. Semantic analysis preserves fallthrough and
+required-return/field-readiness checks; lowering emits no IR operation or runtime
+call. Empty blocks remain invalid, and interface requirements remain bodyless.
+The canonical syntax and examples are in LANGUAGE_BIBLE.md Section 27.2;
+`examples/pass.void` exercises nested control flow and subsequent execution through
+normal/O2 JIT and separately linked AOT in the existing frontend/source_cli suites.
+The editor grammar assigns `pass` the same control-keyword scope as `return`.
+
 ## Syntax and supported semantics
 
 ```swift

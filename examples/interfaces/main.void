@@ -7,7 +7,9 @@ value struct motion:
 func (m motion) read() -> i32:
     return m.x
 func (m motion) move(amount: i32):
+    pass
     m.x += amount
+    pass
 struct actor:
     using motion
 func consume(const r: readable) -> i32:

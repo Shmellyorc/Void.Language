@@ -5,7 +5,8 @@
 
 **Created:** 12 October 2026  
 **Project:** [Shmellyorc/Void.Language](https://github.com/Shmellyorc/Void.Language)  
-**Snapshot:** VOID 2.0 Phase 12 implemented locally and pushed; GitHub Actions run #17 is in progress at the time of writing.  
+**Updated:** 14 October 2026
+**Snapshot:** Phases **1–20 hosted-verified and locked**. Phase **21 structural interfaces implemented locally**, 55/55 across six Linux LLVM 19.1.7 configurations; [Actions run #36](https://github.com/Shmellyorc/Void.Language/actions/runs/38578057629), commit `9696eb6`, was **in progress** at this snapshot. Do not lock Phase 21 without checking all seven final job results.
 **Purpose:** If the conversation gets too long, a branch loses context, or a different assistant takes over, **read this file before working on VOID**.
 
 ---
@@ -198,13 +199,15 @@ Other important foundations:
 
 - **Modules:** canonical project-scoped VFS/import ownership, qualified/direct imports, aliases, visibility, multiple files, stable source identity.
 - **Diagnostics:** structured source ranges, multi-error recovery, diagnostic budgets, retained source snapshots and precise native runtime error reporting for the implemented arithmetic boundaries.
-- **Native reload proof:** logical function identities and leased generations. Safe compatible body replacement has proof coverage; changes to layouts/signatures/constant contracts may require a restart.
-- **Experimental GC proof:** single-threaded non-moving tracing with explicit roots and generated root checks. It is **not** a production managed runtime. Thread registration, world-stop coordination, LLVM statepoint/stack-map integration, and unwind cleanup remain unresolved.
+- **Native reload:** logical identities and whole-generation leases support compatible body replacement across managed inheritance, virtual calls, composition and locally implemented interface dispatch. Signature, layout, binding, access, effect and other compatibility changes require restart.
+- **Managed runtime and precise GC:** Phases 15–21 added the runtime-owned thread registry, cooperative NativeSafe/Managed rendezvous, explicit Frame/Slot roots, non-moving tracing, complete-object publication, managed inheritance and interface-reference roots. Optimized JIT and linked AOT have substantial tests. This remains an **experimental, not production-certified** runtime; weak references, finalization, async roots, broader failure/unwind policies and tuning still need deliberate design. Do not describe thread coordination as unimplemented.
 - **Native C proof:** trusted C ABI fixture, UTF-8 borrowing, opaque resources and retained callback/lifetime checks. This does not mean arbitrary native libraries are automatically importable as VOID packages yet.
 - **LSP:** real `voidls` stdio server using source analysis for diagnostics, definitions, references, open-document overlays and revisions.
-- **Editor client:** TypeScript VS Code/VSCodium extension with grammar, VSIX packaging, guarded native LSP startup, real editor-host integration and lifecycle tests.
+- **Editor client:** TypeScript VS Code/VSCodium extension with grammar, indentation for managed/virtual/interface declarations, VSIX packaging, guarded native LSP startup, real editor-host integration and lifecycle tests. Actual installed VS Code has been tested; VSCodium binary execution has not been claimed.
 
-**Important external ABI distinction:** Phase 12 value structs use compiler-private aggregate calling conventions. No public C aggregate ABI or stable serialization layout has been promised.
+**Important external ABI distinction:** Value structs and the two-word managed-backed interface view use compiler-private aggregate calling conventions. No public C aggregate ABI, managed/interface FFI or stable serialized layout has been promised.
+
+**The current object model:** `extends` is managed subtype identity (Phase 20); `using` stores and promotes one-hop composition (Phase 19); structural `interface` states supported behavior without `implements` (Phase 21, awaiting hosted gate).
 
 ---
 
@@ -225,7 +228,17 @@ The implementation was primarily performed by the **keyboard clanker**. My part 
 | **9** | Revision-aware tooling sessions, unsaved overlays, stale-result protection | Cross-platform green |
 | **10** | Real `voidls` LSP transport, diagnostics, definition/references and UTF-16/editor boundaries | **Run #13 green**, commit `ccfea79` |
 | **11** | VS Code/VSCodium extension, syntax highlighting, language-client integration, trust and lifecycle tests | **Run #16 green**, commit `1b32151` |
-| **12** | Nested numeric/bool value structs, copy semantics, defaults, named construction, fields, params/returns, shared IR and LLVM | **Pushed** at `f9d9f3b`; **run #17 pending** when this file was created |
+| **12** | Numeric/bool nested value structs, independent copies, compile-time field defaults and named construction | [Run #18](https://github.com/Shmellyorc/Void.Language/actions/runs/38230971697) green after the semantic-stack correction |
+| **13** | Owner-module receiver methods, original-storage calls, mutation/effect inference and initializer groundwork | [Run #19](https://github.com/Shmellyorc/Void.Language/actions/runs/38240239951) green |
+| **14** | Custom value initialization, source-order/default argument binding and recursive nested construction | Hosted-verified by [run #22](https://github.com/Shmellyorc/Void.Language/actions/runs/38300953164) following fixes |
+| **15** | Runtime-owned managed thread coordination, precise root frames, stop-the-world rendezvous and failure-safe GC foundation | Hosted baseline confirmed and Phase 15 locked by [run #27](https://github.com/Shmellyorc/Void.Language/actions/runs/38340577548) |
+| **16** | Managed reference structs, identity/aliases, deep readonly, nullable references, complete-object publication and automatic GC | [Run #28](https://github.com/Shmellyorc/Void.Language/actions/runs/38356006737) green, 35 suites/job |
+| **17** | Staged managed custom `init`, required references and single complete-object commit | [Run #29](https://github.com/Shmellyorc/Void.Language/actions/runs/38371590635) green, 39 suites/job |
+| **18** | Reference-containing value structs, per-reference readonly capabilities and precise nested roots | [Run #30](https://github.com/Shmellyorc/Void.Language/actions/runs/38423319242), attempt 2, green, 43 suites/job |
+| **19** | Named/unnamed stored `using` composition with accessible one-hop member promotion | [Run #33](https://github.com/Shmellyorc/Void.Language/actions/runs/38452135087), attempt 2, green, 47 suites/job |
+| **20** | Managed single `extends`, true object identity, `virtual`/`override`/`super`, staged base construction | [Run #35](https://github.com/Shmellyorc/Void.Language/actions/runs/38519624653) green, 51 suites/job, including Windows AST relocation correction |
+| **21** | Implicit structural interfaces, managed-backed two-word reference/witness views, original-route dispatch, readonly, roots, reload and tooling | **Local only:** 55/55 in six Linux configurations. [Run #36](https://github.com/Shmellyorc/Void.Language/actions/runs/38578057629) at `9696eb6` pending final seven-job decision at this snapshot |
+
 
 ### The Phase 11 Windows saga, preserved for posterity XD
 
@@ -243,64 +256,46 @@ The lesson: inspect the exact failing layer and avoid weakening the architecture
 
 ---
 
-## 8. Phase 12: current state at the handoff
+## 8. Phase 21: current state at the handoff
 
-**User-approved design gate:** Declared field defaults use **Option A**, pure typed compile-time expressions. Runtime named-construction expressions evaluate exactly once in written order. Runtime field defaults and custom `init` are deferred, not permanently outlawed.
+**Phase 20 is LOCKED.** [Hosted run #35](https://github.com/Shmellyorc/Void.Language/actions/runs/38519624653) passed all seven jobs (51/51 each, 357 suite executions). The Windows/MSVC vector-relocation issue was corrected by making `Structure` explicitly move-only without forcing `noexcept` or cloning the AST. The separate Windows CRT selection correction from Phase 19 is retained.
 
-### Implemented and locally verified
+**Phase 21 was approved as IF1–IF8 and implemented locally.** It supports owner-module interfaces with bodyless requirements, implicit accessible structural conformance (including inherited and unambiguous one-hop promoted methods), nullable views, compile-time-only readonly capabilities, private-factory access checked at conversion, and original static-view binding. No source `implements` is necessary. A copyable view contains a complete managed object reference plus an immutable code-independent binding witness; the existing generation owns executable dispatch. Precise GC traces the object, never the witness. No automatic boxing is introduced.
 
-- Value structs containing ten supported numeric primitive types, bool, or acyclic nested value structs.
-- Recursive zero/false/default initialization and compile-time declared defaults.
-- Named-field construction with source-order evaluation.
-- Independent copies on assignments, parameters and returns.
-- Nested field reads and writes, arithmetic field updates and readonly protection.
-- Nominal type identity across imports; integration with validated analysis, LSP and compatible reload checks.
-- One shared compiler/LLVM lowering path for JIT/AOT.
-- Real source acceptance: `examples/value_structs/main.void 10` returned **46** in normal JIT, optimized JIT and a separately linked AOT executable.
-- **22/22 native suites** passed in each of six local configurations: Debug, Release and strict ASan/UBSan under both the installed and official LLVM 19.1.7 SDKs. This represents **132 passing suite executions**, not 132 distinct suites.
-- **4/4 editor unit tests** passed. Real local VS Code trusted, restricted and multi-root profiles passed. Existing GC/reload/native/diagnostics suites remain.
+**Reported final local verification:** 55/55 tests across Debug, Release and strict ASan/UBSan plus leak checks under each of two LLVM 19.1.7 SDKs (330 full-suite executions); 252 repeated stress runs; 36 1 MiB stack executions; real normal/O2 JIT and linked AOT; LSP and VS Code tests; VSIX packaging. Real source examples returned 28 and 720 in JIT, and 1200 in normal/O2 linked AOT. These are keyboard-clanker-reported local results and documentation reviewed by the wrench clanker, **not** hosted acceptance. The existing semantic-depth gate caught and corrected unbounded type-hint recursion without increasing depth or stack limits.
 
-**Read these project documents:**
+**Live GitHub checkpoint as captured on 14 October 2026:**
 
-- `docs/LANGUAGE_BIBLE.md` (approved design intent)
-- `docs/DEVELOPMENT_STRATEGY.md` (architecture and stages)
-- `docs/DECISIONS.md` (actual implementation choices)
-- `docs/KNOWN_ISSUES.md` (limitations)
-- `docs/SOURCE_COMPILER.md`
-- `docs/VALUE_SEMANTICS.md`
-- `docs/VALUE_STRUCTS_PROPOSAL.md` (approved Phase 12 gate)
-- `docs/VALUE_STRUCTS.md` (implemented Phase 12 surface)
-- `docs/WORK_LOG.md` (actual commands and evidence)
-- `docs/EDITOR_INTEGRATION.md` (existing editor behavior)
+- **Commit:** `9696eb6d4ae1fad3dacbe24cf77c5521727b5339`, titled `Phase 21: Implement structural interfaces`.
+- **Workflow:** [Actions run #36](https://github.com/Shmellyorc/Void.Language/actions/runs/38578057629), attempt 1. **In progress at this snapshot.** Windows Debug and Release had passed; macOS ARM64 Debug/Release and Ubuntu Debug/Release/Sanitizers were running.
+- **Gate:** All seven final jobs must succeed, each with 55/55 suites, for a total of 385 suite executions, plus required host-specific stack/editor checks. Re-check live status and exact SHA. A partial success is not a lock.
+- **On a failure:** Inspect the actual failing job, step and logs, then request a narrow fix. Do not rewrite the milestone or bypass failing tests.
 
-### Live CI checkpoint
+**Most useful current reference documents:** `docs/LANGUAGE_BIBLE.md`, `docs/DEVELOPMENT_STRATEGY.md`, `docs/DECISIONS.md`, `docs/KNOWN_ISSUES.md`, `docs/WORK_LOG.md`, `docs/INHERITANCE.md`, `docs/COMPOSITION.md`, `docs/INTERFACES_PROPOSAL.md` (approved IF1–IF8) and `docs/INTERFACES.md` (implemented contract). Older phase-only exclusions are historical, not current behavior.
 
-- **Commit:** `f9d9f3bf68828c9e46671e157cb165fa46407651`
-- **GitHub Actions:** [Phase 12 run #17](https://github.com/Shmellyorc/Void.Language/actions/runs/38226468142)
-- **Observed when creating this file:** Run #17 **in progress**, without a verified final conclusion.
-- **Action for the next conversation:** Re-check the current GitHub Actions result. If it is green across all three platforms, declare Phase 12 locked. If not, read the exact failing job and only then write a focused correction prompt.
-
-### Not implemented just because Phase 12 succeeded
-
-Managed reference structs, a production GC, strings, collections, generics, interfaces, inheritance, user receiver methods, custom initializers, positional construction, runtime field defaults, external aggregate ABI bindings, stable field offsets, aggregate equality, broad package management and general async remain outside the current VOID 2.0 language surface.
-
-Be especially careful not to accidentally inherit features from the old VOIDC compiler.
+**Current intentional exclusions:** standalone value-to-interface erasure/boxing, interface inheritance/default bodies/width conversions/downcasts/runtime type tests, generic polymorphism, source `string`/collections, public managed/native aggregate bindings, broad error/resource cleanup, async/tasks, package manager and editor completion/hover/formatting. Do not silently carry any of these over from VOIDC 1.0.
 
 ---
 
-## 9. What comes next, but only after the owner agrees
+## 9. Future VOID 2.0 work: the wrench clanker's proposed priorities
 
-**Possible Phase 13:** Design and implement **receiver methods and initialization**, beginning with value structs. The Phase 12 document recommends dealing with receiver mutability, readonly behavior, the observable construction sequence and `init` semantics coherently.
+**These are recommendations, not approved milestones, implementation promises or additions to the Language Bible.** First close the Phase 21 hosted gate. Then review the newest implementation/docs and let the boss select the next contract. The provisional order below aims to make VOID genuinely useful for small games while protecting GC, ABI, readonly and reload semantics.
 
-This is a **recommendation, not an authorized task**. Before writing an implementation prompt:
+| Tentative candidate | Why it is worth doing | Design gate / keep out of scope |
+| --- | --- | --- |
+| **22: UTF-8 strings and basic text** | Essential to usable programs, diagnostics, names, files and game UI. Start with literals, immutable string value/reference semantics, common operations and safe root/lifetime handling; interpolation can follow in the approved boundary. | Specify allocation, Unicode/code-point vs byte indexing, equality, native borrowing and failure behavior first. Do not silently promise a full formatting library. |
+| **23: Typed arrays, indexing and iteration** | Real gameplay needs tables, inventories, entity lists and safe indexed storage. | Decide value/reference storage, bounds errors, slicing/borrow lifetime, precise embedded roots and iteration invalidation. Keep C array ABI separate. |
+| **24: Generics foundation** | Reusable algorithms and containers without a second ad-hoc type system. | Specialization vs sharing, code size, constraints, module identity, GC layouts, inference and hot-reload compatibility require owner approval. Number/order can change if arrays need generics earlier. |
+| **25: Core collections and library** | A usable `list`, dictionary/map and practical iteration built atop proven arrays and generics. | Hash/equality contracts, reallocation and aliasing, root liveness and standard-library authorship. Avoid compiler magic where ordinary `.void` code works. |
+| **26: Errors, patterns and deterministic cleanup** | Practical application code needs `result`/`Ok`/`Err`/`?`, `match`, `defer` and resource-safe cleanup. | Separate exception/failure-channel rules, exhaustiveness, early exits, `deinit` and native unwind/GC effects. A staged sequence is safer than one giant phase. |
+| **27: Source-level C interoperability** | First serious external library bridge; eventually raylib/SDL3 and game libraries. | Exact scalar/string/opaque/callback ABI, lifetime pin/borrow, platform linker rules and diagnostic quality. Compiler-private aggregates and interface views are **not** automatically C ABI types. |
+| **28: Project and editor ergonomics** | Open a `.void` file and have it work; completion/hover/rename, source formatting, project/entry discovery and dependency clarity. | Reuse compiler analysis/LSP, preserve trust and path identity. Full package distribution is its own security/versioning decision. |
+| **Later: Concurrency and async** | `async`, tasks, cancellation, threads and scheduler are part of the bigger language goal. | First prove GC rendezvous, suspended-frame roots, reload leases, callbacks, shutdown and failure cleanup. No duplicate async runtime. |
+| **Later: Real game integration proof** | A playable native VOID program using a small supported graphics/input/audio binding is a better acceptance test than another synthetic benchmark. | Start with a tiny demo, not a premature port of the C# VOID Engine. Native packages and a stable game-facing API must be real first. |
 
-1. Verify Phase 12 CI run #17 and close any real platform failures.
-2. Read the newest `LANGUAGE_BIBLE.md`, `VALUE_STRUCTS.md`, `DECISIONS.md`, `KNOWN_ISSUES.md` and `WORK_LOG.md`.
-3. Identify actual semantic questions that need the owner's approval. The language Bible intentionally leaves portions of custom construction open.
-4. Propose the smallest useful slice that respects GC boundaries and current calling conventions.
-5. Only then send a focused keyboard-clanker assignment.
+**Other deliberately separate ideas:** managed value-to-interface erasure (perhaps specialization without boxing), more interface conversions/type tests, properties, closures/events, richer initializers, filesystem/serialization, numeric SIMD, debugger ergonomics and production GC performance. They belong on a backlog until a concrete program demands them. Never silently label an idea as already approved or use a phase number as authorization.
 
-Other important long-term work includes a real managed runtime/GC gate, string and collection types, wider object-oriented behavior, safe native-library bindings, automatic project entry discovery and eventually richer developer ergonomics. Do not treat this list as a license to start everything now.
+**Roadmap discipline:** Prefer one design investigation when semantics are unresolved, obtain IF-style owner approval, implement one coherent slice, verify installed/official LLVM 19.1.7 SDKs in six local configurations, then use the seven hosted jobs as the lock gate. Preserve the currently approved Language Bible and meaningful tests even when a more convenient feature seems tempting.
 
 ---
 
@@ -345,10 +340,11 @@ This list is meant to preserve the *kind* of work we do together, not award me c
 
 - **Milestone scoping:** Turning big ambitions into cohesive phases with gates, tests and no unchecked feature creep.
 - **LLVM decisions:** Helping preserve a backend-independent VOID IR, shared LLVM lowering, and one JIT/AOT semantic contract.
-- **GC realism:** Repeatedly refusing to pretend explicit-root GC prototypes are a complete managed runtime. Managed objects must wait for a proper liveness, thread and unwind story.
+- **GC realism:** Insisting on precise roots, coordinated safepoints, transactional complete publication, 1 MiB checks and failure recovery as managed features arrived. The runtime now has thread coordination, but is still not production-certified.
 - **Native interoperability boundaries:** Keeping trusted C ABI proof separate from user-facing arbitrary C library support.
 - **Cross-platform CI triage:** Diagnosing real LLVM SDK/linker, RTTI, Windows path/drive casing, language-client lifecycle and editor-host failures from evidence.
 - **Editor milestones:** Keeping syntax highlighting, LSP transport, document revisions, user trust and process lifecycle separated into testable work.
+- **Object-model design gates:** Helping approve P3/P4 deep readonly/publication, reference-containing values, `using` composition, managed inheritance and structural interface witnesses without breaking original storage or hot reload.
 - **Value struct design gate:** Recognizing that field-default execution semantics were unresolved and recommending Option A rather than inventing runtime behavior.
 - **Honest acceptance checks:** Asking for real `.void` programs to produce the same results in normal JIT, optimized JIT and linked native AOT.
 - **Communication:** Helping explain native LLVM versus the old C-based compiler, draft short updates, and keep engineering claims defensible in public.
@@ -360,14 +356,14 @@ This list is meant to preserve the *kind* of work we do together, not award me c
 
 These are not surprise "bugs" that must be fixed immediately. They are documented limits and design gates.
 
-- **GC:** Experimental, single-threaded roots; no complete precise concurrent/multithread safepoint protocol, unwind cleanup or production collector. Do not casually introduce managed types that depend on unproven guarantees.
-- **Reload:** Compatible function changes can be published under leases. Signature, const or value-type layout/default contract changes intentionally require restart.
-- **Value struct ABI:** Compiler-private native layouts/calls, not arbitrary foreign C aggregate interoperability.
+- **GC:** A coordinated non-moving managed runtime with precise generated roots, NativeSafe/Managed participant protocol and tested cross-thread rendezvous now exists. It is experimental, not production-certified. Weak references, finalizers, suspended async roots, detailed unwind policies, collection tuning and optimizer/liveness auditing remain separate work.
+- **Reload:** Compatible body changes use whole-generation leases. Struct/interface requirement, route, visibility, effect, witness or layout changes and construction dependency changes can require restart. Interface metadata must survive old code retirement without holding executable pointers.
+- **Value/interface ABI:** Compiler-private aggregate layouts/calls, including two-word interface views, are not arbitrary foreign C ABI promises. The Windows CRT selection and move-only AST fixes are locked regression protections.
 - **Module/project discovery:** Current editor has explicit `void.server.path` / `void.project.entry` setup in relevant workflows, and standalone file fallback. The user's desired experience is eventually **open a `.void` file and VOID just works**.
 - **LSP/editor:** The editor is real and useful, but it does not yet offer all completion, hover, rename, formatting, package discovery, auto-reload or full multi-root support. Don't present syntax coloring as proof the language server is running.
 - **Optional trace notification:** The basic LSP may log an unsupported `$/setTrace` method. This was known and was not a reason to rewrite Phase 11.
 - **Previous compiler:** C#-style features and old milestones are historical; new implementation claims must be backed by current code and tests.
-- **Validation:** Generated LLVM application code is not automatically covered by the same ASan/UBSan instrumentation as the C++ compiler/runtime. Understand the test coverage boundaries.
+- **Validation:** Generated LLVM application code is not automatically covered by the same ASan/UBSan instrumentation as the C++ compiler/runtime. Understand the test coverage boundaries. Always retain the physical-layout depth 128, semantic depth 256 and real 1 MiB stack check; do not inflate limits to cover recursion bugs.
 
 ---
 
@@ -383,7 +379,7 @@ The handoff file is a working reference, not a replacement for reading the proje
 
 ## 14. How to keep this file alive
 
-After each **hosted-green phase**, update only what changed rather than rewriting all of our shared history.
+After each **hosted-green phase**, update only what changed rather than rewriting all of our shared history. A pending run remains pending until GitHub proves otherwise, even when the previous two jobs were green.
 
 **Maintenance checklist:**
 
@@ -391,9 +387,9 @@ After each **hosted-green phase**, update only what changed rather than rewritin
 - [ ] Add or correct a row in the **phase ledger**.
 - [ ] Record the **commit SHA, GitHub Actions URL and verified result**.
 - [ ] Record any **approved language-design decisions**.
-- [ ] Update **implemented versus deferred** features.
+- [ ] Update **implemented versus deferred** features, including the experimental managed runtime boundary.
 - [ ] Note any important failed CI runs and the real fixes, without burying the win.
-- [ ] Update the **next possible phase**, clearly marked as a proposal until the boss agrees.
+- [ ] Update the **next possible phase**, clearly marked as a proposal until the boss agrees. Do not treat this handoff roadmap as the current Language Bible.
 - [ ] Preserve the personality and rules instead of replacing them with a dry generated status report.
 
 For substantive updates, trust the current repo's `docs/WORK_LOG.md`, `docs/DECISIONS.md`, `docs/KNOWN_ISSUES.md`, technical phase docs and real GitHub CI over this snapshot. If this file is stale, say so.

@@ -5790,3 +5790,109 @@ and the unchanged seven-job hosted CI gate. Windows/macOS and the hosted Linux S
 runner matrix remain unverified until the owner pushes and runs CI. Linux success
 is not reported as Windows/macOS verification. No commits, pushes, branches or
 remote modifications were made.
+
+
+## 14 October 2026 — `pass` statement and editor highlighting
+
+Baseline: owner reports Phase 21 locked after GitHub Actions run #36 passed all
+seven hosted jobs. This change preserves the 55-suite matrix and the seven-job
+workflow; hosted results below do not claim verification of these new changes.
+
+Investigation checked indentation lexing, parser block/recovery and bodyless
+interface requirement parsing, statement flow analysis, construction readiness,
+reference capabilities, shared IR lowering and source/native test drivers. Ordinary
+blocks already require a statement. Interface requirements have their own signature
+parser and never use ordinary statement bodies.
+
+Implementation adds the reserved `pass` keyword, one no-op AST statement kind,
+normal semantic fallthrough and an empty lowering case. No IR opcode, backend
+operation or runtime machinery was added. Required return paths and required
+managed-field initialization remain enforced. `pass` cannot be an expression,
+identifier, call, field declaration or concrete interface requirement body.
+
+`examples/pass.void` covers no-result functions, value initialization and methods,
+nested conditionals, conditional/unbounded loops, ordinary execution after `pass`,
+and preserved break/continue behavior. Inputs -1/0/1/10 produce 7/8/9/18. Existing
+frontend/source_cli suites execute it with normal/O2 JIT and independently linked
+native AOT, verifying emitted debug information and preserving native CLI input
+assertions. Frontend coverage also executes a managed initializer and a bodyless
+interface fulfilled by a real no-op method, and rejects missing returns, empty
+comment-only bodies, malformed/expression uses, unavailable required references and
+interface bodies. Recovery verifies two accurate independent diagnostics after a
+malformed `pass` statement. The existing interface fixture adds `pass` before and
+after a promoted mutation, retaining all expected results in JIT and linked AOT.
+
+Three old fixture helpers named `pass` were renamed to `forward` in nullable
+interface and inheritance tests/examples because the new statement keyword is
+reserved. Their behavior and assertions are unchanged. No existing assertion or
+suite was removed.
+
+VS Code/VSCodium grammar places `pass` in the exact `keyword.control.void` rule used
+by `return`. The presentation test asserts both share that rule and rejects partial
+matches (`passing`, `bypass`). Canonical LANGUAGE_BIBLE.md Section 27.2 documents
+purpose, syntax, legal contexts, control flow, supported loop examples, invalid
+empty/missing-return examples and bodyless interfaces; Section 65 records approval
+and Section 66 replaces the obsolete unresolved placeholder decision. Range loops
+remain deferred. SOURCE_COMPILER.md describes the AST/IR boundary.
+
+Focused verification: `cmake --build build/ci-debug -j2`, then
+`ctest --test-dir build/ci-debug --output-on-failure -j2 -R
+'^(frontend|source_cli|interfaces_source|interfaces_aot_normal|interfaces_aot_optimized|interfaces_cli|inheritance_source)$'`
+passed 7/7 in 15.07 s. Extension `npm test` passed; the explicit Node unit run
+(`node --test --test-isolation=none out/test/config.test.js`) confirmed 4/4 cases.
+`npm run package` produced `editors/vscode/dist/void-language-0.1.0.vsix`.
+Real editor integration (`VOIDLS_PATH=<repo>/build/ci-debug/voidls
+VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:host`) passed normal,
+restricted-trust and multi-root scenarios, including actual native process kills,
+notifications, restart and clean deactivation. VS Code was executed on Linux;
+VSCodium is not installed and is not claimed as a separate verified editor host.
+
+Full verification completed with `python3 build/pass-verification/validate.py`:
+each existing tree was configured (`cmake -S . -B build/<tree>`), built
+(`cmake --build build/<tree> -j2`) and tested (`ctest --test-dir build/<tree>
+--output-on-failure -j4`). All 55 suites passed in all six configurations (330/330
+suite executions), including the existing architectural, GC/coordinator/callback,
+reload, independent IR, native AOT, source diagnostics and LSP regressions.
+Debug build timings are incremental after the focused build; compilation inputs
+were unchanged throughout the complete matrix.
+
+| Build tree | Configure (s) | Build (s) | CTest (s) | Result |
+|---|---:|---:|---:|---|
+| ci-debug | 8.02 | 1.86 | 68.03 | 55/55 |
+| ci-release | 7.95 | 53.36 | 27.21 | 55/55 |
+| ci-sanitizers | 10.84 | 125.30 | 101.08 | 55/55 |
+| ci-official-debug | 8.26 | 34.91 | 64.79 | 55/55 |
+| ci-official-release | 9.39 | 69.79 | 29.01 | 55/55 |
+| ci-official-san | 8.68 | 118.56 | 82.09 | 55/55 |
+
+Both complete SDKs were verified as LLVM 19.1.7, with LLJIT headers,
+libLLVMOrcJIT.a and LLVMConfig.cmake present: `/usr/lib/llvm-19` (RTTI YES) and
+`.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64` (official archive, RTTI NO).
+The existing matched toolchain/RTTI correction was preserved. Debug and Release
+used their respective build types; sanitizer trees used RelWithDebInfo with
+VOID_SANITIZERS=ON. Strict options were
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`.
+The matrix ran outside the process-inspection sandbox so LeakSanitizer could work;
+leak detection and sanitizer assertions were not disabled or suppressed.
+
+`python3 build/pass-verification/stack.py` repeated the six existing focused suites
+(frontend, managed_initialization_source, reference_values_source,
+composition_source, inheritance_source, interfaces_source) three times per SDK
+Debug tree with RLIMIT_STACK=1,048,576 bytes. All 36 executions passed: installed
+SDK 64.06 s, official SDK 57.89 s. A separate native demonstration recorded all
+16 normal/O2 JIT and linked AOT invocations of `examples/pass.void`, confirming
+entry(-1/0/1/10) = 7/8/9/18.
+
+Extension verification used Node 24.19.0 and npm 11.6.2. The VSIX contains the
+updated grammar (149,023 bytes packaged). Logs, executed commands, SDK verification,
+full matrix results, small-stack results, source hashes (276 inputs) and native
+outputs are retained under `build/pass-verification/`. `git diff --check` passed.
+The pre-existing owner changes in docs/WRENCH_CLANKER.md were left untouched.
+
+Local implementation and validation are complete. The owner must still run the
+unchanged seven-job hosted gate to verify these changes on Windows/macOS and the
+hosted Ubuntu environment. No Windows/macOS execution is claimed locally. There
+are no new runtime/IR limitations; range/collection iteration remains deferred.
+No compiler/runtime feature beyond `pass`, no workflow/build changes, and no
+commits, pushes, branches or remote modifications were made.

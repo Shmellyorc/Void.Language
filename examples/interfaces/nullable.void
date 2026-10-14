@@ -7,7 +7,7 @@ func (c cell) read() -> i32:
 value struct carrier:
     target: readable?
     count: i32
-func pass(const r: readable?) -> readable?:
+func forward(const r: readable?) -> readable?:
     return r
 func entry(value: i32) -> i32:
     var absent: cell?
@@ -18,7 +18,7 @@ func entry(value: i32) -> i32:
     var a = carrier(target = c)
     var b = a
     b.count = 5
-    var r = pass(b.target) as readable
+    var r = forward(b.target) as readable
     if a.target == b.target:
         return r.read() + a.count + b.count
     return -2
