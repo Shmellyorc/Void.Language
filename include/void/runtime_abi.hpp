@@ -15,6 +15,9 @@ struct RuntimeTypeRecord {
 };
 }
 extern "C" {
+void vd_string_literal(void**, const char*, std::size_t, vd::RuntimeFailure*) noexcept;
+void vd_string_concat(void**, void*, void*, vd::RuntimeFailure*) noexcept;
+bool vd_string_equal(void*, void*, vd::RuntimeFailure*) noexcept;
 void vd_gc_frame_enter(void*, const vd::Runtime::Slot*, std::size_t) noexcept;
 void vd_gc_frame_leave(void*) noexcept;
 void vd_gc_poll() noexcept;

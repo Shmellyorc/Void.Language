@@ -37,6 +37,10 @@ public:
     Collection collect(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
     void allocate_into(void** rooted_slot, const TypeLayout&);
     void construct_into(void** rooted_slot, const TypeLayout&, const void* prepared_payload);
+    void string_into(void** rooted_slot, std::string_view);
+    void concat_into(void** rooted_slot, void* left, void* right);
+    static std::size_t string_payload_size(std::size_t left, std::size_t right);
+    std::string_view string_bytes(void*) const; // Managed-only immutable borrow.
     void store(void* object, std::size_t offset, void* value);
     bool contains(void*) const;
     void admit_types(std::span<const NominalDescriptor>);
@@ -64,6 +68,8 @@ private:
     static thread_local Thread* current_thread_;
     Thread& thread() const;
     void require_managed() const;
+    void require_output(void**) const;
+    void string_parts_into(void**,std::string_view,std::string_view);
     void validate_descriptor(const TypeLayout&) const; // Caller holds mutex_.
     void park(Thread&, std::unique_lock<std::mutex>&);
     void enter(Thread&);

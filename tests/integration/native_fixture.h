@@ -14,6 +14,11 @@ int32_t fixture_invoke(fixture_resource*, int32_t);
 void fixture_unregister(fixture_resource*);
 void fixture_destroy(fixture_resource*);
 int fixture_resources(void);
+// Synchronous provider retaining a binding-owned, length-aware buffer. Releasing
+// clears every provider reference before the binding destroys its byte owner.
+void fixture_retain_text(fixture_resource*, const char*, size_t);
+int fixture_text_byte(fixture_resource*, size_t);
+void fixture_release_text(fixture_resource*);
 #ifdef __cplusplus
 }
 #endif

@@ -274,7 +274,60 @@ func (v vector2) string() -> string:
 print("Position: {vector2(x = 10, y = 20)}")
 ```
 
-**OPEN:** Exact Unicode character indexing and slicing (bytes, scalar values, grapheme clusters), validation rules for invalid UTF-8, normalization, embedded NUL behavior, and format grammar need formal definitions. The public one-string rule is not open.
+**Current decisions:** S1-S8 approve strict UTF-8, exact-byte equality without
+normalization and embedded NUL for the Phase 22 foundation. Section 8.1 records
+approved future scalar indexing and length APIs, which are outside Phase 22.
+Slicing, index-out-of-range behavior, ordering and format grammar remain OPEN.
+
+### 8.1 Approved string direction, 14 October 2026
+
+**APPROVED DESIGN, NOT YET IMPLEMENTED.** The following decisions do not expand
+Phase 22. Its approved foundation contract is S1-S8 in STRINGS_PROPOSAL.md;
+implementation and verification status belongs in WORK_LOG.md and the string guide.
+
+Ordinary future indexing uses Unicode scalar positions and returns a string with
+exactly one scalar, rather than a UTF-8 byte or a separate character type:
+
+```python
+var text = "test"
+text[0] == "t"
+text[1] == "e"
+text[2] == "s"
+text[3] == "t"
+
+var multibyte = "A🎮B"
+multibyte[0] == "A"
+multibyte[1] == "🎮"
+multibyte[2] == "B"
+```
+
+These examples illustrate future semantics and are not executable Phase 22 code.
+Index-out-of-range behavior remains OPEN. A scalar need not be a complete
+user-perceived character; combining sequences and multi-scalar emoji may need
+separate grapheme-aware APIs. String slicing semantics remain OPEN.
+
+The preferred future public spellings are `text.length` for Unicode scalar count
+and `text.byte_length` for UTF-8 byte count, not length_byte. For `"A🎮B"` these
+are 3 and 6 respectively. Whether byte_length is implemented directly on the type
+or through standard-library machinery remains an implementation decision. Neither
+length API is part of Phase 22. Grapheme counting is separate future functionality.
+
+Ordinary string remains non-nullable with empty-string default. Future `string?`
+support is approved in principle under the existing nullable-type philosophy.
+Phase 22 rejects both `var text: string = null` and `var optional: string?`.
+Further conversion/equality/unwrapping interactions are not invented by this
+approval and require review where existing contracts do not settle them.
+
+Automatic interpolation without f/$ remains agreed, as in `"Hello, {name}!"`.
+Evaluation is deferred from Phase 22; its syntax stays reserved and diagnosed.
+Implicit numeric concatenation such as `"Score: " + 100` remains invalid.
+Ordering is desired future functionality, with comparison semantics OPEN; byte
+ordering, scalar ordering, locale collation and normalization are not selected.
+
+Strict scalar UTF-8, rejection of invalid Unicode scalar escapes and unknown
+escapes, immutable exact bytes without normalization, and embedded NUL independent
+of terminated C boundaries are approved by S1-S8. They are foundation contracts,
+not evidence that future indexing, length, nullable strings or interpolation work.
 
 ## 9. Printing [AGREED]
 
@@ -2731,7 +2784,11 @@ This section matters especially when an AI assistant inherits this file without 
 15. **Iteration modification:** General mutation during traversal should fail; safe current-element deletion during reverse traversal was suggested but not formally accepted/tested.
 16. **Pattern forms:** Range, struct-field, list/rest and dictionary patterns are agreed directions; precise grammar/binding/copy rules need specification.
 17. **Numeric conversion policy:** Literal contextual typing is agreed. Detailed overflow, signed/unsigned, `NaN`, truncation, `as`/`as?` results and float equality/hash need tests.
-18. **UTF-8 semantics:** One string is agreed; indexing unit, grapheme handling, normalization, formatting grammar, and C ABI encoding/ownership details remain open.
+18. **UTF-8 semantics:** S1-S8 approve the strict UTF-8 foundation with exact bytes,
+    no normalization and embedded NUL. Section 8.1 approves future scalar indexing,
+    scalar length, byte_length and nullable strings in principle, outside Phase 22.
+    Index errors, slicing, grapheme APIs, ordering, formatting grammar and broader
+    native binding policy remain open.
 19. **Panic and defer:** Remaining defers and original errors should be preserved when safe; native unwinding/ABI/cleanup error aggregation need implementation design.
 20. **Nullable/`Ok` overloading:** The `Ok` pattern is intentionally allowed for nullable values and results; representation and type-checker disambiguation need explicit formal rules.
 21. **Async API:** `async func`, `await`, and `spawn` are agreed; exact scheduling start semantics, task group binding, async `with`, and cancellation observation points remain to specify.

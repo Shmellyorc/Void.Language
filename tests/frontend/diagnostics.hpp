@@ -88,6 +88,31 @@ void run(const std::filesystem::path& root) {
     manual.description = "scalar range";
     manual.primary = {std::make_shared<const vd::SourceFile>("unicode.void", "# \xc3\xa9\xf0\x9f\x98\x80!"), "/unicode.void", 4, 8};
     check(manual.primary.source->location(4).column == 4 && vd::render_diagnostic(manual).find(" |    ^\n") != std::string::npos, "Unicode scalar range rendering");
+    // Rejected snapshots retain original bytes/spans. Only rendering expands
+    // bad bytes; subsequent/related carets must use those expanded widths.
+    const std::string damaged = "\xef\xbb\xbf# header\r\n# \xc3\xa9\xf0\x9f\x98\x80 \x80\xffx";
+    try { vd::SourceFile invalid("damaged.void", damaged); check(false, "invalid UTF-8 accepted"); }
+    catch (const vd::CompilationError& failure) {
+        auto d = failure.diagnostics().front();
+        const auto offset = damaged.size() - 3;
+        check(d.code == Code::utf8 && d.primary.begin == offset && d.primary.end == offset + 1, "invalid UTF-8 byte span changed");
+        check(d.primary.source->text() == damaged, "rejected snapshot bytes changed");
+        auto position = d.primary.source->location(offset);
+        check(position.line == 2 && position.column == 6, "invalid UTF-8 scalar location changed");
+        const auto rendered = vd::render_diagnostic(d);
+        for (std::size_t i = 0; i < rendered.size();) {
+            auto count = vd::utf8_scalar_bytes(rendered, i);
+            check(count != 0, "diagnostic output is not UTF-8"); i += count;
+        }
+        check(rendered.find("# \xc3\xa9\xf0\x9f\x98\x80 \\x80\\xFFx\n   |      ^^^^\n") != std::string::npos, "escaped byte caret width");
+        d.primary.begin = damaged.size() - 1; d.primary.end = damaged.size();
+        d.related = {{failure.diagnostics().front().primary, "Original invalid byte"}};
+        auto later = vd::render_diagnostic(d);
+        check(later.find("\n   | " + std::string(13, ' ') + "^\n") != std::string::npos, "caret after escaped bytes");
+        check(later.find("Original invalid byte at damaged.void:2:6") != std::string::npos &&
+              later.find("\n   |      ^^^^\n") != std::string::npos, "related invalid-byte rendering");
+        check(d.primary.source->text() == damaged, "rendering changed retained snapshot");
+    }
     write(source, "func f():\n    var value = missing\n    value += 1\n    value += false\n    var copy = value * true\n    return\n");
     check(errors(source).size() == 1, "poisoned local expression cascade");
     write(source, "const first = second\nconst second = first\nconst third = first + 1\nfunc f() -> i32:\n    return third\nfunc later():\n    unknown()\n");

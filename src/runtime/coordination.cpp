@@ -1,4 +1,5 @@
 #include "void/runtime.hpp"
+#include "void/utf8.hpp"
 #include <algorithm>
 #include <cstring>
 #include <limits>
@@ -146,7 +147,7 @@ Runtime::Collection Runtime::collect(std::chrono::milliseconds timeout) {
     changed_.notify_all();
     return result;
 }
-void Runtime::allocate_into(void** slot, const TypeLayout& layout) {
+void Runtime::require_output(void** slot) const {
     require_managed();
     if (!slot) throw std::invalid_argument("null allocation output");
     bool rooted = false;
@@ -155,6 +156,39 @@ void Runtime::allocate_into(void** slot, const TypeLayout& layout) {
             for (std::size_t j = 0; j < f->slots_[i].count; ++j)
                 if (static_cast<const char*>(f->slots_[i].storage) + f->slots_[i].offsets[j] == reinterpret_cast<const char*>(slot)) rooted = true;
     if (!rooted) throw std::invalid_argument("allocation output is not a registered precise root");
+}
+std::string_view Runtime::string_bytes(void* object) const {
+    require_managed();
+    std::lock_guard lock(mutex_);
+    return heap_.string_bytes(object);
+}
+void Runtime::string_into(void** slot,std::string_view text) {
+    string_parts_into(slot,text,{});
+}
+std::size_t Runtime::string_payload_size(std::size_t left,std::size_t right) {
+    constexpr auto maximum=std::numeric_limits<std::size_t>::max()-sizeof(std::uint64_t);
+    if (left>maximum || right>maximum-left) throw std::length_error("string extent overflow");
+    return sizeof(std::uint64_t)+left+right;
+}
+void Runtime::string_parts_into(void** slot,std::string_view left,std::string_view right) {
+    require_output(slot);
+    auto bytes=string_payload_size(left.size(),right.size());
+    if (!valid_utf8(left) || !valid_utf8(right)) throw std::invalid_argument("invalid UTF-8 string");
+    if (left.empty() && right.empty()) { *slot=nullptr; return; }
+    std::vector<char> payload(bytes);
+    std::uint64_t size=left.size()+right.size(); std::memcpy(payload.data(),&size,sizeof(size));
+    if(!left.empty()) std::memcpy(payload.data()+sizeof(size),left.data(),left.size());
+    if(!right.empty()) std::memcpy(payload.data()+sizeof(size)+left.size(),right.data(),right.size());
+    TypeLayout layout{payload.size(),{}}; layout.kind=TypeLayout::Kind::string;
+    construct_into(slot,layout,payload.data());
+}
+void Runtime::concat_into(void** slot,void* left,void* right) {
+    auto a=string_bytes(left),b=string_bytes(right);
+    string_parts_into(slot,a,b);
+}
+void Runtime::allocate_into(void** slot, const TypeLayout& layout) {
+    require_output(slot);
+    if (layout.kind!=TypeLayout::Kind::ordinary) throw std::invalid_argument("intrinsic allocation requires complete construction");
     // Before allocation, the caller's registered slot contains null/its old
     // value. There is no safepoint between allocation and publication.
     poll();
@@ -163,13 +197,15 @@ void Runtime::allocate_into(void** slot, const TypeLayout& layout) {
     *slot = heap_.allocate(layout);
 }
 void Runtime::construct_into(void** slot, const TypeLayout& layout, const void* payload) {
-    require_managed();
-    if (!payload || !slot) throw std::invalid_argument("missing prepared object");
-    bool rooted=false;
-    for (auto* f=thread().frames;f;f=f->previous_)
-        for (std::size_t i=0;i<f->count_;++i) for (std::size_t j=0;j<f->slots_[i].count;++j)
-            if (static_cast<const char*>(f->slots_[i].storage)+f->slots_[i].offsets[j]==reinterpret_cast<const char*>(slot)) rooted=true;
-    if (!rooted) throw std::invalid_argument("construction output is not a precise root");
+    require_output(slot);
+    if (!payload) throw std::invalid_argument("missing prepared object");
+    if (layout.kind==TypeLayout::Kind::string) {
+        if (layout.size<=sizeof(std::uint64_t) || !layout.references.empty() || layout.descriptor)
+            throw std::invalid_argument("invalid intrinsic string layout");
+        std::uint64_t size; std::memcpy(&size,payload,sizeof(size));
+        if (size!=layout.size-sizeof(size) || !valid_utf8({static_cast<const char*>(payload)+sizeof(size),static_cast<std::size_t>(size)}))
+            throw std::invalid_argument("invalid intrinsic string payload");
+    }
     bool due;
     { std::lock_guard lock(mutex_); due=allocation_budget_ && allocations_>=allocation_budget_; }
     // Neither collection nor parking occurs with a collector-required lock held.
@@ -268,7 +304,7 @@ void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::sp
         if(!witness_candidates.emplace(input.key,std::make_shared<InterfaceWitness>(input)).second) throw std::invalid_argument("duplicate interface witness");
     }
     for(const auto& input:incoming) {
-        if(input.identity.empty() || input.shape.empty() || !input.layout.size || input.layout.descriptor)
+        if(input.identity.empty() || input.shape.empty() || !input.layout.size || input.layout.descriptor || input.layout.kind!=TypeLayout::Kind::ordinary)
             throw std::invalid_argument("invalid nominal descriptor");
         auto value=std::make_shared<NominalDescriptor>(input);
         auto& offsets=value->layout.references;

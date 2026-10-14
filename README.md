@@ -411,7 +411,11 @@ build/ci-debug/voidc run examples/composition/main.void 10 # 111
 
 This compiles real source through the shared frontend/IR/LLVM path. Phase 20 adds
 managed inheritance and component virtual dispatch. Phase 21 adds managed-backed
-structural interface views; transitive promotion, stateless mixins and standalone
+structural interface views. Phase 22 adds immutable UTF-8 strings, quoted literals
+and escapes, empty defaults, content equality and concatenation, pure templates,
+managed/value fields and safe shared JIT/AOT ownership; see [STRINGS.md](docs/STRINGS.md).
+String indexing/length/nullability APIs, interpolation evaluation, formatting and
+print remain deferred. Transitive promotion, stateless mixins and standalone
 value-interface erasure remain deferred.
 
 

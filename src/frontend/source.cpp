@@ -2,22 +2,6 @@
 #include <algorithm>
 #include <stdexcept>
 namespace vd {
-unsigned utf8_scalar_bytes(std::string_view text, std::size_t i) {
-    if (i >= text.size()) return 0;
-    auto c = static_cast<unsigned char>(text[i]);
-    if (c < 128) return 1;
-    unsigned count = c >= 0xc2 && c <= 0xdf ? 2 : c >= 0xe0 && c <= 0xef ? 3 : c >= 0xf0 && c <= 0xf4 ? 4 : 0;
-    if (!count || count > text.size()-i) return 0;
-    unsigned scalar = c & (count == 2 ? 31 : count == 3 ? 15 : 7);
-    for (unsigned n=1;n<count;++n) {
-        auto next=static_cast<unsigned char>(text[i+n]);
-        if ((next & 0xc0) != 0x80) return 0;
-        scalar = (scalar << 6) | (next & 63);
-    }
-    if ((scalar >= 0xd800 && scalar <= 0xdfff) || scalar > 0x10ffff ||
-        (count == 3 && scalar < 0x800) || (count == 4 && scalar < 0x10000)) return 0;
-    return count;
-}
 SourceFile::SourceFile(std::string path, std::string text)
     : path_(std::move(path)) {
     auto snapshot = std::make_shared<Snapshot>(Snapshot{std::move(text), {0}});
@@ -82,19 +66,30 @@ std::string render_diagnostic(const Diagnostic& d) {
     const char* severity = d.severity == Severity::error ? "error" : d.severity == Severity::warning ? "warning" : "info";
     std::string result = position.path + ":" + std::to_string(position.line) + ":" + std::to_string(position.column) +
         ": " + severity + ": " + d.description + "\n    code: " + diagnostic_code(d.code) + "\n";
-    // Runtime excerpts deliberately keep their existing ABI and presentation.
-    auto excerpt = source.excerpt(span.begin);
-    auto newline = excerpt.find('\n');
-    auto line = excerpt.substr(0, newline);
-    auto gutter = std::to_string(position.line);
-    auto width = std::size_t{0};
-    for (auto i = span.begin; i < span.end && i < source.text().size(); ++i) {
-        auto c = static_cast<unsigned char>(source.text()[i]);
-        if (c == '\r' || c == '\n') break;
-        if ((c & 0xc0) != 0x80) ++width;
+    // Escape rejected source bytes only in this presentation. Runtime excerpts,
+    // owned snapshots, byte spans and source/LSP coordinates remain unchanged.
+    const auto& text = source.text();
+    auto begin = source.line_starts()[position.line - 1];
+    if (begin == 0 && text.starts_with("\xef\xbb\xbf")) begin = 3;
+    std::string line;
+    std::size_t column = 0, width = 0;
+    constexpr char hex[] = "0123456789ABCDEF";
+    for (auto i = begin; i < text.size() && text[i] != '\r' && text[i] != '\n';) {
+        auto count = utf8_scalar_bytes(text, i);
+        auto rendered_width = count ? 1u : 4u;
+        if (i < span.begin) column += rendered_width;
+        else if (i < span.end) width += rendered_width;
+        if (count) line.append(text, i, count);
+        else {
+            auto byte = static_cast<unsigned char>(text[i]);
+            line += "\\x";
+            line += hex[byte >> 4]; line += hex[byte & 15];
+        }
+        i += count ? count : 1;
     }
+    auto gutter = std::to_string(position.line);
     result += "\n " + gutter + " | " + line + "\n " + std::string(gutter.size(), ' ') + " | " +
-        std::string(position.column - 1, ' ') + std::string(std::max(std::size_t{1}, width), '^') + "\n";
+        std::string(column, ' ') + std::string(std::max(std::size_t{1}, width), '^') + "\n";
     if (!span.module_identity.empty()) result += "    Module: " + span.module_identity + "\n";
     for (const auto& related : d.related) {
         auto location = related.span.source->location(related.span.begin);

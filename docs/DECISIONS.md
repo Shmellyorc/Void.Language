@@ -1,5 +1,34 @@
 # Architectural decisions
 
+## Phase 22: owner-approved UTF-8 string foundation, 14 October 2026
+
+Boss and wrench clanker approved S1-S8 in STRINGS_PROPOSAL.md, including the 16 MiB
+decoded constant/result and 64 MiB unique module-pool limits. The subsequent
+diagnostic amendment was additional work, not a replacement or new approval gate.
+
+Use one intrinsic immutable string type, a zero-word empty representation and
+flat nonempty payloads on the existing coordinated Heap. Extend its private
+layout kind/extent checks, reuse complete publication and share scalar validation
+without a frontend/LLVM runtime dependency. The existing shape walker includes
+immutable leaves for tracing while keeping mutable-reference authority separate.
+Roots, staged/aggregate storage, argument/return handoffs, failure cleanup,
+generation leases and private JIT/AOT calling conventions remain authoritative.
+
+Quoted literals and approved escapes, empty defaults, pure owned byte templates,
+content equality and +/+= use the existing typed AST/IR/validator/shared lowerer.
+Keep exact bytes with no normalization. Embedded NUL is valid ordinary content;
+terminated native bridging still rejects it. Native calls use owned copies before
+NativeSafe entry; retaining providers release references before byte-owner teardown.
+No runtime string cache, per-length nominal descriptors, string heap, source cstring
+or external aggregate ABI is added. STRINGS.md describes behavior and current costs.
+
+Language Bible Section 8.1 separately records approved future scalar indexing,
+scalar length/byte_length, nullable strings in principle and automatic interpolation.
+These remain outside Phase 22 implementation. Ordering, slicing/index failures and
+broader native bindings retain their design questions. WORK_LOG.md owns measured
+verification and the pending seven-job hosted gate; no local execution certifies
+Windows/macOS or production GC readiness.
+
 ## Foundation phase, 10 October 2026
 
 ### C++20 and LLVM 19.1.7

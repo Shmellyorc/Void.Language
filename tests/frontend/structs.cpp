@@ -59,7 +59,8 @@ void struct_tests(const std::filesystem::path& root) {
     invalid(point+"func f():\n    const p = point()\n    p.x = 8\n","readonly",6,5);
     invalid(point+"func f():\n    var p = point()\n    p.nope = 8\n","Unknown field",6,7);
     invalid(point+"func f():\n    var p = point()\n    var v = p.nope\n","Unknown field",6,15);
-    invalid("value struct bad:\n    x: string\n","Unsupported type",2,8);
+    // Strings now have positive managed/value storage coverage in strings_source.
+    invalid("value struct bad:\n    x: unsupported_type\n","Unsupported type",2,8);
     invalid("value struct bad:\n    x: i32\n    x: bool\n","Duplicate field",3,5);
     invalid("value struct bad:\n    child: bad\n","Recursive value layout",1,14);
     invalid("value struct first:\n    child: second\nvalue struct second:\n    child: first\n","Recursive value layout",1,14);

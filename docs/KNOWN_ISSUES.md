@@ -1,5 +1,41 @@
 # Known issues and deferred work
 
+## Phase 22 approved diagnostic amendment
+
+The recorded VOID1001 malformed-source output defect is fixed locally. The shared
+compile-time renderer escapes rejected bytes as `\xHH`, keeping output valid
+UTF-8 and aligning carets with the escaped display. Detection/rejection, original
+source bytes and spans, scalar locations, related diagnostics, runtime excerpts
+and LSP UTF-16 coordinates are preserved. Strict UTF-8 CLI regression probes,
+retained-snapshot/caret checks and disk-error/overlay-repair LSP coverage verify
+the correction. See DIAGNOSTICS.md and WORK_LOG.md for the contract and measured
+verification. Hosted Windows/macOS acceptance remains with the seven-job gate;
+no local result is claimed as hosted verification. S1-S8 string foundation work is
+separately approved and described in STRINGS.md; WORK_LOG.md records its validation.
+
+## Phase 22 string boundary
+
+The UTF-8 foundation supports immutable strings, empty defaults, literals/escapes,
+content equality, concatenation, constants/default templates, managed/value fields,
+parameters/returns, coordinated GC and shared JIT/AOT paths. Retained text contains
+copied bytes, never source/LLVM/JIT addresses. The same shape walker distinguishes
+traced immutable leaves from mutable-reference authority. See STRINGS.md for the
+implemented contracts and STRINGS_PROPOSAL.md for approved S1-S8 alternatives.
+
+Scalar indexing, scalar length, byte_length and nullable strings are approved
+future direction, not implemented features. Interpolation remains reserved and
+diagnosed. Print, formatting, multiline text, slicing/iteration, grapheme APIs,
+ordering, collections, builders, general string FFI and public string ABI remain
+deferred. Index errors, slicing and ordering semantics remain open. Flat concat
+can be quadratic; scratch duplicates payload bytes transiently; fixed root homes
+can retain dead text until return. Compiler constants/pools have approved 16/64 MiB
+limits, not a total runtime memory quota or production-GC guarantee.
+
+## Historical Phase 21 status
+
+The following phase-specific pending wording predates the owner's report of
+successful runs #36 and #37. Current Phase 22 evidence is in WORK_LOG.md.
+
 Updated for Phase 21. Phase 20 is owner-locked at run #35 (51/51 in all seven jobs).
 Phase 21 adds four suites (55 total); INTERFACES.md and WORK_LOG.md record the local
 implementation and validation. Its seven-job hosted Windows/macOS/Linux gate is pending.
@@ -108,9 +144,10 @@ Layout remains compiler-private with 128-level/65536-expanded-field bounds.
   rejected. Runtime module variables/initialization remain absent. Internal
   visibility currently operates inside one compiled project;
   external library export/visibility boundaries remain deferred.
-- Supported value types are all ten exact-width numeric types, bool and acyclic
+- Supported value types include the Phase 22 string foundation in STRINGS.md,
+  all ten exact-width numeric types, bool and acyclic
   numeric/bool value structs, plus the bounded managed family in MANAGED_STRUCTS.md.
-  Strings, collections/ranges, custom managed init,
+  Collections/ranges, custom managed init,
   generics, closures, async, named/default function arguments,
   multiple return values and broader managed features are not implemented. Unsupported
   syntax is rejected rather than simulated.

@@ -1,5 +1,12 @@
 # First real source compiler
 
+Phase 22 adds the owner-approved UTF-8 string foundation through this same pipeline.
+See [STRINGS.md](STRINGS.md) for immutable content, escapes, empty/default templates,
+managed/value storage, exact equality/concatenation, roots, failures, reload and
+native copying boundaries. Future indexing/length/nullability/interpolation APIs
+remain outside this implementation. WORK_LOG.md records actual local verification
+and the pending seven-job hosted gate.
+
 Phase 20 adds managed single inheritance, identity-preserving ancestor conversions, explicit virtual/override/super dispatch and staged base initialization. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.
 
 Implemented locally on 10 October 2026, using LLVM 19.1.7. LANGUAGE_BIBLE.md

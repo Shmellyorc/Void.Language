@@ -36,6 +36,26 @@ void construct(void** slot,std::size_t size,const std::size_t* offsets,std::size
 }
 }
 extern "C" {
+void vd_string_literal(void** slot,const char* bytes,std::size_t size,vd::RuntimeFailure* failure) noexcept {
+    try { vd::Runtime::current().string_into(slot,{bytes,size}); }
+    catch(const std::bad_alloc&) { failure->message="String allocation failed"; }
+    catch(const std::length_error&) { failure->message="String size limit exceeded"; }
+    catch(const std::invalid_argument&) { failure->message="Invalid UTF-8 string storage"; }
+    catch(...) { std::terminate(); }
+}
+void vd_string_concat(void** slot,void* left,void* right,vd::RuntimeFailure* failure) noexcept {
+    try { vd::Runtime::current().concat_into(slot,left,right); }
+    catch(const std::bad_alloc&) { failure->message="String allocation failed"; }
+    catch(const std::length_error&) { failure->message="String size limit exceeded"; }
+    catch(const std::invalid_argument&) { failure->message="Invalid UTF-8 string storage"; }
+    catch(...) { std::terminate(); }
+}
+bool vd_string_equal(void* left,void* right,vd::RuntimeFailure* failure) noexcept {
+    try { auto& runtime=vd::Runtime::current(); return runtime.string_bytes(left)==runtime.string_bytes(right); }
+    catch(const std::invalid_argument&) { failure->message="Invalid UTF-8 string storage"; }
+    catch(...) { std::terminate(); }
+    return false;
+}
 void vd_gc_frame_enter(void* frame, const vd::Runtime::Slot* slots, std::size_t count) noexcept {
     try { new (frame) vd::Runtime::Frame(vd::Runtime::current(), slots, count); }
     catch (...) { std::terminate(); }

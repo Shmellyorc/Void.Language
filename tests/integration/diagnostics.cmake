@@ -1,4 +1,9 @@
 # Invalid source cannot execute or replace an existing output, in either mode.
+execute_process(COMMAND "${PYTHON}" "${ROOT}/tests/integration/utf8_diagnostics.py" "${COMPILER}"
+  RESULT_VARIABLE utf8_status)
+if(NOT utf8_status EQUAL 0)
+  message(FATAL_ERROR "Strict UTF-8 diagnostic output regression failed: ${utf8_status}")
+endif()
 foreach(mode normal optimized)
   set(flags)
   if(mode STREQUAL "normal")

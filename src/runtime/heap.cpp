@@ -1,4 +1,5 @@
 #include "void/heap.hpp"
+#include "void/utf8.hpp"
 #include <algorithm>
 #include <cstring>
 #include <new>
@@ -7,6 +8,9 @@ namespace vd {
 Heap::~Heap() { for (auto& [p, o] : objects_) { (void)o; ::operator delete(p); } }
 void* Heap::allocate(const TypeLayout& layout) {
     if (!layout.size) throw std::invalid_argument("empty object layout");
+    if (layout.kind == TypeLayout::Kind::string &&
+        (layout.size <= sizeof(std::uint64_t) || !layout.references.empty() || layout.descriptor))
+        throw std::invalid_argument("invalid intrinsic string layout");
     std::vector<std::size_t> offsets = layout.references;
     std::sort(offsets.begin(), offsets.end());
     for (std::size_t i = 0; i < offsets.size(); ++i)
@@ -20,6 +24,15 @@ void* Heap::allocate(const TypeLayout& layout) {
     return p;
 }
 bool Heap::contains(void* p) const { return p && objects_.contains(p); }
+std::string_view Heap::string_bytes(void* p) const {
+    if (!p) return {};
+    auto found=objects_.find(p);
+    if (found==objects_.end() || found->second.layout.kind!=TypeLayout::Kind::string)
+        throw std::invalid_argument("invalid string object");
+    std::uint64_t size; std::memcpy(&size,p,sizeof(size));
+    if (size!=found->second.layout.size-sizeof(size)) throw std::logic_error("corrupt string extent");
+    return {static_cast<const char*>(p)+sizeof(size),static_cast<std::size_t>(size)};
+}
 std::string_view Heap::nominal_identity(void* p) const {
     auto found=objects_.find(p);
     if(found==objects_.end() || !found->second.layout.descriptor) return {};

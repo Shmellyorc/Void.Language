@@ -90,7 +90,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
     std::function<llvm::Type*(ir::Type)> type = [&](ir::Type t) -> llvm::Type* {
         if(t.kind==ir::Type::interface_ref) return interface_type;
         if(t.kind==ir::Type::prepared_receiver) return prepared_type;
-        if (t.kind == ir::Type::managed_ref) return b.getPtrTy();
+        if (t.kind == ir::Type::managed_ref || t.kind==ir::Type::string) return b.getPtrTy();
         if (t.kind == ir::Type::aggregate) {
             if (auto found = aggregates.find(t.definition->identity); found != aggregates.end()) return found->second;
             auto* result = llvm::StructType::create(context,t.definition->identity); aggregates.emplace(t.definition->identity,result);
@@ -122,7 +122,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         auto reference_offsets = [&](ir::Type t, std::uint64_t base, auto& result) {
             // Translate the shared logical shape into this module's target
             // offsets. Qualifiers never change native layout or root identity.
-            for (const auto& path:ir::reference_paths(t)) {
+            for (const auto& path:ir::reference_paths(t,true)) {
                 auto current=t; auto offset=base;
                 for (auto field:path) {
                     offset+=field_offset(current,field);
@@ -280,7 +280,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
     debug.createCompileUnit(llvm::dwarf::DW_LANG_C, file, "VOID source compiler", false, "", 0);
     std::map<std::string,llvm::DIType*> debug_aggregates;
     std::function<llvm::DIType*(ir::Type)> debug_value_type = [&](ir::Type t) -> llvm::DIType* {
-        if (t.kind == ir::Type::managed_ref) return debug.createPointerType(nullptr, layout.getPointerSizeInBits());
+        if (t.kind == ir::Type::managed_ref || t.kind==ir::Type::string) return debug.createPointerType(nullptr, layout.getPointerSizeInBits());
         if(t.kind==ir::Type::interface_ref || t.kind==ir::Type::prepared_receiver) {
             auto* native=llvm::cast<llvm::StructType>(type(t));auto* offsets=layout.getStructLayout(native);std::vector<llvm::Metadata*> members;
             for(unsigned n=0;n<native->getNumElements();++n) {auto* part=native->getElementType(n);llvm::DIType* debug_part=n< (t.kind==ir::Type::interface_ref ? 2u : 3u) ? static_cast<llvm::DIType*>(debug.createPointerType(nullptr,layout.getPointerSizeInBits())) : debug.createBasicType("binding selector",64,llvm::dwarf::DW_ATE_unsigned);
@@ -525,8 +525,23 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     if (f.receiver && f.parameters[0].kind==ir::Type::aggregate && instruction.a == 0) v = b.CreateLoad(type(f.parameters[0]),fn->getArg(0));
                     else v = fn->getArg(instruction.a);
                     break;
+                case Op::string_literal: case Op::string_concat: case Op::string_equal: {
+                    if(instruction.op==Op::string_equal) {
+                        v=b.CreateCall(module->getOrInsertFunction("vd_string_equal",b.getInt1Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{values[instruction.a],values[instruction.b],failure});
+                    } else {
+                        auto* storage=value_roots[n].at(values.size());
+                        if(instruction.op==Op::string_literal) {
+                            const auto& text=input.strings.at(instruction.immediate);
+                            b.CreateCall(module->getOrInsertFunction("vd_string_literal",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy()),
+                                {storage,b.CreateGlobalStringPtr(llvm::StringRef(text.data(),text.size())),llvm::ConstantInt::get(size_type,text.size()),failure});
+                        } else b.CreateCall(module->getOrInsertFunction("vd_string_concat",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{storage,values[instruction.a],values[instruction.b],failure});
+                        v=b.CreateLoad(b.getPtrTy(),storage);
+                    }
+                    fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),b.CreateStructGEP(failure_type,failure,0))),"String operation failed");
+                    break;
+                }
                 case Op::constant:
-                    if(ir::reference_value(instruction.type)) v=llvm::Constant::getNullValue(type(instruction.type));
+                    if(ir::reference_value(instruction.type) || instruction.type==ir::Type::string) v=llvm::Constant::getNullValue(type(instruction.type));
                     else if (numeric::floating(instruction.type)) v = llvm::ConstantFP::get(context,llvm::APFloat(instruction.type == ir::Type::f32 ? llvm::APFloat::IEEEsingle() : llvm::APFloat::IEEEdouble(),llvm::APInt(numeric::width(instruction.type),static_cast<std::uint64_t>(instruction.immediate))));
                     else v = llvm::ConstantInt::get(type(instruction.type),instruction.immediate,true);
                     break;
@@ -746,6 +761,7 @@ Jit::Jit() : impl_(std::make_shared<Impl>()) {
     initialize();
     impl_->jit = unwrap(llvm::orc::LLJITBuilder().create());
     bind("vd_gc_frame_enter",vd_gc_frame_enter); bind("vd_gc_frame_leave",vd_gc_frame_leave);
+    bind("vd_string_literal",vd_string_literal); bind("vd_string_concat",vd_string_concat); bind("vd_string_equal",vd_string_equal);
     bind("vd_gc_construct",vd_gc_construct);
     bind("vd_gc_construct_typed",vd_gc_construct_typed);
     bind("vd_gc_dynamic_type",vd_gc_dynamic_type);

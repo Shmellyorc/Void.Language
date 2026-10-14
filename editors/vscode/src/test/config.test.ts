@@ -52,6 +52,15 @@ test('validate executable and deterministic canonical project selection', async 
 test('presentation covers approved keyword colors and space indentation', async () => {
     const root = path.resolve(__dirname, '../..');
     const grammar = JSON.parse(await fs.readFile(path.join(root, 'syntaxes/void.tmLanguage.json'), 'utf8'));
+    const stringRule = grammar.patterns.find((p:{name?:string}) => p.name === 'string.quoted.double.void');
+    assert(stringRule && stringRule.begin === '"' && stringRule.end === '"|$');
+    const escape = new RegExp(stringRule.patterns.find((p:{name:string}) => p.name === 'constant.character.escape.void').match);
+    for (const text of ['\\n', '\\r', '\\t', '\\0', '\\"', '\\\\', '\\u{1f3ae}']) assert(escape.test(text), `Missing string escape: ${text}`);
+    for (const text of ['\\q', '\\xFF', '\\u{}']) assert(!escape.test(text), `Unsupported string escape: ${text}`);
+    const braces = new RegExp(stringRule.patterns.find((p:{name:string}) => p.name === 'constant.character.escape.brace.void').match);
+    assert(braces.test('{{') && braces.test('}}') && !braces.test('{'));
+    const types = new RegExp(grammar.patterns.find((p:{name?:string}) => p.name === 'storage.type.void').match);
+    assert(types.test('string') && !types.test('strings'));
     const keywords = grammar.patterns.filter((p:{name?:string}) => p.name === 'keyword.control.void')
         .map((p:{match:string}) => new RegExp(p.match));
     assert(keywords.length > 0);

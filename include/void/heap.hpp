@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <span>
 #include <unordered_map>
@@ -14,6 +15,7 @@ struct TypeLayout {
     std::size_t size;
     std::vector<std::size_t> references;
     std::shared_ptr<const NominalDescriptor> descriptor = {};
+    enum class Kind { ordinary, string } kind = Kind::ordinary;
 };
 // Runtime-owned data only: no code pointers, LLVM types, or generation leases.
 struct NominalDescriptor {
@@ -31,6 +33,7 @@ public:
     void collect(std::span<void* const> additional_roots);
     bool contains(void* object) const;
     std::string_view nominal_identity(void* object) const;
+    std::string_view string_bytes(void* object) const;
     std::size_t size() const { return objects_.size(); }
     void add_root(void** slot);
     void remove_root(void** slot);

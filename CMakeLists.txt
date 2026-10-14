@@ -169,7 +169,13 @@ if(BUILD_TESTING)
   target_link_libraries(void_managed_test_abi PRIVATE void_options Threads::Threads)
   target_compile_definitions(void_managed_test_abi PRIVATE vd_gc_poll=vd_gc_real_poll vd_gc_construct=vd_gc_real_construct vd_gc_construct_typed=vd_gc_real_construct_typed vd_gc_frame_enter=vd_gc_real_frame_enter vd_gc_frame_leave=vd_gc_real_frame_leave)
   function(void_managed_source_tests family folder fixture programs)
-    add_executable(void_${family}_tests tests/${family}/tests.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+    set(abi void_managed_test_abi)
+    set(extra)
+    if(family STREQUAL "strings")
+      set(abi void_string_test_abi)
+      set(extra tests/strings/probe.cpp)
+    endif()
+    add_executable(void_${family}_tests tests/${family}/tests.cpp tests/managed/probe.cpp ${extra} $<TARGET_OBJECTS:${abi}>)
     target_link_libraries(void_${family}_tests PRIVATE void_llvm)
     add_test(NAME ${family}_source COMMAND void_${family}_tests "${PROJECT_SOURCE_DIR}")
     set_tests_properties(${family}_source PROPERTIES TIMEOUT 180)
@@ -184,7 +190,7 @@ if(BUILD_TESTING)
         COMMAND void_${family}_tests --emit-library "${PROJECT_SOURCE_DIR}/examples/${folder}/${fixture}.void" "${library_object}" "${mode}"
         DEPENDS void_${family}_tests ${source_files} VERBATIM)
       set_source_files_properties("${library_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
-      add_executable(void_${family}_aot_${mode} tests/${family}/aot.cpp tests/managed/probe.cpp "${library_object}" $<TARGET_OBJECTS:void_managed_test_abi>)
+      add_executable(void_${family}_aot_${mode} tests/${family}/aot.cpp tests/managed/probe.cpp ${extra} "${library_object}" $<TARGET_OBJECTS:${abi}>)
       target_link_libraries(void_${family}_aot_${mode} PRIVATE void_runtime)
       add_test(NAME ${family}_aot_${mode} COMMAND void_${family}_aot_${mode})
       set_tests_properties(${family}_aot_${mode} PROPERTIES TIMEOUT 180)
@@ -217,6 +223,20 @@ if(BUILD_TESTING)
   void_managed_source_tests(composition composition stress "main;stress;imports;order;staged;receiver_order")
   void_managed_source_tests(inheritance inheritance stress "main;initialization;stress;order;imports;receiver_order;nested;results;failure")
   void_managed_source_tests(interfaces interfaces stress "main;stress;nullable;selection;handoffs;imports;cycles;static")
+  add_library(void_string_test_abi OBJECT src/runtime/abi.cpp)
+  target_link_libraries(void_string_test_abi PRIVATE void_options Threads::Threads)
+  target_compile_definitions(void_string_test_abi PRIVATE vd_gc_poll=vd_gc_real_poll vd_gc_construct=vd_gc_real_construct vd_gc_construct_typed=vd_gc_real_construct_typed vd_gc_frame_enter=vd_gc_real_frame_enter vd_gc_frame_leave=vd_gc_real_frame_leave vd_string_literal=vd_real_string_literal vd_string_concat=vd_real_string_concat)
+  void_managed_source_tests(strings strings stress "main;stress;initialization;unicode")
+  target_link_libraries(void_strings_tests PRIVATE native_fixture)
+  foreach(mode normal optimized)
+    target_link_libraries(void_strings_aot_${mode} PRIVATE native_fixture)
+    set(object "${CMAKE_CURRENT_BINARY_DIR}/strings-reloaded-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${object}"
+      COMMAND void_strings_tests --emit-reload "${PROJECT_SOURCE_DIR}/examples/strings/stress.void" "${object}" "${mode}"
+      DEPENDS void_strings_tests "${PROJECT_SOURCE_DIR}/examples/strings/stress.void" VERBATIM)
+    set_source_files_properties("${object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    target_sources(void_strings_aot_${mode} PRIVATE "${object}")
+  endforeach()
   foreach(mode normal optimized)
     set(interface_reloaded_object "${CMAKE_CURRENT_BINARY_DIR}/interfaces-reloaded-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
     add_custom_command(OUTPUT "${interface_reloaded_object}"
@@ -312,6 +332,7 @@ if(BUILD_TESTING)
     "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/aot proof" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"
     -P "${PROJECT_SOURCE_DIR}/tests/integration/aot.cmake")
   add_test(NAME source_cli COMMAND "${CMAKE_COMMAND}"
+    "-DPYTHON=${Python3_EXECUTABLE}"
     "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
     "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DROOT=${PROJECT_SOURCE_DIR}"
     "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/source programs with spaces" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"

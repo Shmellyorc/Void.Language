@@ -510,6 +510,54 @@ def interfaces(executable, root):
     print("interfaces: original requirement navigation, imported signatures/effects and unsaved revision repair passed")
 
 
+def invalid_utf8_disk(executable, root):
+    root.mkdir(parents=True, exist_ok=True)
+    entry = root / "main.void"
+    raw = "# header\r\n# é😀 ".encode("utf-8") + b"\x80\xff\r\nfunc entry(value: i32) -> i32:\r\n    return value\r\n"
+    entry.write_bytes(raw)
+    uri = entry.as_uri()
+    with Client(executable, entry) as c:
+        def rejected(notes):
+            items = diagnostics(notes)[uri]["diagnostics"]
+            assert len(items) == 1 and items[0]["code"] == "VOID1001", items
+            assert items[0]["range"] == {"start": {"line": 1, "character": 6},
+                                          "end": {"line": 1, "character": 7}}, items
+        rejected(c.initialize())
+        repaired = raw.replace(b"\x80\xff", b"repaired").decode("utf-8", errors="strict")
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": uri, "languageId": "void", "version": 1, "text": repaired}})
+        assert all(not note["diagnostics"] for note in c.sync())
+        c.notify("textDocument/didClose", {"textDocument": {"uri": uri}})
+        rejected(c.sync())
+        assert entry.read_bytes() == raw, "diagnostic rendering changed disk bytes"
+        c.shutdown()
+    print("invalid disk UTF-8: original UTF16 ranges, overlay repair and close passed")
+
+
+def strings(executable, root):
+    root.mkdir(parents=True, exist_ok=True)
+    entry, worker = root / "main.void", root / "text.void"
+    library = 'const greeting = "Hello, 世界"\nfunc echo(text: string) -> string:\n    return text\n'
+    text = 'use "./text.void" as t\nfunc entry(value: i32) -> i32:\n    const message = "é🎮 {{name}}"\n    if t.echo(t.greeting) == "Hello, 世界":\n        return value\n    return 0\n'
+    entry.write_bytes(text.encode()); worker.write_bytes(library.encode())
+    uri, target = entry.as_uri(), worker.as_uri()
+    query = {"textDocument": {"uri": uri}, "position": source_position(text, "greeting")}
+    with Client(executable, entry) as c:
+        assert all(not n["diagnostics"] for n in c.initialize())
+        response, _ = c.request("textDocument/definition", query)
+        assert response["result"]["uri"] == target and response["result"]["range"]["start"] == source_position(library, "greeting"), response
+        bad = text.replace("{{name}}", "\\q")
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": uri, "languageId": "void", "version": 1, "text": bad}})
+        notes = diagnostics(c.sync())[uri]["diagnostics"]
+        assert len(notes) == 1 and notes[0]["code"] == "VOID1101", notes
+        assert notes[0]["range"]["start"] == source_position(bad, "\\q"), notes
+        assert c.request("textDocument/definition", query)[0]["result"] is None
+        c.notify("textDocument/didChange", {"textDocument": {"uri": uri, "version": 2}, "contentChanges": [{"text": text}]})
+        assert all(not n["diagnostics"] for n in c.sync())
+        assert c.request("textDocument/definition", query)[0]["result"]["uri"] == target
+        c.shutdown()
+    print("strings: imported constants, UTF16 escape spans and unsaved repair passed")
+
+
 if __name__ == "__main__":
     executable = pathlib.Path(sys.argv[1]).resolve()
     # Unicode physical root names work without changing the ASCII VFS policy.
@@ -531,3 +579,5 @@ if __name__ == "__main__":
 
     inheritance(executable, root / "inheritance project")
     interfaces(executable, root / "interface project")
+    invalid_utf8_disk(executable, root / "invalid UTF8 project")
+    strings(executable, root / "string project")

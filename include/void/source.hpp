@@ -1,12 +1,11 @@
 #pragma once
+#include "void/utf8.hpp"
 #include <cstddef>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
 namespace vd {
-// Zero for an invalid UTF-8 scalar; shared by source validation and adapters.
-unsigned utf8_scalar_bytes(std::string_view text, std::size_t offset);
 struct SourceLocation { std::string path; unsigned line = 1; unsigned column = 1; };
 class SourceFile {
 public:

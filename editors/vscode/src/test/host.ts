@@ -105,6 +105,17 @@ export async function run(): Promise<void> {
         await replace(worker, originalText);
         await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'diagnostic clearing');
         assert.equal((await definitions())?.[0].uri.toString(), workerUri.toString());
+        const withStrings = originalText.replace('    return x + 42', '    const text: string = "é🎮 # return {{braces}}"\n    return x + 42');
+        assert.notEqual(withStrings, originalText);
+        await replace(worker, withStrings);
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'valid UTF-8 string source');
+        assert.equal((await definitions())?.[0].uri.toString(), workerUri.toString());
+        await replace(worker, withStrings.replace('{{braces}}', '{braces}'));
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.some(d => d.message.includes('interpolation is deferred')), 'reserved string interpolation diagnostic');
+        assert.equal((await definitions())?.length ?? 0, 0);
+        await replace(worker, originalText);
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'string edit repair');
+        assert.equal((await definitions())?.[0].uri.toString(), workerUri.toString());
         record('Before save'); await worker.save(); record('After save');
         record('Before close'); await vscode.commands.executeCommand('workbench.action.closeAllEditors'); record('After close');
         assert(vscode.window.tabGroups.all.every(group => group.tabs.length === 0));

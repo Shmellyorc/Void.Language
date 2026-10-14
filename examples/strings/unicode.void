@@ -1,0 +1,9 @@
+const equivalent = "é" == "\u{e9}"
+const decomposed = "e\u{301}"
+
+func entry(value: i32) -> i32:
+    var controls = "\"\\\n\r\t\0"
+    var braces = "{{name}}"
+    if equivalent and "é" != decomposed and braces == "\u{7b}name\u{7d}" and controls != "":
+        return value + 3
+    return -100

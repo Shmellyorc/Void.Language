@@ -19,13 +19,13 @@
 namespace vd {
 namespace {
 using Type = ir::Type;
-enum class TokenKind { invalid, name, number, path, symbol, newline, indent, dedent, end };
-struct Token { TokenKind kind; std::string text; std::size_t offset; };
+enum class TokenKind { invalid, name, number, path, string, symbol, newline, indent, dedent, end };
+struct Token { TokenKind kind; std::string text; std::size_t offset; std::string decoded = {}; };
 using Code = DiagnosticCode;
 SourceSpan span(const SourceFile& source, const Token& token) {
     auto begin = std::min(token.offset, source.text().size());
     auto length = token.kind == TokenKind::path ? token.text.size() + 2 :
-        (token.kind == TokenKind::name || token.kind == TokenKind::number || token.kind == TokenKind::symbol) ? token.text.size() : 0;
+        (token.kind == TokenKind::name || token.kind == TokenKind::number || token.kind == TokenKind::string || token.kind == TokenKind::symbol) ? token.text.size() : 0;
     if (token.text.empty() && begin < source.text().size()) {
         if (token.kind == TokenKind::symbol && source.text()[begin] != '\r' && source.text()[begin] != '\n') {
             length = 1;
@@ -109,7 +109,8 @@ public:
 bool letter(char c) { return (c >= 'a' && c <= 'z') || c == '_'; }
 bool digit(char c) { return c >= '0' && c <= '9'; }
 const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue", "pass",
-    "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "as", "private", "public", "internal"};
+    "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
+#include "strings.inc"
 std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     const auto& text = source.text();
     std::vector<Token> tokens;
@@ -146,6 +147,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
             beginning = true; continue;
         }
         if (c == '"') {
+            if (tokens.empty() || tokens.back().text!="use") { tokens.push_back(string_token(source,p)); continue; }
             ++p;
             while (p < text.size() && text[p] != '"' && text[p] != '\r' && text[p] != '\n') ++p;
             if (p == text.size() || text[p] != '"') error(source, {TokenKind::path, "", start}, Code::import_quote, "Unterminated import path.", "Close the path with a double quote on this line.");
@@ -172,7 +174,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
         }
         if (std::string("():,.+-*/%=<>?").find(c) != std::string::npos) { ++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
         error(source, {TokenKind::symbol, "", p}, Code::character, "Unexpected character in source.",
-              c == '\t' ? "Use spaces instead of tabs." : "Use the supported numeric/bool syntax and lowercase ASCII identifiers; Unicode identifiers and strings are not implemented yet.");
+              c == '\t' ? "Use spaces instead of tabs." : "Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.");
         } catch (const CompilationError& e) {
             diagnostics.add(e);
             auto line = source.location(p).line;
@@ -381,10 +383,10 @@ class Parser {
         static const std::map<std::string, Type> types = {
             {"i8",Type::i8},{"i16",Type::i16},{"i32",Type::i32},{"i64",Type::i64},
             {"u8",Type::u8},{"u16",Type::u16},{"u32",Type::u32},{"u64",Type::u64},
-            {"f32",Type::f32},{"f64",Type::f64},{"bool",Type::boolean}};
+            {"f32",Type::f32},{"f64",Type::f64},{"bool",Type::boolean},{"string",Type::string}};
         auto found = types.find(peek().text);
         if (found != types.end()) { take(); if (at("?")) error(source,take(),Code::unsupported_type,"Only managed references can be nullable in this phase."); return found->second; }
-        if (peek().kind != TokenKind::name || reserved.contains(peek().text)) error(source,peek(),Code::unsupported_type,"Unsupported type '" + peek().text + "'.","Use a numeric type, bool or a visible value/managed struct.");
+        if (peek().kind != TokenKind::name || reserved.contains(peek().text)) error(source,peek(),Code::unsupported_type,"Unsupported type '" + peek().text + "'.","Use a numeric type, bool, string or a visible value/managed struct.");
         auto token = name();
         std::string spelling = token.text;
         auto reference_token = token;
@@ -428,9 +430,11 @@ class Parser {
         if (++nodes > 512) error(source, peek(), Code::nesting, "Expression size limit exceeded.", "Split this expression into smaller local values.");
         auto token = take();
         if (token.kind == TokenKind::invalid) throw Poison{};
-        if (token.kind == TokenKind::number || token.text == "true" || token.text == "false" || token.text == "null") {
+        if (token.kind == TokenKind::string || token.kind == TokenKind::number || token.text == "true" || token.text == "false" || token.text == "null") {
             auto e = std::make_unique<Expr>(Expr::Kind::literal, token);
-            if (token.kind == TokenKind::number) {
+            if (token.kind == TokenKind::string) {
+                e->type=Type::string; e->aggregate_value.text=token.decoded;
+            } else if (token.kind == TokenKind::number) {
                 e->literal_text = token.text;
             } else { e->type = token.text == "null" ? Type::null_value : Type::boolean; e->value = token.text == "true"; }
             return e;
@@ -689,7 +693,7 @@ Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std
     if (t.kind != Type::unresolved) return t;
     auto [owner, structure] = structure_lookup(unit,root,units,t.definition->name,token); (void)owner;
     auto location = token; location.offset = t.definition->source_offset; location.text = t.definition->name;
-    if (!structure) error(unit.source,location,Code::unsupported_type,"Unsupported type '" + t.definition->name + "'.","Use a numeric type, bool or a visible value/managed struct.");
+    if (!structure) error(unit.source,location,Code::unsupported_type,"Unsupported type '" + t.definition->name + "'.","Use a numeric type, bool, string or a visible value/managed struct.");
     if (structure->layout_state == 3) throw Poison{};
     Type result(structure->definition, structure->definition->interface_type ? Type::interface_ref : structure->definition->managed ? Type::managed_ref : Type::aggregate);
     result.nullable = t.nullable; result.readonly=t.readonly;
@@ -1301,6 +1305,11 @@ class Semantics {
         if (logical) {
             expect(left,Type::boolean,e.parts[0]->token); expect(right,Type::boolean,e.parts[1]->token); return e.type = Type::boolean;
         }
+        if (left==Type::string || right==Type::string) {
+            expect(right,left,e.token);
+            if (left!=Type::string || (e.op!="+" && e.op!="==" && e.op!="!=")) error(source,e.token,Code::numeric_operator,"Strings support only +, == and !=.");
+            return e.type=e.op=="+" ? Type::string : Type::boolean;
+        }
         if (e.op != "==" && e.op != "!=" && !numeric::number(left)) expect(left,Type::i32,e.parts[0]->token);
         if ((e.op=="==" || e.op=="!=") && left.kind==Type::managed_ref && right.kind==Type::managed_ref) {
             auto normalize=[&](std::unique_ptr<Expr>& operand,Type target) {
@@ -1389,7 +1398,7 @@ class Semantics {
             s.fields=std::move(expanded);
             s.assigned_type = t;
             expect(expression(*s.expression, t), t, s.expression->token);
-            if (s.op != "=" && t != error_type && !numeric::number(t)) expect(t,Type::i32,s.token);
+            if (s.op != "=" && t != error_type && !numeric::number(t) && !(t==Type::string && s.op=="+=")) expect(t,Type::i32,s.token);
             if (s.op == "%=" && numeric::floating(t)) error(source,s.token,Code::numeric_operator,"Illegal compound floating remainder operator.");
             if (numeric::integer(t) && (s.op == "/=" || s.op == "%=") && s.expression->kind == Expr::Kind::literal && s.expression->value == 0)
                 error(source, s.expression->token, Code::zero_divisor, "Division or remainder by zero.");
@@ -1519,8 +1528,60 @@ public:
         }
     }
 };
+struct StringPool {
+    std::vector<std::string> values;
+    std::map<std::string,unsigned,std::less<>> indexes;
+    std::size_t bytes=0;
+    unsigned intern(std::string_view text,const SourceFile& source,const Token& token) {
+        auto found=indexes.find(text); if(found!=indexes.end()) return found->second;
+        if(text.size()>ir::string_constant_limit || text.size()>ir::string_pool_limit-bytes)
+            error(source,token,Code::limit,"String constants exceed the 16 MiB value or 64 MiB module-pool limit.");
+        auto id=static_cast<unsigned>(values.size());
+        indexes.emplace(text,id); values.emplace_back(text); bytes+=text.size(); return id;
+    }
+};
+// All owned templates, including unused declaration metadata, belong to the
+// compiled graph's pool. Checking and lowering enforce the same finite budget.
+StringPool string_pool(const std::map<std::string,std::unique_ptr<Unit>>& units) {
+    StringPool pool;
+    for(const auto& [id,u]:units) {
+        std::vector<const Expr*> expressions;
+        auto value=[&](const ir::ConstantValue& root,const Token& token) {
+            std::vector<const ir::ConstantValue*> pending{&root};
+            while(!pending.empty()) {
+                auto* current=pending.back();pending.pop_back();
+                if(!current->text.empty()) pool.intern(current->text,u->source,token);
+                for(const auto& child:current->fields) pending.push_back(&child);
+            }
+        };
+        auto statements=[&](const std::vector<Statement>& body) {
+            std::vector<const Statement*> pending; for(const auto& s:body) pending.push_back(&s);
+            while(!pending.empty()) {
+                auto* s=pending.back();pending.pop_back(); if(s->expression) expressions.push_back(s->expression.get());
+                for(const auto& child:s->body) pending.push_back(&child);
+                for(const auto& child:s->otherwise) pending.push_back(&child);
+            }
+        };
+        for(const auto& c:u->constants) {value(c.aggregate_value,c.declaration.token);if(c.declaration.expression) expressions.push_back(c.declaration.expression.get());}
+        for(const auto& structure:u->structures) {value(structure.defaults,structure.token);statements(structure.fields);}
+        for(const auto& f:u->functions) {
+            statements(f.body); value(f.initialization_value,f.token);
+            if(f.base_prelude) expressions.push_back(f.base_prelude.get());
+            for(const auto& e:f.initialization_defaults) expressions.push_back(e.get());
+            for(const auto& p:f.parameters) {if(p.default_value) value(*p.default_value,p.token);if(p.default_expression) expressions.push_back(p.default_expression.get());}
+        }
+        while(!expressions.empty()) {
+            auto* e=expressions.back();expressions.pop_back();value(e->aggregate_value,e->token);
+            for(const auto& child:e->parts) expressions.push_back(child.get());
+            for(const auto& child:e->omitted) expressions.push_back(child.get());
+        }
+    }
+    return pool;
+}
 class Lowering {
     const SourceFile& source;
+    ir::Module& module;
+    StringPool& strings;
     ir::Function output;
     std::optional<unsigned> current;
     const ConstructionContext* context=nullptr;
@@ -1533,13 +1594,17 @@ class Lowering {
     void jump(unsigned to) { terminate({ir::Terminator::Kind::jump, 0, to}); }
     unsigned emit(ir::Instruction i, const Token& token) {
         i.source = source.location(token.offset);
-        if (i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
+        if (i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
             i.source_excerpt = source.excerpt(token.offset);
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
     }
     unsigned constant(Type t, const ir::ConstantValue& value, const Token& token) {
-        ir::Instruction i{t.kind == Type::aggregate ? ir::Op::aggregate : ir::Op::constant}; i.type = t;
+        ir::Instruction i{t.kind == Type::aggregate ? ir::Op::aggregate : t==Type::string ? ir::Op::string_literal : ir::Op::constant}; i.type = t;
+        if (t==Type::string) {
+            i.immediate=strings.intern(value.text,source,token);
+            module.coordinated=true; return emit(i,token);
+        }
         if (t.kind == Type::aggregate) for (unsigned n = 0; n < t.definition->fields.size(); ++n)
             i.arguments.push_back(constant(ir::field_type(t,n),value.fields.at(n),token));
         else i.immediate = std::bit_cast<std::int64_t>(value.bits);
@@ -1625,7 +1690,7 @@ class Lowering {
         switch (e.kind) {
         case K::base_initialization: throw std::logic_error("base initialization is a dedicated prelude");
         case K::literal: {
-            return constant(e.type,e.type.kind == Type::aggregate ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
+            return constant(e.type,(e.type.kind == Type::aggregate || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
         }
         case K::field: { auto value=expression(*e.parts[0]); ir::Instruction i{e.parts[0]->type.kind==Type::managed_ref ? ir::Op::gc_read : ir::Op::extract,value}; i.immediate=e.slot; return emit(i,e.token); }
         case K::construction: {
@@ -1745,6 +1810,10 @@ class Lowering {
                 current = merge; return emit({ir::Op::load, slot}, e.token);
             }
             auto right = expression(*e.parts[1]); left = emit({ir::Op::load, slot}, e.token);
+            if(e.parts[0]->type==Type::string) {
+                auto equal=emit({e.op=="+" ? ir::Op::string_concat : ir::Op::string_equal,left,right},e.token);
+                return e.op=="!=" ? emit({ir::Op::logical_not,equal},e.token) : equal;
+            }
             return emit({operation(e.op), left, right}, e.token);
         }
         }
@@ -1793,7 +1862,7 @@ class Lowering {
             auto value = expression(*s.expression);
             if (old_slot) {
                 auto old = emit({ir::Op::load, *old_slot}, s.token);
-                value = emit({operation(s.op.substr(0, 1)), old, value}, s.token);
+                value = emit({s.assigned_type==Type::string ? ir::Op::string_concat : operation(s.op.substr(0, 1)), old, value}, s.token);
             }
             write_place(selected,value,s.token); break;
         }
@@ -1824,7 +1893,7 @@ class Lowering {
         }
     }
 public:
-    explicit Lowering(const SourceFile& s) : source(s) {}
+    explicit Lowering(const SourceFile& s, ir::Module& m, StringPool& p) : source(s), module(m), strings(p) {}
     ir::Function lower(const Function& f, const ConstructionContext* construction=nullptr) {
         context=construction;
         output = {}; output.name = f.symbol; output.source_name = f.token.text; output.source = source.location(f.token.offset);
@@ -2027,7 +2096,7 @@ public:
 // Only typed, pure ASTs reach this evaluator. The shared software kernel
 // preserves declared precision and wrapping independently of host arithmetic.
 ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
-    if (e.kind == Expr::Kind::literal) return e.type.kind == Type::aggregate ? e.aggregate_value : ir::ConstantValue{e.value,{}};
+    if (e.kind == Expr::Kind::literal) return (e.type.kind == Type::aggregate || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}};
     if (e.kind == Expr::Kind::construction) {
         auto result = e.aggregate_value;
         for (unsigned n = 0; n < e.parts.size(); ++n) result.fields[e.field_indexes[n]] = constant_value(source,*e.parts[n]);
@@ -2035,6 +2104,15 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
         return result;
     }
     if (e.kind == Expr::Kind::field) return constant_value(source,*e.parts[0]).fields.at(e.slot);
+    if (e.kind==Expr::Kind::binary && e.parts[0]->type==Type::string) {
+        auto a=constant_value(source,*e.parts[0]).text;
+        auto b=constant_value(source,*e.parts[1]).text;
+        if(e.op=="+") {
+            if(b.size()>ir::string_constant_limit-a.size()) error(source,e.token,Code::limit,"Folded string exceeds the 16 MiB constant limit.");
+            a+=b; return {0,{},std::move(a)};
+        }
+        return {static_cast<std::uint64_t>(e.op=="==" ? a==b : a!=b),{}};
+    }
     auto a = constant_value(source,*e.parts[0]).bits;
     try {
         if (e.kind == Expr::Kind::conversion) {
@@ -2362,9 +2440,11 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     diagnostics.finish();
     analyze_construction(units,diagnostics);
     diagnostics.finish();
+    (void)string_pool(units);
 }
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
     ir::Module module;
+    auto strings=string_pool(units);
     for (const auto& [id,unit] : units) for (const auto& structure : unit->structures) {
         module.nominal_types.emplace_back(structure.definition,structure.definition->interface_type ? Type::interface_ref : structure.definition->managed ? Type::managed_ref : Type::aggregate);
         if (structure.definition->managed || structure.definition->interface_type) module.coordinated=true;
@@ -2373,7 +2453,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
     for(const auto& [id,u]:units) {auto& imports=module.source_imports[id];for(const auto& i:u->imports) if(!i.target.empty()) imports.insert(i.target);}
     module.source_path = units.at(entry)->source.path();
     for (auto& [id, unit] : units) {
-        Lowering lowering(unit->source);
+        Lowering lowering(unit->source,module,strings);
         for (const auto& f : unit->functions) {
             if(f.interface_requirement) {
                 ir::Function requirement;requirement.name=f.symbol;requirement.parameters={f.receiver->type};
@@ -2392,6 +2472,11 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
         }
     }
     module.interface_bindings=units.at(entry)->member_catalog->interface_bindings;
+    module.strings=std::move(strings.values);
+    if(!module.strings.empty()) module.coordinated=true;
+    auto trace_string=[&](Type t) { if(ir::reference_paths(t,true)!=ir::reference_paths(t)) module.coordinated=true; };
+    for(const auto& f:module.functions) { trace_string(f.result); for(auto t:f.parameters) trace_string(t); for(auto t:f.locals) trace_string(t); }
+    for(auto t:module.nominal_types) if(t.definition) trace_string(Type(t.definition));
     ir::validate(module); return module;
 }
 
@@ -2507,7 +2592,7 @@ struct AnalysisAccess {
             }
             for (const auto& c : unit->constants) {
                 auto key = id + "::" + c.declaration.name;
-                declaration({AnalyzedDeclaration::Kind::module_constant,key,id,c.visibility,location(c.declaration.token),{},c.type,c.declaration.constant_syntax,c.type.kind == Type::aggregate ? std::optional<std::uint64_t>{} : std::optional<std::uint64_t>{c.value}});
+                declaration({AnalyzedDeclaration::Kind::module_constant,key,id,c.visibility,location(c.declaration.token),{},c.type,c.declaration.constant_syntax,(c.type.kind == Type::aggregate || c.type==Type::string) ? std::optional<std::uint64_t>{} : std::optional<std::uint64_t>{c.value}});
                 expression(*c.declaration.expression,key,{});
             }
             for (const auto& f : unit->functions) {

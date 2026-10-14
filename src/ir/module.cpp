@@ -41,7 +41,7 @@ FieldType::operator Type() const {
     Type t(std::move(d),kind); t.nullable=nullable; t.readonly=readonly; return t;
 }
 
-ReferencePaths reference_paths(Type root) {
+ReferencePaths reference_paths(Type root, bool include_strings) {
     ReferencePaths result;
     struct Pending { Type type; ReferencePath path; };
     std::vector<Pending> pending{{root,{}}};
@@ -49,7 +49,7 @@ ReferencePaths reference_paths(Type root) {
     while (!pending.empty()) {
         auto [type,path]=std::move(pending.back()); pending.pop_back();
         if (type.construction) continue; // A stage is a place, never a heap root.
-        if (reference_value(type) || type.kind==Type::prepared_receiver) { result.insert(std::move(path)); continue; }
+        if (reference_value(type) || type.kind==Type::prepared_receiver || (include_strings && type.kind==Type::string)) { result.insert(std::move(path)); continue; }
         if (type.kind!=Type::aggregate) continue;
         if (!type.definition || path.size()>=128 || ++expanded>65536)
             throw std::invalid_argument("VOID IR: recursive or excessive reference shape");
@@ -158,7 +158,7 @@ std::string type_name(Type t) {
     if(t.kind==Type::prepared_receiver && t.definition) return "prepared receiver "+t.definition->identity;
     if (t.readonly && t.kind!=Type::managed_ref) { t.readonly=false; return "readonly " + type_name(t); }
     if (t.kind == Type::managed_ref && t.definition) return std::string(t.readonly ? "readonly " : "") + t.definition->identity + (t.nullable ? "?" : "");
-    switch (t.kind) { case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
+    switch (t.kind) { case Type::string: return "string"; case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
     throw std::invalid_argument("VOID IR: unknown type");
 }
 std::vector<VirtualTarget> virtual_targets(const Module& module,const Function& root) {
@@ -211,9 +211,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         std::vector<Type> pending{root};
         for (std::size_t n=0;n<pending.size();++n) {
             auto t=pending[n];
+            if (t.kind==Type::string && (t.definition || t.nullable || t.construction || !t.preparation.empty() || !t.readonly_references.empty())) fail("invalid intrinsic string type");
             if (t.construction && (t.kind!=Type::managed_ref || t.nullable)) fail("invalid construction view type");
             if (t.nullable && !reference_value(t)) fail("nullable non-reference type");
-            if ((reference_value(t) || t.kind==Type::prepared_receiver) && !m.coordinated) fail("managed references require coordinated runtime");
+            if ((reference_value(t) || t.kind==Type::prepared_receiver || t.kind==Type::string) && !m.coordinated) fail("managed references require coordinated runtime");
             if(t.kind==Type::interface_ref || t.kind==Type::prepared_receiver) {
                 if(!t.definition || !t.definition->interface_type || t.definition->managed || t.definition->identity.empty() || !t.definition->fields.empty() || !t.definition->base.expired()) fail("invalid interface definition");
                 if(t.definition->visibility!="public" && t.definition->visibility!="internal" && t.definition->visibility!="private") fail("invalid interface visibility");
@@ -280,6 +281,11 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             if(t.definition->fields[n].owner!=t.definition->identity) fail("nominal catalog field belongs to another owner");
     }
     struct Signature { std::vector<Type> parameters; Type result; bool receiver = false, mutates = false, initializer = false; };
+    std::size_t string_bytes=0; std::set<std::string_view> unique_strings;
+    for (const auto& text:m.strings) {
+        if (!m.coordinated || text.size()>string_constant_limit || !valid_utf8(text) || !unique_strings.insert(text).second || text.size()>string_pool_limit-string_bytes) fail("invalid or excessive string constant pool");
+        string_bytes+=text.size();
+    }
     std::map<std::string, Signature> names;
     for (const auto& name : m.imports)
         if (name.empty() || !names.emplace(name, Signature{{Type::i32}, Type::i32}).second) fail("duplicate or empty import");
@@ -460,8 +466,14 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::argument:
                     if (i.a >= f.parameters.size()) fail("invalid argument index");
                     result = f.parameters[i.a]; break;
+                case Op::string_literal:
+                    if (!m.coordinated || i.type!=Type::string || i.immediate<0 || static_cast<std::size_t>(i.immediate)>=m.strings.size()) fail("invalid string literal");
+                    valid_type(i.type); result=Type::string; break;
+                case Op::string_concat: case Op::string_equal:
+                    if (!m.coordinated || operand(i.a)!=Type::string || operand(i.b)!=Type::string) fail("invalid string operands");
+                    result=i.op==Op::string_concat ? Type::string : Type::boolean; break;
                 case Op::constant:
-                    if (i.type.construction || i.type.kind == Type::aggregate || i.type.kind==Type::prepared_receiver || i.type == Type::none || (reference_value(i.type) && i.immediate != 0) || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1)) fail("invalid literal");
+                    if (i.type.construction || i.type.kind == Type::aggregate || i.type.kind==Type::prepared_receiver || i.type == Type::none || (reference_value(i.type) && i.immediate != 0) || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1) || (i.type==Type::string && i.immediate!=0)) fail("invalid literal");
                     if (reference_value(i.type) && !i.type.nullable) fail("null literal requires a nullable reference type");
                     valid_type(i.type); result = i.type; break;
                 case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:

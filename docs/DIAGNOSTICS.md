@@ -38,6 +38,29 @@ wide-character or terminal-display-width accuracy. Long source lines are retaine
 and rendered in full. A future IDE adapter must convert byte spans to its protocol
 encoding using these snapshots, not reinterpret scalar columns as UTF-16.
 
+Phase 22's approved diagnostic amendment escapes each malformed source byte as
+uppercase ASCII `\xHH` in compile-time snippets, including related locations.
+Valid UTF-8 scalars remain unchanged. Caret indentation and range width account
+for the four displayed characters per escaped byte, while diagnostic header
+locations, original byte spans, source snapshots and LSP UTF-16 positions remain
+unchanged. The underline for VOID1001 covers the escaped first offending byte;
+additional malformed bytes on that line are escaped too. Source validation still
+rejects the file at its original first malformed byte. No replacement characters,
+normalization or rewritten source buffers are used. Runtime excerpts keep their
+existing presentation because invalid source never reaches runtime lowering.
+
+The existing frontend suite verifies retained bytes/spans, scalar locations,
+expanded primary/related carets and valid UTF-8 rendering. The source_cli suite
+also invokes `tests/integration/utf8_diagnostics.py`, which captures real
+check/run/emit stdout and stderr as bytes and decodes both with strict UTF-8.
+It covers stray continuations, overlong encodings, surrogates, values above the
+Unicode range, bad continuations, truncation, BOMs, LF/CRLF/CR, missing final
+newlines and non-ASCII text before/after damage. The test checks exact locations,
+escapes/carets, rejection and protected output/source bytes in both execution
+modes. The LSP protocol regression verifies malformed disk source retains its
+UTF-16 range through an unsaved repair and close back to the rejected disk bytes.
+WORK_LOG.md records actual local verification and hosted limitations.
+
 No warnings are currently generated. Severity supports warning/information; the
 lowering gate tests error severity, so warnings alone do not invalidate a program.
 There is no successful-compilation warnings/result API in this slice.

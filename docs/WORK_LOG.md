@@ -1,5 +1,171 @@
 # Work log
 
+## 14 October 2026: Phase 22 UTF-8 foundation implementation
+
+S1-S8 are owner-approved, including resource limits. Implementation and full local
+verification are complete. All six matrices, stress repeats, small-stack checks,
+real editor integration and VSIX packaging passed. Stop for owner review before
+the unchanged seven-job hosted gate.
+The accepted VOID1001 output amendment remains integrated. No future indexing,
+length/byte_length, nullable strings, interpolation execution, ordering, formatting,
+print or collection feature was added. Language Bible Section 8.1 records the
+supplied future decisions as approved design, not implemented syntax.
+
+### Implemented contracts
+
+- Added one intrinsic string Type, owned ConstantValue text and a deduplicated
+  IR byte-template pool. The existing frontend, typed AST, pure evaluator,
+  construction/default plans and independent IR validator handle literals,
+  exact content equality, +/+=, empty defaults, constants, fields, parameters and
+  returns. Only two obsolete string-type deferral assertions were replaced with
+  unknown-type negatives; new positive/negative string families cover the new
+  behavior. No existing suite or meaningful safety assertion was removed.
+- String tokens retain exact written spelling/spans and decoded bytes separately.
+  Strict escapes, scalar validation and 16 MiB literal/folded-result limits apply
+  before oversized append/concatenation. One shared pool interner applies the
+  64 MiB unique-template limit in analysis and lowering, including owned declaration
+  metadata. Pure defaults/constants remain templates with fallible materialization,
+  not eager runtime module initialization. Unterminated literals recover on their
+  physical line; import-path grammar remains separate.
+- Nonempty strings occupy one intrinsic leaf allocation on the existing Heap.
+  Internal zero denotes empty, without introducing source null/string?. Layout
+  kind/extent/UTF-8 checks prevent ordinary objects or nominal descriptors from
+  masquerading as intrinsic text. Runtime scratch contains complete copied bytes,
+  no managed pointers, and feeds the existing construct_into transaction. Allocation
+  budgets, collection/poll, last-step publication and checked failure cleanup are
+  reused. No second allocator, collector, string heap or pending-object registry.
+- The existing bounded logical shape walker includes strings for tracing while
+  excluding them from mutable-referent authority. Mixed managed/interface readonly
+  capabilities remain intact. Shared LLVM lowering roots string-only programs,
+  nested values/fields, inherited layouts, actual stage/receiver storage, arguments,
+  results and fixed loop slots. Existing no-GC call/return handoffs remain. Native
+  private signatures and the i32 CLI adapter are unchanged.
+- The same scalar UTF-8 validator now serves source, IR and native/runtime helpers
+  without a frontend/LLVM runtime dependency. Embedded NUL remains length-aware
+  ordinary content. native_utf8 still rejects NUL for terminated APIs. The real C
+  fixture proves both terminated copies and a retained pointer-plus-length copy:
+  original managed storage is collected, provider reads retain exact NUL bytes,
+  provider release clears references before byte-owner teardown. This synchronous
+  provider proof does not authorize arbitrary asynchronous retained-pointer APIs.
+- Heap payloads/metadata contain no AST/LLVM/global/code pointer or generation
+  lease. Tests observe old string-bearing holders surviving allocating JIT-code
+  retirement, compatible active body reload with concurrent collection, and new
+  separately linked AOT code reading the old typed holder. Const/default changes
+  still require restart. No public aggregate/string ABI or hidden string cache.
+- Added STRINGS.md and updated the approved proposal, Bible future-design section,
+  decisions, source guide, known issues and README. LSP tests cover imported text
+  constants, UTF-16 escape spans and unsaved failure/repair; grammar and real-editor
+  tests cover string/type/escape regions and reserved interpolation diagnostics.
+
+### Frozen verification inputs and preliminary failures
+
+The final 288 source/test/editor/build inputs are recorded by SHA-256 in
+build/phase22-verification/frozen-source.json. No implementation input changed
+during the final matrix. Both SDKs report LLVM 19.1.7 with ORC headers, libraries
+and LLVMConfig.cmake; installed RTTI YES and official archive RTTI NO remain
+matched throughout the program. Existing strict sanitizer settings are unchanged.
+
+Initial targeted string/frontend/LSP/normal-O2 AOT/CLI checks passed 6/6. The first
+broader verification overlapped the final audit: an append-guard edit had a missing
+parenthesis, and builds configured before the new native fixture wiring linked
+without its C library. These were corrected before the freeze. The pre-freeze
+logs, including failures, are retained under pre-freeze-matrix and are not final
+acceptance evidence. The initial official small-stack listing still contained
+only six prior suites; pre-freeze-stack is also excluded. The final stack script
+asserts exactly seven requested suites, including strings, before executing them.
+
+The final matrix uses `python3 build/phase22-verification/validate.py`: each tree
+runs `cmake -S . -B build/<tree>`, `cmake --build build/<tree> -j2`, then
+`ctest --test-dir build/<tree> --output-on-failure -j4`. Matrix results are recorded
+below; earlier baseline/diagnostic-only
+tables elsewhere in this log remain historical evidence.
+
+| Build tree | Configure seconds | Build seconds | CTest seconds | Result |
+| --- | ---: | ---: | ---: | --- |
+| ci-debug | 9.34 | 2.72 | 73.45 | 59/59 |
+| ci-release | 9.41 | 66.89 | 29.01 | 59/59 |
+| ci-sanitizers | 9.77 | 218.77 | 113.13 | 59/59 |
+| ci-official-debug | 8.97 | 86.29 | 70.59 | 59/59 |
+| ci-official-release | 9.17 | 214.79 | 38.64 | 59/59 |
+| ci-official-san | 9.12 | 341.55 | 85.59 | 59/59 |
+
+All **354 full-suite executions passed**. The existing 55 suites remain, with
+strings_source, strings_aot_normal, strings_aot_optimized and strings_cli bringing
+the total to 59. CLI fixtures run -1/0/10 through normal/O2 JIT and independent
+AOT. For input 10, main/stress/initialization/unicode return 11/310/12/13. The two
+independent AOT harnesses link runtime plus the C fixture, without LLVM libraries;
+they check normal/O2 roots, checked failures and new-code access to old holders.
+
+Strict runs retained `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`, outside the process
+inspection sandbox so LeakSanitizer could operate. No leak check, sanitizer,
+assertion or platform suite was disabled. The existing official-SDK no-RTTI/vptr
+limitation remains unchanged. Generated application code does not gain full
+ASan/UBSan instrumentation merely because the C++ host/runtime is instrumented;
+independent IR, explicit roots and native bounds/publication assertions remain
+necessary evidence.
+
+Final `python3 build/phase22-verification/stack.py` used exact soft/hard
+RLIMIT_STACK=1048576. It asserted seven selected suites existed and ran frontend,
+managed initialization, reference values, composition, inheritance, interfaces
+and strings three times per Debug SDK. All **42 executions passed**: installed
+SDK 99.09 s, official SDK 90.07 s. No stack-limit assertion was weakened.
+
+Editor tools remain Node 24.19.0 and npm 11.6.2, using existing installed tools
+without dependency/lockfile updates. `npm test` passed; explicit
+`node --test --test-isolation=none out/test/config.test.js` confirmed 4/4 cases.
+Final real editor integration used the frozen build/ci-debug/voidls with
+`VOIDLS_PATH=<repo>/build/ci-debug/voidls VSCODE_EXECUTABLE_PATH=/usr/share/code/code
+npm run test:host`. Normal, restricted-trust and multi-root scenarios passed,
+including real native-process kills, restart/failure/deactivation assertions and
+the new unsaved string error/repair/navigation checks. VS Code ran on Linux;
+VSCodium is not installed and is not claimed as a separately executed host.
+`npm run package` produced the 149139-byte VSIX, and its string grammar bytes
+match the source grammar exactly. Editor/unit/package logs and package hash are
+under build/phase22-verification/editor/.
+
+Repeated stress used `python3 build/phase22-verification/stress.py`, dispatched
+over the six completed configurations. Each uses CTest `--repeat until-fail:3 -j2`
+for exactly 17 suites: the preceding runtime/generated/callback/invariant/failure,
+managed/init/reference-value/composition/inheritance/interface source and native
+families plus string source and both AOT suites. The script asserts the requested
+inventory exists before running. All **306 executions passed**.
+
+| Stress tree | Result | Seconds |
+| --- | --- | ---: |
+| ci-debug | 17/17, three repeats | 78.82 |
+| ci-release | 17/17, three repeats | 35.21 |
+| ci-sanitizers | 17/17, three repeats | 76.01 |
+| ci-official-debug | 17/17, three repeats | 76.17 |
+| ci-official-release | 17/17, three repeats | 24.22 |
+| ci-official-san | 17/17, three repeats | 52.87 |
+
+Final input SHA-256 comparison matched all 288 frozen files. `git diff --check`
+passed; the new documents contain no em dashes. Logs, SDK evidence, source hashes,
+per-configuration matrix/stress JSON and stack/editor/package evidence remain in
+build/phase22-verification/. The pre-freeze failures remain separate and visible.
+
+This establishes local Linux verification, not hosted Windows/macOS acceptance.
+Both complete LLVM 19.1.7 SDKs, Debug/Release, strict sanitizers/leaks, normal/O2
+JIT, independent native AOT, GC/root/OOM/reload stress, 1 MiB checks, real editor
+and VSIX packaging were exercised without weakening checks. No production GC,
+hard real-time behavior, arbitrary native-provider lifetime, public managed ABI
+or deferred string API is claimed. No workflow/toolchain/dependency update or Git
+mutation was performed. Phase 22 is ready for boss/wrench-clanker review; the owner
+handles Git and the seven hosted jobs. Do not advance to a new phase automatically.
+
+## 14 October 2026: Phase 22 S1-S8 implementation authorized
+
+Boss and wrench clanker explicitly confirm S1-S8 and their recommended resource
+limits approved. Full UTF-8 string foundation implementation remains authorized;
+the accepted diagnostic amendment was additional work. STRINGS_PROPOSAL.md now
+records approval and implementation-in-progress status. No additional design gate
+is required for the foundation. The Language Bible records the supplied approved
+future scalar indexing, length/byte_length, nullable-string and interpolation
+direction as not implemented and outside Phase 22. Ordering and out-of-range
+behavior remain open. Final implementation and validation evidence will follow;
+no completion or hosted verification is claimed at this stage.
+
 ## Phase 18 reference-containing value structs: design only, 13 October 2026
 
 The owner declares Phase 17 locked and reports Actions run #29 passed all seven
@@ -5896,3 +6062,184 @@ hosted Ubuntu environment. No Windows/macOS execution is claimed locally. There
 are no new runtime/IR limitations; range/collection iteration remains deferred.
 No compiler/runtime feature beyond `pass`, no workflow/build changes, and no
 commits, pushes, branches or remote modifications were made.
+
+## 14 October 2026: Phase 22 UTF-8 strings, design and investigation only
+
+The owner reports phases 1 through 21 complete and hosted-verified: Phase 21
+Actions run #36 and the subsequent pass improvement run #37 each passed seven
+jobs. This is owner-reported evidence; no hosted run was inspected here. Initial
+read-only git status was clean. Workspace and pasted assignment were accessible.
+No AGENTS.md was found under the project parent. No implementation was authorized.
+
+Reviewed current LANGUAGE_BIBLE, DEVELOPMENT_STRATEGY, DECISIONS, KNOWN_ISSUES,
+WORK_LOG, SOURCE_COMPILER, GC_RUNTIME and INTERFACES, with relevant initialization,
+reference-value and analysis compatibility contracts. Inspected actual source
+validation/lexing/parsing/typed AST, pure constants/default construction, shared
+Type/reference shapes, independent IR validation, LLVM layouts/root homes/calls/
+returns/failure paths, Heap and coordinated complete publication, private runtime
+ABI/bootstrap, generation leases/contracts, native_utf8, LSP positions/snapshots,
+editor grammar, relevant tests and the seven-job workflow.
+
+Created STRINGS_PROPOSAL.md. Principal findings:
+
+- Valid UTF-8 source and immutable byte snapshots exist. Double quotes currently
+  produce import-path tokens without escapes, not string expressions. Builtin
+  string types, byte constants, string operations and ordinary string coloring
+  are absent. The current native_utf8 helper validates and owns a terminated
+  temporary while rejecting NUL; it is not a general VOID string implementation.
+- Heap TypeLayout supports variable positive sizes and leaf payloads, but admitted
+  nominal descriptors require exact fixed sizes. A variable tail needs explicit
+  intrinsic payload classification/extent validation, not a fixed descriptor
+  workaround, per-length metadata accumulation or a second memory system.
+- reference_paths serves both tracing and readonly/effect analysis. Immutable
+  strings need traced leaves without mutable-referent requirements, while mixed
+  managed/interface capabilities retain their current restrictions. Simply adding
+  string to reference_value would also impose incorrect nominal/default/null rules.
+- Existing root frames, nested target offsets, argument/result homes, no-GC
+  handoffs, selected-owner snapshots, staged fields and complete publication are
+  reusable. Current coordinated-module inference scans nominal declarations;
+  a string-only program needs explicit coverage. Source strings still use the
+  private call convention and current i32 CLI entry adapter, not a public C ABI.
+- Pure constants currently contain bits/recursive fields. Nonempty immutable text
+  templates and fallible runtime materialization are a proposed extension to
+  current pure-default rules, requiring approval. C1/S1/P3/P4/RV and independent
+  IR validation must remain authoritative.
+- Persistent bytes cannot borrow source/LLVM/JIT globals. Runtime-owned data and
+  whole-generation leases already separate heap and executable lifetime. The
+  same separation must hold for old strings used by a new generation.
+
+Recommended approval items S1-S8 cover flat immutable intrinsic leaves in the
+existing heap, internal zero-as-empty, existing publication/root/failure machinery,
+strict UTF-8/escapes, exact-byte equality/no normalization, reserved automatic
+interpolation syntax, deferred indexing/character/length APIs, +/+= and pure byte
+templates, embedded NUL independent of terminated native APIs, copying boundaries,
+JIT/AOT/reload compatibility and a coherent first slice. The proposal presents
+alternatives, proposed compiler byte limits, valid/invalid future examples,
+implementation order, targeted regressions, risks and full eventual acceptance.
+These are recommendations, not owner-approved semantics.
+
+Document discrepancies were retained and explained: original Bible/Strategy opening
+status is historical; current code/DECISIONS settle C++20 and LLVM 19.1.7.
+GC_RUNTIME's source/budget exclusions are historical. KNOWN_ISSUES/INTERFACES
+pending Phase 21 hosted wording predates the owner's new report. No Language Bible
+change or unrelated status cleanup was made.
+
+### Focused local verification actually executed
+
+- `ctest --test-dir build/ci-debug -N`: 55 registered suites.
+- `/usr/lib/llvm-19/bin/llvm-config --version`: 19.1.7. Existing Debug cache uses
+  `/usr/lib/llvm-19/lib/cmake/llvm`, CMAKE_BUILD_TYPE=Debug, sanitizers OFF.
+- `cmake --build build/ci-debug -j2`: successful incremental build. A second
+  invocation completed successfully with its full log captured; no compiler,
+  runtime, test, build or editor source was modified.
+- `ctest --test-dir build/ci-debug --output-on-failure -j2 -R
+  '^(frontend|native|gc|reload|runtime_generated|runtime_failures|reference_values_source|managed_initialization_source|interfaces_aot_normal|interfaces_aot_optimized|lsp_positions|lsp_protocol|source_cli)$'`:
+  **13/13 passed in 13.63 seconds**. Existing tests cover normal/O2 JIT,
+  independently linked AOT, native malformed/NUL validation, rooting/failures,
+  aggregate construction and LSP positions/protocol. These are unchanged baseline
+  tests, not proof of strings. Full six-configuration matrix, sanitizers, second
+  SDK execution, small-stack, editor host/VSIX and hosted CI were not repeated for
+  this documentation-only assignment.
+- Temporary CLI `voidc check` probes: a Unicode comment checked successfully;
+  a quoted Unicode expression failed with VOID1101; string parameter/result
+  annotations failed with VOID1103; malformed comment bytes C0 AF failed with
+  VOID1001. Temporary inputs were automatically removed. The first Python probe
+  harness failed to decode the malformed-source diagnostic because the CLI emits
+  raw invalid bytes in its excerpt. Repeating with byte capture/backslash display
+  confirmed the expected compiler rejection. This separate renderer concern is
+  recorded for review and was not fixed or hidden.
+
+Build/CTest log copies are retained under `build/phase22-investigation/`.
+Final `git diff --check` and explicit whitespace/em-dash checks on both new document
+sections passed. Read-only git status confirms only STRINGS_PROPOSAL.md and this
+log changed. No implementation, tests, Language Bible, SDK or workflow was changed;
+no Git operations beyond read-only inspection were performed. Stop for owner/
+wrench-clanker review of S1-S8; implementation requires explicit authorization.
+
+## 14 October 2026: approved Phase 22 UTF-8 diagnostic-output amendment
+
+Boss and wrench clanker explicitly authorized fixing the recorded VOID1001
+rendering defect, superseding the earlier instruction to leave it documented
+without implementation. This authorization is limited to malformed-source
+diagnostic output; S1-S8 string implementation remains unapproved.
+
+Reproduced the defect using a new strict-decoding real CLI regression before
+changing production code. The original compiler rejected the malformed file,
+but Python's strict stderr decode failed on byte 80. The cause was direct copying
+of raw rejected source into render_diagnostic's snippet. SourceFile correctly
+retained the original rejected bytes and first-invalid-byte span.
+
+Changed only that shared compile-time renderer in src/frontend/source.cpp. It
+uses the existing scalar validator, retains each valid UTF-8 scalar and renders
+each malformed byte as uppercase ASCII `\xHH`. It calculates caret indentation
+and underline width from the displayed scalar/escape widths. Related snippets
+use this same path. SourceFile validation, line indexes, scalar locations, raw
+snapshots/spans, runtime excerpts and LSP position conversion are unchanged.
+No buffer normalization, replacement source text, second renderer or broader
+architecture change was needed.
+
+Added meaningful regressions without changing the 55-suite inventory:
+
+- tests/frontend/diagnostics.hpp verifies original rejected bytes and precise
+  first-byte span, scalar position after multibyte/astral text, strict-valid
+  rendered UTF-8, four-character escaped-byte underline, caret alignment after
+  two escaped bytes and related-location rendering from the same snapshot.
+- tests/integration/utf8_diagnostics.py executes 218 real CLI probes. It decodes
+  both stdout/stderr strictly and checks check/run/emit rejection, exact paths,
+  lines/columns, escaped snippets/carets, source preservation and protected object
+  bytes. Cases include stray continuations, two/three-byte overlong sequences,
+  surrogate/out-of-range scalars, forbidden leads, bad continuations, truncation,
+  BOMs, all three line endings, EOF without newline and valid non-ASCII text
+  around damage. Only output CRLF is normalized after strict decoding for portable
+  transcript comparison; source bytes are never normalized. Canonical generic
+  paths account for Windows separators and macOS temporary-directory aliases.
+- The existing source_cli/diagnostics.cmake invokes this script through the
+  already required configured Python interpreter. CMake passes that interpreter
+  to the existing suite; no new dependency, test bypass or platform skip is added.
+- tests/lsp/protocol.py verifies a real malformed disk source reports VOID1001
+  at the original UTF-16 range, an unsaved valid overlay clears it, and closing
+  the overlay restores the disk diagnostic. Original disk bytes remain identical.
+
+Updated DIAGNOSTICS.md with the rendering/coordinate contract and regression
+coverage. KNOWN_ISSUES.md marks the recorded defect fixed locally, with hosted
+acceptance still pending. STRINGS_PROPOSAL.md replaces its unresolved-observation
+wording with this approved correction and preserves the string approval gate.
+Earlier log entries remain historical evidence, superseded by this amendment.
+
+### Verification executed for the correction
+
+`cmake --build build/ci-debug -j2` succeeded. The new strict CLI script passed
+218/218 probes directly. Focused frontend/lsp_positions/lsp_protocol passed 3/3
+in 7.89 s. The additional malformed-disk LSP case passed separately in 0.42 s.
+
+Final Debug `ctest --test-dir build/ci-debug --output-on-failure -j4` passed
+**55/55 in 61.67 s**, including the new CLI checks inside source_cli and all
+existing source/JIT/AOT/runtime/editor-protocol acceptance. No assertion or
+existing suite was removed or weakened.
+
+Built targets `voidc void_tests voidls void_lsp_tests` with `-j2` in both
+build/ci-official-debug and build/ci-sanitizers. Focused CTest command for each:
+`ctest --test-dir build/<tree> --output-on-failure -j2 -R
+'^(frontend|source_cli|lsp_positions|lsp_protocol)$'`.
+
+| Configuration | Result | Seconds |
+| --- | --- | ---: |
+| Official LLVM 19.1.7 Debug | 4/4 | 7.65 |
+| Installed LLVM 19.1.7 strict ASan/UBSan, RelWithDebInfo | 4/4 | 10.94 |
+
+Strict sanitizer options remained
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. The first sandboxed
+attempt failed because LeakSanitizer cannot inspect processes under ptrace.
+The approved unrestricted rerun passed all four suites with leak detection and
+all sanitizer checks enabled; the failed sandbox log is retained separately.
+Both focused configurations include the 218-probe CLI regression. Release, the
+remaining sanitizer/SDK combinations, small-stack, real GUI editor/VSIX and hosted
+Windows/macOS jobs were not rerun for this narrow renderer correction. Actual LSP
+process behavior was tested, not a claim of a new GUI editor run. All seven hosted
+jobs remain the platform acceptance gate.
+
+Logs are retained under build/phase22-investigation/utf8-diagnostics/. The fix is
+verified locally and is no longer recorded as an unresolved renderer defect.
+String implementation, Language Bible, LLVM version, runtime memory semantics
+and the hosted workflow are unchanged. No Git mutations were performed.

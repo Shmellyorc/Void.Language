@@ -17,7 +17,7 @@ struct TypeArena;
 using ReferencePath = std::vector<unsigned>;
 using ReferencePaths = std::set<ReferencePath>;
 struct Type {
-    enum Kind { i32, boolean, none, i8, i16, i64, u8, u16, u32, u64, f32, f64, aggregate, unresolved, invalid, managed_ref, null_value, interface_ref, prepared_receiver };
+    enum Kind { i32, boolean, none, i8, i16, i64, u8, u16, u32, u64, f32, f64, aggregate, unresolved, invalid, managed_ref, null_value, interface_ref, prepared_receiver, string };
     Kind kind = i32;
     bool nullable = false, readonly = false;
     std::string preparation = {}; // Private prepared requirement identity; never user storage.
@@ -67,8 +67,9 @@ inline bool operator==(const Type& a, const Type& b) {
     return (a.kind!=Type::prepared_receiver || a.preparation==b.preparation) && a.kind == b.kind && a.nullable == b.nullable && a.construction == b.construction && (a.kind != Type::aggregate && a.kind != Type::unresolved && a.kind != Type::managed_ref && a.kind != Type::interface_ref && a.kind != Type::prepared_receiver ? true :
         a.definition && b.definition && a.definition->identity == b.definition->identity);
 }
-struct ConstantValue { std::uint64_t bits = 0; std::vector<ConstantValue> fields; };
-ReferencePaths reference_paths(Type type);
+struct ConstantValue { std::uint64_t bits = 0; std::vector<ConstantValue> fields; std::string text = {}; };
+// Immutable strings participate in tracing, never mutable-reference authority.
+ReferencePaths reference_paths(Type type, bool include_strings = false);
 ReferencePaths readonly_paths(Type type);
 Type with_readonly_paths(Type type, const ReferencePaths& paths);
 Type readonly_view(Type type);
@@ -83,7 +84,7 @@ std::string type_name(Type type);
 enum class Op { argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
-    upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call };
+    upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal };
 // A validated local aggregate storage path; never a source-visible reference.
 struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
 struct Instruction {
@@ -135,7 +136,10 @@ struct Module {
         std::string key;
     };
     std::vector<Binding> interface_bindings = {};
+    std::vector<std::string> strings = {}; // Owned unique UTF-8 byte templates.
 };
+inline constexpr std::size_t string_constant_limit = 16 * 1024 * 1024;
+inline constexpr std::size_t string_pool_limit = 64 * 1024 * 1024;
 bool reference_value(Type);
 struct MemberSelection {
     enum Status { missing, found, inaccessible, ambiguous } status = missing;
