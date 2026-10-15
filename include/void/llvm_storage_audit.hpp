@@ -47,6 +47,9 @@ public:
     // All certificate and final-byte checks run before touching the destination.
     void deliver(const std::filesystem::path&);
     const std::string& report() const;
+    // Read-only Linux x64 experiment. Never grants delivery or ownership credit.
+    std::string research_encoded_cfg(const std::filesystem::path&, const std::string& function,
+                                    const std::string& machine_certificate) const;
 };
 std::set<StorageRole> all_storage_roles();
 // Explicit investigation entry, never called by public emit_object/runtime paths.

@@ -1,5 +1,6 @@
 // Production AOT emission boundary extracted from the pinned machine proof.
 #include "void/llvm_storage_audit.hpp"
+#include "encoded_cfg.hpp"
 #include <limits>
 #include <functional>
 #include <mutex>
@@ -172,7 +173,7 @@ json::Object outgoingObservation(MachineFunction &mf, StringRef triple) {
   while (!work.empty()) {
     auto *bb = work.back(); work.pop_back();
     int64_t depth = entry[bb]; bool returned = false;
-    json::Array events, successors;
+    json::Array events, spEvents, successors;
     if (bb->isEHPad() || bb->hasAddressTaken()) reject("EH/address-taken CFG block");
     for (const auto &mi : *bb) {
       if (mi.isDebugInstr() || mi.isCFIInstruction()) continue;
@@ -185,12 +186,14 @@ json::Object outgoingObservation(MachineFunction &mf, StringRef triple) {
         if (op != "CALL64pcrel32" || !callee || !callees.count(callee))
           reject("unproved machine call/cleanup identity");
         if (depth % 16 != 8) reject("call-site SP is not SysV-aligned");
+        events.push_back(json::Object{{"kind", "call"}, {"callee", callee ? callee->getName() : StringRef("")}, {"depth", depth}});
         calls.push_back(json::Object{{"block", bb->getNumber()}, {"opcode", op},
           {"callee", callee ? callee->getName() : StringRef("")}, {"entry_sp_depth", depth}});
         continue; // Supported C call+return is net zero, excluding callee storage.
       }
       if (mi.isReturn()) {
         returned = true;
+        events.push_back(json::Object{{"kind", "return"}, {"depth", depth}});
         if (op != "RET64" || depth != 0 || !bb->succ_empty()) reject("unbalanced/unsupported return");
         continue;
       }
@@ -213,7 +216,8 @@ json::Object outgoingObservation(MachineFunction &mf, StringRef triple) {
       if ((delta > 0 && depth > std::numeric_limits<int64_t>::max() - delta) ||
           (delta < 0 && depth < -delta)) { reject("negative/overflowing SP depth"); continue; }
       depth += delta; peak = std::max(peak,uint64_t(depth));
-      events.push_back(json::Object{{"opcode", op}, {"delta", delta}, {"depth", depth}});
+      spEvents.push_back(json::Object{{"opcode", op}, {"delta", delta}, {"depth", depth}});
+      events.push_back(json::Object{{"kind", "sp"}, {"opcode", op}, {"delta", delta}, {"depth", depth}});
     }
     if (bb->succ_empty() && !returned) reject("unproved terminal CFG path");
     for (const auto *next : bb->successors()) {
@@ -222,8 +226,9 @@ json::Object outgoingObservation(MachineFunction &mf, StringRef triple) {
       if (inserted) work.push_back(next);
       else if (at->second != depth) reject("unequal CFG join or accumulating stack cycle");
     }
-    blocks.push_back(json::Object{{"block", bb->getNumber()}, {"entry_depth", entry[bb]},
-      {"exit_depth", depth}, {"successors", std::move(successors)}, {"sp_events", std::move(events)}});
+    unsigned layout = 0; for (const auto &candidate : mf) { if (&candidate == bb) break; ++layout; }
+    blocks.push_back(json::Object{{"block", bb->getNumber()}, {"layout", layout}, {"entry_depth", entry[bb]},
+      {"exit_depth", depth}, {"successors", std::move(successors)}, {"sp_events", std::move(spEvents)}, {"ordered_events", std::move(events)}});
   }
   if (entry.size() != mf.size()) reject("uncovered machine CFG blocks");
   const bool complete = errors.empty();
@@ -577,6 +582,12 @@ const DataLayout& AotObjectEmitter::data_layout() const { return impl_->layout; 
 const std::string& AotObjectEmitter::triple() const { return impl_->triple; }
 std::string AotObjectEmitter::identity() const { return impl_->profile; }
 const std::string& AotObjectEmitter::report() const { return impl_->report; }
+std::string AotObjectEmitter::research_encoded_cfg(const std::filesystem::path &path,
+    const std::string &function, const std::string &certificate) const {
+  auto bytes = MemoryBuffer::getFile(path.string());
+  if (!bytes) throw std::runtime_error("Cannot read research object: " + bytes.getError().message());
+  return inspect_research_cfg((*bytes)->getBuffer(),function,certificate,impl_->profile,*impl_->machine,*impl_->target);
+}
 namespace {
 // Pinned InstCombine simplifyAllocaArraySize: i8,N -> [N x i8],1.
 // Observe the actual RAUW edge while both objects are alive. Shape coincidence,

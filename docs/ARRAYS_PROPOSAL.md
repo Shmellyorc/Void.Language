@@ -2234,3 +2234,170 @@ boundary. No production reconciliation rule was widened across that boundary.
 No public emitter, ABI, source semantics, GC/readonly contracts, native array gate,
 ORC/LSP path, ordinary CI or unrelated receiver-chain code changed. No commits,
 pushes, branches or remote changes.
+
+## 20. Part 5A: research-only final encoded-object CFG verification
+
+Owner reports CI #44 is locked. Reviewed the supplied Research Clanker report
+(final machine certification review of 6740b666), Section 19 and the rolling work
+log. The hybrid direction is approved, but this checkpoint implements only the
+independent encoded-CFG pilot. No instruction labels, emission-origin hooks, ABI
+ledger, storage reconciliation, public activation or native arrays are introduced.
+The 65,536-byte policy and every existing certification rejection remain intact.
+
+### 20.1 Read-only verifier and supported boundary
+
+AotObjectEmitter::research_encoded_cfg reuses the staged service's exact LLVM
+19.1.7 TargetMachine/profile and installed object/MC facilities. Its implementation
+is in src/backend/llvm/encoded_cfg.cpp. It reads an existing object; it never emits,
+replaces or delivers one. The explicit compiler-fixture --research-cfg entry writes
+only a separate research JSON report. deliver() and checkObject() retain their
+existing decisions, including the separate signed-PUSH/tail gates.
+
+The bounded profile is Linux x64, little-endian ELF64, ET_REL/ET_EXEC/ET_DYN,
+and one explicitly selected function. ObjectFile/computeSymbolSizes establish
+section/function extents; overlapping function extents, aliases that make linked
+function addresses ambiguous, missing symbols and truncated extents reject.
+MCDisassembler must decode every byte into exact instruction intervals. The small
+explicit opcode allowlist contains the observed integer/register/memory operations,
+NOPs, supported RSP immediate arithmetic, 64-bit pushes/pops, direct calls,
+JCC/JMP short/near branches and RET64. Unknown opcodes/SP writers, indirect calls/
+branches, unfamiliar returns and failed/soft decoding reject.
+
+MCInstrAnalysis evaluates direct local branch targets. Every target must stay
+within the function and land on a decoded instruction boundary. Conditional edges
+include the taken target and fallthrough; JMP has no fallthrough; calls require a
+continuation; RET terminates. Missing fallthrough, unreachable decoded bytes and
+incomplete function coverage reject. The report records intervals, original bytes,
+opcodes, branch targets, fallthroughs, successors, ordered events and entry depths.
+The selected function is not a whole-image or extra-thunk coverage certificate.
+
+For ET_REL, only exact five-byte direct-call R_X86_64_PLT32/R_X86_64_PC32 operands
+with addend -4 are supported. The relocation must cover the call displacement,
+not an opcode, branch or other immediate. Unsupported relocation types in the
+selected code section, duplicate/unused relevant relocations and relocations crossing
+function boundaries reject. Local branches must have fully resolved targets without
+relocation. Linked-image calls must resolve to an exact defined function symbol;
+unidentified PLT stubs/thunks and indirect edges reject. Other sections' unrelated
+relocations are outside this selected-function experiment. Linker transformations
+and the full call target/ABI contract remain future proof obligations.
+
+### 20.2 Exact-depth dataflow and machine comparison
+
+A worklist propagates one exact entry-relative SP depth per decoded instruction.
+Every join/backedge must agree; growing cycles, negative/overflowing depths,
+misaligned call-site SP and unbalanced returns reject. Balanced loops are analyzed
+without enumerating iterations. CALL is modeled as net zero across its continuation
+under the explicit ordinary Linux x64 C caller-pop contract, excluding callee
+execution and the transient return-address push. This is a stated pilot assumption,
+not a newly proved per-call ABI ledger. Tail calls remain unsupported.
+
+The existing machine observer now adds layout and ordered_events (SP, call, return)
+while preserving its prior sp_events field. The verifier independently constructs
+its encoded event graph, retaining successor relationships through non-event
+instructions. It compares event order, labels/depths, successor sets, entry set and
+peak with a complete same-profile machine observation. Missing or altered evidence
+rejects. The comparison is deliberately tied to the current layout/event order;
+it does not infer an origin map, accept an arbitrary graph isomorphism or silently
+normalize an unfamiliar machine expansion. Non-event instructions still receive
+independent encoded boundary, reachability and opcode checks. Their exact machine
+instruction attribution remains Part 5B.
+
+Event-free cycles reject conservatively. Traversal uses explicit worklists rather
+than recursive path enumeration. Research resource guards limit a selected symbol
+to 1 MiB and decoded instructions/machine blocks/events to 4,096. These bounds
+limit this pilot's analysis workload; they are not new compiler storage budgets,
+array extent limits or approvals of any native frame size.
+
+Every result carries the exact profile and input object SHA-256. supported=true
+means only supported intraprocedural CFG/SP analysis under the stated call contract.
+The independent flags delivery_credit, abi_ownership_proved and
+physical_memory_bound_proved remain false. SP movement does not prove red-zone,
+stack-derived memory, probing, realignment, hidden-home ownership or total recursive
+call-chain storage. No new O, R or budget credit is granted, even below 65,536 bytes.
+Signed PUSH forms can share a measured SP effect here without overriding the old
+machine-to-object encoding rejection or claiming their origin transformation proved.
+
+### 20.3 Mandatory mutation and regression scope
+
+The exact retained Part 4 branch original passes supported encoded analysis and
+agrees with the fresh ordered machine observation. Its retained never-executed
+mutation, with identical flattened SP/call lists, rejects as an inconsistent join/
+growing stack cycle. Both original and negative object hashes are independently
+checked before/after inspection and against the retained Part 4 metadata.
+Neither input is modified, and the negative is never executed.
+
+The existing arrays_storage_audit suite also contains self-contained normal/O2
+ELF fixtures. A real emitted conditional function with two direct C call alternatives
+passes machine/event comparison. Copy-only branch retargets to frame setup and into
+an instruction reject. The original bytes and rejected copies remain unchanged.
+These fixtures require no retained build artifacts and do not add a CI workflow.
+
+tools/ci/aot_encoded_cfg_probe.py exercises the retained mandatory pair and ordinary
+normal/O2 controls in linked and relocatable forms. Positives cover both branch
+paths, reserved/nonreserved areas, padding, multiple calls, loops, near-limit homes
+and hidden results. A supported CFG does not rescue the latter candidates' existing
+storage-origin/ownership failures. Negatives additionally cover unknown instructions,
+indirect flow, unknown SP writes, unbalanced returns, truncated decoding, missing
+conditional/ordinary fallthrough, out-of-function/mid-instruction targets, unreachable
+bytes, event-free/growing cycles, unequal joins, unsupported/wrong-addend/branch/
+boundary relocations, mismatched profiles and missing/altered machine events/edges.
+Synthetic wide/narrow signed PUSH cases compare stack effects only; production
+encoding acceptance is unchanged. All altered copies are explicitly never executed.
+
+### 20.4 Actual results and review boundary
+
+LLVM/Clang tools and SDK: 19.1.7, native Linux x64 only. The completed adversarial
+driver passes 92 checks in each of Debug, Release and strict ASan/UBSan: 60 supported
+research cases and 32 required rejections/input-protection checks per build. It
+independently disassembles the retained mandatory pair and checks identical flattened
+SP/call lists. The original's decoded peak is 88 bytes; the retarget rejects both
+with and without machine comparison. The old native control hash remains
+E56F290C3DC2902D01099A043F02F78D272487BDF03C2B9BB0E29061318F58A0.
+No mutation is executed. The 4,096-instruction boundary passes; 4,097 rejects.
+
+Malformed JSON errors are consumed through LLVM's Expected API before reporting
+rejection. Missing SP deltas, machine layout/events/edges and mismatched profiles
+reject. Foreign ELF ABI/machine/flags reject. The fixture CLI forbids report paths
+that alias object or machine inputs, including canonical/equivalent paths; collision
+regressions use disposable copies so a failing guard cannot damage retained evidence.
+The inspected originals and all final input hashes are unchanged. These checks add
+no serialized-certificate import or publication authority.
+
+Full Debug passes 61/61 (90.96 s; audit 10.58 s); full Release passes 61/61
+(33.20 s; audit 2.82 s). After final research-only malformed-input/ABI/report guards,
+focused audits pass again, Debug 9.03 s and Release 2.65 s, together with the final
+92-case drivers above. Strict audit/foundation/generated-runtime/interfaces pass
+4/4 (16.44 s; audit 6.49 s), with ASan leak detection/abort and UBSan halt/stack
+reporting enabled with permitted ptrace. The strict 92-case driver uses the same
+settings. No full sanitizer or six-configuration matrix is claimed.
+
+The complete staged AOT corpus is unchanged: 334 attempts, 275 accepted / 59 rejected,
+all individual outcomes identical to Part 4. The 288 exact source-identity routes
+retain identical profile, frozen IR, optimized IR, inventory and private-object hashes.
+All 15 original integration scripts pass. Accepted CLI objects pass 1,596 exact
+comparisons / 3,192 native runs. Seven complete assertion harness pairs pass
+(14 runs); nine configurations remain rejected/not linked. Every rejection retains
+its sentinel. Overlapping reasons stay 54 unmatched, 14 incoming, two final-SP/PUSH
+and three final-call/tail. No rejected object is linked or executed.
+
+The outgoing native witness driver passes again: 36 debugger executions plus
+72 ordinary runs, 36 at hard/soft 1 MiB, ASLR enabled. Debug and Release production
+main/handoffs normal/O2 small-stack selections each pass 64 comparisons / 128 native
+runs, including 64 at 1 MiB. These corroborate native behavior, not whole-program
+certification. The historical interface crash capture is preserved without a new
+cause/fix claim. No Windows/macOS execution or portability proof is claimed.
+
+Evidence: build/p23-2-part5a-cfg-{debug,release,sanitizers}-complete retains all
+92 reports/cases per build, mandatory disassemblies/flattened equality, input hashes
+and never-executed negatives. build/p23-2-part5a-corpus contains complete.json,
+records.jsonl, part5a-evidence-summary.json, IR, objects/sentinels and native logs.
+Other evidence is in build/p23-2-part5a-outgoing-native and
+build/p23-2-part5a-small-stack-{debug,release}; build/CTest logs use the same prefix.
+Earlier exploratory/incomplete directories are not acceptance evidence.
+
+Stop for boss/wrench review. Part 5A's bounded encoded CFG/SP milestone is met;
+verified emission origins, exact non-event machine attribution, call-site ABI ledger,
+stack-memory-region coverage, physical storage reconciliation and final linked-code
+publication remain unproved. No later hybrid stage, LLVM hook/fork, acceptance
+increase, budget change, public activation, native arrays, ORC/LSP integration,
+Git mutation or CI workflow edit is included.

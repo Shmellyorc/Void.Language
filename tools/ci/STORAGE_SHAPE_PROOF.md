@@ -162,3 +162,39 @@ both files and requires identical flattened SP/call lists. The modified file is
 never executed or submitted for delivery. encoded-cfg-gap.json documents why the
 existing linear final check cannot certify machine CFG path multiplicity.
 See proposal Section 19 for the activation stop and required architectural review.
+
+## Part 5A: read-only encoded-CFG pilot
+
+Build/run the existing audit suite to generate current ordered machine observations.
+The outgoing driver above can generate ordinary native controls in a fresh directory.
+Then run:
+
+```sh
+python3 tools/ci/aot_encoded_cfg_probe.py \
+  --audit build/ci-debug/void_arrays_storage_audit \
+  --fixtures 'build/ci-debug/storage shape fixtures' \
+  --controls build/aot-outgoing-example --llvm-bin /usr/lib/llvm-19/bin \
+  --output build/aot-encoded-cfg-example
+```
+
+For the exact retained Part 4 mandatory pair, use
+--controls build/p23-2-part4-outgoing-final. The driver verifies both hashes against
+encoded-cfg-gap.json, requires the original to pass and the never-executed retarget
+to reject, and preserves all inputs. Its other altered copies are never executed.
+It also tests normal/O2 linked and relocatable controls and explicit malformed
+instruction, edge, relocation and machine-evidence cases. This driver needs no
+ptrace; only the separate outgoing native-witness driver does.
+
+The read-only fixture command for one function is:
+
+```sh
+build/ci-debug/void_arrays_storage_audit --research-cfg object.o sample \
+  machine.certificate.json research.json normal
+```
+
+Use O2 for an O2 profile or '-' for no machine comparison. Exit 0 means supported
+research CFG analysis, exit 2 means research rejection. Neither authorizes delivery.
+JSON always records input SHA-256, profile and false delivery/ownership/memory-bound
+credits. Public AOT and all old staged certification decisions stay unchanged.
+See proposal Section 20 for the explicit opcode/relocation subset, conditional C
+call-continuation contract, selected-function scope and remaining origin/ABI gates.

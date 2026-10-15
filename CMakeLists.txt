@@ -71,7 +71,7 @@ add_library(void_core src/frontend/source.cpp src/frontend/compiler.cpp src/fron
 target_link_libraries(void_core PUBLIC void_options)
 add_library(void_runtime src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp)
 target_link_libraries(void_runtime PUBLIC void_options Threads::Threads)
-add_library(void_llvm src/backend/llvm/backend.cpp src/backend/llvm/storage_audit.cpp)
+add_library(void_llvm src/backend/llvm/backend.cpp src/backend/llvm/storage_audit.cpp src/backend/llvm/encoded_cfg.cpp)
 target_include_directories(void_llvm SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 separate_arguments(VOID_LLVM_DEFINITIONS NATIVE_COMMAND "${LLVM_DEFINITIONS}")
 target_compile_options(void_llvm PRIVATE ${VOID_LLVM_DEFINITIONS})

@@ -8,6 +8,9 @@
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/SourceMgr.h>
 #include <llvm/TargetParser/Host.h>
+#include <llvm/Object/ObjectFile.h>
+#include <llvm/Object/SymbolSize.h>
+#include <llvm/Support/MemoryBuffer.h>
 #include <llvm/TargetParser/Triple.h>
 #include <filesystem>
 #include <fstream>
@@ -103,6 +106,43 @@ void outgoingFixtures(const std::filesystem::path &out, bool optimized) {
         auto j=report(e);auto *o=j.getAsObject()->getObject("functions")->getObject("sample")->getObject("outgoing_sp_observation");
         check(!o->getBoolean("complete_machine_observation").value_or(true) && o->get("peak_entry_sp_depth")->kind()==llvm::json::Value::Null,"unsupported outgoing shape received a bound");
         std::ofstream evidence(base.string()+".json");evidence<<e.report();
+    }
+}
+void researchCFGFixtures(const std::filesystem::path &out, bool optimized) {
+    llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),optimized);
+    auto m=parse(c,e,"declare i64 @one(ptr)\ndeclare i64 @two(ptr)\ndefine i64 @sample(i32 %go){\n %a=alloca [32 x i8],align 8\n %test=icmp eq i32 %go,0\n br i1 %test,label %yes,label %no\nyes:\n %x=call i64 @one(ptr %a)\n ret i64 %x\nno:\n %y=call i64 @two(ptr %a)\n ret i64 %y\n}\n");
+    auto inv=inventory(*m);e.freeze(*m,inv);e.optimize();
+    const auto base=out/(optimized?"research-CFG-O2":"research-CFG-normal");auto object=base.string()+".o";
+    e.deliver(object);const auto original=read(object);
+    auto result=e.research_encoded_cfg(object,"sample",e.report());auto j=llvm::json::parse(result);
+    check(j && j->getAsObject()->getBoolean("supported").value_or(false),"research CFG rejected original: "+result);
+    check(!j->getAsObject()->getBoolean("delivery_credit").value_or(true),"research CFG authorized delivery");
+    {std::ofstream evidence(base.string()+".json");evidence<<result;}
+    auto parsed=llvm::object::ObjectFile::createObjectFile(llvm::MemoryBufferRef(original,"fixture"));check(bool(parsed),"fixture object parser failed");
+    size_t fileOffset=0;
+    for(auto &[symbol,size]:llvm::object::computeSymbolSizes(**parsed)) {
+        auto name=symbol.getName();check(bool(name),"unreadable fixture symbol");if(*name!="sample")continue;
+        auto section=symbol.getSection();auto address=symbol.getAddress();check(bool(section)&&bool(address),"unreadable fixture section");
+        auto content=(**section).getContents();check(bool(content),"unreadable fixture bytes");
+        fileOffset=size_t(content->data()-original.data())+size_t(*address-(**section).getAddress());
+    }
+    check(fileOffset>0,"missing fixture function offset");
+    auto *instructions=j->getAsObject()->getArray("instructions");check(instructions,"missing decoded instructions");
+    const llvm::json::Object *branch=nullptr;
+    for(const auto &v:*instructions) {auto *n=v.getAsObject();auto op=n->getString("opcode").value_or("");if(op=="JCC_1" || op=="JCC_4"){branch=n;break;}}
+    check(branch,"fixture lost conditional branch");
+    auto offset=*branch->getInteger("offset"),size=*branch->getInteger("size");unsigned width=size==2?1:4;
+    for(bool middle:{false,true}) {
+        auto bytes=original;int64_t delta=(middle?1:0)-offset-size;
+        check(width==4 || (delta>=-128 && delta<=127),"fixture displacement does not fit");
+        for(unsigned n=0;n<width;++n) bytes[fileOffset+size_t(offset+size-width+n)]=char(uint64_t(delta)>>(8*n));
+        const auto negative=base.string()+(middle?"-middle.never-executed.o":"-cycle.never-executed.o");
+        {std::ofstream file(negative,std::ios::binary);file.write(bytes.data(),std::streamsize(bytes.size()));}
+        auto rejection=e.research_encoded_cfg(negative,"sample",e.report());auto r=llvm::json::parse(rejection);
+        check(r && !r->getAsObject()->getBoolean("supported").value_or(true),"mutated branch received supported CFG");
+        check(r->getAsObject()->getString("error").value_or("").contains(middle?"middle of instruction":"inconsistent join/growing"),"wrong branch rejection: "+rejection);
+        check(read(negative)==bytes && read(object)==original,"read-only verifier changed objects");
+        std::ofstream evidence(negative+".json");evidence<<rejection;
     }
 }
 void fixtures(const std::filesystem::path &out, bool optimized) {
@@ -329,6 +369,7 @@ void fixtures(const std::filesystem::path &out, bool optimized) {
     const llvm::Triple native(llvm::sys::getDefaultTargetTriple());
     if(native.isOSLinux() && native.getArch()==llvm::Triple::x86_64) {
         outgoingFixtures(out,optimized);
+        researchCFGFixtures(out,optimized);
         llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),optimized);
         auto m=parse(c,e,"declare void @many(ptr,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64)\ndefine void @sample(){ %a=alloca [65520 x i8],align 8\n call void @many(ptr %a,i64 1,i64 2,i64 3,i64 4,i64 5,i64 6,i64 7,i64 8,i64 9,i64 10)\n ret void }\n");
         auto inv=inventory(*m);e.freeze(*m,inv);e.optimize();
@@ -345,6 +386,17 @@ void fixtures(const std::filesystem::path &out, bool optimized) {
 }
 int main(int argc,char **argv) {
     try {
+        if(argc==7 && std::string(argv[1])=="--research-cfg") {
+            auto aliases=[](const std::filesystem::path &a,const std::filesystem::path &b) {
+                std::error_code ec;
+                return std::filesystem::weakly_canonical(a)==std::filesystem::weakly_canonical(b) || std::filesystem::equivalent(a,b,ec);
+            };
+            check(!aliases(argv[2],argv[5]) && (std::string(argv[4])=="-" || !aliases(argv[4],argv[5])),"Research report must not replace input evidence");
+            AotObjectEmitter emitter(llvm::sys::getDefaultTargetTriple(),std::string(argv[6])=="O2");
+            auto result=emitter.research_encoded_cfg(argv[2],argv[3],std::string(argv[4])=="-"?"":read(argv[4]));
+            {std::ofstream output(argv[5]);output<<result;}
+            auto parsed=llvm::json::parse(result);return parsed->getAsObject()->getBoolean("supported").value_or(false)?0:2;
+        }
         if(argc==4 && std::string(argv[1])=="--emit-architecture-proof") {
             emit_aot_storage_proof(ir::architecture_proof(),argv[2],std::string(argv[3])=="O2",
                 std::string(argv[2])+".certificate.json",ProofAdapter::architecture);return 0;

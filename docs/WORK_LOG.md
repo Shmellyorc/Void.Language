@@ -7830,3 +7830,92 @@ build/p23-2-part4-production-native; build/p23-2-part4-small-stack-{debug,releas
 and build/p23-2-part4 build/CTest logs. Reproduction instructions are in
 tools/ci/STORAGE_SHAPE_PROOF.md. Stop for boss/wrench review. No Git mutations,
 remote modifications, CI changes or unrelated compiler/runtime edits.
+
+## 15 October 2026: P23-2 Part 5A encoded-object CFG research pilot
+
+Owner reports CI #44 is locked. Reviewed the Research Clanker hybrid architecture
+report supplied in this conversation, proposal Section 19 and the rolling work log.
+Implemented only the Linux x64 independent encoded-CFG checkpoint. The report's
+emission-origin, ABI-ledger and reconciliation stages remain deferred. Proposal
+Section 20 and tools/ci/STORAGE_SHAPE_PROOF.md describe scope and reproduction.
+
+### Implemented and confirmed
+
+- Added read-only AotObjectEmitter::research_encoded_cfg and a small internal
+  encoded_cfg.cpp service using the existing exact TargetMachine/profile, LLVM
+  19.1.7 ObjectFile/ELF, MCDisassembler, MCInstrInfo and MCInstrAnalysis facilities.
+  The explicit --research-cfg option exists only in the compiler fixture binary.
+  Public AOT, deliver/checkObject decisions and the 65,536-byte policy are unchanged.
+- Reconstructs exact instruction intervals, local direct branches/fallthroughs,
+  direct-call continuations, ordered SP/call/return events and reachable exact SP
+  depths. Unknown opcodes/SP writes, indirect flow, unfamiliar relocations/returns,
+  targets outside a function or into an instruction, missing fallthrough, inconsistent
+  joins/growing cycles and incomplete byte coverage reject. Supported call relocation
+  semantics are restricted to PLT32/PC32 displacement fields with addend -4; linked
+  calls need an exact function-symbol target. Unknown thunks/branch relocations reject.
+- Added layout/ordered_events to the existing machine observation while preserving
+  its old sp_events data. Independently decoded event order/edges/depth/peak compare
+  against complete same-profile machine evidence. No arbitrary graph matching,
+  origin guess, emission labels or new subtraction credit is introduced.
+- Explicitly selected-function research scope, finite opcode subset, ELF ABI checks
+  and analysis workload caps are documented. Research guards (1 MiB symbol extent,
+  4,096 instructions/blocks/events) are not compiler storage limits. Results always
+  deny delivery, ABI ownership and physical-memory-bound credit. Ordinary Linux x64
+  C call-return SP behavior is a stated pilot contract, not an implemented ABI ledger.
+  Red-zone/stack-derived memory, probing, full linker coverage and recursive-chain
+  storage remain separate obligations.
+- Mandatory exact Part 4 original passes (peak 88) and its untouched, never-executed
+  retarget rejects as inconsistent join/growing cycle, both with and without machine
+  evidence. Independent disassembly confirms identical flattened SP/call lists.
+  Retained original SHA-256 remains E56F290C3DC2902D01099A043F02F78D272487BDF03C2B9BB0E29061318F58A0.
+- Added self-contained normal/O2 compiler regressions for an emitted two-path function
+  and copy-only cycle/mid-instruction mutations. Existing assertions, sentinel tests,
+  native-array prohibition, signed-PUSH/tail, lineage and ownership gates remain.
+- Added tracked aot_encoded_cfg_probe.py. It tests linked/relocatable normal/O2 cases,
+  both alternatives, balanced loops, padding, multiple calls, near-limit homes and
+  hidden results, plus malformed instruction/edge/relocation/machine-evidence cases.
+  Malformed LLVM JSON errors are consumed before rejection; foreign ABI flags and
+  missing machine fields reject. CLI report/input alias guards preserve evidence.
+  Collision tests use disposable copies, never risk the retained originals. Wide/
+  narrow signed pushes compare stack effects only; the production encoding gate
+  remains unchanged. All negatives are never executed.
+
+### Actual verification
+
+- Final encoded-CFG driver: 92 checks in each of Debug, Release and strict ASan/UBSan,
+  each 60 supported research cases / 32 required negative or input-preservation
+  checks. Includes the exact retained mandatory pair, unchanged input hashes,
+  machine-evidence alterations, malformed JSON, ELF profiles, instruction-resource
+  boundary 4,096 pass / 4,097 reject, and report collision protection. No input is
+  modified or executed by this read-only driver.
+- Full Debug 61/61, 90.96 s (audit 10.58 s); full Release 61/61, 33.20 s
+  (audit 2.82 s). Final research-input guard changes were followed by focused
+  audits: Debug 9.03 s, Release 2.65 s, and all final 92-case drivers.
+- Strict ASan/UBSan audit/foundation/generated-runtime/interfaces 4/4, 16.44 s
+  (audit 6.49 s), leak detection/abort and halt/stack reporting enabled with permitted
+  ptrace. The independent 92-case sanitizer driver retains the same strict settings.
+  No full sanitizer/six-configuration matrix or new hosted result is claimed.
+- Complete staged corpus: 334 attempts, 275 accepted / 59 rejected, every outcome
+  unchanged from Part 4. All 288 exact source-identity routes retain identical profile,
+  frozen/optimized IR, inventory and object hashes. All 15 original integration
+  scripts pass; accepted CLI objects pass 1,596 comparisons / 3,192 native executions.
+  Seven complete assertion harness pairs pass (14 runs); nine remain rejected/not
+  linked. Rejection counts stay 54 unmatched, 14 incoming, two SP/PUSH, three call/tail,
+  overlapping by module. All rejection sentinels survive; no rejected object executes.
+- Native outgoing witnesses pass again: 36 GDB runs plus 72 ordinary runs, 36 at
+  hard/soft 1 MiB with ASLR enabled. Debug/Release production main/handoffs selections
+  each pass 64 comparisons / 128 runs, including 64 at 1 MiB. Rejected null_failure
+  stays in the complete corpus rather than being claimed as selected success.
+- Debug interface crash capture remains untouched. Passing tests establish no
+  attribution or fix for the historical crash. No Windows/macOS execution, complete
+  physical storage certificate, source native arrays or ORC/LSP activation is claimed.
+
+Artifacts: build/p23-2-part5a-cfg-{debug,release,sanitizers}-complete;
+build/p23-2-part5a-corpus/{complete.json,records.jsonl,part5a-evidence-summary.json};
+build/p23-2-part5a-outgoing-native; build/p23-2-part5a-small-stack-{debug,release};
+and matching build/CTest logs. Exploratory runs are retained separately.
+
+Stop for boss/wrench review. The bounded Part 5A milestone is met. Emission-origin
+hooks, exact attribution/ABI ownership, memory-region proof, storage reconciliation
+and production publication remain future gates. No commits, pushes, branches,
+remote changes, normal CI edits or unrelated runtime/compiler semantics changes.
