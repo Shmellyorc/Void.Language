@@ -1,3 +1,4 @@
+#include "../storage_proof.hpp"
 #include "proof.hpp"
 #include "void/backend.hpp"
 #include "void/frontend.hpp"
@@ -112,8 +113,9 @@ void active_reload(bool opt) {
 }
 int main(int argc,char** argv) {
     try {
-        if(argc==5 && std::string(argv[1])=="--emit-library") {auto p=vd::compile_project(argv[2]);vd::emit_runtime_object(p.module,argv[3],std::string(argv[4])=="optimized");return 0;}
-        if(argc==5 && std::string(argv[1])=="--emit-reload") {auto text=vd::read_source(argv[2]).text();auto at=text.find("return 7");require(at!=std::string::npos,"reload fixture marker missing");text.replace(at,8,"return 8");auto p=vd::analyze_source({"/stress.void",text});if(!p.succeeded()) throw vd::CompilationError(p.diagnostics);vd::emit_runtime_object(p.program->lower(),argv[3],std::string(argv[4])=="optimized","__reloaded");return 0;}
+        const bool storage_proof = argc==6 && std::string(argv[5])=="--storage-proof";
+        if((argc==5 || storage_proof) && std::string(argv[1])=="--emit-library") {auto p=vd::compile_project(argv[2]);storage_fixture::emit(p.module,argv[3],std::string(argv[4])=="optimized",storage_proof);return 0;}
+        if((argc==5 || storage_proof) && std::string(argv[1])=="--emit-reload") {auto text=vd::read_source(argv[2]).text();auto at=text.find("return 7");require(at!=std::string::npos,"reload fixture marker missing");text.replace(at,8,"return 8");auto p=vd::analyze_source({"/stress.void",text});if(!p.succeeded()) throw vd::CompilationError(p.diagnostics);storage_fixture::emit(p.program->lower(),argv[3],std::string(argv[4])=="optimized",storage_proof,"__reloaded");return 0;}
         require(argc==2,"string project root required");language();independent();string_test::runtime_checks();for(bool opt:{false,true}) {source(argv[1],opt);reload(opt);active_reload(opt);}std::cout<<"UTF-8 string source, IR, roots, failures and reload passed\n";
     }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
 }

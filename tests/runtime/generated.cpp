@@ -1,3 +1,4 @@
+#include "../storage_proof.hpp"
 #include "void/backend.hpp"
 #include "void/runtime.hpp"
 #include "void/runtime_abi.hpp"
@@ -93,7 +94,7 @@ void numeric_loop(bool optimized) {
 int main(int argc, char** argv) {
     try {
         auto module = runtime_test::proof();
-        if (argc == 3) { vd::emit_runtime_object(module,argv[1],std::string(argv[2]) == "optimized"); return 0; }
+        if (argc == 3 || (argc == 4 && std::string(argv[3]) == "--storage-proof")) { storage_fixture::emit(module,argv[1],std::string(argv[2]) == "optimized",argc == 4); return 0; }
         auto rejects = [](const vd::ir::Module& invalid) {
             try { vd::ir::validate(invalid); } catch (const std::invalid_argument&) { return; }
             throw std::runtime_error("invalid runtime IR accepted");

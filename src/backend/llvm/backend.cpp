@@ -1088,8 +1088,10 @@ void emit_runtime_object(const ir::Module& input, const std::filesystem::path& o
 }
 namespace llvm_backend {
 void emit_aot_storage_proof(const ir::Module& input, const std::filesystem::path& output,
-                            bool optimize, const std::filesystem::path& report) {
-    emit_impl(input,output,optimize,true,false,{},true,report);
+                            bool optimize, const std::filesystem::path& report, ProofAdapter adapter,
+                            const std::string& generation_suffix) {
+    emit_impl(input,output,optimize,adapter == ProofAdapter::source,
+              adapter == ProofAdapter::runtime,generation_suffix,true,report);
 }
 }
 }

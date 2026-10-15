@@ -1637,3 +1637,193 @@ source-diagnostic hardening, optimization lineage, full root/staging inventories
 GC safety and borrowing/reload contracts retain their existing gates. Public
 emit_object/emit_runtime_object continue to choose the original branch, not the
 proof entry. See tools/ci/STORAGE_SHAPE_PROOF.md for tracked reproduction commands.
+
+## 17. Production AOT certification Part 2: corpus and binding gates
+
+15 October 2026. Owner reports hosted CI #41 passed all seven jobs, 61/61 suites
+per configuration, locking Section 16. This checkpoint keeps public AOT on its
+original path. The approved 65,536-byte policy is unchanged; source native arrays,
+ORC/LSP activation and later checkpoints remain blocked.
+
+### 17.1 Exact production producers and fail-closed scope
+
+The explicit proof entry now selects the existing source CLI, architecture adapter
+or runtime-library producer, including the existing reload generation suffix.
+Fixture-only --storage-proof arguments reuse the original seven family/library
+producers, the three edited reload producers and runtime_test::proof(). There is
+no second frontend, alternate module builder, environment activation switch or
+public CLI activation. Original arguments still choose emit_object or
+emit_runtime_object and their unchanged original emission branch.
+
+The tracked aot_certificate_corpus.py driver reads configured integration commands
+from CTest JSON and family/program lists from CMake. It captures each successful
+ordinary emission immediately, before generated/imported sources can be edited
+again. It exercises both profiles for the architecture and edited-source fixtures
+that ordinarily emit only O2. All other corpus producers already provide normal
+and O2. Source-invalid diagnostic cases retain their original checks and are not
+counted as native fixture candidates.
+
+Unknown non-spill machine homes and unproved incoming-object ownership now reject
+array-free candidates too. The previous array-free exemption did not constitute a
+storage-lineage or general ABI proof. Current certificates retain every unmatched
+index, physical extent/alignment, current alloca text or absence of an alloca,
+and zero subtraction credit. Dynamic/opaque frames still reject. Every remaining
+LLVM definition must have PEI, late and final-emission machine coverage; emitted
+function bytes must still match the late SP/call certificate. An actual
+available_externally definition with no emitted machine function demonstrates
+incomplete-coverage rejection.
+
+A failed attempt must preserve an existing sentinel destination. It cannot fall
+back to the public emitter, be linked or execute. Ordinary emissions in the
+investigation are separate control objects, never replacements for failed proof
+outputs. Array-free acceptance keeps C=null and does not newly impose the array
+budget or prove future array argument/result/root/borrow accounting.
+
+### 17.2 Owned profile, inventory and object identity
+
+One single-use service owns the TargetMachine and its actual target triple, generic
+CPU, features, DataLayout, relocation/code model, machine optimization and pinned
+LLVM 19.1.7 options. Its profile distinguishes verify-only IR from the unchanged
+PassBuilder(no-TM) default O2 pipeline. Per-function target-cpu, tune-cpu,
+target-features or target-abi attributes that disagree with the owned profile
+reject before emission. Target triple/DataLayout are checked again at each boundary.
+
+After the approved CLI-home normalization, freeze records the exact normalized
+module SHA-256 and an owned serialization/hash of original home identities,
+roles, kinds, target-derived extents/alignment, P and policy applicability.
+Optimization rejects intervening caller edits, then records its exact output
+module SHA-256. Delivery rejects later edits before instruction selection. The
+original allocation WeakVH identities remain independent of these content hashes;
+matching hashes do not manufacture missing transformation lineage. A caller's
+later changes to its LoweringInventory cannot change the frozen service.
+
+The resulting certificate includes the owned profile, serialized inventory,
+both module hashes and the private emitted object SHA-256. The corpus driver
+independently checks those hashes and optimization identity against saved IR and
+delivered bytes for each accepted candidate. Machine reconciliation, post-printer
+comparison and final encoded SP/call checks remain mandatory before delivery.
+No serialized certificate import, external cache acceptance or cryptographic
+attestation is implemented or claimed. Reuse across modules/profiles is forbidden
+by the service lifecycle, not enabled by a hash-only cache.
+
+The corpus also found a staged report lifetime defect: entry_home_moves stored a
+StringRef to an original basic-block name. O2 could delete that block before JSON
+serialization, leaving invalid UTF-8 in original_block. Freeze now owns that name.
+The CLI microfixture checks that both parse/run names survive normal/O2, and corpus
+logs/certificates use strict UTF-8 decoding. This reporting correction changes no
+source, runtime, public AOT or array semantics. It does not attribute or resolve the
+historical interfaces_source crash. That suite's phase/mode/core instrumentation
+is preserved.
+
+### 17.3 Confirmed blockers and review boundary
+
+Existing production value-struct functions require incoming stack-object ownership
+that the general service has not proved. For value_structs/main.void, choose has
+two incoming objects (8 bytes at entry SP+16 and 1 byte at entry SP+8), P=49 and
+F=0 in the normal Linux x64 fixture. Their presence is measured; no caller/callee
+ownership assumption is awarded. Both normal/O2 main and numeric fixtures now have
+focused destination-preserving rejection tests.
+
+The normal numeric entry additionally has a measured 64-byte, align-8 non-spill
+object with no LLVM alloca identity (index 47, P=480, F=600). Its current interface
+cannot prove this object's origin. O2 also leaves unmatched current allocas in
+existing managed functions and inlined receivers, including main wrappers. Current
+size, source spelling or similarity to a deleted home cannot prove that lineage.
+The service rejects rather than crediting such homes or disabling optimization.
+Original lifetime-colored storage reuse still passes its focused fixture with P=512
+and R=0. Array-free and policy-applicable inline-clone negatives both reject.
+
+The normal numeric entry's final encoding also changes PUSH64i32:i1 to PUSH64i8:i1.
+All other recorded SP operands in that example agree. This equivalence is not in
+the proved opcode normalizer, so final-byte certification rejects it as well.
+No broad opcode exemption or unproved emission acceptance was added. This is a
+separate remaining encoding-proof obligation, not evidence of a source compiler
+miscompile.
+
+Stop production activation here. The next proof should establish general incoming
+ABI ownership and trace original storage through actual optimizer/codegen changes,
+including ABI-generated homes without AllocaInst identities. Exact signed-push
+encoding equivalence also needs its own narrowly tested rule before acceptance.
+No guessed ABI allowance, new estimator, budget increase, inlining suppression,
+readonly/GC shortcut or receiver-chain correction is justified by this corpus.
+Full target-native Windows/macOS coverage and future array/root/staging/borrow
+contracts remain gates. Historical Section 16 accepted O2 managed observations
+must not be read as acceptance under this stricter unknown-home requirement.
+
+### 17.4 Actual corpus results and storage inventory
+
+Native Linux x64, installed LLVM 19.1.7, Debug compiler build. All 15 configured
+AOT-related integration scripts pass their original checks. The separate complete
+corpus contains 334 staged attempts, 167 at each profile: 247 accept and 87 reject.
+These are investigation results, not approval of activation.
+
+| Producer | Normal attempted / accepted | O2 attempted / accepted |
+| --- | ---: | ---: |
+| Integration source/architecture, including generated edits | 104 / 100 | 104 / 100 |
+| Seven families' source CLI programs | 52 / 41 | 52 / 1 |
+| Runtime libraries | 7 / 3 | 7 / 0 |
+| Edited reload generations | 3 / 1 | 3 / 0 |
+| Generated runtime IR | 1 / 1 | 1 / 0 |
+
+Across 1,972 observed machine functions, the complete reports retain every live
+frame object, original home purpose/extent, incoming object, call area, SP writer,
+post-PEI observation and final encoded comparison. The driver groups 32 combinations
+of recorded home kinds, CLI moves, zero extents, lifetime markers, incoming and
+unmatched objects. These combinations are an index into the full per-object reports,
+not an exhaustive taxonomy of future storage behavior.
+
+Observed original kinds are value, argument, root, Frame, Slot array, staging and
+both CLI ABI homes. No evidence here establishes future fixed-array result/copy,
+reference-bearing array or borrow inventories. There are 310 CLI-home move records
+at function level, 29 functions with exact zero-home mappings, 40 with lifetime
+markers, 14 with incoming objects and 309 with unmatched objects. Zero-byte homes
+retain zero subtraction credit. There are 24 distinct unmatched physical
+size/alignment/alloca-presence combinations, including allocations without any
+AllocaInst identity. Full extents and identities remain in each certificate.
+
+No corpus frame has variable/opaque storage after the narrowly approved CLI
+normalization. Dynamic/opaque negatives remain in the focused suite. There are
+575 functions whose machine snapshot changes after PEI, demonstrating why the late
+boundary and final-byte check remain necessary. There are also 395 functions with
+local objects below the measured local-frame range, including ordinary Linux
+red-zone storage. These array-free reports have C=null; they do not certify a
+64 KiB physical bound or general red-zone ownership. Policy-applicable fixtures
+continue to reject objects outside their accounted local frame. General target/ABI
+integration remains blocked, rather than extending array policy to ordinary code.
+
+Rejection reasons overlap by module: unmatched allocations occur in 82 candidates,
+unproved incoming ownership in 14, final encoded SP mismatch in two and final call
+mismatch in three. The last category occurs in O2 inheritance stress CLI/library/
+reload virtual thunks. The late machine list includes TAILJMPd64, while the final
+MC call list contains four CALL64pcrel32 entries and no tail-call marker. SP lists
+agree for that thunk. No equivalence between a target tail pseudo and final branch
+classification is assumed. A focused actual inheritance-stress fixture retains
+this rejection and protects an existing destination.
+
+All 242 accepted CLI candidates are independently linked and compared against
+ordinary control objects for six argument cases: 1,452 exact exit/stdout/stderr
+comparisons, 2,904 native executions. Four complete native assertion harness pairs
+also pass (managed, managed_initialization, inheritance and runtime, all normal).
+The other 12 harness configurations are explicitly recorded as rejected/not linked;
+a partly accepted library/reload pair is never executed. The corpus does not run
+new 1 MiB tests or claim the historical Section 16 small-stack witness for newly
+rejected O2 objects. No Windows/macOS native or cross-target execution is claimed.
+
+Evidence and reproduction: tools/ci/STORAGE_SHAPE_PROOF.md and
+build/p23-2-part2-corpus-final/{complete.json,records.jsonl,shape-inventory.json}.
+The directory retains all 334 reports, original/normalized/optimized IR, rejection
+sentinels, accepted objects and native/harness logs. The initial incomplete
+build/p23-2-part2-corpus attempt exposed the report-name lifetime bug and is not
+an acceptance result. Exact source/ABI failure regressions are restricted to
+native Linux x64 observations; other targets retain portable service/scalar tests
+without guessed ABI/encoding assertions. The normal public cross-platform fixture
+corpus and test assertions remain on their existing paths.
+
+Local compiler validation: full Debug 61/61 (65.83 s), followed by final focused
+audit passes in Debug (1.39 s), Release (0.78 s) and strict ASan/UBSan (1.72 s).
+The strict audit/foundation/runtime-generated/interface set also passes 4/4
+(10.11 s), with leak detection and halt/stack reporting enabled. Final additions
+after the broad run were test-only actual-fixture negatives and target guards;
+shared product code was unchanged. No full Release/sanitizer/six-configuration
+matrix, new hosted acceptance or interface-crash attribution is claimed. Public
+activation remains stopped at the general ABI/lineage and final-encoding gates.

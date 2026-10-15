@@ -1,3 +1,4 @@
+#include "../storage_proof.hpp"
 #include "proof.hpp"
 #include "void/backend.hpp"
 #include "void/frontend.hpp"
@@ -301,13 +302,14 @@ void roots(const std::filesystem::path& root,bool optimized) {
 }
 int main(int argc,char** argv) {
     try {
-        if(argc==5 && std::string(argv[1])=="--emit-reload") {
+        const bool storage_proof = argc==6 && std::string(argv[5])=="--storage-proof";
+        if((argc==5 || storage_proof) && std::string(argv[1])=="--emit-reload") {
             auto source=vd::read_source(argv[2]);auto text=source.text();const std::string body="return d.child.value + (d.wide as i32)";
             auto offset=text.find(body);require(offset!=std::string::npos,"reload fixture body absent");text.replace(offset,body.size(),body+" + 1");
             vd::SourceOverrides overrides{{"/stress.void",vd::SourceFile(source.path(),text)}};auto a=vd::analyze_project(argv[2],overrides);if(!a.succeeded()) throw vd::CompilationError(a.diagnostics);
-            vd::emit_runtime_object(a.program->lower(),argv[3],std::string(argv[4])=="optimized","__reloaded");return 0;
+            storage_fixture::emit(a.program->lower(),argv[3],std::string(argv[4])=="optimized",storage_proof,"__reloaded");return 0;
         }
-        if(argc==5 && std::string(argv[1])=="--emit-library") {auto p=vd::compile_project(argv[2]);vd::emit_runtime_object(p.module,argv[3],std::string(argv[4])=="optimized");return 0;}
+        if((argc==5 || storage_proof) && std::string(argv[1])=="--emit-library") {auto p=vd::compile_project(argv[2]);storage_fixture::emit(p.module,argv[3],std::string(argv[4])=="optimized",storage_proof);return 0;}
         if(argc==3 && std::string(argv[1])=="--measure") {performance(argv[2]);return 0;}
         require(argc==2,"inheritance project root required");diagnostics();programs();ir_negative();tooling();admission();for(bool opt:{false,true}) {roots(argv[1],opt);retirement(argv[1],opt);construction_and_imports(argv[1],opt);reload_and_threads(opt);}
         std::cout<<"inheritance: source, exact contracts, prefix stages, virtual effects, IR, sole Base GC roots, reload and navigation passed\n";

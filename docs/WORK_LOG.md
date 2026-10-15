@@ -7451,3 +7451,135 @@ hardening, optimization lineage, full GC/root/staging and borrow/reload proofs
 remain open. The unexplained Debug interface crash also remains unresolved.
 No source native arrays, ORC/LSP work, unrelated receiver-chain correction, CI or
 Git mutations occurred. No commits, pushes, branches or remote modifications.
+
+## 15 October 2026: P23-2 production AOT certification Part 2
+
+Owner reports CI #41 passed all seven jobs, 61/61 suites/configuration. Section 16
+is locked. Reviewed that section and the preceding work-log evidence before this
+checkpoint. Public AOT remains on its restored original branch. No source native
+arrays, ORC/LSP activation, budget change, CI changes or Git mutations.
+
+Implemented only staged integration/proof hardening:
+
+- Added explicit source/architecture/runtime adapter selection to the investigation
+  entry, reusing emit_impl and the actual original generation suffix. Seven family
+  library fixtures, three edited reload producers and generated-runtime IR accept
+  an explicit test-only --storage-proof argument. Existing arguments still select
+  their original public path. The audit test target also links the existing
+  examples/proof.cpp module producer; no new suite or alternate builder was added.
+- The same owned LLVM 19.1.7 TargetMachine/profile supplies freeze and emission.
+  Function CPU/tuning/features/ABI attributes must agree. Frozen normalized IR,
+  immutable target-layout inventory serialization and optimized IR now have SHA-256
+  identities retained alongside the emitted object hash. Edits between freeze,
+  optimization and delivery reject. Tests cover profile/content mismatches and
+  show that mutating the caller's inventory cannot mutate the frozen service.
+- Every remaining definition must have PEI, late and final-emission coverage.
+  Available-externally/no-machine-code coverage now has an explicit negative.
+  Unknown non-spill homes and unproved incoming ownership reject array-free
+  candidates as well as array-policy candidates. No credit is awarded to unknown
+  homes. Reports preserve their exact object index, extent/alignment, current
+  alloca text or absence of an identity. Dynamic/opaque and final SP/call checks
+  remain mandatory. Existing reuse fixture still proves P=512, R=0; array-free
+  and array-policy inline clones reject. The 65,536-byte constant is untouched.
+- Corpus exploration found a staged reporting lifetime bug. entry_home_moves
+  retained a non-owning block-name StringRef across optimization. The first
+  incomplete attempt exposed invalid UTF-8 bytes in original_block after O2
+  removed the block. Freeze now copies that name into owned storage. A regression
+  checks the original parse/run names after normal/O2, and the final corpus uses
+  strict UTF-8 decoding of every log/report. No source diagnostic, compiler ABI,
+  runtime or public-emission semantics changed. This does not establish a cause
+  for the earlier interfaces_source crash.
+
+Complete production corpus investigation:
+
+- tools/ci/aot_certificate_corpus.py reads CTest's configured integration commands
+  and CMake's seven source families. All 15 AOT-related scripts pass their original
+  assertions through an output/status-preserving capture wrapper. Every successful
+  emission is attempted separately at the exact current source snapshot, before
+  imported/generated files change again. Architecture and edited-source fixtures
+  are additionally attempted in normal mode; their ordinary scripts emit O2 only.
+- 334 staged candidates, 167 per profile: 247 accepted, 87 rejected. Integration
+  source/architecture: 208 attempted, 200 accepted. Family source CLI: 104/42.
+  Runtime libraries: 14/3. Edited reloads: 6/1. Generated runtime IR: 2/1.
+  Normal/O2 breakdown and exact routes are in proposal Section 17 and records.jsonl.
+  Every rejected candidate preserves an existing sentinel object. None is linked,
+  run or replaced by fallback emission.
+- All 242 accepted CLI objects are independently linked against the same runtime
+  and compared with ordinary controls: 1,452 identical exit/stdout/stderr cases,
+  2,904 native executions. Four complete native harness pairs pass all original
+  assertions: managed, managed_initialization, inheritance and runtime, normal.
+  The other 12 library configurations are explicitly rejected/not linked when
+  either required generation fails. A partial library pair is not a native pass.
+- Reports cover 1,972 machine functions and 32 observed combinations of home kinds,
+  CLI moves, zero extents, lifetime markers, incoming and unmatched objects. Full
+  per-object extents/offsets/identities and final encoding observations are retained.
+  Observed kinds: value, argument, root, Frame, Slot array, staging, CLI parse and
+  CLI failure. There are 310 function-level CLI move observations, 29 zero-home,
+  40 lifetime-marker, 14 incoming and 309 unmatched observations. The unmatched
+  objects span 24 size/alignment/alloca-presence combinations. No corpus frame is
+  dynamic/opaque after the narrowed CLI normalization; focused negatives still
+  reject such shapes. 575 functions change after PEI. 395 have local objects below
+  the measured local frame, including ordinary Linux red-zone storage. Those
+  array-free C=null reports do not prove an array budget or general ABI bound.
+
+Confirmed activation blockers, left fail-closed:
+
+- Raw aggregate ABI incoming ownership is unproved in existing value-struct paths.
+  Normal choose has P=49, F=0, with 8-byte and 1-byte incoming objects at entry
+  SP+16/+8. The numeric fixture has further incoming stack objects. Normal numeric
+  entry also has an unmatched 64-byte/align-8 machine object with no AllocaInst
+  identity (index 47, P=480, F=600). No general ABI credit or allowance was guessed.
+- O2 leaves unmatched transformed storage in managed functions and receiver/main
+  wrappers. Matching extents/names or a current AllocaInst do not prove original
+  lineage. Under the stronger coverage contract, the previous O2 managed positives
+  become explicit destination-preserving rejection tests. Normal exact managed
+  positives remain, and scalar source CLI positive tests cover both profiles.
+- Numeric normal final encoding changes PUSH64i32:i1 to PUSH64i8:i1; its remaining
+  recorded SP operands agree. This is outside the existing proved normalizer and
+  remains rejected. Three O2 inheritance stress CLI/library/reload thunks also
+  disagree on call classification: late TAILJMPd64 has no MC call marker, while
+  four CALL64pcrel32 entries remain. SP lists agree for that thunk. No tail-pseudo
+  or signed-push equivalence was silently admitted.
+- Rejection categories overlap: unmatched objects in 82 candidates, incoming
+  ownership in 14, final SP mismatches in two, final call mismatches in three.
+  Focused actual value-struct and inheritance tests retain the evidence and assert
+  existing outputs survive. Exact native ABI/encoding expectations are Linux x64
+  only; other targets retain portable service/scalar cases without invented results.
+
+Actual local validation:
+
+- Complete Debug build and 61/61 tests pass, 65.83 s with four CTest workers.
+  This includes ordinary native AOT, compiler/frontend/IR/runtime/GC/reload,
+  string/interface and editor/LSP tests. Public activation was off throughout.
+- Release audit suite passes. After the final actual aggregate/tail-call rejection
+  regressions, Debug audit passes 1/1 (1.39 s), Release 1/1 (0.78 s).
+- Strict ASan/UBSan audit/foundation/runtime_generated/interfaces_source passes
+  4/4 (10.11 s). The final extended audit passes again, 1/1 (1.72 s). Leak detection,
+  abort/halt on error and UBSan stack traces stay enabled. These native runs used
+  approved execution outside the ptrace-restricted sandbox; no check was disabled.
+- Python compilation and whitespace/diff checks pass. Final native corpus
+  complete.json is true, with the separate 247 accepted/87 rejected counts above.
+  The initial incomplete corpus directory is preserved as reporting-bug evidence,
+  not cited as a successful experiment. Later test-only additions/target guards
+  received the final focused checks; shared product code stayed unchanged after
+  the full Debug and complete corpus runs.
+
+Reproduction: tools/ci/STORAGE_SHAPE_PROOF.md. Evidence:
+build/p23-2-part2-corpus-final contains complete.json, records.jsonl,
+shape-inventory.json, all 334 certificates and three IR snapshots per candidate,
+objects/sentinels, native binaries and harness logs. Build/test logs use the
+build/p23-2-part2-* names. No new 1 MiB test, full Release/sanitizer/six-configuration
+matrix, hosted run, Windows/macOS native execution or cross-target validation is
+claimed. Historical small-stack observations do not validate newly rejected O2
+objects. The older storage_shape_probe.py is documented as a historical Section 16
+driver, not an all-pass gate for the stricter service.
+
+Stop for boss/wrench review. General incoming ABI ownership, original-to-transformed
+storage lineage, allocationless machine homes, exact push/tail encoding proof,
+general red-zone ownership and target-native coverage remain unproved. The next
+checkpoint should address those concrete boundaries before activation, preserving
+current rejection. Source native arrays, GC/root/staging completeness, const-formal
+borrow/reload, ORC/LSP and receiver-chain hardening retain their separate gates.
+The historical Debug interface crash remains unexplained; existing phase/mode/core
+capture instrumentation is preserved and passing tests do not establish a fix or
+attribution. No commits, pushes, branches, remote modifications or CI edits.

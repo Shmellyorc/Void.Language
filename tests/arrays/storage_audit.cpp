@@ -8,6 +8,7 @@
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/SourceMgr.h>
 #include <llvm/TargetParser/Host.h>
+#include <llvm/TargetParser/Triple.h>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -92,7 +93,7 @@ void fixtures(const std::filesystem::path &out, bool optimized) {
         auto m=parse(c,e,single(16));auto inv=inventory(*m);e.freeze(*m,inv);e.optimize();
         auto *f=m->getFunction("sample");llvm::IRBuilder<> b(&*f->getEntryBlock().begin());
         auto *extra=b.CreateAlloca(b.getInt32Ty());b.CreateCall(m->getFunction("touch"),{extra,b.getInt64(1)});
-        rejects([&]{e.deliver(path);},"unmatched allocation");check(!std::filesystem::exists(path),"unplanned machine home delivered");
+        rejects([&]{e.deliver(path);},"content mismatch");check(!std::filesystem::exists(path),"unplanned machine home delivered");
     }
     {
         llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),optimized);
@@ -155,6 +156,10 @@ void fixtures(const std::filesystem::path &out, bool optimized) {
         check(initializers[0]->getParent()->getName()=="parse" && initializers[1]->getParent()->getName()=="run","CLI initialization moved across control flow");
         e.optimize();e.deliver(path);auto j=report(e);auto *r=j.getAsObject()->getObject("functions")->getObject("main");
         check(r->getArray("entry_home_moves")->size()==2 && !r->getBoolean("has_variable_objects").value_or(true),"CLI normalization still dynamic");
+        std::set<std::string> original_blocks;
+        for(const auto &move:*r->getArray("entry_home_moves"))
+            original_blocks.insert(move.getAsObject()->getString("original_block").value_or("").str());
+        check(original_blocks==std::set<std::string>{"parse","run"},"frozen block names did not survive O2 deletion");
         std::ofstream evidence(out/(std::string("cli-home-proof")+suffix+".json"));evidence<<e.report();std::filesystem::remove(path);
         for(const std::string reason:{"repeated","alignment","stack-control","variable","shape"}) {
             llvm::LLVMContext nc;AotObjectEmitter ne(llvm::sys::getDefaultTargetTriple(),optimized);auto text=cli;
@@ -183,12 +188,54 @@ void fixtures(const std::filesystem::path &out, bool optimized) {
         auto inv=inventory(*m,false);e.freeze(*m,inv);e.optimize();
         rejects([&]{e.deliver(path);},"unsupported dynamic/opaque frame");check(!std::filesystem::exists(path),"dynamic zero-byte home bypassed certificate");
     }
+    {
+        llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),optimized);
+        auto m=parse(c,e,single(16));auto inv=inventory(*m);e.freeze(*m,inv);
+        // The caller's mutable inventory is not consulted after freezing.
+        inv.complete(*m->getFunction("sample"),{});e.optimize();e.deliver(path);
+        check(report(e).getAsObject()->getString("inventory_sha256")->size()==64,"inventory identity absent");
+        std::filesystem::remove(path);
+    }
+    if(!optimized) {
+        llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),false);
+        auto m=parse(c,e,"define available_externally void @sample(){ret void}\n");
+        auto inv=inventory(*m,false);e.freeze(*m,inv);e.optimize();
+        rejects([&]{e.deliver(path);},"incomplete machine-function coverage");
+        check(!std::filesystem::exists(path),"incomplete machine coverage delivered");
+    }
+    // Array-free inlining must not bypass provenance coverage either.
+    {
+        llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),optimized);
+        auto m=parse(c,e,inlined);auto inv=inventory(*m,false);e.freeze(*m,inv);e.optimize();
+        if(optimized) rejects([&]{e.deliver(path);},"unmatched allocation");
+        else {e.deliver(path);std::filesystem::remove(path);}
+    }
+    for(const std::string attribute:{"target-cpu","tune-cpu","target-features","target-abi"}) {
+        llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),optimized);
+        auto m=parse(c,e,single(16));m->getFunction("sample")->addFnAttr(attribute,"unbound-profile");
+        auto inv=inventory(*m);rejects([&]{e.freeze(*m,inv);},"target profile mismatch");
+        check(!std::filesystem::exists(path),"mismatched function profile delivered");
+    }
+    for(bool before_optimizer:{false,true}) {
+        llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),optimized);
+        auto m=parse(c,e,single(16));auto inv=inventory(*m);e.freeze(*m,inv);
+        if(!before_optimizer) e.optimize();
+        m->getFunction("sample")->addFnAttr("noinline");
+        {std::ofstream owner(path);owner<<"existing owner object";}
+        if(before_optimizer) rejects([&]{e.optimize();},"content mismatch");
+        else rejects([&]{e.deliver(path);},"content mismatch");
+        check(read(path)=="existing owner object","profile/content rejection damaged destination");std::filesystem::remove(path);
+    }
     AotObjectEmitter profile(llvm::sys::getDefaultTargetTriple(),optimized);
     check(profile.identity().find(optimized?"PassBuilder(no-TM)":"verify-only")!=std::string::npos,"optimizer identity incomplete");
 }
 }
 int main(int argc,char **argv) {
     try {
+        if(argc==4 && std::string(argv[1])=="--emit-architecture-proof") {
+            emit_aot_storage_proof(ir::architecture_proof(),argv[2],std::string(argv[3])=="O2",
+                std::string(argv[2])+".certificate.json",ProofAdapter::architecture);return 0;
+        }
         if(argc==5 && std::string(argv[1])=="--emit-proof") {
             auto p=compile_project(argv[2]);emit_aot_storage_proof(p.module,argv[3],std::string(argv[4])=="O2",std::string(argv[3])+".certificate.json");return 0;
         }
@@ -207,11 +254,24 @@ int main(int argc,char **argv) {
             }
             check(runtime.collect()==Runtime::Collection::completed && runtime.snapshot().objects==0,"empty Slot frame leaked root lifetime");
         }
-        for(bool optimized:{false,true}) for(const auto *file:{"main","handoffs"}) {
+        const llvm::Triple target(llvm::sys::getDefaultTargetTriple());
+        const bool linux_x64=target.isOSLinux() && target.getArch()==llvm::Triple::x86_64;
+        // Exact source failure classifications below are native Linux evidence.
+        // Other targets retain the portable service/scalar fixtures, without
+        // inventing incoming-ABI or final-encoding expectations for them.
+        if(linux_x64) for(bool optimized:{false,true}) for(const auto *file:{"main","handoffs"}) {
             auto p=compile_project(std::filesystem::path(argv[2])/"examples/managed_structs"/(std::string(file)+".void"));
             const auto object=out/(std::string(file)+(optimized?"-O2.o":"-normal.o"));
-            emit_aot_storage_proof(p.module,object,optimized,object.string()+".certificate.json");
-            check(std::filesystem::exists(object),"exact AOT fixture did not certify");
+            if(optimized) {
+                std::filesystem::remove(object);
+                {std::ofstream owner(object);owner<<"existing owner object";}
+                rejects([&]{emit_aot_storage_proof(p.module,object,true,object.string()+".certificate.json");},"unmatched allocation");
+                check(read(object)=="existing owner object","actual optimized AOT rejection damaged destination");
+                std::filesystem::remove(object);
+            } else {
+                emit_aot_storage_proof(p.module,object,false,object.string()+".certificate.json");
+                check(std::filesystem::exists(object),"exact AOT fixture did not certify");
+            }
             if(!optimized) {
                 llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),false);
                 auto original=parse(c,e,read(object.string()+".original.ll"));auto incomplete=inventory(*original,false);
@@ -223,6 +283,38 @@ int main(int argc,char **argv) {
                 std::ofstream evidence(out/(std::string(file)+"-unmarked-rejection.json"));evidence<<e.report();
                 std::filesystem::remove(rejected);
             }
+        }
+        if(linux_x64) {
+            auto p=compile_project(std::filesystem::path(argv[2])/"examples/inheritance/stress.void");
+            auto object=out/"virtual-tail-O2.o";
+            {std::ofstream owner(object);owner<<"existing owner object";}
+            rejects([&]{emit_aot_storage_proof(p.module,object,true,object.string()+".certificate.json");},"final encoded calls differ");
+            check(read(object)=="existing owner object","unproved tail encoding damaged destination");std::filesystem::remove(object);
+        }
+        // The corpus exposes existing raw-aggregate ABI objects, independently
+        // of future array lowering. Never certify their ownership by guessing.
+        if(linux_x64) for(bool optimized:{false,true}) for(const auto *file:{"main","numeric"}) {
+            auto p=compile_project(std::filesystem::path(argv[2])/"examples/value_structs"/(std::string(file)+".void"));
+            auto object=out/(std::string("aggregate-")+file+(optimized?"-O2.o":"-normal.o"));
+            {std::ofstream owner(object);owner<<"existing owner object";}
+            rejects([&]{emit_aot_storage_proof(p.module,object,optimized,object.string()+".certificate.json");},"unproved incoming ownership");
+            check(read(object)=="existing owner object","aggregate ABI rejection damaged destination");
+            auto j=llvm::json::parse(read(object.string()+".certificate.json"));check(bool(j),"aggregate rejection report missing");
+            bool incoming=false,unmatched=false;
+            for(const auto &entry:*j->getAsObject()->getObject("functions")) {
+                const auto *f=entry.second.getAsObject();
+                incoming|=!f->getArray("incoming")->empty();
+                unmatched|=!f->getArray("unmatched_homes")->empty();
+            }
+            check(incoming,"actual aggregate incoming evidence lost");
+            if(!optimized && std::string(file)=="numeric") check(unmatched,"actual ABI-created unmatched home evidence lost");
+            std::filesystem::remove(object);
+        }
+        for(bool optimized:{false,true}) {
+            auto p=compile_project(std::filesystem::path(argv[2])/"examples/architecture.void");
+            auto object=out/(optimized?"scalar-O2.o":"scalar-normal.o");
+            emit_aot_storage_proof(p.module,object,optimized,object.string()+".certificate.json");
+            check(std::filesystem::exists(object),"actual scalar CLI certification failed");
         }
         auto source=analyze_source({"arrays.void","func entry(x: i32) -> i32:\n    var values: [i32, 2] = [1, 2]\n    return values[0]\n"});
         check(source.succeeded(),"array analysis rejected");

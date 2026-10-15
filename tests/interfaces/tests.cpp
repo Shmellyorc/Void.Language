@@ -1,3 +1,4 @@
+#include "../storage_proof.hpp"
 #include "proof.hpp"
 #include "void/backend.hpp"
 #include "void/frontend.hpp"
@@ -223,12 +224,13 @@ void roots(const std::filesystem::path& root,bool opt) {
 }
 int main(int argc,char** argv) {
     try {
-        if(argc==5 && std::string(argv[1])=="--emit-library") {auto p=vd::compile_project(argv[2]);vd::emit_runtime_object(p.module,argv[3],std::string(argv[4])=="optimized");return 0;}
-        if(argc==5 && std::string(argv[1])=="--emit-reload") {
+        const bool storage_proof = argc==6 && std::string(argv[5])=="--storage-proof";
+        if((argc==5 || storage_proof) && std::string(argv[1])=="--emit-library") {auto p=vd::compile_project(argv[2]);storage_fixture::emit(p.module,argv[3],std::string(argv[4])=="optimized",storage_proof);return 0;}
+        if((argc==5 || storage_proof) && std::string(argv[1])=="--emit-reload") {
             auto source=vd::read_source(argv[2]);auto text=source.text();auto position=text.find("return c.n");require(position!=std::string::npos,"interface reload body missing");text.replace(position,10,"return c.n + 1");
             // Match the original fixture's owned source identity in both native generations.
             auto original=vd::analyze_source({"/stress.void",text});if(!original.succeeded()) throw vd::CompilationError(original.diagnostics);
-            vd::emit_runtime_object(original.program->lower(),argv[3],std::string(argv[4])=="optimized","__reloaded");return 0;
+            storage_fixture::emit(original.program->lower(),argv[3],std::string(argv[4])=="optimized",storage_proof,"__reloaded");return 0;
         }
         require(argc==2,"interfaces project root required");
         auto phase=[](const char* name,auto work) {

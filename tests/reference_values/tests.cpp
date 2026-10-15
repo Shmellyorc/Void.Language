@@ -1,3 +1,4 @@
+#include "../storage_proof.hpp"
 #include "proof.hpp"
 #include "void/backend.hpp"
 #include "void/frontend.hpp"
@@ -179,7 +180,8 @@ void contracts() {
 }
 int main(int argc,char** argv) {
     try {
-        if(argc==5 && std::string(argv[1])=="--emit-library") {auto p=vd::compile_project(argv[2]);vd::emit_runtime_object(p.module,argv[3],std::string(argv[4])=="optimized");return 0;}
+        const bool storage_proof = argc==6 && std::string(argv[5])=="--storage-proof";
+        if((argc==5 || storage_proof) && std::string(argv[1])=="--emit-library") {auto p=vd::compile_project(argv[2]);storage_fixture::emit(p.module,argv[3],std::string(argv[4])=="optimized",storage_proof);return 0;}
         require(argc==2,"reference value test root argument");std::filesystem::path root=argv[1];diagnostics();contracts();
         for(bool optimized:{false,true}) {programs(root,optimized);roots(root,optimized);parked(root,optimized);timeout(root,optimized);retired_layout(root,optimized);}
         std::cout<<"reference values: copies, capabilities, construction, sole aggregate roots, failure, tooling and reload passed\n";

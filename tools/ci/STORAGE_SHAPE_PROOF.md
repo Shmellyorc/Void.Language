@@ -6,20 +6,40 @@ CLI adapter producer, then invokes the staged service. It does not permit source
 native arrays or activate ORC/LSP certification.
 
 ```sh
-cmake --build build/ci-debug --target void_arrays_storage_audit voidc -j2
+cmake --build build/ci-debug -j4
 ctest --test-dir build/ci-debug -R '^arrays_storage_audit$' --output-on-failure
-python3 tools/ci/storage_shape_probe.py --build build/ci-debug --root . \
-  --cxx /usr/bin/clang++-19 --llvm-bin /usr/lib/llvm-19/bin \
-  --output build/storage-shapes-native-example
+python3 tools/ci/aot_certificate_corpus.py --build build/ci-debug --root . \
+  --cxx /usr/bin/clang++-19 --output build/aot-certificate-corpus-example
 ```
 
-The driver requires a fresh directory and native Linux x64. It links original and
-certified objects independently against the same runtime archive, then compares
-exit status, stdout and stderr for main, handoffs and null_failure, normal/O2,
-eight argument cases, and inherited/1 MiB stacks. No unexpected signal is accepted.
-It preserves commands, certificates, disassembly, input/normalized/optimized LLVM
-IR, binaries and results. Preserve the C++ driver name: resolving a clang++ symlink
-to clang changes automatic C++ library linking. `--cxx` intentionally retains it.
+The corpus driver requires a fresh directory and native Linux x64. It reads the
+configured integration commands from CTest JSON and the seven source families
+from CMake. Integration scripts keep their original compiler outputs and assertions;
+a fixture wrapper separately attempts certification at the exact source snapshot,
+including edited/imported/generated sources. Original `emit` failures are not native
+fixtures and remain source-diagnostic tests. Architecture and edited-source fixtures
+are additionally attempted in normal mode because their ordinary scripts emit O2
+only. Both profiles are otherwise already covered by the original corpus.
+
+Library/reload producers accept an explicit final `--storage-proof` test argument.
+The generated-runtime fixture uses the same option. Their original modes still call
+the public emitter. No environment switch or public CLI option activates the service.
+Accepted objects are linked separately with the same native callers/runtime. Failed
+certificates must preserve an existing sentinel output, and are never linked or run.
+The driver compares CLI exit/stdout/stderr and executes the original library harness
+assertions where every required object certifies. A skipped harness is recorded as
+rejected, never as a pass. `complete.json` means investigation coverage completed;
+its accepted/rejected counts report certification separately. `records.jsonl` retains
+all commands, source routes, profiles and rejection reasons. Objects, three IR
+snapshots, certificates, native binaries and harness logs remain in that directory.
+SHA-256 checks independently bind each accepted final object, normalized frozen IR,
+optimized IR and serialized inventory to its report. Preserve the C++ driver name:
+resolving a clang++ symlink to clang changes automatic C++ library linking.
+
+The older `storage_shape_probe.py` records the Section 16 historical experiment.
+The stronger unknown-home rule now rejects its optimized managed cases, so it is
+not an all-pass acceptance driver for the present service. No prior 1 MiB result is
+presented as validation of a newly rejected object. Use the corpus driver above.
 
 The CTest artifacts are in `build/ci-debug/storage shape fixtures`. The two exact
 original managed modules without the CLI-home proof must be rejected without
@@ -60,4 +80,4 @@ gdb -nx -q -batch -ex 'set disable-randomization off' -ex run \
 GDB/LeakSanitizer may require execution outside a ptrace-restricted sandbox. Keep
 leak detection and UBSan halt/stack reporting enabled; do not disable checks to
 make a restricted run pass. No Windows/macOS native verification is implied by
-these Linux drivers. See ARRAYS_PROPOSAL.md Section 16 for the proof boundary.
+these Linux drivers. See ARRAYS_PROPOSAL.md Sections 16 and 17 for the proof boundaries.

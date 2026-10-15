@@ -1,3 +1,4 @@
+#include "../storage_proof.hpp"
 #include "../reference_values/proof.hpp"
 #include "void/backend.hpp"
 #include "void/frontend.hpp"
@@ -192,7 +193,8 @@ void timeout(const std::filesystem::path& root,bool optimized) {
 }
 int main(int argc,char** argv) {
     try {
-        if(argc==5 && std::string(argv[1])=="--emit-library") {auto p=vd::compile_project(argv[2]);vd::emit_runtime_object(p.module,argv[3],std::string(argv[4])=="optimized");return 0;}
+        const bool storage_proof = argc==6 && std::string(argv[5])=="--storage-proof";
+        if((argc==5 || storage_proof) && std::string(argv[1])=="--emit-library") {auto p=vd::compile_project(argv[2]);storage_fixture::emit(p.module,argv[3],std::string(argv[4])=="optimized",storage_proof);return 0;}
         require(argc==2,"composition project root required");diagnostics();programs();tooling();imports(argv[1]);
         for(bool opt:{false,true}) {
             auto imports=vd::compile_project(std::filesystem::path(argv[1])/"examples/composition/imports.void");

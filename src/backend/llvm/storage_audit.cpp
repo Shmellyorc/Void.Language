@@ -189,7 +189,7 @@ struct Audit : MachineFunctionPass {
         lifetime |= callee->getName().starts_with("llvm.lifetime.");
     std::vector<Credit> credits;
     std::set<size_t> represented;
-    json::Array incoming, zeroHomes;
+    json::Array incoming, zeroHomes, unmatched;
     for (int i = fi.getObjectIndexBegin(); i < fi.getObjectIndexEnd(); ++i) {
       if (fi.isDeadObjectIndex(i)) continue;
       const auto size = fi.getObjectSize(i), offset = fi.getObjectOffset(i);
@@ -201,7 +201,7 @@ struct Audit : MachineFunctionPass {
         incoming.push_back(json::Object{{"sp_reference", reference.getFixed()},
           {"base_register", mf.getSubtarget().getRegisterInfo()->getName(base)}, {"offset", offset}, {"size", size}, {"caller_owned", owned},
           {"callee_entry_sp_offset", offset + int64_t(e)}});
-        if (enforce && !owned) fail(s, name, "unproved incoming ownership");
+        if (!owned) fail(s, name, "unproved incoming ownership");
         continue;
       }
       if (enforce && (offset < -int64_t(fi.getStackSize() + e) || offset + size > -int64_t(e)))
@@ -234,7 +234,14 @@ struct Audit : MachineFunctionPass {
           break;
         }
       }
-      if (s.enforce && !found) fail(s, name, "unmatched allocation (including clone/merge) receives no subtraction credit");
+      if (!found) {
+        std::string ir;
+        if (allocation) { raw_string_ostream stream(ir); allocation->print(stream); }
+        unmatched.push_back(json::Object{{"index", i}, {"physical_bytes", size},
+          {"alignment", int64_t(fi.getObjectAlign(i).value())}, {"current_alloca", ir},
+          {"has_alloca_identity", allocation != nullptr}, {"subtraction_credit", 0}});
+        fail(s, name, "unmatched allocation (including clone/merge) receives no subtraction credit");
+      }
     }
     for (auto &x : credits) for (auto &y : credits)
       if (x.index != y.index && std::max(x.start, y.start) < std::min(x.end, y.end)) x.overlap = true;
@@ -250,6 +257,7 @@ struct Audit : MachineFunctionPass {
     snapshot["lifetime_no_credit"] = lifetime;
     snapshot["incoming"] = std::move(incoming);
     snapshot["zero_extent_homes"] = std::move(zeroHomes);
+    snapshot["unmatched_homes"] = std::move(unmatched);
     snapshot["entry_home_moves"] = json::Array(plan.entryMoves);
     snapshot["changed_after_pei"] = s.pei[name] != key;
     auto observed = json::parse(s.pei[name]);
@@ -368,7 +376,7 @@ void LoweringInventory::complete(llvm::Function &f, std::set<StorageRole> roles)
 struct AotObjectEmitter::Impl {
   std::unique_ptr<TargetMachine> machine;
   const Target *target;
-  std::string triple, profile, report;
+  std::string triple, profile, report, frozenDigest, optimizedDigest, inventoryDigest, inventoryText;
   DataLayout layout;
   bool optimize, frozen = false, optimized = false, emitted = false;
   Module *module = nullptr;
@@ -398,9 +406,26 @@ struct AotObjectEmitter::Impl {
       {"target_options", "LLVM19.1.7-default;VOID-AOT-v1"},
       {"ir_pipeline", optimize ? "default<O2>;PassBuilder(no-TM)" : "verify-only"}});
   }
+  std::string module_digest() const {
+    std::string text; raw_string_ostream out(text); module->print(out, nullptr);
+    return toHex(SHA256::hash(arrayRefFromStringRef(text)));
+  }
+  void check_digest(const std::string &expected) const {
+    if (module_digest() != expected) throw std::invalid_argument("AOT frozen module/profile content mismatch");
+  }
   void check_module() const {
     if (!module || module->getDataLayout() != layout || module->getTargetTriple() != triple)
       throw std::invalid_argument("AOT inventory/emission target identity mismatch");
+    for (const auto &f : *module) {
+      for (auto name : {"target-cpu", "tune-cpu", "target-features", "target-abi"}) {
+        auto attribute = f.getFnAttribute(name);
+        if (!attribute.isValid()) continue;
+        const auto expected = StringRef(name) == "target-features" ? machine->getTargetFeatureString() :
+          StringRef(name) == "target-abi" ? StringRef("") : machine->getTargetCPU();
+        if (attribute.getValueAsString() != expected)
+          throw std::invalid_argument("AOT function target profile mismatch: " + f.getName().str() + "/" + name);
+      }
+    }
     std::string message; raw_string_ostream stream(message);
     if (verifyModule(*module, &stream)) throw std::invalid_argument("Invalid audited LLVM IR: " + message);
   }
@@ -503,7 +528,7 @@ void AotObjectEmitter::freeze(Module &module, const LoweringInventory &inventory
   for (const auto *home : moves) {
     auto *a = home->allocation; auto *f = a->getFunction();
     s.plans[f->getName().str()].entryMoves.push_back(json::Object{
-      {"identity", home->identity}, {"original_block", a->getParent()->getName()},
+      {"identity", home->identity}, {"original_block", a->getParent()->getName().str()},
       {"maximum_executions_per_invocation", 1}, {"original_identity_retained", true}});
     a->moveBefore(&*f->getEntryBlock().getFirstInsertionPt());
   }
@@ -526,11 +551,22 @@ void AotObjectEmitter::freeze(Module &module, const LoweringInventory &inventory
         auto p = s.plans.find(callee->getName().str());
         if (p != s.plans.end() && p->second.policy) s.plans[f.getName().str()].arrayCalls.insert(callee->getName().str());
       }
+  json::Object frozen;
+  for (const auto &[name, plan] : s.plans) {
+    json::Array homes;
+    for (const auto &home : plan.homes) homes.push_back(json::Object{
+      {"identity", home.name}, {"bytes", int64_t(home.bytes)}, {"alignment", int64_t(home.alignment)},
+      {"role", int64_t(home.role)}, {"kind", int64_t(home.kind)}});
+    frozen[name] = json::Object{{"P", int64_t(plan.bytes)}, {"policy", plan.policy}, {"homes", std::move(homes)}};
+  }
+  i.inventoryText = jsonText(std::move(frozen));
+  i.inventoryDigest = toHex(SHA256::hash(arrayRefFromStringRef(i.inventoryText)));
+  i.frozenDigest = i.module_digest();
 }
 void AotObjectEmitter::optimize() {
   auto &i = *impl_;
   if (!i.frozen || i.optimized) throw std::logic_error("Invalid AOT optimizer lifecycle");
-  i.check_module();
+  i.check_module(); i.check_digest(i.frozenDigest);
   // Preserve the existing production pipeline exactly; target-aware IR
   // optimization is not silently substituted from the standalone experiment.
   if (i.optimize) {
@@ -554,12 +590,13 @@ void AotObjectEmitter::optimize() {
     for (auto &callee : plan.arrayCalls) if (!retained.count(callee))
       fail(i.state, name, "unproved transformed array-call lineage (including fully eliminated inline homes)");
   }
+  i.optimizedDigest = i.module_digest();
   i.optimized = true;
 }
 void AotObjectEmitter::deliver(const std::filesystem::path &destination) {
   auto &i = *impl_;
   if (!i.optimized || i.emitted) throw std::logic_error("Invalid audited AOT delivery lifecycle");
-  i.emitted = true; i.check_module(); auto &s = i.state;
+  i.emitted = true; i.check_module(); i.check_digest(i.optimizedDigest); auto &s = i.state;
   SmallVector<char, 0> bytes; raw_svector_ostream buffer(bytes);
   auto *tm = static_cast<LLVMTargetMachine *>(i.machine.get());
   legacy::PassManager pm; auto *mmi = new MachineModuleInfoWrapperPass(tm); auto *config = tm->createPassConfig(pm);
@@ -572,6 +609,11 @@ void AotObjectEmitter::deliver(const std::filesystem::path &destination) {
   if (tm->addAsmPrinter(pm, buffer, nullptr, CodeGenFileType::ObjectFile, mmi->getMMI().getContext()))
     throw std::runtime_error("Audited AOT object emission unavailable");
   pm.add(new Audit(s, 2)); pm.add(createFreeMachineFunctionPass()); pm.run(*i.module);
+  for (const auto &f : *i.module) if (!f.isDeclaration()) {
+    const auto name = f.getName().str();
+    if (!s.reports.count(name) || !s.pei.count(name) || !s.late.count(name))
+      fail(s, name, "incomplete machine-function coverage");
+  }
   checkObject(s, StringRef(bytes.data(), bytes.size()), *i.machine, *i.target);
   json::Object functions, errors;
   for (auto &[name, r] : s.reports) functions[name] = std::move(r);
@@ -579,7 +621,8 @@ void AotObjectEmitter::deliver(const std::filesystem::path &destination) {
   auto digest = SHA256::hash(ArrayRef<uint8_t>(reinterpret_cast<const uint8_t *>(bytes.data()), bytes.size()));
   i.report = jsonText(json::Object{{"profile", i.profile}, {"certified_delivery", s.errors.empty()},
     {"array_storage_policy_applicable", s.enforce}, {"budget", int64_t(array_function_storage_budget)},
-    {"object_sha256", toHex(digest)}, {"functions", std::move(functions)}, {"errors", std::move(errors)}});
+    {"frozen_module_sha256", i.frozenDigest}, {"optimized_module_sha256", i.optimizedDigest},
+    {"inventory", i.inventoryText}, {"inventory_sha256", i.inventoryDigest}, {"object_sha256", toHex(digest)}, {"functions", std::move(functions)}, {"errors", std::move(errors)}});
   if (!s.errors.empty()) {
     std::string reason;
     for (const auto &[name, failures] : s.errors) for (const auto &v : failures) reason += name + ": " + v + "; ";

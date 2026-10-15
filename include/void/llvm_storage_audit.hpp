@@ -51,6 +51,9 @@ public:
 std::set<StorageRole> all_storage_roles();
 // Explicit investigation entry, never called by public emit_object/runtime paths.
 // Reuses their shared module/adapter producer and the staged certificate service.
+enum class ProofAdapter { source, architecture, runtime };
 void emit_aot_storage_proof(const ir::Module&, const std::filesystem::path& object,
-                            bool optimize, const std::filesystem::path& report);
+                            bool optimize, const std::filesystem::path& report,
+                            ProofAdapter adapter = ProofAdapter::source,
+                            const std::string& generation_suffix = {});
 }
