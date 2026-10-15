@@ -6631,3 +6631,76 @@ Workflow YAML parses successfully; inspection confirms only workflow_dispatch an
 three native runner entries. Compared normal CI bytes against HEAD, SHA-256
 `a571baeb838fea17b3baa3d80f759739cd2d2295313357a75ed5eae6a5cb5400`, unchanged.
 `git diff --check` passes. No full compiler matrix was run for this experiment.
+
+### 2026-10-14: Native probe run #1 portability corrections
+
+Inspected all three hosted job logs for
+[probe run #1](https://github.com/Shmellyorc/Void.Language/actions/runs/38656555339),
+commit `4e905b5a349ad7512bb996763238d22a2966e187`, and downloaded the Windows
+and macOS artifacts into ignored `build/phase23-probe-run1`. Ubuntu job
+116167589699 passed all 30 depth cases with the previously recorded thresholds.
+Windows job 116167589376 failed O0 CMake configuration before any executable ran.
+macOS job 116167589596 executed natively on ARM64 with Clang 19.1.7; its results
+contain 18 exit-70 normal-return cases and 12 exit-90 verified guard overflows.
+All six macOS unrelated-fault controls passed. Small-depth logs report successful
+collection and balanced runtime cleanup, followed by the generic alternate signal
+stack cleanup error. These are failed harness cases, not accepted platform passes.
+
+Windows `configure-O0.log` identifies CMakeLists.txt:33 add_executable reparsing
+`D:\a\Void.Language\Void.Language\build\phase23-stack-probe\O0\objects/frame-64.o`
+and rejecting the `\a` escape. Native compiler detection succeeded as Clang 19.1.7
+with the MSVC command-line interface. The runner now supplies compiler and object
+directory cache paths through Path.as_posix(), using explicit CMake PATH types.
+Other native process paths, LLVM target selection, compilation and Windows stack
+checks are unchanged. A focused regression uses PureWindowsPath with a drive,
+`\a`, spaces and nested directories; a real CMake second-parse check reproduces
+the original invalid escape and accepts the corrected argument on local Linux.
+This validates path serialization, not Windows configuration or execution.
+
+The former POSIX cleanup sent a zero-initialized descriptor with SS_DISABLE and
+combined sigaltstack and munmap with short-circuit OR. Apple's
+[UNIX03 wrapper source](https://github.com/apple-oss-distributions/Libc/blob/71bbe350ab79eef58113991d817ccc6165061a64/compat-43/sigaltstk.c)
+rejects a descriptor smaller than MINSIGSTKSZ with ENOMEM before checking its flags
+or entering the kernel. This identifies a concrete zero-size disable defect in
+our request. Run #1 did not capture errno or the individual operation, so ENOMEM
+is source-supported diagnosis, not a fabricated native errno observation.
+
+Corrected cleanup preserves the installed descriptor size when disabling, queries
+and verifies disabled/not-active state, then unmaps the alternate stack. Separate
+JSON events record each syscall return and immediately saved native errno. Failures
+throw with operation, numeric errno in JSON and error text on stderr, retaining
+exit 70. A failed disable/query never unmaps possibly registered storage. Success
+is now emitted after cleanup, and POSIX success classification additionally requires
+all three successful cleanup records. No failure classification was relaxed.
+
+Added one isolated cleanup-check child per POSIX mode. It records the old zero-size
+disable result, numeric errno and ENOMEM name directly on the executing OS, then
+requires the corrected lifecycle. Only the deliberately invalid diagnostic request
+may return ENOMEM; any error from real cleanup remains fatal. If the old call succeeds,
+the control reinstalls the stack before checking the corrected cleanup. This will
+isolate the exact macOS operation/error in the next hosted artifacts without
+silently retrying or suppressing failures in normal probe runs.
+
+Focused local verification:
+
+- `python3 -m unittest discover -s tools/ci/stack_probe -p test_runner.py` passes
+  six tests, including real CMake path reparsing and rejection of cleanup failure
+  even after a successful-collection event, missing cleanup evidence and failed
+  unmapping. Existing crash-evidence tests remain intact.
+- `python3 tools/ci/stack_probe/run.py --llvm-bin /usr/lib/llvm-19/bin --output build/phase23-stack-probe-portability`
+  passes 30 Linux native depth cases: 18 normal completions and 12 verified guard
+  overflows, plus six unrelated-fault controls and two successful lifecycle controls.
+  On Linux the old zero-size disable returns 0/errno 0; reinstall, corrected disable,
+  disabled-state query and munmap all return 0/errno 0 at both O0/O2.
+- Linux thresholds and LLVM frame/observed stride measurements are unchanged from
+  the previous local probe. Verified 1 MiB stack bounds, 512 KiB guards, alternate
+  signal-stack size, precise root checks and unexpected-crash rejection remain.
+
+Windows/macOS corrections require another native hosted run. No local result is
+claimed for those platforms and no hosted dispatch occurred. Updated the harness
+README with lifecycle evidence and run #1 limitations. No production compiler or
+runtime source, normal CI, suite inventory or numerical storage policy changed.
+No full suite, Git commit or push was performed. Stopped for owner review.
+Final byte comparisons confirm both workflows are unchanged; comparison of old/new
+Linux result JSON confirms identical thresholds, frame sizes and observed strides.
+`git diff --check` passes.

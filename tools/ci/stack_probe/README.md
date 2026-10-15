@@ -60,6 +60,23 @@ Stack API references: [Windows reservation flag](https://learn.microsoft.com/en-
 Each size/mode retains LLVM's native frame-size diagnostic and generated assembly.
 The harness also measures frame-address stride across live recursive calls, checks
 native Slot/Frame ABI, and verifies collection plus balanced cleanup on success.
+POSIX success is emitted only after alternate-stack disable, disabled-state query
+and unmapping all succeed. Each operation records its return value and immediate
+native errno separately. A failed disable never proceeds to unmap registered memory.
+The disable request retains the installed descriptor's valid size because Darwin's
+[UNIX03 libc wrapper](https://github.com/apple-oss-distributions/Libc/blob/71bbe350ab79eef58113991d817ccc6165061a64/compat-43/sigaltstk.c)
+checks that size even when SS_DISABLE is set.
+
+Before the depth cases, each POSIX mode runs a separate `cleanup-check` child. It
+observes the former zero-size disable request and records the exact result/errno.
+Only that deliberate diagnostic request may report ENOMEM; any other error fails
+the control. If it disables successfully, the child reinstalls the stack, then
+requires the corrected disable/query/unmap lifecycle to succeed. Errors from the
+actual cleanup are never ignored or retried. This lets the hosted macOS job verify
+the diagnosis that run #1's combined cleanup error could not distinguish.
+
+CMake cache path arguments use forward slashes and explicit PATH types. Native
+Windows compiler/process paths and stack controls retain their original behavior.
 The frame warning threshold of one byte requests evidence; it is not a compiler
 limit. Caller return-address/alignment costs can make observed stride differ from
 LLVM's reported frame size.
@@ -75,8 +92,10 @@ harness with code 90 and platform evidence; an unrelated fault exits 91.
 Artifacts (14 days) contain JSON results/environment/commands, a concise Markdown
 summary, per-child logs, generated IR, assembly and small configure/build logs.
 Binaries, the SDK and CMake object trees are excluded. Job summaries show host-native
-outcomes only. Windows/macOS results remain pending until the owner triggers those
-jobs; local Linux results or cross-target objects are not substitutes.
+outcomes only. Run #1 passed Ubuntu, stopped Windows at CMake path parsing, and
+failed macOS normal-return cases during cleanup. Verification of the portability
+corrections on Windows/macOS remains pending a new owner-triggered run; local Linux
+results or cross-target objects are not substitutes.
 
 ## Local reproduction
 

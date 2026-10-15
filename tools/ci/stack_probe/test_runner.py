@@ -1,7 +1,10 @@
 """Ensure isolated crashes cannot be mistaken for successful exhaustion probes."""
 import json
+import subprocess
+import tempfile
 import unittest
-from run import classify, STACK_BYTES
+from pathlib import Path, PureWindowsPath
+from run import classify, cmake_path_definition, STACK_BYTES
 
 
 class CrashEvidenceTests(unittest.TestCase):
@@ -41,6 +44,39 @@ class CrashEvidenceTests(unittest.TestCase):
         output = self.evidence().replace('"actual_bytes": 1048576', '"actual_bytes": 8388608')
         error = dict(event='stack_overflow', evidence='fault_in_low_guard', signal='SIGBUS', fault_address='0x100')
         self.assertEqual(self.outcome(error, stdout=output), 'unexpected')
+
+    def test_cleanup_failure_cannot_pass_after_successful_collection(self):
+        start = self.evidence().replace('"depth": 16', '"depth": 1')
+        passed = dict(event='passed', live_frames=1, balanced_cleanup=True, observed_frames=1,
+                      min_stride_bytes=0, max_stride_bytes=0)
+        cleanup = [dict(event='cleanup', operation=name, result=0, errno=0) for name in
+                   ('sigaltstack_disable', 'sigaltstack_query_disabled', 'munmap_alternate')]
+        output = start + '\n' + '\n'.join(json.dumps(x) for x in [*cleanup, passed])
+        self.assertEqual(classify(0, output, '', 1, 65560, 64, 'Linux')[0], 'pass')
+        self.assertEqual(classify(70, output, 'munmap failed: errno=22', 1, 65560, 64, 'Linux')[0], 'unexpected')
+        cleanup[-1].update(result=-1, errno=22)
+        output = start + '\n' + '\n'.join(json.dumps(x) for x in [*cleanup, passed])
+        self.assertEqual(classify(0, output, '', 1, 65560, 64, 'Linux')[0], 'unexpected')
+        output = start + '\n' + json.dumps(passed)
+        self.assertEqual(classify(0, output, '', 1, 65560, 64, 'Linux')[0], 'unexpected')
+
+    def test_windows_cache_paths_do_not_introduce_cmake_escapes(self):
+        path = PureWindowsPath(r'D:\a\Void.Language\build with spaces\O0\objects')
+        self.assertEqual(cmake_path_definition('PROBE_OBJECT_DIR', path),
+                         '-DPROBE_OBJECT_DIR:PATH=D:/a/Void.Language/build with spaces/O0/objects')
+        # Exercise CMake's second parsing boundary on any host. This is not
+        # Windows compilation or execution: it reproduces the path escape only.
+        with tempfile.TemporaryDirectory() as scratch:
+            script = Path(scratch) / 'path.cmake'
+            script.write_text('cmake_language(EVAL CODE "set(object \\"${PROBE_OBJECT_DIR}/frame-64.o\\")")\n',
+                              encoding='utf-8')
+            unsafe = subprocess.run(['cmake', f'-DPROBE_OBJECT_DIR={path}', '-P', str(script)],
+                                    capture_output=True, text=True)
+            safe = subprocess.run(['cmake', cmake_path_definition('PROBE_OBJECT_DIR', path), '-P', str(script)],
+                                  capture_output=True, text=True)
+            self.assertNotEqual(unsafe.returncode, 0)
+            self.assertIn('Invalid character escape', unsafe.stderr)
+            self.assertEqual(safe.returncode, 0, safe.stderr)
 
 
 if __name__ == '__main__':

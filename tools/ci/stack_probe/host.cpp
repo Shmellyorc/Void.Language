@@ -1,6 +1,7 @@
 // Investigation harness only. Each process contains one explicitly sized worker.
 #include "void/runtime.hpp"
 #include <atomic>
+#include <cerrno>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -8,6 +9,7 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 #ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
@@ -26,7 +28,7 @@ extern const std::uint64_t probe_slot_bytes, probe_frame_bytes, probe_pointer_by
 }
 namespace {
 constexpr unsigned overflow_exit = 90, unexpected_fault_exit = 91;
-struct Request { unsigned depth; std::size_t bytes; bool unexpected_fault; int result = 70; };
+struct Request { unsigned depth; std::size_t bytes; bool unexpected_fault; bool cleanup_check; int result = 70; };
 struct Observation {
     std::uintptr_t previous = 0, minimum = std::numeric_limits<std::uintptr_t>::max(), maximum = 0;
     unsigned count = 0;
@@ -62,6 +64,32 @@ void fault(int signal, siginfo_t* info, void*) {
     while (*suffix) text[n++] = *suffix++;
     (void)!write(STDERR_FILENO, text, n);
     _exit(overflow ? overflow_exit : unexpected_fault_exit);
+}
+void cleanup_result(const char* operation, int result, int error) {
+    std::printf("{\"event\":\"cleanup\",\"operation\":\"%s\",\"result\":%d,\"errno\":%d}\n", operation, result, error);
+    std::fflush(stdout);
+    if (result) throw std::system_error(error, std::generic_category(), operation);
+}
+void cleanup_alternate(const stack_t& installed) {
+    // Darwin's UNIX03 libc checks ss_size even with SS_DISABLE. Preserve the
+    // installed size instead of sending the former zero-initialized descriptor.
+    stack_t disable = installed; disable.ss_flags = SS_DISABLE;
+    errno = 0;
+    const int disabled = sigaltstack(&disable, nullptr);
+    const int disable_error = errno;
+    cleanup_result("sigaltstack_disable", disabled, disable_error);
+    // Never unmap storage while it could still be registered as an active stack.
+    stack_t state{};
+    errno = 0;
+    const int queried = sigaltstack(nullptr, &state);
+    const int query_error = errno;
+    cleanup_result("sigaltstack_query_disabled", queried, query_error);
+    if (!(state.ss_flags & SS_DISABLE) || (state.ss_flags & SS_ONSTACK))
+        throw std::runtime_error("alternate signal stack remains enabled or active");
+    errno = 0;
+    const int unmapped = munmap(installed.ss_sp, installed.ss_size);
+    const int unmap_error = errno;
+    cleanup_result("munmap_alternate", unmapped, unmap_error);
 }
 #endif
 void run(Request& request) {
@@ -126,6 +154,33 @@ void run(Request& request) {
         request.depth, static_cast<unsigned long long>(probe_static_bytes), static_cast<unsigned long long>(probe_elements),
         sizeof(vd::Runtime::Slot), sizeof(vd::Runtime::Frame));
     std::fflush(stdout);
+#ifndef _WIN32
+    if (request.cleanup_check) {
+        // Diagnostic control only: explicitly observe the old failing request.
+        // An ENOMEM here is expected on affected Darwin libc, never accepted
+        // from the real corrected cleanup below. Linux normally returns zero.
+        stack_t old_disable{}; old_disable.ss_flags = SS_DISABLE;
+        errno = 0;
+        const int old_result = sigaltstack(&old_disable, nullptr);
+        const int old_error = errno;
+        std::printf("{\"event\":\"zero_size_disable\",\"result\":%d,\"errno\":%d,\"errno_name\":\"%s\"}\n",
+            old_result, old_error, old_error == ENOMEM ? "ENOMEM" : old_error == 0 ? "none" : "other");
+        std::fflush(stdout);
+        if (old_result && old_error != ENOMEM)
+            throw std::system_error(old_error, std::generic_category(), "zero-size disable diagnostic control");
+        if (!old_result) {
+            errno = 0;
+            const int reinstalled = sigaltstack(&signal_stack, nullptr);
+            const int reinstall_error = errno;
+            cleanup_result("sigaltstack_reinstall_control", reinstalled, reinstall_error);
+        }
+        cleanup_alternate(signal_stack);
+        std::printf("{\"event\":\"cleanup_checked\"}\n");
+        std::fflush(stdout);
+        request.result = 0;
+        return;
+    }
+#endif
     if (request.unexpected_fault) {
 #ifdef _WIN32
         RaiseException(EXCEPTION_ACCESS_VIOLATION, 0, 0, nullptr);
@@ -147,16 +202,14 @@ void run(Request& request) {
     if (observation.count != request.depth || observation.invalid ||
         (request.depth > 1 && observation.minimum != observation.maximum))
         throw std::runtime_error("inconsistent native frame spacing");
+#ifndef _WIN32
+    cleanup_alternate(signal_stack);
+#endif
     request.result = 0;
     std::printf("{\"event\":\"passed\",\"live_frames\":%d,\"balanced_cleanup\":true,\"observed_frames\":%u,\"min_stride_bytes\":%llu,\"max_stride_bytes\":%llu}\n",
         result, observation.count, static_cast<unsigned long long>(request.depth > 1 ? observation.minimum : 0),
         static_cast<unsigned long long>(observation.maximum));
     std::fflush(stdout);
-#ifndef _WIN32
-    stack_t disable{}; disable.ss_flags = SS_DISABLE;
-    if (sigaltstack(&disable, nullptr) || munmap(alternate, 65536))
-        throw std::runtime_error("alternate signal stack cleanup failed");
-#endif
 }
 void guarded_run(Request& request) {
     try { run(request); }
@@ -193,10 +246,13 @@ extern "C" int probe_collect() noexcept {
 int main(int argc, char** argv) {
     if (argc < 3 || argc > 4) return 2;
     try {
-        Request request{static_cast<unsigned>(std::stoul(argv[1])), static_cast<std::size_t>(std::stoull(argv[2])), argc == 4};
+        const std::string control = argc == 4 ? argv[3] : "";
+        Request request{static_cast<unsigned>(std::stoul(argv[1])), static_cast<std::size_t>(std::stoull(argv[2])),
+            control == "unexpected-fault", control == "cleanup-check"};
         if (!request.depth || request.depth > 64 || request.bytes != 1048576 ||
-            (argc == 4 && std::string(argv[3]) != "unexpected-fault")) return 2;
+            (argc == 4 && !request.unexpected_fault && !request.cleanup_check)) return 2;
 #ifdef _WIN32
+        if (request.cleanup_check) return 2;
         SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
         SetUnhandledExceptionFilter(fault);
         auto handle = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, static_cast<unsigned>(request.bytes), worker,

@@ -16,6 +16,12 @@ DEPTHS = (1, 2, 4, 8, 16)
 BUDGETS_KIB = (64, 128, 256)
 
 
+def cmake_path_definition(name, path):
+    # CMake may parse source paths again internally. Native backslashes can
+    # become escapes (D:\a...), even though subprocess passes one intact argv.
+    return f'-D{name}:PATH={path.as_posix()}'
+
+
 def generate_ir(target, layout, kib):
     static_bytes = kib * 1024
     # Four pointer-array homes + four 32-byte root slots + one 32-byte frame.
@@ -84,7 +90,12 @@ def classify(returncode, stdout, stderr, depth, frame_bytes, kib, system, negati
                      not any(x['event'] == 'passed' for x in output))
             return ('negative_control_pass', 'unrelated fault rejected') if valid else ('unexpected', 'negative control failed')
         passed = [x for x in output if x['event'] == 'passed']
+        cleanup = [x for x in output if x['event'] == 'cleanup']
+        cleanup_ok = system == 'Windows' or (
+            [x['operation'] for x in cleanup] == ['sigaltstack_disable', 'sigaltstack_query_disabled', 'munmap_alternate'] and
+            all(x['result'] == 0 and x['errno'] == 0 for x in cleanup))
         success = (returncode == 0 and not errors and len(passed) == 1 and
+                   cleanup_ok and
                    passed[0]['live_frames'] == depth and passed[0]['balanced_cleanup'] is True and
                    passed[0]['observed_frames'] == depth and
                    passed[0]['min_stride_bytes'] == passed[0]['max_stride_bytes'] and
@@ -220,9 +231,19 @@ def main():
                 records.append(case); mode_records.append(case)
             tree = out / mode / 'build'
             command(['cmake', '-S', root / 'tools/ci/stack_probe', '-B', tree, '-G', args.generator,
-                     '-DCMAKE_BUILD_TYPE=Probe', f'-DCMAKE_CXX_COMPILER={cxx}',
-                     f'-DPROBE_MODE={mode}', f'-DPROBE_OBJECT_DIR={objects}'], f'configure-{mode}.log')
+                     '-DCMAKE_BUILD_TYPE=Probe', cmake_path_definition('CMAKE_CXX_COMPILER', cxx),
+                     f'-DPROBE_MODE={mode}', cmake_path_definition('PROBE_OBJECT_DIR', objects)], f'configure-{mode}.log')
             command(['cmake', '--build', tree, '--parallel', '3'], f'build-{mode}.log', timeout=300)
+            if system != 'Windows':
+                # Observe the old zero-size disable call, then require the actual
+                # corrected disable/query/unmap lifecycle to complete successfully.
+                lifecycle = command([tree / 'stack_probe_64', 1, STACK_BYTES, 'cleanup-check'],
+                                    f'cleanup-check-{mode}.log', timeout=20)
+                events = [json.loads(line) for line in lifecycle.stdout.splitlines()]
+                observations = [x for x in events if x['event'] == 'zero_size_disable']
+                if (len(observations) != 1 or not any(x['event'] == 'cleanup_checked' for x in events)):
+                    raise RuntimeError('Missing native signal-stack lifecycle evidence')
+                environment.setdefault('cleanup_checks', {})[mode] = events
             for case in mode_records:
                 exe = tree / f"stack_probe_{case['kib']}{suffix}"
                 # A deliberately unrelated fault must never become expected overflow.
@@ -246,6 +267,8 @@ def main():
                                     record['native_stack'] = event
                                 elif event.get('event') == 'passed':
                                     record['native_pass'] = event
+                                elif event.get('event') == 'cleanup':
+                                    record.setdefault('native_cleanup', []).append(event)
                         except (ValueError, AttributeError):
                             pass # Classification above already rejects malformed evidence.
                     except subprocess.TimeoutExpired:
