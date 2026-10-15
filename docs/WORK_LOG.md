@@ -6728,3 +6728,128 @@ probe measurements, thresholds, runner and workflows remain unchanged. No native
 stack experiment or full suite was rerun for this test-only policy correction.
 Broader documentation cleanup remains deferred until after hosted testing.
 No commits, pushes, remote changes or hosted dispatch occurred. Stopped for review.
+
+
+### 2026-10-14: Probe #3 independently verified; 64 KiB approval
+
+Read all three job logs and downloaded all three artifacts for
+[run #3](https://github.com/Shmellyorc/Void.Language/actions/runs/38660215692),
+commit ea8685180750f69b1dc4d182b7ac5940ddc6c9bd. Linux x64 job 116179441236,
+macOS ARM64 job 116179441602 and Windows x64 job 116179441784 all succeed.
+Each platform passes six regressions, 18 successful native depth cases, 12 verified
+stack overflows and six unrelated-fault controls. JSON confirms native targets,
+LLVM 19.1.7, exact 1 MiB worker extents and cleanup. Linux/macOS pass two lifecycle
+controls each; macOS independently records old disable errno 12/ENOMEM and corrected
+cleanup success. Section 10 now retains all six frame/stride measurements per
+platform, corrects its stale pending claims and six-test count. Artifacts are
+retained locally in ignored build/phase23-probe-run3.
+
+Recorded owner/wrench approval of 65536 bytes per array-carrying function, with
+explicit target layout, parameter/result homes, copies, roots, staging, alignment
+and known ABI overhead accounting. This is not a maximum allocation, save-file size
+or universal stack guarantee. Implementation remains subject to the real ABI/storage
+proofs, with P23-1 only currently authorized. No compiler limit is enforced from
+hand-generated payload estimates. P23-2 through P23-6 remain review-gated.
+
+
+### 2026-10-14: P23-1 scalar fixed-array foundation and storage contract
+
+Implemented only the P23-1 source/analysis/IR checkpoint after recording native
+probe #3 evidence and the owner's 65536-byte approval. Existing frontend, type
+arena, pure constant evaluator, selected-place lowering and independent IR
+validator remain the single paths. No native arrays, ranges or iteration were added.
+
+Changes:
+
+- Added structural array descriptor kinds and canonical identity from exact element
+  type and evaluated extent. A descriptor has one weak element edge and an extent,
+  never synthetic nominal element fields. Existing TypeArena ownership retains
+  query/IR Types and their element definitions without strong descriptor cycles.
+  Active source storage is scalar fixed arrays; growable/nested/reference-bearing
+  storage explicitly diagnoses as deferred to subsequent checkpoints.
+- Added brackets, contextual fixed literals, exact length checks, zero-length
+  arrays, zero defaults, fields, parameters/results and value-copy IR through the
+  existing parser and semantic pipeline. Numeric/bool elements reuse contextual
+  numeric typing. No implicit widening, null elements, list inference, string
+  indexing or deferred builtin API was introduced.
+- Kept extent expressions as owned AST until declaration discovery. Reused module
+  constants, imported/root visibility, dependency states/cycle diagnostics and
+  bounded semantic work. Forward extents and pure value-constant fields work;
+  runtime/local-const extents, negative/noninteger/oversized extents and cycles
+  reject with source diagnostics. Array multiplicity participates in the existing
+  65536 expanded-shape and 128 depth guards before default allocation. A regression
+  proves extent parsing cannot reset the enclosing 512-node expression guard.
+- Added checked fixed construction/read/update IR. Independent validation derives
+  element types and exact arity, rejects noninteger indexes, forged extents/strides,
+  wrong values, invalid structural descriptors and unsupported nonscalar storage.
+  Shared unsigned-bit normalization covers all integer widths, signed MIN,
+  unsigned MAX, -1/-n and empty arrays without narrowing or signed-negation UB.
+  Pure constant indexing executes these checks during analysis; runtime accesses
+  remain checked IR with original source snapshots.
+- Reused selected-owner places for exact-once evaluation. Reads acquire current
+  array bytes after index effects. Writes check before RHS, snapshot compounds,
+  preserve the original selected owner and reacquire current inline bytes after
+  RHS effects. Existing capability and construction visitors also traverse index
+  effects. Scalar arrays introduce no GC/reference-authority leaves. Const-formal
+  metadata remains distinct for later snapshot/borrow proofs; no borrowing is
+  implemented or presumed safe at this checkpoint.
+- Added NativeStoragePlanner to void_core as the common inventory/aggregation
+  contract. It requires explicit target identity/DataLayout, a target value-layout
+  provider, actual storage extents/alignment and complete accounting for parameter,
+  result, local, instruction, copy, root/frame, staging and known ABI homes.
+  Checked multiplication/alignment/addition and the approved 65536-byte policy
+  reject incomplete/oversized inventories. There is no host-size fallback or LSP
+  calculator. Arithmetic tests use explicitly synthetic layouts, not invented
+  platform measurements. The actual LLVM/ABI inventory producer and target-context
+  plumbing into shared analysis/tooling remain P23-2 prerequisites. The shared
+  LLVM path explicitly rejects array types/operations until those proofs exist.
+
+Verification on LLVM 19.1.7:
+
+- Added arrays_foundation, linked to the existing core, with positive/negative
+  source cases, forward/imported ownership and constants, finite/default/zero
+  layouts, exact diagnostic operand spans, readonly aliases/formals, all scalar
+  element and integer index widths, CFG/evaluation order, independent forged IR,
+  retained arena ownership and incomplete/overflowing storage inventories.
+- Final full Debug CTest passes 60/60 in 66.24 seconds, including all original
+  59 suites. The initial full 59-suite Debug check also passed in 75.87 seconds.
+  Inventory comparison against the untouched official Debug baseline confirms no
+  original suite was removed or renamed; arrays_foundation is the sole addition.
+  Logs: build/p23-1-debug-all-final-tests.log and build/p23-1-debug-tests.log.
+- Final focused Debug and Release checks pass 6/6 each: arrays_foundation, frontend,
+  numeric, analysis, modules and tooling. Debug LSP positions/protocol/demo pass
+  3/3. Logs: build/p23-1-debug-focused-tests.log, build/p23-1-release-tests.log and
+  build/p23-1-lsp-tests.log. These are not a six-configuration acceptance claim.
+- arrays_foundation and the original frontend suite pass with a 1048576-byte stack
+  in both Debug and Release. Frontend logs are build/p23-1-debug-frontend-1m.log
+  and build/p23-1-release-frontend-1m.log. This does not test or fix the separate
+  valid receiver-chain lowering defect.
+- Strict ASan/UBSan arrays_foundation passes with detect_leaks=1,
+  strict_string_checks=1, halt_on_error/abort_on_error and UBSan halt/stacktrace
+  enabled, in 0.13 seconds. Initial sandbox execution failed at LeakSanitizer
+  thread inspection under ptrace, so the identical strict run was executed outside
+  that restriction with authorization. No sanitizer or leak checks were disabled.
+  Log: build/p23-1-san-tests.log.
+- CLI check accepts a scalar-array source; both run/JIT and emit/AOT reject it with
+  the explicit P23-2 prerequisite message. Log: build/p23-1-native-gate.log.
+  No native fixed-array execution is claimed. Frozen implementation hashes are
+  in build/p23-1-source-hashes.json. Both workflow files remain byte-for-byte
+  unchanged; no production runtime file was changed.
+
+Proposal Sections A10/9/10/11 now distinguish historical proposals, verified native
+runs, approved numerical policy and the P23-1 implementation boundary. Updated the
+probe README and summary wording so new reports refer to the recorded approval
+instead of incorrectly claiming the budget remains unapproved. The probe's stack
+controls, measurements, thresholds and execution code are unchanged.
+
+Limitations/review handoff: actual target ABI home accounting and shared target
+configuration must be proved before native fixed-array lowering. Global constant-
+array pool policy, nonscalar/nested/growable storage, GC maps/publication, resize,
+iteration/ranges, indexing of strings and later tooling/editor acceptance remain
+outside this checkpoint. No guessed global array-pool cap was adopted. No full
+six-configuration matrix, new hosted run or P23-2 work is claimed. No commits,
+pushes, branches or remote mutations occurred. Stopped for boss/wrench review.
+Final probe-harness regressions still pass 6/6 after the summary-text correction.
+Frozen implementation hashes match the verified files and `git diff --check`
+passes. Generated frontend fixtures from small-stack checks are retained under
+ignored build/p23-1-frontend-1m-fixtures, outside the reviewable source changes.

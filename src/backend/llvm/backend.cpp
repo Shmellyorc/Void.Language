@@ -88,6 +88,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
     auto* interface_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy());
     auto* prepared_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty());
     std::function<llvm::Type*(ir::Type)> type = [&](ir::Type t) -> llvm::Type* {
+        if(ir::array_type(t)) throw std::invalid_argument("P23-1 arrays support validated analysis/IR only; native lowering requires P23-2 storage planning and review");
         if(t.kind==ir::Type::interface_ref) return interface_type;
         if(t.kind==ir::Type::prepared_receiver) return prepared_type;
         if (t.kind == ir::Type::managed_ref || t.kind==ir::Type::string) return b.getPtrTy();
@@ -444,6 +445,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     }
                 };
                 switch (instruction.op) {
+                case ir::Op::fixed_array: case ir::Op::array_get: case ir::Op::array_set:
+                    throw std::invalid_argument("P23-1 checked array IR cannot execute before P23-2 review");
                 case Op::interface_pack: {
                     auto* object=values[instruction.a];auto* nonnull=llvm::BasicBlock::Create(context,"bind_interface",fn);auto* joined=llvm::BasicBlock::Create(context,"interface_view",fn);auto* start=b.GetInsertBlock();
                     b.CreateCondBr(b.CreateIsNull(object),joined,nonnull);b.SetInsertPoint(nonnull);

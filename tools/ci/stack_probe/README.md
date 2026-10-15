@@ -93,9 +93,10 @@ Artifacts (14 days) contain JSON results/environment/commands, a concise Markdow
 summary, per-child logs, generated IR, assembly and small configure/build logs.
 Binaries, the SDK and CMake object trees are excluded. Job summaries show host-native
 outcomes only. Run #1 passed Ubuntu, stopped Windows at CMake path parsing, and
-failed macOS normal-return cases during cleanup. Verification of the portability
-corrections on Windows/macOS remains pending a new owner-triggered run; local Linux
-results or cross-target objects are not substitutes.
+failed macOS normal-return cases during cleanup. Run #3 at commit ea86851 verifies all three complete native experiments and six
+regressions per platform. See docs/ARRAYS_PROPOSAL.md Section 10 for the verified
+frame/stride table and approval status. Local Linux results or cross-target objects
+are not substitutes for these hosted executions.
 
 ## Local reproduction
 

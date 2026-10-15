@@ -5,8 +5,35 @@
 #include <algorithm>
 #include <set>
 #include <functional>
+#include <bit>
 #include <stdexcept>
 namespace vd::ir {
+bool array_type(Type t) { return t.kind==Type::fixed_array || t.kind==Type::growable_array; }
+Type array_element(Type t) {
+    if (!array_type(t) || !t.definition || !t.definition->element) throw std::invalid_argument("VOID IR: missing array element");
+    return *t.definition->element;
+}
+std::string array_identity(Type element, std::optional<std::uint64_t> extent) {
+    const auto key=std::to_string(static_cast<unsigned>(element.kind))+":"+Type::key(element)+(element.nullable ? "?" : "");
+    return "$array:"+std::to_string(key.size())+":"+key+":"+(extent ? std::to_string(*extent) : "growable");
+}
+bool scalar_fixed_array(Type t) {
+    return t.kind==Type::fixed_array && t.definition && t.definition->element &&
+        (numeric::number(array_element(t)) || array_element(t)==Type::boolean);
+}
+std::uint64_t checked_array_index(std::uint64_t bits,Type index,std::uint64_t extent) {
+    if (!numeric::integer(index)) throw std::invalid_argument("Array index requires an integer");
+    const auto width=numeric::width(index);
+    if(width<64) bits &= (std::uint64_t{1}<<width)-1;
+    if(numeric::signed_integer(index) && (bits & (std::uint64_t{1}<<(width-1)))) {
+        const auto mask=width==64 ? ~std::uint64_t{0} : (std::uint64_t{1}<<width)-1;
+        const auto magnitude=((~bits)&mask)+1;
+        if(magnitude>extent) throw std::out_of_range("Array index out of bounds");
+        return extent-magnitude;
+    }
+    if(bits>=extent) throw std::out_of_range("Array index out of bounds");
+    return bits;
+}
 bool reference_value(Type t) { return t.kind==Type::managed_ref || t.kind==Type::interface_ref; }
 Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
     if (!d) return;
@@ -23,6 +50,7 @@ Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
             current->arena = owner;
             owner->definitions.push_back(current);
             if (auto base=current->base.lock()) pending.push_back(std::move(base));
+            if (current->element) if (auto child=current->element->target.lock()) pending.push_back(std::move(child));
             for (const auto& field : current->fields)
                 if (auto child = field.type.target.lock()) pending.push_back(std::move(child));
         }
@@ -35,7 +63,7 @@ FieldType::FieldType(Type t) : kind(t.kind), nullable(t.nullable), readonly(t.re
     if (t.definition) target = t.definition->self;
 }
 FieldType::operator Type() const {
-    if (kind != Type::aggregate && kind != Type::unresolved && kind != Type::managed_ref && kind != Type::interface_ref) { Type t(kind); t.nullable=nullable; t.readonly=readonly; return t; }
+    if (kind != Type::aggregate && kind != Type::unresolved && kind != Type::managed_ref && kind != Type::interface_ref && kind!=Type::fixed_array && kind!=Type::growable_array) { Type t(kind); t.nullable=nullable; t.readonly=readonly; return t; }
     auto d = target.lock();
     if (!d) throw std::logic_error("nominal type edge outlived its definition table");
     Type t(std::move(d),kind); t.nullable=nullable; t.readonly=readonly; return t;
@@ -157,6 +185,7 @@ std::string type_name(Type t) {
     if(t.kind==Type::interface_ref && t.definition) return std::string(t.readonly ? "readonly " : "")+t.definition->identity+(t.nullable ? "?" : "");
     if(t.kind==Type::prepared_receiver && t.definition) return "prepared receiver "+t.definition->identity;
     if (t.readonly && t.kind!=Type::managed_ref) { t.readonly=false; return "readonly " + type_name(t); }
+    if(array_type(t)) return "["+type_name(array_element(t))+(t.definition->extent ? ", "+std::to_string(*t.definition->extent) : "")+"]";
     if (t.kind == Type::managed_ref && t.definition) return std::string(t.readonly ? "readonly " : "") + t.definition->identity + (t.nullable ? "?" : "");
     switch (t.kind) { case Type::string: return "string"; case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
     throw std::invalid_argument("VOID IR: unknown type");
@@ -192,11 +221,18 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     using LayoutExtent=std::pair<unsigned,std::size_t>;
     std::map<const ValueType*,LayoutExtent> extents;
     std::function<LayoutExtent(Type)> inline_layout = [&](Type t)->LayoutExtent {
-        if(t.kind!=Type::aggregate) return {0,0};
+        if(t.kind!=Type::aggregate && t.kind!=Type::fixed_array) return {0,0};
         auto* d=t.definition.get();
+        if(!d) fail("missing inline type definition");
         if(auto found=extents.find(d);found!=extents.end()) return found->second;
         if(visiting.size()>=128 || !visiting.insert(d).second) fail("recursive or excessive value layout");
         unsigned depth=1;std::size_t expanded=0;auto base=d->base.lock();
+        if(t.kind==Type::fixed_array) {
+            if(!d->extent || !d->element) fail("missing fixed-array layout");
+            const auto child=inline_layout(array_element(t));
+            if(*d->extent>65536 || child.second>=65536 || *d->extent>65536/(child.second+1)) fail("excessive expanded array layout");
+            expanded=static_cast<std::size_t>(*d->extent)*(child.second+1);depth=child.first+1;
+        }
         if(base) {auto parent=inline_layout(Type(base));depth=parent.first+1;expanded=parent.second;}
         for(unsigned n=base ? static_cast<unsigned>(base->fields.size()) : 0;n<d->fields.size();++n) {
             auto child=inline_layout(d->fields[n].type);depth=std::max(depth,child.first+1);
@@ -211,6 +247,18 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         std::vector<Type> pending{root};
         for (std::size_t n=0;n<pending.size();++n) {
             auto t=pending[n];
+            if(array_type(t)) {
+                if(!scalar_fixed_array(t)) fail("nonscalar/growable array IR storage awaits later checkpoints");
+                if(!t.definition || !t.definition->element || t.nullable || t.construction || !t.preparation.empty() ||
+                   !t.definition->fields.empty() || t.definition->managed || t.definition->interface_type || !t.definition->base.expired() ||
+                   (t.kind==Type::fixed_array)!=t.definition->extent.has_value()) fail("invalid structural array type");
+                const auto element=array_element(t);
+                if(element==Type::none || element.kind==Type::prepared_receiver || element.kind==Type::invalid || element.kind==Type::unresolved ||
+                   element.construction || element.readonly || !element.readonly_references.empty() ||
+                   t.definition->identity!=array_identity(element,t.definition->extent)) fail("invalid array element or identity");
+                if(checked.insert(t.definition.get()).second) {pending.push_back(element);inline_layout(t);}
+                continue;
+            }
             if (t.kind==Type::string && (t.definition || t.nullable || t.construction || !t.preparation.empty() || !t.readonly_references.empty())) fail("invalid intrinsic string type");
             if (t.construction && (t.kind!=Type::managed_ref || t.nullable)) fail("invalid construction view type");
             if (t.nullable && !reference_value(t)) fail("nullable non-reference type");
@@ -455,6 +503,25 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if (i.type.kind != Type::aggregate || !i.type.definition || i.arguments.size() != i.type.definition->fields.size()) fail("invalid aggregate construction");
                     for (unsigned n = 0; n < i.arguments.size(); ++n) expect(i.arguments[n], i.type.definition->fields[n].type);
                     result = i.type; break;
+                case Op::fixed_array:
+                    valid_type(i.type);
+                    if(!scalar_fixed_array(i.type) || i.arguments.size()!=*i.type.definition->extent || i.receiver || i.initialization || i.immediate || !i.callee.empty())
+                        fail("invalid scalar fixed-array construction");
+                    for(auto argument:i.arguments) expect(argument,array_element(i.type));
+                    result=i.type;break;
+                case Op::array_get: case Op::array_set: {
+                    const auto array=operand(i.a), index=operand(i.b);
+                    if(!scalar_fixed_array(array) || !numeric::integer(index) || i.receiver || i.initialization || i.immediate || !i.callee.empty())
+                        fail("invalid checked scalar array access");
+                    if(i.op==Op::array_set) {
+                        if(i.arguments.size()!=1) fail("array update requires exactly one value");
+                        expect(i.arguments[0],array_element(array));result=array;
+                    } else {
+                        if(!i.arguments.empty()) fail("array read has unexpected operands");
+                        result=array_element(array);
+                    }
+                    break;
+                }
                 case Op::extract: case Op::insert: {
                     auto t = operand(i.a);
                     if (t.kind != Type::aggregate || i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= t.definition->fields.size()) fail("invalid aggregate field");
@@ -473,7 +540,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if (!m.coordinated || operand(i.a)!=Type::string || operand(i.b)!=Type::string) fail("invalid string operands");
                     result=i.op==Op::string_concat ? Type::string : Type::boolean; break;
                 case Op::constant:
-                    if (i.type.construction || i.type.kind == Type::aggregate || i.type.kind==Type::prepared_receiver || i.type == Type::none || (reference_value(i.type) && i.immediate != 0) || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1) || (i.type==Type::string && i.immediate!=0)) fail("invalid literal");
+                    if (array_type(i.type) || i.type.construction || i.type.kind == Type::aggregate || i.type.kind==Type::prepared_receiver || i.type == Type::none || (reference_value(i.type) && i.immediate != 0) || (i.type == Type::boolean && i.immediate != 0 && i.immediate != 1) || (i.type==Type::string && i.immediate!=0)) fail("invalid literal");
                     if (reference_value(i.type) && !i.type.nullable) fail("null literal requires a nullable reference type");
                     valid_type(i.type); result = i.type; break;
                 case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:

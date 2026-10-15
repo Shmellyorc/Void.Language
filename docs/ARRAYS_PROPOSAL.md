@@ -1,14 +1,15 @@
 # Phase 23 proposal: typed arrays, indexing and iteration
 
 **Status: A1-A10 APPROVED AS REVISED; implementation authorized at P23-1 through
-P23-6. No Phase 23 feature is implemented or claimed complete yet.**
+P23-6. P23-1 scalar fixed-array analysis/IR is implemented and locally verified for review.
+Native array execution and P23-2 through P23-6 remain unimplemented.**
 
 The owner approved the revised architecture and recorded choices, including final
-i32/i64 ranges, on 14 October 2026. Numerical native storage limits remain withheld
-pending target-aware evidence and separate owner approval. The implementation
-preflight below returns a measured budget candidate before adopting any limit.
-The follow-up manual native workflow in Section 10 investigates that candidate;
-no numerical limit is approved, and array implementation remains paused.
+i32/i64 ranges, on 14 October 2026. The owner now approves 64 KiB (65536 bytes) as the initial target-aware per-function
+native static-storage budget for array-carrying functions, subject to the storage
+planning and ABI proofs below. This is not an allocation/save-file limit or an
+arbitrary-recursion safety guarantee. P23-1 alone is currently authorized.
+Section 10 records independently verified native probe run #3 evidence.
 
 Phase 22 is locked. The owner reports Actions run #39 passed all seven jobs,
 59 suites per configuration. This investigation uses clean commit `95e79ff`.
@@ -54,8 +55,8 @@ in the existing collector. Fixed-array snapshot semantics are mandatory; borrowi
 is only a proved optimization. Nested selections must reacquire storage and
 revalidate dependent owners after possible resize or safepoints. Live elements
 must always satisfy their source type, including required references; zeroed spare
-capacity is private GC storage only. The proposed 256 KiB storage limit remains
-UNAPPROVED pending target-aware sizing and small-stack evidence.
+capacity is private GC storage only. The earlier 256 KiB proposal is superseded by the owner-approved 64 KiB
+per-function policy, subject to target-aware accounting and implementation proofs.
 
 ## 2. Bible commitments and approved bounded choices
 
@@ -498,19 +499,26 @@ fixed-array multiplicity in the existing 65536 expanded-layout bound and 128 dep
 bound; never materialize an enormous vector just to discover it exceeds the bound.
 Check total owned literal/template work as well, not just an individual literal.
 
-These bounds alone do not bound native stack size: instruction homes, parameters,
-construction staging and copied fixed arrays can multiply storage. Recommend an
-additional target-layout-aware budget for total statically reserved array-carrying
-function storage. The earlier 256 KiB estimate is UNAPPROVED: do not adopt it as a
-compiler limit, acceptance threshold or justification for rejecting source yet.
-First obtain target-aware sizing of parameter/return temporaries, copies, alignment,
-roots and staging on relevant ABIs, then justify a candidate with Debug/Release
-small-stack evidence. Establish how the same target configuration reaches shared
-analysis and LSP diagnostics, and return the measured policy for owner review.
-If that evidence is unavailable, the numeric limit remains unresolved; do not
-accept huge inline arrays on the strength of an untested estimate. Do not silently heap-box value arrays or raise platform stack reserves.
-This is array resource planning, not authorization to fix the existing unrelated
-receiver-chain lowering issue or promise arbitrary source recursion fits 1 MiB.
+These shape bounds alone do not bound native stack size: instruction homes,
+parameters, construction staging and copied arrays can multiply storage. The owner
+approves **65536 bytes per array-carrying function** after native probe run #3.
+Use the selected target DataLayout and actual ABI to account for parameter/result
+homes, local/instruction homes, copies, roots, staging, alignment and known ABI
+scratch. Do not enforce a payload-only guess. The earlier 256 KiB estimate is not
+adopted. The same target configuration and shared plan must serve analysis, LSP
+and lowering. Array-free functions receive no incidental new restriction.
+
+P23-1 prepares `NativeStoragePlanner`, a common checked inventory/aggregation
+contract requiring an explicit target layout provider and all storage categories,
+including those proved empty. It has no host-size fallback. P23-2 must populate
+that inventory from real lowering decisions, root records and target calling
+conventions, feed the same configuration to shared analysis/tooling, and prove
+coverage before enabling LLVM ArrayType lowering. P23-1 deliberately blocks native
+arrays while that integration is incomplete. Test-only layout providers are
+arithmetic fixtures, not platform measurements or ABI proofs. Stop if the approved
+budget is unworkable rather than changing it, heap-boxing value arrays or increasing
+platform stack reserves. This does not authorize the receiver-chain hardening task
+or promise arbitrary source recursion fits 1 MiB.
 
 Runtime lengths/counts use checked exact arithmetic, INT64_MAX and target size_t
 limits plus ordinary allocation failure. No arbitrary public capacity maximum is
@@ -578,7 +586,7 @@ leases; GC reachability and generation reclamation remain separate.
 
 | Step | Deliverable and exit proof |
 | --- | --- |
-| P23-0 | Owner/wrench review approves A1-A10 scope and the resource-proof plan; the numeric storage cap remains withheld pending evidence; no implementation before this gate |
+| P23-0 | Completed owner/wrench approval of A1-A10 and, after native run #3, the initial 65536-byte policy subject to real target/ABI inventory proofs |
 | P23-1 | Canonical structural types, finite/default layouts and source diagnostics; scalar fixed literals/access and exact extent negatives through existing analysis/IR |
 | P23-2 | Normal/O2 fixed-array JIT/AOT and for/range/reverse CFGs, original indexes, i32 range endpoint safety and readonly const-formal borrow/fallback proofs; i64 may follow before the final gate |
 | P23-3 | GC header/buffer proof, scalar list defaults/push/remove, alias identity, version checks and rollback under injected failures |
@@ -674,7 +682,7 @@ Numerical storage budgets still require evidence and separate approval. Nullable
 arrays, string indexing, reverse deletion, public element references, a generic
 iterator protocol and the separate lowering fix remain outside implementation.
 
-## 9. Implementation preflight: numerical storage decision pending
+## 9. Historical implementation preflight: storage evidence before approval
 
 The owner authorized P23-1 through P23-6, preserving the explicit numerical-budget
 approval gate. Before enabling fixed-array native lowering, inspected its real
@@ -720,7 +728,7 @@ thread/frame cleanup. This is 24 target/mode/layout measurements and 32 Linux
 stack runs: 20 successful and 12 expected exhaustion cases. It neither repairs nor
 exercises the separate frontend receiver-chain lowering defect.
 
-**New numerical recommendation for owner approval: 64 KiB (65536 bytes) per
+**Historical recommendation, subsequently approved after run #3: 64 KiB (65536 bytes) per
 array-carrying function for total statically reserved storage before optimization.**
 This is a candidate resource policy, not an adopted compiler limit or a guarantee
 about arbitrary recursion. Count all known local/parameter/result/stage/copy homes,
@@ -731,18 +739,17 @@ and checked size arithmetic, including zero-sized layouts and alignment.
 
 Before enforcement, a common target-aware storage plan must serve validated
 analysis/LSP and shared lowering, and cover actual array parameter/return ABI,
-borrow fallback copies and intrinsic call scratch. The current APIs have no such
-shared native-storage plan. The hand-generated probe does not prove those missing
+borrow fallback copies and intrinsic call scratch. At that preflight the APIs had no such
+shared native-storage plan; P23-1 now prepares the common inventory contract. The hand-generated probe does not prove those missing
 parts; the real planner and later six-configuration/native tests must audit them.
 Register spills and arbitrary caller depth remain outside a simplistic payload
 sum, so the budget cannot be advertised as native-stack safety for every program.
 
 The earlier 256 KiB proposal remains unapproved and is not supported as a default
-by this nesting evidence. No 64 KiB or other limit has been adopted. Work stops at
-this owner-required numerical approval boundary before source/IR feature changes.
-Approval of the candidate would authorize implementing that budget within the
-already authorized Phase 23 work and full verification;
-it would not waive the existing proof, platform, readonly or initialization gates.
+by this nesting evidence. At this historical preflight, no limit had been adopted
+and work stopped for numerical review. Section 10 supersedes that pending status:
+64 KiB is now approved, with P23-1 authorized and all target/ABI, readonly,
+initialization and later checkpoint proof gates retained.
 Evidence and rerunnable scripts are in build/phase23-storage, including measured.json,
 target assembly, run.py and measure.py. Full Phase 23 acceptance is still outstanding.
 
@@ -789,21 +796,94 @@ Actual Linux x64 execution of the final observer-enabled harness:
 | 256 | 262168 / 262176 | 262184 / 262192 | 1, 2 | 4, 8, 16 |
 
 This is 30 depth cases: 18 successful collections with balanced cleanup and
-12 verified guard faults. All six unrelated-fault controls pass. Four evidence
+12 verified guard faults. All six unrelated-fault controls pass. Six evidence
 classification tests reject invalid guard addresses, non-stack Windows exceptions,
 bare signal/exit claims, missing/malformed evidence and mismatched stack extents.
 Observed recursive frame strides are consistent and include call/alignment costs
 outside LLVM's frame-size diagnostic. No optimization suppression is used.
 
-Windows x64 and macOS ARM64 native results are **pending owner dispatch**. Earlier
-cross-target frame measurements are compile-only evidence and cannot fill those
-rows. Each job records native target, version, source/header hashes, exact commands,
-assembly, frame diagnostics, stack extents and per-child results in JSON/logs,
-with a concise job summary and 14-day artifacts. Setup failures retain logs and
-do not silently fall back to default stack conditions. See
-`tools/ci/stack_probe/README.md` for reproduction and platform limitations.
+Independently inspected [native probe run #3](https://github.com/Shmellyorc/Void.Language/actions/runs/38660215692),
+commit `ea8685180750f69b1dc4d182b7ac5940ddc6c9bd`: all three jobs and platform
+artifacts pass with LLVM 19.1.7. Each platform passes six harness regressions,
+18 normal depth cases, 12 verified overflows and six unrelated-fault controls.
+All platforms have the same tested passing/exhaustion depths in the preceding table.
+These are native executions, not cross-compilation inference.
 
-Neither 64 KiB nor 256 KiB is adopted. No Phase 23 array code or receiver-chain
-correction is included. Review native platform evidence and the missing real
-array ABI/storage-plan proofs before approving any numerical policy or resuming
-implementation. Full Phase 23 acceptance remains outstanding.
+| Planned KiB | Linux x64 O0 frame / stride | Linux x64 O2 frame / stride | Windows x64 O0 frame / stride | Windows x64 O2 frame / stride | macOS ARM64 O0 frame / stride | macOS ARM64 O2 frame / stride |
+| --- | --- | --- | --- | --- | --- | --- |
+| 64 | 65560 / 65568 | 65576 / 65584 | 65592 / 65600 | 65608 / 65616 | 65632 / 65632 | 65616 / 65616 |
+| 128 | 131096 / 131104 | 131112 / 131120 | 131128 / 131136 | 131144 / 131152 | 131168 / 131168 | 131152 / 131152 |
+| 256 | 262168 / 262176 | 262184 / 262192 | 262200 / 262208 | 262216 / 262224 | 262240 / 262240 | 262224 / 262224 |
+
+All frame/stride values are bytes. Artifacts verify the requested native 1 MiB
+worker extents, platform guard/reporting controls, root ABI and successful cleanup.
+Linux and macOS pass both lifecycle controls. macOS records the old zero-size
+request returning -1 with errno 12/ENOMEM at O0/O2; corrected disable/query/unmap
+returns zero. Windows verifies the actual reserved stack and actual stack-overflow
+exception. Artifacts retain target/version, source hashes, commands, assembly,
+frame diagnostics and per-child JSON/logs. Local copies are under ignored
+`build/phase23-probe-run3`; hosted artifacts have 14-day retention.
+
+Boss/wrench approve **65536 bytes of total per-function native static storage**
+for array-carrying functions, subject to target DataLayout and real ABI proofs.
+Account for parameter/result homes, local and instruction homes, copies, roots,
+staging, alignment and known ABI overhead. Native enforcement must use a shared
+plan consumed by analysis/tooling and lowering; no separate LSP calculator or
+payload-only estimate is authorized. The earlier 256 KiB proposal is not adopted.
+The probe does not prove real array calling conventions, reference-bearing arrays,
+borrow fallback storage or arbitrary source recursion. Stop if the approved budget
+cannot be supported, rather than changing it. Full Phase 23 acceptance remains outstanding.
+
+## 11. P23-1 implementation boundary
+
+P23-1 adds structural array descriptor kinds, element/extent identity keys and
+canonical scalar fixed-array instances in the existing type arena. Array descriptors
+contain one nonowning element edge, not a vector of synthetic nominal fields.
+Source storage currently accepts fixed arrays of existing numeric/bool scalars.
+Growable, nested and reference-bearing storage diagnose as deferred to subsequent
+checkpoints; the descriptor foundation does not claim those operations work.
+
+Scalar fixed annotations, exact contextual literals, omitted zero defaults,
+parameters/results, inline struct fields, value copies and checked reads/updates
+flow through the existing parser, semantic analysis and validated IR. Empty fixed
+literals need a context; zero extents contain no elements. Numeric contextual
+typing retains exact existing conversions and range rules. All existing integer
+index widths are accepted; bool/floating indexes reject. The shared checked
+normalization handles -1/-n, signed MIN, unsigned MAX and empty arrays without
+signed-negation overflow or target-width narrowing. Runtime bounds operations are
+retained as checked IR; only pure constant out-of-bounds accesses execute and
+diagnose during this checkpoint.
+
+Extent expressions remain owned syntax until declaration discovery. Resolution
+reuses pure module constants, root/import visibility, existing dependency states
+and diagnostics, including forward references, value-constant fields and cycles
+through array annotations. Runtime/local-const extents reject. Layout multiplicity
+uses the existing 65536 expanded-shape and 128 depth guards before allocating
+default/template vectors. The parser's existing 512 expression-node guard also
+covers extent subexpressions inside casts. No new constant-array pool numerical
+policy is inferred from string limits; aggregate pool work remains a later reviewed
+resource obligation before the broader array template/GC implementation.
+
+Indexed places reuse existing selected-owner storage. Owners/index expressions
+evaluate once; index effects finish before reading current array bytes. Selected
+writes check bounds before the RHS, snapshot compound operands, then reacquire
+current storage for commit so unrelated RHS writes are preserved. Checked access
+instructions retain source locations/excerpts. Scalar arrays have no GC/readonly
+reference leaves; reference-containing profiles, resize/version selection and
+borrow optimization remain later proof gates.
+
+`NativeStoragePlanner` is the shared target-aware inventory contract described in
+A10. Its finalizer requires all home categories and checked target alignment/size
+arithmetic; a complete array-carrying inventory exceeding 65536 bytes rejects.
+Target layouts are supplied explicitly, without sizeof(host) guesses. The actual
+LLVM/ABI inventory producer and its shared analysis/tooling target configuration
+are not implemented in P23-1. Consequently the common LLVM lowering path explicitly
+rejects array types/operations before native execution. This gate applies to JIT
+and AOT, preventing accidental native support before budget enforcement is proved.
+
+The new `arrays_foundation` suite validates source/IR positives and negatives,
+forged IR extents/index/value/stride metadata, dependency ownership, zero/default
+layouts, source evaluation order, integer extrema and incomplete/overflowing storage
+inventories. The 59 original suites remain present. P23-2 through P23-6, iterable
+loops/ranges, native array lowering, growable storage, GC array maps, indexing of
+strings and the unrelated receiver-chain hardening task are not implemented here.

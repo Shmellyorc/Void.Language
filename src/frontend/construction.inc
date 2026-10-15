@@ -112,8 +112,9 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     auto alias=context.aliases.find(s.slot);
                     if (alias!=context.aliases.end()) {
                         if (s.fields.empty()) issue(s.token,"A construction receiver or alias cannot be rebound.");
-                        if (s.field_indexes.size()>1 || s.op!="=") require_field(alias->second,s.field_indexes.front(),current,s.token);
+                        if (s.index || s.field_indexes.size()>1 || s.op!="=") require_field(alias->second,s.field_indexes.front(),current,s.token);
                     }
+                    if (s.index && expression(*s.index,current)) issue(s.index->token,"A construction view cannot be an index.");
                     if (s.expression && expression(*s.expression,current)) issue(s.expression->token,"A construction view cannot be stored or published through assignment.");
                     if (alias!=context.aliases.end()) current.emplace(alias->second,s.field_indexes.front());
                 } else if (s.kind==K::variable) {

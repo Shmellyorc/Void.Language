@@ -187,6 +187,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             for (auto& s:body) {
                 using K=Statement::Kind;
                 ReferenceFacts rhs;
+                if (s.index) expression(*s.index);
                 if (s.expression) rhs=expression(*s.expression);
                 else if (s.kind==K::variable) rhs=ir::reference_facts(f.locals.at(s.slot));
                 if (s.kind==K::variable) {

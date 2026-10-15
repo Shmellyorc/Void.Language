@@ -177,7 +177,7 @@ def main():
             lines.append(f"| {case['kib']} | {case['mode']} | {case['frame_bytes']} | {strides} | {outcomes} |")
         if error:
             lines += ['', f'ERROR: {error}']
-        lines += ['', '64 KiB remains unapproved. No full compiler build, CTest matrix or hosted acceptance is implied.']
+        lines += ['', 'Probe results do not enact compiler policy; approval status is recorded in docs/ARRAYS_PROPOSAL.md. No full compiler build, CTest matrix or Phase 23 acceptance is implied.']
         (artifacts / 'summary.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
 
     try:

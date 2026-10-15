@@ -179,7 +179,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
             pair == "-=" || pair == "*=" || pair == "/=" || pair == "%=" || pair == "++" || pair == "--") {
             p += 2; emit(TokenKind::symbol, pair, start); continue;
         }
-        if (std::string("():,.+-*/%=<>?").find(c) != std::string::npos) { ++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
+        if (std::string("[]():,.+-*/%=<>?").find(c) != std::string::npos) { ++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
         error(source, {TokenKind::symbol, "", p}, Code::character, "Unexpected character in source.",
               c == '\t' ? "Use spaces instead of tabs." : "Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.");
         } catch (const CompilationError& e) {
@@ -198,7 +198,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     return tokens;
 }
 struct Expr {
-    enum class Kind { literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization } kind;
+    enum class Kind { literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::string op, qualifier, target;
@@ -223,6 +223,7 @@ struct Statement {
     std::string name, op, constant_syntax;
     std::optional<Type> annotation;
     std::unique_ptr<Expr> expression;
+    std::unique_ptr<Expr> index; // Scalar fixed-array selected write, P23-1.
     std::vector<Token> fields;
     std::vector<bool> implicit_fields;
     std::vector<unsigned> field_indexes;
@@ -274,6 +275,14 @@ struct Constant {
     std::uint64_t value = 0;
     ir::ConstantValue aggregate_value;
 };
+struct ArraySyntax {
+    Token token;
+    Type element;
+    std::shared_ptr<ir::ValueType> definition;
+    std::unique_ptr<Expr> extent;
+    Type resolved = Type::none;
+    unsigned state = 0;
+};
 struct Unit;
 struct Structure {
     Structure() = default;
@@ -310,6 +319,7 @@ struct Unit {
     std::vector<Function> functions;
     std::vector<Constant> constants;
     std::vector<Structure> structures;
+    std::vector<ArraySyntax> arrays;
     std::vector<std::pair<Token,Type>> type_uses;
     std::map<std::string, Structure*> structure_names;
     std::map<std::string, Constant*> constant_names;
@@ -317,6 +327,7 @@ struct Unit {
     std::map<std::string, std::vector<Unit*>> qualifiers;
     std::set<std::string> explicit_qualifiers;
     std::set<std::string> failed_qualifiers, invalid_declarations;
+    std::function<Type(Type,const Token&)> resolve_array;
     bool failed_import = false;
     bool parse_failed = false;
     std::shared_ptr<ir::Module> member_catalog;
@@ -328,6 +339,7 @@ class Parser {
     std::size_t p = 0;
     Diagnostics& diagnostics;
     unsigned depth = 0, nodes = 0;
+    std::vector<ArraySyntax> arrays;
     std::vector<std::pair<Token,Type>> type_uses;
     const Token& peek(std::size_t ahead = 0) const { return tokens[std::min(p + ahead, tokens.size() - 1)]; }
     void synchronize(std::size_t start, bool declaration) {
@@ -359,7 +371,7 @@ class Parser {
         need("(");
         if (!at(")")) do {
             bool readonly_parameter=accept("const");
-            auto token = name(); need(":"); Parameter parameter{token,type()}; parameter.type.readonly=readonly_parameter;
+            auto token = name(); need(":"); nodes=0; Parameter parameter{token,type()}; parameter.type.readonly=readonly_parameter;
             if (accept("=")) {
                 if(!defaults) error(source,tokens[p-1],Code::argument_count,"Interface requirements cannot declare parameter defaults.");
                 auto begin = p; parameter.default_begin = peek().offset; nodes = 0; parameter.default_expression = expression();
@@ -368,7 +380,7 @@ class Parser {
             }
             f.parameters.push_back(std::move(parameter));
         } while (accept(","));
-        need(")"); if (accept("->")) f.result = type();
+        need(")"); if (accept("->")) {nodes=0;f.result = type();}
     }
     bool at(const std::string& text) const { return peek().text == text; }
     Token take() { auto result = peek(); if (p + 1 < tokens.size()) ++p; return result; }
@@ -387,6 +399,16 @@ class Parser {
         return take();
     }
     Type type() {
+        Depth guard(depth,source,peek());
+        if (at("[")) {
+            auto token=take();auto element=type();std::unique_ptr<Expr> extent;
+            if(accept(",")) extent=expression();
+            need("]");
+            if(at("?")) error(source,take(),Code::unsupported_type,"Nullable arrays are deferred.");
+            auto d=std::make_shared<ir::ValueType>();d->name="<unresolved array>";d->identity=d->name;
+            Type result(d,extent ? Type::fixed_array : Type::growable_array);
+            arrays.push_back({token,element,d,std::move(extent)});return result;
+        }
         static const std::map<std::string, Type> types = {
             {"i8",Type::i8},{"i16",Type::i16},{"i32",Type::i32},{"i64",Type::i64},
             {"u8",Type::u8},{"u16",Type::u16},{"u32",Type::u32},{"u64",Type::u64},
@@ -433,42 +455,48 @@ class Parser {
         if (op == "*" || op == "/" || op == "%") return 5;
         return 0;
     }
+    std::unique_ptr<Expr> postfix(std::unique_ptr<Expr> e) {
+        while(true) {
+            if(accept(".")) {
+                auto member=std::make_unique<Expr>(Expr::Kind::field,name());
+                member->parts.push_back(std::move(e));e=std::move(member);
+            } else if(at("[")) {
+                if(++nodes>512) error(source,peek(),Code::nesting,"Expression size limit exceeded.");
+                auto selected=std::make_unique<Expr>(Expr::Kind::array_index,take());
+                selected->parts.push_back(std::move(e));selected->parts.push_back(expression());need("]");e=std::move(selected);
+            } else if(accept("(")) {
+                if(e->kind==Expr::Kind::field) e->kind=Expr::Kind::method_call;
+                else if(e->kind==Expr::Kind::name) e->kind=Expr::Kind::call;
+                else error(source,e->token,Code::not_callable,"Only named functions, value types and receiver methods are callable.");
+                if(!at(")")) do {
+                    Token named{TokenKind::name,"",peek().offset};
+                    if(p+1<tokens.size() && tokens[p+1].text=="=") {named=name();need("=");}
+                    e->names.push_back(named);e->parts.push_back(expression());
+                } while(accept(","));
+                need(")");
+            } else break;
+        }
+        return e;
+    }
     std::unique_ptr<Expr> primary() {
         if (++nodes > 512) error(source, peek(), Code::nesting, "Expression size limit exceeded.", "Split this expression into smaller local values.");
-        auto token = take();
-        if (token.kind == TokenKind::invalid) throw Poison{};
-        if (token.kind == TokenKind::string || token.kind == TokenKind::number || token.text == "true" || token.text == "false" || token.text == "null") {
-            auto e = std::make_unique<Expr>(Expr::Kind::literal, token);
-            if (token.kind == TokenKind::string) {
-                e->type=Type::string; e->aggregate_value.text=token.decoded;
-            } else if (token.kind == TokenKind::number) {
-                e->literal_text = token.text;
-            } else { e->type = token.text == "null" ? Type::null_value : Type::boolean; e->value = token.text == "true"; }
-            return e;
+        auto token=take();
+        if(token.kind==TokenKind::invalid) throw Poison{};
+        if(token.text=="[") {
+            auto e=std::make_unique<Expr>(Expr::Kind::array_literal,token);
+            if(!at("]")) do { e->parts.push_back(expression()); } while(accept(","));
+            need("]");return postfix(std::move(e));
         }
-        if (token.text == "(" || (token.kind == TokenKind::name && !reserved.contains(token.text))) {
-            std::unique_ptr<Expr> e;
-            if (token.text == "(") { e = expression(); need(")"); }
-            else e = std::make_unique<Expr>(Expr::Kind::name, token);
-            while (true) {
-                if (accept(".")) {
-                    auto member = std::make_unique<Expr>(Expr::Kind::field, name());
-                    member->parts.push_back(std::move(e)); e = std::move(member);
-                } else if (accept("(")) {
-                    if (e->kind == Expr::Kind::field) e->kind = Expr::Kind::method_call;
-                    else if (e->kind == Expr::Kind::name) e->kind = Expr::Kind::call;
-                    else error(source,e->token,Code::not_callable,"Only named functions, value types and receiver methods are callable.");
-                    if (!at(")")) do {
-                        Token named{TokenKind::name,"",peek().offset};
-                        if (p + 1 < tokens.size() && tokens[p+1].text == "=") { named = name(); need("="); }
-                        e->names.push_back(named); e->parts.push_back(expression());
-                    } while (accept(","));
-                    need(")");
-                } else break;
-            }
-            return e;
+        if(token.kind==TokenKind::string || token.kind==TokenKind::number || token.text=="true" || token.text=="false" || token.text=="null") {
+            auto e=std::make_unique<Expr>(Expr::Kind::literal,token);
+            if(token.kind==TokenKind::string) {e->type=Type::string;e->aggregate_value.text=token.decoded;}
+            else if(token.kind==TokenKind::number) e->literal_text=token.text;
+            else {e->type=token.text=="null" ? Type::null_value : Type::boolean;e->value=token.text=="true";}
+            return postfix(std::move(e));
         }
-        error(source, token, Code::syntax, "Expected an expression, found '" + token.text + "'.");
+        if(token.text=="(") {auto e=expression();need(")");return postfix(std::move(e));}
+        if(token.kind==TokenKind::name && !reserved.contains(token.text)) return postfix(std::make_unique<Expr>(Expr::Kind::name,token));
+        error(source,token,Code::syntax,"Expected an expression, found '"+token.text+"'.");
     }
     std::unique_ptr<Expr> unary() {
         Depth guard(depth, source, peek());
@@ -548,9 +576,16 @@ class Parser {
         if (peek().kind == TokenKind::name && p + 1 < tokens.size()) {
             auto end = p + 1;
             while (end + 1 < tokens.size() && tokens[end].text == "." && tokens[end+1].kind == TokenKind::name) end += 2;
+            if(end<tokens.size() && tokens[end].text=="[") {
+                unsigned brackets=0;
+                do {if(tokens[end].text=="[") ++brackets;else if(tokens[end].text=="]") --brackets;++end;}
+                while(end+1<tokens.size() && brackets && tokens[end].kind!=TokenKind::newline);
+            }
             auto op = tokens[end].text;
             if (op == "=" || op == "+=" || op == "-=" || op == "*=" || op == "/=" || op == "%=" || op == "++" || op == "--") {
-                Statement s(Statement::Kind::assignment, name()); s.name = s.token.text; while (accept(".")) s.fields.push_back(name()); s.op = take().text;
+                Statement s(Statement::Kind::assignment, name()); s.name = s.token.text; while (accept(".")) s.fields.push_back(name());
+                if(accept("[")) {s.index=expression();need("]");}
+                s.op = take().text;
                 if (op == "++" || op == "--") {
                     s.expression = std::make_unique<Expr>(Expr::Kind::literal, s.token); s.expression->literal_text = "1";
                 } else s.expression = expression();
@@ -565,7 +600,7 @@ public:
         auto before = diagnostics.size();
         while (peek().kind != TokenKind::end) {
             if (diagnostics.full()) { unit.parse_failed = true; break; }
-            auto start = p;
+            auto start = p;nodes=0;
             try {
             if (accept("<newline>")) continue;
             if (peek().kind == TokenKind::invalid) throw Poison{};
@@ -612,6 +647,7 @@ public:
                     bool composition = at("using") && peek(1).text != ":";
                     if (composition) take();
                     auto start = p;
+                    nodes=0;
                     Statement field(Statement::Kind::variable, name()); field.name = field.token.text;
                     field.using_field = composition;
                     if (composition && !at(":")) {
@@ -651,6 +687,7 @@ public:
         }
         unit.parse_failed |= diagnostics.size() != before;
         unit.type_uses = std::move(type_uses);
+        unit.arrays = std::move(arrays);
     }
 };
 ir::Op operation(const std::string& op) {
@@ -697,6 +734,7 @@ std::pair<Unit*, Structure*> structure_lookup(Unit& unit, Unit& root,
     return candidates.empty() ? std::pair<Unit*,Structure*>{nullptr,nullptr} : candidates.begin()->second;
 }
 Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std::unique_ptr<Unit>>& units, const Token& token) {
+    if(ir::array_type(t)) return unit.resolve_array(t,token);
     if (t.kind != Type::unresolved) return t;
     auto [owner, structure] = structure_lookup(unit,root,units,t.definition->name,token); (void)owner;
     auto location = token; location.offset = t.definition->source_offset; location.text = t.definition->name;
@@ -1094,6 +1132,12 @@ class Semantics {
             auto [owner,c] = constant(e); if (c) { evaluate(*owner,*c); return c->type; }
             return {};
         }
+        if(e.kind==K::array_index) {
+            auto owner=anchor(*e.parts[0]);
+            if(owner && ir::array_type(*owner)) return ir::array_element(*owner);
+            return {};
+        }
+        if(e.kind==K::array_literal) return {};
         if (e.kind == K::method_call) {
             if (module_call(e)) {
                 Expr qualified(K::call,e.token); qualified.qualifier = e.parts[0]->token.text; qualified.qualifier_token = e.parts[0]->token;
@@ -1174,6 +1218,8 @@ class Semantics {
     // temporaries here exhausts a 1 MiB Debug stack before the depth guard.
     Type expression_impl(Expr& e, std::optional<Type> expected) {
         switch (e.kind) {
+        case Expr::Kind::array_literal: return array_expression(e,expected);
+        case Expr::Kind::array_index: return index_expression(e);
         case Expr::Kind::literal: return literal_expression(e, expected);
         case Expr::Kind::name: return name_expression(e);
         case Expr::Kind::field: return field_expression(e, expected);
@@ -1183,6 +1229,22 @@ class Semantics {
         case Expr::Kind::unary: return unary_expression(e, expected);
         default: return binary_expression(e, expected);
         }
+    }
+    VOID_SEMANTIC_HANDLER Type array_expression(Expr& e,std::optional<Type> expected) {
+        if(!expected) error(source,e.token,Code::unsupported_type,e.parts.empty() ? "An empty array literal requires contextual typing." : "Inferred growable literals are deferred beyond P23-1; supply a fixed-array type.");
+        if(!ir::scalar_fixed_array(*expected)) error(source,e.token,Code::unsupported_type,"P23-1 literals require a scalar fixed-array context; other array construction is deferred.");
+        if(e.parts.size()!=*expected->definition->extent) error(source,e.token,Code::type_mismatch,"Fixed-array literal requires exactly "+std::to_string(*expected->definition->extent)+" elements.");
+        for(auto& part:e.parts) expect(expression(*part,ir::array_element(*expected)),ir::array_element(*expected),part->token);
+        return e.type=*expected;
+    }
+    VOID_SEMANTIC_HANDLER Type index_expression(Expr& e) {
+        auto array=expression(*e.parts[0]);
+        if(array==error_type) return error_type;
+        if(!ir::scalar_fixed_array(array)) error(source,e.token,Code::unsupported_type,"P23-1 indexing requires a scalar fixed array; string and other indexing remain deferred.");
+        auto index=expression(*e.parts[1]);
+        if(index==error_type) return error_type;
+        if(!numeric::integer(index)) error(source,e.parts[1]->token,Code::type_mismatch,"Array index requires an integer, excluding bool and floating types.");
+        return e.type=ir::array_element(array);
     }
     VOID_SEMANTIC_HANDLER Type literal_expression(Expr& e, std::optional<Type> expected) {
         if (e.token.text == "null") {
@@ -1376,6 +1438,11 @@ class Semantics {
                 catch (const CompilationError& failure) { diagnostics.add(failure); t = error_type; }
             }
             if (!s.expression && ir::reference_value(t) && !t.nullable) error(source,s.token,Code::initializer,"A non-nullable reference requires an initializer.","Construct the object explicitly using its type.");
+            if (!s.expression && ir::array_type(t)) {
+                if(!ir::scalar_fixed_array(t)) error(source,s.token,Code::unsupported_type,"P23-1 default construction requires a scalar fixed array.");
+                s.expression=std::make_unique<Expr>(Expr::Kind::literal,s.token);s.expression->type=t;
+                s.expression->aggregate_value.fields.resize(static_cast<std::size_t>(*t.definition->extent));
+            }
             if (!s.expression && t.kind == Type::aggregate) {
                 auto [owner,structure] = owned_structure(t);
                 s.expression = std::make_unique<Expr>(Expr::Kind::construction,s.token);
@@ -1403,6 +1470,12 @@ class Semantics {
                 }
             }
             s.fields=std::move(expanded);
+            if(s.index) {
+                if(!ir::scalar_fixed_array(t)) error(source,s.token,Code::unsupported_type,"P23-1 selected assignment requires a scalar fixed array.");
+                auto index=expression(*s.index);
+                if(index!=error_type && !numeric::integer(index)) error(source,s.index->token,Code::type_mismatch,"Array index requires an integer.");
+                t=ir::array_element(t);
+            }
             s.assigned_type = t;
             expect(expression(*s.expression, t), t, s.expression->token);
             if (s.op != "=" && t != error_type && !numeric::number(t) && !(t==Type::string && s.op=="+=")) expect(t,Type::i32,s.token);
@@ -1445,6 +1518,7 @@ class Semantics {
         return s.flow = flow;
     }
 public:
+    Type pure_expression(Expr& e) { return expression(e); }
     Semantics(Unit& u, const std::map<std::string, std::unique_ptr<Unit>>& graph, Unit& r,
         std::function<void(Unit&, Constant&)> eval, Diagnostics& d, std::function<void(Unit&,Structure&)> defs)
         : source(u.source), unit(u), units(graph), root(r), evaluate(std::move(eval)), defaults(std::move(defs)), diagnostics(d) {
@@ -1495,6 +1569,10 @@ public:
             expect(expression(*field.expression,t),t,field.token);
             if (field.expression->type == error_type) throw Poison{};
             return constant_value(source,*field.expression);
+        }
+        if(ir::array_type(t)) {
+            if(!ir::scalar_fixed_array(t)) error(source,field.token,Code::unsupported_type,"P23-1 field defaults require scalar fixed arrays.");
+            ir::ConstantValue value;value.fields.resize(static_cast<std::size_t>(*t.definition->extent));return value;
         }
         if (t.kind != Type::aggregate) return {};
         for (const auto& [id,owner] : units) for (auto& nested : owner->structures) if (nested.definition == t.definition) {
@@ -1601,18 +1679,19 @@ class Lowering {
     void jump(unsigned to) { terminate({ir::Terminator::Kind::jump, 0, to}); }
     unsigned emit(ir::Instruction i, const Token& token) {
         i.source = source.location(token.offset);
-        if (i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
+        if (i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
             i.source_excerpt = source.excerpt(token.offset);
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
     }
     unsigned constant(Type t, const ir::ConstantValue& value, const Token& token) {
-        ir::Instruction i{t.kind == Type::aggregate ? ir::Op::aggregate : t==Type::string ? ir::Op::string_literal : ir::Op::constant}; i.type = t;
+        ir::Instruction i{t.kind == Type::fixed_array ? ir::Op::fixed_array : t.kind == Type::aggregate ? ir::Op::aggregate : t==Type::string ? ir::Op::string_literal : ir::Op::constant}; i.type = t;
         if (t==Type::string) {
             i.immediate=strings.intern(value.text,source,token);
             module.coordinated=true; return emit(i,token);
         }
-        if (t.kind == Type::aggregate) for (unsigned n = 0; n < t.definition->fields.size(); ++n)
+        if(t.kind==Type::fixed_array) for(const auto& element:value.fields) i.arguments.push_back(constant(ir::array_element(t),element,token));
+        else if (t.kind == Type::aggregate) for (unsigned n = 0; n < t.definition->fields.size(); ++n)
             i.arguments.push_back(constant(ir::field_type(t,n),value.fields.at(n),token));
         else i.immediate = std::bit_cast<std::int64_t>(value.bits);
         return emit(i,token);
@@ -1695,9 +1774,22 @@ class Lowering {
     unsigned expression(const Expr& e) {
         using K = Expr::Kind;
         switch (e.kind) {
+        case K::array_literal: {
+            ir::Instruction i{ir::Op::fixed_array};i.type=e.type;
+            std::vector<unsigned> slots;
+            for(const auto& part:e.parts) {auto value=expression(*part);slots.push_back(snapshot(value,part->type,part->token));}
+            for(auto slot:slots) i.arguments.push_back(emit({ir::Op::load,slot},e.token));
+            return emit(i,e.token);
+        }
+        case K::array_index: {
+            auto selected=place(*e.parts[0]);
+            auto index=expression(*e.parts[1]);
+            auto array=read_place(selected,e.token); // Index effects finish before selecting bytes.
+            return emit({ir::Op::array_get,array,index},e.token);
+        }
         case K::base_initialization: throw std::logic_error("base initialization is a dedicated prelude");
         case K::literal: {
-            return constant(e.type,(e.type.kind == Type::aggregate || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
+            return constant(e.type,(e.type.kind == Type::aggregate || e.type.kind==Type::fixed_array || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
         }
         case K::field: { auto value=expression(*e.parts[0]); ir::Instruction i{e.parts[0]->type.kind==Type::managed_ref ? ir::Op::gc_read : ir::Op::extract,value}; i.immediate=e.slot; return emit(i,e.token); }
         case K::construction: {
@@ -1858,6 +1950,20 @@ class Lowering {
             emit({ir::Op::store, s.slot, value}, s.token); break;
         }
         case K::assignment: {
+            if(s.index) {
+                auto selected=select_place({s.slot,{}},s.field_indexes,s.token);
+                auto index=expression(*s.index);auto index_slot=snapshot(index,s.index->type,s.index->token);
+                auto array=read_place(selected,s.token);
+                auto old=emit({ir::Op::array_get,array,index},s.index->token); // Bounds check before RHS, even for '='.
+                std::optional<unsigned> old_slot;
+                if(s.op!="=") old_slot=snapshot(old,s.assigned_type,s.token);
+                auto value=expression(*s.expression);
+                if(old_slot) value=emit({operation(s.op.substr(0,1)),emit({ir::Op::load,*old_slot},s.token),value},s.token);
+                index=emit({ir::Op::load,index_slot},s.index->token);
+                array=read_place(selected,s.token); // Reacquire current inline bytes after RHS effects.
+                ir::Instruction update{ir::Op::array_set,array,index};update.arguments={value};
+                auto updated=emit(update,s.index->token);write_place(selected,updated,s.token);break;
+            }
             auto selected=select_place({s.slot,{}},s.field_indexes,s.token);
             // Load compound-assignment LHS before evaluating its RHS.
             std::optional<unsigned> old_slot;
@@ -2103,7 +2209,15 @@ public:
 // Only typed, pure ASTs reach this evaluator. The shared software kernel
 // preserves declared precision and wrapping independently of host arithmetic.
 ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
-    if (e.kind == Expr::Kind::literal) return (e.type.kind == Type::aggregate || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}};
+    if (e.kind == Expr::Kind::literal) return (e.type.kind == Type::aggregate || e.type.kind==Type::fixed_array || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}};
+    if(e.kind==Expr::Kind::array_literal) {
+        ir::ConstantValue result;for(const auto& part:e.parts) result.fields.push_back(constant_value(source,*part));return result;
+    }
+    if(e.kind==Expr::Kind::array_index) {
+        auto array=constant_value(source,*e.parts[0]);auto index=constant_value(source,*e.parts[1]);
+        try {return array.fields.at(static_cast<std::size_t>(ir::checked_array_index(index.bits,e.parts[1]->type,array.fields.size())));}
+        catch(const std::out_of_range&) {error(source,e.token,Code::invalid_value,"Constant array index out of bounds.");}
+    }
     if (e.kind == Expr::Kind::construction) {
         auto result = e.aggregate_value;
         for (unsigned n = 0; n < e.parts.size(); ++n) result.fields[e.field_indexes[n]] = constant_value(source,*e.parts[n]);
@@ -2242,7 +2356,100 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             } catch (const CompilationError& failure) { diagnostics.add(failure); unit->failed_qualifiers.insert(alias); }
         }
     }
-    std::function<void(Unit&,Structure&)> layout = [&](Unit& owner, Structure& structure) {
+    // Extents may request existing pure value constants before the ordinary
+    // body/default pass. Discover runtime-only init presence first, so staged
+    // resolution cannot accidentally treat such construction as a pure template.
+    for(auto& [id,u]:units) for(auto& f:u->functions)
+        if(f.receiver && f.token.text=="init" && f.receiver->type.kind==Type::unresolved) {
+            auto found=u->structure_names.find(f.receiver->type.definition->name);
+            if(found!=u->structure_names.end()) found->second->initializer=&f;
+        }
+    root.member_catalog=std::make_shared<ir::Module>(member_catalog(units,entry));
+    std::function<void(Unit&,Structure&)> layout;
+    std::function<void(Unit&,Structure&)> defaults;
+    std::function<void(Unit&,Constant&)> evaluate;
+    std::vector<std::string> dependency;
+    evaluate = [&](Unit& owner, Constant& c) {
+        if (c.state == 2) return;
+        if (c.state == 3) throw Poison{};
+        if (dependency.size() >= 128) error(owner.source, c.declaration.token, Code::nesting, "Constant dependency depth limit exceeded.", "Reduce the dependency chain between constants.");
+        auto key = owner.identity + "::" + c.declaration.name;
+        if (c.state == 1) {
+            std::string chain;
+            for (const auto& item : dependency) chain += item + " -> ";
+            error(owner.source, c.declaration.token, Code::constant_cycle, "Circular constant dependency: " + chain + key + ".");
+        }
+        c.state = 1; dependency.push_back(key);
+        try {
+            Semantics(owner, units, root, evaluate, diagnostics, defaults).analyze_constant(c);
+            c.aggregate_value = constant_value(owner.source, *c.declaration.expression); c.value = c.aggregate_value.bits;
+            c.state = 2; dependency.pop_back();
+        } catch (...) { c.state = 3; dependency.pop_back(); throw; }
+    };
+    defaults = [&](Unit& owner, Structure& structure) {
+        if (structure.definition->interface_type) {structure.default_state=2;return;}
+        if(structure.layout_state==1) error(owner.source,structure.token,Code::constant_cycle,"Circular layout/constant dependency.");
+        if(structure.layout_state==0) layout(owner,structure);
+        if (structure.layout_state != 2) throw Poison{};
+        if (structure.default_state == 2) return;
+        if (structure.default_state == 3) throw Poison{};
+        if (structure.default_state == 1) error(owner.source,structure.token,Code::constant_cycle,"Circular field default dependency for '" + structure.token.text + "'.");
+        Depth guard(diagnostics.semantic_depth(),owner.source,structure.token,128);
+        structure.default_state = 1;
+        try {
+            Semantics semantics(owner,units,root,evaluate,diagnostics,defaults);
+            if (auto base=structure.definition->base.lock()) for (auto& [id,u]:units) for (auto& parent:u->structures) if (parent.definition==base) {
+                defaults(*u,parent); structure.defaults.fields=parent.defaults.fields;
+            }
+            for (auto& field : structure.fields) structure.defaults.fields.push_back(semantics.field_default(field));
+            structure.default_state = 2;
+        } catch (...) { structure.default_state = 3; throw; }
+    };
+    std::map<std::string,std::shared_ptr<ir::ValueType>> canonical_arrays;
+    for(auto& [id,u]:units) u->resolve_array=[&,owner=u.get()](Type raw,const Token&)->Type {
+        auto found=std::find_if(owner->arrays.begin(),owner->arrays.end(),[&](const auto& a){return a.definition==raw.definition;});
+        if(found==owner->arrays.end()) return raw; // Already canonical.
+        auto& syntax=*found;
+        if(syntax.state==2) {auto result=syntax.resolved;result.readonly=raw.readonly;return result;}
+        if(syntax.state==3) throw Poison{};
+        if(syntax.state==1) error(owner->source,syntax.token,Code::constant_cycle,"Circular array extent/type dependency.");
+        Depth guard(diagnostics.semantic_depth(),owner->source,syntax.token,128);syntax.state=1;
+        try {
+            auto element=resolve_type(syntax.element,*owner,root,units,syntax.token);
+            std::optional<std::uint64_t> extent;
+            if(syntax.extent) {
+                Semantics semantics(*owner,units,root,evaluate,diagnostics,defaults);
+                auto type=semantics.pure_expression(*syntax.extent);
+                if(type==error_type) throw Poison{};
+                if(!numeric::integer(type)) error(owner->source,syntax.extent->token,Code::unsupported_type,"Fixed-array extent requires a pure nonnegative integer module-constant expression.");
+                const auto value=constant_value(owner->source,*syntax.extent).bits;
+                if(numeric::signed_integer(type) && (value & (std::uint64_t{1}<<(numeric::width(type)-1))))
+                    error(owner->source,syntax.extent->token,Code::integer_range,"Fixed-array extent cannot be negative.");
+                if(value>65536) error(owner->source,syntax.extent->token,Code::nesting,"Expanded array layout exceeds 65536 elements.");
+                extent=value;
+            }
+            if(element.kind==Type::aggregate) for(auto& [child_id,child_owner]:units) for(auto& child:child_owner->structures)
+                if(child.definition==element.definition) {
+                    layout(*child_owner,child);
+                    if(extent && (child.expanded_fields>=65536 || *extent>65536/(child.expanded_fields+1)))
+                        error(owner->source,syntax.token,Code::nesting,"Expanded array layout exceeds 65536 fields.");
+                }
+            // P23-1 materialization is scalar only. Do not silently accept
+            // reference-containing storage without the later GC/profile proofs.
+            if(!extent || (!numeric::number(element) && element!=Type::boolean))
+                error(owner->source,syntax.token,Code::unsupported_type,"P23-1 supports scalar fixed-array storage; growable and nonscalar array storage is deferred.");
+            const auto key=ir::array_identity(element,extent);
+            auto& canonical=canonical_arrays[key];
+            if(!canonical) {
+                canonical=std::make_shared<ir::ValueType>();canonical->identity=key;canonical->name=key;
+                canonical->element=ir::FieldType(element);canonical->extent=extent;
+                canonical->self=canonical;canonical->arena=arena;arena->definitions.push_back(canonical);
+            }
+            syntax.resolved=Type(canonical,extent ? Type::fixed_array : Type::growable_array);syntax.state=2;
+            auto result=syntax.resolved;result.readonly=raw.readonly;return result;
+        } catch(...) {syntax.state=3;throw;}
+    };
+    layout = [&](Unit& owner, Structure& structure) {
         if (structure.definition->interface_type) {structure.layout_state=2;return;}
         if (structure.layout_state == 2) return;
         if (structure.layout_state == 1) error(owner.source,structure.token,Code::unsupported_type,"Recursive value layout or inheritance for '" + structure.token.text + "'.","Use an acyclic nesting of value types.");
@@ -2275,6 +2482,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 if (field.using_field && ((t.kind!=Type::aggregate && t.kind!=Type::managed_ref) || t.nullable))
                     error(owner.source,field.token,Code::unsupported_type,"A using field requires a non-nullable nominal struct type.","Use an ordinary field for primitives or nullable references.");
                 std::size_t expanded = 1;
+                if(t.kind==Type::fixed_array) {expanded+=static_cast<std::size_t>(*t.definition->extent);structure.layout_depth=std::max(structure.layout_depth,2u);}
                 if (t.kind == Type::aggregate) for (auto& [id,u] : units) for (auto& child : u->structures) if (child.definition == t.definition) {
                     layout(*u,child); expanded += child.expanded_fields; structure.layout_depth=std::max(structure.layout_depth,child.layout_depth+1);
                     if(structure.layout_depth>128) error(owner.source,field.token,Code::nesting,"Physical layout depth limit exceeded.","Reduce the combined inheritance and inline-value depth; the current limit is 128.");
@@ -2326,43 +2534,6 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     }
     validate_inheritance(units,root,diagnostics);
     root.member_catalog=std::make_shared<ir::Module>(member_catalog(units,entry));
-    // Failed layouts are poisoned and never form owning descriptor cycles.
-    std::function<void(Unit&, Structure&)> defaults;
-    std::vector<std::string> dependency;
-    std::function<void(Unit&, Constant&)> evaluate = [&](Unit& owner, Constant& c) {
-        if (c.state == 2) return;
-        if (c.state == 3) throw Poison{};
-        if (dependency.size() >= 128) error(owner.source, c.declaration.token, Code::nesting, "Constant dependency depth limit exceeded.", "Reduce the dependency chain between constants.");
-        auto key = owner.identity + "::" + c.declaration.name;
-        if (c.state == 1) {
-            std::string chain;
-            for (const auto& item : dependency) chain += item + " -> ";
-            error(owner.source, c.declaration.token, Code::constant_cycle, "Circular constant dependency: " + chain + key + ".");
-        }
-        c.state = 1; dependency.push_back(key);
-        try {
-            Semantics(owner, units, root, evaluate, diagnostics, defaults).analyze_constant(c);
-            c.aggregate_value = constant_value(owner.source, *c.declaration.expression); c.value = c.aggregate_value.bits;
-            c.state = 2; dependency.pop_back();
-        } catch (...) { c.state = 3; dependency.pop_back(); throw; }
-    };
-    defaults = [&](Unit& owner, Structure& structure) {
-        if (structure.definition->interface_type) {structure.default_state=2;return;}
-        if (structure.layout_state != 2) throw Poison{};
-        if (structure.default_state == 2) return;
-        if (structure.default_state == 3) throw Poison{};
-        if (structure.default_state == 1) error(owner.source,structure.token,Code::constant_cycle,"Circular field default dependency for '" + structure.token.text + "'.");
-        Depth guard(diagnostics.semantic_depth(),owner.source,structure.token,128);
-        structure.default_state = 1;
-        try {
-            Semantics semantics(owner,units,root,evaluate,diagnostics,defaults);
-            if (auto base=structure.definition->base.lock()) for (auto& [id,u]:units) for (auto& parent:u->structures) if (parent.definition==base) {
-                defaults(*u,parent); structure.defaults.fields=parent.defaults.fields;
-            }
-            for (auto& field : structure.fields) structure.defaults.fields.push_back(semantics.field_default(field));
-            structure.default_state = 2;
-        } catch (...) { structure.default_state = 3; throw; }
-    };
     for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
         try { defaults(*unit,structure); }
         catch (const CompilationError& failure) { diagnostics.add(failure); }
@@ -2401,7 +2572,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             auto* statement=statements.back(); statements.pop_back();
             for (const auto& child : statement->body) statements.push_back(&child);
             for (const auto& child : statement->otherwise) statements.push_back(&child);
-            std::vector<const Expr*> expressions; if (statement->expression) expressions.push_back(statement->expression.get());
+            std::vector<const Expr*> expressions; if(statement->index) expressions.push_back(statement->index.get()); if (statement->expression) expressions.push_back(statement->expression.get());
             while (!expressions.empty()) {
                 auto* e=expressions.back(); expressions.pop_back();
                 for (const auto& part : e->parts) expressions.push_back(part.get());
@@ -2448,6 +2619,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     analyze_construction(units,diagnostics);
     diagnostics.finish();
     (void)string_pool(units);
+    for(auto& [id,u]:units) u->resolve_array={}; // No closures into this validation frame escape.
 }
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
     ir::Module module;
@@ -2567,6 +2739,10 @@ struct AnalysisAccess {
                 for (const auto& part : e.parts) visit_expression(*part,owner,locals,implicit);
                 for (const auto& part : e.omitted) visit_expression(*part,owner,locals,true);
             };
+            for(const auto& array:unit->arrays) if(array.extent) {
+                expression(*array.extent,id,{});
+                field(result->contract_,"array-extent");field(result->contract_,ir::type_name(array.resolved));
+            }
             for (const auto& [token,raw] : unit->type_uses) {
                 auto t = resolve_type(raw,*unit,*graph->at(entry),*graph,token);
                 // Attribute annotation dependencies to their enclosing declaration,
@@ -2642,6 +2818,7 @@ struct AnalysisAccess {
                                 t = t.definition->fields.at(s.field_indexes[n]).type;
                             }
                         }
+                        if (s.index) expression(*s.index,owner,locals);
                         if (s.expression) expression(*s.expression,owner,locals);
                         if (s.readonly) locals.emplace(s.slot,owner);
                         body(s.body); body(s.otherwise);
