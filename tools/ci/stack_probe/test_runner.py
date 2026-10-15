@@ -68,7 +68,8 @@ class CrashEvidenceTests(unittest.TestCase):
         # Windows compilation or execution: it reproduces the path escape only.
         with tempfile.TemporaryDirectory() as scratch:
             script = Path(scratch) / 'path.cmake'
-            script.write_text('cmake_language(EVAL CODE "set(object \\"${PROBE_OBJECT_DIR}/frame-64.o\\")")\n',
+            script.write_text('cmake_minimum_required(VERSION 3.24)\n'
+                              'cmake_language(EVAL CODE "set(object \\"${PROBE_OBJECT_DIR}/frame-64.o\\")")\n',
                               encoding='utf-8')
             unsafe = subprocess.run(['cmake', f'-DPROBE_OBJECT_DIR={path}', '-P', str(script)],
                                     capture_output=True, text=True)

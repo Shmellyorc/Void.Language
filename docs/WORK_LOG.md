@@ -6704,3 +6704,27 @@ No full suite, Git commit or push was performed. Stopped for owner review.
 Final byte comparisons confirm both workflows are unchanged; comparison of old/new
 Linux result JSON confirms identical thresholds, frame sizes and observed strides.
 `git diff --check` passes.
+
+### 2026-10-14: Probe #2 CMake path-regression policy baseline
+
+The owner reports probe #2 failed the CMake path regression on Ubuntu and Windows,
+while macOS ARM64 passed the complete native experiment. Wrench reproduced the
+regression failure with CMake 3.31.6: the generated path.cmake omitted a policy
+baseline, leaving CMP0010 unset and allowing the unsafe escape to produce a warning
+with exit zero. This hosted/reproduction evidence is supplied by the owner; it is
+not a new local Windows or macOS verification claim.
+
+Added `cmake_minimum_required(VERSION 3.24)` before `cmake_language(EVAL CODE ...)`
+in the generated regression script, matching the actual probe project's minimum
+and policy baseline. Preserved the unsafe-path nonzero-exit and invalid-escape
+assertions and the normalized-path zero-exit assertion without modification.
+
+`python3 -m unittest discover -s tools/ci/stack_probe -p test_runner.py -v` passes
+all six regression tests locally with CMake 4.3.4, including the real CMake unsafe
+path failure and normalized path success. `git diff --check` passes. Local CMake
+3.31.6 was not used; that version's reproduction is the wrench-supplied evidence.
+Only the generated regression script and this log entry changed. Production code,
+probe measurements, thresholds, runner and workflows remain unchanged. No native
+stack experiment or full suite was rerun for this test-only policy correction.
+Broader documentation cleanup remains deferred until after hosted testing.
+No commits, pushes, remote changes or hosted dispatch occurred. Stopped for review.
