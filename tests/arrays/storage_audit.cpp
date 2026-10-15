@@ -226,6 +226,60 @@ void fixtures(const std::filesystem::path &out, bool optimized) {
         else rejects([&]{e.deliver(path);},"content mismatch");
         check(read(path)=="existing owner object","profile/content rejection damaged destination");std::filesystem::remove(path);
     }
+    // Only the exact observed byte-count rewrite of declared opaque homes is
+    // recoverable. It keeps P and every physical byte in F, with zero R credit.
+    for(const std::string variant:{"frame","staging","missing","wrong-role","wrong-type","over-budget"}) {
+        llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),optimized);
+        unsigned bytes=variant=="over-budget"?40000:32;
+        auto text="declare void @touch(ptr,i64)\ndefine void @sample(){ %a=alloca "+std::string(variant=="wrong-type"?"i16,i64 16":"i8,i64 "+std::to_string(bytes))+",align 8\n call void @touch(ptr %a,i64 "+std::to_string(bytes)+")\n ret void }\n";
+        auto m=parse(c,e,text);auto &f=*m->getFunction("sample");auto &a=llvm::cast<llvm::AllocaInst>(*f.getEntryBlock().begin());
+        LoweringInventory inv;inv.function(f,true);
+        const bool staging=variant=="staging";
+        inv.home(a,variant=="wrong-role"?StorageRole::local:staging?StorageRole::staging:StorageRole::roots,
+                 variant=="missing"?HomeKind::value:staging?HomeKind::staging:HomeKind::frame,"opaque/original");
+        inv.complete(f,all_storage_roles());e.freeze(*m,inv);e.optimize();
+        bool missing=variant=="missing" || variant=="wrong-role" || variant=="wrong-type";
+        if(optimized && (missing || variant=="over-budget")) {
+            {std::ofstream owner(path);owner<<"existing owner object";}
+            rejects([&]{e.deliver(path);},missing?"unmatched allocation":"65536-byte policy exceeded");
+            check(read(path)=="existing owner object","canonical rejection damaged destination");std::filesystem::remove(path);
+        } else {
+            e.deliver(path);auto j=report(e);auto *r=j.getAsObject()->getObject("functions")->getObject("sample");
+            check(r->getInteger("P")==bytes,"canonical rewrite changed immutable P");
+            if(optimized) {
+                check(r->getInteger("R")==0 && r->getArray("canonical_byte_array_homes")->size()==1,"canonical rewrite granted credit or lost lineage");
+                check(r->getInteger("C")==((bytes+*r->getInteger("frame")+*r->getInteger("E")+15)/16)*16,"canonical charge omitted physical storage");
+            }
+            std::filesystem::remove(path);
+        }
+        std::ofstream evidence(out/(std::string("canonical-")+variant+suffix+".json"));evidence<<e.report();
+    }
+    {
+        llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),optimized);
+        auto m=parse(c,e,"declare void @touch(ptr,i64)\ndeclare void @llvm.lifetime.start.p0(i64 immarg,ptr nocapture)\ndeclare void @llvm.lifetime.end.p0(i64 immarg,ptr nocapture)\ndefine void @sample(){ %a=alloca i8,i64 32,align 8\n %b=alloca i8,i64 32,align 8\n call void @llvm.lifetime.start.p0(i64 32,ptr %a)\n call void @touch(ptr %a,i64 32)\n call void @llvm.lifetime.end.p0(i64 32,ptr %a)\n call void @llvm.lifetime.start.p0(i64 32,ptr %b)\n call void @touch(ptr %b,i64 32)\n call void @llvm.lifetime.end.p0(i64 32,ptr %b)\n ret void }\n");
+        auto &f=*m->getFunction("sample");LoweringInventory inv;inv.function(f,true);unsigned id=0;
+        for(auto &bb:f)for(auto &instruction:bb)if(auto *a=llvm::dyn_cast<llvm::AllocaInst>(&instruction))
+            inv.home(*a,StorageRole::roots,HomeKind::frame,"distinct/"+std::to_string(id++));
+        inv.complete(f,all_storage_roles());e.freeze(*m,inv);e.optimize();e.deliver(path);
+        auto j=report(e);auto *r=j.getAsObject()->getObject("functions")->getObject("sample");
+        check(r->getInteger("P")==64 && r->getInteger("R")==0,"canonical reuse changed P or granted credit");
+        unsigned physical=0;for(const auto &o:*r->getArray("objects")) if(!o.getAsObject()->getBoolean("spill").value_or(true))++physical;
+        check(physical==1,"canonical reuse fixture did not share storage");
+        if(optimized) check(j.getAsObject()->getArray("canonical_rewrite_observations")->size()==2,"distinct canonical identities were conflated");
+        std::ofstream evidence(out/(std::string("canonical-reuse")+suffix+".json"));evidence<<e.report();std::filesystem::remove(path);
+    }
+    const llvm::Triple native(llvm::sys::getDefaultTargetTriple());
+    if(native.isOSLinux() && native.getArch()==llvm::Triple::x86_64) {
+        llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),optimized);
+        auto m=parse(c,e,"declare void @many(ptr,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64)\ndefine void @sample(){ %a=alloca [65520 x i8],align 8\n call void @many(ptr %a,i64 1,i64 2,i64 3,i64 4,i64 5,i64 6,i64 7,i64 8,i64 9,i64 10)\n ret void }\n");
+        auto inv=inventory(*m);e.freeze(*m,inv);e.optimize();
+        {std::ofstream owner(path);owner<<"existing owner object";}
+        rejects([&]{e.deliver(path);},"unproved nonreserved outgoing");
+        check(read(path)=="existing owner object","unreserved call frame delivered");std::filesystem::remove(path);
+        auto j=report(e);auto *r=j.getAsObject()->getObject("functions")->getObject("sample");
+        check(!r->getBoolean("reserved_call_frame").value_or(true) && *r->getInteger("outgoing")>0,"fixture failed to expose outgoing ownership gap");
+        std::ofstream evidence(out/(std::string("unreserved-call-frame")+suffix+".json"));evidence<<e.report();
+    }
     AotObjectEmitter profile(llvm::sys::getDefaultTargetTriple(),optimized);
     check(profile.identity().find(optimized?"PassBuilder(no-TM)":"verify-only")!=std::string::npos,"optimizer identity incomplete");
 }
@@ -262,15 +316,18 @@ int main(int argc,char **argv) {
         if(linux_x64) for(bool optimized:{false,true}) for(const auto *file:{"main","handoffs"}) {
             auto p=compile_project(std::filesystem::path(argv[2])/"examples/managed_structs"/(std::string(file)+".void"));
             const auto object=out/(std::string(file)+(optimized?"-O2.o":"-normal.o"));
+            emit_aot_storage_proof(p.module,object,optimized,object.string()+".certificate.json");
+            check(std::filesystem::exists(object),"exact AOT fixture did not certify");
             if(optimized) {
-                std::filesystem::remove(object);
-                {std::ofstream owner(object);owner<<"existing owner object";}
-                rejects([&]{emit_aot_storage_proof(p.module,object,true,object.string()+".certificate.json");},"unmatched allocation");
-                check(read(object)=="existing owner object","actual optimized AOT rejection damaged destination");
-                std::filesystem::remove(object);
-            } else {
-                emit_aot_storage_proof(p.module,object,false,object.string()+".certificate.json");
-                check(std::filesystem::exists(object),"exact AOT fixture did not certify");
+                // Same real module without compiler-owned home identities must
+                // retain the former rejection; shape/byte equality is no proof.
+                llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),true);
+                auto original=parse(c,e,read(object.string()+".entry.ll"));auto missing=inventory(*original,false);
+                e.freeze(*original,missing);e.optimize();auto rejected=out/(std::string(file)+"-missing-lineage.o");
+                {std::ofstream owner(rejected);owner<<"existing owner object";}
+                rejects([&]{e.deliver(rejected);},"unmatched allocation");
+                check(read(rejected)=="existing owner object","actual optimized AOT rejection damaged destination");
+                std::filesystem::remove(rejected);
             }
             if(!optimized) {
                 llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),false);

@@ -1,6 +1,7 @@
 // Production AOT emission boundary extracted from the pinned machine proof.
 #include "void/llvm_storage_audit.hpp"
 #include <limits>
+#include <functional>
 #include <mutex>
 #include <stdexcept>
 #include <llvm/ADT/SmallVector.h>
@@ -21,6 +22,7 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Module.h>
+#include <llvm/IR/PassInstrumentation.h>
 #include <llvm/IR/ValueHandle.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/IRReader/IRReader.h>
@@ -52,11 +54,28 @@
 using namespace llvm;
 namespace vd::llvm_backend {
 namespace {
-struct Home { WeakVH identity; std::string name; uint64_t bytes, alignment; StorageRole role; HomeKind kind; };
+struct Home { WeakVH identity; std::string name; uint64_t bytes, alignment; StorageRole role; HomeKind kind;
+  WeakVH canonical; bool canonicalProved = false;
+};
+struct RewriteObserver final : CallbackVH {
+  std::function<void(Value *,Value *)> record;
+  RewriteObserver(Value *value, std::function<void(Value *,Value *)> callback)
+    : CallbackVH(value), record(std::move(callback)) {}
+  ~RewriteObserver() = default;
+  void allUsesReplacedWith(Value *replacement) override { record(getValPtr(),replacement); }
+};
 struct Plan { std::vector<Home> homes; uint64_t bytes = 0; bool lifetime = false; bool policy = false; json::Array entryMoves; std::set<std::string> arrayCalls; };
 struct State {
   std::map<std::string, Plan> plans;
   std::map<std::string, json::Object> reports;
+  std::map<std::string, json::Array> earlyObjects;
+  struct TraceHome { WeakVH value; std::string id; };
+  std::vector<TraceHome> traceHomes;
+  std::map<const Value *, size_t> traceIndex;
+  std::map<std::string, std::string> lastTrace;
+  json::Array optimizationEvents, rewriteEvents;
+  std::vector<std::string> activePasses;
+  std::vector<std::unique_ptr<RewriteObserver>> rewriteObservers;
   std::map<std::string, std::string> pei, late;
   std::map<std::string, std::vector<std::string>> sp;
   std::map<std::string, std::map<std::string, uint64_t>> calls;
@@ -126,6 +145,16 @@ struct Early : MachineFunctionPass {
   Early(State &s) : MachineFunctionPass(ID), s(s) {}
   bool runOnMachineFunction(MachineFunction &mf) override {
     const auto &ti = *mf.getSubtarget().getInstrInfo();
+    auto &fi = mf.getFrameInfo();
+    auto &objects = s.earlyObjects[mf.getName().str()];
+    for (int index = fi.getObjectIndexBegin(); index < fi.getObjectIndexEnd(); ++index) {
+      if (fi.isDeadObjectIndex(index)) continue;
+      const auto *allocation = fi.getObjectAllocation(index);
+      objects.push_back(json::Object{{"index", index}, {"bytes", fi.getObjectSize(index)},
+        {"offset", fi.getObjectOffset(index)}, {"alignment", int64_t(fi.getObjectAlign(index).value())},
+        {"fixed", fi.isFixedObjectIndex(index)}, {"spill", fi.isSpillSlotObjectIndex(index)},
+        {"has_alloca_identity", allocation != nullptr}});
+    }
     for (auto &bb : mf) {
       int64_t area = -1;
       for (auto &mi : bb) {
@@ -175,6 +204,11 @@ struct Audit : MachineFunctionPass {
       }
     }
     const bool enforce = plan.policy;
+    const bool reservedCallFrame = fl->hasReservedCallFrame(mf);
+    // A push sequence can put the outgoing area below the static local frame.
+    // Do not add an estimated area or rely on hasVarSizedObjects to catch it.
+    if (enforce && !reservedCallFrame && fi.getMaxCallFrameSize())
+      fail(s, name, "unproved nonreserved outgoing call-frame storage");
     uint64_t r = 0, e = -fl->getOffsetOfLocalArea(), a = fl->getStackAlign().value();
     if (fi.hasVarSizedObjects() || fi.hasOpaqueSPAdjustment())
       fail(s, name, "unsupported dynamic/opaque frame; no dynamic-storage certificate");
@@ -189,7 +223,7 @@ struct Audit : MachineFunctionPass {
         lifetime |= callee->getName().starts_with("llvm.lifetime.");
     std::vector<Credit> credits;
     std::set<size_t> represented;
-    json::Array incoming, zeroHomes, unmatched;
+    json::Array incoming, zeroHomes, unmatched, canonicalHomes;
     for (int i = fi.getObjectIndexBegin(); i < fi.getObjectIndexEnd(); ++i) {
       if (fi.isDeadObjectIndex(i)) continue;
       const auto size = fi.getObjectSize(i), offset = fi.getObjectOffset(i);
@@ -211,7 +245,9 @@ struct Audit : MachineFunctionPass {
       bool found = false;
       for (size_t h = 0; h < plan.homes.size(); ++h) {
         const auto &home = plan.homes[h];
-        if (home.identity && static_cast<Value *>(home.identity) == allocation) {
+        const bool original = home.identity && static_cast<Value *>(home.identity) == allocation;
+        const bool canonical = home.canonicalProved && home.canonical && static_cast<Value *>(home.canonical) == allocation;
+        if (original || canonical) {
           found = true;
           const auto *count = allocation ? dyn_cast<ConstantInt>(allocation->getArraySize()) : nullptr;
           const bool stillZero = allocation && allocation->isStaticAlloca() && count &&
@@ -230,6 +266,11 @@ struct Audit : MachineFunctionPass {
               fail(s, name, "zero home physical byte outside accounted frame");
             zeroHomes.push_back(json::Object{{"identity", home.name}, {"index", i},
               {"logical_bytes", 0}, {"physical_bytes", size}, {"subtraction_credit", 0}});
+          } else if (canonical) {
+            // The original P stays immutable and every physical byte stays in F.
+            // This exact rewrite has provenance, but earns no subtraction credit.
+            canonicalHomes.push_back(json::Object{{"identity", home.name}, {"index", i},
+              {"bytes", size}, {"subtraction_credit", 0}});
           } else credits.push_back({i, offset, offset + size, uint64_t(size)});
           break;
         }
@@ -251,12 +292,16 @@ struct Audit : MachineFunctionPass {
     if (enforce && r > fi.getStackSize()) { fail(s, name, "home credit exceeds measured frame"); r = 0; }
     const auto charge = alignTo(plan.bytes + fi.getStackSize() - r + e, a);
     if (enforce && charge > array_function_storage_budget) fail(s, name, "65536-byte policy exceeded");
+    snapshot["reserved_call_frame"] = reservedCallFrame;
+    snapshot["has_tail_call"] = fi.hasTailCall();
+    snapshot["early_objects"] = json::Array(s.earlyObjects[name]);
     snapshot["storage_policy_applicable"] = enforce;
     snapshot["P"] = int64_t(plan.bytes); snapshot["R"] = int64_t(r); snapshot["E"] = int64_t(e);
     snapshot["A"] = int64_t(a); snapshot["C"] = enforce ? json::Value(int64_t(charge)) : json::Value(nullptr);
     snapshot["lifetime_no_credit"] = lifetime;
     snapshot["incoming"] = std::move(incoming);
     snapshot["zero_extent_homes"] = std::move(zeroHomes);
+    snapshot["canonical_byte_array_homes"] = std::move(canonicalHomes);
     snapshot["unmatched_homes"] = std::move(unmatched);
     snapshot["entry_home_moves"] = json::Array(plan.entryMoves);
     snapshot["changed_after_pei"] = s.pei[name] != key;
@@ -438,6 +483,77 @@ const std::string& AotObjectEmitter::triple() const { return impl_->triple; }
 std::string AotObjectEmitter::identity() const { return impl_->profile; }
 const std::string& AotObjectEmitter::report() const { return impl_->report; }
 namespace {
+// Pinned InstCombine simplifyAllocaArraySize: i8,N -> [N x i8],1.
+// Observe the actual RAUW edge while both objects are alive. Shape coincidence,
+// matching names, arbitrary metadata and a later snapshot cannot create this edge.
+void recordCanonicalRewrite(State &s, Home &home, Value *oldValue, Value *newValue,
+                            const DataLayout &layout) {
+  if (s.activePasses.empty() || s.activePasses.back() != "InstCombinePass") return;
+  auto *old = dyn_cast<AllocaInst>(oldValue); auto *next = dyn_cast<AllocaInst>(newValue);
+  if (!old || !next || !home.identity || static_cast<Value *>(home.identity) != old) return;
+  auto *count = dyn_cast<ConstantInt>(old->getArraySize());
+  auto *nextCount = dyn_cast<ConstantInt>(next->getArraySize());
+  auto *array = dyn_cast<ArrayType>(next->getAllocatedType());
+  bool proved = old->isStaticAlloca() && next->isStaticAlloca() && old->getFunction() == next->getFunction() &&
+    old->getAddressSpace() == 0 && next->getAddressSpace() == 0 && old->getAllocatedType()->isIntegerTy(8) &&
+    count && count->getValue().getActiveBits() <= 63 && count->getZExtValue() > 1 &&
+    nextCount && nextCount->isOne() && array && array->getElementType() == old->getAllocatedType() &&
+    array->getNumElements() == count->getZExtValue() && old->getAlign() == next->getAlign() &&
+    !old->isUsedWithInAlloca() && !next->isUsedWithInAlloca() && !old->isSwiftError() && !next->isSwiftError();
+  if (proved) proved = layout.getTypeAllocSize(array) == home.bytes && next->getAlign().value() == home.alignment;
+  // Never let two original homes claim a single replacement identity.
+  for (auto &[name, plan] : s.plans) for (auto &other : plan.homes) if (&other != &home)
+    if ((other.identity && static_cast<Value *>(other.identity) == next) ||
+        (other.canonical && static_cast<Value *>(other.canonical) == next)) {
+      other.canonicalProved = false; proved = false;
+    }
+  home.canonical = next; home.canonicalProved = proved;
+  s.rewriteEvents.push_back(json::Object{{"original_identity", home.name},
+    {"pass", s.activePasses.back()}, {"rule", "LLVM19.1.7-InstCombine-i8-count-to-array"},
+    {"proved", proved}, {"bytes", int64_t(home.bytes)}, {"subtraction_credit", 0}});
+}
+// Observations identify births/deaths across actual production pass boundaries.
+// They DO NOT map a new allocation to an old home, infer a partition, follow RAUW,
+// or grant credit. A deleted address reused by LLVM gets a fresh identity.
+void observeStorage(State &s, Module &module, StringRef boundary) {
+  std::map<std::string, std::string> current;
+  json::Array created, removed, changed;
+  std::map<const Value *, std::vector<std::string>> originalNames;
+  for (const auto &[function, plan] : s.plans) for (const auto &home : plan.homes)
+    if (home.identity) originalNames[static_cast<Value *>(home.identity)].push_back(home.name);
+  for (auto &f : module) for (auto &bb : f) for (auto &inst : bb) {
+    auto *a = dyn_cast<AllocaInst>(&inst); if (!a) continue;
+    std::string id;
+    auto existing = s.traceIndex.find(a);
+    if (existing != s.traceIndex.end()) {
+      const auto &home = s.traceHomes[existing->second];
+      if (home.value && static_cast<Value *>(home.value) == a) id = home.id;
+    }
+    if (id.empty()) {
+      id = "observed/" + std::to_string(s.traceHomes.size());
+      s.traceIndex[a] = s.traceHomes.size();
+      s.traceHomes.push_back({WeakVH(a), id});
+    }
+    std::string type; raw_string_ostream out(type); a->getAllocatedType()->print(out);
+    std::string count; raw_string_ostream countOut(count); a->getArraySize()->printAsOperand(countOut,false);
+    json::Array originals;
+    for (const auto &name : originalNames[a]) originals.push_back(name);
+    auto description = jsonText(json::Object{{"id", id}, {"function", f.getName().str()},
+      {"type", type}, {"count", count}, {"alignment", int64_t(a->getAlign().value())},
+      {"original_identities", std::move(originals)}});
+    current[id] = description;
+    auto old = s.lastTrace.find(id);
+    if (old == s.lastTrace.end()) created.push_back(description);
+    else if (old->second != description) changed.push_back(description);
+  }
+  for (const auto &[id, description] : s.lastTrace)
+    if (!current.count(id)) removed.push_back(description);
+  if (!created.empty() || !removed.empty() || !changed.empty())
+    s.optimizationEvents.push_back(json::Object{{"observed_after", boundary.str()},
+      {"created", std::move(created)}, {"removed", std::move(removed)}, {"changed", std::move(changed)},
+      {"reconciliation_credit", 0}});
+  s.lastTrace = std::move(current);
+}
 bool reaches(const BasicBlock *from, const BasicBlock *to, bool nonempty) {
   std::vector<const BasicBlock *> work;
   if (nonempty) for (auto *next : successors(from)) work.push_back(next);
@@ -512,7 +628,7 @@ void AotObjectEmitter::freeze(Module &module, const LoweringInventory &inventory
         throw std::length_error("Original storage extent overflow");
       auto bytes = n * unit;
       planner.storage(home.role, home.identity, {bytes, a->getAlign().value()});
-      plan.homes.push_back({WeakVH(a), home.identity, bytes, a->getAlign().value(), home.role, home.kind});
+      plan.homes.push_back({WeakVH(a), home.identity, bytes, a->getAlign().value(), home.role, home.kind, WeakVH(), false});
     }
     for (const auto &bb : f) for (const auto &instruction : bb) {
       if (auto *a = dyn_cast<AllocaInst>(&instruction))
@@ -562,6 +678,18 @@ void AotObjectEmitter::freeze(Module &module, const LoweringInventory &inventory
   i.inventoryText = jsonText(std::move(frozen));
   i.inventoryDigest = toHex(SHA256::hash(arrayRefFromStringRef(i.inventoryText)));
   i.frozenDigest = i.module_digest();
+  observeStorage(s,module,"frozen-inventory");
+  for (auto &[name, plan] : s.plans) for (auto &home : plan.homes) {
+    const bool owned = (home.kind == HomeKind::frame && home.role == StorageRole::roots) ||
+      (home.kind == HomeKind::staging && home.role == StorageRole::staging);
+    if (owned) {
+      auto *original = static_cast<Value *>(home.identity); auto *identity = &home;
+      s.rewriteObservers.push_back(std::make_unique<RewriteObserver>(original,
+        [&s,identity,&module](Value *oldValue, Value *newValue) {
+          recordCanonicalRewrite(s,*identity,oldValue,newValue,module.getDataLayout());
+        }));
+    }
+  }
 }
 void AotObjectEmitter::optimize() {
   auto &i = *impl_;
@@ -571,7 +699,20 @@ void AotObjectEmitter::optimize() {
   // optimization is not silently substituted from the standalone experiment.
   if (i.optimize) {
     LoopAnalysisManager loops; FunctionAnalysisManager functions;
-    CGSCCAnalysisManager cgscc; ModuleAnalysisManager modules; PassBuilder builder;
+    CGSCCAnalysisManager cgscc; ModuleAnalysisManager modules;
+    PassInstrumentationCallbacks observations;
+    observations.registerBeforeNonSkippedPassCallback([&](StringRef pass, const Any &) {
+      i.state.activePasses.push_back(pass.str());
+    });
+    auto observed = [&](StringRef pass) {
+      observeStorage(i.state,*i.module,pass);
+      if (i.state.activePasses.empty() || i.state.activePasses.back() != pass)
+        fail(i.state,"optimizer","incomplete pass-observation nesting");
+      else i.state.activePasses.pop_back();
+    };
+    observations.registerAfterPassCallback([&](StringRef pass, const Any &, const PreservedAnalyses &) { observed(pass); });
+    observations.registerAfterPassInvalidatedCallback([&](StringRef pass, const PreservedAnalyses &) { observed(pass); });
+    PassBuilder builder(nullptr,PipelineTuningOptions(),std::nullopt,&observations);
     builder.registerModuleAnalyses(modules); builder.registerCGSCCAnalyses(cgscc);
     builder.registerFunctionAnalyses(functions); builder.registerLoopAnalyses(loops);
     builder.crossRegisterProxies(loops, functions, cgscc, modules);
@@ -622,6 +763,8 @@ void AotObjectEmitter::deliver(const std::filesystem::path &destination) {
   i.report = jsonText(json::Object{{"profile", i.profile}, {"certified_delivery", s.errors.empty()},
     {"array_storage_policy_applicable", s.enforce}, {"budget", int64_t(array_function_storage_budget)},
     {"frozen_module_sha256", i.frozenDigest}, {"optimized_module_sha256", i.optimizedDigest},
+    {"optimization_storage_observations", std::move(s.optimizationEvents)},
+    {"canonical_rewrite_observations", std::move(s.rewriteEvents)},
     {"inventory", i.inventoryText}, {"inventory_sha256", i.inventoryDigest}, {"object_sha256", toHex(digest)}, {"functions", std::move(functions)}, {"errors", std::move(errors)}});
   if (!s.errors.empty()) {
     std::string reason;

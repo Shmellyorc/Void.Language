@@ -1827,3 +1827,206 @@ after the broad run were test-only actual-fixture negatives and target guards;
 shared product code was unchanged. No full Release/sanitizer/six-configuration
 matrix, new hosted acceptance or interface-crash attribution is claimed. Public
 activation remains stopped at the general ABI/lineage and final-encoding gates.
+
+## 18. Production AOT certification Part 3: limited lineage proof, ABI gate retained
+
+15 October 2026. Owner reports CI #42 passed all seven jobs, 61/61 suites, locking
+Part 2. Public AOT, native-array prohibition, the 65,536-byte policy, original ABI,
+ORC/LSP gates and the separate PUSH/tail blockers remain unchanged.
+
+### 18.1 Incoming ownership: real addresses and a missing charging boundary
+
+Native Linux x64 witnesses use the distinct original production AOT control
+executables, input 10, with ASLR enabled. GDB breaks at caller entry, the actual
+call instruction, callee entry, return and caller cleanup. It verifies the same
+argument bytes/addresses on both sides of the call and the machine-reported
+alignment for every incoming object. No rejected candidate is executed.
+
+| Original normal control | Caller static F | Additional outgoing storage below F | Incoming objects | Callee-entry offsets |
+| --- | ---: | ---: | ---: | --- |
+| value_structs/main, choose | 280 | 16 | 2 | +8 (1 byte, align 16), +16 (8 bytes, align 8) |
+| value_structs/numeric, exchange | 600 | 144 | 17 | +8 through +136 in 8-byte steps, align 16/8 alternating |
+
+At both calls, caller SP is 16-byte aligned; CALL places the return address eight
+bytes below it. RET restores the call-site SP, and caller cleanup restores entry
+SP minus static F. Incoming storage is visibly in a caller-created argument area
+for these executions. The choose area occupies 16 bytes, not the nine bytes
+obtained by summing logical object extents. Numeric's MFI maxCallFrameSize is 136,
+while native additional SP use is 144: alignment padding is not a guessed allowance.
+These observations do not grant callee subtraction credit or establish a general
+caller charge from an incoming offset alone.
+
+Pinned [X86 call lowering](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/Target/X86/X86ISelLoweringCall.cpp)
+creates formal-memory objects from actual CC assignments; separate tail-call,
+byval, copy-elision and variadic paths also exist. Pinned
+[X86 frame lowering](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/Target/X86/X86FrameLowering.cpp)
+explicitly excludes push sequences from reserved call frames. Thus
+hasVarSizedObjects=false does not prove that outgoing arguments are inside static F.
+The shared auditor now records reserved_call_frame, has_tail_call and the original
+FinalizeISel object inventory. Policy-applicable functions reject nonreserved,
+nonzero outgoing call frames until a full bound is proved. Array-free candidates
+retain C=null; this does not alter their public ABI or newly impose the array cap.
+
+A focused near-limit negative has P=65,520, F=65,528, R=65,520, E=8, nominal C=65,536,
+and a nonreserved 40-byte outgoing call area. It rejects at the new storage gate in
+normal/O2, independently of the existing final PUSH encoding rejection. No guessed
+rounding term is added to C. No incoming ownership is marked proved on any target.
+Windows x64 and macOS ARM64 have no new native ABI witness here. Their general
+ownership/charging gates remain closed; earlier restricted proofs are not generalized.
+
+### 18.2 ABI-created storage: cause identified, general identity still missing
+
+In numeric normal, the extra 64-byte/align-8 object is already present at
+FinalizeISel, without an AllocaInst. Independently generated pinned MIR shows
+LEA stack.47 passed in RDI to exchange, then returned fields loaded from stack.47.
+The native original control confirms RDI equals caller entry SP minus 112, the
+measured object's address (MFI offset -120 plus E=8), and confirms exchange writes
+its expected first and tail fields there. The role of this particular hidden
+result buffer is established.
+
+Pinned [SelectionDAGBuilder return demotion](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp)
+creates a target-sized stack object and inserts a hidden result pointer when the
+return cannot be lowered directly. The object has no compiler AllocaInst identity.
+A shape match to a source return type is not a reusable call-site identity proof.
+The general auditor has no verified origin event connecting this frame index to
+an immutable lowering result home, especially after call transformation/reuse.
+It continues to reject that object. No source ABI is changed to eliminate it.
+
+### 18.3 Exact count canonicalization: proved edge, zero subtraction credit
+
+The real production O2 pipeline now has read-only pass instrumentation. Weak
+allocation identities prevent a deleted address reused by LLVM from acquiring
+an old observation identity. Reports record births, deaths and descriptor changes
+at the boundary where they are first observed. These snapshots identify where to
+investigate; they do not invent parent/child lineage or prove partitions/merges.
+
+The actual managed main/handoffs mismatches include InstCombine's
+[simplifyAllocaArraySize](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/Transforms/InstCombine/InstCombineLoadStoreAlloca.cpp):
+it replaces alloca i8,N with alloca [N x i8],1. A live CallbackVH observes the
+actual replaceAllUsesWith edge while both instructions exist. Acceptance is limited
+to original compiler-declared Frame/roots and staging/staging homes, the actual
+InstCombine pass, static same-function/default-address-space allocations, a positive
+constant count greater than one, exact byte element/count/type and preserved
+alignment. Inalloca/swifterror forms and replacements claimed by another original home
+are excluded. Names, copied metadata, matching sizes or after-pass coincidence
+cannot supply a replacement edge. An erased/replaced successor cannot retain a
+valid WeakVH identity by address reuse.
+
+The immutable P remains unchanged. A late exact matching machine object records
+canonical_byte_array_homes with original identity and FI, but receives **zero R**.
+All physical storage remains in F, including alignment, spills and staging. This
+is conservative reconciliation, not a new optimization or backend lowering.
+A 40,000-byte canonical home therefore rejects at C=80,016 with R=0. This deliberate
+overcharge is not a new allocation limit; future large staging still needs a
+stronger subtraction proof or must fail the unchanged policy.
+
+A reuse fixture keeps two distinct 32-byte original identities, both exact rewrite
+edges, one physical colored object, P=64, F=40, R=0 and C=112 on Linux x64 O2.
+The original 512-byte reuse assertion remains intact. Missing compiler identities,
+wrong role, wrong type, original inline clones, zero-home clones, post-freeze edits,
+missing inventory/coverage and over-budget forms still reject. Exact former managed
+O2 candidates now have positive production-route tests and an altered-identity
+replay of the same normalized module retaining the prior unknown-home rejection
+and destination-preservation assertion.
+
+For managed main O2, profile, frozen IR, optimized IR, immutable inventory and
+private object hashes match Part 2 exactly. Acceptance changes only because the
+new live edge proves the narrow rewrite; no pass, source evaluation, GC operation,
+readonly/value semantics, target option or instruction encoding changes.
+
+### 18.4 Remaining proof boundary
+
+Inlining can create homes in a different caller without an original-home identity;
+SROA can erase/promote or partition allocas; stack coloring can retain a representative
+while rewriting uses of other slots. The observer records actual transformations
+and pre/post-machine shapes, but snapshots do not establish each byte-range mapping.
+The narrow count rule is not applied to clones or inferred partitions. Unknown
+homes still reject, including optimized null_failure inline storage. Existing
+source/IR/GC/readonly/reload contracts are not bypassed.
+
+Stop general activation here. Incoming acceptance requires a verified caller/callee
+assignment map and complete outgoing-SP bound, including padding, push sequences,
+CFG paths and joins, cleanup, tail/byval/variadic cases and target differences.
+ABI result storage requires a trustworthy lowering/codegen origin event or a separately
+approved bounded producer transformation; FI/extent similarity is insufficient.
+Remaining optimization lineage needs equally explicit transformation edges.
+No broad ABI calculator, metadata-origin guess, suppression of optimization or new
+LLVM fork/ABI change is introduced in this checkpoint. The signed-PUSH and tail-pseudo
+encoding proofs remain separate and their rejection logic is unchanged.
+
+### 18.5 Complete corpus rerun and local verification
+
+All 15 original integration scripts pass again. The complete native Linux x64
+corpus has 334 attempts, 275 accepted and 59 rejected, compared with 247/87 in
+Part 2. All 28 newly accepted candidates are O2 and use the narrow reconciliation.
+No normal-profile candidate changes outcome.
+
+| Producer | Normal attempted / accepted | O2 attempted / accepted |
+| --- | ---: | ---: |
+| Integration source/architecture | 104 / 100 | 104 / 100 |
+| Seven families' source CLI programs | 52 / 41 | 52 / 25 |
+| Runtime libraries | 7 / 3 | 7 / 2 |
+| Edited reload generations | 3 / 1 | 3 / 1 |
+| Generated runtime IR | 1 / 1 | 1 / 1 |
+
+All 288 routes sharing the exact source identity with the retained Part 2 corpus
+have identical target profile, frozen IR, optimized IR, immutable inventory and
+private object hashes. Generated integration paths intentionally differ between
+artifact directories and are not included in that cross-run identity comparison.
+The corpus driver independently verifies each accepted delivered object and IR/
+inventory hashes. There is no fallback for rejected candidates.
+
+Reports contain 1,972 machine functions, 454 proved canonical rewrite events and
+447 physical canonical-home observations, all with zero subtraction credit. Some
+rewritten allocations are subsequently eliminated. Remaining unmatched storage
+contains 200 objects in 80 functions, including 51 objects without AllocaInst
+identities. Incoming objects remain unproved in 14 functions. Eleven function
+observations have nonreserved/nonzero outgoing areas; corpus functions remain
+array-free C=null, while policy-applicable regression fixtures reject this shape.
+
+Rejection reasons overlap: unmatched storage in 54 candidates, incoming ownership
+in 14, final encoded SP differences in two and final call differences in three.
+The PUSH/tail reasons and counts match Part 2. All 59 rejected outputs retain their
+sentinels and are neither linked nor executed. Actual source negatives, rather
+than guessed ABI permissions, preserve these boundaries.
+
+The 266 accepted CLI candidates pass 1,596 exact exit/stdout/stderr comparisons,
+3,192 native process executions. Seven complete assertion harness pairs pass:
+managed normal/O2, managed_initialization normal, inheritance normal, strings O2
+and generated runtime normal/O2. The other nine library/reload configurations are
+explicitly not linked because at least one required object rejects. These 14
+harness executions retain the existing caller, GC, reload and runtime assertions.
+
+The original three-program small-stack driver correctly stops before linking or
+executing optimized null_failure. Its directory remains an incomplete negative
+experiment. A fresh explicit main/handoffs selection passes all normal/O2 cases:
+64 comparisons, 128 executions, including 64 executions under hard/soft 1 MiB stack
+limits. The selector changes no default coverage or crash classification. The
+full corpus still includes rejected null_failure and its recorded cause.
+
+Full Debug 61/61 passes (69.56 s, four workers); the audit suite passes within that
+run (9.04 s). Full Release 61/61 also passes (30.16 s, four workers); the focused
+Release audit passes (2.36 s). Strict ASan/UBSan audit,
+foundation, generated runtime and interfaces pass 4/4 (16.56 s), with leak detection,
+abort/halt and stack reporting enabled outside the ptrace-restricted sandbox.
+The existing Debug interface crash capture is untouched; no cause or fix is claimed.
+
+Evidence: build/p23-2-part3-corpus contains complete.json, records.jsonl, all reports,
+IR, objects/sentinels, native/harness logs and part3-evidence-summary.json.
+build/p23-2-part3-native-witness-verified retains GDB scripts, disassembly, normal-exit
+checks, original-control hashes and pointer/alignment observations. Independent
+numeric MIR is in build/p23-2-part3-native. Pinned source copies and SHA256SUMS are
+in build/p23-2-part3-sources. The successful small-stack subset is in
+build/p23-2-part3-small-stack-certified; the earlier incomplete run is preserved
+separately. Tracked reproduction is in tools/ci/STORAGE_SHAPE_PROOF.md.
+
+A sanitizer build attempt overlapped editing the fixture translation unit and ended
+in Clang SIGBUS after invalid source-byte diagnostics. The log, preprocessed source
+and compiler reproduction script are retained in build/p23-2-part3-toolchain-crash.
+The stable-source rebuild and strict tests above pass. No formal cause is assigned
+to that toolchain failure or to the historical VOID Debug interface crash.
+
+No hosted run, Windows/macOS native execution, complete target ABI proof, ORC/LSP
+certification or source native-array execution is claimed. Stop for boss/wrench
+review at the remaining ABI, lineage, budget-reconciliation and encoding gates.
+No commits, pushes, branches, remote modifications or CI edits.

@@ -18,6 +18,9 @@ def main():
     p.add_argument('--cxx', required=True, type=Path)
     p.add_argument('--output', required=True, type=Path)
     p.add_argument('--llvm-bin', required=True, type=Path)
+    p.add_argument('--programs', nargs='+', choices=('main','handoffs','null_failure'),
+                   default=('main','handoffs','null_failure'),
+                   help='explicit fixture selection; rejected selected candidates still fail the run')
     a = p.parse_args()
     if platform.system() != 'Linux' or platform.machine() != 'x86_64':
         p.error('this execution witness requires native Linux x64')
@@ -41,7 +44,7 @@ def main():
     run([a.llvm_bin / 'llvm-objdump', '--version'], 'objdump-version')
     arguments = [[], ['10'], ['-4'], ['oops'], ['1', '2'], ['2147483648'], ['-2147483649'], ['2.0']]
     for mode in ('normal', 'O2'):
-        for name in ('main', 'handoffs', 'null_failure'):
+        for name in a.programs:
             source = root / 'examples/managed_structs' / (name+'.void')
             case = name+'-'+mode
             binaries = []

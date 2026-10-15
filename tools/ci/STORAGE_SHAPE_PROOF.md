@@ -81,3 +81,53 @@ GDB/LeakSanitizer may require execution outside a ptrace-restricted sandbox. Kee
 leak detection and UBSan halt/stack reporting enabled; do not disable checks to
 make a restricted run pass. No Windows/macOS native verification is implied by
 these Linux drivers. See ARRAYS_PROPOSAL.md Sections 16 and 17 for the proof boundaries.
+
+## Part 3: incoming storage and the narrow count rewrite
+
+The production audit now records post-pass storage observations and observes the
+actual InstCombine replacement edge for declared Frame/staging byte-count homes.
+Its canonical_byte_array_homes retain the original P and grant zero R credit.
+Unknown origins, inline clones and incoming ownership still reject. The PUSH/tail
+normalizer is unchanged. These observations do not activate public certification.
+
+After generating a fresh corpus as above, native original-control witnesses are:
+
+```sh
+python3 tools/ci/aot_incoming_probe.py --corpus build/aot-certificate-corpus-example \
+  --llvm-bin /usr/lib/llvm-19/bin --output build/aot-incoming-example
+```
+
+This requires native Linux x64, GDB and permitted ptrace. It executes only distinct
+ordinary control executables produced by the integration scripts. GDB checks entry,
+call, callee-entry, return and cleanup SP; actual argument addresses/bytes/alignment;
+and numeric's measured hidden-result pointer and written result fields. Failed
+certificate outputs are never executed. The normal-profile witnesses do not imply
+an O2/native Windows/macOS ABI proof or a complete caller/callee charging rule.
+
+Independent pinned MIR observation for the numeric normal fixture is reproducible
+with the installed LLVM 19.1.7 tools (find its exact record/object path in
+records.jsonl, then use that object's .optimized.ll snapshot):
+
+```sh
+/usr/lib/llvm-19/bin/llc -O2 -relocation-model=pic -mcpu=generic \
+  -stop-after=finalize-isel input.o.optimized.ll -o numeric-finalize-isel.mir
+```
+
+Inspect the call's LEA from stack.47 to RDI and post-call loads from that slot,
+with size=64/alignment=8 and no AllocaInst identity. This is independent compile
+inspection, not certified delivery or native execution of a rejected object.
+
+For the newly reconciled managed main/handoffs cases, an explicit accepted subset
+can be tested at inherited and 1 MiB stack limits:
+
+```sh
+python3 tools/ci/storage_shape_probe.py --build build/ci-debug --root . \
+  --cxx /usr/bin/clang++-19 --llvm-bin /usr/lib/llvm-19/bin \
+  --programs main handoffs --output build/aot-canonical-small-stack-example
+```
+
+The default still selects all three historical programs, including null_failure,
+and fails if any selected object rejects. Part 3 leaves its optimized inline homes
+unproved; the full corpus records that rejection. The selector never silently
+skips failed candidates or relaxes exit/crash classification. See proposal Section
+18 for the proof limits and actual evidence.
