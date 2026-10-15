@@ -1,18 +1,22 @@
 # Phase 23 proposal: typed arrays, indexing and iteration
 
 **Status: A1-A10 APPROVED AS REVISED; implementation authorized at P23-1 through
-P23-6. P23-1 scalar fixed-array analysis/IR is implemented and locally verified for review.
-Native array execution and P23-2 through P23-6 remain unimplemented.**
+P23-6. Owner/wrench lock P23-1 after run #40 passed seven jobs, 60/60 suites
+per configuration. Native arrays remain unimplemented at the P23-2 storage proof
+gate. The current assignment is ABI investigation only, recorded in Section 13.**
 
 The owner approved the revised architecture and recorded choices, including final
 i32/i64 ranges, on 14 October 2026. The owner now approves 64 KiB (65536 bytes) as the initial target-aware per-function
 native static-storage budget for array-carrying functions, subject to the storage
 planning and ABI proofs below. This is not an allocation/save-file limit or an
-arbitrary-recursion safety guarantee. P23-1 alone is currently authorized.
-Section 10 records independently verified native probe run #3 evidence.
+arbitrary-recursion safety guarantee. P23-2 implementation was authorized, then
+stopped at its required proof gate; production work is paused for the currently
+authorized ABI investigation. Section 10 records independently verified native
+probe run #3 evidence; Sections 12 and 13 record the subsequent ABI investigations.
 
 Phase 22 is locked. The owner reports Actions run #39 passed all seven jobs,
-59 suites per configuration. This investigation uses clean commit `95e79ff`.
+59 suites per configuration. The original architecture investigation used clean
+commit `95e79ff`; that is historical context, not the current workspace status.
 The Language Bible is authoritative. The owner approved the revised A1-A10
 recommendations below, excluding unapproved numerical limits and explicitly deferred
 features; alternatives retained for context do not authorize a second design. Existing S1-S8 strings and value/reference contracts remain
@@ -887,3 +891,291 @@ layouts, source evaluation order, integer extrema and incomplete/overflowing sto
 inventories. The 59 original suites remain present. P23-2 through P23-6, iterable
 loops/ranges, native array lowering, growable storage, GC array maps, indexing of
 strings and the unrelated receiver-chain hardening task are not implemented here.
+
+## 12. P23-2 storage proof preflight: stopped before production lowering
+
+Boss/wrench report hosted run #40 passed all seven jobs, 60/60 per configuration;
+P23-1 is locked. The P23-2 assignment retains the approved 65536-byte budget and
+requires stopping if complete target accounting or const-formal borrow proofs
+cannot be established. The storage accounting prerequisite is not yet proved.
+P23-2 is **not implemented or accepted** by this investigation.
+
+The current shared backend constructs ordinary value parameters/results directly
+as LLVM value types. Extending only its type mapper to LLVM ArrayType would expose
+arrays to target aggregate argument/result legalization. DataLayout gives the
+inline value's layout, not the whole storage cost of that legalization. The
+P23-1 StorageTarget value_layout callback and explicit role checklist alone do
+not enumerate machine-generated homes. There is no real inventory producer or
+shared analysis/LSP native target context yet. Marking known_abi as accounted
+without enumerating those homes would be an unsupported proof claim.
+
+The tracked standalone reproducer is tools/ci/array_abi_probe/probe.py with host.c
+and README.md. It models that raw aggregate extension in separately generated
+caller/callee modules, with the existing trailing failure-pointer shape. It does
+not remove the production backend's array gate or implement a second compiler.
+Each array contains i32 scalars. The caller has two explicit homes of one payload
+each; the callee has one. External helpers populate, mutate and check all elements.
+
+LLVM 19.1.7 post-prologue/epilogue MIR measurements:
+
+| Target / evidence | Payload bytes | Caller frame normal / O2 | Callee frame normal / O2 |
+| --- | ---: | ---: | ---: |
+| Linux x64, native | 4096 | 20440 / 20440 | 8200 / 8104 |
+| Linux x64, native | 16384 | 81880 / 81880 | 32776 / 20392 |
+| Windows x64, compile-only | 4096 | 24616 / 24616 | 8248 / 8152 |
+| Windows x64, compile-only | 16384 | 98344 / 98344 | 32824 / 20440 |
+| macOS ARM64, compile-only | 4096 | 20464 / 20464 | 8192 / 8096 |
+| macOS ARM64, compile-only | 16384 | 81904 / 81920 | 32768 / 20384 |
+
+Normal leaves LLVM IR unoptimized, while O2 uses default<O2>. Both use the current
+AOT default machine optimization level, llc -O2, not llc -O0. Target DataLayouts
+come from the pinned target compiler. Windows/macOS rows are compile-only, not
+hosted results or native verification. This experiment does not reproduce ORC's
+host CPU/features or prove its storage configuration matches AOT.
+
+For the 4096-element Linux caller, explicit array homes total 32768 bytes, but the
+machine frame is 81880 bytes. MIR additionally shows a 16384-byte hidden result
+home, a 32736-byte maximum outgoing call area, scalar spills and callee-saved
+storage. These frame categories must be inspected together; summing independent
+reported fields can double-count overlapping accounting. The callee has fixed
+incoming argument slots outside its reported local frame. No single DataLayout
+payload multiplier or fixed overhead measured here is a complete ABI proof for
+all numeric/bool elements, zero extents, surrounding value structs, signatures,
+call sites, optimization modes and supported targets.
+
+This is an integration hazard in a possible P23-2 extension, not a defect in the
+locked P23-1 gate or evidence that the approved budget is unworkable. These modules
+omit production root frames, source argument snapshots and construction staging.
+Their measured frames are not proposed constants for NativeStoragePlanner. The
+older native stack probe remains valid for its own four-home/root-frame experiment;
+it did not exercise array-valued parameters or results.
+
+Review recommendation: first prove a lowering inventory that makes array value
+homes, argument snapshots and result handoffs explicit. Investigate an internal
+address-based representation for new array-carrying values, preserving existing
+array-free ABI and independent value snapshots. Compare that against retaining
+raw aggregates with target machine-level call/storage auditing. Either approach
+must account for all remaining ABI storage, validate its coverage against emitted
+machine frames, and supply the same selected triple/DataLayout/CPU/features and
+policy to analysis, LSP, JIT and AOT. Retain the approved preoptimization
+explicit-home inventory: a smaller optimized frame must not replace that policy.
+Machine measurements audit coverage, not authorize omitted homes. The exact
+complete accounting mechanism remains unproved; neither approach is silently
+adopted here. A const-formal borrow must also prove stable owner storage and no
+later-argument/callee alias writes; otherwise
+its explicit snapshot belongs in the inventory at ordinary argument evaluation.
+Readonly metadata alone is insufficient.
+
+The required proof gate therefore stops production work before enabling ArrayType,
+native checked accesses, borrowing or iteration/range CFGs. No budget increase,
+heap boxing, stack-reserve change, array-free restriction, receiver-chain repair,
+string indexing or P23-3 through P23-6 work is included. Native feature regressions,
+JIT/AOT agreement, strict sanitizers and the eventual hosted acceptance remain
+required once this prerequisite is resolved. WORK_LOG.md records actual local
+checks and artifact paths. Stop for boss/wrench review; no Git/remote mutations.
+
+## 13. P23-2 explicit address-call investigation, 14 October 2026
+
+Investigation only, following wrench review of Section 12. The approved per-function
+65536-byte policy is unchanged. No production array lowering, ABI, compiler/runtime,
+LSP or workflow has been changed. The reproducible tools/ci/array_abi_probe harness
+now compares raw calls and a candidate explicit-address protocol, retaining the
+original independently linked validation and assertions.
+
+### 13.1 Candidate protocol and value/failure behavior
+
+For the sampled mutable by-value array parameter/result:
+
+- The caller owns input, an argument snapshot taken at ordinary evaluation time,
+  and a distinct private result home. These are three target-sized homes.
+- The candidate callee takes plain result/snapshot/failure pointers and returns
+  void. It copies the argument snapshot into its own mutable local, then fills
+  the result on success. No LLVM aggregate crosses the boundary; no byval/sret
+  attributes request hidden copies. Memcpy intrinsics optimize normally.
+- Result storage must remain private until the existing failure channel reports
+  success. It must not be the final user-visible assignment destination while
+  the callee can fail or reenter code that observes that destination.
+- The scalar adapter remains i32(i32, ptr). A future internal call descriptor
+  should be driven by signature types, not body contents. Adding array locals to
+  a function must not change its existing array-free signature, receiver, scalar
+  result or failure ABI. Mixed signatures still require accounting for unchanged
+  raw non-array aggregate parameters. Virtual/interface dispatch, imports and
+  leased reload calls must use the same descriptor, not argument-count guesses.
+
+The C host preserves both original seed checks, checks every returned element and
+requires fill/touch/check exactly twice before additional address tests run. The
+new tests mutate the original owner during later-argument evaluation and verify
+that the earlier snapshot and returned value remain independent. They check event
+order, later-argument failure before invocation, callee failure after a partial
+result write, suppression of result consumption on failure and one-frame trace
+propagation using the existing message/count/32-frame shape. Normal/O2 negative
+controls deliberately delay the snapshot or pass the changed original as an
+unsafe borrow; all four must exit exactly 1 through the assertions. Signals and
+unexplained failures are rejected. This is not production source-diagnostic proof.
+
+### 13.2 Measured frames and the unchanged budget
+
+All measurements use LLVM 19.1.7, target-derived DataLayouts and i32 size/alignment
+4/4, witnessed by each target compiler. Normal has no LLVM IR optimization; O2
+uses default<O2>. Both use the existing AOT default machine-code level, llc -O2,
+with PIC. No noinline/volatile attributes, suppression of optimization, heap
+boxing or stack-reserve increase are used. Independent
+modules naturally preserve the call boundary; Section 13.3 also tests inlining.
+
+Actual machine frame bytes for a 16384-byte array payload:
+
+| Target / evidence | Raw caller normal / O2 | Address caller normal / O2 | Raw callee normal / O2 | Address callee normal / O2 |
+| --- | ---: | ---: | ---: | ---: |
+| Linux x64, native | 81880 / 81880 | 49192 / 49192 | 32776 / 20392 | 16408 / 16408 |
+| Windows x64, compile-only | 98344 / 98344 | 49224 / 49224 | 32824 / 20440 | 16440 / 16440 |
+| macOS ARM64, compile-only | 81904 / 81920 | 49200 / 49200 | 32768 / 20384 | 16416 / 16416 |
+
+Raw 4096-element frame measurements above reuse Section 12's frozen artifacts;
+the unchanged raw input modules were independently checked byte-for-byte. All
+eight historical Linux native runs were replayed, including four 1 MiB runs.
+Fresh raw 1024-element code generation at both modes/all three targets matches
+all prior frames and retains the original native assertions. Address rows are
+new measurements. Windows/macOS are compile-only, not native or hosted results.
+
+For the address caller, the preoptimization homes are 49152 bytes. Its actual
+frame also contains outgoing call storage, saved registers/spills and alignment.
+At this size, measured non-home frame bytes are 40 Linux, 72 Windows and 48 macOS;
+Windows reports a 32-byte outgoing call area already included in its frame.
+A tiny LLVM C++ target-facts helper also queries stack alignment and the local-area
+offset. For these profiles, the entry return slot outside F is 8 bytes on x64
+and 0 on ARM64, consistent with the earlier native frame/stride evidence.
+These observations are not proposed fixed allowances for copies/spills. Residuals change at other
+extents and signatures.
+
+The address samples at 5440 elements have 65280 bytes of explicit caller homes.
+Their aligned inventory-plus-audit charges are 65328 Linux, 65360 Windows and
+65328 macOS, all within policy. At 5461 elements, explicit homes total 65532 bytes,
+aligned to exactly 65536 before ABI additions. Actual caller frames are 65576,
+65608 and 65584 bytes respectively; final charges are 65584, 65616 and 65584.
+All three are reported over-budget by the experimental auditor under the unchanged
+policy despite a payload-only plan fitting. Normal/O2 agree for these samples. Callee storage is charged to the
+callee, not added as a new call-chain limit. Over-budget samples execute only as
+investigations; these tools enforce no production limit or maximum array length.
+
+Address verification covers 24 target/extent/mode pairs and 48 principal frame
+measurements. Linux independently linked AOT passes 16/16 runs, eight with hard/
+soft RLIMIT_STACK=1048576 before exec. This is a main-process limit, not the older
+probe's mapped worker stack. Eight additional Linux lli ORC runs pass with generic
+CPU/machine O2 and independent IR modules. All 32 actual ORC frame warnings match
+the four corresponding AOT/MIR functions per run. ORC uses the inherited process
+stack limit. This verifies the configured standalone experiment, not production
+VOID's current host-feature ORC configuration or a complete target factory.
+
+### 13.3 Inventory reconciliation and remaining concrete gaps
+
+The pinned-MIR auditor matches each explicit machine home to the preoptimization
+inventory and records actual call areas, incoming slots, spills and saved-register
+objects. For its supported fixed, nonoverlapping case:
+
+```
+P = unrounded original target-sized/aligned home inventory
+R = bytes of machine objects matched to planned homes
+F = actual machine frame bytes, including call areas/spills/padding
+E = entry-area prefix from the supported target FrameLowering profile
+candidate charge = align_up(P + F - R + E, target stack alignment)
+```
+
+For the pinned nonleaf X86/AArch64 profiles, E is minus getOffsetOfLocalArea,
+queried from the selected generic/PIC TargetMachine, not an invented allowance.
+Its stack alignment and DataLayout are checked against the target compiler.
+This does not establish that recipe for other architectures or frame shapes.
+Round only the final sum; frame fields already included in F must not be added
+again. P remains charged when O2 eliminates a home. An actual dead-home test keeps
+its 16 bytes in the charge: normal retains it, O2 deletes it. Untracked non-spill
+objects, ambiguous extents, unsupported incoming areas, overlapping planned homes,
+opaque/dynamic stack adjustments, tail calls and unproved realignment receive no
+policy verdict. Red-zone or other target storage outside getStackSize also needs
+explicit coverage; F-R is not a general-purpose formula for every LLVM function.
+The MIR text parser is an investigation tool, not production infrastructure.
+
+Two measured gaps matter before production:
+
+1. The five-argument failure callee on Windows has a 120-byte frame and an 8-byte
+   incoming slot; its caller has a 264-byte frame with a 40-byte outgoing area.
+   The auditor refuses to certify the incoming slot's ownership/extent rather
+   than silently omit it or count a guessed universal call area. Address calls
+   remove aggregate scalarization but do not remove scalar ABI obligations.
+2. Combining the ordinary caller/callee modules and enabling default O2 produces
+   an entry frame of 49176 bytes on Linux. The snapshot disappears and a new
+   16384-byte home.i appears from the inlined callee. Native validation passes;
+   the auditor rejects its missing provenance and issues no budget verdict.
+   Production needs a proved replacement/reuse mapping or explicit added storage
+   for introduced homes. It must retain the original preoptimization inventory
+   and must not disable inlining or accept a smaller optimized frame as the proof.
+
+The nine focused regressions additionally reject actual raw hidden result homes,
+omitted or inexact inventories, understated frame sizes, untracked allocations
+and unsafe snapshot protocols. Their artifacts include the real optimized modules
+and machine records, not only synthetic arithmetic assertions.
+
+### 13.4 Recommended shared production proof boundary
+
+Recommend continuing toward explicit address-based passing of array-carrying
+by-value arguments/results, with always-owned snapshots as the correctness path.
+It removes the observed aggregate ABI multiplier while leaving existing array-free
+calls intact. It is a viable foundation within 65536 bytes for the sampled cases,
+not yet a complete production proof or approval to implement it in this turn.
+
+Use one native preflight/emission service for the frontend/tooling and both native
+engines. Its context must identify triple, DataLayout, CPU/features, relocation/
+code model, target options, LLVM version and IR/machine optimization profile. Do
+not reuse the generic measurements for the current host-feature JIT. LSP must
+select the same active context and invoke that service, not port the Python
+layout arithmetic or introduce another calculator. Exact native dry-run audits
+may need caching/cancellation; latency must not become permission to skip checks.
+
+The preoptimization producer must enumerate actual lowering choices with stable
+home identities, roles, target extents/alignment and lifetimes. It includes source
+locals, argument/result snapshots, instruction copies, roots/Frame/Slot records,
+construction staging, call helpers and source failure/native guards. Every role
+must be accounted, including those proved empty. Preserve that plan through
+optimization. Track allocation deletion, cloning, inlining and storage replacement;
+unknown lineage is a failed proof, not an empty category.
+
+Audit the real MachineFunction/FrameInfo from the same emission that will publish
+code, after target frame placement and before publishing the object. LLVM 19.1.7
+provides getObjectAllocation/Size/Align/Offset, object indices, getStackSize and
+getMaxCallFrameSize; TargetPassConfig exposes insertion after
+PrologEpilogCodeInserterID. The exact pipeline integration and any later target
+frame changes still need verification. Reconcile complete object extents, fixed
+incoming/outgoing ownership, red zones, realignment, saved registers and spills;
+prove supported padding/reuse rather than adding a measured constant. Verify
+target-generated prologue/epilogue and stack-probe scratch, including any frame
+changes after the chosen audit point.
+
+Both AOT and a custom ORC compile callback should use that same audited emitter.
+LLJITBuilder's CompileFunctionCreator is the appropriate proposed boundary; IR
+transforms happen too early, and an object transform alone has lost AllocaInst/
+MachineFrameInfo provenance. Reject unaccounted storage or an over-budget plan
+before symbol lookup/publication or final object delivery. Cache attestations only
+with matching target/profile, IR/lowering and ABI identities. This integration is
+not implemented or claimed proved by invoking lli. Independent IR validation and
+ordinary source failure/diagnostic contracts remain mandatory.
+
+### 13.5 Roots, staging, borrowing and review boundary
+
+Scalar i32 samples do not prove managed-owner liveness, mixed value layouts with
+existing reference fields, GC root maps, Slot/Frame ABI, complete construction
+publication or failure cleanup. Inventory these using the same selected target
+layout and existing walkers/runtime contracts. Reference-containing future result
+homes need complete zero initialization and registered roots before safepoints,
+with private publication only after success. No reference arrays are implemented.
+
+Const-formal optimization remains a separate proof: snapshot first at ordinary
+argument evaluation unless later arguments and all callee aliases cannot change
+those bytes. A readonly spelling alone does not establish that. Borrowed storage
+must retain its owner/root, stable address and lifetime through polls, calls and
+failure cleanup. Independent IR verification must enforce the proof, and compatible
+reload must not invalidate an already-generated caller's assumptions about alias
+writes. Otherwise retain an owned snapshot and charge its copy. No borrow is
+implemented or inferred safe from the pointer ABI experiment.
+
+Stop for boss/wrench review. Production integration, inlining provenance, general
+ABI-slot ownership and GC/staging/borrow proofs remain open implementation gates.
+The numerical limit, all 60 suites, normal CI and P23-1 remain unchanged. No
+production arrays, later checkpoints or unrelated hardening have been started.
