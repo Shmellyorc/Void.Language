@@ -1457,10 +1457,11 @@ GC and reload contracts remain unchanged.
 
 The earlier 65,536-byte production per-function policy is superseded. Its research
 fixtures and safety evidence remain valid within their stated scope. Current
-P23-1 frontend/IR extent/expanded-layout guards and the prohibition on native array
-lowering remain implementation limitations pending reviewed changes; this language
-commitment does not claim large/growable arrays already execute. See
-ARRAYS_PROPOSAL.md A10 and Section 21. Failed/unsupported required functions must
+Stage 1 compact frontend/IR shapes and pure default templates supersede the old
+array extent/multiplicity guards for reference-free values. Finite layouts,
+checked representability and actual analysis-work limits remain. Native array
+lowering remains prohibited; large/growable arrays do not yet execute. See
+ARRAYS_PROPOSAL.md A10 and Sections 21-22. Failed/unsupported required functions must
 fail the complete build with a clear diagnostic, never be silently omitted from
 an otherwise successful output. Array indexing remains separate from the approved
 future Unicode scalar indexing of strings.

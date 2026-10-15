@@ -4,7 +4,8 @@
 61/61 suites per configuration; Part 5A is locked. Native arrays remain disabled.
 The superseding owner decision below withdraws the earlier 65,536-byte production
 per-function array-storage approval. Storage architecture and activation require
-new owner/wrench review.**
+new owner/wrench review. Large-array Stage 1 compact analysis/default-template
+foundation is implemented locally, pending review; see Section 22.**
 
 > **SUPERSEDING OWNER DECISION: large arrays are a language requirement.**
 > Neither `[T, n]` nor `[T]` may have an arbitrary 64 KiB source-level ceiling.
@@ -17,9 +18,10 @@ new owner/wrench review.**
 > No alternative representation, changed numerical ceiling or production policy
 > reactivation is approved by this documentation correction.
 
-The separate 65,536 expanded-layout guard also requires review: its present array
-multiplicity checks impose a source-visible element/shape ceiling. Internal
-analysis-work protection must not silently recreate the rejected size limit.
+The separate 65,536 expanded-layout guard imposed a source-visible element/shape
+ceiling in the Section 21 snapshot. Stage 1 replaces multiplicity accounting on
+compact reference-free paths (Section 22). Internal analysis-work protection must
+not silently recreate the rejected size limit.
 A successful build must include every required function. Unsupported operations or
 compilation failures must fail the whole build with a clear diagnostic; no omitted
 function, partial output or success fallback may hide failure.
@@ -28,9 +30,9 @@ Earlier A1-A10 semantic approvals, original storage measurements and Part 5A CFG
 ABI, stack-depth and cross-platform evidence remain valuable. Historical numerical
 approvals and inline-only assumptions in Sections 8-20 are retained as records of
 those checkpoints, superseded for future production policy by this decision and
-revised A10. Section 21 audits the unchanged implementation and activation work.
-The previously approved array semantics remain binding; the production storage
-strategy is reopened for investigation, not selected or implemented here.
+revised A10. Section 21 retains the historical unchanged-code audit; Section 22
+records the current bounded foundation. Previously approved array semantics remain
+binding. Production storage implementation and activation require later review.
 
 Phase 22 is locked. The owner reports Actions run #39 passed all seven jobs,
 59 suites per configuration. The original architecture investigation used clean
@@ -2513,3 +2515,74 @@ No alternative storage design or changed numerical limit is adopted here. Sectio
 9-20 remain historical evidence, including failures and measured frames. The staged
 certificate and encoded-CFG verifier are unchanged and operational. Stop for owner/
 wrench review before further architecture or implementation work.
+
+
+## 22. Large-array foundation, Stage 1 (local implementation, review pending)
+
+The owner supplied the complete Large-Array Storage Architecture Review and
+explicitly authorized Stage 1 only. Its six-stage roadmap supersedes the old
+inline-payload implementation sequence where they conflict. Section 21 is the
+historical unchanged-code audit, not the current implementation status.
+
+### Implemented analysis and IR contract
+
+- The canonical arena retains one element edge and the exact unsigned 64-bit
+  extent, including zero. Source extents must fit the already approved A3 i64
+  public-count contract; this representation check is not an array-byte policy.
+  No element fields are synthesized. Structural keys,
+  nominal element identities, constant dependencies and source spans are retained.
+- Reference-free fixed arrays and nested value shapes can be analyzed. Scalar
+  literals and indexing retain their existing behavior. Nonscalar explicit literals,
+  indexing, growables and reference-bearing elements remain gated. This checkpoint
+  does not implement their future runtime operations.
+- Pure defaults use an owned compact template: an exact repetition count plus one
+  element prototype, or no prototype at zero extent. Nested arrays and pure value
+  defaults compose these templates. Repeating a value denotes independent logical
+  values; it does not authorize shared mutable runtime storage.
+- Existing fixed_array IR gains an explicit repeated-template mode. Independent
+  validation recomputes the shape, identity, extent and operand typing. It verifies
+  a constant/aggregate/array-only prototype DAG in block SSA order; calls, loads
+  and other computations cannot be disguised as pure repeated defaults. Explicit
+  literal expressions remain individual ordered instructions, including effects.
+- A shared memoized shape walk performs checked unsigned 64-bit logical scalar-byte
+  arithmetic. This is a necessary representability lower bound, **not** DataLayout,
+  heap allocation size, ABI layout, native-stack inventory or an allocation promise.
+  Target alignment, object headers, allocator limits and actual construction bounds
+  remain later-stage obligations. Even enormous zero-payload repeated shapes can
+  remain representable without allocating per-element compiler metadata.
+- The old element-count/multiplicity rejection is removed for these compact paths.
+  Finite logical value checks apply even to zero repeats. Existing depth bounds and
+  actual analysis/default-recipe work protections remain. The latter constrain real
+  graph edges or explicitly represented recipe fields, never repeated payload count.
+  Custom-initializer repetition is rejected rather than executing an initializer
+  once and incorrectly copying its effects. Effectful construction recipes are deferred.
+
+### Boundaries requiring later review
+
+Stage 1 selects no native representation, array ABI, production stack policy or
+GC descriptor. Research recommends existing-GC-owned fixed payloads with independent
+copies and stable-header growables; the representation, recursive copy/publication
+rules, repeated GC descriptors and native completeness ledger must be locked at
+subsequent review checkpoints before their implementation. No copy-on-write,
+stack/heap cutoff, second allocator or replacement numerical ceiling is adopted.
+Production native array lowering remains rejected. Runtime/collector code, native
+storage planner, staged certification, Part 5A verifier and 64 KiB experiments are
+unchanged. Passing compact analysis does not certify memory availability or execution.
+
+### Verification
+
+Linux x64, pinned LLVM 19.1.7: Debug and Release full CTest runs both pass
+61/61 suites. Strict ASan/UBSan with leak detection passes arrays_foundation,
+arrays_storage_audit, frontend, analysis, interfaces_source and runtime_generated
+(6/6). The expanded foundation suite also passes under 1 MiB Debug/Release stacks.
+The unchanged research auditor remains covered by both full runs and sanitizers.
+
+Repeated 1-byte, 2 MiB and 8 MiB defaults each lower to four IR instructions.
+Fresh Debug CLI checks under a 512 MiB address-space cap use about 34 MiB peak RSS,
+independent of extent at these sizes. Nested value recipes retain nonzero defaults
+without expansion. Source and forged-IR negatives cover representation, finite
+cycles, arity, purity and actual recipe-work exhaustion. Normal/O2 native JIT/AOT
+attempts on an 8 MiB source still reject; AOT destination sentinels are preserved.
+Exact commands, measurements and limitations are in the Stage 1 WORK_LOG entry.
+Hosted Windows/macOS execution and later-stage native large-array acceptance remain
+unverified. Stop for owner/wrench review before Stage 2.

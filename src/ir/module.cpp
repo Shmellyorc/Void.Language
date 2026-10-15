@@ -6,6 +6,7 @@
 #include <set>
 #include <functional>
 #include <bit>
+#include <limits>
 #include <stdexcept>
 namespace vd::ir {
 bool array_type(Type t) { return t.kind==Type::fixed_array || t.kind==Type::growable_array; }
@@ -20,6 +21,52 @@ std::string array_identity(Type element, std::optional<std::uint64_t> extent) {
 bool scalar_fixed_array(Type t) {
     return t.kind==Type::fixed_array && t.definition && t.definition->element &&
         (numeric::number(array_element(t)) || array_element(t)==Type::boolean);
+}
+CompactValueShape compact_value_shape(Type root) {
+    std::map<const ValueType*,CompactValueShape> memo;
+    std::set<const ValueType*> active;
+    std::size_t work=0;
+    auto add=[](std::uint64_t a,std::uint64_t b) {
+        if(b>std::numeric_limits<std::uint64_t>::max()-a)
+            throw std::length_error("Array logical scalar extent is not representable in 64 bits");
+        return a+b;
+    };
+    std::function<CompactValueShape(Type)> visit=[&](Type t)->CompactValueShape {
+        if(t.nullable || t.construction || !t.preparation.empty()) throw std::invalid_argument("Unsupported array value shape");
+        if(numeric::number(t) || t==Type::boolean) return {0,t==Type::boolean ? 1u : numeric::width(t)/8u,1};
+        if((t.kind!=Type::fixed_array && t.kind!=Type::aggregate) || !t.definition || t.definition->managed || t.definition->interface_type)
+            throw std::invalid_argument("Reference-bearing/growable array shapes await GC support");
+        auto* d=t.definition.get();
+        if(t.kind==Type::fixed_array) {
+            if(!d->element || !d->extent || !d->fields.empty() || !d->base.expired()) throw std::invalid_argument("Malformed repeated array shape");
+            if(*d->extent>static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max()))
+                throw std::length_error("Array extent is not representable as an i64 count");
+        } else if(d->element || d->extent || !d->base.expired()) throw std::invalid_argument("Malformed array value shape");
+        if(auto found=memo.find(d);found!=memo.end()) return found->second;
+        if(active.size()>=128 || !active.insert(d).second) throw std::invalid_argument("Recursive or excessive array value shape");
+        CompactValueShape result{1,0,1};
+        auto child=[&](Type element,std::uint64_t count) {
+            if(++work>65536) throw std::length_error("Array distinct-shape analysis work exhausted");
+            auto shape=visit(element);result.depth=std::max(result.depth,shape.depth+1);
+            if(shape.scalar_bytes && count>std::numeric_limits<std::uint64_t>::max()/shape.scalar_bytes)
+                throw std::length_error("Array logical scalar extent is not representable in 64 bits");
+            result.scalar_bytes=add(result.scalar_bytes,count*shape.scalar_bytes);
+            // Defaults still contain explicit struct fields. Bound that real recipe
+            // expansion, independently of repeated array multiplicity.
+            if(count) {
+                if(shape.template_nodes>65536-result.template_nodes) throw std::length_error("Array default-template analysis work exhausted");
+                result.template_nodes+=shape.template_nodes;
+            }
+        };
+        if(t.kind==Type::fixed_array) {
+            child(array_element(t),*d->extent); // Validate finite element even at zero extent.
+        } else {
+            for(const auto& field:d->fields) child(field.type,1);
+        }
+        if(result.depth>128) throw std::invalid_argument("Excessive array value depth");
+        active.erase(d);memo.emplace(d,result);return result;
+    };
+    return visit(root);
 }
 std::uint64_t checked_array_index(std::uint64_t bits,Type index,std::uint64_t extent) {
     if (!numeric::integer(index)) throw std::invalid_argument("Array index requires an integer");
@@ -230,8 +277,8 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         if(t.kind==Type::fixed_array) {
             if(!d->extent || !d->element) fail("missing fixed-array layout");
             const auto child=inline_layout(array_element(t));
-            if(*d->extent>65536 || child.second>=65536 || *d->extent>65536/(child.second+1)) fail("excessive expanded array layout");
-            expanded=static_cast<std::size_t>(*d->extent)*(child.second+1);depth=child.first+1;
+            if(child.second>=65536) fail("excessive array template work");
+            expanded=*d->extent ? child.second+1 : 0;depth=child.first+1;
         }
         if(base) {auto parent=inline_layout(Type(base));depth=parent.first+1;expanded=parent.second;}
         for(unsigned n=base ? static_cast<unsigned>(base->fields.size()) : 0;n<d->fields.size();++n) {
@@ -248,7 +295,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         for (std::size_t n=0;n<pending.size();++n) {
             auto t=pending[n];
             if(array_type(t)) {
-                if(!scalar_fixed_array(t)) fail("nonscalar/growable array IR storage awaits later checkpoints");
+                if(t.kind!=Type::fixed_array) fail("growable array IR storage awaits later checkpoints");
                 if(!t.definition || !t.definition->element || t.nullable || t.construction || !t.preparation.empty() ||
                    !t.definition->fields.empty() || t.definition->managed || t.definition->interface_type || !t.definition->base.expired() ||
                    (t.kind==Type::fixed_array)!=t.definition->extent.has_value()) fail("invalid structural array type");
@@ -256,7 +303,11 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 if(element==Type::none || element.kind==Type::prepared_receiver || element.kind==Type::invalid || element.kind==Type::unresolved ||
                    element.construction || element.readonly || !element.readonly_references.empty() ||
                    t.definition->identity!=array_identity(element,t.definition->extent)) fail("invalid array element or identity");
-                if(checked.insert(t.definition.get()).second) {pending.push_back(element);inline_layout(t);}
+                if(checked.insert(t.definition.get()).second) {
+                    try {compact_value_shape(t);}
+                    catch(const std::length_error& failure) {fail(failure.what());}
+                    pending.push_back(element);inline_layout(t);
+                }
                 continue;
             }
             if (t.kind==Type::string && (t.definition || t.nullable || t.construction || !t.preparation.empty() || !t.readonly_references.empty())) fail("invalid intrinsic string type");
@@ -282,6 +333,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             }
             if (!t.definition || t.definition->identity.empty() || t.definition->identity.find('\0')!=std::string::npos || t.definition->name.empty()) fail("missing value type identity");
             auto* d=t.definition.get();
+            if(d->element || d->extent) fail("structural array metadata on nominal type");
             if(!m.interface_requirements.empty() && d->visibility!="public" && d->visibility!="internal" && d->visibility!="private") fail("invalid concrete nominal visibility");
             if(!m.interface_requirements.empty() && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
             if (t.construction && !d->managed) fail("construction view requires a managed nominal");
@@ -436,6 +488,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         std::vector<std::vector<Type>> body_types;
         for (const auto& b : f.blocks) {
             std::vector<Type> types;
+            std::vector<bool> pure_templates;
             auto operand = [&](unsigned id) {
                 if (id >= types.size() || types[id] == Type::none) fail("invalid operand in " + f.name);
                 return types[id];
@@ -447,6 +500,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             };
             for (const auto& i : b.instructions) {
                 Type result = Type::i32;
+                if(i.array_repeat && i.op!=Op::fixed_array) fail("repeat template on non-array instruction");
                 switch (i.op) {
                 case Op::interface_pack: {
                     valid_type(i.type);auto from=operand(i.a);auto concrete=from;concrete.nullable=false;
@@ -505,8 +559,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     result = i.type; break;
                 case Op::fixed_array:
                     valid_type(i.type);
-                    if(!scalar_fixed_array(i.type) || i.arguments.size()!=*i.type.definition->extent || i.receiver || i.initialization || i.immediate || !i.callee.empty())
-                        fail("invalid scalar fixed-array construction");
+                    if(i.type.kind!=Type::fixed_array || i.arguments.size()!=(i.array_repeat ? (*i.type.definition->extent ? 1u : 0u) : *i.type.definition->extent) || i.receiver || i.initialization || i.immediate || !i.callee.empty())
+                        fail("invalid fixed-array construction/template");
+                    if(i.array_repeat) for(auto argument:i.arguments)
+                        if(argument>=pure_templates.size() || !pure_templates[argument]) fail("effectful repeated array prototype");
                     for(auto argument:i.arguments) expect(argument,array_element(i.type));
                     result=i.type;break;
                 case Op::array_get: case Op::array_set: {
@@ -620,6 +676,12 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 }
                 default: fail("unknown operation");
                 }
+                bool pure=i.op==Op::constant;
+                if(i.op==Op::aggregate || i.op==Op::fixed_array) {
+                    pure=true;
+                    for(auto argument:i.arguments) pure=pure && argument<pure_templates.size() && pure_templates[argument];
+                }
+                pure_templates.push_back(pure);
                 types.push_back(result);
             }
             body_types.push_back(types);

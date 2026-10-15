@@ -21,8 +21,10 @@ void negative(const std::string& text,DiagnosticCode code) {
           "wrong diagnostic: "+render_diagnostic(result.diagnostics.front()));
     for(const auto& d:result.diagnostics) check(d.primary.source && d.primary.end<=text.size(),"lost source span");
 }
-void reject_ir(ir::Module module) {
-    try {ir::validate(module);} catch(const std::invalid_argument&) {return;}
+void reject_ir(ir::Module module,const std::string& reason={}) {
+    try {ir::validate(module);} catch(const std::invalid_argument& error) {
+        check(reason.empty() || std::string(error.what()).find(reason)!=std::string::npos,"wrong IR rejection: "+std::string(error.what()));return;
+    }
     throw std::runtime_error("forged array IR accepted");
 }
 void source_and_ir() {
@@ -43,7 +45,7 @@ void source_and_ir() {
     bool zero=false, defaults=false, get=false, set=false;
     for(const auto& f:module.functions) for(const auto& b:f.blocks) for(const auto& i:b.instructions) {
         if(i.op==ir::Op::fixed_array && i.arguments.empty()) zero=*i.type.definition->extent==0;
-        if(i.op==ir::Op::fixed_array && ir::array_element(i.type)==Type::i32 && i.arguments.size()==2) defaults=true;
+        if(i.op==ir::Op::fixed_array && ir::array_element(i.type)==Type::i32 && i.array_repeat && i.arguments.size()==1) defaults=true;
         if(i.op==ir::Op::array_get) {get=true;check(!i.source_excerpt.empty(),"missing checked access snapshot");}
         if(i.op==ir::Op::array_set) set=true;
     }
@@ -134,8 +136,8 @@ void negatives() {
     for(const auto& type:{"[i32,]","[i32 2]"}) negative(header+"    var a: "+type+"\n    return x\n",DiagnosticCode::syntax);
     negative(header+"    var a: [i32, -1]\n    return x\n",DiagnosticCode::integer_range);
     for(const auto& extent:{"true","2.5"}) negative(header+"    var a: [i32, "+extent+"]\n    return x\n",DiagnosticCode::unsupported_type);
-    negative(header+"    var a: [i32, 65537]\n    return x\n",DiagnosticCode::nesting);
-    analyze(header+"    var a: [i8, 65536]\n    return x\n"); // Existing shape limit, not native-budget approval.
+    analyze(header+"    var a: [i32, 65537]\n    return x\n");
+    analyze(header+"    var a: [i8, 65536]\n    return x\n"); // Repetition no longer consumes expanded shape work.
     std::string deep="i32";for(unsigned i=0;i<160;++i) deep="["+deep+", 0]";
     negative(header+"    var a: "+deep+"\n    return x\n",DiagnosticCode::nesting);
     std::string casts="0";for(unsigned i=0;i<600;++i) casts+=" as [i32, 1]";
@@ -165,7 +167,7 @@ void negatives() {
     negative("const a: [i32, 1] = [42]\nconst b = a[18446744073709551615 as u64]\n",DiagnosticCode::invalid_value);
     negative("const a: [i32, n] = [1]\nconst n = a[0]\n",DiagnosticCode::constant_cycle);
     negative("const a = b\nconst b = a\n"+header+"    var v: [i32, a]\n    return x\n",DiagnosticCode::constant_cycle);
-    negative("value struct holder:\n    a: [i32, 32768]\n    b: [i32, 32768]\n",DiagnosticCode::nesting);
+    analyze("value struct holder:\n    a: [i32, 32768]\n    b: [i32, 32768]\n");
     negative("value struct recursive:\n    a: [recursive, 1]\n",DiagnosticCode::unsupported_type);
     negative("value struct point:\n    width: i32\nfunc (self point) init():\n    pass\n"
              "const dimensions = point()\nconst size = dimensions.width\n"+header+
@@ -177,6 +179,92 @@ void negatives() {
     negative(header+"    return \"x\"[0]\n",DiagnosticCode::unsupported_type);
     negative("struct holder:\n    items: [i32, 1]\nfunc frozen(owner: holder):\n"
              "    const ro = owner\n    var alias = ro\n    alias.items[0] = 3\n",DiagnosticCode::readonly);
+}
+void compact_shapes() {
+    auto program=analyze(
+        "value struct pixel:\n    channel: i32 = 7\n    tile: [u8, 2097152]\n"
+        "value struct image:\n    pixels: [pixel, 3]\n"
+        "const defaults = image()\nconst last = defaults.pixels\n"
+        "value struct numbers:\n    values: [i32, 2097152]\n"
+        "const zero = numbers().values[-1]\n"
+        "func large() -> [pixel, 1048576]:\n    var data: [pixel, 1048576]\n    return data\n"
+        "func nested() -> [[u8, 2097152], 4]:\n    var data: [[u8, 2097152], 4]\n    return data\n"
+        "func empty() -> [[i32, 0], 9223372036854775807 as i64]:\n"
+        "    var data: [[i32, 0], 9223372036854775807 as i64]\n    return data\n");
+    auto module=program->lower();ir::validate(module);
+    std::size_t instructions=0,repeats=0;bool nonzero_default=false;
+    for(const auto& f:module.functions) for(const auto& b:f.blocks) for(const auto& i:b.instructions) {
+        ++instructions;
+        if(i.op==ir::Op::constant && i.type==Type::i32 && i.immediate==7) nonzero_default=true;
+        if(i.op==ir::Op::fixed_array) {
+            check(i.array_repeat,"default lost repeated template mode");++repeats;
+            check(i.arguments.size()==(*i.type.definition->extent ? 1u : 0u),"default expanded per element");
+            check(i.type.definition->fields.empty(),"array generated per-element fields");
+        }
+    }
+    check(instructions<40 && repeats>=5 && nonzero_default,"repeated shapes lost defaults or consumed per-element IR");
+    auto shape=ir::compact_value_shape(module.functions.front().result);
+    check(shape.scalar_bytes==std::uint64_t{1048576}*(2097152+4) && shape.template_nodes==5,
+          "nested logical summary or compact template incorrect");
+    check(std::any_of(program->declarations().begin(),program->declarations().end(),[](const auto& d) {
+        return d.identity.ends_with("::zero") && d.value==0;
+    }),"constant selection from repeated default did not fold");
+    for(auto count:{"1","2097152","8388608"}) {
+        auto m=analyze(std::string("func bytes() -> [u8, ")+count+"]:\n    var data: [u8, "+count+"]\n    return data\n")->lower();
+        check(m.functions.front().blocks.front().instructions.size()==4,"IR grows with repeated extent");
+        ir::validate(m);
+    }
+    negative("func bad():\n    var a: [u64, 9223372036854775807 as i64]\n",DiagnosticCode::limit);
+    negative("func bad():\n    var a: [[u8, 4294967296 as u64], 4294967296 as u64]\n",DiagnosticCode::limit);
+    negative("func bad():\n    var a: [u8, 18446744073709551616]\n",DiagnosticCode::integer_range);
+    negative("func bad():\n    var a: [[i32, 0], 9223372036854775808 as u64]\n",DiagnosticCode::integer_range);
+    negative("value struct node:\n    child: [node, 0]\n",DiagnosticCode::unsupported_type);
+    negative("struct node:\n    n: i32\nfunc bad():\n    var a: [node, 1000000]\n",DiagnosticCode::unsupported_type);
+    negative("value struct leaf:\n    n: string\nfunc bad():\n    var a: [leaf, 1000000]\n",DiagnosticCode::unsupported_type);
+    negative("value struct point:\n    n: i32\nfunc (self point) init():\n    self.n = 7\n"
+             "func bad():\n    var a: [point, 1000000]\n",DiagnosticCode::unsupported_type);
+    auto simple=analyze("func value() -> i32:\n    return 7\nfunc data() -> [i32, 2097152]:\n"
+                        "    var a: [i32, 2097152]\n    return a\n")->lower();
+    auto bad=simple;
+    auto& body=bad.functions.back().blocks.front().instructions;
+    auto repeated=std::find_if(body.begin(),body.end(),[](const auto& i){return i.op==ir::Op::fixed_array;});
+    check(repeated!=body.end(),"missing repeat fixture");
+    const auto position=static_cast<std::size_t>(repeated-body.begin());
+    auto prototype=repeated->arguments.at(0);
+    body[prototype].op=ir::Op::call;body[prototype].callee=bad.functions.front().name;
+    reject_ir(bad,"effectful repeated array prototype"); // Same typed result, not a pure recipe.
+    bad=simple;bad.functions.back().blocks.front().instructions[prototype].array_repeat=true;reject_ir(bad);
+    bad=simple;bad.functions.back().blocks.front().instructions[position].arguments.push_back(prototype);reject_ir(bad);
+    bad=simple;bad.functions.back().blocks.front().instructions[position].array_repeat=false;reject_ir(bad);
+    bad=simple;bad.functions.back().locals.push_back(Type(simple.functions.back().result.definition,Type::aggregate));
+    reject_ir(bad,"structural array metadata on nominal type");
+    bad=simple;
+    auto& instruction=bad.functions.back().blocks.front().instructions[position];
+    auto definition=std::make_shared<ir::ValueType>(*instruction.type.definition);
+    definition->extent=std::numeric_limits<std::uint64_t>::max();
+    definition->identity=ir::array_identity(Type::i32,definition->extent);
+    definition->self.reset();definition->arena.reset();instruction.type=Type(definition,Type::fixed_array);
+    reject_ir(bad,"not representable"); // Independent shape arithmetic, not literal arity.
+    bad=simple;
+    auto cycle=std::make_shared<ir::ValueType>(*simple.functions.back().result.definition);
+    cycle->self.reset();cycle->arena.reset();
+    Type cyclic(cycle,Type::fixed_array);cycle->element=ir::FieldType(cyclic);
+    bad.functions.back().blocks.front().instructions[position].type=cyclic;
+    reject_ir(bad,"invalid array element or identity");
+    bool finite=false;
+    try {ir::compact_value_shape(cyclic);} catch(const std::invalid_argument& error) {
+        finite=std::string(error.what()).find("Recursive or excessive")!=std::string::npos;
+    }
+    check(finite,"compact shape walker accepted a recursive value");
+    // A tiny source DAG can still require excessive explicit value-default work.
+    // This is actual recipe duplication, not array multiplicity or payload size.
+    std::string recipe="value struct layer0:\n    n: i32\n";
+    for(unsigned n=1;n<18;++n) recipe+="value struct layer"+std::to_string(n)+":\n    a: [layer"+
+        std::to_string(n-1)+", 1]\n    b: [layer"+std::to_string(n-1)+", 1]\n";
+    auto exhausted=analyze_source({"recipes.void",recipe});
+    check(!exhausted.succeeded() && std::any_of(exhausted.diagnostics.begin(),exhausted.diagnostics.end(),[](const auto& d) {
+        return d.code==DiagnosticCode::limit || d.code==DiagnosticCode::nesting;
+    }),"real default-recipe resource exhaustion lost its diagnostic");
 }
 void indexes_and_budget() {
     check(ir::checked_array_index(~std::uint64_t{0},Type::i64,3)==2,"negative last");
@@ -206,6 +294,6 @@ void indexes_and_budget() {
 }
 }
 int main() {
-    try {source_and_ir();negatives();indexes_and_budget();std::cout<<"P23-1 scalar fixed-array analysis/IR and storage-contract checks passed\n";return 0;}
+    try {source_and_ir();negatives();compact_shapes();indexes_and_budget();std::cout<<"P23-1 scalar fixed-array analysis/IR and storage-contract checks passed\n";return 0;}
     catch(const std::exception& error) {std::cerr<<error.what()<<'\n';return 1;}
 }

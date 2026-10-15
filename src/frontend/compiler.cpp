@@ -1439,9 +1439,8 @@ class Semantics {
             }
             if (!s.expression && ir::reference_value(t) && !t.nullable) error(source,s.token,Code::initializer,"A non-nullable reference requires an initializer.","Construct the object explicitly using its type.");
             if (!s.expression && ir::array_type(t)) {
-                if(!ir::scalar_fixed_array(t)) error(source,s.token,Code::unsupported_type,"P23-1 default construction requires a scalar fixed array.");
                 s.expression=std::make_unique<Expr>(Expr::Kind::literal,s.token);s.expression->type=t;
-                s.expression->aggregate_value.fields.resize(static_cast<std::size_t>(*t.definition->extent));
+                s.expression->aggregate_value=array_default(t,s.token);
             }
             if (!s.expression && t.kind == Type::aggregate) {
                 auto [owner,structure] = owned_structure(t);
@@ -1563,6 +1562,29 @@ public:
         construction_fields(plan,*owner,*structure,true,true);
         f.initialization_defaults=std::move(plan.omitted); f.initialization_value=structure->defaults;
     }
+    ir::ConstantValue array_default(Type t,const Token& token) {
+        ir::ConstantValue value;value.repeat=*t.definition->extent;
+        // Validate the recipe even for an empty repeat, without executing init.
+        std::set<const ir::ValueType*> seen;
+        std::function<void(Type)> pure=[&](Type child) {
+            if(child.definition && !seen.insert(child.definition.get()).second) return;
+            if(child.kind==Type::fixed_array) pure(ir::array_element(child));
+            if(child.kind==Type::aggregate) {
+                auto [owner,structure]=owned_structure(child);
+                if(structure->initializer) error(source,token,Code::unsupported_type,"Repeated array defaults with custom initializers await construction recipes.");
+                for(const auto& field:child.definition->fields) pure(field.type);
+            }
+        };
+        pure(t);
+        if(!*value.repeat) return value;
+        auto element=ir::array_element(t);
+        if(element.kind==Type::fixed_array) value.fields.push_back(array_default(element,token));
+        else if(element.kind==Type::aggregate) {
+            auto [owner,structure]=owned_structure(element);defaults(*owner,*structure);
+            value.fields.push_back(structure->defaults);
+        } else value.fields.emplace_back();
+        return value;
+    }
     ir::ConstantValue field_default(Statement& field) {
         auto t = *field.annotation;
         if (field.expression) {
@@ -1571,8 +1593,7 @@ public:
             return constant_value(source,*field.expression);
         }
         if(ir::array_type(t)) {
-            if(!ir::scalar_fixed_array(t)) error(source,field.token,Code::unsupported_type,"P23-1 field defaults require scalar fixed arrays.");
-            ir::ConstantValue value;value.fields.resize(static_cast<std::size_t>(*t.definition->extent));return value;
+            return array_default(t,field.token);
         }
         if (t.kind != Type::aggregate) return {};
         for (const auto& [id,owner] : units) for (auto& nested : owner->structures) if (nested.definition == t.definition) {
@@ -1690,7 +1711,11 @@ class Lowering {
             i.immediate=strings.intern(value.text,source,token);
             module.coordinated=true; return emit(i,token);
         }
-        if(t.kind==Type::fixed_array) for(const auto& element:value.fields) i.arguments.push_back(constant(ir::array_element(t),element,token));
+        if(t.kind==Type::fixed_array) {
+            i.array_repeat=value.repeat.has_value();
+            if(value.repeat && *value.repeat!=*t.definition->extent) throw std::logic_error("Mismatched repeated default extent");
+            for(const auto& element:value.fields) i.arguments.push_back(constant(ir::array_element(t),element,token));
+        }
         else if (t.kind == Type::aggregate) for (unsigned n = 0; n < t.definition->fields.size(); ++n)
             i.arguments.push_back(constant(ir::field_type(t,n),value.fields.at(n),token));
         else i.immediate = std::bit_cast<std::int64_t>(value.bits);
@@ -2215,7 +2240,10 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
     }
     if(e.kind==Expr::Kind::array_index) {
         auto array=constant_value(source,*e.parts[0]);auto index=constant_value(source,*e.parts[1]);
-        try {return array.fields.at(static_cast<std::size_t>(ir::checked_array_index(index.bits,e.parts[1]->type,array.fields.size())));}
+        try {
+            const auto selected=ir::checked_array_index(index.bits,e.parts[1]->type,array.repeat.value_or(array.fields.size()));
+            return array.fields.at(array.repeat ? 0 : static_cast<std::size_t>(selected));
+        }
         catch(const std::out_of_range&) {error(source,e.token,Code::invalid_value,"Constant array index out of bounds.");}
     }
     if (e.kind == Expr::Kind::construction) {
@@ -2425,19 +2453,24 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 const auto value=constant_value(owner->source,*syntax.extent).bits;
                 if(numeric::signed_integer(type) && (value & (std::uint64_t{1}<<(numeric::width(type)-1))))
                     error(owner->source,syntax.extent->token,Code::integer_range,"Fixed-array extent cannot be negative.");
-                if(value>65536) error(owner->source,syntax.extent->token,Code::nesting,"Expanded array layout exceeds 65536 elements.");
+                if(value>static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max()))
+                    error(owner->source,syntax.extent->token,Code::integer_range,"Array extent is not representable as an i64 count.");
                 extent=value;
             }
             if(element.kind==Type::aggregate) for(auto& [child_id,child_owner]:units) for(auto& child:child_owner->structures)
                 if(child.definition==element.definition) {
                     layout(*child_owner,child);
-                    if(extent && (child.expanded_fields>=65536 || *extent>65536/(child.expanded_fields+1)))
-                        error(owner->source,syntax.token,Code::nesting,"Expanded array layout exceeds 65536 fields.");
                 }
-            // P23-1 materialization is scalar only. Do not silently accept
-            // reference-containing storage without the later GC/profile proofs.
-            if(!extent || (!numeric::number(element) && element!=Type::boolean))
-                error(owner->source,syntax.token,Code::unsupported_type,"P23-1 supports scalar fixed-array storage; growable and nonscalar array storage is deferred.");
+            if(!extent) error(owner->source,syntax.token,Code::unsupported_type,"Growable array storage is deferred.");
+            // Compact, reference-free value recipes only. Native/GC storage remains gated.
+            ir::CompactValueShape shape;
+            try {shape=ir::compact_value_shape(element);}
+            catch(const std::length_error& failure) {error(owner->source,syntax.token,Code::limit,failure.what());}
+            catch(const std::invalid_argument& failure) {error(owner->source,syntax.token,Code::unsupported_type,failure.what());}
+            if(shape.depth>=128) error(owner->source,syntax.token,Code::nesting,"Array value shape depth limit exceeded.");
+            if(shape.template_nodes>=65536) error(owner->source,syntax.token,Code::limit,"Array default-template analysis work exhausted.");
+            if(shape.scalar_bytes && *extent>std::numeric_limits<std::uint64_t>::max()/shape.scalar_bytes)
+                error(owner->source,syntax.token,Code::limit,"Array logical scalar extent is not representable in 64 bits.");
             const auto key=ir::array_identity(element,extent);
             auto& canonical=canonical_arrays[key];
             if(!canonical) {
@@ -2482,7 +2515,11 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 if (field.using_field && ((t.kind!=Type::aggregate && t.kind!=Type::managed_ref) || t.nullable))
                     error(owner.source,field.token,Code::unsupported_type,"A using field requires a non-nullable nominal struct type.","Use an ordinary field for primitives or nullable references.");
                 std::size_t expanded = 1;
-                if(t.kind==Type::fixed_array) {expanded+=static_cast<std::size_t>(*t.definition->extent);structure.layout_depth=std::max(structure.layout_depth,2u);}
+                if(t.kind==Type::fixed_array) {
+                    const auto shape=ir::compact_value_shape(t);
+                    expanded=shape.template_nodes;structure.layout_depth=std::max(structure.layout_depth,shape.depth+1);
+                    if(structure.layout_depth>128) error(owner.source,field.token,Code::nesting,"Physical layout depth limit exceeded.");
+                }
                 if (t.kind == Type::aggregate) for (auto& [id,u] : units) for (auto& child : u->structures) if (child.definition == t.definition) {
                     layout(*u,child); expanded += child.expanded_fields; structure.layout_depth=std::max(structure.layout_depth,child.layout_depth+1);
                     if(structure.layout_depth>128) error(owner.source,field.token,Code::nesting,"Physical layout depth limit exceeded.","Reduce the combined inheritance and inline-value depth; the current limit is 128.");
@@ -2775,7 +2812,7 @@ struct AnalysisAccess {
             }
             for (const auto& c : unit->constants) {
                 auto key = id + "::" + c.declaration.name;
-                declaration({AnalyzedDeclaration::Kind::module_constant,key,id,c.visibility,location(c.declaration.token),{},c.type,c.declaration.constant_syntax,(c.type.kind == Type::aggregate || c.type==Type::string) ? std::optional<std::uint64_t>{} : std::optional<std::uint64_t>{c.value}});
+                declaration({AnalyzedDeclaration::Kind::module_constant,key,id,c.visibility,location(c.declaration.token),{},c.type,c.declaration.constant_syntax,(c.type.kind == Type::aggregate || ir::array_type(c.type) || c.type==Type::string) ? std::optional<std::uint64_t>{} : std::optional<std::uint64_t>{c.value}});
                 expression(*c.declaration.expression,key,{});
             }
             for (const auto& f : unit->functions) {

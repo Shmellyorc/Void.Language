@@ -7,14 +7,14 @@ per-function array-storage policy. Neither fixed nor growable arrays may have an
 arbitrary 64 KiB source-level ceiling. CI #45 is owner-confirmed green (7/7 jobs,
 61 suites each), locking Part 5A research, not enabling production native arrays.
 
-Current code is unchanged: the planner/staged machine auditor retain 65536-byte
-research checks; frontend/independent IR validation also reject array extents or
-expanded shapes above their 65536 guards. Enclosing-value multiplicity accounting
-can reject arrays too. Those checks are active implementation limitations and
-must be revised under review before general large-array activation. Analysis
-resource protection must not silently recreate the same element/payload ceiling.
-Defaults currently allocate per-element compiler values, so merely deleting a
-comparison is not a complete or safe correction.
+Stage 1 replaces the old extent/multiplicity ceiling for compact reference-free
+fixed-array analysis and pure defaults. Repeated defaults no longer allocate one
+compiler value per element. Independent IR validation checks these compact shapes
+and templates. Actual recipe/graph work and finite/depth/checked-arithmetic guards
+remain; target allocation representation is not yet implemented. Reference-bearing
+arrays, effectful repeated construction and nonscalar array operations remain
+later work. The planner/staged machine auditor retain their unchanged research
+checks. See ARRAYS_PROPOSAL.md Section 22 for the current local checkpoint.
 
 Investigate storage for large fixed snapshots, including the existing GC heap,
 without another memory manager. No alternative representation, new numeric limit,

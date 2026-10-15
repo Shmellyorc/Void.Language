@@ -7998,3 +7998,134 @@ for this documentation-only task. Existing verifier code/checks remain operation
 and unchanged; CI #45 status is attributed to the owner, not a new local run.
 Historical evidence is retained. No commits, pushes, branches or remote changes.
 Stop for owner/wrench review before further architecture or implementation.
+
+
+## 15 October 2026: Phase 23 large-array foundation, Stage 1
+
+### Authority and scope
+
+Read the owner's complete new Large-Array Storage Architecture Review, including
+fixed owned-value semantics, compact shapes/defaults, future GC dependencies,
+correctness obligations and six-stage roadmap. This is distinct from the earlier
+hybrid certification report. Section 21's code audit is historical. Only Stage 1
+is authorized: compact analysis and defaults plus independent IR validation.
+CI #45's 7/7 jobs and 61 suites are owner-reported locked baseline evidence, not
+hosted verification of these changes. No later-stage storage or activation approval
+is inferred from the research direction.
+
+### Implementation
+
+- Reuse the existing structural Type/FieldType arena: exact canonical element edge
+  and extent, no synthetic element fields. Remove the active 65536 extent and
+  multiplicity barriers on the supported compact paths, including enclosing values.
+- Add shared compact_value_shape analysis with memoized distinct descriptor walks,
+  finite/depth checks and checked logical scalar-byte sums/products. Source count
+  must fit the already approved A3 i64 public count contract. The scalar-byte result
+  is a necessary lower bound, not a native/GC layout or target allocation estimator.
+  Target padding, object overhead and allocator representation remain future checks.
+- Pure defaults carry an exact repeat count and one prototype, or none for zero.
+  Reference-free nested arrays and value defaults are supported in analysis/IR.
+  Constant selection normalizes against logical extent and selects the prototype,
+  rather than indexing a nonexistent expanded vector. Array-valued module constants
+  no longer advertise a fabricated scalar numeric value to tooling.
+- Existing fixed_array IR gains repeated-template mode. Independent validation
+  recomputes shape/identity/extent, validates exact prototype arity/types and proves
+  constant/aggregate/array-only prototype DAGs in SSA order. Calls and other effectful
+  results cannot masquerade as pure repeated defaults. Repetition metadata on other
+  ops, nominal reuse of array descriptors, arithmetic overflow and cycles reject.
+  No frontend cached summary or unchecked count is trusted.
+- Explicit scalar literal expressions keep their original ordered IR/effects.
+  Custom-initializer repetition, reference-bearing shapes, growables and nonscalar
+  literal/access operations remain explicitly deferred. Existing nominal/default
+  recipe work bounds remain where the compiler still materializes actual fields.
+  Distinct-shape/default-recipe work limits are not array-count or payload ceilings.
+- Production backend/runtime/GC, native storage accounting, research certificate and
+  encoded-CFG verifier are unchanged. Source native arrays still reject. No alternate
+  ABI, GC descriptor, allocator, inline/heap cutoff or production policy is introduced.
+
+### Focused evidence
+
+Expanded the existing arrays_foundation suite, preserving its research byte-budget
+boundary/overflow assertions and all existing suites. Positives include 2 MiB and
+8 MiB scalar defaults, nested arrays, repeated value structs with nonzero defaults,
+constant selection, exact identities and an INT64_MAX repeat of a zero-payload
+shape. Logical huge-shape analysis is not a claim of successful runtime allocation.
+The 1/2097152/8388608-byte cases each have exactly four IR instructions; the nested
+fixture has fewer than 40, with no per-element fields or default arguments.
+
+Negatives cover exact arity, incorrect repeat mode, effectful prototypes, metadata
+on other ops, nominal/array descriptor confusion, finite cycles including zero
+extents, malformed types, existing constant dependency failures, count/literal
+representation, nested checked-product overflow and actual default-recipe exhaustion.
+The last case is a small source DAG whose explicitly represented value-default
+recipe duplicates fields; failure remains a structured resource diagnostic.
+
+The first focused run caught my diagnostic catch wrapping a representability error
+as unsupported_type; the catch scope was corrected and the intended diagnostic is
+asserted. A cyclic forged array cannot have its claimed canonical identity: IR
+rejects that identity, while a direct shape-walker negative separately verifies
+finite-cycle detection. Neither failure was bypassed to obtain a passing test.
+
+Linux LLVM 19.1.7 Debug and Release foundation tests pass, including 1 MiB native
+stack runs of the expanded suite. Fresh Debug CLI checks under a 512 MiB address-
+space limit measured (Linux wait4 ru_maxrss, separate child processes):
+
+| Byte extent | Peak RSS KiB | Elapsed seconds |
+| --- | ---: | ---: |
+| 1 | 34952 | 0.0105 |
+| 2097152 | 35000 | 0.0131 |
+| 8388608 | 34568 | 0.0201 |
+
+Timing/RSS are local observations, not performance thresholds. Deterministic IR and
+metadata assertions provide the regression proof. Reproduce using a function with
+`var data: [u8, N]` and `return data[-1] as i32`, CLI check, RLIMIT_AS=512 MiB,
+and wait4 per child. The host lacks /usr/bin/time, so Python resource/wait4 was used.
+
+The 8 MiB fixture's JIT and AOT attempts both reject with the retained native-array
+message at normal/O2; AOT output sentinels remain unchanged. Rejected output was
+never executed. A successful compact source check does not authorize native delivery.
+
+### Remaining review boundaries
+
+Before Stage 2 or later implementation, lock repeated GC descriptor ownership and
+validation, rooted/private complete construction and failure, recursive fixed-value
+copy/publication rules, growable identity/versioning, deterministic array ABI and
+whole-build/reload publication. Production stack policy remains separate from
+payload size. No machine/ABI/origin/CFG proof or platform evidence is discarded.
+Reference-bearing analysis must not bypass the current reference-path/GC gates.
+No heap-backed arrays, source native execution, ORC/LSP certification or later stage
+is complete. Windows/macOS execution and hosted acceptance are not claimed.
+
+
+### Completed validation and stop
+
+Pinned SDK verified with `/usr/lib/llvm-19/bin/llvm-config --version`: 19.1.7.
+Rebuilt all Debug/Release targets after the final source/IR checks, then ran:
+
+| Check | Actual result |
+| --- | --- |
+| cmake --build build/ci-debug -j2; ctest --test-dir build/ci-debug --output-on-failure -j2 | Full build succeeded; 61/61 passed, 117.03 seconds |
+| cmake --build build/ci-release -j2; ctest --test-dir build/ci-release --output-on-failure -j2 | Full build succeeded; 61/61 passed, 60.40 seconds |
+| Strict sanitizers: arrays_storage_audit, arrays_foundation | 2/2 passed, 7.50 seconds |
+| Strict sanitizers: interfaces_source, analysis, frontend | 3/3 passed, 21.60 seconds |
+| Strict sanitizers: runtime_generated | 1/1 passed, 1.32 seconds |
+| ulimit -s 1024; build/ci-debug/void_arrays_foundation | Passed |
+| ulimit -s 1024; build/ci-release/void_arrays_foundation | Passed |
+| git diff --check | Passed |
+
+Sanitizer targets were rebuilt with VOID_SANITIZERS=ON (RelWithDebInfo); tests used
+ASAN_OPTIONS=detect_leaks=1:abort_on_error=1 and
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1, serially outside the ptrace sandbox
+so LeakSanitizer could work. No sanitizer options/assertions were weakened. The two
+full 61-suite runs include existing native AOT, GC, reload, source diagnostics,
+LSP/tooling and the retained storage-audit/encoded-CFG suite. Interface crash capture
+instrumentation is unchanged. No Windows/macOS run or complete six-configuration
+matrix is claimed for this focused foundation checkpoint.
+
+Updated proposal Section 22/current-status text, Language Bible implementation
+status and Known Issues to distinguish compact analysis from future execution.
+Historical Section 21 measurements/audit and 64 KiB research are retained. Only
+compiler type/frontend/IR foundation, its existing test suite and documentation
+change. No runtime/GC/backend implementation, CI, commits, pushes, branches or
+remote modifications. Stage 1 is complete locally; stop for owner/wrench review
+before Stage 2 or any production activation.

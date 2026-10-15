@@ -70,7 +70,10 @@ inline bool operator==(const Type& a, const Type& b) {
     return (a.kind!=Type::prepared_receiver || a.preparation==b.preparation) && a.kind == b.kind && a.nullable == b.nullable && a.construction == b.construction && (a.kind != Type::aggregate && a.kind != Type::unresolved && a.kind != Type::managed_ref && a.kind != Type::interface_ref && a.kind != Type::prepared_receiver && a.kind != Type::fixed_array && a.kind != Type::growable_array ? true :
         a.definition && b.definition && a.definition->identity == b.definition->identity);
 }
-struct ConstantValue { std::uint64_t bits = 0; std::vector<ConstantValue> fields; std::string text = {}; };
+struct ConstantValue { std::uint64_t bits = 0; std::vector<ConstantValue> fields; std::string text = {};
+    // A pure repeated default has one prototype (none for zero extent).
+    std::optional<std::uint64_t> repeat = {};
+};
 // Immutable strings participate in tracing, never mutable-reference authority.
 ReferencePaths reference_paths(Type type, bool include_strings = false);
 ReferencePaths readonly_paths(Type type);
@@ -88,6 +91,10 @@ bool array_type(Type);
 Type array_element(Type);
 std::string array_identity(Type element, std::optional<std::uint64_t> extent);
 bool scalar_fixed_array(Type);
+// Logical scalar-byte lower bound, NOT a target layout or native storage estimate.
+// Repetition contributes arithmetic, never per-element metadata or work.
+struct CompactValueShape { unsigned depth = 0; std::uint64_t scalar_bytes = 0; std::size_t template_nodes = 0; };
+CompactValueShape compact_value_shape(Type);
 std::uint64_t checked_array_index(std::uint64_t bits, Type index, std::uint64_t extent);
 enum class Op { argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
@@ -107,6 +114,7 @@ struct Instruction {
     std::optional<Place> receiver = {};
     bool initialization = false; // Only compiler-validated construction invokes init.
     std::string source_excerpt = {}; // Snapshot of the source line and caret.
+    bool array_repeat = false; // fixed_array only: pure prototype value, copied extent times.
 };
 struct Terminator {
     enum class Kind { return_value, branch, jump, return_void, unreachable } kind = Kind::return_value;
