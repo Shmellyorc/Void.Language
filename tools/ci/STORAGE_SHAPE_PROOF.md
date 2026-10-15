@@ -131,3 +131,34 @@ and fails if any selected object rejects. Part 3 leaves its optimized inline hom
 unproved; the full corpus records that rejection. The selector never silently
 skips failed candidates or relaxes exit/crash classification. See proposal Section
 18 for the proof limits and actual evidence.
+
+## Part 4: outgoing depth observations and final-CFG negative
+
+Run the focused compiler suite first to produce current normal/O2 fixture IR and
+reports, then use a fresh output directory:
+
+```sh
+ctest --test-dir build/ci-debug -R '^arrays_storage_audit$' --output-on-failure
+python3 tools/ci/aot_outgoing_probe.py \
+  --fixtures 'build/ci-debug/storage shape fixtures' \
+  --llvm-bin /usr/lib/llvm-19/bin --output build/aot-outgoing-example
+```
+
+This native Linux x64 driver requires permitted GDB ptrace and LLVM 19.1.7. It
+compiles distinct ordinary controls from the saved optimized IR, independently
+links their C caller/callees, checks exact results and side effects at inherited
+and 1 MiB stack limits, and measures caller SP while stepping over callees.
+No staged rejected object is linked or executed. ASLR remains enabled.
+
+The nine normal/O2 cases cover reserved and nonreserved areas, padding, two calls,
+both branch paths, three loop iterations, two near-limit homes and a hidden result.
+The compiler suite also retains null-bound tail/dynamic/indirect/realignment
+negatives and owner-destination assertions. An observation is not a certificate:
+final_encoded_cfg_bound is false and no reconciliation or incoming credit is given.
+
+The driver also retains a bytes-only negative whose conditional branch targets
+frame setup instead of the original alternative. It independently disassembles
+both files and requires identical flattened SP/call lists. The modified file is
+never executed or submitted for delivery. encoded-cfg-gap.json documents why the
+existing linear final check cannot certify machine CFG path multiplicity.
+See proposal Section 19 for the activation stop and required architectural review.

@@ -140,6 +140,100 @@ json::Object frame(MachineFunction &mf) {
     {"opaque_sp_adjustment", fi.hasOpaqueSPAdjustment()}, {"objects", std::move(objects)},
     {"sp_writes", std::move(writes)}, {"mi_sp_opcodes", std::move(rawOpcodes)}, {"call_opcodes", std::move(calls)}};
 }
+// Investigation evidence only. This does not certify the encoded CFG or ABI
+// ownership and MUST NOT replace the nonreserved-area rejection below. The final
+// object checker binds linear SP/call lists, not branch targets/path multiplicity.
+json::Object outgoingObservation(MachineFunction &mf, StringRef triple) {
+  json::Array errors, blocks, calls;
+  const auto &fi = mf.getFrameInfo();
+  const auto &ti = *mf.getSubtarget().getInstrInfo();
+  const auto &ri = *mf.getSubtarget().getRegisterInfo();
+  auto reject = [&](StringRef why) { errors.push_back(why.str()); };
+  const Triple target(triple);
+  if (!target.isOSLinux() || target.getArch() != Triple::x86_64)
+    reject("no Linux x64 SP observation profile");
+  if (fi.hasVarSizedObjects() || fi.hasOpaqueSPAdjustment() || fi.hasTailCall() ||
+      fi.getMaxAlign() > Align(16) || mf.getFunction().getCallingConv() != CallingConv::C)
+    reject("dynamic/tail/realigned/non-C shape");
+  std::set<const Function *> callees;
+  for (const auto &bb : mf.getFunction()) for (const auto &inst : bb)
+    if (auto *call = dyn_cast<CallBase>(&inst)) {
+      auto *callee = call->getCalledFunction();
+      if (!callee || call->getCallingConv() != CallingConv::C || callee->isVarArg() ||
+          call->hasFnAttr(Attribute::ReturnsTwice) || call->hasOperandBundles()) {
+        reject("unproved source call/cleanup shape"); continue;
+      }
+      callees.insert(callee);
+    }
+  std::map<const MachineBasicBlock *, int64_t> entry;
+  std::vector<const MachineBasicBlock *> work;
+  if (!mf.empty()) { entry[&mf.front()] = 0; work.push_back(&mf.front()); }
+  uint64_t peak = 0;
+  while (!work.empty()) {
+    auto *bb = work.back(); work.pop_back();
+    int64_t depth = entry[bb]; bool returned = false;
+    json::Array events, successors;
+    if (bb->isEHPad() || bb->hasAddressTaken()) reject("EH/address-taken CFG block");
+    for (const auto &mi : *bb) {
+      if (mi.isDebugInstr() || mi.isCFIInstruction()) continue;
+      const auto op = ti.getName(mi.getOpcode());
+      if (mi.isInlineAsm() || mi.isIndirectBranch()) reject("inline assembly/indirect CFG");
+      if (mi.isCall()) {
+        const Function *callee = nullptr;
+        for (const auto &operand : mi.operands()) if (operand.isGlobal())
+          callee = dyn_cast<Function>(operand.getGlobal());
+        if (op != "CALL64pcrel32" || !callee || !callees.count(callee))
+          reject("unproved machine call/cleanup identity");
+        if (depth % 16 != 8) reject("call-site SP is not SysV-aligned");
+        calls.push_back(json::Object{{"block", bb->getNumber()}, {"opcode", op},
+          {"callee", callee ? callee->getName() : StringRef("")}, {"entry_sp_depth", depth}});
+        continue; // Supported C call+return is net zero, excluding callee storage.
+      }
+      if (mi.isReturn()) {
+        returned = true;
+        if (op != "RET64" || depth != 0 || !bb->succ_empty()) reject("unbalanced/unsupported return");
+        continue;
+      }
+      bool writes = false;
+      for (const auto &operand : mi.operands())
+        if (operand.isReg() && operand.isDef() && spReg(operand.getReg(),ri)) writes = true;
+      if (!writes) continue;
+      int64_t delta = 0; bool known = false;
+      if ((op == "SUB64ri32" || op == "SUB64ri8" || op == "ADD64ri32" || op == "ADD64ri8") &&
+          mi.getNumExplicitOperands() == 3 && mi.getOperand(0).isReg() && mi.getOperand(1).isReg() &&
+          StringRef(ri.getName(mi.getOperand(0).getReg())) == "RSP" &&
+          mi.getOperand(0).getReg() == mi.getOperand(1).getReg() && mi.getOperand(2).isImm() &&
+          mi.getOperand(2).getImm() >= 0) {
+        delta = mi.getOperand(2).getImm() * (op.starts_with("SUB") ? 1 : -1); known = true;
+      } else if (op == "PUSH64r" || op == "PUSH64rmm" || op == "PUSH64i32" || op == "PUSH64i8") {
+        delta = 8; known = true;
+      } else if (op == "POP64r" && mi.getNumExplicitOperands() == 1 && mi.getOperand(0).isReg() &&
+                 !spReg(mi.getOperand(0).getReg(),ri)) { delta = -8; known = true; }
+      if (!known) { reject("unknown SP writer: " + op.str()); continue; }
+      if ((delta > 0 && depth > std::numeric_limits<int64_t>::max() - delta) ||
+          (delta < 0 && depth < -delta)) { reject("negative/overflowing SP depth"); continue; }
+      depth += delta; peak = std::max(peak,uint64_t(depth));
+      events.push_back(json::Object{{"opcode", op}, {"delta", delta}, {"depth", depth}});
+    }
+    if (bb->succ_empty() && !returned) reject("unproved terminal CFG path");
+    for (const auto *next : bb->successors()) {
+      successors.push_back(next->getNumber());
+      auto [at, inserted] = entry.emplace(next,depth);
+      if (inserted) work.push_back(next);
+      else if (at->second != depth) reject("unequal CFG join or accumulating stack cycle");
+    }
+    blocks.push_back(json::Object{{"block", bb->getNumber()}, {"entry_depth", entry[bb]},
+      {"exit_depth", depth}, {"successors", std::move(successors)}, {"sp_events", std::move(events)}});
+  }
+  if (entry.size() != mf.size()) reject("uncovered machine CFG blocks");
+  const bool complete = errors.empty();
+  return json::Object{{"scope", "diagnostic-machine-CFG-only;not-a-delivery-certificate"},
+    {"complete_machine_observation", complete}, {"final_encoded_cfg_bound", false},
+    {"incoming_credit", 0}, {"reconciliation_credit", 0},
+    {"peak_entry_sp_depth", complete ? json::Value(int64_t(peak)) : json::Value(nullptr)},
+    {"additional_below_F", complete ? json::Value(int64_t(peak > fi.getStackSize() ? peak-fi.getStackSize() : 0)) : json::Value(nullptr)},
+    {"blocks", std::move(blocks)}, {"calls", std::move(calls)}, {"errors", std::move(errors)}};
+}
 struct Early : MachineFunctionPass {
   static char ID; State &s;
   Early(State &s) : MachineFunctionPass(ID), s(s) {}
@@ -292,6 +386,7 @@ struct Audit : MachineFunctionPass {
     if (enforce && r > fi.getStackSize()) { fail(s, name, "home credit exceeds measured frame"); r = 0; }
     const auto charge = alignTo(plan.bytes + fi.getStackSize() - r + e, a);
     if (enforce && charge > array_function_storage_budget) fail(s, name, "65536-byte policy exceeded");
+    snapshot["outgoing_sp_observation"] = outgoingObservation(mf,s.triple);
     snapshot["reserved_call_frame"] = reservedCallFrame;
     snapshot["has_tail_call"] = fi.hasTailCall();
     snapshot["early_objects"] = json::Array(s.earlyObjects[name]);

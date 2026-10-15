@@ -47,6 +47,64 @@ std::string single(unsigned n) { return "declare void @touch(ptr, i64)\ndefine v
 llvm::json::Value report(const AotObjectEmitter &e) {
     auto j=llvm::json::parse(e.report()); check(bool(j),"invalid certificate JSON"); return std::move(*j);
 }
+void outgoingFixtures(const std::filesystem::path &out, bool optimized) {
+    const std::string seven="declare i64 @sink7(ptr,i64,i64,i64,i64,i64,i64)\n";
+    const std::string eleven="declare i64 @sink11(ptr,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64)\n";
+    const std::string call7="call i64 @sink7(ptr %a,i64 1001,i64 1002,i64 1003,i64 1004,i64 1005,i64 1006)";
+    const std::string call11="call i64 @sink11(ptr %a,i64 1001,i64 1002,i64 1003,i64 1004,i64 1005,i64 1006,i64 1007,i64 1008,i64 1009,i64 1010)";
+    for(const std::string kind:{"reserved","reserved-padding","padding","multiple","branch","loop","near-under","near-limit","hidden-result","tail"}) {
+        const unsigned bytes=kind=="near-limit"?65520:kind=="near-under"?65456:32;
+        std::string source=seven+eleven+"declare i64 @sink0(ptr)\ndeclare {i64,i64,i64,i64,i64,i64,i64,i64} @large()\n";
+        source+="define i64 @sample(i32 %go){\nentry:\n %a=alloca ["+std::to_string(bytes)+" x i8],align 8\n";
+        if(kind=="reserved") source+=" %r=call i64 @sink0(ptr %a)\n ret i64 %r\n";
+        else if(kind=="multiple") source+=" %x="+call7+"\n %y="+call11+"\n %r=add i64 %x,%y\n ret i64 %r\n";
+        else if(kind=="branch") source+=" %test=icmp ne i32 %go,0\n br i1 %test,label %yes,label %no\nyes:\n %x="+call7+"\n br label %done\nno:\n %y="+call11+"\n br label %done\ndone:\n %r=phi i64 [%x,%yes],[%y,%no]\n ret i64 %r\n";
+        else if(kind=="loop") source+=" br label %body\nbody:\n %n=phi i32 [0,%entry],[%next,%body]\n %x="+call11+"\n %next=add i32 %n,1\n %test=icmp ult i32 %next,3\n br i1 %test,label %body,label %done\ndone:\n ret i64 %x\n";
+        else if(kind=="hidden-result") source+=" %x=call {i64,i64,i64,i64,i64,i64,i64,i64} @large()\n %r=extractvalue {i64,i64,i64,i64,i64,i64,i64,i64} %x,7\n ret i64 %r\n";
+        else if(kind=="tail") { source="declare i64 @tail_target(i32)\ndefine i64 @sample(i32 %go){ %r=tail call i64 @tail_target(i32 %go)\n ret i64 %r\n"; }
+        else source+=" %r="+(kind=="reserved-padding"?call7:call11)+"\n ret i64 %r\n";
+        source+="}\n";
+        llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),optimized);
+        auto m=parse(c,e,source);auto inv=inventory(*m);e.freeze(*m,inv);e.optimize();
+        const auto base=out/("outgoing-"+kind+(optimized?"-O2":"-normal"));
+        {std::error_code ec;llvm::raw_fd_ostream ir(base.string()+".ll",ec);check(!ec,"cannot save outgoing IR");m->print(ir,nullptr);}
+        auto object=base.string()+".o";
+        if(kind=="reserved" || kind=="reserved-padding") {e.deliver(object);std::filesystem::remove(object);}
+        else {
+            {std::ofstream owner(object);owner<<"existing owner object";}
+            rejects([&]{e.deliver(object);},kind=="hidden-result"?"unmatched allocation":kind=="tail"?"tail":"unproved nonreserved outgoing");
+            check(read(object)=="existing owner object","outgoing rejection damaged destination");std::filesystem::remove(object);
+        }
+        {std::ofstream evidence(base.string()+".json");evidence<<e.report();}
+        auto j=report(e);auto *r=j.getAsObject()->getObject("functions")->getObject("sample");
+        auto *observation=r->getObject("outgoing_sp_observation");check(observation,"missing outgoing CFG evidence");
+        check(!observation->getBoolean("final_encoded_cfg_bound").value_or(true) && observation->getInteger("reconciliation_credit")==0,"unproved encoded CFG earned credit");
+        if(kind=="tail") check(!observation->getBoolean("complete_machine_observation").value_or(true),"tail ownership falsely observed");
+        else {
+            check(observation->getBoolean("complete_machine_observation").value_or(false),"outgoing fixture observation incomplete: "+kind);
+            check(*observation->getInteger("peak_entry_sp_depth")>=*r->getInteger("frame"),"SP peak omitted static frame");
+            if(kind=="padding") check(r->getInteger("outgoing")==40 && observation->getInteger("additional_below_F")==48,"alignment padding missed");
+            if(kind=="near-limit") check(r->getInteger("C")==65536 && *observation->getInteger("additional_below_F")>0,"near-limit omission not exposed");
+        }
+    }
+    // A repeated dynamic home cannot be bounded by the largest call area.
+    // Indirect calls and realignment also lack this observation profile.
+    for(const std::string kind:{"cycle","indirect","realigned"}) {
+        std::string source;
+        if(kind=="cycle") source="declare void @touch(ptr,i64)\ndefine void @sample(i32 %n){br label %body\nbody:\n %i=phi i32 [0,%0],[%next,%body]\n %a=alloca [32 x i8],align 8\n call void @touch(ptr %a,i64 32)\n %next=add i32 %i,1\n %test=icmp ult i32 %next,%n\n br i1 %test,label %body,label %done\ndone:\n ret void }\n";
+        else if(kind=="indirect") source="define void @sample(ptr %target){ %a=alloca [32 x i8],align 8\n call void %target(ptr %a,i64 1001,i64 1002,i64 1003,i64 1004,i64 1005,i64 1006,i64 1007,i64 1008,i64 1009,i64 1010)\n ret void }\n";
+        else source="declare void @touch(ptr,i64)\ndefine void @sample(){ %a=alloca [32 x i8],align 32\n call void @touch(ptr %a,i64 32)\n ret void }\n";
+        llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),optimized);
+        auto m=parse(c,e,source);auto inv=inventory(*m,kind!="cycle");e.freeze(*m,inv);e.optimize();
+        const auto base=out/("outgoing-unsupported-"+kind+(optimized?"-O2":"-normal"));
+        const auto object=base.string()+".o";{std::ofstream owner(object);owner<<"existing owner object";}
+        rejects([&]{e.deliver(object);},kind=="cycle"?"dynamic/opaque":kind=="indirect"?"unproved nonreserved outgoing":"realigned");
+        check(read(object)=="existing owner object","unsupported outgoing shape damaged destination");std::filesystem::remove(object);
+        auto j=report(e);auto *o=j.getAsObject()->getObject("functions")->getObject("sample")->getObject("outgoing_sp_observation");
+        check(!o->getBoolean("complete_machine_observation").value_or(true) && o->get("peak_entry_sp_depth")->kind()==llvm::json::Value::Null,"unsupported outgoing shape received a bound");
+        std::ofstream evidence(base.string()+".json");evidence<<e.report();
+    }
+}
 void fixtures(const std::filesystem::path &out, bool optimized) {
     const auto suffix=optimized?"-O2":"-normal";
     auto path=out/(std::string("fixture")+suffix+".o");
@@ -270,6 +328,7 @@ void fixtures(const std::filesystem::path &out, bool optimized) {
     }
     const llvm::Triple native(llvm::sys::getDefaultTargetTriple());
     if(native.isOSLinux() && native.getArch()==llvm::Triple::x86_64) {
+        outgoingFixtures(out,optimized);
         llvm::LLVMContext c;AotObjectEmitter e(llvm::sys::getDefaultTargetTriple(),optimized);
         auto m=parse(c,e,"declare void @many(ptr,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64)\ndefine void @sample(){ %a=alloca [65520 x i8],align 8\n call void @many(ptr %a,i64 1,i64 2,i64 3,i64 4,i64 5,i64 6,i64 7,i64 8,i64 9,i64 10)\n ret void }\n");
         auto inv=inventory(*m);e.freeze(*m,inv);e.optimize();

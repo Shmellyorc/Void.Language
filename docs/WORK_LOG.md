@@ -7729,3 +7729,104 @@ or separately approved producer transformation is needed; matching shapes/FIs ar
 insufficient. No guessed ABI allowance, larger budget, LLVM fork, source array
 execution, ORC/LSP integration, unrelated receiver-chain work, commits, pushes,
 branches, remote modifications or CI edits.
+
+## 15 October 2026: P23-2 production AOT certification Part 4
+
+Owner reports hosted CI #43 passed all seven jobs, 61/61 suites, locking Part 3.
+Reviewed proposal Sections 17–18 and the latest work-log evidence. Investigation
+stops at a confirmed final encoded-CFG/call-site ownership proof boundary. Public
+AOT remains on its original path; source native arrays remain disabled; the
+65,536-byte budget and separate lineage, incoming, PUSH/tail gates are unchanged.
+Proposal Section 19 records the findings and the next review decision.
+
+### Outgoing storage findings and scoped changes
+
+- Rechecked all eight pinned LLVM 19.1.7 source checksums. Reserved areas are already
+  in F. X86 push conversion can instead place arguments below F, and call-frame
+  lowering rounds nonreserved areas, factors pushes/callee cleanup and merges SP
+  updates. One stack argument can stay reserved due to the actual profitability
+  rule; five stack arguments occupy 48 bytes despite raw area 40. No global
+  maxCallFrameSize addition or guessed allowance is safe.
+- Added diagnostic-only outgoing_sp_observation to the existing auditor. It records
+  entry-relative SP depth across machine blocks, successors, exact supported
+  arithmetic/push/pop events and direct C call depths. Joins/backedges must balance;
+  unknown paths/calls/SP operations, dynamic allocation, tails, realignment and
+  uncovered blocks get a null observation. It gives zero incoming/reconciliation
+  credit and explicitly does not bind the final encoded CFG. No acceptance rule,
+  immutable P, R rule, target profile, LLVM pipeline or public delivery path changes.
+- A complete late-machine observation suggests O=max(0,peak_depth-F), avoiding
+  double-counting reserved areas or summing alternative/loop iterations. This is
+  not yet an adopted charging equation. The existing nonreserved/nonzero-area
+  rejection stays in place, including below-budget observations.
+- Added normal/O2 compiler fixtures for reserved/padded areas, multiple calls,
+  branching, balanced repeated calls, 65,456/65,520-byte homes, hidden results,
+  tail calls and unsupported dynamic/indirect/realigned forms. Owner-destination
+  preservation and all previous assertions remain. The new report owns diagnostic
+  error text, including temporary opcode messages; strict JSON/UTF-8 readers pass.
+- Added tracked aot_outgoing_probe.py. Independent ordinary LLVM controls link a
+  separate C caller/callee assertion harness. GDB steps over callees and checks
+  actual caller SP, call alignment, return/cleanup, results and visit counts.
+  Normal/O2 observations and native maxima agree: padded O=48; both branch paths
+  and all three loop iterations are exercised. The two near-limit nominal charges
+  are 65,472/65,536; including measured O would yield 65,520/65,584. Both still reject
+  pending proof. Hidden-result buffers retain unmatched-origin rejection.
+
+### Confirmed architectural stop
+
+The final object checker currently binds flattened SP-writer and separate call
+lists, not branch targets, block extents, event interleaving or path multiplicity.
+A bytes-only negative retargets a real control's conditional branch to its frame
+setup while leaving decoded SP/call lists unchanged. That altered file is never
+executed or delivered. This demonstrates missing certificate information; it does
+not claim the compiler emitted a bad branch or accepted an altered object.
+
+Early's per-callee maximum pseudo area also loses individual call-site assignment,
+cleanup and origin information. Matching a name, size or FI is not an ownership
+proof. Acceptance widening stops here. Recommend architectural review of final MC
+CFG/event binding or an LLVM-origin emission hook, plus persistent per-call ABI/
+result-origin evidence before pseudos disappear. No LLVM fork/hook or architectural
+choice is silently introduced. Incoming ownership, hidden-return origin and general
+optimization lineage remain unproved; signed PUSH/tail normalization stays separate.
+
+### Actual local verification
+
+- Full Debug 61/61, 75.24 s (audit 8.81 s); full Release 61/61, 37.54 s
+  (audit 3.04 s). No test suite or safety assertion was removed.
+- Strict ASan/UBSan audit/foundation/generated-runtime/interfaces 4/4, 15.23 s
+  (audit 6.45 s), leak detection, abort/halt and stack reporting enabled outside
+  the ptrace restriction. No full sanitizer matrix is claimed. The initial build
+  command used a nonexistent generated-runtime target name; the corrected target
+  build and this final test run pass.
+- Complete staged corpus: 334 attempts, 275 accepted / 59 rejected, all individual
+  outcomes unchanged from Part 3. The 288 exact source-identity routes retain
+  identical profile, frozen/optimized IR, inventory and private-object hashes.
+  All 15 original integration scripts pass. Accepted CLI comparisons: 1,596,
+  3,192 native executions. Seven complete assertion harness pairs pass (14 runs);
+  nine configurations remain rejected/not linked. Sentinels survive all rejections;
+  no rejected candidate is executed. Rejection counts remain 54 unmatched, 14
+  incoming, two final-SP and three final-call, overlapping by module.
+- 1,972 machine functions: 1,670 complete diagnostic CFG observations, 302 null.
+  All 11 nonreserved/nonzero-area observations remain array-free C=null and earn
+  zero credit. New controlled tail/dynamic/indirect/realigned negatives have null
+  bounds and still reject. This does not constitute complete outgoing certification.
+- New outgoing witnesses: 36 GDB executions plus 72 ordinary native controls,
+  36 with hard/soft 1 MiB stack. The first sandboxed GDB attempt failed with ptrace
+  Operation not permitted; the final permitted run passes with ASLR enabled.
+  Bytes-only branch negative is never run.
+- Real original production main/numeric GDB witnesses pass again: F/peak/O are
+  280/296/16 and 600/744/144, with argument bytes/addresses, alignment, hidden-result
+  pointer/fields, call return, cleanup and normal-exit assertions preserved.
+- Production managed main/handoffs normal/O2 small-stack selections pass in Debug
+  and Release, each 64 comparisons / 128 native runs, including 64 at 1 MiB. The
+  full corpus retains rejected null_failure; it is not claimed as selected success.
+- Historical Debug interfaces_source crash instrumentation is unchanged. No crash
+  recurrence, attribution or fix is claimed from passing runs. No Windows/macOS
+  native/cross execution, hosted acceptance, ORC/LSP certification or native-array
+  execution is claimed.
+
+Artifacts: build/p23-2-part4-corpus/{complete.json,records.jsonl,
+part4-evidence-summary.json}; build/p23-2-part4-outgoing-final;
+build/p23-2-part4-production-native; build/p23-2-part4-small-stack-{debug,release};
+and build/p23-2-part4 build/CTest logs. Reproduction instructions are in
+tools/ci/STORAGE_SHAPE_PROOF.md. Stop for boss/wrench review. No Git mutations,
+remote modifications, CI changes or unrelated compiler/runtime edits.

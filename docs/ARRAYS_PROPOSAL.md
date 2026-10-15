@@ -2030,3 +2030,207 @@ No hosted run, Windows/macOS native execution, complete target ABI proof, ORC/LS
 certification or source native-array execution is claimed. Stop for boss/wrench
 review at the remaining ABI, lineage, budget-reconciliation and encoding gates.
 No commits, pushes, branches, remote modifications or CI edits.
+
+## 19. Production AOT certification Part 4: outgoing depth and the encoded-CFG gate
+
+15 October 2026. Owner reports CI #43 passed seven jobs, 61/61 suites, locking
+Part 3. This checkpoint does not activate public AOT certification or native arrays.
+The 65,536-byte limit, immutable inventory, incoming/optimization-lineage rejection,
+PUSH/tail encoding gates and interface crash instrumentation are unchanged.
+
+### 19.1 Pinned Linux x64 lowering findings
+
+The installed tools and SDK are LLVM 19.1.7. All eight retained pinned source
+checksums in build/p23-2-part3-sources/SHA256SUMS were rechecked successfully.
+The relevant target rules are:
+
+- [hasReservedCallFrame](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/Target/X86/X86FrameLowering.cpp#L63)
+  excludes variable homes, push sequences and preallocated calls. The SDK contract
+  says a reserved call area is included in the frame. Adding maxCallFrameSize to F
+  unconditionally would therefore double-count reserved storage.
+- [X86CallFrameOptimization](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/Target/X86/X86CallFrameOptimization.cpp#L137)
+  requires closed, nonnested call sequences in each block for its push conversion.
+  Its profitability calculation can keep one stack argument as an SP-relative store
+  in a reserved frame while converting longer sequences to pushes. It explicitly
+  excludes Windows x64; a Linux rule cannot be generalized to that target.
+- [eliminateCallFramePseudoInstr](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/Target/X86/X86FrameLowering.cpp#L3733)
+  rounds a nonreserved call area to stack alignment, subtracts bytes already handled
+  by pushes/callee cleanup, and can merge adjacent SP updates. Dead cleanup after a
+  nonreturning call can be omitted; minsize paths can use pops. FrameSetup/Destroy
+  flags or the largest unrounded pseudo alone cannot recover all physical movement.
+- [LowerCall and cleanup](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/Target/X86/X86ISelLoweringCall.cpp#L1992)
+  distinguish caller/callee-pop conventions, tail calls, byval, inalloca and
+  preallocated arguments. hasCalleePopSRet returns false for 64-bit targets;
+  ordinary Linux x64 C calls return to their call-site SP. This is not a proof for
+  other conventions, variadic/indirect calls or arbitrary generated helper calls.
+- Hidden result demotion remains the Section 18 SelectionDAGBuilder storage-origin
+  problem. Its buffer is a caller home, separate from the outgoing argument area;
+  it must not be charged again as outgoing bytes or accepted from size/FI similarity.
+  Tail reuse of incoming storage is not an ordinary net-zero call/return edge.
+
+### 19.2 Narrow machine-CFG observations, with zero certification credit
+
+The existing auditor now emits outgoing_sp_observation. It changes no LLVM IR,
+pass order, code generation or delivery decision. A worklist starts at entry depth
+zero and requires identical SP depth at every join/backedge. It records every
+reachable block, successor, supported SP delta and call depth. Balanced repeated
+calls do not accumulate storage. Uncovered blocks, unequal joins/accumulating
+cycles, exceptional/address-taken/indirect control, unknown SP writes, dynamic/
+realigned/tail frames and unsupported source/machine calls make the observed bound
+null. Calls in this observation profile are direct Linux x64 C CALL64pcrel32
+instructions with a retained source callee; returns must restore entry SP.
+The recognized arithmetic/push/pop subset is used for measurements only, including
+signed PUSH opcodes. The final encoding normalizer is unchanged.
+
+For a complete machine observation, let D be the maximum entry-relative SP depth.
+O = max(0, D - F) identifies movement below the already accounted static frame.
+It does not add a second reserved area, sum alternative branches or accumulate
+balanced loop iterations. It excludes callee execution and the transient CALL
+return-address push. No incoming object earns credit. Reconciliation would need
+C = alignUp(P + F + O - R + E, A), with R still limited to proved bytes within F,
+**only after the missing ownership and final-encoding proofs are established**.
+This checkpoint does not adopt that equation as a new acceptance rule.
+
+The report explicitly says diagnostic-machine-CFG-only;not-a-delivery-certificate,
+final_encoded_cfg_bound=false, reconciliation_credit=0 and incoming_credit=0.
+The existing policy rejection for nonreserved, nonzero call areas remains mandatory.
+C in such a rejected report is the old nominal local-only value, not a certified
+complete charge. Ordinary array-free functions still have C=null. Unknown observer
+shapes cannot turn a rejected candidate into an accepted one.
+
+### 19.3 Native witnesses and boundary cases
+
+New normal/O2 compiler fixtures cover reserved areas, alignment, multiple calls,
+both branch alternatives, balanced repeated calls, two near-limit sizes, hidden
+result homes and tail rejection. Additional negatives cover repeated dynamic
+allocations, indirect calls and realignment. All rejected destinations preserve
+their owner sentinel. Existing real value_struct/numeric and inheritance negatives,
+IR identity/reuse/inlining assertions and source-native-array prohibition remain.
+
+Native witnesses use distinct ordinary-control objects independently compiled from
+saved optimized fixture IR, then linked against a separate C caller/callee harness.
+They never link staged rejected objects. GDB has ASLR enabled and measures each
+caller instruction, stepping over callees. It checks call-site alignment, unchanged
+SP after each call returns, balanced function return, exact results/side effects,
+and the measured depth against the machine observation. Both branch alternatives
+and all three loop iterations execute. The finite native witnesses corroborate
+these observations; they cannot substitute for an all-path encoding proof.
+
+| Fixture | Raw maximum call area | Static F normal / O2 | Observed peak D normal / O2 | Additional O |
+| --- | ---: | ---: | ---: | ---: |
+| Reserved, register arguments | 0 | 40 / 40 | 40 / 40 | 0 |
+| Reserved, one stack argument | 8 | 40 / 40 | 40 / 40 | 0 |
+| Five stack arguments, padded | 40 | 40 / 40 | 88 / 88 | 48 |
+| Two calls with different areas | 40 | 56 / 56 | 104 / 104 | 48 |
+| Branch alternatives | 40 | 40 / 40 | 88 / 88 | 48 |
+| Three loop iterations | 40 | 56 / 40 | 104 / 88 | 48 |
+| Original home 65,456 bytes | 40 | 65,464 / 65,464 | 65,512 / 65,512 | 48 |
+| Original home 65,520 bytes | 40 | 65,528 / 65,528 | 65,576 / 65,576 | 48 |
+| Hidden 64-byte result home | 0 | 104 / 72 | 104 / 72 | 0 |
+
+For the two near-limit cases, nominal C is 65,472 and 65,536 respectively. Adding
+the observed 48 bytes would produce 65,520 and 65,584 after alignment. Both still
+reject because the general outgoing proof is incomplete, even where the observed
+sum fits. No limit increase, estimated allowance or partial-proof acceptance is
+introduced. Hidden result fixtures reject their unmatched ABI home in both profiles,
+with zero new provenance/subtraction credit. Tail/dynamic/indirect/realigned forms
+have null observation bounds and retain their separate rejection reasons.
+
+All 36 debugger witnesses pass. The separate controls pass 72 ordinary native runs,
+36 with hard and soft RLIMIT_STACK=1,048,576, plus the 36 debugger executions.
+The first restricted GDB attempt correctly failed with ptrace Operation not
+permitted; the final run used permitted ptrace. There is no Windows/macOS native
+or cross-target execution claim in this Linux-only checkpoint.
+
+### 19.4 Confirmed stop boundary: encoded CFG and call-site ownership
+
+The current final object check compares a linear list of SP writers and a separate
+linear list of call opcodes. It does not bind branch targets, block ranges, call/SP
+interleaving or path multiplicity to the late machine CFG. Post-printer frame
+comparison does not supply that missing final-byte relationship.
+
+A reproducible **bytes-only, never-executed** negative changes the ordinary branch
+control's conditional jump target to function entry/frame setup. The final decoded
+SP-writer and call lists stay exactly identical, while a path can repeat allocation
+without cleanup. The native compiler did not emit this altered object. The experiment
+shows insufficiency of the available certificate information, not a compiler
+miscompile or an accepted faulty delivery. No rejected/altered object is executed.
+The existing final-SP/call checks are preserved rather than advertised as a CFG proof.
+
+There is also no complete outgoing call-site assignment map: Early currently records
+maximum pseudo area per callee name, losing individual sites, ordering and cleanup
+ownership. Source callee membership and a matching FI/extent do not prove that map,
+especially for generated calls, return demotion and transformed/inlined calls.
+
+Stop acceptance widening and production activation here. Recommended next checkpoint,
+subject to architectural review: bind final MC block ranges, conditional/unconditional
+branch targets, fallthroughs and ordered call/SP events to the audited CFG, rejecting
+unknown relocations, branches, indirect flow, tail encodings and uncovered bytes.
+Alternatively, an LLVM-origin emission hook must attest the equivalent mapping through
+relaxation and pseudo expansion. In addition, capture trustworthy per-call argument/
+cleanup/result-origin assignments before call-frame pseudos disappear and preserve
+those identities through transformations. Do not introduce a fork/hook or guess
+ownership without review. The separate optimizer lineage, hidden-return origin and
+PUSH/tail gates remain open. No claim of completed outgoing certification is made.
+
+### 19.5 Corpus rerun, unchanged decisions and actual verification
+
+The complete staged Linux x64 corpus again has 334 attempts, 275 accepted and
+59 rejected. All 334 individual outcomes match Part 3. Every one of the 288 routes
+with identical physical source identity also has identical profile, frozen IR,
+optimized IR, inventory and private-object hashes. This observer changes report
+content only. Generated integration paths differ across artifact directories and
+are excluded from that cross-run identity comparison.
+
+| Producer | Normal attempted / accepted | O2 attempted / accepted |
+| --- | ---: | ---: |
+| Integration source/architecture | 104 / 100 | 104 / 100 |
+| Seven families' CLI programs | 52 / 41 | 52 / 25 |
+| Runtime libraries | 7 / 3 | 7 / 2 |
+| Reload generations | 3 / 1 | 3 / 1 |
+| Generated runtime | 1 / 1 | 1 / 1 |
+
+All 15 original integration scripts pass. Accepted CLI objects pass 1,596 exact
+exit/stdout/stderr comparisons, 3,192 native executions. The same seven complete
+native assertion harness pairs pass as Part 3 (14 executions); the remaining nine
+configurations are rejected/not linked. All rejected candidates retain their
+sentinels and are never executed. Rejection reasons, overlapping by module, stay
+54 unmatched-lineage, 14 incoming-ownership, two final-SP/PUSH and three final-call/
+tail. No acceptance gain is claimed or required.
+
+Of 1,972 machine function observations, 1,670 have a complete diagnostic machine
+path-depth observation and 302 have a null bound. Unsupported source/machine calls
+and tail/non-C shapes account for those null observations; reasons can overlap.
+All 11 nonreserved/nonzero-area observations have a measured machine depth, zero
+new credit and array-free C=null. These measurements do not certify their modules.
+The real value_structs main/numeric original-control debugger witnesses pass again:
+F/D/O are 280/296/16 and 600/744/144. Argument addresses/bytes, alignment, hidden
+result pointer/fields, return SP, caller cleanup and normal exit checks pass.
+
+Full Debug passes 61/61 (75.24 s; audit 8.81 s). Full Release passes 61/61
+(37.54 s; audit 3.04 s). Strict ASan/UBSan audit, foundation, generated runtime
+and interfaces pass 4/4 (15.23 s; audit 6.45 s), with leak detection, abort/halt
+and stack reporting enabled with permitted ptrace. No full sanitizer matrix or
+new hosted acceptance is claimed. Debug interface crash instrumentation is untouched;
+this checkpoint neither reproduces nor attributes/fixes the historical crash.
+
+The explicit production managed main/handoffs small-stack selection passes in both
+Debug and Release: each build has 64 comparisons and 128 native executions, including
+64 executions at hard/soft 1 MiB. Rejected null_failure remains in the full corpus;
+it is not silently included as a successful selected program. These checks are in
+addition to the new outgoing-control 1 MiB witnesses in Section 19.3.
+
+Evidence is retained under build/p23-2-part4-corpus (complete.json, records.jsonl,
+part4-evidence-summary.json, reports, three IR snapshots, objects/sentinels and logs),
+build/p23-2-part4-outgoing-final (36 native witnesses, commands, independent controls
+and encoded-cfg-gap.json), build/p23-2-part4-production-native and
+build/p23-2-part4-small-stack-{debug,release}. Build/CTest logs have the
+build/p23-2-part4 prefix. The earlier restricted/incomplete debugger directory is
+retained separately; it is not acceptance evidence. Tracked reproduction is in
+tools/ci/STORAGE_SHAPE_PROOF.md and tools/ci/aot_outgoing_probe.py.
+
+Stop for boss/wrench architectural review of the encoded-CFG and call-site origin
+boundary. No production reconciliation rule was widened across that boundary.
+No public emitter, ABI, source semantics, GC/readonly contracts, native array gate,
+ORC/LSP path, ordinary CI or unrelated receiver-chain code changed. No commits,
+pushes, branches or remote changes.
