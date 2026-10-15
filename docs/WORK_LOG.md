@@ -7919,3 +7919,82 @@ Stop for boss/wrench review. The bounded Part 5A milestone is met. Emission-orig
 hooks, exact attribution/ABI ownership, memory-region proof, storage reconciliation
 and production publication remain future gates. No commits, pushes, branches,
 remote changes, normal CI edits or unrelated runtime/compiler semantics changes.
+
+## 15 October 2026: superseding owner correction, large-array size limits
+
+Owner confirms CI #45 green, 7/7 jobs and 61/61 suites per configuration; Part 5A
+is locked. The owner explicitly supersedes the earlier 65,536-byte production
+per-function array-storage approval. This entry records a documentation-only
+correction, not a compiler change or approval of an alternative representation.
+
+### Documentation changes
+
+- ARRAYS_PROPOSAL.md now opens with the superseding decision and replaces A10's
+  production byte/expanded-array ceiling language. A1/A2 express value/snapshot
+  semantics independently of physical placement; the original A8 inline diagram
+  is labeled a candidate rather than a universal stack requirement. Sections 8-20
+  retain original approvals, numerical measurements and failures as historical
+  research evidence, explicitly superseded for production policy. Section 21 gives
+  the unchanged-code audit and activation gates.
+- DECISIONS.md records that neither `[T, n]` nor `[T]` may have an arbitrary 64 KiB
+  source-level ceiling, and that no replacement number, representation, stack/heap
+  cutoff or production reactivation is approved.
+- LANGUAGE_BIBLE.md Section 32 records the agreed large-array commitment with
+  implementation pending. Large fixed values preserve independent snapshots and
+  existing element/reference/readonly semantics. Inline storage is not a requirement
+  that every payload live on the native stack. Future string indexing stays separate.
+- DEVELOPMENT_STRATEGY.md adds the revised review/activation sequence. KNOWN_ISSUES.md
+  documents current guards as limitations, including old expanded-field descriptions,
+  rather than presenting them as permanent array semantics. All documents require
+  complete builds: unsupported/failed required functions diagnose and fail the whole
+  build; no silently omitted function or partial-success delivery.
+
+### Read-only code audit and implementation impact
+
+The byte policy is declared at include/void/native_storage.hpp:26 and enforced by
+NativeStoragePlanner::finish(..., true), src/ir/native_storage.cpp:43-44. The staged
+emitter freezes via finish(..., false) at storage_audit.cpp:745; its separate late
+machine C check at :393 uses plan.policy, propagated through callers at :756-777.
+The report still advertises the old budget at :870. This is not active public
+native-array support: backend.cpp:101 still rejects native array lowering. These
+checks remain intact as research/activation gates, but cannot be reactivated as a
+universal production rejection of otherwise valid large-array programs.
+
+A distinct, active source restriction exists at frontend/compiler.cpp:2428 (extent
+above 65536) and :2434-2435 (expanded element multiplicity), plus enclosing-value
+charging at :2483-2491. Independent IR inline_layout at ir/module.cpp:222-244 repeats
+extent/multiplicity/aggregate guards. Existing foundation.cpp:137-138 explicitly
+tests 65537 rejection / 65536 acceptance. A byte-policy-only correction would leave
+this user-visible element/shape barrier. Defaults at compiler.cpp:1444/:1575 currently
+expand per-element ConstantValue fields, so simply removing the guards is unsafe.
+
+reference_paths at ir/module.cpp:73-89 separately bounds aggregate traversal work;
+it currently does not traverse fixed arrays. Its real work/cycle protection must
+be reviewed with future repeated reference metadata, not deleted blindly. The
+interface discovery budget at ir/interfaces.inc:89 is unrelated to array size.
+Research thresholds remain in tools/ci/array_abi_probe and array storage fixtures;
+probe.py's 1..65536 count range and Part 5A workload bounds are experiment scopes,
+not language limits. Section 21 lists detailed code/test/harness locations.
+
+Before activation, investigate safe large fixed/growable storage on the existing
+coordinated GC with no second memory-management system. No heap-backed fixed array,
+copy-on-write rule or hybrid cutoff is selected. Review analysis complexity and
+compact repeated/default/reference metadata across frontend, IR and shared tooling,
+preserving finite layout, checked target bounds, actual resource protection, roots,
+publication, safepoints, failure, readonly borrowing and reload contracts. Do not
+rename or relocate the same arbitrary ceiling. Owner/wrench approval of architecture
+and resource policy must precede implementation or production activation, followed
+by megabyte-scale value/copy/GC/failure, complete-function, JIT/AOT/tooling and native
+cross-platform verification. All useful CFG/ABI/stack research remains required.
+
+### Verification and stop
+
+Read-only source searches and call-site inspection distinguish the two guards and
+existing coverage-before-delivery protection; no function-omission bug is claimed
+fixed or newly demonstrated. Documentation diff/whitespace checks pass. Only the
+six requested Markdown files change. No compiler/runtime, tests, harnesses, research
+verifier, build configuration or CI files change; no builds or test matrix were run
+for this documentation-only task. Existing verifier code/checks remain operational
+and unchanged; CI #45 status is attributed to the owner, not a new local run.
+Historical evidence is retained. No commits, pushes, branches or remote changes.
+Stop for owner/wrench review before further architecture or implementation.

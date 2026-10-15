@@ -1,5 +1,32 @@
 # Known issues and deferred work
 
+## Phase 23 activation blocker: large-array storage and analysis limits
+
+The owner's 15 October 2026 decision supersedes the earlier 65,536-byte production
+per-function array-storage policy. Neither fixed nor growable arrays may have an
+arbitrary 64 KiB source-level ceiling. CI #45 is owner-confirmed green (7/7 jobs,
+61 suites each), locking Part 5A research, not enabling production native arrays.
+
+Current code is unchanged: the planner/staged machine auditor retain 65536-byte
+research checks; frontend/independent IR validation also reject array extents or
+expanded shapes above their 65536 guards. Enclosing-value multiplicity accounting
+can reject arrays too. Those checks are active implementation limitations and
+must be revised under review before general large-array activation. Analysis
+resource protection must not silently recreate the same element/payload ceiling.
+Defaults currently allocate per-element compiler values, so merely deleting a
+comparison is not a complete or safe correction.
+
+Investigate storage for large fixed snapshots, including the existing GC heap,
+without another memory manager. No alternative representation, new numeric limit,
+production policy reactivation or heap-backed array implementation is approved.
+Preserve CFG/ABI/origin/stack safety research, readonly/reference semantics, roots,
+publication, failure and reload. Native array lowering remains explicitly blocked.
+A successful build must contain every required function; unsupported operations or
+failed required functions must diagnose and fail the whole build, never silently
+omit code or deliver incomplete success. ARRAYS_PROPOSAL.md Section 21 audits the
+specific enforcement locations and future approval/implementation gates. The
+research verifier remains operational and unchanged.
+
 ## Deep valid receiver chains in small-stack IR lowering
 
 The run #38 investigation separately found that a valid 120-call inline-value
@@ -62,7 +89,9 @@ casts to descendants, type-pattern expansion, protected/richer field access,
 inherited hiding, covariance, abstract/final, richer interface features, open-world type loading,
 implicit constructor forwarding/chaining and external managed aggregate ABI remain
 deferred. Physical layout depth combines inheritance and inline nesting (128);
-expanded fields remain capped at 65536 and construction contexts at 1024.
+expanded fields currently remain capped at 65536 and construction contexts at 1024.
+The expanded-layout guard is an implementation limit under the Phase 23 review
+above, not authority for a permanent array-size ceiling.
 Guarded exact-key dispatch prioritizes correctness over cache/table optimization;
 preliminary dispatch timing is not a production benchmark. Objects own no code
 pointers and do not pin their allocating generation. The runtime remains a tested
@@ -107,7 +136,9 @@ An enclosing value initializer requires default-constructible fields; required
 value children can be explicitly supplied to no-init wrappers. Managed init uses
 required-reference definite initialization as documented for Phase 17. Compile-time contexts
 cannot execute init. Initialization body/helper changes require manual restart.
-Layout remains compiler-private with 128-level/65536-expanded-field bounds.
+Layout remains compiler-private with current 128-level/65536-expanded-field bounds.
+Their array-multiplicity interaction requires the Phase 23 review above; these
+implementation guards do not override the large-array language commitment.
 
 ## Platform verification
 

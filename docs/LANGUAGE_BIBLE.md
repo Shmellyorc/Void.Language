@@ -1440,6 +1440,31 @@ func biggest<t: comparable>(a: t, b: t) -> t:
 
 ## 32. Lists: growable and fixed-size arrays [AGREED]
 
+**Superseding owner decision, 15 October 2026 [AGREED DESIGN; implementation pending]:**
+Neither `[T, n]` nor `[T]` has an arbitrary 64 KiB source-level size ceiling. VOID
+must support useful large arrays, including megabytes of JSON/text/image/asset data.
+Real count/address-space representability, checked arithmetic and allocation failure
+still apply. An internal stack-safety experiment or analysis-work guard must not
+silently become a universal array-element or payload-size restriction.
+
+Fixed arrays preserve value/snapshot semantics at large sizes; physical placement
+must not expose mutable aliasing in place of a required independent copy. Inline
+storage is an optimization where safe, not a requirement that every fixed-array
+payload fit on a native stack. Investigation may use the existing coordinated GC,
+without a second memory manager; no new representation, numerical cutoff or
+production activation is approved here. Readonly, embedded reference, initialization,
+GC and reload contracts remain unchanged.
+
+The earlier 65,536-byte production per-function policy is superseded. Its research
+fixtures and safety evidence remain valid within their stated scope. Current
+P23-1 frontend/IR extent/expanded-layout guards and the prohibition on native array
+lowering remain implementation limitations pending reviewed changes; this language
+commitment does not claim large/growable arrays already execute. See
+ARRAYS_PROPOSAL.md A10 and Section 21. Failed/unsupported required functions must
+fail the complete build with a clear diagnostic, never be silently omitted from
+an otherwise successful output. Array indexing remains separate from the approved
+future Unicode scalar indexing of strings.
+
 Only two built-in collection families are required: lists `[]` and dictionaries `{}`. Both are usable without imports. Lists default to growable; specifying a size makes them fixed-length.
 
 ```python

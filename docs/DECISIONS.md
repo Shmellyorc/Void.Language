@@ -1,5 +1,40 @@
 # Architectural decisions
 
+## Phase 23: superseding large-array size decision, 15 October 2026
+
+The owner explicitly withdraws the earlier approval of 65,536 bytes as a production
+per-function array-storage policy. Neither `[T, n]` nor `[T]` may have an arbitrary
+64 KiB source-level ceiling. General-purpose/game programs must be able to use large
+arrays, including megabytes of JSON, text, image and asset data, subject to real
+representability/address-space bounds, checked arithmetic and allocation failure.
+No replacement numerical ceiling is approved.
+
+The threshold remains valid as an explicitly scoped research parameter for stack,
+CFG/ABI certification, diagnostics and verification experiments. Preserve all useful
+measurements and safety assertions; do not loosen them to accept large payloads.
+The separate 65,536 expanded-layout guard must be reviewed as well: actual analysis
+resource protection cannot silently impose an equivalent element/byte ceiling.
+Current frontend/IR guards are implementation limitations, not permanent language
+semantics, and remain unchanged by this documentation-only task.
+
+Large fixed arrays retain value/snapshot semantics regardless of physical storage.
+Investigate safe representations using VOID's existing coordinated GC heap without
+another memory-management system. No heap-backed fixed-array design, hybrid cutoff,
+copy-on-write rule, changed limit or production policy reactivation is approved.
+Existing reference/readonly, GC/root/publication, failure and reload contracts remain.
+
+Successful compilation must include every required function. An unsupported operation
+or failed required function fails the whole build with a clear diagnostic; never
+silently omit it or deliver partial success. Normal optimization may still eliminate
+unneeded code when its correctness is proved; compilation failure is not that proof.
+
+Owner confirms CI #45 green, 7/7 jobs and 61 suites per configuration, locking Part 5A.
+Native arrays and public certification activation remain gated. ARRAYS_PROPOSAL.md
+introduction, A10 and Section 21 contain the revised authority, code audit and required
+review/implementation work. Earlier approvals and measurements remain historical
+evidence. Further architecture/implementation requires owner/wrench approval.
+
+
 ## Phase 22: owner-approved UTF-8 string foundation, 14 October 2026
 
 Boss and wrench clanker approved S1-S8 in STRINGS_PROPOSAL.md, including the 16 MiB

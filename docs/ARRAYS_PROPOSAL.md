@@ -1,23 +1,36 @@
 # Phase 23 proposal: typed arrays, indexing and iteration
 
-**Status: A1-A10 APPROVED AS REVISED; implementation authorized at P23-1 through
-P23-6. Owner/wrench lock P23-1 after run #40 passed seven jobs, 60/60 suites
-per configuration. Native arrays remain unimplemented at the P23-2 storage proof
-gate. The standalone certificate proof is complete (Section 14). First production
-integration is staged; Section 16 resolves the two restricted storage shapes in
-the proof path. Production activation remains explicitly disabled for review, and
-the historical Debug interface crash remains unexplained.**
+**Current status, 15 October 2026: owner confirms CI #45 passed 7/7 jobs,
+61/61 suites per configuration; Part 5A is locked. Native arrays remain disabled.
+The superseding owner decision below withdraws the earlier 65,536-byte production
+per-function array-storage approval. Storage architecture and activation require
+new owner/wrench review.**
 
-The owner approved the revised architecture and recorded choices, including final
-i32/i64 ranges, on 14 October 2026. The owner now approves 64 KiB (65536 bytes) as the initial target-aware per-function
-native static-storage budget for array-carrying functions, subject to the storage
-planning and ABI proofs below. This is not an allocation/save-file limit or an
-arbitrary-recursion safety guarantee. P23-2 implementation was authorized, then
-stopped at its required proof gate. The authorized first production integration
-checkpoint exposed additional storage shapes (Section 15). Section 16 records
-their restricted proofs; ordinary AOT activation remains withdrawn pending review. Section 10 records independently verified native
-probe run #3 evidence; Sections 12-14 record subsequent ABI/certificate proofs, and
-Section 15 records the staged service and activation blockers.
+> **SUPERSEDING OWNER DECISION: large arrays are a language requirement.**
+> Neither `[T, n]` nor `[T]` may have an arbitrary 64 KiB source-level ceiling.
+> Valid large-array programs, including megabytes of JSON, text, image and asset
+> data, must not be universally rejected by a 65,536-byte per-function policy.
+> That threshold may remain in research fixtures, stack investigations, diagnostics
+> and internal verification experiments. It is not an approved production policy.
+> Large fixed arrays retain value/snapshot semantics. Investigate safe storage,
+> including the existing coordinated GC heap, without a second memory manager.
+> No alternative representation, changed numerical ceiling or production policy
+> reactivation is approved by this documentation correction.
+
+The separate 65,536 expanded-layout guard also requires review: its present array
+multiplicity checks impose a source-visible element/shape ceiling. Internal
+analysis-work protection must not silently recreate the rejected size limit.
+A successful build must include every required function. Unsupported operations or
+compilation failures must fail the whole build with a clear diagnostic; no omitted
+function, partial output or success fallback may hide failure.
+
+Earlier A1-A10 semantic approvals, original storage measurements and Part 5A CFG,
+ABI, stack-depth and cross-platform evidence remain valuable. Historical numerical
+approvals and inline-only assumptions in Sections 8-20 are retained as records of
+those checkpoints, superseded for future production policy by this decision and
+revised A10. Section 21 audits the unchanged implementation and activation work.
+The previously approved array semantics remain binding; the production storage
+strategy is reopened for investigation, not selected or implemented here.
 
 Phase 22 is locked. The owner reports Actions run #39 passed all seven jobs,
 59 suites per configuration. The original architecture investigation used clean
@@ -41,7 +54,7 @@ collection framework is required to type these builtin constructors.
 
 Recommended final element domain: existing ordinary storable types, including
 strings, managed/interface references, value structs and nested typed arrays,
-subject to finite inline layout and explicit resource limits. Private construction
+subject to finite value layout, checked physical bounds and reviewed analysis-resource protection. Private construction
 views and prepared receivers, void, unresolved types and unfinished values are
 never elements. Array types are structural; nominal element identity is preserved.
 Do not initially make arrays inherit structs, accept `using` on an array itself,
@@ -64,8 +77,9 @@ in the existing collector. Fixed-array snapshot semantics are mandatory; borrowi
 is only a proved optimization. Nested selections must reacquire storage and
 revalidate dependent owners after possible resize or safepoints. Live elements
 must always satisfy their source type, including required references; zeroed spare
-capacity is private GC storage only. The earlier 256 KiB proposal is superseded by the owner-approved 64 KiB
-per-function policy, subject to target-aware accounting and implementation proofs.
+capacity is private GC storage only. The earlier 256 KiB proposal and later
+64 KiB production approval are superseded by the current large-array decision.
+Neither is an approved production array-size or per-function compilation ceiling.
 
 ## 2. Bible commitments and approved bounded choices
 
@@ -127,7 +141,7 @@ gates and deferred features remain exceptions, not implicit approvals.
 
 ### A1. Types, inference and initialization
 
-- `[t, n]` is an inline value type whose identity includes the exact element type
+- `[t, n]` is a value-semantic type whose identity includes the exact element type
   and evaluated length. `[t]` is a reference-semantic list type. Neither implicitly
   converts to the other; an expected fixed type contextualizes a literal directly.
 - Literal elements evaluate once, left to right. A fixed literal supplies exactly
@@ -182,14 +196,14 @@ var zeros: [i32, 4]                     # four valid zero elements
 Recommend a stable GC list header pointing to replaceable contiguous GC storage.
 `var b = a` for growable lists aliases the same header: push/remove through b is
 visible through a. Independent defaults/literals create distinct headers. Fixed
-assignment, arguments and returns copy inline elements; embedded list/managed
+assignment, arguments and returns preserve element-value snapshots; embedded list/managed
 references retain target identity, and strings share immutable content. No implicit
 deep clone, frozen object or source-visible stack/heap choice is introduced.
 
 A const list is a deep readonly access path. Copying that reference to var cannot
 thaw it. Independently held mutable aliases may still change it. A const fixed
 array cannot be written through its binding; copying it to var yields independent
-writable inline storage while preserving readonly authority of embedded referents,
+writable value storage while preserving readonly authority of embedded referents,
 as RV requires. Immutable strings need tracing but no mutable authority.
 
 **Capability design requiring proof:** fixed arrays need a conservative homogeneous
@@ -223,12 +237,12 @@ managed inheritance or structural interfaces.
 
 Const fixed-array formals retain value snapshot semantics. Borrow actual storage
 without a full copy only when later arguments and the callee cannot overwrite the
-selected inline bytes through aliases, and the owner remains rooted/stable. A
+selected value bytes through aliases, and the owner remains rooted/stable. A
 readonly formal alone does not prove that: another argument may mutate its owner.
 Otherwise copy into an independent snapshot at that argument's ordinary evaluation
 point, before evaluating later arguments, or retain a rooted owned temporary for
 an rvalue. Neither later-argument writes nor callee writes through another alias
-may change the inline bytes observed by the const formal. A const formal does not
+may change the value bytes observed by the const formal. A const formal does not
 permit a delayed copy or a live view of changed caller storage.
 This optimization does not freeze referenced objects and introduces no public
 borrow/ref syntax. Include a simple proved borrow case and alias-conflict fallback
@@ -392,7 +406,14 @@ a distinct contract from traversing integer values.
 
 ### A8. Precise GC, resize transactions and publication
 
-Recommended representation, compiler-private and subject to target layout:
+The following is the original candidate representation, compiler-private and
+subject to target layout. Its fixed-array inline entry is not a requirement that
+large values occupy native stack storage. Revised A10 requires investigation and
+owner review of large fixed-array storage on the existing GC, without choosing
+that architecture here. The growable header/backing and precise-GC obligations
+remain; no heap-backed fixed array is implemented or newly approved.
+
+Original candidate diagram:
 
 ```text
 source [t] word -> stable header { backing reference, count, capacity, version }
@@ -501,40 +522,56 @@ resolved protocol call. Public iterator/next/disposal names and library conforma
 remain OPEN; Section 35 forbids turning every future collection into a new hardcoded
 compiler family.
 
-### A10. Approved compatibility policy and numerical resource approval gate
+### A10. Superseding large-array commitment and production approval gate
 
-Retain existing parser/semantic, inline-depth and expanded-shape guards. Count
-fixed-array multiplicity in the existing 65536 expanded-layout bound and 128 depth
-bound; never materialize an enormous vector just to discover it exceeds the bound.
-Check total owned literal/template work as well, not just an individual literal.
+**Owner decision, 15 October 2026, supersedes the earlier 65,536-byte production
+policy and the proposal to count array multiplicity into a permanent 65,536-shape
+ceiling.** Neither fixed nor growable arrays have an arbitrary 64 KiB source-level
+size ceiling. The current implementation still has the old gates (Section 21);
+this documentation does not remove checks or claim large arrays already compile.
 
-These shape bounds alone do not bound native stack size: instruction homes,
-parameters, construction staging and copied arrays can multiply storage. The owner
-approves **65536 bytes per array-carrying function** after native probe run #3.
-Use the selected target DataLayout and actual ABI to account for parameter/result
-homes, local/instruction homes, copies, roots, staging, alignment and known ABI
-scratch. Do not enforce a payload-only guess. The earlier 256 KiB estimate is not
-adopted. The same target configuration and shared plan must serve analysis, LSP
-and lowering. Array-free functions receive no incidental new restriction.
+Retain finite-layout/cycle validation, checked arithmetic, parser/semantic work
+protection and the valuable target-aware inventory, CFG, ABI, root and stack-depth
+proofs. Distinguish actual analysis complexity from repeated element count or
+payload bytes. Review frontend, IR, shape walks, defaults/constants and reference
+metadata together; do not just rename, raise or move the same size ceiling. Safe
+analysis-resource exhaustion must diagnose and fail the complete build, never
+truncate types, elements or required functions. No new numerical cap is approved.
 
-P23-1 prepares `NativeStoragePlanner`, a common checked inventory/aggregation
-contract requiring an explicit target layout provider and all storage categories,
-including those proved empty. It has no host-size fallback. P23-2 must populate
-that inventory from real lowering decisions, root records and target calling
-conventions, feed the same configuration to shared analysis/tooling, and prove
-coverage before enabling LLVM ArrayType lowering. P23-1 deliberately blocks native
-arrays while that integration is incomplete. Test-only layout providers are
-arithmetic fixtures, not platform measurements or ABI proofs. Stop if the approved
-budget is unworkable rather than changing it, heap-boxing value arrays or increasing
-platform stack reserves. This does not authorize the receiver-chain hardening task
-or promise arbitrary source recursion fits 1 MiB.
+Investigate representations capable of large fixed values and growable storage,
+including use of VOID's existing coordinated GC heap. Candidate studies may compare
+safe inline storage with GC-backed fixed payloads or a combination; no selection,
+cutover threshold, copy-on-write contract or heap-array implementation is authorized.
+Value copies/snapshots must remain independent as required by existing semantics;
+embedded references keep their existing element semantics. Const-formal borrowing
+still needs proof, with safe snapshot copying on alias conflict. Heap use must
+preserve precise roots, safepoints/reacquisition, complete publication, allocation
+failure cleanup, readonly capabilities and reload lifetimes without another allocator
+or collector. Source value semantics do not require all payload bytes on the stack.
 
-Runtime lengths/counts use checked exact arithmetic, INT64_MAX and target size_t
-limits plus ordinary allocation failure. No arbitrary public capacity maximum is
-approved here. Review may choose a smaller first-slice allocation policy; it must
-be documented, tested and distinguished from string constant limits. Compiler
-constant-array pool work needs a separate reviewed budget; the string pool's 64 MiB
-limit is not an automatic array-storage policy.
+NativeStoragePlanner's complete target-derived inventories remain useful. Actual
+DataLayout/ABI homes, arguments/results, copies, roots, staging, alignment, spills
+and call areas still need safe accounting. A future reviewed plan must distinguish
+native stack usage from total array payload/storage. It must serve frontend, IR,
+LLVM JIT/AOT and shared analysis/LSP without an editor-side calculator. The historical
+65,536-byte threshold can remain an explicitly scoped research input; it cannot
+reject every otherwise valid large-array program in production. Do not disable
+certification checks, alter stack reserves or silently substitute a larger ceiling.
+
+Runtime sizes require checked exact arithmetic, representable count/index and
+selected-target address-space limits, plus ordinary allocation-failure handling.
+These physical constraints are distinct from an arbitrary public capacity maximum.
+String literal/pool limits remain their separate contracts and are not array-payload
+limits. Compiler template/default work needs review without eagerly expanding every
+repeated element merely to test a bound.
+
+Before production native-array activation, owner/wrench must approve the revised
+storage architecture and analysis-resource policy, followed by implementation and
+proof of large-array semantics, complete function coverage and atomic failure.
+A failed/unsupported required function fails the entire build with a clear diagnostic;
+no omitted-function success or partial native delivery is permitted. All current
+native-array, lineage, ABI, origin and physical-memory gates remain in force until
+resolved. Receiver-chain hardening remains separate.
 
 Structural type keys must include element kind/nominal identity and fixed extent;
 capability contracts additionally include homogeneous profiles, effects and borrow/
@@ -595,7 +632,7 @@ leases; GC reachability and generation reclamation remain separate.
 
 | Step | Deliverable and exit proof |
 | --- | --- |
-| P23-0 | Completed owner/wrench approval of A1-A10 and, after native run #3, the initial 65536-byte policy subject to real target/ABI inventory proofs |
+| P23-0 | Historical A1-A10 approval; the subsequent 65536-byte production policy is superseded. Revised large-array storage/resource policy requires owner/wrench review before activation |
 | P23-1 | Canonical structural types, finite/default layouts and source diagnostics; scalar fixed literals/access and exact extent negatives through existing analysis/IR |
 | P23-2 | Normal/O2 fixed-array JIT/AOT and for/range/reverse CFGs, original indexes, i32 range endpoint safety and readonly const-formal borrow/fallback proofs; i64 may follow before the final gate |
 | P23-3 | GC header/buffer proof, scalar list defaults/push/remove, alias identity, version checks and rollback under injected failures |
@@ -672,6 +709,12 @@ regression to claim success. New array lowering handlers must avoid increasing
 the old recursive dispatcher frame; a necessary broader refactor returns to review.
 Then stop for owner review. Only owner-controlled CI with all seven jobs passing,
 all 59 preceding suites intact and added array coverage, can lock Phase 23.
+
+> **Historical record notice:** Sections 8-20 retain measurements, approvals and
+> restrictions as they stood at each checkpoint. Their 65,536-byte production-policy
+> statements and mandatory expanded-array size ceilings are superseded by the owner
+> decision above. Research checks remain operational; these records do not authorize
+> production reactivation or an alternative storage design.
 
 ## 8. Investigation-only verification and review handoff
 
@@ -2401,3 +2444,72 @@ stack-memory-region coverage, physical storage reconciliation and final linked-c
 publication remain unproved. No later hybrid stage, LLVM hook/fork, acceptance
 increase, budget change, public activation, native arrays, ORC/LSP integration,
 Git mutation or CI workflow edit is included.
+
+## 21. Superseding array-size decision: unchanged-code audit and activation impact
+
+15 October 2026. This is a documentation-only audit following the owner's explicit
+correction. CI #45 is owner-confirmed green, seven jobs / 61 suites each; Part 5A
+is locked. Existing guards remain operational until separately reviewed changes.
+They must not be mistaken for an approved permanent large-array language policy.
+
+### 21.1 Existing enforcement and resource-sensitive paths
+
+| Location | Actual current behavior | Required follow-up before production activation |
+| --- | --- | --- |
+| include/void/native_storage.hpp:26 | array_function_storage_budget = 65536 | Scope the old constant to research; production must not apply it as a universal array-program rejection |
+| src/ir/native_storage.cpp:31-45 | finish(accounted, true) rejects an aligned inventory over that byte budget; missing categories/overflow/target checks are independent | Keep complete target inventories and arithmetic safety; review production policy/API separation. Current production-source call integration is not enabled |
+| src/backend/llvm/storage_audit.cpp:305-393, 717-745, 756-777, 870 | Staged plan.policy applies the 65536-byte C gate and propagates it to callers; freeze uses planner.finish(..., false), while the late machine audit enforces the policy; report advertises the old budget | Preserve staged experiments and all fail-closed proofs; do not reactivate this array/caller flag as universal production policy. Separate native stack accounting from payload placement under a reviewed design |
+| src/frontend/compiler.cpp:2428, 2434-2435 | Directly rejects extent >65536 and multiplicity above expanded shape bounds | This is already a source-visible ceiling, not merely a byte or stack guard. Review/rework compact repeated-shape analysis rather than hide or rename the cap |
+| src/frontend/compiler.cpp:2483-2491 | Enclosing value layout charges a fixed array's multiplicity into the 65536 expanded-field counter | Review aggregate/nested-array accounting too; changing only the top-level extent check leaves an equivalent barrier |
+| src/ir/module.cpp:222-244 | Independent IR inline_layout validation repeats the extent/multiplicity and aggregate expanded-field guard, with separate finite/depth checks | Keep independent validation, finite-type and overflow protections; revise together with frontend so valid large-array IR is not rejected by a copied ceiling |
+| src/ir/module.cpp:73-89 | reference_paths has a 65536 aggregate traversal-work guard and 128 path-depth bound; it currently does not traverse fixed arrays | Keep actual work/cycle protection; review future repeated reference/capability shapes without O(n) expansion. Do not describe this aggregate walk as an existing array-byte cap or remove it blindly |
+| src/frontend/compiler.cpp:1444, 1575; src/ir/module.cpp:508 | P23-1 defaults allocate per-element ConstantValue fields; literals/IR validate exact argument count | Audit compile-time materialization, default/template work and checked sizes before lifting extent guards. Removing one comparison alone can expose excessive work or allocation failure |
+| src/backend/llvm/backend.cpp:101 | All source array native lowering still rejects pending P23-2 planning/review | Preserve this activation gate until the revised architecture, large-array semantics and safety proofs are approved and implemented |
+| src/backend/llvm/storage_audit.cpp:855-880; checkObject | Staged delivery checks every remaining definition for machine coverage, verifies final bytes and rejects before touching the destination | Preserve this protection and extend future production whole-build diagnostics/required-function coverage. Never turn an unsupported required function into an omitted-success result |
+
+Line numbers identify the audited snapshot; symbol names remain authoritative after
+later edits. The planner's true-budget calls are currently exercised by tests;
+the staged emitter freezes with false and performs its separate late C check.
+No evidence here says the old byte policy is already active in public native-array
+production: source native arrays remain blocked. Conversely, the frontend/IR shape
+restriction is active now and cannot be dismissed as research-only.
+
+Tests retaining the old contracts are tests/arrays/foundation.cpp:137-138 (65537
+extent negative / 65536 accepted) and :197-203 (planner byte boundary and overhead),
+and tests/arrays/storage_audit.cpp's policy/near-limit, canonical/reuse and destination
+negatives. Preserve research coverage; a future approved implementation must separate
+language acceptance tests from experiment-threshold assertions and add large-array
+positives. No test is weakened or rewritten in this task.
+
+tools/ci/array_abi_probe/{audit.py,machine_emit.cpp,test_audit.py,test_machine.py}
+contains explicit 65536 research charging/boundary checks. probe.py:57-58 restricts
+its probe count to 1..65536; this is a harness range, not language authority.
+The stack-probe 64/128/256 KiB sizes and Part 5A's 1 MiB function-extent/4096-instruction
+workload guards remain research parameters, not array allocation policies.
+The separate src/ir/interfaces.inc:89 discovery-work budget (65536 combinations)
+is neither array bytes nor element count and is not changed by this correction.
+
+### 21.2 Review and implementation gates
+
+1. Investigate large fixed-array representation and copying on the existing GC,
+   alongside growable storage, without selecting a second memory manager or an
+   unreviewed stack/heap cutoff. Preserve value snapshots, reference-element semantics,
+   readonly borrowing/fallback, initialization, roots, safepoints, failure and reload.
+2. Review multiplicity-aware type/default/reference metadata and analysis-work
+   accounting across frontend, IR and shared tooling. Genuine resource exhaustion
+   must give a clear whole-build failure. A repeated simple shape must not silently
+   inherit a permanent element/payload ceiling labeled as complexity protection.
+3. Approve the revised architecture and production resource/stack policy before
+   implementation or activation. Do not merely raise the old number or disable
+   CFG, ABI, origin, memory-region or platform checks to make a large fixture pass.
+4. Implement only after approval, then validate megabyte-scale fixed/growable arrays,
+   independent copies/alias conflicts, reference-bearing data, allocation failure,
+   target bounds, JIT/AOT, shared analysis/LSP and all required native functions.
+   Unsupported operations or any failed required function fail the entire build
+   with source diagnostics and no partial delivery. Preserve existing suites and
+   eventual seven-job native acceptance; cross-compilation is not execution.
+
+No alternative storage design or changed numerical limit is adopted here. Sections
+9-20 remain historical evidence, including failures and measured frames. The staged
+certificate and encoded-CFG verifier are unchanged and operational. Stop for owner/
+wrench review before further architecture or implementation work.

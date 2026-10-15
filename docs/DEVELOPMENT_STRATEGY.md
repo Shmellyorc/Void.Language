@@ -10,6 +10,12 @@
 >
 > **Important naming decision:** The project is called **`Void.Language`**, not `Void.Language2`. The earlier project has been backed up. This document does not assume any existing files have been modified.
 
+> **15 October 2026 owner correction, current Phase 23 activation gate:** CI #45 is
+> owner-confirmed green (7/7 jobs, 61 suites each), locking Part 5A. The earlier
+> 65,536-byte production array-function policy is superseded. See the large-array
+> review gate below and ARRAYS_PROPOSAL.md A10/Section 21; historical roadmap entries
+> do not authorize reactivation or an alternative storage architecture.
+
 ---
 
 ## 1. Overall direction
@@ -746,3 +752,31 @@ Debug/Release/strict sanitizers, stress/small-stack and real editor gates, then 
 seven hosted jobs. Review hosted acceptance and frame/analysis pressure before
 selecting a separately designed language expansion. C1, S1 and P3/P4 remain
 authoritative; broader initialization and heap-field capabilities are deferred.
+
+
+## Phase 23 large-array review gate, 15 October 2026
+
+The language must support large fixed and growable arrays without an arbitrary
+64 KiB source-level ceiling. Keep the target-aware inventory, precise GC, machine
+CFG, ABI, stack-depth and native cross-platform research. Separate stack safety
+from payload size; the 65,536-byte threshold can remain a research parameter,
+not a universal production rejection policy.
+
+Next investigate large fixed-value placement/copying using the existing coordinated
+GC and compare safe storage candidates. Preserve snapshots and alias-conflict
+fallbacks, readonly/reference semantics, precise roots, complete publication,
+allocation failure, safepoint/reload contracts and one memory-management system.
+No representation, changed numerical ceiling or inline/heap cutoff is selected.
+Review the frontend/IR 65,536 expanded-layout/multiplicity checks and eager default/
+metadata expansion as analysis-resource work. Do not move the same source-visible
+ceiling into a renamed guard. Retain finite-type, overflow and genuine work protection.
+
+Owner/wrench approval of revised storage and resource policy precedes implementation
+and native-array activation. Thereafter require large fixed/growable positives,
+megabyte-scale payload/copy/GC/failure tests and shared frontend/IR/JIT/AOT/LSP
+consistency. Every required function must be represented in successful output;
+unsupported/failed compilation must diagnose and fail the entire build atomically.
+Preserve fail-closed coverage and all current tests, then the existing full local
+and seven-job hosted acceptance. Do not trade safety checks for acceptance or
+claim cross-compilation as native execution. No compiler/runtime or CI changes
+are authorized by this documentation correction.
