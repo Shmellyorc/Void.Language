@@ -1018,9 +1018,12 @@ unexplained failures are rejected. This is not production source-diagnostic proo
 All measurements use LLVM 19.1.7, target-derived DataLayouts and i32 size/alignment
 4/4, witnessed by each target compiler. Normal has no LLVM IR optimization; O2
 uses default<O2>. Both use the existing AOT default machine-code level, llc -O2,
-with PIC. No noinline/volatile attributes, suppression of optimization, heap
-boxing or stack-reserve increase are used. Independent
-modules naturally preserve the call boundary; Section 13.3 also tests inlining.
+with PIC. In this earlier driver, llc uses its empty CPU default; the generic
+TargetMachine helper supplies layout/frame-prefix facts. Section 14 explicitly
+selects generic for both C++ and independent llc emission and records the one
+observed Windows semantic-frame difference. No noinline/volatile attributes,
+suppression of optimization, heap boxing or stack-reserve increase are used.
+Independent modules naturally preserve the call boundary; Section 13.3 also tests inlining.
 
 Actual machine frame bytes for a 16384-byte array payload:
 
@@ -1093,7 +1096,9 @@ policy verdict. Red-zone or other target storage outside getStackSize also needs
 explicit coverage; F-R is not a general-purpose formula for every LLVM function.
 The MIR text parser is an investigation tool, not production infrastructure.
 
-Two measured gaps matter before production:
+The MIR-only checkpoint exposed two gaps. Section 14 now resolves the specific
+Windows five-argument ownership case and demonstrates C++ rejection of inlining
+without provenance; general ABI and transformation-lineage integration remain open:
 
 1. The five-argument failure callee on Windows has a 120-byte frame and an 8-byte
    incoming slot; its caller has a 264-byte frame with a 40-byte outgoing area.
@@ -1141,8 +1146,10 @@ Audit the real MachineFunction/FrameInfo from the same emission that will publis
 code, after target frame placement and before publishing the object. LLVM 19.1.7
 provides getObjectAllocation/Size/Align/Offset, object indices, getStackSize and
 getMaxCallFrameSize; TargetPassConfig exposes insertion after
-PrologEpilogCodeInserterID. The exact pipeline integration and any later target
-frame changes still need verification. Reconcile complete object extents, fixed
+PrologEpilogCodeInserterID. Section 14 verifies a later C++ boundary after all
+machine passes, with
+post-AsmPrinter and encoded-object checks; the PEI insertion point alone is not
+sufficient for final certification. Reconcile complete object extents, fixed
 incoming/outgoing ownership, red zones, realignment, saved registers and spills;
 prove supported padding/reuse rather than adding a measured constant. Verify
 target-generated prologue/epilogue and stack-probe scratch, including any frame
@@ -1179,3 +1186,195 @@ Stop for boss/wrench review. Production integration, inlining provenance, genera
 ABI-slot ownership and GC/staging/borrow proofs remain open implementation gates.
 The numerical limit, all 60 suites, normal CI and P23-1 remain unchanged. No
 production arrays, later checkpoints or unrelated hardening have been started.
+
+## 14. P23-2 C++ machine-storage certification proof, 14 October 2026
+
+Focused implementation proof following the approved review of commit 47ebbeb.
+The 65536-byte policy and all production code, ABIs and ordinary CI are unchanged.
+This section advances the investigation in Section 13; it does not certify VOID's
+production emitter or authorize later array checkpoints.
+
+### 14.1 Actual audit boundary and immutable inventory
+
+The new standalone machine_emit.cpp uses the LLVM 19.1.7 C++ SDK and the same
+SelectionDAG/legacy machine-code pipeline exposed by LLVMTargetMachine. It freezes
+all original static AllocaInst homes before any IR optimization, using the selected
+TargetMachine DataLayout, allocation count and alignment. WeakVH retains original
+identity without following RAUW replacements. Deleted homes remain charged in P;
+a clone, matching name or matching extent is not original-allocation proof.
+
+An early MachineFunction pass records actual call-frame setup sizes. An observation
+pass immediately after PrologEpilogCodeInserterID records the placed frame. The
+certifying pass runs after TargetPassConfig::addMachinePasses() has added the
+entire target machine pipeline, immediately before addAsmPrinter(). The latter
+boundary is necessary: PEI precedes late scheduling, placement, outlining, CFI work
+and target addPreEmitPass2. The public pipeline sequence was checked against the
+pinned [LLVMTargetMachine.cpp](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/CodeGen/LLVMTargetMachine.cpp)
+and [TargetPassConfig.cpp](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/CodeGen/TargetPassConfig.cpp).
+No optimizer, inliner or machine pass is disabled.
+
+For every MachineFunction, including originally array-free functions, the auditor
+reads live frame objects, exact original-allocation pointers, sizes, alignments,
+fixed/incoming slots, spills, offsets, stack size and outgoing area. Exact,
+nonoverlapping original homes alone can earn R. Unknown non-spill objects fail;
+spills/saved-register storage stays wholly in F. Objects outside the accounted
+frame, dynamic/opaque frames, tail calls and unsupported realignment fail. Missing
+inventories also fail, including newly generated functions. No source name is an
+identity and no measured residual becomes an overhead allowance.
+
+The charge remains C = alignUp(P + F - R + E, A), rounded once. E comes from the
+supported target FrameLowering entry prefix (8 x64, 0 ARM64); A is 16. Homes are
+not rounded to the final stack alignment individually. Incoming caller-owned
+storage is not silently folded into R or added again to the callee's F.
+
+Real lifetime-based coloring merges two 256-byte original homes into one machine
+object on all three targets, at both modes. This prototype grants **zero R to the
+entire function when lifetime markers indicate possible reuse**, including markers
+introduced by optimization. Its P remains 512. This is conservative certification,
+not a proof that pointer identity establishes merged-home lineage. Exact reuse
+credits remain deferred. Dead-home controls retain their original 16 bytes in P
+whether normal preserves the home or O2 deletes it.
+
+Ordinary O2 inlining into originally_array_free introduces a real array home into
+an original P=0 function. Its clone receives R=0 and certification fails. Likewise,
+combining the original address caller/callee modules retains the caller's original
+P=49152 and rejects inlined homes. There is no array-free-function exemption,
+renaming workaround or optimization suppression.
+
+### 14.2 Final object checks and publication gate
+
+Objects remain in a private memory buffer. After AsmPrinter, another actual C++
+MachineFunction pass compares the frame/object/SP/call snapshot with the late
+certificate before LLVM frees the MachineFunction. The prototype then parses the
+emitted ELF/COFF/Mach-O object and uses the selected LLVM MC disassembler to compare
+each function's encoded stack-pointer writes and call opcode sequence with the
+certificate. Function symbols must cover certified functions; Mach-O section-anchor
+aliases are accepted only for an identical certified section/address/byte extent.
+Undecodable code or an unmatched function fails.
+
+A real final-emission change occurs: x86 ADD64ri32/SUB64ri32 can be encoded as the
+imm8 forms. Only these two equivalent encoding families are normalized, and only
+with identical decoded register operands and signed immediate values. Other opcode,
+operand, frame or stack-effect differences fail. This is an explicit encoding
+proof, not permission to ignore late stack changes. The PEI observation also sees
+later changes to epilogue instruction sequences in normal x64 semantic samples
+(the independent llc trace identifies branch-folder merging three caller epilogues
+into one, reducing SP-writing instructions from 20 to 10 without changing F);
+therefore PEI alone is not the final certificate boundary.
+
+Deliberate late changes to MachineFrameInfo and SP instructions both fail after
+emission and deliver no object. A Linux-only fixture alters the actual encoded
+SUB-SP immediate after the post-AsmPrinter check; the MC check independently
+rejects it. Omitting a real snapshot from the original inventory fails against the
+actual machine allocation. Over-budget and incomplete certificates return 2 and
+never create the requested object. Successful delivery uses a private temporary
+file and rename after all checks. The certificate binds the final bytes by SHA256;
+existing delivery paths are refused to avoid stale-object false positives.
+
+Linux independently links only certified caller/callee objects with the unchanged
+C assertions. Standalone lli ORC also loads those already certified objects. This
+demonstrates the object delivery gate on two consumers, not production ORC IR
+compilation, source diagnostics, executable-memory publication hooks or cache/reload
+integration. Production must keep its attestation and emitted buffer together
+through the shared emitter and ORC compile callback before object linking or lookup.
+
+### 14.3 Windows five-argument ownership, measured rather than assumed
+
+The exact investigated C signature is void(ptr result, ptr snapshot, i32 later,
+i32 mode, ptr failure). Independent caller/callee modules preserve this boundary
+at normal and O2. Actual pre-PEI call-frame setup is 40 for checked_roundtrip and
+32 for the caller's ordinary register-only helper calls. The late caller contains
+a real 8-byte store at outgoing SP+32 immediately preceding that direct call.
+The same slot is an 8-byte fixed incoming object at LLVM frame offset 32 in the
+callee; TargetFrameLowering resolves it to post-prologue RSP+160 with F=120,
+or callee entry SP+40. Thus:
+
+| Interval / coordinate | Ownership |
+| --- | --- |
+| Caller pre-CALL SP+[0,32) | Caller-owned shadow area |
+| Caller pre-CALL SP+[32,40) | Caller-owned fifth argument |
+| Callee entry SP+[0,8) | Return address, covered by callee E=8 |
+| Callee entry SP+[8,40) | Same caller shadow area |
+| Callee entry SP+[40,48) | Same caller fifth argument |
+
+The 40-byte outgoing area is already in caller F. The incoming 8 bytes are outside
+callee F; charging them again to the callee would duplicate caller-owned storage.
+The callee has its own 32-byte outgoing area for touch, already included in its
+120-byte F. The return slot is not shadow space and is not subtracted from F.
+
+The prototype accepts this incoming slot only with the exact supported signature,
+target, offset/extent and a previously certified actual caller edge with the
+40-byte setup and SP+32 store. The imported local certificate is bound to its
+actual delivered caller object hash. Missing proof, shadow-only evidence, missing
+store evidence or a stale object hash cannot certify the callee. This resolves
+this probe's five-argument ownership, **not** arbitrary Windows signatures,
+varargs, aggregates, vector conventions, indirect calls or exported entry points.
+A production ABI descriptor and closed call-edge ownership model remain necessary.
+
+### 14.4 Measurements, verification and limits
+
+All results use LLVM 19.1.7, generic CPU, empty explicit feature string, PIC,
+CodeGenOptLevel::Default (machine O2), normal IR or target-aware default<O2> IR.
+The C++ target DataLayout must equal the target-compiled layout witness. Windows
+and macOS results below are **cross-compilation and object decoding only**.
+
+For the original 4096-element, 16384-byte payload, both normal and O2 give:
+
+| Target / evidence | Caller P / F / R / E / C | Callee P / F / R / E / C |
+| --- | --- | --- |
+| Linux x64, native | 49152 / 49192 / 49152 / 8 / 49200 | 16384 / 16408 / 16384 / 8 / 16416 |
+| Windows x64, compile-only | 49152 / 49224 / 49152 / 8 / 49232 | 16384 / 16440 / 16384 / 8 / 16448 |
+| macOS ARM64, compile-only | 49152 / 49200 / 49152 / 0 / 49200 | 16384 / 16416 / 16384 / 0 / 16416 |
+
+At 5440 elements, caller C is 65328/65360/65328 for Linux/Windows/macOS;
+at 5461 it is 65584/65616/65584 and object delivery is rejected on every target
+and mode. The limit remains 65536; these are per-function charges, not call-chain
+or allocation limits. The 5461-element caller is not linked or executed by this
+certifying experiment.
+
+The five-argument semantic callee F/C is 104/112 Linux, 120/128 Windows and
+112/112 macOS. Its caller F/C is 232/240, 280/288 and 240/240 respectively.
+The Windows caller F=280 differs from Section 13's empty-CPU llc result of 264:
+independent llc -mcpu=generic reproduces 280. CPU selection affects copy selection,
+alignment and frame layout. These profiles must not be conflated or turned into
+fixed allowances. Real reused-slot functions have P=512, R=0 and F/C of 264/784,
+296/816 and 288/800, both modes, with all original homes still charged.
+
+Evidence and exact test counts are recorded in the rolling work log and the
+harness README. Source snapshots, input/optimized IR, machine facts, disassembly,
+object hashes, native binaries, command statuses and deliberate rejection artifacts
+are reproducible from tracked sources. No full compiler matrix, hosted execution,
+Windows/macOS native run or ordinary CI change is claimed.
+
+### 14.5 Recommendation and remaining integration obligations
+
+Proceed next, after review, with a shared production storage-plan/audited-emitter
+integration checkpoint, using the exact target/profile for both preflight and
+emission. Keep explicit-address snapshots/results as the correctness path and
+preserve array-free ABI. The proof establishes a usable late MachineFunction and
+encoded-object gate for these profiles, with conservative rejection available
+where optimization lineage is incomplete. Do not port the MIR parser into LSP.
+
+Before accepting production array code, inventory every real LLVM/ABI home,
+parameter/result staging area, instruction copy, native guard and GC Frame/Slot/root
+using the actual shared target layout. Prove zero-sized and other scalar layouts,
+existing non-array aggregates, calls and frame shapes or reject them explicitly.
+Inlining/cloning/merging needs durable transformation-aware lineage, or conservative
+no-credit accounting with explicit added homes where those extents are proved.
+Unknown origins remain failed certification, including in formerly array-free
+functions. Repeated metadata and root walkers must agree with complete publication;
+reference-containing arrays remain outside this checkpoint.
+
+Readonly is still insufficient to justify borrowing. Prove no conflicting writes
+from later argument evaluation, callee aliases, reentrancy or reload, as well as
+owner/root lifetime and stable addresses through safepoints and failure cleanup.
+Otherwise take and charge independent snapshots. Existing result failure and
+partial-construction publication rules remain mandatory. None of these GC or borrow
+proofs is established by the scalar native harness.
+
+Production finalization must fail before AOT delivery or ORC object publication,
+including unsupported late transformations and cache/profile mismatches. Extend
+the small supported MC encoding checks deliberately; do not replace missing proofs
+with overhead constants. Native Windows/macOS integration and actual host-feature
+JIT validation remain required later. Stop for boss/wrench review before production
+array lowering or any later Phase 23 checkpoint.

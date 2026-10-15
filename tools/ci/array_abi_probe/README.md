@@ -104,3 +104,82 @@ Outputs include `results.json`, `complete.json`, `commands.json`, per-function
 marks incomplete runs explicitly. Regression artifacts/logs stay under the chosen
 output directory. Frame numbers describe these samples only; they are neither
 per-platform constants nor a universal stack-safety guarantee.
+
+## C++ MachineFunction and encoded-object proof
+
+The newer, independent proof uses the same generated address protocol and C host:
+
+```sh
+python3 tools/ci/array_abi_probe/machine_proof.py \
+  --llvm-bin /usr/lib/llvm-19/bin \
+  --output build/p23-2-machine-proof-example --cross-targets
+python3 tools/ci/array_abi_probe/test_machine.py \
+  --llvm-bin /usr/lib/llvm-19/bin \
+  --artifacts build/p23-2-machine-proof-example
+```
+
+Use a fresh output directory. This builds only the standalone machine_emit.cpp
+against the pinned LLVM development SDK, never the VOID compiler. Source snapshots
+and hashes are retained; changing investigation sources during the run fails it.
+The driver verifies generated IR and snapshots original AllocaInst identities and
+selected-target layouts before IR optimization inside C++. The target profile is
+explicit generic CPU, PIC and machine Default/O2 at both normal/O2 IR settings.
+This differs from the older llc empty-CPU default; Windows's semantic caller is
+280 bytes here, versus 264 in the older profile. Independent `llc -mcpu=generic`
+measurements in the regression tests must match all 48 principal/semantic frames.
+
+An actual C++ MachineFunction pass audits after the full TargetPassConfig machine
+pipeline, immediately before AsmPrinter. Earlier PEI observations are retained for
+comparison. Another C++ pass checks the certificate after AsmPrinter, and LLVM MC
+decodes the resulting private object to compare SP writes and call opcodes. Only
+x86 ADD/SUB imm32-to-imm8 shortening with identical decoded operands is normalized.
+Actual machine-frame mutations, stack-instruction mutations and a Linux encoded
+object mutation must all be rejected. Unknown original homes, clones, unsupported
+frame shapes, missing incoming ownership and excess budget block object delivery.
+Rejected objects remain private memory buffers and are never linked or executed.
+
+The frozen P is never reduced by optimization. R requires the original live
+AllocaInst pointer, exact extent/alignment and disjoint machine ranges. Functions
+with lifetime markers receive zero subtraction credit; actual slot coloring is
+measured, not inferred safe from a surviving name. O2 inlining of the original
+address modules and inlining into an originally array-free function both fail for
+unproved allocation lineage. An omitted-inventory fixture also fails against the
+real machine object. These rejections preserve optimization and the fixed limit.
+
+Windows five-argument ownership is accepted only for the exact supported
+void(ptr,ptr,i32,i32,ptr) signature and an already certified actual caller edge:
+40-byte setup, a late SP+32 8-byte store, and the callee's matching incoming slot.
+Imported local proof JSON must match the delivered caller object hash. The callee
+entry SP+40 slot belongs to the caller's 40-byte outgoing area; the callee's own
+shadow area stays in its F and its entry return slot is E=8. Wrong shadow-only
+proofs, missing stores and stale hashes are rejected. This is a narrow investigation
+certificate, not an untrusted-input attestation format or a general ABI classifier.
+
+Accepted Linux objects execute against all original assertions via independent
+AOT linking (inherited and 1 MiB RLIMIT_STACK) and standalone ORC object loading
+(1 MiB). The ORC host adapter is compiled separately; this does not certify VOID's
+IR compilation callback, GC, publication/reload path or current host-feature JIT.
+Windows x64 and macOS ARM64 are cross-compiled/decoded only. No native execution
+on those systems, full suite, hosted CI or production policy change is implied.
+
+Artifacts include `complete.json`, `results.json`, `controls.json`, `commands.json`,
+source snapshots/hashes, input and optimized IR, C++ frame certificates, per-object
+SHA256, disassembly, separately linked binaries, and isolated deliberate-failure
+reports with no corresponding delivery object. Tests add independent llc objects
+under `.independent.o`; those are measurement witnesses, not certified deliveries.
+See ARRAYS_PROPOSAL.md Section 14 for measurements, exact scope and remaining
+GC/staging, transformation-lineage, target/profile and const-borrow obligations.
+
+To independently identify post-PEI changes in the Linux normal semantic caller:
+
+```sh
+/usr/lib/llvm-19/bin/llc -mcpu=generic -O2 -relocation-model=pic -filetype=obj \
+  -print-after-all -filter-print-funcs=snapshot_case \
+  build/p23-2-machine-proof-example/x86_64-pc-linux-gnu/normal/semantics-caller.optimized.ll \
+  -o build/p23-2-machine-proof-example/late-pass-witness.o \
+  2> build/p23-2-machine-proof-example/late-pass-trace.log
+```
+
+The Control Flow Optimizer (`branch-folder`) merges three epilogues into one after
+PEI. The C++ `after_pei`/late snapshots show 20 versus 10 SP-writing instructions
+with F=232 unchanged. This trace is a measurement witness, not a certified delivery.

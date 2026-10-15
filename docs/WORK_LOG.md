@@ -7049,3 +7049,137 @@ those or other scalar kinds/zero extents.
 Investigation is ready for boss/wrench review; the production proof gate remains
 open. No production arrays, P23-3 through P23-6, unrelated receiver-chain hardening
 or string-indexing implementation. No commits, pushes, branches or remote changes.
+
+## P23-2 C++ MachineFunction storage proof, 14 October 2026
+
+Scope: focused implementation proof approved after review of 47ebbeb. The existing
+explicit-address reproducer is reused. No production array lowering, ABI, runtime,
+LSP, normal CI or later checkpoint changed. The policy remains 65536 bytes. This
+entry advances the earlier MIR investigation, not full P23-2 implementation.
+
+Added tools/ci/array_abi_probe/machine_emit.cpp, machine_proof.py and test_machine.py.
+The standalone emitter uses the installed pinned LLVM 19.1.7 SDK. Before IR
+optimization it freezes original static AllocaInst identities, selected-target
+sizes/alignment and homes. WeakVH does not follow RAUW to replacements; P is never
+recomputed from optimized IR. Actual MachineFunction passes inspect early call
+areas, post-PEI placement, the complete late machine pipeline and post-AsmPrinter
+state. A final LLVM MC object decoder compares emitted SP writes and call opcode
+sequences with the certificate. Accepted objects are SHA256-bound and delivered
+only after all checks via a private temporary file and rename. Existing delivery
+paths are refused; incomplete/over-budget cases return 2 without a delivery object.
+
+The late gate is after TargetPassConfig::addMachinePasses and before addAsmPrinter,
+following the pinned LLVMTargetMachine.cpp standard pipeline, with machine
+verification enabled. PEI alone is too early. A separate standard llc
+-print-after-all witness identifies Control Flow Optimizer (branch-folder) as a
+real later change: the Linux normal semantic caller goes from three epilogues to
+one. C++ observes 20 SP-writing instructions after PEI versus 10 at the gate;
+F remains 232. Its callee changes 15 to 10 with F=104. Windows normal caller and
+callee similarly change 20 to 10 and 12 to 8, with F unchanged at 280 and 120.
+The late snapshots, not earlier instruction sequences, are certified.
+
+Final MC encoding also changes x86 ADD/SUB imm32 instructions to imm8 forms. The
+checker permits only these encoding families with identical decoded registers
+and signed immediate values; it does not ignore differing stack effects. Mach-O
+section anchors appear as function symbols in LLVM's generic object API. An alias
+is accepted only if its section/address/byte extent equals a certified function;
+other emitted functions fail. These are explicit bounded object-format/encoding
+cases, not suppressed audit failures.
+
+R requires the actual original live AllocaInst pointer, exact machine extent and
+sufficient alignment, without duplicate or overlapping credits. Spill/save bytes
+stay in F. Dynamic, opaque, tail-call, realigned, outside-frame/red-zone and
+unmatched-home shapes fail. Actual lifetime-based coloring merges two original
+256-byte homes into one object on all platforms/modes. The conservative prototype
+awards no R when lifetime markers allow reuse, including optimization-introduced
+markers: P=512, R=0, F/C=264/784 Linux, 296/816 Windows, 288/800 macOS. It does not
+claim merged lineage from the one surviving pointer. Deleted dead homes retain
+their 16-byte policy charge. No subtraction is inferred from names or sizes alone.
+
+Inlining is enabled normally. The original address pair combined at O2 produces
+entry F=49176 Linux, 49208 Windows, 49184 macOS; original P remains 49152. New homes
+lack proved original provenance and lifetime reuse receives R=0, so delivery fails.
+An originally array-free wrapper also acquires an actual inline array allocation;
+its original P=0 is not an exemption, and it is rejected with R=0. Normal versions
+pass. Production clone/merge lineage remains an open integration obligation.
+
+Windows five-argument ownership is resolved for the exact probe C signature
+void(ptr,ptr,i32,i32,ptr). Real call-frame setup for checked_roundtrip is 40;
+register-only helpers use 32. The late caller stores the fifth argument at SP+32.
+The callee fixed slot is 8 bytes at LLVM frame offset 32, resolved by frame lowering
+to post-prologue RSP+160, or entry SP+40, with F=120. Caller pre-CALL SP+[0,32) is
+shadow space and [32,40) is the fifth argument. Callee entry SP+[0,8) is the return
+slot E=8; the caller area begins at entry SP+8. The incoming argument is already
+owned by the caller's outgoing 40 bytes in F, and is not a second callee local.
+The callee's own outgoing 32 bytes for touch remain in its F. A previously
+certified caller object, hash-bound local certificate, exact signature, actual
+40-byte setup and late SP+32 store are required. Missing ownership, shadow-only
+proof, missing-store proof and stale object hash all block delivery. This is not
+a general classifier for Windows aggregates, indirect calls, varargs or exports.
+
+Both normal and target-aware O2 use generic CPU, empty explicit feature string,
+PIC and machine Default/O2. DataLayout must match the selected target's compiled
+witness. For a 4096-element payload, caller F/C is 49192/49200 Linux,
+49224/49232 Windows, 49200/49200 macOS; callee F/C is 16408/16416,
+16440/16448 and 16416/16416. At 5440 elements all pass, with caller C
+65328/65360/65328. At 5461 all fail, with C=65584/65616/65584. Over-budget callers
+are not delivered, linked or executed. No constant ABI overhead is invented.
+The Windows semantic caller is F=280 at explicit generic CPU, versus the earlier
+empty-CPU llc F=264; independent llc -mcpu=generic confirms 280. Its C is 288.
+The semantic caller/callee Linux F/C is 232/240 and 104/112; macOS is 240/240 and
+112/112; Windows callee is 120/128. Do not mix CPU profiles in cached certificates.
+
+Actual final verification:
+
+- machine_proof.py completes 18 target/extent/mode cases and 46 additional controls,
+  issuing 94 C++ auditor invocations over 106 MachineFunctions: 60 module objects
+  certified/delivered and 34 rejected without delivery objects. Source snapshots
+  and hashes are captured before compiling and checked unchanged afterward.
+- Native Linux passes eight independent AOT executions, four inherited-stack and
+  four with both RLIMIT_STACK limits set to 1048576 before exec. All original
+  per-element/two-seed/call-count assertions and semantic mutation/evaluation-order/
+  failure-channel assertions are retained. Four standalone ORC loads of certified
+  objects also pass under 1 MiB. The C host adapter is compiled separately. This
+  verifies the prototype object gate, not production ORC IR compilation or reload.
+- Windows x64 and macOS ARM64 compile and decode at both modes. No Windows/macOS
+  native or hosted execution is claimed. Six over-budget principal callers,
+  original/array-free inline clones, omitted homes, missing incoming ownership,
+  twelve late frame/SP mutations and two post-machine encoded-byte mutations all
+  fail closed. The encoded-byte controls leave post-AsmPrinter machine snapshots
+  unchanged and are rejected independently by final object decoding.
+- All 14 new regression tests pass (1.35 s), including 48 independent standard
+  llc -mcpu=generic frame measurements matching the C++ records. Tests additionally
+  run six bad Windows proof cases: wrong outgoing extent, absent store evidence,
+  and stale object hash at normal/O2. Independent .independent.o files are frame
+  witnesses, not gate deliveries; no failed certificate is linked or executed.
+- All nine pre-existing MIR/value-protocol regressions pass (1.81 s), preserving
+  hidden raw-result checks, invalid plans, actual inline unknown homes and unsafe
+  borrowing/delayed-snapshot negative controls. Python compilation and diff checks
+  pass. Existing arrays_foundation passes Debug (0.09 s) and Release (0.03 s).
+  CTest inventory remains 60. No full compiler matrix or ordinary CI was run.
+
+During development, an initial SP fault fixture only selected large prologue
+immediates and did not perturb Windows's register-based allocation. Its unexpected
+success correctly failed the harness assertion. The fixture now changes a real
+SP-defining instruction with an encodable immediate on each profile; all twelve
+late frame/SP negatives are actually rejected. No production checks were relaxed.
+
+Final evidence: build/p23-2-machine-certificate-reviewed with complete.json,
+results.json, controls.json, commands.json, sources/, sources.sha256, per-function
+certificates including after_pei snapshots, optimized IR, disassembly and objects.
+Logs: build/p23-2-machine-certificate-reviewed.log,
+build/p23-2-machine-certificate-tests.log and
+build/p23-2-machine-prior-regressions.log. late-pass-trace.log and
+late-pass-transitions.json identify the independent standard branch-folder change.
+The README provides fresh reproduction from tracked sources, without historical
+build artifacts. ARRAYS_PROPOSAL.md Section 14 records the detailed proof/results.
+
+Recommendation: review this late C++/encoded-object gate, then integrate a shared
+storage-plan/audited-emitter service under a separately approved production step.
+Analysis/LSP and AOT/ORC must share the exact target/profile, complete lowering
+inventory and certificate delivery gate. Complete GC Frame/Slot/root/staging and
+failure-publication inventories, other layouts/signatures and clone/merge lineage
+remain necessary. Const-formal borrowing still requires alias, later-argument,
+owner/root lifetime, safepoint and reload proofs; otherwise retain owned snapshots.
+This scalar proof does not establish those contracts or a universal stack guarantee.
+Stop for boss/wrench review. No commits, pushes, branches or remote modifications.
