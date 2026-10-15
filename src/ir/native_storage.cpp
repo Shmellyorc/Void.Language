@@ -38,9 +38,10 @@ NativeStoragePlan NativeStoragePlanner::finish(const std::set<StorageRole>& acco
         if(home.extent.bytes>target_.maximum_object_bytes-bytes) throw std::length_error("Native storage sum exceeds target bounds");
         bytes+=home.extent.bytes;
     }
+    const auto unrounded=bytes;
     bytes=aligned(bytes,target_.stack_alignment,target_.maximum_object_bytes);
     if(array_carrying && bytes>array_function_storage_budget)
         throw std::length_error("Array-carrying function exceeds the approved 65536-byte native static-storage budget");
-    return {target_.triple,target_.data_layout,homes_,bytes};
+    return {target_.triple,target_.data_layout,homes_,bytes,unrounded};
 }
 }

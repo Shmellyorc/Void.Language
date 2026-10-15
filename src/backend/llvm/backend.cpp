@@ -1,5 +1,6 @@
 #include "void/path.hpp"
 #include "void/backend.hpp"
+#include "void/llvm_storage_audit.hpp"
 #include "void/frontend.hpp"
 #include "void/numeric.hpp"
 #include "void/runtime_abi.hpp"
@@ -74,12 +75,21 @@ std::string source_message(const SourceLocation& location, const std::string& ex
 }
 std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& context,
                                   const std::string& suffix, const llvm::DataLayout& target_layout,
-                                  std::vector<NominalDescriptor>* host_catalog=nullptr,std::vector<InterfaceWitness>* host_witnesses=nullptr) {
+                                  std::vector<NominalDescriptor>* host_catalog=nullptr,std::vector<InterfaceWitness>* host_witnesses=nullptr,
+                                  llvm_backend::LoweringInventory* inventory=nullptr) {
     ir::InstructionTypes checked_types;
     std::map<std::string,ir::ReferenceEffects> verified_effects;
     ir::validate(input, &checked_types,&verified_effects);
     auto module = std::make_unique<llvm::Module>(input.identity, context);
     module->setDataLayout(target_layout);
+    std::uint64_t home_serial=0;
+    auto home = [&](llvm::AllocaInst* a, StorageRole role, llvm_backend::HomeKind kind) {
+        if(inventory) {
+            inventory->function(*a->getFunction(),false);
+            inventory->home(*a,role,kind,a->getFunction()->getName().str()+"/home/"+std::to_string(++home_serial));
+        }
+        return a;
+    };
     // StructLayout caches use raw context-owned Type pointers as keys. Query
     // the module-owned copy, never the LLJIT layout that outlives these types.
     const auto& layout = module->getDataLayout();
@@ -341,14 +351,14 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         for (unsigned n = 0; n < f.locals.size(); ++n) {
             auto t = f.locals[n];
             if (f.receiver && n == 0 && t.kind==ir::Type::aggregate) { slots.push_back(fn->getArg(0)); continue; }
-            auto* slot = b.CreateAlloca(type(t)); slots.push_back(slot);
+            auto* slot = home(b.CreateAlloca(type(t)),StorageRole::local,llvm_backend::HomeKind::value); slots.push_back(slot);
             b.CreateStore(f.receiver && n==0 && t.kind==ir::Type::managed_ref ? static_cast<llvm::Value*>(fn->getArg(0)) : llvm::Constant::getNullValue(type(t)), slot);
         }
         std::map<unsigned,llvm::Value*> stage_storage;
         for (const auto& block:f.blocks) for (const auto& instruction:block.instructions) if (instruction.op==ir::Op::stage_begin) {
             auto* native=type(ir::Type(instruction.type.definition));
             auto bytes=std::max<std::uint64_t>(1,layout.getTypeAllocSize(native));
-            auto* storage=b.CreateAlloca(b.getInt8Ty(),b.getInt64(bytes));
+            auto* storage=home(b.CreateAlloca(b.getInt8Ty(),b.getInt64(bytes)),StorageRole::staging,llvm_backend::HomeKind::staging);
             storage->setAlignment(layout.getABITypeAlign(native));
             b.CreateMemSet(storage,b.getInt8(0),bytes,layout.getABITypeAlign(native));
             stage_storage.emplace(instruction.a,storage);
@@ -381,7 +391,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 if (f.receiver && i == 0) continue;
                 std::vector<std::uint64_t> offsets; reference_offsets(f.parameters[i],0,offsets);
                 if (offsets.empty()) continue;
-                auto* storage = b.CreateAlloca(type(f.parameters[i]));
+                auto* storage = home(b.CreateAlloca(type(f.parameters[i])),StorageRole::parameter,llvm_backend::HomeKind::argument);
                 b.CreateStore(fn->getArg(i),storage); add_root(f.parameters[i],storage);
             }
             for (unsigned block = 0; block < f.blocks.size(); ++block)
@@ -389,17 +399,17 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     std::vector<std::uint64_t> offsets; reference_offsets(t,0,offsets);
                     llvm::Value* storage = nullptr;
                     if (!offsets.empty()) {
-                        storage = b.CreateAlloca(type(t));
+                        storage = home(b.CreateAlloca(type(t)),StorageRole::instruction,llvm_backend::HomeKind::root);
                         b.CreateStore(llvm::Constant::getNullValue(type(t)),storage);
                         add_root(t,storage);
                     }
                     value_roots[block].push_back(storage);
                 }
             auto* root_array_type = llvm::ArrayType::get(slot_type,entries.size());
-            auto* root_array = b.CreateAlloca(root_array_type);
+            auto* root_array = home(b.CreateAlloca(root_array_type),StorageRole::roots,llvm_backend::HomeKind::slots);
             for (unsigned i = 0; i < entries.size(); ++i)
                 b.CreateStore(entries[i],b.CreateInBoundsGEP(root_array_type,root_array,{b.getInt32(0),b.getInt32(i)}));
-            auto* frame = b.CreateAlloca(b.getInt8Ty(), b.getInt64(sizeof(Runtime::Frame)));
+            auto* frame = home(b.CreateAlloca(b.getInt8Ty(), b.getInt64(sizeof(Runtime::Frame))),StorageRole::roots,llvm_backend::HomeKind::frame);
             frame->setAlignment(llvm::Align(alignof(Runtime::Frame))); root_frame = frame;
             b.CreateCall(module->getOrInsertFunction("vd_gc_frame_enter",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type),
                 {root_frame,root_array,llvm::ConstantInt::get(size_type,entries.size())});
@@ -479,7 +489,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     auto* native=type(object);
                     auto bytes=std::max<std::uint64_t>(1,layout.getTypeAllocSize(native));
                     llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
-                    auto* payload=allocations.CreateAlloca(b.getInt8Ty(),b.getInt64(bytes));
+                    auto* payload=home(allocations.CreateAlloca(b.getInt8Ty(),b.getInt64(bytes)),StorageRole::staging,llvm_backend::HomeKind::staging);
                     payload->setAlignment(layout.getABITypeAlign(native));
                     b.CreateMemSet(payload,b.getInt8(0),bytes,layout.getABITypeAlign(native));
                     for (unsigned field=0;field<instruction.arguments.size();++field) {
@@ -666,7 +676,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                     if (input.coordinated && imported) {
                         // A fixed entry-block slot, including imports inside loops.
                         llvm::IRBuilder<> entry_builder(&*fn->getEntryBlock().begin());
-                        native_guard = entry_builder.CreateAlloca(b.getInt8Ty(),b.getInt64(sizeof(Runtime::Native)));
+                        native_guard = home(entry_builder.CreateAlloca(b.getInt8Ty(),b.getInt64(sizeof(Runtime::Native))),StorageRole::known_abi,llvm_backend::HomeKind::native_guard);
                         native_guard->setAlignment(llvm::Align(alignof(Runtime::Native)));
                         b.CreateCall(module->getOrInsertFunction("vd_gc_native_enter",b.getVoidTy(),b.getPtrTy()),{native_guard});
                     }
@@ -715,6 +725,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         }
     }
     debug.finalize();
+    if(inventory) for(auto& function:*module) if(!function.isDeclaration()) {
+        inventory->function(function,false);
+        inventory->complete(function,llvm_backend::all_storage_roles());
+    }
     return module;
 }
 }
@@ -918,7 +932,8 @@ std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
     finish(*module, optimize);
     return impl_->load(std::move(module), std::move(context), name, {"/proof::root_probe"}, impl_);
 }
-static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object, const std::string& generation_suffix = {}) {
+static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object, const std::string& generation_suffix = {},
+                      bool storage_proof = false, const std::filesystem::path& proof_report = {}) {
     if ((runtime_object && !input.coordinated) || (input.coordinated && !runtime_object && !source_program)) throw std::invalid_argument("coordinated AOT requires the runtime proof bootstrap");
     initialize();
     llvm::LLVMContext context;
@@ -933,7 +948,11 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     std::unique_ptr<llvm::TargetMachine> machine(target->createTargetMachine(triple, "generic", "",
         llvm::TargetOptions(), llvm::Reloc::PIC_));
     if (!machine) throw std::runtime_error("cannot create native target machine");
-    auto module = lower(input, context, source_program ? "__void" : generation_suffix, machine->createDataLayout());
+    llvm_backend::LoweringInventory inventory;
+    std::unique_ptr<llvm_backend::AotObjectEmitter> audited;
+    if (storage_proof) audited = std::make_unique<llvm_backend::AotObjectEmitter>(triple,optimize);
+    auto module = lower(input, context, source_program ? "__void" : generation_suffix, machine->createDataLayout(),
+                        nullptr,nullptr,storage_proof ? &inventory : nullptr);
     module->setTargetTriple(triple);
     module->setDataLayout(machine->createDataLayout());
     if (!runtime_object) {
@@ -945,6 +964,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     auto* main = llvm::Function::Create(llvm::FunctionType::get(b.getInt32Ty(), {b.getInt32Ty(), b.getPtrTy()}, false),
                                        llvm::Function::ExternalLinkage, "main", *module);
     b.SetInsertPoint(llvm::BasicBlock::Create(context, "entry", main));
+    if (storage_proof) inventory.function(*main,false);
     // Runtime input prevents the native proof from folding into a constant exit.
     llvm::Value* input_value = b.CreateSub(main->getArg(0), b.getInt32(2));
     if (source_program) {
@@ -956,6 +976,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         b.CreateCondBr(b.CreateICmpEQ(main->getArg(0), b.getInt32(1)), ready, parse);
         b.SetInsertPoint(parse);
         auto* end = b.CreateAlloca(b.getPtrTy());
+        if (storage_proof) inventory.home(*end,StorageRole::known_abi,llvm_backend::HomeKind::cli_parse,"adapter/input-parse");
         auto* argument_address = b.CreateGEP(b.getPtrTy(), main->getArg(1), b.getInt64(1));
         auto* argument = b.CreateLoad(b.getPtrTy(), argument_address);
         auto convert = module->getOrInsertFunction("strtoll", llvm::FunctionType::get(b.getInt64Ty(), {b.getPtrTy(), b.getPtrTy(), b.getInt32Ty()}, false));
@@ -980,6 +1001,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     auto* failure_type = llvm::StructType::get(b.getPtrTy(), b.getInt32Ty(), llvm::ArrayType::get(b.getPtrTy(), 32));
     if (!entry_function->module_identity.empty()) {
         failure = b.CreateAlloca(failure_type);
+        if (storage_proof) inventory.home(*llvm::cast<llvm::AllocaInst>(failure),StorageRole::known_abi,llvm_backend::HomeKind::cli_failure,"adapter/failure");
         b.CreateStore(llvm::Constant::getNullValue(failure_type), failure);
         arguments.push_back(failure);
     }
@@ -1026,6 +1048,27 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     b.CreateCall(print, {b.CreateGlobalStringPtr("%d\n"), result});
     b.CreateRet(b.getInt32(0));
     }
+    if (storage_proof) {
+        for (auto& function:*module) if (!function.isDeclaration()) {
+            inventory.function(function,false); inventory.complete(function,llvm_backend::all_storage_roles());
+        }
+        auto save_ir = [&](const char* suffix) {
+            std::error_code error;llvm::raw_fd_ostream file(output.string()+suffix,error);
+            if(error) throw std::runtime_error("cannot write storage-proof IR");
+            module->print(file,nullptr);
+        };
+        auto save_report = [&] {
+            std::error_code error;llvm::raw_fd_ostream file(proof_report.string(),error);
+            if(error) throw std::runtime_error("cannot write storage-proof certificate");
+            file<<audited->report()<<"\n";
+        };
+        save_ir(".original.ll");audited->freeze(*module,inventory);save_ir(".entry.ll");
+        audited->optimize();save_ir(".optimized.ll");
+        try {audited->deliver(output);} catch (...) {save_report();throw;}
+        save_report();return;
+    }
+    // Public AOT retains the original optimizer/emitter path. The proof service
+    // and its CLI-home normalization are deliberately NOT activated here.
     finish(*module, optimize);
     std::error_code ec;
     llvm::raw_fd_ostream file(output.string(), ec, llvm::sys::fs::OF_None);
@@ -1042,5 +1085,11 @@ void emit_object(const ir::Module& input, const std::filesystem::path& output, b
 }
 void emit_runtime_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, const std::string& generation_suffix) {
     emit_impl(input,output,optimize,false,true,generation_suffix);
+}
+namespace llvm_backend {
+void emit_aot_storage_proof(const ir::Module& input, const std::filesystem::path& output,
+                            bool optimize, const std::filesystem::path& report) {
+    emit_impl(input,output,optimize,true,false,{},true,report);
+}
 }
 }

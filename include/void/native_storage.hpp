@@ -21,6 +21,7 @@ struct NativeStoragePlan {
     std::string target, data_layout;
     std::vector<StorageHome> homes;
     std::uint64_t bytes;
+    std::uint64_t unrounded_bytes;
 };
 inline constexpr std::uint64_t array_function_storage_budget = 65536;
 class NativeStoragePlanner {

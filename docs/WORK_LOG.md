@@ -7183,3 +7183,271 @@ remain necessary. Const-formal borrowing still requires alias, later-argument,
 owner/root lifetime, safepoint and reload proofs; otherwise retain owned snapshots.
 This scalar proof does not establish those contracts or a universal stack guarantee.
 Stop for boss/wrench review. No commits, pushes, branches or remote modifications.
+
+## P23-2 production audit integration Part 1: activation stopped, 14 October 2026
+
+This checkpoint is not complete. The owner authorized a reusable service and first
+production AOT integration, with an explicit stop on unproved storage/ABI/emission
+boundaries. The attempted actual activation rejected existing managed CLI objects.
+Two additional storage proofs are required. Production activation was withdrawn;
+final emit_impl/emit_object/emit_runtime_object retain their original implementation.
+There is no fallback from failed certification to ordinary emission. The staged
+service is compiled and tested separately through compiler-level fixtures.
+
+Staged changes:
+
+- include/void/llvm_storage_audit.hpp and src/backend/llvm/storage_audit.cpp extract
+  the LLVM 19.1.7 late MachineFunction and final MC mechanism into a reusable,
+  owned, single-use AOT service. Its factory identity includes triple, CPU/features,
+  DataLayout, PIC, actual code model, target-option/version identity and both
+  optimization settings. The current production PassBuilder(no-TM) O2 behavior is
+  preserved in the staged service and distinguished from the standalone probe's
+  target-aware O2. Supported native stack-register families are x64 and AArch64.
+- LoweringInventory requires per-function applicability, distinct original
+  AllocaInst identities, purpose/category records and explicit completeness of all
+  eight existing storage roles. Arguments, results, copies, roots, Frame/Slots,
+  staging and native guards have separate purpose kinds. Actual allocation type,
+  constant count and alignment supply target extents. Missing homes/categories,
+  duplicate/foreign homes and missing functions are rejected. The shared lower()
+  has an optional sink at its actual allocation sites; current public AOT and JIT
+  leave that staged sink unused. Array arguments/results are not lowered natively.
+- NativeStoragePlanner retains its unrounded total as well as its existing rounded
+  total. The service uses this existing calculator for P, not a new estimator.
+  The 65536-byte policy is unchanged. Allocation identity, not names or matching
+  extents, controls R; potential lifetime coloring receives zero R. Original
+  array-call graph closure and rejection of removed array calls/functions keep
+  initially array-free callers from evading the proof when inline homes disappear.
+- Objects remain private through the late audit, post-AsmPrinter comparison and
+  MC SP/call verification. Success binds final bytes with SHA256 and delivers via
+  a temporary file and rename. Failure preserves any existing destination.
+  No production fault hooks or imported probe JSON were added. Unproved incoming
+  ownership in policy-applicable functions remains a rejection, not an ABI guess.
+- New arrays_storage_audit compiler suite covers normal/O2 acceptance, excess
+  budget, incomplete categories, omitted homes, immutable/unique purposes, actual
+  O2 inlining into an initially array-free wrapper, real reused storage with R=0,
+  post-freeze unplanned homes, target mismatch, single-use delivery, unchanged
+  array-free budget scope and the continuing source native-array rejection.
+  Its synthetic root/Frame/Slot purpose fixture proves inventory plumbing only,
+  not production GC walkers, owner lifetime, publication or readonly borrowing.
+
+Actual activation evidence and stop:
+
+The full Debug build reached normal managed-cli-main and managed-cli-handoffs
+object generation through the switched public AOT path. Both failed certification
+before delivery. build/p23-2-audit-activation-blocker.log contains the original
+failure output; build/p23-2-audit-activation-blocker.json retains concise structured
+facts for the failed functions and their original inventories.
+
+1. main has original pointer and RuntimeFailure homes of 8/align8 and 272/align8,
+   P=280. Both are conditional non-entry allocas. LLVM represents them with
+   zero-sized, alignment-1 machine objects, F=40, while emitting real dynamic SP
+   moves/adjustments. The physical dynamic homes are not represented by those
+   zero-size records. F alone does not bound them, and zero-byte matching credit
+   is unjustified. A target/CFG/lifetime proof or reviewed lowering change is
+   required; no blanket dynamic-stack allowance or hoisting was implemented.
+2. position.bump in handoffs has P=40: two 4-byte values, a zero-byte/align8 empty
+   GC Slot array, and a 32-byte Frame. Its machine frame is 88 bytes and includes
+   a 1-byte/align8 object for the original zero-byte Slot home. Exact extent
+   matching fails. A zero-logical-extent/physical-object mapping with no unproved
+   credit needs proof; neither logical sizes nor zero-length semantics changed.
+
+Both confirmed shapes now have focused compiler-service negatives with retained
+certificates at build/ci-{debug,release,sanitizers}/storage audit fixtures/
+conditional-home-blocker.json and zero-slots-blocker.json. The service must reject
+both and create no delivery object. The production activation was then removed,
+not made permissive. All existing AOT objects were rebuilt through the restored
+original emitter. Passing that restored path does not certify the staged service
+for existing programs. ARRAYS_PROPOSAL.md Section 15 records the incomplete status,
+actual evidence and next required proof, and corrects the outdated top-level status.
+
+Actual local verification with the restored final path:
+
+- Debug and Release complete builds pass. Existing 60 suites remain present and
+  unchanged; adding arrays_storage_audit makes 61 suites. The focused Debug run
+  of audit/foundation/runtime_generated/frontend/aot passed 5/5 before broadening.
+- Release full matrix passes 61/61 (49.85 s), including all existing independently
+  linked native AOT/CLI, source, runtime, reload, frontend, tooling and LSP suites.
+- Debug full matrix finishes 60/61 (100.07 s). interfaces_source segfaults once
+  after 2.79 s, with no actionable stack in CTest output. An isolated rerun passes
+  (5.42 s), and a native GDB run exits normally with all interface checks passed.
+  The cause is not established or attributed to baseline/current changes. This
+  remains a validation limitation, not a clean Debug matrix or a diagnosed fix.
+- Strict focused ASan/UBSan passes 3/3 (8.46 s): arrays_storage_audit (0.15 s),
+  arrays_foundation (0.10 s), interfaces_source (8.21 s), with detect_leaks=1,
+  abort_on_error=1, halt_on_error=1 and UBSan stack traces. No checks were disabled.
+  The first sandbox attempt aborted all three because LeakSanitizer could not
+  inspect processes. Repeating outside the sandbox with the same checks passed.
+  GDB likewise initially could not ptrace in the sandbox; the native run above
+  was outside it. No sanitizer finding or native crash trace was captured.
+- Audit fixtures pass Debug (0.09 s) and Release (0.05 s) within the full runs,
+  and retain both blocker certificates. Source native-array execution is still
+  explicitly rejected. No Windows/macOS production run, hosted CI, six-build
+  acceptance matrix or production ORC certificate integration is claimed.
+
+Logs are build/p23-2-audit-debug-restored-build.log,
+build/p23-2-audit-debug-all-tests.log, build/p23-2-audit-release-build.log,
+build/p23-2-audit-release-all-tests.log, build/p23-2-audit-interface-repeat.log,
+build/p23-2-audit-interface-gdb.log, build/p23-2-audit-san-build.log and
+build/p23-2-audit-san-native-tests.log. The rejected trial activation is retained
+separately, not overwritten by the restored build. NativeStoragePlanner's existing
+foundation checks continue to pass; diff checks pass.
+
+Stop for boss/wrench review. The next step is proving conditional and zero-extent
+home reconciliation, or reviewing a semantics-preserving lowering change, before
+switching public AOT delivery. Full inventories, general ABI ownership, exact
+profile/cache hardening, clone/merge lineage, source diagnostic association,
+GC/root/staging safety, readonly borrowing, reload and ORC/LSP remain open gates.
+No source array lowering, budget increase, unrelated receiver-chain correction,
+CI changes, commits, pushes, branches or remote modifications were made.
+
+## P23-2 storage-shape proof, 14 October 2026
+
+The two prior storage mismatches now have restricted, verified handling in the
+staged service. Public AOT remains on the restored original optimizer/emitter
+branch. No native arrays, budget change, ORC/LSP integration or activation occurred.
+The earlier Debug interfaces_source segfault remains unexplained, not fixed or
+attributed. ARRAYS_PROPOSAL.md Section 16 records the proof and remaining gates;
+Section 15 is retained as historical failed-activation evidence.
+
+Conditional homes:
+
+- Verified pinned LLVM SelectionDAGBuilder::visitAlloca: absent a static entry-home
+  mapping, a constant-size non-entry alloca uses DYNAMIC_STACKALLOC with target
+  stack-alignment rounding. A cycle can execute it repeatedly. The prior F=40
+  and zero-size frame objects therefore did not bound those physical homes.
+- Added explicit compiler-owned cli_parse/cli_failure home kinds. Only these may
+  move in the proof service. The producer supplies their existing main C signature
+  and exact ABI types. The service checks role, shape, count one, allocation address
+  space, ABI alignment, reachability, no cycle through the original block, and no
+  stack save/restore or returns-twice control. Repeated/cyclic, variable-count,
+  over-aligned, wrong-shape and stack-control fixtures fail closed.
+- All validation completes before moves. Only the original AllocaInst moves to
+  entry, preserving identity, type, count, alignment, users and debug information.
+  Initializers and all other operations stay put. Tests inspect the initializer
+  blocks directly. These hidden adapter homes are not VOID-addressable values or
+  registered GC roots; the failure buffer remains initialized before invocation.
+  Without stack restoration, each original allocation lived until function return
+  and executed at most once. The narrowed change reserves static storage earlier
+  without moving source evaluation, publication or failure behavior.
+- The audit now rejects variable/opaque frames globally. Moved CLI homes also
+  require SP writes confined to target prologue/epilogue regions. The emitted
+  object must match the late machine snapshot. There is no dynamic-stack estimate,
+  body-adjustment allowance or blanket acceptance of conditional allocas.
+- Exact managed main/handoffs main frames have P=280, normal F=312 and O2 F=328;
+  own F+E is 320/336 on native Linux x64, E=8. Outgoing space is already in F.
+  Every CFG path, including the trace loop, uses this one static frame. Those
+  array-free functions correctly retain C=null. The policy-applicable microfixture
+  has P=280/F=280/R=280/E=8/C=288 in both modes. The 65536-byte policy is unchanged.
+
+Zero-extent homes:
+
+- Downloaded and independently inspected the exact LLVM 19.1.7
+  SelectionDAG/FunctionLoweringInfo.cpp. Lines 143-159 explicitly compute the
+  static alloca size, change zero to one physical byte, and pass the original
+  AllocaInst to CreateStackObject. The source is retained under
+  build/p23-2-shapes/FunctionLoweringInfo.cpp; the proposal links the pinned source.
+- Acceptance requires exact original live/static provenance, still-zero current
+  LLVM type/count, actual machine size one, sufficient alignment, a unique mapping
+  and physical range wholly in F. The original zero logical extent and P are kept.
+  R for this home is always zero; the measured physical byte/padding stays in F.
+  Unknown zero clones and dynamic zero homes still fail. No logical extent,
+  source value, zero-length semantics or GC root count is normalized to one.
+- In exact position.bump, P remains 40 and normal/O2 F is 88/72. The empty Slot
+  array IR and count-zero Frame call are unchanged. Runtime Frame validation and
+  collection walk by count, so no Slot is read at count zero. Native managed
+  cycle/handoff/failure comparisons and existing runtime/source suites exercise
+  the preserved behavior. A direct Runtime regression additionally nests a
+  zero-count Frame with null Slot storage above a live parent root, collects and
+  verifies the root survives, then removes the parent and verifies collection
+  releases the object. This is not a proof of future reference-array GC safety.
+
+Shared producer and regressions:
+
+emit_aot_storage_proof is an explicit compiler-fixture entry. It uses the actual
+public AOT module/adapter producer and its optional inventory sink, then selects
+the staged service. Public emit_object/emit_runtime_object never select this entry;
+they retain the original emission branch and conditional allocation locations.
+No permissive fallback, CLI activation flag or separate IR producer was introduced.
+Original, entry-normalized and optimized IR plus final certificates are retained.
+
+The expanded arrays_storage_audit suite now covers the real
+examples/managed_structs/main.void and handoffs.void modules, normal/O2, along with
+positive zero-size and CLI-home proofs. Replaying their exact original IR without
+the CLI permission rejects while preserving an existing destination object.
+Missing inventories, excess budget, untracked/inlined homes, real reused storage,
+source-native-array rejection and the original assertions remain. Added negatives
+also reject cyclic CLI allocation, variable counts, unsupported alignment/type,
+stack control, untracked zero clones and dynamic zero-size allocations. No false
+failure was converted to a pass by reducing coverage or optimization.
+
+Corrected the earlier Section 15/work-log shorthand examples/managed/main.void to
+the actual managed_structs directory. The failing baseline evidence is unchanged.
+
+Interface-crash investigation:
+
+- First used the unchanged Debug binary for six serial and eight two-worker
+  executions: 14/14 passed. Results/logs are under
+  build/p23-2-shapes/interfaces-original. No original crash was reproduced.
+- Added flushed phase and normal/O2 progress around the existing interface test
+  bodies. No assertion, operation, timeout or optimization inside those tests was
+  removed. The new tools/ci/interfaces_probe.py isolates each child working/core
+  directory, requests a bounded core size and records every failure or timeout.
+- Eight serial and 24 four-worker runs with progress passed 32/32. Six additional
+  native GDB runs with ASLR explicitly enabled also exited normally. The GDB script
+  would retain all-thread full backtraces and a core on an abnormal stop. No signal,
+  crash backtrace or core was captured. Final runner hardening sets inherited
+  core limits before starting threads, avoiding Python preexec callbacks in a
+  threaded parent. Two serial/eight four-worker final runs also pass 10/10.
+  These 62 controlled passes do not establish a fix, baseline attribution or
+  irrelevance to the storage work.
+- Current full Debug/Release matrices and the strict interface sanitizer run pass.
+  The historical isolated segfault remains a review limitation. Progress/core
+  evidence should be preserved if it recurs; a successful retry must not erase it.
+
+Actual validation:
+
+- Full Debug build and 61/61 tests pass (100.93 s). Full Release build and 61/61
+  tests pass (51.92 s). This preserves all original 60 suites plus the staged
+  compiler audit suite. Production AOT activation remains disabled in both runs.
+- Strict ASan/UBSan passes audit/foundation/runtime_generated/interfaces_source,
+  4/4 (10.02 s), with leak detection, abort/halt on error and UBSan stack traces.
+  This ran outside the known ptrace-restricted sandbox; no checks were disabled.
+- After adding the final exact-source fail-closed replay cases
+  and the direct zero-Slot collector case, the final audit suite passes Debug
+  (0.75 s), Release (0.45 s) and strict sanitizers (1.07 s). These extensions changed
+  tests only; shared product code was unchanged from the full-matrix/native runs.
+- tools/ci/storage_shape_probe.py independently links public-original and
+  staged-certified objects against the same runtime for main, handoffs and
+  null_failure, normal/O2. Each build compares eight argument cases at inherited
+  and 1 MiB hard/soft RLIMIT_STACK. Debug and Release each pass 96 comparisons,
+  192 native process executions. Total: 192 matching exit/stdout/stderr comparisons,
+  384 executions; 192 executions use 1 MiB. Source failure, malformed CLI input,
+  i32 range errors and valid input agree exactly. No failed object is executed.
+- Machine certificates for every staged native case reject dynamic/opaque shapes;
+  exact main/handoff zero-home mappings and final object disassembly are retained.
+  Native/public objects remain independent, not LTO-merged. No artificial noinline,
+  volatile suppression, stack-reserve increase or guessed overhead was used.
+- Python compilation, whitespace and diff checks pass. No hosted or native
+  Windows/macOS verification, six-build acceptance matrix or full sanitizer matrix
+  is claimed for this checkpoint.
+
+Reproduction: tools/ci/STORAGE_SHAPE_PROOF.md, tools/ci/storage_shape_probe.py and
+tools/ci/interfaces_probe.py. Evidence: build/p23-2-shapes/native-debug-final and
+native-release contain complete.json, commands.json, results, IR, certificates,
+disassembly and binaries. The full/focused build/test logs and controlled interface
+runs are under build/p23-2-shapes. Compiler-level certificates are under
+build/ci-{debug,release,sanitizers}/storage shape fixtures, including exact unmarked
+rejections. interface-gdb-repeats.log and interface-repeat.gdb retain native GDB
+procedure/results. The LLVM source fetch initially needed network access outside
+the sandbox. An initial native driver link failed because resolving the clang++
+symlink changed its driver mode to clang; preserving the supplied C++ driver name
+corrected the harness. This was not a compiler/runtime failure and no production
+code was altered for it. Only complete verified native directories are cited above.
+
+Stop for review. The two identified shapes are proved only for the narrowed
+staged paths above. Public AOT activation, certification of the entire AOT corpus,
+new-shape native platform coverage, general ABI ownership, source/profile/cache
+hardening, optimization lineage, full GC/root/staging and borrow/reload proofs
+remain open. The unexplained Debug interface crash also remains unresolved.
+No source native arrays, ORC/LSP work, unrelated receiver-chain correction, CI or
+Git mutations occurred. No commits, pushes, branches or remote modifications.

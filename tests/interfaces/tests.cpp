@@ -230,7 +230,22 @@ int main(int argc,char** argv) {
             auto original=vd::analyze_source({"/stress.void",text});if(!original.succeeded()) throw vd::CompilationError(original.diagnostics);
             vd::emit_runtime_object(original.program->lower(),argv[3],std::string(argv[4])=="optimized","__reloaded");return 0;
         }
-        require(argc==2,"interfaces project root required");diagnostics();programs();independent_ir();admission();tooling_and_imports(argv[1]);for(bool opt:{false,true}) {roots(argv[1],opt);handoffs(argv[1],opt);selected(argv[1],opt);retirement(argv[1],opt);parked(argv[1],opt);timeout(argv[1],opt);active_reload(opt);}
+        require(argc==2,"interfaces project root required");
+        auto phase=[](const char* name,auto work) {
+            std::cerr<<"interfaces: "<<name<<" begin"<<std::endl;
+            work();
+            std::cerr<<"interfaces: "<<name<<" passed"<<std::endl;
+        };
+        phase("diagnostics",[&]{diagnostics();});phase("programs",[&]{programs();});
+        phase("independent_ir",[&]{independent_ir();});phase("admission",[&]{admission();});
+        phase("tooling_and_imports",[&]{tooling_and_imports(argv[1]);});
+        for(bool opt:{false,true}) {
+            std::cerr<<"interfaces: mode "<<(opt?"O2":"normal")<<std::endl;
+            phase("roots",[&]{roots(argv[1],opt);});phase("handoffs",[&]{handoffs(argv[1],opt);});
+            phase("selected",[&]{selected(argv[1],opt);});phase("retirement",[&]{retirement(argv[1],opt);});
+            phase("parked",[&]{parked(argv[1],opt);});phase("timeout",[&]{timeout(argv[1],opt);});
+            phase("active_reload",[&]{active_reload(opt);});
+        }
         std::cout<<"structural interface checks passed\n";
     }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
 }
