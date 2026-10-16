@@ -16,8 +16,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Verify crash evidence classification
@@ -28,7 +28,7 @@ jobs:
         with:
           arch: x64
       - name: Cache pinned LLVM SDK
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .toolchains/llvm-19.1.7
           key: llvm-sdk-19.1.7-${{ runner.os }}-${{ runner.arch }}-v1
@@ -46,7 +46,7 @@ jobs:
               stream.write(path.read_text(encoding='utf-8') if path.exists() else 'Probe did not reach execution; inspect setup logs.\n')
       - name: Preserve native measurements and isolated failure evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: phase23-stack-probe-${{ runner.os }}-${{ runner.arch }}
           path: build/phase23-stack-probe/artifacts/
