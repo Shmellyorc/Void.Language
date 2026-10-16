@@ -14,6 +14,17 @@ internal runtime/compiler foundation, not source-level managed `struct` support
 or a production managed runtime. Existing source syntax, entry behavior, value
 initialization, LLVM 19.1.7 and code-generation leases remain in place.
 
+Phase 23 Stage 2D adds runtime-only reference-bearing private buffers, following
+[ARRAYS_PROPOSAL.md Section 27](ARRAYS_PROPOSAL.md#27-stage-2d-reference-bearing-private-buffer-preparation).
+The existing Heap streams immutable capacity through admitted schema reference
+events. Ordered builder writes use registered Frame words, revalidate after polls
+and commit interface pairs atomically. Private null slots remain trace-safe;
+required live completeness and zero spare reference positions are distinct checks.
+Mark rollback and ordinary/string legacy maps remain in place. Catalog snapshots
+retain data-only type/witness ownership; Frame/Slot ABI is unchanged. This does not
+activate source native arrays, copying/read leases or another collector. See the
+proposal and WORK_LOG.md for actual local validation and performance limits.
+
 ## Ownership and thread states
 
 `Runtime` owns one existing `Heap`, its participant registry, handles and one

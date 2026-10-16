@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <map>
 #include <span>
 #include <unordered_map>
 #include <vector>
@@ -23,6 +24,17 @@ struct TypeLayout {
 struct NominalDescriptor {
     std::string identity, base, shape;
     TypeLayout layout;
+};
+// Immutable binding data: no executable addresses, generation leases or permissions.
+struct InterfaceWitness {
+    std::string key, interface_identity, view_identity, contract;
+};
+// Existing transactional Runtime catalog. Buffers retain a data-only snapshot;
+// the same service admits descriptors, witnesses and schemas atomically.
+struct RuntimeMetadata {
+    std::map<std::string,std::shared_ptr<const NominalDescriptor>,std::less<>> types;
+    std::map<std::string,ElementSchemaRef,std::less<>> schemas;
+    std::map<std::string,std::shared_ptr<const InterfaceWitness>,std::less<>> witnesses;
 };
 class Heap {
 public:
@@ -48,6 +60,8 @@ private:
         mutable const void* owner;
         mutable std::uint64_t valid_prefix=0;
         mutable bool complete=false;
+        mutable std::shared_ptr<const RuntimeMetadata> catalog;
+        std::uint64_t requested_live; // immutable construction boundary, not trace extent
     };
     class PendingBuffer {
     public:
@@ -65,6 +79,8 @@ private:
     };
     void* adopt_buffer(PendingBuffer&,std::shared_ptr<const BufferState>);
     const BufferState& buffer_state(void*) const;
+    void validate_reference(const ReferenceEvent&,void*,const void* witness,
+                            const RuntimeMetadata&,bool private_nulls) const;
     bool is_private(void*) const;
     bool private_owner(void*,const void*) const;
     void seal_buffer(void*,const void*,std::uint64_t) noexcept;

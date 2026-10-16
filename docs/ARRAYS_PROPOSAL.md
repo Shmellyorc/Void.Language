@@ -1,11 +1,11 @@
 # Phase 23 proposal: typed arrays, indexing and iteration
 
-**Current status, 15 October 2026: owner confirms CI #49 passed all seven jobs,
-62/62 suites, locking Stage 2B at `4d25f4f`. Stage 1 was locked by CI #47 and Part
-5A by CI #45. Owner/wrench authorize Stage 2C only. Section 26 records the private
-rooted byte-buffer implementation and local evidence. Native source arrays,
-reference-bearing population, leased/deep copying and production certification
-remain disabled. The superseding large-array decision below remains in force.**
+**Current status, 16 October 2026: owner confirms CI #51 passed all seven jobs,
+63/63 suites, locking Stage 2C at `cb601b4`. Stage 1, Stage 2B and Part 5A remain
+locked by their recorded hosted runs. Stage 2D alone is authorized; Section 27
+records runtime-only reference preparation and local verification. Source-native
+arrays, leased/deep copying and production certification remain gated. The
+superseding large-array decision below remains in force.**
 
 > **SUPERSEDING OWNER DECISION: large arrays are a language requirement.**
 > Neither `[T, n]` nor `[T]` may have an arbitrary 64 KiB source-level ceiling.
@@ -2593,7 +2593,7 @@ direction; Section 24 records the bounded Stage 2B implementation.
 ## 23. Stage 2A approval gate: repeated GC layouts and rooted buffers
 
 15 October 2026. **Owner/wrench approved this architectural direction and its
-retained safety gates. Stage 2B is locked; Stage 2C was separately authorized.**
+retained safety gates. Stages 2B/2C are locked; Stage 2D is separately authorized.**
 The owner reports CI #47 passed all seven jobs, 61/61 suites, locking Stage 1.
 Read the complete owner-supplied Large-Array Storage Architecture Review, especially
 Sections 2, 5, 6, 10 and 11, and Section 22 above. This section proposes Stage 2's
@@ -2771,9 +2771,9 @@ failure-injection proof; a plausible scan count does not authorize partial sweep
 ### 23.4 Proposed C++ API surface
 
 This is the full Stage 2 internal embedding/runtime API design, not a new generated-
-code ABI or a claim that every declaration works. Sections 24-26 record implemented
-2B admission and the 2C reference-free subset; reference/copy/lease APIs remain
-proposals. Opaque handles are runtime-
+code ABI or a claim that every declaration works. Sections 24-27 record implemented
+2B admission, 2C byte buffers and 2D reference preparation; copy/lease and public
+mutation APIs remain proposals. Opaque handles are runtime-
 bound and factory-created;
 callers cannot manufacture an admitted handle by constructing shared_ptr<const T>.
 
@@ -3079,8 +3079,8 @@ source native arrays or a selected array-call ABI. Stop rather than substitute
 unproved alignment, source stability, reference completeness or publication rules.
 No later stage is authorized by approving a substep.
 
-**Approved architectural direction, implemented through the separately authorized
-2B and 2C checkpoints only:**
+**Approved overall direction; implemented 2B/2C/2D subsets are recorded in
+Sections 24-27, while stable-source copying/leases still require Stage 2E:**
 runtime-owned DAG/cursor; mutually exclusive
 buffer layout and typed empty representation; same-Heap NativeSafe zero reservation
 then rooted private adoption; prefix/event completeness and sealed publication;
@@ -3090,7 +3090,7 @@ numbers, source ABI/owned-handle layout, production stack policy, growable heade
 commit protocol and source concurrency semantics are not selected here.
 
 The original Stage 2A checkpoint changed documentation only. The subsequent owner
-authorizations separately permit 23.9 steps 2B and 2C, recorded below; remaining
+authorizations separately permit 23.9 steps 2B, 2C and 2D, recorded below; remaining
 implementation steps require their own review. Research checks, CI, Git history and remotes remain
 unchanged.
 
@@ -3631,3 +3631,214 @@ rerun the full 63-suite matrix. Native Windows 2022 execution is unavailable her
 owner-controlled hosted validation remains required. Runtime/compiler code,
 Stage 2D gates, CI workflows and Git history remain untouched. Stop for owner/wrench
 review.
+
+
+## 27. Stage 2D: reference-bearing private buffer preparation
+
+16 October 2026. Owner/wrench authorize Section 23.9 step 2D only. Owner reports
+CI #51 passed all seven jobs, 63/63 suites each, locking Stage 2C at cb601b4.
+The source-array, copying/lease, ABI/LLVM, GC scheduling and certification gates
+remain unchanged. The separately authorized Node 24 workflow maintenance is
+recorded in CI_NODE24_MAINTENANCE.md and is independently reviewable.
+
+### 27.1 Typed events, roots and atomic writes
+
+Implemented `Runtime::RegisteredRootWord`, `root_word(void** registered_slot)`,
+`Runtime::RootedInterfaceSource{RegisteredRootWord object, const InterfaceWitness*
+witness}`, and BufferBuilder::write_reference/write_interface. Root tokens are
+factory-created proofs naming a current-thread public Frame word and its specific
+Frame, Runtime and thread. They do not cache referents or extend Frame lifetime;
+callers must keep that originating Frame linked throughout use. Handles, private
+builder roots and arbitrary native words are not source root registrations.
+
+Each operation validates source registration/membership before cursor work that
+may poll. After locating the next typed event, it validates its kind, nullability,
+nominal/string target and interface binding before the explicit population poll.
+After polling it repeats root validation, rereads the word and repeats typed target
+validation under the mutex. No cached referent, interior address or Heap iterator
+survives a poll. Managed references accept the admitted target or derived nominal
+types. Strings use the intrinsic immutable kind; null retains empty-string meaning.
+Interfaces require exact opaque witness catalog membership before dereferencing,
+matching interface identity and an object compatible with the witness static view.
+A null interface is permitted only with a null witness and a nullable event.
+
+Only after all checks does the builder compute both checked destination addresses
+and write a reference word or both interface words under one mutex acquisition.
+No poll, allocation or fallible operation splits an interface pair. Each call
+consumes one reference event, within the positive reference-event quota; bytes must
+fit the largest atomic group (two pointer words for an interface). Existing node
+and byte quotas still bound cursor/scalar/byte chunks. Wrong kinds, roots, targets,
+witnesses, null required values or incomplete publication poison the transaction.
+No source conversion or mutable/readonly authority is inferred from a GC root;
+exact schema capability profiles and existing witness contracts are retained.
+
+ElementSchema caches zero_data_complete compositionally: required managed/interface
+leaves are false, nullable/string leaves true, Records combine children and empty
+Repeats require no live occurrences. zero_elements is available only for whole
+zero-valid physical elements. This does not execute language defaults/constructors.
+Required events must be explicitly written before the authoritative builder prefix
+advances. Owned-fixed/growable semantic roles remain rejected at admission.
+
+### 27.2 One reference interpretation and full-capacity marking
+
+ElementSchema's existing typed reference-event projection is now shared by the
+reference cursor, offset/path lookup and construction cursor. DataCursor traverses
+physical data OR reference subtrees and emits the same managed/string/interface
+events, retaining schema ownership for borrowed target names. Scalar/byte methods
+cannot consume a pointer event. BufferReferenceCursor wraps ReferenceCursor across
+checked immutable base/stride/capacity geometry, returning the outer element index
+and absolute object/witness offsets. Scratch is shape-depth sized; there is no
+per-capacity descriptor, flat offset expansion or recursive native walker.
+
+RuntimeMetadata is the existing three-map transactional catalog, moved to a shared
+data-only declaration without changing admission/publication. Buffer metadata owns
+a shared snapshot, not a new registry or catalog copy. Each successful reference
+write retains the current catalog if admission has extended it; the old snapshot
+is released outside the write mutex. This retains exact nominal ancestry and
+witness ownership for tracing after future catalog changes, without executable
+callbacks or generation-owned data. Compatible admission still preserves canonical
+pointer identities. InterfaceWitness's declaration moves with this data context;
+its fields and C++ type identity do not change. Frame/Slot definitions are unchanged.
+
+Heap::validate_reference is common to typed construction checks and marking. Buffer
+marking streams EVERY capacity event, including private and unused slots. Private
+null required words are safe to trace but do not establish live completeness;
+sealed live required words must be valid. An immutable requested_live boundary in
+private metadata detects nonzero private spare slots; the sealed valid_prefix does
+the same after publication. Neither boundary shortens the trace extent. Any nonzero
+object OR witness in spare capacity rejects, even if that object would otherwise be
+valid. Interface pairs are validated together; only object words are traced.
+Foreign/untracked/private targets and forged or mismatched witnesses reject before
+sweep. Reference-free payloads retain the constant-time mark shortcut.
+
+The existing mark-before-sweep and catch/reset-all-marks path remains. Buffer edges
+use a lazily constructed optional unique-object queue filter, not one pending entry per duplicate
+occurrence. It allocates only when a buffer discovers unmarked nonnull children;
+ordinary/string scans retain their borrowed legacy cursor and original queue path.
+The set is not even constructed on legacy/null-only paths; this avoids standard
+libraries that allocate while constructing an empty unordered_set.
+All buffer cursor/filter/worklist allocation failures unwind through the same mark
+rollback. Successful publication remains the Stage 2C infallible, scan-free metadata/
+output commit; Heap sealing additionally checks the exact requested prefix.
+
+### 27.3 Regression scope and verification
+
+The existing gc_buffers suite is extended; all 63 suite registrations are retained.
+Independent small offset/witness oracles cover nested physical records, inner
+repeats, outer capacity, padding and nonstandard interface word order. Actual typed
+population is checked byte-for-byte against nominal/string/witness identities and
+followed by reachability checks after ordinary source roots are cleared. Both
+million outer elements and a million inner repetitions retain compact descriptors.
+Late nominal/witness admission during private construction exercises catalog
+snapshot handoff. New root/kind/null/witness/foreign/private/order negatives remain
+recoverable before any publication; existing fatal precise-graph policy remains.
+
+The deterministic Stage 2C concurrency test is preserved. A second partial-element
+request/poll witness uses a test-only Linux x64 linker wrapper at the existing
+Heap::collect(span) entry, after Runtime rendezvous/root enumeration under its
+mutex, to redirect a registered source word between two independently rooted
+objects. The actual mangled symbol was verified in the native library. The writer
+must reread the redirected word after a genuine poll/park and commit the matching
+interface pair. Redirecting to a different nominal type must instead poison the
+builder and preserve the previous output. No production runtime hook, optimization
+suppression, sleep or timing-based pass is added. Other platforms require the same
+genuine request/poll/park but explicitly report redirection instrumentation as
+unavailable. The Linux fallback branch is also executed locally; that is not native
+Windows/macOS verification. An allocator-based prototype was replaced because a
+standard library could allocate while waiting before the world is safe.
+
+Temporary normal Release negative objects that cache the pre-poll source or omit
+post-poll typed validation both fail the corresponding fixture assertions. Production
+objects are unchanged and neither invalid object is delivered as a build result. Existing private-root/ordinary-edge fatal modes remain, supplemented by buffer
+spare words/pairs, private spare storage, required live nulls, wrong nominal/string
+kinds, forged witnesses and private buffer-edge modes.
+
+Measured reference construction/GC failure ordinals exercise cursor/reservation/
+adoption, partial-private marking, unique-queue allocations and mark rollback, then
+reclaim abandoned objects and successfully retry a fresh builder. The old four/six
+allocation-budget sweeps remain unchanged. Final successful-path measurement covers
+all 11 reference construction/collection allocation sites, with injection at each
+ordinal and a fresh successful construction retry. The four/six older constructor
+sweeps and ten fatal subprocess modes also pass.
+
+Full local rebuild/CTest with pinned LLVM 19.1.7: **Debug 63/63 (82.41 s), Release
+63/63 (40.60 s), strict ASan/UBSan RelWithDebInfo 63/63 (102.61 s)**. Sanitizer build
+and execution use detect_leaks=1:abort_on_error=1 and
+halt_on_error=1:print_stacktrace=1 outside the desktop tracing sandbox. No sanitizer
+findings. Explicit 1 MiB Debug/Release checks pass **11/11 each (11.99 s / 2.87 s)**:
+gc_buffers, gc_schemas, coordination, generated JIT, callbacks, failures, invariant
+subprocesses, normal/O2 linked runtime AOT, strings and interfaces. All final
+compactness assertions are included. Frame/Slot remain 32 bytes each; BufferBuilder
+is 328 bytes on this Linux x64 target versus 264 in Stage 2C. These are native C++
+object sizes and stack-limit execution evidence, not a total machine-frame proof.
+Windows/macOS native tests and hosted CI were not run locally. SDK <ciso646> warnings
+remain; no new compiler warnings or weakened assertions were introduced.
+
+### 27.4 Reproducible cost evidence and retained gates
+
+`tools/bench/buffer_preparation.py` uses read-only Git snapshots of cb601b4 and the
+current runtime, equivalent Clang 19 Release flags, native fixture executables and
+CPU affinity. It records exact source hashes, commands, byte-buffer measurements
+for both revisions, and new reference measurements. The legacy Heap audit remains
+separate and unchanged. These native Linux x64 microbenchmarks report requested
+bytes and instrumented new calls, not RSS, allocator overhead, worst-case latency,
+catchable overcommit or cross-platform execution. Artifacts are
+build/phase23-2d-buffer-final/{identity.json,stage2c-bytes.log,stage2d-bytes.log,
+stage2d-references.log}; invocation: python3 tools/bench/buffer_preparation.py
+--baseline cb601b4 --output build/phase23-2d-buffer-final --cpu 0. Three samples per
+size/case, before the full build/test workload. Final runtime, header and test-fixture
+source hashes all match. The final audits ran sequentially after earlier validation, before the final build/test workload.
+
+| Byte buffer / revision | Allocate+zero MiB/s median | Populate MiB/s median | Finish us median | Live GC us median |
+| --- | --- | --- | --- | --- |
+| 1 MiB Stage 2C | 2,601.21 | 20,161.3 | 0.22 | 0.26 |
+| 1 MiB Stage 2D | 2,539.82 | 22,482.0 | 0.27 | 0.31 |
+| 32 MiB Stage 2C | 7,663.28 | 6,850.80 | 0.88 | 1.27 |
+| 32 MiB Stage 2D | 6,934.57 | 6,934.36 | 1.55 | 1.70 |
+
+Both revisions request four construction allocations. Fixed per-buffer requested
+metadata grows from payload+152 to payload+176 bytes, retaining the catalog owner
+and immutable private requested-live boundary. There is no per-element metadata.
+The reference-free mark shortcut remains independent of payload size. Counts exclude
+prior catalog admission/shared snapshot retention: live buffers can extend the
+lifetime of an admitted snapshot's data maps. Raw timings
+vary: 32 MiB Stage 2D live collection spans 1.64-2.06 us; warm/cold 1 MiB zeroing
+varies by over an order of magnitude. No significance/causality claim is made from
+three samples. Dead collection median for 32 MiB is 571.157 us Stage 2C versus
+305.329 us Stage 2D; this allocator/OS-sensitive result is not a deallocation bound.
+
+One versus one million native nullable pointer elements both request four buffer
+construction allocations and payload+176 bytes. A live collection uses three work
+allocations/40 requested bytes for all-null data, or five/160 for references to one
+shared ordinary object, independent of occurrence count. This witnesses cursor and
+unique-queue compactness; genuinely distinct objects still require proportional
+marking work. At one million events the three-sample median is 49.159 ms for nulls
+and 71.569 ms for duplicate nonnull references. Explicit typed population of those
+million references takes median 293.173 ms; zero-element completion skips writes,
+with median build/zero time 1.375 ms. Marking stays stop-the-world and O(reference
+positions). It cannot safely become incremental merely by dropping the mutex;
+barriers/concurrent marking would require a separate architecture decision.
+
+The unchanged legacy audit command uses --parent cb601b4 --stage2b cb601b4
+--label stage2d --objects 100000 --samples 9 --cpu 0, output
+build/phase23-2d-legacy-final/results.json. Parent/control are both locked Stage 2C.
+Final audits ran sequentially, with all timing samples after their corresponding
+benchmark compilation and before the final validation workload. Runtime/header
+hashes match final sources.
+For 0/1/4/16 reference words, new calls remain 200014/300014/300014/300014 per 100,000
+objects; requested and retained metadata, peak requested live bytes and three-pass
+GC work allocation counts/bytes are identical across both baseline controls/current.
+Allocation medians ns/object are 166.60/156.92/150.33/372.07 baseline versus
+159.99/150.50/145.74/367.45 current; live GC 38.51/68.78/86.56/131.93 versus
+38.53/66.77/80.82/129.38. Raw ranges/control samples are retained. This establishes
+no legacy metadata/allocation amplification; it does not prove zero timing cost or
+attribute observed speed differences to a specific code change.
+
+Stage 2E read leases/deep copying, source arrays, LLVM lowering, generated ABI,
+owned fixed values, growable arrays and public certification remain disabled.
+
+Stage 2D is complete locally for owner/wrench review. No native Windows/macOS
+execution, source feature activation or hosted acceptance is claimed. No Git,
+branch, push, remote modification or workflow dispatch was performed. The only CI
+file changes are the separately authorized action versions, documented independently.
+Stop before Stage 2E.

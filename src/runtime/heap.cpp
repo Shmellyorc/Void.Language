@@ -4,6 +4,7 @@
 #include <cstring>
 #include <new>
 #include <utility>
+#include <unordered_set>
 #include <stdexcept>
 namespace vd {
 Heap::~Heap() { for (auto& [p, o] : objects_) { (void)o; destroy(p,o); } }
@@ -21,6 +22,64 @@ void* Heap::allocate_validated(const TypeLayout& layout,LegacyReferenceMap shape
     try { objects_.emplace(p, Object{std::move(shape),layout.descriptor,layout.kind}); }
     catch (...) { ::operator delete(p); throw; }
     return p;
+}
+std::size_t BufferLayout::element_offset(std::uint64_t index) const {
+    if(index>=capacity_) throw std::out_of_range("buffer element outside capacity");
+    if(index && stride_>(std::numeric_limits<std::size_t>::max()-base_)/index) throw std::length_error("buffer offset overflow");
+    return base_+stride_*static_cast<std::size_t>(index);
+}
+BufferReferenceCursor::BufferReferenceCursor(BufferLayoutRef layout)
+    :layout_(std::move(layout)),shape_(layout_ ? layout_->schema() : ElementSchemaRef{}),cursor_(shape_) {}
+std::optional<BufferReferenceEvent> BufferReferenceCursor::next() {
+    if(!shape_.has_references())return {};
+    while(element_<layout_->capacity()) {
+        if(auto event=cursor_.next()) {
+            const auto base=layout_->element_offset(element_);
+            // Admitted child geometry plus factory-checked capacity guarantees
+            // containment. Check again before forming any payload address.
+            auto offset=[&](std::size_t child) {
+                if(base>layout_->bytes() || child>layout_->bytes()-base || sizeof(void*)>layout_->bytes()-base-child)
+                    throw std::logic_error("buffer reference outside allocation");
+                return base+child;
+            };
+            event->offset=offset(event->offset);
+            if(event->witness_offset)event->witness_offset=offset(*event->witness_offset);
+            return BufferReferenceEvent{element_,*event};
+        }
+        ++element_;if(element_<layout_->capacity())cursor_.reset(shape_);
+    }
+    return {};
+}
+void Heap::validate_reference(const ReferenceEvent& event,void* object,const void* witness,
+                              const RuntimeMetadata& catalog,bool private_nulls) const {
+    if(!object) {
+        if(witness || (!private_nulls && !event.nullable))throw std::invalid_argument("incomplete required buffer reference");
+        return;
+    }
+    auto found=objects_.find(object);
+    if(found==objects_.end() || (found->second.kind==TypeLayout::Kind::buffer && !static_cast<const BufferState*>(found->second.metadata.get())->complete))
+        throw std::invalid_argument("untracked or private buffer reference target");
+    if(event.kind==ReferenceEvent::Kind::string) {
+        if(witness || found->second.kind!=TypeLayout::Kind::string)throw std::invalid_argument("buffer string kind mismatch");
+        (void)string_bytes(object);return;
+    }
+    if(found->second.kind!=TypeLayout::Kind::ordinary || !found->second.metadata)throw std::invalid_argument("buffer nominal kind mismatch");
+    const auto* actual=static_cast<const NominalDescriptor*>(found->second.metadata.get());
+    auto current=catalog.types.find(actual->identity);
+    if(current==catalog.types.end() || current->second.get()!=actual)throw std::invalid_argument("foreign buffer nominal descriptor");
+    auto target=event.target;
+    if(event.kind==ReferenceEvent::Kind::interface) {
+        const InterfaceWitness* admitted=nullptr;
+        for(const auto& [key,w]:catalog.witnesses) { (void)key;if(w.get()==witness) {admitted=w.get();break;} }
+        if(!admitted || admitted->interface_identity!=event.target)throw std::invalid_argument("invalid buffer interface witness");
+        target=admitted->view_identity;
+    } else if(event.kind!=ReferenceEvent::Kind::managed || witness)throw std::invalid_argument("incorrect buffer reference kind");
+    for(unsigned depth=0;current!=catalog.types.end() && depth<128;++depth) {
+        if(current->first==target)return;
+        if(current->second->base.empty())break;
+        current=catalog.types.find(current->second->base);
+    }
+    throw std::invalid_argument("buffer reference target mismatch");
 }
 void Heap::release(void* data,std::size_t alignment) noexcept {
     if(!data) return;
@@ -42,7 +101,7 @@ Heap::PendingBuffer& Heap::PendingBuffer::operator=(PendingBuffer&& p) noexcept 
     if(this!=&p) {if(data_)Heap::release(data_,layout_->alignment());data_=std::exchange(p.data_,nullptr);layout_=std::move(p.layout_);}return *this;
 }
 void* Heap::adopt_buffer(PendingBuffer& pending,std::shared_ptr<const BufferState> state) {
-    if(!pending.data_ || !state || state->layout!=pending.layout_ || state->layout->schema()->has_references() || !state->owner || state->complete || private_buffers_==std::numeric_limits<std::size_t>::max())
+    if(!pending.data_ || !state || state->layout!=pending.layout_ || state->requested_live>state->layout->capacity() || !state->catalog || !state->owner || state->complete || private_buffers_==std::numeric_limits<std::size_t>::max())
         throw std::invalid_argument("invalid private buffer adoption");
     auto map=LegacyReferenceMap::validate(state->layout->bytes(),{});
     auto* data=pending.data_;
@@ -64,7 +123,7 @@ void Heap::seal_buffer(void* object,const void* owner,std::uint64_t prefix) noex
     auto found=objects_.find(object);
     if(found==objects_.end() || found->second.kind!=TypeLayout::Kind::buffer)std::terminate();
     const auto& b=*static_cast<const BufferState*>(found->second.metadata.get());
-    if(b.complete || b.owner!=owner || prefix>b.layout->capacity() || !private_buffers_) std::terminate();
+    if(b.complete || b.owner!=owner || prefix!=b.requested_live || prefix>b.layout->capacity() || !private_buffers_) std::terminate();
     b.valid_prefix=prefix;b.owner=nullptr;b.complete=true;--private_buffers_;
 }
 void Heap::destroy(void* object,const Object& record) noexcept {
@@ -112,6 +171,7 @@ void Heap::store(void* object, std::size_t offset, void* value) {
 void Heap::collect() { collect({}); }
 void Heap::collect(std::span<void* const> additional_roots) {
     std::vector<void*> pending;
+    std::optional<std::unordered_set<void*>> buffer_queued; // do not construct even an empty set on legacy paths
     for (auto* root : additional_roots) if (root) pending.push_back(root);
     for (auto* root : roots_) if (*root) pending.push_back(*root);
     // Validate the entire graph before sweeping. A bad slot cannot silently
@@ -123,7 +183,24 @@ void Heap::collect(std::span<void* const> additional_roots) {
             if (found == objects_.end()) throw std::logic_error("untracked managed reference");
             if (found->second.marked) continue;
             found->second.marked = true;
-            if(found->second.kind==TypeLayout::Kind::buffer) continue; // Stage 2C: admitted reference-free layouts only.
+            if(found->second.kind==TypeLayout::Kind::buffer) {
+                const auto& state=*static_cast<const BufferState*>(found->second.metadata.get());
+                if(!state.layout->schema()->has_references())continue;
+                BufferReferenceCursor references(state.layout);
+                while(auto e=references.next()) {
+                    void* child=nullptr;const void* witness=nullptr;
+                    std::memcpy(&child,static_cast<char*>(p)+e->reference.offset,sizeof(child));
+                    if(e->reference.witness_offset)std::memcpy(&witness,static_cast<char*>(p)+*e->reference.witness_offset,sizeof(witness));
+                    if(e->element>=(state.complete ? state.valid_prefix : state.requested_live) && (child || witness))
+                        throw std::logic_error("nonzero reference in spare capacity");
+                    validate_reference(e->reference,child,witness,*state.catalog,!state.complete || e->element>=state.valid_prefix);
+                    if(child && !objects_.find(child)->second.marked) {
+                        if(!buffer_queued)buffer_queued.emplace();
+                        if(buffer_queued->insert(child).second)pending.push_back(child);
+                    }
+                }
+                continue;
+            }
             // Map ownership stays in this stable Heap node until marking ends.
             // No map mutation/sweep or callback occurs during this borrowed scan.
             ReferenceCursor cursor(found->second.references);

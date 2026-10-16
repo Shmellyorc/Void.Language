@@ -26,6 +26,12 @@ thread_local vd::Runtime* allocating_runtime=nullptr;
 thread_local std::latch* zeroing_entered=nullptr;
 thread_local std::latch* zeroing_resume=nullptr;
 std::atomic<bool> allocation_was_native{false};
+// Linux test-only Heap collection-entry witness, after Runtime's rendezvous and
+// root enumeration under its mutex. Both candidate values are already rooted.
+#ifdef VD_BUFFER_WRAP_COLLECT
+thread_local void** redirect_slot=nullptr;
+thread_local void* redirect_value=nullptr;
+#endif
 void* allocate(std::size_t size,std::size_t alignment) {
     if(fail_after==0)throw std::bad_alloc();if(fail_after>0)--fail_after;
     auto prefix=alignment ? (sizeof(Header)+alignment-1)&~(alignment-1) : sizeof(Header);
@@ -97,6 +103,17 @@ extern "C" void* __wrap_memset(void* data,int value,std::size_t bytes) {return z
 #ifdef VD_BUFFER_WRAP_ASAN_MEMSET
 extern "C" void* __wrap___asan_memset(void* data,int value,std::size_t bytes) {return zeroing_witness<true>(data,value,bytes);}
 #endif
+#endif
+
+#ifdef VD_BUFFER_WRAP_COLLECT
+// Verified Linux x64 native C++ ABI symbol for Heap::collect(span<void* const>).
+// The first explicit argument is the method's existing this parameter. This is
+// only a test link wrapper; Runtime and the production library stay unmodified.
+extern "C" void __real__ZN2vd4Heap7collectESt4spanIKPvLm18446744073709551615EE(vd::Heap*,std::span<void* const>);
+extern "C" void __wrap__ZN2vd4Heap7collectESt4spanIKPvLm18446744073709551615EE(vd::Heap* heap,std::span<void* const> roots) {
+    if(redirect_slot) {*redirect_slot=redirect_value;redirect_slot=nullptr;}
+    __real__ZN2vd4Heap7collectESt4spanIKPvLm18446744073709551615EE(heap,roots);
+}
 #endif
 
 namespace {
@@ -216,7 +233,10 @@ void empty_aligned_and_negatives() {
     reject([&]{Runtime::BufferBuilder b(r,one,2,quota);});reject([&]{Runtime::BufferBuilder b(r,one,1,{0,1,1});});
     reject([&]{Runtime::BufferBuilder b(r,one,1,{1,0,1});});reject([&]{Runtime::BufferBuilder b(r,one,1,{1,1,0});});
     reject([&]{Runtime::BufferBuilder b(r,r.buffer_layout(i64,1),1,{1,1,1});});
-    for(auto schema:{refs,empty_refs})reject([&]{Runtime::BufferBuilder b(r,r.buffer_layout(schema,1),1,quota);});
+    {Runtime::BufferBuilder b(r,r.buffer_layout(refs,1),1,quota);reject([&]{b.finish_into(&out.value);});}
+    // Stage 2D now supports the empty repeated shape, without inventing a null
+    // required value: its logical repetition contains no reference occurrence.
+    {Output empty_result(r);Runtime::BufferBuilder b(r,r.buffer_layout(empty_refs,1),1,quota);b.finish_into(&empty_result.value);}
     {Runtime::BufferBuilder b(r,one,1,quota);reject([&]{b.finish_into(&out.value);});reject([&]{b.write_scalar(1);});}
     {Runtime::BufferBuilder b(r,one,1,quota);reject([&]{b.write_scalar(256);});reject([&]{b.finish_into(&out.value);});}
     {Runtime::BufferBuilder b(r,r.buffer_layout(boolean,1),1,quota);reject([&]{b.write_scalar(2);});}
@@ -337,8 +357,221 @@ void native_and_chunk_collections() {
         out.value=nullptr;r.collect();}
     std::cout<<"NativeSafe reservation/zeroing, private adoption and deterministic chunk collection passed\n";
 }
+void allocate_nominal(Runtime& r,Output& out,std::string_view name) {
+    auto descriptor=r.descriptor(name);auto layout=descriptor->layout;layout.descriptor=descriptor;r.allocate_into(&out.value,layout);
+}
+void reference_buffers() {
+    Runtime r;const auto w=sizeof(void*),a=alignof(void*);
+    std::array<NominalDescriptor,3> types{{{"Base","","base",{w,{0}}},{"Derived","Base","derived",{2*w,{0}}},{"Other","","other",{w,{}}}}};
+    std::array<InterfaceWitness,3> witnesses{{{"interface:1:I4:Base","I","Base","read"},{"interface:1:I7:Derived","I","Derived","read"},{"interface:1:J5:Other","J","Other","read"}}};
+    r.admit_metadata(types,witnesses);
+    auto managed=admit(r,spec("required",{SchemaManaged{"Base",false}}));
+    auto nullable=admit(r,spec("nullable",{SchemaManaged{"Base",true}}));
+    auto string=admit(r,spec("string",{SchemaString{}}));
+    auto interface=admit(r,spec("interface",{SchemaInterface{"I",false,2*w,0,3*w,a}}));
+    auto optional_interface=admit(r,spec("optional-interface",{SchemaInterface{"I",true,2*w,0,3*w,a}}));
+    auto nested=admit(r,spec("nested-refs",{SchemaScalar{ScalarEncoding::u8},SchemaManaged{"Base",false},SchemaString{},SchemaInterface{"I",false,2*w,0,3*w,a},
+        SchemaRecord{8*w,a,{{40,3*w,3},{20,w,1},{10,0,0},{30,2*w,2}}},SchemaRepeat{w,9*w,3,4,28*w,a}}));
+    auto large=admit(r,spec("million-refs",{SchemaManaged{"Base",true},SchemaRepeat{0,w,1000000,0,1000000*w,a}}));
+    auto single_repeat=admit(r,spec("single-repeat-ref",{SchemaManaged{"Base",true},SchemaRepeat{0,w,1,0,w,a}}));
+    auto layout=r.buffer_layout(nested,5,2*w,30*w);
+    // Independently enumerate physical offsets, including the full unused capacity.
+    reject([&]{BufferReferenceCursor invalid({});});
+    BufferReferenceCursor cursor(layout);std::size_t events=0;
+    for(std::size_t outer=0;outer<5;++outer)for(std::size_t inner=0;inner<3;++inner)for(std::size_t leaf=0;leaf<3;++leaf) {
+        auto e=cursor.next();check(e && e->element==outer,"capacity cursor lost element");
+        const auto base=2*w+outer*30*w+w+inner*9*w;
+        const auto expected=base+(leaf==0 ? w : leaf==1 ? 2*w : 5*w);
+        check(e->reference.offset==expected,"independent repeated reference offset mismatch");
+        check(e->reference.kind==(leaf==0 ? ReferenceEvent::Kind::managed : leaf==1 ? ReferenceEvent::Kind::string : ReferenceEvent::Kind::interface),"reference event kind mismatch");
+        if(leaf==2)check(e->reference.witness_offset==base+3*w,"independent witness offset mismatch");
+        auto local=ReferenceShape(nested).at(expected-(2*w+outer*30*w));
+        check(local && local->kind==e->reference.kind,"construction/lookup/capacity stream disagreement");++events;
+    }
+    check(events==45 && !cursor.next(),"capacity cursor did not terminate");
+    Heap foreign;Root foreign_root(foreign,foreign.allocate({w,{}}));
+    Runtime::Attachment attached(r);Runtime::Managed active(r);Output object(r),text(r),child(r),other(r),out(r),source(r);
+    allocate_nominal(r,object,"Derived");allocate_nominal(r,child,"Other");allocate_nominal(r,other,"Other");r.store(object.value,0,child.value);r.string_into(&text.value,"GC string 🎮");
+    const auto object_token=r.root_word(&object.value),text_token=r.root_word(&text.value),source_token=r.root_word(&source.value);
+    const auto* witness=r.witness("interface:1:I7:Derived");const auto* base_witness=r.witness("interface:1:I4:Base");
+    capture_size=layout->bytes();
+    {Runtime::BufferBuilder b(r,layout,2,quota);
+        for(std::size_t outer=0;outer<2;++outer)for(std::size_t inner=0;inner<3;++inner) {
+            b.write_scalar(outer*3+inner+1);b.write_reference(object_token);
+            check(r.collect()==Runtime::Collection::completed,"partial required-reference element unsafe to trace");
+            b.write_reference(text_token);b.write_interface({object_token,inner%2 ? base_witness : witness});
+        }
+        b.finish_into(&out.value);}
+    capture_size=0;auto* raw=static_cast<const char*>(out.value);
+    for(std::size_t outer=0;outer<2;++outer)for(std::size_t inner=0;inner<3;++inner) {
+        const auto base=2*w+outer*30*w+w+inner*9*w;void* value=nullptr;const void* observed=nullptr;
+        std::memcpy(&value,raw+base+w,w);check(value==object.value,"managed pointer byte oracle");
+        std::memcpy(&value,raw+base+2*w,w);check(value==text.value,"string pointer byte oracle");
+        std::memcpy(&value,raw+base+5*w,w);check(value==object.value,"interface object byte oracle");
+        std::memcpy(&observed,raw+base+3*w,w);check(observed==(inner%2 ? base_witness : witness),"atomic interface pair oracle");
+    }
+    for(std::size_t i=layout->element_offset(2);i<layout->bytes();++i)check(raw[i]==0,"spare reference capacity was populated");
+    object.value=text.value=child.value=nullptr;r.collect();check(r.snapshot().objects==5,"buffer references failed to retain graph/string");
+    out.value=nullptr;r.collect();check(r.snapshot().objects==1,"dead reference buffer retained graph");
+    allocate_nominal(r,object,"Derived");r.string_into(&text.value,"source");
+    auto attempt=[&](ElementSchemaRef schema,auto action) {
+        Runtime::BufferBuilder b(r,r.buffer_layout(schema,1),1,quota);action(b);reject([&]{b.finish_into(&out.value);});
+    };
+    source.value=nullptr;attempt(managed,[&](auto& b){reject([&]{b.write_reference(source_token);});});
+    attempt(managed,[&](auto& b){reject([&]{b.zero_elements(1);});});
+    attempt(managed,[&](auto& b){reject([&]{b.write_scalar(0);});});
+    attempt(managed,[&](auto& b){std::array<std::byte,sizeof(void*)> bytes{};reject([&]{b.write_bytes(bytes);});});
+    source.value=other.value;attempt(managed,[&](auto& b){reject([&]{b.write_reference(source_token);});});
+    attempt(string,[&](auto& b){reject([&]{b.write_reference(object_token);});});
+    attempt(managed,[&](auto& b){reject([&]{b.write_reference(text_token);});});
+    source.value=foreign_root.get();attempt(nullable,[&](auto& b){reject([&]{b.write_reference(source_token);});});source.value=nullptr;
+    attempt(interface,[&](auto& b){reject([&]{b.write_reference(object_token);});});
+    attempt(managed,[&](auto& b){reject([&]{b.write_interface({object_token,witness});});});
+    attempt(interface,[&](auto& b){reject([&]{b.write_interface({object_token,reinterpret_cast<const InterfaceWitness*>(std::uintptr_t{1})});});});
+    InterfaceWitness forged=*witness;attempt(interface,[&](auto& b){reject([&]{b.write_interface({object_token,&forged});});});
+    attempt(interface,[&](auto& b){reject([&]{b.write_interface({object_token,r.witness("interface:1:J5:Other")});});});
+    attempt(interface,[&](auto& b){reject([&]{b.write_interface({r.root_word(&other.value),witness});});});
+    attempt(optional_interface,[&](auto& b){reject([&]{b.write_interface({source_token,witness});});});
+    attempt(interface,[&](auto& b){reject([&]{b.write_interface({object_token,nullptr});});});
+    void* unregistered=nullptr;reject([&]{r.root_word(&unregistered);});
+    auto foreign_token=std::async(std::launch::async,[&]{Runtime::Attachment attachment(r);Runtime::Managed managed_scope(r);Output temporary(r);return r.root_word(&temporary.value);}).get();
+    attempt(nullable,[&](auto& b){reject([&]{b.write_reference(foreign_token);});});
+    auto expired=[&]{Output temporary(r);return r.root_word(&temporary.value);}();
+    attempt(nullable,[&](auto& b){reject([&]{b.write_reference(expired);});});
+    // A registered public source word is still forbidden to name private storage.
+    {auto one=r.buffer_layout(nullable,1);capture_size=one->bytes();Runtime::BufferBuilder b(r,one,1,quota);capture_size=0;
+        source.value=captured;reject([&]{b.write_reference(source_token);});source.value=nullptr;}
+    {Runtime::BufferBuilder b(r,r.buffer_layout(optional_interface,2),1,quota);b.write_interface({source_token,nullptr});b.finish_into(&out.value);}
+    {Runtime::BufferBuilder b(r,r.buffer_layout(string,2),1,quota);b.write_reference(source_token);b.finish_into(&out.value);}
+    {Runtime::BufferBuilder b(r,r.buffer_layout(nullable,2),1,quota);b.zero_elements(1);b.finish_into(&out.value);}
+    // Compare actual constructor allocation requests for equal-complexity shapes;
+    // repetition count must only change payload bytes, never metadata allocation.
+    r.collect();std::size_t fixed_calls=0,fixed_metadata=0,index=0;
+    for(auto shape:{r.buffer_layout(nullable,1),r.buffer_layout(nullable,1000000),r.buffer_layout(single_repeat,1),r.buffer_layout(large,1)}) {
+        check(!stats[2].live,"previous compactness measurement retained work");stats[2].calls=0;stats[2].bytes=0;recording=2;
+        {Runtime::BufferBuilder b(r,shape,shape->capacity(),quota);b.zero_elements(shape->capacity());b.finish_into(&out.value);}
+        recording=-1;auto calls=stats[2].calls.load(),metadata=stats[2].bytes.load()-shape->bytes();
+        if(!(index%2)) {fixed_calls=calls;fixed_metadata=metadata;}
+        else check(calls==fixed_calls && metadata==fixed_metadata,"repetition count expanded compiler/runtime metadata");
+        ++index;check(r.collect()==Runtime::Collection::completed,"million reference scan failed");
+        out.value=nullptr;r.collect();check(!stats[2].live,"compact buffer metadata was not reclaimed");
+    }
+    check(large->node_count()==2 && large->edge_count()==1,"million repetitions expanded metadata");
+    {Output late(r);Runtime::BufferBuilder b(r,r.buffer_layout(interface,1),1,quota);
+        NominalDescriptor type{"Late","Base","late",{2*w,{0}}};InterfaceWitness added{"interface:1:I4:Late","I","Late","read"};
+        {Runtime::Native native(r);r.admit_metadata({&type,1},{&added,1});}
+        allocate_nominal(r,late,"Late");b.write_interface({r.root_word(&late.value),r.witness(added.key)});b.finish_into(&out.value);
+        late.value=nullptr;check(r.collect()==Runtime::Collection::completed,"buffer lost newly admitted descriptor/witness ownership");}
+    object.value=text.value=other.value=out.value=nullptr;r.collect();check(!r.snapshot().objects,"reference tests leaked graph");
+    std::cout<<"typed managed/string/interface buffers, capacity oracle and million-reference scans passed\n";
+}
+long reference_transaction(long ordinal,bool measure) {
+    Runtime r;auto w=sizeof(void*);NominalDescriptor type{"Target","","plain",{w,{}}};r.admit_types({&type,1});
+    auto schema=admit(r,spec("two-required",{SchemaManaged{"Target",false},SchemaRepeat{0,w,2,0,2*w,alignof(void*)}}));auto layout=r.buffer_layout(schema,2);
+    Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r);allocate_nominal(r,source,"Target");r.allocate_into(&out.value,{8,{}});auto* sentinel=out.value;auto token=r.root_word(&source.value);
+    check(!stats[0].live,"prior reference sweep retained measured storage");stats[0].calls=0;stats[0].bytes=0;recording=0;fail_after=ordinal;bool failed=false,released_source=false;
+    try {
+        Runtime::BufferBuilder b(r,layout,1,quota);b.write_reference(token);b.write_reference(token);
+        source.value=nullptr;released_source=true;
+        const auto before=r.snapshot();auto collected=r.collect();
+        if(collected==Runtime::Collection::allocation_failure) {
+            check(r.snapshot().objects==before.objects && !r.snapshot().requested,"failed reference marking swept or stuck epoch");throw std::bad_alloc();
+        }
+        check(collected==Runtime::Collection::completed,"reference preparation collection failed");
+        b.finish_into(&out.value);
+    } catch(const std::bad_alloc&) {failed=true;}
+    recording=-1;fail_after=-1;auto sites=static_cast<long>(stats[0].calls.load());
+    if(!measure)check(failed && out.value==sentinel,"failed reference construction published or missed ordinal");
+    check(r.collect()==Runtime::Collection::completed,"reference mark rollback retry failed");
+    if(failed) {
+        check(r.snapshot().objects==(released_source ? 1 : 2),"abandoned reference buffer not reclaimed");
+        if(!source.value)allocate_nominal(r,source,"Target");
+        Runtime::BufferBuilder retry(r,layout,1,quota);retry.write_reference(token);retry.write_reference(token);retry.finish_into(&out.value);
+    }
+    out.value=source.value=nullptr;r.collect();check(!stats[0].live && !r.snapshot().objects,"reference failure sweep leaked storage");return sites;
+}
+void reference_failures() {
+    auto sites=reference_transaction(-1,true);check(sites>4,"reference cursor/mark work not measured");
+    for(long ordinal=0;ordinal<sites;++ordinal)reference_transaction(ordinal,false);
+    std::cout<<"reference construction/partial-mark failure sweep: "<<sites<<" sites\n";
+}
+
+void reference_poll_reacquisition(bool invalid_after_poll=false) {
+    Runtime r;const auto w=sizeof(void*);std::array<NominalDescriptor,2> types{{{"T","","plain",{w,{}}},{"Other","","other",{w,{}}}}};
+    InterfaceWitness witness{"interface:1:I1:T","I","T","read"};r.admit_metadata(types,{&witness,1});
+    auto schema=admit(r,spec("poll-pair",{SchemaManaged{"T",false},SchemaInterface{"I",false,0,w,2*w,alignof(void*)},SchemaRecord{3*w,alignof(void*),{{1,0,0},{2,w,1}}}}));
+    auto layout=r.buffer_layout(schema,2);
+    Runtime::Attachment a(r);Runtime::Managed m(r);Output first(r),second(r),source(r),out(r);
+    allocate_nominal(r,first,"T");allocate_nominal(r,second,invalid_after_poll ? "Other" : "T");source.value=out.value=first.value;auto token=r.root_word(&source.value);auto* admitted=r.witness(witness.key);
+    Runtime::BufferBuilder b(r,layout,1,quota);b.write_reference(token);const auto before=r.snapshot();
+    auto observer=std::async(std::launch::async,[&]{return r.wait_for_request(std::chrono::seconds(5));});
+    auto collector=std::async(std::launch::async,[&] {
+        Runtime::Attachment attached(r);Runtime::Managed managed(r);
+#ifdef VD_BUFFER_WRAP_COLLECT
+        redirect_slot=&source.value;redirect_value=second.value;
+#endif
+        auto result=r.collect();
+#ifdef VD_BUFFER_WRAP_COLLECT
+        check(!redirect_slot,"collector root-redirection witness not exercised");
+#endif
+        return result;
+    });
+    const bool observed=observer.get();const auto pending=r.snapshot();const bool managed=r.is_managed();
+    bool rejected=false;
+    try {b.write_interface({token,admitted});}catch(const std::invalid_argument&) {rejected=true;}
+    const auto after=r.snapshot();
+    if(invalid_after_poll)reject([&]{b.finish_into(&out.value);});else b.finish_into(&out.value);
+    Runtime::Collection result;{Runtime::Native native(r);result=collector.get();}
+    check(observed && managed && pending.requested && pending.completed_epoch==before.completed_epoch,"reference request did not overlap a Managed partial element");
+    check(result==Runtime::Collection::completed && !after.requested && after.completed_epoch==pending.epoch && after.cooperative_parks==before.cooperative_parks+1,"reference chunk did not genuinely poll/park");
+    if(invalid_after_poll) {
+        check(rejected && out.value==first.value && source.value==second.value,"post-poll target change was not rejected transactionally");
+        std::cout<<"reference post-poll wrong-type rejection preserved previous output\n";return;
+    }
+    check(!rejected,"valid post-poll source rejected");
+    void* actual=nullptr;const void* actual_witness=nullptr;std::memcpy(&actual,static_cast<char*>(out.value)+w,w);std::memcpy(&actual_witness,static_cast<char*>(out.value)+2*w,w);
+#ifdef VD_BUFFER_WRAP_COLLECT
+    check(actual==second.value && actual_witness==admitted && source.value==second.value,"reference source was cached across poll or interface pair torn");
+    std::cout<<"reference partial-element poll: one collection/park, source slot reacquired at verified Heap boundary\n";
+#else
+    check(actual==first.value && actual_witness==admitted && source.value==first.value,"reference pair changed across collection");
+    std::cout<<"reference partial-element poll: one collection/park; source-redirection instrumentation unavailable on this platform\n";
+#endif
+}
+void fatal_reference(std::string_view mode) {
+    Runtime r;const auto w=sizeof(void*);std::array<NominalDescriptor,2> types{{{"T","","plain",{w,{}}},{"Other","","other",{w,{}}}}};
+    InterfaceWitness witness{"interface:1:I1:T","I","T","read"};r.admit_metadata(types,{&witness,1});
+    const bool pair=mode=="ref-spare-witness" || mode=="ref-forged-witness";
+    auto schema=admit(r,spec("fatal-ref",pair ? std::vector<SchemaNode>{SchemaInterface{"I",true,0,w,2*w,alignof(void*)}} : mode=="ref-wrong-string" ? std::vector<SchemaNode>{SchemaString{}} : std::vector<SchemaNode>{SchemaManaged{"T",false}}));
+    auto layout=r.buffer_layout(schema,3);
+    Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),other(r),out(r);allocate_nominal(r,source,"T");allocate_nominal(r,other,"Other");
+    auto* admitted=r.witness(witness.key);
+    {Runtime::BufferBuilder b(r,layout,1,quota);
+        if(pair)b.write_interface({r.root_word(&source.value),admitted});
+        else if(mode=="ref-wrong-string") {Output empty(r);b.write_reference(r.root_word(&empty.value));}
+        else b.write_reference(r.root_word(&source.value));
+        b.finish_into(&out.value);}
+    void* value=nullptr;const void* bad_witness=reinterpret_cast<const void*>(std::uintptr_t{1});
+    if(mode=="ref-private-spare") {
+        capture_size=layout->bytes();Runtime::BufferBuilder b(r,layout,1,quota);capture_size=0;
+        check(captured,"private spare witness absent");value=source.value;std::memcpy(static_cast<char*>(captured)+layout->element_offset(2),&value,w);
+        r.collect();throw std::runtime_error("private spare reference survived");
+    }
+    if(mode=="ref-spare") {value=source.value;std::memcpy(static_cast<char*>(out.value)+layout->element_offset(2),&value,w);}
+    else if(mode=="ref-spare-witness")std::memcpy(static_cast<char*>(out.value)+layout->element_offset(2)+w,&admitted,w);
+    else if(mode=="ref-required-null")std::memcpy(out.value,&value,w);
+    else if(mode=="ref-wrong-target") {value=other.value;std::memcpy(out.value,&value,w);}
+    else if(mode=="ref-wrong-string") {value=source.value;std::memcpy(out.value,&value,w);}
+    else if(mode=="ref-forged-witness")std::memcpy(static_cast<char*>(out.value)+w,&bad_witness,w);
+    else if(mode=="ref-private-edge") {
+        auto private_layout=r.buffer_layout(schema,2);capture_size=private_layout->bytes();Runtime::BufferBuilder private_builder(r,private_layout,1,quota);capture_size=0;
+        check(captured,"private target witness missing");std::memcpy(out.value,&captured,w);r.collect();throw std::runtime_error("private reference buffer edge survived");
+    } else throw std::runtime_error("unknown fatal reference mode");
+    r.collect();throw std::runtime_error("corrupt buffer graph survived collection");
+}
 void fatal(std::string_view mode) {
     std::set_terminate([]{std::_Exit(79);});
+    if(mode.starts_with("ref-")) {fatal_reference(mode);return;}
     Runtime r;auto s=admit(r,spec("byte",{SchemaScalar{ScalarEncoding::u8}}));auto layout=r.buffer_layout(s,4096);
     Runtime::Attachment a(r);Runtime::Managed m(r);Output out(r);r.allocate_into(&out.value,{sizeof(void*),{0}});
     capture_size=4096;Runtime::BufferBuilder b(r,layout,4096,quota);capture_size=0;check(captured,"fatal fixture capture absent");
@@ -346,6 +579,34 @@ void fatal(std::string_view mode) {
     else if(mode=="private-edge") {std::memcpy(out.value,&captured,sizeof(captured));r.collect();}
     else throw std::runtime_error("unknown fatal mode");
     throw std::runtime_error("private escape resumed execution");
+}
+void measure_references() {
+    Runtime r;const auto w=sizeof(void*);NominalDescriptor nominal{"T","","plain",{w,{}}};r.admit_types({&nominal,1});
+    auto schema=admit(r,spec("reference-measure",{SchemaManaged{"T",true}}));
+    std::array<BufferLayoutRef,2> layouts{r.buffer_layout(schema,1),r.buffer_layout(schema,1000000)};
+    Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r);auto token=r.root_word(&source.value);
+    r.allocate_into(&out.value,{w,{}});out.value=nullptr;r.collect();
+    for(const auto& layout:layouts)for(bool duplicate:{false,true})for(int sample=0;sample<3;++sample) {
+        if(duplicate)allocate_nominal(r,source,"T");
+        check(!stats[2].live && !stats[3].live,"reference measurement retained work");
+        stats[2].calls=0;stats[2].bytes=0;stats[3].calls=0;stats[3].bytes=0;
+        recording=2;auto start=Clock::now();
+        {Runtime::BufferBuilder b(r,layout,layout->capacity(),quota);
+            if(duplicate)for(std::uint64_t i=0;i<layout->capacity();++i)b.write_reference(token);
+            else b.zero_elements(layout->capacity());
+            b.finish_into(&out.value);}
+        auto built=Clock::now();recording=-1;source.value=nullptr;
+        recording=3;auto gc_start=Clock::now();auto result=r.collect();auto gc_end=Clock::now();recording=-1;
+        check(result==Runtime::Collection::completed && r.snapshot().objects==(duplicate ? 2 : 1),"reference measurement reachability");
+        auto live_calls=stats[3].calls.load(),live_bytes=stats[3].bytes.load();
+        auto dead_start=Clock::now();out.value=nullptr;r.collect();auto dead_end=Clock::now();
+        check(!stats[2].live && !stats[3].live,"reference measurement leaked storage");
+        auto us=[](auto start,auto end){return std::chrono::duration<double,std::micro>(end-start).count();};
+        std::cout<<"reference_measure capacity="<<layout->capacity()<<" duplicate="<<duplicate<<" sample="<<sample<<" payload="<<layout->bytes()
+                 <<" build_calls="<<stats[2].calls<<" build_requested="<<stats[2].bytes<<" build_us="<<us(start,built)
+                 <<" live_gc_calls="<<live_calls<<" live_gc_requested="<<live_bytes<<" live_gc_us="<<us(gc_start,gc_end)
+                 <<" dead_gc_us="<<us(dead_start,dead_end)<<"\n";
+    }
 }
 void measure() {
     Runtime r;auto s=admit(r,spec("byte",{SchemaScalar{ScalarEncoding::u8}}));
@@ -375,7 +636,11 @@ void measure() {
 }
 int main(int argc,char** argv) {
     try {
-        if(argc>1) {if(std::string_view(argv[1])=="--measure")measure();else fatal(argv[1]);}
-        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();std::cout<<"private rooted byte buffer checks passed\n";}
+        if(argc>1) {if(std::string_view(argv[1])=="--measure")measure();else if(std::string_view(argv[1])=="--measure-reference")measure_references();else fatal(argv[1]);}
+        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();reference_failures();reference_poll_reacquisition();
+#ifdef VD_BUFFER_WRAP_COLLECT
+            reference_poll_reacquisition(true);
+#endif
+            std::cout<<"private rooted byte/reference buffer checks passed\n";}
     }catch(const std::exception& e){recording=-1;fail_after=-1;std::cerr<<e.what()<<'\n';return 1;}
 }

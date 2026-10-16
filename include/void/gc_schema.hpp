@@ -76,6 +76,7 @@ public:
     std::size_t edge_count() const;
     std::size_t depth() const;
     bool has_references() const;
+    bool zero_data_complete() const;
     bool equivalent(const ElementSchema&) const;
 private:
     friend class Runtime;
@@ -84,9 +85,10 @@ private:
     friend class DataCursor;
     struct Summary {
         std::size_t bytes=0, alignment=1, depth=1;
-        bool references=false, data=false;
+        bool references=false, data=false, zero_complete=true;
         std::vector<std::size_t> physical, logical;
     };
+    std::optional<ReferenceEvent> reference_event(std::size_t node,std::size_t base) const;
     explicit ElementSchema(ElementSchemaSpec);
     static std::shared_ptr<ElementSchema> prepare(const ElementSchemaSpec&);
     ElementSchemaSpec spec_;

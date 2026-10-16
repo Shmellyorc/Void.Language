@@ -74,13 +74,14 @@ ElementSchema::ElementSchema(ElementSchemaSpec spec) : spec_(std::move(spec)) {
             else if constexpr(std::is_same_v<T,SchemaManaged> || std::is_same_v<T,SchemaString>) {
                 if constexpr(std::is_same_v<T,SchemaManaged>) text(v.target);
                 s.bytes=sizeof(void*);s.alignment=alignof(void*);s.references=true;
+                if constexpr(std::is_same_v<T,SchemaManaged>) s.zero_complete=v.nullable;
             } else if constexpr(std::is_same_v<T,SchemaInterface>) {
                 text(v.target);valid_alignment(v.alignment);
                 if(v.alignment<alignof(void*) || v.object_offset%alignof(void*) || v.witness_offset%alignof(void*) ||
                    (v.object_offset<v.witness_offset ? v.witness_offset-v.object_offset : v.object_offset-v.witness_offset)<sizeof(void*) ||
                    aligned(add(std::max(v.object_offset,v.witness_offset),sizeof(void*)),v.alignment)!=v.bytes)
                     bad("invalid interface GC geometry");
-                s.bytes=v.bytes;s.alignment=v.alignment;s.references=true;
+                s.bytes=v.bytes;s.alignment=v.alignment;s.references=true;s.zero_complete=v.nullable;
             } else if constexpr(std::is_same_v<T,SchemaRecord>) {
                 valid_alignment(v.alignment);if(v.bytes%v.alignment) bad("unaligned GC record extent");
                 s.bytes=v.bytes;s.alignment=v.alignment;
@@ -88,7 +89,7 @@ ElementSchema::ElementSchema(ElementSchemaSpec spec) : spec_(std::move(spec)) {
                 for(std::size_t n=0;n<v.fields.size();++n) {
                     const auto& f=v.fields[n];const auto& c=child(f.child);
                     if(f.offset%c.alignment || v.alignment<c.alignment || f.offset>v.bytes || c.bytes>v.bytes-f.offset) bad("GC field outside aligned record");
-                    s.depth=std::max(s.depth,add(c.depth,1));s.references|=c.references;s.data|=c.data;s.physical[n]=s.logical[n]=n;
+                    s.depth=std::max(s.depth,add(c.depth,1));s.references|=c.references;s.data|=c.data;s.zero_complete&=c.zero_complete;s.physical[n]=s.logical[n]=n;
                 }
                 std::sort(s.logical.begin(),s.logical.end(),[&](auto a,auto b){return v.fields[a].id<v.fields[b].id;});
                 for(std::size_t n=1;n<s.logical.size();++n) if(v.fields[s.logical[n-1]].id==v.fields[s.logical[n]].id) bad("duplicate GC logical field");
@@ -106,7 +107,7 @@ ElementSchema::ElementSchema(ElementSchemaSpec spec) : spec_(std::move(spec)) {
                 if(v.alignment<c.alignment || v.base%c.alignment || !v.stride || v.stride<c.bytes || v.stride%c.alignment) bad("invalid GC repeat stride/alignment");
                 if(!v.extent && (v.base || v.bytes)) bad("noncanonical empty GC repeat");
                 if(aligned(add(v.base,multiply(v.stride,v.extent)),v.alignment)!=v.bytes) bad("incorrect GC repeat extent");
-                s.bytes=v.bytes;s.alignment=v.alignment;s.depth=add(c.depth,1);s.references=v.extent && c.references;s.data=v.extent && c.data;
+                s.bytes=v.bytes;s.alignment=v.alignment;s.depth=add(c.depth,1);s.references=v.extent && c.references;s.data=v.extent && c.data;s.zero_complete=!v.extent || c.zero_complete;
             } else bad("owned/growable GC value role awaits later stage");
         },node);
         summaries_.push_back(std::move(s));
@@ -134,6 +135,8 @@ std::size_t ElementSchema::bytes() const {return summaries_[spec_.root].bytes;}
 std::size_t ElementSchema::alignment() const {return summaries_[spec_.root].alignment;}
 std::size_t ElementSchema::depth() const {return summaries_[spec_.root].depth;}
 bool ElementSchema::has_references() const {return summaries_[spec_.root].references;}
+bool ElementSchema::zero_data_complete() const {return summaries_[spec_.root].zero_complete;}
+std::optional<ReferenceEvent> ElementSchema::reference_event(std::size_t node,std::size_t base) const {return event(spec_.nodes[node],base);}
 std::size_t ElementSchema::edge_count() const {
     std::size_t count=0;for(const auto& n:spec_.nodes) {if(auto* r=std::get_if<SchemaRecord>(&n)) count=add(count,r->fields.size());if(std::holds_alternative<SchemaRepeat>(n)) count=add(count,1);}return count;
 }
@@ -175,7 +178,7 @@ std::optional<ReferenceEvent> ReferenceShape::at(std::size_t offset) const {
     std::size_t id=schema_->spec_.root,base=0;
     for(;;) {
         const auto& node=schema_->spec_.nodes[id];const auto& summary=schema_->summaries_[id];
-        if(auto e=event(node,base)) return e->offset==offset ? e : std::nullopt;
+        if(auto e=schema_->reference_event(id,base)) return e->offset==offset ? e : std::nullopt;
         if(auto* r=std::get_if<SchemaRecord>(&node)) {
             auto it=std::upper_bound(summary.physical.begin(),summary.physical.end(),offset-base,[&](auto x,auto f){return x<r->fields[f].offset;});
             if(it==summary.physical.begin()) return {};
@@ -208,7 +211,7 @@ std::optional<ReferenceEvent> ReferenceShape::path(std::span<const SchemaStep> s
             base=add(base,add(r->base,multiply(r->stride,step.value)));id=r->child;
         } else return {};
     }
-    return event(schema_->spec_.nodes[id],base);
+    return schema_->reference_event(id,base);
 }
 ReferenceCursor::ReferenceCursor(ReferenceShape shape) {reset(shape);}
 void ReferenceCursor::reset(const ReferenceShape& shape) {
@@ -228,7 +231,7 @@ std::optional<ReferenceEvent> ReferenceCursor::next() {
 std::optional<ReferenceEvent> ReferenceCursor::next_schema() {
     while(!stack_.empty()) {
         auto& f=stack_.back();const auto& node=schema_->spec_.nodes[f.node];
-        if(auto result=event(node,f.base)) {stack_.pop_back();return result;}
+        if(auto result=schema_->reference_event(f.node,f.base)) {stack_.pop_back();return result;}
         if(auto* r=std::get_if<SchemaRecord>(&node)) {
             const auto& order=schema_->summaries_[f.node].physical;
             if(f.next==order.size()) {stack_.pop_back();continue;}

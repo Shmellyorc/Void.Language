@@ -26,10 +26,6 @@ BufferLayout::BufferLayout(ElementSchemaRef schema,std::uint64_t capacity,std::s
     if(capacity) bytes_=round_up(sum(base,product(stride_,capacity)),alignment);
     if(bytes_>static_cast<std::size_t>(std::numeric_limits<std::ptrdiff_t>::max())) throw std::length_error("buffer allocation/address extent not representable");
 }
-std::size_t BufferLayout::element_offset(std::uint64_t index) const {
-    if(index>=capacity_) throw std::out_of_range("buffer element outside capacity");
-    return sum(base_,product(stride_,index));
-}
 void DataCursor::prepare(ElementSchemaRef schema) {
     if(!schema) throw std::invalid_argument("missing data schema");
     atomic_=1;
@@ -40,12 +36,14 @@ void DataCursor::prepare(ElementSchemaRef schema) {
                           (!std::numeric_limits<float>::is_iec559 || !std::numeric_limits<double>::is_iec559)))
                 throw std::invalid_argument("unsupported native scalar data encoding");
             atomic_=std::max(atomic_,bytes);
-        } else if(!std::holds_alternative<SchemaBytes>(node) && !std::holds_alternative<SchemaRecord>(node) && !std::holds_alternative<SchemaRepeat>(node))
-            throw std::invalid_argument("reference-bearing construction awaits Stage 2D");
+        } else if(std::holds_alternative<SchemaManaged>(node) || std::holds_alternative<SchemaString>(node)) atomic_=std::max(atomic_,sizeof(void*));
+        else if(std::holds_alternative<SchemaInterface>(node)) atomic_=std::max(atomic_,2*sizeof(void*));
+        else if(!std::holds_alternative<SchemaBytes>(node) && !std::holds_alternative<SchemaRecord>(node) && !std::holds_alternative<SchemaRepeat>(node))
+            throw std::invalid_argument("unsupported buffer construction role");
     }
     stack_.reserve(schema->depth());schema_=std::move(schema);reset();
 }
-bool DataCursor::has_data() const {return schema_->summaries_[schema_->spec_.root].data;}
+bool DataCursor::has_data() const {const auto& s=schema_->summaries_[schema_->spec_.root];return s.data || s.references;}
 bool DataCursor::dense_u8() const {
     auto* scalar=std::get_if<SchemaScalar>(&schema_->spec_.nodes[schema_->spec_.root]);
     return scalar && scalar->encoding==ScalarEncoding::u8;
@@ -54,6 +52,9 @@ void DataCursor::reset() noexcept {stack_.clear();if(has_data()) stack_.push_bac
 std::optional<DataCursor::Event> DataCursor::next(std::size_t& work) {
     while(work && !stack_.empty()) {
         --work;auto& frame=stack_.back();const auto& node=schema_->spec_.nodes[frame.node];
+        if(auto ref=schema_->reference_event(frame.node,frame.base)) {
+            Event e{frame.base,schema_->summaries_[frame.node].bytes,false};e.reference=*ref;stack_.pop_back();return e;
+        }
         if(auto* scalar=std::get_if<SchemaScalar>(&node)) {
             Event e{frame.base,schema_->summaries_[frame.node].bytes,true,scalar->encoding};stack_.pop_back();return e;
         }
@@ -63,7 +64,7 @@ std::optional<DataCursor::Event> DataCursor::next(std::size_t& work) {
             if(frame.next==order.size()) {stack_.pop_back();continue;}
             const auto& field=record->fields[order[static_cast<std::size_t>(frame.next++)]];
             auto base=sum(frame.base,field.offset);
-            if(schema_->summaries_[field.child].data) stack_.push_back({field.child,base,0});
+            if(schema_->summaries_[field.child].data || schema_->summaries_[field.child].references) stack_.push_back({field.child,base,0});
         } else {
             const auto& repeat=std::get<SchemaRepeat>(node);
             if(frame.next==repeat.extent) {stack_.pop_back();continue;}
@@ -105,7 +106,8 @@ void Runtime::require_buffer_output(void** output) const {
 }
 Runtime::BufferBuilder::BufferBuilder(Runtime& r,BufferLayoutRef layout,std::uint64_t live,BufferWorkQuota quota)
     :runtime_(r),layout_(std::move(layout)),quota_(quota),root_(r),owner_(std::this_thread::get_id()),requested_(live) {
-    {std::lock_guard lock(r.mutex_);r.validate_buffer_layout(layout_);}
+    std::shared_ptr<const RuntimeMetadata> catalog;
+    {std::lock_guard lock(r.mutex_);r.validate_buffer_layout(layout_);catalog=r.types_;}
     if(live>layout_->capacity() || !quota.bytes || !quota.node_events || !quota.reference_events) throw std::invalid_argument("invalid buffer live extent/work quota");
     bool due;{std::lock_guard lock(r.mutex_);due=layout_->capacity() && r.allocation_budget_ && r.allocations_>=r.allocation_budget_;}
     if(due && r.collect()!=Collection::completed) throw std::bad_alloc();
@@ -113,7 +115,7 @@ Runtime::BufferBuilder::BufferBuilder(Runtime& r,BufferLayoutRef layout,std::uin
     {
         Native native(r);cursor_.prepare(layout_->schema());
         if(quota.bytes<cursor_.atomic_bytes()) throw std::invalid_argument("byte quota cannot hold atomic scalar");
-        if(layout_->capacity()) {state=std::make_shared<const Heap::BufferState>(Heap::BufferState{layout_,&root_});pending=Heap::PendingBuffer(layout_);}
+        if(layout_->capacity()) {state=std::make_shared<const Heap::BufferState>(Heap::BufferState{layout_,&root_,0,false,std::move(catalog),live});pending=Heap::PendingBuffer(layout_);}
     }
     if(layout_->capacity()) {
         std::lock_guard lock(r.mutex_);
@@ -153,7 +155,7 @@ void Runtime::BufferBuilder::normalize() {
 void Runtime::BufferBuilder::write_scalar(std::uint64_t bits) {
     try {
         require_active();normalize();
-        if(!event_ || (!event_->scalar && !event_->u8_run) || (event_->scalar && consumed_)) throw std::invalid_argument("expected an ordered scalar event");
+        if(!event_ || event_->reference || (!event_->scalar && !event_->u8_run) || (event_->scalar && consumed_)) throw std::invalid_argument("expected an ordered scalar event");
         auto width=event_->u8_run ? 1 : event_->bytes;
         if((width<8 && (bits>>(width*8))) || (event_->encoding==ScalarEncoding::boolean && bits>1)) throw std::invalid_argument("scalar bits exceed encoding");
         runtime_.poll();
@@ -185,7 +187,7 @@ void Runtime::BufferBuilder::write_bytes(std::span<const std::byte> input) {
         }
         while(!input.empty()) {
             normalize();
-            if(!event_ || (event_->scalar && event_->encoding!=ScalarEncoding::u8))throw std::invalid_argument("expected byte/u8 construction event");
+            if(!event_ || event_->reference || (event_->scalar && event_->encoding!=ScalarEncoding::u8))throw std::invalid_argument("expected byte/u8 construction event");
             auto count=std::min({input.size(),quota_.bytes,event_->bytes-consumed_});runtime_.poll();
             {std::lock_guard lock(runtime_.mutex_);auto* out=address(sum(event_->offset,consumed_),count);
                 std::memcpy(out,input.data(),count);in_element_=true;consumed_+=count;
@@ -194,9 +196,66 @@ void Runtime::BufferBuilder::write_bytes(std::span<const std::byte> input) {
         }
     } catch(...) {failed_=true;throw;}
 }
+Runtime::RegisteredRootWord Runtime::root_word(void** slot) const {
+    require_managed();std::lock_guard lock(mutex_);require_buffer_output(slot);
+    for(auto* f=thread().frames;f;f=f->previous_) for(std::size_t i=0;i<f->count_;++i)
+        for(std::size_t j=0;j<f->slots_[i].count;++j)
+            if(static_cast<const char*>(f->slots_[i].storage)+f->slots_[i].offsets[j]==reinterpret_cast<const char*>(slot))
+                return RegisteredRootWord(this,f,slot);
+    throw std::invalid_argument("unregistered reference source");
+}
+void* Runtime::reference_source(const RegisteredRootWord& token) const {
+    require_managed();
+    if(token.runtime_!=this || token.owner_!=std::this_thread::get_id()) throw std::invalid_argument("foreign reference root token");
+    bool linked=false;for(auto* f=thread().frames;f;f=f->previous_) if(f==token.frame_) {linked=true;break;}
+    if(!linked) throw std::invalid_argument("expired reference root token");
+    require_buffer_output(token.slot_);
+    bool exact=false;
+    for(std::size_t i=0;i<token.frame_->count_;++i)for(std::size_t j=0;j<token.frame_->slots_[i].count;++j)
+        if(static_cast<const char*>(token.frame_->slots_[i].storage)+token.frame_->slots_[i].offsets[j]==reinterpret_cast<const char*>(token.slot_))exact=true;
+    if(!exact)throw std::invalid_argument("reference source registration changed");
+    void* value=nullptr;std::memcpy(&value,token.slot_,sizeof(value));
+    if(value && !heap_.contains(value)) throw std::invalid_argument("untracked or private reference source");
+    return value;
+}
+void Runtime::BufferBuilder::write_reference(RegisteredRootWord source) {write_root(source,nullptr,false);}
+void Runtime::BufferBuilder::write_interface(const RootedInterfaceSource& source) {write_root(source.object,source.witness,true);}
+void Runtime::BufferBuilder::write_root(const RegisteredRootWord& source,const InterfaceWitness* witness,bool interface) {
+    try {
+        require_active();
+        {std::lock_guard lock(runtime_.mutex_);(void)runtime_.reference_source(source);
+            if(witness) {
+                bool admitted=false;
+                for(const auto& [key,w]:runtime_.types_->witnesses) { (void)key;if(w.get()==witness) {admitted=true;break;} }
+                if(!admitted)throw std::invalid_argument("unadmitted interface source witness");
+            }}
+        normalize();
+        if(!event_ || !event_->reference || consumed_ || (event_->reference->kind==ReferenceEvent::Kind::interface)!=interface)
+            throw std::invalid_argument("incorrect ordered reference event");
+        {std::lock_guard lock(runtime_.mutex_);
+            runtime_.heap_.validate_reference(*event_->reference,runtime_.reference_source(source),witness,*runtime_.types_,false);}
+        runtime_.poll();
+        std::shared_ptr<const RuntimeMetadata> previous_catalog;
+        {std::lock_guard lock(runtime_.mutex_);
+            void* value=runtime_.reference_source(source);
+            runtime_.heap_.validate_reference(*event_->reference,value,witness,*runtime_.types_,false);
+            auto* object_word=address(event_->reference->offset,sizeof(value));
+            char* witness_word=nullptr;
+            if(interface) witness_word=address(*event_->reference->witness_offset,sizeof(witness));
+            const auto& state=runtime_.heap_.buffer_state(root_.value_);
+            // Catalog ownership and both words commit without allocation or poll.
+            if(state.catalog!=runtime_.types_) {
+                previous_catalog=std::move(state.catalog);state.catalog=runtime_.types_;
+            }
+            std::memcpy(object_word,&value,sizeof(value));
+            if(interface)std::memcpy(witness_word,&witness,sizeof(witness));
+            in_element_=true;event_.reset();}
+        normalize();
+    } catch(...) {failed_=true;throw;}
+}
 void Runtime::BufferBuilder::zero_elements(std::uint64_t count) {
     try {
-        require_active();if(in_element_ || count>requested_-prefix_)throw std::invalid_argument("zero data must append whole elements");
+        require_active();if(in_element_ || count>requested_-prefix_ || (count && !layout_->schema()->zero_data_complete()))throw std::invalid_argument("zero data must append whole elements");
         runtime_.poll();{std::lock_guard lock(runtime_.mutex_);validate_private();prefix_+=count;}
         event_.reset();consumed_=0;cursor_.reset();
     } catch(...) {failed_=true;throw;}

@@ -12,10 +12,6 @@
 
 namespace vd {
 class CallbackRegistration;
-// Immutable binding data: no executable addresses, generation leases or permissions.
-struct InterfaceWitness {
-    std::string key, interface_identity, view_identity, contract;
-};
 // These are runtime embedding interfaces, not source-language thread features.
 class Runtime {
 public:
@@ -29,6 +25,8 @@ public:
     class Frame;
     class Handle;
     class BufferBuilder;
+    class RegisteredRootWord;
+    struct RootedInterfaceSource;
     explicit Runtime(std::size_t allocation_budget = 0) : allocation_budget_(allocation_budget) {}
     ~Runtime();
     Runtime(const Runtime&) = delete;
@@ -52,6 +50,7 @@ public:
     void admit_buffer_schemas(std::span<const ElementSchemaSpec>);
     ElementSchemaRef buffer_schema(std::string_view) const;
     ReferenceShape reference_shape(ElementSchemaRef) const;
+    RegisteredRootWord root_word(void** registered_slot) const;
     BufferLayoutRef buffer_layout(ElementSchemaRef,std::uint64_t capacity,std::size_t base=0,std::size_t stride=0) const;
     std::byte buffer_byte(void*,const BufferLayoutRef&,std::uint64_t element,std::size_t offset) const;
     const InterfaceWitness* witness(std::string_view) const;
@@ -84,17 +83,14 @@ private:
     void validate_descriptor(const TypeLayout&) const; // Caller holds mutex_.
     void validate_buffer_layout(const BufferLayoutRef&) const; // mutex_ held
     void require_buffer_output(void**) const;
+    void* reference_source(const RegisteredRootWord&) const; // mutex_ held
     void park(Thread&, std::unique_lock<std::mutex>&);
     void enter(Thread&);
     mutable std::mutex mutex_;
     std::condition_variable changed_;
     Heap heap_;
     using NominalCatalog=std::map<std::string,std::shared_ptr<const NominalDescriptor>,std::less<>>;
-    struct TypeCatalog {
-        NominalCatalog types;
-        std::map<std::string,ElementSchemaRef,std::less<>> schemas;
-        std::map<std::string,std::shared_ptr<const InterfaceWitness>,std::less<>> witnesses;
-    };
+    using TypeCatalog=RuntimeMetadata;
     std::shared_ptr<const TypeCatalog> types_ = {};
     std::vector<Thread*> threads_;
     std::vector<Handle*> handles_;
@@ -182,6 +178,21 @@ private:
     Frame frame_;
     PrivateRoot* previous_;
 };
+// A short-lived registration proof, not a cached referent. The originating Frame
+// must stay linked for each operation. Tokens cannot be created from raw pointers.
+class Runtime::RegisteredRootWord {
+private:
+    friend class Runtime;
+    RegisteredRootWord(const Runtime* r,Frame* f,void** p) : runtime_(r),frame_(f),slot_(p),owner_(std::this_thread::get_id()) {}
+    const Runtime* runtime_;
+    Frame* frame_;
+    void** slot_;
+    std::thread::id owner_;
+};
+struct Runtime::RootedInterfaceSource {
+    RegisteredRootWord object;
+    const InterfaceWitness* witness;
+};
 class Runtime::BufferBuilder {
 public:
     BufferBuilder(Runtime&,BufferLayoutRef,std::uint64_t requested_live,BufferWorkQuota);
@@ -192,11 +203,14 @@ public:
     BufferBuilder& operator=(BufferBuilder&&)=delete;
     void write_scalar(std::uint64_t bits);
     void write_bytes(std::span<const std::byte> native_input);
+    void write_reference(RegisteredRootWord source);
+    void write_interface(const RootedInterfaceSource& source);
     void zero_elements(std::uint64_t count);
     void finish_into(void** registered_output);
 private:
     void require_active();
     void normalize();
+    void write_root(const RegisteredRootWord&,const InterfaceWitness*,bool interface);
     void validate_private() const; // mutex_ held
     char* address(std::size_t offset,std::size_t bytes) const; // mutex_ held
     Runtime& runtime_;

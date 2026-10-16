@@ -29,10 +29,10 @@ private:
 struct BufferWorkQuota {std::size_t bytes,reference_events,node_events;};
 // Physical construction events, over the SAME admitted nodes/physical field index.
 // Runtime-internal: prepare precedes all traversal/reset calls.
-// This cursor rejects all reference roles, even inside an empty repetition.
+// Typed reference events come from the same admitted event interpretation as GC.
 class DataCursor {
 public:
-    struct Event {std::size_t offset,bytes; bool scalar; ScalarEncoding encoding=ScalarEncoding::u8; bool u8_run=false;};
+    struct Event {std::size_t offset,bytes; bool scalar; ScalarEncoding encoding=ScalarEncoding::u8; bool u8_run=false; std::optional<ReferenceEvent> reference={};};
     void prepare(ElementSchemaRef); // NativeSafe: validates subset, reserves depth.
     void reset() noexcept;
     std::optional<Event> next(std::size_t& node_work);
@@ -45,5 +45,17 @@ private:
     ElementSchemaRef schema_;
     std::vector<Frame> stack_;
     std::size_t atomic_=1;
+};
+// Capacity is immutable. Cursor memory depends on schema depth, never capacity.
+struct BufferReferenceEvent {std::uint64_t element; ReferenceEvent reference;};
+class BufferReferenceCursor {
+public:
+    explicit BufferReferenceCursor(BufferLayoutRef);
+    std::optional<BufferReferenceEvent> next();
+private:
+    BufferLayoutRef layout_;
+    ReferenceShape shape_;
+    ReferenceCursor cursor_;
+    std::uint64_t element_=0;
 };
 }
