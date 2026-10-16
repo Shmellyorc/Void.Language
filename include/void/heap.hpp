@@ -1,5 +1,6 @@
 #pragma once
 #include "void/gc_schema.hpp"
+#include "void/buffer.hpp"
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -16,7 +17,7 @@ struct TypeLayout {
     std::size_t size;
     std::vector<std::size_t> references;
     std::shared_ptr<const NominalDescriptor> descriptor = {};
-    enum class Kind { ordinary, string } kind = Kind::ordinary;
+    enum class Kind { ordinary, string, buffer } kind = Kind::ordinary;
 };
 // Runtime-owned data only: no code pointers, LLVM types, or generation leases.
 struct NominalDescriptor {
@@ -42,14 +43,42 @@ public:
 private:
     friend class Runtime;
     void* allocate_validated(const TypeLayout&, LegacyReferenceMap);
+    struct BufferState {
+        BufferLayoutRef layout;
+        mutable const void* owner;
+        mutable std::uint64_t valid_prefix=0;
+        mutable bool complete=false;
+    };
+    class PendingBuffer {
+    public:
+        PendingBuffer()=default;
+        explicit PendingBuffer(BufferLayoutRef);
+        ~PendingBuffer();
+        PendingBuffer(PendingBuffer&&) noexcept;
+        PendingBuffer& operator=(PendingBuffer&&) noexcept;
+        PendingBuffer(const PendingBuffer&)=delete;
+        PendingBuffer& operator=(const PendingBuffer&)=delete;
+    private:
+        friend class Heap;
+        void* data_=nullptr;
+        BufferLayoutRef layout_;
+    };
+    void* adopt_buffer(PendingBuffer&,std::shared_ptr<const BufferState>);
+    const BufferState& buffer_state(void*) const;
+    bool is_private(void*) const;
+    bool private_owner(void*,const void*) const;
+    void seal_buffer(void*,const void*,std::uint64_t) noexcept;
+    static void release(void*,std::size_t alignment) noexcept;
     struct Object {
         LegacyReferenceMap references;
-        std::shared_ptr<const NominalDescriptor> descriptor;
+        std::shared_ptr<const void> metadata; // kind selects immutable nominal/buffer metadata
         TypeLayout::Kind kind;
         bool marked = false;
     };
     std::unordered_map<void*, Object> objects_;
     std::vector<void**> roots_;
+    std::size_t private_buffers_=0;
+    void destroy(void*,const Object&) noexcept;
 };
 class Root {
 public:

@@ -1,5 +1,7 @@
 #pragma once
 #include "void/heap.hpp"
+#include "void/buffer.hpp"
+#include <optional>
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
@@ -26,6 +28,7 @@ public:
     class Native;
     class Frame;
     class Handle;
+    class BufferBuilder;
     explicit Runtime(std::size_t allocation_budget = 0) : allocation_budget_(allocation_budget) {}
     ~Runtime();
     Runtime(const Runtime&) = delete;
@@ -49,6 +52,8 @@ public:
     void admit_buffer_schemas(std::span<const ElementSchemaSpec>);
     ElementSchemaRef buffer_schema(std::string_view) const;
     ReferenceShape reference_shape(ElementSchemaRef) const;
+    BufferLayoutRef buffer_layout(ElementSchemaRef,std::uint64_t capacity,std::size_t base=0,std::size_t stride=0) const;
+    std::byte buffer_byte(void*,const BufferLayoutRef&,std::uint64_t element,std::size_t offset) const;
     const InterfaceWitness* witness(std::string_view) const;
     std::int64_t interface_binding(void* object,const void* witness,std::span<const char* const> keys) const;
     std::shared_ptr<const NominalDescriptor> descriptor(std::string_view) const;
@@ -58,10 +63,12 @@ public:
     void close(); // Reject new attachments; existing participants must drain.
 private:
     friend class CallbackRegistration;
+    class PrivateRoot;
     struct Thread {
         std::thread::id owner = std::this_thread::get_id();
         State state = State::native_safe;
         Frame* frames = nullptr;
+        PrivateRoot* private_roots = nullptr;
         unsigned depth = 0;
         unsigned managed_depth = 0, admissions = 0;
         std::uint64_t epoch = 0;
@@ -75,6 +82,8 @@ private:
     void require_output(void**) const;
     void string_parts_into(void**,std::string_view,std::string_view);
     void validate_descriptor(const TypeLayout&) const; // Caller holds mutex_.
+    void validate_buffer_layout(const BufferLayoutRef&) const; // mutex_ held
+    void require_buffer_output(void**) const;
     void park(Thread&, std::unique_lock<std::mutex>&);
     void enter(Thread&);
     mutable std::mutex mutex_;
@@ -157,4 +166,49 @@ private:
     Runtime& runtime_;
     void* value_;
 };
+// A private root is still an ordinary Frame/Slot. Its separate registration is
+// permission for exactly this word, never permission for another root/heap edge.
+class Runtime::PrivateRoot {
+public:
+    explicit PrivateRoot(Runtime&);
+    ~PrivateRoot() noexcept;
+private:
+    friend class Runtime;
+    friend class Runtime::BufferBuilder;
+    Runtime& runtime_;
+    void* value_=nullptr;
+    static constexpr std::size_t zero_=0;
+    Slot slot_;
+    Frame frame_;
+    PrivateRoot* previous_;
+};
+class Runtime::BufferBuilder {
+public:
+    BufferBuilder(Runtime&,BufferLayoutRef,std::uint64_t requested_live,BufferWorkQuota);
+    ~BufferBuilder()=default;
+    BufferBuilder(const BufferBuilder&)=delete;
+    BufferBuilder& operator=(const BufferBuilder&)=delete;
+    BufferBuilder(BufferBuilder&&)=delete;
+    BufferBuilder& operator=(BufferBuilder&&)=delete;
+    void write_scalar(std::uint64_t bits);
+    void write_bytes(std::span<const std::byte> native_input);
+    void zero_elements(std::uint64_t count);
+    void finish_into(void** registered_output);
+private:
+    void require_active();
+    void normalize();
+    void validate_private() const; // mutex_ held
+    char* address(std::size_t offset,std::size_t bytes) const; // mutex_ held
+    Runtime& runtime_;
+    BufferLayoutRef layout_;
+    BufferWorkQuota quota_;
+    DataCursor cursor_;
+    PrivateRoot root_;
+    std::thread::id owner_;
+    std::uint64_t requested_,prefix_=0;
+    std::optional<DataCursor::Event> event_;
+    std::size_t consumed_=0;
+    bool in_element_=false,failed_=false,finished_=false;
+};
+
 }

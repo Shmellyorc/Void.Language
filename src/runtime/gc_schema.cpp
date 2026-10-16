@@ -69,8 +69,8 @@ ElementSchema::ElementSchema(ElementSchemaSpec spec) : spec_(std::move(spec)) {
             using T=std::decay_t<decltype(v)>;
             if constexpr(std::is_same_v<T,SchemaScalar>) {
                 auto n=static_cast<std::size_t>(v.encoding);if(n>=spec_.storage_domain.scalars.size()) bad("unknown GC scalar encoding");
-                auto value=spec_.storage_domain.scalars[n];s.bytes=value.bytes;s.alignment=value.alignment;
-            } else if constexpr(std::is_same_v<T,SchemaBytes>) {s.bytes=v.bytes;s.alignment=v.alignment;valid_alignment(s.alignment);}
+                auto value=spec_.storage_domain.scalars[n];s.bytes=value.bytes;s.alignment=value.alignment;s.data=true;
+            } else if constexpr(std::is_same_v<T,SchemaBytes>) {s.bytes=v.bytes;s.alignment=v.alignment;s.data=v.bytes!=0;valid_alignment(s.alignment);}
             else if constexpr(std::is_same_v<T,SchemaManaged> || std::is_same_v<T,SchemaString>) {
                 if constexpr(std::is_same_v<T,SchemaManaged>) text(v.target);
                 s.bytes=sizeof(void*);s.alignment=alignof(void*);s.references=true;
@@ -88,7 +88,7 @@ ElementSchema::ElementSchema(ElementSchemaSpec spec) : spec_(std::move(spec)) {
                 for(std::size_t n=0;n<v.fields.size();++n) {
                     const auto& f=v.fields[n];const auto& c=child(f.child);
                     if(f.offset%c.alignment || v.alignment<c.alignment || f.offset>v.bytes || c.bytes>v.bytes-f.offset) bad("GC field outside aligned record");
-                    s.depth=std::max(s.depth,add(c.depth,1));s.references|=c.references;s.physical[n]=s.logical[n]=n;
+                    s.depth=std::max(s.depth,add(c.depth,1));s.references|=c.references;s.data|=c.data;s.physical[n]=s.logical[n]=n;
                 }
                 std::sort(s.logical.begin(),s.logical.end(),[&](auto a,auto b){return v.fields[a].id<v.fields[b].id;});
                 for(std::size_t n=1;n<s.logical.size();++n) if(v.fields[s.logical[n-1]].id==v.fields[s.logical[n]].id) bad("duplicate GC logical field");
@@ -106,7 +106,7 @@ ElementSchema::ElementSchema(ElementSchemaSpec spec) : spec_(std::move(spec)) {
                 if(v.alignment<c.alignment || v.base%c.alignment || !v.stride || v.stride<c.bytes || v.stride%c.alignment) bad("invalid GC repeat stride/alignment");
                 if(!v.extent && (v.base || v.bytes)) bad("noncanonical empty GC repeat");
                 if(aligned(add(v.base,multiply(v.stride,v.extent)),v.alignment)!=v.bytes) bad("incorrect GC repeat extent");
-                s.bytes=v.bytes;s.alignment=v.alignment;s.depth=add(c.depth,1);s.references=v.extent && c.references;
+                s.bytes=v.bytes;s.alignment=v.alignment;s.depth=add(c.depth,1);s.references=v.extent && c.references;s.data=v.extent && c.data;
             } else bad("owned/growable GC value role awaits later stage");
         },node);
         summaries_.push_back(std::move(s));

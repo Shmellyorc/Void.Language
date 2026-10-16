@@ -1,14 +1,11 @@
 # Phase 23 proposal: typed arrays, indexing and iteration
 
-**Current status, 15 October 2026: owner confirms CI #48 passed all seven jobs,
-62/62 suites each; Stage 2B is hosted-verified. Stage 1 was locked by CI #47 and
-Part 5A by CI #45.
-Native arrays remain disabled. The superseding decision below withdraws the
-65,536-byte production array-storage policy. Owner/wrench approved the Stage 2A
-direction and retained gates in Section 23. Stage 2B implements only compact schema
-admission and the common reference cursor; local evidence and limitations are in
-Sections 24-25. Section 25 records the focused legacy Heap performance followup.
-No Stage 2C or source-array execution is activated.**
+**Current status, 15 October 2026: owner confirms CI #49 passed all seven jobs,
+62/62 suites, locking Stage 2B at `4d25f4f`. Stage 1 was locked by CI #47 and Part
+5A by CI #45. Owner/wrench authorize Stage 2C only. Section 26 records the private
+rooted byte-buffer implementation and local evidence. Native source arrays,
+reference-bearing population, leased/deep copying and production certification
+remain disabled. The superseding large-array decision below remains in force.**
 
 > **SUPERSEDING OWNER DECISION: large arrays are a language requirement.**
 > Neither `[T, n]` nor `[T]` may have an arbitrary 64 KiB source-level ceiling.
@@ -2596,7 +2593,7 @@ direction; Section 24 records the bounded Stage 2B implementation.
 ## 23. Stage 2A approval gate: repeated GC layouts and rooted buffers
 
 15 October 2026. **Owner/wrench approved this architectural direction and its
-retained safety gates, authorizing Stage 2B only.**
+retained safety gates. Stage 2B is locked; Stage 2C was separately authorized.**
 The owner reports CI #47 passed all seven jobs, 61/61 suites, locking Stage 1.
 Read the complete owner-supplied Large-Array Storage Architecture Review, especially
 Sections 2, 5, 6, 10 and 11, and Section 22 above. This section proposes Stage 2's
@@ -2774,8 +2771,9 @@ failure-injection proof; a plausible scan count does not authorize partial sweep
 ### 23.4 Proposed C++ API surface
 
 This is the full Stage 2 internal embedding/runtime API design, not a new generated-
-code ABI or a claim that every declaration works. Section 24 records the implemented
-2B admission subset; the buffer APIs remain proposals. Opaque handles are runtime-
+code ABI or a claim that every declaration works. Sections 24-26 record implemented
+2B admission and the 2C reference-free subset; reference/copy/lease APIs remain
+proposals. Opaque handles are runtime-
 bound and factory-created;
 callers cannot manufacture an admitted handle by constructing shared_ptr<const T>.
 
@@ -3081,7 +3079,8 @@ source native arrays or a selected array-call ABI. Stop rather than substitute
 unproved alignment, source stability, reference completeness or publication rules.
 No later stage is authorized by approving a substep.
 
-**Approved architectural direction, with implementation authorized only for 2B:**
+**Approved architectural direction, implemented through the separately authorized
+2B and 2C checkpoints only:**
 runtime-owned DAG/cursor; mutually exclusive
 buffer layout and typed empty representation; same-Heap NativeSafe zero reservation
 then rooted private adoption; prefix/event completeness and sealed publication;
@@ -3091,8 +3090,8 @@ numbers, source ABI/owned-handle layout, production stack policy, growable heade
 commit protocol and source concurrency semantics are not selected here.
 
 The original Stage 2A checkpoint changed documentation only. The subsequent owner
-authorization permits only 23.9 step 2B, recorded below; all remaining implementation
-steps require their own review. Research checks, CI, Git history and remotes remain
+authorizations separately permit 23.9 steps 2B and 2C, recorded below; remaining
+implementation steps require their own review. Research checks, CI, Git history and remotes remain
 unchanged.
 
 
@@ -3358,5 +3357,219 @@ The one/million typed-schema admission requests are 1,878/1,909 bytes, and strea
 still allocates nothing. Existing mark-work failure/recovery covers seven failing
 positions. Whitespace, source-hash and changed-file audits passed.
 
-Stage 2C and native arrays remain disabled; no production certificate, stack policy, CI workflow, commit,
+At the end of this Stage 2B audit, Stage 2C and native arrays remained disabled.
+The subsequent Stage 2C authorization/evidence is in Section 26. No production
+certificate, stack policy, CI workflow, commit,
 push, branch or remote modification is part of this audit.
+
+
+## 26. Stage 2C: private rooted reference-free buffers
+
+15 October 2026. Owner/wrench authorize only Section 23.9 step 2C, after the
+owner-reported CI #49 lock of 4d25f4f (seven jobs, 62/62 suites). The implementation
+is a C++ runtime service; it is not source-native array execution, a fixed-array
+value representation, parameter/result ABI, reference-bearing population or copying.
+
+### 26.1 Exact layout and ownership APIs
+
+`include/void/buffer.hpp` adds runtime-factory-created, immutable `BufferLayoutRef`.
+`Runtime::buffer_layout(ElementSchemaRef, uint64_t capacity, size_t base=0,
+size_t stride=0)` validates exact admitted schema pointer membership. A zero stride
+argument requests the checked natural stride: alignUp(max(schema.bytes,1), alignment).
+Explicit stride must contain the child span and meet native alignment; base must
+also meet it. Extent is checked alignUp(base + capacity*stride, alignment). Count
+fits i64; every product, sum, rounding and target size_t conversion precedes address
+formation/allocation. Allocation extents must fit native ptrdiff_t for byte-address
+arithmetic. This is target representation protection, not a source size ceiling.
+
+Zero-capacity layouts require base=0, retain valid child/stride metadata and have
+bytes=0. The typed empty representation is the retained layout token plus null;
+finish publishes null only with requested_live=0 and allocates no Heap object.
+Nonempty zero-footprint schemas retain positive stride and real backing; they are
+not confused with zero capacity. Capacity layouts are reference-counted by callers
+and live buffer metadata, never permanently interned. Equivalence requires the exact
+canonical schema pointer and all capacity/base/stride/byte geometry, so independently
+created equivalent tokens work while equal-byte foreign/incompatible schemas reject.
+
+The implemented embedding surface is `Runtime::BufferBuilder(Runtime&, layout,
+requested_live, BufferWorkQuota)`, `write_scalar(bits)`, `write_bytes(native_span)`,
+`zero_elements(count)` and `finish_into(registered_output)`. Quotas are supplied
+explicitly, all positive, with bytes large enough for a scalar atomic group. There
+is no production numerical default. `Runtime::buffer_byte(object, expected_layout,
+element_index, byte_offset)` returns one copied byte from a complete live element,
+Managed-only under the mutex, with no poll or raw pointer export. It rejects private,
+foreign, incompatible, spare-capacity and out-of-bounds access. This inspection
+helper does not create a read lease or managed copying API.
+
+### 26.2 Same-Heap reservation, private roots and publication
+
+`Heap::PendingBuffer` uses the existing new/delete family. Native alignment at or
+below default-new alignment uses ordinary new/delete; over-alignment uses matching
+align_val_t new/delete. The returned pointer is checked against the required
+alignment before zeroing. All raw bytes are zeroed while NativeSafe outside the
+collector-required mutex. Reservations contain no managed reference or Heap-map
+identity. An exception before adoption releases raw storage with its recorded
+layout/alignment; failed map insertion leaves ownership with PendingBuffer.
+
+Builder construction links a small null private root through the existing Frame/
+Slot before budget collection or NativeSafe work. Frame and Slot layout/ABI are
+unchanged. A separate per-thread private-root registration authorizes exactly that
+Frame word and private owner; it does not authorize another root containing the same
+pointer. Cursor scratch and buffer metadata are allocated NativeSafe. Reentry uses
+Runtime::Native's existing Managed rendezvous. Under the mutex, Heap adoption
+completes its fallible map insertion, transfers raw ownership, installs the private
+root immediately and increments the existing successful-allocation accounting once.
+No poll/allocation/fallible step separates adoption and root installation. Capacity
+zero does not consume a successful Heap allocation or trigger allocation-budget work.
+
+Heap nodes retain the validated layout and private-owner/complete/valid-prefix state
+in data-only metadata. The existing shared-owner slot is selected by the validated
+object-kind tag; ordinary nodes do not gain a second reference map or per-object
+allocation. Legacy maps and their optimized cursor remain unchanged. TypeLayout's
+reserved buffer kind is rejected by ordinary Heap::allocate, allocate_into and
+construct_into; only private adoption creates it. There is one Heap/collector and
+one ownership transaction, not a second allocator/GC.
+
+Private membership is internal: source-facing contains, Handle construction/reset,
+ordinary stores and inspection cannot expose it as complete. Frame root enumeration
+accepts private pointers only in their registered builder word; an ordinary root or
+heap edge containing a private pointer is a precise-GC invariant failure before
+sweep. A private-buffer counter avoids extra target lookups in ordinary GC when no
+private buffer exists. Stage 2C adoption accepts only reference-free schemas; those
+objects require no payload scan. Mark-before-sweep, pending queue ordering, failure
+rollback and all ordinary/string behavior remain.
+
+`finish_into` checks exact registered public output, full requested-prefix completion
+and private ownership, polls, then rechecks under the mutex. The commit seals the
+valid prefix, marks complete, publishes the output and clears the private builder
+word without allocation, safepoint, callback or payload-sized scan/copy. The internal
+seal helper is noexcept after validation. Failed/incomplete publication preserves
+the old output. Abort clears/unlinks the private root; normal GC later reclaims the
+abandoned object. It does not synchronously wipe/free a rooted payload under the
+mutex. Wrong-thread/state/LIFO destruction retains Frame's fatal invariant policy.
+
+### 26.3 Ordered physical construction and scope gates
+
+The runtime-internal `DataCursor` walks the same admitted schema nodes and physical
+field indexes, using a depth-sized explicit work stack prepared NativeSafe. Admission
+caches whether a subtree has data; empty/zero-footprint subtrees are skipped. Record
+and Repeat events do not expand into per-element metadata. Dense byte/u8 repetitions
+coalesce into spans while preserving the ability to consume u8 scalar events one at
+a time. The outer dense-u8 path advances a checked complete-element prefix per bulk
+chunk. Large byte events can span chunks. Node-walk and byte work respect supplied
+quotas, with polling between chunks and bounded scalar writes.
+
+Scalars use exact native 1/2/4/8-byte encoding, checked high bits and bool 0/1;
+floating encodings require native IEC559 support and preserve bit patterns. Byte
+writes accept byte regions/u8 streams, not arbitrary typed scalar records or pointer
+words. A complete-element prefix advances only after all events; private partial
+progress is unforgeable. All-zero data is complete for this closed reference-free
+subset, so zero_elements can append untouched zeroed whole elements without a
+payload walk. Zero-footprint elements need no data events. These are physical values,
+not execution of language field defaults, constructors or fresh-reference defaults.
+Any throwing builder operation poisons the transaction; only cleanup remains legal.
+A failed multi-chunk input may have changed private bytes but cannot publish them.
+
+Native input spans must remain host-owned/valid across polls; this is the explicit
+C++ lifetime/provenance precondition from Section 23.4, not an escape hatch for an
+unrooted managed borrow. Every reference/string/interface node is rejected before
+reservation, even inside a zero repetition. Stage 2D must separately add capacity
+tracing, typed reference validation and completeness/publication proofs. No reference
+writes, read leases, deep/owned copying, growable headers, generated-code ABI, LLVM
+lowering, ORC/LSP certification or source native-array activation is introduced here.
+The stack/ABI/encoded-CFG research and its rejection gates remain unchanged.
+
+### 26.4 Focused proof and measurements
+
+`gc_buffers` adds one suite, preserving all 62 existing suites. Independent byte
+oracles cover 4 MiB dense input, nested records/repeats, every scalar encoding,
+padding and spare zeros. Positive cases include 64 MiB NativeSafe reservations,
+256-byte over-alignment with independently checked deletion family, typed empty
+capacity, million zero-footprint elements, equivalent layout tokens, retained then
+collected capacity metadata and 2,048-deep data shapes. Negatives cover arithmetic,
+rounding, native address representation, foreign/invalid layout/schema/root,
+incompatible equal-byte identity, bad quotas/width/bool/kind/order, incomplete
+publication, forbidden legacy allocation and poisoned reuse.
+
+Measured constructor-allocation ordinal sweeps exercise normal and budget-triggered
+collection paths; all successful-path sites are injected, old outputs/epochs remain
+valid and every reservation/metadata/node is reclaimed. Separate subprocesses require
+fatal code 79 for private-root and private-edge escape attempts, retaining the existing
+invariant classification instead of treating corrupt graphs as recoverable failures.
+
+Linux test-only linker wrappers pause a production memset call after exactly half
+of the poisoned raw reservation is zeroed; collection completes with no Heap identity
+before zeroing resumes. Clang ASan uses the corresponding __asan_memset wrapper.
+There is no runtime hook or disabled optimization. Other native platforms use the
+allocation pause and concurrent NativeSafe-phase witness, without claiming an exact
+half-zeroed observation. Collection after adoption, within a partial record, between
+chunks, before publication and after abandonment is exercised, together with actual
+cooperative parks. Native Windows/macOS execution is not claimed locally.
+
+Local Linux x64 LLVM 19.1.7 full rebuild/CTest: **Debug 63/63 (115.11 s),
+Release 63/63 (55.60 s), strict ASan/UBSan RelWithDebInfo 63/63 (140.54 s)**.
+ASAN_OPTIONS=detect_leaks=1:abort_on_error=1 and
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 stayed enabled for sanitized build
+steps and tests, outside the desktop ptrace sandbox. The final strengthened lifetime
+fixture then passed the four focused sanitizer suites (1.12 s). Explicit 1 MiB
+Debug/Release runs passed 10/10 suites (13.25 s / 4.07 s), including final buffer
+regressions, generated JIT, normal/O2 linked AOT, callbacks, schemas, collection
+failure recovery, strings and interfaces. Existing invariant/crash instrumentation
+and research sentinels remain in the full suite. Measured allocation-site sweeps
+cover all four normal constructor sites and six budget-triggered sites. The local
+Debug chunk witness completed 2,046 collections and exercised cooperative parking;
+this count is scheduling-dependent, not a throughput promise.
+
+Release `void_gc_buffers --measure` uses explicit 64 KiB byte/64-node fixture work
+quotas, one live buffer, a host-owned input vector outside the measured region,
+prewarmed map buckets and three samples per size. These quotas are test inputs,
+unrelated to the historical stack threshold. The fixture records actual global-new
+requests with matching-family deletion checks; bytes include metadata and payload,
+not RSS or allocator overhead. Both 1 MiB and 32 MiB buffers use four allocations
+and payload + 152 requested bytes, with zero retained measured storage after GC.
+Native embedding sizes are Frame=32, Slot=32 (unchanged) and BufferBuilder=264 bytes;
+these are C++ object sizes, not total machine-frame or recursive-stack certificates.
+No payload-sized native temporary exists; deep cursor storage is allocated NativeSafe
+on the native heap. The 1 MiB execution limits provide actual configuration evidence.
+
+Three-sample medians from the final local Release run:
+
+| Buffer bytes | Allocate + zero MiB/s | Populate MiB/s | Finish us | Live collect us | Dead collect us |
+| --- | --- | --- | --- | --- | --- |
+| 1,048,576 | 2,552.73 | 29,137.5 | 0.20 | 0.33 | 0.41 |
+| 33,554,432 | 6,454.79 | 5,880.50 | 1.66 | 2.48 | 426.82 |
+
+Cold/warm allocator effects are visible: 1 MiB allocation/zeroing ranges from
+1,990.77 to 49,726.5 MiB/s and dead collection from 0.17 to 81.31 us. For 32 MiB,
+allocation/zeroing ranges 6,375.67-6,752.07 MiB/s, population 5,266.36-6,558.99,
+finish 1.48-1.89 us, live collect 2.359-3.21 us and dead collect 345.918-476.067 us.
+This is a local instrumented microbenchmark, not a worst-case time or game frame
+benchmark. Sweep/deallocation cost can scale with allocator/OS work despite the
+reference-free mark path and publication avoiding a payload walk.
+
+The existing reproducible legacy audit was rerun against locked 4d25f4f using
+`tools/bench/heap_legacy.py --output build/phase23-2c-legacy-final --parent 4d25f4f
+--stage2b 4d25f4f --samples 9 --objects 100000 --cpu 0 --label stage2c`.
+Source hashes in results.json match the final production sources. Per-object new
+calls (2 without refs, 3 with refs), requested metadata and retained metadata are
+unchanged for 0/1/4/16-reference ordinary fixtures. Retained requested bytes/object
+remain 85.83/93.83/117.83/213.83, including buckets. Median allocation ns/object is
+157.3/145.0/141.1/357.3 locked versus 162.8/161.6/153.1/384.8 now; live-GC medians
+are 40.1/70.9/87.0/135.9 versus 43.0/71.1/90.1/136.8. Do not claim zero timing cost
+from the new kind/privacy checks, or attribute every difference solely to them;
+raw ranges/control samples are retained in the artifact. The material per-object
+DAG amplification remains eliminated without adding a legacy cache or metadata
+allocation. Tests and benchmark tools stay operational; no CI workflow was changed.
+
+### 26.5 Remaining gates and stop
+
+Stage 2C is complete locally for owner/wrench review. Stage 2D reference-bearing
+construction/capacity tracing remains blocked, including required-reference live
+validity and interface atomic pairs. Stage 2E leases/copies, owned fixed payloads,
+source defaults/constructors, managed mutation, source array ABI, LLVM lowering,
+ORC/LSP/public certification and target-native hosted acceptance remain separate.
+Native Windows/macOS tests were not run locally. No commits, pushes, branches or
+remote changes were made.
+Allocator/OS work, metadata/map growth and stop-the-world sweep can still block;
+no production latency or catchable-overcommit guarantee is inferred. Caller quotas
+in tests/measurements are scheduling inputs, not approved production limits.

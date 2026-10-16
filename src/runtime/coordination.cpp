@@ -42,7 +42,7 @@ Runtime::Attachment::~Attachment() {
     auto& t = runtime_.thread();
     if (callback_) { if (!t.admissions) std::terminate(); --t.admissions; }
     if (!outer_) { if (t.depth < 2) std::terminate(); --t.depth; return; }
-    if (t.depth != 1 || t.frames || t.managed_depth || t.admissions || t.state != State::native_safe) std::terminate();
+    if (t.depth != 1 || t.frames || t.private_roots || t.managed_depth || t.admissions || t.state != State::native_safe) std::terminate();
     std::unique_lock lock(runtime_.mutex_);
     runtime_.changed_.wait(lock, [&] { return !runtime_.requested_; });
     auto& records = runtime_.threads_;
@@ -131,7 +131,15 @@ Runtime::Collection Runtime::collect(std::chrono::milliseconds timeout) {
                     for (std::size_t j = 0; j < slot.count; ++j) {
                         void* value = nullptr;
                         std::memcpy(&value, static_cast<const char*>(slot.storage) + slot.offsets[j], sizeof(value));
-                        if (value) roots.push_back(value);
+                        if (value) {
+                            if(heap_.private_buffers_ && heap_.is_private(value)) {
+                                bool authorized=false;
+                                for(auto* root=t->private_roots;root;root=root->previous_)
+                                    if(&root->frame_==f && static_cast<const char*>(slot.storage)+slot.offsets[j]==reinterpret_cast<const char*>(&root->value_) && root->value_==value && heap_.private_owner(value,root)) authorized=true;
+                                if(!authorized) throw std::logic_error("private buffer escaped its registered root");
+                            }
+                            roots.push_back(value);
+                        }
                     }
                 }
             for (auto* h : handles_) if (h->value_) roots.push_back(h->value_);

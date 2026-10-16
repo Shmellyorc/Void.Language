@@ -81,9 +81,10 @@ private:
     friend class Runtime;
     friend class ReferenceShape;
     friend class ReferenceCursor;
+    friend class DataCursor;
     struct Summary {
         std::size_t bytes=0, alignment=1, depth=1;
-        bool references=false;
+        bool references=false, data=false;
         std::vector<std::size_t> physical, logical;
     };
     explicit ElementSchema(ElementSchemaSpec);
