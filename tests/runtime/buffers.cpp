@@ -569,6 +569,254 @@ void reference_failures() {
     std::cout<<"reference construction/partial-mark failure sweep: "<<sites<<" sites\n";
 }
 
+
+void busy(auto&& operation) {
+    try {operation();}catch(const BufferBusy&) {return;}
+    throw std::runtime_error("leased write did not report BufferBusy");
+}
+void buffer_copy_bytes() {
+    Runtime r;auto schema=admit(r,spec("copy-u8",{SchemaScalar{ScalarEncoding::u8}}));
+    constexpr std::size_t size=3*1024*1024;
+    auto layout=r.buffer_layout(schema,size,16),destination=r.buffer_layout(schema,size+8,32);
+    Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r);
+    std::vector<std::byte> input(size);for(std::size_t i=0;i<size;++i)input[i]=std::byte((i*17+i/37)%256);
+    {Runtime::BufferBuilder b(r,layout,size,quota);b.write_bytes(input);b.finish_into(&source.value);}
+    auto source_token=r.root_word(&source.value);void* original=source.value;
+    auto start=Clock::now();
+    {
+        Runtime::BufferReadLease first(r,source_token,layout),second(r,source_token,layout);
+        check(first.count()==size && second.count()==size,"lease live prefix");
+        busy([&]{r.buffer_store_scalar(source_token,layout,0,{},99);});
+        busy([&]{r.store(source.value,16,nullptr);});
+        Runtime::Handle shared(r,source.value);
+        auto writer=std::async(std::launch::async,[&] {
+            Runtime::Attachment attached(r);Runtime::Managed managed(r);Output alias(r);alias.value=shared.get();
+            busy([&]{r.buffer_store_scalar(r.root_word(&alias.value),layout,0,{},55);});
+        });
+        {Runtime::Native native(r);writer.get();}
+        source.value=nullptr;check(r.collect()==Runtime::Collection::completed,"lease did not root source");
+        check(r.contains(original),"source reclaimed during lease");
+        stats[3].calls=0;stats[3].bytes=0;recording=3;
+        Runtime::BufferBuilder b(r,destination,size,quota);auto copy_start=Clock::now();b.copy_elements(first,0,size);b.finish_into(&out.value);auto copy_end=Clock::now();recording=-1;
+        std::cout<<"byte copy allocation_calls="<<stats[3].calls<<" requested_bytes="<<stats[3].bytes
+                 <<" copy_finish_ms="<<std::chrono::duration<double,std::milli>(copy_end-copy_start).count()<<'\n';
+        check(out.value!=original,"copy reused source storage");
+        for(std::size_t i=0;i<size;++i)check(r.buffer_byte(out.value,destination,i,0)==input[i],"large independent byte oracle");
+        r.buffer_store_scalar(r.root_word(&out.value),destination,size-1,{},71);
+        check(r.buffer_byte(original,layout,size-1,0)==input.back(),"destination mutation changed leased source");
+        source.value=original;
+    }
+    auto end=Clock::now();
+    r.buffer_store_scalar(source_token,layout,0,{},42);
+    check(r.buffer_byte(out.value,destination,0,0)==input[0],"source mutation changed independent copy");
+    check(r.buffer_byte(out.value,destination,size-1,0)==std::byte{71},"destination mutation lost");
+    std::cout<<"independent byte copy bytes="<<size<<" elapsed_ms="<<std::chrono::duration<double,std::milli>(end-start).count()
+             <<" (includes oracle/GC/conflict checks; no latency claim)\n";
+    source.value=out.value=nullptr;r.collect();check(!r.snapshot().objects,"byte copy leaked objects");
+    ElementSchemaRef blob;{Runtime::Native native(r);blob=admit(r,spec("blob-copy",{SchemaBytes{size,64}}));}
+    auto blob_layout=r.buffer_layout(blob,2,64);
+    {Runtime::BufferBuilder b(r,blob_layout,1,quota);b.write_bytes(input);b.finish_into(&source.value);}
+    {Runtime::BufferReadLease lease(r,source_token,blob_layout);Runtime::BufferBuilder b(r,blob_layout,1,quota);b.copy_elements(lease,0,1);b.finish_into(&out.value);}
+    check(out.value!=source.value && !std::memcmp(static_cast<char*>(out.value)+64,input.data(),size),"multi-megabyte blob event oracle");
+    source.value=out.value=nullptr;r.collect();check(!r.snapshot().objects,"blob copy leaked objects");
+}
+ElementSchemaRef copy_schema(Runtime& r) {
+    const auto w=sizeof(void*);
+    return admit(r,spec("nested-copy",{SchemaScalar{ScalarEncoding::i32},SchemaManaged{"T",false},SchemaString{},
+        SchemaInterface{"I",false,0,w,2*w,alignof(void*)},
+        SchemaRecord{5*w,alignof(void*),{{0,0,0},{1,w,1},{2,2*w,2},{3,3*w,3}}},
+        SchemaRepeat{w,5*w,3,4,16*w,alignof(void*)}}));
+}
+void fill_copy_source(Runtime& r,Output& source,Output& object,Output& text,const BufferLayoutRef& layout,const InterfaceWitness* witness) {
+    Runtime::BufferBuilder b(r,layout,2,quota);
+    for(unsigned element=0;element<2;++element)for(unsigned repeat=0;repeat<3;++repeat) {
+        b.write_scalar(100*element+repeat);b.write_reference(r.root_word(&object.value));b.write_reference(r.root_word(&text.value));
+        b.write_interface({r.root_word(&object.value),witness});
+    }
+    b.finish_into(&source.value);
+}
+void copy_oracle(void* payload,const BufferLayoutRef& layout,void* target,void* text,const InterfaceWitness* witness) {
+    // Independent physical offsets, never DataCursor or ReferenceCursor.
+    const auto w=sizeof(void*);
+    for(unsigned element=0;element<2;++element)for(unsigned repeat=0;repeat<3;++repeat) {
+        auto* base=static_cast<const char*>(payload)+layout->base()+element*layout->stride()+w+repeat*5*w;
+        std::uint32_t scalar=0;void* managed=nullptr;void* string=nullptr;void* interface=nullptr;const InterfaceWitness* actual=nullptr;
+        std::memcpy(&scalar,base,4);std::memcpy(&managed,base+w,w);std::memcpy(&string,base+2*w,w);
+        std::memcpy(&interface,base+3*w,w);std::memcpy(&actual,base+4*w,w);
+        check(scalar==100*element+repeat && managed==target && string==text && interface==target && actual==witness,"nested copy identity/content oracle");
+    }
+}
+void nested_copy_and_collections() {
+    Runtime r;const auto w=sizeof(void*);NominalDescriptor type{"T","","copy",{w,{}}};
+    InterfaceWitness wi{"interface:1:I1:T","I","T","read"};r.admit_metadata({&type,1},{&wi,1});auto schema=copy_schema(r);
+    auto layout=r.buffer_layout(schema,3,2*w,17*w),dest=r.buffer_layout(schema,4,4*w,18*w);
+    Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r),object(r),text(r),other(r);
+    allocate_nominal(r,object,"T");allocate_nominal(r,other,"T");r.string_into(&text.value,"shared immutable text");
+    auto* witness=r.witness(wi.key);fill_copy_source(r,source,object,text,layout,witness);auto token=r.root_word(&source.value);
+    {
+        Runtime::BufferReadLease lease(r,token,layout);
+        busy([&]{r.store(source.value,layout->element_offset(0)+2*w,other.value);});
+        {
+            auto** interior=reinterpret_cast<void**>(static_cast<char*>(source.value)+layout->element_offset(0)+2*w);
+            constexpr std::size_t offset=0;Runtime::Slot slot{interior,sizeof(void*),&offset,1};Runtime::Frame frame(r,&slot,1);
+            busy([&]{r.allocate_into(interior,{w,{}});});
+            std::uint64_t prepared=0;busy([&]{r.construct_into(interior,{w,{}},&prepared);});
+            busy([&]{r.string_into(interior,"");});busy([&]{r.string_into(interior,"text");});
+            Runtime::BufferBuilder attempted(r,dest,1,quota);attempted.copy_elements(lease,0,1);
+            busy([&]{attempted.finish_into(interior);});
+            check(*interior==object.value,"output alias bypassed lease");
+        }
+        Runtime::BufferBuilder b(r,dest,2,quota);b.copy_elements(lease,0,1);
+        auto before=r.snapshot();
+        auto observed=std::async(std::launch::async,[&]{return r.wait_for_request(std::chrono::seconds(5));});
+        auto collector=std::async(std::launch::async,[&]{Runtime::Attachment at(r);Runtime::Managed managed(r);return r.collect();});
+        check(observed.get() && r.snapshot().requested && r.is_managed(),"copy request did not overlap Managed partial destination");
+        b.copy_elements(lease,1,1);b.finish_into(&out.value);
+        Runtime::Collection result;{Runtime::Native native(r);result=collector.get();}
+        check(result==Runtime::Collection::completed && r.snapshot().cooperative_parks>before.cooperative_parks,"copy missed genuine poll/park");
+        copy_oracle(out.value,dest,object.value,text.value,witness);
+        // Trusted corruption fixtures deliberately bypass write APIs, then restore
+        // the public graph before any explicit collection. Copy must independently
+        // reject each bad typed word without publishing its partial destination.
+        InterfaceWitness forged{"forged","I","T","read"};
+        for(auto [offset,bad_word]:std::array<std::pair<std::size_t,const void*>,4>{{
+                {2*w,nullptr},{2*w,text.value},{3*w,object.value},{5*w,&forged}}}) {
+            Runtime::BufferBuilder bad(r,dest,1,quota);void* previous=nullptr;
+            auto* address=static_cast<char*>(source.value)+layout->element_offset(0)+offset;
+            std::memcpy(&previous,address,w);std::memcpy(address,&bad_word,w);
+            auto* sentinel=out.value;
+            try {reject([&]{bad.copy_elements(lease,0,1);});}
+            catch(...) {std::memcpy(address,&previous,w);throw;}
+            std::memcpy(address,&previous,w);
+            reject([&]{bad.finish_into(&out.value);});check(out.value==sentinel,"invalid copied reference published");
+        }
+        // Abort a second independent partial copy; its root must unwind.
+        {Runtime::BufferBuilder abort(r,dest,2,quota);abort.copy_elements(lease,0,1);}
+        check(r.collect()==Runtime::Collection::completed,"aborted copy collection");
+    }
+    {
+        auto** interior=reinterpret_cast<void**>(static_cast<char*>(source.value)+layout->element_offset(0)+2*w);
+        constexpr std::size_t zero=0;Runtime::Slot slot{interior,sizeof(void*),&zero,1};Runtime::Frame frame(r,&slot,1);
+        reject([&]{r.string_into(interior,"");}); // even unleased outputs cannot bypass typed stores
+    }
+    r.store(source.value,layout->element_offset(0)+2*w,other.value);
+    std::array<SchemaStep,2> path{{{SchemaStep::Kind::element,1},{SchemaStep::Kind::field,0}}};
+    r.buffer_store_scalar(token,layout,0,path,777);
+    copy_oracle(out.value,dest,object.value,text.value,witness);
+    source.value=object.value=text.value=other.value=nullptr;
+    check(r.collect()==Runtime::Collection::completed && r.snapshot().objects==3,"copy lost shared managed/string referents or retained abandoned buffers");
+    out.value=nullptr;r.collect();check(!r.snapshot().objects,"nested copies leaked graph");
+}
+void copy_negatives() {
+    Runtime r,foreign;auto foreign_schema=admit(foreign,spec("copy-neg-u8",{SchemaScalar{ScalarEncoding::u8}}));
+    std::optional<Runtime::RegisteredRootWord> foreign_token;
+    {Runtime::Attachment a(foreign);Runtime::Managed m(foreign);Output root(foreign);foreign_token=foreign.root_word(&root.value);}
+    auto schema=admit(r,spec("copy-neg-u8",{SchemaScalar{ScalarEncoding::u8}}));
+    auto zero=admit(r,spec("copy-zero",{SchemaBytes{0,64}}));auto layout=r.buffer_layout(schema,2),empty=r.buffer_layout(schema,0),foreign_layout=foreign.buffer_layout(foreign_schema,2);
+    Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r),alias(r);
+    {Runtime::BufferBuilder b(r,layout,1,quota);b.write_scalar(7);b.finish_into(&source.value);}
+    auto token=r.root_word(&source.value);
+    reject([&]{Runtime::BufferReadLease invalid(r,*foreign_token,layout);});
+    reject([&]{Runtime::BufferReadLease invalid(r,token,foreign_layout);});
+    void* unregistered=source.value;reject([&]{(void)r.root_word(&unregistered);});
+    std::optional<Runtime::RegisteredRootWord> expired;
+    {Output temporary(r);temporary.value=source.value;expired=r.root_word(&temporary.value);}
+    reject([&]{Runtime::BufferReadLease invalid(r,*expired,layout);});
+    {Runtime::BufferReadLease lease(r,token,layout);Runtime::BufferBuilder b(r,layout,1,quota);
+        reject([&]{b.copy_elements(lease,1,1);});reject([&]{b.finish_into(&out.value);});}
+    {Runtime::BufferReadLease lease(r,token,layout);Runtime::BufferBuilder b(r,layout,1,quota);
+        reject([&]{b.copy_elements(lease,0,2);});}
+    {capture_size=layout->bytes();Runtime::BufferBuilder b(r,layout,1,quota);capture_size=0;
+        alias.value=captured;reject([&]{Runtime::BufferReadLease private_alias(r,r.root_word(&alias.value),layout);});alias.value=nullptr;}
+    reject([&]{Runtime::BufferReadLease mismatch(r,token,r.buffer_layout(schema,1));});
+    {
+        Runtime::BufferReadLease lease(r,token,layout);
+        auto other_thread=std::async(std::launch::async,[&]{
+            Runtime::Attachment a(r);Runtime::Managed m(r);Runtime::BufferBuilder b(r,layout,1,quota);
+            reject([&]{b.copy_elements(lease,0,1);});
+        });
+        {Runtime::Native native(r);other_thread.get();}
+    }
+    {Runtime::BufferReadLease lease(r,r.root_word(&alias.value),empty);Runtime::BufferBuilder b(r,empty,0,quota);b.copy_elements(lease,0,0);b.finish_into(&out.value);check(!out.value,"empty copy allocated");}
+    auto zlayout=r.buffer_layout(zero,5);
+    {Runtime::BufferBuilder b(r,zlayout,3,quota);b.zero_elements(3);b.finish_into(&alias.value);}
+    {Runtime::BufferReadLease lease(r,r.root_word(&alias.value),zlayout);Runtime::BufferBuilder b(r,zlayout,3,quota);b.copy_elements(lease,1,2);b.copy_elements(lease,0,1);b.finish_into(&out.value);}
+    {Runtime::BufferReadLease lease(r,token,layout);Runtime::BufferBuilder b(r,zlayout,1,quota);reject([&]{b.copy_elements(lease,0,1);});}
+    for(auto node:{SchemaNode{SchemaOwnedFixed{}},SchemaNode{SchemaGrowable{}}}) {Runtime::Native native(r);reject([&]{admit(r,spec("unsupported-copy",{node}));});}
+    auto readonly=spec("readonly-copy",{SchemaScalar{ScalarEncoding::u8}});readonly.capability_profile="readonly";
+    ElementSchemaRef ro_schema;{Runtime::Native native(r);ro_schema=admit(r,std::move(readonly));}
+    auto ro=r.buffer_layout(ro_schema,1);
+    {Runtime::BufferBuilder b(r,ro,1,quota);b.write_scalar(9);b.finish_into(&alias.value);}
+    reject([&]{r.buffer_store_scalar(r.root_word(&alias.value),ro,0,{},3);});
+    {Runtime::BufferReadLease lease(r,r.root_word(&alias.value),ro);Runtime::BufferBuilder b(r,ro,1,quota);b.copy_elements(lease,0,1);b.finish_into(&out.value);}
+    check(r.buffer_byte(out.value,ro,0,0)==std::byte{9},"readonly-profile copy failed");
+    {Runtime::BufferReadLease lease(r,r.root_word(&alias.value),ro);Runtime::BufferBuilder b(r,layout,1,quota);reject([&]{b.copy_elements(lease,0,1);});}
+    r.buffer_store_scalar(token,layout,0,{},8); // aborted copies left no lease.
+    source.value=out.value=alias.value=nullptr;r.collect();check(!r.snapshot().objects,"copy negatives leaked objects");
+}
+void copy_compactness() {
+    std::size_t fixed_calls=0,fixed_metadata=0;
+    for(auto capacity:{std::uint64_t{1},std::uint64_t{131072}}) {
+        {
+            Runtime r;NominalDescriptor type{"T","","copy-metadata",{sizeof(void*),{}}};r.admit_types({&type,1});
+            auto schema=admit(r,spec("copy-nullable",{SchemaManaged{"T",true}}));auto layout=r.buffer_layout(schema,capacity);
+            Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r);
+            {Runtime::BufferBuilder b(r,layout,capacity,quota);b.zero_elements(capacity);b.finish_into(&source.value);}
+            check(!stats[2].live && !stats[2].live_calls,"previous copy measurement retained storage");
+            stats[2].calls=0;stats[2].bytes=0;recording=2;
+            auto start=Clock::now();
+            {Runtime::BufferReadLease lease(r,r.root_word(&source.value),layout);Runtime::BufferBuilder b(r,layout,capacity,quota);
+                b.copy_elements(lease,0,capacity);b.finish_into(&out.value);}
+            auto end=Clock::now();recording=-1;
+            auto calls=stats[2].calls.load(),metadata=stats[2].bytes.load()-layout->bytes();
+            if(capacity==1) {fixed_calls=calls;fixed_metadata=metadata;}
+            else check(calls==fixed_calls && metadata==fixed_metadata,"copy metadata expanded with repetition count");
+            auto gc_start=Clock::now();check(r.collect()==Runtime::Collection::completed,"reference copy live collection");auto gc_end=Clock::now();
+            std::cout<<"reference copy capacity="<<capacity<<" payload_bytes="<<layout->bytes()<<" allocation_calls="<<calls<<" metadata_requested="<<metadata
+                     <<" copy_finish_ms="<<std::chrono::duration<double,std::milli>(end-start).count()
+                     <<" two_live_buffers_gc_ms="<<std::chrono::duration<double,std::milli>(gc_end-gc_start).count()<<'\n';
+            source.value=out.value=nullptr;r.collect();check(!r.snapshot().objects,"reference copy measurement retained objects");
+        }
+        check(!stats[2].live && !stats[2].live_calls,"reference copy storage outlived Runtime");
+    }
+}
+long copy_failure_transaction(long ordinal,bool measure) {
+    long sites=0;
+    {
+        Runtime r;const auto w=sizeof(void*);NominalDescriptor type{"T","","copy",{w,{}}};
+        InterfaceWitness wi{"interface:1:I1:T","I","T","read"};r.admit_metadata({&type,1},{&wi,1});auto schema=copy_schema(r);
+        auto layout=r.buffer_layout(schema,3);Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r),object(r),text(r);
+        allocate_nominal(r,object,"T");r.string_into(&text.value,"copy failure target");auto* witness=r.witness(wi.key);
+        fill_copy_source(r,source,object,text,layout,witness);r.allocate_into(&out.value,{8,{}});auto* sentinel=out.value;
+        reference_native_empty();stats[0].calls=0;stats[0].bytes=0;recording=0;fail_after=ordinal;bool failed=false;
+        try {
+            Runtime::BufferReadLease lease(r,r.root_word(&source.value),layout);Runtime::BufferBuilder b(r,layout,2,quota);
+            b.copy_elements(lease,0,1);auto before=r.snapshot();auto result=r.collect();
+            if(result==Runtime::Collection::allocation_failure) {
+                check(r.snapshot().objects==before.objects && !r.snapshot().requested,"copy marking failure swept or stuck epoch");throw std::bad_alloc();
+            }
+            check(result==Runtime::Collection::completed,"copy failure witness collection");
+            b.copy_elements(lease,1,1);b.finish_into(&out.value);
+        } catch(const std::bad_alloc&) {failed=true;}
+        recording=-1;fail_after=-1;sites=static_cast<long>(stats[0].calls.load());
+        if(!measure)check(failed && out.value==sentinel,"copy failure published or missed ordinal");
+        check(r.collect()==Runtime::Collection::completed,"copy rollback retry collection");
+        if(failed) {
+            check(r.snapshot().objects==4,"failed copy left private objects");
+            Runtime::BufferReadLease lease(r,r.root_word(&source.value),layout);Runtime::BufferBuilder retry(r,layout,2,quota);
+            retry.copy_elements(lease,0,2);retry.finish_into(&out.value);
+        }
+        copy_oracle(out.value,layout,object.value,text.value,witness);
+        r.store(source.value,layout->element_offset(0)+2*w,object.value); // no leaked lease after success/failure
+        source.value=out.value=object.value=text.value=nullptr;r.collect();check(!r.snapshot().objects,"copy sweep leaked GC objects");
+    }
+    reference_native_empty();return sites;
+}
+void copy_failures() {
+    auto sites=copy_failure_transaction(-1,true);check(sites>4,"copy allocation work not measured");
+    for(long ordinal=0;ordinal<sites;++ordinal)copy_failure_transaction(ordinal,false);
+    std::cout<<"copy/partial-mark allocation failure sweep: "<<sites<<" sites\n";
+}
 void reference_poll_reacquisition(bool invalid_after_poll=false) {
     Runtime r;const auto w=sizeof(void*);std::array<NominalDescriptor,2> types{{{"T","","plain",{w,{}}},{"Other","","other",{w,{}}}}};
     InterfaceWitness witness{"interface:1:I1:T","I","T","read"};r.admit_metadata(types,{&witness,1});
@@ -710,7 +958,7 @@ void measure() {
 int main(int argc,char** argv) {
     try {
         if(argc>1) {if(std::string_view(argv[1])=="--measure")measure();else if(std::string_view(argv[1])=="--measure-reference")measure_references();else if(std::string_view(argv[1])=="reference-leak-bytes")checked_reference_transaction(-1,true,37);else if(std::string_view(argv[1])=="reference-leak-zero")checked_reference_transaction(-1,true,0);else fatal(argv[1]);}
-        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();reference_poll_reacquisition();
+        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();reference_poll_reacquisition();
 #ifdef VD_BUFFER_WRAP_COLLECT
             reference_poll_reacquisition(true);
 #endif

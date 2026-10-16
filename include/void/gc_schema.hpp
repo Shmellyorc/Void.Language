@@ -77,6 +77,7 @@ public:
     std::size_t depth() const;
     bool has_references() const;
     bool zero_data_complete() const;
+    bool mutable_data() const {return spec_.capability_profile=="mutable";}
     bool equivalent(const ElementSchema&) const;
 private:
     friend class Runtime;

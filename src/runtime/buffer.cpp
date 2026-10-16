@@ -133,6 +133,7 @@ void Runtime::BufferBuilder::validate_private() const {
     runtime_.validate_buffer_layout(layout_);
     if(layout_->capacity()) {
         const auto& b=runtime_.heap_.buffer_state(root_.value_);
+        if(b.readers)throw BufferBusy("private destination has active read leases");
         if(b.layout!=layout_ || b.complete || b.owner!=&root_) throw std::logic_error("invalid private builder ownership");
     } else if(root_.value_) throw std::logic_error("nonempty typed empty builder");
 }
@@ -262,14 +263,152 @@ void Runtime::BufferBuilder::zero_elements(std::uint64_t count) {
 }
 void Runtime::BufferBuilder::finish_into(void** output) {
     try {
-        require_active();runtime_.require_buffer_output(output);normalize();
+        require_active();runtime_.require_buffer_output(output);
+        {std::lock_guard lock(runtime_.mutex_);runtime_.heap_.validate_output_address(output);}
+        normalize();
         if(prefix_!=requested_ || in_element_ || event_)throw std::logic_error("incomplete buffer construction");
         runtime_.poll();
-        std::lock_guard lock(runtime_.mutex_);runtime_.require_buffer_output(output);validate_private();
+        std::lock_guard lock(runtime_.mutex_);runtime_.require_buffer_output(output);validate_private();runtime_.heap_.validate_output_address(output);
         // All fallible checks precede this commit. No payload scan/copy, allocation,
         // safepoint or callback can occur between sealing and output publication.
         if(layout_->capacity())runtime_.heap_.seal_buffer(root_.value_,&root_,prefix_);
         *output=root_.value_;root_.value_=nullptr;finished_=true;
     } catch(...) {failed_=true;throw;}
 }
+Runtime::BufferReadLease::BufferReadLease(Runtime& r,RegisteredRootWord source,const BufferLayoutRef& layout)
+    :runtime_(r),layout_(layout),owner_(std::this_thread::get_id()),frame_(r,&slot_,1) {
+    r.require_managed();std::lock_guard lock(r.mutex_);r.validate_buffer_layout(layout_);
+    auto* value=r.reference_source(source);
+    if(!layout_->capacity()) {
+        if(value)throw std::invalid_argument("typed empty source must be null");
+        return;
+    }
+    const auto& state=r.heap_.buffer_state(value);
+    if(!state.complete || !state.layout->equivalent(*layout_))throw std::invalid_argument("lease requires an exact complete buffer");
+    if(state.readers==std::numeric_limits<std::size_t>::max())throw std::overflow_error("buffer read lease overflow");
+    // All checks precede the infallible count/root commit. No poll or allocation.
+    count_=state.valid_prefix;++state.readers;value_=value;
+}
+void Runtime::BufferReadLease::validate() const {
+    runtime_.require_managed();
+    if(owner_!=std::this_thread::get_id())throw std::invalid_argument("foreign-thread buffer lease");
+    runtime_.validate_buffer_layout(layout_);
+    if(!layout_->capacity()) {if(value_ || count_)throw std::logic_error("invalid empty lease");return;}
+    const auto& state=runtime_.heap_.buffer_state(value_);
+    if(!state.complete || !state.readers || state.valid_prefix!=count_ || !state.layout->equivalent(*layout_))
+        throw std::logic_error("invalid buffer read lease");
+}
+Runtime::BufferReadLease::~BufferReadLease() noexcept {
+    std::lock_guard lock(runtime_.mutex_);validate();
+    if(value_)--runtime_.heap_.buffer_state(value_).readers;
+    value_=nullptr; // Frame unlinks next, without a poll.
+}
+void Runtime::buffer_store_scalar(RegisteredRootWord owner,const BufferLayoutRef& layout,std::uint64_t index,
+                                 std::span<const SchemaStep> path,std::uint64_t bits) {
+    require_managed();
+    // Resolve one admitted logical path, without walking/expanding repetition.
+    std::size_t node=0,offset=0,width=0;ScalarEncoding encoding;
+    {
+        std::lock_guard lock(mutex_);validate_buffer_layout(layout);
+        if(!layout->schema()->mutable_data())throw std::invalid_argument("buffer profile does not permit mutation");
+        const auto& schema=*layout->schema();node=schema.spec_.root;
+        for(const auto& step:path) {
+            const auto& shape=schema.spec_.nodes[node];
+            if(step.kind==SchemaStep::Kind::field) {
+                auto* record=std::get_if<SchemaRecord>(&shape);
+                if(!record)throw std::invalid_argument("scalar path requires record");
+                auto field=std::find_if(record->fields.begin(),record->fields.end(),[&](const auto& f){return f.id==step.value;});
+                if(field==record->fields.end())throw std::invalid_argument("unknown scalar field");
+                offset=sum(offset,field->offset);node=field->child;
+            } else {
+                if(step.kind!=SchemaStep::Kind::element)throw std::invalid_argument("unknown scalar path step");
+                auto* repeat=std::get_if<SchemaRepeat>(&shape);
+                if(!repeat || step.value>=repeat->extent)throw std::out_of_range("scalar repeat path");
+                offset=sum(offset,sum(repeat->base,product(repeat->stride,step.value)));node=repeat->child;
+            }
+        }
+        auto* scalar=std::get_if<SchemaScalar>(&schema.spec_.nodes[node]);
+        if(!scalar)throw std::invalid_argument("scalar store requires scalar leaf");
+        encoding=scalar->encoding;width=schema.summaries_[node].bytes;
+        if((width!=1 && width!=2 && width!=4 && width!=8) || (width<8 && bits>>(width*8)) || (encoding==ScalarEncoding::boolean && bits>1))
+            throw std::invalid_argument("invalid scalar store bits/width");
+    }
+    auto destination=[&]() {
+        auto* object=reference_source(owner);const auto& state=heap_.buffer_state(object);
+        if(!state.complete || !state.layout->equivalent(*layout) || index>=state.valid_prefix)throw std::invalid_argument("invalid scalar buffer destination");
+        if(state.readers)throw BufferBusy("buffer storage has active read leases");
+        return static_cast<char*>(object)+sum(layout->element_offset(index),offset);
+    };
+    {std::lock_guard lock(mutex_);(void)destination();}
+    poll();
+    std::lock_guard lock(mutex_);auto* out=destination();
+    switch(width) {
+        case 1:{auto v=static_cast<std::uint8_t>(bits);std::memcpy(out,&v,1);break;}
+        case 2:{auto v=static_cast<std::uint16_t>(bits);std::memcpy(out,&v,2);break;}
+        case 4:{auto v=static_cast<std::uint32_t>(bits);std::memcpy(out,&v,4);break;}
+        case 8:std::memcpy(out,&bits,8);break;
+        default:std::terminate();
+    }
+}
+void Runtime::BufferBuilder::copy_elements(BufferReadLease& source,std::uint64_t first,std::uint64_t count) {
+    try {
+        require_active();
+        if(&source.runtime_!=&runtime_)throw std::invalid_argument("foreign buffer lease");
+        auto validate=[&]() {
+            source.validate();validate_private();
+            if(source.layout_->schema()!=layout_->schema())throw std::invalid_argument("copy requires exact admitted schema/profile");
+            if(source.value_ && source.value_==root_.value_)throw std::invalid_argument("copy storage aliases");
+        };
+        {std::lock_guard lock(runtime_.mutex_);validate();}
+        if(in_element_ || consumed_ || first>source.count_ || count>source.count_-first || count>requested_-prefix_)
+            throw std::out_of_range("copy must append complete live elements");
+        const auto begin=prefix_,end=prefix_+count;
+        if(!count)return;
+        if(!cursor_.has_data()) {
+            runtime_.poll();std::lock_guard lock(runtime_.mutex_);validate();prefix_=end;return;
+        }
+        while(prefix_<end) {
+            if(cursor_.dense_u8() && layout_->stride()==1 && source.layout_->stride()==1 && !in_element_) {
+                auto n=static_cast<std::size_t>(std::min<std::uint64_t>(end-prefix_,quota_.bytes));
+                runtime_.poll();
+                {std::lock_guard lock(runtime_.mutex_);validate();
+                    auto* from=static_cast<const char*>(source.value_)+source.layout_->element_offset(first+prefix_-begin);
+                    auto* to=static_cast<char*>(root_.value_)+layout_->element_offset(prefix_);
+                    std::memcpy(to,from,n);prefix_+=n;}
+                continue;
+            }
+            normalize();if(prefix_==end)break;
+            if(!event_)throw std::logic_error("copy data cursor incomplete");
+            runtime_.poll();
+            std::shared_ptr<const RuntimeMetadata> previous_catalog;
+            {
+                std::lock_guard lock(runtime_.mutex_);validate();
+                auto source_element=first+prefix_-begin;
+                auto* from=static_cast<const char*>(source.value_)+sum(source.layout_->element_offset(source_element),sum(event_->offset,consumed_));
+                if(event_->reference) {
+                    const auto& ref=*event_->reference;void* value=nullptr;const InterfaceWitness* witness=nullptr;
+                    // Interface offsets need not begin at the event's base.
+                    auto* base=static_cast<const char*>(source.value_)+source.layout_->element_offset(source_element);
+                    std::memcpy(&value,base+ref.offset,sizeof(value));
+                    if(ref.witness_offset)std::memcpy(&witness,base+*ref.witness_offset,sizeof(witness));
+                    runtime_.heap_.validate_reference(ref,value,witness,*runtime_.types_,false);
+                    auto* to=address(ref.offset,sizeof(value));char* witness_to=nullptr;
+                    if(ref.witness_offset)witness_to=address(*ref.witness_offset,sizeof(witness));
+                    const auto& state=runtime_.heap_.buffer_state(root_.value_);
+                    if(state.catalog!=runtime_.types_) {previous_catalog=std::move(state.catalog);state.catalog=runtime_.types_;}
+                    std::memcpy(to,&value,sizeof(value));if(witness_to)std::memcpy(witness_to,&witness,sizeof(witness));
+                    in_element_=true;event_.reset();
+                } else {
+                    auto n=event_->scalar ? event_->bytes : std::min(event_->bytes-consumed_,quota_.bytes);
+                    auto* to=address(sum(event_->offset,consumed_),n);std::memcpy(to,from,n);
+                    in_element_=true;consumed_+=n;
+                    if(consumed_==event_->bytes) {consumed_=0;event_.reset();}
+                }
+            }
+            normalize();
+        }
+        if(cursor_.dense_u8() && layout_->stride()==1 && source.layout_->stride()==1) {event_.reset();consumed_=0;cursor_.reset();}
+    } catch(...) {failed_=true;throw;}
+}
+
 }

@@ -180,9 +180,10 @@ std::size_t Runtime::string_payload_size(std::size_t left,std::size_t right) {
 }
 void Runtime::string_parts_into(void** slot,std::string_view left,std::string_view right) {
     require_output(slot);
+    {std::lock_guard lock(mutex_);heap_.validate_output_address(slot);}
     auto bytes=string_payload_size(left.size(),right.size());
     if (!valid_utf8(left) || !valid_utf8(right)) throw std::invalid_argument("invalid UTF-8 string");
-    if (left.empty() && right.empty()) { *slot=nullptr; return; }
+    if (left.empty() && right.empty()) { std::lock_guard lock(mutex_);heap_.validate_output_address(slot);*slot=nullptr; return; }
     std::vector<char> payload(bytes);
     std::uint64_t size=left.size()+right.size(); std::memcpy(payload.data(),&size,sizeof(size));
     if(!left.empty()) std::memcpy(payload.data()+sizeof(size),left.data(),left.size());
@@ -196,16 +197,19 @@ void Runtime::concat_into(void** slot,void* left,void* right) {
 }
 void Runtime::allocate_into(void** slot, const TypeLayout& layout) {
     require_output(slot);
+    {std::lock_guard lock(mutex_);heap_.validate_output_address(slot);}
     if (layout.kind!=TypeLayout::Kind::ordinary) throw std::invalid_argument("intrinsic allocation requires complete construction");
     // Before allocation, the caller's registered slot contains null/its old
     // value. There is no safepoint between allocation and publication.
     poll();
     std::lock_guard lock(mutex_);
     validate_descriptor(layout);
+    heap_.validate_output_address(slot);
     *slot = heap_.allocate(layout);
 }
 void Runtime::construct_into(void** slot, const TypeLayout& layout, const void* payload) {
     require_output(slot);
+    {std::lock_guard lock(mutex_);heap_.validate_output_address(slot);}
     if (!payload) throw std::invalid_argument("missing prepared object");
     if (layout.kind==TypeLayout::Kind::string) {
         if (layout.size<=sizeof(std::uint64_t) || !layout.references.empty() || layout.descriptor)
@@ -229,6 +233,7 @@ void Runtime::construct_into(void** slot, const TypeLayout& layout, const void* 
     // Heap::allocate completes every fallible descriptor/map operation. The
     // copy and final root publication cannot throw or invoke user code/GC.
     validate_descriptor(layout);
+    heap_.validate_output_address(slot);
     void* object=heap_.allocate_validated(layout,std::move(references));
     std::memcpy(object,payload,layout.size);
     *slot=object;

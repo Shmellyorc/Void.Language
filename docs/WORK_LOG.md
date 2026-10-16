@@ -8986,3 +8986,114 @@ Code changes only tests/runtime/buffers.cpp and buffers.py; documentation change
 ARRAYS_PROPOSAL.md 27.6 and this log. No production runtime/GC/compiler or workflow
 edits, Git mutations, commits, pushes, branches, remote actions or dispatches.
 Stage 2E remains locked. Stop for owner/Wrench review and native acceptance.
+
+
+## 16 October 2026: Stage 2D hosted lock; Stage 2E authorization
+
+Boss and Wrench confirm Stage 2D LOCKED at `97a9e49`, GitHub CI #55: all seven
+jobs green, 63/63 suites each. This is owner-supplied hosted evidence. Stage 2E
+only is now authorized under proposal 23.6/23.8/23.9: rooted stable-source leases
+and distinct private copies. Stage 2F, source arrays, LLVM/ABI and production
+activation remain gated. No Git or remote actions are authorized.
+
+
+## 16 October 2026: Stage 2E stable-source copying — local implementation review
+
+Implemented only the authorized Stage 2E runtime primitives after recording the
+owner-supplied Stage 2D lock (`97a9e49`, CI #55, seven jobs, 63/63). Stage 2F and
+all source/native-array, owned-fixed/growable child, compiler/LLVM/generated ABI
+and production-certification gates remain closed.
+
+Actual API/ownership:
+- BufferBusy is the explicit internal lease-conflict exception. BufferReadLease
+  takes a verified RegisteredRootWord and exact admitted BufferLayout, owns an
+  independent ordinary Frame/Slot root, and derives its count from the sealed
+  source. Noncopyable/nonmovable, same-thread Managed RAII/Frame lifetime rules.
+- Checked mutex-protected reader counts commit with the root without polling or
+  fallible work; destruction validates/decrements and unlinks the root. Multiple
+  readers coexist; writers throw rather than waiting for readers. No wrap/underflow.
+- BufferBuilder::copy_elements(lease, first, count) streams distinct private
+  destination storage using existing DataCursor events, checked live-prefix/
+  requested-prefix bounds and exact schema/profile identity. Different capacity,
+  base and stride layouts are allowed. Bytes/u8 use bounded chunks; native scalars
+  preserve bits; managed/string/interface roles preserve referent/witness identity.
+  Interface pairs validate and commit atomically. No element-sized stack staging,
+  expanded copy plan, metadata pointer or interior address survives into a poll.
+- Each chunk reacquires source/destination under the existing mutex after polling.
+  A caller can clear its original source word: the lease's root keeps it alive
+  through NativeSafe reservation, collection and copying. Failed builders poison,
+  leases/roots/reservations unwind, old outputs remain unchanged, and abandoned
+  storage uses normal GC. Reserved owned-fixed/growable roles still reject at
+  admission/preparation; there is no shallow-copy workaround.
+
+Writer audit/fix:
+- New checked logical-path scalar mutation and the legacy store's typed buffer
+  managed/string-word branch enforce leases. Both preserve native geometry and
+  required references; legacy interface half-writes, spare/private stores reject.
+  These narrow embedding mutators require the explicit mutable fixture profile;
+  readonly/unfamiliar profiles cannot gain write authority. This does not define
+  source concurrency or a complete public mutation API.
+- Registered output roots could otherwise alias payload words. Allocation,
+  prepared construction, strings (including empty) and private-buffer finish now
+  check this bypass before/post poll as appropriate. Leased aliases give BufferBusy;
+  unleased untyped buffer aliases reject. Private builder address/zero/dense/finish
+  paths also enforce the read-count invariant. No writable interior API is added.
+- Heap buffer-object count is updated only after successful adoption and on
+  destruction. Ordinary/string-only heaps take the output guard's constant-time
+  counter fast path; with buffers present it scans Heap ranges under the mutex.
+  This mixed-heap O(objects) guard is a documented scalability/lock-cost limitation,
+  not a latency guarantee. No new address index, GC, allocator, numerical cutoff or
+  production scheduling policy is selected in this checkpoint.
+
+New proofs remain inside gc_buffers (all 63 suites preserved):
+- 3 MiB u8 and byte-region copies with independent byte oracles, distinct geometry,
+  bidirectional mutation independence, zero-capacity/zero-footprint data, multiple
+  leases and a cross-thread writer reporting BufferBusy.
+- Nested record/repeat scalar, required managed, string and interface content:
+  independent offset/witness oracles, source mutation isolation, retained referents
+  after original roots die. A real request overlaps a Managed partial destination,
+  then copy polls/parks and collection completes deterministically. Aborted copies
+  reclaim. Existing NativeSafe allocation/zeroing and post-poll tests remain intact.
+- Private-source/alias, foreign/expired/unregistered root, foreign schema,
+  wrong-thread lease, bounds, profile and owned-role negatives. Direct output aliases
+  cover allocate, prepared construct, empty/nonempty string and finish paths.
+  Trusted corruption controls restore source words after required-null, wrong
+  managed/string kind and forged witness copy rejection; no partial output publishes.
+- Successful reference-copy/partial-mark baseline measures 17 allocation sites on
+  local libstdc++; all ordinals 0–16 fail, preserve sentinel/graph/epoch rollback,
+  release leases/native reservations, collect abandoned objects and retry correctly.
+  Native leaks check zero count AND bytes after Runtime/Heap owners die; GC objects
+  must be zero immediately after collection. Existing 4/6-site byte and 11-site
+  reference sweeps, ten fatal modes and two deliberate leak controls are retained.
+
+Final complete native Linux x64 Clang/LLVM 19 validation:
+- Debug 63/63, 91.26 s; Release 63/63, 46.66 s.
+- Strict ASan/UBSan 63/63, 115.44 s: ASAN_OPTIONS=detect_leaks=1:abort_on_error=1;
+  UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1. Initial sanitizer build under
+  tracing failed at native AOT generation because LSan does not support ptrace;
+  rerun build and tests outside that sandbox passed, with no suppression/settings
+  relaxation. No production code change was made for that environment failure.
+- 1 MiB stack Debug/Release: 11/11 affected suites, 12.07 s / 3.21 s. Includes
+  buffers, schemas, coordination, generated roots, callbacks, failures, invariants,
+  normal/O2 AOT, strings and interfaces. Full runs also preserve auditor, frontend,
+  editor/LSP, existing stress and CLI coverage.
+- Logs/measurements: build/stage2e-evidence and corresponding CTest LastTest logs.
+  git diff --check passes. HEAD inspected read-only is the locked 97a9e49.
+
+Requested metadata/cost witnesses (not performance thresholds): Release 3 MiB u8
+copy/finish after destination construction 0.729445 ms; four allocations request
+3,145,952 bytes, with destination payload extent 3,145,768 + 184 metadata bytes.
+One vs 131,072 nullable references both use four allocations/184 metadata bytes,
+payload 8 bytes vs 1 MiB. Single-sample copy/finish 0.00172/30.243 ms, two-live-
+buffer GC 0.00123/13.0635 ms. Descriptor/copy metadata does not expand per element.
+Samples ran amid other validation; allocator overhead/RSS, peak memory, pause
+percentiles and production latency are not established. Read count adds one native
+size_t to BufferState; ordinary/string tracing and legacy shape interpretation
+are unchanged. GC remains stop-the-world and proportional to reference positions.
+
+Proposal Section 28 records implementation, APIs and limitations. No native
+Windows/macOS Stage 2E execution or hosted acceptance is claimed. Range-guard
+scaling, comprehensive performance and target-native acceptance remain for review;
+future compiler value-copy plans, owned/growable child roles and source activation
+are separately gated. No workflow edits, commits, pushes, branches, Git mutations,
+remote actions or dispatches. Stop for owner/Wrench review before Stage 2F.

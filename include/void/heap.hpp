@@ -54,6 +54,7 @@ public:
     void store(void* object, std::size_t offset, void* value);
 private:
     friend class Runtime;
+    void validate_output_address(void**) const;
     void* allocate_validated(const TypeLayout&, LegacyReferenceMap);
     struct BufferState {
         BufferLayoutRef layout;
@@ -62,6 +63,7 @@ private:
         mutable bool complete=false;
         mutable std::shared_ptr<const RuntimeMetadata> catalog;
         std::uint64_t requested_live; // immutable construction boundary, not trace extent
+        mutable std::size_t readers=0;
     };
     class PendingBuffer {
     public:
@@ -93,7 +95,7 @@ private:
     };
     std::unordered_map<void*, Object> objects_;
     std::vector<void**> roots_;
-    std::size_t private_buffers_=0;
+    std::size_t private_buffers_=0,buffer_objects_=0;
     void destroy(void*,const Object&) noexcept;
 };
 class Root {

@@ -2,6 +2,9 @@
 #include "void/gc_schema.hpp"
 #include <limits>
 namespace vd {
+class BufferBusy final : public std::logic_error {
+public: using std::logic_error::logic_error;
+};
 class BufferLayout;
 using BufferLayoutRef=std::shared_ptr<const BufferLayout>;
 // Capacity-specific, immutable, data-only. Only Runtime can bind it to admission.

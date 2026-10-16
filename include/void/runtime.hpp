@@ -25,6 +25,7 @@ public:
     class Frame;
     class Handle;
     class BufferBuilder;
+    class BufferReadLease;
     class RegisteredRootWord;
     struct RootedInterfaceSource;
     explicit Runtime(std::size_t allocation_budget = 0) : allocation_budget_(allocation_budget) {}
@@ -53,6 +54,8 @@ public:
     RegisteredRootWord root_word(void** registered_slot) const;
     BufferLayoutRef buffer_layout(ElementSchemaRef,std::uint64_t capacity,std::size_t base=0,std::size_t stride=0) const;
     std::byte buffer_byte(void*,const BufferLayoutRef&,std::uint64_t element,std::size_t offset) const;
+    void buffer_store_scalar(RegisteredRootWord, const BufferLayoutRef&,std::uint64_t element,
+                             std::span<const SchemaStep>,std::uint64_t bits);
     const InterfaceWitness* witness(std::string_view) const;
     std::int64_t interface_binding(void* object,const void* witness,std::span<const char* const> keys) const;
     std::shared_ptr<const NominalDescriptor> descriptor(std::string_view) const;
@@ -193,6 +196,29 @@ struct Runtime::RootedInterfaceSource {
     RegisteredRootWord object;
     const InterfaceWitness* witness;
 };
+// A complete source snapshot's storage is rooted and frozen until this scoped,
+// thread-affine lease dies. Referenced objects retain their ordinary semantics.
+class Runtime::BufferReadLease {
+public:
+    BufferReadLease(Runtime&,RegisteredRootWord,const BufferLayoutRef&);
+    ~BufferReadLease() noexcept;
+    BufferReadLease(const BufferReadLease&)=delete;
+    BufferReadLease& operator=(const BufferReadLease&)=delete;
+    BufferReadLease(BufferReadLease&&)=delete;
+    BufferReadLease& operator=(BufferReadLease&&)=delete;
+    std::uint64_t count() const {return count_;}
+private:
+    friend class Runtime::BufferBuilder;
+    void validate() const; // Runtime mutex held, Managed owner thread
+    Runtime& runtime_;
+    BufferLayoutRef layout_;
+    std::thread::id owner_;
+    void* value_=nullptr;
+    static constexpr std::size_t zero_=0;
+    Slot slot_{&value_,sizeof(value_),&zero_,1};
+    Frame frame_;
+    std::uint64_t count_=0;
+};
 class Runtime::BufferBuilder {
 public:
     BufferBuilder(Runtime&,BufferLayoutRef,std::uint64_t requested_live,BufferWorkQuota);
@@ -206,6 +232,7 @@ public:
     void write_reference(RegisteredRootWord source);
     void write_interface(const RootedInterfaceSource& source);
     void zero_elements(std::uint64_t count);
+    void copy_elements(BufferReadLease&,std::uint64_t source_first,std::uint64_t count);
     void finish_into(void** registered_output);
 private:
     void require_active();

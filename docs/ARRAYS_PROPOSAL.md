@@ -1,11 +1,11 @@
 # Phase 23 proposal: typed arrays, indexing and iteration
 
-**Current status, 16 October 2026: owner confirms CI #51 passed all seven jobs,
-63/63 suites, locking Stage 2C at `cb601b4`. Stage 1, Stage 2B and Part 5A remain
-locked by their recorded hosted runs. Stage 2D alone is authorized; Section 27
-records runtime-only reference preparation and local verification. Source-native
-arrays, leased/deep copying and production certification remain gated. The
-superseding large-array decision below remains in force.**
+**Current status, 16 October 2026: owner/Wrench confirm Stage 2D LOCKED at
+`97a9e49`, CI #55, all seven jobs green and 63/63 suites each. Stage 2E only is
+authorized; Section 28 records runtime-only leases/copying and local verification.
+Stage 2F, source-native arrays, owned-fixed/growable child copying, compiler/LLVM/
+generated ABI changes and production certification remain gated. Earlier Stage 1,
+2B/2C and Part 5A locks and the superseding large-array decision remain in force.**
 
 > **SUPERSEDING OWNER DECISION: large arrays are a language requirement.**
 > Neither `[T, n]` nor `[T]` may have an arbitrary 64 KiB source-level ceiling.
@@ -2772,8 +2772,9 @@ failure-injection proof; a plausible scan count does not authorize partial sweep
 
 This is the full Stage 2 internal embedding/runtime API design, not a new generated-
 code ABI or a claim that every declaration works. Sections 24-27 record implemented
-2B admission, 2C byte buffers and 2D reference preparation; copy/lease and public
-mutation APIs remain proposals. Opaque handles are runtime-
+2B admission, 2C byte buffers and 2D reference preparation. Section 28 records
+the Stage 2E lease/copy APIs and narrow embedding mutators actually implemented;
+the rest of this original proposed surface remains gated. Opaque handles are runtime-
 bound and factory-created;
 callers cannot manufacture an admitted handle by constructing shared_ptr<const T>.
 
@@ -3080,7 +3081,8 @@ unproved alignment, source stability, reference completeness or publication rule
 No later stage is authorized by approving a substep.
 
 **Approved overall direction; implemented 2B/2C/2D subsets are recorded in
-Sections 24-27, while stable-source copying/leases still require Stage 2E:**
+Sections 24-27. Stage 2E copying/lease implementation is recorded in Section 28;
+Stage 2F remains a separate approval gate:**
 runtime-owned DAG/cursor; mutually exclusive
 buffer layout and typed empty representation; same-Heap NativeSafe zero reservation
 then rooted private adoption; prefix/event completeness and sealed publication;
@@ -3090,7 +3092,7 @@ numbers, source ABI/owned-handle layout, production stack policy, growable heade
 commit protocol and source concurrency semantics are not selected here.
 
 The original Stage 2A checkpoint changed documentation only. The subsequent owner
-authorizations separately permit 23.9 steps 2B, 2C and 2D, recorded below; remaining
+authorizations separately permit 23.9 steps 2B, 2C, 2D and 2E, recorded below; remaining
 implementation steps require their own review. Research checks, CI, Git history and remotes remain
 unchanged.
 
@@ -3978,3 +3980,170 @@ ordinals complete rollback/retry and finish with zero Heap objects and zero nati
 count/bytes. Logs: `build/ci54-lifetime/`. No full 63-suite or new native macOS run
 is claimed. Runtime/GC/compiler, workflows and research gates remain unchanged;
 Stage 2E is locked. Stop for owner/Wrench review, no Git or remote actions.
+
+
+## 16 October 2026: Stage 2D hosted lock; Stage 2E authorization
+
+Boss and Wrench confirm Stage 2D LOCKED at `97a9e49`, GitHub CI #55: all seven
+jobs green, 63/63 suites each. This is owner-supplied hosted evidence. Stage 2E
+only is now authorized under proposal 23.6/23.8/23.9: rooted stable-source leases
+and distinct private copies. Stage 2F, source arrays, LLVM/ABI and production
+activation remain gated. No Git or remote actions are authorized.
+
+
+## 28. Stage 2E: rooted stable-source copying (local review checkpoint)
+
+Owner-authorized after Stage 2D lock `97a9e49` / CI #55 (seven jobs, 63/63).
+Implemented only the internal C++ runtime foundation; no source arrays, owned-
+fixed/growable representation, generated-code ABI or certification activation.
+The Section 23 schema, allocation, GC, private construction and publication
+contracts remain authoritative.
+
+### 28.1 Actual API and ownership
+
+- `vd::BufferBusy final : std::logic_error` identifies a lease conflict.
+- `Runtime::BufferReadLease(Runtime&, RegisteredRootWord, const BufferLayoutRef&)`
+  acquires a complete exact-layout source. `count()` exposes its sealed live prefix.
+  It is noncopyable, nonmovable, thread-affine and destroyed while Managed, under
+  the existing Frame lifetime/LIFO rules. Its own ordinary Frame/Slot roots the
+  whole source, independently of the caller's original word. Typed empty/null
+  layouts retain identity without an object/count increment.
+- `BufferBuilder::copy_elements(BufferReadLease&, source_first, count)` appends
+  complete elements into distinct private storage. Bounds check by subtraction;
+  schema **pointer** identity, hence complete profile/domain identity, must match.
+  Different admitted capacity/base/stride layouts are permitted. Source selections
+  must lie in the sealed prefix; destination selections in the requested prefix.
+- `Runtime::buffer_store_scalar(RegisteredRootWord, layout, element,
+  span<const SchemaStep>, bits)` resolves an admitted logical scalar leaf without
+  expanding repeats, validates native width/boolean bits, and revalidates the
+  rooted destination after polling. The existing `Runtime::store`/`Heap::store`
+  buffer branch supports one managed/string reference word via the same
+  `ReferenceShape::at` and typed validation. It rejects interface half-writes,
+  spare/private storage and invalid targets. These narrow internal embedding
+  mutators require the explicit `mutable` fixture capability profile; unfamiliar
+  or readonly profiles are denied, not interpreted as authority to thaw values.
+  No general public source mutation policy or interface mutation API is introduced.
+
+A BufferState has a mutex-protected checked reader count. Lease acquisition checks
+all geometry/registration/completeness/count conditions before an infallible
+count/root commit, with no poll or allocation between them. Destruction validates
+ownership and nonzero count, decrements, then unlinks its root with no poll. The
+count cannot wrap or underflow. Multiple readers coexist. Writers never wait for
+readers: an active lease raises BufferBusy before a write. Referenced objects are
+not frozen; copying preserves their identities, not snapshots of their internals.
+
+### 28.2 Writer coverage and copy mechanism
+
+Every current buffer storage writer is covered: scalar mutation, legacy reference
+store and private builder address/dense/zero/final validation. Complete sources
+cannot be leased as private destinations, and the copier explicitly rejects
+whole-storage aliasing. There is no writable interior export. A writer audit also
+found registered output words could otherwise alias payload bytes. Allocation,
+prepared construction, string output (including the empty fast path) and buffer
+finish now reject such untyped same-Heap buffer aliases, with BufferBusy while
+leased; checks precede and follow polling where applicable. They cannot use a
+registered root as a way to bypass typed mutation. C++ embedding code still obeys
+existing trusted Frame/Slot and raw-memory contracts; deliberate corruption
+fixtures do not represent supported raw mutable exports.
+
+The output guard has a counter fast path on ordinary/string-only heaps. With
+buffers present it checks object ranges under the existing mutex, O(Heap objects).
+The buffer counter increments only after successful adoption and decrements on
+sweep/destruction. This adds no per-object allocation or alternate reference map.
+**Limitation:** this range guard is not a scalable address index and its lock cost
+has not been certified for game-scale mixed heaps. A future measured/indexed
+approach would need its own transactional/rollback proof. No hard latency or
+unapproved scheduling limit is inferred from the current implementation.
+
+Copying reuses DataCursor's admitted physical-event interpretation. Dense u8
+runs and byte regions use bounded memcpy chunks; scalar events copy their native
+width; managed/string/interface events use the existing typed validator. Interface
+object/witness words and catalog retention commit together under one mutex.
+Every copied reference keeps referent identity; all destination value bytes occupy
+a distinct allocation. Padding stays zero and has no reference authority. Reserved
+owned-fixed/growable nodes remain rejected at schema admission and DataCursor
+preparation, so no shallow pointer workaround is reachable.
+
+Each chunk polls without holding the mutex, then reacquires source/destination
+bases and Heap metadata and revalidates the lease/private owner. No iterator,
+metadata reference or raw interior address survives that lock scope into a poll.
+Source geometry and live prefix are immutable; the lease's independent root
+survives caller-slot changes and NativeSafe destination reservation. Cursor space
+depends on schema depth; temporary pointer/interface words have fixed size.
+There are no payload- or element-sized native temporaries. Zero-footprint elements
+copy only checked logical progress. Empty sources/copies and spare capacity retain
+the prior typed-empty and zero-reference invariants.
+
+Any invalid copy poisons its builder. Existing requested-prefix/event progress,
+private roots, NativeSafe zero reservations, allocation budgeting, mark rollback
+and atomic finish are reused. Failed/aborted builders remain unpublished and are
+reclaimed by normal GC; scoped leases unwind on transaction failure. Final
+collection must empty GC objects immediately, and tracked native storage must be
+zero after all Runtime/Heap owners die (the locked CI #54 correction).
+
+### 28.3 Proofs and actual verification
+
+The existing `gc_buffers` suite adds, without changing the 63-suite inventory:
+
+- Independent 3 MiB byte and byte-region oracles, different source/destination
+  geometry, bidirectional mutation independence, zero-capacity and zero-footprint
+  copies, multiple leases and a cross-thread conflicting writer.
+- Nested repeats/records with scalar, required managed, immutable string and
+  interface events; independent physical offset/witness oracles. Source mutation
+  leaves the copy unchanged, and copied referents survive after original roots die.
+- A deterministic request while a partially copied builder is Managed, followed
+  by a real cooperative park/collection and successful completion. Caller-root
+  clearing and collection prove the lease is an independent precise source root.
+- Private-source/alias, expired/foreign/unregistered root, foreign schema,
+  wrong-thread lease, bounds/profile, unsupported-owned-role and incomplete-copy
+  negatives. Output-root alias attempts cover ordinary allocation, prepared
+  construction, empty/nonempty strings and buffer publication. Required-null,
+  wrong managed/string-kind and forged-interface-witness corruption controls
+  independently reject copying and preserve the previous output; fixture graph
+  words are restored before explicit GC.
+- Measured successful-copy allocation/partial-mark work: **17 sites on local
+  libstdc++**. Every ordinal 0–16 throws, preserves the sentinel, rolls back marks/
+  request epochs, releases leases/roots/reservations, collects abandoned storage
+  and permits a fresh successful copy. Site counts remain measured per platform.
+  The prior 4/6-site byte and 11-site reference sweeps, ten fatal subprocess
+  invariants, two deliberate post-owner leak controls and post-poll regressions
+  are unchanged.
+
+Clang/LLVM 19 Linux x64 local final results:
+
+| Configuration | Result | Elapsed |
+| --- | --- | --- |
+| Debug complete existing suite | 63/63 | 91.26 s |
+| Release complete existing suite | 63/63 | 46.66 s |
+| Strict ASan/UBSan complete suite | 63/63 | 115.44 s |
+| 1 MiB Debug stack, affected suites | 11/11 | 12.07 s |
+| 1 MiB Release stack, affected suites | 11/11 | 3.21 s |
+
+Strict settings: ASAN_OPTIONS=detect_leaks=1:abort_on_error=1;
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1. The first in-sandbox sanitizer
+AOT-generation build hit LeakSanitizer's ptrace restriction; rebuilding/running
+outside that tracing sandbox passed with strict settings, no suppressions.
+Focused stack suites cover buffers, schemas, coordination, generated roots,
+callbacks, failures, invariants, normal/O2 AOT, strings and interfaces. Full tests
+also retain the research auditor, frontend/editor and native/AOT coverage.
+Logs/measurements: `build/stage2e-evidence/` and the corresponding CTest logs.
+
+Non-threshold direct Release samples: copying/publishing 3 MiB u8 data takes
+0.729445 ms after destination construction; its four allocations request
+3,145,952 bytes (destination allocation extent 3,145,768, plus 184 requested metadata
+bytes). This excludes source allocation, native allocator headers and RSS. One
+versus 131,072 nullable references both use four allocations and 184 metadata
+bytes, with payloads 8 bytes / 1 MiB: no per-element descriptor/copy-plan expansion.
+Single-sample copy/finish costs are 0.00172 / 30.243 ms, and GC of two live buffers
+0.00123 / 13.0635 ms. These samples include explicit quota polling/validation and
+run with other local validation load. They are diagnostic costs, not statistical
+benchmarks, pause percentiles, peak-RSS measurements or real-time guarantees.
+GC remains stop-the-world and proportional to reference positions; no scheduling
+policy or production size ceiling is introduced.
+
+Native macOS ARM64/Windows execution of Stage 2E, comprehensive performance/
+latency and mixed-heap range-index scaling remain unverified. Stage 2F native
+acceptance and later compiler-owned value-copy plans, heap-owned fixed/growable
+values and source activation require separate authorization. No deep copy of owned
+children, ABI choice, collector redesign, ordinary CI edit, Git mutation, commit,
+push, branch or remote action was performed. Stop for owner/Wrench review.

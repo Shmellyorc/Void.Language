@@ -101,13 +101,13 @@ Heap::PendingBuffer& Heap::PendingBuffer::operator=(PendingBuffer&& p) noexcept 
     if(this!=&p) {if(data_)Heap::release(data_,layout_->alignment());data_=std::exchange(p.data_,nullptr);layout_=std::move(p.layout_);}return *this;
 }
 void* Heap::adopt_buffer(PendingBuffer& pending,std::shared_ptr<const BufferState> state) {
-    if(!pending.data_ || !state || state->layout!=pending.layout_ || state->requested_live>state->layout->capacity() || !state->catalog || !state->owner || state->complete || private_buffers_==std::numeric_limits<std::size_t>::max())
+    if(!pending.data_ || !state || state->layout!=pending.layout_ || state->requested_live>state->layout->capacity() || !state->catalog || !state->owner || state->complete || private_buffers_==std::numeric_limits<std::size_t>::max() || buffer_objects_==std::numeric_limits<std::size_t>::max())
         throw std::invalid_argument("invalid private buffer adoption");
     auto map=LegacyReferenceMap::validate(state->layout->bytes(),{});
     auto* data=pending.data_;
     auto [it,added]=objects_.emplace(data,Object{std::move(map),std::move(state),TypeLayout::Kind::buffer});
     (void)it;if(!added) throw std::logic_error("duplicate buffer storage");
-    ++private_buffers_;pending.data_=nullptr;return data;
+    ++private_buffers_;++buffer_objects_;pending.data_=nullptr;return data;
 }
 const Heap::BufferState& Heap::buffer_state(void* object) const {
     auto found=objects_.find(object);
@@ -129,6 +129,7 @@ void Heap::seal_buffer(void* object,const void* owner,std::uint64_t prefix) noex
 void Heap::destroy(void* object,const Object& record) noexcept {
     if(record.kind==TypeLayout::Kind::buffer) {
         const auto& b=*static_cast<const BufferState*>(record.metadata.get());
+        if(!buffer_objects_)std::terminate();--buffer_objects_;
         if(!b.complete) {if(!private_buffers_)std::terminate();--private_buffers_;}
         release(object,b.layout->alignment());
     } else ::operator delete(object);
@@ -161,8 +162,36 @@ void Heap::remove_root(void** slot) {
     if (found == roots_.end()) throw std::invalid_argument("unregistered root slot");
     roots_.erase(found);
 }
+// A registered root may not serve as an untyped write alias into buffer data.
+// Ordinary/string-only heaps take the constant-time fast path.
+void Heap::validate_output_address(void** slot) const {
+    if(!buffer_objects_)return;
+    const auto address=reinterpret_cast<std::uintptr_t>(slot);
+    for(const auto& [payload,object]:objects_)if(object.kind==TypeLayout::Kind::buffer) {
+        const auto& state=*static_cast<const BufferState*>(object.metadata.get());
+        const auto base=reinterpret_cast<std::uintptr_t>(payload);
+        if((address>=base && address-base<state.layout->bytes()) || (address<base && base-address<sizeof(void*))) {
+            if(state.readers)throw BufferBusy("output aliases leased buffer storage");
+            throw std::invalid_argument("untyped output aliases buffer storage");
+        }
+    }
+}
 void Heap::store(void* object, std::size_t offset, void* value) {
     auto found = objects_.find(object);
+    if(found!=objects_.end() && found->second.kind==TypeLayout::Kind::buffer) {
+        const auto& state=*static_cast<const BufferState*>(found->second.metadata.get());
+        if(state.readers)throw BufferBusy("buffer storage has active read leases");
+        if(!state.complete || offset<state.layout->base())throw std::invalid_argument("invalid buffer store");
+        auto relative=offset-state.layout->base();
+        if(relative/state.layout->stride()>=state.valid_prefix)throw std::out_of_range("buffer store outside live prefix");
+        auto event=ReferenceShape(state.layout->schema()).at(relative%state.layout->stride());
+        if(!event || event->kind==ReferenceEvent::Kind::interface)throw std::invalid_argument("store requires one typed reference word");
+        // Stage 2 embedding mutation is restricted to the explicit mutable profile.
+        // Other profiles cannot gain write authority through this legacy entry.
+        if(!state.layout->schema()->mutable_data())throw std::invalid_argument("buffer profile does not permit mutation");
+        validate_reference(*event,value,nullptr,*state.catalog,false);
+        std::memcpy(static_cast<char*>(object)+offset,&value,sizeof(value));return;
+    }
     if (found == objects_.end() || found->second.kind!=TypeLayout::Kind::ordinary || (value && !contains(value)) ||
         !found->second.references.at(offset))
         throw std::invalid_argument("invalid managed reference store");
