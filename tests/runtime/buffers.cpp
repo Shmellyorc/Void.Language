@@ -864,6 +864,123 @@ void foundation_acceptance_stress() {
     check(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"acceptance stress leaked objects");
     std::cout<<"foundation acceptance: 32 budgeted lease/copy/abort/recovery cycles, two post-copy collections each passed\n";
 }
+// Stage 3A uses the same buffer representation/transactions, with exact fixed
+// extent checks rather than a second object kind or memory owner.
+void fixed_values() {
+    Runtime r(1);auto byte=admit(r,spec("fixed-u8",{SchemaScalar{ScalarEncoding::u8}}));
+    auto layout=r.buffer_layout(byte,4*1024*1024);Runtime::Attachment a(r);Runtime::Managed m(r);
+    Output source(r),copy(r);auto token=r.root_word(&source.value),copied=r.root_word(&copy.value);
+    r.fixed_default_into(&source.value,layout,quota);
+    r.fixed_store_scalar(token,layout,0,19);r.fixed_store_scalar(token,layout,layout->capacity()-1,217);
+    r.fixed_copy_into(&copy.value,token,layout,{4096,1,8});
+    check(source.value!=copy.value,"fixed copy shared mutable payload");
+    for(std::uint64_t i=0;i<layout->capacity();++i)
+        check(r.fixed_scalar(copied,layout,i)==(i==0 ? 19 : i==layout->capacity()-1 ? 217 : 0),"large fixed independent content oracle");
+    r.fixed_store_scalar(token,layout,0,71);r.fixed_store_scalar(copied,layout,layout->capacity()-1,33);
+    check(r.fixed_scalar(copied,layout,0)==19 && r.fixed_scalar(token,layout,layout->capacity()-1)==217,"fixed mutations escaped independent storage");
+    auto* old=source.value;r.fixed_copy_into(&source.value,token,layout,quota);
+    check(source.value!=old && r.fixed_scalar(token,layout,0)==71,"fixed self-copy lost snapshot");
+    {Runtime::BufferReadLease lease(r,token,layout);busy([&]{r.fixed_store_scalar(token,layout,0,1);});}
+    reject([&]{r.fixed_scalar(token,layout,layout->capacity());});
+    reject([&]{r.fixed_store_scalar(token,layout,std::numeric_limits<std::uint64_t>::max(),1);});
+    auto wrong=r.buffer_layout(byte,layout->capacity()-1);
+    reject([&]{r.fixed_scalar(token,wrong,0);});reject([&]{r.fixed_store_scalar(token,wrong,0,1);});
+    reject([&]{r.fixed_copy_into(&copy.value,token,wrong,quota);});
+    auto* sentinel=copy.value;
+    void* unregistered=nullptr;reject([&]{r.fixed_default_into(&unregistered,layout,quota);});
+    auto fake=r.root_word(&source.value); // Later-unlinked Frame tokens reject too.
+    {Output temporary(r);fake=r.root_word(&temporary.value);}
+    reject([&]{r.fixed_copy_into(&copy.value,fake,layout,quota);});
+    Runtime foreign;ElementSchemaRef other;{Runtime::Native native(r);other=admit(foreign,spec("fixed-u8",{SchemaScalar{ScalarEncoding::u8}}));}
+    reject([&]{r.fixed_default_into(&copy.value,foreign.buffer_layout(other,4),quota);});
+    check(copy.value==sentinel,"fixed invalid operation changed output");
+    for(unsigned encoding=0;encoding<11;++encoding) {
+        auto e=static_cast<ScalarEncoding>(encoding);
+        ElementSchemaRef schema;{Runtime::Native native(r);schema=admit(r,spec("fixed-scalar-"+std::to_string(encoding),{SchemaScalar{e}}));}auto small=r.buffer_layout(schema,3);
+        std::array<std::uint64_t,3> bits{0,1,e==ScalarEncoding::boolean ? 1u : 127u};
+        r.fixed_literal_into(&source.value,small,bits,quota);
+        for(unsigned i=0;i<3;++i)check(r.fixed_scalar(token,small,i)==bits[i],"scalar bits/width literal oracle");
+        r.fixed_copy_into(&copy.value,token,small,quota);
+        auto* before=copy.value;
+        reject([&]{r.fixed_literal_into(&copy.value,small,std::span(bits).first(2),quota);});
+        if(schema->bytes()<8) {
+            bits[2]=std::uint64_t{1}<<(schema->bytes()*8);
+            reject([&]{r.fixed_literal_into(&copy.value,small,bits,quota);});
+            reject([&]{r.fixed_store_scalar(token,small,0,bits[2]);});
+        }
+        if(e==ScalarEncoding::boolean) {bits[2]=2;reject([&]{r.fixed_literal_into(&copy.value,small,bits,quota);});}
+        check(copy.value==before,"bad fixed literal published partial output");
+    }
+    auto empty=r.buffer_layout(byte,0);r.fixed_default_into(&source.value,empty,quota);
+    r.fixed_copy_into(&copy.value,token,empty,quota);check(!source.value && !copy.value,"typed fixed empty allocated object");
+    reject([&]{r.fixed_scalar(token,empty,0);});reject([&]{r.fixed_store_scalar(token,empty,0,1);});
+    ElementSchemaRef zero;{Runtime::Native native(r);zero=admit(r,spec("fixed-zero",{SchemaBytes{0,64}}));}auto zeros=r.buffer_layout(zero,32768);
+    r.fixed_default_into(&source.value,zeros,quota);r.fixed_copy_into(&copy.value,token,zeros,quota);
+    check(source.value!=copy.value && zeros->bytes()==2*1024*1024 && zeros->stride()==64,"fixed zero-footprint stride/ownership");
+    check(reinterpret_cast<std::uintptr_t>(source.value)%64==0,"fixed over-alignment");
+    reject([&]{r.fixed_scalar(token,zeros,0);});
+    ElementSchemaRef record;{Runtime::Native native(r);record=admit(r,spec("fixed-nonscalar",{SchemaBytes{8,8}}));}
+    reject([&]{r.fixed_default_into(&copy.value,r.buffer_layout(record,1),quota);});
+    // Complete buffer with spare capacity is not a complete fixed value.
+    auto short_layout=r.buffer_layout(byte,4);
+    {Runtime::BufferBuilder b(r,short_layout,2,quota);b.zero_elements(2);b.finish_into(&source.value);}
+    reject([&]{r.fixed_copy_into(&copy.value,token,short_layout,quota);});
+    reject([&]{r.fixed_scalar(token,short_layout,0);});reject([&]{r.fixed_store_scalar(token,short_layout,0,1);});
+    r.buffer_store_scalar(token,short_layout,0,{},1); // rejected lease did not leak
+    source.value=copy.value=nullptr;check(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"fixed values leaked GC storage");
+    std::cout<<"fixed scalar values: 4 MiB content oracle, independent/self copy, all encodings, typed empty/zero-footprint and negatives passed\n";
+}
+void fixed_poll_and_roots() {
+    Runtime r;auto schema=admit(r,spec("fixed-poll",{SchemaScalar{ScalarEncoding::u64}}));auto layout=r.buffer_layout(schema,8);
+    Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r);auto token=r.root_word(&source.value);
+    r.fixed_default_into(&source.value,layout,quota);auto before=r.snapshot();
+    auto observer=std::async(std::launch::async,[&]{return r.wait_for_request(std::chrono::seconds(5));});
+    auto collector=std::async(std::launch::async,[&]{Runtime::Attachment a(r);Runtime::Managed m(r);return r.collect();});
+    const bool requested=observer.get(); // remain Managed until the production store poll
+    r.fixed_store_scalar(token,layout,7,0xfedcba9876543210ULL);
+    auto after=r.snapshot();Runtime::Collection collected;
+    {Runtime::Native native(r);collected=collector.get();}
+    check(requested && collected==Runtime::Collection::completed && after.completed_epoch==before.epoch+1 &&
+          after.cooperative_parks==before.cooperative_parks+1 && !after.requested,"fixed store failed deterministic poll/park");
+    r.fixed_copy_into(&out.value,token,layout,quota);
+    check(r.fixed_scalar(r.root_word(&out.value),layout,7)==0xfedcba9876543210ULL,"fixed scalar bits changed across GC/copy");
+    auto* sentinel=out.value;
+    reject([&]{r.fixed_default_into(&out.value,layout,{1,1,1});});
+    check(out.value==sentinel,"fixed invalid quota changed output");
+    source.value=out.value=nullptr;check(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"fixed poll roots leaked");
+    std::cout<<"fixed Managed store: genuine request/poll/park, rooted source and post-GC copy passed\n";
+}
+long fixed_failure_transaction(long ordinal,bool measure,unsigned operation,std::size_t budget) {
+    long sites=0;
+    {
+        Runtime r(budget);auto schema=admit(r,spec("fixed-failure",{SchemaScalar{ScalarEncoding::u32}}));auto layout=r.buffer_layout(schema,3);
+        Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r);
+        std::array<std::uint64_t,3> bits{3,5,8};auto token=r.root_word(&source.value);
+        r.fixed_literal_into(&source.value,layout,bits,quota);r.allocate_into(&out.value,{8,{}});auto* sentinel=out.value;
+        reference_native_empty();stats[0].calls=0;stats[0].bytes=0;recording=0;fail_after=ordinal;bool failed=false;
+        auto run=[&] {
+            if(operation==0)r.fixed_default_into(&out.value,layout,quota);
+            else if(operation==1)r.fixed_literal_into(&out.value,layout,bits,quota);
+            else r.fixed_copy_into(&out.value,token,layout,quota);
+        };
+        try {run();}catch(const std::bad_alloc&) {failed=true;}
+        recording=-1;fail_after=-1;sites=static_cast<long>(stats[0].calls.load());
+        if(!measure)check(failed && out.value==sentinel,"fixed failure ordinal missed or published output");
+        check(r.collect()==Runtime::Collection::completed && !r.snapshot().requested,"fixed failure left collection epoch");
+        if(failed) {check(r.snapshot().objects==2,"fixed failure retained private storage");run();}
+        for(unsigned i=0;i<3;++i)check(r.fixed_scalar(r.root_word(&out.value),layout,i)==(operation ? bits[i] : 0),"fixed failure retry content");
+        r.fixed_store_scalar(token,layout,0,13); // all copy leases released
+        source.value=out.value=nullptr;check(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"fixed failure GC leak");
+    }
+    reference_native_empty();return sites; // strict native check after all owners die
+}
+void fixed_failures() {
+    for(auto budget:{std::size_t{0},std::size_t{1}})for(unsigned operation=0;operation<3;++operation) {
+        auto sites=fixed_failure_transaction(-1,true,operation,budget);check(sites>=3,"fixed allocation work not measured");
+        for(long ordinal=0;ordinal<sites;++ordinal)fixed_failure_transaction(ordinal,false,operation,budget);
+        std::cout<<"fixed value allocation sweep operation="<<operation<<" budget="<<budget<<": "<<sites<<" sites\n";
+    }
+}
 void reference_poll_reacquisition(bool invalid_after_poll=false) {
     Runtime r;const auto w=sizeof(void*);std::array<NominalDescriptor,2> types{{{"T","","plain",{w,{}}},{"Other","","other",{w,{}}}}};
     InterfaceWitness witness{"interface:1:I1:T","I","T","read"};r.admit_metadata(types,{&witness,1});
@@ -1005,7 +1122,7 @@ void measure() {
 int main(int argc,char** argv) {
     try {
         if(argc>1) {if(std::string_view(argv[1])=="--measure")measure();else if(std::string_view(argv[1])=="--measure-reference")measure_references();else if(std::string_view(argv[1])=="reference-leak-bytes")checked_reference_transaction(-1,true,37);else if(std::string_view(argv[1])=="reference-leak-zero")checked_reference_transaction(-1,true,0);else fatal(argv[1]);}
-        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();reference_poll_reacquisition();
+        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();fixed_values();fixed_poll_and_roots();fixed_failures();reference_poll_reacquisition();
 #ifdef VD_BUFFER_WRAP_COLLECT
             reference_poll_reacquisition(true);
 #endif

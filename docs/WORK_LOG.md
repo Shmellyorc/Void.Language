@@ -9205,3 +9205,267 @@ unrelated whitespace). Scoped diff/whitespace checks pass for this task's files.
 No commits, pushes, branches, Git mutations, workflow edits or remote actions.
 Stage 2F not locked; Stage 3+ and source-array activation remain locked. Stop for
 owner/Wrench review.
+
+
+## 16 October 2026: Stage 2F hosted lock and Stage 3 architectural review
+
+Boss/Wrench confirm Stage 2F LOCKED at `d872889`, CI #57: seven hosted jobs green,
+63/63 suites each. Record this as owner-supplied native hosted acceptance, not a
+fresh remote query. It supersedes the pending-hosted status in the preceding local
+acceptance entry and proposal Section 29. Historical Linux measurements, fault
+coverage, cross-platform limitations at measurement time and all research evidence
+are retained. No individual hosted logs or new platform timings were obtained here.
+
+Authorized work: Stage 3 architecture only. Reviewed the supplied complete
+Large-Array Storage Architecture Review, current proposal (Stage 1/2 contracts and
+ABI/stack/encoded-CFG research), relevant Language Bible array/value/readonly/
+construction/iteration rules, standing development/decision/known-issue contracts,
+and actual frontend/IR, LLVM lowering, schema, Heap, coordination, buffer and
+runtime-ABI interfaces/implementations. No native array implementation is claimed.
+
+### Findings and proposed contract
+
+Proposal Section 30 records the design, source reuse map, alternatives, proof
+obligations, checkpoint sequence and acceptance matrix. Recommended representation:
+one rooted payload handle for each nonempty fixed value, capacity=sealed prefix=n,
+on the existing coordinated Heap; typed empty at n=0. Exact schema/profile/domain/
+layout identity governs access. No inline-small threshold, replacement production
+size ceiling, COW, second allocator or collector. Physical zero-footprint elements
+retain checked nonzero stride; zero bytes do not imply a valid source default.
+
+Eager distinct snapshots implement assignment, argument and return semantics.
+Prepare each argument before evaluating later arguments. Use explicit caller-rooted
+snapshot/result homes across private array-carrying calls, with existing checked
+failure propagation and no payload-sized raw LLVM aggregates/byval/sret copies.
+Array-free signatures and public adapters stay unchanged. Conservative copying is
+the default; safe const borrowing/result transfer need independent effect/alias/
+single-use proof, including conflicting-later-argument fallback.
+
+Actual Stage 2 copy_elements copies physical data and shared referents. Reserved
+SchemaOwnedFixed/SchemaGrowable are empty variants, rejected by schema admission;
+copying a nested fixed value cannot merely reuse the managed-ref event. Recommend
+extending the existing OwnedFixed role with exact admitted child type/extent,
+checked single-use completed-child handoff and iterative independent child cloning.
+Managed refs, strings and interface referents retain identity/capability/witnesses.
+Growable roles remain rejected. Value structs and managed fields carrying arrays
+need ownership-aware copy/store validation before their execution gates open.
+
+A read lease freezes only one buffer. Nested snapshots must root and lease the
+entire owned subtree before population, with parent links stabilized, checked
+work entries and strict reverse-order Frame/lease cleanup. Ordinary referenced
+objects are not deep-cloned/frozen. This is a proposed proof protocol, not a new
+source concurrency guarantee or an already working runtime feature. Do not publish
+an incomplete parent or install a private child edge. Complete children remain in
+internal roots until transaction handoff; only the finished outer value is exposed
+to source code. Failed preparation preserves previous outputs, releases private
+roots/leases and leaves abandoned storage reclaimable by normal GC.
+
+LLVM's current array type/op gates remain. Aggregate loads/stores/extract/insert,
+functional array_set and direct returns cannot become raw handle aliases by changing
+only physical type mapping. Independent IR validation needs explicit snapshot,
+selected-place and handoff obligations. Shared target-derived schema/call/root
+contracts serve JIT/AOT and tooling; no separate LSP estimator. Root handle words,
+not expanded payload reference offsets; source expressions run in existing order,
+and selected storage is reacquired after RHS effects/polls without restoring stale
+siblings. Mark array allocation coordinated even without ordinary managed references.
+
+### Review checkpoints and retained blockers
+
+Recommended first authorization is **3A: scalar owned-value runtime proof only**:
+exact fixed layout, compact default/literal construction, distinct clone, checked
+scalar reads/writes and transactional registered outputs; no source activation.
+Then 3B shared semantic/IR/helper/private ABI proof; 3C gated scalar source JIT/AOT;
+3D owned nesting/richer references/ordered construction; 3E fixed iteration and
+full acceptance. These are proposals, not implementation permissions or completed
+milestones. Stage 3 completion requires nested value independence, not only scalars.
+Stage 4 growables stay separate.
+
+Unproved obligations remain explicit: exact owned-child catalog dependencies/finite
+logical containment, single-consumption handoff, subtree snapshot and root/lease
+lifetime, generated transaction cleanup, target ABI and root homes, dispatch and
+managed-field adapters, and whole-build required-function completeness/publication.
+An unsupported required function must fail the entire compilation, preserving the
+previous artifact/generation. No silent omissions or unsupported-operation fallback.
+
+Preserve immutable storage inventories and unique homes, conservative reconciliation,
+encoded CFG/branch-retarget negatives, original hashes/sentinels and all existing
+ABI/stack research. Heap placement does not prove emission-origin lineage, caller/
+callee ownership, stack memory bounds, PUSH/tail encoding or final linked/ORC
+relocated code. These gates remain separate and may require a separate approved
+checkpoint before source execution. Public AOT certification remains inactive;
+65,536-byte limits remain research-only, never a universal valid-program cutoff.
+
+The Stage 2F mixed-heap output guard risk remains material (about 14 ms/output at
+500k ordinary objects + one buffer in the recorded Linux benchmark). Stage 3 would
+exercise it more. Retain the guard and negatives; seek separate owner review before
+an index/provenance optimization for production-scale use. No replacement index,
+latency guarantee, numerical limit or unrelated refactoring is introduced here.
+
+### Verification and scope
+
+This checkpoint performs source/document review and documentation consistency/
+whitespace checks only. No builds, runtime/compiler tests or native witnesses were
+run, appropriate to documentation-only architecture work. All proposed normal/O2
+JIT/AOT, two-SDK Debug/Release/strict sanitizer, measured failure sweeps, deterministic
+GC/lease/clone stress, real 1 MiB stack and seven-job native-platform acceptance
+requirements are future evidence, not results of this review. CI #57 is the owner's
+supplied evidence for the locked Stage 2 baseline.
+
+Only docs/ARRAYS_PROPOSAL.md and docs/WORK_LOG.md were edited. No production code,
+tests, CI workflow, Git operations, commits, pushes, branches or remote actions.
+The owner's other files were left untouched. No source arrays, generated ABI or
+Stage 3 implementation activated. Stop for owner/Wrench architectural review.
+
+
+## 16 October 2026: Phase 23 Stage 3A scalar owned-value runtime proof
+
+Stage 2F remains owner/Wrench LOCKED at d872889, CI #57, seven hosted jobs /
+63 suites each. The owner approved proposal Section 30's architectural direction
+and authorized 3A only. This checkpoint implements the scalar runtime layer, not
+source arrays, compiler/IR ownership, generated ABI or later stages.
+
+### Implementation and semantics
+
+Added Runtime::fixed_default_into, fixed_literal_into, fixed_copy_into,
+fixed_scalar and fixed_store_scalar in the existing runtime.hpp/buffer.cpp.
+Reuse BufferLayoutRef's exact admitted element identity/profile/domain/layout and
+immutable capacity as fixed extent; require a complete buffer with sealed live
+prefix equal to capacity. There is no new object kind, descriptor arena, payload
+header, allocator, collector, capacity interning or source size ceiling.
+
+Scalar defaults/literals and copies feed the existing private BufferBuilder.
+Literal bits are checked and consumed in order from stable non-managed native
+input, with no payload staging. Copies acquire BufferReadLease and stream into
+independent private destinations. Self-copy through one registered source/output
+word retains the previous value in the lease until final publication. All fallible
+work precedes the existing poll/revalidate/seal/output commit; failure leaves the
+old output intact and unwinds private roots, reservations and leases. Abandoned
+adopted objects become ordinary GC garbage, not leaked native reservations.
+
+Scalar access validates registered roots, exact physical layout and complete fixed
+extent. Reads copy native-width raw bits under the mutex without exposing an
+interior address. Writes share the old buffer_store_scalar implementation through
+a private helper, retaining width/bool/profile/lease checks and the real poll.
+The fixed-extent condition is checked in its destination lookup after the poll too.
+No unchecked scalar or alias-write path was added.
+
+The subset is root Scalar for all eleven existing encodings, plus physically empty,
+reference-free, zero-complete shapes for defaults/copies. Zero extent uses the
+existing typed-null representation, with expected type supplied by its layout.
+Nonempty zero-footprint elements retain checked positive stride and alignment.
+These C++ embedding APIs use raw bits and uint64 zero-based ordinals; source
+signed/negative index normalization, conversions and effectful constructors are
+not implemented here. Ordinary references, strings/interfaces and nested owned
+children cannot be smuggled into this scalar subset. Existing Stage 2 generic
+buffer roles retain their prior behavior; owned-fixed/growable roles still reject.
+
+### Focused proof and retained negative controls
+
+Extended tests/runtime/buffers.cpp inside the existing gc_buffers suite, preserving
+the 63-suite inventory and Python fatal/leak negative controls. Added:
+
+- Independent full 4 MiB scalar-byte oracle, two-way mutation independence and
+  self-copy; all eleven encodings, full high-bit u64, exact literal count, invalid
+  scalar widths/bool values, out-of-range ordinals and wrong extents.
+- Typed empty and distinct 2 MiB zero-footprint/aligned payload copies; rejection
+  of scalar access to empty-data elements, nonscalar nonempty elements and a
+  sealed buffer with spare capacity instead of a complete fixed extent.
+- Foreign layout, unregistered/unlinked root and invalid quota rejection, preserving
+  sentinel output. Existing private-root/heap-edge/spare corruption, forged witness,
+  output-alias and post-poll reference regressions remain unchanged.
+- Deterministic GC request while the writer remains Managed, followed by the actual
+  fixed-store poll and exactly one cooperative park; successful post-GC copy/content.
+- Successful-path measured allocation sweeps for default/literal/copy at budgets
+  zero and one. Every measured ordinal must fail, preserve output, allow collection
+  and retry; source mutation proves no leaked copy lease. Zero GC objects is checked
+  after cleanup collection, zero native bytes/count after Runtime/Heap destruction.
+
+The first focused attempt rejected test setup because the encoding loop admitted
+schemas while Managed. Corrected that setup to use the established NativeSafe
+admission scope; no production guard or assertion was relaxed. The failed attempt
+and corrected focused run are retained under build/stage3a/initial-*.log.
+
+The first system sanitizer build could not run an AOT generator's LeakSanitizer
+under sandbox ptrace restrictions. Preserved system-san-build-in-sandbox.log and
+summary-before-unsandboxed.json. Resumed remaining local validation outside the
+sandbox with unchanged strict leak/halt settings; no detect_leaks=0, suppression
+or skipped generator/test. This environment failure is not classified as a runtime
+defect or a passing sanitizer check.
+
+### Scope, performance and remaining gates
+
+Existing mixed-heap O(objects) output-alias checks remain intact, including preflight
+and finish validation. The Section 29.4 historical roughly 14 ms/output mixed-heap
+Linux finding remains material and cannot be turned into a production latency
+promise. No replacement index or unrelated optimization was implemented.
+
+Protected manifest inputs (Heap, schema, coordination, generated ABI, compiler,
+CMake and normal CI) match the prior runtime-foundation acceptance manifest.
+Changed code only include/void/runtime.hpp, src/runtime/buffer.cpp and focused
+runtime tests; documentation changes only ARRAYS_PROPOSAL.md and WORK_LOG.md.
+No commits, pushes, branches, remote actions or CI edits. Stage 3B ownership/IR/
+private ABI, nested owned-child copies, source native execution, production
+certification and Stage 4 stay gated. Native Windows/macOS 3A results are pending
+owner-controlled hosted verification; Linux is not substituted for those results.
+
+### Final local verification
+
+Final native Linux x64 verification on both supported LLVM 19.1.7 SDKs:
+
+| Configuration | Full CTest | Real 1 MiB soft stack | Repeat-until-failure stress |
+| --- | --- | --- | --- |
+| system-debug | 63/63, 110.56 s | 6/6, 13.73 s | 5 suites x 3, 38.37 s |
+| system-release | 63/63, 51.11 s | 6/6, 3.51 s | 5 suites x 3, 8.90 s |
+| system-san | 63/63, 144.94 s | Not run | 5 suites x 3, 17.57 s |
+| official-debug | 63/63, 140.98 s | 6/6, 13.73 s | 5 suites x 3, 38.39 s |
+| official-release | 63/63, 45.74 s | 6/6, 3.49 s | 5 suites x 3, 8.92 s |
+| official-san | 63/63, 144.32 s | Not run | 5 suites x 3, 17.50 s |
+
+System SDK `/usr/lib/llvm-19`: RTTI ON. Official archive
+`.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64`: RTTI OFF, matching Clang/LLD.
+Actual compiler versions and all six runtime flag sets were rechecked against the
+prior acceptance manifest. The official sanitizer build used a freshly generated
+Makefiles configuration with the same flags; its native ORC SDK check passed.
+Strict ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 and
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 apply to builds/native
+fixture generators and tests. The sandbox LSan failure remains recorded separately;
+remaining sanitizer execution ran outside ptrace, with no disabled leak checks.
+Official RTTI-off LLVM cannot support vptr checks, as in the locked baseline.
+
+All six configurations measure default/literal/copy at 4/4/4 allocation sites with
+budget zero, and 8/8/10 with budget one: six successful baselines and **38 injected
+failure ordinals per gc_buffers invocation**, preserving old outputs, collection
+rollback, retry and post-owner native leak checks. Retained Stage 2 failure sweeps,
+fatal invariants and deliberate nonzero-/zero-byte leak controls pass unchanged.
+Stress repeats five affected suites three times per configuration (90 suite
+executions), never repeat-until-pass. Full suites account for 378 executions;
+real 1 MiB checks add 24. The six stack suites are gc_buffers, gc_schemas,
+runtime_coordination, runtime_failures, runtime_invariants and runtime_generated.
+
+Both SDKs' actual Debug/Release compiler flags plus -fstack-usage give these native
+C++ entry frames, identical across SDKs:
+
+| Entry | Debug bytes | Release bytes |
+| --- | ---: | ---: |
+| fixed_default_into | 488 | 392 |
+| fixed_literal_into | 600 | 408 |
+| fixed_copy_into | 680 | 520 |
+| fixed_scalar | 264 | 40 |
+| fixed_store_scalar | 152 | 40 |
+
+The shared store implementation reports 584/120 bytes. Complete buffer.cpp reports
+have no dynamic frames. These are per-function native C++ reports, not sums of
+call chains, cross-target measurements or LLVM machine certificates. The 4 MiB
+array and 2 MiB zero-footprint cases pass real 1 MiB Debug/Release execution.
+No payload-sized native temporary or expanded element/root array was introduced.
+
+Evidence: build/stage3a/{manifest.json,summary.json,measured-sites.json,progress.log},
+per-configuration build/full/1m/stress and LastTest logs, initial failure logs and
+frames/{commands.json,summary.json,*.su in configuration directories}. Reproduce
+with `cmake --build <build-directory> -j 2` and the full
+`ctest --test-dir <build-directory> -j 2 --output-on-failure` run; the six-suite
+selection under a real 1024 KiB soft stack; and CTest's five-suite
+`--repeat until-fail:3` selection. Exact command arrays and stack
+limits are in summary.json; SDK paths/flags/source hashes are in manifest.json.
+No Windows/macOS execution or hosted Stage 3A lock is claimed. All later checkpoints
+remain gated; stop for owner/Wrench review.

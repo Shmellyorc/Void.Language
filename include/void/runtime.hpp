@@ -56,6 +56,13 @@ public:
     std::byte buffer_byte(void*,const BufferLayoutRef&,std::uint64_t element,std::size_t offset) const;
     void buffer_store_scalar(RegisteredRootWord, const BufferLayoutRef&,std::uint64_t element,
                              std::span<const SchemaStep>,std::uint64_t bits);
+    // Runtime-only fixed values: exact admitted scalar type and capacity=live extent.
+    // Zero-footprint admitted shapes support default/copy, not scalar access.
+    void fixed_default_into(void**,const BufferLayoutRef&,BufferWorkQuota);
+    void fixed_literal_into(void**,const BufferLayoutRef&,std::span<const std::uint64_t>,BufferWorkQuota);
+    void fixed_copy_into(void**,RegisteredRootWord,const BufferLayoutRef&,BufferWorkQuota);
+    std::uint64_t fixed_scalar(RegisteredRootWord,const BufferLayoutRef&,std::uint64_t index) const;
+    void fixed_store_scalar(RegisteredRootWord,const BufferLayoutRef&,std::uint64_t index,std::uint64_t bits);
     const InterfaceWitness* witness(std::string_view) const;
     std::int64_t interface_binding(void* object,const void* witness,std::span<const char* const> keys) const;
     std::shared_ptr<const NominalDescriptor> descriptor(std::string_view) const;
@@ -85,6 +92,10 @@ private:
     void string_parts_into(void**,std::string_view,std::string_view);
     void validate_descriptor(const TypeLayout&) const; // Caller holds mutex_.
     void validate_buffer_layout(const BufferLayoutRef&) const; // mutex_ held
+    void validate_fixed_layout(const BufferLayoutRef&) const; // mutex_ held
+    void validate_fixed_output(void**,const BufferLayoutRef&) const;
+    void store_scalar(RegisteredRootWord,const BufferLayoutRef&,std::uint64_t,
+                      std::span<const SchemaStep>,std::uint64_t,bool fixed);
     void require_buffer_output(void**) const;
     void* reference_source(const RegisteredRootWord&) const; // mutex_ held
     void park(Thread&, std::unique_lock<std::mutex>&);

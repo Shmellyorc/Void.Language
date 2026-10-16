@@ -305,11 +305,16 @@ Runtime::BufferReadLease::~BufferReadLease() noexcept {
 }
 void Runtime::buffer_store_scalar(RegisteredRootWord owner,const BufferLayoutRef& layout,std::uint64_t index,
                                  std::span<const SchemaStep> path,std::uint64_t bits) {
+    store_scalar(owner,layout,index,path,bits,false);
+}
+void Runtime::store_scalar(RegisteredRootWord owner,const BufferLayoutRef& layout,std::uint64_t index,
+                          std::span<const SchemaStep> path,std::uint64_t bits,bool fixed) {
     require_managed();
     // Resolve one admitted logical path, without walking/expanding repetition.
     std::size_t node=0,offset=0,width=0;ScalarEncoding encoding;
     {
         std::lock_guard lock(mutex_);validate_buffer_layout(layout);
+        if(fixed)validate_fixed_layout(layout);
         if(!layout->schema()->mutable_data())throw std::invalid_argument("buffer profile does not permit mutation");
         const auto& schema=*layout->schema();node=schema.spec_.root;
         for(const auto& step:path) {
@@ -336,6 +341,7 @@ void Runtime::buffer_store_scalar(RegisteredRootWord owner,const BufferLayoutRef
     auto destination=[&]() {
         auto* object=reference_source(owner);const auto& state=heap_.buffer_state(object);
         if(!state.complete || !state.layout->equivalent(*layout) || index>=state.valid_prefix)throw std::invalid_argument("invalid scalar buffer destination");
+        if(fixed && state.valid_prefix!=layout->capacity())throw std::invalid_argument("incomplete fixed extent");
         if(state.readers)throw BufferBusy("buffer storage has active read leases");
         return static_cast<char*>(object)+sum(layout->element_offset(index),offset);
     };
@@ -349,6 +355,65 @@ void Runtime::buffer_store_scalar(RegisteredRootWord owner,const BufferLayoutRef
         case 8:std::memcpy(out,&bits,8);break;
         default:std::terminate();
     }
+}
+void Runtime::validate_fixed_layout(const BufferLayoutRef& layout) const {
+    validate_buffer_layout(layout);
+    const auto& schema=*layout->schema();
+    if(!std::holds_alternative<SchemaScalar>(schema.spec_.nodes[schema.spec_.root]) &&
+       (schema.bytes() || schema.has_references() || !schema.zero_data_complete()))
+        throw std::invalid_argument("fixed runtime proof requires scalar or zero-footprint element");
+}
+void Runtime::validate_fixed_output(void** output,const BufferLayoutRef& layout) const {
+    require_buffer_output(output);
+    std::lock_guard lock(mutex_);validate_fixed_layout(layout);heap_.validate_output_address(output);
+}
+void Runtime::fixed_default_into(void** output,const BufferLayoutRef& layout,BufferWorkQuota quota) {
+    validate_fixed_output(output,layout);
+    BufferBuilder builder(*this,layout,layout->capacity(),quota);
+    builder.zero_elements(layout->capacity());
+    builder.finish_into(output);
+}
+void Runtime::fixed_literal_into(void** output,const BufferLayoutRef& layout,
+                                std::span<const std::uint64_t> bits,BufferWorkQuota quota) {
+    validate_fixed_output(output,layout);
+    const auto& schema=*layout->schema();
+    if(!std::holds_alternative<SchemaScalar>(schema.spec_.nodes[schema.spec_.root]))
+        throw std::invalid_argument("scalar literal requires scalar element");
+    if(bits.size()!=layout->capacity())throw std::invalid_argument("fixed literal extent mismatch");
+    // Native input has the same stable, non-managed span contract as write_bytes.
+    // No payload staging: ordered values feed the existing rooted transaction.
+    BufferBuilder builder(*this,layout,layout->capacity(),quota);
+    for(auto value:bits)builder.write_scalar(value);
+    builder.finish_into(output);
+}
+void Runtime::fixed_copy_into(void** output,RegisteredRootWord source,const BufferLayoutRef& layout,BufferWorkQuota quota) {
+    validate_fixed_output(output,layout);
+    BufferReadLease lease(*this,source,layout);
+    if(lease.count()!=layout->capacity())throw std::invalid_argument("fixed source live extent mismatch");
+    BufferBuilder builder(*this,layout,layout->capacity(),quota);
+    builder.copy_elements(lease,0,layout->capacity());
+    builder.finish_into(output);
+}
+std::uint64_t Runtime::fixed_scalar(RegisteredRootWord source,const BufferLayoutRef& layout,std::uint64_t index) const {
+    require_managed();std::lock_guard lock(mutex_);validate_fixed_layout(layout);
+    const auto& schema=*layout->schema();
+    if(!std::holds_alternative<SchemaScalar>(schema.spec_.nodes[schema.spec_.root]))
+        throw std::invalid_argument("scalar read requires scalar element");
+    if(index>=layout->capacity())throw std::out_of_range("fixed index outside extent");
+    auto* object=reference_source(source);const auto& state=heap_.buffer_state(object);
+    if(!state.complete || !state.layout->equivalent(*layout) || state.valid_prefix!=layout->capacity())
+        throw std::invalid_argument("invalid fixed scalar source");
+    auto* address=static_cast<const char*>(object)+layout->element_offset(index);
+    switch(schema.bytes()) {
+        case 1:{std::uint8_t v;std::memcpy(&v,address,1);return v;}
+        case 2:{std::uint16_t v;std::memcpy(&v,address,2);return v;}
+        case 4:{std::uint32_t v;std::memcpy(&v,address,4);return v;}
+        case 8:{std::uint64_t v;std::memcpy(&v,address,8);return v;}
+        default:throw std::invalid_argument("unsupported scalar width");
+    }
+}
+void Runtime::fixed_store_scalar(RegisteredRootWord owner,const BufferLayoutRef& layout,std::uint64_t index,std::uint64_t bits) {
+    store_scalar(owner,layout,index,{},bits,true);
 }
 void Runtime::BufferBuilder::copy_elements(BufferReadLease& source,std::uint64_t first,std::uint64_t count) {
     try {
