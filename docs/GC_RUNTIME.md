@@ -25,6 +25,13 @@ retain data-only type/witness ownership; Frame/Slot ABI is unchanged. This does 
 activate source native arrays, copying/read leases or another collector. See the
 proposal and WORK_LOG.md for actual local validation and performance limits.
 
+Stage 2E is locked at `3cbe250` / owner-confirmed CI #56. It adds rooted RAII
+read leases and independent physical-value copying; these freeze buffer value
+bytes, not the contents of shared referents. Stage 2F local acceptance, mixed-heap
+alias-guard scaling and pending hosted verification are recorded in
+[ARRAYS_PROPOSAL.md Section 29](ARRAYS_PROPOSAL.md#29-stage-2f-final-runtime-foundation-acceptance-and-review).
+Source arrays, owned-fixed/growable child copying and later stages remain gated.
+
 ## Ownership and thread states
 
 `Runtime` owns one existing `Heap`, its participant registry, handles and one

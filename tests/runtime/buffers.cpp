@@ -780,10 +780,10 @@ void copy_compactness() {
         check(!stats[2].live && !stats[2].live_calls,"reference copy storage outlived Runtime");
     }
 }
-long copy_failure_transaction(long ordinal,bool measure) {
+long copy_failure_transaction(long ordinal,bool measure,std::size_t budget) {
     long sites=0;
     {
-        Runtime r;const auto w=sizeof(void*);NominalDescriptor type{"T","","copy",{w,{}}};
+        Runtime r(budget);const auto w=sizeof(void*);NominalDescriptor type{"T","","copy",{w,{}}};
         InterfaceWitness wi{"interface:1:I1:T","I","T","read"};r.admit_metadata({&type,1},{&wi,1});auto schema=copy_schema(r);
         auto layout=r.buffer_layout(schema,3);Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r),object(r),text(r);
         allocate_nominal(r,object,"T");r.string_into(&text.value,"copy failure target");auto* witness=r.witness(wi.key);
@@ -813,9 +813,56 @@ long copy_failure_transaction(long ordinal,bool measure) {
     reference_native_empty();return sites;
 }
 void copy_failures() {
-    auto sites=copy_failure_transaction(-1,true);check(sites>4,"copy allocation work not measured");
-    for(long ordinal=0;ordinal<sites;++ordinal)copy_failure_transaction(ordinal,false);
-    std::cout<<"copy/partial-mark allocation failure sweep: "<<sites<<" sites\n";
+    for(auto budget:{std::size_t{0},std::size_t{1}}) {
+        auto sites=copy_failure_transaction(-1,true,budget);check(sites>4,"copy allocation work not measured");
+        for(long ordinal=0;ordinal<sites;++ordinal)copy_failure_transaction(ordinal,false,budget);
+        std::cout<<"copy/partial-mark allocation failure sweep budget="<<budget<<": "<<sites<<" sites\n";
+    }
+}
+// Stage 2F hosted acceptance: deterministic work, not retries/timing-based
+// overlap. Existing CTest suite/workflow picks this up on every native runner.
+void foundation_acceptance_stress() {
+    Runtime r(1);const auto w=sizeof(void*);NominalDescriptor type{"acceptance-target","","plain",{w,{}}};r.admit_types({&type,1});
+    auto schema=admit(r,spec("acceptance-record",{SchemaScalar{ScalarEncoding::u64},SchemaManaged{type.identity,false},
+        SchemaRecord{2*w,alignof(void*),{{0,0,0},{1,w,1}}}}));
+    auto layout=r.buffer_layout(schema,32);const BufferWorkQuota work{64,1,1};
+    Runtime::Attachment a(r);Runtime::Managed m(r);Output object(r),source(r),out(r),sentinel(r);
+    allocate_nominal(r,object,type.identity.c_str());
+    {Runtime::BufferBuilder b(r,layout,17,work);for(unsigned i=0;i<17;++i) {b.write_scalar(i);b.write_reference(r.root_word(&object.value));}b.finish_into(&source.value);}
+    const auto source_token=r.root_word(&source.value);
+    const std::array<SchemaStep,1> scalar_path{{{SchemaStep::Kind::field,0}}};
+    for(unsigned cycle=0;cycle<32;++cycle) {
+        r.allocate_into(&sentinel.value,{w,{}});out.value=sentinel.value;
+        {
+            Runtime::BufferReadLease lease(r,source_token,layout);
+            Runtime::BufferBuilder b(r,layout,17,work);b.copy_elements(lease,0,8);
+            check(r.collect()==Runtime::Collection::completed,"acceptance partial-copy GC failed");
+            busy([&]{r.store(source.value,layout->element_offset(0)+w,object.value);});
+            busy([&]{r.buffer_store_scalar(source_token,layout,0,scalar_path,999);});
+            {
+                // Its budget-triggered collection sees the outer partial copy.
+                Runtime::BufferBuilder aborted(r,layout,17,work);aborted.copy_elements(lease,0,1);
+                reject([&]{aborted.copy_elements(lease,17,1);});
+                reject([&]{aborted.finish_into(&out.value);});
+                check(out.value==sentinel.value,"acceptance failed copy replaced old output");
+            }
+            b.copy_elements(lease,8,9);b.finish_into(&out.value);
+        }
+        r.buffer_store_scalar(source_token,layout,0,scalar_path,cycle+1);
+        r.store(source.value,layout->element_offset(0)+w,object.value); // no leaked lease
+        for(int pass=0;pass<2;++pass) {
+            check(r.collect()==Runtime::Collection::completed,"acceptance repeated GC failed");
+            for(unsigned i=0;i<17;++i) {
+                std::uint64_t bits=0;void* target=nullptr;
+                auto* element=static_cast<const char*>(out.value)+i*2*w;
+                std::memcpy(&bits,element,sizeof(bits));std::memcpy(&target,element+w,w);
+                check(bits==(i ? i : cycle) && target==object.value,"acceptance snapshot/referent changed");
+            }
+        }
+    }
+    object.value=source.value=out.value=sentinel.value=nullptr;
+    check(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"acceptance stress leaked objects");
+    std::cout<<"foundation acceptance: 32 budgeted lease/copy/abort/recovery cycles, two post-copy collections each passed\n";
 }
 void reference_poll_reacquisition(bool invalid_after_poll=false) {
     Runtime r;const auto w=sizeof(void*);std::array<NominalDescriptor,2> types{{{"T","","plain",{w,{}}},{"Other","","other",{w,{}}}}};
@@ -958,7 +1005,7 @@ void measure() {
 int main(int argc,char** argv) {
     try {
         if(argc>1) {if(std::string_view(argv[1])=="--measure")measure();else if(std::string_view(argv[1])=="--measure-reference")measure_references();else if(std::string_view(argv[1])=="reference-leak-bytes")checked_reference_transaction(-1,true,37);else if(std::string_view(argv[1])=="reference-leak-zero")checked_reference_transaction(-1,true,0);else fatal(argv[1]);}
-        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();reference_poll_reacquisition();
+        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();reference_poll_reacquisition();
 #ifdef VD_BUFFER_WRAP_COLLECT
             reference_poll_reacquisition(true);
 #endif

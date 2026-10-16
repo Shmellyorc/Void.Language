@@ -1,11 +1,12 @@
 # Phase 23 proposal: typed arrays, indexing and iteration
 
-**Current status, 16 October 2026: owner/Wrench confirm Stage 2D LOCKED at
-`97a9e49`, CI #55, all seven jobs green and 63/63 suites each. Stage 2E only is
-authorized; Section 28 records runtime-only leases/copying and local verification.
-Stage 2F, source-native arrays, owned-fixed/growable child copying, compiler/LLVM/
-generated ABI changes and production certification remain gated. Earlier Stage 1,
-2B/2C and Part 5A locks and the superseding large-array decision remain in force.**
+**Current status, 16 October 2026: Boss/Wrench confirm Stage 2E LOCKED at
+`3cbe250`, CI #56, all seven hosted jobs green and 63/63 suites each. Stage 2F
+only is authorized for runtime-foundation acceptance/review; Section 29 records
+local verification on both LLVM 19.1.7 Linux SDK configurations. Stage 2F is NOT
+LOCKED: owner-controlled hosted verification remains required. Source arrays,
+Stage 3+, compiler/LLVM/generated ABI changes and production activation remain
+gated. The superseding large-array decision and earlier research locks stand.**
 
 > **SUPERSEDING OWNER DECISION: large arrays are a language requirement.**
 > Neither `[T, n]` nor `[T]` may have an arbitrary 64 KiB source-level ceiling.
@@ -3082,7 +3083,8 @@ No later stage is authorized by approving a substep.
 
 **Approved overall direction; implemented 2B/2C/2D subsets are recorded in
 Sections 24-27. Stage 2E copying/lease implementation is recorded in Section 28;
-Stage 2F remains a separate approval gate:**
+Stage 2F acceptance is authorized and recorded in Section 29; required hosted
+acceptance remains pending:**
 runtime-owned DAG/cursor; mutually exclusive
 buffer layout and typed empty representation; same-Heap NativeSafe zero reservation
 then rooted private adoption; prefix/event completeness and sealed publication;
@@ -4147,3 +4149,240 @@ acceptance and later compiler-owned value-copy plans, heap-owned fixed/growable
 values and source activation require separate authorization. No deep copy of owned
 children, ABI choice, collector redesign, ordinary CI edit, Git mutation, commit,
 push, branch or remote action was performed. Stop for owner/Wrench review.
+
+
+## 16 October 2026: Stage 2E hosted lock; Stage 2F acceptance authorization
+
+Boss/Wrench confirm Stage 2E LOCKED at `3cbe250`, CI #56, all seven hosted
+jobs passed with 63/63 suites each. This is owner-supplied native hosted evidence.
+Only Stage 2F runtime-foundation acceptance/review is authorized. Stage 2F remains
+unlocked until the required owner-controlled hosted run passes. No source-array,
+compiler/LLVM/generated ABI, later-stage, Git, CI-edit or remote action is authorized.
+
+
+## 29. Stage 2F: final runtime-foundation acceptance and review
+
+Owner/Wrench locked Stage 2E at `3cbe250`, CI #56, seven native hosted jobs,
+63/63 suites each. That lock is owner-supplied evidence, not a new remote query.
+This checkpoint authorizes acceptance only. **Stage 2F remains unlocked until
+required owner-controlled hosted verification passes.** No production runtime,
+compiler, LLVM lowering, generated ABI, storage representation, collector or
+ordinary CI implementation changed in this checkpoint.
+
+### 29.1 Contract and failure-boundary audit
+
+Read Sections 23.6/23.8/23.9/28, the Language Bible's array/value/readonly contracts,
+work log, actual schema/cursor, Heap, coordination and buffer implementations.
+The audit found no reproduced production correctness defect. This is bounded
+acceptance of the supported internal runtime roles, not source-array completion.
+
+| Contract | Source boundary and acceptance evidence |
+| --- | --- |
+| Immutable runtime ownership | Transactional catalog builds private owned candidates, validates full identity/profile/domain and retained nominal/witness owners, then commits only against the matching snapshot. Concurrent admission retries cannot publish half a catalog. Caller-spec destruction, incompatible admission and all measured rollback ordinals remain tested. |
+| Compact repeated schemas | Topological node/edge admission rejects cycles/forward edges, unknown roles, bad domains and overflow; repetition count is arithmetic, not expanded fields. Shared reference event/seek/path interpretation and independent small-layout oracles cover tracing/store/copy, including legacy unaligned reference words. Million-reference and billion-byte shape analyses remain compact. |
+| Rooted construction | PendingBuffer reserves/zeros aligned raw memory NativeSafe outside the collector mutex, with no managed reference/observable public identity. Managed adoption inserts transactionally, then roots before any poll/fallible operation. Typed empty and zero-footprint/positive-stride cases remain distinct. |
+| Whole-capacity tracing | Private/live/spare rules differ deliberately. GC streams all capacity, permits private uninitialized nulls, validates typed nonzero words and forbids nonzero spare positions/private heap edges. Public live required refs must be complete. Mark failures reset marks before any sweep; failures before marking need no sweep rollback. |
+| Sealed publication | Builder event/progress state is authoritative. Output registration, completeness, private ownership and alias checks precede the infallible seal/output/root-clear commit under one mutex. No payload-sized copy/scan, poll or allocation occurs in the commit. |
+| Leases | Own precise whole-object Frame/Slot roots, checked reader counts and same-thread Managed lifetime. Acquisition/decrement cannot wrap or underflow; every supported writer and output-alias path checks leases. Conflicts throw BufferBusy rather than waiting for a reader. Changing the original caller word cannot invalidate a lease's root. |
+| Independent copying | Exact admitted schema/profile, live-prefix bounds and distinct private storage; chunk locks reacquire bases/metadata after polls. Scalars/bytes copy values; managed/string/interface roles preserve referent/witness identity with atomic pairs. Padding has no reference authority. Owned-fixed/growable child roles still reject, not shallow-copy. |
+| Failure recovery | Catalog/cursor/reservation/map/mark failures retain prior outputs, unwind private roots/leases and retry from a fresh builder. Failed builders cannot publish. GC objects must be zero immediately after final collection; native allocation count/bytes zero only after all owners die. Deliberate byte/zero-byte leak controls and all fatal graph invariants remain. |
+| Existing semantics | Ordinary/string legacy paths, null-empty-string convention, complete nominal/interface objects, precise generated roots, RuntimeFailure adapters and Frame/Slot/Handle layout contracts remain unchanged. Existing normal/O2 JIT, independently linked native AOT, source and LSP/analysis suites all pass. Array-native lowering and research CFG/ABI/certification gates remain in place. |
+
+Coverage gap addressed in tests, not production code: copy allocation-failure
+sweeps now independently measure budgets **0 and 1**. Budget 1 exercises collection
+with a source lease active during destination construction, before reservation/
+adoption, as well as the existing explicit partial-copy collection. Each baseline
+measures successful sites; every ordinal is injected in a fresh transaction and
+must throw, preserve its sentinel, roll back graph/epoch state, release ownership
+and permit a successful retry. Nothing is retried to conceal a failing assertion.
+
+Measured on both Linux SDKs in all three configurations: schema admission **40**
+sites; byte construction budgets 0/1 **4/6**; reference construction **11**; copy
+budgets 0/1 **17/29**. Counts are measured per process/platform, not hardcoded to
+these Linux observations. The ten fatal subprocess controls, two deliberate native
+leak controls and post-poll regressions are preserved.
+
+The existing gc_buffers suite also gains 32 deterministic budgeted acceptance
+cycles: required-reference records, partial copies, collection with live private
+storage/leases, exact BufferBusy conflicts, poisoned aborted copies preserving old
+outputs, successful finish, source mutation independence and two post-copy GCs per
+cycle. These are fixed checked operations, not timing-based passes or probabilistic
+collector overlap. No new CTest suite or workflow command is required, so all
+63 existing suites stay present and native hosted runners exercise the new cases.
+
+### 29.2 Native stack and lifetime audit
+
+Schema/cursor/mark traversals use iterative work storage; repeated extents do not
+become native recursive element walks or automatic arrays. Builder/copy temporaries
+are bounded words/events; raw reservations and payloads use the existing Heap
+allocation family. Cursor metadata depends on schema depth. Safepoint inspection
+found no retained borrowed Heap iterator/state reference/interior pointer across
+polls in buffer copying; owning schemas/catalog snapshots and registered whole-
+object roots are intentionally retained. Host Frame/Slot and raw-memory trust
+contracts still apply. The STL's own balanced-container implementation and arbitrary
+caller/source recursion are not a universal bounded-stack guarantee.
+
+Native Clang `-fstack-usage` probes compile buffer/heap/gc_schema/coordination using
+each build's actual runtime flags, with metadata output added. Both SDKs report
+the same per-function bytes below; source hashes/commands and all .su files are in
+`build/stage2f/frames/`. No inspected runtime-source entry reports a dynamic frame.
+
+| Function | Debug bytes | Release bytes |
+| --- | ---: | ---: |
+| BufferBuilder constructor | 552 | 296 |
+| BufferReadLease constructor | 184 | 40 |
+| copy_elements | 520 | 168 |
+| adopt_buffer | 312 | 136 |
+| seal_buffer | 104 | 8 |
+| output-alias guard | 152 | 24 |
+| Heap::collect(span) | 1,016 | 376 |
+| Largest runtime-source entry: catalog admission | 2,584 | 568 |
+
+These are native Linux C++ compiler frame reports, not a sum of all call-chain
+storage, an emitted-object certificate, Windows/macOS measurements or authorization
+of any numerical production stack/array ceiling. Real 1 MiB Debug/Release execution
+covers multi-megabyte buffers, deep compact shapes, copies, all fault ordinals,
+frontend and affected runtime/JIT/AOT components. Physical depth 128 and semantic
+depth 256 protections and the separate receiver-chain hardening issue are unchanged.
+
+### 29.3 Both supported Linux SDKs: exact final acceptance
+
+System SDK: `/usr/lib/llvm-19`, LLVM/Clang 19.1.7, LLVM RTTI ON, runtime
+`-frtti`. Official archive: `.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64`,
+LLVM/Clang 19.1.7, LLVM RTTI OFF, runtime `-fno-rtti`, matching archive LLD.
+All execution here is native Linux x64. Runtime/compiler flags and exact tool paths
+are retained in `build/stage2f/manifest.json`; production sources match locked
+HEAD `3cbe250`. The final acceptance test source has its own recorded hash.
+
+| SDK | Configuration | Full suites | Elapsed | Stress per selected suite | Stress elapsed |
+| --- | --- | --- | ---: | ---: | ---: |
+| system | debug | 63/63 | 128.29 s | 5 | 30.99 s |
+| system | release | 63/63 | 67.15 s | 10 | 20.33 s |
+| system | san | 63/63 | 149.16 s | 5 | 10.63 s |
+| official | debug | 63/63 | 117.93 s | 5 | 30.56 s |
+| official | release | 63/63 | 60.95 s | 10 | 20.32 s |
+| official | san | 63/63 | 140.18 s | 5 | 10.40 s |
+
+Debug and Release are the actual CMake modes; sanitizer builds are RelWithDebInfo
+with VOID_SANITIZERS=ON. Strict native sanitizer settings exactly retain hosted
+policies: `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. Builds/AOT generators
+and tests run outside the ptrace sandbox where LSan requires it. No suppression,
+platform skip, assertion removal or sanitizer relaxation is used. Generated LLVM
+instructions and vendor SDK libraries are not automatically sanitizer-instrumented;
+the native/JIT/AOT behavioral suites remain distinct from C++ sanitizer coverage.
+
+Stress uses `ctest --repeat until-fail:N`, never repeat-until-pass, on gc_buffers,
+gc_schemas, runtime_coordination, runtime_failures and runtime_invariants. All
+**200** selected-suite executions passed. Every gc_buffers run includes all measured
+fault ordinals, the new 32 budgeted cycles, deterministic NativeSafe/Managed
+collection witnesses, fatal graph controls and deliberate leak controls.
+
+Real child-process soft stack limit is 1,024 KiB (`ulimit -s 1024`), no simulation:
+
+| SDK | Configuration | Affected suites | Elapsed |
+| --- | --- | --- | ---: |
+| system | debug | 12/12 | 14.88 s |
+| system | release | 12/12 | 6.91 s |
+| official | debug | 12/12 | 16.86 s |
+| official | release | 12/12 | 6.85 s |
+
+The 12 suites are frontend, gc_buffers, gc_schemas, runtime_coordination,
+runtime_generated, runtime_callbacks, runtime_failures, runtime_invariants,
+runtime_aot_normal, runtime_aot_optimized, strings_source and interfaces_source.
+Six full runs preserve **378** suite executions; stack runs add **48**. All 63
+suite names remain present. Existing compiler/editor analysis and diagnostic tests
+are retained; a new local Electron/npm acceptance run is not claimed here.
+
+Raw final CTest logs, repetition-count checks, measured-site lines and JSON summary
+are in `build/stage2f/acceptance/`. `manifest.json` fingerprints runtime/header/test
+inputs and ordinary CI; `frames/` retains commands/reports. No production defect
+was reproduced; the only functional test changes add coverage rather than alter
+runtime semantics.
+
+### 29.4 Mixed-heap alias guard: material measured scaling risk
+
+Reproducible tracked harness: `tools/bench/buffer_alias.cpp` and
+`tools/bench/buffer_alias.py`. Run each non-sanitized Release build separately:
+
+```sh
+python3 tools/bench/buffer_alias.py --build build/ci-release --output build/stage2f/alias-system --samples 5 --iterations 64 --cpu 0
+python3 tools/bench/buffer_alias.py --build build/ci-official-release --output build/stage2f/alias-official --samples 5 --iterations 64 --cpu 0
+```
+
+The harness uses the actual Release runtime archive and compiler/RTTI/linker
+configuration (compile_commands supports Makefiles/Ninja). An ELF link wrapper
+around the verified native C++ guard symbol times the **real production function**
+while its Runtime caller holds the mutex; exactly two guard calls per empty-string
+output are asserted. The body is not reimplemented, inlined into a guessed scan,
+artificially deoptimized or replaced with an index. Hook clock/call overhead is
+included, not subtracted. Timer coverage excludes mutex acquisition/wait and the
+rest of the caller's critical section, so it is lock-held guard service time,
+not total lock latency or a contention/collector-wait bound.
+
+Fixture ordinary objects form a rooted chain with constant-sized root lookup;
+this avoids conflating O(objects) guard cost with an O(objects) root-word search.
+Each population uses zero, one or 16 complete reference-free 8-byte buffers. Timed
+empty-string outputs allocate no payload and perform no collection. A leased
+interior-output negative control independently confirms real guard rejection.
+All graphs must collect to zero after measurement.
+
+Final measurements use five fresh-process samples, 64 outputs/sample, CPU 0 on
+AMD Ryzen 7 1700X / Linux x64; SDK runs are sequential with no concurrent agent
+build/test workload. Frequency/scheduler/cache effects are not controlled. Full
+raw samples, min/max, executable commands, compiler identities and source/archive/
+workflow hashes are in `build/stage2f/alias-{system,official}/results.json`.
+
+One-buffer results (median microseconds; total Heap objects = ordinary count + 1):
+
+| Ordinary objects | System output (2 scans) | System lock-held scan | Official output (2 scans) | Official lock-held scan |
+| ---: | ---: | ---: | ---: | ---: |
+| 0 | 0.135 | 0.028 | 0.135 | 0.028 |
+| 1,000 | 7.885 | 3.895 | 7.887 | 3.897 |
+| 10,000 | 69.542 | 34.705 | 71.953 | 35.905 |
+| 100,000 | 3669.990 | 1834.270 | 3640.820 | 1819.690 |
+| 500,000 | 14123.700 | 7060.690 | 13866.400 | 6932.240 |
+
+The ordinary-only counter fast path remains essentially flat (about 0.134–0.136
+microseconds/output including probe overhead). With 500,000 ordinary objects and
+one buffer the guard costs roughly **14 ms/output**, about **7 ms under the mutex
+per scan**. Maximum individual observed scans are about 13.67 ms system / 12.57 ms
+official. The 16-buffer cases also retain O(objects) behavior; allocation/cache
+layout can make them faster than one-buffer cases, not a beneficial buffer-count
+scaling law. Neither medians nor observed maxima are guarantees or real-game pause
+percentiles, and Linux timings cannot stand in for Windows/macOS measurements.
+
+**Finding:** this is a material scalability/lock-service risk, not a reproduced
+ownership/correctness bug. Review a separate optimization checkpoint before
+production-scale mixed-heap use. Any indexed/provenance alternative must retain
+exact bounds/lease conflicts, transactional adoption rollback, sweep/destruction
+removal and ordinary fast-path behavior. No replacement index, weaker guard,
+numerical source limit or scheduling policy is approved or implemented here.
+
+### 29.5 Owner-controlled hosted acceptance and stop boundary
+
+The existing unmodified seven-job workflow is the acceptance carrier: Linux x64
+Debug/Release/Sanitizers; Windows 2022 x64 Debug/Release; macOS ARM64 Debug/Release.
+Its existing CTest step runs the unchanged 63-suite inventory, including the new
+32-cycle and budget-one fault coverage in gc_buffers. Existing SDK 19.1.7,
+Python 3.12, Node 24.19.0 editor steps, matrix, caches, sanitizer exit policies,
+artifacts and failure behavior are untouched. The current LastTest artifact path
+retains measured-site/stress output; focused harness/stack artifacts above are
+local review evidence, not newly dispatched hosted jobs.
+
+For owner/Wrench acceptance require all seven jobs green, all 63 suites per job,
+all measured platform-specific failure ordinals exercised, native Windows/macOS
+buffer/lease/copy behavior and existing Debug editor/native compatibility steps.
+Do not infer those results from Linux or from Stage 2E's earlier #56 run. No new
+native Windows/macOS Stage 2F execution is claimed. **Stage 2F is not locked.**
+
+Remaining risks: material mixed-heap guard lock cost; stop-the-world GC work
+proportional to reference positions; OS overcommit cannot promise catchable OOM;
+no universal recursive stack bound or general sanitizer coverage of emitted code.
+Owned-fixed/growable child copy plans, source arrays, compiler/LLVM/generated ABI,
+production certification and Stage 3+ remain gated. Preserve all prior 64 KiB
+research/CFG/ABI evidence without turning it into a source size restriction.
+
+Stop for owner/Wrench review. No commits, pushes, branches, CI edits, workflow
+dispatches or remote actions. The owner's pre-existing WRENCH_CLANKER.md edit was
+left untouched; its unrelated whitespace is not altered by this checkpoint.

@@ -9097,3 +9097,111 @@ scaling, comprehensive performance and target-native acceptance remain for revie
 future compiler value-copy plans, owned/growable child roles and source activation
 are separately gated. No workflow edits, commits, pushes, branches, Git mutations,
 remote actions or dispatches. Stop for owner/Wrench review before Stage 2F.
+
+
+## 16 October 2026: Stage 2E hosted lock; Stage 2F acceptance authorization
+
+Boss/Wrench confirm Stage 2E LOCKED at `3cbe250`, CI #56, all seven hosted
+jobs passed with 63/63 suites each. This is owner-supplied native hosted evidence.
+Only Stage 2F runtime-foundation acceptance/review is authorized. Stage 2F remains
+unlocked until the required owner-controlled hosted run passes. No source-array,
+compiler/LLVM/generated ABI, later-stage, Git, CI-edit or remote action is authorized.
+
+
+## 16 October 2026: Stage 2F local runtime-foundation acceptance, hosted pending
+
+Recorded owner/Wrench lock: Stage 2E `3cbe250`, CI #56, 7/7 jobs and 63/63 each.
+Stage 2F alone authorized; it remains UNLOCKED until required owner-controlled
+hosted verification. No remote verification or dispatch performed.
+
+Audited Sections 23.6/23.8/23.9/28, Language Bible arrays/value/readonly rules,
+current log and actual schema/cursor/Heap/coordination/buffer paths. Runtime-owned
+immutable schemas/catalogs remain transactional and compact; repeats use checked
+geometry and distinct-node traversal. NativeSafe zero reservations, private rooted
+adoption, whole-capacity tracing, sealed publication, lease roots/counts, all writer
+conflicts and copied value/referent identities retain their contracts. No production
+correctness defect reproduced; no runtime/compiler/generated ABI changes made.
+
+Acceptance coverage additions, retaining all assertions and 63 suite names:
+- gc_buffers now runs 32 deterministic budgeted record-copy cycles on every hosted
+  platform: partial destination GC, lease conflicts, poisoned abort retaining old
+  output, complete independent snapshot, post-lease mutation and two GCs/cycle.
+- Copy fault coverage now measures budgets 0 AND 1; the latter directly exercises
+  construction-triggered collection with a source lease active before reservation.
+  Baselines measure successful allocation sites, then every ordinal is injected in
+  a fresh transaction. Measured sites on both SDKs/all configs: schema admission 40;
+  bytes budgets 0/1 4/6; references 11; copies budgets 0/1 17/29. Original sentinels,
+  no-sweep/epoch rollback, fresh retries, after-owner native leak checks, ten fatal
+  graph modes, two deliberate leak controls and post-poll checks stay intact.
+
+Final native Linux x64 complete matrix (LLVM/Clang 19.1.7 in both cases):
+
+| SDK | Debug | Release | Strict ASan/UBSan |
+| --- | --- | --- | --- |
+| system | 63/63, 128.29 s | 63/63, 67.15 s | 63/63, 149.16 s |
+| official | 63/63, 117.93 s | 63/63, 60.95 s | 63/63, 140.18 s |
+
+System /usr/lib/llvm-19 has LLVM RTTI ON/runtime -frtti; official archive under
+.toolchains/ci-investigation/LLVM-19.1.7-Linux-X64 has RTTI OFF/-fno-rtti and matching
+LLD. Full builds succeeded before acceptance. Strict settings match ordinary CI:
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87;
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86. Sanitizer builds/native
+AOT generators/tests run outside ptrace so LSan works; no suppressed failures or
+relaxed checks. Generated machine instructions/vendor SDKs are not automatically
+ASan/UBSan-instrumented, distinct from compiler/runtime C++ coverage.
+
+Repeat-until-failure stress (never repeat-until-pass): five selected runtime suites,
+5 repetitions each in Debug/sanitizers and 10 in Release, both SDKs: all 200 suite
+executions pass. Includes complete measured fault sweeps and genuine deterministic
+NativeSafe/Managed GC, copy/lease/concurrent coordination regressions.
+
+Real 1 MiB soft-stack executions, including frontend and 11 runtime/source suites:
+- system: Debug 12/12, 14.88 s; Release 12/12, 6.91 s.
+- official: Debug 12/12, 16.86 s; Release 12/12, 6.85 s.
+
+Native C++ -fstack-usage probes use each runtime's actual build flags across buffer,
+heap, schema and coordination units. Both SDKs: builder ctor 552/296 bytes Debug/
+Release, lease ctor 184/40, copy 520/168, adopt 312/136, seal 104/8, guard 152/24,
+Heap collect 1016/376; largest runtime-source entry catalog admission 2584/568.
+No inspected runtime-source entry has a dynamic frame. Algorithms are iterative
+by shape/element; owning heap metadata/cursors do not become payload-sized native
+temporaries. Storage references are reacquired after polls. These are per-function
+compiler reports, not total call-chain/ABI certificates, cross-target measurements
+or a production array/stack numerical policy. Real small-stack execution complements
+source/frame inspection. Existing physical depth 128/semantic depth 256 guards and
+separate receiver-chain issue stay unchanged.
+
+Added tracked Linux bench tools/bench/buffer_alias.{cpp,py}. The link-time ELF
+probe measures the real production guard inside its caller's mutex, asserts two
+calls/output, preserves optimization and records compiler/archive/source/CI hashes.
+Rooted ordinary chains keep root-word lookup constant-sized. Empty-string output
+allocates/collects nothing; zero/one/16 buffers and 0/1k/10k/100k/500k ordinary nodes
+show scan scaling. Leased-output corruption controls reject. Five samples x64
+outputs/population, sequential SDK runs, CPU 0/Ryzen 1700X, no agent build/test load.
+Clock/wrapper overhead included, no guessed subtraction. Timing excludes mutex
+wait and surrounding critical work; scheduler/cache/frequency are not controlled.
+
+Final one-buffer medians: system 100k nodes 3.670 ms/output, 1.834 ms lock-held scan;
+500k 14.124 ms/output, 7.061 ms/scan. Official 100k 3.641 ms/1.820 ms; 500k
+13.866 ms/6.932 ms. Maximum observed scans 13.67/12.57 ms system/official.
+Ordinary-only counter fast path remains about 0.134–0.136 us/output including probe
+overhead. 16 buffers remain O(objects); layout/cache variations are not speedup
+claims. This is a MATERIAL mixed-heap lock/scalability risk. Recommend separate
+owner/Wrench review before a production-scale index/provenance optimization;
+no index, weaker guard, arbitrary size cap or performance guarantee was introduced.
+
+Artifacts: build/stage2f/manifest.json, acceptance/{summary.json, CTest logs},
+frames/{commands.json,summary.json,*.su}, alias-{system,official}/results.json.
+Proposal Section 29 contains exact tables, repro commands, audit boundaries and
+hosted acceptance checklist. Existing seven-job workflow untouched: owner must
+obtain native Linux x64 Debug/Release/Sanitizers, Windows x64 Debug/Release and
+macOS ARM64 Debug/Release, all 63 suites and current Debug editor steps. New native
+Windows/macOS Stage 2F results remain pending, not inferred from Linux/#56.
+
+Changed only focused acceptance test, standalone benchmark and relevant docs.
+Production include/src, compiler, CMake and ordinary/probe workflows match HEAD.
+The pre-existing owner edit docs/WRENCH_CLANKER.md is preserved (including its
+unrelated whitespace). Scoped diff/whitespace checks pass for this task's files.
+No commits, pushes, branches, Git mutations, workflow edits or remote actions.
+Stage 2F not locked; Stage 3+ and source-array activation remain locked. Stop for
+owner/Wrench review.
