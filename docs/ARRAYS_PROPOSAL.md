@@ -3842,3 +3842,62 @@ execution, source feature activation or hosted acceptance is claimed. No Git,
 branch, push, remote modification or workflow dispatch was performed. The only CI
 file changes are the separately authorized action versions, documented independently.
 Stop before Stage 2E.
+
+
+### 27.5 CI #53 macOS Debug reference-sweep investigation (16 October 2026)
+
+Owner reports commit `41f5b71`: macOS ARM64 Debug builds, but `gc_buffers`
+reports `reference failure sweep leaked storage` (62/63 suites). That combined
+assertion cannot identify baseline versus injected ordinal, native allocations
+versus managed objects, or owner-retained capacity versus a leak. No native macOS
+runner or libc++ installation is available in this Linux x64 workspace; the hosted
+ordinal, counts/bytes and allocation owner remain **unresolved**. No claim of a
+macOS fix or runtime leak is made.
+
+Reviewed the actual transaction: two ordinary objects precede the measured builder
+adoption, which adds a third Heap map node. Failed adoption retains the pending
+reservation until RAII cleanup; successful adoption roots private storage before
+polling. Failed marking clears marks before retry; abandoned builders drop their
+private root and the explicit collection reclaims unreachable objects. The final
+assertion runs while Runtime, its Heap map and metadata owners still exist. Heap
+collection erases dead nodes but does not release the map's bucket capacity.
+Platform-specific map growth retained until owner destruction is therefore a
+plausible accounting/lifetime explanation, **not established as CI #53's cause**.
+The marking work vector/unique-target set are local collection work, unlike the
+long-lived Heap object table. No ownership change is justified without evidence.
+
+The narrowly scoped test change retains the pre-destruction zero-storage check,
+adds outstanding allocation count (including zero-byte allocations), and splits
+Heap-object and native-storage failures. Each completed transaction flushes a
+stdio record with baseline flag, ordinal, successful allocation sites, failure/
+source-release state, native count/bytes and Heap object count. If any transaction
+throws, an outer handler reports native survivors after all transaction owners
+unwind and rethrows the original failure. Final collection completion is checked
+explicitly. Recording/failure injection are disabled before these records; no new
+C++ allocations are introduced into the measured window. All ordinals, rollback,
+fatal invariants and post-poll tests remain intact. Runtime/compiler/workflows are
+unchanged; the test still fails on retained storage rather than exempting macOS.
+
+Local Clang 19 Linux/libstdc++ Debug and Release both measure 11 successful
+allocation sites: baseline and injected ordinals 0–10 each end with native
+count=0, bytes=0 and Heap objects=0. Focused 11-suite runs pass Debug (12.08 s),
+Release (2.80 s), strict ASan/UBSan with leak detection (7.69 s), and 1 MiB stacks
+Debug (12.14 s)/Release (2.90 s). Coverage includes gc_buffers' ten fatal subprocess
+modes, schemas, coordination, generated roots, callbacks, failures, invariants,
+normal/O2 native AOT, strings and interfaces. This is focused validation, not a
+new full 63-suite run or native macOS validation.
+
+A disposable Linux diagnostic-control copy adds a deliberate 37-byte RAII owner
+inside the measured baseline. It fails as required with native count=1/bytes=37,
+Heap objects=0, then reports native count=0/bytes=0 after unwinding. It exits 1;
+no assertion is bypassed. This validates the reporting distinction only, not the
+macOS cause. Local logs and the disposable control are in
+`build/ci53-diagnostics/`; the control is not part of tracked tests.
+
+Next native macOS evidence must establish the failing baseline/ordinal and the
+before/after teardown counters. Nonzero objects identify a managed reclamation
+failure; zero objects with native survivors require allocator-owner attribution.
+Counters dropping only at owner destruction indicate retained lifetime, whereas
+post-teardown survivors require a leak investigation. Neither outcome authorizes
+an allowance, skipped ordinal or changed production semantics. Stop for owner/
+Wrench review before further correction or Stage 2E.

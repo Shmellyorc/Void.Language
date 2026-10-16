@@ -8870,3 +8870,53 @@ All triggers, permissions, cache keys, artifact names/paths, shell/test commands
 sanitizer settings, conditions, timeouts and failure policies remain unchanged.
 No deprecation-suppression environment flags, third-party action update, remote
 modification or workflow dispatch. Owner controls separate commits/hosted acceptance.
+
+
+## 16 October 2026: CI #53 macOS Debug reference-sweep diagnostic checkpoint
+
+Request: investigate `reference failure sweep leaked storage` at `41f5b71`, without
+weakening rollback/fatal/post-poll checks or changing Stage 2D semantics. Native
+macOS ARM64 and libc++ are unavailable locally. The original combined assertion
+and supplied log cannot establish which ordinal failed (including baseline),
+remaining counts/bytes, allocation owner or real leak versus accounting defect.
+These hosted facts remain unresolved; no remote action was performed.
+
+Reviewed reference_transaction, PendingBuffer/adoption RAII, private-root cleanup,
+mark rollback/retry, and Heap sweep/destruction. A concrete lifetime distinction:
+GC erases object nodes but Runtime's unordered_map retains bucket capacity until
+owner destruction. Reference adoption adds a third object after two pre-measurement
+objects. Different standard-library growth behavior could retain a measured
+bucket allocation. This is a hypothesis, not attribution of the macOS failure;
+there is no evidence supporting a runtime patch yet.
+
+Changed tests/runtime/buffers.cpp only: count outstanding native allocations as
+well as bytes, split GC/native assertions, explicitly require successful final
+collection, and flush baseline/ordinal/site/failure/source-release/native-count/
+native-bytes/Heap-object diagnostics. An outer catch reports native survivors
+after the Runtime and all local owners unwind, then rethrows. The original
+pre-teardown retention failure is preserved and zero-byte native allocations
+also fail. Logging occurs outside failure injection/recording. No ordinal is
+removed; no warm-up, timing pass, platform exception or production fix is added.
+
+Actual Linux x64 Clang 19/libstdc++ validation after rebuilding void_gc_buffers:
+- Baseline: 11 sites; every injected ordinal 0–10 fails and rolls back correctly.
+  Baseline and all ordinals end with native allocations=0, bytes=0, Heap objects=0
+  in both Debug and Release. Logs: build/ci53-diagnostics/{debug,release}.log.
+- Focused 11/11 suites pass Debug 12.08 s, Release 2.80 s, strict ASan/UBSan
+  7.69 s (detect_leaks=1, abort_on_error=1; UBSan halt/stacktrace enabled).
+- 1 MiB native stack: the same 11/11 pass Debug 12.14 s and Release 2.90 s.
+  Includes gc_buffers and all ten fatal child modes, schemas, coordination,
+  generated roots, callbacks, failures, invariants, normal/O2 AOT, strings and
+  interfaces. Full 63-suite matrix was not rerun for this test-only diagnostic.
+- Disposable diagnostic-control source under build/ci53-diagnostics deliberately
+  retains a 37-byte RAII allocation in the measured baseline. It exits 1, reports
+  native count=1/bytes=37/Heap objects=0 before teardown and count=0/bytes=0 after
+  teardown. This proves the new reporting path preserves strict failure and
+  distinguishes owner lifetime; it does not reproduce the platform failure.
+- git diff --check passes. No runtime/compiler, workflow or generated ABI edits.
+
+ARRAYS_PROPOSAL.md 27.5 records findings and the native evidence still needed.
+Do not claim CI #53 fixed: the smallest deterministic diagnostics are prepared
+for owner-controlled native verification. No Git mutations, commits, pushes,
+branches, remote changes or dispatches. Stage 2E remains gated. Stop for owner/
+Wrench review.

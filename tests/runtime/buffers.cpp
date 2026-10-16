@@ -2,6 +2,7 @@
 #include <atomic>
 #include <chrono>
 #include <cstring>
+#include <cstdio>
 #include <cstdlib>
 #include <future>
 #include <iostream>
@@ -14,7 +15,7 @@
 #include <malloc.h>
 #endif
 namespace {
-struct Stats {std::atomic<std::size_t> calls{0},bytes{0},live{0};};
+struct Stats {std::atomic<std::size_t> calls{0},bytes{0},live{0},live_calls{0};};
 Stats stats[4];thread_local int recording=-1;thread_local long fail_after=-1;
 struct alignas(std::max_align_t) Header {void* base;std::size_t alignment,bytes;int record;};
 thread_local std::size_t capture_size=0;
@@ -47,7 +48,7 @@ void* allocate(std::size_t size,std::size_t alignment) {
     if(!base)throw std::bad_alloc();
     auto* data=static_cast<char*>(base)+prefix;auto* header=reinterpret_cast<Header*>(data)-1;
     *header={base,alignment,size,recording};
-    if(recording>=0) {++stats[recording].calls;stats[recording].bytes+=size;stats[recording].live+=size;}
+    if(recording>=0) {++stats[recording].calls;stats[recording].bytes+=size;stats[recording].live+=size;++stats[recording].live_calls;}
     if(capture_size && capture_size==size) {
         captured=data;
         if(allocating_runtime)allocation_was_native=!allocating_runtime->is_managed();
@@ -60,7 +61,7 @@ void deallocate(void* data,std::size_t alignment) noexcept {
     if(!data)return;
     auto* header=static_cast<Header*>(data)-1;
     if(header->alignment!=alignment)std::terminate(); // independently checks delete family/alignment
-    if(header->record>=0)stats[header->record].live-=header->bytes;
+    if(header->record>=0) {stats[header->record].live-=header->bytes;--stats[header->record].live_calls;}
     auto* base=header->base;
 #ifdef _WIN32
     if(alignment) {_aligned_free(base);return;}
@@ -488,11 +489,33 @@ long reference_transaction(long ordinal,bool measure) {
         if(!source.value)allocate_nominal(r,source,"Target");
         Runtime::BufferBuilder retry(r,layout,1,quota);retry.write_reference(token);retry.write_reference(token);retry.finish_into(&out.value);
     }
-    out.value=source.value=nullptr;r.collect();check(!stats[0].live && !r.snapshot().objects,"reference failure sweep leaked storage");return sites;
+    out.value=source.value=nullptr;
+    check(r.collect()==Runtime::Collection::completed,"reference final collection failed");
+    const auto objects=r.snapshot().objects;
+    // Failure injection/recording are off. stdio diagnostics do not allocate via
+    // this fixture's operator new or change the measured failure ordinals.
+    std::fprintf(stderr,"reference sweep before owner teardown: baseline=%d ordinal=%ld sites=%ld failed=%d released_source=%d native_count=%zu native_bytes=%zu heap_objects=%zu\n",
+        measure,ordinal,sites,failed,released_source,stats[0].live_calls.load(),stats[0].live.load(),objects);
+    std::fflush(stderr);
+    check(!objects,"reference failure sweep leaked GC objects");
+    check(!stats[0].live && !stats[0].live_calls,"reference failure sweep leaked native storage");
+    return sites;
 }
 void reference_failures() {
-    auto sites=reference_transaction(-1,true);check(sites>4,"reference cursor/mark work not measured");
-    for(long ordinal=0;ordinal<sites;++ordinal)reference_transaction(ordinal,false);
+    auto transaction=[](long ordinal,bool baseline) {
+        try {return reference_transaction(ordinal,baseline);}
+        catch(...) {
+            // All transaction owners (including Runtime's containers) have now
+            // unwound. Keep the original failure, but distinguish owner-retained
+            // capacity from allocations that actually outlive those owners.
+            std::fprintf(stderr,"reference sweep after owner teardown: baseline=%d ordinal=%ld native_count=%zu native_bytes=%zu\n",
+                baseline,ordinal,stats[0].live_calls.load(),stats[0].live.load());
+            std::fflush(stderr);
+            throw;
+        }
+    };
+    auto sites=transaction(-1,true);check(sites>4,"reference cursor/mark work not measured");
+    for(long ordinal=0;ordinal<sites;++ordinal)transaction(ordinal,false);
     std::cout<<"reference construction/partial-mark failure sweep: "<<sites<<" sites\n";
 }
 
