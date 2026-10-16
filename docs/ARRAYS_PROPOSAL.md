@@ -3901,3 +3901,80 @@ Counters dropping only at owner destruction indicate retained lifetime, whereas
 post-teardown survivors require a leak investigation. Neither outcome authorizes
 an allowance, skipped ordinal or changed production semantics. Stop for owner/
 Wrench review before further correction or Stage 2E.
+
+
+### 27.6 CI #54: object-table ownership and corrected leak-check lifetime
+
+Owner/Wrench supplied native macOS ARM64 Debug **and Release** results: the
+baseline (`ordinal=-1`, not an injected failure) ends with one tracked native
+allocation/40 bytes, zero Heap objects, `failed=0`; after Runtime destruction,
+tracked count/bytes are both zero. Neither run reaches the injected ordinals.
+This supersedes the unknown baseline/ordinal in 27.5. No local macOS execution or
+remote inspection was performed in this checkpoint.
+
+Ownership argument goes beyond matching destruction times:
+
+- Before measurement, the transaction already owns two Heap objects, schema,
+  layout, nominal metadata, Attachment/Managed state and registered outputs.
+  Baseline builder adoption inserts a third entry in `Heap::objects_`.
+- Buffer cursor scratch and constructor temporaries are scoped to the builder;
+  the BufferState control block belongs to its object-table node. Final empty-root
+  collection destroys every payload and node, including BufferState/catalog
+  references. It also destroys local roots/pending vectors and the unique-target
+  mark set. Those are not retained Runtime work caches. Catalog admission is not
+  performed in this transaction's measured window.
+- Heap's remaining storage owners are `objects_` and `roots_`. Runtime roots are
+  passed as additional roots: this path does not populate Heap's `roots_` vector.
+  `objects_.erase()` leaves the unordered_map bucket array owned by the empty map;
+  only its destruction releases that capacity. Thus the outstanding measured
+  storage in this successful empty-Heap baseline is object-table bucket storage,
+  not an unreclaimed managed payload or escaped builder scratch. Rehash size is
+  standard-library-specific; GC is not required to shrink the table.
+
+A tracked Heap-only witness now independently isolates this allocation family:
+allocate ordinary empty-reference objects, measure the next insertion, then
+collect with no roots. No Runtime, schemas, builder, catalog or populated root
+vector exists in that witness; collected payloads and map nodes are gone. The
+remaining owner is the object table. An independent native `std::unordered_map`
+control performs the same insertion/clear sequence and checks retained count/bytes
+against Heap, with strict zero checks after **each** owner dies. Both first
+insertion and the original two-to-three transition are tested. This is an
+ownership/control experiment, not a subtraction allowance or platform exception.
+No 40-byte constant, assumed bucket count, or private implementation access is
+used to obtain a pass.
+
+Local Linux x64/libstdc++ Debug and Release prove the same lifetime mechanism:
+first insertion changes bucket count 1->13 and retains exactly one allocation/
+104 requested bytes in both Heap and control after collection/clear; after owner
+destruction both are zero. The two-to-three transition remains 13->13 and retains
+no newly measured allocation. The source-owner argument plus supplied macOS
+lifetime evidence identifies the macOS failure as an incorrect test lifetime
+expectation. The new witness will also record actual native libc++ bucket counts
+and allocation bytes on hosted verification; those new macOS witness outputs
+have **not** been executed locally. No claim that five buckets or a particular
+libc++ SDK implementation was independently measured here is made.
+
+Correction: `reference_transaction` still requires successful final collection
+and zero Heap objects immediately, before any Runtime destructor could hide a
+reclamation bug. `checked_reference_transaction` calls it, lets every transaction
+owner die, then requires both tracked native allocation count and bytes to be
+zero. The baseline determines the complete successful site count and every
+ordinal still executes with unchanged failure, output-sentinel, rollback and
+retry assertions. Pre/post-teardown diagnostics remain. Unexpected exceptions
+still fail. No allocation is hidden, subtracted, warmed away or forgiven.
+
+Two tracked subprocess negative controls deliberately retain 37-byte and zero-byte
+allocations after owner teardown. Both must exit 1 with the native leak assertion
+and native_count=1, with bytes=37/0 respectively. The control frees its allocation
+only after rejection and rethrows, preserving strict sanitizer operation. The
+Python driver rejects missing assertions or unexpected exit codes. All ten fatal
+private-root/edge/reference modes and both post-poll regressions remain unchanged.
+
+Actual focused validation: 11/11 Debug (11.87 s), Release (2.82 s), strict
+ASan/UBSan with leak detection (7.89 s), and 1 MiB stack Debug (12.66 s)/Release
+(2.96 s). Each gc_buffers run includes all injected ordinals, ten fatal modes and
+the two new leak controls. Linux baseline remains 11 allocation sites; all 0–10
+ordinals complete rollback/retry and finish with zero Heap objects and zero native
+count/bytes. Logs: `build/ci54-lifetime/`. No full 63-suite or new native macOS run
+is claimed. Runtime/GC/compiler, workflows and research gates remain unchanged;
+Stage 2E is locked. Stop for owner/Wrench review, no Git or remote actions.

@@ -8920,3 +8920,69 @@ Do not claim CI #53 fixed: the smallest deterministic diagnostics are prepared
 for owner-controlled native verification. No Git mutations, commits, pushes,
 branches, remote changes or dispatches. Stage 2E remains gated. Stop for owner/
 Wrench review.
+
+
+## 16 October 2026: CI #54 object-table lifetime correction
+
+Owner/Wrench reports both native macOS ARM64 Debug and Release fail the baseline
+ordinal -1 before injected failures: failed=0, native_count=1/native_bytes=40,
+Heap objects=0; after Runtime destruction native count/bytes=0. The earlier
+combined-check uncertainty is narrowed to native owner lifetime, not GC objects.
+
+Traced ownership, rather than relying solely on matching destruction times:
+Runtime/schema/catalog/root setup precedes measurement; baseline builder adoption
+adds the third Heap map node. Cursor and constructor work are builder-local;
+BufferState belongs to the collected node. Runtime roots, Heap pending work and
+mark deduplication are collection-local and destroyed on return. Final empty-root
+collection releases all payloads/nodes. No catalog update or Heap::roots_ growth
+occurs in this transaction. The remaining measured owner is Heap::objects_'s
+retained unordered_map bucket array; erase need not release it. It is runtime-owned
+container capacity, not live managed storage or an instrumentation allocation.
+The test was checking native storage before this legitimate owner died.
+
+Added an independent Heap-only ownership witness plus a native unordered_map
+insertion/clear control. Empty legacy-reference objects need no metadata or root
+registration; after collecting payloads/nodes, the Heap object table is the only
+remaining allocation owner. Compare retained count/bytes to the native bucket
+control and demand zero after both owners die, for first insertion and the original
+two-to-three transition. No hardcoded byte allowance, map-private access or platform
+exemption. Local Linux Debug/Release first insertion: bucket count 1->13, both
+Heap/control retain one 104-byte allocation, both zero after destruction. Two-to-
+three: 13->13, zero new retained allocations. This directly exercises container
+ownership independently of the original Runtime teardown. Native libc++ witness
+output, including its actual bucket count, awaits owner-controlled hosted execution;
+no local macOS SDK/run or five-bucket measurement is claimed. Source-owner exclusion
+and supplied native evidence identify the 40-byte baseline retention as the Heap
+object-table allocation; Section 27.6 records the argument and evidence boundary.
+
+Changed test lifetime, not GC: reference_transaction still checks successful final
+collection and zero Heap objects immediately. Its checked caller now requires
+zero recorded native count AND bytes only after all Runtime/Heap/layout/frame owners
+die, for baseline and every injected ordinal. All output-sentinel, mark rollback,
+retry, fatal invariants and post-poll checks remain. Pre/post-teardown records stay.
+Unexpected exceptions still reject; no allocations are ignored or reset away.
+
+Added tracked deliberate-leak subprocess controls: retain 37 bytes or a zero-byte
+allocation beyond owner teardown. Each must exit 1 with native_count=1 and the
+strict native leak assertion (bytes=37/0). Cleanup occurs only after rejection,
+then rethrows so the child remains failed; this avoids leaving artificial leaks
+for sanitizers. buffers.py requires exact expected rejection, alongside all ten
+existing fatal modes. No failure ordinal is skipped or made timing-dependent.
+
+Actual Clang 19 Linux x64/libstdc++ results after rebuilding void_gc_buffers:
+- Debug 11/11 focused suites, 11.87 s; Release 11/11, 2.82 s.
+- Strict ASan/UBSan 11/11, 7.89 s, detect_leaks=1/abort_on_error=1 and
+  UBSan halt_on_error=1/print_stacktrace=1, outside tracing sandbox.
+- 1 MiB native stacks: Debug 11/11, 12.66 s; Release 11/11, 2.96 s.
+- Includes gc_buffers, schemas, coordination, generated roots, callbacks, failures,
+  invariants, normal/O2 native AOT, strings and interfaces. gc_buffers includes
+  baseline plus all 11 measured ordinals (0–10), ten fatal modes, two leak controls
+  and deterministic poll/park regressions. All real transactions end with Heap
+  objects=0 before teardown and native count/bytes=0 afterward.
+- Direct Debug/Release logs and negative-control records: build/ci54-lifetime/.
+  No full 63-suite rerun or new native macOS/Windows validation is claimed.
+
+Code changes only tests/runtime/buffers.cpp and buffers.py; documentation changes
+ARRAYS_PROPOSAL.md 27.6 and this log. No production runtime/GC/compiler or workflow
+edits, Git mutations, commits, pushes, branches, remote actions or dispatches.
+Stage 2E remains locked. Stop for owner/Wrench review and native acceptance.

@@ -11,6 +11,7 @@
 #include <new>
 #include <thread>
 #include <utility>
+#include <unordered_map>
 #ifdef _WIN32
 #include <malloc.h>
 #endif
@@ -466,11 +467,50 @@ void reference_buffers() {
     object.value=text.value=other.value=out.value=nullptr;r.collect();check(!r.snapshot().objects,"reference tests leaked graph");
     std::cout<<"typed managed/string/interface buffers, capacity oracle and million-reference scans passed\n";
 }
+// Isolate object-table ownership independently of Runtime/builder lifetimes.
+// All payloads/nodes are collected, roots_ is never populated, and empty legacy
+// layouts allocate no metadata. The actual platform's unordered_map supplies
+// the bucket control; no expected libc++ size or allowance is hardcoded.
+void object_table_lifetime() {
+    struct Retained {std::size_t count,bytes;};
+    auto retained=[] {return Retained{stats[1].live_calls.load(),stats[1].live.load()};};
+    auto empty=[] {check(!stats[1].live_calls && !stats[1].live,"object table owner leaked native storage");};
+    // First insertion exercises libstdc++'s bucket allocation; two-to-three
+    // insertion isolates the transition in the original macOS transaction.
+    for(auto initial:{std::size_t{0},std::size_t{2}}) {
+        empty();Retained heap_storage{};
+        {
+            Heap heap;for(std::size_t i=0;i<initial;++i)heap.allocate({8,{}});
+            recording=1;heap.allocate({8,{}});recording=-1;
+            heap.collect();check(!heap.size(),"isolated object table retained GC objects");
+            heap_storage=retained();
+        }
+        empty();Retained bucket_storage{};std::size_t before=0,after=0;
+        {
+            int keys[3]{};std::unordered_map<void*,std::size_t> table;
+            for(std::size_t i=0;i<initial;++i)table.emplace(&keys[i],i);
+            before=table.bucket_count();
+            recording=1;table.emplace(&keys[initial],initial);recording=-1;after=table.bucket_count();
+            table.clear();check(table.empty(),"bucket control retained entries");
+            bucket_storage=retained();
+        }
+        empty();
+        check(heap_storage.count==bucket_storage.count && heap_storage.bytes==bucket_storage.bytes,
+              "isolated Heap retention differs from object-table bucket control");
+        std::cout<<"object-table ownership witness: initial="<<initial<<" buckets="<<before<<"->"<<after
+                 <<" heap_retained_count="<<heap_storage.count<<" heap_retained_bytes="<<heap_storage.bytes
+                 <<" bucket_retained_count="<<bucket_storage.count<<" bucket_retained_bytes="<<bucket_storage.bytes
+                 <<" after_owners_count="<<stats[1].live_calls<<" after_owners_bytes="<<stats[1].live<<'\n';
+    }
+}
+void reference_native_empty() {
+    check(!stats[0].live && !stats[0].live_calls,"reference failure sweep leaked native storage");
+}
 long reference_transaction(long ordinal,bool measure) {
     Runtime r;auto w=sizeof(void*);NominalDescriptor type{"Target","","plain",{w,{}}};r.admit_types({&type,1});
     auto schema=admit(r,spec("two-required",{SchemaManaged{"Target",false},SchemaRepeat{0,w,2,0,2*w,alignof(void*)}}));auto layout=r.buffer_layout(schema,2);
     Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r);allocate_nominal(r,source,"Target");r.allocate_into(&out.value,{8,{}});auto* sentinel=out.value;auto token=r.root_word(&source.value);
-    check(!stats[0].live,"prior reference sweep retained measured storage");stats[0].calls=0;stats[0].bytes=0;recording=0;fail_after=ordinal;bool failed=false,released_source=false;
+    reference_native_empty();stats[0].calls=0;stats[0].bytes=0;recording=0;fail_after=ordinal;bool failed=false,released_source=false;
     try {
         Runtime::BufferBuilder b(r,layout,1,quota);b.write_reference(token);b.write_reference(token);
         source.value=nullptr;released_source=true;
@@ -498,24 +538,34 @@ long reference_transaction(long ordinal,bool measure) {
         measure,ordinal,sites,failed,released_source,stats[0].live_calls.load(),stats[0].live.load(),objects);
     std::fflush(stderr);
     check(!objects,"reference failure sweep leaked GC objects");
-    check(!stats[0].live && !stats[0].live_calls,"reference failure sweep leaked native storage");
+    // Runtime owns object-table bucket capacity until its destructor. Native
+    // leak detection belongs in the caller, after every transaction owner dies.
     return sites;
 }
+long checked_reference_transaction(long ordinal,bool baseline,std::optional<std::size_t> deliberate_leak={}) {
+    void* leaked=nullptr;
+    try {
+        auto sites=reference_transaction(ordinal,baseline); // all owners destroyed on return
+        // Negative controls deliberately keep a measured allocation past owner
+        // teardown. Release it only after the strict check has rejected it.
+        if(deliberate_leak) {recording=0;leaked=::operator new(*deliberate_leak);recording=-1;}
+        std::fprintf(stderr,"reference sweep after owner teardown: baseline=%d ordinal=%ld native_count=%zu native_bytes=%zu\n",
+            baseline,ordinal,stats[0].live_calls.load(),stats[0].live.load());
+        std::fflush(stderr);
+        reference_native_empty();
+        return sites;
+    } catch(...) {
+        recording=-1;fail_after=-1;
+        std::fprintf(stderr,"reference sweep rejected after owner teardown: baseline=%d ordinal=%ld native_count=%zu native_bytes=%zu\n",
+            baseline,ordinal,stats[0].live_calls.load(),stats[0].live.load());
+        std::fflush(stderr);
+        ::operator delete(leaked); // negative-control cleanup, never converts failure to success
+        throw;
+    }
+}
 void reference_failures() {
-    auto transaction=[](long ordinal,bool baseline) {
-        try {return reference_transaction(ordinal,baseline);}
-        catch(...) {
-            // All transaction owners (including Runtime's containers) have now
-            // unwound. Keep the original failure, but distinguish owner-retained
-            // capacity from allocations that actually outlive those owners.
-            std::fprintf(stderr,"reference sweep after owner teardown: baseline=%d ordinal=%ld native_count=%zu native_bytes=%zu\n",
-                baseline,ordinal,stats[0].live_calls.load(),stats[0].live.load());
-            std::fflush(stderr);
-            throw;
-        }
-    };
-    auto sites=transaction(-1,true);check(sites>4,"reference cursor/mark work not measured");
-    for(long ordinal=0;ordinal<sites;++ordinal)transaction(ordinal,false);
+    auto sites=checked_reference_transaction(-1,true);check(sites>4,"reference cursor/mark work not measured");
+    for(long ordinal=0;ordinal<sites;++ordinal)checked_reference_transaction(ordinal,false);
     std::cout<<"reference construction/partial-mark failure sweep: "<<sites<<" sites\n";
 }
 
@@ -659,8 +709,8 @@ void measure() {
 }
 int main(int argc,char** argv) {
     try {
-        if(argc>1) {if(std::string_view(argv[1])=="--measure")measure();else if(std::string_view(argv[1])=="--measure-reference")measure_references();else fatal(argv[1]);}
-        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();reference_failures();reference_poll_reacquisition();
+        if(argc>1) {if(std::string_view(argv[1])=="--measure")measure();else if(std::string_view(argv[1])=="--measure-reference")measure_references();else if(std::string_view(argv[1])=="reference-leak-bytes")checked_reference_transaction(-1,true,37);else if(std::string_view(argv[1])=="reference-leak-zero")checked_reference_transaction(-1,true,0);else fatal(argv[1]);}
+        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();reference_poll_reacquisition();
 #ifdef VD_BUFFER_WRAP_COLLECT
             reference_poll_reacquisition(true);
 #endif
