@@ -8613,3 +8613,81 @@ pushes, branches or remote modifications. Stage 2C is locally complete; stop for
 owner/wrench review before Stage 2D. Reference-bearing tracing/completeness, read
 leases/deep copies, owned source fixed arrays, growable storage, source ABI/LLVM/
 ORC/LSP/public certification and native hosted acceptance remain future checkpoints.
+
+
+## 15 October 2026: CI #50 gc_buffers deterministic synchronization correction
+
+Owner reports Windows 2022 Release 62/63, solely gc_buffers:
+"no collection/poll interaction exercised"; Windows Debug 63/63. Inspected
+native_and_chunk_collections, Runtime::collect/poll/park, Native/Managed entry and
+wait_for_request. The failing assertion combined collections>0 and cumulative
+cooperative_parks>0 without printing either. The supplied hosted failure therefore
+cannot establish which counter was zero. No native Windows environment is available
+locally; no Windows execution or hosted rerun is claimed.
+
+Confirmed a test synchronization defect: request.count_down preceded the collect
+loop, and the writer could set done before the collector requested anything.
+Completed collections could also occur outside Managed construction. Two temporary
+Linux Release fixtures controlled these legal schedules with latches and reproduced
+the old assertion, first collections=0/parks=0, then collections=1/parks=0. Existing
+runtime code was used unchanged. The second witness distinguishes completed
+collections from actual cooperative interaction; the original message cannot.
+
+Changed only tests/runtime/buffers.cpp and documentation. The writer now constructs
+the same 4 MiB private buffer, populates a 4,096-byte prefix, then stays Managed
+while an unattached observer witnesses a real single-collector request. Snapshot
+checks require pending next epoch, unchanged completed epoch, two attached threads,
+one parked collector and the private object. No writer poll or Native transition
+occurs before the witness. Remaining write_bytes must cooperatively park and allow
+collection; its snapshot is captured before finish_into or a Native join. Require
+completed epoch, surviving private object and exactly one additional cooperative
+park. Then publish, check first/prefix-boundary/last bytes, release and collect.
+Separate assertions identify request/completion/park failures. Success prints
+completed_collections=1 cooperative_parks=1. No production coordination change is
+needed for this confirmed scheduling hole.
+
+The observer uses wait_for_request with a five-second failure watchdog, not a
+success-by-time check. No sleeps, repeated collector loop, extra input iterations,
+scheduling yield or weakened assertions. Fatal private-root/private-edge checks,
+allocation failure sweeps, independent byte oracles and NativeSafe/half-zeroed raw
+reservation witnesses remain intact.
+
+Verification and experiments:
+
+- Controlled old Release schedules: both exit 1 at the original assertion with the
+  explicit counters above. Temporary files are /tmp/p23-2c-original-controlled.cpp
+  and /tmp/p23-2c-original-no-park.cpp; these are experiments, not tracked tests.
+- An initial local observer prototype passed milliseconds::max to the timed-wait
+  API. On this standard library the wait returns false immediately; throwing from
+  the observer then blocks future unwinding while the writer is still Managed.
+  Both initial Debug/Release runs were killed by the existing 150-second subprocess
+  watchdog. Replaced this prototype with the finite failure watchdog and deferred
+  assertions; all final results below use the corrected source. No runtime API
+  change or hidden timeout increase.
+- Rebuilt void_gc_buffers in existing Debug, Release and strict sanitizer builds.
+  Nine selected suites pass: Debug 9/9 (2.87 s), Release 9/9 (2.03 s), strict
+  ASan/UBSan RelWithDebInfo 9/9 (2.06 s). Sanitized execution outside the desktop
+  tracing sandbox retains detect_leaks=1:abort_on_error=1 and
+  halt_on_error=1:print_stacktrace=1; no sanitizer findings.
+- With ulimit -s 1024: Debug 9/9 (2.72 s), Release 9/9 (2.03 s). Selected suites:
+  gc_buffers, gc_schemas, runtime_coordination, runtime_generated, runtime_callbacks,
+  runtime_failures, runtime_invariants, runtime_aot_normal, runtime_aot_optimized.
+  gc_buffers includes both fatal subprocesses (required exit 79), four normal and
+  six budget-triggered measured constructor failure sites. No full matrix rerun
+  for this test-only correction; all existing suites remain registered.
+- Final direct Release run prints exactly completed_collections=1 and
+  cooperative_parks=1, with both allocation-site counts unchanged.
+- Negative sensitivity experiment: compiled /tmp/p23-2c-no-write-poll.cpp, a separate
+  copy with only write_bytes polls removed; production sources unchanged. Linked
+  against the final fixture and existing Release runtime. It exits 1 with
+  "chunk write did not complete the pending collection", despite finish_into's
+  poll and the later Native join. The test cannot pass using those later events.
+
+After adding the explicit <utility> include for std::pair, rebuilt all three
+fixtures and reran gc_buffers: 1 MiB Debug 1/1 (2.66 s), 1 MiB Release 1/1
+(0.25 s), strict sanitizer 1/1 (0.88 s), including fatal/failure subchecks.
+
+Proposal Section 26.6 records the diagnosis and limits. No runtime/compiler edits,
+Stage 2D implementation, Git mutations, remote changes or CI workflow edits.
+Windows Release confirmation remains a hosted owner-controlled check. Stop for
+owner/Wrench review.

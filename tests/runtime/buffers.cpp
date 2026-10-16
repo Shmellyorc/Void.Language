@@ -9,6 +9,7 @@
 #include <limits>
 #include <new>
 #include <thread>
+#include <utility>
 #ifdef _WIN32
 #include <malloc.h>
 #endif
@@ -288,17 +289,53 @@ void native_and_chunk_collections() {
         check(r.collect()==Runtime::Collection::completed && r.snapshot().objects==1,"private adopted buffer not rooted");
         finish.count_down();{Runtime::Native native(r);worker.get();}
         check(result.load()!=nullptr,"concurrent buffer not published");r.collect();check(!r.snapshot().objects,"retired worker buffer not collected");}
-    // Actual chunk polling: a collector requests while the writer is Managed.
+    // A request-ready signal is insufficient: the collector may not run again
+    // until after the writer finishes. Instead hold a PARTIALLY populated builder
+    // Managed, observe the actual pending epoch from an unattached thread, then
+    // let the next production write_bytes poll perform the rendezvous.
     auto many=r.buffer_layout(s,4*1024*1024);std::vector<std::byte> input(many->capacity(),std::byte{0x71});
-    std::latch request(1);std::atomic<bool> done{false};std::atomic<std::size_t> collections{0};
-    auto collector=std::async(std::launch::async,[&]{Runtime::Attachment a(r);Runtime::Managed m(r);request.count_down();while(!done){if(r.collect()==Runtime::Collection::completed)++collections;std::this_thread::yield();}});
     {Runtime::Attachment a(r);Runtime::Managed m(r);Output out(r);
-        {Runtime::Native native(r);request.wait();}
-        {Runtime::BufferBuilder b(r,many,many->capacity(),{4096,1,8});b.write_bytes(input);b.finish_into(&out.value);}
-        check(r.buffer_byte(out.value,many,many->capacity()-1,0)==std::byte{0x71},"chunk write content");done=true;
-        {Runtime::Native native(r);collector.get();}
-        check(collections>0 && r.snapshot().cooperative_parks>0,"no collection/poll interaction exercised");out.value=nullptr;r.collect();}
-    std::cout<<"NativeSafe reservation/zeroing, private adoption and chunk collections: "<<collections.load()<<" collections\n";
+        Runtime::BufferBuilder b(r,many,many->capacity(),{4096,1,8});
+        constexpr std::size_t prefix=4096;
+        auto bytes=std::span<const std::byte>(input);
+        b.write_bytes(bytes.first(prefix));
+        const auto before=r.snapshot();
+        auto observer=std::async(std::launch::async,[&] {
+            // The writer must stay Managed; wait_for_request deliberately rejects
+            // that state. This observer has no attachment or root responsibility.
+            // A watchdog can fail the test; elapsed time never satisfies it.
+            const bool observed=r.wait_for_request(std::chrono::seconds(5));
+            return std::pair{observed,r.snapshot()};
+        });
+        auto collector=std::async(std::launch::async,[&] {
+            Runtime::Attachment attached(r);Runtime::Managed managed(r);
+            return r.collect();
+        });
+        const auto [observed,pending]=observer.get(); // no Native transition or writer poll
+        const bool writer_managed=r.is_managed();
+        const bool output_unchanged=out.value==nullptr;
+        b.write_bytes(bytes.subspan(prefix));
+        const auto after_poll=r.snapshot(); // before finish or a Native transition
+        b.finish_into(&out.value);
+        Runtime::Collection collected;
+        {Runtime::Native native(r);collected=collector.get();}
+        // Distinct assertions identify request, completion and poll/park failures.
+        check(writer_managed && output_unchanged,"partial builder did not remain private and Managed");
+        check(observed && pending.requested && pending.epoch==before.epoch+1 && pending.completed_epoch==before.completed_epoch && pending.parked==1 && pending.threads==2 && pending.objects==1,
+              "collection request did not overlap the Managed partial builder");
+        check(collected==Runtime::Collection::completed,"partial-buffer collection did not complete");
+        check(!after_poll.requested && after_poll.completed_epoch==pending.epoch && after_poll.objects==1,
+              "chunk write did not complete the pending collection");
+        check(after_poll.cooperative_parks==before.cooperative_parks+1,
+              "chunk write did not cooperatively park for the pending collection");
+        check(r.buffer_byte(out.value,many,0,0)==std::byte{0x71} &&
+              r.buffer_byte(out.value,many,prefix-1,0)==std::byte{0x71} &&
+              r.buffer_byte(out.value,many,prefix,0)==std::byte{0x71} &&
+              r.buffer_byte(out.value,many,many->capacity()-1,0)==std::byte{0x71},"chunk write content");
+        std::cout<<"Managed partial-buffer request: completed_collections="<<(after_poll.completed_epoch-before.completed_epoch)
+                 <<" cooperative_parks="<<(after_poll.cooperative_parks-before.cooperative_parks)<<"\n";
+        out.value=nullptr;r.collect();}
+    std::cout<<"NativeSafe reservation/zeroing, private adoption and deterministic chunk collection passed\n";
 }
 void fatal(std::string_view mode) {
     std::set_terminate([]{std::_Exit(79);});

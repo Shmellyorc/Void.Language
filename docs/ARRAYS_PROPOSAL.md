@@ -3573,3 +3573,61 @@ remote changes were made.
 Allocator/OS work, metadata/map growth and stop-the-world sweep can still block;
 no production latency or catchable-overcommit guarantee is inferred. Caller quotas
 in tests/measurements are scheduling inputs, not approved production limits.
+
+
+### 26.6 CI #50: deterministic partial-buffer collection witness
+
+15 October 2026. Owner reports Windows 2022 Release CI #50 passed 62/63 suites,
+with gc_buffers reporting "no collection/poll interaction exercised"; Windows
+Debug passed 63/63. That old message combines completed collections and cooperative
+parks. Neither counter was printed, so its exact hosted values cannot be recovered
+from the reported assertion. Do not claim that the Windows failure identified one
+particular counter or established a runtime failure.
+
+The old collector signaled readiness before entering its collect/done loop. A
+writer could finish all construction and set done before any request; alternatively
+collections could complete before the writer became Managed, with no cooperative
+park. Both schedules are legal. Temporary Release witnesses, using latches to
+control these schedules without sleeps, reproduced the original failure with
+collections=0/parks=0 and collections=1/parks=0 respectively. These were Linux
+executions of the existing runtime, not native Windows reproductions.
+
+Only tests/runtime/buffers.cpp changes: write a 4,096-byte prefix of the existing
+4 MiB buffer, keep its builder/root and writer Managed, and use an unattached
+observer to wait for an actual collection request. The single collector cannot
+finish while that writer stays Managed. The observed snapshot must contain the
+next pending epoch, unchanged completed epoch, exactly two attached threads, one
+parked collector and one private Heap object. The remaining write_bytes must then
+poll/park. A snapshot taken before finish_into or any Native transition must prove
+that epoch completed, the private object survived and the cooperative-park count
+increased exactly once. Publication and byte checks cover both sides of the prefix
+boundary and the final element. Distinct assertions distinguish overlap, collection,
+completion and park failures; successful logs print both counters.
+
+The observer's five-second wait is solely a failure watchdog. A timeout cannot
+satisfy the test. No sleep, retry/count inflation, scheduling yield, disabled
+assertion or timing-based success condition remains. An initial local observer
+prototype used milliseconds::max with the timed wait; this returned immediately on
+the local standard library and led to a future-unwind wait until the existing
+150-second subprocess watchdog failed in Debug/Release. It was corrected to the
+finite watchdog and deferred checks before the final successful validation. No
+runtime timed-wait API was changed by this test correction.
+
+A temporary negative witness compiled a separate copy of buffer.cpp with only
+write_bytes polls removed, leaving finish_into polling intact. It fails with
+"chunk write did not complete the pending collection". This demonstrates that a
+later publication poll or NativeSafe join cannot substitute for the required
+construction poll. Neither temporary witness changes tracked production sources.
+
+Final Linux x64 checks, existing LLVM 19.1.7 builds: nine selected runtime suites
+pass in Debug (2.87 s), Release (2.03 s), strict ASan/UBSan (2.06 s), and explicit
+1 MiB Debug (2.72 s)/Release (2.03 s) stacks. The selection includes gc_buffers,
+gc_schemas, runtime_coordination/generated/callbacks/failures/invariants and both
+normal/O2 independently linked runtime AOT suites. gc_buffers retains the fatal
+private-root/private-edge subprocesses and all four/six constructor-allocation
+failure ordinals. The final direct Release witness reports exactly one completed
+collection and one cooperative park. This focused test-only correction did not
+rerun the full 63-suite matrix. Native Windows 2022 execution is unavailable here;
+owner-controlled hosted validation remains required. Runtime/compiler code,
+Stage 2D gates, CI workflows and Git history remain untouched. Stop for owner/wrench
+review.
