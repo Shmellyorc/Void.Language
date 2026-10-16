@@ -39,8 +39,8 @@ std::string key(const SchemaNode& node) {
     },node);
     return result;
 }
-std::optional<ReferenceEvent> event(const SchemaNode& node,std::size_t base,bool legacy) {
-    if(auto* v=std::get_if<SchemaManaged>(&node)) return ReferenceEvent{legacy ? ReferenceEvent::Kind::legacy : ReferenceEvent::Kind::managed,base,{},v->nullable,v->target};
+std::optional<ReferenceEvent> event(const SchemaNode& node,std::size_t base) {
+    if(auto* v=std::get_if<SchemaManaged>(&node)) return ReferenceEvent{ReferenceEvent::Kind::managed,base,{},v->nullable,v->target};
     if(std::holds_alternative<SchemaString>(node)) return ReferenceEvent{ReferenceEvent::Kind::string,base,{},true,{}};
     if(auto* v=std::get_if<SchemaInterface>(&node)) return ReferenceEvent{ReferenceEvent::Kind::interface,add(base,v->object_offset),add(base,v->witness_offset),v->nullable,v->target};
     return {};
@@ -56,7 +56,7 @@ StorageDomain StorageDomain::native() {
                storage<float>(),storage<double>(),storage<bool>()};
     return d;
 }
-ElementSchema::ElementSchema(ElementSchemaSpec spec,bool legacy) : spec_(std::move(spec)),legacy_(legacy) {
+ElementSchema::ElementSchema(ElementSchemaSpec spec) : spec_(std::move(spec)) {
     text(spec_.identity);text(spec_.capability_profile);text(spec_.lowering_layout_key);
     if(spec_.storage_domain!=StorageDomain::native()) bad("foreign GC storage domain");
     if(spec_.nodes.empty() || spec_.root>=spec_.nodes.size()) bad("missing GC schema root");
@@ -72,8 +72,8 @@ ElementSchema::ElementSchema(ElementSchemaSpec spec,bool legacy) : spec_(std::mo
                 auto value=spec_.storage_domain.scalars[n];s.bytes=value.bytes;s.alignment=value.alignment;
             } else if constexpr(std::is_same_v<T,SchemaBytes>) {s.bytes=v.bytes;s.alignment=v.alignment;valid_alignment(s.alignment);}
             else if constexpr(std::is_same_v<T,SchemaManaged> || std::is_same_v<T,SchemaString>) {
-                if constexpr(std::is_same_v<T,SchemaManaged>) {if(!legacy) text(v.target);}
-                s.bytes=sizeof(void*);s.alignment=legacy ? 1 : alignof(void*);s.references=true;
+                if constexpr(std::is_same_v<T,SchemaManaged>) text(v.target);
+                s.bytes=sizeof(void*);s.alignment=alignof(void*);s.references=true;
             } else if constexpr(std::is_same_v<T,SchemaInterface>) {
                 text(v.target);valid_alignment(v.alignment);
                 if(v.alignment<alignof(void*) || v.object_offset%alignof(void*) || v.witness_offset%alignof(void*) ||
@@ -138,7 +138,7 @@ std::size_t ElementSchema::edge_count() const {
     std::size_t count=0;for(const auto& n:spec_.nodes) {if(auto* r=std::get_if<SchemaRecord>(&n)) count=add(count,r->fields.size());if(std::holds_alternative<SchemaRepeat>(n)) count=add(count,1);}return count;
 }
 bool ElementSchema::equivalent(const ElementSchema& other) const {
-    if(legacy_!=other.legacy_ || spec_.identity!=other.spec_.identity || spec_.capability_profile!=other.spec_.capability_profile ||
+    if(spec_.identity!=other.spec_.identity || spec_.capability_profile!=other.spec_.capability_profile ||
        spec_.lowering_layout_key!=other.spec_.lowering_layout_key || spec_.storage_domain!=other.spec_.storage_domain) return false;
     std::vector<std::pair<std::size_t,std::size_t>> work{{spec_.root,other.spec_.root}};std::set<std::pair<std::size_t,std::size_t>> seen;
     while(!work.empty()) {
@@ -155,30 +155,27 @@ bool ElementSchema::equivalent(const ElementSchema& other) const {
     return true;
 }
 ReferenceShape::ReferenceShape(ElementSchemaRef schema) :schema_(std::move(schema)) {if(!schema_) bad("missing reference schema");}
-ReferenceShape ReferenceShape::legacy(std::size_t bytes,std::span<const std::size_t> offsets) {
-    ElementSchemaSpec spec{"$legacy","flat","legacy",StorageDomain::native(),0,{}};
-    SchemaRecord root{bytes,1,{}};
-    if(!offsets.empty()) {
-        spec.nodes.emplace_back(SchemaManaged{"",true});
-        std::vector<std::size_t> sorted(offsets.begin(),offsets.end());std::sort(sorted.begin(),sorted.end());
-        for(std::size_t n=0;n<sorted.size();++n) root.fields.push_back({n,sorted[n],0});
-        spec.root=1;
-    }
-    spec.nodes.emplace_back(std::move(root));
-    return ReferenceShape(ElementSchemaRef(new ElementSchema(std::move(spec),true)));
+std::optional<ReferenceEvent> LegacyReferenceMap::at(std::size_t offset) const {
+    if(!std::binary_search(offsets_.begin(),offsets_.end(),offset)) return {};
+    return ReferenceEvent{ReferenceEvent::Kind::legacy,offset,{},true,{}};
 }
+ReferenceShape::ReferenceShape(std::shared_ptr<const LegacyReferenceMap> map) :legacy_(std::move(map)) {}
+ReferenceShape ReferenceShape::legacy(std::size_t bytes,std::span<const std::size_t> offsets) {
+    return ReferenceShape(std::make_shared<const LegacyReferenceMap>(LegacyReferenceMap::validate(bytes,offsets)));
+}
+bool ReferenceShape::has_references() const {return legacy_ ? !legacy_->offsets().empty() : schema_->has_references();}
+std::size_t ReferenceShape::bytes() const {return legacy_ ? legacy_->bytes() : schema_->bytes();}
 std::vector<std::size_t> ReferenceShape::legacy_offsets() const {
-    if(!schema_->legacy_) bad("not a legacy reference layout");
-    std::vector<std::size_t> result;
-    for(const auto& f:std::get<SchemaRecord>(schema_->spec_.nodes[schema_->spec_.root]).fields) result.push_back(f.offset);
-    return result;
+    if(!legacy_) bad("not a legacy reference layout");
+    auto offsets=legacy_->offsets();return {offsets.begin(),offsets.end()};
 }
 std::optional<ReferenceEvent> ReferenceShape::at(std::size_t offset) const {
+    if(legacy_) return legacy_->at(offset);
     if(offset>=schema_->bytes()) return {};
     std::size_t id=schema_->spec_.root,base=0;
     for(;;) {
         const auto& node=schema_->spec_.nodes[id];const auto& summary=schema_->summaries_[id];
-        if(auto e=event(node,base,schema_->legacy_)) return e->offset==offset ? e : std::nullopt;
+        if(auto e=event(node,base)) return e->offset==offset ? e : std::nullopt;
         if(auto* r=std::get_if<SchemaRecord>(&node)) {
             auto it=std::upper_bound(summary.physical.begin(),summary.physical.end(),offset-base,[&](auto x,auto f){return x<r->fields[f].offset;});
             if(it==summary.physical.begin()) return {};
@@ -193,6 +190,10 @@ std::optional<ReferenceEvent> ReferenceShape::at(std::size_t offset) const {
     }
 }
 std::optional<ReferenceEvent> ReferenceShape::path(std::span<const SchemaStep> steps) const {
+    if(legacy_) {
+        if(steps.size()!=1 || steps[0].kind!=SchemaStep::Kind::field || steps[0].value>=legacy_->offsets().size()) return {};
+        return legacy_->at(legacy_->offsets()[static_cast<std::size_t>(steps[0].value)]);
+    }
     std::size_t id=schema_->spec_.root,base=0;
     for(const auto& step:steps) {
         const auto& node=schema_->spec_.nodes[id];
@@ -207,19 +208,27 @@ std::optional<ReferenceEvent> ReferenceShape::path(std::span<const SchemaStep> s
             base=add(base,add(r->base,multiply(r->stride,step.value)));id=r->child;
         } else return {};
     }
-    return event(schema_->spec_.nodes[id],base,schema_->legacy_);
+    return event(schema_->spec_.nodes[id],base);
 }
-ReferenceCursor::ReferenceCursor(ReferenceShape shape) {reset(std::move(shape));}
-void ReferenceCursor::reset(ReferenceShape shape) {
+ReferenceCursor::ReferenceCursor(ReferenceShape shape) {reset(shape);}
+void ReferenceCursor::reset(const ReferenceShape& shape) {
     // Reserve before replacing state; next() never allocates.
-    if(shape.has_references()) stack_.reserve(shape.schema_->depth());
-    stack_.clear();schema_=std::move(shape.schema_);
-    if(schema_->has_references()) stack_.push_back({schema_->spec_.root,0,0});
+    if(shape.schema_ && shape.has_references()) stack_.reserve(shape.schema_->depth());
+    stack_.clear();schema_=shape.schema_;legacy_owner_=shape.legacy_;
+    borrowed_=nullptr;legacy_index_=0;
+    if(schema_ && schema_->has_references()) stack_.push_back({schema_->spec_.root,0,0});
 }
 std::optional<ReferenceEvent> ReferenceCursor::next() {
+    if(legacy_owner_ || borrowed_) {
+        if(auto offset=next_offset()) return ReferenceEvent{ReferenceEvent::Kind::legacy,*offset,{},true,{}};
+        return {};
+    }
+    return next_schema();
+}
+std::optional<ReferenceEvent> ReferenceCursor::next_schema() {
     while(!stack_.empty()) {
         auto& f=stack_.back();const auto& node=schema_->spec_.nodes[f.node];
-        if(auto result=event(node,f.base,schema_->legacy_)) {stack_.pop_back();return result;}
+        if(auto result=event(node,f.base)) {stack_.pop_back();return result;}
         if(auto* r=std::get_if<SchemaRecord>(&node)) {
             const auto& order=schema_->summaries_[f.node].physical;
             if(f.next==order.size()) {stack_.pop_back();continue;}

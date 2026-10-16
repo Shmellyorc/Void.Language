@@ -149,6 +149,42 @@ void legacy_consumers() {
     reject([&]{r.construct_into(&output,layout,payload.data());});check(output==sentinel,"bad prepared payload changed output");
     reject([&]{r.construct_into(&output,{0,{}},payload.data());});check(output==sentinel,"zero layout changed output");
 }
+void flat_fast_path_regressions() {
+    // Public cursors own temporary adapters; copying/moving a cursor must retain
+    // that ownership. Mixed offset/event calls advance exactly one common stream.
+    ReferenceCursor detached(ReferenceShape::legacy(3*P+1,std::array<std::size_t,3>{2*P+1,1,P+1}));
+    auto copy=detached;auto moved=std::move(copy);
+    check(moved.next_offset()==1 && moved.next()->offset==P+1 && moved.next_offset()==2*P+1 && !moved.next(),"flat cursor ownership/position");
+    check(!copy.next(),"moved-from flat cursor retained a borrowed owner");
+    check(detached.next()->offset==1,"copied flat cursor changed original position");
+    auto shape=ReferenceShape::legacy(3*P+1,std::array<std::size_t,3>{2*P+1,1,P+1});
+    for(std::uint64_t i=0;i<3;++i) {
+        SchemaStep step{SchemaStep::Kind::field,i};
+        check(shape.path({&step,1})->offset==1+i*P,"legacy field path changed");
+    }
+    Runtime r;auto scalar=spec("offset-events",{SchemaString{},SchemaRepeat{0,P,3,0,3*P,A}});admit(r,scalar);
+    ReferenceCursor typed(r.reference_shape(r.buffer_schema("offset-events")));
+    check(typed.next_offset()==0 && typed.next()->offset==P && typed.next_offset()==2*P && !typed.next_offset(),"typed offset/event stream diverged");
+    Heap heap;TypeLayout input{3*P+1,{2*P+1,1}};
+    Root root(heap,heap.allocate(input));auto* child=heap.allocate({P,{}});
+    // Caller mutation, reallocations and an alternating shape cannot change an
+    // existing object's immutable map. There is no cache key or borrowed input.
+    input.references={P+1};heap.allocate(input);heap.store(root.get(),1,child);
+    reject([&]{heap.store(root.get(),P+1,child);});
+    heap.collect();check(heap.size()==2,"flat map borrowed/misidentified caller offsets");
+    // The fast allocation transaction has fewer sites, but must still release
+    // payload/map nodes and preserve the old graph at every actual failing site.
+    TypeLayout fresh{3*P+1,{2*P+1,1}};
+    allocation_count=0;count_new=true;auto* measured=heap.allocate(fresh);count_new=false;
+    auto sites=allocation_count;check(sites>=3,"allocation-site fixture missed payload/map/offsets");
+    heap.collect();check(!heap.contains(measured),"unrooted measured object retained");
+    for(long ordinal=0;ordinal<sites;++ordinal) {
+        fail_after=ordinal;bool failed=false;
+        try {heap.allocate(fresh);} catch(const std::bad_alloc&) {failed=true;}
+        fail_after=-1;check(failed && heap.size()==2,"fast allocation failed to roll back");
+        heap.collect();check(heap.size()==2 && heap.contains(child),"failed fast allocation damaged roots");
+    }
+}
 void lifetime_and_depth() {
     ElementSchemaRef retained;std::weak_ptr<const NominalDescriptor> nominal_owner;
     {
@@ -214,6 +250,6 @@ void concurrent_admission() {
 }
 }
 int main() {
-    try {oracles_and_compactness();negatives_and_ownership();legacy_consumers();lifetime_and_depth();catalog_failures();concurrent_admission();std::cout<<"compact GC schemas/shared cursor checks passed\n";}
+    try {oracles_and_compactness();negatives_and_ownership();legacy_consumers();flat_fast_path_regressions();lifetime_and_depth();catalog_failures();concurrent_admission();std::cout<<"compact GC schemas/shared cursor checks passed\n";}
     catch(const std::exception& e) {fail_after=-1;count_new=false;std::cerr<<e.what()<<'\n';return 1;}
 }

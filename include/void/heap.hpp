@@ -41,8 +41,13 @@ public:
     void store(void* object, std::size_t offset, void* value);
 private:
     friend class Runtime;
-    void* allocate_validated(const TypeLayout&, ReferenceShape);
-    struct Object { TypeLayout layout; ReferenceShape references; bool marked = false; };
+    void* allocate_validated(const TypeLayout&, LegacyReferenceMap);
+    struct Object {
+        LegacyReferenceMap references;
+        std::shared_ptr<const NominalDescriptor> descriptor;
+        TypeLayout::Kind kind;
+        bool marked = false;
+    };
     std::unordered_map<void*, Object> objects_;
     std::vector<void**> roots_;
 };

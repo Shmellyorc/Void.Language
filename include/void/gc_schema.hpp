@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -7,6 +8,8 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <stdexcept>
+#include <utility>
 #include <variant>
 #include <vector>
 namespace vd {
@@ -83,13 +86,33 @@ private:
         bool references=false;
         std::vector<std::size_t> physical, logical;
     };
-    explicit ElementSchema(ElementSchemaSpec,bool legacy=false);
+    explicit ElementSchema(ElementSchemaSpec);
     static std::shared_ptr<ElementSchema> prepare(const ElementSchemaSpec&);
     ElementSchemaSpec spec_;
     std::vector<Summary> summaries_;
-    bool legacy_=false;
     std::vector<std::shared_ptr<const NominalDescriptor>> nominal_owners_;
     std::vector<std::shared_ptr<const InterfaceWitness>> witness_owners_;
+};
+// Validated, owned legacy map. No DAG allocation or alignment upgrade is needed.
+// Copies retain ownership; no API exposes a mutable offset vector.
+class LegacyReferenceMap {
+public:
+    static LegacyReferenceMap validate(std::size_t bytes,std::span<const std::size_t> offsets) {
+        std::vector<std::size_t> sorted(offsets.begin(),offsets.end());
+        std::sort(sorted.begin(),sorted.end());
+        for(std::size_t i=0;i<sorted.size();++i)
+            if(sorted[i]>bytes || bytes-sorted[i]<sizeof(void*) || (i && sorted[i]-sorted[i-1]<sizeof(void*)))
+                throw std::invalid_argument("invalid legacy reference layout");
+        return LegacyReferenceMap(bytes,std::move(sorted));
+    }
+    std::size_t bytes() const { return bytes_; }
+    std::span<const std::size_t> offsets() const { return offsets_; }
+    std::optional<ReferenceEvent> at(std::size_t) const;
+private:
+    friend class ReferenceCursor;
+    LegacyReferenceMap(std::size_t bytes,std::vector<std::size_t> offsets) : bytes_(bytes),offsets_(std::move(offsets)) {}
+    std::size_t bytes_;
+    std::vector<std::size_t> offsets_;
 };
 class ReferenceShape {
 public:
@@ -98,21 +121,44 @@ public:
     std::vector<std::size_t> legacy_offsets() const;
     std::optional<ReferenceEvent> at(std::size_t byte_offset) const;
     std::optional<ReferenceEvent> path(std::span<const SchemaStep>) const;
-    bool has_references() const { return schema_->has_references(); }
-    std::size_t bytes() const { return schema_->bytes(); }
+    bool has_references() const;
+    std::size_t bytes() const;
 private:
     friend class ReferenceCursor;
+    explicit ReferenceShape(std::shared_ptr<const LegacyReferenceMap>);
     ElementSchemaRef schema_;
+    std::shared_ptr<const LegacyReferenceMap> legacy_;
 };
 class ReferenceCursor {
 public:
     ReferenceCursor() = default;
     explicit ReferenceCursor(ReferenceShape);
-    void reset(ReferenceShape);
+    void reset(const ReferenceShape&);
     std::optional<ReferenceEvent> next();
+    // Same stream position as next(), without constructing an unused typed event
+    // for ordinary Heap scans. The legacy offset path has no per-word call/alloc.
+    std::optional<std::size_t> next_offset() {
+        const auto* map=legacy_owner_ ? legacy_owner_.get() : borrowed_;
+        if(map) {
+            if(legacy_index_==map->offsets_.size()) return {};
+            return map->offsets_[legacy_index_++];
+        }
+        if(auto event=next_schema()) return event->offset;
+        return {};
+    }
 private:
+    friend class Heap;
+    friend class Runtime;
+    // Only Heap/Runtime may borrow their own immutable validated map. They keep
+    // it alive throughout traversal, under the existing Heap/Runtime exclusion.
+    // Public shape/cursor APIs always retain ownership, including temporaries.
+    explicit ReferenceCursor(const LegacyReferenceMap& map) noexcept : borrowed_(&map) {}
+    std::optional<ReferenceEvent> next_schema();
     struct Frame { std::size_t node, base; std::uint64_t next=0; };
     ElementSchemaRef schema_;
     std::vector<Frame> stack_;
+    std::shared_ptr<const LegacyReferenceMap> legacy_owner_;
+    const LegacyReferenceMap* borrowed_=nullptr;
+    std::size_t legacy_index_=0;
 };
 }

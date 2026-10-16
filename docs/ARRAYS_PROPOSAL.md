@@ -1,12 +1,14 @@
 # Phase 23 proposal: typed arrays, indexing and iteration
 
-**Current status, 15 October 2026: owner confirms CI #47 passed all seven jobs,
-61/61 suites each; large-array Stage 1 is locked. Part 5A was locked by CI #45.
+**Current status, 15 October 2026: owner confirms CI #48 passed all seven jobs,
+62/62 suites each; Stage 2B is hosted-verified. Stage 1 was locked by CI #47 and
+Part 5A by CI #45.
 Native arrays remain disabled. The superseding decision below withdraws the
 65,536-byte production array-storage policy. Owner/wrench approved the Stage 2A
 direction and retained gates in Section 23. Stage 2B implements only compact schema
 admission and the common reference cursor; local evidence and limitations are in
-Section 24. No Stage 2C or source-array execution is activated.**
+Sections 24-25. Section 25 records the focused legacy Heap performance followup.
+No Stage 2C or source-array execution is activated.**
 
 > **SUPERSEDING OWNER DECISION: large arrays are a language requirement.**
 > Neither `[T, n]` nor `[T]` may have an arbitrary 64 KiB source-level ceiling.
@@ -3166,8 +3168,10 @@ validation and structural comparison are iterative too, avoiding a native recurs
 call chain for deep finite DAGs. Event target string views borrow metadata retained
 by the shape/cursor; callers must retain that owner while using the view.
 
-`ReferenceShape::legacy` copies and normalizes existing flat offsets into a private
-validated record with shared generic reference leaves. Its alignment-one adapter
+The initial Stage 2B `ReferenceShape::legacy` copied flat offsets into a private
+validated DAG record with shared generic reference leaves. The performance followup
+in Section 25 replaces this expansion with an owned validated flat map inside the
+same service. Its alignment-one compatibility contract
 preserves accepted unaligned memcpy offsets and rejects duplicate/overlapping or
 out-of-bounds words. The adapter is not admissible as a new typed buffer schema.
 Heap objects retain this reference shape. Heap allocation validation, marking,
@@ -3219,3 +3223,140 @@ ptrace; leak checks stayed enabled. `git diff --check` and an exact changed-file
 audit passed. Native hosted Windows/macOS execution is not claimed. Stage 2B is
 complete locally for owner/wrench review; Stage 2C, GC publication changes, source
 arrays and ABI/certification activation remain gated.
+
+
+## 25. Stage 2B followup: ordinary Heap performance audit
+
+15 October 2026. Owner reports CI #48 green, seven jobs and 62/62 suites,
+locking the Stage 2B baseline. This focused followup compares `3c69f66` with
+`cb77d62` and the local optimization. It does not implement Stage 2C.
+
+### 25.1 Reproducible method
+
+`tools/bench/heap_legacy.py` reads both Git revisions into ignored build snapshots
+without changing Git state. It compiles the same ordinary Heap fixture against each
+revision and the working sources with Clang 19.1.7 and the existing Release flags:
+`-O3 -DNDEBUG -std=c++20 -frtti -Wall -Wextra -Wpedantic`. Only Heap and, where
+present, the schema service are linked; no LLVM compiler/backend optimization is
+disabled, and no whole-compiler benchmark substitute is used. This is a direct
+ordinary Heap audit, not a claim about coordinated Runtime latency or source arrays.
+
+Final command: `python3 tools/bench/heap_legacy.py --output
+build/phase23-gc-perf-reviewed --samples 13 --objects 100000 --cpu 0 --label
+optimized` (one shell line). All three variants use identical flags and fixture
+code. Thirteen process samples rotate variant order on the same allowed logical
+CPU after a warm-up process for each variant. Each fresh Heap allocates 100,000
+ordinary objects with 0/1/4/16 deliberately unsorted, unaligned reference offsets;
+payload bytes are `32 + reference_count * sizeof(void*)`. Nonempty layouts form
+a real backwards chain through the first word. Three all-live collections and one
+all-dead collection assert the exact object counts. Timings use the normal allocator.
+
+Separate instrumented executables count new calls, requested bytes and retained
+requested live bytes. The fixture root vector is allocated outside the measured
+phase; payload bytes are subtracted from allocation metadata totals. Hash nodes and
+buckets remain included. These are C++ allocation requests, not RSS or malloc size-
+class overhead; instrumentation headers are excluded. Instrumented timings are
+not used for throughput. Each run records commands, exact commit IDs, source/header
+SHA-256 hashes, CPU affinity and all raw samples in `results.json` under the output
+directory. Local Linux x64 execution only; no Windows/macOS performance is claimed.
+
+### 25.2 Finding and bounded correction
+
+The original per-allocation legacy DAG construction is materially expensive.
+It allocated node variants, summaries, field indexes, canonicalization keys/maps
+and control blocks for a shape already supplied as a flat offset list, including
+for reference-free objects. The first seven-sample/50,000-object audit reproduced
+roughly 5-11x allocation latency and substantially increased collection costs.
+The final three-way measurements below reproduce the defect against the locked
+Stage 2B snapshot rather than relying on a remembered baseline.
+
+The correction is an owned immutable `LegacyReferenceMap`: validate/sort/copy the
+offsets once, retaining the original byte extent and legacy unaligned memcpy rules.
+It is the flat mode of the same reference service, not another collector or a
+per-Heap/global cache. Heap nodes own this value together with kind and nominal
+descriptor; they no longer duplicate the offset vector in a second TypeLayout copy.
+Empty maps allocate no offset metadata. Public `ReferenceShape::legacy` and cursors
+still retain strong ownership, including temporary/copy/move lifetimes.
+
+Heap and prepared construction alone may create a private, scoped borrowing cursor
+over their own validated map. The map remains alive and immutable for traversal;
+Heap traversal occurs under its existing exclusion, before sweep, with no user
+callback or map mutation. Construction keeps its local map alive across polling
+and validation, then moves it into the new node after traversal. Public cursor
+operations cannot request this borrow. `next_offset()` projects the same stream
+position as `next()`, avoiding unused typed event construction in GC; mixed-call
+regressions check this for both flat and DAG shapes. Lookup and prepared validation
+use that same validated map/cursor. Typed DAG admission/geometry is unchanged; the
+obsolete private legacy-only DAG alignment bypass is removed. No checks, payload
+publication, roots, string/nominal behavior, GC queue/mark rollback or native ABI
+are relaxed. No registry of retained historical layouts is introduced.
+
+### 25.3 Measured results
+
+Cells below are **parent / locked Stage 2B / optimized**, per object. New-call cells
+exclude the 14 common bucket-growth allocations per 100,000-object run; byte cells
+include their actual contribution. All counts are from separately instrumented
+executables using the exact same fixture.
+
+| Reference words | New calls | Requested metadata bytes | Retained metadata bytes |
+| --- | --- | --- | --- |
+| 0 | 2 / 11 / 2 | 107.26 / 963.26 / 99.26 | 93.83 / 701.83 / 85.83 |
+| 1 | 4 / 18 / 3 | 123.26 / 1499.26 / 107.26 | 101.83 / 909.83 / 93.83 |
+| 4 | 4 / 22 / 3 | 171.26 / 1831.26 / 131.26 | 125.83 / 1053.83 / 117.83 |
+| 16 | 4 / 26 / 3 | 363.26 / 3153.26 / 227.26 | 221.83 / 1629.83 / 213.83 |
+
+Median nanoseconds per object (same **parent / Stage 2B / optimized** order):
+
+| Reference words | Allocate | All-live collect | All-dead collect |
+| --- | --- | --- | --- |
+| 0 | 174.6 / 1020.9 / 170.1 | 44.0 / 107.2 / 40.0 | 54.9 / 204.9 / 47.6 |
+| 1 | 168.1 / 1363.9 / 155.2 | 66.5 / 330.0 / 70.4 | 74.6 / 406.3 / 73.4 |
+| 4 | 167.0 / 1642.7 / 148.3 | 74.9 / 538.6 / 83.7 | 82.0 / 405.7 / 80.3 |
+| 16 | 420.5 / 3192.2 / 372.7 | 144.9 / 843.0 / 134.3 | 118.5 / 541.4 / 94.4 |
+
+Allocation throughput in millions of objects/second:
+
+| Reference words | Parent | Stage 2B | Optimized |
+| --- | --- | --- | --- |
+| 0 | 5.73 | 0.98 | 5.88 |
+| 1 | 5.95 | 0.73 | 6.44 |
+| 4 | 5.99 | 0.61 | 6.74 |
+| 16 | 2.38 | 0.31 | 2.68 |
+
+Retained requested metadata is eight bytes/object below the parent on this native
+C++/standard-library layout, versus the original Stage 2B increase of hundreds of
+bytes. This is a measurement, not a portable object-size guarantee. All three live
+collections request 54 allocations/6,291,432 bytes in parent and optimized runs;
+Stage 2B reference-bearing runs request 57/6,291,576 due to cursor work-stack setup.
+There is no per-object or per-reference allocation during the optimized mark walk.
+
+Allocation medians improve relative to the parent in these fixtures. GC does not
+establish universal performance parity: one-reference live GC is 70.4 versus 66.5
+ns/object (+5.7%), and four-reference live GC is 83.7 versus 74.9 (+11.8%). Their
+13-sample ranges overlap (64.0-101.6 versus 63.2-92.4, and 78.2-120.0 versus
+69.9-117.8 ns/object). Reference-free/16-reference medians improve; these overlapping
+local ranges neither prove zero residual cost nor a production frame-time bound.
+The scoped flat correction removes the large per-object DAG amplification without
+expanding the optimization into collector scheduling, allocator tuning or a cache.
+
+### 25.4 Verification and review boundary
+
+Full local rebuilds and CTest passed: Debug 62/62 (108.73 s), Release 62/62
+(53.69 s), strict ASan/UBSan RelWithDebInfo 62/62 (135.02 s). Sanitized build steps
+and tests ran outside the ptrace sandbox with leak detection/abort enabled and
+UBSan halt/stacktrace enabled. Nine selected GC/runtime/string/interface suites
+also passed with explicit 1 MiB Debug/Release stacks (11.73 s / 3.74 s), including
+normal/O2 native AOT and generated JIT coverage. Expanded schema tests cover owning
+flat cursor temporaries/copies/moves, shared offset/event positions for flat/DAG
+shapes, legacy logical paths, caller mutation/alternating maps and every measured
+fast-allocation failure site. Existing forged geometry, independent oracles,
+million-element compactness, mark rollback, invariant termination, interface crash
+capture and research rejection suites are retained. The combined catalog sweep
+now measures/covers all 40 successful-path allocation sites rather than the original
+48; the change removes real metadata work without reducing the ordinal coverage.
+The one/million typed-schema admission requests are 1,878/1,909 bytes, and streaming
+still allocates nothing. Existing mark-work failure/recovery covers seven failing
+positions. Whitespace, source-hash and changed-file audits passed.
+
+Stage 2C and native arrays remain disabled; no production certificate, stack policy, CI workflow, commit,
+push, branch or remote modification is part of this audit.

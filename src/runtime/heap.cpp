@@ -7,9 +7,9 @@
 namespace vd {
 Heap::~Heap() { for (auto& [p, o] : objects_) { (void)o; ::operator delete(p); } }
 void* Heap::allocate(const TypeLayout& layout) {
-    return allocate_validated(layout,ReferenceShape::legacy(layout.size,layout.references));
+    return allocate_validated(layout,LegacyReferenceMap::validate(layout.size,layout.references));
 }
-void* Heap::allocate_validated(const TypeLayout& layout,ReferenceShape shape) {
+void* Heap::allocate_validated(const TypeLayout& layout,LegacyReferenceMap shape) {
     if (!layout.size || layout.size!=shape.bytes()) throw std::invalid_argument("empty or mismatched object layout");
     if (layout.kind!=TypeLayout::Kind::ordinary && layout.kind!=TypeLayout::Kind::string) throw std::invalid_argument("unknown object layout kind");
     if (layout.kind == TypeLayout::Kind::string &&
@@ -17,7 +17,7 @@ void* Heap::allocate_validated(const TypeLayout& layout,ReferenceShape shape) {
         throw std::invalid_argument("invalid intrinsic string layout");
     auto* p = ::operator new(layout.size);
     std::memset(p, 0, layout.size);
-    try { objects_.emplace(p, Object{layout,std::move(shape)}); }
+    try { objects_.emplace(p, Object{std::move(shape),layout.descriptor,layout.kind}); }
     catch (...) { ::operator delete(p); throw; }
     return p;
 }
@@ -25,16 +25,16 @@ bool Heap::contains(void* p) const { return p && objects_.contains(p); }
 std::string_view Heap::string_bytes(void* p) const {
     if (!p) return {};
     auto found=objects_.find(p);
-    if (found==objects_.end() || found->second.layout.kind!=TypeLayout::Kind::string)
+    if (found==objects_.end() || found->second.kind!=TypeLayout::Kind::string)
         throw std::invalid_argument("invalid string object");
     std::uint64_t size; std::memcpy(&size,p,sizeof(size));
-    if (size!=found->second.layout.size-sizeof(size)) throw std::logic_error("corrupt string extent");
+    if (size!=found->second.references.bytes()-sizeof(size)) throw std::logic_error("corrupt string extent");
     return {static_cast<const char*>(p)+sizeof(size),static_cast<std::size_t>(size)};
 }
 std::string_view Heap::nominal_identity(void* p) const {
     auto found=objects_.find(p);
-    if(found==objects_.end() || !found->second.layout.descriptor) return {};
-    return found->second.layout.descriptor->identity;
+    if(found==objects_.end() || !found->second.descriptor) return {};
+    return found->second.descriptor->identity;
 }
 void Heap::add_root(void** slot) {
     if (!slot || std::find(roots_.begin(), roots_.end(), slot) != roots_.end())
@@ -58,7 +58,6 @@ void Heap::collect(std::span<void* const> additional_roots) {
     std::vector<void*> pending;
     for (auto* root : additional_roots) if (root) pending.push_back(root);
     for (auto* root : roots_) if (*root) pending.push_back(*root);
-    ReferenceCursor cursor;
     // Validate the entire graph before sweeping. A bad slot cannot silently
     // turn a reachable object into reclaimed memory.
     try {
@@ -68,10 +67,12 @@ void Heap::collect(std::span<void* const> additional_roots) {
             if (found == objects_.end()) throw std::logic_error("untracked managed reference");
             if (found->second.marked) continue;
             found->second.marked = true;
-            cursor.reset(found->second.references);
-            while (auto reference=cursor.next()) {
+            // Map ownership stays in this stable Heap node until marking ends.
+            // No map mutation/sweep or callback occurs during this borrowed scan.
+            ReferenceCursor cursor(found->second.references);
+            while (auto offset=cursor.next_offset()) {
                 void* child = nullptr;
-                std::memcpy(&child, static_cast<char*>(p) + reference->offset, sizeof(child));
+                std::memcpy(&child, static_cast<char*>(p) + *offset, sizeof(child));
                 if (child) pending.push_back(child);
             }
         }

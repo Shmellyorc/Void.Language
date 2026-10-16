@@ -8340,3 +8340,127 @@ ARRAYS_PROPOSAL.md Section 24 records the implementation, APIs, evidence and gat
 No compiler/backend/reload code, research verifier, 64 KiB experiments or CI workflow
 changes. No commits, pushes, branches or remote mutations. Stop for owner/wrench
 review before Stage 2C.
+
+
+## 15 October 2026: Stage 2B ordinary Heap performance audit and flat adapter
+
+### Authority, reproducibility and baseline
+
+Owner reports hosted CI #48 passed all seven jobs with 62/62 suites, locking Stage
+2B. Authorized a focused Release comparison with parent 3c69f66 and the smallest
+safe correction if overhead was material. No Stage 2C or remote work is authorized.
+The starting tree was clean at cb77d62. Added tools/bench/heap_legacy.{cpp,py} as a
+standalone reproducible ordinary Heap audit, with no CMake or CI registration change.
+Read-only git archive snapshots preserve parent and locked Stage 2B sources without
+creating a worktree/branch, checking out files or changing Git state.
+
+The final comparison uses identical production Release flags (-O3 -DNDEBUG,
+C++20, RTTI, normal warnings), Clang 19.1.7 and native Linux x64 for all three
+variants. The benchmark links actual Heap/schema sources directly, with no LLVM
+backend dependency or artificial optimization suppression. Thirteen process samples
+rotate parent, locked Stage 2B and optimized order on logical CPU 0 after one warm-up
+process each. Per shape: 100,000 objects, ordinary payload 32 + refs*sizeof(void*),
+0/1/4/16 unsorted unaligned reference offsets, actual backward managed edges,
+three all-live collections and one all-dead collection. Every collection verifies
+its exact object count. Separate instrumented executables measure new requests,
+requested/retained metadata bytes and GC work allocation; timing binaries use the
+normal allocator. Fixture root vectors and payload bytes are excluded from metadata,
+while hash nodes/buckets are included. No RSS, platform-independent allocator size,
+coordinated Runtime latency or source-array performance is inferred.
+
+Command (one line): python3 tools/bench/heap_legacy.py --output
+build/phase23-gc-perf-reviewed --samples 13 --objects 100000 --cpu 0 --label optimized.
+The output results.json records exact commit IDs, compiler identity/commands,
+source/header SHA-256 manifests, affinity, all individual samples, medians and ranges.
+Earlier exploratory outputs (before, after, final, inline and pinned) remain under
+build/phase23-gc-perf-*; the reviewed output is the final source-identical comparison.
+No compilation/test load was launched until that final measurement completed.
+
+### Diagnosis and smallest correction
+
+The original flat adapter built a fresh ElementSchema DAG per allocation, including
+canonicalization maps/strings, node variants, summaries, field-index vectors and
+shared control blocks. This is material even for no-reference objects. Initial
+seven-sample/50,000-object measurements showed about 5-11x allocation latency;
+the final locked-snapshot comparison reproduces roughly 6-10x. Per-object new
+calls rise from parent 2/4/4/4 to Stage 2B 11/18/22/26, excluding the same 14 bucket-
+growth calls at 100,000 objects. Trace/event projection and per-object DAG destruction
+also substantially increase live and dead collection costs.
+
+Implemented a validated owned LegacyReferenceMap as the legacy mode of the shared
+reference service, rather than constructing synthetic DAG nodes. Sorting, whole-word
+bounds, duplicate/overlap rejection and unaligned memcpy offsets are preserved.
+Heap nodes own this map once plus object kind and nominal descriptor, avoiding a
+second TypeLayout offset copy. No cache, weak interning table, allocator or collector
+change is introduced. Typed DAG canonicalization/domain/geometry/identity admission
+is unchanged; its obsolete private legacy alignment bypass is removed.
+
+Public flat shapes/cursors retain owned metadata across temporary, copy and move
+lifetimes. Only Heap/Runtime can use a private scoped borrowed-map cursor, while
+their validated map is stable and alive. The mark-loop cursor is local to each
+object, ends before sweep and cannot escape or call user code. construct_into holds
+its local map through poll/validation and transfers it only after traversal; its
+existing output publication sequence is unchanged. next_offset projects the exact
+same stream/index as next, avoiding construction of an unused typed event for GC.
+Lookup, prepared validation and tracing share this service. Inspection of generated
+code exposed a reset-helper call before the scoped-borrow constructor refinement;
+no always-inline/noinline flags or ABI allowances were added to hide overhead.
+
+### Final measurements
+
+See ARRAYS_PROPOSAL.md Section 25 for full parent/Stage 2B/optimized tables. Compact
+values below are in that order, per object (metadata includes bucket contribution):
+
+| Reference words | Requested metadata bytes | Retained metadata bytes | Allocate ns | Live GC ns | Dead GC ns |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 107.26 / 963.26 / 99.26 | 93.83 / 701.83 / 85.83 | 174.6 / 1020.9 / 170.1 | 44.0 / 107.2 / 40.0 | 54.9 / 204.9 / 47.6 |
+| 1 | 123.26 / 1499.26 / 107.26 | 101.83 / 909.83 / 93.83 | 168.1 / 1363.9 / 155.2 | 66.5 / 330.0 / 70.4 | 74.6 / 406.3 / 73.4 |
+| 4 | 171.26 / 1831.26 / 131.26 | 125.83 / 1053.83 / 117.83 | 167.0 / 1642.7 / 148.3 | 74.9 / 538.6 / 83.7 | 82.0 / 405.7 / 80.3 |
+| 16 | 363.26 / 3153.26 / 227.26 | 221.83 / 1629.83 / 213.83 | 420.5 / 3192.2 / 372.7 | 144.9 / 843.0 / 134.3 | 118.5 / 541.4 / 94.4 |
+
+Optimized new calls are 2/3/3/3 per object, with no additional per-object metadata
+allocation for reference-free objects. Retained requested metadata is eight bytes
+below the parent for each shape on this ABI. Allocation throughput is respectively
+5.88/6.44/6.74/2.68 million objects/s versus parent 5.73/5.95/5.99/2.38. Live-GC work
+requests match parent exactly: 54 new calls/6,291,432 bytes for three passes;
+locked Stage 2B reference-bearing runs add three cursor allocations/144 bytes.
+
+Do not claim universal GC parity: optimized live GC with one/four references is
+5.7%/11.8% above parent medians. Their 13-sample ranges overlap (64.0-101.6 versus
+63.2-92.4, and 78.2-120.0 versus 69.9-117.8 ns/object). Other live-GC medians and
+all dead-sweep medians improve. This removes the material DAG amplification without
+claiming zero residual cost, exclusive CPU access, frame-time or cross-platform
+performance. No further collector/allocator/cache architecture is selected.
+
+### Verification and retained boundaries
+
+- Full Debug rebuild and CTest: 62/62 passed, 108.73 s.
+- Full Release rebuild and CTest: 62/62 passed, 53.69 s.
+- Expanded gc_schemas checks retain temporary/copy/move flat cursor ownership,
+  common mixed typed/offset positions, logical paths, caller-offset mutation and
+  alternating layouts. A measured three-site ordinary allocation failure sweep
+  covers offset-vector/payload/map-node failure, preserves the rooted graph and
+  confirms recovery. Existing geometry/forged-input, independent oracles, million-
+  element compactness and catalog rollback assertions are retained.
+- Direct 1 MiB Debug/Release schema runs passed: 1,878 versus 1,909 requested
+  metadata bytes for one/million references, zero next allocations, and every one
+  of the now 40 measured combined catalog allocation sites rolls back/retries.
+  This is fewer genuine allocation sites, not a reduced ordinal sweep. Existing
+  mark-work failure recovery passes seven failing positions with all assertions.
+- Full strict ASan/UBSan RelWithDebInfo rebuild and CTest: 62/62 passed, 135.02 s,
+  outside the ptrace sandbox with ASAN_OPTIONS=detect_leaks=1:abort_on_error=1 and
+  UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1. No sanitizer findings.
+- Nine-suite 1 MiB Debug/Release checks: 9/9 each, 11.73 s / 3.74 s, comprising
+  gc_schemas, runtime_coordination, runtime_generated, runtime_callbacks,
+  runtime_failures, runtime_aot_normal, runtime_aot_optimized, strings_source and
+  interfaces_source. The full source/CLI/AOT and research checks remain in the
+  62-suite runs; no Windows/macOS native performance or verification is claimed.
+- git diff --check, new-section style/fence checks, benchmark source-hash match
+  and exact changed-file audit passed. Benchmark artifacts remain in ignored build
+  output; tracked tools and document tables reproduce/preserve the evidence.
+
+The standalone benchmark is not a CTest timing threshold. No performance threshold,
+source size ceiling, new source arrays, native execution/certification, Stage 2C
+buffer allocation/reservation/builders, GC publication/queue changes or CI workflow
+changes. No commits, pushes, branches or remote modifications. Stop for owner/wrench
+review before Stage 2C.

@@ -206,7 +206,7 @@ void Runtime::construct_into(void** slot, const TypeLayout& layout, const void* 
         if (size!=layout.size-sizeof(size) || !valid_utf8({static_cast<const char*>(payload)+sizeof(size),static_cast<std::size_t>(size)}))
             throw std::invalid_argument("invalid intrinsic string payload");
     }
-    auto references=ReferenceShape::legacy(layout.size,layout.references);
+    auto references=LegacyReferenceMap::validate(layout.size,layout.references);
     ReferenceCursor cursor(references);
     bool due;
     { std::lock_guard lock(mutex_); due=allocation_budget_ && allocations_>=allocation_budget_; }
@@ -214,8 +214,8 @@ void Runtime::construct_into(void** slot, const TypeLayout& layout, const void* 
     if (due && collect()!=Collection::completed) throw std::bad_alloc();
     poll();
     std::lock_guard lock(mutex_);
-    while (auto reference=cursor.next()) {
-        void* value=nullptr; std::memcpy(&value,static_cast<const char*>(payload)+reference->offset,sizeof(value));
+    while (auto offset=cursor.next_offset()) {
+        void* value=nullptr; std::memcpy(&value,static_cast<const char*>(payload)+*offset,sizeof(value));
         if (value && !heap_.contains(value)) throw std::logic_error("prepared reference belongs to another heap");
     }
     // Heap::allocate completes every fallible descriptor/map operation. The
