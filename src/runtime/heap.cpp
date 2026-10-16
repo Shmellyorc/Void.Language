@@ -7,19 +7,17 @@
 namespace vd {
 Heap::~Heap() { for (auto& [p, o] : objects_) { (void)o; ::operator delete(p); } }
 void* Heap::allocate(const TypeLayout& layout) {
-    if (!layout.size) throw std::invalid_argument("empty object layout");
+    return allocate_validated(layout,ReferenceShape::legacy(layout.size,layout.references));
+}
+void* Heap::allocate_validated(const TypeLayout& layout,ReferenceShape shape) {
+    if (!layout.size || layout.size!=shape.bytes()) throw std::invalid_argument("empty or mismatched object layout");
+    if (layout.kind!=TypeLayout::Kind::ordinary && layout.kind!=TypeLayout::Kind::string) throw std::invalid_argument("unknown object layout kind");
     if (layout.kind == TypeLayout::Kind::string &&
         (layout.size <= sizeof(std::uint64_t) || !layout.references.empty() || layout.descriptor))
         throw std::invalid_argument("invalid intrinsic string layout");
-    std::vector<std::size_t> offsets = layout.references;
-    std::sort(offsets.begin(), offsets.end());
-    for (std::size_t i = 0; i < offsets.size(); ++i)
-        if (offsets[i] > layout.size || layout.size - offsets[i] < sizeof(void*) ||
-            (i && offsets[i] - offsets[i - 1] < sizeof(void*)))
-            throw std::invalid_argument("invalid reference layout");
     auto* p = ::operator new(layout.size);
     std::memset(p, 0, layout.size);
-    try { objects_.emplace(p, Object{layout}); }
+    try { objects_.emplace(p, Object{layout,std::move(shape)}); }
     catch (...) { ::operator delete(p); throw; }
     return p;
 }
@@ -51,7 +49,7 @@ void Heap::remove_root(void** slot) {
 void Heap::store(void* object, std::size_t offset, void* value) {
     auto found = objects_.find(object);
     if (found == objects_.end() || (value && !contains(value)) ||
-        std::find(found->second.layout.references.begin(), found->second.layout.references.end(), offset) == found->second.layout.references.end())
+        !found->second.references.at(offset))
         throw std::invalid_argument("invalid managed reference store");
     std::memcpy(static_cast<char*>(object) + offset, &value, sizeof(value));
 }
@@ -60,6 +58,7 @@ void Heap::collect(std::span<void* const> additional_roots) {
     std::vector<void*> pending;
     for (auto* root : additional_roots) if (root) pending.push_back(root);
     for (auto* root : roots_) if (*root) pending.push_back(*root);
+    ReferenceCursor cursor;
     // Validate the entire graph before sweeping. A bad slot cannot silently
     // turn a reachable object into reclaimed memory.
     try {
@@ -69,9 +68,10 @@ void Heap::collect(std::span<void* const> additional_roots) {
             if (found == objects_.end()) throw std::logic_error("untracked managed reference");
             if (found->second.marked) continue;
             found->second.marked = true;
-            for (auto offset : found->second.layout.references) {
+            cursor.reset(found->second.references);
+            while (auto reference=cursor.next()) {
                 void* child = nullptr;
-                std::memcpy(&child, static_cast<char*>(p) + offset, sizeof(child));
+                std::memcpy(&child, static_cast<char*>(p) + reference->offset, sizeof(child));
                 if (child) pending.push_back(child);
             }
         }

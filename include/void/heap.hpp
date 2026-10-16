@@ -1,4 +1,5 @@
 #pragma once
+#include "void/gc_schema.hpp"
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -39,7 +40,9 @@ public:
     void remove_root(void** slot);
     void store(void* object, std::size_t offset, void* value);
 private:
-    struct Object { TypeLayout layout; bool marked = false; };
+    friend class Runtime;
+    void* allocate_validated(const TypeLayout&, ReferenceShape);
+    struct Object { TypeLayout layout; ReferenceShape references; bool marked = false; };
     std::unordered_map<void*, Object> objects_;
     std::vector<void**> roots_;
 };

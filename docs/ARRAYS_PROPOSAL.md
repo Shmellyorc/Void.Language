@@ -1,11 +1,12 @@
 # Phase 23 proposal: typed arrays, indexing and iteration
 
-**Current status, 15 October 2026: owner confirms CI #45 passed 7/7 jobs,
-61/61 suites per configuration; Part 5A is locked. Native arrays remain disabled.
-The superseding owner decision below withdraws the earlier 65,536-byte production
-per-function array-storage approval. Storage architecture and activation require
-new owner/wrench review. Large-array Stage 1 compact analysis/default-template
-foundation is implemented locally, pending review; see Section 22.**
+**Current status, 15 October 2026: owner confirms CI #47 passed all seven jobs,
+61/61 suites each; large-array Stage 1 is locked. Part 5A was locked by CI #45.
+Native arrays remain disabled. The superseding decision below withdraws the
+65,536-byte production array-storage policy. Owner/wrench approved the Stage 2A
+direction and retained gates in Section 23. Stage 2B implements only compact schema
+admission and the common reference cursor; local evidence and limitations are in
+Section 24. No Stage 2C or source-array execution is activated.**
 
 > **SUPERSEDING OWNER DECISION: large arrays are a language requirement.**
 > Neither `[T, n]` nor `[T]` may have an arbitrary 64 KiB source-level ceiling.
@@ -2517,10 +2518,11 @@ certificate and encoded-CFG verifier are unchanged and operational. Stop for own
 wrench review before further architecture or implementation work.
 
 
-## 22. Large-array foundation, Stage 1 (local implementation, review pending)
+## 22. Large-array foundation, Stage 1 (locked, CI #47)
 
+The owner reports CI #47 passed all seven jobs, 61/61 suites each, locking Stage 1.
 The owner supplied the complete Large-Array Storage Architecture Review and
-explicitly authorized Stage 1 only. Its six-stage roadmap supersedes the old
+explicitly authorized Stage 1 only for the implementation recorded here. Its six-stage roadmap supersedes the old
 inline-payload implementation sequence where they conflict. Section 21 is the
 historical unchanged-code audit, not the current implementation status.
 
@@ -2584,5 +2586,636 @@ without expansion. Source and forged-IR negatives cover representation, finite
 cycles, arity, purity and actual recipe-work exhaustion. Normal/O2 native JIT/AOT
 attempts on an 8 MiB source still reject; AOT destination sentinels are preserved.
 Exact commands, measurements and limitations are in the Stage 1 WORK_LOG entry.
-Hosted Windows/macOS execution and later-stage native large-array acceptance remain
-unverified. Stop for owner/wrench review before Stage 2.
+These were the original local results. The owner subsequently confirmed CI #47
+passed all seven jobs, locking Stage 1. That is hosted baseline evidence, not
+verification of later-stage native arrays. Section 23 records the approved runtime
+direction; Section 24 records the bounded Stage 2B implementation.
+
+## 23. Stage 2A approval gate: repeated GC layouts and rooted buffers
+
+15 October 2026. **Owner/wrench approved this architectural direction and its
+retained safety gates, authorizing Stage 2B only.**
+The owner reports CI #47 passed all seven jobs, 61/61 suites, locking Stage 1.
+Read the complete owner-supplied Large-Array Storage Architecture Review, especially
+Sections 2, 5, 6, 10 and 11, and Section 22 above. This section proposes Stage 2's
+runtime primitives. It does not implement them or approve a source array ABI,
+heap-backed source arrays, native execution, a size cutoff or production certification.
+Historical inline-storage diagrams in A6 describe an earlier proposal, not a new
+requirement to put fixed payloads on the stack.
+
+### 23.1 Inspected baseline before Stage 2B
+
+| Existing location | Observed behavior | Stage 2 implication |
+| --- | --- | --- |
+| include/void/heap.hpp, Heap::Object | TypeLayout owns a flat reference vector; object map owns layout copies | Add compact runtime-owned descriptors without flattening repetitions |
+| src/runtime/heap.cpp, allocate | Sort/check offsets, operator new, zero whole payload, emplace with rollback | Preserve this ordinary/string behavior; a new buffer reservation/adoption path must avoid long zeroing under Runtime's mutex |
+| Heap::store / collect | Linear offset membership; memcpy pointer words; mark graph before sweep; reset marks on failure | One common compact cursor/lookup interpretation; retain fail-before-sweep and mark rollback |
+| coordination.cpp, require_output / Frame | Output must be an exact current-thread Frame root address; Handle is not an allocation output | Use existing small Frame/Slot roots for private buffers, not payload-sized root arrays |
+| construct_into | Optional budget collection, poll, lock, validate prepared refs, allocate, whole-payload memcpy, publish root | Do not route large buffers through a payload-sized prepared vector or this long locked copy |
+| allocate_into | Poll then allocate/zero under mutex; not the construct_into allocation-budget path | Explicitly integrate new buffer adoption with the existing allocation budget, not a new collector |
+| collect / Native | Managed threads park; NativeSafe frame chains stay frozen; invalid precise graphs terminate; bad_alloc returns allocation_failure | Chunked preparation polls; raw reservation/zeroing may be NativeSafe only before it contains managed references |
+| admit_metadata / validate_descriptor | NativeSafe transactional catalog, exact runtime-owned descriptor identity, no code pointers | Extend this catalog/lifetime model; do not borrow compiler/LLVM descriptor memory |
+| abi.cpp / reload.cpp | Selected errors use RuntimeFailure, invariant failures terminate; invocation keeps generation leases; reload publishes compatible code atomically | No new source failure/ABI semantics or generation-owned tracing callbacks |
+
+The actual heap uses ordinary operator new/delete internally. A temporary reservation
+owned by that same Heap allocation transaction is not a second heap or a new source
+ownership system. The current collector is stop-the-world; this proposal does not
+turn it into a concurrent/incremental collector.
+
+### 23.2 Runtime-owned schema and physical layout
+
+Propose an immutable **ElementSchema** DAG admitted into Runtime's metadata catalog.
+Input specs contain node indices and owned strings/data, never arbitrary node/code
+pointers. Admission deep-copies, validates acyclic inline edges, canonicalizes and
+publishes atomically. Shared DAG children are retained once. Managed reference
+identity edges use admitted nominal keys, not recursive inline expansion.
+
+The proposed input record is ElementSchemaSpec{identity, capability_profile,
+storage_domain, lowering_layout_key, root_node, nodes}. NodeSpec is a discriminated variant, not a bag
+of optional unchecked fields: Scalar{encoding}, Bytes{bytes, alignment},
+ManagedRef{target_identity, nullable}, StringRef{}, Interface{interface_identity,
+nullable, object_offset, witness_offset, bytes, alignment}, Record{bytes, alignment,
+fields[{logical_id, offset, child_node}]}, Repeat{base, stride, extent, child_node,
+bytes, alignment}, and the rejected reserved roles. Primitive sizes/alignments must
+match the storage domain; record/repeat spans must match checked derived geometry.
+Record fields have unique logical IDs and nonoverlapping physical ranges. Unknown
+variants/encodings/extra unresolved targets reject. Specs use topologically ordered
+child indices; forward/self/cyclic inline indices reject before publication.
+
+Each admitted node has checked byte extent/alignment and one of these roles:
+
+| Node | Physical/semantic data |
+| --- | --- |
+| Scalar / byte region | Encoding, bytes, alignment; bool validity is explicit; byte regions cannot contain declared references |
+| Managed reference | One whole-object pointer word; admitted nominal target/subtype rule and required/nullable policy |
+| String reference | One GC object word; null is the existing empty string, otherwise intrinsic string kind |
+| Interface value | Object word plus runtime-owned witness word at explicit offsets; only the object word is traced; pair consistency and witness membership are checked |
+| Record | Logical field IDs and child offsets; separate sorted physical index; padding is explicit non-reference storage |
+| Repeat | One child, exact extent, base/stride; no per-element nodes |
+| Owned fixed child / growable header | Reserved semantic roles, rejected by the first Stage 2 value-copy implementation pending later representation contracts |
+
+Reserved owned/growable roles have no chosen source handle width/offset in Stage 2;
+reject their admission for executable value operations until that later review.
+A reference shape is the projection of this schema, not a separate manually supplied
+flat list. Cache has_references, zero_data_complete, copy classification and maximum
+atomic write group as derived admission results. Invalid/missing classifications
+reject. This does not infer pointer fields from numeric bits. Compiler semantic-type
+to runtime-schema correspondence remains an independent later lowering/IR proof;
+runtime validation is not protection against arbitrary dishonest embedding code.
+
+A per-allocation **BufferLayout** retains its admitted element schema, domain,
+base, stride, capacity, exact payload bytes and alignment. It has no executable
+pointer, source AST/TypeArena edge, LLVM object or generation lease. Element schemas
+are catalog-owned; capacity-specific layouts are reference-counted by buffers and
+users, not interned forever for every historical capacity. Every use rechecks exact
+admitted-schema pointer membership in this Runtime, not identity strings alone;
+foreign handles remain invalid even if a destroyed Runtime's address is reused.
+
+```text
+Heap object-map metadata (outside payload)
+    kind=buffer, shared immutable BufferLayout, private/complete,
+    sealed valid_prefix, read-lease count, allocation/deallocation alignment
+
+GC payload
+    zeroed prefix padding [0, base)
+    capacity slots, each stride bytes
+    zeroed trailing alignment padding
+```
+
+For element footprint S/alignment a, the buffer factory computes:
+
+- stride = checkedAlignUp(max(S, 1), a), including physically empty elements;
+- require base % a == 0; payload alignment = a;
+- bytes = checkedAlignUp(base + capacity * stride, a), with every intermediate
+  operation checked before narrowing to size_t or forming an address;
+- capacity fits the approved i64 count contract and the actual host allocation
+  representation. Zero capacity uses base=0, bytes=0, a typed empty token and no
+  Heap allocation. Zero-payload elements do not imply zero stride for nonempty backing.
+
+No guessed field widths or alignment from Stage 1's logical scalar-byte lower bound.
+The storage domain records pointer size/alignment, scalar encoding sizes/alignments,
+byte order and runtime storage-format revision. Runtime derives/checks these native
+facts without an LLVM dependency. A separate exact lowering_layout_key binds the
+schema's declared physical layout identity and reload compatibility; it is not,
+by itself, proof that LLVM used that layout. Stage 2 fixtures use an explicit native
+C++ fixture key and sizeof/alignof/offsetof. Future LLVM lowering supplies its selected
+DataLayout/configuration identity and independently proves the match before admission.
+Foreign pointer/encoding/alignment domains reject; equal-size schemas with different
+layout keys are not interchangeable. No cross-target code execution is implied by
+metadata validation. This specifies internal GC buffer storage, not a source fixed-
+array parameter/result representation or public C ABI.
+
+Admission checks power-of-two/supported alignment, offset alignment, nested child
+containment, nonoverlapping record storage, stride >= child span, exact checked
+repeat end, pointer-word containment, node indices, finite topology and semantic
+identity/capability profile. Repetition disjointness follows from the child's
+validated region plus stride, without enumerating reference occurrences. Validate
+children even for extent zero. Hashes may index canonical data; full identity and
+schema comparison decide equality. No payload/element-count complexity ceiling is
+introduced. Actual descriptor work/allocation exhaustion fails explicitly.
+
+For new buffer layouts, pointer words meet the selected domain's pointer alignment.
+Existing ordinary layouts may have unaligned memcpy-accessed pointer offsets;
+they retain that accepted behavior. No new alignment rule retroactively rejects them.
+Over-aligned buffer allocation uses the existing Heap's matching aligned new/delete
+forms; record the deletion form. Default ordinary/string allocation stays unchanged.
+If this alignment/deallocation proof cannot be established, stop that slice rather
+than silently weakening alignment or substituting a different allocator.
+
+### 23.3 One interpretation for all GC operations
+
+Propose a validated schema cursor with two operations: stream reference/value events
+and seek a byte offset or logical field/index path. Record lookup uses its sorted
+physical index; Repeat lookup uses checked quotient/remainder and child descent.
+Both operations interpret the same admitted nodes and rules. Explicit cursor storage
+is bounded by shape depth, allocated before a fallible operation needs it, not by
+capacity. No recursive native call chain or expanded offset vector is required.
+
+| Consumer | Required use |
+| --- | --- |
+| Allocation/admission | Symbolic region/disjointness checks and cached schema properties, not an O(capacity) metadata expansion |
+| Marking | Stream declared object words for the full immutable capacity; skip nulls; skip reference-free subgraphs in O(1) |
+| Checked stores | Seek exactly a declared leaf inside valid live storage; validate reference kind/target/nullability and runtime ownership |
+| Prepared-payload validation | Stream the same leaves/pairs, validate targets, use memcpy access; never maintain a second offset interpretation |
+| Construction/copy | Same cursor identifies scalar regions, reference words and atomic interface groups; data completeness follows the corresponding typed event order |
+
+Legacy flat layouts are an adapter/view over their validated sorted offsets in this
+same service. Sort/validate an owned copy once; existing Heap inputs may be unsorted,
+so seek must not assume the caller already sorted them. TypeLayout's new buffer
+variant is mutually exclusive with ordinary flat references, intrinsic string kind and nominal-object descriptor fields. Reject
+mixed/unknown variants; do not attempt an unchecked union of overlapping maps.
+Existing construct_into uses the common reference service without changing its old
+payload contract. Existing Heap::allocate, Runtime::allocate_into and construct_into
+must reject the buffer variant: only the reservation/builder path can create and
+seal it. A raw prepared buffer pointer cannot bypass completeness or root checks.
+Prepared buffer validation is exercised through typed rooted chunks/copy sources,
+not an external payload containing unrooted reference words. New buffer operations
+bypass whole-payload staging/copy.
+
+The trace extent is immutable allocation capacity, never a mutable source count.
+Private and spare slots contain zero in reference positions. Null there is safe for
+tracing but not a complete live required-reference value. GC does not reconstruct
+source validity from nullness or from a caller-supplied header count. For a sealed
+buffer, a nonnull reference outside valid_prefix is an invariant violation, detected
+while streaming the capacity during collection; private partially filled elements
+permit nulls. Heap edges to private targets reject, while an internal registered
+builder root may name its own private allocation. Geometry interpretation is common;
+required-value checks depend explicitly on private/complete state, not a second map.
+
+Marking remains O(actual reference positions + reachable objects), not O(payload
+bytes) for byte buffers. Avoid a vector of expanded offsets or one pending entry
+per duplicate reference: use streaming cursor/work items and unique queued/marked
+objects, with complete mark rollback on any worklist allocation failure. All graph
+validation precedes sweep as today. Any queue/mark ordering change needs its own
+failure-injection proof; a plausible scan count does not authorize partial sweep.
+
+### 23.4 Proposed C++ API surface
+
+This is the full Stage 2 internal embedding/runtime API design, not a new generated-
+code ABI or a claim that every declaration works. Section 24 records the implemented
+2B admission subset; the buffer APIs remain proposals. Opaque handles are runtime-
+bound and factory-created;
+callers cannot manufacture an admitted handle by constructing shared_ptr<const T>.
+
+```cpp
+// Proposed namespace vd declarations; handle constructors remain private.
+class BufferBusy final : public std::logic_error {
+public: using std::logic_error::logic_error;
+};
+struct BufferWorkQuota { std::size_t bytes, reference_events, node_events; };
+
+// Proposed additions INSIDE Runtime, alongside existing Frame/Handle declarations:
+class BufferBuilder;
+class BufferReadLease;
+void admit_metadata(std::span<const NominalDescriptor>,
+                    std::span<const InterfaceWitness>,
+                    std::span<const ElementSchemaSpec>); // NativeSafe/host overload
+void admit_buffer_schemas(std::span<const ElementSchemaSpec>); // wrapper over overload
+ElementSchemaRef buffer_schema(std::string_view identity) const;
+BufferLayoutRef buffer_layout(ElementSchemaRef, std::uint64_t capacity,
+                              std::size_t base = 0) const;
+RegisteredRootWord root_word(void** slot) const;
+void buffer_store_scalar(RegisteredRootWord owner, BufferLayoutRef,
+                         std::uint64_t index, SchemaPath, std::uint64_t bits);
+void buffer_store_interface(RegisteredRootWord owner, BufferLayoutRef,
+                            std::uint64_t index, SchemaPath,
+                            const RootedInterfaceSource&);
+
+// Proposed nested class definitions; private storage omitted here.
+class Runtime::BufferBuilder {
+public:
+    BufferBuilder(Runtime&, BufferLayoutRef, std::uint64_t requested_live,
+                  BufferWorkQuota);
+    ~BufferBuilder() noexcept;
+    BufferBuilder(const BufferBuilder&) = delete;
+    BufferBuilder& operator=(const BufferBuilder&) = delete;
+    BufferBuilder(BufferBuilder&&) = delete;
+    BufferBuilder& operator=(BufferBuilder&&) = delete;
+    void write_scalar(std::uint64_t bits);
+    void write_bytes(std::span<const std::byte> native_input);
+    void write_reference(RegisteredRootWord source);
+    void write_interface(const RootedInterfaceSource& source);
+    void zero_elements(std::uint64_t count);
+    void copy_elements(BufferReadLease&, std::uint64_t first, std::uint64_t count);
+    void finish_into(void** registered_output);
+};
+class Runtime::BufferReadLease {
+public:
+    BufferReadLease(Runtime&, RegisteredRootWord source, BufferLayoutRef expected);
+    ~BufferReadLease() noexcept;
+    BufferReadLease(const BufferReadLease&) = delete;
+    BufferReadLease& operator=(const BufferReadLease&) = delete;
+    BufferReadLease(BufferReadLease&&) = delete;
+    BufferReadLease& operator=(BufferReadLease&&) = delete;
+};
+// Existing Runtime::store gains buffer-aware reference-leaf lookup/rules;
+// paired interface writes require buffer_store_interface, not an object-word store.
+```
+
+The new admission overload prepares nominal types, witnesses and schemas in one
+copy/validate/publish catalog transaction; references may resolve against that prepared
+catalog. The convenience schema method calls this service with empty other inputs.
+Existing admission signatures delegate with no buffer specs. Do not introduce a
+second admission registry or publish three separate partial catalogs.
+
+Builders and read leases are Managed-only, thread-affine and own small Frame roots.
+Their destructors require the same Managed thread and perform no allocation/poll;
+wrong-thread/state/LIFO destruction retains the existing fatal Frame policy.
+SchemaPath is an input span of field-ID/repeat-index selections, validated against
+the immutable schema on every operation, not a trusted byte offset. Root tokens
+are short-lived registration proofs; their Frame must remain linked for the call.
+The lease copies the validated source word into its own root before any subsequent
+poll, so changing the caller's slot cannot redirect the lease to another buffer.
+No mutable raw payload address or persistent generation-owned callback is returned.
+
+Builder calls consume the **next** typed event(s), with a complete-element prefix
+and bounded in-element cursor. They do not accept arbitrary out-of-order offsets. Event order is a storage protocol,
+not permission to reorder source expressions: later lowering must evaluate named
+arguments/constructors in source order, staging rooted values where necessary rather
+than introducing payload-sized native temporaries.
+Missing, repeated, wrong-width or wrong-kind writes fail before changing progress.
+Any throwing builder operation poisons that transaction: only destruction/abort is
+then legal, and finish rejects. A failed multi-chunk call may have written private
+bytes, so retry means a fresh builder, not replaying the whole call over an unknown
+cursor position. Constructor failure unwinds all reservations/roots automatically.
+write_bytes accepts byte regions/dense u8 streams, not pointer words or arbitrary
+serialized structs. A span is a trusted C++ lifetime/provenance precondition, not
+proof that an arbitrary address is outside the GC heap. Managed input must use the
+rooted source API; the source compiler must never turn a managed borrow into this
+native-input span to bypass rooting. Native input must remain host-owned and valid for the call,
+including safepoints; it is not an unrooted managed borrow. Managed sources use
+root/lease APIs and are reread after polls. write_scalar validates its declared
+encoding: width-masked bits, bool 0/1, and existing floating bit patterns. It is
+not a new source numeric conversion.
+
+A root token names a registered slot, not a cached raw referent. Validate membership
+before polling and reacquire the value afterward. RootedInterfaceSource also binds
+an admitted witness; validate opaque catalog membership before dereferencing it.
+A complete-element prefix advances only after every required event passes.
+zero_elements explicitly appends all-zero data values only where zero_data_complete
+proves required-reference/encoding validity. This is not a language-default operation:
+physical layout cannot infer a field default of 7, a required constructor execution,
+or a fresh list header. Source default lowering must use the Stage 1 pure template
+or explicit ordered construction, with an independent source-construction proof
+before Stage 3 activation. Stage 2 fixtures use passive physical value records;
+GC/data completeness does not certify that arbitrary user constructors ran.
+
+Work quotas bound population/copy work per Managed critical section and guarantee
+polling between chunks. They are work bounds, not worst-case wall-clock guarantees;
+allocator calls, Heap map growth and existing stop-the-world marking remain separate
+latency costs to measure. Bytes must accommodate the schema's largest atomic group;
+all quotas must be positive. They are scheduling parameters, not array-size acceptance limits;
+no numerical production default/cutoff is selected at this gate. Large elements can
+span chunks. Reference words and interface pairs are never torn across a safepoint;
+partially constructed elements remain private with valid references or zeros.
+
+### 23.5 Reservation, roots, completeness and publication
+
+Use the following state machine, all through the existing Heap/Runtime:
+
+1. Validate the admitted layout, requested_live <= capacity and quotas using cached
+   geometry. Construct a small null private root and link its existing Frame/Slot.
+   Keep the caller's eventual output unchanged. Honor existing allocation-budget
+   collection outside the mutex, with all source roots already registered.
+2. Enter Runtime::Native with the frozen frame chain. Allocate the shape-sized
+   cursor work storage here as well; no managed data is read. A Heap-owned PendingBuffer
+   obtains raw storage from the Heap's allocation family and zeroes it outside the
+   Runtime mutex. It contains no managed references, is not a tracked object and
+   has no observable identity. Collection can proceed during allocation/zeroing;
+   no managed pointer/payload is dereferenced in this NativeSafe phase.
+3. Reenter Managed through the existing rendezvous, then lock and adopt the fully
+   zeroed reservation as a **private buffer** in the Heap map. Complete every fallible
+   map operation before relinquishing PendingBuffer ownership. Install the private
+   Frame root immediately, without a poll or fallible step between adoption/rooting.
+   Adoption updates the existing successful-allocation accounting once.
+4. Populate in bounded Managed chunks. All reference targets must already be complete,
+   same-runtime objects. No incomplete-to-incomplete heap edge is needed in this slice.
+   When Stage 3 enables owned-child buffer roles, children must finish into their own
+   roots before becoming parent edges; that role is not activated here. The collector
+   can trace every capacity slot safely after any chunk.
+5. Maintain an authoritative prefix/cursor in the unforgeable builder. All capacity
+   after requested_live stays zero; the final partially prepared element is never
+   live. Validate semantic completeness incrementally. Do not rescan a multi-megabyte
+   payload under one lock in finish_into.
+6. finish_into checks the exact output root, full requested-prefix completeness and
+   private object identity; poll before commit, then revalidate under the mutex.
+   In one nonfallible/no-safepoint critical section set complete + sealed valid_prefix
+   and assign the output root. No user callback, allocation, memcpy of the whole
+   payload or descriptor creation occurs in commit. This is publication's linearization
+   point with respect to collector/runtime operations, not a new lock-free language API.
+7. Drop the private builder root after successful root handoff. On abort clear it and
+   unlink the Frame; normal GC reclaims the abandoned graph. An unadopted reservation
+   is released immediately with matching delete. Do not wipe a huge aborted payload
+   while holding the mutex or free a still-rooted managed allocation manually.
+
+For capacity zero, keep the typed empty layout token and no object. No element writes
+are permitted; finish_into publishes null only with requested_live=0. Typed APIs
+validate the token so null cannot impersonate an arbitrary nonempty buffer.
+
+Private object state is distinct from GC membership. Collector root/edge validation
+uses internal tracked membership; source-facing contains/nominal access, persistent
+Handle publication and ordinary stores must not expose a private buffer as a complete
+value. Ordinary Runtime::store cannot write private destinations. Only the builder
+capability can do so; ordinary stores of private targets reject. Debug object-count
+telemetry may include private allocations, but is not source-value publication.
+
+This design deliberately zeroes **all** raw bytes before Heap adoption. It needs no
+mutable tracing frontier, per-element initialized bitmap or scan of uninitialized
+memory. Private/spare nulls are allowed solely because no source operation can read
+them as required values. Sealed valid_prefix is authoritative for buffer live access;
+GC still traces capacity. Future growable commits must coordinate this prefix with
+header count/version, under separately reviewed Stage 4 rules.
+
+### 23.6 Copy correctness, aliasing and readonly
+
+Proposed Stage 2 copying supports scalar buffers, nested physical value records/repeats and managed/
+string/interface reference elements into distinct destination allocations. Managed
+references retain referent identity, immutable strings share storage, interface
+witnesses remain runtime-owned, and copied value bytes are independent. Padding
+has no reference authority. Exact schema/profile matching precedes copying.
+
+A read lease roots and freezes the **buffer's value bytes** for chunked copying.
+Readonly source syntax alone is not proof of stability against another alias.
+Acquire/release the lease under the Runtime mutex; every buffer writer checks the
+lease, including the buffer branch of existing store. Never block a Managed writer
+waiting for a lease across a safepoint. A conflicting writer throws BufferBusy
+before writing. Lease counts use checked increment/decrement with no wrap/underflow.
+This is an internal protocol in Stage 2 fixtures, not a new source concurrency rule.
+Later lowering must prove exclusive/stable access or resolve it before entering the primitive.
+No raw writable buffer export is offered. Referenced ordinary objects can still
+mutate: copying their identity does not promise snapshots of their contents.
+
+copy_elements streams directly between a rooted leased source and a distinct private
+destination. It never needs an element-sized native temporary. A private destination
+cannot alias its source. Every chunk is checked/committed before polling. The lease
+is bounded to preparation and released by RAII on failure. Reacquire the rooted base
+and Heap metadata under the mutex for each chunk; do not retain heap-map iterators,
+metadata addresses or interior pointers across allocations/polls. A lease on one
+buffer is not validation of a future growable header/selection version.
+Metadata/capability profiles
+are preserved; tracing data does not create authority to thaw managed readonly views.
+
+Future type-directed value copying must use these actions:
+
+| Value component | Required action |
+| --- | --- |
+| Scalar / trivial byte region | Checked bulk copy into independent destination storage |
+| Ordinary managed ref / immutable string / interface | Share valid referent identity and preserve capability/witness |
+| Inline value record / repeated physical value shape | Compose actions in logical order, with rooted partial destination |
+| Owned fixed-array child | Allocate/clone recursively or transfer uniquely owned complete storage under proof; never shallow-copy its pointer as a shared ref |
+| Growable array child | Retain stable header identity when Stage 4 representation exists |
+
+Stage 2 must **reject** reserved owned-fixed/growable actions in generic copying;
+calling a byte-copy helper is not an implementation of deep value copying. Stage 3
+must supply the approved semantic-to-storage copy plan and ownership proof before
+these roles can activate. Nested physical Repeat fixtures exercise descriptor
+composition, not approval of inline source fixed-array storage. Recursive cloning
+will root both owners and each unfinished child, finish children before linking,
+and unwind only private state on failure. Constructor evaluation remains compiler-
+ordered; no generation-owned user callback is stored in a GC descriptor.
+
+### 23.7 Failure taxonomy and compatibility
+
+| Condition | Required outcome |
+| --- | --- |
+| Count/base/stride/alignment/end overflow or size_t narrowing | Checked representation/length failure before allocation/address formation; no output mutation |
+| Bad spec/unknown role/foreign domain/runtime/nominal identity | Admission or typed-operation rejection; no catalog/heap/output partial commit |
+| Metadata, cursor, raw storage, map-node or clone allocation failure | bad_alloc path; RAII roots/reservation/lease unwind; previous output unchanged |
+| Incomplete builder, holes, invalid required reference, torn interface | Reject finish/write; never mark complete or publish; structural/invariant failure is not ordinary OOM |
+| Corrupt graph/untracked pointer found by collector | Existing invariant-failure policy; no sweep or successful delivery, not a recoverable allocation success |
+| GC work allocation failure during preparation | Existing mark rollback and allocation_failure; valid private graph remains rooted until abort; retry a fresh transaction |
+| Writer conflicts with active read lease | Explicit internal conflict, no waiting Managed and no partial write; source policy remains gated |
+| Allocation succeeds physically but OS overcommit later kills process | No promise of catchable OOM; deterministic injection proves language/runtime rollback paths independently |
+
+Stage 2 C++ tests use existing exception conventions (invalid_argument for bad API
+inputs, length/overflow errors for representation, bad_alloc for allocation, logic
+errors for broken internal construction/root protocols). BufferBusy is the specific
+internal lease-conflict exception; never silently map it to source OOM.
+Future C helpers must translate only approved recoverable cases into the existing
+RuntimeFailure channel and never unwind through generated frames; no such ABI is
+introduced in Stage 2. Invalid precise roots retain existing fatal policy.
+
+Ordinary/string object bytes, nominal descriptors, null-empty-string convention,
+UTF-8 checks, Frame/Slot/Handle ABI and all public C adapters remain unchanged.
+The legacy offset adapter must be regression-tested against existing layout/store/GC
+behavior. Element/schema ownership is runtime data lifetime: active objects retain
+metadata through code-generation retirement. Admission compares complete semantic
+identity, physical graph, extent, capability and storage domain, not just equal byte
+sizes or a hash. Incompatible changes require the existing restart decision. Retired
+JIT code is never needed to trace an old buffer. No reload/GC invariant is delegated
+to LLVM, and no production ORC/AOT publication gate is relaxed.
+
+### 23.8 Required proof tests and acceptance
+
+| Area | Positive proof | Negative proof |
+| --- | --- | --- |
+| Descriptor compactness | Millions of scalar/ref elements, nested repeats; metadata nodes/edges independent of capacity | Expanded offset vector; node/edge cycle, missing node, forged identity/domain rejected |
+| Geometry | Derived host stride/base, padding, aligned allocations, nested fields, zero-capacity token, zero-footprint elements | Overflow at each sum/product/align/narrow, bad/nonpower alignment, short stride, overlapping refs/regions, leaf past end, foreign pointer width |
+| Shared interpretation | Enumerated offsets agree with seek/store/prepared checks for small independently enumerated fixture oracles | Off-by-one/inside-pointer/padding offset and mixed flat/buffer variants reject |
+| Existing objects | All existing ordinary/string/root/inheritance/interface fixtures retain behavior, including allowed legacy unaligned memcpy offsets | Wrong kind, corrupt UTF-8/string header, bad old roots remain rejected/fatal |
+| Construction | Collect before reservation, during NativeSafe zeroing, after adoption, between scalar/ref chunks and partial large elements | Private pointer escape, unregistered output, foreign-root token, incomplete child edge, premature finish, null required live ref reject |
+| Live versus spare | Source access restricted to sealed prefix; unused capacity zeros trace safely | Count/prefix forgery; live access/store in spare slot; corrupted nonzero reference in sealed unused tail; private source lease reject |
+| Copies | Distinct multi-megabyte allocations; mutate either copy, other unchanged; shared referent identity preserved; nested records/ref repeats | Source/destination alias, active-lease write, unregistered/foreign source root, shallow owned-fixed/growable copy action reject |
+| Failure injection | Sweep new-allocation failure ordinals across admission, cursor, reservation, adoption and copying; old sentinel/root stable and retry succeeds | Any changed catalog/output, leaked lease/frame, double free, stale requested epoch, partial sweep or published partial value |
+| Scheduling | Collector completes while raw allocation/zeroing is NativeSafe; bounded chunk polls; reference-free tracing independent of byte extent | Poll while holding required mutex, NativeSafe managed dereference, oversized atomic group for quota, starvation/deadlock |
+| Lifetime | Destroy caller specs, retire allocating generation and collect/use old buffers with retained schemas | Compiler-owned pointer, executable tracing callback, equal-size incompatible schema accepted |
+| Native stack | Large runtime buffer fixtures under 1 MiB Debug/Release stacks, bounded cursor/handle homes | Payload-sized stack input/staging/root arrays or hidden deep recursive native work |
+
+Use independently enumerated small-layout oracles, not just two calls to the same
+walker. Allocation failure ordinal sweeps must first measure the successful path's
+allocation sites, then cover each site; do not rely on one guessed fail_after value.
+Exercise cancellation/abort and rollback before a successful retry. Preserve existing
+mark-worklist failure tests in tests/runtime/failures.cpp, fatal invariant subprocess
+tests, coordinated epochs, interface crash capture and research destination sentinels.
+
+Benchmarks record descriptor bytes, allocation/zero/copy throughput, copied bytes,
+peak live memory and collector pause distributions for byte and reference-rich
+buffers. No frame-time or OOM guarantee is claimed from average elapsed time. Collection
+itself still stops mutators while tracing actual reference locations; permitting
+mutators during marking would require write barriers/another architecture decision.
+
+### 23.9 Smallest implementation sequence after approval
+
+1. **2B, schemas/common cursor:** Implement runtime-owned admission, exact domain/
+   checked geometry, legacy adapter, seek/stream invariants and independent oracles.
+   No new allocation/source path yet. Keep existing objects' behavior and all 61 suites.
+2. **2C, private rooted byte buffers:** Same-Heap PendingBuffer reservation, NativeSafe
+   zeroing, aligned adoption and existing Frame root handoff; pure byte defaults,
+   sealed prefix and nonfallible finish. Prove failure/collection boundaries before
+   allowing reference-bearing population.
+3. **2D, reference-bearing preparation:** Typed reference/interface events, zero spare
+   capacity, required-value completeness, common prepared validation and bounded
+   chunk polling. Prove no private escape and preserve failed-collection rollback.
+4. **2E, stable-source copying:** Checked read leases and every-writer enforcement,
+   distinct destinations, nested physical shapes and explicit unsupported owned-copy
+   negatives. Prove alias/conflict/failure behavior; no source-level borrow optimization.
+5. **2F, acceptance/review:** Debug/Release, strict sanitizers, failure ordinals, 1 MiB
+   stacks, stress and runtime-native Windows x64/macOS ARM64/Linux x64 acceptance
+   using existing CI conventions only when separately authorized. Keep all current
+   suites, add focused runtime suites, preserve ABI/stack/CFG research, then stop.
+
+The smallest useful first slice is 2B followed by 2C byte buffers; it does not need
+source native arrays or a selected array-call ABI. Stop rather than substitute
+unproved alignment, source stability, reference completeness or publication rules.
+No later stage is authorized by approving a substep.
+
+**Approved architectural direction, with implementation authorized only for 2B:**
+runtime-owned DAG/cursor; mutually exclusive
+buffer layout and typed empty representation; same-Heap NativeSafe zero reservation
+then rooted private adoption; prefix/event completeness and sealed publication;
+checked nonblocking read-lease protocol for runtime fixtures; reserved owned-copy
+rejection pending Stage 3; the incremental review sequence above. Chunk scheduling
+numbers, source ABI/owned-handle layout, production stack policy, growable header
+commit protocol and source concurrency semantics are not selected here.
+
+The original Stage 2A checkpoint changed documentation only. The subsequent owner
+authorization permits only 23.9 step 2B, recorded below; all remaining implementation
+steps require their own review. Research checks, CI, Git history and remotes remain
+unchanged.
+
+
+## 24. Stage 2B: compact schemas and shared reference cursor
+
+15 October 2026. Bounded runtime implementation following approved Section 23.9.
+This checkpoint adds metadata and reference-map services only. There is no buffer
+object kind, allocation/reservation API, private builder, new generated-code ABI,
+source array execution or production machine-certificate activation.
+
+### 24.1 Admission, identity and lifetime
+
+`include/void/gc_schema.hpp` defines `ElementSchemaSpec`, the discriminated
+`SchemaNode` variants, `StorageDomain`, opaque immutable `ElementSchemaRef`,
+`ReferenceShape` and `ReferenceCursor`. Runtime provides the three-input
+`admit_metadata(nominals, witnesses, schemas)` overload, `admit_buffer_schemas`,
+`buffer_schema(identity)` and `reference_shape(handle)`. Existing admission
+signatures delegate with no schemas. The same catalog snapshot/prepare/compare/
+publish transaction admits all three metadata classes; a failing allocation,
+validation or compatibility check publishes none of them. Concurrent admissions
+retry against the latest catalog. Admission remains host/NativeSafe only.
+
+Specs are copied into runtime-owned storage. Child indices must precede parents;
+all nodes must be reachable from the root. Admission validates every node,
+including children of empty repeats, then shares structurally identical nodes.
+Node keys contain local child IDs, never recursively expanded child text.
+Compatibility compares the complete rooted structure iteratively, independently
+of topological node numbering, including nominal identities, field IDs, nullability,
+capability profile, domain and layout key. Equal byte size is insufficient.
+Compatible readmission retains the existing canonical handle. Input node/field
+ordering is a representation contract; it cannot change the declared field IDs,
+offsets or child shapes under an existing identity.
+
+Domain facts come from actual native C++ sizes/alignments and byte order, without
+LLVM. All scalar encodings, pointer geometry and storage-format revision must match.
+Record fields have unique IDs, aligned contained disjoint nonzero physical spans;
+zero-byte fields remain logically selectable without shadowing physical lookup.
+Repeats validate positive aligned stride, child span, base, i64 extent and exact
+rounded total bytes with checked sums/products/alignment. Zero repeats have zero
+base/bytes but still validate their child/stride. Metadata work depends on distinct
+nodes/edges, not repetition count. Allocation exhaustion throws through the existing
+C++ exception convention; no replacement payload/count cutoff is introduced.
+Power-of-two over-alignment can be represented as metadata; allocator support and
+matching aligned deletion remain an unproved Stage 2C obligation, not an allocation
+capability granted by schema admission.
+
+Managed targets resolve to prepared/admitted nominal descriptors. Interface targets
+resolve to prepared/admitted witnesses with the exact interface identity because
+the current catalog has no standalone interface-declaration registry. An interface
+without any witness is conservatively rejected; this does not invent a new registry
+or approve source interface construction. Strong metadata references retain nominal
+and witness dependencies. Schemas contain no executable pointers, LLVM objects or
+Runtime backpointer. Handles/cursors may retain immutable geometry after Runtime
+retirement; this conveys no heap/allocation authority. `Runtime::reference_shape`
+requires exact pointer membership in that Runtime's catalog, rejecting equal-key
+foreign handles. Callers cannot construct/copy an admitted `ElementSchema` object.
+
+### 24.2 One reference interpretation and legacy compatibility
+
+`ReferenceCursor::next()` streams physical-order `ReferenceEvent`s with offset,
+kind, target/nullability and optional interface witness offset. Only an interface's
+object word is a trace reference. `ReferenceShape::at(byte_offset)` uses the same
+nodes with sorted record lookup and repeat quotient/remainder; only exact reference
+word starts match. `path(field-ID/element-index steps)` descends checked logical
+selections. Pointer interiors, witnesses, padding, invalid IDs and out-of-range
+indices return no reference event. These operations describe reference geometry;
+they do not yet validate typed live values or expose scalar-construction events.
+
+The cursor uses an explicit heap work stack bounded by schema depth, reserves before
+replacing its state and performs no allocation during `next()`. Reference-free
+subgraphs and empty repeats are skipped without visiting each element. Geometry
+validation and structural comparison are iterative too, avoiding a native recursive
+call chain for deep finite DAGs. Event target string views borrow metadata retained
+by the shape/cursor; callers must retain that owner while using the view.
+
+`ReferenceShape::legacy` copies and normalizes existing flat offsets into a private
+validated record with shared generic reference leaves. Its alignment-one adapter
+preserves accepted unaligned memcpy offsets and rejects duplicate/overlapping or
+out-of-bounds words. The adapter is not admissible as a new typed buffer schema.
+Heap objects retain this reference shape. Heap allocation validation, marking,
+checked stores, nominal layout normalization and `construct_into` prepared-reference
+validation use the shared service. Existing ordinary/string payloads, output-root
+publication, UTF-8 checks, null-empty-string convention and Frame/Slot/Handle ABI
+remain unchanged. Frame/Slot root registration retains its existing ABI and root
+alias rules; it is not reclassified as a new heap element schema.
+
+The collector still validates the graph before sweeping and resets marks after
+failure. Its pending-object queue/mark ordering is unchanged. This checkpoint does
+not claim the future duplicate-reference queue optimization or chunked preparation,
+value completeness, target/nullability checking for buffer stores, private-object
+states, read leases or safe publication. No DAG-backed payload can be allocated
+through the legacy Heap API.
+
+### 24.3 Focused proof and local validation
+
+`tests/runtime/schemas.cpp` adds `gc_schemas`, preserving the existing 61 suites.
+Independent small-layout oracles cover nested records/repeats, physical and logical
+lookups, interface object versus witness words and every byte of legacy unaligned
+layouts. Million-reference metadata has two nodes/one edge; the cursor streams
+without an expanded offset vector or a payload allocation. A billion-byte
+reference-free shape is skipped. Tests also cover all scalar domains, empty and
+zero-footprint children, duplicate nodes, alternate topological numbering, deep
+iterative traversal, detached metadata lifetime and concurrent catalog admission.
+Forged domains/identities/targets, reserved roles, cycles/forward edges, unused
+nodes, overlap, invalid stride/alignment, every extent arithmetic boundary, foreign
+handles and incompatible readmission reject. A measured 48-allocation-site sweep
+checks all-or-nothing nominal/witness/schema admission and successful retry;
+incompatible readmission also preserves the old catalog. Cursor reserve-failure
+rollback preserves its previous traversal. On local Linux x64, requested admission
+allocation bytes were 1,886 for one reference versus 1,917 for a million with
+identical catalog seeds and type identity. Streaming the million events requested
+zero allocations after reset. These are requested metadata bytes measured by the
+fixture allocation hook, not resident-memory or payload/GC throughput measurements.
+
+Local Linux x64 LLVM 19.1.7 verification: all 62 suites passed in Debug
+(120.66 s) and Release (56.64 s). The final expanded schema fixture passed again
+in both configurations. Nine GC/runtime/string/interface suites also passed under
+explicit 1 MiB Debug/Release native stack limits (12.66 s / 3.95 s), including
+normal/O2 independently linked runtime AOT, generated JIT, callbacks, collection
+failure rollback and the 2,048-level iterative schema fixture. The full strict
+ASan/UBSan RelWithDebInfo rebuild and all 62 suites passed (146.99 s), with
+`ASAN_OPTIONS=detect_leaks=1:abort_on_error=1` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1`. Generated build steps and tests
+ran outside the desktop ptrace sandbox because LeakSanitizer explicitly rejects
+ptrace; leak checks stayed enabled. `git diff --check` and an exact changed-file
+audit passed. Native hosted Windows/macOS execution is not claimed. Stage 2B is
+complete locally for owner/wrench review; Stage 2C, GC publication changes, source
+arrays and ABI/certification activation remain gated.

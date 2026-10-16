@@ -45,6 +45,10 @@ public:
     bool contains(void*) const;
     void admit_types(std::span<const NominalDescriptor>);
     void admit_metadata(std::span<const NominalDescriptor>,std::span<const InterfaceWitness>);
+    void admit_metadata(std::span<const NominalDescriptor>,std::span<const InterfaceWitness>,std::span<const ElementSchemaSpec>);
+    void admit_buffer_schemas(std::span<const ElementSchemaSpec>);
+    ElementSchemaRef buffer_schema(std::string_view) const;
+    ReferenceShape reference_shape(ElementSchemaRef) const;
     const InterfaceWitness* witness(std::string_view) const;
     std::int64_t interface_binding(void* object,const void* witness,std::span<const char* const> keys) const;
     std::shared_ptr<const NominalDescriptor> descriptor(std::string_view) const;
@@ -79,6 +83,7 @@ private:
     using NominalCatalog=std::map<std::string,std::shared_ptr<const NominalDescriptor>,std::less<>>;
     struct TypeCatalog {
         NominalCatalog types;
+        std::map<std::string,ElementSchemaRef,std::less<>> schemas;
         std::map<std::string,std::shared_ptr<const InterfaceWitness>,std::less<>> witnesses;
     };
     std::shared_ptr<const TypeCatalog> types_ = {};

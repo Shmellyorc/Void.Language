@@ -206,21 +206,22 @@ void Runtime::construct_into(void** slot, const TypeLayout& layout, const void* 
         if (size!=layout.size-sizeof(size) || !valid_utf8({static_cast<const char*>(payload)+sizeof(size),static_cast<std::size_t>(size)}))
             throw std::invalid_argument("invalid intrinsic string payload");
     }
+    auto references=ReferenceShape::legacy(layout.size,layout.references);
+    ReferenceCursor cursor(references);
     bool due;
     { std::lock_guard lock(mutex_); due=allocation_budget_ && allocations_>=allocation_budget_; }
     // Neither collection nor parking occurs with a collector-required lock held.
     if (due && collect()!=Collection::completed) throw std::bad_alloc();
     poll();
     std::lock_guard lock(mutex_);
-    for (auto offset:layout.references) {
-        if (offset>layout.size || layout.size-offset<sizeof(void*)) throw std::invalid_argument("invalid prepared reference offset");
-        void* value=nullptr; std::memcpy(&value,static_cast<const char*>(payload)+offset,sizeof(value));
+    while (auto reference=cursor.next()) {
+        void* value=nullptr; std::memcpy(&value,static_cast<const char*>(payload)+reference->offset,sizeof(value));
         if (value && !heap_.contains(value)) throw std::logic_error("prepared reference belongs to another heap");
     }
     // Heap::allocate completes every fallible descriptor/map operation. The
     // copy and final root publication cannot throw or invoke user code/GC.
     validate_descriptor(layout);
-    void* object=heap_.allocate(layout);
+    void* object=heap_.allocate_validated(layout,std::move(references));
     std::memcpy(object,payload,layout.size);
     *slot=object;
     if (allocations_ != static_cast<std::size_t>(-1)) ++allocations_;
@@ -289,12 +290,19 @@ void* Runtime::Handle::get() const {
 
 namespace vd {
 void Runtime::admit_types(std::span<const NominalDescriptor> incoming) {admit_metadata(incoming,{});}
-void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::span<const InterfaceWitness> incoming_witnesses) {
+void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::span<const InterfaceWitness> witnesses) {admit_metadata(incoming,witnesses,{});}
+void Runtime::admit_buffer_schemas(std::span<const ElementSchemaSpec> schemas) {admit_metadata({},{},schemas);}
+void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::span<const InterfaceWitness> incoming_witnesses,std::span<const ElementSchemaSpec> incoming_schemas) {
     if(current_thread_ && current_thread_->state!=State::native_safe)
         throw std::logic_error("type admission requires NativeSafe state");
-    if(incoming.empty() && incoming_witnesses.empty()) return;
+    if(incoming.empty() && incoming_witnesses.empty() && incoming_schemas.empty()) return;
     NominalCatalog candidates;
     std::map<std::string,std::shared_ptr<const InterfaceWitness>,std::less<>> witness_candidates;
+    std::map<std::string,std::shared_ptr<ElementSchema>,std::less<>> schema_candidates;
+    for(const auto& input:incoming_schemas) {
+        auto schema=ElementSchema::prepare(input);
+        if(!schema_candidates.emplace(input.identity,std::move(schema)).second) throw std::invalid_argument("duplicate element schema");
+    }
     for(const auto& input:incoming_witnesses) {
         if(input.key.empty() || input.interface_identity.empty() || input.view_identity.empty() || input.contract.empty() ||
             input.key.find('\0')!=std::string::npos || input.interface_identity.find('\0')!=std::string::npos || input.view_identity.find('\0')!=std::string::npos || input.contract.find('\0')!=std::string::npos)
@@ -307,10 +315,7 @@ void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::sp
         if(input.identity.empty() || input.shape.empty() || !input.layout.size || input.layout.descriptor || input.layout.kind!=TypeLayout::Kind::ordinary)
             throw std::invalid_argument("invalid nominal descriptor");
         auto value=std::make_shared<NominalDescriptor>(input);
-        auto& offsets=value->layout.references;
-        std::sort(offsets.begin(),offsets.end());
-        for(unsigned n=0;n<offsets.size();++n) if(offsets[n]>value->layout.size || value->layout.size-offsets[n]<sizeof(void*) || (n && offsets[n]-offsets[n-1]<sizeof(void*)))
-            throw std::invalid_argument("invalid nominal tracing layout");
+        value->layout.references=ReferenceShape::legacy(value->layout.size,value->layout.references).legacy_offsets();
         if(!candidates.emplace(value->identity,std::move(value)).second) throw std::invalid_argument("duplicate nominal descriptor");
     }
     for(;;) {
@@ -346,6 +351,27 @@ void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::sp
                     throw std::invalid_argument("incompatible interface witness admission");
             }
         }
+        for(const auto& [key,schema]:schema_candidates) {
+            std::map<std::string,std::shared_ptr<const NominalDescriptor>> targets;
+            std::map<std::string,std::shared_ptr<const InterfaceWitness>> interfaces;
+            for(const auto& node:schema->spec_.nodes) {
+                if(auto* ref=std::get_if<SchemaManaged>(&node)) {
+                    auto target=prepared->types.find(ref->target);
+                    if(target==prepared->types.end()) throw std::invalid_argument("unadmitted schema reference target");
+                    targets.emplace(ref->target,target->second);
+                }
+                if(auto* ref=std::get_if<SchemaInterface>(&node)) {
+                    auto witness=std::find_if(prepared->witnesses.begin(),prepared->witnesses.end(),[&](const auto& entry){return entry.second->interface_identity==ref->target;});
+                    if(witness==prepared->witnesses.end()) throw std::invalid_argument("unadmitted schema interface target");
+                    interfaces.emplace(ref->target,witness->second);
+                }
+            }
+            schema->nominal_owners_.clear();schema->witness_owners_.clear();
+            for(const auto& [id,target]:targets) { (void)id;schema->nominal_owners_.push_back(target); }
+            for(const auto& [id,witness]:interfaces) { (void)id;schema->witness_owners_.push_back(witness); }
+            auto [found,added]=prepared->schemas.emplace(key,schema);
+            if(!added && !found->second->equivalent(*schema)) throw std::invalid_argument("incompatible element schema admission");
+        }
         {std::lock_guard lock(mutex_);
             if(closing_) throw std::logic_error("runtime is closing");
             if(types_!=snapshot) continue;
@@ -353,6 +379,19 @@ void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::sp
             return;
         }
     }
+}
+ReferenceShape Runtime::reference_shape(ElementSchemaRef schema) const {
+    std::lock_guard lock(mutex_);
+    if(schema && types_) {
+        auto found=types_->schemas.find(schema->identity());
+        if(found!=types_->schemas.end() && found->second==schema) return ReferenceShape(std::move(schema));
+    }
+    throw std::invalid_argument("foreign or unadmitted element schema handle");
+}
+ElementSchemaRef Runtime::buffer_schema(std::string_view key) const {
+    std::lock_guard lock(mutex_);
+    if(types_) {auto found=types_->schemas.find(key);if(found!=types_->schemas.end()) return found->second;}
+    throw std::invalid_argument("element schema is not admitted");
 }
 std::shared_ptr<const NominalDescriptor> Runtime::descriptor(std::string_view key) const {
     std::lock_guard lock(mutex_);

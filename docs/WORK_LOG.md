@@ -8129,3 +8129,214 @@ compiler type/frontend/IR foundation, its existing test suite and documentation
 change. No runtime/GC/backend implementation, CI, commits, pushes, branches or
 remote modifications. Stage 1 is complete locally; stop for owner/wrench review
 before Stage 2 or any production activation.
+
+
+## 15 October 2026: Stage 2A repeated-GC/buffer architecture approval gate
+
+### Authority and inspection
+
+The owner reports CI #47 passed all seven jobs, 61/61 suites each, locking the
+Stage 1 foundation. This entry attributes hosted status to the owner; no remote
+verification or CI dispatch was performed. Reviewed the complete owner-supplied
+Large-Array Storage Architecture Review, proposal Section 22 and the actual
+include/void/{heap,runtime}.hpp, src/runtime/{heap,coordination,abi,reload}.cpp,
+relevant LLVM root/staging lowering, and existing coordination/failure/invariant
+tests. This is the new large-array report, not only the older hybrid verifier report.
+
+Confirmed flat reference metadata, linear checked-store lookup, whole-payload
+zeroing under Runtime's allocation lock, prepared-payload validation/copy under
+construct_into's lock, registered exact Frame output requirements, NativeSafe frozen
+root chains, stop-the-world mark-before-sweep with rollback, transactional runtime
+metadata and code-generation lease lifetime. The existing failure test injects new
+failures during graph work; invariant subprocesses require termination rather than
+resuming after corrupt roots. These are design inputs, not newly reproduced defects.
+
+### Proposed contracts for approval
+
+Added ARRAYS_PROPOSAL.md Section 23, with exact proposed C++ API fragments, physical
+metadata/payload layout, ownership/state invariants, negative tests and review steps.
+Updated the proposal status and Section 22 to record Stage 1's owner-confirmed lock,
+retaining original local evidence and the historical Section 21 audit.
+
+- Runtime-owned immutable, compact element DAGs admitted transactionally into the
+  existing catalog; per-allocation capacity layouts retain them without expanding
+  repeated references or permanently interning every growth capacity. Domain,
+  nominal/capability identity, geometry and checked arithmetic are explicit.
+- One cursor/seek interpretation serves validation, tracing, stores and prepared
+  references. Legacy flat offsets adapt into it; ordinary/string accepted layouts
+  and existing unaligned memcpy reference offsets remain supported. Buffer/flat/
+  string/nominal descriptor variants cannot be mixed as an unchecked union.
+- Reserve and zero raw buffer storage through the same Heap while NativeSafe,
+  before it contains any managed reference or GC identity. Reenter Managed and
+  adopt the fully zeroed storage with an immediate precise private root, then
+  populate in bounded chunks. This avoids payload-sized stack staging and a
+  mutable uninitialized-tail tracing frontier. Raw allocation/zeroing can still
+  have OS latency; it does not hold the collector-required mutex.
+- Builders own small existing Frame roots, a complete prefix and in-element event
+  cursor. Trace the full immutable capacity; spare/private nulls are not complete
+  required-reference values. Child objects must be complete before linking.
+  Nonfallible finish seals the prefix and publishes the output root without a
+  safepoint, allocation, user callback or whole-payload copy. Failure preserves the
+  old output and leaves only unreachable private garbage or a released reservation.
+- Chunked source copying requires an independently rooted read lease; every runtime
+  buffer writer honors it. BufferBusy is an explicit internal conflict before any
+  write, with no waiting Managed across a safepoint. Readonly syntax alone does not
+  prove alias stability; no public concurrency semantics or source borrow optimizer
+  is introduced. Scalars and inline value bytes copy independently; managed/string/
+  interface referents retain identity and capabilities. Owned-fixed/growable copy
+  roles remain rejected until later representation/type-directed-copy review.
+- Checked failure taxonomy, deterministic allocation-site sweeps, complete GC mark
+  rollback, metadata/generation lifetime and legacy ABI preservation are specified.
+  Reference-free buffers avoid payload scanning; reference-rich marking is still
+  stop-the-world and proportional to actual pointer locations. No concurrent tracer,
+  write-barrier system, allocator, size cutoff or numerical chunk default is chosen.
+
+The proposed sequence is 2B schema/cursor proof, 2C private rooted byte buffers,
+2D typed reference construction, 2E leased copying, then 2F local/native acceptance
+and review. Approval of one step does not activate a later stage. New C++ buffer
+services are not a source array ABI; all native-array, production certification,
+ORC/LSP and ABI/origin/CFG gates remain. Future growable publication/versioning and
+owned fixed-handle layouts remain separately reviewed obligations.
+
+### Verification and stop
+
+Documentation-only inspection and git diff --check; no builds, runtime tests or
+benchmark experiments were run for this architecture checkpoint. Section 23's
+acceptance table is a required future test plan, not passing-test evidence. It
+includes independent small-layout oracles, millions-of-elements metadata counts,
+all geometry/representation failures, private escape/incomplete publication,
+collection at preparation boundaries, every allocation-site failure, lease/alias
+conflicts, nested copy roles, retired metadata and 1 MiB/native platform checks.
+Only ARRAYS_PROPOSAL.md and WORK_LOG.md change. No runtime/compiler code, ordinary
+CI, research verifier, commits, pushes, branches or remote modifications. Stop for
+owner/wrench approval before implementing any Stage 2 runtime change.
+
+Design review refinements: zero_elements means explicit zero data, not execution
+of language defaults. A field's nonzero default or user constructor cannot be
+inferred from a physical GC schema; the Stage 1 recipe/source-construction proof
+is a separate Stage 3 requirement. Failed builder operations poison the private
+transaction and retry starts a fresh builder. Legacy buffer allocation/prepared
+entry points cannot bypass the builder. Native storage facts stay LLVM-free;
+lowering_layout_key compatibility is not a claim of verified LLVM emission identity.
+
+Final documentation checks passed: whitespace, balanced new-section code fences,
+new-section no-em-dash style, and an exact changed-file check restricted to the
+two requested documents. Stop for owner/wrench architecture approval.
+
+
+## 15 October 2026: Stage 2B compact GC schemas and shared cursor
+
+### Authority and implementation boundary
+
+Owner/wrench approved Section 23's Stage 2A direction and retained gates, authorizing
+only Section 23.9 step 2B. Stage 1 remains owner-locked by CI #47, 7/7 jobs with
+61/61 suites. No remote verification, dispatch or remote modification was performed.
+Reviewed the complete supplied large-array report and actual transactional catalog,
+Heap allocation/store/mark rollback, prepared construction, precise roots, interface
+witness and invariant/failure fixtures. Stage 2A's documentation edits already
+existed in this working tree and are retained with the subsequent approval status.
+
+Added include/void/gc_schema.hpp and src/runtime/gc_schema.cpp. ElementSchemaSpec
+uses native storage-domain facts and a discriminated topological DAG with scalar,
+byte, managed/string/interface, record and repeat nodes. Owned-fixed/growable roles
+remain explicit rejections. Checked admission proves finite topology, root coverage,
+alignment, field identity/disjointness/containment, stride/base, i64 count and exact
+representable repeated extent without enumerating elements. Duplicate structural
+nodes share metadata; canonical keys never recursively embed child text. Iterative
+comparison includes full shape, nominal/nullable/capability/domain/layout identity,
+with no equal-size shortcut. Reordered topological node numbering is compatible.
+All graph traversal work/storage depends on distinct nodes/edges or actual emitted
+reference events, rather than a flat per-occurrence descriptor vector.
+
+Extended Runtime's existing copy/validate/publish catalog with a three-input
+admit_metadata overload and schema-only wrapper, canonical-handle lookup and exact
+Runtime membership validation. Nominal, witness and schema additions commit together
+or not at all. Deep-owned immutable metadata retains nominal/witness dependencies
+without retaining Runtime, executable code, LLVM objects or generation leases.
+Caller specs can be destroyed; retained cursors remain geometry-only after Runtime
+retirement. Foreign handles reject even when their textual identities match.
+Concurrent catalog admissions use the existing snapshot comparison/retry protocol.
+
+One ReferenceCursor streams object-word events in physical order. Byte lookup and
+logical field/index path lookup descend the same validated nodes; interface witness
+words, padding, pointer interiors and invalid selections do not become references.
+Cursor reset reserves a depth-bounded explicit work stack before changing state;
+next allocates nothing. Reference-free repeats are skipped without element visits.
+Zero-size logical fields do not shadow containing nonzero fields in physical lookup.
+Legacy flat layouts adapt into the same service with alignment-one reference leaves,
+preserving existing unaligned memcpy reference offsets and sorted normalization.
+Heap allocation validation, tracing, checked stores, nominal layout normalization
+and construct_into prepared-reference validation now consume this shared geometry.
+The original object allocation/zero/copy/output-root publication sequence, ordinary/
+string semantics, Frame/Slot/Handle ABI and collector mark-before-sweep/rollback
+remain. Collector pending-object queue/mark ordering is deliberately unchanged.
+
+### Focused regressions and measurements
+
+Added tests/runtime/schemas.cpp and the gc_schemas CTest target, retaining all 61
+prior suites for 62 total. Independent nested-layout and every-byte legacy oracles
+compare cursor, byte lookup, logical selections and accepted stores; real unaligned
+Heap and prepared Runtime objects survive collection. Interface tests distinguish
+the object and witness words. Positive cases include all scalar storage domains,
+empty repeats, zero-footprint children, duplicate sharing, alternate node numbering,
+2,048-level finite shapes, detached metadata lifetime and two concurrent catalog
+writers. Forged domains, identities, targets, recursive/forward/unused nodes,
+reserved roles, overlap, duplicate logical IDs, misalignment/stride, arithmetic
+boundaries, incompatible schema identity and foreign handles reject.
+
+A million-reference repeated shape retains two nodes/one edge/depth two, with no
+GC payload allocation. Independently seeded admission requested 1,886 metadata
+allocation bytes for one reference and 1,917 for a million; this measures requested
+bytes through the fixture's new hook, not RSS. Streaming a million events after
+reset requests zero allocations. A billion-byte reference-free repeated shape
+is skipped. A measured 48-allocation-site sweep covers every allocation ordinal in
+a successful combined nominal/witness/schema transaction, verifies no partial catalog
+publication and retries successfully. Separate incompatible-readmission and cursor
+reserve-failure regressions preserve prior metadata/traversal state.
+
+### Local validation
+
+- LLVM 19.1.7, Linux x64, full Debug rebuild and CTest: 62/62 passed, 120.66 s.
+- Full Release rebuild and CTest: 62/62 passed, 56.64 s.
+- Rebuilt the final expanded schema regression and ran it again under 1 MiB Debug
+  and Release stacks; both passed with identical compactness/48-site results.
+- Explicit 1 MiB Debug/Release CTest selection: 9/9 each, 12.66 s / 3.95 s:
+  gc_schemas, runtime_coordination, runtime_generated, runtime_callbacks,
+  runtime_failures, runtime_aot_normal, runtime_aot_optimized, strings_source and
+  interfaces_source. This includes generated JIT and independently linked native
+  AOT comparisons. Existing mark-work failure/recovery reports eight injected
+  failure positions and preserves every assertion.
+- Full strict ASan/UBSan RelWithDebInfo rebuild and CTest: 62/62 passed, 146.99 s,
+  including the final schema fixture and unchanged research/invariant/crash-capture
+  suites. ASAN_OPTIONS=detect_leaks=1:abort_on_error=1 and
+  UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1 remained enabled for generated
+  build steps and tests. No sanitizer finding was reported.
+- git diff --check, latest-section style/fence checks and exact changed-file audit
+  passed. No Windows/macOS native execution is claimed.
+
+The first sanitizer build's generated-code step failed because LeakSanitizer cannot
+run under the desktop ptrace sandbox. The log states that restriction explicitly;
+no runtime diagnostic or test assertion was suppressed. Rebuilt outside that sandbox
+with detect_leaks=1:abort_on_error=1 and UBSan halt_on_error=1:print_stacktrace=1.
+Build logs also contain the existing SDK ciso646 C++20 warning; no new schema-source
+warning was observed in Debug/Release.
+
+### Retained gates and limitations
+
+Schemas are metadata only: no buffer kind/allocation, PendingBuffer, builder,
+reservation, source arrays, new ABI, GC publication state or production certificate
+is introduced. DAG admission is not permission to allocate payloads through legacy
+Heap entry points. Native domains are host-derived, while lowering_layout_key is
+compatibility data and not a proof of future LLVM/native emission correspondence.
+Over-aligned geometry is representable but matching allocation/deletion remains a
+Stage 2C proof. The catalog has no standalone interface declaration registry, so
+an interface schema conservatively requires a prepared/admitted matching witness;
+future typed buffer operations must still validate exact witness membership and
+live value contracts. No existing readonly/source/reload contract is inferred from
+geometry alone. Reserved owned/growable copies, source defaults, completeness,
+read leases, private publication and queue optimization remain later-stage work.
+
+ARRAYS_PROPOSAL.md Section 24 records the implementation, APIs, evidence and gates.
+No compiler/backend/reload code, research verifier, 64 KiB experiments or CI workflow
+changes. No commits, pushes, branches or remote mutations. Stop for owner/wrench
+review before Stage 2C.
