@@ -1,0 +1,7 @@
+func entry(value: i32) -> i32:
+    var numbers: [i32, 2] = [5, 7]
+    if value < 0:
+        return numbers[18446744073709551615 as u64]
+    if value > 0:
+        return numbers[-9223372036854775808 as i64]
+    return numbers[-1 as i8] + numbers[-1 as i16] + numbers[-1 as i32] + numbers[-1 as i64] + numbers[1 as u8] + numbers[1 as u16] + numbers[1 as u32] + numbers[1 as u64]

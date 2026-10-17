@@ -47,6 +47,19 @@ cmake --build build/debug --parallel 4
 ctest --test-dir build/debug --output-on-failure
 ```
 
+Machine-code ownership certification is optional research. Ordinary JIT/AOT
+compilation uses typed IR validation, LLVM verification and the shared lowerer;
+it does not require allocation lineage or final-byte certificates. To build the
+existing experiments, configure with `-DVOID_LLVM_RESEARCH=ON`, build
+`void_arrays_storage_audit`, and run
+`ctest --test-dir build/debug -L research --output-on-failure`. Research checker rejections are not LLVM correctness
+failures or production compilation blockers. The research-only 64 KiB storage
+budget is not a production limit.
+The optional [private fixed-call experiment](tests/research/call_envelope/README.md)
+uses direct LLVM arguments and Runtime copy helpers, without envelope
+permissions, store-identity protocols or a linked-byte certificate gate. It does
+not enable native source arrays.
+
 Verify your distribution actually provides 19.1.7. CMake rejects different SDK
 versions. LLVM's development package depends on other development libraries;
 keep them installed. In particular, missing `libzstd-dev` prevents the installed
@@ -64,6 +77,11 @@ The complete official Linux archive has RTTI disabled; ASan/UBSan remain enabled
 but Clang's RTTI-dependent vptr check is unavailable in that ABI. A complete
 RTTI-enabled LLVM 19.1.7 SDK supplies the separate vptr validation configuration.
 See [the CI sanitizer investigation and coverage limits](docs/CI_SANITIZER_ABI.md).
+
+Numeric fixed arrays now compile and execute through the ordinary JIT/AOT path,
+including copies, checked mutation, function arguments/returns and heap-backed
+megabyte payloads. See [numeric fixed arrays](docs/FIXED_ARRAYS.md) and
+[working source examples](examples/fixed_arrays/main.void).
 
 ## Compile and execute real source
 

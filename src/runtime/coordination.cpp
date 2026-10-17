@@ -155,15 +155,14 @@ Runtime::Collection Runtime::collect(std::chrono::milliseconds timeout) {
     changed_.notify_all();
     return result;
 }
-void Runtime::require_output(void** slot) const {
+Runtime::Frame* Runtime::require_output(void** slot) const {
     require_managed();
     if (!slot) throw std::invalid_argument("null allocation output");
-    bool rooted = false;
     for (auto* f = thread().frames; f; f = f->previous_)
         for (std::size_t i = 0; i < f->count_; ++i)
             for (std::size_t j = 0; j < f->slots_[i].count; ++j)
-                if (static_cast<const char*>(f->slots_[i].storage) + f->slots_[i].offsets[j] == reinterpret_cast<const char*>(slot)) rooted = true;
-    if (!rooted) throw std::invalid_argument("allocation output is not a registered precise root");
+                if (static_cast<const char*>(f->slots_[i].storage) + f->slots_[i].offsets[j] == reinterpret_cast<const char*>(slot)) return f;
+    throw std::invalid_argument("allocation output is not a registered precise root");
 }
 std::string_view Runtime::string_bytes(void* object) const {
     require_managed();

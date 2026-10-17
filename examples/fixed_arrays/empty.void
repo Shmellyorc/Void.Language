@@ -1,0 +1,9 @@
+func echo(values: [u64, 0]) -> [u64, 0]:
+    return values
+
+func entry(value: i32) -> i32:
+    var zero: [u64, 0] = []
+    var copy = echo(zero)
+    if value < 0:
+        return copy[0] as i32
+    return value

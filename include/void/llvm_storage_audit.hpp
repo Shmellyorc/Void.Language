@@ -6,6 +6,9 @@
 #include <vector>
 namespace llvm { class Module; class Function; class AllocaInst; class DataLayout; }
 namespace vd::llvm_backend {
+// Optional research API, implemented only with VOID_LLVM_RESEARCH=ON.
+// Inventory identity, lineage and final-byte certificates are experiment
+// requirements, never acceptance criteria for ordinary JIT/AOT compilation.
 // Lowering declares every home by identity and purpose. Extents are read from
 // the actual LLVM allocation and selected target, never supplied as estimates.
 enum class HomeKind { value, argument, result, copy, root, frame, slots, staging, native_guard, cli_parse, cli_failure };
@@ -44,7 +47,7 @@ struct FixedCallLayout {
     std::vector<FixedCallOperand> operands;
     bool result_is_home;
 };
-// Owns the exact TargetMachine and options used for both freeze and emission.
+// Research emitter: owns the TargetMachine used for freeze and certification.
 // No ORC/LSP integration or source native-array permission is implied.
 class AotObjectEmitter {
     struct Impl;

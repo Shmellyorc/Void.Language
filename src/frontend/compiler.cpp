@@ -2690,7 +2690,10 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
     module.interface_bindings=units.at(entry)->member_catalog->interface_bindings;
     module.strings=std::move(strings.values);
     if(!module.strings.empty()) module.coordinated=true;
-    auto trace_string=[&](Type t) { if(ir::reference_paths(t,true)!=ir::reference_paths(t)) module.coordinated=true; };
+    std::function<void(Type)> trace_string=[&](Type t) {
+        if(ir::array_type(t) || ir::reference_paths(t,true)!=ir::reference_paths(t)) module.coordinated=true;
+        if(t.kind==Type::aggregate) for(const auto& field:t.definition->fields) trace_string(field.type);
+    };
     for(const auto& f:module.functions) { trace_string(f.result); for(auto t:f.parameters) trace_string(t); for(auto t:f.locals) trace_string(t); }
     for(auto t:module.nominal_types) if(t.definition) trace_string(Type(t.definition));
     ir::validate(module); return module;

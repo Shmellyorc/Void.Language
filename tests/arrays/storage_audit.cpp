@@ -261,7 +261,7 @@ void fixtures(const std::filesystem::path &out, bool optimized) {
         check(j.getAsObject()->getObject("functions")->getObject("sample")->get("C")->kind()==llvm::json::Value::Null,"array-free storage falsely certified");
         std::filesystem::remove(path);
     }
-    // Confirmed activation blockers: preserve their rejection rather than
+    // Research checker limitations: preserve their rejection rather than
     // exempt ordinary ABI homes or credit guessed physical extents.
     if(!optimized) {
         const std::string bodies[]={
@@ -503,9 +503,13 @@ int main(int argc,char **argv) {
             {std::ofstream owner(object);owner<<"existing owner object";}
             rejects([&]{emit_aot_storage_proof(p.module,object,true,object.string()+".certificate.json");},"final encoded calls differ");
             check(read(object)=="existing owner object","unproved tail encoding damaged destination");std::filesystem::remove(object);
+            emit_object(p.module,out/"ordinary-virtual-tail-O2.o",true,true);
+            Jit jit;auto code=jit.compile(p.module,p.module.entry_symbol,true);
+            check(code->invoke(10)==1110,"encoded-call checker rejection blocked correct optimized JIT");
         }
-        // The corpus exposes existing raw-aggregate ABI objects, independently
-        // of future array lowering. Never certify their ownership by guessing.
+        // Valid production programs can exceed this research checker's ability
+        // to recover ABI home ownership. A rejection must not govern normal
+        // compilation. The CLI suite also links and executes these exact files.
         if(linux_x64) for(bool optimized:{false,true}) for(const auto *file:{"main","numeric"}) {
             auto p=compile_project(std::filesystem::path(argv[2])/"examples/value_structs"/(std::string(file)+".void"));
             auto object=out/(std::string("aggregate-")+file+(optimized?"-O2.o":"-normal.o"));
@@ -520,6 +524,12 @@ int main(int argc,char **argv) {
                 unmatched|=!f->getArray("unmatched_homes")->empty();
             }
             check(incoming,"actual aggregate incoming evidence lost");
+            const auto ordinary=out/(std::string("ordinary-aggregate-")+file+(optimized?"-O2.o":"-normal.o"));
+            emit_object(p.module,ordinary,optimized,true);
+            check(std::filesystem::file_size(ordinary)>0,"research rejection blocked ordinary AOT");
+            check(!std::filesystem::exists(ordinary.string()+".certificate.json"),"ordinary AOT requested research evidence");
+            Jit jit;auto code=jit.compile(p.module,p.module.entry_symbol,optimized);
+            check(code->invoke(10)==(std::string(file)=="main"?46:15),"research rejection blocked correct JIT execution");
             if(!optimized && std::string(file)=="numeric") check(unmatched,"actual ABI-created unmatched home evidence lost");
             std::filesystem::remove(object);
         }
@@ -532,8 +542,8 @@ int main(int argc,char **argv) {
         auto source=analyze_source({"arrays.void","func entry(x: i32) -> i32:\n    var values: [i32, 2] = [1, 2]\n    return values[0]\n"});
         check(source.succeeded(),"array analysis rejected");
         auto object=out/"source-array.o";
-        rejects([&]{emit_object(source.program->lower(),object,true,true);},"native lowering requires P23-2");
-        check(!std::filesystem::exists(object),"source arrays executed natively");
-        std::cout<<"AOT storage service fixtures passed (normal/O2); source arrays remain blocked\n";
+        emit_object(source.program->lower(),object,true,true);
+        check(std::filesystem::file_size(object)>0,"ordinary source-array native emission failed");
+        std::cout<<"AOT storage service fixtures passed (normal/O2); ordinary source arrays emit without research certification\n";
     } catch(const std::exception &e) {std::cerr<<e.what()<<'\n';return 1;}
 }

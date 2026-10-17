@@ -107,6 +107,11 @@ void* Heap::adopt_buffer(PendingBuffer& pending,std::shared_ptr<const BufferStat
     auto* data=pending.data_;
     auto [it,added]=objects_.emplace(data,Object{std::move(map),std::move(state),TypeLayout::Kind::buffer});
     (void)it;if(!added) throw std::logic_error("duplicate buffer storage");
+    const auto base=reinterpret_cast<std::uintptr_t>(data);
+    const auto tail=pending.layout_->bytes()-1;
+    const auto high=tail>std::numeric_limits<std::uintptr_t>::max()-base ? std::numeric_limits<std::uintptr_t>::max() : base+tail;
+    if(!buffer_objects_) {buffer_low_=base;buffer_high_=high;}
+    else {buffer_low_=std::min(buffer_low_,base);buffer_high_=std::max(buffer_high_,high);}
     ++private_buffers_;++buffer_objects_;pending.data_=nullptr;return data;
 }
 const Heap::BufferState& Heap::buffer_state(void* object) const {
@@ -167,6 +172,9 @@ void Heap::remove_root(void** slot) {
 void Heap::validate_output_address(void** slot) const {
     if(!buffer_objects_)return;
     const auto address=reinterpret_cast<std::uintptr_t>(slot);
+    // Pointer-sized writes beginning just below the lowest buffer may overlap.
+    // Use subtraction to avoid wrapping address+sizeof(void*) near UINTPTR_MAX.
+    if(address>buffer_high_ || (address<buffer_low_ && buffer_low_-address>=sizeof(void*)))return;
     for(const auto& [payload,object]:objects_)if(object.kind==TypeLayout::Kind::buffer) {
         const auto& state=*static_cast<const BufferState*>(object.metadata.get());
         const auto base=reinterpret_cast<std::uintptr_t>(payload);

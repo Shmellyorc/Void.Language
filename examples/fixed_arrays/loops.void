@@ -1,0 +1,17 @@
+func positive(value: i32) -> bool:
+    return value >= 0
+
+func entry(value: i32) -> i32:
+    var numbers: [i32, 2] = [0, 2]
+    var flags: [bool, 2] = [positive(value), positive(value) and positive(value)]
+    flags[0] = positive(value) and positive(value + 1)
+    var index = 0
+    for index < value:
+        numbers[0] += index
+        index += 1
+        if index == 3:
+            continue
+        numbers[1] += 1
+    if flags[0] != (value >= 0) or flags[1] != (value >= 0):
+        return -1000
+    return numbers[0] + numbers[1]

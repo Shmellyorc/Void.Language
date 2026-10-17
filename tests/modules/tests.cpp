@@ -1,5 +1,8 @@
 #include "void/frontend.hpp"
 #include "void/backend.hpp"
+#include "void/runtime.hpp"
+#include <llvm/Object/ObjectFile.h>
+#include <llvm/Support/Error.h>
 #include <fstream>
 #include <iostream>
 #include <set>
@@ -48,6 +51,56 @@ struct Fixture {
     }
 };
 const std::string entry_start = "func entry(x: i32) -> i32:\n    return ";
+void private_linkage(const fs::path& output) {
+    Fixture f{output / "private linkage"};
+    const std::string helper="private func helper(x: i32) -> i32:\n    return x + 2\n";
+    f.file("lib.void", "private func snapshot(values: [i32, 3], x: i32) -> [i32, 3]:\n    values[1] = x\n    return values\npublic func imported(x: i32) -> i32:\n    var original: [i32, 3] = [10, 20, 30]\n    var changed = snapshot(original, x)\n    return changed[0] + changed[1] + original[1]\ninternal func project(x: i32) -> i32:\n    return x + 3\n");
+    const auto main=std::string("use \"/lib.void\" as library\n")+helper+
+        "func entry(x: i32) -> i32:\n    return library.imported(helper(x)) + library.project(x)\n";
+    f.file("main.void",main);
+    f.run({{0,35},{7,49},{-1,33}},5);
+    auto original=f.compile();
+    vd::Jit jit;
+    for(bool optimized:{false,true}) {
+        auto runtime=std::make_shared<vd::Runtime>(1);
+        // The selected host entry need not be the module's default entry, and
+        // explicit selection of a private function must remain lookup-visible.
+        auto selected=jit.compile(original.module,"/main.void::helper",optimized,{},runtime);
+        require(selected->invoke(7)==9,"private selected JIT entry is not resolvable");
+        auto imported=jit.compile(original.module,"/lib.void::imported",optimized,{},runtime);
+        require(imported->invoke(7)==37,"imported JIT entry is not resolvable");
+        auto old=jit.compile(original.module,original.module.entry_symbol,optimized,{},runtime);
+        vd::ReloadSlot slot(old);
+        auto updated=main;updated.replace(updated.find("x + 2"),5,"x + 5");
+        f.file("main.void",updated);auto replacement=f.compile();
+        require(slot.replace(jit.compile(replacement.module,replacement.module.entry_symbol,optimized,{},runtime)),"private helper replacement rejected");
+        require(slot.invoke(7)==52 && old->invoke(7)==49,"private helper generation identity changed");
+        f.file("main.void",main);
+        {vd::Runtime::Attachment a(*runtime);vd::Runtime::Managed m(*runtime);
+            require(runtime->collect()==vd::Runtime::Collection::completed && !runtime->snapshot().objects,"private array calls retained temporary roots");}
+        const auto mode=optimized ? "optimized" : "normal";
+        vd::emit_object(original.module,f.root/(std::string(mode)+".o"),optimized,true);
+        vd::emit_runtime_object(original.module,f.root/(std::string(mode)+"-library.o"),optimized);
+        auto object=llvm::object::ObjectFile::createObjectFile((f.root/(std::string(mode)+"-library.o")).string());
+        if(!object)throw std::runtime_error(llvm::toString(object.takeError()));
+        for(auto [identity,external]:{std::pair{"/main.void::helper",false},{"/lib.void::snapshot",false},
+                {"/main.void::entry",true},{"/lib.void::imported",true},{"/lib.void::project",true}}) {
+            std::string native="__vd_";const char* hex="0123456789abcdef";
+            for(unsigned char c:std::string(identity)) {native+=hex[c>>4];native+=hex[c&15];}
+            bool found=false;
+            for(const auto& symbol:object->getBinary()->symbols()) {
+                auto name=symbol.getName();if(!name)throw std::runtime_error(llvm::toString(name.takeError()));
+                // Object platforms may prepend their normal global prefix.
+                if(!name->ends_with(native))continue;
+                auto flags=symbol.getFlags();if(!flags)throw std::runtime_error(llvm::toString(flags.takeError()));
+                require(bool(*flags & llvm::object::BasicSymbolRef::SF_Global)==external,"wrong native function linkage");
+                found=true;
+            }
+            require(found || (!external && optimized),"required native symbol missing");
+        }
+    }
+    require(jit.live_generations()==0,"private linkage generation leaked");
+}
 void positives(const fs::path& output) {
     Fixture f{output / "positive project"};
     f.file("lib/core.void", "private func hidden(x: i32) -> i32:\n    return x + 2\npublic func update(x: i32) -> i32:\n    return hidden(x)\n");
@@ -226,6 +279,7 @@ void constants(const fs::path& output) {
 
 }
 void module_tests(const std::filesystem::path& output) {
+    private_linkage(output);
     positives(output); negatives(output); constants(output);
     std::cout << "Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed\n";
 }

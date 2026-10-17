@@ -22,11 +22,19 @@ bool vd_string_equal(void*, void*, vd::RuntimeFailure*) noexcept;
 // admitted layout/explicit work-quota values for the duration of a call.
 // No transaction object or C++ exception crosses a generated frame. Literal
 // words must be stable non-managed storage, as in Runtime::fixed_literal_into.
+// Check a static scalar signature at the embedding boundary. Data helpers
+// already validate registered roots, buffer layout and publication themselves.
+void vd_fixed_validate_layout(const vd::BufferLayoutRef*,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
 void vd_fixed_default(void**,const vd::BufferLayoutRef*,const vd::BufferWorkQuota*,vd::RuntimeFailure*) noexcept;
 void vd_fixed_literal(void**,const vd::BufferLayoutRef*,const std::uint64_t*,std::size_t,const vd::BufferWorkQuota*,vd::RuntimeFailure*) noexcept;
 void vd_fixed_copy(void**,void**,const vd::BufferLayoutRef*,const vd::BufferWorkQuota*,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_fixed_read(void**,const vd::BufferLayoutRef*,std::uint64_t,vd::RuntimeFailure*) noexcept;
 void vd_fixed_write(void**,const vd::BufferLayoutRef*,std::uint64_t,std::uint64_t,vd::RuntimeFailure*) noexcept;
+// Source numeric fixed arrays use Runtime buffers and ordinary scalar/pointer ABI.
+void vd_array_default(void**,unsigned,std::uint64_t,std::uint64_t,vd::RuntimeFailure*) noexcept;
+void vd_array_copy(void**,void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
+std::uint64_t vd_array_read(void**,std::uint64_t,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
+void vd_array_write(void**,std::uint64_t,std::uint64_t,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 void vd_gc_frame_enter(void*, const vd::Runtime::Slot*, std::size_t) noexcept;
 void vd_gc_frame_leave(void*) noexcept;
 void vd_gc_poll() noexcept;

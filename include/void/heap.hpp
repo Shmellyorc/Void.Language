@@ -96,6 +96,9 @@ private:
     std::unordered_map<void*, Object> objects_;
     std::vector<void**> roots_;
     std::size_t private_buffers_=0,buffer_objects_=0;
+    // Conservative inclusive address bounds, widened on adoption. Stale bounds
+    // after collection only cause extra scanning; no per-object index is needed.
+    std::uintptr_t buffer_low_=0,buffer_high_=0;
     void destroy(void*,const Object&) noexcept;
 };
 class Root {

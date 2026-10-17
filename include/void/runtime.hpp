@@ -63,6 +63,9 @@ public:
     void fixed_copy_into(void**,RegisteredRootWord,const BufferLayoutRef&,BufferWorkQuota);
     std::uint64_t fixed_scalar(RegisteredRootWord,const BufferLayoutRef&,std::uint64_t index) const;
     void fixed_store_scalar(RegisteredRootWord,const BufferLayoutRef&,std::uint64_t index,std::uint64_t bits);
+    BufferLayoutRef fixed_scalar_layout(ScalarEncoding,std::uint64_t extent);
+    BufferLayoutRef fixed_scalar_layout(RegisteredRootWord,ScalarEncoding,std::uint64_t extent);
+    void validate_fixed_scalar_layout(const BufferLayoutRef&,ScalarEncoding,std::uint64_t extent) const;
     const InterfaceWitness* witness(std::string_view) const;
     std::int64_t interface_binding(void* object,const void* witness,std::span<const char* const> keys) const;
     std::shared_ptr<const NominalDescriptor> descriptor(std::string_view) const;
@@ -88,15 +91,16 @@ private:
     static thread_local Thread* current_thread_;
     Thread& thread() const;
     void require_managed() const;
-    void require_output(void**) const;
+    Frame* require_output(void**) const;
     void string_parts_into(void**,std::string_view,std::string_view);
     void validate_descriptor(const TypeLayout&) const; // Caller holds mutex_.
     void validate_buffer_layout(const BufferLayoutRef&) const; // mutex_ held
+    ElementSchemaRef fixed_scalar_schema(ScalarEncoding);
     void validate_fixed_layout(const BufferLayoutRef&) const; // mutex_ held
     void validate_fixed_output(void**,const BufferLayoutRef&) const;
     void store_scalar(RegisteredRootWord,const BufferLayoutRef&,std::uint64_t,
                       std::span<const SchemaStep>,std::uint64_t,bool fixed);
-    void require_buffer_output(void**) const;
+    Frame* require_buffer_output(void**) const;
     void* reference_source(const RegisteredRootWord&) const; // mutex_ held
     void park(Thread&, std::unique_lock<std::mutex>&);
     void enter(Thread&);

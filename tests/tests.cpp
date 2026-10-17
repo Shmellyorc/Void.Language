@@ -144,6 +144,18 @@ void jit() {
         auto code = engine.compile(vd::ir::architecture_proof(), "entry", optimized);
         require(code->invoke(0) == 42 && code->invoke(10) == 52 && code->invoke(-1) == 7, "JIT branch/call result");
     }
+    for(bool optimized:{false,true}) {
+        vd::Jit linked;
+        auto provider=linked.compile(vd::ir::architecture_proof(40),"entry",optimized);
+        // A separate LLVM module imports an existing non-entry native export.
+        // Keep the provider lease alive for the consumer's execution.
+        vd::ir::Function caller{"entry",{"cross-module.void",1,1},{{
+            {{vd::ir::Op::argument},{vd::ir::Op::call,0,0,0,"calculate__v1"}},
+            {vd::ir::Terminator::Kind::return_value,1}}}};
+        vd::ir::Module consumer{"/consumer.void",{"calculate__v1"},{caller}};
+        auto code=linked.compile(consumer,"entry",optimized);
+        require(code->invoke(2)==42,"cross-LLVM-module export resolution failed");
+    }
     require(engine.live_generations() == 0, "JIT code not retired");
     rejects([&] { engine.compile(vd::ir::architecture_proof(), "missing"); });
     // A lease owns the execution session even after its compiler host is destroyed.

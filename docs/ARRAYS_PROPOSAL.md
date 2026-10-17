@@ -1,5 +1,17 @@
 # Phase 23 proposal: typed arrays, indexing and iteration
 
+**Current implementation update, 17 October 2026 (Order 3):** Numeric/bool fixed
+arrays now execute from ordinary `.void` source through normal/O2 LLVM JIT and
+linked AOT. Copies, calls/returns, checked indexing/mutation and heap-backed
+megabyte payloads use the existing Runtime. Orders 1 and 2 removed mandatory
+research certificates and envelope authorization from this path. See
+[FIXED_ARRAYS.md](FIXED_ARRAYS.md) and the Order 3 WORK_LOG entry for supported
+behavior, tests and limitations. Growable/nested/reference-element arrays and
+array-specific iteration remain deferred. The older checkpoint/status paragraphs
+below are historical; their source-array/research gates do not override the
+owner's Order 3 authorization or this implemented numeric slice.
+
+
 **Current status, 16 October 2026: Stage 3A is owner/Wrench LOCKED at
 `44fc8b6`, CI #58, all seven hosted jobs passed with 63/63 suites each.
 Stage 2F remains LOCKED at `d872889`, CI #57. Section 30's Stage 3 architecture
@@ -5261,3 +5273,220 @@ document record the owner's starting documentation. The Language Bible later
 changed outside this checkpoint's edits; its latest replacement was preserved
 without restoration or formatting, with both hash observations recorded. Other
 unrelated documents remain protected by the initial hashes.
+
+
+## 34. Stage 3B private call-envelope integration checkpoint (17 October 2026)
+
+Research-only follow-on to the closed envelope pilot, against accepted baseline
+`7abc6249a5e1828fd49232a868dcc300b13b7894`. This checkpoint does not approve a
+production/private ABI replacement, public JIT/AOT activation or Stage 3C.
+
+The realistic caller resolves the observed O2 tail problem by checking failure
+and consuming/processing the returned value. No dummy operation, tail attribute,
+global optimizer restriction, storage-auditor relaxation or LLVM patch is used.
+The revised Clang-produced boundary now certifies in both normal and O2.
+Historical rejection evidence is retained in the research pilot record.
+
+A new explicit `emit_private_envelope_research` test entry reuses `lower()` and
+`fixed_call_layout`. It admits one validated owned-IR body only: eight identical
+nonempty fixed-u64-array parameters, no locals, return argument 0. Frontend
+analysis supplies canonical types; the fixture driver constructs the owned IR.
+This is actual VOID lowerer-generated LLVM, not native compilation of a VOID
+source-array program, nor general fixed-array instruction lowering. Ordinary
+source/JIT/AOT entrypoints never request this branch and retain their rejection.
+The new POD definitions describe only the research envelope/context/identity.
+
+The generated caller registers eight null-initialized pointer homes with real
+Slots/Frame, validates the closed host context, clones each independent snapshot
+before later source effects, constructs a bounded envelope and passes one pointer.
+Its callee validates exact registered homes and compiler-derived signature/profile
+identity, establishes its own real Slots/Frame before collection, and transactionally
+copies argument 0 into the caller result home. Every supported helper failure
+branches to cleanup. The caller checks failure and processes the successful
+result after returning. Saved registration tokens reject after both Frames leave.
+No payload-sized stack storage or inferred stack-position ownership is used.
+
+Unchanged machine/encoded verification accepts both compiler-generated profiles:
+
+| Generated function | Profile | P | F | R | E | A | C | Incoming / outgoing |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| callee | normal and O2 | 352 | 392 | 352 | 8 | 16 | 400 | 0 / 0 |
+| caller | normal | 464 | 552 | 464 | 8 | 16 | 560 | 0 / 0 |
+| caller | O2 | 464 | 536 | 464 | 8 | 16 | 544 | 0 / 0 |
+
+F is the report's frame field; C remains a research charge, not a new production
+64 KiB policy or a whole-executable stack bound. The original ten-pointer fixture
+is unchanged and still rejects four incoming ownership slots in each profile,
+with intact output sentinels. Raw Clang target-profile mismatch also remains a
+negative: its portable fixture input is adapted before freeze; the compiler's
+own generated input requires no such repair. Full provenance/table details are
+in `tests/research/call_envelope/README.md`.
+
+Focused Linux LLVM 19.1.7 evidence: 64 revised Clang-boundary and 48 compiler-
+generated-boundary case executions, including normal/O2 and actual 1 MiB stack
+runs. Only objects whose certified-delivery flag and exact SHA-256 match are
+linked/executed. Unsupported IR and missing-ownership negatives retain sentinels.
+The unchanged full storage-auditor fixture set passes, as do five rebuilt affected
+GC/runtime suites. Strict ASan/UBSan/leaks pass another 56 cases against sanitized
+C++ hooks/Runtime; the certified LLVM boundary objects themselves are not sanitizer-
+instrumented. No full six-configuration matrix or hosted CI was run.
+
+**Retained boundary:** semantic authority is the exact admitted owned IR,
+generated protocol and closed runtime fixture assertions. There is no independent
+final-byte ownership/root/failure certificate for all linked hook implementations
+or the executable. Generated cleanup is verified by token expiration; missing-
+cleanup fault injection remains in the separate Clang fixture. Exhaustive new-path
+allocation failure sweeps, arbitrary IR bodies, nested/managed elements, selected-
+place commits, general source lowering, ORC and other targets remain future work.
+No arbitrary incoming-ownership acceptance is introduced. Existing acceptance
+gates, initialization/value/readonly/GC contracts and production ABI remain binding.
+
+Evidence: `build/stage3b-envelope/integration-final`, `integration-san` and focused
+build/test logs in that parent directory. Source changes and review evidence are
+packaged in `build/stage3b-envelope/private-envelope-review.zip` and the adjacent
+unified patch. Stop for owner and Wrench review before production integration or
+Stage 3C.
+
+
+## 35. Stage 3B generated ownership authority checkpoint (17 October 2026)
+
+Research-only follow-on to Section 34. The preceding normal/O2 evidence and ZIP
+are preserved. No production/private ABI selection, public JIT/AOT gate, LLVM
+fork, production storage limit or Stage 3C activation changes.
+
+The test registry no longer authorizes entry. Generated code compares the exact
+compiler identity and ordered envelope/context/epoch fields against a compiler-
+constructed per-call CallBinding, validates actual caller-home membership in its
+named live Runtime Frame, establishes callee Slots/Frame before collection, and
+revalidates before result publication. CallBinding is local compiler storage,
+not a second runtime registry. Only existing Frame/Slot registration is used.
+Runtime also checks expected scalar encoding and extent against its already
+admitted schema, rejecting same-layout scalar substitution. Output-place checks
+allow an initially null registered result home without pretending it is a source.
+
+The compiler synthesizes and validates the wrapper with existing owned IR:
+independent fixed_snapshot operations, selected source mutations, and a call
+that consumes each fresh argument once. The original LLVM protocol check binds
+those IR snapshot values to the actual copy destination, Slot storage field,
+ordinal envelope/binding field and callee home/Slot. The selected return source
+comes from the validated callee argument instruction. Arguments 0 and 3 now both
+execute, returning distinct snapshots despite later source effects. Unsupported
+valid IR bodies remain rejected. This is not arbitrary caller IR or source-array
+lowering; the eight-u64-array wrapper remains deliberately narrow.
+
+The supplemental gate checks required operations after optimization and
+entry/cleanup dominance/postdominance. Twelve mutants per body/profile reject,
+including post-pipeline deletion of registration, cleanup, snapshots or handoff,
+and an entered path bypassing cleanup. It is not a replacement for the existing
+machine/encoded gates or a final-byte ownership certificate. Its JSON explicitly
+marks optimized store lineage and final-byte ownership as unproved.
+
+All four generated objects certify under pinned LLVM 19.1.7 on Linux x64:
+
+| Function | Profile | P | F | R | E | A | C | Incoming / outgoing |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| callee (arg 0 or 3) | normal | 352 | 408 | 352 | 8 | 16 | 416 | 0 / 0 |
+| callee (arg 0 or 3) | O2 | 352 | 424 | 352 | 8 | 16 | 432 | 0 / 0 |
+| caller | normal and O2 | 592 | 664 | 592 | 8 | 16 | 672 | 0 / 0 |
+
+No tail call is observed. F/C remain per-function research measurements. Envelope
+and CallBinding are 120 bytes each on this host, independent of payload extent.
+No ownership credit comes from those sizes, matching offsets or one pointer.
+
+280 boundary case executions pass, including 64 executions of the same generated
+objects linked with no-op witness hooks and no active registry. Normal/O2 and
+actual 1 MiB stack limits are included. Another 140 strict sanitizer cases pass
+for C++ Runtime/helpers/witnesses around the exact accepted object bytes; those
+LLVM objects themselves are not sanitizer-instrumented. The unchanged full
+storage-auditor negative set and five affected Runtime/GC suites pass. The original
+ten-pointer fixture retains four incoming-ownership rejections per profile and
+intact sentinels. No rejected object is executed.
+
+The native Context remains a trusted embedding boundary. General incoming
+provenance, arbitrary/recursive/concurrent callers, nested/managed carriers,
+exhaustive composite allocation-failure sweeps, optimized field-store lineage,
+IR-to-final-target ownership correspondence and complete linked ownership/failure
+certification remain open. No-op hooks establish independence from test authority,
+not future compilation with all hooks removed or LTO. General source execution,
+ORC and other targets remain outside this proof. No production readiness claim.
+
+See tests/research/call_envelope/README.md, WORK_LOG.md and
+build/stage3b-ownership/review plus sanitizers for source, exact commands,
+protocol reports, LLVM, certificates and logs. The review ZIP contains scoped
+source and full/incremental patches. Protected documents and certification code
+are unchanged. Stop for owner and Wrench review before production or Stage 3C.
+
+## 36. Stage 3B optimized-store and linked-code checkpoint (17 October 2026)
+
+This supplements section 35 without activating the private production ABI or
+Stage 3C. The preceding uncommitted implementation and all earlier evidence are
+preserved. All four accepted generated objects (normal/O2, returning argument
+0/3) are byte-identical to the generated-ownership checkpoint. The change adds
+research proof gates and a compile-only alternative, not a new ownership engine.
+
+**Optimized LLVM evidence.** The supplemental protocol gate independently checks
+88 surviving scalar StoreInst relationships: caller/callee Slot storage, size,
+offset-table and count fields; caller home-to-envelope/CallBinding fields; and
+callee incoming handle-to-home stores. Original SSA allocation/argument/global
+identities are pinned against replacement. Addresses use typed DataLayout field
+projections within those same objects, never machine stack offsets as ownership
+authority. Recursive load/value expressions must agree, and each store must reach
+its straight-line registration/binding consumer without overlapping writes or
+opaque calls/memory writes. Unsupported replacements conservatively reject.
+Caller homes must be completely zeroed before registration. Normal retains two
+aggregate-zero stores; O2 replaces them with two exact 64-byte zero memsets.
+All 88 critical scalar stores survive in both profiles, with address expressions
+canonicalized by O2. Result-copy, Frame cleanup and safepoint operations retain
+the existing 52-call argument and dominance/postdominance checks.
+
+**Linked evidence.** The closed ELF64 Linux x64 fixture now links using pinned
+lld 19.1.7, non-PIE, `--emit-relocs --no-relax`. Before delivery or execution,
+`linked.py` checks the certified object hash, actual map contribution and linked
+non-relocation instruction bytes (3454 normal / 3448 O2 bytes). All 57 direct
+calls per generated object (52 required operations plus five witness hooks) must
+reach the exact expected entry point. External calls must retain matching
+symbol/addend/type relocations; the local callee must remain at its exact mapped
+object location. Four encoded identity/root-offset references and retained
+relocations must target their exact compiler objects. Original and linked
+signature/profile strings and extent agree. Eight required Runtime entry points
+must map to the supplied archive members with matching symbol placements and
+non-relocation body bytes. Reports hash the actual object, executable, Runtime
+archive and member bytes. These are trusted local review inputs, not signed
+certificates against replacement of every input.
+
+**Behavior and controls.** The final source-frozen run passes 280 native boundary
+cases, including 64 no-registry generated cases, plus all original auditor/CFG,
+raw-Clang, admission and sentinel controls. The original 48 protocol mutants are
+retained; 32 new controls bring the total to 80. They reject changed store value
+or field, removed or substituted store, wrong Slot home, intervening overwrite,
+store after its consumer and missing null initialization. Another 56 linked
+mutants reject wrong helper targets, missing root calls, altered cleanup/store
+bytes, stale identity contents, changed retained call relocations and redirected
+identity references. Every rejection retains its output sentinel; rejected
+artifacts are not executed. The unchanged ten-pointer fixture still rejects four
+unproved incoming ownership homes in normal/O2. Five affected Runtime/GC suites
+pass. Strict sanitizer results are recorded in the engineering log.
+
+**Unresolved boundary.** Neither surviving LLVM expressions nor linked symbol,
+relocation and byte correspondence establish machine register/argument-value or
+packed ownership-store semantics. General data relocations, dynamic-loader
+behavior, transitive helper targets/semantics, final-byte all-path cleanup and
+failure/publication ownership remain unproved. Machine-storage/encoded-CFG
+certification, LLVM protocol checks, linked correspondence and behavioral
+execution are separate evidence. `optimized_store_lineage_certified` and
+`final_byte_ownership_certified` deliberately remain false.
+
+The compile-only `helper_alternative.cpp` evaluates small noinline,
+no-safepoint initializers using existing Runtime::Slot, without a new registry.
+Normal/O2 LLVM and machine output are saved. Moving the writes behind a reviewed
+native helper contract could reduce generated proof to exact helper arguments
+and helper behavior. That would still need semantic certification of the helper;
+the alternative is not linked into this fixture or integrated into Runtime.
+General x64 store/alias/register dataflow would exceed the existing SP/CFG
+observer and this bounded sprint. Stop at this boundary for owner/Wrench review.
+
+Evidence and commands: `build/stage3b-linked/accepted`, `trace.json`,
+`focused-tests.log` and `sanitizers`; reproduction and exact limitations are in
+`tests/research/call_envelope/README.md`. No public acceptance gate, protected
+document, storage auditor or encoded-CFG verifier changed. No production limit,
+complete matrix, hosted CI, branch, commit, push or remote write was introduced.

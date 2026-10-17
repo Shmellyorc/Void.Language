@@ -100,9 +100,10 @@ Runtime::PrivateRoot::~PrivateRoot() noexcept {
     runtime_.require_managed();auto& t=runtime_.thread();if(t.private_roots!=this)std::terminate();
     value_=nullptr;t.private_roots=previous_;
 }
-void Runtime::require_buffer_output(void** output) const {
-    require_output(output);
+Runtime::Frame* Runtime::require_buffer_output(void** output) const {
+    auto* frame=require_output(output);
     for(auto* root=thread().private_roots;root;root=root->previous_) if(output==&root->value_) throw std::invalid_argument("publication into private builder root");
+    return frame;
 }
 Runtime::BufferBuilder::BufferBuilder(Runtime& r,BufferLayoutRef layout,std::uint64_t live,BufferWorkQuota quota)
     :runtime_(r),layout_(std::move(layout)),quota_(quota),root_(r),owner_(std::this_thread::get_id()),requested_(live) {
@@ -198,12 +199,8 @@ void Runtime::BufferBuilder::write_bytes(std::span<const std::byte> input) {
     } catch(...) {failed_=true;throw;}
 }
 Runtime::RegisteredRootWord Runtime::root_word(void** slot) const {
-    require_managed();std::lock_guard lock(mutex_);require_buffer_output(slot);
-    for(auto* f=thread().frames;f;f=f->previous_) for(std::size_t i=0;i<f->count_;++i)
-        for(std::size_t j=0;j<f->slots_[i].count;++j)
-            if(static_cast<const char*>(f->slots_[i].storage)+f->slots_[i].offsets[j]==reinterpret_cast<const char*>(slot))
-                return RegisteredRootWord(this,f,slot);
-    throw std::invalid_argument("unregistered reference source");
+    require_managed();std::lock_guard lock(mutex_);
+    return RegisteredRootWord(this,require_buffer_output(slot),slot);
 }
 void* Runtime::reference_source(const RegisteredRootWord& token) const {
     require_managed();
@@ -212,7 +209,7 @@ void* Runtime::reference_source(const RegisteredRootWord& token) const {
     if(!linked) throw std::invalid_argument("expired reference root token");
     require_buffer_output(token.slot_);
     bool exact=false;
-    for(std::size_t i=0;i<token.frame_->count_;++i)for(std::size_t j=0;j<token.frame_->slots_[i].count;++j)
+    for(std::size_t i=0;i<token.frame_->count_ && !exact;++i)for(std::size_t j=0;j<token.frame_->slots_[i].count && !exact;++j)
         if(static_cast<const char*>(token.frame_->slots_[i].storage)+token.frame_->slots_[i].offsets[j]==reinterpret_cast<const char*>(token.slot_))exact=true;
     if(!exact)throw std::invalid_argument("reference source registration changed");
     void* value=nullptr;std::memcpy(&value,token.slot_,sizeof(value));
@@ -362,6 +359,54 @@ void Runtime::validate_fixed_layout(const BufferLayoutRef& layout) const {
     if(!std::holds_alternative<SchemaScalar>(schema.spec_.nodes[schema.spec_.root]) &&
        (schema.bytes() || schema.has_references() || !schema.zero_data_complete()))
         throw std::invalid_argument("fixed runtime proof requires scalar or zero-footprint element");
+}
+ElementSchemaRef Runtime::fixed_scalar_schema(ScalarEncoding encoding) {
+    require_managed();
+    if(static_cast<unsigned>(encoding)>static_cast<unsigned>(ScalarEncoding::boolean))
+        throw std::invalid_argument("invalid fixed scalar encoding");
+    const auto key="void.fixed.scalar.v1/"+std::to_string(static_cast<unsigned>(encoding));
+    ElementSchemaRef schema;
+    {std::lock_guard lock(mutex_);if(types_) {auto i=types_->schemas.find(key);if(i!=types_->schemas.end()) schema=i->second;}}
+    if(!schema) {
+        Native native(*this);
+        ElementSchemaSpec spec{key,"mutable",key,StorageDomain::native(),0,{SchemaScalar{encoding}}};
+        admit_buffer_schemas({&spec,1});schema=buffer_schema(key);
+    }
+    return schema;
+}
+BufferLayoutRef Runtime::fixed_scalar_layout(ScalarEncoding encoding,std::uint64_t extent) {
+    auto layout=buffer_layout(fixed_scalar_schema(encoding),extent);
+    validate_fixed_scalar_layout(layout,encoding,extent);
+    return layout;
+}
+BufferLayoutRef Runtime::fixed_scalar_layout(RegisteredRootWord source,ScalarEncoding encoding,std::uint64_t extent) {
+    auto schema=fixed_scalar_schema(encoding);
+    BufferLayoutRef layout;
+    {
+        std::lock_guard lock(mutex_);
+        auto* object=reference_source(source);
+        if(object) {
+            const auto& state=heap_.buffer_state(object);
+            // Reuse the immutable layout already owned by the buffer. Construct
+            // the expected geometry on the stack; retain exact schema, packing
+            // and complete fixed-extent checks without allocating metadata.
+            BufferLayout expected(schema,extent,0,0);
+            if(!state.complete || state.valid_prefix!=extent || !state.layout->equivalent(expected))
+                throw std::invalid_argument("invalid fixed scalar source");
+            layout=state.layout;
+        }
+    }
+    // Empty arrays have no heap object from which to recover a layout.
+    if(!layout) layout=buffer_layout(schema,extent);
+    validate_fixed_scalar_layout(layout,encoding,extent);
+    return layout;
+}
+void Runtime::validate_fixed_scalar_layout(const BufferLayoutRef& layout,ScalarEncoding encoding,std::uint64_t extent) const {
+    require_managed();std::lock_guard lock(mutex_);validate_fixed_layout(layout);
+    const auto& schema=*layout->schema();
+    auto* scalar=std::get_if<SchemaScalar>(&schema.spec_.nodes[schema.spec_.root]);
+    if(!scalar || scalar->encoding!=encoding || layout->capacity()!=extent)
+        throw std::invalid_argument("fixed scalar signature/layout mismatch");
 }
 void Runtime::validate_fixed_output(void** output,const BufferLayoutRef& layout) const {
     require_buffer_output(output);

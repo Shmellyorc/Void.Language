@@ -41,6 +41,16 @@ Compiler responsibilities stop at code generation; the existing experimental
 heap and thread coordinator serve managed source through explicit runtime ownership
 and AOT bootstrap; reload leases and the C bridge remain runtime/host responsibilities.
 
+Source `private` function definitions now use LLVM internal linkage, except when
+explicitly selected as the host/JIT or AOT entry. All source files in an import
+graph lower into one LLVM module, so their private implementation calls resolve
+locally. Public/project-visible source functions, legacy native definitions,
+trusted C imports, Runtime ABI declarations and externally consumed metadata
+retain their existing linkage. Virtual/interface helpers were already internal.
+Names, generation suffixes, calling conventions and source visibility are
+unchanged. Debug subprogram metadata reflects local linkage. This is a function
+construction rule, not an internalization pass or a new native FFI contract.
+
 `pass` is supported as a standalone no-op in every ordinary statement block,
 including methods and initializers. Semantic analysis preserves fallthrough and
 required-return/field-readiness checks; lowering emits no IR operation or runtime

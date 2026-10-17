@@ -9732,3 +9732,1031 @@ LANGUAGE_BIBLE.md and WRENCH_CLANKER.md are byte-for-byte unchanged. The Wrench
 handoff's historical mentions of the removed header are intentionally untouched.
 No CMake, workflow, Git or remote changes. Evidence and exact scoped diffs are in
 build/stage3b-abi-header-cleanup. Stop for Wrench review.
+
+
+## Phase 23 Stage 3B: private call-envelope integration, 17 October 2026
+
+Continued the completed research pilot at baseline
+`7abc6249a5e1828fd49232a868dcc300b13b7894`; no investigation restart or production
+ABI replacement. The original pilot notes/evidence remain available in
+`tests/research/call_envelope/PILOT.md` and `build/stage3b-envelope/review`.
+
+Resolved the Clang fixture's O2 tail rejection with an observable caller
+continuation: branch on failure, read the returned value, process it for the
+consumer (100 on success, 0 on failure). The unchanged auditor accepts normal
+and O2. No dummy operation, tail-call disabling, gate relaxation or LLVM patch.
+
+Added an explicit research emitter entry in the existing backend and a narrowly
+gated branch within `lower()`. It runs existing owned-IR validation, derives the
+logical signature and exact profile through `fixed_call_layout`, checks POD
+sizes/alignments/offsets against target DataLayout, and constructs actual LLVM
+caller/callee functions. The only admitted logical body returns argument 0 from
+eight identical fixed-u64-array parameters. The test driver obtains canonical
+types from frontend analysis and constructs this owned IR explicitly; this is
+not completed native VOID source-array lowering. Public source/JIT/AOT entrypoints
+never select this path. Their existing array rejection remains in place.
+
+Generated homes, Slots, Frames, envelope lifetime, transactional copies, ordered
+source effects, failure branches, result processing and cleanup are explicit.
+Runtime assertions establish actual registration, independent snapshots/results,
+callee roots before collection and expiration of both Frames. Closed C++ authority
+records are fixture support, not an added compiler-wide ownership system. No
+payload-sized stack allocation or offset-derived ownership is accepted.
+
+Both generated modules receive storage delivery certificates. Callee: P/F/R/E/A/C
+= 352/392/352/8/16/400 in normal and O2. Caller normal:
+464/552/464/8/16/560; caller O2: 464/536/464/8/16/544. Each has zero incoming
+slots, zero outgoing argument bytes and no tail call. Full revised Clang and
+baseline comparison appears in ARRAYS_PROPOSAL Section 34 and the research README.
+The original ten-pointer fixture, storage auditor and encoded-CFG verifier are
+unchanged; both ten-pointer profiles still reject four incoming ownership slots
+and preserve sentinels. Raw Clang profile mismatch remains a recorded rejection;
+compiler-generated LLVM needs no target-attribute adaptation.
+
+Focused system LLVM/Clang 19.1.7 verification:
+
+- The runner passes 64 revised Clang-boundary and 48 compiler-generated case
+  executions across normal/O2 and actual 1,048,576-byte stack limits. It checks
+  certified delivery plus exact object SHA-256 before linking/execution; no
+  uncertified candidate is executed. Negative admission tests preserve output
+  sentinels for unsupported bodies and absent ownership contracts.
+- The existing full storage-auditor fixture/negative suite passes unchanged.
+- Five rebuilt suites pass (5/5, 11.27 seconds locally): gc_buffers,
+  arrays_foundation, runtime_generated, runtime_failures and runtime_invariants.
+  Existing fixed-helper failure sweeps and fatal controls remain enabled.
+- Another 56 cases pass with strict ASan/UBSan and leak detection against the
+  existing sanitized Runtime. Only accepted boundary objects are linked. Hooks
+  and Runtime are instrumented; emitted boundary objects are not, so this is
+  not complete generated-code sanitizer coverage. Sandbox LeakSanitizer process
+  inspection failed; the unrestricted rerun passes with detect_leaks=1,
+  halt_on_error=1 and unchanged strict exit codes (ASan 87, UBSan 86).
+
+One initial generator run crashed before writing IR because the new fixture
+created a global string with no insertion block/module argument. Corrected the
+fixture to provide its module explicitly; subsequent normal/O2 generation,
+certification and execution pass. No rejected/crashed-generation object was
+linked. Earlier attempted-run logs are retained, not represented as successful.
+
+Semantic and storage evidence remain distinct. No independent final-byte proof
+of the complete linked ownership/root/failure protocol is claimed. Arbitrary IR,
+new-path exhaustive allocation-failure sweeps, nested/managed arrays, selected-
+place commits, general source execution, ORC, recursive/concurrent registry
+semantics and other native targets remain outside this checkpoint. Generated
+cleanup is checked by token expiration; the separate Clang fixture retains
+missing-cleanup injection/repair before stack homes expire.
+
+Evidence: build/stage3b-envelope/integration-final and integration-san, with
+commands, original/optimized LLVM, identity manifests, certificates, source hashes
+and native logs; affected build/test logs are in the parent directory. The review
+ZIP contains scoped source changes, unified patch and focused evidence. No
+six-configuration matrix, hosted CI, branch, commit, push or remote write.
+LANGUAGE_BIBLE.md and WRENCH_CLANKER.md were not edited; the preexisting Bible
+change remains preserved and is excluded from the sprint patch. Stop for owner
+and Wrench review before production integration or Stage 3C.
+
+
+## Phase 23 Stage 3B: generated ownership authority, 17 October 2026
+
+Continued the existing uncommitted integration at accepted baseline
+`7abc6249a5e1828fd49232a868dcc300b13b7894`. Preserved the pilot, preceding
+integration source ZIP, passing reports and native logs. Current evidence is
+`build/stage3b-ownership/review`; preceding evidence remains under
+`build/stage3b-envelope`. No production ABI or Stage 3C activation.
+
+Review found that `research_validate` and `research_context_validate` still made
+the C++ active-call registry an authorizer. Removed both calls and definitions.
+The registry now observes/injects faults only. Generated code checks the exact
+compiler identity, ordered envelope fields, per-call binding, epoch, context and
+actual live-Frame membership. The private callee has internal linkage.
+
+The compiler now constructs the fixture wrapper in existing owned IR and invokes
+shared `ir::validate`: independent fixed_snapshot values, later selected-place
+source mutations, and exactly-once consumption at the call. No second ownership
+engine or structural type analyzer was introduced. The compiler maps each IR
+snapshot to one SSA home used by its Slot, envelope field and compiler-generated
+CallBinding. CallBinding is bounded per-call stack storage, not a second runtime
+registry or permission minted by the test harness. Freshness comes from the IR
+contract and actual completed copies, not registration or matching offsets.
+
+Added exact-Frame root_word validation using the existing Runtime Frame list.
+Root validation additionally binds the compiler-derived scalar encoding/extent
+to Runtime's admitted schema metadata. This fixes an actual type hole: a same-
+sized i64 schema could otherwise substitute for u64. A separate output-place
+helper preserves the existing ability to publish into a registered null result
+home, without reading it as an initialized fixed source. The generated callee
+validates its own homes before collection and revalidates the envelope before
+transactional result publication. These helpers are not registered with ORC and
+never grant incoming ownership.
+
+The admitted callee now returns a validated argument index rather than a
+hardcoded zero. Arguments 0 and 3 are tested: snapshots yield result values 7
+and 10, processed by the real caller continuation into 8 and 11. A valid but
+unsupported additional-snapshot body and missing ownership still reject.
+General caller/source-array lowering is not implemented: the wrapper remains a
+synthesized, narrowly admitted research workload with eight same-layout u64
+arguments and explicit source effects.
+
+A supplemental private IR gate checks original snapshot/Slot/envelope/binding
+and callee-load mappings, exact ordinal/Slot storage fields, the selected return
+source, required operations and cleanup dominance/postdominance. It checks 52
+required operations after optimization, including the private handoff itself.
+The final handoff check corrected a gap where helper calls could remain in an
+unused callee despite deletion of the actual call. The protocol report explicitly
+declines optimized store-lineage and final-byte ownership certification. Existing
+immutable storage inventory, machine observer and encoded-code gates are unchanged.
+
+Fresh system LLVM/Clang 19.1.7 verification:
+
+- Four generated objects certify: arguments 0/3, normal/O2. Callee normal
+  P/F/R/E/A/C = 352/408/352/8/16/416; callee O2 = 352/424/352/8/16/432.
+  Caller both profiles = 592/664/592/8/16/672. All have zero incoming slots,
+  zero outgoing argument bytes and no tail call. Charges remain research-only.
+- 280 boundary case executions pass: 64 retained Clang cases, 152 generated
+  checked cases, 64 generated cases with no-op witness hooks and no registry.
+  Each body/profile also runs with an actual 1,048,576-byte stack limit. The same
+  certificate/hash-verified object bytes are linked into both witness variants.
+- Runtime negatives cover missing source/result/snapshot registration, reordered
+  homes, copied identity with matching physical layout, changed signature,
+  wrong live Frame, replayed epoch, before/after-safepoint failure, incorrect
+  publication, quotas, first-failure preservation, same-layout scalar substitution
+  and wrong extent. Successful empty outputs are covered in both witness modes.
+- 48 protocol mutants reject with intact output sentinels: missing caller/callee
+  entry/leave, redirected snapshot, missing publication, incorrect envelope
+  mapping, post-pipeline removal of required operations or handoff, and an
+  entered exit bypassing cleanup. Eight admission controls also reject. No
+  rejected object is linked or executed.
+- The existing full storage-auditor fixture/negative set passes unchanged. The
+  ten-pointer regression retains four incoming-ownership rejections in each
+  profile, zero incoming credit and intact sentinels. Raw Clang profile mismatch
+  remains a separate negative; compiler-generated input needs no attribute repair.
+- Five rebuilt affected suites pass, 5/5 in 11.28 seconds locally: gc_buffers,
+  arrays_foundation, runtime_generated, runtime_failures and runtime_invariants.
+  Existing failure sweeps and fatal controls remain enabled.
+- Strict ASan/UBSan and leak detection pass 140 cases: 32 retained Clang,
+  76 generated checked, 32 generated no-witness. Runtime/helpers/witnesses are
+  instrumented; the exact certified boundary objects are not. This is not full
+  generated-code sanitizer instrumentation. LeakSanitizer needs process inspection
+  outside this host's sandbox; the permitted unrestricted run retained
+  detect_leaks=1:halt_on_error=1:exitcode=87 and
+  halt_on_error=1:print_stacktrace=1:exitcode=86, with no suppressions.
+
+Ownership evidence now comes from generated construction/checks plus shared IR
+validation; tests no longer authorize the callee. The no-witness executable has
+no active-call registry or identity/root permission callback. The native Context
+is still a trusted embedding contract. General native provenance, escaped/forged
+bindings, recursive/concurrent calls and arbitrary caller IR are not approved.
+Optimized store lineage, IR-to-final-call-target ownership correspondence, linked
+helper/relocation semantics and complete final-executable ownership/failure
+certification remain open. LLVM tracking handles and matching call/stack evidence
+are not promoted into that missing proof. New composite allocation-failure
+ordinals are not exhaustively swept; existing helper sweeps are retained.
+
+Source changes, full/delta patches, certificates, LLVM, manifests and focused logs
+are packaged in build/stage3b-ownership/generated-ownership-review.zip. No complete
+six-configuration matrix, hosted CI, branches, commits, pushes or remote writes.
+LANGUAGE_BIBLE.md and WRENCH_CLANKER.md were not edited; protected source hashes
+also confirm unchanged storage-auditor/encoded-CFG/ten-pointer implementations.
+Stop for owner and Wrench review before production integration or Stage 3C.
+
+### Phase 23 Stage 3B — optimized ownership stores and linked code (2026-10-17)
+
+Continued the current uncommitted generated-ownership worktree at accepted HEAD
+7abc6249a5e1828fd49232a868dcc300b13b7894. Earlier pilot/integration/ownership
+sources, results and ZIPs remain intact. The preceding ownership README is
+preserved verbatim as tests/research/call_envelope/OWNERSHIP.md.
+
+The new supplemental gate checks 88 original scalar store expressions after
+normal/O2 optimization. It pins actual original LLVM object identities, checks
+typed field projections and recursive loaded values, and requires each store to
+reach its same-block Frame registration or pre-injection binding consumer without
+an overlapping/unknown write or opaque call. Deleted/replaced original stores
+reject even if a replacement appears equivalent. Caller null initialization
+accepts only complete original aggregate zero or the observed exact zero memset.
+The successful objects contain the same 88 scalar stores; O2 canonicalizes GEPs
+and changes two 64-byte aggregate-zero initializations into two memsets. Machine
+output in both profiles has eight movaps vector-store lines for initialization;
+those observations are not ownership credits for packed stores. Existing result
+publication, required-call arguments, safepoint dominance and cleanup
+postdominance checks remain in force.
+
+The new research-only linked gate consumes the actual lld map and retained ELF
+relocations, after verifying the exact object against its machine-storage
+certificate. With non-PIE/--emit-relocs/--no-relax it compares generated text
+outside relocation operands, decodes all 57 direct calls, checks encoded targets
+and retained external symbol/addend/type identity, matches the 52 generated
+required-operation multiplicities, and checks local callee placement. Four
+identity/root-offset references are checked against exact mapped compiler data
+objects; original and linked signature/profile/extent contents agree. Eight
+Runtime entry points are tied to the supplied archive members and corresponding
+non-relocation body bytes. Executable, archive and member hashes are recorded.
+This is local byte/target correspondence, not transitive helper or ownership
+semantics. No candidate executes before successful linked delivery.
+
+Verified normal/O2 results under pinned LLVM/Clang/lld 19.1.7:
+
+- All four generated objects (return argument 0/3) are byte-identical to the prior
+  ownership checkpoint. Each passes 88 scalar store facts, caller-null checking,
+  52 required operations, unchanged storage auditing and final encoded CFG gates.
+- Callee P=352, F=408/424, R=352, E=8, A=16, C=416/432 (normal/O2).
+  Caller P=592, F=664, R=592, E=8, A=16, C=672 in both. No incoming homes or
+  tail calls. Linked non-relocation text coverage is 3454/3448 bytes.
+- Eight native linked variants pass: two profiles, two bodies and checked versus
+  no-registry witnesses. Native totals: 64 C++ boundary, 152 generated checked,
+  64 generated no-registry cases = 280, including 1 MiB stack repetitions.
+- All original 48 protocol mutants retained; 32 new store/null-init controls
+  produce 80 expected protocol rejections. All 56 linked mutations reject.
+  Sentinels remain intact, and rejected artifacts are never executed.
+- Full existing storage-auditor research controls pass unchanged. The old
+  ten-pointer normal/O2 control still rejects four unproved incoming homes;
+  its rejected output remains a sentinel.
+- Focused gc_buffers, arrays_foundation, runtime_generated, runtime_failures and
+  runtime_invariants: 5/5, 11.22 seconds, build/stage3b-linked/focused-tests.log.
+
+Strict ASan/UBSan/LSan passes another 140 cases: 32 C++ boundary, 76 generated
+checked and 32 generated no-registry. All eight generated sanitizer executables
+also pass linked delivery. ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87;
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86. C++ hooks and Runtime
+are instrumented; certified LLVM objects remain exact and uninstrumented. Host
+process inspection was allowed for strict LeakSanitizer; no leak/UB settings were
+weakened. See build/stage3b-linked/sanitizers/complete.json.
+
+Evidence is under build/stage3b-linked/accepted (source hashes, commands, original
+and optimized LLVM, exact objects/certificates, linked maps/reports, mutation and
+execution logs), trace.json (disassembly commands, object equality, IR forms and
+frame figures) and sanitizers. Intermediate runs under review/verified/final are
+not accepted final evidence: source-hash guards rejected runs whose source was
+edited during gate hardening. The source-frozen accepted run completed normally.
+
+The compile-only helper_alternative.cpp produces normal/O2 LLVM and machine
+output for small noinline Slot/field initializers, using existing Runtime::Slot
+and no registry. Its O2 output is short direct store sequences with no calls. It
+is not linked or promoted into Runtime. A reviewed no-safepoint native helper
+contract is the simplest conservative alternative to a broad x64 store-lineage
+engine; helper argument identity and body semantics would still require proof.
+
+Remaining obligations: no general IR-to-machine store lineage, machine register
+or call-argument semantics, arbitrary data-relocation/dynamic-loader proof,
+transitive Runtime/helper semantic proof or all-path final-byte ownership,
+publication/failure/cleanup certificate. Both optimized_store_lineage_certified
+and final_byte_ownership_certified remain false. Matching field values, stack
+offsets, call counts and passing executions grant no ownership authority.
+
+LANGUAGE_BIBLE.md, WRENCH_CLANKER.md, storage_audit.cpp, encoded_cfg.cpp and the
+original storage_audit test remain hash-identical to sprint entry. No production
+ABI activation, Stage 3C, new ownership registry, LLVM fork, production 64 KiB
+policy, full six-configuration matrix, hosted CI, branch/commit/push or remote
+write. Stop for owner and Wrench review before production integration.
+
+Review artifacts: build/stage3b-linked/optimized-linked-review.zip, cumulative
+optimized-linked-review.patch and incremental
+optimized-linked-since-ownership.patch (against the preceding ownership ZIP's
+source snapshot). Both patches are application-checked and reconstructed sources
+must match the final scoped files. Protected documents are excluded.
+
+## Order 1: optional LLVM certification, 17 October 2026
+
+Implemented against the current local worktree, preserving its pre-existing
+private-envelope/runtime experiments. No prior Order 1 ZIP was used. The
+independent review's recorded conclusions in WRENCH_CLANKER.md and the owner's
+clarification supplied the scope: machine identity and final-byte certification
+only. No Order 2 or source-array implementation.
+
+Findings and changes:
+
+- Ordinary JIT already called lower/finish/ORC without an ownership inventory.
+  Ordinary AOT already called the same lowerer, LLVM verification/O2 and
+  TargetMachine object emission without freeze/deliver certification. There was
+  no demonstrated production acceptance defect to bypass.
+- The remaining coupling was at build/test level: storage_audit.cpp and
+  encoded_cfg.cpp were unconditional compiler-library inputs. They and the
+  private research entrypoints/inventory instrumentation now require the
+  default-OFF CMake option VOID_LLVM_RESEARCH. The research-only disassembler
+  dependency is requested with that option. The default library contains only
+  backend.cpp.o, with no defined research-emitter/certification symbols.
+- The existing arrays_storage_audit suite is retained under that option and
+  labeled research. Its invalid-fixture, lineage, incoming-home, encoded-CFG
+  and final-byte negative controls remain intact. Explicit --storage-proof
+  requests in test harnesses report the missing build option when disabled;
+  they do not silently fall back to ordinary emission.
+- Added paired acceptance regressions: the same aggregate main/numeric programs
+  rejected for unproved incoming ownership still emit normally and execute in
+  JIT, normal/O2. The inheritance stress program rejected for final encoded
+  calls still emits normally and executes optimized JIT. These are unsupported
+  research-checker shapes, not evidence of LLVM miscompilation. Existing CLI
+  tests execute the aggregate objects after native linking.
+- Typed IR validation, LLVM verification, precise Frame/Slot construction,
+  safepoints/root lifetimes, independent value snapshots, transactional
+  publication, cleanup and conservative runtime call memory effects are
+  unchanged. LLVM 19.1.7 and the shared lowerer/runtime remain in use. The
+  historical 64 KiB research budget is confined to optional experiments; no
+  production limit was added or relaxed.
+
+Local Linux validation (LLVM/Clang/LLD 19.1.7; Debug):
+
+```
+cmake -S . -B build/order1/production -DCMAKE_BUILD_TYPE=Debug \
+  -DCMAKE_C_COMPILER=/usr/bin/clang-19 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-19 \
+  -DLLVM_DIR=/usr/lib/llvm-19/lib/cmake/llvm \
+  -DVOID_LINKER=/usr/lib/llvm-19/bin/ld.lld \
+  -DVOID_CLANG=/usr/lib/llvm-19/bin/clang-19 \
+  -DVOID_DWARFDUMP=/usr/lib/llvm-19/bin/llvm-dwarfdump
+cmake --build build/order1/production --target voidc void_tests void_managed_tests void_runtime_generated void_runtime_aot_normal void_runtime_aot_optimized void_gc_buffers -j 4
+cmake --build build/order1/production --target void_inheritance_cli_stress_normal void_inheritance_cli_stress_optimized -j 2
+ctest --test-dir build/order1/production -R '^(core|jit|gc|native|value_structs_cli|managed_source|runtime_generated|runtime_aot_normal|runtime_aot_optimized|gc_buffers)$' --output-on-failure -j 2
+cmake -S . -B build/ci-debug -DVOID_LLVM_RESEARCH=ON
+cmake --build build/ci-debug --target void_arrays_storage_audit voidc -j 3
+cmake --build build/ci-debug --target void_arrays_storage_audit -j 3
+ctest --test-dir build/ci-debug -R '^arrays_storage_audit$' --output-on-failure
+ctest --test-dir build/ci-debug -R '^value_structs_cli$' --output-on-failure
+```
+
+All builds succeeded. Production focused CTest: 10/10 passed (9.86 seconds).
+Research suite: 1/1 passed (8.95 seconds), including new acceptance regressions
+and preserved negative controls. Research-enabled value_structs_cli: 1/1 passed
+(1.90 seconds), exercising linked AOT and JIT with/without O2. Additional direct
+runs of inheritance/stress.void at inputs -1, 0, 10 passed JIT and linked AOT in
+both modes (12 executions; expected input + 1100). A disabled research request
+failed with the expected VOID_LLVM_RESEARCH=ON diagnostic and preserved an
+existing output sentinel. llvm-ar/llvm-nm and CTest inventory inspection confirmed
+research code/test absence from the default build. Logs are in build/order1/.
+Changed implementation files pass git diff --check; existing trailing Markdown
+spaces in WRENCH_CLANKER.md were left intact.
+
+Official LLVM references consulted: [LLVM 19 code generator](https://releases.llvm.org/19.1.0/docs/CodeGenerator.html)
+and [LLVM 19 language reference](https://releases.llvm.org/19.1.0/docs/LangRef.html).
+LLVM's optimizer/code generator owns instruction selection, ABI lowering,
+register allocation and encoding; VOID still owns correct input IR and runtime
+contracts. No LLVM correctness failure was demonstrated in this order.
+
+Limitations: Linux Debug focused execution only; no new Release, sanitizer,
+Windows, macOS or hosted-CI claim. Research limitations deliberately remain in
+opt-in experiments. Source arrays remain unsupported natively. No commits,
+pushes, branches or remote writes were performed.
+
+## Order 2: simplify private fixed-array calls, 17 October 2026
+
+Completed against the current worktree, retaining Order 1. Inspection confirmed
+that the Envelope/CallBinding implementation was an optional closed research
+fixture, not production source-array lowering. No source-array implementation,
+new backend, ownership registry, certification framework or Git mutation was
+introduced. Pre-edit files are retained locally in build/order2/baseline/.
+
+Changes:
+
+- Replaced Envelope and CallBinding with direct LLVM parameters: eight argument
+  home pointers plus result, layout, quota and failure. The callee is internal;
+  LLVM's normal calling convention handles native register/stack transport.
+  The test callee remains noinline to exercise an actual native call.
+- Removed duplicated argument/context metadata, identity/profile/epoch checks,
+  expected-Frame root authorization and repeated explicit root-validation calls.
+  Removed the 330-line EnvelopeProtocol verifier, synthetic ownership-wrapper
+  validation, mutation protocol, linked-byte/ABI reconstruction gate and duplicate
+  C++ envelope/helper alternatives. Historical research reports are marked as
+  superseded, with their historical claims preserved.
+- Kept one static scalar layout/extent check at the embedding boundary. The
+  existing Runtime helpers remain responsible for registered roots, valid/live
+  buffer layouts, independent copies, polling/leases and transactional output.
+  Removed only the research-specific expected-Frame overload of root_word;
+  its normal exact live-slot registration checks and expired-token checks remain.
+- Caller snapshots are independent Runtime buffers with ordered source effects.
+  Caller roots remain live across the private call. The callee loads the rooted
+  incoming handles into its own precise Frame/Slots before collecting, and
+  retains them through result copying. Both frames are removed on failure and
+  success. Payload size does not enlarge native homes; no 64 KiB cap is imposed.
+- Reused the shared lowerer, LLVM verifier/O2 pipeline, native TargetMachine
+  factory and ordinary object writer. The private fixture no longer invokes the
+  research storage auditor or requests byte certificates. Order 1's default-OFF
+  VOID_LLVM_RESEARCH option and independent auditor/negative controls remain.
+- Added normal/O2 CTest behavior tests, using the identical generated object
+  with observing hooks and empty hooks. Hooks grant no permission and provide no
+  call metadata. Deleted duplicate no-witness source in favor of one test source
+  compiled in both modes. The small Python driver now only builds/runs CTest.
+
+Focused Linux Debug validation, LLVM/Clang/LLD 19.1.7:
+
+```
+cmake -S . -B build/ci-debug -DVOID_LLVM_RESEARCH=ON
+cmake --build build/ci-debug --target void_private_fixed_call_normal_0_2_observed -j 3
+ctest --test-dir build/ci-debug -R '^private_fixed_call_normal_0_2_observed$' --output-on-failure
+python3 tests/research/call_envelope/run.py --build build/ci-debug
+cmake --build build/ci-debug --target void_arrays_storage_audit -j 2
+ctest --test-dir build/ci-debug -R '^arrays_storage_audit$' --output-on-failure
+cmake --build build/order1/production --target voidc void_gc_buffers void_runtime_generated void_runtime_aot_normal void_runtime_aot_optimized void_managed_tests -j 2
+ctest --test-dir build/order1/production -R '^(gc_buffers|runtime_generated|runtime_aot_normal|runtime_aot_optimized|managed_source|value_structs_cli)$' --output-on-failure -j 2
+```
+
+All builds and tests passed. The private-call driver builds/runs the 12 targets
+`void_private_fixed_call_{normal,optimized}_{0_2,3_2,7_16384}_{observed,unobserved}`
+with CTest label private_calls. Final run: 12/12 passed in 6.17 seconds, totaling
+162 behavioral cases (six observed executables with 15 cases each, six empty-hook
+executables with 12 cases each). Tests check snapshot order/payload independence,
+argument transport, roots across collection, expired caller/callee tokens,
+independent complete results, unregistered source/result, source/result alias,
+preserved existing failure, invalid quotas/layout/type/extent, absent layout or
+quota, null source, initially null result, pre/post-poll failures, failed return
+publication and zero retained temporary buffers after collection. The selected
+arguments are 0 and 3 at extent 2, and 7 at extent 16384 (128 KiB). Each of six
+object generations also rejects three invalid typed/body inputs with an existing
+output sentinel intact and confirms ordinary source-array native rejection.
+
+Additional stack check: directly executed
+`build/ci-debug/void_private_fixed_call_{normal,optimized}_7_16384_{observed,unobserved} 7 16384`
+with subprocess RLIMIT_STACK soft/hard both 1048576 bytes. All four executables
+passed (54 additional cases), demonstrating large heap payloads with a 1 MiB
+native stack. Command/output log: build/order2/small-stack-tests.log.
+
+Affected production tests passed 6/6 in 9.91 seconds, including existing Runtime
+allocation-failure ordinals, copy/publication rollback, GC coordination, generated
+roots, ordinary normal/O2 linked AOT and source JIT behavior. The separate Order 1
+auditor passed 1/1 in 8.99 seconds, including its deliberate negative controls.
+llvm-ar/llvm-nm confirmed the default production archive still contains only
+backend.cpp.o and no private-call/research-emitter certificate symbols.
+Implementation files pass git diff --check; pre-existing Markdown hard-break
+spaces in WRENCH_CLANKER.md remain unchanged. Logs are in build/order2/.
+
+Official references consulted before implementation: [LLVM 19 calling conventions](https://releases.llvm.org/19.1.0/docs/LangRef.html#calling-conventions)
+and [LLVM 19 code generation](https://releases.llvm.org/19.1.0/docs/CodeGenerator.html).
+No independent reconstruction of register/stack argument transport is required
+by this fixture.
+
+Limitations: this remains a closed scalar-u64, nonempty fixed-array research
+fixture with eight arguments and an argument-return body. No general private-call
+or source-array native lowering was added; ordinary source arrays still reject.
+The new fixture was executed through linked AOT only, not a private-array ORC
+entry. Ordinary JIT was covered by existing managed/aggregate tests. Windows,
+macOS, Release, sanitizers and full/hosted CI were not run. No genuine production
+correctness failure was observed. No commits, pushes, branches or remote changes.
+
+
+## Order 3: real source numeric fixed arrays, 17 October 2026
+
+Implemented the production feature against the current Orders 1/2 worktree.
+The existing frontend already parsed/typed fixed arrays and produced validated
+fixed_array/array_get/array_set IR; ordinary LLVM lowering was the missing piece.
+It is now enabled in default builds, without invoking any research emitter.
+
+Implementation:
+
+- Represent numeric/bool fixed values as handles to existing Runtime buffers.
+  Add handle offsets to generated Frame/Slot and managed/value-field layouts;
+  payload bytes never become native array allocas. The existing shared lowerer
+  serves JIT and AOT, with normal LLVM pointer/scalar argument/return lowering.
+- Lower literals/defaults, exact-width checked indexing, functional updates and
+  snapshots. Reuse existing frontend owner/index/RHS sequencing, including old
+  scalar snapshots for compounds and reacquisition after RHS field mutations.
+- Eagerly copy array storage at local/snapshot stores, parameter initialization,
+  managed-field writes and returns. Recursively copy array fields inside value
+  aggregates into rooted staging, publishing the complete value after success.
+  No copy-on-write or const-borrowing contract was introduced. Repeated defaults
+  remain compact IR; empty arrays remain typed null handles internally.
+- Four small source ABI helpers use Runtime's admitted scalar schemas, existing
+  buffer constructors, leases, copies, scalar access, quotas and failure channel.
+  Scalar schemas are admitted through the existing metadata owner; no separate
+  ownership registry, allocator or collector was added. The internal byte quota
+  is a polling chunk size, not an array-size limit.
+- Integers retain their exact bits and signedness; floats use bit transport,
+  including NaN and negative zero. Signed indexes normalize without negating MIN;
+  unsigned indexes are checked before narrowing. Invalid accesses return source
+  diagnostics and leave generated frames normally.
+- Preserve Order 1's default-OFF research option and its negative certificates;
+  preserve Order 2's direct-call fixture. Update the former source-array rejection
+  test to require ordinary successful emission, and remove the obsolete research
+  fixture assertion that all source arrays must reject.
+
+Added eleven actual .void examples under examples/fixed_arrays/: the requested
+sample, independent copies/eight-argument calls/returns, selected-write and
+literal/argument evaluation order, all scalar encodings, signed/unsigned index
+extremes, empty arrays, 2 MiB payloads, value/managed fields, bounds-before-RHS
+failure, loops and short-circuit expressions. The sample returns 17 for input 7.
+See docs/FIXED_ARRAYS.md for behavior and remaining scope.
+
+Exact focused commands (configured LLVM/Clang/LLD 19.1.7, Linux Debug):
+
+```
+cmake --build build/order1/production --target voidc -j 3
+cmake -S . -B build/order1/production
+cmake --build build/order1/production --target void_fixed_arrays_tests -j 3
+cmake --build build/order1/production --target void_fixed_arrays_cli_main_normal void_fixed_arrays_cli_copies_normal void_fixed_arrays_cli_order_normal void_fixed_arrays_cli_numeric_normal void_fixed_arrays_cli_indexes_normal void_fixed_arrays_cli_index_types_normal void_fixed_arrays_cli_empty_normal void_fixed_arrays_cli_large_normal void_fixed_arrays_cli_value_fields_normal void_fixed_arrays_cli_bounds_order_normal void_fixed_arrays_cli_loops_normal void_fixed_arrays_cli_main_optimized void_fixed_arrays_cli_copies_optimized void_fixed_arrays_cli_order_optimized void_fixed_arrays_cli_numeric_optimized void_fixed_arrays_cli_indexes_optimized void_fixed_arrays_cli_index_types_optimized void_fixed_arrays_cli_empty_optimized void_fixed_arrays_cli_large_optimized void_fixed_arrays_cli_value_fields_optimized void_fixed_arrays_cli_bounds_order_optimized void_fixed_arrays_cli_loops_optimized -j 3
+cmake --build build/order1/production --target void_fixed_arrays_tests void_arrays_foundation void_gc_buffers void_managed_tests void_runtime_generated void_runtime_aot_normal void_runtime_aot_optimized -j 3
+ctest --test-dir build/order1/production -R '^(fixed_arrays_source|fixed_arrays_cli|arrays_foundation|gc_buffers|managed_source|runtime_generated|runtime_aot_normal|runtime_aot_optimized|value_structs_cli)$' --output-on-failure -j 2
+ctest --test-dir build/order1/production -R '^fixed_arrays_(source|cli)$' --output-on-failure
+cmake -S . -B build/ci-debug -DVOID_LLVM_RESEARCH=ON
+cmake --build build/ci-debug --target void_arrays_storage_audit void_private_fixed_call_normal_0_2_observed void_private_fixed_call_optimized_7_16384_unobserved -j 3
+ctest --test-dir build/ci-debug -R '^(arrays_storage_audit|private_fixed_call_normal_0_2_observed|private_fixed_call_optimized_7_16384_unobserved)$' --output-on-failure
+```
+
+Results:
+
+- Focused production/dependency suites: 9/9 passed, 16.51 seconds. This includes
+  analysis/IR negatives, Runtime buffers and existing allocation-failure controls,
+  managed source/rooting, generated safepoints, normal/O2 runtime AOT and ordinary
+  value-struct CLI execution.
+- Final array-only recheck after adding constant-template and floating-bit
+  examples: 2/2 passed, 11.39 seconds (source 4.35; CLI 7.04). The CLI suite runs
+  116 normal/O2 JIT/linked-AOT executions, including 24 expected checked bounds
+  failures. The source harness uses Runtime allocation budget 1 and inspects
+  actual registered roots, then verifies no call temporaries survive collection.
+- Source allocation injection: 327 failing budgets in normal mode and 327 in O2,
+  every failure followed by collection and a successful retry. Additional direct
+  production-ABI allocation sweeps keep the old result sentinel intact on every
+  failed copy and verify two rooted objects only, then zero after clearing roots.
+- Orders 1/2 focused regressions: 3/3 passed, 10.03 seconds, including the full
+  optional storage-auditor suite and representative normal/optimized direct-call
+  fixtures. Research-only invalid fixtures remain intentional rejections.
+- Four large-source runs passed under RLIMIT_STACK soft/hard 1048576: ordinary
+  voidc run large.void 7, normal/O2, and linked native large normal/O2 executables.
+  Each returned 53 while manipulating independent 2 MiB arrays. Exact argv and
+  output are in build/order3/small-stack-tests.log.
+- llvm-ar/llvm-nm confirm the default backend archive still contains only
+  backend.cpp.o, with no research emitter/certification entrypoints. Changed code
+  and new sources pass whitespace checks; pre-existing Markdown hard-break
+  spaces in WRENCH_CLANKER.md remain intact.
+
+During development the new target initially required CMake regeneration. One
+source-test run used the stale 155 expectation after the order fixture gained
+an extra literal-evaluation side effect; updating/rebuilding its expectation to
+156 resolved that test mismatch. Final source/CLI runs pass. No LLVM or Runtime
+correctness failure was demonstrated or hidden by those test corrections.
+
+Logs and exact expanded AOT build command are in build/order3/. Pre-edit sources
+are in build/order3/baseline/; implementation.diff isolates the production changes
+against the actual local Orders 1/2 source. These are local development artifacts,
+not a Git commit or hosted result.
+
+LLVM references consulted: [LLVM 19 calling conventions](https://releases.llvm.org/19.1.0/docs/LangRef.html#calling-conventions)
+and [LLVM 19 bitcast](https://releases.llvm.org/19.1.0/docs/LangRef.html#bitcast-to-instruction).
+
+Remaining scope/limits: numeric/bool scalar fixed elements only; nested,
+struct/string/reference elements and growable arrays remain unsupported natively.
+Array-specific traversal/ranges and .count are not implemented by this order.
+Copies are deliberately eager and can be redundant; instruction/staging roots
+can retain temporaries until function exit. Const-formal borrowing and performance
+optimization are deferred. Windows, macOS, Release, sanitizers and full/hosted CI
+were not run. Orders 1/2 remain in place. No Order 4 work, commits, pushes,
+branches or remote modifications were performed.
+
+## 2026-10-17 — Order 4: measured root storage and Runtime lookup efficiency
+
+Inspected the actual uncommitted Orders 1-3 implementation, FIXED_ARRAYS.md,
+WRENCH_CLANKER.md and the latest work-log entries before editing. Those changes
+remain intact. This order changes only Runtime lookup/publication fast paths and
+focused tests/documentation. No Order 5, LLVM/backend/frontend change, collector
+rewrite, Git mutation or remote modification.
+
+Baseline and method:
+
+- Saved pre-edit runtime sources and headers in build/order4/baseline/; saved a
+  Release runtime archive and compiler before production changes. Configured
+  build/order4/release with clang/LLVM/LLD 19.1.7, Release (-O3 -DNDEBUG), research
+  disabled. Host: Linux x86-64, Ryzen 7 1700X. No sanitizer or LTO.
+- The small manual benchmark tests/runtime/root_lookup_measure.cpp measures only
+  the paths investigated here. Five timed batches after warmup; median/min/max
+  ns/op in CSV. Separate 100-operation allocation counts intercept C++ new,
+  including aligned new. Counts are requested allocation bytes, not RSS or peak
+  live storage. No timing assertions or general benchmarking framework added.
+- Baseline measurements preceded changes: root-token lookup doubled its search,
+  1,024-root source reads cost about 4.55 us, scalar layout creation allocated
+  three times/103 bytes, and empty publication cost about 9.86 us with 1,024
+  buffers despite just two stack roots. Source lookup and heap alias scanning
+  were isolated in separate cases. Initial/raw measurements remain under
+  build/order4/baseline/measure.csv and initial-source-timings.json.
+- Final baseline-versus-updated comparison ran serially, without concurrent
+  builds/tests, pinned to CPU 0. Baseline benchmark uses the saved baseline
+  runtime.hpp AND heap.hpp: mixing headers with different Heap sizes would be
+  invalid. Final benchmark uses current headers. Source AOT comparisons link the
+  SAME baseline-generated object against each matching Runtime archive. No code
+  generation difference is included in the Runtime comparison.
+
+Findings and changes:
+
+1. Frame entry validates and links caller-owned storage; it performs zero heap
+   allocations at 8, 128 and 1,024 slots. Compiler root homes are allocated once
+   per static instruction/local/staging type and reused through loop iterations,
+   not allocated per dynamic array access. Frame exit unlinks without allocation.
+   Temporary retention until function exit remains bounded by these static homes.
+   No measured root-storage allocation problem justified a new root allocator or
+   liveness analysis, so compiler storage/lifetime behavior is unchanged.
+2. require_output used to scan every root even after a match; root_word then
+   repeated the search. require_output/require_buffer_output now return the
+   matching Frame and root_word reuses it. reference_source also stops its exact
+   originating-frame membership search at a match. Runtime/thread ownership,
+   originating-frame linkage, exact slot membership and private-root exclusions
+   remain checked. Nested duplicate registrations do not invalidate older tokens.
+3. Source read/write/copy previously allocated a new shared capacity layout every
+   time. They now recover the source buffer's existing immutable layout after
+   checking canonical catalog schema, default packing, full live extent and
+   publication. Stack-constructed expected geometry uses the existing
+   BufferLayout implementation, avoiding a second geometry implementation. The
+   existing scalar-schema admission logic is shared by both factory paths.
+   Empty arrays retain the factory path. Copies still allocate independent data;
+   only immutable metadata is shared. Default creation still uses the factory.
+4. Heap::validate_output_address scanned the entire object table whenever any
+   buffer existed. Two conservative inclusive address bounds on the existing
+   Heap skip the scan for outputs definitely outside buffer storage. Successful
+   adoption widens them; a first buffer resets them. Deletion need not shrink
+   them: false positives run the original full scan. Saturating upper-bound
+   arithmetic and subtraction for lower-edge pointer overlap avoid wraparound.
+   Potential aliases retain the original BufferBusy/invalid-output checks.
+   Updates occur under the existing Runtime mutex; direct Heap remains its
+   existing single-threaded interface. No per-object index/global cache added.
+5. Allocation/type/buffer/reference lookup otherwise uses the existing object
+   hash table and admitted catalogs. Mixed heaps and buffer-only heaps had the
+   same read scaling, identifying root traversal rather than payload-table size
+   as the read bottleneck. Copy/publish scans were separately demonstrated above.
+   Independent payload copies, read leases and GC graph traversal remain ordinary
+   required work. Eager compiler copies were not rewritten speculatively.
+
+Pinned final microbenchmark medians (ns/op):
+
+| Workload | Baseline | Updated |
+| --- | ---: | ---: |
+| Frame enter/leave, 1,024 slots | 1,509 | 1,505 |
+| Create root token, last of 1,024 slots | 2,384 | 1,082 |
+| Source read, 1 buffer / 2 slots | 314 | 282 |
+| Source read, 1,024 buffers / 1,025 slots, source first | 4,148 | 282 |
+| Source read, 1 buffer + 1,024 ordinary objects/roots | 4,164 | 284 |
+| Empty publication, 1,024 buffers / 2 stack roots | 9,927 | 30.6 |
+| Copy + collect, 1,024 retained buffers/roots | 51,190 | 46,219 |
+| Copy + collect, 1 MiB payload / 2 roots | 58,360 | 59,270 |
+| Copy + collect, 2 MiB payload / 2 roots | 157,790 | 150,950 |
+
+A source read now allocates once/31 bytes (schema-key string) instead of three
+allocations/103 bytes. Copy+collect with two roots allocates 9 times versus 11;
+requested bytes are payload+263 versus payload+335, at BOTH 1 MiB and 2 MiB.
+That includes transient builder/collection bookkeeping, not just retained object
+metadata. There is no payload-proportional metadata growth in this measurement.
+Large copies show no reliable throughput change; preserving independent data is
+more important than the small fixed metadata saving. No claim of universal speedup.
+
+Real source AOT: CPU 0, two warmup pairs, 15 alternating before/after samples per
+case; medians include process startup. Every execution's answer was checked.
+access.void reads a 16-element i32 array 200,000 times (answer 1,700,000);
+mutate.void updates element zero 5,000 times (answer 4,999). Programs are saved
+in build/order4/. large is the existing examples/fixed_arrays/large.void, input 7,
+answer 53, using independent 2 MiB arrays. Existing entry Runtime budget 256 stays
+unchanged, so the mutation workload includes ordinary automatic collection.
+
+| Source program | Baseline ms normal / O2 | Updated ms normal / O2 |
+| --- | ---: | ---: |
+| access | 74.391 / 78.635 | 72.733 / 69.978 |
+| mutate | 62.524 / 62.681 | 42.044 / 41.541 |
+| existing large | 17.613 / 17.734 | 17.690 / 17.837 |
+
+The initial unpinned large-program samples were noisy (including an apparent O2
+regression); CPU-pinned paired measurements resolved this to less than 1% with
+overlapping ranges. Both raw datasets are retained. The tiny normal access gain
+also has overlapping ranges; the mutation gain is clear in both modes. These
+measurements justify the specific removed work, not additional optimizations.
+
+Exact measurement commands (from repository root):
+
+```sh
+cmake -S . -B build/order4/release -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang-19 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-19 -DLLVM_DIR=/usr/lib/llvm-19/lib/cmake/llvm -DVOID_LINKER=/usr/lib/llvm-19/bin/ld.lld -DVOID_CLANG=/usr/lib/llvm-19/bin/clang-19 -DVOID_DWARFDUMP=/usr/lib/llvm-19/bin/llvm-dwarfdump
+cmake --build build/order4/release --target voidc void_gc_buffers -j 3
+/usr/bin/clang++-19 -std=c++20 -O2 -Ibuild/order4/baseline/include -Iinclude tests/runtime/root_lookup_measure.cpp build/order4/baseline/libvoid_runtime.a -pthread --ld-path=/usr/lib/llvm-19/bin/ld.lld -o build/order4/baseline/measure
+/usr/bin/clang++-19 -std=c++20 -O2 -Iinclude tests/runtime/root_lookup_measure.cpp build/order4/release/libvoid_runtime.a -pthread --ld-path=/usr/lib/llvm-19/bin/ld.lld -o build/order4/final/measure
+taskset -c 0 build/order4/baseline/measure > build/order4/baseline/pinned-measure.csv
+taskset -c 0 build/order4/final/measure > build/order4/final/pinned-measure.csv
+python3 build/order4/build_measurements.py
+python3 build/order4/run_measurements.py
+```
+
+The two small local scripts save the expanded emit/link argv in
+aot-commands.json and individual process timings in source-timings.json. They
+are local development artifacts, as are saved baseline headers/archive/compiler;
+the focused C++ measurement source is retained in tests/runtime/ for rerunning
+against matching headers/archive from any revision.
+
+Focused correctness verification, exact commands:
+
+```sh
+cmake --build build/order1/production --target void_gc_buffers void_runtime_tests void_fixed_arrays_tests void_managed_tests void_runtime_generated void_runtime_aot_normal void_runtime_aot_optimized -j 3
+python3 - <<'PY'
+import subprocess
+from pathlib import Path
+targets = ['void_fixed_arrays_cli_' + p.stem + '_' + mode
+           for mode in ['normal', 'optimized']
+           for p in Path('examples/fixed_arrays').glob('*.void')]
+subprocess.run(['cmake', '--build', 'build/order1/production', '--target', *targets, '-j', '3'], check=True)
+PY
+ctest --test-dir build/order1/production -R '^(fixed_arrays_source|fixed_arrays_cli|gc_buffers|runtime_coordination|managed_source|runtime_generated|runtime_aot_normal|runtime_aot_optimized)$' --output-on-failure -j 2
+ctest --test-dir build/order4/release -R '^gc_buffers$' --output-on-failure
+```
+
+Results: Debug 8/8 passed in 13.74 s; Release Runtime buffers 1/1 passed in
+0.83 s. Source tests passed 215 failing allocation budgets in EACH normal/O2
+mode, with collection and successful retry after every failure; transactional
+ABI failure sweeps also passed. CLI runs all 116 existing real-source normal/O2
+JIT/AOT cases, including expected bounds failures and 2 MiB payloads. Runtime
+buffer tests include allocation/adoption/partial-copy/collection failure
+injection, genuine concurrent collection, safepoint leases and aborted builders.
+New regressions cover matching-layout pointer reuse, wrong encoding/extent,
+custom schema, padded packing, incomplete extent, empty fallback, independent
+payloads, nested duplicate roots, changed registration and expired inner tokens.
+Alias tests cover first/last byte and pointer-sized overlap before a buffer,
+leased and unleased, across collection to an empty buffer heap and re-adoption.
+All existing alias and allocation cleanup cases remain enabled. Logs are
+build/order4/{focused-tests,release-tests}.log and corresponding build logs.
+
+Remaining limitations: root search remains linear in the worst case; possible
+buffer aliases still scan the object table, and conservative stale bounds can
+increase false positives. A schema-key string allocation remains per source
+operation; default/empty layouts still allocate. Compiler roots retain some
+instruction temporaries until function exit; eager copies remain. No evidence
+here justified a registry/cache, root-liveness rewrite or copy-elision project.
+Timings are local single-host observations; cross-platform/full CI and sanitizer
+runs were not performed. No production size ceiling was introduced. Orders 1-3
+are preserved; Order 5 was not started.
+
+## 2026-10-17 — Order 5: simplify source-private LLVM function linkage
+
+Audited the actual current Orders 1-4 worktree, backend construction/emission,
+frontend ownership/visibility, JIT bindings/lookups, reload leases, imports,
+callbacks, metadata and existing module/native tests. Saved the pre-edit backend,
+module tests, CMake and compiler in build/order5/baseline/. No Runtime, frontend,
+calling-convention, symbol-name, GC or array implementation changes in this order.
+
+Official LLVM references consulted first:
+[LLVM 19 linkage types](https://releases.llvm.org/19.1.0/docs/LangRef.html#linkage-types),
+[ORC lookup, mangling and resource tracking](https://releases.llvm.org/19.1.0/docs/ORCv2.html),
+and [DISubprogram flags](https://releases.llvm.org/19.1.0/docs/LangRef.html#disubprogram).
+Internal linkage permits local object symbols; it does not require removing
+function names from debug information. Existing LLJIT lookup, MangleAndInterner
+and ResourceTracker remain the implementation for external resolution/lifetimes.
+
+Findings and exact production changes:
+
+- lower_graph combines the complete source import graph into ONE typed IR/LLVM
+  module. File-private functions already carry module_identity and visibility;
+  their definitions nevertheless all used ExternalLinkage. No cross-object
+  native consumer is entitled to those unselected file-private implementations.
+- The shared lowerer now uses InternalLinkage only for source-owned functions
+  with visibility == private, unless that function is the exported entry.
+  This one rule is applied at function construction. Jit::compile passes its
+  actual selected function identity, which may differ from module.entry_symbol;
+  AOT emission passes module.entry_symbol. The optional research caller supplies
+  its entry too. There is no internalization pass or extra export registry.
+- DISubprogram flags now include SPFlagLocalToUnit when the resulting function
+  has local linkage. Logical names, native names, source paths/locations, function
+  signatures, call lookup maps and generation suffixes are unchanged.
+- Public and project/internal-visible source functions remain external, including
+  imported source exports. Legacy hand-built IR functions remain external: they
+  are used by separately linked native harnesses and can be imported by another
+  LLVM module. This intentionally does not maximize hidden symbols.
+- Trusted C import declarations remain external. Runtime ABI declarations,
+  callback bindings, main, root-probe host entry, selected JIT entry, nominal and
+  interface metadata globals remain as before. Metadata is consumed by native
+  bootstrap/harnesses, so it was not internalized. Generated virtual dispatch and
+  interface prepare/invoke helpers were already internal and needed no change.
+
+Evidence from actual ELF objects, using the same private-array module fixture
+with the pre-edit compiler versus the updated lowerer:
+
+| Function | Before normal / O2 | After normal / O2 |
+| --- | --- | --- |
+| /main.void::helper (private scalar) | global / global | local / inlined away |
+| /lib.void::snapshot (private array argument/return) | global / global | local / local |
+| /main.void::entry | global / global | global / global |
+| /lib.void::imported (public export) | global / global | global / global |
+| /lib.void::project (project-visible export) | global / global | global / global |
+
+Both CLI objects (existing __void suffix) and library objects show the intended
+bindings. The automated modules test reads native object symbol flags through
+LLVM's existing ObjectFile API: private definitions cannot be global, normal
+private bodies must exist, and required external exports must exist in both
+modes. O2 may remove unused/inlined private bodies. Platform global-name prefixes
+are allowed. CMake gives only the existing void_tests target LLVM header access;
+no new compiler API, verification service or certification system is involved.
+
+New focused regressions also exercise:
+
+- Private scalar and array bodies across source-file imports, array argument
+  snapshots, result publication and copy independence.
+- Explicit JIT selection of a private non-default entry, and selection of an
+  imported public function, normal/O2.
+- Replacing a private helper body while an old generation lease remains usable;
+  forced Runtime allocation budget 1, post-return collection and no live roots.
+- A separate LLVM consumer module resolving the provider's unselected legacy
+  calculate__v1 export through ORC, normal/O2. The provider lease stays alive,
+  preserving the existing host-owned dependency lifetime contract.
+
+Exact focused commands, using the pinned LLVM 19.1.7 Debug build:
+
+```sh
+/usr/lib/llvm-19/bin/llvm-config --version
+cmake --build build/order1/production --target void_tests voidc void_runtime_callbacks void_runtime_generated void_runtime_aot_normal void_runtime_aot_optimized void_fixed_arrays_tests -j 3
+cmake --build build/order1/production --target void_tests void_inheritance_tests void_inheritance_aot_normal void_inheritance_aot_optimized void_interfaces_tests -j 3
+ctest --test-dir build/order1/production -R '^(modules|jit|reload|native|modules_cli|runtime_callbacks|runtime_generated|runtime_aot_normal|runtime_aot_optimized|fixed_arrays_source|gc_buffers)$' --output-on-failure -j 2
+python3 - <<'PY'
+from pathlib import Path
+import subprocess
+targets = ['void_fixed_arrays_cli_' + p.stem + '_' + mode
+           for mode in ['normal', 'optimized']
+           for p in Path('examples/fixed_arrays').glob('*.void')]
+subprocess.run(['cmake', '--build', 'build/order1/production', '--target', *targets, '-j', '3'], check=True)
+PY
+ctest --test-dir build/order1/production -R '^(fixed_arrays_cli|inheritance_source|interfaces_source|inheritance_aot_normal|inheritance_aot_optimized)$' --output-on-failure -j 2
+cmake --build build/ci-debug --target void_arrays_storage_audit void_private_fixed_call_normal_0_2_observed void_private_fixed_call_optimized_7_16384_unobserved -j 3
+ctest --test-dir build/ci-debug -R '^(arrays_storage_audit|private_fixed_call_normal_0_2_observed|private_fixed_call_optimized_7_16384_unobserved)$' --output-on-failure
+python3 build/order5/check_objects.py
+/usr/lib/llvm-19/bin/llvm-ar t build/order1/production/libvoid_llvm.a
+/usr/lib/llvm-19/bin/llvm-nm --defined-only build/order1/production/libvoid_llvm.a
+```
+
+Results:
+
+- Production: 11/11 passed, 66.09 s; additional dispatch/array suites 5/5 passed,
+  10.00 s. These are targeted suites, not the complete compiler matrix.
+- Orders 1/2 research regressions: 3/3 passed, 10.30 s. The default archive still
+  contains only backend.cpp.o and no research emitter/certification entrypoints.
+- Fixed-array CLI: all 116 normal/O2 JIT/linked-AOT cases pass, including checked
+  failures and 2 MiB arrays. Source allocation failures remain 215 failing
+  budgets per normal/O2 mode, with collection, cleanup and successful retries.
+  gc_buffers retains the Order 4 layout reuse, alias-boundary, root lifetime,
+  collection and allocation-failure regressions. Runtime source files were not
+  edited by Order 5.
+- New fixture native checks: four successful CLI/library executions, six actual
+  object symbol dumps and six llvm-dwarfdump --verify checks passed. The library
+  harness separately links against the PUBLIC/imported and project-visible
+  generated functions and external nominal/witness catalogs, forces GC during
+  private array calls and confirms no remaining objects after return.
+- The local check_objects.py script records every emit/link/nm/dwarfdump argv in
+  build/order5/object-commands.json. Inputs/objects are generated by the modules
+  test in build/order1/production/module fixtures with spaces/private linkage/.
+  Script, C++ native harness, symbol dumps and logs remain in build/order5/.
+  This is a small local inspection driver, not a production framework.
+- Initial test build required adding the Runtime header for the new forced-GC
+  fixture (backend.hpp only forward-declares Runtime). Fixed in the same sprint;
+  final builds and focused tests pass. No production execution failure occurred.
+
+Remaining limits/platform concerns: validation was local Linux x86-64. LLVM
+internal linkage and existing target mangling are used without ELF-specific
+production rules; Windows COFF and macOS Mach-O are not claimed tested. The
+object-symbol regression tolerates the normal target prefix, but hosted CI is
+still needed. Public/project and legacy native exports remain intentionally
+conservative. Existing cross-generation raw native imports require the host to
+retain provider leases; this order adds no dependency-lifetime registry. No
+performance claim, new native FFI contract or source visibility change is made.
+
+Orders 1-4 remain uncommitted and preserved. No commit, push, branch, remote
+modification, full CI or unrelated feature work was performed. Order 5 is complete;
+stop here until the owner authorizes consolidated validation/hosted CI.
+
+## 2026-10-17 — Final consolidated validation, Orders 1–5
+
+Completed the owner-authorized combined validation against the actual uncommitted
+worktree. Read the five order entries, current continuity rules and relevant
+source-array, module, source-compiler, sanitizer and editor documentation. All
+five implementations remain present. No integration defect was demonstrated;
+no compiler, Runtime, test, CMake or workflow repair was necessary. The tracked
+worktree diff was byte-identical before and after testing, before this final
+documentation update. Earlier owner changes were preserved.
+
+Combined source reviewed:
+
+- Order 1: default-OFF VOID_LLVM_RESEARCH gates storage_audit.cpp, encoded_cfg.cpp,
+  inventory instrumentation, optional emitters and research tests. Ordinary
+  lower/verify/optimize/JIT/object emission does not invoke certification.
+- Order 2: the optional private-call fixture uses normal direct LLVM arguments,
+  with Frame/Slot lifetimes and Runtime copy transactions. Envelope/CallBinding,
+  duplicated authorization and custom machine-ABI reconstruction remain removed.
+- Order 3: numeric/bool fixed arrays use Runtime heap buffers through the shared
+  frontend/typed IR/LLVM JIT/AOT path. Independent snapshots, checked indexing,
+  evaluation order, arguments/returns, precise roots and transactional publication
+  are preserved. Large payloads are not allocated on the native stack.
+- Order 4: matching-Frame reuse/early search termination, immutable source-layout
+  reuse and conservative per-Heap alias bounds remain. Exact root lifetime,
+  schema/packing/extent, lease and publication checks are still enforced.
+- Order 5: unselected source-private definitions are LLVM-internal with matching
+  debug local-unit flags. Actual selected entries, public/project exports,
+  legacy native definitions, C/Runtime imports and external metadata remain
+  resolvable. Source names, module ownership and ABI lowering are unchanged.
+
+Local environment: Linux x86-64; installed Clang/LLVM/LLD 19.1.7 at /usr/lib/llvm-19,
+C++20, RTTI ON matching the SDK. Existing build caches retain those explicit tool
+paths. Debug and Release are unsanitized; sanitizer configuration is
+RelWithDebInfo (-O2 -g -DNDEBUG) with -fsanitize=address,undefined and
+-fno-omit-frame-pointer. No suppression/ignorelist or sanitizer disabling added.
+
+| Final run | Outcome | Wall time |
+| --- | --- | ---: |
+| Complete production CTest, Debug, research OFF | 64/64 passed | 139.14 s |
+| Complete production CTest, Release, research OFF | 64/64 passed | 55.24 s |
+| Complete production CTest, strict ASan/UBSan/leaks, research OFF | 64/64 passed | 144.36 s |
+| Optional research ON, auditor plus all private-call cases | 13/13 passed | 15.86 s |
+| Debug frontend with 1 MiB stack | 1/1 passed | 9.03 s |
+| Release frontend with 1 MiB stack | 1/1 passed | 4.68 s |
+
+The 192 production suite executions cover ordinary/O2 JIT and linked native AOT,
+all existing compiler/frontend/type/module/native tests, callbacks and hot reload,
+precise GC/safepoints/allocation failures, diagnostics/tooling/sessions and LSP.
+Each configuration executes all 116 fixed-array CLI cases, including expected
+bounds failures and independent 2 MiB payloads. Strict sanitizer source-array
+output records 215 failing allocation budgets in EACH normal/O2 mode, with
+collection, cleanup and successful retry after each, plus ABI publication sweeps.
+Order 4's root/layout/alias regressions pass in gc_buffers in all three builds.
+The modules suite checks actual private/public object bindings, selected private
+and imported JIT entries, private array calls/returns, old-generation leases and
+separate LLVM-module import resolution. No correctness checks were weakened.
+
+Eight additional large-array executions passed under a 1 MiB native stack:
+normal/O2 JIT and linked AOT in both Debug and Release, each returning 53 for
+input 7. The existing frontend small-stack regressions also passed as above.
+
+Production inventories are identical across configurations: 64 tests, no
+arrays_storage_audit or private_fixed_call research tests. All three default
+backend archives contain only backend.cpp.o; llvm-nm finds neither research
+emitter entrypoint. Ordinary successful array/aggregate/managed execution does
+not depend on the optional research acceptance limits. No artificial array-size
+limit was introduced.
+
+Environment failures investigated and resolved without source changes:
+
+- The tracing sandbox made LeakSanitizer abort explicitly with "does not work
+  under ptrace", first in a small environment probe and then during the first
+  sanitized CLI object generation. Make deleted the failed generated object.
+  Continued the same build and ran the complete suite outside that sandbox,
+  retaining detect_leaks=1, halt_on_error=1 and strict report exit settings.
+- Chromium's sandbox operation was denied when launching real editor tests.
+  Reran the unchanged test outside the host sandbox, using disposable profiles
+  and the installed VS Code 1.141.0. No editor assertions were disabled.
+
+Editor/package validation: Node 24.19.0, existing lockfile-installed dependencies.
+`npm test` passed its configuration test and TypeScript/build steps. Real editor
+trusted, restricted-trust and multi-root profiles all passed against the current
+Debug voidls, including actual native-child lifecycle and failure cleanup.
+`npm run package` successfully built the existing eight-file VSIX at
+editors/vscode/dist/void-language-0.1.0.vsix (149139 bytes). SHA-256:
+75686052f20787a1f351ee5a5c33e7e17765659a91f16ac9cf556be1c7926c6a.
+No editor source/dependency changes were required.
+
+Exact build/test commands (repository root, existing pinned build caches):
+
+```sh
+cmake -S . -B build/order1/production -DVOID_LLVM_RESEARCH=OFF
+cmake --build build/order1/production -j 3
+ctest --test-dir build/order1/production --output-on-failure -j 2
+cmake -S . -B build/order4/release -DVOID_LLVM_RESEARCH=OFF
+cmake --build build/order4/release -j 2
+ctest --test-dir build/order4/release --output-on-failure -j 2
+cmake -S . -B build/ci-sanitizers -DVOID_LLVM_RESEARCH=OFF -DVOID_SANITIZERS=ON
+# Run outside the tracing sandbox; keep every sanitizer option enabled.
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 cmake --build build/ci-sanitizers -j 2
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers --output-on-failure -j 2
+cmake -S . -B build/ci-debug -DVOID_LLVM_RESEARCH=ON
+python3 - <<'PY'
+import json, subprocess
+x = json.loads(subprocess.check_output(['ctest', '--test-dir', 'build/ci-debug', '--show-only=json-v1'], text=True))
+targets = ['void_arrays_storage_audit'] + ['void_' + t['name'] for t in x['tests'] if t['name'].startswith('private_fixed_call_')]
+subprocess.run(['cmake', '--build', 'build/ci-debug', '--target', *targets, '-j', '2'], check=True)
+PY
+ctest --test-dir build/ci-debug -L research --output-on-failure -j 2
+```
+
+Small-stack commands, executed in separate shells for each build:
+
+```sh
+for build in build/order1/production build/order4/release; do
+  (
+    ulimit -s 1024
+    ctest --test-dir "$build" -R '^frontend$' --output-on-failure
+    "$build/voidc" run examples/fixed_arrays/large.void 7 --no-opt
+    "$build/voidc" run examples/fixed_arrays/large.void 7
+    "$build/void_fixed_arrays_cli_large_normal" 7
+    "$build/void_fixed_arrays_cli_large_optimized" 7
+  )
+done
+```
+
+Editor commands, from editors/vscode:
+
+```sh
+export PATH=/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:$PATH
+npm test
+npm run package
+# Outside the tracing sandbox, with the existing desktop display:
+VOIDLS_PATH=/home/shmellyorc/Documents/Void.Language/build/order1/production/voidls VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:host
+```
+
+Complete build/test logs, test inventories, sanitizer success output, original
+sandbox diagnostics and backend symbol listings are in build/final-validation/.
+The final combined uncommitted worktree patch there includes modified tracked
+files AND the 24 new source/documentation files; it excludes ignored build/editor
+products. It preserves earlier local owner changes as part of the combined state.
+
+Readiness review: .github/workflows/ci.yml is unchanged and already configures
+fresh default-OFF research builds, builds all production targets and runs
+unfiltered CTest in Linux Debug/Release/Sanitizers and Windows/macOS Debug/Release.
+It also retains strict sanitizer environment settings, Linux frontend small-stack
+checks, Node 24.19.0, real editor tests and VSIX packaging. All intended includes,
+research fixture sources, 11 fixed-array examples and new tests/docs are present.
+The combined implementation is ready for the owner's commit/push and hosted CI.
+
+Limitations: these results are local Linux evidence, not Windows/COFF or
+macOS/Mach-O execution. The installed SDK enables RTTI/vptr coverage; the official
+CI archive uses its existing no-RTTI ABI policy. LLVM's prebuilt libraries and
+emitted JIT/AOT instructions are not rebuilt with ASan instrumentation; VOID's
+C++ compiler/Runtime/tests are instrumented. Existing fixed-array scope limits,
+eager copies/root retention and worst-case linear lookups remain documented.
+No new feature or speculative optimization was added. No commits, pushes,
+branches, remote modifications or hosted CI launches were performed. Stop here.

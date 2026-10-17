@@ -1,0 +1,111 @@
+func echo_i8(values: [i8, 2]) -> [i8, 2]:
+    values[0] += 1
+    return values
+
+func echo_i16(values: [i16, 2]) -> [i16, 2]:
+    values[0] += 1
+    return values
+
+func echo_i32(values: [i32, 2]) -> [i32, 2]:
+    values[0] += 1
+    return values
+
+func echo_i64(values: [i64, 2]) -> [i64, 2]:
+    values[0] += 1
+    return values
+
+func echo_u8(values: [u8, 2]) -> [u8, 2]:
+    values[0] += 1
+    return values
+
+func echo_u16(values: [u16, 2]) -> [u16, 2]:
+    values[0] += 1
+    return values
+
+func echo_u32(values: [u32, 2]) -> [u32, 2]:
+    values[0] += 1
+    return values
+
+func echo_u64(values: [u64, 2]) -> [u64, 2]:
+    values[0] += 1
+    return values
+
+func echo_f32(values: [f32, 2]) -> [f32, 2]:
+    values[0] += 1
+    return values
+
+func echo_f64(values: [f64, 2]) -> [f64, 2]:
+    values[0] += 1
+    return values
+
+func echo_bool(values: [bool, 2]) -> [bool, 2]:
+    values[0] = false
+    return values
+
+func entry(value: i32) -> i32:
+    var original_i8: [i8, 2] = [value as i8, -128]
+    var copy_i8 = echo_i8(original_i8)
+    var zero_i8: [i8, 2]
+    if original_i8[0] as i32 != value or copy_i8[0] as i32 != value + 1 or copy_i8[-1] != -128 or zero_i8[1] != 0:
+        return -100
+    var original_i16: [i16, 2] = [value as i16, -32768]
+    var copy_i16 = echo_i16(original_i16)
+    var zero_i16: [i16, 2]
+    if original_i16[0] as i32 != value or copy_i16[0] as i32 != value + 1 or copy_i16[-1] != -32768 or zero_i16[1] != 0:
+        return -101
+    var original_i32: [i32, 2] = [value as i32, -2147483648]
+    var copy_i32 = echo_i32(original_i32)
+    var zero_i32: [i32, 2]
+    if original_i32[0] as i32 != value or copy_i32[0] as i32 != value + 1 or copy_i32[-1] != -2147483648 or zero_i32[1] != 0:
+        return -102
+    var original_i64: [i64, 2] = [value as i64, -9223372036854775808]
+    var copy_i64 = echo_i64(original_i64)
+    var zero_i64: [i64, 2]
+    if original_i64[0] as i32 != value or copy_i64[0] as i32 != value + 1 or copy_i64[-1] != -9223372036854775808 or zero_i64[1] != 0:
+        return -103
+    var original_u8: [u8, 2] = [value as u8, 255]
+    var copy_u8 = echo_u8(original_u8)
+    var zero_u8: [u8, 2]
+    if original_u8[0] as i32 != value or copy_u8[0] as i32 != value + 1 or copy_u8[-1] != 255 or zero_u8[1] != 0:
+        return -104
+    var original_u16: [u16, 2] = [value as u16, 65535]
+    var copy_u16 = echo_u16(original_u16)
+    var zero_u16: [u16, 2]
+    if original_u16[0] as i32 != value or copy_u16[0] as i32 != value + 1 or copy_u16[-1] != 65535 or zero_u16[1] != 0:
+        return -105
+    var original_u32: [u32, 2] = [value as u32, 4294967295]
+    var copy_u32 = echo_u32(original_u32)
+    var zero_u32: [u32, 2]
+    if original_u32[0] as i32 != value or copy_u32[0] as i32 != value + 1 or copy_u32[-1] != 4294967295 or zero_u32[1] != 0:
+        return -106
+    var original_u64: [u64, 2] = [value as u64, 18446744073709551615]
+    var copy_u64 = echo_u64(original_u64)
+    var zero_u64: [u64, 2]
+    if original_u64[0] as i32 != value or copy_u64[0] as i32 != value + 1 or copy_u64[-1] != 18446744073709551615 or zero_u64[1] != 0:
+        return -107
+    var original_f32: [f32, 2] = [value as f32, -1.25]
+    var copy_f32 = echo_f32(original_f32)
+    var zero_f32: [f32, 2]
+    if original_f32[0] as i32 != value or copy_f32[0] as i32 != value + 1 or copy_f32[-1] != -1.25 or zero_f32[1] != 0:
+        return -108
+    var original_f64: [f64, 2] = [value as f64, -2.5d]
+    var copy_f64 = echo_f64(original_f64)
+    var zero_f64: [f64, 2]
+    if original_f64[0] as i32 != value or copy_f64[0] as i32 != value + 1 or copy_f64[-1] != -2.5d or zero_f64[1] != 0:
+        return -109
+    var flags: [bool, 2] = [true, false]
+    var flipped = echo_bool(flags)
+    var defaults: [bool, 2]
+    if flags[0] != true or flipped[0] != false or defaults[1] != false:
+        return -200
+    var zero32 = (value as f32) - (value as f32)
+    var bits32: [f32, 2] = [zero32 / zero32, -zero32]
+    var saved32 = bits32
+    if saved32[0] == saved32[0] or 1.0 / saved32[1] > 0.0:
+        return -300
+    var zero64 = (value as f64) - (value as f64)
+    var bits64: [f64, 2] = [zero64 / zero64, -zero64]
+    var saved64 = bits64
+    if saved64[0] == saved64[0] or 1.0d / saved64[1] > 0.0d:
+        return -301
+    return value + 100

@@ -869,6 +869,65 @@ void foundation_acceptance_stress() {
 }
 // Stage 3A uses the same buffer representation/transactions, with exact fixed
 // extent checks rather than a second object kind or memory owner.
+void output_alias_bounds() {
+    Runtime r;Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r);
+    auto layout=r.fixed_scalar_layout(ScalarEncoding::u8,64);
+    for(unsigned cycle=0;cycle<3;++cycle) {
+        r.fixed_default_into(&source.value,layout,quota);
+        auto token=r.root_word(&source.value);
+        for(bool leased:{false,true}) {
+            std::optional<Runtime::BufferReadLease> lease;
+            if(leased)lease.emplace(r,token,layout);
+            const auto base=reinterpret_cast<std::uintptr_t>(source.value);
+            for(auto address:{base-(sizeof(void*)-1),base,base+layout->bytes()-1}) {
+                auto** alias=reinterpret_cast<void**>(address);
+                constexpr std::size_t zero=0;Runtime::Slot slot{alias,sizeof(void*),&zero,1};Runtime::Frame frame(r,&slot,1);
+                if(leased)busy([&]{r.string_into(alias,{});});
+                else reject([&]{r.string_into(alias,{});});
+            }
+        }
+        r.string_into(&out.value,{});check(!out.value,"stack output publication failed");
+        source.value=nullptr;
+        check(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"alias bounds collection leaked");
+    }
+}
+void source_layout_reuse() {
+    Runtime r(1);Runtime::Attachment a(r);Runtime::Managed m(r);Output source(r),out(r);
+    auto layout=r.fixed_scalar_layout(ScalarEncoding::i32,3);
+    r.fixed_default_into(&source.value,layout,quota);
+    auto outer=r.root_word(&source.value);
+    check(r.fixed_scalar_layout(outer,ScalarEncoding::i32,3)==layout,"source layout was rebuilt");
+    std::optional<Runtime::RegisteredRootWord> inner;
+    {
+        constexpr std::size_t zero=0;Runtime::Slot slot{&source.value,sizeof(void*),&zero,1};Runtime::Frame nested(r,&slot,1);
+        inner=r.root_word(&source.value);
+        check(r.fixed_scalar(outer,layout,0)==0,"nested duplicate registration invalidated outer token");
+        check(r.fixed_scalar(*inner,layout,0)==0,"nested root token rejected");
+        slot.storage=&out.value;
+        reject([&]{r.fixed_scalar(*inner,layout,0);});
+        slot.storage=&source.value;
+    }
+    reject([&]{r.fixed_scalar(*inner,layout,0);});
+    check(r.fixed_scalar(outer,layout,0)==0,"outer token expired with nested frame");
+    reject([&]{r.fixed_scalar_layout(outer,ScalarEncoding::u32,3);});
+    reject([&]{r.fixed_scalar_layout(outer,ScalarEncoding::i32,2);});
+    reject([&]{r.fixed_scalar_layout(outer,static_cast<ScalarEncoding>(999),3);});
+    auto padded=r.buffer_layout(layout->schema(),3,4,8);
+    r.fixed_default_into(&source.value,padded,quota);
+    reject([&]{r.fixed_scalar_layout(outer,ScalarEncoding::i32,3);});
+    {Runtime::BufferBuilder b(r,layout,2,quota);b.zero_elements(2);b.finish_into(&source.value);}
+    reject([&]{r.fixed_scalar_layout(outer,ScalarEncoding::i32,3);});
+    ElementSchemaRef custom;{Runtime::Native native(r);custom=admit(r,spec("custom-source-i32",{SchemaScalar{ScalarEncoding::i32}}));}
+    r.fixed_default_into(&source.value,r.buffer_layout(custom,3),quota);
+    reject([&]{r.fixed_scalar_layout(outer,ScalarEncoding::i32,3);});
+    r.fixed_default_into(&source.value,layout,quota);
+    r.fixed_copy_into(&out.value,outer,r.fixed_scalar_layout(outer,ScalarEncoding::i32,3),quota);
+    check(source.value!=out.value,"reused layout shared array payload");
+    check(r.collect()==Runtime::Collection::completed && r.snapshot().objects==2,"layout reuse lost live buffers or retained temporary storage");
+    source.value=out.value=nullptr;
+    check(r.fixed_scalar_layout(outer,ScalarEncoding::i32,0)->capacity()==0,"empty layout fallback failed");
+    check(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"source layout reuse leaked");
+}
 void fixed_values() {
     Runtime r(1);auto byte=admit(r,spec("fixed-u8",{SchemaScalar{ScalarEncoding::u8}}));
     auto layout=r.buffer_layout(byte,4*1024*1024);Runtime::Attachment a(r);Runtime::Managed m(r);
@@ -1164,7 +1223,7 @@ void measure() {
 int main(int argc,char** argv) {
     try {
         if(argc>1) {if(std::string_view(argv[1])=="--measure")measure();else if(std::string_view(argv[1])=="--measure-reference")measure_references();else if(std::string_view(argv[1])=="reference-leak-bytes")checked_reference_transaction(-1,true,37);else if(std::string_view(argv[1])=="reference-leak-zero")checked_reference_transaction(-1,true,0);else fatal(argv[1]);}
-        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();fixed_values();fixed_poll_and_roots();fixed_failures();fixed_private_bridge();reference_poll_reacquisition();
+        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();output_alias_bounds();source_layout_reuse();fixed_values();fixed_poll_and_roots();fixed_failures();fixed_private_bridge();reference_poll_reacquisition();
 #ifdef VD_BUFFER_WRAP_COLLECT
             reference_poll_reacquisition(true);
 #endif
