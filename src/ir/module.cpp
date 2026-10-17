@@ -257,6 +257,7 @@ std::vector<VirtualTarget> virtual_targets(const Module& module,const Function& 
 #include "interfaces.inc"
 #include "construction.inc"
 #include "reference_capabilities.inc"
+#include "fixed_ownership.inc"
 void validate(const Module& m, InstructionTypes* results,std::map<std::string,ReferenceEffects>* verified_effects) {
     if (results) results->clear();
     InstructionTypes qualified_types;
@@ -565,6 +566,21 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                         if(argument>=pure_templates.size() || !pure_templates[argument]) fail("effectful repeated array prototype");
                     for(auto argument:i.arguments) expect(argument,array_element(i.type));
                     result=i.type;break;
+                case Op::fixed_snapshot:
+                    if(!f.fixed_ownership || !scalar_fixed_array(operand(i.a)) || i.receiver || !i.arguments.empty() || i.b || i.immediate || i.initialization || !i.callee.empty())
+                        fail("invalid fixed snapshot");
+                    result=operand(i.a);break;
+                case Op::fixed_select:
+                    if(!f.fixed_ownership || !i.receiver || !i.receiver->fields.empty() || !scalar_fixed_array(slot(i.receiver->slot)) ||
+                       slot(i.receiver->slot).readonly || !numeric::integer(operand(i.a)) || i.b || i.immediate || i.initialization || !i.arguments.empty() || !i.callee.empty())
+                        fail("invalid fixed selection");
+                    result=Type::none;break;
+                case Op::fixed_commit: {
+                    if(!f.fixed_ownership || i.a>=types.size() || b.instructions[i.a].op!=Op::fixed_select || i.receiver ||
+                       i.immediate || i.initialization || !i.arguments.empty() || !i.callee.empty()) fail("invalid selected-place commit");
+                    expect(i.b,array_element(slot(b.instructions[i.a].receiver->slot)));
+                    result=Type::none;break;
+                }
                 case Op::array_get: case Op::array_set: {
                     const auto array=operand(i.a), index=operand(i.b);
                     if(!scalar_fixed_array(array) || !numeric::integer(index) || i.receiver || i.initialization || i.immediate || !i.callee.empty())
@@ -701,6 +717,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             }
         }
         validate_construction(f,m,body_types);
+        validate_fixed_ownership(f,m,body_types);
     }
     if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition)) fail("incomplete nominal universe for structural interfaces");
     validate_reference_capabilities(m,qualified_types,verified_effects);

@@ -456,6 +456,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 };
                 switch (instruction.op) {
                 case ir::Op::fixed_array: case ir::Op::array_get: case ir::Op::array_set:
+                case ir::Op::fixed_snapshot: case ir::Op::fixed_select: case ir::Op::fixed_commit:
                     throw std::invalid_argument("P23-1 checked array IR cannot execute before P23-2 review");
                 case Op::interface_pack: {
                     auto* object=values[instruction.a];auto* nonnull=llvm::BasicBlock::Create(context,"bind_interface",fn);auto* joined=llvm::BasicBlock::Create(context,"interface_view",fn);auto* start=b.GetInsertBlock();

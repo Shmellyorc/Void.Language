@@ -5,9 +5,10 @@
 
 **Created:** 12 October 2026  
 **Project:** [Shmellyorc/Void.Language](https://github.com/Shmellyorc/Void.Language)  
-**Updated:** 16 October 2026  
-**Snapshot:** VOID 2.0 Phases **1–22 hosted-verified and locked**. Phase **23: typed arrays** is **NOT complete**. Large-array Stage **1**, runtime Stage **2B**, **2C**, **2D** and **2E** are locked. Latest verified GitHub checkpoint: **Stage 2E** at commit [`3cbe250`](https://github.com/Shmellyorc/Void.Language/commit/3cbe2506ed8feb452f19e862ed6aec9e90330e55), [Actions CI #56](https://github.com/Shmellyorc/Void.Language/actions/runs/38902950811), **seven of seven jobs succeeded, 63/63 suites on each platform**. **Stage 2F is next but has not been authorized or implemented at this snapshot.** Source-native arrays, owned fixed-array semantics, growable list execution, LLVM ABI integration, source loops/ranges and full Phase 23 certification remain gated.
-**Continuity rule:** Read **Section 8 (Phase 23 current state)** and **Section 9 (exact remaining plan)** before proposing ANY next action. This is a dated snapshot, so check the latest owner documents, local report and GitHub before advancing.
+**Updated:** 16 October 2026 (after Stage 3B blocker investigation and workflow decision)  
+**Snapshot:** VOID 2.0 Phases **1–22 hosted-verified and locked**; Phase **23 is NOT complete**. Stage **1** and runtime **2B–2F** are hosted locked. Stage **2F**: commit [`d872889`](https://github.com/Shmellyorc/Void.Language/commit/d872889cedb1cee8dbb69e9d6411dea98b4fa5f3), [CI #57](https://github.com/Shmellyorc/Void.Language/actions/runs/38922793539), seven successful hosted jobs, 63/63 suites per job. Stage **3A**: commit [`44fc8b6`](https://github.com/Shmellyorc/Void.Language/commit/44fc8b686b1e28665455b37a1a825f7ba05e186e), [CI #58](https://github.com/Shmellyorc/Void.Language/actions/runs/38982940254), seven successful hosted jobs, 63/63 per job, **441/441** total, independently checked by Wrench. Stage **3B**: bounded private IR/runtime/layout/helper work passed 63/63 in all six Linux LLVM 19.1.7 configurations **locally**, but is **not hosted locked**. Four incoming ABI ownership slots remain correctly rejected; the original Clang and Debug JIT crashes did not reproduce against the isolated locked Stage 3A comparison and remain unexplained. **Stage 3C and public source-native arrays remain gated**, as do nested owned-child execution and Stage 4 growable lists. The next request is a narrow KISS/DRY ABI-header consolidation review, then a separately approved plan for missing native caller/callee certification.  
+**Operating strategy:** **Normal GPT-6 Sol (High thinking where useful) is the default Keyboard Clanker.** Use **Work selectively** only when a large cross-system integration, genuinely extensive audit or autonomous tool workflow justifies its usage cost. Wrench advises and reviews; the boss alone approves scope and handles Git.  
+**Continuity rule:** Read **Section 8 (Phase 23 current state)**, **Section 9 (next gate)** and **Section 10 (Normal Sol/Work routing and validation)** before proposing ANY next action. This is a dated snapshot, so check the latest owner documents, local report and GitHub before advancing.
 
 **Purpose:** If the conversation gets too long, a branch loses context, or a different assistant takes over, **read this file before working on VOID**.
 
@@ -70,27 +71,34 @@ What I do:
 1. Understand what the user is actually trying to build, not merely the next individual code change.
 2. Read the project's real documentation and code/evidence when available.
 3. Identify the **next coherent phase**, with clear boundaries and acceptance tests.
-4. Draft a focused instruction for Work, the keyboard clanker, to implement.
+4. Draft a focused instruction for Keyboard Clanker, normally in **Normal Sol**; recommend **Work** only when its autonomy and broad tool access are genuinely worth the usage.
 5. Stop at genuine language-design decisions, explain the alternatives, and ask the owner to approve one.
-6. Review the Work report and actual logs, distinguishing local tests from hosted results.
+6. Review Keyboard Clanker reports and actual logs, distinguishing local tests from hosted results.
 7. Inspect GitHub Actions read-only after the owner pushes. Diagnose failures from the actual failing step and logs, not from a guess.
 8. Draft a narrow corrective prompt when needed. Do not pile new features on a failing CI run.
 9. Celebrate a phase only after the required Linux, Windows, and macOS jobs pass.
 10. Remember decisions and hand them off before a long conversation loses context.
 
-**What I do not do:** Claim that I personally implemented the compiler changes that Work made. Claim a test is green without evidence. Make git commits, push, create branches, alter remotes, or quietly change the user's architecture. Pretend I can see the user's local project when I have only a GitHub snapshot and attached documents.
+**What I do not do:** Claim that I personally implemented compiler changes made by the Keyboard Clanker. Claim a test is green without evidence. Make git commits, push, create branches, alter remotes, or quietly change the user's architecture. Pretend I can see the user's local project when I have only a GitHub snapshot and attached documents.
 
-### ⌨️🤖 Work: the keyboard clanker
+### ⌨️🤖 Keyboard Clanker: Normal Sol by default
 
-**Role:** The coding/implementation agent working against the local project.
+**Role:** The implementation agent, whether working through normal GPT-6 Sol with owner-provided project files/changes or, when justified, through Work directly against the local repository.
 
-- Inspects source, modifies code, builds, tests, and documents changes.
-- Reports exact commands, positive and negative checks, SDKs, limitations, and unverified platforms.
-- Writes or updates the project's `docs/WORK_LOG.md` and the relevant design/implementation documents.
-- Does **not** commit, push, branch, or modify GitHub remotes. The boss handles Git operations.
-- When an important observable language behavior is genuinely undecided, proposes a contract and waits for approval rather than silently inventing a rule.
+- **Normal Sol is the default** for bounded implementation, focused debugging, compiler changes with a clear contract, header consolidation, architectural reasoning and preparation/review of small patches. It may work from user-provided files or an archive and return edits for owner application; do not pretend it automatically has access to the local directory.
+- **Work is a specialist tool, not a mandatory stronger model.** Recommend it for tasks touching many subsystems/files, difficult independent audits, complicated environment/tool orchestration, or major integration where autonomous access saves more effort than the extra usage costs. A medium-effort Work session is not presumed superior to a well-scoped high-thinking Normal Sol task.
+- Both routes inspect applicable evidence, implement only approved scope, run focused checks, and report exact commands, outcomes, regressions, limitations and unverified platforms.
+- Documentation should be maintained without conflict with the separate Markdown bot. The boss alone commits, pushes, branches or alters GitHub state.
+- When an important observable language behavior or native safety proof is undecided, stop with evidence for owner/Wrench review; do not infer approval from a passing unrelated suite.
 
-The roles have become our shared joke: **keyboard clanker builds; research clanker studies options; wrench clanker checks the bolts; boss pulls the GitHub lever. XD**
+### 🧰 Work: selective heavy-duty assistance
+
+- Use **only when it pays for itself**: broad cross-file compiler/runtime/backend integration, independent security/ABI/GC audits, or substantial autonomous environmental debugging.
+- Give Work **one tightly scoped checkpoint**, not an entire chain of implementation, audit, docs and next-phase authorization.
+- Protect continuity: usage exhaustion once stopped progress for roughly two hours. Record a handoff and let Normal Sol handle independent bounded tasks while Work usage recovers. Never assume an unavailable Work session prevents all development.
+- When a Work task finishes, Wrench independently reviews its scope and evidence before proposing another; avoid automatically routing follow-up cleanup back through Work.
+
+The roles remain our shared joke: **Keyboard Clanker builds (usually Normal Sol); Research Clanker studies options; Wrench Clanker checks the bolts; Boss pulls the GitHub lever. XD**
 
 ### 📚🤖 Research: the research clanker
 
@@ -152,6 +160,12 @@ These rules are important enough to survive every context reset.
 12. **Prompts should not be bloated.** Establish standing rules once at the beginning of a block and make subsequent task-specific prompts focused. Longer audit tasks can justify more detail.
 13. **Do not automatically shift focus back to editors.** After Phase 11, the user wanted real language features. Editor polish may be valuable later, but only when the user chooses it.
 14. **Tell the owner if context is drifting.** Do not bluff about missing project details. Propose an updated handoff or ask to read the current docs.
+15. **Normal Sol first, Work only by exception.** Before every new task, ask whether Normal GPT-6 Sol can reasonably do it from supplied source/files. If yes, do not recommend Work. An audit spanning many subsystems or requiring sustained direct environment interaction may justify Work; get owner buy-in.
+16. **Conserve usage without relaxing proofs.** Use focused subsystem and negative-regression tests while editing. Run the complete required Linux SDK/sanitizer/stack matrix on the final checkpoint candidate, not after every small wording or header change. Hosted verification is a separate owner-controlled gate.
+17. **Keep prompts small.** Give full standing constraints once at the start of a new block, then brief milestone-specific prompts in that same chat. Avoid repeated massive test/architecture/delivery boilerplate.
+18. **Never burn a session on repeated runs without a new hypothesis.** Preserve unexplained failure logs; seek a targeted reproduction, independent baseline or specific causal test. A green retry is not a fix.
+19. **Keep work moving through usage interruptions.** Leave a concise checkpoint/handoff in `WORK_LOG.md`/proposal; route non-conflicting tasks to Normal Sol. Do not make paid Work usage a project-wide bottleneck.
+20. **Do not silently label known issues as closed.** After Phase 23, the owner wants a focused correctness/known-issues cleanup. Every real defect needs a reproduced issue, a fix and regression evidence; deferred language features are classified separately.
 
 ---
 
@@ -217,7 +231,7 @@ Other important foundations:
 
 **The current object model:** `extends` is managed subtype identity (Phase 20); `using` stores and promotes one-hop composition (Phase 19); structural `interface` states supported behavior without `implements` (Phase 21, now hosted locked).
 
-**Strings and large-array progress:** Phase 22 implemented immutable UTF-8 strings with literals, equality, `+`/`+=`, roots, defaults and native borrowing proofs, and is hosted locked. Phase 23 now has structural fixed-array *analysis* plus a substantial runtime buffer/precise-GC/copying foundation, but this is **not** source-native array execution. In particular, 2E's 3 MiB C++ runtime copy test does not mean a `.void` program can yet declare, call with, index or return native heap-backed arrays. String scalar indexing and interpolation execution remain separate future features.
+**Strings and large-array progress:** Phase 22 implemented immutable UTF-8 strings with literals, equality, `+`/`+=`, roots, defaults and native borrowing proofs, and is hosted locked. Phase 23 now has structural fixed-array analysis; locked Stage 2F buffer/precise-GC/copying infrastructure; locked Stage 3A scalar fixed-array **C++ runtime** operations; and a locally validated but native-blocked Stage 3B **private** IR/ABI-helper contract. **None is source-native array execution.** Multi-megabyte C++ runtime copies do not mean a `.void` program can yet declare, call with, index or return heap-backed arrays. String scalar indexing and interpolation execution remain separate future features.
 
 ---
 
@@ -268,14 +282,14 @@ The lesson: inspect the exact failing layer and avoid weakening the architecture
 
 ---
 
-## 8. Phase 23: actual state at the 16 October 2026 handoff
+## 8. Phase 23: state after Stage 3B blocker investigation, 16 October 2026
 
-**Read this first, future Wrench Clanker.** Our earlier handoff stopped at Phase 21. Since then Phase 21 and Phase 22 became hosted green, and Phase 23 expanded into a substantial multi-stage array architecture. **Never say Phase 23 is done merely because Stage 2F is done.** Runtime plumbing and callable source arrays are different acceptance targets.
+**Read this first, future Wrench Clanker.** Our earlier handoff stopped at Phase 21; it later advanced only through Stage 2E. Since then Phase 21/22 and Phase 23 Stages 2F and 3A became hosted green. Stage 3B has bounded local proof with explicit ABI blockers. **Never say Phase 23 is done merely because Stage 2F or Stage 3A is locked.** Runtime plumbing, private IR evidence and callable source arrays are different acceptance targets.
 
 ### 8.1 The two independent numbering schemes (easy to confuse)
 
 1. **Large-array architecture Stages 1, 2A, 2B, 2C, 2D, 2E, 2F, then later Stage 3/4 work.** These address feasibility, bounded type/resource analysis, same-GC runtime buffer infrastructure, safe copying and the eventual owned-fixed/growable storage representation. Stage **2A** was a design approval; **2B-2F** are incremental runtime checkpoints.
-2. **Original Phase 23 source-language checkpoints P23-0 to P23-6** in `docs/ARRAYS_PROPOSAL.md` Section 6. **P23-1** supplies structural/foundation source typing, but its native array lowering remains rejected. **P23-2 through P23-6** still represent distinct, significant source execution/integration goals. Later large-array storage decisions supersede conflicting old inline/64 KiB assumptions. The two schemes are **not interchangeable**, and their remaining pieces may require revised sequencing after the Stage 2F review.
+2. **Original Phase 23 source-language checkpoints P23-0 to P23-6** in `docs/ARRAYS_PROPOSAL.md` Section 6. **P23-1** supplies structural/foundation source typing, but its native array lowering remains rejected. **P23-2 through P23-6** still represent distinct, significant source execution/integration goals. Later large-array storage decisions supersede conflicting old inline/64 KiB assumptions. The two schemes are **not interchangeable**. The approved Stage 3 breakdown in Section 30.8 (3A through 3E) adds independent runtime, IR/private ABI, source, nesting and acceptance gates.
 
 **Why Phase 23 got big:** Small scalar arrays looked straightforward until cross-platform fixed-array value semantics, large native ABI copies, lifetime/readonly aliasing, GC tracing, dynamically resizable lists, nested reference-bearing values, native stack/LLVM calling conventions and actual user-facing loops had to agree. The boss correctly refused an arbitrary 64 KiB production size ceiling as a shortcut.
 
@@ -289,9 +303,11 @@ The lesson: inspect the exact failing layer and avoid weakening the architecture
 | **Stage 2C** | [**CI #51**](https://github.com/Shmellyorc/Void.Language/actions/runs/38858081026), commit `cb601b4`, 7/7, 63/63 per job | Same-Heap private rooted reference-free buffers, NativeSafe zero/reservation/adoption, sealed publication | No reference-bearing population or leasing |
 | **Stage 2D** | [**CI #55**](https://github.com/Shmellyorc/Void.Language/actions/runs/38892081551), commit `97a9e49`, **7/7, 63/63 per job** | Typed managed/string/interface buffer writes, complete required live references, tracing capacity and safe rollback | No stable-source copying or source arrays |
 | **Stage 2E** | [**CI #56**](https://github.com/Shmellyorc/Void.Language/actions/runs/38902950811), commit **`3cbe2506ed8feb452f19e862ed6aec9e90330e55`**, **7/7, 63/63 per job** | Rooted RAII read leases, no-wait `BufferBusy` writer checks, chunked independent copy of scalar/nested/reference/interface content, GC-safe reacquisition, alias/output guards, deterministic allocation rollback | **No fixed-value source representation, growable header, source syntax lowering, generated ABI, owned child cloning, Stage 2F or Phase 23 final acceptance** |
-| **Stage 2F** | **NOT STARTED/LOCKED at snapshot** | Planned overall Stage 2 runtime acceptance and review | Does not itself complete the source-level language feature |
+| **Stage 2F** | [**CI #57**](https://github.com/Shmellyorc/Void.Language/actions/runs/38922793539), commit `d872889`, **7/7, 63/63 per job** | Complete Stage 2B-2E runtime acceptance review and failure/GC/copy proof | No source array execution or native generated-array ABI |
+| **Stage 3A** | [**CI #58**](https://github.com/Shmellyorc/Void.Language/actions/runs/38982940254), commit `44fc8b6`, **7/7, 63/63 per job**, 441/441 | Scalar fixed-value runtime default/literal/copy/read/write through existing buffers/registered roots, multi-MiB value independence | Runtime-only; no source arrays, nested owned children or generated private calls |
+| **Stage 3B (bounded checkpoint)** | **Local only, NOT hosted locked**; six LLVM 19.1.7 Linux configurations **63/63 each** | Private IR snapshot/selection/transfer checks, target-derived call-home descriptor, checked fixed helper bridge; independent C++ witness; ABI negative certificates and isolated Stage 3A baseline investigation | **Four incoming native ABI slots still rejected**. No generated caller/callee proof, no public source activation, no verified Windows/macOS Stage 3B evidence |
 
-**Read-only source:** [Repository](https://github.com/Shmellyorc/Void.Language) and latest `main`/GitHub Actions. On 16 October 2026 Wrench inspected all seven jobs and the actual `gc_buffers`/63-suite results for CI #55 and CI #56. CI #56 finished **success** on `3cbe250`, including both macOS ARM64 jobs, both Windows jobs, and all three Ubuntu jobs. Every job ran 63/63 suites: **441/441 suite executions, zero failed suites**. Do not apply this exact count to future runs that add tests.
+**Read-only sources:** [Repository](https://github.com/Shmellyorc/Void.Language), [CI #57](https://github.com/Shmellyorc/Void.Language/actions/runs/38922793539) and [CI #58](https://github.com/Shmellyorc/Void.Language/actions/runs/38982940254). Wrench independently inspected **each of the seven Stage 3A hosted job logs** and confirmed `gc_buffers` plus all 63 CTest suites in each. The current Stage 3B evidence is in `ARRAYS_PROPOSAL.md` Sections **32-33** and `WORK_LOG.md`, **not a GitHub lock**. Check HEAD and CI afresh before making later status claims.
 
 ### 8.3 The macOS 40-byte ghost bolt, and what it taught us
 
@@ -301,7 +317,7 @@ The lesson: inspect the exact failing layer and avoid weakening the architecture
 - Commit **`97a9e49`**, CI **#55**, kept the **zero-objects-immediately-after-collection** requirement and moved the strict **zero-native-count AND zero-native-bytes** check to **after all owners die**. All injected ordinals remained; deliberate 37-byte and zero-byte leak controls still rejected. Mac Debug/Release plus the other five jobs passed 63/63 each.
 - Rule: **Prove the owner and expected lifetime before changing GC. Never add a platform exception, skip a failed test, or weaken leak checks just to make CI green.**
 
-### 8.4 Exactly what Stage 2E added and what remains suspect
+### 8.4 Historical Stage 2E infrastructure and the retained performance risk
 
 The API is internal C++ runtime infrastructure, recorded in `docs/ARRAYS_PROPOSAL.md` **Section 28** and `docs/WORK_LOG.md`:
 
@@ -326,36 +342,31 @@ The project's `docs/LANGUAGE_BIBLE.md` is authoritative; `docs/ARRAYS_PROPOSAL.m
 
 ### 8.6 Where to read authoritative CURRENT details
 
-1. `docs/ARRAYS_PROPOSAL.md`: opening **superseding owner decision**, A1-A10, **Section 6** (P23 checkpoints), **Section 7** (eventual source acceptance), **Section 22** (Stage 1), **Section 23.6 / 23.8 / 23.9** (read leases/copies and Stage 2 ordering), **Sections 24-28** (2B through 2E implementation, proof and limits).
-2. `docs/WORK_LOG.md`: Stage 1, Stages 2B-2E, CI #53/#54 macOS diagnosis, Node24 maintenance and Linux verification. Treat reports as locally grounded unless linked host CI independently verifies them.
-3. `docs/LANGUAGE_BIBLE.md`, `docs/GC_RUNTIME.md`, `docs/DECISIONS.md`, `docs/DEVELOPMENT_STRATEGY.md`, `docs/KNOWN_ISSUES.md`: shared contracts, outstanding decisions, ABI and memory safety constraints.
-4. Actual source at the relevant commit: `include/void/buffer.hpp`, `include/void/gc_schema.hpp`, `include/void/heap.hpp`, `include/void/runtime.hpp`, `src/runtime/buffer.cpp`, `src/runtime/gc_schema.cpp`, `src/runtime/heap.cpp`, `src/runtime/coordination.cpp`, `tests/runtime/buffers.cpp`, `tests/runtime/buffers.py`.
-5. Real GitHub Actions [CI #55](https://github.com/Shmellyorc/Void.Language/actions/runs/38892081551) and [CI #56](https://github.com/Shmellyorc/Void.Language/actions/runs/38902950811). Check the HEAD and latest runs again when the file is read later.
+1. `docs/ARRAYS_PROPOSAL.md`: superseding large-array decision, approved A1-A10 and source acceptance, **Section 30** approved Stage 3 architecture/checkpoints, **Section 31** Stage 3A runtime, **Section 32** bounded Stage 3B implementation, **Section 33** latest native incoming ownership/crash investigation. Earlier sections remain historical design evidence, not all current gates.
+2. `docs/WORK_LOG.md`: 2F, 3A and 3B local evidence, machine negative certificates, the isolated `44fc8b6` baseline, unresolved Clang/Debug JIT failures and ABI slot map. This report remains local evidence until separately hosted-verified.
+3. `docs/LANGUAGE_BIBLE.md` (latest owner replacement), `docs/GC_RUNTIME.md`, `docs/DECISIONS.md`, `docs/DEVELOPMENT_STRATEGY.md`, `docs/KNOWN_ISSUES.md`: semantics, ABI/safety constraints and post-Phase-23 correctness work.
+4. Latest local source (if available) and current remote code at confirmed SHA; the worktree may be **ahead of GitHub**. In particular inspect `include/void/runtime_abi.hpp` and the uncommitted `fixed_runtime_abi.hpp` before proposing an ABI-header consolidation; do not assume the new header is on GitHub.
+5. Hosted lock: [CI #57](https://github.com/Shmellyorc/Void.Language/actions/runs/38922793539) and [CI #58](https://github.com/Shmellyorc/Void.Language/actions/runs/38982940254). **No Stage 3B hosted result is claimed.**
 
 ---
 
-## 9. What comes next: exact Phase 23 roadmap and stop gates
+## 9. What comes next: Phase 23 roadmap and stop gates
 
-**CURRENT SINGLE NEXT ACTION (as of 16 October 2026): obtain boss authorization to begin Stage 2F, the Stage 2 runtime acceptance/review gate. Stage 2E is already locked.** Do not begin P23-2 native source lowering, Stage 3 fixed ownership, Stage 4 growables, compiler ABI integration or another phase merely because this handoff contains a roadmap. The boss decides.
+**CURRENT NEXT TASK:** The owner wants a **Normal Sol** KISS/DRY inspection of the new uncommitted `fixed_runtime_abi.hpp` against the existing `include/void/runtime_abi.hpp`. If safe, consolidate the fixed-array private helper declarations into the existing header without altering ABI signatures, ownership, runtime behavior or safety gates. Do not force a merge across real dependency cycles. Run focused checks; full local matrix at checkpoint acceptance. No Git operations by the assistant.
 
-### 9.1 Immediate next: Stage 2F (requires owner authorization)
+**NEXT ARCHITECTURAL GATE:** Stage 3B native caller/callee **ownership certification**. Four incoming native slots are correctly rejected. The existing machine observer knows transport offsets but cannot establish caller/outgoing ownership, rooted home identity, callee roots, transformed packed lane provenance, final emitted call identity or failure cleanup. The documented LLVM fixture intentionally omits a caller/bridge body and generated Frames. Treat this as a real independent proof blocker. Stage 3C source execution remains **NOT AUTHORIZED**. A narrowly scoped proof plan requires owner approval before implementation.
 
-`docs/ARRAYS_PROPOSAL.md` Section **23.9 item 5** specifies **2F, acceptance/review**. The intended work is to assemble strong final evidence for the runtime-only Stage 2 foundation, preserving the already locked contracts, not to quietly implement a new source feature.
+### 9.1 Stage 3B remaining proof, not a Stage 3C shortcut
 
-- Audit Stage 2B-2E schema identity/geometry, repeated cursor interpretation, same-Heap reservation/adoption/root/publication, precise capacity tracing, required live references, RAII leases, every-writer exclusion and byte/reference/interface copying.
-- Test independent oracles and deliberate negatives: overflow and wrong identity, unsupported owned/growable copy roles, unrooted/wrong-thread/foreign inputs, lease conflicts, arbitrary output aliases, bad witness/required-null references, source/destination alias, incomplete copies, missing roots, failed GC mark rollback, fail-after ordinals, reclaimed temporary storage and clean retries.
-- Exercise reference-free and reference-rich **multi-megabyte** values, nested repeats, zero-capacity and zero-footprint elements, deterministic real collection and safepoint interleavings. Maintain a real 1 MiB Debug/Release stack boundary and strict sanitizer/leak detection.
-- Run full available local Debug/Release and strict sanitizer suites using pinned LLVM 19.1.7 installed and official SDKs where appropriate; preserve JIT/AOT/editor and unchanged ordinary/string/inheritance/interoperability baselines. Record exact test counts, hashes, SDKs and limitations. Then stop for boss/Wrench review and owner-controlled cross-platform CI. Never claim Windows/macOS until hosted native jobs execute.
-- **Performance review:** the O(Heap objects) mixed-heap output-alias guard, stop-the-world reference scan and chunk/lock costs are NOT certified for game workloads. Record measurements/risks. A correct but unscalable guard may justify a separate design/proof milestone; do not silently introduce an unverified index or fake real-time guarantees in 2F.
-- **Gate for locking 2F:** owner review of evidence + successful relevant hosted Ubuntu 24.04 Debug/Release/Sanitizers, Windows 2022 Debug/Release, macOS ARM64 Debug/Release, with unchanged safety assertions. Record exact final SHA and Actions URL. If no code changes are necessary, do not invent one simply to claim a milestone.
+- Stage 2F is **already hosted locked** at `d872889` / CI #57; Stage 3A is **already hosted locked** at `44fc8b6` / CI #58. Do not repeat those missions or imply Stage 3A supports executable `.void` arrays.
+- Stage 3B IR validation and helper bridge have strong **local** Linux coverage, 63/63 in each of six configurations. Preserve these tests and the full negative certificate. This is **not** a native-call or cross-platform acceptance certificate.
+- Controlled isolated Stage 3A source/binary comparison did **not** reproduce an earlier Clang exit 139 or Debug composition JIT SIGSEGV. Both causes remain **unexplained**, not proven fixed or irrelevant. Do not consume cycles repeating the same tests without a new hypothesis.
+- The next certification design must bind evaluated caller snapshot homes to ABI operand identity and final emitted physical bytes (including packed loads/stores), callee roots before safepoints and correct result/failure cleanup; reuse the current immutable inventory, final encoded CFG verifier and provenance architecture. Exact four incoming slot rejections must remain until proof exists.
+- Owner decides whether a bounded Normal Sol proof increment suffices or a cross-system certification audit truly warrants selective Work. No public array lowering, ORC helper registration, Stage 3C, owned nested children or growable Stage 4 as a byproduct.
 
-**Candidate next Keyboard Clanker mission** (give only after owner authorization):
+### 9.2 Stage 3C–3E, Stage 4 and the remaining Phase 23 endpoint
 
-> Stage 2E locked at `3cbe250` / CI #56 (7/7, 63/63 each). Work **only on Stage 2F Stage 2 runtime acceptance and review**, following `ARRAYS_PROPOSAL.md` Sections 23.8-23.9 and 28. Independently audit every runtime safety boundary, reproduce all failure/lease/GC/alias controls, run the complete local pinned-LLVM matrix and 1 MiB Debug/Release checks, measure and document mixed-heap scan cost and clear limitations. Do not introduce source arrays, LLVM/ABI, owned-child copying, growable semantics, a second GC, a new size cutoff, CI workflow edits or broad unrelated refactoring. Never disable a meaningful check. Record evidence and updated docs; **no git commits/pushes/branches or remote actions**. Stop for boss/Wrench review and separately owner-controlled hosted acceptance.
-
-### 9.2 After Stage 2F, Phase 23 is STILL NOT finished
-
-The original implementation plan (`ARRAYS_PROPOSAL.md` Section 6) retains **five significant not-yet-completed source-language checkpoints**, P23-2 through P23-6. Their **newer architectural dependencies** include Stage 3 for owned fixed-array storage/copy plans, and Stage 4 for growable list headers/commit protocols. Do not treat Stage 3/4 as already designed or approved simply because runtime Stage 2 passed. The order and exact number of coding missions remain subject to later review.
+The original source plan (`ARRAYS_PROPOSAL.md` Section 6) retains **five significant source-language goals**, P23-2 through P23-6. Section 30.8 now explicitly sequences **Stage 3C** (smallest scalar fixed source execution **after ABI certification**), **3D** (nested owned-child/richer elements), **3E** (fixed-array acceptance, iterations/ranges/tooling) and later **Stage 4** growables. Only their architectural direction is approved where stated; they require separate implementation authorizations and proof gates. Neither 3B local green nor earlier Stage 2 acceptance unlocks them.
 
 | Remaining language checkpoint | End-user deliverable / proof still outstanding | Architectural risks/dependencies |
 | --- | --- | --- |
@@ -365,7 +376,7 @@ The original implementation plan (`ARRAYS_PROPOSAL.md` Section 6) retains **five
 | **P23-5** | Nested selected writes and RHS alias/resize effects, original-index forward/reverse iteration, invalidation timing, reload/code-retirement and old-holder/new-AOT proofs | Root owner/reacquire after safepoints; no raw interior pointers; preserve value snapshots under later arg/callee mutations |
 | **P23-6** | Shared LSP/editor/tooling support and diagnostic recovery, real i64 ranges including `0..<items.count`, final documented resource/stack/GC/ABI proof and complete local acceptance followed by all hosted jobs | Production semantics as approved in Bible/A1-A10; full source compile, native execution, editor and cross-platform verification |
 
-**This is an acceptance plan, not a promise of only five future prompts or five calendar days.** The newly required source-storage, selected ABI and machine/native-stack proofs may warrant extra owner-approved substages or redesign. Never invent a stage number and call it authoritative. If the boss asks "how much of Phase 23 is left?", answer: **Stage 2F to finish current runtime foundation; then the remaining source-language/representation work corresponding to P23-2 through P23-6, with Stage 3/4 architectural dependencies.** Phase 23 ends **only** after compiled real `.void` fixed AND growable arrays satisfy the approved language semantics and full hosted acceptance, not when C++ buffer internals turn green.
+**This is an acceptance plan, not a promise of five prompts or five calendar days.** The current Stage 3B native ownership/certification proof must be resolved before Stage 3C. Additional owner-approved checkpoints may be needed; never invent one as already authorized. If asked how much remains: **3B native ABI certification; then 3C source scalar execution, 3D nesting, 3E fixed-array acceptance and Stage 4 growables, completing the source goals P23-2 through P23-6.** Phase 23 ends **only** after real `.void` fixed AND growable arrays satisfy approved semantics and complete hosted acceptance.
 
 ### 9.3 Acceptance target for saying "PHASE 23 LOCKED!"
 
@@ -382,28 +393,39 @@ The target is genuine, usable native VOID source, not merely green runtime unit 
 
 ### 9.4 What happens AFTER Phase 23
 
-After Phase 23 is truly hosted locked, discuss later work like generics, fuller collections and standard library, error/pattern/defer resources, source-level C interop, editor usability and eventual game engine integration. The old proposed **Phase 24+ labels are suggestions**, not owner-approved milestones. Do not jump ahead while arrays remain source-incomplete.
+After Phase 23 is truly hosted locked, the owner wants to prioritize a **dedicated correctness/KNOWN_ISSUES.md stabilization pass** before major new language features. Verify each issue against current source, categorize real correctness/safety bugs versus performance measurements, deferred features and outdated notes; reproduce and fix real defects with regression tests. The tentative name **Phase 24** is a planning suggestion, not an already locked or authorized numbered milestone. Existing mixed-heap alias-guard O(objects) costs and compiler/native stack concerns merit evidence-based triage. Only then discuss new features such as generics, fuller collections and standard library, additional interop, editor improvements or engine integration.
 
 
 ---
 
-## 10. The exact review and CI process
+## 10. The review, task routing, usage and CI process
+
+### 10.1 Default: Normal Sol first, Work selectively
+
+- **Normal GPT-6 Sol**: default for bounded compiler features, code review, small-to-medium C++ fixes, header merges, architecture planning, code patches, focused regression tests and narrow debugging. Use High thinking when it materially helps. Ordinary chat may need attached files or a zipped source snapshot to make edits; it is not silently connected to the owner's filesystem.
+- **Work**: reserve for genuinely broad multi-subsystem integration, independent large-scope ABI/GC/LLVM audits, extensive test-environment orchestration and tasks where direct autonomous repository interaction repays its usage. Do not route every follow-up or documentation correction through Work.
+- **Markdown bot**: targeted documentation reconciliation, working around live compiler edits; avoid simultaneous edits to the same files. Wrench reviews wording, technical consistency and stage status.
+- **Wrench**: advisor, scoper, independent reviewer and GitHub CI evidence checker. **Boss**: architecture choices, file application, Git commits/pushes, CI dispatch and releases.
+- **One bounded checkpoint at a time.** During edits run focused tests and meaningful negatives; before acceptance run the entire required local LLVM 19.1.7 six-configuration matrix including strict sanitizer/leak checks and applicable real 1 MiB stack/regression stress. Preserve all negatives and real JIT/AOT/Windows/macOS native gates. Do not demand a six-way matrix after every single tiny edit.
+- **Make usage exhaustion non-blocking.** Before a long autonomous job, ensure `WORK_LOG.md`/the proposal has a checkpoint. If Work usage becomes unavailable, use Normal Sol for independent bounded changes or design reviews. If the unavailable capability is required, stop at its proof gate; never fake a pass.
+- **Prompts:** one comprehensive standing-rules section at the beginning of each new block, concise milestone-specific follow-ups thereafter. Work-specific standing rules only when opening a separate Work audit block. Wrench should not repeatedly paste huge architecture/testing boilerplate.
+- **No thrashing:** keep initial failures/logs, try targeted reproduction and baseline comparison only with a causal hypothesis, do not relabel unexplained crashes as fixed because retries pass.
 
 ### Before a phase
 
 - Determine the current **hosted-verified** baseline, not just the last local run.
 - Inspect the actual repo/docs; stale chat memory is a clue, not authority.
 - Read the design source of truth and recent work log.
-- Frame the scope, important safety constraints, and what acceptance will prove.
+- Frame the scope, choose **Normal Sol or justified Work**, and specify the important safety constraints and what acceptance will prove.
 - Ask the owner to approve changes to observable language semantics.
 
-### During Work's implementation
+### During Keyboard Clanker implementation
 
-- Work may take time. Don't repeatedly interrupt just to ask for progress.
+- Normal Sol is the first choice. If Work is explicitly chosen, it may take time; do not repeatedly interrupt merely for status.
 - If Work stops on a sound design question, help the owner make a deliberate decision.
 - Keep the current task isolated. Don't tack on speculative unrelated features.
 
-### After Work reports completion
+### After Keyboard Clanker reports completion
 
 - Inspect report, key code/doc changes if accessible, and the exact evidence.
 - Check compiler, runtime, GC, reload, diagnostics, JIT/AOT, optimizer, SDK and editor behavior relevant to the change.
@@ -447,7 +469,9 @@ These are not surprise "bugs" that must be fixed immediately. They are documente
 - **GC:** A coordinated non-moving managed runtime with precise generated roots, NativeSafe/Managed participant protocol, repeated buffer tracing and tested cross-thread rendezvous now exists. It is experimental, not production-certified. Weak references, finalizers, suspended async roots, detailed unwind policies, collection tuning and optimizer/liveness auditing remain separate work.
 - **Reload:** Compatible body changes use whole-generation leases. Note these code-generation leases are distinct from Phase 23 buffer read leases. Struct/interface requirement, route, visibility, effect, witness or layout changes and construction dependency changes can require restart. Interface metadata must survive old code retirement without holding executable pointers.
 - **Value/interface/array ABI:** Compiler-private aggregate layouts/calls, including two-word interface views, are not arbitrary foreign C ABI promises. Native source array calling conventions remain gated at Phase 23. The Windows CRT selection and move-only AST fixes are locked regression protections.
-- **Phase 23 array memory/performance:** Stage 2E read leases and independent copying work, but future source arrays/owned child semantics are not enabled. A mixed-heap output-root alias guard scans O(Heap objects) under a mutex. This is not a production pause-time or performance certificate. Stage 3 fixed ownership and Stage 4 growable representation are future design gates; no 64 KiB source limit may be reintroduced.
+- **Phase 23 array memory/performance:** Stage 2F and 3A are locked runtime infrastructure, and 3B has locally validated private IR/helpers, but public source arrays/owned child semantics are not enabled. The mixed-heap output-root alias guard remains O(Heap objects) under a mutex. No production pause-time certificate exists. Stage 3C/3D/3E and Stage 4 remain gated; no arbitrary 64 KiB source ceiling may be reintroduced.
+- **Stage 3B native ABI certification:** four incoming stack-argument ownership slots deliberately reject; exact caller/callee snapshot-home identity, outgoing-to-incoming ABI attribution, packed-lane provenance, generated roots/Frame/failure cleanup and final encoded-call identity still need independent proof. Small frames or passing runtime tests are insufficient. Initial Clang and Debug JIT crashes did not reproduce against isolated Stage 3A and remain unexplained.
+- **Post-Phase-23 correctness:** owner wants `KNOWN_ISSUES.md` actively triaged and real defects fixed before starting major new features. Do not equate deferred features with bugs or silently mark entries solved.
 - **String feature boundary:** Phase 22 implements UTF-8 string storage, literals, equality, concat and native copy/lifetime evidence. Scalar string indexing, interpolation execution, slicing and formatting remain future work.
 - **Module/project discovery:** Current editor has explicit `void.server.path` / `void.project.entry` setup in relevant workflows, and standalone file fallback. The user's desired experience is eventually **open a `.void` file and VOID just works**.
 - **LSP/editor:** The editor is real and useful, but it does not yet offer all completion, hover, rename, formatting, package discovery, auto-reload or full multi-root support. Don't present syntax coloring as proof the language server is running.
@@ -461,8 +485,7 @@ These are not surprise "bugs" that must be fixed immediately. They are documente
 
 Copy the following if opening a new chat or if the context has been lost:
 
-> You are continuing as my **🔧🤖 Wrench Clanker** for the VOID Engine / VOID Language project. Read the attached **WRENCH_CLANKER.md** fully, especially **Sections 8 and 9 for Phase 23**. Keep our warm, playful, technically rigorous personality, including occasional "HAHAHAHA! XD", while never inventing progress or pretending to possess inaccessible context. I am the boss/owner and alone approve milestones and operate Git. **Keyboard Clanker** implements and tests locally; **Wrench Clanker** reviews architecture/evidence, checks actual GitHub CI, and writes focused prompts. The current new native compiler is **C++20 / LLVM 19.1.7 VOID 2.0**, NOT historical VOIDC 1.0. **As of 16 October 2026, Phase 23 Stage 2E locked at commit `3cbe250`, CI #56, 7/7 green and 63/63 each. Stage 2F is NEXT but NOT YET AUTHORIZED, and Phase 23 still needs real source-native fixed/growable arrays after the runtime foundation.** Re-check GitHub `main`, `docs/ARRAYS_PROPOSAL.md`, `WORK_LOG.md`, and LANGUAGE_BIBLE before asserting current status or proposing the next gate. Large arrays must not be arbitrarily capped at 64 KiB; fixed arrays preserve value snapshots and growable lists alias stable headers. Follow KISS/DRY, preserve strong tests and source/ABI/GC proof, no em dashes. For VS Code Git commit messages, give one short copyable title with a Copy button. Do not authorize/implement later stages without my explicit approval.
-
+> You are continuing as my **🔧🤖 Wrench Clanker** for VOID 2.0 (C++20 / LLVM 19.1.7), not the historical VOIDC 1.0. Read the attached `WRENCH_CLANKER.md`, especially Sections **8-10**, then verify current `ARRAYS_PROPOSAL.md`, `WORK_LOG.md`, `LANGUAGE_BIBLE.md` and GitHub evidence; this is a dated handoff. Keep our playful but rigorous voice and never invent evidence or pretend to have inaccessible context. **Boss** alone approves architecture and handles Git. **Normal GPT-6 Sol is the default Keyboard Clanker** for bounded compiler work, debugging, cleanup and focused testing. Recommend **Work only selectively** for broad multi-subsystem integration, independent audits or long autonomous environment tasks, to avoid usage stalls; keep task prompts concise and standing rules in the first checkpoint. Wrench reviews architecture, evidence and actual seven-host CI; Markdown bot handles docs when directed. **Phase 23 Stage 2F LOCKED** at `d872889`, CI #57, 7/7 and 63/63 per job; **Stage 3A LOCKED** at `44fc8b6`, CI #58, 7/7 and 63/63 per job (441/441). **Stage 3B only locally validated**: private IR/runtime/layout bridge 63/63 in six Linux matrices, four incoming native ABI ownership slots still rejected; original Clang/Debug JIT crashes not reproduced and not explained. **Stage 3C and public `.void` arrays remain gated**. Next bounded preference is to review consolidation of `fixed_runtime_abi.hpp` into `runtime_abi.hpp` where safe, then separately approve a rigorous native caller/callee certification proof. Large fixed arrays retain independent value snapshots without arbitrary 64 KiB caps; `[T]` lists have stable alias identity. KISS/DRY, no test weakening, real target stack/GC/ABI evidence, no em dashes, and no unauthorized later-stage work. After Phase 23, prioritize evidence-based `KNOWN_ISSUES.md` defect cleanup.
 The handoff file is a working reference, not a replacement for reading the project's current technical docs and GitHub results.
 
 ---
@@ -480,6 +503,7 @@ After each **hosted-green phase or separately locked Phase 23 stage**, update on
 - [ ] Update **implemented versus deferred** features, including the experimental managed runtime boundary.
 - [ ] Note any important failed CI runs and the real fixes, without burying the win.
 - [ ] Update the **next possible stage/checkpoint**, clearly marked as a proposal until the boss agrees. Do not treat this handoff roadmap as the current Language Bible.
+- [ ] Preserve **Normal Sol first / Work selectively** task routing, focus-first/final-matrix testing, handoffs that survive usage exhaustion and concise milestone prompts.
 - [ ] Preserve the personality and rules instead of replacing them with a dry generated status report.
 
 For substantive updates, trust the current repo's `docs/WORK_LOG.md`, `docs/DECISIONS.md`, `docs/KNOWN_ISSUES.md`, technical phase docs and real GitHub CI over this snapshot. If this file is stale, say so.

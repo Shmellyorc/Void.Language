@@ -581,6 +581,58 @@ AotObjectEmitter::~AotObjectEmitter() = default;
 const DataLayout& AotObjectEmitter::data_layout() const { return impl_->layout; }
 const std::string& AotObjectEmitter::triple() const { return impl_->triple; }
 std::string AotObjectEmitter::identity() const { return impl_->profile; }
+FixedCallLayout AotObjectEmitter::fixed_call_layout(const ir::Function& function) const {
+  if(!function.fixed_ownership || function.receiver || function.initializer || !function.virtual_slot.empty())
+    throw std::invalid_argument("Private fixed call requires the scalar ownership contract");
+  // Independently validate canonical logical types without trusting a lowering
+  // annotation or executing the original body. Full-body validation is separate.
+  ir::Function shape; shape.name="private-shape"; shape.parameters=function.parameters;
+  shape.locals={function.result};shape.result=ir::Type::none;shape.fixed_ownership=true;
+  if(function.result==ir::Type::none) shape.locals.clear();
+  shape.blocks={{{},{ir::Terminator::Kind::return_void}}};
+  ir::Module logical{"private-shape",{},{shape}};logical.coordinated=true;ir::validate(logical);
+  LLVMContext context;
+  auto* ptr=PointerType::getUnqual(context);
+  // StructLayout caches retain Type* keys. Keep these temporary-context queries
+  // in a fresh layout whose cache dies before the context, never the emitter.
+  const DataLayout dl(impl_->layout.getStringRepresentation());
+  auto* size=dl.getIntPtrType(context);
+  auto extent=[&](Type* t) {return StorageExtent{dl.getTypeAllocSize(t).getFixedValue(),dl.getABITypeAlign(t).value()};};
+  auto* slot=StructType::get(context,{ptr,size,ptr,size});
+  auto* failure=StructType::get(context,{ptr,Type::getInt32Ty(context),ArrayType::get(ptr,32)});
+  FixedCallLayout result;result.profile=identity();result.handle=extent(ptr);result.slot=extent(slot);result.failure=extent(failure);
+  result.logical_identity="fixed-owned-v1:"+function.name+":";
+  auto key=[](ir::Type t) {return std::to_string(t.kind)+":"+ir::Type::key(t)+":"+
+    std::to_string(t.nullable)+":"+std::to_string(t.readonly);};
+  for(unsigned n=0;n<slot->getNumElements();++n) result.slot_offsets.push_back(dl.getStructLayout(slot)->getElementOffset(n));
+  for(unsigned n=0;n<failure->getNumElements();++n) result.failure_offsets.push_back(dl.getStructLayout(failure)->getElementOffset(n));
+  auto scalar=[&](ir::Type t)->Type* {
+    switch(t.kind) {
+    case ir::Type::boolean:return Type::getInt1Ty(context);
+    case ir::Type::i8:case ir::Type::u8:return Type::getInt8Ty(context);
+    case ir::Type::i16:case ir::Type::u16:return Type::getInt16Ty(context);
+    case ir::Type::i32:case ir::Type::u32:return Type::getInt32Ty(context);
+    case ir::Type::i64:case ir::Type::u64:return Type::getInt64Ty(context);
+    case ir::Type::f32:return Type::getFloatTy(context);
+    case ir::Type::f64:return Type::getDoubleTy(context);
+    default:throw std::invalid_argument("Unsupported private fixed scalar ABI");
+    }
+  };
+  bool carries=false;
+  for(auto parameter:function.parameters) {
+    const bool array=ir::scalar_fixed_array(parameter);carries|=array;
+    result.operands.push_back({array ? FixedCallOperand::Mode::snapshot_home : FixedCallOperand::Mode::scalar,parameter,
+                               array ? result.handle : extent(scalar(parameter))});
+    result.logical_identity+=key(parameter)+";";
+  }
+  result.result_is_home=ir::scalar_fixed_array(function.result);carries|=result.result_is_home;
+  if(!carries) throw std::invalid_argument("Array-free ABI must remain unchanged");
+  if(result.result_is_home) result.operands.push_back({FixedCallOperand::Mode::result_home,function.result,result.handle});
+  else if(function.result!=ir::Type::none) scalar(function.result);
+  result.operands.push_back({FixedCallOperand::Mode::failure,ir::Type::none,result.handle});
+  result.logical_identity+="->"+key(function.result);
+  return result;
+}
 const std::string& AotObjectEmitter::report() const { return impl_->report; }
 std::string AotObjectEmitter::research_encoded_cfg(const std::filesystem::path &path,
     const std::string &function, const std::string &certificate) const {

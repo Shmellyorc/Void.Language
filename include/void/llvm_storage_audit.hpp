@@ -29,6 +29,21 @@ public:
     void complete(llvm::Function&, std::set<StorageRole> accounted);
     const std::vector<FunctionInventory>& functions() const { return functions_; }
 };
+// Target-derived private signature proposal, not an execution certificate.
+// Home addresses carry a single precisely rooted handle, never byval payloads.
+struct FixedCallOperand {
+    enum class Mode { scalar, snapshot_home, result_home, failure };
+    Mode mode;
+    ir::Type logical;
+    StorageExtent storage;
+};
+struct FixedCallLayout {
+    std::string profile, logical_identity;
+    StorageExtent handle, slot, failure;
+    std::vector<std::uint64_t> slot_offsets, failure_offsets;
+    std::vector<FixedCallOperand> operands;
+    bool result_is_home;
+};
 // Owns the exact TargetMachine and options used for both freeze and emission.
 // No ORC/LSP integration or source native-array permission is implied.
 class AotObjectEmitter {
@@ -40,6 +55,7 @@ public:
     const llvm::DataLayout& data_layout() const;
     const std::string& triple() const;
     std::string identity() const;
+    FixedCallLayout fixed_call_layout(const ir::Function&) const;
     // Freezes the original inventory before the existing production optimizer.
     // This object is single-use. Replacing its module/profile is forbidden.
     void freeze(llvm::Module&, const LoweringInventory&);

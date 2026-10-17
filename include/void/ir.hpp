@@ -100,7 +100,7 @@ enum class Op { argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
     upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal,
-    fixed_array, array_get, array_set };
+    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit };
 // A validated local aggregate storage path; never a source-visible reference.
 struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
 struct Instruction {
@@ -133,6 +133,8 @@ struct Function {
     std::string virtual_slot = {}; // Root declaration identity, shared by overrides.
     bool overriding = false;
     std::string method_name = {}, visibility = "public";
+    // Private scalar owned-value proof; source/native activation is separate.
+    bool fixed_ownership = false;
 };
 struct Module {
     std::string identity;

@@ -47,6 +47,50 @@ LoweringInventory inventory(llvm::Module &m,bool arrays=true,bool omit=false,boo
     return result;
 }
 std::string single(unsigned n) { return "declare void @touch(ptr, i64)\ndefine void @sample() {\n %a = alloca ["+std::to_string(n)+" x i32], align 4\n call void @touch(ptr %a,i64 "+std::to_string(n)+")\n ret void\n}\n"; }
+void privateFixedProof(const std::filesystem::path& out,bool optimized) {
+    auto analysis=analyze_source({"private-types.void","func shape(a: [u64, 1048576]) -> [u64, 1048576]:\n    return a\n"});
+    check(analysis.succeeded(),"large private signature analysis failed");
+    auto function=analysis.program->lower().functions.front();function.fixed_ownership=true;
+    function.parameters.assign(8,function.result);
+    AotObjectEmitter emitter(llvm::sys::getDefaultTargetTriple(),optimized);
+    const auto layout=emitter.fixed_call_layout(function);
+    check(layout.profile==emitter.identity() && layout.operands.size()==10 && layout.result_is_home,"private target/profile signature mismatch");
+    check(layout.handle.bytes==emitter.data_layout().getPointerSize() && layout.handle.bytes<1048576,"payload entered private call home");
+    for(unsigned n=0;n<8;++n) check(layout.operands[n].mode==FixedCallOperand::Mode::snapshot_home &&
+        layout.operands[n].storage.bytes==layout.handle.bytes,"array argument is not a rooted handle home");
+    check(layout.operands[8].mode==FixedCallOperand::Mode::result_home && layout.operands[9].mode==FixedCallOperand::Mode::failure,"result/failure convention changed");
+    // Native ABI checks, independently compiled C++ layout on this runner only.
+    check(layout.handle.bytes==sizeof(void*) && layout.slot.bytes==sizeof(Runtime::Slot) && layout.slot.alignment==alignof(Runtime::Slot) &&
+        layout.slot_offsets==std::vector<std::uint64_t>{offsetof(Runtime::Slot,storage),offsetof(Runtime::Slot,size),offsetof(Runtime::Slot,offsets),offsetof(Runtime::Slot,count)} &&
+        layout.failure.bytes==sizeof(RuntimeFailure) && layout.failure.alignment==alignof(RuntimeFailure) &&
+        layout.failure_offsets==std::vector<std::uint64_t>{offsetof(RuntimeFailure,message),offsetof(RuntimeFailure,count),offsetof(RuntimeFailure,frames)},"private root/failure ABI mismatch");
+    auto altered=function;altered.parameters[0]=ir::Type::i32;
+    check(emitter.fixed_call_layout(altered).logical_identity!=layout.logical_identity,"signature identity omitted scalar kind");
+    altered.parameters[0]=ir::Type::i64;
+    auto other=emitter.fixed_call_layout(altered).logical_identity;altered.parameters[0]=ir::Type::i32;
+    check(other!=emitter.fixed_call_layout(altered).logical_identity,"distinct scalar kinds collide");
+    altered.fixed_ownership=false;rejects([&]{emitter.fixed_call_layout(altered);},"ownership contract");
+    altered.fixed_ownership=true;altered.parameters={ir::Type::i32};altered.result=ir::Type::i32;
+    rejects([&]{emitter.fixed_call_layout(altered);},"Array-free ABI");
+    // The current independent auditor must NOT be bypassed for this pointer-home
+    // call shape. No runtime root/ABI certificate is inferred from small homes.
+    llvm::LLVMContext context;
+    auto module=parse(context,emitter,
+        "declare void @bridge(ptr,ptr,ptr,ptr,ptr,ptr,ptr,ptr,ptr,ptr)\n"
+        "define void @private_call(ptr %a,ptr %b,ptr %c,ptr %d,ptr %e,ptr %f,ptr %g,ptr %h,ptr %out,ptr %fail) {\n"
+        " %home=alloca ptr,align 8\n %payload=load ptr,ptr %a\n store ptr %payload,ptr %home\n"
+        " call void @bridge(ptr %home,ptr %b,ptr %c,ptr %d,ptr %e,ptr %f,ptr %g,ptr %h,ptr %out,ptr %fail)\n ret void\n}\n");
+    auto original=inventory(*module);emitter.freeze(*module,original);emitter.optimize();
+    auto object=out/(optimized?"private-fixed-O2.o":"private-fixed-normal.o");
+    {std::ofstream sentinel(object);sentinel<<"private owner sentinel";}
+    bool rejected=false;
+    try {emitter.deliver(object);} catch(const std::exception& error) {
+        rejected=true;std::cout<<"private fixed "<<(optimized?"O2":"normal")<<" certification retained: "<<error.what()<<'\n';
+    }
+    check(rejected && read(object)=="private owner sentinel","uncertified private call delivered or sentinel damaged");
+    {std::ofstream report(object.string()+".certificate.json");report<<emitter.report();}
+    // Deliberately never link or execute the rejected object.
+}
 llvm::json::Value report(const AotObjectEmitter &e) {
     auto j=llvm::json::parse(e.report()); check(bool(j),"invalid certificate JSON"); return std::move(*j);
 }
@@ -406,6 +450,7 @@ int main(int argc,char **argv) {
         }
         check(argc==3,"expected artifact directory and project root");std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
         fixtures(out,false);fixtures(out,true);
+        privateFixedProof(out,false);privateFixedProof(out,true);
         // A zero-count frame must neither read Slot storage nor hide its live
         // parent frame. Null storage makes any accidental Slot read observable.
         {

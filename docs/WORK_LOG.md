@@ -9469,3 +9469,266 @@ selection under a real 1024 KiB soft stack; and CTest's five-suite
 limits are in summary.json; SDK paths/flags/source hashes are in manifest.json.
 No Windows/macOS execution or hosted Stage 3A lock is claimed. All later checkpoints
 remain gated; stop for owner/Wrench review.
+
+
+## Phase 23 Stage 3B: private semantic/IR and call-proof checkpoint
+
+16 October 2026. Owner/Wrench confirms Stage 3A LOCKED at `44fc8b6`, hosted
+CI #58, all seven jobs passed with 63/63 suites each. Recorded this supplied lock
+and reconciled the existing Markdown bot formatting before updating proposal
+status and appending Section 32. Pre-edit documents are retained locally in
+`build/stage3b/*.md.before`; historical measurements and writing remain intact.
+
+Implemented an opt-in scalar owned-value contract in the existing shared IR:
+explicit snapshots, borrowed loads, one-use argument/store/return transfers,
+checked selection tokens and leaf-only commits. Independent validation rejects
+shallow mutable aliases, repeated handoffs/commits, stale borrows, incomplete
+selections, uninitialized homes at CFG joins, entry reexecution, mixed legacy/private
+array calls and unsupported carriers. Source lowering remains functional and gated.
+
+Added the exact emitter-derived private home/signature description and bounded
+noexcept Stage 3A helper wrappers, plus an independently compiled six-argument
+native C++ embedding witness. Existing runtime fixed operations, mixed-heap guard,
+GC, schemas, BufferBuilder/read leases and fatal invariant controls are unchanged.
+Expanded measured allocation-failure sweeps retain every original ordinal and add
+bridge default/literal/copy ordinals with strict output, retry, roots/leases and
+post-Runtime native-allocation cleanup checks.
+
+Concrete stop boundary: the eight-pointer LLVM normal/O2 call fixture rejects for
+two unproved incoming ownership objects (8 bytes each, entry offsets 0/8,
+alignments 16/8). P=8/F=24/R=8/E=8/A=16/C=32 in the existing research certificate;
+outgoing observation=16. No small-frame inference grants ownership. Sentinels stay
+intact; rejected candidates are never linked or executed. Generated private calls,
+Frame/root cleanup, final executable identity and cross-platform native acceptance
+remain unproved. Public arrays, source ABI activation, Stage 3C+, nested ownership
+and growables remain gated. Owner/Wrench review is required at this boundary.
+
+Initial focused Debug verification passed arrays_foundation, gc_buffers and
+arrays_storage_audit (3/3, 18.24 s). One earlier build invocation had a Clang 19
+frontend crash with corrupted built-in-macro diagnostics; its log is retained in
+`build/stage3b/stage3b-build.log`. A subsequent focused build completed. No compiler-source
+cause is established; do not label that tool failure fixed or unrelated. Full
+matrix and final evidence follow below.
+
+
+Portability refinement before final acceptance: six homes plus result/failure fit
+in ARM64 argument registers. The final negative machine fixture therefore uses
+eight fixed argument homes plus result/failure (ten pointers) on every target,
+without a platform exemption. Focused Debug arrays_storage_audit passes (8.71 s).
+Final Linux normal/O2 evidence is P=8/F=40/R=8/E=8/A=16/C=48, outgoing observation
+32, with four unproved incoming objects: MachineFrameInfo offsets 0/8/16/24 and
+callee-entry-SP offsets 8/16/24/32. The initial six-home reports are retained as
+initial evidence, not substituted for the final fixture. No native Windows/macOS
+result is claimed. The test-only refinement requires rechecking the earlier two
+Linux matrix entries against the final fixture.
+
+The initial system Debug full run failed 62/63 at composition stress/optimized/JIT,
+input -1 (expected 2002). Preserved log: system-debug-first-full-failed.log. The
+same command passed 30 serial runs, 30 two-worker runs and one GDB run; the unchanged
+official-SDK Stage 3A binary passed 30 two-worker controls. The complete composition
+CLI suite passed five serial repeats (21.75 s). A fresh full Debug run passed 63/63
+(106.12 s). This does not establish a cause, a fix or independence from this work;
+the initial crash remains unexplained. Commands, binary hash, outputs and GDB log
+are retained in build/stage3b/composition-repro. No assertion or production code
+was changed to obtain that passing retry.
+
+
+Validation scheduling correction: an additional final-fixture system sanitizer
+full run overlapped the official SDK's large LLVM LTO links. It recorded
+modules_cli timeout at its unchanged 180.08 s limit (earlier serial pass: 84.13 s);
+numeric_cli passed in 136.45 s versus 56.04 s in the earlier serial run. CPU load
+was high. This is evidence of contention, not proof of a runtime defect or permission
+to raise the timeout. The overlapping recheck process group was terminated and its
+partial log retained as build/stage3b/contention-system-san-full.log. The final
+system sanitizer full run will be repeated serially after the official SDK work.
+No test assertion, timeout, sanitizer option or compiler/runtime code was changed.
+
+
+### Stage 3B final local verification and review stop
+
+Final local evidence, LLVM 19.1.7 in both existing system and official Linux SDK
+configurations. All six latest full runs pass all 63 suites. The system rows use
+the final fixture refresh; official rows already include that fixture. Times are
+observations on this host, not performance guarantees or isolated benchmarks.
+
+| Linux configuration | Full suites | Full elapsed | 1 MiB eight-suite elapsed (s) | Seven suites, three repeats |
+| --- | --- | --- | --- | --- |
+| system-debug | 63/63 | 131.97 s | 22.7 | 64.18 s |
+| system-release | 63/63 | 53.05 s | 5.92 | 16.14 s |
+| system-san | 63/63 | 147.33 s | not run under sanitizer | 37.47 s |
+| official-debug | 63/63 | 105.59 s | 22.45 | 64.40 s |
+| official-release | 63/63 | 47.30 s | 5.6 | 15.12 s |
+| official-san | 63/63 | 130.05 s | not run under sanitizer | 33.64 s |
+
+Both sanitizer profiles retain ASan/UBSan, leak detection and halt-on-error:
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. The existing SDK RTTI
+profiles remain unchanged, including the official SDK's unavailable vptr check.
+No sanitizer option or timeout was relaxed. The contended additional recheck timed
+out; the final serial rerun passed modules_cli in 83.19 s against the same 180 s
+limit (earlier serial 84.13 s). Preserve the partial timeout log as scheduling
+evidence, not a passing run.
+
+The eight affected suites ran under a real 1,048,576-byte soft RLIMIT_STACK in
+Debug/Release for both SDKs (32 suite executions). The final system machine fixture
+also passed separate 1 MiB reruns (8.51/3.57 s). Original seven-suite stress covers
+126 suite executions; the final system audit fixture refresh adds three repeats
+per system configuration (25.61/8.79/19.30 s; exact command records are authoritative).
+All existing fatal, leak-control, rollback, post-poll and failure-injection tests
+remain enabled. The fixed-value sweeps retain the original 38 measured positions
+and add 38 bridge positions, with 12 baselines per buffer run. Captured logs confirm
+76 positions: budgets 0/1 give 4/8 default, 4/8 literal and 4/10 copy for both direct
+and bridge operations. Every failed ordinal preserves old output, retries and checks
+root/lease cleanup, zero GC objects after collection and native allocation cleanup
+after Runtime/Heap destruction. Earlier reference/copy sweeps are unchanged.
+
+Both SDK compilers report static C++ frames: the six-home witness is 504 bytes
+Debug / 360 Release; outer default/literal/copy/read/write wrappers are
+56/120/104/104/104 Debug and 56/72/136/104/120 Release. Captured code/commands show
+no payload-sized native temporary. These are individual C++ frames, not a complete
+call-chain bound or a generated-code certificate. Stage 3A runtime header and buffer
+implementation hashes match the prior Stage 3A manifest. The O(objects) mixed-heap
+alias guard is unchanged.
+
+All twelve final machine certificates (six configurations, normal/O2) reject the
+four incoming ownership slots and preserve sentinels. No rejected object is linked
+or executed. Public source arrays and production certification remain inactive.
+The initial Clang frontend failure and initial Debug composition JIT crash remain
+unexplained; passing retries do not establish their cause or a fix. Reproduction,
+GDB, initial failure and timeout logs are retained. No Windows/macOS native result
+or hosted Stage 3B acceptance is claimed.
+
+Evidence: `build/stage3b/summary.json`, `final-refinement-summary.json`, command/log
+files, `environment.json` (actual compilers, flags, LLVM paths and all suite names),
+`manifest.json`, `measured-sites.json`, `certificates/`, `certificate-summary.json`,
+`stage3a-preservation.json`, `frames/`, and `composition-repro/`. The source/test
+manifest matches the final files. Validation scripts are copied into that evidence
+directory. No commits, pushes, branches, CI workflow or remote changes.
+
+**Review stop:** this is a bounded Stage 3B IR/runtime/layout checkpoint. The native
+private calling proof is incomplete. Resolve incoming/outgoing ownership and
+generated root/Frame/failure/emission obligations before native delivery; do not
+advance to Stage 3C or infer permission from small frames or green runtime tests.
+
+
+## Phase 23 Stage 3B blocker-resolution checkpoint, 16 October 2026
+
+Continued Section 32 without compiler/runtime/test/workflow edits. Preserved the
+original Clang frontend exit 139 and Debug composition JIT SIGSEGV evidence.
+Detailed findings and next proof boundary are in ARRAYS_PROPOSAL.md Section 33.
+
+- Saved Clang recovery input is valid UTF-8, 7,525,722 bytes. Three cc1 replays per
+  LLVM 19.1.7 SDK pass with stable per-SDK object hashes. Three matching Debug
+  system-driver compilations each of locked/current storage_audit.cpp also pass.
+  The original built-in macro-buffer diagnostics and Lexer::SkipWhitespace trace
+  remain unexplained. Recovery source is not proof of the failing in-memory buffer.
+- After explicit owner authorization, downloaded only exact commit
+  `44fc8b686b1e28665455b37a1a825f7ba05e186e` into isolated /tmp storage and built its
+  system LLVM 19.1.7 Debug voidc. Archive SHA-256:
+  `d3acbd304282429be77604386dd6d37c53b57f1427c028e4fc847a9c09781b4f`.
+  No Git access, working-tree replacement, remote modification or branch operation.
+- Current system/official Debug and isolated locked system Debug each pass 30
+  serial, 30 two-worker parallel and 10 real 1 MiB runs of the same optimized
+  composition stress source with argument -1 and exact output 2002. Core dumps
+  were enabled; no crash/core was produced. This does not fix, classify or explain
+  the original crash, or exclude a regression. No official-SDK locked build claimed.
+- Normal/O2 compile-only MIR establishes four incoming pointer words at entry SP
+  +8/+16/+24/+32, forwarded by two packed vector loads/stores into the existing
+  32-byte outgoing area within F=40. Local pointer home is at post-prologue SP+32.
+  P/R/E remain 8/8/8; research C=48. No rejected object is delivered or executed.
+- Native GDB inspection of the existing C++ six-home embedding witness confirms
+  four stack slots at those offsets, balanced return SP, successful rooted copy
+  result and normal full gc_buffers completion. Its result/layout/quota/failure
+  roles differ from the LLVM fixture's g/h/result/failure and cannot certify it.
+- Actual blocker: LLVM fixture has no caller definition, bridge body, generated
+  Frame/Slots or failure cleanup. Current machine observations do not bind a stable
+  call-site/formal ABI assignment and root ownership to final encoded bytes.
+  Packed forwarding also loses four separate identities in the present report.
+  General incoming acceptance would require the retained ABI-ledger/origin proof,
+  with exact transformations and negative identities, not an offset-based exception.
+  No narrow safe correction was established; all four rejections remain enabled.
+
+Fresh local verification completed successfully. Every profile's four targeted
+suites pass before its full 63-suite run; no compiler/runtime/test code changed.
+
+| Linux configuration | Full suites | Full elapsed (s) | 1 MiB eight suites (s) | Seven suites, three repeats (s) |
+| --- | --- | --- | --- | --- |
+| system-debug | 63/63 | 109.56 | 22.31 | 63.90 |
+| system-release | 63/63 | 53.60 | 5.98 | 16.28 |
+| system-san | 63/63 | 146.67 | not run under sanitizer | 37.10 |
+| official-debug | 63/63 | 105.57 | 22.30 | 63.79 |
+| official-release | 63/63 | 47.56 | 5.52 | 14.99 |
+| official-san | 63/63 | 140.12 | not run under sanitizer | 35.44 |
+
+Strict ASan/UBSan and leak detection remain enabled in both SDK sanitizer profiles,
+using the unchanged Section 32 flags and SDK RTTI configuration. No timeout,
+assertion, failure ordinal or negative certificate was relaxed. The four actual
+1,048,576-byte Debug/Release stack runs cover 32 suite executions. Seven suites
+repeated three times in all six profiles cover 126 stress suite executions.
+All twelve newly copied normal/O2 reports retain four incoming-ownership errors,
+zero incoming credit and unchanged output sentinels. None was linked or executed.
+The native witness log confirms all 76 measured fixed-value failure ordinals and
+12 baselines; other existing failure and fatal controls remain in the full suite.
+No crash recurred, so both original causes remain unresolved after this independent
+baseline comparison. Generated incoming/root/failure/emission provenance remains
+the review blocker. No Stage 3C or production/native-array activation.
+
+Evidence: build/stage3b-blockers, including archive/build identity, source hashes,
+Clang commands, per-process composition results, compile-only machine snapshots,
+slot-mapping.json, native-cpp-homes.json and validation command/log records.
+All existing negative controls, failure ordinals, fatal invariants and strict leak
+checks remain enabled. Stage 3C and later checkpoints remain locked. Stop for
+owner/Wrench review; no hosted acceptance or Windows/macOS execution is claimed.
+
+Documentation preservation note: the Language Bible changed relative to the initial
+checkpoint checksum while this work was running. No command in this checkpoint
+wrote it. Its latest contents are preserved untouched; initial/observed hashes
+and a read-only evidence copy are retained. Do not restore the earlier file or
+attribute that separate replacement to this investigation.
+
+
+## Phase 23 Stage 3B: private ABI header consolidation, 16 October 2026
+
+Consolidation succeeded without a dependency cycle or a new dependency. Inspected
+both headers, both ABI implementation files, the three fixed-header consumers
+and the existing runtime/execution/buffer include chain. The removed fixed header
+already included runtime_abi.hpp; that header already provides every required type.
+Both groups are private same-build C-linkage helpers, not a public FFI boundary.
+
+Moved all five vd_fixed_* declarations and their scalar-proof/lifetime contract
+comment into the existing extern "C" block in include/void/runtime_abi.hpp.
+Removed include/void/fixed_runtime_abi.hpp. Updated only the include directives in
+src/runtime/fixed_abi.cpp, tests/runtime/buffers.cpp and tests/runtime/fixed_call.cpp.
+The implementations remain in fixed_abi.cpp. All five declaration lines are
+byte-identical and unique in the consolidated header; implementation bodies and
+test assertions are byte-identical after accounting for those include substitutions.
+C linkage, signatures, noexcept, failure translation and calling conventions are
+unchanged. No forwarding header, duplicate declarations or abstraction was added.
+
+Focused Linux system LLVM 19.1.7 verification, without the full six-configuration
+matrix or full 63-suite rerun:
+
+| Configuration | Focused suites | Elapsed | Real 1 MiB stack suites | Elapsed |
+| --- | --- | --- | --- | --- |
+| Debug | 8/8 | 38.64 s | 3/3 | 19.26 s |
+| Release | 8/8 | 9.94 s | 3/3 | 3.78 s |
+| strict ASan/UBSan/leaks | 3/3 | 11.22 s | not run under sanitizer | n/a |
+
+Debug/Release cover gc_buffers, arrays_storage_audit, runtime_generated,
+runtime_failures, runtime_invariants, runtime_coordination, strings_source and
+interfaces_source. The sanitizer selection and the two real 1,048,576-byte stack
+runs cover gc_buffers, arrays_storage_audit and runtime_generated. The sanitizer
+options remain detect_leaks=1:halt_on_error=1:exitcode=87 for ASan and
+halt_on_error=1:print_stacktrace=1:exitcode=86 for UBSan. All selected target builds
+pass. Existing buffer failure sweeps, fatal/leak controls and native private-call
+witnesses remain enabled. No new test logic was needed for declaration relocation.
+
+All six fresh normal/O2 reports across these three configurations retain exactly
+four unproved incoming ownership slots, zero incoming credit and intact delivery
+sentinels. No rejected object was executed or delivered. No machine-certification
+rule, root/Frame contract, source-array gate or Stage 3C boundary changed.
+
+LANGUAGE_BIBLE.md and WRENCH_CLANKER.md are byte-for-byte unchanged. The Wrench
+handoff's historical mentions of the removed header are intentionally untouched.
+No CMake, workflow, Git or remote changes. Evidence and exact scoped diffs are in
+build/stage3b-abi-header-cleanup. Stop for Wrench review.

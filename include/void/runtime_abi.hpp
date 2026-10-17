@@ -18,6 +18,15 @@ extern "C" {
 void vd_string_literal(void**, const char*, std::size_t, vd::RuntimeFailure*) noexcept;
 void vd_string_concat(void**, void*, void*, vd::RuntimeFailure*) noexcept;
 bool vd_string_equal(void*, void*, vd::RuntimeFailure*) noexcept;
+// Private same-build scalar proof bridge. The embedding caller retains these
+// admitted layout/explicit work-quota values for the duration of a call.
+// No transaction object or C++ exception crosses a generated frame. Literal
+// words must be stable non-managed storage, as in Runtime::fixed_literal_into.
+void vd_fixed_default(void**,const vd::BufferLayoutRef*,const vd::BufferWorkQuota*,vd::RuntimeFailure*) noexcept;
+void vd_fixed_literal(void**,const vd::BufferLayoutRef*,const std::uint64_t*,std::size_t,const vd::BufferWorkQuota*,vd::RuntimeFailure*) noexcept;
+void vd_fixed_copy(void**,void**,const vd::BufferLayoutRef*,const vd::BufferWorkQuota*,vd::RuntimeFailure*) noexcept;
+std::uint64_t vd_fixed_read(void**,const vd::BufferLayoutRef*,std::uint64_t,vd::RuntimeFailure*) noexcept;
+void vd_fixed_write(void**,const vd::BufferLayoutRef*,std::uint64_t,std::uint64_t,vd::RuntimeFailure*) noexcept;
 void vd_gc_frame_enter(void*, const vd::Runtime::Slot*, std::size_t) noexcept;
 void vd_gc_frame_leave(void*) noexcept;
 void vd_gc_poll() noexcept;

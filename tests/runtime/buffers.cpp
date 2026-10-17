@@ -1,4 +1,5 @@
 #include "void/runtime.hpp"
+#include "void/runtime_abi.hpp"
 #include <atomic>
 #include <chrono>
 #include <cstring>
@@ -15,6 +16,8 @@
 #ifdef _WIN32
 #include <malloc.h>
 #endif
+extern "C" void fixed_six_witness(void**,void**,void**,void**,void**,void**,void**,
+    const vd::BufferLayoutRef*,const vd::BufferWorkQuota*,vd::RuntimeFailure*) noexcept;
 namespace {
 struct Stats {std::atomic<std::size_t> calls{0},bytes{0},live{0},live_calls{0};};
 Stats stats[4];thread_local int recording=-1;thread_local long fail_after=-1;
@@ -961,25 +964,64 @@ long fixed_failure_transaction(long ordinal,bool measure,unsigned operation,std:
         auto run=[&] {
             if(operation==0)r.fixed_default_into(&out.value,layout,quota);
             else if(operation==1)r.fixed_literal_into(&out.value,layout,bits,quota);
-            else r.fixed_copy_into(&out.value,token,layout,quota);
+            else if(operation==2) r.fixed_copy_into(&out.value,token,layout,quota);
+            else {
+                RuntimeFailure failure;
+                if(operation==3) vd_fixed_default(&out.value,&layout,&quota,&failure);
+                if(operation==4) vd_fixed_literal(&out.value,&layout,bits.data(),bits.size(),&quota,&failure);
+                if(operation==5) vd_fixed_copy(&out.value,&source.value,&layout,&quota,&failure);
+                failed=failure.message!=nullptr;
+            }
         };
         try {run();}catch(const std::bad_alloc&) {failed=true;}
         recording=-1;fail_after=-1;sites=static_cast<long>(stats[0].calls.load());
         if(!measure)check(failed && out.value==sentinel,"fixed failure ordinal missed or published output");
         check(r.collect()==Runtime::Collection::completed && !r.snapshot().requested,"fixed failure left collection epoch");
         if(failed) {check(r.snapshot().objects==2,"fixed failure retained private storage");run();}
-        for(unsigned i=0;i<3;++i)check(r.fixed_scalar(r.root_word(&out.value),layout,i)==(operation ? bits[i] : 0),"fixed failure retry content");
+        for(unsigned i=0;i<3;++i)check(r.fixed_scalar(r.root_word(&out.value),layout,i)==(operation%3 ? bits[i] : 0),"fixed failure retry content");
         r.fixed_store_scalar(token,layout,0,13); // all copy leases released
         source.value=out.value=nullptr;check(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"fixed failure GC leak");
     }
     reference_native_empty();return sites; // strict native check after all owners die
 }
 void fixed_failures() {
-    for(auto budget:{std::size_t{0},std::size_t{1}})for(unsigned operation=0;operation<3;++operation) {
+    for(auto budget:{std::size_t{0},std::size_t{1}})for(unsigned operation=0;operation<6;++operation) {
         auto sites=fixed_failure_transaction(-1,true,operation,budget);check(sites>=3,"fixed allocation work not measured");
         for(long ordinal=0;ordinal<sites;++ordinal)fixed_failure_transaction(ordinal,false,operation,budget);
         std::cout<<"fixed value allocation sweep operation="<<operation<<" budget="<<budget<<": "<<sites<<" sites\n";
     }
+}
+void fixed_private_bridge() {
+    Runtime r(1);auto schema=admit(r,spec("private-call-u64",{SchemaScalar{ScalarEncoding::u64}}));auto layout=r.buffer_layout(schema,2);
+    Runtime::Attachment attach(r);Runtime::Managed managed(r);
+    Output source(r),a(r),b(r),c(r),d(r),e(r),f(r),out(r);
+    RuntimeFailure failure;
+    const std::uint64_t words[]={7,11};vd_fixed_literal(&source.value,&layout,words,2,&quota,&failure);
+    for(auto root:{&a.value,&b.value,&c.value,&d.value,&e.value,&f.value}) {
+        vd_fixed_copy(root,&source.value,&layout,&quota,&failure);
+        vd_fixed_write(&source.value,&layout,0,vd_fixed_read(&source.value,&layout,0,&failure)+1,&failure);
+    }
+    check(!failure.message,"private bridge argument construction failed");
+    fixed_six_witness(&a.value,&b.value,&c.value,&d.value,&e.value,&f.value,&out.value,&layout,&quota,&failure);
+    check(!failure.message && vd_fixed_read(&out.value,&layout,0,&failure)==99,"six-home result/GC witness failed");
+    check(vd_fixed_read(&source.value,&layout,0,&failure)==13 && vd_fixed_read(&b.value,&layout,0,&failure)==8,
+          "argument snapshots observed later source effects");
+    vd_fixed_write(&a.value,&layout,0,51,&failure);
+    check(vd_fixed_read(&out.value,&layout,0,&failure)==99,"result shares mutable argument storage");
+    auto* sentinel=out.value;
+    vd_fixed_copy(&out.value,nullptr,&layout,&quota,&failure);
+    check(failure.message && out.value==sentinel,"invalid bridge root published output");
+    const auto* first=failure.message;
+    vd_fixed_default(&out.value,&layout,&quota,&failure);
+    check(failure.message==first && out.value==sentinel,"failure propagation executed later operation");
+    failure={};
+    {Runtime::BufferReadLease lease(r,r.root_word(&a.value),layout);
+        vd_fixed_write(&a.value,&layout,0,9,&failure);
+        check(failure.message && std::string(failure.message)=="Fixed buffer is busy","bridge lease conflict misclassified");}
+    failure={};vd_fixed_read(&a.value,&layout,2,&failure);check(failure.message,"bridge bounds failure escaped");
+    source.value=a.value=b.value=c.value=d.value=e.value=f.value=out.value=nullptr;
+    check(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"bridge retained temporary roots");
+    std::cout<<"private scalar bridge: six caller homes, GC, ordered snapshots, independent result and failure preservation passed\n";
 }
 void reference_poll_reacquisition(bool invalid_after_poll=false) {
     Runtime r;const auto w=sizeof(void*);std::array<NominalDescriptor,2> types{{{"T","","plain",{w,{}}},{"Other","","other",{w,{}}}}};
@@ -1122,7 +1164,7 @@ void measure() {
 int main(int argc,char** argv) {
     try {
         if(argc>1) {if(std::string_view(argv[1])=="--measure")measure();else if(std::string_view(argv[1])=="--measure-reference")measure_references();else if(std::string_view(argv[1])=="reference-leak-bytes")checked_reference_transaction(-1,true,37);else if(std::string_view(argv[1])=="reference-leak-zero")checked_reference_transaction(-1,true,0);else fatal(argv[1]);}
-        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();fixed_values();fixed_poll_and_roots();fixed_failures();reference_poll_reacquisition();
+        else {layouts();byte_oracles();scalar_and_deep_oracles();empty_aligned_and_negatives();failures();native_and_chunk_collections();reference_buffers();object_table_lifetime();reference_failures();buffer_copy_bytes();check(!stats[3].live && !stats[3].live_calls,"byte copy native allocations outlived Runtime");nested_copy_and_collections();copy_negatives();copy_compactness();copy_failures();foundation_acceptance_stress();fixed_values();fixed_poll_and_roots();fixed_failures();fixed_private_bridge();reference_poll_reacquisition();
 #ifdef VD_BUFFER_WRAP_COLLECT
             reference_poll_reacquisition(true);
 #endif

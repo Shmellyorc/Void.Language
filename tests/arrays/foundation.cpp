@@ -292,8 +292,55 @@ void indexes_and_budget() {
     rejected=false;try {planner.value(StorageRole::copy,"overflow",Type::i64,~std::uint64_t{0});} catch(const std::length_error&) {rejected=true;}
     check(rejected,"storage multiplication overflow accepted");
 }
+void owned_ir() {
+    const auto type=analyze("func sample(a: [i32, 2]) -> [i32, 2]:\n    return a\n")->lower().functions.front().result;
+    ir::Function callee;callee.name="six";callee.parameters.assign(6,type);callee.result=type;callee.fixed_ownership=true;
+    callee.blocks={{{{ir::Op::argument,0}}, {ir::Terminator::Kind::return_value,0}}};
+    ir::Function caller;caller.name="entry";caller.parameters={};caller.locals={type};caller.result=type;caller.fixed_ownership=true;
+    ir::Instruction scalar{ir::Op::constant};scalar.immediate=1;
+    ir::Instruction construct{ir::Op::fixed_array};construct.type=type;construct.arguments={0,0};
+    std::vector<ir::Instruction> code{scalar,construct,{ir::Op::store,0,1},{ir::Op::load,0}};
+    for(unsigned n=0;n<6;++n) code.push_back({ir::Op::fixed_snapshot,3});
+    ir::Instruction call{ir::Op::call};call.callee="six";call.arguments={4,5,6,7,8,9};code.push_back(call);
+    caller.blocks={{code,{ir::Terminator::Kind::return_value,10}}};
+    ir::Module module{"owned-proof",{},{callee,caller}};module.coordinated=true;
+    ir::validate(module);
+    auto bad=module;bad.functions[1].blocks[0].instructions[10].arguments[1]=4;
+    reject_ir(bad,"use after transfer");
+    bad=module;bad.functions[1].blocks[0].instructions[10].arguments[0]=3;
+    reject_ir(bad,"explicit snapshot");
+    bad=module;bad.functions[0].blocks[0].instructions.push_back({ir::Op::argument,0});
+    reject_ir(bad,"repeated argument");
+    bad=module;bad.functions[0].fixed_ownership=false;reject_ir(bad,"mixed legacy/private");
+    bad=module;bad.coordinated=false;reject_ir(bad,"runtime/receiver");
+    bad=module;bad.functions[1].blocks[0].end={ir::Terminator::Kind::return_value,3};
+    reject_ir(bad,"invalidated borrow");
+    // Selection captures a rooted owner/index before RHS effects. Commit has no
+    // whole-array operand that could restore stale siblings.
+    ir::Function selected=caller;selected.result=Type::i32;
+    ir::Instruction select{ir::Op::fixed_select,0};select.receiver=ir::Place{0,{}};
+    selected.blocks={{{scalar,construct,{ir::Op::store,0,1},select,{ir::Op::gc_poll},
+        {ir::Op::fixed_commit,3,0},{ir::Op::load,0},{ir::Op::array_get,6,0}},
+        {ir::Terminator::Kind::return_value,7}}};
+    ir::Module places{"places",{},{selected}};places.coordinated=true;ir::validate(places);
+    bad=places;bad.functions[0].blocks[0].instructions[5].a=0;reject_ir(bad,"selected-place commit");
+    bad=places;bad.functions[0].blocks[0].instructions.push_back({ir::Op::fixed_commit,3,0});
+    reject_ir(bad,"repeated selected-place");
+    bad=places;bad.functions[0].blocks[0].instructions[5]={ir::Op::gc_poll};reject_ir(bad,"uncommitted selected");
+    bad=places;bad.functions[0].locals[0].readonly=true;reject_ir(bad,"fixed selection");
+    bad=places;bad.functions[0].blocks[0].instructions[2]={ir::Op::gc_poll};reject_ir(bad,"uninitialized selected");
+    // Definite initialization at a CFG join is an intersection, not a union.
+    auto joined=places;auto& f=joined.functions[0];
+    f.blocks={{{{ir::Op::constant,0,0,1,"",{},Type::boolean}},{ir::Terminator::Kind::branch,0,1,2}},
+        {{scalar,construct,{ir::Op::store,0,1}},{ir::Terminator::Kind::jump,0,3}},
+        {{},{ir::Terminator::Kind::jump,0,3}},
+        {{{ir::Op::load,0},scalar,{ir::Op::array_get,0,1}},{ir::Terminator::Kind::return_value,2}}};
+    reject_ir(joined,"uninitialized fixed home");
+    f.blocks[2].instructions={scalar,construct,{ir::Op::store,0,1}};ir::validate(joined);
+    f.blocks[3].end={ir::Terminator::Kind::jump,0,0};reject_ir(joined,"entry reexecution");
+}
 }
 int main() {
-    try {source_and_ir();negatives();compact_shapes();indexes_and_budget();std::cout<<"P23-1 scalar fixed-array analysis/IR and storage-contract checks passed\n";return 0;}
+    try {source_and_ir();negatives();compact_shapes();indexes_and_budget();owned_ir();std::cout<<"Scalar fixed-array analysis, owned IR and storage-contract checks passed\n";return 0;}
     catch(const std::exception& error) {std::cerr<<error.what()<<'\n';return 1;}
 }

@@ -1,11 +1,12 @@
 # Phase 23 proposal: typed arrays, indexing and iteration
 
-**Current status, 16 October 2026: Stage 2F remains owner/Wrench LOCKED at
-`d872889`, CI #57, seven jobs / 63 suites each. Section 30's Stage 3 architecture
-is owner/Wrench approved. Stage 3A ONLY is authorized: the scalar owned-value
-runtime proof in Section 31. Stage 3B+, source arrays, compiler/LLVM/generated
-calling conventions, nested owned children and Stage 4 growables remain gated.
-The superseding large-array decision and independent certification gates stand.**
+**Current status, 16 October 2026: Stage 3A is owner/Wrench LOCKED at
+`44fc8b6`, CI #58, all seven hosted jobs passed with 63/63 suites each.
+Stage 2F remains LOCKED at `d872889`, CI #57. Section 30's Stage 3 architecture
+is approved. Stage 3B only is authorized; Section 32 records its bounded private
+IR/runtime proof and retained native certification blocker. Public source arrays,
+Stage 3C+, nested owned children and Stage 4 growables remain gated. The
+superseding large-array decision and independent certification gates stand.**
 
 > **SUPERSEDING OWNER DECISION: large arrays are a language requirement.**
 > Neither `[T, n]` nor `[T]` may have an arbitrary 64 KiB source-level ceiling.
@@ -4693,8 +4694,9 @@ acceptable game-frame latency. This review does not authorize that optimization.
 | **3D: owned nesting and richer elements** | Extend the existing owned schema role and cursor, transactional child handoff, subtree lease acquisition and iterative deep clone. Cover nested fixed arrays, array-containing value records, managed/string/interface elements and ordered effectful construction. Prove managed-field and dispatch integration before admitting those boundaries. Keep growable roles rejected. |
 | **3E: fixed-array acceptance** | Fixed forward/reverse iteration, original i64 indices, copied owned items, break/continue/return and polling; approved i32/i64 numeric ranges with endpoint-overflow safety via existing CFG machinery. Full value/readonly/reload/tooling/native-platform and performance acceptance, then owner-controlled hosted gate. No growable headers/mutation or Stage 4 APIs. |
 
-The owner subsequently authorized 3A only, recorded in Section 31. The remaining
-checkpoints still require separate authorization. 3C's scalar-only scope is useful but must not be called completed Stage 3; nested
+The owner subsequently locked 3A (Section 31) at `44fc8b6`, CI #58, and
+authorized 3B only (Section 32). The remaining checkpoints require separate
+authorization. 3C's scalar-only scope is useful but must not be called completed Stage 3; nested
 value independence and richer elements remain mandatory before fixed-array acceptance.
 If the native certification prerequisite needs a separate hybrid-proof checkpoint,
 insert that approved checkpoint rather than weakening its gates or promising a date.
@@ -4743,6 +4745,10 @@ hardening issue remain separate. Stop for owner/Wrench architectural review.
 
 
 ## 31. Stage 3A: scalar owned-value runtime proof
+
+**Hosted update:** owner/Wrench locked this checkpoint at `44fc8b6`, CI #58,
+seven jobs and 63/63 suites each. The local report below predates that hosted
+confirmation; its pending-hosted wording is historical. Stage 3B is Section 32.
 
 16 October 2026. Bounded extension of the locked Stage 2 runtime, following the
 approved Section 30 direction. This adds C++ embedding operations, not a generated
@@ -4899,3 +4905,359 @@ LLVM JIT/AOT array lowering, final code certification and shared tooling remain
 Stage 3B+ proofs. Nested owned children and subtree leases/handoffs are not implemented;
 copying ordinary physical bytes cannot substitute for them. Stage 4 remains gated.
 Stop for owner/Wrench review; Stage 3A is not hosted-locked by local verification.
+
+
+## 32. Stage 3B: private owned IR, target homes and retained proof boundary
+
+16 October 2026. Owner/Wrench reports Stage 3A locked at `44fc8b6`, hosted CI
+#58, seven passing jobs with 63/63 suites each. This records that supplied hosted
+lock, not a new remote inspection. The current Markdown bot formatting was read
+and retained before these status edits and additions. Exact pre-edit documents
+are saved locally in `build/stage3b/*.md.before` for review.
+
+### 32.1 Shared IR ownership proof
+
+The existing shared IR has an opt-in `Function::fixed_ownership` scalar proof
+contract. Existing frontend output keeps its functional value representation and
+native rejection. No second IR, source feature or general ownership framework is
+introduced. Private fixed signatures may call only the corresponding private fixed
+contract, not a legacy array signature.
+
+- `fixed_array` and fixed call results produce fresh values. An incoming argument
+  is a single-use handoff of a caller snapshot, not permission to alias a source
+  binding. Array argument instructions are unique and entry-only; entry backedges
+  reject. Fresh values may be transferred once into a local home, argument home or
+  return. Reusing a transferred value rejects.
+- A local load is a borrowed view. `fixed_snapshot` explicitly clones it into
+  independent value storage at that instruction's evaluation point. Copies are
+  conservative; no move inference, borrow optimization or LLVM last-use heuristic
+  grants transfer authority. Borrowed loads cannot be stored, passed or returned
+  as independent mutable values. Calls and fixed mutations invalidate outstanding
+  borrowed views, requiring a new load or prior snapshot.
+- `fixed_select` records a checked local owner/index selection before RHS effects.
+  Its token denotes the same registered place and evaluated index, not an
+  interior pointer or a saved whole value. A single `fixed_commit` reacquires the
+  current value of that home and revalidates before writing the scalar leaf;
+  it has no whole-array operand that could restore stale sibling contents. Tokens
+  cannot cross block boundaries or be committed twice. The initial subset accepts
+  direct fixed locals only; nested selected owners remain rejected.
+- The independent validator derives result types, fresh/borrowed/consumed facts,
+  definite local initialization at CFG intersections and selection lifetime from
+  instructions. It does not trust source summaries. Functional `array_set` is
+  rejected in the private mode until a separate copy plan exists. Aggregate,
+  managed/string/interface carriers and nested fixed values reject in this proof.
+
+This is a semantic contract and validation proof, not implemented generated
+selection lowering. Its runtime rooting/cleanup still needs native integration. For this direct-local subset,
+RHS replacement of the local updates the same registered home; commit must not
+write an obsolete pre-RHS payload or restore an earlier whole-array snapshot.
+
+### 32.2 One target-derived private signature/home description
+
+`AotObjectEmitter::fixed_call_layout` uses the emitter's exact LLVM 19.1.7 target
+machine DataLayout and profile identity, including triple, CPU, features and
+normal/O2 pipeline. It records exact logical signature, scalar operands, one-word
+caller snapshot homes, an explicit caller result-home address when applicable,
+and the existing trailing failure-context pointer. It records target-derived
+Slot/failure sizes, alignment and field offsets, checked against the independently
+compiled C++ ABI on the executing host. Array payload extent does not appear in
+native handle-home size. Array-free signatures reject this descriptor and retain
+their existing calling convention.
+
+Temporary LLVM type-layout queries use a fresh DataLayout cache tied to their
+LLVMContext, avoiding dangling StructLayout cache keys in the long-lived emitter.
+The descriptor does not invent Frame sizes, outgoing call allowances, root homes,
+spill credit or a new production stack policy. It is not yet wired into public
+lowering, ORC or source calls and does not certify Runtime::Frame generation.
+No cross-target execution or Windows/macOS ABI acceptance is claimed locally.
+
+### 32.3 Bounded helper bridge and native embedding witness
+
+The private same-build `vd_fixed_default/literal/copy/read/write` wrappers reuse
+Stage 3A operations without changing their implementation. They accept exact
+admitted layout references, registered home addresses, explicit work quotas and
+RuntimeFailure. All layout/quota arguments are borrowed only for the call;
+literal words must be stable non-managed native storage. Layout/quota pointers
+avoid a new by-value aggregate helper ABI. Builder/lease/reservation RAII stays
+inside one call; there is no multi-call transaction lifetime or payload-sized
+staging allocation. Expected allocation, bounds, layout/root and BufferBusy errors
+use static failure messages. A preexisting failure suppresses later work; unexpected
+exceptions terminate. No C++ exception crosses this bridge. Existing fatal heap,
+private-root and graph invariants remain fatal.
+
+An independently compiled C++ six-argument embedding witness receives registered
+caller snapshot homes, validates them before loading handles, roots six bounded
+callee homes before collection, mutates one handed-off value and clones its result
+into the registered caller output. Caller-side tests finish each clone before
+later source mutation and prove independent arguments/results, failure preservation,
+lease conflicts and root cleanup. This is native C++ embedding evidence in Debug
+and optimized Release builds. It is not LLVM-generated fixed-array execution or a
+certificate for a generated calling convention.
+
+### 32.4 Actual native certification stop gate
+
+A separate LLVM normal/O2 fixture compiles a private ten-pointer call shape:
+eight argument-home pointers, caller result home and failure context, with an exact
+original one-pointer alloca inventory. Ten pointers force incoming stack arguments
+on all three intended native targets, unlike six homes plus result/failure, which
+fit in ARM64 argument registers. The existing machine service rejects both
+objects on Linux x64 for **four unproved incoming ownership slots**. Both original
+output sentinels survive; neither rejected candidate is linked or executed.
+
+Observed in both final profiles: P=8, F=40, R=8, E=8, A=16 and research charge
+C=48. LLVM reports four fixed incoming objects of 8 bytes, MachineFrameInfo offsets
+0/8/16/24 and callee-entry-SP offsets 8/16/24/32; outgoing observation is 32 bytes.
+The initial six-home Linux fixture also rejected (two incoming objects, F=24,
+C=32, outgoing=16); its reports are retained in build/stage3b/initial-six-*.json.
+The final fixture avoids assuming that ARM64 has the Linux register-argument limit. These measurements do not
+prove caller/callee ownership. The small frame and matching encoded events cannot
+clear the existing ABI-ledger/emission-origin gates. The research 65,536-byte
+threshold remains unchanged and research-only.
+
+**Stop:** no generated private caller/callee execution, ORC bridge registration,
+source activation or production ABI change is attempted past this concrete
+boundary. Stage 3B is a bounded review checkpoint, not a completed native calling
+proof. Next review must resolve per-call incoming/outgoing ownership and generated
+Frame/root/failure cleanup with the independent certification architecture before
+native delivery. Existing PUSH/tail, optimization lineage, encoded CFG mutation,
+final linking/relocation and native cross-platform gates remain intact. Stage 3C
+must not start automatically. IR-to-schema admission/bootstrap and compiler-generated
+helper invocation, selected-place commit and root/failure cleanup lowering are not
+implemented. The new helper symbols are not registered with ORC or the public AOT
+producer. They must not be mistaken for a wired native array path.
+
+### 32.5 Verification evidence
+
+Final local evidence, LLVM 19.1.7 in both existing system and official Linux SDK
+configurations. All six latest full runs pass all 63 suites. The system rows use
+the final fixture refresh; official rows already include that fixture. Times are
+observations on this host, not performance guarantees or isolated benchmarks.
+
+| Linux configuration | Full suites | Full elapsed | 1 MiB eight-suite elapsed (s) | Seven suites, three repeats |
+| --- | --- | --- | --- | --- |
+| system-debug | 63/63 | 131.97 s | 22.7 | 64.18 s |
+| system-release | 63/63 | 53.05 s | 5.92 | 16.14 s |
+| system-san | 63/63 | 147.33 s | not run under sanitizer | 37.47 s |
+| official-debug | 63/63 | 105.59 s | 22.45 | 64.40 s |
+| official-release | 63/63 | 47.30 s | 5.6 | 15.12 s |
+| official-san | 63/63 | 130.05 s | not run under sanitizer | 33.64 s |
+
+Both sanitizer profiles retain ASan/UBSan, leak detection and halt-on-error:
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. The existing SDK RTTI
+profiles remain unchanged, including the official SDK's unavailable vptr check.
+No sanitizer option or timeout was relaxed. The contended additional recheck timed
+out; the final serial rerun passed modules_cli in 83.19 s against the same 180 s
+limit (earlier serial 84.13 s). Preserve the partial timeout log as scheduling
+evidence, not a passing run.
+
+The eight affected suites ran under a real 1,048,576-byte soft RLIMIT_STACK in
+Debug/Release for both SDKs (32 suite executions). The final system machine fixture
+also passed separate 1 MiB reruns (8.51/3.57 s). Original seven-suite stress covers
+126 suite executions; the final system audit fixture refresh adds three repeats
+per system configuration (25.61/8.79/19.30 s; exact command records are authoritative).
+All existing fatal, leak-control, rollback, post-poll and failure-injection tests
+remain enabled. The fixed-value sweeps retain the original 38 measured positions
+and add 38 bridge positions, with 12 baselines per buffer run. Captured logs confirm
+76 positions: budgets 0/1 give 4/8 default, 4/8 literal and 4/10 copy for both direct
+and bridge operations. Every failed ordinal preserves old output, retries and checks
+root/lease cleanup, zero GC objects after collection and native allocation cleanup
+after Runtime/Heap destruction. Earlier reference/copy sweeps are unchanged.
+
+Both SDK compilers report static C++ frames: the six-home witness is 504 bytes
+Debug / 360 Release; outer default/literal/copy/read/write wrappers are
+56/120/104/104/104 Debug and 56/72/136/104/120 Release. Captured code/commands show
+no payload-sized native temporary. These are individual C++ frames, not a complete
+call-chain bound or a generated-code certificate. Stage 3A runtime header and buffer
+implementation hashes match the prior Stage 3A manifest. The O(objects) mixed-heap
+alias guard is unchanged.
+
+All twelve final machine certificates (six configurations, normal/O2) reject the
+four incoming ownership slots and preserve sentinels. No rejected object is linked
+or executed. Public source arrays and production certification remain inactive.
+The initial Clang frontend failure and initial Debug composition JIT crash remain
+unexplained; passing retries do not establish their cause or a fix. Reproduction,
+GDB, initial failure and timeout logs are retained. No Windows/macOS native result
+or hosted Stage 3B acceptance is claimed.
+
+Evidence: `build/stage3b/summary.json`, `final-refinement-summary.json`, command/log
+files, `environment.json` (actual compilers, flags, LLVM paths and all suite names),
+`manifest.json`, `measured-sites.json`, `certificates/`, `certificate-summary.json`,
+`stage3a-preservation.json`, `frames/`, and `composition-repro/`. The source/test
+manifest matches the final files. Validation scripts are copied into that evidence
+directory. No commits, pushes, branches, CI workflow or remote changes.
+
+**Review stop:** this is a bounded Stage 3B IR/runtime/layout checkpoint. The native
+private calling proof is incomplete. Resolve incoming/outgoing ownership and
+generated root/Frame/failure/emission obligations before native delivery; do not
+advance to Stage 3C or infer permission from small frames or green runtime tests.
+
+
+## 33. Stage 3B blocker investigation: crash evidence and incoming ownership
+
+16 October 2026. This is a focused continuation of Section 32, not Stage 3C or
+an approval of generated array execution. No compiler, runtime, test assertion or
+workflow changes were made in this investigation. Existing rejections remain.
+
+### 33.1 Preserved failures and isolated locked comparison
+
+The original system-Clang failure compiling `storage_audit.cpp` is preserved,
+including its exit 139, malformed token/UTF-8 diagnostics in the built-in macro
+buffer and backtrace through `clang::Lexer::SkipWhitespace`, token lexing and
+parser recovery. Its crash-recovery preprocessed source is 7,525,722 bytes and
+valid UTF-8. That recovery file is not proof of the exact in-memory buffer at the
+fault: Clang generates recovery inputs after failure. Do not infer a source,
+LLVM, hardware or concurrency cause from the diagnostic alone.
+
+The saved cc1 command, with only its output/input paths relocated, passed three
+times on each installed LLVM 19.1.7 distribution. Object hashes are stable within
+each distribution. The command retains the driver's original cc1 options; its
+stock internal `-disable-llvm-verifier` option is not a change to VOID's LLVM IR
+verification. Current and locked `storage_audit.cpp` also each passed three full
+system-Clang driver compilations using their actual Debug compile commands,
+redirecting object outputs and removing dependency-file output options so build
+products are untouched. No crash was reproduced, and no cause or fix is established.
+
+No local locked executable was initially available. After explicit owner approval,
+the exact Stage 3A source archive for
+`44fc8b686b1e28665455b37a1a825f7ba05e186e` was downloaded read-only into a separate
+`/tmp/void-stage3a-44fc8b686b1e28665455b37a1a825f7ba05e186e` directory. Archive
+SHA-256 is `d3acbd304282429be77604386dd6d37c53b57f1427c028e4fc847a9c09781b4f`.
+Its isolated Debug `voidc` build uses system Clang/LLVM/LLD 19.1.7, RTTI on and the
+same configuration as the original failing system build. The build succeeded,
+including its ordinary two-job backend compilation. No Git state was accessed or
+changed; the archive is not substituted into the working tree.
+
+The original composition failure was an optimized JIT run of
+`examples/composition/stress.void -1`, expected output `2002`. New controlled runs
+use the exact same source, argument and expected output, with core dumps enabled
+and separate process directories. Current system Debug and official-SDK Debug
+binaries each pass 30 serial, 30 two-worker parallel and 10 real 1 MiB stack runs.
+The isolated locked system Debug binary passes the same 70 runs against that
+identical source. This is an independent matching system-SDK comparison, not an
+official-SDK baseline build. Relevant input hashes and baseline/current source
+diffs are recorded. The frontend, runtime buffer/coordination and stress source
+are identical; IR/backend differences remain and are not dismissed as irrelevant.
+No SIGSEGV/core was produced in these runs. The original JIT crash remains
+unexplained; passing both revisions does not prove absence of a regression.
+
+### 33.2 Exact physical slots are not ownership identities
+
+Existing certificate reports and new compile-only LLVM 19.1.7 normal/O2 MIR and
+assembly agree. Let B be `private_call` entry SP and Q = B - 40 be its SP after
+prologue. The first six pointer operands arrive in registers. The remaining
+transport slots are:
+
+| Logical operand | MFI offset | Entry address | Post-prologue address | Forwarded `bridge` outgoing address |
+| --- | --- | --- | --- | --- |
+| 7, argument home g | 0 | B + 8 | Q + 48 | Q + 0 |
+| 8, argument home h | 8 | B + 16 | Q + 56 | Q + 8 |
+| 9, caller result home | 16 | B + 24 | Q + 64 | Q + 16 |
+| 10, failure context | 24 | B + 32 | Q + 72 | Q + 24 |
+
+Each slot is eight bytes. Entry B is 8 modulo 16 and Q is 16-byte aligned.
+LLVM combines incoming pairs into aligned 16-byte loads at Q+48/Q+64 and writes
+the pairs with unaligned 16-byte stores to Q/Q+16. The local handle home occupies
+Q+32 for eight bytes. `bridge` entry SP is Q-8 after CALL, so its stack operands
+would again be at entry offsets 8/16/24/32. The four individual logical identities
+are not retained by merely observing two vector stores. F=40 already includes the
+32-byte reserved outgoing area; it must not be charged twice. P=8, R=8, E=8 and
+research C=48 remain observations, with no incoming ownership credit or policy
+activation.
+
+An actual native GDB witness of the existing independently compiled C++
+`fixed_six_witness` confirms stack operands at entry offsets 8/16/24/32, a return
+SP exactly eight bytes above callee entry, a nonnull completed result, clear
+failure state and successful completion of the full `gc_buffers` executable.
+That C++ signature's last four roles are result/layout/quota/failure, unlike the
+LLVM fixture's g/h/result/failure. Its registered caller homes, bounded callee
+Frame, collection, result clone and cleanup are real C++ evidence, not permission
+to transfer ownership facts to a different LLVM function or object.
+
+The rejected LLVM module defines only the forwarder. Its caller is absent and
+`bridge` is a declaration. Its one alloca is a copied handle word, not a generated
+registered Slot/Frame; there is no generated failure branch or cleanup plan.
+Consequently neither edge has the complete owned-home/root contract that a
+certificate would need. The production auditor deliberately rejects fixed incoming
+objects; the current outgoing observation names callees, not stable per-site ABI
+assignments. The narrow earlier Windows research signature proof does not establish
+this Linux signature or generated rooting. Matching offsets or small frame sizes
+cannot clear these gates.
+
+### 33.3 Smallest remaining proof and review stop
+
+The missing proof must reuse the existing immutable inventory, machine observer,
+private object staging and independent encoded-CFG architecture:
+
+1. A closed private caller/callee fixture must identify each evaluated snapshot,
+   registered caller Slot/home, result home and failure context. Complete snapshots
+   precede later argument effects. The caller roots remain live through the call;
+   callee roots exist before its first safepoint. Failure exits preserve the old
+   result and discharge every temporary root/lease without throwing across frames.
+2. Bind each call site and formal argument to the actual target ABI assignment,
+   including register or stack location, padded extent, alignment and cleanup.
+   Preserve logical ownership separately from pointer-transport bytes. Require the
+   same target/CPU/features/DataLayout/optimization and actual caller-object identity.
+   No credit follows from a callee name, frame index, size or expected SysV offset.
+3. Preserve or independently prove the mapping through packed stores, scheduling,
+   cloning, inlining and reuse. The observed two 16-byte stores need exact byte/lane
+   provenance to four argument identities. Reject missing or ambiguous lineage.
+4. Bind those events to final encoded call/continuation ranges and relocations,
+   alongside the existing independent CFG verifier. Prove the reserved outgoing
+   region's ownership and avoid double-counting it in F. Incoming transport cannot
+   stand in for proof of rooted payload ownership, result lifetime or failure cleanup.
+5. Retain negatives for changed argument/home identities with identical offsets,
+   absent callers, forged/unregistered roots, missing failure cleanup, stale profile
+   or object identities, aliasing, ambiguous reuse and altered encoded successors.
+
+The required ABI-assignment/emission-origin evidence is the still-open hybrid
+architecture work described in Sections 17-19 and 30. No such hook or ledger is
+implemented by this checkpoint. A signature-specific guessed ownership exception
+would bypass, rather than resolve, the blocker. No narrowly proved production
+correction emerged, so all four normal/O2 incoming rejections remain. Stop for
+owner/Wrench review of this precise boundary before further implementation.
+Public arrays, ORC registration, Stage 3C, nested children and growables stay gated.
+The historical 65,536-byte experiments remain operational and research-only.
+
+### 33.4 Fresh validation and preserved evidence
+
+All six fresh Linux LLVM 19.1.7 configurations pass 63/63 suites. Each profile's
+four targeted suites passed before its complete run. Builds/configurations were
+run sequentially, without overlapping our heavy compiler builds with tests.
+Times describe these host runs, not performance guarantees.
+
+| Linux configuration | Full suites | Full elapsed (s) | 1 MiB eight suites (s) | Seven suites, three repeats (s) |
+| --- | --- | --- | --- | --- |
+| system-debug | 63/63 | 109.56 | 22.31 | 63.90 |
+| system-release | 63/63 | 53.60 | 5.98 | 16.28 |
+| system-san | 63/63 | 146.67 | not run under sanitizer | 37.10 |
+| official-debug | 63/63 | 105.57 | 22.30 | 63.79 |
+| official-release | 63/63 | 47.56 | 5.52 | 14.99 |
+| official-san | 63/63 | 140.12 | not run under sanitizer | 35.44 |
+
+Both strict sanitizer profiles retain
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. SDK RTTI profiles and
+the official SDK's unavailable vptr check remain unchanged. No timeout or check
+was relaxed. Debug/Release for both SDKs executed the eight affected suites with
+soft RLIMIT_STACK set to exactly 1,048,576 bytes before exec: 32 suite executions.
+The seven-suite stress selection passed three times per configuration: 126 suite
+executions. All existing rollback/fatal/post-poll/leak negative controls remain.
+The native witness log independently records 12 fixed-value baselines and all 76
+measured failure ordinals, with the earlier reference/copy sweeps also retained.
+
+All twelve fresh normal/O2 private-call reports retain four incoming-ownership
+rejections, zero incoming credit and intact output sentinels. No rejected object
+was linked/executed. All 13 Stage 3B code/test manifest entries remain unchanged.
+No Windows/macOS native result, hosted acceptance, crash fix or complete generated
+private-call proof is claimed. Stop for owner/Wrench review, not Stage 3C.
+
+Evidence is under `build/stage3b-blockers/`: original/replayed Clang artifacts and
+commands in `clang/`, current and locked composition process records, isolated
+archive/configure/build records, compile-only MIR/assembly and slot mapping in
+`abi/`, native C++ debugger measurements, and fresh validation logs. Original
+Section 32 failures and evidence remain intact. Initial hashes of every Markdown
+document record the owner's starting documentation. The Language Bible later
+changed outside this checkpoint's edits; its latest replacement was preserved
+without restoration or formatting, with both hash observations recorded. Other
+unrelated documents remain protected by the initial hashes.

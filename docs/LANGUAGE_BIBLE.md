@@ -1,7 +1,8 @@
 # VOID 2.0: Language Bible and Compiler Architecture
 
-**Status:** Design reference, not an implemented language specification  
+**Status:** Living language design and implementation reference. Approved subsets are implemented; later proposals and examples are not all executable.  
 **Design snapshot:** 10 October 2026  
+**Implementation reconciliation:** 16 October 2026. Read the approved phase documents for the exact implemented boundaries; old OPEN/RECOMMENDED labels must not undo later owner decisions.  
 **Purpose:** Preserve the entire VOID 2.0 design discussion so it can be continued accurately in a new chat or used as the foundation for implementation milestones.  
 **Relationship to VOIDC 1.0:** VOID 2.0 is a *new* language design. VOIDC 1.0 pursued C# semantics through a C backend; VOID 2.0 is free to define smaller, independent semantics and is planned around LLVM native code generation.
 
@@ -28,6 +29,8 @@
 ---
 
 ## 0. How to use this bible
+
+> **Implementation status precedence (16 October 2026):** This Bible retains the original language design, including proposed features. The relevant approved and implemented contracts in `NUMERIC_TYPES.md`, `VALUE_SEMANTICS.md`, `MODULE_SYSTEM.md`, `INITIALIZATION.md`, `MANAGED_INITIALIZATION.md`, `MANAGED_STRUCTS.md`, `REFERENCE_VALUE_STRUCTS.md`, `RECEIVER_METHODS.md`, `COMPOSITION.md`, `INHERITANCE.md`, `INTERFACES.md`, `STRINGS.md`, and `DIAGNOSTICS.md` supersede older *phase-only* OPEN or deferred statements. Future features are **not deleted or silently approved**. `ARRAYS_PROPOSAL.md` and `WORK_LOG.md` give separate acceptance and implementation status for Phase 23. An approved design direction is not equivalent to working `.void` source behavior.
 
 This file is both a design contract and a future-conversation handoff.
 
@@ -126,9 +129,13 @@ func main():
 
 ### 4.1 Identifier and source details [OPEN]
 
+**Current compiler boundary:** Identifiers are currently restricted to lowercase ASCII letters, digits and underscores. Tabs in indentation are diagnosed by VOID1002. The future Unicode identifier policy, any broader leading-underscore naming rules, and formatter policy remain open. The old heading describes those remaining extensions, not a lack of working identifier/token rules.
+
 Exact identifier Unicode rules, tab-versus-space policy, allowed leading underscores, formatter behavior, and detailed token grammar need formalization. The standard style remains four-space indentation and lowercase snake case.
 
 ## 5. Variables and readonly constants [AGREED]
+
+**Implemented clarification (Phases 4, 16, 18):** Local `const` is a runtime readonly binding, while module `const` is a pure compile-time value and participates in dependency/cycle checking. For managed references, `const` provides a **deep readonly access path**, not a globally frozen object: mutation through that view is a compile error, even after copying it into `var`, casting it, returning it or following nested references. Another independently held mutable alias may still mutate the object. Reference-free value copies have independent writable storage when copied into `var`; readonly authority of embedded managed references is retained in value copies. See `VALUE_SEMANTICS.md`, `MANAGED_STRUCTS.md` (P3) and `REFERENCE_VALUE_STRUCTS.md` (RV1–RV7). No additional global-freezing feature is implied.
 
 `var` creates a mutable variable. `const` creates a readonly binding; assigning a constant's value to a mutable variable does **not** make that variable constant. `=` on an existing variable performs assignment. Redeclaring a visible variable with `var` is a **compile error**.
 
@@ -162,6 +169,8 @@ func test():
 **Important semantics to specify precisely [OPEN]:** The user wants `const` to mean readonly *data*. A readonly access path must reject field/element mutations and mutating methods. A referenced mutable object may still change through another mutable alias unless the language adds stronger globally immutable/frozen-object semantics. Also distinguish compile-time-evaluable constants, used for array sizes, from readonly runtime object values. Any source change to a `const` requires manual restart in development mode.
 
 ## 6. Numeric types and literals [AGREED]
+
+**Implemented clarification (Phase 6):** All ten fixed-width integer/float types, contextual literals, wrapping integer arithmetic, defined division/remainder, IEEE floating behavior and explicit **checked numeric `as`** are specified and implemented in `NUMERIC_TYPES.md`. These are not still undecided. Invalid runtime casts report source-located failures; numeric `as?`, platform-sized aliases, alternative base/exponent/separator literals, hashing and other broader conversions remain future scope. Exact rules for those extensions are not inferred from examples here.
 
 Exact-width types are available: `i8`, `i16`, `i32`, `i64`, unsigned counterparts, `f32`, `f64`, and `bool`. The precise list of platform-sized integer aliases remains open. Unannotated small integral literals normally infer `i32`; unannotated floating literals normally infer `f32`, reflecting the game-development focus.
 
@@ -227,6 +236,8 @@ print(hero.inventory.count) # 0
 Default values do **not** determine stack versus heap allocation. Object/value semantics and compiler analysis determine storage.
 
 ## 8. Strings, interpolation, and formatting [AGREED]
+
+**Implemented clarification (Phase 22):** The S1–S8 foundation in `STRINGS.md` provides immutable, strict UTF-8 strings, escapes, embedded NUL, safe defaults, byte-exact equality, `+`/`+=`, pure templates and GC-rooted managed/value storage. Interpolation currently remains **reserved and diagnosed**, not executable. Future scalar indexing, scalar length, byte length, nullable strings and interpolation have approved direction but are not yet implemented; slicing, index-error behavior, ordering and formatting grammar remain open. Do not treat the complete examples in this section as Phase 22 executable source.
 
 VOID exposes one public `string` type, with UTF-8 as the chosen internal representation. Every ordinary string supports interpolation automatically, with no `$` or `f` prefix. There is no C-style `%s`/`%f` formatting requirement.
 
@@ -351,6 +362,8 @@ No separate `printf`/`println` family is required in ordinary VOID.
 
 ## 10. Project entry point and VFS imports [AGREED]
 
+**Implemented clarification (Phases 3–4):** `MODULE_SYSTEM.md` defines the working project-root VFS, exact-case root-relative/relative imports, path normalization, rejection of escaping/root-redirecting components, duplicate import identity, aliases, public/internal/private access, import cycles, and deterministic name ambiguity. `VALUE_SEMANTICS.md` defines compile-time root-constant lookup and dependency cycles. External package/project identities, runtime file globals and the separately proposed executable top-level entry model remain future design, not unresolved behavior of working local imports.
+
 The project's entry point may be `main.void`, `program.void`, an explicitly configured entry file, or a unique project-root file containing `main()`. The precise discovery priority is recommended and still needs implementation agreement. The entry file defines the project root and provides project-wide constants.
 
 ```text
@@ -408,6 +421,8 @@ A `.void` module may contain private functions and top-level instances, rather t
 
 ## 11. Visibility and `static` [AGREED]
 
+**Implemented clarification:** Public/internal/file-private ownership and direct-owner imports are enforced for current source declarations. Later phases establish receiver ownership, one-hop composition, managed inheritance, exact virtual overrides and structural interface lookup. Richer protected access and static member source syntax beyond the existing supported surface remain future work; do not erase approved object semantics because this broader section is incomplete.
+
 - **Public by default.** Omit the `public` keyword in ordinary declarations.
 - `public` may be written explicitly for documentation or library APIs.
 - `private` hides a member from outside its declaring struct; a top-level `private func` is file-private.
@@ -434,6 +449,8 @@ static func player.create(name: string) -> player:
 **Phase 20 I2, owner approved:** Existing receiver methods retain public/internal/file-private ownership and direct-owner imports. Derived types gain no privileged private access; protected access and field visibility modifiers remain deferred. Virtual declarations are public/internal and overrides retain exact visibility. Public derived types require public bases; internal derived types cannot expose private bases. Broader protected/access design remains OPEN. See INHERITANCE.md.
 
 ## 12. Ordinary `struct` and `value struct` [AGREED]
+
+**Implemented clarification (Phases 12, 16, 18–21):** Inline `value struct` copies remain independent; ordinary managed `struct` assignments share object identity. Managed reference leaves retain readonly permissions through copies. Approved `using` composition is stored and one-hop, and approved `extends`, `virtual`, `override`, `super` and structural interfaces work within their documented source boundaries. Generic erasure, transitive promotion, stateless mixins, protected access and other extensions are not implied by these implementations. See the individual phase documents.
 
 The language has **one object-oriented struct family**, with an explicit distinction between reference and value semantics:
 
@@ -550,6 +567,8 @@ A using field retains ordinary defaults, stored-field constructor labels and dec
 
 ## 13. Interfaces [AGREED; PHASE 21 BOUNDED IMPLEMENTATION]
 
+**Implemented clarification (Phase 21):** `INTERFACES.md` records owner-approved IF1–IF8: structural conformance of completed managed objects, exact method requirements, original managed identity, two-word managed-backed views, static-binding-aware method dispatch, readonly effect checking, precise GC roots and JIT/AOT support. No `implements` keyword is needed. Value boxing/erasure, interface inheritance/default bodies, dynamic tests, generic constraints and richer conversions remain explicitly deferred. The old label OPEN applies to those *extensions*, not the working managed-backed interface contract.
+
 Interfaces specify required behavior and provide polymorphism without forcing inheritance chains. **Conformance is structural:** a struct satisfies an interface when its accessible method set fulfills the interface's requirements, including unambiguous methods promoted through `using`. No mandatory `implements` keyword is required. An interface injects no storage and does not automatically supply implementations.
 
 Interface method calls are polymorphic. Phase 21 supports managed-backed views of qualifying managed structs, including inherited and promoted implementations:
@@ -606,6 +625,8 @@ interface representation, public managed FFI and richer conversions remain OPEN 
 deferred; no implicit boxing or mandatory implements keyword is introduced.
 
 ## 14. Ordinary functions and receiver methods [AGREED]
+
+**Implemented clarification (Phase 13):** Owner-module receiver methods, correct mutable original-storage selection, inferred mutation/effects, left-to-right argument evaluation, conservative readonly checking and shared JIT/AOT lowering are working. Ordinary named/default function argument calls remain outside the supported constructor-argument grammar. Consult `RECEIVER_METHODS.md` for exact source boundaries.
 
 Every function or method starts with `func`. A method has a receiver `(name type)` before the method name. Parameter annotations are **name-first**: `amount: i32`. Return types use `->`. No `this` or `void` keywords.
 
@@ -676,6 +697,8 @@ Unnamed forms such as `-> (f32, f32)` are valid. Multiple returns are conceptual
 **OPEN:** Exact ABI lowering, discarding selected returns, named-return metadata, and whether implicit destructuring of non-function values is allowed.
 
 ## 16. Constructors: `init()` [AGREED / details OPEN]
+
+**Implemented clarification (Phases 14 and 17):** `INITIALIZATION.md` and `MANAGED_INITIALIZATION.md` define and implement one owner-module initializer, positional-prefix/named parameter binding, pure defaults, left-to-right supplied-argument evaluation, required field readiness, nested construction and last-step successful publication for the approved value and managed types. `init()` currently has no result annotation; fallible `result`-returning construction, resource teardown/rollback and richer escaped construction views remain separate OPEN extensions. The old broad heading does not mean ordinary approved `init()` is unresolved.
 
 Most structs need no explicit constructor. A struct call constructs it with safe defaults and optional named fields. When custom logic is required, define a receiver method named `init`.
 
@@ -981,6 +1004,8 @@ Events preserve stable callback identity for unsubscribing and hot reload. Ordin
 # Part IV. Control flow, patterns, errors, and collections
 
 ## 23. `if`, `else if`, and Boolean logic [AGREED]
+
+**Current boundary:** Statement `if`/`else if`/`else`, Boolean conditions and short-circuit operators are implemented. The expression form yielding a value from branch expressions is still a future language-design item, including compulsory `else` and branch type joining.
 
 No parentheses required around conditions. All conditions must have Boolean type. Use words `and`, `or`, `not`, not C/JavaScript logical glyphs.
 
@@ -1363,6 +1388,8 @@ Use proper error types, including enums with cases such as `not_found`, `permiss
 
 ## 30. Type casts, checks, and parsing [AGREED]
 
+**Implemented clarification:** Phase 6 defines the numeric `as` conversion matrix, floating truncation/rounding, invalid-value failures, range checking and optimization-independent behavior. Phase 16+ separately implements bounded checked managed reference conversions/upcasts in its approved nominal/interface source family. This section's older generic OPEN language applies to future `as?`, downcasts, foreign conversions and richer type patterns, not the existing checked numeric casts.
+
 - `value as type` is an explicit checked conversion; when allowed but invalid at runtime, report a VOID runtime error.
 - `value as? type` is a checked, nullable conversion; return `null` on failure.
 - `value is type` / `value is type(binding)` checks types and narrows them through the pattern system.
@@ -1439,6 +1466,8 @@ func biggest<t: comparable>(a: t, b: t) -> t:
 **OPEN:** `comparable` interface contract, generic variance, recursive-instantiation detection, specialization sharing, and resulting code-size tradeoffs. The intended semantics retain useful static typing and avoid unnecessary runtime boxing.
 
 ## 32. Lists: growable and fixed-size arrays [AGREED]
+
+**Current implementation and approval boundary (16 October 2026):** Phase 23's A1–A10 approve fixed-array **value snapshots**, growable-list **shared reference identity**, safe checked indexing including negative offsets, readonly capability preservation, initial `.count`, `.push(value)` and `.remove_at(index)` API names, and i32/i64 range goals. The superseding owner decision rejects any arbitrary 64 KiB production source-array/per-function storage ceiling. Stage 2F remains locked; **Stage 3A is also hosted-LOCKED** at `44fc8b6`, CI #58 (run `38982940254`, seven jobs green, 63/63 suites each). It remains a **runtime-only scalar fixed-value proof**, not source-array activation. Normal `.void` array execution, nested owned values, generated calling ABI, source/JIT/AOT integration and growable lists still await later acceptance. Slicing, additional APIs and user iterators remain future design. Never convert a documented runtime-only proof into an assertion that source arrays compile today.
 
 **Superseding owner decision, 15 October 2026 [AGREED DESIGN; implementation pending]:**
 Neither `[T, n]` nor `[T]` has an arbitrary 64 KiB source-level size ceiling. VOID
@@ -1591,6 +1620,8 @@ Equal keys must always hash equally. Developers should not have to configure a l
 
 ## 34. Mutation during iteration [RECOMMENDED / exception OPEN]
 
+**Current approved Phase 23 direction:** Structural version invalidation is checked at the **next iterator access**, for forward and reverse iteration. A structural mutation followed by `break` requires no further iterator access; other active iterators detect invalidation when they resume. The reverse remove-current exception remains **deferred**, not implemented or guaranteed by the example below. Do not claim source list traversal is active merely because the design is approved.
+
 Ordinary `for` iteration does not create a copy. Adding/removing entries while iterating generally raises a clear runtime error (or a compile-time error where statically provable), avoiding skipped elements and invalidated iterators. Mutating fields of existing referenced objects is allowed.
 
 ```python
@@ -1638,6 +1669,8 @@ The syntax is agreed; the precise `iterator`/`next`/disposal protocol is still *
 # Part V. Memory, execution, concurrency, and native interoperability
 
 ## 36. Memory model and object lifetime [AGREED]
+
+**Implemented foundation:** Phase 15 provides the precise nonmoving Heap, compiler-managed roots and coordinated thread/GC safety boundary, extended by Phases 16–22 for supported managed, value, interface and string source types. Performance tuning, advanced collectors, general finalization and arbitrary native callbacks remain separate work. A precise working foundation is not production GC certification.
 
 Developers should not decide manually between stack and heap based on whether fields have default values. **Storage placement is an optimization; object semantics are part of the language contract.**
 
@@ -2058,6 +2091,8 @@ Example discovery scenario:
 No actual registry or package manifest has been specified yet. Package distribution and trust/security verification are design work, not an assumed solved problem.
 
 ## 48. Unified diagnostics [AGREED]
+
+**Implemented clarification:** `DIAGNOSTICS.md` assigns stable codes (including VOID1001–VOID4001 and VOID9001), owned source snapshots, byte locations, related declarations, bounded recovery and source-facing runtime failure information. Illustrative future codes in examples here do not supersede allocated compiler IDs. New feature families may require **new** codes, not renumbering existing ones.
 
 All diagnostics should be easy to understand regardless of experience level: file/line/column, human-readable problem, diagnostic code, source snippet with precise range, expected/received values where useful, and a practical hint. Runtime failures additionally show a VOID-source stack trace.
 
@@ -2755,6 +2790,8 @@ The built-in game API is optional. This is intended to feel PICO-8-like without 
 
 ## 65. Explicitly accepted language decisions
 
+**Reading note (16 October 2026):** This table records owner-accepted *design intent*, not a blanket claim that every example or future API is currently implemented. Use the status reconciliation below and the actual phase documents to distinguish (1) working source semantics, (2) approved future source semantics, (3) internal runtime proofs, and (4) still-unapproved extensions. No listed feature is removed by this distinction.
+
 | Area | Agreed decision |
 |---|---|
 | Philosophy | Easy and fun, small syntax, powerful functionality, compiler hides complexity |
@@ -2789,49 +2826,53 @@ The built-in game API is optional. This is intended to feel PICO-8-like without 
 | Async | `async func`/`await` with implicit task mechanics, `spawn`, task groups, sync library |
 | Tooling | First-class IntelliSense, docs, source-level compile/runtime diagnostics, stack traces |
 
-## 66. Decisions that are *not* final and should not be assumed
+## 66. Previously open decisions: implemented boundaries and genuinely unfinished design
 
 This section matters especially when an AI assistant inherits this file without the preceding chat.
 
-1. **`const` and deep immutability:** A readonly access path is agreed, but whether every `const` object is globally frozen under all aliases is not. Distinguish compile-time literals from runtime readonly managed objects and provide safe borrow rules.
-2. **File/module import identity:** External `../` imports, symlinks, versioned packages, duplicate paths, case sensitivity on physical filesystems, and cross-project access need formal semantics.
-3. **Exact grammar for module scopes:** Project-wide root constants are agreed; file-level mutable global initialization order, collisions, and cyclic dependencies are not complete.
-4. **Static syntax:** The concept is accepted; `static func type.method()` grammar and visibility combinations need a parser contract.
-5. **Object-model boundary:** Phase 20 implements owner-approved I1–I8 for managed inheritance, substitutability, exact overrides, explicit super preludes, prefix layouts, guarded leased dispatch and conservative reload. Ordinary methods remain nonvirtual. Protected/richer visibility, hiding, variance/covariance, abstract/final, source downcasts/type patterns, automatic constructor chaining and open-world loading remain deferred. Phase 21 implements owner-approved IF1–IF8 for managed-backed structural views with exact conformance, original ownership, readonly effects, precise roots and guarded leased dispatch. Standalone value erasure, interface inheritance/defaults, generic constraints, dynamic type tests and richer conversions remain deferred; no mandatory implements keyword is introduced. See Sections 12.1 and 13 and INHERITANCE.md.
-6. **Construction:** `init()` is accepted. Named-field/custom-init interactions, fallible init return form, parent errors, and rollback cleanup need specification.
-7. **`value struct` native ownership:** Ensure copying cannot double-release a native handle; initially restrict resource-owning value types or introduce an explicit safe transfer contract.
-8. **Closures:** Mutable capture behavior is accepted; syntax/ABI of closure returns, lifetime, and hot-reload capture-layout compatibility need proof.
-9. **Function call grammar:** Anonymous multiline functions passed directly into calls, named parameters, and default evaluation order need exact parse rules.
-10. **Events:** Event-owner emission rule, subscriber ordering, mutation while emitting, weak versus strong callbacks, and unsubscribe identity must be resolved.
-11. **Generic implementation:** Monomorphization/code-size strategy, interface constraints, recursive instantiation, and specialized versus shared representations remain open.
-12. **Dictionary grammar:** Decide whether unquoted `name = value` is allowed alongside `"name": value`. Do not invent silent meaning for bare identifiers.
-13. **Mixed/general collections:** `[]` and `{}` were discussed as general-purpose untyped options, but their dynamic type, boxing, and inference semantics are undecided.
-14. **Array API spelling:** Both `add` and `push` appeared. The final name/alias set has not been locked. `push` and `pop` were explicitly liked.
-15. **Iteration modification:** General mutation during traversal should fail; safe current-element deletion during reverse traversal was suggested but not formally accepted/tested.
-16. **Pattern forms:** Range, struct-field, list/rest and dictionary patterns are agreed directions; precise grammar/binding/copy rules need specification.
-17. **Numeric conversion policy:** Literal contextual typing is agreed. Detailed overflow, signed/unsigned, `NaN`, truncation, `as`/`as?` results and float equality/hash need tests.
-18. **UTF-8 semantics:** S1-S8 approve the strict UTF-8 foundation with exact bytes,
+**Reconciled 16 October 2026:** The 33 historical topics below are retained in full. Items labeled **IMPLEMENTED CORE** have an owner-approved working compiler contract described elsewhere; only their stated extensions remain open. **RESOLVED** items should no longer be described as undecided. **OPEN EXTENSION** and **FUTURE DESIGN** do not authorize implementation. The per-item original design questions remain as historical context.
+
+1. **`const` and deep immutability:** [IMPLEMENTED CORE: P3/RV deep readonly access, not global freezing] P3/RV implement deep readonly reference **views**, not object-wide freezing: mutation through a `const` reference or any derived copy/view is rejected, while an independent mutable alias still works. Module `const` is pure compile-time, local `const` is runtime readonly. A separate globally-frozen-object feature and any broader borrowing optimization require distinct future approval.
+2. **File/module import identity:** [IMPLEMENTED CORE: local VFS identity and aliasing; external packages open] Local VFS identity and imports already normalize in-root `../`, repeated paths, import cycles and exact-case spellings; symlinks/redirected imported components and duplicate hard-link identities are rejected by current policy. External root-escaping imports, versioned packages, Unicode filenames and persistent cross-project identities still require separate design.
+3. **Exact grammar for module scopes:** [IMPLEMENTED CORE: compile-time root constants/cycle rules; runtime globals open] Public/internal entry-file compile-time root constants, project-wide name collisions and structural constant dependency cycles have implemented deterministic rules. Runtime file-level mutable variables, their initialization order and runtime dependency cycles remain unimplemented and undecided.
+4. **Static syntax:** [FUTURE DESIGN: full static member grammar] The concept is accepted; `static func type.method()` grammar and visibility combinations need a parser contract.
+5. **Object-model boundary:** [IMPLEMENTED CORE: I1–I8 and IF1–IF8 bounded semantics; richer OOP open] Phase 20 implements owner-approved I1–I8 for managed inheritance, substitutability, exact overrides, explicit super preludes, prefix layouts, guarded leased dispatch and conservative reload. Ordinary methods remain nonvirtual. Protected/richer visibility, hiding, variance/covariance, abstract/final, source downcasts/type patterns, automatic constructor chaining and open-world loading remain deferred. Phase 21 implements owner-approved IF1–IF8 for managed-backed structural views with exact conformance, original ownership, readonly effects, precise roots and guarded leased dispatch. Standalone value erasure, interface inheritance/defaults, generic constraints, dynamic type tests and richer conversions remain deferred; no mandatory implements keyword is introduced. See Sections 12.1 and 13 and INHERITANCE.md.
+6. **Construction:** [IMPLEMENTED CORE: C1/S1 init; fallible/resource init open] `init()` is implemented for approved value and managed structs: custom-init calls bind constructor arguments solely to init parameters; types without init retain named-field construction; derived initialization uses an explicit `super.init(...)` prelude. Fallible `result`-returning init, native-resource rollback/destruction and richer constructor escape remain future design.
+7. **`value struct` native ownership:** [FUTURE DESIGN: resource-owning value copies] Ensure copying cannot double-release a native handle; initially restrict resource-owning value types or introduce an explicit safe transfer contract.
+8. **Closures:** [FUTURE DESIGN: closures] Mutable capture behavior is accepted; syntax/ABI of closure returns, lifetime, and hot-reload capture-layout compatibility need proof.
+9. **Function call grammar:** [IMPLEMENTED CORE: constructor argument order; ordinary named/default calls open] Constructor invocations already accept an ordered positional prefix plus named arguments and pure parameter defaults, with supplied arguments evaluated exactly once left to right. Ordinary function named/default arguments and direct multiline anonymous-function call grammar remain future design.
+10. **Events:** [FUTURE DESIGN: event semantics] Event-owner emission rule, subscriber ordering, mutation while emitting, weak versus strong callbacks, and unsubscribe identity must be resolved.
+11. **Generic implementation:** [FUTURE DESIGN: generic compiler/language rules] Monomorphization/code-size strategy, interface constraints, recursive instantiation, and specialized versus shared representations remain open.
+12. **Dictionary grammar:** [FUTURE DESIGN: dictionary literal grammar] Decide whether unquoted `name = value` is allowed alongside `"name": value`. Do not invent silent meaning for bare identifiers.
+13. **Mixed/general collections:** [FUTURE DESIGN: heterogeneous collections] `[]` and `{}` were discussed as general-purpose untyped options, but their dynamic type, boxing, and inference semantics are undecided.
+14. **Array API spelling:** [APPROVED PHASE 23 API: count/push/remove_at; source arrays still gated] Phase 23 A9 approves `.count`, `.push(value)` and `.remove_at(index)` for the first source-array slice; it does not approve an automatic `add` alias. `pop`, search/equality removal, slicing and other methods remain separate future API decisions. Approved names do not establish completed source-array implementation.
+15. **Iteration modification:** [APPROVED DIRECTION: invalidation at next iterator access] Structural mutation invalidates active growable-list iterators when they next access the iterator, in either direction; this is approved design, not completed source-list execution. The special reverse-current-element deletion exception remains deferred, not accepted or tested.
+16. **Pattern forms:** [FUTURE DESIGN: full pattern language] Range, struct-field, list/rest and dictionary patterns are agreed directions; precise grammar/binding/copy rules need specification.
+17. **Numeric conversion policy:** [IMPLEMENTED CORE: Phase 6 numeric behavior; additional casts/hashing open] `NUMERIC_TYPES.md` implements contextual literal typing, wrapping integer overflow, signed/unsigned arithmetic rules, IEEE NaN/signed-zero comparisons and checked numeric `as` (including truncate-toward-zero float-to-int). `as?`, float hashing/total ordering, platform-sized aliases and additional conversions remain future design.
+18. **UTF-8 semantics:** [IMPLEMENTED CORE: Phase 22 UTF-8 foundation; future indexing/slicing open] S1-S8 approve the strict UTF-8 foundation with exact bytes,
     no normalization and embedded NUL. Section 8.1 approves future scalar indexing,
     scalar length, byte_length and nullable strings in principle, outside Phase 22.
     Index errors, slicing, grapheme APIs, ordering, formatting grammar and broader
     native binding policy remain open.
-19. **Panic and defer:** Remaining defers and original errors should be preserved when safe; native unwinding/ABI/cleanup error aggregation need implementation design.
-20. **Nullable/`Ok` overloading:** The `Ok` pattern is intentionally allowed for nullable values and results; representation and type-checker disambiguation need explicit formal rules.
-21. **Async API:** `async func`, `await`, and `spawn` are agreed; exact scheduling start semantics, task group binding, async `with`, and cancellation observation points remain to specify.
-22. **Hot-reload implementation:** Compatible-body-only behavior is agreed. Dispatch indirection, JIT memory retirement, cross-thread publication, and metadata lifetime need early proof.
-23. **GC details:** Non-moving precise tracing is initial direction, not a permanent ban on other collectors. Root tracking, safepoint lowering, allocator layout, concurrency, and barriers need benchmarks and proof.
-24. **FFI details:** No user-facing pointers/C strings is agreed; trusted native binding grammar, ownership metadata, foreign threads, and callback trampoline semantics are not finished.
-25. **Tooling/packaging:** LSP, docs and extension discovery are goals; registry protocol, package manifests, trust verification, and compiler CLI spelling remain proposals.
-26. **Module-as-scene adapter:** A module directly satisfying a scene interface and `func call()` at file level was explored, but the user corrected the discussion to favor **struct callback fields wired to private module functions**. Do not implement module-callable semantics as a locked feature without explicit reapproval.
-27. **Empty function bodies — resolved:** `pass` is the approved, implemented intentional no-op placeholder (Section 27.2). Empty ordinary statement bodies remain invalid; interface requirements remain bodyless.
-28. **Operator overloading:** No general user-defined operator suite has been agreed. Avoid treating one as required just because structs and generics exist.
-29. **Error diagnostics codes:** Code examples use illustrative `VOID...` IDs. The real diagnostic catalog is not yet allocated.
-30. **Compiler implementation language and LLVM integration:** Not yet chosen. The C API and C++ API each have costs; evaluate concretely against hot reload and GC requirements.
-31. **`using` remaining design scope:** Named `using motion: movement` and unnamed `using movement` (stored name `movement`) are approved directions. Duplicate stored names diagnose at declaration; overlapping promoted member names are legal until ambiguous access. No member/argument/result type disambiguation is allowed. Direct-member precedence, initial one-hop promotion, ordinary stored-field initialization and exact method ownership/imports are approved; Phase 19 implements the owner-approved revised U1–U7 contract; see `COMPOSITION.md`. Automatic transitive promotion remains deferred; Phase 21 integrates structural interfaces without transitive promotion; Phase 20 implements the approved inheritance and component virtual-dispatch interactions. Preserve C1/S1/P3/P4/RV1–RV7, physical storage, identity, readonly capabilities and precise GC; no subtyping or implicit composition conversion. See Section 12.1 and `COMPOSITION_PROPOSAL.md`.
-32. **Possible `has` operator:** OPEN future idea for inspecting composition or embedded capabilities, not an accepted keyword or implemented feature. Meaning, grammar, type checking and necessity remain undecided; no compiler requirement is established.
-33. **Method-only reuse without embedded state:** Separate OPEN future design question. Phase 19 `using` always embeds ordinary stored fields; it introduces no trait/mixin behavior or syntax.
+19. **Panic and defer:** [FUTURE DESIGN: panic/defer cleanup] Remaining defers and original errors should be preserved when safe; native unwinding/ABI/cleanup error aggregation need implementation design.
+20. **Nullable/`Ok` overloading:** [IMPLEMENTED CORE: managed nullable conversion; Ok pattern grammar open] The `Ok` pattern is intentionally allowed for nullable values and results; representation and type-checker disambiguation need explicit formal rules.
+21. **Async API:** [FUTURE DESIGN: async/task source] `async func`, `await`, and `spawn` are agreed; exact scheduling start semantics, task group binding, async `with`, and cancellation observation points remain to specify.
+22. **Hot-reload implementation:** [IMPLEMENTED FOUNDATION: generation leases and native replacement; complete auto-reload open] Compatible-body-only behavior is agreed. The internal JIT generation leases, retained metadata and native replacement proofs already exist; complete automatic source watching, general code retirement, cross-thread publication across all future feature forms and full live product hot reload are still separate design and acceptance concerns.
+23. **GC details:** [IMPLEMENTED FOUNDATION: precise GC/roots; optimization and production acceptance open] The Phase 15 precise non-moving Heap, compiler-managed roots, explicit frame/slot contracts and cooperative collection/rendezvous have implemented proofs; later source phases use them. Production tuning, advanced/concurrent collector strategies, allocation thresholds, liveness optimization and comprehensive barrier/performance certification remain separate work; non-moving is not a permanent language restriction.
+24. **FFI details:** [IMPLEMENTED INTERNAL BRIDGE: source FFI design open] No user-facing pointers/C strings is agreed; trusted native binding grammar, ownership metadata, foreign threads, and callback trampoline semantics are not finished.
+25. **Tooling/packaging:** [IMPLEMENTED CORE: diagnostics/LSP/editor foundations; packages and CLI extensions open] A minimal language server, editor integration, source diagnostics and tooling sessions are implemented within their documented scope. Package registry/protocol, external-library discovery, trust verification, complete CLI spelling and later IntelliSense features remain future design.
+26. **Module-as-scene adapter:** [UNAPPROVED IDEA: module-as-scene adapter] A module directly satisfying a scene interface and `func call()` at file level was explored, but the user corrected the discussion to favor **struct callback fields wired to private module functions**. Do not implement module-callable semantics as a locked feature without explicit reapproval.
+27. **Empty function bodies — resolved:** [RESOLVED AND IMPLEMENTED: pass] `pass` is the approved, implemented intentional no-op placeholder (Section 27.2). Empty ordinary statement bodies remain invalid; interface requirements remain bodyless.
+28. **Operator overloading:** [UNAPPROVED IDEA: general operator overloading] No general user-defined operator suite has been agreed. Avoid treating one as required just because structs and generics exist.
+29. **Error diagnostics codes:** [RESOLVED CORE: diagnostic IDs allocated; future features add new IDs] Illustrative IDs in earlier examples are not guarantees. `DIAGNOSTICS.md` already assigns stable current IDs including VOID1001–VOID4001 and VOID9001; additional language features require new codes without repurposing assigned IDs.
+30. **Compiler implementation language and LLVM integration:** [RESOLVED AND IMPLEMENTED: C++20 and LLVM 19.1.7] Resolved: VOID 2.0 uses C++20 with LLVM/Clang/LLD 19.1.7 and a shared LLVM lowering path for ORC JIT and native AOT. The former C versus C++ API tradeoff remains a historical architecture note, not an open implementation-language choice.
+31. **`using` remaining design scope:** [IMPLEMENTED CORE: Phase 19 one-hop using; transitive promotion open] Named `using motion: movement` and unnamed `using movement` (stored name `movement`) are approved directions. Duplicate stored names diagnose at declaration; overlapping promoted member names are legal until ambiguous access. No member/argument/result type disambiguation is allowed. Direct-member precedence, initial one-hop promotion, ordinary stored-field initialization and exact method ownership/imports are approved; Phase 19 implements the owner-approved revised U1–U7 contract; see `COMPOSITION.md`. Automatic transitive promotion remains deferred; Phase 21 integrates structural interfaces without transitive promotion; Phase 20 implements the approved inheritance and component virtual-dispatch interactions. Preserve C1/S1/P3/P4/RV1–RV7, physical storage, identity, readonly capabilities and precise GC; no subtyping or implicit composition conversion. See Section 12.1 and `COMPOSITION_PROPOSAL.md`.
+32. **Possible `has` operator:** [UNAPPROVED IDEA: has operator] OPEN future idea for inspecting composition or embedded capabilities, not an accepted keyword or implemented feature. Meaning, grammar, type checking and necessity remain undecided; no compiler requirement is established.
+33. **Method-only reuse without embedded state:** [FUTURE DESIGN: stateless/method-only reuse] Separate OPEN future design question. Phase 19 `using` always embeds ordinary stored fields; it introduces no trait/mixin behavior or syntax.
 
 ## 67. Resolved changes and corrections from the discussion
+
+**Maintenance reminder:** Treat the reconciled statuses in Section 66 as the current implementation boundary; do not delete original future features from Parts I–IX, assume full language implementation, or widen compiler policy without a new owner decision. For Phase 23 specifically, compare against the latest `ARRAYS_PROPOSAL.md` and `WORK_LOG.md` rather than earlier stack/array research thresholds.
 
 To avoid future context drift, here are ideas explicitly changed or clarified:
 
@@ -3098,3 +3139,9 @@ Live objects and init execution remain outside compile-time pure expressions.
 REFERENCE_VALUE_STRUCTS.md defines the implemented boundary and deferred richer
 initialization/readonly-field policies. This clarification supersedes earlier
 phase-only reference-containing-value deferrals, not the broader language design.
+
+### Phase 23 Stage 3A hosted acceptance, 16 October 2026
+
+**Stage 3A is LOCKED** at `44fc8b686b1e28665455b37a1a825f7ba05e186e`, CI #58 (run `38982940254`): seven hosted jobs succeeded across Ubuntu x64 Debug/Release/Sanitizers, Windows x64 Debug/Release, and macOS ARM64 Debug/Release. Each ran **63/63 CTest suites**, including `gc_buffers`, for **441/441** total. This is a **runtime-only scalar owned fixed-value proof**, not source-array activation. Stage 3B, generated/LLVM array calling conventions, nested owned-child operations and Stage 4 growables remain gated.
+
+Historical pre-hosted/local-only wording in earlier phase sections records the status at those checkpoints. It does not override this later hosted acceptance. The approved future array language behavior and all existing unresolved language-design questions are preserved.
