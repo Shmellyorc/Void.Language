@@ -372,10 +372,16 @@ void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::sp
                     if(target==prepared->types.end()) throw std::invalid_argument("unadmitted schema reference target");
                     targets.emplace(ref->target,target->second);
                 }
+                if(auto* ref=std::get_if<SchemaGrowable>(&node)) {
+                    auto target=prepared->types.find(ref->header);if(target==prepared->types.end())throw std::invalid_argument("unadmitted nested list header type");targets.emplace(ref->header,target->second);
+                }
                 if(auto* ref=std::get_if<SchemaInterface>(&node)) {
                     auto witness=std::find_if(prepared->witnesses.begin(),prepared->witnesses.end(),[&](const auto& entry){return entry.second->interface_identity==ref->target;});
-                    if(witness==prepared->witnesses.end()) throw std::invalid_argument("unadmitted schema interface target");
-                    interfaces.emplace(ref->target,witness->second);
+                    if(witness==prepared->witnesses.end()) {
+                        auto declaration=prepared->types.find(ref->target);
+                        if(declaration==prepared->types.end() || !declaration->second->shape.starts_with("interface:"))throw std::invalid_argument("unadmitted schema interface target");
+                        targets.emplace(ref->target,declaration->second);
+                    } else interfaces.emplace(ref->target,witness->second);
                 }
             }
             schema->nominal_owners_.clear();schema->witness_owners_.clear();

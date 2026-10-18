@@ -78,10 +78,12 @@ but Clang's RTTI-dependent vptr check is unavailable in that ABI. A complete
 RTTI-enabled LLVM 19.1.7 SDK supplies the separate vptr validation configuration.
 See [the CI sanitizer investigation and coverage limits](docs/CI_SANITIZER_ABI.md).
 
-Numeric fixed arrays now compile and execute through the ordinary JIT/AOT path,
-including copies, checked mutation, function arguments/returns and heap-backed
-megabyte payloads. See [numeric fixed arrays](docs/FIXED_ARRAYS.md) and
-[working source examples](examples/fixed_arrays/main.void).
+Fixed arrays and [growable lists](docs/GROWABLE_ARRAYS.md) execute through
+production JIT/AOT with numeric/bool, string, value-struct, managed/nullable/interface
+and nested-array elements. Fixed children copy independently; lists share identity.
+Checked nested mutation, count/push/remove, forward/reverse iteration, i32/i64 ranges
+and heap-backed megabyte payloads use the existing coordinated Runtime. See
+[fixed arrays](docs/FIXED_ARRAYS.md) and [source examples](examples/arrays/iteration.void).
 
 ## Compile and execute real source
 

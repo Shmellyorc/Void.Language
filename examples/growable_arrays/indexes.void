@@ -1,0 +1,4 @@
+func entry(value: i32) -> i32:
+    var values = [10, 20, 30]
+    var removed = values.remove_at(value)
+    return removed + values.count as i32

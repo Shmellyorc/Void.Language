@@ -36,7 +36,7 @@ void DataCursor::prepare(ElementSchemaRef schema) {
                           (!std::numeric_limits<float>::is_iec559 || !std::numeric_limits<double>::is_iec559)))
                 throw std::invalid_argument("unsupported native scalar data encoding");
             atomic_=std::max(atomic_,bytes);
-        } else if(std::holds_alternative<SchemaManaged>(node) || std::holds_alternative<SchemaString>(node)) atomic_=std::max(atomic_,sizeof(void*));
+        } else if(std::holds_alternative<SchemaManaged>(node) || std::holds_alternative<SchemaString>(node) || std::holds_alternative<SchemaOwnedFixed>(node) || std::holds_alternative<SchemaGrowable>(node)) atomic_=std::max(atomic_,sizeof(void*));
         else if(std::holds_alternative<SchemaInterface>(node)) atomic_=std::max(atomic_,2*sizeof(void*));
         else if(!std::holds_alternative<SchemaBytes>(node) && !std::holds_alternative<SchemaRecord>(node) && !std::holds_alternative<SchemaRepeat>(node))
             throw std::invalid_argument("unsupported buffer construction role");

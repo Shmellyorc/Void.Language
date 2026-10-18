@@ -73,16 +73,18 @@ extern "C" void vd_gc_poll() noexcept {
 }
 template<class Commit> void observe_construct(void** slot,std::size_t size,const std::size_t*,std::size_t,const void* payload,vd::RuntimeFailure* failure,Commit commit) noexcept {
     auto* p=managed_test::active;
-    auto* previous=*slot;
+    auto* previous=*slot;const auto enclosing_budget=fail_after;bool scoped_failure=false;
     if (p) {
         inspect(*p);
         ++p->constructions;
         if (p->before_construct) p->before_construct(p->constructions,payload,size);
         if (p->collect_before && vd::Runtime::current().collect()!=vd::Runtime::Collection::completed) std::terminate();
-        if (p->constructions==p->fail_construction) fail_after=p->fail_allocation;
+        if (p->constructions==p->fail_construction) {scoped_failure=true;fail_after=p->fail_allocation;}
     }
     commit();
-    fail_after=-1;
+    // A per-construction probe must not cancel an enclosing whole-invocation
+    // allocation sweep at the first ordinary managed object construction.
+    if(scoped_failure)fail_after=enclosing_budget;
     if (p) {
         if (failure->message) p->commits_valid &= *slot==previous;
         else {

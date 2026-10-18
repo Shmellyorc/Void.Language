@@ -29,7 +29,7 @@ std::set<unsigned> validate_reference_initialization(const Function& f) {
             for(auto predecessor:predecessors[block])
                 std::erase_if(state,[&](auto slot){return !outgoing[predecessor].contains(slot);});
             if(incoming[block]!=state){incoming[block]=state;changed=true;}
-            for(const auto& i:f.blocks[block].instructions) if(i.op==Op::store) state.insert(i.a);
+            for(const auto& i:f.blocks[block].instructions) if(i.op==Op::store) state.insert(i.a);else if(i.op==Op::array_capture)state.insert(static_cast<unsigned>(i.immediate));
             if(outgoing[block]!=state){outgoing[block]=state;changed=true;}
         }
     }while(changed);
@@ -45,7 +45,7 @@ std::set<unsigned> validate_reference_initialization(const Function& f) {
         for(const auto& i:f.blocks[block].instructions) {
             if(i.op==Op::load) require(i.a);
             if(i.receiver) require(i.receiver->slot);
-            if(i.op==Op::store) state.insert(i.a);
+            if(i.op==Op::store) state.insert(i.a);else if(i.op==Op::array_capture)state.insert(static_cast<unsigned>(i.immediate));
         }
     }
     return observed_defaults;
@@ -93,6 +93,9 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                     switch (i.op) {
                     case Op::argument: value=formal_facts(f.parameters[i.a],i.a); break;
                     case Op::load: value=reference_facts(f.locals[i.a]);join_facts(value,locals[i.a]);break;
+                    case Op::array_capture:
+                        check(values[i.a],f.locals.at(i.immediate),true);
+                        local_changed|=join_facts(locals.at(i.immediate),values[i.a]);value={};break;
                     case Op::store: {
                         if (!capability_assignable(types[function][block][i.b],f.locals[i.a])) fail("store discards reference or construction-place capability");
                         const auto position=std::pair{block,n};
@@ -107,6 +110,15 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         value=field_facts(types[function][block][i.a],values[i.a],static_cast<unsigned>(i.immediate)); break;
                     case Op::insert:
                         value=replaced_facts(values[i.a],static_cast<unsigned>(i.immediate),values[i.b]); break;
+                    case Op::fixed_array:
+                        for(auto argument:i.arguments)for(const auto& [leaf,fact]:values[argument]) {auto path=leaf;path.insert(path.begin(),array_element_path);value[path].join(fact);}
+                        break;
+                    case Op::array_initialize:
+                        check(values[i.arguments[0]],array_element(types[function][block][i.a]),true);break;
+                    case Op::array_get:
+                        value=field_facts(types[function][block][i.a],values[i.a],array_element_path);break;
+                    case Op::array_set:
+                        check(values[i.arguments[0]],array_element(types[function][block][i.a]),true);value=values[i.a];break;
                     case Op::aggregate:
                         for(unsigned field=0;field<i.arguments.size();++field)
                             value=replaced_facts(std::move(value),field,values[i.arguments[field]]);
@@ -116,6 +128,13 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                     case Op::gc_construct:
                         for(auto argument:i.arguments) retain(values[argument]);
                         break;
+                    case Op::list_push: case Op::list_remove: case Op::list_commit: {
+                        auto owner=types[function][block][i.a];
+                        if(auto found=values[i.a].find({});found!=values[i.a].end()) {effect(summary.mutations,found->second);if(found->second.readonly)fail("mutation through readonly list");}
+                        if(i.op!=Op::list_remove)check(values[i.op==Op::list_push?i.b:i.arguments[0]],array_element(owner),true);
+                        else value=field_facts(owner,values[i.a],array_element_path);
+                        break;
+                    }
                     case Op::gc_write:
                         if (auto found=values[i.a].find({});found!=values[i.a].end()) {
                             effect(summary.mutations,found->second);

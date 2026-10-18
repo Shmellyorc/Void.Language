@@ -1,0 +1,11 @@
+func entry(value: i32) -> i32:
+    var numbers: [i32] = []
+    numbers.push(10)
+    numbers.push(value)
+    numbers.push(30)
+    var alias = numbers
+    alias.push(40)
+    var removed = numbers.remove_at(0)
+    if alias[0] != value or alias[-1] != 40 or alias.count != numbers.count:
+        return -1000
+    return numbers.count as i32 + removed

@@ -59,6 +59,12 @@ void Heap::validate_reference(const ReferenceEvent& event,void* object,const voi
     auto found=objects_.find(object);
     if(found==objects_.end() || (found->second.kind==TypeLayout::Kind::buffer && !static_cast<const BufferState*>(found->second.metadata.get())->complete))
         throw std::invalid_argument("untracked or private buffer reference target");
+    if(event.kind==ReferenceEvent::Kind::buffer) {
+        if(witness || found->second.kind!=TypeLayout::Kind::buffer)throw std::invalid_argument("nested fixed buffer kind mismatch");
+        const auto& state=buffer_state(object);
+        if(state.layout->schema()->identity()!=event.target || state.layout->capacity()!=event.extent || state.valid_prefix!=event.extent)throw std::invalid_argument("nested fixed buffer type mismatch");
+        return;
+    }
     if(event.kind==ReferenceEvent::Kind::string) {
         if(witness || found->second.kind!=TypeLayout::Kind::string)throw std::invalid_argument("buffer string kind mismatch");
         (void)string_bytes(object);return;

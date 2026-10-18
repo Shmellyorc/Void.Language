@@ -1,0 +1,12 @@
+func entry(value: i32) -> i32:
+    var values: [u64]
+    var index = 0
+    for index < 262145:
+        values.push(index as u64)
+        index += 1
+    var alias = values
+    alias[-1] += 1
+    var removed = values.remove_at(0)
+    if values[0] != 1 or alias[-1] != 262145:
+        return -100
+    return values.count as i32 + removed as i32 + value

@@ -1,0 +1,24 @@
+interface readable:
+    func read() -> i32
+struct node:
+    value: i32
+func (n node) read() -> i32:
+    return n.value
+interface absent:
+    func missing() -> i32
+func entry(value: i32) -> i32:
+    var empty: [absent?] = []
+    var defaults: [absent?, 2]
+    var a: [readable] = [node(value = value)]
+    a.push(node(value = 3))
+    var copy: [readable, 2] = [a[0], a[1]]
+    var nullable: [readable?] = [null]
+    nullable.push(a[0])
+    var acquired = nullable.remove_at(1) as readable
+    if nullable[0] != null or acquired.read() != value:
+        return -100
+    var result = 0
+    for item in copy:
+        result += item.read()
+    var removed = a.remove_at(0)
+    return result + removed.read() + defaults.count as i32 + empty.count as i32

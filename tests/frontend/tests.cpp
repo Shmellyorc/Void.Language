@@ -67,7 +67,7 @@ void diagnostics() {
     rejects("func f():\n    break\n", "inside a for", "2:5");
     rejects("func f():\n    continue\n", "inside a for", "2:5");
     rejects("func f():\n    while true:\n        return\n", "Replace 'while condition:' with 'for condition:'", "2:5");
-    rejects("func f():\n    for item in values:\n        return\n", "Collection/range iteration", "2:14");
+    rejects("func f():\n    for item in 3:\n        return\n", "Iteration requires an array or integer range", "2:5");
     rejects("func f():\n    if 1:\n        return\n", "expected bool");
     rejects("func f():\n    var x = true + false\n", "expected i32");
     rejects("func f():\n    var x = 1 and true\n", "expected bool");

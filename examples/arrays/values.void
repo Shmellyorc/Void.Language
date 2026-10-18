@@ -1,0 +1,44 @@
+struct node:
+    value: i32
+value struct item:
+    child: node?
+    name: string = "ok"
+    fixed: [i32, 2] = [1, 2]
+    data: [i32]
+func copied(a: [item, 2]) -> [item, 2]:
+    a[0].fixed[0] = 50
+    a[0].data.push(8)
+    return a
+func shared(a: [item]) -> [item]:
+    a.push(item())
+    return a
+func entry(value: i32) -> i32:
+    var a: [node] = [node(value = 1)]
+    a.push(node(value = 2))
+    var held = a[0]
+    held.value += value
+    var optional: [node?, 2]
+    optional[1] = a[0]
+    if optional[0] != null or (optional[1] as node).value != value + 1:
+        return -500
+    var records: [item, 2]
+    var list: [item]
+    list.push(records[0])
+    var copy = records
+    var selected = copy[0]
+    selected.fixed[0] = 90
+    selected.data.push(7)
+    if records[0].fixed[0] != 1 or records[1].data.count != 0 or records[0].data.count != 1:
+        return -100
+    var result = copied(records)
+    if records[0].fixed[0] != 1 or result[0].fixed[0] != 50 or records[0].data.count != 2:
+        return -200
+    result[0].fixed[1] = 60
+    if records[0].fixed[1] != 2:
+        return -300
+    var alias = shared(list)
+    alias[0].data.push(9)
+    if list.count != 2 or records[0].data.count != 3:
+        return -400
+    var removed = a.remove_at(0)
+    return removed.value + a[0].value

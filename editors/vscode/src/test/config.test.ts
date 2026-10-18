@@ -65,11 +65,12 @@ test('presentation covers approved keyword colors and space indentation', async 
         .map((p:{match:string}) => new RegExp(p.match));
     assert(keywords.length > 0);
     const highlighted = (text:string) => keywords.some((rule:RegExp) => rule.test(text));
-    for (const word of ['func','return','pass','const','for','break','continue','as','struct','value struct'])
+    for (const word of ['func','return','pass','const','for','break','continue','as','and','or','not','in','reverse','struct','value struct'])
         assert(highlighted(word), `Missing keyword highlighting: ${word}`);
     for (const word of ['while','async','match','defer','structure','function','returning','passing','bypass','value'])
         assert(!highlighted(word), `Unexpected keyword highlighting: ${word}`);
     assert(keywords.some((rule:RegExp) => rule.test('return') && rule.test('pass')), 'pass and return must share the control keyword rule');
+    assert(keywords.some((rule:RegExp) => ['and','or','not','as','if','return'].every(word => rule.test(word))), 'logical words must share the ordinary control keyword category');
     const config = JSON.parse(await fs.readFile(path.join(root, 'language-configuration.json'), 'utf8'));
     assert.equal(config.comments.lineComment, '#');
     const indent = new RegExp(config.indentationRules.increaseIndentPattern);

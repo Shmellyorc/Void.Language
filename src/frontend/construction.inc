@@ -110,13 +110,14 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 using K=Statement::Kind;
                 if (s.kind==K::assignment) {
                     auto alias=context.aliases.find(s.slot);
-                    if (alias!=context.aliases.end()) {
+                    if(s.selection) {expression(*s.selection,current);}
+                    if (alias!=context.aliases.end() && !s.selection) {
                         if (s.fields.empty()) issue(s.token,"A construction receiver or alias cannot be rebound.");
                         if (s.index || s.field_indexes.size()>1 || s.op!="=") require_field(alias->second,s.field_indexes.front(),current,s.token);
                     }
                     if (s.index && expression(*s.index,current)) issue(s.index->token,"A construction view cannot be an index.");
                     if (s.expression && expression(*s.expression,current)) issue(s.expression->token,"A construction view cannot be stored or published through assignment.");
-                    if (alias!=context.aliases.end()) current.emplace(alias->second,s.field_indexes.front());
+                    if (alias!=context.aliases.end() && !s.selection) current.emplace(alias->second,s.field_indexes.front());
                 } else if (s.kind==K::variable) {
                     if (s.expression) if (auto origin=expression(*s.expression,current)) {
                         if (f.locals.at(s.slot).nullable) issue(s.token,"A construction view cannot be injected into a nullable reference.");
@@ -125,6 +126,7 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 } else {
                     if (s.expression && expression(*s.expression,current)) issue(s.expression->token,"A construction view cannot be returned or used as an ordinary value.");
                 }
+                if(s.range_end && expression(*s.range_end,current))issue(s.range_end->token,"A construction view cannot be a range endpoint.");
                 if (s.kind==K::returned) {
                     if (f.initializer) require_all(0,current,s.token);
                     result.next.reset(); continue;
@@ -139,7 +141,7 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     result.continues.insert(result.continues.end(),yes.continues.begin(),yes.continues.end()); result.continues.insert(result.continues.end(),no.continues.begin(),no.continues.end());
                 } else if (s.kind==K::loop) {
                     auto inner=sequence(s.body,current);
-                    result.next=always(s.expression.get()) ? std::optional<Ready>{} : std::optional{current};
+                    result.next=s.binder.text.empty() && always(s.expression.get()) ? std::optional<Ready>{} : std::optional{current};
                     for (const auto& path:inner.breaks) result.next=merge(result.next,path);
                 } else result.next=current;
             }

@@ -1,0 +1,75 @@
+func entry(value: i32) -> i32:
+    var a_i8: [i8] = [-7]
+    a_i8.push(3)
+    if a_i8.remove_at(-2) != -7 or a_i8[0] != 3:
+        return -100
+    var a_i16: [i16] = [-7]
+    a_i16.push(3)
+    if a_i16.remove_at(-2) != -7 or a_i16[0] != 3:
+        return -100
+    var a_i32: [i32] = [-7]
+    a_i32.push(3)
+    if a_i32.remove_at(-2) != -7 or a_i32[0] != 3:
+        return -100
+    var a_i64: [i64] = [-7]
+    a_i64.push(3)
+    if a_i64.remove_at(-2) != -7 or a_i64[0] != 3:
+        return -100
+    var a_u8: [u8] = [7]
+    a_u8.push(3)
+    if a_u8.remove_at(-2) != 7 or a_u8[0] != 3:
+        return -100
+    var a_u16: [u16] = [7]
+    a_u16.push(3)
+    if a_u16.remove_at(-2) != 7 or a_u16[0] != 3:
+        return -100
+    var a_u32: [u32] = [7]
+    a_u32.push(3)
+    if a_u32.remove_at(-2) != 7 or a_u32[0] != 3:
+        return -100
+    var a_u64: [u64] = [7]
+    a_u64.push(3)
+    if a_u64.remove_at(-2) != 7 or a_u64[0] != 3:
+        return -100
+    var a_f32: [f32] = [1.5f]
+    a_f32.push(2.5f)
+    if a_f32.remove_at(-2) != 1.5f or a_f32[0] != 2.5f:
+        return -100
+    var a_f64: [f64] = [1.5d]
+    a_f64.push(2.5d)
+    if a_f64.remove_at(-2) != 1.5d or a_f64[0] != 2.5d:
+        return -100
+    var a_bool: [bool] = [true]
+    a_bool.push(false)
+    if a_bool.remove_at(-2) != true or a_bool[0] != false:
+        return -100
+    var index_i8: i8 = 0
+    if a_i32[index_i8] != 3:
+        return -201
+    var index_i16: i16 = 0
+    if a_i32[index_i16] != 3:
+        return -201
+    var index_i32: i32 = 0
+    if a_i32[index_i32] != 3:
+        return -201
+    var index_i64: i64 = 0
+    if a_i32[index_i64] != 3:
+        return -201
+    var index_u8: u8 = 0
+    if a_i32[index_u8] != 3:
+        return -201
+    var index_u16: u16 = 0
+    if a_i32[index_u16] != 3:
+        return -201
+    var index_u32: u32 = 0
+    if a_i32[index_u32] != 3:
+        return -201
+    var index_u64: u64 = 0
+    if a_i32[index_u64] != 3:
+        return -201
+    var empty: [i32]
+    var defaults: [i32]
+    empty.push(7)
+    if defaults.count != 0:
+        return -200
+    return 100 + value

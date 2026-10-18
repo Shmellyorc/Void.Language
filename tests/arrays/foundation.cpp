@@ -172,10 +172,10 @@ void negatives() {
     negative("value struct point:\n    width: i32\nfunc (self point) init():\n    pass\n"
              "const dimensions = point()\nconst size = dimensions.width\n"+header+
              "    var a: [i32, size]\n    return x\n",DiagnosticCode::constant_call);
-    // Later checkpoints stay explicit, including future string indexing.
+    // Empty inference and string indexing remain outside array syntax.
     negative(header+"    var a = []\n    return x\n",DiagnosticCode::unsupported_type);
-    negative(header+"    var a: [i32]\n    return x\n",DiagnosticCode::unsupported_type);
-    negative(header+"    var a: [string, 1] = [\"x\"]\n    return x\n",DiagnosticCode::unsupported_type);
+    analyze(header+"    var a: [[i32]]\n    return x\n");
+    analyze(header+"    var a: [string, 1] = [\"x\"]\n    return x\n");
     negative(header+"    return \"x\"[0]\n",DiagnosticCode::unsupported_type);
     negative("struct holder:\n    items: [i32, 1]\nfunc frozen(owner: holder):\n"
              "    const ro = owner\n    var alias = ro\n    alias.items[0] = 3\n",DiagnosticCode::readonly);
@@ -219,10 +219,10 @@ void compact_shapes() {
     negative("func bad():\n    var a: [u8, 18446744073709551616]\n",DiagnosticCode::integer_range);
     negative("func bad():\n    var a: [[i32, 0], 9223372036854775808 as u64]\n",DiagnosticCode::integer_range);
     negative("value struct node:\n    child: [node, 0]\n",DiagnosticCode::unsupported_type);
-    negative("struct node:\n    n: i32\nfunc bad():\n    var a: [node, 1000000]\n",DiagnosticCode::unsupported_type);
-    negative("value struct leaf:\n    n: string\nfunc bad():\n    var a: [leaf, 1000000]\n",DiagnosticCode::unsupported_type);
-    negative("value struct point:\n    n: i32\nfunc (self point) init():\n    self.n = 7\n"
-             "func bad():\n    var a: [point, 1000000]\n",DiagnosticCode::unsupported_type);
+    negative("struct node:\n    n: i32\nfunc bad():\n    var a: [node, 1000000]\n",DiagnosticCode::initializer);
+    analyze("value struct leaf:\n    n: string\nfunc supported():\n    var a: [leaf, 1000000]\n");
+    analyze("value struct point:\n    n: i32\nfunc (self point) init():\n    self.n = 7\n"
+             "func supported():\n    var a: [point, 1000000]\n");
     auto simple=analyze("func value() -> i32:\n    return 7\nfunc data() -> [i32, 2097152]:\n"
                         "    var a: [i32, 2097152]\n    return a\n")->lower();
     auto bad=simple;

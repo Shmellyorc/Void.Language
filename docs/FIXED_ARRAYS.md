@@ -1,4 +1,4 @@
-# Numeric fixed arrays
+# Fixed arrays
 
 Order 3 implements real source `[T, n]` arrays through the existing typed IR,
 shared LLVM 19.1.7 lowerer, ORC JIT, ordinary AOT writer and GC Runtime. This
@@ -20,9 +20,12 @@ build/debug/voidc emit examples/fixed_arrays/main.void -o main.o
 The program returns 17. Link generated objects with the existing `void_runtime`
 CMake target and the host C++ toolchain, as the fixed-array CLI tests do.
 
-Supported elements are i8/i16/i32/i64, u8/u16/u32/u64, f32/f64 and bool. Literals
-require fixed-array context and exactly n elements. Defaults initialize all
-numeric/bool elements to zero/false; zero-length arrays and contextual `[]` work.
+Supported elements include all existing numeric types, bool, strings, value
+structs, managed/nullable and interface references, and nested fixed/growable arrays. Fixed literals
+require fixed-array context and exactly n elements. Defaults initialize numeric/bool elements to zero/false, strings to empty,
+nullable references to null, and composite fields using their existing defaults.
+Required nonnullable references need explicit initialization; zero-length arrays
+and contextual `[]` work. Custom initializers execute separately per element.
 Array constants, value-struct fields and managed-struct fields use the same path.
 Existing source readonly/type checks remain in force.
 
@@ -53,8 +56,11 @@ updates and rooted staging. It can make redundant copies and retain instruction
 temporaries until function exit. No zero-copy const-formal borrowing, performance
 claim or unrelated optimization is included in this order.
 
-Nested array elements, struct/string/reference elements, growable arrays,
-array-specific iteration/ranges and `.count` are not implemented by this order.
+[Growable arrays](GROWABLE_ARRAYS.md) add shared-identity `[T]` lists and
+`.count` on both array kinds. Phase 23 supports composite/nested elements and
+forward/reverse traversal with optional original indexes, plus i32/i64 ranges.
+That document describes traversal and nested-selection semantics. Fixed children
+copy recursively; growable and managed fields preserve reference identity.
 Unsupported native types still fail the whole compilation explicitly. Existing
 scalar loops and function calls can manipulate fixed arrays normally.
 

@@ -1,0 +1,16 @@
+struct node:
+    value: i32
+interface absent:
+    func read() -> i32
+func entry(value: i32) -> i32:
+    var a: [node, 0]
+    var b: [[node, 0], 2]
+    var c: [absent?, 0] = []
+    var d: [string, 0]
+    var e: [string] = []
+    for item in reverse d:
+        return -100
+    e.push("")
+    if e.remove_at(0) != "" or e.count != 0 or b[0].count != 0:
+        return -200
+    return value + a.count as i32 + c.count as i32

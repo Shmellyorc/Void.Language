@@ -35,6 +35,13 @@ void vd_array_default(void**,unsigned,std::uint64_t,std::uint64_t,vd::RuntimeFai
 void vd_array_copy(void**,void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_array_read(void**,std::uint64_t,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 void vd_array_write(void**,std::uint64_t,std::uint64_t,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
+void vd_list_new(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
+std::uint64_t vd_list_count(void**,unsigned,vd::RuntimeFailure*) noexcept;
+std::uint64_t vd_list_version(void**,unsigned,vd::RuntimeFailure*) noexcept;
+std::uint64_t vd_list_read(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
+void vd_list_write(void**,unsigned,std::uint64_t,std::uint64_t,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
+void vd_list_push(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
+std::uint64_t vd_list_remove(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 void vd_gc_frame_enter(void*, const vd::Runtime::Slot*, std::size_t) noexcept;
 void vd_gc_frame_leave(void*) noexcept;
 void vd_gc_poll() noexcept;
@@ -53,4 +60,14 @@ void vd_gc_allocate(void**, std::size_t, const std::size_t*, std::size_t, vd::Ru
 bool vd_gc_alive(void*) noexcept;
 void vd_gc_native_enter(void*) noexcept;
 void vd_gc_native_leave(void*) noexcept;
+}
+extern "C" {
+void vd_value_array_new(void**,const vd::NativeArrayElement*,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
+std::uint64_t vd_value_array_count(void**,const vd::NativeArrayElement*,vd::RuntimeFailure*) noexcept;
+std::uint64_t vd_value_array_version(void**,const vd::NativeArrayElement*,vd::RuntimeFailure*) noexcept;
+void vd_value_array_read(void*,void**,const vd::NativeArrayElement*,std::uint64_t,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
+void vd_value_array_write(void**,const vd::NativeArrayElement*,std::uint64_t,unsigned,std::uint64_t,const void*,std::uint64_t,unsigned,unsigned,vd::RuntimeFailure*) noexcept;
+void vd_value_array_push(void**,const vd::NativeArrayElement*,const void*,vd::RuntimeFailure*) noexcept;
+void vd_value_array_remove(void*,void**,const vd::NativeArrayElement*,std::uint64_t,vd::RuntimeFailure*) noexcept;
+void vd_value_array_copy(void**,void**,const vd::NativeArrayElement*,std::uint64_t,vd::RuntimeFailure*) noexcept;
 }

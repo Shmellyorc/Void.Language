@@ -170,10 +170,11 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
                 ++p; while (p < text.size() && digit(text[p])) ++p;
             }
             if (p < text.size() && (text[p] == 'f' || text[p] == 'd')) ++p;
-            if (p < text.size() && (letter(text[p]) || text[p] == '.' || (text[p] >= 'A' && text[p] <= 'Z')))
-                error(source, {TokenKind::number, "", start}, Code::numeric_literal, "Unsupported numeric literal.", "Use decimal digits, an optional fractional part, and optional f or d suffix; separators, exponents and ranges are not implemented.");
+            if (p < text.size() && (letter(text[p]) || (text[p] == '.' && text.substr(p,2)!="..") || (text[p] >= 'A' && text[p] <= 'Z')))
+                error(source, {TokenKind::number, "", start}, Code::numeric_literal, "Unsupported numeric literal.", "Use decimal digits, an optional fractional part, and optional f or d suffix; separators and exponents are not implemented.");
             emit(TokenKind::number, text.substr(start, p - start), start); continue;
         }
+        if(text.substr(p,2)=="..") {auto op=text.substr(p,3)=="..<" ? "..<" : "..";p+=std::string_view(op).size();emit(TokenKind::symbol,op,start);continue;}
         std::string pair = text.substr(p, 2);
         if (pair == "->" || pair == "==" || pair == "!=" || pair == "<=" || pair == ">=" || pair == "+=" ||
             pair == "-=" || pair == "*=" || pair == "/=" || pair == "%=" || pair == "++" || pair == "--") {
@@ -198,7 +199,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     return tokens;
 }
 struct Expr {
-    enum class Kind { literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index } kind;
+    enum class Kind { literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::string op, qualifier, target;
@@ -223,7 +224,12 @@ struct Statement {
     std::string name, op, constant_syntax;
     std::optional<Type> annotation;
     std::unique_ptr<Expr> expression;
-    std::unique_ptr<Expr> index; // Scalar fixed-array selected write, P23-1.
+    std::unique_ptr<Expr> index;
+    std::unique_ptr<Expr> selection;
+    std::unique_ptr<Expr> range_end;
+    Token binder{TokenKind::name,"",0}, index_binder{TokenKind::name,"",0};
+    unsigned index_slot=0;
+    bool reverse=false, exclusive=false;
     std::vector<Token> fields;
     std::vector<bool> implicit_fields;
     std::vector<unsigned> field_indexes;
@@ -549,8 +555,11 @@ class Parser {
         if (at("if")) return conditional(take());
         if (at("for")) {
             Statement s(Statement::Kind::loop, take());
-            if (!at(":")) s.expression = expression();
-            if (at("in") || at(",")) error(source, peek(), Code::unsupported_iteration, "Collection/range iteration is not implemented.", "Use 'for condition:' or 'for:' for this subset.");
+            if(peek().kind==TokenKind::name && (peek(1).text=="in" || peek(1).text==",")) {
+                s.binder=name();if(accept(","))s.index_binder=name();need("in");s.reverse=accept("reverse");
+                s.expression=expression();
+                if(at("..") || at("..<")) {s.exclusive=take().text=="..<";s.range_end=expression();}
+            } else if (!at(":")) s.expression = expression();
             s.body = block(); return s;
         }
         if (at("var") || at("const")) {
@@ -574,17 +583,19 @@ class Parser {
             newline(); return s;
         }
         if (peek().kind == TokenKind::name && p + 1 < tokens.size()) {
-            auto end = p + 1;
-            while (end + 1 < tokens.size() && tokens[end].text == "." && tokens[end+1].kind == TokenKind::name) end += 2;
-            if(end<tokens.size() && tokens[end].text=="[") {
-                unsigned brackets=0;
-                do {if(tokens[end].text=="[") ++brackets;else if(tokens[end].text=="]") --brackets;++end;}
+            auto end = p + 1;unsigned indexes=0;bool after_index=false;
+            while(end+1<tokens.size()) {
+                if(tokens[end].text=="." && tokens[end+1].kind==TokenKind::name){after_index|=indexes!=0;end+=2;continue;}
+                if(tokens[end].text!="[")break;
+                ++indexes;unsigned brackets=0;
+                do {if(tokens[end].text=="[")++brackets;else if(tokens[end].text=="]")--brackets;++end;}
                 while(end+1<tokens.size() && brackets && tokens[end].kind!=TokenKind::newline);
             }
             auto op = tokens[end].text;
             if (op == "=" || op == "+=" || op == "-=" || op == "*=" || op == "/=" || op == "%=" || op == "++" || op == "--") {
-                Statement s(Statement::Kind::assignment, name()); s.name = s.token.text; while (accept(".")) s.fields.push_back(name());
-                if(accept("[")) {s.index=expression();need("]");}
+                Statement s(Statement::Kind::assignment, name());s.name=s.token.text;
+                if(indexes>1 || after_index)s.selection=postfix(std::make_unique<Expr>(Expr::Kind::name,s.token));
+                else {while(accept("."))s.fields.push_back(name());if(accept("[")){s.index=expression();need("]");}}
                 s.op = take().text;
                 if (op == "++" || op == "--") {
                     s.expression = std::make_unique<Expr>(Expr::Kind::literal, s.token); s.expression->literal_text = "1";
@@ -944,6 +955,23 @@ class Semantics {
             return call_expression(e);
         }
         auto receiver = expression(*e.parts[0]);
+        (void)expected;
+        return resolved_method_expression(e,receiver);
+    }
+    // Resolve the receiver before reserving mutation/member-check temporaries.
+    // Deep receiver chains must reach the existing semantic nesting guard on
+    // the supported 1 MiB native stack in Debug as well as optimized builds.
+    VOID_SEMANTIC_HANDLER Type resolved_method_expression(Expr& e,Type receiver) {
+        if(ir::array_type(receiver) && (e.token.text=="push" || e.token.text=="remove_at")) {
+            if(!current)error(source,e.token,Code::constant_call,"List mutation is not a pure constant expression.");
+            if(receiver.kind!=Type::growable_array)error(source,e.token,Code::type_mismatch,"Fixed arrays cannot change length.");
+            if(e.parts.size()!=2 || std::any_of(e.names.begin(),e.names.end(),[](const auto& n){return !n.text.empty();}))error(source,e.token,Code::argument_count,"List operations require one positional argument.");
+            e.target="$array."+e.token.text;
+            auto argument=expression(*e.parts[1],e.token.text=="push" ? std::optional(ir::array_element(receiver)) : std::nullopt);
+            if(e.token.text=="push")expect(argument,ir::array_element(receiver),e.parts[1]->token);
+            else if(!numeric::integer(argument))error(source,e.parts[1]->token,Code::type_mismatch,"List index requires an integer, excluding bool and floats.");
+            return e.type=e.token.text=="push" ? Type::none : ir::array_element(receiver);
+        }
         if (!current) error(source,e.token,Code::constant_call,"A compile-time constant cannot call a method.","Use a local const for runtime values.");
         if (e.token.text == "init" || e.token.text == "deinit")
             error(source,e.token,Code::initializer_deferred,"Lifecycle methods cannot be called directly; construct a new value using its type.");
@@ -984,7 +1012,6 @@ class Semantics {
             e.parts[0]=std::make_unique<Expr>(Expr::Kind::conversion,original->token); e.parts[0]->op="upcast"; e.parts[0]->implicit=true;
             e.parts[0]->type=target.receiver->type; e.parts[0]->type.readonly=receiver.readonly; e.parts[0]->parts.push_back(std::move(original));
         }
-        (void)expected;
         return e.type = call_arguments(e,target,1);
     }
     Type call_arguments(Expr& e, const Function& target, std::size_t first, bool constructor = false) {
@@ -1035,7 +1062,9 @@ class Semantics {
             if (!e.initializer.empty() || std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end()) {
                 const auto& field = *structure.effective_fields[n].second;
                 auto& field_owner=*structure.effective_fields[n].first;
-                if (field.expression || field.annotation->kind != Type::aggregate) continue;
+                if(field.expression)continue;
+                if(ir::array_type(*field.annotation) && needs_array_recipe(*field.annotation)) {auto value=array_recipe(*field.annotation,initializer_declaration ? field.token : e.token,runtime,field_owner);value->slot=n;e.omitted.push_back(std::move(value));continue;}
+                if(field.annotation->kind!=Type::aggregate)continue;
                 auto [child_owner,child] = owned_structure(*field.annotation);
                 auto value = std::make_unique<Expr>(Expr::Kind::construction,initializer_declaration ? field.token : e.token); value->slot = n;
                 try { construction(*value,*child_owner,*child,runtime,field_owner); }
@@ -1112,6 +1141,12 @@ class Semantics {
         auto slot = static_cast<unsigned>(current->locals.size()); current->locals.push_back(type);
         scopes.back().emplace(token.text, Variable{type, slot, readonly, token}); return slot;
     }
+    // Qualified lookup needs a temporary AST node only on this cold path.
+    // Keep it out of every recursive receiver-chain hint's native stack frame.
+    VOID_SEMANTIC_HANDLER std::optional<Type> qualified_anchor(const Expr& e,Expr::Kind kind) {
+        Expr qualified(kind,e.token);qualified.qualifier=e.parts[0]->token.text;qualified.qualifier_token=e.parts[0]->token;
+        return anchor(qualified);
+    }
     // Hints resolve typed anchors without prematurely defaulting untyped literals.
     std::optional<Type> anchor(Expr& e) {
         try {
@@ -1140,11 +1175,11 @@ class Semantics {
         if(e.kind==K::array_literal) return {};
         if (e.kind == K::method_call) {
             if (module_call(e)) {
-                Expr qualified(K::call,e.token); qualified.qualifier = e.parts[0]->token.text; qualified.qualifier_token = e.parts[0]->token;
-                return anchor(qualified);
+                return qualified_anchor(e,K::call);
             }
             auto receiver = anchor(*e.parts[0]);
             if (!receiver) return std::nullopt;
+            if(ir::array_type(*receiver) && e.token.text=="remove_at")return ir::array_element(*receiver);
             auto selected=member(*receiver,e.token,true);
             return selected.function ? std::optional<Type>(selected.function->result) : std::nullopt;
         }
@@ -1156,11 +1191,10 @@ class Semantics {
         if (e.kind == K::field) {
             const auto& operand = *e.parts[0];
             if (operand.kind == K::name && !lookup(operand.token.text) && unit.qualifiers.contains(operand.token.text)) {
-                Expr qualified(K::name,e.token); qualified.qualifier = operand.token.text; qualified.qualifier_token = operand.token;
-                auto [owner,c] = constant(qualified); if (c) { evaluate(*owner,*c); return c->type; }
-                return {};
+                return qualified_anchor(e,K::name);
             }
             auto base = anchor(*e.parts[0]);
+            if(base && ir::array_type(*base) && e.token.text=="count")return Type::i64;
             if (base && (base->kind == Type::aggregate || base->kind == Type::managed_ref)) {
                 auto selected=member(*base,e.token);
                 if (!selected.function) { auto t=*base; for (auto index:selected.path) t=ir::field_type(t,index); return t; }
@@ -1231,16 +1265,24 @@ class Semantics {
         }
     }
     VOID_SEMANTIC_HANDLER Type array_expression(Expr& e,std::optional<Type> expected) {
-        if(!expected) error(source,e.token,Code::unsupported_type,e.parts.empty() ? "An empty array literal requires contextual typing." : "Inferred growable literals are deferred beyond P23-1; supply a fixed-array type.");
-        if(!ir::scalar_fixed_array(*expected)) error(source,e.token,Code::unsupported_type,"P23-1 literals require a scalar fixed-array context; other array construction is deferred.");
-        if(e.parts.size()!=*expected->definition->extent) error(source,e.token,Code::type_mismatch,"Fixed-array literal requires exactly "+std::to_string(*expected->definition->extent)+" elements.");
+        if(!expected) {
+            if(e.parts.empty())error(source,e.token,Code::unsupported_type,"An empty array literal requires contextual typing.");
+            std::optional<Type> element;
+            for(auto& part:e.parts) if(auto hint=anchor(*part)) {element=hint;break;}
+            if(!element)element=expression(*e.parts.front());
+            if(*element==Type::none || *element==Type::null_value)error(source,e.token,Code::unsupported_type,"Array element requires a concrete value type.");
+            *element=ir::with_readonly_paths(*element,{});auto definition=std::make_shared<ir::ValueType>();definition->identity=ir::array_identity(*element,{});definition->name=definition->identity;definition->element=ir::FieldType(*element);
+            expected=Type(definition,Type::growable_array);
+        }
+        if(!ir::array_type(*expected)) error(source,e.token,Code::unsupported_type,"Array literals require a fixed or growable array context.");
+        if(expected->kind==Type::fixed_array && e.parts.size()!=*expected->definition->extent) error(source,e.token,Code::type_mismatch,"Fixed-array literal requires exactly "+std::to_string(*expected->definition->extent)+" elements.");
         for(auto& part:e.parts) expect(expression(*part,ir::array_element(*expected)),ir::array_element(*expected),part->token);
         return e.type=*expected;
     }
     VOID_SEMANTIC_HANDLER Type index_expression(Expr& e) {
         auto array=expression(*e.parts[0]);
         if(array==error_type) return error_type;
-        if(!ir::scalar_fixed_array(array)) error(source,e.token,Code::unsupported_type,"P23-1 indexing requires a scalar fixed array; string and other indexing remain deferred.");
+        if(!ir::array_type(array)) error(source,e.token,Code::unsupported_type,"Indexing requires an array.");
         auto index=expression(*e.parts[1]);
         if(index==error_type) return error_type;
         if(!numeric::integer(index)) error(source,e.parts[1]->token,Code::type_mismatch,"Array index requires an integer, excluding bool and floating types.");
@@ -1265,7 +1307,14 @@ class Semantics {
             if (c) {
                 evaluate(*owner, *c); e.target = owner->identity + "::" + c->declaration.name; e.kind = K::literal; e.value = c->value;
                 e.aggregate_value = c->aggregate_value;
-                return e.type = c->type;
+                // Fresh list objects in pure templates retain readonly authority.
+                // Existing null reference templates remain ordinary value defaults.
+                auto paths=ir::readonly_paths(c->type);
+                for(const auto& path:ir::reference_paths(c->type)) {
+                    auto leaf=c->type;for(auto field:path)leaf=ir::field_type(leaf,field);
+                    if(leaf.kind==Type::growable_array)paths.insert(path);
+                }
+                return e.type = ir::with_readonly_paths(c->type,paths);
             }
         }
         if (!v && unit.failed_import) throw Poison{};
@@ -1281,6 +1330,7 @@ class Semantics {
         }
         auto t = expression(base);
         if (t == error_type) return error_type;
+        if(ir::array_type(t) && e.token.text=="count") {e.target="$array.count";return e.type=Type::i64;}
         if (t.nullable) error(source,e.token,Code::type_mismatch,"Unwrap the nullable reference before field access.");
         if (t.kind != Type::aggregate && t.kind != Type::managed_ref) error(source,e.token,Code::type_mismatch,"Field access requires a struct.");
         auto selected=member(t,e.token);
@@ -1439,8 +1489,8 @@ class Semantics {
             }
             if (!s.expression && ir::reference_value(t) && !t.nullable) error(source,s.token,Code::initializer,"A non-nullable reference requires an initializer.","Construct the object explicitly using its type.");
             if (!s.expression && ir::array_type(t)) {
-                s.expression=std::make_unique<Expr>(Expr::Kind::literal,s.token);s.expression->type=t;
-                s.expression->aggregate_value=array_default(t,s.token);
+                if(needs_array_recipe(t))s.expression=array_recipe(t,s.token,true,unit);
+                else {s.expression=std::make_unique<Expr>(Expr::Kind::literal,s.token);s.expression->type=t;s.expression->aggregate_value=array_default(t,s.token);}
             }
             if (!s.expression && t.kind == Type::aggregate) {
                 auto [owner,structure] = owned_structure(t);
@@ -1448,7 +1498,7 @@ class Semantics {
                 construction(*s.expression,*owner,*structure,true,unit);
 
             }
-            if (!ir::reference_value(t)) t.readonly=false;
+            if (!ir::reference_value(t) && t.kind!=Type::growable_array) t.readonly=false;
             s.slot = declare(s.token, t, s.readonly); break;
         }
         case K::assignment: {
@@ -1457,6 +1507,15 @@ class Semantics {
                 error(source, s.token, Code::readonly, "Cannot mutate readonly const or declaration '" + s.name + "'.", "Use var for a mutable local binding.");
             if (!variable) error(source, s.token, Code::unknown_identifier, "Unknown identifier '" + s.name + "'.", "Declare it with var before assignment.");
             auto t = variable->type; s.slot = variable->slot;
+            if(s.selection) {
+                t=expression(*s.selection);
+                if(s.selection->target=="$array.count")error(source,s.selection->token,Code::readonly,"Array count is readonly.");
+                s.assigned_type=t;expect(expression(*s.expression,t),t,s.expression->token);
+                if(s.op!="=" && !numeric::number(t) && !(t==Type::string && s.op=="+="))error(source,s.token,Code::type_mismatch,"Unsupported compound element assignment.");
+                if(s.op=="%=" && numeric::floating(t))error(source,s.token,Code::numeric_operator,"Illegal compound floating remainder operator.");
+                if(numeric::integer(t) && (s.op=="/=" || s.op=="%=") && s.expression->kind==Expr::Kind::literal && s.expression->value==0)error(source,s.expression->token,Code::zero_divisor,"Division or remainder by zero.");
+                break;
+            }
             std::vector<Token> expanded;
             for (const auto& field : s.fields) {
                 auto selected=member(t,field);
@@ -1470,7 +1529,7 @@ class Semantics {
             }
             s.fields=std::move(expanded);
             if(s.index) {
-                if(!ir::scalar_fixed_array(t)) error(source,s.token,Code::unsupported_type,"P23-1 selected assignment requires a scalar fixed array.");
+                if(!ir::array_type(t)) error(source,s.token,Code::unsupported_type,"Selected assignment requires an array.");
                 auto index=expression(*s.index);
                 if(index!=error_type && !numeric::integer(index)) error(source,s.index->token,Code::type_mismatch,"Array index requires an integer.");
                 t=ir::array_element(t);
@@ -1501,13 +1560,29 @@ class Semantics {
             catch (const CompilationError& failure) { diagnostics.add(failure); }
             flow = sequence(s.body) | (s.otherwise.empty() ? next_flow : sequence(s.otherwise)); break;
         case K::loop: {
-            if (s.expression) {
+            if(!s.binder.text.empty()) {
+                Type item;
+                if(s.range_end) {
+                    if(!s.index_binder.text.empty())error(source,s.index_binder,Code::unsupported_iteration,"Ranges have one item binding.");
+                    auto hint=anchor(*s.expression);if(!hint)hint=anchor(*s.range_end);
+                    auto first=expression(*s.expression,hint);auto last=expression(*s.range_end,first);expect(last,first,s.range_end->token);
+                    if(first!=Type::i32 && first!=Type::i64)error(source,s.token,Code::type_mismatch,"Range endpoints require matching i32 or i64 values.");
+                    item=first;
+                } else {
+                    auto array=expression(*s.expression);
+                    if(!ir::array_type(array))error(source,s.token,Code::unsupported_iteration,"Iteration requires an array or integer range.");
+                    item=ir::array_element(array);
+                }
+                scopes.emplace_back();s.slot=declare(s.binder,item);
+                if(!s.index_binder.text.empty())s.index_slot=declare(s.index_binder,Type::i64);
+            } else if (s.expression) {
                 try { expect(expression(*s.expression), Type::boolean, s.expression->token); }
                 catch (const CompilationError& failure) { diagnostics.add(failure); }
             }
             ++loops; auto body = sequence(s.body); --loops;
+            if(!s.binder.text.empty())scopes.pop_back();
             flow = body & return_flow;
-            if (!always(s.expression.get()) || (body & break_flow)) flow |= next_flow;
+            if (!s.binder.text.empty() || !always(s.expression.get()) || (body & break_flow)) flow |= next_flow;
             break;
         }
         case K::broken: case K::continued:
@@ -1562,23 +1637,31 @@ public:
         construction_fields(plan,*owner,*structure,true,true);
         f.initialization_defaults=std::move(plan.omitted); f.initialization_value=structure->defaults;
     }
+    bool needs_array_recipe(Type t) {
+        if(t.kind==Type::growable_array)return false;
+        if(t.kind==Type::fixed_array)return *t.definition->extent && needs_array_recipe(ir::array_element(t));
+        if(t.kind!=Type::aggregate)return false;
+        auto [owner,structure]=owned_structure(t);if(structure->initializer)return true;
+        for(const auto& field:t.definition->fields)if(needs_array_recipe(field.type))return true;
+        return false;
+    }
+    std::unique_ptr<Expr> array_recipe(Type t,const Token& token,bool runtime,Unit& access) {
+        auto e=std::make_unique<Expr>(Expr::Kind::literal,token);e->type=t;
+        if(t.kind==Type::growable_array)return e;
+        if(t.kind==Type::fixed_array) {
+            if(!*t.definition->extent){e->aggregate_value.repeat=0;return e;}
+            e->kind=Expr::Kind::array_default;e->parts.push_back(array_recipe(ir::array_element(t),token,runtime,access));return e;
+        }
+        if(t.kind==Type::aggregate){auto [owner,structure]=owned_structure(t);construction(*e,*owner,*structure,runtime,access);}
+        else if(ir::reference_value(t) && !t.nullable)error(source,token,Code::initializer,"A required array reference needs an explicit initializer.");
+        return e;
+    }
     ir::ConstantValue array_default(Type t,const Token& token) {
-        ir::ConstantValue value;value.repeat=*t.definition->extent;
-        // Validate the recipe even for an empty repeat, without executing init.
-        std::set<const ir::ValueType*> seen;
-        std::function<void(Type)> pure=[&](Type child) {
-            if(child.definition && !seen.insert(child.definition.get()).second) return;
-            if(child.kind==Type::fixed_array) pure(ir::array_element(child));
-            if(child.kind==Type::aggregate) {
-                auto [owner,structure]=owned_structure(child);
-                if(structure->initializer) error(source,token,Code::unsupported_type,"Repeated array defaults with custom initializers await construction recipes.");
-                for(const auto& field:child.definition->fields) pure(field.type);
-            }
-        };
-        pure(t);
+        ir::ConstantValue value;if(t.kind==Type::growable_array)return value;value.repeat=*t.definition->extent;
         if(!*value.repeat) return value;
         auto element=ir::array_element(t);
-        if(element.kind==Type::fixed_array) value.fields.push_back(array_default(element,token));
+        if(ir::reference_value(element) && !element.nullable)error(source,token,Code::initializer,"A nonempty array of required references needs a complete literal.");
+        if(ir::array_type(element)) value.fields.push_back(array_default(element,token));
         else if(element.kind==Type::aggregate) {
             auto [owner,structure]=owned_structure(element);defaults(*owner,*structure);
             value.fields.push_back(structure->defaults);
@@ -1700,18 +1783,27 @@ class Lowering {
     void jump(unsigned to) { terminate({ir::Terminator::Kind::jump, 0, to}); }
     unsigned emit(ir::Instruction i, const Token& token) {
         i.source = source.location(token.offset);
-        if (i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
+        if (i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
             i.source_excerpt = source.excerpt(token.offset);
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
     }
+    unsigned repeated_array(Type t,std::uint64_t count,const Token& token,const std::function<unsigned()>& element) {
+        ir::Instruction allocation{ir::Op::array_allocate};allocation.type=t;
+        auto owner=capture(emit(allocation,token),t,token);
+        auto index=snapshot(constant(Type::u64,{0,{}},token),Type::u64,token);
+        auto test=block(),body=block(),done=block();jump(test);current=test;
+        terminate({ir::Terminator::Kind::branch,emit({ir::Op::less,emit({ir::Op::load,index},token),constant(Type::u64,{count,{}},token)},token),body,done});current=body;
+        auto value=element();ir::Instruction initialize{ir::Op::array_initialize,emit({ir::Op::load,owner},token),emit({ir::Op::load,index},token)};initialize.arguments={value};emit(initialize,token);
+        emit({ir::Op::store,index,emit({ir::Op::add,emit({ir::Op::load,index},token),constant(Type::u64,{1,{}},token)},token)},token);jump(test);current=done;return emit({ir::Op::load,owner},token);
+    }
     unsigned constant(Type t, const ir::ConstantValue& value, const Token& token) {
-        ir::Instruction i{t.kind == Type::fixed_array ? ir::Op::fixed_array : t.kind == Type::aggregate ? ir::Op::aggregate : t==Type::string ? ir::Op::string_literal : ir::Op::constant}; i.type = t;
+        ir::Instruction i{ir::array_type(t) ? ir::Op::fixed_array : t.kind == Type::aggregate ? ir::Op::aggregate : t==Type::string ? ir::Op::string_literal : ir::Op::constant}; i.type = t;
         if (t==Type::string) {
             i.immediate=strings.intern(value.text,source,token);
             module.coordinated=true; return emit(i,token);
         }
-        if(t.kind==Type::fixed_array) {
+        if(ir::array_type(t)) {
             i.array_repeat=value.repeat.has_value();
             if(value.repeat && *value.repeat!=*t.definition->extent) throw std::logic_error("Mismatched repeated default extent");
             for(const auto& element:value.fields) i.arguments.push_back(constant(ir::array_element(t),element,token));
@@ -1796,9 +1888,48 @@ class Lowering {
             value=replace_path(root,value,place.fields,0,token); emit({ir::Op::store,place.slot,value},token);
         }
     }
+    struct Selection {Type type;std::function<unsigned()> read;std::function<void(unsigned)> write;bool dependent=false;};
+    unsigned capture(unsigned value,Type type,const Token& token) {
+        if(!ir::array_type(type))return snapshot(value,type,token);
+        auto slot=static_cast<unsigned>(output.locals.size());output.locals.push_back(type);ir::Instruction i{ir::Op::array_capture,value};i.immediate=slot;emit(i,token);return slot;
+    }
+    Selection select_expression(const Expr& e) {
+        auto token=e.token;
+        if(e.kind==Expr::Kind::name) {
+            auto slot=e.slot;return {e.type,[=,this]{return emit({ir::Op::load,slot},token);},[=,this](unsigned value){emit({ir::Op::store,slot,value},token);}};
+        }
+        if(e.kind==Expr::Kind::field) {
+            auto parent=std::make_shared<Selection>(select_expression(*e.parts[0]));auto field=e.slot;
+            if(parent->type.kind==Type::managed_ref) {
+                auto owner=snapshot(parent->read(),parent->type,token);
+                return {e.type,[=,this]{ir::Instruction i{ir::Op::gc_read,emit({ir::Op::load,owner},token)};i.immediate=field;return emit(i,token);},[=,this](unsigned value){ir::Instruction i{ir::Op::gc_write,emit({ir::Op::load,owner},token),value};i.immediate=field;emit(i,token);}};
+            }
+            return {e.type,[=,this]{ir::Instruction i{ir::Op::extract,parent->read()};i.immediate=field;return emit(i,token);},[=,this](unsigned value){ir::Instruction i{ir::Op::insert,parent->read(),value};i.immediate=field;parent->write(emit(i,token));},parent->dependent};
+        }
+        if(e.kind==Expr::Kind::array_index) {
+            auto parent=std::make_shared<Selection>(select_expression(*e.parts[0]));
+            // Reading a nested list reference severs its former inline ancestry.
+            std::optional<unsigned> selected_owner;
+            if(parent->type.kind==Type::growable_array && parent->dependent)selected_owner=capture(parent->read(),parent->type,token);
+            auto index=snapshot(expression(*e.parts[1]),e.parts[1]->type,token);
+            if(parent->type.kind==Type::growable_array) {
+                auto owner=selected_owner.value_or(~0u);if(!selected_owner)owner=capture(parent->read(),parent->type,token);
+                auto normalized=snapshot(emit({ir::Op::list_index,emit({ir::Op::load,owner},token),emit({ir::Op::load,index},token)},token),Type::u64,token);
+                auto version=snapshot(emit({ir::Op::list_version,emit({ir::Op::load,owner},token)},token),Type::u64,token);
+                return {e.type,[=,this]{auto object=emit({ir::Op::load,owner},token);emit({ir::Op::list_check,object,emit({ir::Op::load,version},token)},token);return emit({ir::Op::array_get,object,emit({ir::Op::load,normalized},token)},token);},[=,this](unsigned value){ir::Instruction i{ir::Op::list_commit,emit({ir::Op::load,owner},token),emit({ir::Op::load,normalized},token)};i.arguments={value,emit({ir::Op::load,version},token)};emit(i,token);},true};
+            }
+            // Bounds/index effects precede the RHS, while later reads reacquire
+            // the current fixed value from the original selected owning place.
+            emit({ir::Op::array_get,parent->read(),emit({ir::Op::load,index},token)},token);
+            return {e.type,[=,this]{return emit({ir::Op::array_get,parent->read(),emit({ir::Op::load,index},token)},token);},[=,this](unsigned value){ir::Instruction i{ir::Op::array_set,parent->read(),emit({ir::Op::load,index},token)};i.arguments={value};parent->write(emit(i,token));},parent->dependent};
+        }
+        auto slot=capture(expression(e),e.type,token);
+        return {e.type,[=,this]{return emit({ir::Op::load,slot},token);},[=,this](unsigned value){emit({ir::Op::store,slot,value},token);}};
+    }
     unsigned expression(const Expr& e) {
         using K = Expr::Kind;
         switch (e.kind) {
+        case K::array_default: return repeated_array(e.type,*e.type.definition->extent,e.token,[&]{return expression(*e.parts[0]);});
         case K::array_literal: {
             ir::Instruction i{ir::Op::fixed_array};i.type=e.type;
             std::vector<unsigned> slots;
@@ -1806,17 +1937,12 @@ class Lowering {
             for(auto slot:slots) i.arguments.push_back(emit({ir::Op::load,slot},e.token));
             return emit(i,e.token);
         }
-        case K::array_index: {
-            auto selected=place(*e.parts[0]);
-            auto index=expression(*e.parts[1]);
-            auto array=read_place(selected,e.token); // Index effects finish before selecting bytes.
-            return emit({ir::Op::array_get,array,index},e.token);
-        }
+        case K::array_index: return select_expression(e).read();
         case K::base_initialization: throw std::logic_error("base initialization is a dedicated prelude");
         case K::literal: {
-            return constant(e.type,(e.type.kind == Type::aggregate || e.type.kind==Type::fixed_array || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
+            return constant(e.type,(e.type.kind == Type::aggregate || ir::array_type(e.type) || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
         }
-        case K::field: { auto value=expression(*e.parts[0]); ir::Instruction i{e.parts[0]->type.kind==Type::managed_ref ? ir::Op::gc_read : ir::Op::extract,value}; i.immediate=e.slot; return emit(i,e.token); }
+        case K::field: { auto value=expression(*e.parts[0]); if(e.target=="$array.count")return emit({ir::Op::array_count,value},e.token); ir::Instruction i{e.parts[0]->type.kind==Type::managed_ref ? ir::Op::gc_read : ir::Op::extract,value}; i.immediate=e.slot; return emit(i,e.token); }
         case K::construction: {
             std::vector<unsigned> arguments;
             for (const auto& part : e.parts) {
@@ -1881,6 +2007,11 @@ class Lowering {
         }
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
         case K::method_call: case K::call: {
+            if(e.target.starts_with("$array.")) {
+                auto owner=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);
+                auto argument=expression(*e.parts[1]);
+                return emit({e.token.text=="push" ? ir::Op::list_push : ir::Op::list_remove,emit({ir::Op::load,owner},e.token),argument},e.token);
+            }
             std::optional<ir::Place> receiver;
             std::size_t first = 0;
             if (e.kind == K::method_call) {
@@ -1975,15 +2106,35 @@ class Lowering {
             emit({ir::Op::store, s.slot, value}, s.token); break;
         }
         case K::assignment: {
+            if(s.selection) {
+                auto selected=select_expression(*s.selection);auto old=selected.read();std::optional<unsigned> old_slot;
+                if(s.op!="=")old_slot=snapshot(old,s.assigned_type,s.token);
+                auto value=expression(*s.expression);
+                if(old_slot)value=emit({s.assigned_type==Type::string ? ir::Op::string_concat : operation(s.op.substr(0,1)),emit({ir::Op::load,*old_slot},s.token),value},s.token);
+                selected.write(value);break;
+            }
             if(s.index) {
                 auto selected=select_place({s.slot,{}},s.field_indexes,s.token);
                 auto index=expression(*s.index);auto index_slot=snapshot(index,s.index->type,s.index->token);
                 auto array=read_place(selected,s.token);
+                auto array_type=output.locals[selected.slot];for(auto field:selected.fields)array_type=ir::field_type(array_type,field);
+                if(array_type.kind==Type::growable_array) {
+                    auto owner_slot=snapshot(array,array_type,s.token);
+                    auto normalized=emit({ir::Op::list_index,array,index},s.index->token);
+                    auto normalized_slot=snapshot(normalized,Type::u64,s.token);
+                    std::optional<unsigned> old_slot;
+                    if(s.op!="=")old_slot=snapshot(emit({ir::Op::array_get,array,normalized},s.index->token),s.assigned_type,s.token);
+                    auto version_slot=snapshot(emit({ir::Op::list_version,array},s.token),Type::u64,s.token);
+                    auto value=expression(*s.expression);
+                    if(s.op!="=")value=emit({s.assigned_type==Type::string ? ir::Op::string_concat : operation(s.op.substr(0,1)),emit({ir::Op::load,*old_slot},s.token),value},s.token);
+                    ir::Instruction commit{ir::Op::list_commit,emit({ir::Op::load,owner_slot},s.token),emit({ir::Op::load,normalized_slot},s.token)};
+                    commit.arguments={value,emit({ir::Op::load,version_slot},s.token)};emit(commit,s.index->token);break;
+                }
                 auto old=emit({ir::Op::array_get,array,index},s.index->token); // Bounds check before RHS, even for '='.
                 std::optional<unsigned> old_slot;
                 if(s.op!="=") old_slot=snapshot(old,s.assigned_type,s.token);
                 auto value=expression(*s.expression);
-                if(old_slot) value=emit({operation(s.op.substr(0,1)),emit({ir::Op::load,*old_slot},s.token),value},s.token);
+                if(old_slot) value=emit({s.assigned_type==Type::string ? ir::Op::string_concat : operation(s.op.substr(0,1)),emit({ir::Op::load,*old_slot},s.token),value},s.token);
                 index=emit({ir::Op::load,index_slot},s.index->token);
                 array=read_place(selected,s.token); // Reacquire current inline bytes after RHS effects.
                 ir::Instruction update{ir::Op::array_set,array,index};update.arguments={value};
@@ -2018,6 +2169,57 @@ class Lowering {
             break;
         }
         case K::loop: {
+            if(!s.binder.text.empty()) {
+                const auto item=output.locals[s.slot];
+                auto scalar=[&](Type t,std::uint64_t bits){return constant(t,{bits,{}},s.token);};
+                auto load=[&](unsigned slot){return emit({ir::Op::load,slot},s.token);};
+                auto store=[&](unsigned slot,unsigned value){emit({ir::Op::store,slot,value},s.token);};
+                unsigned cursor,terminal,direction;std::optional<unsigned> owner,version;std::optional<Selection> fixed_view;
+                auto test=block(),body=block(),step=block(),done=block();
+                if(s.range_end) {
+                    auto first=snapshot(expression(*s.expression),item,s.token);
+                    auto last=snapshot(expression(*s.range_end),item,s.token);
+                    direction=snapshot(emit({ir::Op::less_equal,load(first),load(last)},s.token),Type::boolean,s.token);
+                    cursor=snapshot(load(s.reverse?last:first),item,s.token);
+                    terminal=snapshot(load(s.reverse?first:last),item,s.token);
+                    if(s.reverse) {
+                        store(direction,emit({ir::Op::logical_not,load(direction)},s.token));
+                        if(s.exclusive) {
+                            auto prepare=block();terminate({ir::Terminator::Kind::branch,emit({ir::Op::not_equal,load(first),load(last)},s.token),prepare,done});current=prepare;
+                            auto up=block(),down=block(),ready=block();terminate({ir::Terminator::Kind::branch,load(direction),up,down});
+                            current=up;store(cursor,emit({ir::Op::add,load(cursor),scalar(item,1)},s.token));jump(ready);
+                            current=down;store(cursor,emit({ir::Op::subtract,load(cursor),scalar(item,1)},s.token));jump(ready);current=ready;
+                        }
+                    }
+                } else {
+                    auto array=s.expression->type;
+                    // Root the selected handle without invoking fixed value-copy storage.
+                    owner=static_cast<unsigned>(output.locals.size());output.locals.push_back(array);
+                    if(array.kind==Type::fixed_array)fixed_view=select_expression(*s.expression);
+                    ir::Instruction capture{ir::Op::array_capture,fixed_view ? fixed_view->read() : expression(*s.expression)};capture.immediate=*owner;emit(capture,s.token);
+                    auto count=snapshot(emit({ir::Op::array_count,load(*owner)},s.token),Type::i64,s.token);
+                    if(array.kind==Type::growable_array)version=snapshot(emit({ir::Op::list_version,load(*owner)},s.token),Type::u64,s.token);
+                    cursor=snapshot(s.reverse ? emit({ir::Op::subtract,load(count),scalar(Type::i64,1)},s.token) : scalar(Type::i64,0),Type::i64,s.token);
+                    terminal=snapshot(s.reverse ? scalar(Type::i64,~std::uint64_t{0}) : load(count),Type::i64,s.token);
+                    direction=snapshot(scalar(Type::boolean,!s.reverse),Type::boolean,s.token);
+                }
+                jump(test);current=test;
+                if(fixed_view){ir::Instruction refresh{ir::Op::array_capture,fixed_view->read()};refresh.immediate=*owner;emit(refresh,s.token);}
+                if(version)emit({ir::Op::list_check,load(*owner),load(*version)},s.token);
+                if(!s.range_end || (s.exclusive && !s.reverse))terminate({ir::Terminator::Kind::branch,emit({ir::Op::not_equal,load(cursor),load(terminal)},s.token),body,done});else jump(body);
+                current=body;
+                store(s.slot,s.range_end ? load(cursor) : emit({ir::Op::array_get,load(*owner),load(cursor)},s.token));
+                if(!s.index_binder.text.empty())store(s.index_slot,load(cursor));
+                loops.emplace_back(step,done);sequence(s.body);if(current)jump(step);loops.pop_back();
+                current=step;
+                if(s.range_end && (!s.exclusive || s.reverse)) {
+                    auto advance=block();terminate({ir::Terminator::Kind::branch,emit({ir::Op::equal,load(cursor),load(terminal)},s.token),done,advance});current=advance;
+                }
+                auto up=block(),down=block();terminate({ir::Terminator::Kind::branch,load(direction),up,down});
+                current=up;store(cursor,emit({ir::Op::add,load(cursor),scalar(s.range_end?item:Type(Type::i64),1)},s.token));jump(test);
+                current=down;store(cursor,emit({ir::Op::subtract,load(cursor),scalar(s.range_end?item:Type(Type::i64),1)},s.token));jump(test);
+                current=done;break;
+            }
             auto test = block(), body = block(), done = block(); jump(test);
             current = test;
             if (always(s.expression.get())) jump(body);
@@ -2234,7 +2436,7 @@ public:
 // Only typed, pure ASTs reach this evaluator. The shared software kernel
 // preserves declared precision and wrapping independently of host arithmetic.
 ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
-    if (e.kind == Expr::Kind::literal) return (e.type.kind == Type::aggregate || e.type.kind==Type::fixed_array || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}};
+    if (e.kind == Expr::Kind::literal) return (e.type.kind == Type::aggregate || ir::array_type(e.type) || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}};
     if(e.kind==Expr::Kind::array_literal) {
         ir::ConstantValue result;for(const auto& part:e.parts) result.fields.push_back(constant_value(source,*part));return result;
     }
@@ -2252,7 +2454,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
         for (const auto& child : e.omitted) result.fields[child->slot] = constant_value(source,*child);
         return result;
     }
-    if (e.kind == Expr::Kind::field) return constant_value(source,*e.parts[0]).fields.at(e.slot);
+    if (e.kind == Expr::Kind::field) {auto value=constant_value(source,*e.parts[0]);if(e.target=="$array.count")return {value.repeat.value_or(value.fields.size()),{}};return value.fields.at(e.slot);}
     if (e.kind==Expr::Kind::binary && e.parts[0]->type==Type::string) {
         auto a=constant_value(source,*e.parts[0]).text;
         auto b=constant_value(source,*e.parts[1]).text;
@@ -2457,19 +2659,19 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                     error(owner->source,syntax.extent->token,Code::integer_range,"Array extent is not representable as an i64 count.");
                 extent=value;
             }
-            if(element.kind==Type::aggregate) for(auto& [child_id,child_owner]:units) for(auto& child:child_owner->structures)
+            if(extent && element.kind==Type::aggregate) for(auto& [child_id,child_owner]:units) for(auto& child:child_owner->structures)
                 if(child.definition==element.definition) {
                     layout(*child_owner,child);
                 }
-            if(!extent) error(owner->source,syntax.token,Code::unsupported_type,"Growable array storage is deferred.");
-            // Compact, reference-free value recipes only. Native/GC storage remains gated.
+
+            // Fixed ownership remains finite; growable edges have pointer-sized storage.
             ir::CompactValueShape shape;
-            try {shape=ir::compact_value_shape(element);}
+            try {shape=extent ? ir::compact_value_shape(element) : ir::CompactValueShape{0,sizeof(void*),1};}
             catch(const std::length_error& failure) {error(owner->source,syntax.token,Code::limit,failure.what());}
             catch(const std::invalid_argument& failure) {error(owner->source,syntax.token,Code::unsupported_type,failure.what());}
             if(shape.depth>=128) error(owner->source,syntax.token,Code::nesting,"Array value shape depth limit exceeded.");
             if(shape.template_nodes>=65536) error(owner->source,syntax.token,Code::limit,"Array default-template analysis work exhausted.");
-            if(shape.scalar_bytes && *extent>std::numeric_limits<std::uint64_t>::max()/shape.scalar_bytes)
+            if(extent && shape.scalar_bytes && *extent>std::numeric_limits<std::uint64_t>::max()/shape.scalar_bytes)
                 error(owner->source,syntax.token,Code::limit,"Array logical scalar extent is not representable in 64 bits.");
             const auto key=ir::array_identity(element,extent);
             auto& canonical=canonical_arrays[key];
@@ -2768,7 +2970,7 @@ struct AnalysisAccess {
                     reference(owner,e.type.definition->identity,e,*unit,true);
                     for(const auto& binding:graph->at(entry)->member_catalog->interface_bindings) if(binding.key==e.target)
                         for(const auto& [requirement,route]:binding.methods) {reference(owner,requirement,e,*unit,true);reference(owner,route.second,e,*unit,true);}
-                } else if (!e.target.empty()) reference(owner,e.target,e,*unit,implicit || e.implicit);
+                } else if (!e.target.empty() && !e.target.starts_with("$array.")) reference(owner,e.target,e,*unit,implicit || e.implicit);
                 else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit || e.implicit);
                 if(!e.virtual_slot.empty() && !e.super_call) for(const auto& [id,target_unit]:*graph) for(const auto& target:target_unit->functions)
                     if(target.virtual_slot==e.virtual_slot) reference(owner,target.symbol,e,*unit,true);
@@ -2858,6 +3060,8 @@ struct AnalysisAccess {
                                 t = t.definition->fields.at(s.field_indexes[n]).type;
                             }
                         }
+                        if (s.selection) expression(*s.selection,owner,locals);
+                        if (s.range_end) expression(*s.range_end,owner,locals);
                         if (s.index) expression(*s.index,owner,locals);
                         if (s.expression) expression(*s.expression,owner,locals);
                         if (s.readonly) locals.emplace(s.slot,owner);

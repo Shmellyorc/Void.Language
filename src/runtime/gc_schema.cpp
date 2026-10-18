@@ -30,6 +30,8 @@ std::string key(const SchemaNode& node) {
         using T=std::decay_t<decltype(v)>;
         if constexpr(std::is_same_v<T,SchemaScalar>) number(static_cast<unsigned>(v.encoding));
         else if constexpr(std::is_same_v<T,SchemaBytes>) {number(v.bytes);number(v.alignment);}
+        else if constexpr(std::is_same_v<T,SchemaOwnedFixed>) {word(v.element);number(v.extent);}
+        else if constexpr(std::is_same_v<T,SchemaGrowable>) word(v.header);
         else if constexpr(std::is_same_v<T,SchemaManaged>) {word(v.target);number(v.nullable);}
         else if constexpr(std::is_same_v<T,SchemaInterface>) {word(v.target);number(v.nullable);number(v.object_offset);number(v.witness_offset);number(v.bytes);number(v.alignment);}
         else if constexpr(std::is_same_v<T,SchemaRecord>) {
@@ -43,6 +45,8 @@ std::optional<ReferenceEvent> event(const SchemaNode& node,std::size_t base) {
     if(auto* v=std::get_if<SchemaManaged>(&node)) return ReferenceEvent{ReferenceEvent::Kind::managed,base,{},v->nullable,v->target};
     if(std::holds_alternative<SchemaString>(node)) return ReferenceEvent{ReferenceEvent::Kind::string,base,{},true,{}};
     if(auto* v=std::get_if<SchemaInterface>(&node)) return ReferenceEvent{ReferenceEvent::Kind::interface,add(base,v->object_offset),add(base,v->witness_offset),v->nullable,v->target};
+    if(auto* v=std::get_if<SchemaOwnedFixed>(&node))return ReferenceEvent{ReferenceEvent::Kind::buffer,base,{},v->extent==0,v->element,v->extent};
+    if(auto* v=std::get_if<SchemaGrowable>(&node))return ReferenceEvent{ReferenceEvent::Kind::managed,base,{},false,v->header};
     return {};
 }
 }
@@ -108,7 +112,12 @@ ElementSchema::ElementSchema(ElementSchemaSpec spec) : spec_(std::move(spec)) {
                 if(!v.extent && (v.base || v.bytes)) bad("noncanonical empty GC repeat");
                 if(aligned(add(v.base,multiply(v.stride,v.extent)),v.alignment)!=v.bytes) bad("incorrect GC repeat extent");
                 s.bytes=v.bytes;s.alignment=v.alignment;s.depth=add(c.depth,1);s.references=v.extent && c.references;s.data=v.extent && c.data;s.zero_complete=!v.extent || c.zero_complete;
-            } else bad("owned/growable GC value role awaits later stage");
+            } else if constexpr(std::is_same_v<T,SchemaOwnedFixed> || std::is_same_v<T,SchemaGrowable>) {
+                if constexpr(std::is_same_v<T,SchemaOwnedFixed>) {text(v.element);if(v.extent>static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max()))throw std::length_error("nested fixed extent exceeds i64");}
+                else text(v.header);
+                s.bytes=sizeof(void*);s.alignment=alignof(void*);s.references=true;s.zero_complete=false;
+                if constexpr(std::is_same_v<T,SchemaOwnedFixed>)s.zero_complete=v.extent==0;
+            } else bad("unsupported GC value role");
         },node);
         summaries_.push_back(std::move(s));
     }

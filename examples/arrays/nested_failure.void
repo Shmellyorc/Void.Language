@@ -1,0 +1,11 @@
+func change(a: [[i32, 2]]) -> i32:
+    a.push([3, 4])
+    return 7
+func entry(mode: i32) -> i32:
+    var a: [[i32, 2]] = [[1, 2]]
+    if mode == 1:
+        a[0][0] += change(a)
+    if mode == 2:
+        var selected = a[0][change(a)]
+        return selected
+    return a[0][0]

@@ -11,6 +11,11 @@
 #include <map>
 
 namespace vd {
+// Native element geometry emitted from the shared LLVM DataLayout. This describes
+// the existing typed schema, not ownership or executable callbacks.
+struct NativeArrayField {const char* target;std::size_t offset;std::uint64_t extent;unsigned kind,nullable;};
+struct NativeArrayElement {const char* key;std::size_t bytes,alignment,count;const NativeArrayField* fields;};
+class ListModified final : public std::logic_error {public: using std::logic_error::logic_error;};
 class CallbackRegistration;
 // These are runtime embedding interfaces, not source-language thread features.
 class Runtime {
@@ -66,6 +71,22 @@ public:
     BufferLayoutRef fixed_scalar_layout(ScalarEncoding,std::uint64_t extent);
     BufferLayoutRef fixed_scalar_layout(RegisteredRootWord,ScalarEncoding,std::uint64_t extent);
     void validate_fixed_scalar_layout(const BufferLayoutRef&,ScalarEncoding,std::uint64_t extent) const;
+    BufferLayoutRef native_array_layout(const NativeArrayElement&,std::uint64_t capacity);
+    void array_new(void**,const BufferLayoutRef&,bool list,bool zero_live=false);
+    std::uint64_t array_count(RegisteredRootWord,const BufferLayoutRef&,bool list) const;
+    std::uint64_t array_version(RegisteredRootWord,const BufferLayoutRef&) const;
+    void array_read(void*,RegisteredRootWord,const BufferLayoutRef&,bool list,std::uint64_t) const;
+    void array_write(RegisteredRootWord,const BufferLayoutRef&,bool list,std::uint64_t,const void*,bool initialize=false,std::optional<std::uint64_t> version={});
+    void array_push(RegisteredRootWord,const ElementSchemaRef&,const void*);
+    void array_remove(void*,RegisteredRootWord,const ElementSchemaRef&,std::uint64_t);
+    void array_copy(void**,RegisteredRootWord,const BufferLayoutRef&);
+    void list_into(void**,ScalarEncoding,std::uint64_t count=0);
+    std::uint64_t list_count(RegisteredRootWord,ScalarEncoding) const;
+    std::uint64_t list_version(RegisteredRootWord,ScalarEncoding) const;
+    std::uint64_t list_read(RegisteredRootWord,ScalarEncoding,std::uint64_t index) const;
+    void list_write(RegisteredRootWord,ScalarEncoding,std::uint64_t index,std::uint64_t bits,std::optional<std::uint64_t> version={});
+    void list_push(RegisteredRootWord,ScalarEncoding,std::uint64_t bits);
+    std::uint64_t list_remove(RegisteredRootWord,ScalarEncoding,std::uint64_t index);
     const InterfaceWitness* witness(std::string_view) const;
     std::int64_t interface_binding(void* object,const void* witness,std::span<const char* const> keys) const;
     std::shared_ptr<const NominalDescriptor> descriptor(std::string_view) const;
@@ -97,6 +118,13 @@ private:
     void validate_buffer_layout(const BufferLayoutRef&) const; // mutex_ held
     ElementSchemaRef fixed_scalar_schema(ScalarEncoding);
     void validate_fixed_layout(const BufferLayoutRef&) const; // mutex_ held
+    struct ListHeader {void* backing;std::uint64_t count,capacity,version;};
+    void array_write_value(RegisteredRootWord,const ElementSchemaRef&,const BufferLayout*,std::uint64_t,const void*,bool,std::optional<std::uint64_t>);
+    static std::string list_identity(const ElementSchemaRef&);
+    ListHeader& list_header(RegisteredRootWord,const ElementSchemaRef&) const;
+    ListHeader& list_header(RegisteredRootWord,ScalarEncoding) const; // mutex_ held
+    void validate_native_element(const void*,DataCursor&,const ElementSchemaRef&) const;
+    void append_native(BufferBuilder&,const BufferLayoutRef&,const void*);
     void validate_fixed_output(void**,const BufferLayoutRef&) const;
     void store_scalar(RegisteredRootWord,const BufferLayoutRef&,std::uint64_t,
                       std::span<const SchemaStep>,std::uint64_t,bool fixed);

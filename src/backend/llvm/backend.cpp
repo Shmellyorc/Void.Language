@@ -85,10 +85,12 @@ void write_object(llvm::Module& module, llvm::TargetMachine& machine, const std:
     if (file.has_error()) throw std::runtime_error("object write failed");
 }
 bool contains_arrays(ir::Type t) {
-    if(ir::array_type(t)) return true;
+    if(ir::array_type(t)) return t.kind==ir::Type::fixed_array;
     if(t.kind==ir::Type::aggregate) for(const auto& field:t.definition->fields) if(contains_arrays(field.type)) return true;
     return false;
 }
+
+
 unsigned scalar_encoding(ir::Type t) {
     switch(t.kind) {
 #define VD_SCALAR(name) case ir::Type::name: return static_cast<unsigned>(ScalarEncoding::name)
@@ -113,14 +115,39 @@ std::string source_message(const SourceLocation& location, const std::string& ex
     return location.path + ":" + std::to_string(location.line) + ":" + std::to_string(location.column) +
         ": " + description + "\n" + excerpt;
 }
-std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& context,
+std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext& context,
                                   const std::string& suffix, const llvm::DataLayout& target_layout, const std::string& exported_entry,
                                   std::vector<NominalDescriptor>* host_catalog=nullptr,std::vector<InterfaceWitness>* host_witnesses=nullptr,
                                   llvm_backend::LoweringInventory* inventory=nullptr,
                                   bool fixed_call_research=false) {
+    // Pure default DAGs are outlined into ordinary private typed-IR functions.
+    // The normal shared lowerer supplies roots, failure cleanup and native ABI;
+    // defaults execute once per element without expanding IR by array extent.
     ir::InstructionTypes checked_types;
     std::map<std::string,ir::ReferenceEffects> verified_effects;
-    ir::validate(input, &checked_types,&verified_effects);
+    ir::validate(source,&checked_types,&verified_effects);
+    ir::Module input=source;
+    using Origin=std::tuple<std::string,unsigned,unsigned>;
+    std::map<Origin,Origin> origins;
+    std::map<Origin,std::string> defaults,outlined;
+    std::set<std::string> default_functions,names;std::size_t default_serial=0;
+    for(const auto& f:input.functions){names.insert(f.name);for(unsigned b=0;b<f.blocks.size();++b)for(unsigned i=0;i<f.blocks[b].instructions.size();++i)origins[{f.name,b,i}]={f.name,b,i};}
+    for(unsigned index=0;index<input.functions.size();++index) {
+        const auto owner=input.functions[index];
+        for(unsigned block=0;block<owner.blocks.size();++block)for(unsigned position=0;position<owner.blocks[block].instructions.size();++position) {
+            const auto& instruction=owner.blocks[block].instructions[position];
+            if(instruction.op!=ir::Op::fixed_array || !instruction.array_repeat || ir::scalar_fixed_array(instruction.type) || !*instruction.type.definition->extent)continue;
+            const auto prototype=instruction.arguments.front();const auto origin=origins.at({owner.name,block,prototype});
+            auto existing=defaults.find(origin);
+            if(existing!=defaults.end()){outlined[{owner.name,block,position}]=existing->second;continue;}
+            std::string name,short_name;do{short_name="$array_default_"+std::to_string(default_serial++);name=owner.module_identity.empty()?short_name:owner.module_identity+"::"+short_name;}while(names.contains(name));names.insert(name);default_functions.insert(name);defaults.emplace(origin,name);outlined[{owner.name,block,position}]=name;
+            std::set<unsigned> needed;std::function<void(unsigned)> collect=[&](unsigned id){if(!needed.insert(id).second)return;for(auto child:owner.blocks[block].instructions[id].arguments)collect(child);};collect(prototype);
+            ir::Function helper;helper.name=name;helper.source=instruction.source;helper.source_name=short_name;helper.module_identity=owner.module_identity;helper.visibility="private";helper.parameters.clear();helper.result=ir::array_element(instruction.type);helper.blocks.emplace_back();
+            std::map<unsigned,unsigned> remap;std::vector<ir::Type> helper_types;
+            for(auto id:needed){auto copied=owner.blocks[block].instructions[id];for(auto& child:copied.arguments)child=remap.at(child);auto next=static_cast<unsigned>(helper.blocks[0].instructions.size());remap[id]=next;origins[{name,0,next}]=origins.at({owner.name,block,id});helper.blocks[0].instructions.push_back(std::move(copied));helper_types.push_back(checked_types[index][block][id]);}
+            helper.blocks[0].end={ir::Terminator::Kind::return_value,remap.at(prototype)};input.functions.push_back(std::move(helper));checked_types.push_back({std::move(helper_types)});
+        }
+    }
     auto module = std::make_unique<llvm::Module>(input.identity, context);
     module->setDataLayout(target_layout);
 #ifdef VOID_LLVM_RESEARCH
@@ -153,7 +180,6 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
     auto* prepared_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty());
     std::function<llvm::Type*(ir::Type)> type = [&](ir::Type t) -> llvm::Type* {
         if(ir::array_type(t)) {
-            if(!ir::scalar_fixed_array(t)) throw std::invalid_argument("Native arrays require numeric or bool fixed-array elements; nested and growable arrays are not implemented");
             if(!input.coordinated) throw std::invalid_argument("Native fixed arrays require a coordinated Runtime");
             return b.getPtrTy();
         }
@@ -193,7 +219,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         // Scalar array payloads live in Runtime buffers; only their handles are
         // embedded in native values. Trace handles even though numeric element
         // shapes have no logical managed-reference leaves.
-        if(ir::scalar_fixed_array(t)) {result.push_back(base);return;}
+        if(ir::array_type(t)) {result.push_back(base);return;}
         if(t.kind==ir::Type::aggregate) {
             for(unsigned n=0;n<t.definition->fields.size();++n) reference_offsets(ir::field_type(t,n),base+field_offset(t,n),result);
             return;
@@ -213,6 +239,34 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
             return new llvm::GlobalVariable(*module, array_type, true, llvm::GlobalValue::PrivateLinkage,
                 llvm::ConstantArray::get(array_type, constants), "gc.offsets");
         };
+    auto element_key=[&](ir::Type t) {
+        if(numeric::number(t) || t==ir::Type::boolean)return std::string("void.fixed.scalar.v1/")+std::to_string(scalar_encoding(t));
+        return std::string("void.array.element.v1/")+std::to_string(t.kind)+":"+ir::Type::key(t)+(t.nullable?"?":"");
+    };
+    auto list_key=[&](ir::Type element) {auto key=element_key(element);constexpr std::string_view scalar="void.fixed.scalar.v1/";return key.starts_with(scalar) ? "void.list.v1/"+key.substr(scalar.size()) : "void.list.v2/"+key;};
+    auto* element_field_type=llvm::StructType::get(b.getPtrTy(),size_type,b.getInt64Ty(),b.getInt32Ty(),b.getInt32Ty());
+    auto* element_record_type=llvm::StructType::get(b.getPtrTy(),size_type,size_type,size_type,b.getPtrTy());
+    if(layout.getTypeAllocSize(element_field_type)!=sizeof(NativeArrayField) || layout.getStructLayout(element_field_type)->getElementOffset(3)!=offsetof(NativeArrayField,kind) || layout.getTypeAllocSize(element_record_type)!=sizeof(NativeArrayElement))throw std::invalid_argument("array element descriptor ABI mismatch");
+    std::map<ir::Type,llvm::Constant*> element_records;
+    auto element_record=[&](ir::Type root)->llvm::Constant* {
+        if(auto found=element_records.find(root);found!=element_records.end())return found->second;
+        std::vector<llvm::Constant*> fields;
+        std::function<void(ir::Type,std::uint64_t)> visit=[&](ir::Type t,std::uint64_t offset) {
+            if(t.kind==ir::Type::aggregate) {for(unsigned n=0;n<t.definition->fields.size();++n)visit(ir::field_type(t,n),offset+field_offset(t,n));return;}
+            unsigned kind;std::string target;std::uint64_t extent=0;
+            if(numeric::number(t) || t==ir::Type::boolean)kind=scalar_encoding(t);
+            else if(t.kind==ir::Type::managed_ref){kind=11;target=ir::Type::key(t);}
+            else if(t.kind==ir::Type::string)kind=12;
+            else if(t.kind==ir::Type::interface_ref){kind=13;target=ir::Type::key(t);}
+            else if(t.kind==ir::Type::fixed_array){kind=14;target=element_key(ir::array_element(t));extent=*t.definition->extent;}
+            else if(t.kind==ir::Type::growable_array){kind=15;target=list_key(ir::array_element(t));}
+            else throw std::invalid_argument("unsupported native array element");
+            fields.push_back(llvm::ConstantStruct::get(element_field_type,{b.CreateGlobalStringPtr(target),llvm::ConstantInt::get(size_type,offset),b.getInt64(extent),b.getInt32(kind),b.getInt32(t.nullable)}));
+        };visit(root,0);
+        auto* fields_type=llvm::ArrayType::get(element_field_type,fields.size());auto* data=new llvm::GlobalVariable(*module,fields_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantArray::get(fields_type,fields),"array.element.fields");
+        auto* record=new llvm::GlobalVariable(*module,element_record_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantStruct::get(element_record_type,{b.CreateGlobalStringPtr(element_key(root)),llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(type(root))),llvm::ConstantInt::get(size_type,layout.getABITypeAlign(type(root)).value()),llvm::ConstantInt::get(size_type,fields.size()),data}),"array.element");
+        element_records.emplace(root,record);return record;
+    };
     auto* signature = llvm::FunctionType::get(b.getInt32Ty(), {b.getInt32Ty()}, false);
     std::map<std::string, llvm::Function*> functions;
     for (const auto& name : input.imports)
@@ -225,12 +279,12 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         // Source-private bodies are called within this LLVM module, including
         // bodies from the flattened import graph. Keep the selected host entry
         // lookup-visible, and preserve public/project and legacy native exports.
-        const auto linkage = !f.module_identity.empty() && f.visibility == "private" && f.name != exported_entry
+        const auto linkage = default_functions.contains(f.name) || (!f.module_identity.empty() && f.visibility == "private" && f.name != exported_entry)
             ? llvm::Function::InternalLinkage : llvm::Function::ExternalLinkage;
         functions[f.name] = llvm::Function::Create(function_type, linkage, native_symbol(f, suffix), *module);
     }
     std::map<std::string,ir::Type> nominal_types;
-    for(auto t:input.nominal_types) if(t.kind==ir::Type::managed_ref) nominal_types.emplace(t.definition->identity,t);
+    for(auto t:input.nominal_types) if(t.kind==ir::Type::managed_ref || t.kind==ir::Type::interface_ref) nominal_types.emplace(t.definition->identity,t);
     auto* record_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type);
     const auto* record_layout=layout.getStructLayout(record_type);
     if(record_layout->getSizeInBytes()!=sizeof(RuntimeTypeRecord) || record_layout->getElementOffset(3)!=offsetof(RuntimeTypeRecord,size) || record_layout->getElementOffset(5)!=offsetof(RuntimeTypeRecord,count))
@@ -238,10 +292,11 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
     auto string=[&](const std::string& text) {return b.CreateGlobalStringPtr(text,"",0,module.get());};
     std::vector<llvm::Constant*> records,keys;
     for(const auto& [key,t]:nominal_types) {
-        std::vector<std::uint64_t> offsets; reference_offsets(ir::Type(t.definition),0,offsets);
-        auto bytes=std::max<std::uint64_t>(1,layout.getTypeAllocSize(type(ir::Type(t.definition))));
+        auto payload=t.kind==ir::Type::interface_ref ? t : ir::Type(t.definition);
+        std::vector<std::uint64_t> offsets;reference_offsets(payload,0,offsets);
+        auto bytes=std::max<std::uint64_t>(1,layout.getTypeAllocSize(type(payload)));
         auto base=t.definition->base.lock();
-        std::string shape=std::to_string(bytes)+":"+std::to_string(layout.getABITypeAlign(type(ir::Type(t.definition))).value());
+        std::string shape=(t.kind==ir::Type::interface_ref ? "interface:" : "")+std::to_string(bytes)+":"+std::to_string(layout.getABITypeAlign(type(payload)).value());
         for(unsigned n=0;n<t.definition->fields.size();++n) {
             const auto& field=t.definition->fields[n];
             for(const auto& part:{field.name,field.owner,ir::type_name(field.type),std::to_string(field_offset(t,n))}) shape+="|"+std::to_string(part.size())+":"+part;
@@ -295,7 +350,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         access_contract+=encoded(ir::type_name(t))+encoded(std::to_string(t.kind))+encoded(t.definition->module_identity)+encoded(t.definition->visibility);auto base=t.definition->base.lock();access_contract+=encoded(base ? base->identity : "");
         for(const auto& field:t.definition->fields) access_contract+=encoded(field.name)+encoded(field.owner)+encoded(ir::type_name(field.type))+(field.using_field ? "U;" : "F;");
     }
-    for(const auto& f:input.functions) {access_contract+=encoded(f.name)+encoded(f.visibility)+encoded(f.virtual_slot);for(auto t:f.parameters) access_contract+=encoded(ir::type_name(t))+encoded(ir::capability_key(t));access_contract+=encoded(ir::type_name(f.result))+encoded(ir::capability_key(f.result));}
+    for(const auto& f:input.functions) if(!default_functions.contains(f.name)){access_contract+=encoded(f.name)+encoded(f.visibility)+encoded(f.virtual_slot);for(auto t:f.parameters) access_contract+=encoded(ir::type_name(t))+encoded(ir::capability_key(t));access_contract+=encoded(ir::type_name(f.result))+encoded(ir::capability_key(f.result));}
     for(const auto& r:input.interface_requirements) {
         auto& text=interface_contracts[ir::Type::key(r.parameters[0])];text+=encoded(r.name)+encoded(ir::type_name(r.result))+encoded(ir::capability_key(r.result));
         for(auto t:r.parameters) text+=encoded(ir::type_name(t))+encoded(ir::capability_key(t));
@@ -365,7 +420,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 members.push_back(debug.createMemberType(file,std::to_string(n),file,0,layout.getTypeSizeInBits(part),layout.getABITypeAlign(part).value()*8,offsets->getElementOffsetInBits(n),llvm::DINode::FlagZero,debug_part));}
             return debug.createStructType(file,ir::type_name(t),file,0,offsets->getSizeInBits(),layout.getABITypeAlign(native).value()*8,llvm::DINode::FlagZero,nullptr,debug.getOrCreateArray(members));
         }
-        if (ir::scalar_fixed_array(t)) return debug.createPointerType(nullptr,layout.getPointerSizeInBits(),0,{},ir::type_name(t));
+        if (ir::array_type(t)) return debug.createPointerType(nullptr,layout.getPointerSizeInBits(),0,{},ir::type_name(t));
         if (t == ir::Type::none) return nullptr;
         if (t.kind == ir::Type::aggregate) {
             if (auto found = debug_aggregates.find(t.definition->identity); found != debug_aggregates.end()) return found->second;
@@ -441,17 +496,49 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
         for(auto t:f.locals) plan_copy(t);
         plan_copy(f.result);
         for(const auto& block:instruction_types) for(auto t:block) plan_copy(t);
+        std::map<ir::Type,llvm::Value*> element_staging,copy_cursors,array_sources;
+        auto plan_element=[&](ir::Type child){if(!element_staging.contains(child)){auto* storage=home(b.CreateAlloca(type(child)),StorageRole::copy,llvm_backend::HomeKind::copy);b.CreateStore(llvm::Constant::getNullValue(type(child)),storage);element_staging.emplace(child,storage);}};
+        std::set<ir::Type> planned;
+        std::function<void(ir::Type)> plan_elements=[&](ir::Type t) {
+            if(ir::scalar_array(t))return;
+            if(!planned.insert(t).second)return;
+            if(ir::array_type(t)) {
+                auto child=ir::array_element(t);
+                plan_element(child);
+                auto* source=home(b.CreateAlloca(type(t)),StorageRole::copy,llvm_backend::HomeKind::copy);b.CreateStore(llvm::Constant::getNullValue(type(t)),source);array_sources.emplace(t,source);
+                auto* cursor=home(b.CreateAlloca(b.getInt64Ty()),StorageRole::copy,llvm_backend::HomeKind::copy);copy_cursors.emplace(t,cursor);
+                if(!copy_staging.contains(t)){auto* copy=home(b.CreateAlloca(type(t)),StorageRole::copy,llvm_backend::HomeKind::copy);b.CreateStore(llvm::Constant::getNullValue(type(t)),copy);copy_staging.emplace(t,copy);}
+                plan_elements(child);
+            } else if(t.kind==ir::Type::aggregate)for(const auto& field:t.definition->fields)plan_elements(field.type);
+        };
+        for(auto t:f.locals)plan_elements(t);plan_elements(f.result);for(const auto& block:instruction_types)for(auto t:block)plan_elements(t);
+        for(const auto& block:f.blocks)for(const auto& i:block.instructions)if(i.op==ir::Op::array_allocate)plan_element(ir::array_element(i.type));
         std::function<void(ir::Type,llvm::Value*,llvm::Value*,const std::function<void()>&)> copy_value;
         copy_value=[&](ir::Type t,llvm::Value* destination,llvm::Value* source,const std::function<void()>& check_failure) {
             if(ir::scalar_fixed_array(t)) {
-                b.CreateCall(module->getOrInsertFunction("vd_array_copy",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),
-                    {destination,source,b.getInt32(scalar_encoding(ir::array_element(t))),b.getInt64(*t.definition->extent),failure});
-                check_failure();return;
+                b.CreateCall(module->getOrInsertFunction("vd_array_copy",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{destination,source,b.getInt32(scalar_encoding(ir::array_element(t))),b.getInt64(*t.definition->extent),failure});check_failure();return;
+            }
+            if(t.kind==ir::Type::fixed_array) {
+                b.CreateStore(b.CreateLoad(type(t),source),array_sources.at(t));source=array_sources.at(t);
+                auto child=ir::array_element(t);auto* record=element_record(child);auto* count=b.getInt64(*t.definition->extent);
+                b.CreateCall(module->getOrInsertFunction("vd_value_array_copy",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy()),{destination,source,record,count,failure});check_failure();
+                if(!contains_arrays(child))return;
+                source=destination;
+                auto* cursor=copy_cursors.at(t);b.CreateStore(b.getInt64(0),cursor);
+                auto* test=llvm::BasicBlock::Create(context,"array.copy.test",fn);auto* body=llvm::BasicBlock::Create(context,"array.copy.body",fn);auto* done=llvm::BasicBlock::Create(context,"array.copy.done",fn);b.CreateBr(test);b.SetInsertPoint(test);auto* index=b.CreateLoad(b.getInt64Ty(),cursor);b.CreateCondBr(b.CreateICmpULT(index,count),body,done);b.SetInsertPoint(body);
+                auto* temporary=element_staging.at(child);
+                b.CreateCall(module->getOrInsertFunction("vd_value_array_read",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{temporary,source,record,count,b.getInt32(0),index,failure});check_failure();
+                // The selected native value remains a precise whole-value root while
+                // recursive child copies allocate. Publication follows their success.
+                if(contains_arrays(child)) {
+                    auto* copied=copy_staging.contains(child)?copy_staging.at(child):temporary;copy_value(child,copied,temporary,check_failure);temporary=copied;
+                }
+                b.CreateCall(module->getOrInsertFunction("vd_value_array_write",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt32Ty(),b.getPtrTy()),{destination,record,count,b.getInt32(0),index,temporary,b.getInt64(0),b.getInt32(0),b.getInt32(0),failure});check_failure();b.CreateStore(b.CreateAdd(index,b.getInt64(1)),cursor);b.CreateBr(test);b.SetInsertPoint(done);return;
             }
             b.CreateStore(b.CreateLoad(type(t),source),destination);
-            for(unsigned field=0;field<t.definition->fields.size();++field) {
+            if(t.kind==ir::Type::aggregate)for(unsigned field=0;field<t.definition->fields.size();++field) {
                 auto child=ir::field_type(t,field);
-                if(contains_arrays(child)) copy_value(child,field_address(t,destination,field),field_address(t,source,field),check_failure);
+                if(contains_arrays(child))copy_value(child,field_address(t,destination,field),field_address(t,source,field),check_failure);
             }
         };
         std::vector<std::vector<llvm::Value*>> value_roots(f.blocks.size());
@@ -477,6 +564,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
             };
             for (unsigned i = 0; i < slots.size(); ++i) add_root(f.locals[i],slots[i]);
             for(auto [t,storage]:copy_staging) add_root(t,storage);
+            for(auto [t,storage]:element_staging) add_root(t,storage);
+            for(auto [t,storage]:array_sources) add_root(t,storage);
             for (auto [slot,storage]:stage_storage) add_root(ir::Type(f.locals[slot].definition),storage);
             for (unsigned i = 0; i < f.parameters.size(); ++i) {
                 if (f.parameters[i].construction) { add_root(ir::Type(f.parameters[i].definition),fn->getArg(i)); continue; }
@@ -531,6 +620,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 auto operand_type = [&](unsigned id) { return value_types.at(id); };
                 auto guard_complete = [&](ir::Type value_type,llvm::Value* value) {
                     for (const auto& path:ir::reference_paths(value_type)) {
+                        if(std::find(path.begin(),path.end(),ir::array_element_path)!=path.end())continue;
                         auto leaf=value_type;
                         for (auto field:path) leaf=ir::field_type(leaf,field);
                         auto* reference=path.empty() ? value : b.CreateExtractValue(value,path);
@@ -546,21 +636,52 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                         } else if(!leaf.nullable) fail_if(b.CreateIsNull(reference),"Null supplied for non-nullable field");
                     }
                 };
-                auto array_failure=[&] {fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Fixed array operation failed");};
+                auto array_failure=[&] {fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Array operation failed");};
+                auto native_arg=[&](ir::Type t,unsigned id,bool own=false)->llvm::Value* {
+                    auto* source=value_roots[n].at(id);
+                    if(!source){source=element_staging.at(t);b.CreateStore(values[id],source);}
+                    if(own && contains_arrays(t)){auto* destination=copy_staging.at(t);copy_value(t,destination,source,array_failure);return destination;}
+                    return source;
+                };
+                auto native_write=[&](ir::Type array,llvm::Value* owner,llvm::Value* index,llvm::Value* value,bool initialize=false,llvm::Value* version=nullptr) {
+                    b.CreateCall(module->getOrInsertFunction("vd_value_array_write",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt32Ty(),b.getPtrTy()),{owner,element_record(ir::array_element(array)),b.getInt64(array.definition->extent.value_or(0)),b.getInt32(array.kind==ir::Type::growable_array),index,value,version?version:b.getInt64(0),b.getInt32(version!=nullptr),b.getInt32(initialize),failure});array_failure();
+                };
                 auto bits=[&](llvm::Value* value,ir::Type t)->llvm::Value* {
                     if(numeric::floating(t)) value=b.CreateBitCast(value,b.getIntNTy(numeric::width(t)));
                     return b.CreateZExtOrTrunc(value,b.getInt64Ty());
                 };
-                auto array_index=[&](unsigned id,ir::Type array)->llvm::Value* {
+                auto array_index=[&](unsigned id,ir::Type array,unsigned owner)->llvm::Value* {
                     auto index_type=operand_type(id);auto* index=values.at(id);
                     index=numeric::signed_integer(index_type)?b.CreateSExtOrTrunc(index,b.getInt64Ty()):b.CreateZExtOrTrunc(index,b.getInt64Ty());
-                    auto* count=b.getInt64(*array.definition->extent);
+                    llvm::Value* count;
+                    if(array.kind==ir::Type::growable_array) {
+                        count=ir::scalar_array(array) ? b.CreateCall(module->getOrInsertFunction("vd_list_count",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{value_roots[n].at(owner),b.getInt32(scalar_encoding(ir::array_element(array))),failure}) : b.CreateCall(module->getOrInsertFunction("vd_value_array_count",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{value_roots[n].at(owner),element_record(ir::array_element(array)),failure});array_failure();
+                    } else count=b.getInt64(*array.definition->extent);
                     if(numeric::signed_integer(index_type)) index=b.CreateSelect(b.CreateICmpSLT(index,b.getInt64(0)),b.CreateAdd(index,count),index);
-                    fail_if(b.CreateICmpUGE(index,count),"Fixed array index outside extent");return index;
+                    fail_if(b.CreateICmpUGE(index,count),array.kind==ir::Type::growable_array ? "List index outside extent" : "Fixed array index outside extent");return index;
                 };
                 switch (instruction.op) {
                 case Op::fixed_array: {
                     auto t=instruction.type;auto* storage=value_roots[n].at(values.size());
+                    if(!ir::scalar_array(t)) {
+                        auto child=ir::array_element(t);auto* count=b.getInt64(t.definition->extent.value_or(instruction.arguments.size()));
+                        b.CreateCall(module->getOrInsertFunction("vd_value_array_new",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getPtrTy()),{storage,element_record(child),count,b.getInt32(t.kind==ir::Type::growable_array),failure});array_failure();
+                        if(instruction.array_repeat && *t.definition->extent) {
+                            auto* cursor=copy_cursors.at(t);b.CreateStore(b.getInt64(0),cursor);
+                            auto* test=llvm::BasicBlock::Create(context,"array.default.test",fn);auto* body=llvm::BasicBlock::Create(context,"array.default.body",fn);auto* done=llvm::BasicBlock::Create(context,"array.default.done",fn);b.CreateBr(test);b.SetInsertPoint(test);auto* index=b.CreateLoad(b.getInt64Ty(),cursor);b.CreateCondBr(b.CreateICmpULT(index,count),body,done);b.SetInsertPoint(body);
+                            auto* value=b.CreateCall(functions.at(outlined.at({f.name,n,static_cast<unsigned>(values.size())})),{failure});array_failure();auto* temporary=element_staging.at(child);b.CreateStore(value,temporary);native_write(t,storage,index,temporary,true);
+                            b.CreateStore(b.CreateAdd(index,b.getInt64(1)),cursor);b.CreateBr(test);b.SetInsertPoint(done);
+                        } else for(unsigned i=0;i<instruction.arguments.size();++i)native_write(t,storage,b.getInt64(i),native_arg(child,instruction.arguments[i],true),true);
+                        v=b.CreateLoad(type(t),storage);break;
+                    }
+                    if(t.kind==ir::Type::growable_array) {
+                        auto* encoding=b.getInt32(scalar_encoding(ir::array_element(t)));
+                        b.CreateCall(module->getOrInsertFunction("vd_list_new",b.getVoidTy(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{storage,encoding,b.getInt64(instruction.arguments.size()),failure});array_failure();
+                        for(unsigned i=0;i<instruction.arguments.size();++i) {
+                            b.CreateCall(module->getOrInsertFunction("vd_list_write",b.getVoidTy(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getInt64Ty(),b.getInt64Ty(),b.getInt32Ty(),b.getPtrTy()),{storage,encoding,b.getInt64(i),bits(values[instruction.arguments[i]],ir::array_element(t)),b.getInt64(0),b.getInt32(0),failure});array_failure();
+                        }
+                        v=b.CreateLoad(type(t),storage);break;
+                    }
                     auto* encoding=b.getInt32(scalar_encoding(ir::array_element(t)));auto* count=b.getInt64(*t.definition->extent);
                     auto* initial=instruction.array_repeat && !instruction.arguments.empty()?bits(values[instruction.arguments.front()],ir::array_element(t)):static_cast<llvm::Value*>(b.getInt64(0));
                     b.CreateCall(module->getOrInsertFunction("vd_array_default",b.getVoidTy(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getInt64Ty(),b.getPtrTy()),{storage,encoding,count,initial,failure});array_failure();
@@ -572,10 +693,20 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                 }
                 case Op::array_get: case Op::array_set: case Op::fixed_snapshot: {
                     auto t=operand_type(instruction.a);auto* source=value_roots[n].at(instruction.a);
-                    llvm::Value* index=instruction.op==Op::fixed_snapshot?nullptr:array_index(instruction.b,t);
-                    auto* encoding=b.getInt32(scalar_encoding(ir::array_element(t)));auto* count=b.getInt64(*t.definition->extent);
+                    llvm::Value* index=instruction.op==Op::fixed_snapshot?nullptr:array_index(instruction.b,t,instruction.a);
+                    if(!ir::scalar_array(t)) {
+                        auto child=ir::array_element(t);auto* count=b.getInt64(t.definition->extent.value_or(0));
+                        if(instruction.op==Op::array_get) {
+                            auto* result=element_staging.at(child);
+                            b.CreateCall(module->getOrInsertFunction("vd_value_array_read",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{result,source,element_record(child),count,b.getInt32(t.kind==ir::Type::growable_array),index,failure});array_failure();v=b.CreateLoad(type(child),result);
+                        } else {auto* result=value_roots[n].at(values.size());copy_value(t,result,source,array_failure);native_write(t,result,index,native_arg(child,instruction.arguments.front(),true));v=b.CreateLoad(type(t),result);}
+                        break;
+                    }
+                    auto* encoding=b.getInt32(scalar_encoding(ir::array_element(t)));auto* count=b.getInt64(t.definition->extent.value_or(0));
                     if(instruction.op==Op::array_get) {
-                        auto* value=b.CreateCall(module->getOrInsertFunction("vd_array_read",b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,index,encoding,count,failure});array_failure();
+                        auto* value=t.kind==ir::Type::growable_array ?
+                            b.CreateCall(module->getOrInsertFunction("vd_list_read",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,encoding,index,failure}) :
+                            b.CreateCall(module->getOrInsertFunction("vd_array_read",b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,index,encoding,count,failure});array_failure();
                         auto element=ir::array_element(t);auto* narrow=b.CreateTruncOrBitCast(value,b.getIntNTy(numeric::width(element)));
                         v=numeric::floating(element)?b.CreateBitCast(narrow,type(element)):narrow;
                     } else {
@@ -586,6 +717,48 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& input, llvm::LLVMContext& 
                                 {destination,index,bits(values[instruction.arguments[0]],ir::array_element(t)),encoding,count,failure});array_failure();
                         }
                         v=b.CreateLoad(type(t),destination);
+                    }
+                    break;
+                }
+                case Op::array_allocate: {
+                    auto t=instruction.type;auto* result=value_roots[n].at(values.size());b.CreateCall(module->getOrInsertFunction("vd_value_array_new",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getPtrTy()),{result,element_record(ir::array_element(t)),b.getInt64(*t.definition->extent),b.getInt32(0),failure});array_failure();v=b.CreateLoad(type(t),result);break;
+                }
+                case Op::array_initialize: {
+                    auto t=operand_type(instruction.a);native_write(t,value_roots[n].at(instruction.a),values[instruction.b],native_arg(ir::array_element(t),instruction.arguments[0],true),true);break;
+                }
+                case Op::array_capture: v=b.CreateStore(values[instruction.a],slots.at(instruction.immediate));break;
+                case Op::list_check: {
+                    auto t=operand_type(instruction.a);
+                    auto* version=ir::scalar_array(t) ? b.CreateCall(module->getOrInsertFunction("vd_list_version",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{value_roots[n].at(instruction.a),b.getInt32(scalar_encoding(ir::array_element(t))),failure}) : b.CreateCall(module->getOrInsertFunction("vd_value_array_version",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{value_roots[n].at(instruction.a),element_record(ir::array_element(t)),failure});array_failure();
+                    fail_if(b.CreateICmpNE(version,values[instruction.b]),"List structurally modified during iteration");break;
+                }
+                case Op::array_count: case Op::list_version: {
+                    auto t=operand_type(instruction.a);
+                    if(t.kind==ir::Type::fixed_array)v=b.getInt64(*t.definition->extent);
+                    else if(!ir::scalar_array(t)){v=b.CreateCall(module->getOrInsertFunction(instruction.op==Op::list_version ? "vd_value_array_version" : "vd_value_array_count",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{value_roots[n].at(instruction.a),element_record(ir::array_element(t)),failure});array_failure();}
+                    else {v=b.CreateCall(module->getOrInsertFunction(instruction.op==Op::list_version ? "vd_list_version" : "vd_list_count",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{value_roots[n].at(instruction.a),b.getInt32(scalar_encoding(ir::array_element(t))),failure});array_failure();}
+                    break;
+                }
+                case Op::list_index: case Op::list_push: case Op::list_remove: case Op::list_commit: {
+                    auto t=operand_type(instruction.a);auto element=ir::array_element(t);auto* source=value_roots[n].at(instruction.a);
+                    if(!ir::scalar_array(t)) {
+                        if(instruction.op==Op::list_index){v=array_index(instruction.b,t,instruction.a);break;}
+                        if(instruction.op==Op::list_commit)native_write(t,source,values[instruction.b],native_arg(element,instruction.arguments[0],true),false,values[instruction.arguments[1]]);
+                        else if(instruction.op==Op::list_push){b.CreateCall(module->getOrInsertFunction("vd_value_array_push",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{source,element_record(element),native_arg(element,instruction.b,true),failure});array_failure();}
+                        else {auto* index=array_index(instruction.b,t,instruction.a);auto* result=element_staging.at(element);b.CreateCall(module->getOrInsertFunction("vd_value_array_remove",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy()),{result,source,element_record(element),index,failure});array_failure();v=b.CreateLoad(type(element),result);}
+                        break;
+                    }
+                    auto* encoding=b.getInt32(scalar_encoding(element));
+                    if(instruction.op==Op::list_index) {v=array_index(instruction.b,t,instruction.a);break;}
+                    if(instruction.op==Op::list_push) {
+                        v=b.CreateCall(module->getOrInsertFunction("vd_list_push",b.getVoidTy(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,encoding,bits(values[instruction.b],element),failure});array_failure();
+                    } else if(instruction.op==Op::list_commit) {
+                        v=b.CreateCall(module->getOrInsertFunction("vd_list_write",b.getVoidTy(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getInt64Ty(),b.getInt64Ty(),b.getInt32Ty(),b.getPtrTy()),{source,encoding,values[instruction.b],bits(values[instruction.arguments[0]],element),values[instruction.arguments[1]],b.getInt32(1),failure});
+                        fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"List selected write invalidated or failed");
+                    } else {
+                        auto* index=array_index(instruction.b,t,instruction.a);
+                        auto* value=b.CreateCall(module->getOrInsertFunction("vd_list_remove",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,encoding,index,failure});array_failure();
+                        auto* narrow=b.CreateTruncOrBitCast(value,b.getIntNTy(numeric::width(element)));v=numeric::floating(element)?b.CreateBitCast(narrow,type(element)):narrow;
                     }
                     break;
                 }
@@ -945,6 +1118,9 @@ Jit::Jit() : impl_(std::make_shared<Impl>()) {
     bind("vd_string_literal",vd_string_literal); bind("vd_string_concat",vd_string_concat); bind("vd_string_equal",vd_string_equal);
     bind("vd_array_default",vd_array_default);bind("vd_array_copy",vd_array_copy);
     bind("vd_array_read",vd_array_read);bind("vd_array_write",vd_array_write);
+    bind("vd_value_array_new",vd_value_array_new);bind("vd_value_array_count",vd_value_array_count);bind("vd_value_array_version",vd_value_array_version);bind("vd_value_array_read",vd_value_array_read);bind("vd_value_array_write",vd_value_array_write);bind("vd_value_array_push",vd_value_array_push);bind("vd_value_array_remove",vd_value_array_remove);bind("vd_value_array_copy",vd_value_array_copy);
+    bind("vd_list_new",vd_list_new);bind("vd_list_count",vd_list_count);bind("vd_list_version",vd_list_version);
+    bind("vd_list_read",vd_list_read);bind("vd_list_write",vd_list_write);bind("vd_list_push",vd_list_push);bind("vd_list_remove",vd_list_remove);
     bind("vd_gc_construct",vd_gc_construct);
     bind("vd_gc_construct_typed",vd_gc_construct_typed);
     bind("vd_gc_dynamic_type",vd_gc_dynamic_type);

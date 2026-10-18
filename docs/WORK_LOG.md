@@ -10760,3 +10760,284 @@ C++ compiler/Runtime/tests are instrumented. Existing fixed-array scope limits,
 eager copies/root retention and worst-case linear lookups remain documented.
 No new feature or speculative optimization was added. No commits, pushes,
 branches, remote modifications or hosted CI launches were performed. Stop here.
+
+## 17 October 2026: Production numeric/bool growable arrays
+
+Implemented the owner's complete growable-array feature against clean baseline
+7170502f4b2cba4986264b51d4c046833148df40. The owner reports baseline CI #60 green
+(7/7); no hosted run was launched or independently claimed for these changes.
+Orders 1–5 remain in place: research is optional/OFF in the production build,
+private calls use normal LLVM lowering, fixed arrays retain independent snapshots,
+Runtime/root improvements remain, and function linkage policy is unchanged.
+
+### Implementation
+
+- The existing structural `[T]` type now supports all ten numeric types and bool
+  in real source. Contextual empty literals, inferred nonempty literals, defaults,
+  count (also fixed arrays), push/remove, signed/unsigned checked indexing and
+  compounds use the existing frontend and typed IR. No later-statement inference
+  for an unannotated empty literal was added.
+- Growable handles participate in the existing logical reference leaf/capability
+  model and precise root maps. Assignment, arguments, returns and aggregate copies
+  preserve header identity; fresh literals/defaults are independent. An aggregate
+  containing both fixed and growable arrays copies the fixed value independently
+  while retaining the growable alias. Readonly authority survives aliasing and
+  function/field propagation; source and independent IR negatives enforce it.
+- Selected writes snapshot the rooted header, checked normalized index, structural
+  version and (for compounds) old scalar before RHS evaluation. Rebinding does not
+  redirect the write. RHS push/remove invalidates commit even when count is restored.
+  Scalar element mutations during the RHS remain visible.
+- `src/runtime/list.cpp` uses an ordinary existing GC object for the stable header
+  and the existing scalar buffer/schema/BufferBuilder for replaceable storage.
+  Empty headers have no buffer. Growth is geometric, arithmetic checked, copies
+  poll under existing read leases, and publication updates the header only after
+  a complete replacement and version check. In-capacity mutation/removal completes
+  under the Runtime lock; unused tail bytes are cleared and live prefix updated.
+  There is no new collector, allocator, ownership registry or certification scheme.
+- Shared LLVM lowering binds ordinary Runtime C helpers for both ORC and AOT;
+  LLVM handles the native ABI. Growable values are rooted pointer-sized handles,
+  not fixed-array snapshots or native payload allocas. The existing CMake CLI
+  fixture loop is shared by fixed/growable families rather than copied.
+- Added seven ordinary source examples, the focused `growable_arrays_source`
+  harness and `growable_arrays_cli` integration suite. Replaced the now-obsolete
+  foundation assertion rejecting `[i32]` with a still-unsupported nested-list
+  negative; positive production list tests cover the newly supported type.
+  README, FIXED_ARRAYS, ARRAYS_PROPOSAL and WRENCH link the new GROWABLE_ARRAYS doc.
+
+### Genuine failures found and repaired
+
+The initial list-parameter lowering reached the old numeric debug-type fallback
+and threw "Not a numeric type". Array pointer debug types now cover both kinds.
+The focused reference-value regression then exposed an overly broad readonly view
+on pure module templates: an existing null reference field became permanently
+readonly, preventing replacement with a fresh mutable object. Constant materialization
+now adds readonly authority only to actual list leaves, preserving existing null
+reference-template behavior. The original `reference_values/templates.void` passes,
+and a new negative prevents thawing a list field inside a constant value template.
+No existing safety assertion or sanitizer was disabled.
+
+### Focused local verification
+
+LLVM: `/usr/bin/llvm-config-19 --version` reports **19.1.7**. Default production
+configuration has `VOID_LLVM_RESEARCH:BOOL=OFF`. Final Debug focused CTest run:
+**18/18 passed**, 34.38 seconds. This includes the new source/CLI suites, fixed
+source/CLI arrays, array foundation, GC buffers/schemas, coordination/generated
+Runtime, managed/reference values, core, frontend, analysis, tooling, modules,
+JIT and reload. The growable CLI suite executes **80** normal/O2 JIT/linked-AOT
+cases, including 16 expected checked failures. A subsequent mixed fixed/list
+field-copy regression rerun passed both growable suites.
+
+The source harness additionally passed these deterministic allocation sweeps:
+15 failing budgets for growth, 1 for in-capacity push, 1 for removal, 12 for a
+replacement empty header, 48 for cold metadata/header/backing construction, and
+35 each for normal/O2 source invocation. Every failed budget verifies unchanged
+published state, collection/cleanup and successful retry. Wrong scalar encoding,
+unregistered root words, unrepresentable extent and stale selected versions
+reject. Concurrent collection parks live list operations and preserves all 4097
+elements through resizing; all roots balance and all objects collect afterwards.
+All numeric/bool element types and all eight integer index types execute; signed
+minimum and unsigned maximum indexes fail safely. Readonly and malformed IR
+negatives pass.
+
+Strict final ASan/UBSan/leak result: **5/5 passed**, 18.54 seconds (growable
+source, fixed source, reference-value source, GC buffers and coordination).
+
+The large source example grows 262145 u64 elements (more than 2 MiB live payload,
+4 MiB backing capacity), aliases/mutates/removes and returns **262151** for input
+7 through all four modes under a **1 MiB stack**. All four runs passed.
+
+Reproducible build commands and exact focused test commands (from repository root;
+existing pinned build directories):
+
+```sh
+cmake -S . -B build/order1/production
+python3 - <<'PY'
+import subprocess
+families = [('growable_arrays', 'main aliases selection invalidation indexes numeric large'),
+            ('fixed_arrays', 'main copies order numeric indexes index_types empty large value_fields bounds_order loops')]
+targets = ['void_' + family + '_cli_' + program + '_' + mode
+           for family, programs in families for program in programs.split()
+           for mode in ['normal', 'optimized']]
+targets += ['void_fixed_arrays_tests', 'void_growable_arrays_tests', 'void_gc_buffers',
+            'void_gc_schemas', 'void_runtime_tests', 'void_runtime_generated',
+            'void_managed_tests', 'void_reference_values_tests', 'void_tests']
+subprocess.run(['cmake', '--build', 'build/order1/production', '--target', *targets, '-j2'], check=True)
+PY
+ctest --test-dir build/order1/production -R '^(growable_arrays_source|growable_arrays_cli|fixed_arrays_source|fixed_arrays_cli|arrays_foundation|gc_buffers|gc_schemas|runtime_coordination|runtime_generated|managed_source|reference_values_source|core|frontend|analysis|tooling|modules|jit|reload)$' --output-on-failure -j2
+build/order1/production/void_growable_arrays_tests .
+cmake --build build/order1/production --target void_growable_arrays_cli_aliases_normal void_growable_arrays_cli_aliases_optimized -j2
+ctest --test-dir build/order1/production -R '^growable_arrays_(source|cli)$' --output-on-failure
+cmake -S . -B build/ci-sanitizers -DVOID_LLVM_RESEARCH=OFF -DVOID_SANITIZERS=ON
+# Outside the tracing sandbox, retaining all strict sanitizer settings:
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 cmake --build build/ci-sanitizers --target void_growable_arrays_tests void_fixed_arrays_tests void_reference_values_tests void_gc_buffers void_runtime_tests -j2
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers -R '^(growable_arrays_source|fixed_arrays_source|reference_values_source|gc_buffers|runtime_coordination)$' --output-on-failure
+(
+  ulimit -s 1024
+  build/order1/production/voidc run examples/growable_arrays/large.void 7 --no-opt
+  build/order1/production/voidc run examples/growable_arrays/large.void 7
+  build/order1/production/void_growable_arrays_cli_large_normal 7
+  build/order1/production/void_growable_arrays_cli_large_optimized 7
+)
+git diff --check
+```
+
+Detailed logs are in build/growable/: final-tests.log, mixed-fields-tests.log,
+source-details.log, final-sanitizer-tests.log and small-stack.log. Existing
+GitHub Actions builds all production targets and runs unfiltered CTest, so the
+new suites are included without a separate workflow or test framework.
+
+Limitations: numeric/bool elements only; nested/reference/string/struct elements,
+list equality, iteration/ranges and other collection APIs remain deferred.
+Removal is linear, retains capacity and holds the Runtime lock during memmove;
+compiler temporary roots retain existing lifetimes. Physical size/count/version
+representability is checked; no arbitrary 64 KiB ceiling is imposed. This sprint
+provides local Linux evidence, not Windows/macOS execution or a full CI matrix.
+Sanitizers instrument VOID C++ compiler/Runtime/tests; the prebuilt LLVM SDK and
+generated JIT/AOT machine instructions are not rebuilt with instrumentation.
+No commits, pushes, branches, remote changes or hosted CI launches were performed.
+
+## Phase 23 continuation — complete source arrays, 17 October 2026
+
+Implemented strings, value structs, managed/nullable and interface references,
+and nested fixed/growable arrays in the existing production frontend, typed IR,
+shared LLVM 19.1.7 lowerer and coordinated Runtime. Fixed children copy recursively;
+growable and managed fields retain identity. Recursive value types through list
+fields work, including cyclic managed graphs. Required references need explicit
+values; zero-length arrays remain valid. Per-element defaults, including custom
+initializers, execute independently. Pure defaults retain compact repeated IR;
+the shared lowerer outlines their validated pure recipes as private ordinary
+functions instead of expanding IR by element count. There is no new backend,
+collector, ownership registry, verifier protocol or arbitrary storage ceiling.
+
+Composite elements reuse the existing schema catalog, DataCursor, BufferBuilder,
+read leases and Frame/Slot roots. One generic list mutation implementation serves
+both scalar and composite APIs. Native element records describe LLVM DataLayout
+fields; the Runtime owns admitted metadata after code retirement. Fixed construction
+uses an unpublished initialized prefix, and nested copying completes before result
+publication. Failure paths and safepoints retain precise roots. Hot reload preserves
+compatible array-held interface witnesses without retaining allocating code.
+
+Nested selections keep rooted owners, normalized indexes and dependent structural
+versions. Inline writes reacquire current parent values and preserve unrelated RHS
+writes; independently captured nested list/managed identities end the containing
+storage dependency. Logical homogeneous element profiles preserve readonly authority
+without per-index metadata. Mutable list element profiles are invariant; copied
+value storage cannot restore readonly reference authority.
+
+Source `for element[, original_index] in [reverse] array:` traverses without a
+collection/reversal copy. Item values follow ordinary copy/reference semantics;
+index binders are original i64 indexes. Nested loops, continue, break and return
+retain existing behavior. Replacing an element is nonstructural. The owner resolved
+A6 explicitly: check a list's captured version at the next access **including normal
+completion**; mutation followed immediately by break/return is allowed. No active
+iterator registry or reverse-removal exception was added.
+
+`a..b` and `a..<b` accept matching i32/i64 endpoints, evaluated once left to right,
+ascending or descending, optionally reversed. Equal inclusive/exclusive ranges are
+singleton/empty. Terminal checks precede stepping; full integer boundary ranges do
+not compute a span or materialize storage. `0..<items.count` uses i64 as approved.
+
+The existing TextMate grammar assigns `and`, `or`, `not` to the same keyword scope
+as `as`, `if`, `return`, preserving `as`; traversal keywords are included. Extension
+unit checks, packaging and real editor validation use the existing infrastructure.
+
+Defects found and repaired during validation:
+
+- Source composite-default lowering initially expanded pure IR and violated the
+  existing compact-template assertions. Restored the compact representation and
+  used ordinary private default-recipe functions; original assertions remain.
+- The test construction probe canceled an enclosing allocation-failure sweep after
+  the first managed object. It now restores only its own scoped override. The
+  source suite now exercises **265 failing budgets per JIT mode**, plus **275 per
+  mode for per-element custom defaults**, with collection,
+  unchanged publication and successful retry after each failure.
+- The unchanged 1 MiB semantic-depth regression exposed excessive native stack
+  frames in recursive receiver hints/method checking. Debugger reproduction located
+  these frames. Isolated qualified-node temporaries and post-receiver member checks
+  from recursive dispatch, retaining the existing 256-depth guard, diagnostics and
+  resource-limit assertions. No stack limit or assertion was relaxed.
+- Updated obsolete "iteration unsupported"/numeric-only test expectations to actual
+  invalid iterable/type cases, and removed stale numeric-only diagnostics.
+
+Focused evidence: 13/13 directly affected Runtime, array, reference, interface,
+inheritance and initialization suites passed before consolidation. Native reference
+transaction sweeps cover 19 failing growth budgets, 4 in-capacity append, 3 removal,
+and 62 cold metadata/header/backing construction budgets. Concurrent collection
+preserves 257 reference elements through growth. Additional source cases cover
+nullable interface/managed elements, recursive fixed defaults, composite function
+arguments/results, readonly rejection, structural failure/recovery, independent
+nested copies and code retirement/reload. `arrays_cli` executes **152** source
+normal/O2 JIT/linked-AOT cases, including **24 expected checked failures**.
+
+Reproducible final commands (repository root unless noted; pinned existing build
+directories, production research OFF):
+
+```sh
+cmake --build build/order1/production -j2
+ctest --test-dir build/order1/production --output-on-failure -j2
+cmake --build build/order1/production --target void_tests voidc -j2
+(ulimit -s 1024; ctest --test-dir build/order1/production -R '^frontend$' --output-on-failure)
+python3 tests/integration/semantic_depth.py build/order1/production/voidc
+# All three large programs, normal/O2 JIT and linked AOT, under a 1 MiB stack:
+(ulimit -s 1024; python3 - <<'PY'
+import subprocess
+for family, expected in [('fixed_arrays', '53'), ('growable_arrays', '262151'), ('arrays', '14')]:
+    for mode, flags in [('normal', ['--no-opt']), ('optimized', [])]:
+        commands = [['build/order1/production/voidc', 'run', 'examples/' + family + '/large.void', '7', *flags],
+                    ['build/order1/production/void_' + family + '_cli_large_' + mode, '7']]
+        for command in commands:
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            assert result.stdout.strip() == expected, (command, result.stdout)
+PY
+)
+# Outside the tracing sandbox, retaining strict checks throughout build/test:
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 cmake --build build/ci-sanitizers -j2
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers --output-on-failure -j2
+# editors/vscode, with the existing pinned Node 24.19.0 in PATH:
+npm test
+VOIDLS_PATH=/home/shmellyorc/Documents/Void.Language/build/order1/production/voidls VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:host
+npm run package
+# Repository root, actual installed VS Code TextMate/Oniguruma engine:
+env ELECTRON_RUN_AS_NODE=1 /usr/share/code/code build/phase23/keyword-scopes.cjs
+git diff --check
+```
+
+Final production Debug CTest: **68/68 passed**, 170.14 seconds. The strengthened
+custom-default failure harness also passed after consolidation (275 failing budgets
+in each JIT mode), using `cmake --build build/order1/production --target
+void_arrays_source -j2` and `build/order1/production/void_arrays_source .`.
+The unchanged frontend suite passed under a 1 MiB stack (11.28 seconds); its
+standalone deep-receiver check passed. All **12** large-array JIT/AOT runs passed
+under that same stack limit (fixed 2 MiB, growable >2 MiB, composite 2 MiB).
+
+Editor unit checks passed; all three actual editor-host modes passed (trusted,
+restricted trust, multi-root rejection). The installed VS Code TextMate/Oniguruma
+engine confirmed identical keyword.control.void scopes for if/or/and/not/as/return
+and preserved comment/string scopes. VSIX packaging succeeded (8 files, 145.64 KiB),
+at editors/vscode/dist/void-language-0.1.0.vsix.
+
+Strict ASan/UBSan with leak detection: **68/68 passed**, 208.37 seconds,
+including the strengthened composite/default failure sweeps, source CLI depth
+regression, normal/O2 JIT and linked AOT. No sanitizer or leak failures remain.
+Both builds use LLVM 19.1.7 and VOID_LLVM_RESEARCH=OFF.
+
+Final logs: build/phase23/final-build.log, final-tests.log,
+sanitizer-final-build.log, sanitizer-final-tests.log,
+custom-default-failures-tests.log, stack-repair2-test.log, semantic-depth.log,
+large-small-stack.log, editor-final-unit.log, editor-final-host.log,
+editor-final-package.log and editor-scopes.log. The local tokenizer script is
+build/phase23/keyword-scopes.cjs; no new verification framework or dependency was
+introduced. Existing GitHub Actions builds all production targets and runs
+unfiltered CTest, so arrays_source/arrays_cli are included automatically.
+The combined source is ready for the owner's hosted cross-platform acceptance gate.
+
+Remaining scope/costs: slices, collection equality/search/sorting, generics, custom
+iteration and string indexing remain future language work. Inline mutating methods
+on array elements still reject as required by A4; explicit nested assignments work.
+Eager fixed snapshots and existing temporary-root lifetimes can retain/copy extra
+storage. List removal remains linear under the Runtime lock. Physical extent,
+address and version representability remain checked. No cross-platform execution
+or hosted CI is claimed. The prebuilt LLVM SDK and generated machine code are not
+rebuilt with C++ sanitizer instrumentation. Orders 1–5 and previous source-array
+work are preserved; research certification remains optional. No commits, pushes,
+branches, remote changes or hosted CI launches were performed.

@@ -41,8 +41,8 @@ struct SchemaRepeat {
     std::size_t base, stride; std::uint64_t extent; std::size_t child, bytes, alignment;
     bool operator==(const SchemaRepeat&) const = default;
 };
-struct SchemaOwnedFixed { bool operator==(const SchemaOwnedFixed&) const = default; };
-struct SchemaGrowable { bool operator==(const SchemaGrowable&) const = default; };
+struct SchemaOwnedFixed { std::string element; std::uint64_t extent=0; bool operator==(const SchemaOwnedFixed&) const = default; };
+struct SchemaGrowable { std::string header; bool operator==(const SchemaGrowable&) const = default; };
 using SchemaNode=std::variant<SchemaScalar,SchemaBytes,SchemaManaged,SchemaString,SchemaInterface,SchemaRecord,SchemaRepeat,SchemaOwnedFixed,SchemaGrowable>;
 struct ElementSchemaSpec {
     std::string identity, capability_profile, lowering_layout_key;
@@ -55,12 +55,13 @@ struct SchemaStep {
     std::uint64_t value;
 };
 struct ReferenceEvent {
-    enum class Kind { legacy, managed, string, interface } kind;
+    enum class Kind { legacy, managed, string, interface, buffer } kind;
     std::size_t offset;
     std::optional<std::size_t> witness_offset;
     bool nullable;
     // Borrowed from the owning ReferenceShape/cursor, not caller input specs.
     std::string_view target;
+    std::uint64_t extent=0;
 };
 class ElementSchema;
 using ElementSchemaRef=std::shared_ptr<const ElementSchema>;

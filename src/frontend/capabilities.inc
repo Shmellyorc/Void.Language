@@ -52,6 +52,10 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 changed|=f.reference_effects.required_mutable.insert(origin).second;
             if (!report) return;
             const auto allowed=ir::readonly_paths(expected);
+            if(!ir::capability_assignable(ir::fact_type(expected,actual),expected)) {
+                bool readonly_failure=false;for(const auto& [path,fact]:actual)readonly_failure|=fact.readonly && !allowed.contains(path);
+                if(!readonly_failure)issue(token,"Mutable list storage requires an invariant element authority profile.",related);
+            }
             for (const auto& [path,fact]:actual) if(fact.readonly && !allowed.contains(path)) {
                 auto fields=leaf_related(expected,path);fields.insert(fields.end(),related.begin(),related.end());
                 issue(token,"Cannot assign readonly reference leaf '"+ir::reference_path_name(expected,path)+"' to storage or a parameter promising mutable access.",std::move(fields));
@@ -90,14 +94,29 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         expression=[&](Expr& e)->ReferenceFacts {
             using K=Expr::Kind;
             auto view=ir::reference_facts(e.type);
-            if (e.kind==K::name) view=locals.at(e.slot);
+            if(e.kind==K::array_literal || e.kind==K::array_default) {
+                for(auto& part:e.parts) {
+                    auto child=expression(*part);
+                    for(const auto& [leaf,fact]:child) {auto path=leaf;path.insert(path.begin(),ir::array_element_path);view[path].join(fact);}
+                }
+            } else if(e.kind==K::array_index) {
+                auto owner=expression(*e.parts[0]);expression(*e.parts[1]);view=ir::field_facts(e.parts[0]->type,owner,ir::array_element_path);
+            } else if (e.kind==K::name) view=locals.at(e.slot);
             else if (e.kind==K::field) {
                 auto base=expression(*e.parts[0]);
-                view=ir::field_facts(e.parts[0]->type,base,e.slot);
+                if(e.target!="$array.count")view=ir::field_facts(e.parts[0]->type,base,e.slot);
             } else if (e.kind==K::conversion) view=expression(*e.parts[0]);
             else if (e.kind==K::call || e.kind==K::method_call) {
                 std::vector<ReferenceFacts> arguments;
                 for (auto& part:e.parts) arguments.push_back(expression(*part));
+                if(e.target.starts_with("$array.")) {
+                    if(e.token.text=="push")compatible(arguments[1],ir::array_element(e.parts[0]->type),e.token);
+                    else view=ir::field_facts(e.parts[0]->type,arguments[0],ir::array_element_path);
+                    if(auto leaf=arguments[0].find({});leaf!=arguments[0].end()) {
+                        effect(f.reference_effects.mutations,leaf->second);
+                        if(report && leaf->second.readonly)issue(e.token,"Cannot mutate a readonly list.");
+                    }
+                }
                 if (auto found=functions.find(e.target);found!=functions.end()) {
                     auto& target=*found->second;
                     view=call(target,arguments,e.token,!e.virtual_slot.empty() && !e.super_call);
@@ -187,12 +206,26 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             for (auto& s:body) {
                 using K=Statement::Kind;
                 ReferenceFacts rhs;
+                if (s.selection)expression(*s.selection);
+                if (s.range_end) expression(*s.range_end);
                 if (s.index) expression(*s.index);
                 if (s.expression) rhs=expression(*s.expression);
                 else if (s.kind==K::variable) rhs=ir::reference_facts(f.locals.at(s.slot));
                 if (s.kind==K::variable) {
                     if (s.readonly) for (auto& [path,fact]:rhs) fact.readonly=true;
                     local_changed|=ir::join_facts(locals[s.slot],rhs);
+                } else if(s.kind==K::assignment && s.selection) {
+                    compatible(rhs,s.selection->type,s.expression->token);
+                    bool heap=false;ir::ReferencePath path;
+                    std::function<void(const Expr&)> inspect=[&](const Expr& e) {
+                        if(e.kind==Expr::Kind::name)return;
+                        const auto& owner=*e.parts[0];inspect(owner);
+                        if(owner.type.kind==Type::managed_ref || (e.kind==Expr::Kind::array_index && owner.type.kind==Type::growable_array)) {
+                            heap=true;if(auto leaf=evaluated.at(&owner).find({});leaf!=evaluated.at(&owner).end()) {effect(f.reference_effects.mutations,leaf->second);if(report && leaf->second.readonly)issue(e.token,"Cannot mutate storage through readonly array/reference authority.");}
+                        }
+                        path.push_back(e.kind==Expr::Kind::array_index ? ir::array_element_path : e.slot);
+                    };inspect(*s.selection);
+                    if(!heap) {ir::ReferenceFacts inserted;for(const auto& [leaf,fact]:rhs) {auto target=path;target.insert(target.end(),leaf.begin(),leaf.end());inserted[target]=fact;}local_changed|=ir::join_facts(locals[s.slot],inserted);if(f.receiver && s.slot==f.receiver->slot && !f.receiver_mutates){f.receiver_mutates=true;changed=true;}}
                 } else if (s.kind==K::assignment) {
                     auto type=ir::fact_type(f.locals.at(s.slot),locals.at(s.slot));
                     auto selected=locals.at(s.slot);
@@ -209,7 +242,17 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                         selected=ir::field_facts(type,selected,field); type=ir::field_type(type,field);
                         prefix.push_back(field);
                     }
-                    if (heap) retain(rhs,s.expression->type,s.expression->token);
+                    if(s.index && ir::array_type(type)) {
+                        if(auto leaf=selected.find({});leaf!=selected.end()) {effect(f.reference_effects.mutations,leaf->second);if(report && leaf->second.readonly)issue(s.token,"Cannot mutate a readonly list.");}
+                        compatible(rhs,ir::array_element(type),s.expression->token);
+                        if(type.kind==Type::fixed_array && !heap) {
+                            ir::ReferenceFacts prefixed;
+                            for(const auto& [leaf,fact]:rhs) {auto path=s.field_indexes;path.push_back(ir::array_element_path);path.insert(path.end(),leaf.begin(),leaf.end());prefixed[path]=fact;}
+                            local_changed|=ir::join_facts(locals[s.slot],prefixed);
+                            if(f.receiver && s.slot==f.receiver->slot && !f.receiver_mutates){f.receiver_mutates=true;changed=true;}
+                        }
+                    }
+                    else if (heap) retain(rhs,s.expression->type,s.expression->token);
                     else {
                         const bool receiver=f.receiver && s.slot==f.receiver->slot;
                         if (receiver && !f.receiver_mutates) { f.receiver_mutates=true; changed=true; }
@@ -238,6 +281,10 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     }
                 } else if (s.kind==K::returned) {
                     changed|=ir::join_facts(f.reference_effects.returned,rhs);
+                }
+                if(s.kind==K::loop && !s.binder.text.empty()) {
+                    auto item=s.range_end ? ir::ReferenceFacts{} : ir::field_facts(s.expression->type,rhs,ir::array_element_path);
+                    f.locals[s.slot]=ir::fact_type(f.locals[s.slot],item);local_changed|=ir::join_facts(locals[s.slot],item);
                 }
                 sequence(s.body); sequence(s.otherwise);
             }

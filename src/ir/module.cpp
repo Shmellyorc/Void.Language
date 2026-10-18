@@ -12,16 +12,20 @@ namespace vd::ir {
 bool array_type(Type t) { return t.kind==Type::fixed_array || t.kind==Type::growable_array; }
 Type array_element(Type t) {
     if (!array_type(t) || !t.definition || !t.definition->element) throw std::invalid_argument("VOID IR: missing array element");
-    return *t.definition->element;
+    auto element=Type(*t.definition->element);ReferencePaths paths=readonly_paths(element);
+    for(const auto& path:readonly_paths(t))if(!path.empty() && path[0]==array_element_path)paths.insert(ReferencePath(path.begin()+1,path.end()));
+    if(t.readonly)element=readonly_view(element);else element=with_readonly_paths(element,paths);
+    return element;
 }
 std::string array_identity(Type element, std::optional<std::uint64_t> extent) {
     const auto key=std::to_string(static_cast<unsigned>(element.kind))+":"+Type::key(element)+(element.nullable ? "?" : "");
     return "$array:"+std::to_string(key.size())+":"+key+":"+(extent ? std::to_string(*extent) : "growable");
 }
-bool scalar_fixed_array(Type t) {
-    return t.kind==Type::fixed_array && t.definition && t.definition->element &&
+bool scalar_array(Type t) {
+    return array_type(t) && t.definition && t.definition->element &&
         (numeric::number(array_element(t)) || array_element(t)==Type::boolean);
 }
+bool scalar_fixed_array(Type t) {return t.kind==Type::fixed_array && scalar_array(t);}
 CompactValueShape compact_value_shape(Type root) {
     std::map<const ValueType*,CompactValueShape> memo;
     std::set<const ValueType*> active;
@@ -32,8 +36,9 @@ CompactValueShape compact_value_shape(Type root) {
         return a+b;
     };
     std::function<CompactValueShape(Type)> visit=[&](Type t)->CompactValueShape {
-        if(t.nullable || t.construction || !t.preparation.empty()) throw std::invalid_argument("Unsupported array value shape");
+        if((t.nullable && !reference_value(t)) || t.construction || !t.preparation.empty()) throw std::invalid_argument("Unsupported array value shape");
         if(numeric::number(t) || t==Type::boolean) return {0,t==Type::boolean ? 1u : numeric::width(t)/8u,1};
+        if(reference_value(t) || t.kind==Type::string || t.kind==Type::growable_array)return {0,sizeof(void*),1};
         if((t.kind!=Type::fixed_array && t.kind!=Type::aggregate) || !t.definition || t.definition->managed || t.definition->interface_type)
             throw std::invalid_argument("Reference-bearing/growable array shapes await GC support");
         auto* d=t.definition.get();
@@ -118,19 +123,25 @@ FieldType::operator Type() const {
 
 ReferencePaths reference_paths(Type root, bool include_strings) {
     ReferencePaths result;
-    struct Pending { Type type; ReferencePath path; };
-    std::vector<Pending> pending{{root,{}}};
+    struct Pending {Type type;ReferencePath path;std::set<const ValueType*> lists;};
+    std::vector<Pending> pending{{root,{}, {}}};
     std::size_t expanded=0;
     while (!pending.empty()) {
-        auto [type,path]=std::move(pending.back()); pending.pop_back();
+        auto [type,path,lists]=std::move(pending.back()); pending.pop_back();
         if (type.construction) continue; // A stage is a place, never a heap root.
         if (reference_value(type) || type.kind==Type::prepared_receiver || (include_strings && type.kind==Type::string)) { result.insert(std::move(path)); continue; }
+        if(array_type(type)) {
+            if(!type.definition || !type.definition->element)throw std::invalid_argument("VOID IR: missing array reference shape");
+            if(type.kind==Type::growable_array) {result.insert(path);if(!lists.insert(type.definition.get()).second)continue;}
+            if(path.size()>=128 || ++expanded>65536)throw std::invalid_argument("VOID IR: recursive or excessive array reference shape");
+            path.push_back(array_element_path);pending.push_back({Type(*type.definition->element),std::move(path),std::move(lists)});continue;
+        }
         if (type.kind!=Type::aggregate) continue;
         if (!type.definition || path.size()>=128 || ++expanded>65536)
             throw std::invalid_argument("VOID IR: recursive or excessive reference shape");
         for (unsigned n=0;n<type.definition->fields.size();++n) {
             auto child=path; child.push_back(n);
-            pending.push_back({type.definition->fields[n].type,std::move(child)});
+            pending.push_back({type.definition->fields[n].type,std::move(child),lists});
         }
     }
     return result;
@@ -141,15 +152,30 @@ ReferencePaths readonly_paths(Type type) {
     return type.readonly_references;
 }
 Type with_readonly_paths(Type type,const ReferencePaths& paths) {
+    ReferencePaths normalized=paths;
+    if(!paths.empty() && !type.construction) {
+        auto declared=reference_paths(type);
+        for(const auto& path:paths)if(!declared.contains(path)) {
+            auto raw=type;raw.readonly=false;raw.readonly_references.clear();ReferencePath prefix;std::optional<ReferencePath> container;
+            if(raw.kind==Type::growable_array && declared.contains(prefix))container=prefix;
+            for(auto field:path) {
+                raw=field_type(raw,field);raw.readonly=false;raw.readonly_references.clear();prefix.push_back(field);
+                if(raw.kind==Type::growable_array && declared.contains(prefix))container=prefix;
+            }
+            if(!container)throw std::invalid_argument("VOID IR: readonly path outside reference shape");
+            normalized.erase(path);normalized.insert(*container);
+        }
+    }
     // A private construction view is a place capability, not a managed leaf.
     // Its readonly place permission must survive ordinary fact propagation.
     if (type.construction) {
-        if(!paths.empty() && paths!=ReferencePaths{ReferencePath{}}) throw std::invalid_argument("VOID IR: invalid construction authority path");
-        type.readonly|=paths.contains(ReferencePath{});type.readonly_references.clear();return type;
+        if(!normalized.empty() && normalized!=ReferencePaths{ReferencePath{}}) throw std::invalid_argument("VOID IR: invalid construction authority path");
+        type.readonly|=normalized.contains(ReferencePath{});type.readonly_references.clear();return type;
     }
-    type.readonly=false; type.readonly_references=paths;
+    type.readonly=false; type.readonly_references=normalized;
+    if(type.kind==Type::growable_array) {type.readonly=normalized.contains(ReferencePath{});type.readonly_references.erase(ReferencePath{});return type;}
     if ((reference_value(type) || type.kind==Type::prepared_receiver) && !type.construction) {
-        type.readonly=paths.contains(ReferencePath{});
+        type.readonly=normalized.contains(ReferencePath{});
         type.readonly_references.clear();
     }
     return type;
@@ -159,6 +185,7 @@ Type readonly_view(Type type) {
     return with_readonly_paths(type,reference_paths(type));
 }
 Type field_type(Type owner,unsigned field) {
+    if(array_type(owner) && field==array_element_path)return array_element(owner);
     auto result=Type(owner.definition->fields.at(field).type);
     if (owner.kind==Type::managed_ref) return owner.readonly ? readonly_view(result) : result;
     ReferencePaths projected=readonly_paths(result);
@@ -175,11 +202,21 @@ Type with_field_type(Type owner,unsigned field,Type value) {
     return with_readonly_paths(owner,paths);
 }
 bool capability_assignable(Type actual,Type expected) {
-    if (actual.construction && actual.readonly && !expected.readonly) return false;
-    const auto allowed=readonly_paths(expected);
-    for (const auto& path:readonly_paths(actual)) if (!allowed.contains(path)) return false;
-    return true;
+    std::set<std::string> seen;
+    std::function<bool(Type,Type)> visit=[&](Type a,Type e) {
+        if(a.construction && a.readonly && !e.readonly)return false;
+        const auto allowed=readonly_paths(e);for(const auto& path:readonly_paths(a))if(!allowed.contains(path))return false;
+        auto key=std::to_string(a.kind)+":"+Type::key(a)+"|"+capability_key(a)+"|"+capability_key(e);
+        if(!seen.insert(key).second)return true;
+        if(array_type(a) && array_type(e)) {
+            if(a.kind==Type::growable_array && !e.readonly && readonly_paths(array_element(a))!=readonly_paths(array_element(e)))return false;
+            return visit(array_element(a),array_element(e));
+        }
+        if(a.kind==Type::aggregate && e.kind==Type::aggregate)for(unsigned n=0;n<a.definition->fields.size();++n)if(!visit(field_type(a,n),field_type(e,n)))return false;
+        return true;
+    };return visit(actual,expected);
 }
+
 bool subtype(Type actual,Type expected) {
     if (actual.kind!=Type::managed_ref || expected.kind!=Type::managed_ref ||
         actual.construction || expected.construction || !actual.definition || !expected.definition || !actual.definition->managed || !expected.definition->managed) return false;
@@ -213,9 +250,9 @@ std::string capability_key(Type type) {
     return result;
 }
 std::string reference_path_name(Type type,const ReferencePath& path) {
-    std::string result=type.definition ? type.definition->name : type_name(type);
+    std::string result=array_type(type) ? type_name(type) : type.definition ? type.definition->name : type_name(type);
     for (auto field:path) {
-        result+='.'+type.definition->fields.at(field).name;
+        if(array_type(type) && field==array_element_path)result+="[]";else result+='.'+type.definition->fields.at(field).name;
         type=field_type(type,field);
     }
     return result;
@@ -296,16 +333,16 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         for (std::size_t n=0;n<pending.size();++n) {
             auto t=pending[n];
             if(array_type(t)) {
-                if(t.kind!=Type::fixed_array) fail("growable array IR storage awaits later checkpoints");
+                if(t.kind==Type::growable_array && !m.coordinated)fail("growable arrays require coordinated storage");
                 if(!t.definition || !t.definition->element || t.nullable || t.construction || !t.preparation.empty() ||
                    !t.definition->fields.empty() || t.definition->managed || t.definition->interface_type || !t.definition->base.expired() ||
                    (t.kind==Type::fixed_array)!=t.definition->extent.has_value()) fail("invalid structural array type");
-                const auto element=array_element(t);
+                const auto element=Type(*t.definition->element);
                 if(element==Type::none || element.kind==Type::prepared_receiver || element.kind==Type::invalid || element.kind==Type::unresolved ||
                    element.construction || element.readonly || !element.readonly_references.empty() ||
                    t.definition->identity!=array_identity(element,t.definition->extent)) fail("invalid array element or identity");
                 if(checked.insert(t.definition.get()).second) {
-                    try {compact_value_shape(t);}
+                    try {if(t.kind==Type::fixed_array)compact_value_shape(t);}
                     catch(const std::length_error& failure) {fail(failure.what());}
                     pending.push_back(element);inline_layout(t);
                 }
@@ -560,12 +597,38 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     result = i.type; break;
                 case Op::fixed_array:
                     valid_type(i.type);
-                    if(i.type.kind!=Type::fixed_array || i.arguments.size()!=(i.array_repeat ? (*i.type.definition->extent ? 1u : 0u) : *i.type.definition->extent) || i.receiver || i.initialization || i.immediate || !i.callee.empty())
+                    if(!array_type(i.type) || (i.type.kind==Type::fixed_array ? i.arguments.size()!=(i.array_repeat ? (*i.type.definition->extent ? 1u : 0u) : *i.type.definition->extent) : i.array_repeat) || i.receiver || i.initialization || i.immediate || !i.callee.empty())
                         fail("invalid fixed-array construction/template");
                     if(i.array_repeat) for(auto argument:i.arguments)
                         if(argument>=pure_templates.size() || !pure_templates[argument]) fail("effectful repeated array prototype");
                     for(auto argument:i.arguments) expect(argument,array_element(i.type));
                     result=i.type;break;
+                case Op::array_allocate:
+                    valid_type(i.type);if(i.type.kind!=Type::fixed_array || !i.arguments.empty() || i.receiver || i.immediate || !i.callee.empty())fail("invalid array construction storage");result=i.type;break;
+                case Op::array_initialize:
+                    if(operand(i.a).kind!=Type::fixed_array || operand(i.b)!=Type::u64 || i.arguments.size()!=1 || i.receiver || i.immediate || !i.callee.empty())fail("invalid array element initialization");expect(i.arguments[0],array_element(operand(i.a)));result=Type::none;break;
+                case Op::array_capture:
+                    if(i.immediate<0 || static_cast<std::size_t>(i.immediate)>=f.locals.size() || !array_type(operand(i.a)) || operand(i.a)!=f.locals[i.immediate] || i.b || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid array iteration capture");
+                    result=Type::none;break;
+                case Op::list_check:
+                    if(operand(i.a).kind!=Type::growable_array || operand(i.b)!=Type::u64 || i.receiver || !i.arguments.empty() || i.immediate || !i.callee.empty())fail("invalid iterator version check");
+                    result=Type::none;break;
+                case Op::array_count: case Op::list_version:
+                    if(!array_type(operand(i.a)) || (i.op==Op::list_version && operand(i.a).kind!=Type::growable_array) || i.b || i.receiver || !i.arguments.empty() || i.immediate || i.initialization || !i.callee.empty())fail("invalid array property");
+                    result=i.op==Op::array_count ? Type::i64 : Type::u64;break;
+                case Op::list_index: case Op::list_push: case Op::list_remove: case Op::list_commit: {
+                    auto array=operand(i.a);
+                    if(!array_type(array) || array.kind!=Type::growable_array || i.receiver || i.immediate || i.initialization || !i.callee.empty())fail("invalid list operation");
+                    if(i.op==Op::list_push) {expect(i.b,array_element(array));if(!i.arguments.empty())fail("unexpected list push operands");result=Type::none;}
+                    else {
+                        if(!numeric::integer(operand(i.b)))fail("list index requires integer");
+                        if(i.op==Op::list_commit) {
+                            if(operand(i.b)!=Type::u64 || i.arguments.size()!=2)fail("invalid selected list commit");
+                            expect(i.arguments[0],array_element(array));expect(i.arguments[1],Type::u64);result=Type::none;
+                        } else {if(!i.arguments.empty())fail("unexpected list index operands");result=i.op==Op::list_index ? Type::u64 : array_element(array);}
+                    }
+                    break;
+                }
                 case Op::fixed_snapshot:
                     if(!f.fixed_ownership || !scalar_fixed_array(operand(i.a)) || i.receiver || !i.arguments.empty() || i.b || i.immediate || i.initialization || !i.callee.empty())
                         fail("invalid fixed snapshot");
@@ -583,7 +646,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 }
                 case Op::array_get: case Op::array_set: {
                     const auto array=operand(i.a), index=operand(i.b);
-                    if(!scalar_fixed_array(array) || !numeric::integer(index) || i.receiver || i.initialization || i.immediate || !i.callee.empty())
+                    if(!array_type(array) || (i.op==Op::array_set && array.kind!=Type::fixed_array) || !numeric::integer(index) || i.receiver || i.initialization || i.immediate || !i.callee.empty())
                         fail("invalid checked scalar array access");
                     if(i.op==Op::array_set) {
                         if(i.arguments.size()!=1) fail("array update requires exactly one value");
@@ -692,7 +755,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 }
                 default: fail("unknown operation");
                 }
-                bool pure=i.op==Op::constant;
+                bool pure=i.op==Op::constant || i.op==Op::string_literal;
                 if(i.op==Op::aggregate || i.op==Op::fixed_array) {
                     pure=true;
                     for(auto argument:i.arguments) pure=pure && argument<pure_templates.size() && pure_templates[argument];

@@ -7,7 +7,8 @@ template<class Work> void checked(vd::RuntimeFailure* failure,Work work) noexcep
     if(failure->message) return;
     try {
         work();
-    } catch(const std::bad_alloc&) {failure->message="Fixed value allocation failed";}
+    } catch(const vd::ListModified&) {failure->message="List structurally modified during selected operation";}
+      catch(const std::bad_alloc&) {failure->message="Fixed value allocation failed";}
       catch(const vd::BufferBusy&) {failure->message="Fixed buffer is busy";}
       catch(const std::out_of_range&) {failure->message="Fixed index outside extent";}
       catch(const std::length_error&) {failure->message="Fixed layout is not representable";}
@@ -90,4 +91,43 @@ std::uint64_t vd_array_read(void** source,std::uint64_t index,unsigned encoding,
 void vd_array_write(void** source,std::uint64_t index,std::uint64_t bits,unsigned encoding,std::uint64_t extent,vd::RuntimeFailure* failure) noexcept {
     array_source_checked(source,encoding,extent,failure,[&](auto& r,auto root,const auto& layout){r.fixed_store_scalar(root,layout,index,bits);});
 }
+}
+
+extern "C" {
+void vd_list_new(void** out,unsigned encoding,std::uint64_t count,vd::RuntimeFailure* failure) noexcept {
+    checked(failure,[&]{vd::Runtime::current().list_into(out,static_cast<vd::ScalarEncoding>(encoding),count);});
+}
+#define VD_LIST_QUERY(name) \
+std::uint64_t vd_list_##name(void** source,unsigned encoding,vd::RuntimeFailure* failure) noexcept { \
+    std::uint64_t result=0;checked(failure,[&]{auto& r=vd::Runtime::current();result=r.list_##name(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding));});return result;}
+VD_LIST_QUERY(count)
+VD_LIST_QUERY(version)
+#undef VD_LIST_QUERY
+std::uint64_t vd_list_read(void** source,unsigned encoding,std::uint64_t index,vd::RuntimeFailure* failure) noexcept {
+    std::uint64_t result=0;checked(failure,[&]{auto& r=vd::Runtime::current();result=r.list_read(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding),index);});return result;
+}
+void vd_list_write(void** source,unsigned encoding,std::uint64_t index,std::uint64_t bits,std::uint64_t version,unsigned selected,vd::RuntimeFailure* failure) noexcept {
+    checked(failure,[&]{auto& r=vd::Runtime::current();r.list_write(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding),index,bits,selected ? std::optional(version) : std::nullopt);});
+}
+void vd_list_push(void** source,unsigned encoding,std::uint64_t bits,vd::RuntimeFailure* failure) noexcept {
+    checked(failure,[&]{auto& r=vd::Runtime::current();r.list_push(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding),bits);});
+}
+std::uint64_t vd_list_remove(void** source,unsigned encoding,std::uint64_t index,vd::RuntimeFailure* failure) noexcept {
+    std::uint64_t result=0;checked(failure,[&]{auto& r=vd::Runtime::current();result=r.list_remove(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding),index);});return result;
+}
+}
+namespace {
+template<class Work> void native_array(const vd::NativeArrayElement* element,std::uint64_t extent,vd::RuntimeFailure* failure,Work work) noexcept {
+    checked(failure,[&]{if(!element)throw std::invalid_argument("missing array element descriptor");auto& runtime=vd::Runtime::current();auto layout=runtime.native_array_layout(*element,extent);work(runtime,layout);});
+}
+}
+extern "C" {
+void vd_value_array_new(void** out,const vd::NativeArrayElement* e,std::uint64_t count,unsigned list,vd::RuntimeFailure* f) noexcept {native_array(e,count,f,[&](auto& r,const auto& l){r.array_new(out,l,list!=0);});}
+std::uint64_t vd_value_array_count(void** source,const vd::NativeArrayElement* e,vd::RuntimeFailure* f) noexcept {std::uint64_t result=0;native_array(e,0,f,[&](auto& r,const auto& l){result=r.array_count(r.root_word(source),l,true);});return result;}
+std::uint64_t vd_value_array_version(void** source,const vd::NativeArrayElement* e,vd::RuntimeFailure* f) noexcept {std::uint64_t result=0;native_array(e,0,f,[&](auto& r,const auto& l){result=r.array_version(r.root_word(source),l);});return result;}
+void vd_value_array_read(void* out,void** source,const vd::NativeArrayElement* e,std::uint64_t extent,unsigned list,std::uint64_t index,vd::RuntimeFailure* f) noexcept {native_array(e,extent,f,[&](auto& r,const auto& l){r.array_read(out,r.root_word(source),l,list!=0,index);});}
+void vd_value_array_write(void** source,const vd::NativeArrayElement* e,std::uint64_t extent,unsigned list,std::uint64_t index,const void* value,std::uint64_t version,unsigned selected,unsigned initialize,vd::RuntimeFailure* f) noexcept {native_array(e,extent,f,[&](auto& r,const auto& l){r.array_write(r.root_word(source),l,list!=0,index,value,initialize!=0,selected?std::optional(version):std::nullopt);});}
+void vd_value_array_push(void** source,const vd::NativeArrayElement* e,const void* value,vd::RuntimeFailure* f) noexcept {native_array(e,0,f,[&](auto& r,const auto& l){r.array_push(r.root_word(source),l->schema(),value);});}
+void vd_value_array_remove(void* out,void** source,const vd::NativeArrayElement* e,std::uint64_t index,vd::RuntimeFailure* f) noexcept {native_array(e,0,f,[&](auto& r,const auto& l){r.array_remove(out,r.root_word(source),l->schema(),index);});}
+void vd_value_array_copy(void** out,void** source,const vd::NativeArrayElement* e,std::uint64_t extent,vd::RuntimeFailure* f) noexcept {native_array(e,extent,f,[&](auto& r,const auto& l){r.array_copy(out,r.root_word(source),l);});}
 }

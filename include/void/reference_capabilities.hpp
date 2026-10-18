@@ -49,6 +49,11 @@ inline Type fact_type(Type type,const ReferenceFacts& facts) {
 }
 inline ReferenceFacts field_facts(Type owner,const ReferenceFacts& facts,unsigned field) {
     ReferenceFacts result=reference_facts(field_type(owner,field));
+    if(array_type(owner) && field==array_element_path) {
+        for(const auto& [path,fact]:facts)if(!path.empty() && path[0]==field)result[ReferencePath(path.begin()+1,path.end())].join(fact);
+        if(owner.kind==Type::growable_array)if(auto found=facts.find({});found!=facts.end() && found->second.readonly)for(auto& [path,fact]:result)fact.readonly=true;
+        return result;
+    }
     if (owner.kind==Type::managed_ref) {
         if (auto found=facts.find({});found!=facts.end())
             for (auto& [path,fact]:result) fact.join(found->second);

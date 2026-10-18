@@ -1,0 +1,17 @@
+func entry(value: i32) -> i32:
+    var fixed: [[i32, 2], 2] = [[1, 2], [3, 4]]
+    var copy = fixed
+    var inner = copy[0]
+    inner[0] = 9
+    if fixed[0][0] != 1:
+        return -100
+    var lists: [[i32], 2]
+    var first = lists[0]
+    first.push(8)
+    if lists[1].count != 0:
+        return -200
+    var outer: [[i32, 2]] = [[10, 20]]
+    outer.push(inner)
+    inner[0] = 99
+    var got = outer[-1]
+    return got[0] + lists[0][0] + value

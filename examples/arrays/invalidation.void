@@ -1,0 +1,26 @@
+func entry(mode: i32) -> i32:
+    var a = [1, 2]
+    var sum = 0
+    for n, index in a:
+        sum += n
+        if mode == 1 and index == 1:
+            a.push(3)
+        if mode == 2:
+            a.remove_at(-1)
+            a.push(9)
+            continue
+        if mode == 3:
+            a.push(3)
+            break
+        if mode == 4:
+            a.push(3)
+            return 40
+    if mode == 5:
+        for n in reverse a:
+            a.remove_at(0)
+    if mode == 6:
+        for outer in a:
+            for inner in a:
+                a.push(5)
+                break
+    return sum

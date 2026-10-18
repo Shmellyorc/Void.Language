@@ -1,13 +1,14 @@
 # Phase 23 proposal: typed arrays, indexing and iteration
 
-**Current implementation update, 17 October 2026 (Order 3):** Numeric/bool fixed
+**Current implementation update, 17 October 2026 (Orders 1–5 and growable lists):** Numeric/bool fixed
 arrays now execute from ordinary `.void` source through normal/O2 LLVM JIT and
 linked AOT. Copies, calls/returns, checked indexing/mutation and heap-backed
 megabyte payloads use the existing Runtime. Orders 1 and 2 removed mandatory
 research certificates and envelope authorization from this path. See
 [FIXED_ARRAYS.md](FIXED_ARRAYS.md) and the Order 3 WORK_LOG entry for supported
-behavior, tests and limitations. Growable/nested/reference-element arrays and
-array-specific iteration remain deferred. The older checkpoint/status paragraphs
+behavior, tests and limitations. Numeric/bool growable `[T]` lists now also run
+through production normal/O2 JIT and native AOT; see [GROWABLE_ARRAYS.md](GROWABLE_ARRAYS.md).
+Nested/reference-element arrays and array-specific iteration remain deferred. The older checkpoint/status paragraphs
 below are historical; their source-array/research gates do not override the
 owner's Order 3 authorization or this implemented numeric slice.
 
@@ -375,12 +376,11 @@ existing referenced object remains allowed. A nested list is a separate containe
 resizing it does not invalidate traversal of the outer list unless the outer is
 also structurally changed.
 
-Recommend detecting a body-induced structural change at the next iterator access,
-not necessarily rejecting the mutation itself. Thus a mutation followed by break
-has no further access and can succeed; another still-active nested iterator will
-fail when it resumes. This exact timing is OPEN for approval. An eager active-
-iterator mutation ban is a valid alternative, but needs counted lifetime cleanup
-on every exit. Do not mix the two models accidentally.
+Owner-approved timing (17 October 2026): detect a body-induced structural change
+at the next iterator access, including normal completion. Mutation followed
+immediately by break or return has no further access and succeeds; another active
+nested iterator fails when it resumes. Continue reaches the next version check.
+The production implementation uses this rule, without an active-iterator registry.
 
 Defer the reverse remove-current exception. Even one duplicate value, two nested
 reverse iterators or remove/reinsert can defeat a naive cursor adjustment. Do not
@@ -5490,3 +5490,16 @@ Evidence and commands: `build/stage3b-linked/accepted`, `trace.json`,
 `tests/research/call_envelope/README.md`. No public acceptance gate, protected
 document, storage auditor or encoded-CFG verifier changed. No production limit,
 complete matrix, hosted CI, branch, commit, push or remote write was introduced.
+
+## Phase 23 source implementation, 17 October 2026
+
+Fixed/growable arrays now support numeric/bool, string, value-struct, managed and
+nullable/interface references, and nested arrays through the existing typed IR,
+LLVM 19.1.7 JIT/AOT lowerer and coordinated typed buffers. Forward/reverse array
+traversal and matching i32/i64 inclusive/exclusive ranges execute in source.
+See FIXED_ARRAYS.md and GROWABLE_ARRAYS.md for the precise implementation boundary.
+
+**A6 timing resolved by owner:** structural invalidation is checked on the next
+iterator access, including normal completion. Mutation immediately followed by
+break or return is allowed; continue reaches the next check. No reverse-removal
+exception is implemented. This supersedes the older OPEN timing wording above.

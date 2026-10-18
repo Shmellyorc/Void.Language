@@ -1197,7 +1197,9 @@ for i in 10..<0:    # 10 through 1, excluding 0
     print(i)
 ```
 
-Direction follows the endpoint ordering. **OPEN:** Range steps, empty ranges, mixed signedness, non-integral endpoints, and overflow behavior. Plain C-style three-part `for` is intentionally omitted.
+Direction follows the endpoint ordering. **Implemented Phase 23:** matching i32/i64 endpoints, equal inclusive singleton
+and exclusive empty ranges, direction from endpoint order, and overflow-safe
+terminal checks. Steps, mixed widths/signedness and non-integral endpoints reject. Plain C-style three-part `for` is intentionally omitted.
 
 ## 27. `for`, `break`, `continue`, `return`, `pass` [AGREED]
 
@@ -1289,8 +1291,8 @@ func repeat():
         i++ # Executes normally after pass.
 ```
 
-Conditional and unbounded `for` loops are implemented. Range/collection iteration
-in Section 26 remains deferred; `pass` does not enable those iteration forms.
+Conditional, unbounded, fixed/growable array and i32/i64 range `for` loops are
+implemented. See GROWABLE_ARRAYS.md for traversal, reverse and fail-fast rules.
 An unbounded `for:` containing only `pass` continues indefinitely.
 
 Empty ordinary statement blocks, including comment-only bodies, remain invalid:
@@ -1469,7 +1471,10 @@ func biggest<t: comparable>(a: t, b: t) -> t:
 
 ## 32. Lists: growable and fixed-size arrays [AGREED]
 
-**Current implementation and approval boundary (16 October 2026):** Phase 23's A1–A10 approve fixed-array **value snapshots**, growable-list **shared reference identity**, safe checked indexing including negative offsets, readonly capability preservation, initial `.count`, `.push(value)` and `.remove_at(index)` API names, and i32/i64 range goals. The superseding owner decision rejects any arbitrary 64 KiB production source-array/per-function storage ceiling. Stage 2F remains locked; **Stage 3A is also hosted-LOCKED** at `44fc8b6`, CI #58 (run `38982940254`, seven jobs green, 63/63 suites each). It remains a **runtime-only scalar fixed-value proof**, not source-array activation. Normal `.void` array execution, nested owned values, generated calling ABI, source/JIT/AOT integration and growable lists still await later acceptance. Slicing, additional APIs and user iterators remain future design. Never convert a documented runtime-only proof into an assertion that source arrays compile today.
+**Current implementation and approval boundary (16 October 2026):** Phase 23's A1–A10 approve fixed-array **value snapshots**, growable-list **shared reference identity**, safe checked indexing including negative offsets, readonly capability preservation, initial `.count`, `.push(value)` and `.remove_at(index)` API names, and i32/i64 range goals. The superseding owner decision rejects any arbitrary 64 KiB production source-array/per-function storage ceiling. Stage 2F remains locked; **Stage 3A is also hosted-LOCKED** at `44fc8b6`, CI #58 (run `38982940254`, seven jobs green, 63/63 suites each). It remains a **runtime-only scalar fixed-value proof**, not source-array activation. The subsequent Orders 1–5 and Phase 23 implement source fixed/growable arrays,
+composite/nested elements, ordinary LLVM ABI lowering and production JIT/AOT
+execution. See FIXED_ARRAYS.md, GROWABLE_ARRAYS.md and the latest WORK_LOG.md
+for local validation; earlier hosted proof results remain historical. Slicing, additional APIs and user iterators remain future design. Never convert a documented runtime-only proof into an assertion that source arrays compile today.
 
 **Superseding owner decision, 15 October 2026 [AGREED DESIGN; implementation pending]:**
 Neither `[T, n]` nor `[T]` has an arbitrary 64 KiB source-level size ceiling. VOID
@@ -1622,7 +1627,8 @@ Equal keys must always hash equally. Developers should not have to configure a l
 
 ## 34. Mutation during iteration [RECOMMENDED / exception OPEN]
 
-**Current approved Phase 23 direction:** Structural version invalidation is checked at the **next iterator access**, for forward and reverse iteration. A structural mutation followed by `break` requires no further iterator access; other active iterators detect invalidation when they resume. The reverse remove-current exception remains **deferred**, not implemented or guaranteed by the example below. Do not claim source list traversal is active merely because the design is approved.
+**Current approved Phase 23 direction:** Structural version invalidation is checked at the **next iterator access**, for forward and reverse iteration. A structural mutation followed by `break` requires no further iterator access; other active iterators detect invalidation when they resume. The reverse remove-current exception remains **deferred**, not implemented or guaranteed by the example below. Phase 23 implements this rule, including the completion check and immediate
+return as well as break.
 
 Ordinary `for` iteration does not create a copy. Adding/removing entries while iterating generally raises a clear runtime error (or a compile-time error where statically provable), avoiding skipped elements and invalidated iterators. Mutating fields of existing referenced objects is allowed.
 
@@ -3147,3 +3153,16 @@ phase-only reference-containing-value deferrals, not the broader language design
 **Stage 3A is LOCKED** at `44fc8b686b1e28665455b37a1a825f7ba05e186e`, CI #58 (run `38982940254`): seven hosted jobs succeeded across Ubuntu x64 Debug/Release/Sanitizers, Windows x64 Debug/Release, and macOS ARM64 Debug/Release. Each ran **63/63 CTest suites**, including `gc_buffers`, for **441/441** total. This is a **runtime-only scalar owned fixed-value proof**, not source-array activation. Stage 3B, generated/LLVM array calling conventions, nested owned-child operations and Stage 4 growables remain gated.
 
 Historical pre-hosted/local-only wording in earlier phase sections records the status at those checkpoints. It does not override this later hosted acceptance. The approved future array language behavior and all existing unresolved language-design questions are preserved.
+
+### Phase 23 source arrays and traversal, 17 October 2026
+
+Later source work implements fixed/growable arrays with every existing numeric/bool,
+string, value-struct, managed/nullable/interface and nested-array element kind.
+Fixed children have independent value semantics; growable children share identity.
+Forward/reverse iteration preserves original i64 indexes and existing control flow.
+Matching i32/i64 inclusive/exclusive ranges support both directions and overflow-safe
+boundaries without materialization. Structural list mutation fails at the next
+iterator access, including completion; immediate break/return is allowed.
+FIXED_ARRAYS.md, GROWABLE_ARRAYS.md and WORK_LOG.md contain the current source
+implementation boundary and local evidence, superseding earlier source deferrals.
+Hosted cross-platform acceptance is still owned by the repository owner.

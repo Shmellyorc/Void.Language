@@ -87,9 +87,11 @@ std::vector<unsigned> physical_field_path(Type owner, unsigned field);
 std::string capability_key(Type type);
 std::string reference_path_name(Type type,const ReferencePath& path);
 std::string type_name(Type type);
+inline constexpr unsigned array_element_path=~0u;
 bool array_type(Type);
 Type array_element(Type);
 std::string array_identity(Type element, std::optional<std::uint64_t> extent);
+bool scalar_array(Type);
 bool scalar_fixed_array(Type);
 // Logical scalar-byte lower bound, NOT a target layout or native storage estimate.
 // Repetition contributes arithmetic, never per-element metadata or work.
@@ -100,7 +102,7 @@ enum class Op { argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
     upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal,
-    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit };
+    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize };
 // A validated local aggregate storage path; never a source-visible reference.
 struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
 struct Instruction {
