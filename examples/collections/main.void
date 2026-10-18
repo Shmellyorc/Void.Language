@@ -1,0 +1,24 @@
+func entry(value: i32) -> i32:
+    var items = [1, 3]
+    var alias = items
+    items.insert(1, value)
+    items.insert(items.count, 4)
+    items.insert(-1, 5)
+    if alias.count != 5 or alias[1] != value or alias[-1] != 4:
+        return -100
+    var copied = items[-1..0]
+    copied[0] = 90
+    if items[-1] != 4 or copied[3] != value:
+        return -200
+    alias.clear()
+    if items.count != 0 or copied.count != 5:
+        return -300
+    items.clear()
+    items.insert(0, value)
+    var empty = items[1..<1]
+    var zero: [i32] = []
+    var another = zero[0..<0]
+    empty.push(2)
+    if another.count != 0 or items.count != 1:
+        return -400
+    return copied[3] + copied.count as i32

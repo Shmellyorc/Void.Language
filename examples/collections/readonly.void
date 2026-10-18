@@ -1,0 +1,12 @@
+struct node:
+    value: i32
+func entry(value: i32) -> i32:
+    const numbers = [1, 2, 3]
+    var copy = numbers[0..<3]
+    copy.insert(0, value)
+    copy.clear()
+    copy.push(value)
+    const n = node(value = value)
+    var items = [n]
+    var part = items[0..0]
+    return part[0].value + copy[0]

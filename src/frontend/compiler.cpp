@@ -208,7 +208,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     return tokens;
 }
 struct Expr {
-    enum class Kind { literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default } kind;
+    enum class Kind { literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::string op, qualifier, target, source_target;
@@ -540,7 +540,9 @@ class Parser {
             } else if(at("[")) {
                 if(++nodes>512) error(source,peek(),Code::nesting,"Expression size limit exceeded.");
                 auto selected=std::make_unique<Expr>(Expr::Kind::array_index,take());
-                selected->parts.push_back(std::move(e));selected->parts.push_back(expression());need("]");e=std::move(selected);
+                selected->parts.push_back(std::move(e));selected->parts.push_back(expression());
+                if(at("..") || at("..<")){selected->kind=Expr::Kind::array_slice;selected->op=take().text;selected->parts.push_back(expression());}
+                need("]");e=std::move(selected);
             } else if(type_call() && (e->kind==Expr::Kind::name || e->kind==Expr::Kind::field)) {
                 e->type_arguments=type_arguments();
             } else if(accept("(")) {
@@ -1059,15 +1061,20 @@ class Semantics {
     // Deep receiver chains must reach the existing semantic nesting guard on
     // the supported 1 MiB native stack in Debug as well as optimized builds.
     VOID_SEMANTIC_HANDLER Type resolved_method_expression(Expr& e,Type receiver) {
-        if(ir::array_type(receiver) && (e.token.text=="push" || e.token.text=="remove_at")) {
+        if(ir::array_type(receiver) && (e.token.text=="push" || e.token.text=="remove_at" || e.token.text=="insert" || e.token.text=="clear" || e.token.text=="pop")) {
+            if(e.token.text=="pop")error(source,e.token,Code::unsupported_type,"pop awaits result/Ok support; use checked remove_at(-1).");
             if(!current)error(source,e.token,Code::constant_call,"List mutation is not a pure constant expression.");
             if(receiver.kind!=Type::growable_array)error(source,e.token,Code::type_mismatch,"Fixed arrays cannot change length.");
-            if(e.parts.size()!=2 || std::any_of(e.names.begin(),e.names.end(),[](const auto& n){return !n.text.empty();}))error(source,e.token,Code::argument_count,"List operations require one positional argument.");
+            const auto count=e.token.text=="clear"?1u:e.token.text=="insert"?3u:2u;
+            if(e.parts.size()!=count || std::any_of(e.names.begin(),e.names.end(),[](const auto& n){return !n.text.empty();}))error(source,e.token,Code::argument_count,"Incorrect positional arguments for list operation.");
             e.target="$array."+e.token.text;
-            auto argument=expression(*e.parts[1],e.token.text=="push" ? std::optional(ir::array_element(receiver)) : std::nullopt);
-            if(e.token.text=="push")expect(argument,ir::array_element(receiver),e.parts[1]->token);
-            else if(!numeric::integer(argument))error(source,e.parts[1]->token,Code::type_mismatch,"List index requires an integer, excluding bool and floats.");
-            return e.type=e.token.text=="push" ? Type::none : ir::array_element(receiver);
+            if(count>1) {
+                const bool index=e.token.text!="push";auto argument=expression(*e.parts[1],index?std::nullopt:std::optional(ir::array_element(receiver)));
+                if(index){if(!numeric::integer(argument))error(source,e.parts[1]->token,Code::type_mismatch,"List index requires an integer, excluding bool and floats.");}
+                else expect(argument,ir::array_element(receiver),e.parts[1]->token);
+            }
+            if(count==3)expect(expression(*e.parts[2],ir::array_element(receiver)),ir::array_element(receiver),e.parts[2]->token);
+            return e.type=e.token.text=="remove_at"?ir::array_element(receiver):Type(Type::none);
         }
         if (!current) error(source,e.token,Code::constant_call,"A compile-time constant cannot call a method.","Use a local const for runtime values.");
         if (e.token.text == "init" || e.token.text == "deinit")
@@ -1270,9 +1277,9 @@ class Semantics {
             auto [owner,c] = constant(e); if (c) { evaluate(*owner,*c); return c->type; }
             return {};
         }
-        if(e.kind==K::array_index) {
+        if(e.kind==K::array_index || e.kind==K::array_slice) {
             auto owner=anchor(*e.parts[0]);
-            if(owner && ir::array_type(*owner)) return ir::array_element(*owner);
+            if(owner && ir::array_type(*owner)) return e.kind==K::array_slice?slice_type(*owner):ir::array_element(*owner);
             return {};
         }
         if(e.kind==K::array_literal) return {};
@@ -1357,8 +1364,10 @@ class Semantics {
     // temporaries here exhausts a 1 MiB Debug stack before the depth guard.
     Type expression_impl(Expr& e, std::optional<Type> expected) {
         switch (e.kind) {
+        case Expr::Kind::construction: return e.type; // An inferred literal may revisit its already checked constructor.
         case Expr::Kind::array_literal: return array_expression(e,expected);
         case Expr::Kind::array_index: return index_expression(e);
+        case Expr::Kind::array_slice: return slice_expression(e);
         case Expr::Kind::literal: return literal_expression(e, expected);
         case Expr::Kind::name: return name_expression(e);
         case Expr::Kind::field: return field_expression(e, expected);
@@ -1383,6 +1392,19 @@ class Semantics {
         if(expected->kind==Type::fixed_array && e.parts.size()!=*expected->definition->extent) error(source,e.token,Code::type_mismatch,"Fixed-array literal requires exactly "+std::to_string(*expected->definition->extent)+" elements.");
         for(auto& part:e.parts) expect(expression(*part,ir::array_element(*expected)),ir::array_element(*expected),part->token);
         return e.type=*expected;
+    }
+    Type slice_type(Type source) {
+        auto element=ir::array_element(source);auto definition=std::make_shared<ir::ValueType>();definition->identity=definition->name=ir::array_identity(element,{});definition->element=ir::FieldType(element);
+        Type result(definition,Type::growable_array);ir::ReferencePaths paths;
+        for(auto path:ir::readonly_paths(element)){path.insert(path.begin(),ir::array_element_path);paths.insert(std::move(path));}
+        return ir::with_readonly_paths(result,paths);
+    }
+    VOID_SEMANTIC_HANDLER Type slice_expression(Expr& e) {
+        auto array=expression(*e.parts[0]);if(array==error_type)return error_type;
+        if(!ir::array_type(array))error(source,e.token,Code::unsupported_type,"Slicing requires an array.");
+        for(unsigned n=1;n<3;++n)if(!numeric::integer(expression(*e.parts[n])))error(source,e.parts[n]->token,Code::type_mismatch,"Slice endpoint requires an integer, excluding bool and floats.");
+        if(!current)error(source,e.token,Code::constant_call,"Slicing is a runtime array operation.");
+        return e.type=slice_type(array);
     }
     VOID_SEMANTIC_HANDLER Type index_expression(Expr& e) {
         auto array=expression(*e.parts[0]);
@@ -1916,7 +1938,7 @@ class Lowering {
     void jump(unsigned to) { terminate({ir::Terminator::Kind::jump, 0, to}); }
     unsigned emit(ir::Instruction i, const Token& token) {
         i.source = source.location(token.offset);
-        if (i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
+        if (i.op==ir::Op::array_slice || i.op==ir::Op::list_insert || i.op==ir::Op::list_clear || i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
             i.source_excerpt = source.excerpt(token.offset);
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
@@ -2071,6 +2093,12 @@ class Lowering {
             return emit(i,e.token);
         }
         case K::array_index: return select_expression(e).read();
+        case K::array_slice: {
+            auto owner=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);
+            auto first=snapshot(expression(*e.parts[1]),e.parts[1]->type,e.token);
+            auto last=snapshot(expression(*e.parts[2]),e.parts[2]->type,e.token);
+            ir::Instruction slice{ir::Op::array_slice,emit({ir::Op::load,owner},e.token),emit({ir::Op::load,first},e.token)};slice.type=e.type;slice.immediate=e.op=="..<";slice.arguments={emit({ir::Op::load,last},e.token)};return emit(slice,e.token);
+        }
         case K::base_initialization: throw std::logic_error("base initialization is a dedicated prelude");
         case K::literal: {
             return constant(e.type,(e.type.kind == Type::aggregate || ir::array_type(e.type) || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
@@ -2142,7 +2170,15 @@ class Lowering {
         case K::method_call: case K::call: {
             if(e.target.starts_with("$array.")) {
                 auto owner=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);
+                if(e.token.text=="clear")return emit({ir::Op::list_clear,emit({ir::Op::load,owner},e.token)},e.token);
                 auto argument=expression(*e.parts[1]);
+                if(e.token.text=="insert") {
+                    ir::Instruction boundary{ir::Op::list_index,emit({ir::Op::load,owner},e.token),argument};boundary.immediate=1;
+                    auto index=snapshot(emit(boundary,e.token),Type::u64,e.token);
+                    auto version=snapshot(emit({ir::Op::list_version,emit({ir::Op::load,owner},e.token)},e.token),Type::u64,e.token);
+                    auto value=snapshot(expression(*e.parts[2]),e.parts[2]->type,e.token);
+                    ir::Instruction insert{ir::Op::list_insert,emit({ir::Op::load,owner},e.token),emit({ir::Op::load,index},e.token)};insert.arguments={emit({ir::Op::load,value},e.token),emit({ir::Op::load,version},e.token)};return emit(insert,e.token);
+                }
                 return emit({e.token.text=="push" ? ir::Op::list_push : ir::Op::list_remove,emit({ir::Op::load,owner},e.token),argument},e.token);
             }
             std::optional<ir::Place> receiver;

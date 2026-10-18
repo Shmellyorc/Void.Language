@@ -1485,6 +1485,20 @@ specialization sharing/code-size tradeoffs.
 
 ## 32. Lists: growable and fixed-size arrays [AGREED]
 
+**Phase 25 clarification (18 October 2026, owner-approved):** `.insert(index, value)`,
+`.clear()` and independent inclusive/exclusive slices extend the completed Phase
+23/24 arrays. Insertion accepts 0..count and existing negative element offsets;
+its boundary precedes value evaluation and structural RHS changes invalidate the
+selected insertion. Clear retains identity/capacity and changes version only when
+nonempty. Both source kinds slice to fresh growable lists; normalize negative
+endpoints before choosing direction, permit an exclusive end at count and equal
+exclusive boundary empties, reject invalid bounds without clamping, and require
+both endpoints. Receiver/start/end evaluate once left to right; fixed sources
+snapshot before endpoint effects. Embedded readonly/value/reference guarantees
+remain. `.pop()` stays deferred until `result`/`Ok`; checked `remove_at(-1)` remains
+available. See ARRAY_OPERATIONS.md for the complete bounded contract and evidence.
+Older pending/research status paragraphs below are historical.
+
 **Current implementation and approval boundary (16 October 2026):** Phase 23's A1–A10 approve fixed-array **value snapshots**, growable-list **shared reference identity**, safe checked indexing including negative offsets, readonly capability preservation, initial `.count`, `.push(value)` and `.remove_at(index)` API names, and i32/i64 range goals. The superseding owner decision rejects any arbitrary 64 KiB production source-array/per-function storage ceiling. Stage 2F remains locked; **Stage 3A is also hosted-LOCKED** at `44fc8b6`, CI #58 (run `38982940254`, seven jobs green, 63/63 suites each). It remains a **runtime-only scalar fixed-value proof**, not source-array activation. The subsequent Orders 1–5 and Phase 23 implement source fixed/growable arrays,
 composite/nested elements, ordinary LLVM ABI lowering and production JIT/AOT
 execution. See FIXED_ARRAYS.md, GROWABLE_ARRAYS.md and the latest WORK_LOG.md
@@ -1595,7 +1609,7 @@ match letters.get(7):
         print("No item: {err}")
 ```
 
-**OPEN:** Whether fixed-size slicing yields fixed or growable results, precise negative-index bounds, safe resizable-collection borrows, and specialized zero-copy views.
+**Resolved in Phase 25:** Both source kinds yield independent growable results; negative bounds and exclusive boundary empties follow ARRAY_OPERATIONS.md. Safe resizable borrows, omitted endpoints and specialized zero-copy views remain OPEN.
 
 ## 33. Dictionaries [AGREED]
 
@@ -1640,6 +1654,9 @@ Equal keys must always hash equally. Developers should not have to configure a l
 **OPEN:** Hashing floating-point keys (`NaN`, signed zero), mutable value-struct fields after insertion, stable hashes across launches, randomization against hostile input, and opt-in custom key equality. Do not silently promise field-hash behavior when it would violate equality constraints.
 
 ## 34. Mutation during iteration [RECOMMENDED / exception OPEN]
+
+Phase 25 insertion and nonempty clear are structural changes under this rule;
+empty clear is a no-op. Slicing does not structurally mutate its source.
 
 **Current approved Phase 23 direction:** Structural version invalidation is checked at the **next iterator access**, for forward and reverse iteration. A structural mutation followed by `break` requires no further iterator access; other active iterators detect invalidation when they resume. The reverse remove-current exception remains **deferred**, not implemented or guaranteed by the example below. Phase 23 implements this rule, including the completion check and immediate
 return as well as break.

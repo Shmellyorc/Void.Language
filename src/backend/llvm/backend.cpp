@@ -513,7 +513,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         };
         for(auto t:f.locals)plan_elements(t);plan_elements(f.result);for(const auto& block:instruction_types)for(auto t:block)plan_elements(t);
         for(const auto& block:f.blocks)for(const auto& i:block.instructions)if(i.op==ir::Op::array_allocate)plan_element(ir::array_element(i.type));
+        for(unsigned bi=0;bi<f.blocks.size();++bi)for(const auto& i:f.blocks[bi].instructions)if(i.op==ir::Op::list_insert)plan_element(ir::array_element(instruction_types[bi][i.a]));
         std::function<void(ir::Type,llvm::Value*,llvm::Value*,const std::function<void()>&)> copy_value;
+        std::function<void(ir::Type,llvm::Value*,llvm::Value*,const std::function<void()>&)> copy_children;
         copy_value=[&](ir::Type t,llvm::Value* destination,llvm::Value* source,const std::function<void()>& check_failure) {
             if(ir::scalar_fixed_array(t)) {
                 b.CreateCall(module->getOrInsertFunction("vd_array_copy",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{destination,source,b.getInt32(scalar_encoding(ir::array_element(t))),b.getInt64(*t.definition->extent),failure});check_failure();return;
@@ -522,24 +524,28 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 b.CreateStore(b.CreateLoad(type(t),source),array_sources.at(t));source=array_sources.at(t);
                 auto child=ir::array_element(t);auto* record=element_record(child);auto* count=b.getInt64(*t.definition->extent);
                 b.CreateCall(module->getOrInsertFunction("vd_value_array_copy",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy()),{destination,source,record,count,failure});check_failure();
-                if(!contains_arrays(child))return;
-                source=destination;
-                auto* cursor=copy_cursors.at(t);b.CreateStore(b.getInt64(0),cursor);
-                auto* test=llvm::BasicBlock::Create(context,"array.copy.test",fn);auto* body=llvm::BasicBlock::Create(context,"array.copy.body",fn);auto* done=llvm::BasicBlock::Create(context,"array.copy.done",fn);b.CreateBr(test);b.SetInsertPoint(test);auto* index=b.CreateLoad(b.getInt64Ty(),cursor);b.CreateCondBr(b.CreateICmpULT(index,count),body,done);b.SetInsertPoint(body);
-                auto* temporary=element_staging.at(child);
-                b.CreateCall(module->getOrInsertFunction("vd_value_array_read",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{temporary,source,record,count,b.getInt32(0),index,failure});check_failure();
-                // The selected native value remains a precise whole-value root while
-                // recursive child copies allocate. Publication follows their success.
-                if(contains_arrays(child)) {
-                    auto* copied=copy_staging.contains(child)?copy_staging.at(child):temporary;copy_value(child,copied,temporary,check_failure);temporary=copied;
-                }
-                b.CreateCall(module->getOrInsertFunction("vd_value_array_write",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt32Ty(),b.getPtrTy()),{destination,record,count,b.getInt32(0),index,temporary,b.getInt64(0),b.getInt32(0),b.getInt32(0),failure});check_failure();b.CreateStore(b.CreateAdd(index,b.getInt64(1)),cursor);b.CreateBr(test);b.SetInsertPoint(done);return;
+                copy_children(t,destination,count,check_failure);return;
             }
             b.CreateStore(b.CreateLoad(type(t),source),destination);
             if(t.kind==ir::Type::aggregate)for(unsigned field=0;field<t.definition->fields.size();++field) {
                 auto child=ir::field_type(t,field);
                 if(contains_arrays(child))copy_value(child,field_address(t,destination,field),field_address(t,source,field),check_failure);
             }
+        };
+        copy_children=[&](ir::Type t,llvm::Value* destination,llvm::Value* count,const std::function<void()>& check_failure) {
+                auto child=ir::array_element(t);auto* record=element_record(child);
+                if(!contains_arrays(child))return;
+                auto* source=destination;
+                auto* cursor=copy_cursors.at(t);b.CreateStore(b.getInt64(0),cursor);
+                auto* test=llvm::BasicBlock::Create(context,"array.copy.test",fn);auto* body=llvm::BasicBlock::Create(context,"array.copy.body",fn);auto* done=llvm::BasicBlock::Create(context,"array.copy.done",fn);b.CreateBr(test);b.SetInsertPoint(test);auto* index=b.CreateLoad(b.getInt64Ty(),cursor);b.CreateCondBr(b.CreateICmpULT(index,count),body,done);b.SetInsertPoint(body);
+                auto* temporary=element_staging.at(child);
+                b.CreateCall(module->getOrInsertFunction("vd_value_array_read",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{temporary,source,record,count,b.getInt32(t.kind==ir::Type::growable_array),index,failure});check_failure();
+                // The selected native value remains a precise whole-value root while
+                // recursive child copies allocate. Publication follows their success.
+                if(contains_arrays(child)) {
+                    auto* copied=copy_staging.contains(child)?copy_staging.at(child):temporary;copy_value(child,copied,temporary,check_failure);temporary=copied;
+                }
+                b.CreateCall(module->getOrInsertFunction("vd_value_array_write",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt32Ty(),b.getPtrTy()),{destination,record,count,b.getInt32(t.kind==ir::Type::growable_array),index,temporary,b.getInt64(0),b.getInt32(0),b.getInt32(0),failure});check_failure();b.CreateStore(b.CreateAdd(index,b.getInt64(1)),cursor);b.CreateBr(test);b.SetInsertPoint(done);return;
         };
         std::vector<std::vector<llvm::Value*>> value_roots(f.blocks.size());
         if (input.coordinated) {
@@ -650,7 +656,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     if(numeric::floating(t)) value=b.CreateBitCast(value,b.getIntNTy(numeric::width(t)));
                     return b.CreateZExtOrTrunc(value,b.getInt64Ty());
                 };
-                auto array_index=[&](unsigned id,ir::Type array,unsigned owner)->llvm::Value* {
+                auto array_index=[&](unsigned id,ir::Type array,unsigned owner,bool boundary=false)->llvm::Value* {
                     auto index_type=operand_type(id);auto* index=values.at(id);
                     index=numeric::signed_integer(index_type)?b.CreateSExtOrTrunc(index,b.getInt64Ty()):b.CreateZExtOrTrunc(index,b.getInt64Ty());
                     llvm::Value* count;
@@ -658,7 +664,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         count=ir::scalar_array(array) ? b.CreateCall(module->getOrInsertFunction("vd_list_count",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{value_roots[n].at(owner),b.getInt32(scalar_encoding(ir::array_element(array))),failure}) : b.CreateCall(module->getOrInsertFunction("vd_value_array_count",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{value_roots[n].at(owner),element_record(ir::array_element(array)),failure});array_failure();
                     } else count=b.getInt64(*array.definition->extent);
                     if(numeric::signed_integer(index_type)) index=b.CreateSelect(b.CreateICmpSLT(index,b.getInt64(0)),b.CreateAdd(index,count),index);
-                    fail_if(b.CreateICmpUGE(index,count),array.kind==ir::Type::growable_array ? "List index outside extent" : "Fixed array index outside extent");return index;
+                    fail_if(boundary?b.CreateICmpUGT(index,count):b.CreateICmpUGE(index,count),array.kind==ir::Type::growable_array ? "List index outside extent" : "Fixed array index outside extent");return index;
                 };
                 switch (instruction.op) {
                 case Op::fixed_array: {
@@ -739,17 +745,37 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     else {v=b.CreateCall(module->getOrInsertFunction(instruction.op==Op::list_version ? "vd_list_version" : "vd_list_count",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{value_roots[n].at(instruction.a),b.getInt32(scalar_encoding(ir::array_element(t))),failure});array_failure();}
                     break;
                 }
+                case Op::array_slice: {
+                    auto t=operand_type(instruction.a);auto* source=value_roots[n].at(instruction.a);
+                    auto* first=array_index(instruction.b,t,instruction.a,instruction.immediate!=0);
+                    auto* last=array_index(instruction.arguments[0],t,instruction.a,instruction.immediate!=0);
+                    auto* descending=b.CreateICmpUGT(first,last);
+                    auto* length=b.CreateSelect(descending,b.CreateSub(first,last),b.CreateSub(last,first));
+                    if(!instruction.immediate)length=b.CreateAdd(length,b.getInt64(1));
+                    // Equal exclusive boundaries are empty; every other start is an element.
+                    if(instruction.immediate){auto* empty=llvm::BasicBlock::Create(context,"slice.empty",fn);auto* checked=llvm::BasicBlock::Create(context,"slice.start",fn);auto* join=llvm::BasicBlock::Create(context,"slice.copy",fn);b.CreateCondBr(b.CreateICmpEQ(first,last),empty,checked);b.SetInsertPoint(empty);b.CreateBr(join);b.SetInsertPoint(checked);array_index(instruction.b,t,instruction.a);b.CreateBr(join);b.SetInsertPoint(join);}
+                    auto* result=value_roots[n].at(values.size());
+                    b.CreateCall(module->getOrInsertFunction("vd_value_array_slice",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getInt64Ty(),b.getInt32Ty(),b.getPtrTy()),{result,source,element_record(ir::array_element(t)),b.getInt64(t.definition->extent.value_or(0)),b.getInt32(t.kind==ir::Type::growable_array),first,length,b.CreateZExt(descending,b.getInt32Ty()),failure});array_failure();
+                    if(contains_arrays(ir::array_element(t)))copy_children(instruction.type,result,length,array_failure);
+                    v=b.CreateLoad(type(instruction.type),result);break;
+                }
+                case Op::list_insert: case Op::list_clear: {
+                    auto t=operand_type(instruction.a);auto* source=value_roots[n].at(instruction.a);auto* record=element_record(ir::array_element(t));
+                    if(instruction.op==Op::list_clear)b.CreateCall(module->getOrInsertFunction("vd_value_array_clear",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{source,record,failure});
+                    else b.CreateCall(module->getOrInsertFunction("vd_value_array_insert",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy()),{source,record,values[instruction.b],native_arg(ir::array_element(t),instruction.arguments[0],true),values[instruction.arguments[1]],failure});
+                    if(instruction.op==Op::list_insert)fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"List selected insertion invalidated or failed");else array_failure();break;
+                }
                 case Op::list_index: case Op::list_push: case Op::list_remove: case Op::list_commit: {
                     auto t=operand_type(instruction.a);auto element=ir::array_element(t);auto* source=value_roots[n].at(instruction.a);
                     if(!ir::scalar_array(t)) {
-                        if(instruction.op==Op::list_index){v=array_index(instruction.b,t,instruction.a);break;}
+                        if(instruction.op==Op::list_index){v=array_index(instruction.b,t,instruction.a,instruction.immediate!=0);break;}
                         if(instruction.op==Op::list_commit)native_write(t,source,values[instruction.b],native_arg(element,instruction.arguments[0],true),false,values[instruction.arguments[1]]);
                         else if(instruction.op==Op::list_push){b.CreateCall(module->getOrInsertFunction("vd_value_array_push",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{source,element_record(element),native_arg(element,instruction.b,true),failure});array_failure();}
                         else {auto* index=array_index(instruction.b,t,instruction.a);auto* result=element_staging.at(element);b.CreateCall(module->getOrInsertFunction("vd_value_array_remove",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy()),{result,source,element_record(element),index,failure});array_failure();v=b.CreateLoad(type(element),result);}
                         break;
                     }
                     auto* encoding=b.getInt32(scalar_encoding(element));
-                    if(instruction.op==Op::list_index) {v=array_index(instruction.b,t,instruction.a);break;}
+                    if(instruction.op==Op::list_index) {v=array_index(instruction.b,t,instruction.a,instruction.immediate!=0);break;}
                     if(instruction.op==Op::list_push) {
                         v=b.CreateCall(module->getOrInsertFunction("vd_list_push",b.getVoidTy(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,encoding,bits(values[instruction.b],element),failure});array_failure();
                     } else if(instruction.op==Op::list_commit) {
@@ -1118,6 +1144,7 @@ Jit::Jit() : impl_(std::make_shared<Impl>()) {
     bind("vd_string_literal",vd_string_literal); bind("vd_string_concat",vd_string_concat); bind("vd_string_equal",vd_string_equal);
     bind("vd_array_default",vd_array_default);bind("vd_array_copy",vd_array_copy);
     bind("vd_array_read",vd_array_read);bind("vd_array_write",vd_array_write);
+    bind("vd_value_array_insert",vd_value_array_insert);bind("vd_value_array_clear",vd_value_array_clear);bind("vd_value_array_slice",vd_value_array_slice);
     bind("vd_value_array_new",vd_value_array_new);bind("vd_value_array_count",vd_value_array_count);bind("vd_value_array_version",vd_value_array_version);bind("vd_value_array_read",vd_value_array_read);bind("vd_value_array_write",vd_value_array_write);bind("vd_value_array_push",vd_value_array_push);bind("vd_value_array_remove",vd_value_array_remove);bind("vd_value_array_copy",vd_value_array_copy);
     bind("vd_list_new",vd_list_new);bind("vd_list_count",vd_list_count);bind("vd_list_version",vd_list_version);
     bind("vd_list_read",vd_list_read);bind("vd_list_write",vd_list_write);bind("vd_list_push",vd_list_push);bind("vd_list_remove",vd_list_remove);

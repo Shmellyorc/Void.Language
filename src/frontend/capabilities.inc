@@ -99,6 +99,9 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     auto child=expression(*part);
                     for(const auto& [leaf,fact]:child) {auto path=leaf;path.insert(path.begin(),ir::array_element_path);view[path].join(fact);}
                 }
+            } else if(e.kind==K::array_slice) {
+                auto owner=expression(*e.parts[0]);expression(*e.parts[1]);expression(*e.parts[2]);
+                view=ir::replaced_facts(std::move(view),ir::array_element_path,ir::field_facts(e.parts[0]->type,owner,ir::array_element_path));
             } else if(e.kind==K::array_index) {
                 auto owner=expression(*e.parts[0]);expression(*e.parts[1]);view=ir::field_facts(e.parts[0]->type,owner,ir::array_element_path);
             } else if (e.kind==K::name) view=locals.at(e.slot);
@@ -111,7 +114,8 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 for (auto& part:e.parts) arguments.push_back(expression(*part));
                 if(e.target.starts_with("$array.")) {
                     if(e.token.text=="push")compatible(arguments[1],ir::array_element(e.parts[0]->type),e.token);
-                    else view=ir::field_facts(e.parts[0]->type,arguments[0],ir::array_element_path);
+                    else if(e.token.text=="insert")compatible(arguments[2],ir::array_element(e.parts[0]->type),e.token);
+                    else if(e.token.text=="remove_at")view=ir::field_facts(e.parts[0]->type,arguments[0],ir::array_element_path);
                     if(auto leaf=arguments[0].find({});leaf!=arguments[0].end()) {
                         effect(f.reference_effects.mutations,leaf->second);
                         if(report && leaf->second.readonly)issue(e.token,"Cannot mutate a readonly list.");

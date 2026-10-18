@@ -117,6 +117,9 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         check(values[i.arguments[0]],array_element(types[function][block][i.a]),true);break;
                     case Op::array_get:
                         value=field_facts(types[function][block][i.a],values[i.a],array_element_path);break;
+                    case Op::array_slice:
+                        value=replaced_facts(std::move(value),array_element_path,field_facts(types[function][block][i.a],values[i.a],array_element_path));
+                        break;
                     case Op::array_set:
                         check(values[i.arguments[0]],array_element(types[function][block][i.a]),true);value=values[i.a];break;
                     case Op::aggregate:
@@ -128,11 +131,11 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                     case Op::gc_construct:
                         for(auto argument:i.arguments) retain(values[argument]);
                         break;
-                    case Op::list_push: case Op::list_remove: case Op::list_commit: {
+                    case Op::list_push: case Op::list_remove: case Op::list_commit: case Op::list_insert: case Op::list_clear: {
                         auto owner=types[function][block][i.a];
                         if(auto found=values[i.a].find({});found!=values[i.a].end()) {effect(summary.mutations,found->second);if(found->second.readonly)fail("mutation through readonly list");}
-                        if(i.op!=Op::list_remove)check(values[i.op==Op::list_push?i.b:i.arguments[0]],array_element(owner),true);
-                        else value=field_facts(owner,values[i.a],array_element_path);
+                        if(i.op!=Op::list_remove && i.op!=Op::list_clear)check(values[i.op==Op::list_push?i.b:i.arguments[0]],array_element(owner),true);
+                        else if(i.op==Op::list_remove)value=field_facts(owner,values[i.a],array_element_path);
                         break;
                     }
                     case Op::gc_write:

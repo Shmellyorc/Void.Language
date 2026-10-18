@@ -11265,3 +11265,137 @@ research acceptance boundaries are unchanged. HEAD remains the accepted baseline
 all delivery changes are uncommitted. No branches, commits, pushes, remote
 modifications or hosted CI launches were performed. Ready for owner review and
 hosted cross-platform validation.
+
+
+## 2026-10-18 — Phase 25: expanded array operations
+
+Baseline: owner-locked Phase 24 `47cb73c300bc9ea1cef6fcc6789eb6b481e438d0`,
+CI #63 (seven green jobs). Implemented the owner's approved insertion, clear and
+slice contract; Phase 24 and Orders 1–5 remain intact. LLVM remains 19.1.7 and
+research remains OFF in all production validation configurations.
+
+- Growable `.insert(index, value)` accepts positions 0 through count, including
+  existing negative element normalization. Receiver/index selection and boundary
+  checking precede value evaluation; captured version rejects structural RHS
+  mutation while preserving earlier side effects. Push and insert share the
+  existing locked in-capacity path and transactional leased-buffer growth path.
+- `.clear()` preserves list identity/capacity, zeros removed elements and updates
+  the traced live prefix under the Runtime lock. Nonempty clear increments the
+  version once; empty clear is a no-op. Removed references become collectible.
+- Fixed/growable `source[first..last]` and `source[first..<last]` create fresh
+  growable collections, support negative/mixed integer endpoints and normalized
+  forward/reverse direction, and reject invalid bounds without clamping. Equal
+  exclusive boundary endpoints are empty. Receiver/start/end evaluate once in
+  order; fixed receivers snapshot before endpoint effects, list receivers retain
+  identity and copy current contents afterwards. Fixed children copy recursively;
+  lists/managed references preserve identity and readonly authority.
+- Reused the existing semantic checker, IR capability propagation/validation,
+  precise Frame/Slot roots, BufferBuilder/read leases, and shared LLVM JIT/AOT
+  lowerer. Extracted the existing fixed-child copy loop for use by slicing. No
+  additional collector, collection implementation, registry or verification system.
+- Added eight real source fixtures and `collections_source` / `collections_cli`
+  to the existing production CTest workflow. They exercise all element families,
+  generic instances, readonly errors, evaluation order, aliases, fixed snapshots,
+  iterator invalidation, reference reclamation, failure rollback/retry, roots,
+  publication, hot reload/old leases and generic source navigation.
+- Owner addition: `.github/workflows/ci.yml` job timeout changed from 90 to
+  **120 minutes** (two hours); the existing seven-job matrix is unchanged.
+
+A demonstrated frontend integration defect was fixed: inference revisited an
+already checked constructor inside an unannotated nested array literal, dispatched
+it as a binary expression and accessed nonexistent operands. Reuse its checked
+construction type on that revisit; the normal contextual compatibility check still
+runs. Both readonly rejection and positive nested-construction/slice cases cover
+this path. The initial CLI invalidation regression also exposed an opaque generic
+array failure message; insertion now reports selected insertion invalidation/failure
+with its original source location. Tests retain strict checked-failure assertions.
+
+Focused validation before consolidated builds:
+
+```sh
+cmake --build build/order1/production --target void_collections_tests void_arrays_source void_generics_tests void_tests -j3
+ctest --test-dir build/order1/production -R '^(collections_source|arrays_source|generics_source|frontend)$' --output-on-failure -j2
+ctest --test-dir build/order1/production -R '^(collections_source|collections_cli)$' --output-on-failure -j2
+```
+
+Results: adjacent suite **4/4 passed** (61.46 s); final feature JIT/AOT suites
+**2/2 passed** (63.94 s). Feature CLI covers **120 executions**: 76 successful
+and 44 checked failures through normal/O2 JIT and independently linked AOT.
+Source sweeps cover 276 failing budgets for main and 2,170 for nested in each
+codegen mode, with valid balanced roots, transactional publication, collection
+to an empty heap and successful retry after every failure. Native sweeps separately
+cover growth (19), in-capacity insertion (4) and slicing (36) failing budgets on
+this Linux build; allocation-free paths are allowed to succeed at budget zero.
+Logs and exact build evidence are under ignored `build/phase25/`.
+
+Consolidated validation commands (existing configured Debug, Release and strict
+RelWithDebInfo sanitizer builds; all with `VOID_LLVM_RESEARCH=OFF`):
+
+```sh
+cmake --build build/order1/production -j3
+ctest --test-dir build/order1/production --output-on-failure -j2
+cmake -S . -B build/ci-release -DVOID_LLVM_RESEARCH=OFF
+cmake --build build/ci-release -j3
+ctest --test-dir build/ci-release --output-on-failure -j2
+export ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87
+export UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86
+cmake -S . -B build/ci-sanitizers -DVOID_LLVM_RESEARCH=OFF
+cmake --build build/ci-sanitizers -j3
+ctest --test-dir build/ci-sanitizers --output-on-failure -j2
+```
+
+Sanitizer execution uses the ordinary host environment outside the tracing sandbox
+so LeakSanitizer can run. No sanitizer is disabled and no findings are suppressed.
+
+Debug and Release also pass the existing frontend and deep-receiver regressions
+with a **1 MiB native stack**, plus all four normal/O2 JIT/linked AOT executions of
+the 2 MiB collection fixture (each returns 14). Exact commands, run for each build:
+
+```sh
+for configuration in order1/production ci-release; do
+  (ulimit -s 1024; ctest --test-dir build/$configuration -R '^frontend$' --output-on-failure)
+  python3 tests/integration/semantic_depth.py build/$configuration/voidc
+  (ulimit -s 1024; build/$configuration/voidc run examples/collections/large.void 7 --no-opt && build/$configuration/voidc run examples/collections/large.void 7 && build/$configuration/void_collections_cli_large_normal 7 && build/$configuration/void_collections_cli_large_optimized 7)
+done
+```
+
+The final rebuilt Debug voidls passes the existing real VS Code trusted, restricted
+trust and multi-root integration runs. Extension typecheck/build/test and VSIX
+packaging also pass. Commands (Node 24.19.0 on PATH):
+
+```sh
+npm --prefix editors/vscode test
+VOIDLS_PATH=/home/shmellyorc/Documents/Void.Language/build/order1/production/voidls VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm --prefix editors/vscode run test:host
+npm --prefix editors/vscode run package
+```
+
+The local deliverable is `editors/vscode/dist/void-language-0.1.0.vsix`. Evidence:
+`build/phase25/editor-tests.log`, `editor-host.log`, `vsix.log`,
+`debug-stack.log` and `release-stack.log`. Existing CTest coverage includes LSP,
+hot reload, cross-module/entry/linkage, native packaging and Runtime regressions.
+
+Final consolidated results on the corrected source:
+
+| Configuration | Production CTest | Elapsed |
+| --- | --- | --- |
+| Linux Debug | **72/72 passed** | 254.83 s |
+| Linux Release | **72/72 passed** | 108.30 s |
+| Strict ASan/UBSan + leak detection | **72/72 passed**, no sanitizer/leak findings | 239.64 s |
+
+Final build/test logs are `build/phase25/{debug,release,sanitizer}-build.log` and
+`{debug,release,sanitizer}-tests.log`; corresponding `*-test-details.log` files
+preserve successful-test output and failure-sweep evidence. All three configurations
+report the same collection allocation-sweep counts above. No test assertions were
+weakened, production tests removed or sanitizer settings relaxed.
+
+Remaining boundaries: `.pop()` deliberately awaits result/Ok; omitted slice
+endpoints, slice assignment/views, string slicing and unrelated collection features
+are outside this approved delivery. Compiler temporaries retain ordinary function
+root lifetimes. There are no known failing local production tests. Windows/macOS
+verification remains the owner's hosted acceptance gate; no cross-platform pass
+claim is made. Updated ARRAY_OPERATIONS.md and the relevant language/array/generic
+contracts document the implemented behavior and supersede historical exclusions.
+
+`git diff --check` passed. HEAD remains the accepted baseline and all changes are
+uncommitted. No branches, commits, pushes, remote modifications or hosted CI
+launches were performed. Ready for owner review and hosted cross-platform CI.

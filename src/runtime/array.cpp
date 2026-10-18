@@ -141,18 +141,22 @@ void Runtime::array_write_value(RegisteredRootWord source,const ElementSchemaRef
     std::memcpy(static_cast<char*>(object)+state.layout->element_offset(index),value,schema->bytes());state.catalog=types_;
     if(initialize) {++state.valid_prefix;if(h)++h->count;}
 }
-void Runtime::array_push(RegisteredRootWord source,const ElementSchemaRef& schema,const void* value) {
+void Runtime::array_push(RegisteredRootWord source,const ElementSchemaRef& schema,const void* value) {array_insert(source,schema,{},value);}
+void Runtime::array_insert(RegisteredRootWord source,const ElementSchemaRef& schema,std::optional<std::uint64_t> position,const void* value,std::optional<std::uint64_t> expected) {
     require_managed();if(!schema || !schema->mutable_data())throw std::invalid_argument("array profile does not permit mutation");DataCursor cursor;if(!std::holds_alternative<SchemaScalar>(schema->spec_.nodes[schema->spec_.root]))cursor.prepare(schema);poll();
     void* old=nullptr;void* next=nullptr;constexpr std::size_t zero=0;Slot slots[]={{&old,sizeof(old),&zero,1},{&next,sizeof(next),&zero,1}};Frame roots(*this,slots,2);
     std::uint64_t count,capacity,version;BufferLayoutRef old_layout;
-    {std::lock_guard lock(mutex_);validate_native_element(value,cursor,schema);auto& h=list_header(source,schema);structural_room(h.version);if(h.count==maximum)throw std::length_error("list count overflow");
+    {std::lock_guard lock(mutex_);validate_native_element(value,cursor,schema);auto& h=list_header(source,schema);if(expected && *expected!=h.version)throw ListModified("List structurally modified during selected insertion");
+        if(!position)position=h.count;if(*position>h.count)throw std::out_of_range("list insertion index outside extent");structural_room(h.version);if(h.count==maximum)throw std::length_error("list count overflow");
         if(h.count<h.capacity) {const auto& state=heap_.buffer_state(h.backing);if(state.readers)throw BufferBusy("leased list backing");
-            std::memcpy(static_cast<char*>(h.backing)+state.layout->element_offset(h.count),value,schema->bytes());state.catalog=types_;state.valid_prefix=++h.count;++h.version;return;}
+            auto* to=static_cast<char*>(h.backing)+state.layout->element_offset(*position);
+            std::memmove(to+state.layout->stride(),to,static_cast<std::size_t>(h.count-*position)*state.layout->stride());
+            std::memcpy(to,value,schema->bytes());state.catalog=types_;state.valid_prefix=++h.count;++h.version;return;}
         count=h.count;capacity=h.capacity;version=h.version;old=h.backing;if(old)old_layout=heap_.buffer_state(old).layout;
     }
     const auto grown=capacity ? (capacity>maximum/2 ? maximum : capacity*2) : 4;auto next_layout=buffer_layout(schema,grown);
     std::optional<BufferReadLease> lease;if(old)lease.emplace(*this,root_word(&old),old_layout);
-    BufferBuilder builder(*this,next_layout,count+1,quota);if(lease)builder.copy_elements(*lease,0,count);append_native(builder,next_layout,value);builder.finish_into(&next);
+    BufferBuilder builder(*this,next_layout,count+1,quota);if(lease)builder.copy_elements(*lease,0,*position);append_native(builder,next_layout,value);if(lease)builder.copy_elements(*lease,*position,count-*position);builder.finish_into(&next);
     std::lock_guard lock(mutex_);auto& h=list_header(source,schema);
     if(h.version!=version || h.backing!=old || h.count!=count)throw ListModified("List structurally modified during resize");
     h.backing=next;h.capacity=grown;h.count=count+1;h.version=version+1;
@@ -166,5 +170,35 @@ void Runtime::array_remove(void* out,RegisteredRootWord source,const ElementSche
 void Runtime::array_copy(void** out,RegisteredRootWord source,const BufferLayoutRef& layout) {
     require_buffer_output(out);BufferReadLease lease(*this,source,layout);if(lease.count()!=layout->capacity())throw std::invalid_argument("incomplete fixed snapshot");
     BufferBuilder builder(*this,layout,layout->capacity(),quota);builder.copy_elements(lease,0,layout->capacity());builder.finish_into(out);
+}
+}
+
+namespace vd {
+void Runtime::array_clear(RegisteredRootWord source,const ElementSchemaRef& schema) {
+    require_managed();if(!schema || !schema->mutable_data())throw std::invalid_argument("array profile does not permit mutation");poll();std::lock_guard lock(mutex_);auto& h=list_header(source,schema);
+    if(!h.count)return;structural_room(h.version);const auto& state=heap_.buffer_state(h.backing);
+    if(state.readers)throw BufferBusy("leased list backing");
+    std::memset(static_cast<char*>(h.backing)+state.layout->element_offset(0),0,static_cast<std::size_t>(h.count)*state.layout->stride());state.valid_prefix=h.count=0;++h.version;
+}
+void Runtime::array_slice(void** out,RegisteredRootWord source,const BufferLayoutRef& layout,bool list,std::uint64_t first,std::uint64_t count,bool reverse) {
+    require_managed();require_buffer_output(out);poll();
+    void* backing=nullptr;void* next=nullptr;void* result=nullptr;constexpr std::size_t zero=0;
+    Slot slots[]={{&backing,sizeof(backing),&zero,1},{&next,sizeof(next),&zero,1},{&result,sizeof(result),&zero,1}};Frame roots(*this,slots,3);
+    std::uint64_t live,version=0;BufferLayoutRef original;
+    {std::lock_guard lock(mutex_);validate_buffer_layout(layout);heap_.validate_output_address(out);
+        if(list){auto& h=list_header(source,layout->schema());backing=h.backing;live=h.count;version=h.version;}
+        else {backing=reference_source(source);const auto& state=heap_.buffer_state(backing);if(!state.complete || !state.layout->equivalent(*layout) || state.valid_prefix!=layout->capacity())throw std::invalid_argument("invalid fixed slice source");live=layout->capacity();}
+        if(count ? (first>=live || (reverse ? count-1>first : count>live-first)) : first>live)throw std::out_of_range("slice outside extent");
+        if(backing)original=heap_.buffer_state(backing).layout;
+    }
+    auto target=buffer_layout(layout->schema(),count);std::optional<BufferReadLease> lease;
+    if(count)lease.emplace(*this,root_word(&backing),original);
+    if(count){BufferBuilder builder(*this,target,count,quota);if(!reverse)builder.copy_elements(*lease,first,count);else for(std::uint64_t i=0;i<count;++i)builder.copy_elements(*lease,first-i,1);builder.finish_into(&next);}
+    array_new(&result,buffer_layout(layout->schema(),0),true);
+    auto result_root=root_word(&result);
+    {std::lock_guard lock(mutex_);
+        if(list){const auto& h=list_header(source,layout->schema());if(h.version!=version || h.backing!=backing || h.count!=live)throw ListModified("List structurally modified during slice");}
+        auto& h=list_header(result_root,layout->schema());h.backing=next;h.count=h.capacity=count;*out=result;
+    }
 }
 }

@@ -1,0 +1,35 @@
+struct state:
+    count: i32
+    items: [i32]
+    fixed: [i32, 3]
+func mark(s: state, digit: i32, result: i32) -> i32:
+    s.count = s.count * 10 + digit
+    return result
+func mutate(s: state) -> i32:
+    s.items.push(9)
+    return 8
+func rebind(s: state) -> i32:
+    s.items = [9]
+    return 0
+func endpoint(s: state) -> i32:
+    s.fixed[0] = 99
+    return 0
+func entry(value: i32) -> i32:
+    var s = state(items = [1, 2], fixed = [1, 2, 3])
+    if value == 1:
+        s.items.insert(mark(s, 1, 99), mark(s, 2, 8))
+    if value == 2:
+        s.items.insert(0, mutate(s))
+    s.items.insert(mark(s, 1, 1), mark(s, 2, 8))
+    if s.count != 12 or s.items[1] != 8:
+        return -100
+    var part = s.items[mark(s, 3, 0)..<mark(s, 4, 2)]
+    if s.count != 1234 or part.count != 2:
+        return -200
+    var old = s.items[rebind(s)..<3]
+    if old.count != 3 or old[1] != 8 or s.items.count != 1:
+        return -250
+    var snap = s.fixed[endpoint(s)..2]
+    if snap[0] != 1 or s.fixed[0] != 99:
+        return -300
+    return 12

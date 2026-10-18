@@ -98,3 +98,10 @@ payload copies were left unchanged. Worst-case root scans and potential-alias
 scans remain linear, and schema-key lookup still allocates one small string per
 source access. See the Order 4 WORK_LOG entry for reproducible commands, baseline,
 allocation counts, focused tests and measurement limitations.
+
+## Phase 25 slicing
+
+Fixed sources now support inclusive/exclusive independent slices returning `[T]`.
+Their source value is snapshotted before endpoint evaluation; fixed children copy
+and referenced identities/readonly authority retain their existing rules. See
+[ARRAY_OPERATIONS.md](ARRAY_OPERATIONS.md). Fixed arrays cannot insert or clear.

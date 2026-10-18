@@ -1,0 +1,19 @@
+func cycle<t>(value: t) -> t:
+    var items: [t] = []
+    items.insert(0, value)
+    var part = items[0..0]
+    items.clear()
+    return part.remove_at(0)
+func select<i>(index: i) -> i32:
+    var numbers = [2]
+    return numbers[index..index][0]
+func entry(value: i32) -> i32:
+    if cycle<i8>(-128) != -128 or cycle<i16>(-32768) != -32768 or cycle<i32>(value) != value or cycle<i64>(-9223372036854775808) != -9223372036854775808:
+        return -100
+    if cycle<u8>(255) != 255 or cycle<u16>(65535) != 65535 or cycle<u32>(4294967295) != 4294967295 or cycle<u64>(18446744073709551615) != 18446744073709551615:
+        return -200
+    if cycle<f32>(0.5) != 0.5f or cycle<f64>(0.5) != 0.5d or not cycle<bool>(true):
+        return -300
+    if select<i8>(0) + select<i16>(0) + select<i32>(0) + select<i64>(0) + select<u8>(0) + select<u16>(0) + select<u32>(0) + select<u64>(0) != 16:
+        return -400
+    return value

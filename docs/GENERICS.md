@@ -100,3 +100,6 @@ selected entries, reload, root inspection, GC pressure and allocation-failure
 cleanup/retry. `tests/integration/generics.cmake` executes the same source examples
 through normal/O2 JIT and independently linked AOT, including 2 MiB fixed arrays.
 See the Phase 24 WORK_LOG entry for exact commands and measured results.
+
+Phase 25 applies insert, clear and independent slicing to concrete generic elements
+and generic bodies through the same specialization path; see ARRAY_OPERATIONS.md.

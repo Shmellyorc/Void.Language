@@ -78,6 +78,9 @@ public:
     void array_read(void*,RegisteredRootWord,const BufferLayoutRef&,bool list,std::uint64_t) const;
     void array_write(RegisteredRootWord,const BufferLayoutRef&,bool list,std::uint64_t,const void*,bool initialize=false,std::optional<std::uint64_t> version={});
     void array_push(RegisteredRootWord,const ElementSchemaRef&,const void*);
+    void array_insert(RegisteredRootWord,const ElementSchemaRef&,std::optional<std::uint64_t>,const void*,std::optional<std::uint64_t> version={});
+    void array_clear(RegisteredRootWord,const ElementSchemaRef&);
+    void array_slice(void**,RegisteredRootWord,const BufferLayoutRef&,bool,std::uint64_t,std::uint64_t,bool);
     void array_remove(void*,RegisteredRootWord,const ElementSchemaRef&,std::uint64_t);
     void array_copy(void**,RegisteredRootWord,const BufferLayoutRef&);
     void list_into(void**,ScalarEncoding,std::uint64_t count=0);

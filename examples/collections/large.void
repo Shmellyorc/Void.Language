@@ -1,0 +1,11 @@
+func entry(value: i32) -> i32:
+    var bytes: [u8, 2097152]
+    bytes[0] = 1
+    bytes[-1] = 7
+    var full = bytes[0..<2097152]
+    full.insert(1, 2)
+    var backwards = full[-1..0]
+    if backwards[0] != 7 or backwards[-1] != 1 or full.count != 2097153:
+        return -100
+    full.clear()
+    return value + backwards[0] as i32

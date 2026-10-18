@@ -617,13 +617,19 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::array_count: case Op::list_version:
                     if(!array_type(operand(i.a)) || (i.op==Op::list_version && operand(i.a).kind!=Type::growable_array) || i.b || i.receiver || !i.arguments.empty() || i.immediate || i.initialization || !i.callee.empty())fail("invalid array property");
                     result=i.op==Op::array_count ? Type::i64 : Type::u64;break;
-                case Op::list_index: case Op::list_push: case Op::list_remove: case Op::list_commit: {
+                case Op::array_slice:
+                    valid_type(i.type);
+                    if(!array_type(operand(i.a)) || i.type.kind!=Type::growable_array || array_element(i.type)!=array_element(operand(i.a)) || !numeric::integer(operand(i.b)) || i.arguments.size()!=1 || !numeric::integer(operand(i.arguments[0])) || i.immediate<0 || i.immediate>1 || i.receiver || i.initialization || !i.callee.empty())fail("invalid array slice");
+                    result=i.type;break;
+                case Op::list_clear:
+                    if(operand(i.a).kind!=Type::growable_array || i.b || i.immediate || i.receiver || !i.arguments.empty() || i.initialization || !i.callee.empty())fail("invalid list clear");result=Type::none;break;
+                case Op::list_index: case Op::list_push: case Op::list_remove: case Op::list_commit: case Op::list_insert: {
                     auto array=operand(i.a);
-                    if(!array_type(array) || array.kind!=Type::growable_array || i.receiver || i.immediate || i.initialization || !i.callee.empty())fail("invalid list operation");
+                    if(!array_type(array) || array.kind!=Type::growable_array || i.receiver || (i.immediate && !(i.op==Op::list_index && i.immediate==1)) || i.initialization || !i.callee.empty())fail("invalid list operation");
                     if(i.op==Op::list_push) {expect(i.b,array_element(array));if(!i.arguments.empty())fail("unexpected list push operands");result=Type::none;}
                     else {
                         if(!numeric::integer(operand(i.b)))fail("list index requires integer");
-                        if(i.op==Op::list_commit) {
+                        if(i.op==Op::list_commit || i.op==Op::list_insert) {
                             if(operand(i.b)!=Type::u64 || i.arguments.size()!=2)fail("invalid selected list commit");
                             expect(i.arguments[0],array_element(array));expect(i.arguments[1],Type::u64);result=Type::none;
                         } else {if(!i.arguments.empty())fail("unexpected list index operands");result=i.op==Op::list_index ? Type::u64 : array_element(array);}

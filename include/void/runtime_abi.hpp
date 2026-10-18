@@ -67,6 +67,9 @@ std::uint64_t vd_value_array_count(void**,const vd::NativeArrayElement*,vd::Runt
 std::uint64_t vd_value_array_version(void**,const vd::NativeArrayElement*,vd::RuntimeFailure*) noexcept;
 void vd_value_array_read(void*,void**,const vd::NativeArrayElement*,std::uint64_t,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 void vd_value_array_write(void**,const vd::NativeArrayElement*,std::uint64_t,unsigned,std::uint64_t,const void*,std::uint64_t,unsigned,unsigned,vd::RuntimeFailure*) noexcept;
+void vd_value_array_insert(void**,const vd::NativeArrayElement*,std::uint64_t,const void*,std::uint64_t,vd::RuntimeFailure*) noexcept;
+void vd_value_array_clear(void**,const vd::NativeArrayElement*,vd::RuntimeFailure*) noexcept;
+void vd_value_array_slice(void**,void**,const vd::NativeArrayElement*,std::uint64_t,unsigned,std::uint64_t,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
 void vd_value_array_push(void**,const vd::NativeArrayElement*,const void*,vd::RuntimeFailure*) noexcept;
 void vd_value_array_remove(void*,void**,const vd::NativeArrayElement*,std::uint64_t,vd::RuntimeFailure*) noexcept;
 void vd_value_array_copy(void**,void**,const vd::NativeArrayElement*,std::uint64_t,vd::RuntimeFailure*) noexcept;

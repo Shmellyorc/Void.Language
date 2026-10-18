@@ -1,0 +1,20 @@
+func entry(value: i32) -> i32:
+    var items = [10, 20, 30]
+    if value == 1:
+        return items[3..3].count as i32
+    if value == 2:
+        return items[3..<0].count as i32
+    if value == 3:
+        return items[-4..0].count as i32
+    if value == 4:
+        items.insert(-4, 9)
+    if value == 5:
+        var huge: u64 = 18446744073709551615
+        return items[0..<huge].count as i32
+    if value == 6:
+        var empty: [i32] = []
+        return empty[0..0].count as i32
+    var all = items[0..<items.count]
+    var backwards = items[-1..<0]
+    var singleton = items[-1..-1]
+    return all.count as i32 + backwards[1] + singleton[0]

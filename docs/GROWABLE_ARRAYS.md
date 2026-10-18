@@ -77,8 +77,8 @@ backing capacity). The large example also runs under a 1 MiB native stack.
 Exact local commands/results are recorded in the growable-array WORK_LOG entry.
 
 The additional `arrays_source` and `arrays_cli` suites cover composite/nested
-elements, traversal and ranges described below. List equality, slicing, sorting
-and generic collections remain outside this feature. Cross-platform
+elements, traversal and ranges described below. Phase 24 adds native generic collections. Phase 25 adds insert/clear/slicing as
+described in ARRAY_OPERATIONS.md; equality and sorting remain outside this feature. Cross-platform
 execution remains for hosted CI; local evidence is Linux LLVM 19.1.7.
 
 ## Phase 23: composite elements and traversal
@@ -130,3 +130,10 @@ Other endpoint types, mixed endpoint widths, steps and range index binders rejec
 See examples/arrays and the arrays_source/arrays_cli production suites. Slices,
 array equality/search, user iterators, dictionary traversal and additional collection
 APIs remain outside this implementation.
+
+## Phase 25 operations
+
+See [ARRAY_OPERATIONS.md](ARRAY_OPERATIONS.md) for `.insert(index, value)`, `.clear()`
+and independent `[..]`/`[..<]` slices, approved boundary/evaluation/version rules,
+GC/failure behavior and the deliberate deferral of `.pop()` pending result/Ok.
+The earlier exclusions describe the original Phase 23 delivery.
