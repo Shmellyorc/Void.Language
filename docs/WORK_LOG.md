@@ -11041,3 +11041,46 @@ or hosted CI is claimed. The prebuilt LLVM SDK and generated machine code are no
 rebuilt with C++ sanitizer instrumentation. Orders 1–5 and previous source-array
 work are preserved; research certification remains optional. No commits, pushes,
 branches, remote changes or hosted CI launches were performed.
+
+## Phase 23 — macOS allocation-sweep correction, 17 October 2026
+
+CI run [39085394432](https://github.com/Shmellyorc/Void.Language/actions/runs/39085394432)
+fails `growable_arrays_source` in macOS ARM64 Debug/Release. Both job logs show
+operation 0 completing 13 failing allocation budgets, then `Runtime list allocation
+sweep incomplete` before operation 1 is printed. In this test, that means the
+in-capacity append succeeded at budget zero: `success` is true, `failures` is zero,
+and the unconditional `failures>0` assertion rejects a legitimate success.
+
+Inspected `Runtime::list_push/list_remove`, `fixed_scalar_schema`, and the shared
+`array_push/array_remove` implementations. Warm scalar in-capacity append copies
+into existing backing and updates count/version; removal shifts/clears existing
+storage and updates count/version. Neither requires new backing or a new header.
+Incidental standard-library allocations, including lookup-key strings, are not a
+portable requirement. Locally both paths happen to exercise one failing budget;
+requiring that allocation is the test defect, not evidence of a Runtime failure.
+
+Minimal correction: require at least one allocation failure only for growth
+(operation 0) and new-header construction (operation 3). All operations still
+sweep budgets until success, and any failures still run the original rollback,
+count/version, element-integrity, collection and retained-object assertions.
+Root lifetime, stale-version, wrong-encoding, unregistered-root, cold construction,
+concurrent collection and source normal/O2 failure/recovery checks are unchanged.
+No production Runtime or other tests changed.
+
+Focused Linux LLVM 19.1.7 results: Debug **1/1 passed**, 10.31 seconds; strict
+ASan/UBSan/leak **1/1 passed**, 7.11 seconds. Both report failing budgets
+**14/1/1/12** for operations 0–3, **48** for cold construction, and **42** each for
+normal/O2 source invocation. The Debug baseline had the same counts. Exact commands:
+
+```sh
+cmake --build build/order1/production --target void_growable_arrays_tests -j2
+ctest --test-dir build/order1/production -R '^growable_arrays_source$' --output-on-failure
+# Outside the tracing sandbox, preserving strict sanitizer settings:
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 cmake --build build/ci-sanitizers --target void_growable_arrays_tests -j2
+env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers -R '^growable_arrays_source$' --output-on-failure
+git diff --check
+```
+
+Logs: build/phase23-macos-sweep/ and the respective CTest LastTest.log files.
+macOS execution remains for the owner's CI verification; it was not reproduced
+on this Linux host. No commits, pushes, branches, remote changes or CI reruns.

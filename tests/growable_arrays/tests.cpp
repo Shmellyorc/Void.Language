@@ -92,7 +92,9 @@ void runtime_transactions() {
             require(r.snapshot().objects==(success && operation==3 ? 3u:2u),"abandoned list allocation retained");
             if(success)break;
         }
-        require(success && failures>0,"Runtime list allocation sweep incomplete");
+        // Growth/new headers must allocate; in-capacity append/removal may not.
+        const bool allocation_required=operation==0 || operation==3;
+        require(success && (!allocation_required || failures>0),"Runtime list allocation sweep incomplete");
         std::cout<<"list transaction "<<operation<<": "<<failures<<" failing allocation budgets passed\n";
     }
     alias=nullptr;r.list_into(&list,encoding);auto version=r.list_version(token,encoding);r.list_push(token,encoding,10);
