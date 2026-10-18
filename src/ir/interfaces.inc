@@ -8,7 +8,13 @@ bool method_accessible(const Module& m,const Function& f,std::string_view scope)
     return found!=m.source_imports.end() && found->second.contains(f.module_identity);
 }
 MemberSelection select_member(const Module& m,Type t,std::string_view name,std::string_view scope,std::size_t* work) {
-    if(!t.definition || t.nullable || (t.kind!=Type::aggregate && t.kind!=Type::managed_ref)) return {};
+    if(!t.definition || t.nullable)return {};
+    if(t.kind==Type::interface_ref) {
+        for(const auto& f:m.interface_requirements)if(f.method_name==name && !f.parameters.empty() && f.parameters[0].definition==t.definition)
+            return {method_accessible(m,f,scope)?MemberSelection::found:MemberSelection::inaccessible,{},f.name,{}};
+        return {};
+    }
+    if(t.kind!=Type::aggregate && t.kind!=Type::managed_ref)return {};
     auto charge=[&] {if(work) {if(!*work) throw std::length_error("Interface member-selection work budget of 8388608 visits exceeded");--*work;}};
     auto method=[&](const std::shared_ptr<const ValueType>& d)->const Function* {
         for(const auto& f:m.functions) {charge();if(f.receiver && f.method_name==name && !f.initializer &&
@@ -47,11 +53,11 @@ std::string binding_key(const Module::Binding& binding) {
     }
     return result;
 }
-Module::Binding structural_binding(const Module& m,Type view,Type interface,std::string_view scope,std::size_t* work) {
+static Module::Binding structural_conformance(const Module& m,Type view,Type interface,std::string_view scope,std::size_t* work) {
     std::size_t local_work=8388608;if(!work) work=&local_work;
     auto fail=[](const std::string& text){throw std::invalid_argument("VOID interface: "+text);};
-    if(view.kind!=Type::managed_ref || view.construction || !view.definition || !view.definition->managed || view.nullable)
-        fail("Only complete non-nullable managed views support interface erasure; standalone value erasure is deferred");
+    if((view.kind!=Type::managed_ref && view.kind!=Type::aggregate && view.kind!=Type::interface_ref) || view.construction || !view.definition || view.nullable)
+        fail("A constraint requires a complete non-nullable struct or interface reference");
     if(interface.kind!=Type::interface_ref || !interface.definition || !interface.definition->interface_type) fail("Invalid interface type");
     auto visible=[&](const ValueType& d) {
         if(d.visibility=="private" && d.module_identity!=scope) return false;
@@ -69,8 +75,9 @@ Module::Binding structural_binding(const Module& m,Type view,Type interface,std:
         if(selected.status==MemberSelection::inaccessible) fail("Requirement '"+requirement.method_name+"' is inaccessible; import its original owner");
         if(selected.status!=MemberSelection::found) fail("Missing requirement '"+requirement.method_name+"'");
         if(selected.method.empty()) fail("A field cannot satisfy callable requirement '"+requirement.method_name+"'");
-        auto target=std::find_if(m.functions.begin(),m.functions.end(),[&](const auto& f){return f.name==selected.method;});
-        if(target==m.functions.end()) fail("Missing binding method header");
+        const Function* target=nullptr;
+        for(const auto* family:{&m.functions,&m.interface_requirements})for(const auto& f:*family)if(f.name==selected.method)target=&f;
+        if(!target) fail("Missing binding method header");
         bool exact=target->parameters.size()==requirement.parameters.size() && target->result==requirement.result;
         for(unsigned n=1;exact && n<requirement.parameters.size();++n)
             exact=target->parameters[n]==requirement.parameters[n] && target->parameters[n].readonly==requirement.parameters[n].readonly && readonly_paths(target->parameters[n])==readonly_paths(requirement.parameters[n]);
@@ -79,6 +86,15 @@ Module::Binding structural_binding(const Module& m,Type view,Type interface,std:
     }
     if(binding.methods.empty()) fail("An interface requires at least one method");
     binding.key=binding_key(binding);return binding;
+}
+
+Module::Binding structural_binding(const Module& m,Type view,Type interface,std::string_view scope,std::size_t* work) {
+    if(view.kind!=Type::managed_ref || view.construction || !view.definition || !view.definition->managed || view.nullable)
+        throw std::invalid_argument("VOID interface: Only complete non-nullable managed views support interface erasure; standalone value erasure is deferred");
+    return structural_conformance(m,view,interface,scope,work);
+}
+void satisfy_constraint(const Module& m,Type view,Type interface,std::string_view scope) {
+    (void)structural_conformance(m,view,interface,scope,nullptr);
 }
 
 std::vector<Module::Binding> interface_universe(const Module& m) {

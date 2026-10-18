@@ -1,0 +1,14 @@
+struct box<t>:
+    value: t
+func (b box<t>) choose<u>(value: u) -> u:
+    return value
+value struct holder:
+    value: i32
+func (h holder) repeat<t>(value: t) -> t:
+    return value
+func entry(value: i32) -> i32:
+    var b = box(value = "text")
+    var h = holder()
+    if b.choose("text") != "text":
+        return -100
+    return b.choose<i32>(value) + b.choose(1) + h.repeat<i32>(2)

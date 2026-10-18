@@ -63,6 +63,7 @@ struct ValueType {
     // Structural arrays use one element edge, never synthetic nominal fields.
     std::optional<FieldType> element = {};
     std::optional<std::uint64_t> extent = {};
+    std::string display_name = {}; // Optional source-facing name; identity remains canonical.
 };
 struct TypeArena { std::vector<std::shared_ptr<const ValueType>> definitions; };
 inline std::string Type::key(const Type& t) { return t.definition ? t.definition->identity : std::string{}; }
@@ -137,6 +138,7 @@ struct Function {
     std::string method_name = {}, visibility = "public";
     // Private scalar owned-value proof; source/native activation is separate.
     bool fixed_ownership = false;
+    std::string display_name = {}; // Debug/diagnostic spelling, independent of native identity.
 };
 struct Module {
     std::string identity;
@@ -170,6 +172,7 @@ struct MemberSelection {
 };
 MemberSelection select_member(const Module&,Type,std::string_view,std::string_view scope,std::size_t* work=nullptr);
 bool method_accessible(const Module&,const Function&,std::string_view scope);
+void satisfy_constraint(const Module&,Type,Type,std::string_view scope);
 Module::Binding structural_binding(const Module&,Type,Type,std::string_view scope,std::size_t* work=nullptr);
 std::vector<Module::Binding> interface_universe(const Module&);
 std::string binding_key(const Module::Binding&);

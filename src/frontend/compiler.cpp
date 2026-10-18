@@ -8,6 +8,7 @@
 #include <functional>
 #include <bit>
 #include <iterator>
+#include <list>
 #include <limits>
 #include <map>
 #include <memory>
@@ -60,13 +61,20 @@ class Diagnostics {
     std::map<std::string, std::pair<std::string, std::shared_ptr<const SourceFile>>> snapshots;
     std::set<std::tuple<std::string, std::size_t, std::size_t, int, std::string>> seen;
     bool suppressed = false;
-    unsigned expression_depth = 0;
+    unsigned expression_depth = 0, specialization_depth = 0;
+    std::vector<RelatedLocation> context;
 public:
+    struct Context {
+        Diagnostics& owner;std::size_t previous;unsigned previous_depth;
+        Context(Diagnostics& d,const std::vector<RelatedLocation>& locations,std::optional<unsigned> depth={}):owner(d),previous(d.context.size()),previous_depth(d.specialization_depth){d.context.insert(d.context.end(),locations.begin(),locations.end());if(depth)d.specialization_depth=*depth;}
+        ~Context(){owner.context.resize(previous);owner.specialization_depth=previous_depth;}
+    };
     void bind(const SourceFile& source, const std::string& identity) {
         snapshots.insert_or_assign(source.path(), std::make_pair(identity, std::make_shared<const SourceFile>(source)));
     }
     void add(const CompilationError& failure) {
         for (auto d : failure.diagnostics()) {
+            d.related.insert(d.related.end(),context.begin(),context.end());
             auto own = [&](SourceSpan& location) {
                 auto found = snapshots.find(location.source->path());
                 if (found != snapshots.end() && (&found->second.second->text() == &location.source->text() || found->second.second->text() == location.source->text())) {
@@ -87,6 +95,7 @@ public:
     }
     bool failed() const { return std::any_of(items.begin(), items.end(), [](const auto& d) { return d.severity == Severity::error; }); }
     unsigned& semantic_depth() { return expression_depth; }
+    unsigned current_specialization_depth() const {return specialization_depth;}
     bool full() { if (items.size() < 100) return false; suppressed = true; return true; }
     bool within(const SourceFile& source, std::size_t begin, std::size_t end) const {
         return std::any_of(items.begin(), items.end(), [&](const auto& d) {
@@ -202,7 +211,8 @@ struct Expr {
     enum class Kind { literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
-    std::string op, qualifier, target;
+    std::string op, qualifier, target, source_target;
+    std::vector<Type> type_arguments;
     std::uint64_t value = 0;
     ir::ConstantValue aggregate_value;
     std::vector<Token> names;
@@ -251,7 +261,17 @@ struct ConstructionContext {
     std::map<unsigned,unsigned> aliases;
     std::map<const Expr*,std::set<unsigned>> calls;
 };
+struct GenericParameter { Token token; std::optional<Type> constraint; };
 struct Function {
+    std::vector<GenericParameter> generics;
+    std::vector<Token> syntax;
+    std::vector<std::pair<Token,Type>> type_uses;
+    std::map<std::string,Type> substitutions;
+    std::map<std::string,std::string> substitution_sources;
+    std::string generic_origin, concrete_name, concrete_method_name, display_name;
+    std::vector<RelatedLocation> instantiation_context;
+    unsigned specialization_depth=0;
+    bool analyzed=false, prepared=false, defaults_prepared=false, initializer_prepared=false;
     std::map<std::set<unsigned>,ConstructionContext> construction_contexts;
     std::string construction_contract;
     Token token;
@@ -281,6 +301,7 @@ struct Constant {
     std::uint64_t value = 0;
     ir::ConstantValue aggregate_value;
 };
+struct GenericApplication {Token token;std::string name;std::shared_ptr<ir::ValueType> definition;std::vector<Type> arguments;Type resolved=Type::none;};
 struct ArraySyntax {
     Token token;
     Type element;
@@ -288,6 +309,7 @@ struct ArraySyntax {
     std::unique_ptr<Expr> extent;
     Type resolved = Type::none;
     unsigned state = 0;
+    bool template_syntax=false;
 };
 struct Unit;
 struct Structure {
@@ -299,6 +321,13 @@ struct Structure {
     Structure(Structure&&) = default;
     Structure& operator=(Structure&&) = default;
     Token token;
+    std::vector<GenericParameter> generics;
+    std::vector<Token> syntax;
+    std::vector<std::pair<Token,Type>> type_uses;
+    std::vector<Type> type_arguments;
+    Structure* generic_origin=nullptr;
+    bool hierarchy_checked=false;
+    unsigned specialization_depth=0;
     std::shared_ptr<ir::ValueType> definition;
     std::string visibility = "public";
     std::vector<Statement> fields;
@@ -322,11 +351,14 @@ struct Unit {
     SourceFile source;
     std::string identity;
     std::vector<Import> imports;
-    std::vector<Function> functions;
+    std::list<Function> functions, generic_functions;
     std::vector<Constant> constants;
-    std::vector<Structure> structures;
-    std::vector<ArraySyntax> arrays;
+    std::list<Structure> structures, generic_structures;
+    std::list<ArraySyntax> arrays;
+    std::list<GenericApplication> applications;
     std::vector<std::pair<Token,Type>> type_uses;
+    std::map<std::string,Function*> specialized_functions;
+    std::map<std::string,Structure*> specialized_structures;
     std::map<std::string, Structure*> structure_names;
     std::map<std::string, Constant*> constant_names;
     std::map<std::string, Function*> declarations, methods;
@@ -334,6 +366,9 @@ struct Unit {
     std::set<std::string> explicit_qualifiers;
     std::set<std::string> failed_qualifiers, invalid_declarations;
     std::function<Type(Type,const Token&)> resolve_array;
+    std::function<Type(Type,const Token&)> resolve_application;
+    std::function<Function&(Unit&,Unit&,Function&,const std::vector<Type>&,const Token&,unsigned,Type)> specialize_function;
+    std::function<Structure&(Unit&,Unit&,Structure&,const std::vector<Type>&,const Token&)> specialize_structure;
     bool failed_import = false;
     bool parse_failed = false;
     std::shared_ptr<ir::Module> member_catalog;
@@ -345,7 +380,11 @@ class Parser {
     std::size_t p = 0;
     Diagnostics& diagnostics;
     unsigned depth = 0, nodes = 0;
-    std::vector<ArraySyntax> arrays;
+    std::list<ArraySyntax> arrays;
+    std::list<GenericApplication> applications;
+    std::map<std::string,Type> substitutions;
+    std::set<std::string> generic_names;
+    bool instantiating=false;
     std::vector<std::pair<Token,Type>> type_uses;
     const Token& peek(std::size_t ahead = 0) const { return tokens[std::min(p + ahead, tokens.size() - 1)]; }
     void synchronize(std::size_t start, bool declaration) {
@@ -404,14 +443,38 @@ class Parser {
             error(source, peek(), Code::identifier, "Expected a lowercase identifier.");
         return take();
     }
+    std::vector<GenericParameter> generic_parameters() {
+        std::vector<GenericParameter> result;
+        if(!accept("<"))return result;
+        do {
+            auto token=name();
+            if(!generic_names.insert(token.text).second)error(source,token,Code::duplicate,"Duplicate generic type parameter '"+token.text+"'.");
+            std::optional<Type> constraint;if(accept(":"))constraint=type();
+            result.push_back({token,constraint});
+        }while(accept(","));
+        need(">");return result;
+    }
+    std::vector<Type> type_arguments() {
+        std::vector<Type> result;need("<");do {result.push_back(type());}while(accept(","));need(">");return result;
+    }
+    bool type_call() const {
+        if(!at("<"))return false;
+        unsigned nesting=0;
+        for(auto n=p;n<tokens.size();++n) {
+            if(tokens[n].text=="<")++nesting;
+            else if(tokens[n].text==">") {if(!--nesting)return n+1<tokens.size() && tokens[n+1].text=="(";}
+            else if(tokens[n].kind==TokenKind::newline || tokens[n].kind==TokenKind::end)return false;
+        }
+        return false;
+    }
     Type type() {
         Depth guard(depth,source,peek());
         if (at("[")) {
             auto token=take();auto element=type();std::unique_ptr<Expr> extent;
             if(accept(",")) extent=expression();
-            need("]");
+            auto close=need("]");
             if(at("?")) error(source,take(),Code::unsupported_type,"Nullable arrays are deferred.");
-            auto d=std::make_shared<ir::ValueType>();d->name="<unresolved array>";d->identity=d->name;
+            auto d=std::make_shared<ir::ValueType>();d->name=source.text().substr(token.offset,close.offset+1-token.offset);d->identity=d->name;
             Type result(d,extent ? Type::fixed_array : Type::growable_array);
             arrays.push_back({token,element,d,std::move(extent)});return result;
         }
@@ -426,8 +489,16 @@ class Parser {
         std::string spelling = token.text;
         auto reference_token = token;
         if (accept(".")) { reference_token = name(); spelling += "." + reference_token.text; }
+        if(spelling==token.text && substitutions.contains(spelling)) {
+            if(at("?"))error(source,take(),Code::unsupported_type,"Nullable generic parameters are not implemented.");
+            return substitutions.at(spelling);
+        }
         auto d = std::make_shared<ir::ValueType>(); d->name = spelling; d->identity = spelling; d->source_offset = token.offset;
-        Type result(d,Type::unresolved); result.nullable = accept("?"); type_uses.emplace_back(reference_token,result); return result;
+        if(at("<")){applications.push_back({reference_token,spelling,d,type_arguments()});d->name=source.text().substr(token.offset,tokens[p-1].offset+1-token.offset);}
+        Type result(d,Type::unresolved); result.nullable = accept("?");
+        if(result.nullable && generic_names.contains(spelling))error(source,reference_token,Code::unsupported_type,"Nullable generic parameters are not implemented.");
+        type_uses.emplace_back(reference_token,result);
+        return result;
     }
     void newline() { need("<newline>"); }
     std::vector<Statement> block() {
@@ -470,6 +541,8 @@ class Parser {
                 if(++nodes>512) error(source,peek(),Code::nesting,"Expression size limit exceeded.");
                 auto selected=std::make_unique<Expr>(Expr::Kind::array_index,take());
                 selected->parts.push_back(std::move(e));selected->parts.push_back(expression());need("]");e=std::move(selected);
+            } else if(type_call() && (e->kind==Expr::Kind::name || e->kind==Expr::Kind::field)) {
+                e->type_arguments=type_arguments();
             } else if(accept("(")) {
                 if(e->kind==Expr::Kind::field) e->kind=Expr::Kind::method_call;
                 else if(e->kind==Expr::Kind::name) e->kind=Expr::Kind::call;
@@ -607,11 +680,16 @@ class Parser {
     }
 public:
     explicit Parser(const SourceFile& s, Diagnostics& d) : source(s), tokens(lex(s, d)), diagnostics(d) {}
+    Parser(const SourceFile& s,Diagnostics& d,std::vector<Token> syntax,std::map<std::string,Type> bindings)
+        :source(s),tokens(std::move(syntax)),diagnostics(d),substitutions(std::move(bindings)),instantiating(true) {
+        tokens.push_back({TokenKind::end,"<end of file>",tokens.empty()?0:tokens.back().offset});
+    }
     void parse(Unit& unit) {
         auto before = diagnostics.size();
         while (peek().kind != TokenKind::end) {
             if (diagnostics.full()) { unit.parse_failed = true; break; }
-            auto start = p;nodes=0;
+            auto start = p;nodes=0;generic_names.clear();const auto use_begin=type_uses.size(),array_begin=arrays.size();
+            auto template_syntax=[&](auto& declaration) {declaration.type_uses.assign(type_uses.begin()+use_begin,type_uses.end());type_uses.resize(use_begin);auto n=std::size_t{0};for(auto& a:arrays)if(n++>=array_begin)a.template_syntax=true;};
             try {
             if (accept("<newline>")) continue;
             if (peek().kind == TokenKind::invalid) throw Poison{};
@@ -650,6 +728,7 @@ public:
             if (value_declaration || at("struct")) {
                 need("struct"); Structure structure; structure.token = name(); structure.visibility = f.visibility;
                 structure.definition = std::make_shared<ir::ValueType>(); structure.definition->name = structure.token.text; structure.definition->managed = !value_declaration;
+                structure.generics=generic_parameters();
                 if (accept("extends")) { structure.base_token=peek(); structure.base_type=type(); }
                 need(":"); newline();
                 bool fields=accept("<indent>");
@@ -671,7 +750,11 @@ public:
                     for (auto n = begin; n < p; ++n) field.constant_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
                     newline(); structure.fields.push_back(std::move(field));
                 }
-                if (fields) need("<dedent>"); unit.structures.push_back(std::move(structure)); continue;
+                if (fields) need("<dedent>");
+                if(!instantiating && !structure.generics.empty()) {
+                    template_syntax(structure);structure.syntax.assign(tokens.begin()+start,tokens.begin()+p);unit.generic_structures.push_back(std::move(structure));
+                } else {structure.generics.clear();unit.structures.push_back(std::move(structure));}
+                continue;
             }
             f.virtual_method=accept("virtual");
             f.overriding=!f.virtual_method && accept("override");
@@ -681,10 +764,15 @@ public:
                 f.receiver = Parameter{receiver,receiver_type};
             }
             f.token = name();
+            f.generics=generic_parameters();
             parameters(f);
             auto body_begin = p; f.body = block();
             for (auto n = body_begin; n < p; ++n) f.body_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
-            f.parse_failed = diagnostics.within(source, f.token.offset, peek().offset); unit.functions.push_back(std::move(f));
+            f.parse_failed = diagnostics.within(source, f.token.offset, peek().offset);
+            const bool generic_receiver=f.receiver && std::any_of(applications.begin(),applications.end(),[&](const auto& a){return a.definition==f.receiver->type.definition;});
+            if(!instantiating && (!f.generics.empty() || generic_receiver)) {
+                template_syntax(f);f.syntax.assign(tokens.begin()+start,tokens.begin()+p);unit.generic_functions.push_back(std::move(f));
+            } else {f.generics.clear();f.substitutions=substitutions;unit.functions.push_back(std::move(f));}
             } catch (const CompilationError& e) {
                 diagnostics.add(e); unit.parse_failed = true;
                 auto declaration = start;
@@ -698,7 +786,7 @@ public:
         }
         unit.parse_failed |= diagnostics.size() != before;
         unit.type_uses = std::move(type_uses);
-        unit.arrays = std::move(arrays);
+        unit.arrays = std::move(arrays);unit.applications=std::move(applications);
     }
 };
 ir::Op operation(const std::string& op) {
@@ -747,9 +835,17 @@ std::pair<Unit*, Structure*> structure_lookup(Unit& unit, Unit& root,
 Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std::unique_ptr<Unit>>& units, const Token& token) {
     if(ir::array_type(t)) return unit.resolve_array(t,token);
     if (t.kind != Type::unresolved) return t;
+    for(auto& application:unit.applications)if(application.definition==t.definition) {
+        auto result=application.resolved;
+        if(result==Type::none)result=unit.resolve_application(t,token);
+        result.nullable=t.nullable;result.readonly=t.readonly;
+        if(result.nullable && !ir::reference_value(result))error(unit.source,token,Code::unsupported_type,"Only managed references can be nullable.");
+        return result;
+    }
     auto [owner, structure] = structure_lookup(unit,root,units,t.definition->name,token); (void)owner;
     auto location = token; location.offset = t.definition->source_offset; location.text = t.definition->name;
     if (!structure) error(unit.source,location,Code::unsupported_type,"Unsupported type '" + t.definition->name + "'.","Use a numeric type, bool, string or a visible value/managed struct.");
+    if(!structure->generics.empty())error(unit.source,token,Code::unsupported_type,"Generic type '"+structure->token.text+"' requires concrete type arguments.");
     if (structure->layout_state == 3) throw Poison{};
     Type result(structure->definition, structure->definition->interface_type ? Type::interface_ref : structure->definition->managed ? Type::managed_ref : Type::aggregate);
     result.nullable = t.nullable; result.readonly=t.readonly;
@@ -856,6 +952,7 @@ class Semantics {
         if (unit.failed_import) throw Poison{};
         error(source, e.token, Code::unknown_function, "Unknown function '" + e.token.text + "'.", "Declare it here or import its declaring file; imports are not transitive exports.");
     }
+#include "generic_inference.inc"
     struct Member {
         std::vector<unsigned> path;
         const Function* function = nullptr;
@@ -978,6 +1075,7 @@ class Semantics {
         const auto& target = [&]() -> const Function& {
             auto check_arguments = [&] { for (std::size_t n=1; n<e.parts.size(); ++n) expression(*e.parts[n]); };
             try {
+                if(auto* specialized=concrete_method(e,receiver))return *specialized;
                 auto selected=member(receiver,e.token,true);
                 if (!selected.function) error(source,e.token,Code::not_callable,"Field '"+e.token.text+"' is not callable.");
                 for (auto index:selected.path) embedded_receiver(e.parts[0],index,e.token);
@@ -1143,8 +1241,13 @@ class Semantics {
     }
     // Qualified lookup needs a temporary AST node only on this cold path.
     // Keep it out of every recursive receiver-chain hint's native stack frame.
-    VOID_SEMANTIC_HANDLER std::optional<Type> qualified_anchor(const Expr& e,Expr::Kind kind) {
+    VOID_SEMANTIC_HANDLER std::optional<Type> qualified_anchor(Expr& e,Expr::Kind kind) {
         Expr qualified(kind,e.token);qualified.qualifier=e.parts[0]->token.text;qualified.qualifier_token=e.parts[0]->token;
+        if(kind==Expr::Kind::call) {
+            auto [owner,structure]=structure_lookup(unit,root,units,qualified.qualifier+"."+e.token.text,qualified.qualifier_token);
+            if(structure){auto& concrete=concrete_structure(e,*owner,*structure,1);return Type(concrete.definition,concrete.definition->managed?Type::managed_ref:Type::aggregate);}
+            return concrete_function(e,resolve(qualified),1).result;
+        }
         return anchor(qualified);
     }
     // Hints resolve typed anchors without prematurely defaulting untyped literals.
@@ -1180,13 +1283,15 @@ class Semantics {
             auto receiver = anchor(*e.parts[0]);
             if (!receiver) return std::nullopt;
             if(ir::array_type(*receiver) && e.token.text=="remove_at")return ir::array_element(*receiver);
+            if(auto* specialized=concrete_method(e,*receiver))return specialized->result;
             auto selected=member(*receiver,e.token,true);
             return selected.function ? std::optional<Type>(selected.function->result) : std::nullopt;
         }
         if (e.kind == K::call) {
+            if(current && e.qualifier.empty() && !lookup(e.token.text) && current->substitutions.contains(e.token.text))return current->substitutions.at(e.token.text);
             auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
-            if (structure) return Type(structure->definition,structure->definition->interface_type ? Type::interface_ref : structure->definition->managed ? Type::managed_ref : Type::aggregate);
-            return resolve(e).result;
+            if (structure) {auto& concrete=concrete_structure(e,*owner,*structure);return Type(concrete.definition,concrete.definition->interface_type?Type::interface_ref:concrete.definition->managed?Type::managed_ref:Type::aggregate);}
+            return concrete_function(e,resolve(e)).result;
         }
         if (e.kind == K::field) {
             const auto& operand = *e.parts[0];
@@ -1341,9 +1446,17 @@ class Semantics {
         return e.type=ir::field_type(owner,e.slot);
     }
     VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+        if(current && e.qualifier.empty() && !lookup(e.token.text) && current->substitutions.contains(e.token.text)) {
+            if(!e.type_arguments.empty())error(source,e.token,Code::unsupported_type,"Type parameters are not generic constructors.");
+            if(current->substitution_sources.contains(e.token.text))e.source_target=current->substitution_sources.at(e.token.text);
+            const auto type=current->substitutions.at(e.token.text);
+            if(!type.definition || type.nullable || (type.kind!=Type::aggregate && type.kind!=Type::managed_ref))error(source,e.token,Code::not_callable,"The specialized type has no source constructor.");
+            auto [owner,structure]=owned_structure(type);construction(e,*owner,*structure,true,unit);return e.type;
+        }
         auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
         if (structure && !(e.qualifier.empty() && lookup(e.token.text))) {
-            construction(e,*owner,*structure,current != nullptr,unit);
+            auto& concrete=concrete_structure(e,*owner,*structure);
+            construction(e,*owner,concrete,current != nullptr,unit);
             return e.type;
         }
         if (std::any_of(e.names.begin(),e.names.end(),[](const auto& t) { return !t.text.empty(); })) error(source,e.token,Code::argument_count,"Named arguments are currently supported only for value construction.");
@@ -1354,7 +1467,7 @@ class Semantics {
         }
         const auto& target = [&]() -> const Function& {
             auto check_arguments = [&] { for (auto& argument : e.parts) expression(*argument); };
-            try { return resolve(e); }
+            try { return concrete_function(e,resolve(e)); }
             catch (const CompilationError&) { check_arguments(); throw; }
             catch (const Poison&) { check_arguments(); throw; }
         }();
@@ -1608,25 +1721,43 @@ public:
             for (const auto& [name, f] : units.at(import.target)->declarations)
                 if (!f->file_private) visible_names.insert(name);
     }
+    void validate_generic_receiver(Type receiver,const Token& token) {
+        auto selected=ir::select_member(*root.member_catalog,receiver,token.text,unit.identity);
+        if(selected.path.empty() && !selected.method.empty())
+            error(source,token,Code::receiver,"Inherited methods cannot be hidden by a method-specific generic declaration.");
+    }
+    void validate_header_names(Function& f) {
+        current=&f;scopes={{}};
+        if(f.receiver)declare(f.receiver->token,f.receiver->type);
+        for(const auto& p:f.parameters)declare(p.token,p.type,p.type.readonly);
+        f.locals.clear();current=nullptr;scopes.clear();
+    }
     void analyze_constant(Constant& c) {
         if (c.declaration.annotation) c.declaration.annotation = resolve_type(*c.declaration.annotation,unit,root,units,c.declaration.token);
         c.type = expression(*c.declaration.expression, c.declaration.annotation);
         if (c.type == error_type) throw Poison{};
         if (c.declaration.annotation) expect(c.type, *c.declaration.annotation, c.declaration.token);
     }
+    void validate_parameter_structure(const Function& f) {
+        bool optional=false;
+        for(const auto& p:f.parameters) {
+            if(p.default_expression) {
+                if(!f.receiver || f.token.text!="init")error(source,p.token,Code::initializer_deferred,"Default parameters are supported on initializers only in this phase.");
+                optional=true;
+            } else if(optional)error(source,p.token,Code::argument_count,"Required parameters must precede defaulted parameters.");
+        }
+    }
     void parameter_defaults(Function& f) {
-        bool optional = false;
-        for (auto& p : f.parameters) {
-            if (p.default_expression) {
-                if (!f.initializer) error(source,p.token,Code::initializer_deferred,"Default parameters are supported on initializers only in this phase.");
-                optional = true; expect(expression(*p.default_expression,p.type),p.type,p.token);
-                if (p.default_expression->type == error_type) throw Poison{};
-                p.default_value = constant_value(source,*p.default_expression);
-            } else if (optional) error(source,p.token,Code::argument_count,"Required parameters must precede defaulted parameters.");
+        if(f.defaults_prepared)return;f.defaults_prepared=true;
+        validate_parameter_structure(f);
+        for(auto& p:f.parameters)if(p.default_expression) {
+            expect(expression(*p.default_expression,p.type),p.type,p.token);
+            if(p.default_expression->type==error_type)throw Poison{};
+            p.default_value=constant_value(source,*p.default_expression);
         }
     }
     void initializer_fields(Function& f) {
-        if (!f.initializer) return;
+        if (!f.initializer || f.initializer_prepared) return;f.initializer_prepared=true;
         auto [owner,structure] = owned_structure(f.receiver->type);
         if (f.receiver->type.kind==Type::aggregate) for (const auto& field:structure->fields) {
             auto type=*field.annotation;
@@ -1687,11 +1818,13 @@ public:
     void analyze() {
         for (auto& f : unit.functions) {
             if(f.interface_requirement) {
-                f.locals={f.receiver->type};f.receiver->slot=0;
+                f.analyzed=true;f.locals={f.receiver->type};f.receiver->slot=0;
                 for(auto& p:f.parameters) {p.slot=static_cast<unsigned>(f.locals.size());f.locals.push_back(p.type);}
                 continue;
             }
             if (diagnostics.full()) break;
+            if(f.analyzed)continue;f.analyzed=true;
+            Diagnostics::Context generic_context(diagnostics,f.instantiation_context,f.specialization_depth);
             current = &f; scopes = {{}}; invalid_function = false;
             auto before = diagnostics.size();
             if (f.receiver) {
@@ -2236,13 +2369,13 @@ public:
     explicit Lowering(const SourceFile& s, ir::Module& m, StringPool& p) : source(s), module(m), strings(p) {}
     ir::Function lower(const Function& f, const ConstructionContext* construction=nullptr) {
         context=construction;
-        output = {}; output.name = f.symbol; output.source_name = f.token.text; output.source = source.location(f.token.offset);
+        output = {}; output.name = f.symbol; output.source_name = f.concrete_name.empty() ? f.token.text : f.concrete_name; output.display_name=f.display_name; output.source = source.location(f.token.offset);
         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
         output.virtual_slot=f.virtual_slot; output.overriding=f.overriding; output.visibility=f.visibility;
-        if(f.receiver) output.method_name=f.token.text;
+        if(f.receiver) output.method_name=f.concrete_method_name.empty()?f.token.text:f.concrete_method_name;
         output.receiver = f.receiver.has_value(); output.receiver_mutates = f.receiver_mutates; output.initializer = f.initializer;
         if (f.receiver) {
-            output.source_name = f.receiver->type.definition->name + "::method::" + f.token.text;
+            output.source_name = f.receiver->type.definition->name + "::method::" + output.method_name;
             output.parameters.push_back(f.receiver->type);
         }
         for (std::size_t n = 0; n < f.parameters.size(); ++n) {
@@ -2485,16 +2618,20 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
 #include "capabilities.inc"
 #include "construction.inc"
 #include "inheritance.inc"
+ir::Function member_header(const Unit& u,const Function& f) {
+    ir::Function header;header.name=f.symbol;header.module_identity=u.identity;header.method_name=f.concrete_method_name.empty()?f.token.text:f.concrete_method_name;
+    header.receiver=static_cast<bool>(f.receiver);header.initializer=f.initializer;header.visibility=f.visibility;header.result=f.result;header.virtual_slot=f.virtual_slot;header.receiver_mutates=f.receiver_mutates;
+    header.parameters.clear();if(f.receiver)header.parameters.push_back(f.receiver->type);
+    for(const auto& p:f.parameters)header.parameters.push_back(p.type);
+    return header;
+}
 ir::Module member_catalog(const std::map<std::string,std::unique_ptr<Unit>>& units,const std::string& entry) {
     ir::Module m;m.root_identity=entry;
     for(const auto& [id,u]:units) {
         auto& imports=m.source_imports[id];for(const auto& i:u->imports) if(!i.target.empty()) imports.insert(i.target);
         for(const auto& s:u->structures) m.nominal_types.emplace_back(s.definition,s.definition->interface_type ? Type::interface_ref : s.definition->managed ? Type::managed_ref : Type::aggregate);
         for(const auto& f:u->functions) if(!f.parse_failed) {
-            ir::Function header;header.name=f.symbol;header.module_identity=id;header.method_name=f.token.text;
-            header.receiver=static_cast<bool>(f.receiver);header.initializer=f.initializer;header.visibility=f.visibility;header.result=f.result;header.virtual_slot=f.virtual_slot;header.receiver_mutates=f.receiver_mutates;
-            header.parameters.clear();if(f.receiver) header.parameters.push_back(f.receiver->type);
-            for(const auto& p:f.parameters) header.parameters.push_back(p.type);
+            auto header=member_header(*u,f);
             if(f.interface_requirement) m.interface_requirements.push_back(std::move(header));else m.functions.push_back(std::move(header));
         }
     }
@@ -2510,7 +2647,9 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     // Every external resolved Type aliases this table; field edges are nonowning.
 
     // Discover every signature before checking any body, including cyclic imports.
-    for (auto& [id, unit] : units) for (auto& f : unit->functions) {
+    for (auto& [id, unit] : units) {
+    std::vector<Function*> declarations;for(auto& f:unit->functions)declarations.push_back(&f);for(auto& f:unit->generic_functions)declarations.push_back(&f);
+    for(auto* declaration:declarations) {auto& f=*declaration;
         if (f.receiver) continue;
         f.symbol = id + "::" + f.token.text;
         auto [previous, inserted] = unit->declarations.emplace(f.token.text, &f);
@@ -2520,7 +2659,13 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             catch (const CompilationError& failure) { diagnostics.add(failure); }
         }
     }
+    }
     auto& root = *units.at(entry);
+    for(auto& [id,u]:units)for(auto& s:u->generic_structures) {
+        s.definition->identity=id+"::"+s.token.text;s.definition->module_identity=id;s.definition->visibility=s.visibility;
+        if(u->declarations.contains(s.token.text) || !u->structure_names.emplace(s.token.text,&s).second)
+            error(u->source,s.token,Code::duplicate,"Duplicate generic declaration '"+s.token.text+"'.");
+    }
     for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
         auto name = structure.token.text; structure.definition->identity = id + "::" + name;
         structure.definition->source_offset=structure.token.offset;structure.definition->module_identity=id;structure.definition->visibility=structure.visibility;
@@ -2595,6 +2740,8 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             if(found!=u->structure_names.end()) found->second->initializer=&f;
         }
     root.member_catalog=std::make_shared<ir::Module>(member_catalog(units,entry));
+    std::function<void(Unit&,Function&)> prepare_function;
+    bool headers_ready=false;
     std::function<void(Unit&,Structure&)> layout;
     std::function<void(Unit&,Structure&)> defaults;
     std::function<void(Unit&,Constant&)> evaluate;
@@ -2635,6 +2782,22 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             structure.default_state = 2;
         } catch (...) { structure.default_state = 3; throw; }
     };
+    auto array_extent=[&](Unit& owner,ArraySyntax& syntax) {
+        std::optional<std::uint64_t> extent;
+            if(syntax.extent) {
+                Semantics semantics(owner,units,root,evaluate,diagnostics,defaults);
+                auto type=semantics.pure_expression(*syntax.extent);
+                if(type==error_type) throw Poison{};
+                if(!numeric::integer(type)) error(owner.source,syntax.extent->token,Code::unsupported_type,"Fixed-array extent requires a pure nonnegative integer module-constant expression.");
+                const auto value=constant_value(owner.source,*syntax.extent).bits;
+                if(numeric::signed_integer(type) && (value & (std::uint64_t{1}<<(numeric::width(type)-1))))
+                    error(owner.source,syntax.extent->token,Code::integer_range,"Fixed-array extent cannot be negative.");
+                if(value>static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max()))
+                    error(owner.source,syntax.extent->token,Code::integer_range,"Array extent is not representable as an i64 count.");
+                extent=value;
+            }
+        return extent;
+    };
     std::map<std::string,std::shared_ptr<ir::ValueType>> canonical_arrays;
     for(auto& [id,u]:units) u->resolve_array=[&,owner=u.get()](Type raw,const Token&)->Type {
         auto found=std::find_if(owner->arrays.begin(),owner->arrays.end(),[&](const auto& a){return a.definition==raw.definition;});
@@ -2646,19 +2809,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         Depth guard(diagnostics.semantic_depth(),owner->source,syntax.token,128);syntax.state=1;
         try {
             auto element=resolve_type(syntax.element,*owner,root,units,syntax.token);
-            std::optional<std::uint64_t> extent;
-            if(syntax.extent) {
-                Semantics semantics(*owner,units,root,evaluate,diagnostics,defaults);
-                auto type=semantics.pure_expression(*syntax.extent);
-                if(type==error_type) throw Poison{};
-                if(!numeric::integer(type)) error(owner->source,syntax.extent->token,Code::unsupported_type,"Fixed-array extent requires a pure nonnegative integer module-constant expression.");
-                const auto value=constant_value(owner->source,*syntax.extent).bits;
-                if(numeric::signed_integer(type) && (value & (std::uint64_t{1}<<(numeric::width(type)-1))))
-                    error(owner->source,syntax.extent->token,Code::integer_range,"Fixed-array extent cannot be negative.");
-                if(value>static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max()))
-                    error(owner->source,syntax.extent->token,Code::integer_range,"Array extent is not representable as an i64 count.");
-                extent=value;
-            }
+            auto extent=array_extent(*owner,syntax);
             if(extent && element.kind==Type::aggregate) for(auto& [child_id,child_owner]:units) for(auto& child:child_owner->structures)
                 if(child.definition==element.definition) {
                     layout(*child_owner,child);
@@ -2734,12 +2885,15 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             structure.layout_state = 2;
         } catch (...) { structure.layout_state = 3; throw; }
     };
+#include "generics.inc"
     for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
         try { layout(*unit,structure); }
         catch (const CompilationError& failure) { diagnostics.add(failure); }
         catch (const Poison&) {}
     }
-    for (auto& [id,unit] : units) for (auto& f : unit->functions) {
+    prepare_function = [&](Unit& owner,Function& f) {
+        auto* unit=&owner;
+        if(f.prepared)return;f.prepared=true;
         auto resolve = [&](Type& t, const Token& token) {
             try { t = resolve_type(t,*unit,root,units,token); }
             catch (const CompilationError& failure) { diagnostics.add(failure); t = error_type; f.parse_failed = true; }
@@ -2764,15 +2918,20 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 if(f.interface_requirement) for(const auto& check:[&] {std::vector<Type> types{f.result};for(const auto& p:f.parameters) types.push_back(p.type);return types;}())
                     if(check.definition && ((f.visibility=="public" && check.definition->visibility!="public") || (f.visibility=="internal" && check.definition->visibility=="private")))
                         error(unit->source,f.token,Code::visibility,"An interface requirement cannot expose a less-visible type.");
-                f.symbol = t.definition->identity + "::method::" + f.token.text;
+                f.symbol = t.definition->identity + "::method::" + (f.concrete_method_name.empty()?f.token.text:f.concrete_method_name);
                 if (!unit->methods.emplace(f.symbol,&f).second) error(unit->source,f.token,Code::duplicate,"Duplicate receiver method '" + f.token.text + "'.");
                 if (f.initializer) unit->structure_names.at(t.definition->name)->initializer = &f;
             } catch (const CompilationError& failure) { diagnostics.add(failure); f.parse_failed = true; }
               catch (const Poison&) { f.parse_failed = true; }
         }
-    }
+    };
+    bool pending_headers=true;
+    while(pending_headers) {pending_headers=false;for(auto& [id,u]:units)for(auto& f:u->functions)if(!f.prepared){prepare_function(*u,f);pending_headers=true;}}
+    headers_ready=true;
     validate_inheritance(units,root,diagnostics);
     root.member_catalog=std::make_shared<ir::Module>(member_catalog(units,entry));
+#include "generic_declarations.inc"
+    for(auto& check:pending_generic_constraints)check();
     for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
         try { defaults(*unit,structure); }
         catch (const CompilationError& failure) { diagnostics.add(failure); }
@@ -2796,7 +2955,14 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         catch (const CompilationError& failure) { diagnostics.add(failure); }
         catch (const Poison&) {}
     }
-    for (auto& [id, unit] : units) Semantics(*unit, units, root, evaluate, diagnostics, defaults).analyze();
+    bool pending_bodies=true;
+    while(pending_bodies && !diagnostics.full()) {
+        pending_bodies=false;
+        for(auto& [id,u]:units) {
+            for(const auto& f:u->functions)if(!f.analyzed && !f.interface_requirement){pending_bodies=true;break;}
+            Semantics(*u,units,root,evaluate,diagnostics,defaults).analyze();
+        }
+    }
     diagnostics.finish();
     try {root.member_catalog->interface_bindings=ir::interface_universe(*root.member_catalog);}
     catch(const std::length_error& failure) {error(root.source,root.structures.front().token,Code::limit,failure.what(),"Split unrelated providers into separately compiled projects.");}
@@ -2858,7 +3024,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     analyze_construction(units,diagnostics);
     diagnostics.finish();
     (void)string_pool(units);
-    for(auto& [id,u]:units) u->resolve_array={}; // No closures into this validation frame escape.
+    for(auto& [id,u]:units) {u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
 }
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
     ir::Module module;
@@ -2911,8 +3077,23 @@ struct AnalysisAccess {
         result->entry_ = entry;
         auto graph = std::make_shared<const std::map<std::string, std::unique_ptr<Unit>>>(std::move(units));
         auto field = [](std::string& out, const std::string& value) { out += std::to_string(value.size()) + ":" + value; };
-        auto declaration = [&](AnalyzedDeclaration d) {
+        std::map<std::string,std::string> source_identities;
+        for(const auto& [id,u]:*graph) {
+            for(const auto& f:u->functions)if(!f.generic_origin.empty())source_identities.emplace(f.symbol,f.generic_origin);
+            for(const auto& s:u->structures)if(s.generic_origin)source_identities.emplace(s.definition->identity,s.generic_origin->definition->identity);
+        }
+        auto source_identity=[&](const std::string& key) {
+            auto prefix=key;
+            while(true) {
+                if(auto found=source_identities.find(prefix);found!=source_identities.end())return found->second+key.substr(prefix.size());
+                auto end=prefix.rfind("::");if(end==std::string::npos)return key;prefix.resize(end);
+            }
+        };
+        std::set<std::string> visible_declarations;
+        std::set<std::tuple<std::string,std::string,std::string,std::size_t,std::size_t,bool>> visible_references;
+        auto declaration = [&](AnalyzedDeclaration d,bool native_contract=true) {
             if (d.owner.empty()) d.owner = d.module;
+            if(native_contract) {
             field(result->contract_, "declaration"); field(result->contract_, d.identity); field(result->contract_, d.visibility);
             field(result->contract_, std::to_string(static_cast<int>(d.kind)));
             field(result->contract_, d.type.kind == Type::aggregate ? d.type.definition->identity : ir::type_name(d.type));
@@ -2939,12 +3120,16 @@ struct AnalysisAccess {
                 field(result->constants_,d.using_field ? "using" : "ordinary-field");
                 field(result->constants_, d.type.kind == Type::aggregate ? d.type.definition->identity : ir::type_name(d.type)); field(result->constants_, d.constant_syntax);
             }
-            result->declarations_.push_back(std::move(d));
+            }
+            d.identity=source_identity(d.identity);d.owner=source_identity(d.owner);d.virtual_slot=source_identity(d.virtual_slot);d.override_target=source_identity(d.override_target);
+            if(visible_declarations.insert(d.identity).second)result->declarations_.push_back(std::move(d));
         };
         auto reference = [&](const std::string& from, const std::string& to, const Expr& e, const Unit& u, bool implicit = false) {
             auto location = span(u.source,e.token); location.module_identity = u.identity;
             auto spelling = e.qualifier + "::" + e.token.text;
-            result->references_.push_back({from,to,spelling,std::move(location),implicit});
+            auto origin=source_identity(from),target=source_identity(to);
+            if(visible_references.emplace(origin,target,u.identity,location.begin,location.end,implicit).second)
+                result->references_.push_back({origin,target,spelling,std::move(location),implicit});
             field(result->contract_,"reference"); field(result->contract_,from); field(result->contract_,to);
         };
         for (const auto& [id, unit] : *graph) {
@@ -2963,10 +3148,12 @@ struct AnalysisAccess {
             for (const auto& i : imports) field(result->contract_,i);
             result->modules_.push_back(std::move(module));
             auto location = [&](const Token& t) { auto l = span(unit->source,t); l.module_identity=id; return l; };
+#include "generic_tooling.inc"
             std::function<void(const Expr&,const std::string&,const std::map<unsigned,std::string>&,bool)> visit_expression;
             auto expression = [&](const Expr& e, const std::string& owner, const std::map<unsigned,std::string>& locals) { visit_expression(e,owner,locals,false); };
             visit_expression = [&](const Expr& e, const std::string& owner, const auto& locals, bool implicit) {
-                if(e.kind==Expr::Kind::conversion && e.op=="interface") {
+                if(!e.source_target.empty()) {reference(owner,e.source_target,e,*unit);if(!e.target.empty())reference(owner,e.target,e,*unit,true);}
+                else if(e.kind==Expr::Kind::conversion && e.op=="interface") {
                     reference(owner,e.type.definition->identity,e,*unit,true);
                     for(const auto& binding:graph->at(entry)->member_catalog->interface_bindings) if(binding.key==e.target)
                         for(const auto& [requirement,route]:binding.methods) {reference(owner,requirement,e,*unit,true);reference(owner,route.second,e,*unit,true);}
@@ -2981,7 +3168,7 @@ struct AnalysisAccess {
                 for (const auto& part : e.parts) visit_expression(*part,owner,locals,implicit);
                 for (const auto& part : e.omitted) visit_expression(*part,owner,locals,true);
             };
-            for(const auto& array:unit->arrays) if(array.extent) {
+            for(const auto& array:unit->arrays) if(array.extent && !array.template_syntax) {
                 expression(*array.extent,id,{});
                 field(result->contract_,"array-extent");field(result->contract_,ir::type_name(array.resolved));
             }

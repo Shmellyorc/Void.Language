@@ -250,7 +250,7 @@ std::string capability_key(Type type) {
     return result;
 }
 std::string reference_path_name(Type type,const ReferencePath& path) {
-    std::string result=array_type(type) ? type_name(type) : type.definition ? type.definition->name : type_name(type);
+    std::string result=array_type(type) ? type_name(type) : type.definition ? (type.definition->display_name.empty()?type.definition->name:type.definition->display_name) : type_name(type);
     for (auto field:path) {
         if(array_type(type) && field==array_element_path)result+="[]";else result+='.'+type.definition->fields.at(field).name;
         type=field_type(type,field);
@@ -266,6 +266,7 @@ std::string construction_name(const std::string& symbol,const std::vector<unsign
 }
 std::string type_name(Type t) {
     if (t.construction) { t.construction=false; return "construction view " + type_name(t); }
+    if(t.definition && !t.definition->display_name.empty())return std::string(t.readonly?"readonly ":"")+t.definition->display_name+(t.nullable?"?":"");
     if(t.kind==Type::interface_ref && t.definition) return std::string(t.readonly ? "readonly " : "")+t.definition->identity+(t.nullable ? "?" : "");
     if(t.kind==Type::prepared_receiver && t.definition) return "prepared receiver "+t.definition->identity;
     if (t.readonly && t.kind!=Type::managed_ref) { t.readonly=false; return "readonly " + type_name(t); }

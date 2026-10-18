@@ -1,0 +1,8 @@
+private func hidden<t>(value: t) -> t:
+    return value
+func identity<t>(value: t) -> t:
+    return hidden(value)
+struct box<t>:
+    value: t
+func (b box<t>) read() -> t:
+    return b.value

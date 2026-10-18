@@ -569,7 +569,7 @@ A using field retains ordinary defaults, stored-field constructor labels and dec
 
 ## 13. Interfaces [AGREED; PHASE 21 BOUNDED IMPLEMENTATION]
 
-**Implemented clarification (Phase 21):** `INTERFACES.md` records owner-approved IF1–IF8: structural conformance of completed managed objects, exact method requirements, original managed identity, two-word managed-backed views, static-binding-aware method dispatch, readonly effect checking, precise GC roots and JIT/AOT support. No `implements` keyword is needed. Value boxing/erasure, interface inheritance/default bodies, dynamic tests, generic constraints and richer conversions remain explicitly deferred. The old label OPEN applies to those *extensions*, not the working managed-backed interface contract.
+**Implemented clarification (Phase 21):** `INTERFACES.md` records owner-approved IF1–IF8: structural conformance of completed managed objects, exact method requirements, original managed identity, two-word managed-backed views, static-binding-aware method dispatch, readonly effect checking, precise GC roots and JIT/AOT support. No `implements` keyword is needed. Value boxing/erasure, interface inheritance/default bodies, dynamic tests and richer conversions remain explicitly deferred. Phase 24 adds compile-time generic constraints without changing managed-backed erasure. The old label OPEN applies to those *extensions*, not the working managed-backed interface contract.
 
 Interfaces specify required behavior and provide polymorphism without forcing inheritance chains. **Conformance is structural:** a struct satisfies an interface when its accessible method set fulfills the interface's requirements, including unambiguous methods promoted through `using`. No mandatory `implements` keyword is required. An interface injects no storage and does not automatically supply implementations.
 
@@ -1467,7 +1467,21 @@ func biggest<t: comparable>(a: t, b: t) -> t:
     return b
 ```
 
-**OPEN:** `comparable` interface contract, generic variance, recursive-instantiation detection, specialization sharing, and resulting code-size tradeoffs. The intended semantics retain useful static typing and avoid unnecessary runtime boxing.
+**Implemented clarification (Phase 24, owner-approved):** Native generics use
+compile-time concrete specialization through the existing semantic checker and
+LLVM backend. Syntax and declaration structure are checked immediately; bodies
+are type-checked when specialized. Constraints gate concrete arguments and reuse
+accessible exact interface conformance for value structs, managed structs and
+existing interface references without boxing. Bodies may use other operations
+supported by their concrete types. Owner parameters bind through
+`func (b box<t>) get() -> t:`. Ordinary recursive instances are reused; expanding
+instantiations have deterministic resource diagnostics. See `GENERICS.md` for
+working source, inference, readonly/lifetime rules, tooling and explicit bounds.
+The `t?`, `result`/`Ok` and `comparable` examples above remain illustrative future
+syntax; they are not working feature claims.
+
+**OPEN:** `comparable`/operator contracts, generic variance and more aggressive
+specialization sharing/code-size tradeoffs.
 
 ## 32. Lists: growable and fixed-size arrays [AGREED]
 
@@ -2844,13 +2858,13 @@ This section matters especially when an AI assistant inherits this file without 
 2. **File/module import identity:** [IMPLEMENTED CORE: local VFS identity and aliasing; external packages open] Local VFS identity and imports already normalize in-root `../`, repeated paths, import cycles and exact-case spellings; symlinks/redirected imported components and duplicate hard-link identities are rejected by current policy. External root-escaping imports, versioned packages, Unicode filenames and persistent cross-project identities still require separate design.
 3. **Exact grammar for module scopes:** [IMPLEMENTED CORE: compile-time root constants/cycle rules; runtime globals open] Public/internal entry-file compile-time root constants, project-wide name collisions and structural constant dependency cycles have implemented deterministic rules. Runtime file-level mutable variables, their initialization order and runtime dependency cycles remain unimplemented and undecided.
 4. **Static syntax:** [FUTURE DESIGN: full static member grammar] The concept is accepted; `static func type.method()` grammar and visibility combinations need a parser contract.
-5. **Object-model boundary:** [IMPLEMENTED CORE: I1–I8 and IF1–IF8 bounded semantics; richer OOP open] Phase 20 implements owner-approved I1–I8 for managed inheritance, substitutability, exact overrides, explicit super preludes, prefix layouts, guarded leased dispatch and conservative reload. Ordinary methods remain nonvirtual. Protected/richer visibility, hiding, variance/covariance, abstract/final, source downcasts/type patterns, automatic constructor chaining and open-world loading remain deferred. Phase 21 implements owner-approved IF1–IF8 for managed-backed structural views with exact conformance, original ownership, readonly effects, precise roots and guarded leased dispatch. Standalone value erasure, interface inheritance/defaults, generic constraints, dynamic type tests and richer conversions remain deferred; no mandatory implements keyword is introduced. See Sections 12.1 and 13 and INHERITANCE.md.
+5. **Object-model boundary:** [IMPLEMENTED CORE: I1–I8 and IF1–IF8 bounded semantics; richer OOP open] Phase 20 implements owner-approved I1–I8 for managed inheritance, substitutability, exact overrides, explicit super preludes, prefix layouts, guarded leased dispatch and conservative reload. Ordinary methods remain nonvirtual. Protected/richer visibility, hiding, variance/covariance, abstract/final, source downcasts/type patterns, automatic constructor chaining and open-world loading remain deferred. Phase 21 implements owner-approved IF1–IF8 for managed-backed structural views with exact conformance, original ownership, readonly effects, precise roots and guarded leased dispatch. Standalone value erasure, interface inheritance/defaults, dynamic type tests and richer conversions remain deferred; Phase 24 adds compile-time constraints without value erasure; no mandatory implements keyword is introduced. See Sections 12.1 and 13 and INHERITANCE.md.
 6. **Construction:** [IMPLEMENTED CORE: C1/S1 init; fallible/resource init open] `init()` is implemented for approved value and managed structs: custom-init calls bind constructor arguments solely to init parameters; types without init retain named-field construction; derived initialization uses an explicit `super.init(...)` prelude. Fallible `result`-returning init, native-resource rollback/destruction and richer constructor escape remain future design.
 7. **`value struct` native ownership:** [FUTURE DESIGN: resource-owning value copies] Ensure copying cannot double-release a native handle; initially restrict resource-owning value types or introduce an explicit safe transfer contract.
 8. **Closures:** [FUTURE DESIGN: closures] Mutable capture behavior is accepted; syntax/ABI of closure returns, lifetime, and hot-reload capture-layout compatibility need proof.
 9. **Function call grammar:** [IMPLEMENTED CORE: constructor argument order; ordinary named/default calls open] Constructor invocations already accept an ordered positional prefix plus named arguments and pure parameter defaults, with supplied arguments evaluated exactly once left to right. Ordinary function named/default arguments and direct multiline anonymous-function call grammar remain future design.
 10. **Events:** [FUTURE DESIGN: event semantics] Event-owner emission rule, subscriber ordering, mutation while emitting, weak versus strong callbacks, and unsubscribe identity must be resolved.
-11. **Generic implementation:** [FUTURE DESIGN: generic compiler/language rules] Monomorphization/code-size strategy, interface constraints, recursive instantiation, and specialized versus shared representations remain open.
+11. **Generic implementation:** [IMPLEMENTED FOUNDATION: Phase 24] Concrete specialization, interface constraints, argument inference and bounded recursion use the existing compiler/Runtime; see GENERICS.md. Variance, operator contracts and more aggressive representation/code-size sharing remain open.
 12. **Dictionary grammar:** [FUTURE DESIGN: dictionary literal grammar] Decide whether unquoted `name = value` is allowed alongside `"name": value`. Do not invent silent meaning for bare identifiers.
 13. **Mixed/general collections:** [FUTURE DESIGN: heterogeneous collections] `[]` and `{}` were discussed as general-purpose untyped options, but their dynamic type, boxing, and inference semantics are undecided.
 14. **Array API spelling:** [APPROVED PHASE 23 API: count/push/remove_at; source arrays still gated] Phase 23 A9 approves `.count`, `.push(value)` and `.remove_at(index)` for the first source-array slice; it does not approve an automatic `add` alias. `pop`, search/equality removal, slicing and other methods remain separate future API decisions. Approved names do not establish completed source-array implementation.

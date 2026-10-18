@@ -11084,3 +11084,184 @@ git diff --check
 Logs: build/phase23-macos-sweep/ and the respective CTest LastTest.log files.
 macOS execution remains for the owner's CI verification; it was not reproduced
 on this Linux host. No commits, pushes, branches, remote changes or CI reruns.
+
+## Phase 24 — native generic functions and structs (17 October 2026)
+
+Baseline: local HEAD was verified as `ca22f1b5800b291e4741f048b28a19627b324839`,
+Phase 23 accepted at owner-provided CI #62. The initial worktree was clean.
+The owner's Work-first preference supersedes the earlier environment-routing
+advice; long sprints, KISS/DRY, focused development tests and owner-controlled
+commits/hosted acceptance remain unchanged.
+
+Owner decisions applied: validate syntax/declaration structure immediately,
+type-check bodies per concrete specialization, enforce interface constraints
+before accepting instances while permitting additional concrete operations;
+use `func (b box<t>) get() -> t:` to bind owner parameters; allow constraints on
+value/managed structs and existing interface references via shared exact/access
+conformance without boxing. No operator/comparable or variance contract invented.
+
+Implementation:
+
+- The existing parser retains template tokens and reparses a requested concrete
+  instance with type bindings. Original Units own ordinary concrete declarations;
+  identical nominal argument lists reuse instances. Existing layout, construction,
+  defaults, semantic checking/effects, typed IR and LLVM 19.1.7 JIT/AOT are reused.
+- Explicit/inferred generic functions, managed/value structs, nested arguments,
+  generic-to-generic calls, recursive calls/types, receiver owner parameters and
+  separate method parameters execute in real source programs. Constructor
+  inference uses supplied fields/init parameters. Conflicting/ambiguous inference
+  diagnoses; existing exact conversions and source evaluation order remain.
+- Interface constraints use the existing structural selector/signature checker;
+  managed interface erasure retains its original representation boundary.
+  Concrete root layouts, independent fixed snapshots, shared lists/references,
+  readonly authority, safepoints, publication and cleanup use existing facilities.
+  No Runtime, collector, allocator or LLVM calling-convention changes.
+- Template body errors retain body and requesting call/declaration spans. Native
+  identity stays canonical; debug/trace names and source navigation use original
+  declarations. Original type parameters/references publish once. Existing module
+  access, private linkage, selected entry exports, reload contracts and generation
+  leases remain in force.
+- Dependency depth 128 and a per-analysis specialization-identity work budget
+  8,388,608 characters bound pathological expansion. Ordinary recursion reuses
+  its instance. There is no parameter-count or array-payload ceiling.
+- Added examples/generics, tests/generics and the existing CLI/AOT CMake family;
+  GENERICS.md documents actual syntax, approved decisions and exclusions. Bible,
+  interface guide and WRENCH status now distinguish working constraints from
+  future boxing/variance/operator syntax.
+
+Defects caught and corrected during integration:
+
+- The initial body worklist skipped any function carrying a recovered parse/lex
+  error. Existing string recovery, UTF-8 snapshot and retained-analysis recovery tests demonstrated that this
+  suppressed independent body diagnostics. Restored ordinary recovery analysis;
+  the analyzed flag alone prevents worklist repeats. Existing assertions remain
+  unchanged. Focused strings_source/generics_source/frontend then passed 3/3.
+- Unused template header checks now reuse existing declaration-shadow checks and
+  parameter-default structure rules. Fixed-array extent validation was factored
+  from existing array resolution so malformed unused annotations also diagnose;
+  dependent layouts/bodies still wait for concrete types.
+- In the new test fixture only, root-probe frame storage is reserved before an
+  allocation sweep: its noexcept observation hook must not allocate while the
+  injected failure budget is active. Root/frame assertions remain enabled.
+  Fixture identifiers that violated existing no-shadow rules were corrected;
+  production shadowing rules were preserved.
+- An unused-template navigation regression exposed missing references to named
+  constraint/annotation types. Header navigation now uses existing source-name
+  lookup without instantiating the template or checking an unused body. Added
+  regression checks for unused constraints and nominal annotations. The focused
+  generics suite passed after correction. Deferred body semantic references are
+  documented rather than fabricated.
+
+- A reproduced method-specific generic declaration could hide an inherited
+  ordinary method because it was absent from ordinary concrete headers until
+  called. Declaration and specialization checks now reuse the shared member
+  selector to preserve the existing no-hiding rule. Ordinary and generic receiver
+  regressions cover both paths; generics_source/inheritance_source passed 2/2.
+- The new reload fixture now retains the existing SourceFile UTF-8 path instead
+  of relying on a native filesystem-path-to-string conversion (not portable to
+  Windows). Its focused Debug/Release/strict-sanitizer checks passed. No Windows
+  execution is claimed.
+
+Validation results and exact commands follow below.
+
+Reproducible local commands (existing cached configurations, all research OFF;
+LLVM reports **19.1.7**):
+
+```sh
+/usr/lib/llvm-19/bin/llvm-config --version
+cmake -S . -B build/order1/production
+cmake -S . -B build/ci-release -DVOID_LLVM_RESEARCH=OFF
+cmake -S . -B build/ci-sanitizers -DVOID_LLVM_RESEARCH=OFF
+
+# Focused development/repair checks:
+ctest --test-dir build/order1/production -R '^(frontend|tooling|modules|arrays_source|interfaces_source|reload)$' --output-on-failure -j2
+ctest --test-dir build/order1/production -R '^(strings_source|generics_source|frontend)$' --output-on-failure -j2
+ctest --test-dir build/order1/production -R '^generics_source$' --output-on-failure
+
+# Complete corrected source, existing Debug and Release configurations:
+cmake --build build/order1/production -j3
+ctest --test-dir build/order1/production --output-on-failure -j2
+cmake --build build/ci-release -j3
+ctest --test-dir build/ci-release --output-on-failure -j2
+
+# Strict sanitizer configuration: executed outside the tracing sandbox for LSan.
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 cmake --build build/ci-sanitizers -j3
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers --output-on-failure -j2
+
+(ulimit -s 1024; ctest --test-dir build/order1/production -R '^frontend$' --output-on-failure)
+python3 tests/integration/semantic_depth.py build/order1/production/voidc
+(ulimit -s 1024; build/order1/production/voidc run examples/generics/large.void 7 --no-opt && build/order1/production/voidc run examples/generics/large.void 7 && build/order1/production/void_generics_cli_large_normal 7 && build/order1/production/void_generics_cli_large_optimized 7)
+
+PATH=/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:$PATH npm --prefix editors/vscode test
+PATH=/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:$PATH VOIDLS_PATH=/home/shmellyorc/Documents/Void.Language/build/order1/production/voidls VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm --prefix editors/vscode run test:host
+PATH=/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:$PATH npm --prefix editors/vscode run package
+git diff --check
+```
+
+The initial six adjacent suites passed 6/6; diagnostic-recovery repair checks
+passed 3/3, and the final focused generics test passed. The real editor passed
+trusted-project diagnostics/unsaved repair/navigation/lifecycle checks, restricted
+trust (no native child), and multi-root rejection (no native child). Extension
+Node tests/typechecking/build and VSIX packaging passed. `xvfb-run` is absent on
+this host; the real editor ran successfully on its available local display.
+
+Final corrected production validation (logs in ignored `build/phase24/`):
+
+| Configuration | Complete CTest result | Elapsed |
+| --- | --- | --- |
+| Debug (`order1/production`) | **70/70 passed** | 182.66 s |
+| Release (`ci-release`) | **70/70 passed** | 86.61 s |
+| Strict ASan/UBSan + leak detection (`ci-sanitizers`) | **70/70 passed**, no sanitizer/leak findings | 198.90 s |
+
+Final logs: `validation-debug.log`, `validation-release.log`,
+`validation-sanitizer.log`; matching `*-build.log` files contain build evidence.
+No assertions were weakened, sanitizer settings disabled or production tests
+removed. Superseded runs exposed the recovery defect above and were repaired;
+sanitizer runs on superseded source were stopped before final validation.
+
+The new `generics_cli` suite checks **96 successful executions** (12 source
+programs, inputs 0/7, normal/O2, JIT/independently linked AOT), plus four checked
+bounds failures retaining the original generic-body source/function trace.
+`generics_source` passes all three configurations, including independent fixed
+copies, list aliases, nested/recursive generic types and cycles, exact numeric
+boundaries, strings/interfaces, owner/method parameters, constraints, argument
+ordering, original-source navigation, selected entries, compatible reload/old
+leases and metadata/object retirement after executable generation release.
+Root inspection and transactional construction publication remain asserted.
+
+Each configuration sweeps **354** failing allocation budgets for the reference/
+array fixture and **231** for generic initialization, in both normal and O2:
+**1,170 intentional allocation failures per configuration**, followed by successful
+budgets. Every failure verifies balanced valid roots, unchanged publication,
+collection to an empty heap, and a successful retry. Construction/growth are real
+allocating paths; no allocation-free Runtime operation is forced to fail.
+
+Final Debug and Release frontend tests both passed with a **1 MiB stack**;
+`semantic_depth.py` passed for both compilers, preserving recovery/nesting spans.
+The 2 MiB generic payload returned 14 through normal/O2 JIT and linked AOT under
+that stack in both configurations (eight executions). Release commands were:
+
+```sh
+(ulimit -s 1024; ctest --test-dir build/ci-release -R '^frontend$' --output-on-failure)
+python3 tests/integration/semantic_depth.py build/ci-release/voidc
+(ulimit -s 1024; build/ci-release/voidc run examples/generics/large.void 7 --no-opt && build/ci-release/voidc run examples/generics/large.void 7 && build/ci-release/void_generics_cli_large_normal 7 && build/ci-release/void_generics_cli_large_optimized 7)
+```
+
+The final rebuilt Debug voidls also passed the real editor's trusted, restricted
+and multi-root runs (`validation-editor-host.log`). The local package is
+`editors/vscode/dist/void-language-0.1.0.vsix`. `git diff --check` passed.
+
+Remaining boundaries are documented in GENERICS.md: general `t?`, generic
+interfaces, method-specific generic virtuals/initializers, variance/operators and
+more aggressive code sharing are outside this foundation. Method-specific
+generic selection currently requires a direct receiver declaration; unused bodies
+have header/type navigation and gain semantic body references when specialized.
+Existing owner-parameter methods use ordinary concrete inheritance/composition.
+There are no known failing local production tests. Windows/macOS acceptance
+remains the owner's hosted gate; this sprint makes no cross-platform pass claim.
+
+Phase 23 and Orders 1–5 remain intact. LLVM stays 19.1.7; Runtime/GC and optional
+research acceptance boundaries are unchanged. HEAD remains the accepted baseline;
+all delivery changes are uncommitted. No branches, commits, pushes, remote
+modifications or hosted CI launches were performed. Ready for owner review and
+hosted cross-platform validation.

@@ -157,8 +157,12 @@ The native test family links generated objects independently against the runtime
 with the existing Windows CRT selection source. It adds source, normal/optimized
 AOT and CLI suites; the 51 earlier suites and seven hosted jobs are retained.
 
+Phase 24 adds compile-time interface constraints on concrete value/managed structs
+and existing interface references through the same member selection and exact
+signature checks. Constraints do not add runtime erasure; see GENERICS.md.
+
 Deferred: standalone value/interface representation, boxing, interface inheritance,
-generics/Self, defaults/bodies, overloads, dynamic type tests, downcasts/width casts,
+generic interfaces/Self, defaults/bodies, overloads, dynamic type tests, downcasts/width casts,
 managed/interface FFI, open-world providers, transitive using, finalizers and runtime
 permission systems. Root homes can retain dead values until function return, as in
 the existing GC foundation; this phase does not add a liveness optimizer.

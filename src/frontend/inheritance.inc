@@ -20,6 +20,7 @@ void validate_inheritance(std::map<std::string,std::unique_ptr<Unit>>& units,Uni
     auto depth=[](const Structure* s) { unsigned n=0; for(auto base=s->definition->base.lock();base;base=base->base.lock()) ++n; return n; };
     std::stable_sort(ordered.begin(),ordered.end(),[&](auto a,auto b){return depth(a)<depth(b);});
     for (auto* s:ordered) {
+        if(s->hierarchy_checked)continue;s->hierarchy_checked=true;
         auto& owner=*structures.at(s->definition->identity).first;
         try {
             for (const auto& field:s->fields) {

@@ -451,7 +451,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             debug_types.push_back(logical);
         }
         auto* debug_type = debug.createSubroutineType(debug.getOrCreateTypeArray(debug_types));
-        auto* subprogram = debug.createFunction(source_file, f.source_name.empty() ? f.name : f.source_name, fn->getName(), source_file,
+        auto* subprogram = debug.createFunction(source_file, !f.display_name.empty() ? f.display_name : f.source_name.empty() ? f.name : f.source_name, fn->getName(), source_file,
             f.source.line, debug_type, f.source.line, llvm::DINode::FlagPrototyped,
             llvm::DISubprogram::SPFlagDefinition | (fn->hasLocalLinkage() ? llvm::DISubprogram::SPFlagLocalToUnit : llvm::DISubprogram::SPFlagZero));
         fn->setSubprogram(subprogram);
@@ -611,7 +611,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     b.CreateCondBr(invalid_value,invalid,valid); b.SetInsertPoint(invalid);
                     if (failure) {
                         auto message = source_message(loc,instruction.source_excerpt,"runtime error: " + description);
-                        message += "In function " + f.module_identity + "::" + f.source_name + "\n";
+                        message += "In function " + f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name) + "\n";
                         b.CreateStore(b.CreateGlobalStringPtr(message),b.CreateStructGEP(failure_type,failure,0)); return_failure();
                     } else { b.CreateCall(llvm::Intrinsic::getDeclaration(module.get(),llvm::Intrinsic::trap)); b.CreateUnreachable(); }
                     b.SetInsertPoint(valid);
@@ -1018,7 +1018,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         b.CreateCondBr(b.CreateICmpULT(count, b.getInt32(32)), append, limit);
                         b.SetInsertPoint(limit); b.CreateStore(b.getInt32(33), count_address); b.CreateBr(done);
                         b.SetInsertPoint(append);
-                        auto trace = "Called from " + f.module_identity + "::" + f.source_name + "\n" +
+                        auto trace = "Called from " + f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name) + "\n" +
                             source_message(loc, instruction.source_excerpt, "source call");
                         auto* frames = b.CreateStructGEP(failure_type, failure, 2);
                         auto* address = b.CreateGEP(llvm::ArrayType::get(b.getPtrTy(), 32), frames, {b.getInt32(0), count});
