@@ -554,36 +554,36 @@ class Parser {
         }
         return false;
     }
-    Type type() {
-        Depth guard(depth,source,peek());
-        if(accept("(")){auto value=type();need(")");if(accept("?")){if(!ir::reference_value(value) && !(value.definition && value.definition->callable))error(source,tokens[p-1],Code::unsupported_type,"Only references and function values can be nullable.");value.nullable=true;}return value;}
-        if(at("func")) {
-            auto token=take();need("(");std::vector<Type> parameters;
-            if(!at(")"))do{auto readonly=accept("const");auto parameter=type();parameter.readonly=readonly;parameters.push_back(parameter);}while(accept(","));need(")");
-            auto result=accept("->")?type():Type(Type::none);
-            auto definition=std::make_shared<ir::ValueType>();definition->callable=true;definition->name=definition->identity="func";
-            function_types.push_back({token,std::move(parameters),result,definition});Type value(definition);value.nullable=accept("?");return value;
-        }
-        if(at("result")) {
-            auto token=take();need("<");auto success=type();need(",");auto failure=type();need(">");
-            auto d=std::make_shared<ir::ValueType>();d->name=d->identity="result";d->result_type=true;
-            results.push_back({token,success,failure,d});return Type(d);
-        }
-        if(at("{")) {
-            auto token=take();auto key=type();need(":");auto value=type();auto close=need("}");
-            if(at("?"))error(source,take(),Code::unsupported_type,"Nullable dictionaries are deferred.");
-            auto d=std::make_shared<ir::ValueType>();d->name=d->identity=source.text().substr(token.offset,close.offset+1-token.offset);
-            arrays.push_back({token,value,d,{}});arrays.back().key=key;return Type(d,Type::dictionary);
-        }
-        if (at("[")) {
-            auto token=take();auto element=type();std::unique_ptr<Expr> extent;
-            if(accept(",")) extent=expression();
-            auto close=need("]");
-            if(at("?")) error(source,take(),Code::unsupported_type,"Nullable arrays are deferred.");
-            auto d=std::make_shared<ir::ValueType>();d->name=source.text().substr(token.offset,close.offset+1-token.offset);d->identity=d->name;
-            Type result(d,extent ? Type::fixed_array : Type::growable_array);
-            arrays.push_back({token,element,d,std::move(extent)});return result;
-        }
+    // Keep branch-specific temporaries out of every recursive type frame. The
+    // existing shared Depth guard still counts each source type exactly once.
+    VOID_SEMANTIC_HANDLER Type function_type() {
+        auto token=take();need("(");std::vector<Type> parameters;
+        if(!at(")"))do{auto readonly=accept("const");auto parameter=type();parameter.readonly=readonly;parameters.push_back(parameter);}while(accept(","));need(")");
+        auto result=accept("->")?type():Type(Type::none);
+        auto definition=std::make_shared<ir::ValueType>();definition->callable=true;definition->name=definition->identity="func";
+        function_types.push_back({token,std::move(parameters),result,definition});Type value(definition);value.nullable=accept("?");return value;
+    }
+    VOID_SEMANTIC_HANDLER Type result_type() {
+        auto token=take();need("<");auto success=type();need(",");auto failure=type();need(">");
+        auto d=std::make_shared<ir::ValueType>();d->name=d->identity="result";d->result_type=true;
+        results.push_back({token,success,failure,d});return Type(d);
+    }
+    VOID_SEMANTIC_HANDLER Type dictionary_type() {
+        auto token=take();auto key=type();need(":");auto value=type();auto close=need("}");
+        if(at("?"))error(source,take(),Code::unsupported_type,"Nullable dictionaries are deferred.");
+        auto d=std::make_shared<ir::ValueType>();d->name=d->identity=source.text().substr(token.offset,close.offset+1-token.offset);
+        arrays.push_back({token,value,d,{}});arrays.back().key=key;return Type(d,Type::dictionary);
+    }
+    VOID_SEMANTIC_HANDLER Type array_type() {
+        auto token=take();auto element=type();std::unique_ptr<Expr> extent;
+        if(accept(",")) extent=expression();
+        auto close=need("]");
+        if(at("?")) error(source,take(),Code::unsupported_type,"Nullable arrays are deferred.");
+        auto d=std::make_shared<ir::ValueType>();d->name=source.text().substr(token.offset,close.offset+1-token.offset);d->identity=d->name;
+        Type result(d,extent ? Type::fixed_array : Type::growable_array);
+        arrays.push_back({token,element,d,std::move(extent)});return result;
+    }
+    VOID_SEMANTIC_HANDLER Type named_type() {
         static const std::map<std::string, Type> types = {
             {"i8",Type::i8},{"i16",Type::i16},{"i32",Type::i32},{"i64",Type::i64},
             {"u8",Type::u8},{"u16",Type::u16},{"u32",Type::u32},{"u64",Type::u64},
@@ -605,6 +605,15 @@ class Parser {
         if(result.nullable && generic_names.contains(spelling))error(source,reference_token,Code::unsupported_type,"Nullable generic parameters are not implemented.");
         type_uses.emplace_back(reference_token,result);
         return result;
+    }
+    Type type() {
+        Depth guard(depth,source,peek());
+        if(accept("(")){auto value=type();need(")");if(accept("?")){if(!ir::reference_value(value) && !(value.definition && value.definition->callable))error(source,tokens[p-1],Code::unsupported_type,"Only references and function values can be nullable.");value.nullable=true;}return value;}
+        if(at("func"))return function_type();
+        if(at("result"))return result_type();
+        if(at("{"))return dictionary_type();
+        if(at("["))return array_type();
+        return named_type();
     }
     void newline() { if(multiline_expression && !at("<newline>")){multiline_expression=false;return;}multiline_expression=false;need("<newline>"); }
     std::vector<Statement> block() {

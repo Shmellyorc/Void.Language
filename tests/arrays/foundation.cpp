@@ -341,6 +341,13 @@ void owned_ir() {
 }
 }
 int main() {
-    try {source_and_ir();negatives();compact_shapes();indexes_and_budget();owned_ir();std::cout<<"Scalar fixed-array analysis, owned IR and storage-contract checks passed\n";return 0;}
+    try {
+        std::cout<<"arrays_foundation: source_and_ir"<<std::endl;source_and_ir();
+        std::cout<<"arrays_foundation: negatives"<<std::endl;negatives();
+        std::cout<<"arrays_foundation: compact_shapes"<<std::endl;compact_shapes();
+        std::cout<<"arrays_foundation: indexes_and_budget"<<std::endl;indexes_and_budget();
+        std::cout<<"arrays_foundation: owned_ir"<<std::endl;owned_ir();
+        std::cout<<"Scalar fixed-array analysis, owned IR and storage-contract checks passed\n";return 0;
+    }
     catch(const std::exception& error) {std::cerr<<error.what()<<'\n';return 1;}
 }

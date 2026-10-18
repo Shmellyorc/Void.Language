@@ -12056,3 +12056,122 @@ and ci.yml are unchanged. A full 80-suite matrix was not repeated for this AST
 ownership-only correction. Windows Debug/Release compilation and hosted regression
 acceptance remain for the owner's CI rerun; local Linux results do not substitute
 for that platform verification. No commits, branches, pushes or hosted CI actions.
+
+## 18 October 2026: CI #67 Windows Debug arrays_foundation crash
+
+Inspected clean HEAD 1e6a66f109a0641127015b32204021a7f255b6f7. Downloaded the
+actual failed [Windows Debug job](https://github.com/Shmellyorc/Void.Language/actions/runs/39171696075/job/117805914321)
+log and tests-Windows-X64-Debug artifact (id 12152573039). The job used pinned
+LLVM 19.1.7 clang-cl with Debug /Zi /Ob0 /Od /RTC1. It records arrays_foundation
+SegFault after 0.07 s, with every other test passing. LastTest.log contains no
+foundation output or native dump. Windows Release job 117805914291 succeeded.
+Read-only retrieval commands:
+
+```
+gh run view 39171696075 --repo Shmellyorc/Void.Language --json jobs,headSha,conclusion
+gh api repos/Shmellyorc/Void.Language/actions/runs/39171696075/artifacts
+gh api repos/Shmellyorc/Void.Language/actions/jobs/117805914321/logs
+gh run download 39171696075 --repo Shmellyorc/Void.Language --name tests-Windows-X64-Debug --dir build/windows-arrays-crash/windows-debug-artifact
+```
+
+The raw job log, original artifact and native investigation evidence remain under
+ignored build/windows-arrays-crash. No hosted job was started or rerun.
+
+**Demonstrated cause:** compiler parser stack exhaustion, not array payload stack
+allocation, stale array storage or an IR/GC failure. After relinking the exact
+current Debug source, running void_arrays_foundation with `ulimit -s 1024`
+reproduced SIGSEGV. GDB entry breakpoints showed source_and_ir completed and
+negatives entered. The crash is the existing foundation.cpp:142 rejection of a
+160-level nested fixed-array annotation. Backtrace: negative -> analyze_source ->
+Parser::parse/block/statement -> 87 recursive Parser::type frames. The faulting
+instruction spills an argument below the stack after the type prologue reserves
+0x2cd0 (11,472) bytes; it occurs before the next Depth guard can execute. The
+parent frame has depth=87 and the current token is `[`. No semantic/IR validation
+has begun for that annotation. See baseline-stack-current.log.
+
+The Stage 3 foundation source is unchanged between cd95e373 / CI #65 and this
+commit. Built that exact prior commit from a read-only git archive, separately
+under build/windows-arrays-crash/stage3-source and stage3-debug, using the same
+Clang 19, LLVM 19.1.7 and -g/no-optimization flags. Its complete foundation suite
+passes at 1 MiB. Its Parser::type prologue reserves 0x1d60 (7,520) bytes.
+Stage 4 added function/result/parenthesized type parsing to the same recursive
+function; Debug reserves space for branch-local temporaries even when those
+branches are not selected. This grew every nested array's native frame past the
+existing guard's stack budget. This controlled reproduction explains the
+Debug-only Windows failure without assuming that CTest's generic SegFault label
+is itself a Windows exception-code diagnosis. Microsoft's documented x64 default
+[stack reserve is 1 MiB](https://learn.microsoft.com/en-us/cpp/build/reference/stack-stack-allocations?view=msvc-170).
+
+**Repair:** separate the existing function/result/dictionary/array/named type
+productions into ordinary Parser handlers using the existing noinline handler
+boundary. Recursive type() retains the same shared 128-level Depth guard, token
+ordering and parentheses behavior. Branch-local storage is now paid only for the
+selected production. Corrected Debug prologues reserve 0x430 (1,072) bytes for
+type() and 0x620 (1,568) for array_type(), instead of 11,472 bytes for every level.
+These are measured Linux Clang Debug frames, not claimed Windows measurements.
+No grammar/type semantics, guard limits, LLVM version, Runtime/GC, stack reserves,
+optimization flags or CI configuration changed.
+
+All five unchanged foundation subtests now complete at 1 MiB, including negatives,
+compact_shapes, indexes_and_budget and owned_ir. Added flushed subtest labels to
+main so a future hosted crash artifact identifies the last entered section.
+Existing semantic_depth.py now covers fixed/growable arrays, dictionaries,
+function/result/generic/parenthesized and mixed type nesting: shallow forms must
+compile; 160 levels must report exactly one VOID1107 nesting error and recover to
+an independent later VOID2003 error. It uses the existing 1 MiB Linux child limit
+and the normal Windows executable stack, without a new test harness or relaxed
+assertions. The existing receiver/closure/defer depth checks remain intact.
+
+First focused checks passed:
+
+```
+cmake --build build/order1/production -j2 --target void_arrays_foundation voidc
+(ulimit -s 1024; build/order1/production/void_arrays_foundation)
+python3 tests/integration/semantic_depth.py build/order1/production/voidc
+```
+
+Final affected verification (LLVM 19.1.7, research OFF):
+
+| Configuration | Focused CTest | Elapsed | Foundation + depth recovery at 1 MiB |
+| --- | --- | --- | --- |
+| Debug | 22/22 passed | 170.23 s | passed |
+| Release | 22/22 passed | 53.89 s | passed |
+| Strict ASan/UBSan/leaks | 22/22 passed | 119.69 s | passed |
+
+Exact focused CTest command, with BUILD set to build/order1/production,
+build/ci-release and build/ci-sanitizers respectively:
+
+```
+ctest --test-dir BUILD -R '^(arrays_foundation|fixed_arrays_source|growable_arrays_source|arrays_source|generics_source|dictionaries_source|collections_source|frontend|modules|numeric|tooling|analysis|lsp_positions|lsp_protocol|patterns_source|patterns_cli|advanced_source|advanced_cli|properties_source|properties_cli|source_cli|analysis_cli)$' --output-on-failure -j2
+```
+
+Actual local orchestration commands:
+
+```
+python3 build/windows-arrays-crash/verify.py build/order1/production debug
+python3 build/windows-arrays-crash/verify.py build/ci-release release
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 python3 build/windows-arrays-crash/verify.py build/ci-sanitizers sanitizers
+```
+
+The disposable helper rebuilds affected existing CMake targets and pattern/advanced/
+property native fixtures, runs the selected suites, then runs the full foundation
+binary at 1 MiB and the existing extended semantic-depth script. Expanded build
+commands are saved in {debug,release,sanitizers}-commands.txt; build/test/small-stack
+output is in the corresponding -build.log, -tests.log and -small-stack.log under
+build/windows-arrays-crash. Sanitizer builds, emitted objects and tests run outside
+tracing with the above strict environment and leak detection enabled throughout.
+All 66 focused suites pass, including normal/O2 JIT, independently linked AOT,
+large arrays, GC/failure cleanup, Stage 4 patterns/closures/events/results,
+generics, owned tooling, reload and parser recovery. The entire unchanged
+foundation suite, including compact shape/owned IR negatives, passes at 1 MiB in
+all three configurations; no subtest or assertion was disabled.
+
+The full unrelated 80-suite matrix was not repeated. Runtime/GC, LLVM, source
+contracts, existing budgets, sanitizer settings and ci.yml are unchanged.
+`git diff --check` passes. Source changes are limited to the type-production
+handler boundaries, foundation progress labels and existing depth regression.
+The actual Windows artifact supplies no native dump, so the reported native trace
+and controlled before/after measurements are the equivalent Linux 1 MiB
+reproduction. Windows Debug hosted confirmation remains for the owner's next CI
+attempt; no new hosted pass is claimed. No commits, pushes, branches, remote
+modifications or hosted CI actions were made.

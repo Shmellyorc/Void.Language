@@ -1,8 +1,8 @@
-"""A deep receiver must reach the semantic guard before exhausting the stack.
+"""Recursive frontend syntax must reach its guards before exhausting the stack.
 
-This reproduces run #38's Release failure independently of JIT or other tests.
+Covers run #38's receiver and run #67's recursive type-parser stack regressions.
 Linux children use 1 MiB, matching the default Windows executable stack reserve.
-Keep the ordinary compiler optimization and the existing 256-depth limit intact.
+Keep ordinary compiler optimization and the existing nesting limits intact.
 """
 import pathlib
 import re
@@ -67,3 +67,40 @@ with tempfile.TemporaryDirectory(prefix="void-semantic-depth-") as directory:
                                 preexec_fn=small_stack if sys.platform == "linux" else None)
         assert result.returncode == 1, (kind, result.returncode, result.stdout, result.stderr)
         assert "code: VOID1107" in result.stderr, (kind, result.stderr)
+
+    # CI #67: unused type-grammar temporaries exhausted a Debug 1 MiB stack
+    # before the shared 128-level parser guard could reject deep fixed arrays.
+    # Every recursive type form must preserve that guard and later recovery.
+    forms = {
+        "fixed": ("[", ", 0]"), "growable": ("[", "]"),
+        "dictionary": ("{i32: ", "}"), "function": ("func() -> ", ""),
+        "result": ("result<i32, ", ">"), "generic": ("box<", ">"),
+        "parenthesized": ("(", ")"),
+    }
+    for kind in (*forms, "mixed"):
+        def nested_type(count):
+            value = "i32"
+            for level in range(count):
+                form = ("fixed", "function", "dictionary", "result")[level % 4] if kind == "mixed" else kind
+                before, after = forms[form]
+                value = before + value + after
+            return value
+
+        prefix = "struct box<t>:\n    value: t\n" if kind == "generic" else ""
+        for count in (8, 160):
+            text = prefix + f"func nested(value: {nested_type(count)}):\n    pass\n"
+            if count == 160:
+                text += "func later():\n    missing()\n"
+            source.write_text(text, encoding="utf-8")
+            result = subprocess.run([sys.argv[1], "check", str(source)], capture_output=True,
+                                    encoding="utf-8", errors="strict", timeout=20,
+                                    preexec_fn=small_stack if sys.platform == "linux" else None)
+            assert result.returncode == (0 if count == 8 else 1), (kind, count, result.returncode, result.stdout, result.stderr)
+            if count == 8:
+                assert result.stderr == "", (kind, result.stderr)
+            else:
+                assert result.stderr.count("code: VOID1107") == 1, (kind, result.stderr)
+                assert "Source nesting limit exceeded" in result.stderr, (kind, result.stderr)
+                assert result.stderr.count("code: VOID2003") == 1, (kind, result.stderr)
+                assert "Unknown function 'missing'" in result.stderr, (kind, result.stderr)
+    print("Recursive type grammar: shallow acceptance, bounded stack, nesting diagnostic and later recovery verified")
