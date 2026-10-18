@@ -43,9 +43,12 @@ void reload(bool optimized) {
     auto incompatible=analyze_source({"reload-pattern.void",reordered});require(incompatible.succeeded(),"enum reorder analysis");require(!jit.replace(slot,*incompatible.program,optimized),"enum ordinal change accepted as body reload");empty(*runtime);
 }
 void run(const std::filesystem::path& root,bool optimized) {
-    for(auto [name,answer]:{std::pair{"results",28},{"main",36},{"values",10},{"interfaces",7},{"generic",7},{"large",11},{"nullable",7},{"control",27},{"combined",35},{"unmatched",42},{"transactions",16},{"nested",17},{"types",14},{"fields",14}}) {
+    for(auto [name,answer]:{std::pair{"results",28},{"main",36},{"values",10},{"interfaces",7},{"generic",7},{"large",11},{"nullable",7},{"control",27},{"combined",35},{"unmatched",42},{"transactions",16},{"nested",17},{"types",14},{"fields",14},{"relocation",196}}) {
         auto program=compile_project(root/"examples/patterns"/(std::string(name)+".void"));auto runtime=std::make_shared<Runtime>(1);Jit jit;auto code=jit.compile(program.module,program.module.entry_symbol,optimized,{},runtime);
         const auto input=std::string(name)=="unmatched"?1:7;
+        if(std::string(name)=="relocation")for(auto [input,expected]:{std::pair{0,134},{8,240},{99,456}}) {
+            require(code->invoke(input)==expected,"relocated pattern lost owned expressions/arm order");empty(*runtime);
+        }
         managed_test::Probe probe;probe.inspect_roots=true;probe.frames.reserve(192);
         {managed_test::Observe observe(probe);if(code->invoke(input)!=answer)throw std::runtime_error(std::string("pattern/result source result: ")+name);}
         require(probe.frames.empty() && probe.roots_valid && probe.commits_valid,"pattern/result roots/publication");empty(*runtime);

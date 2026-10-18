@@ -235,6 +235,13 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
 }
 struct Expr;
 struct Pattern {
+    Pattern() = default;
+    // vectors of owning nodes can appear copyable to library traits even though
+    // instantiating their copy bodies fails. Make relocation move-only explicitly.
+    Pattern(const Pattern&) = delete;
+    Pattern& operator=(const Pattern&) = delete;
+    Pattern(Pattern&&) = default;
+    Pattern& operator=(Pattern&&) = default;
     enum class Kind { wildcard, capture, value, range, constructor, list, dictionary } kind=Kind::wildcard;
     Token token{TokenKind::name,"",0};std::string spelling;
     std::vector<Pattern> children;std::vector<std::unique_ptr<Expr>> values;std::vector<Token> fields;
@@ -267,6 +274,10 @@ struct Expr {
     bool super_call = false, interface_call = false, property = false, receiver_writes = false, selected_receiver = false, setter_mutates = false;
     std::string setter;
     Expr(Kind k, Token t) : kind(k), token(std::move(t)) {}
+    Expr(const Expr&) = delete;
+    Expr& operator=(const Expr&) = delete;
+    Expr(Expr&&) = default;
+    Expr& operator=(Expr&&) = default;
 };
 struct Statement {
     enum class Kind { scoped, deferred, match, variable, assignment, expression, returned, conditional, loop, broken, continued, no_op } kind;
@@ -393,6 +404,15 @@ struct Structure {
     std::size_t expanded_fields = 0;
     Function* initializer = nullptr;
 };
+static_assert(!std::is_copy_constructible_v<Pattern> && !std::is_copy_assignable_v<Pattern>);
+static_assert(std::is_move_constructible_v<Pattern> && std::is_move_assignable_v<Pattern>);
+static_assert(std::is_same_v<decltype(std::move_if_noexcept(std::declval<Pattern&>())),Pattern&&>);
+static_assert(!std::is_copy_constructible_v<Expr> && !std::is_copy_assignable_v<Expr>);
+static_assert(std::is_move_constructible_v<Expr> && std::is_move_assignable_v<Expr>);
+static_assert(std::is_same_v<decltype(std::move_if_noexcept(std::declval<Expr&>())),Expr&&>);
+static_assert(std::is_move_constructible_v<Statement> && std::is_move_assignable_v<Statement>);
+static_assert(!std::is_copy_constructible_v<Function> && !std::is_copy_assignable_v<Function>);
+static_assert(std::is_move_constructible_v<Function> && std::is_move_assignable_v<Function>);
 static_assert(!std::is_copy_constructible_v<Statement> && !std::is_copy_assignable_v<Statement>);
 static_assert(!std::is_copy_constructible_v<Structure> && !std::is_copy_assignable_v<Structure>);
 static_assert(std::is_move_constructible_v<Structure> && std::is_move_assignable_v<Structure>);

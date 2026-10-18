@@ -11959,3 +11959,100 @@ await approved exact signatures/error types. Root lifetimes remain conservative;
 the separately documented deeply valid receiver-chain lowering limit remains.
 No hosted platform is claimed validated by this Linux sprint. Stage 5's future
 persistent Debug cache proposal is preserved. No Git/remote/hosted CI actions.
+
+## 18 October 2026: Windows CI #66, move-only Pattern relocation
+
+Baseline HEAD: f904c34f82957b6dbd98e63af31848cd913c3216; clean worktree before
+this correction. The owner supplied the Windows Debug/Release compiler failure
+from [CI #66](https://github.com/Shmellyorc/Void.Language/actions/runs/39162980962):
+xmemory construct_at, Pattern vector relocation, copying values, then deleted
+unique_ptr<Expr> copy. No Windows compiler/STL execution is claimed locally.
+
+Cause: Pattern's implicitly declared copy operations appear available to type
+traits because vector declares copying without instantiating its element-copy
+body. When relocation chooses that copy path rather than a potentially throwing
+move, the owned expressions cannot be copied. Expr has the same latent contract
+through its owning vectors and enclosed patterns. This is the same ownership
+boundary as the previous Structure correction. Microsoft's explanations of
+[vector copy traits](https://devblogs.microsoft.com/oldnewthing/20190926-00/?p=102924)
+and [move_if_noexcept](https://learn.microsoft.com/en-us/cpp/standard-library/utility-functions?view=msvc-170#move_if_noexcept)
+confirm why a declared-but-uninstantiable copy can select the wrong path.
+
+Reproduction on Linux/Clang 19: four assertions requiring Pattern/Expr to be
+noncopyable fail on the baseline. Explicitly instantiating the baseline
+vector<Pattern> copy reproduces the construct_at/deleted unique_ptr<Expr> chain
+at compiler.cpp:237. Linux ordinarily selects moving, so this reproduces the
+incorrect trait contract and failing copy body, not the Windows STL selection.
+Scratch probes and diagnostics are in build/windows-pattern-relocation:
+baseline-ownership.log, baseline-copy.log and corrected-ownership.log. Commands:
+
+```
+clang++-19 -std=c++20 -I. -Iinclude -fsyntax-only build/windows-pattern-relocation/ownership.cpp
+# Baseline: four failed noncopyability assertions. Corrected source: passes.
+clang++-19 -std=c++20 -Iinclude -Isrc/frontend -fsyntax-only build/windows-pattern-relocation/baseline-copy.cpp
+# Expected negative reproduction from the original compiler.cpp plus explicit copy.
+```
+
+Small production correction: Pattern and Expr explicitly delete copy construction/
+assignment and default move construction/assignment. Pattern retains its default
+constructor. No forced noexcept annotation: exception specifications are inferred
+from the actual members. Compile-time assertions require noncopyability, movable
+construction/assignment and rvalue selection by move_if_noexcept. Enclosing
+Statement/Function movement and noncopyability are checked; Structure's existing
+ownership assertions remain. No parser, language, LLVM, Runtime/GC or CI behavior
+is changed.
+
+Added examples/patterns/relocation.void to the existing pattern source/native
+fixtures. It grows nested child vectors, dictionary key-expression vectors,
+constructor field patterns, range-valued match-expression arms and statement arms
+owning optional Patterns. First/middle/last/fallback inputs 0/7/8/99 must produce
+134/196/240/456 in normal/O2 JIT; the shared pattern CLI suite also verifies the
+fixture through normal/O2 JIT and independently linked AOT. Original assertions
+and all existing fixtures remain intact. No new test framework or suite is added.
+
+Focused verification first: rebuilt voidc/void_patterns_tests, then
+`ctest --test-dir build/order1/production -R '^patterns_source$' --output-on-failure`:
+1/1 passed (7.21 s), including the relocation fixture, GC, failure sweeps and reload.
+
+Expanded focused validation rebuilds affected frontend/tooling binaries, source
+suites and the existing pattern/advanced/property native fixture targets. It
+runs the following unchanged CTest families, without the unrelated full matrix:
+
+```
+ctest --test-dir BUILD -R '^(frontend|modules|numeric|tooling|analysis|lsp_positions|lsp_protocol|patterns_source|patterns_cli|advanced_source|advanced_cli|properties_source|properties_cli|source_cli|analysis_cli)$' --output-on-failure -j2
+```
+
+Final focused results with LLVM 19.1.7 and research OFF:
+
+| Configuration | Focused CTest | Elapsed |
+| --- | --- | --- |
+| Debug | 15/15 passed | 82.92 s |
+| Release | 15/15 passed | 20.13 s |
+| Strict ASan/UBSan/leaks (RelWithDebInfo) | 15/15 passed | 57.21 s |
+
+Exact local orchestration commands (the disposable helper configures each cached
+build and selects the affected existing CMake targets, not a new test framework):
+
+```
+python3 build/windows-pattern-relocation/verify.py build/order1/production debug
+python3 build/windows-pattern-relocation/verify.py build/ci-release release
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 python3 build/windows-pattern-relocation/verify.py build/ci-sanitizers sanitizers
+```
+
+The expanded exact cmake build target lists and CTest commands are saved as
+build/windows-pattern-relocation/{debug,release,sanitizers}-commands.txt; configure/
+build and test output are in the corresponding -build.log and -tests.log files.
+Sanitizer compilation, emitted-object construction and tests ran outside tracing
+with leak detection enabled throughout. All 45 selected tests pass, including
+normal/O2 JIT, independent native AOT, pattern allocation failures/GC/reload,
+Stage 4 closures/events/cleanup/properties, parser recovery, owned analysis/tooling,
+LSP and the existing semantic-depth 1 MiB stack checks through source_cli.
+No failures were masked and no existing assertion or fixture was removed.
+
+`git diff --check` passes. Source changes are limited to compiler.cpp special
+members/assertions, the relocation source fixture and its existing CMake/source/
+CLI test registration. LLVM, Runtime/GC, language semantics, sanitizer settings
+and ci.yml are unchanged. A full 80-suite matrix was not repeated for this AST
+ownership-only correction. Windows Debug/Release compilation and hosted regression
+acceptance remain for the owner's CI rerun; local Linux results do not substitute
+for that platform verification. No commits, branches, pushes or hosted CI actions.
