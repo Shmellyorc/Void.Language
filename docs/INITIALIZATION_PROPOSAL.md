@@ -1,5 +1,7 @@
 # Phase 14: custom value initialization — owner approval required
 
+**Design/proposal history.** For delivered behavior and superseded activation gates, read the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and the corresponding implementation guide.
+
 Status: **C1 approved by the owner for Phase 14**, including the nested-child
 boundary, visibility, reload closure and narrowly scoped obsolete-test updates.
 See INITIALIZATION.md for implemented behavior and WORK_LOG.md for verification.

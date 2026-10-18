@@ -1,12 +1,15 @@
 # Void.Language
 
+See [current implementation status and original Stage 0–7 roadmap](docs/DEVELOPMENT_STRATEGY.md#current-implementation-status) first. Phases 1–25 are owner-locked at `c946510` / CI #64 (seven jobs green). The local Stage 3 completion adds [ordered native dictionaries](docs/DICTIONARIES.md); hosted acceptance of these changes remains pending.
+
 VOID 2.0 is a new language, independent of the earlier C#-compatible VOIDC.
 This repository now compiles graphs of actual `.void` files through one frontend, typed
 semantic model, backend-independent IR, and shared LLVM 19.1.7 AOT/JIT lowering.
 The implemented subset supports typed functions, all ten exact-width numeric types,
 contextual literals, checked numeric `as`, bool expressions, local variables,
 conditionals, `for` loops, readonly/compile-time constants, numeric/bool/nested value structs carrying managed references with custom initialization, managed structs with receiver methods, custom initialization, single inheritance and explicit virtual dispatch, and source-first
-compile/runtime diagnostics. Compile-time errors now include stable codes, ranges,
+compile/runtime diagnostics. Fixed/growable arrays, interfaces, concrete generics,
+list insertion/clear/slicing and ordered dictionaries execute through this same pipeline. Compile-time errors now include stable codes, ranges,
 related declarations and recovery across independent errors. Cooperative GC roots/thread coordination, leased function
 replacement, and native C interoperability retain their architectural regression proofs.
 The [runtime foundation](docs/GC_RUNTIME.md) uses shared optimized JIT/AOT lowering;
@@ -27,7 +30,7 @@ base construction and source evaluation order are demonstrated by
 `examples/inheritance/initialization.void` and `examples/inheritance/order.void`.
 These run through the shared normal/O2 JIT and separately linked AOT, with precise
 GC and code-independent object descriptors. See [inheritance scope](docs/INHERITANCE.md)
-and [actual validation evidence](docs/WORK_LOG.md). Interfaces and source downcasts
+and [actual validation evidence](docs/WORK_LOG.md). Structural interfaces are implemented; source downcasts
 remain deferred; no public managed-reference ABI is promised.
 
 ## Build on Linux
@@ -58,7 +61,7 @@ budget is not a production limit.
 The optional [private fixed-call experiment](tests/research/call_envelope/README.md)
 uses direct LLVM arguments and Runtime copy helpers, without envelope
 permissions, store-identity protocols or a linked-byte certificate gate. It does
-not enable native source arrays.
+is separate from already implemented production source arrays.
 
 Verify your distribution actually provides 19.1.7. CMake rejects different SDK
 versions. LLVM's development package depends on other development libraries;

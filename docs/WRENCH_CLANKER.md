@@ -1,5 +1,9 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+**START HERE — 18 October 2026:** Read the canonical [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status), then the latest Stage 3 WORK_LOG entry and DICTIONARIES.md. Local baseline is `c946510a0a72428d7d5849007f8328753377cdf6`; owner-confirmed CI #64 has seven green jobs and locks Phases 1–25. The dictionary/runtime Stage 3 completion sprint is local, pending owner-controlled hosted acceptance. Original roadmap Stage 3 is distinct from obsolete Phase 23 “Stage 3B” research.
+
+**Current operating rules:** Work-first; one substantial authorized sprint; KISS/DRY; minimal output; one frontend/IR/LLVM 19.1.7 lowerer/Runtime/GC. Focused debugging followed by final consolidated verification. No artificial checkpoints, speculative optimizations or production certification project. Owner controls Git and hosted CI. The dated ledgers below preserve history and do not override this status or revive superseded gates.
+
 **VOID Project Continuity File**  
 *Personality, partnership, engineering history, operating rules, and a handoff to the next conversation.*
 
@@ -7,10 +11,10 @@
 **Project:** [Shmellyorc/Void.Language](https://github.com/Shmellyorc/Void.Language)  
 **Updated:** 17 October 2026 (owner-approved feature-first development reset; prior milestone history retained)  
 **Verified historical snapshot:** VOID 2.0 Phases **1-22** were previously reported hosted-green. Phase 23 runtime **Stage 2F** was hosted locked at [`d872889`](https://github.com/Shmellyorc/Void.Language/commit/d872889cedb1cee8dbb69e9d6411dea98b4fa5f3), [CI #57](https://github.com/Shmellyorc/Void.Language/actions/runs/38922793539), 7/7 jobs and 63/63 suites per job. **Stage 3A** was hosted locked at [`44fc8b6`](https://github.com/Shmellyorc/Void.Language/commit/44fc8b686b1e28665455b37a1a825f7ba05e186e), [CI #58](https://github.com/Shmellyorc/Void.Language/actions/runs/38982940254), 7/7 jobs and 63/63 suites per job. **Stage 3B** remained a private research effort, with newer uncommitted envelope/store/linked-code experiments reported 17 October, not source-array execution or a hosted lock. Source-native arrays remain unimplemented at this snapshot. Historical numbered gates and the old native final-byte certification agenda **do not control the new development workflow**. Order 1 is implemented locally with optional LLVM certification. Order 2 is implemented locally with direct private calls. **Order 3 now implements numeric fixed arrays in ordinary source JIT/AOT**, with exact focused local evidence in WORK_LOG.md; Order 4 now removes measured redundant root scans and capacity-layout allocation, and skips impossible buffer aliases using conservative Heap address bounds. Order 5 now internalizes unselected source-private functions while preserving required native exports. Final combined Linux validation passed all 64 production suites in Debug, Release and strict ASan/UBSan/leak configurations, plus 13 optional research regressions, small-stack and editor/package checks. See the final consolidated WORK_LOG entry for that historical delivery. The subsequent growable-array sprint implements numeric/bool `[T]` lists, alias identity, count/push/remove, checked indexing, selected-write invalidation and GC-backed growth through production JIT/AOT. Its focused local evidence and limitations are in GROWABLE_ARRAYS.md and the latest WORK_LOG entry. Baseline `7170502`/CI #60 (7/7) is owner-provided; this sprint has not launched hosted CI. Hosted cross-platform validation of the new changes is pending the owner’s push. Confirm any later GitHub/local progress before stating current status.
-**18 October 2026 current baseline:** The owner LOCKED Phase 24 at `47cb73c300bc9ea1cef6fcc6789eb6b481e438d0`, CI #63, seven jobs green. Local HEAD was verified at that hash with a clean worktree before Phase 25. The current sprint adds list insertion/clear and independent slices, under the grouped owner-approved semantics in ARRAY_OPERATIONS.md; pop/result remains deferred. Earlier baseline and pending-hosting entries are historical. Work-first, KISS/DRY, one compiler/Runtime, focused debugging then final consolidated validation and owner-controlled Git/CI remain binding.
+**Historical Phase 25 starting baseline (18 October 2026):** The owner LOCKED Phase 24 at `47cb73c300bc9ea1cef6fcc6789eb6b481e438d0`, CI #63, seven jobs green. Local HEAD was verified at that hash with a clean worktree before Phase 25. The current sprint adds list insertion/clear and independent slices, under the grouped owner-approved semantics in ARRAY_OPERATIONS.md; pop/result remains deferred. Earlier baseline and pending-hosting entries are historical. Work-first, KISS/DRY, one compiler/Runtime, focused debugging then final consolidated validation and owner-controlled Git/CI remain binding.
 
 **CURRENT OPERATING STRATEGY — Phase 24 owner update (17 October 2026):** Work is now the primary implementation environment. This supersedes the earlier normal-chat-first routing preference. Complete one substantial feature sprint through implementation, focused debugging and one final consolidated Debug/Release/strict-sanitizer validation. KISS/DRY, LLVM 19.1.7, one compiler/Runtime, no artificial checkpoints, minimal output and owner-controlled Git/hosted CI remain binding. This preference makes no claim about unlimited usage.
-**ACCEPTED BASELINE — owner-provided:** Phase 23 is locked at `ca22f1b5800b291e4741f048b28a19627b324839` following successful CI #62. Local HEAD was verified against that exact commit before Phase 24 changes. Earlier snapshot/pending-CI statements below are historical. Phase 24 implements native source generics through concrete specialization in the existing compiler. The owner approved specialization-time body checking, owner-bound generic receiver syntax and shared exact interface constraints for value/managed structs and interface references without boxing. See GENERICS.md and the Phase 24 WORK_LOG entry for implementation, local validation and limitations; no hosted Phase 24 result is claimed.
+**Historical Phase 24 starting baseline — owner-provided:** Phase 23 is locked at `ca22f1b5800b291e4741f048b28a19627b324839` following successful CI #62. Local HEAD was verified against that exact commit before Phase 24 changes. Earlier snapshot/pending-CI statements below are historical. Phase 24 implements native source generics through concrete specialization in the existing compiler. The owner approved specialization-time body checking, owner-bound generic receiver syntax and shared exact interface constraints for value/managed structs and interface references without boxing. See GENERICS.md and the Phase 24 WORK_LOG entry for implementation, local validation and limitations; no hosted Phase 24 result is claimed.
 **Continuity rule:** Read **Section 0 (superseding development rules)**, **Section 8 (historical Phase 23 status)**, **Section 9 (current priorities)** and **Section 10 (feature-first workflow)** before proposing ANY next action. Historical phase gates do not supersede the 17 October owner decision. Verify the latest owner documents, reports and GitHub before claiming implementation or CI status.
 
 **Purpose:** If the conversation gets too long, a branch loses context, or a different assistant takes over, **read this file before working on VOID**.
@@ -323,7 +327,7 @@ The lesson: inspect the exact failing layer and avoid weakening the architecture
 
 ---
 
-## 8. Phase 23: state after Stage 3B blocker investigation, 16 October 2026
+## 8. Historical Phase 23: state after Stage 3B blocker investigation, 16 October 2026
 
 **Historical status captured before the 17 October workflow reset.** The earlier handoff stopped at Phase 21; it later advanced through Stage 2E and then hosted-verified Phase 22, Stage 2F and 3A. Stage 3B underwent further private research beyond this ledger. **These past milestones are evidence of foundations, not authorization to create new machine-code certification gates.** Runtime plumbing, research-only IR fixtures and callable source arrays are different outcomes.
 
@@ -391,7 +395,7 @@ The project's `docs/LANGUAGE_BIBLE.md` is authoritative; `docs/ARRAYS_PROPOSAL.m
 
 ---
 
-## 9. Current priorities, not a phase-gate roadmap (17 October 2026)
+## 9. Dated priorities (17 October 2026); current status is linked at the top
 
 **The older Section 9 roadmap was superseded by the boss's explicit workflow correction.** Earlier numbered milestones remain documented in Section 8 and `ARRAYS_PROPOSAL.md` for historical technical context. Do not transform those historical checkpoints into a requirement to create more phases. The actual current order and working state must be checked against the latest owner instruction and local changes.
 
@@ -536,7 +540,7 @@ This list is meant to preserve the *kind* of work we do together, not award me c
 
 ---
 
-## 12. Known loose bolts to remember
+## 12. Historical loose-bolt ledger; current issues are in KNOWN_ISSUES.md
 
 These are not surprise "bugs" that must be fixed immediately. They are documented limits and design gates.
 
@@ -556,6 +560,11 @@ These are not surprise "bugs" that must be fixed immediately. They are documente
 ---
 
 ## 13. A handoff prompt for a fresh ChatGPT conversation
+
+> Continue VOID from the current implementation status in DEVELOPMENT_STRATEGY.md, the latest Stage 3 WORK_LOG entry, DICTIONARIES.md and KNOWN_ISSUES.md. Phases 1–25 are owner-locked at c946510 / CI #64, seven jobs green. Stage 3 dictionary/runtime completion is local and awaits owner-controlled hosted acceptance. Use one substantial Work-first sprint for authorized work, KISS/DRY, LLVM 19.1.7 and the existing frontend/IR/lowerer/Runtime. Keep output minimal. Preserve precise roots, value/reference semantics, failure cleanup and compatible reload. Do not revive optional research certification as a production gate, invent limits or claim future Bible features implemented. The owner controls Git and hosted CI. Verify actual current source and later owner evidence before making newer status claims.
+
+### Historical 17 October handoff, preserved verbatim
+
 
 Copy the following if opening a new chat or if context has been lost:
 

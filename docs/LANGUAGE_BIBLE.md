@@ -1,5 +1,7 @@
 # VOID 2.0: Language Bible and Compiler Architecture
 
+**Implementation versus design:** See the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). This Bible preserves future design as well as implemented contracts; examples are not all executable language features.
+
 **Status:** Living language design and implementation reference. Approved subsets are implemented; later proposals and examples are not all executable.  
 **Design snapshot:** 10 October 2026  
 **Implementation reconciliation:** 16 October 2026. Read the approved phase documents for the exact implemented boundaries; old OPEN/RECOMMENDED labels must not undo later owner decisions.  
@@ -1499,7 +1501,7 @@ remain. `.pop()` stays deferred until `result`/`Ok`; checked `remove_at(-1)` rem
 available. See ARRAY_OPERATIONS.md for the complete bounded contract and evidence.
 Older pending/research status paragraphs below are historical.
 
-**Current implementation and approval boundary (16 October 2026):** Phase 23's A1–A10 approve fixed-array **value snapshots**, growable-list **shared reference identity**, safe checked indexing including negative offsets, readonly capability preservation, initial `.count`, `.push(value)` and `.remove_at(index)` API names, and i32/i64 range goals. The superseding owner decision rejects any arbitrary 64 KiB production source-array/per-function storage ceiling. Stage 2F remains locked; **Stage 3A is also hosted-LOCKED** at `44fc8b6`, CI #58 (run `38982940254`, seven jobs green, 63/63 suites each). It remains a **runtime-only scalar fixed-value proof**, not source-array activation. The subsequent Orders 1–5 and Phase 23 implement source fixed/growable arrays,
+**Historical implementation and approval boundary (16 October 2026):** Phase 23's A1–A10 approve fixed-array **value snapshots**, growable-list **shared reference identity**, safe checked indexing including negative offsets, readonly capability preservation, initial `.count`, `.push(value)` and `.remove_at(index)` API names, and i32/i64 range goals. The superseding owner decision rejects any arbitrary 64 KiB production source-array/per-function storage ceiling. Stage 2F remains locked; **Stage 3A is also hosted-LOCKED** at `44fc8b6`, CI #58 (run `38982940254`, seven jobs green, 63/63 suites each). It remains a **runtime-only scalar fixed-value proof**, not source-array activation. The subsequent Orders 1–5 and Phase 23 implement source fixed/growable arrays,
 composite/nested elements, ordinary LLVM ABI lowering and production JIT/AOT
 execution. See FIXED_ARRAYS.md, GROWABLE_ARRAYS.md and the latest WORK_LOG.md
 for local validation; earlier hosted proof results remain historical. Slicing, additional APIs and user iterators remain future design. Never convert a documented runtime-only proof into an assertion that source arrays compile today.
@@ -1613,6 +1615,15 @@ match letters.get(7):
 
 ## 33. Dictionaries [AGREED]
 
+**Implemented Stage 3 contract, owner-approved 18 October 2026:** DICTIONARIES.md
+specifies actual colon literals/defaults, supported key families, insertion-order
+iteration, checked indexing/upsert, contains/remove/clear/count, readonly authority
+and next-access structural invalidation. Bare identifiers are ordinary key expressions,
+not implicit strings. Dictionaries share identity. Float/collection/interface/custom-
+equality keys remain unsupported. Result-based get/Ok below is future design, not
+implemented syntax. Dictionary hashing belongs to the existing Runtime and does not
+promise stable cross-launch hashes or adversarial-input randomization.
+
 Dictionaries infer key/value types when possible; explicit declaration uses `{key_type: value_type}`. Keys have predictable equality and hashing semantics; insertion order is guaranteed.
 
 ```python
@@ -1638,7 +1649,7 @@ for value, key in stats:
 
 Order rules: updating a key doesn't move it; deleting and reinserting a key makes it newest. Reverse iteration traverses the reverse insertion order. `.get()` exposes `Ok`/`Err` so a missing key is distinguishable from a present nullable value that happens to be null.
 
-Earlier examples used Lua-like bare keys `health = 100`, while the later typed-dictionary examples favor explicit string keys `"health": 100`. The key-value literal grammar should choose a canonical behavior; both spellings have not been conclusively unified. **OPEN:** Whether bare identifiers imply string keys, reference local variables as keys, or are disallowed.
+Earlier examples used Lua-like bare keys `health = 100`, while the later typed-dictionary examples favor explicit string keys `"health": 100`. The Stage 3 owner decision selects colon literals and ordinary identifier expressions. **Resolved for Stage 3:** Bare identifiers reference ordinary local/constant expressions; implicit string keys and `name = value` entries are not supported.
 
 ### 33.1 Equality and hashing
 
@@ -1651,9 +1662,11 @@ Earlier examples used Lua-like bare keys `health = 100`, while the later typed-d
 
 Equal keys must always hash equally. Developers should not have to configure a lookup strategy simply because a key is `string`, `bool`, or a supported value struct. Hash algorithms, collision handling, resizing, and lookup behavior belong in the runtime/library implementation, not application code.
 
-**OPEN:** Hashing floating-point keys (`NaN`, signed zero), mutable value-struct fields after insertion, stable hashes across launches, randomization against hostile input, and opt-in custom key equality. Do not silently promise field-hash behavior when it would violate equality constraints.
+**Resolved for Stage 3:** Value keys store independent inline field values; later mutation of the original value does not change the stored key. Managed referents contribute identity, not their mutable fields. **OPEN/deferred:** Hashing floating-point keys (`NaN`, signed zero), stable hashes across launches, randomization against hostile input, and opt-in custom key equality. Do not silently promise field-hash behavior when it would violate equality constraints.
 
 ## 34. Mutation during iteration [RECOMMENDED / exception OPEN]
+
+Stage 3 dictionaries use the same next-access/completion rule: new keys, successful deletion and nonempty clear are structural; replacement, absent deletion and empty clear are not.
 
 Phase 25 insertion and nonempty clear are structural changes under this rule;
 empty clear is a no-op. Slicing does not structurally mutate its source.

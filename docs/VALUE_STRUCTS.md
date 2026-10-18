@@ -1,5 +1,7 @@
 # Phase 12: value struct foundations
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 Phase 16 integration: [MANAGED_STRUCTS.md](MANAGED_STRUCTS.md) describes the now
 implemented managed-source boundary. Earlier phase-only exclusions below remain
 historical. Phase 17 [managed custom initialization](MANAGED_INITIALIZATION.md)

@@ -1,5 +1,7 @@
 # Fixed arrays
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 Order 3 implements real source `[T, n]` arrays through the existing typed IR,
 shared LLVM 19.1.7 lowerer, ORC JIT, ordinary AOT writer and GC Runtime. This
 feature is enabled in default builds; `VOID_LLVM_RESEARCH` is not required.

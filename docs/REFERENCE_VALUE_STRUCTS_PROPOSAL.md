@@ -1,5 +1,7 @@
 # Phase 18: reference-containing value structs
 
+**Design/proposal history.** For delivered behavior and superseded activation gates, read the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and the corresponding implementation guide.
+
 **Status: RV1–RV7 approved by the owner for Phase 18 implementation.**
 Implementation details and current boundaries are in REFERENCE_VALUE_STRUCTS.md;
 actual validation results are recorded in WORK_LOG.md.

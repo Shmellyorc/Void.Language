@@ -1,5 +1,7 @@
 # Reference-containing value structs (Phase 18)
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 The owner approved RV1–RV7 in REFERENCE_VALUE_STRUCTS_PROPOSAL.md. This guide
 supersedes historical exclusions of managed references from source value fields.
 The existing frontend, semantic model, IR, LLVM 19.1.7 backend and coordinated

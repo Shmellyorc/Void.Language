@@ -1,5 +1,7 @@
 # Module system and multi-file native compilation
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 Implemented locally on 10 October 2026. The user confirmed the preceding source
 compiler passed Linux, Windows and macOS Actions. The user reports this ten-suite
 module phase passed all three hosted platforms. The user also reports Phase 4 value semantics (commit `d78b6b8`, run #6) passed

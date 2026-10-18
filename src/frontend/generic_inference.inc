@@ -6,6 +6,7 @@ Unit& generic_owner(const Function& function) {
 }
 Type inference_type(Expr& e) {
     if(auto hinted=anchor(e);hinted && hinted->kind!=Type::unresolved && *hinted!=Type::none)return *hinted;
+    if(e.kind==Expr::Kind::dictionary_literal && !e.parts.empty()){auto key=inference_type(*e.parts[0]),value=inference_type(*e.parts[1]);if(key!=error_type && value!=error_type)return unit.make_dictionary(key,value);}
     if(e.kind==Expr::Kind::array_literal) {
         if(e.parts.empty())return error_type;
         std::optional<Type> element;
@@ -37,9 +38,9 @@ std::vector<Type> infer_arguments(Unit& owner,const std::vector<GenericParameter
             actual=ir::with_readonly_paths(actual,{});actual.readonly=false;
             auto [found,inserted]=inferred.emplace(pattern.definition->name,actual);
             if(!inserted && found->second!=actual)error(source,site,Code::type_mismatch,"Conflicting inference for generic parameter '"+pattern.definition->name+"': "+ir::type_name(found->second)+" and "+ir::type_name(actual)+".");
-        } else if(ir::array_type(pattern)) {
+        } else if(ir::collection_type(pattern)) {
             auto found=std::find_if(owner.arrays.begin(),owner.arrays.end(),[&](const auto& a){return a.definition==pattern.definition;});
-            if(found!=owner.arrays.end() && ir::array_type(actual) && actual.kind==pattern.kind)match(found->element,ir::array_element(actual));
+            if(found!=owner.arrays.end() && ir::collection_type(actual) && actual.kind==pattern.kind){if(found->key){match(*found->key,ir::dictionary_key(actual));match(found->element,ir::dictionary_value(actual));}else match(found->element,ir::array_element(actual));}
         } else if(pattern.kind==Type::unresolved) {
             auto application=std::find_if(owner.applications.begin(),owner.applications.end(),[&](const auto& a){return a.definition==pattern.definition;});
             if(application==owner.applications.end())return;
@@ -50,6 +51,7 @@ std::vector<Type> infer_arguments(Unit& owner,const std::vector<GenericParameter
     };
     std::set<std::string> anchored;
     std::function<void(Type,Expr&,bool)> argument=[&](Type pattern,Expr& expression,bool fallback) {
+        if(pattern.kind==Type::dictionary && expression.kind==Expr::Kind::dictionary_literal){auto found=std::find_if(owner.arrays.begin(),owner.arrays.end(),[&](const auto& a){return a.definition==pattern.definition;});if(found!=owner.arrays.end() && found->key){for(unsigned n=0;n<expression.parts.size();n+=2){argument(*found->key,*expression.parts[n],fallback);argument(found->element,*expression.parts[n+1],fallback);}return;}}
         if(ir::array_type(pattern) && expression.kind==Expr::Kind::array_literal) {
             auto found=std::find_if(owner.arrays.begin(),owner.arrays.end(),[&](const auto& a){return a.definition==pattern.definition;});
             if(found!=owner.arrays.end()){for(auto& item:expression.parts)argument(found->element,*item,fallback);return;}

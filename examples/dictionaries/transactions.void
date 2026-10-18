@@ -1,0 +1,16 @@
+struct node:
+    value: i32
+    next: node?
+value struct payload:
+    fixed: [i32, 3]
+    ref: node
+func entry(value: i32) -> i32:
+    var n = node(value = value)
+    n.next = n
+    var items: {string: payload} = {}
+    for index in 0..<6:
+        items["key" + "suffix"] = payload(fixed = [value, 2, 3], ref = n)
+        items["second"] = items["keysuffix"]
+    var result = items["second"]
+    items.clear()
+    return result.fixed[0] + result.ref.value

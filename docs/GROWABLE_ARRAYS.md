@@ -1,5 +1,7 @@
 # Growable arrays
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 `[T]` lists execute through the production frontend, typed IR, shared LLVM
 19.1.7 JIT/AOT lowerer and coordinated Runtime. Research builds are unnecessary.
 Elements support all existing numeric types and bool, strings, value structs,

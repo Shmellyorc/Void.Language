@@ -1,5 +1,7 @@
 # Phase 23 proposal: typed arrays, indexing and iteration
 
+**Design/proposal history.** For delivered behavior and superseded activation gates, read the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and the corresponding implementation guide.
+
 **18 October 2026 superseding update:** Phase 24 is owner-LOCKED at `47cb73c`, CI #63. Phase 25 owner decisions authorize insertion, nonempty/empty clear behavior and independent slices from both source kinds; ARRAY_OPERATIONS.md records exact boundaries, evaluation, readonly and version rules. Pop/result remains deferred. Earlier staged/research exclusions below are historical.
 
 **Current implementation update, 17 October 2026 (Orders 1–5 and growable lists):** Numeric/bool fixed

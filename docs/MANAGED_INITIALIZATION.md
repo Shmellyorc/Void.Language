@@ -1,5 +1,7 @@
 # Phase 17: managed custom initialization
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 Implements owner-approved **S1 + MI1–MI7** from
 [MANAGED_INITIALIZATION_PROPOSAL.md](MANAGED_INITIALIZATION_PROPOSAL.md).
 Phase 16 is locked: the owner reports run #28 passed all seven jobs, 35 suites

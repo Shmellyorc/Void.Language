@@ -10,8 +10,33 @@
 #include <stdexcept>
 namespace vd::ir {
 bool array_type(Type t) { return t.kind==Type::fixed_array || t.kind==Type::growable_array; }
+bool collection_type(Type t) {return array_type(t) || t.kind==Type::dictionary;}
+Type dictionary_type(Type key,Type value) {
+    auto identity=[](Type t){return std::to_string(t.kind)+":"+Type::key(t)+(t.nullable?"?":"");};
+    const auto k=identity(key),v=identity(value);auto name="$dict:"+std::to_string(k.size())+":"+k+":"+v;
+    auto entry=std::make_shared<ValueType>();entry->identity=entry->name=name+"::entry";
+    auto plain=[](Type t){t.readonly=false;t.readonly_references.clear();return t;};
+    entry->fields={{"key",FieldType(plain(key))},{"value",FieldType(plain(value))},{"hash",FieldType(Type::u64)}};
+    Type pair(entry);auto definition=std::make_shared<ValueType>();definition->identity=definition->name=name;definition->element=FieldType(pair);
+    Type result(definition,Type::dictionary);ReferencePaths paths;
+    for(unsigned field=0;field<2;++field)for(auto path:readonly_paths(field?value:key)){path.insert(path.begin(),field);path.insert(path.begin(),array_element_path);paths.insert(std::move(path));}
+    return with_readonly_paths(result,paths);
+}
+Type dictionary_key(Type t) {return field_type(array_element(t),0);}
+Type dictionary_value(Type t) {return field_type(array_element(t),1);}
+bool dictionary_key_supported(Type root) {
+    std::set<const ValueType*> active;std::map<const ValueType*,bool> memo;std::size_t work=0;
+    std::function<bool(Type)> visit=[&](Type t){
+        if(numeric::integer(t) || t==Type::boolean || t==Type::string || t.kind==Type::managed_ref)return true;
+        if(t.kind!=Type::aggregate || !t.definition || active.size()>=128 || ++work>65536)return false;
+        if(auto found=memo.find(t.definition.get());found!=memo.end())return found->second;
+        if(!active.insert(t.definition.get()).second)return false;
+        for(const auto& field:t.definition->fields)if(!visit(field.type))return false;active.erase(t.definition.get());memo.emplace(t.definition.get(),true);return true;
+    };return visit(root);
+}
+
 Type array_element(Type t) {
-    if (!array_type(t) || !t.definition || !t.definition->element) throw std::invalid_argument("VOID IR: missing array element");
+    if (!collection_type(t) || !t.definition || !t.definition->element) throw std::invalid_argument("VOID IR: missing array element");
     auto element=Type(*t.definition->element);ReferencePaths paths=readonly_paths(element);
     for(const auto& path:readonly_paths(t))if(!path.empty() && path[0]==array_element_path)paths.insert(ReferencePath(path.begin()+1,path.end()));
     if(t.readonly)element=readonly_view(element);else element=with_readonly_paths(element,paths);
@@ -38,7 +63,7 @@ CompactValueShape compact_value_shape(Type root) {
     std::function<CompactValueShape(Type)> visit=[&](Type t)->CompactValueShape {
         if((t.nullable && !reference_value(t)) || t.construction || !t.preparation.empty()) throw std::invalid_argument("Unsupported array value shape");
         if(numeric::number(t) || t==Type::boolean) return {0,t==Type::boolean ? 1u : numeric::width(t)/8u,1};
-        if(reference_value(t) || t.kind==Type::string || t.kind==Type::growable_array)return {0,sizeof(void*),1};
+        if(reference_value(t) || t.kind==Type::string || (t.kind==Type::growable_array || t.kind==Type::dictionary))return {0,sizeof(void*),1};
         if((t.kind!=Type::fixed_array && t.kind!=Type::aggregate) || !t.definition || t.definition->managed || t.definition->interface_type)
             throw std::invalid_argument("Reference-bearing/growable array shapes await GC support");
         auto* d=t.definition.get();
@@ -115,7 +140,7 @@ FieldType::FieldType(Type t) : kind(t.kind), nullable(t.nullable), readonly(t.re
     if (t.definition) target = t.definition->self;
 }
 FieldType::operator Type() const {
-    if (kind != Type::aggregate && kind != Type::unresolved && kind != Type::managed_ref && kind != Type::interface_ref && kind!=Type::fixed_array && kind!=Type::growable_array) { Type t(kind); t.nullable=nullable; t.readonly=readonly; return t; }
+    if (kind != Type::aggregate && kind != Type::unresolved && kind != Type::managed_ref && kind != Type::interface_ref && kind!=Type::fixed_array && kind!=Type::growable_array && kind!=Type::dictionary) { Type t(kind); t.nullable=nullable; t.readonly=readonly; return t; }
     auto d = target.lock();
     if (!d) throw std::logic_error("nominal type edge outlived its definition table");
     Type t(std::move(d),kind); t.nullable=nullable; t.readonly=readonly; return t;
@@ -130,9 +155,9 @@ ReferencePaths reference_paths(Type root, bool include_strings) {
         auto [type,path,lists]=std::move(pending.back()); pending.pop_back();
         if (type.construction) continue; // A stage is a place, never a heap root.
         if (reference_value(type) || type.kind==Type::prepared_receiver || (include_strings && type.kind==Type::string)) { result.insert(std::move(path)); continue; }
-        if(array_type(type)) {
+        if(collection_type(type)) {
             if(!type.definition || !type.definition->element)throw std::invalid_argument("VOID IR: missing array reference shape");
-            if(type.kind==Type::growable_array) {result.insert(path);if(!lists.insert(type.definition.get()).second)continue;}
+            if((type.kind==Type::growable_array || type.kind==Type::dictionary)) {result.insert(path);if(!lists.insert(type.definition.get()).second)continue;}
             if(path.size()>=128 || ++expanded>65536)throw std::invalid_argument("VOID IR: recursive or excessive array reference shape");
             path.push_back(array_element_path);pending.push_back({Type(*type.definition->element),std::move(path),std::move(lists)});continue;
         }
@@ -157,10 +182,10 @@ Type with_readonly_paths(Type type,const ReferencePaths& paths) {
         auto declared=reference_paths(type);
         for(const auto& path:paths)if(!declared.contains(path)) {
             auto raw=type;raw.readonly=false;raw.readonly_references.clear();ReferencePath prefix;std::optional<ReferencePath> container;
-            if(raw.kind==Type::growable_array && declared.contains(prefix))container=prefix;
+            if((raw.kind==Type::growable_array || raw.kind==Type::dictionary) && declared.contains(prefix))container=prefix;
             for(auto field:path) {
                 raw=field_type(raw,field);raw.readonly=false;raw.readonly_references.clear();prefix.push_back(field);
-                if(raw.kind==Type::growable_array && declared.contains(prefix))container=prefix;
+                if((raw.kind==Type::growable_array || raw.kind==Type::dictionary) && declared.contains(prefix))container=prefix;
             }
             if(!container)throw std::invalid_argument("VOID IR: readonly path outside reference shape");
             normalized.erase(path);normalized.insert(*container);
@@ -173,7 +198,7 @@ Type with_readonly_paths(Type type,const ReferencePaths& paths) {
         type.readonly|=normalized.contains(ReferencePath{});type.readonly_references.clear();return type;
     }
     type.readonly=false; type.readonly_references=normalized;
-    if(type.kind==Type::growable_array) {type.readonly=normalized.contains(ReferencePath{});type.readonly_references.erase(ReferencePath{});return type;}
+    if((type.kind==Type::growable_array || type.kind==Type::dictionary)) {type.readonly=normalized.contains(ReferencePath{});type.readonly_references.erase(ReferencePath{});return type;}
     if ((reference_value(type) || type.kind==Type::prepared_receiver) && !type.construction) {
         type.readonly=normalized.contains(ReferencePath{});
         type.readonly_references.clear();
@@ -185,7 +210,7 @@ Type readonly_view(Type type) {
     return with_readonly_paths(type,reference_paths(type));
 }
 Type field_type(Type owner,unsigned field) {
-    if(array_type(owner) && field==array_element_path)return array_element(owner);
+    if(collection_type(owner) && field==array_element_path)return array_element(owner);
     auto result=Type(owner.definition->fields.at(field).type);
     if (owner.kind==Type::managed_ref) return owner.readonly ? readonly_view(result) : result;
     ReferencePaths projected=readonly_paths(result);
@@ -208,8 +233,8 @@ bool capability_assignable(Type actual,Type expected) {
         const auto allowed=readonly_paths(e);for(const auto& path:readonly_paths(a))if(!allowed.contains(path))return false;
         auto key=std::to_string(a.kind)+":"+Type::key(a)+"|"+capability_key(a)+"|"+capability_key(e);
         if(!seen.insert(key).second)return true;
-        if(array_type(a) && array_type(e)) {
-            if(a.kind==Type::growable_array && !e.readonly && readonly_paths(array_element(a))!=readonly_paths(array_element(e)))return false;
+        if(collection_type(a) && collection_type(e)) {
+            if((a.kind==Type::growable_array || a.kind==Type::dictionary) && !e.readonly && readonly_paths(array_element(a))!=readonly_paths(array_element(e)))return false;
             return visit(array_element(a),array_element(e));
         }
         if(a.kind==Type::aggregate && e.kind==Type::aggregate)for(unsigned n=0;n<a.definition->fields.size();++n)if(!visit(field_type(a,n),field_type(e,n)))return false;
@@ -252,7 +277,7 @@ std::string capability_key(Type type) {
 std::string reference_path_name(Type type,const ReferencePath& path) {
     std::string result=array_type(type) ? type_name(type) : type.definition ? (type.definition->display_name.empty()?type.definition->name:type.definition->display_name) : type_name(type);
     for (auto field:path) {
-        if(array_type(type) && field==array_element_path)result+="[]";else result+='.'+type.definition->fields.at(field).name;
+        if(collection_type(type) && field==array_element_path)result+="[]";else result+='.'+type.definition->fields.at(field).name;
         type=field_type(type,field);
     }
     return result;
@@ -270,6 +295,7 @@ std::string type_name(Type t) {
     if(t.kind==Type::interface_ref && t.definition) return std::string(t.readonly ? "readonly " : "")+t.definition->identity+(t.nullable ? "?" : "");
     if(t.kind==Type::prepared_receiver && t.definition) return "prepared receiver "+t.definition->identity;
     if (t.readonly && t.kind!=Type::managed_ref) { t.readonly=false; return "readonly " + type_name(t); }
+    if(t.kind==Type::dictionary)return "{"+type_name(dictionary_key(t))+": "+type_name(dictionary_value(t))+"}";
     if(array_type(t)) return "["+type_name(array_element(t))+(t.definition->extent ? ", "+std::to_string(*t.definition->extent) : "")+"]";
     if (t.kind == Type::managed_ref && t.definition) return std::string(t.readonly ? "readonly " : "") + t.definition->identity + (t.nullable ? "?" : "");
     switch (t.kind) { case Type::string: return "string"; case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
@@ -303,7 +329,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     if (m.identity.empty()) fail("missing module identity");
     if(!m.interface_requirements.empty() && (m.root_identity!=m.identity || !m.source_imports.contains(m.root_identity))) fail("invalid interface source scope graph");
     std::map<std::string,const ValueType*> definitions;
-    std::set<const ValueType*> visiting, checked;
+    std::set<const ValueType*> visiting, checked,dictionary_entries;
     using LayoutExtent=std::pair<unsigned,std::size_t>;
     std::map<const ValueType*,LayoutExtent> extents;
     std::function<LayoutExtent(Type)> inline_layout = [&](Type t)->LayoutExtent {
@@ -333,6 +359,12 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         std::vector<Type> pending{root};
         for (std::size_t n=0;n<pending.size();++n) {
             auto t=pending[n];
+            if(t.kind==Type::dictionary) {
+                if(!m.coordinated || !t.definition || !t.definition->element || t.definition->extent || !t.definition->fields.empty() || t.nullable || t.construction || !t.preparation.empty())fail("invalid dictionary type");
+                auto entry=array_element(t);if(entry.kind!=Type::aggregate || entry.definition->fields.size()!=3 || field_type(entry,2)!=Type::u64 || !dictionary_key_supported(dictionary_key(t)) || dictionary_type(dictionary_key(t),dictionary_value(t))!=t)fail("invalid dictionary key/value shape");
+                auto expected=dictionary_type(dictionary_key(t),dictionary_value(t));if(entry.definition->identity!=array_element(expected).definition->identity || entry.definition->managed || entry.definition->interface_type || !entry.definition->base.expired() || entry.definition->element || entry.definition->extent || entry.definition->fields[0].name!="key" || entry.definition->fields[1].name!="value" || entry.definition->fields[2].name!="hash")fail("invalid dictionary entry type");
+                dictionary_entries.insert(entry.definition.get());if(checked.insert(t.definition.get()).second)pending.push_back(entry);continue;
+            }
             if(array_type(t)) {
                 if(t.kind==Type::growable_array && !m.coordinated)fail("growable arrays require coordinated storage");
                 if(!t.definition || !t.definition->element || t.nullable || t.construction || !t.preparation.empty() ||
@@ -374,7 +406,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             auto* d=t.definition.get();
             if(d->element || d->extent) fail("structural array metadata on nominal type");
             if(!m.interface_requirements.empty() && d->visibility!="public" && d->visibility!="internal" && d->visibility!="private") fail("invalid concrete nominal visibility");
-            if(!m.interface_requirements.empty() && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
+            if(!m.interface_requirements.empty() && !dictionary_entries.contains(d) && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
             if (t.construction && !d->managed) fail("construction view requires a managed nominal");
             if (t.kind==Type::aggregate && d->managed) fail("managed nominal cannot be an inline value");
             auto [found,added]=definitions.emplace(d->identity,d);
@@ -617,6 +649,18 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::array_count: case Op::list_version:
                     if(!array_type(operand(i.a)) || (i.op==Op::list_version && operand(i.a).kind!=Type::growable_array) || i.b || i.receiver || !i.arguments.empty() || i.immediate || i.initialization || !i.callee.empty())fail("invalid array property");
                     result=i.op==Op::array_count ? Type::i64 : Type::u64;break;
+                case Op::dict_new:
+                    valid_type(i.type);if(i.type.kind!=Type::dictionary || i.a || i.b || i.receiver || i.immediate || i.initialization || !i.callee.empty())fail("invalid dictionary construction");for(auto argument:i.arguments)expect(argument,array_element(i.type));result=i.type;break;
+                case Op::dict_get: case Op::dict_contains: case Op::dict_remove: case Op::dict_set: case Op::dict_entry: case Op::dict_count: case Op::dict_version: case Op::dict_check: case Op::dict_clear: {
+                    auto owner=operand(i.a);if(owner.kind!=Type::dictionary || i.receiver || i.immediate || i.initialization || !i.callee.empty())fail("invalid dictionary operation");
+                    if(i.op==Op::dict_set){expect(i.b,array_element(owner));if(i.arguments.size()!=1)fail("invalid dictionary write version");expect(i.arguments[0],Type::u64);result=Type::none;}
+                    else {if(!i.arguments.empty())fail("unexpected dictionary arguments");
+                        if(i.op==Op::dict_get || i.op==Op::dict_contains || i.op==Op::dict_remove){expect(i.b,dictionary_key(owner));result=i.op==Op::dict_get?dictionary_value(owner):Type(Type::boolean);}
+                        else if(i.op==Op::dict_entry){if(!numeric::integer(operand(i.b)))fail("invalid dictionary cursor");result=array_element(owner);}
+                        else if(i.op==Op::dict_check){expect(i.b,Type::u64);result=Type::none;}
+                        else {if(i.b)fail("unexpected dictionary operand");result=i.op==Op::dict_clear?Type(Type::none):i.op==Op::dict_count?Type(Type::i64):Type(Type::u64);}
+                    }break;
+                }
                 case Op::array_slice:
                     valid_type(i.type);
                     if(!array_type(operand(i.a)) || i.type.kind!=Type::growable_array || array_element(i.type)!=array_element(operand(i.a)) || !numeric::integer(operand(i.b)) || i.arguments.size()!=1 || !numeric::integer(operand(i.arguments[0])) || i.immediate<0 || i.immediate>1 || i.receiver || i.initialization || !i.callee.empty())fail("invalid array slice");
@@ -763,7 +807,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 default: fail("unknown operation");
                 }
                 bool pure=i.op==Op::constant || i.op==Op::string_literal;
-                if(i.op==Op::aggregate || i.op==Op::fixed_array) {
+                if(i.op==Op::aggregate || i.op==Op::fixed_array || i.op==Op::dict_new) {
                     pure=true;
                     for(auto argument:i.arguments) pure=pure && argument<pure_templates.size() && pure_templates[argument];
                 }
@@ -789,7 +833,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         validate_construction(f,m,body_types);
         validate_fixed_ownership(f,m,body_types);
     }
-    if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition)) fail("incomplete nominal universe for structural interfaces");
+    if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition)) fail("incomplete nominal universe for structural interfaces");
     validate_reference_capabilities(m,qualified_types,verified_effects);
     if (results) *results=std::move(qualified_types);
 }

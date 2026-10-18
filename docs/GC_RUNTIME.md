@@ -1,5 +1,7 @@
 # Phase 15 runtime foundation
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 Phase 20 extends existing heap layouts with runtime-owned immutable nominal descriptors and transactional NativeSafe admission. Generation-owned guarded dispatch uses the same precise roots and collector; objects never retain JIT code pointers. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.
 
 Phase 16 integration: [MANAGED_STRUCTS.md](MANAGED_STRUCTS.md) describes the now
@@ -9,7 +11,9 @@ compiler-checked staged field roots and the existing complete-object commit; the
 runtime implementation is unchanged. Phase 18 source values now carry managed
 references using this same Frame/Slot/descriptor runtime; see REFERENCE_VALUE_STRUCTS.md.
 
-This implements the owner-approved G1–G6 in `GC_RUNTIME_PROPOSAL.md`. It is an
+## Historical Phase 15–23 foundation context
+
+This implemented the owner-approved G1–G6 in `GC_RUNTIME_PROPOSAL.md`. It is an
 internal runtime/compiler foundation, not source-level managed `struct` support
 or a production managed runtime. Existing source syntax, entry behavior, value
 initialization, LLVM 19.1.7 and code-generation leases remain in place.
@@ -32,7 +36,19 @@ alias-guard scaling and pending hosted verification are recorded in
 [ARRAYS_PROPOSAL.md Section 29](ARRAYS_PROPOSAL.md#29-stage-2f-final-runtime-foundation-acceptance-and-review).
 Source arrays, owned-fixed/growable child copying and later stages remain gated.
 
-## Ownership and thread states
+## Stage 3 collection integration
+
+Real fixed/growable arrays, strings and native ordered dictionaries now use this
+same Heap/coordinator/Frame/Slot runtime. Dictionary headers trace their ordered
+entry and scalar index buffers; entry schemas trace nested keys/values, including
+cycles and nullable/interface references. Growth stages existing BufferBuilder
+storage and revalidates before publication; clear/removal vacate traced entries.
+Data-only Runtime metadata survives code retirement without executable callbacks.
+See DICTIONARIES.md and the latest WORK_LOG entry for actual validation. Earlier
+source-nonactivation exclusions above describe historical research only. Stage 3
+acceptance does not require concurrent collection or a new certification framework.
+
+## Current ownership and thread states
 
 `Runtime` owns one existing `Heap`, its participant registry, handles and one
 coordination mutex/condition variable. Both owners are noncopyable. There is no

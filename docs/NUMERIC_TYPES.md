@@ -1,5 +1,7 @@
 # Numeric types and contextual literals
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 Phase 6 contract approved by the user on 11 October 2026. This specifies the
 implemented numeric slice without changing the agreed Language Bible. Phase 5
 commit `4f3688d` passed hosted run #8 according to the user. Phase 6 hosted

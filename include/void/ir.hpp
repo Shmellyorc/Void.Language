@@ -17,7 +17,7 @@ struct TypeArena;
 using ReferencePath = std::vector<unsigned>;
 using ReferencePaths = std::set<ReferencePath>;
 struct Type {
-    enum Kind { i32, boolean, none, i8, i16, i64, u8, u16, u32, u64, f32, f64, aggregate, unresolved, invalid, managed_ref, null_value, interface_ref, prepared_receiver, string, fixed_array, growable_array };
+    enum Kind { i32, boolean, none, i8, i16, i64, u8, u16, u32, u64, f32, f64, aggregate, unresolved, invalid, managed_ref, null_value, interface_ref, prepared_receiver, string, fixed_array, growable_array, dictionary };
     Kind kind = i32;
     bool nullable = false, readonly = false;
     std::string preparation = {}; // Private prepared requirement identity; never user storage.
@@ -68,7 +68,7 @@ struct ValueType {
 struct TypeArena { std::vector<std::shared_ptr<const ValueType>> definitions; };
 inline std::string Type::key(const Type& t) { return t.definition ? t.definition->identity : std::string{}; }
 inline bool operator==(const Type& a, const Type& b) {
-    return (a.kind!=Type::prepared_receiver || a.preparation==b.preparation) && a.kind == b.kind && a.nullable == b.nullable && a.construction == b.construction && (a.kind != Type::aggregate && a.kind != Type::unresolved && a.kind != Type::managed_ref && a.kind != Type::interface_ref && a.kind != Type::prepared_receiver && a.kind != Type::fixed_array && a.kind != Type::growable_array ? true :
+    return (a.kind!=Type::prepared_receiver || a.preparation==b.preparation) && a.kind == b.kind && a.nullable == b.nullable && a.construction == b.construction && (a.kind != Type::aggregate && a.kind != Type::unresolved && a.kind != Type::managed_ref && a.kind != Type::interface_ref && a.kind != Type::prepared_receiver && a.kind != Type::fixed_array && a.kind != Type::growable_array && a.kind != Type::dictionary ? true :
         a.definition && b.definition && a.definition->identity == b.definition->identity);
 }
 struct ConstantValue { std::uint64_t bits = 0; std::vector<ConstantValue> fields; std::string text = {};
@@ -90,6 +90,11 @@ std::string reference_path_name(Type type,const ReferencePath& path);
 std::string type_name(Type type);
 inline constexpr unsigned array_element_path=~0u;
 bool array_type(Type);
+bool collection_type(Type);
+Type dictionary_type(Type key,Type value);
+Type dictionary_key(Type);
+Type dictionary_value(Type);
+bool dictionary_key_supported(Type);
 Type array_element(Type);
 std::string array_identity(Type element, std::optional<std::uint64_t> extent);
 bool scalar_array(Type);
@@ -103,7 +108,7 @@ enum class Op { argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
     upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal,
-    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice };
+    fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry };
 // A validated local aggregate storage path; never a source-visible reference.
 struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
 struct Instruction {

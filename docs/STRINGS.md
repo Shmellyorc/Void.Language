@@ -1,8 +1,10 @@
 # UTF-8 string foundation, Phase 22
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 S1-S8 in STRINGS_PROPOSAL.md are owner-approved, including resource limits. This
-guide describes the locally verified implementation, pending owner review and
-hosted acceptance. WORK_LOG.md records the actual matrix and acceptance status.
+guide describes the implemented Phase 22 contract. Phases 1–25 are now hosted
+accepted at the baseline linked above; the following matrix is historical evidence. WORK_LOG.md records the actual matrix and acceptance status.
 All six SDK/configuration matrices passed 59/59, with 306 stress and 42 small-stack
 executions plus real editor/unit/VSIX checks. The runtime remains
 an experimental precise-GC foundation, not a production-ready GC.

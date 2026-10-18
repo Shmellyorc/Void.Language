@@ -1,5 +1,7 @@
 # Structured diagnostics and compiler recovery (Phase 5)
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 The user reports Phase 4 commit `d78b6b8`, Actions run #6, passed Linux, Windows
 and macOS. Phase 5 preserves that LLVM 19.1.7 foundation and all ten suite names.
 The Language Bible's section 48 examples are illustrative, not previously reserved

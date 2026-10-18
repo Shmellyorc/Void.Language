@@ -1,5 +1,7 @@
 # Phase 19: stored composition and member promotion
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 Phase 20 preserves U1–U7 while adding static ancestry precedence, inherited using fields, original storage paths and virtual dispatch on component identity. Component promotion still considers directly declared members only. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.
 
 The owner approved U1–U7 in [COMPOSITION_PROPOSAL.md](COMPOSITION_PROPOSAL.md),

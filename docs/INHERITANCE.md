@@ -1,5 +1,7 @@
 # Managed inheritance and explicit virtual dispatch
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 Phase 20 implements the owner-approved I1–I8 contract from
 [INHERITANCE_PROPOSAL.md](INHERITANCE_PROPOSAL.md). Actual verification and hosted
 limitations are recorded in WORK_LOG.md. This extends the existing compiler and

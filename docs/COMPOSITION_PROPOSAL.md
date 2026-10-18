@@ -1,5 +1,7 @@
 # Phase 19 proposal: using composition and member promotion
 
+**Design/proposal history.** For delivered behavior and superseded activation gates, read the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and the corresponding implementation guide.
+
 Status: **U1–U7 approved for implementation by the owner, including named and
 unnamed stored composition.** The original investigation/review contract follows;
 [COMPOSITION.md](COMPOSITION.md) describes implemented behavior. Verification and

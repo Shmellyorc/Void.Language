@@ -1,5 +1,7 @@
 # Document revisions and tooling sessions (Phase 9)
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 Phase 8 commit `f25b268` passed hosted run #11 on Linux, Windows and macOS,
 according to the user. Phase 9 adds local in-process document orchestration;
 no language syntax, native publication mechanism or LLVM version changes.

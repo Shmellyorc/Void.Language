@@ -1,0 +1,64 @@
+struct state:
+    digits: i32
+    items: {i32: i32}
+func mark(s: state, digit: i32, answer: i32) -> i32:
+    s.digits = s.digits * 10 + digit
+    return answer
+func mutate(s: state) -> i32:
+    s.items[9] = 99
+    return 7
+func replace(s: state) -> i32:
+    s.items[1] = 33
+    return 7
+func rebind(s: state) -> i32:
+    s.items = {0: 100}
+    return 7
+func entry(value: i32) -> i32:
+    var s = state(items = {1: 2, 2: 3})
+    if value == 1:
+        return s.items[99]
+    if value == 2:
+        s.items[1] = mutate(s)
+    if value == 3:
+        for item, key in s.items:
+            s.items[3] = 4
+    if value == 4:
+        for item in reverse s.items:
+            s.items.remove(1)
+    if value == 5:
+        for item in s.items:
+            s.items.clear()
+    if value == 9:
+        var single = {1: 2}
+        for item in single:
+            single[2] = 3
+    if value == 6:
+        for item in s.items:
+            s.items.clear()
+            break
+        return 0
+    if value == 8:
+        for item in s.items:
+            s.items[3] = 4
+            return 1
+    var made = {mark(s, 1, 0): mark(s, 2, 9), mark(s, 3, 1): mark(s, 4, 8)}
+    if s.digits != 1234:
+        return -100
+    s.items[mark(s, 5, 1)] = mark(s, 6, 10)
+    if s.digits != 123456 or s.items[1] != 10:
+        return -200
+    s.items[1] = replace(s)
+    if s.items[1] != 7:
+        return -300
+    var alias = s.items
+    s.items[2] = rebind(s)
+    if alias[2] != 7 or s.items[0] != 100:
+        return -400
+    var captured = s.items
+    s.items[rebind(s)] = 5
+    if captured[7] != 5 or s.items.count != 1:
+        return -450
+    for item, key in alias:
+        alias[key] = item + 1
+        alias.remove(100)
+    return made[0] + alias[1]

@@ -1,5 +1,7 @@
 # Phase 16: managed structs
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 Phase 20 implements managed inheritance and explicit virtual dispatch under I1–I8. Earlier phase-only exclusions below are historical; P3/P4 remain unchanged. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.
 
 Implemented locally using the owner-approved P1–P7 contract in

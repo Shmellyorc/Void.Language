@@ -1,6 +1,21 @@
 # Known issues and deferred work
 
-## Phase 23 activation blocker: large-array storage and analysis limits
+## Current boundaries, 18 October 2026
+
+See the [canonical status summary](DEVELOPMENT_STRATEGY.md#current-implementation-status). Phases 1–25 are owner-accepted at `c946510` / CI #64; Stage 3 dictionary/runtime changes await their hosted gate. Source arrays, interfaces, generics, collection iteration/ranges, named/default arguments and custom initialization are implemented. Older exclusions below are dated findings, not new approval requirements.
+
+- The reproduced deep valid receiver-chain lowering stack issue below remains open; no unrelated repair is claimed.
+- Dictionary keys exclude floats, interfaces, arrays/lists/dictionaries and value structs containing unsupported fields. Custom equality/hash, adversarial hash randomization and stable cross-launch hash guarantees are not implemented. Result-based `.get()` remains deferred; checked lookup and contains/remove/clear are available.
+- Dictionary template literals/defaults can contain pure entries, but dictionary lookup/count/methods require runtime evaluation. Dictionaries share identity; no independent dictionary clone/view API is promised.
+- Pop/result, missing slice endpoints/views, string indexing/interpolation/formatting, match/defer/closures, source concurrency/schedulers and general managed FFI remain future work.
+- Root lifetimes remain conservative to function exit; collection is coordinated, precise and nonmoving, not concurrent collection or a production performance certification. Metadata and executable retirement retain existing contracts.
+- LSP completion/hover/rename/formatting and package discovery remain deferred. No new platform pass is claimed before the owner's hosted gate.
+
+## Historical issue records and original scope notes
+
+The following records are retained for traceability. The large-array activation blocker is superseded by Orders 1–5 and Phases 23–25; it is not a current limitation. Current implementation contracts take precedence over dated phase boundaries.
+
+## Historical, resolved Phase 23 activation blocker: large-array storage and analysis limits
 
 The owner's 15 October 2026 decision supersedes the earlier 65,536-byte production
 per-function array-storage policy. Neither fixed nor growable arrays may have an
@@ -189,9 +204,9 @@ implementation guards do not override the large-array language commitment.
 - Supported value types include the Phase 22 string foundation in STRINGS.md,
   all ten exact-width numeric types, bool and acyclic
   numeric/bool value structs, plus the bounded managed family in MANAGED_STRUCTS.md.
-  Collections/ranges, custom managed init,
-  generics, closures, async, named/default function arguments,
-  multiple return values and broader managed features are not implemented. Unsupported
+  Collections/ranges, custom initialization, generics and named/default arguments
+  were implemented in later phases. Closures, async, multiple returns and the
+  remaining future language systems are not implemented. Unsupported
   syntax is rejected rather than simulated.
 - UTF-8 source validation and scalar columns work; identifiers currently use
   lowercase ASCII/underscore/digits. Unicode identifier policy remains open.
@@ -204,7 +219,8 @@ implementation guards do not override the large-array language commitment.
 - Phase 6 implements the explicitly approved numeric contract in NUMERIC_TYPES.md:
   wrapping integers, IEEE floats, contextual literals and checked numeric as.
   Exponent/base/separator syntax, float remainder, nullable as?, platform-sized
-  aliases, hashing and arbitrary public native numeric ABIs remain deferred.
+  aliases and arbitrary public native numeric ABIs remain deferred. Dictionary
+  integer/bool hashing is now implemented.
   Native bindings that change host rounding/flush-to-zero state need a future
   environment boundary contract; current hosts use the standard IEEE environment.
   Compiler recovery now bounds parser/semantic/dependency/import recursion; see
@@ -293,7 +309,7 @@ implementation guards do not override the large-array language commitment.
   inspection. Running outside the sandbox tracing restriction passed with leak
   detection enabled. This is a host execution constraint, not a skipped leak check.
 
-## Current phase and subsequent work
+## Historical phase priorities and subsequent work
 
 The user reports Phase 7 commit `04768bf` passed hosted run #10 on Linux, Windows
 and macOS. Phase 8 adds tooling/tooling_demo while preserving all fourteen prior
@@ -359,7 +375,7 @@ Existing RTTI and managed-runtime/package design gates remain unchanged.
 
 The user reports Phase 10 commit `ccfea79` passed hosted run #13 on all platforms.
 Phase 11 provides the local editor extension described in
-[EDITOR_INTEGRATION.md](EDITOR_INTEGRATION.md); its own hosted run is still needed.
+[EDITOR_INTEGRATION.md](EDITOR_INTEGRATION.md); its dated phase validation is superseded by the owner-accepted current baseline.
 Local actual-editor results and package evidence are recorded in WORK_LOG.md.
 VSCodium is API-compatible by design but not installed/tested on this host.
 The declared editor API minimum is 1.91; actual local testing uses VS Code 1.141.0.

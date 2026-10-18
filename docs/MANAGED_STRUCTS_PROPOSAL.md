@@ -1,5 +1,7 @@
 # Phase 16: managed structs, architecture and source contract
 
+**Design/proposal history.** For delivered behavior and superseded activation gates, read the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and the corresponding implementation guide.
+
 Status: **P1–P7 approved by the owner; Phase 16 implemented locally**.
 The owner explicitly approved P3 deep readonly views and delegated P4 to the
 recommended reusable complete-object publication architecture. The sections below

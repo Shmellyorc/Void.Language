@@ -1,5 +1,7 @@
 # Phase 13: receiver methods and initialization decision gate
 
+**Design/proposal history.** For delivered behavior and superseded activation gates, read the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and the corresponding implementation guide.
+
 Status: the owner approved **M1 + I1**. I2 and M2 below remain unapproved
 alternatives, not implemented language behavior. See RECEIVER_METHODS.md for
 the implemented scope. The owner reports Phase 12 commit `acf7355`

@@ -1,5 +1,11 @@
 # Architectural decisions
 
+## Stage 3 dictionary decisions, owner-approved 18 October 2026
+
+Current status and hosted evidence live in DEVELOPMENT_STRATEGY.md. The owner approved the grouped dictionary decisions recorded in DICTIONARIES.md: expression keys with colon literals, exact string/integer/bool/managed-identity and eligible value-struct keys, checked indexing/upsert, contains/remove/clear/count, shared dictionary identity, deep readonly and fixed-child value copies, deterministic order, captured receiver/key/version before RHS, and next-access structural iterator invalidation. Float/collection/interface/custom-equality keys and result-based get are deferred. No result/pattern system, collector or certification framework is added. CI timeout becomes 180 minutes; the owner retains Git/hosted CI control.
+
+Older phase decisions below remain historical where superseded by delivered Phases 23–25 and this Stage 3 work.
+
 ## Phase 23: superseding large-array size decision, 15 October 2026
 
 The owner explicitly withdraws the earlier approval of 65,536 bytes as a production

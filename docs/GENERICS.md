@@ -1,5 +1,7 @@
 # Native generics (Phase 24)
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 Generic functions, managed structs and value structs use lowercase parameters:
 
 ```typescript

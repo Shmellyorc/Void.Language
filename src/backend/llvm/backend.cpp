@@ -179,7 +179,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     auto* interface_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy());
     auto* prepared_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty());
     std::function<llvm::Type*(ir::Type)> type = [&](ir::Type t) -> llvm::Type* {
-        if(ir::array_type(t)) {
+        if(ir::collection_type(t)) {
             if(!input.coordinated) throw std::invalid_argument("Native fixed arrays require a coordinated Runtime");
             return b.getPtrTy();
         }
@@ -219,7 +219,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         // Scalar array payloads live in Runtime buffers; only their handles are
         // embedded in native values. Trace handles even though numeric element
         // shapes have no logical managed-reference leaves.
-        if(ir::array_type(t)) {result.push_back(base);return;}
+        if(ir::collection_type(t)) {result.push_back(base);return;}
         if(t.kind==ir::Type::aggregate) {
             for(unsigned n=0;n<t.definition->fields.size();++n) reference_offsets(ir::field_type(t,n),base+field_offset(t,n),result);
             return;
@@ -260,12 +260,20 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             else if(t.kind==ir::Type::interface_ref){kind=13;target=ir::Type::key(t);}
             else if(t.kind==ir::Type::fixed_array){kind=14;target=element_key(ir::array_element(t));extent=*t.definition->extent;}
             else if(t.kind==ir::Type::growable_array){kind=15;target=list_key(ir::array_element(t));}
+            else if(t.kind==ir::Type::dictionary){kind=16;target="void.dict.v1/"+element_key(ir::array_element(t));}
             else throw std::invalid_argument("unsupported native array element");
             fields.push_back(llvm::ConstantStruct::get(element_field_type,{b.CreateGlobalStringPtr(target),llvm::ConstantInt::get(size_type,offset),b.getInt64(extent),b.getInt32(kind),b.getInt32(t.nullable)}));
         };visit(root,0);
         auto* fields_type=llvm::ArrayType::get(element_field_type,fields.size());auto* data=new llvm::GlobalVariable(*module,fields_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantArray::get(fields_type,fields),"array.element.fields");
         auto* record=new llvm::GlobalVariable(*module,element_record_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantStruct::get(element_record_type,{b.CreateGlobalStringPtr(element_key(root)),llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(type(root))),llvm::ConstantInt::get(size_type,layout.getABITypeAlign(type(root)).value()),llvm::ConstantInt::get(size_type,fields.size()),data}),"array.element");
         element_records.emplace(root,record);return record;
+    };
+    auto* dictionary_record_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy(),size_type,size_type);
+    if(layout.getTypeAllocSize(dictionary_record_type)!=sizeof(NativeDictionary) || layout.getStructLayout(dictionary_record_type)->getElementOffset(2)!=offsetof(NativeDictionary,value_offset))throw std::invalid_argument("dictionary descriptor ABI mismatch");
+    std::map<ir::Type,llvm::Constant*> dictionary_records;
+    auto dictionary_record=[&](ir::Type t)->llvm::Constant* {
+        if(auto found=dictionary_records.find(t);found!=dictionary_records.end())return found->second;auto entry=ir::array_element(t);
+        auto* record=new llvm::GlobalVariable(*module,dictionary_record_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantStruct::get(dictionary_record_type,{element_record(entry),element_record(ir::dictionary_key(t)),llvm::ConstantInt::get(size_type,field_offset(entry,1)),llvm::ConstantInt::get(size_type,field_offset(entry,2))}),"dictionary.layout");dictionary_records.emplace(t,record);return record;
     };
     auto* signature = llvm::FunctionType::get(b.getInt32Ty(), {b.getInt32Ty()}, false);
     std::map<std::string, llvm::Function*> functions;
@@ -420,7 +428,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 members.push_back(debug.createMemberType(file,std::to_string(n),file,0,layout.getTypeSizeInBits(part),layout.getABITypeAlign(part).value()*8,offsets->getElementOffsetInBits(n),llvm::DINode::FlagZero,debug_part));}
             return debug.createStructType(file,ir::type_name(t),file,0,offsets->getSizeInBits(),layout.getABITypeAlign(native).value()*8,llvm::DINode::FlagZero,nullptr,debug.getOrCreateArray(members));
         }
-        if (ir::array_type(t)) return debug.createPointerType(nullptr,layout.getPointerSizeInBits(),0,{},ir::type_name(t));
+        if (ir::collection_type(t)) return debug.createPointerType(nullptr,layout.getPointerSizeInBits(),0,{},ir::type_name(t));
         if (t == ir::Type::none) return nullptr;
         if (t.kind == ir::Type::aggregate) {
             if (auto found = debug_aggregates.find(t.definition->identity); found != debug_aggregates.end()) return found->second;
@@ -502,7 +510,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         std::function<void(ir::Type)> plan_elements=[&](ir::Type t) {
             if(ir::scalar_array(t))return;
             if(!planned.insert(t).second)return;
-            if(ir::array_type(t)) {
+            if(t.kind==ir::Type::dictionary){auto entry=ir::array_element(t);plan_element(entry);plan_element(ir::dictionary_key(t));plan_element(ir::dictionary_value(t));plan_elements(entry);}
+            else if(ir::array_type(t)) {
                 auto child=ir::array_element(t);
                 plan_element(child);
                 auto* source=home(b.CreateAlloca(type(t)),StorageRole::copy,llvm_backend::HomeKind::copy);b.CreateStore(llvm::Constant::getNullValue(type(t)),source);array_sources.emplace(t,source);
@@ -744,6 +753,22 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     else if(!ir::scalar_array(t)){v=b.CreateCall(module->getOrInsertFunction(instruction.op==Op::list_version ? "vd_value_array_version" : "vd_value_array_count",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{value_roots[n].at(instruction.a),element_record(ir::array_element(t)),failure});array_failure();}
                     else {v=b.CreateCall(module->getOrInsertFunction(instruction.op==Op::list_version ? "vd_list_version" : "vd_list_count",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{value_roots[n].at(instruction.a),b.getInt32(scalar_encoding(ir::array_element(t))),failure});array_failure();}
                     break;
+                }
+                case Op::dict_new: {
+                    auto* result=value_roots[n].at(values.size());b.CreateCall(module->getOrInsertFunction("vd_dict_new",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{result,dictionary_record(instruction.type),failure});array_failure();for(auto argument:instruction.arguments){auto* version=b.CreateCall(module->getOrInsertFunction("vd_dict_count",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{result,dictionary_record(instruction.type),b.getInt32(1),failure});array_failure();b.CreateCall(module->getOrInsertFunction("vd_dict_write",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy()),{result,dictionary_record(instruction.type),native_arg(ir::array_element(instruction.type),argument,true),version,failure});array_failure();}v=b.CreateLoad(b.getPtrTy(),result);break;
+                }
+                case Op::dict_get: case Op::dict_contains: case Op::dict_remove: case Op::dict_set: case Op::dict_entry: case Op::dict_count: case Op::dict_version: case Op::dict_check: case Op::dict_clear: {
+                    auto owner=operand_type(instruction.a);auto* root=value_roots[n].at(instruction.a);auto* record=dictionary_record(owner);auto entry=ir::array_element(owner);
+                    auto check=[&]{fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),instruction.op==Op::dict_get?"Dictionary key not found or lookup failed":instruction.op==Op::dict_set?"Dictionary selected write invalidated or failed":"Dictionary operation failed");};
+                    if(instruction.op==Op::dict_count || instruction.op==Op::dict_version || instruction.op==Op::dict_check){auto* count=b.CreateCall(module->getOrInsertFunction("vd_dict_count",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{root,record,b.getInt32(instruction.op!=Op::dict_count),failure});check();if(instruction.op==Op::dict_check)fail_if(b.CreateICmpNE(count,values[instruction.b]),"Dictionary structurally modified during iteration or selected access");else v=count;}
+                    else if(instruction.op==Op::dict_clear){b.CreateCall(module->getOrInsertFunction("vd_dict_clear",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{root,record,failure});check();}
+                    else if(instruction.op==Op::dict_set){b.CreateCall(module->getOrInsertFunction("vd_dict_write",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy()),{root,record,native_arg(entry,instruction.b,true),values[instruction.arguments[0]],failure});check();}
+                    else if(instruction.op==Op::dict_remove){auto* found=b.CreateCall(module->getOrInsertFunction("vd_dict_remove",b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{root,record,native_arg(ir::dictionary_key(owner),instruction.b,true),failure});check();v=b.CreateICmpNE(found,b.getInt32(0));}
+                    else {auto* result=element_staging.at(entry);
+                        if(instruction.op==Op::dict_entry)b.CreateCall(module->getOrInsertFunction("vd_dict_entry",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy()),{result,root,record,values[instruction.b],failure});
+                        else {auto* found=b.CreateCall(module->getOrInsertFunction("vd_dict_read",b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{result,root,record,native_arg(ir::dictionary_key(owner),instruction.b,true),b.getInt32(instruction.op==Op::dict_contains),failure});if(instruction.op==Op::dict_contains)v=b.CreateICmpNE(found,b.getInt32(0));}
+                        check();if(instruction.op!=Op::dict_contains){v=b.CreateLoad(type(entry),result);if(instruction.op==Op::dict_get)v=b.CreateExtractValue(v,1);}
+                    }break;
                 }
                 case Op::array_slice: {
                     auto t=operand_type(instruction.a);auto* source=value_roots[n].at(instruction.a);
@@ -1144,6 +1169,7 @@ Jit::Jit() : impl_(std::make_shared<Impl>()) {
     bind("vd_string_literal",vd_string_literal); bind("vd_string_concat",vd_string_concat); bind("vd_string_equal",vd_string_equal);
     bind("vd_array_default",vd_array_default);bind("vd_array_copy",vd_array_copy);
     bind("vd_array_read",vd_array_read);bind("vd_array_write",vd_array_write);
+    bind("vd_dict_new",vd_dict_new);bind("vd_dict_count",vd_dict_count);bind("vd_dict_read",vd_dict_read);bind("vd_dict_entry",vd_dict_entry);bind("vd_dict_write",vd_dict_write);bind("vd_dict_remove",vd_dict_remove);bind("vd_dict_clear",vd_dict_clear);
     bind("vd_value_array_insert",vd_value_array_insert);bind("vd_value_array_clear",vd_value_array_clear);bind("vd_value_array_slice",vd_value_array_slice);
     bind("vd_value_array_new",vd_value_array_new);bind("vd_value_array_count",vd_value_array_count);bind("vd_value_array_version",vd_value_array_version);bind("vd_value_array_read",vd_value_array_read);bind("vd_value_array_write",vd_value_array_write);bind("vd_value_array_push",vd_value_array_push);bind("vd_value_array_remove",vd_value_array_remove);bind("vd_value_array_copy",vd_value_array_copy);
     bind("vd_list_new",vd_list_new);bind("vd_list_count",vd_list_count);bind("vd_list_version",vd_list_version);

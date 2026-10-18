@@ -1,5 +1,7 @@
 # Work log
 
+**Current handoff:** [Canonical implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). The latest Stage 3 entry is at the end; earlier dated entries retain historical evidence and do not override delivered Phases 1–25.
+
 ## 14 October 2026: Phase 22 UTF-8 foundation implementation
 
 S1-S8 are owner-approved, including resource limits. Implementation and full local
@@ -11399,3 +11401,219 @@ contracts document the implemented behavior and supersede historical exclusions.
 `git diff --check` passed. HEAD remains the accepted baseline and all changes are
 uncommitted. No branches, commits, pushes, remote modifications or hosted CI
 launches were performed. Ready for owner review and hosted cross-platform CI.
+
+
+## 2026-10-18 — Original Stage 3: managed Runtime completion
+
+Accepted baseline: local HEAD verified at `c946510a0a72428d7d5849007f8328753377cdf6`,
+initial worktree clean. The owner confirms CI #64, all seven jobs green, locking
+Phases 1–25. No hosted run was launched/fetched for this sprint; the next hosted
+acceptance remains owner-controlled. Original roadmap Stage 3 is distinct from the
+historical Phase 23 research stages. LLVM remains 19.1.7.
+
+The owner approved one grouped dictionary decision: colon expression-key literals,
+ordinary identifier expressions, integer/bool/string/managed-identity and recursively
+eligible value keys, shared dictionary identity, checked indexing/upsert, bool
+contains/remove, clear/count, captured receiver/key/version before RHS, ordered
+forward/reverse value/key traversal and next-access/completion invalidation.
+Result-based get and float/interface/collection/custom-equality keys are deferred.
+
+### Delivered implementation and integration
+
+- Added structural `{K: V}` types, contextual/inferred multiline literals, safe
+  empty defaults and pure module/field/parameter templates to the existing parser,
+  checker, generic specialization/inference and typed IR. Literal key/value
+  evaluation is ordered and duplicate keys preserve the original insertion place.
+- Added one managed dictionary header with an ordered typed entry buffer and a
+  scalar open-addressed hash-index buffer. Both use the existing Heap, schemas,
+  BufferBuilder/read leases and coordinator; no second allocator or collection
+  framework. Stored hashes filter lookups, exact field/content/identity equality
+  handles collisions, and native padding is ignored. Resizing stages both buffers,
+  revalidates version/backing and commits last. Locked updates/removal/clear perform
+  no fallible allocations after mutation begins. Removal compacts order; clear
+  retains capacity and vacates traced references. Metadata contains no JIT callbacks.
+- Shared LLVM lowering uses ordinary supported native ABI calls and target
+  DataLayout geometry. Precise roots protect receivers, native entry/key staging,
+  old/new buffers, results and fixed-child snapshots across safepoints. Existing
+  value copies, shared references, nullable/interface values, deep readonly, staged
+  publication/failure cleanup and hot reload remain intact.
+- Seven real .void fixtures and two production CTest suites exercise supported key
+  families, all existing value families/generic instances, cycles, nested values,
+  independent repeated defaults, exact embedded-NUL strings, collisions, aliases,
+  evaluation/capture order, iterator completion invalidation, readonly errors,
+  missing-key failures, allocation rollback/retry, reference reclamation, compatible
+  reload/old leases and data surviving complete JIT/analysis retirement. A fresh
+  generation subsequently executes against the same Runtime. The large fixture
+  stores twelve independent 2 MiB fixed payloads and iterates them without placing
+  payloads on the native stack.
+- Increased only `.github/workflows/ci.yml` timeout from 120 to **180 minutes**.
+  Parsed old/new YAML with PyYAML BaseLoader, changed that single old value in
+  memory and asserted complete structural equality, plus seven matrix entries.
+  LLVM/cache, triggers/permissions, sanitizers/leaks, unfiltered CTest, editor and
+  artifact steps are preserved. Evidence: build/stage3/workflow-validation.log.
+
+### Failures investigated and corrected
+
+Focused runs exposed incomplete new dictionary integration, not a need to rebuild
+the existing Runtime: dictionary count initially entered ordinary field capability
+projection; generic header/inference traversal initially only recognized arrays;
+private entry shapes needed canonical structural ownership rather than duplicate
+nominal definitions; and repeated dictionary defaults initially produced a nonpure
+load prototype. The final constructor is one typed dictionary-new operation with
+entry arguments, using the existing pure-template factory/outlining mechanism;
+arbitrary mutation does not become a pure prototype. Receiver capture now precedes
+key-side rebinding. Dictionary constant tooling metadata no longer advertises scalar
+bits or nonexistent builtin source symbols. Positive/negative regressions cover
+these paths.
+
+A native sweep fixture initially passed an unregistered temporary entry reference
+to append_native. GDB stopped at Runtime::require_output and identified its exact
+word; the fixture now registers whole entry staging with Frame/Slot. The Runtime
+root assertion was retained. Invalid native dictionary geometry is rejected before
+publication. The fixture also retained source variable shadowing diagnostics; its
+conflicting local/type name was renamed rather than relaxing that rule.
+
+### Focused evidence
+
+```sh
+cmake --build build/order1/production --target voidc void_dictionaries_tests void_arrays_source void_generics_tests void_collections_tests -j3
+ctest --test-dir build/order1/production -R '^(dictionaries_source|arrays_source|generics_source|collections_source)$' --output-on-failure -j2
+ctest --test-dir build/order1/production -R '^(dictionaries_source|dictionaries_cli)$' --output-on-failure -j2
+```
+
+Adjacent suites: **4/4 passed**, 68.16 s. Feature source/CLI: **2/2 passed**,
+49.17 s; the final tooling-metadata regression source rerun passed in 48.76 s.
+The final CLI performs **92 executions**: 68 successful and 24 checked failures across
+normal/O2 JIT and independently linked AOT. Explicit source tests preserve RHS
+side effects after invalidation, verify unchanged selected values, and cover
+structural change on the final iterator element.
+
+On the focused Linux build, source allocation sweeps report **740** failing budgets
+for main and **1,816** for the reference/fixed-value transaction fixture in each
+codegen mode. Every failure checks valid balanced roots/publication, collection to
+an empty heap and successful retry. Native sweeps report construction 20, growth
+45, in-capacity insertion 10, replacement 10, removal 9, clear 9 and query 9 failures;
+only genuinely allocation-required paths require a positive count. Header identity,
+count/version, collision-chain elements and collection/cleanup remain asserted.
+Final matrix evidence follows below; logs are under ignored build/stage3/.
+
+During the final readiness review, an additional isolated real program reproduced
+`VOID IR: invalid dictionary type`: `func entry(value: i32) -> i32: return
+{1: 2}.count as i32` had no collection local/signature or string to activate the
+coordinated Runtime. Dictionary construction now marks coordination at its shared
+IR emission point, covering literal-only and numeric template-only programs. A
+standalone literal fixture exercises both paths; final consolidated verification
+is on this corrected source. Superseded build/test logs do not serve as final
+acceptance evidence.
+
+The first consolidated run also caught the existing scalar-iteration negative test's
+exact message expectation: the new diagnostic correctly lists dictionaries among
+iterable types. Updated only that expected text; scalar iteration must still reject
+at 2:5 with the same diagnostic path. No acceptance condition or source assertion
+was removed.
+
+The Runtime-activation and diagnostic repairs passed the focused dictionary/frontend
+suites **2/2** in 54.19 s; the isolated literal program returns 9 for input 7.
+Final source is frozen before the corrected consolidated builds below.
+
+### Final consolidated commands
+
+```sh
+cmake -S . -B build/order1/production
+cmake --build build/order1/production -j3
+ctest --test-dir build/order1/production --output-on-failure -j2
+cmake -S . -B build/ci-release -DVOID_LLVM_RESEARCH=OFF
+cmake --build build/ci-release -j3
+ctest --test-dir build/ci-release --output-on-failure -j2
+export ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87
+export UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86
+cmake -S . -B build/ci-sanitizers -DVOID_LLVM_RESEARCH=OFF
+cmake --build build/ci-sanitizers -j3
+ctest --test-dir build/ci-sanitizers --output-on-failure -j2
+```
+
+All configurations use LLVM 19.1.7 and research OFF. Sanitizer build/tests run
+outside the tracing sandbox so LeakSanitizer can operate, with no suppressions.
+Final evidence uses the `build/stage3/final-*-build.log` and `final-*-tests.log`
+files; earlier superseded logs preserve the investigations above.
+
+Small-stack commands for Debug and Release:
+
+```sh
+for configuration in order1/production ci-release; do
+  (ulimit -s 1024; ctest --test-dir build/$configuration -R '^frontend$' --output-on-failure)
+  python3 tests/integration/semantic_depth.py build/$configuration/voidc
+  (ulimit -s 1024; build/$configuration/voidc run examples/dictionaries/large.void 7 --no-opt && build/$configuration/voidc run examples/dictionaries/large.void 7 && build/$configuration/void_dictionaries_cli_large_normal 7 && build/$configuration/void_dictionaries_cli_large_optimized 7)
+done
+```
+
+Editor/package commands (Node 24.19.0 on PATH):
+
+```sh
+npm --prefix editors/vscode test
+VOIDLS_PATH=/home/shmellyorc/Documents/Void.Language/build/order1/production/voidls VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm --prefix editors/vscode run test:host
+npm --prefix editors/vscode run package
+```
+
+Extension unit/typecheck/build, actual trusted/restricted/multi-root editor runs and
+VSIX packaging pass. Artifact: editors/vscode/dist/void-language-0.1.0.vsix. Logs:
+build/stage3/editor-tests.log, editor-host.log and vsix.log. Existing unfiltered CTest
+covers LSP, native packaging/linkage/entry resolution, GC coordination, code/metadata
+retirement and the full earlier array/generic/collection regressions.
+
+### Documentation handoff
+
+DEVELOPMENT_STRATEGY.md now owns one current implementation-status summary, with
+Phases 1–25, accepted commit/owner-reported CI evidence, original Stage 0–7 status,
+architecture, actual executable features, future design and meaningful limitations.
+WRENCH_CLANKER.md leads with this summary and Work-first/minimal-output/owner-Git
+rules before historical material. README, LANGUAGE_BIBLE, DECISIONS, KNOWN_ISSUES,
+GC_RUNTIME and all active feature/tooling guides link that owner; dated proposals
+and superseded research/activation gates are explicitly historical. DICTIONARIES.md
+defines the new implemented contract. Historical results and unresolved findings
+were preserved, not relabeled as new verification or erased.
+
+### Final results and readiness
+
+| Configuration | Production CTest | Elapsed |
+| --- | --- | --- |
+| Linux Debug | **74/74 passed** | 307.47 s |
+| Linux Release | **74/74 passed** | 145.23 s |
+| Strict ASan/UBSan + leak detection | **74/74 passed**, no sanitizer/leak findings | 301.26 s |
+
+Successful-test details and allocation counts are preserved in
+build/stage3/final-{debug,release,sanitizer}-details.log. All three configurations
+report the same source/native dictionary sweep counts above: **5,224 intentional
+allocation failures per configuration**, followed by successful budgets and retries.
+The final seven-fixture CLI suite passes its 92 normal/O2 JIT/linked AOT executions.
+Dictionary source tests include literal-only Runtime activation, nullable-present
+values, generic value keys, live retired graphs and fresh-generation execution.
+
+Debug and Release frontend/deep-receiver regressions pass under a **1 MiB stack**.
+The nested 2 MiB dictionary payload fixture returns 14 in all four normal/O2
+JIT/linked AOT modes under that stack in both configurations (eight executions).
+Evidence: build/stage3/debug-stack.log and release-stack.log. Real editor trusted,
+restricted and multi-root runs, extension tests/typechecking and VSIX packaging
+pass on the corrected compiler; no client functionality or checks were disabled.
+
+Stage 3 is **locally complete and ready for owner-controlled hosted acceptance**
+for its implemented managed-memory contract: one allocator/precise coordinated GC,
+reference/value structs, immutable strings, fixed/growable lists and ordered
+dictionaries, correct under normal/O2 native JIT/AOT. This is not a claim of a new
+production GC certification, concurrent collection or completion of Stages 4–7.
+Phases 1–25 and Orders 1–5 remain intact. CI timeout is verified at **180 minutes**,
+with the seven-job workflow otherwise structurally unchanged.
+
+Remaining meaningful boundaries: result-based dictionary get/pop, float/interface/
+collection/custom-equality keys, string indexing/interpolation, omitted slice
+endpoints/views, source concurrency/general FFI and other future language/tooling
+work remain deferred. Dictionary deletion is O(n); root lifetimes remain conservative.
+Dictionary lookup/count/methods are runtime operations, even for pure template data.
+The pre-existing deep valid receiver-chain lowering stack issue remains documented
+in KNOWN_ISSUES.md; no unrelated repair is claimed. There are no failing final local
+production tests or sanitizer findings. Windows/macOS acceptance of this new source
+remains pending the owner's hosted run.
+
+`git diff --check` passes. HEAD remains c946510a0a72428d7d5849007f8328753377cdf6;
+all delivery edits are uncommitted. No branches, commits, pushes, remote changes
+or hosted CI triggers were performed.

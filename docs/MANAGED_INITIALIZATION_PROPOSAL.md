@@ -1,5 +1,7 @@
 # Phase 17: managed custom initialization proposal
 
+**Design/proposal history.** For delivered behavior and superseded activation gates, read the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and the corresponding implementation guide.
+
 **Status: owner approved S1 + MI1–MI7; implemented locally.**
 The owner declares Phase 16 locked and reports Actions run #28 passed all seven
 jobs, 35 suites per configuration. Approval explicitly includes replacement of

@@ -2,15 +2,94 @@
 
 **Project/repository:** `Void.Language`  
 **Language:** VOID 2.0 (`.void`)  
-**Status:** Proposed development plan, agreed direction; implementation not yet started by this document  
+**Status:** Implemented foundation plus the original roadmap; see current implementation status below
 **Date:** October 10, 2026  
 **Companion document:** `VOID_2_0_Language_Bible.md`
+
+## Current implementation status
+
+**18 October 2026.** This is the canonical current-status summary. The roadmap and
+older proposal/proof notes below remain historical design evidence where superseded.
+Feature guides define implemented contracts; LANGUAGE_BIBLE.md includes both those
+contracts and approved future design, and is not a claim that every illustrated
+syntax executes today.
+
+**Accepted baseline:** local HEAD verified at
+[`c946510a0a72428d7d5849007f8328753377cdf6`](https://github.com/Shmellyorc/Void.Language/commit/c946510a0a72428d7d5849007f8328753377cdf6).
+The owner confirms CI **#64, all seven jobs green**, locking Phases 1–25. This is
+owner-supplied hosted evidence, not a newly launched or independently fetched CI run.
+The Stage 3 dictionary/runtime completion is **locally complete**: 74/74 production
+suites pass in Linux Debug, Release and strict ASan/UBSan/leak configurations, with
+JIT/AOT, small-stack and editor/VSIX checks. Hosted acceptance awaits the owner. Exact local commands/results and defects are in WORK_LOG.md's
+latest Stage 3 entry. No newer hosted pass is claimed.
+
+| Implemented phases | Delivered source/toolchain behavior |
+| --- | --- |
+| 1–4 | Native compiler foundation, real source functions/control flow, modules, value semantics and JIT/AOT execution |
+| 5–7 | Structured/recovering diagnostics, exact-width numeric types/conversions, validated analysis and compatibility |
+| 8–11 | Owned tooling snapshots/revisions, LSP, VS Code/VSCodium extension and VSIX workflow |
+| 12–14 | Value structs, receiver methods and custom value initialization |
+| 15–18 | Coordinated precise GC, managed structs/cycles, staged initialization, managed references inside value structs |
+| 19–21 | Composition, managed inheritance/virtual dispatch, structural interfaces |
+| 22 | Immutable UTF-8 strings, exact content equality/concatenation and owned templates |
+| 23 | Real fixed/growable arrays, nested/composite elements, forward/reverse iteration and integer ranges |
+| 24 | Concrete native generic functions/types/methods, exact interface constraints and specialization-time body checking |
+| 25 | List insertion/clear and independent inclusive/exclusive slicing; approved pop deferral |
+
+The current Stage 3 sprint adds **native ordered dictionaries**; DICTIONARIES.md
+records the owner-approved key, lookup, mutation, readonly and iteration contract.
+It reuses the existing Heap, typed buffers, Frame/Slot roots and shared LLVM lowerer.
+Stage 3's acceptance is managed-memory correctness under optimization, not a new
+GC certification framework or a promise of concurrent collection/production tuning.
+
+The original **Stage 0–7** roadmap (Section 4) remains authoritative as a roadmap;
+its numbers are distinct from implementation phases and Phase 23 research substages:
+
+| Roadmap stage | Current state and remaining boundary |
+| --- | --- |
+| 0 Architecture proofs | Implemented and regression-tested LLVM/GC/leased reload/native-call foundations |
+| 1 Frontend | Implemented for the delivered language subset; future Bible syntax remains future work |
+| 2 Core native language | Implemented functions/types/control flow/value and managed structs with native execution |
+| 3 Managed runtime | Allocator/precise coordinated GC, reference/value structs, strings, lists and dictionaries; locally complete and verified, hosted gate pending |
+| 4 Advanced language | Partial: interfaces/generics implemented; properties, match/result, defer, closures/events and source callbacks remain future work |
+| 5 Hot reload | Partial: compatibility checks, leased code replacement/retirement and metadata lifetime implemented; automatic file watching/live application deployment is not implemented |
+| 6 Concurrency/native libraries | Partial: Runtime coordination and typed native architectural proofs; no source async/scheduler/thread-pool or arbitrary FFI/library ecosystem |
+| 7 Tooling/optimization | Partial: LSP diagnostics/navigation, editor integration/VSIX and LLVM O2; completion/rename/formatting, library discovery and broad performance work remain deferred |
+
+Ordinary `.void` programs execute all delivered features together through normal/O2
+ORC JIT or independently linked AOT. Examples live under examples/managed_structs,
+strings, arrays, generics, collections and dictionaries. Fixed arrays copy values;
+lists/dictionaries and managed references share identity. Precise roots, safepoints,
+transactional publication and failure cleanup apply across these features. Large
+payloads use the existing GC Heap; no arbitrary 64 KiB production or native-stack
+payload limit applies. Public managed aggregate FFI is not promised.
+
+**Architecture:** C++20 frontend/semantic checker → typed validated IR → one LLVM
+**19.1.7** lowerer shared by JIT/AOT; one coordinated Runtime/Heap with precise
+Frame/Slot roots and runtime-owned data-only metadata. LSP owns immutable analysis
+snapshots; the extension launches voidls. GitHub Actions retains seven Linux,
+Windows and macOS Debug/Release/strict sanitizer configurations, unfiltered
+production CTest, editor integration and VSIX artifacts; timeout is **180 minutes**.
+
+**Historical supersession:** Phase 23 runtime stages 2A–2F/3A–3B and later envelope/
+final-byte experiments are dated research, not current source-feature blockers.
+Orders 1–5 made certification optional, simplified private calls, delivered real
+fixed arrays, removed measured root/lookup overhead and corrected linkage. Source
+arrays and Phases 24–25 supersede their old nonactivation claims. No further
+certification gate is required for ordinary compiler acceptance.
+
+**Meaningful limits:** see KNOWN_ISSUES.md and the individual guides. Dictionary
+float/interface/collection/custom-equality keys and result-based get remain deferred;
+so do pop/result, missing slice endpoints/views, string indexing/interpolation,
+source concurrency and the remaining Stage 4–7 work. The known deep valid receiver
+chain lowering stack issue remains open unless a later reproduced repair is recorded.
+Do not interpret Stage 3 completion as completion of all language or tooling design.
 
 > **Purpose:** This document preserves our agreed development strategy so a future conversation, contributor, or milestone team can continue without rebuilding architectural context. The Language Bible defines what VOID 2.0 should do. This roadmap explains how to develop it, validate its foundations, and decide when a milestone is truly complete.
 >
 > **Important naming decision:** The project is called **`Void.Language`**, not `Void.Language2`. The earlier project has been backed up. This document does not assume any existing files have been modified.
 
-> **15 October 2026 owner correction, current Phase 23 activation gate:** CI #45 is
+> **Historical 15 October 2026 Phase 23 activation discussion (superseded by Orders 1–5 and Phases 23–25):** CI #45 is
 > owner-confirmed green (7/7 jobs, 61 suites each), locking Part 5A. The earlier
 > 65,536-byte production array-function policy is superseded. See the large-array
 > review gate below and ARRAYS_PROPOSAL.md A10/Section 21; historical roadmap entries

@@ -1,5 +1,9 @@
 # First real source compiler
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
+Stage 3 extends this same pipeline with native `{K: V}` dictionaries; see DICTIONARIES.md for the implemented source/runtime contract, supported keys and deferred result-based get.
+
 Phase 22 adds the owner-approved UTF-8 string foundation through this same pipeline.
 See [STRINGS.md](STRINGS.md) for immutable content, escapes, empty/default templates,
 managed/value storage, exact equality/concatenation, roots, failures, reload and

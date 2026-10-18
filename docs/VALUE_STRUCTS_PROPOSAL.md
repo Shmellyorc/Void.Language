@@ -1,5 +1,7 @@
 # Phase 12 value struct contract — Option A approved
 
+**Design/proposal history.** For delivered behavior and superseded activation gates, read the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and the corresponding implementation guide.
+
 Reviewed 12 October 2026; Option A approved by the project owner on the same date.
 This preserves the design proposal and alternatives; VALUE_STRUCTS.md records the
 implemented surface and limitations. The Language Bible

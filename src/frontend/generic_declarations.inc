@@ -18,9 +18,9 @@ for(auto& [id,u]:units) {
             if(raw.nullable)error(u->source,token,Code::unsupported_type,"Nullable generic parameters are not implemented.");
             return;
         }
-        if(ir::array_type(raw)) {
+        if(ir::collection_type(raw)) {
             auto a=std::find_if(u->arrays.begin(),u->arrays.end(),[&](const auto& a){return a.definition==raw.definition;});
-            if(a!=u->arrays.end()){(void)array_extent(*u,*a);type(a->element,token,names);}
+            if(a!=u->arrays.end()){if(a->key)type(*a->key,token,names);else (void)array_extent(*u,*a);type(a->element,token,names);}
             return;
         }
         auto application=std::find_if(u->applications.begin(),u->applications.end(),[&](const auto& a){return a.definition==raw.definition;});

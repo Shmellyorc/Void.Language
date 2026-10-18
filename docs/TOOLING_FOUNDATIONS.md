@@ -1,5 +1,7 @@
 # In-process tooling and invalidation planning (Phase 8)
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 The user reports Phase 7 commit `04768bf` passed Actions run #10 on Linux,
 Windows and macOS. This phase consumes its existing successful analysis records;
 it changes neither language semantics nor exact native reload compatibility.

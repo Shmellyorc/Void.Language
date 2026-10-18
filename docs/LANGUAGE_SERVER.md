@@ -1,5 +1,7 @@
 # Minimal VOID language server (Phase 10)
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 `voidls` is a synchronous, single-threaded stdio implementation of the
 [Language Server Protocol 3.17](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/).
 It analyzes real `.void` source through the existing compiler and Phase 9

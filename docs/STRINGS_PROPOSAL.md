@@ -1,5 +1,7 @@
 # Phase 22: UTF-8 strings proposal
 
+**Design/proposal history.** For delivered behavior and superseded activation gates, read the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and the corresponding implementation guide.
+
 Status: **S1-S8 approved by boss and wrench clanker, 14 October 2026**, including
 the recommended 16 MiB per-constant and 64 MiB constant-pool limits. Full Phase 22
 implementation is complete and locally verified, pending owner review and the

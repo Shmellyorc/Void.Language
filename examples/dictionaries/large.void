@@ -1,0 +1,16 @@
+func entry(value: i32) -> i32:
+    var payload: [u8, 2097152]
+    payload[0] = 7
+    var items: {i32: [u8, 2097152]} = {0: payload}
+    for key in 1..<12:
+        items[key] = items[0]
+    items[0][0] = 9
+    if items[11][0] != 7 or payload[0] != 7:
+        return -100
+    var count = 0
+    for item, key in reverse items:
+        count += 1
+    if count != 12:
+        return -200
+    items.remove(0)
+    return items[1][0] as i32 + value

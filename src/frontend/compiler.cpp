@@ -132,11 +132,12 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     std::vector<Token> tokens;
     std::vector<std::size_t> indents{0};
     std::size_t p = text.starts_with("\xef\xbb\xbf") ? 3 : 0;
-    bool beginning = true;
+    bool beginning = true;unsigned braces=0;
     auto emit = [&](TokenKind kind, std::string value, std::size_t offset) { tokens.push_back({kind, std::move(value), offset}); };
     while (p < text.size()) {
         if (diagnostics.full()) break;
         try {
+        if(beginning && braces){while(p<text.size() && text[p]==' ')++p;beginning=false;}
         if (beginning) {
             auto start = p;
             while (p < text.size() && text[p] == ' ') ++p;
@@ -159,7 +160,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
         if (c == '#') { while (p < text.size() && text[p] != '\r' && text[p] != '\n') ++p; continue; }
         if (c == '\r' || c == '\n') {
             ++p; if (c == '\r' && p < text.size() && text[p] == '\n') ++p;
-            if (!tokens.empty() && tokens.back().kind != TokenKind::newline) emit(TokenKind::newline, "<newline>", start);
+            if (!braces && !tokens.empty() && tokens.back().kind != TokenKind::newline) emit(TokenKind::newline, "<newline>", start);
             beginning = true; continue;
         }
         if (c == '"') {
@@ -189,7 +190,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
             pair == "-=" || pair == "*=" || pair == "/=" || pair == "%=" || pair == "++" || pair == "--") {
             p += 2; emit(TokenKind::symbol, pair, start); continue;
         }
-        if (std::string("[]():,.+-*/%=<>?").find(c) != std::string::npos) { ++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
+        if (std::string("{}[]():,.+-*/%=<>?").find(c) != std::string::npos) { if(c=='{')++braces;else if(c=='}' && braces)--braces;++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
         error(source, {TokenKind::symbol, "", p}, Code::character, "Unexpected character in source.",
               c == '\t' ? "Use spaces instead of tabs." : "Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.");
         } catch (const CompilationError& e) {
@@ -208,7 +209,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     return tokens;
 }
 struct Expr {
-    enum class Kind { literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice } kind;
+    enum class Kind { literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::string op, qualifier, target, source_target;
@@ -310,6 +311,7 @@ struct ArraySyntax {
     Type resolved = Type::none;
     unsigned state = 0;
     bool template_syntax=false;
+    std::optional<Type> key={};
 };
 struct Unit;
 struct Structure {
@@ -366,6 +368,7 @@ struct Unit {
     std::set<std::string> explicit_qualifiers;
     std::set<std::string> failed_qualifiers, invalid_declarations;
     std::function<Type(Type,const Token&)> resolve_array;
+    std::function<Type(Type,Type)> make_dictionary;
     std::function<Type(Type,const Token&)> resolve_application;
     std::function<Function&(Unit&,Unit&,Function&,const std::vector<Type>&,const Token&,unsigned,Type)> specialize_function;
     std::function<Structure&(Unit&,Unit&,Structure&,const std::vector<Type>&,const Token&)> specialize_structure;
@@ -469,6 +472,12 @@ class Parser {
     }
     Type type() {
         Depth guard(depth,source,peek());
+        if(at("{")) {
+            auto token=take();auto key=type();need(":");auto value=type();auto close=need("}");
+            if(at("?"))error(source,take(),Code::unsupported_type,"Nullable dictionaries are deferred.");
+            auto d=std::make_shared<ir::ValueType>();d->name=d->identity=source.text().substr(token.offset,close.offset+1-token.offset);
+            arrays.push_back({token,value,d,{}});arrays.back().key=key;return Type(d,Type::dictionary);
+        }
         if (at("[")) {
             auto token=take();auto element=type();std::unique_ptr<Expr> extent;
             if(accept(",")) extent=expression();
@@ -563,6 +572,11 @@ class Parser {
         if (++nodes > 512) error(source, peek(), Code::nesting, "Expression size limit exceeded.", "Split this expression into smaller local values.");
         auto token=take();
         if(token.kind==TokenKind::invalid) throw Poison{};
+        if(token.text=="{") {
+            auto e=std::make_unique<Expr>(Expr::Kind::dictionary_literal,token);
+            if(!at("}"))do{e->parts.push_back(expression());need(":");e->parts.push_back(expression());}while(accept(",") && !at("}"));
+            need("}");return postfix(std::move(e));
+        }
         if(token.text=="[") {
             auto e=std::make_unique<Expr>(Expr::Kind::array_literal,token);
             if(!at("]")) do { e->parts.push_back(expression()); } while(accept(","));
@@ -835,7 +849,7 @@ std::pair<Unit*, Structure*> structure_lookup(Unit& unit, Unit& root,
     return candidates.empty() ? std::pair<Unit*,Structure*>{nullptr,nullptr} : candidates.begin()->second;
 }
 Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std::unique_ptr<Unit>>& units, const Token& token) {
-    if(ir::array_type(t)) return unit.resolve_array(t,token);
+    if(ir::collection_type(t)) return unit.resolve_array(t,token);
     if (t.kind != Type::unresolved) return t;
     for(auto& application:unit.applications)if(application.definition==t.definition) {
         auto result=application.resolved;
@@ -1061,6 +1075,13 @@ class Semantics {
     // Deep receiver chains must reach the existing semantic nesting guard on
     // the supported 1 MiB native stack in Debug as well as optimized builds.
     VOID_SEMANTIC_HANDLER Type resolved_method_expression(Expr& e,Type receiver) {
+        if(receiver.kind==Type::dictionary && (e.token.text=="contains" || e.token.text=="remove" || e.token.text=="clear" || e.token.text=="get")) {
+            if(e.token.text=="get")error(source,e.token,Code::unsupported_type,"Dictionary get awaits result/Ok support; use checked indexing or contains.");
+            if(!current)error(source,e.token,Code::constant_call,"Dictionary operations require runtime evaluation.");
+            if(e.parts.size()!=(e.token.text=="clear"?1u:2u) || std::any_of(e.names.begin(),e.names.end(),[](const auto& n){return !n.text.empty();}))error(source,e.token,Code::argument_count,"Incorrect dictionary positional arguments.");
+            if(e.parts.size()==2)expect(expression(*e.parts[1],ir::readonly_view(ir::dictionary_key(receiver))),ir::readonly_view(ir::dictionary_key(receiver)),e.parts[1]->token);
+            e.target="$dict."+e.token.text;return e.type=e.token.text=="clear"?Type(Type::none):Type(Type::boolean);
+        }
         if(ir::array_type(receiver) && (e.token.text=="push" || e.token.text=="remove_at" || e.token.text=="insert" || e.token.text=="clear" || e.token.text=="pop")) {
             if(e.token.text=="pop")error(source,e.token,Code::unsupported_type,"pop awaits result/Ok support; use checked remove_at(-1).");
             if(!current)error(source,e.token,Code::constant_call,"List mutation is not a pure constant expression.");
@@ -1279,6 +1300,7 @@ class Semantics {
         }
         if(e.kind==K::array_index || e.kind==K::array_slice) {
             auto owner=anchor(*e.parts[0]);
+            if(owner && owner->kind==Type::dictionary && e.kind==K::array_index)return ir::dictionary_value(*owner);
             if(owner && ir::array_type(*owner)) return e.kind==K::array_slice?slice_type(*owner):ir::array_element(*owner);
             return {};
         }
@@ -1306,7 +1328,7 @@ class Semantics {
                 return qualified_anchor(e,K::name);
             }
             auto base = anchor(*e.parts[0]);
-            if(base && ir::array_type(*base) && e.token.text=="count")return Type::i64;
+            if(base && ir::collection_type(*base) && e.token.text=="count")return Type::i64;
             if (base && (base->kind == Type::aggregate || base->kind == Type::managed_ref)) {
                 auto selected=member(*base,e.token);
                 if (!selected.function) { auto t=*base; for (auto index:selected.path) t=ir::field_type(t,index); return t; }
@@ -1365,6 +1387,7 @@ class Semantics {
     Type expression_impl(Expr& e, std::optional<Type> expected) {
         switch (e.kind) {
         case Expr::Kind::construction: return e.type; // An inferred literal may revisit its already checked constructor.
+        case Expr::Kind::dictionary_literal: return dictionary_expression(e,expected);
         case Expr::Kind::array_literal: return array_expression(e,expected);
         case Expr::Kind::array_index: return index_expression(e);
         case Expr::Kind::array_slice: return slice_expression(e);
@@ -1377,6 +1400,18 @@ class Semantics {
         case Expr::Kind::unary: return unary_expression(e, expected);
         default: return binary_expression(e, expected);
         }
+    }
+    VOID_SEMANTIC_HANDLER Type dictionary_expression(Expr& e,std::optional<Type> expected) {
+        if(!expected){
+            if(e.parts.empty())error(source,e.token,Code::unsupported_type,"Empty dictionary literal requires a typed context.");
+            std::optional<Type> key,value;for(unsigned n=0;n<e.parts.size();n+=2){if(!key)key=anchor(*e.parts[n]);if(!value)value=anchor(*e.parts[n+1]);}
+            if(!key)key=expression(*e.parts[0]);if(!value)value=expression(*e.parts[1]);
+            if(*key==Type::null_value || *value==Type::null_value || *key==Type::none || *value==Type::none)error(source,e.token,Code::unsupported_type,"Dictionary entries require concrete types or a typed context.");expected=unit.make_dictionary(*key,*value);
+        }
+        if(expected->kind!=Type::dictionary)error(source,e.token,Code::type_mismatch,"Dictionary literal requires dictionary context.");
+        if(!ir::dictionary_key_supported(ir::dictionary_key(*expected)))error(source,e.token,Code::unsupported_type,"Unsupported dictionary key type.");
+        for(unsigned n=0;n<e.parts.size();n+=2){expect(expression(*e.parts[n],ir::dictionary_key(*expected)),ir::dictionary_key(*expected),e.parts[n]->token);expect(expression(*e.parts[n+1],ir::dictionary_value(*expected)),ir::dictionary_value(*expected),e.parts[n+1]->token);}
+        return e.type=*expected;
     }
     VOID_SEMANTIC_HANDLER Type array_expression(Expr& e,std::optional<Type> expected) {
         if(!expected) {
@@ -1409,7 +1444,8 @@ class Semantics {
     VOID_SEMANTIC_HANDLER Type index_expression(Expr& e) {
         auto array=expression(*e.parts[0]);
         if(array==error_type) return error_type;
-        if(!ir::array_type(array)) error(source,e.token,Code::unsupported_type,"Indexing requires an array.");
+        if(array.kind==Type::dictionary){if(!current)error(source,e.token,Code::constant_call,"Dictionary lookup requires runtime evaluation.");expect(expression(*e.parts[1],ir::readonly_view(ir::dictionary_key(array))),ir::readonly_view(ir::dictionary_key(array)),e.parts[1]->token);return e.type=ir::dictionary_value(array);}
+        if(!ir::array_type(array)) error(source,e.token,Code::unsupported_type,"Indexing requires an array or dictionary.");
         auto index=expression(*e.parts[1]);
         if(index==error_type) return error_type;
         if(!numeric::integer(index)) error(source,e.parts[1]->token,Code::type_mismatch,"Array index requires an integer, excluding bool and floating types.");
@@ -1439,7 +1475,7 @@ class Semantics {
                 auto paths=ir::readonly_paths(c->type);
                 for(const auto& path:ir::reference_paths(c->type)) {
                     auto leaf=c->type;for(auto field:path)leaf=ir::field_type(leaf,field);
-                    if(leaf.kind==Type::growable_array)paths.insert(path);
+                    if(leaf.kind==Type::growable_array || leaf.kind==Type::dictionary)paths.insert(path);
                 }
                 return e.type = ir::with_readonly_paths(c->type,paths);
             }
@@ -1457,7 +1493,7 @@ class Semantics {
         }
         auto t = expression(base);
         if (t == error_type) return error_type;
-        if(ir::array_type(t) && e.token.text=="count") {e.target="$array.count";return e.type=Type::i64;}
+        if(ir::collection_type(t) && e.token.text=="count") {if(t.kind==Type::dictionary && !current)error(source,e.token,Code::constant_call,"Dictionary count requires runtime evaluation.");e.target=t.kind==Type::dictionary?"$dict.count":"$array.count";return e.type=Type::i64;}
         if (t.nullable) error(source,e.token,Code::type_mismatch,"Unwrap the nullable reference before field access.");
         if (t.kind != Type::aggregate && t.kind != Type::managed_ref) error(source,e.token,Code::type_mismatch,"Field access requires a struct.");
         auto selected=member(t,e.token);
@@ -1623,7 +1659,7 @@ class Semantics {
                 catch (const CompilationError& failure) { diagnostics.add(failure); t = error_type; }
             }
             if (!s.expression && ir::reference_value(t) && !t.nullable) error(source,s.token,Code::initializer,"A non-nullable reference requires an initializer.","Construct the object explicitly using its type.");
-            if (!s.expression && ir::array_type(t)) {
+            if (!s.expression && ir::collection_type(t)) {
                 if(needs_array_recipe(t))s.expression=array_recipe(t,s.token,true,unit);
                 else {s.expression=std::make_unique<Expr>(Expr::Kind::literal,s.token);s.expression->type=t;s.expression->aggregate_value=array_default(t,s.token);}
             }
@@ -1633,7 +1669,7 @@ class Semantics {
                 construction(*s.expression,*owner,*structure,true,unit);
 
             }
-            if (!ir::reference_value(t) && t.kind!=Type::growable_array) t.readonly=false;
+            if (!ir::reference_value(t) && t.kind!=Type::growable_array && t.kind!=Type::dictionary) t.readonly=false;
             s.slot = declare(s.token, t, s.readonly); break;
         }
         case K::assignment: {
@@ -1644,7 +1680,7 @@ class Semantics {
             auto t = variable->type; s.slot = variable->slot;
             if(s.selection) {
                 t=expression(*s.selection);
-                if(s.selection->target=="$array.count")error(source,s.selection->token,Code::readonly,"Array count is readonly.");
+                if(s.selection->target=="$array.count" || s.selection->target=="$dict.count")error(source,s.selection->token,Code::readonly,"Array count is readonly.");
                 s.assigned_type=t;expect(expression(*s.expression,t),t,s.expression->token);
                 if(s.op!="=" && !numeric::number(t) && !(t==Type::string && s.op=="+="))error(source,s.token,Code::type_mismatch,"Unsupported compound element assignment.");
                 if(s.op=="%=" && numeric::floating(t))error(source,s.token,Code::numeric_operator,"Illegal compound floating remainder operator.");
@@ -1664,10 +1700,10 @@ class Semantics {
             }
             s.fields=std::move(expanded);
             if(s.index) {
-                if(!ir::array_type(t)) error(source,s.token,Code::unsupported_type,"Selected assignment requires an array.");
-                auto index=expression(*s.index);
-                if(index!=error_type && !numeric::integer(index)) error(source,s.index->token,Code::type_mismatch,"Array index requires an integer.");
-                t=ir::array_element(t);
+                if(!ir::collection_type(t)) error(source,s.token,Code::unsupported_type,"Selected assignment requires an array or dictionary.");
+                auto index=expression(*s.index,t.kind==Type::dictionary?std::optional(ir::dictionary_key(t)):std::nullopt);
+                if(t.kind==Type::dictionary){expect(index,ir::dictionary_key(t),s.index->token);t=ir::dictionary_value(t);}
+                else {if(index!=error_type && !numeric::integer(index))error(source,s.index->token,Code::type_mismatch,"Array index requires an integer.");t=ir::array_element(t);}
             }
             s.assigned_type = t;
             expect(expression(*s.expression, t), t, s.expression->token);
@@ -1705,11 +1741,11 @@ class Semantics {
                     item=first;
                 } else {
                     auto array=expression(*s.expression);
-                    if(!ir::array_type(array))error(source,s.token,Code::unsupported_iteration,"Iteration requires an array or integer range.");
-                    item=ir::array_element(array);
+                    if(!ir::collection_type(array))error(source,s.token,Code::unsupported_iteration,"Iteration requires an array, dictionary or integer range.");
+                    item=array.kind==Type::dictionary?ir::dictionary_value(array):ir::array_element(array);
                 }
                 scopes.emplace_back();s.slot=declare(s.binder,item);
-                if(!s.index_binder.text.empty())s.index_slot=declare(s.index_binder,Type::i64);
+                if(!s.index_binder.text.empty())s.index_slot=declare(s.index_binder,s.expression->type.kind==Type::dictionary?ir::dictionary_key(s.expression->type):Type(Type::i64));
             } else if (s.expression) {
                 try { expect(expression(*s.expression), Type::boolean, s.expression->token); }
                 catch (const CompilationError& failure) { diagnostics.add(failure); }
@@ -1791,7 +1827,7 @@ public:
         f.initialization_defaults=std::move(plan.omitted); f.initialization_value=structure->defaults;
     }
     bool needs_array_recipe(Type t) {
-        if(t.kind==Type::growable_array)return false;
+        if(t.kind==Type::growable_array || t.kind==Type::dictionary)return false;
         if(t.kind==Type::fixed_array)return *t.definition->extent && needs_array_recipe(ir::array_element(t));
         if(t.kind!=Type::aggregate)return false;
         auto [owner,structure]=owned_structure(t);if(structure->initializer)return true;
@@ -1800,7 +1836,7 @@ public:
     }
     std::unique_ptr<Expr> array_recipe(Type t,const Token& token,bool runtime,Unit& access) {
         auto e=std::make_unique<Expr>(Expr::Kind::literal,token);e->type=t;
-        if(t.kind==Type::growable_array)return e;
+        if(t.kind==Type::growable_array || t.kind==Type::dictionary)return e;
         if(t.kind==Type::fixed_array) {
             if(!*t.definition->extent){e->aggregate_value.repeat=0;return e;}
             e->kind=Expr::Kind::array_default;e->parts.push_back(array_recipe(ir::array_element(t),token,runtime,access));return e;
@@ -1810,11 +1846,11 @@ public:
         return e;
     }
     ir::ConstantValue array_default(Type t,const Token& token) {
-        ir::ConstantValue value;if(t.kind==Type::growable_array)return value;value.repeat=*t.definition->extent;
+        ir::ConstantValue value;if(t.kind==Type::growable_array || t.kind==Type::dictionary)return value;value.repeat=*t.definition->extent;
         if(!*value.repeat) return value;
         auto element=ir::array_element(t);
         if(ir::reference_value(element) && !element.nullable)error(source,token,Code::initializer,"A nonempty array of required references needs a complete literal.");
-        if(ir::array_type(element)) value.fields.push_back(array_default(element,token));
+        if(ir::collection_type(element)) value.fields.push_back(array_default(element,token));
         else if(element.kind==Type::aggregate) {
             auto [owner,structure]=owned_structure(element);defaults(*owner,*structure);
             value.fields.push_back(structure->defaults);
@@ -1828,7 +1864,7 @@ public:
             if (field.expression->type == error_type) throw Poison{};
             return constant_value(source,*field.expression);
         }
-        if(ir::array_type(t)) {
+        if(ir::collection_type(t)) {
             return array_default(t,field.token);
         }
         if (t.kind != Type::aggregate) return {};
@@ -1937,8 +1973,9 @@ class Lowering {
     void terminate(ir::Terminator end) { output.blocks[*current].end = end; current.reset(); }
     void jump(unsigned to) { terminate({ir::Terminator::Kind::jump, 0, to}); }
     unsigned emit(ir::Instruction i, const Token& token) {
+        if(i.op==ir::Op::dict_new)module.coordinated=true;
         i.source = source.location(token.offset);
-        if (i.op==ir::Op::array_slice || i.op==ir::Op::list_insert || i.op==ir::Op::list_clear || i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
+        if (i.op==ir::Op::dict_get || i.op==ir::Op::dict_set || i.op==ir::Op::dict_contains || i.op==ir::Op::dict_remove || i.op==ir::Op::dict_clear || i.op==ir::Op::dict_entry || i.op==ir::Op::dict_check || i.op==ir::Op::dict_new || i.op==ir::Op::array_slice || i.op==ir::Op::list_insert || i.op==ir::Op::list_clear || i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
             i.source_excerpt = source.excerpt(token.offset);
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
@@ -1953,11 +1990,12 @@ class Lowering {
         emit({ir::Op::store,index,emit({ir::Op::add,emit({ir::Op::load,index},token),constant(Type::u64,{1,{}},token)},token)},token);jump(test);current=done;return emit({ir::Op::load,owner},token);
     }
     unsigned constant(Type t, const ir::ConstantValue& value, const Token& token) {
-        ir::Instruction i{ir::array_type(t) ? ir::Op::fixed_array : t.kind == Type::aggregate ? ir::Op::aggregate : t==Type::string ? ir::Op::string_literal : ir::Op::constant}; i.type = t;
+        ir::Instruction i{t.kind==Type::dictionary ? ir::Op::dict_new : ir::array_type(t) ? ir::Op::fixed_array : t.kind == Type::aggregate ? ir::Op::aggregate : t==Type::string ? ir::Op::string_literal : ir::Op::constant}; i.type = t;
         if (t==Type::string) {
             i.immediate=strings.intern(value.text,source,token);
             module.coordinated=true; return emit(i,token);
         }
+        if(t.kind==Type::dictionary){for(unsigned n=0;n<value.fields.size();n+=2){auto key=constant(ir::dictionary_key(t),value.fields[n],token);auto child=constant(ir::dictionary_value(t),value.fields[n+1],token);i.arguments.push_back(dictionary_pair(key,child,t,token));}return emit(i,token);}
         if(ir::array_type(t)) {
             i.array_repeat=value.repeat.has_value();
             if(value.repeat && *value.repeat!=*t.definition->extent) throw std::logic_error("Mismatched repeated default extent");
@@ -2043,10 +2081,14 @@ class Lowering {
             value=replace_path(root,value,place.fields,0,token); emit({ir::Op::store,place.slot,value},token);
         }
     }
-    struct Selection {Type type;std::function<unsigned()> read;std::function<void(unsigned)> write;bool dependent=false;};
+    struct Selection {Type type;std::function<unsigned()> read;std::function<void(unsigned)> write;bool dependent=false;bool read_before_write=true;};
     unsigned capture(unsigned value,Type type,const Token& token) {
         if(!ir::array_type(type))return snapshot(value,type,token);
         auto slot=static_cast<unsigned>(output.locals.size());output.locals.push_back(type);ir::Instruction i{ir::Op::array_capture,value};i.immediate=slot;emit(i,token);return slot;
+    }
+    unsigned dictionary_pair(unsigned key,unsigned value,Type type,const Token& token) {ir::Instruction pair{ir::Op::aggregate};pair.type=ir::array_element(type);pair.arguments={key,value,constant(Type::u64,{0,{}},token)};return emit(pair,token);}
+    void dictionary_set(unsigned owner,unsigned key,unsigned value,unsigned version,Type type,const Token& token) {
+        ir::Instruction write{ir::Op::dict_set,owner,dictionary_pair(key,value,type,token)};write.arguments={version};emit(write,token);
     }
     Selection select_expression(const Expr& e) {
         auto token=e.token;
@@ -2063,6 +2105,10 @@ class Lowering {
         }
         if(e.kind==Expr::Kind::array_index) {
             auto parent=std::make_shared<Selection>(select_expression(*e.parts[0]));
+            if(parent->type.kind==Type::dictionary) {
+                auto owner=snapshot(parent->read(),parent->type,token);auto key=snapshot(expression(*e.parts[1]),e.parts[1]->type,token);auto version=snapshot(emit({ir::Op::dict_version,emit({ir::Op::load,owner},token)},token),Type::u64,token);
+                return {e.type,[=,this]{auto object=emit({ir::Op::load,owner},token);emit({ir::Op::dict_check,object,emit({ir::Op::load,version},token)},token);return emit({ir::Op::dict_get,object,emit({ir::Op::load,key},token)},token);},[=,this](unsigned value){dictionary_set(emit({ir::Op::load,owner},token),emit({ir::Op::load,key},token),value,emit({ir::Op::load,version},token),parent->type,token);},true,false};
+            }
             // Reading a nested list reference severs its former inline ancestry.
             std::optional<unsigned> selected_owner;
             if(parent->type.kind==Type::growable_array && parent->dependent)selected_owner=capture(parent->read(),parent->type,token);
@@ -2085,6 +2131,10 @@ class Lowering {
         using K = Expr::Kind;
         switch (e.kind) {
         case K::array_default: return repeated_array(e.type,*e.type.definition->extent,e.token,[&]{return expression(*e.parts[0]);});
+        case K::dictionary_literal: {
+            std::vector<unsigned> pairs;for(unsigned n=0;n<e.parts.size();n+=2){auto key=snapshot(expression(*e.parts[n]),e.parts[n]->type,e.token);auto value=snapshot(expression(*e.parts[n+1]),e.parts[n+1]->type,e.token);pairs.push_back(snapshot(dictionary_pair(emit({ir::Op::load,key},e.token),emit({ir::Op::load,value},e.token),e.type,e.token),ir::array_element(e.type),e.token));}
+            ir::Instruction create{ir::Op::dict_new};create.type=e.type;for(auto pair:pairs)create.arguments.push_back(emit({ir::Op::load,pair},e.token));return emit(create,e.token);
+        }
         case K::array_literal: {
             ir::Instruction i{ir::Op::fixed_array};i.type=e.type;
             std::vector<unsigned> slots;
@@ -2101,9 +2151,9 @@ class Lowering {
         }
         case K::base_initialization: throw std::logic_error("base initialization is a dedicated prelude");
         case K::literal: {
-            return constant(e.type,(e.type.kind == Type::aggregate || ir::array_type(e.type) || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
+            return constant(e.type,(e.type.kind == Type::aggregate || ir::collection_type(e.type) || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
         }
-        case K::field: { auto value=expression(*e.parts[0]); if(e.target=="$array.count")return emit({ir::Op::array_count,value},e.token); ir::Instruction i{e.parts[0]->type.kind==Type::managed_ref ? ir::Op::gc_read : ir::Op::extract,value}; i.immediate=e.slot; return emit(i,e.token); }
+        case K::field: { auto value=expression(*e.parts[0]); if(e.target=="$dict.count")return emit({ir::Op::dict_count,value},e.token);if(e.target=="$array.count")return emit({ir::Op::array_count,value},e.token); ir::Instruction i{e.parts[0]->type.kind==Type::managed_ref ? ir::Op::gc_read : ir::Op::extract,value}; i.immediate=e.slot; return emit(i,e.token); }
         case K::construction: {
             std::vector<unsigned> arguments;
             for (const auto& part : e.parts) {
@@ -2168,6 +2218,10 @@ class Lowering {
         }
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
         case K::method_call: case K::call: {
+            if(e.target.starts_with("$dict.")) {
+                auto owner=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);auto key=e.parts.size()>1?expression(*e.parts[1]):0;
+                return emit({e.token.text=="clear"?ir::Op::dict_clear:e.token.text=="contains"?ir::Op::dict_contains:ir::Op::dict_remove,emit({ir::Op::load,owner},e.token),key},e.token);
+            }
             if(e.target.starts_with("$array.")) {
                 auto owner=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);
                 if(e.token.text=="clear")return emit({ir::Op::list_clear,emit({ir::Op::load,owner},e.token)},e.token);
@@ -2276,7 +2330,7 @@ class Lowering {
         }
         case K::assignment: {
             if(s.selection) {
-                auto selected=select_expression(*s.selection);auto old=selected.read();std::optional<unsigned> old_slot;
+                auto selected=select_expression(*s.selection);auto old=(selected.read_before_write || s.op!="=")?selected.read():0;std::optional<unsigned> old_slot;
                 if(s.op!="=")old_slot=snapshot(old,s.assigned_type,s.token);
                 auto value=expression(*s.expression);
                 if(old_slot)value=emit({s.assigned_type==Type::string ? ir::Op::string_concat : operation(s.op.substr(0,1)),emit({ir::Op::load,*old_slot},s.token),value},s.token);
@@ -2284,9 +2338,15 @@ class Lowering {
             }
             if(s.index) {
                 auto selected=select_place({s.slot,{}},s.field_indexes,s.token);
+                auto array_type=output.locals[selected.slot];for(auto field:selected.fields)array_type=ir::field_type(array_type,field);
+                if(array_type.kind==Type::dictionary) {
+                    auto owner=snapshot(read_place(selected,s.token),array_type,s.token);auto index_slot=snapshot(expression(*s.index),s.index->type,s.index->token);auto object=emit({ir::Op::load,owner},s.token);auto version=snapshot(emit({ir::Op::dict_version,object},s.token),Type::u64,s.token);std::optional<unsigned> old;
+                    if(s.op!="=")old=snapshot(emit({ir::Op::dict_get,object,emit({ir::Op::load,index_slot},s.token)},s.token),s.assigned_type,s.token);
+                    auto value=expression(*s.expression);if(old)value=emit({s.assigned_type==Type::string?ir::Op::string_concat:operation(s.op.substr(0,1)),emit({ir::Op::load,*old},s.token),value},s.token);
+                    dictionary_set(emit({ir::Op::load,owner},s.token),emit({ir::Op::load,index_slot},s.token),value,emit({ir::Op::load,version},s.token),array_type,s.token);break;
+                }
                 auto index=expression(*s.index);auto index_slot=snapshot(index,s.index->type,s.index->token);
                 auto array=read_place(selected,s.token);
-                auto array_type=output.locals[selected.slot];for(auto field:selected.fields)array_type=ir::field_type(array_type,field);
                 if(array_type.kind==Type::growable_array) {
                     auto owner_slot=snapshot(array,array_type,s.token);
                     auto normalized=emit({ir::Op::list_index,array,index},s.index->token);
@@ -2365,20 +2425,21 @@ class Lowering {
                     // Root the selected handle without invoking fixed value-copy storage.
                     owner=static_cast<unsigned>(output.locals.size());output.locals.push_back(array);
                     if(array.kind==Type::fixed_array)fixed_view=select_expression(*s.expression);
-                    ir::Instruction capture{ir::Op::array_capture,fixed_view ? fixed_view->read() : expression(*s.expression)};capture.immediate=*owner;emit(capture,s.token);
-                    auto count=snapshot(emit({ir::Op::array_count,load(*owner)},s.token),Type::i64,s.token);
-                    if(array.kind==Type::growable_array)version=snapshot(emit({ir::Op::list_version,load(*owner)},s.token),Type::u64,s.token);
+                    if(array.kind==Type::dictionary)store(*owner,expression(*s.expression));else {ir::Instruction capture{ir::Op::array_capture,fixed_view ? fixed_view->read() : expression(*s.expression)};capture.immediate=*owner;emit(capture,s.token);}
+                    auto count=snapshot(emit({array.kind==Type::dictionary?ir::Op::dict_count:ir::Op::array_count,load(*owner)},s.token),Type::i64,s.token);
+                    if(array.kind==Type::growable_array || array.kind==Type::dictionary)version=snapshot(emit({array.kind==Type::dictionary?ir::Op::dict_version:ir::Op::list_version,load(*owner)},s.token),Type::u64,s.token);
                     cursor=snapshot(s.reverse ? emit({ir::Op::subtract,load(count),scalar(Type::i64,1)},s.token) : scalar(Type::i64,0),Type::i64,s.token);
                     terminal=snapshot(s.reverse ? scalar(Type::i64,~std::uint64_t{0}) : load(count),Type::i64,s.token);
                     direction=snapshot(scalar(Type::boolean,!s.reverse),Type::boolean,s.token);
                 }
                 jump(test);current=test;
                 if(fixed_view){ir::Instruction refresh{ir::Op::array_capture,fixed_view->read()};refresh.immediate=*owner;emit(refresh,s.token);}
-                if(version)emit({ir::Op::list_check,load(*owner),load(*version)},s.token);
+                if(version)emit({s.expression->type.kind==Type::dictionary?ir::Op::dict_check:ir::Op::list_check,load(*owner),load(*version)},s.token);
                 if(!s.range_end || (s.exclusive && !s.reverse))terminate({ir::Terminator::Kind::branch,emit({ir::Op::not_equal,load(cursor),load(terminal)},s.token),body,done});else jump(body);
                 current=body;
-                store(s.slot,s.range_end ? load(cursor) : emit({ir::Op::array_get,load(*owner),load(cursor)},s.token));
-                if(!s.index_binder.text.empty())store(s.index_slot,load(cursor));
+                if(!s.range_end && s.expression->type.kind==Type::dictionary){auto entry=emit({ir::Op::dict_entry,load(*owner),load(cursor)},s.token);ir::Instruction value{ir::Op::extract,entry};value.immediate=1;store(s.slot,emit(value,s.token));if(!s.index_binder.text.empty()){ir::Instruction key{ir::Op::extract,entry};key.immediate=0;store(s.index_slot,emit(key,s.token));}}
+                else {store(s.slot,s.range_end ? load(cursor) : emit({ir::Op::array_get,load(*owner),load(cursor)},s.token));
+                if(!s.index_binder.text.empty())store(s.index_slot,load(cursor));}
                 loops.emplace_back(step,done);sequence(s.body);if(current)jump(step);loops.pop_back();
                 current=step;
                 if(s.range_end && (!s.exclusive || s.reverse)) {
@@ -2605,7 +2666,8 @@ public:
 // Only typed, pure ASTs reach this evaluator. The shared software kernel
 // preserves declared precision and wrapping independently of host arithmetic.
 ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
-    if (e.kind == Expr::Kind::literal) return (e.type.kind == Type::aggregate || ir::array_type(e.type) || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}};
+    if(e.kind==Expr::Kind::dictionary_literal){ir::ConstantValue result;for(const auto& part:e.parts)result.fields.push_back(constant_value(source,*part));return result;}
+    if (e.kind == Expr::Kind::literal) return (e.type.kind == Type::aggregate || ir::collection_type(e.type) || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}};
     if(e.kind==Expr::Kind::array_literal) {
         ir::ConstantValue result;for(const auto& part:e.parts) result.fields.push_back(constant_value(source,*part));return result;
     }
@@ -2835,6 +2897,10 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         return extent;
     };
     std::map<std::string,std::shared_ptr<ir::ValueType>> canonical_arrays;
+    for(auto& [id,u]:units)u->make_dictionary=[&](Type key,Type value) {
+        auto raw=ir::dictionary_type(key,value);auto& canonical=canonical_arrays[Type::key(raw)];if(!canonical)canonical=std::const_pointer_cast<ir::ValueType>(raw.definition);
+        return ir::with_readonly_paths(Type(canonical,Type::dictionary),ir::readonly_paths(raw));
+    };
     for(auto& [id,u]:units) u->resolve_array=[&,owner=u.get()](Type raw,const Token&)->Type {
         auto found=std::find_if(owner->arrays.begin(),owner->arrays.end(),[&](const auto& a){return a.definition==raw.definition;});
         if(found==owner->arrays.end()) return raw; // Already canonical.
@@ -2845,6 +2911,12 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         Depth guard(diagnostics.semantic_depth(),owner->source,syntax.token,128);syntax.state=1;
         try {
             auto element=resolve_type(syntax.element,*owner,root,units,syntax.token);
+            if(syntax.key) {
+                auto key=resolve_type(*syntax.key,*owner,root,units,syntax.token);
+                if(key.kind==Type::aggregate)for(auto& [id,u]:units)for(auto& child:u->structures)if(child.definition==key.definition)layout(*u,child);
+                if(!ir::dictionary_key_supported(key))error(owner->source,syntax.token,Code::unsupported_type,"Unsupported dictionary key type.");
+                syntax.resolved=owner->make_dictionary(key,element);syntax.state=2;auto result=syntax.resolved;result.readonly=raw.readonly;return result;
+            }
             auto extent=array_extent(*owner,syntax);
             if(extent && element.kind==Type::aggregate) for(auto& [child_id,child_owner]:units) for(auto& child:child_owner->structures)
                 if(child.definition==element.definition) {
@@ -3095,7 +3167,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
     module.strings=std::move(strings.values);
     if(!module.strings.empty()) module.coordinated=true;
     std::function<void(Type)> trace_string=[&](Type t) {
-        if(ir::array_type(t) || ir::reference_paths(t,true)!=ir::reference_paths(t)) module.coordinated=true;
+        if(ir::collection_type(t) || ir::reference_paths(t,true)!=ir::reference_paths(t)) module.coordinated=true;
         if(t.kind==Type::aggregate) for(const auto& field:t.definition->fields) trace_string(field.type);
     };
     for(const auto& f:module.functions) { trace_string(f.result); for(auto t:f.parameters) trace_string(t); for(auto t:f.locals) trace_string(t); }
@@ -3193,7 +3265,7 @@ struct AnalysisAccess {
                     reference(owner,e.type.definition->identity,e,*unit,true);
                     for(const auto& binding:graph->at(entry)->member_catalog->interface_bindings) if(binding.key==e.target)
                         for(const auto& [requirement,route]:binding.methods) {reference(owner,requirement,e,*unit,true);reference(owner,route.second,e,*unit,true);}
-                } else if (!e.target.empty() && !e.target.starts_with("$array.")) reference(owner,e.target,e,*unit,implicit || e.implicit);
+                } else if (!e.target.empty() && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.")) reference(owner,e.target,e,*unit,implicit || e.implicit);
                 else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit || e.implicit);
                 if(!e.virtual_slot.empty() && !e.super_call) for(const auto& [id,target_unit]:*graph) for(const auto& target:target_unit->functions)
                     if(target.virtual_slot==e.virtual_slot) reference(owner,target.symbol,e,*unit,true);
@@ -3240,7 +3312,7 @@ struct AnalysisAccess {
             }
             for (const auto& c : unit->constants) {
                 auto key = id + "::" + c.declaration.name;
-                declaration({AnalyzedDeclaration::Kind::module_constant,key,id,c.visibility,location(c.declaration.token),{},c.type,c.declaration.constant_syntax,(c.type.kind == Type::aggregate || ir::array_type(c.type) || c.type==Type::string) ? std::optional<std::uint64_t>{} : std::optional<std::uint64_t>{c.value}});
+                declaration({AnalyzedDeclaration::Kind::module_constant,key,id,c.visibility,location(c.declaration.token),{},c.type,c.declaration.constant_syntax,(c.type.kind == Type::aggregate || ir::collection_type(c.type) || c.type==Type::string) ? std::optional<std::uint64_t>{} : std::optional<std::uint64_t>{c.value}});
                 expression(*c.declaration.expression,key,{});
             }
             for (const auto& f : unit->functions) {

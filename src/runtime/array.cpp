@@ -44,7 +44,7 @@ BufferLayoutRef Runtime::native_array_layout(const NativeArrayElement& element,s
                 using T=std::decay_t<decltype(value)>;
                 if constexpr(std::is_same_v<T,SchemaScalar>)expected.kind=static_cast<unsigned>(value.encoding);
                 else if constexpr(std::is_same_v<T,SchemaString>)expected.kind=12;
-                else if constexpr(std::is_same_v<T,SchemaManaged>){expected.kind=11;expected.target=value.target.c_str();expected.nullable=value.nullable;}
+                else if constexpr(std::is_same_v<T,SchemaManaged>){expected.kind=std::string_view(value.target).starts_with("void.dict.v1/")?16:11;expected.target=value.target.c_str();expected.nullable=value.nullable;}
                 else if constexpr(std::is_same_v<T,SchemaInterface>){expected.kind=13;expected.target=value.target.c_str();expected.nullable=value.nullable;}
                 else if constexpr(std::is_same_v<T,SchemaOwnedFixed>){expected.kind=14;expected.target=value.element.c_str();expected.extent=value.extent;}
                 else if constexpr(std::is_same_v<T,SchemaGrowable>){expected.kind=15;expected.target=value.header.c_str();}
@@ -63,6 +63,7 @@ BufferLayoutRef Runtime::native_array_layout(const NativeArrayElement& element,s
             else if(f.kind==13) {if(!f.target)throw std::invalid_argument("missing interface element type");node=SchemaInterface{f.target,f.nullable!=0,0,sizeof(void*),2*sizeof(void*),alignof(void*)};}
             else if(f.kind==14) {if(!f.target)throw std::invalid_argument("missing nested fixed type");node=SchemaOwnedFixed{f.target,f.extent};}
             else if(f.kind==15) {if(!f.target)throw std::invalid_argument("missing nested list type");node=SchemaGrowable{f.target};headers.push_back({f.target,"","array-list-v2",{sizeof(ListHeader),{offsetof(ListHeader,backing)}}});}
+            else if(f.kind==16) {if(!f.target)throw std::invalid_argument("missing dictionary type");node=SchemaManaged{f.target,false};headers.push_back({f.target,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}});}
             else throw std::invalid_argument("unknown native element field");
             record.fields.push_back({n,f.offset,spec.nodes.size()});spec.nodes.push_back(std::move(node));
         }

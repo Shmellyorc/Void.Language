@@ -1,5 +1,7 @@
 # VOID editor integration (Phase 11)
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 The extension in `editors/vscode/` registers `.void` as language ID `void`, supplies
 basic TextMate highlighting/indentation, and runs the existing `voidls` through
 `vscode-languageclient`. Diagnostics and navigation come from the actual compiler.

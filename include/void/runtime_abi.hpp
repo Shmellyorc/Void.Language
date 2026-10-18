@@ -62,6 +62,13 @@ void vd_gc_native_enter(void*) noexcept;
 void vd_gc_native_leave(void*) noexcept;
 }
 extern "C" {
+void vd_dict_new(void**,const vd::NativeDictionary*,vd::RuntimeFailure*) noexcept;
+std::uint64_t vd_dict_count(void**,const vd::NativeDictionary*,unsigned,vd::RuntimeFailure*) noexcept;
+unsigned vd_dict_read(void*,void**,const vd::NativeDictionary*,const void*,unsigned,vd::RuntimeFailure*) noexcept;
+void vd_dict_entry(void*,void**,const vd::NativeDictionary*,std::uint64_t,vd::RuntimeFailure*) noexcept;
+void vd_dict_write(void**,const vd::NativeDictionary*,const void*,std::uint64_t,vd::RuntimeFailure*) noexcept;
+unsigned vd_dict_remove(void**,const vd::NativeDictionary*,const void*,vd::RuntimeFailure*) noexcept;
+void vd_dict_clear(void**,const vd::NativeDictionary*,vd::RuntimeFailure*) noexcept;
 void vd_value_array_new(void**,const vd::NativeArrayElement*,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_value_array_count(void**,const vd::NativeArrayElement*,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_value_array_version(void**,const vd::NativeArrayElement*,vd::RuntimeFailure*) noexcept;

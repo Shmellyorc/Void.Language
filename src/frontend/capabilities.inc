@@ -99,19 +99,22 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     auto child=expression(*part);
                     for(const auto& [leaf,fact]:child) {auto path=leaf;path.insert(path.begin(),ir::array_element_path);view[path].join(fact);}
                 }
+            } else if(e.kind==K::dictionary_literal) {
+                for(unsigned n=0;n<e.parts.size();n+=2)for(unsigned field=0;field<2;++field){auto child=expression(*e.parts[n+field]);for(const auto& [leaf,fact]:child){auto path=leaf;path.insert(path.begin(),field);path.insert(path.begin(),ir::array_element_path);view[path].join(fact);}}
             } else if(e.kind==K::array_slice) {
                 auto owner=expression(*e.parts[0]);expression(*e.parts[1]);expression(*e.parts[2]);
                 view=ir::replaced_facts(std::move(view),ir::array_element_path,ir::field_facts(e.parts[0]->type,owner,ir::array_element_path));
             } else if(e.kind==K::array_index) {
-                auto owner=expression(*e.parts[0]);expression(*e.parts[1]);view=ir::field_facts(e.parts[0]->type,owner,ir::array_element_path);
+                auto owner=expression(*e.parts[0]);expression(*e.parts[1]);view=ir::field_facts(e.parts[0]->type,owner,ir::array_element_path);if(e.parts[0]->type.kind==Type::dictionary)view=ir::field_facts(ir::array_element(e.parts[0]->type),view,1);
             } else if (e.kind==K::name) view=locals.at(e.slot);
             else if (e.kind==K::field) {
                 auto base=expression(*e.parts[0]);
-                if(e.target!="$array.count")view=ir::field_facts(e.parts[0]->type,base,e.slot);
+                if(e.target!="$array.count" && e.target!="$dict.count")view=ir::field_facts(e.parts[0]->type,base,e.slot);
             } else if (e.kind==K::conversion) view=expression(*e.parts[0]);
             else if (e.kind==K::call || e.kind==K::method_call) {
                 std::vector<ReferenceFacts> arguments;
                 for (auto& part:e.parts) arguments.push_back(expression(*part));
+                if(e.target.starts_with("$dict.") && e.token.text!="contains")if(auto leaf=arguments[0].find({});leaf!=arguments[0].end()){effect(f.reference_effects.mutations,leaf->second);if(report && leaf->second.readonly)issue(e.token,"Cannot mutate a readonly dictionary.");}
                 if(e.target.starts_with("$array.")) {
                     if(e.token.text=="push")compatible(arguments[1],ir::array_element(e.parts[0]->type),e.token);
                     else if(e.token.text=="insert")compatible(arguments[2],ir::array_element(e.parts[0]->type),e.token);
@@ -224,7 +227,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     std::function<void(const Expr&)> inspect=[&](const Expr& e) {
                         if(e.kind==Expr::Kind::name)return;
                         const auto& owner=*e.parts[0];inspect(owner);
-                        if(owner.type.kind==Type::managed_ref || (e.kind==Expr::Kind::array_index && owner.type.kind==Type::growable_array)) {
+                        if(owner.type.kind==Type::managed_ref || (e.kind==Expr::Kind::array_index && (owner.type.kind==Type::growable_array || owner.type.kind==Type::dictionary))) {
                             heap=true;if(auto leaf=evaluated.at(&owner).find({});leaf!=evaluated.at(&owner).end()) {effect(f.reference_effects.mutations,leaf->second);if(report && leaf->second.readonly)issue(e.token,"Cannot mutate storage through readonly array/reference authority.");}
                         }
                         path.push_back(e.kind==Expr::Kind::array_index ? ir::array_element_path : e.slot);
@@ -246,9 +249,9 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                         selected=ir::field_facts(type,selected,field); type=ir::field_type(type,field);
                         prefix.push_back(field);
                     }
-                    if(s.index && ir::array_type(type)) {
+                    if(s.index && ir::collection_type(type)) {
                         if(auto leaf=selected.find({});leaf!=selected.end()) {effect(f.reference_effects.mutations,leaf->second);if(report && leaf->second.readonly)issue(s.token,"Cannot mutate a readonly list.");}
-                        compatible(rhs,ir::array_element(type),s.expression->token);
+                        compatible(rhs,type.kind==Type::dictionary?ir::dictionary_value(type):ir::array_element(type),s.expression->token);
                         if(type.kind==Type::fixed_array && !heap) {
                             ir::ReferenceFacts prefixed;
                             for(const auto& [leaf,fact]:rhs) {auto path=s.field_indexes;path.push_back(ir::array_element_path);path.insert(path.end(),leaf.begin(),leaf.end());prefixed[path]=fact;}
@@ -288,6 +291,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 }
                 if(s.kind==K::loop && !s.binder.text.empty()) {
                     auto item=s.range_end ? ir::ReferenceFacts{} : ir::field_facts(s.expression->type,rhs,ir::array_element_path);
+                    if(s.expression->type.kind==Type::dictionary){auto pair=item;item=ir::field_facts(ir::array_element(s.expression->type),pair,1);if(!s.index_binder.text.empty()){auto key=ir::field_facts(ir::array_element(s.expression->type),pair,0);f.locals[s.index_slot]=ir::fact_type(f.locals[s.index_slot],key);local_changed|=ir::join_facts(locals[s.index_slot],key);}}
                     f.locals[s.slot]=ir::fact_type(f.locals[s.slot],item);local_changed|=ir::join_facts(locals[s.slot],item);
                 }
                 sequence(s.body); sequence(s.otherwise);

@@ -1,5 +1,7 @@
 # Constants, numeric correctness and runtime diagnostics
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 Phase 12 adds numeric/bool value structs with recursive defaults, independent
 copies, deep readonly paths and aggregate parameters/returns. See
 [VALUE_STRUCTS.md](VALUE_STRUCTS.md) for the approved contract. The scalar rules

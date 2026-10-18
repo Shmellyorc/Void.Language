@@ -1,5 +1,7 @@
 # Phase 20: managed inheritance and explicit virtual dispatch
 
+**Design/proposal history.** For delivered behavior and superseded activation gates, read the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and the corresponding implementation guide.
+
 **Status: I1–I8 approved by the owner for Phase 20 implementation.**
 Phase 19 is locked at Actions run #33, attempt #2 (47 suites/all seven jobs).
 The recommendations below retain the design-review rationale; their approval is no

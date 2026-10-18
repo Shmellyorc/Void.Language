@@ -1,5 +1,7 @@
 # Phase 15: GC roots and thread coordination proposal
 
+**Design/proposal history.** For delivered behavior and superseded activation gates, read the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and the corresponding implementation guide.
+
 **Status: G1–G6 approved and implemented locally; all six Linux configurations pass. Hosted Windows/macOS verification remains required.**
 Inspected baseline: `c1b4a66`, 12 October 2026. The owner declares Phase 14 complete.
 The owner subsequently authorized implementation with deterministic coordination,

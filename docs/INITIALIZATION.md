@@ -1,5 +1,7 @@
 # Phase 14: custom initialization for value structs
 
+Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
+
 Phase 20 applies owner-approved I5–I6 to managed inheritance: mandatory first super.init preludes, base-to-derived preparation and one most-derived complete commit. C1 value initialization remains unchanged. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.
 
 Phase 16 managed source is described in [MANAGED_STRUCTS.md](MANAGED_STRUCTS.md).

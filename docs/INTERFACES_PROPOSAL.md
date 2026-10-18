@@ -1,5 +1,7 @@
 # Phase 21: structural interfaces
 
+**Design/proposal history.** For delivered behavior and superseded activation gates, read the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and the corresponding implementation guide.
+
 **Status: IF1–IF8 owner-approved and implemented locally; six Linux configurations passed 55/55. Hosted seven-job verification pending.**
 The owner locks Phase 20 at hosted run #35, all seven configurations, 51/51 suites.
 The investigation below remains the architectural rationale. INTERFACES.md describes

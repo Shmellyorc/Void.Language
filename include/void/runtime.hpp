@@ -18,6 +18,7 @@ struct NativeArrayElement {const char* key;std::size_t bytes,alignment,count;con
 class ListModified final : public std::logic_error {public: using std::logic_error::logic_error;};
 class CallbackRegistration;
 // These are runtime embedding interfaces, not source-language thread features.
+struct NativeDictionary {const NativeArrayElement* entry;const NativeArrayElement* key;std::size_t value_offset,hash_offset;};
 class Runtime {
 public:
     enum class State { native_safe, managed, parked };
@@ -80,6 +81,13 @@ public:
     void array_push(RegisteredRootWord,const ElementSchemaRef&,const void*);
     void array_insert(RegisteredRootWord,const ElementSchemaRef&,std::optional<std::uint64_t>,const void*,std::optional<std::uint64_t> version={});
     void array_clear(RegisteredRootWord,const ElementSchemaRef&);
+    void dictionary_new(void**,const NativeDictionary&);
+    std::uint64_t dictionary_count(RegisteredRootWord,const NativeDictionary&,bool version=false);
+    bool dictionary_read(void*,RegisteredRootWord,const NativeDictionary&,const void*,bool contains=false);
+    void dictionary_entry(void*,RegisteredRootWord,const NativeDictionary&,std::uint64_t);
+    void dictionary_write(RegisteredRootWord,const NativeDictionary&,const void*,std::uint64_t);
+    bool dictionary_remove(RegisteredRootWord,const NativeDictionary&,const void*);
+    void dictionary_clear(RegisteredRootWord,const NativeDictionary&);
     void array_slice(void**,RegisteredRootWord,const BufferLayoutRef&,bool,std::uint64_t,std::uint64_t,bool);
     void array_remove(void*,RegisteredRootWord,const ElementSchemaRef&,std::uint64_t);
     void array_copy(void**,RegisteredRootWord,const BufferLayoutRef&);
@@ -121,6 +129,14 @@ private:
     void validate_buffer_layout(const BufferLayoutRef&) const; // mutex_ held
     ElementSchemaRef fixed_scalar_schema(ScalarEncoding);
     void validate_fixed_layout(const BufferLayoutRef&) const; // mutex_ held
+    struct DictionaryHeader {void* entries;void* buckets;std::uint64_t count,capacity,version;};
+    struct DictionaryLayout {BufferLayoutRef entries,key;std::shared_ptr<const NominalDescriptor> header;};
+    DictionaryLayout dictionary_layout(const NativeDictionary&);
+    DictionaryHeader& dictionary_header(RegisteredRootWord,const DictionaryLayout&) const;
+    std::uint64_t dictionary_hash(const void*,const NativeArrayElement&) const;
+    bool dictionary_equal(const void*,const void*,const NativeArrayElement&) const;
+    std::uint64_t dictionary_find(const DictionaryHeader&,const NativeDictionary&,const void*,std::uint64_t) const;
+    void dictionary_index(DictionaryHeader&,const NativeDictionary&) const;
     struct ListHeader {void* backing;std::uint64_t count,capacity,version;};
     void array_write_value(RegisteredRootWord,const ElementSchemaRef&,const BufferLayout*,std::uint64_t,const void*,bool,std::optional<std::uint64_t>);
     static std::string list_identity(const ElementSchemaRef&);
