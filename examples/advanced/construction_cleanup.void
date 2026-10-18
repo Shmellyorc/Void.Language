@@ -1,0 +1,13 @@
+struct tracker:
+    total: i32
+func add(t: tracker, number: i32):
+    t.total += number
+struct item:
+    number: i32
+func (i item) init(t: tracker):
+    defer add(t, 3)
+    i.number = 7
+func entry(value: i32) -> i32:
+    var t = tracker(total=0)
+    var object = item(t)
+    return object.number + t.total

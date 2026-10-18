@@ -91,8 +91,11 @@ sharing optimizations remain outside this foundation. An already nullable manage
 type can be supplied as `t`. Named ordinary method arguments retain the existing
 language restriction. Method-specific generic selection currently requires a
 direct receiver declaration; owner-parameter methods become ordinary concrete
-methods and use the established inheritance/composition paths. No future `result`,
-`Ok`, dictionary or collection API syntax is activated by illustrative Bible code.
+methods and use the established inheritance/composition paths. Later source
+dictionaries and Stage 4 results/function types use these same concrete
+specializations. Explicit generic function references and context-inferred generic
+method callbacks are covered in ADVANCED_LANGUAGE.md; no parallel generic checker
+or polymorphic Runtime representation is introduced.
 
 ## Regression coverage
 

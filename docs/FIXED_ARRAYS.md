@@ -1,5 +1,10 @@
 # Fixed arrays
 
+Stage 4 adds enum/result and function-value elements, including escaping closures,
+through the same storage and tracing paths. Enum/result values and required
+function elements need explicit complete initializers; nullable functions can
+default to null. See [ADVANCED_LANGUAGE.md](ADVANCED_LANGUAGE.md).
+
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 Order 3 implements real source `[T, n]` arrays through the existing typed IR,

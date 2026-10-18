@@ -44,6 +44,7 @@ public:
     void poll();
     Collection collect(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
     void allocate_into(void** rooted_slot, const TypeLayout&);
+    bool begin_release(void*);
     void construct_into(void** rooted_slot, const TypeLayout&, const void* prepared_payload);
     void string_into(void** rooted_slot, std::string_view);
     void concat_into(void** rooted_slot, void* left, void* right);

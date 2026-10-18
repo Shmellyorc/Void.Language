@@ -1,7 +1,7 @@
 // Source declarations are published once, independently of how many concrete
 // instances are emitted. Native identities remain private to compilation/ABI.
 auto pattern_type=[](Type raw) {
-    if(raw.kind!=Type::unresolved && !ir::collection_type(raw))return raw;
+    if(raw.kind!=Type::unresolved && !ir::collection_type(raw) && !(raw.definition && (raw.definition->result_type || raw.definition->callable)))return raw;
     auto name=std::make_shared<ir::ValueType>();name->name=raw.definition->name;name->identity=name->name;
     return Type(name,Type::unresolved);
 };

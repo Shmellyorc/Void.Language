@@ -44,6 +44,8 @@ void vd_list_push(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_list_remove(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 void vd_gc_frame_enter(void*, const vd::Runtime::Slot*, std::size_t) noexcept;
 void vd_gc_frame_leave(void*) noexcept;
+void vd_cleanup_failure(vd::RuntimeFailure*,const vd::RuntimeFailure*) noexcept;
+bool vd_gc_release(void*) noexcept;
 void vd_gc_poll() noexcept;
 void vd_gc_collect(vd::RuntimeFailure*) noexcept;
 void vd_gc_construct(void**, std::size_t, const std::size_t*, std::size_t, const void*, vd::RuntimeFailure*) noexcept;

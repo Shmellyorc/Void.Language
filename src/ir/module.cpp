@@ -28,11 +28,21 @@ bool dictionary_key_supported(Type root) {
     std::set<const ValueType*> active;std::map<const ValueType*,bool> memo;std::size_t work=0;
     std::function<bool(Type)> visit=[&](Type t){
         if(numeric::integer(t) || t==Type::boolean || t==Type::string || t.kind==Type::managed_ref)return true;
-        if(t.kind!=Type::aggregate || !t.definition || active.size()>=128 || ++work>65536)return false;
+        if(t.kind!=Type::aggregate || !t.definition || (!t.definition->cases.empty() || t.definition->callable) || active.size()>=128 || ++work>65536)return false;
         if(auto found=memo.find(t.definition.get());found!=memo.end())return found->second;
         if(!active.insert(t.definition.get()).second)return false;
         for(const auto& field:t.definition->fields)if(!visit(field.type))return false;active.erase(t.definition.get());memo.emplace(t.definition.get(),true);return true;
     };return visit(root);
+}
+
+bool pattern_comparable(Type root) {
+    std::vector<std::pair<Type,unsigned>> pending{{root,0}};std::set<const ValueType*> seen;
+    while(!pending.empty()) {
+        auto [type,depth]=pending.back();pending.pop_back();
+        if(depth>128 || type.construction || type.kind==Type::prepared_receiver || collection_type(type) || type==Type::none || type.kind==Type::invalid || type.kind==Type::unresolved || type.kind==Type::null_value)return false;
+        if(type.kind==Type::aggregate){if(!type.definition)return false;if(seen.insert(type.definition.get()).second)for(const auto& field:type.definition->fields)pending.push_back({field.type,depth+1});}
+    }
+    return true;
 }
 
 Type array_element(Type t) {
@@ -61,7 +71,7 @@ CompactValueShape compact_value_shape(Type root) {
         return a+b;
     };
     std::function<CompactValueShape(Type)> visit=[&](Type t)->CompactValueShape {
-        if((t.nullable && !reference_value(t)) || t.construction || !t.preparation.empty()) throw std::invalid_argument("Unsupported array value shape");
+        if((t.nullable && !reference_value(t) && !(t.definition && t.definition->callable)) || t.construction || !t.preparation.empty()) throw std::invalid_argument("Unsupported array value shape");
         if(numeric::number(t) || t==Type::boolean) return {0,t==Type::boolean ? 1u : numeric::width(t)/8u,1};
         if(reference_value(t) || t.kind==Type::string || (t.kind==Type::growable_array || t.kind==Type::dictionary))return {0,sizeof(void*),1};
         if((t.kind!=Type::fixed_array && t.kind!=Type::aggregate) || !t.definition || t.definition->managed || t.definition->interface_type)
@@ -111,6 +121,7 @@ std::uint64_t checked_array_index(std::uint64_t bits,Type index,std::uint64_t ex
     if(bits>=extent) throw std::out_of_range("Array index out of bounds");
     return bits;
 }
+bool requires_initialization(Type t){return !t.nullable && (reference_value(t) || (t.definition && (t.definition->callable || !t.definition->cases.empty())));}
 bool reference_value(Type t) { return t.kind==Type::managed_ref || t.kind==Type::interface_ref; }
 Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
     if (!d) return;
@@ -127,6 +138,8 @@ Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
             current->arena = owner;
             owner->definitions.push_back(current);
             if (auto base=current->base.lock()) pending.push_back(std::move(base));
+            if(current->call_result)if(auto child=current->call_result->target.lock())pending.push_back(std::move(child));
+            for(const auto& parameter:current->call_parameters)if(auto child=parameter.target.lock())pending.push_back(std::move(child));
             if (current->element) if (auto child=current->element->target.lock()) pending.push_back(std::move(child));
             for (const auto& field : current->fields)
                 if (auto child = field.type.target.lock()) pending.push_back(std::move(child));
@@ -134,16 +147,15 @@ Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
     }
     definition = std::shared_ptr<const ValueType>(std::move(owner),d.get());
 }
-FieldType::FieldType(Type t) : kind(t.kind), nullable(t.nullable), readonly(t.readonly) {
+FieldType::FieldType(Type t) : kind(t.kind), nullable(t.nullable), readonly(t.readonly), readonly_references(t.readonly_references) {
     if (t.construction) throw std::invalid_argument("construction view cannot be a field type");
-    if (!t.readonly_references.empty()) throw std::invalid_argument("qualified reference leaves cannot be nominal field declarations");
     if (t.definition) target = t.definition->self;
 }
 FieldType::operator Type() const {
-    if (kind != Type::aggregate && kind != Type::unresolved && kind != Type::managed_ref && kind != Type::interface_ref && kind!=Type::fixed_array && kind!=Type::growable_array && kind!=Type::dictionary) { Type t(kind); t.nullable=nullable; t.readonly=readonly; return t; }
+    if (kind != Type::aggregate && kind != Type::unresolved && kind != Type::managed_ref && kind != Type::interface_ref && kind!=Type::fixed_array && kind!=Type::growable_array && kind!=Type::dictionary) { Type t(kind); t.nullable=nullable; t.readonly=readonly;t.readonly_references=readonly_references; return t; }
     auto d = target.lock();
     if (!d) throw std::logic_error("nominal type edge outlived its definition table");
-    Type t(std::move(d),kind); t.nullable=nullable; t.readonly=readonly; return t;
+    Type t(std::move(d),kind); t.nullable=nullable; t.readonly=readonly;t.readonly_references=readonly_references; return t;
 }
 
 ReferencePaths reference_paths(Type root, bool include_strings) {
@@ -153,6 +165,7 @@ ReferencePaths reference_paths(Type root, bool include_strings) {
     std::size_t expanded=0;
     while (!pending.empty()) {
         auto [type,path,lists]=std::move(pending.back()); pending.pop_back();
+        if(type.definition && type.definition->callable)continue; // Callable environments are opaque; invocation uses the checked signature.
         if (type.construction) continue; // A stage is a place, never a heap root.
         if (reference_value(type) || type.kind==Type::prepared_receiver || (include_strings && type.kind==Type::string)) { result.insert(std::move(path)); continue; }
         if(collection_type(type)) {
@@ -383,7 +396,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             }
             if (t.kind==Type::string && (t.definition || t.nullable || t.construction || !t.preparation.empty() || !t.readonly_references.empty())) fail("invalid intrinsic string type");
             if (t.construction && (t.kind!=Type::managed_ref || t.nullable)) fail("invalid construction view type");
-            if (t.nullable && !reference_value(t)) fail("nullable non-reference type");
+            if (t.nullable && !reference_value(t) && !(t.definition && t.definition->callable)) fail("nullable non-reference type");
             if ((reference_value(t) || t.kind==Type::prepared_receiver || t.kind==Type::string) && !m.coordinated) fail("managed references require coordinated runtime");
             if(t.kind==Type::interface_ref || t.kind==Type::prepared_receiver) {
                 if(!t.definition || !t.definition->interface_type || t.definition->managed || t.definition->identity.empty() || !t.definition->fields.empty() || !t.definition->base.expired()) fail("invalid interface definition");
@@ -404,9 +417,22 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             }
             if (!t.definition || t.definition->identity.empty() || t.definition->identity.find('\0')!=std::string::npos || t.definition->name.empty()) fail("missing value type identity");
             auto* d=t.definition.get();
+            if(d->callable){
+                if(t.kind!=Type::aggregate || d->managed || d->interface_type || !d->cases.empty() || d->result_type || d->fields.size()!=2 || Type(d->fields[0].type)!=Type::u64 || Type(d->fields[1].type).kind!=Type::managed_ref || !d->fields[1].type.nullable || !d->call_result || !d->base.expired())fail("invalid function value shape");
+                pending.push_back(*d->call_result);for(const auto& parameter:d->call_parameters){if(Type(parameter)==Type::none)fail("no-result function parameter");pending.push_back(parameter);}
+            }
+            if(d->result_type && d->cases.empty())fail("result type has no variants");
+            if(!d->cases.empty()) {
+                if(t.kind!=Type::aggregate || d->fields.empty() || Type(d->fields[0].type)!=Type::i32 || d->managed || d->interface_type || !d->base.expired())fail("invalid sum layout");
+                unsigned field=1;std::set<std::string> names;
+                for(const auto& variant:d->cases){if(variant.name.empty() || variant.name.find('\0')!=std::string::npos || variant.begin!=field || !names.insert(variant.name).second || variant.count>d->fields.size()-field)fail("invalid sum variant layout");field+=variant.count;}
+                if(field!=d->fields.size() || (d->result_type && (d->cases.size()!=2 || d->cases[0].name!="Ok" || d->cases[1].name!="Err" || d->cases[0].count!=1 || d->cases[1].count!=1)))fail("invalid sum variant coverage");
+            }
             if(d->element || d->extent) fail("structural array metadata on nominal type");
             if(!m.interface_requirements.empty() && d->visibility!="public" && d->visibility!="internal" && d->visibility!="private") fail("invalid concrete nominal visibility");
-            if(!m.interface_requirements.empty() && !dictionary_entries.contains(d) && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
+            const bool callable_environment=d->identity=="$void::$environment";
+            if(callable_environment && (!d->managed || !d->fields.empty() || !d->base.expired() || !d->module_identity.empty() || d->name!="$environment" || d->visibility!="private"))fail("invalid shared callable environment base");
+            if(!m.interface_requirements.empty() && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->callable && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
             if (t.construction && !d->managed) fail("construction view requires a managed nominal");
             if (t.kind==Type::aggregate && d->managed) fail("managed nominal cannot be an inline value");
             auto [found,added]=definitions.emplace(d->identity,d);
@@ -421,16 +447,16 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 if (d->fields.size()<base->fields.size()) fail("missing inherited field prefix");
                 for(unsigned n=0;n<base->fields.size();++n) {
                     const auto& a=d->fields[n];const auto& b=base->fields[n];
-                    if(a.name!=b.name || Type(a.type)!=Type(b.type) || a.owner!=b.owner || a.using_field!=b.using_field) fail("inconsistent inherited field ownership/type");
+                    if(a.name!=b.name || Type(a.type)!=Type(b.type) || capability_key(a.type)!=capability_key(b.type) || a.owner!=b.owner || a.using_field!=b.using_field || a.event!=b.event) fail("inconsistent inherited field ownership/type");
                 }
                 pending.emplace_back(base,Type::managed_ref);
             }
             std::set<std::string> fields;
             for (const auto& field:d->fields) {
                 if (field.name.empty() || field.name.find('\0')!=std::string::npos || !fields.insert(field.name).second || Type(field.type)==Type::none) fail("invalid value field");
-                if(field.using_field && ((Type(field.type).kind!=Type::aggregate && Type(field.type).kind!=Type::managed_ref) || field.type.nullable)) fail("invalid using component type");
+                if(field.using_field && ((Type(field.type).kind!=Type::aggregate && Type(field.type).kind!=Type::managed_ref) || field.type.nullable || (Type(field.type).definition && (Type(field.type).definition->callable || !Type(field.type).definition->cases.empty())))) fail("invalid using component type");
                 if(Type(field.type).kind==Type::prepared_receiver) fail("prepared receiver cannot be stored in a field");
-                if (field.type.readonly) fail("readonly nominal field declarations are not supported");
+
                 pending.push_back(field.type);
             }
             // References break physical layout recursion, not graph validation.
@@ -440,7 +466,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         for (const auto& path:root.readonly_references) if (!shape.contains(path)) fail("invalid readonly reference path");
     };
     auto assignable = [](Type actual,Type expected) {
-        return actual==expected || (reference_value(actual) && actual.kind==expected.kind && Type::key(actual)==Type::key(expected) && actual.construction==expected.construction && (!actual.nullable || expected.nullable));
+        return actual==expected || (actual.definition && expected.definition && actual.definition->callable && expected.definition->callable && Type::key(actual)==Type::key(expected) && (!actual.nullable || expected.nullable)) || (reference_value(actual) && actual.kind==expected.kind && Type::key(actual)==Type::key(expected) && actual.construction==expected.construction && (!actual.nullable || expected.nullable));
     };
     std::set<const ValueType*> catalog_definitions;
     for(auto t:m.nominal_types) {
@@ -451,7 +477,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         for(unsigned n=base ? static_cast<unsigned>(base->fields.size()) : 0;n<t.definition->fields.size();++n)
             if(t.definition->fields[n].owner!=t.definition->identity) fail("nominal catalog field belongs to another owner");
     }
-    struct Signature { std::vector<Type> parameters; Type result; bool receiver = false, mutates = false, initializer = false; };
+    struct Signature { std::vector<Type> parameters; Type result; bool receiver = false, mutates = false, initializer = false, closure = false; };
     std::size_t string_bytes=0; std::set<std::string_view> unique_strings;
     for (const auto& text:m.strings) {
         if (!m.coordinated || text.size()>string_constant_limit || !valid_utf8(text) || !unique_strings.insert(text).second || text.size()>string_pool_limit-string_bytes) fail("invalid or excessive string constant pool");
@@ -480,16 +506,21 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     }
     for (const auto& f : m.functions) {
         if(!m.interface_requirements.empty() && !m.source_imports.contains(f.module_identity)) fail("function has no source access scope");
-        if (f.name.empty() || !names.emplace(f.name, Signature{f.parameters, f.result,f.receiver,f.receiver_mutates,f.initializer}).second) fail("duplicate or empty function");
+        if (f.name.empty() || !names.emplace(f.name, Signature{f.parameters, f.result,f.receiver,f.receiver_mutates,f.initializer,f.closure}).second) fail("duplicate or empty function");
         std::vector<unsigned> context_parameters;
         for (unsigned n=0;n<f.parameters.size();++n) if (f.parameters[n].construction) context_parameters.push_back(n);
         auto expected_name=f.module_identity+"::"+f.source_name;
         if (!f.initializer) expected_name=construction_name(expected_name,context_parameters);
         if (!f.module_identity.empty() && (f.source_name.empty() || f.name != expected_name))
             fail("inconsistent function ownership");
+        if(f.closure && (f.receiver || f.initializer || f.parameters.empty() || f.parameters[0].kind!=Type::managed_ref || f.parameters[0].nullable || f.parameters[0].construction))fail("invalid closure environment signature");
+        if(f.bound_receiver && (!f.closure || f.parameters.empty() || f.parameters[0].kind!=Type::managed_ref || f.parameters[0].definition->fields.size()!=1 || (field_type(f.parameters[0],0).kind!=Type::managed_ref && field_type(f.parameters[0],0).kind!=Type::interface_ref)))fail("invalid bound callback receiver");
         if (f.receiver) {
             if (f.parameters.empty() || (f.parameters[0].kind != Type::aggregate && f.parameters[0].kind != Type::managed_ref) || f.locals.empty() || f.locals[0] != f.parameters[0] || readonly_paths(f.locals[0])!=readonly_paths(f.parameters[0])) fail("invalid receiver signature/storage");
         } else if (f.receiver_mutates) fail("receiver effect without receiver");
+        if(f.accessor>2 || (f.accessor && (!f.receiver || f.initializer)) ||
+           (f.accessor==1 && (f.parameters.size()!=1 || f.result==Type::none || f.receiver_mutates)) ||
+           (f.accessor==2 && (f.parameters.size()!=2 || f.result!=Type::none)))fail("invalid property accessor");
         if (f.initializer && (!f.receiver || f.result != Type::none)) fail("invalid initializer signature");
         if(f.initializer && f.parameters[0].construction && f.parameters[0].readonly) fail("initializer requires mutable construction storage");
         if(f.result.kind==Type::prepared_receiver) fail("prepared receiver cannot be returned");
@@ -555,6 +586,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     if(bindings.size()!=expected_bindings.size()) fail("incomplete interface binding universe");
     for (const auto& f : m.functions) {
         if (f.blocks.empty()) fail("function has no blocks");
+        if(f.cleanup_entry && (!m.coordinated || *f.cleanup_entry>=f.blocks.size()))fail("invalid function cleanup entry");
         qualified_types.emplace_back();
         std::vector<std::vector<Type>> body_types;
         for (const auto& b : f.blocks) {
@@ -617,15 +649,52 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     else { result = field; if (result.kind==Type::managed_ref) result.readonly=object.readonly; }
                     break;
                 }
+                case Op::gc_release:
+                    if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable || operand(i.a).construction)fail("invalid deterministic release");result=Type::boolean;break;
                 case Op::gc_alive:
                     if (!m.coordinated || (operand(i.a).kind != Type::managed_ref || operand(i.a).construction)) fail("invalid managed inspection");
                     result = Type::boolean; break;
                 case Op::gc_collect: case Op::gc_poll:
                     if (!m.coordinated) fail("runtime operation outside coordinated module");
                     result = Type::none; break;
+                case Op::function_null:
+                    valid_type(i.type);if(!i.type.definition || !i.type.definition->callable || !i.type.nullable || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid null function value");result=i.type;break;
+                case Op::function_reference: {
+                    valid_type(i.type);auto target=names.find(i.callee);
+                    if(!i.type.definition || !i.type.definition->callable || target==names.end() || target->second.receiver || target->second.initializer || target->second.parameters.size()!=i.type.definition->call_parameters.size()+(target->second.closure?1:0) || target->second.result!=Type(*i.type.definition->call_result) || i.receiver || i.arguments.size()!=(target->second.closure?1:0))fail("invalid function reference");
+                    if(target->second.closure){expect(i.arguments[0],target->second.parameters[0]);auto environment=Type(i.type.definition->fields[1].type);environment.nullable=false;if(!subtype(operand(i.arguments[0]),environment))fail("function environment does not match callable storage");}
+                    for(unsigned n=0;n<i.type.definition->call_parameters.size();++n)if(target->second.parameters[n+(target->second.closure?1:0)]!=Type(i.type.definition->call_parameters[n]) || capability_key(target->second.parameters[n+(target->second.closure?1:0)])!=capability_key(i.type.definition->call_parameters[n]))fail("function reference parameter authority mismatch");
+                    if(!capability_assignable(target->second.result,*i.type.definition->call_result))fail("function reference discards result authority");result=i.type;break;
+                }
+                case Op::cleanup_call:
+                    if(!operand(i.a).definition || !operand(i.a).definition->callable || !operand(i.a).definition->call_parameters.empty() || Type(*operand(i.a).definition->call_result)!=Type::none || !f.cleanup_entry || static_cast<unsigned>(&b-f.blocks.data())<*f.cleanup_entry || !i.arguments.empty() || i.receiver || !i.callee.empty())fail("invalid cleanup call");result=Type::none;break;
+                case Op::function_call: {
+                    auto type=operand(i.a);if(!type.definition || !type.definition->callable || i.arguments.size()!=type.definition->call_parameters.size() || i.receiver || !i.callee.empty())fail("invalid function invocation");for(unsigned n=0;n<i.arguments.size();++n)expect(i.arguments[n],type.definition->call_parameters[n]);result=*type.definition->call_result;break;
+                }
+                case Op::panic:
+                    if(i.callee.empty() || i.a || i.b || i.receiver || !i.arguments.empty())fail("invalid source failure");result=Type::none;break;
+                case Op::type_test: case Op::type_cast:
+                    valid_type(i.type);
+                    if(!reference_value(operand(i.a)) || operand(i.a).construction || !reference_value(i.type) || i.type.nullable || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid dynamic type pattern");
+                    result=i.op==Op::type_test?Type(Type::boolean):i.type;break;
+                case Op::pattern_equal:
+                    if(operand(i.a)!=operand(i.b) || !pattern_comparable(operand(i.a)))fail("invalid pattern comparison");result=Type::boolean;break;
+                case Op::sum: {
+                    valid_type(i.type);
+                    if(i.type.kind!=Type::aggregate || !i.type.definition || i.immediate<0 || static_cast<std::size_t>(i.immediate)>=i.type.definition->cases.size() || i.receiver || i.initialization || !i.callee.empty())fail("invalid sum construction");
+                    const auto& variant=i.type.definition->cases[i.immediate];
+                    if(i.arguments.size()!=variant.count)fail("invalid sum payload count");
+                    for(unsigned n=0;n<i.arguments.size();++n)expect(i.arguments[n],field_type(i.type,variant.begin+n));
+                    result=i.type;break;
+                }
+                case Op::sum_get: {
+                    auto type=operand(i.a);
+                    if(type.kind!=Type::aggregate || !type.definition || type.definition->cases.empty() || i.immediate<=0 || static_cast<std::size_t>(i.immediate)>=type.definition->fields.size() || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid sum payload access");
+                    result=field_type(type,i.immediate);break;
+                }
                 case Op::aggregate:
                     valid_type(i.type);
-                    if (i.type.kind != Type::aggregate || !i.type.definition || i.arguments.size() != i.type.definition->fields.size()) fail("invalid aggregate construction");
+                    if (i.type.kind != Type::aggregate || !i.type.definition || (!i.type.definition->cases.empty() || i.type.definition->callable) || i.arguments.size() != i.type.definition->fields.size()) fail("invalid aggregate construction");
                     for (unsigned n = 0; n < i.arguments.size(); ++n) expect(i.arguments[n], i.type.definition->fields[n].type);
                     result = i.type; break;
                 case Op::fixed_array:
@@ -709,6 +778,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     break;
                 }
                 case Op::extract: case Op::insert: {
+                    auto owner=operand(i.a);if(owner.definition && ((owner.definition->callable) || (!owner.definition->cases.empty() && (i.op==Op::insert || i.immediate!=0))))fail("sum payload requires checked access");
                     auto t = operand(i.a);
                     if (t.kind != Type::aggregate || i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= t.definition->fields.size()) fail("invalid aggregate field");
                     auto field = t.definition->fields[static_cast<std::size_t>(i.immediate)].type;
@@ -737,7 +807,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if (!numeric::supports(i.op,operand(i.a))) fail("non-numeric ordering");
                     expect(i.b,operand(i.a)); result = Type::boolean; break;
                 case Op::equal: case Op::not_equal:
-                    if (!((reference_value(operand(i.a)) && !operand(i.a).construction && operand(i.b).kind==operand(i.a).kind && !operand(i.b).construction && Type::key(operand(i.a))==Type::key(operand(i.b))) || (numeric::supports(i.op,operand(i.a)) && operand(i.a)==operand(i.b)))) fail("comparison type mismatch");
+                    if (!((operand(i.a).definition && operand(i.b).definition && operand(i.a).definition->callable && operand(i.b).definition->callable && Type::key(operand(i.a))==Type::key(operand(i.b))) || (reference_value(operand(i.a)) && !operand(i.a).construction && operand(i.b).kind==operand(i.a).kind && !operand(i.b).construction && Type::key(operand(i.a))==Type::key(operand(i.b))) || (numeric::supports(i.op,operand(i.a)) && operand(i.a)==operand(i.b)))) fail("comparison type mismatch");
                     result = Type::boolean; break;
                 case Op::stage_prefix: {
                     auto from=operand(i.a),to=i.type;
@@ -768,7 +838,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 }
                 case Op::convert:
                     valid_type(i.type);
-                    if (!((reference_value(operand(i.a)) && !operand(i.a).construction && i.type.kind==operand(i.a).kind && !i.type.construction && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)))) fail("invalid conversion");
+                    if (!((operand(i.a).definition && i.type.definition && operand(i.a).definition->callable && i.type.definition->callable && Type::key(operand(i.a))==Type::key(i.type)) || (reference_value(operand(i.a)) && !operand(i.a).construction && i.type.kind==operand(i.a).kind && !i.type.construction && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)))) fail("invalid conversion");
                     result = i.type; break;
                 case Op::negate:
                     result = operand(i.a); if (!numeric::number(result)) fail("non-numeric negation"); break;
@@ -806,8 +876,8 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 }
                 default: fail("unknown operation");
                 }
-                bool pure=i.op==Op::constant || i.op==Op::string_literal;
-                if(i.op==Op::aggregate || i.op==Op::fixed_array || i.op==Op::dict_new) {
+                bool pure=i.op==Op::constant || i.op==Op::string_literal || i.op==Op::function_null || (i.op==Op::function_reference && i.arguments.empty());
+                if(i.op==Op::sum || i.op==Op::aggregate || i.op==Op::fixed_array || i.op==Op::dict_new) {
                     pure=true;
                     for(auto argument:i.arguments) pure=pure && argument<pure_templates.size() && pure_templates[argument];
                 }
@@ -833,7 +903,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         validate_construction(f,m,body_types);
         validate_fixed_ownership(f,m,body_types);
     }
-    if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition)) fail("incomplete nominal universe for structural interfaces");
+    if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition) && !definition->result_type && !definition->callable) fail("incomplete nominal universe for structural interfaces");
     validate_reference_capabilities(m,qualified_types,verified_effects);
     if (results) *results=std::move(qualified_types);
 }

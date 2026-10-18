@@ -15,13 +15,13 @@ contracts and approved future design, and is not a claim that every illustrated
 syntax executes today.
 
 **Accepted baseline:** local HEAD verified at
-[`c946510a0a72428d7d5849007f8328753377cdf6`](https://github.com/Shmellyorc/Void.Language/commit/c946510a0a72428d7d5849007f8328753377cdf6).
-The owner confirms CI **#64, all seven jobs green**, locking Phases 1–25. This is
-owner-supplied hosted evidence, not a newly launched or independently fetched CI run.
-The Stage 3 dictionary/runtime completion is **locally complete**: 74/74 production
-suites pass in Linux Debug, Release and strict ASan/UBSan/leak configurations, with
-JIT/AOT, small-stack and editor/VSIX checks. Hosted acceptance awaits the owner. Exact local commands/results and defects are in WORK_LOG.md's
-latest Stage 3 entry. No newer hosted pass is claimed.
+`cd95e37341f756e749ea5f3d6da9ad44716d491f`.
+The owner confirms [CI #65](https://github.com/Shmellyorc/Void.Language/actions/runs/39125218619),
+all seven platform/configuration jobs successful. **Stage 3 Managed Runtime is LOCKED**,
+including dictionaries and managed-runtime integration. This is owner-supplied hosted
+evidence. Stage 4 Advanced Language is the current authorized implementation scope;
+approved contracts are recorded in LANGUAGE_BIBLE.md Section 0.3 and DECISIONS.md.
+Approval of those contracts does not claim their implementation or hosted acceptance.
 
 | Implemented phases | Delivered source/toolchain behavior |
 | --- | --- |
@@ -36,7 +36,7 @@ latest Stage 3 entry. No newer hosted pass is claimed.
 | 24 | Concrete native generic functions/types/methods, exact interface constraints and specialization-time body checking |
 | 25 | List insertion/clear and independent inclusive/exclusive slicing; approved pop deferral |
 
-The current Stage 3 sprint adds **native ordered dictionaries**; DICTIONARIES.md
+Stage 3 implements **native ordered dictionaries**; DICTIONARIES.md
 records the owner-approved key, lookup, mutation, readonly and iteration contract.
 It reuses the existing Heap, typed buffers, Frame/Slot roots and shared LLVM lowerer.
 Stage 3's acceptance is managed-memory correctness under optimization, not a new
@@ -50,9 +50,9 @@ its numbers are distinct from implementation phases and Phase 23 research substa
 | 0 Architecture proofs | Implemented and regression-tested LLVM/GC/leased reload/native-call foundations |
 | 1 Frontend | Implemented for the delivered language subset; future Bible syntax remains future work |
 | 2 Core native language | Implemented functions/types/control flow/value and managed structs with native execution |
-| 3 Managed runtime | Allocator/precise coordinated GC, reference/value structs, strings, lists and dictionaries; locally complete and verified, hosted gate pending |
-| 4 Advanced language | Partial: interfaces/generics implemented; properties, match/result, defer, closures/events and source callbacks remain future work |
-| 5 Hot reload | Partial: compatibility checks, leased code replacement/retirement and metadata lifetime implemented; automatic file watching/live application deployment is not implemented |
+| 3 Managed runtime | Allocator/precise coordinated GC, reference/value structs, strings, lists and dictionaries; LOCKED at cd95e373 / CI #65, seven jobs successful |
+| 4 Advanced language | Implemented locally: properties/callable structs, tagged enums, result/propagation, shared is/match patterns, defer/with/one-shot managed deinit, function values/escaping closures, callbacks and synchronous events; see ADVANCED_LANGUAGE.md and WORK_LOG.md. 80/80 production suites pass locally in Debug, Release and strict ASan/UBSan/leaks; hosted acceptance pending |
+| 5 Hot reload | Partial: compatibility checks, leased code replacement/retirement and metadata lifetime implemented; automatic watching and persistent Debug compilation caching are approved future work, not implemented |
 | 6 Concurrency/native libraries | Partial: Runtime coordination and typed native architectural proofs; no source async/scheduler/thread-pool or arbitrary FFI/library ecosystem |
 | 7 Tooling/optimization | Partial: LSP diagnostics/navigation, editor integration/VSIX and LLVM O2; completion/rename/formatting, library discovery and broad performance work remain deferred |
 
@@ -80,8 +80,8 @@ certification gate is required for ordinary compiler acceptance.
 
 **Meaningful limits:** see KNOWN_ISSUES.md and the individual guides. Dictionary
 float/interface/collection/custom-equality keys and result-based get remain deferred;
-so do pop/result, missing slice endpoints/views, string indexing/interpolation,
-source concurrency and the remaining Stage 4–7 work. The known deep valid receiver
+so do pop, missing slice endpoints/views, string indexing/interpolation,
+source concurrency and future Stage 5–7 work. The known deep valid receiver
 chain lowering stack issue remains open unless a later reproduced repair is recorded.
 Do not interpret Stage 3 completion as completion of all language or tooling design.
 
@@ -215,6 +215,36 @@ Each stage is divided into small milestones. Stage completion requires integrati
 | **7. Tooling and optimization** | LSP, extension, library discovery, benchmarks, packaging | Developer-ready toolchain and validated performance |
 
 **Important:** These stages express emphasis, not a rule to defer architecture-sensitive concerns. GC metadata and reload identities must influence early IR design. Source spans, documentation metadata and LSP-ready symbol information must begin in Stage 1. Windows/Linux checks must begin in Stage 0/2, not Stage 7. Native bindings also need an early Stage 0 proof even if their full library ecosystem comes later.
+
+### Stage 5 approved future goal: persistent Debug cache and shared hot-reload integration
+
+**Status (18 October 2026): APPROVED FUTURE DEVELOPMENT GOAL ONLY. Not implemented and not authorized for an implementation sprint.** Stage 7 may eventually measure and tune its performance. This is a compiler/development-host capability, not new VOID source syntax or a new bytecode runtime. It is separate from the currently implemented, process-local ORC generations, validated source analysis and compatible-code replacement.
+
+**Intended Debug workflow:**
+
+- **First launch:** Validate and compile the project normally, then persist reusable relocatable native artifacts under `.void/cache/` when safe and useful.
+- **Later launches and machine restarts:** Validate that cached artifacts still match the current sources, toolchain, target and runtime; reuse valid compiled code without repeating its native compilation. A new process still creates its own Runtime, roots, JIT session and code-generation leases.
+- **Source edits:** Identify affected code through the existing dependency/compatibility machinery. Revalidate relevant source and recompile affected units where technically sound; avoid rebuilding unaffected units when measured granularity and dependency correctness allow it.
+- **While running:** Combine newly validated compiled artifacts with the existing compatible hot-reload publication and old-generation retirement rules. Cache updates do **not** by themselves authorize live replacement; incompatible changes still require the existing restart policy.
+- **Release:** Preserve the current optimized LLVM AOT pipeline and its behavior. The new disk-cache policy is Debug-only.
+
+**Reuse the current architecture, not a competing compiler:** The compiler already owns project/VFS identities, parsed and validated analysis, exact source/declaration dependency and reload-compatibility information, typed IR, one LLVM 19.1.7 lowering path, ORC JIT object generation and resource-tracked native generations. A future caching implementation should consume these existing authoritative facts. A cache validity decision may need stronger or different inputs than hot-reload compatibility: an edit may be safe for live replacement yet still require recompilation, and an artifact reusable after restart is not automatically eligible for replacement in an active generation. Never create separate dependency graphs, semantic models, backends, or Runtime/GC systems just for the cache.
+
+**Research candidates, not selected designs:** Begin with LLVM 19.1.7's existing relocatable object emission and ORC object-file linking. Compare persisted native object files with LLVM bitcode if measurement and target semantics warrant it; neither requires a VOID-specific bytecode format or interpreter. Confirm the pinned SDK's object-cache/IR-compile-layer hooks, `LLJIT` object loading, target portability and ownership behavior before selecting an interface. ORC lazy reexports / compile-on-demand may defer work until first call, but are optional research, **not** an approved implementation mechanism. Prior-execution function profiles or speculative warming are likewise optional only after simpler caching works and shows a measured need. Prefer the simplest practical cache unit first (for example, a compilation unit); use function-level artifacts only when the benefit clearly outweighs symbol, generic-specialization, invalidation and linking complexity.
+
+**Correctness and invalidation requirements:**
+
+- A cache hit must reflect validated source and every compilation-relevant transitive dependency: imported declarations, generic specializations, constants/defaults, type layouts, methods, virtual/interface bindings and other runtime-visible metadata. All reachable source must receive appropriate validation even when an unchanged artifact is reused; a cached object must never conceal a current source error.
+- Include sufficient identity for compiler/build format, exact LLVM/Clang version and relevant ABI, target triple/architecture/CPU features, data layout, compile/optimization/debug options, dependency and runtime contract versions, and any instrumentation affecting the emitted object. Do not treat a filename or stale modification time as proof of compatibility.
+- Persist relocatable artifacts rather than raw in-memory code addresses. After a restart, resolve symbols and register runtime metadata afresh; do not deserialize previous process heap objects, GC roots, JIT addresses, code leases or active generations. Preserve current Frame/Slot tracing, safepoints, failure cleanup and native lifetime/retirement guarantees.
+- Missing, corrupt, partial, outdated, unreadable or otherwise invalid entries must be rejected safely and fall back to normal validation/compilation. Cache publication must tolerate interruption (for example, atomic complete-entry replacement), and failures must not overwrite known-good output or publish invalid native code. The entire cache must remain disposable without affecting correctness. Treat cache content as untrusted until validated against the intended local build inputs and expected format.
+- Confirm Linux, Windows and macOS object/linking behavior and existing hot-reload/GC tests. A cold or invalid cache must compile the same program with the same diagnostics and observable behavior; a valid cache must preserve optimized/rooted execution semantics. Keep the existing owner-controlled seven-job hosted acceptance procedure when this goal is eventually implemented.
+
+**Measure before design and optimization:** Use a realistic project (including a roughly 100,000-line workload) and record source discovery/parsing, semantic analysis, IR generation, LLVM optimization/codegen, object linking/relocation, metadata admission and process startup separately. Compare a cold first launch, warm unchanged launch in a fresh process after machine restart, a one-function edit, an imported declaration/layout change, and deliberate cache corruption/invalidation. Measure time to main/first useful frame, time to first call for optional laziness, cache hit/miss rates, invalidated work, disk usage and memory overhead. Determine where latency actually goes; "near-instant" is an aspirational outcome, not a guaranteed target or excuse to skip correctness validation.
+
+**Implementation authorization remains separate.** This section records the owner's approved objective and safety boundaries only. Do not add `.void/cache/` machinery, change the compiler or CI, start a phase, or change Release behavior without a later explicit owner request.
+
+**LLVM research reference:** [LLVM 19 ORC Design and Implementation](https://releases.llvm.org/19.1.0/docs/ORCv2.html), especially relocatable object linking, LLJIT and laziness; verify any chosen C++ interface against the pinned LLVM 19.1.7 headers/source before engineering work.
 
 ### Stage 0: Four early architectural proofs
 
@@ -468,6 +498,8 @@ Priority order:
 4. **GC latency:** Track average and worst-case pauses, including game frame-time consistency.
 5. **Memory usage:** Monitor fragmentation, live heap, metadata and allocation overhead.
 6. **Compilation speed:** Fast incremental development while permitting aggressive release optimization.
+
+Persistent Debug compilation caching and optional lazy native materialization are **approved future Stage 5 goals**, not implemented optimizations. Evaluate their startup and incremental costs under the measured acceptance plan in [Stage 5 above](#stage-5-approved-future-goal-persistent-debug-cache-and-shared-hot-reload-integration); Stage 7 can tune them only after correctness and representative workloads are established.
 
 Potential mechanisms to evaluate:
 

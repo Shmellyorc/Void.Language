@@ -11617,3 +11617,345 @@ remains pending the owner's hosted run.
 `git diff --check` passes. HEAD remains c946510a0a72428d7d5849007f8328753377cdf6;
 all delivery edits are uncommitted. No branches, commits, pushes, remote changes
 or hosted CI triggers were performed.
+
+## 18 October 2026: Stage 3 hosted lock; Stage 4 contracts and native accessor/callable subset
+
+Baseline HEAD verified at `cd95e37341f756e749ea5f3d6da9ad44716d491f`.
+The owner's [CI #65](https://github.com/Shmellyorc/Void.Language/actions/runs/39125218619)
+confirmation locks Stage 3 Managed Runtime, dictionaries and integration across
+all seven jobs. This is owner-provided hosted evidence. The pre-existing uncommitted
+Stage 5 persistent Debug cache design in DEVELOPMENT_STRATEGY.md is preserved.
+No commits, branches, pushes, remote changes or hosted CI actions were performed.
+
+Before implementation, recorded the approved Stage 4 contracts in Bible Section
+0.3 and DECISIONS.md. The owner additionally approved explicit `var` pattern
+captures (bare names compare), managed-only no-result one-shot deinit, and explicit
+fallible factories without init rewriting. These remain **design**, not an
+implementation claim. Exact result signatures/error types for dictionary get and
+list pop are still deferred.
+
+**Actual implementation delivered:** Bible property/get/set declarations on
+managed/value/concrete generic receivers, field-like reads and assignment/compound
+assignment, nested value/fixed-array update through setters, inherited and one-hop
+using selection, module visibility, deep readonly checks, and nonmutating getters
+including transitive receiver effects. Accessors are ordinary methods in the
+existing semantic checker, typed IR, LLVM lowerer and Runtime; no new backend,
+Runtime operation, ownership registry or alternative execution engine is added.
+Accessor role is validated in typed IR and included in reload compatibility.
+Body replacement and old-code leases are exercised; setter removal requires restart.
+
+Concrete structs/interfaces with compatible call methods can be invoked through
+ordinary callable syntax, including locals, fields, managed indexed elements,
+properties and returned temporaries. Generic functions can receive concrete
+callable structs. Normal argument/result, receiver, visibility, readonly and GC
+rules apply. This is **not function types/values or callback erasure**.
+PROPERTIES.md gives the executable scope and limitations. Tooling dependencies
+include accessors, and the existing TextMate grammar recognizes property/get/set.
+
+Corrections during integration:
+
+- An experimental selected-inline-element copy-back path was unsafe: in
+  build/stage4/array-receiver-alias.void a callee changed a sibling field through
+  an array alias to 99, then copy-back overwrote it with 0. Removed that extension;
+  indexed inline mutating receivers remain rejected. The original arrays_source
+  rejection assertion is unchanged (tests/arrays/source.cpp has no delivery diff).
+  A new callable regression checks this rejection too. Managed indexed callables
+  retain identity and need no inline copy-back. No mutable element borrow is added.
+- Computed value-property receivers must evaluate their getter before RHS effects.
+  The receiver fixture checks a failing getter cannot be rescued by an RHS which
+  changes its denominator. This applies to normal/O2 JIT and linked AOT.
+- A nonmutating inner setter must not publish an unchanged captured outer value
+  over RHS effects. Copy-back is conditional on the inferred setter receiver
+  effect; the receiver fixture preserves the RHS value 99. No-op setters still
+  require readonly authority to be respected.
+- Kept ordinary direct field assignment on its existing initialization path;
+  only property-containing paths enter selected-property lowering. An early broad
+  rewrite produced mistyped managed-init IR and was corrected before acceptance.
+- The first consolidated Release pass reproduced a composition_source diagnostic
+  regression: a scalar field hiding a promoted method reported "Member access
+  requires a struct" instead of the established not-callable error. Callable-field
+  adaptation now rejects scalar fields before receiver rewriting. The existing
+  composition assertion is preserved and the corrected-source pass follows below.
+- Allocation-failure test probes reserve their own frame-observation storage
+  before injection, matching the existing test convention; injected failures must
+  not abort a noexcept observer through the test's own vector allocation.
+
+**Stage 4 is incomplete.** Enums, shared is/match patterns, result/Ok/Err/?,
+defer/with/deinit execution, function types/values, anonymous/escaping closures,
+events and erased source callbacks remain unimplemented. All their approved
+contracts are retained. This delivery does not fulfill the complete Stage 4 mission
+or authorize a Stage 4 hosted lock. Mutating inline array/dictionary element
+receivers still require an independent local value and explicit replacement.
+The pre-existing deep valid receiver-chain stack limitation remains in KNOWN_ISSUES.md.
+
+Validation commands and final results follow below after the corrected-source pass.
+
+Reproducible commands (repository root, existing build configurations; all LLVM
+research options OFF, `/usr/bin/clang++-19`, LLVM 19.1.7 at `/usr/lib/llvm-19`):
+
+```sh
+cmake --build build/order1/production -j 2
+ctest --test-dir build/order1/production --output-on-failure
+cmake --build build/ci-release -j 2
+ctest --test-dir build/ci-release --output-on-failure
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+cmake --build build/ci-sanitizers -j 2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+ctest --test-dir build/ci-sanitizers --output-on-failure
+```
+
+Sanitizer build generators and tests run outside the tracing sandbox so LSan is
+fully enabled; no sanitizer checks or production tests are disabled. Debug is
+CMAKE_BUILD_TYPE=Debug, Release is Release; sanitizers use RelWithDebInfo and
+VOID_SANITIZERS=ON. The existing `properties_source`/`properties_cli` additions
+bring the 74-suite baseline to 76. The seven-job workflow and 180-minute timeout
+are unchanged.
+
+Small-stack and malformed/deep receiver checks:
+
+```sh
+(ulimit -s 1024; ctest --test-dir build/order1/production -R '^frontend$' --output-on-failure)
+python3 tests/integration/semantic_depth.py build/order1/production/voidc
+(ulimit -s 1024; build/ci-release/void_tests frontend /home/shmellyorc/Documents/Void.Language)
+python3 tests/integration/semantic_depth.py build/ci-release/voidc
+```
+
+For each `B` equal to `build/order1/production` and `build/ci-release`, the four
+2 MiB property-array executions also run under `ulimit -s 1024`:
+
+```sh
+"$B/voidc" run examples/properties/references.void 7 --no-opt
+"$B/voidc" run examples/properties/references.void 7
+"$B/void_properties_cli_references_normal" 7
+"$B/void_properties_cli_references_optimized" 7
+```
+
+Editor commands (Node 24.19.0 on PATH):
+
+```sh
+npm --prefix editors/vscode test
+VOIDLS_PATH=/home/shmellyorc/Documents/Void.Language/build/order1/production/voidls \
+VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm --prefix editors/vscode run test:host
+npm --prefix editors/vscode run package
+```
+
+The real editor test uses the local display/IPC outside the sandbox. VSIX output
+is `editors/vscode/dist/void-language-0.1.0.vsix`. Logs are under the ignored
+`build/stage4/` directory: `{debug,release,sanitizer}-{build,tests}.log`,
+`{debug,release}-stack.log`, `editor-unit.log`, `editor-host.log` and `vsix.log`.
+
+### Final corrected-source local results
+
+| Configuration | Production CTest | Wall time |
+| --- | --- | --- |
+| Linux Debug | **76/76 passed** | 625.12 s |
+| Linux Release | **76/76 passed** | 254.07 s |
+| Linux strict ASan/UBSan/leaks | **76/76 passed** | 618.62 s |
+
+All 74 pre-existing suites remain present, with assertions preserved, alongside
+properties_source and properties_cli. The final runs execute the corrected scalar
+callable diagnostic. The three configurations ran concurrently; wall times are
+validation timings, not performance benchmarks. No final failing tests or sanitizer
+findings remain for the implemented subset.
+
+Each configuration reports 172 intentional property allocation failures in normal
+JIT and 172 in O2 JIT, followed by success, balanced precise roots, collection and
+successful retry. Native accessor/callable integration reports **44 successes and
+12 source-located checked failures** through normal/O2 JIT and independently
+linked AOT. Failure budgets are test-only and not production limits. The existing
+GC, callbacks/quiescence, hot-reload/retirement, dictionary, array, generics and
+publication/failure suites pass without weakening their assertions.
+
+Final 1 MiB checks pass in Debug and Release: both frontend suites and bounded
+malformed/deep-chain scripts, plus all eight normal/O2 JIT/linked AOT executions
+of the 2 MiB fixed-array property fixture (each returns 12). The final exact command
+uses `void_tests frontend /home/shmellyorc/Documents/Void.Language` under the stack
+limit for **both** build directories; full evidence is build/stage4/final-stack.log.
+The known separate valid deeply chained receiver limitation is not claimed fixed.
+
+Extension unit tests/typechecking, all three real editor modes (trusted, restricted,
+multi-root), and VSIX packaging pass. Full per-test output, including allocation
+counts, is saved in build/stage4/{debug,release,sanitizer}-details.log.
+`git diff --check` passes; HEAD remains cd95e373. The original array mutation rejection
+and ci.yml are unchanged. No commits, branches, pushes, remote changes or hosted
+CI triggers were made.
+
+Source changes are in src/frontend/compiler.cpp (property parsing/selection and
+callable syntax), capabilities.inc (shared call/write effects), generics.inc
+(accessor specialization roles), include/void/ir.hpp and src/ir/{module.cpp,
+interfaces.inc} (accessor role/signature/conformance checks). The LLVM backend and
+production Runtime are unchanged. Tests use the existing CMake/CTest source and
+native-link infrastructure: tests/properties/tests.cpp,
+tests/integration/properties.cmake and examples/properties/*.void. The existing
+VS Code grammar/config tests cover accessor highlighting. PROPERTIES.md documents
+the local feature boundary; canonical status, Bible/decisions, known issues,
+receiver guide, README and WRENCH handoff are reconciled.
+
+The implemented subset is locally validated and available for owner review.
+**The full Stage 4 mission is not complete or ready for Stage 4 acceptance.**
+Remaining enums, result/patterns, defer/with/deinit, function values/escaping closures,
+events and erased source callbacks are approved but unimplemented. No missing
+feature is represented by a stub, alternate backend or claimed working syntax.
+Stage 3 stays hosted-locked; Stage 4 has no hosted lock. Stage 5's persistent Debug
+cache/automatic watching remains approved future design, untouched by production
+changes here.
+
+## 18 October 2026: Stage 4 continuation, complete advanced source systems
+
+Resumed the existing uncommitted properties/callable implementation; Stage 3 stays
+locked at cd95e373 / owner CI #65. The continuation implements tagged/data-carrying
+enums, contextual result<t,e>/Ok/Err and exact-error propagation; shared is/match
+patterns with explicit success-scoped var captures; first-class functions,
+anonymous/escaping closures, generic/method/interface/callable-struct callbacks;
+defer, with, managed-only one-shot deinit; and synchronous ordered events.
+ADVANCED_LANGUAGE.md documents executable syntax, authority/lifetime rules and
+boundaries. Properties/callable structs remain intact.
+
+The existing semantic checker, typed IR and shared LLVM 19.1.7 lowerer implement
+all execution. Sum payloads occupy disjoint zeroed fields and trace only valid
+references. Closures use ordinary managed cells/environments with precise roots;
+value receivers snapshot independently, ordinary captured locals share cells.
+No executable pointer is stored in managed metadata. Callback dispatch and reload
+use the existing generation lease. Events reuse growable buffers and snapshot
+subscribers before synchronous calls. Defer nodes are ordinary managed objects;
+with prepares cleanup storage before acquisition. Explicit/deferred/with release
+shares one synchronized object bit. Runtime failures drain applicable cleanup,
+preserve the primary error and attach bounded additional diagnostics.
+
+Owner decisions added to DECISIONS.md: deferred call arguments/receiver evaluate
+at registration; deferred blocks read shared state at cleanup; escaping captured
+value receivers snapshot independently, shared by copies of their closure.
+
+Integration defects reproduced and corrected:
+
+- New expression cases increased recursive semantic stack frames and broke the
+  existing 1 MiB deep-receiver rejection. GDB identified the dispatcher frame;
+  extracted handlers using the existing semantic-handler convention. Kept depth
+  guards/assertions unchanged. Added deep closure/defer recovery to the existing
+  semantic_depth.py regression, without a second harness.
+- Capture authority profiles now join monotonically; readonly retention exemptions
+  apply to the destination field schema, never the source expression's authority.
+  Consolidation exposed otherwise-accepted readonly storage in managed/value/
+  interface construction; all original negative tests remain and now reject.
+- Function environments share a stable private builtin base across independently
+  compiled roots using the same Runtime. Capture-layout/authority changes enter
+  the compatibility contract and require restart before Runtime admission.
+- Managed/interface bound callback identities compare underlying receiver identity;
+  virtual/base and readonly aliases canonicalize to the same adapter. Compatible
+  body reload and old leased code retain their behavior.
+- Multiline closures/matches inside dictionary literals restore lexer indentation
+  context. Constructor escape checking distinguishes registered expression
+  snapshots from captured constructor storage. Explicit complete result/function
+  field defaults satisfy the existing value-init completeness rule.
+- Pattern condition checking preserves the existing lazy numeric diagnostics in
+  false-and/true-or branches. Invalid interface field reads retain the established
+  diagnostic while valid interface method references remain callable.
+- Pattern CFG block numbering exposed quadratic initialization-dataflow convergence:
+  modules_cli exceeded its unchanged 180-second limit in Debug and Release. GDB
+  sampled set intersections in validate_reference_initialization. Its existing
+  fixed-point checker now visits reverse postorder (iteratively, avoiding native
+  recursion), preserving every initialization check. The same 304-case numeric
+  matrix checked in 3.473 seconds in corrected Debug; focused modules_cli passed
+  in 54.50 seconds. No timeout/test/sanitizer was weakened.
+
+Focused corrected commands/results:
+
+```
+cmake --build build/order1/production -j2 --target voidc void_managed_tests void_managed_initialization_tests void_reference_values_tests void_interfaces_tests void_tests
+ctest --test-dir build/order1/production -R '^(managed_source|managed_initialization_source|reference_values_source|interfaces_source|numeric)$' --output-on-failure -j1
+# 5/5 passed; build/stage4/corrections-focused.log
+cmake --build build/order1/production -j2 --target voidc void_advanced_tests void_patterns_tests void_tests
+ctest --test-dir build/order1/production -R '^(advanced_source|patterns_source|numeric|modules_cli|numeric_cli)$' --output-on-failure -j2
+# 5/5 passed; build/stage4/final-corrections-focused.log
+```
+
+The inventory expands from 76 to 80 production suites: patterns_source/cli and
+advanced_source/cli. Fourteen pattern and twenty-two advanced fixtures execute
+through normal/O2 JIT and independent native linking. Source suites force GC before
+construction, inspect precise roots/publication, sweep allocation failures, check
+retries and reclamation, primary/secondary cleanup failures, with-acquisition
+failure, compatible reload and incompatible capture-layout restart. Combined
+programs use properties, generics, collections, results, patterns, cleanup,
+closures, callbacks and events together. The 2 MiB capture fixture executes with a
+1 MiB stack in both JIT modes and both separately linked native modes.
+
+Final corrected consolidated validation (LLVM 19.1.7, research OFF):
+
+| Configuration | Production CTest | Elapsed |
+| --- | --- | --- |
+| Debug | 80/80 passed | 400.47 s |
+| Release | 80/80 passed | 164.27 s |
+| RelWithDebInfo, strict ASan/UBSan/leaks | 80/80 passed | 358.68 s |
+
+```
+cmake --build build/order1/production -j2
+ctest --test-dir build/order1/production --output-on-failure -j2
+cmake --build build/ci-release -j2
+ctest --test-dir build/ci-release --output-on-failure -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 cmake --build build/ci-sanitizers -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers --output-on-failure -j2
+```
+
+Sanitizer builds/tests ran outside the tracing sandbox so LeakSanitizer could
+operate normally; leak detection stayed enabled, including generated-object
+compilation. Logs: build/stage4/{debug,release,sanitizers}-final-{build,ctest}.log;
+full per-test output is also in each build's Testing/Temporary/LastTest.log.
+All original 76 suites remain. Allocation sweeps in each configuration and each
+JIT mode observe captures 232, with 230, events 412 and fixed_capture 133 failures;
+patterns observe values 418, large 232 and combined 169 failures. Cleanup, roots,
+transactional publication, retry and final reclamation assertions all pass.
+
+For each of the three build directories, ran the following under `ulimit -s 1024`
+(with the same strict sanitizer environment for ci-sanitizers):
+
+```
+BUILD/voidc run examples/advanced/large.void 7 --no-opt
+BUILD/voidc run examples/advanced/large.void 7
+BUILD/void_advanced_cli_large_normal 7
+BUILD/void_advanced_cli_large_optimized 7
+BUILD/void_tests frontend /home/shmellyorc/Documents/Void.Language
+```
+
+Each of the twelve large-payload executions returned 17; all three complete
+frontend runs passed. Logs: build/stage4/final-small-stack-{debug,release,sanitizers}.log.
+The full CTest diagnostics workflow also runs the extended semantic-depth recovery
+script with its existing 1 MiB child stack limit. Scratch diagnostics generated
+by the standalone frontend runs were moved under ignored build/stage4.
+
+```
+npm --prefix editors/vscode test
+npm --prefix editors/vscode run package
+PATH=/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:$PATH VOIDLS_PATH=/home/shmellyorc/Documents/Void.Language/build/order1/production/voidls VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm --prefix editors/vscode run test:host
+```
+
+Extension typechecking/unit tests: 1/1 passed. Real VS Code trusted, restricted
+trust and multi-root modes: all passed against the final corrected voidls.
+VSIX: editors/vscode/dist/void-language-0.1.0.vsix (8 files, 145.71 KB reported
+by vsce). Logs: editor-final-tests.log, editor-final-package.log and
+editor-corrected-host.log under build/stage4. LSP/native/session/reload regressions
+also pass in each full CTest run. The existing seven-job workflow retains
+unfiltered production CTest, frontend stack checks, real editor integration and
+VSIX packaging; ci.yml and its 180-minute job timeout are unchanged.
+
+Actual implementation files: frontend compiler.cpp plus pattern_parser.inc,
+pattern_semantics.inc and pattern_lowering.inc, shared capabilities/construction/
+generic helpers; include/void/{ir,frontend,diagnostic,reference_capabilities}.hpp;
+src/ir/module.cpp, reference_capabilities.inc and interfaces.inc; the shared LLVM lowerer;
+and the existing Runtime/Heap ABI/schema/array/coordination files. Source fixtures
+and regression suites use the existing CMake native-link and managed probe helpers.
+No alternate checker, execution engine, GC or ownership registry was introduced.
+Feature/status/Bible/decisions/diagnostics/generic/receiver/array/interface/inheritance
+guides, known issues and Wrench handoff are reconciled. `git diff --check` passes;
+HEAD remains cd95e373. Stage 4 is ready for owner review and hosted CI verification;
+no new cross-platform or hosted acceptance is claimed.
+
+Remaining boundaries: no generic enum declarations, unit/void result payload
+syntax, module-time pattern execution or bound-receiver allocation, arbitrary
+managed/native callback FFI, async or automatic watching/persistent Debug cache.
+Callback readonly result authority is conservative. Dictionary get/list pop still
+await approved exact signatures/error types. Root lifetimes remain conservative;
+the separately documented deeply valid receiver-chain lowering limit remains.
+No hosted platform is claimed validated by this Linux sprint. Stage 5's future
+persistent Debug cache proposal is preserved. No Git/remote/hosted CI actions.

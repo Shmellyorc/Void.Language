@@ -1,5 +1,64 @@
 # Architectural decisions
 
+**Stage 4 continuation decisions (owner approved):** Deferred calls capture their receiver and arguments when registration is reached; deferred blocks read shared captures when cleanup executes. Escaping closures created in value-struct methods capture an independent receiver snapshot, shared by copies of that closure. Ordinary captured locals keep shared storage; managed receivers keep their managed identity.
+
+## Stage 4 Advanced Language, owner-approved 18 October 2026
+
+Stage 3 is hosted-locked at `cd95e37341f756e749ea5f3d6da9ad44716d491f`,
+[CI #65](https://github.com/Shmellyorc/Void.Language/actions/runs/39125218619),
+seven successful jobs. These are approved Stage 4 contracts, **not an implementation
+or hosted-acceptance claim**. Older OPEN labels below are superseded only as stated.
+
+- `result<t,e>` carries `Ok(value)` or `Err(error)`. `?` unwraps success or propagates
+  the exact matching error type. Recoverable errors remain distinct from runtime
+  failures. `Ok` also matches present nullable values, without converting nullable
+  into result; `Ok(null)` can be a successful nullable payload.
+- One pattern model serves `is` and statement/expression `match`: type, value,
+  range, nullable/result, tagged enum payload, struct field, list and dictionary
+  patterns. Dictionaries permit extra keys; list rest copies independently.
+  Bare names compare existing bindings; **`var name` explicitly captures**,
+  including `Ok(var value)` and `..var rest`. Captures have success-only lexical
+  scope and cannot shadow existing bindings. Incomplete matches warn; an unmatched
+  statement does nothing, an unmatched expression raises a source-located runtime
+  failure. Exhaustive matches do not warn.
+- Reached defers register dynamically and run LIFO on function exit, early return
+  and `?`. `with` cleans at scope exit. `deinit` releases external resources,
+  never GC finalization. Initially it is managed-struct-only, no-result; value
+  structs cannot define it. Explicit/deferred `deinit` and `with` share per-object
+  one-shot release state so aliases cannot release twice. Ordinary value copies
+  are unchanged. Fallible acquisition uses explicit result-returning factories,
+  without rewriting `init`. Deferred code permits Ok/Err and locally valid nested
+  break/continue, but no direct return/`?`/await. Preserve the primary runtime
+  failure, attach cleanup failures and continue applicable cleanup.
+- Bible `property`/`get`/`set` syntax executes accessor logic through field access.
+  Getters cannot mutate receivers; missing setters are readonly. Recoverable errors
+  use explicit methods. Preserve receiver selection, evaluation order, deep readonly
+  and value semantics. Accessor body changes can reload; incompatible signatures,
+  type/layout changes require restart.
+- Function types, function values, anonymous functions and escaping closures share
+  captured mutable storage (including value locals), while unrelated ordinary value
+  assignments remain independent copies. Assigning closures shares state. Captures
+  retain reference identity/readonly and precise GC tracing beyond stack lifetime.
+  Reuse stable function identities/dispatch/code leases; incompatible capture layout
+  requires restart and compatible bodies can reload.
+- Events are synchronous, ordered, strong subscriptions. Snapshot subscribers per
+  emission; duplicates are legal; `-=` removes the latest matching identity.
+  Only the owner emits; mutation/nested emission must be safe. Callback identity
+  survives assignment/compatible reload. Handlers have no result and handle
+  recoverable errors internally; runtime panic stops later handlers. No implicit
+  async. Single function fields remain distinct from events.
+- Compatible `call()` structs are callable/callback values using existing method,
+  structural checks, visibility, effects and readonly rules. No arbitrary external
+  C function-pointer ABI promise; preserve native callback/quiescence contracts.
+- Implement necessary enum/function-type foundations through the existing frontend,
+  typed IR, LLVM 19.1.7 lowerer and coordinated Runtime. No second execution engine,
+  collector, type checker or ownership registry. Dictionary `.get()` and list
+  `.pop()` remain deferred until exact signatures/error types are approved.
+- Preserve Stage 3, seven CI jobs, strict sanitizers and 180-minute timeout. Stage 5
+  automatic watching/persistent Debug cache remains approved future work, not part
+  of this sprint. Stages 6–7 remain outside this scope. Owner controls Git and CI.
+
+
 ## Stage 3 dictionary decisions, owner-approved 18 October 2026
 
 Current status and hosted evidence live in DEVELOPMENT_STRATEGY.md. The owner approved the grouped dictionary decisions recorded in DICTIONARIES.md: expression keys with colon literals, exact string/integer/bool/managed-identity and eligible value-struct keys, checked indexing/upsert, contains/remove/clear/count, shared dictionary identity, deep readonly and fixed-child value copies, deterministic order, captured receiver/key/version before RHS, and next-access structural iterator invalidation. Float/collection/interface/custom-equality keys and result-based get are deferred. No result/pattern system, collector or certification framework is added. CI timeout becomes 180 minutes; the owner retains Git/hosted CI control.

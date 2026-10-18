@@ -49,3 +49,21 @@ with tempfile.TemporaryDirectory(prefix="void-semantic-depth-") as directory:
         assert text.splitlines()[7][column - 1:column + 3] == "same", diagnostic
         assert ":10:5: error: Unknown function 'missing'" in diagnostic, diagnostic
     print("Deep receiver chains: bounded stack, nesting location and later error verified")
+
+    # New block forms must retain the same bounded, recovering parser on 1 MiB.
+    for kind in ("defer", "closure"):
+        lines = ["func entry(value: i32) -> i32:"]
+        for depth in range(80):
+            prefix = "    " * (depth + 1)
+            lines.append(prefix + ("defer {" if kind == "defer" else f"var callback_{depth} = func():"))
+        lines.append("    " * 81 + "pass")
+        if kind == "defer":
+            for depth in reversed(range(80)):
+                lines.append("    " * (depth + 1) + "}")
+        lines.extend(["    var later = func() -> i32:", "        return value", "    return later()", ""])
+        source.write_text("\n".join(lines), encoding="utf-8")
+        result = subprocess.run([sys.argv[1], "check", str(source)], capture_output=True,
+                                encoding="utf-8", errors="strict", timeout=20,
+                                preexec_fn=small_stack if sys.platform == "linux" else None)
+        assert result.returncode == 1, (kind, result.returncode, result.stdout, result.stderr)
+        assert "code: VOID1107" in result.stderr, (kind, result.stderr)

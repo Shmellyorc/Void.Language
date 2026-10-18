@@ -17,7 +17,7 @@ std::shared_ptr<const vd::ValidatedAnalysis> analyze(const std::string& text) {
 const std::string node="struct node:\n    value: i32\n    next: node?\n\n";
 void invalid(const std::string& text,const std::string& reason) {
     auto r=vd::analyze_source({"/managed.void",text});
-    require(!r.succeeded(),"invalid managed source accepted");
+    if(r.succeeded())throw std::runtime_error("invalid managed source accepted:\n"+text);
     bool found=false;
     for(const auto& d:r.diagnostics) {
         require(d.primary.source->text()==text && d.primary.end>d.primary.begin,"managed diagnostic source/span");

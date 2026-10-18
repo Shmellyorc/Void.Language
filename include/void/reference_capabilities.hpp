@@ -121,6 +121,13 @@ inline ReferenceFact instantiate_fact(const ReferenceFact& summary,const std::ve
     }
     return result;
 }
+inline ReferenceFacts callable_result(Type function,const std::vector<ReferenceFacts>& arguments) {
+    auto result=reference_facts(*function.definition->call_result);
+    // A checked callable signature promises its result authority. Provenance
+    // remains conservative, without treating readonly arguments as result aliases.
+    for(auto& [path,fact]:result)for(const auto& argument:arguments)for(const auto& [leaf,input]:argument)fact.origins.insert(input.origins.begin(),input.origins.end());
+    return result;
+}
 inline ReferenceFacts instantiate_result(const ReferenceFacts& summary,const std::vector<ReferenceFacts>& arguments) {
     ReferenceFacts result;
     for (const auto& [path,fact]:summary) result[path]=instantiate_fact(fact,arguments);

@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
             if (check || run || emit) {
                 auto program = vd::compile_project(argv[2]);
                 const auto& source = program.entry; const auto& module = program.module;
+                if(module.analysis)for(const auto& warning:module.analysis->warnings())std::cerr<<vd::render_diagnostic(warning)<<'\n';
                 if (check) { std::cout << "Source checked successfully\n"; return 0; }
                 vd::require_source_entry(source, module);
                 if (run) {

@@ -1,0 +1,11 @@
+interface readable:
+    func get() -> i32
+struct item:
+    value: i32
+func (i item) get() -> i32:
+    return i.value
+func entry(x: i32) -> i32:
+    var object = item(value = x)
+    if object is readable(var view) and view.get() > 0:
+        return view.get()
+    return 0

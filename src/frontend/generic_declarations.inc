@@ -18,6 +18,14 @@ for(auto& [id,u]:units) {
             if(raw.nullable)error(u->source,token,Code::unsupported_type,"Nullable generic parameters are not implemented.");
             return;
         }
+        if(raw.definition && raw.definition->callable) {
+            auto callable=std::find_if(u->function_types.begin(),u->function_types.end(),[&](const auto& syntax){return syntax.definition==raw.definition;});
+            if(callable!=u->function_types.end()){for(auto parameter:callable->parameters)type(parameter,token,names);type(callable->result,token,names);}return;
+        }
+        if(raw.definition && raw.definition->result_type) {
+            auto result=std::find_if(u->results.begin(),u->results.end(),[&](const auto& syntax){return syntax.definition==raw.definition;});
+            if(result!=u->results.end()){type(result->success,token,names);type(result->failure,token,names);}return;
+        }
         if(ir::collection_type(raw)) {
             auto a=std::find_if(u->arrays.begin(),u->arrays.end(),[&](const auto& a){return a.definition==raw.definition;});
             if(a!=u->arrays.end()){if(a->key)type(*a->key,token,names);else (void)array_extent(*u,*a);type(a->element,token,names);}

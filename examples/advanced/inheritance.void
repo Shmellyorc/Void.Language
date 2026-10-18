@@ -1,0 +1,18 @@
+struct tracker:
+    total: i32
+struct base:
+    tracker: tracker
+virtual func (b base) deinit():
+    b.tracker.total += 10
+struct derived extends base:
+    extra: i32
+override func (d derived) deinit():
+    d.tracker.total += d.extra
+    super.deinit()
+func entry(value: i32) -> i32:
+    var t = tracker(total=0)
+    var d = derived(tracker=t, extra=value)
+    var b: base = d
+    b.deinit()
+    d.deinit()
+    return t.total

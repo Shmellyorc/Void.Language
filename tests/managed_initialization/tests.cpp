@@ -17,7 +17,7 @@ const std::string types="struct leaf:\n    value: i32\n\nstruct owner:\n    chil
 const std::string declaration="func (o owner) init(c: leaf, flag: bool = true):\n";
 void invalid(const std::string& text,const std::string& reason,bool related=false) {
     auto result=vd::analyze_source({"/initialization.void",text});
-    require(!result.succeeded(),"invalid construction accepted"); bool found=false;
+    if(result.succeeded())throw std::runtime_error("invalid construction accepted:\n"+text); bool found=false;
     for (const auto& d:result.diagnostics) {
         require(d.primary.end>d.primary.begin && d.primary.source->path()=="/initialization.void","construction diagnostic location");
         if (d.description.find(reason)!=std::string::npos) { found=true; if (related) require(!d.related.empty(),"unsafe helper missing related source use"); }

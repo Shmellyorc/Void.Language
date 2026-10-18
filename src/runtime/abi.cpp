@@ -61,6 +61,14 @@ void vd_gc_frame_enter(void* frame, const vd::Runtime::Slot* slots, std::size_t 
     catch (...) { std::terminate(); }
 }
 void vd_gc_frame_leave(void* frame) noexcept { static_cast<vd::Runtime::Frame*>(frame)->~Frame(); }
+void vd_cleanup_failure(vd::RuntimeFailure* primary,const vd::RuntimeFailure* cleanup) noexcept {
+    if(!cleanup->message)return;
+    if(!primary->message){*primary=*cleanup;return;}
+    auto append=[&](const char* message){if(primary->count<32)primary->frames[primary->count++]=message;else primary->count=33;};
+    append("Additional failure during defer:\n");append(cleanup->message);
+    for(unsigned n=0;n<cleanup->count && n<32;++n)append(cleanup->frames[n]);
+}
+bool vd_gc_release(void* object) noexcept {try{return vd::Runtime::current().begin_release(object);}catch(...){std::terminate();}}
 void vd_gc_poll() noexcept {
     try { vd::Runtime::current().poll(); } catch (...) { std::terminate(); }
 }

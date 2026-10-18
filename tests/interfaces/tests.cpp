@@ -15,7 +15,7 @@ std::shared_ptr<const vd::ValidatedAnalysis> analyze(const std::string& text) {
     auto result=vd::analyze_source({"/interfaces.void",text});if(!result.succeeded()) throw vd::CompilationError(result.diagnostics);return result.program;
 }
 void rejects(const std::string& text,const std::string& fragment) {
-    auto result=vd::analyze_source({"/interfaces.void",text});require(!result.succeeded(),"invalid interface source accepted");bool found=false;
+    auto result=vd::analyze_source({"/interfaces.void",text});if(result.succeeded())throw std::runtime_error("invalid interface source accepted:\n"+text);bool found=false;
     for(const auto& d:result.diagnostics) {require(d.primary.source && d.primary.end>d.primary.begin,"interface diagnostic lost source span");found|=d.description.find(fragment)!=std::string::npos;}
     if(!found) throw vd::CompilationError(result.diagnostics);
 }

@@ -243,6 +243,11 @@ void Runtime::store(void* object, std::size_t offset, void* value) {
     std::lock_guard lock(mutex_);
     heap_.store(object, offset, value);
 }
+bool Runtime::begin_release(void* object) {
+    require_managed();std::lock_guard lock(mutex_);auto found=heap_.objects_.find(object);
+    if(found==heap_.objects_.end() || found->second.kind!=TypeLayout::Kind::ordinary || !found->second.metadata)throw std::invalid_argument("Invalid resource receiver");
+    if(found->second.released)return false;found->second.released=true;return true;
+}
 bool Runtime::contains(void* p) const { std::lock_guard lock(mutex_); return heap_.contains(p); }
 Runtime::Snapshot Runtime::snapshot() const {
     std::lock_guard lock(mutex_);

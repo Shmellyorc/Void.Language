@@ -251,8 +251,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     auto element_record=[&](ir::Type root)->llvm::Constant* {
         if(auto found=element_records.find(root);found!=element_records.end())return found->second;
         std::vector<llvm::Constant*> fields;
-        std::function<void(ir::Type,std::uint64_t)> visit=[&](ir::Type t,std::uint64_t offset) {
-            if(t.kind==ir::Type::aggregate) {for(unsigned n=0;n<t.definition->fields.size();++n)visit(ir::field_type(t,n),offset+field_offset(t,n));return;}
+        std::function<void(ir::Type,std::uint64_t,bool)> visit=[&](ir::Type t,std::uint64_t offset,bool inactive) {
+            if(t.kind==ir::Type::aggregate) {for(unsigned n=0;n<t.definition->fields.size();++n)visit(ir::field_type(t,n),offset+field_offset(t,n),inactive || (!t.definition->cases.empty() && n!=0));return;}
             unsigned kind;std::string target;std::uint64_t extent=0;
             if(numeric::number(t) || t==ir::Type::boolean)kind=scalar_encoding(t);
             else if(t.kind==ir::Type::managed_ref){kind=11;target=ir::Type::key(t);}
@@ -262,8 +262,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             else if(t.kind==ir::Type::growable_array){kind=15;target=list_key(ir::array_element(t));}
             else if(t.kind==ir::Type::dictionary){kind=16;target="void.dict.v1/"+element_key(ir::array_element(t));}
             else throw std::invalid_argument("unsupported native array element");
-            fields.push_back(llvm::ConstantStruct::get(element_field_type,{b.CreateGlobalStringPtr(target),llvm::ConstantInt::get(size_type,offset),b.getInt64(extent),b.getInt32(kind),b.getInt32(t.nullable)}));
-        };visit(root,0);
+            fields.push_back(llvm::ConstantStruct::get(element_field_type,{b.CreateGlobalStringPtr(target),llvm::ConstantInt::get(size_type,offset),b.getInt64(extent),b.getInt32(kind),b.getInt32(t.nullable || (inactive && (kind==11 || kind==13 || kind>=14)))}));
+        };visit(root,0,false);
         auto* fields_type=llvm::ArrayType::get(element_field_type,fields.size());auto* data=new llvm::GlobalVariable(*module,fields_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantArray::get(fields_type,fields),"array.element.fields");
         auto* record=new llvm::GlobalVariable(*module,element_record_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantStruct::get(element_record_type,{b.CreateGlobalStringPtr(element_key(root)),llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(type(root))),llvm::ConstantInt::get(size_type,layout.getABITypeAlign(type(root)).value()),llvm::ConstantInt::get(size_type,fields.size()),data}),"array.element");
         element_records.emplace(root,record);return record;
@@ -290,6 +290,42 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         const auto linkage = default_functions.contains(f.name) || (!f.module_identity.empty() && f.visibility == "private" && f.name != exported_entry)
             ? llvm::Function::InternalLinkage : llvm::Function::ExternalLinkage;
         functions[f.name] = llvm::Function::Create(function_type, linkage, native_symbol(f, suffix), *module);
+    }
+    std::map<std::string,std::uint64_t> function_ids;
+    for(const auto& [name,function]:functions)function_ids.emplace(name,function_ids.size()+1);
+    std::map<std::string,llvm::Function*> callable_dispatchers;
+    std::map<std::string,ir::Type> callable_types;
+    std::vector<ir::Type> pending_callables;
+    for(auto t:input.nominal_types)pending_callables.push_back(t);
+    for(const auto& f:input.functions){pending_callables.push_back(f.result);pending_callables.insert(pending_callables.end(),f.parameters.begin(),f.parameters.end());pending_callables.insert(pending_callables.end(),f.locals.begin(),f.locals.end());}
+    std::set<const ir::ValueType*> seen_callable_types;
+    while(!pending_callables.empty()){
+        auto t=pending_callables.back();pending_callables.pop_back();if(!t.definition || !seen_callable_types.insert(t.definition.get()).second)continue;
+        if(t.definition->callable){callable_types.emplace(ir::Type::key(t),t);for(const auto& p:t.definition->call_parameters)pending_callables.push_back(p);pending_callables.push_back(*t.definition->call_result);}
+        if(t.definition->element)pending_callables.push_back(*t.definition->element);for(const auto& field:t.definition->fields)pending_callables.push_back(field.type);
+    }
+    for(const auto& [key,t]:callable_types){
+        std::vector<llvm::Type*> parameters{type(t)};for(const auto& p:t.definition->call_parameters)parameters.push_back(type(p));parameters.push_back(b.getPtrTy());auto result=ir::Type(*t.definition->call_result);
+        auto* dispatcher=llvm::Function::Create(llvm::FunctionType::get(type(result),parameters,false),llvm::GlobalValue::InternalLinkage,"callable_dispatch",*module);callable_dispatchers.emplace(key,dispatcher);
+        b.SetInsertPoint(llvm::BasicBlock::Create(context,"select_callable",dispatcher));auto* invalid=llvm::BasicBlock::Create(context,"invalid_callable",dispatcher);auto* selected=b.CreateSwitch(b.CreateExtractValue(dispatcher->getArg(0),0),invalid);
+        for(const auto& target:input.functions){
+            if(target.receiver || target.initializer || target.parameters.size()!=t.definition->call_parameters.size()+(target.closure?1:0) || target.result!=result || !ir::capability_assignable(target.result,result))continue;
+            bool same=true;for(unsigned n=0;n<t.definition->call_parameters.size();++n)same&=target.parameters[n+(target.closure?1:0)]==ir::Type(t.definition->call_parameters[n]) && ir::capability_key(target.parameters[n+(target.closure?1:0)])==ir::capability_key(t.definition->call_parameters[n]);if(!same)continue;
+            auto* invoke=llvm::BasicBlock::Create(context,"invoke_callable",dispatcher);selected->addCase(b.getInt64(function_ids.at(target.name)),invoke);b.SetInsertPoint(invoke);
+            std::vector<llvm::Value*> arguments;if(target.closure)arguments.push_back(b.CreateExtractValue(dispatcher->getArg(0),1));for(unsigned n=1;n<dispatcher->arg_size();++n)arguments.push_back(dispatcher->getArg(n));auto* value=b.CreateCall(functions.at(target.name),arguments);if(result==ir::Type::none)b.CreateRetVoid();else b.CreateRet(value);
+        }
+        b.SetInsertPoint(invalid);b.CreateStore(b.CreateGlobalStringPtr("Null or incompatible function value"),dispatcher->getArg(dispatcher->arg_size()-1));if(result==ir::Type::none)b.CreateRetVoid();else b.CreateRet(llvm::Constant::getNullValue(type(result)));
+    }
+    std::map<std::string,llvm::Function*> callable_comparisons;
+    for(const auto& [key,t]:callable_types){
+        auto* compare=llvm::Function::Create(llvm::FunctionType::get(b.getInt1Ty(),{type(t),type(t)},false),llvm::GlobalValue::InternalLinkage,"callable_identity",*module);callable_comparisons.emplace(key,compare);
+        auto* entry=llvm::BasicBlock::Create(context,"compare",compare);auto* choose=llvm::BasicBlock::Create(context,"same_function",compare);auto* different=llvm::BasicBlock::Create(context,"different",compare);auto* ordinary=llvm::BasicBlock::Create(context,"closure_identity",compare);b.SetInsertPoint(entry);auto* left=compare->getArg(0);auto* right=compare->getArg(1);b.CreateCondBr(b.CreateICmpEQ(b.CreateExtractValue(left,0),b.CreateExtractValue(right,0)),choose,different);b.SetInsertPoint(different);b.CreateRet(b.getFalse());b.SetInsertPoint(choose);auto* selected=b.CreateSwitch(b.CreateExtractValue(left,0),ordinary);
+        for(const auto& target:input.functions)if(target.bound_receiver){
+            if(target.parameters.size()!=t.definition->call_parameters.size()+1 || target.result!=ir::Type(*t.definition->call_result))continue;bool same=true;for(unsigned n=0;n<t.definition->call_parameters.size();++n)same&=target.parameters[n+1]==ir::Type(t.definition->call_parameters[n]);if(!same)continue;
+            auto* bound=llvm::BasicBlock::Create(context,"bound_receiver",compare);selected->addCase(b.getInt64(function_ids.at(target.name)),bound);b.SetInsertPoint(bound);auto environment=target.parameters[0];auto receiver=ir::field_type(environment,0);auto* a=b.CreateLoad(type(receiver),field_address(environment,b.CreateExtractValue(left,1),0));auto* c=b.CreateLoad(type(receiver),field_address(environment,b.CreateExtractValue(right,1),0));llvm::Value* equal;
+            if(receiver.kind==ir::Type::interface_ref)equal=b.CreateAnd(b.CreateICmpEQ(b.CreateExtractValue(a,0),b.CreateExtractValue(c,0)),b.CreateICmpEQ(b.CreateExtractValue(a,1),b.CreateExtractValue(c,1)));else equal=b.CreateICmpEQ(a,c);b.CreateRet(equal);
+        }
+        b.SetInsertPoint(ordinary);b.CreateRet(b.CreateICmpEQ(b.CreateExtractValue(left,1),b.CreateExtractValue(right,1)));
     }
     std::map<std::string,ir::Type> nominal_types;
     for(auto t:input.nominal_types) if(t.kind==ir::Type::managed_ref || t.kind==ir::Type::interface_ref) nominal_types.emplace(t.definition->identity,t);
@@ -356,6 +392,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     for(const auto& [scope,imports]:input.source_imports) {access_contract+=encoded(scope);for(const auto& imported:imports) access_contract+=encoded(imported);}
     for(auto t:input.nominal_types) {
         access_contract+=encoded(ir::type_name(t))+encoded(std::to_string(t.kind))+encoded(t.definition->module_identity)+encoded(t.definition->visibility);auto base=t.definition->base.lock();access_contract+=encoded(base ? base->identity : "");
+        for(const auto& variant:t.definition->cases)access_contract+=encoded(variant.name)+encoded(std::to_string(variant.begin))+encoded(std::to_string(variant.count));
         for(const auto& field:t.definition->fields) access_contract+=encoded(field.name)+encoded(field.owner)+encoded(ir::type_name(field.type))+(field.using_field ? "U;" : "F;");
     }
     for(const auto& f:input.functions) if(!default_functions.contains(f.name)){access_contract+=encoded(f.name)+encoded(f.visibility)+encoded(f.virtual_slot);for(auto t:f.parameters) access_contract+=encoded(ir::type_name(t))+encoded(ir::capability_key(t));access_contract+=encoded(ir::type_name(f.result))+encoded(ir::capability_key(f.result));}
@@ -472,7 +509,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         auto leave_frame = [&] {
             if (input.coordinated) b.CreateCall(module->getOrInsertFunction("vd_gc_frame_leave", b.getVoidTy(), b.getPtrTy()), {root_frame});
         };
+        unsigned active_block=0;
         auto return_failure = [&] {
+            if(f.cleanup_entry && active_block<*f.cleanup_entry){b.CreateBr(blocks[*f.cleanup_entry]);return;}
             leave_frame();
             if (f.result == ir::Type::none) b.CreateRetVoid();
             else b.CreateRet(llvm::Constant::getNullValue(type(f.result)));
@@ -538,7 +577,16 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             b.CreateStore(b.CreateLoad(type(t),source),destination);
             if(t.kind==ir::Type::aggregate)for(unsigned field=0;field<t.definition->fields.size();++field) {
                 auto child=ir::field_type(t,field);
-                if(contains_arrays(child))copy_value(child,field_address(t,destination,field),field_address(t,source,field),check_failure);
+                if(contains_arrays(child)) {
+                    llvm::BasicBlock* done=nullptr;
+                    if(!t.definition->cases.empty()) {
+                        unsigned variant=0;for(;variant<t.definition->cases.size();++variant){const auto& c=t.definition->cases[variant];if(field>=c.begin && field<c.begin+c.count)break;}
+                        auto* active=llvm::BasicBlock::Create(context,"copy_active_payload",fn);done=llvm::BasicBlock::Create(context,"copy_payload_done",fn);
+                        b.CreateCondBr(b.CreateICmpEQ(b.CreateLoad(b.getInt32Ty(),field_address(t,source,0)),b.getInt32(variant)),active,done);b.SetInsertPoint(active);
+                    }
+                    copy_value(child,field_address(t,destination,field),field_address(t,source,field),check_failure);
+                    if(done){b.CreateBr(done);b.SetInsertPoint(done);}
+                }
             }
         };
         copy_children=[&](ir::Type t,llvm::Value* destination,llvm::Value* count,const std::function<void()>& check_failure) {
@@ -611,7 +659,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 {root_frame,root_array,llvm::ConstantInt::get(size_type,entries.size())});
         }
         for (std::size_t n = 0; n < f.blocks.size(); ++n) {
-            b.SetInsertPoint(blocks[n]);
+            active_block=n;b.SetInsertPoint(blocks[n]);
             if (input.coordinated) b.CreateCall(module->getOrInsertFunction("vd_gc_poll",b.getVoidTy()));
             std::vector<llvm::Value*> values;
             std::vector<ir::Type> value_types;
@@ -633,23 +681,33 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 };
                 // IR operand types preserve signedness, even when native widths coincide.
                 auto operand_type = [&](unsigned id) { return value_types.at(id); };
-                auto guard_complete = [&](ir::Type value_type,llvm::Value* value) {
-                    for (const auto& path:ir::reference_paths(value_type)) {
-                        if(std::find(path.begin(),path.end(),ir::array_element_path)!=path.end())continue;
-                        auto leaf=value_type;
-                        for (auto field:path) leaf=ir::field_type(leaf,field);
-                        auto* reference=path.empty() ? value : b.CreateExtractValue(value,path);
-                        if(leaf.kind==ir::Type::interface_ref) {
-                            auto* object=b.CreateExtractValue(reference,0);auto* witness=b.CreateExtractValue(reference,1);
-                            auto* selected=binding_index(reference);auto* bad=b.CreateICmpSLT(selected,b.getInt64(0));
-                            // A witness for a different nominal interface is not valid storage.
-                            llvm::Value* known=b.getFalse();
-                            for(unsigned n=0;n<bindings.size();++n) if(bindings[n]->interface.definition==leaf.definition) known=b.CreateOr(known,b.CreateICmpEQ(selected,b.getInt64(n)));
-                            bad=b.CreateOr(bad,b.CreateNot(known));
-                            if(leaf.nullable) bad=b.CreateAnd(bad,b.CreateNot(b.CreateAnd(b.CreateIsNull(object),b.CreateIsNull(witness))));
-                            fail_if(bad,"Invalid interface field binding");
-                        } else if(!leaf.nullable) fail_if(b.CreateIsNull(reference),"Null supplied for non-nullable field");
+                std::function<void(ir::Type,llvm::Value*)> guard_complete;
+                guard_complete = [&](ir::Type value_type,llvm::Value* value) {
+                    if(value_type.definition && value_type.definition->callable){if(!value_type.nullable)fail_if(b.CreateICmpEQ(b.CreateExtractValue(value,0),b.getInt64(0)),"Null supplied for non-nullable function field");return;}
+                    if(value_type.kind==ir::Type::aggregate) {
+                        for(unsigned field=0;field<value_type.definition->fields.size();++field) {
+                            llvm::BasicBlock* done=nullptr;
+                            if(!value_type.definition->cases.empty() && field) {
+                                unsigned variant=0;for(;variant<value_type.definition->cases.size();++variant){const auto& c=value_type.definition->cases[variant];if(field>=c.begin && field<c.begin+c.count)break;}
+                                auto* active=llvm::BasicBlock::Create(context,"validate_active_payload",fn);done=llvm::BasicBlock::Create(context,"validate_payload_done",fn);
+                                b.CreateCondBr(b.CreateICmpEQ(b.CreateExtractValue(value,0),b.getInt32(variant)),active,done);b.SetInsertPoint(active);
+                            }
+                            guard_complete(ir::field_type(value_type,field),b.CreateExtractValue(value,field));
+                            if(done){b.CreateBr(done);b.SetInsertPoint(done);}
+                        }
+                        return;
                     }
+                    if(!ir::reference_value(value_type))return;
+                    auto leaf=value_type;auto* reference=value;
+                    if(leaf.kind==ir::Type::interface_ref) {
+                        auto* object=b.CreateExtractValue(reference,0);auto* witness=b.CreateExtractValue(reference,1);
+                        auto* selected=binding_index(reference);auto* bad=b.CreateICmpSLT(selected,b.getInt64(0));
+                        llvm::Value* known=b.getFalse();
+                        for(unsigned n=0;n<bindings.size();++n)if(bindings[n]->interface.definition==leaf.definition)known=b.CreateOr(known,b.CreateICmpEQ(selected,b.getInt64(n)));
+                        bad=b.CreateOr(bad,b.CreateNot(known));
+                        if(leaf.nullable)bad=b.CreateAnd(bad,b.CreateNot(b.CreateAnd(b.CreateIsNull(object),b.CreateIsNull(witness))));
+                        fail_if(bad,"Invalid interface field binding");
+                    } else if(!leaf.nullable)fail_if(b.CreateIsNull(reference),"Null supplied for non-nullable field");
                 };
                 auto array_failure=[&] {fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Array operation failed");};
                 auto native_arg=[&](ir::Type t,unsigned id,bool own=false)->llvm::Value* {
@@ -834,6 +892,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     }
                     break;
                 }
+                case Op::gc_release:v=b.CreateCall(module->getOrInsertFunction("vd_gc_release",b.getInt1Ty(),b.getPtrTy()),{values[instruction.a]});break;
                 case Op::gc_alive:
                     v = b.CreateCall(module->getOrInsertFunction("vd_gc_alive",b.getInt1Ty(),b.getPtrTy()),{values[instruction.a]}); break;
                 case Op::stage_begin: {
@@ -894,6 +953,70 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     else v = b.CreateStore(stored,address);
                     break;
                 }
+                case Op::cleanup_call:{
+                    llvm::IRBuilder<> entry_builder(&*fn->getEntryBlock().begin());auto* secondary=home(entry_builder.CreateAlloca(failure_type),StorageRole::known_abi,llvm_backend::HomeKind::value);
+                    b.CreateStore(llvm::Constant::getNullValue(failure_type),secondary);
+                    b.CreateCall(callable_dispatchers.at(ir::Type::key(operand_type(instruction.a))),{values[instruction.a],secondary});
+                    b.CreateCall(module->getOrInsertFunction("vd_cleanup_failure",b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{failure,secondary});break;
+                }
+                case Op::function_null:v=llvm::Constant::getNullValue(type(instruction.type));break;
+                case Op::function_reference:v=llvm::Constant::getNullValue(type(instruction.type));v=b.CreateInsertValue(v,b.getInt64(function_ids.at(instruction.callee)),0);if(!instruction.arguments.empty())v=b.CreateInsertValue(v,values[instruction.arguments[0]],1);break;
+                case Op::panic:
+                    fail_if(b.getTrue(),instruction.callee);v=llvm::UndefValue::get(b.getInt32Ty());break;
+                case Op::type_test: case Op::type_cast: {
+                    auto from=operand_type(instruction.a);auto* object=values[instruction.a];if(from.kind==ir::Type::interface_ref)object=b.CreateExtractValue(object,0);
+                    auto* selected=b.CreateCall(module->getOrInsertFunction("vd_gc_dynamic_type",b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),size_type),{object,dynamic_keys,llvm::ConstantInt::get(size_type,keys.size())});
+                    llvm::Value* matches=b.getFalse();llvm::Value* witness=llvm::ConstantPointerNull::get(b.getPtrTy());unsigned index=0;
+                    for(const auto& [key,dynamic]:nominal_types){
+                        if(dynamic.kind==ir::Type::managed_ref) {
+                            if(instruction.type.kind==ir::Type::managed_ref && ir::subtype(dynamic,instruction.type))matches=b.CreateOr(matches,b.CreateICmpEQ(selected,b.getInt64(index)));
+                            if(instruction.type.kind==ir::Type::interface_ref)for(const auto* binding:bindings)if(binding->view==dynamic && binding->interface==instruction.type){auto* found=b.CreateICmpEQ(selected,b.getInt64(index));matches=b.CreateOr(matches,found);auto* value=b.CreateCall(module->getOrInsertFunction("vd_gc_witness",b.getPtrTy(),b.getPtrTy()),{b.CreateGlobalStringPtr(binding->key)});witness=b.CreateSelect(found,value,witness);}
+                        }
+                        ++index;
+                    }
+                    if(instruction.op==Op::type_test)v=matches;else{
+                        fail_if(b.CreateNot(matches),"Managed type pattern conversion failed");v=object;
+                        if(instruction.type.kind==ir::Type::interface_ref){v=llvm::Constant::getNullValue(type(instruction.type));v=b.CreateInsertValue(v,object,0);v=b.CreateInsertValue(v,witness,1);}
+                    }break;
+                }
+                case Op::pattern_equal: {
+                    std::function<llvm::Value*(ir::Type,llvm::Value*,llvm::Value*)> compare;
+                    compare=[&](ir::Type t,llvm::Value* left,llvm::Value* right)->llvm::Value* {
+                        if(t.kind==ir::Type::aggregate) {
+                            llvm::Value* equal=b.getTrue();
+                            if(!t.definition->cases.empty())equal=b.CreateICmpEQ(b.CreateExtractValue(left,0),b.CreateExtractValue(right,0));
+                            for(unsigned field=t.definition->cases.empty()?0u:1u;field<t.definition->fields.size();++field) {
+                                llvm::BasicBlock* done=nullptr;llvm::BasicBlock* skipped=nullptr;
+                                if(!t.definition->cases.empty()) {
+                                    unsigned variant=0;for(;variant<t.definition->cases.size();++variant){const auto& c=t.definition->cases[variant];if(field>=c.begin && field<c.begin+c.count)break;}
+                                    auto* active=llvm::BasicBlock::Create(context,"compare_active_payload",fn);done=llvm::BasicBlock::Create(context,"compare_payload_done",fn);skipped=b.GetInsertBlock();
+                                    b.CreateCondBr(b.CreateAnd(equal,b.CreateICmpEQ(b.CreateExtractValue(left,0),b.getInt32(variant))),active,done);b.SetInsertPoint(active);
+                                }
+                                auto* next=b.CreateAnd(equal,compare(ir::field_type(t,field),b.CreateExtractValue(left,field),b.CreateExtractValue(right,field)));
+                                if(done){auto* active_end=b.GetInsertBlock();b.CreateBr(done);b.SetInsertPoint(done);auto* phi=b.CreatePHI(b.getInt1Ty(),2);phi->addIncoming(equal,skipped);phi->addIncoming(next,active_end);equal=phi;}else equal=next;
+                            }
+                            return equal;
+                        }
+                        if(t.definition && t.definition->callable)return b.CreateCall(callable_comparisons.at(ir::Type::key(t)),{left,right});
+                        if(t==ir::Type::string){auto* result=b.CreateCall(module->getOrInsertFunction("vd_string_equal",b.getInt1Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{left,right,failure});array_failure();return result;}
+                        if(t.kind==ir::Type::interface_ref){left=b.CreateExtractValue(left,0);right=b.CreateExtractValue(right,0);}
+                        if(numeric::floating(t))return b.CreateFCmpOEQ(left,right);
+                        return b.CreateICmpEQ(left,right);
+                    };
+                    v=compare(operand_type(instruction.a),values[instruction.a],values[instruction.b]);break;
+                }
+                case Op::sum: {
+                    auto t=instruction.type;v=llvm::Constant::getNullValue(type(t));v=b.CreateInsertValue(v,b.getInt32(instruction.immediate),0);
+                    const auto& variant=t.definition->cases.at(instruction.immediate);
+                    for(unsigned field=0;field<instruction.arguments.size();++field)v=b.CreateInsertValue(v,values[instruction.arguments[field]],variant.begin+field);
+                    guard_complete(t,v);break;
+                }
+                case Op::sum_get: {
+                    auto t=operand_type(instruction.a);unsigned variant=0;
+                    for(;variant<t.definition->cases.size();++variant){const auto& c=t.definition->cases[variant];if(instruction.immediate>=c.begin && instruction.immediate<c.begin+c.count)break;}
+                    fail_if(b.CreateICmpNE(b.CreateExtractValue(values[instruction.a],0),b.getInt32(variant)),"Enum/result payload does not match its active variant");
+                    v=b.CreateExtractValue(values[instruction.a],static_cast<unsigned>(instruction.immediate));break;
+                }
                 case Op::aggregate:
                     v = llvm::Constant::getNullValue(type(instruction.type));
                     for (unsigned n = 0; n < instruction.arguments.size(); ++n) v = b.CreateInsertValue(v,values[instruction.arguments[n]],{n});
@@ -928,6 +1051,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 case Op::upcast: case Op::stage_prefix: v=values[instruction.a]; break;
                 case Op::convert: {
                     auto* a = values[instruction.a]; auto from = operand_type(instruction.a), to = instruction.type;
+                    if(from.definition && from.definition->callable){if(!to.nullable)fail_if(b.CreateICmpEQ(b.CreateExtractValue(a,0),b.getInt64(0)),"Null function value in checked conversion");v=a;break;}
                     if(ir::reference_value(from)) {
                         if(!to.nullable) fail_if(b.CreateIsNull(from.kind==ir::Type::interface_ref ? b.CreateExtractValue(a,0) : a),from.kind==ir::Type::interface_ref ? "Null interface reference in checked conversion" : "Null managed reference in checked conversion");
                         if(from.kind==ir::Type::interface_ref) guard_complete(to,a);
@@ -972,6 +1096,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:
                 case Op::equal: case Op::not_equal: case Op::less: case Op::less_equal: case Op::greater: case Op::greater_equal: {
                     auto* a = values[instruction.a]; auto* divisor = values[instruction.b];
+                    if(operand_type(instruction.a).definition && operand_type(instruction.a).definition->callable){auto* same=b.CreateCall(callable_comparisons.at(ir::Type::key(operand_type(instruction.a))),{a,divisor});v=instruction.op==Op::equal?same:b.CreateNot(same);break;}
                     if(operand_type(instruction.a).kind==ir::Type::interface_ref) {a=b.CreateExtractValue(a,0);divisor=b.CreateExtractValue(divisor,0);}
                     bool floating = a->getType()->isFloatingPointTy();
                     bool sign = numeric::signed_integer(operand_type(instruction.a));
@@ -1012,7 +1137,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     }
                     v=b.CreateStore(value,slots[instruction.a]);break;
                 }
-                case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
+                case Op::function_call: case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
                     if(instruction.op==Op::base_init && instruction.callee.empty()) {
                         auto* address=b.CreateLoad(b.getPtrTy(),slots[0]);
                         for(unsigned field=0;field<instruction.arguments.size();++field) {
@@ -1023,6 +1148,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         break;
                     }
                     std::vector<llvm::Value*> arguments;
+                    if(instruction.op==Op::function_call)arguments.push_back(values[instruction.a]);
                     if (instruction.receiver) {
                         auto* address = slots.at(instruction.receiver->slot);
                         auto t = f.locals.at(instruction.receiver->slot);
@@ -1038,7 +1164,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     bool legacy_single = imported;
                     for (const auto& target : input.functions) if (target.name == instruction.callee) legacy_single = !target.receiver && target.parameters.size() == 1;
                     if (arguments.empty() && legacy_single) arguments.push_back(values[instruction.a]);
-                    auto* callee = instruction.op==Op::interface_call ? interface_dispatchers.at(instruction.callee) : functions.at(instruction.callee);
+                    auto* callee = instruction.op==Op::function_call ? callable_dispatchers.at(ir::Type::key(operand_type(instruction.a))) : instruction.op==Op::interface_call ? interface_dispatchers.at(instruction.callee) : functions.at(instruction.callee);
                     if(instruction.op==Op::virtual_call) {
                         for(const auto& target:input.functions) if(target.name==instruction.callee) callee=dispatchers.at(target.virtual_slot);
                     }
@@ -1088,6 +1214,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 values.push_back(v);
             }
             const auto& end = f.blocks[n].end;
+            if(f.cleanup_entry && n>=*f.cleanup_entry && (end.kind==ir::Terminator::Kind::return_value || end.kind==ir::Terminator::Kind::return_void)){
+                auto* failed=llvm::BasicBlock::Create(context,"cleanup_failed",fn);auto* ready=llvm::BasicBlock::Create(context,"cleanup_complete",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),failed,ready);b.SetInsertPoint(failed);return_failure();b.SetInsertPoint(ready);
+            }
             switch (end.kind) {
             case ir::Terminator::Kind::return_value: {
                 auto* value=values[end.value];
@@ -1179,8 +1308,8 @@ Jit::Jit() : impl_(std::make_shared<Impl>()) {
     bind("vd_gc_dynamic_type",vd_gc_dynamic_type);
     bind("vd_gc_witness",vd_gc_witness);
     bind("vd_gc_interface_binding",vd_gc_interface_binding);
-    bind("vd_gc_poll",vd_gc_poll); bind("vd_gc_collect",vd_gc_collect); bind("vd_gc_allocate",vd_gc_allocate);
-    bind("vd_gc_alive",vd_gc_alive); bind("vd_gc_native_enter",vd_gc_native_enter); bind("vd_gc_native_leave",vd_gc_native_leave);
+    bind("vd_cleanup_failure",vd_cleanup_failure);bind("vd_gc_poll",vd_gc_poll); bind("vd_gc_collect",vd_gc_collect); bind("vd_gc_allocate",vd_gc_allocate);
+    bind("vd_gc_release",vd_gc_release);bind("vd_gc_alive",vd_gc_alive); bind("vd_gc_native_enter",vd_gc_native_enter); bind("vd_gc_native_leave",vd_gc_native_leave);
 }
 Jit::~Jit() = default;
 void Jit::bind_address(std::string name, std::uintptr_t entry) {
@@ -1231,7 +1360,8 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
             if (!t.definition || layouts.contains(t.definition->identity)) return;
             auto base=t.definition->base.lock();
             std::string text = encoded(t.definition->identity) + "base:"+encoded(base ? base->identity : "")+"{";
-            for (const auto& field : t.definition->fields) text += encoded(field.name) + ":"+encoded(field.owner)+":"+encoded(ir::type_name(field.type))+";";
+            for (const auto& field : t.definition->fields) text += encoded(field.name) + ":"+encoded(field.owner)+":"+encoded(ir::type_name(field.type))+":"+encoded(ir::capability_key(field.type))+";";
+            for(const auto& variant:t.definition->cases)text+=encoded(variant.name)+":"+std::to_string(variant.begin)+":"+std::to_string(variant.count)+";";
             layouts.emplace(t.definition->identity,text + "}");
             for (const auto& field : t.definition->fields) record(field.type);
         };

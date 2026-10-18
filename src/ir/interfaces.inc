@@ -78,6 +78,7 @@ static Module::Binding structural_conformance(const Module& m,Type view,Type int
         const Function* target=nullptr;
         for(const auto* family:{&m.functions,&m.interface_requirements})for(const auto& f:*family)if(f.name==selected.method)target=&f;
         if(!target) fail("Missing binding method header");
+        if(target->accessor)fail("A property cannot satisfy a method requirement");
         bool exact=target->parameters.size()==requirement.parameters.size() && target->result==requirement.result;
         for(unsigned n=1;exact && n<requirement.parameters.size();++n)
             exact=target->parameters[n]==requirement.parameters[n] && target->parameters[n].readonly==requirement.parameters[n].readonly && readonly_paths(target->parameters[n])==readonly_paths(requirement.parameters[n]);

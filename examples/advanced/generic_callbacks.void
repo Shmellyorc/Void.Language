@@ -1,0 +1,15 @@
+struct generic_callable:
+    n: i32
+func (g generic_callable) call<t>(value: t) -> t:
+    return value
+func identity<t>(value: t) -> t:
+    return value
+func entry(value: i32) -> i32:
+    var g = generic_callable(n=0)
+    var narrow: func(i32) -> i32 = g
+    var wide: func(i64) -> i64 = g
+    var generic = identity<i32>
+    var nested = identity<func(i32) -> i32>
+    var method = g.call<i32>
+    var inferred: func(i64) -> i64 = g.call
+    return narrow(value) + wide(value as i64) as i32 + nested(generic)(value) + method(value) + inferred(value as i64) as i32

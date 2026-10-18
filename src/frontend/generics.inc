@@ -12,7 +12,7 @@ auto specialization_name=[&](const SourceFile& source,const Token& token,const s
     return result+">";
 };
 auto transfer_syntax=[](Unit& owner,Unit& parsed) {
-    owner.arrays.splice(owner.arrays.end(),parsed.arrays);owner.applications.splice(owner.applications.end(),parsed.applications);
+    owner.function_types.splice(owner.function_types.end(),parsed.function_types);owner.results.splice(owner.results.end(),parsed.results);owner.arrays.splice(owner.arrays.end(),parsed.arrays);owner.applications.splice(owner.applications.end(),parsed.applications);
     owner.type_uses.insert(owner.type_uses.end(),std::make_move_iterator(parsed.type_uses.begin()),std::make_move_iterator(parsed.type_uses.end()));
 };
 std::vector<std::function<void()>> pending_generic_constraints;
@@ -43,7 +43,7 @@ for(auto& [id,u]:units) {
         Unit parsed(owner.source,owner.identity);Parser(owner.source,diagnostics,generic.syntax,std::move(bindings)).parse(parsed);
         if(parsed.parse_failed || parsed.functions.size()!=1)throw Poison{};
         transfer_syntax(owner,parsed);owner.functions.splice(owner.functions.end(),parsed.functions);
-        auto& concrete=owner.functions.back();
+        auto& concrete=owner.functions.back();concrete.accessor=generic.accessor;
         for(const auto& p:generic.generics)concrete.substitution_sources.emplace(p.token.text,generic.symbol+"::type::"+p.token.text);
         if(generic.receiver)for(const auto& s:owner.structures)if(s.definition==receiver.definition && s.generic_origin)
             for(const auto& p:s.generic_origin->generics)concrete.substitution_sources.emplace(p.token.text,s.generic_origin->definition->identity+"::type::"+p.token.text);
@@ -81,7 +81,7 @@ for(auto& [id,u]:units) {
             if(application==owner.applications.end() || application->name!=generic.token.text)continue;
             Unit body(owner.source,owner.identity);Parser(owner.source,diagnostics,method.syntax,bindings).parse(body);
             if(body.parse_failed || body.functions.size()!=1)throw Poison{};
-            transfer_syntax(owner,body);owner.functions.splice(owner.functions.end(),body.functions);auto& f=owner.functions.back();
+            transfer_syntax(owner,body);owner.functions.splice(owner.functions.end(),body.functions);auto& f=owner.functions.back();f.accessor=method.accessor;
             f.generic_origin=generic.definition->identity+"::method::"+method.token.text;f.display_name=generic.token.text+"::method::"+method.token.text;f.instantiation_context=context;f.specialization_depth=depth;
             for(const auto& p:generic.generics)f.substitution_sources.emplace(p.token.text,generic.definition->identity+"::type::"+p.token.text);
             methods.push_back(&f);

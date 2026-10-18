@@ -313,3 +313,17 @@ rejection. Constructor binding uses existing VOID2004/2005 and type errors, pure
 initialization uses VOID2011, and access uses VOID3003. Unavailable nested defaults
 identify the field and required initializer parameter. Existing source snapshots,
 bounded recovery and backend-before-publication gates remain.
+
+## Stage 4 patterns and cleanup
+
+VOID2021 is the nonfatal incomplete-match warning. Exhaustive matches do not emit
+it. Warnings accompany successful analysis and reach CLI/LSP clients through the
+same owned Diagnostic representation; they do not consume the error-recovery
+budget or suppress later errors. An unmatched statement is a no-op; an unmatched
+expression raises a source-located Runtime failure. Existing type, readonly,
+lifecycle and control-flow codes cover the new source forms.
+
+Cleanup uses the existing bounded RuntimeFailure trace: the original failure
+remains primary, additional deferred failures attach diagnostics, and remaining
+applicable cleanup continues. See ADVANCED_LANGUAGE.md and WORK_LOG.md for tests
+and the boundary against native process corruption or forced termination.

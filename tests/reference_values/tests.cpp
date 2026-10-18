@@ -16,7 +16,7 @@ std::shared_ptr<const vd::ValidatedAnalysis> analyze(const std::string& text) {
 }
 void invalid(const std::string& source,const std::string& reason) {
     auto result=vd::analyze_source({"/reference.void",source});
-    require(!result.succeeded(),"unsafe reference value accepted");bool found=false;
+    if(result.succeeded())throw std::runtime_error("unsafe reference value accepted:\n"+source);bool found=false;
     for(const auto& d:result.diagnostics) {
         require(d.primary.source && d.primary.source->text()==source && d.primary.end>d.primary.begin,"reference value diagnostic lost source span");
         found|=d.description.find(reason)!=std::string::npos;

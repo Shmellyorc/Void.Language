@@ -47,9 +47,73 @@ If an implementation exposes a contradiction between agreed features, prefer a s
 
 VOID 2.0 is a proposed, compact, statically typed, garbage-collected, natively compiled language drawing ideas from Python, Go, Lua, PICO-8, GDScript, and useful C# features. It is **not** intended to reproduce C# or become an Odin clone. The developer wants all identifiers in lowercase `snake_case` (with the accepted special patterns `Ok`/`Err`), indentation-based syntax, `func`, receiver methods, `struct` reference objects and `value struct` value types, automatic type inference, simple `var`/readonly `const`, explicit `private`/`internal` and public-by-default, optional properties, method `init()`/`deinit()`, `call()`-callable structs, closures and events, `if`/`else if`/`match`/`is`, `Ok`/`Err`/`result`, `for` for all loops (iteration, Boolean conditions, and unbounded repetition), optional index/key, reverse iteration, `defer` with optional `{ ... }` block, arrays `[]` (growable or fixed-size) and dictionaries `{}`, UTF-8 strings with automatic interpolation, native C libraries through safe bindings, no exposed pointers in ordinary code, and excellent IDE diagnostics. LLVM AOT release builds are planned; LLVM ORC is the leading design for development-mode hot reload of compatible function bodies without restarting. GC is planned as precise, non-moving tracing, initially stop-the-world with thread-local small-object allocation and carefully chosen safepoints. **Compiler/runtime complexity must never be pushed onto ordinary application developers.**
 
-### 0.2 Not yet implemented
+### 0.2 Design versus implementation
 
-This document records design decisions and a proposal for implementation. It does **not** claim that LLVM code generation, a collector, a language server, hot reload, a package registry, or any of the syntax shown here already exist for VOID 2.0.
+The canonical DEVELOPMENT_STRATEGY.md status and feature guides identify executable
+features. Stage 3 is hosted-locked at cd95e373 / CI #65. Later examples still include
+approved future syntax; they are not an implementation claim.
+
+### 0.3 Stage 4 approved contract (18 October 2026)
+
+Stage 4 source behavior is implemented locally: properties/callable structs are
+documented in PROPERTIES.md; enums/results/patterns, cleanup, functions/closures
+and events are documented in ADVANCED_LANGUAGE.md. Exact validation and remaining
+boundaries are in WORK_LOG.md. Hosted acceptance remains owner-controlled.
+
+Stage 3 is hosted-locked at `cd95e37341f756e749ea5f3d6da9ad44716d491f`,
+[CI #65](https://github.com/Shmellyorc/Void.Language/actions/runs/39125218619),
+seven successful jobs. These are approved Stage 4 contracts, **not an implementation
+or hosted-acceptance claim**. Older OPEN labels below are superseded only as stated.
+
+- `result<t,e>` carries `Ok(value)` or `Err(error)`. `?` unwraps success or propagates
+  the exact matching error type. Recoverable errors remain distinct from runtime
+  failures. `Ok` also matches present nullable values, without converting nullable
+  into result; `Ok(null)` can be a successful nullable payload.
+- One pattern model serves `is` and statement/expression `match`: type, value,
+  range, nullable/result, tagged enum payload, struct field, list and dictionary
+  patterns. Dictionaries permit extra keys; list rest copies independently.
+  Bare names compare existing bindings; **`var name` explicitly captures**,
+  including `Ok(var value)` and `..var rest`. Captures have success-only lexical
+  scope and cannot shadow existing bindings. Incomplete matches warn; an unmatched
+  statement does nothing, an unmatched expression raises a source-located runtime
+  failure. Exhaustive matches do not warn.
+- Reached defers register dynamically and run LIFO on function exit, early return
+  and `?`. `with` cleans at scope exit. `deinit` releases external resources,
+  never GC finalization. Initially it is managed-struct-only, no-result; value
+  structs cannot define it. Explicit/deferred `deinit` and `with` share per-object
+  one-shot release state so aliases cannot release twice. Ordinary value copies
+  are unchanged. Fallible acquisition uses explicit result-returning factories,
+  without rewriting `init`. Deferred code permits Ok/Err and locally valid nested
+  break/continue, but no direct return/`?`/await. Preserve the primary runtime
+  failure, attach cleanup failures and continue applicable cleanup.
+- Bible `property`/`get`/`set` syntax executes accessor logic through field access.
+  Getters cannot mutate receivers; missing setters are readonly. Recoverable errors
+  use explicit methods. Preserve receiver selection, evaluation order, deep readonly
+  and value semantics. Accessor body changes can reload; incompatible signatures,
+  type/layout changes require restart.
+- Function types, function values, anonymous functions and escaping closures share
+  captured mutable storage (including value locals), while unrelated ordinary value
+  assignments remain independent copies. Assigning closures shares state. Captures
+  retain reference identity/readonly and precise GC tracing beyond stack lifetime.
+  Reuse stable function identities/dispatch/code leases; incompatible capture layout
+  requires restart and compatible bodies can reload.
+- Events are synchronous, ordered, strong subscriptions. Snapshot subscribers per
+  emission; duplicates are legal; `-=` removes the latest matching identity.
+  Only the owner emits; mutation/nested emission must be safe. Callback identity
+  survives assignment/compatible reload. Handlers have no result and handle
+  recoverable errors internally; runtime panic stops later handlers. No implicit
+  async. Single function fields remain distinct from events.
+- Compatible `call()` structs are callable/callback values using existing method,
+  structural checks, visibility, effects and readonly rules. No arbitrary external
+  C function-pointer ABI promise; preserve native callback/quiescence contracts.
+- Implement necessary enum/function-type foundations through the existing frontend,
+  typed IR, LLVM 19.1.7 lowerer and coordinated Runtime. No second execution engine,
+  collector, type checker or ownership registry. Dictionary `.get()` and list
+  `.pop()` remain deferred until exact signatures/error types are approved.
+- Preserve Stage 3, seven CI jobs, strict sanitizers and 180-minute timeout. Stage 5
+  automatic watching/persistent Debug cache remains approved future work, not part
+  of this sprint. Stages 6–7 remain outside this scope. Owner controls Git and CI.
+
 
 ---
 
@@ -818,6 +882,11 @@ Important rules:
 
 ## 18. Properties and accessors [AGREED]
 
+**Local implementation:** PROPERTIES.md specifies the executable getter/setter,
+readonly, value-copy, nested mutation, generics and reload behavior. Hosted
+acceptance is pending. The remaining locally implemented Stage 4 features are
+documented in ADVANCED_LANGUAGE.md.
+
 Ordinary fields need no accessors. A `property` adds getter/setter logic with receiver syntax, using normal field-like access at the call site. Omitting `set` makes the property readonly.
 
 ```python
@@ -966,7 +1035,7 @@ print(counter())  # 1
 print(counter())  # 2
 ```
 
-Mutable captures are shared with the closure. Value structs copied as ordinary values retain the established copy semantics; precise capture-by-reference rules and hot-reload compatibility for closure environments must be designed.
+Mutable local captures share managed storage with the closure. Unrelated ordinary value copies remain independent. Captured value-method receivers use independent snapshots shared by copies of the closure; managed receivers retain identity. Compatible bodies reload under existing generation leases; capture-layout or authority changes require restart. See ADVANCED_LANGUAGE.md.
 
 ## 22. Events [AGREED]
 
@@ -1000,7 +1069,7 @@ hero.on_damage -= display_damage
 
 The earlier idea `const handler: func(i32)` as an automatically created event was **withdrawn** to avoid hidden declaration behavior. Use `event` for that purpose.
 
-Events preserve stable callback identity for unsubscribing and hot reload. Ordinary code may subscribe; ideally only the event owner emits its event. The exact rule for file-level events, anonymous-subscription identity, ordering, re-entrancy, synchronization, and observer lifetime is still **OPEN**. `deinit()` is a natural place to unsubscribe; GC alone does not run deterministic unsubscription.
+Stage 4 implements owner-method emission, ordered strong subscriptions, duplicate callbacks, latest-match removal and a subscriber snapshot per synchronous emission. Nested emissions and changes affect subsequent snapshots; runtime failure stops later handlers. Callback identities survive assignment and compatible reload. GC does not run deterministic unsubscription. File-level events and source concurrency remain future work. See ADVANCED_LANGUAGE.md.
 
 
 ---
@@ -1352,7 +1421,7 @@ Additional failure during defer:
   at load_game() src/main.void:6
 ```
 
-**Important limitation:** Native process corruption, forced termination, or an irrecoverable machine failure cannot guarantee any cleanup or complete stack trace. **OPEN:** Exact lowering and control-flow grammar for `return`, `break`, or `await` inside deferred blocks, whether defer bodies may return `result`, and aggregation/reporting of multiple cleanup errors.
+**Important limitation:** Native process corruption, forced termination, or an irrecoverable machine failure cannot guarantee cleanup or a complete stack trace. Stage 4 implements registration-time deferred call arguments, execution-time block captures and LIFO cleanup on return, propagation and language-managed runtime failure. Deferred code cannot directly return or propagate; locally valid loop control is allowed. Cleanup preserves the primary failure, attaches bounded additional failures and continues. Managed-only one-shot deinit and with share the same release state. See ADVANCED_LANGUAGE.md.
 
 ## 29. `result`, `Ok`, `Err`, `?`, and nullable patterns [AGREED]
 
@@ -2891,23 +2960,23 @@ This section matters especially when an AI assistant inherits this file without 
 5. **Object-model boundary:** [IMPLEMENTED CORE: I1–I8 and IF1–IF8 bounded semantics; richer OOP open] Phase 20 implements owner-approved I1–I8 for managed inheritance, substitutability, exact overrides, explicit super preludes, prefix layouts, guarded leased dispatch and conservative reload. Ordinary methods remain nonvirtual. Protected/richer visibility, hiding, variance/covariance, abstract/final, source downcasts/type patterns, automatic constructor chaining and open-world loading remain deferred. Phase 21 implements owner-approved IF1–IF8 for managed-backed structural views with exact conformance, original ownership, readonly effects, precise roots and guarded leased dispatch. Standalone value erasure, interface inheritance/defaults, dynamic type tests and richer conversions remain deferred; Phase 24 adds compile-time constraints without value erasure; no mandatory implements keyword is introduced. See Sections 12.1 and 13 and INHERITANCE.md.
 6. **Construction:** [IMPLEMENTED CORE: C1/S1 init; fallible/resource init open] `init()` is implemented for approved value and managed structs: custom-init calls bind constructor arguments solely to init parameters; types without init retain named-field construction; derived initialization uses an explicit `super.init(...)` prelude. Fallible `result`-returning init, native-resource rollback/destruction and richer constructor escape remain future design.
 7. **`value struct` native ownership:** [FUTURE DESIGN: resource-owning value copies] Ensure copying cannot double-release a native handle; initially restrict resource-owning value types or introduce an explicit safe transfer contract.
-8. **Closures:** [FUTURE DESIGN: closures] Mutable capture behavior is accepted; syntax/ABI of closure returns, lifetime, and hot-reload capture-layout compatibility need proof.
+8. **Closures:** [IMPLEMENTED LOCALLY: Stage 4] Shared captured locals, independent captured value receivers, escaping managed environments and capture-layout reload checks; see ADVANCED_LANGUAGE.md.
 9. **Function call grammar:** [IMPLEMENTED CORE: constructor argument order; ordinary named/default calls open] Constructor invocations already accept an ordered positional prefix plus named arguments and pure parameter defaults, with supplied arguments evaluated exactly once left to right. Ordinary function named/default arguments and direct multiline anonymous-function call grammar remain future design.
-10. **Events:** [FUTURE DESIGN: event semantics] Event-owner emission rule, subscriber ordering, mutation while emitting, weak versus strong callbacks, and unsubscribe identity must be resolved.
+10. **Events:** [IMPLEMENTED LOCALLY: Stage 4] Owner emission, ordered strong snapshots, re-entrancy and stable callback identities; see ADVANCED_LANGUAGE.md.
 11. **Generic implementation:** [IMPLEMENTED FOUNDATION: Phase 24] Concrete specialization, interface constraints, argument inference and bounded recursion use the existing compiler/Runtime; see GENERICS.md. Variance, operator contracts and more aggressive representation/code-size sharing remain open.
 12. **Dictionary grammar:** [FUTURE DESIGN: dictionary literal grammar] Decide whether unquoted `name = value` is allowed alongside `"name": value`. Do not invent silent meaning for bare identifiers.
 13. **Mixed/general collections:** [FUTURE DESIGN: heterogeneous collections] `[]` and `{}` were discussed as general-purpose untyped options, but their dynamic type, boxing, and inference semantics are undecided.
 14. **Array API spelling:** [APPROVED PHASE 23 API: count/push/remove_at; source arrays still gated] Phase 23 A9 approves `.count`, `.push(value)` and `.remove_at(index)` for the first source-array slice; it does not approve an automatic `add` alias. `pop`, search/equality removal, slicing and other methods remain separate future API decisions. Approved names do not establish completed source-array implementation.
 15. **Iteration modification:** [APPROVED DIRECTION: invalidation at next iterator access] Structural mutation invalidates active growable-list iterators when they next access the iterator, in either direction; this is approved design, not completed source-list execution. The special reverse-current-element deletion exception remains deferred, not accepted or tested.
-16. **Pattern forms:** [FUTURE DESIGN: full pattern language] Range, struct-field, list/rest and dictionary patterns are agreed directions; precise grammar/binding/copy rules need specification.
+16. **Pattern forms:** [IMPLEMENTED LOCALLY: Stage 4] Shared is/match patterns with success-scoped explicit var captures, range/struct/list/rest/dictionary forms; see ADVANCED_LANGUAGE.md.
 17. **Numeric conversion policy:** [IMPLEMENTED CORE: Phase 6 numeric behavior; additional casts/hashing open] `NUMERIC_TYPES.md` implements contextual literal typing, wrapping integer overflow, signed/unsigned arithmetic rules, IEEE NaN/signed-zero comparisons and checked numeric `as` (including truncate-toward-zero float-to-int). `as?`, float hashing/total ordering, platform-sized aliases and additional conversions remain future design.
 18. **UTF-8 semantics:** [IMPLEMENTED CORE: Phase 22 UTF-8 foundation; future indexing/slicing open] S1-S8 approve the strict UTF-8 foundation with exact bytes,
     no normalization and embedded NUL. Section 8.1 approves future scalar indexing,
     scalar length, byte_length and nullable strings in principle, outside Phase 22.
     Index errors, slicing, grapheme APIs, ordering, formatting grammar and broader
     native binding policy remain open.
-19. **Panic and defer:** [FUTURE DESIGN: panic/defer cleanup] Remaining defers and original errors should be preserved when safe; native unwinding/ABI/cleanup error aggregation need implementation design.
-20. **Nullable/`Ok` overloading:** [IMPLEMENTED CORE: managed nullable conversion; Ok pattern grammar open] The `Ok` pattern is intentionally allowed for nullable values and results; representation and type-checker disambiguation need explicit formal rules.
+19. **Panic and defer:** [IMPLEMENTED LOCALLY: Stage 4] Applicable cleanup continues after failure while preserving the primary diagnostic and bounded additional errors; native process corruption cannot guarantee cleanup.
+20. **Nullable/`Ok` overloading:** [IMPLEMENTED LOCALLY: Stage 4] Ok matches present nullable values or result success according to the subject type; Ok(null) result payloads remain distinct from Err.
 21. **Async API:** [FUTURE DESIGN: async/task source] `async func`, `await`, and `spawn` are agreed; exact scheduling start semantics, task group binding, async `with`, and cancellation observation points remain to specify.
 22. **Hot-reload implementation:** [IMPLEMENTED FOUNDATION: generation leases and native replacement; complete auto-reload open] Compatible-body-only behavior is agreed. The internal JIT generation leases, retained metadata and native replacement proofs already exist; complete automatic source watching, general code retirement, cross-thread publication across all future feature forms and full live product hot reload are still separate design and acceptance concerns.
 23. **GC details:** [IMPLEMENTED FOUNDATION: precise GC/roots; optimization and production acceptance open] The Phase 15 precise non-moving Heap, compiler-managed roots, explicit frame/slot contracts and cooperative collection/rendezvous have implemented proofs; later source phases use them. Production tuning, advanced/concurrent collector strategies, allocation thresholds, liveness optimization and comprehensive barrier/performance certification remain separate work; non-moving is not a permanent language restriction.

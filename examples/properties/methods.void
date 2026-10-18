@@ -1,0 +1,16 @@
+value struct point:
+    x: i32
+func (p point) add(value: i32):
+    p.x += value
+struct store:
+    point: point
+property (s store) position: point:
+    get:
+        return s.point
+    set(value):
+        s.point = value
+func entry(value: i32) -> i32:
+    var s = store()
+    s.position.add(value)
+    s.position.add(2)
+    return s.position.x

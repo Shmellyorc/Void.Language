@@ -1,0 +1,7 @@
+use "./library.void" as lib
+func entry(value: i32) -> i32:
+    var d = lib.derived(value = 1, extra = 2)
+    d.number = value
+    var c = lib.composed()
+    c.doubled = 10
+    return d.number + c.doubled

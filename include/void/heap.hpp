@@ -91,7 +91,7 @@ private:
         LegacyReferenceMap references;
         std::shared_ptr<const void> metadata; // kind selects immutable nominal/buffer metadata
         TypeLayout::Kind kind;
-        bool marked = false;
+        bool marked = false, released = false;
     };
     std::unordered_map<void*, Object> objects_;
     std::vector<void**> roots_;

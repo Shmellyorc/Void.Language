@@ -87,8 +87,11 @@ receiver selects its storage before argument effects and the callee observes its
 current value after those effects. For example, `p.read(p.change())` observes
 `change`'s update. An ordinary aggregate argument is a snapshot taken at its own
 evaluation position. Non-addressable receivers materialize one owned temporary.
-There are no indexed fields, properties or escaping borrowed receivers in this
-slice. Nested inline storage remains selected even if an argument replaces its
+This describes the original receiver slice. Stage 4 adds properties and callable
+struct syntax as documented in PROPERTIES.md, plus bound method callbacks and
+captured receiver snapshots as documented in ADVANCED_LANGUAGE.md. Indexed inline mutating receivers
+and escaping borrowed receivers remain unsupported; the existing rejection test
+is retained to prevent silent copy mutation or alias-overwriting copy-back. Nested inline storage remains selected even if an argument replaces its
 containing aggregate. Calls do not perform delayed copy-back that could overwrite
 argument-side mutations or unrelated fields.
 

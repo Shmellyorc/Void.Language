@@ -1,0 +1,26 @@
+struct node:
+    value: i32
+struct store:
+    children: [node]
+    payload: [i32, 524288]
+    table: {i32: node}
+property (s store) nodes: [node]:
+    get:
+        return s.children
+property (s store) values: {i32: node}:
+    get:
+        return s.table
+property (s store) snapshot: [i32, 524288]:
+    get:
+        return s.payload
+func entry(value: i32) -> i32:
+    var s = store(children = [node(value = 1)])
+    s.nodes.push(node(value = value))
+    s.nodes[0].value = 2
+    s.values[1] = s.nodes[1]
+    s.values[1].value += 3
+    var a = s.snapshot
+    a[0] = 99
+    if s.snapshot[0] != 0:
+        return -100
+    return s.nodes[0].value + s.values[1].value

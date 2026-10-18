@@ -1,0 +1,12 @@
+struct fraction:
+    denominator: i32
+property (f fraction) quotient: i32:
+    get:
+        return 100 / f.denominator
+    set(value):
+        f.denominator = 100 / value
+func entry(value: i32) -> i32:
+    var f = fraction(denominator = value)
+    if value == -1:
+        f.quotient = value + 1
+    return f.quotient

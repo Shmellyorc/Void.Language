@@ -42,18 +42,25 @@ struct Type {
 struct FieldType {
     Type::Kind kind = Type::i32;
     bool nullable = false, readonly = false;
+    ReferencePaths readonly_references = {};
     std::weak_ptr<const ValueType> target;
     FieldType(Type::Kind k) : kind(k) {}
     FieldType(Type t);
     operator Type() const;
 };
-struct ValueField { std::string name; FieldType type; std::string owner = {}; bool using_field = false; };
+struct ValueField { std::string name; FieldType type; std::string owner = {}; bool using_field = false, event = false; };
+struct SumCase { std::string name; unsigned begin=0, count=0; };
 struct ValueType {
     std::string identity, name;
     std::vector<ValueField> fields;
     std::size_t source_offset = 0;
     bool managed = false;
     bool interface_type = false;
+    std::vector<SumCase> cases = {}; // Disjoint, zero-inactive payload fields; field zero is the tag.
+    bool result_type = false;
+    bool callable = false;
+    std::vector<FieldType> call_parameters = {};
+    std::optional<FieldType> call_result = {};
     std::string module_identity = {}, visibility = "public";
     // Effective logical fields retain ancestor indexes. The native payload is
     // { complete BasePayload, own fields... }; this edge never owns the arena.
@@ -95,6 +102,7 @@ Type dictionary_type(Type key,Type value);
 Type dictionary_key(Type);
 Type dictionary_value(Type);
 bool dictionary_key_supported(Type);
+bool pattern_comparable(Type);
 Type array_element(Type);
 std::string array_identity(Type element, std::optional<std::uint64_t> extent);
 bool scalar_array(Type);
@@ -104,7 +112,7 @@ bool scalar_fixed_array(Type);
 struct CompactValueShape { unsigned depth = 0; std::uint64_t scalar_bytes = 0; std::size_t template_nodes = 0; };
 CompactValueShape compact_value_shape(Type);
 std::uint64_t checked_array_index(std::uint64_t bits, Type index, std::uint64_t extent);
-enum class Op { argument, constant, add, multiply, less, call, subtract, divide,
+enum class Op { gc_release, cleanup_call, function_reference, function_call, function_null, sum, sum_get, pattern_equal, type_test, type_cast, panic, argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
     upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal,
@@ -134,7 +142,10 @@ struct Function {
     std::vector<Type> parameters = {Type::i32};
     Type result = Type::i32;
     std::vector<Type> locals = {};
+    bool closure = false, bound_receiver = false;
+    std::optional<unsigned> cleanup_entry;
     bool initializer = false;
+    unsigned accessor = 0; // 1 getter, 2 setter; ordinary native method ABI.
     bool receiver = false, receiver_mutates = false; // First parameter aliases local slot zero.
     std::map<unsigned,unsigned> construction_origins = {}; // View slot -> owning slot/formal.
     std::string source_name = {}, module_identity = {}; // Empty for legacy hand-built proofs.
@@ -169,6 +180,7 @@ struct Module {
 inline constexpr std::size_t string_constant_limit = 16 * 1024 * 1024;
 inline constexpr std::size_t string_pool_limit = 64 * 1024 * 1024;
 bool reference_value(Type);
+bool requires_initialization(Type);
 struct MemberSelection {
     enum Status { missing, found, inaccessible, ambiguous } status = missing;
     std::vector<unsigned> path;

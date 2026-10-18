@@ -1,0 +1,22 @@
+struct base:
+    n: i32
+virtual func (b base) read() -> i32:
+    return b.n
+struct derived extends base:
+    extra: i32
+override func (d derived) read() -> i32:
+    return d.n + d.extra
+interface reader:
+    func read() -> i32
+func entry(value: i32) -> i32:
+    var d = derived(n=value, extra=3)
+    var b: base = d
+    const view = b
+    var first = d.read
+    var second = view.read
+    var erased = d as reader
+    var third = erased.read
+    var alias = third
+    if first == second and third == alias:
+        return first() + second() + third()
+    return -1

@@ -46,8 +46,8 @@ BufferLayoutRef Runtime::native_array_layout(const NativeArrayElement& element,s
                 else if constexpr(std::is_same_v<T,SchemaString>)expected.kind=12;
                 else if constexpr(std::is_same_v<T,SchemaManaged>){expected.kind=std::string_view(value.target).starts_with("void.dict.v1/")?16:11;expected.target=value.target.c_str();expected.nullable=value.nullable;}
                 else if constexpr(std::is_same_v<T,SchemaInterface>){expected.kind=13;expected.target=value.target.c_str();expected.nullable=value.nullable;}
-                else if constexpr(std::is_same_v<T,SchemaOwnedFixed>){expected.kind=14;expected.target=value.element.c_str();expected.extent=value.extent;}
-                else if constexpr(std::is_same_v<T,SchemaGrowable>){expected.kind=15;expected.target=value.header.c_str();}
+                else if constexpr(std::is_same_v<T,SchemaOwnedFixed>){expected.kind=14;expected.target=value.element.c_str();expected.extent=value.extent;expected.nullable=value.nullable;}
+                else if constexpr(std::is_same_v<T,SchemaGrowable>){expected.kind=15;expected.target=value.header.c_str();expected.nullable=value.nullable;}
             },node);
             if(expected.kind==~0u || input.kind!=expected.kind || input.offset!=expected.offset || input.extent!=expected.extent || input.nullable!=expected.nullable || !input.target || std::string_view(input.target)!=expected.target)throw std::invalid_argument("incompatible native array field metadata");
         }
@@ -56,14 +56,14 @@ BufferLayoutRef Runtime::native_array_layout(const NativeArrayElement& element,s
         std::vector<NominalDescriptor> headers;
         for(std::size_t n=0;n<element.count;++n) {
             const auto& f=element.fields[n];SchemaNode node;
-            if(f.nullable>1 || (f.kind!=14 && f.extent) || ((f.kind<=10 || f.kind==12 || f.kind>=14) && f.nullable))throw std::invalid_argument("invalid native element field flags");
+            if(f.nullable>1 || (f.kind!=14 && f.extent) || ((f.kind<=10 || f.kind==12) && f.nullable))throw std::invalid_argument("invalid native element field flags");
             if(f.kind<=10)node=SchemaScalar{static_cast<ScalarEncoding>(f.kind)};
             else if(f.kind==11) {if(!f.target)throw std::invalid_argument("missing managed element type");node=SchemaManaged{f.target,f.nullable!=0};}
             else if(f.kind==12)node=SchemaString{};
             else if(f.kind==13) {if(!f.target)throw std::invalid_argument("missing interface element type");node=SchemaInterface{f.target,f.nullable!=0,0,sizeof(void*),2*sizeof(void*),alignof(void*)};}
-            else if(f.kind==14) {if(!f.target)throw std::invalid_argument("missing nested fixed type");node=SchemaOwnedFixed{f.target,f.extent};}
-            else if(f.kind==15) {if(!f.target)throw std::invalid_argument("missing nested list type");node=SchemaGrowable{f.target};headers.push_back({f.target,"","array-list-v2",{sizeof(ListHeader),{offsetof(ListHeader,backing)}}});}
-            else if(f.kind==16) {if(!f.target)throw std::invalid_argument("missing dictionary type");node=SchemaManaged{f.target,false};headers.push_back({f.target,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}});}
+            else if(f.kind==14) {if(!f.target)throw std::invalid_argument("missing nested fixed type");node=SchemaOwnedFixed{f.target,f.extent,f.nullable!=0};}
+            else if(f.kind==15) {if(!f.target)throw std::invalid_argument("missing nested list type");node=SchemaGrowable{f.target,f.nullable!=0};headers.push_back({f.target,"","array-list-v2",{sizeof(ListHeader),{offsetof(ListHeader,backing)}}});}
+            else if(f.kind==16) {if(!f.target)throw std::invalid_argument("missing dictionary type");node=SchemaManaged{f.target,f.nullable!=0};headers.push_back({f.target,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}});}
             else throw std::invalid_argument("unknown native element field");
             record.fields.push_back({n,f.offset,spec.nodes.size()});spec.nodes.push_back(std::move(node));
         }

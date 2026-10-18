@@ -1,0 +1,19 @@
+struct counter:
+    n: i32
+func (c counter) add(value: i32) -> i32:
+    c.n += value
+    return c.n
+value struct vector:
+    n: i32
+func (v vector) call(value: i32) -> i32:
+    v.n += value
+    return v.n
+func apply(callback: func(i32) -> i32, value: i32) -> i32:
+    return callback(value)
+func entry(value: i32) -> i32:
+    var c = counter(n=2)
+    var callback = c.add
+    var v = vector(n=3)
+    var f: func(i32) -> i32 = v
+    var alias = f
+    return callback(value) + apply(c.add, value) + f(1) + alias(2) + v.n

@@ -1,0 +1,16 @@
+struct item:
+    value: i32
+func present(value: i32) -> result<item?, string>:
+    if value == 0:
+        return Ok(null)
+    return Ok(item(value = value))
+func entry(value: i32) -> i32:
+    var result = present(value)
+    match result:
+        Ok(Ok(var object)):
+            return object.value
+        Ok(null):
+            return -1
+        Err(_):
+            return -2
+    return -3

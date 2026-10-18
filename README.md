@@ -1,6 +1,6 @@
 # Void.Language
 
-See [current implementation status and original Stage 0–7 roadmap](docs/DEVELOPMENT_STRATEGY.md#current-implementation-status) first. Phases 1–25 are owner-locked at `c946510` / CI #64 (seven jobs green). The local Stage 3 completion adds [ordered native dictionaries](docs/DICTIONARIES.md); hosted acceptance of these changes remains pending.
+See [current implementation status and original Stage 0–7 roadmap](docs/DEVELOPMENT_STRATEGY.md#current-implementation-status) first. Stage 3, including [ordered native dictionaries](docs/DICTIONARIES.md), is owner-locked at `cd95e373` / [CI #65](https://github.com/Shmellyorc/Void.Language/actions/runs/39125218619), seven jobs successful. Stage 4 adds [properties and callable structs](docs/PROPERTIES.md), plus [tagged enums, results/patterns, deterministic cleanup, escaping closures, callbacks and events](docs/ADVANCED_LANGUAGE.md). Local validation is recorded in WORK_LOG.md; Stage 4 hosted acceptance remains pending.
 
 VOID 2.0 is a new language, independent of the earlier C#-compatible VOIDC.
 This repository now compiles graphs of actual `.void` files through one frontend, typed

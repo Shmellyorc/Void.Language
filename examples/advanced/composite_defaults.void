@@ -1,0 +1,16 @@
+func double(value: i32) -> i32:
+    return value * 2
+value struct plain:
+    value: result<i32, string> = Ok(3)
+value struct initialized:
+    value: result<i32, string> = Ok(4)
+    callback: func(i32) -> i32 = double
+func (i initialized) init():
+    pass
+func entry(value: i32) -> i32:
+    var first: [plain, 2]
+    var second: [initialized, 2]
+    var amount = match first[1].value:
+        Ok(var number): number
+        Err(_): 0
+    return amount + second[0].callback(value)

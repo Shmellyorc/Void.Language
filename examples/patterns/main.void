@@ -1,0 +1,19 @@
+struct base:
+    value: i32
+struct derived extends base:
+    extra: i32
+func entry(x: i32) -> i32:
+    var d = {"a": x, "b": 8}
+    var items: [i32] = [1, 2, 3]
+    var total = match x:
+        1..4: 10
+        _: 20
+    if items is [1, var middle, ..var rest]:
+        rest[0] = 99
+        total += middle + items[2]
+    if d is {"a": var a}:
+        total += a
+    var item: base = derived(value = 3, extra = 4)
+    if item is derived(var child):
+        total += child.extra
+    return total

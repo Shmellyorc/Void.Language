@@ -33,7 +33,7 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             const auto& fields=parameters.at(origin).definition->fields;
             for (unsigned field=0;field<fields.size();++field) {
                 Type t=fields[field].type;
-                if (!f.initializer || !ir::reference_value(t) || t.nullable) initial.emplace(origin,field);
+                if (!f.initializer || !ir::requires_initialization(t)) initial.emplace(origin,field);
             }
         }
         auto require_field=[&](unsigned origin,unsigned field,const Ready& ready,const Token& token) {
@@ -46,6 +46,7 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         std::function<std::optional<unsigned>(const Expr&,const Ready&)> expression;
         expression=[&](const Expr& e,const Ready& ready)->std::optional<unsigned> {
             using K=Expr::Kind;
+            if(e.kind==K::capture_reference && e.parts.empty() && context.aliases.contains(e.slot))issue(e.token,"A construction view cannot escape in a closure.");
             if (e.kind==K::name) {
                 if (auto i=context.aliases.find(e.slot);i!=context.aliases.end()) return i->second;
                 return {};

@@ -1,0 +1,13 @@
+func produce(value: i32) -> result<[u8, 2097152], string>:
+    var data: [u8, 2097152]
+    data[0] = value as u8
+    data[-1] = 4
+    return Ok(data)
+func entry(value: i32) -> i32:
+    var original = produce(value)
+    var copy = original
+    if copy is Ok(var bytes):
+        bytes[0] = 99
+    return match original:
+        Ok(var bytes): bytes[0] as i32 + bytes[-1] as i32
+        Err(_): -1

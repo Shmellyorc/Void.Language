@@ -38,6 +38,12 @@ std::vector<Type> infer_arguments(Unit& owner,const std::vector<GenericParameter
             actual=ir::with_readonly_paths(actual,{});actual.readonly=false;
             auto [found,inserted]=inferred.emplace(pattern.definition->name,actual);
             if(!inserted && found->second!=actual)error(source,site,Code::type_mismatch,"Conflicting inference for generic parameter '"+pattern.definition->name+"': "+ir::type_name(found->second)+" and "+ir::type_name(actual)+".");
+        } else if(pattern.definition && pattern.definition->callable && actual.definition && actual.definition->callable){
+            auto found=std::find_if(owner.function_types.begin(),owner.function_types.end(),[&](const auto& syntax){return syntax.definition==pattern.definition;});
+            if(found!=owner.function_types.end() && found->parameters.size()==actual.definition->call_parameters.size()){for(unsigned n=0;n<found->parameters.size();++n)match(found->parameters[n],actual.definition->call_parameters[n]);match(found->result,*actual.definition->call_result);}
+        } else if(pattern.definition && pattern.definition->result_type && actual.definition && actual.definition->result_type) {
+            auto found=std::find_if(owner.results.begin(),owner.results.end(),[&](const auto& syntax){return syntax.definition==pattern.definition;});
+            if(found!=owner.results.end()){match(found->success,ir::field_type(actual,1));match(found->failure,ir::field_type(actual,2));}
         } else if(ir::collection_type(pattern)) {
             auto found=std::find_if(owner.arrays.begin(),owner.arrays.end(),[&](const auto& a){return a.definition==pattern.definition;});
             if(found!=owner.arrays.end() && ir::collection_type(actual) && actual.kind==pattern.kind){if(found->key){match(*found->key,ir::dictionary_key(actual));match(found->element,ir::dictionary_value(actual));}else match(found->element,ir::array_element(actual));}
@@ -103,7 +109,7 @@ Structure& concrete_structure(Expr& e,Unit& owner,Structure& declaration,unsigne
     return unit.specialize_structure(unit,owner,declaration,arguments,e.token);
 }
 
-const Function* concrete_method(Expr& e,Type receiver) {
+const Function* concrete_method(Expr& e,Type receiver,bool reference=false) {
     if(!receiver.definition)return nullptr;
     for(const auto& [id,u]:units)for(auto& generic:u->generic_functions) {
         if(!generic.receiver || generic.generics.empty() || generic.token.text!=e.token.text)continue;
@@ -114,8 +120,8 @@ const Function* concrete_method(Expr& e,Type receiver) {
         if((u.get()!=&unit && generic.file_private) || (u.get()!=&unit && u.get()!=&root && !std::any_of(unit.imports.begin(),unit.imports.end(),[&](const auto& i){return i.target==id;})))
             error(source,e.token,Code::visibility,"Generic method is not accessible from this module.");
         validate_generic_receiver(receiver,e.token);
-        if(e.parts.size()-1!=generic.parameters.size())error(source,e.token,Code::argument_count,"Incorrect generic method argument count.");
-        std::vector<std::pair<Type,Expr*>> supplied;for(unsigned n=0;n<generic.parameters.size();++n)supplied.emplace_back(generic.parameters[n].type,e.parts[n+1].get());
+        if(!reference && e.parts.size()-1!=generic.parameters.size())error(source,e.token,Code::argument_count,"Incorrect generic method argument count.");
+        std::vector<std::pair<Type,Expr*>> supplied;if(!reference)for(unsigned n=0;n<generic.parameters.size();++n)supplied.emplace_back(generic.parameters[n].type,e.parts[n+1].get());
         auto arguments=infer_arguments(*u,generic.generics,e.type_arguments,supplied,e.token);
         return &unit.specialize_function(unit,*u,generic,arguments,e.token,current?current->specialization_depth+1:0,receiver);
     }

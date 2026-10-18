@@ -4,6 +4,7 @@ std::set<unsigned> validate_reference_initialization(const Function& f) {
     std::set<unsigned> required,entry,all;
     for (unsigned slot=0;slot<f.locals.size();++slot) {
         all.insert(slot);
+        if(f.locals[slot].definition && (f.locals[slot].definition->callable || !f.locals[slot].definition->cases.empty()) && !f.locals[slot].nullable)required.insert(slot);
         for (const auto& path:reference_paths(f.locals[slot])) {
             auto leaf=f.locals[slot];for(auto field:path) leaf=field_type(leaf,field);
             if (!leaf.nullable) required.insert(slot);
@@ -12,19 +13,27 @@ std::set<unsigned> validate_reference_initialization(const Function& f) {
     if (f.receiver) entry.insert(0);
     std::vector<std::vector<unsigned>> predecessors(f.blocks.size());
     std::set<unsigned> reachable;
-    std::vector<unsigned> pending{0};
+    std::vector<unsigned> order;
+    std::vector<std::pair<unsigned,bool>> pending{{0,false}};
     while(!pending.empty()) {
-        auto block=pending.back();pending.pop_back();if(!reachable.insert(block).second) continue;
+        auto [block,finished]=pending.back();pending.pop_back();
+        if(finished){order.push_back(block);continue;}
+        if(!reachable.insert(block).second)continue;
+        pending.emplace_back(block,true);
         const auto& end=f.blocks[block].end;
-        auto edge=[&](unsigned target){predecessors[target].push_back(block);pending.push_back(target);};
+        auto edge=[&](unsigned target){predecessors[target].push_back(block);pending.emplace_back(target,false);};
         if(end.kind==Terminator::Kind::branch){edge(end.yes);edge(end.no);}
-        else if(end.kind==Terminator::Kind::jump) edge(end.yes);
+        else if(end.kind==Terminator::Kind::jump)edge(end.yes);
     }
+    // Source pattern branches need not follow block-number order. Reverse
+    // postorder propagates straight-line facts in one pass, without changing
+    // the fixed point or loop checks.
+    std::reverse(order.begin(),order.end());
     std::vector<std::set<unsigned>> incoming(f.blocks.size(),all),outgoing(f.blocks.size(),all);
     bool changed;
     do {
         changed=false;
-        for(auto block:reachable) {
+        for(auto block:order) {
             auto state=block==0 ? entry : all;
             for(auto predecessor:predecessors[block])
                 std::erase_if(state,[&](auto slot){return !outgoing[predecessor].contains(slot);});
@@ -34,7 +43,7 @@ std::set<unsigned> validate_reference_initialization(const Function& f) {
         }
     }while(changed);
     std::set<unsigned> observed_defaults;
-    for(auto block:reachable) {
+    for(auto block:order) {
         auto state=incoming[block];
         auto require=[&](unsigned slot) {
             if(!state.contains(slot)) {
@@ -77,8 +86,9 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
         auto effect=[&](std::set<ReferenceOrigin>& into,const ReferenceFact& fact) {
             for (const auto& origin:fact.origins) changed|=into.insert(origin).second;
         };
-        auto retain=[&](const ReferenceFacts& facts) {
+        auto retain=[&](const ReferenceFacts& facts,Type storage=Type::none) {
             for (const auto& [path,fact]:facts) {
+                if(storage!=Type::none && readonly_paths(storage).contains(path))continue;
                 effect(summary.retained,fact);
                 if (fact.readonly) fail("readonly reference stored in mutable managed field");
             }
@@ -91,6 +101,18 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                     const auto& i=b.instructions[n]; auto type=types[function][block][n];
                     auto value=reference_facts(type);
                     switch (i.op) {
+                    case Op::function_reference:{
+                        const auto& target=module.functions.at(indexes.at(i.callee));const auto& effects=summaries.at(indexes.at(i.callee));
+                        std::vector<ReferenceFacts> arguments;if(target.closure)arguments.push_back(values[i.arguments[0]]);
+                        if(target.closure){for(const auto* origins:{&effects.mutations,&effects.retained,&effects.required_mutable})for(const auto& origin:*origins)if(origin.parameter==0)if(auto found=arguments[0].find(origin.path);found!=arguments[0].end()){effect(summary.retained,found->second);if(found->second.readonly)fail("function environment discards readonly authority");}}
+                        auto result=reference_facts(target.result);join_facts(result,instantiate_result(effects.returned,arguments));check(result,*i.type.definition->call_result);break;
+                    }
+                    case Op::function_call: {
+                        auto callable=types[function][block][i.a];
+                        std::vector<ReferenceFacts> arguments;
+                        for(unsigned argument=0;argument<i.arguments.size();++argument){auto formal=Type(callable.definition->call_parameters[argument]);const auto& facts=values[i.arguments[argument]];check(facts,formal,true);for(const auto& [path,fact]:facts)if(!readonly_paths(formal).contains(path)){effect(summary.mutations,fact);effect(summary.retained,fact);}arguments.push_back(facts);}
+                        value=callable_result(callable,arguments);break;
+                    }
                     case Op::argument: value=formal_facts(f.parameters[i.a],i.a); break;
                     case Op::load: value=reference_facts(f.locals[i.a]);join_facts(value,locals[i.a]);break;
                     case Op::array_capture:
@@ -106,7 +128,7 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         for (auto& [path,fact]:stored) fact.readonly=capacity.contains(path);
                         local_changed|=join_facts(locals[i.a],stored); value={}; break;
                     }
-                    case Op::extract: case Op::gc_read:
+                    case Op::sum_get: case Op::extract: case Op::gc_read:
                         value=field_facts(types[function][block][i.a],values[i.a],static_cast<unsigned>(i.immediate)); break;
                     case Op::insert:
                         value=replaced_facts(values[i.a],static_cast<unsigned>(i.immediate),values[i.b]); break;
@@ -132,14 +154,19 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         break;
                     case Op::array_set:
                         check(values[i.arguments[0]],array_element(types[function][block][i.a]),true);value=values[i.a];break;
+                    case Op::sum: {
+                        const auto& variant=i.type.definition->cases.at(i.immediate);
+                        for(unsigned field=0;field<i.arguments.size();++field)value=replaced_facts(std::move(value),variant.begin+field,values[i.arguments[field]]);
+                        break;
+                    }
                     case Op::aggregate:
                         for(unsigned field=0;field<i.arguments.size();++field)
                             value=replaced_facts(std::move(value),field,values[i.arguments[field]]);
                         join_facts(value,reference_facts(i.type));
                         break;
-                    case Op::interface_pack: case Op::interface_prepare: case Op::convert: case Op::upcast: case Op::stage_prefix: value=values[i.a];join_facts(value,reference_facts(i.type));break;
+                    case Op::type_cast: case Op::interface_pack: case Op::interface_prepare: case Op::convert: case Op::upcast: case Op::stage_prefix: value=values[i.a];join_facts(value,reference_facts(i.type));break;
                     case Op::gc_construct:
-                        for(auto argument:i.arguments) retain(values[argument]);
+                        for(unsigned field=0;field<i.arguments.size();++field)retain(values[i.arguments[field]],field_type(i.type,field));
                         break;
                     case Op::list_push: case Op::list_remove: case Op::list_commit: case Op::list_insert: case Op::list_clear: {
                         auto owner=types[function][block][i.a];
@@ -148,12 +175,14 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         else if(i.op==Op::list_remove)value=field_facts(owner,values[i.a],array_element_path);
                         break;
                     }
+                    case Op::gc_release:
+                        if(auto found=values[i.a].find({});found!=values[i.a].end()){effect(summary.mutations,found->second);if(found->second.readonly)fail("release through readonly reference");}break;
                     case Op::gc_write:
                         if (auto found=values[i.a].find({});found!=values[i.a].end()) {
                             effect(summary.mutations,found->second);
                             if (found->second.readonly) fail("write through readonly reference");
                         }
-                        retain(values[i.b]); value={}; break;
+                        retain(values[i.b],field_type(types[function][block][i.a],static_cast<unsigned>(i.immediate))); value={}; break;
                     case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
                         if(i.op==Op::base_init && i.callee.empty()) { for(auto argument:i.arguments) retain(values[argument]); break; }
                         auto found=indexes.find(i.callee);

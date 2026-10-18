@@ -1,0 +1,21 @@
+value struct component:
+    value: i32
+property (c component) doubled: i32:
+    get:
+        return c.value * 2
+    set(value):
+        c.value = value / 2
+value struct composed:
+    using part: component
+struct base:
+    value: i32
+property (b base) number: i32:
+    get:
+        return b.value
+    set(value):
+        b.value = value
+private property (b base) hidden: i32:
+    get:
+        return b.value
+struct derived extends base:
+    extra: i32

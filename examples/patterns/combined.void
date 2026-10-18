@@ -1,0 +1,18 @@
+value struct counter:
+    backing: i32
+property (c counter) value: i32:
+    get:
+        return c.backing
+    set(value):
+        c.backing = value
+func (c counter) call(value: i32) -> result<i32, string>:
+    if value < 0:
+        return Err("negative")
+    c.value += value
+    return Ok(c.value)
+func entry(value: i32) -> i32:
+    var c = counter()
+    var items = {"first": c(value), "second": c(value)}
+    if items is {"first": Ok(var first), "second": Ok(var second)}:
+        return first + second + c.value
+    return -1

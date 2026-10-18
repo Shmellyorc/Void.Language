@@ -1,0 +1,12 @@
+value struct box<t>:
+    value: t
+func wrap<t>(value: t) -> result<t, string>:
+    return Ok(value)
+func unwrap(value: result<box<i32>, string>) -> result<i32, string>:
+    var item = value?
+    return Ok(item.value)
+func entry(x: i32) -> i32:
+    var value = unwrap(wrap(box<i32>(value = x)))
+    return match value:
+        Ok(var answer): answer
+        Err(_): -1

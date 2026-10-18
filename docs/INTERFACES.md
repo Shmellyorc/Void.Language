@@ -2,6 +2,11 @@
 
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
+Stage 4 adds guarded interface/managed type patterns and interface method
+references as first-class callbacks through the existing witnesses and generation
+leases; see ADVANCED_LANGUAGE.md. This does not add standalone value erasure or
+arbitrary source downcasts. Earlier phase-only exclusions below are historical.
+
 The owner approved IF1–IF8 in INTERFACES_PROPOSAL.md. This guide describes the
 implemented contract. Both LLVM 19.1.7 SDKs passed Debug, Release and strict sanitizer
 configurations (55/55 each), repeated stress and 1 MiB checks. WORK_LOG.md records

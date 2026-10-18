@@ -1,0 +1,15 @@
+struct box<t>:
+    backing: t
+property (b box<t>) value: t:
+    get:
+        return b.backing
+    set(value):
+        b.backing = value
+func entry(value: i32) -> i32:
+    var b = box(backing = value)
+    b.value += 2
+    var s = box(backing = "before")
+    s.value = "after"
+    if s.value != "after":
+        return -100
+    return b.value

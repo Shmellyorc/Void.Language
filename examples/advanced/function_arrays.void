@@ -1,0 +1,12 @@
+func double(value: i32) -> i32:
+    return value * 2
+const callback: func(i32) -> i32 = double
+value struct handler:
+    callback: func(i32) -> i32 = double
+func entry(value: i32) -> i32:
+    var optional: [(func(i32) -> i32)?, 2]
+    var handlers: [handler, 2]
+    optional[1] = callback
+    if optional[0] is null and optional[1] is Ok(var present):
+        return present(value) + handlers[1].callback(value)
+    return -1
