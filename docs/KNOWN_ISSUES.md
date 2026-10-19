@@ -1,5 +1,19 @@
 # Known issues and deferred work
 
+## Delivery 3 status — 19 October 2026
+
+Delivery 2 is locked at `5d228804be809465ce2c97b7e0b58b89caa718ac`, owner-confirmed
+CI #74 (7/7 jobs, 791/791 suites). Delivery 3 bounded value-only source spawn is
+locally accepted: 120/120 each in Debug, Release and strict sanitizers (360/360).
+Owner review and hosted verification are pending. ASYNC.md records the actual
+transfer/effect restrictions, worker resource bounds and queue policy. Mutable
+shared references, `jobs.spawn`, task/closure/native-resource transfers, worker
+child creation/joins, native libraries and cancellation recovery remain deferred.
+Completed tasks/frames remain retained until root drain; queues grow with available
+memory and checked allocation failure. No universal source task count, fairness,
+forced termination or general race-free source-memory model is promised.
+The older Delivery 2 pending-hosted and parallel-deferred notes below are historical.
+
 ## Current boundaries, 18 October 2026
 
 See the [canonical status summary](DEVELOPMENT_STRATEGY.md#current-implementation-status). Phases 1–25 and Stage 3 dictionary/runtime integration are owner-accepted at `cd95e373` / CI #65, all seven jobs successful. Stage 4 is hosted-verified and LOCKED at `483e67e4` / CI #68: 80/80 suites in all seven configurations. Source arrays, interfaces, generics, collection iteration/ranges, named/default arguments and custom initialization are implemented. Older exclusions below are dated findings, not new approval requirements.

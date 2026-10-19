@@ -701,6 +701,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         for (std::size_t n = 0; n < f.blocks.size(); ++n) {
             active_block=n;b.SetInsertPoint(blocks[n]);
             if (input.coordinated) b.CreateCall(module->getOrInsertFunction("vd_gc_poll",b.getVoidTy()));
+            if(!async && input.coordinated && (!f.cleanup_entry || n<*f.cleanup_entry)){
+                auto* cancelled=b.CreateCall(module->getOrInsertFunction("vd_worker_checkpoint",b.getInt1Ty(),b.getPtrTy()),{failure});
+                auto* bad=llvm::BasicBlock::Create(context,"worker.cancelled",fn);auto* good=llvm::BasicBlock::Create(context,"worker.continue",fn);b.CreateCondBr(cancelled,bad,good);b.SetInsertPoint(bad);return_failure();b.SetInsertPoint(good);
+            }
             if(async && n<*f.cleanup_entry){
                 b.CreateCall(module->getOrInsertFunction("vd_async_checkpoint",b.getVoidTy(),b.getPtrTy()),{failure});
                 auto* bad=llvm::BasicBlock::Create(context,"async.checkpoint_failure",fn);auto* good=llvm::BasicBlock::Create(context,"async.checkpoint_valid",fn);
@@ -1432,7 +1436,7 @@ Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
     bind("vd_gc_interface_binding",vd_gc_interface_binding);
     bind("vd_cleanup_failure",vd_cleanup_failure);bind("vd_gc_poll",vd_gc_poll); bind("vd_gc_collect",vd_gc_collect); bind("vd_gc_allocate",vd_gc_allocate);
     bind("vd_gc_release",vd_gc_release);bind("vd_gc_alive",vd_gc_alive); bind("vd_gc_native_enter",vd_gc_native_enter); bind("vd_gc_native_leave",vd_gc_native_leave);
-    bind("vd_async_root",vd_async_root);bind("vd_async_new",vd_async_new);bind("vd_async_start",vd_async_start);bind("vd_async_ready",vd_async_ready);bind("vd_async_suspend",vd_async_suspend);bind("vd_async_complete",vd_async_complete);bind("vd_async_cancel_children",vd_async_cancel_children);bind("vd_async_cleanup_enter",vd_async_cleanup_enter);bind("vd_async_cleanup_leave",vd_async_cleanup_leave);bind("vd_async_finish",vd_async_finish);bind("vd_async_cancel",vd_async_cancel);bind("vd_async_checkpoint",vd_async_checkpoint);bind("vd_async_group_enter",vd_async_group_enter);bind("vd_async_group_join",vd_async_group_join);bind("vd_async_drain",vd_async_drain);
+    bind("vd_worker_checkpoint",vd_worker_checkpoint);bind("vd_async_root",vd_async_root);bind("vd_async_new",vd_async_new);bind("vd_async_start",vd_async_start);bind("vd_async_ready",vd_async_ready);bind("vd_async_suspend",vd_async_suspend);bind("vd_async_complete",vd_async_complete);bind("vd_async_cancel_children",vd_async_cancel_children);bind("vd_async_cleanup_enter",vd_async_cleanup_enter);bind("vd_async_cleanup_leave",vd_async_cleanup_leave);bind("vd_async_finish",vd_async_finish);bind("vd_async_cancel",vd_async_cancel);bind("vd_async_checkpoint",vd_async_checkpoint);bind("vd_async_group_enter",vd_async_group_enter);bind("vd_async_group_join",vd_async_group_join);bind("vd_async_drain",vd_async_drain);
     impl_->custom_bindings=false;
 }
 Jit::~Jit() = default;

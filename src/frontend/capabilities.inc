@@ -11,6 +11,8 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         for (auto& f:u->functions) { functions.emplace(f.symbol,&f); function_units.emplace(f.symbol,u.get()); }
         for (auto& s:u->structures) structures.emplace(s.definition->identity,std::pair{u.get(),&s});
     }
+    struct Edges {std::set<std::string> calls;std::set<Expr*> spawns;bool unsafe=false;};
+    std::map<std::string,Edges> graph;for(const auto& [name,f]:functions)graph.try_emplace(name);
     auto leaf_related=[&](Type type,const ir::ReferencePath& path) {
         std::vector<RelatedLocation> result;
         if (type.definition) if (auto found=structures.find(type.definition->identity);found!=structures.end())
@@ -66,6 +68,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             }
         };
         auto call=[&](Function& target,const std::vector<ReferenceFacts>& arguments,const Token& token,bool dynamic=false) {
+            graph[f.symbol].calls.insert(target.symbol);if(dynamic || target.asynchronous)graph[f.symbol].unsafe=true;
             const auto& target_effects=dynamic ? target.virtual_effects : target.reference_effects;
             unsigned first=target.receiver ? 1u : 0u;
             auto formal=[&](unsigned n) { return n<first ? target.receiver->type : target.parameters.at(n-first).type; };
@@ -172,8 +175,14 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         };
         expression=[&](Expr& e)->ReferenceFacts {
             using K=Expr::Kind;
+            auto& edges=graph[f.symbol];
+            if(e.kind==K::spawned){edges.spawns.insert(&e);edges.unsafe=true;}
+            if(e.kind==K::awaited || e.kind==K::task_cancel || e.kind==K::function_call || e.asynchronous_call || e.interface_call || !e.virtual_slot.empty())edges.unsafe=true;
+            if(e.kind==K::function_reference)edges.calls.insert(e.target);
+            if((e.kind==K::call || e.kind==K::method_call) && !functions.contains(e.target) && !e.target.starts_with("$array.") && !e.target.starts_with("$dict."))edges.unsafe=true;
             auto view=ir::reference_facts(e.type);
-            if(e.kind==K::awaited){
+            if(e.kind==K::spawned){auto result=expression(*e.parts[0]);view=ir::replaced_facts(view,1,result);
+            } else if(e.kind==K::awaited){
                 auto task=expression(*e.parts[0]);view=ir::field_facts(e.parts[0]->type,task,1);
             } else if(e.kind==K::capture_reference){
                 auto facts=e.parts.empty()?locals.at(e.slot):expression(*e.parts[0]);auto stored=ir::field_type(e.type,0);auto combined=ir::reference_facts(stored);ir::join_facts(combined,facts);auto profile=ir::fact_type(stored,combined);
@@ -316,6 +325,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         sequence=[&](auto& body) {
             for (auto& s:body) {
                 using K=Statement::Kind;
+                if(s.task_group)graph[f.symbol].unsafe=true;
                 ReferenceFacts rhs;
                 if (s.selection)expression(*s.selection);
                 if (s.range_end) expression(*s.range_end);
@@ -479,4 +489,15 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         }
         f.capability_contract=std::move(contract);
     }
+    for(const auto& [name,edges]:graph)for(auto* spawn:edges.spawns){
+        std::set<std::string> seen;std::vector<std::string> pending{spawn->parts[0]->target};
+        const auto& effects=functions.at(spawn->parts[0]->target)->reference_effects;
+        bool unsafe=!effects.mutations.empty() || !effects.retained.empty() || !effects.required_mutable.empty();
+        while(!pending.empty()){auto target=std::move(pending.back());pending.pop_back();if(!seen.insert(target).second)continue;
+            auto found=graph.find(target);if(found==graph.end() || functions.at(target)->asynchronous){unsafe=true;break;}
+            if(found->second.unsafe){unsafe=true;break;}pending.insert(pending.end(),found->second.calls.begin(),found->second.calls.end());
+        }
+        if(unsafe)try{error(function_units.at(name)->source,spawn->token,Code::unsupported_type,"Worker reachable calls must be synchronous and have known private effects; task operations and indirect/native calls are unsupported.");}catch(const CompilationError& error){diagnostics.add(error);}
+    }
+
 }

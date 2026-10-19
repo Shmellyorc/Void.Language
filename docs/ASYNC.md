@@ -1,11 +1,12 @@
-# Stage 6 Deliveries 1–2: native async and structured lifecycle
+# Stage 6 Deliveries 1–3: async, structured lifecycle and bounded workers
 
-Delivery 1 is owner-confirmed hosted-accepted at
-`34efb761965a5e19841e2fcf2816a5b851e902a7`, [CI #73 checks](https://github.com/Shmellyorc/Void.Language/commit/34efb761965a5e19841e2fcf2816a5b851e902a7/checks):
-7/7 jobs, 98/98 suites each (686/686). Delivery 2 passed local Debug, Release and strict ASan/UBSan/leak acceptance:
-**113/113 each (339/339)**, plus 1 MiB stack and editor/package checks. Hosted
-acceptance remains owner-controlled; stop for review before any Delivery 3 work.
-The five-delivery roadmap and restricted decisions are in [STAGE6_PROPOSAL.md](STAGE6_PROPOSAL.md).
+**Locked baseline:** Delivery 2, `5d228804be809465ce2c97b7e0b58b89caa718ac`,
+[CI #74 checks](https://github.com/Shmellyorc/Void.Language/commit/5d228804be809465ce2c97b7e0b58b89caa718ac/checks),
+owner-confirmed 7/7 jobs, 113/113 each (791/791). Delivery 3 passed local Debug, Release and strict
+ASan/UBSan/leak acceptance: **120/120 each (360/360)**, plus editor/package and
+1 MiB checks. STOP for owner review and hosted verification. Deliveries 4–5 remain deferred and
+require owner authorization after the prior hosted gate. Git and hosted CI belong
+to the owner. The five-delivery roadmap remains in STAGE6_PROPOSAL.md.
 
 ```typescript
 async func increment(value: i32) -> i32:
@@ -52,8 +53,8 @@ One owning thread executes activations in FIFO ready order. It suspends the
 current activation when a dependency is incomplete, resumes ready waiters in
 creation order, and never blocks an executor thread on a child. Concurrent roots
 on one Runtime and nested adapters are checked failures. Separate Runtime owners
-retain their existing independence. There is no worker pool, parallel spawn,
-detachment, cancellation recovery API or general native binding surface.
+retain their existing independence. Bounded parallel source jobs use the same scheduler, as described below.
+Detachment, cancellation recovery and general native bindings remain deferred.
 
 ## Structured task lifecycle (Delivery 2)
 
@@ -70,8 +71,7 @@ async func run(value: i32) -> i32:
 
 The group alias exists only within its lexical body and is not a first-class
 value. Declare a result local outside the group to use it after that body; normal
-VOID lexical scoping applies. `jobs.spawn`, parallel source execution and explicit
-public task type spelling remain deferred. A user binding/import named `tasks`
+VOID lexical scoping applies. `jobs.spawn` and explicit public task type spelling remain deferred. A user binding/import named `tasks`
 continues to resolve normally; `tasks.group()` is recognized contextually in
 `with` when that name is unbound.
 
@@ -166,3 +166,73 @@ completed/repeated await, normal/early/Err exits, nested/implicit scopes, siblin
 failure, cleanup failure ordering and parent precedence. Deterministic semaphore
 poll gates cover cancellation with GC rendezvous, compatible reload/retirement
 and Runtime close; allocation sweeps and malformed IR are permanent regressions.
+
+## Bounded parallel spawn (Delivery 3)
+
+```typescript
+func calculate(value: i32) -> i32:
+    return value + 1
+
+async func entry(value: i32) -> i32:
+    var pending = spawn calculate(value)
+    return await pending
+```
+
+`spawn` requires an async body and a directly resolved named synchronous,
+noncapturing function. Caller arguments evaluate once in ordinary caller order;
+the target body executes on a native pool thread. Numeric/bool scalars, immutable
+strings and recursively safe value structs, fixed arrays and tagged enum/result
+payloads cross this boundary. Fixed data is independently copied before enqueue
+and on each await. A worker may create and mutate private managed objects, but
+cannot receive or return mutable managed/list/dictionary/interface references,
+Task handles, resource wrappers, callable values or nested shapes containing them.
+Readonly aliases do not make mutable objects transferable.
+
+Existing capability analysis records the resolved call/reference edges while
+inferring effects. Spawn checks those summaries and reachable edges; task creation,
+await, cancellation forwarding, indirect calls and unknown/native effects are
+rejected within a worker's reachable source graph. The independent typed-IR
+validator repeats the transfer, effect and worker-entry proof. Compiler-created
+reached defer/deinit callbacks remain supported with their known source targets;
+ordinary indirect source invocation is deferred. There is no second effect lattice.
+Current module constants are immutable templates; this does not approve future
+mutable globals. `jobs.spawn`, nested spawn, synchronous worker task waits and
+shared-reference parallelism remain deferred.
+
+The existing Runtime owns all precise roots and coordination. Private typed-IR
+worker wrappers use the same heap-frame and native checked-resume lowering as
+async activations. A worker writes only its own activation/result payload. A
+release/acquire completion handoff publishes that owned result; the executor
+alone applies Task outcome/status, waiter wakeup, failure propagation and parent
+frame changes. Ready activation work continues while workers execute. When no
+activation is runnable, the executor waits for completion notifications in
+NativeSafe state. No scheduler lock crosses Runtime admission, Managed entry,
+user code, collection or code retirement. Each worker attaches and admits once,
+then uses NativeSafe idle waits so Runtime close drains admitted work safely.
+
+The host-only `Runtime::async_worker_limit(count)` configures an idle Runtime:
+1–64 workers, default 4. These are finite native resource limits, not a language
+task-count ceiling. The pool starts lazily with the first parallel job, drains and
+joins before the adapter returns. Its linked admission queue uses existing Task
+records and is FIFO; one worker executes admissions in order. With several workers,
+start/finish order and fairness are not promised. Queue/storage growth is limited
+by available memory and checked allocation failure; no arbitrary source task cap
+or queue-full cancellation policy is introduced. Existing root-scope retention of
+completed records/frames remains unchanged.
+
+Cancellation is an atomic request. Explicit worker checkpoints in synchronous
+CFG loops/helpers unwind through existing reached cleanup. `vd_gc_poll()` remains
+a collection safepoint and never throws for cancellation. Reached cleanup is
+shielded; a real cleanup failure supersedes cancellation. Scope exit and root
+shutdown retain storage, Runtime metadata and the enclosing generation lease
+until workers actually finish, even after cancellation/failure. There is no
+detachment, forced termination or worker child join. Worker completions are also
+received at owner activation checkpoints, so a running owner observes child
+failure without first awaiting. Existing parent-primary and creation-order
+unobserved-failure rules apply.
+
+Private frame/code addresses remain absent from managed metadata and persistent
+Debug cache records. Same-generation enqueue validation covers worker publication;
+a compatible reload may publish new code while old queued/running workers retain
+their root invocation's lease. Final local/cross-platform evidence belongs in
+WORK_LOG.md; no hosted Delivery 3 acceptance is implied here.

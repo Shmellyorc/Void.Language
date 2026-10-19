@@ -1,4 +1,5 @@
 #include "void/runtime_abi.hpp"
+#include "void/async.hpp"
 #include <new>
 #include <stdexcept>
 namespace vd {
@@ -63,6 +64,7 @@ void vd_gc_frame_enter(void* frame, const vd::Runtime::Slot* slots, std::size_t 
 void vd_gc_frame_leave(void* frame) noexcept { static_cast<vd::Runtime::Frame*>(frame)->~Frame(); }
 void vd_cleanup_failure(vd::RuntimeFailure* primary,const vd::RuntimeFailure* cleanup) noexcept {
     if(!cleanup->message)return;
+    if(vd_worker_cleanup_failure(primary,cleanup))return;
     if(!primary->message){*primary=*cleanup;return;}
     auto append=[&](const char* message){if(primary->count<32)primary->frames[primary->count++]=message;else primary->count=33;};
     append("Additional failure during defer:\n");append(cleanup->message);

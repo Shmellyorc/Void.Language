@@ -133,7 +133,7 @@ public:
 bool letter(char c) { return (c >= 'a' && c <= 'z') || c == '_'; }
 bool digit(char c) { return c >= '0' && c <= '9'; }
 const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue", "pass",
-    "async", "await", "event", "defer", "with", "enum", "is", "match", "property", "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
+    "async", "await", "spawn", "event", "defer", "with", "enum", "is", "match", "property", "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
 #include "strings.inc"
 std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     const auto& text = source.text();
@@ -253,7 +253,7 @@ struct Expr {
     bool event=false, asynchronous_call=false;
     std::string event_owner;
     Type environment=Type::none;
-    enum class Kind { task_cancel, awaited, lambda, capture_reference, function_reference, function_call, function_null, test, match, sum, propagate, literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal } kind;
+    enum class Kind { spawned, task_cancel, awaited, lambda, capture_reference, function_reference, function_call, function_null, test, match, sum, propagate, literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::string op, qualifier, target, source_target;
@@ -718,6 +718,7 @@ class Parser {
     }
     std::unique_ptr<Expr> unary() {
         Depth guard(depth, source, peek());
+        if(accept("spawn")) {auto e=std::make_unique<Expr>(Expr::Kind::spawned,tokens[p-1]);e->parts.push_back(unary());return e;}
         if(accept("await")) {auto e=std::make_unique<Expr>(Expr::Kind::awaited,tokens[p-1]);e->parts.push_back(unary());return e;}
         if (at("not") || at("-") || at("+")) {
             auto token = take(); auto e = std::make_unique<Expr>(Expr::Kind::unary, token); e->op = token.text;
@@ -1656,6 +1657,17 @@ class Semantics {
         invalid_function = true;
         return e.type = error_type;
     }
+    VOID_SEMANTIC_HANDLER Type spawned_expression(Expr& e) {
+        if(!current || !current->asynchronous || current->deferred)error(source,e.token,Code::unsupported_type,"spawn requires an async body outside deferred cleanup.");
+        auto result=expression(*e.parts[0]);auto& call=*e.parts[0];
+        if(call.kind!=Expr::Kind::call || call.asynchronous_call || call.target.empty() || call.target.starts_with("$"))error(source,e.token,Code::unsupported_type,"spawn requires a directly named synchronous noncapturing function.");
+        std::vector<Type> transfer{result};for(const auto& part:call.parts)transfer.push_back(part->type);
+        while(!transfer.empty()){auto type=transfer.back();transfer.pop_back();if(!ir::worker_transfer_safe(type))error(source,e.token,Code::unsupported_type,"spawn transfers only scalars, immutable strings and recursively safe fixed values.");
+            if(type.kind==Type::aggregate){Token deinit=e.token;deinit.text="deinit";if(direct_method(type,deinit))error(source,e.token,Code::unsupported_type,"Native/resource wrappers cannot cross a worker boundary.");for(const auto& field:type.definition->fields)transfer.push_back(field.type);}
+            else if(type.kind==Type::fixed_array)transfer.push_back(ir::array_element(type));
+        }
+        return e.type=unit.make_task(result);
+    }
     VOID_SEMANTIC_HANDLER Type awaited_expression(Expr& e) {
         if(!current || !current->asynchronous || current->deferred)error(source,e.token,Code::unsupported_type,"await requires an async function and is not allowed in deferred code.");
         auto task=expression(*e.parts[0]);if(!task.definition || !task.definition->task_result || task.kind!=Type::managed_ref || task.nullable || task.construction)error(source,e.token,Code::type_mismatch,"await requires a non-null inferred task handle.");
@@ -1665,6 +1677,7 @@ class Semantics {
     // temporaries here exhausts a 1 MiB Debug stack before the depth guard.
     Type expression_impl(Expr& e, std::optional<Type> expected) {
         switch (e.kind) {
+        case Expr::Kind::spawned:return spawned_expression(e);
         case Expr::Kind::awaited:return awaited_expression(e);
         case Expr::Kind::lambda:return lambda_expression(e);
         case Expr::Kind::task_cancel:case Expr::Kind::capture_reference:case Expr::Kind::function_null: case Expr::Kind::function_reference:return e.type;
@@ -2216,7 +2229,7 @@ class Semantics {
         }
         case K::expression:
             if (expression(*s.expression) == error_type) break;
-            if (s.expression->kind != Expr::Kind::task_cancel && s.expression->kind != Expr::Kind::awaited && s.expression->kind != Expr::Kind::call && s.expression->kind != Expr::Kind::method_call && s.expression->kind!=Expr::Kind::function_call) error(source, s.token, Code::invalid_value, "Only function calls can be standalone expressions.", "Assign this value with var or return it.");
+            if (s.expression->kind != Expr::Kind::spawned && s.expression->kind != Expr::Kind::task_cancel && s.expression->kind != Expr::Kind::awaited && s.expression->kind != Expr::Kind::call && s.expression->kind != Expr::Kind::method_call && s.expression->kind!=Expr::Kind::function_call) error(source, s.token, Code::invalid_value, "Only function calls can be standalone expressions.", "Assign this value with var or return it.");
             break;
         case K::returned:
             if(current->deferred)error(source,s.token,Code::invalid_value,"Deferred code cannot return directly.");
@@ -2718,7 +2731,18 @@ class Lowering {
         return {e.type,[=,this]{return emit({ir::Op::load,slot},token);},[=,this](unsigned value){emit({ir::Op::store,slot,value},token);}};
     }
 #include "pattern_lowering.inc"
-    unsigned expression(const Expr& e) {
+    VOID_SEMANTIC_HANDLER unsigned spawned(const Expr& e) {
+            auto& call=*e.parts[0];ir::Function wrapper;wrapper.name=call.target+"::$spawn."+std::to_string(module.functions.size());wrapper.module_identity=call.target.substr(0,call.target.find("::"));wrapper.source_name=wrapper.name.substr(wrapper.module_identity.size()+2);wrapper.source=source.location(e.token.offset);wrapper.visibility="private";wrapper.asynchronous=true;wrapper.worker=true;wrapper.task=e.type;wrapper.result=call.type;wrapper.parameters.clear();
+            ir::Block body;ir::Instruction invoke{ir::Op::call};invoke.callee=call.target;invoke.source=wrapper.source;
+            for(unsigned n=0;n<call.parts.size();++n){wrapper.parameters.push_back(call.parts[n]->type);invoke.arguments.push_back(n);body.instructions.push_back({ir::Op::argument,n});}
+            unsigned value=body.instructions.size();body.instructions.push_back(invoke);
+            if(call.type!=Type::none){wrapper.locals.push_back(call.type);body.instructions.push_back({ir::Op::store,0,value});}
+            body.end={ir::Terminator::Kind::jump,0,1};wrapper.blocks.push_back(std::move(body));wrapper.cleanup_entry=1;
+            ir::Block cleanup;cleanup.instructions.push_back({ir::Op::async_drain});if(call.type==Type::none)cleanup.end={ir::Terminator::Kind::return_void};else{cleanup.instructions.push_back({ir::Op::load,0});cleanup.end={ir::Terminator::Kind::return_value,1};}wrapper.blocks.push_back(std::move(cleanup));
+            auto target=wrapper.name;module.functions.push_back(std::move(wrapper));return expression(call,target);
+
+    }
+    unsigned expression(const Expr& e,std::string_view parallel_target={}) {
         using K = Expr::Kind;
         switch (e.kind) {
         case K::lambda:throw std::logic_error("Unanalyzed anonymous function");
@@ -2841,6 +2865,7 @@ class Lowering {
             }
             return emit({ir::Op::load,slot},e.token);
         }
+        case K::spawned:return spawned(e);
         case K::task_cancel: return emit({ir::Op::async_cancel,expression(*e.parts[0])},e.token);
         case K::awaited: return emit({ir::Op::await,expression(*e.parts[0])},e.token);
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
@@ -2895,7 +2920,7 @@ class Lowering {
                 emit({ir::Op::store, slot, value}, arg->token); slots.push_back(slot);
             }
             if(selected_receiver && !e.parts[0]->property)emit({ir::Op::store,receiver->slot,selected_receiver->read()},e.token);
-            ir::Instruction i{e.asynchronous_call ? ir::Op::async_call : e.interface_call ? ir::Op::interface_call : !e.virtual_slot.empty() && !e.super_call ? ir::Op::virtual_call : ir::Op::call}; i.callee = e.target+(e.super_call && e.token.text=="deinit"?"::$body$"+Type::key(e.parts[0]->type):""); i.receiver = receiver;
+            ir::Instruction i{e.asynchronous_call || !parallel_target.empty() ? ir::Op::async_call : e.interface_call ? ir::Op::interface_call : !e.virtual_slot.empty() && !e.super_call ? ir::Op::virtual_call : ir::Op::call}; i.callee = parallel_target.empty()?e.target+(e.super_call && e.token.text=="deinit"?"::$body$"+Type::key(e.parts[0]->type):""):std::string(parallel_target); i.receiver = receiver;
             if (context) if (auto found=context->calls.find(&e);found!=context->calls.end())
                 i.callee=ir::construction_name(e.target,{found->second.begin(),found->second.end()});
             for (auto slot : slots) i.arguments.push_back(emit({ir::Op::load, slot}, e.token));

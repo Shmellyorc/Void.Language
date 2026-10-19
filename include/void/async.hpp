@@ -6,7 +6,7 @@ extern "C" {
 using vd_async_start_entry = void* (*)(std::int32_t,vd::RuntimeFailure*);
 using vd_async_resume_entry = void (*)(void*,vd::RuntimeFailure*);
 std::int32_t vd_async_root(vd_async_start_entry,std::int32_t,std::size_t,const void*,vd::RuntimeFailure*) noexcept;
-void vd_async_new(void**,void**,std::size_t,const std::size_t*,std::size_t,std::size_t,const std::size_t*,std::size_t,const char*,const void*,vd_async_resume_entry,vd::RuntimeFailure*) noexcept;
+void vd_async_new(void**,void**,std::size_t,const std::size_t*,std::size_t,std::size_t,const std::size_t*,std::size_t,const char*,const void*,vd_async_resume_entry,vd::RuntimeFailure*,std::int32_t worker=0) noexcept;
 void vd_async_start(void*,vd::RuntimeFailure*) noexcept;
 bool vd_async_ready(void*,vd::RuntimeFailure*) noexcept;
 void vd_async_suspend(void*,void*,vd::RuntimeFailure*) noexcept;
@@ -17,6 +17,8 @@ void vd_async_cleanup_leave() noexcept;
 void vd_async_finish(vd::RuntimeFailure*) noexcept;
 void vd_async_cancel_children() noexcept;
 void vd_async_checkpoint(vd::RuntimeFailure*) noexcept;
+bool vd_worker_checkpoint(vd::RuntimeFailure*) noexcept;
+bool vd_worker_cleanup_failure(vd::RuntimeFailure*,const vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_async_group_enter(vd::RuntimeFailure*) noexcept;
 bool vd_async_group_join(std::uint64_t,std::int32_t,void*,vd::RuntimeFailure*) noexcept;
 bool vd_async_drain(void*,vd::RuntimeFailure*) noexcept;

@@ -122,6 +122,17 @@ std::uint64_t checked_array_index(std::uint64_t bits,Type index,std::uint64_t ex
     if(bits>=extent) throw std::out_of_range("Array index out of bounds");
     return bits;
 }
+bool worker_transfer_safe(Type root) {
+    std::vector<Type> pending{root};std::set<const ValueType*> seen;
+    while(!pending.empty()){auto t=pending.back();pending.pop_back();
+        if(t.construction || t.nullable)return false;
+        if(t.kind==Type::none || t.kind==Type::string || (t.kind>=Type::i32 && t.kind<=Type::f64))continue;
+        if(t.kind!=Type::aggregate && t.kind!=Type::fixed_array)return false;
+        if(!t.definition || t.definition->managed || t.definition->callable || t.definition->interface_type || t.definition->task_result)return false;
+        if(!seen.insert(t.definition.get()).second)continue;
+        if(t.kind==Type::fixed_array)pending.push_back(array_element(t));else for(const auto& field:t.definition->fields)pending.push_back(field.type);
+    }return true;
+}
 bool async_boundary_safe(Type root) {
     std::vector<Type> pending{root};std::set<const ValueType*> seen;
     while(!pending.empty()){auto t=pending.back();pending.pop_back();if(t.construction || t.kind==Type::prepared_receiver)return false;if(!t.definition || !seen.insert(t.definition.get()).second)continue;if(t.definition->callable)return false;if(t.definition->element)pending.push_back(*t.definition->element);for(const auto& field:t.definition->fields)pending.push_back(field.type);}
@@ -961,9 +972,34 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         validate_construction(f,m,body_types);
         validate_fixed_ownership(f,m,body_types);
     }
-    if(m.async_root){auto entry=functions.find(m.entry_symbol);if(entry==functions.end() || !entry->second->asynchronous || entry->second->parameters!=std::vector<Type>{Type::i32} || entry->second->result!=Type::i32)fail("invalid explicit async root adapter signature");}
+    if(m.async_root){auto entry=functions.find(m.entry_symbol);if(entry!=functions.end() && entry->second->worker)fail("worker cannot be a root adapter");if(entry==functions.end() || !entry->second->asynchronous || entry->second->parameters!=std::vector<Type>{Type::i32} || entry->second->result!=Type::i32)fail("invalid explicit async root adapter signature");}
     if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition) && !definition->result_type && !definition->callable) fail("incomplete nominal universe for structural interfaces");
-    validate_reference_capabilities(m,qualified_types,verified_effects);
+    std::map<std::string,ReferenceEffects> worker_effects;
+    auto* inferred=verified_effects?verified_effects:&worker_effects;
+    validate_reference_capabilities(m,qualified_types,inferred);
+    for(const auto& worker:m.functions)if(worker.worker){
+        const auto& effects=inferred->at(worker.name);
+        if(!effects.mutations.empty() || !effects.retained.empty() || !effects.required_mutable.empty())fail("worker has shared reference effects");
+        if(!worker.asynchronous || worker.receiver || worker.closure || worker.bound_receiver || !worker_transfer_safe(worker.result))fail("invalid worker entry/result");
+        std::vector<Type> transfers=worker.parameters;transfers.push_back(worker.result);
+        while(!transfers.empty()){auto t=transfers.back();transfers.pop_back();if(!worker_transfer_safe(t))fail("unsafe worker transfer");
+            if(t.kind==Type::aggregate){for(const auto& method:m.functions)if(method.receiver && method.method_name=="deinit" && method.parameters[0]==t)fail("worker resource transfer");for(const auto& field:t.definition->fields)transfers.push_back(field.type);}
+            else if(t.kind==Type::fixed_array)transfers.push_back(array_element(t));
+        }
+        std::set<std::string> visited;std::vector<const Function*> graph{&worker};
+        while(!graph.empty()){auto* f=graph.back();graph.pop_back();if(!visited.insert(f->name).second)continue;
+            if(f!=&worker && f->asynchronous)fail("worker cannot create/await tasks");
+            for(const auto& block:f->blocks)for(const auto& i:block.instructions){
+                switch(i.op){
+                case Op::async_drain:if(f!=&worker)fail("worker task operation");break;
+                case Op::async_call:case Op::async_cancel:case Op::async_cancel_children:case Op::async_group_enter:case Op::async_group_join:case Op::await:case Op::function_call:case Op::interface_call:case Op::virtual_call:fail("unsupported worker task/indirect effect");break;
+                case Op::call:case Op::base_init:case Op::function_reference:{auto target=functions.find(i.callee);if(target==functions.end())fail("worker has unknown native effect");graph.push_back(target->second);break;}
+                default:break;
+                }
+            }
+        }
+    }
+    for(const auto& f:m.functions)for(const auto& block:f.blocks)for(const auto& i:block.instructions)if(i.op==Op::async_call && functions.at(i.callee)->worker && (!f.asynchronous || f.worker))fail("spawn requires an owning async activation");
     if (results) *results=std::move(qualified_types);
 }
 }

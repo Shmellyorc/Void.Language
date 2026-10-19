@@ -1,6 +1,7 @@
 #pragma once
 #include "void/runtime_abi.hpp"
 #include <memory>
+#include <atomic>
 #include <semaphore>
 #include <functional>
 #include <vector>
@@ -23,6 +24,7 @@ struct Probe {
     std::unique_ptr<vd::Runtime::Handle> retained;
 };
 extern thread_local Probe* active;
+extern std::atomic<void(*)()> concurrent_poll; // Native source execution rendezvous, tests only.
 struct AllocationFailure {
     explicit AllocationFailure(int budget);
     ~AllocationFailure();
@@ -32,4 +34,5 @@ struct Observe {
     ~Observe() { active=nullptr; }
 };
 void require(bool,const char*);
+void allocation_budget(int);
 }

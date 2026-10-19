@@ -27,8 +27,10 @@ void* operator new[](std::size_t size,const std::nothrow_t&) noexcept {
 void operator delete[](void* p,const std::nothrow_t&) noexcept { ::operator delete(p); }
 namespace managed_test {
 thread_local Probe* active=nullptr;
+std::atomic<void(*)()> concurrent_poll{nullptr};
 AllocationFailure::AllocationFailure(int budget) { fail_after=budget; }
 AllocationFailure::~AllocationFailure() { fail_after=-1; }
+void allocation_budget(int budget){fail_after=budget;}
 void require(bool yes,const char* message) { if (!yes) throw std::runtime_error(message); }
 }
 namespace {
@@ -64,6 +66,7 @@ extern "C" void vd_gc_real_poll() noexcept;
 extern "C" void vd_gc_real_construct_typed(void**,std::size_t,const std::size_t*,std::size_t,const void*,const char*,vd::RuntimeFailure*) noexcept;
 extern "C" void vd_gc_real_construct(void**,std::size_t,const std::size_t*,std::size_t,const void*,vd::RuntimeFailure*) noexcept;
 extern "C" void vd_gc_poll() noexcept {
+    if(auto observe=managed_test::concurrent_poll.load(std::memory_order_acquire))observe();
     if (auto* p=managed_test::active) {
         inspect(*p);
         ++p->polls;

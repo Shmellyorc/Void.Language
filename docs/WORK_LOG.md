@@ -13089,3 +13089,139 @@ only after green hosted acceptance. Deliveries 3–5 remain pending and unauthor
 parallel spawn/workers, native libraries, detached tasks, cancellation recovery,
 general await in cleanup and automatic watching were not added. No commits,
 pushes, branches, remote modifications or hosted CI actions were performed.
+
+
+## 19 October 2026 — Delivery 3 baseline and authorization
+
+HEAD verified clean at `5d228804be809465ce2c97b7e0b58b89caa718ac`. Owner confirms
+Delivery 2 hosted acceptance, CI #74, 7/7 jobs, 113/113 each (791/791).
+Delivery 3 authorizes initial value-only bounded parallel spawn; Deliveries 4–5
+remain pending. Canonical handoffs preserve this superseding status before implementation.
+Research and implementation pending; no Git/remote modifications authorized.
+
+
+## 19 October 2026 — Delivery 3 implementation and focused research
+
+Existing async Task records, root invocation leases, precise Handle/frame maps,
+Runtime admission and the shared LLVM 19.1.7 lowerer supply the implementation.
+Source spawn creates a private typed-IR worker wrapper around a directly resolved
+synchronous function. Existing capability traversal records its resolved call /
+reference graph and uses inferred reference-effect summaries; no second effect
+lattice or compiler is introduced. Independent IR checks enforce safe recursive
+transfer types and reject task/indirect/native effects in worker graphs.
+
+The scheduler now owns a lazy bounded native pool (default 4; idle host config
+1–64). FIFO linked admission reuses Task records; storage remains memory bounded
+by actual allocation failure, with no source task-count ceiling. Worker-private
+heap frames/results remain precisely rooted. Release/acquire completion hands
+publication back to the owning executor; no parent activation is written by a
+worker. Managed admission and user code run outside queue locks; idle and owner
+notification waits are NativeSafe. Once-admitted workers drain through Runtime
+close. Explicit synchronous CFG checkpoints implement cancellation separately
+from GC polling and preserve shielded reached cleanup / cleanup-failure precedence.
+Owner checkpoints receive completions so child failure interrupts a busy owner.
+
+Focused tests use actual generated source loops and condition-variable rendezvous
+on two distinct worker threads (no sleep/timing proof), pool-one native FIFO and
+foreign-generation rejection, forced worker GC, worker/caller allocation failure,
+compatible reload leases, close/drain, running cancellation, sibling failures and
+cleanup-failure precedence. JIT normal/O2 and permanent linked AOT fixtures cover
+fixed arrays, strings, result payloads, argument order, no-result/repeated await and
+groups. LSP overlay tests cover spawn definition/unsafe effects/recovery; grammar
+checks cover spawn/await as ordinary control keywords. Final acceptance pending.
+
+Development evidence: the first focused run caught a fixture naming collision
+(`var counter = counter()`), corrected to `owner`; compiler shadowing checks were
+preserved. A later five-suite focused run passed async source/IR/lifecycle/parallel
+and LSP, 5/5 in 47.13s. Subsequent audit reuses the existing capability traversal
+for call edges (including defaults, properties and resource cleanup), and avoids
+mutating analyzed AST call nodes while emitting worker wrappers. These changes
+require the final frozen-source checks below. No hosted/Git actions performed.
+
+
+Final audit before acceptance tightened worker cancellation aggregation: only the
+actual cancellation primary is replaced by a real cleanup failure. An inner
+cleanup's own primary/additional failures remain intact until merged at that
+boundary; no string scanning infers outcomes. The deterministic running-cancel
+test now includes nested failing defers and verifies both cleanup diagnostics
+survive, with cancellation absent as primary. Focused async_parallel passed in
+3.89s after this correction. Final matrices rebuild the audited sources; initial
+build transcripts are preparation evidence only. Code is frozen for acceptance.
+
+
+## Delivery 3 acceptance in progress — frozen production sources
+
+Debug full CTest passed **120/120** in **321.02s**. Release full CTest passed
+**120/120** in **138.30s**. A late fixture-only change adds a nested lexical group
+to `spawn.void`; its Debug AOT objects were refreshed and both affected AOT suites
+passed again (2/2, 0.09s). The Debug JIT suite and Release matrix also consumed that
+final fixture. This correction changes no production code or test expectation.
+Strict sanitizer acceptance is still pending below.
+
+Additional checks passed: editor `npm test` and `npm run package` (8-file VSIX,
+145.72 KB); existing frontend depth guards at 1 MiB for Debug/Release/strict;
+normal/O2 independently linked `large`, `lifecycle_resources` and `spawn` binaries
+at 1 MiB for all three configurations (18/18 native stack checks). LLVM SDK reports
+19.1.7. Strict commands use real leak detection / failure exits, outside tracing:
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`.
+
+Evidence is retained under `build/stage6-delivery3/` (ignored local artifacts).
+The `*-final-build.log` files are final audited builds; first-pass `*-build.log`
+files are preparation transcripts. No sanitizers, assertions or baseline suites
+were disabled. No commits, pushes, branches or hosted actions were performed.
+
+
+## 19 October 2026 — Delivery 3 final local acceptance / STOP
+
+Delivery 3 is complete locally. No incomplete implementation, failing local test
+or unresolved Delivery 3 language decision remains. The hosted-locked baseline
+is still Delivery 2 at `5d228804be809465ce2c97b7e0b58b89caa718ac`, owner-confirmed
+[CI #74 checks](https://github.com/Shmellyorc/Void.Language/commit/5d228804be809465ce2c97b7e0b58b89caa718ac/checks),
+7/7 jobs, 113/113 each (791/791). HEAD is unchanged; Delivery 3 has no hosted lock.
+
+| Final audited configuration | Result | CTest elapsed |
+| --- | --- | --- |
+| Debug — `build/order1/production` | **120/120 passed** | 321.02s |
+| Release — `build/ci-release` | **120/120 passed** | 138.30s |
+| Strict ASan/UBSan/leaks — `build/ci-sanitizers` | **120/120 passed** | 251.77s |
+
+**360/360 total**, LLVM **19.1.7**. Final builds used `cmake --build <tree> -j 3`,
+followed by `ctest --test-dir <tree> -j 3 --output-on-failure`. Strict build/tests
+ran outside tracing with the exact ASan/UBSan/leak options recorded above. All
+baseline suites remain enabled. The two affected Debug AOT suites additionally
+passed after refreshing the nested-group fixture; production code was unchanged.
+
+All three frontend 1 MiB depth checks and **18/18** native 1 MiB checks passed:
+normal/O2 linked `large`, `lifecycle_resources`, and `spawn` in every configuration.
+VS Code `npm test` passed; `npm run package` produced the existing 8-file VSIX
+(145.72 KB). No dependency changes or sanitizer suppressions were introduced.
+
+Permanent regressions include the `async_parallel` suite and source fixtures
+`spawn`, `spawn_cancel`, `spawn_failure`, each normal/O2 independently linked AOT.
+They cover real generated-source overlap via synchronization, worker bounds one
+and multiple, FIFO admission, argument order, fixed copies, immutable strings,
+private managed allocation, tagged results, no-result/repeated await and nested
+groups. Additional coverage verifies worker/caller allocation failure, precise GC
+rendezvous, running cancellation, nested cleanup failures superseding cancellation,
+sibling failure/shielded drain, a busy owning activation observing completion,
+close/shutdown, old-generation retirement under reload, actual Debug cache hits,
+malformed worker IR, unsafe transfer/effects and foreign-generation publication.
+LSP overlay definition/unsafe-effect/recovery and grammar keyword tests passed.
+
+Deliverables are the production/frontend/IR/shared LLVM/runtime changes, permanent
+regressions, and updated ASYNC, STAGE6_PROPOSAL, WRENCH_CLANKER, canonical strategy,
+Bible, GC runtime and known-issue documents. Evidence is under `build/stage6-delivery3/`:
+`*-final-build.log`, `*-ctest.log`, stack/editor logs, and the explicit Debug spawn
+refresh/rerun transcripts. Historical preparation/focused entries remain intact.
+
+Known bounds are documented rather than hidden: value-only transfers, no worker
+child tasks/indirect/native effects, default four workers with idle host config
+1–64, FIFO admission without multiworker start/finish fairness, memory-dependent
+queue admission and root-duration completed-frame retention. General shared-memory
+concurrency, native libraries, `jobs.spawn`, cancellation recovery and detach are
+not delivered. These restrictions match the approved initial scope.
+
+**Next action belongs to Boss/Wrench:** review Delivery 3; owner commit/push and
+seven-job hosted CI; lock only when green. Deliveries 4–5 remain unauthorized.
+No commits, pushes, branches, remote modifications or hosted actions occurred.

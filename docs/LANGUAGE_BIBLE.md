@@ -2042,10 +2042,14 @@ An import such as `use "sqlite"` should select compatible package/native artifac
 functions, await, heap frames and the explicit owning root adapter. Local Debug,
 Release and strict sanitizer acceptance passed 98/98 each; owner-confirmed CI #73
 subsequently locked Delivery 1 at `34efb761965a5e19841e2fcf2816a5b851e902a7`.
-Delivery 2 adds cooperative cancellation and lexical groups as documented in
-ASYNC.md; local acceptance passed 113/113 each in Debug, Release and strict
-sanitizers. Owner review and hosted acceptance remain pending. Library IO, parallel spawn, cancellation
-recovery and async CLI examples below remain design.
+Delivery 2 is owner-confirmed hosted-accepted at `5d228804be809465ce2c97b7e0b58b89caa718ac`,
+CI #74, seven jobs / 113 suites each (791/791). Delivery 3 implements bounded
+`spawn function(arguments)` with reviewed value-only transfers, owning-executor
+publication and cooperative worker cancellation; local Debug/Release/strict
+acceptance passed 120/120 each (360/360). Hosted verification remains owner-controlled.
+See ASYNC.md for exact restrictions. Library IO, `jobs.spawn`, general shared
+references, native libraries, cancellation recovery and async CLI examples remain
+design. Deliveries 4–5 require separate owner authorization.
 
 The syntax should feel like ordinary functions with only necessary async markers. `async func` indicates suspension capability; `await` retrieves the eventual result. Developers do **not** write explicit `task<t>` returns for ordinary async declarations: the compiler creates the task machinery.
 

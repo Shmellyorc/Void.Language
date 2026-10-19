@@ -145,6 +145,7 @@ struct Function {
     std::vector<Type> locals = {};
     bool closure = false, bound_receiver = false;
     bool asynchronous = false;
+    bool worker = false; // Private enqueue wrapper; synchronous reachable source body on a pool thread.
     Type task = Type::none; // Exact checked task shape for an async declaration.
     std::optional<unsigned> cleanup_entry;
     bool initializer = false;
@@ -185,6 +186,7 @@ inline constexpr std::size_t string_constant_limit = 16 * 1024 * 1024;
 inline constexpr std::size_t string_pool_limit = 64 * 1024 * 1024;
 bool reference_value(Type);
 bool async_boundary_safe(Type);
+bool worker_transfer_safe(Type);
 bool requires_initialization(Type);
 struct MemberSelection {
     enum Status { missing, found, inaccessible, ambiguous } status = missing;

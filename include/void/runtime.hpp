@@ -105,11 +105,14 @@ public:
     std::int64_t dynamic_type(void*,std::span<const char* const>) const;
     Snapshot snapshot() const;
     bool wait_for_request(std::chrono::milliseconds);
+    void async_worker_limit(unsigned); // Host configuration, 1..64, before root admission.
+    unsigned async_worker_limit() const;
     bool enter_async(); // Claim one owning executor for this Runtime.
     void leave_async() noexcept;
     void close(); // Reject new attachments; existing participants must drain.
 private:
     friend class CallbackRegistration;
+    unsigned async_worker_limit_ = 4;
     class PrivateRoot;
     struct Thread {
         std::thread::id owner = std::this_thread::get_id();

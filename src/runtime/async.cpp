@@ -1,6 +1,9 @@
 #include "void/async.hpp"
 #include "void/runtime.hpp"
 #include <algorithm>
+#include <atomic>
+#include <mutex>
+#include <condition_variable>
 #include <cstring>
 #include <limits>
 #include <memory>
@@ -37,7 +40,7 @@ struct Diagnostic {
 struct Task;
 struct Group {Task* owner=nullptr;Group* outer=nullptr;std::uint64_t id=0;bool closed=false;};
 struct Task {
-    enum State { prepared,ready,running,waiting,joining,finished } state=prepared;
+    enum State { prepared,ready,running,waiting,joining,working,finished } state=prepared;
     enum Outcome { success,cancelled,failed } outcome=success;
     vd::Runtime::Handle task,frame;
     void* address=nullptr;
@@ -48,12 +51,23 @@ struct Task {
     Group* group=nullptr;
     Group* active_group=&children;
     Group* joining_group=nullptr;
-    bool observed=false,cancel_requested=false,cancel_observed=false,draining=false,child_interrupt=false;
+    struct Work {
+        std::atomic<bool> done{false};
+        bool cancelled=false,draining=false,completed=false;
+        unsigned cleanup_depth=0;
+        Diagnostic failure;
+    };
+    std::unique_ptr<Work> work;
+    Task* next_worker=nullptr;
+    std::atomic<bool> cancel_requested{false};
+    bool observed=false,cancel_observed=false,draining=false,child_interrupt=false;
     unsigned cleanup_depth=0;
     Diagnostic interrupted;
     Diagnostic failure;
     explicit Task(vd::Runtime& runtime):task(runtime),frame(runtime){children.owner=this;}
 };
+thread_local Task* worker_task=nullptr;
+constexpr char worker_cancellation[]="Async task cancelled";
 struct Scope {
     vd::Runtime& runtime;
     std::thread::id owner=std::this_thread::get_id();
@@ -62,7 +76,61 @@ struct Scope {
     Task* current=nullptr;
     Task* ready_head=nullptr;
     Task* ready_tail=nullptr;
+    std::mutex work_mutex;
+    std::condition_variable work_changed;
+    std::vector<std::thread> workers;
+    Task* work_head=nullptr;
+    Task* work_tail=nullptr;
+    unsigned admitted=0;
+    bool stopping=false,startup_failed=false;
     const void* generation;
+    ~Scope(){
+        for(auto& task:tasks)task->cancel_requested=true;
+        {std::lock_guard lock(work_mutex);stopping=true;}work_changed.notify_all();
+        if(!workers.empty()){vd::Runtime::Native native(runtime);for(auto& worker:workers)if(worker.joinable())worker.join();}
+    }
+    void worker_loop() noexcept {
+        bool announced=false;
+        try {
+            vd::Runtime::Attachment attachment(runtime);
+            vd::Runtime::Managed managed(runtime); // Admit once; Runtime close must drain this participant.
+            {std::lock_guard lock(work_mutex);++admitted;announced=true;}work_changed.notify_all();
+            for(;;){Task* task;
+                {vd::Runtime::Native native(runtime);std::unique_lock lock(work_mutex);work_changed.wait(lock,[&]{return stopping || work_head;});if(!work_head){if(stopping)return;continue;}task=work_head;work_head=task->next_worker;if(!work_head)work_tail=nullptr;}
+                worker_task=task;vd::RuntimeFailure failure;
+                task->resume(task->frame.get(),&failure);
+                if(!failure.message && !task->work->completed)failure.message="Worker returned without checked completion";
+                task->work->failure.assign(failure);worker_task=nullptr;
+                // Only the executor reads the private payload after this release.
+                {std::lock_guard lock(work_mutex);task->work->done.store(true,std::memory_order_release);}work_changed.notify_all();
+            }
+        }catch(...){worker_task=nullptr;std::lock_guard lock(work_mutex);startup_failed=true;if(!announced)++admitted;work_changed.notify_all();}
+    }
+    void ensure_workers(){
+        if(!workers.empty())return;
+        auto count=runtime.async_worker_limit();workers.reserve(count);
+        for(unsigned n=0;n<count;++n)workers.emplace_back([this]{worker_loop();});
+        {vd::Runtime::Native native(runtime);std::unique_lock lock(work_mutex);work_changed.wait(lock,[&]{return admitted==count;});if(startup_failed)throw std::logic_error("Worker Runtime admission failed");}
+    }
+    void publish(Task& task){
+        ensure_workers();task.state=Task::working;task.next_worker=nullptr;
+        {std::lock_guard lock(work_mutex);if(startup_failed)throw std::logic_error("Worker unavailable");if(work_tail)work_tail->next_worker=&task;else work_head=&task;work_tail=&task;}work_changed.notify_one();
+    }
+    bool work_pending() const noexcept {for(const auto& task:tasks)if(task->state==Task::working)return true;return false;}
+    void receive() noexcept {
+        for(auto& task:tasks)if(task->state==Task::working && task->work->done.load(std::memory_order_acquire)){
+            task->state=Task::finished;const auto& failure=task->work->failure.value;
+            if(failure.message){task->failure.assign(failure);task->outcome=task->work->cancelled?Task::cancelled:Task::failed;if(task->outcome==Task::cancelled)task->failure.value={};}
+            else{std::int32_t complete=1;std::memcpy(task->address,&complete,sizeof(complete));}
+            failed_child(*task);
+        }
+    }
+    void wait_work(){
+        vd::Runtime::Native native(runtime);std::unique_lock lock(work_mutex);
+        work_changed.wait(lock,[&]{if(startup_failed)return true;for(const auto& task:tasks)if(task->state==Task::working && task->work->done.load(std::memory_order_acquire))return true;return false;});
+        if(startup_failed)throw std::logic_error("Worker execution failed");
+    }
+
     Scope(vd::Runtime& owner,const void* identity):runtime(owner),generation(identity){}
     Task& find(void* address) {
         for(auto& task:tasks)if(task->address==address)return *task;
@@ -106,9 +174,9 @@ Scope& scope(){if(!active || active->owner!=std::this_thread::get_id())throw std
 void exception(vd::RuntimeFailure* failure,const char* message) noexcept {failure->message=message;}
 }
 extern "C" {
-void vd_async_new(void** task,void** frame,std::size_t frame_size,const std::size_t* frame_offsets,std::size_t frame_count,std::size_t task_size,const std::size_t* task_offsets,std::size_t task_count,const char* task_key,const void* generation,vd_async_resume_entry resume,vd::RuntimeFailure* failure) noexcept {
+void vd_async_new(void** task,void** frame,std::size_t frame_size,const std::size_t* frame_offsets,std::size_t frame_count,std::size_t task_size,const std::size_t* task_offsets,std::size_t task_count,const char* task_key,const void* generation,vd_async_resume_entry resume,vd::RuntimeFailure* failure,std::int32_t worker) noexcept {
     try {
-        auto& s=scope();if(s.current && (s.current->draining || s.current->cleanup_depth)){exception(failure,"Async calls cannot enqueue during structured cleanup");return;}if(s.generation!=generation)throw std::logic_error("async generation mismatch");auto item=std::make_unique<Task>(s.runtime);item->resume=resume;item->group=s.current?s.current->active_group:nullptr;
+        auto& s=scope();if(s.current && (s.current->draining || s.current->cleanup_depth)){exception(failure,"Async calls cannot enqueue during structured cleanup");return;}if(s.generation!=generation)throw std::logic_error("async generation mismatch");auto item=std::make_unique<Task>(s.runtime);item->resume=resume;if(worker)item->work=std::make_unique<Task::Work>();item->group=s.current?s.current->active_group:nullptr;
         vd::TypeLayout task_layout{task_size,{}},frame_layout{frame_size,{}};
         if(task_count)task_layout.references.assign(task_offsets,task_offsets+task_count);
         if(frame_count)frame_layout.references.assign(frame_offsets,frame_offsets+frame_count);
@@ -120,7 +188,7 @@ void vd_async_new(void** task,void** frame,std::size_t frame_size,const std::siz
      catch(const std::exception&){exception(failure,"Async activation requires a valid owning root adapter");}
 }
 void vd_async_start(void* address,vd::RuntimeFailure* failure) noexcept {
-    try{auto& s=scope();auto& task=s.find(address);if(task.state!=Task::prepared)throw std::logic_error("duplicate async start");s.enqueue(task);}
+    try{auto& s=scope();auto& task=s.find(address);if(task.state!=Task::prepared)throw std::logic_error("duplicate async start");if(task.work)s.publish(task);else s.enqueue(task);}
     catch(...){exception(failure,"Async activation publication failed");}
 }
 bool vd_async_ready(void* address,vd::RuntimeFailure* failure) noexcept {
@@ -142,6 +210,7 @@ void vd_async_suspend(void* frame,void* address,vd::RuntimeFailure* failure) noe
     catch(...){exception(failure,"Invalid async suspension");}
 }
 void vd_async_complete(void* address) noexcept {
+    if(worker_task){if(worker_task->address!=address || worker_task->work->completed)std::terminate();worker_task->work->completed=true;return;}
     try{auto& s=scope();if(!s.current || s.current->address!=address || s.current->state!=Task::running)std::terminate();std::int32_t complete=1;std::memcpy(address,&complete,sizeof(complete));s.current->state=Task::finished;}
     catch(...){std::terminate();}
 }
@@ -149,16 +218,27 @@ void vd_async_cancel(void* address,vd::RuntimeFailure* failure) noexcept {
     try{auto& s=scope();auto& task=s.find(address);if(task.state!=Task::finished)task.cancel_requested=true;}
     catch(...){exception(failure,"Invalid task cancellation");}
 }
-void vd_async_cleanup_enter() noexcept {if(active && active->current)++active->current->cleanup_depth;}
-void vd_async_cleanup_leave() noexcept {if(active && active->current){if(!active->current->cleanup_depth)std::terminate();--active->current->cleanup_depth;}}
+void vd_async_cleanup_enter() noexcept {if(worker_task){++worker_task->work->cleanup_depth;return;}if(active && active->current)++active->current->cleanup_depth;}
+void vd_async_cleanup_leave() noexcept {if(worker_task){if(!worker_task->work->cleanup_depth)std::terminate();--worker_task->work->cleanup_depth;return;}if(active && active->current){if(!active->current->cleanup_depth)std::terminate();--active->current->cleanup_depth;}}
 void vd_async_cancel_children() noexcept {try{auto& s=scope();if(!s.current)std::terminate();s.cancel_children(*s.current);}catch(...){std::terminate();}}
 void vd_async_finish(vd::RuntimeFailure* failure) noexcept {
+    if(worker_task)return;
     try{auto& task=*scope().current;
         if(task.outcome==Task::cancelled){if(failure->message){task.failure.assign(*failure);task.outcome=Task::failed;}else exception(failure,"Async task cancelled");}
     }catch(...){exception(failure,"Invalid async completion outcome");}
 }
+bool vd_worker_cleanup_failure(vd::RuntimeFailure* primary,const vd::RuntimeFailure* cleanup) noexcept {
+    if(!worker_task || !worker_task->work->cancelled || primary->message!=worker_cancellation || !cleanup->message)return false;
+    worker_task->work->cancelled=false;*primary=*cleanup;return true;
+}
+bool vd_worker_checkpoint(vd::RuntimeFailure* failure) noexcept {
+    if(!worker_task || failure->message || worker_task->work->draining || worker_task->work->cleanup_depth)return false;
+    if(worker_task->cancel_requested.load(std::memory_order_relaxed)){worker_task->work->cancelled=true;exception(failure,worker_cancellation);return true;}
+    return false;
+}
 void vd_async_checkpoint(vd::RuntimeFailure* failure) noexcept {
-    try{auto& s=scope();auto& task=*s.current;if(task.draining)return;
+    if(worker_task){vd_worker_checkpoint(failure);return;}
+    try{auto& s=scope();s.receive();auto& task=*s.current;if(task.draining)return;
         if(task.failure.value.message){*failure=task.failure.value;return;}
         // Child failure is selected only after the shielded join, in creation order.
         if(s.child_failure(task)){task.child_interrupt=true;exception(failure,"Async child failure requires structured cleanup");return;}
@@ -185,6 +265,7 @@ bool vd_async_group_join(std::uint64_t id,std::int32_t cancel,void* frame,vd::Ru
     }catch(...){exception(failure,"Invalid async group join");return true;}
 }
 bool vd_async_drain(void* frame,vd::RuntimeFailure* failure) noexcept {
+    if(worker_task){worker_task->work->draining=true;return true;}
     try{auto& s=scope();auto& task=*s.current;if(task.frame.get()!=frame)throw std::logic_error("invalid drain frame");
         if(!task.draining){
             task.draining=true;
@@ -215,6 +296,7 @@ std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::si
         Diagnostic root_failure;if(initial.message)root_failure.assign(initial);
         Task* root=nullptr;if(root_address)root=&s.find(root_address);
         for(;;) {
+            s.receive();
             for(auto& task:s.tasks){
                 if(task->state==Task::waiting && (task->dependency->state==Task::finished || task->cancel_requested || s.child_failure(*task)))s.enqueue(*task);
                 else if(task->state==Task::joining && !s.pending(*task,task->joining_group))s.enqueue(*task);
@@ -223,6 +305,7 @@ std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::si
             for(auto& task:s.tasks){pending|=task->state!=Task::finished && task->state!=Task::prepared;}
             if(!next){
                 if(!pending)break;
+                if(s.work_pending()){s.wait_work();continue;}
                 // Resume through the checked await failure edge so reached
                 // cleanup runs even for an invalid cyclic dependency graph.
                 vd::RuntimeFailure cycle;cycle.message="Async await dependency cycle";

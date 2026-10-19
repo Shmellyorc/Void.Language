@@ -258,6 +258,11 @@ bool Runtime::wait_for_request(std::chrono::milliseconds timeout) {
     std::unique_lock lock(mutex_);
     return changed_.wait_for(lock, timeout, [&] { return requested_; });
 }
+void Runtime::async_worker_limit(unsigned count) {
+    if(!count || count>64)throw std::invalid_argument("worker limit must be 1..64");
+    std::lock_guard lock(mutex_);if(async_owner_!=std::thread::id{} || closing_)throw std::logic_error("worker configuration requires an idle Runtime");async_worker_limit_=count;
+}
+unsigned Runtime::async_worker_limit() const {std::lock_guard lock(mutex_);return async_worker_limit_;}
 bool Runtime::enter_async(){require_managed();std::lock_guard lock(mutex_);if(async_owner_!=std::thread::id{} || closing_)return false;async_owner_=std::this_thread::get_id();return true;}
 void Runtime::leave_async() noexcept {std::lock_guard lock(mutex_);if(async_owner_!=std::this_thread::get_id())std::terminate();async_owner_={};}
 void Runtime::close() {

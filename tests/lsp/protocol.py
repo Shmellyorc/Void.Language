@@ -558,6 +558,26 @@ def strings(executable, root):
     print("strings: imported constants, UTF16 escape spans and unsaved repair passed")
 
 
+def parallel_spawn(executable, root):
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / "main.void"
+    valid = "func work(value: i32) -> i32:\n    return value + 1\nasync func entry(value: i32) -> i32:\n    return await spawn work(value)\n"
+    path.write_text(valid, encoding="utf-8")
+    uri = path.as_uri()
+    with Client(executable, path) as c:
+        notes = diagnostics(c.initialize())
+        assert not notes[uri]["diagnostics"], notes
+        response, _ = c.request("textDocument/definition", {"textDocument": {"uri": uri}, "position": source_position(valid, "work(value)")})
+        assert response["result"]["range"]["start"] == {"line": 0, "character": 5}, response
+        bad = "func work(value: i32) -> i32:\n    var callable = func() -> i32:\n        return value\n    return callable()\nasync func entry(value: i32) -> i32:\n    return await spawn work(value)\n"
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": uri, "languageId": "void", "version": 1, "text": bad}})
+        notes = diagnostics(c.sync())
+        assert any("Worker reachable calls" in item["message"] for item in notes[uri]["diagnostics"]), notes
+        c.notify("textDocument/didChange", {"textDocument": {"uri": uri, "version": 2}, "contentChanges": [{"text": valid}]})
+        notes = diagnostics(c.sync())
+        assert not notes[uri]["diagnostics"], notes
+
+
 if __name__ == "__main__":
     executable = pathlib.Path(sys.argv[1]).resolve()
     # Unicode physical root names work without changing the ASCII VFS policy.
@@ -581,3 +601,5 @@ if __name__ == "__main__":
     interfaces(executable, root / "interface project")
     invalid_utf8_disk(executable, root / "invalid UTF8 project")
     strings(executable, root / "string project")
+
+    parallel_spawn(executable, root / "parallel spawn project")

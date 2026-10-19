@@ -8,7 +8,41 @@
 
 ## Current implementation status
 
-## Stage 6 permanent delivery handoff (19 October 2026)
+## Delivery 3 authorization — 19 October 2026
+
+**Locked baseline:** Delivery 2 at `5d228804be809465ce2c97b7e0b58b89caa718ac`,
+[CI #74 checks](https://github.com/Shmellyorc/Void.Language/commit/5d228804be809465ce2c97b7e0b58b89caa718ac/checks),
+owner-confirmed 7/7 jobs, 113/113 each (791/791). Delivery 3 alone is now authorized:
+bounded native workers for directly named synchronous noncapturing source functions;
+scalar/string and recursively safe fixed value transfers only. No mutable managed
+references, task/callable/native-resource transfers, worker task creation or joins.
+Preserve structured cancellation/drain, precise GC, generation leases and shared
+JIT/AOT lowering. Local acceptance passed **120/120 each** in Debug, Release and strict
+ASan/UBSan/leak configurations (**360/360**), plus editor/package and 1 MiB checks.
+**STOPPED for owner review and seven-job hosted verification.** Deliveries 4–5
+remain unauthorized. Stop after local acceptance for owner review and hosted CI.
+D1 parallel sharing is approved only within this initial value-only boundary;
+the six design-decision groups remain distinct from the five deliveries.
+
+| Implementation delivery | Current status and dependency |
+| --- | --- |
+| 1 — Native Async Activation | Hosted accepted, CI #73 |
+| 2 — Structured Task Lifecycle | Hosted accepted, CI #74; current locked baseline |
+| 3 — Bounded Parallel Spawn | Locally accepted: 120/120 each in Debug/Release/strict; owner review and hosted CI pending |
+| 4 — Native Libraries | Not authorized; requires Delivery 3 hosted acceptance and owner approval |
+| 5 — Integrated Stage 6 Acceptance | Not authorized; requires Delivery 4 hosted acceptance and owner approval |
+
+These are the five implementation deliveries, not the six D1–D6 decision groups.
+D1 parallel execution now approves only the documented initial value-only scope.
+D2 enqueue/await/inferred handles, D3 root/group ownership and D4 lifecycle rules
+retain their approved contracts. D5 cross-task callable escapes stay restricted;
+D6 native scope remains Delivery 4 review. No general sharing, task-type spelling,
+async-callable or cancellation recovery contract has been silently added.
+
+Earlier Delivery 2 pending-hosted handoffs below are historical, superseded here.
+Boss controls Git/CI, Wrench reviews architecture, Keyboard implements authorized work.
+
+## Historical Delivery 2 handoff (superseded by Delivery 3 status above)
 
 **Current locked baseline:** Delivery 1 at `34efb761965a5e19841e2fcf2816a5b851e902a7`,
 [CI #73](https://github.com/Shmellyorc/Void.Language/commit/34efb761965a5e19841e2fcf2816a5b851e902a7/checks),

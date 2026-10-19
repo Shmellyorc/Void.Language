@@ -21,6 +21,18 @@ the same handles while groups join and cancellation drains. Children finish
 cleanup before parent resource release; no scheduler wait blocks the owning
 executor and no code address enters Runtime metadata.
 
+Delivery 3 reuses this coordinator for bounded parallel source jobs. Workers attach
+and enter Managed once, then wait NativeSafe when idle. Their private frames and
+results retain the same persistent Handle roots; a release/acquire handoff lets
+only the owning executor publish outcome/status and update awaiting parent frames.
+The owner runs ready activations and waits NativeSafe for notifications only when
+none are runnable. Queue locks never span Runtime/GC admission or user code.
+Cancellation checkpoints are explicit checked operations, separate from GC polling;
+worker storage and the enclosing code lease survive through actual completion and
+shielded cleanup. Transfer restrictions forbid arbitrary mutable shared graphs.
+Delivery 3 passed 120/120 local suites in Debug, Release and strict sanitizers;
+hosted verification remains owner-controlled.
+
 ## Historical Phase 15–23 foundation context
 
 This implemented the owner-approved G1–G6 in `GC_RUNTIME_PROPOSAL.md`. It is an
