@@ -12981,3 +12981,33 @@ No additional failure appeared, so no broader investigation or changes were made
 Windows compilation is pending owner push and cross-platform verification; no
 local Windows success or Delivery 1 hosted lock is claimed. No commits, pushes,
 branches or CI actions were performed. STOPPED for owner verification.
+
+## 19 October 2026: Windows Debug CI #72 editor keyword-test repair
+
+Owner-confirmed CI #72 at `ee42c39c8ffa50096c87b6e4cdbf0d15e5fd1f19` passed
+Windows Release. Windows Debug built the compiler and passed all 98/98 native
+CTest suites; its remaining failure was the VS Code extension unit assertion
+`Unexpected keyword highlighting: async`. The test still classified `async` as
+unsupported after the approved grammar change made it a control keyword.
+
+Updated only `editors/vscode/src/test/config.test.ts`: added `async` to the
+positive keyword expectations, removed it from the negative expectations, and
+added an assertion that one `keyword.control.void` rule matches both `async` and
+`return`. All other positive/negative assertions, the actual grammar and native
+implementation remain unchanged.
+
+Using the extension's required Node 24.19.0 runtime, both requested commands
+passed from `editors/vscode`:
+
+```sh
+PATH=/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:$PATH npm test
+PATH=/home/shmellyorc/.nvm/versions/node/v24.19.0/bin:$PATH npm run package
+```
+
+`npm test` completed type checking, compilation and the configuration test file
+with zero failures. Packaging succeeded and produced
+`editors/vscode/dist/void-language-0.1.0.vsix` (8 files, 145.71 KB).
+Logs: `/tmp/void-ci72-editor-test.log` and `/tmp/void-ci72-editor-package.log`.
+`git diff --check` passed. No native rebuild or unrelated changes were needed.
+No commits, pushes, branches or CI actions were performed. STOPPED for owner
+push and hosted verification; no new hosted acceptance or lock is claimed.
