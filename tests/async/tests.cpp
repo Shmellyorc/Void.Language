@@ -6,6 +6,7 @@
 #include <future>
 #include <latch>
 void async_ir_tests();
+void async_lifecycle_tests(const std::filesystem::path&,const std::filesystem::path&);
 void async_lifetime_tests(const std::filesystem::path&);
 #include <filesystem>
 #include <fstream>
@@ -16,11 +17,12 @@ void require(bool value,const char* message){if(!value)throw std::runtime_error(
 std::shared_ptr<const vd::ValidatedAnalysis> analyze(const std::filesystem::path& file){auto result=vd::analyze_project(file);if(!result.succeeded())throw vd::CompilationError(result.diagnostics);return result.program;}
 }
 int main(int argc,char** argv){try{
+    if(argc==4 && std::string(argv[1])=="--lifecycle"){async_lifecycle_tests(argv[2],argv[3]);return 0;}
     if(argc==5 && std::string(argv[1])=="--emit"){auto analysis=analyze(argv[2]);vd::emit_async_object(analysis->lower(),argv[3],std::string(argv[4])=="optimized");return 0;}
     if(argc==2 && std::string(argv[1])=="--ir"){async_ir_tests();return 0;}
     require(argc==3,"repository root and fixture root required");auto file=std::filesystem::path(argv[1])/"examples/async/activation.void";auto analysis=analyze(file);
     for(bool optimize:{false,true}){vd::Jit jit;auto code=jit.compile_async(*analysis,optimize);require(code->invoke(7)==17,"async await result");}
-    for(auto [name,answer]:{std::pair{"managed",343},std::pair{"large",27},std::pair{"closures",16},std::pair{"loops",25},std::pair{"values",39},std::pair{"methods",129}}){auto a=analyze(std::filesystem::path(argv[1])/"examples/async"/(std::string(name)+".void"));for(bool optimize:{false,true}){vd::Jit jit;auto code=jit.compile_async(*a,optimize);auto actual=code->invoke(7);if(actual!=answer)throw std::runtime_error(std::string(name)+": expected "+std::to_string(answer)+", got "+std::to_string(actual));}}
+    for(auto [name,answer]:{std::pair{"lifecycle_exits",14},std::pair{"lifecycle_values",17},std::pair{"lifecycle_resources",30},std::pair{"lifecycle",8},std::pair{"managed",343},std::pair{"large",27},std::pair{"closures",16},std::pair{"loops",25},std::pair{"values",39},std::pair{"methods",129}}){auto a=analyze(std::filesystem::path(argv[1])/"examples/async"/(std::string(name)+".void"));for(bool optimize:{false,true}){vd::Jit jit;auto code=jit.compile_async(*a,optimize);auto actual=code->invoke(7);if(actual!=answer)throw std::runtime_error(std::string(name)+": expected "+std::to_string(answer)+", got "+std::to_string(actual));}}
     auto fixtures=std::filesystem::path(argv[2]);std::filesystem::create_directories(fixtures);std::filesystem::remove_all(fixtures/".void");
     auto source=fixtures/"main.void";
     auto write=[&](const std::string& text){std::ofstream out(source);out<<text;require(bool(out),"fixture write failed");};

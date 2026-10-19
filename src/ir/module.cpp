@@ -614,13 +614,17 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         if (f.blocks.empty()) fail("function has no blocks");
         if(f.cleanup_entry && (!m.coordinated || *f.cleanup_entry>=f.blocks.size()))fail("invalid function cleanup entry");
         qualified_types.emplace_back();
+        std::set<unsigned> group_slots;
+        for(const auto& block:f.blocks)for(unsigned n=0;n<block.instructions.size();++n){const auto& i=block.instructions[n];if(i.op==Op::store && i.b<n && block.instructions[i.b].op==Op::async_group_enter)group_slots.insert(i.a);}
         std::vector<std::vector<Type>> body_types;
         for (const auto& b : f.blocks) {
             std::vector<Type> types;
             std::vector<bool> pure_templates;
+            std::vector<bool> group_values;const Instruction* validating=nullptr;
             for(const auto& instruction:b.instructions)if(instruction.op==Op::function_reference && functions.contains(instruction.callee) && functions.at(instruction.callee)->asynchronous)fail("async function value requires an async callable contract");
             auto operand = [&](unsigned id) {
                 if (id >= types.size() || types[id] == Type::none) fail("invalid operand in " + f.name);
+                if(group_values[id] && (!validating || (validating->op!=Op::async_group_join && !(validating->op==Op::store && group_slots.contains(validating->a)))))fail("async group token escapes lifecycle operations");
                 return types[id];
             };
             auto expect = [&](unsigned id, Type t) { if (!assignable(operand(id),t)) fail("mistyped operand in " + f.name); };
@@ -629,6 +633,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 return f.locals[id];
             };
             for (const auto& i : b.instructions) {
+                validating=&i;
                 Type result = Type::i32;
                 if(i.array_repeat && i.op!=Op::fixed_array) fail("repeat template on non-array instruction");
                 switch (i.op) {
@@ -816,6 +821,18 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     else result = field;
                     break;
                 }
+                case Op::async_cancel_children:
+                    if(!f.asynchronous || i.a || i.b || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || (f.cleanup_entry && &b-f.blocks.data()>=*f.cleanup_entry))fail("invalid early async exit");result=Type::none;break;
+                case Op::async_cancel: {
+                    auto task=operand(i.a);if(!m.coordinated || !task.definition || !task.definition->task_result || task.kind!=Type::managed_ref || task.nullable || task.construction || i.b || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid task cancellation");result=Type::none;break;
+                }
+                case Op::async_group_enter: case Op::async_group_join: case Op::async_drain: {
+                    if(!f.asynchronous || i.b || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid async lifecycle operation");
+                    auto cleanup=f.cleanup_entry && &b-f.blocks.data()>=*f.cleanup_entry;
+                    if(i.op==Op::async_drain){if(!cleanup || &b-f.blocks.data()!=*f.cleanup_entry || &i!=b.instructions.data() || i.a || i.immediate)fail("illegal async drain transition");}
+                    else {if(cleanup)fail("async group operation during cleanup");if(i.op==Op::async_group_join){expect(i.a,Type::u64);if(i.immediate!=0 && i.immediate!=1)fail("invalid group exit mode");}else if(i.a || i.immediate)fail("invalid group entry");}
+                    result=i.op==Op::async_group_enter?Type::u64:Type::none;break;
+                }
                 case Op::await: {
                     auto task=operand(i.a);if(!f.asynchronous || !task.definition || !task.definition->task_result || task.kind!=Type::managed_ref || task.nullable || task.construction)fail("illegal await or task shape");
                     if(f.cleanup_entry && static_cast<std::size_t>(&b-f.blocks.data())>=*f.cleanup_entry)fail("await during deferred cleanup");
@@ -918,11 +935,13 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     for(auto argument:i.arguments) pure=pure && argument<pure_templates.size() && pure_templates[argument];
                 }
                 pure_templates.push_back(pure);
+                group_values.push_back(i.op==Op::async_group_enter || (i.op==Op::load && group_slots.contains(i.a)));
                 types.push_back(result);
             }
             body_types.push_back(types);
             qualified_types.back().push_back(types);
             auto destination = [&](unsigned id) { if (id >= f.blocks.size()) fail("invalid branch destination"); };
+            validating=nullptr;
             switch (b.end.kind) {
             case Terminator::Kind::return_value:
                 if (f.result == Type::none) fail("value returned from no-result function");

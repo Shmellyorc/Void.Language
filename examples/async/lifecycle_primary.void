@@ -1,0 +1,30 @@
+struct ledger:
+    number: i32 = 0
+
+async func tick() -> i32:
+    return 1
+
+async func child(owner: ledger, zero: i32) -> i32:
+    defer {
+        owner.number += 1
+    }
+    var ignored = await tick()
+    return 1 / zero
+
+async func parent(owner: ledger, value: i32) -> i32:
+    defer {
+        owner.number += 100
+    }
+    defer {
+        var invalid = (value - value - 1) as u8
+    }
+    var pending = child(owner, 0)
+    var ignored = await tick()
+    return 1 / (value - value)
+
+async func entry(value: i32) -> i32:
+    var owner = ledger()
+    defer {
+        owner.number += 1000
+    }
+    return await parent(owner, value)

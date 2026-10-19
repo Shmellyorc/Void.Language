@@ -16,7 +16,10 @@ frames and task results. Native task records hold ordinary persistent handles
 through complete root draining; frame maps contain data offsets, never code
 owners. Resume scratch roots leave before suspension. The enclosing NativeCode
 lease covers suspended native resumptions and retirement; see [ASYNC.md](ASYNC.md)
-and WORK_LOG.md for the exact local acceptance and restrictions.
+and WORK_LOG.md for the exact local acceptance and restrictions. Delivery 2 uses
+the same handles while groups join and cancellation drains. Children finish
+cleanup before parent resource release; no scheduler wait blocks the owning
+executor and no code address enters Runtime metadata.
 
 ## Historical Phase 15–23 foundation context
 

@@ -22,6 +22,11 @@ struct Diagnostic {
             for(unsigned n=0;n<frames.size();++n)value.frames[n]=frames[n].c_str();
         }catch(...){value={};value.message="Async failure diagnostic allocation failed";}
     }
+    void append_frames(const vd::RuntimeFailure& failure) noexcept {
+        bool truncated=value.count>32 || failure.count>32;
+        try{for(unsigned n=0;n<std::min(failure.count,32u);++n){if(frames.size()<32)frames.emplace_back(failure.frames[n]);else truncated=true;}}catch(...){truncated=true;}
+        value.count=truncated?33:static_cast<unsigned>(frames.size());for(unsigned n=0;n<frames.size();++n)value.frames[n]=frames[n].c_str();
+    }
     void append(const vd::RuntimeFailure& failure) noexcept {
         bool truncated=value.count>32;
         try{auto add=[&](const char* text){if(frames.size()<32)frames.emplace_back(text);else truncated=true;};add("Additional unobserved task failure:\n");add(failure.message);for(unsigned n=0;n<std::min(failure.count,32u);++n)add(failure.frames[n]);truncated|=failure.count>32;}
@@ -29,21 +34,31 @@ struct Diagnostic {
         value.count=truncated?33:static_cast<unsigned>(frames.size());for(unsigned n=0;n<frames.size();++n)value.frames[n]=frames[n].c_str();
     }
 };
+struct Task;
+struct Group {Task* owner=nullptr;Group* outer=nullptr;std::uint64_t id=0;bool closed=false;};
 struct Task {
-    enum State { prepared,ready,running,waiting,finished } state=prepared;
+    enum State { prepared,ready,running,waiting,joining,finished } state=prepared;
+    enum Outcome { success,cancelled,failed } outcome=success;
     vd::Runtime::Handle task,frame;
     void* address=nullptr;
     vd_async_resume_entry resume=nullptr;
     Task* dependency=nullptr;
     Task* next_ready=nullptr;
-    bool observed=false;
+    Group children;
+    Group* group=nullptr;
+    Group* active_group=&children;
+    Group* joining_group=nullptr;
+    bool observed=false,cancel_requested=false,cancel_observed=false,draining=false,child_interrupt=false;
+    unsigned cleanup_depth=0;
+    Diagnostic interrupted;
     Diagnostic failure;
-    explicit Task(vd::Runtime& runtime):task(runtime),frame(runtime){}
+    explicit Task(vd::Runtime& runtime):task(runtime),frame(runtime){children.owner=this;}
 };
 struct Scope {
     vd::Runtime& runtime;
     std::thread::id owner=std::this_thread::get_id();
     std::vector<std::unique_ptr<Task>> tasks;
+    std::vector<std::unique_ptr<Group>> groups;
     Task* current=nullptr;
     Task* ready_head=nullptr;
     Task* ready_tail=nullptr;
@@ -59,7 +74,29 @@ struct Scope {
         ready_tail=&task;
     }
     Task* pop() noexcept {auto* task=ready_head;if(task){ready_head=task->next_ready;if(!ready_head)ready_tail=nullptr;task->next_ready=nullptr;}return task;}
-
+    bool member(const Task& task,const Group* group) const noexcept {return task.group==group;}
+    bool owned(const Task& task,const Task& owner) const noexcept {return task.group && task.group->owner==&owner;}
+    bool pending(const Task& owner,const Group* group=nullptr) const noexcept {
+        for(auto& task:tasks)if((group?member(*task,group):owned(*task,owner)) && task->state!=Task::prepared && task->state!=Task::finished)return true;
+        return false;
+    }
+    void cancel_children(Task& owner,Group* group=nullptr) noexcept {
+        for(auto& task:tasks)if((group?member(*task,group):owned(*task,owner)) && task->state!=Task::finished)task->cancel_requested=true;
+    }
+    Task* child_failure(Task& owner,Group* group=nullptr) noexcept {
+        for(auto& task:tasks)if((group?member(*task,group):owned(*task,owner)) && task->state!=Task::prepared && task->outcome==Task::failed && !task->observed)return task.get();
+        return nullptr;
+    }
+    void collect(Task& owner,Group* group=nullptr) noexcept {
+        for(auto& task:tasks)if((group?member(*task,group):owned(*task,owner)) && task->outcome==Task::failed && !task->observed){
+            if(owner.outcome!=Task::failed){owner.failure.assign(task->failure.value);owner.outcome=Task::failed;}
+            else owner.failure.append(task->failure.value);
+            task->observed=true;
+        }
+    }
+    void failed_child(Task& child) noexcept {
+        if(child.group && child.outcome==Task::failed){auto& owner=*child.group->owner;cancel_children(owner,child.group);}
+    }
 };
 thread_local Scope* active=nullptr;
 // NativeCode::invoke/AOT copies or prints this owned export immediately after
@@ -71,7 +108,7 @@ void exception(vd::RuntimeFailure* failure,const char* message) noexcept {failur
 extern "C" {
 void vd_async_new(void** task,void** frame,std::size_t frame_size,const std::size_t* frame_offsets,std::size_t frame_count,std::size_t task_size,const std::size_t* task_offsets,std::size_t task_count,const char* task_key,const void* generation,vd_async_resume_entry resume,vd::RuntimeFailure* failure) noexcept {
     try {
-        auto& s=scope();if(s.generation!=generation)throw std::logic_error("async generation mismatch");auto item=std::make_unique<Task>(s.runtime);item->resume=resume;
+        auto& s=scope();if(s.current && (s.current->draining || s.current->cleanup_depth)){exception(failure,"Async calls cannot enqueue during structured cleanup");return;}if(s.generation!=generation)throw std::logic_error("async generation mismatch");auto item=std::make_unique<Task>(s.runtime);item->resume=resume;item->group=s.current?s.current->active_group:nullptr;
         vd::TypeLayout task_layout{task_size,{}},frame_layout{frame_size,{}};
         if(task_count)task_layout.references.assign(task_offsets,task_offsets+task_count);
         if(frame_count)frame_layout.references.assign(frame_offsets,frame_offsets+frame_count);
@@ -89,21 +126,83 @@ void vd_async_start(void* address,vd::RuntimeFailure* failure) noexcept {
 bool vd_async_ready(void* address,vd::RuntimeFailure* failure) noexcept {
     try {
         auto& s=scope();if(!s.current)throw std::logic_error("await outside activation");
-        if(s.current->failure.value.message){*failure=s.current->failure.value;return true;}
+        vd_async_checkpoint(failure);if(failure->message)return true;
         auto& task=s.find(address);
         if(&task==s.current){exception(failure,"Task cannot await itself");return true;}
+        for(auto* owner=s.current->group? s.current->group->owner:nullptr;owner;owner=owner->group?owner->group->owner:nullptr)if(owner==&task && task.state!=Task::finished){exception(failure,"Async await dependency cycle");return true;}
         if(task.state!=Task::finished)return false;
-        task.observed=true;if(task.failure.value.message)*failure=task.failure.value;
+        task.observed=true;if(task.outcome==Task::cancelled){s.current->cancel_observed=true;exception(failure,"Async task cancelled");}else if(task.failure.value.message)*failure=task.failure.value;
         return true;
     }catch(...){exception(failure,"Invalid task await");return true;}
 }
 void vd_async_suspend(void* frame,void* address,vd::RuntimeFailure* failure) noexcept {
-    try{auto& s=scope();if(!s.current || s.current->state!=Task::running || s.current->frame.get()!=frame)throw std::logic_error("invalid suspension");s.current->dependency=&s.find(address);s.current->state=Task::waiting;}
+    try{auto& s=scope();if(!s.current || s.current->state!=Task::running || s.current->frame.get()!=frame)throw std::logic_error("invalid suspension");auto* dependency=&s.find(address);
+        for(auto* next=dependency;next;next=next->state==Task::waiting?next->dependency:nullptr)if(next==s.current)throw std::logic_error("cyclic suspension");
+        s.current->dependency=dependency;s.current->state=Task::waiting;}
     catch(...){exception(failure,"Invalid async suspension");}
 }
 void vd_async_complete(void* address) noexcept {
     try{auto& s=scope();if(!s.current || s.current->address!=address || s.current->state!=Task::running)std::terminate();std::int32_t complete=1;std::memcpy(address,&complete,sizeof(complete));s.current->state=Task::finished;}
     catch(...){std::terminate();}
+}
+void vd_async_cancel(void* address,vd::RuntimeFailure* failure) noexcept {
+    try{auto& s=scope();auto& task=s.find(address);if(task.state!=Task::finished)task.cancel_requested=true;}
+    catch(...){exception(failure,"Invalid task cancellation");}
+}
+void vd_async_cleanup_enter() noexcept {if(active && active->current)++active->current->cleanup_depth;}
+void vd_async_cleanup_leave() noexcept {if(active && active->current){if(!active->current->cleanup_depth)std::terminate();--active->current->cleanup_depth;}}
+void vd_async_cancel_children() noexcept {try{auto& s=scope();if(!s.current)std::terminate();s.cancel_children(*s.current);}catch(...){std::terminate();}}
+void vd_async_finish(vd::RuntimeFailure* failure) noexcept {
+    try{auto& task=*scope().current;
+        if(task.outcome==Task::cancelled){if(failure->message){task.failure.assign(*failure);task.outcome=Task::failed;}else exception(failure,"Async task cancelled");}
+    }catch(...){exception(failure,"Invalid async completion outcome");}
+}
+void vd_async_checkpoint(vd::RuntimeFailure* failure) noexcept {
+    try{auto& s=scope();auto& task=*s.current;if(task.draining)return;
+        if(task.failure.value.message){*failure=task.failure.value;return;}
+        // Child failure is selected only after the shielded join, in creation order.
+        if(s.child_failure(task)){task.child_interrupt=true;exception(failure,"Async child failure requires structured cleanup");return;}
+        if(task.cancel_requested){task.cancel_observed=true;exception(failure,"Async task cancelled");}
+    }catch(...){exception(failure,"Invalid async checkpoint");}
+}
+std::uint64_t vd_async_group_enter(vd::RuntimeFailure* failure) noexcept {
+    try{auto& s=scope();if(!s.current || s.current->draining)throw std::logic_error("invalid group entry");
+        auto group=std::make_unique<Group>();group->owner=s.current;group->outer=s.current->active_group;group->id=s.groups.size()+1;
+        auto* address=group.get();s.groups.push_back(std::move(group));s.current->active_group=address;return address->id;
+    }catch(...){exception(failure,"Async group allocation or entry failed");return 0;}
+}
+bool vd_async_group_join(std::uint64_t id,std::int32_t cancel,void* frame,vd::RuntimeFailure* failure) noexcept {
+    try{auto& s=scope();if(!s.current || s.current->frame.get()!=frame || !id || id>s.groups.size())throw std::logic_error("invalid group join");
+        auto& task=*s.current;auto* group=s.groups[id-1].get();if(group->owner!=&task || task.active_group!=group || group->closed)throw std::logic_error("invalid group ownership");
+        if(cancel || task.cancel_requested || s.child_failure(task,group))s.cancel_children(task,group);
+        if(s.pending(task,group)){task.joining_group=group;task.state=Task::joining;return false;}
+        group->closed=true;task.active_group=group->outer;task.joining_group=nullptr;
+        // Select failures across all owned groups at the activation drain, so a
+        // later lexical group cannot outrank an earlier-created outer child.
+        if(s.child_failure(task,group)){task.child_interrupt=true;exception(failure,"Async child failure requires structured cleanup");}
+        else if(task.cancel_requested){task.cancel_observed=true;exception(failure,"Async task cancelled");}
+        return true;
+    }catch(...){exception(failure,"Invalid async group join");return true;}
+}
+bool vd_async_drain(void* frame,vd::RuntimeFailure* failure) noexcept {
+    try{auto& s=scope();auto& task=*s.current;if(task.frame.get()!=frame)throw std::logic_error("invalid drain frame");
+        if(!task.draining){
+            task.draining=true;
+            if(failure->message && task.failure.value.message)task.failure.assign(*failure);
+            if(failure->message && !task.failure.value.message){
+                if(task.child_interrupt)task.interrupted.assign(*failure);
+                else if(task.cancel_observed)task.outcome=Task::cancelled;
+                else {task.failure.assign(*failure);task.outcome=Task::failed;}
+            }
+        }
+        if(task.outcome==Task::failed)s.failed_child(task);
+        *failure={};
+        if(task.outcome!=Task::success || s.child_failure(task))s.cancel_children(task);
+        if(s.pending(task)){task.joining_group=nullptr;task.state=Task::joining;return false;}
+        s.collect(task);if(task.child_interrupt){task.failure.append_frames(task.interrupted.value);task.child_interrupt=false;}task.active_group=&task.children;
+        if(task.outcome==Task::failed)*failure=task.failure.value;
+        return true;
+    }catch(...){exception(failure,"Invalid async structured drain");return true;}
 }
 std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::size_t result_offset,const void* generation,vd::RuntimeFailure* failure) noexcept {
     if(active){exception(failure,"Nested async root adapters are unsupported");return 0;}
@@ -116,7 +215,10 @@ std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::si
         Diagnostic root_failure;if(initial.message)root_failure.assign(initial);
         Task* root=nullptr;if(root_address)root=&s.find(root_address);
         for(;;) {
-            for(auto& task:s.tasks)if(task->state==Task::waiting && task->dependency->state==Task::finished)s.enqueue(*task);
+            for(auto& task:s.tasks){
+                if(task->state==Task::waiting && (task->dependency->state==Task::finished || task->cancel_requested || s.child_failure(*task)))s.enqueue(*task);
+                else if(task->state==Task::joining && !s.pending(*task,task->joining_group))s.enqueue(*task);
+            }
             Task* next=s.pop();bool pending=false;
             for(auto& task:s.tasks){pending|=task->state!=Task::finished && task->state!=Task::prepared;}
             if(!next){
@@ -124,18 +226,19 @@ std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::si
                 // Resume through the checked await failure edge so reached
                 // cleanup runs even for an invalid cyclic dependency graph.
                 vd::RuntimeFailure cycle;cycle.message="Async await dependency cycle";
-                for(auto& task:s.tasks)if(task->state==Task::waiting){task->failure.assign(cycle);s.enqueue(*task);}
+                for(auto& task:s.tasks)if(task->state==Task::waiting){task->failure.assign(cycle);task->outcome=Task::failed;s.enqueue(*task);}
                 continue;
             }
             s.current=next;next->state=Task::running;vd::RuntimeFailure result;
             next->resume(next->frame.get(),&result);
-            if(result.message){next->failure.assign(result);next->state=Task::finished;}
-            else if(next->state==Task::running){result.message="Async activation returned without completion or suspension";next->failure.assign(result);next->state=Task::finished;}
-            s.current=nullptr;
+            if(result.message){if(next->outcome==Task::failed)next->failure.assign(result);else {if(next->cancel_observed)next->outcome=Task::cancelled;else{next->failure.assign(result);next->outcome=Task::failed;}}next->state=Task::finished;}
+            else if(next->state==Task::running){result.message="Async activation returned without completion or suspension";next->failure.assign(result);next->outcome=Task::failed;next->state=Task::finished;}
+            s.failed_child(*next);s.current=nullptr;
         }
         const vd::RuntimeFailure* outcome=initial.message?&root_failure.value:root && root->failure.value.message?&root->failure.value:nullptr;
         if(!outcome)for(auto& task:s.tasks)if(task->failure.value.message && !task->observed){outcome=&task->failure.value;break;}
         std::int32_t value=0;
+        if(!outcome && root && root->outcome==Task::cancelled){exception(failure,"Async task cancelled");return 0;}
         if(outcome){exported_failure.assign(*outcome);for(auto& task:s.tasks)if(task.get()!=root && &task->failure.value!=outcome && task->failure.value.message && !task->observed)exported_failure.append(task->failure.value);*failure=exported_failure.value;}
         else if(root)std::memcpy(&value,static_cast<const char*>(root->task.get())+result_offset,sizeof(value));
         return value;

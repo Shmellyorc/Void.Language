@@ -1,0 +1,36 @@
+value struct packet:
+    items: [i32, 1]
+
+struct box:
+    current: packet
+    cleanups: i32 = 0
+
+async func tick() -> i32:
+    return 1
+
+async func change(owner: box):
+    defer {
+        owner.current.items[0] = 99
+        owner.cleanups += 1
+    }
+    var ignored = await tick()
+
+async func snapshot_array(owner: box) -> [i32, 1]:
+    with tasks.group() as jobs:
+        var pending = change(owner)
+        var ignored = await tick()
+        return owner.current.items
+
+async func snapshot_packet(owner: box) -> packet:
+    with tasks.group() as jobs:
+        var pending = change(owner)
+        var ignored = await tick()
+        return owner.current
+
+async func entry(value: i32) -> i32:
+    var owner = box()
+    owner.current.items[0] = value
+    var first = await snapshot_array(owner)
+    owner.current.items[0] = value + 1
+    var second = await snapshot_packet(owner)
+    return first[0] + second.items[0] + owner.cleanups

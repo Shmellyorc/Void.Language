@@ -253,7 +253,7 @@ struct Expr {
     bool event=false, asynchronous_call=false;
     std::string event_owner;
     Type environment=Type::none;
-    enum class Kind { awaited, lambda, capture_reference, function_reference, function_call, function_null, test, match, sum, propagate, literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal } kind;
+    enum class Kind { task_cancel, awaited, lambda, capture_reference, function_reference, function_call, function_null, test, match, sum, propagate, literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::string op, qualifier, target, source_target;
@@ -298,7 +298,7 @@ struct Statement {
     Type assigned_type = Type::none;
     std::vector<Statement> body, otherwise;
     unsigned slot = 0, flow = 0;
-    bool readonly = false, invalid = false, using_field = false, event = false;
+    bool readonly = false, invalid = false, using_field = false, event = false, task_group = false;
     Statement(Kind k, Token t) : kind(k), token(std::move(t)) {}
 };
 struct Parameter {
@@ -1080,7 +1080,7 @@ class Semantics {
     std::function<void(Unit&, Structure&)> defaults;
     Diagnostics& diagnostics;
     bool invalid_function = false;
-    struct Variable { Type type; unsigned slot; bool readonly; Token declaration;Function* owner=nullptr; };
+    struct Variable { Type type; unsigned slot; bool readonly; Token declaration;Function* owner=nullptr; bool task_group=false; };
     std::function<Variable*(const std::string&)> enclosing;
     std::vector<std::map<std::string, Variable>> scopes;
     Function* current = nullptr;
@@ -1101,7 +1101,7 @@ class Semantics {
             const auto slot=static_cast<unsigned>(current->locals.size());current->locals.push_back(outer->type);
             current->capture_inputs.emplace(slot,static_cast<unsigned>(current->captures.size()));current->captured_locals.emplace(slot,cell);
             current->captures.push_back({outer->slot,cell,outer->declaration,snapshot});
-            auto [position,inserted]=scopes.front().emplace(name,Variable{outer->type,slot,outer->readonly,outer->declaration,current});return &position->second;
+            auto [position,inserted]=scopes.front().emplace(name,Variable{outer->type,slot,outer->readonly,outer->declaration,current,outer->task_group});return &position->second;
         }
         return nullptr;
     }
@@ -1284,6 +1284,11 @@ class Semantics {
             return call_expression(e);
         }
         auto event_access=allow_event;allow_event=e.token.text=="emit";auto receiver=expression(*e.parts[0]);allow_event=event_access;
+        if(receiver.definition && receiver.definition->task_result && e.token.text=="cancel"){
+            if(e.parts.size()!=1 || !e.type_arguments.empty() || !current)error(source,e.token,Code::unsupported_type,"Task cancellation requires a function activation and no arguments.");
+            if(receiver.nullable)error(source,e.token,Code::type_mismatch,"Task cancellation requires a non-null handle.");
+            e.kind=Expr::Kind::task_cancel;return e.type=Type::none;
+        }
         (void)expected;
         return resolved_method_expression(e,receiver);
     }
@@ -1662,7 +1667,7 @@ class Semantics {
         switch (e.kind) {
         case Expr::Kind::awaited:return awaited_expression(e);
         case Expr::Kind::lambda:return lambda_expression(e);
-        case Expr::Kind::capture_reference:case Expr::Kind::function_null: case Expr::Kind::function_reference:return e.type;
+        case Expr::Kind::task_cancel:case Expr::Kind::capture_reference:case Expr::Kind::function_null: case Expr::Kind::function_reference:return e.type;
         case Expr::Kind::function_call:return function_invocation(e);
         case Expr::Kind::test:return test_expression(e);
         case Expr::Kind::match:return match_expression(e,expected);
@@ -1897,6 +1902,7 @@ class Semantics {
         }
         if (!v && unit.failed_import) throw Poison{};
         if (!v) error(source, e.token, Code::unknown_identifier, "Unknown identifier '" + e.token.text + "'.", "Declare it with var before use.");
+        if(v->task_group)error(source,e.token,Code::unsupported_type,"Task group aliases are lexical scopes, not first-class values; jobs.spawn is deferred.");
         e.slot = v->slot; return e.type = v->type;
     }
     VOID_SEMANTIC_HANDLER Type field_expression(Expr& e, std::optional<Type> expected) {
@@ -2124,6 +2130,12 @@ class Semantics {
             s.slot = declare(s.token, t, s.readonly); break;
         }
         case K::scoped:{
+            auto& call=*s.expression;
+            if(call.kind==Expr::Kind::method_call && call.token.text=="group" && call.parts.size()==1 && call.parts[0]->kind==Expr::Kind::name && call.parts[0]->token.text=="tasks" && !lookup("tasks") && !visible_names.contains("tasks")){
+                if(!current || !current->asynchronous || current->deferred || !call.type_arguments.empty())error(source,s.token,Code::unsupported_type,"tasks.group() requires an async scope.");
+                call.kind=Expr::Kind::literal;call.type=Type::u64;call.parts.clear();s.task_group=true;scopes.emplace_back();s.slot=declare(s.binder,Type::u64,true);lookup(s.binder.text)->task_group=true;
+                flow=sequence(s.body,false);scopes.pop_back();break;
+            }
             auto type=expression(*s.expression);if(type.kind!=Type::managed_ref || type.nullable)error(source,s.token,Code::type_mismatch,"with requires a non-nullable managed resource with deinit.");
             scopes.emplace_back();s.slot=declare(s.binder,type,false);
             auto cell=unit.make_capture_record(current->symbol+"::$cell$"+std::to_string(s.slot),type,true);auto initial=type;initial.nullable=true;std::const_pointer_cast<ir::ValueType>(cell.definition)->fields[0].type=initial;current->captured_locals.emplace(s.slot,cell);
@@ -2204,7 +2216,7 @@ class Semantics {
         }
         case K::expression:
             if (expression(*s.expression) == error_type) break;
-            if (s.expression->kind != Expr::Kind::awaited && s.expression->kind != Expr::Kind::call && s.expression->kind != Expr::Kind::method_call && s.expression->kind!=Expr::Kind::function_call) error(source, s.token, Code::invalid_value, "Only function calls can be standalone expressions.", "Assign this value with var or return it.");
+            if (s.expression->kind != Expr::Kind::task_cancel && s.expression->kind != Expr::Kind::awaited && s.expression->kind != Expr::Kind::call && s.expression->kind != Expr::Kind::method_call && s.expression->kind!=Expr::Kind::function_call) error(source, s.token, Code::invalid_value, "Only function calls can be standalone expressions.", "Assign this value with var or return it.");
             break;
         case K::returned:
             if(current->deferred)error(source,s.token,Code::invalid_value,"Deferred code cannot return directly.");
@@ -2476,18 +2488,26 @@ class Lowering {
     const ConstructionContext* context=nullptr;
     std::map<unsigned,unsigned> cells;
     std::optional<unsigned> cleanup_head,return_slot;
-    std::vector<unsigned> with_scopes;
+    struct WithScope {unsigned slot;bool group=false;std::optional<unsigned> owned_group={};};
+    std::vector<WithScope> with_scopes;
     std::vector<std::size_t> loop_with_depth;
     unsigned register_cleanup(unsigned handler,bool active,const Token& token){
         ir::Instruction node{ir::Op::gc_construct};auto type=output.locals[*cleanup_head];type.nullable=false;node.type=type;node.arguments={emit({ir::Op::load,*cleanup_head},token),handler,constant(Type::boolean,{static_cast<unsigned>(active),{}},token)};auto value=emit(node,token);emit({ir::Op::store,*cleanup_head,value},token);return capture(value,type,token);
     }
-    void leave_with(unsigned slot,const Token& token){
+    void join_group(unsigned slot,bool cancel,const Token& token){ir::Instruction join{ir::Op::async_group_join,emit({ir::Op::load,slot},token)};join.immediate=cancel;emit(join,token);}
+    void leave_with(WithScope scope,const Token& token,bool cancel=true){
+        if(scope.group){join_group(scope.slot,cancel,token);return;}
+        if(scope.owned_group)join_group(*scope.owned_group,cancel,token);
+        auto slot=scope.slot;
         auto owner=emit({ir::Op::load,slot},token);ir::Instruction deactivate{ir::Op::gc_write,owner,constant(Type::boolean,{0,{}},token)};deactivate.immediate=2;emit(deactivate,token);
         auto handler=extract_managed(owner,1,token);emit({ir::Op::function_call,handler},token);
     }
+    const Statement* normal_return=nullptr;
     std::vector<unsigned> cleanup_jumps;
-    void return_through_cleanup(std::optional<unsigned> value,const Token& token){
-        if(!cleanup_head){terminate(value?ir::Terminator{ir::Terminator::Kind::return_value,*value}:ir::Terminator{ir::Terminator::Kind::return_void});return;}
+    void return_through_cleanup(std::optional<unsigned> value,const Token& token,bool early=false){
+        if(output.asynchronous && early)emit({ir::Op::async_cancel_children},token);
+        if(output.asynchronous)for(auto scope=with_scopes.rbegin();scope!=with_scopes.rend();++scope){if(scope->group)join_group(scope->slot,true,token);else if(scope->owned_group)join_group(*scope->owned_group,true,token);}
+        if(!cleanup_head && !output.asynchronous){terminate(value?ir::Terminator{ir::Terminator::Kind::return_value,*value}:ir::Terminator{ir::Terminator::Kind::return_void});return;}
         if(value)emit({ir::Op::store,*return_slot,*value},token);
         cleanup_jumps.push_back(*current);terminate({ir::Terminator::Kind::jump});
     }
@@ -2732,7 +2752,7 @@ class Lowering {
             terminate({ir::Terminator::Kind::branch,emit({ir::Op::equal,tag,constant(Type::i32,{0,{}},e.token)},e.token),success,failure});
             current=failure;ir::Instruction payload{ir::Op::sum_get,emit({ir::Op::load,source},e.token)};payload.immediate=2;
             auto value=emit(payload,e.token);ir::Instruction propagate{ir::Op::sum};propagate.type=output.result;propagate.immediate=1;propagate.arguments={value};
-            return_through_cleanup(emit(propagate,e.token),e.token);
+            return_through_cleanup(emit(propagate,e.token),e.token,true);
             current=success;ir::Instruction payload_ok{ir::Op::sum_get,emit({ir::Op::load,source},e.token)};payload_ok.immediate=1;return emit(payload_ok,e.token);
         }
         case K::array_default: return repeated_array(e.type,*e.type.definition->extent,e.token,[&]{return expression(*e.parts[0]);});
@@ -2821,6 +2841,7 @@ class Lowering {
             }
             return emit({ir::Op::load,slot},e.token);
         }
+        case K::task_cancel: return emit({ir::Op::async_cancel,expression(*e.parts[0])},e.token);
         case K::awaited: return emit({ir::Op::await,expression(*e.parts[0])},e.token);
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
         case K::method_call: case K::call: {
@@ -2956,11 +2977,13 @@ class Lowering {
             if(s.flow&next_flow){jump(done);current=done;}else terminate({ir::Terminator::Kind::unreachable});break;
         }
         case K::scoped:{
+            if(s.task_group){emit({ir::Op::store,s.slot,emit({ir::Op::async_group_enter},s.token)},s.token);with_scopes.push_back({s.slot,true});sequence(s.body);if(current)join_group(s.slot,false,s.token);with_scopes.pop_back();break;}
+            std::optional<unsigned> group;if(output.asynchronous)group=snapshot(emit({ir::Op::async_group_enter},s.token),Type::u64,s.token);
             auto home=cells.at(s.slot);auto cell=output.locals.at(home);auto field=ir::field_type(cell,0);ir::Instruction construct{ir::Op::gc_construct};construct.type=cell;construct.arguments={constant(field,{0,{}},s.token)};emit({ir::Op::store,home,emit(construct,s.token)},s.token);
             auto node=register_cleanup(expression(*s.selection),false,s.token);
             auto value=expression(*s.expression);emit({ir::Op::store,s.slot,value},s.token);
             ir::Instruction activate{ir::Op::gc_write,emit({ir::Op::load,node},s.token),constant(Type::boolean,{1,{}},s.token)};activate.immediate=2;emit(activate,s.token);
-            with_scopes.push_back(node);sequence(s.body);if(current)leave_with(node,s.token);with_scopes.pop_back();break;
+            with_scopes.push_back({node,false,group});sequence(s.body);if(current)leave_with(with_scopes.back(),s.token,false);with_scopes.pop_back();break;
         }
         case K::deferred:register_cleanup(expression(*s.expression),true,s.token);break;
         case K::no_op: break;
@@ -3028,7 +3051,7 @@ class Lowering {
         }
         case K::expression: expression(*s.expression); break;
         case K::returned:
-            return_through_cleanup(s.expression?std::optional<unsigned>{expression(*s.expression)}:std::nullopt,s.token);
+            return_through_cleanup(s.expression?std::optional<unsigned>{expression(*s.expression)}:std::nullopt,s.token,&s!=normal_return);
             break;
         case K::conditional: {
             auto yes=block(),no=block(),merge=block();
@@ -3106,12 +3129,13 @@ class Lowering {
 public:
     explicit Lowering(const SourceFile& s, ir::Module& m, StringPool& p) : source(s), module(m), strings(p) {}
     ir::Function lower(const Function& f, const ConstructionContext* construction=nullptr) {
-        context=construction;
+        context=construction;normal_return=!f.body.empty() && f.body.back().kind==Statement::Kind::returned?&f.body.back():nullptr;
         output = {}; output.name = f.symbol; output.source_name = f.concrete_name.empty() ? f.token.text : f.concrete_name; output.display_name=f.display_name; output.source = source.location(f.token.offset);
         output.asynchronous=f.asynchronous;output.task=f.task;
         output.bound_receiver=f.bound_receiver;output.closure=f.anonymous;cells.clear();cleanup_head.reset();return_slot.reset();cleanup_jumps.clear();with_scopes.clear();loop_with_depth.clear();
         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
-        if(f.cleanup_type!=Type::none){cleanup_head=output.locals.size();auto head=f.cleanup_type;head.nullable=true;output.locals.push_back(head);if(f.result!=Type::none){return_slot=output.locals.size();output.locals.push_back(f.result);}}
+        if(f.cleanup_type!=Type::none){cleanup_head=output.locals.size();auto head=f.cleanup_type;head.nullable=true;output.locals.push_back(head);}
+        if((cleanup_head || f.asynchronous) && f.result!=Type::none){return_slot=output.locals.size();output.locals.push_back(f.result);}
         for(const auto& [slot,type]:f.captured_locals){cells.emplace(slot,static_cast<unsigned>(output.locals.size()));output.locals.push_back(type);}
         for(const auto& [slot,field]:f.capture_inputs){
             auto environment=emit({ir::Op::argument,0},f.token);ir::Instruction read{ir::Op::gc_read,environment};read.immediate=field;
@@ -3152,12 +3176,16 @@ public:
         }
         sequence(f.body);
         if(current)return_through_cleanup({},f.token);
-        if(cleanup_head){
+        if(cleanup_head || f.asynchronous){
             auto entry=block();output.cleanup_entry=entry;for(auto from:cleanup_jumps)output.blocks[from].end.yes=entry;current=entry;
+            if(f.asynchronous)emit({ir::Op::async_drain},f.token);
+            if(cleanup_head){
+            // A separate loop entry prevents executing the structured drain again.
+            auto loop=block();jump(loop);current=loop;
             auto head=output.locals[*cleanup_head];auto node=head;node.nullable=false;
             auto body=block(),done=block();auto selected=emit({ir::Op::load,*cleanup_head},f.token);terminate({ir::Terminator::Kind::branch,emit({ir::Op::not_equal,selected,constant(head,{0,{}},f.token)},f.token),body,done});
-            current=body;ir::Instruction unwrap{ir::Op::convert,emit({ir::Op::load,*cleanup_head},f.token)};unwrap.type=node;auto owner=emit(unwrap,f.token);auto handler=capture(extract_managed(owner,1,f.token),ir::field_type(node,1),f.token);auto previous=extract_managed(owner,0,f.token);emit({ir::Op::store,*cleanup_head,previous},f.token);auto active=extract_managed(owner,2,f.token);auto invoke=block();terminate({ir::Terminator::Kind::branch,active,invoke,entry});current=invoke;emit({ir::Op::cleanup_call,emit({ir::Op::load,handler},f.token)},f.token);jump(entry);
-            current=done;if(return_slot)terminate({ir::Terminator::Kind::return_value,emit({ir::Op::load,*return_slot},f.token)});else terminate({ir::Terminator::Kind::return_void});
+            current=body;ir::Instruction unwrap{ir::Op::convert,emit({ir::Op::load,*cleanup_head},f.token)};unwrap.type=node;auto owner=emit(unwrap,f.token);auto handler=capture(extract_managed(owner,1,f.token),ir::field_type(node,1),f.token);auto previous=extract_managed(owner,0,f.token);emit({ir::Op::store,*cleanup_head,previous},f.token);auto active=extract_managed(owner,2,f.token);auto invoke=block();terminate({ir::Terminator::Kind::branch,active,invoke,loop});current=invoke;emit({ir::Op::cleanup_call,emit({ir::Op::load,handler},f.token)},f.token);jump(loop);
+            current=done;}if(return_slot)terminate({ir::Terminator::Kind::return_value,emit({ir::Op::load,*return_slot},f.token)});else terminate({ir::Terminator::Kind::return_void});
         }
         return std::move(output);
     }

@@ -113,7 +113,7 @@ bool scalar_fixed_array(Type);
 struct CompactValueShape { unsigned depth = 0; std::uint64_t scalar_bytes = 0; std::size_t template_nodes = 0; };
 CompactValueShape compact_value_shape(Type);
 std::uint64_t checked_array_index(std::uint64_t bits, Type index, std::uint64_t extent);
-enum class Op { async_call, await, gc_release, cleanup_call, function_reference, function_call, function_null, sum, sum_get, pattern_equal, type_test, type_cast, panic, argument, constant, add, multiply, less, call, subtract, divide,
+enum class Op { async_cancel_children, async_cancel, async_group_enter, async_group_join, async_drain, async_call, await, gc_release, cleanup_call, function_reference, function_call, function_null, sum, sum_get, pattern_equal, type_test, type_cast, panic, argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
     upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal,

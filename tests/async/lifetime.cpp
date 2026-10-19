@@ -61,8 +61,8 @@ void async_lifetime_tests(const std::filesystem::path& source) {
         require(number==111,"adapter failed to drain descendants created after root completion");
         probe.retained.reset();runtime->collect();require(runtime->snapshot().objects==0,"successful drain retains roots");
     }
-    // The root returns before either child runs. Both checked failures must drain,
-    // including their reached defers; diagnostics follow creation order.
+    // Child failure cancels the suspended sibling through reached cleanup.
+    // A failing root cancels children before their bodies start (Delivery 2).
     const std::string failures=
         "struct box:\n    number: i32 = 0\n"
         "async func delay(value: i32) -> i32:\n    return value\n"
@@ -83,11 +83,11 @@ void async_lifetime_tests(const std::filesystem::path& source) {
         {managed_test::Observe observe(probe);try{code->invoke(7);}catch(const std::runtime_error& failure){diagnostic=failure.what();}}
         require(!diagnostic.empty() && probe.retained && probe.frames.empty() && probe.roots_valid,"draining failure roots");
         if(exit==1)require(diagnostic.find("::entry")<diagnostic.find("Additional unobserved"),"root failure precedence");
-        else require(diagnostic.find("::first")<diagnostic.find("::second"),"unobserved failure creation order");
+        else require(diagnostic.find("::second")!=std::string::npos && diagnostic.find("::first")==std::string::npos,"child failure did not cancel suspended sibling");
         if(exit==2)require(diagnostic.find("Called from /main.void::entry")!=std::string::npos,"await failure lost caller trace");
         vd::Runtime::Attachment attachment(*runtime);vd::Runtime::Managed managed(*runtime);
         std::int32_t number=0;std::memcpy(&number,probe.retained->get(),sizeof(number));
-        require(number==111,"unawaited failed tasks did not finish their defers");
+        require(number==(exit==1?1:111),"structured failure cleanup or cancellation-before-start");
         probe.retained.reset();runtime->collect();require(runtime->snapshot().objects==0,"drained failures retain roots");
     }
     // Hold a child while its parent is suspended. A collector, replacement and

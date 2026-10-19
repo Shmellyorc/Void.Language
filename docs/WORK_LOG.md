@@ -13011,3 +13011,81 @@ Logs: `/tmp/void-ci72-editor-test.log` and `/tmp/void-ci72-editor-package.log`.
 `git diff --check` passed. No native rebuild or unrelated changes were needed.
 No commits, pushes, branches or CI actions were performed. STOPPED for owner
 push and hosted verification; no new hosted acceptance or lock is claimed.
+
+
+## 19 October 2026 — Delivery 2 authorized
+
+Owner confirms Delivery 1 hosted acceptance at `34efb761965a5e19841e2fcf2816a5b851e902a7`, CI #73: seven green jobs, 98/98 each (686/686). This is owner-provided evidence. Delivery 2 assignment approves its eight lifecycle rules; canonical handoffs now preserve the authorization and Delivery 3–5 gates. Research: existing executor owns Task records/precise handles until root drain; checked failure edges enter reached LIFO cleanup, but there is no per-activation child/group drain or cancellation state. Implementation and acceptance pending. No Git or remote modifications authorized.
+
+
+## 19 October 2026 — Delivery 2 implementation and focused evidence
+
+Implemented in the existing owner-thread executor and LLVM state-machine lowering: native success/cancelled/failed outcomes; idempotent task cancellation; starts/await/CFG checkpoints; implicit activation ownership and contextual lexical task groups; shielded asynchronous joins; early-exit cancellation; failure wakeup/sibling cancellation; children-before-parent cleanup. Ordinary async resource `with` scopes own child work until join/deinit. Cleanup cannot indirectly publish fresh async work. Cancellation is separate from RuntimeFailure while defers run, so actual cleanup failures supersede cancellation. Existing parent runtime failure and additional defer diagnostics survive; unobserved children across lexical groups are selected in creation order. Existing typed frame roots, Runtime ownership and invocation generation leases/cache remain in use.
+
+Independent IR validation checks cancellation operands, opaque group homes/uses, LIFO joins/CFG merges, required drain, and illegal bypass/repeated drain/work after cleanup. Source rejects first-class group escapes, unsupported spawn/group arguments, cancellation arguments and deferred await. Cancellation requests remain nonsuspending and can be forwarded through inferred synchronous helpers/cleanup. No worker pool, parallel spawn, native library or public cancellation recovery was added.
+
+Focused Debug CTest (`async_source`, `async_ir`, `async_lifecycle`) passed 3/3 in 50.14s during development (`/tmp/void-d2-focused.log`). Subsequent audit strengthened failure aggregation across groups and retention of additional defer failures; final consolidated acceptance covers those corrections. Real fixtures cover normal/early/Err exits, before-start/suspended cancellation, repeated/completed awaits, implicit/nested scopes, cleanup failure ordering and parent precedence. Allocation sweeps, cache/reload, semaphore-gated cancellation/GC/retirement, close/drain and private-ABI self/ancestor waits extend those fixtures. D1 failure tests now assert D2 sibling cancellation and no unreached defers, rather than expecting cancelled bodies to run. No tests/sanitizers were disabled. Full Debug/Release/strict acceptance pending below.
+
+
+Final audit reproduced a contextual-name collision: a visible global `const tasks = factory()` with an ordinary `group()` resource method was incorrectly treated as the builtin task namespace. `/tmp/void-d2-bound-tasks-before.log` records the pre-fix diagnostic. Recognition now uses the checker's existing complete visible-name set (plus lexical lookup), preserving constants/types/functions/imports and local bindings. A permanent normal/O2 source regression covers the factory resource method. Group-alias capture also preserves its restricted marker through existing closure lookup, preventing a first-class escape before lowering. Cancellation requests support inferred synchronous helpers and nonsuspending cleanup, while enqueue from cleanup remains rejected. Full frozen-source matrices are repeated after these audit corrections; earlier diagnostic builds are not final acceptance evidence.
+
+
+Acceptance hardening: AOT expected-failure tests now require the checked CLI status **1**, so strict sanitizer exit codes 86/87 or crashes cannot masquerade as expected task failure. All six failure cases passed in each of Debug, Release and strict sanitizers (18/18 focused checks). A targeted array/value-struct return probe confirmed the existing owned-field snapshot path already preserves the value evaluated before group draining even when a child's cleanup mutates the managed source (expected/actual 17); no additional copy mechanism was added. The real `lifecycle_values.void` fixture preserves this behavior in normal/O2 JIT/AOT and allocation/GC checks. Final suite count is 113.
+
+
+## 19 October 2026 — Delivery 2 final local acceptance / STOP for owner review
+
+Delivery 2 is complete locally. No incomplete implementation, failing local test
+or unresolved Delivery 2 approval question remains. Locked baseline remains
+`34efb761965a5e19841e2fcf2816a5b851e902a7` (owner-confirmed CI #73, 7/7,
+98/98 each / 686/686); HEAD remains unchanged. Delivery 2 has **no hosted lock**.
+
+| Final frozen-source configuration | Result | CTest elapsed |
+| --- | --- | --- |
+| Debug — `build/order1/production` | **113/113 passed** | 339.73 sec |
+| Release — `build/ci-release` | **113/113 passed** | 156.43 sec |
+| Strict ASan/UBSan/leaks — `build/ci-sanitizers` | **113/113 passed** | 319.20 sec |
+
+**339/339 total.** Compiler SDK verified locally as LLVM **19.1.7**. Each tree
+completed `cmake --build <tree> -j 3` followed by
+`ctest --test-dir <tree> -j 3 --output-on-failure`. Strict build and test both used
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`, outside tracing so
+LeakSanitizer can operate. No sanitizers, checks or existing suites were disabled.
+Earlier diagnostic/intermediate runs are superseded by these complete matrices.
+
+Additional final evidence: frontend recursive receiver/type grammar guards passed
+at **1 MiB**; independently linked normal/O2 async `large` and
+`lifecycle_resources` binaries passed at 1 MiB in all three configurations
+(**12/12**, including strict sanitizers). Expected-failure AOT checks additionally
+passed **18/18** with exact checked exit status 1, preserving sanitizer/crash
+failures. VS Code `npm test` passed (one reported test file); `npm run package`
+passed, producing the existing 8-file / 145.71 KB VSIX locally. No editor sources
+or dependency versions changed in this delivery.
+
+Permanent new source fixtures: `lifecycle`, `lifecycle_exits`,
+`lifecycle_cancelled`, `lifecycle_failures`, `lifecycle_primary`,
+`lifecycle_resources`, `lifecycle_values`, each normal/O2 JIT and independently
+linked AOT. The lifecycle suite adds forced precise GC, allocation sweeps, cached
+group activation, compatible reload/old-code retirement under cancellation,
+semaphore-gated GC rendezvous, Runtime close/drain, namespace binding, cleanup
+publication rejection and compiler negatives. Independent IR cases cover valid
+synchronous cancellation forwarding, required drain, malformed cancellation,
+forged/escaping groups, LIFO ownership, bypassed/duplicate joins/drains and prior
+initialization/borrow/suspension proofs. Native helper tests reject self/ancestor
+wait cycles and duplicate publication. Cancellation-before-start runs no
+unreached defer; reached child cleanup finishes before parent cleanup/deinit;
+parent failure and additional cleanup failures survive deterministically.
+
+Deliverables: source/backend/runtime and permanent tests in the working tree;
+updated ASYNC, proposal, Wrench handoff, canonical strategy, Bible/status,
+GC runtime and known issues. Final build/CTest/stack/editor transcripts and
+focused failure-status/reproduction evidence are retained in
+`build/stage6-delivery2/` (ignored local artifacts).
+
+**Next action belongs to Boss/Wrench:** review the uncommitted Delivery 2 diff,
+then owner commit/push and the existing seven-job hosted gate. Lock Delivery 2
+only after green hosted acceptance. Deliveries 3–5 remain pending and unauthorized;
+parallel spawn/workers, native libraries, detached tasks, cancellation recovery,
+general await in cleanup and automatic watching were not added. No commits,
+pushes, branches, remote modifications or hosted CI actions were performed.

@@ -1,0 +1,34 @@
+struct ledger:
+    number: i32 = 0
+
+async func tick() -> i32:
+    return 1
+
+async func first(owner: ledger, zero: i32) -> i32:
+    defer {
+        owner.number += 1
+    }
+    defer {
+        var invalid = 1 / zero
+    }
+    return await tick()
+
+async func second(owner: ledger, value: i32) -> i32:
+    defer {
+        owner.number += 10
+    }
+    defer {
+        var invalid = (value - value - 1) as u8
+    }
+    return await tick()
+
+async func trigger(zero: i32) -> i32:
+    return 1 / zero
+
+async func entry(value: i32) -> i32:
+    var owner = ledger()
+    var a = first(owner, 0)
+    with tasks.group() as jobs:
+        var b = second(owner, value)
+        var c = trigger(0)
+    return value

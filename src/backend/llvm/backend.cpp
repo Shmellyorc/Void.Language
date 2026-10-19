@@ -539,7 +539,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         auto* failure_type = llvm::StructType::get(b.getPtrTy(), b.getInt32Ty(), llvm::ArrayType::get(b.getPtrTy(), 32));
         llvm::Value* failure = async?fn->getArg(1):f.module_identity.empty() && !input.coordinated ? nullptr : fn->getArg(static_cast<unsigned>(f.parameters.size()));
         llvm::Value* root_frame = nullptr;
+        const bool deinit_body=f.receiver && (f.method_name=="deinit" || f.method_name.starts_with("deinit::$body$"));
         auto leave_frame = [&] {
+            if(deinit_body)b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_leave",b.getVoidTy()));
             if (input.coordinated) b.CreateCall(module->getOrInsertFunction("vd_gc_frame_leave", b.getVoidTy(), b.getPtrTy()), {root_frame});
         };
         unsigned active_block=0;
@@ -693,11 +695,17 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             b.CreateCall(module->getOrInsertFunction("vd_gc_frame_enter",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type),
                 {root_frame,root_array,llvm::ConstantInt::get(size_type,entries.size())});
         }
+        if(deinit_body)b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_enter",b.getVoidTy()));
         llvm::SwitchInst* resume_states=nullptr;unsigned resume_serial=0;
         if(async){auto* invalid=llvm::BasicBlock::Create(context,"async.invalid_state",fn);resume_states=b.CreateSwitch(b.CreateLoad(b.getInt32Ty(),frame_home(1)),invalid);resume_states->addCase(b.getInt32(0),blocks.front());b.SetInsertPoint(invalid);b.CreateStore(b.CreateGlobalStringPtr("Invalid async resume state"),failure);return_failure();}
         for (std::size_t n = 0; n < f.blocks.size(); ++n) {
             active_block=n;b.SetInsertPoint(blocks[n]);
             if (input.coordinated) b.CreateCall(module->getOrInsertFunction("vd_gc_poll",b.getVoidTy()));
+            if(async && n<*f.cleanup_entry){
+                b.CreateCall(module->getOrInsertFunction("vd_async_checkpoint",b.getVoidTy(),b.getPtrTy()),{failure});
+                auto* bad=llvm::BasicBlock::Create(context,"async.checkpoint_failure",fn);auto* good=llvm::BasicBlock::Create(context,"async.checkpoint_valid",fn);
+                b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),bad,good);b.SetInsertPoint(bad);return_failure();b.SetInsertPoint(good);
+            }
             std::vector<llvm::Value*> values;
             std::vector<ir::Type> value_types;
             for (const auto& instruction : f.blocks[n].instructions) {
@@ -1010,7 +1018,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 case Op::cleanup_call:{
                     llvm::IRBuilder<> entry_builder(&*fn->getEntryBlock().begin());auto* secondary=home(entry_builder.CreateAlloca(failure_type),StorageRole::known_abi,llvm_backend::HomeKind::value);
                     b.CreateStore(llvm::Constant::getNullValue(failure_type),secondary);
+                    b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_enter",b.getVoidTy()));
                     b.CreateCall(callable_dispatchers.at(ir::Type::key(operand_type(instruction.a))),{values[instruction.a],secondary});
+                    b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_leave",b.getVoidTy()));
                     b.CreateCall(module->getOrInsertFunction("vd_cleanup_failure",b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{failure,secondary});break;
                 }
                 case Op::function_null:v=llvm::Constant::getNullValue(type(instruction.type));break;
@@ -1077,6 +1087,22 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     break;
                 case Op::extract: v = b.CreateExtractValue(values[instruction.a],{static_cast<unsigned>(instruction.immediate)}); break;
                 case Op::insert: v = b.CreateInsertValue(values[instruction.a],values[instruction.b],{static_cast<unsigned>(instruction.immediate)}); break;
+                case Op::async_cancel_children: v=b.CreateCall(module->getOrInsertFunction("vd_async_cancel_children",b.getVoidTy()));break;
+                case Op::async_cancel:
+                    b.CreateCall(module->getOrInsertFunction("vd_async_cancel",b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{values[instruction.a],failure});
+                    {auto* bad=llvm::BasicBlock::Create(context,"async.cancel_failure",fn);auto* good=llvm::BasicBlock::Create(context,"async.cancel_valid",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),bad,good);b.SetInsertPoint(bad);trace_failure();b.SetInsertPoint(good);}v=llvm::UndefValue::get(b.getInt8Ty());break;
+                case Op::async_group_enter:
+                    v=b.CreateCall(module->getOrInsertFunction("vd_async_group_enter",b.getInt64Ty(),b.getPtrTy()),{failure});
+                    {auto* bad=llvm::BasicBlock::Create(context,"async.group_failure",fn);auto* good=llvm::BasicBlock::Create(context,"async.group_valid",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),bad,good);b.SetInsertPoint(bad);trace_failure();b.SetInsertPoint(good);}break;
+                case Op::async_group_join: case Op::async_drain: {
+                    auto* check=llvm::BasicBlock::Create(context,"async.join",fn);b.CreateBr(check);resume_states->addCase(b.getInt32(++resume_serial),check);b.SetInsertPoint(check);
+                    for(unsigned k=0;k<values.size();++k)if(value_types[k]!=ir::Type::none)values[k]=b.CreateLoad(type(value_types[k]),frame_home(async->values[n][k]));
+                    llvm::Value* ready=instruction.op==Op::async_drain?
+                        b.CreateCall(module->getOrInsertFunction("vd_async_drain",b.getInt1Ty(),b.getPtrTy(),b.getPtrTy()),{fn->getArg(0),failure}):
+                        b.CreateCall(module->getOrInsertFunction("vd_async_group_join",b.getInt1Ty(),b.getInt64Ty(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy()),{values[instruction.a],b.getInt32(instruction.immediate),fn->getArg(0),failure});
+                    auto* suspend=llvm::BasicBlock::Create(context,"async.join_suspend",fn);auto* done=llvm::BasicBlock::Create(context,"async.join_complete",fn);b.CreateCondBr(ready,done,suspend);b.SetInsertPoint(suspend);b.CreateStore(b.getInt32(resume_serial),frame_home(1));leave_frame();b.CreateRetVoid();b.SetInsertPoint(done);
+                    if(instruction.op!=Op::async_drain){auto* bad=llvm::BasicBlock::Create(context,"async.join_failure",fn);auto* good=llvm::BasicBlock::Create(context,"async.join_valid",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),bad,good);b.SetInsertPoint(bad);trace_failure();b.SetInsertPoint(good);}v=llvm::UndefValue::get(b.getInt8Ty());break;
+                }
                 case Op::await: {
                     auto* check=llvm::BasicBlock::Create(context,"async.await",fn);b.CreateBr(check);resume_states->addCase(b.getInt32(++resume_serial),check);b.SetInsertPoint(check);
                     for(unsigned k=0;k<values.size();++k)if(value_types[k]!=ir::Type::none)values[k]=b.CreateLoad(type(value_types[k]),frame_home(async->values[n][k]));
@@ -1271,6 +1297,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             }
             const auto& end = f.blocks[n].end;
             if(f.cleanup_entry && n>=*f.cleanup_entry && (end.kind==ir::Terminator::Kind::return_value || end.kind==ir::Terminator::Kind::return_void)){
+                if(async)b.CreateCall(module->getOrInsertFunction("vd_async_finish",b.getVoidTy(),b.getPtrTy()),{failure});
                 auto* failed=llvm::BasicBlock::Create(context,"cleanup_failed",fn);auto* ready=llvm::BasicBlock::Create(context,"cleanup_complete",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),failed,ready);b.SetInsertPoint(failed);return_failure();b.SetInsertPoint(ready);
             }
             switch (end.kind) {
@@ -1405,7 +1432,7 @@ Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
     bind("vd_gc_interface_binding",vd_gc_interface_binding);
     bind("vd_cleanup_failure",vd_cleanup_failure);bind("vd_gc_poll",vd_gc_poll); bind("vd_gc_collect",vd_gc_collect); bind("vd_gc_allocate",vd_gc_allocate);
     bind("vd_gc_release",vd_gc_release);bind("vd_gc_alive",vd_gc_alive); bind("vd_gc_native_enter",vd_gc_native_enter); bind("vd_gc_native_leave",vd_gc_native_leave);
-    bind("vd_async_root",vd_async_root);bind("vd_async_new",vd_async_new);bind("vd_async_start",vd_async_start);bind("vd_async_ready",vd_async_ready);bind("vd_async_suspend",vd_async_suspend);bind("vd_async_complete",vd_async_complete);
+    bind("vd_async_root",vd_async_root);bind("vd_async_new",vd_async_new);bind("vd_async_start",vd_async_start);bind("vd_async_ready",vd_async_ready);bind("vd_async_suspend",vd_async_suspend);bind("vd_async_complete",vd_async_complete);bind("vd_async_cancel_children",vd_async_cancel_children);bind("vd_async_cleanup_enter",vd_async_cleanup_enter);bind("vd_async_cleanup_leave",vd_async_cleanup_leave);bind("vd_async_finish",vd_async_finish);bind("vd_async_cancel",vd_async_cancel);bind("vd_async_checkpoint",vd_async_checkpoint);bind("vd_async_group_enter",vd_async_group_enter);bind("vd_async_group_join",vd_async_group_join);bind("vd_async_drain",vd_async_drain);
     impl_->custom_bindings=false;
 }
 Jit::~Jit() = default;

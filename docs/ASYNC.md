@@ -1,9 +1,11 @@
-# Stage 6 Delivery 1: native async activation
+# Stage 6 Deliveries 1–2: native async and structured lifecycle
 
-Delivery 1 passed local Linux Debug, Release and strict ASan/UBSan/leak acceptance:
-98/98 suites in each configuration. Stage 5 remains the hosted-locked baseline;
-Delivery 1 requires owner review and seven-job hosted CI.
-The five-delivery roadmap and remaining decisions are in [STAGE6_PROPOSAL.md](STAGE6_PROPOSAL.md).
+Delivery 1 is owner-confirmed hosted-accepted at
+`34efb761965a5e19841e2fcf2816a5b851e902a7`, [CI #73 checks](https://github.com/Shmellyorc/Void.Language/commit/34efb761965a5e19841e2fcf2816a5b851e902a7/checks):
+7/7 jobs, 98/98 suites each (686/686). Delivery 2 passed local Debug, Release and strict ASan/UBSan/leak acceptance:
+**113/113 each (339/339)**, plus 1 MiB stack and editor/package checks. Hosted
+acceptance remains owner-controlled; stop for review before any Delivery 3 work.
+The five-delivery roadmap and restricted decisions are in [STAGE6_PROPOSAL.md](STAGE6_PROPOSAL.md).
 
 ```typescript
 async func increment(value: i32) -> i32:
@@ -50,17 +52,76 @@ One owning thread executes activations in FIFO ready order. It suspends the
 current activation when a dependency is incomplete, resumes ready waiters in
 creation order, and never blocks an executor thread on a child. Concurrent roots
 on one Runtime and nested adapters are checked failures. Separate Runtime owners
-retain their existing independence. There is no worker pool, cancellation,
-detachment, public task group or general native binding surface.
+retain their existing independence. There is no worker pool, parallel spawn,
+detachment, cancellation recovery API or general native binding surface.
 
-The adapter drains every started task before returning, including unawaited work
-and work started by a child after the root completes or fails. It preserves the
-root failure as primary. If the root succeeds, the first otherwise unobserved
-failure in creation order is primary; additional unobserved failures follow in
-that order within the existing 32-frame diagnostic bound. Awaiting a failed task
-observes that failure and propagates it through normal reached cleanup. Failures
-own copied diagnostics. A cyclic wait is diagnosed and waiting activations resume
-through checked cleanup; siblings are not implicitly cancelled.
+## Structured task lifecycle (Delivery 2)
+
+Every activation owns an implicit child scope. An explicit lexical group owns
+async calls created within that scope, including calls through synchronous helpers:
+
+```typescript
+async func run(value: i32) -> i32:
+    with tasks.group() as jobs:
+        var pending = increment(value)
+        var answer = await pending
+    return value
+```
+
+The group alias exists only within its lexical body and is not a first-class
+value. Declare a result local outside the group to use it after that body; normal
+VOID lexical scoping applies. `jobs.spawn`, parallel source execution and explicit
+public task type spelling remain deferred. A user binding/import named `tasks`
+continues to resolve normally; `tasks.group()` is recognized contextually in
+`with` when that name is unbound.
+
+Normal group exit joins its children asynchronously. Normal activation completion
+(including a final top-level return) drains its children. An early return from a
+nested/conditional region, `break`, `continue` or `?` requests cancellation of
+unfinished work in the exited scopes and joins before leaving. Returning from an
+explicit group cancels/joins that group. A normal-success root completion retains
+Delivery 1's drain rule. Dropping a handle never detaches a task.
+
+`pending.cancel()` requests cooperative cancellation idempotently, including
+through an inferred synchronous helper or a nonsuspending cleanup callback. Requests are
+observed before an async body starts, at awaits and typed CFG block checkpoints.
+A task already completed remains completed. Cancellation observed before start
+executes no body and no unreached defer. Awaiting a cancelled task propagates a
+distinct cancellation outcome through reached cleanup; it does not synthesize an
+`Err` or expose a catching/inspection API. A returned `Err` is ordinary successful
+task completion and never automatically cancels siblings. Repeated awaits retain
+the same outcome and independent value-copy behavior.
+
+Cancellation or runtime failure cancels/joins descendants before parent cleanup.
+Every ordinary managed-resource `with` in an async body also owns a private child
+scope: normal resource exit joins before one-shot deinit; early exit cancels/joins
+before deinit. This retains resource lifetime without giving general await to
+ordinary `with`, `defer` or `deinit`. Indirect enqueue from a defer/deinit callback
+is checked and rejected: cleanup cannot publish work after its drain. Synchronous
+closures keep their existing behavior outside these cleanup boundaries.
+
+Group and activation draining is cancellation-shielded and never blocks the owning
+executor thread. A request arriving after body completion does not interrupt its
+shielded cleanup. Existing reached LIFO defers and one-shot deinit remain in use.
+Cancellation is kept separately from RuntimeFailure while cleanup runs, so an
+actual cleanup failure supersedes cancellation and cannot disappear behind it.
+
+A child runtime failure cancels unfinished siblings in its owning group and wakes
+a parent waiting on another task. Existing parent runtime failure remains primary;
+otherwise unobserved child failures are selected in creation order across the
+activation's groups. Additional failures, including failures found in cancelled
+children's cleanup, retain the established 32-frame diagnostic bound. Diagnostics
+own their text and caller locations. Observed failures propagate through await.
+Self-await, ancestor waits and clear dependency cycles are checked failures;
+waiting tasks resume through reached cleanup. Publication, waiting, joining and
+single completion remain checked executor transitions.
+
+The adapter drains all started activations before returning, even after cancellation
+or failure. All precise roots, Runtime metadata and the enclosing native code
+lease remain retained until drain and cleanup finish. Runtime close rejects new
+admissions; already active work follows checked failure/cleanup if further task
+allocation is rejected. Closing neither force-terminates a body nor invents public
+cancellation/shutdown APIs.
 
 ## Ownership and validation
 
@@ -71,7 +132,11 @@ scratch storage and are removed before suspension. Only validated resume states
 can be entered; required frame reads and borrowed values crossing suspension have
 an independent IR proof. Malformed task shapes, forged payload access/construction,
 sync bypass calls and awaits during deferred cleanup are rejected independently
-of source checking.
+of source checking. Lifecycle validation additionally proves opaque group-token
+use, matching LIFO joins across CFG merges, required structured drains, and no
+async work or repeated drain after cleanup begins. Malformed cancellation/group
+operands, forged/escaping tokens and exits that bypass a group join diagnose
+before LLVM lowering.
 
 Task payload authority/provenance uses the existing logical reference-path model,
 as collection handles already do. Physical GC maps trace the task pointer; its
@@ -95,4 +160,9 @@ managed/nullable values, results, generic forwarding, fixed copies, large arrays
 loops and closures. Additional regressions cover deterministic unobserved failure
 draining, checked cleanup, allocation failures, GC rendezvous, concurrent executor
 rejection, reload/cache leases and malformed IR. Exact acceptance results and
-remaining limitations are recorded in [WORK_LOG.md](WORK_LOG.md).
+remaining limitations are recorded in [WORK_LOG.md](WORK_LOG.md). Delivery 2 adds
+real source JIT/AOT fixtures for cancellation before start/during suspension,
+completed/repeated await, normal/early/Err exits, nested/implicit scopes, sibling
+failure, cleanup failure ordering and parent precedence. Deterministic semaphore
+poll gates cover cancellation with GC rendezvous, compatible reload/retirement
+and Runtime close; allocation sweeps and malformed IR are permanent regressions.

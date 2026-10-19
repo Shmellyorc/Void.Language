@@ -2040,9 +2040,12 @@ An import such as `use "sqlite"` should select compatible package/native artifac
 
 **Delivery 1 implementation boundary:** [ASYNC.md](ASYNC.md) records native async
 functions, await, heap frames and the explicit owning root adapter. Local Debug,
-Release and strict sanitizer acceptance passed 98/98 each; owner review and hosted
-acceptance remain pending. Stage 5 remains the hosted lock. Library IO,
-parallel spawn, cancellation/groups and async CLI examples below remain design.
+Release and strict sanitizer acceptance passed 98/98 each; owner-confirmed CI #73
+subsequently locked Delivery 1 at `34efb761965a5e19841e2fcf2816a5b851e902a7`.
+Delivery 2 adds cooperative cancellation and lexical groups as documented in
+ASYNC.md; local acceptance passed 113/113 each in Debug, Release and strict
+sanitizers. Owner review and hosted acceptance remain pending. Library IO, parallel spawn, cancellation
+recovery and async CLI examples below remain design.
 
 The syntax should feel like ordinary functions with only necessary async markers. `async func` indicates suspension capability; `await` retrieves the eventual result. Developers do **not** write explicit `task<t>` returns for ordinary async declarations: the compiler creates the task machinery.
 

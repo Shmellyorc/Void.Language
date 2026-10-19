@@ -1,31 +1,33 @@
 # Stage 6: concurrency and native libraries
 
-## Stage 6 permanent delivery handoff (18 October 2026)
+## Stage 6 permanent delivery handoff (19 October 2026)
 
-**Current locked baseline:** `4627687b3a18349633715e4294bc915cf74ddd41`,
-[CI #70](https://github.com/Shmellyorc/Void.Language/actions/runs/39193640484),
-7/7 successful jobs and 82/82 suites each (574/574), independently verified.
-Stage 5 remains locked. Stage 6 has no hosted acceptance yet.
+**Current locked baseline:** Delivery 1 at `34efb761965a5e19841e2fcf2816a5b851e902a7`,
+[CI #73](https://github.com/Shmellyorc/Void.Language/commit/34efb761965a5e19841e2fcf2816a5b851e902a7/checks),
+7/7 jobs, 98/98 suites per configuration (686/686), as confirmed by the owner.
+Stage 5 remains historically locked at `4627687b3a18349633715e4294bc915cf74ddd41`,
+[CI #70](https://github.com/Shmellyorc/Void.Language/actions/runs/39193640484).
 
-**Owner authorization:** overall architecture direction approved; implement
-**Delivery 1 only** as one substantial sprint. Stackless state machines through
-existing typed IR/LLVM 19.1.7, precisely traced heap activation frames, safe
-suspension, generation leases, one owning executor, enqueue without inline body
-execution, await completed/incomplete tasks and inferred internal task handles.
-Preserve evaluation order, value copies, managed identity and reached cleanup.
-Keep the synchronous CLI ABI; use an explicit scheduler root adapter. Restrict new
-cross-task callable escapes; synchronous closures remain unchanged. Independently
-validate async IR, frame initialization and legal suspension/resumption, including
-malformed-IR negatives. No public cancellation, task groups, parallel spawn,
-general native bindings or automatic watching in Delivery 1.
+**19 October owner authorization:** implement Delivery 2 only. Cooperative
+idempotent `job.cancel()`, distinct success/cancellation/runtime failure (`Err`
+is an ordinary result), activation ownership and lexical
+`with tasks.group() as jobs:` scopes. Normal exits join; early exits cancel and
+join. Cancellation/failure cancels and joins descendants before parent cleanup;
+draining is shielded. Preserve parent runtime failure; otherwise select unobserved
+child failures in creation order within the bounded diagnostic policy. Child
+runtime failure cancels siblings and wakes the waiting parent. Keep one owning
+executor, explicit root adapter and synchronous CLI ABI. No implicit detach,
+workers, parallel spawn, cancellation recovery API or general cleanup await.
+Independent IR and source negatives, JIT/AOT, GC/allocation/reload and complete
+Debug/Release/strict sanitizer acceptance are required before owner review.
 
 | Sequential implementation delivery | Scope and dependency | Status |
 | --- | --- | --- |
-| Delivery 1 — Native Async Activation | Async functions, await, heap frames, owning executor and leased resumptions; starts from locked Stage 5 | Locally verified: 98/98 in Debug, Release and strict sanitizers; owner review and hosted lock pending |
-| Delivery 2 — Structured Task Lifecycle | Cancellation, task groups, failure propagation, structured cleanup and shutdown; requires Delivery 1 hosted lock and new owner authorization | Not authorized |
-| Delivery 3 — Bounded Parallel Spawn | Worker pool, approved value-transfer restrictions, parallel source jobs and GC-safe coordination; requires Delivery 2 lock and authorization | Not authorized |
-| Delivery 4 — Native Libraries | Trusted compiled native bridges, typed scalar/string/opaque handles, ownership and callbacks; requires Delivery 3 lock and authorization | Not authorized |
-| Delivery 5 — Integrated Stage 6 Acceptance | Combined async/parallel/native behavior, hot reload, Debug cache, lifetime and cross-platform integration; requires Delivery 4 lock and authorization | Not authorized |
+| Delivery 1 — Native Async Activation | Async functions, await, traced frames, owning executor, leased resumptions | Hosted accepted at CI #73 |
+| Delivery 2 — Structured Task Lifecycle | Cancellation, groups, failures, structured cleanup/shutdown | Locally accepted: 113/113 Debug, Release and strict sanitizers; owner review/hosted CI pending |
+| Delivery 3 — Bounded Parallel Spawn | Workers, reviewed value transfer, parallel source jobs, GC coordination; requires Delivery 2 lock | Not authorized |
+| Delivery 4 — Native Libraries | Trusted bridges, typed scalar/string/opaque handles, ownership/callbacks; requires Delivery 3 lock | Not authorized |
+| Delivery 5 — Integrated Stage 6 Acceptance | Combined async/parallel/native, reload/cache/lifetime/cross-platform; requires Delivery 4 lock | Not authorized |
 
 **Owner-approved calling boundary (18 October):** ordinary async functions and
 managed receiver methods are supported. Root receiver identities and retain code
@@ -38,15 +40,14 @@ These five **implementation deliveries are distinct from D1–D6 design decision
 D1: owning-executor async is approved; worker sharing/parallel restrictions remain
 future review. D2: enqueue semantics, inferred task handles and await are approved;
 public task-type/async-callable syntax is not approved. D3: explicit root adapter
-and unchanged sync CLI approved; public group/detach/async CLI rules deferred.
-D4: preserve reached cleanup and checked failures; cancellation/group policies
-remain Delivery 2 review. D5: per-activation leases approved; new cross-task
+and unchanged sync CLI approved; lexical groups approved for Delivery 2; detach and async CLI rules deferred.
+D4: preserve reached cleanup and checked failures; the assigned Delivery 2 cancellation/group policies are approved. D5: per-activation leases approved; new cross-task
 callable escapes restricted instead of approving session-wide generation pinning.
 D6: native-library scope/grammar/ownership remain Delivery 4 review.
 
 **Workflow for every delivery:** implement selected delivery → focused tests →
 complete local acceptance → owner review/commit/push → existing seven-job hosted
-CI → lock only when green. STOP after local Delivery 1 review; do not automatically
+CI → lock only when green. STOP after local Delivery 2 review; do not automatically
 begin another delivery. No assistant commits, pushes, branch creation, remote
 writes or hosted dispatch. Boss owns product decisions and Git/CI; Wrench reviews
 architecture/evidence; Keyboard implements only authorized scope.
@@ -59,24 +60,28 @@ stale generation pointers and callable escapes. Language-facing choices not cove
 by authorization return to owner review; do not invent contracts. Owner-approved root policy: drain every started task, including unawaited tasks,
 before the adapter returns. Preserve root failure as primary; if root succeeds,
 report otherwise unobserved task failures deterministically in creation order.
-Retain roots/leases and run all cleanup. No cancellation, detach or public groups.
+Retain roots/leases and run all cleanup. Delivery 2 adds the approved cooperative cancellation and lexical groups; detach remains unavailable.
 Implementation and exact boundaries are in [ASYNC.md](ASYNC.md). The adapter
 drains within its existing NativeCode lease, covering every retained task/frame
 and resumption; a generation token rejects cross-generation publication. No task
 escapes the drained invocation. Private frame offsets are copied into Runtime
 heap layouts, without code pointers or public metadata admission exceptions.
-Local acceptance completed on 19 October: Linux Debug **98/98**, Release **98/98**,
-strict ASan/UBSan/leak **98/98**; 294/294 total, with 1 MiB frontend and async AOT
-stack checks passing. Exact commands and logs are in WORK_LOG.md. No Delivery 1
-decision or failing local test remains. **STOPPED for owner review**; owner controls
-commit/push and seven-job hosted CI. Windows/macOS acceptance and the Delivery 1
-lock remain pending. No later delivery is active or authorized.
+**Delivery 1 historical local acceptance:** Debug, Release and strict sanitizers
+passed 98/98 each; subsequent owner-confirmed CI #73 locks Delivery 1 above.
+**Delivery 2 current work:** native cancellation outcomes, activation ownership,
+lexical groups, shielded nonblocking joins, cleanup ordering and independent IR
+proofs are implemented. Final local acceptance passed **113/113** in Debug, Release and strict
+ASan/UBSan/leak configurations (**339/339**), plus 1 MiB frontend/native-stack
+checks and editor test/package checks. No incomplete Delivery 2 implementation
+or failing local test remains. Exact evidence is in WORK_LOG.md; logs are under
+`build/stage6-delivery2`. **STOPPED for owner review and hosted acceptance.**
+Owner review, commit/push and the seven-job hosted gate must precede a Delivery 2
+lock or any authorization to begin Delivery 3. No later delivery is active.
 
 
-18 October 2026. **Overall architecture direction approved; Delivery 1 authorized
-under the permanent handoff above.** The original recommendations below remain
-research where restricted or deferred by that authorization. Delivery 1 is now
-implemented and locally verified as recorded above; hosted acceptance is pending.
+**Original architecture research (18 October 2026):** the recommendations below
+are superseded where the current Delivery 1/2 handoff approves or restricts them.
+The six decision groups remain distinct from the five implementation deliveries.
 
 ## Baseline and recommendation
 
@@ -445,20 +450,20 @@ TSan can check scheduler/coordinator/bridge code but does not automatically
 instrument generated JIT application instructions; use deterministic observable
 handoff/race regressions as well. Hosted acceptance remains owner-controlled.
 
-## 8. Decisions for Wrench/Boss review
+## 8. D1–D6 design decisions and current approval
 
-| Decision requiring approval | Recommendation | Alternative/impact |
+| Decision group | Approved/restricted boundary | Still requires owner review |
 | --- | --- | --- |
-| D1. First parallel sharing contract | Owner-thread async plus noncapturing value-only worker inputs/results, with transitive call-effect checking | Full managed-reference/closure spawn needs an explicit isolation or shared-memory/race contract first. Readonly is insufficient. |
-| D2. Call start and task handles | Enqueue immediately without inline body execution; repeated await; internal inferred task type and special no-result completion | Eager-to-first-await or lazy tasks change side-effect ordering. Public handle/async callable spelling and supported storage positions remain to approve. |
-| D3. Task ownership and entry | Nearest group/implicit child scope, no detach; explicit scheduler root adapter | Approve async CLI entry signature and which synchronous contexts may create tasks. Existing i32 entry behavior remains. |
-| D4. Cancellation and group exits | Separate cancellation outcome; await/checkpoint propagation; cancel/join on abnormal or early exit; shield draining; child cleanup before resource release | Approve public observation/recovery, ?/return/break policies, parent/child primary-failure precedence and special async group `with` behavior. No general async deinit/defer. |
-| D5. Reload lifetime of escaping callables | Conservatively retain task-used generation leases until scheduler shutdown initially | More memory after reload; otherwise restrict escaping callable results/stores or separately design reachability-based native owner release. Activation leases alone are inadequate. |
-| D6. Native scope and surface | Reviewed project-local compiled bridges, scalar/string/opaque wrapper fixture, static first; dynamic libraries pinned until shutdown if included | Approve declaration format, hidden handle authority, supported ABI subset, thread-affinity/error contracts and whether dynamic loading is part of the first sprint. No arbitrary C library promise. |
+| D1. First parallel sharing contract | One owning executor for Deliveries 1–2 | Worker pool, transfer restrictions and transitive effects in Delivery 3; general shared references remain unapproved |
+| D2. Call start and task handles | Enqueue without inline body execution; inferred task handles; completed/repeated await; distinct cancellation outcome | Public task type spelling, async callable values and other deferred calling forms |
+| D3. Task ownership and entry | Creating activation/nearest lexical group; no detach; `with tasks.group() as jobs:`; explicit root adapter and sync CLI ABI | Async CLI, detached tasks and public first-class groups |
+| D4. Cancellation and group exits | Assigned Delivery 2 rules approved: idempotent request, checkpoints, early-exit cancel/join, shielded drain, parent-primary/creation-order failures, child-before-parent cleanup; Err is ordinary completion | Cancellation inspection/recovery; general await in cleanup remains unsupported |
+| D5. Reload lifetime of escaping callables | Drained invocation retains its native generation lease; foreign-generation enqueue rejected; new cross-task callable escapes restricted | Async value receivers, virtual/interface dispatch and async function values; broader escaping-callable ownership. No session-wide generation pinning approved |
+| D6. Native scope and surface | Separate bounded Delivery 4; existing trusted host ABI preserved | Native declaration/ABI, opaque authority, ownership, callback affinity/quiescence, dynamic loading |
 
-The internal state-machine transformation, ordinary queue and existing root/lease
-reuse are engineering recommendations. D1–D6 include observable behavior and scope
-choices; this document does not approve them on the owner's behalf.
+These six groups are design decisions, not the five implementation deliveries.
+Only the owner's assigned Delivery 1/2 boundaries are approved; the remaining
+architecture recommendations do not authorize Deliveries 3–5.
 
 ## 9. Main risks and acceptance limits
 

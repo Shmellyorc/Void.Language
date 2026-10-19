@@ -320,9 +320,9 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 if (s.selection)expression(*s.selection);
                 if (s.range_end) expression(*s.range_end);
                 if (s.index) expression(*s.index);
-                if (s.expression) rhs=expression(*s.expression);
+                if (s.expression && !s.task_group) rhs=expression(*s.expression);
                 else if (s.kind==K::variable) rhs=ir::reference_facts(f.locals.at(s.slot));
-                if (s.kind==K::variable || s.kind==K::scoped) {
+                if (s.kind==K::variable || (s.kind==K::scoped && !s.task_group)) {
                     if (s.readonly) for (auto& [path,fact]:rhs) fact.readonly=true;
                     local_changed|=ir::join_facts(locals[s.slot],rhs);
                 } else if(s.kind==K::assignment && s.event){

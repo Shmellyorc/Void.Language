@@ -1,0 +1,70 @@
+struct ledger:
+    number: i32 = 0
+
+async func tick(value: i32) -> i32:
+    return value
+
+async func child(owner: ledger):
+    defer {
+        owner.number = owner.number * 10 + 2
+    }
+    var ignored = await tick(1)
+    owner.number = owner.number * 10 + 1
+
+async func parent(owner: ledger):
+    defer {
+        owner.number = owner.number * 10 + 3
+    }
+    var ignored = child(owner)
+
+async func rejected() -> result<i32, i32>:
+    return Err(9)
+
+async func early(owner: ledger) -> i32:
+    with tasks.group() as jobs:
+        var pending = child(owner)
+        var first = await tick(1)
+        return first
+
+async func early_implicit(owner: ledger) -> i32:
+    var pending = child(owner)
+    var first = await tick(1)
+    if first == 1:
+        return first
+    return 2
+
+async func entry(value: i32) -> i32:
+    var owner = ledger()
+    var pending = parent(owner)
+    await pending
+    await pending
+    pending.cancel()
+    if owner.number != 123:
+        return 1
+    owner.number = 0
+    with tasks.group() as jobs:
+        var stopped = child(owner)
+        stopped.cancel()
+        stopped.cancel()
+    if owner.number != 0:
+        return 2
+    with tasks.group() as outer:
+        with tasks.group() as inner:
+            var normal = child(owner)
+            var rejection = await rejected()
+            var code = match rejection:
+                Ok(var answer): answer
+                Err(var error): error
+            if code != 9:
+                return 5
+    if owner.number != 12:
+        return 3
+    owner.number = 0
+    var implicit = await early_implicit(owner)
+    if owner.number != 2 or implicit != 1:
+        return 6
+    owner.number = 0
+    var result = await early(owner)
+    if owner.number != 2:
+        return 4
+    return value + result
