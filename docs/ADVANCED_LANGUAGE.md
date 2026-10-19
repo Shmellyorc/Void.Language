@@ -5,6 +5,9 @@ lowerer and coordinated Runtime. Properties and callable structs remain as
 specified in [PROPERTIES.md](PROPERTIES.md). **Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total).
 Exact local validation and remaining boundaries are recorded in [WORK_LOG.md](WORK_LOG.md).
 
+Stage 6 Delivery 1 composes these synchronous contracts with native async
+activation; see [ASYNC.md](ASYNC.md) for the implemented subset and acceptance.
+
 ## Enums, results and patterns
 
 ```typescript
@@ -140,8 +143,9 @@ handlers and enters ordinary function cleanup. Handlers have no result.
 Module-time pattern execution and bound receiver allocation are not supported;
 named function constants are supported. Result success/error types must be existing
 value types; no new unit/void syntax is introduced. Generic enum declarations,
-custom collection equality/hash, arbitrary native callback/managed FFI, async and
-Stage 5 watching/persistent caching remain outside this implementation. Callback
+custom collection equality/hash, arbitrary native callback/managed FFI and async
+remain outside this implementation. Stage 5 caching was delivered separately and
+is hosted-locked at CI #70; automatic watching remains future work. Callback
 signatures cannot discard returned readonly reference authority.
 
 Dictionary `.get()` and list `.pop()` still await their approved error types and

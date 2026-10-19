@@ -59,6 +59,7 @@ struct ValueType {
     std::vector<SumCase> cases = {}; // Disjoint, zero-inactive payload fields; field zero is the tag.
     bool result_type = false;
     bool callable = false;
+    std::optional<FieldType> task_result = {}; // Private inferred task handle; no public constructor.
     std::vector<FieldType> call_parameters = {};
     std::optional<FieldType> call_result = {};
     std::string module_identity = {}, visibility = "public";
@@ -112,7 +113,7 @@ bool scalar_fixed_array(Type);
 struct CompactValueShape { unsigned depth = 0; std::uint64_t scalar_bytes = 0; std::size_t template_nodes = 0; };
 CompactValueShape compact_value_shape(Type);
 std::uint64_t checked_array_index(std::uint64_t bits, Type index, std::uint64_t extent);
-enum class Op { gc_release, cleanup_call, function_reference, function_call, function_null, sum, sum_get, pattern_equal, type_test, type_cast, panic, argument, constant, add, multiply, less, call, subtract, divide,
+enum class Op { async_call, await, gc_release, cleanup_call, function_reference, function_call, function_null, sum, sum_get, pattern_equal, type_test, type_cast, panic, argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
     upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal,
@@ -143,6 +144,8 @@ struct Function {
     Type result = Type::i32;
     std::vector<Type> locals = {};
     bool closure = false, bound_receiver = false;
+    bool asynchronous = false;
+    Type task = Type::none; // Exact checked task shape for an async declaration.
     std::optional<unsigned> cleanup_entry;
     bool initializer = false;
     unsigned accessor = 0; // 1 getter, 2 setter; ordinary native method ABI.
@@ -164,6 +167,7 @@ struct Module {
     std::string source_path = {}; // Physical debug source; not part of stable identity.
     std::shared_ptr<const ValidatedAnalysis> analysis = {};
     std::string constant_contract = {}; // Exact canonical const declarations.
+    bool async_root = false; // Explicit scheduler adapter, never implicit CLI behavior.
     bool coordinated = false; // Requires a runtime owner; inferred for managed source.
     std::vector<Type> nominal_types = {}; // Complete validated generation universe.
     std::string root_identity = {};
@@ -180,6 +184,7 @@ struct Module {
 inline constexpr std::size_t string_constant_limit = 16 * 1024 * 1024;
 inline constexpr std::size_t string_pool_limit = 64 * 1024 * 1024;
 bool reference_value(Type);
+bool async_boundary_safe(Type);
 bool requires_initialization(Type);
 struct MemberSelection {
     enum Status { missing, found, inaccessible, ambiguous } status = missing;

@@ -21,6 +21,7 @@ public:
     std::shared_ptr<const NativeCode> compile(const ir::Module&, const std::string& entry,
                                              bool optimize = true, Compatibility contract = {}, std::shared_ptr<Runtime> runtime = {});
     std::shared_ptr<const NativeCode> compile(const ValidatedAnalysis&, bool optimize = true, Compatibility contract = {});
+    std::shared_ptr<const NativeCode> compile_async(const ValidatedAnalysis&, bool optimize = true, Compatibility contract = {});
     // Preflight complete validated source safety before code generation; publication rechecks.
     bool replace(ReloadSlot&, const ValidatedAnalysis&, bool optimize = true, Compatibility contract = {});
     bool replace(ReloadSlot&, const ToolingSession&, const SessionAnalysis&, bool optimize = true, Compatibility contract = {});
@@ -28,11 +29,12 @@ public:
     std::shared_ptr<const NativeCode> compile_root_probe(bool optimize);
     std::size_t live_generations() const;
 private:
-    std::shared_ptr<const NativeCode> compile_analysis(const ValidatedAnalysis&, bool, Compatibility, std::shared_ptr<Runtime>);
+    std::shared_ptr<const NativeCode> compile_analysis(const ValidatedAnalysis&, bool, Compatibility, std::shared_ptr<Runtime>, bool async_root = false);
     std::shared_ptr<const NativeCode> replacement(const NativeCode&, const ValidatedAnalysis&, bool, Compatibility);
     struct Impl;
     std::shared_ptr<Impl> impl_;
 };
+void emit_async_object(const ir::Module&, const std::filesystem::path&, bool optimize);
 void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize, bool source_program = false);
 // Internal architectural harness supplies its own runtime entry guard/main.
 void emit_runtime_object(const ir::Module&, const std::filesystem::path&, bool optimize, const std::string& generation_suffix = {});

@@ -61,8 +61,11 @@ Properties/callable structs are documented in PROPERTIES.md; enums/results/patte
 cleanup, functions/closures and events are documented in ADVANCED_LANGUAGE.md.
 WORK_LOG.md records local evidence and remaining boundaries. Older OPEN labels
 below are superseded only as stated by these delivered contracts. The owner approved Stage 5 cache architecture and its first production implementation,
-recorded in STAGE5_CACHE_PROPOSAL.md. It adds an optional compiler cache without
-changing source semantics; hosted acceptance is pending.
+recorded in STAGE5_CACHE_PROPOSAL.md. The delivered subset is now hosted-locked at
+`4627687b3a18349633715e4294bc915cf74ddd41`, [CI #70](https://github.com/Shmellyorc/Void.Language/actions/runs/39193640484), seven configurations,
+82/82 suites each. Windows persistence bypass and automatic-watching deferral remain.
+STAGE6_PROPOSAL.md is research only; its recommendations do not approve or implement
+the future concurrency/native-library contracts below.
 
 - `result<t,e>` carries `Ok(value)` or `Err(error)`. `?` unwraps success or propagates
   the exact matching error type. Recoverable errors remain distinct from runtime
@@ -110,8 +113,9 @@ changing source semantics; hosted acceptance is pending.
   collector, type checker or ownership registry. Dictionary `.get()` and list
   `.pop()` remain deferred until exact signatures/error types are approved.
 - Preserve Stage 3, seven CI jobs, strict sanitizers and 180-minute timeout. Stage 5
-  automatic watching/persistent Debug cache remains approved future work, not part
-  of this sprint. Stages 6–7 remain outside this scope. Owner controls Git and CI.
+  persistent Debug caching was delivered separately and is hosted-locked at CI #70;
+  automatic watching remains future work. Stages 6–7 remain outside this Stage 4
+  contract. Stage 6 research is not implementation authorization. Owner controls Git and CI.
 
 
 ---
@@ -2033,6 +2037,12 @@ An import such as `use "sqlite"` should select compatible package/native artifac
 **OPEN:** Package manifest schema, native ownership annotation format, header-import generation, FFI calling conventions, callback exception propagation, dynamic library lifetime, and supported C ABI type mapping. These should be fixed before claiming arbitrary C libraries work automatically.
 
 ## 42. Async, tasks, and `spawn` [AGREED]
+
+**Delivery 1 implementation boundary:** [ASYNC.md](ASYNC.md) records native async
+functions, await, heap frames and the explicit owning root adapter. Local Debug,
+Release and strict sanitizer acceptance passed 98/98 each; owner review and hosted
+acceptance remain pending. Stage 5 remains the hosted lock. Library IO,
+parallel spawn, cancellation/groups and async CLI examples below remain design.
 
 The syntax should feel like ordinary functions with only necessary async markers. `async func` indicates suspension capability; `await` retrieves the eventual result. Developers do **not** write explicit `task<t>` returns for ordinary async declarations: the compiler creates the task machinery.
 

@@ -11,6 +11,13 @@ compiler-checked staged field roots and the existing complete-object commit; the
 runtime implementation is unchanged. Phase 18 source values now carry managed
 references using this same Frame/Slot/descriptor runtime; see REFERENCE_VALUE_STRUCTS.md.
 
+Stage 6 Delivery 1 uses this same Runtime for precisely traced heap activation
+frames and task results. Native task records hold ordinary persistent handles
+through complete root draining; frame maps contain data offsets, never code
+owners. Resume scratch roots leave before suspension. The enclosing NativeCode
+lease covers suspended native resumptions and retirement; see [ASYNC.md](ASYNC.md)
+and WORK_LOG.md for the exact local acceptance and restrictions.
+
 ## Historical Phase 15–23 foundation context
 
 This implemented the owner-approved G1–G6 in `GC_RUNTIME_PROPOSAL.md`. It is an

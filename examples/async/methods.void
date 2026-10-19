@@ -1,0 +1,34 @@
+interface readable:
+    func add(amount: i32) -> i32
+
+struct box:
+    number: i32 = 0
+
+async func (owner box) bump(amount: i32) -> i32:
+    defer {
+        owner.number += 1
+    }
+    owner.number += amount
+    return owner.number
+
+func (owner box) add(amount: i32) -> i32:
+    return owner.number + amount
+
+async func zero(value: i32) -> i32:
+    return value - value
+
+async func read(const owner: box) -> box:
+    return owner
+
+async func entry(value: i32) -> i32:
+    var owner = box(number = value)
+    var old = owner
+    var job = owner.bump(2)
+    if old.number != value:
+        return -1000
+    owner = box(number = 100)
+    var answer = await job
+    var alias = await read(old)
+    var view: readable = alias
+    var amount = await zero(value)
+    return answer + old.number + owner.number + view.add(amount)

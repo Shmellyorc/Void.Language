@@ -12654,3 +12654,297 @@ passed. Windows and macOS execution of the repair remains unverified locally and
 requires owner-controlled hosted acceptance; Stage 5 is not declared hosted-locked.
 No stack probes, cache/isolation behavior, GC checks or existing assertions were
 disabled. No commit, push, branch, remote mutation or hosted CI action was performed.
+
+## 18 October 2026: Stage 5 hosted lock and Stage 6 architecture investigation
+
+**Authorization:** research/proposal and documentation reconciliation only. No
+Stage 6 compiler, Runtime, library, scheduler or test implementation was authorized
+or performed. Local HEAD was clean at
+`4627687b3a18349633715e4294bc915cf74ddd41` before documentation edits.
+
+### Verified hosted baseline
+
+The owner declared Stage 5 locked at CI #70. Read-only Actions metadata identifies
+[run 39193640484](https://github.com/Shmellyorc/Void.Language/actions/runs/39193640484),
+number 70, at that exact HEAD, conclusion success. All seven completed job logs
+independently contain their successful 82/82 inventory: Windows Debug/Release,
+macOS ARM64 Debug/Release and Ubuntu Debug/Release/strict sanitizers. **574/574
+hosted suites passed.** Assertions over metadata and every per-job CTest summary
+are retained in `build/stage6-investigation/ci70-summary.json`, with raw metadata
+and downloaded logs beside it. The aggregate `gh run view --log` returned empty
+output; per-job read-only API downloads supplied the actual evidence instead.
+
+The canonical strategy, current known issues, Bible status, Wrench handoff and
+Stage 5 proposal now reflect that lock. ADVANCED_LANGUAGE.md clarifies that the
+cache was delivered separately. Stage 4 retains its own historical CI #68 lock.
+Stage 5 acceptance covers its delivered subset: Windows persistent disk caching
+still bypasses safely; macOS cache suites and Windows fallback passed hosted verification.
+Automatic watching, finer native partitions and power-loss durability remain
+unimplemented/unverified as previously documented. Earlier dated entries remain
+history. The Stage 5 guide also now describes the CI #70 direct platform/process
+link order, rather than the superseded main-only generation link.
+
+### Investigation and recommendation
+
+Created [STAGE6_PROPOSAL.md](STAGE6_PROPOSAL.md). Inspected the current Language
+Bible concurrency/native/reload contracts and unresolved decisions; development
+strategy; complete GC_RUNTIME and ADVANCED_LANGUAGE guides; known issues; actual
+runtime coordination, handles/frames, callback admission/close, checked native ABI,
+JIT/AOT lowering, source cleanup/capture lowering, IR types/CFG, reload slots and
+native provider fixtures. Source evidence includes:
+
+- `include/void/runtime.hpp`, `src/runtime/coordination.cpp`: TLS attachment,
+  Managed/NativeSafe/Parked rendezvous, precise collection and Handle ownership.
+- `include/void/ir.hpp`, `src/frontend/compiler.cpp`: synchronous typed CFG,
+  concrete callables/captures and dynamic LIFO cleanup, with no task/suspension IR.
+- `src/backend/llvm/backend.cpp`: direct field loads/stores, root frames,
+  NativeSafe imports, generation isolation/default links, cache and revision checks.
+- `include/void/execution.hpp`, `src/runtime/reload.cpp`: synchronous generation
+  leases, exact compatibility and generation-borrowed diagnostics.
+- `include/void/callback.hpp`, `src/runtime/callback.cpp`, runtime callback and
+  coordination tests: provider quiescence, foreign/same-thread reentry and shutdown.
+- `src/runtime/abi.cpp`, `src/runtime/native.cpp`, native C fixtures: current
+  internal C ABI/string/resource boundaries, not an implemented source FFI.
+
+The principal finding is that existing thread coordination makes collection safe;
+it does not define concurrent source mutation or freeze readonly aliases. A pool
+alone cannot safely enable arbitrary managed-reference or closure spawn. A second
+finding is that suspended task leases are necessary but insufficient for callable
+values escaping a completed task; their generation lifetime also needs a policy.
+Neither gap is represented as an existing compiler defect.
+
+Recommendation: explicit stackless lowering in the existing typed IR, ordinary
+traced heap frames, persistent active-task roots and existing NativeCode leases;
+one owner executor for async source; a bounded pool with a proposed first
+noncapturing/value-only source spawn boundary and transitive effect checks.
+Cancellation and groups share checked cleanup, with suspension-based joins and
+explicit draining shutdown. Source native libraries form a separate bounded
+compiled-bridge/wrapper delivery. No duplicate backend, collector, task VM,
+work-stealing system, generic FFI engine or package service is proposed.
+
+The proposal contains five implementation deliveries, regression requirements,
+risks and six owner decision groups: parallel sharing/effects, call/handle semantics,
+entry/scope ownership, cancellation/group cleanup, escaping-callable leases and
+native binding scope/representation. Every new behavior and restriction is labeled
+as recommended and unapproved. No example or foreign-language behavior was promoted
+to VOID's contract. The owner must approve semantics and authorize a selected
+implementation sprint before Stage 6 production work starts.
+
+### Upstream research and checks
+
+Official LLVM 19 coroutine documentation and exact `llvmorg-19.1.7`
+`llvm/docs/Coroutines.rst` were inspected, along with primary documentation for
+libuv work/completion scheduling, Python task-group failure/cancellation, Rust
+Send/Sync, C++ data races and Microsoft's DLL loader/lock rules. Direct source
+links and the relevance/limits of each comparison are in STAGE6_PROPOSAL.md.
+The exact LLVM document is retained in ignored `build/stage6-investigation/`.
+No experimental Stage 6 algorithm or timing was claimed or added to production.
+
+Commands ran from the repository root:
+
+```sh
+git rev-parse HEAD
+git status --short
+gh run list --repo Shmellyorc/Void.Language --limit 8 --json databaseId,number,headSha,conclusion,status
+gh run view 39193640484 --repo Shmellyorc/Void.Language --json headSha,jobs,conclusion,number
+# For each of the seven returned databaseId values:
+gh api repos/Shmellyorc/Void.Language/actions/jobs/JOB_ID/logs
+gh api 'repos/llvm/llvm-project/contents/llvm/docs/Coroutines.rst?ref=llvmorg-19.1.7' -H 'Accept: application/vnd.github.raw+json'
+ctest --test-dir build/ci-release -R '^(runtime_coordination|runtime_callbacks|runtime_generated|jit|reload|debug_cache|debug_cache_processes|native)$' --output-on-failure -j2
+git diff --check
+```
+
+Existing focused Release baseline checks passed **8/8, 5.66 s**. Their log is
+`build/stage6-investigation/baseline-focused.log`. This rechecks mechanisms used
+by the recommendation; it does not validate proposed async/scheduler behavior.
+No rebuild or full local matrix was needed for documentation-only changes.
+Markdown/local-link and documentation-scope validation are recorded with the
+research evidence. No commits, pushes, branches, remote writes or hosted CI
+operations were performed. Owner approval/implementation remains outstanding.
+
+
+## 18 October 2026: Stage 6 Delivery 1 authorization and implementation start
+
+Owner approved Native Async Activation only. Before production edits, persisted
+the exact Stage 5 lock, five sequential deliveries, D1–D6 approval/restriction
+mapping, owner-controlled hosted gates, risks and pending root-adapter lifecycle
+question in WRENCH_CLANKER.md, STAGE6_PROPOSAL.md and canonical development status.
+Existing uncommitted architecture/status documents are preserved. Implementation
+and acceptance are pending; no later delivery or Git/CI operation is authorized.
+
+Owner clarified the root lifecycle: drain all started/unawaited tasks before
+return, preserve root failure as primary, report otherwise unobserved failures
+when root succeeds, deterministic order and complete roots/leases/cleanup.
+No implicit cancellation, detached tasks or public groups. Recorded in the
+proposal, Wrench handoff and canonical status before implementation proceeds.
+
+Delivery 1 is in progress, not accepted. Added source/IR async effects, inferred
+task shapes, native heap frames/start/resume lowering and an explicit root API;
+the first normal/O2 activation/await source fixture passed. Expanded tests found
+and are repairing no-result await statement recognition, snapshot-helper source
+ownership and fixed-result rooted handoff. Broader regression, allocation, GC,
+AOT/cache/reload and full local acceptance are pending. Native ready wakeup uses
+nonallocating task links. No later delivery is active.
+
+Delivery 1 implementation research/repair evidence (in progress):
+- Native start/resume lowering uses existing typed CFG, failure/cleanup and root
+  machinery; snapshot helpers are ordinary validated IR rather than a second
+  array-copy ABI. Task/frame allocation is rooted before publication; enqueue and
+  wakeup need no allocation. Scope ownership rejects competing/nested executors.
+- Owner approved ordinary async functions and managed receivers, with value
+  receivers, virtual/interface methods and async function values diagnosed until
+  their calling/lifetime contracts are reviewed. Persisted the decision and
+  rationale in the proposal and Wrench handoff; these features remain deferred.
+- Expanded normal/O2 JIT plus five normal AOT focused suites passed 7/7 (58.39 s).
+  The initial fixed-result failure was an unregistered task-payload copy source;
+  loading into the existing registered instruction home before copying corrected
+  it. An initial failure fixture used a compile-time-invalid negative u8 literal;
+  replaced it with an input-dependent checked conversion, preserving the failure.
+- Added managed receivers, result/value/generic forwarding and readonly profiles.
+  Investigation found two integration defects: inferring async-call effects from
+  the returned task-shaped type misclassified synchronous generic forwarding;
+  calls now record their actual declaration effect. Task payload authority also
+  needs to survive await. Existing logical reference paths now carry immutable
+  task result profiles/provenance, while physical LLVM root maps trace only the
+  task pointer. Treating the task's aggregate payload as a pointer map initially
+  failed descriptor admission; the pointer special case now requires managed_ref.
+- Added root-success/root-failure unobserved sibling draining and reached-defers
+  observations, concurrent-root rejection, GC overlap with a suspended parent,
+  live old-generation replacement/retirement, nested-root and foreign-generation
+  publication rejection. Source activation tests passed with these cases before
+  the final trace and malformed-IR additions. Await now shares synchronous call
+  trace propagation rather than discarding the caller location.
+- Malformed task-shape coverage exposed an out-of-range field lookup before
+  validation. Task shape is now independently validated before reading its result
+  authority; added forged construction and live borrowed-place negatives.
+- Strict sanitizer build under the traced sandbox hit LeakSanitizer's documented
+  ptrace fatal error. Re-running the unchanged strict leak/ASan/UBSan settings
+  outside tracing; no sanitizer suppression or test weakening was introduced.
+
+Current verification is not final acceptance. Full local matrix runs are in
+progress and must be rebuilt after the last verifier/trace changes. Delivery 1
+is not hosted-accepted, and no later delivery is authorized.
+
+A focused borrowed-receiver probe (`build/stage6-investigation/borrow.log`)
+confirmed that `view.method(await task)` retained a prepared interface place.
+The IR verifier rejected it, as the proposal requires, but source checking had
+accepted it. Added a source-located diagnostic with the safe explicit-local
+rewrite, plus a source negative. Ordinary constructor arguments evaluate before
+staging and do not acquire this restriction. This keeps the existing suspension
+boundary rather than inventing a prepared-place lifetime contract.
+The provisional full Release matrix passed 97/98; its old async_ir executable
+caught the malformed-task out-of-range lookup described above. The corrected
+independent verifier and added forged-construction/borrowed-place negatives pass
+in focused Debug. Final rebuilt acceptance remains pending. Retained `spawn` as
+an ordinary identifier in this delivery; no spawn grammar was introduced.
+The provisional full Debug matrix passed 97/98 and caught the original 1 MiB
+semantic-depth regression: placing await's Type temporaries in the recursive
+expression dispatcher enlarged every synchronous recursive dispatch frame. Moved
+await checking into the existing non-inlined semantic-handler pattern; kept the
+original depth limits and small-stack test unchanged. Added managed string
+argument/result suspension to the GC/allocation fixture. Final rebuilt matrix
+will verify these corrections with no lowered guards or sanitizer suppressions.
+Independent async IR execution now covers normal/O2 directly, rather than only
+source-generated IR. Its required task descriptor must be in the generation's
+nominal catalog; added a missing-catalog negative to prevent valid-looking IR
+from failing descriptor admission only at execution. Tightened the private task
+shape against unrelated enum/collection flags and recorded async effects in raw
+IR reload contracts. Explicitly diagnose async deinit, preserving the existing
+synchronous lifecycle/cleanup contract. Final source cases now include successful
+unawaited descendants created after root completion and sibling failure creation
+order even when the first-created failure completes last.
+A focused generic-constructor probe reached the internal missing-struct assertion
+for an inferred task type. Added a source diagnostic at `t()` and a negative,
+preserving the approved no-public-task-constructor boundary. The independent IR
+constructor rejection remains in place. No language-facing task constructor or
+new task API was added.
+
+## 19 October 2026: Stage 6 Delivery 1 local completion — STOP for owner review
+
+Implemented Native Async Activation only: `async func`, inferred internal tasks,
+`await`, native start/resume state machines, precisely traced zero-initialized heap
+frames, one owning executor thread and an explicit synchronous-ABI root adapter.
+Argument order, fixed value copies, managed/nullable/string identities, readonly
+profiles, generic forwarding, synchronous local closures and reached cleanup are
+covered. Managed receiver identity survives variable rebinding and suspension.
+Unsupported async lifecycle/value-receiver/virtual/interface/callable forms and
+prepared interface receivers across await diagnose before LLVM lowering. Task
+payload access/construction is private; generic task construction diagnoses too.
+
+The root adapter drains all started work, including descendants created after
+root completion. Root failure remains primary; otherwise unobserved failures are
+reported in creation order, even when completion order differs. Checked await
+failure shares existing caller-trace and cleanup propagation. No cancellation,
+detachment, public groups, parallel spawn, general native libraries or watching
+was introduced. `spawn` remains an ordinary identifier in this delivery.
+
+Existing NativeCode leases enclose complete draining and every resumption; no task
+can be resumed outside its owning root scope. Generation identity rejects foreign
+publication. Live replacement changes private frame layout and suspension-state
+count while the old root remains suspended; its original state/code resumes,
+then the old generation retires. Task/frame trace maps and diagnostic strings are
+owned independently of retired code. Persistent Debug source-cache cold/hit paths
+and all original raw-IR linking/native-helper regressions remain covered.
+
+The final tree was frozen after the corrections documented above. Earlier partial
+and mixed-build logs are investigation evidence, not acceptance; superseded local
+verification processes were stopped before the final frozen build. The final
+checks below all passed without weakened tests, guards or sanitizer settings.
+
+| Final local configuration | Result | Time | Evidence under `build/stage6-investigation/` |
+| --- | --- | --- | --- |
+| Clang/LLVM 19.1.7 Debug, research OFF | 98/98 | 421.90 s | `delivery1-debug-acceptance.log` |
+| Clang/LLVM 19.1.7 Release | 98/98 | 156.70 s | `delivery1-release-acceptance.log` |
+| RelWithDebInfo, strict ASan/UBSan/leak checks | 98/98 | 349.47 s | `delivery1-sanitizers-acceptance.log` |
+
+**294/294 full-suite passes**, preserving all original 82 suites and adding 16:
+async source, independent async IR and seven native AOT fixtures in normal/O2.
+Source coverage includes GC root inspection/forced collection, exhaustive native
+allocation budgets through first success in both modes, deterministic failure
+and cleanup draining, cache, active reload/retirement, competing/nested executors,
+foreign generation rejection and unsupported-source negatives. Independent IR
+executes normal/O2 and rejects malformed effects/task shapes/catalogs, uninitialized
+required locals, forged task access/construction, cleanup awaits, invalid control
+flow and borrowed local/instruction values surviving suspension.
+
+Additional focused evidence: final source/IR **2/2, 42.29 s** in
+`delivery1-frozen-focused.log`; unchanged 1 MiB semantic-depth/recovery checks in
+`delivery1-frozen-depth.log`; 2 MiB fixed-array async AOT normal/O2 both returned
+27 on **1 MiB native stacks**, recorded in `delivery1-small-stack.json`.
+Documentation local-link validation passed (`delivery1-doc-links.json`), and
+`git diff --check` passed. Structured totals are in `delivery1-acceptance.json`.
+
+Final commands from the repository root (build output retained in matching logs):
+
+```sh
+cmake --build build/order1/production -j4
+ctest --test-dir build/order1/production --output-on-failure -j2
+cmake --build build/ci-release -j4
+ctest --test-dir build/ci-release --output-on-failure -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 cmake --build build/ci-sanitizers -j3
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers --output-on-failure -j2
+python3 tests/integration/semantic_depth.py build/order1/production/voidc
+git diff --check
+```
+
+Strict sanitizer build/tests ran outside tracing because LeakSanitizer cannot run
+under ptrace. Leak detection and halt/error exit settings stayed enabled. The
+normal/O2 small-stack probe uses Python `resource.setrlimit(RLIMIT_STACK,
+(1048576, 1048576))` and executes both `void_async_aot_large_*` binaries with input7.
+No editor/package change was made or claimed.
+
+Deliverables: production compiler/IR/backend/runtime changes, seven fixtures in
+`examples/async`, regressions in `tests/async`, [ASYNC.md](ASYNC.md), updated
+proposal/Wrench/canonical handoff and GC/language/known-boundary guides. Existing
+uncommitted Stage 6 research and Stage 5 reconciliation were preserved.
+
+**Remaining:** owner review/commit/push and the seven-job hosted run. Windows and
+macOS were not executed locally. Stage 5 stays LOCKED at
+`4627687b3a18349633715e4294bc915cf74ddd41`, CI #70, 7/7 jobs and 574/574 suites.
+Delivery 1 is locally complete, not hosted-locked. Root-scope task/frame retention
+is conservative until drain; very long roots can grow with total created work.
+Other calling contracts, cancellation/groups, parallelism and native libraries
+remain the approved later-delivery review work. No Delivery 1 owner decision or
+failing local check remains. No commits, pushes, branches, remote writes or hosted
+CI actions were performed. **STOPPED. Do not begin Delivery 2 without hosted
+acceptance and explicit owner authorization.**

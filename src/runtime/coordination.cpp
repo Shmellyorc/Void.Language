@@ -10,7 +10,7 @@ namespace vd {
 thread_local Runtime* Runtime::current_runtime_ = nullptr;
 thread_local Runtime::Thread* Runtime::current_thread_ = nullptr;
 Runtime::~Runtime() {
-    if (!threads_.empty() || !handles_.empty() || requested_ || callbacks_) std::terminate();
+    if (!threads_.empty() || !handles_.empty() || requested_ || callbacks_ || async_owner_!=std::thread::id{}) std::terminate();
 }
 Runtime::Thread& Runtime::thread() const {
     if (current_runtime_ != this || !current_thread_ || current_thread_->owner != std::this_thread::get_id())
@@ -258,6 +258,8 @@ bool Runtime::wait_for_request(std::chrono::milliseconds timeout) {
     std::unique_lock lock(mutex_);
     return changed_.wait_for(lock, timeout, [&] { return requested_; });
 }
+bool Runtime::enter_async(){require_managed();std::lock_guard lock(mutex_);if(async_owner_!=std::thread::id{} || closing_)return false;async_owner_=std::this_thread::get_id();return true;}
+void Runtime::leave_async() noexcept {std::lock_guard lock(mutex_);if(async_owner_!=std::this_thread::get_id())std::terminate();async_owner_={};}
 void Runtime::close() {
     if (current_runtime_ == this && thread().state == State::managed) throw std::logic_error("close requires NativeSafe state");
     std::lock_guard lock(mutex_);

@@ -1,0 +1,12 @@
+async func copy(items: [i32, 524288]) -> [i32, 524288]:
+    return items
+
+async func entry(value: i32) -> i32:
+    var input: [i32, 524288]
+    input[0] = 7
+    var job = copy(input)
+    input[0] = 9
+    var result = await job
+    result[0] = 11
+    var again = await job
+    return again[0] + input[0] + result[0]

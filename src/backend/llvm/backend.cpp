@@ -11,6 +11,7 @@
 #include "void/tooling.hpp"
 #include "void/numeric.hpp"
 #include "void/runtime_abi.hpp"
+#include "void/async.hpp"
 #include "void/reference_capabilities.hpp"
 #include <cmath>
 #include <array>
@@ -127,10 +128,17 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     // Pure default DAGs are outlined into ordinary private typed-IR functions.
     // The normal shared lowerer supplies roots, failure cleanup and native ABI;
     // defaults execute once per element without expanding IR by array extent.
+    ir::Module input=source;
+    // Snapshot value-array parameters at enqueue, through ordinary checked IR.
+    std::vector<ir::Function> snapshots;
+    for(const auto& f:source.functions)if(f.asynchronous)for(unsigned n=0;n<f.parameters.size();++n)if(contains_arrays(f.parameters[n])){
+        ir::Function copy;copy.name=f.name+"::$asynccopy."+std::to_string(n);copy.source=f.source;copy.module_identity=f.module_identity;copy.source_name=copy.name.substr(f.module_identity.size()+2);copy.visibility="private";copy.parameters={f.parameters[n]};copy.result=f.parameters[n];
+        copy.blocks={{{{ir::Op::argument}},{ir::Terminator::Kind::return_value,0}}};snapshots.push_back(std::move(copy));
+    }
+    input.functions.insert(input.functions.end(),snapshots.begin(),snapshots.end());
     ir::InstructionTypes checked_types;
     std::map<std::string,ir::ReferenceEffects> verified_effects;
-    ir::validate(source,&checked_types,&verified_effects);
-    ir::Module input=source;
+    ir::validate(input,&checked_types,&verified_effects);
     using Origin=std::tuple<std::string,unsigned,unsigned>;
     std::map<Origin,Origin> origins;
     std::map<Origin,std::string> defaults,outlined;
@@ -223,7 +231,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         // Scalar array payloads live in Runtime buffers; only their handles are
         // embedded in native values. Trace handles even though numeric element
         // shapes have no logical managed-reference leaves.
-        if(ir::collection_type(t)) {result.push_back(base);return;}
+        if(ir::collection_type(t) || (t.kind==ir::Type::managed_ref && t.definition && t.definition->task_result)) {result.push_back(base);return;}
         if(t.kind==ir::Type::aggregate) {
             for(unsigned n=0;n<t.definition->fields.size();++n) reference_offsets(ir::field_type(t,n),base+field_offset(t,n),result);
             return;
@@ -287,13 +295,31 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         std::vector<llvm::Type*> parameters;
         for (unsigned n = 0; n < f.parameters.size(); ++n) parameters.push_back(f.receiver && n == 0 ? b.getPtrTy() : type(f.parameters[n]));
         if (!f.module_identity.empty() || input.coordinated) parameters.push_back(b.getPtrTy());
-        auto* function_type = llvm::FunctionType::get(type(f.result), parameters, false);
+        auto* function_type = llvm::FunctionType::get(f.asynchronous?b.getPtrTy():type(f.result), parameters, false);
         // Source-private bodies are called within this LLVM module, including
         // bodies from the flattened import graph. Keep the selected host entry
         // lookup-visible, and preserve public/project and legacy native exports.
         const auto linkage = default_functions.contains(f.name) || (!f.module_identity.empty() && f.visibility == "private" && f.name != exported_entry)
             ? llvm::Function::InternalLinkage : llvm::Function::ExternalLinkage;
-        functions[f.name] = llvm::Function::Create(function_type, linkage, native_symbol(f, suffix), *module);
+        functions[f.name] = llvm::Function::Create(function_type, linkage, native_symbol(f, suffix)+(f.asynchronous?"$async":""), *module);
+    }
+    auto* async_generation=new llvm::GlobalVariable(*module,b.getInt8Ty(),true,llvm::GlobalValue::PrivateLinkage,b.getInt8(0),"async.generation");
+    struct AsyncPlan {llvm::StructType* frame;llvm::Function* resume;std::vector<unsigned> parameters,locals;std::vector<std::vector<unsigned>> values;std::vector<std::uint64_t> offsets;};
+    std::map<std::string,AsyncPlan> async_plans;
+    for(unsigned index=0;index<input.functions.size();++index){const auto& f=input.functions[index];if(!f.asynchronous)continue;
+        AsyncPlan plan;std::vector<llvm::Type*> fields{b.getPtrTy(),b.getInt32Ty()};std::vector<ir::Type> logical{f.task,ir::Type::i32};
+        auto add=[&](ir::Type t){auto i=static_cast<unsigned>(fields.size());fields.push_back(t==ir::Type::none?b.getInt8Ty():type(t));logical.push_back(t);return i;};
+        for(auto t:f.parameters)plan.parameters.push_back(add(t));for(auto t:f.locals)plan.locals.push_back(add(t));
+        for(const auto& block:checked_types[index]){std::vector<unsigned> values;for(auto t:block)values.push_back(add(t));plan.values.push_back(std::move(values));}
+        plan.frame=llvm::StructType::create(context,fields,"async.frame"+suffix);auto* native=layout.getStructLayout(plan.frame);
+        for(unsigned n=0;n<logical.size();++n)if(logical[n]!=ir::Type::none)reference_offsets(logical[n],native->getElementOffset(n),plan.offsets);
+        plan.resume=llvm::Function::Create(llvm::FunctionType::get(b.getVoidTy(),{b.getPtrTy(),b.getPtrTy()},false),llvm::GlobalValue::InternalLinkage,"async.resume"+suffix,*module);
+#ifdef VOID_ASYNC_START_SANITIZER_HASH
+        auto metadata=[&](llvm::Function* function,std::int32_t magic,std::int32_t hash){function->setMetadata("func_sanitize",llvm::MDNode::get(context,{llvm::ConstantAsMetadata::get(b.getInt32(magic)),llvm::ConstantAsMetadata::get(b.getInt32(hash))}));};
+        if(input.async_root && f.name==exported_entry)metadata(functions.at(f.name),VOID_ASYNC_START_SANITIZER_MAGIC,VOID_ASYNC_START_SANITIZER_HASH);
+        metadata(plan.resume,VOID_ASYNC_RESUME_SANITIZER_MAGIC,VOID_ASYNC_RESUME_SANITIZER_HASH);
+#endif
+        async_plans.emplace(f.name,std::move(plan));
     }
     std::map<std::string,std::uint64_t> function_ids;
     for(const auto& [name,function]:functions)function_ids.emplace(name,function_ids.size()+1);
@@ -313,7 +339,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         auto* dispatcher=llvm::Function::Create(llvm::FunctionType::get(type(result),parameters,false),llvm::GlobalValue::InternalLinkage,"callable_dispatch",*module);callable_dispatchers.emplace(key,dispatcher);
         b.SetInsertPoint(llvm::BasicBlock::Create(context,"select_callable",dispatcher));auto* invalid=llvm::BasicBlock::Create(context,"invalid_callable",dispatcher);auto* selected=b.CreateSwitch(b.CreateExtractValue(dispatcher->getArg(0),0),invalid);
         for(const auto& target:input.functions){
-            if(target.receiver || target.initializer || target.parameters.size()!=t.definition->call_parameters.size()+(target.closure?1:0) || target.result!=result || !ir::capability_assignable(target.result,result))continue;
+            if(target.asynchronous || target.receiver || target.initializer || target.parameters.size()!=t.definition->call_parameters.size()+(target.closure?1:0) || target.result!=result || !ir::capability_assignable(target.result,result))continue;
             bool same=true;for(unsigned n=0;n<t.definition->call_parameters.size();++n)same&=target.parameters[n+(target.closure?1:0)]==ir::Type(t.definition->call_parameters[n]) && ir::capability_key(target.parameters[n+(target.closure?1:0)])==ir::capability_key(t.definition->call_parameters[n]);if(!same)continue;
             auto* invoke=llvm::BasicBlock::Create(context,"invoke_callable",dispatcher);selected->addCase(b.getInt64(function_ids.at(target.name)),invoke);b.SetInsertPoint(invoke);
             std::vector<llvm::Value*> arguments;if(target.closure)arguments.push_back(b.CreateExtractValue(dispatcher->getArg(0),1));for(unsigned n=1;n<dispatcher->arg_size();++n)arguments.push_back(dispatcher->getArg(n));auto* value=b.CreateCall(functions.at(target.name),arguments);if(result==ir::Type::none)b.CreateRetVoid();else b.CreateRet(value);
@@ -490,7 +516,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     std::size_t function_index = 0;
     for (const auto& f : input.functions) {
         const auto& instruction_types = checked_types.at(function_index++);
-        auto* fn = functions.at(f.name);
+        const auto* async=f.asynchronous?&async_plans.at(f.name):nullptr;
+        auto* fn = async?async->resume:functions.at(f.name);
+        llvm::BasicBlock* setup=async?llvm::BasicBlock::Create(context,"async.enter",fn):nullptr;
+        auto frame_home=[&](unsigned field){return b.CreateStructGEP(async->frame,fn->getArg(0),field);};
         auto path = vd::utf8_path(f.source.path);
         auto* source_file = debug.createFile(vd::path_utf8(path.filename()), vd::path_utf8(path.parent_path()));
         std::vector<llvm::Metadata*> debug_types{debug_value_type(f.result)};
@@ -508,7 +537,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         for (std::size_t i = 0; i < f.blocks.size(); ++i)
             blocks.push_back(llvm::BasicBlock::Create(context, "block" + std::to_string(i), fn));
         auto* failure_type = llvm::StructType::get(b.getPtrTy(), b.getInt32Ty(), llvm::ArrayType::get(b.getPtrTy(), 32));
-        llvm::Value* failure = f.module_identity.empty() && !input.coordinated ? nullptr : fn->getArg(static_cast<unsigned>(f.parameters.size()));
+        llvm::Value* failure = async?fn->getArg(1):f.module_identity.empty() && !input.coordinated ? nullptr : fn->getArg(static_cast<unsigned>(f.parameters.size()));
         llvm::Value* root_frame = nullptr;
         auto leave_frame = [&] {
             if (input.coordinated) b.CreateCall(module->getOrInsertFunction("vd_gc_frame_leave", b.getVoidTy(), b.getPtrTy()), {root_frame});
@@ -517,17 +546,17 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         auto return_failure = [&] {
             if(f.cleanup_entry && active_block<*f.cleanup_entry){b.CreateBr(blocks[*f.cleanup_entry]);return;}
             leave_frame();
-            if (f.result == ir::Type::none) b.CreateRetVoid();
+            if (async || f.result == ir::Type::none) b.CreateRetVoid();
             else b.CreateRet(llvm::Constant::getNullValue(type(f.result)));
         };
         std::vector<llvm::Value*> slots;
-        b.SetInsertPoint(blocks.front());
+        b.SetInsertPoint(async?setup:blocks.front());
         b.SetCurrentDebugLocation(llvm::DebugLoc());
         for (unsigned n = 0; n < f.locals.size(); ++n) {
             auto t = f.locals[n];
             if (f.receiver && n == 0 && t.kind==ir::Type::aggregate) { slots.push_back(fn->getArg(0)); continue; }
-            auto* slot = home(b.CreateAlloca(type(t)),StorageRole::local,llvm_backend::HomeKind::value); slots.push_back(slot);
-            b.CreateStore(f.receiver && n==0 && t.kind==ir::Type::managed_ref ? static_cast<llvm::Value*>(fn->getArg(0)) : llvm::Constant::getNullValue(type(t)), slot);
+            llvm::Value* slot = async?frame_home(async->locals[n]):home(b.CreateAlloca(type(t)),StorageRole::local,llvm_backend::HomeKind::value); slots.push_back(slot);
+            if(!async)b.CreateStore(f.receiver && n==0 && t.kind==ir::Type::managed_ref ? static_cast<llvm::Value*>(fn->getArg(0)) : llvm::Constant::getNullValue(type(t)), slot);
         }
         std::map<unsigned,llvm::Value*> stage_storage;
         for (const auto& block:f.blocks) for (const auto& instruction:block.instructions) if (instruction.op==ir::Op::stage_begin) {
@@ -635,6 +664,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             for(auto [t,storage]:array_sources) add_root(t,storage);
             for (auto [slot,storage]:stage_storage) add_root(ir::Type(f.locals[slot].definition),storage);
             for (unsigned i = 0; i < f.parameters.size(); ++i) {
+                if(async){add_root(f.parameters[i],frame_home(async->parameters[i]));continue;}
                 if (f.parameters[i].construction) { add_root(ir::Type(f.parameters[i].definition),fn->getArg(i)); continue; }
                 if (f.receiver && i == 0) continue;
                 std::vector<std::uint64_t> offsets; reference_offsets(f.parameters[i],0,offsets);
@@ -643,12 +673,13 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 b.CreateStore(fn->getArg(i),storage); add_root(f.parameters[i],storage);
             }
             for (unsigned block = 0; block < f.blocks.size(); ++block)
-                for (auto t : instruction_types[block]) {
+                for (unsigned position=0;position<instruction_types[block].size();++position) {
+                    auto t=instruction_types[block][position];
                     std::vector<std::uint64_t> offsets; reference_offsets(t,0,offsets);
                     llvm::Value* storage = nullptr;
                     if (!offsets.empty()) {
-                        storage = home(b.CreateAlloca(type(t)),StorageRole::instruction,llvm_backend::HomeKind::root);
-                        b.CreateStore(llvm::Constant::getNullValue(type(t)),storage);
+                        storage = async?frame_home(async->values[block][position]):home(b.CreateAlloca(type(t)),StorageRole::instruction,llvm_backend::HomeKind::root);
+                        if(!async)b.CreateStore(llvm::Constant::getNullValue(type(t)),storage);
                         add_root(t,storage);
                     }
                     value_roots[block].push_back(storage);
@@ -662,6 +693,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             b.CreateCall(module->getOrInsertFunction("vd_gc_frame_enter",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type),
                 {root_frame,root_array,llvm::ConstantInt::get(size_type,entries.size())});
         }
+        llvm::SwitchInst* resume_states=nullptr;unsigned resume_serial=0;
+        if(async){auto* invalid=llvm::BasicBlock::Create(context,"async.invalid_state",fn);resume_states=b.CreateSwitch(b.CreateLoad(b.getInt32Ty(),frame_home(1)),invalid);resume_states->addCase(b.getInt32(0),blocks.front());b.SetInsertPoint(invalid);b.CreateStore(b.CreateGlobalStringPtr("Invalid async resume state"),failure);return_failure();}
         for (std::size_t n = 0; n < f.blocks.size(); ++n) {
             active_block=n;b.SetInsertPoint(blocks[n]);
             if (input.coordinated) b.CreateCall(module->getOrInsertFunction("vd_gc_poll",b.getVoidTy()));
@@ -672,6 +705,23 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 b.SetCurrentDebugLocation(llvm::DILocation::get(context, loc.line, loc.column, subprogram));
                 llvm::Value* v = nullptr;
                 using ir::Op;
+                auto trace_failure = [&] {
+                        auto* count_address = b.CreateStructGEP(failure_type, failure, 1);
+                        auto* count = b.CreateLoad(b.getInt32Ty(), count_address);
+                        auto* append = llvm::BasicBlock::Create(context, "trace_caller", fn);
+                        auto* done = llvm::BasicBlock::Create(context, "error_return", fn);
+                        auto* limit = llvm::BasicBlock::Create(context, "trace_limit", fn);
+                        b.CreateCondBr(b.CreateICmpULT(count, b.getInt32(32)), append, limit);
+                        b.SetInsertPoint(limit); b.CreateStore(b.getInt32(33), count_address); b.CreateBr(done);
+                        b.SetInsertPoint(append);
+                        auto trace = "Called from " + f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name) + "\n" +
+                            source_message(loc, instruction.source_excerpt, "source call");
+                        auto* frames = b.CreateStructGEP(failure_type, failure, 2);
+                        auto* address = b.CreateGEP(llvm::ArrayType::get(b.getPtrTy(), 32), frames, {b.getInt32(0), count});
+                        b.CreateStore(b.CreateGlobalStringPtr(trace), address);
+                        b.CreateStore(b.CreateAdd(count, b.getInt32(1)), count_address);
+                        b.CreateBr(done); b.SetInsertPoint(done); return_failure();
+                };
                 auto fail_if = [&](llvm::Value* invalid_value, const std::string& description) {
                     auto* invalid = llvm::BasicBlock::Create(context,"numeric_error",fn);
                     auto* valid = llvm::BasicBlock::Create(context,"numeric_valid",fn);
@@ -1027,8 +1077,23 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     break;
                 case Op::extract: v = b.CreateExtractValue(values[instruction.a],{static_cast<unsigned>(instruction.immediate)}); break;
                 case Op::insert: v = b.CreateInsertValue(values[instruction.a],values[instruction.b],{static_cast<unsigned>(instruction.immediate)}); break;
+                case Op::await: {
+                    auto* check=llvm::BasicBlock::Create(context,"async.await",fn);b.CreateBr(check);resume_states->addCase(b.getInt32(++resume_serial),check);b.SetInsertPoint(check);
+                    for(unsigned k=0;k<values.size();++k)if(value_types[k]!=ir::Type::none)values[k]=b.CreateLoad(type(value_types[k]),frame_home(async->values[n][k]));
+                    auto* task=values[instruction.a];auto task_type=operand_type(instruction.a);
+                    auto* ready=b.CreateCall(module->getOrInsertFunction("vd_async_ready",b.getInt1Ty(),b.getPtrTy(),b.getPtrTy()),{task,failure});
+                    auto propagate=[&]{auto* bad=llvm::BasicBlock::Create(context,"async.await_failure",fn);auto* okay=llvm::BasicBlock::Create(context,"async.await_valid",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),bad,okay);b.SetInsertPoint(bad);trace_failure();b.SetInsertPoint(okay);};propagate();
+                    auto* suspend=llvm::BasicBlock::Create(context,"async.suspend",fn);auto* completed=llvm::BasicBlock::Create(context,"async.completed",fn);b.CreateCondBr(ready,completed,suspend);b.SetInsertPoint(suspend);
+                    b.CreateStore(b.getInt32(resume_serial),frame_home(1));b.CreateCall(module->getOrInsertFunction("vd_async_suspend",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{fn->getArg(0),task,failure});propagate();leave_frame();b.CreateRetVoid();b.SetInsertPoint(completed);
+                    auto result=instruction_types[n].at(values.size());auto* address=field_address(task_type,task,1);
+                    if(result==ir::Type::none)v=llvm::UndefValue::get(b.getInt8Ty());
+                    else if(contains_arrays(result)){auto* source=value_roots[n].at(values.size());b.CreateStore(b.CreateLoad(type(result),address),source);auto* destination=copy_staging.at(result);copy_value(result,destination,source,propagate);v=b.CreateLoad(type(result),destination);}
+                    else v=b.CreateLoad(type(result),address);
+                    break;
+                }
                 case Op::argument:
-                    if (f.receiver && f.parameters[0].kind==ir::Type::aggregate && instruction.a == 0) v = b.CreateLoad(type(f.parameters[0]),fn->getArg(0));
+                    if(async)v=b.CreateLoad(type(f.parameters[instruction.a]),frame_home(async->parameters[instruction.a]));
+                    else if (f.receiver && f.parameters[0].kind==ir::Type::aggregate && instruction.a == 0) v = b.CreateLoad(type(f.parameters[0]),fn->getArg(0));
                     else v = fn->getArg(instruction.a);
                     break;
                 case Op::string_literal: case Op::string_concat: case Op::string_equal: {
@@ -1141,7 +1206,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     }
                     v=b.CreateStore(value,slots[instruction.a]);break;
                 }
-                case Op::function_call: case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
+                case Op::async_call: case Op::function_call: case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
                     if(instruction.op==Op::base_init && instruction.callee.empty()) {
                         auto* address=b.CreateLoad(b.getPtrTy(),slots[0]);
                         for(unsigned field=0;field<instruction.arguments.size();++field) {
@@ -1191,21 +1256,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         auto* message = b.CreateLoad(b.getPtrTy(), b.CreateStructGEP(failure_type, failure, 0));
                         b.CreateCondBr(b.CreateIsNotNull(message), failed, resume);
                         b.SetInsertPoint(failed);
-                        auto* count_address = b.CreateStructGEP(failure_type, failure, 1);
-                        auto* count = b.CreateLoad(b.getInt32Ty(), count_address);
-                        auto* append = llvm::BasicBlock::Create(context, "trace_caller", fn);
-                        auto* done = llvm::BasicBlock::Create(context, "error_return", fn);
-                        auto* limit = llvm::BasicBlock::Create(context, "trace_limit", fn);
-                        b.CreateCondBr(b.CreateICmpULT(count, b.getInt32(32)), append, limit);
-                        b.SetInsertPoint(limit); b.CreateStore(b.getInt32(33), count_address); b.CreateBr(done);
-                        b.SetInsertPoint(append);
-                        auto trace = "Called from " + f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name) + "\n" +
-                            source_message(loc, instruction.source_excerpt, "source call");
-                        auto* frames = b.CreateStructGEP(failure_type, failure, 2);
-                        auto* address = b.CreateGEP(llvm::ArrayType::get(b.getPtrTy(), 32), frames, {b.getInt32(0), count});
-                        b.CreateStore(b.CreateGlobalStringPtr(trace), address);
-                        b.CreateStore(b.CreateAdd(count, b.getInt32(1)), count_address);
-                        b.CreateBr(done); b.SetInsertPoint(done); return_failure();
+                        trace_failure();
                         b.SetInsertPoint(resume);
                     }
                     break;
@@ -1213,7 +1264,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
 
                 }
                 auto result_type = instruction_types[n].at(values.size());
-                if (input.coordinated && value_roots[n].at(values.size())) b.CreateStore(v,value_roots[n][values.size()]);
+                if(async && result_type!=ir::Type::none)b.CreateStore(v,frame_home(async->values[n][values.size()]));
+                else if (input.coordinated && value_roots[n].at(values.size())) b.CreateStore(v,value_roots[n][values.size()]);
                 value_types.push_back(result_type);
                 values.push_back(v);
             }
@@ -1234,15 +1286,17 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     });
                     value=b.CreateLoad(type(f.result),staging);
                 }
-                leave_frame();b.CreateRet(value);break;
+                if(async){auto* task=b.CreateLoad(b.getPtrTy(),frame_home(0));b.CreateStore(value,field_address(f.task,task,1));b.CreateCall(module->getOrInsertFunction("vd_async_complete",b.getVoidTy(),b.getPtrTy()),{task});leave_frame();b.CreateRetVoid();}
+                else {leave_frame();b.CreateRet(value);}break;
             }
-            case ir::Terminator::Kind::return_void: leave_frame(); b.CreateRetVoid(); break;
+            case ir::Terminator::Kind::return_void: if(async)b.CreateCall(module->getOrInsertFunction("vd_async_complete",b.getVoidTy(),b.getPtrTy()),{b.CreateLoad(b.getPtrTy(),frame_home(0))});leave_frame(); b.CreateRetVoid(); break;
             case ir::Terminator::Kind::jump: b.CreateBr(blocks[end.yes]); break;
             case ir::Terminator::Kind::branch: b.CreateCondBr(values[end.value], blocks[end.yes], blocks[end.no]); break;
             case ir::Terminator::Kind::unreachable: b.CreateUnreachable(); break;
             }
         }
     }
+#include "async_start.inc"
     debug.finalize();
 #ifdef VOID_LLVM_RESEARCH
     if(inventory) for(auto& function:*module) if(!function.isDeclaration()) {
@@ -1351,6 +1405,7 @@ Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
     bind("vd_gc_interface_binding",vd_gc_interface_binding);
     bind("vd_cleanup_failure",vd_cleanup_failure);bind("vd_gc_poll",vd_gc_poll); bind("vd_gc_collect",vd_gc_collect); bind("vd_gc_allocate",vd_gc_allocate);
     bind("vd_gc_release",vd_gc_release);bind("vd_gc_alive",vd_gc_alive); bind("vd_gc_native_enter",vd_gc_native_enter); bind("vd_gc_native_leave",vd_gc_native_leave);
+    bind("vd_async_root",vd_async_root);bind("vd_async_new",vd_async_new);bind("vd_async_start",vd_async_start);bind("vd_async_ready",vd_async_ready);bind("vd_async_suspend",vd_async_suspend);bind("vd_async_complete",vd_async_complete);
     impl_->custom_bindings=false;
 }
 Jit::~Jit() = default;
@@ -1386,6 +1441,8 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     if (!selected) for (const auto& f : input.functions)
         if (f.name == input.identity + "::" + entry && !f.module_identity.empty()) selected = &f;
     if (!selected) throw std::invalid_argument("entry function does not exist");
+    if(selected->asynchronous!=input.async_root)throw std::invalid_argument("Async entry requires the explicit scheduler root adapter");
+    contract.async_root=input.async_root;
     if (selected->parameters != std::vector<ir::Type>{ir::Type::i32} || selected->result != ir::Type::i32)
         throw std::invalid_argument("host invocation requires i32(i32), not the selected function signature");
     auto expected_id = selected->module_identity.empty() ? input.identity + "::" + entry : selected->name;
@@ -1410,6 +1467,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
         };
         for(auto t:input.nominal_types) record(t);
         for (const auto& f : input.functions) {
+            contract.source_contract+=f.asynchronous?"async;":"sync;";
             contract.source_contract+="virtual:"+encoded(f.name)+encoded(f.virtual_slot)+encoded(f.method_name)+encoded(f.visibility);
             contract.source_contract+=encoded(ir::type_name(f.result))+encoded(ir::capability_key(f.result))+std::to_string(f.parameters.size())+":";
             for(auto t:f.parameters) contract.source_contract+=encoded(ir::type_name(t))+encoded(ir::capability_key(t));
@@ -1444,20 +1502,21 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     return impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, std::move(runtime),suffix,!selected->module_identity.empty());
 }
 const std::string& Jit::cache_status() const {return impl_->cache_status;}
-std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis& analysis,bool optimize,Compatibility contract,std::shared_ptr<Runtime> runtime) {
+std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis& analysis,bool optimize,Compatibility contract,std::shared_ptr<Runtime> runtime,bool async_root) {
+    contract.async_root=async_root;
     if(auto* attached=Runtime::attached();attached && attached->is_managed()) {
-        Runtime::Native native(*attached);return compile_analysis(analysis,optimize,std::move(contract),std::move(runtime));
+        Runtime::Native native(*attached);return compile_analysis(analysis,optimize,std::move(contract),std::move(runtime),async_root);
     }
     require_source_entry(analysis);
     impl_->cache_status="disabled";
-    auto cold=[&]{auto module=analysis.lower();return compile(module,module.entry_symbol,optimize,contract,runtime);};
+    auto cold=[&]{auto module=analysis.lower();module.async_root=async_root;return compile(module,module.entry_symbol,optimize,contract,runtime);};
     if(!impl_->cache.project_root.empty() && impl_->cache.build_identity.empty()){impl_->cache_status="unavailable";return cold();}
     if(optimize || impl_->custom_bindings || impl_->cache.project_root.empty())return cold();
     std::string identity;
     try {
     identity="VOID-debug-object-v1";
     auto field=[&](std::string_view value){llvm_backend::cache_field(identity,value);};
-    field(impl_->cache.build_identity);field(impl_->target_identity);field(analysis.entry_identity());
+    field(impl_->cache.build_identity);field(impl_->target_identity);field(analysis.entry_identity());field(async_root?"async-root-v1":"sync-root");
     field(analysis.compatibility_contract());field(analysis.constant_contract());field(runtime ? "forced-runtime" : "automatic-runtime");
     field(std::to_string(analysis.modules().size()));
     for(const auto& m:analysis.modules()) {field("module");field(m.identity);field(m.source.path());field(m.source.text());field(std::to_string(m.imports.size()));for(const auto& i:m.imports)field(i);}
@@ -1491,12 +1550,13 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
 std::shared_ptr<const NativeCode> Jit::compile(const ValidatedAnalysis& analysis, bool optimize, Compatibility contract) {
     return compile_analysis(analysis,optimize,std::move(contract),{});
 }
+std::shared_ptr<const NativeCode> Jit::compile_async(const ValidatedAnalysis& analysis,bool optimize,Compatibility contract){return compile_analysis(analysis,optimize,std::move(contract),{},true);}
 std::shared_ptr<const NativeCode> Jit::replacement(const NativeCode& current,const ValidatedAnalysis& analysis,bool optimize,Compatibility contract) {
     if(contract.function_id.empty())contract.function_id=analysis.entry_identity()+"::entry";
     contract.constant_contract=analysis.constant_contract();contract.source_contract=analysis.compatibility_contract();
-    contract.analysis=analysis.shared_from_this();contract.runtime_identity=current.compatibility().runtime_identity;
+    contract.analysis=analysis.shared_from_this();contract.runtime_identity=current.compatibility().runtime_identity;contract.async_root=current.compatibility().async_root;
     if(!(current.compatibility()==contract))return {};
-    return compile_analysis(analysis,optimize,std::move(contract),current.runtime_owner());
+    return compile_analysis(analysis,optimize,std::move(contract),current.runtime_owner(),current.compatibility().async_root);
 }
 bool Jit::replace(ReloadSlot& slot,const ValidatedAnalysis& analysis,bool optimize,Compatibility contract) {
     auto next=replacement(*slot.acquire(),analysis,optimize,std::move(contract));return next && slot.replace(std::move(next));
@@ -1555,6 +1615,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     bool entry_valid = false;
     for (const auto& f : input.functions) if (f.name == input.entry_symbol)
         entry_valid = f.parameters == std::vector<ir::Type>{ir::Type::i32} && f.result == ir::Type::i32;
+    for(const auto& f:input.functions)if(f.name==input.entry_symbol && f.asynchronous!=input.async_root)throw std::invalid_argument("Async AOT entry requires the explicit scheduler root adapter");
     if (!entry_valid) throw std::invalid_argument("AOT CLI adapter requires entry: i32(i32)");
     auto machine = native_machine();
     const auto triple = machine->getTargetTriple().str();
@@ -1699,6 +1760,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     finish(*module, optimize);
     write_object(*module,*machine,output);
 }
+void emit_async_object(const ir::Module& source,const std::filesystem::path& output,bool optimize){auto module=source;module.async_root=true;emit_object(module,output,optimize,true);}
 void emit_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program) {
     emit_impl(input,output,optimize,source_program,false);
 }

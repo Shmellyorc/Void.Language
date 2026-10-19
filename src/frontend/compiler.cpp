@@ -133,7 +133,7 @@ public:
 bool letter(char c) { return (c >= 'a' && c <= 'z') || c == '_'; }
 bool digit(char c) { return c >= '0' && c <= '9'; }
 const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue", "pass",
-    "event", "defer", "with", "enum", "is", "match", "property", "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
+    "async", "await", "event", "defer", "with", "enum", "is", "match", "property", "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
 #include "strings.inc"
 std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
     const auto& text = source.text();
@@ -250,10 +250,10 @@ struct Pattern {
     Type type=Type::none,narrowed=Type::none;unsigned slot=0,tag=0;bool rest=false,exclusive=false,nullable=false,annotated_type=false;
 };
 struct Expr {
-    bool event=false;
+    bool event=false, asynchronous_call=false;
     std::string event_owner;
     Type environment=Type::none;
-    enum class Kind { lambda, capture_reference, function_reference, function_call, function_null, test, match, sum, propagate, literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal } kind;
+    enum class Kind { awaited, lambda, capture_reference, function_reference, function_call, function_null, test, match, sum, propagate, literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::string op, qualifier, target, source_target;
@@ -316,7 +316,8 @@ struct ConstructionContext {
 struct GenericParameter { Token token; std::optional<Type> constraint; };
 struct Function {
     struct Capture {unsigned outer_slot;Type cell;Token token;bool snapshot=false;};
-    bool anonymous=false, deferred=false, bound_receiver=false;
+    bool anonymous=false, deferred=false, bound_receiver=false, asynchronous=false;
+    Type task=Type::none;
     unsigned binding_ordinal=0;
     Type cleanup_type=Type::none;
     std::list<Function> lambdas;
@@ -444,6 +445,7 @@ struct Unit {
     std::vector<Type> synthetic_types;
     std::function<Type(Type,const Token&)> resolve_callable;
     std::function<Type(const std::vector<Type>&,Type)> make_callable;
+    std::function<Type(Type)> make_task;
     std::function<Type(const std::string&,Type,bool)> make_capture_record;
     std::function<Type()> make_cleanup;
     std::function<Type(Type,const Token&)> resolve_result;
@@ -716,6 +718,7 @@ class Parser {
     }
     std::unique_ptr<Expr> unary() {
         Depth guard(depth, source, peek());
+        if(accept("await")) {auto e=std::make_unique<Expr>(Expr::Kind::awaited,tokens[p-1]);e->parts.push_back(unary());return e;}
         if (at("not") || at("-") || at("+")) {
             auto token = take(); auto e = std::make_unique<Expr>(Expr::Kind::unary, token); e->op = token.text;
             // not binds below comparisons: not a < b means not (a < b).
@@ -889,6 +892,7 @@ public:
                 structure.definition=std::make_shared<ir::ValueType>(); structure.definition->name=structure.token.text; structure.definition->interface_type=true;
                 need(":");newline();need("<indent>");unsigned count=0;
                 while(!at("<dedent>") && !at("<end of file>")) {
+                    if(peek().text=="async")error(source,peek(),Code::unsupported_type,"Async interface methods require a reviewed calling and dispatch contract.");
                     need("func");Function requirement;requirement.interface_requirement=true;
                     requirement.visibility=f.visibility;requirement.file_private=f.file_private;
                     requirement.token=name();
@@ -965,6 +969,7 @@ public:
                 }
                 need("<dedent>");if(!getter)error(source,property,Code::syntax,"A property requires a getter.");continue;
             }
+            f.asynchronous=accept("async");
             f.virtual_method=accept("virtual");
             f.overriding=!f.virtual_method && accept("override");
             need("func");
@@ -1393,6 +1398,11 @@ class Semantics {
         return e.type = call_arguments(e,target,1);
     }
     Type call_arguments(Expr& e, const Function& target, std::size_t first, bool constructor = false) {
+        e.asynchronous_call=target.asynchronous;
+        if(e.interface_call) {
+            std::vector<const Expr*> pending;for(std::size_t n=first;n<e.parts.size();++n)pending.push_back(e.parts[n].get());
+            while(!pending.empty()){auto* part=pending.back();pending.pop_back();if(part->kind==Expr::Kind::awaited)error(source,part->token,Code::unsupported_type,"await cannot retain a prepared interface receiver across suspension.","Await arguments into locals before selecting the interface method.");for(const auto& child:part->parts)pending.push_back(child.get());}
+        }
         std::vector<bool> bound(target.parameters.size());
         std::vector<unsigned> mapping;
         bool named = false, invalid = false;
@@ -1426,7 +1436,7 @@ class Semantics {
             e.parts.push_back(std::move(value)); mapping.push_back(n);
         }
         if (constructor) e.field_indexes = std::move(mapping);
-        return invalid ? error_type : target.result;
+        return invalid ? error_type : target.asynchronous ? unit.make_task(target.result) : target.result;
     }
     std::pair<Unit*,Structure*> owned_structure(Type type) {
         for (const auto& [id,owner] : units) for (auto& structure : owner->structures)
@@ -1641,10 +1651,16 @@ class Semantics {
         invalid_function = true;
         return e.type = error_type;
     }
+    VOID_SEMANTIC_HANDLER Type awaited_expression(Expr& e) {
+        if(!current || !current->asynchronous || current->deferred)error(source,e.token,Code::unsupported_type,"await requires an async function and is not allowed in deferred code.");
+        auto task=expression(*e.parts[0]);if(!task.definition || !task.definition->task_result || task.kind!=Type::managed_ref || task.nullable || task.construction)error(source,e.token,Code::type_mismatch,"await requires a non-null inferred task handle.");
+        return e.type=Type(*task.definition->task_result)==Type::none?Type::none:ir::field_type(task,1);
+    }
     // Keep the recursive dispatch frame small: reserving every handler's
     // temporaries here exhausts a 1 MiB Debug stack before the depth guard.
     Type expression_impl(Expr& e, std::optional<Type> expected) {
         switch (e.kind) {
+        case Expr::Kind::awaited:return awaited_expression(e);
         case Expr::Kind::lambda:return lambda_expression(e);
         case Expr::Kind::capture_reference:case Expr::Kind::function_null: case Expr::Kind::function_reference:return e.type;
         case Expr::Kind::function_call:return function_invocation(e);
@@ -1856,6 +1872,7 @@ class Semantics {
                     if(e.type_arguments.empty())error(source,e.token,Code::unsupported_type,"A generic function value requires explicit concrete type arguments.");
                     std::vector<Type> arguments;for(auto type:e.type_arguments)arguments.push_back(resolve_type(type,unit,root,units,e.token));auto& owner=generic_owner(*function);function=&unit.specialize_function(unit,owner,const_cast<Function&>(*function),arguments,e.token,current?current->specialization_depth+1:0,Type::none);
                 }else if(!e.type_arguments.empty())error(source,e.token,Code::unsupported_type,"This function value is not generic.");
+                if(function->asynchronous)error(source,e.token,Code::unsupported_type,"Async function values require a reviewed async callable contract; call the function directly.");
                 std::vector<Type> parameters;for(const auto& parameter:function->parameters)parameters.push_back(parameter.type);
                 e.target=function->symbol;e.kind=Expr::Kind::function_reference;return e.type=unit.make_callable(parameters,function->result);
             }
@@ -1892,6 +1909,7 @@ class Semantics {
         if(auto variant=enum_expression(e,false))return *variant;
         auto t = expression(base);
         if (t == error_type) return error_type;
+        if(t.definition && t.definition->task_result)error(source,e.token,Code::unsupported_type,"Inferred task handles support await; task internals are not source fields.");
         if(base.event)error(source,e.token,Code::invalid_value,"Event subscription storage is private.");
         if(ir::collection_type(t) && e.token.text=="count") {if(t.kind==Type::dictionary && !current)error(source,e.token,Code::constant_call,"Dictionary count requires runtime evaluation.");e.target=t.kind==Type::dictionary?"$dict.count":"$array.count";return e.type=Type::i64;}
         if (t.nullable) error(source,e.token,Code::type_mismatch,"Unwrap the nullable reference before field access.");
@@ -1913,7 +1931,7 @@ class Semantics {
         }
         if(selected.function){
             const auto& target=*selected.function;std::vector<Type> parameters;for(const auto& parameter:target.parameters)parameters.push_back(parameter.type);
-            auto signature=unit.make_callable(parameters,target.result);auto arguments=e.type_arguments;auto receiver=std::move(e.parts[0]);auto token=e.token;e=std::move(*receiver);return bind_method(e,token,signature,std::move(arguments));
+            if(target.asynchronous)error(source,e.token,Code::unsupported_type,"Async method values require a reviewed async callable contract.");auto signature=unit.make_callable(parameters,target.result);auto arguments=e.type_arguments;auto receiver=std::move(e.parts[0]);auto token=e.token;e=std::move(*receiver);return bind_method(e,token,signature,std::move(arguments));
         }
         for (unsigned n=0;n+1<selected.path.size();++n) embedded_receiver(e.parts[0],selected.path[n],e.token);
         auto owner=e.parts[0]->type;
@@ -1926,6 +1944,7 @@ class Semantics {
             if(!e.type_arguments.empty())error(source,e.token,Code::unsupported_type,"Type parameters are not generic constructors.");
             if(current->substitution_sources.contains(e.token.text))e.source_target=current->substitution_sources.at(e.token.text);
             const auto type=current->substitutions.at(e.token.text);
+            if(type.definition && type.definition->task_result)error(source,e.token,Code::not_callable,"Inferred task handles have no source constructor; call an async function.");
             if(!type.definition || type.nullable || (type.kind!=Type::aggregate && type.kind!=Type::managed_ref))error(source,e.token,Code::not_callable,"The specialized type has no source constructor.");
             auto [owner,structure]=owned_structure(type);construction(e,*owner,*structure,true,unit);return e.type;
         }
@@ -2185,7 +2204,7 @@ class Semantics {
         }
         case K::expression:
             if (expression(*s.expression) == error_type) break;
-            if (s.expression->kind != Expr::Kind::call && s.expression->kind != Expr::Kind::method_call && s.expression->kind!=Expr::Kind::function_call) error(source, s.token, Code::invalid_value, "Only function calls can be standalone expressions.", "Assign this value with var or return it.");
+            if (s.expression->kind != Expr::Kind::awaited && s.expression->kind != Expr::Kind::call && s.expression->kind != Expr::Kind::method_call && s.expression->kind!=Expr::Kind::function_call) error(source, s.token, Code::invalid_value, "Only function calls can be standalone expressions.", "Assign this value with var or return it.");
             break;
         case K::returned:
             if(current->deferred)error(source,s.token,Code::invalid_value,"Deferred code cannot return directly.");
@@ -2802,6 +2821,7 @@ class Lowering {
             }
             return emit({ir::Op::load,slot},e.token);
         }
+        case K::awaited: return emit({ir::Op::await,expression(*e.parts[0])},e.token);
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
         case K::method_call: case K::call: {
             if(e.target=="$event.emit")return event_emit(e);
@@ -2854,7 +2874,7 @@ class Lowering {
                 emit({ir::Op::store, slot, value}, arg->token); slots.push_back(slot);
             }
             if(selected_receiver && !e.parts[0]->property)emit({ir::Op::store,receiver->slot,selected_receiver->read()},e.token);
-            ir::Instruction i{e.interface_call ? ir::Op::interface_call : !e.virtual_slot.empty() && !e.super_call ? ir::Op::virtual_call : ir::Op::call}; i.callee = e.target+(e.super_call && e.token.text=="deinit"?"::$body$"+Type::key(e.parts[0]->type):""); i.receiver = receiver;
+            ir::Instruction i{e.asynchronous_call ? ir::Op::async_call : e.interface_call ? ir::Op::interface_call : !e.virtual_slot.empty() && !e.super_call ? ir::Op::virtual_call : ir::Op::call}; i.callee = e.target+(e.super_call && e.token.text=="deinit"?"::$body$"+Type::key(e.parts[0]->type):""); i.receiver = receiver;
             if (context) if (auto found=context->calls.find(&e);found!=context->calls.end())
                 i.callee=ir::construction_name(e.target,{found->second.begin(),found->second.end()});
             for (auto slot : slots) i.arguments.push_back(emit({ir::Op::load, slot}, e.token));
@@ -3088,6 +3108,7 @@ public:
     ir::Function lower(const Function& f, const ConstructionContext* construction=nullptr) {
         context=construction;
         output = {}; output.name = f.symbol; output.source_name = f.concrete_name.empty() ? f.token.text : f.concrete_name; output.display_name=f.display_name; output.source = source.location(f.token.offset);
+        output.asynchronous=f.asynchronous;output.task=f.task;
         output.bound_receiver=f.bound_receiver;output.closure=f.anonymous;cells.clear();cleanup_head.reset();return_slot.reset();cleanup_jumps.clear();with_scopes.clear();loop_with_depth.clear();
         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
         if(f.cleanup_type!=Type::none){cleanup_head=output.locals.size();auto head=f.cleanup_type;head.nullable=true;output.locals.push_back(head);if(f.result!=Type::none){return_slot=output.locals.size();output.locals.push_back(f.result);}}
@@ -3363,7 +3384,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
 #include "inheritance.inc"
 ir::Function member_header(const Unit& u,const Function& f) {
     ir::Function header;header.name=f.symbol;header.module_identity=u.identity;header.method_name=f.concrete_method_name.empty()?f.token.text:f.concrete_method_name;
-    header.bound_receiver=f.bound_receiver;header.closure=f.anonymous;header.accessor=f.accessor;header.receiver=static_cast<bool>(f.receiver);header.initializer=f.initializer;header.visibility=f.visibility;header.result=f.result;header.virtual_slot=f.virtual_slot;header.receiver_mutates=f.receiver_mutates;
+    header.asynchronous=f.asynchronous;header.task=f.task;header.bound_receiver=f.bound_receiver;header.closure=f.anonymous;header.accessor=f.accessor;header.receiver=static_cast<bool>(f.receiver);header.initializer=f.initializer;header.visibility=f.visibility;header.result=f.result;header.virtual_slot=f.virtual_slot;header.receiver_mutates=f.receiver_mutates;
     header.parameters.clear();if(f.receiver)header.parameters.push_back(f.receiver->type);
     for(const auto& p:f.parameters)header.parameters.push_back(p.type);
     return header;
@@ -3590,6 +3611,14 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     };
     auto environment=std::make_shared<ir::ValueType>();environment->name="$environment";environment->identity="$void::"+environment->name;environment->managed=true;environment->visibility="private";
     environment->self=environment;environment->arena=arena;arena->definitions.push_back(environment);
+    std::map<std::string,std::shared_ptr<ir::ValueType>> canonical_tasks;
+    for(auto& [id,u]:units)u->make_task=[&](Type result) {
+        auto eventual=result;result=ir::with_readonly_paths(result,{});
+        auto key="$task:"+std::to_string(result.kind)+":"+Type::key(result)+(result.nullable?"?":"")+":"+ir::capability_key(result);
+        auto& d=canonical_tasks[key];if(!d){d=std::make_shared<ir::ValueType>();d->identity=d->name=key;d->managed=true;d->visibility="private";d->task_result=ir::FieldType(result);
+            d->fields={{"$status",Type::i32,key},{"$result",result==Type::none?Type::boolean:result,key}};d->self=d;d->arena=arena;arena->definitions.push_back(d);root.synthetic_types.emplace_back(d,Type::managed_ref);}
+        return ir::with_field_type(Type(d,Type::managed_ref),1,eventual);
+    };
     std::map<std::string,std::shared_ptr<ir::ValueType>> canonical_callables;
     for(auto& [id,u]:units) {
         u->make_callable=[&](const std::vector<Type>& parameters,Type result)->Type {
@@ -3835,7 +3864,8 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     analyze_construction(units,diagnostics);
     diagnostics.finish();
     (void)string_pool(units);
-    for(auto& [id,u]:units) {u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
+    for(auto& [id,u]:units)for(auto& f:u->functions)if(f.asynchronous){f.task=u->make_task(f.result);if(!ir::async_boundary_safe(f.result))error(u->source,f.token,Code::unsupported_type,"Callable-containing results cannot escape an async task in Delivery 1.");for(const auto& parameter:f.parameters)if(!ir::async_boundary_safe(parameter.type))error(u->source,parameter.token,Code::unsupported_type,"Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.");if(f.receiver && !ir::async_boundary_safe(f.receiver->type))error(u->source,f.token,Code::unsupported_type,"Callable-containing managed receivers cannot cross an async task boundary in Delivery 1.");if(f.initializer || f.accessor || (f.receiver && f.token.text=="deinit") || f.virtual_method || f.overriding || f.interface_requirement || (f.receiver && f.receiver->type.kind!=Type::managed_ref))error(u->source,f.token,Code::unsupported_type,"Async lifecycle methods, accessors, value receivers and virtual/interface methods require a reviewed contract.");}
+    for(auto& [id,u]:units) {u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
 }
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
     ir::Module module;
@@ -4046,7 +4076,7 @@ struct AnalysisAccess {
                 method_record.initialization_contract=f.initialization_contract;
                 method_record.virtual_slot=f.virtual_slot;
                 if(f.overriding) method_record.override_target=f.virtual_slot;
-                method_record.capability_contract=f.capability_contract;
+                method_record.capability_contract=f.capability_contract+(f.asynchronous?";async-effect":"");
                 for (const auto& [mask,context]:f.construction_contexts)
                     method_record.construction_parameters.emplace_back(mask.begin(),mask.end());
                 if (f.initializer && f.receiver->type.kind==Type::managed_ref)

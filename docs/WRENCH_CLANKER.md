@@ -1,6 +1,79 @@
 # 🔧🤖 THE WRENCH CLANKER
 
-**START HERE — 18 October 2026:** Read the canonical [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). **Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total). Stage 3 remains locked. Delivered properties/callable structs, enums/results/patterns, cleanup, functions/closures, callbacks and synchronous events retain their existing contracts and limitations in PROPERTIES.md, ADVANCED_LANGUAGE.md and KNOWN_ISSUES.md. The owner approved Stage 5 architecture and its first production implementation: [STAGE5_CACHE_PROPOSAL.md](STAGE5_CACHE_PROPOSAL.md) records optional whole-graph Debug native caching, revision-checked reload, actual measurements and local verification. Hosted Stage 5 acceptance is pending. Automatic watching remains future work. No Stage 6–7 work is authorized. Earlier pending-hosted entries below are historical.
+## Stage 6 permanent delivery handoff (18 October 2026)
+
+**Current locked baseline:** `4627687b3a18349633715e4294bc915cf74ddd41`,
+[CI #70](https://github.com/Shmellyorc/Void.Language/actions/runs/39193640484),
+7/7 successful jobs and 82/82 suites each (574/574), independently verified.
+Stage 5 remains locked. Stage 6 has no hosted acceptance yet.
+
+**Owner authorization:** overall architecture direction approved; implement
+**Delivery 1 only** as one substantial sprint. Stackless state machines through
+existing typed IR/LLVM 19.1.7, precisely traced heap activation frames, safe
+suspension, generation leases, one owning executor, enqueue without inline body
+execution, await completed/incomplete tasks and inferred internal task handles.
+Preserve evaluation order, value copies, managed identity and reached cleanup.
+Keep the synchronous CLI ABI; use an explicit scheduler root adapter. Restrict new
+cross-task callable escapes; synchronous closures remain unchanged. Independently
+validate async IR, frame initialization and legal suspension/resumption, including
+malformed-IR negatives. No public cancellation, task groups, parallel spawn,
+general native bindings or automatic watching in Delivery 1.
+
+| Sequential implementation delivery | Scope and dependency | Status |
+| --- | --- | --- |
+| Delivery 1 — Native Async Activation | Async functions, await, heap frames, owning executor and leased resumptions; starts from locked Stage 5 | Locally verified: 98/98 in Debug, Release and strict sanitizers; owner review and hosted lock pending |
+| Delivery 2 — Structured Task Lifecycle | Cancellation, task groups, failure propagation, structured cleanup and shutdown; requires Delivery 1 hosted lock and new owner authorization | Not authorized |
+| Delivery 3 — Bounded Parallel Spawn | Worker pool, approved value-transfer restrictions, parallel source jobs and GC-safe coordination; requires Delivery 2 lock and authorization | Not authorized |
+| Delivery 4 — Native Libraries | Trusted compiled native bridges, typed scalar/string/opaque handles, ownership and callbacks; requires Delivery 3 lock and authorization | Not authorized |
+| Delivery 5 — Integrated Stage 6 Acceptance | Combined async/parallel/native behavior, hot reload, Debug cache, lifetime and cross-platform integration; requires Delivery 4 lock and authorization | Not authorized |
+
+**Owner-approved calling boundary (18 October):** ordinary async functions and
+managed receiver methods are supported. Root receiver identities and retain code
+leases; never retain a pointer to caller-local value storage. Diagnose async value
+receivers, virtual/interface async methods and async function values before LLVM
+lowering. Their calling, dispatch and lifetime contracts remain future review;
+these features are deferred, not permanently prohibited.
+
+These five **implementation deliveries are distinct from D1–D6 design decisions**.
+D1: owning-executor async is approved; worker sharing/parallel restrictions remain
+future review. D2: enqueue semantics, inferred task handles and await are approved;
+public task-type/async-callable syntax is not approved. D3: explicit root adapter
+and unchanged sync CLI approved; public group/detach/async CLI rules deferred.
+D4: preserve reached cleanup and checked failures; cancellation/group policies
+remain Delivery 2 review. D5: per-activation leases approved; new cross-task
+callable escapes restricted instead of approving session-wide generation pinning.
+D6: native-library scope/grammar/ownership remain Delivery 4 review.
+
+**Workflow for every delivery:** implement selected delivery → focused tests →
+complete local acceptance → owner review/commit/push → existing seven-job hosted
+CI → lock only when green. STOP after local Delivery 1 review; do not automatically
+begin another delivery. No assistant commits, pushes, branch creation, remote
+writes or hosted dispatch. Boss owns product decisions and Git/CI; Wrench reviews
+architecture/evidence; Keyboard implements only authorized scope.
+
+**Acceptance and recovery:** existing JIT/AOT, GC roots, failure cleanup, reload
+compatibility, old-code leases and Debug cache remain mandatory. Record exact local
+results, incomplete code, failures and next action in WORK_LOG.md and this handoff.
+Main risks are unrooted suspended values, malformed resume states, cleanup loss,
+stale generation pointers and callable escapes. Language-facing choices not covered
+by authorization return to owner review; do not invent contracts. Owner-approved root policy: drain every started task, including unawaited tasks,
+before the adapter returns. Preserve root failure as primary; if root succeeds,
+report otherwise unobserved task failures deterministically in creation order.
+Retain roots/leases and run all cleanup. No cancellation, detach or public groups.
+Implementation and exact boundaries are in [ASYNC.md](ASYNC.md). The adapter
+drains within its existing NativeCode lease, covering every retained task/frame
+and resumption; a generation token rejects cross-generation publication. No task
+escapes the drained invocation. Private frame offsets are copied into Runtime
+heap layouts, without code pointers or public metadata admission exceptions.
+Local acceptance completed on 19 October: Linux Debug **98/98**, Release **98/98**,
+strict ASan/UBSan/leak **98/98**; 294/294 total, with 1 MiB frontend and async AOT
+stack checks passing. Exact commands and logs are in WORK_LOG.md. No Delivery 1
+decision or failing local test remains. **STOPPED for owner review**; owner controls
+commit/push and seven-job hosted CI. Windows/macOS acceptance and the Delivery 1
+lock remain pending. No later delivery is active or authorized.
+
+
+**START HERE — 18 October 2026:** Read the canonical [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). **Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total). Stage 3 remains locked. Delivered properties/callable structs, enums/results/patterns, cleanup, functions/closures, callbacks and synchronous events retain their existing contracts and limitations in PROPERTIES.md, ADVANCED_LANGUAGE.md and KNOWN_ISSUES.md. The owner approved Stage 5 architecture and its first production implementation: [STAGE5_CACHE_PROPOSAL.md](STAGE5_CACHE_PROPOSAL.md) records optional whole-graph Debug native caching, revision-checked reload, actual measurements and local verification. Stage 5 is now hosted-verified and owner-LOCKED at `4627687b3a18349633715e4294bc915cf74ddd41`, [CI #70](https://github.com/Shmellyorc/Void.Language/actions/runs/39193640484): seven successful configurations, 82/82 each (574/574). Windows persistence still bypasses safely; automatic watching remains future work. Stage 6 Delivery 1 production implementation is authorized under the permanent handoff above; later deliveries and Stage 7 are not authorized. Earlier pending-hosted entries below are historical.
 
 **Current operating rules:** Work-first; one substantial authorized sprint; KISS/DRY; minimal output; one frontend/IR/LLVM 19.1.7 lowerer/Runtime/GC. Focused debugging followed by final consolidated verification. No artificial checkpoints, speculative optimizations or production certification project. Owner controls Git and hosted CI. The dated ledgers below preserve history and do not override this status or revive superseded gates.
 

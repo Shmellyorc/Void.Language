@@ -8,22 +8,92 @@
 
 ## Current implementation status
 
+## Stage 6 permanent delivery handoff (18 October 2026)
+
+**Current locked baseline:** `4627687b3a18349633715e4294bc915cf74ddd41`,
+[CI #70](https://github.com/Shmellyorc/Void.Language/actions/runs/39193640484),
+7/7 successful jobs and 82/82 suites each (574/574), independently verified.
+Stage 5 remains locked. Stage 6 has no hosted acceptance yet.
+
+**Owner authorization:** overall architecture direction approved; implement
+**Delivery 1 only** as one substantial sprint. Stackless state machines through
+existing typed IR/LLVM 19.1.7, precisely traced heap activation frames, safe
+suspension, generation leases, one owning executor, enqueue without inline body
+execution, await completed/incomplete tasks and inferred internal task handles.
+Preserve evaluation order, value copies, managed identity and reached cleanup.
+Keep the synchronous CLI ABI; use an explicit scheduler root adapter. Restrict new
+cross-task callable escapes; synchronous closures remain unchanged. Independently
+validate async IR, frame initialization and legal suspension/resumption, including
+malformed-IR negatives. No public cancellation, task groups, parallel spawn,
+general native bindings or automatic watching in Delivery 1.
+
+| Sequential implementation delivery | Scope and dependency | Status |
+| --- | --- | --- |
+| Delivery 1 — Native Async Activation | Async functions, await, heap frames, owning executor and leased resumptions; starts from locked Stage 5 | Locally verified: 98/98 in Debug, Release and strict sanitizers; owner review and hosted lock pending |
+| Delivery 2 — Structured Task Lifecycle | Cancellation, task groups, failure propagation, structured cleanup and shutdown; requires Delivery 1 hosted lock and new owner authorization | Not authorized |
+| Delivery 3 — Bounded Parallel Spawn | Worker pool, approved value-transfer restrictions, parallel source jobs and GC-safe coordination; requires Delivery 2 lock and authorization | Not authorized |
+| Delivery 4 — Native Libraries | Trusted compiled native bridges, typed scalar/string/opaque handles, ownership and callbacks; requires Delivery 3 lock and authorization | Not authorized |
+| Delivery 5 — Integrated Stage 6 Acceptance | Combined async/parallel/native behavior, hot reload, Debug cache, lifetime and cross-platform integration; requires Delivery 4 lock and authorization | Not authorized |
+
+These five **implementation deliveries are distinct from D1–D6 design decisions**.
+D1: owning-executor async is approved; worker sharing/parallel restrictions remain
+future review. D2: enqueue semantics, inferred task handles and await are approved;
+public task-type/async-callable syntax is not approved. D3: explicit root adapter
+and unchanged sync CLI approved; public group/detach/async CLI rules deferred.
+D4: preserve reached cleanup and checked failures; cancellation/group policies
+remain Delivery 2 review. D5: per-activation leases approved; new cross-task
+callable escapes restricted instead of approving session-wide generation pinning.
+D6: native-library scope/grammar/ownership remain Delivery 4 review.
+
+**Workflow for every delivery:** implement selected delivery → focused tests →
+complete local acceptance → owner review/commit/push → existing seven-job hosted
+CI → lock only when green. STOP after local Delivery 1 review; do not automatically
+begin another delivery. No assistant commits, pushes, branch creation, remote
+writes or hosted dispatch. Boss owns product decisions and Git/CI; Wrench reviews
+architecture/evidence; Keyboard implements only authorized scope.
+
+**Acceptance and recovery:** existing JIT/AOT, GC roots, failure cleanup, reload
+compatibility, old-code leases and Debug cache remain mandatory. Record exact local
+results, incomplete code, failures and next action in WORK_LOG.md and this handoff.
+Main risks are unrooted suspended values, malformed resume states, cleanup loss,
+stale generation pointers and callable escapes. Language-facing choices not covered
+by authorization return to owner review; do not invent contracts. Owner-approved root policy: drain every started task, including unawaited tasks,
+before the adapter returns. Preserve root failure as primary; if root succeeds,
+report otherwise unobserved task failures deterministically in creation order.
+Retain roots/leases and run all cleanup. No cancellation, detach or public groups.
+Implementation and exact boundaries are in [ASYNC.md](ASYNC.md). The adapter
+drains within its existing NativeCode lease, covering every retained task/frame
+and resumption; a generation token rejects cross-generation publication. No task
+escapes the drained invocation. Private frame offsets are copied into Runtime
+heap layouts, without code pointers or public metadata admission exceptions.
+Local acceptance completed on 19 October: Linux Debug **98/98**, Release **98/98**,
+strict ASan/UBSan/leak **98/98**; 294/294 total, with 1 MiB frontend and async AOT
+stack checks passing. Exact commands and logs are in WORK_LOG.md. No Delivery 1
+decision or failing local test remains. **STOPPED for owner review**; owner controls
+commit/push and seven-job hosted CI. Windows/macOS acceptance and the Delivery 1
+lock remain pending. No later delivery is active or authorized.
+
+
 **18 October 2026.** This is the canonical current-status summary. The roadmap and
 older proposal/proof notes below remain historical design evidence where superseded.
 Feature guides define implemented contracts; LANGUAGE_BIBLE.md includes both those
 contracts and approved future design, and is not a claim that every illustrated
 syntax executes today.
 
-**Accepted baseline:** local HEAD verified at `483e67e407b65674bdc82d44767f29bd83d73ae8`.
+**Accepted baseline:** local HEAD verified at `4627687b3a18349633715e4294bc915cf74ddd41`.
+**Stage 5 is hosted-verified and LOCKED** at that commit, [CI #70](https://github.com/Shmellyorc/Void.Language/actions/runs/39193640484):
+seven successful configurations, 82/82 suites each (574/574 total), independently
+verified from all seven job logs. The lock covers the delivered cache/reload subset;
+Windows persistence still bypasses safely and automatic watching remains future work.
 **Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total).
 The owner supplied the suite totals; read-only GitHub run metadata independently
 confirms this commit and all seven successful jobs. Stage 3 remains locked and
 all delivered Orders 1–5 and Phases 1–25 are preserved. Stage 5
-now has an owner-authorized first production implementation of optional persistent
-Debug native-object caching and revision-checked hot-reload integration. See
-[STAGE5_CACHE_PROPOSAL.md](STAGE5_CACHE_PROPOSAL.md) for the implemented contract,
-local evidence and remaining hosted-platform verification. Automatic watching is
-not implemented. Stage 5 is not hosted-locked.
+has hosted-accepted optional persistent Debug native-object caching and
+revision-checked hot-reload integration. See [STAGE5_CACHE_PROPOSAL.md](STAGE5_CACHE_PROPOSAL.md)
+for the implemented contract and retained local evidence. Automatic watching is not
+implemented. [STAGE6_PROPOSAL.md](STAGE6_PROPOSAL.md) preserves the architecture research and current delivery authorization;
+overall architecture direction is approved and Delivery 1 is authorized under the permanent handoff above. Later deliveries and unresolved language contracts still require owner approval.
 
 | Implemented phases | Delivered source/toolchain behavior |
 | --- | --- |
@@ -54,8 +124,8 @@ its numbers are distinct from implementation phases and Phase 23 research substa
 | 2 Core native language | Implemented functions/types/control flow/value and managed structs with native execution |
 | 3 Managed runtime | Allocator/precise coordinated GC, reference/value structs, strings, lists and dictionaries; LOCKED at cd95e373 / CI #65, seven jobs successful |
 | 4 Advanced language | Hosted-verified and LOCKED at 483e67e4 / CI #68: properties/callable structs, tagged enums, result/propagation, shared is/match patterns, defer/with/one-shot managed deinit, function values/escaping closures, callbacks and synchronous events; 80/80 suites in all seven configurations. See ADVANCED_LANGUAGE.md and WORK_LOG.md |
-| 5 Hot reload | Optional persistent whole-graph Debug native objects, current-source validation, generation-isolated loading and revision-checked compatible replacement implemented locally. Automatic watching remains future work; hosted Stage 5 acceptance is pending |
-| 6 Concurrency/native libraries | Partial: Runtime coordination and typed native architectural proofs; no source async/scheduler/thread-pool or arbitrary FFI/library ecosystem |
+| 5 Hot reload | Delivered cache/reload subset hosted-verified and LOCKED at 4627687b / CI #70, 82/82 in all seven configurations. Whole-graph Debug objects, current-source validation, isolated generations and revision-checked replacement; Windows persistence bypass and automatic-watching deferral remain |
+| 6 Concurrency/native libraries | Architecture investigated in STAGE6_PROPOSAL.md; approval/implementation pending. Existing Runtime coordination/native proofs do not implement source async, tasks, scheduling or a source native-library ecosystem |
 | 7 Tooling/optimization | Partial: LSP diagnostics/navigation, editor integration/VSIX and LLVM O2; completion/rename/formatting, library discovery and broad performance work remain deferred |
 
 Ordinary `.void` programs execute all delivered features together through normal/O2
@@ -222,7 +292,7 @@ Each stage is divided into small milestones. Stage completion requires integrati
 
 The owner approved the architecture and authorized the first production implementation. [STAGE5_CACHE_PROPOSAL.md](STAGE5_CACHE_PROPOSAL.md) records the implementation, measurements and boundaries. The original investigation requirements below remain design rationale where not superseded by that implementation record.
 
-**Status (18 October 2026): first production implementation delivered locally; hosted acceptance pending.** Stage 7 may eventually measure and tune its performance. This is a compiler/development-host capability, not new VOID source syntax or a new bytecode runtime. It is separate from the currently implemented, process-local ORC generations, validated source analysis and compatible-code replacement.
+**Status (18 October 2026): delivered subset hosted-verified and LOCKED at 4627687b / CI #70, seven configurations, 82/82 each.** Stage 7 may eventually measure and tune its performance. This is a compiler/development-host capability, not new VOID source syntax or a new bytecode runtime. It is separate from the currently implemented, process-local ORC generations, validated source analysis and compatible-code replacement.
 
 **Intended Debug workflow:**
 

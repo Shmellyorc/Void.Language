@@ -147,6 +147,10 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                         }
                         if (inline_place && !f.receiver_mutates) { f.receiver_mutates=true; changed=true; }
                     }
+                    if(target.asynchronous) {
+                        for(unsigned n=0;n<arguments.size();++n)retain(arguments[n],n==0 && target.receiver?target.receiver->type:target.parameters[n-(target.receiver?1:0)].type,e.token);
+                        result=ir::replaced_facts(ir::reference_facts(e.type),1,result);
+                    }
                     return result;
                 }
             return {};
@@ -169,7 +173,9 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         expression=[&](Expr& e)->ReferenceFacts {
             using K=Expr::Kind;
             auto view=ir::reference_facts(e.type);
-            if(e.kind==K::capture_reference){
+            if(e.kind==K::awaited){
+                auto task=expression(*e.parts[0]);view=ir::field_facts(e.parts[0]->type,task,1);
+            } else if(e.kind==K::capture_reference){
                 auto facts=e.parts.empty()?locals.at(e.slot):expression(*e.parts[0]);auto stored=ir::field_type(e.type,0);auto combined=ir::reference_facts(stored);ir::join_facts(combined,facts);auto profile=ir::fact_type(stored,combined);
                 if(ir::capability_key(stored)!=ir::capability_key(profile)){std::const_pointer_cast<ir::ValueType>(e.type.definition)->fields[0].type=profile;changed=true;}
                 retain(facts,profile,e.token);

@@ -1,6 +1,11 @@
 # Stage 5: persistent Debug cache proposal
 
-18 October 2026. **Architecture approved; first production implementation delivered locally. Hosted Stage 5 acceptance remains pending.**
+18 October 2026. **Delivered Stage 5 subset is hosted-verified and owner-LOCKED** at
+`4627687b3a18349633715e4294bc915cf74ddd41`, [CI #70](https://github.com/Shmellyorc/Void.Language/actions/runs/39193640484):
+seven successful configurations, 82/82 suites each (574/574 total), verified in
+read-only job metadata and all seven CTest logs. Windows persistence bypass,
+automatic-watching deferral and the other documented limitations remain.
+The original implementation/research baseline below is retained as history.
 Baseline: `483e67e407b65674bdc82d44767f29bd83d73ae8`,
 [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997),
 seven successful configurations, 80/80 suites each. Stage 4 is hosted-verified and
@@ -57,7 +62,9 @@ existing validated lowerer and LLVM compilation unchanged.
 
 The existing ORC object-transform hook copies the freshly generated relocatable
 object. Cold source modules and persisted objects share generation loading: a new
-JITDylib links only to the main Runtime-import dylib, with its own ResourceTracker.
+JITDylib links to the main Runtime-import dylib followed by LLVM platform/process
+default links, with its own ResourceTracker. CI #70 accepts the Windows native
+helper resolution repair without weakening source-generation isolation.
 The trusted raw-IR API retains its existing main-dylib exported-symbol linking
 contract; it does not use persistence.
 Canonical cache symbols can coexist in multiple live generations. Relocated
@@ -82,7 +89,8 @@ must be owned by the effective user with no group/other permissions. Descriptor-
 relative no-follow opens pin the directories; files must be owned regular files
 with private permissions. Windows currently bypasses persistence and compiles
 normally: a verified ACL/path/publication implementation is deliberately absent.
-macOS uses the POSIX implementation and still requires hosted verification.
+macOS uses the POSIX implementation; CI #70 verifies its hosted cache suites.
+Windows hosted suites verify the intentional fallback, not persistent disk reuse.
 
 The binary envelope is 64 ASCII hex bytes of SHA-256 of the remaining body,
 64 ASCII hex bytes of the key, one coordination byte (`0`/`1`), and the native
@@ -101,8 +109,9 @@ non-allocating view of captured bytes; all envelope allocation stays inside the
 writer’s guarded failure boundary. No production size quota
 is introduced. Abrupt death can leave an ignored temporary; manual cache removal
 is safe. A corrupt existing key remains a miss until removed rather than adding
-locks or replacement ownership machinery. Physical power-loss durability and
-Windows/macOS hosted behavior have not been demonstrated locally.
+locks or replacement ownership machinery. Physical power-loss durability remains
+unverified. CI #70 supplies native Windows/macOS acceptance for the delivered
+subset, without claiming Windows persistence or power-loss durability.
 
 ### Milestone completion and evidence
 
@@ -116,8 +125,9 @@ Windows/macOS hosted behavior have not been demonstrated locally.
    concurrent writers, malformed native objects and filesystem failures. The final
    commands, production measurements and configuration results are in WORK_LOG.md.
 
-No owner architecture decision remains open. Hosted platform acceptance remains
-owner-controlled; no hosted workflow was triggered by this implementation.
+No owner architecture decision remains open for this delivered subset. The owner
+completed hosted acceptance at CI #70. The implementation and subsequent Stage 6
+investigation did not trigger a hosted workflow.
 
 ### Production measurements
 

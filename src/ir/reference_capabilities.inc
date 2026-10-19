@@ -128,8 +128,8 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         for (auto& [path,fact]:stored) fact.readonly=capacity.contains(path);
                         local_changed|=join_facts(locals[i.a],stored); value={}; break;
                     }
-                    case Op::sum_get: case Op::extract: case Op::gc_read:
-                        value=field_facts(types[function][block][i.a],values[i.a],static_cast<unsigned>(i.immediate)); break;
+                    case Op::await: case Op::sum_get: case Op::extract: case Op::gc_read:
+                        value=field_facts(types[function][block][i.a],values[i.a],i.op==Op::await?1:static_cast<unsigned>(i.immediate)); break;
                     case Op::insert:
                         value=replaced_facts(values[i.a],static_cast<unsigned>(i.immediate),values[i.b]); break;
                     case Op::fixed_array:
@@ -183,7 +183,7 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                             if (found->second.readonly) fail("write through readonly reference");
                         }
                         retain(values[i.b],field_type(types[function][block][i.a],static_cast<unsigned>(i.immediate))); value={}; break;
-                    case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
+                    case Op::async_call: case Op::interface_call: case Op::call: case Op::virtual_call: case Op::base_init: {
                         if(i.op==Op::base_init && i.callee.empty()) { for(auto argument:i.arguments) retain(values[argument]); break; }
                         auto found=indexes.find(i.callee);
                         if (found==indexes.end()) break; // Existing trusted scalar ABI.
@@ -238,7 +238,7 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                             check(prefixed,f.locals[i.receiver->slot]);
                             local_changed|=join_facts(locals[i.receiver->slot],prefixed);
                         }
-                        value=instantiate_result(effects.returned,arguments); break;
+                        if(i.op==Op::async_call){for(unsigned n=0;n<arguments.size();++n)retain(arguments[n],target.parameters[n]);value=replaced_facts(reference_facts(type),1,instantiate_result(effects.returned,arguments));}else value=instantiate_result(effects.returned,arguments); break;
                     }
                     default: break;
                     }

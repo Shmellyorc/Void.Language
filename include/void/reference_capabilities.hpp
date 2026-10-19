@@ -54,7 +54,7 @@ inline ReferenceFacts field_facts(Type owner,const ReferenceFacts& facts,unsigne
         if((owner.kind==Type::growable_array || owner.kind==Type::dictionary))if(auto found=facts.find({});found!=facts.end() && found->second.readonly)for(auto& [path,fact]:result)fact.readonly=true;
         return result;
     }
-    if (owner.kind==Type::managed_ref) {
+    if (owner.kind==Type::managed_ref && !owner.definition->task_result) {
         if (auto found=facts.find({});found!=facts.end())
             for (auto& [path,fact]:result) fact.join(found->second);
     } else for (const auto& [path,fact]:facts)

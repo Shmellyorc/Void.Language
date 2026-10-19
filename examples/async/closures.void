@@ -1,0 +1,13 @@
+async func leaf(value: i32) -> i32:
+    return value + 1
+
+async func entry(value: i32) -> i32:
+    var number = 7
+    var next = func() -> i32:
+        number += 1
+        return number
+    defer {
+        number += 100
+    }
+    var result = await leaf(value)
+    return next() + result

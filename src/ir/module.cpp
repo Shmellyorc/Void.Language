@@ -121,6 +121,11 @@ std::uint64_t checked_array_index(std::uint64_t bits,Type index,std::uint64_t ex
     if(bits>=extent) throw std::out_of_range("Array index out of bounds");
     return bits;
 }
+bool async_boundary_safe(Type root) {
+    std::vector<Type> pending{root};std::set<const ValueType*> seen;
+    while(!pending.empty()){auto t=pending.back();pending.pop_back();if(t.construction || t.kind==Type::prepared_receiver)return false;if(!t.definition || !seen.insert(t.definition.get()).second)continue;if(t.definition->callable)return false;if(t.definition->element)pending.push_back(*t.definition->element);for(const auto& field:t.definition->fields)pending.push_back(field.type);}
+    return true;
+}
 bool requires_initialization(Type t){return !t.nullable && (reference_value(t) || (t.definition && (t.definition->callable || !t.definition->cases.empty())));}
 bool reference_value(Type t) { return t.kind==Type::managed_ref || t.kind==Type::interface_ref; }
 Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
@@ -138,6 +143,7 @@ Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
             current->arena = owner;
             owner->definitions.push_back(current);
             if (auto base=current->base.lock()) pending.push_back(std::move(base));
+            if(current->task_result)if(auto child=current->task_result->target.lock())pending.push_back(std::move(child));
             if(current->call_result)if(auto child=current->call_result->target.lock())pending.push_back(std::move(child));
             for(const auto& parameter:current->call_parameters)if(auto child=parameter.target.lock())pending.push_back(std::move(child));
             if (current->element) if (auto child=current->element->target.lock()) pending.push_back(std::move(child));
@@ -167,6 +173,14 @@ ReferencePaths reference_paths(Type root, bool include_strings) {
         auto [type,path,lists]=std::move(pending.back()); pending.pop_back();
         if(type.definition && type.definition->callable)continue; // Callable environments are opaque; invocation uses the checked signature.
         if (type.construction) continue; // A stage is a place, never a heap root.
+        // A private immutable task carries logical result authority/provenance,
+        // like a collection handle. The LLVM root mapper traces its pointer only.
+        if(type.definition && type.definition->task_result) {
+            result.insert(path);
+            if(!lists.insert(type.definition.get()).second || path.size()>=128 || ++expanded>65536)throw std::invalid_argument("VOID IR: recursive task result shape");
+            if(Type(*type.definition->task_result)!=Type::none){path.push_back(1);pending.push_back({type.definition->fields[1].type,std::move(path),std::move(lists)});}
+            continue;
+        }
         if (reference_value(type) || type.kind==Type::prepared_receiver || (include_strings && type.kind==Type::string)) { result.insert(std::move(path)); continue; }
         if(collection_type(type)) {
             if(!type.definition || !type.definition->element)throw std::invalid_argument("VOID IR: missing array reference shape");
@@ -214,7 +228,7 @@ Type with_readonly_paths(Type type,const ReferencePaths& paths) {
     if((type.kind==Type::growable_array || type.kind==Type::dictionary)) {type.readonly=normalized.contains(ReferencePath{});type.readonly_references.erase(ReferencePath{});return type;}
     if ((reference_value(type) || type.kind==Type::prepared_receiver) && !type.construction) {
         type.readonly=normalized.contains(ReferencePath{});
-        type.readonly_references.clear();
+        if(type.definition && type.definition->task_result)type.readonly_references.erase(ReferencePath{});else type.readonly_references.clear();
     }
     return type;
 }
@@ -225,7 +239,8 @@ Type readonly_view(Type type) {
 Type field_type(Type owner,unsigned field) {
     if(collection_type(owner) && field==array_element_path)return array_element(owner);
     auto result=Type(owner.definition->fields.at(field).type);
-    if (owner.kind==Type::managed_ref) return owner.readonly ? readonly_view(result) : result;
+    if (owner.kind==Type::managed_ref && !owner.definition->task_result) return owner.readonly ? readonly_view(result) : result;
+    if(owner.readonly)return readonly_view(result);
     ReferencePaths projected=readonly_paths(result);
     for (const auto& path:readonly_paths(owner)) if (!path.empty() && path[0]==field)
         projected.insert(ReferencePath(path.begin()+1,path.end()));
@@ -417,6 +432,9 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             }
             if (!t.definition || t.definition->identity.empty() || t.definition->identity.find('\0')!=std::string::npos || t.definition->name.empty()) fail("missing value type identity");
             auto* d=t.definition.get();
+            if(d->task_result){
+                auto r=Type(*d->task_result);if(t.kind!=Type::managed_ref || !d->managed || d->callable || d->interface_type || !d->base.expired() || !d->cases.empty() || d->result_type || d->element || d->extent || d->fields.size()!=2 || Type(d->fields[0].type)!=Type::i32 || (Type(d->fields[1].type)!=(r==Type::none?Type::boolean:r) || capability_key(d->fields[1].type)!=capability_key(r==Type::none?Type::boolean:r)) || d->identity!="$task:"+std::to_string(r.kind)+":"+Type::key(r)+(r.nullable?"?":"")+":"+capability_key(r))fail("invalid task handle shape");
+            }
             if(d->callable){
                 if(t.kind!=Type::aggregate || d->managed || d->interface_type || !d->cases.empty() || d->result_type || d->fields.size()!=2 || Type(d->fields[0].type)!=Type::u64 || Type(d->fields[1].type).kind!=Type::managed_ref || !d->fields[1].type.nullable || !d->call_result || !d->base.expired())fail("invalid function value shape");
                 pending.push_back(*d->call_result);for(const auto& parameter:d->call_parameters){if(Type(parameter)==Type::none)fail("no-result function parameter");pending.push_back(parameter);}
@@ -432,7 +450,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             if(!m.interface_requirements.empty() && d->visibility!="public" && d->visibility!="internal" && d->visibility!="private") fail("invalid concrete nominal visibility");
             const bool callable_environment=d->identity=="$void::$environment";
             if(callable_environment && (!d->managed || !d->fields.empty() || !d->base.expired() || !d->module_identity.empty() || d->name!="$environment" || d->visibility!="private"))fail("invalid shared callable environment base");
-            if(!m.interface_requirements.empty() && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->callable && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
+            if(!m.interface_requirements.empty() && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->callable && !d->task_result && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
             if (t.construction && !d->managed) fail("construction view requires a managed nominal");
             if (t.kind==Type::aggregate && d->managed) fail("managed nominal cannot be an inline value");
             auto [found,added]=definitions.emplace(d->identity,d);
@@ -506,6 +524,13 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     }
     for (const auto& f : m.functions) {
         if(!m.interface_requirements.empty() && !m.source_imports.contains(f.module_identity)) fail("function has no source access scope");
+        if(f.asynchronous){
+            if(!m.coordinated || f.task.kind!=Type::managed_ref || f.task.nullable || f.task.construction || !f.task.definition || !f.task.definition->task_result || f.initializer || f.accessor || (f.receiver && f.method_name=="deinit") || !f.virtual_slot.empty() || f.closure || (f.receiver && (f.parameters.empty() || f.parameters[0].kind!=Type::managed_ref)))fail("invalid async declaration or task result");
+            if(!async_boundary_safe(f.result))fail("callable escape through async result");for(auto t:f.parameters)if(!async_boundary_safe(t))fail("callable or borrowed place crosses async argument boundary");
+            valid_type(f.task);
+            if(std::none_of(m.nominal_types.begin(),m.nominal_types.end(),[&](auto t){return t.kind==Type::managed_ref && t.definition==f.task.definition;}))fail("async task absent from generation catalog");
+            if(Type(*f.task.definition->task_result)!=f.result || capability_key(field_type(f.task,1))!=capability_key(f.result))fail("invalid async declaration or task result");
+        }else if(f.task!=Type::none)fail("sync declaration carries async task shape");
         if (f.name.empty() || !names.emplace(f.name, Signature{f.parameters, f.result,f.receiver,f.receiver_mutates,f.initializer,f.closure}).second) fail("duplicate or empty function");
         std::vector<unsigned> context_parameters;
         for (unsigned n=0;n<f.parameters.size();++n) if (f.parameters[n].construction) context_parameters.push_back(n);
@@ -592,6 +617,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         for (const auto& b : f.blocks) {
             std::vector<Type> types;
             std::vector<bool> pure_templates;
+            for(const auto& instruction:b.instructions)if(instruction.op==Op::function_reference && functions.contains(instruction.callee) && functions.at(instruction.callee)->asynchronous)fail("async function value requires an async callable contract");
             auto operand = [&](unsigned id) {
                 if (id >= types.size() || types[id] == Type::none) fail("invalid operand in " + f.name);
                 return types[id];
@@ -631,17 +657,20 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if (!i.type.construction || !i.type.definition->managed || slot(i.a)!=i.type) fail("invalid construction storage");
                     result=i.type; break;
                 case Op::gc_construct:
+                    if(i.type.definition && i.type.definition->task_result)fail("task construction requires async call");
                     valid_type(i.type);
                     if (!m.coordinated || i.type.kind!=Type::managed_ref || i.type.nullable || i.type.construction || i.arguments.size()!=i.type.definition->fields.size()) fail("invalid complete managed construction");
                     for (unsigned n=0;n<i.arguments.size();++n) expect(i.arguments[n],i.type.definition->fields[n].type);
                     if (i.receiver && (!i.receiver->fields.empty() || !slot(i.receiver->slot).construction || Type::key(slot(i.receiver->slot))!=Type::key(i.type))) fail("invalid construction commit place");
                     result=i.type; break;
                 case Op::gc_allocate:
+                    if(i.type.definition && i.type.definition->task_result)fail("task construction requires async call");
                     valid_type(i.type);
                     if(std::any_of(m.nominal_types.begin(),m.nominal_types.end(),[&](auto t){return t.kind==Type::managed_ref && Type::key(t)==Type::key(i.type);})) fail("nominal source objects require complete construction");
                     if (!m.coordinated || i.type.kind != Type::managed_ref || i.type.construction || i.type.definition->fields.empty()) fail("invalid managed allocation");
                     result = i.type; break;
                 case Op::gc_read: case Op::gc_write: {
+                    if(operand(i.a).definition && operand(i.a).definition->task_result)fail("task payload access requires await");
                     auto object = operand(i.a);
                     if (!m.coordinated || object.kind != Type::managed_ref || i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= object.definition->fields.size()) fail("invalid managed field");
                     auto field = object.definition->fields[static_cast<std::size_t>(i.immediate)].type;
@@ -786,6 +815,11 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     else result = field;
                     break;
                 }
+                case Op::await: {
+                    auto task=operand(i.a);if(!f.asynchronous || !task.definition || !task.definition->task_result || task.kind!=Type::managed_ref || task.nullable || task.construction)fail("illegal await or task shape");
+                    if(f.cleanup_entry && static_cast<std::size_t>(&b-f.blocks.data())>=*f.cleanup_entry)fail("await during deferred cleanup");
+                    result=Type(*task.definition->task_result)==Type::none?Type::none:field_type(task,1);break;
+                }
                 case Op::argument:
                     if (i.a >= f.parameters.size()) fail("invalid argument index");
                     result = f.parameters[i.a]; break;
@@ -847,13 +881,14 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::store:
                     if (f.receiver && f.parameters[0].kind==Type::aggregate && !f.receiver_mutates && i.a == 0) fail("non-mutating method writes receiver");
                     expect(i.b, slot(i.a)); result = Type::none; break;
-                case Op::call: case Op::virtual_call: {
+                case Op::async_call: case Op::call: case Op::virtual_call: {
                     auto declaration=functions.find(i.callee);
                     if(requirements.contains(i.callee)) fail("ordinary call cannot bypass interface receiver preparation");
                     if(i.op==Op::virtual_call && (declaration==functions.end() || declaration->second->virtual_slot.empty() || i.initialization)) fail("invalid virtual call target");
                     auto target = names.find(i.callee);
                     if (target == names.end()) fail("unknown callee " + i.callee);
                     const auto& signature = target->second;
+                    if((i.op==Op::async_call)!=(declaration!=functions.end() && declaration->second->asynchronous))fail("async call effect mismatch");
                     if (i.initialization != signature.initializer) fail("initializer invocation kind mismatch");
                     if (i.initialization && (!i.receiver || !i.receiver->fields.empty() || (f.receiver && i.receiver->slot==0))) fail("initializer requires fresh construction storage");
                     if (i.receiver.has_value() != signature.receiver) fail("call receiver mismatch");
@@ -872,7 +907,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if (!signature.receiver && args.empty() && signature.parameters.size() == 1) args.push_back(i.a);
                     if (args.size()+first != signature.parameters.size()) fail("call argument count mismatch");
                     for (std::size_t n = 0; n < args.size(); ++n) expect(args[n], signature.parameters[n+first]);
-                    result = target->second.result; break;
+                    result = i.op==Op::async_call ? declaration->second->task : target->second.result; break;
                 }
                 default: fail("unknown operation");
                 }
@@ -900,9 +935,13 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             default: fail("unknown terminator");
             }
         }
+        if(f.asynchronous){
+#include "async_validation.inc"
+        }
         validate_construction(f,m,body_types);
         validate_fixed_ownership(f,m,body_types);
     }
+    if(m.async_root){auto entry=functions.find(m.entry_symbol);if(entry==functions.end() || !entry->second->asynchronous || entry->second->parameters!=std::vector<Type>{Type::i32} || entry->second->result!=Type::i32)fail("invalid explicit async root adapter signature");}
     if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition) && !definition->result_type && !definition->callable) fail("incomplete nominal universe for structural interfaces");
     validate_reference_capabilities(m,qualified_types,verified_effects);
     if (results) *results=std::move(qualified_types);

@@ -20,10 +20,11 @@ struct Compatibility {
     std::string source_contract = {};
     std::shared_ptr<const ValidatedAnalysis> analysis = {};
     std::uintptr_t runtime_identity = 0;
+    bool async_root = false;
     bool operator==(const Compatibility& other) const {
         return function_id == other.function_id && signature == other.signature &&
             layout == other.layout && captures == other.captures && constants == other.constants &&
-            constant_contract == other.constant_contract && source_contract == other.source_contract && runtime_identity == other.runtime_identity;
+            constant_contract == other.constant_contract && source_contract == other.source_contract && runtime_identity == other.runtime_identity && async_root == other.async_root;
     }
 };
 class NativeCode {

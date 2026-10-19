@@ -105,6 +105,8 @@ public:
     std::int64_t dynamic_type(void*,std::span<const char* const>) const;
     Snapshot snapshot() const;
     bool wait_for_request(std::chrono::milliseconds);
+    bool enter_async(); // Claim one owning executor for this Runtime.
+    void leave_async() noexcept;
     void close(); // Reject new attachments; existing participants must drain.
 private:
     friend class CallbackRegistration;
@@ -160,6 +162,7 @@ private:
     std::shared_ptr<const TypeCatalog> types_ = {};
     std::vector<Thread*> threads_;
     std::vector<Handle*> handles_;
+    std::thread::id async_owner_ = {};
     bool closing_ = false;
     bool requested_ = false;
     std::size_t callbacks_ = 0;
