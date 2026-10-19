@@ -15,8 +15,14 @@ std::int32_t input(const char* text) {
 }
 int main(int argc, char** argv) {
     try {
-        bool optimize = true;
-        if (argc > 1 && std::string(argv[argc - 1]) == "--no-opt") { optimize = false; --argc; }
+        bool optimize = true, cache=false;
+        while(argc>1) {
+            auto flag=std::string(argv[argc-1]);
+            if(flag=="--cache"){cache=true;optimize=false;--argc;}
+            else if(flag=="--no-opt"){optimize=false;--argc;}
+            else break;
+        }
+
         if (argc == 3 && std::string(argv[1]) == "--emit-proof") {
             vd::emit_object(vd::ir::architecture_proof(), argv[2], true);
             std::cout << "Wrote native architecture proof object\n"; return 0;
@@ -28,10 +34,21 @@ int main(int argc, char** argv) {
         }
         if (argc >= 3) {
             std::string command = argv[1];
+            if(cache && command!="run")throw std::invalid_argument("--cache is available only for Debug JIT runs");
             bool check = command == "check" && argc == 3;
             bool run = command == "run" && (argc == 3 || argc == 4);
             bool emit = command == "emit" && argc == 5 && std::string(argv[3]) == "-o";
             if (check || run || emit) {
+                if(cache && run) {
+                    auto analysis=vd::analyze_project(argv[2]);
+                    if(!analysis.succeeded())throw vd::CompilationError(std::move(analysis.diagnostics));
+                    for(const auto& warning:analysis.program->warnings())std::cerr<<vd::render_diagnostic(warning)<<'\n';
+                    vd::require_source_entry(*analysis.program);
+                    vd::Jit jit({std::filesystem::canonical(std::filesystem::path(argv[2]).parent_path().empty() ? std::filesystem::path(".") : std::filesystem::path(argv[2]).parent_path()),std::string(vd::compiler_build_identity())});
+                    auto code=jit.compile(*analysis.program,false);
+                    std::cerr<<"Debug cache: "<<jit.cache_status()<<'\n';
+                    std::cout<<code->invoke(argc==4 ? input(argv[3]) : 0)<<'\n';return 0;
+                }
                 auto program = vd::compile_project(argv[2]);
                 const auto& source = program.entry; const auto& module = program.module;
                 if(module.analysis)for(const auto& warning:module.analysis->warnings())std::cerr<<vd::render_diagnostic(warning)<<'\n';
@@ -49,7 +66,7 @@ int main(int argc, char** argv) {
             }
         }
         std::cerr << "Usage: voidc check <file.void>\n"
-                     "       voidc run <file.void> [i32 input] [--no-opt]\n"
+                     "       voidc run <file.void> [i32 input] [--no-opt] [--cache]\n"
                      "       voidc emit <file.void> -o <object> [--no-opt]\n"
                      "Proof harness: --emit-proof <object> | --jit-proof\n";
         return 2;

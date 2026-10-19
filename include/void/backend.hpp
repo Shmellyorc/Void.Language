@@ -1,13 +1,17 @@
 #pragma once
 #include "void/execution.hpp"
+#include "void/cache.hpp"
 #include "void/ir.hpp"
 #include <filesystem>
 #include <memory>
 #include <string>
 namespace vd {
+class ToolingSession;
+class SessionAnalysis;
 class Jit {
 public:
-    Jit();
+    explicit Jit(DebugCache cache = {});
+    const std::string& cache_status() const;
     ~Jit();
     // Symbol mutation and compilation are serialized by the development host.
     void bind_address(std::string name, std::uintptr_t address);
@@ -19,10 +23,13 @@ public:
     std::shared_ptr<const NativeCode> compile(const ValidatedAnalysis&, bool optimize = true, Compatibility contract = {});
     // Preflight complete validated source safety before code generation; publication rechecks.
     bool replace(ReloadSlot&, const ValidatedAnalysis&, bool optimize = true, Compatibility contract = {});
+    bool replace(ReloadSlot&, const ToolingSession&, const SessionAnalysis&, bool optimize = true, Compatibility contract = {});
     // A generated optimized loop registers a stack root around native safepoints.
     std::shared_ptr<const NativeCode> compile_root_probe(bool optimize);
     std::size_t live_generations() const;
 private:
+    std::shared_ptr<const NativeCode> compile_analysis(const ValidatedAnalysis&, bool, Compatibility, std::shared_ptr<Runtime>);
+    std::shared_ptr<const NativeCode> replacement(const NativeCode&, const ValidatedAnalysis&, bool, Compatibility);
     struct Impl;
     std::shared_ptr<Impl> impl_;
 };

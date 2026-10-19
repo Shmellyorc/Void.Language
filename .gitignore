@@ -28,6 +28,7 @@ compile_commands.json
 *.gcda
 *.gcno
 .cache/
+**/.void/cache/
 __pycache__/
 *.pyc
 *.tmp

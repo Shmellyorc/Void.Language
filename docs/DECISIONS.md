@@ -1,13 +1,17 @@
 # Architectural decisions
 
+**Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total).
+The owner approved Stage 5 architecture and authorized its first production implementation. [STAGE5_CACHE_PROPOSAL.md](STAGE5_CACHE_PROPOSAL.md) records the optional whole-graph Debug native cache, identity, privacy, fallback and revision-checked reload contract. Stage 5 hosted acceptance remains pending; automatic watching remains future work.
+
 **Stage 4 continuation decisions (owner approved):** Deferred calls capture their receiver and arguments when registration is reached; deferred blocks read shared captures when cleanup executes. Escaping closures created in value-struct methods capture an independent receiver snapshot, shared by copies of that closure. Ordinary captured locals keep shared storage; managed receivers keep their managed identity.
 
 ## Stage 4 Advanced Language, owner-approved 18 October 2026
 
 Stage 3 is hosted-locked at `cd95e37341f756e749ea5f3d6da9ad44716d491f`,
 [CI #65](https://github.com/Shmellyorc/Void.Language/actions/runs/39125218619),
-seven successful jobs. These are approved Stage 4 contracts, **not an implementation
-or hosted-acceptance claim**. Older OPEN labels below are superseded only as stated.
+seven successful jobs. The following Stage 4 contracts are now implemented and
+hosted-locked at CI #68 as recorded above. Older OPEN labels below are superseded
+only as stated.
 
 - `result<t,e>` carries `Ok(value)` or `Err(error)`. `?` unwraps success or propagates
   the exact matching error type. Recoverable errors remain distinct from runtime

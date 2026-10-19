@@ -33,6 +33,7 @@ struct AnalyzedDeclaration {
     std::vector<std::vector<unsigned>> construction_parameters = {};
     std::vector<std::string> required_initialization_fields = {};
     std::string base_identity = {}, virtual_slot = {}, override_target = {};
+    bool generic_template = false;
 };
 struct AnalyzedReference {
     std::string from, to, spelling;
@@ -80,4 +81,5 @@ struct SourceProgram { SourceFile entry; ir::Module module; };
 SourceProgram compile_project(const std::filesystem::path& entry);
 SourceFile read_source(const std::filesystem::path& path);
 void require_source_entry(const SourceFile& source, const ir::Module& module);
+void require_source_entry(const ValidatedAnalysis&);
 }

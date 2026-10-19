@@ -1,6 +1,6 @@
 # Work log
 
-**Current handoff:** [Canonical implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). The latest Stage 3 entry is at the end; earlier dated entries retain historical evidence and do not override delivered Phases 1–25.
+**Current handoff:** [Canonical implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Stage 4 is hosted-locked at 483e67e4 / CI #68 (seven configurations, 80/80 suites each). The latest Stage 5 production implementation entry is at the end; earlier dated entries retain historical evidence.
 
 ## 14 October 2026: Phase 22 UTF-8 foundation implementation
 
@@ -12175,3 +12175,356 @@ and controlled before/after measurements are the equivalent Linux 1 MiB
 reproduction. Windows Debug hosted confirmation remains for the owner's next CI
 attempt; no new hosted pass is claimed. No commits, pushes, branches, remote
 modifications or hosted CI actions were made.
+
+## 18 October 2026: Stage 4 hosted lock and Stage 5 cache architecture investigation
+
+Baseline verified at `483e67e407b65674bdc82d44767f29bd83d73ae8`, initially
+clean. Stage 4 is **hosted-verified and LOCKED** at
+[CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997):
+owner reports 80/80 suites in each of seven configurations (560/560 total).
+Read-only run metadata independently confirms this commit and all seven successes.
+Canonical status, Bible, decisions, feature guides, known issues and Wrench handoff
+now record that acceptance. Earlier pending-hosted entries remain historical.
+
+Delivered `docs/STAGE5_CACHE_PROPOSAL.md`, **awaiting owner approval**. Production
+compiler, Runtime, tests, CI and Git state were not changed. No persistent cache,
+watcher, new language behavior, backend, verifier or dependency system was added.
+LLVM 19.1.7 remains pinned; Release AOT remains unchanged.
+
+### Investigation and recommendation
+
+Inspected SourceGraph/disk consistency, full semantic/generic validation,
+ValidatedAnalysis snapshots/contracts, ToolingSession/plan_invalidation, whole-graph
+typed IR, shared LLVM lowering, native object materialization, Runtime metadata
+admission and generation leases/retirement. Started with official LLVM 19 ORCv2
+reference; checked exact installed 19.1.7 headers and downloaded tagged
+CompileUtils.cpp, LLJIT.cpp and Unix/Windows filesystem implementations.
+
+Recommend one relocatable object per reachable source graph/selected entry. Full
+current-source checking and existing entry checks precede a hit; exact matching
+inputs reuse the previous typed-IR/LLVM-validated native result without rebuilding
+IR. Misses retain every existing IR/LLVM check. One JITDylib/ResourceTracker per
+generation isolates stable object symbols. Reuse the object's existing type and
+witness catalogs through vd_runtime_admit_metadata, with current Runtime identity,
+source contracts and NativeCode leases. Whole-unit first-time edits still compile
+cold; finer partitioning needs real native boundaries, not another dependency graph.
+
+The proposal specifies content/build/target identity, private local storage,
+single-file length/digest validation, no-replace LLVM hard-link publication,
+interruption/concurrent-process handling, normal compilation fallback and required
+regressions. A build-derived embedded compiler ID is justified by the measured
+234 ms cost of hashing the 59.7 MB compiler each launch. It must derive from actual
+CMake link inputs/configuration and requires implementation/rebuild tests; no stale
+sidecar or timestamp shortcut is proposed. Hard-link-unsupported filesystems skip
+persistent writes; damaged existing entries miss until this disposable cache is
+cleared. Cross-platform cache behavior and actual reboot/power loss are unverified.
+
+### Measurements and executable evidence
+
+Ignored research sources/scripts/objects/logs are retained under
+`build/stage5-cache-research/`; no experimental source was put in production.
+Scratch copies added scoped timers to the actual compiler/lowerer and used LLVM's
+ordinary compile/object layers. The load probe takes an explicitly named trusted
+object: it is not a production cache or an implementation of identity/fallback.
+
+Linux x86-64 Ryzen 7 1700X / 32 GiB, Clang/LLVM/LLD 19.1.7; host Release
+`-O3 -DNDEBUG -frtti`, guest normal Debug/no middle-end O2, research OFF.
+Three fresh processes per mode, warm OS pages, main-to-first-verified-result medians:
+
+| Source workload | Cold | Reuse retaining current typed IR | Reuse after full current source validation |
+| --- | ---: | ---: | ---: |
+| Real Stage 4 combined | 0.1701 s | 0.01293 s | 0.00357 s |
+| 2,223 generated lines | 1.894 s | 0.2110 s | 0.04256 s |
+| 21,243 generated lines | 19.931 s | 2.836 s | 0.4824 s |
+| 105,243 generated lines | 142.888 s | 41.095 s | 5.694 s |
+
+Largest fixture: 21 reachable modules, 5,000 executed mixed-feature helpers,
+5,041 concrete functions, 2,380,496 source bytes; generated scaling workload,
+not an existing 100k-line application. Cold range 140.554–143.853 s; direct native
+reuse 3.653–5.833 s. Native object 51,530,744 bytes. Phase medians at 105k:
+analysis 2.761 s (read 12.72 ms, lex 124.37 ms, parse 260.76 ms, semantic 2.194 s,
+records 156.32 ms); typed IR 19.218 s; LLVM lowering/checks 20.637 s; LLVM finish
+0.772 s; native codegen 77.567 s; lookup/codegen/link 80.233 s. Direct-load lookup
+median 2.874 s, Runtime admission 0.056 ms, useful execution 39.09 ms. Nested
+phase values must not be added as independent costs. Peak RSS medians: cold
+2,013 MiB; IR-retaining reuse 1,229 MiB; source-validated reuse 878 MiB.
+
+Unmodified production compiler 21k whole-process wall: 19.800 s, versus instrumented
+20.011 s median. One-helper edit: 19.601 s; imported managed-layout edit: 20.358 s.
+Isolated 50/250-helper units took 0.897/4.671 s (LLVM codegen 0.721/3.706 s);
+these demonstrate favorable finer-granularity potential, not a working incremental
+cache with shared catalogs/imports. A five-launch small-program probe measured
+7.37 ms spawn/loader/static initialization, 5.65 ms main-to-result and 15.58 ms
+whole-process lifetime. No reboot or cold-storage startup is claimed.
+
+LLVM Support SHA256 five-run medians: compiler 234.01 ms; 2.383 MB encoded source
+records 9.32 ms; 82,648-byte object 0.322 ms; 10.283 MB object 40.64 ms; 51.531 MB
+object 201.63 ms. The 5.694 s direct-load result excludes cache format/integrity and
+owned-buffer filesystem overhead. Adding measured source/object hashing alone is
+about 5.90 s, a projection, not a complete persistent-cache launch measurement.
+
+Fresh-process normal/O2 objects executed combined Stage 4, interface witnesses,
+module calls and a captured 2 MiB fixed array correctly. Same-object concurrent
+JITDylibs, changed-body replacement (new 48/old lease 47), layout rejection, host
+destruction with live code, Runtime budget-1 collection and final cleanup passed.
+The large capture also passed at 1 MiB stack. Invalid current source failed before
+loading; LLVM rejected a truncated object. Twelve concurrent LLVM hard-link
+publishers produced one complete winner and eleven existing-entry refusals;
+unlinking temporary names preserved the winner. No crash/power-loss guarantee is
+inferred from that Linux primitive test.
+
+### Exact commands and retained evidence
+
+Commands ran from the repository root. Official research and hosted baseline reads:
+
+```sh
+git rev-parse HEAD
+git status --short
+gh run view 39174408997 --repo Shmellyorc/Void.Language --json headSha,jobs,conclusion,number > build/stage5-cache-research/ci68.json
+gh api 'repos/llvm/llvm-project/contents/llvm/lib/ExecutionEngine/Orc/CompileUtils.cpp?ref=llvmorg-19.1.7' -H 'Accept: application/vnd.github.raw+json' > build/stage5-cache-research/CompileUtils-19.1.7.cpp
+gh api 'repos/llvm/llvm-project/contents/llvm/lib/ExecutionEngine/Orc/LLJIT.cpp?ref=llvmorg-19.1.7' -H 'Accept: application/vnd.github.raw+json' > build/stage5-cache-research/LLJIT-19.1.7.cpp
+gh api 'repos/llvm/llvm-project/contents/llvm/lib/Support/Windows/Path.inc?ref=llvmorg-19.1.7' -H 'Accept: application/vnd.github.raw+json' > build/stage5-cache-research/Windows-Path-19.1.7.inc
+gh api 'repos/llvm/llvm-project/contents/llvm/lib/Support/Unix/Path.inc?ref=llvmorg-19.1.7' -H 'Accept: application/vnd.github.raw+json' > build/stage5-cache-research/Unix-Path-19.1.7.inc
+```
+
+Reproduction scripts contain exact compiler/link invocations, fixture generator,
+phase probes and per-process resource collection. `build.py` compiles copied
+compiler.cpp and the backend/driver with the flags above and links existing Release
+core/runtime plus the exact LLVM libraries from CMake's voidc link command.
+`link_small.py` reuses that research object (renaming its main with llvm-objcopy)
+for the direct-source hit and lease probes. Main timing runs completed before the
+remaining performance comparisons; no full compiler matrices ran during them.
+
+```sh
+python3 build/stage5-cache-research/prepare.py
+python3 build/stage5-cache-research/generate.py
+python3 build/stage5-cache-research/build.py
+/usr/lib/llvm-19/bin/llvm-objcopy --redefine-sym main=benchmark_main build/stage5-cache-research/driver.o build/stage5-cache-research/lease_support.o
+python3 build/stage5-cache-research/link_small.py fast
+python3 build/stage5-cache-research/link_small.py lease
+python3 build/stage5-cache-research/measure.py
+bash build/stage5-cache-research/after_measure.sh
+python3 build/stage5-cache-research/publication_probe.py
+python3 build/stage5-cache-research/startup.py
+python3 build/stage5-cache-research/report.py
+```
+
+`after_measure.sh` contains the individual object capture/load, edited-source,
+isolated-unit, O2/interface/large/module, invalid-source/truncation, lease, hash and
+small-stack commands. Small standalone SHA256/publication tools link installed
+19.1.7 LLVMSupport/LLVMDemangle with Clang 19 and the matching LLD. Raw numeric
+results: `measurements.json`, `fast_measurements.json`, `extra_measurements.json`,
+`startup.json`, `llvm-hash-costs.txt`, `source-hash-cost.txt`, `summary.txt` and
+per-launch `.txt` files. Generator/build/helper scripts are local disposable
+research material, not a supported benchmark framework. The proposal retains the
+fixture recipe, measured tables, methodology and limits independently of build files.
+
+Focused existing production verification (no test/assertion changes):
+
+```sh
+cmake --build build/ci-release --target voidc void_tests void_advanced_tests void_gc_schemas -j2
+ctest --test-dir build/ci-release -R '^(analysis|tooling|sessions|reload|gc_schemas|advanced_source|advanced_cli)$' --output-on-failure -j1
+cmake --build build/ci-sanitizers --target void_tests void_gc_schemas -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers -R '^(analysis|tooling|sessions|reload|gc_schemas)$' --output-on-failure -j1
+git diff --check
+```
+
+**Results:** Release **7/7 passed, 12.79 s**; strict ASan/UBSan/leaks **5/5 passed,
+2.60 s**. Expected negative probes rejected; all positive research runs passed.
+Research execution/timing and LSan ran outside sandbox tracing. Initial scratch
+harness errors (Expected reference unwrapping, missing Managed collection guard,
+missing ArrayRef include and unavailable `/usr/bin/time`) were corrected in ignored
+research only; they were not production defects. Python's existing process resource
+API supplied per-process wall time and peak RSS. No production repair was indicated.
+
+**Remaining approval:** the recommended whole-graph native-object architecture,
+embedded build identity and implementation authorization. First-time edit latency,
+actual reboot/crash recovery, cross-platform object/filesystem behavior and complete
+cache end-to-end performance remain explicit implementation/acceptance work.
+No commit, push, branch, remote mutation or hosted CI launch was performed.
+
+## 18 October 2026: Stage 5 first production Debug native cache
+
+**Authorization/baseline:** owner approved STAGE5_CACHE_PROPOSAL.md and all four
+implementation milestones. HEAD remains 483e67e407b65674bdc82d44767f29bd83d73ae8;
+Stage 4 remains hosted-locked at CI #68. This entry supersedes the preceding
+architecture entry's pending-approval boundary. No commits, branches, pushes,
+remote mutations, hosted workflow or Stage 6–7 work were performed.
+
+### Production implementation
+
+- Added optional `voidc run FILE INPUT --cache` and embedding `DebugCache` policy.
+  Full current-source analysis/specialization and the shared entry rule precede
+  hits. Misses use the existing typed IR and LLVM 19.1.7 lowerer. Release AOT and
+  ordinary/O2 JIT paths remain available without persistence. Custom native
+  bindings bypass persistence. Generic-template entry diagnostics remain identical
+  to uncached execution; entry validation is shared rather than duplicated.
+- CMake embeds a content identity from actual CLI objects, compiler/Runtime and
+  LLVM archives plus configuration/toolchain settings. Unidentified shared LLVM
+  compiler libraries disable persistence. Keys include target CPU/features/layout,
+  exact reachable source/import graph and entry/compatibility/constant/Runtime mode.
+  No Git/mtime identity, duplicate dependency graph or serialized frontend was added.
+- Added a private descriptor-relative POSIX `.void/cache/v1` store with owned bytes,
+  SHA-256 envelopes, private file/directory checks, exclusive temporary writes,
+  fsync and non-replacing hard-link publication. Missing/unsafe/corrupt/failed
+  artifacts fall back to normal compilation. Root and nested project cache directories
+  are Git-ignored. Interrupted temporary files are ignored;
+  corrupt final entries remain misses until disposable cache removal. Windows
+  safely bypasses persistence pending verified ACL/path publication support.
+- Source native generations have separate ORC JITDylibs/ResourceTrackers and retain
+  existing NativeCode leases. Cold objects and hits admit relocated metadata through
+  the existing Runtime ABI; redundant host metadata construction was removed.
+  Raw-IR clients retain their established exported-symbol linking behavior.
+- Compatible replacement uses the same cache path and existing Runtime identity.
+  ToolingSession publication checks the current revision before compilation and
+  again before publication. Incompatible changes still require restart. No
+  automatic watcher, lazy JIT, native partitioner, GC or ownership registry was added.
+- Added `debug_cache` and `debug_cache_processes`; existing 80 suites remain intact.
+  Tests exercise fresh processes, source/import/generic/build invalidation, malformed
+  native objects, symlinks/permissions/path failures, interrupted temporaries,
+  concurrent first writers, collection/roots/publication, allocation rollback,
+  callbacks/events, large arrays, optimized/custom-import bypass, current/stale
+  revisions, incompatible layouts and old-generation leases.
+
+### Demonstrated defects and corrections
+
+1. Initial consolidated Debug and Release runs each passed 81/82: existing `jit`
+   reported `Symbols not found: [ calculate__v1 ]`. Isolating every raw-IR module
+   broke its explicit cross-module native-export contract. The unchanged regression
+   holds a provider lease and imports its non-entry export from a second module.
+   Source generations now isolate; trusted raw-IR compilation retains main-dylib
+   linking and ResourceTracker retirement. Focused Debug `jit`, both cache suites,
+   `reload` and `advanced_source` then passed 5/5 (43.40 s).
+2. A real CLI child with `RLIMIT_FSIZE=(1,1)` returned -25 (SIGXFSZ) while optional
+   cache publication wrote beyond the OS limit. The writer now checks the actual
+   process file-size limit before creating/writing its envelope and skips persistence
+   when it cannot fit. This introduces no array/object quota or signal-handler
+   changes. A subprocess regression requires successful execution, no published
+   artifact, then normal miss/hit after the limit is removed. Debug cache regressions
+   passed 2/2 (19.56 s) after this repair.
+3. Review found an allocation outside the writer’s noexcept boundary: constructing
+   its NativeArtifact argument copied the captured object after successful native
+   compilation. A linked fault-injection probe reproduced `std::bad_alloc` escaping
+   that exact call shape (write-allocation-before.txt). The writer now accepts a
+   non-allocating string_view and coordination flag; all envelope allocation remains
+   inside its guarded fallback. A zero-budget publication regression covers this
+   boundary. No compiler/Runtime allocation failure is suppressed.
+4. Initial Make generation lacked a target ordering edge for CLI object hashing;
+   explicit `void_cache_identity` -> `voidc_objects` ordering fixes clean object
+   availability. Generation ownership also now starts before fallible JITDylib/
+   tracker setup, so failed candidates retire correctly. The candidate NativeCode
+   lease is prepared before Runtime metadata admission, preserving the original
+   cold-path commit ordering even if lease allocation fails. Cache identity fields
+   include module/import counts to make graph grouping unambiguous.
+
+The first sanitizer build was launched under sandbox tracing and LSan correctly
+refused to operate (`LeakSanitizer does not work under ptrace`). It was rerun
+outside tracing with strict leak/error settings unchanged; no sanitizer was disabled.
+
+### Reproduction and final verification commands
+
+All build directories use LLVM 19.1.7, `VOID_LLVM_RESEARCH=OFF`:
+
+```sh
+cmake -S . -B build/order1/production
+cmake -S . -B build/ci-release
+cmake -S . -B build/ci-sanitizers
+cmake --build build/order1/production -j2
+cmake --build build/ci-release -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+  cmake --build build/ci-sanitizers -j2
+ctest --test-dir build/order1/production --output-on-failure -j2
+ctest --test-dir build/ci-release --output-on-failure -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+  ctest --test-dir build/ci-sanitizers --output-on-failure -j2
+```
+
+Builds independently regenerate/link the existing normal/O2 AOT executables. Final
+configuration outcomes, small-stack and production measurements follow below.
+
+| Final configuration | CTest result | Elapsed |
+| --- | --- | --- |
+| Linux Debug (`build/order1/production`) | 82/82 passed | 380.05 s |
+| Linux Release (`build/ci-release`) | 82/82 passed | 158.04 s |
+| Strict ASan/UBSan/leaks (`build/ci-sanitizers`, RelWithDebInfo) | 82/82 passed | 352.54 s |
+
+These runs include the unchanged 80-suite inventory and both new cache suites,
+normal/O2 JIT, independently linked AOT, GC/failure cleanup, collections,
+results/patterns, closures/events, source/constant/layout reload and tooling tests.
+The final cache policy/ownership, publication-allocation and warning assertions
+were rebuilt and checked first using
+`ctest --test-dir BUILD -R '^(jit|debug_cache|debug_cache_processes|reload)$' --output-on-failure -j1`
+in each build (4/4 passed: Debug 20.16 s, Release 3.75 s, strict sanitizers 12.23 s).
+Logs are in ignored `build/stage5-implementation/` (`*-delivery-ctest.log`,
+`*-delivery-focused.log`); no failing assertion was weakened.
+
+Additional verification:
+
+```sh
+python3 build/stage5-implementation/small-stack.py
+PATH=/home/shmellyorc/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/tmp/void-phase11-tools/node_modules/.bin:$PATH npm --prefix editors/vscode test
+# In editors/vscode, using the same PATH:
+node --test --test-isolation=none out/test/config.test.js
+VOIDLS_PATH=/home/shmellyorc/Documents/Void.Language/build/order1/production/voidls \
+VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:host
+npm run package
+```
+
+The scratch small-stack runner uses Python `resource.setrlimit(RLIMIT_STACK,
+(1048576,1048576))` in each native child and strict sanitizer settings. In **each**
+configuration it runs arrays_foundation, the complete frontend suite, the existing
+semantic_depth.py regression, the 2 MiB advanced/large source program through
+normal/O2 JIT and linked normal/O2 AOT, then fresh-process cached cold/hit runs.
+**27/27 checks passed**, all large-array results 17, including cached execution.
+Commands/results are preserved in small-stack.json and small-stack.log.
+
+Editor build/typecheck passed; direct Node test reporting confirms **4/4 cases**.
+Installed real VS Code passed all three existing host profiles: trusted unsaved
+repair/ranges, navigation/references, stale queries, lifecycle/restart/failure
+cleanup; restricted trust (no native child); multi-root explanatory failure (no
+native child). VSIX packaging passed: 149,208 bytes, SHA-256
+`c012baf2dcc6730e81e5481adc8ec997ffa4102aee391d5d1ab6371327ab1269`.
+
+A scratch invocation of the actual CacheBuildIdentity.cmake generator confirmed
+unchanged object bytes retain the identity, changed object bytes and configuration
+invalidate it, and unidentified shared compiler input disables persistence. Evidence:
+build-identity-check.txt. No production object/archive was altered for this probe.
+
+### Actual production performance and remaining boundary
+
+```sh
+python3 build/stage5-implementation/measure-production.py
+python3 build/stage5-implementation/report-production.py
+```
+
+All **34 fresh-process production runs passed**, asserting stdout/results and cache
+statuses. The 105,243-line / ten-module / 5,000-function workload measured:
+uncached 142.332 s, cold cache miss 142.689 s, unchanged warm median **5.681 s**
+(three launches: 5.519–6.606 s), one-helper edit 145.964 s, deliberate corruption
+144.940 s. Cold/warm peak RSS: 2,020.6 / 940.0 MiB (warm median). One artifact:
+51,141,049 bytes including its 129-byte envelope. Outputs were 60,000 before the
+edit and 60,001 after. The full five-workload table, smaller generated projects,
+real combined-language and 2 MiB payload cases are in STAGE5_CACHE_PROPOSAL.md;
+raw production-measurements.json/.log includes every sample, CPU time and RSS.
+
+These use the real Release-built production compiler with Debug/no-O2 guest code,
+not the earlier prototype. They cover launch to successful process exit, including
+execution/teardown; the native cache was cleared for cold samples, OS page caches
+were not flushed. No compiler build/test ran concurrently. One cold/edit/corrupt
+sample and three warm samples per generated workload are evidence, not a latency
+SLA. The 2 MiB example remained dominated by execution (0.539 s cold, 0.493 s warm
+median); no unrelated Runtime optimization is justified by that result.
+
+**Delivery boundary:** all four authorized implementation milestones are complete
+locally. All existing Orders 1–5 / Phases 1–25 / Stage 3–4 behavior and suites remain
+intact; Stage 4 stays hosted-locked. Stage 5 is ready for owner-controlled hosted
+CI, not hosted-verified. Windows persistence intentionally bypasses safely;
+Windows fallback/CMake integration and macOS persistence still need hosted tests.
+Builds using unidentified shared LLVM compiler libraries bypass persistence too.
+No reboot/power-cut test, automatic watcher, function-granular cache, eviction
+service or remote/shared cache is claimed. First-time edits recompile the graph;
+corrupt exact keys remain misses until cache removal. Compiler/Runtime source,
+cache tests, generated build-identity helper and updated status/contract documents
+are present. No Git operation or hosted action was performed.

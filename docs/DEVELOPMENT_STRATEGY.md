@@ -14,14 +14,16 @@ Feature guides define implemented contracts; LANGUAGE_BIBLE.md includes both tho
 contracts and approved future design, and is not a claim that every illustrated
 syntax executes today.
 
-**Accepted baseline:** local HEAD verified at
-`cd95e37341f756e749ea5f3d6da9ad44716d491f`.
-The owner confirms [CI #65](https://github.com/Shmellyorc/Void.Language/actions/runs/39125218619),
-all seven platform/configuration jobs successful. **Stage 3 Managed Runtime is LOCKED**,
-including dictionaries and managed-runtime integration. This is owner-supplied hosted
-evidence. Stage 4 Advanced Language is the current authorized implementation scope;
-approved contracts are recorded in LANGUAGE_BIBLE.md Section 0.3 and DECISIONS.md.
-Approval of those contracts does not claim their implementation or hosted acceptance.
+**Accepted baseline:** local HEAD verified at `483e67e407b65674bdc82d44767f29bd83d73ae8`.
+**Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total).
+The owner supplied the suite totals; read-only GitHub run metadata independently
+confirms this commit and all seven successful jobs. Stage 3 remains locked and
+all delivered Orders 1–5 and Phases 1–25 are preserved. Stage 5
+now has an owner-authorized first production implementation of optional persistent
+Debug native-object caching and revision-checked hot-reload integration. See
+[STAGE5_CACHE_PROPOSAL.md](STAGE5_CACHE_PROPOSAL.md) for the implemented contract,
+local evidence and remaining hosted-platform verification. Automatic watching is
+not implemented. Stage 5 is not hosted-locked.
 
 | Implemented phases | Delivered source/toolchain behavior |
 | --- | --- |
@@ -51,8 +53,8 @@ its numbers are distinct from implementation phases and Phase 23 research substa
 | 1 Frontend | Implemented for the delivered language subset; future Bible syntax remains future work |
 | 2 Core native language | Implemented functions/types/control flow/value and managed structs with native execution |
 | 3 Managed runtime | Allocator/precise coordinated GC, reference/value structs, strings, lists and dictionaries; LOCKED at cd95e373 / CI #65, seven jobs successful |
-| 4 Advanced language | Implemented locally: properties/callable structs, tagged enums, result/propagation, shared is/match patterns, defer/with/one-shot managed deinit, function values/escaping closures, callbacks and synchronous events; see ADVANCED_LANGUAGE.md and WORK_LOG.md. 80/80 production suites pass locally in Debug, Release and strict ASan/UBSan/leaks; hosted acceptance pending |
-| 5 Hot reload | Partial: compatibility checks, leased code replacement/retirement and metadata lifetime implemented; automatic watching and persistent Debug compilation caching are approved future work, not implemented |
+| 4 Advanced language | Hosted-verified and LOCKED at 483e67e4 / CI #68: properties/callable structs, tagged enums, result/propagation, shared is/match patterns, defer/with/one-shot managed deinit, function values/escaping closures, callbacks and synchronous events; 80/80 suites in all seven configurations. See ADVANCED_LANGUAGE.md and WORK_LOG.md |
+| 5 Hot reload | Optional persistent whole-graph Debug native objects, current-source validation, generation-isolated loading and revision-checked compatible replacement implemented locally. Automatic watching remains future work; hosted Stage 5 acceptance is pending |
 | 6 Concurrency/native libraries | Partial: Runtime coordination and typed native architectural proofs; no source async/scheduler/thread-pool or arbitrary FFI/library ecosystem |
 | 7 Tooling/optimization | Partial: LSP diagnostics/navigation, editor integration/VSIX and LLVM O2; completion/rename/formatting, library discovery and broad performance work remain deferred |
 
@@ -216,9 +218,11 @@ Each stage is divided into small milestones. Stage completion requires integrati
 
 **Important:** These stages express emphasis, not a rule to defer architecture-sensitive concerns. GC metadata and reload identities must influence early IR design. Source spans, documentation metadata and LSP-ready symbol information must begin in Stage 1. Windows/Linux checks must begin in Stage 0/2, not Stage 7. Native bindings also need an early Stage 0 proof even if their full library ecosystem comes later.
 
-### Stage 5 approved future goal: persistent Debug cache and shared hot-reload integration
+### Stage 5: persistent Debug cache and shared hot-reload integration
 
-**Status (18 October 2026): APPROVED FUTURE DEVELOPMENT GOAL ONLY. Not implemented and not authorized for an implementation sprint.** Stage 7 may eventually measure and tune its performance. This is a compiler/development-host capability, not new VOID source syntax or a new bytecode runtime. It is separate from the currently implemented, process-local ORC generations, validated source analysis and compatible-code replacement.
+The owner approved the architecture and authorized the first production implementation. [STAGE5_CACHE_PROPOSAL.md](STAGE5_CACHE_PROPOSAL.md) records the implementation, measurements and boundaries. The original investigation requirements below remain design rationale where not superseded by that implementation record.
+
+**Status (18 October 2026): first production implementation delivered locally; hosted acceptance pending.** Stage 7 may eventually measure and tune its performance. This is a compiler/development-host capability, not new VOID source syntax or a new bytecode runtime. It is separate from the currently implemented, process-local ORC generations, validated source analysis and compatible-code replacement.
 
 **Intended Debug workflow:**
 
@@ -242,7 +246,7 @@ Each stage is divided into small milestones. Stage completion requires integrati
 
 **Measure before design and optimization:** Use a realistic project (including a roughly 100,000-line workload) and record source discovery/parsing, semantic analysis, IR generation, LLVM optimization/codegen, object linking/relocation, metadata admission and process startup separately. Compare a cold first launch, warm unchanged launch in a fresh process after machine restart, a one-function edit, an imported declaration/layout change, and deliberate cache corruption/invalidation. Measure time to main/first useful frame, time to first call for optional laziness, cache hit/miss rates, invalidated work, disk usage and memory overhead. Determine where latency actually goes; "near-instant" is an aspirational outcome, not a guaranteed target or excuse to skip correctness validation.
 
-**Implementation authorization remains separate.** This section records the owner's approved objective and safety boundaries only. Do not add `.void/cache/` machinery, change the compiler or CI, start a phase, or change Release behavior without a later explicit owner request.
+**Authorization:** the owner subsequently approved whole-graph native-object caching and its first implementation. Release AOT, language semantics and CI configuration remain unchanged. Automatic watching and finer-grained native partitioning are outside this delivery.
 
 **LLVM research reference:** [LLVM 19 ORC Design and Implementation](https://releases.llvm.org/19.1.0/docs/ORCv2.html), especially relocatable object linking, LLJIT and laziness; verify any chosen C++ interface against the pinned LLVM 19.1.7 headers/source before engineering work.
 
@@ -499,7 +503,7 @@ Priority order:
 5. **Memory usage:** Monitor fragmentation, live heap, metadata and allocation overhead.
 6. **Compilation speed:** Fast incremental development while permitting aggressive release optimization.
 
-Persistent Debug compilation caching and optional lazy native materialization are **approved future Stage 5 goals**, not implemented optimizations. Evaluate their startup and incremental costs under the measured acceptance plan in [Stage 5 above](#stage-5-approved-future-goal-persistent-debug-cache-and-shared-hot-reload-integration); Stage 7 can tune them only after correctness and representative workloads are established.
+Persistent Debug compilation caching has an initial production implementation described in STAGE5_CACHE_PROPOSAL.md. Lazy native materialization remains future-only. Stage 7 tuning requires measured evidence and must preserve the Stage 5 correctness contracts.
 
 Potential mechanisms to evaluate:
 

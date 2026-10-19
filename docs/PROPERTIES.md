@@ -3,8 +3,7 @@
 The initial properties/callable-struct delivery passed 76/76 Linux Debug, Release
 and strict sanitizer suites. The Stage 4 continuation adds the remaining systems;
 see [ADVANCED_LANGUAGE.md](ADVANCED_LANGUAGE.md) and the latest WORK_LOG entry for
-combined validation. Stage 3 remains locked at cd95e373 / CI #65; hosted Stage 4
-acceptance is pending.
+combined validation. **Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total). Stage 3 remains locked.
 
 ## Properties
 

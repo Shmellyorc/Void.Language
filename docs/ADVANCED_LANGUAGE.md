@@ -2,8 +2,8 @@
 
 Stage 4 extends the production frontend, typed IR, shared LLVM 19.1.7 JIT/AOT
 lowerer and coordinated Runtime. Properties and callable structs remain as
-specified in [PROPERTIES.md](PROPERTIES.md). Hosted acceptance belongs to the
-owner; exact local validation is recorded in [WORK_LOG.md](WORK_LOG.md).
+specified in [PROPERTIES.md](PROPERTIES.md). **Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total).
+Exact local validation and remaining boundaries are recorded in [WORK_LOG.md](WORK_LOG.md).
 
 ## Enums, results and patterns
 

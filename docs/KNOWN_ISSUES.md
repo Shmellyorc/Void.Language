@@ -2,14 +2,16 @@
 
 ## Current boundaries, 18 October 2026
 
-See the [canonical status summary](DEVELOPMENT_STRATEGY.md#current-implementation-status). Phases 1–25 and Stage 3 dictionary/runtime integration are owner-accepted at `cd95e373` / CI #65, all seven jobs successful. Stage 4 contracts are approved; implementation status is tracked separately. Source arrays, interfaces, generics, collection iteration/ranges, named/default arguments and custom initialization are implemented. Older exclusions below are dated findings, not new approval requirements.
+See the [canonical status summary](DEVELOPMENT_STRATEGY.md#current-implementation-status). Phases 1–25 and Stage 3 dictionary/runtime integration are owner-accepted at `cd95e373` / CI #65, all seven jobs successful. Stage 4 is hosted-verified and LOCKED at `483e67e4` / CI #68: 80/80 suites in all seven configurations. Source arrays, interfaces, generics, collection iteration/ranges, named/default arguments and custom initialization are implemented. Older exclusions below are dated findings, not new approval requirements.
 
 - The reproduced deep valid receiver-chain lowering stack issue below remains open; no unrelated repair is claimed.
 - Dictionary keys exclude floats, interfaces, arrays/lists/dictionaries and value structs containing unsupported fields. Custom equality/hash, adversarial hash randomization and stable cross-launch hash guarantees are not implemented. Result-based `.get()` remains deferred; checked lookup and contains/remove/clear are available.
 - Dictionary template literals/defaults can contain pure entries, but dictionary lookup/count/methods require runtime evaluation. Dictionaries share identity; no independent dictionary clone/view API is promised.
-- Stage 4 is implemented locally; see ADVANCED_LANGUAGE.md and WORK_LOG.md for validated behavior. Hosted acceptance is pending. Generic enums, unit/void result payload syntax, module-time patterns and module-time bound receiver allocation are outside the delivered subset. Readonly callback-result authority is conservative. Pop/get still await exact signatures/error types. Missing slice endpoints/views, string indexing/interpolation/formatting, source concurrency/schedulers and general managed FFI remain future work.
+- Stage 4 is hosted-locked at CI #68; see ADVANCED_LANGUAGE.md and WORK_LOG.md for validated behavior. Generic enums, unit/void result payload syntax, module-time patterns and module-time bound receiver allocation are outside the delivered subset. Readonly callback-result authority is conservative. Pop/get still await exact signatures/error types. Missing slice endpoints/views, string indexing/interpolation/formatting, source concurrency/schedulers and general managed FFI remain future work.
 - Root lifetimes remain conservative to function exit; collection is coordinated, precise and nonmoving, not concurrent collection or a production performance certification. Metadata and executable retirement retain existing contracts.
-- LSP completion/hover/rename/formatting and package discovery remain deferred. No new platform pass is claimed before the owner's hosted gate.
+- LSP completion/hover/rename/formatting and package discovery remain deferred. CI #68 covers the delivered Stage 4 baseline; no hosted Stage 5 result is claimed.
+
+- Optional persistent Debug caching is implemented; see STAGE5_CACHE_PROPOSAL.md for local evidence. Windows persistence currently bypasses safely because private ACL/path publication is not established. Builds using unidentified shared LLVM compiler libraries also bypass. macOS persistence and Windows fallback need owner-controlled hosted verification. Automatic watching, per-function caching, automatic eviction and remote/shared caches are not implemented. Corrupt entries remain misses until the disposable cache is removed.
 
 ## Historical issue records and original scope notes
 

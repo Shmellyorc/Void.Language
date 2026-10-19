@@ -50,20 +50,19 @@ VOID 2.0 is a proposed, compact, statically typed, garbage-collected, natively c
 ### 0.2 Design versus implementation
 
 The canonical DEVELOPMENT_STRATEGY.md status and feature guides identify executable
-features. Stage 3 is hosted-locked at cd95e373 / CI #65. Later examples still include
+features. Stage 4 is hosted-verified and locked at 483e67e4 / CI #68 (seven
+configurations, 80/80 each); Stage 3 remains locked. Later examples still include
 approved future syntax; they are not an implementation claim.
 
 ### 0.3 Stage 4 approved contract (18 October 2026)
 
-Stage 4 source behavior is implemented locally: properties/callable structs are
-documented in PROPERTIES.md; enums/results/patterns, cleanup, functions/closures
-and events are documented in ADVANCED_LANGUAGE.md. Exact validation and remaining
-boundaries are in WORK_LOG.md. Hosted acceptance remains owner-controlled.
-
-Stage 3 is hosted-locked at `cd95e37341f756e749ea5f3d6da9ad44716d491f`,
-[CI #65](https://github.com/Shmellyorc/Void.Language/actions/runs/39125218619),
-seven successful jobs. These are approved Stage 4 contracts, **not an implementation
-or hosted-acceptance claim**. Older OPEN labels below are superseded only as stated.
+**Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total).
+Properties/callable structs are documented in PROPERTIES.md; enums/results/patterns,
+cleanup, functions/closures and events are documented in ADVANCED_LANGUAGE.md.
+WORK_LOG.md records local evidence and remaining boundaries. Older OPEN labels
+below are superseded only as stated by these delivered contracts. The owner approved Stage 5 cache architecture and its first production implementation,
+recorded in STAGE5_CACHE_PROPOSAL.md. It adds an optional compiler cache without
+changing source semantics; hosted acceptance is pending.
 
 - `result<t,e>` carries `Ok(value)` or `Err(error)`. `?` unwraps success or propagates
   the exact matching error type. Recoverable errors remain distinct from runtime
@@ -882,9 +881,9 @@ Important rules:
 
 ## 18. Properties and accessors [AGREED]
 
-**Local implementation:** PROPERTIES.md specifies the executable getter/setter,
-readonly, value-copy, nested mutation, generics and reload behavior. Hosted
-acceptance is pending. The remaining locally implemented Stage 4 features are
+**Hosted-verified implementation (CI #68):** PROPERTIES.md specifies the executable
+getter/setter, readonly, value-copy, nested mutation, generics and reload behavior.
+The remaining delivered Stage 4 features are
 documented in ADVANCED_LANGUAGE.md.
 
 Ordinary fields need no accessors. A `property` adds getter/setter logic with receiver syntax, using normal field-like access at the call site. Omitting `set` makes the property readonly.
@@ -2960,23 +2959,23 @@ This section matters especially when an AI assistant inherits this file without 
 5. **Object-model boundary:** [IMPLEMENTED CORE: I1–I8 and IF1–IF8 bounded semantics; richer OOP open] Phase 20 implements owner-approved I1–I8 for managed inheritance, substitutability, exact overrides, explicit super preludes, prefix layouts, guarded leased dispatch and conservative reload. Ordinary methods remain nonvirtual. Protected/richer visibility, hiding, variance/covariance, abstract/final, source downcasts/type patterns, automatic constructor chaining and open-world loading remain deferred. Phase 21 implements owner-approved IF1–IF8 for managed-backed structural views with exact conformance, original ownership, readonly effects, precise roots and guarded leased dispatch. Standalone value erasure, interface inheritance/defaults, dynamic type tests and richer conversions remain deferred; Phase 24 adds compile-time constraints without value erasure; no mandatory implements keyword is introduced. See Sections 12.1 and 13 and INHERITANCE.md.
 6. **Construction:** [IMPLEMENTED CORE: C1/S1 init; fallible/resource init open] `init()` is implemented for approved value and managed structs: custom-init calls bind constructor arguments solely to init parameters; types without init retain named-field construction; derived initialization uses an explicit `super.init(...)` prelude. Fallible `result`-returning init, native-resource rollback/destruction and richer constructor escape remain future design.
 7. **`value struct` native ownership:** [FUTURE DESIGN: resource-owning value copies] Ensure copying cannot double-release a native handle; initially restrict resource-owning value types or introduce an explicit safe transfer contract.
-8. **Closures:** [IMPLEMENTED LOCALLY: Stage 4] Shared captured locals, independent captured value receivers, escaping managed environments and capture-layout reload checks; see ADVANCED_LANGUAGE.md.
+8. **Closures:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Shared captured locals, independent captured value receivers, escaping managed environments and capture-layout reload checks; see ADVANCED_LANGUAGE.md.
 9. **Function call grammar:** [IMPLEMENTED CORE: constructor argument order; ordinary named/default calls open] Constructor invocations already accept an ordered positional prefix plus named arguments and pure parameter defaults, with supplied arguments evaluated exactly once left to right. Ordinary function named/default arguments and direct multiline anonymous-function call grammar remain future design.
-10. **Events:** [IMPLEMENTED LOCALLY: Stage 4] Owner emission, ordered strong snapshots, re-entrancy and stable callback identities; see ADVANCED_LANGUAGE.md.
+10. **Events:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Owner emission, ordered strong snapshots, re-entrancy and stable callback identities; see ADVANCED_LANGUAGE.md.
 11. **Generic implementation:** [IMPLEMENTED FOUNDATION: Phase 24] Concrete specialization, interface constraints, argument inference and bounded recursion use the existing compiler/Runtime; see GENERICS.md. Variance, operator contracts and more aggressive representation/code-size sharing remain open.
 12. **Dictionary grammar:** [FUTURE DESIGN: dictionary literal grammar] Decide whether unquoted `name = value` is allowed alongside `"name": value`. Do not invent silent meaning for bare identifiers.
 13. **Mixed/general collections:** [FUTURE DESIGN: heterogeneous collections] `[]` and `{}` were discussed as general-purpose untyped options, but their dynamic type, boxing, and inference semantics are undecided.
 14. **Array API spelling:** [APPROVED PHASE 23 API: count/push/remove_at; source arrays still gated] Phase 23 A9 approves `.count`, `.push(value)` and `.remove_at(index)` for the first source-array slice; it does not approve an automatic `add` alias. `pop`, search/equality removal, slicing and other methods remain separate future API decisions. Approved names do not establish completed source-array implementation.
 15. **Iteration modification:** [APPROVED DIRECTION: invalidation at next iterator access] Structural mutation invalidates active growable-list iterators when they next access the iterator, in either direction; this is approved design, not completed source-list execution. The special reverse-current-element deletion exception remains deferred, not accepted or tested.
-16. **Pattern forms:** [IMPLEMENTED LOCALLY: Stage 4] Shared is/match patterns with success-scoped explicit var captures, range/struct/list/rest/dictionary forms; see ADVANCED_LANGUAGE.md.
+16. **Pattern forms:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Shared is/match patterns with success-scoped explicit var captures, range/struct/list/rest/dictionary forms; see ADVANCED_LANGUAGE.md.
 17. **Numeric conversion policy:** [IMPLEMENTED CORE: Phase 6 numeric behavior; additional casts/hashing open] `NUMERIC_TYPES.md` implements contextual literal typing, wrapping integer overflow, signed/unsigned arithmetic rules, IEEE NaN/signed-zero comparisons and checked numeric `as` (including truncate-toward-zero float-to-int). `as?`, float hashing/total ordering, platform-sized aliases and additional conversions remain future design.
 18. **UTF-8 semantics:** [IMPLEMENTED CORE: Phase 22 UTF-8 foundation; future indexing/slicing open] S1-S8 approve the strict UTF-8 foundation with exact bytes,
     no normalization and embedded NUL. Section 8.1 approves future scalar indexing,
     scalar length, byte_length and nullable strings in principle, outside Phase 22.
     Index errors, slicing, grapheme APIs, ordering, formatting grammar and broader
     native binding policy remain open.
-19. **Panic and defer:** [IMPLEMENTED LOCALLY: Stage 4] Applicable cleanup continues after failure while preserving the primary diagnostic and bounded additional errors; native process corruption cannot guarantee cleanup.
-20. **Nullable/`Ok` overloading:** [IMPLEMENTED LOCALLY: Stage 4] Ok matches present nullable values or result success according to the subject type; Ok(null) result payloads remain distinct from Err.
+19. **Panic and defer:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Applicable cleanup continues after failure while preserving the primary diagnostic and bounded additional errors; native process corruption cannot guarantee cleanup.
+20. **Nullable/`Ok` overloading:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Ok matches present nullable values or result success according to the subject type; Ok(null) result payloads remain distinct from Err.
 21. **Async API:** [FUTURE DESIGN: async/task source] `async func`, `await`, and `spawn` are agreed; exact scheduling start semantics, task group binding, async `with`, and cancellation observation points remain to specify.
 22. **Hot-reload implementation:** [IMPLEMENTED FOUNDATION: generation leases and native replacement; complete auto-reload open] Compatible-body-only behavior is agreed. The internal JIT generation leases, retained metadata and native replacement proofs already exist; complete automatic source watching, general code retirement, cross-thread publication across all future feature forms and full live product hot reload are still separate design and acceptance concerns.
 23. **GC details:** [IMPLEMENTED FOUNDATION: precise GC/roots; optimization and production acceptance open] The Phase 15 precise non-moving Heap, compiler-managed roots, explicit frame/slot contracts and cooperative collection/rendezvous have implemented proofs; later source phases use them. Production tuning, advanced/concurrent collector strategies, allocation thresholds, liveness optimization and comprehensive barrier/performance certification remain separate work; non-moving is not a permanent language restriction.

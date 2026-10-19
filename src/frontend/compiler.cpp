@@ -4192,18 +4192,33 @@ SourceProgram compile_project(const std::filesystem::path& entry) {
     for (const auto& m : result.program->modules()) if (m.identity == module.identity) return {m.source,std::move(module)};
     throw std::logic_error("Validated entry absent");
 }
-void require_source_entry(const SourceFile& source, const ir::Module& module) {
-    Diagnostics diagnostics; diagnostics.bind(source, module.identity);
+namespace {
+void entry_signature(const SourceFile& source,const std::string& identity,bool found,bool valid,std::size_t offset) {
+    Diagnostics diagnostics;diagnostics.bind(source,identity);
     try {
-    for (const auto& f : module.functions) if (f.name == module.entry_symbol) {
-        if (f.parameters == std::vector<Type>{Type::i32} && f.result == Type::i32) return;
-        std::size_t offset = 0;
-        while (offset < source.text().size() && source.location(offset).line < f.source.line) ++offset;
-        while (offset < source.text().size() && source.location(offset).column < f.source.column) ++offset;
-        error(source, {TokenKind::name, "entry", offset}, Code::entry, "The CLI entry point must have signature entry(value: i32) -> i32.", "Other functions can have any supported parameter list; choose an i32 adapter for the CLI.");
+        if(valid)return;
+        if(found)error(source,{TokenKind::name,"entry",offset},Code::entry,"The CLI entry point must have signature entry(value: i32) -> i32.","Other functions can have any supported parameter list; choose an i32 adapter for the CLI.");
+        error(source,{TokenKind::end,"",0},Code::entry,"No entry function found.","Define func entry(value: i32) -> i32 to run or emit this file; check accepts libraries without an entry.");
+    } catch(const CompilationError& failure){diagnostics.add(failure);diagnostics.finish();}
+}
+}
+void require_source_entry(const ValidatedAnalysis& analysis) {
+    for(const auto& module:analysis.modules())if(module.identity==analysis.entry_identity()) {
+        for(const auto& declaration:analysis.declarations())if(declaration.identity==module.identity+"::entry" && declaration.kind==AnalyzedDeclaration::Kind::function && !declaration.generic_template) {
+            entry_signature(module.source,module.identity,true,declaration.parameters==std::vector<Type>{Type::i32} && declaration.type==Type::i32,declaration.source.begin);return;
+        }
+        entry_signature(module.source,module.identity,false,false,0);return;
     }
-    error(source, {TokenKind::end, "", 0}, Code::entry, "No entry function found.", "Define func entry(value: i32) -> i32 to run or emit this file; check accepts libraries without an entry.");
-    } catch (const CompilationError& failure) { diagnostics.add(failure); diagnostics.finish(); }
+    throw std::logic_error("Validated entry absent");
+}
+void require_source_entry(const SourceFile& source, const ir::Module& module) {
+    for(const auto& f:module.functions)if(f.name==module.entry_symbol) {
+        std::size_t offset=0;
+        while(offset<source.text().size() && source.location(offset).line<f.source.line)++offset;
+        while(offset<source.text().size() && source.location(offset).column<f.source.column)++offset;
+        entry_signature(source,module.identity,true,f.parameters==std::vector<Type>{Type::i32} && f.result==Type::i32,offset);return;
+    }
+    entry_signature(source,module.identity,false,false,0);
 }
 }
 

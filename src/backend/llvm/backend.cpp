@@ -1,10 +1,14 @@
 #include "void/path.hpp"
+#include "native_cache.hpp"
+#include <llvm/ExecutionEngine/Orc/ObjectTransformLayer.h>
+#include <llvm/ExecutionEngine/Orc/JITTargetMachineBuilder.h>
 #include "void/backend.hpp"
 #include "void/llvm_storage_audit.hpp"
 #ifdef VOID_LLVM_RESEARCH
 #include "void/private_fixed_call_research.hpp"
 #endif
 #include "void/frontend.hpp"
+#include "void/tooling.hpp"
 #include "void/numeric.hpp"
 #include "void/runtime_abi.hpp"
 #include "void/reference_capabilities.hpp"
@@ -1252,48 +1256,80 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
 struct Jit::Impl {
     std::unique_ptr<llvm::orc::LLJIT> jit;
     std::uint64_t serial = 0;
+    DebugCache cache;
+    std::string cache_status="disabled", target_identity, captured;
+    bool custom_bindings=false, capture=false, canonical=false;
     std::shared_ptr<Runtime> source_runtime;
     std::atomic<std::size_t> live{0};
     struct Generation {
         std::shared_ptr<Impl> owner;
         llvm::orc::ResourceTrackerSP tracker;
+        llvm::orc::JITDylib* dylib=nullptr;
         ~Generation() {
-            if (auto error = tracker->remove())
+            if (tracker) if (auto error = tracker->remove())
                 llvm::errs() << "VOID JIT retirement failed: " << llvm::toString(std::move(error)) << '\n';
+            if(dylib) if(auto error=owner->jit->getExecutionSession().removeJITDylib(*dylib))
+                llvm::errs()<<"VOID JIT dylib retirement failed: "<<llvm::toString(std::move(error))<<'\n';
             --owner->live;
         }
     };
     std::shared_ptr<const NativeCode> load(std::unique_ptr<llvm::Module> module,
         std::unique_ptr<llvm::LLVMContext> context, const std::string& symbol,
-        Compatibility contract, const std::shared_ptr<Impl>& self, bool checked = false, std::shared_ptr<Runtime> runtime = {}, std::span<const NominalDescriptor> catalog = {},std::span<const InterfaceWitness> witnesses = {}) {
+        Compatibility contract, const std::shared_ptr<Impl>& self, bool checked = false, std::shared_ptr<Runtime> runtime = {}, const std::string& suffix = {}, bool isolated = false, std::unique_ptr<llvm::MemoryBuffer> object = {}) {
 #ifdef VOID_FUNCTION_SANITIZER_HASH
         // The host ABI is checked before reaching this boundary. Match the
         // compiler-generated plain/checked entry metadata without disabling UBSan.
+        if(module) {
         auto* function = module->getFunction(symbol);
         llvm::IRBuilder<> builder(*context);
         function->setMetadata("func_sanitize", llvm::MDNode::get(*context, {
             llvm::ConstantAsMetadata::get(builder.getInt32(VOID_FUNCTION_SANITIZER_MAGIC)),
             llvm::ConstantAsMetadata::get(builder.getInt32(checked ? VOID_CHECKED_SANITIZER_HASH : VOID_FUNCTION_SANITIZER_HASH))}));
-#endif
-        auto tracker = jit->getMainJITDylib().createResourceTracker();
-        auto generation = std::make_shared<Generation>();
-        generation->owner = self;
-        generation->tracker = tracker;
-        ++live;
-        check(jit->addIRModule(tracker, llvm::orc::ThreadSafeModule(std::move(module), std::move(context))));
-        auto address = unwrap(jit->lookup(symbol));
-        if (checked) {
-            auto result=std::make_shared<NativeCode>(address.toPtr<NativeCode::CheckedEntry>(),generation,std::move(contract),runtime);
-            if(runtime) runtime->admit_metadata(catalog,witnesses);
-            return result;
         }
-        auto entry = address.toPtr<NativeCode::Entry>();
-        return std::make_shared<NativeCode>(entry, generation, std::move(contract));
+#endif
+        auto generation = std::make_shared<Generation>();
+        generation->owner = self;++live;
+        auto* target=&jit->getMainJITDylib();
+        // Source generations are self-contained. Trusted raw-IR clients retain
+        // their existing cross-module exported-symbol linking contract.
+        if(isolated) {
+            auto created=jit->getExecutionSession().createJITDylib("void.g"+std::to_string(++serial));
+            if(!created)throw std::runtime_error(llvm::toString(created.takeError()));
+            target=&*created;generation->dylib=target;
+            target->addToLinkOrder(jit->getMainJITDylib());
+        }
+        auto& dylib=*target;
+        generation->tracker=dylib.createResourceTracker();
+        if(object)check(jit->addObjectFile(generation->tracker,std::move(object)));
+        else check(jit->addIRModule(generation->tracker, llvm::orc::ThreadSafeModule(std::move(module), std::move(context))));
+        auto address = unwrap(jit->lookup(dylib,symbol));
+        // Prepare the lease before committing Runtime metadata, as on the
+        // original cold path: allocation failure must not leave a new catalog.
+        auto result=checked
+            ? std::make_shared<NativeCode>(address.toPtr<NativeCode::CheckedEntry>(),generation,std::move(contract),runtime)
+            : std::make_shared<NativeCode>(address.toPtr<NativeCode::Entry>(),generation,std::move(contract));
+        if(runtime) {
+            auto lookup=[&](const std::string& name){return unwrap(jit->lookup(dylib,name+suffix));};
+            RuntimeFailure failure;
+            vd_runtime_admit_metadata(runtime.get(),lookup("__vd_types").toPtr<const RuntimeTypeRecord*>(),
+                *lookup("__vd_type_count").toPtr<const std::size_t*>(),lookup("__vd_witnesses").toPtr<const RuntimeWitnessRecord*>(),
+                *lookup("__vd_witness_count").toPtr<const std::size_t*>(),&failure);
+            if(failure.message)throw std::runtime_error(failure.message);
+        }
+        return result;
     }
 };
-Jit::Jit() : impl_(std::make_shared<Impl>()) {
+Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
+    impl_->cache=std::move(cache);
     initialize();
-    impl_->jit = unwrap(llvm::orc::LLJITBuilder().create());
+    auto machine=unwrap(llvm::orc::JITTargetMachineBuilder::detectHost());
+    impl_->target_identity=machine.getTargetTriple().str()+"|"+machine.getCPU()+"|"+machine.getFeatures().getString()+"|default-codegen|default-relocation|default-code-model";
+    impl_->jit = unwrap(llvm::orc::LLJITBuilder().setJITTargetMachineBuilder(std::move(machine)).create());
+    impl_->target_identity+="|"+impl_->jit->getDataLayout().getStringRepresentation();
+    impl_->jit->getObjTransformLayer().setTransform([owner=impl_.get()](std::unique_ptr<llvm::MemoryBuffer> object)->llvm::Expected<std::unique_ptr<llvm::MemoryBuffer>> {
+        if(owner->capture) {try{owner->captured=object->getBuffer().str();}catch(const std::bad_alloc&){owner->captured.clear();}}
+        return std::move(object);
+    });
     bind("vd_gc_frame_enter",vd_gc_frame_enter); bind("vd_gc_frame_leave",vd_gc_frame_leave);
     bind("vd_string_literal",vd_string_literal); bind("vd_string_concat",vd_string_concat); bind("vd_string_equal",vd_string_equal);
     bind("vd_array_default",vd_array_default);bind("vd_array_copy",vd_array_copy);
@@ -1310,10 +1346,12 @@ Jit::Jit() : impl_(std::make_shared<Impl>()) {
     bind("vd_gc_interface_binding",vd_gc_interface_binding);
     bind("vd_cleanup_failure",vd_cleanup_failure);bind("vd_gc_poll",vd_gc_poll); bind("vd_gc_collect",vd_gc_collect); bind("vd_gc_allocate",vd_gc_allocate);
     bind("vd_gc_release",vd_gc_release);bind("vd_gc_alive",vd_gc_alive); bind("vd_gc_native_enter",vd_gc_native_enter); bind("vd_gc_native_leave",vd_gc_native_leave);
+    impl_->custom_bindings=false;
 }
 Jit::~Jit() = default;
 void Jit::bind_address(std::string name, std::uintptr_t entry) {
     if (!entry) throw std::invalid_argument("null native import");
+    impl_->custom_bindings=true;
     llvm::orc::SymbolMap symbols;
     symbols[impl_->jit->mangleAndIntern(name)] = llvm::orc::ExecutorSymbolDef(
         llvm::orc::ExecutorAddr(entry), llvm::JITSymbolFlags::Exported);
@@ -1392,29 +1430,76 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
         for (const auto& [name,text] : layouts) { (void)name; contract.source_contract += std::to_string(text.size()) + ":" + text; }
     }
     if (!selected->module_identity.empty()) contract.constant_contract = input.analysis ? input.analysis->constant_contract() : input.constant_contract;
-    auto suffix = "__v" + std::to_string(++impl_->serial);
+    auto suffix = impl_->canonical ? "__cache" : "__v" + std::to_string(++impl_->serial);
     auto context = std::make_unique<llvm::LLVMContext>();
-    std::vector<NominalDescriptor> catalog;std::vector<InterfaceWitness> witnesses;
-    auto module = lower(input, *context, suffix, impl_->jit->getDataLayout(),selected->name,&catalog,&witnesses);
+    auto module = lower(input, *context, suffix, impl_->jit->getDataLayout(),selected->name);
     module->setDataLayout(impl_->jit->getDataLayout());
     module->setTargetTriple(impl_->jit->getTargetTriple().str());
     finish(*module, optimize);
-    return impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, std::move(runtime),catalog,witnesses);
+    return impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, std::move(runtime),suffix,!selected->module_identity.empty());
+}
+const std::string& Jit::cache_status() const {return impl_->cache_status;}
+std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis& analysis,bool optimize,Compatibility contract,std::shared_ptr<Runtime> runtime) {
+    if(auto* attached=Runtime::attached();attached && attached->is_managed()) {
+        Runtime::Native native(*attached);return compile_analysis(analysis,optimize,std::move(contract),std::move(runtime));
+    }
+    require_source_entry(analysis);
+    impl_->cache_status="disabled";
+    auto cold=[&]{auto module=analysis.lower();return compile(module,module.entry_symbol,optimize,contract,runtime);};
+    if(!impl_->cache.project_root.empty() && impl_->cache.build_identity.empty()){impl_->cache_status="unavailable";return cold();}
+    if(optimize || impl_->custom_bindings || impl_->cache.project_root.empty())return cold();
+    std::string identity;
+    try {
+    identity="VOID-debug-object-v1";
+    auto field=[&](std::string_view value){llvm_backend::cache_field(identity,value);};
+    field(impl_->cache.build_identity);field(impl_->target_identity);field(analysis.entry_identity());
+    field(analysis.compatibility_contract());field(analysis.constant_contract());field(runtime ? "forced-runtime" : "automatic-runtime");
+    field(std::to_string(analysis.modules().size()));
+    for(const auto& m:analysis.modules()) {field("module");field(m.identity);field(m.source.path());field(m.source.text());field(std::to_string(m.imports.size()));for(const auto& i:m.imports)field(i);}
+    } catch(const std::bad_alloc&) {impl_->cache_status="unavailable";return cold();}
+    llvm_backend::NativeCache store(impl_->cache.project_root,identity);
+    if(!store.available()){impl_->cache_status="unavailable";return cold();}
+    auto artifact=store.read();
+    if(artifact) {
+        try {
+            auto object=llvm::MemoryBuffer::getMemBufferCopy(artifact->object);
+            auto owner=runtime;
+            if(artifact->coordinated && !owner){if(!impl_->source_runtime)impl_->source_runtime=std::make_shared<Runtime>(256);owner=impl_->source_runtime;}
+            if(bool(owner)!=artifact->coordinated)throw std::runtime_error("cache coordination mismatch");
+            auto expected=analysis.entry_identity()+"::entry";
+            if(contract.function_id.empty())contract.function_id=expected;
+            if(contract.function_id!=expected || contract.signature!="c:i32(i32)")throw std::invalid_argument("code identity or signature does not match IR");
+            contract.source_contract=analysis.compatibility_contract();contract.constant_contract=analysis.constant_contract();
+            contract.analysis=analysis.shared_from_this();contract.runtime_identity=reinterpret_cast<std::uintptr_t>(owner.get());
+            ir::Function entry;entry.name=expected;entry.module_identity=analysis.entry_identity();
+            auto result=impl_->load({}, {},native_symbol(entry,"__cache"),contract,impl_,true,std::move(owner),"__cache",true,std::move(object));
+            impl_->cache_status="hit";return result;
+        } catch(const std::exception&) { /* Discard candidate; compile once normally. */ }
+    }
+    impl_->cache_status="miss";impl_->canonical=true;impl_->capture=true;impl_->captured.clear();
+    try {
+        auto result=cold();impl_->canonical=false;impl_->capture=false;
+        if(!impl_->captured.empty())store.write(bool(result->runtime_owner()),impl_->captured);
+        impl_->captured.clear();return result;
+    } catch(...) {impl_->canonical=false;impl_->capture=false;impl_->captured.clear();throw;}
 }
 std::shared_ptr<const NativeCode> Jit::compile(const ValidatedAnalysis& analysis, bool optimize, Compatibility contract) {
-    auto module = analysis.lower();
-    return compile(module,module.entry_symbol,optimize,std::move(contract));
+    return compile_analysis(analysis,optimize,std::move(contract),{});
 }
-bool Jit::replace(ReloadSlot& slot, const ValidatedAnalysis& analysis, bool optimize, Compatibility contract) {
-    auto current = slot.acquire();
-    if (contract.function_id.empty()) contract.function_id = analysis.entry_identity() + "::entry";
-    contract.constant_contract = analysis.constant_contract();
-    contract.source_contract = analysis.compatibility_contract();
-    contract.analysis = analysis.shared_from_this();
-    contract.runtime_identity=current->compatibility().runtime_identity;
-    if (!(current->compatibility() == contract)) return false;
-    auto module=analysis.lower();
-    return slot.replace(compile(module,module.entry_symbol,optimize,std::move(contract),current->runtime_owner()));
+std::shared_ptr<const NativeCode> Jit::replacement(const NativeCode& current,const ValidatedAnalysis& analysis,bool optimize,Compatibility contract) {
+    if(contract.function_id.empty())contract.function_id=analysis.entry_identity()+"::entry";
+    contract.constant_contract=analysis.constant_contract();contract.source_contract=analysis.compatibility_contract();
+    contract.analysis=analysis.shared_from_this();contract.runtime_identity=current.compatibility().runtime_identity;
+    if(!(current.compatibility()==contract))return {};
+    return compile_analysis(analysis,optimize,std::move(contract),current.runtime_owner());
+}
+bool Jit::replace(ReloadSlot& slot,const ValidatedAnalysis& analysis,bool optimize,Compatibility contract) {
+    auto next=replacement(*slot.acquire(),analysis,optimize,std::move(contract));return next && slot.replace(std::move(next));
+}
+bool Jit::replace(ReloadSlot& slot,const ToolingSession& session,const SessionAnalysis& revision,bool optimize,Compatibility contract) {
+    if(!session.is_current(revision) || !revision.result().succeeded())return false;
+    auto next=replacement(*slot.acquire(),*revision.result().program,optimize,std::move(contract));
+    return next && session.is_current(revision) && slot.replace(std::move(next));
 }
 std::size_t Jit::live_generations() const { return impl_->live.load(); }
 std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
