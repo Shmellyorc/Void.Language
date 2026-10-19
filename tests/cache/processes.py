@@ -73,6 +73,18 @@ with tempfile.TemporaryDirectory(prefix="void-cache-") as temporary:
     else:
         run(mode="unavailable")
 
+    # Each string local and expression has a precise native root. This makes
+    # the ordinary generated frame exceed a Windows stack page, requiring the
+    # real ABI stack-probe helper. Exercise fresh source generations and objects.
+    source.write_text("func entry(value: i32) -> i32:\n" +
+                      "".join(f'    var text{i} = "root{i}"\n' for i in range(160)) +
+                      "    return value + 1\n")
+    run(mode="miss" if supported else "unavailable")
+    run(mode="hit" if supported else "unavailable")
+    for flags in [["--no-opt"], []]:
+        result = subprocess.run([str(compiler), "run", str(source), "7", *flags], capture_output=True, text=True)
+        assert result.returncode == 0 and result.stdout.strip() == "8", result
+
     source.write_text("use \"/helper.void\" as h\nfunc entry(value: i32) -> i32:\n    return h.add(value)\n")
     helper = root / "helper.void"
     helper.write_text("func add<t>(value: t) -> t:\n    return value + 2\n")

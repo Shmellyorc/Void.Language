@@ -1297,6 +1297,11 @@ struct Jit::Impl {
             if(!created)throw std::runtime_error(llvm::toString(created.takeError()));
             target=&*created;generation->dylib=target;
             target->addToLinkOrder(jit->getMainJITDylib());
+            // ORC link orders are not transitive. Main's platform/process
+            // links do not resolve native helpers (e.g. Windows __chkstk)
+            // for this generation. Keep explicit imports first, then use
+            // LLJIT's supported platform/process defaults directly.
+            target->addToLinkOrder(jit->defaultLinkOrder());
         }
         auto& dylib=*target;
         generation->tracker=dylib.createResourceTracker();

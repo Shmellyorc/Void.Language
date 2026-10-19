@@ -12528,3 +12528,129 @@ service or remote/shared cache is claimed. First-time edits recompile the graph;
 corrupt exact keys remain misses until cache removal. Compiler/Runtime source,
 cache tests, generated build-identity helper and updated status/contract documents
 are present. No Git operation or hosted action was performed.
+
+
+## 18 October 2026: CI #69 Windows source-generation native helper resolution
+
+**Baseline:** `ebfdaf84fb17c9ea8901f4e7c8f0654017b44191`, initially clean.
+Read-only inspection of [CI #69](https://github.com/Shmellyorc/Void.Language/actions/runs/39191134603)
+and both completed Windows job logs confirmed successful builds followed by the
+same 16/82 failed suites in Debug and Release. Source-generation materialization
+reported missing `__chkstk`; both cache suites and raw-IR `jit` passed. The overall
+run was still active when inspected, so individual completed job logs were fetched
+through the read-only jobs API. No hosted run was launched or modified.
+
+### Root cause and correction
+
+Stage 4 (`483e67e407b65674bdc82d44767f29bd83d73ae8`) loaded source modules into
+LLJIT's main JITDylib. LLVM 19.1.7 gives main direct default links to its platform
+and process-symbol JITDylibs. Stage 5 created each isolated source generation with
+`ExecutionSession::createJITDylib`, then linked only main. ORC symbol searches do
+not recursively traverse main's own link order. Explicit `vd_*` native imports
+remained available because `Jit::bind_address` defines them directly in main;
+platform/process helpers were absent from the generation's search order.
+
+The Windows x64 ABI requires the real stack probe for large fixed native frames.
+LLVM can introduce that call during machine-code generation even when no source
+or typed-IR import names it. The LLVM process lookup path includes existing
+Windows explicit helper bindings; no new helper implementation is needed.
+Smaller cache fixtures did not exercise that missing helper, and raw-IR modules
+continued loading in main with its correct default links.
+
+The repair appends `jit->defaultLinkOrder()` directly after main in each isolated
+generation's link order. This uses LLVM 19.1.7's supported ORC APIs and preserves
+lookup priority: generation, explicit main imports, then LLVM platform/process
+symbols. No global process generator, native-binding registry or platform-specific
+workaround was added. Source generations remain separate; disk-object hits and
+cold compilation share this path. Raw-IR linking, metadata admission, precise GC,
+ResourceTracker/NativeCode ownership and retirement are unchanged.
+
+Exact-version sources inspected (retained under ignored `build/ci69-repair/`):
+
+- [LLJIT.cpp](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/ExecutionEngine/Orc/LLJIT.cpp): process generator setup, default links, and LLJIT's `createJITDylib` wrapper.
+- [LLJIT.h](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/include/llvm/ExecutionEngine/Orc/LLJIT.h): supported `defaultLinkOrder` API, also checked against installed 19.1.7 headers.
+- [ORC Core.cpp](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/ExecutionEngine/Orc/Core.cpp): lookup walks the supplied search order.
+- [Windows DynamicLibrary.inc](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/Support/Windows/DynamicLibrary.inc) and [explicit_symbols.inc](https://github.com/llvm/llvm-project/blob/llvmorg-19.1.7/llvm/lib/Support/Windows/explicit_symbols.inc): LLVM's existing platform helper lookup.
+- [Microsoft x64 prolog/epilog ABI](https://learn.microsoft.com/en-us/cpp/build/prolog-and-epilog): `__chkstk` probes large native allocations while preserving argument registers and RAX. It cannot be replaced by an ordinary C stub.
+
+### Permanent regressions and causal evidence
+
+The initial causal probe imported real native `abs` from a source-identified
+isolated generation without `Jit::bind`. Before the backend repair, it failed
+locally with `Symbols not found: [ abs ]` in `void.g2`, proving the same missing
+process-link mechanism independently of Windows; after repair it passed. The
+permanent `jit` regression uses real native `tolower` in normal and O2 modes. A
+second check explicitly binds that name to the existing native fixture and verifies
+that main's explicit binding wins over process symbols. Existing cross-module
+raw-IR provider/consumer checks remain intact.
+
+The new precedence assertion initially used `abs`; Debug focused testing caught
+that its O2 form could not test binding precedence, because LLVM replaces `abs`
+with `llvm.abs.i32`. A standalone exact-version `opt -passes='default<O2>'` probe
+confirmed this transformation (`abs-call-o2.ll`). The regression now uses the
+locale-dependent `tolower` call, which retains real native resolution in both
+modes. No production optimization or assertion was disabled. Corrected Release
+`jit` passed; corrected Debug focused verification passed 6/6, 28.52 s.
+
+`debug_cache_processes` now generates 160 string locals, requiring a large precise
+root frame, and executes fresh-process cache miss/hit (or the existing Windows
+unavailable fallback), uncached normal JIT and O2 JIT. No artificial alloca,
+stack-probe suppression, dummy helper or weakened assertion was added. A local
+normal emitted object for this exact fixture reserves `0x3230` (12,848) native
+stack bytes, independently confirming it exceeds a Windows stack page. This is
+Linux frame/codegen evidence, not a claim of Windows execution. Existing cache
+lease/coexistence, source revisions, GC and failure regressions are preserved.
+
+### Local verification
+
+All configurations use LLVM 19.1.7 with `VOID_LLVM_RESEARCH=OFF`. Initial focused
+Release verification passed 6/6 (`jit`, `reload`, both cache suites,
+`fixed_arrays_source`, `properties_source`), 10.71 s. Before-fix rejection is saved
+in `before-jit.log`; build/test logs, upstream source snapshots, Windows job logs
+and stack-frame disassembly are under ignored `build/ci69-repair/`.
+
+Commands (repository root; existing build configurations retained):
+
+```sh
+cmake --build build/ci-release -j2
+cmake --build build/order1/production -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+  cmake --build build/ci-sanitizers -j2
+# Focused checks in each configuration before consolidated acceptance:
+ctest --test-dir BUILD -R '^(jit|reload|debug_cache|debug_cache_processes|fixed_arrays_source|properties_source)$' --output-on-failure -j2
+ctest --test-dir build/ci-release --output-on-failure -j2
+ctest --test-dir build/order1/production --output-on-failure -j2
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 \
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 \
+  ctest --test-dir build/ci-sanitizers --output-on-failure -j2
+python3 build/ci69-repair/small-stack.py
+git diff --check
+```
+
+Sanitizer builds, focused/full tests and the small-stack runner execute outside
+sandbox tracing with every strict sanitizer/leak option retained. The scratch
+small-stack runner applies `RLIMIT_STACK=1 MiB` to each child and runs the exact
+160-string fixture through normal/O2 uncached JIT and fresh-process cached
+cold/hit paths in Debug, Release and strict sanitizers: **12/12 passed**.
+`small-stack.json` retains commands, status, stdout and stderr. No editor or
+language-server behavior changed; no unrelated editor/package work was added.
+
+| Final local configuration | Complete CTest result | Elapsed |
+| --- | --- | --- |
+| Linux Debug (`build/order1/production`) | 82/82 passed | 356.27 s |
+| Linux Release (`build/ci-release`) | 82/82 passed | 140.78 s |
+| Strict ASan/UBSan/leaks (`build/ci-sanitizers`) | 82/82 passed | 329.61 s |
+
+The final strict sanitizer focused run passed 6/6 (15.59 s). All three complete
+builds succeeded and regenerated/linked the existing normal/O2 native AOT
+executables. The unchanged 82-suite inventory includes both cache suites and
+cross-module raw-IR linking. Final `git diff --check` passed. Build logs retain
+existing toolchain/header and aggregate-initializer warnings; none was suppressed.
+
+**Delivery boundary:** one production link-order correction plus permanent native
+resolution/precedence and large-frame process regressions. All final local checks
+passed. Windows and macOS execution of the repair remains unverified locally and
+requires owner-controlled hosted acceptance; Stage 5 is not declared hosted-locked.
+No stack probes, cache/isolation behavior, GC checks or existing assertions were
+disabled. No commit, push, branch, remote mutation or hosted CI action was performed.

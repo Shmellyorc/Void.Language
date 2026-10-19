@@ -1,4 +1,5 @@
 #include "void/backend.hpp"
+#include "void/frontend.hpp"
 #include "void/heap.hpp"
 #include "void/native.hpp"
 #include "void/reference_capabilities.hpp"
@@ -140,6 +141,25 @@ void core() {
 }
 void jit() {
     vd::Jit engine;
+    // Native imports must reach LLJIT's process-symbol search from isolated
+    // source generations, without an explicit Jit::bind (e.g. Windows __chkstk).
+    auto process_module=vd::compile_source({"/process-helper.void",
+        "func entry(value: i32) -> i32:\n    return value\n"});
+    process_module.imports.push_back("tolower");
+    auto& block=process_module.functions.front().blocks.front();
+    block.instructions.push_back({vd::ir::Op::call,block.end.value,0,0,"tolower"});
+    block.end.value=block.instructions.size()-1;
+    for(bool optimized:{false,true}) {
+        auto code=engine.compile(process_module,"entry",optimized);
+        require(code->invoke('A')=='a' && code->invoke('z')=='z',"isolated process helper resolution");
+    }
+    // Use a locale-dependent call rather than abs, which LLVM can fold into
+    // arithmetic even when a host binding with that spelling exists.
+    engine.bind("tolower",&fixture_twice);
+    for(bool optimized:{false,true}) {
+        auto code=engine.compile(process_module,"entry",optimized);
+        require(code->invoke(19)==38,"explicit native import lost precedence to process symbols");
+    }
     for (bool optimized : {false, true}) {
         auto code = engine.compile(vd::ir::architecture_proof(), "entry", optimized);
         require(code->invoke(0) == 42 && code->invoke(10) == 52 && code->invoke(-1) == 7, "JIT branch/call result");
