@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <set>
 #include <functional>
+#include <iterator>
 #include <bit>
 #include <limits>
 #include <stdexcept>

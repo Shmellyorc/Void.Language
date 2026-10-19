@@ -12948,3 +12948,36 @@ remain the approved later-delivery review work. No Delivery 1 owner decision or
 failing local check remains. No commits, pushes, branches, remote writes or hosted
 CI actions were performed. **STOPPED. Do not begin Delivery 2 without hosted
 acceptance and explicit owner authorization.**
+
+## 19 October 2026: Windows CI #71 missing iterator header repair
+
+Owner-reported Windows Debug and Release compilation failures at
+`8257237d3b2d984cb0b52537f90e20a52ef1e959` have the same cause:
+`src/ir/async_validation.inc:16` calls `std::inserter`, but its including
+translation unit did not explicitly include `<iterator>`. Clang-cl 19.1.7 with
+MSVC STL reports `no member named 'inserter' in namespace 'std'`. The local Linux
+build's transitive includes had masked this missing standard-header dependency.
+
+Added only `#include <iterator>` alongside the standard-library includes in
+`src/ir/module.cpp`. No standard header was added to the function-included
+fragment. IR validation logic, tests, sanitizer settings and constraints are
+unchanged.
+
+Focused Linux Debug verification passed:
+
+```sh
+cmake --build build/order1/production --target void_async_tests -j4
+ctest --test-dir build/order1/production -R '^async_ir$' --output-on-failure
+cmake --build build/order1/production --target void_tests -j4
+ctest --test-dir build/order1/production -R '^(core|async_ir)$' --output-on-failure
+git diff --check
+```
+
+Both build targets succeeded. The standalone async IR check passed 1/1; the final
+core/async IR regression run passed **2/2, 0.08 s**. Logs are
+`/tmp/void-ci71-focused-build.log`, `/tmp/void-ci71-focused-ir.log`,
+`/tmp/void-ci71-core-build.log` and `/tmp/void-ci71-ir-regressions.log`.
+No additional failure appeared, so no broader investigation or changes were made.
+Windows compilation is pending owner push and cross-platform verification; no
+local Windows success or Delivery 1 hosted lock is claimed. No commits, pushes,
+branches or CI actions were performed. STOPPED for owner verification.
