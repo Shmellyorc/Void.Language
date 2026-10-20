@@ -1,9 +1,8 @@
-func entry(value: i32) -> i32:
-    var fixed: [i32, 3] = [1, 2, 3]
-    var numbers: [i32] = [4, 5]
-    numbers.push(6)
-    var labels: {i32: i32} = {1: 10, 2: 20}
+func entry(latest_score: i32) -> i32:
+    var scores: [i32] = [10, 20]
+    scores.push(latest_score)
+
     var total = 0
-    for number in numbers:
-        total += number
-    return fixed[0] + total + labels.count as i32
+    for score in scores:
+        total += score
+    return total

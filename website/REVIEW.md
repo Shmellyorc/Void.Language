@@ -1,66 +1,61 @@
-# Owner review
+# Examples cleanup review
 
-## Scope
+Only `/website` was edited. Repository `/examples` and `/docs` remain unchanged.
+No compiler, runtime, CI, Git history, publication or Cloudflare changes.
 
-Only `/website` was edited. Existing `/docs` and `/examples` were read for
-accuracy; they were not modified. Compiler, Runtime, language/editor tests, CMake,
-LLVM integration and Git history were not changed. No publication was performed.
+## Changed teaching programs
 
-## Current deliverables
+| Example | Focus | Input → result |
+| --- | --- | --- |
+| Functions & recursion | Factorial and its base case | 5 → 120 |
+| Readable loops | Sum odd numbers through a limit | 5 → 9 |
+| Growable lists | Append a score, then total the list | 5 → 35 |
+| Generics | Return the larger of two typed values | 5 → 10 |
+| Properties | Compute a rectangle's area | 5 → 15 |
+| Events | Send one sensor reading to a display | 5 → 5 |
+| Scoped cleanup | Own an in-memory workspace with `with` | 5 → 10 |
+| Task groups | Wait for two scoped progress updates | 5 → 11 |
+| Parallel workers | Independently square two inputs | 5 → 61 |
 
-- Why VOID is now a substantial public explanation of the problems being solved:
-  everyday ceremony, readable native development, memory/resource responsibilities,
-  native integration boundaries, lost iteration state, source-first feedback,
-  portability and consistent rules. It explains the deliberate combination of
-  choices and the supplied Python/Go/Lua/PICO-8/GDScript/C# influences.
-- Implemented foundations, implemented subsets and future workflow goals are
-  distinguished. Automatic on-save reload, broad native loading and package
-  management are not represented as delivered features. No unmeasured performance
-  comparison or universal claim about other languages is made.
-- Documentation now has 30 public guides: eight foundations plus expanded coverage
-  of modules, generics, interfaces, receiver methods, properties, callable structs,
-  closures, events, cleanup, enum patterns, Unicode strings, nullable values,
-  composition, inheritance, initialization, dictionaries, async/await, structured
-  groups/cancellation, parallel workers, native integration, tooling and live
-  development. Category navigation uses native details disclosures.
-- The example browser offers 15 curated programs through a labeled native select,
-  with URL fragments, expected results, downloads, explanations and guide links.
-  Without JavaScript, all programs remain readable. Async adapter requirements
-  and the module example's supporting files are explained in place.
-- Working repository examples are copied unchanged where used. The small methods
-  guide adapts the existing geometry example into a complete program. Website
-  code blocks are checked against their downloadable sources.
-- Branding, source-only availability notice, original landscape recreation,
-  light/dark themes, static metadata, sitemap and Cloudflare files are retained.
-  Public pages contain no internal handoff/review language or Markdown doc links.
+The introductory panel now reuses the existing clear syntax example (10 → 52).
+Closures, value/reference behavior, results, basic async and modules were already
+small and relevant, and were preserved. The nine changed guides and their source
+links/explanations were synchronized. Duplicate factorial/loop downloads were
+consolidated into canonical website files. The existing visual design, native
+selector, fragment URLs, guide navigation and static architecture were preserved.
 
-## Validation
+## Verification
 
-Passed:
+- Content, links, anchors, source parity, metadata and static build passed.
+- Visible input/result pairs are now validated against the manifest as well as
+  against the actual downloadable source and result metadata.
+- `verify_examples.py build/ci-release/voidc --async-build build/ci-release` passed:
+  47 result checks, including focused edge cases, and six fresh async AOT builds.
+- Async source is emitted from the actual website downloads through the existing
+  explicit adapter in normal and optimized modes, linked against existing matching
+  runtime archives and executed. No stale fixture executables are substituted.
+- The manifest explicitly distinguishes independent teaching programs from retained
+  repository copies. Copy parity remains enforced for the latter; execution remains
+  mandatory for both. Missing async tools fail verification instead of skipping it.
 
-- `python3 website/scripts/check.py`: local and cross-page links/anchors, guide
-  source parity, required metadata/headings, branding and content boundaries.
-- `python3 website/scripts/verify_examples.py build/ci-release/voidc --async-artifacts build/order1/production`:
-  28 executions (25 synchronous website programs including an error-path case,
-  and three existing test-suite async AOT examples), three compiler async source
-  checks, and byte parity for unchanged repository copies. No compiler rebuild.
-- `python3 website/scripts/build.py`: isolated public deployment output.
-- In-app Chromium: all 30 guides checked at 390 and 1440 px, 60 layout checks with
-  correct headings/sidebar state and no horizontal document overflow.
-- All 15 dropdown options tested: exactly one corresponding panel visible and
-  the URL fragment updated correctly. A direct async fragment selected its panel.
-- Why VOID checked visually on desktop and mobile; async sidebar/current-topic
-  visibility verified on mobile. No warning/error logs observed in guide checks.
+- Browser checks: all 15 dropdown choices select one matching panel; the linked
+  function guide shows the canonical factorial program and result. Updated guide
+  pages were checked for heading/layout overflow. A final 871 px preview also had
+  no document overflow. Browser navigation timed out during two batches, so those
+  checks were resumed from the loaded pages rather than treated as passes.
+- Screenshot: `review/examples-cleanup.jpg`. The existing styles and dropdown
+  behavior were retained; no CSS or interaction code was changed for this cleanup.
+- A deliberately incorrect displayed result was rejected by the content checker;
+  the original page was restored before final validation/build.
 
-Review screenshots: `review/why-void-desktop.jpg`, `review/why-void.jpg` (full page),
-`review/why-void-mobile.jpg`, `review/guide.jpg`, `review/examples.jpg`.
+## Language boundaries
 
-## Remaining limitations
+- Async entry functions need the explicit async adapter; the synchronous CLI entry
+  adapter does not run them. The site does not add a new compiler command.
+- Factorial uses small non-negative i32 inputs; results beyond 12! wrap.
+- Cleanup intentionally models ownership in memory. It invents no file, buffer or
+  native-library API. Real external resources need their supported binding release.
+- Worker inputs remain within the implemented independent scalar/value subset.
 
-Guides introduce supported behavior; they are not an exhaustive formal reference.
-Native host bindings, async execution and future workflows have their stated
-boundaries. There are no public builds or promised release dates.
-
-Safari/Firefox, physical devices and a full assistive-technology audit were not
-performed. Publication, Cloudflare deployment, DNS/TLS/redirects and production
-header verification remain owner-controlled. Stopped for owner review.
+Public release/deployment and broader browser/assistive-technology testing remain
+outside this local website cleanup. Stopped for owner review.

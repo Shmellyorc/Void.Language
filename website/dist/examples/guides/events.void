@@ -1,23 +1,18 @@
-struct source:
-    event changed: func(i32)
-func (s source) fire(value: i32):
-    s.changed.emit(value)
-struct observer:
-    total: i32
-func (o observer) add(value: i32):
-    o.total += value
-func entry(value: i32) -> i32:
-    var s = source()
-    var seen = observer(total=0)
-    s.changed += seen.add
-    s.changed += seen.add
-    s.changed -= seen.add
-    s.fire(value)
-    var local = 0
-    var callback = func(n: i32):
-        local += n
-    s.changed += callback
-    s.fire(2)
-    s.changed -= callback
-    s.fire(3)
-    return seen.total * 10 + local
+struct sensor:
+    event measured: func(i32)
+
+func (source sensor) publish(reading: i32):
+    source.measured.emit(reading)
+
+struct display:
+    latest_reading: i32 = 0
+
+func (screen display) update(reading: i32):
+    screen.latest_reading = reading
+
+func entry(reading: i32) -> i32:
+    var source = sensor()
+    var screen = display()
+    source.measured += screen.update
+    source.publish(reading)
+    return screen.latest_reading

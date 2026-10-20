@@ -1,59 +1,77 @@
 # VOID Language website
 
-Self-contained static website. All work lives in `/website`; the compiler, Runtime,
-existing documentation, editor projects and tests are independent of this project.
-No npm packages, framework, backend, analytics or external fonts are used.
+Independent static HTML, CSS and JavaScript. All website sources and tooling live
+here; compiler sources, repository `/docs`, repository `/examples` and language
+regression tests are separate and must not be edited by website work.
 
-## Local preview
+## Preview and build
 
 From the repository root, with Python 3.9+:
 
 ```sh
 python3 website/scripts/check.py
-python3 -m http.server 4173 --bind 127.0.0.1 --directory website/public
+python3 website/scripts/build.py
+python3 -m http.server 4173 --bind 127.0.0.1 --directory website/dist
 ```
 
-Open http://127.0.0.1:4173. Stop with Ctrl+C.
+Open http://127.0.0.1:4173. Stop the server with Ctrl+C. The build copies only
+`website/public` into the ignored `website/dist` directory. No npm, framework,
+backend, database, analytics or external fonts are required.
 
-## Build
+## Example maintenance
+
+Website examples teach a focused idea and are maintained independently of compiler
+regression fixtures. Keep helpful small examples; remove assertions and operations
+that exist only to test compiler behavior when adapting a fixture for readers.
+
+- `public/examples/index.html`: curated dropdown, explanations and source downloads.
+- `public/examples/*.void` and `public/examples/guides/`: downloadable programs.
+- `public/docs/*/index.html`: guides using the same canonical downloadable sources.
+- `scripts/guide-examples.json`: primary input/result, additional cases, async mode
+  and an explicit `teaching` or `repository-copy` maintenance policy.
+
+A `teaching` program is website-owned; do not require it to match a regression
+fixture. A `repository-copy` retains exact byte parity with its recorded source.
+Every displayed program must match its download. Displayed inputs/results and
+result metadata must agree with the manifest. `check.py` enforces these checks,
+links, anchors, metadata, branding and public-content boundaries.
+
+The factorial and loop guides share their canonical files at
+`public/examples/functions.void` and `public/examples/loops.void`. No duplicate
+copies of those programs are maintained under `guides/`.
+
+To compile and execute all programs with existing local builds:
 
 ```sh
-python3 website/scripts/check.py
-python3 website/scripts/build.py
+python3 website/scripts/verify_examples.py build/ci-release/voidc --async-build build/ci-release
 ```
 
-The build copies only `website/public/` into `website/dist/`. The output is ignored
-by the repository's existing `dist/` rule. No compiler build is involved. To preview
-that exact output, change the server's directory argument to `website/dist`.
-The Python scripts use only the standard library. Python is a development/build
-tool; the deployed website needs only a static file host.
+Select a current compatible build for your checkout. Async validation uses the
+existing `void_async_tests --emit` adapter and matching runtime archives from the
+selected directory. It freshly emits each exact website source in normal and
+optimized LLVM modes, links with `clang++-19` (override using `--cxx`), and executes
+its documented cases. All generated objects/executables live in an automatically
+removed temporary directory. No compiler/runtime rebuild or modification occurs.
+Existing fixture executables cannot validate independently authored website code
+and are not reused. Missing async tooling fails verification instead of silently
+skipping execution. Website deployment does not require compiler binaries.
 
-## Files
+## Public content
 
-- `public/index.html`: home page, roadmap, semantic HTML and metadata.
-- `public/{why-void,features,examples,docs,getting-started}/index.html`: separate
-  content pages with shared styles, navigation and accessible theme controls.
-- `public/assets/`: CSS, progressive JavaScript, original SVG mark, optimized reference-based landscape and
-  a 1200×630 PNG social preview.
-- `public/docs/*/index.html`: 30 public language guides with sidebar navigation,
-  complete examples, explanations and expected results.
-- `public/examples/`: three introductory repository examples and 27 guide programs.
-- `public/404.html`, `robots.txt`, `sitemap.xml`, `_headers`: static hosting files.
-- `scripts/`: small validation and copy-build scripts.
-- `REVIEW.md`: content sources, validation evidence and owner review items.
+The site contains 30 guides and 15 curated examples. Navigation and guides work
+without JavaScript; all examples remain readable when the selector enhancement
+is unavailable. JavaScript supplies the menu, locally saved theme and dropdown.
+Public pages do not expose internal workflow language or substitute Markdown
+links for explanations. Keep implemented behavior distinct from future design.
 
-The original generated landscape and its built-in image_gen prompt are retained
-in `artwork/`; only the optimized WebP is deployed.
-
-Navigation, documentation links and native details disclosures work without
-JavaScript. JavaScript enables the mobile menu, theme selection (saved locally
-when storage is available) and current-page navigation highlighting. A system
-dark preference is respected until a visitor chooses a theme. No data is sent.
+The cleanup example is an in-memory model of scoped ownership, not a claim that a
+filesystem/native-resource API exists. Async programs require the explicit async
+host adapter; the ordinary synchronous CLI entry adapter does not run them.
+Factorial demonstrates small non-negative inputs; i32 results beyond 12! wrap.
 
 ## Cloudflare Pages — owner deployment only
 
-No project, domain, DNS, Git or publication changes have been made.
-After owner review, create a Pages project connected to this repository with:
+No deployment, DNS, Git publication or Cloudflare changes have been performed.
 
 | Setting | Value |
 | --- | --- |
@@ -63,84 +81,20 @@ After owner review, create a Pages project connected to this repository with:
 | Build command | `python3 scripts/check.py && python3 scripts/build.py` |
 | Build output directory | `dist` |
 
-Use a Pages build image providing Python 3.9+. The validation script reads the
-repository's sibling `examples` directory; use a full repository
-checkout. If using a prebuilt Direct Upload instead, build locally and upload
-only the contents of `website/dist`, never the entire repository.
-
-These settings follow Cloudflare's [static HTML guide](https://developers.cloudflare.com/pages/framework-guides/deploy-anything/)
+Use a Python 3.9+ build environment with the full repository checkout for retained
+source-copy checks. Alternatively build locally and upload only `website/dist`.
+See Cloudflare's [static HTML guide](https://developers.cloudflare.com/pages/framework-guides/deploy-anything/)
 and [build configuration guide](https://developers.cloudflare.com/pages/configuration/build-configuration/).
 
-After the owner approves deployment:
+After owner approval, add `voidlang.com` through Pages Custom domains. An apex must
+be a Cloudflare zone in the same account. Configure `voidlang.net` as an
+owner-controlled permanent redirect to the primary domain, preserving paths and
+queries. Follow the [custom domain guide](https://developers.cloudflare.com/pages/configuration/custom-domains/)
+and [domain redirect example](https://developers.cloudflare.com/pages/how-to/www-redirect/).
+Verify HTTPS, actual redirect responses, assets, 404 and `_headers` behavior after
+deployment. Python's preview server does not interpret Cloudflare headers or
+production 404 routing. Canonical/social URLs and sitemap use `voidlang.com`.
 
-1. Check the Pages preview, navigation, asset responses and 404 behavior.
-2. In the Pages project's **Custom domains**, add `voidlang.com`. An apex domain
-   must be a Cloudflare zone in the same account; follow the dashboard's DNS and
-   certificate steps. See [custom domains](https://developers.cloudflare.com/pages/configuration/custom-domains/).
-3. Add `voidlang.net` through the owner-controlled domain setup. Use Cloudflare
-   Bulk Redirects to issue a permanent redirect from that host to
-   `https://voidlang.com`, preserving paths and query strings. Configure `www`
-   hostnames only if desired. See the [domain redirect example](https://developers.cloudflare.com/pages/how-to/www-redirect/).
-4. Verify HTTPS on both domains and the actual redirect response. The canonical,
-   sitemap and social URLs already use `https://voidlang.com`.
-5. Decide whether the production `pages.dev` hostname should redirect to the
-   primary domain; preserve preview deployment access as appropriate.
-
-`_headers` supplies self-only resource loading, nosniff and frame restrictions on
-Cloudflare Pages. The Python preview server does not interpret `_headers` or
-provide production 404 behavior. Cloudflare/DNS/HTTPS behavior must be checked by
-the owner after deployment. There are no Functions, routing rewrites or SPA fallback.
-
-## Content updates
-
-Check the actual compiler contracts before changing claims. The Language Bible
-includes future design; do not treat every example as executable. Pages contain
-public explanations and guides written for language users. Internal handoffs and
-workflow language must stay out of `public/`.
-When upstream examples change, update the corresponding downloads and displayed
-code together, rerun `check.py`, and execute the examples with a current `voidc`.
-No public installer, package manager, performance benchmark, license grant or
-release date is promised. The SVG mark is an original approximation of the mockup
-and needs owner branding approval before publication.
-
-## Guide example verification
-
-`python3 website/scripts/check.py` also verifies that displayed guide source
-matches each downloadable program. `scripts/guide-examples.json` records the
-input and expected result for each guide; execute these with a current compiler
-when changing examples. The verified local compiler for this revision was
-`build/ci-release/voidc`. Public documentation contains no installation claims
-or links that require readers to open internal Markdown files.
-
-To repeat the executable guide checks from the repository root:
-
-```sh
-python3 website/scripts/verify_examples.py build/ci-release/voidc
-```
-
-Choose a current compiler path for your checkout; an older architecture-only
-binary cannot validate the current language features. This check is optional for
-website deployment and never builds or modifies the compiler.
-
-## Expanded content
-
-Why VOID explains the problems, design choices, influences and current/future
-boundaries. The public documentation covers foundations, data and behavior,
-concurrency, native integration, editor tooling and live development.
-The examples page offers a native dropdown with 15 curated programs, direct
-fragment links, downloads and guide links. Without JavaScript all examples remain
-readable. Public content does not send visitors to internal Markdown files.
-
-Repository examples are working test-suite programs. The website preserves its
-copies and checks its own displayed code, expected results and links. Async
-programs use the existing explicit async adapter; that execution requirement is
-shown rather than presenting them as synchronous CLI programs.
-
-To also rerun the existing async AOT examples without building anything:
-
-```sh
-python3 website/scripts/verify_examples.py build/ci-release/voidc --async-artifacts build/order1/production
-```
-
-Both binary paths refer to existing local builds; choose matching paths for your
-checkout. Website deployment needs neither the compiler nor these artifacts.
+Original background artwork and its generation prompt remain in `artwork/`; only
+optimized WebP assets deploy. `review/` and `REVIEW.md` contain private verification
+notes/screenshots and are excluded from output.

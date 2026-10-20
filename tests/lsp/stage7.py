@@ -14,9 +14,10 @@ def init(c, safe=False):
     c.notify('initialized',{});c.sync();return result
 with tempfile.TemporaryDirectory(prefix='VOID Stage7 é😀 ') as directory:
     root=pathlib.Path(directory);entry=root/'main.void';worker=root/'worker.void'
-    worker.write_text('func calculate(x: i32, y: i32) -> i32:\n    return x + y\n')
+    # Byte writes preserve UTF-8 and LF offsets on every platform.
+    worker.write_bytes('func calculate(x: i32, y: i32) -> i32:\n    return x + y\n'.encode("utf-8"))
     text='# é😀\nuse "/worker.void" as worker\nfunc entry(x: i32) -> i32:\n    var value = x\n    return worker.calculate(value, x)\n'
-    entry.write_text(text)
+    entry.write_bytes(text.encode("utf-8"))
     with Client(server,entry) as c:
         init(c,True);uri=entry.as_uri();version=1
         def settext(new):
@@ -63,8 +64,8 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage7 é😀 ') as directory:
         assert c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':0,'character':7},'newName':'return'})[0]['error']['code']==-32602
         # Legal source rebinding/conflicts are rejected; server writes no files.
         assert c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':0,'character':7},'newName':'entry'})[0]['error']['code']==-32602
-        assert worker.read_text().startswith('func calculate')
-        worker.write_text('func calculate(x: i32, y: i32) -> i32:\n    return x - y\n')
+        assert worker.read_text(encoding="utf-8").startswith('func calculate')
+        worker.write_bytes('func calculate(x: i32, y: i32) -> i32:\n    return x - y\n'.encode("utf-8"))
         assert c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':0,'character':7},'newName':'compute'})[0]['error']['code']==-32602
         c.request('void/refreshProject',{})
         # Disk refresh preserves a dirty overlay, including errors.
@@ -104,7 +105,7 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage7 é😀 ') as directory:
         init(c,False);assert c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':0,'character':7},'newName':'other'})[0]['error']['code']==-32602;c.shutdown()
     types='value struct point:\n    count: i32\nfunc (p point) init(first: i32 = 1, second: i32 = 2):\n    p.count = first + second\nfunc (p point) change(value: i32):\n    p.count = value\n'
     valid=types+'func entry(x: i32) -> i32:\n    const p = point(second=x, first=x)\n    return p.count\n'
-    entry.write_text(valid)
+    entry.write_bytes(valid.encode("utf-8"))
     with Client(server,entry) as c:
         init(c,True)
         result=c.request('textDocument/signatureHelp',{'textDocument':{'uri':entry.as_uri()},'position':at(valid,'second=x',len('second='))})[0]['result']
@@ -119,7 +120,7 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage7 é😀 ') as directory:
             result=c.request('textDocument/completion',{'textDocument':{'uri':entry.as_uri()},'position':at(edited,needle,len(needle))})[0]['result'];labels={x['label'] for x in result}
             assert expected<=labels and not excluded&labels,(labels,expected)
         c.shutdown()
-    entry.write_text('const amount = 4\nfunc entry(x: i32) -> i32:\n    return x + amount\n')
+    entry.write_bytes('const amount = 4\nfunc entry(x: i32) -> i32:\n    return x + amount\n'.encode("utf-8"))
     with Client(server,entry) as c:
         init(c,True)
         result=c.request('textDocument/rename',{'textDocument':{'uri':entry.as_uri()},'position':{'line':0,'character':7},'newName':'bonus'})[0]['result']

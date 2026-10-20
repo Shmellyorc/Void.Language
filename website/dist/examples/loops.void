@@ -1,14 +1,8 @@
-# Conditional and unbounded loops, local mutation and loop exits.
+# Add the odd numbers from 1 through the limit.
 func entry(limit: i32) -> i32:
-    var total: i32
-    var index = 0
-    for index < limit:
-        index++
-        if index % 2 == 0:
-            continue
-        total += index
-    for:
-        if total >= 20:
-            break
-        total += 3
+    var total = 0
+    var number = 1
+    for number <= limit:
+        total += number
+        number += 2
     return total

@@ -13689,3 +13689,23 @@ No commit, push, branch/remote mutation, publication or hosted CI action occurre
 Original HEAD remains `4139297f92c195782f59a28546444e6b3bec4ad8`.
 **STOPPED for Wrench review and Boss-controlled commit/push/seven-job hosted CI.
 Stage 7 is not locked.**
+
+## 20 October 2026 — CI #79 Windows Stage 7 fixture encoding repair
+
+Windows Release passed 139/140 suites; `lsp_stage7` failed before starting its
+client because default CP1252 text output cannot encode the Unicode fixture.
+Read-only review of completed Windows Debug job 118629041717 confirms the same
+`stage7.py:19` UnicodeEncodeError and 139/140 result; no additional failed suite.
+Changed all five fixture `write_text` calls in `tests/lsp/stage7.py` to explicit
+UTF-8 byte writes, preserving LF bytes/offsets on Windows. The corresponding text
+read now specifies UTF-8; the existing byte restoration and Unicode coverage stay.
+No compiler/LSP production code changed.
+
+Focused checks passed: `ctest --test-dir build/ci-release --output-on-failure -R
+'^lsp_stage7$'` (1/1, 0.14 s), the same selection in `build/order1/production`
+(1/1, 0.19 s), and the complete Stage 7 script with default-encoding warnings
+and Python UTF-8 mode disabled. An instrumented full-script run rejected implicit
+text writes/reads and checked all six byte writes (including restore) for UTF-8
+round-trip and LF-only bytes. `git diff --check` passed. These are Linux checks;
+the repair awaits Boss commit/push and Windows hosted revalidation. No Git
+mutation or hosted dispatch occurred; unrelated website work was preserved.

@@ -1,27 +1,12 @@
-struct log:
-    values: [i32]
+# An in-memory model of a workspace with scope-owned cleanup.
+struct temporary_workspace:
+    item_count: i32
 
-struct resource:
-    log: log
-    id: i32
+func (workspace temporary_workspace) deinit():
+    workspace.item_count = 0
 
-func (r resource) deinit():
-    r.log.values.push(r.id)
-
-func work(l: log, value: i32) -> result<i32, i32>:
-    with resource(log=l, id=value) as r:
-        defer l.values.push(99)
-        if value == 0:
-            return Err(-1)
-        l.values.push(10)
-    l.values.push(20)
-    return Ok(3)
-
-func entry(value: i32) -> i32:
-    var l = log(values=[])
-    var result = work(l, value)
-    var r = resource(log=l, id=50)
-    var alias = r
-    r.deinit()
-    alias.deinit()
-    return l.values[0] + l.values[1] + l.values[2] + l.values[3] + l.values[4]
+func entry(item_count: i32) -> i32:
+    var processed = 0
+    with temporary_workspace(item_count = item_count) as workspace:
+        processed = workspace.item_count * 2
+    return processed

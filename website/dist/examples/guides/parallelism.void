@@ -1,57 +1,7 @@
-value struct packet:
-    numbers: [i32, 2]
-    text: string = ""
+func square(number: i32) -> i32:
+    return number * number
 
-struct private_state:
-    number: i32 = 0
-
-func calculate(value: packet) -> result<packet, string>:
-    var local = private_state(number = value.numbers[0])
-    var copy = value
-    copy.numbers[0] = local.number + 10
-    copy.text = value.text + "!"
-    return Ok(copy)
-
-func identity(value: i32) -> i32:
-    var sum = 0
-    for i in 0..<value:
-        sum += 1
-    return sum
-
-struct counter:
-    number: i32 = 0
-
-func next(owner: counter) -> i32:
-    owner.number += 1
-    return owner.number
-
-func pair(first: i32, second: i32) -> i32:
-    return first * 10 + second
-
-func noop(value: i32):
-    var local = private_state(number = value)
-
-async func entry(value: i32) -> i32:
-    var no_result = spawn noop(value)
-    await no_result
-    await no_result
-    var owner = counter()
-    var order = spawn pair(next(owner), next(owner))
-    if await order != 12 or owner.number != 2:
-        return -1000
-    var original = packet(text = "immutable")
-    original.numbers[0] = value
-    var pending = spawn calculate(original)
-    original.numbers[0] = 100
-    var result = await pending
-    var answer = match result:
-        Ok(var item): match item.text == "immutable!":
-            true: item.numbers[0]
-            false: -1000
-        Err(_): -1000
-    with tasks.group() as jobs:
-        var first = spawn identity(4)
-        with tasks.group() as nested:
-            var second = spawn identity(5)
-            answer += await first + await second
-    return answer + original.numbers[0]
+async func entry(number: i32) -> i32:
+    var first = spawn square(number)
+    var second = spawn square(number + 1)
+    return await first + await second
