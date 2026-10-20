@@ -2,6 +2,15 @@
 
 **Implementation versus design:** See the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). This Bible preserves future design as well as implemented contracts; examples are not all executable language features.
 
+**Stage 6 Delivery 4 implemented subset:** Explicit host opt-in to one trusted,
+statically linked C fixture, typed project-local descriptors and ordinary `.void`
+wrappers now use the existing frontend/IR/LLVM/Runtime. Exact-width scalars, owned
+UTF-8 transfers, opaque managed resources and quiescent leased callbacks are
+implemented; see [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md). General-purpose native
+syntax/loading and package management remain proposed. Delivery 3 is hosted-locked
+at `62b17c8c`, CI #75; Delivery 4 passed local 131/131 suites in Debug, Release
+and strict sanitizers; owner review and hosted verification remain pending.
+
 **Status:** Living language design and implementation reference. Approved subsets are implemented; later proposals and examples are not all executable.  
 **Design snapshot:** 10 October 2026  
 **Implementation reconciliation:** 16 October 2026. Read the approved phase documents for the exact implemented boundaries; old OPEN/RECOMMENDED labels must not undo later owner decisions.  

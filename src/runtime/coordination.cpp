@@ -1,4 +1,6 @@
 #include "void/runtime.hpp"
+#include "void/native_runtime.hpp"
+#include "void/callback.hpp"
 #include "void/utf8.hpp"
 #include <algorithm>
 #include <cstring>
@@ -10,6 +12,7 @@ namespace vd {
 thread_local Runtime* Runtime::current_runtime_ = nullptr;
 thread_local Runtime::Thread* Runtime::current_thread_ = nullptr;
 Runtime::~Runtime() {
+    close();
     if (!threads_.empty() || !handles_.empty() || requested_ || callbacks_ || async_owner_!=std::thread::id{}) std::terminate();
 }
 Runtime::Thread& Runtime::thread() const {
@@ -266,10 +269,10 @@ unsigned Runtime::async_worker_limit() const {std::lock_guard lock(mutex_);retur
 bool Runtime::enter_async(){require_managed();std::lock_guard lock(mutex_);if(async_owner_!=std::thread::id{} || closing_)return false;async_owner_=std::this_thread::get_id();return true;}
 void Runtime::leave_async() noexcept {std::lock_guard lock(mutex_);if(async_owner_!=std::this_thread::get_id())std::terminate();async_owner_={};}
 void Runtime::close() {
+    if(CallbackRegistration::active_on(*this))throw std::logic_error("Runtime cannot quiesce its own callback");
     if (current_runtime_ == this && thread().state == State::managed) throw std::logic_error("close requires NativeSafe state");
-    std::lock_guard lock(mutex_);
-    closing_ = true;
-    changed_.notify_all();
+    {std::lock_guard lock(mutex_);closing_ = true;changed_.notify_all();}
+    native_shutdown(*this);
 }
 Runtime::Frame::Frame(Runtime& r, const Slot* slots, std::size_t count)
     : runtime_(r), previous_(nullptr), slots_(slots), count_(count) {

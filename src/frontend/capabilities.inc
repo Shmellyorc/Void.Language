@@ -29,6 +29,11 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
     };
     auto run=[&](Unit& unit,Function& f,bool report,bool requirements) {
         if(f.interface_requirement) return false;
+        if(!f.native_symbol.empty()){
+            graph[f.symbol].unsafe=true;
+            for(unsigned n=0;n<f.parameters.size();++n)for(const auto& [path,fact]:ir::formal_facts(f.parameters[n].type,n))for(const auto& origin:fact.origins){f.reference_effects.mutations.insert(origin);f.reference_effects.retained.insert(origin);}
+            f.capability_contract="native:"+f.native_symbol;return false;
+        }
         bool changed=false,local_changed=false;
         if(f.receiver && f.token.text=="deinit"){changed|=f.reference_effects.mutations.insert(ir::ReferenceOrigin{0,{}}).second;if(!f.receiver_mutates){f.receiver_mutates=true;changed=true;}}
         std::vector<ReferenceFacts> locals(f.locals.size());
@@ -190,7 +195,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 retain(facts,profile,e.token);
             } else if(e.kind==K::function_reference) {
                 std::vector<ReferenceFacts> arguments;for(auto& part:e.parts)arguments.push_back(expression(*part));
-                auto& target=*functions.at(e.target);
+                auto& target=*functions.at(e.target);if(!target.native_symbol.empty())issue(e.token,"Native bindings cannot escape as function values.");
                 if(e.op=="value_bound"){
                     auto field=ir::field_type(e.environment,0);auto combined=ir::reference_facts(field);ir::join_facts(combined,arguments[0]);auto profile=ir::fact_type(field,combined);if(ir::capability_key(field)!=ir::capability_key(profile)){std::const_pointer_cast<ir::ValueType>(e.environment.definition)->fields[0].type=profile;changed=true;}retain(arguments[0],profile,e.token);arguments={ir::reference_facts(e.environment)};
                 }
@@ -487,7 +492,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             contract+="S["; for(auto field:path) contract+=std::to_string(field)+","; contract+=fact.readonly ? "]C" : "]V";
             for(const auto& value:fact.origins) contract+=origin(value);
         }
-        f.capability_contract=std::move(contract);
+        f.capability_contract=std::move(contract)+(f.native_symbol.empty()?"":"|native:"+f.native_symbol);
     }
     for(const auto& [name,edges]:graph)for(auto* spawn:edges.spawns){
         std::set<std::string> seen;std::vector<std::string> pending{spawn->parts[0]->target};

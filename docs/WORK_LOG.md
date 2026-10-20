@@ -13225,3 +13225,117 @@ not delivered. These restrictions match the approved initial scope.
 **Next action belongs to Boss/Wrench:** review Delivery 3; owner commit/push and
 seven-job hosted CI; lock only when green. Deliveries 4–5 remain unauthorized.
 No commits, pushes, branches, remote modifications or hosted actions occurred.
+
+
+## 19 October 2026 — Delivery 4 baseline / bounded native authorization
+
+HEAD verified clean at `62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090`. Owner confirms
+Delivery 3 CI #75, seven green jobs, 120/120 each (840/840). Delivery 4 authorizes
+one statically linked trusted C fixture with typed project-local descriptors and
+normal source wrappers; no public native grammar or general FFI. Research reuses
+CallbackRegistration's provider barrier, precise Handle roots, NativeSafe boundaries
+and generation leases. Runtime-native resource ownership must remain separate from
+GC cleanup. Callback leases must not create a Runtime → generation → compiler →
+Runtime ownership cycle. Implementation and acceptance pending; no Git/remote writes.
+
+## 19 October 2026 — Delivery 4 implementation and focused evidence
+
+Implemented an explicitly authorized project descriptor for the real statically
+compiled `src/native/fixture.c`, ordinary `examples/native/*.void` wrappers and
+one existing typed-IR/LLVM JIT/AOT path. The host supplies the verified virtual
+binding header; no CLI/LSP auto-admission, public native grammar, symbol discovery,
+dynamic loading or worker/native relaxation was added. Descriptor signatures,
+compiled symbol identity and affinity/blocking/callback metadata fail closed.
+
+The C++ compiled bridge applies the actual target C ABI for exact-width integer,
+float and bool prototypes. LLVM's private transport carries only scalar bits and
+pointers. UTF-8 terminated temporaries reject NUL; length-aware/returned/retained
+bytes preserve it. Native storage is represented by nonforgeable managed identities
+in a Runtime registry; native pointers never enter source fields. Existing result,
+one-shot deinit and with release deterministically; GC never runs a native finalizer.
+
+Native callback registrations reuse CallbackRegistration, real C register/unregister,
+provider reservation/quiescence, captured precise roots and an exact generation
+lease. Initial callback registration requires direct named/literal/bound creation;
+forwarded callable values diagnose because existing callable discriminators have
+no generation token. Resource calls are owner-thread only; blocking calls and
+foreign dispatch/join are NativeSafe. Shutdown drains even reserved pre-admission
+callbacks and serializes concurrent native shutdown calls. Registry/provider locks
+are released before source execution, root release and native-code retirement.
+
+Two lifetime hazards identified and corrected: retaining a generation through the
+compiler Impl would form Runtime → callback → generation → Impl → Runtime, so
+generations now retain the existing shared ORC engine/counter directly. Mutable
+thread-local failure scratch could be overwritten/freed by a failing defer while
+its primary error was still borrowed; native failures now have invocation-owned,
+bounded diagnostics, copied before a callback lease ends and exported for AOT.
+A permanent native primary-plus-cleanup failure program verifies preservation.
+
+Focused Debug evidence: `native_source` and main/cleanup-failure normal/O2 AOT
+passed 5/5 (`/tmp/d4-focus4.log`). Expanded `native_source` then passed in 9.36s
+(`/tmp/d4-nativefinal.log`), including real C callback snapshots, cache cold/hit,
+callback self-drain and foreign affinity rejection. Other permanent cases cover
+all scalar widths, UTF-8/NUL, acquisition failure, retained/returned ownership,
+checked close failures, allocation sweeps, foreign callback allocation/GC,
+pre-admission provider teardown, forged source/IR, descriptor ABI/symbol mismatch,
+lease retention/reload and shutdown. Consolidated acceptance is running; results
+will be recorded below. Historical entries remain unchanged.
+
+Final source was frozen after adding serialized native shutdown, explicit standard
+header coverage and independent value-owner/task-transfer/worker-native rejection
+cases. Preparation transcripts are retained as `*-prepare-build.log` and
+`*-prepare-ctest.log`; each configuration refreshes the native Runtime object and
+runs the complete matrix on that frozen source. Final Debug passed **131/131**
+(301.16s); final Release passed **131/131** (129.35s), including the new source/IR
+negatives. Both passed their 1 MiB semantic checks, eight normal/O2 native AOT
+stack checks and explicit native-host execution (`19`). Editor `npm test` passed
+(1/1); `npm run package` produced the VSIX. Strict final refresh/acceptance remains
+in progress; it uses ASan/leak exit 87 and UBSan exit 86 with halt-on-error, outside
+tracing. No sanitizer or existing assertion was disabled.
+
+
+## 19 October 2026 — Delivery 4 complete local acceptance / owner handoff
+
+The frozen implementation passed the consolidated final matrix:
+
+| Configuration | Suites | CTest elapsed |
+| --- | --- | --- |
+| Debug | 131/131 | 301.16 sec |
+| Release | 131/131 | 129.35 sec |
+| Strict | 131/131 | 268.49 sec |
+
+**393/393 suites passed**, preserving every original 120-suite configuration.
+Strict acceptance retained ASan, UBSan (including host-generated callback function
+metadata), leak checking and checked failure exits; both build and execution ran
+outside tracing. The earlier preparation transcripts are superseded by these
+refreshed final builds and tests, including the final native Runtime object.
+
+Each configuration also passed the existing 1 MiB semantic-depth checks and eight
+1 MiB independent native AOT runs: async large/lifecycle_resources/spawn and the
+new native main, normal/O2 (**24/24 total**). All three explicit native example
+hosts printed `19`. Editor `npm test` passed (1/1); `npm run package` produced
+`editors/vscode/dist/void-language-0.1.0.vsix`. `git diff --check` passed.
+No unresolved local test/sanitizer failure remains. Cross-platform hosted results
+are pending; no Windows/macOS success is inferred from these Linux results.
+
+Deliverables: the compiled C fixture/bridge and typed project descriptor, existing
+frontend/IR/LLVM lowering and Runtime ownership changes, real ordinary VOID
+wrappers/programs, permanent positive/negative source/IR/JIT/AOT regressions and
+updated NATIVE_LIBRARIES/ASYNC/STAGE6_PROPOSAL/WRENCH_CLANKER/canonical strategy,
+Bible, GC runtime and known-issue documentation. Evidence is retained under
+`build/stage6-delivery4/`: final `*-build.log`, `*-ctest.log`, semantic/AOT stack,
+host, editor/package and focused native transcripts; preparation logs remain too.
+
+Known boundaries remain explicit: one trusted static fixture, host opt-in instead
+of automatic CLI/LSP admission, direct/literal/bound generation-local callback
+creation, one-shot registration, owner-thread resource calls, no resource task
+transfer or worker/native effects. General native syntax/loading/packages and
+broader callable/library ownership require future review. GC does not free native
+resources; omitted deterministic release retains them until Runtime shutdown.
+
+**STOPPED. Next action: Boss/Wrench review; owner commit/push and seven-job hosted
+CI; lock Delivery 4 only when green.** Hosted baseline remains Delivery 3 at
+`62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090`, owner-confirmed CI #75 (840/840).
+Delivery 5 was not begun and requires separate owner authorization after that
+hosted gate. No commits, pushes, branches, remote modifications or hosted actions
+were performed.

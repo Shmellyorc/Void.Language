@@ -43,6 +43,7 @@ public:
         }
         return success;
     }
+    static bool active_on(const Runtime&) noexcept;
     void close(); // NativeSafe/unattached; rejects self-drain without closing.
 private:
     struct Active { CallbackRegistration* registration; Active* previous; };

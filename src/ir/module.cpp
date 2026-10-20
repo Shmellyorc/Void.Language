@@ -1,4 +1,5 @@
 #include "void/ir.hpp"
+#include "void/native_binding.hpp"
 #include "void/numeric.hpp"
 #include "void/reference_capabilities.hpp"
 #include <map>
@@ -135,7 +136,7 @@ bool worker_transfer_safe(Type root) {
 }
 bool async_boundary_safe(Type root) {
     std::vector<Type> pending{root};std::set<const ValueType*> seen;
-    while(!pending.empty()){auto t=pending.back();pending.pop_back();if(t.construction || t.kind==Type::prepared_receiver)return false;if(!t.definition || !seen.insert(t.definition.get()).second)continue;if(t.definition->callable)return false;if(t.definition->element)pending.push_back(*t.definition->element);for(const auto& field:t.definition->fields)pending.push_back(field.type);}
+    while(!pending.empty()){auto t=pending.back();pending.pop_back();if(t.construction || t.kind==Type::prepared_receiver)return false;if(!t.definition || !seen.insert(t.definition.get()).second)continue;if(t.definition->callable || t.definition->native_resource)return false;if(t.definition->element)pending.push_back(*t.definition->element);for(const auto& field:t.definition->fields)pending.push_back(field.type);}
     return true;
 }
 bool requires_initialization(Type t){return !t.nullable && (reference_value(t) || (t.definition && (t.definition->callable || !t.definition->cases.empty())));}
@@ -363,6 +364,7 @@ std::vector<VirtualTarget> virtual_targets(const Module& module,const Function& 
 #include "reference_capabilities.inc"
 #include "fixed_ownership.inc"
 void validate(const Module& m, InstructionTypes* results,std::map<std::string,ReferenceEffects>* verified_effects) {
+    for(const auto& symbol:m.imports)if(symbol.starts_with("vd_native_fixture_call"))throw std::invalid_argument("VOID IR: native bridge requires its verified typed descriptor");
     if (results) results->clear();
     InstructionTypes qualified_types;
     auto fail = [](const std::string& text) { throw std::invalid_argument("VOID IR: " + text); };
@@ -444,6 +446,8 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             }
             if (!t.definition || t.definition->identity.empty() || t.definition->identity.find('\0')!=std::string::npos || t.definition->name.empty()) fail("missing value type identity");
             auto* d=t.definition.get();
+            if(auto base=d->base.lock();base && base->native_resource)fail("native resource cannot be extended");
+            if(d->native_resource && (m.native_library!="void.fixture.v1" || t.kind!=Type::managed_ref || !d->managed || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::u64 || d->callable || !d->base.expired() || !d->cases.empty() || d->interface_type))fail("invalid native resource identity");
             if(d->task_result){
                 auto r=Type(*d->task_result);if(t.kind!=Type::managed_ref || !d->managed || d->callable || d->interface_type || !d->base.expired() || !d->cases.empty() || d->result_type || d->element || d->extent || d->fields.size()!=2 || Type(d->fields[0].type)!=Type::i32 || (Type(d->fields[1].type)!=(r==Type::none?Type::boolean:r) || capability_key(d->fields[1].type)!=capability_key(r==Type::none?Type::boolean:r)) || d->identity!="$task:"+std::to_string(r.kind)+":"+Type::key(r)+(r.nullable?"?":"")+":"+capability_key(r))fail("invalid task handle shape");
             }
@@ -697,6 +701,13 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 }
                 case Op::gc_release:
                     if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable || operand(i.a).construction)fail("invalid deterministic release");result=Type::boolean;break;
+                case Op::native_call: {
+                    valid_type(i.type);
+                    std::vector<Type> parameters;for(auto value:i.arguments)parameters.push_back(operand(value));
+                    if(!m.coordinated || m.native_library!="void.fixture.v1" || i.receiver || !native_signature(i.callee,parameters,i.type))fail("invalid native ABI/call/publication");
+                    if(i.callee=="vd_native_fixture_call#register" && b.instructions[i.arguments[1]].op!=Op::function_reference)fail("native callback lacks generation-local provenance");
+                    result=i.type;break;
+                }
                 case Op::gc_alive:
                     if (!m.coordinated || (operand(i.a).kind != Type::managed_ref || operand(i.a).construction)) fail("invalid managed inspection");
                     result = Type::boolean; break;
@@ -940,6 +951,8 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 }
                 default: fail("unknown operation");
                 }
+                if((i.op==Op::gc_construct || i.op==Op::gc_allocate || i.op==Op::stage_begin) && i.type.definition && i.type.definition->native_resource)fail("forged native resource");
+                if((i.op==Op::gc_read || i.op==Op::gc_write || i.op==Op::extract || i.op==Op::insert) && operand(i.a).definition && operand(i.a).definition->native_resource)fail("native resource payload access");
                 bool pure=i.op==Op::constant || i.op==Op::string_literal || i.op==Op::function_null || (i.op==Op::function_reference && i.arguments.empty());
                 if(i.op==Op::sum || i.op==Op::aggregate || i.op==Op::fixed_array || i.op==Op::dict_new) {
                     pure=true;
@@ -992,7 +1005,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             for(const auto& block:f->blocks)for(const auto& i:block.instructions){
                 switch(i.op){
                 case Op::async_drain:if(f!=&worker)fail("worker task operation");break;
-                case Op::async_call:case Op::async_cancel:case Op::async_cancel_children:case Op::async_group_enter:case Op::async_group_join:case Op::await:case Op::function_call:case Op::interface_call:case Op::virtual_call:fail("unsupported worker task/indirect effect");break;
+                case Op::native_call:case Op::async_call:case Op::async_cancel:case Op::async_cancel_children:case Op::async_group_enter:case Op::async_group_join:case Op::await:case Op::function_call:case Op::interface_call:case Op::virtual_call:fail("unsupported worker task/indirect effect");break;
                 case Op::call:case Op::base_init:case Op::function_reference:{auto target=functions.find(i.callee);if(target==functions.end())fail("worker has unknown native effect");graph.push_back(target->second);break;}
                 default:break;
                 }

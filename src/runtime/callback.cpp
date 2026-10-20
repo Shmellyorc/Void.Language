@@ -9,6 +9,7 @@ CallbackRegistration::CallbackRegistration(Runtime& runtime, CallbackProvider& p
     ++runtime_.callbacks_;
 }
 CallbackRegistration::~CallbackRegistration() { if (!closed_) std::terminate(); }
+bool CallbackRegistration::active_on(const Runtime& runtime) noexcept {for(auto* active=current_;active;active=active->previous)if(&active->registration->runtime_==&runtime)return true;return false;}
 void CallbackRegistration::close() {
     if (Runtime::current_runtime_ == &runtime_ && runtime_.thread().state == Runtime::State::managed)
         throw std::logic_error("callback drain requires NativeSafe state");

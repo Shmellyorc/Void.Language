@@ -1,5 +1,6 @@
 #pragma once
 #include "void/ir.hpp"
+#include "void/native_binding.hpp"
 #include "void/diagnostic.hpp"
 #include <filesystem>
 #include <functional>
@@ -72,6 +73,7 @@ AnalysisResult analyze_source(const SourceFile& source);
 using SourceOverrides = std::map<std::string, std::optional<SourceFile>>;
 void require_module_identity(const std::string& identity);
 AnalysisResult analyze_project(const std::filesystem::path& entry);
+AnalysisResult analyze_project(const std::filesystem::path& entry,const NativeProject&);
 AnalysisResult analyze_project(const std::filesystem::path& entry, const SourceOverrides& overrides);
 // One source pipeline shared by checking, JIT and AOT. Errors contain rendered
 // source diagnostics and are raised before invoking any backend.

@@ -6,9 +6,38 @@
 **Date:** October 10, 2026  
 **Companion document:** `VOID_2_0_Language_Bible.md`
 
+## Delivery 4 authorization — 19 October 2026
+
+Delivery 3 is owner-confirmed hosted-accepted at `62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090`,
+[CI #75 checks](https://github.com/Shmellyorc/Void.Language/commit/62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090/checks),
+7/7 jobs, 120/120 each (840/840). Delivery 4 alone is authorized: one explicitly
+trusted statically compiled C fixture, typed project-local binding descriptors,
+ordinary VOID wrappers, owned UTF-8 transfers, opaque managed resource identities
+and quiescent rooted callbacks. No public native grammar, dynamic loading, package
+management or worker/native effects are approved. The bounded implementation is complete.
+**Local Delivery 4 acceptance passed: 131/131 each in Debug, Release and strict ASan/UBSan/leak configurations (393/393).** The 1 MiB semantic/native checks, explicit native host and editor/package checks passed. STOPPED for owner review and seven-job hosted verification; Delivery 5 remains unauthorized. See [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md).
+Delivery 5 requires Delivery 4 hosted acceptance and separate owner authorization.
+Boss controls Git/hosted CI; Wrench reviews; Keyboard implements this delivery and
+stops after complete local acceptance. Earlier pending-hosted statuses are historical.
+
 ## Current implementation status
 
-## Delivery 3 authorization — 19 October 2026
+| Implementation delivery | Current status and dependency |
+| --- | --- |
+| 1 — Native Async Activation | Hosted accepted, CI #73 |
+| 2 — Structured Task Lifecycle | Hosted accepted, CI #74 |
+| 3 — Bounded Parallel Spawn | Hosted accepted at `62b17c8c`, CI #75; current locked baseline |
+| 4 — Native Libraries | Locally accepted: 131/131 each in Debug/Release/strict (393/393); owner review and hosted CI pending |
+| 5 — Integrated Stage 6 Acceptance | Not authorized; requires Delivery 4 hosted acceptance and owner approval |
+
+These are the five implementation deliveries, not the six D1–D6 decision groups.
+D1 parallel execution now approves only the documented initial value-only scope.
+D2 enqueue/await/inferred handles, D3 root/group ownership and D4 lifecycle rules
+retain their approved contracts. D5 cross-task callable escapes stay restricted;
+D6 now approves the bounded trusted static fixture described in [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md); general FFI remains deferred. No general sharing, task-type spelling,
+async-callable or cancellation recovery contract has been silently added.
+
+## Historical Delivery 3 authorization — superseded by Delivery 4 status
 
 **Locked baseline:** Delivery 2 at `5d228804be809465ce2c97b7e0b58b89caa718ac`,
 [CI #74 checks](https://github.com/Shmellyorc/Void.Language/commit/5d228804be809465ce2c97b7e0b58b89caa718ac/checks),
@@ -23,21 +52,6 @@ ASan/UBSan/leak configurations (**360/360**), plus editor/package and 1 MiB chec
 remain unauthorized. Stop after local acceptance for owner review and hosted CI.
 D1 parallel sharing is approved only within this initial value-only boundary;
 the six design-decision groups remain distinct from the five deliveries.
-
-| Implementation delivery | Current status and dependency |
-| --- | --- |
-| 1 — Native Async Activation | Hosted accepted, CI #73 |
-| 2 — Structured Task Lifecycle | Hosted accepted, CI #74; current locked baseline |
-| 3 — Bounded Parallel Spawn | Locally accepted: 120/120 each in Debug/Release/strict; owner review and hosted CI pending |
-| 4 — Native Libraries | Not authorized; requires Delivery 3 hosted acceptance and owner approval |
-| 5 — Integrated Stage 6 Acceptance | Not authorized; requires Delivery 4 hosted acceptance and owner approval |
-
-These are the five implementation deliveries, not the six D1–D6 decision groups.
-D1 parallel execution now approves only the documented initial value-only scope.
-D2 enqueue/await/inferred handles, D3 root/group ownership and D4 lifecycle rules
-retain their approved contracts. D5 cross-task callable escapes stay restricted;
-D6 native scope remains Delivery 4 review. No general sharing, task-type spelling,
-async-callable or cancellation recovery contract has been silently added.
 
 Earlier Delivery 2 pending-hosted handoffs below are historical, superseded here.
 Boss controls Git/CI, Wrench reviews architecture, Keyboard implements authorized work.
@@ -165,7 +179,7 @@ its numbers are distinct from implementation phases and Phase 23 research substa
 | 3 Managed runtime | Allocator/precise coordinated GC, reference/value structs, strings, lists and dictionaries; LOCKED at cd95e373 / CI #65, seven jobs successful |
 | 4 Advanced language | Hosted-verified and LOCKED at 483e67e4 / CI #68: properties/callable structs, tagged enums, result/propagation, shared is/match patterns, defer/with/one-shot managed deinit, function values/escaping closures, callbacks and synchronous events; 80/80 suites in all seven configurations. See ADVANCED_LANGUAGE.md and WORK_LOG.md |
 | 5 Hot reload | Delivered cache/reload subset hosted-verified and LOCKED at 4627687b / CI #70, 82/82 in all seven configurations. Whole-graph Debug objects, current-source validation, isolated generations and revision-checked replacement; Windows persistence bypass and automatic-watching deferral remain |
-| 6 Concurrency/native libraries | Architecture investigated in STAGE6_PROPOSAL.md; approval/implementation pending. Existing Runtime coordination/native proofs do not implement source async, tasks, scheduling or a source native-library ecosystem |
+| 6 Concurrency/native libraries | Deliveries 1–3 hosted accepted through CI #75. Delivery 4 bounded static C integration locally accepted (131/131 each in Debug/Release/strict); owner review/hosted pending; see ASYNC.md and NATIVE_LIBRARIES.md. Delivery 5 unauthorized. |
 | 7 Tooling/optimization | Partial: LSP diagnostics/navigation, editor integration/VSIX and LLVM O2; completion/rename/formatting, library discovery and broad performance work remain deferred |
 
 Ordinary `.void` programs execute all delivered features together through normal/O2

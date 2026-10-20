@@ -1,18 +1,18 @@
 # Known issues and deferred work
 
-## Delivery 3 status — 19 October 2026
+## Delivery 4 status — 19 October 2026
 
-Delivery 2 is locked at `5d228804be809465ce2c97b7e0b58b89caa718ac`, owner-confirmed
-CI #74 (7/7 jobs, 791/791 suites). Delivery 3 bounded value-only source spawn is
-locally accepted: 120/120 each in Debug, Release and strict sanitizers (360/360).
-Owner review and hosted verification are pending. ASYNC.md records the actual
-transfer/effect restrictions, worker resource bounds and queue policy. Mutable
-shared references, `jobs.spawn`, task/closure/native-resource transfers, worker
-child creation/joins, native libraries and cancellation recovery remain deferred.
-Completed tasks/frames remain retained until root drain; queues grow with available
-memory and checked allocation failure. No universal source task count, fairness,
-forced termination or general race-free source-memory model is promised.
-The older Delivery 2 pending-hosted and parallel-deferred notes below are historical.
+Delivery 3 is hosted-accepted at `62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090`,
+CI #75 (7/7 jobs, 840/840 suites), owner-confirmed. Delivery 4's bounded trusted
+static fixture passed local acceptance: 131/131 each in Debug, Release and strict
+ASan/UBSan/leak configurations (393/393), plus 1 MiB and editor/package checks.
+Owner review and hosted verification remain pending. See
+[NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md). General FFI/native grammar, dynamic
+loading, automatic CLI/LSP binding admission, packages, worker/native effects and
+resource task transfer remain deferred. Registration is one-shot and accepts only
+generation-local direct/literal/bound callable creation. Dropped native owners
+retain resources until explicit Runtime shutdown; GC does not run native finalizers.
+No general shared-memory policy, async CLI or Delivery 5 authorization is implied.
 
 ## Current boundaries, 18 October 2026
 
@@ -21,10 +21,10 @@ See the [canonical status summary](DEVELOPMENT_STRATEGY.md#current-implementatio
 - The reproduced deep valid receiver-chain lowering stack issue below remains open; no unrelated repair is claimed.
 - Dictionary keys exclude floats, interfaces, arrays/lists/dictionaries and value structs containing unsupported fields. Custom equality/hash, adversarial hash randomization and stable cross-launch hash guarantees are not implemented. Result-based `.get()` remains deferred; checked lookup and contains/remove/clear are available.
 - Dictionary template literals/defaults can contain pure entries, but dictionary lookup/count/methods require runtime evaluation. Dictionaries share identity; no independent dictionary clone/view API is promised.
-- Stage 4 is hosted-locked at CI #68; see ADVANCED_LANGUAGE.md and WORK_LOG.md for validated behavior. Generic enums, unit/void result payload syntax, module-time patterns and module-time bound receiver allocation are outside the delivered subset. Readonly callback-result authority is conservative. Pop/get still await exact signatures/error types. Missing slice endpoints/views, string indexing/interpolation/formatting, parallel source execution and general managed FFI remain future work. Native async activation has the bounded Delivery 1 implementation described in ASYNC.md; Delivery 1 is owner-confirmed hosted-accepted at CI #73; Delivery 2 local lifecycle acceptance passed 113/113 each in Debug, Release and strict sanitizers; hosted acceptance is pending.
+- Stage 4 is hosted-locked at CI #68; see ADVANCED_LANGUAGE.md and WORK_LOG.md for validated behavior. Generic enums, unit/void result payload syntax, module-time patterns and module-time bound receiver allocation are outside the delivered subset. Readonly callback-result authority is conservative. Pop/get still await exact signatures/error types. Missing slice endpoints/views, string indexing/interpolation/formatting, general shared-memory parallel execution and general managed FFI remain future work; bounded value-only source spawn is hosted-accepted at CI #75. Native async activation has the bounded Delivery 1 implementation described in ASYNC.md; Delivery 1 is owner-confirmed hosted-accepted at CI #73; Delivery 2 is hosted-accepted at CI #74.
 - Root lifetimes remain conservative to function exit; collection is coordinated, precise and nonmoving, not concurrent collection or a production performance certification. Metadata and executable retirement retain existing contracts.
 - LSP completion/hover/rename/formatting and package discovery remain deferred. Stage 5 is hosted-locked at `4627687b` / [CI #70](https://github.com/Shmellyorc/Void.Language/actions/runs/39193640484), 82/82 suites in all seven configurations. Stage 4 retains its CI #68 historical lock.
-- [STAGE6_PROPOSAL.md](STAGE6_PROPOSAL.md) preserves the approved five-delivery roadmap. Delivery 1 implements ordinary async functions, managed receivers, await and an explicit owning root adapter; see [ASYNC.md](ASYNC.md) for restrictions and local acceptance. Delivery 2 implements cooperative cancellation and lexical groups locally (113/113 each in Debug, Release and strict sanitizers; hosted pending); parallel spawn/sharing, native libraries, public cancellation recovery and an async CLI remain deferred. Completed task records/frames remain rooted until the adapter finishes draining, so long-lived roots can retain substantial memory. Existing GC coordination does not serialize arbitrary application writes.
+- [STAGE6_PROPOSAL.md](STAGE6_PROPOSAL.md) preserves the approved five-delivery roadmap. Delivery 1 implements ordinary async functions, managed receivers, await and an explicit owning root adapter; see [ASYNC.md](ASYNC.md) for restrictions and local acceptance. Delivery 2 cooperative cancellation/groups and Delivery 3 value-only parallel spawn are hosted accepted at CI #74/#75. Delivery 4 adds the bounded static fixture documented in NATIVE_LIBRARIES.md; general parallel sharing/native libraries, public cancellation recovery and an async CLI remain deferred. Completed task records/frames remain rooted until the adapter finishes draining, so long-lived roots can retain substantial memory. Existing GC coordination does not serialize arbitrary application writes.
 
 - Optional persistent Debug caching is hosted-accepted at CI #70; see STAGE5_CACHE_PROPOSAL.md. Windows persistence still bypasses safely because private ACL/path publication is not established; CI verifies fallback, not Windows disk reuse. Builds using unidentified shared LLVM compiler libraries also bypass. macOS cache suites and Windows fallback passed hosted verification. Automatic watching, per-function caching, automatic eviction and remote/shared caches are not implemented. Corrupt entries remain misses until the disposable cache is removed.
 
@@ -255,7 +255,7 @@ implementation guards do not override the large-array language commitment.
 - AOT emits a host-native object with a simple i32 entry adapter; JIT uses the
   same host ABI. General executable/project compilation, arbitrary entry ABIs,
   cross-compilation, public library/export ABI, linker orchestration, deployment and
-  source-level native bindings remain deferred.
+  general source-level native bindings remain deferred; the explicitly trusted static fixture is documented in NATIVE_LIBRARIES.md.
 
 ## Managed memory
 
@@ -299,7 +299,7 @@ implementation guards do not override the large-array language commitment.
   pre-admission calls. Arbitrary providers, native dynamic-library ownership and
   generalized asynchronous native bindings remain unsupported.
 - The UTF-8 helper implements borrowing of terminated UTF-8 with a temporary
-  owned copy. Retained string storage, returned buffers, UTF-16 and native binding
+  owned copy. The static fixture now implements retained string storage and returned buffers; general UTF-16 and native binding
   metadata syntax are not implemented. NUL rejection is specific to this bridge,
   not a decision to forbid NUL in VOID strings.
 

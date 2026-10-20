@@ -37,7 +37,7 @@ for(unsigned block=0;block<f.blocks.size();++block)for(unsigned position=0;posit
         const auto& end=current.end;if(end.kind==Terminator::Kind::branch){pending.push_back({end.yes,0,item.borrowed});pending.push_back({end.no,0,item.borrowed});}else if(end.kind==Terminator::Kind::jump)pending.push_back({end.yes,0,item.borrowed});
     }
     for(unsigned n=position+1;n<f.blocks[block].instructions.size();++n){const auto& i=f.blocks[block].instructions[n];auto check=[&](unsigned id){if(id<position && (body_types[block][id].construction || body_types[block][id].kind==Type::prepared_receiver))fail("transient instruction value survives suspension");};
-        switch(i.op){case Op::async_cancel_children:case Op::async_group_enter:case Op::async_drain:case Op::constant:case Op::argument:case Op::string_literal:case Op::load:case Op::stage_begin:break;case Op::store:check(i.b);break;case Op::call:case Op::async_call:case Op::virtual_call:case Op::interface_call:case Op::base_init:for(auto id:i.arguments)check(id);break;default:check(i.a);check(i.b);for(auto id:i.arguments)check(id);break;}
+        switch(i.op){case Op::async_cancel_children:case Op::async_group_enter:case Op::async_drain:case Op::constant:case Op::argument:case Op::string_literal:case Op::load:case Op::stage_begin:break;case Op::store:check(i.b);break;case Op::native_call:case Op::call:case Op::async_call:case Op::virtual_call:case Op::interface_call:case Op::base_init:for(auto id:i.arguments)check(id);break;default:check(i.a);check(i.b);for(auto id:i.arguments)check(id);break;}
     }
 }
 

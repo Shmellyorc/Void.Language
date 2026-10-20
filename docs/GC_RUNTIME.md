@@ -2,6 +2,15 @@
 
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
+Stage 6 Delivery 4 adds Runtime-owned native registry entries containing ordinary
+Handle roots, owned retained bytes and CallbackRegistration state. Native C pointers
+never live in managed payloads; GC never finalizes C resources. Explicit `with`/
+`deinit`/close or Runtime shutdown performs provider unregister and quiescence,
+including dispatches reserved before admission, before releasing roots/code leases.
+No provider/registry lock is held while executing source or retiring code. The
+existing precise collector and NativeSafe/Managed admission remain the only memory
+coordination mechanism. See [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md).
+
 Phase 20 extends existing heap layouts with runtime-owned immutable nominal descriptors and transactional NativeSafe admission. Generation-owned guarded dispatch uses the same precise roots and collector; objects never retain JIT code pointers. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.
 
 Phase 16 integration: [MANAGED_STRUCTS.md](MANAGED_STRUCTS.md) describes the now

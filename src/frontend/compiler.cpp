@@ -251,7 +251,7 @@ struct Pattern {
 };
 struct Expr {
     bool event=false, asynchronous_call=false;
-    std::string event_owner;
+    std::string event_owner,native_symbol;
     Type environment=Type::none;
     enum class Kind { spawned, task_cancel, awaited, lambda, capture_reference, function_reference, function_call, function_null, test, match, sum, propagate, literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal } kind;
     Token token;
@@ -332,6 +332,7 @@ struct Function {
     std::string generic_origin, concrete_name, concrete_method_name, display_name;
     std::vector<RelatedLocation> instantiation_context;
     unsigned specialization_depth=0;
+    std::string native_symbol;
     bool analyzed=false, prepared=false, defaults_prepared=false, initializer_prepared=false;
     std::map<std::set<unsigned>,ConstructionContext> construction_contexts;
     std::string construction_contract;
@@ -1234,6 +1235,7 @@ class Semantics {
             error(source,token,Code::ambiguous,"Ambiguous promoted member '"+token.text+"': "+routes+".","Qualify the intended embedded field explicitly; types and signatures do not select a component.",std::move(related));
         }
         if(selected.status==ir::MemberSelection::found) {
+            if(selected.method.empty()){auto path_owner=t;for(auto index:selected.path){if(path_owner.definition->native_resource)error(source,token,Code::unsupported_type,"Native resource payload is binding-private.");path_owner=ir::field_type(path_owner,index);}}
             const Function* target=nullptr;
             if(!selected.method.empty()) for(const auto& [id,u]:units) for(const auto& f:u->functions) if(f.symbol==selected.method) target=&f;
             return {selected.path,target};
@@ -1404,7 +1406,7 @@ class Semantics {
         return e.type = call_arguments(e,target,1);
     }
     Type call_arguments(Expr& e, const Function& target, std::size_t first, bool constructor = false) {
-        e.asynchronous_call=target.asynchronous;
+        e.asynchronous_call=target.asynchronous;e.native_symbol=target.native_symbol;
         if(e.interface_call) {
             std::vector<const Expr*> pending;for(std::size_t n=first;n<e.parts.size();++n)pending.push_back(e.parts[n].get());
             while(!pending.empty()){auto* part=pending.back();pending.pop_back();if(part->kind==Expr::Kind::awaited)error(source,part->token,Code::unsupported_type,"await cannot retain a prepared interface receiver across suspension.","Await arguments into locals before selecting the interface method.");for(const auto& child:part->parts)pending.push_back(child.get());}
@@ -1426,6 +1428,7 @@ class Semantics {
             if (bound[index]) error(source,label.text.empty() ? e.parts[n]->token : label,Code::duplicate,"Initializer parameter is supplied more than once.");
             bound[index] = true; mapping.push_back(index);
             auto actual = expression(*e.parts[n],target.parameters[index].type);
+            if(target.native_symbol=="vd_native_fixture_call#register" && index==1 && e.parts[n]->kind!=Expr::Kind::function_reference)error(source,e.parts[n]->token,Code::unsupported_type,"Native callback registration requires a directly named function or a literal closure created in this generation.");
             try { expect(actual,target.parameters[index].type,e.parts[n]->token); }
             catch (const CompilationError& failure) { diagnostics.add(failure); invalid = true; }
             invalid |= actual == error_type;
@@ -1472,6 +1475,7 @@ class Semantics {
         }
     }
     void construction(Expr& e, Unit& owner, Structure& structure, bool runtime, Unit& access) {
+        if(structure.definition->native_resource)error(source,e.token,Code::unsupported_type,"Native resources are nonforgeable; use the checked binding factory.");
         if(structure.definition->interface_type) error(source,e.token,Code::initializer,"An interface cannot be constructed; convert a complete conforming managed value.");
         defaults(owner,structure);
         if (structure.definition->managed && !runtime) error(source,e.token,Code::constant_call,"Managed allocation is not a compile-time expression.");
@@ -1954,6 +1958,7 @@ class Semantics {
         }
         for (unsigned n=0;n+1<selected.path.size();++n) embedded_receiver(e.parts[0],selected.path[n],e.token);
         auto owner=e.parts[0]->type;
+        if(owner.definition && owner.definition->native_resource)error(source,e.token,Code::unsupported_type,"Native resource payload is binding-private.");
         e.slot=selected.path.back(); e.target=owner.definition->fields[e.slot].owner+"::field::"+e.token.text;
         e.event=owner.definition->fields[e.slot].event;e.event_owner=owner.definition->fields[e.slot].owner;if(e.event && !allow_event)error(source,e.token,Code::invalid_value,"Events support subscriptions and owner emission; subscriber storage cannot escape.");
         return e.type=ir::field_type(owner,e.slot);
@@ -2433,6 +2438,7 @@ public:
                 } catch (const CompilationError& failure) { diagnostics.add(failure); }
                   catch (const Poison&) {}
             }
+            if(!f.native_symbol.empty())return;
             auto flow = sequence(f.body, false);
             if (f.result != Type::none && (flow & next_flow) && diagnostics.size() == before && !f.parse_failed && !invalid_function)
                 try { error(source, f.token, Code::missing_return, "Missing return path in '" + f.token.text + "'.", "Return a " + std::string(ir::type_name(f.result)) + " on every path that reaches the end."); }
@@ -2909,11 +2915,11 @@ class Lowering {
             }
             // Materialize each argument in a slot: later short-circuit arguments
             // may create new blocks, while IR instruction values stay block-local.
-            std::vector<unsigned> slots;
+            std::vector<unsigned> slots;std::optional<unsigned> native_callback;
             for (std::size_t n = first; n < e.parts.size(); ++n) {
                 const auto& arg = e.parts[n];
                 auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(expression_type(*arg));
-                auto value = expression(*arg);
+                auto value = expression(*arg);if(e.native_symbol=="vd_native_fixture_call#register" && n==1)native_callback=value;
                 if (expression_type(*arg).construction) {
                     output.construction_origins[slot]=view_origin(value);
                 }
@@ -2924,6 +2930,7 @@ class Lowering {
             if (context) if (auto found=context->calls.find(&e);found!=context->calls.end())
                 i.callee=ir::construction_name(e.target,{found->second.begin(),found->second.end()});
             for (auto slot : slots) i.arguments.push_back(emit({ir::Op::load, slot}, e.token));
+            if(!e.native_symbol.empty()){i.op=ir::Op::native_call;i.callee=e.native_symbol;i.type=e.type;if(native_callback)i.arguments[1]=*native_callback;}
             auto result=emit(i,e.token);
             if(selected_receiver) {
                 // Forward declarations need not have been lowered yet. The
@@ -3284,9 +3291,10 @@ class SourceGraph {
     Diagnostics& diagnostics;
     unsigned depth = 0;
     const SourceOverrides& overrides;
+    const NativeProject* native=nullptr;
 public:
     std::map<std::string, std::unique_ptr<Unit>> units;
-    explicit SourceGraph(std::filesystem::path project_root, Diagnostics& d, const SourceOverrides& o) : root(std::move(project_root)), diagnostics(d), overrides(o) {}
+    explicit SourceGraph(std::filesystem::path project_root, Diagnostics& d, const SourceOverrides& o,const NativeProject* bindings=nullptr) : root(std::move(project_root)), diagnostics(d), overrides(o),native(bindings) {}
     Unit& load(const Unit& from, const Token& path) {
         auto id = normalize(from, path);
         if (auto found = units.find(id); found != units.end()) return *found->second;
@@ -3362,6 +3370,8 @@ public:
         auto before = diagnostics.size();
         Parser(result->source, diagnostics).parse(*result);
         result->parse_failed |= diagnostics.size() != before;
+        if(native && id==native->module){for(auto& structure:result->structures)structure.definition->native_resource=true;for(auto& f:result->functions)for(const auto& b:native->bindings)if(f.token.text==b.name)f.native_symbol=b.symbol;}
+
         for (auto& import : result->imports) {
             try {
                 auto& target = load(*result, import.path);
@@ -3743,6 +3753,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 if ((structure.visibility=="public" && parent->visibility!="public") || (structure.visibility=="internal" && parent->visibility=="private"))
                     error(owner.source,structure.base_token,Code::visibility,"A derived type cannot expose a less-visible base type.",{},{{span(parent_owner->source,parent->token),"Base type declared here."}});
                 layout(*parent_owner,*parent);
+                if(parent->definition->native_resource)error(owner.source,structure.base_token,Code::unsupported_type,"Native resource identities cannot be extended or forged.");
                 structure.base_type=t; structure.definition->base=parent->definition;
                 structure.definition->fields=parent->definition->fields;
                 structure.effective_fields=parent->effective_fields;
@@ -3936,6 +3947,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
     for (auto& [id, unit] : units) {
         Lowering lowering(unit->source,module,strings);
         for (const auto& f : unit->functions) {
+            if(!f.native_symbol.empty()){module.native_library="void.fixture.v1";module.coordinated=true;continue;}
             if(f.interface_requirement) {
                 ir::Function requirement;requirement.name=f.symbol;requirement.parameters={f.receiver->type};
                 for(const auto& p:f.parameters) requirement.parameters.push_back(p.type);
@@ -3972,7 +3984,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
 
 }
 std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile&);
-std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false);
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr);
 // This factory is the only way to construct a successful result.
 struct AnalysisAccess {
     static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={}) {
@@ -4196,6 +4208,12 @@ AnalysisResult analyze_source(const SourceFile& source) {
     try { auto program=validated_source(source);return {program,program->warnings()}; }
     catch (const CompilationError& e) { return {nullptr,e.diagnostics()}; }
 }
+AnalysisResult analyze_project(const std::filesystem::path& entry,const NativeProject& bindings) {
+    try{validate_native_project(bindings);require_module_identity(bindings.module);auto root=std::filesystem::absolute(entry).parent_path();if(std::filesystem::exists(root/utf8_path(bindings.module).relative_path()))throw std::invalid_argument("Native descriptor module collides with a project source file");SourceOverrides overrides;
+        overrides.emplace(bindings.module,SourceFile(path_utf8(root/utf8_path(bindings.module).relative_path()),native_project_source(bindings)));
+        auto program=validated_project(entry,overrides,true,&bindings);return {program,program->warnings()};
+    }catch(const CompilationError& e){return {nullptr,e.diagnostics()};}
+}
 AnalysisResult analyze_project(const std::filesystem::path& entry) {
     try { auto program=validated_project(entry);return {program,program->warnings()}; }
     catch (const CompilationError& e) { return {nullptr,e.diagnostics()}; }
@@ -4222,7 +4240,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile& sour
     validate_graph(units, identity, diagnostics);
     return AnalysisAccess::build(std::move(units), identity,diagnostics.warnings());
 }
-std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path& entry, const SourceOverrides& overrides, bool verify_disk) {
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path& entry, const SourceOverrides& overrides, bool verify_disk,const NativeProject* bindings) {
     for (const auto& [id, source] : overrides) { (void)source; require_module_identity(id); }
     std::error_code ec;
     auto absolute = std::filesystem::absolute(entry, ec);
@@ -4232,7 +4250,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
     // A diagnostic anchor is needed even before the entry file can be opened.
     Unit anchor(SourceFile(path_utf8(absolute), ""), "/");
     Diagnostics diagnostics; diagnostics.bind(anchor.source, "/" + path_utf8(absolute.filename()));
-    SourceGraph graph(root, diagnostics, overrides);
+    SourceGraph graph(root, diagnostics, overrides,bindings);
     auto& first = [&]() -> Unit& {
         try { return graph.load(anchor, {TokenKind::path, "/" + path_utf8(absolute.filename()), 0}); }
         catch (const CompilationError& failure) { diagnostics.add(failure); diagnostics.finish(); throw; }
@@ -4240,7 +4258,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
     // A disk read is not an atomic filesystem transaction. Re-discover paths and
     // compare exact bytes before accepting this captured graph. Overlays are frozen.
     if (verify_disk) {
-        Diagnostics check; SourceGraph again(root, check, overrides);
+        Diagnostics check; SourceGraph again(root, check, overrides,bindings);
         again.load(anchor, {TokenKind::path, first.identity, 0});
         bool same = graph.units.size() == again.units.size();
         for (const auto& [id, unit] : graph.units) {

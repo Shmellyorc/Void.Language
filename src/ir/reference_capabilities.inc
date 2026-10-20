@@ -175,6 +175,8 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         else if(i.op==Op::list_remove)value=field_facts(owner,values[i.a],array_element_path);
                         break;
                     }
+                    case Op::native_call:
+                        for(auto argument:i.arguments){retain(values[argument]);for(const auto& [path,fact]:values[argument])effect(summary.mutations,fact);}value=reference_facts(type);break;
                     case Op::gc_release:
                         if(auto found=values[i.a].find({});found!=values[i.a].end()){effect(summary.mutations,found->second);if(found->second.readonly)fail("release through readonly reference");}break;
                     case Op::gc_write:

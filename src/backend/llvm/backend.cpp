@@ -12,6 +12,8 @@
 #include "void/numeric.hpp"
 #include "void/runtime_abi.hpp"
 #include "void/async.hpp"
+#include "void/native_binding.hpp"
+#include "void/native_runtime.hpp"
 #include "void/reference_capabilities.hpp"
 #include <cmath>
 #include <array>
@@ -1091,6 +1093,27 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     break;
                 case Op::extract: v = b.CreateExtractValue(values[instruction.a],{static_cast<unsigned>(instruction.immediate)}); break;
                 case Op::insert: v = b.CreateInsertValue(values[instruction.a],values[instruction.b],{static_cast<unsigned>(instruction.immediate)}); break;
+                case Op::native_call: {
+                    const auto& catalog=native_fixture_catalog();const auto& binding=native_binding(instruction.callee);unsigned op=static_cast<unsigned>(&binding-catalog.data());
+                    llvm::Value* bits=b.getInt64(0);llvm::Value* object=llvm::ConstantPointerNull::get(b.getPtrTy());llvm::Value* text=object;llvm::Value* environment=object;llvm::Value* entry=object;llvm::Value* function=b.getInt64(0);
+                    for(auto id:instruction.arguments){auto t=operand_type(id);auto* argument=values[id];
+                        if(t==ir::Type::string)text=argument;
+                        else if(t.kind==ir::Type::managed_ref)object=argument;
+                        else if(t.definition && t.definition->callable){
+                            function=b.CreateExtractValue(argument,0);environment=b.CreateExtractValue(argument,1);
+                            auto* callback=llvm::Function::Create(llvm::FunctionType::get(b.getInt32Ty(),{b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()},false),llvm::GlobalValue::InternalLinkage,"native.callback"+suffix,*module);
+                            llvm::IRBuilder<> cb(context);cb.SetInsertPoint(llvm::BasicBlock::Create(context,"entry",callback));llvm::Value* callable=llvm::UndefValue::get(type(t));callable=cb.CreateInsertValue(callable,callback->getArg(0),0);callable=cb.CreateInsertValue(callable,callback->getArg(1),1);cb.CreateRet(cb.CreateCall(callable_dispatchers.at(ir::Type::key(t)),{callable,callback->getArg(2),callback->getArg(3)}));
+#ifdef VOID_NATIVE_CALLBACK_SANITIZER_HASH
+                            callback->setMetadata("func_sanitize",llvm::MDNode::get(context,{llvm::ConstantAsMetadata::get(b.getInt32(VOID_NATIVE_CALLBACK_SANITIZER_MAGIC)),llvm::ConstantAsMetadata::get(b.getInt32(VOID_NATIVE_CALLBACK_SANITIZER_HASH))}));
+#endif
+                            entry=callback;
+                        }else {if(t==ir::Type::f32)argument=b.CreateBitCast(argument,b.getInt32Ty());else if(t==ir::Type::f64)argument=b.CreateBitCast(argument,b.getInt64Ty());bits=b.CreateZExtOrTrunc(argument,b.getInt64Ty());}
+                    }
+                    llvm::Value* output=llvm::ConstantPointerNull::get(b.getPtrTy());if(instruction.type==ir::Type::string || instruction.type.kind==ir::Type::managed_ref)output=value_roots[n].at(values.size());
+                    auto* result=b.CreateCall(module->getOrInsertFunction("vd_native_fixture_call",b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{b.getInt32(op),bits,object,text,function,environment,entry,output,b.CreateGlobalStringPtr(op==14?instruction.type.definition->identity:""),failure});
+                    auto* bad=llvm::BasicBlock::Create(context,"native.failure",fn);auto* okay=llvm::BasicBlock::Create(context,"native.valid",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),bad,okay);b.SetInsertPoint(bad);trace_failure();b.SetInsertPoint(okay);
+                    if(instruction.type==ir::Type::none)v=llvm::UndefValue::get(b.getInt8Ty());else if(instruction.type==ir::Type::string || instruction.type.kind==ir::Type::managed_ref)v=b.CreateLoad(type(instruction.type),output);else if(instruction.type==ir::Type::f32)v=b.CreateBitCast(b.CreateTrunc(result,b.getInt32Ty()),b.getFloatTy());else if(instruction.type==ir::Type::f64)v=b.CreateBitCast(result,b.getDoubleTy());else v=b.CreateZExtOrTrunc(result,type(instruction.type));break;
+                }
                 case Op::async_cancel_children: v=b.CreateCall(module->getOrInsertFunction("vd_async_cancel_children",b.getVoidTy()));break;
                 case Op::async_cancel:
                     b.CreateCall(module->getOrInsertFunction("vd_async_cancel",b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{values[instruction.a],failure});
@@ -1339,28 +1362,29 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
 }
 }
 struct Jit::Impl {
-    std::unique_ptr<llvm::orc::LLJIT> jit;
+    std::shared_ptr<llvm::orc::LLJIT> jit;
     std::uint64_t serial = 0;
     DebugCache cache;
     std::string cache_status="disabled", target_identity, captured;
     bool custom_bindings=false, capture=false, canonical=false;
     std::shared_ptr<Runtime> source_runtime;
-    std::atomic<std::size_t> live{0};
+    std::shared_ptr<std::atomic<std::size_t>> live=std::make_shared<std::atomic<std::size_t>>(0);
     struct Generation {
-        std::shared_ptr<Impl> owner;
+        std::shared_ptr<llvm::orc::LLJIT> jit;
+        std::shared_ptr<std::atomic<std::size_t>> live;
         llvm::orc::ResourceTrackerSP tracker;
         llvm::orc::JITDylib* dylib=nullptr;
         ~Generation() {
             if (tracker) if (auto error = tracker->remove())
                 llvm::errs() << "VOID JIT retirement failed: " << llvm::toString(std::move(error)) << '\n';
-            if(dylib) if(auto error=owner->jit->getExecutionSession().removeJITDylib(*dylib))
+            if(dylib) if(auto error=jit->getExecutionSession().removeJITDylib(*dylib))
                 llvm::errs()<<"VOID JIT dylib retirement failed: "<<llvm::toString(std::move(error))<<'\n';
-            --owner->live;
+            --*live;
         }
     };
     std::shared_ptr<const NativeCode> load(std::unique_ptr<llvm::Module> module,
         std::unique_ptr<llvm::LLVMContext> context, const std::string& symbol,
-        Compatibility contract, const std::shared_ptr<Impl>& self, bool checked = false, std::shared_ptr<Runtime> runtime = {}, const std::string& suffix = {}, bool isolated = false, std::unique_ptr<llvm::MemoryBuffer> object = {}) {
+        Compatibility contract, const std::shared_ptr<Impl>&, bool checked = false, std::shared_ptr<Runtime> runtime = {}, const std::string& suffix = {}, bool isolated = false, std::unique_ptr<llvm::MemoryBuffer> object = {}) {
 #ifdef VOID_FUNCTION_SANITIZER_HASH
         // The host ABI is checked before reaching this boundary. Match the
         // compiler-generated plain/checked entry metadata without disabling UBSan.
@@ -1373,7 +1397,7 @@ struct Jit::Impl {
         }
 #endif
         auto generation = std::make_shared<Generation>();
-        generation->owner = self;++live;
+        generation->jit=jit;generation->live=live;++*live;
         auto* target=&jit->getMainJITDylib();
         // Source generations are self-contained. Trusted raw-IR clients retain
         // their existing cross-module exported-symbol linking contract.
@@ -1436,7 +1460,7 @@ Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
     bind("vd_gc_interface_binding",vd_gc_interface_binding);
     bind("vd_cleanup_failure",vd_cleanup_failure);bind("vd_gc_poll",vd_gc_poll); bind("vd_gc_collect",vd_gc_collect); bind("vd_gc_allocate",vd_gc_allocate);
     bind("vd_gc_release",vd_gc_release);bind("vd_gc_alive",vd_gc_alive); bind("vd_gc_native_enter",vd_gc_native_enter); bind("vd_gc_native_leave",vd_gc_native_leave);
-    bind("vd_worker_checkpoint",vd_worker_checkpoint);bind("vd_async_root",vd_async_root);bind("vd_async_new",vd_async_new);bind("vd_async_start",vd_async_start);bind("vd_async_ready",vd_async_ready);bind("vd_async_suspend",vd_async_suspend);bind("vd_async_complete",vd_async_complete);bind("vd_async_cancel_children",vd_async_cancel_children);bind("vd_async_cleanup_enter",vd_async_cleanup_enter);bind("vd_async_cleanup_leave",vd_async_cleanup_leave);bind("vd_async_finish",vd_async_finish);bind("vd_async_cancel",vd_async_cancel);bind("vd_async_checkpoint",vd_async_checkpoint);bind("vd_async_group_enter",vd_async_group_enter);bind("vd_async_group_join",vd_async_group_join);bind("vd_async_drain",vd_async_drain);
+    bind("vd_native_fixture_call",vd_native_fixture_call);bind("vd_worker_checkpoint",vd_worker_checkpoint);bind("vd_async_root",vd_async_root);bind("vd_async_new",vd_async_new);bind("vd_async_start",vd_async_start);bind("vd_async_ready",vd_async_ready);bind("vd_async_suspend",vd_async_suspend);bind("vd_async_complete",vd_async_complete);bind("vd_async_cancel_children",vd_async_cancel_children);bind("vd_async_cleanup_enter",vd_async_cleanup_enter);bind("vd_async_cleanup_leave",vd_async_cleanup_leave);bind("vd_async_finish",vd_async_finish);bind("vd_async_cancel",vd_async_cancel);bind("vd_async_checkpoint",vd_async_checkpoint);bind("vd_async_group_enter",vd_async_group_enter);bind("vd_async_group_join",vd_async_group_join);bind("vd_async_drain",vd_async_drain);
     impl_->custom_bindings=false;
 }
 Jit::~Jit() = default;
@@ -1597,7 +1621,7 @@ bool Jit::replace(ReloadSlot& slot,const ToolingSession& session,const SessionAn
     auto next=replacement(*slot.acquire(),*revision.result().program,optimize,std::move(contract));
     return next && session.is_current(revision) && slot.replace(std::move(next));
 }
-std::size_t Jit::live_generations() const { return impl_->live.load(); }
+std::size_t Jit::live_generations() const { return impl_->live->load(); }
 std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
     auto context = std::make_unique<llvm::LLVMContext>();
     auto module = std::make_unique<llvm::Module>("root proof", *context);

@@ -1,12 +1,21 @@
-# Stage 6 Deliveries 1–3: async, structured lifecycle and bounded workers
+# Stage 6 Deliveries 1–4: async, lifecycle, workers and static native integration
 
-**Locked baseline:** Delivery 2, `5d228804be809465ce2c97b7e0b58b89caa718ac`,
-[CI #74 checks](https://github.com/Shmellyorc/Void.Language/commit/5d228804be809465ce2c97b7e0b58b89caa718ac/checks),
-owner-confirmed 7/7 jobs, 113/113 each (791/791). Delivery 3 passed local Debug, Release and strict
-ASan/UBSan/leak acceptance: **120/120 each (360/360)**, plus editor/package and
-1 MiB checks. STOP for owner review and hosted verification. Deliveries 4–5 remain deferred and
-require owner authorization after the prior hosted gate. Git and hosted CI belong
-to the owner. The five-delivery roadmap remains in STAGE6_PROPOSAL.md.
+**Locked baseline:** Delivery 3, `62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090`,
+[CI #75 checks](https://github.com/Shmellyorc/Void.Language/commit/62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090/checks),
+owner-confirmed 7/7 jobs, 120/120 each (840/840). Delivery 4's bounded static native
+integration is locally accepted: **131/131 each in Debug, Release and strict
+ASan/UBSan/leak configurations (393/393)**, plus 1 MiB and editor/package checks.
+STOP for owner review and hosted verification. See
+[NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md) for the exact embedding API and ownership
+contract. Git and hosted CI belong to the owner. Delivery 5 remains unauthorized.
+The five implementation deliveries remain distinct from D1–D6 design decisions.
+
+Native resources cannot cross task/worker boundaries, and native calls remain
+forbidden in worker-reachable graphs. This delivery does not route blocking native
+calls onto workers: the owner enters NativeSafe, foreign callbacks enter through
+the existing rooted CallbackRegistration protocol, and the provider drains every
+reserved dispatch before releasing roots and generation leases. Static native
+binding does not expand the approved value-only parallel memory model.
 
 ```typescript
 async func increment(value: i32) -> i32:

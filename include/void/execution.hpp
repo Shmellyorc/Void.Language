@@ -3,6 +3,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <vector>
 namespace vd {
 class ValidatedAnalysis;
 class Runtime;
@@ -12,6 +13,18 @@ struct RuntimeFailure {
     std::uint32_t count = 0;
     const char* frames[32] = {};
 };
+// Native failures may survive reached cleanup and a callback generation's release.
+// Own the bounded diagnostic rather than borrowing mutable bridge scratch storage.
+class OwnedRuntimeFailure {
+    std::string message_;
+    std::vector<std::string> frames_;
+    RuntimeFailure value_;
+public:
+    void assign(const RuntimeFailure&) noexcept;
+    const RuntimeFailure& value() const noexcept{return value_;}
+};
+void retain_native_failure(const RuntimeFailure&,RuntimeFailure*) noexcept;
+void export_native_failure(RuntimeFailure*) noexcept;
 struct Compatibility {
     std::string function_id;
     std::string signature = "c:i32(i32)";
@@ -34,6 +47,16 @@ public:
     NativeCode(Entry entry, std::shared_ptr<void> owner, Compatibility compatibility);
     NativeCode(CheckedEntry entry, std::shared_ptr<void> owner, Compatibility compatibility, std::shared_ptr<Runtime> runtime = {});
     std::int32_t invoke(std::int32_t value) const;
+    static std::shared_ptr<void> active_lease();
+    class LeaseScope {
+        struct FailureRecord;
+        std::unique_ptr<FailureRecord> failures_;
+        LeaseScope* previous_failures_=nullptr;
+        std::shared_ptr<void> previous_;
+        friend void retain_native_failure(const RuntimeFailure&,RuntimeFailure*) noexcept;
+    public: explicit LeaseScope(std::shared_ptr<void>);~LeaseScope();
+        LeaseScope(const LeaseScope&)=delete;LeaseScope& operator=(const LeaseScope&)=delete;
+    };
     const std::shared_ptr<Runtime>& runtime_owner() const { return runtime_; }
     const Compatibility& compatibility() const { return compatibility_; }
 private:
@@ -50,6 +73,7 @@ public:
     std::shared_ptr<const NativeCode> acquire() const;
     bool replace(std::shared_ptr<const NativeCode> replacement);
     std::int32_t invoke(std::int32_t value) const;
+
 private:
     mutable std::mutex mutex_;
     std::shared_ptr<const NativeCode> current_;

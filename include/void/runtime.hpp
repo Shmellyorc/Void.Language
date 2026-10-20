@@ -19,6 +19,7 @@ class ListModified final : public std::logic_error {public: using std::logic_err
 class CallbackRegistration;
 // These are runtime embedding interfaces, not source-language thread features.
 struct NativeDictionary {const NativeArrayElement* entry;const NativeArrayElement* key;std::size_t value_offset,hash_offset;};
+class NativeLibrary;
 class Runtime {
 public:
     enum class State { native_safe, managed, parked };
@@ -112,6 +113,9 @@ public:
     void close(); // Reject new attachments; existing participants must drain.
 private:
     friend class CallbackRegistration;
+    friend class NativeLibrary;
+    friend void native_shutdown(Runtime&);
+    std::shared_ptr<NativeLibrary> native_library_;
     unsigned async_worker_limit_ = 4;
     class PrivateRoot;
     struct Thread {

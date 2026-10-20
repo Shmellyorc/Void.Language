@@ -1,6 +1,35 @@
 # 🔧🤖 THE WRENCH CLANKER
 
-## Delivery 3 authorization — 19 October 2026
+## Delivery 4 authorization — 19 October 2026
+
+Delivery 3 is owner-confirmed hosted-accepted at `62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090`,
+[CI #75 checks](https://github.com/Shmellyorc/Void.Language/commit/62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090/checks),
+7/7 jobs, 120/120 each (840/840). Delivery 4 alone is authorized: one explicitly
+trusted statically compiled C fixture, typed project-local binding descriptors,
+ordinary VOID wrappers, owned UTF-8 transfers, opaque managed resource identities
+and quiescent rooted callbacks. No public native grammar, dynamic loading, package
+management or worker/native effects are approved. The bounded implementation is complete.
+**Local Delivery 4 acceptance passed: 131/131 each in Debug, Release and strict ASan/UBSan/leak configurations (393/393).** The 1 MiB semantic/native checks, explicit native host and editor/package checks passed. STOPPED for owner review and seven-job hosted verification; Delivery 5 remains unauthorized. See [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md).
+Delivery 5 requires Delivery 4 hosted acceptance and separate owner authorization.
+Boss controls Git/hosted CI; Wrench reviews; Keyboard implements this delivery and
+stops after complete local acceptance. Earlier pending-hosted statuses are historical.
+
+| Implementation delivery | Current status and dependency |
+| --- | --- |
+| 1 — Native Async Activation | Hosted accepted, CI #73 |
+| 2 — Structured Task Lifecycle | Hosted accepted, CI #74 |
+| 3 — Bounded Parallel Spawn | Hosted accepted at `62b17c8c`, CI #75; current locked baseline |
+| 4 — Native Libraries | Locally accepted: 131/131 each in Debug/Release/strict (393/393); owner review and hosted CI pending |
+| 5 — Integrated Stage 6 Acceptance | Not authorized; requires Delivery 4 hosted acceptance and owner approval |
+
+These are the five implementation deliveries, not the six D1–D6 decision groups.
+D1 parallel execution now approves only the documented initial value-only scope.
+D2 enqueue/await/inferred handles, D3 root/group ownership and D4 lifecycle rules
+retain their approved contracts. D5 cross-task callable escapes stay restricted;
+D6 now approves the bounded trusted static fixture described in [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md); general FFI remains deferred. No general sharing, task-type spelling,
+async-callable or cancellation recovery contract has been silently added.
+
+## Historical Delivery 3 authorization — superseded by Delivery 4 status
 
 **Locked baseline:** Delivery 2 at `5d228804be809465ce2c97b7e0b58b89caa718ac`,
 [CI #74 checks](https://github.com/Shmellyorc/Void.Language/commit/5d228804be809465ce2c97b7e0b58b89caa718ac/checks),
@@ -15,21 +44,6 @@ ASan/UBSan/leak configurations (**360/360**), plus editor/package and 1 MiB chec
 remain unauthorized. Stop after local acceptance for owner review and hosted CI.
 D1 parallel sharing is approved only within this initial value-only boundary;
 the six design-decision groups remain distinct from the five deliveries.
-
-| Implementation delivery | Current status and dependency |
-| --- | --- |
-| 1 — Native Async Activation | Hosted accepted, CI #73 |
-| 2 — Structured Task Lifecycle | Hosted accepted, CI #74; current locked baseline |
-| 3 — Bounded Parallel Spawn | Locally accepted: 120/120 each in Debug/Release/strict; owner review and hosted CI pending |
-| 4 — Native Libraries | Not authorized; requires Delivery 3 hosted acceptance and owner approval |
-| 5 — Integrated Stage 6 Acceptance | Not authorized; requires Delivery 4 hosted acceptance and owner approval |
-
-These are the five implementation deliveries, not the six D1–D6 decision groups.
-D1 parallel execution now approves only the documented initial value-only scope.
-D2 enqueue/await/inferred handles, D3 root/group ownership and D4 lifecycle rules
-retain their approved contracts. D5 cross-task callable escapes stay restricted;
-D6 native scope remains Delivery 4 review. No general sharing, task-type spelling,
-async-callable or cancellation recovery contract has been silently added.
 
 Earlier Delivery 2 pending-hosted handoffs below are historical, superseded here.
 Boss controls Git/CI, Wrench reviews architecture, Keyboard implements authorized work.

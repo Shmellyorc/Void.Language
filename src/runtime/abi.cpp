@@ -15,7 +15,7 @@ std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value
         vd::Runtime::Attachment attachment(runtime);
         if(count || witness_count) {vd_runtime_admit_metadata(&runtime,records,count,witnesses,witness_count,failure);if(failure->message) return 0;}
         vd::Runtime::Managed managed(runtime);
-        return entry(value,failure);
+        vd::NativeCode::LeaseScope native_failures(vd::NativeCode::active_lease());auto result=entry(value,failure);if(failure->message)vd::export_native_failure(failure);return result;
     } catch (const std::bad_alloc&) {failure->message="Runtime startup allocation failed";}
       catch (...) {std::terminate();}
     return 0;
