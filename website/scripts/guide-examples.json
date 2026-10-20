@@ -245,5 +245,505 @@
     "expected": 16,
     "repository_source": "examples/modules/main.void",
     "maintenance": "repository-copy"
+  },
+  {
+    "source": "public/docs/snippets/syntax.void",
+    "guide": "syntax",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 4,
+    "expected": 12,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/variables.void",
+    "guide": "variables",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 17,
+    "cases": [
+      {
+        "input": 2,
+        "expected": 8
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/types.void",
+    "guide": "types",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 300,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/functions.void",
+    "guide": "functions",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 60,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/factorial.void",
+    "guide": "functions",
+    "kind": "fragment",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 120,
+    "context_before": "",
+    "context_after": "\nfunc entry(number: i32) -> i32:\n    return factorial(number)\n",
+    "cases": [
+      {
+        "input": 0,
+        "expected": 1
+      },
+      {
+        "input": 1,
+        "expected": 1
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/control-flow.void",
+    "guide": "control-flow",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 9,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      },
+      {
+        "input": 9,
+        "expected": 25
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/collections.void",
+    "guide": "collections",
+    "kind": "fragment",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 50,
+    "context_before": "func entry(input: i32) -> i32:\n",
+    "context_after": "    return total\n",
+    "context_indent": 4
+  },
+  {
+    "source": "public/docs/snippets/dictionaries.void",
+    "guide": "dictionaries",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 7,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 2
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/strings.void",
+    "guide": "strings",
+    "kind": "fragment",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 1,
+    "context_before": "func entry(input: i32) -> i32:\n",
+    "context_after": "    if message == \"Hello, \u4e16\u754c!\":\n        return 1\n    return 0\n",
+    "context_indent": 4
+  },
+  {
+    "source": "public/docs/snippets/value-copy.void",
+    "guide": "structs",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 5,
+    "cases": [
+      {
+        "input": 2,
+        "expected": 2
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/shared-object.void",
+    "guide": "structs",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 8,
+    "cases": [
+      {
+        "input": 2,
+        "expected": 5
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/errors.void",
+    "guide": "errors",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 4,
+    "expected": 6,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      },
+      {
+        "input": 3,
+        "expected": 8
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/generics.void",
+    "guide": "generics",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 18,
+    "cases": [
+      {
+        "input": 25,
+        "expected": 25
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/initialization.void",
+    "guide": "initialization",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 6,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 1
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/methods.void",
+    "guide": "methods",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 50,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      },
+      {
+        "input": 3,
+        "expected": 18
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/composition.void",
+    "guide": "composition",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 15,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 10
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/inheritance.void",
+    "guide": "inheritance",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 15,
+    "cases": [
+      {
+        "input": 2,
+        "expected": 9
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/interfaces.void",
+    "guide": "interfaces",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 5,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/properties.void",
+    "guide": "properties",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 27,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 12
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/callables.void",
+    "guide": "callables",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 12,
+    "expected": 9,
+    "cases": [
+      {
+        "input": 20,
+        "expected": 17
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/closures.void",
+    "guide": "closures",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 10,
+    "cases": [
+      {
+        "input": 3,
+        "expected": 6
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/events.void",
+    "guide": "events",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 6,
+    "cases": [
+      {
+        "input": 10,
+        "expected": 11
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/nullable.void",
+    "guide": "nullable",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 10,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      },
+      {
+        "input": -3,
+        "expected": -3
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/patterns.void",
+    "guide": "patterns",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 5,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/cleanup.void",
+    "guide": "cleanup",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 5,
+    "cases": [
+      {
+        "input": 2,
+        "expected": 2
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/async.void",
+    "guide": "async",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 63,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 3
+      }
+    ],
+    "mode": "async"
+  },
+  {
+    "source": "public/docs/snippets/task-groups.void",
+    "guide": "task-groups",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 240,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 40
+      }
+    ],
+    "mode": "async"
+  },
+  {
+    "source": "public/docs/snippets/parallelism.void",
+    "guide": "parallelism",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 55,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      },
+      {
+        "input": 3,
+        "expected": 14
+      }
+    ],
+    "mode": "async"
+  },
+  {
+    "source": "public/docs/snippets/modules/main.void",
+    "guide": "modules",
+    "kind": "program",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 23,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 3
+      }
+    ],
+    "support": [
+      "public/docs/snippets/modules/pricing.void",
+      "public/docs/snippets/modules/delivery.void"
+    ]
+  },
+  {
+    "source": "public/docs/snippets/editor-tooling.void",
+    "guide": "editor-tooling",
+    "kind": "fragment",
+    "maintenance": "teaching",
+    "input": 4,
+    "expected": 20,
+    "context_before": "",
+    "context_after": "\nfunc entry(reading: i32) -> i32:\n    return reading_total(reading, 5)\n"
+  },
+  {
+    "source": "public/docs/snippets/live-development.void",
+    "guide": "live-development",
+    "kind": "fragment",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 10,
+    "context_before": "",
+    "context_after": "\nfunc entry(steps: i32) -> i32:\n    return move_distance(steps)\n"
+  },
+  {
+    "source": "public/showcase/scores.void",
+    "input": 18,
+    "expected": 2,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 3
+      },
+      {
+        "input": 30,
+        "expected": 0
+      }
+    ],
+    "maintenance": "teaching",
+    "showcase": true
+  },
+  {
+    "source": "public/showcase/choose.void",
+    "input": 5,
+    "expected": 5,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      },
+      {
+        "input": -2,
+        "expected": 0
+      }
+    ],
+    "maintenance": "teaching",
+    "showcase": true
+  },
+  {
+    "source": "public/showcase/shipment.void",
+    "input": 5,
+    "expected": 5,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      }
+    ],
+    "maintenance": "teaching",
+    "showcase": true
   }
 ]

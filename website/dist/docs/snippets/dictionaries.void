@@ -1,0 +1,5 @@
+func entry(extra_notebooks: i32) -> i32:
+    var supplies: {string: i32} = {"notebooks": 2, "pens": 5}
+    supplies["notebooks"] += extra_notebooks
+    supplies["folders"] = 3
+    return supplies["notebooks"]

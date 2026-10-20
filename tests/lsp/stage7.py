@@ -59,7 +59,12 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage7 é😀 ') as directory:
         rename=c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':0,'character':7},'newName':'compute'})[0]
         assert 'result' in rename,rename
         changes=rename['result']['documentChanges'];assert len(changes)==2
-        assert {d['textDocument']['uri']:d['textDocument']['version'] for d in changes}=={uri:version,worker.as_uri():None}
+        actual_versions={d['textDocument']['uri']:d['textDocument']['version'] for d in changes}
+        expected_versions={uri:version,worker.as_uri():None}
+        assert actual_versions==expected_versions,json.dumps({'actual':actual_versions,'expected':expected_versions},ensure_ascii=True)
+        expected_edits={uri:[{'range':{'start':at(text,'calculate'),'end':at(text,'calculate',len('calculate'))},'newText':'compute'}],
+                        worker.as_uri():[{'range':{'start':{'line':0,'character':5},'end':{'line':0,'character':14}},'newText':'compute'}]}
+        assert {d['textDocument']['uri']:d['edits'] for d in changes}==expected_edits,changes
         assert q('textDocument/rename','entry',newName='changed')['error']['code']==-32602
         assert c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':0,'character':7},'newName':'return'})[0]['error']['code']==-32602
         # Legal source rebinding/conflicts are rejected; server writes no files.
@@ -127,4 +132,55 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage7 é😀 ') as directory:
         assert result['documentChanges'][0]['textDocument']['version'] is None and len(result['documentChanges'][0]['edits'])==2
         assert c.request('textDocument/hover',{'textDocument':{'uri':entry.as_uri()},'position':{'line':0,'character':7}})[0]['result']['contents']['value'].endswith(' = 4')
         c.shutdown()
+# Client URI spelling and selected-root aliases must survive canonical compiler paths.
+def rename_uri_regression(folder):
+    entry=folder/'main.void';worker=folder/'worker.void'
+    text='use "/worker.void" as worker\nfunc entry(x: i32) -> i32:\n    return worker.calculate(x)\n'
+    entry.write_bytes(text.encode('utf-8'))
+    worker.write_bytes(b'func calculate(x: i32) -> i32:\n    return x\n')
+    # Deliberately valid spellings different from the server's normal encoder.
+    client_uri=entry.as_uri().replace('file://','FILE://localhost').replace('/main.void','/%6dain.void')
+    import re
+    client_uri=re.sub(r'%[0-9A-Fa-f]{2}',lambda m:m[0].lower(),client_uri)
+    if os.name=='nt':
+        drive=client_uri.index('localhost/')+len('localhost/')
+        client_uri=client_uri[:drive]+client_uri[drive].swapcase()+client_uri[drive+1:]
+    def verify(c,expected):
+        response=c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':0,'character':7},'newName':'compute'})[0]
+        assert 'result' in response,response
+        changes=response['result']['documentChanges']
+        actual={d['textDocument']['uri']:d['textDocument']['version'] for d in changes}
+        assert len(changes)==2 and actual==expected,json.dumps({'actual':actual,'expected':expected},ensure_ascii=True)
+        edits={d['textDocument']['uri']:d['edits'] for d in changes}
+        main_uri=next(u for u in expected if u!=worker.as_uri())
+        assert edits=={main_uri:[{'range':{'start':at(text,'calculate'),'end':at(text,'calculate',9)},'newText':'compute'}],
+                       worker.as_uri():[{'range':{'start':{'line':0,'character':5},'end':{'line':0,'character':14}},'newText':'compute'}]},edits
+    with Client(server,entry) as c:
+        init(c,True)
+        for version in [0,7,-3]:
+            if version==-3:
+                c.notify('textDocument/didClose',{'textDocument':{'uri':client_uri}});c.sync()
+            if version!=7:
+                c.notify('textDocument/didOpen',{'textDocument':{'uri':client_uri,'version':version,'languageId':'void','text':text}})
+            else:
+                c.notify('textDocument/didChange',{'textDocument':{'uri':entry.resolve().as_uri(),'version':version},'contentChanges':[{'text':text}]})
+            c.sync();verify(c,{client_uri:version,worker.as_uri():None})
+        c.notify('textDocument/didChange',{'textDocument':{'uri':client_uri,'version':-2},'contentChanges':[{'text':text.replace('worker.calculate(x)','missing')}]})
+        notes=c.sync();assert any(n['uri']==client_uri and n['diagnostics'] and n['version']==-2 for n in notes),notes
+        c.notify('textDocument/didClose',{'textDocument':{'uri':client_uri}})
+        notes=c.sync();assert any(n['uri']==client_uri and not n['diagnostics'] for n in notes),notes
+        verify(c,{entry.as_uri():None,worker.as_uri():None})
+        if folder.is_symlink():
+            redirected=folder.parent/'redirected';redirected.mkdir()
+            (redirected/'main.void').write_bytes(entry.read_bytes());(redirected/'worker.void').write_bytes(worker.read_bytes())
+            folder.unlink();folder.symlink_to(redirected,target_is_directory=True)
+            rejected=c.request('textDocument/rename',{'textDocument':{'uri':worker.as_uri()},'position':{'line':0,'character':7},'newName':'compute'})[0]
+            assert rejected['error']['code']==-32602,rejected
+        c.shutdown()
+with tempfile.TemporaryDirectory(prefix='VOID URI é😀 # % ') as directory:
+    folder=pathlib.Path(directory);rename_uri_regression(folder)
+    if os.name!='nt':
+        # /var -> /private/var on macOS and similar root aliases reproduce on Linux.
+        real=folder/'real';real.mkdir();alias=folder/'alias';alias.symlink_to(real,target_is_directory=True)
+        rename_uri_regression(alias)
 print('Stage 7: completion/recovery, signatures, hover, bindings, symbols, guarded rename, formatting, refresh, batching, cancellation passed')

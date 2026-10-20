@@ -1,0 +1,7 @@
+const unit_price: i32 = 3
+
+func entry(quantity: i32) -> i32:
+    var total = quantity * unit_price
+    total += 2
+    const amount_due = total
+    return amount_due

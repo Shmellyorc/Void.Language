@@ -1,0 +1,5 @@
+func factorial(number: i32) -> i32:
+    if number == 0:
+        return 1
+    else:
+        return factorial(number - 1) * number

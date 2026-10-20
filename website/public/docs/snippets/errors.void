@@ -1,0 +1,9 @@
+func average(total: i32, count: i32) -> result<i32, string>:
+    if count <= 0:
+        return Err("at least one reading is required")
+    return Ok(total / count)
+
+func entry(reading_count: i32) -> i32:
+    return match average(24, reading_count):
+        Ok(var mean): mean
+        Err(var message): 0

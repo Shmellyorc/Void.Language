@@ -1,0 +1,5 @@
+use "/pricing.void" as pricing
+use "./delivery.void"
+
+func entry(items: i32) -> i32:
+    return pricing.subtotal(items) + delivery_fee()

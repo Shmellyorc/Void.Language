@@ -70,7 +70,12 @@ checked for overlaps and exact spelling. Current selection and all closed module
 bytes are checked before returning. The server never writes source files.
 
 Open edits carry the exact signed LSP version in `documentChanges`; closed files
-carry null versions. Rename is advertised only with documentChanges plus
+carry null versions. Outbound URIs preserve the exact `didOpen` spelling for open
+documents; closed documents use the originally selected entry-root spelling.
+Filesystem canonicalization remains internal to compiler/VFS identity. This avoids
+losing editor version checks through root aliases, drive notation or equivalent
+URI escapes. Closing a differently spelled URI clears its published diagnostics;
+rename rejects a selected root alias that has been retargeted before the response. Rename is advertised only with documentChanges plus
 `textOnlyTransactional` failure handling, or the shipped adapter's explicit
 version-guard contract. The Neovim adapter preflights **every** open target version
 (including zero/negative versions) before any edit. The pinned VS Code client

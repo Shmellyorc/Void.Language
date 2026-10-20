@@ -1,0 +1,15 @@
+interface readable:
+    func read() -> i32
+
+struct fuel_tank:
+    liters: i32
+
+func (tank fuel_tank) read() -> i32:
+    return tank.liters
+
+func fuel_level(const source: readable) -> i32:
+    return source.read()
+
+func entry(liters: i32) -> i32:
+    var tank = fuel_tank(liters = liters)
+    return fuel_level(tank)

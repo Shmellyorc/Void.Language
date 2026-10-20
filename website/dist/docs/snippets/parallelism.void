@@ -1,0 +1,11 @@
+func sum_squares(limit: i32) -> i32:
+    var total = 0
+    var number = 1
+    for number <= limit:
+        total += number * number
+        number += 1
+    return total
+
+async func entry(limit: i32) -> i32:
+    var calculation = spawn sum_squares(limit)
+    return await calculation

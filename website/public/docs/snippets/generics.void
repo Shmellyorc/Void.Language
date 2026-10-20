@@ -1,0 +1,8 @@
+func larger<t>(first: t, second: t) -> t:
+    if second > first:
+        return second
+    return first
+
+func entry(temperature: i32) -> i32:
+    var morning_peak = larger(temperature, 12)
+    return larger(morning_peak, 18)

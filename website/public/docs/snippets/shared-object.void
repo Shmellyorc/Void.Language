@@ -1,0 +1,8 @@
+struct shopping_basket:
+    item_count: i32
+
+func entry(items: i32) -> i32:
+    var basket = shopping_basket(item_count = items)
+    var shared_basket = basket
+    shared_basket.item_count += 3
+    return basket.item_count

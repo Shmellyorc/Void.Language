@@ -1,0 +1,10 @@
+async func line_count(pages: i32) -> i32:
+    return pages * 40
+
+async func entry(chapter_pages: i32) -> i32:
+    var total_lines = 0
+    with tasks.group() as chapters:
+        var chapter = line_count(chapter_pages)
+        var appendix = line_count(1)
+        total_lines = await chapter + await appendix
+    return total_lines

@@ -1,0 +1,13 @@
+value struct position:
+    x: i32
+
+func (location position) advance(steps: i32):
+    location.x += steps
+
+struct cursor:
+    using location: position
+
+func entry(steps: i32) -> i32:
+    var pointer = cursor(location = position(x = 10))
+    pointer.advance(steps)
+    return pointer.x

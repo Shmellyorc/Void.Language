@@ -1,0 +1,10 @@
+func double(number: i32) -> i32:
+    return number * 2
+
+func entry(number: i32) -> i32:
+    var adjustment: (func(i32) -> i32)?
+    if number > 0:
+        adjustment = double
+    return match adjustment:
+        Ok(var calculate): calculate(number)
+        null: number

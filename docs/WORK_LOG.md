@@ -13709,3 +13709,48 @@ text writes/reads and checked all six byte writes (including restore) for UTF-8
 round-trip and LF-only bytes. `git diff --check` passed. These are Linux checks;
 the repair awaits Boss commit/push and Windows hosted revalidation. No Git
 mutation or hosted dispatch occurred; unrelated website work was preserved.
+
+
+## 20 October 2026 — CI #80 rename URI portability repair
+
+Read-only CI #80 logs confirm the exact mapping assertion failure on Windows
+Release and macOS Release (139/140); Boss also confirmed Windows Debug and the
+same macOS failure in CI #79. Added ASCII-safe actual/expected URI/version mapping
+diagnostics before changing production behavior. Reproduced locally using a
+symlinked temporary root: actual paths contained `/tmp/void-ci80-real/`, expected
+paths `/tmp/void-ci80-alias/`, while both mappings carried main version **11** and
+closed-worker **null**. An additional pre-fix regression demonstrated URI
+re-encoding (uppercase escapes versus the client's lowercase escapes/localhost
+spelling), again with correct version **0** and closed-worker null. The defect
+is outbound filesystem/URI canonicalization, not lost versions or a missing rename
+edit. Original hosted logs lack mappings, so their exact path spelling differences
+cannot be recovered retroactively; the new assertion exposes them on any recurrence.
+
+The server now retains the exact URI supplied at didOpen and uses it for that
+open document's edits/locations/diagnostics. Closed files use the original selected
+entry-root path, while canonical compiler/VFS identity and rename revalidation stay
+unchanged. Nonempty diagnostic publication also retains its URI so close/reopen
+under another spelling clears the old diagnostics. Rename rechecks the selected
+root's canonical identity and rejects an alias retargeted during server lifetime.
+No weakening of capability checks, signed versions, binding equivalence, closed-file
+byte checks, or exact URI assertions. No compiler/language semantics changed.
+
+Expanded `lsp_stage7` checks exact URI/version mappings **and both complete edit
+sets/ranges/replacement text**. Coverage includes Unicode/reserved path bytes,
+lowercase percent escapes, localhost/scheme spelling, Windows drive-letter spelling,
+zero/positive/negative versions, changes through canonical URI aliases, reopen,
+closed-file null versions, stale-diagnostic cleanup, POSIX aliased roots and alias
+retarget rejection. The previous executable fails the added URI regression;
+the repaired executable passes it without normalizing the expected edit mapping.
+
+Focused final commands: `cmake --build <dir> --target voidls void_lsp_tests -j2`,
+then `ctest --test-dir <dir> --output-on-failure -R '^lsp_'`. Debug
+`build/order1/production`: **4/4**, 0.81 s; Release `build/ci-release`: **4/4**,
+0.49 s; strict ASan/UBSan/leaks `build/ci-sanitizers`: **4/4**, 1.75 s
+(`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87`,
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`, outside ptrace).
+The whole Stage 7 script also passed with `TMPDIR=/tmp/void-ci80-alias`.
+`git diff --check` passed. No full native matrix was repeated. Local Linux evidence
+does not claim native Windows/macOS execution of the repair. Stopped for owner
+review/commit/push and cross-platform revalidation; no Git mutations, hosted
+dispatches or publication. Unrelated website work preserved; Stage 7 is not locked.

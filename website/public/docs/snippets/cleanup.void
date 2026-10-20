@@ -1,0 +1,21 @@
+# An in-memory model: reserve workspace slots, then release them.
+struct workspace:
+    available: i32
+
+struct reservation:
+    owner: workspace
+    slots: i32
+
+func (booking reservation) deinit():
+    booking.owner.available += booking.slots
+
+func reserve(space: workspace, slots: i32) -> reservation:
+    space.available -= slots
+    return reservation(owner = space, slots = slots)
+
+func entry(capacity: i32) -> i32:
+    var space = workspace(available = capacity)
+    with reserve(space, 2) as booking:
+        # The two reserved slots belong to this scope.
+        pass
+    return space.available

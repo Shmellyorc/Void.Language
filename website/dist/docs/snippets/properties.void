@@ -1,0 +1,12 @@
+value struct rectangle:
+    width: i32
+    height: i32
+
+property (shape rectangle) area: i32:
+    get:
+        return shape.width * shape.height
+
+func entry(extension: i32) -> i32:
+    var garden = rectangle(width = 4, height = 3)
+    garden.width += extension
+    return garden.area

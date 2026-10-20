@@ -1,0 +1,14 @@
+value struct label:
+    text: string = "Untitled"
+
+func (item label) init(text: string = "Ready"):
+    item.text = text
+
+struct package:
+    title: label
+    item_count: i32 = 1
+
+func entry(extra_items: i32) -> i32:
+    var parcel = package()
+    parcel.item_count += extra_items
+    return parcel.item_count

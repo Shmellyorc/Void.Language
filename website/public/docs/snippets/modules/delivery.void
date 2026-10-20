@@ -1,0 +1,2 @@
+func delivery_fee() -> i32:
+    return 3

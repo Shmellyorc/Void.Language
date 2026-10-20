@@ -1,11 +1,11 @@
-# VOID Language 2.0
+# VOID Language
 
 VOID is a statically typed language for native applications, with indentation-based
 syntax, value and managed types, and automatic memory management. Its compiler uses
 one frontend and typed intermediate representation for LLVM ahead-of-time (AOT)
 compilation and just-in-time (JIT) execution.
 
-VOID 2.0 is under active development and is independent of the earlier
+VOID is under active development and is independent of the earlier
 C#-compatible VOIDC. The compiler implements a working language subset; the language
 design documents also contain proposals that are not yet implemented.
 

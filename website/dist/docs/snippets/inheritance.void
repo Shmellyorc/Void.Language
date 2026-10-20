@@ -1,0 +1,16 @@
+struct shipping:
+    rate: i32 = 2
+
+virtual func (service shipping) cost(weight: i32) -> i32:
+    return service.rate * weight
+
+struct express_shipping extends shipping:
+    surcharge: i32 = 5
+
+override func (service express_shipping) cost(weight: i32) -> i32:
+    return super.cost(weight) + service.surcharge
+
+func entry(weight: i32) -> i32:
+    var express = express_shipping()
+    var service: shipping = express
+    return service.cost(weight)

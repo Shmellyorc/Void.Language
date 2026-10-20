@@ -1,0 +1,11 @@
+enum shipment:
+    waiting
+    ready(items: i32)
+
+func entry(items: i32) -> i32:
+    var state = shipment.waiting
+    if items > 0:
+        state = shipment.ready(items)
+    return match state:
+        shipment.waiting: 0
+        shipment.ready(var packed): packed

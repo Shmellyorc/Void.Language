@@ -1,0 +1,19 @@
+struct sensor:
+    event measured: func(i32)
+
+func (source sensor) publish(reading: i32):
+    source.measured.emit(reading)
+
+struct display:
+    reading: i32
+
+func (screen display) show(reading: i32):
+    screen.reading = reading
+
+func entry(first_reading: i32) -> i32:
+    var source = sensor()
+    var screen = display()
+    source.measured += screen.show
+    source.publish(first_reading)
+    source.publish(first_reading + 1)
+    return screen.reading

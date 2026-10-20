@@ -1,0 +1,3 @@
+# Three items fit in each box.
+func entry(boxes: i32) -> i32:
+    return boxes * 3

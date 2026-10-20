@@ -1,0 +1,8 @@
+value struct position:
+    x: i32
+
+func entry(start: i32) -> i32:
+    var original = position(x = start)
+    var moved = original
+    moved.x += 3
+    return original.x

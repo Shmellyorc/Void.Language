@@ -1,0 +1,8 @@
+var scores: [i32] = []
+scores.push(12)
+scores.push(18)
+scores.push(20)
+
+var total = 0
+for score in scores:
+    total += score

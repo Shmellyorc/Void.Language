@@ -1,0 +1,9 @@
+value struct coupon:
+    discount: i32
+
+func (offer coupon) call(price: i32) -> i32:
+    return price - offer.discount
+
+func entry(price: i32) -> i32:
+    var save_three = coupon(discount = 3)
+    return save_three(price)

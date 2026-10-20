@@ -1,0 +1,11 @@
+func make_counter(step: i32) -> func() -> i32:
+    var count = 0
+    return func() -> i32:
+        count += step
+        return count
+
+func entry(step: i32) -> i32:
+    var next_count = make_counter(step)
+    next_count()
+    var shared_counter = next_count
+    return shared_counter()

@@ -1,0 +1,4 @@
+var greeting = "Hello, "
+const name = "世界"
+var message = greeting + name
+message += "!"

@@ -1,0 +1,3 @@
+func entry(minutes: i32) -> i32:
+    var seconds: i64 = (minutes as i64) * 60
+    return seconds as i32

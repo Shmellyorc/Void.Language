@@ -164,11 +164,11 @@ j::Object range(const vd::SourceSpan& span) {
 }
 class Server {
     enum class State { initial, waiting, ready, shutdown } state=State::initial;
-    struct Document { std::int64_t version; };
+    struct Document { std::int64_t version; std::string uri; };
     fs::path root, selected_root, entry_path;
     vd::ToolingSession session;
     std::map<std::string,Document> open;
-    std::set<std::string> published;
+    std::map<std::string,std::string> published;
     bool hierarchical_symbols=false;
     bool dirty=false;
     std::int64_t process_id=0;
@@ -192,7 +192,12 @@ class Server {
         vd::require_module_identity(key); // Includes escape/canonical/case spelling policies.
         return key;
     }
-    std::string uri(const std::string& id) const { return vd::lsp::file_uri(root/vd::utf8_path(id).relative_path()); }
+    std::string uri(const std::string& id) const {
+        // Filesystem canonicalization owns compiler identity, not client URI spelling.
+        // Versioned edits must address the exact document opened by the client.
+        if(auto document=open.find(id);document!=open.end())return document->second.uri;
+        return vd::lsp::file_uri(selected_root/vd::utf8_path(id).relative_path());
+    }
     j::Object location(const vd::SourceSpan& span) const {
         return j::Object{{"uri",uri(span.module_identity)},{"range",range(span)}};
     }
@@ -208,7 +213,7 @@ class Server {
         if(!session.accept(result) || !session.is_current(*result)) return;
         std::map<std::string,j::Array> groups;
         for(const auto& [id,doc]:open) { (void)doc; groups[id]; }
-        for(const auto& id:published) groups[id]; // Clear removed/repaired graph nodes.
+        for(const auto& [id,previous_uri]:published) { (void)previous_uri; groups[id]; } // Clear removed/repaired graph nodes.
         if(result->result().program) for(const auto& module:result->result().program->modules()) groups[module.identity];
         for(const auto& d:result->result().diagnostics) {
             auto id=d.primary.module_identity;
@@ -224,13 +229,17 @@ class Server {
             }
             groups[id].push_back(std::move(diagnostic));
         }
+        // Closing/reopening under another URI spelling must clear old diagnostics.
+        for(const auto& [id,previous_uri]:published)if(previous_uri!=uri(id))
+            send(j::Object{{"jsonrpc","2.0"},{"method","textDocument/publishDiagnostics"},
+                {"params",j::Object{{"uri",previous_uri},{"diagnostics",j::Array{}}}}});
         published.clear();
         for(auto& [id,diagnostics]:groups) {
             j::Object params{{"uri",uri(id)},{"diagnostics",std::move(diagnostics)}};
             if(auto doc=open.find(id); doc!=open.end() && diagnostic_versions) params["version"]=doc->second.version;
             // Retain only nonempty diagnostics: old empty/unreachable nodes need
             // no unbounded clearing history. Open and reachable nodes seed each run.
-            if(!params.getArray("diagnostics")->empty()) published.insert(id);
+            if(!params.getArray("diagnostics")->empty()) published.emplace(id,uri(id));
             send(j::Object{{"jsonrpc","2.0"},{"method","textDocument/publishDiagnostics"},{"params",std::move(params)}});
         }
     }
@@ -405,6 +414,9 @@ class Server {
         for(const auto& r:index->references())if(!r.implicit){if(!identities.contains(r.to))throw std::invalid_argument("Uncertain reference target");expected.emplace(r.source.module_identity,translate(r.source.module_identity,r.source.begin),identities.at(r.to));}
         for(const auto& r:fresh.references())if(!r.implicit)actual.emplace(r.source.module_identity,r.source.begin,r.to);
         if(expected!=actual)throw std::invalid_argument("Rename would rebind a written reference");
+        std::error_code root_error;
+        auto current_root=fs::canonical(selected_root,root_error);
+        if(root_error || current_root!=root)throw std::invalid_argument("Rename project root changed; restart the server");
         if(!session.is_current(*current) || !disk_current(*current->result().program))throw std::invalid_argument("Rename snapshot changed");
         j::Array changes;for(const auto& [id,spans]:edits){j::Array replacements;for(const auto& span:spans)replacements.push_back(j::Object{{"range",range(span)},{"newText",replacement}});
             j::Value version=nullptr;if(auto doc=open.find(id);doc!=open.end())version=doc->second.version;
@@ -426,7 +438,7 @@ class Server {
                 if(found!=open.end()) throw std::invalid_argument("Document is already open");
                 if(string(document,"languageId")!="void") throw std::invalid_argument("Expected VOID languageId 'void'");
                 if(open.size()>=4096) throw std::invalid_argument("Too many open documents");
-                text=string(document,"text"); session.open(id,next(id),std::move(text)); open.emplace(id,Document{version});
+                text=string(document,"text"); session.open(id,next(id),std::move(text)); open.emplace(id,Document{version,string(document,"uri")});
             } else {
                 if(found==open.end()) throw std::invalid_argument("Document is not open");
                 if(version<=found->second.version) throw std::invalid_argument("Stale or duplicate document version");

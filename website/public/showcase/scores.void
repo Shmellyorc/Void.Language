@@ -1,0 +1,8 @@
+# Count scores that meet the minimum.
+func entry(minimum: i32) -> i32:
+    var scores = [12, 18, 25]
+    var qualified = 0
+    for score in scores:
+        if score >= minimum:
+            qualified += 1
+    return qualified

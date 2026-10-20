@@ -1,0 +1,7 @@
+func entry(limit: i32) -> i32:
+    var total = 0
+    for number in [1, 3, 5, 7, 9]:
+        if number > limit:
+            break
+        total += number
+    return total

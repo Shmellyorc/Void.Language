@@ -1,7 +1,6 @@
 'use strict';
 const root = document.documentElement;
 const themeButton = document.querySelector('.theme-toggle');
-const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
 function savedTheme() {
   try { return localStorage.getItem('void-theme'); } catch { return null; }
 }
@@ -11,15 +10,12 @@ function applyTheme(theme) {
   themeButton.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`);
 }
 const saved = savedTheme();
-applyTheme(saved === 'dark' || saved === 'light' ? saved : systemTheme.matches ? 'dark' : 'light');
+applyTheme(saved === 'dark' || saved === 'light' ? saved : 'light');
 themeButton.hidden = false;
 themeButton.addEventListener('click', () => {
   const theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
   applyTheme(theme);
   try { localStorage.setItem('void-theme', theme); } catch { /* Theme still works without storage. */ }
-});
-systemTheme.addEventListener('change', event => {
-  if (!['dark', 'light'].includes(savedTheme())) applyTheme(event.matches ? 'dark' : 'light');
 });
 const menuButton = document.querySelector('.menu-toggle');
 const nav = document.querySelector('#navigation');

@@ -1,0 +1,2 @@
+func subtotal(items: i32) -> i32:
+    return items * 4

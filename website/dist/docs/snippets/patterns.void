@@ -1,0 +1,11 @@
+enum delivery:
+    pickup
+    shipped(fee: i32)
+
+func entry(shipping_fee: i32) -> i32:
+    var method = delivery.pickup
+    if shipping_fee > 0:
+        method = delivery.shipped(shipping_fee)
+    return match method:
+        delivery.pickup: 0
+        delivery.shipped(var charge): charge
