@@ -18,7 +18,7 @@
 namespace {
 void require(bool value,const char* text){if(!value)throw std::runtime_error(text);}
 auto analyze(const std::filesystem::path& path){auto a=vd::analyze_project(path,vd::native_fixture_project());if(!a.succeeded())throw vd::CompilationError(a.diagnostics);return a.program;}
-void write(const std::filesystem::path& path,const std::string& text){std::ofstream out(path);out<<text;require(bool(out),"integrated source write");}
+void write(const std::filesystem::path& path,const std::string& text){std::ofstream out(path,std::ios::binary);out<<text;require(bool(out),"integrated source write");}
 void empty(vd::Runtime& runtime){vd::Runtime::Attachment attached(runtime);vd::Runtime::Managed managed(runtime);require(runtime.collect()==vd::Runtime::Collection::completed && runtime.snapshot().objects==0,"integrated precise roots retained after drain");}
 std::thread::id collector_owner;
 std::atomic<unsigned> foreign_collections{0};
@@ -127,8 +127,18 @@ void native_integrated_tests(const std::filesystem::path& repository,const std::
     // Tooling has no trust descriptor: valid async/spawn snapshots remain useful,
     // but importing the native fixture cannot silently authorize it in the LSP.
     const std::string plain="func work(value: i32) -> i32:\n    return value + 1\nasync func entry(value: i32) -> i32:\n    return await spawn work(value)\n";
-    write(file,plain);vd::ToolingSession session(file);auto snapshot=session.select();auto good=vd::ToolingSession::analyze(snapshot);require(good->result().succeeded() && session.accept(good),"combined tooling baseline");auto definition=session.current_index()->definition_at("/main.void",plain.rfind("work(value)"));require(definition.has_value(),"spawn source reference missing");
+    write(file,plain);require(vd::read_source(file).text()==plain,"integrated LF fixture bytes changed");vd::ToolingSession session(file);auto snapshot=session.select();auto good=vd::ToolingSession::analyze(snapshot);require(good->result().succeeded() && session.accept(good),"combined tooling baseline");auto definition=session.current_index()->definition_at("/main.void",plain.rfind("work(value)"));require(definition.has_value(),"spawn source reference missing");
     session.open("/main.void",1,"use \"/native_bridge.void\" as bridge\n"+plain);auto bad=vd::ToolingSession::analyze(session.select());require(!bad->result().succeeded() && session.accept(bad) && !session.current_index(),"tooling silently authorized native fixture");session.replace("/main.void",2,plain);auto repaired=vd::ToolingSession::analyze(session.select());require(!session.accept(good) && !session.accept(bad) && repaired->result().succeeded() && session.accept(repaired) && session.current_index(),"combined tooling stale result or repair");require(good->index()->definition_at("/main.void",plain.rfind("work(value)")).has_value(),"immutable historical source reference changed");
+    // Disk fixtures and queries use exact bytes. Reproduce Windows text-mode
+    // translation explicitly so this offset regression also runs on LF hosts.
+    require(definition->source.source->text()==plain,"integrated LF analysis bytes changed");
+    std::string crlf;for(char c:plain){if(c=='\n')crlf+='\r';crlf+=c;}
+    write(file,crlf);require(vd::read_source(file).text()==crlf,"integrated CRLF fixture bytes changed");
+    vd::ToolingSession crlf_session(file);auto crlf_result=vd::ToolingSession::analyze(crlf_session.select());
+    require(crlf_result->result().succeeded() && crlf_session.accept(crlf_result),"integrated CRLF tooling baseline");
+    require(!crlf_session.current_index()->definition_at("/main.void",plain.rfind("work(value)")),"LF offset unexpectedly matched CRLF reference");
+    auto crlf_definition=crlf_session.current_index()->definition_at("/main.void",crlf.rfind("work(value)"));
+    require(crlf_definition && crlf_definition->identity==definition->identity && crlf_definition->source.source->text()==crlf,"integrated CRLF source reference or snapshot bytes changed");
     for(const auto& source:{
         "use \"/wrappers.void\" as library\nasync func task(owner: library.resource) -> i32:\n    return 1\nfunc entry(value: i32) -> i32:\n    return value\n",
         "use \"/wrappers.void\" as library\nfunc worker(value: i32) -> i32:\n    with library.open() as owner:\n        return owner.invoke(value)\nasync func entry(value: i32) -> i32:\n    return await spawn worker(value)\n"

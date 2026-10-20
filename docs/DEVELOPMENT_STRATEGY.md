@@ -16,6 +16,39 @@ and the current implementation records below remain intact.
 
 ### Current development workflow
 
+#### Stage 7 trial: research, engineering and acceptance
+
+Boss approved this **trial workflow beginning with Stage 7, after Stage 6 receives
+its final hosted lock**. It is not an inflexible permanent process. Recording the
+workflow does not begin Stage 7 research or implementation or change Stage 6's
+contracts, status or remaining acceptance. Stage 7 retains one cohesive
+implementation sprint by default; these phases are not additional deliveries.
+
+**Phase 1 — GPT-6.1 High: Research and Roadmap.** Conduct bounded,
+architecture-focused research using the existing source and relevant official
+documentation. Identify dependencies, complexity, reusable infrastructure,
+platform risks, testing needs and unresolved decisions. Record an actionable
+roadmap in permanent documentation. Scale research to the complexity; routine
+features do not require exhaustive investigation. Small technical experiments
+are allowed when needed to answer a concrete question.
+
+**Phase 2 — GPT-6.1 Medium: Engineering.** Following owner authorization,
+implement the complete stage in dependency order. Preserve engineering freedom,
+KISS/DRY and the existing architecture. Run focused tests, correct inaccurate
+roadmap assumptions and investigate new problems as they arise. A focused return
+to High is permitted for genuinely difficult unresolved questions, without
+automatically creating another delivery.
+
+**Phase 3 — Acceptance.** Complete consolidated local regression and sanitizer
+testing, receive Wrench Clanker review, then stop for owner commit/push and the
+seven-job hosted CI. Normally run hosted CI once at stage completion.
+Intermediate hosted checks are justified only by consequential platform-specific
+risks that cannot reasonably be resolved locally. Boss retains Git/CI control;
+this trial adds no automatic intermediate hosted checkpoints.
+
+The following engineering principles continue to support this trial and future
+work; the trial's model/effort split does not restrict useful Work usage.
+
 Deliver substantial engineering sprints with a clear finished outcome. Simple and
 moderately complex features normally fit one integrated sprint: use focused tests
 while developing, repair concrete failures, then complete consolidated acceptance.

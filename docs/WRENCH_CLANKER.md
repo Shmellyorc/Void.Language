@@ -7,6 +7,38 @@ unchanged through Delivery 5 and its existing owner-controlled hosted acceptance
 Do not reinterpret this update as changing any Stage 6 contract, implementation
 status or delivery authorization. Preserve the historical records below.
 
+### Approved Stage 7 trial workflow
+
+Begin this trial only **after Stage 6's final hosted lock**. It is a trial starting
+with Stage 7, not an inflexible permanent process or authorization to begin the
+stage now. Keep Stage 6's existing contracts and acceptance unchanged. The three
+phases below support one cohesive Stage 7 implementation sprint by default; they
+are not new deliveries.
+
+**Phase 1 — GPT-6.1 High, Research and Roadmap:** use existing source and relevant
+official documentation for bounded architectural research. Identify dependencies,
+complexity, reusable infrastructure, platform risks, testing needs and unresolved
+decisions; save an actionable roadmap in permanent documentation. Research is
+proportional to complexity, not exhaustive investigation of routine features.
+Small technical experiments are allowed when needed.
+
+**Phase 2 — GPT-6.1 Medium, Engineering:** following owner authorization, implement
+the complete stage in dependency order with engineering freedom, KISS/DRY and the
+existing architecture. Run focused tests, correct inaccurate roadmap assumptions
+and investigate new problems as they arise. Return to High for focused work on
+genuinely difficult unresolved questions when needed; this does not automatically
+create another delivery.
+
+**Phase 3 — Acceptance:** complete consolidated local regression/sanitizer tests,
+receive Wrench review, then stop for owner commit/push and seven-job hosted CI.
+Normally run hosted CI once at stage completion. Intermediate hosted checks are
+justified only for consequential platform-specific risks that cannot reasonably
+be resolved locally. Boss retains Git/CI control; no automatic intermediate
+hosted checkpoints are added.
+
+The engineering principles below remain applicable; this trial does not impose an
+artificial restriction on useful Work usage.
+
 Boss wants substantial sprints with a clear finished outcome. Implement simple
 and moderately complex features in one integrated sprint, using focused tests
 during development and consolidated acceptance when stable. Investigate highly

@@ -13518,3 +13518,49 @@ and macOS execution, packaging and all seven hosted jobs still require owner CI.
 No local production defect or unresolved implementation failure was demonstrated.
 Next action: owner review, commit/push, hosted verification; lock Stage 6 only if
 all seven jobs pass. Do not begin Stage 7 without separate authorization.
+
+## 19 October 2026 — CI #77 Windows integrated fixture byte-offset repair
+
+Baseline verified locally: `d3bf74430f06cc094eda5dad18d65d7d7e9b0c2c`.
+Owner reports [CI #77](https://github.com/Shmellyorc/Void.Language/actions/runs/39372676122)
+Windows Debug/Release passed 138/139, with only `stage6_integrated` failing at
+`spawn source reference missing`. Existing workflow documentation changes and
+untracked `docs/RESEARCH_CLANKER.md` were preserved.
+
+Verified the exact mismatch in the fixture: `write()` opened `std::ofstream` in
+text mode, while compiler `read_source()` explicitly reads binary bytes. The
+original LF `plain` string locates the spawn call's `work(value)` at byte **111**;
+Windows LF-to-CRLF translation adds three preceding CR bytes and moves that same
+reference to byte **114**. At byte 111 the CRLF source contains `wn work(val...`,
+not the start of the callable identifier. The permanent regression explicitly
+writes those CRLF bytes on every platform: real disk analysis rejects the original
+LF query offset and resolves byte 114 to the same `work` declaration. This
+reproduces the reported failure mechanism locally without claiming a local
+Windows run or changing source-position policy.
+
+Smallest fixture correction: open the existing integrated source writer with
+`std::ios::binary`. LF and explicit CRLF fixtures now assert exact disk-byte
+round trips and exact analyzed snapshot contents. The original definition,
+historical snapshot, authorization, diagnostic repair and stale-result assertions
+remain intact. The new CRLF positive lookup uses its own actual byte offset;
+UTF-8/UTF-16 and CRLF production semantics remain unchanged. No compiler, Runtime,
+LLVM, scheduler, GC, language behavior, expected outcome or test skip changed.
+
+Focused local commands, for `B=build/order1/production` (Debug) and
+`B=build/ci-release` (Release):
+
+```sh
+cmake --build "$B" --target void_native_tests -j3
+ctest --test-dir "$B" -R '^(stage6_integrated|tooling|tooling_demo|lsp_positions|lsp_protocol|lsp_demo)$' --output-on-failure
+```
+
+Both builds passed. **6/6 each, 12/12 total**: Debug 11.38s, Release 5.86s.
+This includes the integrated normal/O2 execution and new LF/CRLF regression,
+compiler tooling/session tests, LSP UTF-8/UTF-16/CRLF coordinate tests, real LSP
+protocol tests and tooling/LSP demos. Logs:
+`build/stage6-delivery5/ci77-{debug,release}-{build,focused}.log`.
+`git diff --check` passed. No additional full matrix was warranted by this
+fixture-only correction. Windows hosted confirmation remains pending owner CI.
+
+**STOPPED for owner review.** No commits, pushes, branches or remote actions.
+Stage 6 remains pending final hosted acceptance; Stage 7 remains unauthorized.
