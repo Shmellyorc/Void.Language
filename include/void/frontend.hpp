@@ -14,7 +14,7 @@ struct AnalyzedParameter {
     std::optional<SourceSpan> default_source = {};
 };
 struct AnalyzedDeclaration {
-    enum class Kind { function, module_constant, local_constant, value_structure, value_field, receiver_method, initializer, managed_structure, managed_field, interface_type, interface_requirement, type_parameter } kind;
+    enum class Kind { function, module_constant, local_constant, value_structure, value_field, receiver_method, initializer, managed_structure, managed_field, interface_type, interface_requirement, type_parameter, local_variable, parameter, import_alias } kind;
     std::string identity, module, visibility;
     SourceSpan source;
     std::vector<ir::Type> parameters;
@@ -35,6 +35,11 @@ struct AnalyzedDeclaration {
     std::vector<std::string> required_initialization_fields = {};
     std::string base_identity = {}, virtual_slot = {}, override_target = {};
     bool generic_template = false;
+    // Editor records never participate in compatibility serialization.
+    std::vector<AnalyzedParameter> written_parameters = {};
+    std::optional<SourceSpan> extent = {};
+    bool rename_safe = false;
+    int editor_symbol_kind = 0;
 };
 struct AnalyzedReference {
     std::string from, to, spelling;
@@ -48,6 +53,8 @@ class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis>
     std::vector<AnalyzedModule> modules_;
     std::vector<AnalyzedDeclaration> declarations_;
     std::vector<AnalyzedReference> references_;
+    std::vector<AnalyzedDeclaration> editor_declarations_;
+    std::vector<AnalyzedReference> editor_references_;
     std::function<ir::Module()> lower_;
     ValidatedAnalysis() = default;
 public:
@@ -58,6 +65,8 @@ public:
     const auto& modules() const { return modules_; }
     const auto& declarations() const { return declarations_; }
     const auto& references() const { return references_; }
+    const auto& editor_declarations() const { return editor_declarations_; }
+    const auto& editor_references() const { return editor_references_; }
     const std::string& compatibility_contract() const { return contract_; }
     const std::string& constant_contract() const { return constants_; }
     // Lowers the retained validated tree; no filesystem reads or reanalysis.
@@ -75,6 +84,19 @@ void require_module_identity(const std::string& identity);
 AnalysisResult analyze_project(const std::filesystem::path& entry);
 AnalysisResult analyze_project(const std::filesystem::path& entry,const NativeProject&);
 AnalysisResult analyze_project(const std::filesystem::path& entry, const SourceOverrides& overrides);
+struct EditorCandidate { std::string name, detail; int kind = 6; };
+struct EditorAssistance {
+    std::vector<EditorCandidate> candidates;
+    std::string signature;
+    std::vector<std::string> parameters;
+    unsigned active_parameter = 0;
+    std::size_t begin = 0, end = 0;
+};
+// Bounded recovery uses the compiler parser and binder, never produces validated IR.
+EditorAssistance editor_assistance(const std::filesystem::path&, const SourceOverrides&,
+    const std::string& module, std::size_t cursor);
+bool valid_editor_identifier(const std::string&);
+std::optional<std::string> format_source(const SourceFile&);
 // One source pipeline shared by checking, JIT and AOT. Errors contain rendered
 // source diagnostics and are raised before invoking any backend.
 ir::Module compile_source(const SourceFile& source);

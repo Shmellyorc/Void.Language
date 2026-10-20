@@ -1,0 +1,9 @@
+async func leaf(value: i32) -> i32:
+    return value + 1
+
+async func entry(value: i32) -> i32:
+    var first = leaf(value)
+    var second = leaf(value + 1)
+    var a = await first
+    var b = await second
+    return a + b

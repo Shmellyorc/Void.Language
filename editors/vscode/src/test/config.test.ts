@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import * as path from 'node:path';
 import {promises as fs} from 'node:fs';
 import * as os from 'node:os';
-import {inside, resolveProject, resolveSetting} from '../config';
+import {inside, resolveProject, resolveSetting, discoverServer} from '../config';
 
 test('literal workspace paths, spaces, no shell expansion', () => {
     assert.equal(resolveSetting('build/server space', '/project', path.posix), '/project/build/server space');
@@ -28,6 +28,10 @@ test('validate executable and deterministic canonical project selection', async 
     try {
         const server = path.join(directory, process.platform === 'win32' ? 'voidls.exe' : 'voidls');
         await fs.writeFile(server, 'not executed by unit tests'); await fs.chmod(server, 0o755);
+        assert.equal(await discoverServer('', undefined, server, ''), server);
+        assert.equal(await discoverServer('', undefined, undefined, directory), server);
+        assert.equal(await discoverServer(server, undefined, '/ignored', ''), server);
+        await assert.rejects(discoverServer('', undefined, undefined, '.'), /Cannot find voidls/);
         const settings = {server, entry: 'main.void', trace: 'off' as const};
         const project = await resolveProject(settings, [directory]);
         assert.equal(project.root, await fs.realpath(directory));

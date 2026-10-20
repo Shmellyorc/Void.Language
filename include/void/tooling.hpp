@@ -5,9 +5,13 @@ namespace vd {
 // Owns the successful analysis. Query results are copies with owning source spans.
 class ToolingIndex {
     std::shared_ptr<const ValidatedAnalysis> analysis_;
+    std::vector<AnalyzedDeclaration> all_declarations_;
+    std::vector<AnalyzedReference> all_references_;
     std::map<std::string,std::size_t> declarations_;
     std::map<std::string,std::vector<std::size_t>> modules_, incoming_, positions_;
 public:
+    const auto& declarations() const { return all_declarations_; }
+    const auto& references() const { return all_references_; }
     explicit ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis);
     std::optional<AnalyzedDeclaration> declaration(const std::string& identity) const;
     std::optional<AnalyzedDeclaration> definition_at(const std::string& module, std::size_t byte_offset) const;

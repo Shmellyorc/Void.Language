@@ -1,12 +1,56 @@
 # VOID 2.0: Development Strategy and Compiler Architecture Roadmap
 
+## Current implementation status
+
+As of **20 October 2026**:
+
+| Stage | Current status | Evidence / next gate |
+| --- | --- | --- |
+| Stage 6 — Concurrency and native libraries | **Hosted LOCKED** at `4139297f92c195782f59a28546444e6b3bec4ad8` | Owner-confirmed CI #78, seven successful jobs (973/973 suites) |
+| Stage 7 — Developer tooling and optimization | **Engineering locally complete; awaiting hosted acceptance** | 140/140 Debug, 140/140 Release and 140/140 strict sanitizer suites (420/420); targeted Wrench source review completed |
+
+Stage 7 is **not hosted locked**. The existing **seven-job hosted CI gate remains
+mandatory**: Linux Debug/Release/Sanitizers, Windows Debug/Release and macOS ARM64
+Debug/Release. Boss controls commit, push and hosted execution; local results and
+source review do not replace that gate. LLVM remains **19.1.7**.
+
+See [Stage 7's technical contract](STAGE7_IMPLEMENTATION.md) and
+[exact local evidence and compatibility boundaries](stage7/ACCEPTANCE.md).
+The implemented subset includes compiler-owned language assistance, guarded
+rename/formatting, project refresh, bounded message batching, editor adapters and
+local native packaging. VSCodium, new Windows/macOS editor combinations, research
+minimum editor versions and clean-machine portability remain unverified.
+
+## Reading the historical records
+
+The dated research/planning/delivery records below preserve the decisions and
+results as they stood at the time. **Stage 6 pending-delivery/pending-lock statements
+and Stage 7 partial, research-only or unauthorized statements are historical.**
+They do not override the current status above. The original Stage 0–7 roadmap is
+design intent; implemented technical contracts determine available behavior.
+
 **Project/repository:** `Void.Language`  
 **Language:** VOID 2.0 (`.void`)  
-**Status:** Implemented foundation plus the original roadmap; see current implementation status below
-**Date:** October 10, 2026  
-**Companion document:** `VOID_2_0_Language_Bible.md`
+**Original roadmap date:** 10 October 2026
 
-## Owner workflow and Stage 7 planning — 19 October 2026
+**Companion design:** [Language Bible](LANGUAGE_BIBLE.md)
+
+## Historical Stage 7 research handoff — 20 October 2026
+
+Boss confirms Stage 6 locked at `4139297f92c195782f59a28546444e6b3bec4ad8`,
+CI #78, seven jobs and 973/973 tests. Local HEAD matches that baseline; the hosted
+result is owner-confirmed, not rerun by research. This supersedes the historical
+pending-lock status below. Boss authorized Stage 7 **research only**.
+
+The [Stage 7 roadmap](STAGE7_ROADMAP.md) records the completed source/official-doc
+investigation, local measurements, real editor baseline probes, proposed feature
+contracts, implementation order, testing and decisions for Wrench/Boss. No Stage 7
+production implementation is authorized or claimed. Stop for Wrench review and
+Boss authorization; earlier workflow and technical history remain preserved.
+
+<a id="owner-workflow-and-stage-7-planning--19-october-2026"></a>
+
+## Historical owner workflow and Stage 7 planning — 19 October 2026
 
 **Planning only; Stage 7 implementation is not authorized.** Stage 6 continues
 unchanged through its existing five deliveries and owner-controlled hosted
@@ -14,7 +58,7 @@ acceptance. This update changes no Stage 6 contract, implementation status,
 remaining delivery authorization or acceptance gate. Previous engineering history
 and the current implementation records below remain intact.
 
-### Current development workflow
+### Development workflow recorded on 19 October
 
 #### Stage 7 trial: research, engineering and acceptance
 
@@ -123,7 +167,7 @@ See [LANGUAGE_SERVER.md](LANGUAGE_SERVER.md#stage-7-planning-goals-not-implement
 and [EDITOR_INTEGRATION.md](EDITOR_INTEGRATION.md#stage-7-editor-goals-planning-only)
 for the current baseline versus future server/editor goals.
 
-## Delivery 5 local acceptance — 19 October 2026
+## Historical Delivery 5 local acceptance — 19 October 2026
 
 Delivery 4 is owner-confirmed hosted-accepted at
 `619331ccb83227419081bc93cf47bd3a0b8b64cc`,
@@ -146,9 +190,9 @@ fixture-race correction are recorded in [WORK_LOG.md](WORK_LOG.md).
 **STOPPED for owner review, commit/push and seven-job hosted verification.**
 The final Stage 6 lock is pending; Stage 7 implementation is not authorized.
 
-## Current implementation status
+## Historical Stage 6 delivery status — 19 October 2026
 
-| Implementation delivery | Current status and dependency |
+| Implementation delivery | Status and dependency recorded on 19 October |
 | --- | --- |
 | 1 — Native Async Activation | Hosted accepted, CI #73 |
 | 2 — Structured Task Lifecycle | Hosted accepted, CI #74 |

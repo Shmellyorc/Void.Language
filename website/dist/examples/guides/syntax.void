@@ -1,0 +1,3 @@
+# Add a fixed amount to the input.
+func entry(value: i32) -> i32:
+    return value + 42

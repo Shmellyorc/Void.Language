@@ -49,6 +49,22 @@ export async function run(): Promise<void> {
     const unhandled: unknown[] = []; const rejected = (error:unknown) => { unhandled.push(error); record('Unhandled rejection: ' + String(error)); };
     process.on('unhandledRejection', rejected);
     const messages: string[] = [];
+    // Installed extensions receive their own VS Code API object. Read the real
+    // product output there; development tests also intercept actual UI reports.
+    let readingReports = false;
+    const reportTimer = process.env.VOID_TEST_VSIX ? setInterval(async () => {
+        if (readingReports) return; readingReports = true;
+        try {
+            const logs = path.join(process.env.VOID_TEST_PROFILE!, 'logs');
+            const files = (await fs.readdir(logs, {recursive:true})).filter(f => f.endsWith(path.join('void-language.void-language', 'VOID.log')));
+            const content = (await Promise.all(files.map(f => fs.readFile(path.join(logs, f), 'utf8')))).join('\n');
+            const reports = content.split('\n').map(line => line.split('[info] ')[1] ?? '').filter(line =>
+                line.startsWith('VOID: ') || line.startsWith('VOID native analysis requires') || line.startsWith('VOID requires a filesystem') ||
+                line.startsWith('VOID language server failed') || line.startsWith('VOID language server terminated'));
+            messages.splice(0, messages.length, ...reports);
+        } catch { /* The output directory appears after activation. */ }
+        finally { readingReports = false; }
+    }, 25) : undefined;
     const originalError = vscode.window.showErrorMessage;
     // Capture UI error reporting without modal notifications obstructing the test.
     (vscode.window as {showErrorMessage: typeof originalError}).showErrorMessage = ((message: string) => {
@@ -56,6 +72,7 @@ export async function run(): Promise<void> {
     }) as typeof originalError;
     const config = vscode.workspace.getConfiguration('void');
     const extension = vscode.extensions.getExtension('void-language.void-language'); assert(extension);
+    if (process.env.VOID_TEST_VSIX) assert(extension.extensionPath.includes(path.sep + 'extensions' + path.sep), 'Test the installed VSIX');
     const gone = (child:cp.ChildProcess) => child.pid === undefined || child.exitCode !== null || child.signalCode !== null;
     let api: {ready():Promise<void>; status():{state:string;entry?:string}; deactivate():Promise<void>} | undefined;
     try {
@@ -63,6 +80,7 @@ export async function run(): Promise<void> {
         const main = await vscode.workspace.openTextDocument(mainUri); await vscode.window.showTextDocument(main);
         api = await extension.activate(); assert(api); await api!.ready(); record('Activation ready: ' + JSON.stringify(api!.status()));
         record('Editor diagnostics: ' + JSON.stringify(vscode.languages.getDiagnostics(mainUri)));
+        if (process.env.VOID_TEST_VSIX && process.env.VOID_TEST_MODE !== 'trusted') await until(() => messages.length, n => n > 0, 'installed restriction report');
         if (process.env.VOID_TEST_MODE === 'multi-root') {
             assert.equal(vscode.workspace.workspaceFolders?.length, 2);
             assert.equal(children.length, 0); assert.equal(api!.status().state, 'stopped');
@@ -94,6 +112,37 @@ export async function run(): Promise<void> {
             const edit = new vscode.WorkspaceEdit(); edit.replace(document.uri, new vscode.Range(document.positionAt(0), document.positionAt(document.getText().length)), text);
             assert(await vscode.workspace.applyEdit(edit));
         }
+        const mainText = main.getText();
+        const hover = await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider', mainUri, point);
+        assert(hover?.some(h => h.contents.some(c => typeof c === 'object' && 'value' in c && c.value.includes('calculate'))));
+        const symbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', mainUri);
+        assert(symbols?.some(s => s.name === 'entry' && s.range.end.line >= 3));
+        const workspaceSymbols = await vscode.commands.executeCommand<vscode.SymbolInformation[]>('vscode.executeWorkspaceSymbolProvider', 'calc');
+        assert(workspaceSymbols?.some(s => s.name === 'calculate'));
+        await replace(main, mainText.replace('worker.calculate(x)', 'worker.'));
+        const completion = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', mainUri, new vscode.Position(3, 18), '.');
+        const candidate = completion?.items.find(i => (typeof i.label === 'string' ? i.label : i.label.label) === 'calculate');
+        assert(candidate?.textEdit);
+        const selected = new vscode.WorkspaceEdit(); selected.set(mainUri, [candidate.textEdit]);
+        assert(await vscode.workspace.applyEdit(selected)); assert(main.getText().includes('worker.calculate'));
+        await replace(main, mainText.replace('worker.calculate(x)', 'worker.calculate('));
+        const signature = await vscode.commands.executeCommand<vscode.SignatureHelp>('vscode.executeSignatureHelpProvider', mainUri, new vscode.Position(3, 28), '(');
+        assert(signature?.signatures[0].label.includes('x: i32'));
+        await replace(main, mainText);
+        assert.equal((await definitions())?.length, 1);
+        const rename = await vscode.commands.executeCommand<vscode.WorkspaceEdit>('vscode.executeDocumentRenameProvider', workerUri, new vscode.Position(0, 7), 'compute');
+        assert(rename && await vscode.workspace.applyEdit(rename));
+        assert(main.getText().includes('worker.compute(x)') && worker.getText().includes('func compute'));
+        await replace(worker, originalText); await replace(main, mainText);
+        assert.equal((await definitions())?.length, 1);
+        await replace(worker, originalText.replace('    return x + 42', '  return x + 42'));
+        const formatting = await vscode.commands.executeCommand<vscode.TextEdit[]>('vscode.executeFormatDocumentProvider', workerUri, {tabSize: 4, insertSpaces: true});
+        assert(formatting?.length === 1);
+        const formatEdit = new vscode.WorkspaceEdit(); formatEdit.set(workerUri, formatting); assert(await vscode.workspace.applyEdit(formatEdit));
+        assert.equal(worker.getText(), originalText);
+        assert.equal((await vscode.commands.executeCommand<vscode.TextEdit[]>('vscode.executeFormatDocumentProvider', workerUri, {tabSize: 4, insertSpaces: true}))?.length ?? 0, 0);
+        await vscode.commands.executeCommand('void.refreshProject');
+        assert.equal((await definitions())?.length, 1);
         await replace(worker, originalText.replace('x + 42', 'missing'));
         const diagnostic = await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.some(d => code(d) === 'VOID2002'), 'unsaved unknown identifier');
         const unknown = diagnostic.find(d => code(d) === 'VOID2002')!;
@@ -215,6 +264,7 @@ export async function run(): Promise<void> {
         assert.equal(unhandled.length, 0, 'Unhandled client rejection');
         console.log('PASS real editor: VOID2002 unsaved repair/ranges, definition/references, no stale queries, close/reopen, restart/configuration/failure/deactivation cleanup');
     } catch (error) { record('Editor test failure: ' + String(error) + (error instanceof Error ? '\n' + error.stack : '')); throw error; } finally {
+        if (reportTimer) clearInterval(reportTimer);
         process.off('unhandledRejection', rejected);
         (cp as {spawn: typeof cp.spawn}).spawn = original;
         (vscode.window as {showErrorMessage: typeof originalError}).showErrorMessage = originalError;

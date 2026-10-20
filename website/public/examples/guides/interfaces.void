@@ -1,0 +1,22 @@
+interface readable:
+    func read() -> i32
+interface movable:
+    func move(amount: i32)
+value struct motion:
+    x: i32
+func (m motion) read() -> i32:
+    return m.x
+func (m motion) move(amount: i32):
+    pass
+    m.x += amount
+    pass
+struct actor:
+    using motion
+func consume(const r: readable) -> i32:
+    return r.read()
+func entry(value: i32) -> i32:
+    var a = actor(motion = motion(x = value))
+    var moving: movable = a
+    moving.move(4)
+    const reading: readable = a
+    return consume(reading) + a.motion.x

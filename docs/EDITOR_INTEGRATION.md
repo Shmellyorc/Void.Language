@@ -1,5 +1,142 @@
 # VOID editor integration (Phase 11)
 
+## Stage 7 setup — current instructions (20 October 2026)
+
+Production engineering is authorized. This section and
+[STAGE7_IMPLEMENTATION.md](STAGE7_IMPLEMENTATION.md) supersede the historical
+Phase 11 feature exclusions below. See [acceptance](stage7/ACCEPTANCE.md) for exact
+executed versions; compatibility targets do not establish a tested version range.
+
+All editors share compiler diagnostics, completion, hover, signatures, navigation,
+document/workspace symbols, conservative formatting and refresh. Supported rename
+categories are negotiated by client capability; **Vim rename stays disabled**.
+Each window selects one entry-reachable project. Unsaved overlays remain authoritative.
+
+### VS Code / VSCodium
+
+The extension now declares VS Code **1.141.0+**, raising the old untested 1.91
+minimum to the actually exercised API version. VSCodium is an integration target;
+execution evidence must be recorded separately. Configure `void.project.entry`
+or run **VOID: Select Project Entry**. Empty entry fixes a standalone session to
+the first selected local `.void` file until configuration/restart. The status bar
+shows this entry and the selected server path.
+
+Server precedence: literal `void.server.path`, matching bundled native `server/voidls`
+(`voidls.exe` on Windows), then an absolute executable on PATH. Discovery/spawn
+happens only in a trusted filesystem workspace. No repository build, shell expansion,
+server download or source execution occurs automatically. Initialization must expose
+VOID tooling protocol 1; an incompatible installation fails visibly.
+
+The extension watches project `.void` files and forwards save notifications.
+**VOID: Refresh Project** rereads disk without losing dirty buffers. **VOID: Restart
+Language Server** restarts the selected service. Output → VOID retains diagnostics
+about startup, protocol and lifecycle failures. Verbose trace can contain source.
+Multiple workspace folders, UNC/network and virtual documents remain unsupported.
+
+Build an owner-local package with pinned Node 24.19.0 and existing locked dependencies:
+
+```sh
+npm --prefix editors/vscode test
+npm --prefix editors/vscode run package
+# Generic VSIX: configure/install voidls separately.
+code --install-extension editors/vscode/dist/void-language-0.1.0.vsix
+# VSCodium uses the same offline workflow (execution remains separately verified):
+codium --install-extension editors/vscode/dist/void-language-0.1.0.vsix
+```
+
+Prepare a shared native archive and a matching private platform VSIX:
+
+```sh
+cmake --build build/ci-release --target voidls -j2
+python3 tools/package_tooling.py --server build/ci-release/voidls \
+  --target linux-x64 --output build/stage7-artifacts --vsix
+code --install-extension build/stage7-artifacts/void-language-linux-x64.vsix
+```
+
+Packaging audits dependencies, extracts the archive and verifies a real server
+handshake without SDK paths on PATH. This is local acceptance on the same host,
+not proof of a self-contained bundle or clean-machine portability. Other targets
+must be built and audited on their own native hosts. No public redistribution is
+authorized while repository licensing remains UNLICENSED.
+
+### Neovim
+
+Install/copy the shipped runtime directories, or point `runtimepath` at them.
+Example user configuration with an explicit trusted project:
+
+```lua
+vim.opt.runtimepath:prepend('/absolute/Void.Language/editors/vim')
+vim.opt.runtimepath:prepend('/absolute/Void.Language/editors/neovim')
+vim.cmd('filetype plugin indent on')
+require('void').setup({
+  server = '/absolute/path/voidls', -- omit to discover installed PATH executable
+  entry = '/absolute/project/main.void', -- omit for a fixed standalone-file session
+})
+```
+
+The adapter uses built-in LSP config/enable/completion, with no Mason,
+nvim-lspconfig or completion plugin dependency. The research minimum target is
+0.11.5; exact executed releases/dev builds are listed in acceptance. `gd`, `gr`,
+`K`, Ctrl-K and `<leader>vd` provide definitions, references, hover, signatures and
+diagnostics. Built-in completion works with Ctrl-X Ctrl-O and auto-triggering.
+`<leader>rn` uses guarded rename; `<leader>vf` / `:VoidFormat` guard formatting by
+changedtick; `<leader>vr` / `:VoidRefresh` refresh disk. `:VoidRestart` restarts the
+client. No user configuration is edited by integration tests.
+
+### Vim
+
+Use actual Vim **9.1+** as a target, with **yegappan/lsp pinned at
+`c741b2f1afb42b9f267824dac4049674908f4a41`**. Only the exact executed version is
+claimed tested. Install that maintained client using your existing package
+workflow, then add the shipped runtime and choose one entry:
+
+```vim
+set runtimepath^=/absolute/Void.Language/editors/vim
+" Load the installed yegappan/lsp plugin before setup (for example :packadd lsp).
+filetype plugin indent on
+syntax enable
+call void#setup('/absolute/path/voidls', '/absolute/project/main.void')
+```
+
+Use an empty first argument for PATH discovery. Passing a single source file as
+entry is the standalone fallback. `gd`, `gr`, `K`, Ctrl-K, Ctrl-X Ctrl-O and the
+client's diagnostic/symbol commands use the shared server. `:VoidFormat` checks
+changedtick after its RPC before applying the compiler's whole-document edit.
+`:VoidRefresh` and `:VoidRestart` control refresh/lifecycle. Use these guarded
+formatting commands; third-party async formatting callers own stale-result checks.
+No rename mapping/capability is provided to the pinned Vim client.
+
+On this host installing Neovim changed the `vim` alternative to Neovim. Tests use
+`/usr/bin/vim.basic` for actual Vim 9.2 and leave alternatives/configuration intact.
+Check `vim --version` before selecting the adapter; Neovim cannot run Vim9 scripts.
+
+### Reproduce real adapter tests
+
+```sh
+python3 tests/editors/run.py --server build/ci-release/voidls \
+  --nvim /usr/bin/nvim --vim /usr/bin/vim.basic \
+  --vim-client /absolute/pinned-yegappan-lsp \
+  --output build/stage7-editors.json
+VOIDLS_PATH="$PWD/build/ci-release/voidls" \
+VSCODE_EXECUTABLE_PATH=/usr/share/code/code \
+npm --prefix editors/vscode run test:host
+# Set VOID_TEST_VSIX to the platform VSIX to install and test the actual artifact
+# in disposable profiles; otherwise the existing extension-development mode runs.
+```
+
+Tests exercise real clients with temporary projects, Unicode physical roots,
+unsaved edits and shutdown. Vim/Neovim runtime files are not installed into the
+user's configuration. The server itself is not published or installed system-wide.
+
+---
+
+
+**20 October 2026:** See the [Stage 7 research roadmap](STAGE7_ROADMAP.md) for
+verified current editor behavior, real Linux Neovim/Vim baseline probes, measured
+latency and the proposed shared-server sprint. Boss confirms Stage 6 locked at
+`4139297f` / CI #78. Research is complete; no Stage 7 production integration or
+new capability is implemented by that research.
+
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 The extension in `editors/vscode/` registers `.void` as language ID `void`, supplies

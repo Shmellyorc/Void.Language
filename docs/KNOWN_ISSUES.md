@@ -1,5 +1,35 @@
 # Known issues and deferred work
 
+## Stage 7 implementation boundaries — 20 October 2026
+
+The current contract is [STAGE7_IMPLEMENTATION.md](STAGE7_IMPLEMENTATION.md);
+[acceptance](stage7/ACCEPTANCE.md) distinguishes executed checks from support targets.
+Earlier “not implemented/unauthorized” Stage 7 sections below describe research
+history. The previously recorded deep valid receiver-chain capability/lowering
+stack failure is repaired locally without reducing depth guards; see the acceptance
+record for baseline reproduction and 1 MiB positive/rejection results.
+Recovery is bounded to identifier/one-line call contexts; existing call-callee
+replacement can return no completion. Methods are
+conservatively suppressed on readonly recovered receivers. Types/member families,
+aliases, generic families and captured bindings are excluded from rename. General
+quick fixes and semantic tokens are absent. Native archives require audited host
+runtime dependencies and remain private; no redistribution license is selected.
+VSCodium, advertised research minimums and new Windows/macOS client combinations
+remain unverified unless execution evidence is explicitly added. No Stage 7 lock
+or hosted result follows from local acceptance.
+
+
+## Stage 7 research findings — 20 October 2026
+
+Boss confirms Stage 6 locked at `4139297f` / CI #78, 973/973; earlier pending-lock
+statements below are historical. [STAGE7_ROADMAP.md](STAGE7_ROADMAP.md) records the
+authorized research result. The main dependencies are compiler-owned scopes and
+incomplete-source completion, bounded rename/formatting policies and native
+distribution. Measurements demonstrate queued full-analysis work. The inspected
+Vim client does not enforce versioned workspace edits, so safe rename must not be
+advertised without a tested solution. These are research findings/proposed Stage 7
+work, not implemented fixes, new Stage 6 blockers or implementation authorization.
+
 ## Stage 7 planning boundary — 19 October 2026
 
 Stage 7's future goals are recorded in the [development strategy](DEVELOPMENT_STRATEGY.md#owner-workflow-and-stage-7-planning--19-october-2026),

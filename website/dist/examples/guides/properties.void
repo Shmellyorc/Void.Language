@@ -1,0 +1,44 @@
+value struct point:
+    x: i32
+property (p point) doubled: i32:
+    get:
+        return p.x * 2
+    set(value):
+        p.x = value / 2
+struct player:
+    backing: i32 = 10
+    position: point
+    items: [i32, 3]
+property (p player) health: i32:
+    get:
+        return p.backing
+    set(value):
+        if value < 0:
+            p.backing = 0
+        else:
+            p.backing = value
+property (p player) location: point:
+    get:
+        return p.position
+    set(value):
+        p.position = value
+property (p player) snapshot: [i32, 3]:
+    get:
+        return p.items
+    set(value):
+        p.items = value
+property (p player) alive: bool:
+    get:
+        return p.health > 0
+func entry(value: i32) -> i32:
+    var p = player(items = [1, 2, 3])
+    p.health = value
+    p.health += 3
+    p.location.x = 4
+    p.location.doubled += 2
+    p.snapshot[1] = 20
+    var copy = p.location
+    copy.x = 100
+    if p.location.x != 5 or p.snapshot[1] != 20 or not p.alive:
+        return -100
+    return p.health + p.location.doubled

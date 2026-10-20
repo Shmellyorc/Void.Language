@@ -1,0 +1,27 @@
+{
+  "baseline": "4139297f92c195782f59a28546444e6b3bec4ad8",
+  "baseline_build": "Fresh git archive of HEAD; LLVM 19.1.7, Clang 19, -O0; normal analyze_project API",
+  "candidate_build": "build/order1/production, Debug",
+  "contracts": {
+    "examples/analysis/main.void": {
+      "sha256": "ce83190d2e07dafa3f2c61ecbb5a109d4b3b3da10eab48303f816ce4cb31c907",
+      "bytes": 1911,
+      "equal": true
+    },
+    "examples/generics/main.void": {
+      "sha256": "db618ab286506a02f89a75e8c16aa7ad4407f979f755a1950b3953032bcc19d3",
+      "bytes": 1558,
+      "equal": true
+    },
+    "examples/advanced/combined.void": {
+      "sha256": "b422199ad10d327dcda24dc4253e4c96d24c981af30479dfd96be73c1adaf427",
+      "bytes": 11165,
+      "equal": true
+    },
+    "examples/async/spawn.void": {
+      "sha256": "ef910ba6cd1099072f50c31a30be3c1f061c5d1a91a6a602d867fdff826251d3",
+      "bytes": 5415,
+      "equal": true
+    }
+  }
+}

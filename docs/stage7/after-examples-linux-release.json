@@ -1,0 +1,140 @@
+{
+  "baseline": "4139297f92c195782f59a28546444e6b3bec4ad8",
+  "host": "Linux-7.2.6-pikaos-x86_64-with-glibc2.44",
+  "python": "3.14.7",
+  "cpu": "AMD Ryzen 7 1700X Eight-Core Processor",
+  "cpu_count": 16,
+  "repetitions": 7,
+  "binaries": {
+    "voidls": {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-release/voidls",
+      "sha256": "849505cbea9960babd7105ab49037363bb0ef9143b57ddd06010ed6dcab556e5"
+    },
+    "voidc": {
+      "path": "/home/shmellyorc/Documents/Void.Language/build/ci-release/voidc",
+      "sha256": "afb89273b74dfd97efb28474762f9dc025a00216763497a465711b8f5c01d1d0"
+    }
+  },
+  "repository_examples": {
+    "analysis/main": {
+      "cli_check_including_ir_lowering": {
+        "samples": 7,
+        "median_ms": 7.393,
+        "p95_ms": 10.088,
+        "raw_ms": [
+          9.691,
+          6.746,
+          10.088,
+          9.662,
+          6.65,
+          6.469,
+          7.393
+        ]
+      },
+      "server_spawn_initialize_diagnostics_barrier": {
+        "samples": 7,
+        "median_ms": 4.044,
+        "p95_ms": 5.434,
+        "raw_ms": [
+          4.044,
+          5.434,
+          5.076,
+          4.78,
+          3.406,
+          3.856,
+          3.933
+        ]
+      }
+    },
+    "generics/main": {
+      "cli_check_including_ir_lowering": {
+        "samples": 7,
+        "median_ms": 7.353,
+        "p95_ms": 8.274,
+        "raw_ms": [
+          7.501,
+          7.139,
+          6.946,
+          8.274,
+          7.353,
+          7.134,
+          7.378
+        ]
+      },
+      "server_spawn_initialize_diagnostics_barrier": {
+        "samples": 7,
+        "median_ms": 3.634,
+        "p95_ms": 3.775,
+        "raw_ms": [
+          3.773,
+          3.758,
+          3.775,
+          3.595,
+          3.281,
+          3.634,
+          3.252
+        ]
+      }
+    },
+    "advanced/combined": {
+      "cli_check_including_ir_lowering": {
+        "samples": 7,
+        "median_ms": 13.201,
+        "p95_ms": 19.112,
+        "raw_ms": [
+          12.947,
+          13.196,
+          14.115,
+          19.112,
+          13.135,
+          13.201,
+          13.856
+        ]
+      },
+      "server_spawn_initialize_diagnostics_barrier": {
+        "samples": 7,
+        "median_ms": 5.2,
+        "p95_ms": 5.78,
+        "raw_ms": [
+          5.78,
+          5.342,
+          5.138,
+          5.2,
+          5.169,
+          5.4,
+          4.994
+        ]
+      }
+    },
+    "async/spawn": {
+      "cli_check_including_ir_lowering": {
+        "samples": 7,
+        "median_ms": 13.564,
+        "p95_ms": 19.206,
+        "raw_ms": [
+          16.189,
+          13.528,
+          15.268,
+          13.564,
+          13.169,
+          13.25,
+          19.206
+        ]
+      },
+      "server_spawn_initialize_diagnostics_barrier": {
+        "samples": 7,
+        "median_ms": 4.971,
+        "p95_ms": 6.907,
+        "raw_ms": [
+          5.734,
+          6.907,
+          4.771,
+          6.399,
+          4.763,
+          4.971,
+          4.947
+        ]
+      }
+    }
+  }
+}

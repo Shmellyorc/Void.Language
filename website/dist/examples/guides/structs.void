@@ -1,0 +1,15 @@
+value struct point:
+    x: i32
+    y: i32
+
+struct counter:
+    total: i32
+
+func entry(value: i32) -> i32:
+    var original = point(x = 2, y = 3)
+    var copied = original
+    copied.x += 10
+    var shared = counter(total = 0)
+    var alias = shared
+    alias.total += 5
+    return original.x + copied.x + shared.total

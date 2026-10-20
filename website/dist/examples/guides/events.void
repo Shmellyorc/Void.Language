@@ -1,0 +1,23 @@
+struct source:
+    event changed: func(i32)
+func (s source) fire(value: i32):
+    s.changed.emit(value)
+struct observer:
+    total: i32
+func (o observer) add(value: i32):
+    o.total += value
+func entry(value: i32) -> i32:
+    var s = source()
+    var seen = observer(total=0)
+    s.changed += seen.add
+    s.changed += seen.add
+    s.changed -= seen.add
+    s.fire(value)
+    var local = 0
+    var callback = func(n: i32):
+        local += n
+    s.changed += callback
+    s.fire(2)
+    s.changed -= callback
+    s.fire(3)
+    return seen.total * 10 + local

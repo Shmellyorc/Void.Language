@@ -111,7 +111,7 @@ class Client:
                 "publishDiagnostics": {"relatedInformation": True, "versionSupport": True}}}}, "initialize")
         assert not notifications
         caps = response["result"]["capabilities"]
-        assert caps == {"positionEncoding": "utf-16", "textDocumentSync": {"openClose": True, "change": 1},
+        assert {key: caps[key] for key in ["positionEncoding", "textDocumentSync", "definitionProvider", "referencesProvider"]} == {"positionEncoding": "utf-16", "textDocumentSync": {"openClose": True, "change": 1, "save": {"includeText": False}},
                         "definitionProvider": True, "referencesProvider": True}, caps
         self.notify("initialized", {})
         return self.sync()

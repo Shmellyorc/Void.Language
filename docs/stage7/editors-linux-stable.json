@@ -1,0 +1,50 @@
+{
+  "nvim": {
+    "editor": {
+      "minor": 12,
+      "patch": 6,
+      "build": "v0.12.6",
+      "api_compatible": 0,
+      "api_level": 14,
+      "api_prerelease": false,
+      "major": 0
+    },
+    "passed": [
+      "shipped adapter",
+      "completion selection",
+      "incomplete call signature",
+      "hover",
+      "symbols",
+      "navigation",
+      "dirty repair",
+      "cross-file guarded rename",
+      "stale edit rejection",
+      "stale formatting rejection",
+      "formatting",
+      "refresh",
+      "restart",
+      "stop",
+      "no orphan server"
+    ],
+    "executable": "/tmp/void-stage7-clients/nvim-linux-x86_64/bin/nvim"
+  },
+  "vim": {
+    "passed": [
+      "shipped adapter",
+      "hover",
+      "symbols",
+      "incomplete completion",
+      "signature",
+      "definition",
+      "rename disabled",
+      "dirty diagnostics",
+      "guarded formatting",
+      "refresh",
+      "restart",
+      "stop",
+      "no orphan server"
+    ],
+    "editor": "VIM - Vi IMproved 9.2 (2026 Feb 14, compiled Jul 27 2026 10:11:18)",
+    "executable": "/usr/bin/vim.basic"
+  }
+}

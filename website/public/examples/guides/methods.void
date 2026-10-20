@@ -1,0 +1,15 @@
+value struct point:
+    x: i32 = 2
+    y: i32 = 3
+
+func (p point) move(dx: i32, dy: i32):
+    p.x += dx
+    p.y += dy
+
+func (p point) distance_squared() -> i32:
+    return p.x * p.x + p.y * p.y
+
+func entry(value: i32) -> i32:
+    var position = point()
+    position.move(value, 0)
+    return position.distance_squared()

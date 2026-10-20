@@ -1,0 +1,10 @@
+func divide(value: i32) -> result<i32, string>:
+    if value == 0:
+        return Err("division by zero")
+    return Ok(100 / value)
+
+func entry(value: i32) -> i32:
+    var outcome = divide(value)
+    return match outcome:
+        Ok(var number): number
+        Err(var reason): -1

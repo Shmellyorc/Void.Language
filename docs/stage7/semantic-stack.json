@@ -1,0 +1,56 @@
+{
+  "stack_bytes": 1048576,
+  "baseline_analysis_96": -11,
+  "baseline_analysis_96_backtrace": "capabilities.inc expression lambda",
+  "after": [
+    {
+      "chain": 16,
+      "stage7_cli": 0
+    },
+    {
+      "chain": 64,
+      "stage7_cli": 0
+    },
+    {
+      "chain": 96,
+      "stage7_cli": 0
+    },
+    {
+      "chain": 104,
+      "stage7_cli": 0
+    },
+    {
+      "chain": 112,
+      "stage7_cli": 0
+    },
+    {
+      "chain": 120,
+      "stage7_cli": 0
+    },
+    {
+      "chain": 124,
+      "stage7_cli": 0
+    },
+    {
+      "chain": 126,
+      "stage7_cli": 1
+    },
+    {
+      "chain": 127,
+      "stage7_cli": 1
+    },
+    {
+      "chain": 128,
+      "stage7_cli": 1
+    },
+    {
+      "chain": 160,
+      "stage7_cli": 1
+    },
+    {
+      "chain": 400,
+      "stage7_cli": 1
+    }
+  ],
+  "baseline_analyze_and_lower_64": -11
+}

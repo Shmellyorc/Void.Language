@@ -186,14 +186,14 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             if(e.kind==K::function_reference)edges.calls.insert(e.target);
             if((e.kind==K::call || e.kind==K::method_call) && !functions.contains(e.target) && !e.target.starts_with("$array.") && !e.target.starts_with("$dict."))edges.unsafe=true;
             auto view=ir::reference_facts(e.type);
-            if(e.kind==K::spawned){auto result=expression(*e.parts[0]);view=ir::replaced_facts(view,1,result);
-            } else if(e.kind==K::awaited){
+            if(e.kind==K::spawned)frontend_case([&] {auto result=expression(*e.parts[0]);view=ir::replaced_facts(view,1,result);
+            }); else if(e.kind==K::awaited)frontend_case([&] {
                 auto task=expression(*e.parts[0]);view=ir::field_facts(e.parts[0]->type,task,1);
-            } else if(e.kind==K::capture_reference){
+            }); else if(e.kind==K::capture_reference)frontend_case([&] {
                 auto facts=e.parts.empty()?locals.at(e.slot):expression(*e.parts[0]);auto stored=ir::field_type(e.type,0);auto combined=ir::reference_facts(stored);ir::join_facts(combined,facts);auto profile=ir::fact_type(stored,combined);
                 if(ir::capability_key(stored)!=ir::capability_key(profile)){std::const_pointer_cast<ir::ValueType>(e.type.definition)->fields[0].type=profile;changed=true;}
                 retain(facts,profile,e.token);
-            } else if(e.kind==K::function_reference) {
+            }); else if(e.kind==K::function_reference) frontend_case([&] {
                 std::vector<ReferenceFacts> arguments;for(auto& part:e.parts)arguments.push_back(expression(*part));
                 auto& target=*functions.at(e.target);if(!target.native_symbol.empty())issue(e.token,"Native bindings cannot escape as function values.");
                 if(e.op=="value_bound"){
@@ -204,42 +204,42 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     if(report && !ir::capability_assignable(ir::fact_type(target.result,ir::instantiate_result(target.reference_effects.returned,arguments)),*e.type.definition->call_result))issue(e.token,"Bound callback would discard returned readonly authority.");
                 }
                 if(report){auto& target=*functions.at(e.target);if(!ir::capability_assignable(ir::fact_type(target.result,target.reference_effects.returned),*e.type.definition->call_result))issue(e.token,"Function value would discard returned readonly authority.");}
-            } else if(e.kind==K::function_call) {
+            }); else if(e.kind==K::function_call) frontend_case([&] {
                 expression(*e.parts[0]);std::vector<ReferenceFacts> arguments;
                 for(unsigned n=1;n<e.parts.size();++n){auto facts=expression(*e.parts[n]);auto formal=Type(e.parts[0]->type.definition->call_parameters[n-1]);compatible(facts,formal,e.parts[n]->token);for(const auto& [path,fact]:facts)if(!ir::readonly_paths(formal).contains(path)){effect(f.reference_effects.mutations,fact);effect(f.reference_effects.retained,fact);}arguments.push_back(std::move(facts));}
                 view=ir::callable_result(e.parts[0]->type,arguments);
-            } else if(e.kind==K::test) {
+            }); else if(e.kind==K::test) frontend_case([&] {
                 auto subject=expression(*e.parts[0]);pattern(e.patterns[0],subject);
-            } else if(e.kind==K::match) {
+            }); else if(e.kind==K::match) frontend_case([&] {
                 auto subject=expression(*e.parts[0]);
                 for(unsigned n=0;n<e.patterns.size();++n){pattern(e.patterns[n],subject);ir::join_facts(view,expression(*e.parts[n+1]));}
-            } else if(e.kind==K::sum) {
+            }); else if(e.kind==K::sum) frontend_case([&] {
                 const auto& variant=e.type.definition->cases.at(e.slot);
                 for(unsigned n=0;n<e.parts.size();++n)view=ir::replaced_facts(std::move(view),variant.begin+n,expression(*e.parts[n]));
-            } else if(e.kind==K::propagate) {
+            }); else if(e.kind==K::propagate) frontend_case([&] {
                 auto child=expression(*e.parts[0]);view=ir::field_facts(e.parts[0]->type,child,1);
                 // Error propagation is a real return edge, with the same authority checks.
                 auto failure=ir::replaced_facts(ir::reference_facts(f.result),2,ir::field_facts(e.parts[0]->type,child,2));
                 compatible(failure,f.result,e.token);
                 for(const auto& [path,fact]:failure)changed|=f.reference_effects.returned[path].join(fact);
-            } else if(e.kind==K::array_literal || e.kind==K::array_default) {
+            }); else if(e.kind==K::array_literal || e.kind==K::array_default) frontend_case([&] {
                 for(auto& part:e.parts) {
                     auto child=expression(*part);
                     for(const auto& [leaf,fact]:child) {auto path=leaf;path.insert(path.begin(),ir::array_element_path);view[path].join(fact);}
                 }
-            } else if(e.kind==K::dictionary_literal) {
+            }); else if(e.kind==K::dictionary_literal) frontend_case([&] {
                 for(unsigned n=0;n<e.parts.size();n+=2)for(unsigned field=0;field<2;++field){auto child=expression(*e.parts[n+field]);for(const auto& [leaf,fact]:child){auto path=leaf;path.insert(path.begin(),field);path.insert(path.begin(),ir::array_element_path);view[path].join(fact);}}
-            } else if(e.kind==K::array_slice) {
+            }); else if(e.kind==K::array_slice) frontend_case([&] {
                 auto owner=expression(*e.parts[0]);expression(*e.parts[1]);expression(*e.parts[2]);
                 view=ir::replaced_facts(std::move(view),ir::array_element_path,ir::field_facts(e.parts[0]->type,owner,ir::array_element_path));
-            } else if(e.kind==K::array_index) {
+            }); else if(e.kind==K::array_index) frontend_case([&] {
                 auto owner=expression(*e.parts[0]);expression(*e.parts[1]);view=ir::field_facts(e.parts[0]->type,owner,ir::array_element_path);if(e.parts[0]->type.kind==Type::dictionary)view=ir::field_facts(ir::array_element(e.parts[0]->type),view,1);
-            } else if (e.kind==K::name) view=locals.at(e.slot);
-            else if (e.kind==K::field) {
+            }); else if (e.kind==K::name) view=locals.at(e.slot);
+            else if (e.kind==K::field) frontend_case([&] {
                 auto base=expression(*e.parts[0]);
                 if(e.target!="$array.count" && e.target!="$dict.count")view=ir::field_facts(e.parts[0]->type,base,e.slot);
-            } else if (e.kind==K::conversion) view=expression(*e.parts[0]);
-            else if (e.kind==K::call || e.kind==K::method_call) {
+            }); else if (e.kind==K::conversion) view=expression(*e.parts[0]);
+            else if (e.kind==K::call || e.kind==K::method_call) frontend_case([&] {
                 std::vector<ReferenceFacts> arguments;
                 for (auto& part:e.parts) arguments.push_back(expression(*part));
                 if(e.target=="$event.emit"){
@@ -256,7 +256,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     }
                 }
                 if(functions.contains(e.target))view=invoke(e,e.target,arguments);
-            } else if (e.kind==K::construction || e.kind==K::base_initialization) {
+            }); else if (e.kind==K::construction || e.kind==K::base_initialization) frontend_case([&] {
                 view=ir::reference_facts(e.type);
                 if (e.initializer.empty()) {
                     for (unsigned n=0;n<e.parts.size();++n) {
@@ -285,7 +285,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                         ir::join_facts(view,ir::reference_facts(target.receiver->type));
                     }
                 }
-            } else for (auto& child:e.parts) expression(*child);
+            }); else for (auto& child:e.parts) expression(*child);
             // Null/default values still have reference authority. An absent
             // provenance origin must never erase their logical reference leaf.
             for (const auto& path:ir::reference_paths(e.type)) view.try_emplace(path);

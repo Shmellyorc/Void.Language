@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-20",
+  "head": "4139297f92c195782f59a28546444e6b3bec4ad8",
+  "llvm": "19.1.7",
+  "stageLocked": false,
+  "tests": {
+    "Debug": {
+      "passed": 140,
+      "failed": 0,
+      "seconds": 427.92
+    },
+    "Release": {
+      "passed": 140,
+      "failed": 0,
+      "seconds": 165.36
+    },
+    "ASan_UBSan_LSan": {
+      "passed": 140,
+      "failed": 0,
+      "seconds": 365.19
+    },
+    "frontend_1MiB_Debug": true,
+    "frontend_1MiB_Release": true,
+    "VSCode_development_profiles": 3,
+    "VSCode_installed_VSIX_profiles": 3
+  },
+  "voidls_sha256": "849505cbea9960babd7105ab49037363bb0ef9143b57ddd06010ed6dcab556e5",
+  "allPackagedServerBytesMatch": true,
+  "artifacts": {
+    "build/stage7-artifacts/void-tooling-linux-x64.tar.gz": {
+      "sha256": "3aeeea2df694e0d9a46bdfe6786a14ab1cb0338938c9715fba5b866ecff503f8",
+      "bytes": 1900442
+    },
+    "build/stage7-artifacts/void-language-linux-x64.vsix": {
+      "sha256": "3a062cb496fb9861e5a107c07b73e8280191e653031a66fe60df1c5615c110dc",
+      "bytes": 2081163
+    }
+  },
+  "unverified": [
+    "VSCodium",
+    "Windows",
+    "macOS",
+    "minimum target editor versions",
+    "clean-machine native dependencies"
+  ],
+  "publicRedistributionAuthorized": false
+}

@@ -1,0 +1,22 @@
+const greeting = "Hello, "
+const target = greeting + "世界"
+
+value struct label:
+    text: string
+
+struct message:
+    title: string = "untitled"
+    payload: label
+
+func echo(const text: string) -> string:
+    return text
+
+func entry(value: i32) -> i32:
+    var empty: string
+    var m = message(payload = label(text = target))
+    const snapshot = echo(m.payload.text)
+    var changed = snapshot
+    changed += "!"
+    if empty == "" and snapshot == "Hello, 世界" and changed != snapshot and m.title == "untitled":
+        return value + 1
+    return -100

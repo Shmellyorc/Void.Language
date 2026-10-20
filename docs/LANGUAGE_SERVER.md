@@ -1,5 +1,25 @@
 # Minimal VOID language server (Phase 10)
 
+# Stage 7 language service — current contract
+
+Boss authorized Stage 7 production engineering on 20 October 2026.
+[STAGE7_IMPLEMENTATION.md](STAGE7_IMPLEMENTATION.md) is the current protocol,
+recovery, rewrite, synchronization and scheduling contract. It supersedes the
+historical Phase 10 exclusions below. Added methods: completion, hover,
+signatureHelp, documentSymbol, workspace/symbol, guarded prepareRename/rename,
+formatting, didSave, watched-file refresh, cancellation and void/refreshProject.
+Initialization exposes `experimental.voidToolingProtocol: 1` and server version
+0.2.0. The same compiler-owned server serves every editor. Local evidence and
+remaining limitations are in [acceptance](stage7/ACCEPTANCE.md); Stage 7 is not locked.
+
+---
+
+
+**20 October 2026:** [Stage 7 research roadmap](STAGE7_ROADMAP.md) verifies the
+current source, including later symbol coverage that exceeds the original Phase 10
+summary below. Boss confirms Stage 6 locked at `4139297f` / CI #78. Research is
+complete; Stage 7 implementation is not authorized and no new capability is claimed.
+
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 `voidls` is a synchronous, single-threaded stdio implementation of the

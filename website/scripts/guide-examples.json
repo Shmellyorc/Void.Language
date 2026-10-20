@@ -1,0 +1,161 @@
+[
+  {
+    "source": "public/examples/guides/syntax.void",
+    "input": 10,
+    "expected": 52
+  },
+  {
+    "source": "public/examples/guides/variables.void",
+    "input": 10,
+    "expected": 12
+  },
+  {
+    "source": "public/examples/guides/types.void",
+    "input": 10,
+    "expected": 12
+  },
+  {
+    "source": "public/examples/guides/functions.void",
+    "input": 5,
+    "expected": 120
+  },
+  {
+    "source": "public/examples/guides/control-flow.void",
+    "input": 5,
+    "expected": 21
+  },
+  {
+    "source": "public/examples/guides/collections.void",
+    "input": 0,
+    "expected": 18
+  },
+  {
+    "source": "public/examples/guides/structs.void",
+    "input": 0,
+    "expected": 19
+  },
+  {
+    "source": "public/examples/guides/errors.void",
+    "input": 2,
+    "expected": 50
+  },
+  {
+    "source": "public/examples/guides/async.void",
+    "input": 5,
+    "expected": 13,
+    "repository_source": "examples/async/activation.void",
+    "mode": "check",
+    "async_artifact": "activation"
+  },
+  {
+    "source": "public/examples/guides/task-groups.void",
+    "input": 5,
+    "expected": 6,
+    "repository_source": "examples/async/lifecycle.void",
+    "mode": "check",
+    "async_artifact": "lifecycle"
+  },
+  {
+    "source": "public/examples/guides/parallelism.void",
+    "input": 5,
+    "expected": 124,
+    "repository_source": "examples/async/spawn.void",
+    "mode": "check",
+    "async_artifact": "spawn"
+  },
+  {
+    "source": "public/examples/guides/generics.void",
+    "input": 5,
+    "expected": 5,
+    "repository_source": "examples/generics/main.void"
+  },
+  {
+    "source": "public/examples/guides/interfaces.void",
+    "input": 5,
+    "expected": 18,
+    "repository_source": "examples/interfaces/main.void"
+  },
+  {
+    "source": "public/examples/guides/properties.void",
+    "input": 5,
+    "expected": 18,
+    "repository_source": "examples/properties/main.void"
+  },
+  {
+    "source": "public/examples/guides/closures.void",
+    "input": 5,
+    "expected": 13,
+    "repository_source": "examples/advanced/closures.void"
+  },
+  {
+    "source": "public/examples/guides/events.void",
+    "input": 5,
+    "expected": 102,
+    "repository_source": "examples/advanced/events.void"
+  },
+  {
+    "source": "public/examples/guides/cleanup.void",
+    "input": 5,
+    "expected": 184,
+    "repository_source": "examples/advanced/with.void"
+  },
+  {
+    "source": "public/examples/guides/patterns.void",
+    "input": 5,
+    "expected": 8,
+    "repository_source": "examples/patterns/values.void"
+  },
+  {
+    "source": "public/examples/guides/strings.void",
+    "input": 5,
+    "expected": 6,
+    "repository_source": "examples/strings/main.void"
+  },
+  {
+    "source": "public/examples/guides/nullable.void",
+    "input": 5,
+    "expected": 10,
+    "repository_source": "examples/advanced/nullable.void"
+  },
+  {
+    "source": "public/examples/guides/composition.void",
+    "input": 5,
+    "expected": 106,
+    "repository_source": "examples/composition/main.void"
+  },
+  {
+    "source": "public/examples/guides/inheritance.void",
+    "input": 5,
+    "expected": 103,
+    "repository_source": "examples/inheritance/main.void"
+  },
+  {
+    "source": "public/examples/guides/initialization.void",
+    "input": 5,
+    "expected": 7,
+    "repository_source": "examples/strings/initialization.void"
+  },
+  {
+    "source": "public/examples/guides/dictionaries.void",
+    "input": 5,
+    "expected": 8,
+    "repository_source": "examples/dictionaries/main.void"
+  },
+  {
+    "source": "public/examples/guides/callables.void",
+    "input": 5,
+    "expected": 18,
+    "repository_source": "examples/properties/callable.void"
+  },
+  {
+    "source": "public/examples/guides/methods.void",
+    "input": 5,
+    "expected": 58
+  },
+  {
+    "source": "public/examples/guides/modules/main.void",
+    "input": 5,
+    "expected": 16,
+    "repository_source": "examples/modules/main.void"
+  }
+]

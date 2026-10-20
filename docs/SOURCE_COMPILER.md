@@ -28,6 +28,120 @@ Phase 17 adds custom managed initialization with checked construction views,
 required-reference readiness, safe helper contexts and complete-object commit; see
 [MANAGED_INITIALIZATION.md](MANAGED_INITIALIZATION.md).
 
+## Building the compiler
+
+VOID requires the complete LLVM **19.1.7** SDK, including headers and development
+libraries. For a first program, start with the
+[root README](../README.md#a-small-example).
+
+### Linux dependencies and build
+
+Requires CMake 3.24+, a C++20 compiler, and the complete **LLVM 19.1.7** development
+SDK. The tests also require Python 3.9+, matching Clang 19.1.7 and `llvm-dwarfdump`.
+On Debian-family distributions that provide these versions:
+
+```sh
+sudo apt-get install build-essential cmake ninja-build python3 llvm-19-dev clang-19 lld-19 libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libz3-dev
+cmake -S . -B build/debug -G Ninja \
+  -DLLVM_DIR=/usr/lib/llvm-19/lib/cmake/llvm \
+  -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19 \
+  -DVOID_LINKER=/usr/lib/llvm-19/bin/ld.lld \
+  -DCMAKE_BUILD_TYPE=Debug
+cmake --build build/debug --parallel 4
+ctest --test-dir build/debug --output-on-failure
+```
+
+Machine-code ownership certification is optional research. Ordinary JIT/AOT
+compilation uses typed IR validation, LLVM verification and the shared lowerer;
+it does not require allocation lineage or final-byte certificates. To build the
+existing experiments, configure with `-DVOID_LLVM_RESEARCH=ON`, build
+`void_arrays_storage_audit`, and run
+`ctest --test-dir build/debug -L research --output-on-failure`. Research checker rejections are not LLVM correctness
+failures or production compilation blockers. The research-only 64 KiB storage
+budget is not a production limit.
+The optional [private fixed-call experiment](../tests/research/call_envelope/README.md)
+uses direct LLVM arguments and Runtime copy helpers, without envelope
+permissions, store-identity protocols or a linked-byte certificate gate. It is
+separate from already implemented production source arrays.
+
+Verify your distribution actually provides 19.1.7. CMake rejects different SDK
+versions. LLVM's development package depends on other development libraries;
+keep them installed. In particular, missing `libzstd-dev` prevents the installed
+LLVM CMake targets from linking. `libedit-dev` supplies the optional SDK
+line-editing dependency. No alternate library paths or stub targets are used.
+
+For optimized and instrumented builds, use separate directories with
+`-DCMAKE_BUILD_TYPE=Release`, or `-DCMAKE_BUILD_TYPE=RelWithDebInfo
+-DVOID_SANITIZERS=ON`. Run the same CTest suite in each directory.
+LeakSanitizer requires a host that permits process inspection and cannot run
+under ptrace; use an environment without that tracing restriction.
+
+CMake matches the selected SDK's RTTI setting across all linked C++ targets.
+The complete official Linux archive has RTTI disabled; ASan/UBSan remain enabled,
+but Clang's RTTI-dependent vptr check is unavailable in that ABI. A complete
+RTTI-enabled LLVM 19.1.7 SDK supplies the separate vptr validation configuration.
+See [the CI sanitizer investigation and coverage limits](CI_SANITIZER_ABI.md).
+
+### Native execution and linking
+
+```sh
+build/debug/voidc check examples/architecture.void
+build/debug/voidc run examples/architecture.void 10
+# 52
+build/debug/voidc emit examples/architecture.void -o build/debug/architecture.o
+clang-19 -fuse-ld=/usr/lib/llvm-19/bin/ld.lld build/debug/architecture.o -o build/debug/architecture
+build/debug/architecture 10
+# 52
+```
+
+`run` uses the native ORC JIT. `emit` produces a host-native object with a `main`
+adapter and source line information; the compiler does not launch a shell or
+linker. Both execution modes accept one optional decimal i32 input, defaulting to
+zero. The adapter requires `func entry(value: i32) -> i32` (any parameter name).
+The executable prints its i32 result and exits successfully; invalid input exits
+with status 2. `check` also accepts libraries without an entry function. Append
+`--no-opt` to `run` or `emit` to disable LLVM O2.
+
+For managed programs, link the VOID Runtime and its dependencies as described in
+[managed structs](MANAGED_STRUCTS.md). Feature-specific native examples belong in
+[receiver methods](RECEIVER_METHODS.md), [initialization](INITIALIZATION.md),
+[managed initialization](MANAGED_INITIALIZATION.md),
+[reference-containing values](REFERENCE_VALUE_STRUCTS.md),
+[inheritance](INHERITANCE.md) and [interfaces](INTERFACES.md).
+
+The older `--jit-proof` and `--emit-proof OBJECT` options are hand-built IR
+architecture harnesses, separate from source compilation. Their AOT adapter uses
+argument count. They are not substitutes for the source commands above.
+
+### Windows and macOS
+
+The [CI workflow](../.github/workflows/ci.yml) downloads complete official
+LLVM 19.1.7 development archives, including headers and static libraries.
+Windows uses the MSVC/Windows SDK environment and `clang-cl`, with the release
+MSVC dynamic runtime and iterator ABI matching the prebuilt LLVM libraries in
+both build configurations. The native AOT link uses the SDK's `clang` driver,
+with `-llegacy_stdio_definitions` to resolve the direct native `printf` symbol
+through the active MSVC library search paths. Use a Visual Studio developer
+environment (CI initializes it before configuration and testing).
+macOS selects the official archive matching the runner architecture and uses
+the Xcode SDK. Linux installs development dependencies explicitly and selects
+the same archive's LLD 19.1.7 because its static LLVM libraries contain bitcode.
+CMake matches the LLVM backend's RTTI setting to the selected SDK, retaining
+exception support. Configuration links and executes an ORC host as an SDK check.
+On Windows, stale exported DIA library paths are resolved against the active
+Visual Studio DIA SDK (`VSINSTALLDIR`); an explicit real
+`-DVOID_DIA_GUIDS_LIBRARY=.../diaguids.lib` can also be supplied.
+
+On Windows, link an unmanaged source object from the Visual Studio developer
+environment with `clang architecture.o -llegacy_stdio_definitions -o architecture.exe`.
+On macOS, use the pinned SDK's `clang architecture.o -o architecture`.
+
+The established seven-job gate covers Ubuntu Debug/Release/Sanitizers, Windows
+Debug/Release and macOS ARM64 Debug/Release. Stage 6 is hosted locked at CI #78;
+Stage 7's Linux local acceptance does not certify its new Windows/macOS tooling.
+See [current status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and
+[local evidence](stage7/ACCEPTANCE.md) for the distinction.
+
 ## Working pipeline
 
 `SourceFile` validates UTF-8 and retains original byte offsets. The indentation

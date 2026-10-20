@@ -1,0 +1,7 @@
+const step: i32 = 2
+
+func entry(value: i32) -> i32:
+    var total = value
+    total += step
+    const snapshot = total
+    return snapshot

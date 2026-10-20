@@ -4,7 +4,7 @@ import {promises as fs, constants} from 'node:fs';
 export interface Settings { server: string; entry: string; trace: 'off'|'messages'|'verbose'; }
 export interface Project { server: string; entry: string; root: string; trace: Settings['trace']; singleFile: boolean; }
 
-// Paths are literal. No shell, environment substitutions, tilde or PATH search.
+// Explicit paths are literal. Discovery searches only the installed PATH.
 export function resolveSetting(value: string, workspace?: string, paths: path.PlatformPath = path): string {
     if (!value || value.includes('\0')) throw new Error('Configure void.server.path and void.project.entry with valid literal paths.');
     if (paths.sep === '\\' && (/^[a-z]:($|[^\\/])/i.test(value) || /^[\\/](?![\\/])/i.test(value)))
@@ -17,10 +17,21 @@ export function inside(root: string, file: string, paths: path.PlatformPath = pa
     const relative = paths.relative(root, file);
     return relative !== '..' && !relative.startsWith('..' + paths.sep) && !paths.isAbsolute(relative);
 }
-export async function resolveProject(settings: Settings, workspaces: readonly string[], active?: string): Promise<Project> {
+export async function discoverServer(explicit: string, workspace?: string, bundled?: string, search = process.env.PATH ?? ''): Promise<string> {
+    if (explicit) return resolveSetting(explicit, workspace);
+    if (bundled) { try { if ((await fs.stat(bundled)).isFile()) return bundled; } catch { /* PATH fallback */ } }
+    const executable = process.platform === 'win32' ? 'voidls.exe' : 'voidls';
+    for (const directory of search.split(path.delimiter)) {
+        if (!path.isAbsolute(directory)) continue;
+        const candidate = path.join(directory, executable);
+        try { if ((await fs.stat(candidate)).isFile()) { await fs.access(candidate, process.platform === 'win32' ? constants.F_OK : constants.X_OK); return candidate; } } catch { /* next PATH entry */ }
+    }
+    throw new Error('Cannot find voidls. Configure void.server.path or install the native server on PATH.');
+}
+export async function resolveProject(settings: Settings, workspaces: readonly string[], active?: string, bundled?: string): Promise<Project> {
     if (workspaces.length > 1) throw new Error('VOID supports one project in one workspace folder. Open each project in a separate window.');
     const workspace = workspaces[0];
-    const server = resolveSetting(settings.server, workspace);
+    const server = await discoverServer(settings.server, workspace, bundled);
     const selected = settings.entry ? resolveSetting(settings.entry, workspace) : active;
     if (!selected || path.extname(selected) !== '.void') throw new Error('Configure void.project.entry, or open a local .void file for a single-file project.');
     // Match voidls canonical root output. A new unsaved file still needs an existing parent.

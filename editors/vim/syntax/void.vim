@@ -1,0 +1,16 @@
+if exists('b:current_syntax') | finish | endif
+syn keyword voidKeyword func var const return if else for in reverse break continue pass use as private public internal struct value interface virtual override extends super property get set enum match is and or not with defer async await spawn event
+syn keyword voidType i8 i16 i32 i64 u8 u16 u32 u64 f32 f64 bool string
+syn keyword voidConstant true false null Ok Err
+syn match voidNumber '\<\d\+\(\.\d\+\)\?[fd]\?\>'
+syn region voidString start='"' skip='\\.' end='"' contains=voidEscape
+syn match voidEscape '\\\([nrt0"\\]\|u{[0-9a-fA-F]\+}\)' contained
+syn match voidComment '#.*$'
+hi def link voidKeyword Keyword
+hi def link voidType Type
+hi def link voidConstant Constant
+hi def link voidNumber Number
+hi def link voidString String
+hi def link voidEscape SpecialChar
+hi def link voidComment Comment
+let b:current_syntax = 'void'

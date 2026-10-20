@@ -1,0 +1,21 @@
+enum payload:
+    empty
+    numbers(items: [i32, 3])
+    object(item: thing)
+struct thing:
+    value: i32
+func make(x: i32) -> result<payload, string>:
+    if x < 0:
+        return Err("negative")
+    return Ok(payload.numbers([x, 2, 3]))
+func entry(x: i32) -> i32:
+    var a: [payload] = [payload.empty, payload.object(thing(value = 5)), payload.numbers([1, 2, 3])]
+    var copied = a[2]
+    if copied is payload.numbers(var values):
+        values[0] = 99
+    var result = make(x)
+    match result:
+        Ok(payload.numbers(var values)):
+            return values[0] + a.count as i32
+        _:
+            return -1

@@ -41,9 +41,9 @@ void queries(const fs::path& root) {
     auto local=at(*a,"/leaf.void","return stable")+7;
     check(index.definition_at("/leaf.void",local)->identity=="/leaf.void::calculate::const::stable::0","readonly local definition");
     check(index.declaration("/other.void::hidden")->visibility=="private","private declaration metadata");
-    check(index.declarations_in("/leaf.void").size()==3,"module declarations");
+    check(index.declarations_in("/leaf.void").size()==4,"module declarations");
     check(!index.declaration("missing") && index.references_to("missing").empty() && index.declarations_in("missing").empty(),"missing query fabricated data");
-    check(!index.declaration("/main.void::x") && !index.definition_at("/main.void",at(*a,"/main.void","x < 0")),"mutable local navigation invented");
+    check(!index.declaration("/main.void::x") && index.definition_at("/main.void",at(*a,"/main.void","x < 0"))->kind==vd::AnalyzedDeclaration::Kind::parameter,"mutable local navigation invented");
     for(const auto& r:a->references()) {
         check(index.definition_at(r.source.module_identity,r.source.begin)->identity==r.to &&
               index.definition_at(r.source.module_identity,r.source.end-1)->identity==r.to,"reference index changed resolved target");
@@ -59,7 +59,7 @@ void queries(const fs::path& root) {
     check(location.source->text().substr(location.begin,location.end-location.begin)=="calculate","declaration span");
     check(position==main_text.find("direct.calculate")+7 && position>main_text.find("direct.calculate")-4,"UTF8 byte position");
     // Confirm a scalar-offset approximation from the multibyte comment is incorrect.
-    check(!index.definition_at("/main.void",position-4),"interpreted scalar offsets as bytes");
+    check(!index.definition_at("/main.void",position-4) || index.definition_at("/main.void",position-4)->identity!=d->identity,"interpreted scalar offsets as bytes");
     auto moved=leaf(); write(root/"leaf.void","# moved\n\n"+moved); auto b=analyze(root); vd::ToolingIndex fresh(b);
     auto newer=fresh.declaration(d->identity); check(newer->source.begin==d->source.begin+9,"moved declaration span");
     check(index.declaration(d->identity)->source.begin==d->source.begin,"old index changed");
@@ -156,5 +156,34 @@ void cycles(const fs::path& root) {
     auto copied=forward.references_to("memory.void::later"); return_refs.program.reset();
     check(copied[0].source.source->text().find("later(x)")!=std::string::npos,"copied result lifetime");
 }
+void editor_metadata(const fs::path& root) {
+    const std::string text="func helper(x: i32) -> i32:\n    return x\nfunc entry(x: i32) -> i32:\n    var total = x\n    var callback = func(number: i32):\n        total += number\n    for item in 0..<x:\n        total += item\n    if x > 0:\n        var separate = x\n        total += separate\n    return helper(total)\n";
+    write(root/"main.void",text);auto program=analyze(root);vd::ToolingIndex index(program);
+    auto captured=index.definition_at("/main.void",text.find("total += number"));
+    check(captured && captured->source.begin==text.find("total = x"),"capture lost its exact outer declaration");
+    check(index.references_to(captured->identity).size()==4,"mutable reads/writes/capture references incomplete");
+    auto loop=index.definition_at("/main.void",text.find("+= item")+3);
+    check(loop && loop->source.begin==text.find("item in"),"loop binder identity");
+    auto parameter=index.definition_at("/main.void",text.find("+= number")+3);
+    check(parameter && parameter->source.begin==text.find("number: i32"),"anonymous parameter identity");
+    auto unavailable=vd::editor_assistance(root/"main.void",{{"/main.void",std::nullopt}},"/main.void",0);
+    check(unavailable.candidates.empty() && unavailable.signature.empty(),"editor probe ignored an unavailable overlay");
+    auto partial=text;auto cursor=partial.find("return helper(total)");partial.replace(cursor,std::string("return helper(total)").size(),"return sep");
+    vd::SourceOverrides overrides{{"/main.void",vd::SourceFile("/main.void",partial)}};
+    auto result=vd::editor_assistance(root/"main.void",overrides,"/main.void",cursor+10);
+    check(std::none_of(result.candidates.begin(),result.candidates.end(),[](const auto& c){return c.name=="separate";}),"completion leaked a disjoint scope");
+    check(!vd::analyze_project(root/"main.void",overrides).program,"editor recovery authorized invalid compilation");
+    auto formatted=vd::format_source(vd::SourceFile("format.void","# preserve é😀\r\nfunc entry(x:i32)->i32:\r\n  return x # keep\r\n"));
+    check(formatted && formatted->find("    return x # keep\r\n")!=std::string::npos,"formatter comments/CRLF");
+    check(vd::format_source({"format.void",*formatted})==formatted,"formatter idempotence");
+    const vd::SourceFile literal("literal.void","func entry(x: i32) -> i32:\n  var values: {string: i32} = {\n    \"a\": x\n  }\n  var callback = func(number: i32) -> i32:\n    return number + values[\"a\"]\n  return callback(2)\n");
+    auto canonical=vd::format_source(literal);check(bool(canonical),"braced literal/anonymous block formatting unavailable");
+    auto before=vd::analyze_source(literal),after=vd::analyze_source({"literal.void",*canonical});
+    check(before.program && after.program,"formatter changed valid program structure");
+    for(bool optimize:{false,true}){vd::Jit jit;check(jit.compile(*before.program,optimize)->invoke(3)==5 && jit.compile(*after.program,optimize)->invoke(3)==5,"formatter changed native execution");}
+    check(vd::format_source({"literal.void",*canonical})==canonical,"braced formatter not idempotent");
+    check(!vd::format_source({"bad.void","\tfunc entry(:\n"}),"formatter accepted invalid lexical source");
 }
-void tooling_tests(const fs::path& output) { queries(output/"queries"); planning(output/"planning"); cycles(output/"cycles"); containment(output/"containment"); }
+
+}
+void tooling_tests(const fs::path& output) { queries(output/"queries"); planning(output/"planning"); cycles(output/"cycles"); containment(output/"containment"); editor_metadata(output/"editor"); }

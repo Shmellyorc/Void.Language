@@ -27,6 +27,9 @@
 namespace vd {
 namespace {
 using Type = ir::Type;
+// Proven stack boundary: unrelated capability/lowering case temporaries must
+// not accumulate in every recursive frame on the supported 1 MiB stack.
+template<class Work> VOID_SEMANTIC_HANDLER decltype(auto) frontend_case(Work&& work) { return work(); }
 enum class TokenKind { invalid, name, number, path, string, symbol, newline, indent, dedent, end };
 struct Token { TokenKind kind; std::string text; std::size_t offset; std::string decoded = {}; std::optional<std::size_t> source_width = {}; };
 using Code = DiagnosticCode;
@@ -57,6 +60,12 @@ SourceSpan span(const SourceFile& source, const Token& token) {
 // A poisoned dependency has already produced a primary error. It is never a value.
 struct Poison {};
 const Type error_type = Type::invalid; // AST-only; the lowering gate excludes it.
+struct EditorProbe {
+    std::string module;
+    std::size_t offset;
+    EditorAssistance result;
+};
+struct EditorProbeFound {};
 class Diagnostics {
     std::vector<Diagnostic> items;
     std::map<std::string, std::pair<std::string, std::shared_ptr<const SourceFile>>> snapshots;
@@ -65,6 +74,7 @@ class Diagnostics {
     unsigned expression_depth = 0, specialization_depth = 0;
     std::vector<RelatedLocation> context;
 public:
+    EditorProbe* editor = nullptr;
     struct Context {
         Diagnostics& owner;std::size_t previous;unsigned previous_depth;
         Context(Diagnostics& d,const std::vector<RelatedLocation>& locations,std::optional<unsigned> depth={}):owner(d),previous(d.context.size()),previous_depth(d.specialization_depth){d.context.insert(d.context.end(),locations.begin(),locations.end());if(depth)d.specialization_depth=*depth;}
@@ -280,6 +290,7 @@ struct Expr {
     Expr& operator=(Expr&&) = default;
 };
 struct Statement {
+    std::size_t source_end=0;
     enum class Kind { scoped, deferred, match, variable, assignment, expression, returned, conditional, loop, broken, continued, no_op } kind;
     Token token;
     std::optional<Pattern> pattern;
@@ -353,6 +364,9 @@ struct Function {
     ir::ConstantValue initialization_value;
     Type result = Type::none;
     std::vector<Statement> body;
+    struct Binding { Token token; unsigned slot; bool readonly; };
+    std::vector<Binding> editor_bindings;
+    std::size_t source_end = 0;
     std::vector<Type> locals;
 };
 struct Constant {
@@ -379,6 +393,7 @@ struct FunctionSyntax {Token token;std::vector<Type> parameters;Type result;std:
 struct ResultSyntax { Token token; Type success, failure; std::shared_ptr<ir::ValueType> definition; Type resolved=Type::none; };
 struct Unit;
 struct Structure {
+    std::size_t source_end=0;
     std::vector<Token> case_tokens;
     Structure() = default;
     // Fields own noncopyable AST nodes. Container copy traits do not inspect
@@ -424,6 +439,7 @@ struct Import {
     bool explicit_alias = false;
 };
 struct Unit {
+    EditorProbe* editor=nullptr;
     SourceFile source;
     std::string identity;
     std::vector<Import> imports;
@@ -793,7 +809,7 @@ class Parser {
             if (readonly && !s.expression) error(source, s.token, Code::initializer, "A const requires an initializer.");
             if (readonly) for (auto i = start; i < p; ++i)
                 s.constant_syntax += std::to_string(tokens[i].text.size()) + ":" + tokens[i].text;
-            newline(); return s;
+            newline();s.source_end=peek().offset; return s;
         }
         if(at("with")){
             Statement statement(Statement::Kind::scoped,take());statement.expression=expression(7);
@@ -887,7 +903,7 @@ public:
                     enumeration.definition->cases.push_back(variant);newline();
                 }
                 need("<dedent>");if(cases.empty())error(source,enumeration.token,Code::syntax,"An enum requires at least one variant.");
-                unit.structures.push_back(std::move(enumeration));continue;
+                enumeration.source_end=peek().offset;unit.structures.push_back(std::move(enumeration));continue;
             }
             if (accept("interface")) {
                 Structure structure; structure.token=name(); structure.visibility=f.visibility;
@@ -904,7 +920,7 @@ public:
                     parameters(requirement,false);newline();unit.functions.push_back(std::move(requirement));++count;
                 }
                 if(!count) error(source,structure.token,Code::syntax,"An interface requires at least one method; marker interfaces are deferred.");
-                need("<dedent>");unit.structures.push_back(std::move(structure));continue;
+                need("<dedent>");structure.source_end=peek().offset;unit.structures.push_back(std::move(structure));continue;
             }
             bool value_declaration = accept("value");
             if (value_declaration || at("struct")) {
@@ -930,9 +946,10 @@ public:
                     auto begin = p; nodes = 0;
                     if (accept("=")){if(event)error(source,field.token,Code::initializer,"Events start empty and cannot declare an initializer.");field.expression = expression();}
                     for (auto n = begin; n < p; ++n) field.constant_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
-                    newline(); structure.fields.push_back(std::move(field));
+                    newline();field.source_end=peek().offset; structure.fields.push_back(std::move(field));
                 }
                 if (fields) need("<dedent>");
+                structure.source_end=peek().offset;
                 if(!instantiating && !structure.generics.empty()) {
                     template_syntax(structure);structure.syntax.assign(tokens.begin()+start,tokens.begin()+p);unit.generic_structures.push_back(std::move(structure));
                 } else {structure.generics.clear();unit.structures.push_back(std::move(structure));}
@@ -952,6 +969,7 @@ public:
                     } else error(source,peek(),Code::syntax,"Expected get or set in a property.");
                     auto body_begin=p;{FunctionScope scope(parsing_function,accessor);accessor.body=block();}
                     for(auto n=body_begin;n<p;++n)accessor.body_syntax+=std::to_string(tokens[n].text.size())+":"+tokens[n].text;
+                    accessor.source_end=peek().offset;
                     accessor.parse_failed=diagnostics.within(source,tokens[begin].offset,peek().offset);
                     // Generic accessors re-enter the same ordinary function parser on
                     // specialization, with the original accessor role retained.
@@ -984,6 +1002,7 @@ public:
             parameters(f);
             auto body_begin = p;{FunctionScope scope(parsing_function,f);f.body=block();}
             for (auto n = body_begin; n < p; ++n) f.body_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
+            f.source_end=peek().offset;
             f.parse_failed = diagnostics.within(source, f.token.offset, peek().offset);
             const bool generic_receiver=f.receiver && std::any_of(applications.begin(),applications.end(),[&](const auto& a){return a.definition==f.receiver->type.definition;});
             if(!instantiating && (!f.generics.empty() || generic_receiver)) {
@@ -1049,7 +1068,22 @@ std::pair<Unit*, Structure*> structure_lookup(Unit& unit, Unit& root,
     if (candidates.size() > 1) error(unit.source,token,Code::ambiguous,"Ambiguous imported type '" + name + "'.","Use explicit aliases.");
     return candidates.empty() ? std::pair<Unit*,Structure*>{nullptr,nullptr} : candidates.begin()->second;
 }
+VOID_SEMANTIC_HANDLER void editor_type_candidates(const Type& t,Unit& unit,Unit& root,const std::map<std::string,std::unique_ptr<Unit>>& units,const Token& token) {
+    auto& probe=*root.editor;
+    if(unit.failed_import){probe.result.candidates.clear();probe.result.signature.clear();probe.result.parameters.clear();throw EditorProbeFound{};}
+    auto qualifier=t.definition->name.substr(0,t.definition->name.size()-std::string_view("_void_editor_cursor_").size());
+    std::set<std::string> names;
+    for(const auto& [id,u]:units)for(const auto& [name,structure]:u->structure_names)names.insert(name);
+    for(const auto& name:names)try{
+        auto [owner,structure]=structure_lookup(unit,root,units,qualifier+name,token);
+        if(structure && probe.result.candidates.size()<256)probe.result.candidates.push_back({name,structure->generics.empty()?"type":"generic type",7});
+    }catch(const CompilationError&){}catch(const Poison&){}
+    throw EditorProbeFound{};
+}
 Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std::unique_ptr<Unit>>& units, const Token& token) {
+    if(root.editor && unit.identity==root.editor->module && t.kind==Type::unresolved && t.definition->name.ends_with("_void_editor_cursor_") &&
+        t.definition->source_offset+t.definition->name.size()-std::string_view("_void_editor_cursor_").size()==root.editor->offset)
+        editor_type_candidates(t,unit,root,units,token);
     if(t.definition && t.definition->callable){auto result=unit.resolve_callable(t,token);result.nullable=t.nullable;result.readonly=t.readonly;return result;}
     if(t.definition && t.definition->result_type){auto result=unit.resolve_result(t,token);result.readonly=t.readonly;result.readonly_references=t.readonly_references;return result;}
     if(ir::collection_type(t)) return unit.resolve_array(t,token);
@@ -1405,8 +1439,32 @@ class Semantics {
         }
         return e.type = call_arguments(e,target,1);
     }
+    VOID_SEMANTIC_HANDLER void editor_call(const Expr& e,const Function& target,std::size_t first,bool constructor) {
+        std::optional<std::size_t> active;
+        for(std::size_t n=first;n<e.parts.size() && !active;++n) {
+            std::vector<const Expr*> work{e.parts[n].get()};
+            while(!work.empty()) {
+                auto* part=work.back();work.pop_back();
+                if(editor_cursor(*part)){active=n;break;}
+                for(const auto& child:part->parts)work.push_back(child.get());
+            }
+        }
+        if(!active)return;
+        auto& out=diagnostics.editor->result;out.parameters.clear();out.signature=target.token.text+"(";
+        for(const auto& p:target.parameters) {
+            auto label=p.token.text+": "+ir::type_name(p.type);if(p.default_expression)label+=" = …";
+            if(!out.parameters.empty())out.signature+=", ";out.signature+=label;out.parameters.push_back(label);
+        }
+        out.signature+=") -> "+ir::type_name(target.result);
+        out.active_parameter=static_cast<unsigned>(*active-first);
+        if(constructor && *active-first<e.names.size() && !e.names[*active-first].text.empty()) {
+            auto found=std::find_if(target.parameters.begin(),target.parameters.end(),[&](const auto& p){return p.token.text==e.names[*active-first].text;});
+            if(found!=target.parameters.end())out.active_parameter=static_cast<unsigned>(found-target.parameters.begin());
+        }
+    }
     Type call_arguments(Expr& e, const Function& target, std::size_t first, bool constructor = false) {
         e.asynchronous_call=target.asynchronous;e.native_symbol=target.native_symbol;
+        if(diagnostics.editor) editor_call(e,target,first,constructor);
         if(e.interface_call) {
             std::vector<const Expr*> pending;for(std::size_t n=first;n<e.parts.size();++n)pending.push_back(e.parts[n].get());
             while(!pending.empty()){auto* part=pending.back();pending.pop_back();if(part->kind==Expr::Kind::awaited)error(source,part->token,Code::unsupported_type,"await cannot retain a prepared interface receiver across suspension.","Await arguments into locals before selecting the interface method.");for(const auto& child:part->parts)pending.push_back(child.get());}
@@ -1539,6 +1597,7 @@ class Semantics {
             error(source, token, Code::duplicate, "Duplicate declaration or shadowing of '" + token.text + "'.", "Assign to the existing variable, or choose a distinct name.", std::move(related));
         }
         auto slot = static_cast<unsigned>(current->locals.size()); current->locals.push_back(type);
+        current->editor_bindings.push_back({token,slot,readonly});
         scopes.back().emplace(token.text, Variable{type, slot, readonly, token,current}); return slot;
     }
     // Qualified lookup needs a temporary AST node only on this cold path.
@@ -1679,7 +1738,69 @@ class Semantics {
     }
     // Keep the recursive dispatch frame small: reserving every handler's
     // temporaries here exhausts a 1 MiB Debug stack before the depth guard.
+    bool editor_cursor(const Expr& e) const {
+        return diagnostics.editor && diagnostics.editor->module==unit.identity &&
+            diagnostics.editor->offset==e.token.offset && e.token.text=="_void_editor_cursor_";
+    }
+    VOID_SEMANTIC_HANDLER void editor_candidates(Expr& e, std::optional<Type> receiver = {}) {
+        auto& out=diagnostics.editor->result;
+        // A broken local context or import must never manufacture authority.
+        if (invalid_function || unit.failed_import || (current && current->parse_failed)) {out.candidates.clear();out.signature.clear();out.parameters.clear();throw EditorProbeFound{};}
+        std::map<std::string,EditorCandidate> candidates;
+        auto add=[&](std::string name,Type type,int kind=6) {
+            if(valid_editor_identifier(name) && type!=error_type) candidates.emplace(name,EditorCandidate{name,ir::type_name(type),kind});
+        };
+        if(receiver) {
+            auto t=*receiver;
+            if(t.nullable || !t.definition || t.definition->native_resource || t.definition->callable || !t.definition->cases.empty()) throw EditorProbeFound{};
+            std::set<std::string> names;
+            for(const auto& [id,u]:units) {
+                for(const auto& structure:u->structures) for(const auto& f:structure.definition->fields) names.insert(f.name);
+                for(const auto& f:u->functions) if(f.receiver && !f.initializer && !f.accessor && f.token.text!="deinit") names.insert(f.token.text);
+            }
+            for(const auto& name:names) try {
+                auto token=e.token;token.text=name;auto selected=member(t,token);
+                if(selected.function) {
+                    if(t.readonly || !ir::readonly_paths(t).empty()) continue; // Recovered effects are not finalized.
+                    add(name,selected.function->result,2);
+                } else {auto type=t;for(auto field:selected.path)type=ir::field_type(type,field);add(name,type,5);}
+            } catch(const CompilationError&) {} catch(const Poison&) {}
+        } else {
+            if(e.qualifier.empty()) for(const auto& scope:scopes) for(const auto& [name,v]:scope) if(!v.task_group) add(name,v.type);
+            std::set<std::string> names;
+            for(const auto& [id,u]:units) {
+                for(const auto& [name,f]:u->declarations) names.insert(name);
+                for(const auto& [name,c]:u->constant_names) names.insert(name);
+                for(const auto& [name,structure]:u->structure_names)names.insert(name);
+            }
+            for(const auto& name:names) {
+                if(candidates.contains(name)) continue;
+                Expr test(Expr::Kind::name,e.token);test.token.text=name;test.qualifier=e.qualifier;test.qualifier_token=e.qualifier_token;
+                try {auto& f=resolve(test);add(name,f.result,3);continue;} catch(const CompilationError&) {} catch(const Poison&) {}
+                try {auto [owner,c]=constant(test);if(c) {evaluate(*owner,*c);add(name,c->type,21);continue;}} catch(const CompilationError&) {} catch(const Poison&) {}
+                try {auto [owner,structure]=structure_lookup(unit,root,units,e.qualifier.empty()?name:e.qualifier+"."+name,e.token);
+                    if(structure && structure->layout_state!=3)candidates.emplace(name,EditorCandidate{name,structure->generics.empty()?"type":"generic type",7});
+                } catch(const CompilationError&){}catch(const Poison&){}
+            }
+            if(e.qualifier.empty()) {
+                for(const auto& [name,owners]:unit.qualifiers) candidates.emplace(name,EditorCandidate{name,"import",9});
+                for(const auto& name:{"true","false","null","not","match","func"}) candidates.emplace(name,EditorCandidate{name,"keyword",14});
+                if(current && current->asynchronous)for(const auto& name:{"await","spawn"})candidates.emplace(name,EditorCandidate{name,"keyword",14});
+            }
+        }
+        for(auto& [name,candidate]:candidates) {if(out.candidates.size()==256)break;out.candidates.push_back(std::move(candidate));}
+        throw EditorProbeFound{};
+    }
+    // Construct optional<Type> probe arguments only on cold editor paths. Debug
+    // recursive semantic frames must still reach their guard on a 1 MiB stack.
+    VOID_SEMANTIC_HANDLER void editor_name_candidates(Expr& e) {editor_candidates(e);}
+    VOID_SEMANTIC_HANDLER void editor_field_candidates(Expr& e,const Type& receiver) {
+        auto type=receiver;
+        if(e.parts[0]->kind==Expr::Kind::name)if(auto* variable=lookup(e.parts[0]->token.text))type.readonly|=variable->readonly;
+        editor_candidates(e,type);
+    }
     Type expression_impl(Expr& e, std::optional<Type> expected) {
+        if(editor_cursor(e) && e.kind==Expr::Kind::name) editor_name_candidates(e);
         switch (e.kind) {
         case Expr::Kind::spawned:return spawned_expression(e);
         case Expr::Kind::awaited:return awaited_expression(e);
@@ -1932,6 +2053,7 @@ class Semantics {
         if(auto variant=enum_expression(e,false))return *variant;
         auto t = expression(base);
         if (t == error_type) return error_type;
+        if(editor_cursor(e)) editor_field_candidates(e,t);
         if(t.definition && t.definition->task_result)error(source,e.token,Code::unsupported_type,"Inferred task handles support await; task internals are not source fields.");
         if(base.event)error(source,e.token,Code::invalid_value,"Event subscription storage is private.");
         if(ir::collection_type(t) && e.token.text=="count") {if(t.kind==Type::dictionary && !current)error(source,e.token,Code::constant_call,"Dictionary count requires runtime evaluation.");e.target=t.kind==Type::dictionary?"$dict.count":"$array.count";return e.type=Type::i64;}
@@ -2318,7 +2440,7 @@ public:
         current=&f;scopes={{}};
         if(f.receiver)declare(f.receiver->token,f.receiver->type);
         for(const auto& p:f.parameters)declare(p.token,p.type,p.type.readonly);
-        f.locals.clear();current=nullptr;scopes.clear();
+        f.locals.clear();f.editor_bindings.clear();current=nullptr;scopes.clear();
     }
     void analyze_constant(Constant& c) {
         if (c.declaration.annotation) c.declaration.annotation = resolve_type(*c.declaration.annotation,unit,root,units,c.declaration.token);
@@ -2752,11 +2874,11 @@ class Lowering {
         using K = Expr::Kind;
         switch (e.kind) {
         case K::lambda:throw std::logic_error("Unanalyzed anonymous function");
-        case K::capture_reference:{
+        case K::capture_reference:return frontend_case([&]() -> unsigned {
             if(!e.implicit)return emit({ir::Op::load,cells.at(e.slot)},e.token);
             ir::Instruction cell{ir::Op::gc_construct};cell.type=e.type;cell.arguments={e.parts.empty()?emit({ir::Op::load,e.slot},e.token):expression(*e.parts[0])};return emit(cell,e.token);
-        }
-        case K::function_reference:{ir::Instruction reference{ir::Op::function_reference};reference.type=e.type;reference.callee=e.target;
+        });
+        case K::function_reference:return frontend_case([&]() -> unsigned {ir::Instruction reference{ir::Op::function_reference};reference.type=e.type;reference.callee=e.target;
             if(e.op=="bound")reference.arguments={expression(*e.parts[0])};
             else if(!e.parts.empty() || e.implicit){ir::Instruction environment{ir::Op::gc_construct};
                 for(const auto& function:module.functions)if(function.name==e.target)environment.type=function.parameters.at(0);
@@ -2764,17 +2886,17 @@ class Lowering {
                 environment.type=e.environment;
                 for(const auto& part:e.parts)environment.arguments.push_back(expression(*part));reference.arguments={emit(environment,e.token)};
             }
-            return emit(reference,e.token);}
-        case K::function_null:{ir::Instruction value{ir::Op::function_null};value.type=e.type;return emit(value,e.token);}
-        case K::function_call:{auto function=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);std::vector<unsigned> arguments;for(unsigned n=1;n<e.parts.size();++n)arguments.push_back(snapshot(expression(*e.parts[n]),e.parts[n]->type,e.token));ir::Instruction call{ir::Op::function_call,emit({ir::Op::load,function},e.token)};for(auto slot:arguments)call.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(call,e.token);}
+            return emit(reference,e.token);});
+        case K::function_null:return frontend_case([&]() -> unsigned {ir::Instruction value{ir::Op::function_null};value.type=e.type;return emit(value,e.token);});
+        case K::function_call:return frontend_case([&]() -> unsigned {auto function=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);std::vector<unsigned> arguments;for(unsigned n=1;n<e.parts.size();++n)arguments.push_back(snapshot(expression(*e.parts[n]),e.parts[n]->type,e.token));ir::Instruction call{ir::Op::function_call,emit({ir::Op::load,function},e.token)};for(auto slot:arguments)call.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(call,e.token);});
         case K::test: return lower_test(e);
         case K::match: return lower_match(e);
-        case K::sum: {
+        case K::sum: return frontend_case([&]() -> unsigned {
             ir::Instruction construct{ir::Op::sum};construct.type=e.type;construct.immediate=e.slot;
             std::vector<unsigned> slots;for(const auto& child:e.parts)slots.push_back(snapshot(expression(*child),child->type,child->token));
             for(auto slot:slots)construct.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(construct,e.token);
-        }
-        case K::propagate: {
+        });
+        case K::propagate: return frontend_case([&]() -> unsigned {
             const auto type=e.parts[0]->type;
             auto source=capture(expression(*e.parts[0]),type,e.token);
             auto success=block(),failure=block();
@@ -2784,32 +2906,32 @@ class Lowering {
             auto value=emit(payload,e.token);ir::Instruction propagate{ir::Op::sum};propagate.type=output.result;propagate.immediate=1;propagate.arguments={value};
             return_through_cleanup(emit(propagate,e.token),e.token,true);
             current=success;ir::Instruction payload_ok{ir::Op::sum_get,emit({ir::Op::load,source},e.token)};payload_ok.immediate=1;return emit(payload_ok,e.token);
-        }
+        });
         case K::array_default: return repeated_array(e.type,*e.type.definition->extent,e.token,[&]{return expression(*e.parts[0]);});
-        case K::dictionary_literal: {
+        case K::dictionary_literal: return frontend_case([&]() -> unsigned {
             std::vector<unsigned> pairs;for(unsigned n=0;n<e.parts.size();n+=2){auto key=snapshot(expression(*e.parts[n]),e.parts[n]->type,e.token);auto value=snapshot(expression(*e.parts[n+1]),e.parts[n+1]->type,e.token);pairs.push_back(snapshot(dictionary_pair(emit({ir::Op::load,key},e.token),emit({ir::Op::load,value},e.token),e.type,e.token),ir::array_element(e.type),e.token));}
             ir::Instruction create{ir::Op::dict_new};create.type=e.type;for(auto pair:pairs)create.arguments.push_back(emit({ir::Op::load,pair},e.token));return emit(create,e.token);
-        }
-        case K::array_literal: {
+        });
+        case K::array_literal: return frontend_case([&]() -> unsigned {
             ir::Instruction i{ir::Op::fixed_array};i.type=e.type;
             std::vector<unsigned> slots;
             for(const auto& part:e.parts) {auto value=expression(*part);slots.push_back(snapshot(value,part->type,part->token));}
             for(auto slot:slots) i.arguments.push_back(emit({ir::Op::load,slot},e.token));
             return emit(i,e.token);
-        }
+        });
         case K::array_index: return select_expression(e).read();
-        case K::array_slice: {
+        case K::array_slice: return frontend_case([&]() -> unsigned {
             auto owner=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);
             auto first=snapshot(expression(*e.parts[1]),e.parts[1]->type,e.token);
             auto last=snapshot(expression(*e.parts[2]),e.parts[2]->type,e.token);
             ir::Instruction slice{ir::Op::array_slice,emit({ir::Op::load,owner},e.token),emit({ir::Op::load,first},e.token)};slice.type=e.type;slice.immediate=e.op=="..<";slice.arguments={emit({ir::Op::load,last},e.token)};return emit(slice,e.token);
-        }
+        });
         case K::base_initialization: throw std::logic_error("base initialization is a dedicated prelude");
-        case K::literal: {
+        case K::literal: return frontend_case([&]() -> unsigned {
             return constant(e.type,(e.type.kind == Type::aggregate || ir::collection_type(e.type) || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
-        }
-        case K::field: { auto value=expression(*e.parts[0]); if(e.target=="$dict.count")return emit({ir::Op::dict_count,value},e.token);if(e.target=="$array.count")return emit({ir::Op::array_count,value},e.token); ir::Instruction i{e.parts[0]->type.kind==Type::managed_ref ? ir::Op::gc_read : ir::Op::extract,value}; i.immediate=e.slot; return emit(i,e.token); }
-        case K::construction: {
+        });
+        case K::field: return frontend_case([&]() -> unsigned { auto value=expression(*e.parts[0]); if(e.target=="$dict.count")return emit({ir::Op::dict_count,value},e.token);if(e.target=="$array.count")return emit({ir::Op::array_count,value},e.token); ir::Instruction i{e.parts[0]->type.kind==Type::managed_ref ? ir::Op::gc_read : ir::Op::extract,value}; i.immediate=e.slot; return emit(i,e.token); });
+        case K::construction: return frontend_case([&]() -> unsigned {
             std::vector<unsigned> arguments;
             for (const auto& part : e.parts) {
                 auto argument = static_cast<unsigned>(output.locals.size()); output.locals.push_back(part->type);
@@ -2870,18 +2992,18 @@ class Lowering {
                 return emit(commit,e.token);
             }
             return emit({ir::Op::load,slot},e.token);
-        }
+        });
         case K::spawned:return spawned(e);
         case K::task_cancel: return emit({ir::Op::async_cancel,expression(*e.parts[0])},e.token);
         case K::awaited: return emit({ir::Op::await,expression(*e.parts[0])},e.token);
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
-        case K::method_call: case K::call: {
+        case K::method_call: case K::call: return frontend_case([&]() -> unsigned {
             if(e.target=="$event.emit")return event_emit(e);
-            if(e.target.starts_with("$dict.")) {
+            if(e.target.starts_with("$dict.")) return frontend_case([&]() -> unsigned {
                 auto owner=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);auto key=e.parts.size()>1?expression(*e.parts[1]):0;
                 return emit({e.token.text=="clear"?ir::Op::dict_clear:e.token.text=="contains"?ir::Op::dict_contains:ir::Op::dict_remove,emit({ir::Op::load,owner},e.token),key},e.token);
-            }
-            if(e.target.starts_with("$array.")) {
+            });
+            if(e.target.starts_with("$array.")) return frontend_case([&]() -> unsigned {
                 auto owner=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);
                 if(e.token.text=="clear")return emit({ir::Op::list_clear,emit({ir::Op::load,owner},e.token)},e.token);
                 auto argument=expression(*e.parts[1]);
@@ -2893,17 +3015,17 @@ class Lowering {
                     ir::Instruction insert{ir::Op::list_insert,emit({ir::Op::load,owner},e.token),emit({ir::Op::load,index},e.token)};insert.arguments={emit({ir::Op::load,value},e.token),emit({ir::Op::load,version},e.token)};return emit(insert,e.token);
                 }
                 return emit({e.token.text=="push" ? ir::Op::list_push : ir::Op::list_remove,emit({ir::Op::load,owner},e.token),argument},e.token);
-            }
+            });
             std::optional<ir::Place> receiver;
             std::optional<Selection> selected_receiver;
             std::size_t first = 0;
             if (e.kind == K::method_call) {
                 first = 1;
-                if(e.interface_call) {
+                if(e.interface_call) receiver=frontend_case([&]() -> ir::Place {
                     ir::Instruction prepare{ir::Op::interface_prepare,expression(*e.parts[0])};prepare.callee=e.target;
                     auto prepared=expression_type(*e.parts[0]);prepared.kind=Type::prepared_receiver;prepared.nullable=false;prepared.preparation=e.target;
-                    prepare.type=prepared;auto slot=snapshot(emit(prepare,e.token),prepared,e.token);receiver=ir::Place{slot,{}};
-                } else
+                    prepare.type=prepared;auto slot=snapshot(emit(prepare,e.token),prepared,e.token);return ir::Place{slot,{}};
+                }); else
                 if (e.parts[0]->type.kind==Type::managed_ref) {
                     auto slot=snapshot(expression(*e.parts[0]),expression_type(*e.parts[0]),e.token); receiver=ir::Place{slot,{}};
                 } else if(e.selected_receiver) {
@@ -2916,7 +3038,7 @@ class Lowering {
             // Materialize each argument in a slot: later short-circuit arguments
             // may create new blocks, while IR instruction values stay block-local.
             std::vector<unsigned> slots;std::optional<unsigned> native_callback;
-            for (std::size_t n = first; n < e.parts.size(); ++n) {
+            for (std::size_t n = first; n < e.parts.size(); ++n) frontend_case([&] {
                 const auto& arg = e.parts[n];
                 auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(expression_type(*arg));
                 auto value = expression(*arg);if(e.native_symbol=="vd_native_fixture_call#register" && n==1)native_callback=value;
@@ -2924,7 +3046,8 @@ class Lowering {
                     output.construction_origins[slot]=view_origin(value);
                 }
                 emit({ir::Op::store, slot, value}, arg->token); slots.push_back(slot);
-            }
+            });
+            return frontend_case([&]() -> unsigned {
             if(selected_receiver && !e.parts[0]->property)emit({ir::Op::store,receiver->slot,selected_receiver->read()},e.token);
             ir::Instruction i{e.asynchronous_call || !parallel_target.empty() ? ir::Op::async_call : e.interface_call ? ir::Op::interface_call : !e.virtual_slot.empty() && !e.super_call ? ir::Op::virtual_call : ir::Op::call}; i.callee = parallel_target.empty()?e.target+(e.super_call && e.token.text=="deinit"?"::$body$"+Type::key(e.parts[0]->type):""):std::string(parallel_target); i.receiver = receiver;
             if (context) if (auto found=context->calls.find(&e);found!=context->calls.end())
@@ -2938,17 +3061,18 @@ class Lowering {
                 if(e.receiver_writes)selected_receiver->write(emit({ir::Op::load,receiver->slot},e.token));
             }
             return result;
-        }
-        case K::conversion: {
+            });
+        });
+        case K::conversion: return frontend_case([&]() -> unsigned {
             auto value = expression(*e.parts[0]); if(e.op=="identity" && expression_type(e)==expression_type(*e.parts[0])) return value; ir::Instruction i{e.op=="interface" ? ir::Op::interface_pack : e.op=="upcast" ? (expression_type(e).construction ? ir::Op::stage_prefix : ir::Op::upcast) : ir::Op::convert,value}; i.type = expression_type(e);i.callee=e.target; return emit(i,e.token);
-        }
-        case K::unary: {
+        });
+        case K::unary: return frontend_case([&]() -> unsigned {
             auto value = expression(*e.parts[0]);
             if (e.op == "not") return emit({ir::Op::logical_not, value}, e.token);
             if (e.op == "+") return value;
             return emit({ir::Op::negate,value},e.token);
-        }
-        case K::binary: {
+        });
+        case K::binary: return frontend_case([&]() -> unsigned {
             auto left = expression(*e.parts[0]);
             auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(e.parts[0]->type);
             emit({ir::Op::store, slot, left}, e.token);
@@ -2964,7 +3088,7 @@ class Lowering {
                 return e.op=="!=" ? emit({ir::Op::logical_not,equal},e.token) : equal;
             }
             return emit({operation(e.op), left, right}, e.token);
-        }
+        });
         }
         throw std::logic_error("unknown typed expression");
     }
@@ -3984,7 +4108,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
 
 }
 std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile&);
-std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr);
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr,EditorProbe* = nullptr);
 // This factory is the only way to construct a successful result.
 struct AnalysisAccess {
     static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={}) {
@@ -4039,13 +4163,13 @@ struct AnalysisAccess {
             d.identity=source_identity(d.identity);d.owner=source_identity(d.owner);d.virtual_slot=source_identity(d.virtual_slot);d.override_target=source_identity(d.override_target);
             if(visible && visible_declarations.insert(d.identity).second)result->declarations_.push_back(std::move(d));
         };
-        auto reference = [&](const std::string& from, const std::string& to, const Expr& e, const Unit& u, bool implicit = false) {
+        auto reference = [&](const std::string& from, const std::string& to, const Expr& e, const Unit& u, bool implicit = false, bool native_contract = true) {
             auto location = span(u.source,e.token); location.module_identity = u.identity;
             auto spelling = e.qualifier + "::" + e.token.text;
             auto origin=source_identity(from),target=source_identity(to);
             if(visible_references.emplace(origin,target,u.identity,location.begin,location.end,implicit).second)
-                result->references_.push_back({origin,target,spelling,std::move(location),implicit});
-            field(result->contract_,"reference"); field(result->contract_,from); field(result->contract_,to);
+                (native_contract ? result->references_ : result->editor_references_).push_back({origin,target,spelling,std::move(location),implicit});
+            if(native_contract) {field(result->contract_,"reference"); field(result->contract_,from); field(result->contract_,to);}
         };
         for (const auto& [id, unit] : *graph) {
             AnalyzedModule module{id,unit->source,{}};
@@ -4068,17 +4192,23 @@ struct AnalysisAccess {
             for (const auto& i : imports) field(result->contract_,i);
             result->modules_.push_back(std::move(module));
             auto location = [&](const Token& t) { auto l = span(unit->source,t); l.module_identity=id; return l; };
+            std::set<std::string> aliases;
+            for(const auto& import:unit->imports)if(import.explicit_alias && aliases.insert(import.alias.text).second)
+                result->editor_declarations_.push_back({AnalyzedDeclaration::Kind::import_alias,id+"::import::"+import.alias.text,id,"private",location(import.alias),{},Type::none,{},{},id});
 #include "generic_tooling.inc"
             std::function<void(const Expr&,const std::string&,const std::map<unsigned,std::string>&,bool)> visit_expression;
             auto expression = [&](const Expr& e, const std::string& owner, const std::map<unsigned,std::string>& locals) { visit_expression(e,owner,locals,false); };
             visit_expression = [&](const Expr& e, const std::string& owner, const auto& locals, bool implicit) {
+                if(!e.qualifier.empty() && aliases.contains(e.qualifier)) {
+                    Expr alias(Expr::Kind::name,e.qualifier_token);reference(owner,id+"::import::"+e.qualifier,alias,*unit,implicit,false);
+                }
                 if(!e.source_target.empty()) {reference(owner,e.source_target,e,*unit);if(!e.target.empty())reference(owner,e.target,e,*unit,true);}
                 else if(e.kind==Expr::Kind::conversion && e.op=="interface") {
                     reference(owner,e.type.definition->identity,e,*unit,true);
                     for(const auto& binding:graph->at(entry)->member_catalog->interface_bindings) if(binding.key==e.target)
                         for(const auto& [requirement,route]:binding.methods) {reference(owner,requirement,e,*unit,true);reference(owner,route.second,e,*unit,true);}
                 } else if (!e.target.empty() && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.")) reference(owner,e.target,e,*unit,implicit || e.implicit);
-                else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit || e.implicit);
+                else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit || e.implicit,locals.at(e.slot).find("::const::")!=std::string::npos && locals.at(e.slot).substr(0,locals.at(e.slot).find("::const::"))==owner.substr(0,owner.find("::const::")));
                 if(!e.virtual_slot.empty() && !e.super_call) for(const auto& [id,target_unit]:*graph) for(const auto& target:target_unit->functions)
                     if(target.virtual_slot==e.virtual_slot) reference(owner,target.symbol,e,*unit,true);
                 if (!e.initializer.empty()) reference(owner,e.initializer,e,*unit,implicit);
@@ -4119,25 +4249,32 @@ struct AnalysisAccess {
                     auto t = *member.annotation; auto identity = key + "::field::" + member.name;
                     field(layout,member.event?"event":member.using_field ? "using" : "ordinary-field"); field(layout,member.name); field(layout,t.kind == Type::aggregate ? t.definition->identity : ir::type_name(t)); field(layout,member.constant_syntax);
                     AnalyzedDeclaration record{structure.definition->managed ? AnalyzedDeclaration::Kind::managed_field : AnalyzedDeclaration::Kind::value_field,identity,id,structure.visibility,location(member.token),{},t,member.constant_syntax,{},key};
-                    record.using_field=member.using_field; declaration(std::move(record),true,structure.definition->cases.empty());
+                    if(member.source_end>member.token.offset){auto r=location(member.token);r.begin=unit->source.line_starts().at(unit->source.location(member.token.offset).line-1);r.end=member.source_end;record.extent=r;}
+                    record.using_field=member.using_field;record.editor_symbol_kind=member.event?24:8; declaration(std::move(record),true,structure.definition->cases.empty());
                     if (member.expression) expression(*member.expression,identity,{});
                 }
                 for(unsigned n=0;n<structure.case_tokens.size();++n){const auto& variant=structure.definition->cases[n];std::vector<Type> parameters;for(unsigned field=0;field<variant.count;++field)parameters.push_back(ir::field_type(Type(structure.definition),variant.begin+field));
                     declaration({variant.count?AnalyzedDeclaration::Kind::function:AnalyzedDeclaration::Kind::module_constant,key+"::variant::"+variant.name,id,structure.visibility,location(structure.case_tokens[n]),parameters,Type(structure.definition),std::to_string(n),variant.count?std::optional<std::uint64_t>{}:std::optional<std::uint64_t>{n},key});
                 }
                 AnalyzedDeclaration record{structure.definition->interface_type ? AnalyzedDeclaration::Kind::interface_type : structure.definition->managed ? AnalyzedDeclaration::Kind::managed_structure : AnalyzedDeclaration::Kind::value_structure,key,id,structure.visibility,location(structure.token),{},Type(structure.definition,structure.definition->interface_type ? Type::interface_ref : structure.definition->managed ? Type::managed_ref : Type::aggregate),layout,{},id};
+                if(structure.source_end>structure.token.offset){auto r=location(structure.token);r.begin=unit->source.line_starts().at(unit->source.location(structure.token.offset).line-1);r.end=structure.source_end;record.extent=r;}
+                if(!structure.case_tokens.empty())record.editor_symbol_kind=10;
                 if(auto base=structure.definition->base.lock()) record.base_identity=base->identity;
                 declaration(std::move(record));
             }
             for (const auto& c : unit->constants) {
                 auto key = id + "::" + c.declaration.name;
-                declaration({AnalyzedDeclaration::Kind::module_constant,key,id,c.visibility,location(c.declaration.token),{},c.type,c.declaration.constant_syntax,(c.type.kind == Type::aggregate || ir::collection_type(c.type) || c.type==Type::string) ? std::optional<std::uint64_t>{} : std::optional<std::uint64_t>{c.value}});
+                AnalyzedDeclaration constant_record{AnalyzedDeclaration::Kind::module_constant,key,id,c.visibility,location(c.declaration.token),{},c.type,c.declaration.constant_syntax,(c.type.kind == Type::aggregate || ir::collection_type(c.type) || c.type==Type::string) ? std::optional<std::uint64_t>{} : std::optional<std::uint64_t>{c.value}};
+                if(c.declaration.source_end>c.declaration.token.offset){auto r=location(c.declaration.token);r.begin=unit->source.line_starts().at(unit->source.location(c.declaration.token.offset).line-1);r.end=c.declaration.source_end;constant_record.extent=r;}
+                constant_record.rename_safe=true;declaration(std::move(constant_record));
                 expression(*c.declaration.expression,key,{});
             }
             for (const auto& f : unit->functions) {
                 std::vector<Type> parameters; for (const auto& p : f.parameters) parameters.push_back(p.type);
                 AnalyzedDeclaration method_record{f.interface_requirement ? AnalyzedDeclaration::Kind::interface_requirement : f.initializer ? AnalyzedDeclaration::Kind::initializer : f.receiver ? AnalyzedDeclaration::Kind::receiver_method : AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}};
                 if (f.receiver) { method_record.owner = f.receiver->type.definition->identity; method_record.receiver = f.receiver->type; method_record.receiver_mutates = f.receiver_mutates; }
+                if(f.accessor)method_record.editor_symbol_kind=7;
+                method_record.rename_safe=!f.receiver && !f.anonymous && f.generic_origin.empty() && f.generics.empty() && f.token.text!="entry";
                 method_record.initialization_contract=f.initialization_contract;
                 method_record.virtual_slot=f.virtual_slot;
                 if(f.overriding) method_record.override_target=f.virtual_slot;
@@ -4154,10 +4291,34 @@ struct AnalysisAccess {
                     if (p.default_expression) { auto range=location(p.default_expression->token); range.begin=p.default_begin; range.end=p.default_end; parameter.default_source=std::move(range); }
                     method_record.initializer_parameters.push_back(std::move(parameter));
                 }
+                for(const auto& p:f.parameters) {
+                    AnalyzedParameter parameter{p.token.text,p.type,location(p.token)};
+                    if(p.default_expression){auto r=location(p.token);r.begin=p.default_begin;r.end=p.default_end;parameter.default_source=r;}
+                    method_record.written_parameters.push_back(std::move(parameter));
+                }
+                if(f.source_end>f.token.offset){auto r=location(f.token);r.begin=unit->source.line_starts().at(unit->source.location(f.token.offset).line-1);r.end=f.source_end;
+                    if(f.accessor)for(const auto& other:unit->functions)if(other.accessor && other.token.offset==f.token.offset)r.end=std::max(r.end,other.source_end);
+                    method_record.extent=r;}
                 declaration(std::move(method_record),true,!f.anonymous);
                 if(f.overriding) {Expr use(Expr::Kind::name,f.token);reference(f.symbol,f.virtual_slot,use,*unit,true);}
                 for (const auto& p : f.parameters) if (p.default_expression) expression(*p.default_expression,f.symbol,{});
                 std::map<unsigned,std::string> locals;
+                for(const auto& binding:f.editor_bindings) {
+                    if(!f.generic_origin.empty())continue;
+                    if(binding.readonly && std::none_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;})) continue;
+                    auto key=source_identity(f.symbol)+"::local::"+std::to_string(binding.slot);
+                    auto kind=std::any_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;}) ? AnalyzedDeclaration::Kind::parameter : AnalyzedDeclaration::Kind::local_variable;
+                    AnalyzedDeclaration record{kind,key,id,"local",location(binding.token),{},f.locals.at(binding.slot),{},{},source_identity(f.symbol)};
+                    record.rename_safe=!f.receiver && !f.anonymous && f.lambdas.empty() && f.captures.empty() && valid_editor_identifier(binding.token.text);
+                    result->editor_declarations_.push_back(std::move(record));
+                    locals.emplace(binding.slot,key);
+                }
+                for(const auto& [slot,capture]:f.capture_inputs) {
+                    if(capture>=f.captures.size())continue; // Bound receiver environments have no written capture.
+                    const auto& token=f.captures.at(capture).token;
+                    for(const auto* records:{&result->declarations_,&result->editor_declarations_})for(const auto& record:*records)
+                        if(record.module==id && record.source.begin==token.offset && record.source.end==token.offset+token.text.size())locals.emplace(slot,record.identity);
+                }
                 std::map<std::string,unsigned> names;
                 std::function<void(const std::vector<Statement>&)> body;
                 body = [&](const auto& statements) {
@@ -4165,7 +4326,12 @@ struct AnalysisAccess {
                         auto owner = f.symbol;
                         if (s.readonly) {
                             owner += "::const::" + s.name + "::" + std::to_string(names[s.name]++);
-                            declaration({AnalyzedDeclaration::Kind::local_constant,owner,id,"local",location(s.token),{},f.locals.at(s.slot),s.constant_syntax,{},f.symbol});
+                            AnalyzedDeclaration record{AnalyzedDeclaration::Kind::local_constant,owner,id,"local",location(s.token),{},f.locals.at(s.slot),s.constant_syntax,{},f.symbol};
+                            record.rename_safe=!f.receiver && !f.anonymous && f.generic_origin.empty() && f.lambdas.empty() && f.captures.empty();
+                            declaration(std::move(record));
+                        }
+                        if(s.kind==Statement::Kind::assignment && locals.contains(s.slot) && !s.selection) {
+                            Expr use(Expr::Kind::name,s.token);reference(owner,locals.at(s.slot),use,*unit,false,false);
                         }
                         if (s.kind == Statement::Kind::assignment && !s.fields.empty()) {
                             auto t = f.locals.at(s.slot);
@@ -4240,7 +4406,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile& sour
     validate_graph(units, identity, diagnostics);
     return AnalysisAccess::build(std::move(units), identity,diagnostics.warnings());
 }
-std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path& entry, const SourceOverrides& overrides, bool verify_disk,const NativeProject* bindings) {
+std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path& entry, const SourceOverrides& overrides, bool verify_disk,const NativeProject* bindings,EditorProbe* editor) {
     for (const auto& [id, source] : overrides) { (void)source; require_module_identity(id); }
     std::error_code ec;
     auto absolute = std::filesystem::absolute(entry, ec);
@@ -4249,7 +4415,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
     if (ec) error(SourceFile(path_utf8(entry), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the project root directory.", "Check that the entry's parent directory exists and is readable.");
     // A diagnostic anchor is needed even before the entry file can be opened.
     Unit anchor(SourceFile(path_utf8(absolute), ""), "/");
-    Diagnostics diagnostics; diagnostics.bind(anchor.source, "/" + path_utf8(absolute.filename()));
+    Diagnostics diagnostics; diagnostics.editor=editor; diagnostics.bind(anchor.source, "/" + path_utf8(absolute.filename()));
     SourceGraph graph(root, diagnostics, overrides,bindings);
     auto& first = [&]() -> Unit& {
         try { return graph.load(anchor, {TokenKind::path, "/" + path_utf8(absolute.filename()), 0}); }
@@ -4268,6 +4434,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
         if (!same) error(anchor.source, {TokenKind::end, "", 0}, Code::import_read,
             "Project sources changed during analysis.", "Retry analysis with a stable filesystem or open document overlays.");
     }
+    first.editor=editor;
     validate_graph(graph.units, first.identity, diagnostics);
     auto identity = first.identity;
     return AnalysisAccess::build(std::move(graph.units), identity,diagnostics.warnings());
@@ -4281,6 +4448,99 @@ AnalysisResult analyze_project(const std::filesystem::path& entry, const SourceO
     try {auto program=validated_project(entry,overrides,true);return {program,program->warnings()};}
     catch (const CompilationError& failure) { return {{}, failure.diagnostics()}; }
 }
+bool valid_editor_identifier(const std::string& name) {
+    return !name.empty() && letter(name[0]) && !reserved.contains(name) &&
+        std::all_of(name.begin(),name.end(),[](char c){return letter(c)||digit(c);});
+}
+EditorAssistance editor_assistance(const std::filesystem::path& entry,const SourceOverrides& overrides,const std::string& module,std::size_t cursor) {
+    require_module_identity(module);
+    EditorAssistance empty;
+    auto selected=overrides.find(module);
+    if(selected!=overrides.end() && !selected->second)return empty;
+    SourceFile source=selected!=overrides.end() && selected->second ? *selected->second : read_source(entry.parent_path()/utf8_path(module).relative_path());
+    const auto& text=source.text();
+    if(cursor>text.size() || text.find("_void_editor_cursor_")!=std::string::npos) return empty;
+    Diagnostics diagnostics;auto tokens=lex(source,diagnostics);
+    if(diagnostics.failed()) return empty;
+    std::size_t begin=cursor,end=cursor;
+    for(const auto& t:tokens) {
+        auto r=span(source,t);
+        if(t.kind==TokenKind::name && r.begin<=cursor && cursor<=r.end){begin=r.begin;end=r.end;break;}
+        if(r.begin<=cursor && cursor<r.end && (t.kind==TokenKind::string || t.kind==TokenKind::path || t.kind==TokenKind::number)) return empty;
+    }
+    // Reject trivia/comment positions. Only whitespace between compiler tokens is eligible.
+    auto line=text.find_last_of("\r\n",cursor ? cursor-1 : 0);line=line==std::string::npos ? 0 : line+1;
+    for(std::size_t n=line;n<cursor;++n) if(text[n]=='#') {
+        bool literal=false;for(const auto& t:tokens){auto r=span(source,t);if(r.begin<=n && n<r.end)literal=true;}
+        if(!literal)return empty;
+    }
+    empty.begin=begin;empty.end=end;
+    auto leading=text.substr(line,begin-line);
+    if(leading.find_first_not_of(' ')==std::string::npos) {
+        auto prefix=text.substr(begin,cursor-begin);
+        for(const auto& keyword:reserved)if(keyword.starts_with(prefix))empty.candidates.push_back({keyword,"keyword",14});
+    }
+    auto repaired=text;repaired.replace(begin,end-begin,"_void_editor_cursor_");
+    // Only close unmatched parentheses on this line. No invented declarations,
+    // signatures, imports or statement bodies enter the compiler context.
+    int parentheses=0;
+    for(const auto& t:tokens) if(t.offset>=line && t.offset<begin){if(t.text=="(")++parentheses;else if(t.text==")")--parentheses;}
+    if(parentheses<0 || parentheses>32)return empty;
+    auto stop=text.find_first_of("\r\n",end);if(stop==std::string::npos)stop=text.size();
+    int closing=0;for(const auto& t:tokens)if(t.offset>=end && t.offset<stop && t.text==")")++closing;
+    if(parentheses>closing)repaired.insert(stop+std::string_view("_void_editor_cursor_").size()-(end-begin),static_cast<std::size_t>(parentheses-closing),')');
+    auto frozen=overrides;frozen.insert_or_assign(module,SourceFile(source.path(),std::move(repaired)));
+    EditorProbe probe{module,begin,{}};probe.result.begin=begin;probe.result.end=end;
+    try {(void)validated_project(entry,frozen,true,nullptr,&probe);}
+    catch(const EditorProbeFound&) {
+        const auto prefix=text.substr(begin,cursor-begin);
+        std::erase_if(probe.result.candidates,[&](const auto& c){return !c.name.starts_with(prefix);});
+        return probe.result;
+    } catch(const CompilationError&) {}
+    return empty;
+}
+std::optional<std::string> format_source(const SourceFile& source) {
+    Diagnostics diagnostics;auto tokens=lex(source,diagnostics);
+    if(diagnostics.failed())return {};
+    const auto& text=source.text();
+    struct Edit {std::size_t begin,end;std::string text;};std::vector<Edit> edits;
+    unsigned depth=0,brace_depth=0;std::vector<bool> braces;std::set<std::size_t> lines;
+    const Token* previous=nullptr;
+    for(const auto& t:tokens) {
+        if(t.kind==TokenKind::indent){++depth;continue;}
+        if(t.kind==TokenKind::dedent){if(depth)--depth;continue;}
+        if(t.kind==TokenKind::newline || t.kind==TokenKind::end)continue;
+        if(t.text=="}" && !braces.empty()){if(braces.back() && brace_depth)--brace_depth;braces.pop_back();}
+        auto r=span(source,t);
+        auto start=text.find_last_of("\r\n",t.offset ? t.offset-1 : 0);start=start==std::string::npos?0:start+1;
+        if(lines.insert(start).second) {
+            auto indent=start;if(!start && text.starts_with("\xef\xbb\xbf"))indent=3;
+            auto end=indent;while(end<text.size() && text[end]==' ')++end;
+            if(end==t.offset)edits.push_back({indent,end,std::string((depth+brace_depth)*4,' ')});
+        }
+        if(previous) {
+            auto left=span(source,*previous);
+            if(left.end<=r.begin){auto gap=text.substr(left.end,r.begin-left.end);
+                if(gap.find_first_not_of(' ')==std::string::npos) {
+                    std::string replacement=gap.empty()?"":" ";
+                    if(t.text=="," || t.text==":" || t.text==")" || t.text=="]" || t.text=="." || previous->text=="." || previous->text=="(" || previous->text=="[")replacement="";
+                    else if(previous->text=="," || previous->text==":" || t.text=="=" || previous->text=="=")replacement=" ";
+                    edits.push_back({left.end,r.begin,replacement});
+                }
+            }
+        }
+        if(t.text=="{"){bool literal=!previous || previous->text!="defer";braces.push_back(literal);if(literal)++brace_depth;}
+        previous=&t;
+    }
+    // Retokenization proves the same structural indentation, including literal
+    // blocks. Ambiguous/unsupported relationships produce no edit.
+    auto result=text;for(auto it=edits.rbegin();it!=edits.rend();++it)result.replace(it->begin,it->end-it->begin,it->text);
+    Diagnostics check;auto after=lex(SourceFile(source.path(),result),check);
+    if(check.failed() || tokens.size()!=after.size())return {};
+    for(std::size_t n=0;n<tokens.size();++n)if(tokens[n].kind!=after[n].kind || tokens[n].text!=after[n].text)return {};
+    return result;
+}
+
 ir::Module compile_source(const SourceFile& source) {
     auto result = analyze_source(source);
     if (!result.succeeded()) throw CompilationError(std::move(result.diagnostics));

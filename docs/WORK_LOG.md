@@ -13564,3 +13564,128 @@ fixture-only correction. Windows hosted confirmation remains pending owner CI.
 
 **STOPPED for owner review.** No commits, pushes, branches or remote actions.
 Stage 6 remains pending final hosted acceptance; Stage 7 remains unauthorized.
+
+## 20 October 2026 — Stage 7 research and roadmap
+
+Boss reports Stage 6 locked at `4139297f92c195782f59a28546444e6b3bec4ad8`,
+CI #78, seven jobs and 973/973. Local HEAD independently matches that commit;
+research did not rerun or independently certify hosted CI. This owner-authorized
+mission was research/planning only, with bounded technical experiments.
+
+Deliverable: [STAGE7_ROADMAP.md](STAGE7_ROADMAP.md), with verified implemented
+versus missing capabilities, compiler/session reuse, incomplete-source completion,
+rename/formatter safety, project/refresh/lifecycle policy, official client/version
+sources, platform packaging, one cohesive sprint sequence, focused tests, acceptance
+and decisions for Wrench/Boss. Permanent raw measurements and reproducible probes:
+[research/stage7/README.md](research/stage7/README.md).
+
+Rebuilt Release voidls/voidc and passed 6/6 focused tooling/session/LSP/Stage 6
+integration suites (6.54s). Extension typecheck/build/unit runner, all three existing
+real VS Code 1.141.0 profiles and VSIX packaging passed. Real Neovim 0.12.6 and
+Vim 9.2 + yegappan/lsp c741b2f baseline attachment/unsaved-error/repair/navigation/
+stop probes passed using temporary fixtures and isolated runtime paths. No future
+completion/rename/formatter behavior is claimed by these baseline probes.
+
+Seven-sample Linux Release measurements include real analysis/generic/advanced/
+async fixtures and generated 3/17/33-module projects. Large graph valid edit median
+233.93ms, queued 20-edit burst 4800.57ms with 660 diagnostic notifications; this
+supports batching before speculative incremental compilation. Real editor invalid
+edit/repair medians 304.85/304.33ms; definition command median 1.28ms (70 samples).
+The pinned language client has a 250ms pending-change delay; causation was not fully
+profiled. Native dependency inspection shows the local executable still needs
+system libraries; a standalone portable bundle is not yet verified.
+
+Important constraints: compiler-owned scopes/recovery are missing; new tooling
+records must not accidentally alter native compatibility serialization. Current
+Vim client lacks declared documentChanges support and a TextDocumentEdit version
+check; do not advertise safe rename to it. Boss decisions include entry/rename
+scope, formatting style, Vim parity, distribution/license and supported matrix.
+VSCodium, minimum editor releases, new-client Windows/macOS execution and clean
+native distribution remain unverified. Full production regression/sanitizer runs
+belong to the authorized implementation sprint, not this documentation work.
+
+Initial experiment fixture/setup issues were corrected in the research scripts;
+no production source/test assertions were weakened. No production code, workflow,
+LLVM version, Git history or hosted state changed. **Research complete; STOPPED for
+Wrench review and Boss authorization.**
+
+
+## 20 October 2026 — Stage 7 engineering sprint, local acceptance complete
+
+Boss authorized one cohesive production sprint after the Stage 6 lock. Implemented
+compiler-owned editor queries/bindings, completion on bounded incomplete contexts,
+hover, signature help, symbols, conservative validated/versioned rename, compiler
+lexer formatting with semantic/idempotence checks, save/watch/explicit refresh,
+bounded ordered transport batching/cancellation, parent-process cleanup and richer
+VS Code discovery/trust/entry/lifecycle. Added shipped built-in Neovim and pinned
+Vim LSP adapters with syntax/filetype/indent and stale-edit guards. Vim rename stays
+disabled. Added native install/package tooling, private Linux archive/platform VSIX,
+real editor/install tests and permanent setup/contracts/evidence. LLVM/Clang/LLD
+stays 19.1.7; new tooling records do not alter native contract serialization.
+
+The 1 MiB gate exposed a new cold-probe temporary on recursive frames; isolated
+that construction. Fresh HEAD also reproduced pre-existing capability analysis
+(96 calls) and lowering (64 calls) stack crashes. Narrow noinline capability/IR
+case boundaries now preserve evaluation order and accept legal 16/64/96/124 chains
+on 1 MiB; excessive chains retain normal diagnostics. Depth guards and native
+assertions were not weakened. Four representative freshly built HEAD/current
+compatibility/constant contracts remain byte-identical. An argument-expression
+signature-selection bug was repaired using AST membership rather than comma offsets.
+Initial URI/fixture/installed-host harness issues were corrected without removing
+safety assertions. No known failing final local acceptance test remains.
+
+Final frozen-source builds: `cmake --build <dir> -j2` and
+`ctest --test-dir <dir> --output-on-failure -j2`:
+
+- Debug `build/order1/production`: **140/140**, 0 failed, 427.92 s.
+- Release `build/ci-release`: **140/140**, 0 failed, 165.36 s.
+- RelWithDebInfo `build/ci-sanitizers`, strict ASan/UBSan/leaks: **140/140**,
+  0 failed, 365.19 s. `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87`,
+  `UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`; executed outside
+  tracing sandbox because LSan cannot run under ptrace.
+- Separate `ulimit -s 1024` frontend CTest gates passed in Debug (10.60 s) and
+  Release (4.55 s); strengthened semantic-depth integration passed in all matrices.
+- Extension typecheck/build/unit tests passed. Real VS Code **1.141.0** development
+  extension and actual installed final Linux VSIX each passed trusted, restricted
+  trust and multi-root profiles (3/3 each), including feature/refresh/restart cleanup.
+- Installed **NVIM v0.13.0-dev-1410+g510f61555b**, Release/LuaJIT
+  2.1.1787165859, passed shipped-adapter headless completion selection, incomplete
+  signatures, hover, symbols, definitions, diagnostics/repair, guarded cross-file
+  rename, stale-version/format rejection, formatting/idempotence, refresh,
+  restart/stop and no orphan checks against the final Release server.
+- Portable Neovim **0.12.6** passed the same adapter suite against Debug.
+  Actual **Vim 9.2 patches 1–858**, `/usr/bin/vim.basic`, with yegappan/lsp
+  `c741b2f1afb42b9f267824dac4049674908f4a41` passed completion/signatures,
+  hover/symbols/navigation, rename-disabled, dirty repair, guarded formatting,
+  refresh/restart/stop/no-orphan checks. The installed `vim` alternative resolves
+  to Neovim; selected actual Vim explicitly, preserving all user configurations.
+- Native archive extraction/handshake with SDK PATH removed, CMake component
+  installation/real LSP demo and actual bundled-server VSIX installation passed.
+  Final Release/archive/CMake-installed/VSIX native bytes have the same SHA-256.
+
+Seven-sample same-host Release measurements: large 33-module queued 20-edit burst
+**4800.57 → 277.77 ms**, diagnostics **660 → 33** (about 17.3× shorter).
+Single valid-edit median **233.93 → 271.76 ms** (sample p95 292.14 ms); idle RSS
+**94,596 → 129,584 KiB**. Metadata/revalidation costs are explicit, not an overall
+compiler-speedup claim. Large completion/signature/hover/rename/format medians:
+**191.79 / 186.72 / 0.11 / 430.02 / 253.96 ms**; request timings exclude prior
+synchronization and edits are not applied. Completion workload uses incomplete
+member access; existing call-callee replacement may conservatively return none.
+Seven-observation p95 is only the largest measured sample. Exact commands, raw
+before/after/example/query measurements and profiles are in
+[stage7/ACCEPTANCE.md](stage7/ACCEPTANCE.md) and adjacent JSON files. Copied final
+logs are under ignored `build/stage7-acceptance/`.
+
+Deliverables: `build/stage7-artifacts/void-tooling-linux-x64.tar.gz` and
+`void-language-linux-x64.vsix`, with LLVM notices/dependency audits/private-acceptance
+warnings. Same-host launch does not verify clean-machine portability. VSCodium,
+Windows/macOS and research minimum editor versions remain unverified; extension
+minimum now matches tested VS Code ^1.141.0. Recovery/rename/formatting exclusions
+are explicit in STAGE7_IMPLEMENTATION.md and KNOWN_ISSUES.md. Public redistribution
+requires Boss's licensing/dependency/release decision; repository remains UNLICENSED.
+No unresolved architectural decision blocks the implemented subset.
+
+No commit, push, branch/remote mutation, publication or hosted CI action occurred.
+Original HEAD remains `4139297f92c195782f59a28546444e6b3bec4ad8`.
+**STOPPED for Wrench review and Boss-controlled commit/push/seven-job hosted CI.
+Stage 7 is not locked.**

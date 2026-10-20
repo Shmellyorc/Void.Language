@@ -38,6 +38,9 @@ for(const auto& f:unit->generic_functions) {
     std::vector<Type> parameters;for(const auto& p:f.parameters)parameters.push_back(pattern_type(p.type));
     const auto owner=f.receiver?f.symbol.substr(0,f.symbol.rfind("::method::")):id;
     AnalyzedDeclaration record{f.token.text=="init"?AnalyzedDeclaration::Kind::initializer:f.receiver?AnalyzedDeclaration::Kind::receiver_method:AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,pattern_type(f.result),{},{},owner};
+    for(const auto& p:f.parameters)record.written_parameters.push_back({p.token.text,pattern_type(p.type),location(p.token)});
+    if(f.source_end>f.token.offset){auto r=location(f.token);r.begin=unit->source.line_starts().at(unit->source.location(f.token.offset).line-1);r.end=f.source_end;record.extent=r;}
+    if(f.accessor)record.editor_symbol_kind=7;
     record.generic_template=true;
     if(f.receiver)record.receiver=pattern_type(f.receiver->type);
     declaration(std::move(record),false);parameter_records(f.generics,f.symbol);

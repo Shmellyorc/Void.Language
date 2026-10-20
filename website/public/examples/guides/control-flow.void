@@ -1,0 +1,14 @@
+# Conditional and unbounded loops, local mutation and loop exits.
+func entry(limit: i32) -> i32:
+    var total: i32
+    var index = 0
+    for index < limit:
+        index++
+        if index % 2 == 0:
+            continue
+        total += index
+    for:
+        if total >= 20:
+            break
+        total += 3
+    return total

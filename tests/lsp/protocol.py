@@ -63,7 +63,7 @@ def editor(executable, root):
                                           (wuri, worker, "stable + 1", wuri)]:
             response, _ = c.request("textDocument/definition", {"textDocument": {"uri": url}, "position": source_position(text, symbol)})
             assert response["result"]["uri"] == expected, response
-        for point in [source_position(main, "x: i32"), {"line": 0, "character": 2}, {"line": 0, "character": 3}, {"line": 5, "character": 10000}]:
+        for point in [ {"line": 0, "character": 2}, {"line": 0, "character": 3}, {"line": 5, "character": 10000}]:
             response, _ = c.request("textDocument/definition", {"textDocument": {"uri": uri}, "position": point})
             assert response["result"] is None, response
         # Emoji begins after '# é' (three UTF16 units), surrogate interior is four.
@@ -134,11 +134,11 @@ def editor(executable, root):
         notes = opened(wuri, bad_worker, -2147483648)
         assert notes[wuri]["version"] == -2147483648 and notes[wuri]["diagnostics"]
         changed(wuri, worker, -2147483647)
-        # Mutable locals are not fabricated symbols.
+        # Mutable locals resolve to their compiler-owned declarations.
         mutable = main.replace("return worker.calculate(x) + values.base", "var y = x\r\n    return y")
         changed(uri, mutable, -1)
         response, _ = c.request("textDocument/definition", {"textDocument": {"uri": uri}, "position": source_position(mutable, "return y") | {"character": 11}})
-        assert response["result"] is None
+        assert response["result"]["range"]["start"] == {"line": 5, "character": 8}
         changed(uri, main, 0)
         # Self/forward cycles retain real compiler references and terminate queries.
         cycle = 'use "/main.void" as m\r\nfunc calculate(x: i32) -> i32:\r\n    if x < 0:\r\n        return m.entry(x)\r\n    return later(x)\r\nfunc later(x: i32) -> i32:\r\n    return x\r\n'

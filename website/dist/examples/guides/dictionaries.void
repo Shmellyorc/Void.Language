@@ -1,0 +1,30 @@
+func entry(value: i32) -> i32:
+    var stats = {
+        "health": 100,
+        "damage": 15,
+        "health": 101
+    }
+    var alias = stats
+    stats["health"] = value
+    stats["speed"] = 4
+    if not stats.contains("health") or stats.contains("missing"):
+        return -100
+    var order = ""
+    for item, key in stats:
+        order += key
+    if order != "healthdamagespeed":
+        return -200
+    if not stats.remove("damage") or stats.remove("damage"):
+        return -300
+    stats["damage"] = 9
+    order = ""
+    for item, key in reverse stats:
+        order += key
+    if order != "damagespeedhealth":
+        return -400
+    var answer = alias["health"] + stats.count as i32
+    alias.clear()
+    alias.clear()
+    if stats.count != 0:
+        return -500
+    return answer

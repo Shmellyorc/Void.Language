@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark"><title>Examples — VOID Language</title><meta name="description" content="Explore curated VOID programs: async tasks, parallel workers, generics, closures, events, resources and more."><link rel="canonical" href="https://voidlang.com/examples/"><meta property="og:type" content="website"><meta property="og:title" content="Examples — VOID Language"><meta property="og:description" content="Explore curated VOID programs: async tasks, parallel workers, generics, closures, events, resources and more."><meta property="og:url" content="https://voidlang.com/examples/"><meta property="og:image" content="https://voidlang.com/assets/social.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="VOID Language: Native code. Clear intent."><meta name="twitter:card" content="summary_large_image"><link rel="icon" href="/assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="/assets/style.css"><script src="/assets/site.js" defer></script></head>
+<body><a class="skip-link" href="#main">Skip to content</a><header class="header"><div class="container nav-wrap"><a class="brand" href="/" aria-label="VOID Language home"><svg viewBox="0 0 44 44" aria-hidden="true"><path fill="currentColor" d="M2 5h12l13 23-6 11z"/><path fill="#6b779b" d="M17 5h11l-6 10z"/><path fill="#303b64" d="M31 5h11L29 28l-6-10z"/></svg><span>VOID</span></a><button class="menu-toggle" aria-expanded="false" aria-controls="navigation" hidden>Menu</button><nav id="navigation" aria-label="Main navigation"><a href="/">Home</a><a href="/why-void/">Why VOID</a><a href="/features/">Features</a><a href="/examples/" aria-current="page">Examples</a><a href="/docs/">Docs</a><a href="/getting-started/">Get started</a><a href="/#roadmap">Roadmap</a></nav><button class="theme-toggle" aria-label="Switch to dark theme" aria-pressed="false" hidden><svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14a8.5 8.5 0 0 1-10.5-10.5A8.5 8.5 0 1 0 20.5 14Z"/></svg></button><a class="github-nav" href="https://github.com/Shmellyorc/Void.Language">GitHub <span aria-hidden="true">↗</span></a></div></header>
+<main id="main" class="inner-page"><section class="section container"><div class="section-heading"><div><p class="eyebrow">LET THE CODE SPEAK</p><h1 class="page-title">Small programs.<br><span class="gradient">Real possibilities.</span></h1></div><p>Choose a topic to explore complete VOID source, its expected result and the idea behind it. These are source examples; public compiler builds are not yet available.</p></div><div class="example-picker" hidden><label for="example-select">Choose an example</label><select id="example-select" aria-controls="example-gallery"><option value="native">Native foundations</option><option value="functions">Functions & recursion</option><option value="loops">Readable loops</option><option value="collections">Arrays & dictionaries</option><option value="structs">Values & shared objects</option><option value="errors">Results & matching</option><option value="generics">Generics</option><option value="properties">Properties</option><option value="closures">Functions & closures</option><option value="events">Events</option><option value="cleanup">Defer & resource cleanup</option><option value="async">Async & await</option><option value="task-groups">Task groups & cancellation</option><option value="parallelism">Parallel workers</option><option value="modules">Modules & imports</option></select></div><div id="example-gallery"><article class="gallery-example" id="native" data-example="native"><div class="gallery-copy"><p class="eyebrow">NATIVE FOUNDATIONS</p><h2>Native foundations</h2><p>A condition chooses the negative case or calls calculate to add 42.</p><a href="/docs/syntax/">Read the guide →</a></div><figure class="guide-code"><figcaption>architecture.void<a href="/examples/architecture.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Native foundations source"><code data-source="/examples/architecture.void"><span class="comment"># Compiled from source through the shared VOID frontend and LLVM backend.</span>
+<span class="keyword">func</span> calculate(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">return</span> <span class="keyword">value</span> + <span class="number">42</span>
+
+<span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">if</span> <span class="keyword">value</span> &lt; <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="number">7</span>
+    <span class="keyword">return</span> calculate(<span class="keyword">value</span>)</code></pre><div class="guide-result">Input <strong>10</strong><span aria-hidden="true"> → </span>Expected result <strong>52</strong></div></figure></article><article class="gallery-example" id="functions" data-example="functions"><div class="gallery-copy"><p class="eyebrow">FUNCTIONS & RECURSION</p><h2>Functions & recursion</h2><p>Factorial calls itself with smaller values and returns 120.</p><a href="/docs/functions/">Read the guide →</a></div><figure class="guide-code"><figcaption>functions.void<a href="/examples/functions.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Functions & recursion source"><code data-source="/examples/functions.void"><span class="keyword">func</span> eligible(<span class="keyword">value</span>: <span class="keyword">i32</span>, positive: <span class="keyword">bool</span>) -&gt; <span class="keyword">bool</span>:
+    <span class="keyword">return</span> positive <span class="keyword">and</span> <span class="keyword">value</span> &gt;= <span class="number">0</span>
+
+<span class="keyword">func</span> factorial(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">if</span> <span class="keyword">value</span> &lt;= <span class="number">1</span>:
+        <span class="keyword">return</span> <span class="number">1</span>
+    <span class="keyword">return</span> <span class="keyword">value</span> * factorial(<span class="keyword">value</span> - <span class="number">1</span>)
+
+<span class="keyword">func</span> no_op():
+    <span class="keyword">return</span>
+
+<span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    no_op()
+    <span class="keyword">if</span> eligible(<span class="keyword">value</span>, <span class="keyword">true</span>) <span class="keyword">and</span> <span class="keyword">value</span> &lt;= <span class="number">10</span>:
+        <span class="keyword">return</span> factorial(<span class="keyword">value</span>)
+    <span class="keyword">else</span> <span class="keyword">if</span> <span class="keyword">value</span> &lt; <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="number">9</span>
+    <span class="keyword">else</span>:
+        <span class="keyword">return</span> <span class="number">0</span></code></pre><div class="guide-result">Input <strong>5</strong><span aria-hidden="true"> → </span>Expected result <strong>120</strong></div></figure></article><article class="gallery-example" id="loops" data-example="loops"><div class="gallery-copy"><p class="eyebrow">READABLE LOOPS</p><h2>Readable loops</h2><p>Skip even numbers, then repeat until the total reaches its target.</p><a href="/docs/control-flow/">Read the guide →</a></div><figure class="guide-code"><figcaption>loops.void<a href="/examples/loops.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Readable loops source"><code data-source="/examples/loops.void"><span class="comment"># Conditional and unbounded loops, local mutation and loop exits.</span>
+<span class="keyword">func</span> entry(limit: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> total: <span class="keyword">i32</span>
+    <span class="keyword">var</span> index = <span class="number">0</span>
+    <span class="keyword">for</span> index &lt; limit:
+        index++
+        <span class="keyword">if</span> index % <span class="number">2</span> == <span class="number">0</span>:
+            <span class="keyword">continue</span>
+        total += index
+    <span class="keyword">for</span>:
+        <span class="keyword">if</span> total &gt;= <span class="number">20</span>:
+            <span class="keyword">break</span>
+        total += <span class="number">3</span>
+    <span class="keyword">return</span> total</code></pre><div class="guide-result">Input <strong>5</strong><span aria-hidden="true"> → </span>Expected result <strong>21</strong></div></figure></article><article class="gallery-example" id="collections" data-example="collections"><div class="gallery-copy"><p class="eyebrow">ARRAYS & DICTIONARIES</p><h2>Arrays & dictionaries</h2><p>Use a fixed array, grow a list and count a dictionary.</p><a href="/docs/collections/">Read the guide →</a></div><figure class="guide-code"><figcaption>collections.void<a href="/examples/guides/collections.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Arrays & dictionaries source"><code data-source="/examples/guides/collections.void"><span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> fixed: [<span class="keyword">i32</span>, <span class="number">3</span>] = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]
+    <span class="keyword">var</span> numbers: [<span class="keyword">i32</span>] = [<span class="number">4</span>, <span class="number">5</span>]
+    numbers.push(<span class="number">6</span>)
+    <span class="keyword">var</span> labels: {<span class="keyword">i32</span>: <span class="keyword">i32</span>} = {<span class="number">1</span>: <span class="number">10</span>, <span class="number">2</span>: <span class="number">20</span>}
+    <span class="keyword">var</span> total = <span class="number">0</span>
+    <span class="keyword">for</span> number <span class="keyword">in</span> numbers:
+        total += number
+    <span class="keyword">return</span> fixed[<span class="number">0</span>] + total + labels.count <span class="keyword">as</span> <span class="keyword">i32</span></code></pre><div class="guide-result">Input <strong>0</strong><span aria-hidden="true"> → </span>Expected result <strong>18</strong></div></figure></article><article class="gallery-example" id="structs" data-example="structs"><div class="gallery-copy"><p class="eyebrow">VALUES & SHARED OBJECTS</p><h2>Values & shared objects</h2><p>Copy a point independently while two names share one counter.</p><a href="/docs/structs/">Read the guide →</a></div><figure class="guide-code"><figcaption>structs.void<a href="/examples/guides/structs.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Values & shared objects source"><code data-source="/examples/guides/structs.void"><span class="keyword">value</span> <span class="keyword">struct</span> point:
+    x: <span class="keyword">i32</span>
+    y: <span class="keyword">i32</span>
+
+<span class="keyword">struct</span> counter:
+    total: <span class="keyword">i32</span>
+
+<span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> original = point(x = <span class="number">2</span>, y = <span class="number">3</span>)
+    <span class="keyword">var</span> copied = original
+    copied.x += <span class="number">10</span>
+    <span class="keyword">var</span> shared = counter(total = <span class="number">0</span>)
+    <span class="keyword">var</span> alias = shared
+    alias.total += <span class="number">5</span>
+    <span class="keyword">return</span> original.x + copied.x + shared.total</code></pre><div class="guide-result">Input <strong>0</strong><span aria-hidden="true"> → </span>Expected result <strong>19</strong></div></figure></article><article class="gallery-example" id="errors" data-example="errors"><div class="gallery-copy"><p class="eyebrow">RESULTS & MATCHING</p><h2>Results & matching</h2><p>Return a recoverable result and handle each case explicitly.</p><a href="/docs/errors/">Read the guide →</a></div><figure class="guide-code"><figcaption>errors.void<a href="/examples/guides/errors.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Results & matching source"><code data-source="/examples/guides/errors.void"><span class="keyword">func</span> divide(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">result</span>&lt;<span class="keyword">i32</span>, string&gt;:
+    <span class="keyword">if</span> <span class="keyword">value</span> == <span class="number">0</span>:
+        <span class="keyword">return</span> Err(<span class="string">&quot;division by zero&quot;</span>)
+    <span class="keyword">return</span> Ok(<span class="number">100</span> / <span class="keyword">value</span>)
+
+<span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> outcome = divide(<span class="keyword">value</span>)
+    <span class="keyword">return</span> <span class="keyword">match</span> outcome:
+        Ok(<span class="keyword">var</span> number): number
+        Err(<span class="keyword">var</span> reason): -<span class="number">1</span></code></pre><div class="guide-result">Input <strong>2</strong><span aria-hidden="true"> → </span>Expected result <strong>50</strong></div></figure></article><article class="gallery-example" id="generics" data-example="generics"><div class="gallery-copy"><p class="eyebrow">GENERICS</p><h2>Generics</h2><p>Reuse an operation while keeping its types.</p><a href="/docs/generics/">Read the guide →</a></div><figure class="guide-code"><figcaption>generics.void<a href="/examples/guides/generics.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Generics source"><code data-source="/examples/guides/generics.void"><span class="keyword">func</span> identity&lt;t&gt;(<span class="keyword">value</span>: t) -&gt; t:
+    <span class="keyword">return</span> <span class="keyword">value</span>
+
+<span class="keyword">struct</span> box&lt;t&gt;:
+    <span class="keyword">value</span>: t
+
+<span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> held = box(<span class="keyword">value</span> = identity(<span class="keyword">value</span>))
+    <span class="keyword">var</span> numbers: [<span class="keyword">i32</span>] = [held.<span class="keyword">value</span>, <span class="number">5</span>]
+    <span class="keyword">return</span> identity(numbers)[<span class="number">0</span>]</code></pre><div class="guide-result">Input <strong>5</strong><span aria-hidden="true"> → </span>Expected result <strong>5</strong></div></figure></article><article class="gallery-example" id="properties" data-example="properties"><div class="gallery-copy"><p class="eyebrow">PROPERTIES</p><h2>Properties</h2><p>Put accessor logic behind ordinary field-style access.</p><a href="/docs/properties/">Read the guide →</a></div><figure class="guide-code"><figcaption>properties.void<a href="/examples/guides/properties.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Properties source"><code data-source="/examples/guides/properties.void"><span class="keyword">value</span> <span class="keyword">struct</span> point:
+    x: <span class="keyword">i32</span>
+<span class="keyword">property</span> (p point) doubled: <span class="keyword">i32</span>:
+    <span class="keyword">get</span>:
+        <span class="keyword">return</span> p.x * <span class="number">2</span>
+    <span class="keyword">set</span>(<span class="keyword">value</span>):
+        p.x = <span class="keyword">value</span> / <span class="number">2</span>
+<span class="keyword">struct</span> player:
+    backing: <span class="keyword">i32</span> = <span class="number">10</span>
+    position: point
+    items: [<span class="keyword">i32</span>, <span class="number">3</span>]
+<span class="keyword">property</span> (p player) health: <span class="keyword">i32</span>:
+    <span class="keyword">get</span>:
+        <span class="keyword">return</span> p.backing
+    <span class="keyword">set</span>(<span class="keyword">value</span>):
+        <span class="keyword">if</span> <span class="keyword">value</span> &lt; <span class="number">0</span>:
+            p.backing = <span class="number">0</span>
+        <span class="keyword">else</span>:
+            p.backing = <span class="keyword">value</span>
+<span class="keyword">property</span> (p player) location: point:
+    <span class="keyword">get</span>:
+        <span class="keyword">return</span> p.position
+    <span class="keyword">set</span>(<span class="keyword">value</span>):
+        p.position = <span class="keyword">value</span>
+<span class="keyword">property</span> (p player) snapshot: [<span class="keyword">i32</span>, <span class="number">3</span>]:
+    <span class="keyword">get</span>:
+        <span class="keyword">return</span> p.items
+    <span class="keyword">set</span>(<span class="keyword">value</span>):
+        p.items = <span class="keyword">value</span>
+<span class="keyword">property</span> (p player) alive: <span class="keyword">bool</span>:
+    <span class="keyword">get</span>:
+        <span class="keyword">return</span> p.health &gt; <span class="number">0</span>
+<span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> p = player(items = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])
+    p.health = <span class="keyword">value</span>
+    p.health += <span class="number">3</span>
+    p.location.x = <span class="number">4</span>
+    p.location.doubled += <span class="number">2</span>
+    p.snapshot[<span class="number">1</span>] = <span class="number">20</span>
+    <span class="keyword">var</span> copy = p.location
+    copy.x = <span class="number">100</span>
+    <span class="keyword">if</span> p.location.x != <span class="number">5</span> <span class="keyword">or</span> p.snapshot[<span class="number">1</span>] != <span class="number">20</span> <span class="keyword">or</span> <span class="keyword">not</span> p.alive:
+        <span class="keyword">return</span> -<span class="number">100</span>
+    <span class="keyword">return</span> p.health + p.location.doubled</code></pre><div class="guide-result">Input <strong>5</strong><span aria-hidden="true"> → </span>Expected result <strong>18</strong></div></figure></article><article class="gallery-example" id="closures" data-example="closures"><div class="gallery-copy"><p class="eyebrow">FUNCTIONS & CLOSURES</p><h2>Functions & closures</h2><p>Let a function carry the state it needs.</p><a href="/docs/closures/">Read the guide →</a></div><figure class="guide-code"><figcaption>closures.void<a href="/examples/guides/closures.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Functions & closures source"><code data-source="/examples/guides/closures.void"><span class="keyword">func</span> counter(start: <span class="keyword">i32</span>) -&gt; <span class="keyword">func</span>() -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> number = start
+    <span class="keyword">return</span> <span class="keyword">func</span>() -&gt; <span class="keyword">i32</span>:
+        number += <span class="number">1</span>
+        <span class="keyword">return</span> number
+
+<span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> next = counter(<span class="keyword">value</span>)
+    <span class="keyword">var</span> alias = next
+    <span class="keyword">var</span> first = next()
+    <span class="keyword">return</span> first + alias()</code></pre><div class="guide-result">Input <strong>5</strong><span aria-hidden="true"> → </span>Expected result <strong>13</strong></div></figure></article><article class="gallery-example" id="events" data-example="events"><div class="gallery-copy"><p class="eyebrow">EVENTS</p><h2>Events</h2><p>Connect objects through ordered notifications.</p><a href="/docs/events/">Read the guide →</a></div><figure class="guide-code"><figcaption>events.void<a href="/examples/guides/events.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Events source"><code data-source="/examples/guides/events.void"><span class="keyword">struct</span> source:
+    <span class="keyword">event</span> changed: <span class="keyword">func</span>(<span class="keyword">i32</span>)
+<span class="keyword">func</span> (s source) fire(<span class="keyword">value</span>: <span class="keyword">i32</span>):
+    s.changed.emit(<span class="keyword">value</span>)
+<span class="keyword">struct</span> observer:
+    total: <span class="keyword">i32</span>
+<span class="keyword">func</span> (o observer) add(<span class="keyword">value</span>: <span class="keyword">i32</span>):
+    o.total += <span class="keyword">value</span>
+<span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> s = source()
+    <span class="keyword">var</span> seen = observer(total=<span class="number">0</span>)
+    s.changed += seen.add
+    s.changed += seen.add
+    s.changed -= seen.add
+    s.fire(<span class="keyword">value</span>)
+    <span class="keyword">var</span> local = <span class="number">0</span>
+    <span class="keyword">var</span> callback = <span class="keyword">func</span>(n: <span class="keyword">i32</span>):
+        local += n
+    s.changed += callback
+    s.fire(<span class="number">2</span>)
+    s.changed -= callback
+    s.fire(<span class="number">3</span>)
+    <span class="keyword">return</span> seen.total * <span class="number">10</span> + local</code></pre><div class="guide-result">Input <strong>5</strong><span aria-hidden="true"> → </span>Expected result <strong>102</strong></div></figure></article><article class="gallery-example" id="cleanup" data-example="cleanup"><div class="gallery-copy"><p class="eyebrow">DEFER & RESOURCE CLEANUP</p><h2>Defer & resource cleanup</h2><p>Make cleanup part of the scope that owns it.</p><a href="/docs/cleanup/">Read the guide →</a></div><figure class="guide-code"><figcaption>cleanup.void<a href="/examples/guides/cleanup.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Defer & resource cleanup source"><code data-source="/examples/guides/cleanup.void"><span class="keyword">struct</span> log:
+    values: [<span class="keyword">i32</span>]
+
+<span class="keyword">struct</span> resource:
+    log: log
+    id: <span class="keyword">i32</span>
+
+<span class="keyword">func</span> (r resource) deinit():
+    r.log.values.push(r.id)
+
+<span class="keyword">func</span> work(l: log, <span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">result</span>&lt;<span class="keyword">i32</span>, <span class="keyword">i32</span>&gt;:
+    <span class="keyword">with</span> resource(log=l, id=<span class="keyword">value</span>) <span class="keyword">as</span> r:
+        <span class="keyword">defer</span> l.values.push(<span class="number">99</span>)
+        <span class="keyword">if</span> <span class="keyword">value</span> == <span class="number">0</span>:
+            <span class="keyword">return</span> Err(-<span class="number">1</span>)
+        l.values.push(<span class="number">10</span>)
+    l.values.push(<span class="number">20</span>)
+    <span class="keyword">return</span> Ok(<span class="number">3</span>)
+
+<span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> l = log(values=[])
+    <span class="keyword">var</span> <span class="keyword">result</span> = work(l, <span class="keyword">value</span>)
+    <span class="keyword">var</span> r = resource(log=l, id=<span class="number">50</span>)
+    <span class="keyword">var</span> alias = r
+    r.deinit()
+    alias.deinit()
+    <span class="keyword">return</span> l.values[<span class="number">0</span>] + l.values[<span class="number">1</span>] + l.values[<span class="number">2</span>] + l.values[<span class="number">3</span>] + l.values[<span class="number">4</span>]</code></pre><div class="guide-result">Input <strong>5</strong><span aria-hidden="true"> → </span>Expected result <strong>184</strong></div></figure></article><article class="gallery-example" id="async" data-example="async"><div class="gallery-copy"><p class="eyebrow">ASYNC & AWAIT</p><h2>Async & await</h2><p>Start work now. Await its result when you need it.</p><p class="gallery-note">Requires the explicit async host adapter; the ordinary synchronous CLI entry adapter does not execute this program.</p><a href="/docs/async/">Read the guide →</a></div><figure class="guide-code"><figcaption>async.void<a href="/examples/guides/async.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Async & await source"><code data-source="/examples/guides/async.void"><span class="keyword">async</span> <span class="keyword">func</span> leaf(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">return</span> <span class="keyword">value</span> + <span class="number">1</span>
+
+<span class="keyword">async</span> <span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> first = leaf(<span class="keyword">value</span>)
+    <span class="keyword">var</span> second = leaf(<span class="keyword">value</span> + <span class="number">1</span>)
+    <span class="keyword">var</span> a = <span class="keyword">await</span> first
+    <span class="keyword">var</span> b = <span class="keyword">await</span> second
+    <span class="keyword">return</span> a + b</code></pre><div class="guide-result">Input <strong>5</strong><span aria-hidden="true"> → </span>Expected result <strong>13</strong></div></figure></article><article class="gallery-example" id="task-groups" data-example="task-groups"><div class="gallery-copy"><p class="eyebrow">TASK GROUPS & CANCELLATION</p><h2>Task groups & cancellation</h2><p>Give related work a lifetime.</p><p class="gallery-note">Requires the explicit async host adapter; the ordinary synchronous CLI entry adapter does not execute this program.</p><a href="/docs/task-groups/">Read the guide →</a></div><figure class="guide-code"><figcaption>task-groups.void<a href="/examples/guides/task-groups.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Task groups & cancellation source"><code data-source="/examples/guides/task-groups.void"><span class="keyword">struct</span> ledger:
+    number: <span class="keyword">i32</span> = <span class="number">0</span>
+
+<span class="keyword">async</span> <span class="keyword">func</span> tick(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">return</span> <span class="keyword">value</span>
+
+<span class="keyword">async</span> <span class="keyword">func</span> child(owner: ledger):
+    <span class="keyword">defer</span> {
+        owner.number = owner.number * <span class="number">10</span> + <span class="number">2</span>
+    }
+    <span class="keyword">var</span> ignored = <span class="keyword">await</span> tick(<span class="number">1</span>)
+    owner.number = owner.number * <span class="number">10</span> + <span class="number">1</span>
+
+<span class="keyword">async</span> <span class="keyword">func</span> parent(owner: ledger):
+    <span class="keyword">defer</span> {
+        owner.number = owner.number * <span class="number">10</span> + <span class="number">3</span>
+    }
+    <span class="keyword">var</span> ignored = child(owner)
+
+<span class="keyword">async</span> <span class="keyword">func</span> rejected() -&gt; <span class="keyword">result</span>&lt;<span class="keyword">i32</span>, <span class="keyword">i32</span>&gt;:
+    <span class="keyword">return</span> Err(<span class="number">9</span>)
+
+<span class="keyword">async</span> <span class="keyword">func</span> early(owner: ledger) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">with</span> tasks.group() <span class="keyword">as</span> jobs:
+        <span class="keyword">var</span> pending = child(owner)
+        <span class="keyword">var</span> first = <span class="keyword">await</span> tick(<span class="number">1</span>)
+        <span class="keyword">return</span> first
+
+<span class="keyword">async</span> <span class="keyword">func</span> early_implicit(owner: ledger) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> pending = child(owner)
+    <span class="keyword">var</span> first = <span class="keyword">await</span> tick(<span class="number">1</span>)
+    <span class="keyword">if</span> first == <span class="number">1</span>:
+        <span class="keyword">return</span> first
+    <span class="keyword">return</span> <span class="number">2</span>
+
+<span class="keyword">async</span> <span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> owner = ledger()
+    <span class="keyword">var</span> pending = parent(owner)
+    <span class="keyword">await</span> pending
+    <span class="keyword">await</span> pending
+    pending.cancel()
+    <span class="keyword">if</span> owner.number != <span class="number">123</span>:
+        <span class="keyword">return</span> <span class="number">1</span>
+    owner.number = <span class="number">0</span>
+    <span class="keyword">with</span> tasks.group() <span class="keyword">as</span> jobs:
+        <span class="keyword">var</span> stopped = child(owner)
+        stopped.cancel()
+        stopped.cancel()
+    <span class="keyword">if</span> owner.number != <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="number">2</span>
+    <span class="keyword">with</span> tasks.group() <span class="keyword">as</span> outer:
+        <span class="keyword">with</span> tasks.group() <span class="keyword">as</span> inner:
+            <span class="keyword">var</span> normal = child(owner)
+            <span class="keyword">var</span> rejection = <span class="keyword">await</span> rejected()
+            <span class="keyword">var</span> code = <span class="keyword">match</span> rejection:
+                Ok(<span class="keyword">var</span> answer): answer
+                Err(<span class="keyword">var</span> error): error
+            <span class="keyword">if</span> code != <span class="number">9</span>:
+                <span class="keyword">return</span> <span class="number">5</span>
+    <span class="keyword">if</span> owner.number != <span class="number">12</span>:
+        <span class="keyword">return</span> <span class="number">3</span>
+    owner.number = <span class="number">0</span>
+    <span class="keyword">var</span> implicit = <span class="keyword">await</span> early_implicit(owner)
+    <span class="keyword">if</span> owner.number != <span class="number">2</span> <span class="keyword">or</span> implicit != <span class="number">1</span>:
+        <span class="keyword">return</span> <span class="number">6</span>
+    owner.number = <span class="number">0</span>
+    <span class="keyword">var</span> <span class="keyword">result</span> = <span class="keyword">await</span> early(owner)
+    <span class="keyword">if</span> owner.number != <span class="number">2</span>:
+        <span class="keyword">return</span> <span class="number">4</span>
+    <span class="keyword">return</span> <span class="keyword">value</span> + <span class="keyword">result</span></code></pre><div class="guide-result">Input <strong>5</strong><span aria-hidden="true"> → </span>Expected result <strong>6</strong></div></figure></article><article class="gallery-example" id="parallelism" data-example="parallelism"><div class="gallery-copy"><p class="eyebrow">PARALLEL WORKERS</p><h2>Parallel workers</h2><p>Move independent work onto bounded native workers.</p><p class="gallery-note">Requires the explicit async host adapter; the ordinary synchronous CLI entry adapter does not execute this program.</p><a href="/docs/parallelism/">Read the guide →</a></div><figure class="guide-code"><figcaption>parallelism.void<a href="/examples/guides/parallelism.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Parallel workers source"><code data-source="/examples/guides/parallelism.void"><span class="keyword">value</span> <span class="keyword">struct</span> packet:
+    numbers: [<span class="keyword">i32</span>, <span class="number">2</span>]
+    text: string = <span class="string">&quot;&quot;</span>
+
+<span class="keyword">struct</span> private_state:
+    number: <span class="keyword">i32</span> = <span class="number">0</span>
+
+<span class="keyword">func</span> calculate(<span class="keyword">value</span>: packet) -&gt; <span class="keyword">result</span>&lt;packet, string&gt;:
+    <span class="keyword">var</span> local = private_state(number = <span class="keyword">value</span>.numbers[<span class="number">0</span>])
+    <span class="keyword">var</span> copy = <span class="keyword">value</span>
+    copy.numbers[<span class="number">0</span>] = local.number + <span class="number">10</span>
+    copy.text = <span class="keyword">value</span>.text + <span class="string">&quot;!&quot;</span>
+    <span class="keyword">return</span> Ok(copy)
+
+<span class="keyword">func</span> identity(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> sum = <span class="number">0</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span>..&lt;<span class="keyword">value</span>:
+        sum += <span class="number">1</span>
+    <span class="keyword">return</span> sum
+
+<span class="keyword">struct</span> counter:
+    number: <span class="keyword">i32</span> = <span class="number">0</span>
+
+<span class="keyword">func</span> next(owner: counter) -&gt; <span class="keyword">i32</span>:
+    owner.number += <span class="number">1</span>
+    <span class="keyword">return</span> owner.number
+
+<span class="keyword">func</span> pair(first: <span class="keyword">i32</span>, second: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">return</span> first * <span class="number">10</span> + second
+
+<span class="keyword">func</span> noop(<span class="keyword">value</span>: <span class="keyword">i32</span>):
+    <span class="keyword">var</span> local = private_state(number = <span class="keyword">value</span>)
+
+<span class="keyword">async</span> <span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">var</span> no_result = <span class="keyword">spawn</span> noop(<span class="keyword">value</span>)
+    <span class="keyword">await</span> no_result
+    <span class="keyword">await</span> no_result
+    <span class="keyword">var</span> owner = counter()
+    <span class="keyword">var</span> order = <span class="keyword">spawn</span> pair(next(owner), next(owner))
+    <span class="keyword">if</span> <span class="keyword">await</span> order != <span class="number">12</span> <span class="keyword">or</span> owner.number != <span class="number">2</span>:
+        <span class="keyword">return</span> -<span class="number">1000</span>
+    <span class="keyword">var</span> original = packet(text = <span class="string">&quot;immutable&quot;</span>)
+    original.numbers[<span class="number">0</span>] = <span class="keyword">value</span>
+    <span class="keyword">var</span> pending = <span class="keyword">spawn</span> calculate(original)
+    original.numbers[<span class="number">0</span>] = <span class="number">100</span>
+    <span class="keyword">var</span> <span class="keyword">result</span> = <span class="keyword">await</span> pending
+    <span class="keyword">var</span> answer = <span class="keyword">match</span> <span class="keyword">result</span>:
+        Ok(<span class="keyword">var</span> item): <span class="keyword">match</span> item.text == <span class="string">&quot;immutable!&quot;</span>:
+            <span class="keyword">true</span>: item.numbers[<span class="number">0</span>]
+            <span class="keyword">false</span>: -<span class="number">1000</span>
+        Err(_): -<span class="number">1000</span>
+    <span class="keyword">with</span> tasks.group() <span class="keyword">as</span> jobs:
+        <span class="keyword">var</span> first = <span class="keyword">spawn</span> identity(<span class="number">4</span>)
+        <span class="keyword">with</span> tasks.group() <span class="keyword">as</span> nested:
+            <span class="keyword">var</span> second = <span class="keyword">spawn</span> identity(<span class="number">5</span>)
+            answer += <span class="keyword">await</span> first + <span class="keyword">await</span> second
+    <span class="keyword">return</span> answer + original.numbers[<span class="number">0</span>]</code></pre><div class="guide-result">Input <strong>5</strong><span aria-hidden="true"> → </span>Expected result <strong>124</strong></div></figure></article><article class="gallery-example" id="modules" data-example="modules"><div class="gallery-copy"><p class="eyebrow">MODULES & IMPORTS</p><h2>Modules & imports</h2><p>Organize a program into small source files.</p><p class="gallery-note">This example also needs <a download href="/examples/guides/modules/math/calculator.void">math/calculator.void</a> and <a download href="/examples/guides/modules/helpers/numbers.void">helpers/numbers.void</a>, kept in those relative paths.</p><a href="/docs/modules/">Read the guide →</a></div><figure class="guide-code"><figcaption>main.void<a href="/examples/guides/modules/main.void" download>Download source ↓</a></figcaption><pre tabindex="0" aria-label="Modules & imports source"><code data-source="/examples/guides/modules/main.void"><span class="keyword">use</span> <span class="string">&quot;/math/calculator.void&quot;</span> <span class="keyword">as</span> calculator
+<span class="keyword">use</span> <span class="string">&quot;/helpers/numbers.void&quot;</span>
+
+<span class="keyword">func</span> entry(<span class="keyword">value</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>:
+    <span class="keyword">return</span> calculator.double(<span class="keyword">value</span>) + increment(<span class="keyword">value</span>)</code></pre><div class="guide-result">Input <strong>5</strong><span aria-hidden="true"> → </span>Expected result <strong>16</strong></div></figure></article></div></section></main><footer><div class="container footer-inner"><a class="brand" href="/"><svg viewBox="0 0 44 44" aria-hidden="true"><path fill="currentColor" d="M2 5h12l13 23-6 11z"/><path fill="#6b779b" d="M17 5h11l-6 10z"/><path fill="#303b64" d="M31 5h11L29 28l-6-10z"/></svg><span>VOID <small>LANGUAGE</small></span></a><p>Native code. Clear intent.</p><div><a href="/docs/">Documentation</a><a href="https://github.com/Shmellyorc/Void.Language">GitHub ↗</a></div></div></footer><div class="sr-only" id="announcement" role="status"></div></body></html>

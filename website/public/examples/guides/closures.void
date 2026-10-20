@@ -1,0 +1,11 @@
+func counter(start: i32) -> func() -> i32:
+    var number = start
+    return func() -> i32:
+        number += 1
+        return number
+
+func entry(value: i32) -> i32:
+    var next = counter(value)
+    var alias = next
+    var first = next()
+    return first + alias()

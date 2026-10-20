@@ -1,0 +1,4 @@
+func entry(value: i32) -> i32:
+    var wide: i64 = value as i64
+    var answer: i64 = wide + 2
+    return answer as i32

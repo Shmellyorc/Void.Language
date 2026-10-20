@@ -1,5 +1,59 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## Mandatory Keyboard Clanker rule: MINIMAL OUTPUT
+
+**SHUT UP AND WORK. Tokens and usage are valuable.**
+
+- No progress narration or unnecessary status updates.
+- No repeating instructions, tool-by-tool explanations, motivational filler or unnecessary apologies.
+- Work continuously through the entire authorized sprint; interrupt only for genuine owner decisions.
+- Keep investigation and testing output out of the conversation whenever possible.
+- At completion, report only changes made, tests passed/failed, unresolved problems and deliverables.
+- Spend the budget on implementation, investigation and testing, not conversation.
+
+**KISS. DRY. MAXIMUM WORK. MINIMUM TALK.** This rule applies to future Keyboard
+Clankers and takes precedence over older communication/checkpoint practices below.
+Boss retains Git and hosted acceptance control.
+
+## Stage 7 engineering review handoff — 20 October 2026
+
+Stage 6 is hosted **LOCKED** at `4139297f92c195782f59a28546444e6b3bec4ad8`,
+CI #78, seven successful jobs. Stage 7 engineering is locally complete, and Wrench
+has completed a targeted source review. Stage 7 awaits mandatory seven-job hosted
+acceptance; it is **not hosted locked**. Earlier research-only/unauthorized and
+pending Stage 6 statements below are historical. No new implementation is
+authorized by this documentation cleanup.
+Review [the implementation contract](STAGE7_IMPLEMENTATION.md) and
+[exact local evidence/limitations](stage7/ACCEPTANCE.md). Compiler query recovery
+never authorizes IR; new binding records are tooling-only. Rename validates the
+proposed graph and every written binding; Vim rename is disabled. Formatting uses
+compiler tokens, graph validation, idempotence and client freshness guards.
+
+Final local acceptance: **140/140 Debug, 140/140 Release, 140/140 strict
+ASan/UBSan/leaks (420/420)**; separate 1 MiB gates passed. Real VS Code 1.141.0
+development and installed VSIX profiles (3 each), installed Neovim 0.13 development,
+portable 0.12.6 and actual Vim 9.2 integrations passed. Large queued 20-edit work
+fell from 4800.57 ms / 660 notifications to 277.77 ms / 33; single-analysis latency
+and metadata memory costs increased and are reported rather than hidden.
+
+Review also includes cold compiler case-frame repairs: a fresh HEAD reproduction
+confirmed capability/lowering stack failures; legal chains through 124 calls now
+pass at 1 MiB without weakening rejection guards. Four native contracts remain
+byte-identical. Native archive/installed server/VSIX executable hashes match.
+VSCodium, Windows/macOS, target minimum versions and clean-machine portability
+remain unverified. Public redistribution still requires the owner license decision.
+
+Git history/remotes/branches, publication and hosted CI were not changed. Stage 7
+is **not locked**; remaining support/distribution exclusions are explicit in the
+acceptance record. Boss controls the final commit, push and seven hosted jobs.
+
+
+**Historical 20 October research handoff:** Boss confirms Stage 6 locked at `4139297f` /
+CI #78, 973/973. Stage 7 research is complete in [STAGE7_ROADMAP.md](STAGE7_ROADMAP.md),
+with source evidence, local measurements and decisions for review. Production
+implementation remains unauthorized. The pending Stage 6 lock/Stage 7 research
+restrictions in the dated handoff below are historical relative to that mission.
+
 ## Owner workflow and Stage 7 handoff — 19 October 2026
 
 **Documentation/planning only. Stage 7 is not authorized.** Stage 6 continues

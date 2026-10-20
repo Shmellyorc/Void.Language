@@ -1,0 +1,12 @@
+func double(value: i32) -> i32:
+    return value * 2
+func apply<t>(callback: func(t) -> t, value: t) -> t:
+    return callback(value)
+func entry(value: i32) -> i32:
+    var callback: (func(i32) -> i32)?
+    if callback is Ok(var absent):
+        return absent(value)
+    callback = double
+    return match callback:
+        Ok(var present): apply(present, value)
+        null: -1

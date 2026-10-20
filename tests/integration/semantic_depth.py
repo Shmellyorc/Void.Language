@@ -23,13 +23,16 @@ with tempfile.TemporaryDirectory(prefix="void-semantic-depth-") as directory:
               "func (p point) inspect() -> i32:\n    return p.x\n"
               "func entry(value: i32) -> i32:\n    return point()")
     # Ordinary chains still compile; malformed deep chains must recover below.
-    source.write_text(prefix + ".same()" * 16 + ".inspect()\n", encoding="utf-8")
-    accepted = subprocess.run(
-        [sys.argv[1], "check", str(source)], capture_output=True,
-        encoding="utf-8", errors="strict", timeout=20,
-        preexec_fn=small_stack if sys.platform == "linux" else None)
-    assert accepted.returncode == 0, (accepted.returncode, accepted.stdout, accepted.stderr)
-    assert accepted.stderr == "", accepted.stderr
+    # A legal chain below the semantic guard must also fit capability analysis.
+    # Stage 7 reproduced a pre-existing Debug overflow at 96 calls (including HEAD).
+    for count in (16, 64, 96, 124):
+        source.write_text(prefix + ".same()" * count + ".inspect()\n", encoding="utf-8")
+        accepted = subprocess.run(
+            [sys.argv[1], "check", str(source)], capture_output=True,
+            encoding="utf-8", errors="strict", timeout=20,
+            preexec_fn=small_stack if sys.platform == "linux" else None)
+        assert accepted.returncode == 0, (count, accepted.returncode, accepted.stdout, accepted.stderr)
+        assert accepted.stderr == "", accepted.stderr
     for suffix in (".inspect()", ".inspect() + 1"):
         text = prefix + ".same()" * 400 + suffix + "\nfunc later():\n    missing()\n"
         source.write_text(text, encoding="utf-8")
