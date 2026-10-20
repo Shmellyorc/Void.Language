@@ -1,18 +1,43 @@
 # Known issues and deferred work
 
-## Delivery 4 status — 19 October 2026
+## Stage 7 planning boundary — 19 October 2026
 
-Delivery 3 is hosted-accepted at `62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090`,
-CI #75 (7/7 jobs, 840/840 suites), owner-confirmed. Delivery 4's bounded trusted
-static fixture passed local acceptance: 131/131 each in Debug, Release and strict
-ASan/UBSan/leak configurations (393/393), plus 1 MiB and editor/package checks.
-Owner review and hosted verification remain pending. See
-[NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md). General FFI/native grammar, dynamic
-loading, automatic CLI/LSP binding admission, packages, worker/native effects and
-resource task transfer remain deferred. Registration is one-shot and accepts only
-generation-local direct/literal/bound callable creation. Dropped native owners
-retain resources until explicit Runtime shutdown; GC does not run native finalizers.
-No general shared-memory policy, async CLI or Delivery 5 authorization is implied.
+Stage 7's future goals are recorded in the [development strategy](DEVELOPMENT_STRATEGY.md#owner-workflow-and-stage-7-planning--19-october-2026),
+[server plan](LANGUAGE_SERVER.md#stage-7-planning-goals-not-implemented) and
+[editor plan](EDITOR_INTEGRATION.md#stage-7-editor-goals-planning-only). Completion,
+hover, signature help, rename, formatting, richer symbols/project handling and
+Neovim/Vim integration are goals, not newly implemented capabilities. Vim client/
+version/plugin support, native server discovery/distribution, workspace policy and
+exact feature contracts remain unresolved. Compatibility requires real editor
+integration evidence. All editors must share compiler-owned `voidls` analysis;
+there is no authorization for separate parsers/type checkers or speculative
+optimization systems. Stage 7 is not authorized, and Stage 6's contracts, statuses,
+five-delivery sequence and owner-controlled hosted acceptance remain unchanged.
+
+## Delivery 5 integrated acceptance — 19 October 2026
+
+Delivery 4 is owner-confirmed hosted-accepted at
+`619331ccb83227419081bc93cf47bd3a0b8b64cc`,
+[CI #76](https://github.com/Shmellyorc/Void.Language/actions/runs/39359190869),
+7/7 jobs, 917/917 suites. Delivery 5 local acceptance passed: 139/139 each in Debug,
+Release and strict ASan/UBSan/leak configurations (417/417), plus 1 MiB, editor
+integration and packaging. A completion race in the new cancellation fixture was
+corrected; no known local acceptance failure remains. Windows/macOS and the final
+seven-job hosted acceptance remain owner-controlled and pending. Stage 6 is not
+yet locked and Stage 7 is not authorized.
+Existing bounded native/task/worker contracts remain unchanged.
+
+Combined tests cover explicit root adapters, owning-thread C resources, groups,
+workers, callbacks, GC, reload/cache and shutdown. No compiler/Runtime production
+change was required by the completed acceptance. Richer callable/native ownership,
+resource task transfer, native worker effects, dynamic loading, automatic CLI/LSP
+binding admission, packages, async CLI and general shared-memory parallelism remain
+deferred. Dropped native owners persist until explicit Runtime shutdown; GC never
+runs native cleanup. Root-duration task/frame retention and data-only Runtime
+metadata retention remain conservative; zero post-collection managed objects is
+not a process-memory bound. Corrupt cache entries remain misses until removed.
+See [ASYNC.md](ASYNC.md), [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md) and WORK_LOG.md
+for actual integration evidence and the required owner-controlled hosted gate.
 
 ## Current boundaries, 18 October 2026
 

@@ -6,7 +6,132 @@
 **Date:** October 10, 2026  
 **Companion document:** `VOID_2_0_Language_Bible.md`
 
-## Delivery 4 authorization — 19 October 2026
+## Owner workflow and Stage 7 planning — 19 October 2026
+
+**Planning only; Stage 7 implementation is not authorized.** Stage 6 continues
+unchanged through its existing five deliveries and owner-controlled hosted
+acceptance. This update changes no Stage 6 contract, implementation status,
+remaining delivery authorization or acceptance gate. Previous engineering history
+and the current implementation records below remain intact.
+
+### Current development workflow
+
+Deliver substantial engineering sprints with a clear finished outcome. Simple and
+moderately complex features normally fit one integrated sprint: use focused tests
+while developing, repair concrete failures, then complete consolidated acceptance.
+For highly complex features, investigate the actual source and relevant official
+documentation first, assess dependencies and risks, and split into a few meaningful
+deliveries only when the engineering justifies it. Research is supported and
+encouraged when it answers an architectural, compatibility or correctness question;
+it is neither prohibited nor a compulsory gate for routine work.
+
+Avoid arbitrary micro-milestones, repetitive full test matrices, speculative
+verification frameworks and unnecessary stop-and-ask checkpoints. Repeat or broaden
+verification when changes, failures or unresolved concerns justify it. Existing
+Stage 6 delivery gates remain binding; this workflow does not collapse them.
+
+Use **ChatGPT Work with GPT-6.1 in Codex mode aggressively when valuable** for
+substantial implementation, integration and debugging. Work is not restricted to a
+last resort, sandbox failure or one consolidated invocation. Do not impose an
+artificial usage restriction. This is an owner workflow preference, not permission
+to start an unapproved stage or change Git/CI ownership.
+
+Preserve KISS/DRY, LLVM **19.1.7**, the existing frontend/typed IR/LLVM backend and
+Runtime, and cross-platform correctness. Wrench reviews architecture and challenges
+unsafe or unnecessarily complex decisions. Boss retains final product decisions,
+feature authorization, commits, pushes, branches and hosted CI. These current
+preferences supersede older small-milestone and restricted-Work instructions;
+those dated practices remain historical records.
+
+### Stage 7 goals: Developer Tooling and Optimization
+
+Plan Stage 7 as **one cohesive implementation sprint by default**, with a practical,
+developer-ready editing experience as its outcome. Recommend splitting only if
+investigation identifies real architectural dependencies, high-risk contracts or
+acceptance problems that make a single sprint impractical. The areas below are
+parts of that outcome, not separate mandatory deliveries or approval checkpoints.
+They are future goals, not implemented capabilities or a requirement to implement
+every possible LSP extension.
+
+| Area | Planning goals |
+| --- | --- |
+| VS Code / VSCodium | Full-featured extension experience: reliable installation, configuration, native server discovery/startup; IntelliSense, completion, hover, signature help, navigation, rename, formatting and diagnostics; suitable semantic highlighting, code actions and workspace features where supported; project handling, synchronization, refresh, lifecycle, cross-platform tests and packaging. |
+| Neovim | Native LSP integration with shared `voidls`; filetype recognition, syntax highlighting and indentation; completion, navigation, hover, rename and diagnostics; reproducible configuration examples, documentation and real integration tests. |
+| Vim | An appropriate maintained Vim LSP client using the same `voidls`; filetype, syntax and indentation; compatible diagnostics, completion and navigation; documented supported Vim versions/plugins and realistic integration testing. |
+| Shared LSP | Extend existing compiler-owned analysis and LSP 3.17. Prioritize completion, hover, signature help, rename, formatting, richer symbol coverage, project handling and responsiveness. Preserve immutable snapshots, accurate diagnostics, UTF-16 positions, source identities and stale-result rejection. |
+| Optimization and usability | Measure useful compiler, server and editor workloads; improve demonstrated bottlenecks, developer setup, documentation and packaging. Avoid speculative optimization projects. |
+
+All editors share **one authoritative `voidls`**. Editor adapters, syntax rules and
+configuration must not become editor-specific parsers or type checkers. Preserve
+one compiler and its analysis ownership. Better project discovery and editor disk
+refresh do not imply a new project/package format or automatic native hot reload.
+No native package manager, arbitrary public FFI or new language syntax is silently
+included in Stage 7.
+
+### Investigation and review decisions still open
+
+Choose a maintained Vim client and supported Vim/Neovim version/plugin combinations
+from official documentation and actual compatibility tests; none is selected or
+certified by this plan. Investigate native server distribution/discovery, platform
+packaging and workspace/entry selection against the existing explicit-root policy.
+Define rename scope/conflict handling, formatting policy, richer symbol coverage
+and appropriate optional semantic-token/code-action/workspace support before
+claiming those contracts. Do not invent language semantics to fill tooling gaps.
+
+Use representative projects to measure startup, edit-to-diagnostic and query
+latency, refresh behavior and memory where useful; select workloads and targets
+from evidence. Validate actual editor/client/server attachment, unsaved edits,
+navigation, repairs, stale results, shutdown/restart and packaging on the declared
+supported platforms and versions. Distinguish tested combinations from assumptions.
+These are acceptance planning questions for the future authorized sprint, not new
+Stage 6 blockers or an automatic set of separate research deliveries.
+
+See [LANGUAGE_SERVER.md](LANGUAGE_SERVER.md#stage-7-planning-goals-not-implemented)
+and [EDITOR_INTEGRATION.md](EDITOR_INTEGRATION.md#stage-7-editor-goals-planning-only)
+for the current baseline versus future server/editor goals.
+
+## Delivery 5 local acceptance — 19 October 2026
+
+Delivery 4 is owner-confirmed hosted-accepted at
+`619331ccb83227419081bc93cf47bd3a0b8b64cc`,
+[CI #76](https://github.com/Shmellyorc/Void.Language/actions/runs/39359190869),
+7/7 jobs, 131/131 each (917/917). Delivery 5 alone is now authorized: integrated
+async/groups/workers/native/GC/reload/cache/tooling acceptance, repairing only
+demonstrated defects. Preserve all existing boundaries and 131 suites. Focused
+checks precede one consolidated final Debug/Release/strict, 1 MiB and editor
+acceptance. Stop after local acceptance for owner review and hosted CI; Stage 6
+locks only after seven green hosted jobs. Stage 7 remains planning-only and
+unauthorized; its documented goals and research/Work preferences are unchanged.
+The earlier Delivery 4 pending-hosted status below is historical.
+
+**Delivery 5 is locally complete:** 139/139 suites each in Debug, Release and
+strict ASan/UBSan/leak configurations (417/417); corrected cancellation-fixture
+checks passed in all three. All 42 native 1 MiB AOT runs, three semantic-depth
+checks, editor unit tests, three real editor profiles and VSIX packaging passed.
+No compiler/Runtime production repair was required. Evidence and the initial
+fixture-race correction are recorded in [WORK_LOG.md](WORK_LOG.md).
+**STOPPED for owner review, commit/push and seven-job hosted verification.**
+The final Stage 6 lock is pending; Stage 7 implementation is not authorized.
+
+## Current implementation status
+
+| Implementation delivery | Current status and dependency |
+| --- | --- |
+| 1 — Native Async Activation | Hosted accepted, CI #73 |
+| 2 — Structured Task Lifecycle | Hosted accepted, CI #74 |
+| 3 — Bounded Parallel Spawn | Hosted accepted at `62b17c8c`, CI #75 |
+| 4 — Native Libraries | Hosted accepted at `619331cc`, CI #76; current locked baseline |
+| 5 — Integrated Stage 6 Acceptance | Locally accepted: 139/139 Debug, Release and strict; owner review/seven-job hosted acceptance pending |
+
+These are the five implementation deliveries, not the six D1–D6 decision groups.
+D1 parallel execution now approves only the documented initial value-only scope.
+D2 enqueue/await/inferred handles, D3 root/group ownership and D4 lifecycle rules
+retain their approved contracts. D5 cross-task callable escapes stay restricted;
+D6 now approves the bounded trusted static fixture described in [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md); general FFI remains deferred. No general sharing, task-type spelling,
+async-callable or cancellation recovery contract has been silently added.
+
+
+## Historical Delivery 4 authorization — superseded by Delivery 5 above
 
 Delivery 3 is owner-confirmed hosted-accepted at `62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090`,
 [CI #75 checks](https://github.com/Shmellyorc/Void.Language/commit/62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090/checks),
@@ -19,23 +144,6 @@ management or worker/native effects are approved. The bounded implementation is 
 Delivery 5 requires Delivery 4 hosted acceptance and separate owner authorization.
 Boss controls Git/hosted CI; Wrench reviews; Keyboard implements this delivery and
 stops after complete local acceptance. Earlier pending-hosted statuses are historical.
-
-## Current implementation status
-
-| Implementation delivery | Current status and dependency |
-| --- | --- |
-| 1 — Native Async Activation | Hosted accepted, CI #73 |
-| 2 — Structured Task Lifecycle | Hosted accepted, CI #74 |
-| 3 — Bounded Parallel Spawn | Hosted accepted at `62b17c8c`, CI #75; current locked baseline |
-| 4 — Native Libraries | Locally accepted: 131/131 each in Debug/Release/strict (393/393); owner review and hosted CI pending |
-| 5 — Integrated Stage 6 Acceptance | Not authorized; requires Delivery 4 hosted acceptance and owner approval |
-
-These are the five implementation deliveries, not the six D1–D6 decision groups.
-D1 parallel execution now approves only the documented initial value-only scope.
-D2 enqueue/await/inferred handles, D3 root/group ownership and D4 lifecycle rules
-retain their approved contracts. D5 cross-task callable escapes stay restricted;
-D6 now approves the bounded trusted static fixture described in [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md); general FFI remains deferred. No general sharing, task-type spelling,
-async-callable or cancellation recovery contract has been silently added.
 
 ## Historical Delivery 3 authorization — superseded by Delivery 4 status
 
@@ -179,7 +287,7 @@ its numbers are distinct from implementation phases and Phase 23 research substa
 | 3 Managed runtime | Allocator/precise coordinated GC, reference/value structs, strings, lists and dictionaries; LOCKED at cd95e373 / CI #65, seven jobs successful |
 | 4 Advanced language | Hosted-verified and LOCKED at 483e67e4 / CI #68: properties/callable structs, tagged enums, result/propagation, shared is/match patterns, defer/with/one-shot managed deinit, function values/escaping closures, callbacks and synchronous events; 80/80 suites in all seven configurations. See ADVANCED_LANGUAGE.md and WORK_LOG.md |
 | 5 Hot reload | Delivered cache/reload subset hosted-verified and LOCKED at 4627687b / CI #70, 82/82 in all seven configurations. Whole-graph Debug objects, current-source validation, isolated generations and revision-checked replacement; Windows persistence bypass and automatic-watching deferral remain |
-| 6 Concurrency/native libraries | Deliveries 1–3 hosted accepted through CI #75. Delivery 4 bounded static C integration locally accepted (131/131 each in Debug/Release/strict); owner review/hosted pending; see ASYNC.md and NATIVE_LIBRARIES.md. Delivery 5 unauthorized. |
+| 6 Concurrency/native libraries | Deliveries 1–4 hosted accepted through CI #76 at `619331cc` (131/131 in seven jobs). Delivery 5 integrated acceptance locally passed 139/139 each in Debug, Release and strict; final owner review/seven-job hosted acceptance pending. See ASYNC.md and NATIVE_LIBRARIES.md. |
 | 7 Tooling/optimization | Partial: LSP diagnostics/navigation, editor integration/VSIX and LLVM O2; completion/rename/formatting, library discovery and broad performance work remain deferred |
 
 Ordinary `.void` programs execute all delivered features together through normal/O2
@@ -761,7 +869,7 @@ Every ten milestones, pause for an integration audit. Advance based on evidence 
 
 *Prepared as a portable Markdown companion to the VOID 2.0 Language Bible. It is a strategy and specification artifact, not an implementation-status claim.*
 
-## Current execution policy: 10 October 2026
+## Historical execution policy: 10 October 2026 (superseded by the owner workflow above)
 
 The planning snapshot above is preserved. The user's current instructions
 supersede its small numbered milestone process: develop substantial cohesive

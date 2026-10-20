@@ -8,6 +8,48 @@ basic TextMate highlighting/indentation, and runs the existing `voidls` through
 There is no editor-side parser, resolver, type checker, LSP transport or position
 converter. VS Code and the language client use the server's UTF-16 positions.
 
+## Stage 7 editor goals (planning only)
+
+**Future goals, not delivered functionality or Stage 7 authorization.** The existing
+VS Code adapter described below remains the implementation baseline. Stage 6
+continues unchanged through Delivery 5 and owner-controlled hosted acceptance.
+Stage 7 is planned as one cohesive implementation sprint by default, splitting
+only if investigation exposes genuine architectural dependencies, high-risk
+contracts or acceptance problems. Its aim is a practical, developer-ready editing
+experience; it need not implement every optional LSP extension.
+
+| Editor | Stage 7 goals |
+| --- | --- |
+| VS Code / VSCodium | Full-featured extension experience: reliable installation/configuration, native `voidls` discovery and startup; IntelliSense/completion, hover, signature help, navigation, rename, formatting and diagnostics; appropriate semantic highlighting, code actions and workspace features where supported; reliable project selection, document synchronization/refresh and lifecycle; cross-platform testing and packaging. |
+| Neovim | Native LSP integration with shared `voidls`; filetype recognition, syntax highlighting and indentation; working completion, navigation, hover, rename and diagnostics; reproducible configuration examples, documentation and integration tests. |
+| Vim | Integration through an appropriate maintained Vim LSP client; filetype recognition, syntax and indentation; compatible diagnostics, completion and navigation; documented supported Vim versions and required plugins, validated through realistic integration tests. |
+
+Neovim/Vim adapters and their supported versions/plugins are not delivered or
+selected by this update. Choose the Vim client and compatibility matrix after
+checking official documentation and real behavior. Do not assume that passing
+VS Code tests establishes VSCodium, Neovim or Vim compatibility. Verify actual
+client/server attachment, unsaved edit/repair, completion/navigation and other
+advertised features, startup failures, refresh and shutdown/restart on the declared
+supported combinations. Include installable packaging and reproducible setup.
+
+Every editor shares **one authoritative `voidls`** and compiler-owned analysis.
+Filetype/syntax/indentation rules and client configuration are editor integration;
+no editor-specific parser or type checker is allowed. Preserve the server's
+immutable snapshots, diagnostic accuracy, UTF-16 positions, source identities and
+stale-result checks. Better project handling, executable discovery/distribution,
+workspace scope, rename/formatting behavior and optional semantic/code-action
+support need investigation; this plan does not silently change current settings,
+trust, explicit-entry/root or synchronization contracts.
+
+Measure useful compiler/server/editor performance and setup friction, then repair
+demonstrated bottlenecks. Preserve KISS/DRY and LLVM 19.1.7; do not invent speculative
+optimization frameworks, native packages, public FFI, new syntax or automatic
+native hot reload. Research real source and official editor/client documentation
+for architectural or compatibility questions, then use focused development checks
+and consolidated acceptance. See the [canonical workflow and open decisions](DEVELOPMENT_STRATEGY.md#owner-workflow-and-stage-7-planning--19-october-2026).
+The current instructions and limitations below describe the existing extension,
+not a claim that these future goals have been completed.
+
 ## Requirements and native build
 
 VS Code or VSCodium **1.91+** with desktop filesystem access on the extension host.

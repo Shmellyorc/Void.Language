@@ -578,6 +578,34 @@ def parallel_spawn(executable, root):
         assert not notes[uri]["diagnostics"], notes
 
 
+def native_boundary(executable, root):
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / "main.void"
+    valid = "# é😀 Stage 6\nfunc work(value: i32) -> i32:\n    return value + 1\nasync func entry(value: i32) -> i32:\n    with tasks.group() as jobs:\n        return await spawn work(value)\n"
+    path.write_text(valid, encoding="utf-8")
+    uri = path.as_uri()
+    query = {"textDocument": {"uri": uri}, "position": source_position(valid, "work(value)")}
+    with Client(executable, path) as c:
+        assert all(not n["diagnostics"] for n in c.initialize())
+        assert c.request("textDocument/definition", query)[0]["result"]["range"]["start"] == {"line": 1, "character": 5}
+        refs = c.request("textDocument/references", {**query, "context": {"includeDeclaration": False}})[0]["result"]
+        assert len(refs) == 1 and refs[0]["uri"] == uri, refs
+        forbidden = 'use "/native_bridge.void" as bridge\n' + valid
+        c.notify("textDocument/didOpen", {"textDocument": {"uri": uri, "languageId": "void", "version": 1, "text": forbidden}})
+        notes = diagnostics(c.sync())[uri]["diagnostics"]
+        assert any("native_bridge" in d["message"] for d in notes), notes
+        assert c.request("textDocument/definition", query)[0]["result"] is None
+        assert not c.request("textDocument/references", {**query, "context": {"includeDeclaration": False}})[0]["result"]
+        c.notify("textDocument/didChange", {"textDocument": {"uri": uri, "version": 2}, "contentChanges": [{"text": valid}]})
+        assert all(not n["diagnostics"] for n in c.sync())
+        c.notify("textDocument/didChange", {"textDocument": {"uri": uri, "version": 1}, "contentChanges": [{"text": forbidden}]})
+        assert all(not n["diagnostics"] for n in c.sync())
+        assert c.request("textDocument/definition", query)[0]["result"]["range"]["start"] == {"line": 1, "character": 5}
+        assert path.read_text(encoding="utf-8") == valid
+        c.shutdown()
+    print("Stage 6 native host authorization, async/spawn/group references and stale-overlay repair: passed")
+
+
 if __name__ == "__main__":
     executable = pathlib.Path(sys.argv[1]).resolve()
     # Unicode physical root names work without changing the ASCII VFS policy.
@@ -603,3 +631,5 @@ if __name__ == "__main__":
     strings(executable, root / "string project")
 
     parallel_spawn(executable, root / "parallel spawn project")
+
+    native_boundary(executable, root / "Stage 6 native boundary")

@@ -1,0 +1,29 @@
+use "/wrappers.void" as library
+use "/native_bridge.void" as bridge
+
+func work(value: i32) -> i32:
+    var answer = 0
+    for i in 0..<value:
+        answer += 1
+    return answer + 1
+
+async func step(value: i32) -> i32:
+    var pending = spawn work(value)
+    var verified = bridge.scalar_i32(value)
+    return await pending + verified - value
+
+async func entry(value: i32) -> i32:
+    with library.open() as owner:
+        owner.connect(value)
+        owner.retain(bridge.copy("a\0é"))
+        var answer = 0
+        with tasks.group() as jobs:
+            var first = step(value)
+            var second = step(value + 1)
+            answer = await first + await second
+        if owner.byte(2 as u64) != 195:
+            return -1000
+        var result = owner.invoke(answer)
+        var foreign = owner.foreign(1)
+        owner.disconnect()
+        return result + foreign

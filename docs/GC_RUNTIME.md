@@ -2,6 +2,16 @@
 
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
+Delivery 5 combined regressions exercise this same Runtime through suspended
+parents, queued/running workers, retained native callback roots, foreign callback
+collection and provider shutdown. Existing Frame/Handle/schema ownership and
+NativeSafe admission remain unchanged. Deterministic barriers hold both worker
+storage and a pre-admission callback during shutdown; explicit drain/retirement
+checks and allocation sweeps verify release ordering. Repeated compatible roots
+collect back to zero managed objects after explicit native release. This does not
+measure RSS, reclaim all Runtime metadata or change root-duration retention.
+See ASYNC.md, NATIVE_LIBRARIES.md and WORK_LOG.md for exact integrated evidence.
+
 Stage 6 Delivery 4 adds Runtime-owned native registry entries containing ordinary
 Handle roots, owned retained bytes and CallbackRegistration state. Native C pointers
 never live in managed payloads; GC never finalizes C resources. Explicit `with`/

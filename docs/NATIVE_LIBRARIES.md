@@ -1,13 +1,42 @@
 # Stage 6 Delivery 4: trusted static native fixture
 
-Delivery 3 is hosted-accepted at `62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090`,
-[CI #75 checks](https://github.com/Shmellyorc/Void.Language/commit/62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090/checks),
-owner-confirmed 7/7 jobs and 840/840 suites. Delivery 4 implements the bounded
-D6 contract below. Local acceptance passed **131/131 each in Debug, Release
-and strict ASan/UBSan/leak configurations (393/393)**, plus 1 MiB, host and
-editor/package checks. Detailed evidence is in WORK_LOG.md;
-only the owner can commit, push, run hosted CI and lock this delivery.
-Delivery 5 requires hosted acceptance and separate authorization.
+Delivery 4 is hosted-accepted at `619331ccb83227419081bc93cf47bd3a0b8b64cc`,
+[CI #76](https://github.com/Shmellyorc/Void.Language/actions/runs/39359190869),
+owner-confirmed 7/7 jobs and 917/917 suites. Delivery 5 integrated acceptance is
+locally complete: 139/139 each in Debug, Release and strict ASan/UBSan/leak
+configurations (417/417), with 1 MiB and editor/package checks passed. The bounded
+D6 contract below is unchanged. Only the owner can commit, push, run hosted CI and lock Stage 6
+after all seven jobs pass. Stage 7 remains unauthorized.
+
+## Delivery 5 integration boundary
+
+The real `integrated.void`, `integrated_cancel.void` and `integrated_failure.void`
+programs compose this binding with owning-executor async, groups and value-only
+workers. The native resource stays local to its acquisition thread through await
+and cleanup. Use existing explicit `Jit::compile_async` / `emit_async_object` host
+APIs for these async entries; ordinary CLI/LSP opt-in rules remain unchanged.
+Tests cover normal/O2 JIT and separately linked AOT, GC in foreign callbacks and
+workers, cancellation/failure cleanup and callback-before-admission shutdown while
+a worker is held. No native resource or callable crosses the worker boundary.
+
+Cached old roots, queued/running jobs and retained registrations keep their code
+through compatible replacement. Tests invoke the old callback after its root and
+NativeCode release, then unregister and verify retirement; private async frame
+changes do not migrate old operations. A callback's old task token is rejected
+inside a replacement executor, even though its own native entry remains leased.
+Repeated reload checks count managed objects and live generations, not process RSS.
+
+Fresh-process cache regressions use real C bridges and a stack-probed synchronous
+worker frame. They prove relocation/rebinding and fresh native resource/callback
+creation on cold/hit runs, corrupt-artifact fallback and safe Windows bypass.
+Corrupt artifacts remain misses until explicitly removed; this integration does
+not introduce automatic cache repair, new granularity or file watching. Neither
+live Runtime state nor pointers/handles/callback addresses become cache payloads.
+
+The ordinary compiler-owned tooling session and real LSP process still reject an
+unprovided native descriptor, including after other explicitly authorized native
+projects have run in the host. Overlay repair restores references without accepting
+stale results. No Stage 7 tooling feature or general FFI is introduced.
 
 ## Explicit project trust and one compilation path
 

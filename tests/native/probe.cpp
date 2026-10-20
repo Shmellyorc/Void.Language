@@ -1,7 +1,9 @@
 #include "probe.hpp"
 #include "../managed/probe.hpp"
 #include "../../src/native/fixture.h"
-namespace native_test {std::atomic<Gate*> gate{nullptr};}
+namespace native_test {std::atomic<Gate*> gate{nullptr};std::atomic<void(*)(std::int32_t)> scalar_poll{nullptr};}
+extern "C" std::int32_t vd_fixture_real_i32(std::int32_t);
+extern "C" std::int32_t vd_fixture_i32(std::int32_t input){if(auto hook=native_test::scalar_poll.load())hook(input);return vd_fixture_real_i32(input);}
 extern "C" std::int32_t vd_fixture_real_dispatch(vd_fixture_callback,void*,std::int32_t);
 extern "C" void vd_fixture_real_unregister(vd_fixture_resource*);
 extern "C" std::int32_t vd_fixture_dispatch(vd_fixture_callback callback,void* context,std::int32_t input){

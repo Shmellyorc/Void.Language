@@ -13339,3 +13339,182 @@ CI; lock Delivery 4 only when green.** Hosted baseline remains Delivery 3 at
 Delivery 5 was not begun and requires separate owner authorization after that
 hosted gate. No commits, pushes, branches, remote modifications or hosted actions
 were performed.
+
+
+## 19 October 2026 — Delivery 5 baseline and integration authorization
+
+HEAD verified at `619331ccb83227419081bc93cf47bd3a0b8b64cc`. Owner confirms
+Delivery 4 hosted acceptance, CI #76, seven green jobs, 131/131 each (917/917).
+Five uncommitted Stage 7 planning/workflow documentation changes predate this
+sprint and must be preserved. Delivery 5 adds meaningful combined source/host
+regressions and fixes only reproduced defects, preserving native owner affinity,
+worker effect/transfer restrictions, one compiler/Runtime and owner-only Git/CI.
+Focused integration checks precede consolidated acceptance. Stage 7 remains
+unauthorized. Implementation/evidence will be recorded below.
+
+
+## 19 October 2026 — Delivery 5 focused integration investigation
+
+Added real source applications combining owning-executor async activation, lexical
+groups, value-only workers and trusted C resources/retained buffers/same-foreign
+callbacks. Shared emission selects the existing explicit async AOT adapter; no new
+compiler, syntax, binding authorization or native worker effect is introduced.
+The existing native harness now covers native-owner cleanup after cancellation,
+parent native failure plus nested cleanup failure, GC in workers/callbacks,
+whole-invocation allocation failure and provider shutdown while a worker and a
+pre-admission foreign dispatch are held by deterministic barriers.
+
+Reload tests hold one running worker and another published/queued job beneath
+suspended async parents. A warm cached old generation keeps its frame/code and
+native callback after replacement; the callback still computes its old result
+once the root has drained and NativeCode is dropped. Unregister releases the old
+lease. Four repeated compatible replacements per mode collect to zero managed
+objects and one live current generation. At the held old-root barrier the observed
+heap contains 14 objects; this is a precise object count, not RSS or a promise that
+Runtime metadata/LLVM memory is immediately reclaimed. Broader root-duration
+record retention remains unchanged. A retained old C callback attempting async
+enqueue into a new generation's active root is checked and rejected.
+
+Two initial test assumptions were corrected without changing production policy:
+replacing cleanup/call-reference contracts can require restart, and an invalid
+cache entry remains a miss until explicitly removed (publication never overwrites
+it). Regression assertions now protect both existing contracts. A native cache
+case previously used a nonexistent project root and therefore tested safe
+unavailability; creating that root now exercises actual cold/hit reuse on supported
+platforms. New fresh-process combined cache tests include a real stack-probed
+worker frame and cold/hit/corrupt fallback, with the Windows safe bypass retained.
+No demonstrated compiler/Runtime defect has required a production change.
+
+Compiler snapshot tests and real LSP process tests verify async/spawn/group source
+references, explicit native authorization rejection, overlay repair and stale
+result/version rejection. Stage 7 features were not added. Focused Debug LSP,
+native and integrated/cross-process suites passed 4/4 in 27.11s before the final
+AOT-focused check. One-time setup failures (unbuilt new targets, a test-local name
+collision and incorrect expected rejection text) were repaired in the harness;
+none was treated as a production regression or hidden by weakening a safety check.
+Complete consolidated acceptance is next; final results follow below.
+
+The first consolidated Release pass exposed a race in the new cancellation
+fixture, not in cancellation semantics: its seven-iteration worker could finish
+successfully before `cancel()` reached it. Release normal AOT and all focused
+checks had passed; optimized Release AOT correctly returned that completed result
+(`7`) instead of cancelling an already-completed task. The regression now uses a
+nonterminating cooperative worker with bounded integer state, following the
+existing `spawn_cancel.void` pattern, so success cannot race the cancellation
+request. The separate deterministic C-boundary regression still proves cancellation
+of a worker held inside its real loop. No scheduler behavior, timing assertion,
+safety check or expected cancellation diagnostic was weakened. Final acceptance
+below supersedes that initial fixture failure; its log is retained.
+
+## 19 October 2026 — Delivery 5 locally accepted; owner/hosted handoff
+
+**STOPPED after complete local acceptance.** HEAD remains
+`619331ccb83227419081bc93cf47bd3a0b8b64cc`; Delivery 4 remains the locked baseline,
+owner-confirmed [CI #76](https://github.com/Shmellyorc/Void.Language/actions/runs/39359190869).
+No commits, pushes, branches, hosted actions or remote changes were performed.
+Stage 6 is **not yet finally locked**: Boss reviews/commits/pushes and runs the
+seven-job hosted acceptance. Stage 7 remains unauthorized; its preexisting
+editor/workflow planning changes are preserved. Wrench reviews architecture,
+Keyboard delivers this local integration, Boss owns product/Git/CI decisions.
+
+All 131 baseline suites remain; eight additions bring each matrix to **139**:
+`stage6_integrated`, `stage6_cache_processes` and three new native source fixtures
+in normal/O2 independently linked AOT. No compiler, Runtime, GC, LLVM lowering,
+cache policy, editor production code or CI configuration changed. The harness
+repairs are explicit async AOT adapter selection, real native-cache project-root
+creation and the deterministic cancellation fixture described above.
+
+| Final local evidence | Result | Log under `build/stage6-delivery5/` |
+| --- | --- | --- |
+| Debug full CTest | 139/139, 335.23s | `debug-ctest.log` |
+| Release full CTest after fixture correction | 139/139, 121.69s | `release-final-ctest.log` |
+| Strict ASan/UBSan/leak full CTest | 139/139, 313.99s | `strict-ctest.log` |
+| Corrected fixture + combined host focused checks | 3/3 per configuration; Debug 12.08s, Release 6.47s, strict 12.86s | `*-correction-focused.log` |
+| Semantic 1 MiB depth/recovery | Passed in all three configurations | `*-semantic-stack.log` |
+| Independent normal/O2 AOT at actual 1 MiB | 14/configuration, **42/42** | `debug-final-aot-stack.log`, `release-aot-stack.log`, `strict-final-aot-stack.log` |
+| Editor unit tests | 1/1 | `editor-test.log` |
+| Real VS Code integration | Trusted, restricted-trust and multi-root profiles passed | `editor-host.log` |
+| VSIX packaging | Passed, 145.72 KB | `editor-package.log` |
+
+Full matrices total **417/417**. Debug/strict full matrices passed before the
+cancellation-fixture correction; both were rebuilt and their affected host/AOT
+checks rerun, then all 14 native stack runs rerun. The initial Release full pass
+was 138/139; the initial strict 1 MiB optimized cancellation run also observed the
+same legitimate completed-worker race. These superseded results remain in
+`release-ctest.log` and `strict-aot-stack.log`. Release was rerun in full after the
+correction. No unrelated full matrix or editor acceptance was repeated. The
+pre-matrix focused LSP/native/combined/cache/AOT check passed **10/10 in 25.76s**
+(`focused-ctest.log`). No local test failure remains.
+
+Commands used (`B` is `build/order1/production`, `build/ci-release` or
+`build/ci-sanitizers`; LLVM SDK independently reports **19.1.7**):
+
+```sh
+cmake --build "$B" -j3
+ctest --test-dir "$B" -j3 --output-on-failure
+ctest --test-dir "$B" -R '^(stage6_integrated|native_aot_integrated_cancel_(normal|optimized))$' --output-on-failure
+python3 tests/integration/semantic_depth.py "$PWD/$B/voidc"
+```
+
+Every strict build/test/native stack command retained
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
+`UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`, executed outside
+tracing for LeakSanitizer. No sanitizer disabling/suppression or expected-failure
+sanitizer exit was admitted. Real native stack checks used this temporary driver,
+invoked as `python3 /tmp/d5_stack.py "$B"` (with those same strict variables):
+
+```python
+import pathlib, resource, subprocess, sys
+root = pathlib.Path(sys.argv[1]).resolve()
+cases = [('async','large','27'), ('async','lifecycle_resources','30'),
+         ('async','spawn','126'), ('native','main','19'),
+         ('native','integrated','32'),
+         ('native','integrated_cancel','failure:Async task cancelled'),
+         ('native','integrated_failure','failure:native text cannot contain NUL')]
+for family, fixture, expected in cases:
+    for mode in ('normal', 'optimized'):
+        program = root / f'void_{family}_aot_{fixture}_{mode}'
+        r = subprocess.run([str(program), '7'], capture_output=True, text=True,
+            timeout=90, preexec_fn=lambda: resource.setrlimit(
+                resource.RLIMIT_STACK, (1048576, 1048576)))
+        if expected.startswith('failure:'):
+            assert r.returncode == 1 and expected[8:] in r.stderr + r.stdout, r
+        else:
+            assert r.returncode == 0 and r.stdout.strip() == expected, r
+```
+
+Editor commands used Node 24.19.0 from the owner's available nvm installation:
+
+```sh
+npm --prefix editors/vscode test
+npm --prefix editors/vscode run package
+VOIDLS_PATH="$PWD/build/order1/production/voidls" VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm --prefix editors/vscode run test:host
+```
+
+The real installed VS Code ran using the available display and isolated profiles;
+trusted diagnostics/unsaved repair/definition/references/stale queries/restart/
+configuration/failure/deactivation passed, while untrusted and multi-root profiles
+spawned no native child. Package deliverable:
+`editors/vscode/dist/void-language-0.1.0.vsix`. Existing package-size warning is
+informational. No Stage 7 implementation or broad editor feature claim is implied.
+
+Observed combined lifetime evidence in all three configurations, normal/O2:
+14 managed objects at the held old-root barrier; two live generations during
+replacement and after the old root/NativeCode drains while its registration stays
+live; one generation after explicit unregister/close; four subsequent compatible
+replacements per mode return to zero managed objects and one current generation.
+Normal mode reports an actual cache hit; O2 intentionally bypasses persistence.
+The running-worker/pre-admission shutdown case reaches zero participant/code
+counts after provider and worker drains. Source/harness assertions, not timing
+windows, verify those boundaries. These are object/generation observations, not
+RSS measurements, metadata reclamation guarantees or a new retention policy.
+
+Remaining boundaries: resources stay on the owning executor; worker/native effects,
+resource transfer and new cross-task callable escape remain rejected. General FFI,
+dynamic loading, implicit native authorization, automatic watching, async CLI and
+shared mutable worker graphs remain outside this delivery. Windows stack-helper
+resolution has a permanent combined fresh-process regression, but actual Windows
+and macOS execution, packaging and all seven hosted jobs still require owner CI.
+No local production defect or unresolved implementation failure was demonstrated.
+Next action: owner review, commit/push, hosted verification; lock Stage 6 only if
+all seven jobs pass. Do not begin Stage 7 without separate authorization.

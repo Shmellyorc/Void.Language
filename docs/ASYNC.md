@@ -1,13 +1,13 @@
-# Stage 6 Deliveries 1–4: async, lifecycle, workers and static native integration
+# Stage 6 Deliveries 1–5: async, lifecycle, workers and native integration
 
-**Locked baseline:** Delivery 3, `62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090`,
-[CI #75 checks](https://github.com/Shmellyorc/Void.Language/commit/62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090/checks),
-owner-confirmed 7/7 jobs, 120/120 each (840/840). Delivery 4's bounded static native
-integration is locally accepted: **131/131 each in Debug, Release and strict
-ASan/UBSan/leak configurations (393/393)**, plus 1 MiB and editor/package checks.
-STOP for owner review and hosted verification. See
-[NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md) for the exact embedding API and ownership
-contract. Git and hosted CI belong to the owner. Delivery 5 remains unauthorized.
+**Locked baseline:** Delivery 4, `619331ccb83227419081bc93cf47bd3a0b8b64cc`,
+[CI #76](https://github.com/Shmellyorc/Void.Language/actions/runs/39359190869),
+owner-confirmed 7/7 jobs, 131/131 each (917/917). Delivery 5 integrated acceptance
+passed locally: 139/139 each in Debug, Release and strict ASan/UBSan/leak checks
+(417/417), plus 1 MiB and editor acceptance. Owner review and seven green hosted
+jobs are required before the final
+Stage 6 lock. Stage 7 remains planning-only and unauthorized. Existing
+[NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md) ownership/ABI boundaries remain intact.
 The five implementation deliveries remain distinct from D1–D6 design decisions.
 
 Native resources cannot cross task/worker boundaries, and native calls remain
@@ -49,6 +49,34 @@ receiver is prepared is diagnosed; await into a local before selecting that
 method, as required by the existing no-borrow-across-suspension boundary. Callable-containing values cannot cross new
 async argument/result boundaries, including through managed graphs. Existing
 synchronous closure behavior remains supported within an activation.
+
+## Delivery 5 integrated evidence
+
+`examples/native/integrated.void` exercises async parents/children, lexical groups,
+bounded workers, retained/returned UTF-8 bytes and same/foreign native callbacks in
+one application. The native owner is created on the owning executor and remains
+local across suspension; it is never transferred as a task/worker argument or
+result. Normal/O2 JIT uses the explicit `compile_async` adapter; independent AOT
+uses `emit_async_object`. Cancellation and parent-plus-cleanup failure programs
+verify draining before deterministic native cleanup. No implicit async CLI entry
+or new native/worker contract is added.
+
+Permanent host regressions hold a running worker and another published/queued job
+under suspended async parents while GC and compatible reload occur. The old root
+keeps its original private suspension frame and native callback code. After root
+drain, a retained registration still pins its exact old generation until explicit
+unregister on the original owner thread. Repeated compatible reloads retire back
+to one current generation; collected post-drain managed object counts return to
+zero. Runtime metadata/LLVM allocator memory is not measured by that object count.
+An old C callback cannot enqueue its old task code into a replacement's executor.
+
+Native shutdown also overlaps a held worker and a real foreign callback reserved
+before admission; provider quiescence protects the callback context, roots and
+code while task draining protects worker frames/code. Tests use deterministic
+barriers, not sleeps. Allocation sweeps cover combined publication and cleanup.
+Resource task transfer, native worker effects, incompatible layout/capture changes
+and unauthorized tooling imports remain checked rejections. See WORK_LOG.md for
+actual final acceptance and retained-memory observations.
 
 ## Explicit root adapter
 

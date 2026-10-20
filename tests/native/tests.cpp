@@ -12,6 +12,7 @@
 #include "probe.hpp"
 #include <iostream>
 #include <stdexcept>
+void native_integrated_tests(const std::filesystem::path&,const std::filesystem::path&);
 namespace {
 std::thread::id collecting_owner;
 std::atomic<unsigned> collected_callbacks{0};
@@ -20,7 +21,9 @@ void require(bool condition,const char* message){if(!condition)throw std::runtim
 auto analyze(const std::filesystem::path& file){auto a=vd::analyze_project(file,vd::native_fixture_project());if(!a.succeeded())throw vd::CompilationError(a.diagnostics);return a.program;}
 }
 int main(int argc,char** argv){try{
-    if(argc==5 && std::string(argv[1])=="--emit"){vd::emit_object(analyze(argv[2])->lower(),argv[3],std::string(argv[4])=="optimized",true);return 0;}
+    if(argc==4 && std::string(argv[1])=="--cached-integrated"){vd::Jit jit({argv[3],std::string(vd::compiler_build_identity())});auto code=jit.compile_async(*analyze(argv[2]),false);auto result=code->invoke(7);require(result==32 && vd::native_fixture_live()==0 && code->runtime_owner()->snapshot().threads==0,"cross-process integrated state leaked");std::cout<<jit.cache_status()<<":"<<result<<"\n";return 0;}
+    if(argc==4 && std::string(argv[1])=="--integrated"){native_integrated_tests(argv[2],argv[3]);return 0;}
+    if(argc==5 && std::string(argv[1])=="--emit"){auto module=analyze(argv[2])->lower();auto entry=std::find_if(module.functions.begin(),module.functions.end(),[&](const auto& f){return f.name==module.entry_symbol;});if(entry!=module.functions.end() && entry->asynchronous)vd::emit_async_object(module,argv[3],std::string(argv[4])=="optimized");else vd::emit_object(module,argv[3],std::string(argv[4])=="optimized",true);return 0;}
     require(argc==3,"repository and fixture paths required");auto root=std::filesystem::path(argv[1]);auto a=analyze(root/"examples/native/main.void");
     for(bool optimized:{false,true}){vd::Jit jit;auto code=jit.compile(*a,optimized);auto actual=code->invoke(7);if(actual!=19)throw std::runtime_error("native source result: "+std::to_string(actual));require(vd::native_fixture_live()==0,"native resource leaked");}
     auto fixtures=std::filesystem::path(argv[2]);std::filesystem::create_directories(fixtures);auto main=fixtures/"main.void";auto wrappers=fixtures/"wrappers.void";
@@ -35,7 +38,7 @@ int main(int argc,char** argv){try{
     for(bool optimized:{false,true}){vd::Jit jit;auto code=jit.compile(*a,optimized);managed_test::concurrent_poll=collect_callback;auto result=code->invoke(7);managed_test::concurrent_poll=nullptr;require(result==19 && collected_callbacks>0,"foreign callback GC/root result");require(vd::native_fixture_live()==0,"callback GC leaked native resource");}
     // The persisted object contains relocations only: each hit gets fresh native
     // resources, roots and code leases in its isolated generation.
-    {auto cache_root=fixtures/"native-cache";std::filesystem::remove_all(cache_root);vd::Jit jit({cache_root,std::string(vd::compiler_build_identity())});auto cold=jit.compile(*a,false);bool supported=jit.cache_status()!="unavailable";require(jit.cache_status()==(supported?"miss":"unavailable"),"native cache cold status");require(cold->invoke(7)==19,"native cache cold result");auto hit=jit.compile(*a,false);require(jit.cache_status()==(supported?"hit":"unavailable") && hit->invoke(7)==19 && cold->invoke(7)==19 && vd::native_fixture_live()==0,"native cache hit isolation");}
+    {auto cache_root=fixtures/"native-cache";std::filesystem::remove_all(cache_root);std::filesystem::create_directories(cache_root);vd::Jit jit({cache_root,std::string(vd::compiler_build_identity())});auto cold=jit.compile(*a,false);bool supported=jit.cache_status()!="unavailable";require(jit.cache_status()==(supported?"miss":"unavailable"),"native cache cold status");require(cold->invoke(7)==19,"native cache cold result");auto hit=jit.compile(*a,false);require(jit.cache_status()==(supported?"hit":"unavailable") && hit->invoke(7)==19 && cold->invoke(7)==19 && vd::native_fixture_live()==0,"native cache hit isolation");}
     // Whole caller-allocation sweep includes callback registration, thread startup,
     // returned C-buffer conversion and transactional resource publication.
     {vd::Jit jit;auto code=jit.compile(*a,false);bool succeeded=false;unsigned failures=0;for(int budget=0;budget<1024 && !succeeded;++budget){try{managed_test::AllocationFailure fault(budget);require(code->invoke(7)==19,"native allocation retry result");succeeded=true;}catch(const std::bad_alloc&){++failures;}catch(const std::runtime_error&){++failures;}require(vd::native_fixture_live()==0,"native allocation failure leaked C resource");auto runtime=code->runtime_owner();vd::Runtime::Attachment attachment(*runtime);vd::Runtime::Managed managed(*runtime);require(runtime->collect()==vd::Runtime::Collection::completed && runtime->snapshot().objects==0,"native allocation failure retained GC roots");}require(succeeded && failures,"native allocation sweep did not finish");}

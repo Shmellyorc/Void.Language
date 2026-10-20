@@ -1,6 +1,45 @@
 # Stage 6: concurrency and native libraries
 
-## Delivery 4 authorization — 19 October 2026
+## Delivery 5 local acceptance — 19 October 2026
+
+Delivery 4 is owner-confirmed hosted-accepted at
+`619331ccb83227419081bc93cf47bd3a0b8b64cc`,
+[CI #76](https://github.com/Shmellyorc/Void.Language/actions/runs/39359190869),
+7/7 jobs, 131/131 each (917/917). Delivery 5 alone is now authorized: integrated
+async/groups/workers/native/GC/reload/cache/tooling acceptance, repairing only
+demonstrated defects. Preserve all existing boundaries and 131 suites. Focused
+checks precede one consolidated final Debug/Release/strict, 1 MiB and editor
+acceptance. Stop after local acceptance for owner review and hosted CI; Stage 6
+locks only after seven green hosted jobs. Stage 7 remains planning-only and
+unauthorized; its documented goals and research/Work preferences are unchanged.
+The earlier Delivery 4 pending-hosted status below is historical.
+
+**Delivery 5 is locally complete:** 139/139 suites each in Debug, Release and
+strict ASan/UBSan/leak configurations (417/417); corrected cancellation-fixture
+checks passed in all three. All 42 native 1 MiB AOT runs, three semantic-depth
+checks, editor unit tests, three real editor profiles and VSIX packaging passed.
+No compiler/Runtime production repair was required. Evidence and the initial
+fixture-race correction are recorded in [WORK_LOG.md](WORK_LOG.md).
+**STOPPED for owner review, commit/push and seven-job hosted verification.**
+The final Stage 6 lock is pending; Stage 7 implementation is not authorized.
+
+| Implementation delivery | Current status and dependency |
+| --- | --- |
+| 1 — Native Async Activation | Hosted accepted, CI #73 |
+| 2 — Structured Task Lifecycle | Hosted accepted, CI #74 |
+| 3 — Bounded Parallel Spawn | Hosted accepted at `62b17c8c`, CI #75 |
+| 4 — Native Libraries | Hosted accepted at `619331cc`, CI #76; current locked baseline |
+| 5 — Integrated Stage 6 Acceptance | Locally accepted: 139/139 Debug, Release and strict; owner review/seven-job hosted acceptance pending |
+
+These are the five implementation deliveries, not the six D1–D6 decision groups.
+D1 parallel execution now approves only the documented initial value-only scope.
+D2 enqueue/await/inferred handles, D3 root/group ownership and D4 lifecycle rules
+retain their approved contracts. D5 cross-task callable escapes stay restricted;
+D6 now approves the bounded trusted static fixture described in [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md); general FFI remains deferred. No general sharing, task-type spelling,
+async-callable or cancellation recovery contract has been silently added.
+
+
+## Historical Delivery 4 authorization — superseded by Delivery 5 above
 
 Delivery 3 is owner-confirmed hosted-accepted at `62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090`,
 [CI #75 checks](https://github.com/Shmellyorc/Void.Language/commit/62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090/checks),
@@ -13,21 +52,6 @@ management or worker/native effects are approved. The bounded implementation is 
 Delivery 5 requires Delivery 4 hosted acceptance and separate owner authorization.
 Boss controls Git/hosted CI; Wrench reviews; Keyboard implements this delivery and
 stops after complete local acceptance. Earlier pending-hosted statuses are historical.
-
-| Implementation delivery | Current status and dependency |
-| --- | --- |
-| 1 — Native Async Activation | Hosted accepted, CI #73 |
-| 2 — Structured Task Lifecycle | Hosted accepted, CI #74 |
-| 3 — Bounded Parallel Spawn | Hosted accepted at `62b17c8c`, CI #75; current locked baseline |
-| 4 — Native Libraries | Locally accepted: 131/131 each in Debug/Release/strict (393/393); owner review and hosted CI pending |
-| 5 — Integrated Stage 6 Acceptance | Not authorized; requires Delivery 4 hosted acceptance and owner approval |
-
-These are the five implementation deliveries, not the six D1–D6 decision groups.
-D1 parallel execution now approves only the documented initial value-only scope.
-D2 enqueue/await/inferred handles, D3 root/group ownership and D4 lifecycle rules
-retain their approved contracts. D5 cross-task callable escapes stay restricted;
-D6 now approves the bounded trusted static fixture described in [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md); general FFI remains deferred. No general sharing, task-type spelling,
-async-callable or cancellation recovery contract has been silently added.
 
 ## Historical Delivery 3 authorization — superseded by Delivery 4 status
 

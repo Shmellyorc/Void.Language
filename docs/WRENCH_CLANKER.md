@@ -1,6 +1,89 @@
 # 🔧🤖 THE WRENCH CLANKER
 
-## Delivery 4 authorization — 19 October 2026
+## Owner workflow and Stage 7 handoff — 19 October 2026
+
+**Documentation/planning only. Stage 7 is not authorized.** Stage 6 continues
+unchanged through Delivery 5 and its existing owner-controlled hosted acceptance.
+Do not reinterpret this update as changing any Stage 6 contract, implementation
+status or delivery authorization. Preserve the historical records below.
+
+Boss wants substantial sprints with a clear finished outcome. Implement simple
+and moderately complex features in one integrated sprint, using focused tests
+during development and consolidated acceptance when stable. Investigate highly
+complex work first using the actual source and relevant official documentation;
+split into a few meaningful deliveries only when real dependencies, high-risk
+contracts or acceptance problems justify it. Research remains encouraged for
+important architectural, compatibility and correctness questions. Avoid arbitrary
+micro-milestones, repetitive full matrices, speculative verification frameworks
+and unnecessary stop-and-ask checkpoints.
+
+Use **ChatGPT Work with GPT-6.1 in Codex mode aggressively when valuable** for
+substantial implementation, integration and debugging; do not impose an artificial
+Work restriction or reserve it solely for sandbox limitations. Preserve KISS/DRY,
+LLVM 19.1.7 and the existing frontend/IR/LLVM/Runtime architecture. Wrench reviews
+architecture and challenges unsafe or unnecessarily complex decisions. Keyboard
+implements authorized work. Boss retains final product and Git/CI decisions;
+only the owner commits, pushes, creates branches and runs hosted CI.
+
+Stage 7's default is **one cohesive implementation sprint** for a practical,
+developer-ready VS Code/VSCodium, Neovim and Vim experience using one authoritative
+`voidls`. Goals include reliable setup/server discovery, language assistance,
+project/synchronization/refresh/lifecycle behavior, cross-platform packaging and
+real editor integration tests. Extend compiler-owned LSP 3.17 analysis; preserve
+immutable snapshots, diagnostic accuracy, UTF-16 positions, source identities and
+stale-result rejection. Editor-specific parsers/type checkers are excluded.
+Measure useful compiler/server/editor workloads and improve demonstrated
+bottlenecks. No native package manager, arbitrary public FFI, new syntax or
+automatic native hot reload is implied.
+
+The [canonical Stage 7 plan](DEVELOPMENT_STRATEGY.md#owner-workflow-and-stage-7-planning--19-october-2026)
+records the editor goals and unresolved choices, including Vim client/version
+support, server distribution, project handling and safe rename/formatting scope.
+They are planning goals, not completed functionality or a mandate for every LSP
+extension. Older normal-chat-first/restricted-Work instructions below are retained
+as history and superseded by this owner workflow. Stage 7 implementation must wait
+for completion of the Stage 6 owner-controlled process and explicit authorization.
+
+## Delivery 5 local acceptance — 19 October 2026
+
+Delivery 4 is owner-confirmed hosted-accepted at
+`619331ccb83227419081bc93cf47bd3a0b8b64cc`,
+[CI #76](https://github.com/Shmellyorc/Void.Language/actions/runs/39359190869),
+7/7 jobs, 131/131 each (917/917). Delivery 5 alone is now authorized: integrated
+async/groups/workers/native/GC/reload/cache/tooling acceptance, repairing only
+demonstrated defects. Preserve all existing boundaries and 131 suites. Focused
+checks precede one consolidated final Debug/Release/strict, 1 MiB and editor
+acceptance. Stop after local acceptance for owner review and hosted CI; Stage 6
+locks only after seven green hosted jobs. Stage 7 remains planning-only and
+unauthorized; its documented goals and research/Work preferences are unchanged.
+The earlier Delivery 4 pending-hosted status below is historical.
+
+**Delivery 5 is locally complete:** 139/139 suites each in Debug, Release and
+strict ASan/UBSan/leak configurations (417/417); corrected cancellation-fixture
+checks passed in all three. All 42 native 1 MiB AOT runs, three semantic-depth
+checks, editor unit tests, three real editor profiles and VSIX packaging passed.
+No compiler/Runtime production repair was required. Evidence and the initial
+fixture-race correction are recorded in [WORK_LOG.md](WORK_LOG.md).
+**STOPPED for owner review, commit/push and seven-job hosted verification.**
+The final Stage 6 lock is pending; Stage 7 implementation is not authorized.
+
+| Implementation delivery | Current status and dependency |
+| --- | --- |
+| 1 — Native Async Activation | Hosted accepted, CI #73 |
+| 2 — Structured Task Lifecycle | Hosted accepted, CI #74 |
+| 3 — Bounded Parallel Spawn | Hosted accepted at `62b17c8c`, CI #75 |
+| 4 — Native Libraries | Hosted accepted at `619331cc`, CI #76; current locked baseline |
+| 5 — Integrated Stage 6 Acceptance | Locally accepted: 139/139 Debug, Release and strict; owner review/seven-job hosted acceptance pending |
+
+These are the five implementation deliveries, not the six D1–D6 decision groups.
+D1 parallel execution now approves only the documented initial value-only scope.
+D2 enqueue/await/inferred handles, D3 root/group ownership and D4 lifecycle rules
+retain their approved contracts. D5 cross-task callable escapes stay restricted;
+D6 now approves the bounded trusted static fixture described in [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md); general FFI remains deferred. No general sharing, task-type spelling,
+async-callable or cancellation recovery contract has been silently added.
+
+
+## Historical Delivery 4 authorization — superseded by Delivery 5 above
 
 Delivery 3 is owner-confirmed hosted-accepted at `62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090`,
 [CI #75 checks](https://github.com/Shmellyorc/Void.Language/commit/62b17c8cdff80a2cf1afc08ecfc0ecf33c76a090/checks),
@@ -13,21 +96,6 @@ management or worker/native effects are approved. The bounded implementation is 
 Delivery 5 requires Delivery 4 hosted acceptance and separate owner authorization.
 Boss controls Git/hosted CI; Wrench reviews; Keyboard implements this delivery and
 stops after complete local acceptance. Earlier pending-hosted statuses are historical.
-
-| Implementation delivery | Current status and dependency |
-| --- | --- |
-| 1 — Native Async Activation | Hosted accepted, CI #73 |
-| 2 — Structured Task Lifecycle | Hosted accepted, CI #74 |
-| 3 — Bounded Parallel Spawn | Hosted accepted at `62b17c8c`, CI #75; current locked baseline |
-| 4 — Native Libraries | Locally accepted: 131/131 each in Debug/Release/strict (393/393); owner review and hosted CI pending |
-| 5 — Integrated Stage 6 Acceptance | Not authorized; requires Delivery 4 hosted acceptance and owner approval |
-
-These are the five implementation deliveries, not the six D1–D6 decision groups.
-D1 parallel execution now approves only the documented initial value-only scope.
-D2 enqueue/await/inferred handles, D3 root/group ownership and D4 lifecycle rules
-retain their approved contracts. D5 cross-task callable escapes stay restricted;
-D6 now approves the bounded trusted static fixture described in [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md); general FFI remains deferred. No general sharing, task-type spelling,
-async-callable or cancellation recovery contract has been silently added.
 
 ## Historical Delivery 3 authorization — superseded by Delivery 4 status
 
@@ -614,7 +682,7 @@ The last hosted locked foundation in the archived handoff includes Phase 23 runt
 
 ---
 
-## 10. Feature-first development, research, testing and CI
+## 10. Historical feature-first workflow (superseded by the 19 October owner workflow above)
 
 ### 10.1 Default route: Normal GPT-6 Sol, long sprints
 

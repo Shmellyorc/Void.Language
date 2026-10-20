@@ -7,6 +7,43 @@ Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRA
 It analyzes real `.void` source through the existing compiler and Phase 9
 `ToolingSession`. It never executes source, publishes native code or restarts a host.
 
+## Stage 7 planning goals (not implemented)
+
+Stage 7 should extend this existing compiler-owned LSP 3.17 server into a shared,
+practical editing service for VS Code/VSCodium, Neovim and Vim. **This is planning,
+not Stage 7 implementation authorization.** Stage 6 and its Delivery 5/hosted gates
+continue unchanged. The implemented protocol table below remains the current
+capability contract; future goals do not change it.
+
+Priorities are completion, hover, signature help, rename, formatting, better symbol
+coverage, project handling and responsiveness, with semantic highlighting, code
+actions and workspace features where appropriate and supported. Extend the
+compiler's retained analysis/index rather than adding a second parser, symbol
+resolver or type checker in any editor. All editors use the same authoritative
+`voidls`; client differences belong in adapters/configuration and capability
+negotiation, not competing language semantics.
+
+Preserve immutable snapshots, diagnostic codes/ranges, UTF-16 conversion, canonical
+source identities and stale-result rejection. Richer symbol coverage must be
+checked against actual declarations/references and access rules. Rename needs a
+reviewed scope/conflict policy and edits tied to the correct document versions;
+formatting needs an explicit policy that preserves program meaning. Project
+selection, synchronization and disk refresh need defined behavior against today's
+explicit entry/root and full-document model. This plan selects no new project
+format, background scheduler, incremental parser or caching subsystem.
+
+Investigate real source and official protocol/client documentation before complex
+changes. Measure representative startup, edit/query latency and memory where
+useful; optimize demonstrated bottlenecks. Plan one cohesive Stage 7 sprint with
+focused development tests and consolidated acceptance; split only for demonstrated
+dependencies or risk. Real editor tests must cover attachment, unsaved changes,
+diagnostic repair, navigation, stale results and lifecycle on supported client/
+platform combinations. Optional LSP extensions are not unconditional requirements.
+Server discovery/distribution, workspace policy, symbol coverage and exact feature
+contracts remain review decisions. See the [canonical plan](DEVELOPMENT_STRATEGY.md#owner-workflow-and-stage-7-planning--19-october-2026).
+No package manager, general FFI, new language syntax or automatic native hot reload
+is implied by editor refresh or richer LSP support.
+
 ## Build, start and demonstrate
 
 Build the project normally with the complete LLVM/Clang/LLD **19.1.7** development
