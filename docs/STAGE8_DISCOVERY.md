@@ -59,6 +59,14 @@ project VFS root. An absent main permits a labelled standalone active-file edito
 selection, including a named unsaved file whose parent exists. An explicit override
 must exist. Selection without a workspace uses the labelled standalone fallback.
 
+On POSIX, equivalent workspace-ancestor spellings (including macOS `/var` and
+`/private/var`) are admitted by scanning prefixes from the filesystem root and
+stopping at the first canonical workspace match. A matching prefix itself cannot
+be a symlink. Original descendants still undergo the existing alias and exact
+spelling checks; discovery never resolves the whole active path to establish
+containment. [CI #83/#84 repair evidence](stage8/CI84_DISCOVERY_REPAIR.md) covers
+the shared Debug/Release implementation and native verification limits.
+
 `voidls --discover <workspace-or-empty> <active-or-empty> <override-or-empty>`
 returns JSON `entry`, `root`, `standalone`, then exits. All shipped adapters call
 this preflight before fixing their existing `--entry` LSP session. VS Code uses

@@ -5,6 +5,13 @@ completeness audit and Stage 7 hosted acceptance.
 
 **Current status — 21 October 2026:**
 
+**Later CI #83/#84 repair:** See [cross-platform discovery/editor evidence](stage8/CI84_DISCOVERY_REPAIR.md).
+CI #84 Windows compiler Debug passed 156/156; Release succeeded. A test-only
+separator assertion and CI #83 macOS /var discovery failure have focused repairs,
+verified on Linux Debug/Release (7/7 each) and extension units (4/4). Both macOS
+configurations were inspected; native macOS Debug/Release and Windows editor
+verification remain pending. No new language scope or hosted lock is approved.
+
 **CI #83 repair update:** Owner-run baseline `fbad2b642114a692f93d2f4ce7d3465ea489abf2`
 built on Windows Debug/Release, passing 153/156 each. See the
 [three-failure Unicode repair](stage8/CI83_WINDOWS_REPAIR.md) and its focused

@@ -1,4 +1,15 @@
-# Stage 8 final acceptance gate — CI #83 Windows failures; not locked
+# Stage 8 final acceptance gate — CI #83/#84 repairs; not locked
+
+21 October 2026 later update: CI #84 Windows compiler Debug passed 156/156 and
+Release succeeded, establishing execution of the earlier Unicode repair. Debug
+then failed extension root-path separator equality. CI #83 macOS Release passed
+155/156 with /var discovery failure. Review the
+[cross-platform repair](CI84_DISCOVERY_REPAIR.md): focused Linux Debug/Release
+7/7 each and extension 4/4 do not certify native platforms. Inspect **both macOS
+Debug and Release**, Windows normalized root/entry/fallback assertions and actual
+editor-host steps. CI #84 still had both macOS jobs and Ubuntu jobs building at
+the recorded status check; all eventual outcomes need review. No hosted rerun
+was started. Earlier evidence below is historical, and no lock is established.
 
 21 October 2026 update: Boss ran
 [CI #83](https://github.com/Shmellyorc/Void.Language/actions/runs/39571077819)

@@ -187,6 +187,20 @@ ProjectSelection discover_project(const std::filesystem::path& workspace,
             suffix=suffix.empty()?prefix.filename():prefix.filename()/suffix;prefix=parent;
         }
     }
+#else
+    if(relative.empty() || *relative.begin()=="..") {
+        // Inspect ancestors from the filesystem root, stopping at the first
+        // spelling of the workspace boundary (e.g. /var -> /private/var).
+        // Never resolve a descendant prefix that could alias back to the root.
+        auto prefix=start.root_path();
+        for(const auto& part:start.relative_path()) {
+            prefix/=part;
+            if(fs::canonical(prefix)==boundary) {
+                if(fs::is_symlink(fs::symlink_status(prefix)))throw std::invalid_argument("Project selection contains an alias");
+                relative=start.lexically_relative(prefix);break;
+            }
+        }
+    }
 #endif
     if(relative.empty() || *relative.begin()=="..")throw std::invalid_argument("Active file is outside selected workspace");
     // Do not follow aliases below the chosen workspace boundary.

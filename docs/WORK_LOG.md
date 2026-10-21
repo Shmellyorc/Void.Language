@@ -1,6 +1,6 @@
 # Work log
 
-**Current handoff:** [Documentation index](README.md), [CI #83 Windows repair](stage8/CI83_WINDOWS_REPAIR.md) and [final hosted checklist](stage8/FINAL_HOSTED_GATE.md). All six Stage 8 sprints have local evidence; the focused CI #83 repair awaits Windows Debug/Release verification. Stage 8 is not hosted locked. Earlier entries retain historical evidence.
+**Current handoff:** [Documentation index](README.md), [CI #83/#84 discovery repair](stage8/CI84_DISCOVERY_REPAIR.md) and [final hosted checklist](stage8/FINAL_HOSTED_GATE.md). All six Stage 8 sprints have local evidence; native macOS Debug/Release and Windows editor verification remain pending. Stage 8 is not hosted locked. Earlier entries retain historical evidence.
 
 ## 14 October 2026: Phase 22 UTF-8 foundation implementation
 
@@ -14163,3 +14163,32 @@ commands, logs, hashes and limits. Updated index, approvals, Wrench handoff and
 final hosted checklist. Windows Debug/Release execution is still required;
 Linux/codepage simulation is not Windows acceptance. No full matrix, hosted run,
 commit/push/branch, root README, website or subsequent-stage work was performed.
+
+## 21 October 2026 — CI #83/#84 cross-platform discovery repair
+
+Baseline `dbe01209e4e32da01260b4faaa66b8ce4020ad82`. Inspected CI #84
+Windows Debug logs: compiler 156/156, then test-only '/' versus '\\' root assertion
+failure; Release job succeeded. CI #83 macOS Release logs show 155/156 and
+/var discovery failure. Both macOS configurations were checked: #83 Debug logs
+were unavailable while building; #84 Debug/Release were still building at the
+recorded status check. No unavailable/in-progress result is promoted to acceptance.
+
+Normalized both sides of TypeScript root/entry assertions and strengthened fallback
+to full canonical locations. Production editor path semantics are unchanged.
+POSIX discovery now scans root-first to the first equivalent workspace boundary,
+then checks untouched descendant components. Added synthetic temporary-ancestor
+alias, nested-main, outside, descendant link, escape-and-return, wrong-case and
+main-case negatives; canonical POSIX expected paths/URIs account for /private/var.
+Windows discovery branch, Unicode CLI/object output, VFS and readonly policies
+are preserved. The baseline executable reproduces the new alias regression.
+
+Focused Linux Debug **7/7**, Release **7/7**, final strengthened discovery reruns
+**1/1 each** (not extra unique suites). Extension typecheck/compile/bundle passed;
+explicit TAP units **4/4**, zero skipped. Node win32 path reproducer, Python syntax
+and whitespace checks passed. No full matrix or hosted action was run. Native
+macOS Debug/Release and Windows editor-host verification remain pending.
+
+[Repair record](stage8/CI84_DISCOVERY_REPAIR.md) and machine-readable evidence
+retain logs, source hashes, CI snapshots and limitations. Updated index, Wrench,
+approvals, discovery contract and final hosted checklist. No commit, push, branch,
+website/root README edit, language feature or Stage 9 work. Stop for Wrench review.

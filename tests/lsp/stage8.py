@@ -11,7 +11,7 @@ def selection(result, entry, root, standalone=False):
         # Windows canonical paths may expand ancestor 8.3 names; do not fold
         # arbitrary VFS components or mask spelling changes on other platforms.
         if os.name=='nt': assert os.path.samefile(result[key],expected),result
-        else: assert result[key]==str(expected),result
+        else: assert result[key]==str(expected.resolve()),result
 def reject(workspace, active='', override='', message=None):
     result=subprocess.run([server,'--discover',str(workspace),str(active),str(override)],capture_output=True,text=True,encoding="utf-8")
     assert result.returncode==2,result
@@ -21,7 +21,7 @@ def source_uri(actual, expected):
         from urllib.parse import urlsplit
         from urllib.request import url2pathname
         assert os.path.samefile(url2pathname(urlsplit(actual).path),expected),actual
-    else: assert actual==expected.as_uri(),actual
+    else: assert actual==expected.resolve().as_uri(),actual
 
 def short_path(path):
     import ctypes
@@ -103,6 +103,30 @@ with tempfile.TemporaryDirectory(prefix='VOID discovery é😀 ') as temp:
             else: print('SKIP: descendant short-name alias unavailable')
             print('Windows short/long workspace ancestor checks passed')
     else: print('SKIP: Windows 8.3 coverage requires Windows')
+    if os.name!='nt':
+        # Model macOS /var -> /private/var on every POSIX host. The alias is
+        # above the workspace; aliases within the VFS remain forbidden.
+        alias=root/'temp-alias';alias.symlink_to(root.resolve(),target_is_directory=True)
+        inside=project/'inside-alias';inside.symlink_to(project.resolve(),target_is_directory=True)
+        outside=project/'outside-alias';outside.symlink_to(library.resolve(),target_is_directory=True)
+        back=project/'parent-alias';back.symlink_to(root.resolve(),target_is_directory=True)
+        try:
+            for workspace in [project.resolve(),alias/'project']:
+                for spelling in [root.resolve(),root,alias]:
+                    selection(discover(workspace,spelling/'project/app/systems/player.void'),entry,project)
+                    selection(discover(workspace,spelling/'project/main.void'),entry,project)
+                    reject(workspace,spelling/'project-other/new.void',message='outside selected workspace')
+                    reject(workspace,spelling/'project/inside-alias/app/systems/player.void',message='alias')
+                    reject(workspace,spelling/'project/outside-alias/io/files.void',message='alias')
+                    reject(workspace,spelling/'project/parent-alias/project/new.void',message='alias')
+                    reject(workspace,spelling/'project/APP/systems/player.void')
+                    reject(workspace,spelling/'project/case/new.void',message='exact case')
+                    nested.write_text('invalid selected source must not trigger fallback',encoding='utf-8')
+                    try: selection(discover(workspace,spelling/'project/app/systems/player.void'),nested,project/'app')
+                    finally: nested.unlink()
+        finally:
+            back.unlink();outside.unlink();inside.unlink();alias.unlink()
+        print('POSIX workspace ancestor alias and descendant rejection checks passed')
     if len(sys.argv)>2:
         compiler=pathlib.Path(sys.argv[2]).resolve()
         unicode_entry=standalone/'entrée😀.void';unicode_entry.write_text(api.replace('func read(', 'func entry('),encoding='utf-8')

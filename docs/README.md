@@ -47,7 +47,20 @@ README only if Boss explicitly requests a public-facing README change.”
 Preserve historical evidence and distinguish approved direction, local verification,
 review and hosted locks. Never mark work implemented or locked without verification.
 
-## CI #83 repair handoff — 21 October 2026
+## CI #83/#84 discovery repair handoff — 21 October 2026
+
+At `dbe01209e4e32da01260b4faaa66b8ce4020ad82`, CI #84 Windows Debug passed
+156/156 compiler suites, then failed an extension path-separator assertion;
+Windows Release succeeded. CI #83 macOS Release passed 155/156, failing discovery
+through `/var`. The [cross-platform repair](stage8/CI84_DISCOVERY_REPAIR.md)
+normalizes exact editor-test comparisons and admits POSIX workspace-ancestor
+spellings while retaining descendant alias/security checks. Focused Linux
+Debug/Release passed 7/7 each; extension checks and all four unit tests passed.
+Both macOS configurations were inspected; available Debug evidence remains
+incomplete. Native macOS Debug/Release and Windows editor verification are pending.
+**Stage 8 is not hosted locked.** No hosted action or next stage is authorized.
+
+## Historical CI #83 repair handoff — 21 October 2026
 
 Owner-run CI #83 at `fbad2b642114a692f93d2f4ce7d3465ea489abf2`
 built Windows Debug/Release successfully; each passed 153/156 suites. The three

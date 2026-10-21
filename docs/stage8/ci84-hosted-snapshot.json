@@ -1,0 +1,181 @@
+{
+  "runs": {
+    "ci83": 39571077819,
+    "ci84": 39581217844
+  },
+  "snapshots": {
+    "ci83": [
+      {
+        "id": 119125115766,
+        "name": "macOS ARM64 / Debug",
+        "status": "in_progress",
+        "conclusion": null,
+        "failed_steps": []
+      },
+      {
+        "id": 119125115831,
+        "name": "Ubuntu 24.04 / Release",
+        "status": "completed",
+        "conclusion": "success",
+        "failed_steps": []
+      },
+      {
+        "id": 119125115859,
+        "name": "Ubuntu 24.04 / Debug",
+        "status": "in_progress",
+        "conclusion": null,
+        "failed_steps": []
+      },
+      {
+        "id": 119125116009,
+        "name": "macOS ARM64 / Release",
+        "status": "completed",
+        "conclusion": "failure",
+        "failed_steps": [
+          "Execute Release tests"
+        ]
+      },
+      {
+        "id": 119125116028,
+        "name": "Windows 2022 / Debug",
+        "status": "completed",
+        "conclusion": "failure",
+        "failed_steps": [
+          "Execute Debug tests"
+        ]
+      },
+      {
+        "id": 119125116092,
+        "name": "Ubuntu 24.04 / Sanitizers",
+        "status": "in_progress",
+        "conclusion": null,
+        "failed_steps": []
+      },
+      {
+        "id": 119125116286,
+        "name": "Windows 2022 / Release",
+        "status": "completed",
+        "conclusion": "failure",
+        "failed_steps": [
+          "Execute Release tests"
+        ]
+      }
+    ],
+    "ci84": [
+      {
+        "id": 119159022745,
+        "name": "macOS ARM64 / Release",
+        "status": "in_progress",
+        "conclusion": null,
+        "failed_steps": []
+      },
+      {
+        "id": 119159022980,
+        "name": "Windows 2022 / Release",
+        "status": "completed",
+        "conclusion": "success",
+        "failed_steps": []
+      },
+      {
+        "id": 119159023049,
+        "name": "Ubuntu 24.04 / Sanitizers",
+        "status": "in_progress",
+        "conclusion": null,
+        "failed_steps": []
+      },
+      {
+        "id": 119159023140,
+        "name": "Windows 2022 / Debug",
+        "status": "completed",
+        "conclusion": "failure",
+        "failed_steps": [
+          "Type-check, build and test extension"
+        ]
+      },
+      {
+        "id": 119159023163,
+        "name": "macOS ARM64 / Debug",
+        "status": "in_progress",
+        "conclusion": null,
+        "failed_steps": []
+      },
+      {
+        "id": 119159023178,
+        "name": "Ubuntu 24.04 / Debug",
+        "status": "in_progress",
+        "conclusion": null,
+        "failed_steps": []
+      },
+      {
+        "id": 119159023291,
+        "name": "Ubuntu 24.04 / Release",
+        "status": "in_progress",
+        "conclusion": null,
+        "failed_steps": []
+      }
+    ]
+  },
+  "log_excerpts": {
+    "119125116009": [
+      "2026-10-21T08:40:57.6873310Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +fbad2b642114a692f93d2f4ce7d3465ea489abf2:refs/remotes/origin/main",
+      "2026-10-21T08:40:58.7413080Z  * [new ref]         fbad2b642114a692f93d2f4ce7d3465ea489abf2 -> origin/main",
+      "2026-10-21T08:40:58.9104440Z fbad2b642114a692f93d2f4ce7d3465ea489abf2",
+      "2026-10-21T08:41:17.0914950Z Received 939524096 of 2063895644 (45.5%), 52.5 MBs/sec",
+      "2026-10-21T08:41:29.2228990Z Received 1476395008 of 2063895644 (71.5%), 48.2 MBs/sec",
+      "2026-10-21T08:41:41.2395990Z Received 2047118428 of 2063895644 (99.2%), 47.4 MBs/sec",
+      "2026-10-21T08:45:47.3913950Z /Users/runner/work/Void.Language/Void.Language/examples/proof.cpp:13:6: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]",
+      "2026-10-21T09:33:17.3739580Z ld: warning: object file (/opt/homebrew/Cellar/zstd/1.5.7_1/lib/libzstd.a[23](zstdmt_compress.c.o)) was built for newer 'macOS' version (26.0) than being linked (16.0)",
+      "2026-10-21T09:33:18.3958810Z [132/1356] Generating arrays-cycles-normal.o",
+      "2026-10-21T09:33:18.7983950Z [142/1356] Generating arrays-selection-optimized.o",
+      "2026-10-21T09:33:20.5395720Z [199/1356] Generating dictionaries-keys-optimized.o",
+      "2026-10-21T09:33:21.3950350Z [250/1356] Generating patterns-combined-optimized.o",
+      "2026-10-21T09:33:21.3952120Z Wrote native source object: /Users/runner/work/Void.Language/Void.Language/build/Release/patterns-combined-optimized.o",
+      "2026-10-21T09:33:24.1792340Z [395/1356] Generating interfaces-cli-nullable-normal.o",
+      "2026-10-21T09:33:54.6339550Z [876/1356] Building CXX object CMakeFiles/void_native_aot_integrated_failure_optimized.dir/tests/async/aot.cpp.o",
+      "2026-10-21T10:05:07.4339520Z [1026/1356] Linking CXX executable void_generics_cli_types_normal",
+      "2026-10-21T10:05:16.3951830Z [1291/1356] Linking CXX executable void_runtime_failures",
+      "2026-10-21T10:17:35.0843950Z  25/156 Test  #25: advanced_cli ..............................   Passed    3.85 sec",
+      "2026-10-21T10:18:01.5179270Z  61/156 Test  #61: lsp_stage8 ................................***Failed    0.07 sec",
+      "2026-10-21T10:18:01.5179740Z voidls: Active file is outside selected workspace",
+      "2026-10-21T10:18:17.6395560Z         Start 119: async_aot_lifecycle_values_normal",
+      "2026-10-21T10:18:30.1439510Z         Start 137: async_retention_aot_growth_optimized",
+      "2026-10-21T10:19:20.7756780Z 99% tests passed, 1 tests failed out of 156",
+      "2026-10-21T10:19:22.7134630Z Artifact download URL: https://github.com/Shmellyorc/Void.Language/actions/runs/39571077819/artifacts/12339356244"
+    ],
+    "119159023140": [
+      "2026-10-21T09:59:38.4123952Z   ssh-user: git\r",
+      "2026-10-21T09:59:41.8114098Z [command]\"C:\\Program Files\\Git\\bin\\git.exe\" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +dbe01209e4e32da01260b4faaa66b8ce4020ad82:refs/remotes/origin/main\r",
+      "2026-10-21T09:59:43.2607936Z  * [new ref]         dbe01209e4e32da01260b4faaa66b8ce4020ad82 -> origin/main\r",
+      "2026-10-21T09:59:43.6317184Z dbe01209e4e32da01260b4faaa66b8ce4020ad82\r",
+      "2026-10-21T09:59:43.6739524Z env:\r",
+      "2026-10-21T09:59:43.8789395Z   arch: x64\r",
+      "2026-10-21T09:59:58.8117662Z Received 939524096 of 1236292412 (76.0%), 106.1 MBs/sec\r",
+      "2026-10-21T10:00:28.5345141Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed\r",
+      "2026-10-21T10:01:51.5395196Z Wrote native source object: D:/a/Void.Language/Void.Language/build/Debug/generics-large-optimized.obj\r",
+      "2026-10-21T10:01:55.3143958Z [204/1356] Generating properties-main-normal.obj\r",
+      "2026-10-21T10:02:03.5155165Z [395/1356] Generating interfaces-cli-nullable-normal.obj\r",
+      "2026-10-21T10:02:32.1583954Z [507/1356] Building CXX object CMakeFiles\\void_fixed_arrays_cli_order_normal.dir\\tests\\integration\\native_link.cpp.obj\r",
+      "2026-10-21T10:02:33.3956126Z [587/1356] Building CXX object CMakeFiles\\void_generics_cli_functions_optimized.dir\\tests\\integration\\native_link.cpp.obj\r",
+      "2026-10-21T10:02:42.1439542Z [782/1356] Building CXX object CMakeFiles\\void_reference_values_aot_optimized.dir\\tests\\managed\\probe.cpp.obj\r",
+      "2026-10-21T10:02:46.3950244Z [811/1356] Building CXX object CMakeFiles\\void_inheritance_aot_normal.dir\\tests\\inheritance\\aot.cpp.obj\r",
+      "2026-10-21T10:03:20.8692395Z [941/1356] Building CXX object CMakeFiles\\void_sprint4_tests.dir\\tests\\stage8\\sprint4.cpp.obj\r",
+      "2026-10-21T10:03:51.6395788Z [1010/1356] Linking CXX executable void_arrays_cli_values_optimized.exe\r",
+      "2026-10-21T10:04:34.2839556Z [1171/1356] Linking CXX executable void_advanced_cli_construction_cleanup_optimized.exe\r",
+      "2026-10-21T10:05:07.7716395Z [1293/1356] Linking CXX executable void_runtime_aot_optimized.exe\r",
+      "2026-10-21T10:15:22.1763382Z 100% tests passed, 0 tests failed out of 156\r",
+      "2026-10-21T10:15:40.9673395Z \r",
+      "2026-10-21T10:15:48.6482898Z     actual: 'C:/Users/runneradmin/AppData/Local/Temp/VOID config space fWKORC',\r",
+      "2026-10-21T10:15:48.6484681Z     expected: 'C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\VOID config space fWKORC',\r",
+      "2026-10-21T10:15:50.9549078Z Artifact download URL: https://github.com/Shmellyorc/Void.Language/actions/runs/39581217844/artifacts/12338590823\r"
+    ]
+  },
+  "ci83_macos_debug_log_unavailable": {
+    "error": "GitHub API error 404: ﻿<?xml version=\"1.0\" encoding=\"utf-8\"?><Error><Code>BlobNotFound</Code><Message>The specified blob does not exist.\nRequestId:d7c52004-b01e-0097-7846-61a6d4000000\nTime:2026-10-21T10:22:18.2261042Z</Message></Error>",
+    "error_code": "NOT_FOUND",
+    "error_data": {
+      "error_str": "GitHub API error 404: ﻿<?xml version=\"1.0\" encoding=\"utf-8\"?><Error><Code>BlobNotFound</Code><Message>The specified blob does not exist.\nRequestId:d7c52004-b01e-0097-7846-61a6d4000000\nTime:2026-10-21T10:22:18.2261042Z</Message></Error>"
+    }
+  },
+  "scope": "Read-only observations; in-progress jobs are not acceptance; no workflow action started.",
+  "checked_at_utc": "2026-10-21 10:28:39 UTC"
+}

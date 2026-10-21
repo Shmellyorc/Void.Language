@@ -36,12 +36,14 @@ test('validate executable and deterministic canonical project selection', async 
         await assert.rejects(discoverServer('', undefined, undefined, '.'), /Cannot find voidls/);
         const settings = {server, entry: 'main.void', trace: 'off' as const};
         const project = await resolveProject(settings, [directory]);
-        assert.equal(project.root, await fs.realpath(directory));
-        assert.equal(project.entry, path.join(project.root, 'main.void'));
+        assert.equal(path.normalize(project.root), path.normalize(await fs.realpath(directory)));
+        assert.equal(path.normalize(project.entry), path.normalize(path.join(project.root, 'main.void')));
         assert(!project.singleFile);
         await fs.rm(path.join(directory, 'main.void'));
         const fallback = await resolveProject({...settings, entry: ''}, [directory], path.join(directory, 'single.void'));
-        assert(fallback.singleFile && fallback.entry.endsWith('single.void'));
+        assert(fallback.singleFile);
+        assert.equal(path.normalize(fallback.root), path.normalize(await fs.realpath(directory)));
+        assert.equal(path.normalize(fallback.entry), path.normalize(path.join(await fs.realpath(directory), 'single.void')));
         await assert.rejects(resolveProject(settings, [directory, directory]), /one project/);
         await assert.rejects(resolveProject({...settings, entry: ''}, [directory]), /main.void/);
         await assert.rejects(resolveProject({...settings, server: directory}, [directory]), /regular executable/);

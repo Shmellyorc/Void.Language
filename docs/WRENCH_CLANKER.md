@@ -32,7 +32,20 @@ routine development. It authorizes no additional sprint, commit, push or hosted 
 Clankers and takes precedence over older communication/checkpoint practices below.
 Boss retains Git and hosted acceptance control.
 
-## CI #83 repair handoff — 21 October 2026
+## CI #83/#84 discovery repair handoff — 21 October 2026
+
+Review [cross-platform repair evidence](stage8/CI84_DISCOVERY_REPAIR.md) at baseline
+`dbe01209e4e32da01260b4faaa66b8ce4020ad82`. CI #84 Windows Debug compiler
+156/156 passed before a test-only root separator mismatch; Windows Release
+succeeded. POSIX discovery now maps equivalent ancestor spellings before checking
+the unchanged lexical descendant suffix, repairing CI #83 macOS Release's /var
+failure. The Windows 8.3/reparse branch and previous Unicode repairs are preserved.
+Focused Linux Debug/Release passed 7/7 each, extension typecheck/build and unit
+tests 4/4 passed. Both macOS configurations were inspected; incomplete native
+Debug/Release and Windows editor evidence remains pending. No hosted lock,
+Git/hosted action or next stage is authorized. Earlier snapshots follow.
+
+## Historical CI #83 repair handoff — 21 October 2026
 
 Review [CI #83 repair evidence](stage8/CI83_WINDOWS_REPAIR.md) before the earlier
 Sprint 6 snapshot below. Baseline `fbad2b642114a692f93d2f4ce7d3465ea489abf2`:
