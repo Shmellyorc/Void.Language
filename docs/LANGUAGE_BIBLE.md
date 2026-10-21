@@ -3333,3 +3333,14 @@ iterator access, including completion; immediate break/return is allowed.
 FIXED_ARRAYS.md, GROWABLE_ARRAYS.md and WORK_LOG.md contain the current source
 implementation boundary and local evidence, superseding earlier source deferrals.
 Hosted cross-platform acceptance is still owned by the repository owner.
+
+
+## Stage 8 Sprint 5 measured internal lifetime boundary — 20 October 2026
+
+The [async retention contract](STAGE8_ASYNC_RETENTION.md) records internal
+execution-frame retirement after native resume return/acquired worker completion.
+Task/result handles, repeated-await value-copy/identity, errors/cancellation,
+structured cleanup and generation leases retain their established semantics.
+This is not a new public task/ownership API or a constant-memory scheduler;
+native/result records still grow inside a long-lived root. Approval, local
+verification and hosted acceptance remain separate in the linked evidence.

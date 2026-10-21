@@ -1,5 +1,13 @@
 # Phase 15 runtime foundation
 
+Stage 8 Sprint 5 adds host memory snapshots of the existing Heap payload, buckets,
+Runtime catalog and Handle registries. Completed execution-frame roots now clear
+only after native resume returns or acquired worker publication; ordinary precise
+GC performs reclamation. Task/result records, active frames, cleanup, callbacks
+and native code leases retain their prior safety contracts. See
+[the ownership proof and measured limits](STAGE8_ASYNC_RETENTION.md).
+
+
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 Delivery 5 combined regressions exercise this same Runtime through suspended

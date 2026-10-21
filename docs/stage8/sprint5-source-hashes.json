@@ -1,0 +1,12 @@
+{
+  "CMakeLists.txt": "b77ba3600a531b728baea4fc2212ab3b88747bfeaa6548c509df1507507c986e",
+  "include/void/heap.hpp": "a500e6350fb60a102f8b42c17302643320e751b63d9cdc32118bfa374cc24b39",
+  "include/void/runtime.hpp": "17f03f2eb4dcb3979c9a11881171b49079f758acfea8b807f9b798098a225505",
+  "src/runtime/async.cpp": "7f8ab1f9b7be840805a7b87dccf03a84ed841a0952b10d633050ffc45b63febe",
+  "src/runtime/coordination.cpp": "49044ee248dc9c471933da2eb3766c0620645b25df62e77175c025cdb6182dec",
+  "src/runtime/heap.cpp": "0e9bf997a06815f9d7617877611b514c8a36e41281b59662fc20b505f0f3ee7b",
+  "tests/stage8/sprint5/growth.void": "45ea006763f893138703a536f809203e0fcf11987a229b990fbbf0d04216fa52",
+  "tests/stage8/sprint5/measure.py": "b7f9c2e0edc28c1058ec4b2d667bdaad529cc832a5fb7ed26273231ceff5304d",
+  "tests/stage8/sprint5/retention.cpp": "c6548b80aa8bd2f13b3442937e9097c272c6e82c86805b890271361f65a6b6a0",
+  "tests/stage8/sprint5/workers.void": "58ec88e4d52a15bc6d4ecafd49efe00e17982d7adb90a010eea8b0c2bb4cca0a"
+}

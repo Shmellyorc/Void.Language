@@ -252,6 +252,11 @@ bool Runtime::begin_release(void* object) {
     if(found->second.released)return false;found->second.released=true;return true;
 }
 bool Runtime::contains(void* p) const { std::lock_guard lock(mutex_); return heap_.contains(p); }
+Runtime::MemorySnapshot Runtime::memory_snapshot() const {
+    std::lock_guard lock(mutex_);
+    return {heap_.memory_snapshot(),types_?types_->types.size():0,types_?types_->schemas.size():0,types_?types_->witnesses.size():0,
+            handles_.size(),handles_.capacity(),threads_.size(),callbacks_};
+}
 Runtime::Snapshot Runtime::snapshot() const {
     std::lock_guard lock(mutex_);
     return {epoch_, completed_epoch_, threads_.size(), static_cast<std::size_t>(std::count_if(threads_.begin(), threads_.end(), [](auto* t) { return t->state == State::parked; })), heap_.size(), requested_, cooperative_parks_};

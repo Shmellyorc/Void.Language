@@ -10,29 +10,33 @@ See [Boss approvals and sprint ledger](LANGUAGE_COMPLETENESS_APPROVALS.md).
 
 ## Current execution status — 20 October 2026
 
-Stage 8 Sprint 4 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
-Final consolidated Debug, Release and strict ASan/UBSan/leak runs passed
-**148/148 each: 444/444 unique configuration/suite outcomes**. Both complete
-1 MiB frontend gates passed. See [the application/static-provider contract](STAGE8_APPLICATION_NATIVE.md)
-and [Sprint 4 acceptance](stage8/SPRINT4_ACCEPTANCE.md) for exact evidence,
-preliminary failures/corrections, source hashes and limits.
+Stage 8 Sprint 5 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
+Baseline measurements justified retiring completed execution-frame roots after
+native resume returns or acquired worker completion. The 512-child async workload
+plus sentinel dropped from **34,890,840 to 10,944 reachable payload bytes after GC**;
+native Task/result/Work records remain root-scope owned. No constant-memory claim
+or public task/ownership semantic change is made.
 
-All three Sprint 4 design decisions are approved in [DECISIONS.md](DECISIONS.md);
-no Sprint 4 owner decision remains pending. The bounded sink requires explicit
-C++ admission, one provider descriptor per graph; CLI/LSP imports grant no trust.
-Sprints 1–3 remain preserved, including [CI #82's Windows repair](stage8/CI82_WINDOWS_REPAIR.md),
-argument binding, numeric prelude, UTF-8/collections, tooling and reload contracts.
-Prior failures and verification records remain historical evidence.
+Final consolidated Debug, Release and strict ASan/UBSan/leak runs passed
+**153/153 each: 459/459 unique configuration/suite outcomes**. Both complete
+1 MiB frontend gates passed. [Contract and ownership proof](STAGE8_ASYNC_RETENTION.md),
+[Sprint 5 acceptance](stage8/SPRINT5_ACCEPTANCE.md) and the paired measurement CSV
+record the evidence, observer corrections, capacities, RSS and limits.
+
+Sprints 1–4 remain preserved, including [CI #82's Windows repair](stage8/CI82_WINDOWS_REPAIR.md),
+argument binding, numeric/text/collection APIs, application entry, static native
+admission, tooling and reload/GC/cleanup contracts. No Sprint 5 owner decision
+remains pending; broader task-record/ownership retirement remains deferred.
 
 **Hosted CI remains deferred until the end of Stage 8**, unless Boss explicitly
 authorizes an earlier run. Windows/macOS, hosted CI #82 Debug/Release execution
 and fresh actual editor-client verification remain pending. Linux local tests
 cannot establish those results. Stage 8 is not hosted locked.
 
-**Stopped after Sprint 4 for Wrench review. Sprints 5–6 remain future work.**
-No commits, pushes, branch/remote changes, hosted CI, publication or website work
-occurred. Root README is unchanged; documentation and future sprint prompts belong
-under `docs/` by default. Do not begin Sprint 5 without Boss authorization.
+**Stopped after Sprint 5 for Wrench review. Sprint 6 remains future work.**
+No commits, pushes, branches/remotes, hosted CI, publication or website work
+occurred. Root README is unchanged. Documentation and future prompts belong under
+`docs/` by default; do not begin Sprint 6 without Boss authorization.
 
 The research narrative below remains the pre-sprint snapshot. Its earlier
 missing-feature statements are superseded only by the delivered contracts and
@@ -340,32 +344,25 @@ package manager or full IO library. The historical research remains in
 
 ## Sprint: long-running async resource readiness
 
-**Objective:** determine and, if material, reduce retained completed-work memory
-without weakening task/cleanup/root/generation safety. This is the strongest known
-resource concern, not a reproduced collector corruption defect.
+**Sprint 5 is locally verified; Wrench review pending.** Paired measurements of
+one long-lived root found material execution-frame/referent retention. The narrow
+implementation clears completed frame roots after native resume returns or the
+executor acquires worker completion; it never frees merely on a completion flag.
+Existing precise GC reclaims unreachable storage. Public Task/result/repeated-await,
+copy/identity/error/cancellation, ordering, cleanup and lease contracts are unchanged.
 
-Measure a root performing increasing batches of awaited tasks with significant
-frame/referenced data; separate live managed objects, rooted frames, task records,
-Runtime metadata and process RSS. Existing `Scope::tasks` owns completed records
-until root teardown, and repeated awaits are supported. Establish when result,
-awaiters, cancellation/group state and generation leases can safely retire.
+[The contract](STAGE8_ASYNC_RETENTION.md) records the ownership proof;
+[acceptance](stage8/SPRINT5_ACCEPTANCE.md) records 459/459 final local suites, both
+1 MiB gates, normal/O2 JIT/linked AOT and 32 paired measurement processes. At 512
+async children plus a sentinel, post-GC reachable payload fell from 34,890,840 to
+10,944 bytes. Runtime catalog counts settle after lazy admission; RSS and allocator
+capacity are reported separately and are not live-memory bounds.
 
-Engineering should release only what a concrete ownership proof permits. A task
-handle/owner change needs Boss review if required; do not replace the scheduler,
-GC or native owner model merely to reduce RSS. If measurement does not show a
-material application problem, retain the documented limitation and defer changes.
-
-**Tests/acceptance:** repeated/multiple awaits, success/error/cancel, nested groups,
-defer/with, worker return, suspension during reload and forced GC remain correct.
-Observable roots/frames decline at the approved safe point; active results/code
-stay alive. Include shutdown/failure and sanitizer regression suites, plus the
-same growth workload before/after. Do not use zero post-collection objects as a
-proxy for a total process-memory bound.
-
-Primary files: `src/runtime/async.cpp`, backend async activation/root lowering,
-Runtime coordination/leases and existing async lifecycle/integrated tests.
-Contract: ASYNC and managed/reload ownership contracts. **Exit:** a documented
-measured bound or a clearly scoped retained limitation with evidence.
+Task/result/Work records, null registered Handle slots and container capacities
+still scale within a root. Broader record/handle ownership changes remain deferred;
+no constant-memory or throughput claim, new scheduler/collector, public API or task
+ceiling follows from this change. Preserve held-worker/callback/frame and generation
+safety. Sprint 6 remains future work requiring separate Boss authorization.
 
 ## Priority C and D work
 

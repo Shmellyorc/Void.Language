@@ -13993,3 +13993,38 @@ Research/Wrench handoffs. Preserved CI #82 source/test hashes and the root READM
 No commits, pushes, branches, remotes, hosted CI or publication. Windows/macOS,
 actual editor clients and the end-of-Stage-8 hosted gate remain pending. Stop for
 Wrench review; Sprints 5–6 remain future work without further Boss authorization.
+
+
+## 20 October 2026 — Stage 8 Sprint 5 measured retirement; local acceptance
+
+Clean starting commit: `726b34b658f0d939b1da065acb4e9c735ddfa39d`. Measured
+increasing async/worker batches inside one root before modifying lifetime behavior.
+Canonical paired Release normal/O2 controls show 34,890,840 -> 10,944 post-GC
+managed payload bytes for 512 children plus a sentinel. Records/results remain:
+514 native Tasks and 419,424 Task bytes; RSS and allocator/catalog capacity are
+reported separately. This proves a material internal improvement, not a general
+bounded-memory scheduler or leak fix.
+
+Cleared only execution-frame Handle values after native resume returns or owner
+acquisition of worker completion. Completion callbacks themselves retain frames.
+Preserved Task/result/diagnostic/order/group/cancellation state, cleanup, native
+resources/callbacks and enclosing generation leases. Added host-only observations
+of existing Heap/catalog/Handle state and reproducible baseline/current JIT/AOT
+fixtures; no extra ownership registry, source task API or semantic policy change.
+No new owner decision was necessary.
+
+Final local Debug/Release/strict ASan+UBSan+leak CTest: **153/153 each (459/459)**;
+both complete 1 MiB frontend gates passed. Five new suites cover growth, repeated
+awaits, GC, and normal/O2 linked AOT; existing lifecycle/IR/parallel/integrated
+suites retain failure/cancel/cleanup/closing/reload/old-lease coverage. The initial
+5/10 focused run exposed observer assumptions about lazy schema admission, not a
+Runtime regression; corrected Release and Debug focused checks passed 5/5 each.
+Raw unsuccessful checks, canonical paired measurements and source/log hashes are
+preserved in [Sprint 5 acceptance](stage8/SPRINT5_ACCEPTANCE.md).
+
+Updated async/GC contracts, decisions, known limits, roadmap/approval ledger,
+central index and Keyboard/Research/Wrench handoffs under docs/. No root README,
+CI #82 repair, Git/remote state, hosted CI or publication changes. Windows/macOS
+and the end-of-Stage-8 hosted gate remain pending. Task/result/Work retention,
+null Handle registration and capacities remain documented. Stop for Wrench review;
+Sprint 6 requires separate Boss authorization.

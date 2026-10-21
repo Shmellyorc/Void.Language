@@ -632,6 +632,49 @@ if(BUILD_TESTING)
   add_test(NAME numeric_sprint2 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/numeric/sprint2.py"
     "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}")
   set_tests_properties(numeric_sprint2 PROPERTIES TIMEOUT 180)
+  option(VOID_RETENTION_BASELINE "Build optional Sprint 5 historical measurement control" OFF)
+  set(retention_variants current)
+  if(VOID_RETENTION_BASELINE)
+    # Optional local measurement only; ordinary/shallow builds need no Git history.
+    execute_process(COMMAND git show 726b34b658f0d939b1da065acb4e9c735ddfa39d:src/runtime/async.cpp
+      WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}" OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/sprint5-baseline-async.cpp" RESULT_VARIABLE retention_baseline_status)
+    if(NOT retention_baseline_status EQUAL 0)
+      message(FATAL_ERROR "Requested Sprint 5 baseline scheduler is unavailable")
+    endif()
+    list(APPEND retention_variants baseline)
+  endif()
+  foreach(retention_variant IN LISTS retention_variants)
+    add_executable(void_retention_${retention_variant} tests/stage8/sprint5/retention.cpp tests/native/probe.cpp tests/managed/probe.cpp
+      $<TARGET_OBJECTS:void_native_test_fixture> $<TARGET_OBJECTS:void_managed_test_abi>)
+    target_link_libraries(void_retention_${retention_variant} PRIVATE void_llvm void_cache_identity)
+    if(retention_variant STREQUAL "baseline")
+      set(retention_source "${CMAKE_CURRENT_BINARY_DIR}/sprint5-baseline-async.cpp")
+    else()
+      set(retention_source "${PROJECT_SOURCE_DIR}/src/runtime/async.cpp")
+    endif()
+    target_compile_definitions(void_retention_${retention_variant} PRIVATE VOID_ASYNC_IMPLEMENTATION="${retention_source}" VOID_RETENTION_VARIANT="${retention_variant}")
+  endforeach()
+  add_test(NAME async_retention_sprint5 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint5/measure.py"
+    --current "$<TARGET_FILE:void_retention_current>" --sources "${PROJECT_SOURCE_DIR}/tests/stage8/sprint5" --output "${CMAKE_CURRENT_BINARY_DIR}/sprint5-measurements")
+  set_tests_properties(async_retention_sprint5 PROPERTIES TIMEOUT 180)
+  foreach(retention_workload IN ITEMS growth workers)
+    foreach(retention_mode IN ITEMS normal optimized)
+      set(retention_object "${CMAKE_CURRENT_BINARY_DIR}/retention-${retention_workload}-${retention_mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+      add_custom_command(OUTPUT "${retention_object}" COMMAND void_retention_current --emit
+        "${PROJECT_SOURCE_DIR}/tests/stage8/sprint5/${retention_workload}.void" "${retention_object}" "${retention_mode}"
+        DEPENDS void_retention_current "${PROJECT_SOURCE_DIR}/tests/stage8/sprint5/${retention_workload}.void" VERBATIM)
+      set_source_files_properties("${retention_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+      add_executable(void_retention_aot_${retention_workload}_${retention_mode} tests/stage8/sprint5/retention.cpp tests/native/probe.cpp tests/managed/probe.cpp
+        $<TARGET_OBJECTS:void_native_test_fixture> $<TARGET_OBJECTS:void_managed_test_abi> "${retention_object}")
+      target_link_libraries(void_retention_aot_${retention_workload}_${retention_mode} PRIVATE void_llvm)
+      target_compile_definitions(void_retention_aot_${retention_workload}_${retention_mode} PRIVATE
+        VOID_ASYNC_IMPLEMENTATION="${PROJECT_SOURCE_DIR}/src/runtime/async.cpp" VOID_RETENTION_VARIANT="current" VOID_RETENTION_AOT=1
+        VOID_RETENTION_MODE="aot-${retention_mode}" VOID_RETENTION_WORKLOAD="${retention_workload}")
+      add_test(NAME async_retention_aot_${retention_workload}_${retention_mode} COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint5/measure.py"
+        --aot "$<TARGET_FILE:void_retention_aot_${retention_workload}_${retention_mode}>" --output "${CMAKE_CURRENT_BINARY_DIR}/sprint5-aot-${retention_workload}-${retention_mode}")
+      set_tests_properties(async_retention_aot_${retention_workload}_${retention_mode} PROPERTIES TIMEOUT 120)
+    endforeach()
+  endforeach()
   add_executable(void_sprint4_tests tests/stage8/sprint4.cpp)
   target_link_libraries(void_sprint4_tests PRIVATE void_llvm void_cache_identity)
   add_test(NAME lsp_sprint4 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/lsp_sprint4.py" "$<TARGET_FILE:voidls>")

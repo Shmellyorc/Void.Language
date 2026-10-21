@@ -1,0 +1,119 @@
+{
+  "date": "2026-10-20 America/Los_Angeles",
+  "scope": "Stage 8 Sprint 5 only",
+  "starting_commit": "726b34b658f0d939b1da065acb4e9c735ddfa39d",
+  "outcome": "measured material retention and implemented quiescent execution-frame root retirement",
+  "status": "locally verified; Wrench review pending; not hosted locked",
+  "llvm": "19.1.7",
+  "platform": "Linux x86-64",
+  "configurations": [
+    {
+      "configuration": "debug",
+      "directory": "build/debug",
+      "build_type": "Debug",
+      "passed": 153,
+      "failed": 0,
+      "total": 153,
+      "seconds": 520.47,
+      "command": "ctest --test-dir build/debug --output-on-failure -j 2",
+      "log": "build/stage8-sprint5/evidence/debug-ctest.log",
+      "sha256": "857115bb6e9746d36b9fd64a052eed26b48d4f917c75edba93432e07e0cd29a6"
+    },
+    {
+      "configuration": "release",
+      "directory": "build/ci-release",
+      "build_type": "Release",
+      "passed": 153,
+      "failed": 0,
+      "total": 153,
+      "seconds": 232.69,
+      "command": "ctest --test-dir build/ci-release --output-on-failure -j 2",
+      "log": "build/stage8-sprint5/evidence/release-ctest.log",
+      "sha256": "b08838d459da80d912371f211431bb1db7f67de7350996c993a1256ac4b0ebca"
+    },
+    {
+      "configuration": "sanitizer",
+      "directory": "build/ci-sanitizers",
+      "build_type": "RelWithDebInfo / strict ASan+UBSan+leaks",
+      "passed": 153,
+      "failed": 0,
+      "total": 153,
+      "seconds": 460.39,
+      "command": "ctest --test-dir build/ci-sanitizers --output-on-failure -j 2",
+      "log": "build/stage8-sprint5/evidence/sanitizer-ctest.log",
+      "sha256": "7cf094d976e63fe923c6bc9a15eedfbc416674dcbf1a725d484cd6f16a806bbd"
+    }
+  ],
+  "final_unique_configuration_suite_outcomes": {
+    "passed": 459,
+    "failed": 0,
+    "total": 459
+  },
+  "one_mib_frontend_gates": [
+    {
+      "configuration": "debug",
+      "stack_bytes": 1048576,
+      "exit_code": 0,
+      "working_directory": "/tmp",
+      "log": "build/stage8-sprint5/evidence/debug-1mib.log",
+      "sha256": "78ab52ee80b779a44dbb34cb57904b25f68d908cca2f5e65552234f207f3d4b9"
+    },
+    {
+      "configuration": "release",
+      "stack_bytes": 1048576,
+      "exit_code": 0,
+      "working_directory": "/tmp/sprint5-release-frontend",
+      "log": "build/stage8-sprint5/evidence/release-1mib.log",
+      "sha256": "78ab52ee80b779a44dbb34cb57904b25f68d908cca2f5e65552234f207f3d4b9"
+    }
+  ],
+  "canonical_measurement_processes": 32,
+  "measurement_manifest": "sprint5-measurement-manifest.json",
+  "measurements": "sprint5-measurements.csv",
+  "source_hashes": "sprint5-source-hashes.json",
+  "initial_focused": {
+    "passed": 5,
+    "failed": 5,
+    "total": 10,
+    "reason": "Observer incorrectly compared pre-first-use catalog counts with lazily admitted schemas; Runtime safety/semantics did not fail",
+    "log": "build/stage8-sprint5/evidence/focused-initial.log",
+    "sha256": "3cd1def10fca7e94ce3aa4573c31ce95bba9dfa7fc5bd616b9e0d623a89b2b1b"
+  },
+  "corrected_focused_release": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "log": "build/stage8-sprint5/evidence/focused-corrected.log",
+    "sha256": "a761d8f07716640d825970023827e784d32229324b43ebe7ef3819d3f44677db"
+  },
+  "corrected_focused_debug": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "log": "build/stage8-sprint5/evidence/debug-focused.log",
+    "sha256": "a22f222aee55c01661d3add8f45a802de76c1ca304218c6ba6cda3c31036b6bf"
+  },
+  "strict_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "outside_ptrace": true,
+    "suppressions_added": false,
+    "llvm_generated_code_automatically_instrumented": false
+  },
+  "preserved": {
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "src/frontend/source.cpp": "4900d157d7a84c42f8aeea608c9e6b4c7e9da02679cad7b0fdbda074fa4044e4",
+    "tests/lsp/stage8.py": "258b47a90c5727317342ae25c37a8d1a3d2bfa749073302d3387a780619cc62a"
+  },
+  "remaining_limitations": [
+    "Task/result/Work records remain root-scope owned",
+    "Null Handle registrations and container/allocator capacity remain",
+    "No constant-memory root or scheduler throughput claim",
+    "Catalog counts are not a census of every immutable snapshot allocation",
+    "RSS is not live payload",
+    "Windows/macOS and hosted verification pending"
+  ],
+  "hosted_ci_run": false,
+  "git_mutations": false,
+  "sprint6_started": false
+}

@@ -49,35 +49,41 @@ review and hosted locks. Never mark work implemented or locked without verificat
 
 ## Current stage and acceptance — 20 October 2026
 
-Stage 8 Sprint 4 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
-Final consolidated Debug, Release and strict ASan/UBSan/leak runs passed
-**148/148 each: 444/444 unique configuration/suite outcomes**. Both complete
-1 MiB frontend gates passed. See [the application/static-provider contract](STAGE8_APPLICATION_NATIVE.md)
-and [Sprint 4 acceptance](stage8/SPRINT4_ACCEPTANCE.md) for exact evidence,
-preliminary failures/corrections, source hashes and limits.
+Stage 8 Sprint 5 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
+Baseline measurements justified retiring completed execution-frame roots after
+native resume returns or acquired worker completion. The 512-child async workload
+plus sentinel dropped from **34,890,840 to 10,944 reachable payload bytes after GC**;
+native Task/result/Work records remain root-scope owned. No constant-memory claim
+or public task/ownership semantic change is made.
 
-All three Sprint 4 design decisions are approved in [DECISIONS.md](DECISIONS.md);
-no Sprint 4 owner decision remains pending. The bounded sink requires explicit
-C++ admission, one provider descriptor per graph; CLI/LSP imports grant no trust.
-Sprints 1–3 remain preserved, including [CI #82's Windows repair](stage8/CI82_WINDOWS_REPAIR.md),
-argument binding, numeric prelude, UTF-8/collections, tooling and reload contracts.
-Prior failures and verification records remain historical evidence.
+Final consolidated Debug, Release and strict ASan/UBSan/leak runs passed
+**153/153 each: 459/459 unique configuration/suite outcomes**. Both complete
+1 MiB frontend gates passed. [Contract and ownership proof](STAGE8_ASYNC_RETENTION.md),
+[Sprint 5 acceptance](stage8/SPRINT5_ACCEPTANCE.md) and the paired measurement CSV
+record the evidence, observer corrections, capacities, RSS and limits.
+
+Sprints 1–4 remain preserved, including [CI #82's Windows repair](stage8/CI82_WINDOWS_REPAIR.md),
+argument binding, numeric/text/collection APIs, application entry, static native
+admission, tooling and reload/GC/cleanup contracts. No Sprint 5 owner decision
+remains pending; broader task-record/ownership retirement remains deferred.
 
 **Hosted CI remains deferred until the end of Stage 8**, unless Boss explicitly
 authorizes an earlier run. Windows/macOS, hosted CI #82 Debug/Release execution
 and fresh actual editor-client verification remain pending. Linux local tests
 cannot establish those results. Stage 8 is not hosted locked.
 
-**Stopped after Sprint 4 for Wrench review. Sprints 5–6 remain future work.**
-No commits, pushes, branch/remote changes, hosted CI, publication or website work
-occurred. Root README is unchanged; documentation and future sprint prompts belong
-under `docs/` by default. Do not begin Sprint 5 without Boss authorization.
+**Stopped after Sprint 5 for Wrench review. Sprint 6 remains future work.**
+No commits, pushes, branches/remotes, hosted CI, publication or website work
+occurred. Root README is unchanged. Documentation and future prompts belong under
+`docs/` by default; do not begin Sprint 6 without Boss authorization.
 
 ## Engineering contracts, decisions and handoffs
 
 - [Language completeness roadmap](LANGUAGE_COMPLETENESS_ROADMAP.md),
   [pre-implementation research audit](LANGUAGE_COMPLETENESS_AUDIT.md)
   and [owner approvals and pending decisions](LANGUAGE_COMPLETENESS_APPROVALS.md).
+- [Stage 8 async retention](STAGE8_ASYNC_RETENTION.md),
+  [Sprint 5 local evidence](stage8/SPRINT5_ACCEPTANCE.md).
 - [Stage 8 applications and static providers](STAGE8_APPLICATION_NATIVE.md),
   [Sprint 4 local evidence](stage8/SPRINT4_ACCEPTANCE.md).
 - [Stage 8 UTF-8 text and recoverable collections](STAGE8_TEXT_COLLECTIONS.md),

@@ -123,6 +123,9 @@ struct Scope {
             if(failure.message){task->failure.assign(failure);task->outcome=task->work->cancelled?Task::cancelled:Task::failed;if(task->outcome==Task::cancelled)task->failure.value={};}
             else{std::int32_t complete=1;std::memcpy(task->address,&complete,sizeof(complete));}
             failed_child(*task);
+            // The acquire handoff proves the worker has returned from resume,
+            // removed its scratch roots and stopped accessing this frame.
+            task->frame.reset(nullptr);
         }
     }
     void wait_work(){
@@ -317,6 +320,11 @@ std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::si
             if(result.message){if(next->outcome==Task::failed)next->failure.assign(result);else {if(next->cancel_observed)next->outcome=Task::cancelled;else{next->failure.assign(result);next->outcome=Task::failed;}}next->state=Task::finished;}
             else if(next->state==Task::running){result.message="Async activation returned without completion or suspension";next->failure.assign(result);next->outcome=Task::failed;next->state=Task::finished;}
             s.failed_child(*next);s.current=nullptr;
+            // Completion alone is insufficient: generated return/cleanup still
+            // uses the activation. Retire its root only after resume returned.
+            // Result handles, diagnostics, ordering records and the enclosing
+            // generation lease remain intact for repeated awaits and drains.
+            if(next->state==Task::finished)next->frame.reset(nullptr);
         }
         const vd::RuntimeFailure* outcome=initial.message?&root_failure.value:root && root->failure.value.message?&root->failure.value:nullptr;
         if(!outcome)for(auto& task:s.tasks)if(task->failure.value.message && !task->observed){outcome=&task->failure.value;break;}

@@ -1,0 +1,29 @@
+{
+  "baseline_commit": "726b34b658f0d939b1da065acb4e9c735ddfa39d",
+  "configuration": "Release / Linux x86-64 / LLVM 19.1.7",
+  "canonical_process_measurements": 32,
+  "batch_sizes": [
+    0,
+    8,
+    32,
+    128
+  ],
+  "batches_per_root": 4,
+  "modes": [
+    "normal",
+    "optimized"
+  ],
+  "workloads": [
+    "growth",
+    "workers"
+  ],
+  "data": "sprint5-measurements.csv",
+  "raw_results": "build/stage8-sprint5/final-paired/results.json",
+  "rss": "Linux proc statm resident pages times page size; process-wide and allocator-dependent; not a live-memory bound",
+  "lease_reference_count": "Includes one temporary shared_ptr acquired by the observer; not a public ABI guarantee",
+  "catalog_note": "Schemas are admitted lazily; compare settled group exits, not the pre-first-use snapshot",
+  "baseline_async_sha256": "bcaedbf548bfdb581cac3678af3875b6fc1e846cd3f90a427182bb2508891f52",
+  "current_async_sha256": "7f8ab1f9b7be840805a7b87dccf03a84ed841a0952b10d633050ffc45b63febe",
+  "csv_sha256": "936ebef005f0887e5c9b54b97f92945eba11ebe1723244bb275b352bb67a72ac",
+  "raw_results_sha256": "9d6f8fd1b298a54e22fb7ad4bc64e95baae10e6d62e26447a8f70640825aaf6c"
+}

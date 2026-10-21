@@ -1,5 +1,26 @@
 # Stage 6 Deliveries 1–5: async, lifecycle, workers and native integration
 
+## Stage 8 Sprint 5 completed-frame lifetime
+
+The [Sprint 5 contract](STAGE8_ASYNC_RETENTION.md) supersedes historical blanket
+root-duration execution-frame retention below. After measurements established
+material growth, the scheduler now clears a completed execution-frame root only
+after its native resume returns, or after the owner acquires worker completion.
+The existing GC then reclaims the frame and frame-only referents. Completion
+notification alone never triggers retirement. Task/result records and diagnostics
+remain available for repeated awaits, identity/copy behavior and ordered failure
+handling. Active/suspended/joining frames remain rooted. Native registrations and
+the enclosing code lease retain their existing independent lifetimes.
+
+This does not bound total root memory: Task/Work records, result objects, null
+Handle registrations and allocator capacity can still grow with total work.
+[Acceptance and measurements](stage8/SPRINT5_ACCEPTANCE.md) distinguish actual
+verification from approvals and remaining platform/owner gates.
+
+
+**Historical Deliveries 1–5 context:** the lock/planning statements below describe
+that delivery era; [the docs index](README.md) records current Stage 8 status.
+
 **Locked baseline:** Delivery 4, `619331ccb83227419081bc93cf47bd3a0b8b64cc`,
 [CI #76](https://github.com/Shmellyorc/Void.Language/actions/runs/39359190869),
 owner-confirmed 7/7 jobs, 131/131 each (917/917). Delivery 5 integrated acceptance
@@ -154,8 +175,10 @@ waiting tasks resume through reached cleanup. Publication, waiting, joining and
 single completion remain checked executor transitions.
 
 The adapter drains all started activations before returning, even after cancellation
-or failure. All precise roots, Runtime metadata and the enclosing native code
-lease remain retained until drain and cleanup finish. Runtime close rejects new
+or failure. Active-frame/result/callback roots and Runtime metadata remain protected through
+their required cleanup, and the enclosing native code lease remains until root
+drain. Completed execution-frame roots may retire earlier only at Sprint 5's
+proven quiescent points. Runtime close rejects new
 admissions; already active work follows checked failure/cleanup if further task
 allocation is rejected. Closing neither force-terminates a body nor invents public
 cancellation/shutdown APIs.
@@ -188,9 +211,10 @@ address-significant generation token rejects enqueue from a different generation
 through trusted native reentry. Compatible body reload publishes a new root while
 old roots finish with their original code and Runtime metadata. Old generations
 retire after the last enclosing lease releases. No native code address is stored
-in managed frame descriptors. Root-scope storage currently retains completed task
-records and heap frames until drain finishes; long-lived roots can therefore grow
-with total created work. More eager reclamation is future measured work.
+in managed frame descriptors. Root-scope storage retains task/result records until drain finishes; long-lived
+roots can still grow with total created work. Sprint 5 retires completed execution
+frames at the proven quiescent points described above; broader record/result
+retirement remains deferred.
 
 Normal/O2 JIT and AOT fixtures cover enqueue ordering, arguments, receiver identity,
 managed/nullable values, results, generic forwarding, fixed copies, large arrays,
@@ -254,8 +278,8 @@ joins before the adapter returns. Its linked admission queue uses existing Task
 records and is FIFO; one worker executes admissions in order. With several workers,
 start/finish order and fairness are not promised. Queue/storage growth is limited
 by available memory and checked allocation failure; no arbitrary source task cap
-or queue-full cancellation policy is introduced. Existing root-scope retention of
-completed records/frames remains unchanged.
+or queue-full cancellation policy is introduced. Root-scope record/result retention remains unchanged. Sprint 5 releases worker
+execution-frame roots only after the owning executor acquires completion.
 
 Cancellation is an atomic request. Explicit worker checkpoints in synchronous
 CFG loops/helpers unwind through existing reached cleanup. `vd_gc_poll()` remains

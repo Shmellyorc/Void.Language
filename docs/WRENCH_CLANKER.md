@@ -34,29 +34,33 @@ Boss retains Git and hosted acceptance control.
 
 ## Current Stage 8 handoff — 20 October 2026
 
-Stage 8 Sprint 4 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
-Final consolidated Debug, Release and strict ASan/UBSan/leak runs passed
-**148/148 each: 444/444 unique configuration/suite outcomes**. Both complete
-1 MiB frontend gates passed. See [the application/static-provider contract](STAGE8_APPLICATION_NATIVE.md)
-and [Sprint 4 acceptance](stage8/SPRINT4_ACCEPTANCE.md) for exact evidence,
-preliminary failures/corrections, source hashes and limits.
+Stage 8 Sprint 5 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
+Baseline measurements justified retiring completed execution-frame roots after
+native resume returns or acquired worker completion. The 512-child async workload
+plus sentinel dropped from **34,890,840 to 10,944 reachable payload bytes after GC**;
+native Task/result/Work records remain root-scope owned. No constant-memory claim
+or public task/ownership semantic change is made.
 
-All three Sprint 4 design decisions are approved in [DECISIONS.md](DECISIONS.md);
-no Sprint 4 owner decision remains pending. The bounded sink requires explicit
-C++ admission, one provider descriptor per graph; CLI/LSP imports grant no trust.
-Sprints 1–3 remain preserved, including [CI #82's Windows repair](stage8/CI82_WINDOWS_REPAIR.md),
-argument binding, numeric prelude, UTF-8/collections, tooling and reload contracts.
-Prior failures and verification records remain historical evidence.
+Final consolidated Debug, Release and strict ASan/UBSan/leak runs passed
+**153/153 each: 459/459 unique configuration/suite outcomes**. Both complete
+1 MiB frontend gates passed. [Contract and ownership proof](STAGE8_ASYNC_RETENTION.md),
+[Sprint 5 acceptance](stage8/SPRINT5_ACCEPTANCE.md) and the paired measurement CSV
+record the evidence, observer corrections, capacities, RSS and limits.
+
+Sprints 1–4 remain preserved, including [CI #82's Windows repair](stage8/CI82_WINDOWS_REPAIR.md),
+argument binding, numeric/text/collection APIs, application entry, static native
+admission, tooling and reload/GC/cleanup contracts. No Sprint 5 owner decision
+remains pending; broader task-record/ownership retirement remains deferred.
 
 **Hosted CI remains deferred until the end of Stage 8**, unless Boss explicitly
 authorizes an earlier run. Windows/macOS, hosted CI #82 Debug/Release execution
 and fresh actual editor-client verification remain pending. Linux local tests
 cannot establish those results. Stage 8 is not hosted locked.
 
-**Stopped after Sprint 4 for Wrench review. Sprints 5–6 remain future work.**
-No commits, pushes, branch/remote changes, hosted CI, publication or website work
-occurred. Root README is unchanged; documentation and future sprint prompts belong
-under `docs/` by default. Do not begin Sprint 5 without Boss authorization.
+**Stopped after Sprint 5 for Wrench review. Sprint 6 remains future work.**
+No commits, pushes, branches/remotes, hosted CI, publication or website work
+occurred. Root README is unchanged. Documentation and future prompts belong under
+`docs/` by default; do not begin Sprint 6 without Boss authorization.
 
 Read [the approval ledger](LANGUAGE_COMPLETENESS_APPROVALS.md),
 [roadmap](LANGUAGE_COMPLETENESS_ROADMAP.md), [Sprint 1 contract](STAGE8_DISCOVERY.md),
@@ -894,18 +898,16 @@ These are not surprise "bugs" that must be fixed immediately. They are documente
 
 ## 13. Current handoff prompt
 
-Read `docs/README.md` first. Review Stage 8 Sprint 4 using
-`docs/STAGE8_APPLICATION_NATIVE.md`, `docs/stage8/SPRINT4_ACCEPTANCE.md`, the
-approval ledger and latest work log. Verify actual evidence before promoting
-status. Preserve Sprints 1–3, including CI #82's Windows repair. Check application
-entry/status/cache/reload and the independent static sink's admission, resource,
-string, callback, GC and lease boundaries. Research investigates concrete new
-questions; no Sprint 4 owner choice remains pending. Keep Sprints 5–6 future work.
-Update documentation and permanent handoffs under `docs/` by default; modify root
-README only with separate explicit Boss authorization. No commits, pushes,
-branches, remote changes, hosted CI or publication. The seven-job hosted gate is
-deferred to Stage 8's end. Stop for Boss/Wrench review; do not begin Sprint 5.
-Minimal output, KISS, DRY. No local result establishes a hosted lock.
+Read `docs/README.md` first. Review Stage 8 Sprint 5 using
+`docs/STAGE8_ASYNC_RETENTION.md`, `docs/stage8/SPRINT5_ACCEPTANCE.md`, paired CSV,
+results/source hashes and latest work log. Verify the quiescent frame-retirement
+proof, repeated results, native records/capacities, held workers/GC, ordered failure
+cleanup and old-generation leases. Preserve Sprints 1–4 and CI #82's repair.
+Broader task/result/Handle retirement is not delivered; no constant-memory/RSS
+bound is claimed. Research investigates concrete new questions. Update docs and
+handoffs under `docs/`; root README needs separate explicit Boss authorization.
+No commits, pushes, branches/remotes, hosted CI, publication or Sprint 6. Hosted CI
+stays deferred to Stage 8's end. Stop for Wrench/Boss review. Minimal output.
 
 ### Historical Sprint 1 prompt (superseded)
 

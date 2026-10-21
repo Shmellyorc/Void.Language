@@ -7,6 +7,11 @@
 #include <unordered_set>
 #include <stdexcept>
 namespace vd {
+Heap::MemorySnapshot Heap::memory_snapshot() const {
+    std::size_t bytes=0;
+    for(const auto& [address,object]:objects_) {(void)address;bytes+=object.references.bytes();}
+    return {objects_.size(),bytes,objects_.bucket_count(),roots_.capacity()};
+}
 Heap::~Heap() { for (auto& [p, o] : objects_) { (void)o; destroy(p,o); } }
 void* Heap::allocate(const TypeLayout& layout) {
     return allocate_validated(layout,LegacyReferenceMap::validate(layout.size,layout.references));

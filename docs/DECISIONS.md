@@ -1011,3 +1011,25 @@ Boss answered all three checkpoint questions before implementation:
   admission, dynamic loading, arbitrary pointers or new worker privileges.
 
 These are approved semantics, not implementation or acceptance evidence.
+
+
+## Stage 8 Sprint 5 internal retirement decision — 20 October 2026
+
+Boss authorized measurement and a justified internal improvement, with approval
+required only for changes to public task/ownership semantics. Paired measurements
+found 34,890,840 managed payload bytes retained after GC for 512 awaited children
+plus a sentinel, versus 10,944 bytes with completed execution-frame retirement.
+Normal/O2 measurements used the identical original/current scheduler harness.
+
+Clear `Task::frame` only after executor resume returns, or after acquiring worker
+completion and copying its outcome. Reporting completion alone is insufficient.
+Keep the Task/result handle, owned diagnostics, order/group/cancellation records,
+Work storage and enclosing generation lease unchanged. Existing precise GC frees
+unreachable frame storage. This changes no public task handle, result/copy/identity,
+error/cancellation, resource or cleanup policy, so no new language-policy choice
+was introduced. The [Sprint 5 contract](STAGE8_ASYNC_RETENTION.md) records the proof;
+acceptance remains a separate verification record.
+
+Task/result/Work records and null registered Handle slots still grow within a
+long-lived root; broader ownership/handle retirement remains deferred and would
+require renewed review. RSS and reusable capacity are not live managed payload.

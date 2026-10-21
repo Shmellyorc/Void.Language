@@ -1,0 +1,91 @@
+use "/native_bridge.void" as bridge
+value struct bulk:
+    field_0: i64 = 0
+    field_1: i64 = 0
+    field_2: i64 = 0
+    field_3: i64 = 0
+    field_4: i64 = 0
+    field_5: i64 = 0
+    field_6: i64 = 0
+    field_7: i64 = 0
+    field_8: i64 = 0
+    field_9: i64 = 0
+    field_10: i64 = 0
+    field_11: i64 = 0
+    field_12: i64 = 0
+    field_13: i64 = 0
+    field_14: i64 = 0
+    field_15: i64 = 0
+    field_16: i64 = 0
+    field_17: i64 = 0
+    field_18: i64 = 0
+    field_19: i64 = 0
+    field_20: i64 = 0
+    field_21: i64 = 0
+    field_22: i64 = 0
+    field_23: i64 = 0
+    field_24: i64 = 0
+    field_25: i64 = 0
+    field_26: i64 = 0
+    field_27: i64 = 0
+    field_28: i64 = 0
+    field_29: i64 = 0
+    field_30: i64 = 0
+    field_31: i64 = 0
+    field_32: i64 = 0
+    field_33: i64 = 0
+    field_34: i64 = 0
+    field_35: i64 = 0
+    field_36: i64 = 0
+    field_37: i64 = 0
+    field_38: i64 = 0
+    field_39: i64 = 0
+    field_40: i64 = 0
+    field_41: i64 = 0
+    field_42: i64 = 0
+    field_43: i64 = 0
+    field_44: i64 = 0
+    field_45: i64 = 0
+    field_46: i64 = 0
+    field_47: i64 = 0
+    field_48: i64 = 0
+    field_49: i64 = 0
+    field_50: i64 = 0
+    field_51: i64 = 0
+    field_52: i64 = 0
+    field_53: i64 = 0
+    field_54: i64 = 0
+    field_55: i64 = 0
+    field_56: i64 = 0
+    field_57: i64 = 0
+    field_58: i64 = 0
+    field_59: i64 = 0
+    field_60: i64 = 0
+    field_61: i64 = 0
+    field_62: i64 = 0
+    field_63: i64 = 0
+struct data:
+    items: [i32, 4096]
+async func child(input: bulk, value: i32) -> i32:
+    var storage = data()
+    storage.items[0] = value
+    if value == -999:
+        var checkpoint = bridge.scalar_i32(-2)
+    return storage.items[0] + (input.field_0 as i32)
+async func entry(count: i32) -> i32:
+    var input = bulk()
+    var initial = bridge.scalar_i32(0)
+    var sentinel = await child(input, -999)
+    if sentinel != -999:
+        return 91
+    for batch in 1..4:
+        with tasks.group() as jobs:
+            for i in 0..<count:
+                var task = child(input, i)
+                var first = await task
+                var again = await task
+                if first != i or again != first:
+                    return 90
+            var checkpoint = bridge.scalar_i32(batch * count)
+        var closed = bridge.scalar_i32(-1)
+    return 7

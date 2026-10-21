@@ -110,6 +110,12 @@ public:
     std::shared_ptr<const NominalDescriptor> descriptor(std::string_view) const;
     std::int64_t dynamic_type(void*,std::span<const char* const>) const;
     Snapshot snapshot() const;
+    struct MemorySnapshot {
+        Heap::MemorySnapshot heap;
+        std::size_t types,schemas,witnesses,handles,handle_capacity,participants,callbacks;
+    };
+    MemorySnapshot memory_snapshot() const; // Explicit host observation, never a source task API.
+
     bool wait_for_request(std::chrono::milliseconds);
     void async_worker_limit(unsigned); // Host configuration, 1..64, before root admission.
     unsigned async_worker_limit() const;

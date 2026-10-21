@@ -3,29 +3,33 @@
 
 ## Stage 8 current disposition — 20 October 2026
 
-Stage 8 Sprint 4 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
-Final consolidated Debug, Release and strict ASan/UBSan/leak runs passed
-**148/148 each: 444/444 unique configuration/suite outcomes**. Both complete
-1 MiB frontend gates passed. See [the application/static-provider contract](STAGE8_APPLICATION_NATIVE.md)
-and [Sprint 4 acceptance](stage8/SPRINT4_ACCEPTANCE.md) for exact evidence,
-preliminary failures/corrections, source hashes and limits.
+Stage 8 Sprint 5 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
+Baseline measurements justified retiring completed execution-frame roots after
+native resume returns or acquired worker completion. The 512-child async workload
+plus sentinel dropped from **34,890,840 to 10,944 reachable payload bytes after GC**;
+native Task/result/Work records remain root-scope owned. No constant-memory claim
+or public task/ownership semantic change is made.
 
-All three Sprint 4 design decisions are approved in [DECISIONS.md](DECISIONS.md);
-no Sprint 4 owner decision remains pending. The bounded sink requires explicit
-C++ admission, one provider descriptor per graph; CLI/LSP imports grant no trust.
-Sprints 1–3 remain preserved, including [CI #82's Windows repair](stage8/CI82_WINDOWS_REPAIR.md),
-argument binding, numeric prelude, UTF-8/collections, tooling and reload contracts.
-Prior failures and verification records remain historical evidence.
+Final consolidated Debug, Release and strict ASan/UBSan/leak runs passed
+**153/153 each: 459/459 unique configuration/suite outcomes**. Both complete
+1 MiB frontend gates passed. [Contract and ownership proof](STAGE8_ASYNC_RETENTION.md),
+[Sprint 5 acceptance](stage8/SPRINT5_ACCEPTANCE.md) and the paired measurement CSV
+record the evidence, observer corrections, capacities, RSS and limits.
+
+Sprints 1–4 remain preserved, including [CI #82's Windows repair](stage8/CI82_WINDOWS_REPAIR.md),
+argument binding, numeric/text/collection APIs, application entry, static native
+admission, tooling and reload/GC/cleanup contracts. No Sprint 5 owner decision
+remains pending; broader task-record/ownership retirement remains deferred.
 
 **Hosted CI remains deferred until the end of Stage 8**, unless Boss explicitly
 authorizes an earlier run. Windows/macOS, hosted CI #82 Debug/Release execution
 and fresh actual editor-client verification remain pending. Linux local tests
 cannot establish those results. Stage 8 is not hosted locked.
 
-**Stopped after Sprint 4 for Wrench review. Sprints 5–6 remain future work.**
-No commits, pushes, branch/remote changes, hosted CI, publication or website work
-occurred. Root README is unchanged; documentation and future sprint prompts belong
-under `docs/` by default. Do not begin Sprint 5 without Boss authorization.
+**Stopped after Sprint 5 for Wrench review. Sprint 6 remains future work.**
+No commits, pushes, branches/remotes, hosted CI, publication or website work
+occurred. Root README is unchanged. Documentation and future prompts belong under
+`docs/` by default; do not begin Sprint 6 without Boss authorization.
 
 VSCodium, new Windows/macOS editor combinations and clean-machine portability
 remain unverified. CI #82 Windows execution is deferred, not silently counted as
@@ -115,7 +119,7 @@ See the [canonical status summary](DEVELOPMENT_STRATEGY.md#current-implementatio
 - Stage 4 is hosted-locked at CI #68; see ADVANCED_LANGUAGE.md and WORK_LOG.md for validated behavior. Generic enums, unit/void result payload syntax, module-time patterns and module-time bound receiver allocation are outside the delivered subset. Readonly callback-result authority is conservative. Pop/get still await exact signatures/error types. Missing slice endpoints/views, string indexing/interpolation/formatting, general shared-memory parallel execution and general managed FFI remain future work; bounded value-only source spawn is hosted-accepted at CI #75. Native async activation has the bounded Delivery 1 implementation described in ASYNC.md; Delivery 1 is owner-confirmed hosted-accepted at CI #73; Delivery 2 is hosted-accepted at CI #74.
 - Root lifetimes remain conservative to function exit; collection is coordinated, precise and nonmoving, not concurrent collection or a production performance certification. Metadata and executable retirement retain existing contracts.
 - LSP completion/hover/rename/formatting and package discovery remain deferred. Stage 5 is hosted-locked at `4627687b` / [CI #70](https://github.com/Shmellyorc/Void.Language/actions/runs/39193640484), 82/82 suites in all seven configurations. Stage 4 retains its CI #68 historical lock.
-- [STAGE6_PROPOSAL.md](STAGE6_PROPOSAL.md) preserves the approved five-delivery roadmap. Delivery 1 implements ordinary async functions, managed receivers, await and an explicit owning root adapter; see [ASYNC.md](ASYNC.md) for restrictions and local acceptance. Delivery 2 cooperative cancellation/groups and Delivery 3 value-only parallel spawn are hosted accepted at CI #74/#75. Delivery 4 adds the bounded static fixture documented in NATIVE_LIBRARIES.md; general parallel sharing/native libraries, public cancellation recovery and an async CLI remain deferred. Completed task records/frames remain rooted until the adapter finishes draining, so long-lived roots can retain substantial memory. Existing GC coordination does not serialize arbitrary application writes.
+- [STAGE6_PROPOSAL.md](STAGE6_PROPOSAL.md) preserves the approved five-delivery roadmap. Delivery 1 implements ordinary async functions, managed receivers, await and an explicit owning root adapter; see [ASYNC.md](ASYNC.md) for restrictions and local acceptance. Delivery 2 cooperative cancellation/groups and Delivery 3 value-only parallel spawn are hosted accepted at CI #74/#75. Delivery 4 adds the bounded static fixture documented in NATIVE_LIBRARIES.md; general parallel sharing/native libraries, public cancellation recovery and an async CLI remain deferred. Sprint 5 releases completed execution-frame roots after native return/acquired worker completion; Task/result/Work records and null Handle registrations remain until root drain, so long-lived roots still retain memory proportional to created work. See STAGE8_ASYNC_RETENTION.md for measurements and limits. Existing GC coordination does not serialize arbitrary application writes.
 
 - Optional persistent Debug caching is hosted-accepted at CI #70; see STAGE5_CACHE_PROPOSAL.md. Windows persistence still bypasses safely because private ACL/path publication is not established; CI verifies fallback, not Windows disk reuse. Builds using unidentified shared LLVM compiler libraries also bypass. macOS cache suites and Windows fallback passed hosted verification. Automatic watching, per-function caching, automatic eviction and remote/shared caches are not implemented. Corrupt entries remain misses until the disposable cache is removed.
 

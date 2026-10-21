@@ -49,6 +49,9 @@ public:
     std::string_view nominal_identity(void* object) const;
     std::string_view string_bytes(void* object) const;
     std::size_t size() const { return objects_.size(); }
+    struct MemorySnapshot {std::size_t objects,payload_bytes,buckets,root_capacity;};
+    MemorySnapshot memory_snapshot() const; // Host diagnostics; excludes allocator overhead.
+
     void add_root(void** slot);
     void remove_root(void** slot);
     void store(void* object, std::size_t offset, void* value);
