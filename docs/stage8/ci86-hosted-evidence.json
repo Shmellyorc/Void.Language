@@ -1,0 +1,12 @@
+{
+  "run_id": 39595103500,
+  "job_id": 119205355324,
+  "local_baseline": "58384781c0e3a544ca081b5abd2f8032646b5793",
+  "compiler_summary": [
+    "2026-10-21T12:06:25.8124968Z 100% tests passed, 0 tests failed out of 156\r",
+    "2026-10-21T12:06:25.8125388Z Total Test time (real) = 560.09 sec\r"
+  ],
+  "editor_failure_excerpt": "Editor test failure: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\r\n2026-10-21T12:07:29.5985682Z + actual - expected\r\n2026-10-21T12:07:29.5985794Z \r\n2026-10-21T12:07:29.5987194Z + 'C:/Users/runneradmin/AppData/Local/Temp/VOID editor é😀 p25puK/project space # %/worker space.void'\r\n2026-10-21T12:07:29.5988931Z - 'C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\VOID editor é😀 p25puK\\\\project space # %\\\\worker space.void'\r\n2026-10-21T12:07:29.5989521Z \r\n2026-10-21T12:07:29.5989872Z AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\r\n2026-10-21T12:07:29.5990955Z + actual - expected\r\n2026-10-21T12:07:29.5991108Z \r\n2026-10-21T12:07:29.5991671Z + 'C:/Users/runneradmin/AppData/Local/Temp/VOID editor é😀 p25puK/project space # %/worker space.void'\r\n2026-10-21T12:07:29.5992575Z - 'C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\VOID editor é😀 p25puK\\\\project space # %\\\\worker space.void'\r\n2026-10-21T12:07:29.5992880Z \r\n2026-10-21T12:07:29.5993127Z \tat Object.run (d:\\a\\Void.Language\\Void.Language\\editors\\vscode\\out\\test\\host.js:388:26)\r\n2026-10-21T12:07:29.6054709Z Native stdout: Content-Length: 38\r\n2026-10-21T12:07:29.6055184Z \r\n2026-10-21T12:07:29.6055501Z {\"id\":1,\"jsonrpc\":\"2.0\",\"result\":null}\r\n2026-10-21T12:07:29.6061528Z Native exit: code=0, signal=null\r\n2026-10-21T12:07:29.6778788Z AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\r\n2026-10-21T12:07:29.6779700Z + actual - expected\r\n2026-10-21T12:07:29.6780089Z \r\n2026-10-21T12:07:29.6781296Z + 'C:/Users/runneradmin/AppData/Local/Temp/VOID editor é😀 p25puK/project space # %/worker space.void'\r\n2026-10-21T12:07:29.6782680Z - 'C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\VOID editor é😀 p25puK\\\\project space # %\\\\worker space.void'\r\n2026-10-21T12:07:29.6792968Z \r\n2026-10-21T12:07:29.6794021Z \tat Object.run (d:\\a\\Void.Language\\Void.Language\\editors\\vscode\\out\\test\\ho",
+  "actions_started_by_agent": false,
+  "native_windows_repair_execution": "pending; local Linux results do not certify Windows"
+}

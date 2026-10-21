@@ -1,6 +1,6 @@
 # Work log
 
-**Current handoff:** [Documentation index](README.md), [CI #85 Windows editor repair](stage8/CI85_WINDOWS_EDITOR_REPAIR.md) and [final hosted checklist](stage8/FINAL_HOSTED_GATE.md). All six Stage 8 sprints have local evidence; native verification of the latest repair and Wrench review remain pending. Stage 8 is not hosted locked. Earlier entries retain historical evidence.
+**Current handoff:** [Documentation index](README.md), [incomplete-source/CI #86 repair](stage8/CI86_INCOMPLETE_SOURCE_REPAIR.md) and [final hosted checklist](stage8/FINAL_HOSTED_GATE.md). All six Stage 8 sprints have local evidence; native verification of the latest repair and Wrench review remain pending. Stage 8 is not hosted locked. Earlier entries retain historical evidence.
 
 ## 14 October 2026: Phase 22 UTF-8 foundation implementation
 
@@ -14229,3 +14229,45 @@ Updated evidence, discovery contract, index, approvals, Wrench and final checkli
 Native Windows Debug/Release drive/8.3/junction/SUBST and actual editor execution
 remain required for Wrench/Boss review. No hosted action, Git mutation, root README,
 website or Stage 9 work. Stage 8 remains not hosted locked.
+
+## 21 October 2026 — incomplete-source completion crash and CI #86 repair
+
+Baseline `58384781c0e3a544ca081b5abd2f8032646b5793`. Reproduced `u\n` before
+examples/runtime_errors/main.void as an unsaved overlay: -32603, map::at and native
+exit 2. Debug tracing proved missing key `$application` in the completion-candidate
+map at editor_candidates, reached through editor_assistance/validated_project.
+The synthetic function was correctly registered; candidate insertion rejected its
+non-source name, but documentation assumed insertion and used map::at.
+
+Fixed the underlying invariant: existing insertion returns an accepted candidate
+pointer, all four documentation paths honor it, and invalid source identifiers
+are excluded before resolution. No catch-all, fabricated declaration, second
+compiler pipeline or validation/IR relaxation. Added direct metadata/overlay and
+snapshot tests, 21 incomplete fragments and 172 prefix-edit states, diagnostics,
+positive repair/navigation and clean shutdown in one stdio server. Actual VS Code
+uses real typing, completion and same-child checks, then repairs without restart.
+The exact example now completes safely and resolves its original imported function
+in both configurations, exits 0 and leaves disk bytes unchanged.
+
+Separately inspected CI #86 Windows Debug: 156/156 compiler tests passed; editor
+host.js:388 compared generic '/' to native '\\' selected filename spelling.
+Normalized both sides of all three adjacent entry assertions. Full paths, case,
+containment, alias and identity requirements remain; production editor paths and
+CI #82–#85 discovery/Unicode/drive fixes are byte-identical to baseline.
+
+Final focused Linux outcomes: Debug 10/10, Release 10/10 (20/20 unique suites).
+Extension typecheck/compile/bundle and explicit units 4/4 per configuration passed.
+Actual VS Code 1.141.0 trusted/restricted/multi-root profiles passed 3/3 per server
+configuration, including real typing. No map::at/internal-server/this.task error
+or unhandled rejection remains in those runs. No speculative lifecycle change.
+
+Initial Debug 6/8 reflected two new test expectation errors: the existing parser
+accepted an empty struct in that context, and import completion validly returns
+CompletionList. Corrected the assertions, preserved recovery coverage and reran
+only affected suites; no rerun inflates unique totals. Debugger ptrace required
+execution outside the sandbox. All attempts, source/log hashes and commands are
+retained in [the repair evidence](stage8/CI86_INCOMPLETE_SOURCE_REPAIR.md).
+
+Updated index, approvals, Wrench and final hosted checklist. Native Windows editor
+verification and Wrench review remain pending. No hosted action, commit/push/branch,
+root README or website change, or Stage 9 work. Stage 8 remains not hosted locked.

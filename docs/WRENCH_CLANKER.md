@@ -32,7 +32,27 @@ routine development. It authorizes no additional sprint, commit, push or hosted 
 Clankers and takes precedence over older communication/checkpoint practices below.
 Boss retains Git and hosted acceptance control.
 
-## CI #85 Windows editor repair handoff — 21 October 2026
+## Incomplete-source crash / CI #86 handoff — 21 October 2026
+
+Review [the complete repair evidence](stage8/CI86_INCOMPLETE_SOURCE_REPAIR.md),
+baseline `58384781c0e3a544ca081b5abd2f8032646b5793`. A reproduced `u` overlay
+in runtime_errors caused -32603/exit 2; Debug tracing proved the absent candidate
+key `$application`. The registered synthetic function was intentionally filtered
+out, then documentation incorrectly assumed insertion. The existing insertion
+lambda now returns an accepted candidate; all four documentation paths honor it,
+and synthetic names are excluded before resolution. No catch-all or new pipeline.
+CI #86 selected-entry assertions normalize separators on both sides, retaining
+exact full locations. Discovery/Unicode/drive/VFS code is unchanged.
+
+Final focused Linux Debug/Release 10/10 each; units 4/4 each; actual VS Code
+trusted/restricted/multi-root 3/3 each, including real typing and same-process
+repair. Exact example replay exits cleanly in both builds. The reported secondary
+`this.task` error did not recur; no speculative lifecycle change was made.
+Initial test expectation corrections and all limits remain recorded. Native
+Windows editor verification and Wrench review remain pending. No Git/hosted action,
+root README change or Stage 9 is authorized. Earlier snapshots are historical.
+
+## Historical CI #85 Windows editor repair handoff — 21 October 2026
 
 Review [CI #85 repair evidence](stage8/CI85_WINDOWS_EDITOR_REPAIR.md), baseline
 `e8a1ea7433b465c3800090a7b84737d7474c9228`. Windows Debug compiler 156/156

@@ -174,6 +174,15 @@ void editor_metadata(const fs::path& root) {
     auto result=vd::editor_assistance(root/"main.void",overrides,"/main.void",cursor+10);
     check(std::none_of(result.candidates.begin(),result.candidates.end(),[](const auto& c){return c.name=="separate";}),"completion leaked a disjoint scope");
     check(!vd::analyze_project(root/"main.void",overrides).program,"editor recovery authorized invalid compilation");
+    for(const std::string fragment:{"u","us","unknown","var value =","const value =","if","return (","use","use \"","func","func pending(","func pending() ->","func pending() -> missing:\n    return 1"}) {
+        auto incomplete=fragment+"\n"+text;
+        vd::SourceOverrides edits{{"/main.void",vd::SourceFile("/main.void",incomplete)}};
+        auto assistance=vd::editor_assistance(root/"main.void",edits,"/main.void",fragment.find('\n')==std::string::npos?fragment.size():0);
+        check(std::none_of(assistance.candidates.begin(),assistance.candidates.end(),[](const auto& c){return c.name.find('$')!=std::string::npos;}),"synthetic declaration escaped completion filtering");
+        check(edits.at("/main.void")->text()==incomplete,"editor probe mutated its source overlay");
+        check(!vd::analyze_project(root/"main.void",edits).program,"incomplete source authorized validated analysis: "+fragment);
+    }
+    check(program->modules().front().source.text()==text,"recovery mutated a retained validated snapshot");
     auto formatted=vd::format_source(vd::SourceFile("format.void","# preserve é😀\r\nfunc entry(x:i32)->i32:\r\n  return x # keep\r\n"));
     check(formatted && formatted->find("    return x # keep\r\n")!=std::string::npos,"formatter comments/CRLF");
     check(vd::format_source({"format.void",*formatted})==formatted,"formatter idempotence");

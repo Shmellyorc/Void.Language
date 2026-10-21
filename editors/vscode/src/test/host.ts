@@ -128,6 +128,21 @@ export async function run(): Promise<void> {
         }
         const mainText = main.getText();
         const mainEditor=await vscode.window.showTextDocument(main);
+        const typingChild=children[children.length-1], typingCount=children.length;
+        for(const fragment of ['u','us','unknown','var pending =','return (','func pending(','use "']) {
+            await vscode.commands.executeCommand('hideSuggestWidget');
+            await replace(main,mainText);mainEditor.selection=new vscode.Selection(0,0,0,0);
+            await vscode.commands.executeCommand('type',{text:fragment+'\n'});
+            assert(main.getText().startsWith(fragment+'\n'),'real incomplete edit was not applied');
+            const menu=await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider',mainUri,new vscode.Position(0,fragment.length));
+            assert(!menu || menu.items.every(i=>!(typeof i.label==='string'?i.label:i.label.label).includes('$')),'synthetic completion leaked');
+            assert.equal(api!.status().state,'running');assert.equal(children.length,typingCount);
+            assert(!gone(typingChild),'incomplete typing killed native server');
+            await replace(main,mainText);
+            await until(definitions,d=>!!d?.length,'valid request after incomplete '+fragment);
+            await until(()=>vscode.languages.getDiagnostics(mainUri),ds=>ds.length===0,'typing diagnostic repair');
+        }
+        record('PASS real typing: incomplete top-level keywords/expressions/imports recover in the same native process');
         for (const [prefix,expected] of [['use ','use io/'],['use io/','use io/files'],['use "','use ".vscode/'],['use "app/','use "app/systems/'],['use "app/systems/','use "app/systems/player.void"']]) {
             await vscode.commands.executeCommand('hideSuggestWidget');
             await replace(main,'');mainEditor.selection=new vscode.Selection(0,0,0,0);
@@ -286,14 +301,14 @@ export async function run(): Promise<void> {
         assert.equal(beforeFallbackWarnings, 0, 'Warning deduplication must not mask the selected-file check');
         await fs.rename(mainEntry,mainEntry+'.saved');
         await config.update('project.entry', '', vscode.ConfigurationTarget.Workspace);
-        await api!.ready(); assert.equal(api!.status().entry, workerEntry);
+        await api!.ready(); assert.equal(path.normalize(api!.status().entry!), path.normalize(workerEntry));
         assert.equal(outsideWarnings(), beforeFallbackWarnings, 'The selected fallback file must not warn about itself');
         await fs.rename(mainEntry+'.saved',mainEntry);
         await vscode.languages.setTextDocumentLanguage(mainDocument, 'void');
         await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(mainUri));
-        await api!.ready(); assert.equal(api!.status().entry, workerEntry);
+        await api!.ready(); assert.equal(path.normalize(api!.status().entry!), path.normalize(workerEntry));
         await vscode.commands.executeCommand('void.restartLanguageServer');
-        assert.equal(api!.status().entry, mainEntry);
+        assert.equal(path.normalize(api!.status().entry!), path.normalize(mainEntry));
         await config.update('project.entry', 'main.void', vscode.ConfigurationTarget.Workspace); await api!.ready();
         // Calling the actual extension deactivation hook tests clean child shutdown.
         await api?.deactivate();

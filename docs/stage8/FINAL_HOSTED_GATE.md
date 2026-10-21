@@ -1,4 +1,13 @@
-# Stage 8 final acceptance gate — CI #85 editor repair; not locked
+# Stage 8 final acceptance gate — CI #86 / incomplete-source repair; not locked
+
+21 October 2026 latest update: [the incomplete-source/CI #86 repair](CI86_INCOMPLETE_SOURCE_REPAIR.md)
+fixes the reproduced `$application` completion-map crash and normalizes three
+selected-entry assertions after CI #86 Windows Debug passed 156/156 compiler
+suites but failed actual editor fallback selection. Require same-process partial
+typing/valid-repair checks, exact selected locations, all existing trust/lifecycle
+checks and native Windows Debug execution. Focused Linux Debug/Release passed
+10/10 each, units 4/4 each and real VS Code profiles 3/3 each. These do not replace
+native platform or seven-job hosted acceptance. No hosted action was started.
 
 21 October 2026 latest update: CI #85 at
 `e8a1ea7433b465c3800090a7b84737d7474c9228` passed Windows Debug compiler

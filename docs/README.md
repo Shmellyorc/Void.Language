@@ -47,7 +47,18 @@ README only if Boss explicitly requests a public-facing README change.”
 Preserve historical evidence and distinguish approved direction, local verification,
 review and hosted locks. Never mark work implemented or locked without verification.
 
-## CI #85 Windows editor repair handoff — 21 October 2026
+## Incomplete-source crash / CI #86 handoff — 21 October 2026
+
+[Repair evidence](stage8/CI86_INCOMPLETE_SOURCE_REPAIR.md) records the exact
+`$application` candidate-map miss while completing `u`, its Debug trace and
+baseline exit 2. Candidate insertion/documentation now share the same eligibility
+invariant. Incomplete typing recovers without restarting the server; CI #86's
+separate selected-filename slash assertions are normalized without production
+path changes. Focused Linux suites passed 10/10 per configuration, extension units
+4/4 each and actual VS Code profiles 3/3 each. Native Windows and Wrench review
+remain pending; no hosted lock or subsequent stage is implied.
+
+## Historical CI #85 Windows editor repair handoff — 21 October 2026
 
 At `e8a1ea7433b465c3800090a7b84737d7474c9228`, Windows Debug passed 156/156
 compiler suites and extension units, then failed actual editor discovery with a

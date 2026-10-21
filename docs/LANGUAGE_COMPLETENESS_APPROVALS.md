@@ -5,6 +5,12 @@ completeness audit and Stage 7 hosted acceptance.
 
 **Current status — 21 October 2026:**
 
+**Latest crash/CI #86 repair:** [Evidence and review handoff](stage8/CI86_INCOMPLETE_SOURCE_REPAIR.md)
+record the verified completion-map invariant correction and path-assertion fix,
+focused Debug/Release and real editor results. No language policy changed.
+Native Windows verification and Wrench review remain pending; no hosted lock or
+new stage is approved. Earlier CI records below are historical.
+
 **CI #85 repair update:** [Windows editor discovery evidence](stage8/CI85_WINDOWS_EDITOR_REPAIR.md)
 records a drive-only prefix correction and additional native regressions. Focused
 Linux Debug/Release, units and actual editor profiles passed; native Windows

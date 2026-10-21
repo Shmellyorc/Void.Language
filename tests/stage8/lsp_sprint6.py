@@ -60,4 +60,47 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint6 editor ') as directory:
         for invalid in [source.replace('{echo("hi")}','{1}'),source.replace('node has component','node has i32'),source.replace('        "none"','        9')]:
             errors=replace(invalid);assert errors,invalid
             assert not replace(source)
+        # Ordinary incomplete edits must not terminate this same server or leak
+        # compiler-generated declarations into completion. Repair every state.
+        pid=c.process.pid
+        fragments=['u','us','unknown','var value =','const value =','if','return (','use','use ','use "','use io/','func','func pending(','func pending() ->','struct pending:','func pending() -> missing:\n    return 1']
+        for fragment in fragments:
+            errors=replace(fragment+'\n'+source)
+            if fragment in ['u','us','unknown']:
+                assert any(d['code']=='VOID2002' and fragment in d['message'] for d in errors),(fragment,errors)
+            column=len(fragment.splitlines()[0])
+            for method in ['textDocument/completion','textDocument/hover','textDocument/signatureHelp']:
+                response=q(method,0,column);assert 'error' not in response,(fragment,method,response)
+                if method=='textDocument/completion':
+                    items=response['result']
+                    if isinstance(items,dict):items=items['items']
+                    assert isinstance(items,list),response
+                    assert all('$' not in item['label'] for item in items),response
+            assert c.process.pid==pid and c.process.poll() is None,fragment
+            assert not replace(source),fragment
+            definition=q('textDocument/definition',7,16)['result'];assert definition and definition['uri']==uri,(fragment,definition)
+        # Incomplete function-local expressions and temporary statements share
+        # the same recovery machinery, including anonymous/generated functions.
+        for fragment in ['u','input +','echo(','var callback = func(', 'var text = "{inp']:
+            edited=source[:source.index('    var yes')]+'    '+fragment+'\n'
+            replace(edited)
+            response=q('textDocument/completion',7,len('    '+fragment));assert 'error' not in response,(fragment,response)
+            assert not replace(source)
+            assert q('textDocument/definition',7,16)['result']
+        # Walk complete editing sequences character by character, including
+        # synthetic applications/closures and poisoned declaration signatures.
+        sequences=['var callback = func(value: i32) -> i32:\n    return value\n',
+            'func pending() -> missing:\n    return 1\n',
+            'use "/peer.void" as peer\n',
+            'func identity<t>(value: t) -> t:\n    return value\n']
+        for sequence in sequences:
+            for n in range(1,len(sequence)+1):
+                fragment=sequence[:n];replace(fragment)
+                line=fragment.count('\n');column=len(fragment.rsplit('\n',1)[-1])
+                response=q('textDocument/completion',line,column);assert 'error' not in response,(fragment,response)
+                assert c.process.poll() is None,fragment
+            assert not replace(source)
+            assert q('textDocument/definition',7,16)['result']
+        assert c.process.poll() is None and c.process.pid==pid
+        c.shutdown()
 print('Sprint 6 LSP navigation, UTF-16, hover, rename, completion, signature, diagnostics and formatting passed')

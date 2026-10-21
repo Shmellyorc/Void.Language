@@ -1962,8 +1962,9 @@ class Semantics {
         // A broken local context or import must never manufacture authority.
         if (invalid_function || unit.failed_import || (current && current->parse_failed)) {out.candidates.clear();out.signature.clear();out.parameters.clear();throw EditorProbeFound{};}
         std::map<std::string,EditorCandidate> candidates;
-        auto add=[&](std::string name,Type type,int kind=6) {
-            if(valid_editor_identifier(name) && type!=error_type) candidates.emplace(name,EditorCandidate{name,ir::type_name(type),kind});
+        auto add=[&](std::string name,Type type,int kind=6) -> EditorCandidate* {
+            if(!valid_editor_identifier(name) || type==error_type)return nullptr;
+            return &candidates.emplace(name,EditorCandidate{name,ir::type_name(type),kind}).first->second;
         };
         if(receiver) {
             auto t=*receiver;
@@ -1978,7 +1979,7 @@ class Semantics {
             if(numeric::number(t)) {
                 const bool type_level=primitive_base(*e.parts[0])!=Type::none;
                 for(const auto& api:numeric::members())if(type_level || api.callable) {
-                    std::string name(api.name);add(name,t,api.callable?2:21);candidates.at(name).documentation=std::string(api.documentation);
+                    std::string name(api.name);if(auto* candidate=add(name,t,api.callable?2:21))candidate->documentation=std::string(api.documentation);
                 }
                 for(auto& [name,candidate]:candidates)out.candidates.push_back(std::move(candidate));
                 throw EditorProbeFound{};
@@ -1993,8 +1994,8 @@ class Semantics {
                 auto token=e.token;token.text=name;auto selected=member(t,token);
                 if(selected.function) {
                     if(t.readonly || !ir::readonly_paths(t).empty()) continue; // Recovered effects are not finalized.
-                    add(name,selected.function->result,2);
-                    for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==selected.function)candidates.at(name).documentation=source_documentation(u->source,f.token.offset);
+                    if(auto* candidate=add(name,selected.function->result,2))
+                        for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==selected.function)candidate->documentation=source_documentation(u->source,f.token.offset);
                 } else {auto type=t;for(auto field:selected.path)type=ir::field_type(type,field);add(name,type,5);}
             } catch(const CompilationError&) {} catch(const Poison&) {}
         } else {
@@ -2006,10 +2007,10 @@ class Semantics {
                 for(const auto& [name,structure]:u->structure_names)names.insert(name);
             }
             for(const auto& name:names) {
-                if(candidates.contains(name)) continue;
+                if(!valid_editor_identifier(name) || candidates.contains(name)) continue;
                 Expr test(Expr::Kind::name,e.token);test.token.text=name;test.qualifier=e.qualifier;test.qualifier_token=e.qualifier_token;
-                try {auto& f=resolve(test);add(name,f.result,3);for(const auto& [id,u]:units)if(u->declarations.contains(f.token.text) && u->declarations.at(f.token.text)==&f)candidates.at(name).documentation=source_documentation(u->source,f.token.offset);continue;} catch(const CompilationError&) {} catch(const Poison&) {}
-                try {auto [owner,c]=constant(test);if(c) {evaluate(*owner,*c);add(name,c->type,21);candidates.at(name).documentation=source_documentation(owner->source,c->declaration.token.offset);continue;}} catch(const CompilationError&) {} catch(const Poison&) {}
+                try {auto& f=resolve(test);if(auto* candidate=add(name,f.result,3))for(const auto& [id,u]:units)if(u->declarations.contains(f.token.text) && u->declarations.at(f.token.text)==&f)candidate->documentation=source_documentation(u->source,f.token.offset);continue;} catch(const CompilationError&) {} catch(const Poison&) {}
+                try {auto [owner,c]=constant(test);if(c) {evaluate(*owner,*c);if(auto* candidate=add(name,c->type,21))candidate->documentation=source_documentation(owner->source,c->declaration.token.offset);continue;}} catch(const CompilationError&) {} catch(const Poison&) {}
                 try {auto [owner,structure]=structure_lookup(unit,root,units,e.qualifier.empty()?name:e.qualifier+"."+name,e.token);
                     if(structure && structure->layout_state!=3)candidates.emplace(name,EditorCandidate{name,structure->generics.empty()?"type":"generic type",7,{},source_documentation(owner->source,structure->token.offset)});
                 } catch(const CompilationError&){}catch(const Poison&){}
