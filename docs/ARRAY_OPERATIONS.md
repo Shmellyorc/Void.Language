@@ -1,5 +1,14 @@
 # Expanded array operations (Phase 25)
 
+## Stage 8 Sprint 3 — current extension
+
+The owner-approved [text/collection contract](STAGE8_TEXT_COLLECTIONS.md) supersedes
+the dated get/pop/text-inspection exclusions below. Sprint 3 is locally verified;
+[acceptance evidence](stage8/SPRINT3_ACCEPTANCE.md) records exact results and limits.
+Wrench review remains pending. Public policies are approved
+in [DECISIONS.md](DECISIONS.md); hosted CI remains deferred to Stage 8 end.
+
+
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 The owner approved the following bounded contract on 18 October 2026. These
@@ -92,9 +101,9 @@ apply; no array-byte or native-stack payload ceiling is introduced.
 
 ## Deliberately deferred
 
-The owner approved deferring `.pop()` until the illustrated `result`/`Ok` contract
-exists. `.pop()` is not replaced with an unchecked/incompatible operation; use
-checked `.remove_at(-1)` when a runtime error on empty is appropriate. Missing
+Phase 25 deferred `.pop()` pending result/Ok. Stage 8 Sprint 3 supersedes that
+deferral with `pop() -> result<T, string>`: empty returns `Err("empty list")`
+without mutation. Checked `.remove_at(-1)` retains its existing failure behavior. Missing
 slice endpoints, slice assignment/views, string slicing, dictionaries, sorting,
 general equality/search and future result/pattern features remain outside Phase 25.
 

@@ -15,6 +15,11 @@ struct RuntimeTypeRecord {
 };
 }
 extern "C" {
+std::uint64_t vd_string_count(void*,unsigned,vd::RuntimeFailure*) noexcept;
+void vd_string_index(void**,void*,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
+void vd_string_encode(void**,void*,vd::RuntimeFailure*) noexcept;
+bool vd_string_decode(void**,void**,vd::RuntimeFailure*) noexcept;
+
 void vd_string_literal(void**, const char*, std::size_t, vd::RuntimeFailure*) noexcept;
 void vd_string_concat(void**, void*, void*, vd::RuntimeFailure*) noexcept;
 bool vd_string_equal(void*, void*, vd::RuntimeFailure*) noexcept;

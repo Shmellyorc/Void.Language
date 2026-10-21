@@ -1149,6 +1149,24 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     else if (f.receiver && f.parameters[0].kind==ir::Type::aggregate && instruction.a == 0) v = b.CreateLoad(type(f.parameters[0]),fn->getArg(0));
                     else v = fn->getArg(instruction.a);
                     break;
+                case Op::string_count: case Op::string_index: case Op::string_encode: case Op::string_decode: {
+                    auto text_failure=[&]{fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),instruction.op==Op::string_index?"String index outside extent":"UTF-8 text operation failed");};
+                    if(instruction.op==Op::string_count)v=b.CreateCall(module->getOrInsertFunction("vd_string_count",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{values[instruction.a],b.getInt32(instruction.immediate),failure});
+                    else {
+                        auto* storage=value_roots[n].at(values.size());
+                        if(instruction.op==Op::string_decode){
+                            b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)),storage);auto* payload=b.CreateStructGEP(type(instruction.type),storage,1);
+                            auto* valid=b.CreateCall(module->getOrInsertFunction("vd_string_decode",b.getInt1Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{payload,value_roots[n].at(instruction.a),failure});text_failure();
+                            auto* text=b.CreateLoad(b.getPtrTy(),payload);auto* empty=llvm::ConstantPointerNull::get(b.getPtrTy());
+                            v=llvm::Constant::getNullValue(type(instruction.type));v=b.CreateInsertValue(v,b.CreateSelect(valid,b.getInt32(0),b.getInt32(1)),0);v=b.CreateInsertValue(v,b.CreateSelect(valid,text,empty),1);v=b.CreateInsertValue(v,b.CreateSelect(valid,empty,text),2);
+                        }else {
+                            if(instruction.op==Op::string_encode)b.CreateCall(module->getOrInsertFunction("vd_string_encode",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{storage,values[instruction.a],failure});
+                            else b.CreateCall(module->getOrInsertFunction("vd_string_index",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{storage,values[instruction.a],b.getInt32(scalar_encoding(operand_type(instruction.b))),bits(values[instruction.b],operand_type(instruction.b)),failure});
+                            text_failure();v=b.CreateLoad(type(instruction_types[n].at(values.size())),storage);
+                        }
+                    }
+                    text_failure();break;
+                }
                 case Op::string_literal: case Op::string_concat: case Op::string_equal: {
                     if(instruction.op==Op::string_equal) {
                         v=b.CreateCall(module->getOrInsertFunction("vd_string_equal",b.getInt1Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{values[instruction.a],values[instruction.b],failure});
@@ -1446,6 +1464,7 @@ Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
         return std::move(object);
     });
     bind("vd_gc_frame_enter",vd_gc_frame_enter); bind("vd_gc_frame_leave",vd_gc_frame_leave);
+    bind("vd_string_count",vd_string_count);bind("vd_string_index",vd_string_index);bind("vd_string_encode",vd_string_encode);bind("vd_string_decode",vd_string_decode);
     bind("vd_string_literal",vd_string_literal); bind("vd_string_concat",vd_string_concat); bind("vd_string_equal",vd_string_equal);
     bind("vd_array_default",vd_array_default);bind("vd_array_copy",vd_array_copy);
     bind("vd_array_read",vd_array_read);bind("vd_array_write",vd_array_write);

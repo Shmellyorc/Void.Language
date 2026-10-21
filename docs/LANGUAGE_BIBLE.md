@@ -370,6 +370,13 @@ Slicing, index-out-of-range behavior, ordering and format grammar remain OPEN.
 
 ### 8.1 Approved string direction, 14 October 2026
 
+**20 October 2026 superseding contract:** Stage 8 Sprint 3 now has owner-approved
+scalar/i64 length and byte_length, owned scalar indexing with negative indexes
+and checked bounds failures, and owned UTF-8 byte conversion with string-error
+results. See [the current contract](STAGE8_TEXT_COLLECTIONS.md) for engineering
+and [local acceptance evidence](stage8/SPRINT3_ACCEPTANCE.md). The original Phase 22/future wording below is historical;
+nullable strings, graphemes, slicing and interpolation remain future work.
+
 **APPROVED DESIGN, NOT YET IMPLEMENTED.** The following decisions do not expand
 Phase 22. Its approved foundation contract is S1-S8 in STRINGS_PROPOSAL.md;
 implementation and verification status belongs in WORK_LOG.md and the string guide.
@@ -1691,7 +1698,7 @@ var first = letters[0..<3]  # a, b, c
 var middle = letters[1..3]  # b, c, d (inclusive endpoint)
 ```
 
-The chosen list slicing behavior creates a **new list**, not a view, initially. The direct `[]` index operator raises a VOID runtime error on invalid access. `.get(index)` can instead return `result<t, lookup_error>`:
+The chosen list slicing behavior creates a **new list**, not a view, initially. The direct `[]` index operator raises a VOID runtime error on invalid access. Stage 8 Sprint 3 approves `.get(index) -> result<t, string>` on both fixed arrays and growable lists; invalid indexes return `Err("index out of range")`. See [the current contract](STAGE8_TEXT_COLLECTIONS.md). The older lookup_error illustration below is historical:
 
 ```python
 match letters.get(7):

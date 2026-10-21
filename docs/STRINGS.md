@@ -1,5 +1,14 @@
 # UTF-8 string foundation, Phase 22
 
+## Stage 8 Sprint 3 — current extension
+
+The owner-approved [text/collection contract](STAGE8_TEXT_COLLECTIONS.md) supersedes
+the dated get/pop/text-inspection exclusions below. Sprint 3 is locally verified;
+[acceptance evidence](stage8/SPRINT3_ACCEPTANCE.md) records exact results and limits.
+Wrench review remains pending. Public policies are approved
+in [DECISIONS.md](DECISIONS.md); hosted CI remains deferred to Stage 8 end.
+
+
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 S1-S8 in STRINGS_PROPOSAL.md are owner-approved, including resource limits. This
@@ -71,8 +80,8 @@ under their existing conformance/effect rules.
 Pure module constants and declared/initializer defaults hold owned byte templates,
 including nested aggregates, concatenation and equality. They perform no runtime
 allocation during analysis. Nonempty templates materialize fallibly at execution
-use; no runtime module initializer or permanent cache is added. Ordinary function
-defaults remain outside the existing initializer-only default-parameter feature.
+use; no runtime module initializer or permanent cache is added. Stage 8 Sprint 2 also admits ordinary pure function/method defaults using the
+same binder; see [the calls contract](STAGE8_CALLS_NUMERIC.md).
 C1 fields are valid before init and S1 managed stages commit identity once. String
 fields safely default to empty, not unavailable nonnullable managed references.
 

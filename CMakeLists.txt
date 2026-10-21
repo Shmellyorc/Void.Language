@@ -632,6 +632,11 @@ if(BUILD_TESTING)
   add_test(NAME numeric_sprint2 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/numeric/sprint2.py"
     "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}")
   set_tests_properties(numeric_sprint2 PROPERTIES TIMEOUT 180)
+  add_test(NAME text_collections_sprint3 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/sprint3.py"
+    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}" "$<TARGET_FILE:void_runtime>" "$<TARGET_FILE:void_native_fixture>" "${VOID_SANITIZERS}")
+  set_tests_properties(text_collections_sprint3 PROPERTIES TIMEOUT 240)
+  add_test(NAME lsp_sprint3 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage8/lsp_sprint3.py" "$<TARGET_FILE:voidls>")
+  set_tests_properties(lsp_sprint3 PROPERTIES TIMEOUT 60)
   add_test(NAME lsp_sprint2 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/lsp/sprint2.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_sprint2 PROPERTIES TIMEOUT 60)
   add_test(NAME aot COMMAND "${CMAKE_COMMAND}"

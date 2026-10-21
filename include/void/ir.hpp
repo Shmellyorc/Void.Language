@@ -117,7 +117,7 @@ std::uint64_t checked_array_index(std::uint64_t bits, Type index, std::uint64_t 
 enum class Op { bitcast, native_call, async_cancel_children, async_cancel, async_group_enter, async_group_join, async_drain, async_call, await, gc_release, cleanup_call, function_reference, function_call, function_null, sum, sum_get, pattern_equal, type_test, type_cast, panic, argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
-    upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal,
+    upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal, string_count, string_index, string_encode, string_decode,
     fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry };
 // A validated local aggregate storage path; never a source-visible reference.
 struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };

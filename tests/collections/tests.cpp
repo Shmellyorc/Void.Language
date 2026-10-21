@@ -33,7 +33,7 @@ void diagnostics() {
         "    var a = [1]\n    a.insert(0, false)\n    return x\n",
         "    var a = [1]\n    var b = a[true..0]\n    return x\n",
         "    var a = [1]\n    var b = a[0..<0.5f]\n    return x\n",
-        "    var a = [1]\n    a.pop()\n    return x\n",
+        "    const a = [1]\n    a.pop()\n    return x\n",
         "    var a = [1]\n    var b = a[..1]\n    return x\n",
         "    var a = [1]\n    var b = a[0..]\n    return x\n",
         "    var a = \"abc\"\n    var b = a[0..1]\n    return x\n"

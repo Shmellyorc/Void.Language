@@ -37,6 +37,27 @@ void construct(void** slot,std::size_t size,const std::size_t* offsets,std::size
 }
 }
 extern "C" {
+std::uint64_t vd_string_count(void* source,unsigned bytes,vd::RuntimeFailure* failure) noexcept {
+    try{return vd::Runtime::current().string_count(source,bytes!=0);}
+    catch(const std::exception&){failure->message="Invalid UTF-8 string storage";}catch(...){std::terminate();}return 0;
+}
+void vd_string_index(void** out,void* source,unsigned encoding,std::uint64_t index,vd::RuntimeFailure* failure) noexcept {
+    try{vd::Runtime::current().string_index_into(out,source,static_cast<vd::ScalarEncoding>(encoding),index);}
+    catch(const std::out_of_range&){failure->message="String index outside extent";}
+    catch(const std::bad_alloc&){failure->message="String allocation failed";}
+    catch(const std::exception&){failure->message="Invalid UTF-8 string storage";}catch(...){std::terminate();}
+}
+void vd_string_encode(void** out,void* source,vd::RuntimeFailure* failure) noexcept {
+    try{vd::Runtime::current().string_encode_into(out,source);}
+    catch(const std::bad_alloc&){failure->message="UTF-8 byte allocation failed";}
+    catch(const std::exception&){failure->message="UTF-8 byte conversion failed";}catch(...){std::terminate();}
+}
+bool vd_string_decode(void** out,void** source,vd::RuntimeFailure* failure) noexcept {
+    try{auto& runtime=vd::Runtime::current();auto valid=runtime.string_decode_into(out,runtime.root_word(source));if(!valid)runtime.string_into(out,"invalid UTF-8");return valid;}
+    catch(const std::bad_alloc&){failure->message="String allocation failed";}
+    catch(const std::exception&){failure->message="UTF-8 byte conversion failed";}catch(...){std::terminate();}return false;
+}
+
 void vd_string_literal(void** slot,const char* bytes,std::size_t size,vd::RuntimeFailure* failure) noexcept {
     try { vd::Runtime::current().string_into(slot,{bytes,size}); }
     catch(const std::bad_alloc&) { failure->message="String allocation failed"; }

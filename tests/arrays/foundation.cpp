@@ -172,11 +172,13 @@ void negatives() {
     negative("value struct point:\n    width: i32\nfunc (self point) init():\n    pass\n"
              "const dimensions = point()\nconst size = dimensions.width\n"+header+
              "    var a: [i32, size]\n    return x\n",DiagnosticCode::constant_call);
-    // Empty inference and string indexing remain outside array syntax.
+    // Empty array inference requires context. Sprint 3 scalar string indexing
+    // is valid, but returning string from an i32 function remains a type error.
     negative(header+"    var a = []\n    return x\n",DiagnosticCode::unsupported_type);
     analyze(header+"    var a: [[i32]]\n    return x\n");
     analyze(header+"    var a: [string, 1] = [\"x\"]\n    return x\n");
-    negative(header+"    return \"x\"[0]\n",DiagnosticCode::unsupported_type);
+    negative(header+"    return \"x\"[0]\n",DiagnosticCode::type_mismatch);
+    analyze("func scalar() -> string:\n    return \"x\"[0]\n");
     negative("struct holder:\n    items: [i32, 1]\nfunc frozen(owner: holder):\n"
              "    const ro = owner\n    var alias = ro\n    alias.items[0] = 3\n",DiagnosticCode::readonly);
 }

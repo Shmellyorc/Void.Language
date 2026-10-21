@@ -69,6 +69,22 @@ with tempfile.TemporaryDirectory(prefix="void-semantic-depth-") as directory:
             assert result.stderr.count("code: VOID1107") == 1 and result.stderr.count("code: VOID2003") == 1, result.stderr
     print("Numeric receiver chains: legal depth and recovering rejection fit the unchanged 1 MiB budget")
 
+    # Sprint 3 scalar indexing must preserve the same recursive stack contract.
+    for count in (16, 64, 96, 124, 400):
+        text = 'func entry(value: i32) -> string:\n    return "é"' + '[0]' * count + '\n'
+        if count == 400:
+            text += "func later():\n    missing()\n"
+        source.write_text(text, encoding="utf-8")
+        result = subprocess.run([sys.argv[1], "check", str(source)], capture_output=True,
+                                encoding="utf-8", errors="strict", timeout=20,
+                                preexec_fn=small_stack if sys.platform == "linux" else None)
+        if count < 400:
+            assert result.returncode == 0 and result.stderr == "", (count, result.returncode, result.stderr)
+        else:
+            assert result.returncode == 1, (result.returncode, result.stderr)
+            assert result.stderr.count("code: VOID1107") == 1 and result.stderr.count("code: VOID2003") == 1, result.stderr
+    print("String index chains: legal depth and recovering rejection fit the unchanged 1 MiB budget")
+
     # New block forms must retain the same bounded, recovering parser on 1 MiB.
     for kind in ("defer", "closure"):
         lines = ["func entry(value: i32) -> i32:"]

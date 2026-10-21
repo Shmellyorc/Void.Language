@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-20 America/Los_Angeles",
+  "starting_commit": "483ef87c3ec62c29c2bf1000529b480f0ba5ef2d",
+  "status": "Sprint 3 authorized; public API approval checkpoint pending; no Sprint 3 implementation",
+  "baseline": {
+    "scope": "existing Release build, focused regression baseline only; not fresh Sprint 3 acceptance",
+    "command": "ctest --test-dir build/ci-release --output-on-failure -R '^(numeric_sprint2|lsp_sprint2|lsp_stage8|strings_source|collections_source|dictionaries_source|patterns_source)$'",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "elapsed_seconds": 43.16,
+    "log": "build/stage8-sprint3-acceptance/baseline-release.log",
+    "log_sha256": "644ad3bbedde7c1178027881d105c475777af48164753adb4b2bc208d782999e"
+  },
+  "hosted_ci_run_or_requested": false,
+  "root_readme_changed": false,
+  "git_mutations": false
+}

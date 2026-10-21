@@ -1,0 +1,19 @@
+{
+  "CMakeLists.txt": "4c00d305d8182256c1db03aea0e341ae3ba0c2909e409a56a2b692c2d3b08baa",
+  "include/void/ir.hpp": "2ad06e4ead5b78c5cbd336695ca956e7532ce457453b4700f778a93a4e667824",
+  "include/void/runtime.hpp": "ed0a28b81582a0c4369974c605f160e7899b9842c24138c2c1dc320889383ab9",
+  "include/void/runtime_abi.hpp": "ce9aed4e408ae82961c8d34228ec5b9ce8b182f947eb5fbfe5277f03e1ca0ed1",
+  "src/backend/llvm/backend.cpp": "3b2082485f9cb56b1b0ba6b140ee56fb5c047a55dc446d4ad550391e23e2f1d9",
+  "src/frontend/capabilities.inc": "7bebe2272e97ccd610e21c353acb22e3d3bc3d201175f77f9ffda2efddddaf97",
+  "src/frontend/compiler.cpp": "5c864b9da48613c298661af587a620e049373ff80fb136ed4ac22032cde35ffc",
+  "src/ir/module.cpp": "f82caf3dbdc69f1c0cdcf9dd6a74db62793bfe79b30a32fd1c60f53acafadce3",
+  "src/runtime/abi.cpp": "c9d2b7a3d94d5b9472a5b0be758ccfd95155e9436ea2518d5261c491b2d56453",
+  "src/runtime/array.cpp": "f93a86c6483df3e071491fbad31973f19da1e5e6adc2ea6aee0434056546dc10",
+  "tests/arrays/foundation.cpp": "329c23054af138d7908b6cd5fe1788300ecdead446fc96c7657af37423792bb0",
+  "tests/collections/tests.cpp": "416555bcdcba3528723dab9d3767a1ae0db0d5baf77f5a811398cf90d42af439",
+  "tests/integration/semantic_depth.py": "a6567a483620a02751326defb95eb4104b0ca1640220a9ed6d3a725030618f7d",
+  "tests/stage8/lsp_sprint3.py": "4d3b05cb0555e28be71dbbbe56cd8770b1b40069bcc60217f879ea65b7f0d67d",
+  "tests/stage8/sprint3.hpp": "d84be9060192239adf8fc3689b832f6d9d69f28dbc6082edb10de7f0b693fa10",
+  "tests/stage8/sprint3.py": "b74f14dafcff7e29cff5d46c49bc07b88d3c233e2d228e90e4ec89411c0dfea6",
+  "tests/strings/tests.cpp": "ba4a7179d52f83004244643bb6c4f1d678d8d43e598b36941b93381168d91b0a"
+}

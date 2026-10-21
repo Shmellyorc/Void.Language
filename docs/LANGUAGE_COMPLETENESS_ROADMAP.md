@@ -1,5 +1,6 @@
 # VOID 2.0 language completeness roadmap
 
+
 20 October 2026. **Research reviewed; development direction and sprint sequence
 approved by Boss. The full roadmap is NOT implemented.** The inspected baseline is
 `f704d75ffa37bfd0e587ec2b1513054e07a8a4d8`; Stage 7 was hosted LOCKED by
@@ -9,21 +10,33 @@ See [Boss approvals and sprint ledger](LANGUAGE_COMPLETENESS_APPROVALS.md).
 
 ## Current execution status — 20 October 2026
 
-Stage 8 Sprint 1 is **locally accepted by Boss**, including preservation of the
-[Windows CI #82 path repair](stage8/CI82_WINDOWS_REPAIR.md). Sprint 2 is
-**IMPLEMENTED / LOCALLY VERIFIED** (429/429 suites); Wrench review is pending. See the
-[calls/numeric contract](STAGE8_CALLS_NUMERIC.md) and
-[local verification record](stage8/SPRINT2_ACCEPTANCE.md). All three semantic
-choices are approved in [DECISIONS.md](DECISIONS.md): consistent argument binding,
-the four-member numeric prelude and exact numeric edge behavior.
+Stage 8 Sprint 3 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
+Debug and strict sanitizers passed **145/145 each**. Release passed **144/145**,
+then its obsolete arrays_foundation diagnostic assertion was repaired and passed
+its focused **1/1** rerun: **435/435 final unique configuration/suite outcomes**.
+The original failure is retained, and no production source changed for that test
+repair. Both 1 MiB frontend gates passed. See [the Sprint 3 contract](STAGE8_TEXT_COLLECTIONS.md)
+and [exact acceptance evidence and limits](stage8/SPRINT3_ACCEPTANCE.md).
 
-**Hosted CI is deferred until the end of Stage 8**, unless Boss explicitly
-authorizes an earlier run. Do not run or request hosted CI for Sprint 2.
-Git, branches, remote changes and publication remain owner-controlled; no such
-operations are authorized. Root README remains public-facing and unchanged.
-Stop after Sprint 2 local verification for Wrench review. Sprints 3–6 remain
-future work; do not progress automatically. Stage 7 remains hosted locked at
-`f704d75f`, CI #81 attempt 2, seven jobs, 980/980 suites. Stage 8 is not hosted locked.
+All three Sprint 3 API decisions are approved in [DECISIONS.md](DECISIONS.md).
+No Sprint 3 owner decision remains pending. Queries are runtime-only; builtin
+method values are absent, and worker calls retain conservative admission. The
+contract records these limits; no broader API or async admission is claimed.
+Sprint 1 remains locally accepted by Boss, with its
+[CI #82 Windows repair](stage8/CI82_WINDOWS_REPAIR.md) source/test hashes preserved.
+Sprint 2's named/default, numeric, tooling and reload contracts remain covered.
+
+**Hosted CI remains deferred until the end of Stage 8**, unless Boss explicitly
+authorizes an earlier run. No hosted CI was run or requested. Windows/macOS,
+Windows Debug/Release CI #82 execution and fresh actual editor-client verification
+remain pending; Linux LSP pipe tests do not establish them. Stage 8 is not hosted locked.
+
+**Stopped after Sprint 3 for Wrench review. Sprints 4–6 remain future work.**
+Do not begin Sprint 4 without explicit Boss authorization. No commits, pushes,
+branch/remote changes, publication or website work occurred. Root README is
+unchanged; future sprint prompts direct documentation updates under `docs/` and
+require separate explicit Boss authorization for public-facing root README edits.
+
 
 The research narrative below remains the pre-sprint snapshot. Its earlier
 missing-feature statements are superseded only by the delivered contracts and
@@ -444,7 +457,7 @@ Wrench reviews concrete architecture; Boss authorizes each engineering sprint.
 | Numeric properties and edges | **APPROVED:** exact integer/finite float limits; checked signed-min abs and invalid bounds; bounds validated before NaN propagation; signed-zero/infinity rules in DECISIONS.md. | See Sprint 2 contract and actual verification. |
 | Ordinary arguments/defaults | **APPROVED:** shared initializer binder, pure compile-time defaults and concrete-default annotation inference; explicit generic parameter annotations. | See Sprint 2 contract and actual verification. |
 | Field encapsulation | Approve bounded private/readonly declaration semantics before requiring protected public-wrapper invariants. | Public fields cannot be advertised as protected by existing function privacy/const views. |
-| Recoverable collection/text API | Select error payloads/signatures, indexing/error/conversion behavior; use existing result and one-case unit enum if needed. | get/pop/text implementations would hardcode an unapproved public contract. |
+| Recoverable collection/text API | **Approved 20 October:** scalar/i64 counts, one-scalar indexing with negative indexes/checked failure, owned u8 conversion and string-error get/pop results, including fixed-array get. | [Sprint 3 contract](STAGE8_TEXT_COLLECTIONS.md); local implementation acceptance remains separate. |
 | Native/application scope | Requested synchronous top-level/main forms through existing native invocation, separately from trusted static provider generalization. Preserve legacy output/status. | IO remains fixture-bound, but simple application entry need not wait for a general FFI/linker driver. |
 | Async retirement changes | Measure first; approve handle/lifetime changes only if reclamation needs them. | Cannot promise bounded long-running root memory solely from the current collector. |
 

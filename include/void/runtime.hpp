@@ -49,6 +49,11 @@ public:
     void construct_into(void** rooted_slot, const TypeLayout&, const void* prepared_payload);
     void string_into(void** rooted_slot, std::string_view);
     void concat_into(void** rooted_slot, void* left, void* right);
+    std::uint64_t string_count(void*, bool bytes) const;
+    void string_index_into(void**, void*, ScalarEncoding, std::uint64_t);
+    void string_encode_into(void**, void*);
+    bool string_decode_into(void**, RegisteredRootWord);
+
     static std::size_t string_payload_size(std::size_t left, std::size_t right);
     std::string_view string_bytes(void*) const; // Managed-only immutable borrow.
     void store(void* object, std::size_t offset, void* value);

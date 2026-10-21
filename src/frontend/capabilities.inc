@@ -233,15 +233,21 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 auto owner=expression(*e.parts[0]);expression(*e.parts[1]);expression(*e.parts[2]);
                 view=ir::replaced_facts(std::move(view),ir::array_element_path,ir::field_facts(e.parts[0]->type,owner,ir::array_element_path));
             }); else if(e.kind==K::array_index) frontend_case([&] {
-                auto owner=expression(*e.parts[0]);expression(*e.parts[1]);view=ir::field_facts(e.parts[0]->type,owner,ir::array_element_path);if(e.parts[0]->type.kind==Type::dictionary)view=ir::field_facts(ir::array_element(e.parts[0]->type),view,1);
+                auto owner=expression(*e.parts[0]);expression(*e.parts[1]);if(e.parts[0]->type!=Type::string){view=ir::field_facts(e.parts[0]->type,owner,ir::array_element_path);if(e.parts[0]->type.kind==Type::dictionary)view=ir::field_facts(ir::array_element(e.parts[0]->type),view,1);}
             }); else if (e.kind==K::name) view=locals.at(e.slot);
             else if (e.kind==K::field) frontend_case([&] {
                 auto base=expression(*e.parts[0]);
-                if(e.target!="$array.count" && e.target!="$dict.count")view=ir::field_facts(e.parts[0]->type,base,e.slot);
+                if(e.target!="$array.count" && e.target!="$dict.count" && !e.target.starts_with("$text."))view=ir::field_facts(e.parts[0]->type,base,e.slot);
             }); else if (e.kind==K::conversion) view=expression(*e.parts[0]);
             else if (e.kind==K::call || e.kind==K::method_call) frontend_case([&] {
                 std::vector<ReferenceFacts> arguments;
                 for (auto& part:e.parts) arguments.push_back(expression(*part));
+                if(e.target.starts_with("$safe.")){
+                    auto child=ir::field_facts(e.parts[0]->type,arguments[0],ir::array_element_path);
+                    if(e.parts[0]->type.kind==Type::dictionary)child=ir::field_facts(ir::array_element(e.parts[0]->type),child,1);
+                    view=ir::replaced_facts(std::move(view),1,child);
+                    if(e.target=="$safe.array.pop")if(auto leaf=arguments[0].find({});leaf!=arguments[0].end()){effect(f.reference_effects.mutations,leaf->second);if(report && leaf->second.readonly)issue(e.token,"Cannot pop a readonly list.");}
+                }
                 if(e.target=="$event.emit"){
                     auto signature=ir::array_element(e.parts[0]->type);for(unsigned n=1;n<arguments.size();++n){auto formal=Type(signature.definition->call_parameters[n-1]);compatible(arguments[n],formal,e.token);for(const auto& [path,fact]:arguments[n])if(!ir::readonly_paths(formal).contains(path)){effect(f.reference_effects.mutations,fact);effect(f.reference_effects.retained,fact);}}
                 }

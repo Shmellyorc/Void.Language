@@ -954,3 +954,36 @@ These are approved semantics, not an implementation or acceptance claim. Sprint 
 is owner-locally accepted; preserve CI #82 repair. Hosted CI is deferred to the
 end of Stage 8 unless Boss explicitly authorizes it sooner. No hosted CI request,
 Git mutation or Sprint 3 progression is authorized. Root README stays unchanged.
+
+
+## 20 October 2026 — Stage 8 Sprint 3 owner-approved APIs
+
+Boss explicitly approved all three consolidated public API decisions:
+
+- `text.length` is i64 Unicode scalar count; `text.byte_length` is i64 UTF-8 byte
+  count. `text[index]` returns an owned one-scalar string, accepts all existing
+  integer types and list-style negative indexing, and raises the existing checked
+  runtime failure out of range. Embedded NUL survives. No normalization, grapheme
+  indexing, UTF-16 storage or borrowed source-visible string view.
+- `text.to_utf8()` returns fresh independently owned `[u8]` storage.
+  `string.from_utf8(bytes)` accepts mutable/readonly `[u8]`, copies and validates
+  every byte, and returns `result<string, string>`. Malformed input returns exactly
+  `Err("invalid UTF-8")`, rejecting overlong encodings, surrogates and out-of-range
+  scalars. Allocation/resource failures retain the existing checked failure channel.
+- Both growable-list and fixed-array `get(index)` return `result<T, string>`;
+  invalid indexes return `Err("index out of range")`. List `pop()` returns
+  `result<T, string>` and removes the final element; empty pop returns
+  `Err("empty list")` without changing contents/count/version. Dictionary `get(key)`
+  returns `result<V, string>` and absent keys return `Err("key not found")`.
+  Preserve negative indexes, deep readonly authority, fixed/value copies and shared
+  managed/list/dictionary identity. Pop requires mutable authority and successful
+  removal updates structural version. Reuse existing results, collections and GC.
+
+Only Sprint 3 is authorized. [The contract](STAGE8_TEXT_COLLECTIONS.md) and its
+acceptance evidence determine implementation status. No hosted CI, Git/remote
+mutation, root README edit, website work or Sprint 4 is authorized. The hosted
+seven-job gate remains deferred until Stage 8 end unless separately authorized.
+
+Sprint 3 implementation and local verification are recorded in
+[acceptance evidence](stage8/SPRINT3_ACCEPTANCE.md); Wrench review and the deferred
+hosted gate remain separate from these semantic approvals.

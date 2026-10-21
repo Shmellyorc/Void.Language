@@ -1,5 +1,14 @@
 # Native ordered dictionaries — Stage 3
 
+## Stage 8 Sprint 3 — current extension
+
+The owner-approved [text/collection contract](STAGE8_TEXT_COLLECTIONS.md) supersedes
+the dated get/pop/text-inspection exclusions below. Sprint 3 is locally verified;
+[acceptance evidence](stage8/SPRINT3_ACCEPTANCE.md) records exact results and limits.
+Wrench review remains pending. Public policies are approved
+in [DECISIONS.md](DECISIONS.md); hosted CI remains deferred to Stage 8 end.
+
+
 Current status and hosted evidence live in
 [DEVELOPMENT_STRATEGY.md](DEVELOPMENT_STRATEGY.md#current-implementation-status).
 The owner approved this bounded contract on 18 October 2026. It extends the existing
@@ -59,8 +68,8 @@ func entry(value: i32) -> i32:
   replacement is observed by subsequent accesses. No reversed temporary collection.
 - Pure dictionary literals can be owned module/field/parameter default templates;
   materialization creates fresh storage using the existing template mechanism.
-  Dictionary lookup/count/methods require runtime evaluation. `.get()` remains
-  deliberately deferred until result/Ok exists; no incompatible substitute is added.
+  Dictionary lookup/count/methods require runtime evaluation. Stage 8 Sprint 3
+  adds `get(key) -> result<V, string>` with `Err("key not found")` for absence.
 
 ## Storage and correctness
 

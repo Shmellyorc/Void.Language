@@ -1,0 +1,23 @@
+{
+  "scope": "Linux x86-64 Clang 19 Debug prologue stack allocations; not universal platform measurements",
+  "before_sprint3_cold_helpers": {
+    "anchor": 4896,
+    "method_expression": 1888,
+    "index_expression": 3872
+  },
+  "after": {
+    "anchor": 3456,
+    "method_expression": 1760,
+    "index_expression": 2912
+  },
+  "stack_limit_bytes": 1048576,
+  "nesting_limits_changed": false,
+  "valid_nominal_numeric_string_chain_counts": [
+    16,
+    64,
+    96,
+    124
+  ],
+  "rejected_chain_count": 400,
+  "debug_semantic_depth": "passed after outlining cold text/result helpers"
+}

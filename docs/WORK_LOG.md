@@ -1,6 +1,6 @@
 # Work log
 
-**Current handoff:** [Documentation index](README.md), [canonical implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and [Sprint 2 acceptance](stage8/SPRINT2_ACCEPTANCE.md). Stage 8 Sprint 1 is owner-locally accepted; Sprint 2 is locally verified and awaiting Wrench review. Hosted CI is deferred until Stage 8 end. Latest entries appear at the end; earlier entries retain historical evidence.
+**Current handoff:** [Documentation index](README.md), [Sprint 3 acceptance](stage8/SPRINT3_ACCEPTANCE.md) and [contract](STAGE8_TEXT_COLLECTIONS.md). Stage 8 Sprint 3 is locally verified and stopped for Wrench review; Sprints 4–6 remain future work. Hosted CI is deferred to Stage 8 end. Earlier entries retain historical evidence.
 
 ## 14 October 2026: Phase 22 UTF-8 foundation implementation
 
@@ -13858,3 +13858,98 @@ No hosted CI was run/requested; Windows Debug/Release repair execution, Windows/
 macOS Sprint 2 acceptance and fresh real interactive editor checks remain unverified.
 No commits, pushes, branch/remote changes or publication. Sprints 3–6 remain future
 work; no automatic progression is authorized.
+
+
+## 20 October 2026: Stage 8 Sprint 3 preparation and approval checkpoint
+
+Boss explicitly authorized Sprint 3 from verified starting commit
+`483ef87c3ec62c29c2bf1000529b480f0ba5ef2d`; the initial worktree was clean.
+Read current contracts and inspected UTF-8 validation, string storage/publication,
+collection mutation/versions, result representation, capabilities and tooling paths.
+Presented one consolidated three-part public API approval checkpoint. Its proposed
+text index/count, owned UTF-8 and recoverable collection contracts remain **pending
+owner approval**, not implemented or accepted. See
+[the preparation contract](STAGE8_TEXT_COLLECTIONS.md).
+
+The existing Release build passed **7/7 focused baseline suites**, zero failures,
+43.16 s. [Preparation evidence](stage8/sprint3-preparation.json) distinguishes this
+from fresh implementation acceptance. No production code, root README, Git state,
+remotes, hosted CI or website was modified. No Sprint 4 work. Continue Sprint 3
+engineering only after the required public API decisions are approved; retain
+Sprints 1/2, strict local acceptance and the deferred end-of-Stage-8 hosted gate.
+
+
+## 20 October 2026: Stage 8 Sprint 3 approved implementation in progress
+
+Boss approved all three public API groups after the consolidated checkpoint:
+i64 scalar/byte counts, owned one-scalar checked indexing and owned UTF-8 byte
+conversion; string-error result get/pop signatures, including fixed-array get.
+[DECISIONS.md](DECISIONS.md) records the exact approval. The preparation-only
+checkpoint entry above is superseded; no additional semantic decision is pending.
+
+Engineering reuses existing strings, strict UTF-8 validation, typed buffers,
+results, capability facts, checked failures and compiler-owned editor metadata.
+Safe collection APIs lower through existing count/contains/read/remove/variant
+operations; no collection convenience opcode or duplicate Runtime was added.
+Focused Release process/native/LSP checks pass, including exact byte ownership,
+malformed encodings, all integer widths, readonly effects, fixed copies, pop
+versions, GC, allocation-failure cleanup/retry and compatible retained-lease reload.
+Consolidated local builds/acceptance are in progress, not yet claimed complete.
+
+An initial Debug 1 MiB rejected-chain check crashed because new result/text hint
+temporaries expanded recursive frames. Cold helper boundaries repaired it without
+changing nesting guards or stack reserves. Nominal/numeric/string legal and
+recovering-rejection depth checks now pass; [measurements](stage8/sprint3-stack-frames.json)
+retain the actual prologue evidence. Engineering fixture failures (unsupported
+numeric suffix spelling, missing C++ include, omitted AOT Runtime link inputs,
+stdout/stderr failure capture and allocation-probe frame reservation) were repaired
+without weakening product checks. Final evidence must retain these distinctions
+and count only completed final suites.
+
+Root README and CI #82 repair source/tests remain unchanged. No Git/remote,
+website or hosted CI mutations. Sprints 4–6 remain future work. Stop after
+Sprint 3 local acceptance for Wrench review and Boss-controlled publication.
+
+
+### Sprint 3 consolidated-test assertion repair
+
+The first consolidated Release run passed **144/145**; arrays_foundation retained
+an obsolete expectation that `return "x"[0]` in an i32 function was unsupported
+syntax. Sprint 3 correctly returns string and diagnoses the incompatible i32
+return as VOID2001. Updated that diagnostic expectation, retained the negative,
+and added a positive string-returning scalar-index analysis. The focused Release
+arrays_foundation rerun passed **1/1** (0.05 s). No production source changed.
+Original failure evidence is retained; the rerun is one repaired suite, not an
+additional unique suite. Debug/strict acceptance must use the repaired assertion.
+
+
+## 20 October 2026: Stage 8 Sprint 3 local acceptance and Wrench handoff
+
+**IMPLEMENTED / LOCALLY VERIFIED; STOPPED for Wrench review.** Delivered approved
+scalar/i64 length and byte_length, owned scalar indexing/UTF-8 conversion and
+string-error result list/fixed-array/dictionary get plus list pop. Reused the
+existing Runtime, buffers, strict validator, results, capability checks, typed IR
+and LLVM 19.1.7 JIT/AOT; no collection convenience opcode or extra allocator/cache.
+Compiler-owned LSP metadata covers the APIs without fake writable navigation.
+
+Final unique outcomes: **435/435**. Debug **145/145**; strict ASan/UBSan/leaks
+**145/145**. Release **144/145**, followed by the documented test-only diagnostic
+assertion repair and focused **1/1** arrays_foundation pass; no production code
+changed for that repair. Reruns are not counted as extra unique suites. Both full
+Debug/Release 1 MiB frontend gates passed. Strict execution stayed outside ptrace
+with leak detection and halt-on-error enabled. Focused process coverage is 106;
+GC/failure/copy/readonly/version/reload and compiler-owned editor tests passed.
+
+[Acceptance](stage8/SPRINT3_ACCEPTANCE.md), [results](stage8/sprint3-results.json),
+[source/test hashes](stage8/sprint3-source-hashes.json),
+[stack evidence](stage8/sprint3-stack-frames.json) and
+[traversal measurements](stage8/sprint3-traversal.json) retain exact scope, commands,
+failures/fixes and limitations. All owner decisions are approved. Runtime-only
+queries, builtin method values and conservative worker method-call admission are
+explicit boundaries; no expansion is inferred. Wrench review, new actual editor
+checks and Windows/macOS remain pending, including CI #82 Debug/Release repair
+execution at the deferred end-of-Stage-8 hosted gate.
+
+Sprint 1 repair hashes and Sprint 2 contracts are preserved. Root README unchanged;
+no commits, pushes, branches/remotes, hosted CI, website or publication. Sprints
+4–6 remain future work. Permanent Keyboard/Research/Wrench handoffs are under docs/.

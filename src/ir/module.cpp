@@ -863,6 +863,15 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::argument:
                     if (i.a >= f.parameters.size()) fail("invalid argument index");
                     result = f.parameters[i.a]; break;
+                case Op::string_count: case Op::string_index: case Op::string_encode: case Op::string_decode: {
+                    if(!m.coordinated || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat)fail("invalid text operation flags");
+                    if(i.op==Op::string_decode){valid_type(i.type);if(operand(i.a).kind!=Type::growable_array || array_element(operand(i.a))!=Type::u8 || i.b || i.immediate || i.type.kind!=Type::aggregate || !i.type.definition->result_type || i.type.definition->fields.size()!=3 || field_type(i.type,1)!=Type::string || field_type(i.type,2)!=Type::string)fail("invalid UTF-8 decode");result=i.type;}
+                    else {if(operand(i.a)!=Type::string)fail("invalid text receiver");
+                        if(i.op==Op::string_count){if(i.b || i.immediate<0 || i.immediate>1)fail("invalid text count");result=Type::i64;}
+                        else if(i.op==Op::string_index){if(!numeric::integer(operand(i.b)) || i.immediate)fail("invalid text index");result=Type::string;}
+                        else {valid_type(i.type);if(i.b || i.immediate || i.type.kind!=Type::growable_array || array_element(i.type)!=Type::u8 || i.type.readonly || !readonly_paths(i.type).empty())fail("invalid UTF-8 encode");result=i.type;}
+                    }break;
+                }
                 case Op::string_literal:
                     if (!m.coordinated || i.type!=Type::string || i.immediate<0 || static_cast<std::size_t>(i.immediate)>=m.strings.size()) fail("invalid string literal");
                     valid_type(i.type); result=Type::string; break;

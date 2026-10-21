@@ -1,0 +1,23 @@
+{
+  "scope": "Focused Release repeated traversal sample from tests/stage8/sprint3.hpp; local wall-clock microseconds, not platform or latency guarantees",
+  "source_log": "build/stage8-sprint3-acceptance/native-focused.log",
+  "scalar_counts": [
+    64,
+    1024,
+    4096
+  ],
+  "utf8_bytes_per_scalar": 2,
+  "count_repetitions": 128,
+  "last_scalar_index_repetitions": 32,
+  "count_microseconds": [
+    29,
+    385,
+    1506
+  ],
+  "last_scalar_index_microseconds": [
+    30,
+    223,
+    845
+  ],
+  "policy": "retain linear scanning; no per-string index cache introduced"
+}

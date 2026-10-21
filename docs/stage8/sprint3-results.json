@@ -1,0 +1,109 @@
+{
+  "date": "2026-10-20 America/Los_Angeles",
+  "scope": "Stage 8 Sprint 3 only",
+  "starting_commit": "483ef87c3ec62c29c2bf1000529b480f0ba5ef2d",
+  "status": "implemented and locally verified; Wrench review pending; not hosted locked",
+  "llvm": "19.1.7",
+  "configurations": [
+    {
+      "configuration": "debug",
+      "build_directory": "build/debug",
+      "full_run_passed": 145,
+      "full_run_total": 145,
+      "full_run_failed": 0,
+      "full_run_seconds": 524.29,
+      "final_unique_suites_passed": 145,
+      "final_unique_suites_failed": 0,
+      "log": "build/stage8-sprint3-acceptance/debug-ctest.log",
+      "log_sha256": "e60aa9658f7f6ea064ec798beb74d700bd2b95c88a2a50097dd4f3d82cc75301",
+      "command": "ctest --test-dir build/debug --output-on-failure -j2"
+    },
+    {
+      "configuration": "release",
+      "build_directory": "build/ci-release",
+      "full_run_passed": 144,
+      "full_run_total": 145,
+      "full_run_failed": 1,
+      "full_run_seconds": 222.01,
+      "final_unique_suites_passed": 145,
+      "final_unique_suites_failed": 0,
+      "log": "build/stage8-sprint3-acceptance/release-ctest.log",
+      "log_sha256": "88cfa2c9166a69af8a9be3a150c1c9149cf6bed559521c09905b6d149899ad76",
+      "command": "ctest --test-dir build/ci-release --output-on-failure -j2",
+      "focused_test_only_repair": {
+        "test": "arrays_foundation",
+        "passed": 1,
+        "total": 1,
+        "seconds": 0.05,
+        "production_source_changed": false,
+        "reason": "obsolete unsupported-string-index diagnostic replaced with precise type-mismatch negative and valid string-return positive",
+        "log": "build/stage8-sprint3-acceptance/release-arrays-foundation-repair.log"
+      }
+    },
+    {
+      "configuration": "sanitizers",
+      "build_directory": "build/ci-sanitizers",
+      "full_run_passed": 145,
+      "full_run_total": 145,
+      "full_run_failed": 0,
+      "full_run_seconds": 471.5,
+      "final_unique_suites_passed": 145,
+      "final_unique_suites_failed": 0,
+      "log": "build/stage8-sprint3-acceptance/sanitizers-ctest.log",
+      "log_sha256": "511abfea0128bb49ac15aa859a89f3a99717c2fb652b6ae50df54ea29e8b9086",
+      "command": "ctest --test-dir build/ci-sanitizers --output-on-failure -j2"
+    }
+  ],
+  "final_unique_suite_outcomes": 435,
+  "final_failed_suite_outcomes": 0,
+  "release_full_run_green": false,
+  "release_focused_assertion_repair_passed": true,
+  "reruns_counted_as_additional_unique_suites": false,
+  "focused_process_checks": 106,
+  "source_hashes": "sprint3-source-hashes.json",
+  "stack_measurements": "sprint3-stack-frames.json",
+  "traversal_measurements": "sprint3-traversal.json",
+  "small_stack": {
+    "bytes": 1048576,
+    "debug": "passed",
+    "release": "passed",
+    "command_template": "bash -c 'ulimit -s 1024; exec ./<build>/void_tests frontend .'",
+    "limits_changed": false
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "outside_ptrace": true,
+    "generated_application_code_instrumented": false
+  },
+  "ci82_repair_source_hashes_preserved": {
+    "src/frontend/source.cpp": "4900d157d7a84c42f8aeea608c9e6b4c7e9da02679cad7b0fdbda074fa4044e4",
+    "tests/lsp/stage8.py": "258b47a90c5727317342ae25c37a8d1a3d2bfa749073302d3387a780619cc62a"
+  },
+  "root_readme_changed": false,
+  "hosted_ci_run_or_requested": false,
+  "hosted_gate": "end of Stage 8 unless separately authorized by Boss",
+  "git_mutations": false,
+  "engineering_failure_logs": [
+    "build/stage8-sprint3-acceptance/engineering-void-sprint3-process.log",
+    "build/stage8-sprint3-acceptance/engineering-void-sprint3-process2.log",
+    "build/stage8-sprint3-acceptance/engineering-void-sprint3-process3.log",
+    "build/stage8-sprint3-acceptance/engineering-void-sprint3-process4.log",
+    "build/stage8-sprint3-acceptance/engineering-void-sprint3-process5.log",
+    "build/stage8-sprint3-acceptance/engineering-void-sprint3-native-line.log",
+    "build/stage8-sprint3-acceptance/engineering-void-sprint3-native2.log",
+    "build/stage8-sprint3-acceptance/engineering-void-sprint3-build3.log"
+  ],
+  "pending": [
+    "Wrench review",
+    "Windows/macOS Sprint 3 acceptance at the deferred hosted gate",
+    "Windows Debug/Release CI #82 short/long path and reparse execution",
+    "Fresh real interactive editor Sprint 3 acceptance"
+  ],
+  "scope_boundaries": [
+    "Runtime text/collection inspection, not compile-time evaluation",
+    "No builtin method values",
+    "Existing conservative worker-reachability checker rejects these synthetic method callees (VOID1103); no worker admission expansion",
+    "Sprints 4\u20136 remain future work"
+  ]
+}

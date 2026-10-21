@@ -1,27 +1,42 @@
 # Known issues and deferred work
 
+
 ## Stage 8 current disposition — 20 October 2026
 
-Stage 8 Sprint 1 is **locally accepted by Boss**, including preservation of the
-[Windows CI #82 path repair](stage8/CI82_WINDOWS_REPAIR.md). Sprint 2 is
-**IMPLEMENTED / LOCALLY VERIFIED** (429/429 suites); Wrench review is pending. See the
-[calls/numeric contract](STAGE8_CALLS_NUMERIC.md) and
-[local verification record](stage8/SPRINT2_ACCEPTANCE.md). All three semantic
-choices are approved in [DECISIONS.md](DECISIONS.md): consistent argument binding,
-the four-member numeric prelude and exact numeric edge behavior.
+Stage 8 Sprint 3 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
+Debug and strict sanitizers passed **145/145 each**. Release passed **144/145**,
+then its obsolete arrays_foundation diagnostic assertion was repaired and passed
+its focused **1/1** rerun: **435/435 final unique configuration/suite outcomes**.
+The original failure is retained, and no production source changed for that test
+repair. Both 1 MiB frontend gates passed. See [the Sprint 3 contract](STAGE8_TEXT_COLLECTIONS.md)
+and [exact acceptance evidence and limits](stage8/SPRINT3_ACCEPTANCE.md).
 
-**Hosted CI is deferred until the end of Stage 8**, unless Boss explicitly
-authorizes an earlier run. Do not run or request hosted CI for Sprint 2.
-Git, branches, remote changes and publication remain owner-controlled; no such
-operations are authorized. Root README remains public-facing and unchanged.
-Stop after Sprint 2 local verification for Wrench review. Sprints 3–6 remain
-future work; do not progress automatically. Stage 7 remains hosted locked at
-`f704d75f`, CI #81 attempt 2, seven jobs, 980/980 suites. Stage 8 is not hosted locked.
+All three Sprint 3 API decisions are approved in [DECISIONS.md](DECISIONS.md).
+No Sprint 3 owner decision remains pending. Queries are runtime-only; builtin
+method values are absent, and worker calls retain conservative admission. The
+contract records these limits; no broader API or async admission is claimed.
+Sprint 1 remains locally accepted by Boss, with its
+[CI #82 Windows repair](stage8/CI82_WINDOWS_REPAIR.md) source/test hashes preserved.
+Sprint 2's named/default, numeric, tooling and reload contracts remain covered.
+
+**Hosted CI remains deferred until the end of Stage 8**, unless Boss explicitly
+authorizes an earlier run. No hosted CI was run or requested. Windows/macOS,
+Windows Debug/Release CI #82 execution and fresh actual editor-client verification
+remain pending; Linux LSP pipe tests do not establish them. Stage 8 is not hosted locked.
+
+**Stopped after Sprint 3 for Wrench review. Sprints 4–6 remain future work.**
+Do not begin Sprint 4 without explicit Boss authorization. No commits, pushes,
+branch/remote changes, publication or website work occurred. Root README is
+unchanged; future sprint prompts direct documentation updates under `docs/` and
+require separate explicit Boss authorization for public-facing root README edits.
+
 
 VSCodium, new Windows/macOS editor combinations and clean-machine portability
 remain unverified. CI #82 Windows execution is deferred, not silently counted as
-passing. No existing standard-library catalog, optional-main entry, recoverable
-collections/text, private fields or async retirement is implied by Sprint 2.
+passing. Sprint 3 supplies the bounded text/recoverable collection APIs in its
+contract. Synthetic method callees reached through spawn still reject with VOID1103;
+no builtin method values are added. An official standard-library catalog, optional-main
+entry, private fields and async retirement remain outside this sprint.
 
 ## Stage 7 implementation boundaries — 20 October 2026
 

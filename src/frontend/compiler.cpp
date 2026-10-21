@@ -484,6 +484,8 @@ struct Unit {
     std::set<std::string> explicit_qualifiers;
     std::set<std::string> failed_qualifiers, invalid_declarations;
     std::vector<Type> synthetic_types;
+    std::map<std::string,AnalyzedDeclaration> builtins;
+    std::function<Type(Type,Type)> make_result;
     std::function<Type(Type,const Token&)> resolve_callable;
     std::function<Type(const std::vector<Type>&,Type)> make_callable;
     std::function<Type(Type)> make_task;
@@ -757,7 +759,7 @@ class Parser {
             return postfix(std::move(e));
         }
         if(token.text=="(") {auto e=expression();need(")");return postfix(std::move(e));}
-        if(token.kind==TokenKind::name && (!reserved.contains(token.text) || (numeric::primitive(token.text)!=Type::none && at(".")))) return postfix(std::make_unique<Expr>(Expr::Kind::name,token));
+        if(token.kind==TokenKind::name && (!reserved.contains(token.text) || ((numeric::primitive(token.text)!=Type::none || token.text=="string") && at(".")))) return postfix(std::make_unique<Expr>(Expr::Kind::name,token));
         error(source,token,Code::syntax,"Expected an expression, found '"+token.text+"'.");
     }
     std::unique_ptr<Expr> unary() {
@@ -1368,8 +1370,63 @@ class Semantics {
         auto result=call_arguments(e,target,0);
         return e.type=result;
     }
+    VOID_SEMANTIC_HANDLER bool text_type_base(const Expr& base) {
+        if(base.kind!=Expr::Kind::name || lookup(base.token.text) || unit.qualifiers.contains(base.token.text))return false;
+        auto context=current?current:default_context;
+        return base.token.text=="string" || (context && context->substitutions.contains(base.token.text) && context->substitutions.at(base.token.text)==Type::string);
+    }
+    Type byte_list() {auto definition=std::make_shared<ir::ValueType>();definition->identity=definition->name=ir::array_identity(Type::u8,{});definition->element=ir::FieldType(Type::u8);return Type(definition,Type::growable_array);}
+    void builtin_record(const Function& function,const std::string& documentation) {
+        auto text=std::make_shared<const SourceFile>("<core prelude>",function.token.text);SourceSpan site{text,"$core",0,function.token.text.size()};
+        AnalyzedDeclaration record{AnalyzedDeclaration::Kind::function,function.symbol,"$core","public",site,{},function.result,{}};
+        record.builtin=true;record.documentation=documentation;
+        for(const auto& p:function.parameters){record.parameters.push_back(p.type);record.written_parameters.push_back({p.token.text,p.type,site});}
+        unit.builtins.insert_or_assign(function.symbol,std::move(record));
+    }
+    VOID_SEMANTIC_HANDLER Type text_property(Expr& e) {
+        if(!current)error(source,e.token,Code::constant_call,"String inspection requires runtime evaluation.");
+        e.target="$text."+e.token.text;Function property;property.token=e.token;property.result=Type::i64;property.symbol=e.target;
+        builtin_record(property,e.token.text=="length"?"Unicode scalar count (i64); no grapheme segmentation.":"UTF-8 byte count (i64), including embedded NUL.");unit.builtins.at(property.symbol).kind=AnalyzedDeclaration::Kind::module_constant;e.source_target=e.target;return e.type=Type::i64;
+    }
+    VOID_SEMANTIC_HANDLER Type text_type_call(Expr& e) {return core_call(e,Type::string,true);}
+    VOID_SEMANTIC_HANDLER std::optional<Type> text_anchor() {return Type::string;}
+    VOID_SEMANTIC_HANDLER std::optional<Type> text_result_anchor() {return unit.make_result(Type::string,Type::string);}
+    VOID_SEMANTIC_HANDLER std::optional<Type> core_result_anchor(const Type& receiver) {return unit.make_result(receiver.kind==Type::dictionary?ir::dictionary_value(receiver):ir::array_element(receiver),Type::string);}
+    VOID_SEMANTIC_HANDLER std::optional<Type> byte_list_anchor() {return byte_list();}
+    VOID_SEMANTIC_HANDLER Type text_index_expression(Expr& e) {
+        if(!current)error(source,e.token,Code::constant_call,"String indexing requires runtime evaluation.");
+        if(!numeric::integer(expression(*e.parts[1])))error(source,e.parts[1]->token,Code::type_mismatch,"String index requires an integer, excluding bool and floats.");e.target="$text.index";return e.type=Type::string;
+    }
+    VOID_SEMANTIC_HANDLER Type core_call(Expr& e,const Type& receiver,bool type_level=false) {
+        if(!current)error(source,e.token,Code::constant_call,"Text and collection APIs require runtime evaluation.");
+        if(!e.type_arguments.empty())error(source,e.token,Code::argument_count,"Core members do not take explicit generic arguments.");
+        Function target;target.token=e.token;std::string documentation;std::optional<Type> argument;std::string name;
+        if(type_level) {
+            if(e.token.text!="from_utf8")error(source,e.token,Code::unknown_method,"The string type exposes from_utf8(bytes).");
+            e.target="$text.from_utf8";target.result=unit.make_result(Type::string,Type::string);argument=ir::readonly_view(byte_list());name="bytes";documentation="Copy and validate owned UTF-8 bytes; malformed encoding returns Err(\"invalid UTF-8\").";
+        } else if(receiver==Type::string) {
+            if(e.token.text!="to_utf8")error(source,e.token,Code::unknown_method,"String methods expose to_utf8().");
+            e.target="$text.to_utf8";target.result=byte_list();documentation="Copy immutable text into a fresh independent UTF-8 byte list.";
+        } else {
+            const bool pop=e.token.text=="pop";
+            if(pop && receiver.kind!=Type::growable_array)error(source,e.token,Code::type_mismatch,"Only growable lists support pop().");
+            auto value=receiver.kind==Type::dictionary?ir::dictionary_value(receiver):ir::array_element(receiver);
+            target.result=unit.make_result(value,Type::string);e.target=receiver.kind==Type::dictionary?"$safe.dict.get":pop?"$safe.array.pop":"$safe.array.get";
+            if(!pop){name=receiver.kind==Type::dictionary?"key":"index";argument=receiver.kind==Type::dictionary?ir::readonly_view(ir::dictionary_key(receiver)):Type(Type::i32);
+                if(receiver.kind!=Type::dictionary && e.parts.size()==2 && !editor_cursor(*e.parts[1])){auto t=expression(*e.parts[1]);if(!numeric::integer(t))error(source,e.parts[1]->token,Code::type_mismatch,"Collection index requires an integer, excluding bool and floats.");argument=t;}}
+            documentation=pop?"Remove the last list value; empty lists return Err(\"empty list\") without mutation.":"Recoverable lookup preserving value copies and deep readonly authority.";
+        }
+        target.symbol=e.target+"::"+ir::capability_key(receiver)+(argument?"::"+ir::capability_key(*argument):"");
+        if(argument)target.parameters.push_back({Token{TokenKind::name,name,e.token.offset},*argument});
+        builtin_record(target,documentation);e.source_target=target.symbol;
+        if(type_level)e.parts.erase(e.parts.begin());
+        const auto result=call_arguments(e,target,type_level?0:1);
+        return e.type=result;
+    }
     VOID_SEMANTIC_HANDLER Type method_expression(Expr& e, std::optional<Type> expected) {
         if(!e.argument_indexes.empty())return e.type;
+        if(e.source_target.starts_with("$text.") || e.source_target.starts_with("$safe."))return e.type;
+        if(text_type_base(*e.parts[0]))return text_type_call(e);
         if(primitive_base_selected(*e.parts[0]))return type_numeric_call(e);
         if(auto variant=enum_expression(e,true))return *variant;
         bool super=e.parts[0]->kind==Expr::Kind::name && e.parts[0]->token.text=="super" && !lookup("super") && !unit.qualifiers.contains("super") && !unit.failed_qualifiers.contains("super");
@@ -1395,6 +1452,7 @@ class Semantics {
     // the supported 1 MiB native stack in Debug as well as optimized builds.
     VOID_SEMANTIC_HANDLER Type resolved_method_expression(Expr& e,Type receiver) {
         if(numeric::number(receiver))return numeric_call(e,receiver,false);
+        if(receiver.kind==Type::string || (ir::collection_type(receiver) && (e.token.text=="get" || e.token.text=="pop")))return core_call(e,receiver);
         if(e.parts[0]->event){
             bool owner=false;if(current && current->receiver)for(auto type=current->receiver->type.definition;type;type=type->base.lock())owner|=type->identity==e.parts[0]->event_owner;
             if(e.token.text!="emit" || !owner)error(source,e.token,Code::visibility,"Only methods of the event owner may emit it.");
@@ -1403,14 +1461,14 @@ class Semantics {
         }
         if(receiver.definition && receiver.definition->callable && e.token.text=="call"){e.kind=Expr::Kind::function_call;return function_invocation(e);}
         if(receiver.kind==Type::dictionary && (e.token.text=="contains" || e.token.text=="remove" || e.token.text=="clear" || e.token.text=="get")) {
-            if(e.token.text=="get")error(source,e.token,Code::unsupported_type,"Dictionary get awaits its approved result error type/signature; use checked indexing or contains.");
+
             if(!current)error(source,e.token,Code::constant_call,"Dictionary operations require runtime evaluation.");
             if(e.parts.size()!=(e.token.text=="clear"?1u:2u) || std::any_of(e.names.begin(),e.names.end(),[](const auto& n){return !n.text.empty();}))error(source,e.token,Code::argument_count,"Incorrect dictionary positional arguments.");
             if(e.parts.size()==2)expect(expression(*e.parts[1],ir::readonly_view(ir::dictionary_key(receiver))),ir::readonly_view(ir::dictionary_key(receiver)),e.parts[1]->token);
             e.target="$dict."+e.token.text;return e.type=e.token.text=="clear"?Type(Type::none):Type(Type::boolean);
         }
         if(ir::array_type(receiver) && (e.token.text=="push" || e.token.text=="remove_at" || e.token.text=="insert" || e.token.text=="clear" || e.token.text=="pop")) {
-            if(e.token.text=="pop")error(source,e.token,Code::unsupported_type,"pop awaits its approved result error type/signature; use checked remove_at(-1).");
+
             if(!current)error(source,e.token,Code::constant_call,"List mutation is not a pure constant expression.");
             if(receiver.kind!=Type::growable_array)error(source,e.token,Code::type_mismatch,"Fixed arrays cannot change length.");
             const auto count=e.token.text=="clear"?1u:e.token.text=="insert"?3u:2u;
@@ -1713,18 +1771,23 @@ class Semantics {
         }
         if(e.kind==K::array_index || e.kind==K::array_slice) {
             auto owner=anchor(*e.parts[0]);
+            if(owner && owner->kind==Type::string && e.kind==K::array_index)return text_anchor();
             if(owner && owner->kind==Type::dictionary && e.kind==K::array_index)return ir::dictionary_value(*owner);
             if(owner && ir::array_type(*owner)) return e.kind==K::array_slice?slice_type(*owner):ir::array_element(*owner);
             return {};
         }
         if(e.kind==K::array_literal) return {};
         if (e.kind == K::method_call) {
+            if(e.source_target.starts_with("$text.") || e.source_target.starts_with("$safe."))return e.type;
+            if(text_type_base(*e.parts[0]) && e.token.text=="from_utf8")return text_result_anchor();
             if(primitive_base_selected(*e.parts[0]))return primitive_anchor(*e.parts[0]);
             if (module_call(e)) {
                 return qualified_anchor(e,K::call);
             }
             auto receiver = anchor(*e.parts[0]);
             if (!receiver) return std::nullopt;
+            if(receiver->kind==Type::string && e.token.text=="to_utf8")return byte_list_anchor();
+            if(ir::collection_type(*receiver) && (e.token.text=="get" || (receiver->kind==Type::growable_array && e.token.text=="pop")))return core_result_anchor(*receiver);
             if(numeric::number(*receiver) && numeric::member(e.token.text))return *receiver;
             if(ir::array_type(*receiver) && e.token.text=="remove_at")return ir::array_element(*receiver);
             if(auto* specialized=concrete_method(e,*receiver))return specialized->result;
@@ -1746,7 +1809,7 @@ class Semantics {
                 return qualified_anchor(e,K::name);
             }
             auto base = anchor(*e.parts[0]);
-            if(base && ir::collection_type(*base) && e.token.text=="count")return Type::i64;
+            if(base && ((base->kind==Type::string && (e.token.text=="length" || e.token.text=="byte_length")) || (ir::collection_type(*base) && e.token.text=="count")))return Type::i64;
             if (base && (base->kind == Type::aggregate || base->kind == Type::managed_ref)) {
                 auto selected=member(*base,e.token);
                 if (!selected.function) { auto t=*base; for (auto index:selected.path) t=ir::field_type(t,index); return t; }
@@ -1836,6 +1899,14 @@ class Semantics {
         };
         if(receiver) {
             auto t=*receiver;
+            if(t==Type::string || ir::collection_type(t)) {
+                if(t==Type::string){if(text_type_base(*e.parts[0]))add("from_utf8",unit.make_result(Type::string,Type::string),2);else{add("length",Type::i64,10);add("byte_length",Type::i64,10);add("to_utf8",byte_list(),2);}}
+                else {add("count",Type::i64,10);auto value=t.kind==Type::dictionary?ir::dictionary_value(t):ir::array_element(t);add("get",unit.make_result(value,Type::string),2);
+                    if(!t.readonly && !ir::readonly_paths(t).contains({})){if(t.kind==Type::growable_array)for(const auto& name:{"pop","push","remove_at","insert","clear"})add(name,name==std::string("pop")?unit.make_result(value,Type::string):name==std::string("remove_at")?value:Type(Type::none),2);if(t.kind==Type::dictionary)for(const auto& name:{"remove","clear"})add(name,name==std::string("remove")?Type(Type::boolean):Type(Type::none),2);}
+                    if(t.kind==Type::dictionary)add("contains",Type::boolean,2);
+                }
+                for(auto& [name,candidate]:candidates)out.candidates.push_back(std::move(candidate));throw EditorProbeFound{};
+            }
             if(numeric::number(t)) {
                 const bool type_level=primitive_base(*e.parts[0])!=Type::none;
                 for(const auto& api:numeric::members())if(type_level || api.callable) {
@@ -2078,6 +2149,7 @@ class Semantics {
     VOID_SEMANTIC_HANDLER Type index_expression(Expr& e) {
         auto array=expression(*e.parts[0]);
         if(array==error_type) return error_type;
+        if(array.kind==Type::string)return text_index_expression(e);
         if(array.kind==Type::dictionary){if(!current)error(source,e.token,Code::constant_call,"Dictionary lookup requires runtime evaluation.");expect(expression(*e.parts[1],ir::readonly_view(ir::dictionary_key(array))),ir::readonly_view(ir::dictionary_key(array)),e.parts[1]->token);return e.type=ir::dictionary_value(array);}
         if(!ir::array_type(array)) error(source,e.token,Code::unsupported_type,"Indexing requires an array or dictionary.");
         auto index=expression(*e.parts[1]);
@@ -2139,6 +2211,7 @@ class Semantics {
     VOID_SEMANTIC_HANDLER Type field_expression(Expr& e, std::optional<Type> expected) {
         using K = Expr::Kind;
         auto& base = *e.parts[0];
+        if(text_type_base(base)){if(editor_cursor(e))editor_field_candidates(e,Type::string);error(source,e.token,Code::unknown_method,"String type methods require a call.");}
         if(auto type=primitive_base(base);type!=Type::none) {
             if(editor_cursor(e))editor_field_candidates(e,type);
             auto api=numeric::member(e.token.text);
@@ -2155,6 +2228,7 @@ class Semantics {
         if(editor_cursor(e)) editor_field_candidates(e,t);
         if(t.definition && t.definition->task_result)error(source,e.token,Code::unsupported_type,"Inferred task handles support await; task internals are not source fields.");
         if(base.event)error(source,e.token,Code::invalid_value,"Event subscription storage is private.");
+        if(t.kind==Type::string && (e.token.text=="length" || e.token.text=="byte_length"))return text_property(e);
         if(ir::collection_type(t) && e.token.text=="count") {if(t.kind==Type::dictionary && !current)error(source,e.token,Code::constant_call,"Dictionary count requires runtime evaluation.");e.target=t.kind==Type::dictionary?"$dict.count":"$array.count";return e.type=Type::i64;}
         if (t.nullable) error(source,e.token,Code::type_mismatch,"Unwrap the nullable reference before field access.");
         if (t.kind != Type::aggregate && t.kind != Type::managed_ref && t.kind!=Type::interface_ref) error(source,e.token,Code::type_mismatch,"Field access requires a struct or interface.");
@@ -2417,6 +2491,7 @@ class Semantics {
                         writable(*e.parts[0],writeback && (owner.kind==Type::aggregate || owner.kind==Type::fixed_array));
                     }
                 };writable(*s.selection,true);
+                if(s.selection->target.starts_with("$text."))error(source,s.selection->token,Code::readonly,"String contents and inspection properties are immutable.");
                 if(s.selection->target=="$array.count" || s.selection->target=="$dict.count")error(source,s.selection->token,Code::readonly,"Array count is readonly.");
                 s.event=s.selection->event;s.assigned_type=t;
                 if(s.event){if(s.op!="+=" && s.op!="-=")error(source,s.token,Code::invalid_value,"Events support only += and -= subscription changes.");auto signature=ir::array_element(t);expect(expression(*s.expression,signature),signature,s.expression->token);break;}
@@ -2781,7 +2856,7 @@ class Lowering {
         }
         if(i.op==ir::Op::dict_new)module.coordinated=true;
         i.source = source.location(token.offset);
-        if (i.op==ir::Op::function_call || i.op==ir::Op::panic || i.op==ir::Op::pattern_equal || i.op==ir::Op::type_cast || i.op==ir::Op::sum_get || i.op==ir::Op::dict_get || i.op==ir::Op::dict_set || i.op==ir::Op::dict_contains || i.op==ir::Op::dict_remove || i.op==ir::Op::dict_clear || i.op==ir::Op::dict_entry || i.op==ir::Op::dict_check || i.op==ir::Op::dict_new || i.op==ir::Op::array_slice || i.op==ir::Op::list_insert || i.op==ir::Op::list_clear || i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
+        if (i.op==ir::Op::function_call || i.op==ir::Op::panic || i.op==ir::Op::pattern_equal || i.op==ir::Op::type_cast || i.op==ir::Op::sum_get || i.op==ir::Op::dict_get || i.op==ir::Op::dict_set || i.op==ir::Op::dict_contains || i.op==ir::Op::dict_remove || i.op==ir::Op::dict_clear || i.op==ir::Op::dict_entry || i.op==ir::Op::dict_check || i.op==ir::Op::dict_new || i.op==ir::Op::array_slice || i.op==ir::Op::list_insert || i.op==ir::Op::list_clear || i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_count || i.op==ir::Op::string_index || i.op==ir::Op::string_encode || i.op==ir::Op::string_decode || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
             i.source_excerpt = source.excerpt(token.offset);
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
@@ -2972,6 +3047,37 @@ class Lowering {
             auto target=wrapper.name;module.functions.push_back(std::move(wrapper));return expression(call,target);
 
     }
+    VOID_SEMANTIC_HANDLER unsigned safe_collection(const Expr& e) {
+        const auto token=e.token;const auto type=e.parts[0]->type;
+        const bool dictionary=type.kind==Type::dictionary,pop=e.target=="$safe.array.pop";
+        auto owner=snapshot(expression(*e.parts[0]),type,token);
+        std::optional<unsigned> argument;if(!pop)argument=snapshot(expression(*e.parts[1]),e.parts[1]->type,token);
+        auto load=[&](unsigned slot){return emit({ir::Op::load,slot},token);};
+        auto number=[&](Type t,std::uint64_t bits){return constant(t,{bits,{}},token);};
+        auto result=static_cast<unsigned>(output.locals.size());output.locals.push_back(e.type);
+        auto success=block(),missing=block(),done=block();
+        if(dictionary)terminate({ir::Terminator::Kind::branch,emit({ir::Op::dict_contains,load(owner),load(*argument)},token),success,missing});
+        else {
+            auto count=snapshot(emit({ir::Op::array_count,load(owner)},token),Type::i64,token);
+            if(pop)terminate({ir::Terminator::Kind::branch,emit({ir::Op::greater,load(count),number(Type::i64,0)},token),success,missing});
+            else {
+                auto index_type=e.parts[1]->type;const bool sign=numeric::signed_integer(index_type);
+                ir::Instruction widen{ir::Op::convert,load(*argument)};widen.type=sign?Type::i64:Type::u64;
+                auto index=snapshot(emit(widen,token),widen.type,token);
+                if(sign){auto negative=block(),check=block(),upper=block();terminate({ir::Terminator::Kind::branch,emit({ir::Op::less,load(index),number(Type::i64,0)},token),negative,check});
+                    current=negative;emit({ir::Op::store,index,emit({ir::Op::add,load(index),load(count)},token)},token);jump(check);
+                    current=check;terminate({ir::Terminator::Kind::branch,emit({ir::Op::greater_equal,load(index),number(Type::i64,0)},token),upper,missing});
+                    current=upper;terminate({ir::Terminator::Kind::branch,emit({ir::Op::less,load(index),load(count)},token),success,missing});
+                }else{ir::Instruction unsigned_count{ir::Op::convert,load(count)};unsigned_count.type=Type::u64;terminate({ir::Terminator::Kind::branch,emit({ir::Op::less,load(index),emit(unsigned_count,token)},token),success,missing});}
+            }
+        }
+        current=success;auto index=pop?number(Type::i64,~std::uint64_t{}):load(*argument);
+        auto value=emit({dictionary?ir::Op::dict_get:pop?ir::Op::list_remove:ir::Op::array_get,load(owner),index},token);
+        ir::Instruction ok{ir::Op::sum};ok.type=e.type;ok.arguments={value};emit({ir::Op::store,result,emit(ok,token)},token);jump(done);
+        current=missing;ir::ConstantValue error;error.text=dictionary?"key not found":pop?"empty list":"index out of range";
+        ir::Instruction failure{ir::Op::sum};failure.type=e.type;failure.immediate=1;failure.arguments={constant(Type::string,error,token)};emit({ir::Op::store,result,emit(failure,token)},token);jump(done);
+        current=done;return load(result);
+    }
     unsigned expression(const Expr& e,std::string_view parallel_target={}) {
         using K = Expr::Kind;
         switch (e.kind) {
@@ -3021,7 +3127,7 @@ class Lowering {
             for(auto slot:slots) i.arguments.push_back(emit({ir::Op::load,slot},e.token));
             return emit(i,e.token);
         });
-        case K::array_index: return select_expression(e).read();
+        case K::array_index: return frontend_case([&]() -> unsigned {if(e.target!="$text.index")return select_expression(e).read();auto owner=snapshot(expression(*e.parts[0]),Type::string,e.token);auto index=expression(*e.parts[1]);return emit({ir::Op::string_index,emit({ir::Op::load,owner},e.token),index},e.token);});
         case K::array_slice: return frontend_case([&]() -> unsigned {
             auto owner=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);
             auto first=snapshot(expression(*e.parts[1]),e.parts[1]->type,e.token);
@@ -3032,7 +3138,7 @@ class Lowering {
         case K::literal: return frontend_case([&]() -> unsigned {
             return constant(e.type,(e.type.kind == Type::aggregate || ir::collection_type(e.type) || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}},e.token);
         });
-        case K::field: return frontend_case([&]() -> unsigned { auto value=expression(*e.parts[0]); if(e.target=="$dict.count")return emit({ir::Op::dict_count,value},e.token);if(e.target=="$array.count")return emit({ir::Op::array_count,value},e.token); ir::Instruction i{e.parts[0]->type.kind==Type::managed_ref ? ir::Op::gc_read : ir::Op::extract,value}; i.immediate=e.slot; return emit(i,e.token); });
+        case K::field: return frontend_case([&]() -> unsigned { auto value=expression(*e.parts[0]); if(e.target=="$text.length" || e.target=="$text.byte_length"){ir::Instruction i{ir::Op::string_count,value};i.immediate=e.target=="$text.byte_length";return emit(i,e.token);} if(e.target=="$dict.count")return emit({ir::Op::dict_count,value},e.token);if(e.target=="$array.count")return emit({ir::Op::array_count,value},e.token); ir::Instruction i{e.parts[0]->type.kind==Type::managed_ref ? ir::Op::gc_read : ir::Op::extract,value}; i.immediate=e.slot; return emit(i,e.token); });
         case K::construction: return frontend_case([&]() -> unsigned {
             std::vector<unsigned> arguments;
             for (const auto& part : e.parts) {
@@ -3100,6 +3206,8 @@ class Lowering {
         case K::awaited: return emit({ir::Op::await,expression(*e.parts[0])},e.token);
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
         case K::method_call: case K::call: return frontend_case([&]() -> unsigned {
+            if(e.target.starts_with("$safe."))return safe_collection(e);
+            if(e.target=="$text.to_utf8" || e.target=="$text.from_utf8"){ir::Instruction i{e.target=="$text.to_utf8"?ir::Op::string_encode:ir::Op::string_decode,expression(*e.parts[0])};i.type=e.type;return emit(i,e.token);}
             if(e.target=="$event.emit")return event_emit(e);
             if(e.target.starts_with("$dict.")) return frontend_case([&]() -> unsigned {
                 auto owner=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);auto key=e.parts.size()>1?expression(*e.parts[1]):0;
@@ -3987,22 +4095,20 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         definition->self=definition;definition->arena=arena;arena->definitions.push_back(definition);Type type(definition,Type::managed_ref);owner->synthetic_types.push_back(type);capture_records.emplace(identity,type);return type;
     };
     std::map<std::string,std::shared_ptr<ir::ValueType>> canonical_results;
+    auto make_result=[&](Type success,Type failure)->Type {
+        const auto key="$result:"+ir::array_identity(success,{})+":"+ir::array_identity(failure,{});auto& canonical=canonical_results[key];
+        if(!canonical){canonical=std::make_shared<ir::ValueType>();canonical->identity=canonical->name=key;canonical->result_type=true;canonical->display_name="result<"+ir::type_name(success)+", "+ir::type_name(failure)+">";canonical->cases={{"Ok",1,1},{"Err",2,1}};canonical->fields={{"$tag",Type::i32,key},{"$ok",ir::with_readonly_paths(success,{}),key},{"$err",ir::with_readonly_paths(failure,{}),key}};canonical->self=canonical;canonical->arena=arena;arena->definitions.push_back(canonical);}
+        return ir::with_field_type(ir::with_field_type(Type(canonical),1,success),2,failure);
+    };
+    for(auto& [id,u]:units)u->make_result=make_result;
+
     for(auto& [id,u]:units)u->resolve_result=[&,owner=u.get()](Type raw,const Token& token)->Type {
         auto found=std::find_if(owner->results.begin(),owner->results.end(),[&](const auto& syntax){return syntax.definition==raw.definition;});
         if(found==owner->results.end())return raw;
         if(found->resolved!=Type::none)return found->resolved;
         Depth guard(diagnostics.semantic_depth(),owner->source,token,128);
         auto success=resolve_type(found->success,*owner,root,units,token),failure=resolve_type(found->failure,*owner,root,units,token);
-        const auto key="$result:"+ir::array_identity(success,{})+":"+ir::array_identity(failure,{});
-        auto& canonical=canonical_results[key];
-        if(!canonical) {
-            canonical=std::make_shared<ir::ValueType>();canonical->identity=canonical->name=key;canonical->result_type=true;
-            canonical->display_name="result<"+ir::type_name(success)+", "+ir::type_name(failure)+">";
-            canonical->cases={{"Ok",1,1},{"Err",2,1}};
-            canonical->fields={{"$tag",Type::i32,key},{"$ok",success,key},{"$err",failure,key}};
-            canonical->self=canonical;canonical->arena=arena;arena->definitions.push_back(canonical);
-        }
-        return found->resolved=Type(canonical);
+        return found->resolved=make_result(success,failure);
     };
     layout = [&](Unit& owner, Structure& structure) {
         if (structure.definition->interface_type) {structure.layout_state=2;return;}
@@ -4211,7 +4317,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     diagnostics.finish();
     (void)string_pool(units);
     for(auto& [id,u]:units)for(auto& f:u->functions)if(f.asynchronous){f.task=u->make_task(f.result);if(!ir::async_boundary_safe(f.result))error(u->source,f.token,Code::unsupported_type,"Callable-containing results cannot escape an async task in Delivery 1.");for(const auto& parameter:f.parameters)if(!ir::async_boundary_safe(parameter.type))error(u->source,parameter.token,Code::unsupported_type,"Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.");if(f.receiver && !ir::async_boundary_safe(f.receiver->type))error(u->source,f.token,Code::unsupported_type,"Callable-containing managed receivers cannot cross an async task boundary in Delivery 1.");if(f.initializer || f.accessor || (f.receiver && f.token.text=="deinit") || f.virtual_method || f.overriding || f.interface_requirement || (f.receiver && f.receiver->type.kind!=Type::managed_ref))error(u->source,f.token,Code::unsupported_type,"Async lifecycle methods, accessors, value receivers and virtual/interface methods require a reviewed contract.");}
-    for(auto& [id,u]:units) {u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
+    for(auto& [id,u]:units) {u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
 }
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry) {
     ir::Module module;
@@ -4284,7 +4390,8 @@ struct AnalysisAccess {
             if(!api.callable)record.value=numeric::limit(type,api.name=="max_value");
             result->editor_declarations_.push_back(std::move(record));
         }
-        result->contract_="18:numeric-prelude-v1";
+        for(const auto& [id,u]:units)for(const auto& [symbol,record]:u->builtins)if(std::none_of(result->editor_declarations_.begin(),result->editor_declarations_.end(),[&](const auto& d){return d.identity==symbol;}))result->editor_declarations_.push_back(record);
+        result->contract_="18:numeric-prelude-v1:20:text-collections-v1";
 
         auto graph = std::make_shared<const std::map<std::string, std::unique_ptr<Unit>>>(std::move(units));
         auto field = [](std::string& out, const std::string& value) { out += std::to_string(value.size()) + ":" + value; };

@@ -1,5 +1,14 @@
 # Advanced language: Stage 4
 
+## Stage 8 Sprint 3 — current extension
+
+The owner-approved [text/collection contract](STAGE8_TEXT_COLLECTIONS.md) supersedes
+the dated get/pop/text-inspection exclusions below. Sprint 3 is locally verified;
+[acceptance evidence](stage8/SPRINT3_ACCEPTANCE.md) records exact results and limits.
+Wrench review remains pending. Public policies are approved
+in [DECISIONS.md](DECISIONS.md); hosted CI remains deferred to Stage 8 end.
+
+
 Stage 4 extends the production frontend, typed IR, shared LLVM 19.1.7 JIT/AOT
 lowerer and coordinated Runtime. Properties and callable structs remain as
 specified in [PROPERTIES.md](PROPERTIES.md). **Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total).
@@ -148,9 +157,10 @@ remain outside this implementation. Stage 5 caching was delivered separately and
 is hosted-locked at CI #70; automatic watching remains future work. Callback
 signatures cannot discard returned readonly reference authority.
 
-Dictionary `.get()` and list `.pop()` still await their approved error types and
-signatures, even though `result` now exists. Existing conservative root lifetimes
-and the documented deep valid receiver-chain lowering stack limitation remain.
+Stage 8 Sprint 3 supplies the approved string-error signatures for dictionary/list/
+fixed-array get and list pop. Conservative root lifetimes remain. The old deep valid
+receiver-chain stack limitation was repaired in Stage 7/Sprint 2; unchanged 1 MiB
+gates remain mandatory.
 
 `patterns_source`/`patterns_cli` and `advanced_source`/`advanced_cli` exercise real
 programs in `examples/patterns` and `examples/advanced`: normal/O2 JIT, independently

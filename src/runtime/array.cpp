@@ -1,4 +1,5 @@
 #include "void/runtime.hpp"
+#include "void/utf8.hpp"
 #include <cstring>
 #include <limits>
 namespace vd {
@@ -201,5 +202,51 @@ void Runtime::array_slice(void** out,RegisteredRootWord source,const BufferLayou
         if(list){const auto& h=list_header(source,layout->schema());if(h.version!=version || h.backing!=backing || h.count!=live)throw ListModified("List structurally modified during slice");}
         auto& h=list_header(result_root,layout->schema());h.backing=next;h.count=h.capacity=count;*out=result;
     }
+}
+}
+
+namespace vd {
+std::uint64_t Runtime::string_count(void* source,bool bytes) const {
+    auto text=string_bytes(source);if(text.size()>static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max()))throw std::length_error("string count is not representable");if(bytes)return text.size();
+    std::uint64_t count=0;for(std::size_t i=0;i<text.size();++count)i+=utf8_scalar_bytes(text,i);return count;
+}
+void Runtime::string_index_into(void** out,void* source,ScalarEncoding encoding,std::uint64_t bits) {
+    auto text=string_bytes(source);auto count=string_count(source,false);
+    unsigned width;
+    switch(encoding){case ScalarEncoding::i8:case ScalarEncoding::u8:width=8;break;case ScalarEncoding::i16:case ScalarEncoding::u16:width=16;break;case ScalarEncoding::i32:case ScalarEncoding::u32:width=32;break;case ScalarEncoding::i64:case ScalarEncoding::u64:width=64;break;default:throw std::invalid_argument("noninteger string index");}
+    const bool sign=encoding==ScalarEncoding::i8 || encoding==ScalarEncoding::i16 || encoding==ScalarEncoding::i32 || encoding==ScalarEncoding::i64;
+    if(width<64)bits&=(std::uint64_t{1}<<width)-1;
+    std::uint64_t index=bits;
+    if(sign && (bits&(std::uint64_t{1}<<(width-1)))) {
+        auto magnitude=width==64 ? ~bits+1 : (std::uint64_t{1}<<width)-bits;
+        if(magnitude>count)throw std::out_of_range("string index outside extent");index=count-magnitude;
+    }
+    if(index>=count)throw std::out_of_range("string index outside extent");
+    std::size_t offset=0;for(std::uint64_t i=0;i<index;++i)offset+=utf8_scalar_bytes(text,offset);
+    // string_into stages the complete bytes before its first safepoint.
+    string_into(out,text.substr(offset,utf8_scalar_bytes(text,offset)));
+}
+void Runtime::string_encode_into(void** out,void* source) {
+    // Native scratch owns bytes before metadata admission/allocation can poll.
+    std::string bytes(string_bytes(source));auto layout=fixed_scalar_layout(ScalarEncoding::u8,bytes.size());
+    void* backing=nullptr;void* result=nullptr;constexpr std::size_t zero=0;
+    Slot slots[]={{&backing,sizeof(backing),&zero,1},{&result,sizeof(result),&zero,1}};Frame roots(*this,slots,2);
+    if(!bytes.empty()){BufferBuilder builder(*this,layout,bytes.size(),quota);for(unsigned char byte:bytes)builder.write_scalar(byte);builder.finish_into(&backing);}
+    array_new(&result,fixed_scalar_layout(ScalarEncoding::u8,0),true);
+    auto root=root_word(&result);std::lock_guard lock(mutex_);require_buffer_output(out);heap_.validate_output_address(out);
+    auto& header=list_header(root,layout->schema());header.backing=backing;header.count=header.capacity=bytes.size();*out=result;
+}
+bool Runtime::string_decode_into(void** out,RegisteredRootWord source) {
+    auto schema=fixed_scalar_layout(ScalarEncoding::u8,0)->schema();
+    // Capture the existing backing with a precise root and a read lease. No
+    // source mutation is allowed while the owned native snapshot is copied.
+    void* backing=nullptr;constexpr std::size_t zero=0;Slot slot{&backing,sizeof(backing),&zero,1};Frame roots(*this,&slot,1);
+    std::uint64_t count;BufferLayoutRef layout;
+    {std::lock_guard lock(mutex_);const auto& header=list_header(source,schema);count=header.count;backing=header.backing;if(backing)layout=heap_.buffer_state(backing).layout;}
+    std::string bytes;
+    if(count){BufferReadLease lease(*this,root_word(&backing),layout);bytes.resize(count);
+        for(std::uint64_t i=0;i<count;++i)bytes[i]=static_cast<char>(buffer_byte(backing,layout,i,0));}
+    if(!valid_utf8(bytes))return false;
+    string_into(out,bytes);return true;
 }
 }

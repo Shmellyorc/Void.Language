@@ -1,5 +1,14 @@
 # Fixed arrays
 
+## Stage 8 Sprint 3 — current extension
+
+The owner-approved [text/collection contract](STAGE8_TEXT_COLLECTIONS.md) supersedes
+the dated get/pop/text-inspection exclusions below. Sprint 3 is locally verified;
+[acceptance evidence](stage8/SPRINT3_ACCEPTANCE.md) records exact results and limits.
+Wrench review remains pending. Public policies are approved
+in [DECISIONS.md](DECISIONS.md); hosted CI remains deferred to Stage 8 end.
+
+
 Stage 4 adds enum/result and function-value elements, including escaping closures,
 through the same storage and tracing paths. Enum/result values and required
 function elements need explicit complete initializers; nullable functions can
