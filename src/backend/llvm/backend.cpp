@@ -1094,7 +1094,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 case Op::extract: v = b.CreateExtractValue(values[instruction.a],{static_cast<unsigned>(instruction.immediate)}); break;
                 case Op::insert: v = b.CreateInsertValue(values[instruction.a],values[instruction.b],{static_cast<unsigned>(instruction.immediate)}); break;
                 case Op::native_call: {
-                    const auto& catalog=native_fixture_catalog();const auto& binding=native_binding(instruction.callee);unsigned op=static_cast<unsigned>(&binding-catalog.data());
+                    unsigned op=native_operation(instruction.callee);
                     llvm::Value* bits=b.getInt64(0);llvm::Value* object=llvm::ConstantPointerNull::get(b.getPtrTy());llvm::Value* text=object;llvm::Value* environment=object;llvm::Value* entry=object;llvm::Value* function=b.getInt64(0);
                     for(auto id:instruction.arguments){auto t=operand_type(id);auto* argument=values[id];
                         if(t==ir::Type::string)text=argument;
@@ -1110,7 +1110,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         }else {if(t==ir::Type::f32)argument=b.CreateBitCast(argument,b.getInt32Ty());else if(t==ir::Type::f64)argument=b.CreateBitCast(argument,b.getInt64Ty());bits=b.CreateZExtOrTrunc(argument,b.getInt64Ty());}
                     }
                     llvm::Value* output=llvm::ConstantPointerNull::get(b.getPtrTy());if(instruction.type==ir::Type::string || instruction.type.kind==ir::Type::managed_ref)output=value_roots[n].at(values.size());
-                    auto* result=b.CreateCall(module->getOrInsertFunction("vd_native_fixture_call",b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{b.getInt32(op),bits,object,text,function,environment,entry,output,b.CreateGlobalStringPtr(op==14?instruction.type.definition->identity:""),failure});
+                    auto* result=b.CreateCall(module->getOrInsertFunction(native_provider(instruction.callee)=="void.fixture.v1"?"vd_native_fixture_call":"vd_native_sink_call",b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{b.getInt32(op),bits,object,text,function,environment,entry,output,b.CreateGlobalStringPtr(op==14?instruction.type.definition->identity:""),failure});
                     auto* bad=llvm::BasicBlock::Create(context,"native.failure",fn);auto* okay=llvm::BasicBlock::Create(context,"native.valid",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),bad,okay);b.SetInsertPoint(bad);trace_failure();b.SetInsertPoint(okay);
                     if(instruction.type==ir::Type::none)v=llvm::UndefValue::get(b.getInt8Ty());else if(instruction.type==ir::Type::string || instruction.type.kind==ir::Type::managed_ref)v=b.CreateLoad(type(instruction.type),output);else if(instruction.type==ir::Type::f32)v=b.CreateBitCast(b.CreateTrunc(result,b.getInt32Ty()),b.getFloatTy());else if(instruction.type==ir::Type::f64)v=b.CreateBitCast(result,b.getDoubleTy());else v=b.CreateZExtOrTrunc(result,type(instruction.type));break;
                 }
@@ -1480,7 +1480,7 @@ Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
     bind("vd_gc_interface_binding",vd_gc_interface_binding);
     bind("vd_cleanup_failure",vd_cleanup_failure);bind("vd_gc_poll",vd_gc_poll); bind("vd_gc_collect",vd_gc_collect); bind("vd_gc_allocate",vd_gc_allocate);
     bind("vd_gc_release",vd_gc_release);bind("vd_gc_alive",vd_gc_alive); bind("vd_gc_native_enter",vd_gc_native_enter); bind("vd_gc_native_leave",vd_gc_native_leave);
-    bind("vd_native_fixture_call",vd_native_fixture_call);bind("vd_worker_checkpoint",vd_worker_checkpoint);bind("vd_async_root",vd_async_root);bind("vd_async_new",vd_async_new);bind("vd_async_start",vd_async_start);bind("vd_async_ready",vd_async_ready);bind("vd_async_suspend",vd_async_suspend);bind("vd_async_complete",vd_async_complete);bind("vd_async_cancel_children",vd_async_cancel_children);bind("vd_async_cleanup_enter",vd_async_cleanup_enter);bind("vd_async_cleanup_leave",vd_async_cleanup_leave);bind("vd_async_finish",vd_async_finish);bind("vd_async_cancel",vd_async_cancel);bind("vd_async_checkpoint",vd_async_checkpoint);bind("vd_async_group_enter",vd_async_group_enter);bind("vd_async_group_join",vd_async_group_join);bind("vd_async_drain",vd_async_drain);
+    bind("vd_native_fixture_call",vd_native_fixture_call);bind("vd_native_sink_call",vd_native_sink_call);bind("vd_worker_checkpoint",vd_worker_checkpoint);bind("vd_async_root",vd_async_root);bind("vd_async_new",vd_async_new);bind("vd_async_start",vd_async_start);bind("vd_async_ready",vd_async_ready);bind("vd_async_suspend",vd_async_suspend);bind("vd_async_complete",vd_async_complete);bind("vd_async_cancel_children",vd_async_cancel_children);bind("vd_async_cleanup_enter",vd_async_cleanup_enter);bind("vd_async_cleanup_leave",vd_async_cleanup_leave);bind("vd_async_finish",vd_async_finish);bind("vd_async_cancel",vd_async_cancel);bind("vd_async_checkpoint",vd_async_checkpoint);bind("vd_async_group_enter",vd_async_group_enter);bind("vd_async_group_join",vd_async_group_join);bind("vd_async_drain",vd_async_drain);
     impl_->custom_bindings=false;
 }
 Jit::~Jit() = default;
@@ -1605,7 +1605,7 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
             auto owner=runtime;
             if(artifact->coordinated && !owner){if(!impl_->source_runtime)impl_->source_runtime=std::make_shared<Runtime>(256);owner=impl_->source_runtime;}
             if(bool(owner)!=artifact->coordinated)throw std::runtime_error("cache coordination mismatch");
-            auto expected=analysis.entry_identity()+"::entry";
+            auto expected=analysis.entry_symbol();
             if(contract.function_id.empty())contract.function_id=expected;
             if(contract.function_id!=expected || contract.signature!="c:i32(i32)")throw std::invalid_argument("code identity or signature does not match IR");
             contract.source_contract=analysis.compatibility_contract();contract.constant_contract=analysis.constant_contract();
@@ -1627,7 +1627,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ValidatedAnalysis& analysis
 }
 std::shared_ptr<const NativeCode> Jit::compile_async(const ValidatedAnalysis& analysis,bool optimize,Compatibility contract){return compile_analysis(analysis,optimize,std::move(contract),{},true);}
 std::shared_ptr<const NativeCode> Jit::replacement(const NativeCode& current,const ValidatedAnalysis& analysis,bool optimize,Compatibility contract) {
-    if(contract.function_id.empty())contract.function_id=analysis.entry_identity()+"::entry";
+    if(contract.function_id.empty())contract.function_id=analysis.entry_symbol();
     contract.constant_contract=analysis.constant_contract();contract.source_contract=analysis.compatibility_contract();
     contract.analysis=analysis.shared_from_this();contract.runtime_identity=current.compatibility().runtime_identity;contract.async_root=current.compatibility().async_root;
     if(!(current.compatibility()==contract))return {};
@@ -1724,7 +1724,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
 #endif
     // Runtime input prevents the native proof from folding into a constant exit.
     llvm::Value* input_value = b.CreateSub(main->getArg(0), b.getInt32(2));
-    if (source_program) {
+    if (source_program && !input.application) {
         // CLI adaptation only: parsed VOID functions use the shared lowering.
         auto* parse = llvm::BasicBlock::Create(context, "parse_input", main);
         auto* ready = llvm::BasicBlock::Create(context, "run", main);
@@ -1754,6 +1754,12 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         selected->addIncoming(b.getInt32(0), start);
         auto* truncated = llvm::CastInst::CreateTruncOrBitCast(parsed, b.getInt32Ty(), "input", parse->getTerminator());
         selected->addIncoming(truncated, parse); input_value = selected;
+    }
+    if(source_program && input.application) {
+        input_value=b.getInt32(0);
+        auto* valid=llvm::BasicBlock::Create(context,"app_run",main);auto* invalid=llvm::BasicBlock::Create(context,"app_arguments",main);
+        b.CreateCondBr(b.CreateICmpEQ(main->getArg(0),b.getInt32(1)),valid,invalid);
+        b.SetInsertPoint(invalid);b.CreateRet(b.getInt32(2));b.SetInsertPoint(valid);
     }
     std::vector<llvm::Value*> arguments{input_value};
     llvm::Value* failure = nullptr;
@@ -1806,8 +1812,9 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     }
     auto print = module->getOrInsertFunction("printf",
         llvm::FunctionType::get(b.getInt32Ty(), {b.getPtrTy()}, true));
-    b.CreateCall(print, {b.CreateGlobalStringPtr("%d\n"), result});
-    b.CreateRet(b.getInt32(0));
+    if(input.application)b.CreateRet(result);
+    else {b.CreateCall(print, {b.CreateGlobalStringPtr("%d\n"), result});
+    b.CreateRet(b.getInt32(0));}
     }
 #ifdef VOID_LLVM_RESEARCH
     if (storage_proof) {

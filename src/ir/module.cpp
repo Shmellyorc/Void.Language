@@ -447,7 +447,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             if (!t.definition || t.definition->identity.empty() || t.definition->identity.find('\0')!=std::string::npos || t.definition->name.empty()) fail("missing value type identity");
             auto* d=t.definition.get();
             if(auto base=d->base.lock();base && base->native_resource)fail("native resource cannot be extended");
-            if(d->native_resource && (m.native_library!="void.fixture.v1" || t.kind!=Type::managed_ref || !d->managed || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::u64 || d->callable || !d->base.expired() || !d->cases.empty() || d->interface_type))fail("invalid native resource identity");
+            if(d->native_resource && ((m.native_library!="void.fixture.v1" && m.native_library!="void.sink.v1") || t.kind!=Type::managed_ref || d->native_provider!=m.native_library || !d->managed || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::u64 || d->callable || !d->base.expired() || !d->cases.empty() || d->interface_type))fail("invalid native resource identity");
             if(d->task_result){
                 auto r=Type(*d->task_result);if(t.kind!=Type::managed_ref || !d->managed || d->callable || d->interface_type || !d->base.expired() || !d->cases.empty() || d->result_type || d->element || d->extent || d->fields.size()!=2 || Type(d->fields[0].type)!=Type::i32 || (Type(d->fields[1].type)!=(r==Type::none?Type::boolean:r) || capability_key(d->fields[1].type)!=capability_key(r==Type::none?Type::boolean:r)) || d->identity!="$task:"+std::to_string(r.kind)+":"+Type::key(r)+(r.nullable?"?":"")+":"+capability_key(r))fail("invalid task handle shape");
             }
@@ -704,8 +704,8 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::native_call: {
                     valid_type(i.type);
                     std::vector<Type> parameters;for(auto value:i.arguments)parameters.push_back(operand(value));
-                    if(!m.coordinated || m.native_library!="void.fixture.v1" || i.receiver || !native_signature(i.callee,parameters,i.type))fail("invalid native ABI/call/publication");
-                    if(i.callee=="vd_native_fixture_call#register" && b.instructions[i.arguments[1]].op!=Op::function_reference)fail("native callback lacks generation-local provenance");
+                    if(!m.coordinated || m.native_library!=native_provider(i.callee) || i.receiver || !native_signature(i.callee,parameters,i.type))fail("invalid native ABI/call/publication");
+                    if(native_binding(i.callee).name=="register" && b.instructions[i.arguments[1]].op!=Op::function_reference)fail("native callback lacks generation-local provenance");
                     result=i.type;break;
                 }
                 case Op::gc_alive:

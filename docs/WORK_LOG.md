@@ -13953,3 +13953,43 @@ execution at the deferred end-of-Stage-8 hosted gate.
 Sprint 1 repair hashes and Sprint 2 contracts are preserved. Root README unchanged;
 no commits, pushes, branches/remotes, hosted CI, website or publication. Sprints
 4–6 remain future work. Permanent Keyboard/Research/Wrench handoffs are under docs/.
+
+## 20 October 2026 — Stage 8 Sprint 4 authorized
+
+Baseline `5b40d892aed7d5a2a5e2ac02f3c9c55917e9fed1` was clean. Read docs index,
+current handoffs, approval/roadmap, language and hosting/native contracts. All
+three application CLI, top-level return and second static-provider questions were
+answered before implementation began. Recorded approvals in DECISIONS and the
+ledger; created STAGE8_APPLICATION_NATIVE contract. Implementation/verification
+in progress; acceptance remains unclaimed. No hosted CI or Git mutation authorized.
+
+
+## 20 October 2026 — Stage 8 Sprint 4 local acceptance; Wrench review pending
+
+Implemented explicit `--app` top-level/main hosting through the existing typed IR,
+i32 adapter, LLVM 19.1.7 JIT/AOT and Runtime. Preserved legacy numeric output and
+entry precedence; application statuses remain unprinted. Entry identity now
+participates in analysis/cache/reload. Compiler-owned body names remain hidden
+from written editor declarations and edits, while ordinary local rename works.
+
+Added independently admitted `void.sink.v1` and its disposable C implementation.
+Exact catalog/provider validation, owned UTF-8, opaque owning-thread resources,
+callbacks, shutdown, GC roots and generation leases share existing infrastructure.
+No CLI/LSP native authorization, new worker privilege or dynamic FFI was added.
+
+Final unfiltered local Debug/Release/strict runs passed **148/148 each (444/444)**:
+debug 512.25s, release 226.46s, sanitizers 445.58s. Both complete 1 MiB frontend gates passed. Three permanent
+Sprint 4 suites include 163 process checks per configuration, host/JIT/reload/
+ownership/IR coverage and LSP nonexecution/edit protection. Preliminary failures
+are retained: an obsolete top-level-pass assertion, my relink-during-validation
+sequencing mistake, synthetic-body hover exposure, and ptrace's incompatibility
+with LeakSanitizer. All were corrected before final clean acceptance; reruns do
+not inflate suite totals. See [acceptance](stage8/SPRINT4_ACCEPTANCE.md), JSON
+results and source hashes for exact evidence and instrumentation limits.
+
+Updated the contract, decisions, roadmap/approval ledger, language/module/native
+and CLI documentation, central docs index, known issues and permanent Keyboard/
+Research/Wrench handoffs. Preserved CI #82 source/test hashes and the root README.
+No commits, pushes, branches, remotes, hosted CI or publication. Windows/macOS,
+actual editor clients and the end-of-Stage-8 hosted gate remain pending. Stop for
+Wrench review; Sprints 5–6 remain future work without further Boss authorization.

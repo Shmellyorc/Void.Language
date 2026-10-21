@@ -50,7 +50,8 @@ struct AnalyzedReference {
 };
 class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis> {
     friend struct AnalysisAccess;
-    std::string entry_, contract_, constants_;
+    std::string entry_, entry_symbol_, contract_, constants_;
+    bool application_=false;
     std::vector<Diagnostic> warnings_;
     std::vector<AnalyzedModule> modules_;
     std::vector<AnalyzedDeclaration> declarations_;
@@ -64,6 +65,8 @@ public:
     ValidatedAnalysis& operator=(const ValidatedAnalysis&) = delete;
     const auto& warnings() const {return warnings_;}
     const std::string& entry_identity() const { return entry_; }
+    const std::string& entry_symbol() const { return entry_symbol_; }
+    bool application() const { return application_; }
     const auto& modules() const { return modules_; }
     const auto& declarations() const { return declarations_; }
     const auto& references() const { return references_; }

@@ -497,11 +497,20 @@ struct Unit {
     std::function<Type(Type,const Token&)> resolve_application;
     std::function<Function&(Unit&,Unit&,Function&,const std::vector<Type>&,const Token&,unsigned,Type)> specialize_function;
     std::function<Structure&(Unit&,Unit&,Structure&,const std::vector<Type>&,const Token&)> specialize_structure;
+    bool application_body = false;
     bool failed_import = false;
     bool parse_failed = false;
     std::shared_ptr<ir::Module> member_catalog;
     Unit(SourceFile s, std::string id) : source(std::move(s)), identity(std::move(id)) {}
 };
+// Entry selection is shared by validated metadata and typed IR lowering.
+const Function* application_entry(const Unit& unit) {
+    if(unit.application_body)return unit.declarations.at("$application");
+    if(unit.declarations.contains("entry"))return nullptr;
+    auto found=unit.declarations.find("main");if(found==unit.declarations.end())return nullptr;
+    const auto* f=found->second;
+    return !f->receiver && f->parameters.empty() && f->generics.empty() && !f->asynchronous && (f->result==Type::none || f->result==Type::i32) ? f : nullptr;
+}
 class Parser {
     const SourceFile& source;
     std::vector<Token> tokens;
@@ -858,6 +867,9 @@ class Parser {
         if (at("return")) {
             Statement s(Statement::Kind::returned, take());
             if (peek().kind != TokenKind::newline) s.expression = expression();
+            if(!s.expression && parsing_function && parsing_function->token.text=="$application") {
+                s.expression=std::make_unique<Expr>(Expr::Kind::literal,s.token);s.expression->literal_text="0";
+            }
             newline(); return s;
         }
         if (at("break") || at("continue")) {
@@ -895,6 +907,7 @@ public:
     }
     void parse(Unit& unit) {
         auto before = diagnostics.size();
+        Function application; application.token={TokenKind::name,"$application",0}; application.result=Type::i32; application.visibility="private";
         while (peek().kind != TokenKind::end) {
             if (diagnostics.full()) { unit.parse_failed = true; break; }
             auto start = p;nodes=0;generic_names.clear();const auto use_begin=type_uses.size(),array_begin=arrays.size();
@@ -904,7 +917,7 @@ public:
             if (peek().kind == TokenKind::invalid) throw Poison{};
             if (at("while")) error(source, peek(), Code::while_loop, "VOID uses 'for' for all loops.", "Replace 'while condition:' with 'for condition:' inside a function.");
             if (accept("use")) {
-                if (!unit.functions.empty() || !unit.constants.empty() || !unit.structures.empty()) error(source, peek(), Code::syntax, "Imports must precede constant and function declarations.", "Move use declarations to the start of this file.");
+                if (!unit.functions.empty() || !unit.constants.empty() || !unit.structures.empty() || unit.application_body) error(source, peek(), Code::syntax, "Imports must precede constant and function declarations.", "Move use declarations to the start of this file.");
                 Import import; import.path = take();
                 if(import.path.kind!=TokenKind::path) {
                     auto segment=[&](const Token& t) {return !t.text.empty() && letter(t.text[0]) && std::all_of(t.text.begin(),t.text.end(),[](char c){return letter(c)||digit(c);});};
@@ -958,7 +971,7 @@ public:
                 if(!count) error(source,structure.token,Code::syntax,"An interface requires at least one method; marker interfaces are deferred.");
                 need("<dedent>");structure.source_end=peek().offset;unit.structures.push_back(std::move(structure));continue;
             }
-            bool value_declaration = accept("value");
+            bool value_declaration = at("value") && peek(1).text=="struct"; if(value_declaration)take();
             if (value_declaration || at("struct")) {
                 need("struct"); Structure structure; structure.token = name(); structure.visibility = f.visibility;
                 structure.definition = std::make_shared<ir::ValueType>(); structure.definition->name = structure.token.text; structure.definition->managed = !value_declaration;
@@ -1025,6 +1038,13 @@ public:
                 }
                 need("<dedent>");if(!getter)error(source,property,Code::syntax,"A property requires a getter.");continue;
             }
+            if(!at("func") && !at("async") && !at("virtual") && !at("override")) {
+                unit.application_body=true;
+                FunctionScope scope(parsing_function,application);
+                application.body.push_back(statement());
+                for(auto n=start;n<p;++n)application.body_syntax+=std::to_string(tokens[n].text.size())+":"+tokens[n].text;
+                continue;
+            }
             f.asynchronous=accept("async");
             f.virtual_method=accept("virtual");
             f.overriding=!f.virtual_method && accept("override");
@@ -1054,6 +1074,10 @@ public:
             }
             catch (const Poison&) { unit.parse_failed = true; synchronize(start, true); }
             if (p == start && peek().kind != TokenKind::end) take();
+        }
+        if(unit.application_body) {
+            Statement end(Statement::Kind::returned,application.token);end.expression=std::make_unique<Expr>(Expr::Kind::literal,Token{TokenKind::number,"0",0});end.expression->literal_text="0";application.body.push_back(std::move(end));
+            application.source_end=source.text().size();unit.functions.push_back(std::move(application));
         }
         unit.parse_failed |= diagnostics.size() != before;
         unit.type_uses = std::move(type_uses);
@@ -1624,7 +1648,7 @@ class Semantics {
         for(std::size_t n=first;n<e.parts.size();++n) {
             auto index=mapping[n-first];bound[index]=true;
             auto actual = e.op=="$bound_numeric" && n==0 ? e.parts[n]->type : expression(*e.parts[n],target.parameters[index].type);
-            if(target.native_symbol=="vd_native_fixture_call#register" && index==1 && e.parts[n]->kind!=Expr::Kind::function_reference)error(source,e.parts[n]->token,Code::unsupported_type,"Native callback registration requires a directly named function or a literal closure created in this generation.");
+            if((!target.native_symbol.empty() && native_binding(target.native_symbol).name=="register") && index==1 && e.parts[n]->kind!=Expr::Kind::function_reference)error(source,e.parts[n]->token,Code::unsupported_type,"Native callback registration requires a directly named function or a literal closure created in this generation.");
             try { expect(actual,target.parameters[index].type,e.parts[n]->token); }
             catch (const CompilationError& failure) { diagnostics.add(failure); invalid = true; }
             invalid |= actual == error_type;
@@ -3251,7 +3275,7 @@ class Lowering {
             for (std::size_t n = first; n < e.parts.size(); ++n) frontend_case([&] {
                 const auto& arg = e.parts[n];
                 auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(expression_type(*arg));
-                auto value = expression(*arg);if(e.native_symbol=="vd_native_fixture_call#register" && (e.argument_indexes.empty()?n-first:e.argument_indexes[n-first])==1)native_callback=value;
+                auto value = expression(*arg);if((!e.native_symbol.empty() && native_binding(e.native_symbol).name=="register") && (e.argument_indexes.empty()?n-first:e.argument_indexes[n-first])==1)native_callback=value;
                 if (expression_type(*arg).construction) {
                     output.construction_origins[slot]=view_origin(value);
                 }
@@ -3742,7 +3766,7 @@ public:
         auto before = diagnostics.size();
         Parser(result->source, diagnostics).parse(*result);
         result->parse_failed |= diagnostics.size() != before;
-        if(native && id==native->module){for(auto& structure:result->structures)structure.definition->native_resource=true;for(auto& f:result->functions)for(const auto& b:native->bindings)if(f.token.text==b.name)f.native_symbol=b.symbol;}
+        if(native && id==native->module){for(auto& structure:result->structures){structure.definition->native_resource=true;structure.definition->native_provider=native->library;}for(auto& f:result->functions)for(const auto& b:native->bindings)if(f.token.text==b.name)f.native_symbol=b.symbol;}
 
         for (auto& import : result->imports) {
             try {
@@ -3843,6 +3867,12 @@ ir::Module member_catalog(const std::map<std::string,std::unique_ptr<Unit>>& uni
     return m;
 }
 void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics) {
+    for(auto& [id,u]:units)if(u->application_body) {
+        try {
+            if(id!=entry)error(u->source,{TokenKind::name,"",0},Code::entry,"Imported modules cannot contain executable top-level statements.");
+            for(const auto& f:u->functions)if(f.token.text=="main" && !f.receiver && f.parameters.empty() && f.generics.empty() && !f.asynchronous && (f.result==Type::none || f.result==Type::i32))error(u->source,f.token,Code::entry,"Executable top-level statements compete with main().");
+        } catch(const CompilationError& failure){diagnostics.add(failure);}
+    }
     auto arena = std::make_shared<ir::TypeArena>();
     for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
         structure.definition->self = structure.definition;
@@ -4335,7 +4365,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
     for (auto& [id, unit] : units) {
         Lowering lowering(unit->source,module,strings);
         for (const auto& f : unit->functions) {
-            if(!f.native_symbol.empty()){module.native_library="void.fixture.v1";module.coordinated=true;continue;}
+            if(!f.native_symbol.empty()){module.native_library=std::string(native_provider(f.native_symbol));module.coordinated=true;continue;}
             if(f.interface_requirement) {
                 ir::Function requirement;requirement.name=f.symbol;requirement.parameters={f.receiver->type};
                 for(const auto& p:f.parameters) requirement.parameters.push_back(p.type);
@@ -4358,6 +4388,18 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
             }
         }
     }
+    const auto& selected=*units.at(entry);
+    const auto* application=application_entry(selected);
+    if(application) {
+        module.application=true;module.entry_symbol=entry+"::$app_adapter";
+        ir::Function adapter;adapter.name=module.entry_symbol;adapter.source_name="$app_adapter";adapter.module_identity=entry;adapter.source=selected.source.location(application->token.offset);
+        adapter.parameters={Type::i32};adapter.result=Type::i32;adapter.locals={Type::i32};
+        ir::Instruction call{ir::Op::call};call.callee=application->symbol;call.type=application->result;
+        ir::Block body;body.instructions.push_back(call);
+        if(application->result==Type::none){body.instructions.push_back({ir::Op::constant,0});body.end={ir::Terminator::Kind::return_value,1};}
+        else body.end={ir::Terminator::Kind::return_value,0};
+        adapter.blocks.push_back(std::move(body));module.functions.push_back(std::move(adapter));
+    }
     module.interface_bindings=units.at(entry)->member_catalog->interface_bindings;
     module.strings=std::move(strings.values);
     if(!module.strings.empty()) module.coordinated=true;
@@ -4379,6 +4421,10 @@ struct AnalysisAccess {
     static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={}) {
         auto result = std::shared_ptr<ValidatedAnalysis>(new ValidatedAnalysis);result->warnings_=std::move(warnings);
         result->entry_ = entry;
+        const auto& selected=*units.at(entry);
+        const auto* app=application_entry(selected);
+        result->application_=app!=nullptr;
+        result->entry_symbol_=entry+(app?"::$app_adapter":"::entry");
         // Builtin declaration snapshots provide stable canonical hover/reference
         // identity, but never masquerade as filesystem navigation/edit targets.
         for(auto type:{Type::i8,Type::u8,Type::i16,Type::u16,Type::i32,Type::u32,Type::i64,Type::u64,Type::f32,Type::f64})for(const auto& api:numeric::members()) {
@@ -4391,7 +4437,8 @@ struct AnalysisAccess {
             result->editor_declarations_.push_back(std::move(record));
         }
         for(const auto& [id,u]:units)for(const auto& [symbol,record]:u->builtins)if(std::none_of(result->editor_declarations_.begin(),result->editor_declarations_.end(),[&](const auto& d){return d.identity==symbol;}))result->editor_declarations_.push_back(record);
-        result->contract_="18:numeric-prelude-v1:20:text-collections-v1";
+        result->contract_="18:numeric-prelude-v1:20:text-collections-v1:application-v1:"+result->entry_symbol_;
+        for(const auto& [id,u]:units)for(const auto& f:u->functions)if(!f.native_symbol.empty())result->contract_+=":"+id+":"+f.native_symbol;
 
         auto graph = std::make_shared<const std::map<std::string, std::unique_ptr<Unit>>>(std::move(units));
         auto field = [](std::string& out, const std::string& value) { out += std::to_string(value.size()) + ":" + value; };
@@ -4567,7 +4614,7 @@ struct AnalysisAccess {
                 AnalyzedDeclaration method_record{f.interface_requirement ? AnalyzedDeclaration::Kind::interface_requirement : f.initializer ? AnalyzedDeclaration::Kind::initializer : f.receiver ? AnalyzedDeclaration::Kind::receiver_method : AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}};
                 if (f.receiver) { method_record.owner = f.receiver->type.definition->identity; method_record.receiver = f.receiver->type; method_record.receiver_mutates = f.receiver_mutates; }
                 if(f.accessor)method_record.editor_symbol_kind=7;
-                method_record.rename_safe=!f.receiver && !f.anonymous && f.generic_origin.empty() && f.generics.empty() && f.token.text!="entry";
+                method_record.rename_safe=!f.receiver && !f.anonymous && f.generic_origin.empty() && f.generics.empty() && f.token.text!="entry" && f.token.text!="$application";
                 method_record.initialization_contract=f.initialization_contract;
                 method_record.virtual_slot=f.virtual_slot;
                 if(f.overriding) method_record.override_target=f.virtual_slot;
@@ -4592,7 +4639,7 @@ struct AnalysisAccess {
                 if(f.source_end>f.token.offset){auto r=location(f.token);r.begin=unit->source.line_starts().at(unit->source.location(f.token.offset).line-1);r.end=f.source_end;
                     if(f.accessor)for(const auto& other:unit->functions)if(other.accessor && other.token.offset==f.token.offset)r.end=std::max(r.end,other.source_end);
                     method_record.extent=r;}
-                declaration(std::move(method_record),true,!f.anonymous);
+                declaration(std::move(method_record),true,!f.anonymous && f.token.text!="$application");
                 if(f.overriding) {Expr use(Expr::Kind::name,f.token);reference(f.symbol,f.virtual_slot,use,*unit,true);}
                 for (const auto& p : f.parameters) if (p.default_expression) expression(*p.default_expression,f.symbol,{});
                 std::map<unsigned,std::string> locals;
@@ -4912,6 +4959,7 @@ void entry_signature(const SourceFile& source,const std::string& identity,bool f
 }
 }
 void require_source_entry(const ValidatedAnalysis& analysis) {
+    if(analysis.application())return;
     for(const auto& module:analysis.modules())if(module.identity==analysis.entry_identity()) {
         for(const auto& declaration:analysis.declarations())if(declaration.identity==module.identity+"::entry" && declaration.kind==AnalyzedDeclaration::Kind::function && !declaration.generic_template) {
             entry_signature(module.source,module.identity,true,declaration.parameters==std::vector<Type>{Type::i32} && declaration.type==Type::i32,declaration.source.begin);return;

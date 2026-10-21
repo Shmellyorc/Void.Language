@@ -1,0 +1,24 @@
+use "/native_sink.void" as sink
+func callback(value: i32) -> i32:
+    return value + 3
+func main() -> i32:
+    var missing = sink.acquire(false)
+    if missing != null:
+        return 90
+    var resource = sink.acquire(true) as sink.resource
+    defer sink.destroy(resource)
+    var original = "A\0🎮"
+    var copied = sink.copy(original)
+    sink.retain(resource, copied)
+    original = "changed"
+    copied = "changed again"
+    if sink.byte(resource, 0 as u64) != 65 or sink.byte(resource, 1 as u64) != 0 or sink.byte(resource, 2 as u64) != 240:
+        return 91
+    sink.register(resource, callback)
+    var result = sink.invoke(resource, sink.echo(4))
+    sink.unregister(resource)
+    sink.release_text(resource)
+    if sink.byte(resource, 0 as u64) != -1:
+        return 92
+    sink.close(resource)
+    return result

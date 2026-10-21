@@ -3173,7 +3173,20 @@ deferred fallible/resource/managed rules. This supersedes Phase 13 I1 deferral, 
 unapproved I2 alternative.
 
 
-## Entry-point and top-level execution discussion: 12 October 2026 [PROPOSED, NOT LOCKED]
+## Stage 8 Sprint 4 approved application entry — 20 October 2026
+
+Boss approved explicit `--app` run/emit, selected-source executable statements or
+zero-argument synchronous main, status without automatic printing, and preserved
+legacy entry precedence. Top-level fallthrough/bare return yields 0; i32 return
+supplies status. Explicit `main() -> i32` requires a return on every reachable
+path. Imported executable statements and competing top-level/main forms reject.
+Top-level locals are not runtime module globals. See
+[the implementation contract](STAGE8_APPLICATION_NATIVE.md) and
+[owner decisions](DECISIONS.md) for exact scope and verification status.
+This supersedes conflicting recommendations in the historical discussion below;
+arbitrary `--entry` function selection remains unimplemented and unapproved here.
+
+## Historical entry-point discussion: 12 October 2026 [SUPERSEDED WHERE NOTED]
 
 This records a developer-simplicity discussion for future executable/project work.
 It is an **open alternative** to the discovery choices in Section 10, not an

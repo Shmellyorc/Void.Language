@@ -1,0 +1,20 @@
+{
+  "CMakeLists.txt": "50f512843429ee9058e8b663c66783e95bdc5d6d8d0a5ff0ebc913f7e001a30f",
+  "examples/native_sink/main.void": "99be159fdabc34bb69baed4ce079889c34582c430110357187b089098ab149bb",
+  "include/void/frontend.hpp": "2f14b29e5398d84b72ff44943aa595a0deaa58ce6d744254bc5079d2a058260d",
+  "include/void/ir.hpp": "aeb9ab89677fe24826de79f20a72feed136440c8f072be4eaf6252a1a06437fb",
+  "include/void/native_binding.hpp": "308b0af5b8ade15195cf399813bc2c214a386148a2a28854aebc3ca95ea44147",
+  "include/void/native_runtime.hpp": "52b2d0ac0c727d21e7c48a5f748c9130e6cd4670d029557214aa3156c67e7dc9",
+  "src/backend/llvm/backend.cpp": "f1e7af64b7eec890e9436585ad723699254a9efa4417671dde5effbee1d1a1c4",
+  "src/frontend/compiler.cpp": "51a2198264b8d01ebf0d8237997f5c8f3972bb4a2fb756a7d5bab4227178500d",
+  "src/ir/module.cpp": "c82705513ccda2152cad7d48d5e4ab379ec4fe7d000652ddd988b591167801a7",
+  "src/ir/native_binding.cpp": "ac975b25e8c646d448732e924b725b0ce60eb54cbc2414693246aa1026aebe4f",
+  "src/main.cpp": "11eb30cf60302f92a5a52f55711d8adcbc7ade5afbd03fe940bf0f1ce1392d47",
+  "src/native/sink.c": "78c175e94c600fa41a445a6144906dea3db9df8e4b69aace30fa7610002d34b2",
+  "src/native/sink.h": "158f8341f61682b4608758d2b841e7f626ef53801e230365a4bf7c85c2e2ae2b",
+  "src/runtime/native_binding.cpp": "346788f06b4527871fa9914f66174559842bc09a079638223f84e9a88d8a1c3d",
+  "tests/frontend/tests.cpp": "9de37b21803aca1ac007e316a9af46e392756874f0f579fdb8ce741b7e459aa8",
+  "tests/stage8/lsp_sprint4.py": "bf7d987bc45f375736f4a500e165c2ecf3597aa1844ad2916a52c5e759b87c26",
+  "tests/stage8/sprint4.cpp": "552f2e54fedb83a8aeb87e07ca58288e152620d7193b0fcab03706e097a8a93d",
+  "tests/stage8/sprint4.py": "04ee2346267f53295aee69c3a68b99940470cdf7a8074d10ac05dda1f7eb2039"
+}

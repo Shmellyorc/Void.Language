@@ -222,3 +222,13 @@ semantics and structured recovery remain unchanged.
 through the shared loader and an explicit revision-safe session acceptance boundary.
 Its diagnostic/query wrappers retain the analyzed project revision. Existing disk
 APIs, complete-validation gates, byte spans and exact native contracts remain.
+
+## Selected application source — Stage 8 Sprint 4
+
+The [application contract](STAGE8_APPLICATION_NATIVE.md) adds executable statements
+only to the explicitly selected source. Their variables live inside a synthetic
+function, not module storage; ordinary declared functions cannot access them.
+Imports remain declaration-only: an imported executable body is a compile-time
+error. Exact-case discovery and explicit alternate-entry files remain unchanged.
+Neither project discovery nor LSP analysis executes source or authorizes a native
+provider. Ordinary root constants keep compile-time semantics.

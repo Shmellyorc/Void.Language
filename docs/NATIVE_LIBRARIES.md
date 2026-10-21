@@ -1,4 +1,22 @@
-# Stage 6 Delivery 4: trusted static native fixture
+# Trusted static native providers
+
+Stage 8 Sprint 4 generalizes admission to a second independently admitted static
+in-memory sink. See [the current contract](STAGE8_APPLICATION_NATIVE.md) for
+approval, implementation/verification status, exact supported operations and
+limitations. `native_sink_project()` and `native_fixture_project()` each select
+one compiled catalog; unknown libraries, symbols and signature/flag substitutions
+reject. Provider identity is checked in resource IR and the shared Runtime registry.
+CLI/LSP imports grant no authorization. No dynamic loader, raw-pointer ABI, source
+FFI DSL or new worker privileges are added.
+
+The sink uses a separate disposable C implementation with shared lifecycle,
+rooting, owned strings, callback admission, shutdown draining and generation
+leases. [Example](../examples/native_sink/main.void) requires explicit C++ host
+admission. One provider descriptor per source graph remains the bounded API.
+
+## Original fixture delivery history
+
+### Stage 6 Delivery 4: trusted static native fixture
 
 Delivery 4 is hosted-accepted at `619331ccb83227419081bc93cf47bd3a0b8b64cc`,
 [CI #76](https://github.com/Shmellyorc/Void.Language/actions/runs/39359190869),

@@ -987,3 +987,27 @@ seven-job gate remains deferred until Stage 8 end unless separately authorized.
 Sprint 3 implementation and local verification are recorded in
 [acceptance evidence](stage8/SPRINT3_ACCEPTANCE.md); Wrench review and the deferred
 hosted gate remain separate from these semantic approvals.
+
+## Stage 8 Sprint 4 owner approvals — 20 October 2026
+
+Boss answered all three checkpoint questions before implementation:
+
+- Explicit application CLI: `voidc run <file-or-directory> --app` and
+  `voidc emit <file-or-directory> -o <object> --app`; preserve `--no-opt`
+  and Debug caching. No numeric operand or automatic status printing.
+  Compile/runtime failures exit 1, invalid invocations 2, returned i32 statuses
+  follow platform exit-code rules. Legacy invocation and declaration-only
+  `entry(i32)` precedence remain unchanged.
+- Executable top-level fallthrough and bare return produce 0; `return <i32>`
+  supplies status. Other types reject. Locals remain body-local; ordinary
+  functions cannot capture them. Imported executable statements reject.
+  Explicit `main() -> i32` must return on every reachable path, without an
+  implicit zero return.
+- Second disposable static in-memory sink: i32 echo, owned UTF-8 copy,
+  retention/readback, opaque owning-thread resources, deterministic cleanup
+  and existing one-shot callbacks with shutdown draining. Explicit C++ host
+  admission validates against each provider's own compiled catalog. Preserve
+  isolation, GC roots, ownership and generation leases. No automatic CLI/LSP
+  admission, dynamic loading, arbitrary pointers or new worker privileges.
+
+These are approved semantics, not implementation or acceptance evidence.

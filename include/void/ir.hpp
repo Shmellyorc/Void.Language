@@ -59,6 +59,7 @@ struct ValueType {
     std::vector<SumCase> cases = {}; // Disjoint, zero-inactive payload fields; field zero is the tag.
     bool result_type = false;
     bool callable = false;
+    std::string native_provider = {}; // Compiled catalog identity, independent of source module spelling.
     bool native_resource = false; // Binding-private managed identity; no source payload/constructor.
     std::optional<FieldType> task_result = {}; // Private inferred task handle; no public constructor.
     std::vector<FieldType> call_parameters = {};
@@ -169,6 +170,7 @@ struct Module {
     std::string source_path = {}; // Physical debug source; not part of stable identity.
     std::shared_ptr<const ValidatedAnalysis> analysis = {};
     std::string constant_contract = {}; // Exact canonical const declarations.
+    bool application = false; // Explicit CLI application status policy; adapter retains i32(i32).
     bool async_root = false; // Explicit scheduler adapter, never implicit CLI behavior.
     std::string native_library = {};
     bool coordinated = false; // Requires a runtime owner; inferred for managed source.

@@ -37,7 +37,7 @@ void diagnostics() {
     rejects("func f() -> i32:\n    return pass\n", "Expected an expression", "2:12");
     rejects("func f():\n    var x = pass\n", "Expected an expression", "2:13");
     rejects("func f():\n    var pass = 1\n", "Expected a lowercase identifier");
-    rejects("pass\n", "func");
+    require(vd::compile_source({"/top-pass.void", "pass\n"}).application, "top-level pass must select an application body");
     rejects("struct child:\nstruct owner:\n    child: child\nfunc (o owner) init():\n    pass\n", "initialized");
     auto recovered = vd::analyze_source({"/pass-recovery.void", "func f():\n    pass 1\n    pass\nfunc g() -> i32:\n    return missing\n"});
     require(!recovered.succeeded() && recovered.diagnostics.size() == 2, "pass syntax recovery diagnostic count");

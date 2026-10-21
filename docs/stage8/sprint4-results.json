@@ -1,0 +1,148 @@
+{
+  "date": "2026-10-20 America/Los_Angeles",
+  "scope": "Stage 8 Sprint 4 only",
+  "starting_commit": "5b40d892aed7d5a2a5e2ac02f3c9c55917e9fed1",
+  "status": "implemented and locally verified; Wrench review pending; not hosted locked",
+  "llvm": "19.1.7",
+  "platform": "Linux x86-64",
+  "configurations": [
+    {
+      "configuration": "debug",
+      "build_directory": "build/debug",
+      "build_type": "Debug",
+      "passed": 148,
+      "failed": 0,
+      "total": 148,
+      "seconds": 512.25,
+      "command": "ctest --test-dir build/debug --output-on-failure -j 2",
+      "log": "build/stage8-sprint4-acceptance/debug-final-ctest.log",
+      "sha256": "f99e98a60d548c45281af36e2e991951948f0a6a4ac8292a38999473e678869b"
+    },
+    {
+      "configuration": "release",
+      "build_directory": "build/ci-release",
+      "build_type": "Release",
+      "passed": 148,
+      "failed": 0,
+      "total": 148,
+      "seconds": 226.46,
+      "command": "ctest --test-dir build/ci-release --output-on-failure -j 2",
+      "log": "build/stage8-sprint4-acceptance/release-final-ctest.log",
+      "sha256": "e17642e984306adbc2589f6a95e87f5c4d28bcd2bff2a6eea8bf5109102f64a2"
+    },
+    {
+      "configuration": "sanitizers",
+      "build_directory": "build/ci-sanitizers",
+      "build_type": "RelWithDebInfo",
+      "passed": 148,
+      "failed": 0,
+      "total": 148,
+      "seconds": 445.58,
+      "command": "ctest --test-dir build/ci-sanitizers --output-on-failure -j 2",
+      "log": "build/stage8-sprint4-acceptance/sanitizers-final-ctest.log",
+      "sha256": "3fe073e6ac147c36c16c7de4f51a4184ad26652a61e09c57dc49cc8a0bed4de1"
+    }
+  ],
+  "final_unique_configuration_suite_outcomes": {
+    "passed": 444,
+    "failed": 0,
+    "total": 444
+  },
+  "one_mib_frontend_gates": [
+    {
+      "configuration": "debug",
+      "stack_bytes": 1048576,
+      "exit_code": 0,
+      "groups": [
+        "diagnostics",
+        "programs",
+        "numeric values",
+        "diagnostic recovery/resource limits",
+        "value structs",
+        "receiver methods",
+        "initialization"
+      ],
+      "working_directory": "/tmp/sprint4-frontend-debug",
+      "log": "build/stage8-sprint4-acceptance/debug-final-1mib.log",
+      "sha256": "78ab52ee80b779a44dbb34cb57904b25f68d908cca2f5e65552234f207f3d4b9"
+    },
+    {
+      "configuration": "release",
+      "stack_bytes": 1048576,
+      "exit_code": 0,
+      "groups": [
+        "diagnostics",
+        "programs",
+        "numeric values",
+        "diagnostic recovery/resource limits",
+        "value structs",
+        "receiver methods",
+        "initialization"
+      ],
+      "working_directory": "/tmp/sprint4-frontend-release",
+      "log": "build/stage8-sprint4-acceptance/release-final-1mib.log",
+      "sha256": "78ab52ee80b779a44dbb34cb57904b25f68d908cca2f5e65552234f207f3d4b9"
+    }
+  ],
+  "process_checks_per_configuration": 163,
+  "new_suites": [
+    "lsp_sprint4",
+    "application_native_sprint4_host",
+    "application_native_sprint4"
+  ],
+  "preliminary_full_runs": [
+    {
+      "name": "debug-original",
+      "passed": 142,
+      "failed": 6,
+      "total": 148,
+      "reason": "Five CLI failures from relinking voidc during validation; one obsolete top-level pass rejection assertion.",
+      "log": "build/stage8-sprint4-acceptance/debug-original.log",
+      "sha256": "ff6efda8ad29e035f09aa1566f49d907edb453bf16e5a04079ea5cf82c2e7ae3"
+    },
+    {
+      "name": "release-original",
+      "passed": 147,
+      "failed": 1,
+      "total": 148,
+      "reason": "Transient missing executable while relinking voidc during numeric CLI checks.",
+      "log": "build/stage8-sprint4-acceptance/release-original.log",
+      "sha256": "9e50f965d86ff0ddd3b543e21852083457a58fd8a816a77e68b8a82886c279db"
+    },
+    {
+      "name": "sanitizer-pre-metadata-fix",
+      "passed": 147,
+      "failed": 1,
+      "total": 148,
+      "reason": "New lsp_sprint4 assertion reproduced the synthetic application body declaration/hover bug before the final frontend archive was relinked.",
+      "log": "build/stage8-sprint4-acceptance/sanitizer-pre-metadata-fix.log",
+      "sha256": "d2de6e9a36bf3bf7735c0548bd8c66e493928cc4d47502bdb49017c14e0a8835"
+    }
+  ],
+  "strict_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "outside_ptrace": true,
+    "suppressions_added": false,
+    "generated_llvm_application_instrumentation_claimed": false
+  },
+  "source_hashes": "sprint4-source-hashes.json",
+  "preserved_sha256": {
+    "src/frontend/source.cpp": "4900d157d7a84c42f8aeea608c9e6b4c7e9da02679cad7b0fdbda074fa4044e4",
+    "tests/lsp/stage8.py": "258b47a90c5727317342ae25c37a8d1a3d2bfa749073302d3387a780619cc62a",
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add"
+  },
+  "hosted_ci_run": false,
+  "windows_macos_verified": false,
+  "actual_editor_clients_verified": false,
+  "root_readme_modified": false,
+  "git_mutations": false,
+  "sprints_5_6_started": false,
+  "limits": [
+    "One explicit native descriptor per source graph",
+    "No dynamic loading, pointers or public source FFI DSL",
+    "No new worker privileges or foreign callback operation in the sink catalog",
+    "No general argv, async main or top-level await",
+    "Hosted gate deferred until Stage 8 end; Wrench review pending"
+  ]
+}

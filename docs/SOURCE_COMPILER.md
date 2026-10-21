@@ -1,5 +1,8 @@
 # First real source compiler
 
+The current [Stage 8 application contract](STAGE8_APPLICATION_NATIVE.md) records
+explicit `--app` hosting alongside the preserved legacy CLI described below.
+
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 Stage 3 extends this same pipeline with native `{K: V}` dictionaries; see DICTIONARIES.md for the implemented source/runtime contract, supported keys and deferred result-based get.
@@ -370,3 +373,24 @@ Private factory exposure retains conversion-scope access proof; calls navigate t
 requirements. Independent IR validation recomputes complete nominal/binding universes
 and effects. See [INTERFACES.md](INTERFACES.md) for the source contract, budgets,
 publication, reload policy, deferred value erasure/boxing and private ABI boundaries.
+
+## Stage 8 application hosting
+
+Sprint 4's [application contract](STAGE8_APPLICATION_NATIVE.md) adds explicit
+`voidc run <file-or-directory> --app` and
+`voidc emit <file-or-directory> -o <object> --app`, retaining `--no-opt` and Debug
+run caching. Applications accept no numeric operand and return their status
+without printing it. The linked executable likewise accepts no arguments.
+Invalid invocation exits 2; compile/runtime failure exits 1. Platform exit-code
+representation applies to explicit i32 results.
+
+The selected source may contain executable top-level statements or synchronous
+zero-argument main, with no result or i32. These competing entry forms reject
+when combined. Top-level fallthrough/bare return yields 0; an i32 return supplies
+status. Explicitly typed main requires a return on every reachable path. Imported
+executable statements reject. Top-level variables remain body locals. Declaration-
+only legacy entry programs retain their printed numeric adapter and precedence
+over an ordinary main helper. Use existing legacy commands without `--app`.
+
+Implementation and local acceptance status are maintained in the linked contract;
+this does not grant editor execution, native import trust or hosted acceptance.

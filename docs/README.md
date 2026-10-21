@@ -49,39 +49,37 @@ review and hosted locks. Never mark work implemented or locked without verificat
 
 ## Current stage and acceptance — 20 October 2026
 
-Stage 8 Sprint 3 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
-Debug and strict sanitizers passed **145/145 each**. Release passed **144/145**,
-then its obsolete arrays_foundation diagnostic assertion was repaired and passed
-its focused **1/1** rerun: **435/435 final unique configuration/suite outcomes**.
-The original failure is retained, and no production source changed for that test
-repair. Both 1 MiB frontend gates passed. See [the Sprint 3 contract](STAGE8_TEXT_COLLECTIONS.md)
-and [exact acceptance evidence and limits](stage8/SPRINT3_ACCEPTANCE.md).
+Stage 8 Sprint 4 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
+Final consolidated Debug, Release and strict ASan/UBSan/leak runs passed
+**148/148 each: 444/444 unique configuration/suite outcomes**. Both complete
+1 MiB frontend gates passed. See [the application/static-provider contract](STAGE8_APPLICATION_NATIVE.md)
+and [Sprint 4 acceptance](stage8/SPRINT4_ACCEPTANCE.md) for exact evidence,
+preliminary failures/corrections, source hashes and limits.
 
-All three Sprint 3 API decisions are approved in [DECISIONS.md](DECISIONS.md).
-No Sprint 3 owner decision remains pending. Queries are runtime-only; builtin
-method values are absent, and worker calls retain conservative admission. The
-contract records these limits; no broader API or async admission is claimed.
-Sprint 1 remains locally accepted by Boss, with its
-[CI #82 Windows repair](stage8/CI82_WINDOWS_REPAIR.md) source/test hashes preserved.
-Sprint 2's named/default, numeric, tooling and reload contracts remain covered.
+All three Sprint 4 design decisions are approved in [DECISIONS.md](DECISIONS.md);
+no Sprint 4 owner decision remains pending. The bounded sink requires explicit
+C++ admission, one provider descriptor per graph; CLI/LSP imports grant no trust.
+Sprints 1–3 remain preserved, including [CI #82's Windows repair](stage8/CI82_WINDOWS_REPAIR.md),
+argument binding, numeric prelude, UTF-8/collections, tooling and reload contracts.
+Prior failures and verification records remain historical evidence.
 
 **Hosted CI remains deferred until the end of Stage 8**, unless Boss explicitly
-authorizes an earlier run. No hosted CI was run or requested. Windows/macOS,
-Windows Debug/Release CI #82 execution and fresh actual editor-client verification
-remain pending; Linux LSP pipe tests do not establish them. Stage 8 is not hosted locked.
+authorizes an earlier run. Windows/macOS, hosted CI #82 Debug/Release execution
+and fresh actual editor-client verification remain pending. Linux local tests
+cannot establish those results. Stage 8 is not hosted locked.
 
-**Stopped after Sprint 3 for Wrench review. Sprints 4–6 remain future work.**
-Do not begin Sprint 4 without explicit Boss authorization. No commits, pushes,
-branch/remote changes, publication or website work occurred. Root README is
-unchanged; future sprint prompts direct documentation updates under `docs/` and
-require separate explicit Boss authorization for public-facing root README edits.
-
+**Stopped after Sprint 4 for Wrench review. Sprints 5–6 remain future work.**
+No commits, pushes, branch/remote changes, hosted CI, publication or website work
+occurred. Root README is unchanged; documentation and future sprint prompts belong
+under `docs/` by default. Do not begin Sprint 5 without Boss authorization.
 
 ## Engineering contracts, decisions and handoffs
 
 - [Language completeness roadmap](LANGUAGE_COMPLETENESS_ROADMAP.md),
   [pre-implementation research audit](LANGUAGE_COMPLETENESS_AUDIT.md)
   and [owner approvals and pending decisions](LANGUAGE_COMPLETENESS_APPROVALS.md).
+- [Stage 8 applications and static providers](STAGE8_APPLICATION_NATIVE.md),
+  [Sprint 4 local evidence](stage8/SPRINT4_ACCEPTANCE.md).
 - [Stage 8 UTF-8 text and recoverable collections](STAGE8_TEXT_COLLECTIONS.md),
   [Sprint 3 local evidence](stage8/SPRINT3_ACCEPTANCE.md).
 - [Stage 8 calls and numeric prelude](STAGE8_CALLS_NUMERIC.md),

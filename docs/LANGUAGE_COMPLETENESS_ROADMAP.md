@@ -10,33 +10,29 @@ See [Boss approvals and sprint ledger](LANGUAGE_COMPLETENESS_APPROVALS.md).
 
 ## Current execution status — 20 October 2026
 
-Stage 8 Sprint 3 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
-Debug and strict sanitizers passed **145/145 each**. Release passed **144/145**,
-then its obsolete arrays_foundation diagnostic assertion was repaired and passed
-its focused **1/1** rerun: **435/435 final unique configuration/suite outcomes**.
-The original failure is retained, and no production source changed for that test
-repair. Both 1 MiB frontend gates passed. See [the Sprint 3 contract](STAGE8_TEXT_COLLECTIONS.md)
-and [exact acceptance evidence and limits](stage8/SPRINT3_ACCEPTANCE.md).
+Stage 8 Sprint 4 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
+Final consolidated Debug, Release and strict ASan/UBSan/leak runs passed
+**148/148 each: 444/444 unique configuration/suite outcomes**. Both complete
+1 MiB frontend gates passed. See [the application/static-provider contract](STAGE8_APPLICATION_NATIVE.md)
+and [Sprint 4 acceptance](stage8/SPRINT4_ACCEPTANCE.md) for exact evidence,
+preliminary failures/corrections, source hashes and limits.
 
-All three Sprint 3 API decisions are approved in [DECISIONS.md](DECISIONS.md).
-No Sprint 3 owner decision remains pending. Queries are runtime-only; builtin
-method values are absent, and worker calls retain conservative admission. The
-contract records these limits; no broader API or async admission is claimed.
-Sprint 1 remains locally accepted by Boss, with its
-[CI #82 Windows repair](stage8/CI82_WINDOWS_REPAIR.md) source/test hashes preserved.
-Sprint 2's named/default, numeric, tooling and reload contracts remain covered.
+All three Sprint 4 design decisions are approved in [DECISIONS.md](DECISIONS.md);
+no Sprint 4 owner decision remains pending. The bounded sink requires explicit
+C++ admission, one provider descriptor per graph; CLI/LSP imports grant no trust.
+Sprints 1–3 remain preserved, including [CI #82's Windows repair](stage8/CI82_WINDOWS_REPAIR.md),
+argument binding, numeric prelude, UTF-8/collections, tooling and reload contracts.
+Prior failures and verification records remain historical evidence.
 
 **Hosted CI remains deferred until the end of Stage 8**, unless Boss explicitly
-authorizes an earlier run. No hosted CI was run or requested. Windows/macOS,
-Windows Debug/Release CI #82 execution and fresh actual editor-client verification
-remain pending; Linux LSP pipe tests do not establish them. Stage 8 is not hosted locked.
+authorizes an earlier run. Windows/macOS, hosted CI #82 Debug/Release execution
+and fresh actual editor-client verification remain pending. Linux local tests
+cannot establish those results. Stage 8 is not hosted locked.
 
-**Stopped after Sprint 3 for Wrench review. Sprints 4–6 remain future work.**
-Do not begin Sprint 4 without explicit Boss authorization. No commits, pushes,
-branch/remote changes, publication or website work occurred. Root README is
-unchanged; future sprint prompts direct documentation updates under `docs/` and
-require separate explicit Boss authorization for public-facing root README edits.
-
+**Stopped after Sprint 4 for Wrench review. Sprints 5–6 remain future work.**
+No commits, pushes, branch/remote changes, hosted CI, publication or website work
+occurred. Root README is unchanged; documentation and future sprint prompts belong
+under `docs/` by default. Do not begin Sprint 5 without Boss authorization.
 
 The research narrative below remains the pre-sprint snapshot. Its earlier
 missing-feature statements are superseded only by the delivered contracts and
@@ -310,81 +306,37 @@ follow demonstrated demand.
 
 ## Sprint: optional-main application hosting and static native providers
 
-**Objective:** run simple applications through top-level code or optional main,
-then enable native-backed modules/IO while preserving the bounded ownership
-architecture. Dependencies: shared project selection, approved entry/coexistence
-semantics and, for native wrappers, module/core ownership and encapsulation.
-Application entry is independently useful and may be authorized earlier; it must
-not wait for a provider, print API or full linker driver. Named main functions
-already parse but cannot currently run as entries.
+**Sprint 4 is implemented and locally verified; Wrench review pending.** All three checkpoint decisions are
+approved in [DECISIONS.md](DECISIONS.md). [Acceptance](stage8/SPRINT4_ACCEPTANCE.md)
+records 444/444 final outcomes and both 1 MiB gates. The current
+[implementation contract](STAGE8_APPLICATION_NATIVE.md) supersedes earlier research
+recommendations, including implicit-zero fallthrough for explicitly typed main.
 
-| Form/policy | Proposed contract |
+| Form/policy | Approved contract |
 | --- | --- |
-| Top-level statements, no main | Compiler-owned body executes once; explicit i32 return is status; successful fallthrough/bare return means 0. |
-| `func main():` | No arguments; normal completion/bare return means status 0. |
-| `func main() -> i32:` | Explicit return supplies status. Recommend selected-entry-only implicit 0 on fallthrough; approve that scope before changing return analysis. |
-| Top-level code plus entry-eligible main | Recommend a competing-style error with both locations. C# instead gives global code precedence and warns about ignored Main. Do not automatically run both. |
-| Legacy `entry(i32) -> i32` | Preserve numeric input, printed result and success status 0. Keep main as an ordinary helper if it coexists in an existing declaration-only legacy program; a stricter rule needs migration approval. |
-| Libraries/imports | Checking needs no entry. Do not execute imports or choose arbitrary public functions. Recommend diagnosing imported executable bodies. |
+| Top-level statements | Selected source only; body-local variables; i32 return is status; fallthrough/bare return is 0. |
+| `func main():` | Synchronous, no parameters; completion/bare return yields 0. |
+| `func main() -> i32:` | Explicit i32 return on every reachable path; no implicit zero. |
+| Eligible main plus executable top-level code | Competing-style compile error. |
+| Legacy `entry(i32) -> i32` | Preserve numeric input, printed result, success status 0 and declaration-only precedence over a main helper. |
+| Imported executable statements | Reject during compilation; no import-time execution. |
+| CLI | Explicit `--app` for run/emit; no numeric operand or printed status; failure 1, invalid invocation 2; retain no-opt and Debug cache. |
+| Static native admission | Explicit C++ descriptor checked against its own compiled catalog; independent disposable in-memory sink alongside original fixture. |
 
-These are proposed VOID policies, not an adopted C# contract. See the audit's
-[entry research](LANGUAGE_COMPLETENESS_AUDIT.md#optional-main-executable-top-level-code-and-project-discovery)
-for official sources, alternatives and current source/probe evidence. C# does not
-implicitly return zero from an explicit integer Main that falls through. No Bible
-semantics were changed by this research.
+Reuse the current i32(i32) hosting adapter, typed IR, LLVM 19.1.7 JIT/AOT,
+Runtime, exact-case discovery, GC roots, checked cleanup and generation leases.
+Entry kind participates in cache/reload identity. Editors cannot execute source
+or authorize native imports. Provider resource identities remain opaque, isolated
+and bound to the acquisition thread. Returned/retained UTF-8 is owned; callbacks
+quiesce before resource/root/lease retirement.
 
-Reuse a compiler-owned adapter through current i32(i32) native invocation;
-new applications ignore its private input, call no-argument main or a synthetic
-body and normalize no-result success to zero. Preserve source identities, shared
-typed IR, roots, defer/with and failure/lease handling. Keep top-level var local to
-the synthetic body and pure root constants unchanged; register declarations as
-today and execute statements in relative source order. Do not introduce runtime
-module globals or implicit access from declared functions to program locals.
-Entry metadata must distinguish application versus legacy output/status policy in
-analysis, cache, reload and AOT. Keep unrelated typed-function return checks.
-
-New application JIT/AOT adapters return status without printing it; the legacy
-adapter retains print-and-zero behavior. Preserve explicit-file commands and old
-numeric operands. Review exact no-file/directory CLI spelling without repurposing
-positional arguments ambiguously. General argv, async main/top-level await and
-arbitrary public entry ABI remain outside this synchronous application slice.
-
-The current NativeProject descriptor is fixture-specific: validator library name,
-binding catalog, signatures and affinity are hardcoded. General IO is not enabled
-merely by adding a new descriptor. Generalize a **bounded static provider admission**
-path through the current IR validation/Runtime bridge, retaining explicit host
-trust, supported scalar/owned-string/resource shapes, owning-thread affinity,
-callback registration/quiescence and deterministic shutdown. Do not auto-authorize
-native addresses from imports or allow implicit native execution in voidls.
-
-Choose the smallest useful executable workflow separately from public ABI/export
-design. Preserve existing object output and shared JIT/AOT lowering. Async CLI,
-arbitrary linker configuration, cross-compilation,
-dynamic libraries, source binding DSL and general aggregate/callback ABI should
-not all become prerequisites for a first file/console wrapper.
-
-**Application tests/acceptance:** top-level/main/no-result/integer-return/default
-zero, invalid signatures, partial returns, competing styles, legacy+main helpers,
-old printed result/input, explicit alternate files, libraries and imported scripts.
-Assert stdout and process status separately for normal/O2 JIT/AOT using 0/7 and
-failures; cover cleanup/GC, shared discovery, cache/entry-kind changes and restart.
-Keep ordinary typed-function missing-return diagnostics. Editors never run source.
-
-**Native tests/acceptance:** an independent second disposable static provider proves
-fixture decoupling; wrong signatures/affinity/ownership reject; source/compiler
-analysis does not execute native code; returned/retained strings outlive temporary
-borrows; failed acquisition and cleanup run exactly once; foreign callbacks drain
-before unload/shutdown; normal/O2 JIT/AOT agree under existing sanitizer coverage.
-Application failure exit/status/diagnostic channel must be documented. Use existing
-native and integrated fixtures/ABI tests; no new foreign subsystem.
-
-Primary files: `include/void/native_binding.hpp`, `src/ir/native_binding.cpp`,
-`src/runtime/native_binding.cpp`, callback/native bridge, frontend admission and
-CLI host code, frontend Parser/entry gates/lower_graph, shared project selection,
-backend adapters and cache entry identity. Contracts: Bible §10/entry proposal,
-SOURCE_COMPILER, MODULE_SYSTEM, NATIVE_LIBRARIES, ASYNC, ADVANCED_LANGUAGE, DIAGNOSTICS.
-**Exit:** a reviewed trusted provider can back a real module and a user can run the
-approved application shape. Public distribution/licensing is not decided here.
+Focused tests precede consolidated local Debug/Release/strict sanitizer and 1 MiB
+frontend acceptance. No hosted lock is implied. General argv, async main,
+top-level await, arbitrary entry/export ABI, dynamic native loading, public FFI
+DSL, raw pointers, broader callbacks and new worker privileges remain deferred.
+One descriptor per graph is the bounded admission surface; this is not a native
+package manager or full IO library. The historical research remains in
+[the audit](LANGUAGE_COMPLETENESS_AUDIT.md).
 
 ## Sprint: long-running async resource readiness
 
@@ -452,7 +404,7 @@ Wrench reviews concrete architecture; Boss authorizes each engineering sprint.
 | Stdlib-root selection | One explicitly selected matching source root shared by compiler/server; deterministic startup/configuration error if unavailable when required. | Discovery and compilation could disagree about available modules/providers. This does not decide packaging/distribution. |
 | Project discovery boundary/lifecycle | Explicit file wins; nearest main.void within supplied boundary; labeled standalone editor fallback; fixed selection until deliberate reselection. One frontend helper exposed through voidls preflight. | Nested projects, root attachment and named unsaved main handling otherwise diverge. No recursive search for main declarations. |
 | Entry coexistence/compatibility | Diagnose competing top-level/main styles; retain existing declaration-only legacy entry+main selection. Never run imports or both bodies automatically. | C# precedence is not automatically VOID's rule; working legacy helpers need preservation. |
-| Default-zero scope and top-level locals | **Boss-approved correction:** top-level successful fallthrough and no-result `func main():` exit 0. `func main() -> i32:` must explicitly return an `i32` on every reachable path, like an ordinary typed function. Program vars are entry locals; imported executable bodies diagnose (specific scope policy remains for engineering review). | Preserve current typed-function return checking; no implicit zero for a typed `main()`. |
+| Default-zero scope and top-level locals | **Boss-approved correction:** top-level successful fallthrough and no-result `func main():` exit 0. `func main() -> i32:` must explicitly return an `i32` on every reachable path, like an ordinary typed function. Program vars are entry locals; imported executable bodies diagnose. The exact Sprint 4 return/CLI/provider policies are approved in DECISIONS.md. | Preserve current typed-function return checking; no implicit zero for a typed `main()`. |
 | Core built-in provider admission | **APPROVED:** compiler-owned numeric prelude; no imports or user primitive extensions; four members only. | See Sprint 2 contract; no owner choice remains for this sprint. |
 | Numeric properties and edges | **APPROVED:** exact integer/finite float limits; checked signed-min abs and invalid bounds; bounds validated before NaN propagation; signed-zero/infinity rules in DECISIONS.md. | See Sprint 2 contract and actual verification. |
 | Ordinary arguments/defaults | **APPROVED:** shared initializer binder, pure compile-time defaults and concrete-default annotation inference; explicit generic parameter annotations. | See Sprint 2 contract and actual verification. |
@@ -495,7 +447,10 @@ Eight existing frontend/module/CLI/analysis/session/LSP suites passed, 15.56 sec
 This follow-up did not rebuild or alter production code and is not a new full
 acceptance run. Detailed source/C# evidence and proposed rules are in the audit.
 
-## Executive summary for Boss and Wrench
+## Historical research executive summary for Boss and Wrench
+
+The dated current status and approved Sprint 4 contract above supersede the
+initial gap list and sequencing recommendations below.
 
 1. **Already in good shape:** LLVM/native architecture, precise GC roots,
    value/reference collections, bounded interfaces/generics, errors/closures/

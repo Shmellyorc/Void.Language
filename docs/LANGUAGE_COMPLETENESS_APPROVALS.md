@@ -5,33 +5,29 @@ completeness audit and Stage 7 hosted acceptance.
 
 **Current status — 20 October 2026:**
 
-Stage 8 Sprint 3 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
-Debug and strict sanitizers passed **145/145 each**. Release passed **144/145**,
-then its obsolete arrays_foundation diagnostic assertion was repaired and passed
-its focused **1/1** rerun: **435/435 final unique configuration/suite outcomes**.
-The original failure is retained, and no production source changed for that test
-repair. Both 1 MiB frontend gates passed. See [the Sprint 3 contract](STAGE8_TEXT_COLLECTIONS.md)
-and [exact acceptance evidence and limits](stage8/SPRINT3_ACCEPTANCE.md).
+Stage 8 Sprint 4 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
+Final consolidated Debug, Release and strict ASan/UBSan/leak runs passed
+**148/148 each: 444/444 unique configuration/suite outcomes**. Both complete
+1 MiB frontend gates passed. See [the application/static-provider contract](STAGE8_APPLICATION_NATIVE.md)
+and [Sprint 4 acceptance](stage8/SPRINT4_ACCEPTANCE.md) for exact evidence,
+preliminary failures/corrections, source hashes and limits.
 
-All three Sprint 3 API decisions are approved in [DECISIONS.md](DECISIONS.md).
-No Sprint 3 owner decision remains pending. Queries are runtime-only; builtin
-method values are absent, and worker calls retain conservative admission. The
-contract records these limits; no broader API or async admission is claimed.
-Sprint 1 remains locally accepted by Boss, with its
-[CI #82 Windows repair](stage8/CI82_WINDOWS_REPAIR.md) source/test hashes preserved.
-Sprint 2's named/default, numeric, tooling and reload contracts remain covered.
+All three Sprint 4 design decisions are approved in [DECISIONS.md](DECISIONS.md);
+no Sprint 4 owner decision remains pending. The bounded sink requires explicit
+C++ admission, one provider descriptor per graph; CLI/LSP imports grant no trust.
+Sprints 1–3 remain preserved, including [CI #82's Windows repair](stage8/CI82_WINDOWS_REPAIR.md),
+argument binding, numeric prelude, UTF-8/collections, tooling and reload contracts.
+Prior failures and verification records remain historical evidence.
 
 **Hosted CI remains deferred until the end of Stage 8**, unless Boss explicitly
-authorizes an earlier run. No hosted CI was run or requested. Windows/macOS,
-Windows Debug/Release CI #82 execution and fresh actual editor-client verification
-remain pending; Linux LSP pipe tests do not establish them. Stage 8 is not hosted locked.
+authorizes an earlier run. Windows/macOS, hosted CI #82 Debug/Release execution
+and fresh actual editor-client verification remain pending. Linux local tests
+cannot establish those results. Stage 8 is not hosted locked.
 
-**Stopped after Sprint 3 for Wrench review. Sprints 4–6 remain future work.**
-Do not begin Sprint 4 without explicit Boss authorization. No commits, pushes,
-branch/remote changes, publication or website work occurred. Root README is
-unchanged; future sprint prompts direct documentation updates under `docs/` and
-require separate explicit Boss authorization for public-facing root README edits.
-
+**Stopped after Sprint 4 for Wrench review. Sprints 5–6 remain future work.**
+No commits, pushes, branch/remote changes, hosted CI, publication or website work
+occurred. Root README is unchanged; documentation and future sprint prompts belong
+under `docs/` by default. Do not begin Sprint 5 without Boss authorization.
 
 ## Permanent documentation policy — 20 October 2026
 
@@ -82,7 +78,7 @@ Windows hosted verification remains deferred with the Stage 8 gate.
 | 1 | **Nested stdlib/project imports, compiler-owned VFS discovery, project `main.void` selection, import IntelliSense, source docs/navigation, shared VS Code/VSCodium/Neovim/Vim behavior** | **LOCALLY ACCEPTED by Boss; original 423/423 local evidence and focused CI #82 repair preserved; hosted gate deferred to Stage 8 end** | Correct parsing/resolution/visibility, valid completions and source navigation, real client checks, focused and full local verification, owner-hosted 7-job CI at Stage 8 end |
 | 2 | **Ordinary named/default arguments and built-in type APIs**: `i32.max_value`, `i32.abs(value)`, `value.abs()`, chaining with one canonical implementation | **LOCALLY VERIFIED, 429/429; Wrench review pending; not hosted locked** | Approved signatures and numeric edge behavior; ordinary-call/receiver/generic/JIT/AOT/tooling acceptance |
 | 3 | **Usable UTF-8 text APIs and recoverable collections**: scalar/byte inspection and safe `.get()`/`.pop()` contracts | **LOCALLY VERIFIED; 435/435 final unique suite outcomes; Wrench review pending; not hosted locked** | Approved error/index/ownership policies, strings/arrays/dictionaries normal/O2/GC regressions |
-| 4 | **Optional-main/top-level application execution and bounded native-provider foundation**, with independently useful application-entry work able to be scheduled separately | **PLANNED; not implemented** | Entry coexistence, exit-code, legacy compatibility, JIT/AOT, native ownership and app-host acceptance |
+| 4 | **Optional-main/top-level application execution and bounded native-provider foundation**, with independently useful application-entry work able to be scheduled separately | **LOCALLY VERIFIED; 444/444; Wrench review pending; not hosted locked** | Entry coexistence, exit-code, legacy compatibility, JIT/AOT, native ownership and app-host acceptance |
 | 5 | **Async completed-work retention**: measure first; change lifetime/retirement only if evidence demands it | **PLANNED; measurement only until justified** | Before/after retained work and resource evidence without weakening roots, cleanup or leases |
 | 6 | **Selected language ergonomics** (`has`, if-expression, multiline calls, interpolation/formatting, etc.) | **DEFERRED pending need/individual design approval** | Implement only evidence-backed additions with focused tests |
 
@@ -172,16 +168,24 @@ approved by Boss on 20 October 2026; [the contract](STAGE8_CALLS_NUMERIC.md) rec
 the exact implementation and verification boundary. They are not pending owner
 choices. No private/readonly field declaration work was required.
 
-Sprints 3–6 retain their own design reviews, including recoverable text/collection
-contracts, optional-main/application-host details, native provider admission and
-measured async retirement. Their approval as direction does not implement them.
+Sprint 3 text/collection policy and all three Sprint 4 checkpoint decisions are
+approved in DECISIONS.md. Sprints 5–6 retain their own design reviews, including
+measured async retirement. Approval as direction does not implement future work.
 
 ## Next handoff
 
-Read [docs/README.md](README.md) first, then [Sprint 3 acceptance](stage8/SPRINT3_ACCEPTANCE.md)
-and [the contract](STAGE8_TEXT_COLLECTIONS.md). Review Sprint 3; do not start Sprint 4,
-request/run hosted CI, modify Git/remotes or publish. The seven-job hosted gate
-remains deferred to Stage 8 end unless Boss explicitly changes that instruction.
-Update handoffs under `docs/`; root README requires a separate public-facing request.
+Read [docs/README.md](README.md) first, then the current
+[Sprint 4 contract](STAGE8_APPLICATION_NATIVE.md) and
+[acceptance evidence](stage8/SPRINT4_ACCEPTANCE.md). Review completed Sprint 4; Sprints
+5–6, Git mutations and hosted CI remain unauthorized. Documentation stays under
+`docs/`; root README changes require separate explicit Boss authorization.
 
-**THREE CLANKERS. ONE VOID. STRONG BOLTS. NO GHOST BOLTS!**
+## Sprint 4 checkpoint approvals — 20 October 2026
+
+Boss explicitly authorized Sprint 4 and answered every required question before
+implementation. [DECISIONS.md](DECISIONS.md) records explicit `--app` CLI/status
+policy, top-level return validation and the independently admitted static sink
+provider. [Implementation contract](STAGE8_APPLICATION_NATIVE.md) separates those
+approved rules from verification. [Sprint 4 local acceptance](stage8/SPRINT4_ACCEPTANCE.md)
+now records 444/444 final outcomes and both 1 MiB gates. Wrench review remains
+pending; no hosted lock is claimed. Sprints 5–6 remain future work.
