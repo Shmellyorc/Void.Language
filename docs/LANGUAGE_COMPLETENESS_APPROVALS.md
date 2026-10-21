@@ -8,6 +8,23 @@ completeness audit and Stage 7 hosted acceptance.
 operations and hosted CI separately. Completed work must receive dated evidence
 and a real hosted lock before changing a sprint's status to **LOCKED**.
 
+## Permanent documentation policy — 20 October 2026
+
+[docs/README.md](README.md) is the central documentation index and instruction
+entry point for Keyboard, Research and Wrench Clankers. Read it before preparing
+future sprint prompts or handoffs.
+
+Clanker instructions, AI workflow notes, sprint handoffs, internal status reports
+and development-process discussion belong under `docs/`. Do not add them to the
+repository root `README.md`. Preserve its public-facing installation, usage and
+language documentation. Modify the root README only when Boss explicitly requests
+a public-facing README change; sprint authorization alone does not authorize it.
+
+Future sprint prompts must direct documentation updates to `docs/` by default,
+including the index, relevant contracts, approval ledger and permanent handoffs.
+This rule supersedes any older instruction to update the root README during
+routine development. It authorizes no additional sprint, commit, push or hosted lock.
+
 ## Baseline
 
 - Compiler: native VOID 2.0, LLVM **19.1.7**, one frontend, typed IR,
@@ -104,9 +121,10 @@ Never mark a feature LOCKED based solely on a summary or local success.
 - Editor-specific advanced settings should be minimal; honor VS Code's
   existing editor settings and existing `void.server.path`,
   `void.project.entry` and `void.trace.server` overrides.
-- `README`, `DEVELOPMENT_STRATEGY.md`, `DECISIONS.md`, `WRENCH_CLANKER.md`,
-  this approval ledger, the engineering roadmap, contracts, issue dispositions
-  and work log need **dated status updates** as implementation progresses.
+- `docs/README.md`, `docs/DEVELOPMENT_STRATEGY.md`, `docs/DECISIONS.md`,
+  `docs/WRENCH_CLANKER.md`, this approval ledger, the engineering roadmap,
+  contracts, issue dispositions and work log need **dated status updates** as
+  implementation progresses, following the permanent documentation policy above.
   Keep research snapshots and earlier failures as history; add superseding
   evidence instead of rewriting the past.
 
@@ -123,6 +141,10 @@ every table recommendation in the research files is an implemented language
 contract.
 
 ## Next handoff
+
+Future sprint prompts must begin with [the documentation entry point](README.md)
+and direct documentation updates to `docs/`; root README edits require Boss's
+explicit request for a public-facing change.
 
 **Sprint 1 only** was explicitly authorized by Boss on 20 October 2026.
 Implementation choices and verification boundaries are in [STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md);

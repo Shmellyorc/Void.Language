@@ -9,13 +9,6 @@ VOID is under active development and is independent of the earlier
 C#-compatible VOIDC. The compiler implements a working language subset; the language
 design documents also contain proposals that are not yet implemented.
 
-Stage 8 Sprint 1 is implemented locally: project/module discovery, import
-IntelliSense and source documentation (423/423 consolidated local suites passed).
-Wrench review and hosted acceptance remain pending. [The sprint ledger](docs/LANGUAGE_COMPLETENESS_APPROVALS.md)
-and [acceptance record](docs/stage8/ACCEPTANCE.md) distinguish approved, locally
-verified and hosted-locked work. Stage 7 is owner-confirmed hosted locked at
-`f704d75f`, CI #81 attempt 2, seven jobs, 980/980 suites.
-
 ## Implemented features
 
 - Typed functions, local type inference, mutable variables, constants, conditionals,
@@ -98,9 +91,6 @@ see the [managed-source guide](docs/MANAGED_STRUCTS.md).
 ## Platforms and editor support
 
 The established compiler CI matrix covers Linux x86-64, Windows x64 and macOS ARM64.
-The latest accepted compiler baseline passed all seven hosted Debug/Release/
-sanitizer jobs. The new tooling implementation has passed local Linux acceptance;
-its cross-platform hosted acceptance is still pending.
 
 Actual editor tests cover VS Code **1.141.0**, Neovim **0.12.6** and the installed
 **0.13.0 development build**, and Vim **9.2** with a pinned LSP client. VSCodium,
@@ -114,6 +104,8 @@ require matching host libraries; clean-machine portability is not verified.
 
 ## Documentation
 
+See the [documentation index](docs/README.md) for the complete guide directory.
+
 - [Build guide](docs/SOURCE_COMPILER.md#building-the-compiler) and [source compiler / CLI](docs/SOURCE_COMPILER.md).
 - [Modules and imports](docs/MODULE_SYSTEM.md), [numeric types](docs/NUMERIC_TYPES.md)
   and [value semantics](docs/VALUE_SEMANTICS.md).
@@ -123,9 +115,8 @@ require matching host libraries; clean-machine portability is not verified.
   [advanced language features](docs/ADVANCED_LANGUAGE.md).
 - [Async tasks and concurrency](docs/ASYNC.md), [native bindings](docs/NATIVE_LIBRARIES.md)
   and [diagnostics](docs/DIAGNOSTICS.md).
-- [Language server](docs/LANGUAGE_SERVER.md) and [tooling contract](docs/STAGE7_IMPLEMENTATION.md).
-- [Current status and roadmap](docs/DEVELOPMENT_STRATEGY.md#current-implementation-status),
-  [local tooling acceptance](docs/stage7/ACCEPTANCE.md) and [known issues](docs/KNOWN_ISSUES.md).
+- [Language server](docs/LANGUAGE_SERVER.md), [editor setup](docs/EDITOR_INTEGRATION.md)
+  and [known issues](docs/KNOWN_ISSUES.md).
 
 The [Language Bible](docs/LANGUAGE_BIBLE.md) describes the broader language design;
 implementation guides and acceptance records determine what works today.

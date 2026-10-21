@@ -1,5 +1,22 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## Permanent documentation policy — 20 October 2026
+
+[docs/README.md](README.md) is the central documentation index and instruction
+entry point for Keyboard, Research and Wrench Clankers. Read it before preparing
+future sprint prompts or handoffs.
+
+Clanker instructions, AI workflow notes, sprint handoffs, internal status reports
+and development-process discussion belong under `docs/`. Do not add them to the
+repository root `README.md`. Preserve its public-facing installation, usage and
+language documentation. Modify the root README only when Boss explicitly requests
+a public-facing README change; sprint authorization alone does not authorize it.
+
+Future sprint prompts must direct documentation updates to `docs/` by default,
+including the index, relevant contracts, approval ledger and permanent handoffs.
+This rule supersedes any older instruction to update the root README during
+routine development. It authorizes no additional sprint, commit, push or hosted lock.
+
 ## Mandatory Keyboard Clanker rule: MINIMAL OUTPUT
 
 **SHUT UP AND WORK. Tokens and usage are valuable.**
