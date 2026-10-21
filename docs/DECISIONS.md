@@ -1,5 +1,27 @@
 # Architectural decisions
 
+## Stage 8 Sprint 1 engineering decisions — 20 October 2026
+
+Boss authorized only the first of six approved completeness sprints. Stage 7 is
+owner-confirmed hosted LOCKED at `f704d75f` / CI #81 attempt 2, seven jobs,
+980/980 suites. [STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md) records the concrete
+Sprint 1 contract: separate reserved standard source identities, exact unquoted
+module lookup, importer-relative bare quoted paths, keyword path segments,
+build-configured matching source root with absolute environment override,
+library-aware visibility, bounded shared main discovery, metadata-only import
+completion and `##`/`@param` source docs. These are implementation choices for
+review, not claims that remaining approval-table details are locked. Local
+acceptance passed 423/423 consolidated suites, 8/8 focused and 15/15 final LSP
+checks plus recorded editor/stack/native-engine evidence. Wrench review is pending;
+hosted acceptance remains owner-controlled.
+
+Later sequence remains named/default calls and built-in APIs; UTF-8/recoverable
+collections; optional-main/native providers; measured async retention; selected
+ergonomics. In particular typed `main() -> i32` must explicitly return on every
+reachable path, and competing entry styles must diagnose when Sprint 4 is built.
+No-result completion then exits 0. None of that execution work is part of Sprint 1.
+
+
 **Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total).
 The owner approved Stage 5 architecture and authorized its first production implementation. [STAGE5_CACHE_PROPOSAL.md](STAGE5_CACHE_PROPOSAL.md) records the optional whole-graph Debug native cache, identity, privacy, fallback and revision-checked reload contract. Stage 5 hosted acceptance remains pending; automatic watching remains future work.
 

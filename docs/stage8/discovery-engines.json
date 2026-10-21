@@ -1,0 +1,15 @@
+{
+  "normal": {
+    "jit": 16,
+    "aot": 16
+  },
+  "optimized": {
+    "jit": 16,
+    "aot": 16
+  },
+  "cache": [
+    "miss",
+    "hit",
+    "stdlib-byte-edit miss:21"
+  ]
+}

@@ -1,0 +1,137 @@
+[
+  {
+    "source": "/examples/guides/syntax.void",
+    "input": "10",
+    "expected": "52",
+    "check": true,
+    "normal_o2_jit": true,
+    "normal_o2_aot": true,
+    "async_adapter": false
+  },
+  {
+    "source": "/examples/functions.void",
+    "input": "5",
+    "expected": "120",
+    "check": true,
+    "normal_o2_jit": true,
+    "normal_o2_aot": true,
+    "async_adapter": false
+  },
+  {
+    "source": "/examples/loops.void",
+    "input": "5",
+    "expected": "9",
+    "check": true,
+    "normal_o2_jit": true,
+    "normal_o2_aot": true,
+    "async_adapter": false
+  },
+  {
+    "source": "/examples/guides/collections.void",
+    "input": "5",
+    "expected": "35",
+    "check": true,
+    "normal_o2_jit": true,
+    "normal_o2_aot": true,
+    "async_adapter": false
+  },
+  {
+    "source": "/examples/guides/structs.void",
+    "input": "0",
+    "expected": "19",
+    "check": true,
+    "normal_o2_jit": true,
+    "normal_o2_aot": true,
+    "async_adapter": false
+  },
+  {
+    "source": "/examples/guides/errors.void",
+    "input": "2",
+    "expected": "50",
+    "check": true,
+    "normal_o2_jit": true,
+    "normal_o2_aot": true,
+    "async_adapter": false
+  },
+  {
+    "source": "/examples/guides/generics.void",
+    "input": "5",
+    "expected": "10",
+    "check": true,
+    "normal_o2_jit": true,
+    "normal_o2_aot": true,
+    "async_adapter": false
+  },
+  {
+    "source": "/examples/guides/properties.void",
+    "input": "5",
+    "expected": "15",
+    "check": true,
+    "normal_o2_jit": true,
+    "normal_o2_aot": true,
+    "async_adapter": false
+  },
+  {
+    "source": "/examples/guides/closures.void",
+    "input": "5",
+    "expected": "13",
+    "check": true,
+    "normal_o2_jit": true,
+    "normal_o2_aot": true,
+    "async_adapter": false
+  },
+  {
+    "source": "/examples/guides/events.void",
+    "input": "5",
+    "expected": "5",
+    "check": true,
+    "normal_o2_jit": true,
+    "normal_o2_aot": true,
+    "async_adapter": false
+  },
+  {
+    "source": "/examples/guides/cleanup.void",
+    "input": "5",
+    "expected": "10",
+    "check": true,
+    "normal_o2_jit": true,
+    "normal_o2_aot": true,
+    "async_adapter": false
+  },
+  {
+    "source": "/examples/guides/async.void",
+    "input": "5",
+    "expected": "13",
+    "check": true,
+    "normal_o2_jit": false,
+    "normal_o2_aot": true,
+    "async_adapter": true
+  },
+  {
+    "source": "/examples/guides/task-groups.void",
+    "input": "5",
+    "expected": "11",
+    "check": true,
+    "normal_o2_jit": false,
+    "normal_o2_aot": true,
+    "async_adapter": true
+  },
+  {
+    "source": "/examples/guides/parallelism.void",
+    "input": "5",
+    "expected": "61",
+    "check": true,
+    "normal_o2_jit": false,
+    "normal_o2_aot": true,
+    "async_adapter": true
+  },
+  {
+    "source": "/examples/guides/modules/main.void",
+    "input": "5",
+    "expected": "16",
+    "check": true,
+    "normal_o2_jit": true,
+    "normal_o2_aot": true,
+    "async_adapter": false
+  }
+]

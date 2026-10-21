@@ -1,10 +1,15 @@
 " Vim 9.1+ and pinned yegappan/lsp. Configuration is explicit trusted user code.
-function! void#setup(server, entry) abort
+function! void#setup(server, entry, ...) abort
   if !has('patch-9.1.0') | throw 'VOID requires Vim 9.1+' | endif
   let executable = empty(a:server) ? exepath('voidls') : fnamemodify(a:server, ':p')
   if !executable(executable) | throw 'Install voidls on PATH or configure an executable' | endif
-  let entry = fnamemodify(a:entry, ':p')
-  if empty(a:entry) || fnamemodify(entry, ':e') !=# 'void' | throw 'Select a .void entry (a standalone file is also an entry)' | endif
+  let boundary = a:0 ? a:1 : getcwd()
+  let override = empty(a:entry) ? '' : fnamemodify(a:entry, ':p')
+  let command = join(map([executable, '--discover', boundary, expand('%:p'), override], 'shellescape(v:val)'), ' ')
+  let result = system(command)
+  if v:shell_error | throw 'VOID project discovery failed: ' . result | endif
+  let project = json_decode(result)
+  let entry = project.entry
   call LspAddServer([{'name':'voidls', 'filetype':['void'], 'path':executable, 'args':['--entry',entry]}])
   augroup void_lsp_keys
     autocmd!

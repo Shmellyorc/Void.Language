@@ -30,7 +30,13 @@ async function main(): Promise<void> {
         await fs.writeFile(path.join(root, 'second.void'), 'func entry(x: i32) -> i32:\n    return x\n');
         await fs.mkdir(path.join(root, '.vscode'));
         await fs.writeFile(path.join(root, '.vscode/settings.json'), JSON.stringify({
-            'void.server.path': installed ? '' : server, 'void.project.entry': 'main.void', 'void.trace.server': 'verbose'}));
+            'void.server.path': installed ? '' : server, 'void.project.entry': '', 'void.trace.server': 'verbose'}));
+        await fs.mkdir(path.join(root,'app/systems'), {recursive:true});
+        await fs.mkdir(path.join(temp,'standard/io'), {recursive:true});
+        const documented='## Editor fixture API.\n## @param x input value\nfunc read(x: i32) -> i32:\n    return x\n';
+        await fs.writeFile(path.join(root,'app/systems/player.void'),documented);
+        await fs.writeFile(path.join(temp,'standard/io/files.void'),documented);
+        process.env.VOID_STDLIB_ROOT=path.join(temp,'standard');
         const other = path.join(temp, 'unrelated'); await fs.mkdir(other);
         const multi = path.join(temp, 'multiple.code-workspace');
         await fs.writeFile(multi, JSON.stringify({folders:[{path:root},{path:other}], settings:{'void.server.path':server, 'void.project.entry':path.join(root,'main.void')}}));

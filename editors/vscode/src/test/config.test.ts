@@ -27,7 +27,9 @@ test('validate executable and deterministic canonical project selection', async 
     const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'VOID config space '));
     try {
         const server = path.join(directory, process.platform === 'win32' ? 'voidls.exe' : 'voidls');
-        await fs.writeFile(server, 'not executed by unit tests'); await fs.chmod(server, 0o755);
+        const native = process.env.VOIDLS_TEST_SERVER ?? path.resolve(__dirname, '../../../../build/debug/', process.platform === 'win32' ? 'voidls.exe' : 'voidls');
+        await fs.copyFile(native, server); await fs.chmod(server, 0o755);
+        await fs.writeFile(path.join(directory, 'main.void'), '');
         assert.equal(await discoverServer('', undefined, server, ''), server);
         assert.equal(await discoverServer('', undefined, undefined, directory), server);
         assert.equal(await discoverServer(server, undefined, '/ignored', ''), server);
@@ -37,10 +39,11 @@ test('validate executable and deterministic canonical project selection', async 
         assert.equal(project.root, await fs.realpath(directory));
         assert.equal(project.entry, path.join(project.root, 'main.void'));
         assert(!project.singleFile);
+        await fs.rm(path.join(directory, 'main.void'));
         const fallback = await resolveProject({...settings, entry: ''}, [directory], path.join(directory, 'single.void'));
         assert(fallback.singleFile && fallback.entry.endsWith('single.void'));
         await assert.rejects(resolveProject(settings, [directory, directory]), /one project/);
-        await assert.rejects(resolveProject({...settings, entry: ''}, [directory]), /entry/);
+        await assert.rejects(resolveProject({...settings, entry: ''}, [directory]), /main.void/);
         await assert.rejects(resolveProject({...settings, server: directory}, [directory]), /regular executable/);
         await assert.rejects(resolveProject({...settings, server: path.join(directory, 'missing')}, [directory]), /Cannot find/);
         if (process.platform !== 'win32') {

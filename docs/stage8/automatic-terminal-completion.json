@@ -1,0 +1,108 @@
+{
+  "Neovim 0.13 development": {
+    "use ": {
+      "labels": [
+        "io/"
+      ],
+      "accepted": "use io/"
+    },
+    "use io/": {
+      "labels": [
+        "files"
+      ],
+      "accepted": "use io/files"
+    },
+    "use \"": {
+      "labels": [
+        "app/",
+        "data/",
+        "main.void",
+        "standard/",
+        "state/"
+      ],
+      "accepted": "use \"app/"
+    },
+    "use \"app/": {
+      "labels": [
+        "systems/"
+      ],
+      "accepted": "use \"app/systems/"
+    },
+    "use \"app/systems/": {
+      "labels": [
+        "player.void"
+      ],
+      "accepted": "use \"app/systems/player.void\""
+    }
+  },
+  "Neovim 0.12.6": {
+    "use ": {
+      "labels": [
+        "io/"
+      ],
+      "accepted": "use io/"
+    },
+    "use io/": {
+      "labels": [
+        "files"
+      ],
+      "accepted": "use io/files"
+    },
+    "use \"": {
+      "labels": [
+        "app/",
+        "data/",
+        "main.void",
+        "standard/",
+        "state/"
+      ],
+      "accepted": "use \"app/"
+    },
+    "use \"app/": {
+      "labels": [
+        "systems/"
+      ],
+      "accepted": "use \"app/systems/"
+    },
+    "use \"app/systems/": {
+      "labels": [
+        "player.void"
+      ],
+      "accepted": "use \"app/systems/player.void\""
+    }
+  },
+  "Vim 9.2 pinned client": {
+    "use ": {
+      "labels": [
+        "io/"
+      ],
+      "accepted": "use io/"
+    },
+    "use io/": {
+      "labels": [
+        "files"
+      ],
+      "accepted": "use io/files"
+    },
+    "use \"": {
+      "labels": [
+        "app/",
+        "main.void",
+        "standard/"
+      ],
+      "accepted": "use \"app/"
+    },
+    "use \"app/": {
+      "labels": [
+        "systems/"
+      ],
+      "accepted": "use \"app/systems/"
+    },
+    "use \"app/systems/": {
+      "labels": [
+        "player.void"
+      ],
+      "accepted": "use \"app/systems/player.void\""
+    }
+  }
+}

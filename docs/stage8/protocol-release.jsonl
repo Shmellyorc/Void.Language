@@ -1,0 +1,3 @@
+{"siblings": 10, "lsp_first_ms": 1.1277040466666222, "lsp_median_ms": 0.9433449013158679, "lsp_max_ms": 1.1277040466666222, "barrier_median_ms": 0.06713904440402985, "bytes": 2032, "peak_rss_kib": 9248}
+{"siblings": 1000, "lsp_first_ms": 31.508385902270675, "lsp_median_ms": 21.279987995512784, "lsp_max_ms": 31.508385902270675, "barrier_median_ms": 0.07216003723442554, "bytes": 51743, "peak_rss_kib": 14276}
+{"siblings": 10000, "lsp_first_ms": 43.57700201217085, "lsp_median_ms": 42.75216709356755, "lsp_max_ms": 44.51932699885219, "barrier_median_ms": 0.09578000754117966, "bytes": 51743, "peak_rss_kib": 14364}

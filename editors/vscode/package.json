@@ -77,7 +77,7 @@
           "type": "string",
           "default": "",
           "scope": "window",
-          "description": "Project entry .void file. Absolute or workspace-relative. Its parent is the project root. Empty selects the first active local VOID file as a single-file project."
+          "description": "Project entry .void file. Absolute or workspace-relative. Its parent is the project root. Empty asks voidls for the nearest main.void within the workspace, with a labelled standalone active-file fallback. Selection stays fixed until deliberate restart/reselection."
         },
         "void.trace.server": {
           "type": "string",

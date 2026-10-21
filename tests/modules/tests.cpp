@@ -167,15 +167,16 @@ void negatives(const fs::path& output) {
     f.rejects("use \"/../outside.void\"\n", "escapes the project root");
     f.rejects("use \"./folder/../../a.void\"\n", "escapes the project root");
     f.rejects("use \"./a\\b.void\"\n", "Invalid import path");
-    f.rejects("use \"math\"\n", "Package imports");
-    f.rejects("use \"a.void\"\n", "Package imports");
+    f.rejects("use \"math\"\n", "must name a .void");
+    f.file("main.void", "use \"a.void\"\n" + entry_start + "update(x)\n");
+    f.run({{3,3}});
     f.rejects("use \"C:/a.void\"\n", "OS filesystem paths");
     f.rejects("use \"/a.void/\"\n", "must name a .void");
     f.rejects("use \"/.\"\n", "must name a .void");
     f.rejects("use \"/a.VOID\"\n", "must name a .void");
     for (const auto& path : {"/con.void", "/bad?.void", "/bad:/x.void", "/bad./x.void", "/bad /x.void", "/caf\xc3\xa9.void"})
         f.rejects("use \"" + std::string(path) + "\"\n", "Non-portable module path");
-    f.rejects("use /a.void\n", "quoted import path");
+    f.rejects("use /a.void\n", "quoted project path");
     f.rejects("use \"/a.void\n", "Unterminated import path");
     f.rejects("use \"/a.void\" as if\n", "lowercase identifier", "main.void", "1:18");
     f.rejects("use \"/a.void\" as same\nuse \"/b.void\" as same\n", "Conflicting import alias", "main.void", "2:18");

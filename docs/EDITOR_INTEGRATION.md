@@ -1,5 +1,14 @@
 # VOID editor integration (Phase 11)
 
+**Stage 8 Sprint 1 (20 October 2026):** [STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md)
+supersedes the historical import/discovery exclusions below. It specifies separate
+standard/project source domains, importer-relative bare quoted imports, bounded
+shared `main.void` selection, metadata completion, source docs and readonly standard
+navigation. [Local acceptance](stage8/ACCEPTANCE.md) records actual verification;
+no hosted lock is implied. Existing snapshot, UTF-16, rename and native safety
+contracts remain in force.
+
+
 ## Stage 7 setup — current instructions (20 October 2026)
 
 Production engineering is authorized. This section and
@@ -12,13 +21,28 @@ document/workspace symbols, conservative formatting and refresh. Supported renam
 categories are negotiated by client capability; **Vim rename stays disabled**.
 Each window selects one entry-reachable project. Unsaved overlays remain authoritative.
 
+### Shared Sprint 1 setup
+
+All adapters call `voidls --discover <workspace> <active> <override>`; empty
+arguments represent absent inputs. Explicit entry wins. Neovim accepts
+`require('void').setup({server='/absolute/voidls', workspace='/project'})`;
+Vim accepts `call void#setup('/absolute/voidls', '', '/project')`.
+Their workspace defaults to cwd, so select it deliberately. Neovim restart retains
+its selected graph; start a fresh adapter/editor session with the intended setup to reselect. Vim
+setup selects before its LSP client starts; reconfigure a fresh editor session to
+reselect. `VOID_STDLIB_ROOT` must be an
+absolute matching source directory for relocated installations. No real standard
+module catalog is supplied. See [the contract](STAGE8_DISCOVERY.md) for import
+spelling, source docs, known-root navigation and readonly installed sources.
+
 ### VS Code / VSCodium
 
 The extension now declares VS Code **1.141.0+**, raising the old untested 1.91
 minimum to the actually exercised API version. VSCodium is an integration target;
 execution evidence must be recorded separately. Configure `void.project.entry`
-or run **VOID: Select Project Entry**. Empty entry fixes a standalone session to
-the first selected local `.void` file until configuration/restart. The status bar
+or run **VOID: Select Project Entry**. Empty entry asks `voidls --discover` for nearest exact-case `main.void` within
+the workspace, then uses a labelled standalone active-file fallback when absent.
+Selection stays fixed until explicit configuration/restart. The status bar
 shows this entry and the selected server path.
 
 Server precedence: literal `void.server.path`, matching bundled native `server/voidls`

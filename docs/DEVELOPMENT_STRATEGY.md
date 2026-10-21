@@ -7,9 +7,10 @@ As of **20 October 2026**:
 | Stage | Current status | Evidence / next gate |
 | --- | --- | --- |
 | Stage 6 — Concurrency and native libraries | **Hosted LOCKED** at `4139297f92c195782f59a28546444e6b3bec4ad8` | Owner-confirmed CI #78, seven successful jobs (973/973 suites) |
-| Stage 7 — Developer tooling and optimization | **Engineering locally complete; awaiting hosted acceptance** | 140/140 Debug, 140/140 Release and 140/140 strict sanitizer suites (420/420); targeted Wrench source review completed |
+| Stage 7 — Developer tooling and optimization | **Hosted LOCKED** at `f704d75ffa37bfd0e587ec2b1513054e07a8a4d8` | Owner-supplied CI #81 attempt 2, seven successful jobs, 980/980 suites |
+| Stage 8 — Language completeness, Sprint 1 only | **Implemented / locally verified: 423/423 suites; Wrench review and hosted acceptance pending** | [Contract](STAGE8_DISCOVERY.md), [approval ledger and remaining sprints](LANGUAGE_COMPLETENESS_APPROVALS.md), [acceptance](stage8/ACCEPTANCE.md) |
 
-Stage 7 is **not hosted locked**. The existing **seven-job hosted CI gate remains
+Stage 7 is **hosted locked**. For Stage 8 the existing **seven-job hosted CI gate remains
 mandatory**: Linux Debug/Release/Sanitizers, Windows Debug/Release and macOS ARM64
 Debug/Release. Boss controls commit, push and hosted execution; local results and
 source review do not replace that gate. LLVM remains **19.1.7**.

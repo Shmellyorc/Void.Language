@@ -1,0 +1,34 @@
+{
+  "nvim": {
+    "editor": {
+      "build": "v0.12.6",
+      "patch": 6,
+      "api_level": 14,
+      "major": 0,
+      "api_compatible": 0,
+      "minor": 12,
+      "api_prerelease": false
+    },
+    "passed": [
+      "shipped adapter",
+      "automatic main discovery",
+      "nested import edits",
+      "standard docs/navigation",
+      "completion selection",
+      "incomplete call signature",
+      "hover",
+      "symbols",
+      "navigation",
+      "dirty repair",
+      "cross-file guarded rename",
+      "stale edit rejection",
+      "stale formatting rejection",
+      "formatting",
+      "refresh",
+      "restart",
+      "stop",
+      "no orphan server"
+    ],
+    "executable": "/tmp/void-stage7-clients/nvim-linux-x86_64/bin/nvim"
+  }
+}

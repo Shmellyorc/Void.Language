@@ -7,7 +7,7 @@ local function main()
   vim.opt.runtimepath:prepend(repo..'/editors/neovim')
   vim.opt.runtimepath:prepend(repo..'/editors/vim')
   vim.cmd('filetype plugin indent on')
-  local adapter=require('void');adapter.setup({server=vim.env.VOIDLS_PATH,entry=root..'/main.void'})
+  local adapter=require('void');adapter.setup({server=vim.env.VOIDLS_PATH,workspace=root,entry=vim.env.VOID_STAGE8_EXPLICIT_ENTRY=='1' and root..'/main.void' or nil})
   vim.cmd.edit(vim.fn.fnameescape(root..'/main.void'))
   wait(function()return #vim.lsp.get_clients({bufnr=0,name='voidls'})==1 and vim.lsp.get_clients({bufnr=0,name='voidls'})[1].initialized end)
   local c=vim.lsp.get_clients({bufnr=0,name='voidls'})[1]
@@ -23,6 +23,18 @@ local function main()
   check(request('textDocument/hover',point(2,18)).contents.value:find('calculate',1,true),'hover')
   check(vim.bo.expandtab and vim.bo.shiftwidth==4,'filetype indentation')
   local symbols=request('workspace/symbol',{query='calc'});check(#symbols==1,'workspace symbol')
+  local original=vim.api.nvim_buf_get_lines(buf,0,-1,false)
+  for _,case in ipairs({{'use ','io/'},{'use io/','files'},{'use "','app/'},{'use "app/','systems/'},{'use "app/systems/','player.void'}})do
+    vim.api.nvim_buf_set_lines(buf,0,-1,false,{case[1]})
+    local menu=request('textDocument/completion',point(0,#case[1])).items
+    local chosen=nil;for _,item in ipairs(menu)do if item.label==case[2] then chosen=item end end
+    check(chosen,'nested import menu '..case[1]);vim.lsp.util.apply_text_edits({chosen.textEdit},buf,'utf-16')
+    if case[2]=='player.void' then check(vim.api.nvim_buf_get_lines(buf,0,1,false)[1]=='use "app/systems/player.void"','valid import acceptance')end
+  end
+  vim.api.nvim_buf_set_lines(buf,0,-1,false,{'use io/files as files','func entry(x: i32) -> i32:','    return files.read(x)'})
+  local documented=request('textDocument/hover',point(2,19));check(documented.contents.value:find('Editor fixture API.',1,true),'standard source documentation')
+  check(vim.uri_to_fname(request('textDocument/definition',point(2,19)).uri)==root..'/standard/io/files.void','standard navigation')
+  vim.api.nvim_buf_set_lines(buf,0,-1,false,original)
   vim.api.nvim_buf_set_lines(buf,2,3,false,{'    return worker.'})
   local items=request('textDocument/completion',point(2,18));check(#items==1 and items[1].label=='calculate','incomplete member completion')
   vim.lsp.util.apply_text_edits({items[1].textEdit},buf,'utf-16')
@@ -61,7 +73,7 @@ local function main()
   wait(function()return c:is_stopped()end)
   local replacement=vim.lsp.get_clients({bufnr=worker,name='voidls'})[1]
   replacement:stop();wait(function()return replacement:is_stopped()end)
-  vim.fn.writefile({vim.json.encode({editor=vim.version(),passed={'shipped adapter','completion selection','incomplete call signature','hover','symbols','navigation','dirty repair','cross-file guarded rename','stale edit rejection','stale formatting rejection','formatting','refresh','restart','stop'}})},output)
+  vim.fn.writefile({vim.json.encode({editor=vim.version(),passed={'shipped adapter','shared entry preflight','nested import edits','standard docs/navigation','completion selection','incomplete call signature','hover','symbols','navigation','dirty repair','cross-file guarded rename','stale edit rejection','stale formatting rejection','formatting','refresh','restart','stop'}})},output)
 end
 local ok,err=pcall(main)
 if not ok then vim.fn.writefile({tostring(err)},output..'.error');vim.cmd('cquit 1')else vim.cmd('qa!')end

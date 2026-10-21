@@ -9,6 +9,13 @@ VOID is under active development and is independent of the earlier
 C#-compatible VOIDC. The compiler implements a working language subset; the language
 design documents also contain proposals that are not yet implemented.
 
+Stage 8 Sprint 1 is implemented locally: project/module discovery, import
+IntelliSense and source documentation (423/423 consolidated local suites passed).
+Wrench review and hosted acceptance remain pending. [The sprint ledger](docs/LANGUAGE_COMPLETENESS_APPROVALS.md)
+and [acceptance record](docs/stage8/ACCEPTANCE.md) distinguish approved, locally
+verified and hosted-locked work. Stage 7 is owner-confirmed hosted locked at
+`f704d75f`, CI #81 attempt 2, seven jobs, 980/980 suites.
+
 ## Implemented features
 
 - Typed functions, local type inference, mutable variables, constants, conditionals,

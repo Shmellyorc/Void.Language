@@ -53,9 +53,12 @@ function M.setup(opts)
   vim.api.nvim_create_autocmd('FileType',{group=group,pattern='void',callback=function(args)
     vim.bo[args.buf].expandtab=true;vim.bo[args.buf].shiftwidth=4;vim.bo[args.buf].tabstop=4
     if not selected then
-      local standalone=not entry
-      entry=entry or vim.api.nvim_buf_get_name(args.buf)
-      local root=vim.fs.dirname(entry)
+      local result=vim.system({executable,'--discover',opts.workspace or vim.fn.getcwd(),vim.api.nvim_buf_get_name(args.buf),entry or ''},{text=true}):wait(10000)
+      assert(result.code==0,result.stderr or 'VOID project discovery failed')
+      local project=vim.json.decode(result.stdout)
+      local standalone=project.standalone
+      entry=project.entry
+      local root=project.root
       local caps=vim.lsp.protocol.make_client_capabilities()
       caps.workspace.workspaceEdit.documentChanges=true
       vim.lsp.config('voidls',{

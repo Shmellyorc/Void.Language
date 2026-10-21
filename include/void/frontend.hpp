@@ -40,6 +40,7 @@ struct AnalyzedDeclaration {
     std::optional<SourceSpan> extent = {};
     bool rename_safe = false;
     int editor_symbol_kind = 0;
+    std::string documentation = {};
 };
 struct AnalyzedReference {
     std::string from, to, spelling;
@@ -80,14 +81,21 @@ struct AnalysisResult {
 AnalysisResult analyze_source(const SourceFile& source);
 // Exact canonical VFS keys. nullopt is an explicit unavailable/deleted source.
 using SourceOverrides = std::map<std::string, std::optional<SourceFile>>;
+// One configured source root shared by all frontend consumers. No cwd search.
+std::filesystem::path standard_library_root();
+struct ProjectSelection { std::filesystem::path entry, root; bool standalone = false; };
+ProjectSelection discover_project(const std::filesystem::path& workspace,
+    const std::filesystem::path& active = {}, const std::filesystem::path& explicit_entry = {});
 void require_module_identity(const std::string& identity);
 AnalysisResult analyze_project(const std::filesystem::path& entry);
 AnalysisResult analyze_project(const std::filesystem::path& entry,const NativeProject&);
 AnalysisResult analyze_project(const std::filesystem::path& entry, const SourceOverrides& overrides);
-struct EditorCandidate { std::string name, detail; int kind = 6; };
+struct EditorCandidate { std::string name, detail; int kind = 6; std::string insert_text = {}, documentation = {}; };
 struct EditorAssistance {
     std::vector<EditorCandidate> candidates;
-    std::string signature;
+    std::string signature, documentation;
+    std::vector<std::string> parameter_documentation;
+    bool import_context = false, incomplete = false;
     std::vector<std::string> parameters;
     unsigned active_parameter = 0;
     std::size_t begin = 0, end = 0;

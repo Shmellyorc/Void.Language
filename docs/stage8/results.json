@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-20",
+  "baseline_commit": "f704d75ffa37bfd0e587ec2b1513054e07a8a4d8",
+  "hosted_sprint1": "pending; owner-controlled",
+  "full_suites": {
+    "debug": {
+      "passed": 141,
+      "failed": 0,
+      "seconds": 438.15
+    },
+    "release": {
+      "passed": 141,
+      "failed": 0,
+      "seconds": 166.45
+    },
+    "sanitizers": {
+      "passed": 141,
+      "failed": 0,
+      "seconds": 373.17
+    }
+  },
+  "final_lsp_suites": {
+    "debug": {
+      "passed": 5,
+      "failed": 0
+    },
+    "release": {
+      "passed": 5,
+      "failed": 0
+    },
+    "sanitizers": {
+      "passed": 5,
+      "failed": 0
+    }
+  },
+  "small_stack": {
+    "debug": {
+      "kib": 1024,
+      "passed": 1,
+      "failed": 0
+    },
+    "release": {
+      "kib": 1024,
+      "passed": 1,
+      "failed": 0
+    }
+  },
+  "focused_suites": {
+    "passed": 8,
+    "failed": 0
+  },
+  "vscode_profiles": [
+    "trusted: automatic imports/docs/navigation/lifecycle",
+    "restricted trust: no native child",
+    "multiple workspaces: no native child"
+  ]
+}

@@ -39,17 +39,18 @@ int main(int argc, char** argv) {
             bool run = command == "run" && (argc == 3 || argc == 4);
             bool emit = command == "emit" && argc == 5 && std::string(argv[3]) == "-o";
             if (check || run || emit) {
+                auto selected=std::filesystem::is_directory(std::filesystem::path(argv[2])) ? vd::discover_project(std::filesystem::path(argv[2])).entry : std::filesystem::path(argv[2]);
                 if(cache && run) {
-                    auto analysis=vd::analyze_project(argv[2]);
+                    auto analysis=vd::analyze_project(selected);
                     if(!analysis.succeeded())throw vd::CompilationError(std::move(analysis.diagnostics));
                     for(const auto& warning:analysis.program->warnings())std::cerr<<vd::render_diagnostic(warning)<<'\n';
                     vd::require_source_entry(*analysis.program);
-                    vd::Jit jit({std::filesystem::canonical(std::filesystem::path(argv[2]).parent_path().empty() ? std::filesystem::path(".") : std::filesystem::path(argv[2]).parent_path()),std::string(vd::compiler_build_identity())});
+                    vd::Jit jit({std::filesystem::canonical(selected.parent_path().empty() ? std::filesystem::path(".") : selected.parent_path()),std::string(vd::compiler_build_identity())});
                     auto code=jit.compile(*analysis.program,false);
                     std::cerr<<"Debug cache: "<<jit.cache_status()<<'\n';
                     std::cout<<code->invoke(argc==4 ? input(argv[3]) : 0)<<'\n';return 0;
                 }
-                auto program = vd::compile_project(argv[2]);
+                auto program = vd::compile_project(selected);
                 const auto& source = program.entry; const auto& module = program.module;
                 if(module.analysis)for(const auto& warning:module.analysis->warnings())std::cerr<<vd::render_diagnostic(warning)<<'\n';
                 if (check) { std::cout << "Source checked successfully\n"; return 0; }

@@ -1,6 +1,7 @@
 #include "void/tooling.hpp"
 #include "void/backend.hpp"
 #include <algorithm>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -41,7 +42,7 @@ void queries(const fs::path& root) {
     auto local=at(*a,"/leaf.void","return stable")+7;
     check(index.definition_at("/leaf.void",local)->identity=="/leaf.void::calculate::const::stable::0","readonly local definition");
     check(index.declaration("/other.void::hidden")->visibility=="private","private declaration metadata");
-    check(index.declarations_in("/leaf.void").size()==4,"module declarations");
+    check(index.declarations_in("/leaf.void").size()==5,"module declarations");
     check(!index.declaration("missing") && index.references_to("missing").empty() && index.declarations_in("missing").empty(),"missing query fabricated data");
     check(!index.declaration("/main.void::x") && index.definition_at("/main.void",at(*a,"/main.void","x < 0"))->kind==vd::AnalyzedDeclaration::Kind::parameter,"mutable local navigation invented");
     for(const auto& r:a->references()) {
@@ -185,5 +186,85 @@ void editor_metadata(const fs::path& root) {
     check(!vd::format_source({"bad.void","\tfunc entry(:\n"}),"formatter accepted invalid lexical source");
 }
 
+void discovery(const fs::path& root) {
+    fs::remove_all(root);fs::create_directories(root);
+    auto library=fs::absolute(root/"standard");auto project=fs::absolute(root/"project");
+    auto setroot=[](const std::string& value) {
+#ifdef _WIN32
+        _putenv_s("VOID_STDLIB_ROOT",value.c_str());
+#else
+        if(value.empty())unsetenv("VOID_STDLIB_ROOT");else setenv("VOID_STDLIB_ROOT",value.c_str(),1);
+#endif
+    };
+    std::string previous=std::getenv("VOID_STDLIB_ROOT")?std::getenv("VOID_STDLIB_ROOT"):"";
+    struct Restore {decltype(setroot)& set;std::string value;~Restore(){set(value);}} restore{setroot,previous};
+    setroot(library.string());
+    write(library/"io/files.void","use io\n## Read a fixture.\n## @param x fixture value\nfunc read(x: i32) -> i32:\n    return x + 1\ninternal func hidden(x: i32) -> i32:\n    return x\nprivate func secret(x: i32) -> i32:\n    return x\n");
+    write(library/"io.void","use io/files as files\nfunc read(x: i32) -> i32:\n    return files.hidden(x)\n");
+    write(library/"for.void","func value(x: i32) -> i32:\n    return x\n");
+    write(project/"app/systems/player.void","use \"../helper.void\" as helper\nfunc update(x: i32) -> i32:\n    return helper.update(x)\n");
+    write(project/"app/helper.void","func update(x: i32) -> i32:\n    return x\n");
+    write(project/"io/files.void","func read(x: i32) -> i32:\n    return x + 100\n");
+    const std::string main="use \"/io/files.void\" as project_files\nuse io/files as files\nuse io\nuse for as loop\nuse \"app/systems/player.void\" as player\nfunc entry(x: i32) -> i32:\n    return files.read(x) + player.update(x) + project_files.read(x)\n";
+    write(project/"main.void",main);
+    auto program=analyze(project);vd::ToolingIndex index(program);
+    check(program->modules().size()==7,"nested domains/keyword path/diamond identity");
+    auto definition=index.definition_at("/main.void",main.find("files.read")+7);
+    check(definition && definition->module=="/@stdlib/io/files.void" && definition->documentation.find("Read a fixture.")!=std::string::npos,"standard definition/docs");
+    vd::Jit jit;check(jit.compile(*program,false)->invoke(4)==113,"nested modules JIT");
+    auto probe=[&](std::string text,std::size_t cursor=std::string::npos,const vd::SourceOverrides& extra=vd::SourceOverrides{}) {
+        auto overlays=extra;overlays.insert_or_assign("/main.void",vd::SourceFile((project/"main.void").string(),text));
+        return vd::editor_assistance(project/"main.void",overlays,"/main.void",cursor==std::string::npos?text.size():cursor);
+    };
+    auto hasname=[](const auto& query,const std::string& name){return std::any_of(query.candidates.begin(),query.candidates.end(),[&](const auto& c){return c.name==name;});};
+    check(hasname(probe("use "),"io") && hasname(probe("use "),"io/"),"standard module and same-stem folder");
+    check(hasname(probe("use io/"),"files"),"nested standard completion");
+    check(hasname(probe("use \""),"app/"),"project folder completion");
+    check(hasname(probe("\xef\xbb\xbfuse \""),"app/"),"BOM import completion");
+    check(hasname(probe("use \"app/systems/"),"player.void"),"deep project completion");
+    write(project/"app/worker space.void","");
+    check(hasname(probe("use \"app/worker s"),"worker space.void"),"portable spaces in quoted prefix");
+    auto apply=[&](std::string text,std::size_t cursor,const std::string& name) {auto q=probe(text,cursor);for(const auto& c:q.candidates)if(c.name==name){text.replace(q.begin,q.end-q.begin,c.insert_text);return text;}throw std::runtime_error("missing import edit");};
+    auto edited=apply("use \"app/systems/plXYZ.void\" as player # é😀\r\n",19,"player.void");
+    check(edited=="use \"app/systems/player.void\" as player # é😀\r\n","middle import suffix/alias/comment edit");
+    auto newfile=apply("use \"app/systems/",17,"player.void");check(newfile=="use \"app/systems/player.void\"","closing quote edit");
+    vd::SourceOverrides overlays{{"/virtual/deep/new.void",vd::SourceFile("new.void","")}};
+    check(hasname(probe("use \"",std::string::npos,overlays),"virtual/"),"overlay-only folder");
+    check(hasname(probe("use \"virtual/deep/",std::string::npos,overlays),"new.void"),"overlay-only source");
+    overlays["/app/helper.void"]=std::nullopt;
+    check(!hasname(probe("use \"app/",std::string::npos,overlays),"helper.void"),"tombstone discovery");
+    check(probe("# use ").candidates.empty() && probe("func entry(x: i32) -> i32:\n    var s = \"use ").candidates.empty(),"non-import contexts");
+    auto completion=probe("use io/files as files\nfunc entry(x: i32) -> i32:\n    return files.re");
+    check(hasname(completion,"read") && !hasname(completion,"hidden") && !hasname(completion,"secret"),"documented visible API completion");
+    check(completion.candidates.front().documentation.find("Read a fixture.")!=std::string::npos,"completion docs");
+    auto signature=probe("use io/files as files\nfunc entry(x: i32) -> i32:\n    return files.read(");
+    check(signature.documentation.find("Read a fixture.")!=std::string::npos && signature.parameter_documentation==std::vector<std::string>{"fixture value"},"signature docs");
+    auto reject=[&](const std::string& source){return !vd::analyze_project(project/"main.void",{{"/main.void",vd::SourceFile("main.void",source)}}).program;};
+    check(reject("use io/files as files\nfunc entry(x: i32) -> i32:\n    return files.hidden(x)\n"),"library internal escaped");
+    check(reject("use IO/files\n") && reject("use io/\n") && reject("use io.files\n") && reject("use \"/@stdlib/io/files.void\"\n"),"invalid import spelling/domain escape");
+    write(library/"leak.void","func leak(x: i32) -> i32:\n    return project_secret\n");
+    check(reject("use leak\nconst project_secret = 7\n"),"project constant leaked into standard source");
+    write(library/"leak.void","use \"/app/helper.void\"\n");
+    check(reject("use leak\n"),"standard source admitted a project dependency");
+    write(library/"leak.void","func helper(x: i32) -> i32:\n    return x\nfunc value(x: i32) -> i32:\n    var f = helper\n    return f(x)\n");
+    check(!reject("use leak\nconst helper = 7\n"),"project root constant interfered with library function value");
+    setroot((root/"missing-standard-root").string());check(reject("use io/files\n"),"missing configured standard root");
+    setroot("relative-standard-root");check(reject("use io/files\n"),"relative standard root admitted");setroot(library.string());
+    auto selected=vd::discover_project(project,project/"app/systems/player.void");check(selected.entry==project/"main.void" && !selected.standalone,"nearest main");
+    write(project/"app/main.void","invalid source does not trigger fallback\n");
+    check(vd::discover_project(project,project/"app/systems/player.void").entry==project/"app/main.void","nested main selection");
+    check(vd::discover_project(project,project/"app/helper.void",project/"main.void").entry==project/"main.void","explicit selection wins");
+    fs::remove(project/"app/main.void");fs::remove(project/"main.void");
+    check(vd::discover_project(project,project/"app/helper.void").standalone,"labeled standalone fallback");
+    bool outside=false;try{(void)vd::discover_project(project,library/"io.void");}catch(const std::invalid_argument&){outside=true;}check(outside,"selection escaped workspace");
+    std::error_code links;fs::create_hard_link(project/"io/files.void",project/"linked.void",links);
+    if(!links) {
+        auto alias=vd::analyze_project(project/"new.void",{{"/new.void",vd::SourceFile("diagnostic-only-main", "use \"/io/files.void\" as first\nuse \"/linked.void\" as second\n")},{"/io/files.void",vd::SourceFile("diagnostic-only-label","func read(x: i32) -> i32:\n    return x\n")}});
+        check(!alias.program && std::any_of(alias.diagnostics.begin(),alias.diagnostics.end(),[](const auto& d){return d.description.find("Hard-link aliases")!=std::string::npos;}),"overlaid diagnostic filename bypassed hard-link identity");
+    }
+    std::error_code ec;fs::create_directory_symlink(library,project/"alias",ec);
+    if(!ec)check(!hasname(probe("use \""),"alias/"),"symlink discovery");
 }
-void tooling_tests(const fs::path& output) { queries(output/"queries"); planning(output/"planning"); cycles(output/"cycles"); containment(output/"containment"); editor_metadata(output/"editor"); }
+
+}
+void tooling_tests(const fs::path& output) { discovery(output/"discovery"); queries(output/"queries"); planning(output/"planning"); cycles(output/"cycles"); containment(output/"containment"); editor_metadata(output/"editor"); }

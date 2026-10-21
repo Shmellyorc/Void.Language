@@ -1,5 +1,12 @@
 # Stage 7 local acceptance — 20 October 2026
 
+**Superseding owner evidence (20 October 2026): Stage 7 HOSTED LOCKED** at
+`f704d75ffa37bfd0e587ec2b1513054e07a8a4d8`, CI #81 attempt 2, seven successful
+jobs and 980/980 suites. This is owner-supplied hosted evidence, not a new local
+or independent hosted run. Pending-lock wording below is historical.
+Current work is [Stage 8 Sprint 1](../STAGE8_DISCOVERY.md).
+
+
 Production engineering is locally complete for the bounded functionality in
 [STAGE7_IMPLEMENTATION.md](../STAGE7_IMPLEMENTATION.md). Stage 7 is **not locked**.
 Stop for Wrench review and Boss-controlled commit, push and seven-job hosted CI.

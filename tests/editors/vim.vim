@@ -6,7 +6,7 @@ execute 'source ' .. fnameescape($VOID_VIM_CLIENT .. '/plugin/lsp.vim')
 import autoload 'lsp/lsp.vim'
 filetype plugin indent on
 call LspOptionsSet({autoComplete: false, autoHighlightDiags: true})
-call void#setup($VOIDLS_PATH, $VOID_STAGE7_FIXTURE .. '/main.void')
+call void#setup($VOIDLS_PATH, $VOID_STAGE8_EXPLICIT_ENTRY ==# '1' ? $VOID_STAGE7_FIXTURE .. '/main.void' : '', $VOID_STAGE7_FIXTURE)
 call LspEnable()
 def Wait(Predicate: func(): bool)
   var start = reltime()
@@ -26,6 +26,25 @@ try
   assert_match('calculate', hover.result.contents.value)
   var symbols = server.rpc('workspace/symbol', {query: 'calc'})
   assert_equal(1, len(symbols.result))
+  var original = getline(1, '$')
+  for prefix in ['use ', 'use io/', 'use "', 'use "app/', 'use "app/systems/']
+    setline(1, prefix)
+    listener_flush()
+    var menu = server.rpc('textDocument/completion', {textDocument: point.textDocument, position: {line: 0, character: strlen(prefix)}}).result
+    assert_false(empty(menu.items))
+    if prefix ==# 'use "app/systems/'
+      assert_equal('player.void"', menu.items[0].textEdit.newText)
+    endif
+  endfor
+  setline(1, 'use io/files as files')
+  setline(3, '    return files.read(x)')
+  listener_flush()
+  var standardHover = server.rpc('textDocument/hover', {textDocument: point.textDocument, position: {line: 2, character: 19}})
+  assert_match('Editor fixture API.', standardHover.result.contents.value)
+  var standardDef = server.rpc('textDocument/definition', {textDocument: point.textDocument, position: {line: 2, character: 19}})
+  assert_match('/standard/io/files.void$', standardDef.result.uri)
+  setline(1, original)
+  listener_flush()
   setline(3, '    return worker.')
   listener_flush()
   point.position.character = 18

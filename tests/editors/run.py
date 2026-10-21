@@ -1,10 +1,17 @@
 """Run the shipped adapters in real isolated editors; never writes user config."""
 import argparse, json, os, pathlib, subprocess, tempfile, time, signal
-p=argparse.ArgumentParser();p.add_argument('--server',required=True);p.add_argument('--nvim');p.add_argument('--vim');p.add_argument('--vim-client');p.add_argument('--output',required=True);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--server',required=True);p.add_argument('--nvim');p.add_argument('--vim');p.add_argument('--vim-client');p.add_argument('--output',required=True);p.add_argument('--explicit-entry',action='store_true');a=p.parse_args()
 repo=pathlib.Path(__file__).resolve().parents[2];results={}
 with tempfile.TemporaryDirectory(prefix='VOID editor installation é😀 ') as d:
     root=pathlib.Path(d);env=dict(os.environ)
     env.update(VOID_STAGE7_FIXTURE=str(root),VOID_REPO=str(repo),VOIDLS_PATH=str(pathlib.Path(a.server).resolve()),XDG_STATE_HOME=str(root/'state'),XDG_CACHE_HOME=str(root/'cache'),XDG_DATA_HOME=str(root/'data'))
+    (root/'app/systems').mkdir(parents=True)
+    (root/'standard/io').mkdir(parents=True)
+    api='## Editor fixture API.\n## @param x input value\nfunc read(x: i32) -> i32:\n    return x\n'
+    (root/'app/systems/player.void').write_text(api)
+    (root/'standard/io/files.void').write_text(api)
+    env['VOID_STDLIB_ROOT']=str(root/'standard')
+    env['VOID_STAGE8_EXPLICIT_ENTRY']='1' if a.explicit_entry else ''
     for name in ['nvim','vim']:
         editor=getattr(a,name)
         if not editor:continue
@@ -38,6 +45,7 @@ with tempfile.TemporaryDirectory(prefix='VOID editor installation é😀 ') as d
                 except ProcessLookupError:pass
             assert not leaked,(name,'orphan native servers',leaked)
         results[name]=json.loads(output.read_text())
+        results[name]['selection']='explicit override' if a.explicit_entry else 'automatic main.void'
         results[name]['executable']=str(pathlib.Path(editor).resolve())
         results[name]['passed'].append('no orphan server')
 pathlib.Path(a.output).write_text(json.dumps(results,indent=2)+'\n')

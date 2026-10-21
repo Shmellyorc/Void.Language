@@ -15,7 +15,30 @@
 Clankers and takes precedence over older communication/checkpoint practices below.
 Boss retains Git and hosted acceptance control.
 
-## Stage 7 engineering review handoff — 20 October 2026
+## Current Stage 8 handoff — 20 October 2026
+
+Stage 7 is **HOSTED LOCKED** at `f704d75ffa37bfd0e587ec2b1513054e07a8a4d8`,
+owner-supplied CI #81 attempt 2, seven successful jobs, 980/980 suites. This
+supersedes the dated pending statements retained below.
+
+Boss authorized **Stage 8 Sprint 1 only**. Sprint 1 is implemented locally with **423/423** consolidated suites passed;
+Wrench review and hosted acceptance remain pending. No Sprint 1 hosted lock is claimed. Read the
+[approval ledger](LANGUAGE_COMPLETENESS_APPROVALS.md),
+[roadmap](LANGUAGE_COMPLETENESS_ROADMAP.md),
+[implementation contract](STAGE8_DISCOVERY.md) and
+[acceptance record](stage8/ACCEPTANCE.md) before continuing.
+
+Approved sequence: (1) project/module/IntelliSense discovery, (2) ordinary
+named/default calls and built-in type APIs, (3) UTF-8 text and recoverable
+collections, (4) optional-main entry and bounded native providers, (5) measured
+async retention, (6) selected ergonomics. Sprints 2–6 remain future work, with
+narrower designs pending as recorded in the ledger. No real standard library,
+optional-main execution or website changes belong to Sprint 1. Boss retains Git,
+hosted CI and publication control. Keyboard supplies source/tests, Wrench reviews
+actual evidence, Research resolves concrete remaining design questions.
+
+### Historical Stage 7 engineering review handoff
+
 
 Stage 6 is hosted **LOCKED** at `4139297f92c195782f59a28546444e6b3bec4ad8`,
 CI #78, seven successful jobs. Stage 7 engineering is locally complete, and Wrench
@@ -841,7 +864,11 @@ These are not surprise "bugs" that must be fixed immediately. They are documente
 
 ---
 
-## 13. A handoff prompt for a fresh ChatGPT conversation
+## 13. Current handoff prompt
+
+> Continue Stage 8 Language Completeness, Sprint 1 only. Read LANGUAGE_COMPLETENESS_APPROVALS.md, LANGUAGE_COMPLETENESS_ROADMAP.md, STAGE8_DISCOVERY.md, stage8/ACCEPTANCE.md and the latest WORK_LOG entry. Stage 7 is owner-confirmed hosted LOCKED at f704d75f / CI #81 attempt 2, seven jobs, 980/980 suites. Sprint 1 is implemented locally: 423/423 consolidated suites, 8/8 focused and 15/15 final LSP checks, small-stack and real-editor evidence are recorded. Wrench review and hosted acceptance are pending; verify actual evidence before promoting status. Preserve the approved remaining sprints and future optional-main contract without implementing them. Use the existing frontend/VFS, typed IR, LLVM 19.1.7, Runtime and voidls. Wrench reviews actual source and limitations; Research investigates concrete unanswered questions. Boss alone commits, pushes, branches, runs hosted CI and publishes. Minimal output, KISS and DRY. Never infer a hosted lock from local acceptance.
+
+### Historical Stage 4 handoff prompt (superseded)
 
 > Continue VOID from the current implementation status in DEVELOPMENT_STRATEGY.md, the latest Stage 4 WORK_LOG entry, ADVANCED_LANGUAGE.md, PROPERTIES.md, DICTIONARIES.md and KNOWN_ISSUES.md. Stage 3 dictionary/runtime integration is owner-locked at cd95e373 / CI #65, seven jobs successful. Stage 4 contracts are in LANGUAGE_BIBLE.md Section 0.3 and DECISIONS.md; the complete delivered subset is implemented locally, including properties, enums/results/patterns, cleanup, closures/callbacks and events. Check WORK_LOG.md for exact local results and limits; hosted Stage 4 acceptance is pending. Use one substantial Work-first sprint for authorized work, KISS/DRY, LLVM 19.1.7 and the existing frontend/IR/lowerer/Runtime. Keep output minimal. Preserve precise roots, value/reference semantics, failure cleanup and compatible reload. Do not revive optional research certification as a production gate, invent limits or claim future Bible features implemented. The owner controls Git and hosted CI. Verify actual current source and later owner evidence before making newer status claims.
 

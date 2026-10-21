@@ -49,7 +49,7 @@ class ServerManager {
         if (!settings.entry && !this.fallback) this.fallback = active?.languageId === 'void' && active.uri.scheme === 'file' ? active.uri.fsPath : docs[0]?.uri.fsPath;
         if (!docs.length && !this.client && !restart) return;
         let project: Project;
-        try { project = await resolveProject(settings, folders.map(f => f.uri.fsPath), this.fallback, this.bundled); }
+        try { project = !restart && this.project ? this.project : await resolveProject(settings, folders.map(f => f.uri.fsPath), this.fallback, this.bundled); }
         catch (e) { await this.stop(); this.report(`VOID: ${e instanceof Error ? e.message : String(e)}`); return; }
         for (const doc of docs) if (!inside(project.root, doc.uri.fsPath) || (project.singleFile && doc.uri.fsPath !== vscode.Uri.file(project.entry).fsPath)) {
             this.report('VOID: This document is outside the selected project or single-file entry. Configure void.project.entry for a multi-file project; use a separate window for unrelated projects.');

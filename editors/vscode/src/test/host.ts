@@ -113,6 +113,29 @@ export async function run(): Promise<void> {
             assert(await vscode.workspace.applyEdit(edit));
         }
         const mainText = main.getText();
+        const mainEditor=await vscode.window.showTextDocument(main);
+        for (const [prefix,expected] of [['use ','use io/'],['use io/','use io/files'],['use "','use ".vscode/'],['use "app/','use "app/systems/'],['use "app/systems/','use "app/systems/player.void"']]) {
+            await vscode.commands.executeCommand('hideSuggestWidget');
+            await replace(main,'');mainEditor.selection=new vscode.Selection(0,0,0,0);
+            await vscode.commands.executeCommand('type',{text:prefix});
+            await new Promise(resolve=>setTimeout(resolve,750));
+            await vscode.commands.executeCommand('acceptSelectedSuggestion');
+            assert.equal(main.getText(),expected,'automatic import suggestions '+prefix);
+        }
+        for (const [prefix,label] of [['use ','io/'],['use io/','files'],['use "','app/'],['use "app/','systems/'],['use "app/systems/','player.void']]) {
+            await replace(main,prefix);
+            const menu=await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider',mainUri,new vscode.Position(0,prefix.length),prefix.slice(-1));
+            const item=menu?.items.find(i=>(typeof i.label==='string'?i.label:i.label.label)===label);
+            assert(item?.textEdit,'nested import '+prefix);
+            const edit=new vscode.WorkspaceEdit();edit.set(mainUri,[item.textEdit]);assert(await vscode.workspace.applyEdit(edit));
+            if(label==='player.void')assert.equal(main.getText(),'use "app/systems/player.void"');
+        }
+        await replace(main,'use io/files as files\nfunc entry(x: i32) -> i32:\n    return files.read(x)\n');
+        const documented=await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider',mainUri,new vscode.Position(2,19));
+        assert(documented?.some(h=>h.contents.some(c=>typeof c==='object' && 'value' in c && c.value.includes('fixture'))), JSON.stringify(documented));
+        const standard=await vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider',mainUri,new vscode.Position(2,19));
+        assert(standard?.[0].uri.fsPath.endsWith(path.join('standard','io','files.void')));
+        await replace(main,mainText);
         const hover = await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider', mainUri, point);
         assert(hover?.some(h => h.contents.some(c => typeof c === 'object' && 'value' in c && c.value.includes('calculate'))));
         const symbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', mainUri);
@@ -244,9 +267,11 @@ export async function run(): Promise<void> {
         const outsideWarnings = () => messages.filter(m => m.includes('outside the selected project')).length;
         const beforeFallbackWarnings = outsideWarnings();
         assert.equal(beforeFallbackWarnings, 0, 'Warning deduplication must not mask the selected-file check');
+        await fs.rename(mainEntry,mainEntry+'.saved');
         await config.update('project.entry', '', vscode.ConfigurationTarget.Workspace);
         await api!.ready(); assert.equal(api!.status().entry, workerEntry);
         assert.equal(outsideWarnings(), beforeFallbackWarnings, 'The selected fallback file must not warn about itself');
+        await fs.rename(mainEntry+'.saved',mainEntry);
         await vscode.languages.setTextDocumentLanguage(mainDocument, 'void');
         await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(mainUri));
         await api!.ready(); assert.equal(api!.status().entry, workerEntry);

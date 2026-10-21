@@ -162,6 +162,16 @@ j::Object range(const vd::SourceSpan& span) {
     if(!begin || !end) throw std::logic_error("Compiler span is not a protocol boundary");
     return j::Object{{"start",position(*begin)},{"end",position(*end)}};
 }
+bool known_source_path(fs::path path,const fs::path& source) {
+#ifdef _WIN32
+    auto requested=path.generic_u8string(),expected=source.generic_u8string();
+    auto fold=[](char8_t c){return c>=u8'A' && c<=u8'Z'?char8_t(c+u8'a'-u8'A'):c;};
+    if(requested.size()>1 && expected.size()>1 && requested[1]==u8':' && expected[1]==u8':' && fold(requested[0])==fold(expected[0])) {
+        requested[0]=expected[0];path=fs::path(requested);
+    }
+#endif
+    return path==source;
+}
 class Server {
     enum class State { initial, waiting, ready, shutdown } state=State::initial;
     struct Document { std::int64_t version; std::string uri; };
@@ -176,6 +186,8 @@ class Server {
     bool related_information=false, diagnostic_versions=false, rename_edits=false;
     std::string identity(const std::string& uri) const {
         auto path=vd::lsp::uri_path(uri);
+        if(auto current=session.current_analysis();current && current->result().program)
+            for(const auto& m:current->result().program->modules())if(m.identity.starts_with("/@stdlib/") && known_source_path(path,vd::utf8_path(m.source.path())))return m.identity;
 #ifdef _WIN32
         // Drive-letter spelling is URI/OS notation, not a VFS component.
         auto raw=path.generic_u8string();
@@ -195,6 +207,10 @@ class Server {
     std::string uri(const std::string& id) const {
         // Filesystem canonicalization owns compiler identity, not client URI spelling.
         // Versioned edits must address the exact document opened by the client.
+        if(id.starts_with("/@stdlib/")) {
+            if(auto current=session.current_analysis();current && current->result().program)for(const auto& m:current->result().program->modules())if(m.identity==id)return vd::lsp::file_uri(vd::utf8_path(m.source.path()));
+            return vd::lsp::file_uri(vd::standard_library_root()/vd::utf8_path(id.substr(9)));
+        }
         if(auto document=open.find(id);document!=open.end())return document->second.uri;
         return vd::lsp::file_uri(selected_root/vd::utf8_path(id).relative_path());
     }
@@ -282,6 +298,7 @@ class Server {
         case K::interface_type:return 11;case K::value_field:case K::managed_field:return 8;case K::type_parameter:return 26;default:return 13;}
     }
     static std::string describe(const vd::AnalyzedDeclaration& d) {
+        if(d.identity.ends_with("::$module"))return "module "+d.module;
         auto label=name_of(d);using K=vd::AnalyzedDeclaration::Kind;
         if(d.kind==K::function || d.kind==K::receiver_method || d.kind==K::initializer || d.kind==K::interface_requirement){
             label+="(";for(std::size_t n=0;n<d.parameters.size();++n){if(n)label+=", ";
@@ -306,7 +323,7 @@ class Server {
     }
     bool disk_current(const vd::ValidatedAnalysis& program) const {
         for(const auto& m:program.modules())if(!open.contains(m.identity)) {
-            try {if(vd::read_source(root/vd::utf8_path(m.identity).relative_path()).text()!=m.source.text())return false;}
+            try {if(vd::read_source(vd::utf8_path(m.source.path())).text()!=m.source.text())return false;}
             catch(const std::exception&){return false;}
         }
         return true;
@@ -342,13 +359,14 @@ class Server {
         if(auto found=snapshot.overrides().find(module);found!=snapshot.overrides().end() && found->second)source=&*found->second;
         if(!source && current && current->result().program)source=source_in(*current->result().program,module);
         if(method=="textDocument/formatting") {
+            if(module.starts_with("/@stdlib/"))return j::Array{};
             const auto& options=object(params.get("options"));
             if(!options.getBoolean("insertSpaces").value_or(false) || integer(options.get("tabSize"),1)!=4)throw std::invalid_argument("VOID formatting requires four spaces");
             j::Array result;if(!source || !index || !source_in(*current->result().program,module) || !disk_current(*current->result().program))return result;
             auto formatted=vd::format_source(*source);if(!formatted || *formatted==source->text())return result;
             // The same compiler checks both lexical structure and the entire
             // proposed graph before returning a conservative whole-file edit.
-            auto overlays=snapshot.overrides();for(const auto& m:current->result().program->modules())overlays.insert_or_assign(m.identity,m.source);
+            auto overlays=snapshot.overrides();for(const auto& m:current->result().program->modules())if(!m.identity.starts_with("/@stdlib/"))overlays.insert_or_assign(m.identity,m.source);
             overlays.insert_or_assign(module,vd::SourceFile(source->path(),*formatted));
             auto checked=vd::analyze_project(entry_path,overlays);
             if(!checked.program || checked.program->compatibility_contract()!=current->result().program->compatibility_contract())return result;
@@ -363,16 +381,18 @@ class Server {
         auto offset=Positions(*source).offset(p);if(!offset)throw std::invalid_argument("Invalid UTF-16 position");
         if(method=="textDocument/completion" || method=="textDocument/signatureHelp") {
             auto overlays=snapshot.overrides();
-            if(current && current->result().program)for(const auto& m:current->result().program->modules())overlays.insert_or_assign(m.identity,m.source);
+            if(current && current->result().program)for(const auto& m:current->result().program->modules())if(!m.identity.starts_with("/@stdlib/"))overlays.insert_or_assign(m.identity,m.source);
             overlays.insert_or_assign(module,*source); // Position conversion and probe share exact bytes.
+            if(module.starts_with("/@stdlib/"))return method=="textDocument/completion"?j::Value(j::Array{}):j::Value(nullptr);
             auto assistance=vd::editor_assistance(entry_path,overlays,module,*offset);
             if(method=="textDocument/signatureHelp") {
                 if(assistance.signature.empty())return nullptr;
-                j::Array parameters;for(const auto& label:assistance.parameters)parameters.push_back(j::Object{{"label",label}});
-                return j::Object{{"signatures",j::Array{j::Object{{"label",assistance.signature},{"parameters",std::move(parameters)}}}},{"activeSignature",0},{"activeParameter",assistance.active_parameter}};
+                j::Array parameters;for(std::size_t n=0;n<assistance.parameters.size();++n)parameters.push_back(j::Object{{"label",assistance.parameters[n]},{"documentation",n<assistance.parameter_documentation.size()?assistance.parameter_documentation[n]:""}});
+                return j::Object{{"signatures",j::Array{j::Object{{"label",assistance.signature},{"documentation",assistance.documentation},{"parameters",std::move(parameters)}}}},{"activeSignature",0},{"activeParameter",assistance.active_parameter}};
             }
-            j::Array items;for(const auto& c:assistance.candidates)items.push_back(j::Object{{"label",c.name},{"kind",c.kind},{"detail",c.detail},
-                {"textEdit",j::Object{{"range",range({std::make_shared<const vd::SourceFile>(*source),module,assistance.begin,assistance.end})},{"newText",c.name}}}});
+            j::Array items;for(const auto& c:assistance.candidates)items.push_back(j::Object{{"label",c.name},{"kind",c.kind},{"detail",c.detail},{"documentation",c.documentation},
+                {"textEdit",j::Object{{"range",range({std::make_shared<const vd::SourceFile>(*source),module,assistance.begin,assistance.end})},{"newText",c.insert_text.empty()?c.name:c.insert_text}}}});
+            if(assistance.import_context)return j::Object{{"isIncomplete",assistance.incomplete},{"items",std::move(items)}};
             return items;
         }
         if(!index)return nullptr;
@@ -381,7 +401,8 @@ class Server {
         if(!definition)return nullptr;
         auto selected_span=definition->source;
         for(const auto& ref:index->references())if(!ref.implicit && ref.to==definition->identity && ref.source.module_identity==module && ref.source.begin<=*offset && *offset<ref.source.end){selected_span=ref.source;break;}
-        if(method=="textDocument/hover")return j::Object{{"contents",j::Object{{"kind","plaintext"},{"value",describe(*definition)}}},{"range",range(selected_span)}};
+        if(method=="textDocument/hover")return j::Object{{"contents",j::Object{{"kind","plaintext"},{"value",describe(*definition)+(definition->documentation.empty()?"":"\n\n"+definition->documentation)}}},{"range",range(selected_span)}};
+        if(module.starts_with("/@stdlib/") || definition->module.starts_with("/@stdlib/"))throw std::invalid_argument("Installed standard sources are read-only");
         if(!rename_edits || !definition->rename_safe)throw std::invalid_argument("Rename requires version-safe documentChanges and a supported ordinary function, constant or uncaptured local binding");
         if(!disk_current(*current->result().program))throw std::invalid_argument("Disk sources changed; refresh before rename");
         if(method=="textDocument/prepareRename")return j::Object{{"range",range(selected_span)},{"placeholder",name_of(*definition)}};
@@ -389,7 +410,8 @@ class Server {
         std::map<std::string,std::vector<vd::SourceSpan>> edits;
         edits[definition->module].push_back(definition->source);
         for(const auto& r:index->references_to(definition->identity))edits[r.source.module_identity].push_back(r.source);
-        for(auto& [id,spans]:edits){std::sort(spans.begin(),spans.end(),[](const auto& a,const auto& b){return a.begin<b.begin;});
+        for(auto& [id,spans]:edits){
+            if(id.starts_with("/@stdlib/"))throw std::invalid_argument("Rename would edit installed standard sources");std::sort(spans.begin(),spans.end(),[](const auto& a,const auto& b){return a.begin<b.begin;});
             spans.erase(std::unique(spans.begin(),spans.end(),[](const auto& a,const auto& b){return a.begin==b.begin && a.end==b.end;}),spans.end());
             std::size_t end=0;for(const auto& span:spans){if(span.begin<end || span.source->text().substr(span.begin,span.end-span.begin)!=name_of(*definition))throw std::invalid_argument("Uncertain or overlapping rename binding");end=span.end;}
         }
@@ -427,6 +449,7 @@ class Server {
 
     void synchronize(const std::string& method,const j::Object& params) {
         const auto& document=object(params.get("textDocument")); auto id=identity(string(document,"uri"));
+        if(id.starts_with("/@stdlib/"))return; // Navigation never grants overlay authority.
         auto found=open.find(id);
         if(method=="textDocument/didClose") {
             if(found==open.end()) throw std::invalid_argument("Document is not open");
@@ -523,7 +546,7 @@ public:
                 state=State::waiting;
                 send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",j::Object{
                     {"capabilities",j::Object{{"positionEncoding","utf-16"},{"textDocumentSync",j::Object{{"openClose",true},{"change",1},{"save",j::Object{{"includeText",false}}}}},
-                        {"definitionProvider",true},{"referencesProvider",true},{"hoverProvider",true},{"completionProvider",j::Object{{"triggerCharacters",j::Array{"."}}}},
+                        {"definitionProvider",true},{"referencesProvider",true},{"hoverProvider",true},{"completionProvider",j::Object{{"triggerCharacters",j::Array{"."," ","\"","/"}}}},
                         {"signatureHelpProvider",j::Object{{"triggerCharacters",j::Array{"(",","}}}},{"documentSymbolProvider",true},{"workspaceSymbolProvider",true},
                         {"documentFormattingProvider",true},{"renameProvider",rename_edits ? j::Value(j::Object{{"prepareProvider",true}}):j::Value(false)},
                         {"experimental",j::Object{{"voidToolingProtocol",1},{"refreshProject",true}}}}},{"serverInfo",j::Object{{"name","VOID"},{"version","0.2.0"}}}}}});
@@ -559,6 +582,7 @@ public:
             if(name=="textDocument/didSave") {
                 if(id){fail(-32600,"Save requires a notification");return {};}
                 auto module=identity(string(object(object(o->get("params")).get("textDocument")),"uri"));
+                if(module.starts_with("/@stdlib/"))return {};
                 if(!open.contains(module))throw std::invalid_argument("Saved document is not open");
                 session.refresh();dirty=true;return {};
             }
@@ -585,6 +609,11 @@ public:
     }
     int eof() const { return state==State::shutdown ? 0 : 1; }
 };
+int preflight(const fs::path& workspace,const fs::path& active,const fs::path& explicit_entry) {
+    auto selected=vd::discover_project(workspace,active,explicit_entry);
+    j::Value result=j::Object{{"entry",vd::path_utf8(selected.entry)},{"root",vd::path_utf8(selected.root)},{"standalone",selected.standalone}};
+    llvm::outs()<<result<<"\n";return 0;
+}
 int run(const fs::path& entry) {
 #ifdef _WIN32
     if(_setmode(_fileno(stdin),_O_BINARY)==-1 || _setmode(_fileno(stdout),_O_BINARY)==-1) throw std::runtime_error("Cannot set binary protocol streams");
@@ -636,11 +665,13 @@ int run(const fs::path& entry) {
 #ifdef _WIN32
 int wmain(int argc,wchar_t** argv) {
     try {
+        if(argc==5 && std::wstring_view(argv[1])==L"--discover")return preflight(fs::path(argv[2]),fs::path(argv[3]),fs::path(argv[4]));
         if(argc!=3 || std::wstring_view(argv[1])!=L"--entry") throw std::invalid_argument("Usage: voidls --entry <project entry.void>");
         return run(fs::path(argv[2]));
 #else
 int main(int argc,char** argv) {
     try {
+        if(argc==5 && std::string_view(argv[1])=="--discover")return preflight(vd::utf8_path(argv[2]),vd::utf8_path(argv[3]),vd::utf8_path(argv[4]));
         if(argc!=3 || std::string_view(argv[1])!="--entry") throw std::invalid_argument("Usage: voidls --entry <project entry.void>");
         return run(vd::utf8_path(argv[2]));
 #endif

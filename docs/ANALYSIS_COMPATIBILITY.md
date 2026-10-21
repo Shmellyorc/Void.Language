@@ -1,5 +1,14 @@
 # Validated analysis and source compatibility (Phase 7)
 
+**Stage 8 Sprint 1 (20 October 2026):** [STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md)
+supersedes the historical import/discovery exclusions below. It specifies separate
+standard/project source domains, importer-relative bare quoted imports, bounded
+shared `main.void` selection, metadata completion, source docs and readonly standard
+navigation. [Local acceptance](stage8/ACCEPTANCE.md) records actual verification;
+no hosted lock is implied. Existing snapshot, UTF-16, rename and native safety
+contracts remain in force.
+
+
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 The user reports Phase 6 commit `9b9fdac` passed Actions run #9 on Ubuntu,

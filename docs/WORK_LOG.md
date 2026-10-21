@@ -13754,3 +13754,52 @@ The whole Stage 7 script also passed with `TMPDIR=/tmp/void-ci80-alias`.
 does not claim native Windows/macOS execution of the repair. Stopped for owner
 review/commit/push and cross-platform revalidation; no Git mutations, hosted
 dispatches or publication. Unrelated website work preserved; Stage 7 is not locked.
+
+## Stage 8 Sprint 1 engineering — 20 October 2026 (locally verified; hosted pending)
+
+Boss authorized only project/module/IntelliSense discovery. Stage 7 is now
+owner-supplied **HOSTED LOCKED** at `f704d75ffa37bfd0e587ec2b1513054e07a8a4d8`,
+CI #81 attempt 2, seven successful jobs, 980/980 suites. Older pending statements
+above remain historical. No assistant Git, hosted or publication operations occurred.
+
+The existing parser/SourceGraph and compiler recovery query now implement nested
+unquoted standard sources, importer-relative bare quoted project sources,
+separate standard identities/library visibility, metadata-only file/folder menus,
+source docs and installed-source navigation with readonly guards. Shared bounded
+main discovery is exposed through voidls preflight and consumed by CLI/editor
+adapters; current entry execution is preserved. See STAGE8_DISCOVERY.md for the
+concrete engineering choices and stage8/ACCEPTANCE.md for final evidence/status.
+
+Roadmap, approval ledger, Wrench handoff, strategy, decisions, known issues,
+module/session/analysis/editor contracts, editor setup and README are synchronized.
+Remaining sequence is (2) ordinary named/default calls and built-in APIs,
+(3) UTF-8/recoverable collections, (4) optional-main/native providers,
+(5) measured async retention, (6) selected ergonomics. Those sprints were not begun.
+Final local evidence: **141/141 Debug (438.15 s), 141/141 Release (166.45 s),
+141/141 strict ASan/UBSan/leaks (373.17 s), 423/423 total**. Focused checks passed
+8/8; separate 1 MiB frontend gates passed Debug/Release. A final Windows-drive
+known-standard-URI mapping repair received server rebuilds and 5/5 LSP suites per
+configuration (15/15); its Windows branch still awaits hosted execution. Strict
+sanitizer build/tests and Chromium ran outside tracing restrictions without
+weakening flags. The old malformed `use bare` fixture now uses `use bare/`, since
+bare standard imports are legal. Hard-link checks continue to use physical roots,
+not overlay diagnostic labels; BOM import positions and quoted spaces are tested.
+
+All three actual VS Code development profiles passed, including automatic menus
+and file acceptance at every requested prefix. Actual Neovim 0.13 development,
+portable 0.12.6 and Vim 9.2/pinned yegappan client passed shipped-adapter checks;
+real terminal automatic menus/acceptance passed every prefix in both Neovim
+versions and Vim. Automatic and explicit selection profiles passed on installed
+Neovim/Vim. All 15 website gallery contracts checked and passed normal/O2 linked
+AOT; 12 synchronous programs also passed normal/O2 JIT, while three async programs
+used the established explicit async AOT adapter. The nested standard/project
+fixture passed normal/O2 JIT/AOT and standard-source cache miss/hit/edit invalidation.
+
+Metadata measurements at 10/1,000/10,000 siblings, 1,000 overlays and irrelevant
+descendants justified query-local virtual-child maps; no persistent index was
+introduced. Exact samples, commands, source hashes, client records, limitations
+and surviving future decisions are in [stage8/ACCEPTANCE.md](stage8/ACCEPTANCE.md).
+VSCodium, Windows/macOS, minimum clients, new installed packages and clean-machine
+portability remain unverified. No known failing local test remains. Production
+changes are ready for Wrench review. Sprint 1 is **not hosted locked**; Boss alone
+controls Git, hosted CI and publication. Sprints 2–6 were not started.

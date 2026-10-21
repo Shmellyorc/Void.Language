@@ -1,5 +1,20 @@
 # Known issues and deferred work
 
+## Stage 8 Sprint 1 disposition — 20 October 2026
+
+The discovery/import/source-doc gaps in the research audit are addressed locally by
+[STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md), with 423/423 consolidated suites and
+real VS Code/Neovim/Vim automatic import acceptance recorded in
+[actual evidence](stage8/ACCEPTANCE.md). Wrench review and hosted acceptance remain
+pending. VSCodium, Windows/macOS clients, minimum versions, new installed packages
+and clean-machine portability remain unverified; relocated stdlib sources require
+an absolute matching `VOID_STDLIB_ROOT`. The original
+audit and dated findings below remain historical evidence. No existing standard
+library, optional-main semantics, named/default ordinary calls, UTF-8 inspection,
+recoverable collection additions or async retirement is implied by this sprint.
+Stage 7 is owner-confirmed hosted LOCKED at `f704d75f` / CI #81 attempt 2,
+seven jobs, 980/980 suites; older pending statements below are superseded.
+
 ## Stage 7 implementation boundaries — 20 October 2026
 
 The current contract is [STAGE7_IMPLEMENTATION.md](STAGE7_IMPLEMENTATION.md);

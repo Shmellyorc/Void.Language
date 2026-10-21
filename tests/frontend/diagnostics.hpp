@@ -63,7 +63,7 @@ void run(const std::filesystem::path& root) {
     // Each malformed fragment must terminate and retain a later independent error.
     const std::vector<std::string> malformed = {
         "func damaged(:\n    return\n", "func damaged(value: i32) ->:\n    return\n",
-        "use bare\n", "use \"./unterminated\n", "const no_value\n",
+        "use bare/\n", "use \"./unterminated\n", "const no_value\n",
         "func damaged():\n    var bad =\n    return\n", "func damaged():\n    if true\n        return\n",
         "func damaged():\n    if true:\n        return\n    else if:\n        return\n",
         "func damaged():\n    for in:\n        return\n", "func damaged():\n    while true:\n        return\n",

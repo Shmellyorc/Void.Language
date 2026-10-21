@@ -3,7 +3,8 @@
 bool method_accessible(const Module& m,const Function& f,std::string_view scope) {
     if(f.module_identity.empty()) return false;
     if(f.visibility=="private" && f.module_identity!=scope) return false;
-    if(f.module_identity==scope || f.module_identity==m.root_identity) return true;
+    if(f.visibility=="internal" && f.module_identity.starts_with("/@stdlib/")!=scope.starts_with("/@stdlib/"))return false;
+    if(f.module_identity==scope || (f.module_identity==m.root_identity && scope.starts_with("/@stdlib/")==m.root_identity.starts_with("/@stdlib/"))) return true;
     auto found=m.source_imports.find(std::string(scope));
     return found!=m.source_imports.end() && found->second.contains(f.module_identity);
 }
@@ -61,7 +62,8 @@ static Module::Binding structural_conformance(const Module& m,Type view,Type int
     if(interface.kind!=Type::interface_ref || !interface.definition || !interface.definition->interface_type) fail("Invalid interface type");
     auto visible=[&](const ValueType& d) {
         if(d.visibility=="private" && d.module_identity!=scope) return false;
-        if(d.module_identity==scope || d.module_identity==m.root_identity) return true;
+        if(d.visibility=="internal" && d.module_identity.starts_with("/@stdlib/")!=scope.starts_with("/@stdlib/"))return false;
+        if(d.module_identity==scope || (d.module_identity==m.root_identity && scope.starts_with("/@stdlib/")==m.root_identity.starts_with("/@stdlib/"))) return true;
         auto imports=m.source_imports.find(std::string(scope));
         return imports!=m.source_imports.end() && imports->second.contains(d.module_identity);
     };
