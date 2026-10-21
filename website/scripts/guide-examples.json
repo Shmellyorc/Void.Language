@@ -373,7 +373,7 @@
     "input": 5,
     "expected": 1,
     "context_before": "func entry(input: i32) -> i32:\n",
-    "context_after": "    if message == \"Hello, \u4e16\u754c!\":\n        return 1\n    return 0\n",
+    "context_after": "    if message == \"Hello, 世界!\":\n        return 1\n    return 0\n",
     "context_indent": 4
   },
   {
@@ -676,7 +676,8 @@
     ],
     "support": [
       "public/docs/snippets/modules/pricing.void",
-      "public/docs/snippets/modules/delivery.void"
+      "public/docs/snippets/modules/delivery.void",
+      "public/docs/snippets/modules/details/rates.void"
     ]
   },
   {
@@ -745,5 +746,128 @@
     ],
     "maintenance": "teaching",
     "showcase": true
+  },
+  {
+    "source": "public/examples/named-arguments.void",
+    "maintenance": "teaching",
+    "input": 5,
+    "expected": 10,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      }
+    ]
+  },
+  {
+    "source": "public/examples/unicode.void",
+    "maintenance": "teaching",
+    "input": 7,
+    "expected": 3,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 1
+      },
+      {
+        "input": -1,
+        "expected": 1
+      }
+    ]
+  },
+  {
+    "source": "public/examples/application/main.void",
+    "maintenance": "teaching",
+    "mode": "app",
+    "expected_status": 0,
+    "expected_stdout": ""
+  },
+  {
+    "source": "public/docs/snippets/numeric-prelude.void",
+    "maintenance": "teaching",
+    "guide": "types",
+    "kind": "program",
+    "input": 120,
+    "expected": 100,
+    "cases": [
+      {
+        "input": -3,
+        "expected": 0
+      },
+      {
+        "input": 45,
+        "expected": 45
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/utf8.void",
+    "maintenance": "teaching",
+    "guide": "strings",
+    "kind": "program",
+    "input": 0,
+    "expected": 4
+  },
+  {
+    "source": "public/docs/snippets/recoverable-list.void",
+    "maintenance": "teaching",
+    "guide": "collections",
+    "kind": "program",
+    "input": 18,
+    "expected": 18,
+    "cases": [
+      {
+        "input": 0,
+        "expected": 0
+      },
+      {
+        "input": -1,
+        "expected": 0
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/fixed-array-get.void",
+    "maintenance": "teaching",
+    "guide": "collections",
+    "kind": "program",
+    "input": 1,
+    "expected": 20,
+    "cases": [
+      {
+        "input": 7,
+        "expected": 0
+      },
+      {
+        "input": -1,
+        "expected": 30
+      }
+    ]
+  },
+  {
+    "source": "public/docs/snippets/relationships.void",
+    "maintenance": "teaching",
+    "guide": "composition",
+    "kind": "program",
+    "input": 0,
+    "expected": 1
+  },
+  {
+    "source": "public/docs/snippets/application/main.void",
+    "maintenance": "teaching",
+    "guide": "syntax",
+    "kind": "program",
+    "mode": "app",
+    "expected_status": 7,
+    "expected_stdout": ""
+  },
+  {
+    "source": "public/docs/snippets/top-level.void",
+    "maintenance": "teaching",
+    "guide": "syntax",
+    "kind": "program",
+    "mode": "app",
+    "expected_status": 0,
+    "expected_stdout": ""
   }
 ]

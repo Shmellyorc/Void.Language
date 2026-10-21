@@ -82,7 +82,7 @@ std::unique_ptr<llvm::TargetMachine> native_machine() {
 }
 void write_object(llvm::Module& module, llvm::TargetMachine& machine, const std::filesystem::path& output) {
     std::error_code ec;
-    llvm::raw_fd_ostream file(output.string(), ec, llvm::sys::fs::OF_None);
+    llvm::raw_fd_ostream file(path_utf8(output), ec, llvm::sys::fs::OF_None);
     if (ec) throw std::runtime_error("cannot write object: " + ec.message());
     llvm::legacy::PassManager passes;
     if (machine.addPassesToEmitFile(passes, file, nullptr, llvm::CodeGenFileType::ObjectFile))

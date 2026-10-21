@@ -48,6 +48,21 @@ with tempfile.TemporaryDirectory(prefix='void-website-examples-') as temporary:
         if sample.get('maintenance') == 'repository-copy':
             if source.read_bytes() != (root.parent / sample['repository_source']).read_bytes():
                 raise SystemExit(f'FAIL: website copy differs from {sample["repository_source"]}')
+        if sample.get('mode') == 'app':
+            # A nonzero application status is a returned value, not CLI output.
+            # Compare the raw stdout independently; do not strip or fabricate it.
+            targets = (source, source.parent) if source.name == 'main.void' else (source,)
+            for target, flags in ((target, flags) for target in targets
+                                  for flags in ([], ['--no-opt'])):
+                command = [str(compiler), 'run', str(target), '--app', *flags]
+                result = subprocess.run(command, capture_output=True, text=True, timeout=60)
+                if (result.returncode != sample['expected_status']
+                        or result.stdout != sample['expected_stdout'] or result.stderr):
+                    raise SystemExit(f'FAIL: {command}: expected status {sample["expected_status"]}, '
+                                     f'stdout {sample["expected_stdout"]!r}; got status '
+                                     f'{result.returncode}, stdout {result.stdout!r}, stderr {result.stderr!r}')
+                executed += 1
+            continue
         cases = [{'input': sample['input'], 'expected': sample['expected']}]
         cases += sample.get('cases', [])
         if sample.get('mode') == 'async':

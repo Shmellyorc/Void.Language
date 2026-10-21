@@ -1,5 +1,7 @@
-func subtotal(unit_price: i32, quantity: i32) -> i32:
+func subtotal(unit_price: i32 = 12, quantity: i32 = 1) -> i32:
     return unit_price * quantity
 
 func entry(quantity: i32) -> i32:
-    return subtotal(12, quantity)
+    return subtotal(
+        quantity = quantity,
+    )

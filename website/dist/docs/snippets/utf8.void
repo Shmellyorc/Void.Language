@@ -1,0 +1,6 @@
+func entry(input: i32) -> i32:
+    var bytes = "café".to_utf8()
+    var decoded = string.from_utf8(bytes)
+    return match decoded:
+        Ok(var text): text.length as i32
+        Err(var reason): 0

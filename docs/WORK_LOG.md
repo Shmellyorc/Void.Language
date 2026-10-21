@@ -1,6 +1,6 @@
 # Work log
 
-**Current handoff:** [Documentation index](README.md), [Sprint 3 acceptance](stage8/SPRINT3_ACCEPTANCE.md) and [contract](STAGE8_TEXT_COLLECTIONS.md). Stage 8 Sprint 3 is locally verified and stopped for Wrench review; Sprints 4–6 remain future work. Hosted CI is deferred to Stage 8 end. Earlier entries retain historical evidence.
+**Current handoff:** [Documentation index](README.md), [CI #83 Windows repair](stage8/CI83_WINDOWS_REPAIR.md) and [final hosted checklist](stage8/FINAL_HOSTED_GATE.md). All six Stage 8 sprints have local evidence; the focused CI #83 repair awaits Windows Debug/Release verification. Stage 8 is not hosted locked. Earlier entries retain historical evidence.
 
 ## 14 October 2026: Phase 22 UTF-8 foundation implementation
 
@@ -14135,3 +14135,31 @@ triple strings, recursive has/refinement, broad task ownership and other Bible
 features remain future work. No commits/pushes/branches/remotes/hosted CI/publication,
 root README change, stdlib work or Stage 9. Stop for Wrench review; Boss-controlled
 Git, explicit hosted authorization, Windows/macOS and actual editor gates remain.
+
+## 21 October 2026 — CI #83 focused Windows Unicode repair
+
+Inspected both Windows job logs at baseline
+`fbad2b642114a692f93d2f4ce7d3465ea489abf2`: builds passed, 153/156 suites each;
+`lsp_stage8` lost a supplementary Unicode scalar through narrow CLI argv, while
+both Sprint 3 fixtures failed writing Unicode with Python's default cp1252.
+
+Added Windows wmain with lossless UTF-16/UTF-8 conversion into the shared CLI,
+explicit filesystem argument decoding and UTF-8 LLVM object-output paths.
+Fixtures now use explicit UTF-8 text I/O. Added Unicode ancestor/file-input,
+normal/O2 JIT, cache, object/proof-output and diagnostic checks while retaining
+ASCII-only VFS module basenames and every discovery/alias/readonly assertion.
+Source discovery and the CI #82 security repair are byte-identical to baseline.
+
+Final focused Linux outcomes: **7/7 Debug, 7/7 Release**. Both Sprint 3 suites
+also passed with cp1252 defaults forced in both configurations (four executions;
+106 compiler/link/runtime checks per text/collection execution). Baseline fixtures
+reproduced their expected UnicodeEncodeError under that shim. The first extended
+fixture incorrectly expected a Unicode module basename to compile; both builds
+correctly rejected it. Corrected the expectation and reran only discovery, 1/1
+per configuration. No failed attempt or rerun is hidden or double-counted.
+
+[Repair record](stage8/CI83_WINDOWS_REPAIR.md) and machine-readable results retain
+commands, logs, hashes and limits. Updated index, approvals, Wrench handoff and
+final hosted checklist. Windows Debug/Release execution is still required;
+Linux/codepage simulation is not Windows acceptance. No full matrix, hosted run,
+commit/push/branch, root README, website or subsequent-stage work was performed.

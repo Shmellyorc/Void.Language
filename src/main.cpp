@@ -1,9 +1,11 @@
 #include "void/backend.hpp"
 #include "void/frontend.hpp"
+#include "void/path.hpp"
 #include <cerrno>
 #include <cstdlib>
 #include <iostream>
 #include <limits>
+#include <vector>
 namespace {
 std::int32_t input(const char* text) {
     char* end = nullptr; errno = 0;
@@ -13,7 +15,7 @@ std::int32_t input(const char* text) {
     return static_cast<std::int32_t>(value);
 }
 }
-int main(int argc, char** argv) {
+static int run_cli(int argc, char** argv) {
     try {
         bool optimize = true, cache=false, application=false;
         while(argc>1) {
@@ -25,7 +27,7 @@ int main(int argc, char** argv) {
         }
 
         if (!application && argc == 3 && std::string(argv[1]) == "--emit-proof") {
-            vd::emit_object(vd::ir::architecture_proof(), argv[2], true);
+            vd::emit_object(vd::ir::architecture_proof(), vd::utf8_path(argv[2]), true);
             std::cout << "Wrote native architecture proof object\n"; return 0;
         }
         if (!application && argc == 2 && std::string(argv[1]) == "--jit-proof") {
@@ -41,7 +43,8 @@ int main(int argc, char** argv) {
             bool run = command == "run" && (argc == 3 || (!application && argc == 4));
             bool emit = command == "emit" && argc == 5 && std::string(argv[3]) == "-o";
             if (check || run || emit) {
-                auto selected=std::filesystem::is_directory(std::filesystem::path(argv[2])) ? vd::discover_project(std::filesystem::path(argv[2])).entry : std::filesystem::path(argv[2]);
+                auto path=vd::utf8_path(argv[2]);
+                auto selected=std::filesystem::is_directory(path) ? vd::discover_project(path).entry : path;
                 if(cache && run) {
                     auto analysis=vd::analyze_project(selected);
                     if(!analysis.succeeded())throw vd::CompilationError(std::move(analysis.diagnostics));
@@ -64,7 +67,7 @@ int main(int argc, char** argv) {
                     vd::Jit jit; auto code = jit.compile(module, module.entry_symbol, optimize);
                     auto status=code->invoke(value);if(application)return status;std::cout << status << '\n';
                 } else {
-                    vd::emit_object(module, argv[4], optimize, true);
+                    vd::emit_object(module, vd::utf8_path(argv[4]), optimize, true);
                     std::cout << "Wrote native source object: " << argv[4] << '\n';
                 }
                 return 0;
@@ -79,3 +82,25 @@ int main(int argc, char** argv) {
         std::cerr << error.what() << '\n'; return 1;
     }
 }
+
+#ifdef _WIN32
+int wmain(int argc, wchar_t** argv) {
+    try {
+        // Keep the shared CLI in UTF-8; never pass native arguments through ACP.
+        std::vector<std::string> arguments;
+        arguments.reserve(argc);
+        for(int i=0;i<argc;++i) {
+            auto text=std::filesystem::path(argv[i]).u8string();
+            arguments.emplace_back(text.begin(),text.end());
+        }
+        std::vector<char*> pointers;
+        for(auto& argument:arguments)pointers.push_back(argument.data());
+        pointers.push_back(nullptr);
+        return run_cli(argc,pointers.data());
+    } catch(const std::exception& error) {
+        std::cerr << error.what() << '\n'; return 1;
+    }
+}
+#else
+int main(int argc, char** argv) { return run_cli(argc,argv); }
+#endif

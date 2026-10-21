@@ -1,6 +1,15 @@
-# Stage 8 final acceptance gate — prepared, NOT run
+# Stage 8 final acceptance gate — CI #83 Windows failures; not locked
 
-21 October 2026. This is a checklist, not hosted authorization or a lock.
+21 October 2026 update: Boss ran
+[CI #83](https://github.com/Shmellyorc/Void.Language/actions/runs/39571077819)
+against `fbad2b642114a692f93d2f4ce7d3465ea489abf2`. Windows Debug/Release each
+built and passed 153/156 suites; three Unicode failures block acceptance. Review
+the [focused repair](CI83_WINDOWS_REPAIR.md) and local evidence. Both Windows
+configurations must execute the repair before any lock. No rerun was triggered
+or requested by Keyboard. Other platform/editor outcomes are not inferred here.
+The original prepared checklist below remains required.
+
+21 October 2026 original preparation. This is a checklist, not hosted authorization or a lock.
 Read [docs index](../README.md), [Sprint 6 contract](../STAGE8_ERGONOMICS.md),
 its local acceptance record and the preserved Sprint 1–5 evidence first.
 

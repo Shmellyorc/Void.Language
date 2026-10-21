@@ -32,6 +32,16 @@ routine development. It authorizes no additional sprint, commit, push or hosted 
 Clankers and takes precedence over older communication/checkpoint practices below.
 Boss retains Git and hosted acceptance control.
 
+## CI #83 repair handoff — 21 October 2026
+
+Review [CI #83 repair evidence](stage8/CI83_WINDOWS_REPAIR.md) before the earlier
+Sprint 6 snapshot below. Baseline `fbad2b642114a692f93d2f4ce7d3465ea489abf2`:
+Windows Debug/Release built and passed 153/156 each. The focused repair adds native
+Unicode `voidc` argv, explicit UTF-8 path/object output conversion and UTF-8 fixture
+I/O. Source discovery/CI #82 security code is unchanged. Linux focused final
+outcomes are 7/7 per configuration; native Windows Debug/Release verification
+remains pending. No new hosted run, Git mutation or next stage is authorized.
+
 ## Current Stage 8 handoff — 21 October 2026
 
 Stage 8 Sprint 6 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.

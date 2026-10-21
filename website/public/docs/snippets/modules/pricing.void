@@ -1,2 +1,4 @@
+use "details/rates.void" as rates
+
 func subtotal(items: i32) -> i32:
-    return items * 4
+    return items * rates.unit_price()

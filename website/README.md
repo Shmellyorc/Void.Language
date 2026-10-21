@@ -15,7 +15,7 @@ python3 -m http.server 4173 --bind 127.0.0.1 --directory website/dist
 ```
 
 Open http://127.0.0.1:4173. Stop the server with Ctrl+C. The build copies only
-`website/public` into the ignored `website/dist` directory. No npm, framework,
+`website/public` into the generated `website/dist` directory. No npm, framework,
 backend, database, analytics or external fonts are required.
 
 ## Example maintenance
@@ -28,7 +28,7 @@ that exist only to test compiler behavior when adapting a fixture for readers.
 - `public/examples/*.void` and `public/examples/guides/`: downloadable programs.
 - `public/docs/*/index.html`: documentation with independently authored samples.
 - `public/docs/snippets/`: documentation-owned programs, fragments and support modules.
-- `scripts/guide-examples.json`: primary input/result, additional cases, async mode
+- `scripts/guide-examples.json`: primary input/result, additional cases, async/application modes
   and an explicit `teaching` or `repository-copy` maintenance policy.
 
 A `teaching` program is website-owned; do not require it to match a regression
@@ -65,6 +65,14 @@ Existing fixture executables cannot validate independently authored website code
 and are not reused. Missing async tooling fails verification instead of silently
 skipping execution. Website deployment does not require compiler binaries.
 
+Application rows use `mode: "app"`, `expected_status` and `expected_stdout`, with
+no numeric adapter input or printed-result field. Their result bars distinguish
+process status from standard output. The verifier compares the exact stdout and
+exit status independently in optimized/unoptimized modes; main-based downloads
+also execute through directory discovery. A successful return from main is not a
+printing API. See `STAGE8_WEBSITE_REVIEW.md` for the current content and validation
+record.
+
 ## Homepage showcase and roadmap
 
 The homepage uses three short source programs under `public/showcase/`, registered
@@ -81,7 +89,7 @@ for scope, source evidence, preservation comparisons and verification.
 
 ## Public content
 
-The site contains 30 guides and 15 curated examples. Navigation and guides work
+The site contains 30 guides and 18 curated examples. Navigation and guides work
 without JavaScript; all examples remain readable when the selector enhancement
 is unavailable. JavaScript supplies the menu, locally saved theme and dropdown. The default is
 light, independent of the operating-system preference; an explicitly saved theme

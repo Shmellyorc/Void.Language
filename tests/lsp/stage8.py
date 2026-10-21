@@ -13,7 +13,7 @@ def selection(result, entry, root, standalone=False):
         if os.name=='nt': assert os.path.samefile(result[key],expected),result
         else: assert result[key]==str(expected),result
 def reject(workspace, active='', override='', message=None):
-    result=subprocess.run([server,'--discover',str(workspace),str(active),str(override)],capture_output=True,text=True)
+    result=subprocess.run([server,'--discover',str(workspace),str(active),str(override)],capture_output=True,text=True,encoding="utf-8")
     assert result.returncode==2,result
     if message: assert message in result.stderr,result.stderr
 def source_uri(actual, expected):
@@ -40,15 +40,15 @@ with tempfile.TemporaryDirectory(prefix='VOID discovery é😀 ') as temp:
     (project/'app/systems').mkdir(parents=True);(library/'io').mkdir(parents=True)
     os.environ['VOID_STDLIB_ROOT']=str(library)
     api='## Fixture documentation.\n## @param x incoming number\nfunc read(x: i32) -> i32:\n    return x\n'
-    (library/'io/files.void').write_text(api)
-    (project/'app/systems/player.void').write_text(api)
+    (library/'io/files.void').write_text(api,encoding='utf-8')
+    (project/'app/systems/player.void').write_text(api,encoding='utf-8')
     text='use io/files as files\nfunc entry(x: i32) -> i32:\n    return files.read(x)\n'
-    entry=project/'main.void';entry.write_text(text)
+    entry=project/'main.void';entry.write_text(text,encoding='utf-8')
     active=project/'app/systems/player.void'
     selected=discover(project,active)
     selection(selected,entry,project)
     selection(discover(project),entry,project)
-    nested=project/'app/main.void';nested.write_text('invalid selected source must not trigger fallback')
+    nested=project/'app/main.void';nested.write_text('invalid selected source must not trigger fallback',encoding='utf-8')
     selection(discover(project,active),nested,project/'app')
     selection(discover(project,active,entry),entry,project)
     nested.unlink()
@@ -56,10 +56,10 @@ with tempfile.TemporaryDirectory(prefix='VOID discovery é😀 ') as temp:
     sibling=root/'project-other';sibling.mkdir()
     reject(project,sibling/'new.void',message='outside selected workspace')
     # Exact main spelling and descendant directory spelling remain authoritative.
-    case=project/'case';case.mkdir();(case/'Main.void').write_text(api)
+    case=project/'case';case.mkdir();(case/'Main.void').write_text(api,encoding='utf-8')
     reject(project,case/'new.void',message='exact case')
     if os.name=='nt': reject(project,project/'APP/systems/player.void',message='alias')
-    standalone=root/'standalone';standalone.mkdir();saved=standalone/'saved.void';saved.write_text(api)
+    standalone=root/'standalone';standalone.mkdir();saved=standalone/'saved.void';saved.write_text(api,encoding='utf-8')
     selection(discover(standalone,saved),saved,standalone,True)
     unsaved=discover(standalone,standalone/'new.void')
     assert unsaved['standalone'] and pathlib.Path(unsaved['entry']).name=='new.void',unsaved
@@ -90,7 +90,7 @@ with tempfile.TemporaryDirectory(prefix='VOID discovery é😀 ') as temp:
                     selection(discover(workspace,spelling/'project/main.void'),entry,project)
                     reject(workspace,spelling/'project-other/new.void',message='outside selected workspace')
                     reject(workspace,spelling/'project/APP/systems/player.void',message='alias')
-                    nested.write_text('invalid selected source must not trigger fallback')
+                    nested.write_text('invalid selected source must not trigger fallback',encoding='utf-8')
                     try: selection(discover(workspace,spelling/'project/app/systems/player.void'),nested,project/'app')
                     finally: nested.unlink()
             # A short-name component *inside* the VFS remains an alias, even
@@ -105,8 +105,26 @@ with tempfile.TemporaryDirectory(prefix='VOID discovery é😀 ') as temp:
     else: print('SKIP: Windows 8.3 coverage requires Windows')
     if len(sys.argv)>2:
         compiler=pathlib.Path(sys.argv[2]).resolve()
-        assert 'checked successfully' in subprocess.check_output([compiler,'check',project],text=True)
-        assert subprocess.check_output([compiler,'run',project,'7','--no-opt'],text=True).strip()=='7'
+        unicode_entry=standalone/'entrée😀.void';unicode_entry.write_text(api.replace('func read(', 'func entry('),encoding='utf-8')
+        # Exercise native argv for directories, files, supplementary characters,
+        # both JIT modes, the Debug cache path and native object output paths.
+        def cli(*args):
+            return subprocess.check_output([compiler,*args],text=True,encoding='utf-8',timeout=60)
+        for target in [project,entry]:
+            assert 'checked successfully' in cli('check',target)
+            for flags in [[],['--no-opt']]:
+                assert cli('run',target,'7',*flags).strip()=='7'
+        for _ in range(2):assert cli('run',entry,'7','--cache').strip()=='7'
+        for flags in [[],['--no-opt']]:
+            obj=root/('résultat😀'+str(len(flags))+'.o')
+            cli('emit',project,'-o',obj,*flags);assert obj.is_file() and obj.stat().st_size>0
+        proof=root/'preuve😀.o';cli('--emit-proof',proof);assert proof.is_file() and proof.stat().st_size>0
+        # Unicode ancestors are supported; VFS module basenames remain ASCII.
+        invalid=subprocess.run([compiler,'check',unicode_entry],capture_output=True,text=True,encoding='utf-8',timeout=60)
+        assert invalid.returncode==1 and 'Unicode module filenames are deferred' in invalid.stderr,invalid
+        missing=project/'absent😀.void'
+        failure=subprocess.run([compiler,'check',missing],capture_output=True,text=True,encoding='utf-8',timeout=60)
+        assert failure.returncode==1 and missing.name in failure.stderr,failure
     with Client(server,entry.resolve()) as c:
         caps=c.request('initialize',{'capabilities':{'workspace':{'workspaceEdit':{'documentChanges':True,'failureHandling':'textOnlyTransactional'}}}})[0]['result']['capabilities']
         assert set([' ', '/', '"']).issubset(caps['completionProvider']['triggerCharacters'])

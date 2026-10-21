@@ -1,0 +1,5 @@
+func entry(index: i32) -> i32:
+    const milestones: [i32, 3] = [10, 20, 30]
+    return match milestones.get(index):
+        Ok(var milestone): milestone
+        Err(var reason): 0

@@ -1,0 +1,121 @@
+{
+  "date": "2026-10-21",
+  "baseline": "fbad2b642114a692f93d2f4ce7d3465ea489abf2",
+  "status": "focused Linux verification complete; Windows Debug/Release repair execution pending; not hosted locked",
+  "hosted": {
+    "run_id": 39571077819,
+    "jobs": [
+      {
+        "id": 119125116028,
+        "configuration": "Windows 2022 / Debug",
+        "built": true,
+        "passed": 153,
+        "total": 156
+      },
+      {
+        "id": 119125116286,
+        "configuration": "Windows 2022 / Release",
+        "built": true,
+        "passed": 153,
+        "total": 156
+      }
+    ],
+    "failures": [
+      "lsp_stage8",
+      "text_collections_sprint3",
+      "lsp_sprint3"
+    ],
+    "rerun_started": false
+  },
+  "local": {
+    "configurations": [
+      "build/debug",
+      "build/ci-release"
+    ],
+    "suites": [
+      "debug_cache_processes",
+      "lsp_stage8",
+      "tooling",
+      "modules",
+      "text_collections_sprint3",
+      "lsp_sprint3",
+      "source_cli"
+    ],
+    "initial_outcomes": "6/7 each; new Unicode module basename positive expectation was invalid",
+    "final_discovery_reruns": "1/1 each after asserting existing basename rejection",
+    "final_unique_outcomes": {
+      "passed": 14,
+      "failed": 0
+    },
+    "cp1252_baseline": "both fixtures reproduce UnicodeEncodeError",
+    "cp1252_fixed": "both fixtures pass for Debug and Release; text/collections reports 106 process checks each",
+    "windows_83_checks": "skipped on Linux; retained for Windows"
+  },
+  "changed_source_sha256": {
+    "src/main.cpp": "41188188eae5eea9cb0dd18a87aff084f856e13c1790caab431e35e0256b89aa",
+    "src/backend/llvm/backend.cpp": "0cbc8f39f3ef1929161a5ab7d44c2fa330f25c96129e8eb8d48fa20d468b549f",
+    "tests/lsp/stage8.py": "50ed397bd67c3ca316788a917d3742afa463530cee16a7107f6382616a806029",
+    "tests/stage8/sprint3.py": "b8baba02da0b0431511e974543395f5ac5c93612822e86fef5cc52b7f1b9a031",
+    "tests/stage8/lsp_sprint3.py": "51cd3346815e91dcc2059cefe4c9d4927c80b684344b002e5148066ce03b701b"
+  },
+  "preserved_baseline_sha256": {
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "src/frontend/source.cpp": "4900d157d7a84c42f8aeea608c9e6b4c7e9da02679cad7b0fdbda074fa4044e4",
+    "include/void/path.hpp": "2674378c9b35b6d060f6efad22b7cbfc961c169b21d977301779667e3a06ae98"
+  },
+  "cp1252_reproduction_shim": "import io, locale, pathlib, subprocess, sys\nfrom unittest.mock import patch\nmode, filename, *args = sys.argv[1:]\npath = pathlib.Path(filename).resolve()\ncode = subprocess.check_output(['git', 'show', 'HEAD:' + filename]) if mode == 'baseline' else path.read_bytes()\nsys.argv = [str(path), *args]\n# Force omitted text encodings to cp1252 without changing the OS or the files.\n# subprocess's locale default and pathlib's default are both covered.\nwith patch('io.text_encoding', lambda encoding, stacklevel=2: encoding if encoding is not None else 'cp1252'), patch('locale.getencoding', return_value='cp1252'):\n    exec(compile(code, str(path), 'exec'), {'__name__': '__main__', '__file__': str(path)})\n",
+  "raw_logs": {
+    "/tmp/void-ci83-baseline-lsp-cp1252.log": {
+      "sha256": "3462afad3377698078995514efcc0ca467e76815cd5914bcf7f647ce25b57581",
+      "text": "Traceback (most recent call last):\n  File \"/tmp/void-ci83-codepage.py\", line 10, in <module>\n    exec(compile(code, str(path), 'exec'), {'__name__': '__main__', '__file__': str(path)})\n    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shmellyorc/Documents/Void.Language/tests/stage8/lsp_sprint3.py\", line 21, in <module>\n    entry=pathlib.Path(temp).resolve()/'main.void';entry.write_text(source,encoding='utf-8');uri=entry.as_uri()\n                                                   ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.14/pathlib/__init__.py\", line 811, in write_text\n    return f.write(data)\n           ~~~~~~~^^^^^^\n  File \"/usr/lib/python3.14/encodings/cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\U0001f3ae' in position 48: character maps to <undefined>\n"
+    },
+    "/tmp/void-ci83-baseline-text-cp1252.log": {
+      "sha256": "6d453e7814d7afdd9039e3e878d1250fc508483c4d3b72882458918edc351758",
+      "text": "Traceback (most recent call last):\n  File \"/tmp/void-ci83-codepage.py\", line 10, in <module>\n    exec(compile(code, str(path), 'exec'), {'__name__': '__main__', '__file__': str(path)})\n    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shmellyorc/Documents/Void.Language/tests/stage8/sprint3.py\", line 175, in <module>\n    path=root/(name+'.void');path.write_text(source,encoding='utf-8');run([compiler,'check',path])\n                             ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.14/pathlib/__init__.py\", line 811, in write_text\n    return f.write(data)\n           ~~~~~~~^^^^^^\n  File \"/usr/lib/python3.14/encodings/cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\U0001f3ae' in position 268: character maps to <undefined>\n"
+    },
+    "/tmp/void-ci83-ci-release-build.log": {
+      "sha256": "2635a1f9ff8ed8fb921425aa9eba853e8b33e6deb4340d6ee0658331ba0ba34c",
+      "text": "gmake: jobserver mkfifo: /tmp/GMfifo4: File exists\n[ 33%] Built target void_native_fixture\n[ 33%] Built target void_core\n[ 66%] Built target void_runtime\n[ 66%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o\nIn file included from /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:21:\nIn file included from /usr/lib/llvm-19/include/llvm/ExecutionEngine/Orc/LLJIT.h:16:\nIn file included from /usr/lib/llvm-19/include/llvm/ExecutionEngine/Orc/CompileOnDemandLayer.h:21:\nIn file included from /usr/lib/llvm-19/include/llvm/ExecutionEngine/Orc/IndirectionUtils.h:24:\nIn file included from /usr/lib/llvm-19/include/llvm/Transforms/Utils/ValueMapper.h:20:\nIn file included from /usr/lib/llvm-19/include/llvm/IR/ValueMap.h:33:\nIn file included from /usr/lib/llvm-19/include/llvm/Support/Mutex.h:16:\nIn file included from /usr/lib/llvm-19/include/llvm/Support/Threading.h:21:\n/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/ciso646:49:6: warning: \"<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros\" [-W#warnings]\n   49 | #    warning \"<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros\"\n      |      ^\n1 warning generated.\n[100%] Linking CXX static library libvoid_llvm.a\n[100%] Built target void_llvm\n[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o\n[100%] Built target voidc_objects\n[100%] Generating cache-identity-Release.cpp\n[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o\n[100%] Linking CXX static library libvoid_cache_identity.a\n[100%] Built target void_cache_identity\n[100%] Linking CXX executable voidc\n[100%] Built target voidc\n[  0%] Built target void_core\n[  0%] Built target void_lsp\n[100%] Built target voidls\n[ 25%] Built target void_native_fixture\n[ 25%] Built target void_core\n[ 25%] Built target native_fixture\n[ 50%] Built target void_runtime\n[ 75%] Built target void_llvm\n[ 75%] Linking CXX executable void_tests\n[100%] Built target void_tests\n"
+    },
+    "/tmp/void-ci83-ci-release-discovery-final.log": {
+      "sha256": "4cbfd69143b1660f6c14b85d655a6ae62e4711a9cd3af28a4d55965b7683410b",
+      "text": "UpdateCTestConfiguration  from :/home/shmellyorc/Documents/Void.Language/build/ci-release/DartConfiguration.tcl\nParse Config file:/home/shmellyorc/Documents/Void.Language/build/ci-release/DartConfiguration.tcl\nTest project /home/shmellyorc/Documents/Void.Language/build/ci-release\nConstructing a list of tests\nDone constructing a list of tests\nUpdating test list for fixtures\nAdded 0 tests to meet fixture requirements\nChecking test dependency graph...\nChecking test dependency graph end\ntest 61\n    Start 61: lsp_stage8\n\n61: Test command: /home/shmellyorc/.local/bin/python3.11 \"/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py\" \"/home/shmellyorc/Documents/Void.Language/build/ci-release/voidls\" \"/home/shmellyorc/Documents/Void.Language/build/ci-release/voidc\"\n61: Working Directory: /home/shmellyorc/Documents/Void.Language/build/ci-release\n61: Test timeout computed to be: 1500\n61: Debug cache: miss\n61: Debug cache: hit\n61: SKIP: Windows 8.3 coverage requires Windows\n61: Stage 8 compiler-backed LSP discovery/docs/readonly checks passed\n1/1 Test #61: lsp_stage8 .......................   Passed    0.26 sec\n\nThe following tests passed:\n\tlsp_stage8\n\n100% tests passed, 0 tests failed out of 1\n\nTotal Test time (real) =   0.26 sec\n"
+    },
+    "/tmp/void-ci83-debug-build.log": {
+      "sha256": "f6248a50e48286e908222911b6ee81a42442fbdd839104b07efed3c3bce7e8b8",
+      "text": "gmake: jobserver mkfifo: /tmp/GMfifo4: File exists\n[  0%] Built target void_native_fixture\n[  0%] Built target void_core\n[ 50%] Built target void_runtime\n[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o\nIn file included from /home/shmellyorc/Documents/Void.Language/src/backend/llvm/backend.cpp:21:\nIn file included from /usr/lib/llvm-19/include/llvm/ExecutionEngine/Orc/LLJIT.h:16:\nIn file included from /usr/lib/llvm-19/include/llvm/ExecutionEngine/Orc/CompileOnDemandLayer.h:21:\nIn file included from /usr/lib/llvm-19/include/llvm/ExecutionEngine/Orc/IndirectionUtils.h:24:\nIn file included from /usr/lib/llvm-19/include/llvm/Transforms/Utils/ValueMapper.h:20:\nIn file included from /usr/lib/llvm-19/include/llvm/IR/ValueMap.h:33:\nIn file included from /usr/lib/llvm-19/include/llvm/Support/Mutex.h:16:\nIn file included from /usr/lib/llvm-19/include/llvm/Support/Threading.h:21:\n/usr/lib/gcc/x86_64-linux-gnu/16/../../../../include/c++/16/ciso646:49:6: warning: \"<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros\" [-W#warnings]\n   49 | #    warning \"<ciso646> is not a standard header since C++20, use <version> to detect implementation-specific macros\"\n      |      ^\n1 warning generated.\n[100%] Linking CXX static library libvoid_llvm.a\n[100%] Built target void_llvm\n[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o\n[100%] Built target voidc_objects\n[100%] Generating cache-identity-Debug.cpp\n[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Debug.cpp.o\n[100%] Linking CXX static library libvoid_cache_identity.a\n[100%] Built target void_cache_identity\n[100%] Linking CXX executable voidc\n[100%] Built target voidc\n[  0%] Built target void_core\n[  0%] Built target void_lsp\n[100%] Built target voidls\n[  0%] Built target void_native_fixture\n[  0%] Built target void_core\n[  0%] Built target native_fixture\n[ 33%] Built target void_runtime\n[ 66%] Built target void_llvm\n[ 66%] Linking CXX executable void_tests\n[100%] Built target void_tests\n"
+    },
+    "/tmp/void-ci83-debug-discovery-final.log": {
+      "sha256": "797bdc1c802e6ca0d6a3263f6cb0a98b3983ee3c19c36dfbd1f0cbaa02e6fe3e",
+      "text": "UpdateCTestConfiguration  from :/home/shmellyorc/Documents/Void.Language/build/debug/DartConfiguration.tcl\nParse Config file:/home/shmellyorc/Documents/Void.Language/build/debug/DartConfiguration.tcl\nTest project /home/shmellyorc/Documents/Void.Language/build/debug\nConstructing a list of tests\nDone constructing a list of tests\nUpdating test list for fixtures\nAdded 0 tests to meet fixture requirements\nChecking test dependency graph...\nChecking test dependency graph end\ntest 61\n    Start 61: lsp_stage8\n\n61: Test command: /home/shmellyorc/.local/bin/python3.11 \"/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py\" \"/home/shmellyorc/Documents/Void.Language/build/debug/voidls\" \"/home/shmellyorc/Documents/Void.Language/build/debug/voidc\"\n61: Working Directory: /home/shmellyorc/Documents/Void.Language/build/debug\n61: Test timeout computed to be: 1500\n61: Debug cache: miss\n61: Debug cache: hit\n61: SKIP: Windows 8.3 coverage requires Windows\n61: Stage 8 compiler-backed LSP discovery/docs/readonly checks passed\n1/1 Test #61: lsp_stage8 .......................   Passed    0.33 sec\n\nThe following tests passed:\n\tlsp_stage8\n\n100% tests passed, 0 tests failed out of 1\n\nTotal Test time (real) =   0.33 sec\n"
+    },
+    "/tmp/void-ci83-debug-discovery-retest.log": {
+      "sha256": "e6c70067fb77b2c75271fe771c7e276a41f31aaae8d4ed36008d6c3e3447f585",
+      "text": "Debug cache: miss\nDebug cache: hit\nSKIP: Windows 8.3 coverage requires Windows\nStage 8 compiler-backed LSP discovery/docs/readonly checks passed\n"
+    },
+    "/tmp/void-ci83-debug-tests.log": {
+      "sha256": "ae63935f9806a3c0e36283a1d9cb448412f216f1db2d91bc5d2846cca92c09ef",
+      "text": "Test project /home/shmellyorc/Documents/Void.Language/build/debug\n    Start  15: debug_cache_processes\n1/7 Test  #15: debug_cache_processes ............   Passed   20.66 sec\n    Start  61: lsp_stage8\n2/7 Test  #61: lsp_stage8 .......................***Failed    0.21 sec\n/tmp/VOID discovery é😀 zwgp_11z/standalone/entrée😀.void:1:1: error: Non-portable module path component 'entrée😀.void'.\n    code: VOID3001\n\n 1 | \n   | ^\n    Module: /entrée😀.void\n    Hint: Use printable ASCII filenames without Windows-reserved characters/names or trailing dots/spaces; Unicode module filenames are deferred.\n\nSKIP: Windows 8.3 coverage requires Windows\nTraceback (most recent call last):\n  File \"/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py\", line 114, in <module>\n    assert 'checked successfully' in cli('check',target)\n                                     ^^^^^^^^^^^^^^^^^^^\n  File \"/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py\", line 112, in cli\n    return subprocess.check_output([compiler,*args],text=True,encoding='utf-8',timeout=60)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py\", line 466, in check_output\n    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py\", line 571, in run\n    raise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command '[PosixPath('/home/shmellyorc/Documents/Void.Language/build/debug/voidc'), 'check', PosixPath('/tmp/VOID discovery é😀 zwgp_11z/standalone/entrée😀.void')]' returned non-zero exit status 1.\n\n    Start 129: tooling\n3/7 Test #129: tooling ..........................   Passed    0.44 sec\n    Start 133: modules\n4/7 Test #133: modules ..........................   Passed    1.08 sec\n    Start 146: text_collections_sprint3\n5/7 Test #146: text_collections_sprint3 .........   Passed   70.67 sec\n    Start 147: lsp_sprint3\n6/7 Test #147: lsp_sprint3 ......................   Passed    0.12 sec\n    Start 150: source_cli\n7/7 Test #150: source_cli .......................   Passed    5.51 sec\n\n86% tests passed, 1 tests failed out of 7\n\nTotal Test time (real) =  98.69 sec\n\nThe following tests FAILED:\n\t 61 - lsp_stage8 (Failed)\nErrors while running CTest\n"
+    },
+    "/tmp/void-ci83-fixed-lsp-cp1252.log": {
+      "sha256": "907a1d0a6892889fcc5498d06bc871463059b5fea99140888ca720584879287e",
+      "text": "Sprint 3 text/collection completion, hover, signatures, references and builtin protections passed\n"
+    },
+    "/tmp/void-ci83-fixed-text-cp1252.log": {
+      "sha256": "3a50f0cfeedb245361625cab6c24cc58d0a895ce08881fd5aea23fab3f6d060e",
+      "text": "Sprint 3: 106 text/collection normal/O2 JIT, linked AOT and diagnostic process checks passed\n"
+    },
+    "/tmp/void-ci83-release-lsp-cp1252.log": {
+      "sha256": "907a1d0a6892889fcc5498d06bc871463059b5fea99140888ca720584879287e",
+      "text": "Sprint 3 text/collection completion, hover, signatures, references and builtin protections passed\n"
+    },
+    "/tmp/void-ci83-release-tests.log": {
+      "sha256": "f7998f6417efbc4a0b49b73a8443b3cf6ae2939cdf3e20787762700767430601",
+      "text": "Test project /home/shmellyorc/Documents/Void.Language/build/ci-release\n    Start  15: debug_cache_processes\n1/7 Test  #15: debug_cache_processes ............   Passed    7.41 sec\n    Start  61: lsp_stage8\n2/7 Test  #61: lsp_stage8 .......................***Failed    0.20 sec\n/tmp/VOID discovery é😀 htgzfjpf/standalone/entrée😀.void:1:1: error: Non-portable module path component 'entrée😀.void'.\n    code: VOID3001\n\n 1 | \n   | ^\n    Module: /entrée😀.void\n    Hint: Use printable ASCII filenames without Windows-reserved characters/names or trailing dots/spaces; Unicode module filenames are deferred.\n\nSKIP: Windows 8.3 coverage requires Windows\nTraceback (most recent call last):\n  File \"/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py\", line 114, in <module>\n    assert 'checked successfully' in cli('check',target)\n                                     ^^^^^^^^^^^^^^^^^^^\n  File \"/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py\", line 112, in cli\n    return subprocess.check_output([compiler,*args],text=True,encoding='utf-8',timeout=60)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py\", line 466, in check_output\n    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py\", line 571, in run\n    raise CalledProcessError(retcode, process.args,\nsubprocess.CalledProcessError: Command '[PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-release/voidc'), 'check', PosixPath('/tmp/VOID discovery é😀 htgzfjpf/standalone/entrée😀.void')]' returned non-zero exit status 1.\n\n    Start 129: tooling\n3/7 Test #129: tooling ..........................   Passed    0.25 sec\n    Start 133: modules\n4/7 Test #133: modules ..........................   Passed    0.76 sec\n    Start 146: text_collections_sprint3\n5/7 Test #146: text_collections_sprint3 .........   Passed   51.99 sec\n    Start 147: lsp_sprint3\n6/7 Test #147: lsp_sprint3 ......................   Passed    0.07 sec\n    Start 150: source_cli\n7/7 Test #150: source_cli .......................   Passed    4.91 sec\n\n86% tests passed, 1 tests failed out of 7\n\nTotal Test time (real) =  65.60 sec\n\nThe following tests FAILED:\n\t 61 - lsp_stage8 (Failed)\nErrors while running CTest\n"
+    },
+    "/tmp/void-ci83-release-text-cp1252.log": {
+      "sha256": "3a50f0cfeedb245361625cab6c24cc58d0a895ce08881fd5aea23fab3f6d060e",
+      "text": "Sprint 3: 106 text/collection normal/O2 JIT, linked AOT and diagnostic process checks passed\n"
+    }
+  }
+}

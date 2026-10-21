@@ -189,6 +189,15 @@ for row in manifest:
         continue
     if row.get('maintenance') not in ('teaching', 'repository-copy'):
         fail(source, 'unknown example maintenance policy')
+    if row.get('mode') == 'app':
+        if (type(row.get('expected_status')) is not int
+                or not 0 <= row['expected_status'] <= 255
+                or row.get('expected_stdout') != ''
+                or any(key in row for key in ('input', 'expected', 'cases'))
+                or row.get('kind') == 'fragment'):
+            fail(source, 'application manifest requires separate status and empty stdout, without adapter inputs')
+    elif type(row.get('input')) is not int or type(row.get('expected')) is not int:
+        fail(source, 'entry adapter manifest requires integer input and result')
     if row.get('maintenance') == 'repository-copy':
         original = REPO / row['repository_source']
         if not original.is_file() or source.read_bytes() != original.read_bytes():
@@ -350,6 +359,15 @@ for path, page in pages.items():
             fail(path, 'showcase terminal command/result differs from validation manifest')
     for data, displayed in page.results:
         row = samples.get(data.get('data-source'))
+        if row and row.get('mode') == 'app':
+            result = re.fullmatch(r'\s*Exit status\s+(\d+)\s+·\s+Standard output empty\s*', displayed)
+            if (not result or int(result[1]) != row['expected_status']
+                    or data.get('data-mode') != 'app'
+                    or data.get('data-expected-status') != str(row['expected_status'])
+                    or data.get('data-expected-stdout') != row['expected_stdout']
+                    or 'data-input' in data or 'data-expected' in data):
+                fail(path, 'application result must separate exit status and stdout without an adapter input')
+            continue
         result = re.fullmatch(r'\s*Input\s+(-?\d+)\s+·\s+(?:Expected result|Result)\s+(-?\d+)\s*', displayed)
         if not result:
             fail(path, 'code-window result bar must use one U+00B7 middle-dot separator')

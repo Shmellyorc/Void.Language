@@ -1,0 +1,11 @@
+value struct location:
+    x: i32
+
+struct marker:
+    using position: location
+
+func entry(input: i32) -> i32:
+    return if marker has location:
+        1
+    else:
+        0

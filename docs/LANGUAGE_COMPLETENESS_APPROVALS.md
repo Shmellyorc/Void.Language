@@ -5,6 +5,13 @@ completeness audit and Stage 7 hosted acceptance.
 
 **Current status — 21 October 2026:**
 
+**CI #83 repair update:** Owner-run baseline `fbad2b642114a692f93d2f4ce7d3465ea489abf2`
+built on Windows Debug/Release, passing 153/156 each. See the
+[three-failure Unicode repair](stage8/CI83_WINDOWS_REPAIR.md) and its focused
+Linux Debug/Release evidence. Windows verification of the repair remains pending;
+no hosted lock, new language semantics or subsequent stage is approved here.
+The earlier Sprint 6 local snapshot follows.
+
 Stage 8 Sprint 6 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
 The final planned engineering sprint delivers compile-time `Type has Target`,
 indented typed if-expressions, delimiter-aware multiline calls and bounded

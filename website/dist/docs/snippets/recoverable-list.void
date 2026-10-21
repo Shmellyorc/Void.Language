@@ -1,0 +1,7 @@
+func entry(latest_score: i32) -> i32:
+    var scores: [i32] = []
+    if latest_score > 0:
+        scores.push(latest_score)
+    return match scores.pop():
+        Ok(var score): score
+        Err(var reason): 0

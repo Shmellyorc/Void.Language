@@ -18,7 +18,7 @@ source='''func entry(input: i32) -> i32:
     return length as i32
 '''
 with tempfile.TemporaryDirectory(prefix='VOID sprint3 lsp ') as temp:
-    entry=pathlib.Path(temp).resolve()/'main.void';entry.write_text(source);uri=entry.as_uri()
+    entry=pathlib.Path(temp).resolve()/'main.void';entry.write_text(source,encoding='utf-8');uri=entry.as_uri()
     with Client(server,entry) as c:
         c.request('initialize',{'capabilities':{'workspace':{'workspaceEdit':{'documentChanges':True,'failureHandling':'textOnlyTransactional'}}}});c.notify('initialized',{});c.sync();version=1
         c.notify('textDocument/didOpen',{'textDocument':{'uri':uri,'languageId':'void','version':version,'text':source}});c.sync()

@@ -1,0 +1,918 @@
+{
+  "desktop": [
+    {
+      "badButtons": false,
+      "codeWindows": 2,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 0,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/why-void/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 0,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/features/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 18,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/examples/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 0,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/getting-started/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 0,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/roadmap/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 0,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/404.html",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 0,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 3,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/syntax/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/variables/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 2,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/types/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 2,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/functions/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/control-flow/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 4,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/modules/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 3,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/collections/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/dictionaries/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 2,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/strings/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 2,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/structs/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/initialization/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/methods/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 2,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/composition/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/inheritance/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/interfaces/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/generics/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/properties/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/callables/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/closures/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/events/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/nullable/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/patterns/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/errors/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/cleanup/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/async/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/task-groups/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/parallelism/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 0,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/native-integration/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/editor-tooling/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    },
+    {
+      "badButtons": false,
+      "codeWindows": 1,
+      "focusableCode": true,
+      "h1": 1,
+      "overflow": false,
+      "route": "/docs/live-development/",
+      "theme": "light",
+      "unnamed": false,
+      "width": 1059
+    }
+  ],
+  "mobile": [
+    {
+      "overflow": false,
+      "route": "/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/why-void/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/features/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/getting-started/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/roadmap/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/404.html",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/syntax/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/variables/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/types/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/functions/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/control-flow/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/modules/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/collections/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/dictionaries/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/strings/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/structs/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/initialization/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/methods/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/composition/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/inheritance/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/interfaces/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/generics/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/properties/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/callables/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/closures/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/events/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/nullable/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/patterns/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/errors/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/cleanup/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/async/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/task-groups/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/parallelism/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/native-integration/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/editor-tooling/",
+      "theme": "light",
+      "width": 390
+    },
+    {
+      "overflow": false,
+      "route": "/docs/live-development/",
+      "theme": "light",
+      "width": 390
+    }
+  ],
+  "dropdownDesktop": [
+    {
+      "download": "/examples/guides/syntax.void",
+      "key": "native",
+      "overflow": false,
+      "result": "Input 10 · Expected result 52",
+      "visible": [
+        "native"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/functions.void",
+      "key": "functions",
+      "overflow": false,
+      "result": "Input 5 · Expected result 120",
+      "visible": [
+        "functions"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/loops.void",
+      "key": "loops",
+      "overflow": false,
+      "result": "Input 5 · Expected result 9",
+      "visible": [
+        "loops"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/guides/collections.void",
+      "key": "collections",
+      "overflow": false,
+      "result": "Input 5 · Expected result 35",
+      "visible": [
+        "collections"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/guides/structs.void",
+      "key": "structs",
+      "overflow": false,
+      "result": "Input 0 · Expected result 19",
+      "visible": [
+        "structs"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/guides/errors.void",
+      "key": "errors",
+      "overflow": false,
+      "result": "Input 2 · Expected result 50",
+      "visible": [
+        "errors"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/guides/generics.void",
+      "key": "generics",
+      "overflow": false,
+      "result": "Input 5 · Expected result 10",
+      "visible": [
+        "generics"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/guides/properties.void",
+      "key": "properties",
+      "overflow": false,
+      "result": "Input 5 · Expected result 15",
+      "visible": [
+        "properties"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/guides/closures.void",
+      "key": "closures",
+      "overflow": false,
+      "result": "Input 5 · Expected result 13",
+      "visible": [
+        "closures"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/guides/events.void",
+      "key": "events",
+      "overflow": false,
+      "result": "Input 5 · Expected result 5",
+      "visible": [
+        "events"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/guides/cleanup.void",
+      "key": "cleanup",
+      "overflow": false,
+      "result": "Input 5 · Expected result 10",
+      "visible": [
+        "cleanup"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/guides/async.void",
+      "key": "async",
+      "overflow": false,
+      "result": "Input 5 · Expected result 13",
+      "visible": [
+        "async"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/guides/task-groups.void",
+      "key": "task-groups",
+      "overflow": false,
+      "result": "Input 5 · Expected result 11",
+      "visible": [
+        "task-groups"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/guides/parallelism.void",
+      "key": "parallelism",
+      "overflow": false,
+      "result": "Input 5 · Expected result 61",
+      "visible": [
+        "parallelism"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/guides/modules/math/calculator.void",
+      "key": "modules",
+      "overflow": false,
+      "result": "Input 5 · Expected result 16",
+      "visible": [
+        "modules"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/named-arguments.void",
+      "key": "named-arguments",
+      "overflow": false,
+      "result": "Input 5 · Expected result 10",
+      "visible": [
+        "named-arguments"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/unicode.void",
+      "key": "unicode",
+      "overflow": false,
+      "result": "Input 7 · Expected result 3",
+      "visible": [
+        "unicode"
+      ],
+      "width": 872
+    },
+    {
+      "download": "/examples/application/main.void",
+      "key": "application",
+      "overflow": false,
+      "result": "Exit status 0 · Standard output empty",
+      "visible": [
+        "application"
+      ],
+      "width": 872
+    }
+  ],
+  "dropdownMobile": [
+    {
+      "key": "native",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "functions",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "loops",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "collections",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "structs",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "errors",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "generics",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "properties",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "closures",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "events",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "cleanup",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "async",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "task-groups",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "parallelism",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "modules",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "named-arguments",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "unicode",
+      "overflow": false,
+      "visible": 1
+    },
+    {
+      "key": "application",
+      "overflow": false,
+      "visible": 1
+    }
+  ]
+}

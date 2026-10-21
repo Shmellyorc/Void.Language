@@ -1,7 +1,8 @@
 func choose<t>(use_first: bool, first: t, second: t) -> t:
-    if use_first:
-        return first
-    return second
+    return if use_first:
+        first
+    else:
+        second
 
 func entry(stock: i32) -> i32:
     return choose(stock > 0, stock, 0)

@@ -1,0 +1,2 @@
+func entry(volume: i32) -> i32:
+    return volume.clamp(lower = 0, upper = 100)

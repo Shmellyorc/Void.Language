@@ -2,7 +2,7 @@ value struct point:
     x: i32
     y: i32
 
-func (position point) move(dx: i32, dy: i32):
+func (position point) move(dx: i32 = 0, dy: i32 = 0):
     position.x += dx
     position.y += dy
 
@@ -11,6 +11,6 @@ func (position point) distance_squared() -> i32:
 
 func entry(steps: i32) -> i32:
     var cursor = point(x = 0, y = 0)
-    cursor.move(steps, steps)
+    cursor.move(dy = steps, dx = steps)
     const final_position = cursor
     return final_position.distance_squared()

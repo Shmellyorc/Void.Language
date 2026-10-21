@@ -47,6 +47,16 @@ README only if Boss explicitly requests a public-facing README change.”
 Preserve historical evidence and distinguish approved direction, local verification,
 review and hosted locks. Never mark work implemented or locked without verification.
 
+## CI #83 repair handoff — 21 October 2026
+
+Owner-run CI #83 at `fbad2b642114a692f93d2f4ce7d3465ea489abf2`
+built Windows Debug/Release successfully; each passed 153/156 suites. The three
+Unicode CLI/fixture failures have a [focused repair record](stage8/CI83_WINDOWS_REPAIR.md).
+Final local focused outcomes are 7/7 each in Linux Debug/Release after correcting
+one regression expectation; baseline cp1252 fixture failures were reproduced.
+Windows execution of the repair remains pending; Stage 8 is **not hosted locked**.
+The Sprint 6 acceptance below describes its earlier local snapshot, not CI #83.
+
 ## Current stage and acceptance — 21 October 2026
 
 Stage 8 Sprint 6 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.

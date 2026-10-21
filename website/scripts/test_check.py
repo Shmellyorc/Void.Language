@@ -199,6 +199,30 @@ class SEOChecks(unittest.TestCase):
                 finally:
                     path.write_bytes(before)
 
+    def test_application_status_is_not_stdout(self):
+        path = self.public / 'docs/syntax/index.html'
+        original = path.read_text()
+        cases = [
+            ('Exit status <strong>7</strong>', 'Expected result <strong>7</strong>'),
+            ('data-expected-status="7"', 'data-expected-status="0"'),
+            ('data-expected-stdout=""', 'data-expected-stdout="7"'),
+            ('Standard output empty', 'Standard output 7'),
+            ('data-mode="app"', 'data-mode="entry"'),
+            ('data-mode="app"', 'data-mode="app" data-input="0"'),
+            ('Exit status <strong>7</strong><span aria-hidden="true"> · </span>',
+             'Exit status <strong>7</strong><span aria-hidden="true"> → </span>'),
+        ]
+        for old, new in cases:
+            with self.subTest(mutation=new):
+                try:
+                    self.assertIn(old, original)
+                    path.write_text(original.replace(old, new, 1))
+                    result = self.check()
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn('application result must separate', result.stderr)
+                finally:
+                    path.write_text(original)
+
     def test_clarity_has_no_arbitrary_character_limit(self):
         guide = self.public / 'docs/generics/index.html'
         before = guide.read_text()

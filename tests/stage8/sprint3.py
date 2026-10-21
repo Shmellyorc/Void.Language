@@ -8,7 +8,7 @@ checks=0
 
 def run(args,ok=True):
     global checks
-    result=subprocess.run([str(x) for x in args],capture_output=True,text=True,timeout=60);checks+=1
+    result=subprocess.run([str(x) for x in args],capture_output=True,text=True,encoding="utf-8",timeout=60);checks+=1
     assert result.returncode==(0 if ok else 1),(args,result.returncode,result.stdout,result.stderr)
     return result
 
@@ -172,7 +172,7 @@ func entry(x: i32) -> i32:
 with tempfile.TemporaryDirectory(prefix='VOID sprint3 ') as temp:
     root=pathlib.Path(temp)
     for name,source in [('text',text),('collections',collections),('widths','\n'.join(indexchecks)+'\n'),('order',order)]:
-        path=root/(name+'.void');path.write_text(source);run([compiler,'check',path])
+        path=root/(name+'.void');path.write_text(source,encoding='utf-8');run([compiler,'check',path])
         for flags in [[],['--no-opt']]:
             assert run([compiler,'run',path,'0',*flags]).stdout.strip()=='1'
             obj=root/(name+str(len(flags))+'.o');exe=root/(name+str(len(flags))+('.exe' if os.name=='nt' else '.bin'))
@@ -182,22 +182,22 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint3 ') as temp:
     lines=['func entry(x: i32) -> i32:']
     for n,bytes in enumerate(malformed):
         lines.extend([f'    var bytes{n}: [u8] = '+str(bytes),f'    if string.from_utf8(bytes{n}) is Err(var message{n}):',f'        if message{n} != "invalid UTF-8":','            return 40','    else:','        return 41'])
-    lines.append('    return 1');path.write_text('\n'.join(lines)+'\n')
+    lines.append('    return 1');path.write_text('\n'.join(lines)+'\n',encoding='utf-8')
     for flags in [[],['--no-opt']]:
         assert run([compiler,'run',path,'0',*flags]).stdout.strip()=='1'
         obj=root/('malformed'+str(len(flags))+'.o');exe=root/('malformed'+str(len(flags))+('.exe' if os.name=='nt' else '.bin'));run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,'-o',exe]);assert run([exe,'0']).stdout.strip()=='1'
     for expression in ['""[0]','"abc"[3]','"abc"[-4]','"abc"[i64.min_value]','"abc"[u64.max_value]']:
-        path=root/'bounds.void';path.write_text('func entry(x: i32) -> i32:\n    var value = '+expression+'\n    return 1\n');run([compiler,'check',path])
+        path=root/'bounds.void';path.write_text('func entry(x: i32) -> i32:\n    var value = '+expression+'\n    return 1\n',encoding='utf-8');run([compiler,'check',path])
         for flags in [[],['--no-opt']]:
             assert 'String index' in run([compiler,'run',path,'0',*flags],False).stderr
             obj=root/('bounds'+str(len(flags))+'.o');exe=root/('bounds'+str(len(flags))+('.exe' if os.name=='nt' else '.bin'));run([compiler,'emit',path,'-o',obj,*flags]);run([clang,*link_flags,obj,runtime,fixture,'-o',exe]);failure=run([exe,'0'],False);assert 'String index' in failure.stdout+failure.stderr
 
     invalid=['var s = "x"\n    s[0] = "a"','var s = "x"\n    s.length = 2','var v = "a"[true]','var v = "a"[0.5]','var bytes: [i32] = [1]\n    var v = string.from_utf8(bytes)','var v = [1].get(true)','var v = [1].get(0.5)','var a: [i32, 1] = [1]\n    a.pop()','const a = [1]\n    a.pop()','const a = [1]\n    var b = a\n    b.pop()','var d = {1: 2}\n    d.get(true)']
     for body in invalid:
-        path=root/'invalid.void';path.write_text('func entry(x: i32) -> i32:\n    '+body+'\n    return x\n');run([compiler,'check',path],False)
+        path=root/'invalid.void';path.write_text('func entry(x: i32) -> i32:\n    '+body+'\n    return x\n',encoding='utf-8');run([compiler,'check',path],False)
     prefix='struct node:\n    value: i32\nvalue struct carrier:\n    children: [node]\n'
     for body in ['const a = [node()]\n    if a.get(0) is Ok(var child):\n        child.value = 2','const d = {1: node()}\n    if d.get(1) is Ok(var child):\n        child.value = 2','const a: [node, 1] = [node()]\n    if a.get(0) is Ok(var child):\n        child.value = 2','const a = [carrier(children = [node()])]\n    if a.get(0) is Ok(var item):\n        item.children[0].value = 2']:
-        path=root/'readonly.void';path.write_text(prefix+'func entry(x: i32) -> i32:\n    '+body+'\n    return x\n');assert 'readonly' in run([compiler,'check',path],False).stderr.lower()
-    path=root/'iterator.void';path.write_text('func entry(x: i32) -> i32:\n    var a = [1, 2]\n    for value in a:\n        a.pop()\n    return 1\n')
+        path=root/'readonly.void';path.write_text(prefix+'func entry(x: i32) -> i32:\n    '+body+'\n    return x\n',encoding='utf-8');assert 'readonly' in run([compiler,'check',path],False).stderr.lower()
+    path=root/'iterator.void';path.write_text('func entry(x: i32) -> i32:\n    var a = [1, 2]\n    for value in a:\n        a.pop()\n    return 1\n',encoding='utf-8')
     for flags in [[],['--no-opt']]:assert 'structurally modified' in run([compiler,'run',path,'0',*flags],False).stderr.lower()
 print(f'Sprint 3: {checks} text/collection normal/O2 JIT, linked AOT and diagnostic process checks passed')

@@ -1,0 +1,7 @@
+func delivery_cost(distance: i32, rate: i32 = 2) -> i32:
+    return distance * rate
+
+func entry(distance: i32) -> i32:
+    return delivery_cost(
+        distance = distance,
+    )
