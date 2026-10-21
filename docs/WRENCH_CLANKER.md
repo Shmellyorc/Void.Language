@@ -1,5 +1,18 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## CI #88 Windows output-path repair — 21 October 2026
+
+Boss reports Linux/macOS jobs passed and Windows Debug/Release each 152/158, with
+six failures rejecting the legitimate RUNNER~1 ancestor. The focused native path
+repair admits exact OS-registered short directory ancestors while retaining exact
+descendants/output leaves, reparse rejection and source/hard-link protection.
+[Repair and native gate](stage9/CI88_WINDOWS_PATH_REPAIR.md),
+[focused evidence](stage9/CI88_EVIDENCE.json): Linux Debug/Release/strict sanitizers
+8/8 each (24/24); native Windows post-repair checks remain mandatory and unexecuted
+locally. No tests/expectations were removed, full matrix repeated, Git mutation or
+hosted action performed. Earlier Stage 9/CI evidence remains historical.
+
+
 ## Stage 9 local completion / Wrench review — 21 October 2026
 
 All three authorized milestones are implemented. Final unfiltered local results:

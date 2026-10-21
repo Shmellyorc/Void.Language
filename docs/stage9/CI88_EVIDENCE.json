@@ -1,0 +1,107 @@
+{
+  "date": "2026-10-21",
+  "baseline": "aef1ad7c1dfc49a1940f0d239ed76e13ffcb972f",
+  "platform_executed": "Linux only",
+  "hosted_ci88": {
+    "run": "https://github.com/Shmellyorc/Void.Language/actions/runs/39645461021",
+    "evidence_owner": "Boss supplied; not rerun by agent",
+    "passed_jobs": [
+      "Ubuntu Debug",
+      "Ubuntu Release",
+      "Ubuntu Sanitizers",
+      "macOS ARM64 Debug",
+      "macOS ARM64 Release"
+    ],
+    "windows_debug": {
+      "passed": 152,
+      "total": 158
+    },
+    "windows_release": {
+      "passed": 152,
+      "total": 158
+    },
+    "failed_suites_per_windows_job": 6
+  },
+  "focused_local": {
+    "debug": {
+      "suites": 8,
+      "failures": 0,
+      "skipped": 0,
+      "tests": [
+        "application_workflow_stage9",
+        "native_output_paths_ci88",
+        "lsp_stage8",
+        "numeric_sprint2",
+        "ergonomics_sprint6",
+        "local_libraries",
+        "application_native_sprint4",
+        "text_collections_sprint3"
+      ],
+      "native_path_test_output": "Windows 8.3/reparse checks require native Windows; portable checks execute here.\nCI #88 physical output checks passed: 16"
+    },
+    "release": {
+      "suites": 8,
+      "failures": 0,
+      "skipped": 0,
+      "tests": [
+        "application_workflow_stage9",
+        "native_output_paths_ci88",
+        "lsp_stage8",
+        "numeric_sprint2",
+        "ergonomics_sprint6",
+        "local_libraries",
+        "application_native_sprint4",
+        "text_collections_sprint3"
+      ],
+      "native_path_test_output": "Windows 8.3/reparse checks require native Windows; portable checks execute here.\nCI #88 physical output checks passed: 16"
+    },
+    "san": {
+      "suites": 8,
+      "failures": 0,
+      "skipped": 0,
+      "tests": [
+        "application_workflow_stage9",
+        "native_output_paths_ci88",
+        "lsp_stage8",
+        "numeric_sprint2",
+        "ergonomics_sprint6",
+        "local_libraries",
+        "application_native_sprint4",
+        "text_collections_sprint3"
+      ],
+      "native_path_test_output": "Windows 8.3/reparse checks require native Windows; portable checks execute here.\nCI #88 physical output checks passed: 16"
+    }
+  },
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+  },
+  "sha256": {
+    "src/native_build.cpp": "80535e3564c3eb7fd3cf54f4e94d0684f2bbfc34904cd49ff9952cd86b6d4b22",
+    "CMakeLists.txt": "b5c4fcc757be948d6f236999348666a93a00259cad11a6131db86f50d1aceff4",
+    "tests/stage9/native_paths.py": "b49ff2d996e489b8e7ce587c0df0afb146f1e26687338774f34507bdbc215572",
+    "src/frontend/source.cpp": "2ca73c8aea5ea39e3d9992fef48ca86ff7ab8179e8912ebb9019e6fdcd30651f",
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    ".github/workflows/ci.yml": "efb35464c11f409e1d2191f66b61cd5c5e8fa6ef9a5d4a5096443e9c74ff78c5"
+  },
+  "logs_sha256": {
+    "build/ci88-path-repair/ci88-debug-build.log": "59ea3d8a2b1067e4b600fef5e41c271c86ca3736634cfbc36a27e99d13ebef72",
+    "build/ci88-path-repair/ci88-debug-configure.log": "d1732a554509609efc96c68372a9c6993d14af9ee6f3446be350e61f8a3915c4",
+    "build/ci88-path-repair/ci88-debug-final-build.log": "fa49a44bfa2ab5a9d75d518567c11a65e6461196844a9e50ed84adf64cdb021c",
+    "build/ci88-path-repair/ci88-debug-final-focused.log": "db71bcddc77015f8d0ccc888e753a8ab354ab7e35f160410bbf7d00ec6b7bdd4",
+    "build/ci88-path-repair/ci88-debug-focused.log": "ab45fd269c5bb071457dd4b01a19f112c50e781b2aac9f1102a5eb7863ec2491",
+    "build/ci88-path-repair/ci88-debug-focused.xml": "457a1f7a625e2e8a2084117e139a96fa9b192047109a614c20b65148f4d70483",
+    "build/ci88-path-repair/ci88-release-build.log": "965b1fd9ddedf2e65ad41388985da24cfa00e03367dff5d5946db437ede7b8b8",
+    "build/ci88-path-repair/ci88-release-configure.log": "b5e62cc8b6ce022e29d1a7ba49b27892493cbf406c3db12e9b9170b86869c0e3",
+    "build/ci88-path-repair/ci88-release-focused.log": "4d311c9a807f1319edc0254c0741d9e148b803950218571270b1a1ccf7c331c0",
+    "build/ci88-path-repair/ci88-release-focused.xml": "53e310e7ba2273edd1eb0c5d32e844707644ca97202330800990ed30020dc419",
+    "build/ci88-path-repair/ci88-san-build.log": "a0f1e60c650657bb257c4a5fbb5b90beb6051128f907ec55f733b69b87559d0a",
+    "build/ci88-path-repair/ci88-san-configure.log": "7cbd64f7131d695094c182041401cb6bd545e98c3c1217922023639e444eea67",
+    "build/ci88-path-repair/ci88-san-focused.log": "4e4f651cb1ffc2852fafb6542fc152c3218f416a40d20dabdef0877ed154925a",
+    "build/ci88-path-repair/ci88-san-focused.xml": "811bf71114b8e3b074ae7ea815c9c770116b66bc819110f5d84dec3af8f9179c",
+    "build/ci88-path-repair/debug-LastTest.log": "11487a1b65087b498a3c80b282db0c5e93a2bf3278c77bdea2cb83a4420b5508",
+    "build/ci88-path-repair/release-LastTest.log": "029be37ec5726ddb72f5402170536a42a84c35f6cc577ff3a130dfb6a917a46e",
+    "build/ci88-path-repair/san-LastTest.log": "2c26dfba5357668565569ffec613e733b0f7ae7370f38dfda86b31f24daede55"
+  },
+  "native_windows": "Not executed locally; positive registered 8.3 ancestor and reparse junction checks are mandatory in the added hosted suite."
+}

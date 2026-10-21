@@ -1,5 +1,11 @@
 # Stage 9 engineering and acceptance — 21 October 2026
 
+> CI #88 update, 21 October 2026: the owner reported five successful Linux/macOS
+> jobs and Windows Debug/Release 152/158 with a physical output ancestor regression.
+> [Focused repair/evidence](CI88_WINDOWS_PATH_REPAIR.md) supersede the current path
+> disposition; this original local acceptance snapshot and its hashes remain intact.
+
+
 Status: all three milestones implemented; final local gates passed; ready for Wrench
 review with the unexplained preliminary process observations below disclosed.
 Windows/macOS and hosted acceptance remain unverified.

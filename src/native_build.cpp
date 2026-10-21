@@ -13,16 +13,43 @@
 namespace vd {
 namespace {
 namespace fs = std::filesystem;
-// Output paths are physical paths, never VFS identities. Permit ancestor aliases
-// such as macOS /var, but require exact spelling of each existing component.
+// Physical paths, not VFS identities. Match each component before advancing;
+// never canonicalize the destination and erase descendant spelling/alias evidence.
 void exact_path(const fs::path& path) {
     auto current=path.root_path();
     for(const auto& component:path.relative_path()) {
-        bool found=false;
+        fs::path next;
         for(const auto& child:fs::directory_iterator(current))
-            if(child.path().filename()==component){found=true;break;}
-        if(!found)throw std::runtime_error("Output path has incorrect spelling: "+path_utf8(current/component));
-        current/=component;
+            if(child.path().filename()==component){next=child.path();break;}
+#ifdef _WIN32
+        if(next.empty()) {
+            // Like discover_project's Windows prefix walk, expand only a checked
+            // existing directory ancestor. Unlike GetLongPathNameW alone, the
+            // registered alternate name proves this is an exact OS 8.3 spelling,
+            // rather than a case-insensitive match of an ordinary long name.
+            WIN32_FIND_DATAW entry{};
+            const auto candidate=current/component;
+            auto handle=FindFirstFileW(candidate.c_str(),&entry);
+            if(handle!=INVALID_HANDLE_VALUE) {
+                FindClose(handle);
+                if(entry.cAlternateFileName[0] && component.native()==entry.cAlternateFileName &&
+                   (entry.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+                    if(entry.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)
+                        throw std::runtime_error("Output path contains a reparse point: "+path_utf8(candidate));
+                    next=current/entry.cFileName;
+                }
+            }
+        }
+        if(!next.empty()) {
+            const auto attributes=GetFileAttributesW(next.c_str());
+            if(attributes==INVALID_FILE_ATTRIBUTES)
+                throw std::system_error(GetLastError(),std::system_category(),"Cannot inspect physical path");
+            if((attributes & FILE_ATTRIBUTE_DIRECTORY) && (attributes & FILE_ATTRIBUTE_REPARSE_POINT))
+                throw std::runtime_error("Output path contains a reparse point: "+path_utf8(next));
+        }
+#endif
+        if(next.empty())throw std::runtime_error("Output path has incorrect spelling: "+path_utf8(current/component));
+        current=std::move(next);
     }
 }
 fs::path output_path(const ValidatedAnalysis& analysis,const fs::path& requested) {

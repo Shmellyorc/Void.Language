@@ -46,7 +46,11 @@ Default executable: `<selected-root>/build/<entry-stem>` with `.exe` on Windows.
 An explicit `-o` is caller-relative or absolute. Emit remains object-only.
 Outputs cannot overwrite selected/imported sources or name `.void` files. Existing
 output symlinks, non-files and incorrect physical spelling reject. Physical
-identity catches hard-link collisions. Same-parent private staging preserves old
+identity catches hard-link collisions. [CI #88's repair](stage9/CI88_WINDOWS_PATH_REPAIR.md)
+admits exact OS-registered Windows short directory ancestors; ordinary descendant
+case and output-file spelling stay exact. Directory reparse points reject on
+Windows; POSIX/macOS ancestor-symlink behavior remains unchanged. No complete
+output canonicalization changes source identities. Same-parent private staging preserves old
 artifacts through source/backend/toolchain/link failures; failed intermediates are
 removed. POSIX rename and Windows replacement publish only a successfully produced
 artifact. A Windows executing/locked destination can reject replacement without
