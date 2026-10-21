@@ -5,6 +5,12 @@ completeness audit and Stage 7 hosted acceptance.
 
 **Current status — 21 October 2026:**
 
+**CI #85 repair update:** [Windows editor discovery evidence](stage8/CI85_WINDOWS_EDITOR_REPAIR.md)
+records a drive-only prefix correction and additional native regressions. Focused
+Linux Debug/Release, units and actual editor profiles passed; native Windows
+verification and Wrench review remain pending. No language-policy change, hosted
+lock or new stage is approved. Earlier CI snapshots below remain historical.
+
 **Later CI #83/#84 repair:** See [cross-platform discovery/editor evidence](stage8/CI84_DISCOVERY_REPAIR.md).
 CI #84 Windows compiler Debug passed 156/156; Release succeeded. A test-only
 separator assertion and CI #83 macOS /var discovery failure have focused repairs,

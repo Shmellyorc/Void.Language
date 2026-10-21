@@ -1,0 +1,60 @@
+{
+  "run_id": 39587658170,
+  "job_id": 119180481831,
+  "baseline": "e8a1ea7433b465c3800090a7b84737d7474c9228",
+  "jobs": [
+    {
+      "id": 119180481511,
+      "name": "macOS ARM64 / Debug",
+      "status": "completed",
+      "conclusion": "cancelled"
+    },
+    {
+      "id": 119180481814,
+      "name": "Windows 2022 / Release",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 119180481820,
+      "name": "Ubuntu 24.04 / Debug",
+      "status": "completed",
+      "conclusion": "cancelled"
+    },
+    {
+      "id": 119180481831,
+      "name": "Windows 2022 / Debug",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 119180481881,
+      "name": "macOS ARM64 / Release",
+      "status": "completed",
+      "conclusion": "cancelled"
+    },
+    {
+      "id": 119180481924,
+      "name": "Ubuntu 24.04 / Sanitizers",
+      "status": "completed",
+      "conclusion": "cancelled"
+    },
+    {
+      "id": 119180482004,
+      "name": "Ubuntu 24.04 / Release",
+      "status": "completed",
+      "conclusion": "cancelled"
+    }
+  ],
+  "failure_excerpts": [
+    "2026-10-21T11:06:18.6377674Z 100% tests passed, 0 tests failed out of 156\r",
+    "2026-10-21T11:07:03.4292787Z Error notification: VOID: Command failed: D:\\a\\Void.Language\\Void.Language\\build\\Debug\\voidls.exe --discover c:\\Users\\runneradmin\\AppData\\Local\\Temp\\VOID editor é😀 osIlXV\\project space # % c:\\Users\\runneradmin\\AppData\\Local\\Temp\\VOID editor é😀 osIlXV\\project space # %\\main.void \r",
+    "2026-10-21T11:07:03.4294812Z voidls: Active file is outside selected workspace\r",
+    "2026-10-21T11:07:23.4357351Z Error: Timed out: initial server\r",
+    "2026-10-21T11:07:23.4359574Z Editor test failure: Error: Timed out: initial server\r",
+    "2026-10-21T11:07:23.4360288Z Extension host test runner error Error: Timed out: initial server\r",
+    "2026-10-21T11:07:23.4364492Z Error: Timed out: initial server\r"
+  ],
+  "native_intermediate_canonical_and_expanded_paths": "not present in inspected log; native tracing still required",
+  "actions_started_by_agent": false
+}

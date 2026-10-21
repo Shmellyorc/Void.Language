@@ -23,10 +23,15 @@ def source_uri(actual, expected):
         assert os.path.samefile(url2pathname(urlsplit(actual).path),expected),actual
     else: assert actual==expected.resolve().as_uri(),actual
 
-def short_path(path):
+def drive_spellings(path):
+    drive=path.drive
+    if len(drive)!=2 or drive[1]!=':': return [path]
+    return [pathlib.Path(letter+str(path)[1:]) for letter in [drive[0].upper(),drive[0].lower()]]
+
+def windows_path(function, path):
     import ctypes
     from ctypes import wintypes
-    get=ctypes.WinDLL('kernel32',use_last_error=True).GetShortPathNameW
+    get=getattr(ctypes.WinDLL('kernel32',use_last_error=True),function)
     get.argtypes=[wintypes.LPCWSTR,wintypes.LPWSTR,wintypes.DWORD];get.restype=wintypes.DWORD
     size=get(str(path),None,0)
     if not size: return None
@@ -35,7 +40,9 @@ def short_path(path):
     if not length or length>=size: return None
     return pathlib.Path(buffer.value)
 
-with tempfile.TemporaryDirectory(prefix='VOID discovery é😀 ') as temp:
+def short_path(path): return windows_path('GetShortPathNameW',path)
+
+with tempfile.TemporaryDirectory(prefix='VOID discovery é😀 # % ') as temp:
     root=pathlib.Path(temp);project=root/'project';library=root/'stdlib'
     (project/'app/systems').mkdir(parents=True);(library/'io').mkdir(parents=True)
     os.environ['VOID_STDLIB_ROOT']=str(library)
@@ -73,35 +80,71 @@ with tempfile.TemporaryDirectory(prefix='VOID discovery é😀 ') as temp:
             made=subprocess.run(['cmd','/c','mklink','/J',str(link),str(target)],capture_output=True)
             if made.returncode:
                 print('SKIP: directory alias creation unavailable');continue
-        try: reject(workspace,link/'new.void')
+        try:
+            reject(workspace,link/'new.void')
+            if os.name=='nt':
+                for w in drive_spellings(workspace):
+                    for a in drive_spellings(link/'new.void'): reject(w,a)
         finally:
             if link.is_symlink(): link.unlink()
             else: link.rmdir()
     if os.name=='nt':
         # Expand only the temp ancestor: descendants retain their exact VFS names.
         long_root=root.resolve();short_root=short_path(long_root)
-        if short_root is None or os.path.normcase(str(short_root))==os.path.normcase(str(long_root)):
-            print('SKIP: distinct Windows 8.3 spelling unavailable')
-        else:
-            assert os.path.samefile(short_root,long_root)
-            for workspace in [long_root/'project',short_root/'project']:
-                for spelling in [long_root,short_root]:
-                    selection(discover(workspace,spelling/'project/app/systems/player.void'),entry,project)
-                    selection(discover(workspace,spelling/'project/main.void'),entry,project)
-                    reject(workspace,spelling/'project-other/new.void',message='outside selected workspace')
-                    reject(workspace,spelling/'project/APP/systems/player.void',message='alias')
-                    nested.write_text('invalid selected source must not trigger fallback',encoding='utf-8')
-                    try: selection(discover(workspace,spelling/'project/app/systems/player.void'),nested,project/'app')
-                    finally: nested.unlink()
-            # A short-name component *inside* the VFS remains an alias, even
-            # though alternate spellings of the workspace prefix are allowed.
+        roots=[long_root]
+        has_short=short_root is not None and os.path.normcase(str(short_root))!=os.path.normcase(str(long_root))
+        if has_short:
+            assert os.path.samefile(short_root,long_root);roots.append(short_root)
+        else: print('SKIP: distinct Windows 8.3 spelling unavailable')
+        spellings=[p for r in roots for p in drive_spellings(r)]
+        # Keep redirected Windows cp1252 test logs safe without losing scalars.
+        print('Windows drive discovery fixture:',json.dumps({'original':str(root),'canonical':str(long_root),
+            'expanded_lower':str(windows_path('GetLongPathNameW',drive_spellings(long_root)[-1]))},ensure_ascii=True))
+        for w in spellings:
+            for a in spellings:
+                selection(discover(w/'standalone',a/'standalone/saved.void'),saved,standalone,True)
+                pending=discover(w/'standalone',a/'standalone/new.void')
+                assert pending['standalone'] and pathlib.Path(pending['entry']).name=='new.void',pending
+                assert os.path.samefile(pending['root'],standalone) and os.path.samefile(pathlib.Path(pending['entry']).parent,standalone),pending
+        for workspace in [p/'project' for p in spellings]:
+            selection(discover(workspace),entry,project)
+            for spelling in spellings:
+                selection(discover(workspace,spelling/'project/app/systems/player.void'),entry,project)
+                selection(discover(workspace,spelling/'project/main.void'),entry,project)
+                reject(workspace,spelling/'project-other/new.void',message='outside selected workspace')
+                reject(workspace,spelling/'project/APP/systems/player.void',message='alias')
+                selection(discover(workspace,spelling/'project/app/systems/player.void',spelling/'project/main.void'),entry,project)
+                nested.write_text('invalid selected source must not trigger fallback',encoding='utf-8')
+                try: selection(discover(workspace,spelling/'project/app/systems/player.void'),nested,project/'app')
+                finally: nested.unlink()
+        # An unrelated drive must stay outside even if SUBST maps the same files.
+        import ctypes
+        drives=ctypes.WinDLL('kernel32').GetLogicalDrives()
+        assert drives,'GetLogicalDrives failed'
+        unused=next((chr(65+n)+':' for n in range(25,-1,-1) if not (drives & (1<<n))),None)
+        if unused:
+            mapped=subprocess.run(['subst',unused,str(long_root)],capture_output=True)
+            if mapped.returncode==0:
+                try:
+                    for workspace in [p/'project' for p in spellings]:
+                        reject(workspace,pathlib.Path(unused+'/project/main.void'),message='outside selected workspace')
+                finally: subprocess.run(['subst',unused,'/D'],check=True,capture_output=True)
+                print('Windows unrelated mapped-drive rejection passed')
+            else: print('SKIP: disposable SUBST drive unavailable')
+        else: print('SKIP: no unused drive for SUBST coverage')
+        # Always reject another drive, including when mapping is unavailable.
+        other='D' if long_root.drive[:1].upper()!='D' else 'C'
+        reject(long_root/'project',pathlib.Path(other+str(long_root/'project/main.void')[1:]))
+        if has_short:
+            # Short-name descendants remain aliases, regardless of drive case.
             long_child=project/'long-project-directory';long_child.mkdir()
             short_child=short_path(long_child.resolve())
             if short_child and short_child.name!=long_child.name:
-                reject(long_root/'project',long_root/'project'/short_child.name/'new.void',message='alias')
-                reject(short_root/'project',short_root/'project'/short_child.name/'new.void',message='alias')
+                for spelling in spellings:
+                    reject(spelling/'project',spelling/'project'/short_child.name/'new.void',message='alias')
             else: print('SKIP: descendant short-name alias unavailable')
             print('Windows short/long workspace ancestor checks passed')
+        print('Windows upper/lower drive workspace and active checks passed')
     else: print('SKIP: Windows 8.3 coverage requires Windows')
     if os.name!='nt':
         # Model macOS /var -> /private/var on every POSIX host. The alias is

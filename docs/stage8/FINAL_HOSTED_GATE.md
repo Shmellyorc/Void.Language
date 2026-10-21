@@ -1,4 +1,16 @@
-# Stage 8 final acceptance gate — CI #83/#84 repairs; not locked
+# Stage 8 final acceptance gate — CI #85 editor repair; not locked
+
+21 October 2026 latest update: CI #85 at
+`e8a1ea7433b465c3800090a7b84737d7474c9228` passed Windows Debug compiler
+156/156 and extension units, then failed actual editor discovery with lowercase
+drive spelling. Windows Release succeeded; the other five jobs were cancelled.
+Review [the drive-prefix/editor repair](CI85_WINDOWS_EDITOR_REPAIR.md). Require
+Windows Debug **and Release** drive/8.3/alias/junction/other-drive regressions,
+record optional SUBST/8.3 skips, and complete Debug's actual editor profiles.
+The stale interpolation assertion found by local editor execution is corrected
+without losing rejection/recovery coverage. Native results and all seven required
+job outcomes remain owner-controlled; Wine/Linux do not establish a hosted lock.
+No rerun was triggered. Earlier dated evidence follows.
 
 21 October 2026 later update: CI #84 Windows compiler Debug passed 156/156 and
 Release succeeded, establishing execution of the earlier Unicode repair. Debug

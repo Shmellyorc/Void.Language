@@ -181,6 +181,11 @@ ProjectSelection discover_project(const std::filesystem::path& workspace,
             auto length=GetLongPathNameW(prefix.c_str(),expanded.data(),size);
             if(!length || length>=size)throw std::invalid_argument("Project directory spelling changed during discovery");
             expanded.resize(length);
+            // DOS drive letters are not VFS components. Match only that letter
+            // to the canonical boundary; preserve every directory's exact case.
+            auto drive=fs::path(expanded).root_name().native(), expected=boundary.root_name().native();
+            auto fold=[](wchar_t c){return c>=L'A'&&c<=L'Z'?c+(L'a'-L'A'):c;};
+            if(drive.size()==2 && expected.size()==2 && drive[1]==L':' && expected[1]==L':' && fold(drive[0])==fold(expected[0]))expanded[0]=expected[0];
             if(fs::path(expanded)==boundary) {relative=suffix.empty()?fs::path("."):suffix;break;}
             auto parent=prefix.parent_path();
             if(parent==prefix)break;

@@ -95,6 +95,20 @@ export async function run(): Promise<void> {
             console.log('PASS real editor restricted trust: no native child spawned'); return;
         }
         assert(vscode.workspace.isTrusted);
+        if(process.platform==='win32') {
+            // Exercise the exact native discovery inputs supplied by the editor,
+            // including URI.fsPath's drive spelling and the Unicode/#/% fixture.
+            const workspace=vscode.workspace.workspaceFolders![0].uri.fsPath;
+            const active=mainUri.fsPath;
+            for(const letter of [workspace[0].toUpperCase(),workspace[0].toLowerCase()]) {
+                const selected=JSON.parse(cp.execFileSync(process.env.VOIDLS_PATH!,
+                    ['--discover',letter+workspace.slice(1),active,''],{encoding:'utf8',timeout:10000}));
+                assert.equal(path.normalize(selected.root),path.normalize(root));
+                assert.equal(path.normalize(selected.entry),path.normalize(mainEntry));
+                assert.equal(selected.standalone,false);
+            }
+            record('PASS real Windows editor discovery: upper/lower workspace drives with actual URI.fsPath');
+        }
         await until(() => api!.status().state, s => s === 'running', 'initial server');
         assert.equal(children.length, 1);
         // Definition request flushes full-document synchronization through the client.
@@ -182,8 +196,11 @@ export async function run(): Promise<void> {
         await replace(worker, withStrings);
         await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'valid UTF-8 string source');
         assert.equal((await definitions())?.[0].uri.toString(), workerUri.toString());
+        await replace(worker, withStrings.replace('{{braces}}', '{"braces"}'));
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'valid string interpolation');
+        assert.equal((await definitions())?.[0].uri.toString(), workerUri.toString());
         await replace(worker, withStrings.replace('{{braces}}', '{braces}'));
-        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.some(d => d.message.includes('interpolation is deferred')), 'reserved string interpolation diagnostic');
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.some(d => code(d)==='VOID2002' && d.message.includes('braces')), 'unknown interpolation identifier diagnostic');
         assert.equal((await definitions())?.length ?? 0, 0);
         await replace(worker, originalText);
         await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'string edit repair');

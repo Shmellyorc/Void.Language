@@ -39,6 +39,17 @@ test('validate executable and deterministic canonical project selection', async 
         assert.equal(path.normalize(project.root), path.normalize(await fs.realpath(directory)));
         assert.equal(path.normalize(project.entry), path.normalize(path.join(project.root, 'main.void')));
         assert(!project.singleFile);
+        if(process.platform==='win32') {
+            // The original explicit-entry check bypasses ancestor discovery.
+            // Cover automatic selection with the editor's lowercase drive too.
+            for(const w of [directory[0].toUpperCase(),directory[0].toLowerCase()])
+                for(const a of [directory[0].toUpperCase(),directory[0].toLowerCase()]) {
+                    const automatic=await resolveProject({...settings,entry:''},[w+directory.slice(1)],path.join(a+directory.slice(1),'main.void'));
+                    assert.equal(path.normalize(automatic.root),path.normalize(await fs.realpath(directory)));
+                    assert.equal(path.normalize(automatic.entry),path.normalize(await fs.realpath(path.join(directory,'main.void'))));
+                    assert(!automatic.singleFile);
+                }
+        }
         await fs.rm(path.join(directory, 'main.void'));
         const fallback = await resolveProject({...settings, entry: ''}, [directory], path.join(directory, 'single.void'));
         assert(fallback.singleFile);

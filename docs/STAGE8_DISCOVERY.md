@@ -59,6 +59,12 @@ project VFS root. An absent main permits a labelled standalone active-file edito
 selection, including a named unsaved file whose parent exists. An explicit override
 must exist. Selection without a workspace uses the labelled standalone fallback.
 
+The Windows long-name prefix comparison permits ASCII case equivalence for a
+matching ordinary DOS drive letter only. It adopts the canonical boundary's drive
+spelling before exact prefix comparison, preserving every descendant component,
+unrelated drive and existing UNC/device rules. [CI #85 evidence](stage8/CI85_WINDOWS_EDITOR_REPAIR.md)
+records automatic/editor regressions and pending native Debug/Release execution.
+
 On POSIX, equivalent workspace-ancestor spellings (including macOS `/var` and
 `/private/var`) are admitted by scanning prefixes from the filesystem root and
 stopping at the first canonical workspace match. A matching prefix itself cannot

@@ -1,6 +1,6 @@
 # Work log
 
-**Current handoff:** [Documentation index](README.md), [CI #83/#84 discovery repair](stage8/CI84_DISCOVERY_REPAIR.md) and [final hosted checklist](stage8/FINAL_HOSTED_GATE.md). All six Stage 8 sprints have local evidence; native macOS Debug/Release and Windows editor verification remain pending. Stage 8 is not hosted locked. Earlier entries retain historical evidence.
+**Current handoff:** [Documentation index](README.md), [CI #85 Windows editor repair](stage8/CI85_WINDOWS_EDITOR_REPAIR.md) and [final hosted checklist](stage8/FINAL_HOSTED_GATE.md). All six Stage 8 sprints have local evidence; native verification of the latest repair and Wrench review remain pending. Stage 8 is not hosted locked. Earlier entries retain historical evidence.
 
 ## 14 October 2026: Phase 22 UTF-8 foundation implementation
 
@@ -14192,3 +14192,40 @@ macOS Debug/Release and Windows editor-host verification remain pending.
 retain logs, source hashes, CI snapshots and limitations. Updated index, Wrench,
 approvals, discovery contract and final hosted checklist. No commit, push, branch,
 website/root README edit, language feature or Stage 9 work. Stop for Wrench review.
+
+## 21 October 2026 — CI #85 Windows editor drive-prefix repair
+
+Baseline `e8a1ea7433b465c3800090a7b84737d7474c9228`. Inspected exact Windows
+Debug log: 156/156 compiler suites and extension units passed; actual editor sent
+lowercase c: workspace/active paths containing é😀, spaces and # %. Native
+preflight rejected containment; initial-server timeout followed. Release succeeded;
+the other five jobs were cancelled, not accepted.
+
+Confirmed the drive-sensitive lexical comparison defect from source and a compiled
+counterexample before production changes. WinAPI/Wine experiments demonstrate
+GetLongPathNameW retaining a lower drive while upper-handle canonical output can
+use upper case. Wine lower/lower remained lower; exact hosted intermediate paths
+were not logged. This distinction and native verification limits are explicit in
+[the repair record](stage8/CI85_WINDOWS_EDITOR_REPAIR.md), not silently promoted
+to a native reproduction.
+
+The five-line Windows correction aligns only a matching ordinary DOS drive letter
+with the canonical boundary. Reparse/alias, suffix case, unrelated drives, Unicode,
+8.3, import identity and readonly checks remain. POSIX code is unchanged. Expanded
+Windows LSP/config/editor tests cover independent drives, short/long ancestors,
+saved/unsaved fallback, optional SUBST rejection, junctions and actual URI.fsPath
+startup. No production adapter semantics changed.
+
+Final focused Linux Debug 7/7 (29.42s), Release 7/7 (12.40s); discovery repeats
+1/1 each are not additional unique suites. Extension typecheck/build passed;
+explicit units 4/4 per server configuration. Actual VS Code 1.141.0 profiles
+trusted/restricted/multi-root passed 3/3 with Debug and 3/3 with Release. Initial
+Wine/Electron sandbox/setup failures and the first actual host's stale interpolation
+assertion are retained. Replaced the obsolete deferral message expectation with
+supported-string interpolation plus VOID2002 unknown-substitution rejection,
+failed navigation and repair; no language or compiler diagnostic policy changed.
+
+Updated evidence, discovery contract, index, approvals, Wrench and final checklist.
+Native Windows Debug/Release drive/8.3/junction/SUBST and actual editor execution
+remain required for Wrench/Boss review. No hosted action, Git mutation, root README,
+website or Stage 9 work. Stage 8 remains not hosted locked.

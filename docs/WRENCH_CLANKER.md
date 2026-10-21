@@ -32,7 +32,24 @@ routine development. It authorizes no additional sprint, commit, push or hosted 
 Clankers and takes precedence over older communication/checkpoint practices below.
 Boss retains Git and hosted acceptance control.
 
-## CI #83/#84 discovery repair handoff — 21 October 2026
+## CI #85 Windows editor repair handoff — 21 October 2026
+
+Review [CI #85 repair evidence](stage8/CI85_WINDOWS_EDITOR_REPAIR.md), baseline
+`e8a1ea7433b465c3800090a7b84737d7474c9228`. Windows Debug compiler 156/156
+and extension units passed; editor discovery rejected lowercase-drive inputs.
+The tiny Windows correction makes only an equivalent DOS drive letter match the
+canonical prefix; descendants, other drives, aliases/reparse points, 8.3 rules,
+Unicode and POSIX discovery retain their contracts. Tests add independent drive
+spellings, optional mapped-drive rejection and actual Windows editor preflight.
+The real Linux host exposed a stale interpolation-deferred expectation; its
+replacement preserves rejection/repair and adds a supported interpolation check.
+Local focused Debug/Release 7/7 and units 4/4 each passed. Consult the record for
+real editor profiles, failed attempts and the limits of Wine/source experiments:
+native Windows intermediate strings were not captured. Wrench review and native
+Debug/Release verification remain required. No hosted lock, Git/CI action or
+Stage 9 is authorized. Older handoffs below are historical.
+
+## Historical CI #83/#84 discovery repair handoff — 21 October 2026
 
 Review [cross-platform repair evidence](stage8/CI84_DISCOVERY_REPAIR.md) at baseline
 `dbe01209e4e32da01260b4faaa66b8ce4020ad82`. CI #84 Windows Debug compiler

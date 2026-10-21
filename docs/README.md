@@ -47,7 +47,17 @@ README only if Boss explicitly requests a public-facing README change.”
 Preserve historical evidence and distinguish approved direction, local verification,
 review and hosted locks. Never mark work implemented or locked without verification.
 
-## CI #83/#84 discovery repair handoff — 21 October 2026
+## CI #85 Windows editor repair handoff — 21 October 2026
+
+At `e8a1ea7433b465c3800090a7b84737d7474c9228`, Windows Debug passed 156/156
+compiler suites and extension units, then failed actual editor discovery with a
+lowercase drive. The [focused repair and evidence limits](stage8/CI85_WINDOWS_EDITOR_REPAIR.md)
+cover drive-only boundary equivalence, retained path security and expanded native
+regressions. Linux focused Debug/Release passed 7/7 each and units 4/4 each;
+real editor profile outcomes are retained in the repair evidence. Native Windows
+Debug/Release execution is still required. No hosted lock or next stage is implied.
+
+## Historical CI #83/#84 discovery repair handoff — 21 October 2026
 
 At `dbe01209e4e32da01260b4faaa66b8ce4020ad82`, CI #84 Windows Debug passed
 156/156 compiler suites, then failed an extension path-separator assertion;
