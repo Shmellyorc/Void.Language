@@ -1,0 +1,17 @@
+{
+  "baseline": "10f77fac23273c5af3fa3be6683c72c8ac059584",
+  "sha256": {
+    "CMakeLists.txt": "e59593eda8700d0dd81c7a1ffefcb3aa049b0b51f1248de2bcf5e70a06197ce0",
+    "cmake/NativeBuild.cmake": "251c058d6aa6eb5297a51fe0b7521e9e8c048a2b4b3da7f4c9f598fdddd552eb",
+    "include/void/native_build.hpp": "7e67d03d299f6fc3cec76adcaad4b7ec090ae44faeb722b6053da36e7229405f",
+    "src/backend/llvm/backend.cpp": "fbe77e9c95160ff85da10536f88db7dca68acc90320b12ea496f46b6df4715e0",
+    "src/main.cpp": "bb39594b99bdf00a8298fd47bc63ff5c8cb9fdc4f236701685f10a2a75554508",
+    "src/native_build.cpp": "1af8e2016832a26ab4171f1c5f01431f87503cf19193f08ad1dfdbf8e4d82e4d",
+    "tests/arrays/storage_audit.cpp": "28bc6b9b96b560146a5f54000d27607a04d48e267418bb6bd97efdc0ad9d76d1",
+    "tests/stage8/local_libraries.py": "62d1a2b3948b551ae8b66a72b8b1f179d31543a1dfa5374422cd77d85ce703ac",
+    "tests/stage8/sprint4.py": "57b3eafc93e541e5e24fb0e11c5468af6c7250c52b9ba3e619d71679ea7a64cd",
+    "tests/stage8/sprint6.py": "96b975d90f70c70bee5c9430b080a1a3cf58813164213de580410af216f437de",
+    "tests/stage9/workflow.py": "542a752453460d9dd73a747c696d03b9d5dfc946b271f788eede06b7a6286a51"
+  },
+  "protected_readme_sha256": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add"
+}

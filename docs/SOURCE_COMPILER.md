@@ -6,7 +6,8 @@ has/if/multiline-call/string-interpolation extensions. Historical phase-only
 exclusions below are superseded by those delivered contracts.
 
 The current [Stage 8 application contract](STAGE8_APPLICATION_NATIVE.md) records
-explicit `--app` hosting alongside the preserved legacy CLI described below.
+automatic application hosting and real native executable builds; see
+[Stage 9](STAGE9_APPLICATION_WORKFLOW.md).
 
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
@@ -379,12 +380,13 @@ requirements. Independent IR validation recomputes complete nominal/binding univ
 and effects. See [INTERFACES.md](INTERFACES.md) for the source contract, budgets,
 publication, reload policy, deferred value erasure/boxing and private ABI boundaries.
 
-## Stage 8 application hosting
+## Application hosting (Stage 9 supersedes Sprint 4 CLI selection)
 
-Sprint 4's [application contract](STAGE8_APPLICATION_NATIVE.md) adds explicit
-`voidc run <file-or-directory> --app` and
-`voidc emit <file-or-directory> -o <object> --app`, retaining `--no-opt` and Debug
-run caching. Applications accept no numeric operand and return their status
+[Stage 9](STAGE9_APPLICATION_WORKFLOW.md) selects application/legacy mode from
+validated compiler analysis. `voidc run [file-or-directory]` and `voidc build
+[file-or-directory] [-o executable]` default to cwd discovery; `voidc emit
+<file-or-directory> -o <object>` keeps object emission. Options retain `--no-opt`
+and Debug run caching. The old application flag is removed and rejected. Applications accept no numeric operand and return their status
 without printing it. The linked executable likewise accepts no arguments.
 Invalid invocation exits 2; compile/runtime failure exits 1. Platform exit-code
 representation applies to explicit i32 results.
@@ -395,7 +397,7 @@ when combined. Top-level fallthrough/bare return yields 0; an i32 return supplie
 status. Explicitly typed main requires a return on every reachable path. Imported
 executable statements reject. Top-level variables remain body locals. Declaration-
 only legacy entry programs retain their printed numeric adapter and precedence
-over an ordinary main helper. Use existing legacy commands without `--app`.
+over an ordinary main helper. Numeric input remains exclusive to legacy entry.
 
 Implementation and local acceptance status are maintained in the linked contract;
 this does not grant editor execution, native import trust or hosted acceptance.

@@ -501,7 +501,21 @@ int main(int argc,char **argv) {
             auto p=compile_project(std::filesystem::path(argv[2])/"examples/inheritance/stress.void");
             auto object=out/"virtual-tail-O2.o";
             {std::ofstream owner(object);owner<<"existing owner object";}
-            rejects([&]{emit_aot_storage_proof(p.module,object,true,object.string()+".certificate.json");},"final encoded calls differ");
+            // The stderr adapter changes LLVM's module-wide inline budget. Keep
+            // the real virtual tail dispatcher outlined so this negative checks
+            // final-byte reconciliation rather than an incidental inline choice.
+            const auto seed=out/"virtual-tail-source-O2.o";
+            emit_aot_storage_proof(p.module,seed,true,seed.string()+".certificate.json");
+            llvm::LLVMContext context;AotObjectEmitter emitter(llvm::sys::getDefaultTargetTriple(),true);
+            auto original=parse(context,emitter,read(seed.string()+".original.ll"));
+            unsigned dispatchers=0;
+            for(auto& function:*original)if(function.getName().starts_with("virtual_")) {
+                function.addFnAttr(llvm::Attribute::NoInline);++dispatchers;
+            }
+            check(dispatchers>0,"virtual tail fixture lost its dispatcher");
+            auto homes=inventory(*original,false);emitter.freeze(*original,homes);emitter.optimize();
+            rejects([&]{emitter.deliver(object);},"final encoded calls differ");
+            {std::ofstream evidence(object.string()+".certificate.json");evidence<<emitter.report();}
             check(read(object)=="existing owner object","unproved tail encoding damaged destination");std::filesystem::remove(object);
             emit_object(p.module,out/"ordinary-virtual-tail-O2.o",true,true);
             Jit jit;auto code=jit.compile(p.module,p.module.entry_symbol,true);

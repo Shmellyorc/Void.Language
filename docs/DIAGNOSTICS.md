@@ -338,3 +338,13 @@ structural conformance, generic specialization, capabilities and checked failure
 rules remain authoritative. Both conditional branches type-check. Formatting and
 numeric/bool/custom string conversion remain deferred. Approval and implementation
 are separate from local acceptance, Wrench review and the final hosted lock.
+
+
+## Stage 9 native workflow — 21 October 2026
+
+The [workflow contract](STAGE9_APPLICATION_WORKFLOW.md) distinguishes usage status
+2, validation/runtime/toolchain/link failure status 1 and application-defined
+statuses. Checked AOT failure messages/traces now use stderr and preserve the
+existing source diagnostic contents and 32-caller bound; scalar objects retain
+their CRT-only diagnostic dependency. Real executable/JIT parity includes exact
+stdout/stderr, source locations and cleanup regressions.

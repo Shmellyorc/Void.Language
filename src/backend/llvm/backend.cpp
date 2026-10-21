@@ -1787,8 +1787,23 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         auto* message = b.CreateLoad(b.getPtrTy(), b.CreateStructGEP(failure_type, failure, 0));
         b.CreateCondBr(b.CreateIsNotNull(message), failed, success);
         b.SetInsertPoint(failed);
-        auto puts = module->getOrInsertFunction("puts", llvm::FunctionType::get(b.getInt32Ty(), {b.getPtrTy()}, false));
-        b.CreateCall(puts, {message});
+        // Use the platform CRT's stderr, preserving the existing captured source
+        // messages and bounded trace without requiring Runtime for scalar objects.
+#ifdef _WIN32
+        auto* stream=b.CreateCall(module->getOrInsertFunction("__acrt_iob_func",b.getPtrTy(),b.getInt32Ty()),{b.getInt32(2)});
+#else
+#ifdef __APPLE__
+        const char* stream_name="__stderrp";
+#else
+        const char* stream_name="stderr";
+#endif
+        auto* stream_global=module->getNamedGlobal(stream_name);
+        if(!stream_global)stream_global=new llvm::GlobalVariable(*module,b.getPtrTy(),false,llvm::GlobalValue::ExternalLinkage,nullptr,stream_name);
+        auto* stream=b.CreateLoad(b.getPtrTy(),stream_global);
+#endif
+        auto print_error=module->getOrInsertFunction("fprintf",llvm::FunctionType::get(b.getInt32Ty(),{b.getPtrTy(),b.getPtrTy()},true));
+        auto* format=b.CreateGlobalStringPtr("%s");
+        b.CreateCall(print_error, {stream,format,message});
         auto* count = b.CreateLoad(b.getInt32Ty(), b.CreateStructGEP(failure_type, failure, 1));
         auto* start = b.GetInsertBlock();
         auto* test = llvm::BasicBlock::Create(context, "trace", main);
@@ -1800,15 +1815,15 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         b.SetInsertPoint(body);
         auto* frames = b.CreateStructGEP(failure_type, failure, 2);
         auto* address = b.CreateGEP(llvm::ArrayType::get(b.getPtrTy(), 32), frames, {b.getInt32(0), index});
-        b.CreateCall(puts, {b.CreateLoad(b.getPtrTy(), address)});
+        b.CreateCall(print_error, {stream,format,b.CreateLoad(b.getPtrTy(), address)});
         auto* next = b.CreateAdd(index, b.getInt32(1)); index->addIncoming(next, body);
         b.CreateBr(test); b.SetInsertPoint(done);
         auto* truncated = llvm::BasicBlock::Create(context, "trace_limit", main);
         auto* exit = llvm::BasicBlock::Create(context, "exit", main);
         b.CreateCondBr(b.CreateICmpUGT(count, b.getInt32(32)), truncated, exit);
         b.SetInsertPoint(truncated);
-        b.CreateCall(puts, {b.CreateGlobalStringPtr("Source call trace limited to 32 callers.")}); b.CreateBr(exit);
-        b.SetInsertPoint(exit); b.CreateRet(b.getInt32(1)); b.SetInsertPoint(success);
+        b.CreateCall(print_error, {stream,format,b.CreateGlobalStringPtr("\nSource call trace limited to 32 callers.\n")}); b.CreateBr(exit);
+        b.SetInsertPoint(exit); b.CreateCall(print_error,{stream,format,b.CreateGlobalStringPtr("\n")}); b.CreateRet(b.getInt32(1)); b.SetInsertPoint(success);
     }
     auto print = module->getOrInsertFunction("printf",
         llvm::FunctionType::get(b.getInt32Ty(), {b.getPtrTy()}, true));

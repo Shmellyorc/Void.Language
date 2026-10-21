@@ -1,5 +1,37 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## Stage 9 local completion / Wrench review — 21 October 2026
+
+All three authorized milestones are implemented. Final unfiltered local results:
+Debug 171/171 (13 retained research suites), Release 158/158 and strict
+ASan/UBSan/leaks 158/158: **487/487**, zero final failures/skipped suites. Both full
+1 MiB frontend gates, extension typecheck/build and 4/4 units, real VS Code
+trusted/untrusted/multi-root, and actual Neovim/Vim automatic/explicit integration
+passed. [Acceptance](stage9/ACCEPTANCE.md) records exact hashes, failed attempts
+and two unexplained preliminary process crashes that did not reproduce in focused,
+baseline/current, GDB or final strict gates; no cause/fix is asserted for them.
+Windows/macOS native execution, case-sensitive APFS and Boss's seven-job hosted
+gate remain pending. Root README, CI #87 and local-library protections are
+preserved; no Git/hosted/publication action occurred. Review the complete diff,
+[contract](STAGE9_APPLICATION_WORKFLOW.md), [evidence](stage9/EVIDENCE.json) and
+[hosted requirements](stage9/HOSTED_GATE.md). Deferred language/package/FFI work
+remains outside Stage 9.
+
+
+## Stage 9 authorization — 21 October 2026
+
+Boss authorized the complete three-milestone application workflow: automatic
+compiler-owned entry selection, real host executable build, and consistent
+failures/editor acceptance. The mandatory Sprint 4 application flag and the
+research proposal's optional compatibility flag are superseded: `--app` is removed
+and explicitly rejected. Run/build default to cwd discovery; explicit files may
+have any name. Default native output is selected-root/build/entry-stem with the
+Windows executable suffix. [Current contract](STAGE9_APPLICATION_WORKFLOW.md) and
+[acceptance](stage9/ACCEPTANCE.md) govern implementation/evidence. Earlier
+Stage-9-unauthorized wording below is historical. Boss retains Git and hosted CI
+control; root README remains protected.
+
+
 ## Permanent documentation policy — 20 October 2026
 
 [docs/README.md](README.md) is the central documentation index and instruction
@@ -31,6 +63,14 @@ routine development. It authorizes no additional sprint, commit, push or hosted 
 **KISS. DRY. MAXIMUM WORK. MINIMUM TALK.** This rule applies to future Keyboard
 Clankers and takes precedence over older communication/checkpoint practices below.
 Boss retains Git and hosted acceptance control.
+
+## CI #87 extension path repair — 21 October 2026
+
+[Focused repair evidence](ci87-extension/REPAIR.md) records the Debug directory
+case mismatch and the existing `VOIDLS_TEST_SERVER` step override. TypeScript/build
+and all four real-server units passed locally. All seven matrix configurations,
+strict settings and real editor tests are preserved. Wrench review and hosted
+verification remain pending; historical CI #87 evidence is unchanged.
 
 ## Project-local libraries handoff — 21 October 2026
 

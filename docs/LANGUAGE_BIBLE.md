@@ -3205,6 +3205,18 @@ deferred fallible/resource/managed rules. This supersedes Phase 13 I1 deferral, 
 unapproved I2 alternative.
 
 
+## Stage 9 approved application workflow — 21 October 2026
+
+Boss approved automatic entry classification for check/run/build/emit and removed
+the public application flag entirely. Run/build without a path use cwd main.void
+discovery. Explicit .void filenames remain unrestricted. Build produces a native
+executable under selected-root/build/entry-stem (Windows: .exe), with an optional
+output override. Legacy precedence/input/printing and application status, return,
+import and conflict semantics below remain unchanged. The compiler owns selection,
+validation and shared LLVM lowering. See [the current contract](STAGE9_APPLICATION_WORKFLOW.md)
+and [local/hosted evidence boundary](stage9/ACCEPTANCE.md). This supersedes only
+Sprint 4's explicit CLI-mode requirement; no package manager or broader FFI follows.
+
 ## Stage 8 Sprint 4 approved application entry — 20 October 2026
 
 Boss approved explicit `--app` run/emit, selected-source executable statements or

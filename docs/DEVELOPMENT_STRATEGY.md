@@ -1,5 +1,19 @@
 # VOID 2.0: Development Strategy and Compiler Architecture Roadmap
 
+## Stage 9 authorization — 21 October 2026
+
+Boss authorized the complete three-milestone application workflow: automatic
+compiler-owned entry selection, real host executable build, and consistent
+failures/editor acceptance. The mandatory Sprint 4 application flag and the
+research proposal's optional compatibility flag are superseded: `--app` is removed
+and explicitly rejected. Run/build default to cwd discovery; explicit files may
+have any name. Default native output is selected-root/build/entry-stem with the
+Windows executable suffix. [Current contract](STAGE9_APPLICATION_WORKFLOW.md) and
+[acceptance](stage9/ACCEPTANCE.md) govern implementation/evidence. Earlier
+Stage-9-unauthorized wording below is historical. Boss retains Git and hosted CI
+control; root README remains protected.
+
+
 
 ## Current implementation status
 
@@ -10,6 +24,7 @@ As of **21 October 2026**:
 | Stage 6 — Concurrency and native libraries | **Hosted LOCKED** at `4139297f92c195782f59a28546444e6b3bec4ad8` | Owner-confirmed CI #78, seven successful jobs (973/973 suites) |
 | Stage 7 — Developer tooling and optimization | **Hosted LOCKED** at `f704d75ffa37bfd0e587ec2b1513054e07a8a4d8` | Owner-supplied CI #81 attempt 2, seven successful jobs, 980/980 suites |
 | Stage 8 — Language completeness | **Six planned sprints locally implemented; Sprint 6 468/468; Wrench review pending; not hosted locked** | [Sprint 6 contract](STAGE8_ERGONOMICS.md), [local evidence](stage8/SPRINT6_ACCEPTANCE.md), [final hosted checklist](stage8/FINAL_HOSTED_GATE.md) |
+| Stage 9 — Application workflow | **All three milestones implemented; locally verified; Wrench review pending** | [Contract](STAGE9_APPLICATION_WORKFLOW.md), [487/487 local evidence and disclosed observations](stage9/ACCEPTANCE.md), [native hosted gate](stage9/HOSTED_GATE.md) |
 
 Stage 8 Sprint 6 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
 The final planned engineering sprint delivers compile-time `Type has Target`,

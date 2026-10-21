@@ -77,5 +77,5 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint6 ') as directory:
     for invalid in ['func f(\n    x: i32\n):\n    pass\n','func f<t,\n    u>(x: t):\n    pass\n']:
         source.write_text(invalid, encoding='utf-8');run([compiler,'check',source],1)
     source.write_text('func main() -> i32:\n    return if true:\n        7\n    else:\n        9\n', encoding='utf-8')
-    for switches in [[],['--no-opt']]:assert run([compiler,'run',source,'--app',*switches],7).stdout==''
+    for switches in [[],['--no-opt']]:assert run([compiler,'run',source,*switches],7).stdout==''
 print(f'Sprint 6 process checks passed: {checks}')

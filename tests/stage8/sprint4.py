@@ -31,11 +31,11 @@ with tempfile.TemporaryDirectory(prefix='VOID Sprint 4 ') as directory:
     for number,(text,status) in enumerate(cases):
         write(text)
         run([compiler,'check',source])
-        run([compiler,'run',root,'--app'],status,'')
-        run([compiler,'run',source,'--app','--no-opt'],status,'')
+        run([compiler,'run',root],status,'')
+        run([compiler,'run',source,'--no-opt'],status,'')
         for mode in ['normal','optimized']:
             obj=root/(f'app{number}-{mode}.obj');exe=root/(f'app{number}-{mode}.exe')
-            run([compiler,'emit',source,'-o',obj,'--app',*(['--no-opt'] if mode=='normal' else [])])
+            run([compiler,'emit',source,'-o',obj,*(['--no-opt'] if mode=='normal' else [])])
             link(obj,exe);run([exe],status,'');run([exe,'7'],2,'')
     for text,diagnostic in [
         ('func main() -> i32:\n    if false:\n        return 1\n','Missing return'),
@@ -44,36 +44,36 @@ with tempfile.TemporaryDirectory(prefix='VOID Sprint 4 ') as directory:
         ('func main():\n    pass\nvar x = 1\n','compete'),
         ('return "bad"\n','Type mismatch'),
         ('var local = 1\nfunc helper() -> i32:\n    return local\nreturn helper()\n','local')]:
-        write(text);run([compiler,'run',source,'--app'],1,diagnostic=diagnostic)
+        write(text);run([compiler,'run',source],1,diagnostic=diagnostic)
     # Imported executable statements reject under check as well as execution.
     (root/'library.void').write_text('var value = 7\n',encoding='utf-8')
     write('use "/library.void" as library\nfunc main():\n    pass\n')
     run([compiler,'check',source],1,diagnostic='Imported modules')
     # Explicit file selection, no arbitrary public function entry scan.
     alternate=root/'alternate.void';alternate.write_text('return 11\n',encoding='utf-8')
-    run([compiler,'run',alternate,'--app'],11,'')
-    write('func helper() -> i32:\n    return 7\n');run([compiler,'run',source,'--app'],1)
+    run([compiler,'run',alternate],11,'')
+    write('func helper() -> i32:\n    return 7\n');run([compiler,'run',source],1)
     # Existing numeric adapter keeps printed result, status zero and main helper.
     legacy='func main() -> i32:\n    return 99\nfunc entry(value: i32) -> i32:\n    return value + 2\n'
     write(legacy);run([compiler,'run',source,'5'],0,'7\n');run([compiler,'run',source],0,'2\n')
-    run([compiler,'run',source,'--app'],1)
+    run([compiler,'run',source,'--app'],2,diagnostic='removed')
     obj=root/'legacy.obj';exe=root/'legacy.exe';run([compiler,'emit',source,'-o',obj]);link(obj,exe);run([exe,'5'],0,'7\n')
     # Invocation errors do not consume a numeric argument as application input.
-    write('return 7\n');run([compiler,'run',source,'4','--app'],2);run([compiler,'check',source,'--app'],2)
-    run([compiler,'run',source],1)
+    write('return 7\n');run([compiler,'run',source,'4'],2);run([compiler,'check',source,'--app'],2)
+    run([compiler,'run',source],7,'')
     run([compiler,'--jit-proof','--app'],2,'')
     run([compiler,'--emit-proof',root/'invalid-proof.obj','--app'],2,'')
     # Checked errors retain failure status in both JIT modes and linked AOT.
     write('func main() -> i32:\n    var xs: [i32] = []\n    return xs[0]\n')
-    for extra in [[],['--no-opt']]:run([compiler,'run',source,'--app',*extra],1,diagnostic='index')
-    obj=root/'failure.obj';exe=root/'failure.exe';run([compiler,'emit',source,'-o',obj,'--app']);link(obj,exe);run([exe],1,diagnostic='index')
+    for extra in [[],['--no-opt']]:run([compiler,'run',source,*extra],1,diagnostic='index')
+    obj=root/'failure.obj';exe=root/'failure.exe';run([compiler,'emit',source,'-o',obj]);link(obj,exe);run([exe],1,diagnostic='index')
     # A fresh process cache hit preserves application status policy and identity.
     write('return 7\n')
-    first=run([compiler,'run',source,'--app','--cache'],7,'')
-    second=run([compiler,'run',source,'--cache','--app'],7,'')
+    first=run([compiler,'run',source,'--cache'],7,'')
+    second=run([compiler,'run',source,'--cache'],7,'')
     if 'unavailable' not in first.stderr: assert 'miss' in first.stderr and 'hit' in second.stderr,(first.stderr,second.stderr)
     write(legacy);run([compiler,'run',source,'5','--cache'],0,'7\n')
-    write('return 7\n');run([compiler,'run',source,'--app','--cache'],7,'')
+    write('return 7\n');run([compiler,'run',source,'--cache'],7,'')
     # Explicit host admission is required to emit the sink; CLI cannot grant it.
     sink=pathlib.Path(__file__).resolve().parents[2]/'examples/native_sink/main.void'
     run([compiler,'check',sink],1)

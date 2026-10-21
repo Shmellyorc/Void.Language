@@ -1,0 +1,100 @@
+# Stage 9 application workflow — 21 October 2026
+
+Boss authorized all three milestones as one mission. This supersedes Sprint 4's
+mandatory application flag and the research proposal's optional compatibility
+flag. Entry language semantics, native admission and source identities are unchanged.
+[Acceptance and review handoff](stage9/ACCEPTANCE.md) separates local evidence from
+Boss-controlled native hosted verification.
+
+## Commands
+
+```text
+voidc check <file-or-directory>
+voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--cache]
+voidc build [file-or-directory] [-o executable] [--no-opt]
+voidc emit <file-or-directory> -o <object> [--no-opt]
+```
+
+Absent run/build paths select cwd. Directories use shared deterministic exact-case
+`main.void` discovery. Explicit `.void` files may have any filename; their parent
+is the project root. Options may precede or follow operands. Unknown/duplicate
+options, removed `--app`, unsupported application operands, cache outside run and
+missing/extra operands are invalid invocations (status 2). `check --no-opt` remains accepted as an inert existing spelling. Cache retains its
+existing Debug policy and safe unavailable fallback; it disables optimization.
+
+All commands use the compiler-owned `ValidatedAnalysis`. Checking accepts libraries;
+execution/emission require the validated selected entry. Run uses retained shared
+LLVM lowering, including existing JIT/cache/source snapshot/reload contracts.
+To supply legacy input for cwd, spell the path explicitly (`voidc run . 5`).
+Legacy `entry(i32) -> i32` keeps precedence, optional decimal i32 input, printed
+result and successful process status zero. Applications accept no operands, return
+their i32 status without printing it, and no-result main/top-level fallthrough
+return zero. Typed main requires explicit return on every reachable path.
+Imported executable statements and conflicting entry styles reject; an imported
+main is never selected. No source scanning or separate parser chooses the mode.
+
+## Native artifacts and resources
+
+Build emits the existing source object and links the existing static Runtime and
+fixture/sink archive through configured Clang **19.1.7**, using argv process
+execution. Linux's configured matching LLD retains its version gate. Windows uses
+the active SDK/MSVC/UCRT environment and dynamic CRT policy; macOS receives the
+configured SDK, architecture and deployment target. This is host compilation.
+Source imports never grant native binding or linker permissions.
+
+Default executable: `<selected-root>/build/<entry-stem>` with `.exe` on Windows.
+An explicit `-o` is caller-relative or absolute. Emit remains object-only.
+Outputs cannot overwrite selected/imported sources or name `.void` files. Existing
+output symlinks, non-files and incorrect physical spelling reject. Physical
+identity catches hard-link collisions. Same-parent private staging preserves old
+artifacts through source/backend/toolchain/link failures; failed intermediates are
+removed. POSIX rename and Windows replacement publish only a successfully produced
+artifact. A Windows executing/locked destination can reject replacement without
+removing the old executable. Concurrent external source/output mutation is not a
+filesystem transaction; frontend captured snapshots remain authoritative.
+
+LLVM unique-path generation is applied only to a generated temporary **leaf**;
+percent characters in physical ancestors remain literal. Clang receives the actual
+stage directory via `-working-directory` and a relative executable output name.
+This addresses LLVM 19's absolute percent-output issue while keeping the real
+project/output location. No global cwd change or shell expansion occurs.
+
+CMake generates `void-native.txt` beside the actual voidc target, using target-file
+generator expressions (including multi-configuration paths). It lists the pinned
+host driver/linker, exact Runtime/provider archives and host link arguments.
+There is no cwd/PATH/recursive resource fallback. Missing/malformed configuration,
+missing/nonexecutable resources and mismatched driver/linker versions diagnose.
+Linker child diagnostics are retained and a nonzero child status is labelled.
+Generated applications have no LLVM compiler-library dependency.
+
+```text
+cmake --install <build-tree> --config <configuration> --component compiler --prefix <private-prefix>
+```
+
+The private layout is `bin/voidc[.exe]`, `bin/void-native.txt`, and
+`lib/void/<Runtime/provider archives>`. Installed archive paths are relative to the
+configuration file, so the prefix can relocate. The configured matching host SDK
+and platform development dependencies remain required at their configured paths;
+this does not distribute/download Clang, platform SDKs or system libraries.
+Standard-library source selection retains the existing configured root/absolute
+`VOID_STDLIB_ROOT` override contract; no new stdlib search or package manager ships.
+
+## Failures and editor integration
+
+Usage errors exit 2; source/backend/runtime/tool/link errors exit 1 with their own
+diagnostic context. An application's deliberate nonzero result is returned without
+inventing a failure message. Platform exit-status representation applies.
+Checked AOT failures now use the platform CRT's stderr, retaining existing source
+messages and bounded caller traces. Normal/O2 JIT and real linked executables are
+compared on status, stdout and stderr, including exact failure text. Scalar objects
+still need only their existing CRT link contract; no new Runtime dependency is
+introduced just to print a diagnostic. Runtime cleanup/diagnostic ownership are
+unchanged.
+
+voidls and adapters retain shared discovery, local/standard import isolation,
+overlays/snapshots, UTF-16, incomplete-source recovery and navigation/completion/
+documentation/shutdown. No editor compiler or path resolver was introduced.
+
+No package manager, network fetching, manifests, arbitrary FFI, cross compilation,
+new language feature, Git mutation, hosted execution or public README edit is part
+of this implementation.

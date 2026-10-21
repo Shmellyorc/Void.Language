@@ -1,0 +1,28 @@
+
+> void-language@0.1.0 test
+> npm run build && node --test out/test/config.test.js
+
+
+> void-language@0.1.0 build
+> npm run typecheck && npm run compile
+
+
+> void-language@0.1.0 typecheck
+> tsc --noEmit
+
+
+> void-language@0.1.0 compile
+> tsc && node build.cjs
+
+✔ literal workspace paths, spaces, no shell expansion (1.273383ms)
+✔ Windows paths are literal, drive/root boundaries preserved (0.621456ms)
+✔ validate executable and deterministic canonical project selection (81.133768ms)
+✔ presentation covers approved keyword colors and space indentation (3.516009ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 152.893204

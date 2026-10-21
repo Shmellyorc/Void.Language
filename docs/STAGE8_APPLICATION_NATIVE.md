@@ -1,5 +1,12 @@
 # Stage 8 Sprint 4 — application entry and trusted static providers
 
+> Superseded CLI/authorization status, 21 October 2026: Boss authorized all three
+> Stage 9 milestones and removed `--app` entirely, including compatibility use.
+> [Current workflow](STAGE9_APPLICATION_WORKFLOW.md) and
+> [acceptance](stage9/ACCEPTANCE.md) supersede conflicting proposals/status below.
+> Historical decisions, experiments and verification records remain intact.
+
+
 Status: implemented and locally verified; Wrench review pending; not hosted locked.
 Boss approved all three design checkpoints on 20 October 2026; see
 [DECISIONS.md](DECISIONS.md). Sprints 5–6 remain future work.

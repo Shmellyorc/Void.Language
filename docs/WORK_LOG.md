@@ -1,5 +1,25 @@
 # Work log
 
+## Stage 9 mission — 21 October 2026
+
+Boss authorized one cohesive three-milestone implementation, superseding mandatory
+application mode and the research optional-compatibility recommendation. Automatic
+check/run/build/emit selection now uses ValidatedAnalysis and shared LLVM lowering;
+build links real host executables through pinned Clang, configured platform/Runtime
+resources and same-parent staged publication. Checked AOT failures use stderr.
+No second frontend, Runtime, editor resolver, package manager or native admission
+path was introduced. Existing CI #87/local libraries remain intact.
+
+[Contract](STAGE9_APPLICATION_WORKFLOW.md), [acceptance and retained failures](stage9/ACCEPTANCE.md),
+[source hashes](stage9/SOURCE_HASHES.json) and [native hosted gate](stage9/HOSTED_GATE.md)
+record implementation, exact evidence, unresolved observations and review limits.
+Root README is untouched. No Git mutation, hosted execution or publication occurred.
+Final consolidated gates passed 487/487 (Debug 171, Release 158, strict sanitizers
+158), both actual 1 MiB frontend runs, extension 4/4 and real editor integration.
+The acceptance record discloses unexplained preliminary crashes and native hosted
+limits; no cause is inferred from passing reruns.
+
+
 **Current handoff:** [Documentation index](README.md), [project-local libraries contract](LOCAL_LIBRARIES.md) and [local acceptance](local-libraries/ACCEPTANCE.md). The local-library extension is implemented and locally verified; Wrench review and native Windows/macOS remain pending. CI #87 is separate earlier-snapshot evidence. Stage 8 is not newly hosted locked; earlier entries retain their history.
 
 ## 21 October 2026: owner-authorized project-local libraries

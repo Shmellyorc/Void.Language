@@ -1,5 +1,19 @@
 # VOID 2.0 — Boss-approved completeness direction and implementation ledger
 
+## Stage 9 authorization — 21 October 2026
+
+Boss authorized the complete three-milestone application workflow: automatic
+compiler-owned entry selection, real host executable build, and consistent
+failures/editor acceptance. The mandatory Sprint 4 application flag and the
+research proposal's optional compatibility flag are superseded: `--app` is removed
+and explicitly rejected. Run/build default to cwd discovery; explicit files may
+have any name. Default native output is selected-root/build/entry-stem with the
+Windows executable suffix. [Current contract](STAGE9_APPLICATION_WORKFLOW.md) and
+[acceptance](stage9/ACCEPTANCE.md) govern implementation/evidence. Earlier
+Stage-9-unauthorized wording below is historical. Boss retains Git and hosted CI
+control; root README remains protected.
+
+
 **Decision recorded:** 20 October 2026, after Research Clanker's language
 completeness audit and Stage 7 hosted acceptance.
 

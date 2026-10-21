@@ -80,6 +80,8 @@ jobs:
       - name: Type-check, build and test extension
         if: matrix.configuration == 'Debug'
         working-directory: editors/vscode
+        env:
+          VOIDLS_TEST_SERVER: ${{ github.workspace }}/build/Debug/voidls${{ runner.os == 'Windows' && '.exe' || '' }}
         run: npm test
       - name: Real editor integration (Linux)
         if: runner.os == 'Linux' && matrix.configuration == 'Debug'

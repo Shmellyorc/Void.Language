@@ -55,7 +55,7 @@ with tempfile.TemporaryDirectory(prefix='VOID local libs é😀 # % ') as tempor
     changed=run([compiler,'run',entry,7,'--cache']);assert changed.stdout.strip()=='18'
     if 'unavailable' not in first.stderr:assert 'Debug cache: miss' in changed.stderr,changed
     app=project/'application.void';write(app,'use lib/raylib as rl\nfunc main() -> i32:\n    return rl.read(5)\n')
-    assert run([compiler,'run',app,'--app'],7).stdout==''
+    assert run([compiler,'run',app],7).stdout==''
     with Client(server,entry) as c:
         c.initialize();pid=c.process.pid;version=0
         def replace(text):

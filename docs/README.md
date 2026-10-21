@@ -1,5 +1,17 @@
 # VOID documentation
 
+## Stage 9 implemented / locally verified — Wrench review
+
+Boss approved all three milestones on 21 October 2026; all are implemented.
+Final local acceptance is 487/487 plus 1 MiB and real editor gates; Windows/macOS
+and hosted acceptance remain pending. Read the
+[application workflow contract](STAGE9_APPLICATION_WORKFLOW.md) and
+[acceptance/handoff](stage9/ACCEPTANCE.md). The research/roadmap documents remain
+historical proposals; the dated authorization supersedes their optional flag and
+stop-for-approval recommendations. Existing CI #87 and local-library evidence stay
+intact. Git/hosted actions remain Boss-controlled.
+
+
 ## Getting started and language guides
 
 - [Build, source compiler and CLI](SOURCE_COMPILER.md),
@@ -46,6 +58,30 @@ README only if Boss explicitly requests a public-facing README change.”
 
 Preserve historical evidence and distinguish approved direction, local verification,
 review and hosted locks. Never mark work implemented or locked without verification.
+
+## Stage 9 research handoff — 21 October 2026
+
+Boss authorized **Stage 9 research and planning only** in the current mission.
+[Independent gap audit](STAGE9_RESEARCH.md) and [proposed milestone roadmap](STAGE9_ROADMAP.md)
+review the current local-library source, remaining CLI/Runtime/language/tooling
+boundaries and the native executable workflow. Fresh focused Release verification
+passed 16/16 suites; source/CLI and real AOT probes retain their own evidence.
+Recommended scope is automatic application dispatch without mandatory `--app`,
+preserved legacy behavior, `voidc build` and consistent failures/artifact handling.
+
+This authorization supersedes older statements prohibiting Stage 9 **research**,
+not Stage 8's pending hosted lock or any engineering gate. Implementation remains
+unauthorized. The future Git-based package manager is separate. Existing CI #87
+repair/workflow edits are preserved; root README, production and hosted CI are
+unchanged by research. Stop for Wrench review and Boss authorization.
+
+## CI #87 extension path repair — 21 October 2026
+
+[Focused repair evidence](ci87-extension/REPAIR.md) records the Debug directory
+case mismatch and the existing `VOIDLS_TEST_SERVER` step override. TypeScript/build
+and all four real-server units passed locally. All seven matrix configurations,
+strict settings and real editor tests are preserved. Wrench review and hosted
+verification remain pending; historical CI #87 evidence is unchanged.
 
 ## Project-local libraries handoff — 21 October 2026
 
