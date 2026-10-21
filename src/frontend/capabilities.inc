@@ -213,6 +213,8 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             }); else if(e.kind==K::match) frontend_case([&] {
                 auto subject=expression(*e.parts[0]);
                 for(unsigned n=0;n<e.patterns.size();++n){pattern(e.patterns[n],subject);ir::join_facts(view,expression(*e.parts[n+1]));}
+            }); else if(e.kind==K::choice) frontend_case([&] {
+                expression(*e.parts[0]);ir::join_facts(view,expression(*e.parts[1]));ir::join_facts(view,expression(*e.parts[2]));
             }); else if(e.kind==K::sum) frontend_case([&] {
                 const auto& variant=e.type.definition->cases.at(e.slot);
                 for(unsigned n=0;n<e.parts.size();++n)view=ir::replaced_facts(std::move(view),variant.begin+n,expression(*e.parts[n]));

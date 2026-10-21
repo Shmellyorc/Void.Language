@@ -66,13 +66,17 @@ test('presentation covers approved keyword colors and space indentation', async 
     for (const text of ['\\q', '\\xFF', '\\u{}']) assert(!escape.test(text), `Unsupported string escape: ${text}`);
     const braces = new RegExp(stringRule.patterns.find((p:{name:string}) => p.name === 'constant.character.escape.brace.void').match);
     assert(braces.test('{{') && braces.test('}}') && !braces.test('{'));
+    const interpolation = stringRule.patterns.find((p:{name:string}) => p.name === 'meta.interpolation.void');
+    assert(interpolation && new RegExp(interpolation.begin).test('{text}'));
+    assert(!new RegExp('^(?:' + interpolation.begin + ')').test('{{'));
+
     const types = new RegExp(grammar.patterns.find((p:{name?:string}) => p.name === 'storage.type.void').match);
     assert(types.test('string') && !types.test('strings'));
     const keywords = grammar.patterns.filter((p:{name?:string}) => p.name === 'keyword.control.void')
         .map((p:{match:string}) => new RegExp(p.match));
     assert(keywords.length > 0);
     const highlighted = (text:string) => keywords.some((rule:RegExp) => rule.test(text));
-    for (const word of ['func','property','enum','is','match','defer','with','event','async','await','spawn','return','pass','const','for','break','continue','as','and','or','not','in','reverse','struct','value struct'])
+    for (const word of ['func','property','enum','is','match', 'has','defer','with','event','async','await','spawn','return','pass','const','for','break','continue','as','and','or','not','in','reverse','struct','value struct'])
         assert(highlighted(word), `Missing keyword highlighting: ${word}`);
     for (const word of ['spawning','awaited','while','structure','function','returning','passing','bypass','value'])
         assert(!highlighted(word), `Unexpected keyword highlighting: ${word}`);
@@ -93,7 +97,7 @@ test('presentation covers approved keyword colors and space indentation', async 
     assert(keywords.some((rule:RegExp) => rule.exec('struct point:')?.[0] === 'struct'));
     assert(!highlighted('value: i32'));
     for (const text of ['    using movement', '    using motion: movement']) assert(highlighted(text));
-    for (const text of ['using: movement', 'p.using', 'has', 'extends', 'interface', 'virtual', 'override']) assert(!highlighted(text));
+    for (const text of ['using: movement', 'p.using', 'haste', 'extends', 'interface', 'virtual', 'override']) assert(!highlighted(text));
     for (const [text, token] of [['struct derived extends base:', 'extends'], ['virtual func (b base) read():', 'virtual'], ['override func (d derived) read():', 'override'], ['super.read()', 'super'], ['super .read()', 'super']])
         assert(keywords.some((rule:RegExp) => rule.exec(text)?.[0] === token), `Missing contextual keyword: ${token}`);
     assert(indent.test('struct derived extends module.base:'));

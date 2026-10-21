@@ -51,3 +51,13 @@
         }
         need("<dedent>");multiline_expression=true;return result;
     }
+
+    std::unique_ptr<Expr> choice_expression(Token token) {
+        Depth guard(depth,source,token,64);
+        auto result=std::make_unique<Expr>(Expr::Kind::choice,token);
+        result->parts.push_back(expression());need(":");newline();need("<indent>");
+        result->parts.push_back(expression());newline();need("<dedent>");need("else");
+        if(accept("if"))result->parts.push_back(choice_expression(tokens[p-1]));
+        else {need(":");newline();need("<indent>");result->parts.push_back(expression());newline();need("<dedent>");}
+        multiline_expression=true;return result;
+    }

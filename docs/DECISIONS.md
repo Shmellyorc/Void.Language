@@ -1033,3 +1033,35 @@ acceptance remains a separate verification record.
 Task/result/Work records and null registered Handle slots still grow within a
 long-lived root; broader ownership/handle retirement remains deferred and would
 require renewed review. RSS and reusable capacity are not live managed payload.
+
+
+## 21 October 2026 — Stage 8 Sprint 6 owner approvals
+
+Boss answered all four consolidated questions before implementation:
+
+- `Type has Target` produces a compile-time bool for qualified/generic types and
+  generic parameters. Component tests inspect direct using storage on the type
+  and its ancestors, without recursive component search. Interface tests reuse
+  structural constraints for nonnullable managed/value structs and interfaces.
+  Unsupported families diagnose. No value operands, reflection, conversions,
+  refinement or additional authority. Generic bodies check at specialization;
+  both conditional branches must type-check even for constant conditions.
+- If-expressions use indented `if condition:` / mandatory `else:` with exactly
+  one value expression per branch, including nesting and `else if`. Conditions
+  require bool; expected types apply, otherwise the first branch anchors existing
+  compatibility. Every branch checks and only the selected branch executes.
+  Preserve readonly, copies, identity and GC; no widening or truthiness.
+- Multiline calls allow matched parentheses, nesting, comments/blank lines and
+  optional trailing commas. Continuation indentation is cosmetic, while actual
+  if/match/function bodies remain indentation sensitive. Preserve collections and
+  the shared binder. No continuation outside supported delimiters, backslashes,
+  multiline generic or type-header grammar.
+- Automatic interpolation accepts ordinary single-line **string** expressions,
+  evaluated once left to right through existing concatenation/ownership. Existing
+  pure constant rules apply. Preserve UTF-8, NUL, doubled literal braces and
+  Unicode-escaped braces. Reject unmatched/empty substitutions and format specs.
+  Numeric/bool/custom conversion, locale/formatting and triple strings defer.
+
+Authorization covers Sprint 6 and local verification only. Approval does not
+establish implementation or acceptance. Root README, Git mutations, hosted CI,
+publication and Stage 9 remain outside this authorization.

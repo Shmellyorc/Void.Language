@@ -1,5 +1,10 @@
 # First real source compiler
 
+The [Stage 8 ergonomics contract](STAGE8_ERGONOMICS.md) and
+[local acceptance](stage8/SPRINT6_ACCEPTANCE.md) describe the current bounded
+has/if/multiline-call/string-interpolation extensions. Historical phase-only
+exclusions below are superseded by those delivered contracts.
+
 The current [Stage 8 application contract](STAGE8_APPLICATION_NATIVE.md) records
 explicit `--app` hosting alongside the preserved legacy CLI described below.
 
@@ -394,3 +399,14 @@ over an ordinary main helper. Use existing legacy commands without `--app`.
 
 Implementation and local acceptance status are maintained in the linked contract;
 this does not grant editor execution, native import trust or hosted acceptance.
+
+
+## Stage 8 Sprint 6 — 21 October 2026
+
+[The bounded ergonomics contract](STAGE8_ERGONOMICS.md) supersedes historical
+blanket exclusions above for compile-time type `has`, typed if-expressions,
+multiline calls and string-only interpolation. Existing nominal storage,
+structural conformance, generic specialization, capabilities and checked failure
+rules remain authoritative. Both conditional branches type-check. Formatting and
+numeric/bool/custom string conversion remain deferred. Approval and implementation
+are separate from local acceptance, Wrench review and the final hosted lock.

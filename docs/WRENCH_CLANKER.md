@@ -32,42 +32,50 @@ routine development. It authorizes no additional sprint, commit, push or hosted 
 Clankers and takes precedence over older communication/checkpoint practices below.
 Boss retains Git and hosted acceptance control.
 
-## Current Stage 8 handoff — 20 October 2026
+## Current Stage 8 handoff — 21 October 2026
 
-Stage 8 Sprint 5 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
-Baseline measurements justified retiring completed execution-frame roots after
-native resume returns or acquired worker completion. The 512-child async workload
-plus sentinel dropped from **34,890,840 to 10,944 reachable payload bytes after GC**;
-native Task/result/Work records remain root-scope owned. No constant-memory claim
-or public task/ownership semantic change is made.
+Stage 8 Sprint 6 is **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending**.
+The final planned engineering sprint delivers compile-time `Type has Target`,
+indented typed if-expressions, delimiter-aware multiline calls and bounded
+**string-only** automatic interpolation through existing compiler/IR/LLVM paths.
+All four owner decisions were answered before implementation.
 
-Final consolidated Debug, Release and strict ASan/UBSan/leak runs passed
-**153/153 each: 459/459 unique configuration/suite outcomes**. Both complete
-1 MiB frontend gates passed. [Contract and ownership proof](STAGE8_ASYNC_RETENTION.md),
-[Sprint 5 acceptance](stage8/SPRINT5_ACCEPTANCE.md) and the paired measurement CSV
-record the evidence, observer corrections, capacities, RSS and limits.
+Final unfiltered Debug, Release and strict ASan/UBSan/leak acceptance passed
+**156/156 each: 468/468 unique configuration/suite outcomes; zero final failures**.
+Both complete Debug/Release frontend gates passed on real 1 MiB stacks. Extension
+unit checks passed 4/4; compiler-owned stdio tooling and headless Vim syntax checks
+passed. These do not establish fresh interactive-client acceptance.
+[Contract](STAGE8_ERGONOMICS.md), [Sprint 6 acceptance](stage8/SPRINT6_ACCEPTANCE.md)
+and [final hosted checklist](stage8/FINAL_HOSTED_GATE.md) retain exact scope,
+source/log hashes, unsuccessful engineering attempts and verification limits.
 
-Sprints 1–4 remain preserved, including [CI #82's Windows repair](stage8/CI82_WINDOWS_REPAIR.md),
-argument binding, numeric/text/collection APIs, application entry, static native
-admission, tooling and reload/GC/cleanup contracts. No Sprint 5 owner decision
-remains pending; broader task-record/ownership retirement remains deferred.
+All six planned Stage 8 sprints now have bounded local implementation evidence.
+Sprints 1–5 remain preserved, including [CI #82 repair](stage8/CI82_WINDOWS_REPAIR.md),
+call/numeric/text/collection APIs, application entry, static providers and measured
+async frame retirement. Native Task/result/Work records, null Handle registration
+and capacities still grow within long-lived roots; no constant-memory claim.
 
-**Hosted CI remains deferred until the end of Stage 8**, unless Boss explicitly
-authorizes an earlier run. Windows/macOS, hosted CI #82 Debug/Release execution
-and fresh actual editor-client verification remain pending. Linux local tests
-cannot establish those results. Stage 8 is not hosted locked.
+**Stage 8 is not hosted locked.** Wrench review, Boss-controlled commit/push,
+explicit final hosted authorization, all seven hosted jobs and fresh actual editor
+checks remain pending. Linux results do not establish Windows/macOS, including
+Windows Debug/Release short/long-path and reparse-point repair execution.
 
-**Stopped after Sprint 5 for Wrench review. Sprint 6 remains future work.**
-No commits, pushes, branches/remotes, hosted CI, publication or website work
-occurred. Root README is unchanged. Documentation and future prompts belong under
-`docs/` by default; do not begin Sprint 6 without Boss authorization.
+**Stopped after Sprint 6 for Wrench review. No next sprint or Stage 9 is authorized.**
+Formatting/conversion beyond strings, triple strings, recursive component search,
+conditional compilation, broader task ownership and other deferred Bible features
+remain future work. No commits, pushes, branch/remote changes, hosted CI or publication
+occurred. Root README and CI #82 repair hashes are unchanged. Documentation and
+future prompts belong under `docs/`; public root README work needs explicit Boss
+approval.
+
 
 Read [the approval ledger](LANGUAGE_COMPLETENESS_APPROVALS.md),
 [roadmap](LANGUAGE_COMPLETENESS_ROADMAP.md), [Sprint 1 contract](STAGE8_DISCOVERY.md),
 [Sprint 2 contract](STAGE8_CALLS_NUMERIC.md) and latest [work log](WORK_LOG.md).
-Remaining sequence: (4) optional-main/native providers, (5) measured async
-retention, (6) selected ergonomics. Private/readonly
-field declarations were not needed or authorized as collateral work.
+All six planned engineering sprints now have local evidence. Review Sprint 6 and
+its final hosted checklist; broader deferred work is not a next-sprint instruction.
+Private/readonly field declarations were not added as collateral work. No hosted
+lock or owner Git authorization is inferred from local success.
 
 ### Historical Stage 7 engineering review handoff
 

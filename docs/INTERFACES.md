@@ -173,3 +173,14 @@ generic interfaces/Self, defaults/bodies, overloads, dynamic type tests, downcas
 managed/interface FFI, open-world providers, transitive using, finalizers and runtime
 permission systems. Root homes can retain dead values until function return, as in
 the existing GC foundation; this phase does not add a liveness optimizer.
+
+
+## Stage 8 Sprint 6 — 21 October 2026
+
+[The bounded ergonomics contract](STAGE8_ERGONOMICS.md) supersedes historical
+blanket exclusions above for compile-time type `has`, typed if-expressions,
+multiline calls and string-only interpolation. Existing nominal storage,
+structural conformance, generic specialization, capabilities and checked failure
+rules remain authoritative. Both conditional branches type-check. Formatting and
+numeric/bool/custom string conversion remain deferred. Approval and implementation
+are separate from local acceptance, Wrench review and the final hosted lock.

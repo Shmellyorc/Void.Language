@@ -1,0 +1,142 @@
+interface readable:
+    func read() -> i32
+value struct component:
+    number: i32
+func (self component) read() -> i32:
+    return self.number
+struct base:
+    using component
+struct derived extends base:
+    tag: i32
+func (self derived) read() -> i32:
+    return self.number
+struct nested:
+    using derived
+struct plain:
+    number: i32
+func (self plain) read() -> i64:
+    return self.number as i64
+struct generic<t>:
+    data: t
+func supports<t>(item: t) -> bool:
+    return t has readable
+func add(left: i32, right: i32 = 2) -> i32:
+    return left + right
+func identity<t>(item: t) -> t:
+    return item
+func stored(const defaults: {string: i32} = {
+    "x": 7,
+}) -> i32:
+    return defaults["x"]
+func apply(callback: func(i32) -> i32, item: i32) -> i32:
+    return callback(item)
+struct counter:
+    count: i32
+func (self counter) step(text: string) -> string:
+    self.count++
+    return text
+const greeting = "🎮"
+const message = "{{{greeting + "!"}}}\0\u{7b}"
+const chosen = if true:
+    "{greeting}"
+else:
+    "unused"
+func entry(input: i32) -> i32:
+    if not (derived has component) or nested has component or plain has component:
+        return 11
+    if not (component has readable) or not supports(component()) or not (derived has readable) or not (readable has readable) or plain has readable:
+        return 12
+    if generic<i32> has component or not supports(derived()):
+        return 13
+    var enabled = true
+    if not (enabled and derived has component) or not (false or derived has readable):
+        return 21
+    var c = counter()
+    var first_text = c.step(
+        text = "A",
+    )
+    var text = "[{first_text}{c.step("B")}]"
+    if text != "[AB]" or c.count != 2 or message != "{{🎮!}}\0{{" or chosen != greeting:
+        return 14
+    var n = add(
+        # Written order and shared defaults/names.
+        identity<i32>(
+            3,
+        ),
+
+        right = add(
+            right = 3,
+            left = 2,
+        ),
+    )
+    var selected = if input > 0:
+        c.step("yes")
+    else if input == 0:
+        c.step("zero")
+    else:
+        c.step("no")
+    if c.count != 3 or selected == "":
+        return 15
+    var callback: func(i32) -> i32 = identity<func(i32) -> i32>(
+        identity<i32>,
+    )
+    if callback(9) != 9 or stored() != 7:
+        return 19
+    var constructed = generic<i32>(
+        data = input,
+    )
+    var counted = identity(
+        [1,
+         2],
+    ).count
+    var called = apply(
+        func(number: i32) -> i32:
+            return number + 1
+        ,
+        item = 1,
+    )
+    var matched = identity(
+        match input:
+            1: 7
+            _: 8
+        ,
+    )
+    if constructed.data != input or counted != 2 or called != 2 or matched < 7:
+        return 18
+    var result = add(
+        if input > 0:
+            if input > 1:
+                10
+            else:
+                20
+        else:
+            30
+        ,
+        right = n,
+    )
+    var small: u8 = if true:
+        255
+    else:
+        0
+    var found: result<string, string> = Ok("present")
+    var payload = if found is Ok(var content):
+        content
+    else:
+        "absent"
+    if payload != "present":
+        return 17
+    var original: [i32, 2] = [1, 2]
+    var copied = if true:
+        original
+    else:
+        original
+    copied[0] = 9
+    var shared = derived()
+    var same = if true:
+        shared
+    else:
+        derived()
+    same.tag = 7
+    if original[0] != 1 or shared.tag != 7 or small != 255:
+        return 16
+    return result

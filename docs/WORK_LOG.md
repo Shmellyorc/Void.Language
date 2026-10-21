@@ -14028,3 +14028,110 @@ CI #82 repair, Git/remote state, hosted CI or publication changes. Windows/macOS
 and the end-of-Stage-8 hosted gate remain pending. Task/result/Work retention,
 null Handle registration and capacities remain documented. Stop for Wrench review;
 Sprint 6 requires separate Boss authorization.
+
+
+## 21 October 2026 — Stage 8 Sprint 6 authorized and checkpoint approved
+
+Clean starting HEAD `3d61279237c62157f2ecfff01aa24d6c937f9a0d`. Read the docs
+index, required handoffs/contracts and actual parser, semantics, shared IR/LLVM
+and tooling before presenting four consolidated questions. Waited without closing
+the exchange. Boss explicitly approved all four: type-level has, indented typed
+if, multiline calls and string-only interpolation. Recorded policies in DECISIONS
+and STAGE8_ERGONOMICS; implementation/verification in progress. No hosted CI,
+Git mutation, root README, publication or Stage 9 authorized.
+
+Early engineering evidence is retained under /tmp/sprint6-*. A compilation typo
+used FieldType.definition instead of its existing Type conversion; repaired it.
+An initial synthetic interpolation chunk with raw token spelling `[` was parsed
+as collection syntax; chunks now retain quoted token spelling and actual original
+source widths. Extended literal-block suspension to include if/else inside calls.
+Two test expectations were corrected: duplicate binding wording and completion of
+an already-in-scope input instead of a variable declared after its initializer.
+Focused suites then passed 3/3 and 9/9. A separate probe found inferred-default
+has prematurely froze an unresolved receiver catalog (returned false); inference
+now preserves the query, with dependency-aware header preparation before constant
+queries. The regression is included. These are engineering attempts, not extra
+unique acceptance suites. Final consolidated verification is still pending.
+
+
+### Sprint 6 small-stack and editor engineering repairs
+
+The first two full 1 MiB frontend runs failed in the existing 400-method-chain
+negative. GDB outside the sandbox's ptrace restriction identified the recursive
+semantic dispatcher path. Passing the new if handler's optional expected Type by
+value added an unrelated 128-byte temporary to every expression_impl frame
+(1456 bytes). Borrowing it by const reference restores the smaller hot frame;
+the unchanged complete 1 MiB Debug gate then passed. No depth guard, legal chain,
+assertion or stack limit was relaxed. Trace and unsuccessful logs are retained.
+
+Extension typecheck/build succeeded; new grammar unit assertions first needed an
+anchored interpolation-start regex (escaped braces are consumed by the preceding
+rule), then replacement of the obsolete negative assertion that has was not a
+keyword. Corrected extension checks passed 4/4. Shell PATH initially lacked npm;
+used the installed Node 24.19.0 runtime, without downloading dependencies.
+
+Whole original interpolation spelling is retained on its first literal piece so
+exact compile-time/default/reload syntax contracts cannot collapse into a manually
+written equivalent concatenation. Compiler/tooling still use original piece spans.
+
+
+### Sprint 6 final artifact freshness and continuation repair
+
+First consolidated Debug and Release runs passed 156/156 each. A separate strict
+host probe exposed that editing an included source during an earlier sanitizer
+compile had left a stale core object despite a newer output timestamp. Its exact
+interpolation-spelling restart assertion failed. Stopped only that identified
+strict CTest run (exit 130, 12 completed suites), retained its log and failing
+probe, and forced a fresh compiler rebuild. No sanitizer or semantic check was
+relaxed. Subsequent acceptance must use fully rebuilt final artifacts.
+
+A final focused probe also found a multiline call following a function-type
+annotation was mistaken for a declaration header. Header recognition now follows
+the declaration prefix or immediate func token. Added a typed callback regression
+and retained direct-header/generic-header negatives. A proposed blanket header-line
+check was discarded because it rejected existing multiline collection defaults;
+the permanent positive covers those defaults. No extra header checker ships. Because production parsing changed, the
+final consolidated three-configuration acceptance will be repeated; earlier
+passes are engineering evidence and do not inflate unique suite counts.
+
+
+The has lookahead probe `flag or Type has Target` exposed overly broad scanning
+across consecutive names. Qualified type prefixes now use the existing generic
+lookahead's closing-delimiter logic, without consuming logical operands. Added
+ordinary Boolean operands on both sides of type relationships. This is a parser
+repair within the approved precedence contract, not conditional refinement.
+
+
+The first callback-continuation fixture used unsupported generic inference from
+a function reference and failed 1/3 focused suites. It now supplies the explicit
+existing function-type argument, preserving the established inference boundary.
+The continuation repair itself succeeded: the former newline syntax error became
+the correct existing inference diagnostic. No generic inference policy changed.
+
+
+## 21 October 2026 — Stage 8 Sprint 6 local acceptance; Wrench handoff
+
+Implemented the four owner-approved bounded features through the existing
+frontend, constraint/composition logic, typed branch/string IR and LLVM 19.1.7:
+Type has Target, indented typed if, multiline calls and string-only interpolation.
+Preserved readonly/copy/identity, GC/cleanup, generic both-branch checking,
+application/native, cache/reload, CI #82 and Sprint 5 retirement contracts.
+
+Final unfiltered Debug **156/156 (559.83s)**,
+Release **156/156 (229.57s)** and strict
+ASan/UBSan/leaks **156/156 (476.57s)**:
+**468/468 final unique outcomes; zero final failures**. Both complete 1 MiB
+frontend gates passed. Extension typecheck/build/unit 4/4 and headless Vim syntax
+passed. All engineering failures/repairs above, including interrupted stale-object
+strict validation, remain in evidence; no rerun inflates the count.
+
+Updated the feature contract, decisions/approvals/roadmap, Bible/guides, central
+index, development strategy, known issues and permanent Keyboard/Research/Wrench
+handoffs. Sprint 6 acceptance, log/source hashes, stack evidence and final seven-job
+hosted/editor checklist are under docs/stage8/. Earlier sprint evidence is intact.
+
+No current-sprint semantic decision remains pending. Deferred formatting/display,
+triple strings, recursive has/refinement, broad task ownership and other Bible
+features remain future work. No commits/pushes/branches/remotes/hosted CI/publication,
+root README change, stdlib work or Stage 9. Stop for Wrench review; Boss-controlled
+Git, explicit hosted authorization, Windows/macOS and actual editor gates remain.

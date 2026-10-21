@@ -1,0 +1,59 @@
+{
+  "baseline": "3d61279237c62157f2ecfff01aa24d6c937f9a0d",
+  "scope": "Final source/test bytes, not a Git commit or hosted acceptance",
+  "files": {
+    "CMakeLists.txt": {
+      "sha256": "7bcd2c038ad244906534fa05e2bccf6bd3e3d537b01cc30fa787c6a1b2b9f8dd",
+      "bytes": 53825
+    },
+    "src/frontend/compiler.cpp": {
+      "sha256": "e6891551933bbed674a89723b0089902baea3d3fd08fba1f898a37b804bd844c",
+      "bytes": 408164
+    },
+    "src/frontend/strings.inc": {
+      "sha256": "4a3bf952644e999f5e8770f8633e217c8d3c123c40118429d208c4a37c7c40fd",
+      "bytes": 5169
+    },
+    "src/frontend/pattern_parser.inc": {
+      "sha256": "3e5c901a9e600eeb036097785451630ac8a772968d841b6c47534c53d442c76c",
+      "bytes": 4502
+    },
+    "src/frontend/capabilities.inc": {
+      "sha256": "92ea163b33139dd2b3d80897639f7ec8dc260443f94a371aaa146f9e39b68d7a",
+      "bytes": 43237
+    },
+    "editors/vim/syntax/void.vim": {
+      "sha256": "39b1335f84233b4657c2fe7fbe1d695066106bb314fab97c6c19e627d67b0986",
+      "bytes": 1158
+    },
+    "editors/vscode/syntaxes/void.tmLanguage.json": {
+      "sha256": "00a56b2d0a72a2396e15b3d97a71127a61b93f0ca19eb066f2353ba52b21a0ad",
+      "bytes": 1923
+    },
+    "editors/vscode/src/test/config.test.ts": {
+      "sha256": "3020a96fed99eba615fad632d00559018b2e7facc30ae97c8b80b719c5c4844e",
+      "bytes": 9104
+    },
+    "tests/stage8/sprint6.cpp": {
+      "sha256": "7802c1380f98d354564d3d58cda6f1cb10584759ed688bb51b2fc19a37e6bf79",
+      "bytes": 5195
+    },
+    "tests/stage8/sprint6.py": {
+      "sha256": "028420f7bce9dba56f036f8985c03e12398c53784431e5ae3800d4467e95beb8",
+      "bytes": 6862
+    },
+    "tests/stage8/lsp_sprint6.py": {
+      "sha256": "f86c321ed8669153bec25fea8887ee539e54cf984181eac6368216ebddeed8b5",
+      "bytes": 4006
+    },
+    "tests/stage8/sprint6/ergonomics.void": {
+      "sha256": "8f276f5174d7dc8829f6f82001018d32c194d2e95b2c8f455522508382008a0d",
+      "bytes": 3537
+    }
+  },
+  "protected_unchanged": {
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    "src/frontend/source.cpp": "4900d157d7a84c42f8aeea608c9e6b4c7e9da02679cad7b0fdbda074fa4044e4",
+    "tests/lsp/stage8.py": "258b47a90c5727317342ae25c37a8d1a3d2bfa749073302d3387a780619cc62a"
+  }
+}

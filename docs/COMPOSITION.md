@@ -152,8 +152,19 @@ lifecycle behavior is unchanged.
 
 Phase 20 implements the approved inheritance and component virtual-dispatch
 interactions described in INHERITANCE.md. Deferred: automatic transitive promotion,
-structural interface execution, has, method-only mixins, nullable promotion and new field
-visibility syntax. No subtype/conversion is conferred by composition. All existing
+method-only mixins, nullable promotion and new field visibility syntax. Phase 21
+and Stage 8 Sprint 6 separately deliver structural interfaces and type-level has. No subtype/conversion is conferred by composition. All existing
 source resource limits, native-provider safety and C1/S1/P3/P4/RV contracts remain.
 The seven hosted jobs must verify this phase after the owner pushes; Linux local
 results cannot establish Windows/macOS or unavailable VSCodium execution.
+
+
+## Stage 8 Sprint 6 — 21 October 2026
+
+[The bounded ergonomics contract](STAGE8_ERGONOMICS.md) supersedes historical
+blanket exclusions above for compile-time type `has`, typed if-expressions,
+multiline calls and string-only interpolation. Existing nominal storage,
+structural conformance, generic specialization, capabilities and checked failure
+rules remain authoritative. Both conditional branches type-check. Formatting and
+numeric/bool/custom string conversion remain deferred. Approval and implementation
+are separate from local acceptance, Wrench review and the final hosted lock.

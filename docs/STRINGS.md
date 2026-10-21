@@ -63,10 +63,11 @@ There is no normalization, case folding or locale comparison. Thus `"é"` equals
 `"a\0b"` equals `"a" + "\u{0}" + "b"`. C terminated-API restrictions do not
 truncate or restrict ordinary string values.
 
-`{{`/`}}` denote literal braces. Single raw braces reserve automatic interpolation
-and produce a deferred-interpolation diagnostic. `\u{7b}` yields a literal brace;
-decoded escapes are never reparsed as interpolation. `"Hello, {name}"` remains
-unsupported. Numeric/bool concatenation, ordering, casts and truthiness are not
+`{{`/`}}` denote literal braces. Stage 8 Sprint 6 now admits single-brace
+substitutions containing ordinary single-line string expressions, including
+`"Hello, {name}"`. `\u{7b}` yields a literal brace; decoded escapes are never
+reparsed as interpolation. Numeric/bool/custom display and formatting remain
+deferred; see STAGE8_ERGONOMICS.md. Numeric/bool concatenation, ordering, casts and truthiness are not
 implicitly introduced by string support.
 
 Const bindings cannot be rebound. Payload immutability applies to all bindings;
@@ -165,3 +166,14 @@ interface/virtual uses, checked OOM and recovery, exact Unicode/NUL behavior,
 compound selected owners, active reload leases and old-holder/new-AOT-code access.
 The process-level LSP and real editor regressions include unsaved string failure
 and repair. See WORK_LOG.md for completed commands, results and remaining gates.
+
+
+## Stage 8 Sprint 6 — 21 October 2026
+
+[The bounded ergonomics contract](STAGE8_ERGONOMICS.md) supersedes historical
+blanket exclusions above for compile-time type `has`, typed if-expressions,
+multiline calls and string-only interpolation. Existing nominal storage,
+structural conformance, generic specialization, capabilities and checked failure
+rules remain authoritative. Both conditional branches type-check. Formatting and
+numeric/bool/custom string conversion remain deferred. Approval and implementation
+are separate from local acceptance, Wrench review and the final hosted lock.

@@ -1,0 +1,25 @@
+{
+  "scope": "Linux x86-64 Clang 19 Debug prologue allocations; other platforms require hosted execution",
+  "before_choice_expected_borrow": {
+    "expression_impl": 1456
+  },
+  "after": {
+    "expression": 496,
+    "expression_impl": 1312,
+    "method_expression": 1760,
+    "anchor": 3456
+  },
+  "stack_limit_bytes": 1048576,
+  "depth_guards_unchanged": true,
+  "engineering_full_debug_1mib_exit": 0,
+  "failure_logs": [
+    "/tmp/sprint6-debug-1mib-engineering.log",
+    "/tmp/sprint6-debug-1mib-engineering-2.log",
+    "/tmp/sprint6-stack-trace-2.log"
+  ],
+  "pass_log": "/tmp/sprint6-debug-1mib-engineering-3.log",
+  "final_full_frontend_gates": {
+    "debug": "/tmp/sprint6-debug-1mib-final.log",
+    "release": "/tmp/sprint6-release-1mib-final.log"
+  }
+}

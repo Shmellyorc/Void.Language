@@ -94,8 +94,7 @@ invalid; managed/growable indirection uses the existing rules.
 General `t?`, higher-kinded parameters, generic interfaces, method-specific generic
 virtuals/initializers, variance, operator/comparable contracts and specialization
 sharing optimizations remain outside this foundation. An already nullable managed
-type can be supplied as `t`. Named ordinary method arguments retain the existing
-language restriction. Method-specific generic selection currently requires a
+type can be supplied as `t`. Ordinary named/default method arguments use the Stage 8 Sprint 2 shared binder. Method-specific generic selection currently requires a
 direct receiver declaration; owner-parameter methods become ordinary concrete
 methods and use the established inheritance/composition paths. Later source
 dictionaries and Stage 4 results/function types use these same concrete
@@ -114,3 +113,14 @@ See the Phase 24 WORK_LOG entry for exact commands and measured results.
 
 Phase 25 applies insert, clear and independent slicing to concrete generic elements
 and generic bodies through the same specialization path; see ARRAY_OPERATIONS.md.
+
+
+## Stage 8 Sprint 6 — 21 October 2026
+
+[The bounded ergonomics contract](STAGE8_ERGONOMICS.md) supersedes historical
+blanket exclusions above for compile-time type `has`, typed if-expressions,
+multiline calls and string-only interpolation. Existing nominal storage,
+structural conformance, generic specialization, capabilities and checked failure
+rules remain authoritative. Both conditional branches type-check. Formatting and
+numeric/bool/custom string conversion remain deferred. Approval and implementation
+are separate from local acceptance, Wrench review and the final hosted lock.

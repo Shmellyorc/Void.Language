@@ -1,0 +1,325 @@
+{
+  "date": "2026-10-21",
+  "status": "implemented / locally verified; Wrench review pending; not hosted locked",
+  "baseline": "3d61279237c62157f2ecfff01aa24d6c937f9a0d",
+  "configurations": {
+    "debug": {
+      "passed": 156,
+      "total": 156,
+      "seconds": 559.83,
+      "command": "ctest --test-dir build/debug --output-on-failure -j 2"
+    },
+    "release": {
+      "passed": 156,
+      "total": 156,
+      "seconds": 229.57,
+      "command": "ctest --test-dir build/ci-release --output-on-failure -j 2"
+    },
+    "sanitizer": {
+      "passed": 156,
+      "total": 156,
+      "seconds": 476.57,
+      "command": "env ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87 UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86 ctest --test-dir build/ci-sanitizers --output-on-failure -j 2"
+    }
+  },
+  "unique_configuration_suite_outcomes": 468,
+  "final_failures": 0,
+  "full_1mib_frontend": {
+    "debug": "passed",
+    "release": "passed",
+    "stack_bytes": 1048576
+  },
+  "extension_unit_tests": {
+    "passed": 4,
+    "total": 4,
+    "node": "24.19.0",
+    "actual_gui_client": false
+  },
+  "vim_syntax": "headless syntax assertions passed; not interactive client acceptance",
+  "engineering_attempts": {
+    "initial_full_debug": "156/156, 550.67 s, before final continuation/lookahead repairs",
+    "initial_full_release": "156/156, 220.52 s, before final continuation/lookahead repairs",
+    "initial_strict": "interrupted exit 130 after 12 completed suites when an independent exact-spelling regression exposed stale compiler object; no final acceptance claim",
+    "stale_object_probe": "failed restart assertion; forced fresh compiler rebuild",
+    "small_stack": "two Debug exit-139 attempts; borrowed optional expected Type restores expression_impl frame from 1456 to 1312 bytes; all original guards/tests retained",
+    "focused": "1/3 failed on unsupported generic function-reference inference in new fixture; corrected to existing explicit type argument; final focused 3/3 passed",
+    "other": "FieldType typo, synthetic chunk spelling, if/else continuation, inferred-default catalog timing, grammar assertions and scope-completion fixture repaired; see WORK_LOG and raw evidence"
+  },
+  "sanitizer_scope": "ASan/UBSan/leaks cover C++/C compiler, Runtime and provider code. Generated LLVM application instructions are not automatically claimed instrumented. Strict build/tests outside ptrace; no suppressed categories or disabled leak checks.",
+  "pending": [
+    "Wrench review",
+    "Boss commit/push and explicit final hosted authorization",
+    "seven hosted jobs including Windows Debug/Release CI82 physical-path coverage and macOS",
+    "fresh actual VS Code/VSCodium/Neovim/Vim client verification"
+  ],
+  "logs": {
+    "build/stage8-sprint6/evidence/sprint6-call-type-initial.log": {
+      "sha256": "6b5e77de2b687d621fde696b9842d996632cac7213f980a94213660eb1ff5a46",
+      "bytes": 567
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-1mib-engineering-2.log": {
+      "sha256": "fabc058f1e6ede4248964e35eb26cc2c550707e43537c07d2e2faeafe90338bb",
+      "bytes": 1056
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-1mib-engineering-3.log": {
+      "sha256": "78ab52ee80b779a44dbb34cb57904b25f68d908cca2f5e65552234f207f3d4b9",
+      "bytes": 5801
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-1mib-engineering.log": {
+      "sha256": "fabc058f1e6ede4248964e35eb26cc2c550707e43537c07d2e2faeafe90338bb",
+      "bytes": 1056
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-1mib-final.log": {
+      "sha256": "78ab52ee80b779a44dbb34cb57904b25f68d908cca2f5e65552234f207f3d4b9",
+      "bytes": 5801
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-1mib.log": {
+      "sha256": "78ab52ee80b779a44dbb34cb57904b25f68d908cca2f5e65552234f207f3d4b9",
+      "bytes": 5801
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-acceptance-final.log": {
+      "sha256": "34954809ad4003c756a44a3b26d0f7f799e1d31a73e3a8490137368580aa0b6f",
+      "bytes": 19636
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-acceptance.log": {
+      "sha256": "f3a083e45d516f58684e6a0b4cf02de8576f89f5196608ac68b90a7b90430502",
+      "bytes": 19636
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-configure.log": {
+      "sha256": "e7ea38247e834be850d788a1bd65fc30fa50769023c9e8ae8c7b27d13a56d570",
+      "bytes": 409
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-current-probe.log": {
+      "sha256": "403ba14c2c01de7267642cdb952b6e22c208edfc0797914974a92b8309253dfe",
+      "bytes": 69
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-final-build-2.log": {
+      "sha256": "705cd2d515e58a0ffdd6375ba419a92706866d5e7026f12f5461500639f7cae0",
+      "bytes": 109568
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-final-build-3.log": {
+      "sha256": "a1c8ccbb8857e1419c0eac28889891e5ee2d58f1661657a341906e79e4832351",
+      "bytes": 108997
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-final-build.log": {
+      "sha256": "7681d947d0ca6ad802d3ed4fde9b1db2c93a278ae087cfbeaf3ced5b50f494b4",
+      "bytes": 108997
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-focused-build-10.log": {
+      "sha256": "34655f6bffba91b7a3cccb941ac6e4033abb039f3f9b9585c8c3416b6c03cbec",
+      "bytes": 1298
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-focused-build-11.log": {
+      "sha256": "5f720f17f1584e2f235fc7ed31b869ea53f123e7da22efecec6988f73ec49398",
+      "bytes": 1298
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-focused-build-12.log": {
+      "sha256": "f8c5a890d97971ccf3a85feebf08fdf0f841551a95441fc7333d8b244765fadb",
+      "bytes": 1247
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-focused-build-13.log": {
+      "sha256": "1f294b6331e604f5c43a110acaf320c73ad23627ab768c96bee002c8256aaa21",
+      "bytes": 1298
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-focused-build-2.log": {
+      "sha256": "149aa18b472d128c49cb4193c75aed418951a2e7294701e5bedfe5ac94685076",
+      "bytes": 763
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-focused-build-3.log": {
+      "sha256": "4fec445c4bfde8844e798afcb8eda369b43d2b0090dd3bc44dd0368df81af092",
+      "bytes": 712
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-focused-build-4.log": {
+      "sha256": "149aa18b472d128c49cb4193c75aed418951a2e7294701e5bedfe5ac94685076",
+      "bytes": 763
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-focused-build-5.log": {
+      "sha256": "510ffc84aa63deb8d08b66de59fae946f24ef94153ee982544be09762bd8f684",
+      "bytes": 1146
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-focused-build-6.log": {
+      "sha256": "285139371521c98350c312b99cd22fc0b540a346e35fc5da65555f9c45f76ae0",
+      "bytes": 1007
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-focused-build-7.log": {
+      "sha256": "d743f439b9e5e7b18271e1a77bfbf773024171da534d71a0edca5d3eba118a53",
+      "bytes": 1298
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-focused-build-8.log": {
+      "sha256": "d743f439b9e5e7b18271e1a77bfbf773024171da534d71a0edca5d3eba118a53",
+      "bytes": 1298
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-focused-build-9.log": {
+      "sha256": "c7e8a42881ed3d1e4b005df428389226ac428f6cb7b4df8d65046af8a8a8e4d5",
+      "bytes": 1247
+    },
+    "build/stage8-sprint6/evidence/sprint6-debug-focused-build.log": {
+      "sha256": "fb485fda70ec0a68df1927d7c30d77dd4c74f849a63a11c9756d0654d14ad9d8",
+      "bytes": 996
+    },
+    "build/stage8-sprint6/evidence/sprint6-editor-direct.log": {
+      "sha256": "7f85544710103788142f99431e9305c73b5467fc1febbb83b0f43595a774e6c7",
+      "bytes": 1109
+    },
+    "build/stage8-sprint6/evidence/sprint6-editor-unit-2.log": {
+      "sha256": "7f61f8d5879757eda296992b97ae7355b48a282609a3e6e3c748b853451fa5e0",
+      "bytes": 530
+    },
+    "build/stage8-sprint6/evidence/sprint6-editor-unit-3.log": {
+      "sha256": "37ab0ba521822574010686b25b5737f7a1f0a38795b5a78d202a31ba9ebfa6fc",
+      "bytes": 1341
+    },
+    "build/stage8-sprint6/evidence/sprint6-editor-unit-4.log": {
+      "sha256": "d523b3587e8a8a23a23a4a284297da3dce5cdaf4a34e8d87ae46aa7da4726aaf",
+      "bytes": 685
+    },
+    "build/stage8-sprint6/evidence/sprint6-editor-unit.log": {
+      "sha256": "870cd158be4394e2492f3c34e72205be27c8535bec6c13001839ed9cbefc083b",
+      "bytes": 43
+    },
+    "build/stage8-sprint6/evidence/sprint6-finalize.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "build/stage8-sprint6/evidence/sprint6-focused-1.log": {
+      "sha256": "1c2b5fc0eace590cacc147c472bad0223352ca9e8c198806dacce265cdfdec1d",
+      "bytes": 460
+    },
+    "build/stage8-sprint6/evidence/sprint6-focused-2.log": {
+      "sha256": "d67360b566bde5f8538532b240145b3131657855199a05267d421d85dbf2aa75",
+      "bytes": 1043
+    },
+    "build/stage8-sprint6/evidence/sprint6-focused-3.log": {
+      "sha256": "2a76560049fe54ca032cde65cffda7640724961ac25c94f7c7efca947c419fb1",
+      "bytes": 460
+    },
+    "build/stage8-sprint6/evidence/sprint6-focused-4.log": {
+      "sha256": "1e18b361db4e5d9bc3058317e1c586dc1b6d4db9832eb40a81fb94a6a74d5028",
+      "bytes": 460
+    },
+    "build/stage8-sprint6/evidence/sprint6-focused-5.log": {
+      "sha256": "3608a0a83359e896e7b8a412bb9edadfb337324f7fcac3924b4f932dc088566a",
+      "bytes": 1464
+    },
+    "build/stage8-sprint6/evidence/sprint6-focused-6.log": {
+      "sha256": "265439a2fa180d6b9ad0b23c56de7bd07b45d764b064250300db17bc81a835c3",
+      "bytes": 460
+    },
+    "build/stage8-sprint6/evidence/sprint6-has-lookahead-initial.log": {
+      "sha256": "c8a559c709bf91be748c05886a6c65e7bf2c48e981088db88a49bf156f31dcf6",
+      "bytes": 366
+    },
+    "build/stage8-sprint6/evidence/sprint6-header-guard-rejected.log": {
+      "sha256": "4f9bbdc810d3d41e1736847225e1626bf080654553744d27e95e6d28becaf749",
+      "bytes": 218
+    },
+    "build/stage8-sprint6/evidence/sprint6-host-build.log": {
+      "sha256": "194a6f0492c7e4bfa8b254af48fd16679e68146a0ab538fc03e5de348abe3ff0",
+      "bytes": 383
+    },
+    "build/stage8-sprint6/evidence/sprint6-lsp-1.log": {
+      "sha256": "ffc5a5071cf6d3376376b610b789d8068375d02264b51e3ab53b6b87078db79e",
+      "bytes": 442
+    },
+    "build/stage8-sprint6/evidence/sprint6-more-probe.log": {
+      "sha256": "9961d158a7e0e2f990765971a9e490af826c0743b7d603020f34cc8944319fcb",
+      "bytes": 3
+    },
+    "build/stage8-sprint6/evidence/sprint6-process-1.log": {
+      "sha256": "df0117a5baf33baeb4ed29cba365ea121e7a14e5682692b6f02253a5b0aa2f8a",
+      "bytes": 526
+    },
+    "build/stage8-sprint6/evidence/sprint6-process-2.log": {
+      "sha256": "3f77ad3dd6b4efc3b96f12c298607294a4457b521dde82b2568f80f6ce81b0d9",
+      "bytes": 35
+    },
+    "build/stage8-sprint6/evidence/sprint6-release-1mib-final.log": {
+      "sha256": "78ab52ee80b779a44dbb34cb57904b25f68d908cca2f5e65552234f207f3d4b9",
+      "bytes": 5801
+    },
+    "build/stage8-sprint6/evidence/sprint6-release-1mib.log": {
+      "sha256": "78ab52ee80b779a44dbb34cb57904b25f68d908cca2f5e65552234f207f3d4b9",
+      "bytes": 5801
+    },
+    "build/stage8-sprint6/evidence/sprint6-release-acceptance-final.log": {
+      "sha256": "19564dd284d8f2c2814a521ce5788ce4c9b8d9003c8454d326c490ae41e01b9d",
+      "bytes": 19641
+    },
+    "build/stage8-sprint6/evidence/sprint6-release-acceptance.log": {
+      "sha256": "1f0109e46c53dd4df8499e85f09354d6a8fbccba0f41e6b88547a025d2b60a96",
+      "bytes": 19641
+    },
+    "build/stage8-sprint6/evidence/sprint6-release-configure.log": {
+      "sha256": "f0b9c89f834ef8acc065dea836f5c7b498a7840be097ab0c0becd23a0374a48d",
+      "bytes": 415
+    },
+    "build/stage8-sprint6/evidence/sprint6-release-current-probe.log": {
+      "sha256": "403ba14c2c01de7267642cdb952b6e22c208edfc0797914974a92b8309253dfe",
+      "bytes": 69
+    },
+    "build/stage8-sprint6/evidence/sprint6-release-final-build-2.log": {
+      "sha256": "e8d5ba4c5e873c0086affc04767e29981642c13f10c0d99a446141481efa2c94",
+      "bytes": 111270
+    },
+    "build/stage8-sprint6/evidence/sprint6-release-final-build-3.log": {
+      "sha256": "f1c1cc0ccc450bc3988326ca97ef44a6cbf2ccb7c85d4e384be31a566a86ffb0",
+      "bytes": 111182
+    },
+    "build/stage8-sprint6/evidence/sprint6-release-final-build.log": {
+      "sha256": "8f58485778b57c97e5d0de3af26ccafc2e661401a62d54d37d7d5b4fb3f05682",
+      "bytes": 111322
+    },
+    "build/stage8-sprint6/evidence/sprint6-sanitizer-acceptance-final.log": {
+      "sha256": "53243c8ce7017779584f319d33592fe906b6e1a91fc1de38aa6ebb1ccda5b454",
+      "bytes": 19644
+    },
+    "build/stage8-sprint6/evidence/sprint6-sanitizer-acceptance.log": {
+      "sha256": "46e2ccf1b0d0905c6039caa6cc0612d9288f45c711366fbf8e71e6a9c1ed9557",
+      "bytes": 1586
+    },
+    "build/stage8-sprint6/evidence/sprint6-sanitizer-configure.log": {
+      "sha256": "b53626a9a7f0014b471446abc6e41caff9297cc05972ca6c2f732a6235738dbd",
+      "bytes": 418
+    },
+    "build/stage8-sprint6/evidence/sprint6-sanitizer-final-build-2.log": {
+      "sha256": "e5f08c44658ee1fbdf879480a3a8c25d8cb28f68376a69541a7bca69768de6b7",
+      "bytes": 24239
+    },
+    "build/stage8-sprint6/evidence/sprint6-sanitizer-final-build-3.log": {
+      "sha256": "1400a3406d461c7ed91cc6a9f24f7f350bedc61e02d80a273c40bbe9ba366aaa",
+      "bytes": 112007
+    },
+    "build/stage8-sprint6/evidence/sprint6-sanitizer-final-build-4.log": {
+      "sha256": "5672ec2c7acdb6b218972fee22733d894cc521bf41dca6c6fa7acbb52c161564",
+      "bytes": 112007
+    },
+    "build/stage8-sprint6/evidence/sprint6-sanitizer-final-build.log": {
+      "sha256": "b8962d81f97127a2cf14079e3d3e7b6ef4a9fda87a1d7ca3fff2681565268fcb",
+      "bytes": 112095
+    },
+    "build/stage8-sprint6/evidence/sprint6-sanitizer-stale-object-interrupted.log": {
+      "sha256": "46e2ccf1b0d0905c6039caa6cc0612d9288f45c711366fbf8e71e6a9c1ed9557",
+      "bytes": 1586
+    },
+    "build/stage8-sprint6/evidence/sprint6-stack-trace-2.log": {
+      "sha256": "01895a78f75baa1be12b07bb0c38f8be978c09843bea3b9716a8c1aa566ed862",
+      "bytes": 10872
+    },
+    "build/stage8-sprint6/evidence/sprint6-stack-trace.log": {
+      "sha256": "b5202d07e0006530755949b382d55d9c0a8e98f95d07726e6237a4a3b689d600",
+      "bytes": 143
+    },
+    "build/stage8-sprint6/evidence/sprint6-strict-current-probe.log": {
+      "sha256": "5beb0c2ed51fd5ae9ddb2fd7c291d9d36a95b3a18a4f222b8bd0fc1397e9046a",
+      "bytes": 58
+    },
+    "build/stage8-sprint6/evidence/sprint6-vim-syntax-initial.log": {
+      "sha256": "4d9c5a547122c2fe507373a63f91a1c967a6cbcb3590891e3a9e9821c39d6b51",
+      "bytes": 86
+    },
+    "build/stage8-sprint6/evidence/sprint6-vim-syntax.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

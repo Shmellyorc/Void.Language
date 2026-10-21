@@ -143,23 +143,25 @@ public:
 bool letter(char c) { return (c >= 'a' && c <= 'z') || c == '_'; }
 bool digit(char c) { return c >= '0' && c <= '9'; }
 const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue", "pass",
-    "async", "await", "spawn", "event", "defer", "with", "enum", "is", "match", "property", "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
+    "async", "await", "spawn", "event", "defer", "with", "enum", "has", "is", "match", "property", "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
 #include "strings.inc"
-std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
+std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::size_t begin=0, std::size_t end=std::string::npos, unsigned interpolation_depth=0) {
     const auto& text = source.text();
     std::vector<Token> tokens;
     std::vector<std::size_t> indents{0};
-    std::size_t p = text.starts_with("\xef\xbb\xbf") ? 3 : 0;
-    bool beginning = true;unsigned braces=0;std::size_t line_tokens=0;
-    struct LiteralBlock {unsigned braces;std::size_t parent,indent;};std::vector<LiteralBlock> literal_blocks;
+    std::size_t p = begin ? begin : text.starts_with("\xef\xbb\xbf") ? 3 : 0;
+    end=std::min(end,text.size());
+    std::vector<bool> parentheses;
+    bool beginning = !begin;unsigned braces=0;std::size_t line_tokens=0;
+    struct LiteralBlock {unsigned braces;std::size_t parent,indent;bool conditional;};std::vector<LiteralBlock> literal_blocks;
     auto emit = [&](TokenKind kind, std::string value, std::size_t offset) { tokens.push_back({kind, std::move(value), offset}); };
-    while (p < text.size()) {
+    while (p < end) {
         if (diagnostics.full()) break;
         try {
         if(beginning && !literal_blocks.empty() && !braces){
             auto end=p;while(end<text.size() && text[end]==' ')++end;
             const bool blank=end==text.size() || text[end]=='#' || text[end]=='\r' || text[end]=='\n';
-            if(!blank && end-p<=literal_blocks.back().indent){auto block=literal_blocks.back();literal_blocks.pop_back();while(indents.size()>block.parent+1){indents.pop_back();emit(TokenKind::dedent,"<dedent>",end);}indents.pop_back();braces=block.braces;}
+            if(!blank && end-p<=literal_blocks.back().indent && !(literal_blocks.back().conditional && end-p==literal_blocks.back().indent && text.compare(end,4,"else")==0)){auto block=literal_blocks.back();literal_blocks.pop_back();while(indents.size()>block.parent+1){indents.pop_back();emit(TokenKind::dedent,"<dedent>",end);}indents.pop_back();braces=block.braces;}
         }
         if(beginning && braces){while(p<text.size() && text[p]==' ')++p;beginning=false;}
         if (beginning) {
@@ -185,16 +187,36 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
         if (c == '\r' || c == '\n') {
             ++p; if (c == '\r' && p < text.size() && text[p] == '\n') ++p;
             if(braces && tokens.size()>line_tokens && tokens.back().text==":"){
-                for(auto n=line_tokens;n<tokens.size();++n)if(tokens[n].text=="match" || (tokens[n].text=="func" && n+1<tokens.size() && tokens[n+1].text=="(")){
+                for(auto n=line_tokens;n<tokens.size();++n)if(tokens[n].text=="match" || tokens[n].text=="if" || (tokens[n].text=="func" && n+1<tokens.size() && tokens[n+1].text=="(")){
                     auto line=tokens[n].offset;while(line && text[line-1]!='\n' && text[line-1]!='\r')--line;std::size_t width=0;while(line+width<text.size() && text[line+width]==' ')++width;
-                    literal_blocks.push_back({braces,indents.size(),width});indents.push_back(width);braces=0;break;
+                    literal_blocks.push_back({braces,indents.size(),width,tokens[n].text=="if"});indents.push_back(width);braces=0;break;
                 }
             }
             if (!braces && !tokens.empty() && tokens.back().kind != TokenKind::newline) emit(TokenKind::newline, "<newline>", start);
             line_tokens=tokens.size();beginning = true; continue;
         }
         if (c == '"') {
-            if (tokens.empty() || tokens.back().text!="use") { tokens.push_back(string_token(source,p)); continue; }
+            if (tokens.empty() || tokens.back().text!="use") {
+                if(interpolation_depth>=64)error(source,{TokenKind::symbol,"",p},Code::nesting,"String interpolation nesting limit exceeded.");
+                std::vector<std::pair<std::size_t,std::size_t>> substitutions;std::vector<Token> chunks;
+                auto token=string_token(source,p,&substitutions,&chunks);
+                if(substitutions.empty())tokens.push_back(std::move(token));
+                else {
+                    emit(TokenKind::symbol,"(",token.offset);
+                    for(std::size_t n=0;n<chunks.size();++n){
+                        if(n)emit(TokenKind::symbol,"+",chunks[n].offset);
+                        tokens.push_back(std::move(chunks[n]));
+                        if(n<substitutions.size()){
+                            auto [first,last]=substitutions[n];emit(TokenKind::symbol,"+",first);emit(TokenKind::symbol,"(",first);
+                            auto embedded=lex(source,diagnostics,first,last,interpolation_depth+1);
+                            for(auto& t:embedded)if(t.kind!=TokenKind::newline && t.kind!=TokenKind::end)tokens.push_back(std::move(t));
+                            emit(TokenKind::symbol,")",last);
+                        }
+                    }
+                    emit(TokenKind::symbol,")",p-1);
+                }
+                continue;
+            }
             ++p;
             while (p < text.size() && text[p] != '"' && text[p] != '\r' && text[p] != '\n') ++p;
             if (p == text.size() || text[p] != '"') error(source, {TokenKind::path, "", start}, Code::import_quote, "Unterminated import path.", "Close the path with a double quote on this line.");
@@ -225,7 +247,15 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics) {
             pair == "-=" || pair == "*=" || pair == "/=" || pair == "%=" || pair == "++" || pair == "--") {
             p += 2; emit(TokenKind::symbol, pair, start); continue;
         }
-        if (std::string("{}[]():,.+-*/%=<>?").find(c) != std::string::npos) { if(c=='{' && (tokens.empty() || tokens.back().text!="defer"))++braces;else if(c=='}' && braces)--braces;++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
+        if (std::string("{}[]():,.+-*/%=<>?").find(c) != std::string::npos) { if(c=='('){
+                auto first=line_tokens;
+                while(first<tokens.size() && (tokens[first].kind==TokenKind::indent || tokens[first].kind==TokenKind::dedent || tokens[first].text=="public" || tokens[first].text=="private" || tokens[first].text=="internal" || tokens[first].text=="virtual" || tokens[first].text=="override" || tokens[first].text=="async"))++first;
+                // A function-type annotation earlier on this line is not a
+                // declaration header for a later ordinary call.
+                const bool header=(!tokens.empty() && tokens.back().text=="func") || (first<tokens.size() && (tokens[first].text=="func" || tokens[first].text=="property" || tokens[first].text=="interface"));
+                const bool continuation=!header;parentheses.push_back(continuation);if(continuation)++braces;
+            }else if(c==')' && !parentheses.empty()){if(parentheses.back() && braces)--braces;parentheses.pop_back();}
+            else if(c=='{' && (tokens.empty() || tokens.back().text!="defer"))++braces;else if(c=='}' && braces)--braces;++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
         error(source, {TokenKind::symbol, "", p}, Code::character, "Unexpected character in source.",
               c == '\t' ? "Use spaces instead of tabs." : "Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.");
         } catch (const CompilationError& e) {
@@ -263,7 +293,7 @@ struct Expr {
     bool event=false, asynchronous_call=false;
     std::string event_owner,native_symbol;
     Type environment=Type::none;
-    enum class Kind { spawned, task_cancel, awaited, lambda, capture_reference, function_reference, function_call, function_null, test, match, sum, propagate, literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal } kind;
+    enum class Kind { spawned, task_cancel, awaited, lambda, capture_reference, function_reference, function_call, function_null, test, match, choice, has, sum, propagate, literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::string op, qualifier, target, source_target;
@@ -464,6 +494,7 @@ struct Import {
 };
 struct Unit {
     EditorProbe* editor=nullptr;
+    std::function<void(Type,Type,const SourceFile&,const Token&)> prepare_relationships;
     SourceFile source;
     std::string identity;
     std::vector<Import> imports;
@@ -601,12 +632,13 @@ class Parser {
     std::vector<Type> type_arguments() {
         std::vector<Type> result;need("<");do {result.push_back(type());}while(accept(","));need(">");return result;
     }
-    bool type_call(bool value=false) const {
-        if(!at("<"))return false;
+    bool type_call(bool value=false,bool relationship=false,std::size_t start=std::string::npos) const {
+        if(start==std::string::npos)start=p;
+        if(start>=tokens.size() || tokens[start].text!="<")return false;
         unsigned nesting=0;
-        for(auto n=p;n<tokens.size();++n) {
+        for(auto n=start;n<tokens.size();++n) {
             if(tokens[n].text=="<")++nesting;
-            else if(tokens[n].text==">") {if(!--nesting){if(n+1>=tokens.size())return false;const auto& next=tokens[n+1];return next.text=="(" || (value && (next.kind==TokenKind::newline || next.kind==TokenKind::end || next.text=="," || next.text==")" || next.text=="]" || next.text=="}" || next.text==":"));}}
+            else if(tokens[n].text==">") {if(!--nesting){if(n+1>=tokens.size())return false;const auto& next=tokens[n+1];if(relationship)return next.text=="has" || (next.text=="?" && n+2<tokens.size() && tokens[n+2].text=="has");return next.text=="(" || (value && (next.kind==TokenKind::newline || next.kind==TokenKind::end || next.text=="," || next.text==")" || next.text=="]" || next.text=="}" || next.text==":"));}}
             else if(tokens[n].kind==TokenKind::newline || tokens[n].kind==TokenKind::end)return false;
         }
         return false;
@@ -732,7 +764,7 @@ class Parser {
                     Token named{TokenKind::name,"",peek().offset};
                     if(p+1<tokens.size() && tokens[p+1].text=="=") {named=name();need("=");}
                     e->names.push_back(named);e->parts.push_back(expression());
-                } while(accept(","));
+                } while(accept(",") && !at(")"));
                 need(")");
             } else break;
         }
@@ -747,6 +779,13 @@ class Parser {
             parameters(lambda);auto* parent=parsing_function;auto begin=p;{FunctionScope scope(parsing_function,lambda);lambda.body=block();}
             for(auto n=begin;n<p;++n)lambda.body_syntax+=std::to_string(tokens[n].text.size())+":"+tokens[n].text;
             auto expression=std::make_unique<Expr>(Expr::Kind::lambda,token);expression->slot=static_cast<unsigned>(parent->lambdas.size());parent->lambdas.push_back(std::move(lambda));multiline_expression=true;return expression;
+        }
+        if(token.text=="if")return choice_expression(token);
+        if(token.kind==TokenKind::name){
+            auto cursor=p;
+            while(cursor+1<tokens.size() && tokens[cursor].text=="." && tokens[cursor+1].kind==TokenKind::name)cursor+=2;
+            const bool relationship=tokens[cursor].text=="has" || (tokens[cursor].text=="?" && cursor+1<tokens.size() && tokens[cursor+1].text=="has") || type_call(false,true,cursor);
+            if(relationship){--p;return has_expression();}
         }
         if(token.text=="match")return match_expression(token);
         if(token.kind==TokenKind::invalid) throw Poison{};
@@ -786,6 +825,10 @@ class Parser {
             return e;
         }
         return primary();
+    }
+    VOID_SEMANTIC_HANDLER std::unique_ptr<Expr> has_expression() {
+        auto left=type();auto site=need("has");auto right=type();
+        auto e=std::make_unique<Expr>(Expr::Kind::has,site);e->type_arguments={left,right};return e;
     }
     std::unique_ptr<Expr> expression(int minimum = 1) {
         Depth guard(depth, source, peek());
@@ -1181,6 +1224,7 @@ class Semantics {
     std::vector<std::map<std::string, Variable>> scopes;
     Function* current = nullptr;
     const Function* default_context = nullptr;
+    bool inferring_default=false;
     unsigned loops = 0;
     bool suppress_zero = false,pattern_bindings=false,allow_event=false;
     Variable* lookup(const std::string& name) {
@@ -1972,7 +2016,7 @@ class Semantics {
             }
             if(e.qualifier.empty()) {
                 for(const auto& [name,owners]:unit.qualifiers) candidates.emplace(name,EditorCandidate{name,"import",9});
-                for(const auto& name:{"true","false","null","not","match","func"}) candidates.emplace(name,EditorCandidate{name,"keyword",14});
+                for(const auto& name:{"true","false","null","not","match","if","func"}) candidates.emplace(name,EditorCandidate{name,"keyword",14});
                 if(current && current->asynchronous)for(const auto& name:{"await","spawn"})candidates.emplace(name,EditorCandidate{name,"keyword",14});
             }
         }
@@ -1997,6 +2041,8 @@ class Semantics {
         case Expr::Kind::function_call:return function_invocation(e);
         case Expr::Kind::test:return test_expression(e);
         case Expr::Kind::match:return match_expression(e,expected);
+        case Expr::Kind::choice:return choice_expression(e,expected);
+        case Expr::Kind::has:return has_expression(e);
         case Expr::Kind::sum:return e.type;
         case Expr::Kind::propagate:return propagate_expression(e);
         case Expr::Kind::construction: return e.type; // An inferred literal may revisit its already checked constructor.
@@ -2180,6 +2226,30 @@ class Semantics {
         if(index==error_type) return error_type;
         if(!numeric::integer(index)) error(source,e.parts[1]->token,Code::type_mismatch,"Array index requires an integer, excluding bool and floating types.");
         return e.type=ir::array_element(array);
+    }
+    VOID_SEMANTIC_HANDLER Type has_expression(Expr& e) {
+        auto left=resolve_type(e.type_arguments.at(0),unit,root,units,e.token);
+        auto right=resolve_type(e.type_arguments.at(1),unit,root,units,e.token);
+        auto supported=[](Type t){return !t.nullable && !t.construction && t.definition && (t.kind==Type::managed_ref || t.kind==Type::aggregate || t.kind==Type::interface_ref) && t.definition->cases.empty() && !t.definition->callable;};
+        if(!supported(left) || !supported(right))error(source,e.token,Code::unsupported_type,"has requires nonnullable struct or interface type operands.");
+        // Default type inference needs only bool. Its value is checked again
+        // after all method headers are resolved; never freeze a partial catalog.
+        if(inferring_default)return e.type=Type::boolean;
+        root.prepare_relationships(left,right,source,e.token);
+        bool found=false;
+        if(right.kind==Type::interface_ref){try{ir::satisfy_constraint(*root.member_catalog,left,right,unit.identity);found=true;}catch(const std::invalid_argument&) {}catch(const std::length_error& failure){error(source,e.token,Code::limit,failure.what());}}
+        else if(left.kind!=Type::interface_ref)for(const auto& field:left.definition->fields)if(field.using_field && Type(field.type).definition==right.definition)found=true;
+        e.kind=Expr::Kind::literal;e.value=found;return e.type=Type::boolean;
+    }
+    VOID_SEMANTIC_HANDLER Type choice_expression(Expr& e,const std::optional<Type>& expected) {
+        scopes.emplace_back();
+        Type result=Type::invalid;
+        try {condition(*e.parts[0]);result=expression(*e.parts[1],expected);scopes.pop_back();}
+        catch(...){scopes.pop_back();pattern_bindings=false;throw;}
+        if(expected){expect(result,*expected,e.parts[1]->token);result=*expected;}
+        if(result==Type::none)error(source,e.token,Code::invalid_value,"An if-expression requires value-producing branches.");
+        expect(expression(*e.parts[2],result),result,e.parts[2]->token);
+        return e.type=result;
     }
     VOID_SEMANTIC_HANDLER Type literal_expression(Expr& e, std::optional<Type> expected) {
         if (e.token.text == "null") {
@@ -2613,6 +2683,9 @@ class Semantics {
         return s.flow = flow;
     }
 public:
+    Type infer_default(Expr& e,const Function& context) {
+        inferring_default=true;return pure_expression(e,&context);
+    }
     Type pure_expression(Expr& e,const Function* context=nullptr,std::optional<Type> expected={}) {
         auto previous=default_context;default_context=context;
         try {auto result=expression(e,expected);default_context=previous;return result;}
@@ -3123,6 +3196,14 @@ class Lowering {
         case K::function_call:return frontend_case([&]() -> unsigned {auto function=snapshot(expression(*e.parts[0]),e.parts[0]->type,e.token);std::vector<unsigned> arguments;for(unsigned n=1;n<e.parts.size();++n)arguments.push_back(snapshot(expression(*e.parts[n]),e.parts[n]->type,e.token));ir::Instruction call{ir::Op::function_call,emit({ir::Op::load,function},e.token)};for(auto slot:arguments)call.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(call,e.token);});
         case K::test: return lower_test(e);
         case K::match: return lower_match(e);
+        case K::choice: return frontend_case([&]() -> unsigned {
+            auto result=static_cast<unsigned>(output.locals.size());output.locals.push_back(e.type);
+            auto yes=block(),no=block(),done=block();lower_condition(*e.parts[0],yes,no);
+            current=yes;emit({ir::Op::store,result,expression(*e.parts[1])},e.token);jump(done);
+            current=no;emit({ir::Op::store,result,expression(*e.parts[2])},e.token);jump(done);
+            current=done;return emit({ir::Op::load,result},e.token);
+        });
+        case K::has: throw std::logic_error("Unchecked has expression");
         case K::sum: return frontend_case([&]() -> unsigned {
             ir::Instruction construct{ir::Op::sum};construct.type=e.type;construct.immediate=e.slot;
             std::vector<unsigned> slots;for(const auto& child:e.parts)slots.push_back(snapshot(expression(*child),child->type,child->token));
@@ -3790,6 +3871,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
         try {return {e.token.text=="abs"?numeric::absolute(values.at(0),e.type):numeric::clamp(values.at(0),values.at(1),values.at(2),e.type),{}};}
         catch(const std::invalid_argument& failure){error(source,e.token,Code::numeric_conversion,failure.what());}
     }
+    if(e.kind==Expr::Kind::choice)return constant_value(source,*e.parts[constant_value(source,*e.parts[0]).bits?1:2]);
     if(e.kind==Expr::Kind::sum) {
         ir::ConstantValue result;result.fields.resize(e.type.definition->fields.size());result.fields[0].bits=e.slot;
         const auto& variant=e.type.definition->cases.at(e.slot);
@@ -4196,11 +4278,6 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         } catch (...) { structure.layout_state = 3; throw; }
     };
 #include "generics.inc"
-    for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
-        try { layout(*unit,structure); }
-        catch (const CompilationError& failure) { diagnostics.add(failure); }
-        catch (const Poison&) {}
-    }
     prepare_function = [&](Unit& owner,Function& f) {
         auto* unit=&owner;
         if(f.prepared)return;f.prepared=true;
@@ -4214,7 +4291,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             if(parameter.type==Type::none && parameter.default_expression) {
                 try {
                     const bool readonly=parameter.type.readonly;
-                    parameter.type=Semantics(owner,units,root,evaluate,diagnostics,defaults).pure_expression(*parameter.default_expression,&f);
+                    parameter.type=Semantics(owner,units,root,evaluate,diagnostics,defaults).infer_default(*parameter.default_expression,f);
                     if(parameter.type==Type::none || parameter.type==Type::null_value || parameter.type==error_type || parameter.type.kind==Type::unresolved)
                         error(owner.source,parameter.token,Code::type_mismatch,"Default does not determine a concrete parameter type.");
                     parameter.type.readonly=readonly;
@@ -4247,9 +4324,28 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
               catch (const Poison&) { f.parse_failed = true; }
         }
     };
+    bool preparing_relationships=false;
+    root.prepare_relationships=[&](Type left,Type right,const SourceFile& location,const Token& token){
+        if(headers_ready)return;
+        if(preparing_relationships)error(location,token,Code::constant_cycle,"Cyclic dependency between has and declaration headers.");
+        preparing_relationships=true;
+        try {
+            for(auto type:{left,right})for(auto& [id,owner]:units)for(auto& structure:owner->structures)
+                if(structure.definition==type.definition)layout(*owner,structure);
+            for(auto& [id,owner]:units)for(auto& function:owner->functions)if(!function.prepared && (function.receiver || function.interface_requirement))prepare_function(*owner,function);
+            root.member_catalog=std::make_shared<ir::Module>(member_catalog(units,entry));
+            preparing_relationships=false;
+        }catch(...){preparing_relationships=false;throw;}
+    };
+    for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
+        try { layout(*unit,structure); }
+        catch (const CompilationError& failure) { diagnostics.add(failure); }
+        catch (const Poison&) {}
+    }
     bool pending_headers=true;
     while(pending_headers) {pending_headers=false;for(auto& [id,u]:units)for(auto& f:u->functions)if(!f.prepared){prepare_function(*u,f);pending_headers=true;}}
     headers_ready=true;
+    root.prepare_relationships=[](Type,Type,const SourceFile&,const Token&){};
     validate_inheritance(units,root,diagnostics);
     root.member_catalog=std::make_shared<ir::Module>(member_catalog(units,entry));
 #include "generic_declarations.inc"
@@ -4899,7 +4995,7 @@ std::optional<std::string> format_source(const SourceFile& source) {
     if(diagnostics.failed())return {};
     const auto& text=source.text();
     struct Edit {std::size_t begin,end;std::string text;};std::vector<Edit> edits;
-    unsigned depth=0,brace_depth=0;std::vector<bool> braces;std::set<std::size_t> lines;
+    unsigned depth=0,brace_depth=0,parentheses=0;std::vector<bool> braces;std::set<std::size_t> lines;
     const Token* previous=nullptr;
     for(const auto& t:tokens) {
         if(t.kind==TokenKind::indent){++depth;continue;}
@@ -4911,7 +5007,7 @@ std::optional<std::string> format_source(const SourceFile& source) {
         if(lines.insert(start).second) {
             auto indent=start;if(!start && text.starts_with("\xef\xbb\xbf"))indent=3;
             auto end=indent;while(end<text.size() && text[end]==' ')++end;
-            if(end==t.offset)edits.push_back({indent,end,std::string((depth+brace_depth)*4,' ')});
+            if(end==t.offset && !parentheses)edits.push_back({indent,end,std::string((depth+brace_depth)*4,' ')});
         }
         if(previous) {
             auto left=span(source,*previous);
@@ -4925,6 +5021,7 @@ std::optional<std::string> format_source(const SourceFile& source) {
             }
         }
         if(t.text=="{"){bool literal=!previous || previous->text!="defer";braces.push_back(literal);if(literal)++brace_depth;}
+        if(t.text=="(")++parentheses;else if(t.text==")" && parentheses)--parentheses;
         previous=&t;
     }
     // Retokenization proves the same structural indentation, including literal

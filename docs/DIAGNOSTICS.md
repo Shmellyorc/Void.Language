@@ -327,3 +327,14 @@ Cleanup uses the existing bounded RuntimeFailure trace: the original failure
 remains primary, additional deferred failures attach diagnostics, and remaining
 applicable cleanup continues. See ADVANCED_LANGUAGE.md and WORK_LOG.md for tests
 and the boundary against native process corruption or forced termination.
+
+
+## Stage 8 Sprint 6 — 21 October 2026
+
+[The bounded ergonomics contract](STAGE8_ERGONOMICS.md) supersedes historical
+blanket exclusions above for compile-time type `has`, typed if-expressions,
+multiline calls and string-only interpolation. Existing nominal storage,
+structural conformance, generic specialization, capabilities and checked failure
+rules remain authoritative. Both conditional branches type-check. Formatting and
+numeric/bool/custom string conversion remain deferred. Approval and implementation
+are separate from local acceptance, Wrench review and the final hosted lock.
