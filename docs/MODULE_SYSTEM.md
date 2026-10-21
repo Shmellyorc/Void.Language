@@ -17,6 +17,19 @@ module phase passed all three hosted platforms. The user also reports Phase 4 va
 all three platforms. Phase 5 recovery requires another hosted run. The Language Bible remains unchanged and authoritative; policies
 marked provisional below settle this implementation slice, not the full language.
 
+## Project-local library extension — 21 October 2026
+
+[LOCAL_LIBRARIES.md](LOCAL_LIBRARIES.md) specifies implemented `use lib/...`:
+`lib/raylib` selects `/libs/raylib/raylib.void`; `lib/raylib/graphics` selects
+`/libs/raylib/graphics.void`. Both are ordinary project-owned VFS identities,
+shared with quoted imports. Installed standard modules cannot use this prefix.
+The shared resolver and metadata assistance preserve exact-case/alias/security,
+overlay, snapshot, cache and reload rules. Native privileges remain explicit.
+[Focused acceptance](local-libraries/ACCEPTANCE.md) is local evidence only.
+The dated no-discovery/Unicode exclusions below are historical; current shared
+selection and Unicode physical-root behavior follow STAGE8_DISCOVERY.md and the
+later CI repair records.
+
 ## Working imports
 
 ```python

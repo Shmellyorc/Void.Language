@@ -1,0 +1,5 @@
+'VOID lld plain ' 0 
+'VOID lld é😀 ' 0 
+'VOID lld # ' 0 
+'VOID lld % ' 1 ld.lld: error: cannot open output file /tmp/VOID lld % 62oft6z9/a.bin: No such file or directory
+clang-19: error: linker command failed with exit code 1 (use -v to see invocation)

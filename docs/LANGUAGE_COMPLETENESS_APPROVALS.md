@@ -5,6 +5,16 @@ completeness audit and Stage 7 hosted acceptance.
 
 **Current status — 21 October 2026:**
 
+**Owner-authorized local-library extension — 21 October 2026:**
+`libs/` with reserved unquoted `lib/` is approved and implemented with local
+verification; [contract](LOCAL_LIBRARIES.md) and [evidence](local-libraries/ACCEPTANCE.md)
+define exact mapping, project ownership, canonical identity, assistance and native
+boundaries. This is not a new Stage 8 numbered sprint or Stage 9 authorization.
+Wrench review and native Windows/macOS execution remain pending. Already-running
+CI #87 is separate earlier-snapshot evidence and is not overwritten or claimed
+as acceptance of these edits. No package manager, native linker privileges,
+CLI/build changes, root README edits, Git mutation or hosted action is approved.
+
 **Latest crash/CI #86 repair:** [Evidence and review handoff](stage8/CI86_INCOMPLETE_SOURCE_REPAIR.md)
 record the verified completion-map invariant correction and path-assertion fix,
 focused Debug/Release and real editor results. No language policy changed.

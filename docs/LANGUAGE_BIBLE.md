@@ -447,9 +447,16 @@ No separate `printf`/`println` family is required in ordinary VOID.
 
 ## 10. Project entry point and VFS imports [AGREED]
 
-**Implemented clarification (Phases 3–4):** `MODULE_SYSTEM.md` defines the working project-root VFS, exact-case root-relative/relative imports, path normalization, rejection of escaping/root-redirecting components, duplicate import identity, aliases, public/internal/private access, import cycles, and deterministic name ambiguity. `VALUE_SEMANTICS.md` defines compile-time root-constant lookup and dependency cycles. External package/project identities, runtime file globals and the separately proposed executable top-level entry model remain future design, not unresolved behavior of working local imports.
-
-The project's entry point may be `main.void`, `program.void`, an explicitly configured entry file, or a unique project-root file containing `main()`. The precise discovery priority is recommended and still needs implementation agreement. The entry file defines the project root and provides project-wide constants.
+**Implemented clarification:** [MODULE_SYSTEM.md](MODULE_SYSTEM.md),
+[STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md) and
+[LOCAL_LIBRARIES.md](LOCAL_LIBRARIES.md) define the working VFS/import contracts.
+Explicit entry selection wins; automatic discovery selects the nearest exact
+`main.void` within the selected workspace, with a labelled standalone editor
+fallback. There is no recursive search for files containing `main()`. The entry's
+parent establishes the project root and its compile-time project constants.
+Application mode and selected-entry top-level execution follow the implemented
+Sprint 4 contract; imported executable top-level statements remain forbidden.
+External-package identities and runtime file globals remain future work.
 
 ```text
 my_game/                    <- virtual project root: /
@@ -471,13 +478,30 @@ Paths inside VOID source always use `/`, on Windows, Linux, and macOS. The leadi
 use "/units/player.void"        # Root-relative VFS path
 use "./enemy.void"              # Relative to current file
 use "../base_unit.void"         # Relative to current file
-use "math"                     # Standard / installed package
+use random                     # Official standard-library source
 use "/world/map.void" as world # Optional alias
 ```
 
-Multiple paths to the same physical/module source must resolve to one canonical module identity. Folders provide the compiler's internal qualification, but developers do not write a `namespace` declaration. Directory layout should **not** determine who is allowed to import what. Imports may reference files outside the project root using `../` when explicitly permitted, with stable external-module identities. Case-sensitive module identity across OSes is the proposed policy; filesystem case collisions and symlink behavior need a careful resolver design.
+Multiple paths to the same physical/module source must resolve to one canonical module identity. Folders provide the compiler's internal qualification, but developers do not write a `namespace` declaration. Directory layout should **not** determine who is allowed to import what. Working project imports cannot escape the selected root. Exact component spelling, portable paths, collision rejection and symlink/redirect/hard-link alias checks apply on every OS. External imports require a separately approved future identity and permission contract.
 
 For example, inside `units/player.void`, both `use "/base_unit.void"` and `use "../base_unit.void"` reference the same module. Internally, `units/player.void` might contain `units.player`, but `Player`-style names are **not** the naming convention. A public `player` type can simply be used as `player` following an import. Conflicting imported simple names require qualification or an alias, never silent selection.
+
+### Project-local libraries [IMPLEMENTED; LOCAL VERIFICATION]
+
+The owner-approved physical `libs/` directory uses reserved unquoted `lib/`:
+`use lib/raylib` selects `/libs/raylib/raylib.void`, while
+`use lib/raylib/graphics as gfx` selects `/libs/raylib/graphics.void`.
+Only the first-level library has the repeated-name entry convention; there is
+no general directory/index fallback. Local and quoted paths to the same file
+share one canonical project module, snapshot and dependency identity.
+
+These are project-owned sources with existing root constants and visibility,
+not external packages. Standard imports remain separate and cannot import local
+libraries. Compiler-owned completion uses actual directories/overlays and the
+same VFS checks. Imported `main()` declarations never control application entry.
+No import grants native binding/linking authority. See [the implementation
+contract](LOCAL_LIBRARIES.md); package management and external-package identities
+require future authorization. Hosted verification is not implied.
 
 ### 10.1 Root constants
 

@@ -143,6 +143,23 @@ export async function run(): Promise<void> {
             await until(()=>vscode.languages.getDiagnostics(mainUri),ds=>ds.length===0,'typing diagnostic repair');
         }
         record('PASS real typing: incomplete top-level keywords/expressions/imports recover in the same native process');
+        for(const [prefix,labels] of [['use lib/',['raylib','raylib/']],['use lib/raylib/',['graphics','raylib']]] as const) {
+            await vscode.commands.executeCommand('hideSuggestWidget');
+            await replace(main,'');mainEditor.selection=new vscode.Selection(0,0,0,0);
+            await vscode.commands.executeCommand('type',{text:prefix});
+            const menu=await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider',mainUri,new vscode.Position(0,prefix.length),'/');
+            const names=menu?.items.map(i=>typeof i.label==='string'?i.label:i.label.label) ?? [];
+            assert(labels.every(label=>names.includes(label)),'local library import suggestions '+prefix);
+        }
+        await replace(main,'use lib/raylib as rl\nfunc entry(x: i32) -> i32:\n    return rl.read(x)\n');
+        const localDefinition=await until(()=>vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider',mainUri,new vscode.Position(2,16)),d=>!!d?.length,'local library definition');
+        assert.equal(localDefinition![0].uri.toString(),vscode.Uri.file(path.join(root,'libs/raylib/raylib.void')).toString());
+        const localHover=await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider',mainUri,new vscode.Position(2,16));
+        assert(localHover?.some(h=>h.contents.some(c=>typeof c==='object' && 'value' in c && c.value.replace(/&nbsp;/g,' ').includes('Local editor library'))),
+            JSON.stringify(localHover?.map(h=>h.contents.map(c=>typeof c==='object' && 'value' in c?c.value:c))));
+        await replace(main,mainText);assert.equal((await definitions())?.length,1);
+        assert.equal(children.length,typingCount);assert(!gone(typingChild));
+        record('PASS real editor local libraries: typed imports, nested completion, source definition, docs and same-server repair');
         for (const [prefix,expected] of [['use ','use io/'],['use io/','use io/files'],['use "','use ".vscode/'],['use "app/','use "app/systems/'],['use "app/systems/','use "app/systems/player.void"']]) {
             await vscode.commands.executeCommand('hideSuggestWidget');
             await replace(main,'');mainEditor.selection=new vscode.Selection(0,0,0,0);

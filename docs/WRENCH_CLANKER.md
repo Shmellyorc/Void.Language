@@ -32,6 +32,24 @@ routine development. It authorizes no additional sprint, commit, push or hosted 
 Clankers and takes precedence over older communication/checkpoint practices below.
 Boss retains Git and hosted acceptance control.
 
+## Project-local libraries handoff — 21 October 2026
+
+Review [contract](LOCAL_LIBRARIES.md) and [evidence](local-libraries/ACCEPTANCE.md),
+baseline `9e946c2ecf176637ac67a07fdf86f492768433c6`.
+The existing SourceGraph maps `lib/<library>` to the exact repeated-name entry
+under `/libs/`; deeper paths name exact files. Project ownership, canonical
+quoted/local identity, security, snapshots, cache, invalidation and reload are
+shared. Import metadata assistance supplies root/nested/overlay candidates,
+documentation and navigation without adapter-side discovery. Imported main is
+never selected; standard sources and native host permissions retain isolation.
+
+Focused Linux Debug/Release and strict results, editor profiles, failed initial
+attempts and platform limits are recorded in the acceptance file. CI #87 belongs
+to its earlier committed snapshot; do not replace its history or claim this
+working tree hosted-accepted. Native Windows/macOS and Wrench review remain
+pending. No root README/website edits, Git actions, new hosted run, CLI/build
+proposal or Stage 9 work are authorized. Future updates belong under docs/.
+
 ## Incomplete-source crash / CI #86 handoff — 21 October 2026
 
 Review [the complete repair evidence](stage8/CI86_INCOMPLETE_SOURCE_REPAIR.md),

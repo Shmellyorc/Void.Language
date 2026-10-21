@@ -3757,11 +3757,20 @@ public:
         }
     }
     std::pair<std::string,std::filesystem::path> resolve(const Unit& from, const Token& path, bool directory=false) {
-        if(path.kind==TokenKind::path && standard_module(from.identity))error(from.source,path,Code::import_path,"Standard modules cannot import project VFS sources.","Use an unquoted standard-library module path.");
-        bool standard=path.kind!=TokenKind::path;
+        const bool local=path.kind!=TokenKind::path && path.text.starts_with("lib/");
+        if((path.kind==TokenKind::path || local) && standard_module(from.identity))error(from.source,path,Code::import_path,"Standard modules cannot import project VFS sources.","Use an unquoted standard-library module path outside lib/.");
+        bool standard=path.kind!=TokenKind::path && !local;
         Unit anchor(from.source,from.identity);
         Token requested=path;
         if(path.kind!=TokenKind::path) requested.text="/"+path.text+".void";
+        if(local) {
+            auto name=path.text.substr(4);
+            // Only lib/<library> has the explicit repeated-name entry convention.
+            // Directory probes and deeper modules never select implicit indexes.
+            requested.text="/libs/"+name;
+            if(!directory && name.find('/')==std::string::npos)requested.text+="/"+name;
+            requested.text+=".void";
+        }
         auto relative=normalize(anchor,requested);
         if(relative.starts_with("/@stdlib/"))error(from.source,path,Code::import_path,"Reserved standard-library source identity.");
         auto id=standard ? "/@stdlib"+relative : relative;
@@ -4902,6 +4911,7 @@ std::optional<EditorAssistance> import_assistance(const std::filesystem::path& e
     auto prefix=text.substr(start,cursor-start);
     auto slash=prefix.rfind('/');auto directory=slash==std::string::npos?std::string{}:prefix.substr(0,slash+1);
     auto leaf=slash==std::string::npos?prefix:prefix.substr(slash+1);
+    const bool local=!quoted && prefix.starts_with("lib/");
     out.begin=start+directory.size();out.end=stop;
     bool closing=quoted && stop<text.size() && text[stop]=='"';
     if(!quoted) {
@@ -4910,6 +4920,9 @@ std::optional<EditorAssistance> import_assistance(const std::filesystem::path& e
     }
     Unit anchor(source,module);Diagnostics diagnostics;SourceGraph graph(std::filesystem::canonical(entry.parent_path()),diagnostics,overrides);
     auto token=[&](std::string name){return Token{quoted?TokenKind::path:TokenKind::name,std::move(name),start};};
+    if(!quoted && directory.empty() && std::string_view("lib/").starts_with(leaf)) {
+        try {(void)graph.resolve(anchor,token("lib/_void_discovery_"),true);out.candidates.push_back({"lib/","project-local libraries",19,"lib/"});}catch(const CompilationError&){}
+    }
     try {
         auto dummy=directory+"_void_discovery_"+(quoted?".void":"");
         auto [id,physical]=graph.resolve(anchor,token(dummy),true);
@@ -4918,7 +4931,7 @@ std::optional<EditorAssistance> import_assistance(const std::filesystem::path& e
         std::error_code ec;
         for(std::filesystem::directory_iterator it(physical,ec),end;!ec && it!=end;it.increment(ec))children.insert(path_utf8(it->path().filename()));
         if(ec && ec!=std::errc::no_such_file_or_directory)return out;
-        if(quoted)for(const auto& [key,value]:overrides)if(value && key.starts_with(id+"/")) {
+        if(quoted || local)for(const auto& [key,value]:overrides)if(value && key.starts_with(id+"/")) {
             auto child=key.substr(id.size()+1);children.insert(child.substr(0,child.find('/')));
         }
         for(const auto& child:children) {
@@ -4929,12 +4942,17 @@ std::optional<EditorAssistance> import_assistance(const std::filesystem::path& e
             // portable path, overlay, alias and tombstone checks. Never parse it.
             bool folder=false,file=false;
             try {(void)graph.resolve(anchor,token(directory+child+"/_void_discovery_"+(quoted?".void":"")),true);folder=true;}catch(const CompilationError&){}
-            if(child.ends_with(".void"))try {(void)graph.resolve(anchor,token(directory+(quoted?child:child.substr(0,child.size()-5))));file=true;}catch(const CompilationError&){}
+            const bool local_root=local && directory=="lib/";
+            if((local_root && folder) || (!local_root && child.ends_with(".void")))try {(void)graph.resolve(anchor,token(directory+(quoted || local_root?child:child.substr(0,child.size()-5))));file=true;}catch(const CompilationError&){}
+            if(!quoted && !local && directory.empty() && child=="lib")folder=false;
             if(!quoted) {auto valid_segment=[](const std::string& name){return !name.empty() && letter(name[0]) && std::all_of(name.begin(),name.end(),[](char c){return letter(c)||digit(c);});};if(!valid_segment(file_name))file=false;if(!valid_segment(child))folder=false;}
             if(!folder && !file)continue;
             if(out.candidates.size()>=256){out.incomplete=true;break;}
-            if(file)out.candidates.push_back({file_name,quoted?"project source":"standard module",17,file_name+(quoted && !closing?"\"":"")});
-            if(folder)out.candidates.push_back({child+"/","folder",19,child+"/"});
+            if(file)out.candidates.push_back({file_name,quoted?"project source":local?"local library":"standard module",17,file_name+(quoted && !closing?"\"":"")});
+            if(folder) {
+                if(out.candidates.size()>=256){out.incomplete=true;break;}
+                out.candidates.push_back({child+"/","folder",19,child+"/"});
+            }
         }
     }catch(const CompilationError&){}
     return out;

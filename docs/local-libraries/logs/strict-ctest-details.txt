@@ -1,0 +1,188 @@
+Start testing: Oct 21 07:36 PDT
+----------------------------------------------------------
+15/157 Testing: debug_cache_processes
+15/157 Test: debug_cache_processes
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/cache/processes.py" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/voidc" "/home/shmellyorc/Documents/Void.Language"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-sanitizers
+"debug_cache_processes" start time: Oct 21 07:36 PDT
+Output:
+----------------------------------------------------------
+Fresh processes, corruption, concurrent publication, imports, diagnostics and large arrays passed
+<end of output>
+Test time =  12.71 sec
+----------------------------------------------------------
+Test Passed.
+"debug_cache_processes" end time: Oct 21 07:36 PDT
+"debug_cache_processes" time elapsed: 00:00:12
+----------------------------------------------------------
+
+60/157 Testing: lsp_protocol
+60/157 Test: lsp_protocol
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/lsp/protocol.py" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/voidls" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/lsp fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-sanitizers
+"lsp_protocol" start time: Oct 21 07:36 PDT
+Output:
+----------------------------------------------------------
+editor: CRLF/UTF16, cross-file symbols, overlays, versions, invalid/repair, graph changes and cycles passed
+transport: fragmented/coalesced frames, IDs, malformed messages, bounded framing, lifecycle and EOF passed
+value structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed
+receiver methods: imported native LSP navigation, references, effect changes and revision recovery passed
+initialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed
+managed structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed
+managed initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed
+reference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed
+composition: imported promoted navigation, ambiguity and unsaved repair passed
+inheritance: original owners, static virtual/super navigation, exact override diagnostics and unsaved repair passed
+interfaces: original requirement navigation, imported signatures/effects and unsaved revision repair passed
+invalid disk UTF-8: original UTF16 ranges, overlay repair and close passed
+strings: imported constants, UTF16 escape spans and unsaved repair passed
+Stage 6 native host authorization, async/spawn/group references and stale-overlay repair: passed
+<end of output>
+Test time =   1.24 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_protocol" end time: Oct 21 07:36 PDT
+"lsp_protocol" time elapsed: 00:00:01
+----------------------------------------------------------
+
+61/157 Testing: lsp_stage8
+61/157 Test: lsp_stage8
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/voidls" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/voidc"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-sanitizers
+"lsp_stage8" start time: Oct 21 07:36 PDT
+Output:
+----------------------------------------------------------
+Debug cache: miss
+Debug cache: hit
+SKIP: Windows 8.3 coverage requires Windows
+POSIX workspace ancestor alias and descendant rejection checks passed
+Stage 8 compiler-backed LSP discovery/docs/readonly checks passed
+<end of output>
+Test time =   1.98 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_stage8" end time: Oct 21 07:36 PDT
+"lsp_stage8" time elapsed: 00:00:01
+----------------------------------------------------------
+
+64/157 Testing: native_source
+64/157 Test: native_source
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/void_native_tests" "/home/shmellyorc/Documents/Void.Language" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/native fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-sanitizers
+"native_source" start time: Oct 21 07:36 PDT
+Output:
+----------------------------------------------------------
+native source passed
+<end of output>
+Test time =  10.18 sec
+----------------------------------------------------------
+Test Passed.
+"native_source" end time: Oct 21 07:37 PDT
+"native_source" time elapsed: 00:00:10
+----------------------------------------------------------
+
+125/157 Testing: native
+125/157 Test: native
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/void_tests" "native"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-sanitizers
+"native" start time: Oct 21 07:37 PDT
+Output:
+----------------------------------------------------------
+JIT session error: Symbols not found: [ missing_native ]
+native: passed
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"native" end time: Oct 21 07:37 PDT
+"native" time elapsed: 00:00:00
+----------------------------------------------------------
+
+129/157 Testing: tooling
+129/157 Test: tooling
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/void_tests" "tooling" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/tooling fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-sanitizers
+"tooling" start time: Oct 21 07:37 PDT
+Output:
+----------------------------------------------------------
+queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots
+plan: /leaf.void -> /middle.void::wrapper -> /main.void::entry; validated 53 -> 61, const restart required
+tooling: passed
+<end of output>
+Test time =   0.72 sec
+----------------------------------------------------------
+Test Passed.
+"tooling" end time: Oct 21 07:37 PDT
+"tooling" time elapsed: 00:00:00
+----------------------------------------------------------
+
+130/157 Testing: analysis
+130/157 Test: analysis
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/void_tests" "analysis" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/analysis fixtures"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-sanitizers
+"analysis" start time: Oct 21 07:37 PDT
+Output:
+----------------------------------------------------------
+normal: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 691639
+O2: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 738599
+analysis: passed
+<end of output>
+Test time =   1.17 sec
+----------------------------------------------------------
+Test Passed.
+"analysis" end time: Oct 21 07:37 PDT
+"analysis" time elapsed: 00:00:01
+----------------------------------------------------------
+
+133/157 Testing: modules
+133/157 Test: modules
+Command: "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/void_tests" "modules" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/module fixtures with spaces"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-sanitizers
+"modules" start time: Oct 21 07:37 PDT
+Output:
+----------------------------------------------------------
+Project constants, forwards, visibility, cycles, imports and restart checks passed
+Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+modules: passed
+<end of output>
+Test time =   2.05 sec
+----------------------------------------------------------
+Test Passed.
+"modules" end time: Oct 21 07:37 PDT
+"modules" time elapsed: 00:00:02
+----------------------------------------------------------
+
+142/157 Testing: lsp_sprint6
+142/157 Test: lsp_sprint6
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/lsp_sprint6.py" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/voidls"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-sanitizers
+"lsp_sprint6" start time: Oct 21 07:37 PDT
+Output:
+----------------------------------------------------------
+Sprint 6 LSP navigation, UTF-16, hover, rename, completion, signature, diagnostics and formatting passed
+<end of output>
+Test time =   0.79 sec
+----------------------------------------------------------
+Test Passed.
+"lsp_sprint6" end time: Oct 21 07:37 PDT
+"lsp_sprint6" time elapsed: 00:00:00
+----------------------------------------------------------
+
+143/157 Testing: local_libraries
+143/157 Test: local_libraries
+Command: "/home/shmellyorc/.local/bin/python3.11" "/home/shmellyorc/Documents/Void.Language/tests/stage8/local_libraries.py" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/voidc" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/voidls" "/usr/lib/llvm-19/bin/clang-19" "/usr/lib/llvm-19/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/libvoid_native_fixture.a" "ON"
+Directory: /home/shmellyorc/Documents/Void.Language/build/ci-sanitizers
+"local_libraries" start time: Oct 21 07:37 PDT
+Output:
+----------------------------------------------------------
+Local libraries: 16 compiler/JIT/AOT/cache/application checks and same-server LSP completion/overlay/refresh checks passed
+<end of output>
+Test time =   0.95 sec
+----------------------------------------------------------
+Test Passed.
+"local_libraries" end time: Oct 21 07:37 PDT
+"local_libraries" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 21 07:37 PDT

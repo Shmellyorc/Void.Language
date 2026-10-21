@@ -1,0 +1,27 @@
+gmake: jobserver mkfifo: /tmp/GMfifo4: File exists
+[ 33%] Built target void_native_fixture
+[ 33%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[ 66%] Built target void_runtime
+[ 66%] Linking CXX static library libvoid_core.a
+[ 66%] Built target void_core
+[100%] Built target void_llvm
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-Release.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_core
+[  0%] Built target void_lsp
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target native_fixture
+[ 25%] Built target void_native_fixture
+[ 25%] Built target void_core
+[ 50%] Built target void_runtime
+[ 75%] Built target void_llvm
+[ 75%] Building CXX object CMakeFiles/void_tests.dir/tests/modules/tests.cpp.o
+[ 75%] Building CXX object CMakeFiles/void_tests.dir/tests/tooling/tests.cpp.o
+[ 75%] Linking CXX executable void_tests
+[100%] Built target void_tests

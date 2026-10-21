@@ -1,0 +1,21 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/debug
+    Start  15: debug_cache_processes
+1/8 Test  #15: debug_cache_processes ............   Passed   20.63 sec
+    Start  60: lsp_protocol
+2/8 Test  #60: lsp_protocol .....................   Passed    0.53 sec
+    Start  61: lsp_stage8
+3/8 Test  #61: lsp_stage8 .......................   Passed    0.51 sec
+    Start 129: tooling
+4/8 Test #129: tooling ..........................   Passed    0.52 sec
+    Start 130: analysis
+5/8 Test #130: analysis .........................   Passed    0.74 sec
+    Start 133: modules
+6/8 Test #133: modules ..........................   Passed    1.25 sec
+    Start 142: lsp_sprint6
+7/8 Test #142: lsp_sprint6 ......................   Passed    0.65 sec
+    Start 143: local_libraries
+8/8 Test #143: local_libraries ..................   Passed    0.57 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Total Test time (real) =  25.41 sec

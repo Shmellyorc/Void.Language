@@ -1,0 +1,9 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/debug
+    Start  64: native_source
+1/2 Test  #64: native_source ....................   Passed    9.10 sec
+    Start 125: native
+2/2 Test #125: native ...........................   Passed    0.03 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   9.14 sec

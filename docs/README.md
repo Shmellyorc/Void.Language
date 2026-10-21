@@ -4,7 +4,7 @@
 
 - [Build, source compiler and CLI](SOURCE_COMPILER.md),
   [editor setup](EDITOR_INTEGRATION.md) and [examples](../examples/).
-- [Modules and imports](MODULE_SYSTEM.md), [numeric types](NUMERIC_TYPES.md),
+- [Modules and imports](MODULE_SYSTEM.md), [local libraries](LOCAL_LIBRARIES.md), [numeric types](NUMERIC_TYPES.md),
   [value semantics](VALUE_SEMANTICS.md) and [strings](STRINGS.md).
 - [Value structs](VALUE_STRUCTS.md), [managed structs](MANAGED_STRUCTS.md),
   [initialization](INITIALIZATION.md), [composition](COMPOSITION.md),
@@ -46,6 +46,15 @@ README only if Boss explicitly requests a public-facing README change.”
 
 Preserve historical evidence and distinguish approved direction, local verification,
 review and hosted locks. Never mark work implemented or locked without verification.
+
+## Project-local libraries handoff — 21 October 2026
+
+[Local libraries contract](LOCAL_LIBRARIES.md) and
+[acceptance evidence](local-libraries/ACCEPTANCE.md) record the owner-authorized
+`libs/` / `use lib/...` implementation, shared VFS identities and compiler-owned
+editor assistance. Local verification is separate from already-running CI #87;
+its historical Stage 8 evidence is preserved. Wrench review and native
+Windows/macOS execution remain pending. No hosted lock or Stage 9 progression.
 
 ## Incomplete-source crash / CI #86 handoff — 21 October 2026
 

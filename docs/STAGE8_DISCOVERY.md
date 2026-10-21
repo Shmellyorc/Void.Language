@@ -38,6 +38,18 @@ A relocated installation must set the override or be built with its installation
 source directory. An unavailable root produces an import diagnostic. This sprint
 uses disposable fixture libraries; it promises no official module catalog.
 
+## Later owner-approved project-local library extension
+
+[LOCAL_LIBRARIES.md](LOCAL_LIBRARIES.md) reserves unquoted `lib/` for project
+sources under `libs/`. `lib/raylib` maps to `/libs/raylib/raylib.void`;
+`lib/raylib/graphics` maps to `/libs/raylib/graphics.void`. This is another
+source spelling within the existing project domain, not a third module-identity
+or visibility domain. Equivalent quoted imports deduplicate. Standard sources
+cannot import either project spelling; installed `lib/...` never supplies a
+fallback. Shared resolver checks, overlays, snapshots and bounded metadata
+completion apply. Source imports grant no native authority. Existing selection,
+ancestor aliases, drive handling and descendant restrictions below are unchanged.
+
 ## Shared project selection
 
 `vd::discover_project(workspace, active, explicit_entry)` is the one frontend

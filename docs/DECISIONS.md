@@ -1065,3 +1065,22 @@ Boss answered all four consolidated questions before implementation:
 Authorization covers Sprint 6 and local verification only. Approval does not
 establish implementation or acceptance. Root README, Git mutations, hosted CI,
 publication and Stage 9 remain outside this authorization.
+
+
+## 21 October 2026 — Project-local libraries owner authorization
+
+Boss approved physical `libs/` and reserved unquoted `lib/`: the root spelling
+`lib/raylib` selects `/libs/raylib/raylib.void`; deeper
+`lib/raylib/graphics` selects `/libs/raylib/graphics.void`. Only the first-level
+entry repeats its library name. Preserve aliases, exact VFS validation and one
+canonical identity shared with quoted paths. Libraries remain project-owned,
+including root constants and existing visibility; installed standard sources
+cannot import them. Imported main declarations do not select entry and imported
+executable statements reject. Compiler-owned bounded metadata assistance uses
+actual directories and overlays; adapters do not discover libraries independently.
+
+This authorization grants no native linking/admission privileges, package manager,
+manifest/registry, external-project identities, CLI/build redesign or Stage 9 work.
+[Implementation contract](LOCAL_LIBRARIES.md) and [local evidence](local-libraries/ACCEPTANCE.md)
+record verification separately from approval. Boss retains Git/hosted controls;
+CI #87 is separate historical evidence. Root README remains protected.

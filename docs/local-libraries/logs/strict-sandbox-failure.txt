@@ -1,0 +1,101 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-sanitizers
+    Start  15: debug_cache_processes
+1/8 Test  #15: debug_cache_processes ............***Failed    0.08 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/cache/processes.py", line 24, in <module>
+    first = run()
+            ^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/cache/processes.py", line 19, in run
+    assert result.returncode == 0 and result.stdout.strip() == str(expected), result
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: CompletedProcess(args=['/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/voidc', 'run', '/tmp/void-cache-j3yhrcp5/main.void', '7', '--cache'], returncode=86, stdout='', stderr='Debug cache: miss\n==5==LeakSanitizer has encountered a fatal error.\n==5==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==5==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+    Start  60: lsp_protocol
+2/8 Test  #60: lsp_protocol .....................***Failed    0.18 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/protocol.py", line 613, in <module>
+    editor(executable, root)
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/protocol.py", line 163, in editor
+    c.shutdown()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 139, in shutdown
+    self.finish()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 125, in finish
+    assert code == expected, (code, self.logs.decode("utf-8", errors="replace"))
+           ^^^^^^^^^^^^^^^^
+AssertionError: (86, 'textDocument/didChange: Stale or duplicate document version\ntextDocument/didChange: Stale or duplicate document version\ntextDocument/didOpen: Document is already open\ntextDocument/didChange: Incremental document changes are unsupported\n==8==LeakSanitizer has encountered a fatal error.\n==8==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==8==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+    Start  61: lsp_stage8
+3/8 Test  #61: lsp_stage8 .......................***Failed    0.06 sec
+==13==LeakSanitizer has encountered a fatal error.
+==13==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==13==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py", line 55, in <module>
+    selected=discover(project,active)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py", line 7, in discover
+    return json.loads(subprocess.check_output([server,'--discover',str(workspace),str(active),str(override)]))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '[PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/voidls'), '--discover', '/tmp/VOID discovery é😀 # % iv2hs0pv/project', '/tmp/VOID discovery é😀 # % iv2hs0pv/project/app/systems/player.void', '']' returned non-zero exit status 86.
+
+    Start 129: tooling
+4/8 Test #129: tooling ..........................***Failed    0.74 sec
+==15==LeakSanitizer has encountered a fatal error.
+==15==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==15==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+
+    Start 130: analysis
+5/8 Test #130: analysis .........................***Failed    1.33 sec
+==17==LeakSanitizer has encountered a fatal error.
+==17==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==17==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+
+    Start 133: modules
+6/8 Test #133: modules ..........................***Failed    1.82 sec
+==25==LeakSanitizer has encountered a fatal error.
+==25==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1
+==25==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)
+
+    Start 142: lsp_sprint6
+7/8 Test #142: lsp_sprint6 ......................***Failed    0.91 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage8/lsp_sprint6.py", line 105, in <module>
+    c.shutdown()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 139, in shutdown
+    self.finish()
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 125, in finish
+    assert code == expected, (code, self.logs.decode("utf-8", errors="replace"))
+           ^^^^^^^^^^^^^^^^
+AssertionError: (86, '==28==LeakSanitizer has encountered a fatal error.\n==28==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==28==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+    Start 143: local_libraries
+8/8 Test #143: local_libraries ..................***Failed    0.06 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage8/local_libraries.py", line 23, in <module>
+    assert 'Cannot find' in run([compiler,'check',entry],1).stderr
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage8/local_libraries.py", line 21, in run
+    assert p.returncode==status,(args,p.returncode,p.stdout,p.stderr)
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: ([PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-sanitizers/voidc'), 'check', PosixPath('/tmp/VOID local libs é😀 # % 6sek5dhg/project/app.void')], 86, '', '/tmp/VOID local libs é😀 # % 6sek5dhg/project/app.void:2:5: error: Cannot find imported file \'/libs/raylib/raylib.void\'.\n    code: VOID3002\n\n 2 | use lib/raylib as rl\n   |     ^^^^^^^^^^^\n    Module: /app.void\n    Hint: Check this path relative to the importing file or virtual project root.\n\n/tmp/VOID local libs é😀 # % 6sek5dhg/project/app.void:3:5: error: Cannot find imported file \'/libs/raylib/graphics.void\'.\n    code: VOID3002\n\n 3 | use lib/raylib/graphics as gfx\n   |     ^^^^^^^^^^^^^^^^^^^^\n    Module: /app.void\n    Hint: Check this path relative to the importing file or virtual project root.\n\n/tmp/VOID local libs é😀 # % 6sek5dhg/project/app.void:4:5: error: Cannot find imported file \'/libs/raylib/graphics.void\'.\n    code: VOID3002\n\n 4 | use "/libs/raylib/graphics.void" as same\n   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    Module: /app.void\n    Hint: Check this path relative to the importing file or virtual project root.\n\n==33==LeakSanitizer has encountered a fatal error.\n==33==HINT: For debugging, try setting environment variable LSAN_OPTIONS=verbosity=1:log_threads=1\n==33==HINT: LeakSanitizer does not work under ptrace (strace, gdb, etc)\n')
+
+
+0% tests passed, 8 tests failed out of 8
+
+Total Test time (real) =   5.19 sec
+
+The following tests FAILED:
+	 15 - debug_cache_processes (Failed)
+	 60 - lsp_protocol (Failed)
+	 61 - lsp_stage8 (Failed)
+	129 - tooling (Failed)
+	130 - analysis (Failed)
+	133 - modules (Failed)
+	142 - lsp_sprint6 (Failed)
+	143 - local_libraries (Failed)
+Errors while running CTest

@@ -1,11 +1,13 @@
 #include "void/frontend.hpp"
 #include "void/backend.hpp"
 #include "void/runtime.hpp"
+#include "void/tooling.hpp"
 #include <llvm/Object/ObjectFile.h>
 #include <llvm/Support/Error.h>
 #include <fstream>
 #include <iostream>
 #include <set>
+#include <algorithm>
 #include <stdexcept>
 namespace {
 namespace fs = std::filesystem;
@@ -278,9 +280,59 @@ void constants(const fs::path& output) {
     std::cout << "Project constants, forwards, visibility, cycles, imports and restart checks passed\n";
 }
 
+void local_libraries(const fs::path& output) {
+    Fixture f{output/"local-libraries"};fs::remove_all(f.root);
+    f.file("main.void","use lib/missing\n");require(!vd::analyze_project(f.root/"main.void").program,"missing libs directory admitted");
+    const std::string main="use lib/raylib as rl\nuse lib/raylib/graphics as gfx\nuse \"/libs/raylib/raylib.void\" as again\nuse lib/raylib\nconst root_bonus = 3\nfunc entry(x: i32) -> i32:\n    return rl.read(x) + gfx.read(x) + again.read(x) + raylib.read(x)\n";
+    f.file("main.void",main);
+    f.file("libs/raylib/raylib.void","use lib/raylib/graphics as gfx\nfunc read(x: i32) -> i32:\n    return gfx.read(x) + root_bonus\nfunc main() -> i32:\n    return 99\nprivate func secret(x: i32) -> i32:\n    return x\n");
+    f.file("libs/raylib/graphics.void","use lib/shared as shared\nuse \"/libs/shared/shared.void\" as same\nfunc read(x: i32) -> i32:\n    return shared.add(x)\n");
+    const std::string shared="use lib/raylib as cycle\ninternal func add(x: i32) -> i32:\n    return x + 2\n";
+    f.file("libs/shared/shared.void",shared);
+    f.run({{0,17},{3,29}});
+    auto before=vd::analyze_project(f.root/"main.void");require(bool(before.program),"local library analysis");
+    require(before.program->modules().size()==4,"quoted/local/diamond/cyclic imports duplicated module identity");
+    vd::ToolingIndex index(before.program);
+    auto def=index.definition_at("/main.void",main.find("rl.read")+4);
+    require(def && def->module=="/libs/raylib/raylib.void","local definition lost canonical project identity");
+    auto changed=shared;changed.replace(changed.find("x + 2"),5,"x + 4");f.file("libs/shared/shared.void",changed);
+    auto after=vd::analyze_project(f.root/"main.void");require(bool(after.program),"edited local library analysis");
+    auto plan=vd::plan_invalidation(*before.program,{},after.program.get());
+    require(plan.directly_changed_modules==std::vector<std::string>{"/libs/shared/shared.void"} && !plan.graph_changed,"local edit lost dependency identity");
+    require(std::find(plan.dependent_modules.begin(),plan.dependent_modules.end(),"/main.void")!=plan.dependent_modules.end(),"local edit did not invalidate importing entry");
+    require(index.declaration(def->identity)->source.source->text().find("root_bonus")!=std::string::npos,"local edit corrupted retained snapshot");
+    {vd::Jit jit;vd::ReloadSlot slot(jit.compile(*before.program));auto lease=slot.acquire();
+        require(jit.replace(slot,*after.program) && slot.invoke(3)==37 && lease->invoke(3)==29,"local library edit broke compatible reload/old lease");}
+    f.run({{3,37}});
+    auto reject=[&](const std::string& code){auto a=vd::analyze_project(f.root/"main.void",{{"/main.void",vd::SourceFile("main.void",code+"\nconst root_bonus = 3\n")}});require(!a.program && !a.diagnostics.empty(),"invalid local import admitted: "+code);};
+    for(const auto& path:{"lib/missing","lib/empty","lib/raylib/missing","lib/RAYLIB","lib/raylib/../shared","lib//raylib","lib/raylib.void","lib/con"})reject("use "+std::string(path)+"\n");
+    fs::create_directories(f.root/"libs/empty");reject("use lib/empty\n");
+    f.file("libs/direct.void","func read(x: i32) -> i32:\n    return x\n");reject("use lib/direct\n");
+    auto collision=vd::analyze_project(f.root/"main.void",{{"/main.void",vd::SourceFile("main.void",main)},{"/libs/raylib/Graphics.void",vd::SourceFile("case.void","")}});
+    require(!collision.program,"local library overlay case collision admitted");
+    reject("use lib/raylib as rl\nfunc entry(x: i32) -> i32:\n    return rl.secret(x)\n");
+    f.file("libs/empty/empty.void","var forbidden = 1\n");reject("use lib/empty\n");
+    f.file("libs/raylib/redirect.void","use \"../../../outside.void\"\n");reject("use lib/raylib/redirect\n");
+    // Application selection belongs only to the selected root, never library main.
+    f.file("main.void","use lib/raylib as rl\nconst root_bonus = 3\nfunc main() -> i32:\n    return rl.read(1)\n");
+    auto app=vd::analyze_project(f.root/"main.void");require(app.program && app.program->application(),"selected local-library application lost its entry");
+    for(bool opt:{false,true}){vd::Jit jit;require(jit.compile(*app.program,opt)->invoke(0)==8,"imported main was selected/executed");}
+    // Overlay-only libraries retain their project identities and unavailable guards.
+    vd::SourceOverrides overlays{{"/main.void",vd::SourceFile("main.void","use lib/virtual as v\nfunc entry(x: i32) -> i32:\n    return v.read(x)\n")},{"/libs/virtual/virtual.void",vd::SourceFile("unsaved.void","func read(x: i32) -> i32:\n    return x\n")}};
+    auto virtual_program=vd::analyze_project(f.root/"main.void",overlays);require(virtual_program.program && virtual_program.program->modules().size()==2,"virtual local library failed");
+    overlays["/libs/virtual/virtual.void"]=std::nullopt;require(!vd::analyze_project(f.root/"main.void",overlays).program,"local tombstone ignored");
+    std::error_code ec;fs::create_hard_link(f.root/"libs/shared/shared.void",f.root/"libs/shared/linked.void",ec);
+    if(!ec)reject("use lib/shared\nuse lib/shared/linked\n");
+    fs::create_directory_symlink(fs::absolute(f.root/"libs/raylib"),f.root/"libs/alias",ec);
+    if(!ec)reject("use lib/alias/raylib\n");
+    write(f.root.parent_path()/"external.void","func read() -> i32:\n    return 7\n");
+    fs::create_directory_symlink(fs::absolute(f.root.parent_path()),f.root/"libs/escape",ec);
+    if(!ec)reject("use lib/escape/external\n");
+    std::cout<<"Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed\n";
+}
 }
 void module_tests(const std::filesystem::path& output) {
     private_linkage(output);
-    positives(output); negatives(output); constants(output);
+    positives(output); negatives(output); constants(output); local_libraries(output);
     std::cout << "Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed\n";
 }

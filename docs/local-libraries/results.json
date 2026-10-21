@@ -1,0 +1,83 @@
+{
+  "baseline": "9e946c2ecf176637ac67a07fdf86f492768433c6",
+  "date": "2026-10-21",
+  "platform": "Linux x86_64",
+  "status": "locally verified; Wrench and native Windows/macOS pending",
+  "final": {
+    "debug": {
+      "focused": 8,
+      "native": 2,
+      "failed": 0
+    },
+    "release": {
+      "focused": 8,
+      "native": 2,
+      "failed": 0
+    },
+    "strict_asan_ubsan_leaks": {
+      "focused_including_native": 10,
+      "failed": 0
+    },
+    "extension": {
+      "typecheck_build": "passed",
+      "debug_units": 4,
+      "release_units": 4,
+      "debug_real_editor_profiles": 3,
+      "release_real_editor_profiles": 3,
+      "skipped": 0
+    },
+    "process_acceptance": "16 process checks plus LSP sessions in each configuration"
+  },
+  "initial_attempts": [
+    "Release focused 7/8: external LLVM 19 lld percent-containing executable output directory fails, independently reproduced with trivial C. Source/object remain Unicode/#/%; only linked executable placed in separate artifact directory. Final Release 8/8.",
+    "Initial real editor hover assertion saw MarkdownString plaintext spaces escaped as &nbsp;. Test normalizes that representation and still requires exact documentation phrase. Final Debug/Release 3/3 profiles.",
+    "Sandbox strict tests 0/8: LeakSanitizer cannot inspect threads under ptrace. Same strict checks, including leak detection, passed outside sandbox (10/10).",
+    "Sandbox Node test runner reported only file-level 1/1; final explicit host unit runs exposed and passed all four cases per server."
+  ],
+  "limits": [
+    "Native Windows Debug/Release and macOS Debug/Release were not executed. Platform-specific alias creation uses symlinks with Windows junction fallback and reports a skip only if unavailable. Linux alias checks executed.",
+    "Existing LLVM 19 lld executable output-directory percent behavior remains outside this compiler/source-import sprint.",
+    "CI #87 is separate already-running earlier-snapshot evidence; no hosted run or Git mutation performed."
+  ],
+  "preserved": {
+    "README.md": "byte-identical to baseline",
+    "src/frontend/source.cpp": "byte-identical to baseline",
+    "src/main.cpp": "byte-identical to baseline",
+    "editors/vscode/src/config.ts": "byte-identical to baseline",
+    "editors/vscode/src/extension.ts": "byte-identical to baseline",
+    "website": "no tracked changes",
+    "docs/stage8": "no tracked changes",
+    "src/backend/llvm/backend.cpp": "byte-identical to baseline",
+    "include/void/path.hpp": "byte-identical to baseline",
+    "src/backend and src/runtime": "no tracked changes"
+  },
+  "source_sha256": {
+    "CMakeLists.txt": "a4d6b87d884bd7f45b8c9d2fea022337f7ec2816ed92fd51c3e03f3883aa84c0",
+    "src/frontend/compiler.cpp": "a1daed26babadc17598ee5205e914167891a65edcd02417ce8532252fc2583e2",
+    "tests/modules/tests.cpp": "21f4e840f800ea58e3f8967b231e7bd9479810a8204625b2b379439fc3c224f0",
+    "tests/tooling/tests.cpp": "1d81eb39ec6fa0b7a9f82b33b89f9898153a3dc636d4ce50dac86406d2a6245f",
+    "tests/stage8/local_libraries.py": "f923102b075f6bbecc9df9400ecb8eda378544cbe64a8ee7704536e10267e652",
+    "editors/vscode/src/test/host.ts": "ee4cb56087951b3c2f2a2b00eb6bd6f09aac52f7cfa63037c5ba1105e2d4c127",
+    "editors/vscode/src/test/runHost.ts": "2ad6a92b37b2c149e73e7d9015e209e90a245b02ddea3467d19501b36edaace4"
+  },
+  "log_sha256": {
+    "debug-build.txt": "a3dfbbf868d18a6930a719bbbe91363caed9e37e12fcac7039b4b4946016ff02",
+    "debug-focused.txt": "339bc86b9f6c90ced0fb72690c9221cf61f1ec07dbb13a98478d97330348ae8c",
+    "debug-native.txt": "8bfc0a1516bae7275fa371e09b06fdd2228e608afb83e690739f9beda052a2fd",
+    "editor-debug.txt": "1ca0ee948ac24c3fc512da97285eadb6f5ddcf00e3395bb4ce8b1b319bb6ba70",
+    "editor-initial-hover-failure.txt": "eec87706bbf344cbd193f1d2f9c9c48efe6c1b8f57f615fd70ecf96403b6c7cd",
+    "editor-release.txt": "e0e9c089a1727f0b2c8f13d5478dca0a2ccc76f610d7fc28a5b0e40dd57c8db8",
+    "extension-build.txt": "5ce0162bd6c3f0a83648b28ae279ffe18ade8dd4b965e3b93edb2b801ad7c067",
+    "extension-debug-units.txt": "dfd85c5bfba063c9c1ed9dda4dd0777c14128bb912d31284d57a4328848cd966",
+    "extension-release-units.txt": "7830fe79b13fce5806168f055cbc140b6012293cf8afed75cd9bb2e65a70f2ae",
+    "lld-output-reproducer.txt": "0fe011fc69a9b9ed75ba2bcfb7a7e3bacaff09fc54cecef4481064ecb2c16736",
+    "release-build.txt": "74646f08f7871b1189b3b7bfe8f3a683308f383f8959b1ee0f91d14dd03b4094",
+    "release-focused.txt": "c84a070d9b5366f3265b0bc39de5be44792c8afaa7e2384555cdc56b01e55e74",
+    "release-initial-linker-failure.txt": "31566d3a8d327efb882afecfde93108c7ea2d30e101992c6389d4dab7ee3cecb",
+    "release-native.txt": "83dd06e86a64fb71d15a1ff04f233e44415d1583d9cdc445c4d7d66b73ddde29",
+    "strict-build.txt": "df05627c82b05402fe43e47cadcdda56bbe6746a5f612331933cc5132e75714d",
+    "strict-ctest-details.txt": "bc60fc297874f93a94c62bef5a545a2c265c87866913861e36793c0179419cc5",
+    "strict-focused.txt": "50bbe4db11e2ddf396d904a1ef36ed0e0739530eda73a6eddc9b26bccaf1bff3",
+    "strict-sandbox-failure.txt": "b26628eeae035aec26009bfb6840c08d99afa2919c7fd17334cd70762259936e"
+  }
+}

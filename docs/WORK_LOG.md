@@ -1,6 +1,30 @@
 # Work log
 
-**Current handoff:** [Documentation index](README.md), [incomplete-source/CI #86 repair](stage8/CI86_INCOMPLETE_SOURCE_REPAIR.md) and [final hosted checklist](stage8/FINAL_HOSTED_GATE.md). All six Stage 8 sprints have local evidence; native verification of the latest repair and Wrench review remain pending. Stage 8 is not hosted locked. Earlier entries retain historical evidence.
+**Current handoff:** [Documentation index](README.md), [project-local libraries contract](LOCAL_LIBRARIES.md) and [local acceptance](local-libraries/ACCEPTANCE.md). The local-library extension is implemented and locally verified; Wrench review and native Windows/macOS remain pending. CI #87 is separate earlier-snapshot evidence. Stage 8 is not newly hosted locked; earlier entries retain their history.
+
+## 21 October 2026: owner-authorized project-local libraries
+
+Shared SourceGraph resolution maps reserved `lib/` to physical `libs/`, using
+exact repeated-name first-level entries and direct nested files. Quoted/local
+imports deduplicate with project visibility, root constants and snapshots intact.
+Metadata assistance handles actual/virtual directories, aliases, docs/navigation,
+tombstones and bounded completion. Imported main is not selected; stdlib source
+isolation and explicit native admission remain intact. No adapter resolver added.
+
+Final Linux Debug and Release each passed eight focused compiler/LSP/cache suites
+plus two native guards (10/10 each). Strict ASan/UBSan/leak verification passed
+10/10 outside the ptrace sandbox. Extension typecheck/build passed; explicit
+units 4/4 and actual VS Code profiles 3/3 per build. New process acceptance runs
+16 checks plus same-server overlays/refresh. Reload and old-lease tests passed.
+[Evidence](local-libraries/ACCEPTANCE.md) retains raw logs, source hashes and initial
+failed attempts: external lld `%` executable-output behavior, hover MarkdownString
+space representation, and sandbox leak-scanner limitations. No final test failed.
+
+Updated Bible Section 10, decisions, local contract, module/discovery guides,
+index, approval ledger and Wrench handoff. Historical Stage 8/CI #87 evidence,
+root README, website, production discovery/Unicode and editor lifecycle paths
+remain preserved. Native Windows/macOS and Wrench review are pending; no Git or
+hosted action, CLI/build redesign, package system or Stage 9 work occurred.
 
 ## 14 October 2026: Phase 22 UTF-8 foundation implementation
 

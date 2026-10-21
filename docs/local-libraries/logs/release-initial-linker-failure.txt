@@ -1,0 +1,123 @@
+UpdateCTestConfiguration  from :/home/shmellyorc/Documents/Void.Language/build/ci-release/DartConfiguration.tcl
+Parse Config file:/home/shmellyorc/Documents/Void.Language/build/ci-release/DartConfiguration.tcl
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 15
+    Start  15: debug_cache_processes
+
+15: Test command: /home/shmellyorc/.local/bin/python3.11 "/home/shmellyorc/Documents/Void.Language/tests/cache/processes.py" "/home/shmellyorc/Documents/Void.Language/build/ci-release/voidc" "/home/shmellyorc/Documents/Void.Language"
+15: Working Directory: /home/shmellyorc/Documents/Void.Language/build/ci-release
+15: Test timeout computed to be: 180
+15: Fresh processes, corruption, concurrent publication, imports, diagnostics and large arrays passed
+1/8 Test  #15: debug_cache_processes ............   Passed    7.84 sec
+test 60
+    Start  60: lsp_protocol
+
+60: Test command: /home/shmellyorc/.local/bin/python3.11 "/home/shmellyorc/Documents/Void.Language/tests/lsp/protocol.py" "/home/shmellyorc/Documents/Void.Language/build/ci-release/voidls" "/home/shmellyorc/Documents/Void.Language/build/ci-release/lsp fixtures"
+60: Working Directory: /home/shmellyorc/Documents/Void.Language/build/ci-release
+60: Test timeout computed to be: 180
+60: editor: CRLF/UTF16, cross-file symbols, overlays, versions, invalid/repair, graph changes and cycles passed
+60: transport: fragmented/coalesced frames, IDs, malformed messages, bounded framing, lifecycle and EOF passed
+60: value structs: real LSP type/constructor/field navigation, references, readonly diagnostics and revision recovery passed
+60: receiver methods: imported native LSP navigation, references, effect changes and revision recovery passed
+60: initialization: imported initializer navigation/references, exact argument diagnostics and unsaved recovery passed
+60: managed structs: cyclic types, imported fields/methods, readonly aliases and unsaved recovery passed
+60: managed initialization: imported constructor, private helper navigation, required-field diagnostics and unsaved repair passed
+60: reference values: imported nested reference navigation, precise readonly diagnostics and unsaved recovery passed
+60: composition: imported promoted navigation, ambiguity and unsaved repair passed
+60: inheritance: original owners, static virtual/super navigation, exact override diagnostics and unsaved repair passed
+60: interfaces: original requirement navigation, imported signatures/effects and unsaved revision repair passed
+60: invalid disk UTF-8: original UTF16 ranges, overlay repair and close passed
+60: strings: imported constants, UTF16 escape spans and unsaved repair passed
+60: Stage 6 native host authorization, async/spawn/group references and stale-overlay repair: passed
+2/8 Test  #60: lsp_protocol .....................   Passed    0.32 sec
+test 61
+    Start  61: lsp_stage8
+
+61: Test command: /home/shmellyorc/.local/bin/python3.11 "/home/shmellyorc/Documents/Void.Language/tests/lsp/stage8.py" "/home/shmellyorc/Documents/Void.Language/build/ci-release/voidls" "/home/shmellyorc/Documents/Void.Language/build/ci-release/voidc"
+61: Working Directory: /home/shmellyorc/Documents/Void.Language/build/ci-release
+61: Test timeout computed to be: 1500
+61: Debug cache: miss
+61: Debug cache: hit
+61: SKIP: Windows 8.3 coverage requires Windows
+61: POSIX workspace ancestor alias and descendant rejection checks passed
+61: Stage 8 compiler-backed LSP discovery/docs/readonly checks passed
+3/8 Test  #61: lsp_stage8 .......................   Passed    0.44 sec
+test 129
+    Start 129: tooling
+
+129: Test command: /home/shmellyorc/Documents/Void.Language/build/ci-release/void_tests "tooling" "/home/shmellyorc/Documents/Void.Language/build/ci-release/tooling fixtures"
+129: Working Directory: /home/shmellyorc/Documents/Void.Language/build/ci-release
+129: Test timeout computed to be: 120
+129: queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots
+129: plan: /leaf.void -> /middle.void::wrapper -> /main.void::entry; validated 53 -> 61, const restart required
+129: tooling: passed
+4/8 Test #129: tooling ..........................   Passed    0.31 sec
+test 130
+    Start 130: analysis
+
+130: Test command: /home/shmellyorc/Documents/Void.Language/build/ci-release/void_tests "analysis" "/home/shmellyorc/Documents/Void.Language/build/ci-release/analysis fixtures"
+130: Working Directory: /home/shmellyorc/Documents/Void.Language/build/ci-release
+130: Test timeout computed to be: 180
+130: normal: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 273175
+130: O2: body edit 53 -> 61, const edit rejected, old lease 53; concurrent calls 386811
+130: analysis: passed
+5/8 Test #130: analysis .........................   Passed    0.60 sec
+test 133
+    Start 133: modules
+
+133: Test command: /home/shmellyorc/Documents/Void.Language/build/ci-release/void_tests "modules" "/home/shmellyorc/Documents/Void.Language/build/ci-release/module fixtures with spaces"
+133: Working Directory: /home/shmellyorc/Documents/Void.Language/build/ci-release
+133: Test timeout computed to be: 90
+133: Project constants, forwards, visibility, cycles, imports and restart checks passed
+133: Project-local library identities, cycles, ownership, overlays, native JIT and invalidation passed
+133: Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed
+133: modules: passed
+6/8 Test #133: modules ..........................   Passed    0.82 sec
+test 142
+    Start 142: lsp_sprint6
+
+142: Test command: /home/shmellyorc/.local/bin/python3.11 "/home/shmellyorc/Documents/Void.Language/tests/stage8/lsp_sprint6.py" "/home/shmellyorc/Documents/Void.Language/build/ci-release/voidls"
+142: Working Directory: /home/shmellyorc/Documents/Void.Language/build/ci-release
+142: Test timeout computed to be: 90
+142: Sprint 6 LSP navigation, UTF-16, hover, rename, completion, signature, diagnostics and formatting passed
+7/8 Test #142: lsp_sprint6 ......................   Passed    0.26 sec
+test 143
+    Start 143: local_libraries
+
+143: Test command: /home/shmellyorc/.local/bin/python3.11 "/home/shmellyorc/Documents/Void.Language/tests/stage8/local_libraries.py" "/home/shmellyorc/Documents/Void.Language/build/ci-release/voidc" "/home/shmellyorc/Documents/Void.Language/build/ci-release/voidls" "/usr/lib/llvm-19/bin/clang-19" "/usr/lib/llvm-19/bin/ld.lld" "/home/shmellyorc/Documents/Void.Language/build/ci-release/libvoid_runtime.a" "/home/shmellyorc/Documents/Void.Language/build/ci-release/libvoid_native_fixture.a" "OFF"
+143: Working Directory: /home/shmellyorc/Documents/Void.Language/build/ci-release
+143: Test timeout computed to be: 180
+143: Traceback (most recent call last):
+143:   File "/home/shmellyorc/Documents/Void.Language/tests/stage8/local_libraries.py", line 32, in <module>
+143:     run([compiler,'emit',entry,'-o',obj,*opt]);run([clang,*flags,obj,runtime,fixture,'-o',exe]);assert run([exe,7]).stdout.strip()=='16'
+143:                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+143:   File "/home/shmellyorc/Documents/Void.Language/tests/stage8/local_libraries.py", line 21, in run
+143:     assert p.returncode==status,(args,p.returncode,p.stdout,p.stderr)
+143:            ^^^^^^^^^^^^^^^^^^^^
+143: AssertionError: (['/usr/lib/llvm-19/bin/clang-19', '--driver-mode=g++', '--ld-path=/usr/lib/llvm-19/bin/ld.lld', PosixPath('/tmp/VOID local libs é😀 # % zrehm71m/local0.o'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-release/libvoid_runtime.a'), PosixPath('/home/shmellyorc/Documents/Void.Language/build/ci-release/libvoid_native_fixture.a'), '-o', PosixPath('/tmp/VOID local libs é😀 # % zrehm71m/local0.bin')], 1, '', 'ld.lld: error: cannot open output file /tmp/VOID local libs é😀 # % zrehm71m/local0.bin: No such file or directory\nclang-19: error: linker command failed with exit code 1 (use -v to see invocation)\n')
+8/8 Test #143: local_libraries ..................***Failed    0.16 sec
+
+The following tests passed:
+	debug_cache_processes
+	lsp_protocol
+	lsp_stage8
+	tooling
+	analysis
+	modules
+	lsp_sprint6
+
+88% tests passed, 1 tests failed out of 8
+
+Total Test time (real) =  10.75 sec
+
+The following tests FAILED:
+	143 - local_libraries (Failed)
+Errors while running CTest
+Output from these tests are in: /home/shmellyorc/Documents/Void.Language/build/ci-release/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

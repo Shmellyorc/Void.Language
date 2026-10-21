@@ -248,6 +248,33 @@ void discovery(const fs::path& root) {
     check(completion.candidates.front().documentation.find("Read a fixture.")!=std::string::npos,"completion docs");
     auto signature=probe("use io/files as files\nfunc entry(x: i32) -> i32:\n    return files.read(");
     check(signature.documentation.find("Read a fixture.")!=std::string::npos && signature.parameter_documentation==std::vector<std::string>{"fixture value"},"signature docs");
+    check(!hasname(probe("use "),"lib/") && probe("use lib/").candidates.empty(),"missing libs produced local suggestions");
+    write(project/"libs/raylib/raylib.void","## Local wrapper API.\ninternal func read(x: i32) -> i32:\n    return x\nprivate func secret(x: i32) -> i32:\n    return x\n");
+    write(project/"libs/raylib/graphics.void","func draw(x: i32) -> i32:\n    return x\n");
+    write(project/"libs/direct.void","");fs::create_directories(project/"libs/empty");
+    check(hasname(probe("use "),"lib/") && hasname(probe("use li"),"lib/"),"local prefix discovery");
+    check(hasname(probe("use lib/"),"raylib/") && hasname(probe("use lib/"),"raylib"),"local root entry/folder completion");
+    check(hasname(probe("use lib/"),"empty/") && !hasname(probe("use lib/"),"empty") && !hasname(probe("use lib/"),"direct"),"invented local root entries");
+    check(hasname(probe("use lib/raylib/"),"graphics"),"nested local completion");
+    check(apply("use lib/rayXYZ as rl # é😀\r\n",11,"raylib")=="use lib/raylib as rl # é😀\r\n","local completion damaged suffix/alias");
+    vd::SourceOverrides local_overlays{{"/libs/virtual/virtual.void",vd::SourceFile("virtual.void","")}};
+    check(hasname(probe("use lib/",std::string::npos,local_overlays),"virtual") && hasname(probe("use lib/virtual/",std::string::npos,local_overlays),"virtual"),"overlay-only local library completion");
+    local_overlays["/libs/raylib/raylib.void"]=std::nullopt;
+    check(!hasname(probe("use lib/",std::string::npos,local_overlays),"raylib") && hasname(probe("use lib/",std::string::npos,local_overlays),"raylib/"),"local root tombstone/folder independence");
+    vd::SourceOverrides many_libraries;
+    for(unsigned n=0;n<140;++n){auto name="package"+std::to_string(n);many_libraries.emplace("/libs/"+name+"/"+name+".void",vd::SourceFile(name+".void",""));}
+    auto bounded=probe("use lib/",std::string::npos,many_libraries);
+    check(bounded.incomplete && bounded.candidates.size()==256,"local completion limit/incomplete flag");
+    auto local_api=probe("use lib/raylib as rl\nfunc entry(x: i32) -> i32:\n    return rl.re");
+    check(hasname(local_api,"read") && !hasname(local_api,"secret") && local_api.candidates.front().documentation.find("Local wrapper")!=std::string::npos,"local project ownership/docs completion");
+    write(library/"random.void","func read(x: i32) -> i32:\n    return x + 1\n");write(project/"random.void","func read(x: i32) -> i32:\n    return 999\n");
+    auto mixed=vd::analyze_project(project/"main.void",{{"/main.void",vd::SourceFile("main.void","use random\nuse lib/raylib as rl\nfunc entry(x: i32) -> i32:\n    return random.read(rl.read(x))\n")}});
+    check(mixed.program && mixed.program->modules().size()==3,"local sources shadowed official stdlib");
+    {vd::Jit j;check(j.compile(*mixed.program,false)->invoke(3)==4,"wrong mixed import domain");}
+    write(library/"forbidden_local.void","use lib/raylib\n");
+    check(!vd::analyze_project(project/"main.void",{{"/main.void",vd::SourceFile("main.void","use forbidden_local\n")}}).program,"standard source imported project-local library");
+    write(library/"lib/missing.void","func exists() -> i32:\n    return 1\n");
+    check(vd::analyze_project(project/"main.void",{{"/main.void",vd::SourceFile("main.void","use lib/missing\n")}}).program==nullptr,"local prefix fell through to standard library");
     auto reject=[&](const std::string& source){return !vd::analyze_project(project/"main.void",{{"/main.void",vd::SourceFile("main.void",source)}}).program;};
     check(reject("use io/files as files\nfunc entry(x: i32) -> i32:\n    return files.hidden(x)\n"),"library internal escaped");
     check(reject("use IO/files\n") && reject("use io/\n") && reject("use io.files\n") && reject("use \"/@stdlib/io/files.void\"\n"),"invalid import spelling/domain escape");

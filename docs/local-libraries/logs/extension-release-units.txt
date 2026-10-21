@@ -1,0 +1,12 @@
+✔ literal workspace paths, spaces, no shell expansion (1.465741ms)
+✔ Windows paths are literal, drive/root boundaries preserved (0.821726ms)
+✔ validate executable and deterministic canonical project selection (37.738985ms)
+✔ presentation covers approved keyword colors and space indentation (3.59152ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 117.57625

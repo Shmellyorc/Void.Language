@@ -1,0 +1,25 @@
+Test project /home/shmellyorc/Documents/Void.Language/build/ci-sanitizers
+      Start  15: debug_cache_processes
+ 1/10 Test  #15: debug_cache_processes ............   Passed   12.71 sec
+      Start  60: lsp_protocol
+ 2/10 Test  #60: lsp_protocol .....................   Passed    1.24 sec
+      Start  61: lsp_stage8
+ 3/10 Test  #61: lsp_stage8 .......................   Passed    1.98 sec
+      Start  64: native_source
+ 4/10 Test  #64: native_source ....................   Passed   10.18 sec
+      Start 125: native
+ 5/10 Test #125: native ...........................   Passed    0.08 sec
+      Start 129: tooling
+ 6/10 Test #129: tooling ..........................   Passed    0.72 sec
+      Start 130: analysis
+ 7/10 Test #130: analysis .........................   Passed    1.17 sec
+      Start 133: modules
+ 8/10 Test #133: modules ..........................   Passed    2.05 sec
+      Start 142: lsp_sprint6
+ 9/10 Test #142: lsp_sprint6 ......................   Passed    0.79 sec
+      Start 143: local_libraries
+10/10 Test #143: local_libraries ..................   Passed    0.95 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Total Test time (real) =  31.89 sec
