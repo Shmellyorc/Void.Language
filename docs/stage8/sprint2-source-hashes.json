@@ -1,0 +1,23 @@
+{
+  "CMakeLists.txt": "2ccb7d4e2b3636c4b62448f7e2b18daaa1727725f487034db90a37156bad80f2",
+  "include/void/frontend.hpp": "89f7a84ebb9d55d5a86369d3cd28db4ccbdc34c0319982a469ed92cb70cec985",
+  "include/void/ir.hpp": "f2d48b2d481adc1c07d112115389c0857a174777a253d145a34e2d2265892eaf",
+  "include/void/numeric.hpp": "46aaa3b1382c70fc3161972dd9b7f613e2ffd62e37eb6408e55e59fd1d386fb4",
+  "src/backend/llvm/backend.cpp": "e73b57b38f99798a01ce3814c6c71922929d0a53e9ba2c723a58a11f255ff597",
+  "src/frontend/capabilities.inc": "7aaf5a012ea4b1fa1176b2d4e1dac5e672e3a65a199322004a375078994108aa",
+  "src/frontend/compiler.cpp": "5d89f89a74243e824d08dfdd8ba875d610fe6fa04245f9593cb4b18841b06637",
+  "src/frontend/construction.inc": "e53e1f76772f78c1dfae2b75f44f32bcca54b1bf1d4c347f7e0856f99c289d58",
+  "src/frontend/generic_inference.inc": "d297d77d75b0e20b9eb79dc092277d9a9fe1ac0c102c88cbdce768e568033b3c",
+  "src/frontend/generic_tooling.inc": "68c59fecb78d42a4e1f2e113d44d38703847f68c37a5e7332400b07a9ad87097",
+  "src/frontend/source.cpp": "4900d157d7a84c42f8aeea608c9e6b4c7e9da02679cad7b0fdbda074fa4044e4",
+  "src/ir/module.cpp": "c11cf34de1424577e8c57e5750a2daa456df23d46bc0a6a7e31fb74dbd4efa95",
+  "src/lsp/main.cpp": "e075d99f29322748978c5bd5811b17d0c5ff5d999057a6c60b1ad6e7bd4efada",
+  "src/numeric.cpp": "351557e8abcf2523dec4f513901146142a83c4d410df2ee76856e1aab661e985",
+  "tests/async/tests.cpp": "aaf4b3f09a0b2e511310170950bf0ffdbb47c7afef99a33780ad66037eca4fa0",
+  "tests/integration/semantic_depth.py": "0c6ff275b64a911966beb1badf6de4c7f41d02143ce269cbca6d0c5f01cf09de",
+  "tests/lsp/sprint2.py": "f2754a9cad94ec264f2940a65b08a1a16d0c8bea9b7e3faafb8f9e94750d0ac1",
+  "tests/lsp/stage8.py": "258b47a90c5727317342ae25c37a8d1a3d2bfa749073302d3387a780619cc62a",
+  "tests/numeric/sprint2.py": "392f8baf4a4ad360034e61d74376caaeda6927e216d34ba43448787672db358c",
+  "tests/numeric/tests.cpp": "2a9c617245a461efde1bd5d14e46ed400bc96184e4561882ef63bd0807ce8a2c",
+  "tests/strings/tests.cpp": "6f4f3972626a9a25ad9202d6896afeef6203b5c03599ff59cb657f1fb8e5bd4a"
+}

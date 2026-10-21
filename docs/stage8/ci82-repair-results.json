@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-20 America/Los_Angeles",
+  "scope": "Stage 8 Sprint 1 CI #82 focused repair only",
+  "local_base_commit": "f67f7e353355964c1abfc9d40813bf119cfdb0f8",
+  "hosted_run": {
+    "number": 82,
+    "run_id": 39533326046,
+    "attempt": 1,
+    "head_sha": "cf06d166f60639cc883d80e57390d3990a817063",
+    "url": "https://github.com/Shmellyorc/Void.Language/actions/runs/39533326046",
+    "conclusion": "cancelled",
+    "release_job": {
+      "id": 119004113561,
+      "name": "Windows 2022 / Release",
+      "conclusion": "failure",
+      "passed": 140,
+      "total": 141,
+      "failed_test": "lsp_stage8",
+      "failed_test_number": 61,
+      "diagnostic": "voidls: Active file is outside selected workspace",
+      "active_prefix": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp",
+      "failure_time_utc": "2026-10-21T02:37:00Z"
+    },
+    "debug_job": {
+      "id": 119004113913,
+      "name": "Windows 2022 / Debug",
+      "build": "success",
+      "test_step": "cancelled",
+      "lsp_stage8_observed": false
+    }
+  },
+  "local_tests": [
+    {
+      "configuration": "debug",
+      "platform": "Linux x86-64",
+      "build": "cmake --build build/debug --target voidls voidc void_tests -j4",
+      "build_exit_code": 0,
+      "test_command": "ctest --test-dir build/debug --output-on-failure -R '^(modules|tooling|lsp_stage8|lsp_protocol)$'",
+      "passed": 4,
+      "failed": 0,
+      "seconds": 2.15,
+      "output": "Test project /home/shmellyorc/Documents/Void.Language/build/debug\n    Start  60: lsp_protocol\n1/4 Test  #60: lsp_protocol .....................   Passed    0.48 sec\n    Start  61: lsp_stage8\n2/4 Test  #61: lsp_stage8 .......................   Passed    0.14 sec\n    Start 129: tooling\n3/4 Test #129: tooling ..........................   Passed    0.44 sec\n    Start 133: modules\n4/4 Test #133: modules ..........................   Passed    1.08 sec\n\n100% tests passed, 0 tests failed out of 4\n\nTotal Test time (real) =   2.15 sec\n"
+    },
+    {
+      "configuration": "release",
+      "platform": "Linux x86-64",
+      "build": "cmake --build build/ci-release --target voidls voidc void_tests -j4",
+      "build_exit_code": 0,
+      "test_command": "ctest --test-dir build/ci-release --output-on-failure -R '^(modules|tooling|lsp_stage8|lsp_protocol)$'",
+      "passed": 4,
+      "failed": 0,
+      "seconds": 1.42,
+      "output": "Test project /home/shmellyorc/Documents/Void.Language/build/ci-release\n    Start  60: lsp_protocol\n1/4 Test  #60: lsp_protocol .....................   Passed    0.30 sec\n    Start  61: lsp_stage8\n2/4 Test  #61: lsp_stage8 .......................   Passed    0.12 sec\n    Start 129: tooling\n3/4 Test #129: tooling ..........................   Passed    0.24 sec\n    Start 133: modules\n4/4 Test #133: modules ..........................   Passed    0.75 sec\n\n100% tests passed, 0 tests failed out of 4\n\nTotal Test time (real) =   1.42 sec\n"
+    }
+  ],
+  "source_sha256": {
+    "src/frontend/source.cpp": "4900d157d7a84c42f8aeea608c9e6b4c7e9da02679cad7b0fdbda074fa4044e4",
+    "tests/lsp/stage8.py": "258b47a90c5727317342ae25c37a8d1a3d2bfa749073302d3387a780619cc62a"
+  },
+  "windows_short_path_execution": "pending Windows Debug and Release; skipped on Linux",
+  "new_full_matrix_run": false,
+  "hosted_lock": false
+}

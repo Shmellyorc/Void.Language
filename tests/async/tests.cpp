@@ -28,6 +28,8 @@ int main(int argc,char** argv){try{
     auto fixtures=std::filesystem::path(argv[2]);std::filesystem::create_directories(fixtures);std::filesystem::remove_all(fixtures/".void");
     auto source=fixtures/"main.void";
     auto write=[&](const std::string& text){std::ofstream out(source);out<<text;require(bool(out),"fixture write failed");};
+    write("func worker(left: i32, right: f64 = 2.0d) -> i32:\n    return left + (right as i32)\nasync func child(left: i32, right: i64 = 3) -> i32:\n    return left + (right as i32)\nasync func entry(value: i32) -> i32:\n    var direct = await child(right = 4, left = value)\n    var job = spawn worker(right = 5.0d, left = value)\n    return direct + await job\n");
+    auto named=analyze(source);for(bool optimize:{false,true}){vd::Jit jit;require(jit.compile_async(*named,optimize)->invoke(7)==23,"named async/spawn argument order or typed wrapper");}
     write("async func child(value: i32) -> i32:\n    return 10 / value\nasync func entry(value: i32) -> i32:\n    var ignored = child(0)\n    return 7\n");
     auto unobserved=analyze(source);for(bool optimize:{false,true}){vd::Jit jit;auto code=jit.compile_async(*unobserved,optimize);bool failed=false;try{code->invoke(7);}catch(const std::runtime_error& error){failed=std::string(error.what()).find("child")!=std::string::npos;}require(failed,"unobserved failure was lost");}
     write("async func child(value: i32) -> i32:\n    return (value - value - 1) as u8 as i32\nasync func entry(value: i32) -> i32:\n    var ignored = child(value)\n    return 10 / (value - value)\n");

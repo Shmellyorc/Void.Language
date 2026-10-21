@@ -1,5 +1,24 @@
 # 📜 THE ORDINATION OF THE RESEARCH CLANKER
 
+## Current Stage 8 handoff — 20 October 2026
+
+Stage 8 Sprint 1 is **locally accepted by Boss**, including preservation of the
+[Windows CI #82 path repair](stage8/CI82_WINDOWS_REPAIR.md). Sprint 2 is
+**IMPLEMENTED / LOCALLY VERIFIED** (429/429 suites); Wrench review is pending. See the
+[calls/numeric contract](STAGE8_CALLS_NUMERIC.md) and
+[local verification record](stage8/SPRINT2_ACCEPTANCE.md). All three semantic
+choices are approved in [DECISIONS.md](DECISIONS.md): consistent argument binding,
+the four-member numeric prelude and exact numeric edge behavior.
+
+**Hosted CI is deferred until the end of Stage 8**, unless Boss explicitly
+authorizes an earlier run. Do not run or request hosted CI for Sprint 2.
+Git, branches, remote changes and publication remain owner-controlled; no such
+operations are authorized. Root README remains public-facing and unchanged.
+Stop after Sprint 2 local verification for Wrench review. Sprints 3–6 remain
+future work; do not progress automatically. Stage 7 remains hosted locked at
+`f704d75f`, CI #81 attempt 2, seven jobs, 980/980 suites. Stage 8 is not hosted locked.
+
+
 ## 📚🤖 Keeper of the Sacred Lantern of Discovery
 
 HAHAHAHA! XD

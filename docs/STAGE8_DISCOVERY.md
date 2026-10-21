@@ -1,7 +1,9 @@
 # Stage 8 Sprint 1: project and module discovery
 
 20 October 2026. Sprint 1 is implemented and locally verified (423/423 consolidated suites);
-hosted acceptance is pending. The [approval ledger](LANGUAGE_COMPLETENESS_APPROVALS.md) governs scope.
+Boss locally accepted Sprint 1; its CI #82 repair is preserved in the
+[Sprint 2 verification](stage8/SPRINT2_ACCEPTANCE.md). Hosted acceptance is deferred
+until Stage 8 end, including Windows Debug and Release repair execution. The [approval ledger](LANGUAGE_COMPLETENESS_APPROVALS.md) governs scope.
 No real standard-library modules or new application entry semantics ship here.
 
 ## Source domains and selection
@@ -44,7 +46,15 @@ exact-case `main.void` in the active file's directory and successive parents up 
 the selected workspace boundary, nearest first. With no active file inspect the
 workspace directory only. No recursive search, source parsing or function scan.
 Invalid/wrong-case/aliased main candidates fail instead of selecting another project.
-Source errors in a selected main never cause fallback. Entry parent remains the
+Source errors in a selected main never cause fallback. On Windows, OS 8.3/long
+spellings of the workspace prefix and its ancestors may identify the same selected
+boundary. Discovery expands only that prefix, retains original descendant spelling
+for the existing canonical-path and symlink checks, rejects reparse points during
+prefix inspection, and searches using the canonical boundary spelling. It does not
+canonicalize away descendant aliases or permit short-name VFS components below the
+boundary. Exact `main.void` spelling and containment remain required. The policy is
+shared by Debug and Release; [CI #82 repair evidence](stage8/CI82_WINDOWS_REPAIR.md)
+records local coverage and pending Windows verification. Entry parent remains the
 project VFS root. An absent main permits a labelled standalone active-file editor
 selection, including a named unsaved file whose parent exists. An explicit override
 must exist. Selection without a workspace uses the labelled standalone fallback.

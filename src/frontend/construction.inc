@@ -62,7 +62,7 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     if(e.interface_call) issue(e.token,"Interface dispatch is prohibited on unfinished self or its aliases.");
                     if (!e.virtual_slot.empty()) issue(e.token,"Virtual-family calls are prohibited on unfinished self or its aliases, including direct super calls.");
                     for(unsigned field=0;field<e.parts[i]->type.definition->fields.size();++field) require_field(*origin,field,ready,e.token);
-                    mask.insert(i);
+                    auto first=e.kind==K::method_call?1u:0u;mask.insert(i<first || e.argument_indexes.empty()?i:first+e.argument_indexes[i-first]);
                 }
                 if (!mask.empty()) {
                     auto target=functions.find(e.target);
@@ -71,7 +71,7 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     for (auto index:mask) {
                         auto first=callee.receiver ? 1u : 0u;
                         auto t=index<first ? callee.receiver->type : callee.parameters.at(index-first).type;
-                        if (t.nullable) issue(e.parts[index]->token,"A construction view cannot be injected into a nullable reference.");
+                        if (t.nullable) issue(e.token,"A construction view cannot be injected into a nullable reference.");
                     }
                     context.calls.emplace(&e,mask);
                     request(*target->second.first,callee,mask,std::pair{&unit,e.token});

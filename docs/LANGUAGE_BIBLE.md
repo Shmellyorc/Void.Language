@@ -706,6 +706,15 @@ deferred; no implicit boxing or mandatory implements keyword is introduced.
 
 ## 14. Ordinary functions and receiver methods [AGREED]
 
+**Stage 8 Sprint 2 superseding direction (20 October 2026):** Boss approved the
+shared ordinary/initializer named/default binding contract, concrete-default
+annotation inference and the four-member compiler-owned numeric prelude. Exact
+rules and current implementation status are in [STAGE8_CALLS_NUMERIC.md](STAGE8_CALLS_NUMERIC.md)
+and [DECISIONS.md](DECISIONS.md). The Phase 13 ordinary-call exclusions below are
+historical. Function-value calls and interface requirement defaults retain their
+existing bounded contracts. Hosted CI is deferred until Stage 8 ends.
+
+
 **Implemented clarification (Phase 13):** Owner-module receiver methods, correct mutable original-storage selection, inferred mutation/effects, left-to-right argument evaluation, conservative readonly checking and shared JIT/AOT lowering are working. Ordinary named/default function argument calls remain outside the supported constructor-argument grammar. Consult `RECEIVER_METHODS.md` for exact source boundaries.
 
 Every function or method starts with `func`. A method has a receiver `(name type)` before the method name. Parameter annotations are **name-first**: `amount: i32`. Return types use `->`. No `this` or `void` keywords.
@@ -2986,7 +2995,7 @@ This section matters especially when an AI assistant inherits this file without 
 6. **Construction:** [IMPLEMENTED CORE: C1/S1 init; fallible/resource init open] `init()` is implemented for approved value and managed structs: custom-init calls bind constructor arguments solely to init parameters; types without init retain named-field construction; derived initialization uses an explicit `super.init(...)` prelude. Fallible `result`-returning init, native-resource rollback/destruction and richer constructor escape remain future design.
 7. **`value struct` native ownership:** [FUTURE DESIGN: resource-owning value copies] Ensure copying cannot double-release a native handle; initially restrict resource-owning value types or introduce an explicit safe transfer contract.
 8. **Closures:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Shared captured locals, independent captured value receivers, escaping managed environments and capture-layout reload checks; see ADVANCED_LANGUAGE.md.
-9. **Function call grammar:** [IMPLEMENTED CORE: constructor argument order; ordinary named/default calls open] Constructor invocations already accept an ordered positional prefix plus named arguments and pure parameter defaults, with supplied arguments evaluated exactly once left to right. Ordinary function named/default arguments and direct multiline anonymous-function call grammar remain future design.
+9. **Function call grammar:** [IMPLEMENTED CORE: shared constructor/function/method argument binding] Stage 8 Sprint 2 locally verifies an ordered positional prefix plus named arguments and pure compile-time defaults for ordinary functions and methods using the constructor binder. Supplied arguments evaluate exactly once left to right. See [the contract](STAGE8_CALLS_NUMERIC.md) and [local evidence](stage8/SPRINT2_ACCEPTANCE.md). Direct multiline anonymous-function call grammar remains future design.
 10. **Events:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Owner emission, ordered strong snapshots, re-entrancy and stable callback identities; see ADVANCED_LANGUAGE.md.
 11. **Generic implementation:** [IMPLEMENTED FOUNDATION: Phase 24] Concrete specialization, interface constraints, argument inference and bounded recursion use the existing compiler/Runtime; see GENERICS.md. Variance, operator contracts and more aggressive representation/code-size sharing remain open.
 12. **Dictionary grammar:** [FUTURE DESIGN: dictionary literal grammar] Decide whether unquoted `name = value` is allowed alongside `"name": value`. Do not invent silent meaning for bare identifiers.

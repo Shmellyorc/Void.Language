@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-20 America/Los_Angeles",
+  "scope": "Stage 8 Sprint 2 only",
+  "status": "implemented and locally verified; Wrench review pending; not hosted locked",
+  "llvm": "19.1.7",
+  "configurations": [
+    {
+      "configuration": "debug",
+      "build_directory": "build/debug",
+      "passed": 143,
+      "total": 143,
+      "failed": 0,
+      "elapsed_seconds": 442.25,
+      "log": "build/stage8-sprint2-acceptance/debug-ctest.log",
+      "log_sha256": "98d991f25a01cae5a1a6c044d20b85b14688a629019a3281e6a6e74fce064c35",
+      "command": "ctest --test-dir build/debug --output-on-failure -j2"
+    },
+    {
+      "configuration": "release",
+      "build_directory": "build/ci-release",
+      "passed": 143,
+      "total": 143,
+      "failed": 0,
+      "elapsed_seconds": 179.83,
+      "log": "build/stage8-sprint2-acceptance/release-ctest.log",
+      "log_sha256": "fc60d3f4c668430bd200f6bc5ac4f56e988c552d94a99a6702974a6bd5ca2a60",
+      "command": "ctest --test-dir build/ci-release --output-on-failure -j2"
+    },
+    {
+      "configuration": "sanitizers",
+      "build_directory": "build/ci-sanitizers",
+      "passed": 143,
+      "total": 143,
+      "failed": 0,
+      "elapsed_seconds": 375.82,
+      "log": "build/stage8-sprint2-acceptance/sanitizers-ctest.log",
+      "log_sha256": "fc514ea31b35c1d707c069c369743eb280ac7734b5c17d7124bec11bef0e8baa",
+      "command": "ctest --test-dir build/ci-sanitizers --output-on-failure -j2"
+    }
+  ],
+  "total_passed": 429,
+  "total_failed": 0,
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "outside_ptrace": true,
+    "generated_llvm_application_code_instrumented": false
+  },
+  "small_stack": {
+    "bytes": 1048576,
+    "debug": "passed",
+    "release": "passed",
+    "command_template": "bash -c 'ulimit -s 1024; exec ./<build>/void_tests frontend .'",
+    "nesting_limits_changed": false
+  },
+  "focused_process_checks": 71,
+  "source_hashes": "sprint2-source-hashes.json",
+  "stack_measurements": "sprint2-stack-frames.json",
+  "ci82_repair_source_hashes_preserved": true,
+  "root_readme_changed": false,
+  "hosted_ci_run_or_requested": false,
+  "hosted_gate": "end of Stage 8 unless separately authorized by Boss",
+  "git_mutations": false,
+  "sprints_3_through_6": "future work",
+  "pending": [
+    "Wrench review",
+    "Windows Debug and Release short/long path and reparse execution",
+    "Windows/macOS Sprint 2 execution at deferred hosted gate",
+    "New real interactive editor Sprint 2 acceptance; pipe protocol coverage is not interactive client evidence"
+  ]
+}

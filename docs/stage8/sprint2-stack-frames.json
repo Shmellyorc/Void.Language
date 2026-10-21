@@ -1,0 +1,20 @@
+{
+  "scope": "Linux x86-64 Clang 19 Debug prologue stack allocation, bytes; not universal platform measurements",
+  "before": {
+    "method_expression": 2112,
+    "anchor": 3776
+  },
+  "after": {
+    "method_expression": 1760,
+    "anchor": 3328
+  },
+  "stack_limit_bytes": 1048576,
+  "nesting_limits_changed": false,
+  "valid_chain_counts": [
+    16,
+    64,
+    96,
+    124
+  ],
+  "rejected_chain_count": 400
+}

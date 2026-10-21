@@ -910,6 +910,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     }
                     result=Type::none; break;
                 }
+                case Op::bitcast:
+                    valid_type(i.type);
+                    if(!numeric::number(operand(i.a)) || !numeric::number(i.type) || numeric::width(operand(i.a))!=numeric::width(i.type) || i.b || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid numeric bitcast");
+                    result=i.type;break;
                 case Op::convert:
                     valid_type(i.type);
                     if (!((operand(i.a).definition && i.type.definition && operand(i.a).definition->callable && i.type.definition->callable && Type::key(operand(i.a))==Type::key(i.type)) || (reference_value(operand(i.a)) && !operand(i.a).construction && i.type.kind==operand(i.a).kind && !i.type.construction && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)))) fail("invalid conversion");

@@ -255,7 +255,10 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                         if(report && leaf->second.readonly)issue(e.token,"Cannot mutate a readonly list.");
                     }
                 }
-                if(functions.contains(e.target))view=invoke(e,e.target,arguments);
+                if(functions.contains(e.target)) {
+                    if(!e.argument_indexes.empty()) {auto ordered=arguments;const unsigned first=e.kind==K::method_call?1:0;for(unsigned n=first;n<arguments.size();++n)ordered[first+e.argument_indexes[n-first]]=arguments[n];arguments=std::move(ordered);}
+                    view=invoke(e,e.target,arguments);
+                }
             }); else if (e.kind==K::construction || e.kind==K::base_initialization) frontend_case([&] {
                 view=ir::reference_facts(e.type);
                 if (e.initializer.empty()) {

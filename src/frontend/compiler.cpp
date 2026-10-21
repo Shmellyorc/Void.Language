@@ -274,7 +274,7 @@ struct Expr {
     std::vector<Token> names;
     std::vector<std::unique_ptr<Expr>> omitted;
     std::string initializer;
-    std::vector<unsigned> field_indexes;
+    std::vector<unsigned> field_indexes, argument_indexes;
     std::string literal_text;
     std::vector<std::unique_ptr<Expr>> parts;
     Type type = Type::none;
@@ -546,7 +546,10 @@ class Parser {
         need("(");
         if (!at(")")) do {
             bool readonly_parameter=accept("const");
-            auto token = name(); need(":"); nodes=0; Parameter parameter{token,type()}; parameter.type.readonly=readonly_parameter;
+            auto token = name(); nodes=0; Parameter parameter{token,Type::none};
+            if(accept(":")) parameter.type=type();
+            else if(!at("=") || !defaults || !f.generics.empty()) error(source,token,Code::type_mismatch,"A parameter requires an explicit type or a concrete compile-time default; generic parameter types must be explicit.");
+            parameter.type.readonly=readonly_parameter;
             if (accept("=")) {
                 if(!defaults) error(source,tokens[p-1],Code::argument_count,"Interface requirements cannot declare parameter defaults.");
                 auto begin = p; parameter.default_begin = peek().offset; nodes = 0; parameter.default_expression = expression();
@@ -754,7 +757,7 @@ class Parser {
             return postfix(std::move(e));
         }
         if(token.text=="(") {auto e=expression();need(")");return postfix(std::move(e));}
-        if(token.kind==TokenKind::name && !reserved.contains(token.text)) return postfix(std::make_unique<Expr>(Expr::Kind::name,token));
+        if(token.kind==TokenKind::name && (!reserved.contains(token.text) || (numeric::primitive(token.text)!=Type::none && at(".")))) return postfix(std::make_unique<Expr>(Expr::Kind::name,token));
         error(source,token,Code::syntax,"Expected an expression, found '"+token.text+"'.");
     }
     std::unique_ptr<Expr> unary() {
@@ -1151,6 +1154,7 @@ class Semantics {
     std::function<Variable*(const std::string&)> enclosing;
     std::vector<std::map<std::string, Variable>> scopes;
     Function* current = nullptr;
+    const Function* default_context = nullptr;
     unsigned loops = 0;
     bool suppress_zero = false,pattern_bindings=false,allow_event=false;
     Variable* lookup(const std::string& name) {
@@ -1337,10 +1341,36 @@ class Semantics {
         e.receiver_addressable=true; e.slot=current->receiver->slot;
         auto original=std::move(e.parts[0]);
         e.parts[0]=std::make_unique<Expr>(Expr::Kind::conversion,original->token); e.parts[0]->op="upcast"; e.parts[0]->implicit=true; e.parts[0]->type=selected->receiver->type; e.parts[0]->parts.push_back(std::move(original));
-        if (std::any_of(e.names.begin(),e.names.end(),[](const auto& t){return !t.text.empty();})) error(source,e.token,Code::argument_count,"Use positional method arguments.");
         return e.type=call_arguments(e,*selected,1);
     }
+    VOID_SEMANTIC_HANDLER Type primitive_base(const Expr& base) {
+        if(base.kind!=Expr::Kind::name || lookup(base.token.text) || unit.qualifiers.contains(base.token.text))return Type::none;
+        auto type=numeric::primitive(base.token.text);
+        auto context=current?current:default_context;
+        if(type==Type::none && context && context->substitutions.contains(base.token.text))type=context->substitutions.at(base.token.text);
+        return numeric::number(type)?type:Type::none;
+    }
+    // Keep numeric-only Type and Function temporaries off recursive receiver
+    // frames. Valid and rejected chains must still fit the existing 1 MiB gate.
+    VOID_SEMANTIC_HANDLER bool primitive_base_selected(const Expr& base) {
+        return base.kind==Expr::Kind::name && primitive_base(base)!=Type::none;
+    }
+    VOID_SEMANTIC_HANDLER std::optional<Type> primitive_anchor(const Expr& base) {return primitive_base(base);}
+    VOID_SEMANTIC_HANDLER Type type_numeric_call(Expr& e) {return numeric_call(e,primitive_base(*e.parts[0]),true);}
+    VOID_SEMANTIC_HANDLER Type numeric_call(Expr& e,Type type,bool type_level) {
+        auto api=numeric::member(e.token.text);
+        if(!api || !api->callable)error(source,e.token,type_level?Code::unknown_method:Code::receiver,"No numeric callable named '"+e.token.text+"'.");
+        if(!e.type_arguments.empty())error(source,e.token,Code::argument_count,"Numeric prelude members do not take generic type arguments.");
+        Function target;target.token=e.token;target.result=type;target.symbol=numeric::symbol(type,e.token.text);
+        for(auto name:api->parameters)target.parameters.push_back({Token{TokenKind::name,std::string(name),e.token.offset},type});
+        if(type_level)e.parts.erase(e.parts.begin());else {e.names.insert(e.names.begin(),Token{TokenKind::name,"",e.token.offset});e.op="$bound_numeric";}
+        e.kind=Expr::Kind::call;e.target=target.symbol;
+        auto result=call_arguments(e,target,0);
+        return e.type=result;
+    }
     VOID_SEMANTIC_HANDLER Type method_expression(Expr& e, std::optional<Type> expected) {
+        if(!e.argument_indexes.empty())return e.type;
+        if(primitive_base_selected(*e.parts[0]))return type_numeric_call(e);
         if(auto variant=enum_expression(e,true))return *variant;
         bool super=e.parts[0]->kind==Expr::Kind::name && e.parts[0]->token.text=="super" && !lookup("super") && !unit.qualifiers.contains("super") && !unit.failed_qualifiers.contains("super");
         if (super) return super_expression(e);
@@ -1364,6 +1394,7 @@ class Semantics {
     // Deep receiver chains must reach the existing semantic nesting guard on
     // the supported 1 MiB native stack in Debug as well as optimized builds.
     VOID_SEMANTIC_HANDLER Type resolved_method_expression(Expr& e,Type receiver) {
+        if(numeric::number(receiver))return numeric_call(e,receiver,false);
         if(e.parts[0]->event){
             bool owner=false;if(current && current->receiver)for(auto type=current->receiver->type.definition;type;type=type->base.lock())owner|=type->identity==e.parts[0]->event_owner;
             if(e.token.text!="emit" || !owner)error(source,e.token,Code::visibility,"Only methods of the event owner may emit it.");
@@ -1461,8 +1492,6 @@ class Semantics {
             if (candidate->parts[0]->type.kind==Type::managed_ref) e.receiver_addressable=true;
             candidate=candidate->parts[0].get();
         }
-        if (std::any_of(e.names.begin(),e.names.end(),[](const auto& t) { return !t.text.empty(); }))
-            error(source,e.token,Code::argument_count,"Named method arguments are not implemented; use positional arguments.");
         if (receiver.kind==Type::managed_ref && Type::key(receiver)!=Type::key(target.receiver->type)) {
             auto original=std::move(e.parts[0]);
             e.parts[0]=std::make_unique<Expr>(Expr::Kind::conversion,original->token); e.parts[0]->op="upcast"; e.parts[0]->implicit=true;
@@ -1470,7 +1499,7 @@ class Semantics {
         }
         return e.type = call_arguments(e,target,1);
     }
-    VOID_SEMANTIC_HANDLER void editor_call(const Expr& e,const Function& target,std::size_t first,bool constructor) {
+    VOID_SEMANTIC_HANDLER void editor_call(const Expr& e,const Function& target,std::size_t first,bool /*constructor*/) {
         std::optional<std::size_t> active;
         for(std::size_t n=first;n<e.parts.size() && !active;++n) {
             std::vector<const Expr*> work{e.parts[n].get()};
@@ -1491,11 +1520,39 @@ class Semantics {
         }
         out.signature+=") -> "+ir::type_name(target.result);
         out.active_parameter=static_cast<unsigned>(*active-first);
-        if(constructor && *active-first<e.names.size() && !e.names[*active-first].text.empty()) {
+        if(*active-first<e.names.size() && !e.names[*active-first].text.empty()) {
             auto found=std::find_if(target.parameters.begin(),target.parameters.end(),[&](const auto& p){return p.token.text==e.names[*active-first].text;});
             if(found!=target.parameters.end())out.active_parameter=static_cast<unsigned>(found-target.parameters.begin());
         }
+        if(target.symbol.starts_with("$numeric::")) {
+            out.documentation=std::string(numeric::member(target.token.text)->documentation);
+            if(e.op=="$bound_numeric" && !out.parameters.empty()) {
+                out.parameters.erase(out.parameters.begin());out.parameter_documentation.erase(out.parameter_documentation.begin());out.active_parameter=out.active_parameter?out.active_parameter-1:0;
+                out.signature=target.token.text+"(";for(const auto& p:out.parameters){if(out.signature.back()!='(')out.signature+=", ";out.signature+=p;}out.signature+=") -> "+ir::type_name(target.result);
+            }
+        }
     }
+    std::vector<unsigned> argument_mapping(const Expr& e, const Function& target, std::size_t first, bool constructor) {
+        std::vector<bool> bound(target.parameters.size());
+        std::vector<unsigned> mapping;
+        bool named = false;
+        unsigned positional = 0;
+        for (std::size_t n = first; n < e.parts.size(); ++n) {
+            auto index = positional++;
+            const auto& label = e.names[n-first];
+            if (!label.text.empty()) {
+                named = true;
+                auto found = std::find_if(target.parameters.begin(),target.parameters.end(),[&](const auto& p) { return p.token.text == label.text; });
+                if (found == target.parameters.end()) error(source,label,Code::argument_count,std::string(constructor ? "Unknown initializer parameter '" : "Unknown parameter '") + label.text + "'.");
+                index = static_cast<unsigned>(found-target.parameters.begin());
+            } else if (named) error(source,e.parts[n]->token,Code::argument_count,"Positional arguments must precede named arguments.");
+            if (index >= bound.size()) error(source,e.token,Code::argument_count,"Incorrect argument count for '" + e.token.text + "'.");
+            if (bound[index]) error(source,label.text.empty() ? e.parts[n]->token : label,Code::duplicate,constructor ? "Initializer parameter is supplied more than once." : "Parameter is supplied more than once.");
+            bound[index] = true; mapping.push_back(index);
+        }
+        return mapping;
+    }
+
     Type call_arguments(Expr& e, const Function& target, std::size_t first, bool constructor = false) {
         e.asynchronous_call=target.asynchronous;e.native_symbol=target.native_symbol;
         if(diagnostics.editor) editor_call(e,target,first,constructor);
@@ -1503,23 +1560,12 @@ class Semantics {
             std::vector<const Expr*> pending;for(std::size_t n=first;n<e.parts.size();++n)pending.push_back(e.parts[n].get());
             while(!pending.empty()){auto* part=pending.back();pending.pop_back();if(part->kind==Expr::Kind::awaited)error(source,part->token,Code::unsupported_type,"await cannot retain a prepared interface receiver across suspension.","Await arguments into locals before selecting the interface method.");for(const auto& child:part->parts)pending.push_back(child.get());}
         }
+        auto mapping=argument_mapping(e,target,first,constructor);
         std::vector<bool> bound(target.parameters.size());
-        std::vector<unsigned> mapping;
-        bool named = false, invalid = false;
-        unsigned positional = 0;
-        for (std::size_t n = first; n < e.parts.size(); ++n) {
-            auto index = positional++;
-            const auto& label = e.names[n-first];
-            if (constructor && !label.text.empty()) {
-                named = true;
-                auto found = std::find_if(target.parameters.begin(),target.parameters.end(),[&](const auto& p) { return p.token.text == label.text; });
-                if (found == target.parameters.end()) error(source,label,Code::argument_count,"Unknown initializer parameter '" + label.text + "'.");
-                index = static_cast<unsigned>(found-target.parameters.begin());
-            } else if (constructor && named) error(source,e.parts[n]->token,Code::argument_count,"Positional arguments must precede named arguments.");
-            if (index >= bound.size()) error(source,e.token,Code::argument_count,"Incorrect argument count for '" + e.token.text + "'.");
-            if (bound[index]) error(source,label.text.empty() ? e.parts[n]->token : label,Code::duplicate,"Initializer parameter is supplied more than once.");
-            bound[index] = true; mapping.push_back(index);
-            auto actual = expression(*e.parts[n],target.parameters[index].type);
+        bool invalid=false;
+        for(std::size_t n=first;n<e.parts.size();++n) {
+            auto index=mapping[n-first];bound[index]=true;
+            auto actual = e.op=="$bound_numeric" && n==0 ? e.parts[n]->type : expression(*e.parts[n],target.parameters[index].type);
             if(target.native_symbol=="vd_native_fixture_call#register" && index==1 && e.parts[n]->kind!=Expr::Kind::function_reference)error(source,e.parts[n]->token,Code::unsupported_type,"Native callback registration requires a directly named function or a literal closure created in this generation.");
             try { expect(actual,target.parameters[index].type,e.parts[n]->token); }
             catch (const CompilationError& failure) { diagnostics.add(failure); invalid = true; }
@@ -1527,7 +1573,7 @@ class Semantics {
         }
         for (unsigned n=0;n<bound.size();++n) if (!bound[n]) {
             const auto& parameter = target.parameters[n];
-            if (!constructor || !parameter.default_value) {
+            if (!parameter.default_value) {
                 std::vector<RelatedLocation> related;
                 if (constructor) { auto [owner,structure] = owned_structure(target.receiver->type); (void)structure; related.push_back({span(owner->source,parameter.token),"Required initializer parameter declared here."}); }
                 error(source,e.token,Code::argument_count,"Incorrect argument count: missing required argument '" + parameter.token.text + "'.","Supply an explicit constructed value or every required argument.",std::move(related));
@@ -1536,7 +1582,7 @@ class Semantics {
             value->aggregate_value = *parameter.default_value; value->value = parameter.default_value->bits;
             e.parts.push_back(std::move(value)); mapping.push_back(n);
         }
-        if (constructor) e.field_indexes = std::move(mapping);
+        if(constructor)e.field_indexes=std::move(mapping);else e.argument_indexes=std::move(mapping);
         return invalid ? error_type : target.asynchronous ? unit.make_task(target.result) : target.result;
     }
     std::pair<Unit*,Structure*> owned_structure(Type type) {
@@ -1673,17 +1719,20 @@ class Semantics {
         }
         if(e.kind==K::array_literal) return {};
         if (e.kind == K::method_call) {
+            if(primitive_base_selected(*e.parts[0]))return primitive_anchor(*e.parts[0]);
             if (module_call(e)) {
                 return qualified_anchor(e,K::call);
             }
             auto receiver = anchor(*e.parts[0]);
             if (!receiver) return std::nullopt;
+            if(numeric::number(*receiver) && numeric::member(e.token.text))return *receiver;
             if(ir::array_type(*receiver) && e.token.text=="remove_at")return ir::array_element(*receiver);
             if(auto* specialized=concrete_method(e,*receiver))return specialized->result;
             auto selected=member(*receiver,e.token,true);
             return selected.function ? std::optional<Type>(selected.function->result) : std::nullopt;
         }
         if (e.kind == K::call) {
+            if(e.target.starts_with("$numeric::") || !e.argument_indexes.empty())return e.type;
             if(auto* value=lookup(e.token.text);value && value->type.definition && value->type.definition->callable)return Type(*value->type.definition->call_result);
             if(current && e.qualifier.empty() && !lookup(e.token.text) && current->substitutions.contains(e.token.text))return current->substitutions.at(e.token.text);
             auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
@@ -1691,6 +1740,7 @@ class Semantics {
             return concrete_function(e,resolve(e)).result;
         }
         if (e.kind == K::field) {
+            if(primitive_base_selected(*e.parts[0]))return primitive_anchor(*e.parts[0]);
             const auto& operand = *e.parts[0];
             if (operand.kind == K::name && !lookup(operand.token.text) && unit.qualifiers.contains(operand.token.text)) {
                 return qualified_anchor(e,K::name);
@@ -1786,6 +1836,14 @@ class Semantics {
         };
         if(receiver) {
             auto t=*receiver;
+            if(numeric::number(t)) {
+                const bool type_level=primitive_base(*e.parts[0])!=Type::none;
+                for(const auto& api:numeric::members())if(type_level || api.callable) {
+                    std::string name(api.name);add(name,t,api.callable?2:21);candidates.at(name).documentation=std::string(api.documentation);
+                }
+                for(auto& [name,candidate]:candidates)out.candidates.push_back(std::move(candidate));
+                throw EditorProbeFound{};
+            }
             if(t.nullable || !t.definition || t.definition->native_resource || t.definition->callable || !t.definition->cases.empty()) throw EditorProbeFound{};
             std::set<std::string> names;
             for(const auto& [id,u]:units) {
@@ -2081,6 +2139,12 @@ class Semantics {
     VOID_SEMANTIC_HANDLER Type field_expression(Expr& e, std::optional<Type> expected) {
         using K = Expr::Kind;
         auto& base = *e.parts[0];
+        if(auto type=primitive_base(base);type!=Type::none) {
+            if(editor_cursor(e))editor_field_candidates(e,type);
+            auto api=numeric::member(e.token.text);
+            if(!api || api->callable)error(source,e.token,Code::unknown_method,"Numeric type properties are min_value and max_value; operations require a call.");
+            e.kind=K::literal;e.type=type;e.value=numeric::limit(type,api->name=="max_value");e.target=numeric::symbol(type,api->name);e.parts.clear();return type;
+        }
         if (base.kind == K::name && !lookup(base.token.text) && unit.qualifiers.contains(base.token.text)) {
             e.qualifier = base.token.text; e.qualifier_token = base.token; e.kind = K::name; e.parts.clear();
             return expression_impl(e,expected);
@@ -2121,6 +2185,7 @@ class Semantics {
         return e.type=ir::field_type(owner,e.slot);
     }
     VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+        if(e.target.starts_with("$numeric::") || !e.argument_indexes.empty())return e.type;
         if(current && e.qualifier.empty() && !lookup(e.token.text) && current->substitutions.contains(e.token.text)) {
             if(!e.type_arguments.empty())error(source,e.token,Code::unsupported_type,"Type parameters are not generic constructors.");
             if(current->substitution_sources.contains(e.token.text))e.source_target=current->substitution_sources.at(e.token.text);
@@ -2136,7 +2201,6 @@ class Semantics {
             construction(e,*owner,concrete,current != nullptr,unit);
             return e.type;
         }
-        if (std::any_of(e.names.begin(),e.names.end(),[](const auto& t) { return !t.text.empty(); })) error(source,e.token,Code::argument_count,"Named arguments are currently supported only for value construction.");
         if (!current) error(source, e.token, Code::constant_call, "A compile-time constant cannot call a function.", "Use a local const for runtime values.");
         if (auto* value = e.qualifier.empty() ? lookup(e.token.text) : nullptr) {
             if (value->type == error_type) throw Poison{};
@@ -2450,7 +2514,11 @@ class Semantics {
         return s.flow = flow;
     }
 public:
-    Type pure_expression(Expr& e) { return expression(e); }
+    Type pure_expression(Expr& e,const Function* context=nullptr,std::optional<Type> expected={}) {
+        auto previous=default_context;default_context=context;
+        try {auto result=expression(e,expected);default_context=previous;return result;}
+        catch(...) {default_context=previous;throw;}
+    }
     Semantics(Unit& u, const std::map<std::string, std::unique_ptr<Unit>>& graph, Unit& r,
         std::function<void(Unit&, Constant&)> eval, Diagnostics& d, std::function<void(Unit&,Structure&)> defs)
         : source(u.source), unit(u), units(graph), root(r), evaluate(std::move(eval)), defaults(std::move(defs)), diagnostics(d) {
@@ -2487,7 +2555,6 @@ public:
         bool optional=false;
         for(const auto& p:f.parameters) {
             if(p.default_expression) {
-                if(!f.receiver || f.token.text!="init")error(source,p.token,Code::initializer_deferred,"Default parameters are supported on initializers only in this phase.");
                 optional=true;
             } else if(optional)error(source,p.token,Code::argument_count,"Required parameters must precede defaulted parameters.");
         }
@@ -2496,7 +2563,7 @@ public:
         if(f.defaults_prepared)return;f.defaults_prepared=true;
         validate_parameter_structure(f);
         for(auto& p:f.parameters)if(p.default_expression) {
-            expect(expression(*p.default_expression,p.type),p.type,p.token);
+            expect(pure_expression(*p.default_expression,&f,p.type),p.type,p.token);
             if(p.default_expression->type==error_type)throw Poison{};
             p.default_value=constant_value(source,*p.default_expression);
         }
@@ -2897,7 +2964,7 @@ class Lowering {
     VOID_SEMANTIC_HANDLER unsigned spawned(const Expr& e) {
             auto& call=*e.parts[0];ir::Function wrapper;wrapper.name=call.target+"::$spawn."+std::to_string(module.functions.size());wrapper.module_identity=call.target.substr(0,call.target.find("::"));wrapper.source_name=wrapper.name.substr(wrapper.module_identity.size()+2);wrapper.source=source.location(e.token.offset);wrapper.visibility="private";wrapper.asynchronous=true;wrapper.worker=true;wrapper.task=e.type;wrapper.result=call.type;wrapper.parameters.clear();
             ir::Block body;ir::Instruction invoke{ir::Op::call};invoke.callee=call.target;invoke.source=wrapper.source;
-            for(unsigned n=0;n<call.parts.size();++n){wrapper.parameters.push_back(call.parts[n]->type);invoke.arguments.push_back(n);body.instructions.push_back({ir::Op::argument,n});}
+            wrapper.parameters.resize(call.parts.size());for(unsigned n=0;n<call.parts.size();++n){wrapper.parameters[call.argument_indexes.empty()?n:call.argument_indexes[n]]=call.parts[n]->type;invoke.arguments.push_back(n);body.instructions.push_back({ir::Op::argument,n});}
             unsigned value=body.instructions.size();body.instructions.push_back(invoke);
             if(call.type!=Type::none){wrapper.locals.push_back(call.type);body.instructions.push_back({ir::Op::store,0,value});}
             body.end={ir::Terminator::Kind::jump,0,1};wrapper.blocks.push_back(std::move(body));wrapper.cleanup_entry=1;
@@ -3076,7 +3143,7 @@ class Lowering {
             for (std::size_t n = first; n < e.parts.size(); ++n) frontend_case([&] {
                 const auto& arg = e.parts[n];
                 auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(expression_type(*arg));
-                auto value = expression(*arg);if(e.native_symbol=="vd_native_fixture_call#register" && n==1)native_callback=value;
+                auto value = expression(*arg);if(e.native_symbol=="vd_native_fixture_call#register" && (e.argument_indexes.empty()?n-first:e.argument_indexes[n-first])==1)native_callback=value;
                 if (expression_type(*arg).construction) {
                     output.construction_origins[slot]=view_origin(value);
                 }
@@ -3087,7 +3154,8 @@ class Lowering {
             ir::Instruction i{e.asynchronous_call || !parallel_target.empty() ? ir::Op::async_call : e.interface_call ? ir::Op::interface_call : !e.virtual_slot.empty() && !e.super_call ? ir::Op::virtual_call : ir::Op::call}; i.callee = parallel_target.empty()?e.target+(e.super_call && e.token.text=="deinit"?"::$body$"+Type::key(e.parts[0]->type):""):std::string(parallel_target); i.receiver = receiver;
             if (context) if (auto found=context->calls.find(&e);found!=context->calls.end())
                 i.callee=ir::construction_name(e.target,{found->second.begin(),found->second.end()});
-            for (auto slot : slots) i.arguments.push_back(emit({ir::Op::load, slot}, e.token));
+            i.arguments.resize(slots.size());
+            for(unsigned n=0;n<slots.size();++n) i.arguments[e.argument_indexes.empty()?n:e.argument_indexes[n]]=emit({ir::Op::load,slots[n]},e.token);
             if(!e.native_symbol.empty()){i.op=ir::Op::native_call;i.callee=e.native_symbol;i.type=e.type;if(native_callback)i.arguments[1]=*native_callback;}
             auto result=emit(i,e.token);
             if(selected_receiver) {
@@ -3584,6 +3652,12 @@ public:
 // Only typed, pure ASTs reach this evaluator. The shared software kernel
 // preserves declared precision and wrapping independently of host arithmetic.
 ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
+    if(e.target.starts_with("$numeric::") && e.kind==Expr::Kind::call) {
+        std::vector<std::uint64_t> values(e.parts.size());
+        for(unsigned n=0;n<e.parts.size();++n)values.at(e.argument_indexes.at(n))=constant_value(source,*e.parts[n]).bits;
+        try {return {e.token.text=="abs"?numeric::absolute(values.at(0),e.type):numeric::clamp(values.at(0),values.at(1),values.at(2),e.type),{}};}
+        catch(const std::invalid_argument& failure){error(source,e.token,Code::numeric_conversion,failure.what());}
+    }
     if(e.kind==Expr::Kind::sum) {
         ir::ConstantValue result;result.fields.resize(e.type.definition->fields.size());result.fields[0].bits=e.slot;
         const auto& variant=e.type.definition->cases.at(e.slot);
@@ -4000,7 +4074,19 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             catch (const Poison&) { t = error_type; f.parse_failed = true; }
         };
         resolve(f.result,f.token);
-        for (auto& parameter : f.parameters) resolve(parameter.type,parameter.token);
+        for (auto& parameter : f.parameters) {
+            if(parameter.type==Type::none && parameter.default_expression) {
+                try {
+                    const bool readonly=parameter.type.readonly;
+                    parameter.type=Semantics(owner,units,root,evaluate,diagnostics,defaults).pure_expression(*parameter.default_expression,&f);
+                    if(parameter.type==Type::none || parameter.type==Type::null_value || parameter.type==error_type || parameter.type.kind==Type::unresolved)
+                        error(owner.source,parameter.token,Code::type_mismatch,"Default does not determine a concrete parameter type.");
+                    parameter.type.readonly=readonly;
+                } catch(const CompilationError& failure) {diagnostics.add(failure);parameter.type=error_type;f.parse_failed=true;}
+                  catch(const Poison&) {parameter.type=error_type;f.parse_failed=true;}
+            }
+            resolve(parameter.type,parameter.token);
+        }
         if (f.receiver) {
             resolve(f.receiver->type,f.receiver->token);
             try {
@@ -4115,7 +4201,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         auto& f=*functions.at(key); f.initialization_contract=f.body_syntax;
         for (const auto& dependency : dependencies[key]) pending.push_back(dependency);
     }
-    for (auto& [id,f] : functions) if (f->initializer) for (const auto& p : f->parameters)
+    for (auto& [id,f] : functions) for (const auto& p : f->parameters)
         f->initialization_contract += std::to_string(p.token.text.size()) + ":" + p.token.text + std::to_string(p.default_syntax.size()) + ":" + p.default_syntax;
     // Recovered trees and AST-only poisoned types can never enter capability analysis or IR.
     diagnostics.finish();
@@ -4175,6 +4261,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
     };
     for(const auto& f:module.functions) { trace_string(f.result); for(auto t:f.parameters) trace_string(t); for(auto t:f.locals) trace_string(t); }
     for(auto t:module.nominal_types) if(t.definition) trace_string(Type(t.definition));
+    numeric::append_prelude(module);
     ir::validate(module); return module;
 }
 
@@ -4186,6 +4273,19 @@ struct AnalysisAccess {
     static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={}) {
         auto result = std::shared_ptr<ValidatedAnalysis>(new ValidatedAnalysis);result->warnings_=std::move(warnings);
         result->entry_ = entry;
+        // Builtin declaration snapshots provide stable canonical hover/reference
+        // identity, but never masquerade as filesystem navigation/edit targets.
+        for(auto type:{Type::i8,Type::u8,Type::i16,Type::u16,Type::i32,Type::u32,Type::i64,Type::u64,Type::f32,Type::f64})for(const auto& api:numeric::members()) {
+            const std::string name(api.name);auto text=std::make_shared<const SourceFile>("<numeric prelude>",name);
+            SourceSpan site{text,"$numeric",0,name.size()};
+            AnalyzedDeclaration record{api.callable?AnalyzedDeclaration::Kind::function:AnalyzedDeclaration::Kind::module_constant,numeric::symbol(type,api.name),"$numeric","public",site,{},type,{}};
+            record.builtin=true;record.documentation=std::string(api.documentation);
+            for(auto parameter:api.parameters){record.parameters.push_back(type);record.written_parameters.push_back({std::string(parameter),type,site});}
+            if(!api.callable)record.value=numeric::limit(type,api.name=="max_value");
+            result->editor_declarations_.push_back(std::move(record));
+        }
+        result->contract_="18:numeric-prelude-v1";
+
         auto graph = std::make_shared<const std::map<std::string, std::unique_ptr<Unit>>>(std::move(units));
         auto field = [](std::string& out, const std::string& value) { out += std::to_string(value.size()) + ":" + value; };
         std::map<std::string,std::string> source_identities;
@@ -4292,6 +4392,13 @@ struct AnalysisAccess {
                     if(target.virtual_slot==e.virtual_slot) reference(owner,target.symbol,e,*unit,true);
                 if (!e.initializer.empty()) reference(owner,e.initializer,e,*unit,implicit);
                 if(!e.setter.empty())reference(owner,e.setter,e,*unit,true);
+                if(!e.argument_indexes.empty() && !e.target.starts_with("$"))for(const auto& [target_id,target_unit]:*graph)for(const auto& target:target_unit->functions)if(target.symbol==e.target && target.generic_origin.empty()) {
+                    for(unsigned n=0;n<e.names.size();++n)if(!e.names[n].text.empty()) {
+                        const auto& parameter=target.parameters.at(e.argument_indexes.at(n));
+                        Expr use(Expr::Kind::name,e.names[n]);reference(owner,target.symbol+"::local::"+std::to_string(parameter.slot),use,*unit,false,false);
+                    }
+                }
+
                 if ((e.kind == Expr::Kind::construction || e.kind==Expr::Kind::base_initialization) && e.initializer.empty()) for (unsigned n = 0; n < e.names.size(); ++n) {
                     Expr use(Expr::Kind::name,e.names[n]); reference(owner,e.type.definition->fields.at(e.field_indexes[n]).owner + "::field::" + e.names[n].text,use,*unit);
                 }

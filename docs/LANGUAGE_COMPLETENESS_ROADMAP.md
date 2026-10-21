@@ -7,18 +7,27 @@ CI #81 attempt 2, seven green jobs and 980/980 test suites. The research evidenc
 below remains a snapshot, not proof that the recommended features are implemented.
 See [Boss approvals and sprint ledger](LANGUAGE_COMPLETENESS_APPROVALS.md).
 
-**Current stage: Stage 8, Sprint 1 implemented and locally verified on 20 October
-2026: 423/423 consolidated suites, with focused/editor evidence in
-[acceptance](stage8/ACCEPTANCE.md). Wrench review and hosted acceptance pending.** See
-[the implementation contract](STAGE8_DISCOVERY.md). The remaining five sprints
-retain their approved order and are not authorized by Sprint 1 execution. The
-design narrative below preserves the pre-sprint research baseline; the contract
-and acceptance supersede its old Sprint 1 missing-feature descriptions.
+## Current execution status — 20 October 2026
 
-The original planning approval alone authorized no production implementation,
-branch, commit, push or hosted run. Boss subsequently authorized Sprint 1 coding;
-Git and hosted operations remain owner-controlled. Boss controls
-the execution and acceptance of each engineering sprint.
+Stage 8 Sprint 1 is **locally accepted by Boss**, including preservation of the
+[Windows CI #82 path repair](stage8/CI82_WINDOWS_REPAIR.md). Sprint 2 is
+**IMPLEMENTED / LOCALLY VERIFIED** (429/429 suites); Wrench review is pending. See the
+[calls/numeric contract](STAGE8_CALLS_NUMERIC.md) and
+[local verification record](stage8/SPRINT2_ACCEPTANCE.md). All three semantic
+choices are approved in [DECISIONS.md](DECISIONS.md): consistent argument binding,
+the four-member numeric prelude and exact numeric edge behavior.
+
+**Hosted CI is deferred until the end of Stage 8**, unless Boss explicitly
+authorizes an earlier run. Do not run or request hosted CI for Sprint 2.
+Git, branches, remote changes and publication remain owner-controlled; no such
+operations are authorized. Root README remains public-facing and unchanged.
+Stop after Sprint 2 local verification for Wrench review. Sprints 3–6 remain
+future work; do not progress automatically. Stage 7 remains hosted locked at
+`f704d75f`, CI #81 attempt 2, seven jobs, 980/980 suites. Stage 8 is not hosted locked.
+
+The research narrative below remains the pre-sprint snapshot. Its earlier
+missing-feature statements are superseded only by the delivered contracts and
+actual acceptance records. The full roadmap is not implemented.
 
 The [companion audit](LANGUAGE_COMPLETENESS_AUDIT.md) contains the feature inventory,
 known-issue dispositions, source references, reproducer results and design research.
@@ -431,9 +440,9 @@ Wrench reviews concrete architecture; Boss authorizes each engineering sprint.
 | Project discovery boundary/lifecycle | Explicit file wins; nearest main.void within supplied boundary; labeled standalone editor fallback; fixed selection until deliberate reselection. One frontend helper exposed through voidls preflight. | Nested projects, root attachment and named unsaved main handling otherwise diverge. No recursive search for main declarations. |
 | Entry coexistence/compatibility | Diagnose competing top-level/main styles; retain existing declaration-only legacy entry+main selection. Never run imports or both bodies automatically. | C# precedence is not automatically VOID's rule; working legacy helpers need preservation. |
 | Default-zero scope and top-level locals | **Boss-approved correction:** top-level successful fallthrough and no-result `func main():` exit 0. `func main() -> i32:` must explicitly return an `i32` on every reachable path, like an ordinary typed function. Program vars are entry locals; imported executable bodies diagnose (specific scope policy remains for engineering review). | Preserve current typed-function return checking; no implicit zero for a typed `main()`. |
-| Core built-in provider admission | One canonical provider, normal typed calls, no arbitrary primitive extensions; choose explicit core import versus a tiny designated prelude. | Two call forms, ownership and compatibility cannot be finalized. |
-| Numeric properties and edges | Typed exact limits; finite float min_value; checked signed-min abs; explicit NaN/zero/clamp-invalid-bound rules. | Source implementation/intrinsic choice and tests would otherwise choose language behavior accidentally. |
-| Ordinary arguments/defaults | Generalize existing initializer mapper; decide inferred-parameter and pure default policy explicitly. | Standard APIs may require later incompatible authoring changes. |
+| Core built-in provider admission | **APPROVED:** compiler-owned numeric prelude; no imports or user primitive extensions; four members only. | See Sprint 2 contract; no owner choice remains for this sprint. |
+| Numeric properties and edges | **APPROVED:** exact integer/finite float limits; checked signed-min abs and invalid bounds; bounds validated before NaN propagation; signed-zero/infinity rules in DECISIONS.md. | See Sprint 2 contract and actual verification. |
+| Ordinary arguments/defaults | **APPROVED:** shared initializer binder, pure compile-time defaults and concrete-default annotation inference; explicit generic parameter annotations. | See Sprint 2 contract and actual verification. |
 | Field encapsulation | Approve bounded private/readonly declaration semantics before requiring protected public-wrapper invariants. | Public fields cannot be advertised as protected by existing function privacy/const views. |
 | Recoverable collection/text API | Select error payloads/signatures, indexing/error/conversion behavior; use existing result and one-case unit enum if needed. | get/pop/text implementations would hardcode an unapproved public contract. |
 | Native/application scope | Requested synchronous top-level/main forms through existing native invocation, separately from trusted static provider generalization. Preserve legacy output/status. | IO remains fixture-bound, but simple application entry need not wait for a general FFI/linker driver. |

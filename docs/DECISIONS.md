@@ -929,3 +929,28 @@ Discovery limits are 65536 scope/view/interface combinations and 8388608 member
 inventory visits; violations diagnose without truncating candidates. Existing layout,
 stack and construction-context limits remain. INTERFACES.md documents the implemented
 boundary; WORK_LOG.md distinguishes local results from the pending hosted gate.
+
+## 20 October 2026 — Stage 8 Sprint 2 owner-approved semantics
+
+Boss explicitly approved all three decisions during Sprint 2 engineering:
+
+- Ordinary functions and methods share initializer binding: positional prefix,
+  then named arguments in any order; reject unknown names, duplicate bindings and
+  positional arguments after named ones. Required parameters precede defaults.
+  Defaults are pure compile-time expressions evaluated in the declaration's module.
+  Omitted parameter annotations may be inferred only from concrete, unambiguous
+  defaults; generic parameter annotations remain explicit. Written evaluation
+  order, readonly capabilities and existing construction behavior must survive.
+- Only numeric `min_value`, `max_value`, `abs()` and `clamp()` are admitted through
+  a compiler-owned numeric prelude, without explicit imports or user extensions.
+  `T.operation(value)` and `value.operation()` resolve one canonical implementation.
+- Signed-minimum `abs` fails with a checked error. Float `abs` clears the sign,
+  including negative zero. Integer limits are exact; float `min_value`/`max_value`
+  are the most negative/positive finite values. Clamp bounds are inclusive;
+  reversed bounds or either NaN bound fail. Validate bounds **before** propagating
+  NaN input. Infinite bounds are permitted; in-range signed zero retains its sign.
+
+These are approved semantics, not an implementation or acceptance claim. Sprint 1
+is owner-locally accepted; preserve CI #82 repair. Hosted CI is deferred to the
+end of Stage 8 unless Boss explicitly authorizes it sooner. No hosted CI request,
+Git mutation or Sprint 3 progression is authorized. Root README stays unchanged.

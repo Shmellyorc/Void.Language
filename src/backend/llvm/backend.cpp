@@ -1171,6 +1171,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     break;
                 case Op::negate: v = values[instruction.a]->getType()->isFloatingPointTy() ? b.CreateFNeg(values[instruction.a]) : b.CreateNeg(values[instruction.a]); break;
                 case Op::upcast: case Op::stage_prefix: v=values[instruction.a]; break;
+                case Op::bitcast: v=b.CreateBitCast(values[instruction.a],type(instruction.type));break;
                 case Op::convert: {
                     auto* a = values[instruction.a]; auto from = operand_type(instruction.a), to = instruction.type;
                     if(from.definition && from.definition->callable){if(!to.nullable)fail_if(b.CreateICmpEQ(b.CreateExtractValue(a,0),b.getInt64(0)),"Null function value in checked conversion");v=a;break;}

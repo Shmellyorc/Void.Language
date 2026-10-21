@@ -280,9 +280,9 @@ class Server {
         if(!definition) for(const auto& declaration:index->declarations_in(id))
             if(declaration.source.begin<=*offset && *offset<declaration.source.end) { definition=declaration; break; }
         if(!definition) return empty();
-        if(method=="textDocument/definition") return location(definition->source);
+        if(method=="textDocument/definition") return definition->builtin?j::Value(nullptr):location(definition->source);
         j::Array locations;
-        if(include) locations.push_back(location(definition->source));
+        if(include && !definition->builtin) locations.push_back(location(definition->source));
         for(const auto& ref:index->references_to(definition->identity)) locations.push_back(location(ref.source));
         return locations;
     }
@@ -302,7 +302,7 @@ class Server {
         auto label=name_of(d);using K=vd::AnalyzedDeclaration::Kind;
         if(d.kind==K::function || d.kind==K::receiver_method || d.kind==K::initializer || d.kind==K::interface_requirement){
             label+="(";for(std::size_t n=0;n<d.parameters.size();++n){if(n)label+=", ";
-                if(n<d.written_parameters.size())label+=d.written_parameters[n].name+": ";label+=vd::ir::type_name(d.parameters[n]);}
+                if(n<d.written_parameters.size())label+=d.written_parameters[n].name+": ";label+=vd::ir::type_name(d.parameters[n]);if(n<d.written_parameters.size() && d.written_parameters[n].default_source)label+=" = …";}
             label+=") -> ";
         }else label+=": ";
         label+=vd::ir::type_name(d.type);
@@ -338,7 +338,7 @@ class Server {
             else selected=identity(string(object(params.get("textDocument")),"uri"));
             for(const auto& d:index->declarations()) {
                 if(!selected.empty() && selected!=d.module)continue;
-                if(d.visibility=="local" || !vd::valid_editor_identifier(name_of(d)))continue;
+                if(d.builtin || d.visibility=="local" || !vd::valid_editor_identifier(name_of(d)))continue;
                 if(name_of(d).find(filter)==std::string::npos)continue;
                 if(!seen.emplace(d.module,d.source.begin,d.source.end).second)continue;
                 if(method=="textDocument/documentSymbol" && hierarchical_symbols){
@@ -429,7 +429,14 @@ class Server {
         // Compare every declaration and written binding at its transformed source
         // position: valid compilation alone cannot detect legal rebinding.
         std::map<std::string,std::string> identities;
-        for(const auto& d:index->declarations())for(const auto& next:fresh.declarations())if(d.module==next.module && translate(d.module,d.source.begin)==next.source.begin && d.kind==next.kind)identities.emplace(d.identity,next.identity);
+        for(const auto& d:index->declarations()) {
+            if(d.builtin) {
+                auto next=fresh.declaration(d.identity);
+                if(!next || !next->builtin || next->type!=d.type || next->parameters!=d.parameters)throw std::invalid_argument("Rename changes a compiler-owned numeric declaration");
+                identities.emplace(d.identity,d.identity);continue;
+            }
+            for(const auto& next:fresh.declarations())if(!next.builtin && d.module==next.module && translate(d.module,d.source.begin)==next.source.begin && d.kind==next.kind)identities.emplace(d.identity,next.identity);
+        }
         if(identities.size()!=index->declarations().size() || fresh.declarations().size()!=index->declarations().size())throw std::invalid_argument("Rename changes declaration structure");
         using Binding=std::tuple<std::string,std::size_t,std::string>;
         std::set<Binding> expected,actual;

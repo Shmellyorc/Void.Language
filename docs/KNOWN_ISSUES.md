@@ -1,19 +1,27 @@
 # Known issues and deferred work
 
-## Stage 8 Sprint 1 disposition — 20 October 2026
+## Stage 8 current disposition — 20 October 2026
 
-The discovery/import/source-doc gaps in the research audit are addressed locally by
-[STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md), with 423/423 consolidated suites and
-real VS Code/Neovim/Vim automatic import acceptance recorded in
-[actual evidence](stage8/ACCEPTANCE.md). Wrench review and hosted acceptance remain
-pending. VSCodium, Windows/macOS clients, minimum versions, new installed packages
-and clean-machine portability remain unverified; relocated stdlib sources require
-an absolute matching `VOID_STDLIB_ROOT`. The original
-audit and dated findings below remain historical evidence. No existing standard
-library, optional-main semantics, named/default ordinary calls, UTF-8 inspection,
-recoverable collection additions or async retirement is implied by this sprint.
-Stage 7 is owner-confirmed hosted LOCKED at `f704d75f` / CI #81 attempt 2,
-seven jobs, 980/980 suites; older pending statements below are superseded.
+Stage 8 Sprint 1 is **locally accepted by Boss**, including preservation of the
+[Windows CI #82 path repair](stage8/CI82_WINDOWS_REPAIR.md). Sprint 2 is
+**IMPLEMENTED / LOCALLY VERIFIED** (429/429 suites); Wrench review is pending. See the
+[calls/numeric contract](STAGE8_CALLS_NUMERIC.md) and
+[local verification record](stage8/SPRINT2_ACCEPTANCE.md). All three semantic
+choices are approved in [DECISIONS.md](DECISIONS.md): consistent argument binding,
+the four-member numeric prelude and exact numeric edge behavior.
+
+**Hosted CI is deferred until the end of Stage 8**, unless Boss explicitly
+authorizes an earlier run. Do not run or request hosted CI for Sprint 2.
+Git, branches, remote changes and publication remain owner-controlled; no such
+operations are authorized. Root README remains public-facing and unchanged.
+Stop after Sprint 2 local verification for Wrench review. Sprints 3–6 remain
+future work; do not progress automatically. Stage 7 remains hosted locked at
+`f704d75f`, CI #81 attempt 2, seven jobs, 980/980 suites. Stage 8 is not hosted locked.
+
+VSCodium, new Windows/macOS editor combinations and clean-machine portability
+remain unverified. CI #82 Windows execution is deferred, not silently counted as
+passing. No existing standard-library catalog, optional-main entry, recoverable
+collections/text, private fields or async retirement is implied by Sprint 2.
 
 ## Stage 7 implementation boundaries — 20 October 2026
 

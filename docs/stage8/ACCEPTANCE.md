@@ -1,16 +1,26 @@
 # Stage 8 Sprint 1 local acceptance
 
-20 October 2026. **IMPLEMENTED AND LOCALLY VERIFIED; ready for Wrench review.
-Hosted acceptance is pending.** Stage 7's owner-supplied hosted lock is
+20 October 2026. **Sprint 1 LOCALLY ACCEPTED by Boss; hosted acceptance deferred
+to Stage 8 end.** Stage 7's owner-supplied hosted lock is
 `f704d75ffa37bfd0e587ec2b1513054e07a8a4d8`, CI #81 attempt 2, seven jobs,
 980/980 suites. No new hosted run, Git mutation or publication is claimed.
-Sprints 2–6 remain future work.
+[Sprint 2 is now locally verified](SPRINT2_ACCEPTANCE.md); Sprints 3–6 remain future work.
+The consolidated results below retain the original Sprint 1 snapshot.
 
 Contract: [STAGE8_DISCOVERY.md](../STAGE8_DISCOVERY.md).
 [Machine-readable results](results.json) and [changed source hashes](source-hashes.json)
 retain the local evidence; raw logs are in `build/stage8-acceptance/`.
 
-## Consolidated verification
+## CI #82 repair superseding status
+
+[Focused Windows repair](CI82_WINDOWS_REPAIR.md): hosted Windows Release failed
+`lsp_stage8` on an 8.3 temp-path spelling; Windows Debug was cancelled during tests.
+The shared discovery repair passes focused local Linux Debug and Release checks;
+Windows execution remains pending for both. No hosted lock or fresh consolidated
+matrix is claimed. The results and source hashes below describe the original
+Sprint 1 snapshot; [repair results/hashes](ci82-repair-results.json) cover this change.
+
+## Consolidated verification (original Sprint 1 snapshot)
 
 | Configuration | Result | Time |
 | --- | --- | --- |

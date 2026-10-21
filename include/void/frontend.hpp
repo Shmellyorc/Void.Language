@@ -39,6 +39,7 @@ struct AnalyzedDeclaration {
     std::vector<AnalyzedParameter> written_parameters = {};
     std::optional<SourceSpan> extent = {};
     bool rename_safe = false;
+    bool builtin = false; // Compiler metadata only; has no filesystem definition target.
     int editor_symbol_kind = 0;
     std::string documentation = {};
 };

@@ -120,6 +120,12 @@ CompilationError::CompilationError(std::vector<Diagnostic> diagnostics)
 #include "void/frontend.hpp"
 #include "void/path.hpp"
 #include <cstdlib>
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
 namespace vd {
 std::filesystem::path standard_library_root() {
 #ifdef _WIN32
@@ -159,10 +165,35 @@ ProjectSelection discover_project(const std::filesystem::path& workspace,
     auto boundary=fs::canonical(workspace);
     auto start=active.empty()?boundary:fs::absolute(active).lexically_normal().parent_path();
     auto relative=start.lexically_relative(boundary);
-    if(relative.empty() || (!relative.empty() && *relative.begin()==".."))throw std::invalid_argument("Active file is outside selected workspace");
+#ifdef _WIN32
+    if(relative.empty() || *relative.begin()=="..") {
+        // Expand only the workspace prefix's OS short spelling (e.g. RUNNER~1).
+        // Keep every descendant component as supplied for the alias/case checks
+        // below. Canonicalizing start here would erase junction/symlink evidence.
+        auto prefix=start;fs::path suffix;
+        for(;;) {
+            auto attributes=GetFileAttributesW(prefix.c_str());
+            if(attributes==INVALID_FILE_ATTRIBUTES)throw std::system_error(GetLastError(),std::system_category(),"Cannot inspect project directory");
+            if(attributes & FILE_ATTRIBUTE_REPARSE_POINT)throw std::invalid_argument("Project selection contains an alias");
+            auto size=GetLongPathNameW(prefix.c_str(),nullptr,0);
+            if(!size)throw std::system_error(GetLastError(),std::system_category(),"Cannot inspect project directory spelling");
+            std::wstring expanded(size,L'\0');
+            auto length=GetLongPathNameW(prefix.c_str(),expanded.data(),size);
+            if(!length || length>=size)throw std::invalid_argument("Project directory spelling changed during discovery");
+            expanded.resize(length);
+            if(fs::path(expanded)==boundary) {relative=suffix.empty()?fs::path("."):suffix;break;}
+            auto parent=prefix.parent_path();
+            if(parent==prefix)break;
+            suffix=suffix.empty()?prefix.filename():prefix.filename()/suffix;prefix=parent;
+        }
+    }
+#endif
+    if(relative.empty() || *relative.begin()=="..")throw std::invalid_argument("Active file is outside selected workspace");
     // Do not follow aliases below the chosen workspace boundary.
     auto checked=boundary;
     for(const auto& part:relative)if(part!=".") {checked/=part;if(fs::is_symlink(fs::symlink_status(checked)) || fs::canonical(checked)!=checked)throw std::invalid_argument("Project selection contains an alias");}
+    // Search using the same spelling as boundary, so termination is lexical too.
+    start=checked;
     for(auto directory=start;;directory=directory.parent_path()) {
         auto candidate=directory/"main.void";
         // Validate case collisions even when exact main.void is absent.

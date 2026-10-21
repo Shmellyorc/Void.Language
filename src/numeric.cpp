@@ -1,3 +1,4 @@
+#include <map>
 #include "void/numeric.hpp"
 #include <llvm/ADT/APFloat.h>
 #include <llvm/ADT/APSInt.h>
@@ -134,6 +135,85 @@ std::uint64_t binary(ir::Op op, std::uint64_t x, std::uint64_t y, Type t) {
     case Op::greater: return sign ? a.sgt(b) : a.ugt(b);
     case Op::greater_equal: return sign ? a.sge(b) : a.uge(b);
     default: throw std::invalid_argument("Illegal numeric operator");
+    }
+}
+}
+
+namespace vd::numeric {
+const std::vector<Member>& members() {
+    static const std::vector<Member> entries{
+        {"min_value",false,{},"The most negative finite value (zero for unsigned integers)."},
+        {"max_value",false,{},"The largest finite value of this exact numeric type."},
+        {"abs",true,{"value"},"Absolute value. Signed minimum fails; floating sign is cleared, including negative zero. Type and receiver forms share one implementation."},
+        {"clamp",true,{"value","lower","upper"},"Clamp to inclusive bounds. Validate bounds first: reversed or NaN bounds fail. NaN input propagates; infinite bounds are allowed; in-range signed zero is preserved."}
+    };return entries;
+}
+const Member* member(std::string_view name) {for(const auto& m:members())if(m.name==name)return &m;return nullptr;}
+ir::Type primitive(std::string_view name) {
+    for(auto t:{Type::i8,Type::u8,Type::i16,Type::u16,Type::i32,Type::u32,Type::i64,Type::u64,Type::f32,Type::f64})if(ir::type_name(t)==name)return t;
+    return Type::none;
+}
+std::string symbol(Type t,std::string_view name) {return "$numeric::"+ir::type_name(t)+"::"+std::string(name);}
+std::uint64_t limit(Type t,bool maximum) {
+    if(floating(t))return bits(llvm::APFloat::getLargest(semantics(t),!maximum));
+    if(!integer(t))throw std::invalid_argument("Numeric limits require a numeric type");
+    if(signed_integer(t))return (maximum?llvm::APInt::getSignedMaxValue(width(t)):llvm::APInt::getSignedMinValue(width(t))).getZExtValue();
+    return maximum?llvm::APInt::getMaxValue(width(t)).getZExtValue():0;
+}
+std::uint64_t absolute(std::uint64_t value,Type t) {
+    if(floating(t)){auto v=fp(value,t);v.clearSign();return bits(v);}
+    if(!signed_integer(t))return value;
+    auto v=llvm::APInt(width(t),value);
+    if(v.isMinSignedValue())throw std::invalid_argument("Signed minimum abs is out of range");
+    return (v.isNegative()?-v:v).getZExtValue();
+}
+std::uint64_t clamp(std::uint64_t value,std::uint64_t lower,std::uint64_t upper,Type t) {
+    using ir::Op;
+    if(binary(Op::not_equal,lower,lower,t) || binary(Op::not_equal,upper,upper,t) || binary(Op::greater,lower,upper,t))throw std::invalid_argument("Clamp bounds are reversed or NaN");
+    if(binary(Op::less,value,lower,t))return lower;
+    if(binary(Op::greater,value,upper,t))return upper;
+    return value;
+}
+void append_prelude(ir::Module& module) {
+    using ir::Op;using End=ir::Terminator::Kind;
+    std::map<std::string,SourceLocation> requested;
+    for(const auto& f:module.functions)for(const auto& b:f.blocks)for(const auto& i:b.instructions)if(i.op==Op::call && i.callee.starts_with("$numeric::"))requested.emplace(i.callee,i.source);
+    for(const auto& [name,site]:requested) {
+        auto begin=std::string("$numeric::").size(),end=name.find("::",begin);
+        auto t=primitive(name.substr(begin,end-begin));auto api=member(name.substr(end+2));
+        if(t==Type::none || !api || !api->callable)throw std::logic_error("Invalid numeric prelude identity");
+        ir::Function f;f.name=name;f.source=site;f.module_identity="$numeric";f.visibility="private";f.source_name=name.substr(std::string("$numeric::").size());f.result=t;module.source_imports.try_emplace(f.module_identity);f.parameters.assign(api->parameters.size(),t);
+        auto block=[&] {f.blocks.emplace_back();return unsigned(f.blocks.size()-1);};
+        auto emit=[&](unsigned b,ir::Instruction i){i.source=site;f.blocks[b].instructions.push_back(std::move(i));return unsigned(f.blocks[b].instructions.size()-1);};
+        auto arg=[&](unsigned b,unsigned n){return emit(b,{Op::argument,n});};
+        auto constant=[&](unsigned b,Type type,std::uint64_t value){ir::Instruction i{Op::constant};i.type=type;i.immediate=static_cast<std::int64_t>(value);return emit(b,std::move(i));};
+        auto ret=[&](unsigned b,unsigned v){f.blocks[b].end={End::return_value,v};};
+        auto branch=[&](unsigned b,unsigned condition,unsigned yes,unsigned no){f.blocks[b].end={End::branch,condition,yes,no};};
+        if(api->name=="abs") {
+            auto entry=block();auto x=arg(entry,0);
+            if(floating(t)) {
+                auto raw=t==Type::f32?Type::u32:Type::u64;
+                ir::Instruction cast{Op::bitcast,x};cast.type=raw;auto pattern=emit(entry,cast);
+                auto mask=constant(entry,raw,std::uint64_t{1}<<(width(t)-1));
+                auto magnitude=emit(entry,{Op::remainder,pattern,mask});cast.a=magnitude;cast.type=t;ret(entry,emit(entry,cast));
+            } else if(!signed_integer(t))ret(entry,x);
+            else {
+                auto sign=block(),negative=block(),positive=block(),failure=block();
+                auto minimum=constant(entry,t,limit(t,false));branch(entry,emit(entry,{Op::equal,x,minimum}),failure,sign);
+                auto value=arg(sign,0),zero=constant(sign,t,0);branch(sign,emit(sign,{Op::less,value,zero}),negative,positive);
+                ret(negative,emit(negative,{Op::negate,arg(negative,0)}));ret(positive,arg(positive,0));
+                ir::Instruction fail{Op::panic};fail.callee="Signed minimum abs is out of range";emit(failure,fail);f.blocks[failure].end={End::unreachable};
+            }
+        } else {
+            for(unsigned n=0;n<9;++n)block();
+            auto lower=arg(0,1);branch(0,emit(0,{Op::not_equal,lower,lower}),8,1);
+            auto upper=arg(1,2);branch(1,emit(1,{Op::not_equal,upper,upper}),8,2);
+            auto lo=arg(2,1),hi=arg(2,2);branch(2,emit(2,{Op::greater,lo,hi}),8,3);
+            auto value=arg(3,0),low=arg(3,1);branch(3,emit(3,{Op::less,value,low}),4,5);ret(4,arg(4,1));
+            auto input=arg(5,0),high=arg(5,2);branch(5,emit(5,{Op::greater,input,high}),6,7);ret(6,arg(6,2));ret(7,arg(7,0));
+            ir::Instruction fail{Op::panic};fail.callee="Clamp bounds are reversed or NaN";emit(8,fail);f.blocks[8].end={End::unreachable};
+        }
+        module.functions.push_back(std::move(f));
     }
 }
 }

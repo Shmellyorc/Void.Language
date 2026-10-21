@@ -29,7 +29,10 @@ void language() {
     reject("struct box:\n    text: string\n"+entry+"    const b = box()\n    b.text = \"changed\"\n    return v\n");
     reject("struct node:\n    n: i32\nvalue struct mixed:\n    text: string\n    child: node\n"+entry+"    const b = mixed(child = node())\n    var copy = b\n    copy.child.n++\n    return v\n");
     reject("func string():\n    pass\n");
-    reject("func f(text: string = \"x\"):\n    pass\n");
+    // Sprint 2 admits ordinary pure defaults; keep type rejection and exercise
+    // string template materialization in both native optimization modes.
+    reject("func f(text: string = 1):\n    pass\n");
+    run("func f(text: string = \"x\") -> string:\n    return text\n"+entry+"    if f() == \"x\" and f(text = \"y\") == \"y\":\n        return 1\n    return 0\n",1);
     run("value struct box:\n    text: string\nfunc edit(b: box) -> box:\n    b.text += \"!\"\n    return b\n"+entry+"    const b = box(text = \"hello\")\n    var c = edit(b)\n    if c.text == \"hello!\" and b.text == \"hello\":\n        return 1\n    return 0\n",1);
     run("struct state:\n    text: string\nstruct owner:\n    child: state\n    n: i32\nfunc rhs(s: owner) -> string:\n    s.n++\n    s.child = state(text = \"changed\")\n    return \"!\"\n"+entry+"    var old = state(text = \"original\")\n    var s = owner(child = old)\n    s.child.text += rhs(s)\n    if old.text == \"original!\" and s.child.text == \"changed\" and s.n == 1:\n        return v\n    return -100\n",10);
     run("func recurse(n: i32, text: string) -> string:\n    if n == 0:\n        return text\n    return recurse(n - 1, text + \"a\")\n"+entry+"    if recurse(10, \"\") == \"aaaaaaaaaa\":\n        return v\n    return -100\n",10);

@@ -3,10 +3,23 @@
 **Decision recorded:** 20 October 2026, after Research Clanker's language
 completeness audit and Stage 7 hosted acceptance.
 
-**Status:** Stage 8 Sprint 1 IMPLEMENTED / LOCALLY VERIFIED (20 October 2026).
-**423/423 consolidated suites passed; Wrench review and hosted acceptance pending.** Boss authorizes coding, Git
-operations and hosted CI separately. Completed work must receive dated evidence
-and a real hosted lock before changing a sprint's status to **LOCKED**.
+**Current status — 20 October 2026:**
+
+Stage 8 Sprint 1 is **locally accepted by Boss**, including preservation of the
+[Windows CI #82 path repair](stage8/CI82_WINDOWS_REPAIR.md). Sprint 2 is
+**IMPLEMENTED / LOCALLY VERIFIED** (429/429 suites); Wrench review is pending. See the
+[calls/numeric contract](STAGE8_CALLS_NUMERIC.md) and
+[local verification record](stage8/SPRINT2_ACCEPTANCE.md). All three semantic
+choices are approved in [DECISIONS.md](DECISIONS.md): consistent argument binding,
+the four-member numeric prelude and exact numeric edge behavior.
+
+**Hosted CI is deferred until the end of Stage 8**, unless Boss explicitly
+authorizes an earlier run. Do not run or request hosted CI for Sprint 2.
+Git, branches, remote changes and publication remain owner-controlled; no such
+operations are authorized. Root README remains public-facing and unchanged.
+Stop after Sprint 2 local verification for Wrench review. Sprints 3–6 remain
+future work; do not progress automatically. Stage 7 remains hosted locked at
+`f704d75f`, CI #81 attempt 2, seven jobs, 980/980 suites. Stage 8 is not hosted locked.
 
 ## Permanent documentation policy — 20 October 2026
 
@@ -24,6 +37,17 @@ Future sprint prompts must direct documentation updates to `docs/` by default,
 including the index, relevant contracts, approval ledger and permanent handoffs.
 This rule supersedes any older instruction to update the root README during
 routine development. It authorizes no additional sprint, commit, push or hosted lock.
+
+## CI #82 focused Windows repair — 20 October 2026
+
+[CI #82 repair evidence](stage8/CI82_WINDOWS_REPAIR.md) records the confirmed
+Windows Release `lsp_stage8` failure and a local repair shared by Debug and Release.
+Focused Linux Debug/Release checks pass; Windows short/long paths and reparse-point
+checks still require hosted verification in **both** configurations. CI #82 is
+not a hosted lock; its Windows Debug test step was cancelled. The earlier 423/423
+local result remains historical evidence, not a full rerun of this repair.
+This historical repair gate is superseded by the Sprint 2 authorization above;
+Windows hosted verification remains deferred with the Stage 8 gate.
 
 ## Baseline
 
@@ -43,8 +67,8 @@ routine development. It authorizes no additional sprint, commit, push or hosted 
 
 | Sequence | Cohesive sprint | Status | Required completion evidence |
 | --- | --- | --- | --- |
-| 1 | **Nested stdlib/project imports, compiler-owned VFS discovery, project `main.void` selection, import IntelliSense, source docs/navigation, shared VS Code/VSCodium/Neovim/Vim behavior** | **LOCALLY VERIFIED; 423/423 suites; Wrench review and owner-hosted acceptance pending** | Correct parsing/resolution/visibility, valid completions and source navigation, real client checks, focused and full local verification, owner-hosted 7-job CI |
-| 2 | **Ordinary named/default arguments and built-in type APIs**: `i32.max_value`, `i32.abs(value)`, `value.abs()`, chaining with one canonical implementation | **PLANNED; not implemented** | Approved signatures and numeric edge behavior; ordinary-call/receiver/generic/JIT/AOT/tooling acceptance |
+| 1 | **Nested stdlib/project imports, compiler-owned VFS discovery, project `main.void` selection, import IntelliSense, source docs/navigation, shared VS Code/VSCodium/Neovim/Vim behavior** | **LOCALLY ACCEPTED by Boss; original 423/423 local evidence and focused CI #82 repair preserved; hosted gate deferred to Stage 8 end** | Correct parsing/resolution/visibility, valid completions and source navigation, real client checks, focused and full local verification, owner-hosted 7-job CI at Stage 8 end |
+| 2 | **Ordinary named/default arguments and built-in type APIs**: `i32.max_value`, `i32.abs(value)`, `value.abs()`, chaining with one canonical implementation | **LOCALLY VERIFIED, 429/429; Wrench review pending; not hosted locked** | Approved signatures and numeric edge behavior; ordinary-call/receiver/generic/JIT/AOT/tooling acceptance |
 | 3 | **Usable UTF-8 text APIs and recoverable collections**: scalar/byte inspection and safe `.get()`/`.pop()` contracts | **PLANNED; not implemented** | Approved error/index/ownership policies, strings/arrays/dictionaries normal/O2/GC regressions |
 | 4 | **Optional-main/top-level application execution and bounded native-provider foundation**, with independently useful application-entry work able to be scheduled separately | **PLANNED; not implemented** | Entry coexistence, exit-code, legacy compatibility, JIT/AOT, native ownership and app-host acceptance |
 | 5 | **Async completed-work retention**: measure first; change lifetime/retirement only if evidence demands it | **PLANNED; measurement only until justified** | Before/after retained work and resource evidence without weakening roots, cleanup or leases |
@@ -130,29 +154,23 @@ Never mark a feature LOCKED based solely on a summary or local success.
 
 ## Remaining narrower design review
 
-Boss approved the overall direction and the choices above. Numeric
-overflow/NaN details, primitive provider declaration syntax, general API
-signature details, imported top-level-code diagnostics and later capability/version changes remain
-implementation-design details to review for their authorized sprints. Sprint 1
-source-doc grammar, keyword path segments, root configuration, identity encoding
-and preflight failure behavior are now concretely recorded in
-[STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md) for Wrench review, without a hosted lock. Do not silently declare that
-every table recommendation in the research files is an implemented language
-contract.
+Sprint 2 numeric limits, signed-minimum abs, NaN/zero/infinity and clamp-bound
+semantics, numeric prelude admission and argument/default policy were explicitly
+approved by Boss on 20 October 2026; [the contract](STAGE8_CALLS_NUMERIC.md) records
+the exact implementation and verification boundary. They are not pending owner
+choices. No private/readonly field declaration work was required.
+
+Sprints 3–6 retain their own design reviews, including recoverable text/collection
+contracts, optional-main/application-host details, native provider admission and
+measured async retirement. Their approval as direction does not implement them.
 
 ## Next handoff
 
-Future sprint prompts must begin with [the documentation entry point](README.md)
-and direct documentation updates to `docs/`; root README edits require Boss's
-explicit request for a public-facing change.
-
-**Sprint 1 only** was explicitly authorized by Boss on 20 October 2026.
-Implementation choices and verification boundaries are in [STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md);
-[actual acceptance](stage8/ACCEPTANCE.md) records 8/8 focused, 423/423 consolidated,
-15/15 final LSP checks, small-stack and real-editor evidence. Stop for Wrench review.
-Do not start the other sprints automatically. At the end, produce concrete
-source changes, focused regressions and one consolidated local
-Debug/Release/strict-sanitizer run, preserve current cross-platform concerns,
-stop for Wrench review, and leave Git/hosted CI to Boss.
+Read [docs/README.md](README.md) first. Sprint 2 local verification is complete;
+review [the evidence](stage8/SPRINT2_ACCEPTANCE.md) and stop for Wrench review. Do not request/run hosted CI;
+the final seven-job gate is deferred to the end of Stage 8 unless Boss explicitly
+changes that instruction. Update documentation under `docs/`; root README edits
+require a separate explicit public-facing request. No commit, push, branch change,
+remote modification, publication or Sprint 3 progression is authorized.
 
 **THREE CLANKERS. ONE VOID. STRONG BOLTS. NO GHOST BOLTS!**

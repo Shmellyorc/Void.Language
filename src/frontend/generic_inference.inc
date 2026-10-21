@@ -82,8 +82,8 @@ const Function& concrete_function(Expr& e,const Function& declaration,unsigned f
         return declaration;
     }
     auto& generic=const_cast<Function&>(declaration);auto& owner=generic_owner(generic);
-    if(e.parts.size()-first!=generic.parameters.size())error(source,e.token,Code::argument_count,"Incorrect argument count for generic function '"+e.token.text+"'.");
-    std::vector<std::pair<Type,Expr*>> supplied;for(unsigned n=0;n<e.parts.size()-first;++n)supplied.emplace_back(generic.parameters[n].type,e.parts[n+first].get());
+    auto mapping=argument_mapping(e,generic,first,false);
+    std::vector<std::pair<Type,Expr*>> supplied;for(unsigned n=0;n<mapping.size();++n)supplied.emplace_back(generic.parameters[mapping[n]].type,e.parts[n+first].get());
     auto arguments=infer_arguments(owner,generic.generics,e.type_arguments,supplied,e.token);
     return unit.specialize_function(unit,owner,generic,arguments,e.token,current?current->specialization_depth+1:0,Type::none);
 }
@@ -120,8 +120,8 @@ const Function* concrete_method(Expr& e,Type receiver,bool reference=false) {
         if((u.get()!=&unit && generic.file_private) || (u.get()!=&unit && u.get()!=&root && !std::any_of(unit.imports.begin(),unit.imports.end(),[&](const auto& i){return i.target==id;})))
             error(source,e.token,Code::visibility,"Generic method is not accessible from this module.");
         validate_generic_receiver(receiver,e.token);
-        if(!reference && e.parts.size()-1!=generic.parameters.size())error(source,e.token,Code::argument_count,"Incorrect generic method argument count.");
-        std::vector<std::pair<Type,Expr*>> supplied;if(!reference)for(unsigned n=0;n<generic.parameters.size();++n)supplied.emplace_back(generic.parameters[n].type,e.parts[n+1].get());
+        std::vector<std::pair<Type,Expr*>> supplied;
+        if(!reference) {auto mapping=argument_mapping(e,generic,1,false);for(unsigned n=0;n<mapping.size();++n)supplied.emplace_back(generic.parameters[mapping[n]].type,e.parts[n+1].get());}
         auto arguments=infer_arguments(*u,generic.generics,e.type_arguments,supplied,e.token);
         return &unit.specialize_function(unit,*u,generic,arguments,e.token,current?current->specialization_depth+1:0,receiver);
     }

@@ -1,5 +1,11 @@
 # Native generics (Phase 24)
 
+**Stage 8 Sprint 2 update (20 October 2026):**
+[The shared calls/numeric contract](STAGE8_CALLS_NUMERIC.md) supersedes older
+ordinary named/default-call exclusions below. Existing constructor, readonly,
+receiver and specialization protections remain. See
+[actual local verification](stage8/SPRINT2_ACCEPTANCE.md) for acceptance status.
+
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 Generic functions, managed structs and value structs use lowercase parameters:

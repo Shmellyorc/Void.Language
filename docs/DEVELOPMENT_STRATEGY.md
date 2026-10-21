@@ -8,12 +8,27 @@ As of **20 October 2026**:
 | --- | --- | --- |
 | Stage 6 — Concurrency and native libraries | **Hosted LOCKED** at `4139297f92c195782f59a28546444e6b3bec4ad8` | Owner-confirmed CI #78, seven successful jobs (973/973 suites) |
 | Stage 7 — Developer tooling and optimization | **Hosted LOCKED** at `f704d75ffa37bfd0e587ec2b1513054e07a8a4d8` | Owner-supplied CI #81 attempt 2, seven successful jobs, 980/980 suites |
-| Stage 8 — Language completeness, Sprint 1 only | **Implemented / locally verified: 423/423 suites; Wrench review and hosted acceptance pending** | [Contract](STAGE8_DISCOVERY.md), [approval ledger and remaining sprints](LANGUAGE_COMPLETENESS_APPROVALS.md), [acceptance](stage8/ACCEPTANCE.md) |
+| Stage 8 — Language completeness | **Sprint 1 locally accepted; Sprint 2 locally verified (429/429); Wrench review pending; not hosted locked** | [Sprint 2 contract](STAGE8_CALLS_NUMERIC.md), [approval ledger](LANGUAGE_COMPLETENESS_APPROVALS.md), [local evidence](stage8/SPRINT2_ACCEPTANCE.md) |
 
-Stage 7 is **hosted locked**. For Stage 8 the existing **seven-job hosted CI gate remains
-mandatory**: Linux Debug/Release/Sanitizers, Windows Debug/Release and macOS ARM64
-Debug/Release. Boss controls commit, push and hosted execution; local results and
-source review do not replace that gate. LLVM remains **19.1.7**.
+Stage 8 Sprint 1 is **locally accepted by Boss**, including preservation of the
+[Windows CI #82 path repair](stage8/CI82_WINDOWS_REPAIR.md). Sprint 2 is
+**IMPLEMENTED / LOCALLY VERIFIED** (429/429 suites); Wrench review is pending. See the
+[calls/numeric contract](STAGE8_CALLS_NUMERIC.md) and
+[local verification record](stage8/SPRINT2_ACCEPTANCE.md). All three semantic
+choices are approved in [DECISIONS.md](DECISIONS.md): consistent argument binding,
+the four-member numeric prelude and exact numeric edge behavior.
+
+**Hosted CI is deferred until the end of Stage 8**, unless Boss explicitly
+authorizes an earlier run. Do not run or request hosted CI for Sprint 2.
+Git, branches, remote changes and publication remain owner-controlled; no such
+operations are authorized. Root README remains public-facing and unchanged.
+Stop after Sprint 2 local verification for Wrench review. Sprints 3–6 remain
+future work; do not progress automatically. Stage 7 remains hosted locked at
+`f704d75f`, CI #81 attempt 2, seven jobs, 980/980 suites. Stage 8 is not hosted locked.
+
+The final hosted gate remains seven jobs (Linux Debug/Release/Sanitizers,
+Windows Debug/Release, macOS ARM64 Debug/Release), deferred to Stage 8 end.
+LLVM remains **19.1.7**. Earlier per-sprint hosted-gate language below is historical.
 
 See [Stage 7's technical contract](STAGE7_IMPLEMENTATION.md) and
 [exact local evidence and compatibility boundaries](stage7/ACCEPTANCE.md).

@@ -49,31 +49,29 @@ review and hosted locks. Never mark work implemented or locked without verificat
 
 ## Current stage and acceptance — 20 October 2026
 
-Stage 8 Sprint 1 is implemented locally: project/module discovery, import
-IntelliSense and source documentation (423/423 consolidated local suites passed).
-Wrench review and hosted acceptance remain pending. [The sprint ledger](LANGUAGE_COMPLETENESS_APPROVALS.md)
-and [acceptance record](stage8/ACCEPTANCE.md) distinguish approved, locally
-verified and hosted-locked work. Stage 7 is owner-confirmed hosted locked at
-`f704d75f`, CI #81 attempt 2, seven jobs, 980/980 suites.
+Stage 8 Sprint 1 is **locally accepted by Boss**, including preservation of the
+[Windows CI #82 path repair](stage8/CI82_WINDOWS_REPAIR.md). Sprint 2 is
+**IMPLEMENTED / LOCALLY VERIFIED** (429/429 suites); Wrench review is pending. See the
+[calls/numeric contract](STAGE8_CALLS_NUMERIC.md) and
+[local verification record](stage8/SPRINT2_ACCEPTANCE.md). All three semantic
+choices are approved in [DECISIONS.md](DECISIONS.md): consistent argument binding,
+the four-member numeric prelude and exact numeric edge behavior.
 
-The accepted compiler baseline passed seven hosted Debug/Release/sanitizer jobs.
-Local tooling verification does not establish new cross-platform hosted acceptance;
-see [Stage 7 acceptance](stage7/ACCEPTANCE.md) and
-[Stage 8 acceptance](stage8/ACCEPTANCE.md) for their respective evidence boundaries.
-The compiler matrix covers Linux x86-64, Windows x64 and macOS ARM64.
-
-Sprints 2–6 remain future work: named/default arguments and built-in APIs;
-UTF-8 and recoverable collections; optional-main/application entry and native
-providers; measured async retention; selected ergonomics. The
-[approval ledger](LANGUAGE_COMPLETENESS_APPROVALS.md#approved-roadmap-and-live-status)
-records their individual status and pending design decisions. No further sprint,
-commit or push is authorized by this documentation update.
+**Hosted CI is deferred until the end of Stage 8**, unless Boss explicitly
+authorizes an earlier run. Do not run or request hosted CI for Sprint 2.
+Git, branches, remote changes and publication remain owner-controlled; no such
+operations are authorized. Root README remains public-facing and unchanged.
+Stop after Sprint 2 local verification for Wrench review. Sprints 3–6 remain
+future work; do not progress automatically. Stage 7 remains hosted locked at
+`f704d75f`, CI #81 attempt 2, seven jobs, 980/980 suites. Stage 8 is not hosted locked.
 
 ## Engineering contracts, decisions and handoffs
 
 - [Language completeness roadmap](LANGUAGE_COMPLETENESS_ROADMAP.md),
   [pre-implementation research audit](LANGUAGE_COMPLETENESS_AUDIT.md)
   and [owner approvals and pending decisions](LANGUAGE_COMPLETENESS_APPROVALS.md).
+- [Stage 8 calls and numeric prelude](STAGE8_CALLS_NUMERIC.md),
+  [Sprint 2 local evidence](stage8/SPRINT2_ACCEPTANCE.md).
 - [Stage 8 discovery contract](STAGE8_DISCOVERY.md) and
   [acceptance evidence](stage8/ACCEPTANCE.md).
 - [Stage 7 tooling contract](STAGE7_IMPLEMENTATION.md),

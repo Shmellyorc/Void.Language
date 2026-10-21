@@ -1,5 +1,11 @@
 # Phase 13: receiver methods and initialization groundwork
 
+**Stage 8 Sprint 2 update (20 October 2026):**
+[The shared calls/numeric contract](STAGE8_CALLS_NUMERIC.md) supersedes older
+ordinary named/default-call exclusions below. Existing constructor, readonly,
+receiver and specialization protections remain. See
+[actual local verification](stage8/SPRINT2_ACCEPTANCE.md) for acceptance status.
+
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 Phase 20 implements managed virtual/override methods and direct super calls, retaining exact ownership/imports and conservative family effects. Virtual methods on inline values remain excluded. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.

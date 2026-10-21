@@ -629,6 +629,11 @@ if(BUILD_TESTING)
   if(NOT VOID_CLANG_STATUS EQUAL 0 OR NOT VOID_CLANG_VERSION MATCHES "clang version 19\\.1\\.7")
     message(FATAL_ERROR "AOT tests require matching clang 19.1.7; set VOID_CLANG")
   endif()
+  add_test(NAME numeric_sprint2 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/numeric/sprint2.py"
+    "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_LINKER}")
+  set_tests_properties(numeric_sprint2 PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_sprint2 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/lsp/sprint2.py" "$<TARGET_FILE:voidls>")
+  set_tests_properties(lsp_sprint2 PROPERTIES TIMEOUT 60)
   add_test(NAME aot COMMAND "${CMAKE_COMMAND}"
     "-DLINKER=${VOID_LINKER}" "-DCOMPILER=$<TARGET_FILE:voidc>" "-DCLANG=${VOID_CLANG}"
     "-DWINDOWS=${WIN32}" "-DDWARFDUMP=${VOID_DWARFDUMP}" "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/aot proof" "-DEXE_SUFFIX=${CMAKE_EXECUTABLE_SUFFIX}"

@@ -34,25 +34,28 @@ Boss retains Git and hosted acceptance control.
 
 ## Current Stage 8 handoff — 20 October 2026
 
-Stage 7 is **HOSTED LOCKED** at `f704d75ffa37bfd0e587ec2b1513054e07a8a4d8`,
-owner-supplied CI #81 attempt 2, seven successful jobs, 980/980 suites. This
-supersedes the dated pending statements retained below.
+Stage 8 Sprint 1 is **locally accepted by Boss**, including preservation of the
+[Windows CI #82 path repair](stage8/CI82_WINDOWS_REPAIR.md). Sprint 2 is
+**IMPLEMENTED / LOCALLY VERIFIED** (429/429 suites); Wrench review is pending. See the
+[calls/numeric contract](STAGE8_CALLS_NUMERIC.md) and
+[local verification record](stage8/SPRINT2_ACCEPTANCE.md). All three semantic
+choices are approved in [DECISIONS.md](DECISIONS.md): consistent argument binding,
+the four-member numeric prelude and exact numeric edge behavior.
 
-Boss authorized **Stage 8 Sprint 1 only**. Sprint 1 is implemented locally with **423/423** consolidated suites passed;
-Wrench review and hosted acceptance remain pending. No Sprint 1 hosted lock is claimed. Read the
-[approval ledger](LANGUAGE_COMPLETENESS_APPROVALS.md),
-[roadmap](LANGUAGE_COMPLETENESS_ROADMAP.md),
-[implementation contract](STAGE8_DISCOVERY.md) and
-[acceptance record](stage8/ACCEPTANCE.md) before continuing.
+**Hosted CI is deferred until the end of Stage 8**, unless Boss explicitly
+authorizes an earlier run. Do not run or request hosted CI for Sprint 2.
+Git, branches, remote changes and publication remain owner-controlled; no such
+operations are authorized. Root README remains public-facing and unchanged.
+Stop after Sprint 2 local verification for Wrench review. Sprints 3–6 remain
+future work; do not progress automatically. Stage 7 remains hosted locked at
+`f704d75f`, CI #81 attempt 2, seven jobs, 980/980 suites. Stage 8 is not hosted locked.
 
-Approved sequence: (1) project/module/IntelliSense discovery, (2) ordinary
-named/default calls and built-in type APIs, (3) UTF-8 text and recoverable
-collections, (4) optional-main entry and bounded native providers, (5) measured
-async retention, (6) selected ergonomics. Sprints 2–6 remain future work, with
-narrower designs pending as recorded in the ledger. No real standard library,
-optional-main execution or website changes belong to Sprint 1. Boss retains Git,
-hosted CI and publication control. Keyboard supplies source/tests, Wrench reviews
-actual evidence, Research resolves concrete remaining design questions.
+Read [the approval ledger](LANGUAGE_COMPLETENESS_APPROVALS.md),
+[roadmap](LANGUAGE_COMPLETENESS_ROADMAP.md), [Sprint 1 contract](STAGE8_DISCOVERY.md),
+[Sprint 2 contract](STAGE8_CALLS_NUMERIC.md) and latest [work log](WORK_LOG.md).
+Remaining sequence: (3) UTF-8/recoverable collections, (4) optional-main/native
+providers, (5) measured async retention, (6) selected ergonomics. Private/readonly
+field declarations were not needed or authorized as collateral work.
 
 ### Historical Stage 7 engineering review handoff
 

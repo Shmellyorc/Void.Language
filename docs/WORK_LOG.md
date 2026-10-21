@@ -1,6 +1,6 @@
 # Work log
 
-**Current handoff:** [Canonical implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Stage 4 is hosted-locked at 483e67e4 / CI #68 (seven configurations, 80/80 suites each). The latest Stage 5 production implementation entry is at the end; earlier dated entries retain historical evidence.
+**Current handoff:** [Documentation index](README.md), [canonical implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status) and [Sprint 2 acceptance](stage8/SPRINT2_ACCEPTANCE.md). Stage 8 Sprint 1 is owner-locally accepted; Sprint 2 is locally verified and awaiting Wrench review. Hosted CI is deferred until Stage 8 end. Latest entries appear at the end; earlier entries retain historical evidence.
 
 ## 14 October 2026: Phase 22 UTF-8 foundation implementation
 
@@ -13803,3 +13803,58 @@ VSCodium, Windows/macOS, minimum clients, new installed packages and clean-machi
 portability remain unverified. No known failing local test remains. Production
 changes are ready for Wrench review. Sprint 1 is **not hosted locked**; Boss alone
 controls Git, hosted CI and publication. Sprints 2–6 were not started.
+
+## 20 October 2026: Stage 8 Sprint 1 CI #82 focused Windows repair
+
+Inspected CI #82 Windows Release job 119004113561: `lsp_stage8` (#61/141)
+failed with “Active file is outside selected workspace” on `RUNNER~1` temp paths.
+Windows Debug job 119004113913 built successfully but was cancelled during tests;
+it did not establish a pass for discovery. Repaired the shared frontend selection
+helper to expand only the Windows workspace prefix, preserve descendant alias/case
+checks and use canonical spelling for bounded ancestor traversal. Added process
+coverage and physical-identity assertions in `tests/lsp/stage8.py`.
+
+Focused Linux Debug and Release checks passed; see
+[exact evidence and pending Windows gates](stage8/CI82_WINDOWS_REPAIR.md).
+No full local/hosted matrix, commit, push, branch change or Sprint 2 was performed.
+Root README was left unchanged.
+
+
+## 20 October 2026: Stage 8 Sprint 2 calls and numeric prelude
+
+**IMPLEMENTED / LOCALLY VERIFIED; STOPPED for Wrench review.** All three observable
+policy decisions were explicitly approved by Boss and recorded in
+[DECISIONS.md](DECISIONS.md). No pending Sprint 2 semantic choice is silently settled.
+
+- Reused initializer argument mapping for ordinary functions, methods and generic
+  inference. Preserved written evaluation order, readonly effects, staged
+  construction, async/spawn argument mapping and existing constructors. Pure
+  defaults support concrete annotation inference and explicit generic parameter
+  types, with specialization context separate from runtime locals/receivers.
+- Added only numeric min_value/max_value/abs/clamp across the ten numeric types.
+  Type and receiver calls share canonical private typed IR implementations and
+  existing checked failure handling, LLVM 19.1.7 JIT/AOT and exact numeric kernels.
+  Width-checked numeric bitcast clears floating signs without losing NaN payloads.
+- Compiler-owned metadata supplies completion, hover and signatures; synthetic
+  prelude declarations never become file navigation, rename or symbol targets.
+  Named ordinary parameter labels navigate and rename through real declarations.
+  Parameter names/defaults participate in reload compatibility; body-only reload
+  preserves existing leases. No overload resolution or primitive extensions added.
+- Final frozen-source Debug **143/143**, Release **143/143**, strict
+  ASan/UBSan/leaks **143/143**: **429/429, zero failures**. Both Debug and Release
+  1 MiB frontend gates passed. Added focused 71-process normal/O2 JIT/linked AOT
+  coverage, numeric native bit checks, reload/async/capability checks and LSP tests.
+- Initial verification exposed an obsolete string-default rejection and a Debug
+  recursive-frame regression; replaced the obsolete assertion with positive and
+  negative coverage and outlined cold numeric helpers without weakening depth or
+  stack guards. Strict sanitizer execution ran outside ptrace after LSan rejected
+  tracing; instrumentation and leak detection stayed enabled.
+
+[Contract](STAGE8_CALLS_NUMERIC.md), [acceptance](stage8/SPRINT2_ACCEPTANCE.md),
+[results](stage8/sprint2-results.json), [source hashes](stage8/sprint2-source-hashes.json)
+and [stack measurements](stage8/sprint2-stack-frames.json) retain exact evidence.
+The CI #82 repair source/test hashes are unchanged. Root README is unchanged.
+No hosted CI was run/requested; Windows Debug/Release repair execution, Windows/
+macOS Sprint 2 acceptance and fresh real interactive editor checks remain unverified.
+No commits, pushes, branch/remote changes or publication. Sprints 3–6 remain future
+work; no automatic progression is authorized.

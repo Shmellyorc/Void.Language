@@ -1,6 +1,8 @@
 #include "void/frontend.hpp"
 #include "void/backend.hpp"
+#include "void/numeric.hpp"
 #include <fstream>
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
@@ -94,5 +96,32 @@ void numeric_tests(const std::filesystem::path& root) {
     std::string casts = "func f():\n    var x = 1";
     for (unsigned i=0; i<1024; ++i) casts += " as i32";
     reject(casts + "\n    var later = missing\n",C::nesting);
+    // Sprint 2 canonical prelude: exact bit policies and private IR admission.
+    using T=vd::ir::Type;using O=vd::ir::Op;
+    auto canonical=vd::compile_source({"canonical-numeric.void","func entry(value: i32) -> i32:\n    return i32.abs(value) + value.abs()\n"});
+    require(std::count_if(canonical.functions.begin(),canonical.functions.end(),[](const auto& f){return f.name==vd::numeric::symbol(T::i32,"abs");})==1,"type and receiver forms duplicated the canonical implementation");
+    require(vd::numeric::absolute(0xffc01234u,T::f32)==0x7fc01234u,"f32 abs retained a NaN sign");
+    require(vd::numeric::absolute(0xfff8000000001234ull,T::f64)==0x7ff8000000001234ull,"f64 abs retained a NaN sign");
+    require(vd::numeric::limit(T::f32,false)==0xff7fffffu && vd::numeric::limit(T::f64,true)==0x7fefffffffffffffull,"finite floating limits");
+    for(bool optimized:{false,true}) {
+        vd::ir::Module raw;raw.identity="numeric-bits";vd::ir::Function function;function.name="numeric-bits::entry";function.module_identity="numeric-bits";function.source_name="entry";
+        vd::ir::Instruction nan{O::constant};nan.type=T::f32;nan.immediate=0xffc01234u;
+        vd::ir::Instruction abs{O::call};abs.callee=vd::numeric::symbol(T::f32,"abs");abs.arguments={0};
+        vd::ir::Instruction bits{O::bitcast,1};bits.type=T::i32;
+        function.blocks={{{nan,abs,bits},{vd::ir::Terminator::Kind::return_value,2}}};raw.functions.push_back(function);
+        vd::numeric::append_prelude(raw);vd::ir::validate(raw);
+        require(jit.compile(raw,"entry",optimized)->invoke(0)==0x7fc01234,"native NaN abs sign/payload disagrees with constant kernel");
+        auto invalid=raw;invalid.functions[0].blocks[0].instructions[2].type=T::i64;
+        bool rejected=false;try{vd::ir::validate(invalid);}catch(const std::invalid_argument&){rejected=true;}require(rejected,"IR accepted a width-changing bitcast");
+        const std::string before="func amount(value: i32, extra: i32 = 2) -> i32:\n    return value.abs() + extra\nfunc entry(value: i32) -> i32:\n    return amount(value = value)\n";
+        auto initial=vd::compile_source({"sprint2-reload.void",before});auto live=jit.compile(initial,"entry",optimized);vd::ReloadSlot named_slot(live);
+        auto body=before;body.replace(body.find("+ extra"),7,"+ extra + 1");
+        require(named_slot.replace(jit.compile(vd::compile_source({"sprint2-reload.void",body}),"entry",optimized)),"compatible numeric body replacement failed");
+        auto defaults=before;defaults.replace(defaults.find("= 2"),3,"= 3");
+        require(!named_slot.replace(jit.compile(vd::compile_source({"sprint2-reload.void",defaults}),"entry",optimized)),"default change bypassed reload contract");
+        auto names=before;for(std::size_t at=0;(at=names.find("extra",at))!=std::string::npos;at+=5)names.replace(at,5,"bonus");
+        require(!named_slot.replace(jit.compile(vd::compile_source({"sprint2-reload.void",names}),"entry",optimized)),"parameter name change bypassed reload contract");
+        require(named_slot.invoke(-4)==7 && live->invoke(-4)==6,"numeric/default reload changed an old lease");
+    }
     std::cout << executions << " real-file numeric constant/JIT/O2 checks; structured numeric recovery passed\n";
 }

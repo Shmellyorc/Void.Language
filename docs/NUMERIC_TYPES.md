@@ -183,3 +183,50 @@ and compiler-derived bindings replace whole const-containing source files in
 reload compatibility. Ordinary body/trivia edits beside unchanged constants can
 reload; actual constant changes require manual restart. Language rules, numeric
 semantics and structured recovery remain unchanged.
+
+## Stage 8 Sprint 2 numeric APIs
+
+[The implementation contract](STAGE8_CALLS_NUMERIC.md) and
+[actual acceptance](stage8/SPRINT2_ACCEPTANCE.md) record the current status.
+Boss approved these semantics on 20 October 2026 in [DECISIONS.md](DECISIONS.md).
+All ten numeric types expose exactly four members through the compiler-owned
+prelude; no import or user-defined primitive extension is required or admitted.
+
+```typescript
+var maximum = i32.max_value
+var minimum = i32.min_value
+var a = i32.abs(-10)
+var b = (-10).abs()
+var health: i32 = -20
+var result = health.abs().clamp(0, 100)
+```
+
+| Member | Exact contract |
+| --- | --- |
+| `T.min_value` | Signed integer minimum, unsigned zero, or most negative finite float |
+| `T.max_value` | Integer maximum or most positive finite float |
+| `T.abs(value: T) -> T` / `value.abs() -> T` | One canonical implementation; unsigned identity; checked failure at signed minimum; float sign bit cleared, including negative zero and NaNs |
+| `T.clamp(value: T, lower: T, upper: T) -> T` / `value.clamp(lower: T, upper: T) -> T` | Inclusive bounds; reject NaN bounds or reversed bounds before propagating NaN input; permit infinite bounds and preserve in-range signed zero |
+
+Properties and pure numeric calls work in constant expressions and parameter
+and field defaults. Reached invalid operations diagnose there at compile time;
+ordinary runtime calls produce the existing checked source failure and unwind
+through cleanup. Unreached constant branches retain the existing short-circuit
+rules. Integer unary negation still wraps; checked `abs` does not change it.
+
+Each operation preserves its exact type. Existing contextual numeric literal
+adaptation applies, with no new implicit widening or signed/unsigned conversion.
+Type and receiver call forms use the same argument binder and typed callable;
+receiver expressions evaluate once. Ordinary functions and methods now share the
+initializer named/default argument rules documented in
+[STAGE8_CALLS_NUMERIC.md](STAGE8_CALLS_NUMERIC.md). Explicit generic specializations
+can use their numeric type's properties in pure defaults, such as
+`func maximum<t>(value: t = t.max_value) -> t:`. Missing generic type arguments
+are inferred from supplied values, not guessed from an omitted default.
+
+Compiler-owned completion, typed hover, documentation and bound/unbound signature
+help use the same registry. Builtins have no filesystem definition target;
+navigation returns null rather than fabricating a file, while references still
+identify actual source calls. `bool`, strings and collections gain no numeric API.
+No additional arithmetic operation, provider/import search, boxing, recoverable
+numeric result or mutable static field is introduced.
