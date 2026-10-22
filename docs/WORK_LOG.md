@@ -1,5 +1,21 @@
 # Work log
 
+## CI #93 temporary-root fixture repair — 21 October 2026
+
+Baseline `a6405689399019969f2dd6f76dd8434c097431cd`. Both native Windows jobs
+passed 159/160, failing workflow concurrency when an inherited-ACL linkroot was
+used as TMP/TEMP. Matched CPython source identifies the OWNER RIGHTS inheritance
+route; actual runner SDDL was not in those logs. Added inspection and exclusive
+private-root creation to the existing test helper using production PrivateAccess,
+pins, DACL verification, root admission and effective access checks. Normal and
+overlong fixture roots use it before environment assignment. Unicode paths use
+UTF-8 stdin; existing-root collisions preserve a marker. Junction/null-DACL,
+concurrency, long paths, failures and cleanup checks stay mandatory. No production,
+CMake, hosted workflow or public README changes. [Evidence and native gate](stage9/CI93_WINDOWS_TEMP_ROOT_FIXTURE.md).
+Focused Debug/strict **3/3 each**, Python and Windows cross-target syntax passed;
+new native fixture/MSVC acceptance remains pending. No Git mutation or CI dispatch.
+
+
 ## CI #92 focused Windows repair — 21 October 2026
 
 Baseline `051f463ea35b2b738ce282cb2e93e5e60cdb1c2c`. Changed both post-launch

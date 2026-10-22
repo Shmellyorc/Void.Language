@@ -6,9 +6,9 @@ build=pathlib.Path(sys.argv[2]).resolve()
 configuration=sys.argv[3]
 checks=0
 
-def run(args,status=0,stdout=None,cwd=None,diagnostic=None,env=None,executable=None):
+def run(args,status=0,stdout=None,cwd=None,diagnostic=None,env=None,executable=None,input=None):
     global checks
-    p=subprocess.run([str(a) for a in args],cwd=cwd,capture_output=True,text=True,encoding='utf-8',timeout=90,env=env,executable=executable)
+    p=subprocess.run([str(a) for a in args],cwd=cwd,capture_output=True,text=True,encoding='utf-8',timeout=90,env=env,executable=executable,input=input)
     checks+=1
     assert p.returncode==status,(args,p.returncode,p.stdout,p.stderr)
     if stdout is not None: assert p.stdout==stdout,(args,p.stdout,p.stderr)
@@ -107,7 +107,22 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage9 é 🎮 # % ') as temporary
         import ctypes, concurrent.futures
         from ctypes import wintypes
         # Control the real linker root, retaining Unicode/spaces/#/% literally.
-        linkroot=root/'native link é # %';linkroot.mkdir()
+        def private_root(path):
+            verified=run([sys.argv[4],'--create-private-root'],input=str(path)+'\n')
+            assert 'private_root_verified=1 owner_access=1 restricted_mutation=0' in verified.stdout
+            print('private_root_path=',ascii(str(path)))
+            print(verified.stdout,end='')
+        linkroot=root/'native link é # %'
+        # Record the actual inherited ACL from the original mkdir fixture, but
+        # never use this diagnostic-only incarnation as a compiler temp root.
+        linkroot.mkdir()
+        try: print(run([sys.argv[4],'--inspect-root'],input=str(linkroot)+'\n').stdout,end='')
+        finally: linkroot.rmdir()
+        private_root(linkroot)
+        marker=linkroot/'ownership-marker';marker.write_bytes(b'preserve existing root')
+        run([sys.argv[4],'--create-private-root'],1,diagnostic='Cannot create private test root',input=str(linkroot)+'\n')
+        assert marker.read_bytes()==b'preserve existing root'
+        marker.unlink()
         environment=dict(os.environ,TMP=str(linkroot),TEMP=str(linkroot))
         def native_build(index):
             target=project/('parallel-'+str(index)+'.exe')
@@ -141,11 +156,12 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage9 é 🎮 # % ') as temporary
             clean()
         finally: junction.rmdir()
         # Reject a complete root that cannot fit a short leaf plus program.exe.
-        longenv=dict(environment,TMP=str(project),TEMP=str(project))
+        longenv=dict(environment)
         too_long=project
         while len(str(too_long).encode('utf-16-le'))//2<240:
             too_long=too_long/('long-temp-'+'x'*25)
-        too_long.mkdir(parents=True)
+        too_long.parent.mkdir(parents=True,exist_ok=True)
+        private_root(too_long)
         longenv.update(TMP=str(too_long),TEMP=str(too_long))
         run([compiler,'build',source,'-o',output],1,diagnostic='too long',env=longenv)
         assert output.read_bytes()==before and not list(too_long.iterdir())

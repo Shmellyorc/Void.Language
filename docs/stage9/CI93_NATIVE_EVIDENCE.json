@@ -1,0 +1,44 @@
+{
+  "baseline": "a6405689399019969f2dd6f76dd8434c097431cd",
+  "run": "https://github.com/Shmellyorc/Void.Language/actions/runs/39720055655",
+  "source": "Read-only retrieval of Boss-run CI #93 job logs, before this fixture repair",
+  "jobs": [
+    {
+      "job_id": 119631202753,
+      "configuration": "Windows 2022 / Debug",
+      "url": "https://github.com/Shmellyorc/Void.Language/actions/runs/39720055655/job/119631202753",
+      "result": "159/160",
+      "excerpts": [
+        "2026-10-22T04:07:53.8532278Z rename_probe=metadata_only returned=1 failure=0 source_exists=0 destination_exists=1 source_original=0 destination_original=1 handles_original=1 handles=2 original_volume=1692368384 original_file_id=262144:1299740",
+        "2026-10-22T04:07:53.8534579Z rename_probe=list_directory returned=0 failure=32 source_exists=1 destination_exists=0 source_original=1 destination_original=0 handles_original=1 handles=15 original_volume=1692368384 original_file_id=262144:1299742",
+        "2026-10-22T04:07:53.8536849Z Windows staging ownership, collisions, cleanup, copies and effective access passed",
+        "2026-10-22T04:07:53.8561221Z AssertionError: ([WindowsPath('D:/a/Void.Language/Void.Language/build/Debug/voidc.exe'), 'build', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 � \\U0001f3ae # % 6u8199ge/game # % �/main.void'), '-o', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 � \\U0001f3ae # % 6u8199ge/game # % �/parallel-0.exe')], 1, '', 'Native temporary root permits untrusted modification.\\n')",
+        "2026-10-22T04:07:56.0134417Z   3/160 Test   #3: long_physical_paths_ci89 ..................   Passed    0.91 sec",
+        "2026-10-22T04:19:10.6792812Z 99% tests passed, 1 tests failed out of 160"
+      ]
+    },
+    {
+      "job_id": 119631203034,
+      "configuration": "Windows 2022 / Release",
+      "url": "https://github.com/Shmellyorc/Void.Language/actions/runs/39720055655/job/119631203034",
+      "result": "159/160",
+      "excerpts": [
+        "2026-10-22T04:06:19.1241803Z rename_probe=metadata_only returned=1 failure=0 source_exists=0 destination_exists=1 source_original=0 destination_original=1 handles_original=1 handles=2 original_volume=1692368384 original_file_id=393216:739319",
+        "2026-10-22T04:06:19.1243926Z rename_probe=list_directory returned=0 failure=32 source_exists=1 destination_exists=0 source_original=1 destination_original=0 handles_original=1 handles=15 original_volume=1692368384 original_file_id=327680:739499",
+        "2026-10-22T04:06:19.1245806Z Windows staging ownership, collisions, cleanup, copies and effective access passed",
+        "2026-10-22T04:06:19.1284225Z AssertionError: ([WindowsPath('D:/a/Void.Language/Void.Language/build/Release/voidc.exe'), 'build', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 � \\U0001f3ae # % vrl7wa1t/game # % �/main.void'), '-o', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 � \\U0001f3ae # % vrl7wa1t/game # % �/parallel-0.exe')], 1, '', 'Native temporary root permits untrusted modification.\\n')",
+        "2026-10-22T04:06:20.7532599Z   3/160 Test   #3: long_physical_paths_ci89 ..................   Passed    0.75 sec",
+        "2026-10-22T04:11:17.5907615Z 99% tests passed, 1 tests failed out of 160"
+      ]
+    }
+  ],
+  "confirmed": [
+    "Old metadata-only handles allowed a genuine rename; source disappeared, destination retained original file ID, both handles retained original identity",
+    "FILE_LIST_DIRECTORY pins returned FALSE/error 32; source and all 15 handle identities stable, destination absent",
+    "Native staging ownership/collisions/cleanup/copies/effective access helper passed",
+    "long_physical_paths_ci89 passed both native configurations",
+    "Only workflow failed at concurrent builds after its inherited linkroot was assigned as TMP/TEMP"
+  ],
+  "not_captured": "Exact inherited root SDDL/ACE list was not logged; new inspection mode records it. OWNER RIGHTS inheritance is supported by the matching CPython source, not claimed as an already captured native SDDL.",
+  "new_fixture_native_acceptance": "Pending; no hosted execution launched"
+}

@@ -1,5 +1,13 @@
 # VOID documentation
 
+## CI #93 private Windows test roots — 21 October 2026
+
+[Fixture repair, inherited-ACL investigation and Wrench gate](stage9/CI93_WINDOWS_TEMP_ROOT_FIXTURE.md).
+Compiler/security checks remain unchanged. Normal and overlong test TMP/TEMP
+roots now use verified private DACL creation. Linux Debug/strict each **3/3**;
+new native acceptance pending. Historical CI #93 Windows jobs each **159/160**.
+
+
 ## CI #92 focused Windows follow-up — 21 October 2026
 
 [Directory reservation, Unicode repair and native evidence gate](stage9/CI92_WINDOWS_RESERVATION_REPAIR.md).

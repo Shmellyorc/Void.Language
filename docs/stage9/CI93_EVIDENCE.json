@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-21",
+  "baseline": "a6405689399019969f2dd6f76dd8434c097431cd",
+  "status": "Test fixture repair locally verified; Windows native acceptance pending",
+  "historical_native": "CI93_NATIVE_EVIDENCE.json",
+  "acl_investigation": {
+    "observed": "Both Windows jobs failed strict root admission after ordinary mkdir-created linkroot became TMP/TEMP; exact SDDL was not logged",
+    "source_supported_cause": "CPython 3.12 mode-0700 temporary parent has inheritable OWNER RIGHTS full-access ACE; ordinary child mkdir inherits; production allowlist requires explicit trusted principal",
+    "new_observation": "--inspect-root prints native owner/DACL SDDL and unchanged root-admission outcome before diagnostic-only inherited root is removed"
+  },
+  "implementation": {
+    "test_only_modes": [
+      "--inspect-root",
+      "--create-private-root"
+    ],
+    "transport": "UTF-8 stdin, ASCII mode argument; escaped path and ASCII SDDL diagnostics",
+    "private_creation": "CreateDirectoryW exclusively with existing production PrivateAccess.attributes; no existing-root adoption or ACL mutation",
+    "required_verification": [
+      "PrivateAccess.verify exact protected current-user DACL",
+      "Unchanged PrivateAccess.verify_root admission",
+      "Existing AccessCheck owner permitted / Everyone-restricted mutation denied"
+    ],
+    "controlled_roots": {
+      "linkroot": "Private creation/readback before environment assignment; inherited incarnation inspected only, never used by compiler",
+      "too_long": "Final leaf privately created/verified before environment assignment; existing >240 UTF-16 root-length construction retained",
+      "junction": "Intentional negative reparse root referencing private linkroot; rejection remains mandatory",
+      "native_helper_insecure": "Intentional null-DACL negative root unchanged",
+      "ambient_TMP_TEMP": "Not modified"
+    }
+  },
+  "local": {
+    "debug": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 4.0,
+      "suites": [
+        "application_workflow_stage9",
+        "native_output_paths_ci88",
+        "long_physical_paths_ci89"
+      ]
+    },
+    "strict_sanitizers": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 8.0,
+      "suites": [
+        "application_workflow_stage9",
+        "native_output_paths_ci88",
+        "long_physical_paths_ci89"
+      ]
+    },
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "strict_execution": "Approved outside sandbox for LeakSanitizer",
+    "python_syntax": "Passed",
+    "existing_python_assertions": "All retained; new root verification and duplicate-create marker assertions added",
+    "windows_helper_cross_syntax": "Clang 19.1.7 x86_64-w64-mingw32 syntax-only passed, existing extracted MinGW headers and /tmp LLVM configuration; no MSVC/native execution claim",
+    "logs": "build/ci93-fixture-repair/"
+  },
+  "native_pending": [
+    "Actual inherited/private SDDL and helper command execution",
+    "Unicode stdin path transport on native Windows",
+    "Private normal/overlong root DACL and effective access verification",
+    "Existing-root exclusive failure preserves marker and root security",
+    "Overlong fixture reaches intended path-length diagnostic after valid DACL",
+    "Full workflow concurrency/cleanup/copy/locked-output/failure checks",
+    "Windows Debug/Release 160/160"
+  ],
+  "preserved": [
+    "All production src/include files including pins and verify_root",
+    "CMake and hosted workflow",
+    "Public README and manifests",
+    "Actual deep executable location/launch/identity/status assertions",
+    "Unicode/% roots and four compiler workers",
+    "Cleanup checks and insecure-root rejection"
+  ],
+  "constraints": {
+    "commits": false,
+    "pushes": false,
+    "branches": false,
+    "hosted_dispatch": false,
+    "full_matrix": false
+  },
+  "sha256": {
+    "tests/stage9/workflow.py": "8338a64dbdd9d155294400e2901f4b725ca6dd0ed54e6442fa3025a35951ae08",
+    "tests/stage9/windows_native_staging.cpp": "eae33999b1702c39885e331ec6039d6e1b2d517048c5684843e68850cdfa9787",
+    "src/native_windows.hpp": "f63d92220f790e4e10fe2119984d45eca66e2977f78fa8b6f13b7997df8a1e4c",
+    "src/native_build.cpp": "5d71c086bbd73011ca9f2465c8b081e3da38e3ad7080acc4d18f3c796a2ca8ea",
+    "tests/stage9/long_paths.py": "0a4c7e44071ed6f9e89e4aac404b9a0e6a8d545e8222a95f01395a84806ed5bb",
+    "tests/stage9/windows_process.py": "b781f18f00723878efadf97279548b3888e253ded41f0c7d8405a70e558c617d",
+    "CMakeLists.txt": "dd2b9dc88852815d8da306d8833547fff789ddb065e717c2f2b9757a0b0d996e",
+    "cmake/LongPathAware.manifest": "3242062989f717f0f1846b13ad2082e37438d32bdc33903effeaecaa6cfb7382",
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add"
+  }
+}

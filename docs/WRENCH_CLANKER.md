@@ -1,5 +1,17 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## CI #93 Wrench handoff — 21 October 2026
+
+Review [private-root fixture creation and evidence](stage9/CI93_WINDOWS_TEMP_ROOT_FIXTURE.md).
+The inherited test-root ACL failed the existing trust policy; production is
+unchanged. Both positive TMP/TEMP roots now reuse native private creation/readback
+and effective access checks, preserving negative tests. CI #93 independently
+confirmed real metadata-only rename with stable handles, repaired error-32
+reservation and both genuine long-path suites. New fixture native acceptance is
+pending; focused Linux Debug/strict each **3/3**. Exact inherited SDDL awaits the
+added native inspection; distinguish that from the source-supported OW diagnosis.
+
+
 ## CI #92 Wrench review — 21 October 2026
 
 Review the one-bit FILE_LIST_DIRECTORY addition and the retained/strengthened

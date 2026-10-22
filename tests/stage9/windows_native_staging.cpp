@@ -3,6 +3,7 @@
 #include <future>
 #include <iostream>
 #include <set>
+#include <sddl.h>
 using namespace vd::native_windows;
 void require(bool value,const char* message){if(!value)throw std::runtime_error(message);}
 template<class F> void rejects(F action){bool failed=false;try{action();}catch(const std::exception&){failed=true;}require(failed,"unsafe operation succeeded");}
@@ -116,7 +117,56 @@ void metadata_reservation_control(const fs::path& home) {
     if(!MoveFileExW(moved.c_str(),source.c_str(),0))fail("Cannot restore unreserved control");
     require(fs::remove(source),"metadata control cleanup failed");
 }
+void describe_root_acl(const char* label,HANDLE root) {
+    PSECURITY_DESCRIPTOR descriptor=nullptr;
+    auto error=GetSecurityInfo(root,SE_FILE_OBJECT,OWNER_SECURITY_INFORMATION|DACL_SECURITY_INFORMATION,
+        nullptr,nullptr,nullptr,nullptr,&descriptor);
+    if(error!=ERROR_SUCCESS)fail("Cannot inspect test root ACL",error);
+    struct Free {void* p;~Free(){LocalFree(p);}} memory{descriptor};
+    LPWSTR text=nullptr;
+    if(!ConvertSecurityDescriptorToStringSecurityDescriptorW(descriptor,SDDL_REVISION_1,
+        OWNER_SECURITY_INFORMATION|DACL_SECURITY_INFORMATION,&text,nullptr))fail("Cannot describe test root ACL");
+    Free converted{text};
+    // SDDL's SID/ACE syntax is ASCII, independent of the path/console encoding.
+    std::cout<<"root_acl="<<label<<" sddl=";
+    for(auto c=text;*c;++c)std::cout<<static_cast<char>(*c);
+    std::cout<<std::endl;
+}
+void test_root_command(bool create) {
+    // UTF-8 stdin preserves Unicode/% paths independently of main's narrow argv
+    // encoding on Windows. The command name itself is ASCII.
+    std::string text;
+    require(bool(std::getline(std::cin,text)) && !text.empty(),"missing UTF-8 test root path");
+    const auto path=vd::utf8_path(text);
+    if(!create) {
+        auto pins=pin_directories(path);describe_root_acl("inherited",pins.back().value);
+        PrivateAccess access;
+        try {access.verify_root(pins.back().value);std::cout<<"inherited_root_admitted=1\n";}
+        catch(const std::runtime_error& error) {std::cout<<"inherited_root_admitted=0 reason="<<error.what()<<'\n';}
+        return;
+    }
+    auto parents=pin_directories(path.parent_path());
+    require(path.is_absolute() && path==path.lexically_normal(),"test root path must be absolute and normalized");
+    PrivateAccess access;
+    // Never adopt/re-ACL an existing directory. Apply the production private
+    // descriptor during exclusive creation, before exposing the path as TMP/TEMP.
+    if(!CreateDirectoryW(path.c_str(),&access.attributes))fail("Cannot create private test root");
+    try {
+        auto pins=pin_directories(path);
+        access.verify(pins.back().value);access.verify_root(pins.back().value);
+        access_check(pins.back().value);describe_root_acl("private",pins.back().value);
+        std::cout<<"private_root_verified=1 owner_access=1 restricted_mutation=0\n";
+    } catch(...) {
+        // Only successful creation above grants ownership; this root is empty.
+        if(!RemoveDirectoryW(path.c_str()))std::cerr<<"Private test root cleanup failed: "<<GetLastError()<<'\n';
+        throw;
+    }
+    // The Python TemporaryDirectory fixture owns eventual cleanup after success.
+}
 int main(int argc,char** argv)try {
+    if(argc==2 && (std::string(argv[1])=="--inspect-root" || std::string(argv[1])=="--create-private-root")) {
+        test_root_command(std::string(argv[1])=="--create-private-root");return 0;
+    }
     // A disposable configured driver exercises zero-exit malformed output and
     // transfer failures through the real compiler, without production test hooks.
     if(argc==2 && std::string(argv[1])=="--version") {
