@@ -1,0 +1,86 @@
+{
+  "date": "2026-10-21",
+  "baseline": "db4c979ecb9516ddf9544203c3e20c8bac10b5d9",
+  "status": "Manual native diagnostic workflow prepared for Boss/Wrench review; no filesystem correction selected",
+  "native_windows_error": {
+    "code": null,
+    "message": null,
+    "reason": "Historical diagnostic discarded ec; no native Windows execution locally"
+  },
+  "hosted_ci89": {
+    "run_id": 39691943404,
+    "windows_debug": {
+      "passed": 158,
+      "total": 159,
+      "job": 119539994779
+    },
+    "windows_release": {
+      "passed": 158,
+      "total": 159,
+      "job": 119539993932
+    },
+    "failed_suite": "application_workflow_stage9",
+    "ci88_regression": "Passed in both Windows configurations",
+    "logs": "ci89/LOGS.json"
+  },
+  "local": {
+    "platform": "Linux",
+    "builds": {
+      "Debug": "passed (voidc target)",
+      "RelWithDebInfo_sanitizers": "passed (voidc target)"
+    },
+    "tests": [
+      "application_workflow_stage9",
+      "native_output_paths_ci88",
+      "long_physical_paths_ci89"
+    ],
+    "debug": {
+      "passed": 3,
+      "failed": 0,
+      "seconds": 5.65,
+      "final_long_path_regression_rerun": "passed, 31 process checks"
+    },
+    "strict_sanitizers": {
+      "passed": 3,
+      "failed": 0,
+      "seconds": 10.06,
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+    },
+    "diagnostic_missing_root": "Passed: Linux error 2, category and message retained",
+    "workflow_validation": "YAML parsed; workflow_dispatch only, one Windows job, read-only repository permission, exact two-target build, no CTest command; manifest XML and Python syntax passed",
+    "wine_control": {
+      "ordinary_CreateFileW": 0,
+      "extended_CreateFileW": 0,
+      "message": "Success.",
+      "directory_utf16_units": 298,
+      "interpretation": "Did not reproduce CI89; not native Windows evidence"
+    }
+  },
+  "unexecuted": [
+    "Native Windows baseline and longPathAware probe compilation/execution",
+    "Windows-only 8.3, reparse/junction and insensitive-case branches of the new deep suite",
+    "macOS post-change execution"
+  ],
+  "constraints": {
+    "git_mutations": false,
+    "hosted_actions_launched": false,
+    "speculative_path_fix": false,
+    "production_longPathAware_manifest": false,
+    "full_matrix_repeated": false
+  },
+  "sha256": {
+    "CMakeLists.txt": "fe80a741e8de5ef99d47147ad69a9495e2efc8e8a052763808a743c764dc5cb1",
+    ".github/workflows/windows-path-probe.yml": "9fb38b8531256dc7063a7de06df235950bcb0e655a2eb98590a0c363e1acc8df",
+    "src/frontend/compiler.cpp": "efa94508269c250901a7e2d9171d60558d81504c6c93827b088f3abb8c90cc38",
+    "src/frontend/source.cpp": "2ca73c8aea5ea39e3d9992fef48ca86ff7ab8179e8912ebb9019e6fdcd30651f",
+    "src/native_build.cpp": "80535e3564c3eb7fd3cf54f4e94d0684f2bbfc34904cd49ff9952cd86b6d4b22",
+    "include/void/path.hpp": "2674378c9b35b6d060f6efad22b7cbfc961c169b21d977301779667e3a06ae98",
+    "tests/stage9/workflow.py": "26a5e9bbb5cc245d58ecdb0994e21b7a23d67fc6b263d4d4ce97f2333a27d748",
+    "tests/stage9/native_paths.py": "b49ff2d996e489b8e7ce587c0df0afb146f1e26687338774f34507bdbc215572",
+    "tests/stage9/long_paths.py": "8d0a25d80d4441b4a92ee3e82804af21db1a2afb74145467c11ce2a986d0649b",
+    "tests/stage9/windows_path_probe.cpp": "18ecaf8cfb89436c2c5abd77cc7e6b9d71ec0443930d0489cea46423e20e9427",
+    "tests/stage9/windows_path_probe.py": "f7be496dbcaa9c8a6f2cf32c863a4941d4e0afac148e8e8efdd05df6a10daf91",
+    "tests/stage9/long_path_aware.manifest": "3242062989f717f0f1846b13ad2082e37438d32bdc33903effeaecaa6cfb7382"
+  }
+}

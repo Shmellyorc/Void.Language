@@ -150,6 +150,7 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage9 é 🎮 # % ') as temporary
     for n in range(6):deep=deep/('nested-'+str(n)+'-'+'x'*36)
     deep.mkdir(parents=True)
     longsource=deep/'main.void';longsource.write_text('return 7\n',encoding='utf-8')
+    assert len(str(longsource)) > 260, longsource
     run([compiler,'build',longsource],cwd=unrelated)
     run([deep/'build'/('main'+suffix)],7,'')
     # Real staged install, then relocation. Native config must use its own archives.

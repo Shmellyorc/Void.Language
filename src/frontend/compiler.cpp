@@ -4858,7 +4858,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
     auto absolute = std::filesystem::absolute(entry, ec);
     if (ec) error(SourceFile(path_utf8(entry), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the entry source path.");
     auto root = std::filesystem::canonical(absolute.parent_path(), ec);
-    if (ec) error(SourceFile(path_utf8(entry), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the project root directory.", "Check that the entry's parent directory exists and is readable.");
+    if (ec) error(SourceFile(path_utf8(entry), ""), {TokenKind::end, "", 0}, Code::import_read, "Cannot resolve the project root directory.", "Filesystem error " + std::to_string(ec.value()) + " (" + ec.category().name() + "): " + ec.message() + ". Check that the entry's parent directory exists and is readable.");
     // A diagnostic anchor is needed even before the entry file can be opened.
     Unit anchor(SourceFile(path_utf8(absolute), ""), "/");
     Diagnostics diagnostics; diagnostics.editor=editor; diagnostics.bind(anchor.source, "/" + path_utf8(absolute.filename()));

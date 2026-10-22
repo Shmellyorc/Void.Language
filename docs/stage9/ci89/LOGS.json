@@ -1,0 +1,23 @@
+{
+  "run_id": 39691943404,
+  "baseline": "db4c979ecb9516ddf9544203c3e20c8bac10b5d9",
+  "source": "GitHub connector fetch_workflow_job_logs structuredContent.content; decoded UTF-8, BOM and CRLF retained",
+  "logs": [
+    {
+      "job_id": 119539993932,
+      "configuration": "Release",
+      "file": "docs/stage9/ci89/Windows-Release-119539993932.log.gz",
+      "decoded_log_bytes": 350892,
+      "decoded_log_sha256": "26ea6ca681eed04d886aaa637da2044a27413d077d634c856880ef08fc6950a7",
+      "gzip_sha256": "8ecda63ddb37026b622139a20c44995f0ab01789b2033d86da23a330d697156f"
+    },
+    {
+      "job_id": 119539994779,
+      "configuration": "Debug",
+      "file": "docs/stage9/ci89/Windows-Debug-119539994779.log.gz",
+      "decoded_log_bytes": 349875,
+      "decoded_log_sha256": "a430c6dbf57efd2aa708118adf8c3d1d232407aa0d41ac85fbd76d4e51de8ec1",
+      "gzip_sha256": "4a160f132d0baed796e9faf5a80364be2df134c2663ddfac3d2655d53853b41e"
+    }
+  ]
+}

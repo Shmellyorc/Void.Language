@@ -213,6 +213,15 @@ if(BUILD_TESTING)
   set_tests_properties(application_workflow_stage9 PROPERTIES TIMEOUT 300)
   add_test(NAME native_output_paths_ci88 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage9/native_paths.py" "$<TARGET_FILE:voidc>")
   set_tests_properties(native_output_paths_ci88 PROPERTIES TIMEOUT 180)
+  add_test(NAME long_physical_paths_ci89 COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/stage9/long_paths.py" "$<TARGET_FILE:voidc>")
+  set_tests_properties(long_physical_paths_ci89 PROPERTIES TIMEOUT 180)
+  if(WIN32 AND MSVC)
+    # Diagnostic controls deliberately exclude void_options: compare the same
+    # filesystem implementation with only process long-path awareness changed.
+    add_executable(void_windows_path_probe EXCLUDE_FROM_ALL tests/stage9/windows_path_probe.cpp)
+    add_executable(void_windows_path_probe_aware EXCLUDE_FROM_ALL tests/stage9/windows_path_probe.cpp
+      tests/stage9/long_path_aware.manifest)
+  endif()
   if(VOID_LLVM_RESEARCH)
     add_executable(void_arrays_storage_audit tests/arrays/storage_audit.cpp examples/proof.cpp)
     target_include_directories(void_arrays_storage_audit SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})

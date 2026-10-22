@@ -1,0 +1,42 @@
+name: Windows path diagnosis (manual)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  path-probe:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Windows native SDK environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Cache complete official LLVM SDK
+        uses: actions/cache@v5
+        with:
+          path: .toolchains/llvm-19.1.7
+          key: llvm-sdk-19.1.7-Windows-X64-v1
+      - name: Install and verify LLVM development SDK
+        run: python tools/ci/llvm_sdk.py
+      - name: Configure probe targets
+        run: cmake -S . -B build/windows-path-probe -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}"
+      - name: Build only baseline and longPathAware probes
+        run: cmake --build build/windows-path-probe --target void_windows_path_probe void_windows_path_probe_aware --parallel 2
+      - name: Record native Windows filesystem results
+        run: python tests/stage9/windows_path_probe.py build/windows-path-probe/void_windows_path_probe.exe build/windows-path-probe/void_windows_path_probe_aware.exe --output build/windows-path-probe/results.json
+      - name: Preserve diagnosis
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: windows-path-probe-${{ github.run_id }}
+          path: |
+            build/windows-path-probe/results.json
+            build/windows-path-probe/CMakeCache.txt
+            build/windows-path-probe/CMakeFiles/CMakeConfigureLog.yaml
+            build/windows-path-probe/void_windows_path_probe*.exe
+          if-no-files-found: warn

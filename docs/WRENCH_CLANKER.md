@@ -1,5 +1,15 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## CI #89 Windows long-path diagnosis — 21 October 2026
+
+CI #89 Windows Debug/Release each passed 158/159; the CI #88 regression suite
+passed both. The remaining deep-path failure hides its Windows error code.
+[Investigation and manual probe](stage9/CI89_WINDOWS_LONG_PATH_INVESTIGATION.md)
+provide two isolated native controls and a manual-only single-job workflow for
+Boss review. Native results are pending; no speculative path repair or hosted
+action was performed. Historical CI #88/#89 evidence is preserved.
+
+
 ## CI #88 Windows output-path repair — 21 October 2026
 
 Boss reports Linux/macOS jobs passed and Windows Debug/Release each 152/158, with
