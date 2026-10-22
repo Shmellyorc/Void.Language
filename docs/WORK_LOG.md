@@ -1,5 +1,18 @@
 # Work log
 
+## CI #92 focused Windows repair — 21 October 2026
+
+Baseline `051f463ea35b2b738ce282cb2e93e5e60cdb1c2c`. Changed both post-launch
+Python diagnostics to ascii(application). Added FILE_LIST_DIRECTORY to existing
+native directory opens; all linker, DACL, transfer, publication and cleanup
+mechanisms remain. Kept the reservation assertion and added old-mask controls,
+raw BOOL/failure/path/file-ID logging, stable-handle checks, positive rename
+control and identity-checked recovery before test failure. Workflow retains probe
+stdout. [Native limits, rationale and Wrench gate](stage9/CI92_WINDOWS_RESERVATION_REPAIR.md).
+Debug **3/3**, strict ASan/UBSan/leaks **3/3**, four strict-codec diagnostic checks,
+Python syntax and Windows-target syntax passed. No new native execution, Git
+mutation, CI dispatch or root README change. Earlier CI failures stay historical.
+
 ## CI #91 focused Windows test repair — 21 October 2026
 
 The working short-directory native linker is preserved. Restricted-token tests

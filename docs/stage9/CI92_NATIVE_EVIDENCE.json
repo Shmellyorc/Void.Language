@@ -1,0 +1,28 @@
+{
+  "baseline": "051f463ea35b2b738ce282cb2e93e5e60cdb1c2c",
+  "run": "https://github.com/Shmellyorc/Void.Language/actions/runs/39717364089",
+  "job_id": 119622595777,
+  "configuration": "Windows 2022 / Release",
+  "result": "158/160; two failures",
+  "source": "Read-only retrieval of Boss-run CI #92, prior to this change",
+  "excerpts": [
+    "2026-10-22T03:36:47.5519339Z   1/160 Test   #1: application_workflow_stage9 ...............***Failed    0.09 sec",
+    "2026-10-22T03:36:47.5528695Z AssertionError: (['D:/a/Void.Language/Void.Language/build/Release/void_windows_native_staging.exe'], 1, '', 'directory reservation can be renamed\\n')",
+    "2026-10-22T03:36:49.1809218Z   3/160 Test   #3: long_physical_paths_ci89 ..................***Failed    0.68 sec",
+    "2026-10-22T03:36:49.1815844Z UnicodeEncodeError: 'charmap' codec can't encode character '\\U0001f3ae' in position 53: character maps to <undefined>",
+    "2026-10-22T03:41:54.3083719Z 99% tests passed, 2 tests failed out of 160",
+    "2026-10-22T03:41:54.3087501Z \t  1 - application_workflow_stage9 (Failed)",
+    "2026-10-22T03:41:54.3088135Z \t  3 - long_physical_paths_ci89 (Failed)"
+  ],
+  "demonstrated": {
+    "MoveFileExW": "Nonzero success return inferred from the exact failing require(!MoveFileExW(...)) assertion",
+    "deep_executable_launch": "Reached diagnostic print after same-file proof, successful launch and expected exit 7; diagnostic failed encoding U+1F3AE"
+  },
+  "not_recorded": [
+    "Raw BOOL numeric value",
+    "GetLastError after failure (call reported success)",
+    "Source and destination existence after rename",
+    "Handle/path file identities after rename"
+  ],
+  "new_probe_execution": "Pending native Windows; no fabricated movement or handle observation"
+}

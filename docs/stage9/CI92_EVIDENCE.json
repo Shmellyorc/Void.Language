@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-21",
+  "baseline": "051f463ea35b2b738ce282cb2e93e5e60cdb1c2c",
+  "status": "Focused repair locally verified; new Windows native observations and acceptance pending",
+  "historical_native": "CI92_NATIVE_EVIDENCE.json",
+  "production_delta": "Add only FILE_LIST_DIRECTORY to existing CreateFileW directory desired-access mask, plus explanatory comment",
+  "local": {
+    "debug": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 4.0,
+      "suites": [
+        "application_workflow_stage9",
+        "native_output_paths_ci88",
+        "long_physical_paths_ci89"
+      ]
+    },
+    "strict_sanitizers": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 8.0,
+      "suites": [
+        "application_workflow_stage9",
+        "native_output_paths_ci88",
+        "long_physical_paths_ci89"
+      ]
+    },
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "strict_run": "Approved outside sandbox for LeakSanitizer",
+    "diagnostic_checks": "4 passed: actual two print AST expressions executed through strict ASCII and cp1252 streams with emoji/Unicode/% application spelling",
+    "python_assertions": "All pre-existing assert AST nodes retained",
+    "syntax": "Clang 19.1.7 x86_64-w64-mingw32 -fsyntax-only passed for production and native test; extracted MinGW headers and /tmp-only adjusted LLVM configuration; no MSVC link/native execution claim",
+    "logs": "build/ci92-test-repair/"
+  },
+  "observed_native_before_repair": {
+    "MoveFileExW": "Nonzero return demonstrated; raw numeric return not captured",
+    "actual_movement": "Not recorded by old test; unknown",
+    "handles_still_original": "Not recorded by old test; unknown",
+    "long_path_launch": "Succeeded with exit 7 and same-file proof before diagnostic UnicodeEncodeError"
+  },
+  "native_probe_pending": [
+    "metadata_only raw BOOL/failure, source/destination existence and native volume/file IDs",
+    "all old-mask handles remain same identity after actual rename, if permitted",
+    "list_directory returns FALSE with ERROR_SHARING_VIOLATION 32, source stable, destination absent, handles stable",
+    "full helper and both genuine deep-path suites in Windows Debug/Release",
+    "Windows Debug/Release 160/160"
+  ],
+  "preserved": [
+    "Native emission/linking/copy/publication code",
+    "DACL checks and effective access assertions",
+    "Existing reservation rejection assertion",
+    "All prior Python assertions and six-level fixtures",
+    "Existing temp directory system and cleanup",
+    "Production manifests, CMake, hosted workflow and root README"
+  ],
+  "constraints": {
+    "commit": false,
+    "push": false,
+    "branch": false,
+    "hosted_ci_started": false
+  },
+  "sha256": {
+    "src/native_windows.hpp": "f63d92220f790e4e10fe2119984d45eca66e2977f78fa8b6f13b7997df8a1e4c",
+    "src/native_build.cpp": "5d71c086bbd73011ca9f2465c8b081e3da38e3ad7080acc4d18f3c796a2ca8ea",
+    "tests/stage9/windows_native_staging.cpp": "308e014226617764fc75bf1a68be8e5383bff584c5bbd579b3646fae8fee15e9",
+    "tests/stage9/long_paths.py": "0a4c7e44071ed6f9e89e4aac404b9a0e6a8d545e8222a95f01395a84806ed5bb",
+    "tests/stage9/workflow.py": "8f39a8de634240a24d89592f3f35552c059a564c8cfe2b60937487bbeea23306",
+    "tests/stage9/windows_process.py": "b781f18f00723878efadf97279548b3888e253ded41f0c7d8405a70e558c617d",
+    "cmake/LongPathAware.manifest": "3242062989f717f0f1846b13ad2082e37438d32bdc33903effeaecaa6cfb7382"
+  }
+}

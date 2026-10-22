@@ -7,6 +7,10 @@ Linux results. After Boss supplies passing Windows Debug **160/160** and Release
 **160/160**, update this record to **RESOLVED**, retaining the failed historical run.
 This is a blocking-defect repair, not a permanent known-issue deferral.
 
+Follow-up: [CI #92 directory reservation correction](CI92_WINDOWS_RESERVATION_REPAIR.md)
+adds directory-read access to the original metadata-only pins and retains the
+rename rejection gate. Its native movement/handle observations remain pending.
+
 ## Evidence and cause
 
 - CI #88 rejected valid registered `RUNNER~1` ancestors. The

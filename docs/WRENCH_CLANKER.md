@@ -1,5 +1,14 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## CI #92 Wrench review — 21 October 2026
+
+Review the one-bit FILE_LIST_DIRECTORY addition and the retained/strengthened
+rename assertion in [the repair record](stage9/CI92_WINDOWS_RESERVATION_REPAIR.md).
+CI #92 logged successful old-mask MoveFileExW return, not actual movement or handle
+identity. New probes capture those facts and verify repaired sharing exclusion.
+ASCII-safe diagnostics preserve the already successful deep executable launch.
+Local Debug/strict **3/3** each; native probe execution/acceptance still pending.
+
 ## CI #91 focused Windows test repair — 21 October 2026
 
 The working short-directory native linker is preserved. Restricted-token tests

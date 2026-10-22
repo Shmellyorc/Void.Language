@@ -19,7 +19,8 @@ if os.name=='nt':
     # Native helper shares the production implementation and must run in both
     # Windows configurations; the existing 160-suite inventory is retained.
     assert len(sys.argv)==5, 'Windows staging probe missing'
-    run([sys.argv[4]])
+    # Retain the native rename/identity observations in workflow evidence.
+    print(run([sys.argv[4]]).stdout,end='')
 
 with tempfile.TemporaryDirectory(prefix='VOID Stage9 é 🎮 # % ') as temporary:
     root=pathlib.Path(temporary);project=root/'game # % é';project.mkdir()
@@ -214,7 +215,7 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage9 é 🎮 # % ') as temporary
         assert os.path.samefile(deep_executable,application),(deep_executable,application)
     run([deep_executable],7,'',executable=application)
     if os.name=='nt':
-        print('Deep executable launched via explicit extended application:',application)
+        print('Deep executable launched via explicit extended application:',ascii(application))
     # Real staged install, then relocation. Native config must use its own archives.
     prefix=root/'private install # % é'
     run(['cmake','--install',build,'--config',configuration,'--component','compiler','--prefix',prefix])

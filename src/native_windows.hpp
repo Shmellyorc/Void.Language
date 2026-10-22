@@ -38,14 +38,15 @@ inline BY_HANDLE_FILE_INFORMATION information(HANDLE h) {
         throw std::runtime_error("Native temporary path contains a reparse point.");
     return info;
 }
-// Pin every existing ancestor without delete sharing before traversing further.
+// Pin every existing ancestor with directory read access and no delete sharing.
+// Metadata-only opens do not establish the read/write/delete sharing reservation.
 // OPEN_REPARSE_POINT inspects the component itself, never its redirect target.
 inline std::vector<Handle> pin_directories(const fs::path& path) {
     if(!path.is_absolute() || path!=path.lexically_normal())
         throw std::runtime_error("Native temporary root must be absolute and normalized.");
     std::vector<Handle> result;
     auto pin=[&](const fs::path& p) {
-        Handle h(CreateFileW(p.c_str(),FILE_READ_ATTRIBUTES|READ_CONTROL,
+        Handle h(CreateFileW(p.c_str(),FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL,
             FILE_SHARE_READ|FILE_SHARE_WRITE,nullptr,OPEN_EXISTING,
             FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
         if(h.value==INVALID_HANDLE_VALUE)fail("Cannot pin native temporary directory");

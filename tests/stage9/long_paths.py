@@ -91,7 +91,7 @@ with tempfile.TemporaryDirectory(prefix='VOID CI89 é 🎮 # % ') as temporary:
                 assert os.path.samefile(output, application), (output, application)
             run([output], 7, executable=application)
             if os.name == 'nt':
-                print('Deep executable launched via explicit extended application:', application)
+                print('Deep executable launched via explicit extended application:', ascii(application))
         before = output.read_bytes()
         wrong = output.with_name(output.name.swapcase())
         if wrong.exists():

@@ -1,5 +1,11 @@
 # VOID documentation
 
+## CI #92 focused Windows follow-up — 21 October 2026
+
+[Directory reservation, Unicode repair and native evidence gate](stage9/CI92_WINDOWS_RESERVATION_REPAIR.md).
+Linux Debug/strict each **3/3**; actual old-mask movement/handle identity and
+repaired Windows reservation remain pending. Working native linker preserved.
+
 ## CI #91 focused Windows test repair — 21 October 2026
 
 The working short-directory native linker is preserved. Restricted-token tests

@@ -41,6 +41,81 @@ void access_check(HANDLE directory) {
     Handle other(restricted);
     require(!allowed(other.value),"Everyone restriction has effective mutation access");
 }
+bool same_directory(const BY_HANDLE_FILE_INFORMATION& a,const BY_HANDLE_FILE_INFORMATION& b) {
+    return a.dwVolumeSerialNumber==b.dwVolumeSerialNumber &&
+        a.nFileIndexHigh==b.nFileIndexHigh && a.nFileIndexLow==b.nFileIndexLow;
+}
+bool exists_directory(const fs::path& path) {
+    auto attributes=GetFileAttributesW(path.c_str());
+    if(attributes!=INVALID_FILE_ATTRIBUTES) {
+        require((attributes & FILE_ATTRIBUTE_DIRECTORY)!=0,"probe path is not a directory");return true;
+    }
+    auto error=GetLastError();
+    if(error!=ERROR_FILE_NOT_FOUND && error!=ERROR_PATH_NOT_FOUND)fail("Cannot inspect rename probe path",error);
+    return false;
+}
+bool directory_identity(const fs::path& path,const BY_HANDLE_FILE_INFORMATION& expected) {
+    Handle h(CreateFileW(path.c_str(),FILE_READ_ATTRIBUTES,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+        nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+    if(h.value==INVALID_HANDLE_VALUE)fail("Cannot inspect renamed directory identity");
+    return same_directory(information(h.value),expected);
+}
+struct RenameResult {
+    bool renamed,source_exists,destination_exists,source_original,destination_original,handles_original;
+    DWORD error;
+};
+RenameResult rename_probe(const char* label,const fs::path& source,const fs::path& destination,
+                          const std::vector<HANDLE>& handles) {
+    require(!handles.empty() && !exists_directory(destination),"rename probe requires a fresh destination");
+    std::vector<BY_HANDLE_FILE_INFORMATION> before;
+    for(auto h:handles)before.push_back(information(h));
+    require(directory_identity(source,before.back()),"probe handle did not identify source");
+    const BOOL returned=MoveFileExW(source.c_str(),destination.c_str(),0);
+    const bool renamed=returned!=FALSE;
+    // GetLastError is meaningful only for a failed MoveFileExW.
+    auto error=renamed?ERROR_SUCCESS:GetLastError();
+    auto source_exists=exists_directory(source),destination_exists=exists_directory(destination);
+    bool stable=true;
+    for(std::size_t i=0;i<handles.size();++i)
+        stable= same_directory(before[i],information(handles[i])) && stable;
+    RenameResult result{renamed,source_exists,destination_exists,
+        source_exists && directory_identity(source,before.back()),
+        destination_exists && directory_identity(destination,before.back()),stable,error};
+    std::cout<<"rename_probe="<<label<<" returned="<<returned<<" failure="<<error
+        <<" source_exists="<<source_exists<<" destination_exists="<<destination_exists
+        <<" source_original="<<result.source_original<<" destination_original="<<result.destination_original
+        <<" handles_original="<<stable<<" handles="<<handles.size()
+        <<" original_volume="<<before.back().dwVolumeSerialNumber
+        <<" original_file_id="<<before.back().nFileIndexHigh<<':'<<before.back().nFileIndexLow<<std::endl;
+    return result;
+}
+void metadata_reservation_control(const fs::path& home) {
+    // Reproduce the old access mask inside our exclusively owned fixture. Its
+    // parent remains reserved; only this control's child has metadata-only opens.
+    const auto source=home/"metadata-control",moved=home/"metadata-moved";
+    require(fs::create_directory(source),"cannot exclusively create metadata control");
+    {
+        std::vector<Handle> metadata;std::vector<HANDLE> observed;
+        for(unsigned i=0;i<2;++i) {
+            Handle h(CreateFileW(source.c_str(),FILE_READ_ATTRIBUTES|READ_CONTROL,
+                FILE_SHARE_READ|FILE_SHARE_WRITE,nullptr,OPEN_EXISTING,
+                FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+            if(h.value==INVALID_HANDLE_VALUE)fail("Cannot open metadata control");
+            observed.push_back(h.value);metadata.push_back(std::move(h));
+        }
+        auto result=rename_probe("metadata_only",source,moved,observed);
+        require(result.handles_original,"metadata handles changed directory identity");
+        if(result.renamed) {
+            require(!result.source_exists && result.destination_original,"metadata rename did not move the original directory");
+            if(!MoveFileExW(moved.c_str(),source.c_str(),0))fail("Cannot restore owned metadata control");
+        } else require(result.source_original && !result.destination_exists,"failed metadata rename changed paths");
+    }
+    // Positive control after closing handles rules out permissions or an invalid
+    // rename as the reason a reservation attempt was refused.
+    if(!MoveFileExW(source.c_str(),moved.c_str(),0))fail("Unreserved directory rename failed");
+    if(!MoveFileExW(moved.c_str(),source.c_str(),0))fail("Cannot restore unreserved control");
+    require(fs::remove(source),"metadata control cleanup failed");
+}
 int main(int argc,char** argv)try {
     // A disposable configured driver exercises zero-exit malformed output and
     // transfer failures through the real compiler, without production test hooks.
@@ -70,12 +145,24 @@ int main(int argc,char** argv)try {
 
     auto root=temporary_root();Directory fixture(root,true);
     auto home=fixture.directory;
+    metadata_reservation_control(home);
     occupied=home/"collision";fs::create_directory(occupied);write(occupied/"sentinel","another owner");
     fs::path owned;
     {Directory d(home,true,collide_once);owned=d.directory;require(owned!=occupied,"adopted collision");
      PrivateAccess access;access.verify(d.pins.back().value);access_check(d.pins.back().value);
-     // Directory and ancestors cannot be renamed while reserved.
-     require(!MoveFileExW(d.directory.c_str(),(home/"moved").c_str(),0),"directory reservation can be renamed");}
+     // Observe BOOL/error, both names, and every live handle's native file ID.
+     const auto original=d.directory,moved=home/"moved";
+     std::vector<HANDLE> observed;for(const auto& h:d.pins)observed.push_back(h.value);
+     auto result=rename_probe("list_directory",original,moved,observed);
+     if(result.renamed && result.destination_original && !result.source_exists) {
+         // Recover only the verified owned directory even if this gate fails.
+         d.directory=moved;
+         if(MoveFileExW(moved.c_str(),original.c_str(),0))d.directory=original;
+     }
+     require(!result.renamed,"directory reservation can be renamed");
+     require(result.error==ERROR_SHARING_VIOLATION,"directory rename failed for a reason other than sharing");
+     require(result.source_original && !result.destination_exists && result.handles_original,
+         "directory reservation lost path or handle identity");}
     require(!fs::exists(owned) && bytes(occupied/"sentinel")=="another owner","ownership cleanup failed");
     rejects([&]{Directory d(home,true,always_collide);});
     require(bytes(occupied/"sentinel")=="another owner","collision exhaustion deleted foreign directory");
