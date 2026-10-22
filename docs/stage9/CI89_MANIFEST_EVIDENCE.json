@@ -1,0 +1,119 @@
+{
+  "date": "2026-10-21",
+  "status": "Production manifest repair prepared for Wrench review; native production Debug/Release gate pending",
+  "baseline_native_probe_source": "8cd9139f592af0a2d2566df158139951ec3a1ea4",
+  "original_ci89_baseline": "db4c979ecb9516ddf9544203c3e20c8bac10b5d9",
+  "native_evidence": {
+    "run": "https://github.com/Shmellyorc/Void.Language/actions/runs/39697081031",
+    "job_id": 119556968370,
+    "platform": "Windows Server 2022",
+    "LongPathsEnabled": 1,
+    "deep_utf16_length": 353,
+    "baseline": {
+      "absolute": 0,
+      "canonical": 3,
+      "CreateFileW": 3,
+      "extended_canonical": 0,
+      "error_name": "ERROR_PATH_NOT_FOUND",
+      "message": "The system cannot find the path specified."
+    },
+    "longPathAware": "All observed operations returned 0",
+    "artifacts": "ci89-manifest/native-probe-results.json; ci89-manifest/NATIVE_LOG.json; compressed complete decoded job log",
+    "verification": "Independently retrieved and parsed read-only by agent; run launched by Boss"
+  },
+  "source_change": {
+    "manifest": "cmake/LongPathAware.manifest",
+    "origin": "Byte-identical move of tested tests/stage9/long_path_aware.manifest",
+    "mechanism": "CMake manifest source, WIN32 AND MSVC",
+    "production_targets": [
+      "voidc",
+      "voidls"
+    ],
+    "diagnostic_aware_target_reuses_manifest": true,
+    "path_resolution_changed": false,
+    "system_policy_changed": false
+  },
+  "local": {
+    "platform": "Linux",
+    "build_targets": [
+      "voidc",
+      "voidls"
+    ],
+    "configurations": [
+      "Debug",
+      "RelWithDebInfo strict sanitizers"
+    ],
+    "tests": [
+      "application_workflow_stage9",
+      "native_output_paths_ci88",
+      "long_physical_paths_ci89",
+      "lsp_stage8"
+    ],
+    "debug": {
+      "passed": 4,
+      "failed": 0,
+      "seconds": 6.25,
+      "final_expanded_long_path_rerun": {
+        "passed": 1,
+        "failed": 0,
+        "seconds": 0.7
+      }
+    },
+    "strict_sanitizers": {
+      "passed": 4,
+      "failed": 0,
+      "seconds": 11.77,
+      "final_expanded_long_path_rerun": {
+        "passed": 1,
+        "failed": 0,
+        "seconds": 1.49
+      },
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86"
+    },
+    "expanded_lsp_coverage": [
+      "Deep voidls --discover selects actual root/entry",
+      "Wrong-case explicit deep entry rejected",
+      "Real deep-entry server startup/initialize/didOpen with no diagnostics",
+      "Import definition resolves to actual deep Library.void",
+      "Clean protocol shutdown; sanitizer stderr checked"
+    ],
+    "static_checks": [
+      "XML longPathAware=true",
+      "Manifest hash matches tested historical manifest",
+      "Prior path/source/output/CI88 test/fixture hashes unchanged",
+      "Python syntax passed"
+    ]
+  },
+  "required_native_gate": [
+    "Production voidc.exe/voidls.exe and installed copies embed manifest",
+    "Windows LongPathsEnabled=1 recorded",
+    "Windows Debug/Release original workflow, CI88 regression, expanded CI89 deep-path and LSP suites",
+    "Windows junction/reparse, real 8.3, drive-case, insensitive output spelling and collision/preservation checks"
+  ],
+  "limits": [
+    "No local native Windows production execution",
+    "No post-change macOS execution",
+    "Long paths depend on enabled Windows system policy"
+  ],
+  "constraints": {
+    "committed": false,
+    "pushed": false,
+    "branches_created": false,
+    "hosted_actions_launched": false,
+    "full_matrix_repeated": false
+  },
+  "sha256": {
+    "CMakeLists.txt": "11871eb22842751d006348b4b512c18c4a4442f44a25ce5e7009aa07683d204b",
+    "cmake/LongPathAware.manifest": "3242062989f717f0f1846b13ad2082e37438d32bdc33903effeaecaa6cfb7382",
+    "tests/stage9/long_paths.py": "c94aec912687b60f38fe2350115fcff09c7214cbcb5709d07a3a982c4c33c3a6",
+    "src/frontend/compiler.cpp": "efa94508269c250901a7e2d9171d60558d81504c6c93827b088f3abb8c90cc38",
+    "src/frontend/source.cpp": "2ca73c8aea5ea39e3d9992fef48ca86ff7ab8179e8912ebb9019e6fdcd30651f",
+    "src/native_build.cpp": "80535e3564c3eb7fd3cf54f4e94d0684f2bbfc34904cd49ff9952cd86b6d4b22",
+    "include/void/path.hpp": "2674378c9b35b6d060f6efad22b7cbfc961c169b21d977301779667e3a06ae98",
+    "tests/stage9/workflow.py": "26a5e9bbb5cc245d58ecdb0994e21b7a23d67fc6b263d4d4ce97f2333a27d748",
+    "tests/stage9/native_paths.py": "b49ff2d996e489b8e7ce587c0df0afb146f1e26687338774f34507bdbc215572",
+    ".github/workflows/ci.yml": "efb35464c11f409e1d2191f66b61cd5c5e8fa6ef9a5d4a5096443e9c74ff78c5",
+    ".github/workflows/windows-path-probe.yml": "9fb38b8531256dc7063a7de06df235950bcb0e655a2eb98590a0c363e1acc8df"
+  }
+}

@@ -1,11 +1,18 @@
 """CI #89 acceptance: actual long physical paths and unchanged safety contracts."""
 import os
+import json
 import pathlib
 import subprocess
 import sys
 import tempfile
+from urllib.parse import urlsplit
+from urllib.request import url2pathname
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / 'tools'))
+from lsp_client import Client
 
 compiler = pathlib.Path(sys.argv[1]).resolve()
+server = pathlib.Path(sys.argv[2]).resolve()
 checks = 0
 
 
@@ -32,6 +39,22 @@ with tempfile.TemporaryDirectory(prefix='VOID CI89 é 🎮 # % ') as temporary:
     library.write_text('func value() -> i32:\n    return 7\n', encoding='utf-8')
     valid = 'use "Library.void" as library\nreturn library.value()\n'
     source.write_text(valid, encoding='utf-8')
+    discovery = run([server, '--discover', deep, '', ''])
+    selected = json.loads(discovery.stdout)
+    assert os.path.samefile(selected['entry'], source), selected
+    assert os.path.samefile(selected['root'], deep), selected
+    run([server, '--discover', deep, '', deep / 'MAIN.void'], 2)
+    with Client(server, source.resolve()) as client:
+        client.initialize()
+        uri = source.resolve().as_uri()
+        client.notify('textDocument/didOpen', {'textDocument': {
+            'uri': uri, 'languageId': 'void', 'version': 1, 'text': valid}})
+        diagnostics = client.sync()
+        assert all(not item['diagnostics'] for item in diagnostics), diagnostics
+        definition = client.request('textDocument/definition', {
+            'textDocument': {'uri': uri}, 'position': {'line': 0, 'character': 7}})[0]
+        assert os.path.samefile(url2pathname(urlsplit(definition['result']['uri']).path), library), definition
+        client.shutdown()
     run([compiler, 'check', source])
     run([compiler, 'run', source], 7)
     run([compiler, 'check', deep])

@@ -1,5 +1,16 @@
 # VOID documentation
 
+## CI #89 verified Windows manifest repair — 21 October 2026
+
+Native diagnosis #1 confirmed Windows error 3 at a 353-unit deep directory; the
+identical longPathAware control succeeded with LongPathsEnabled=1. The tested
+manifest now applies to both voidc and voidls using the same CMake mechanism.
+[Exact repair, native evidence and policy dependency](stage9/CI89_WINDOWS_MANIFEST_REPAIR.md):
+Linux Debug and strict sanitizers each passed 4/4 focused suites. Production
+Windows Debug/Release verification remains required. No Git mutation or hosted
+execution was performed; historical evidence is preserved.
+
+
 ## CI #89 Windows long-path diagnosis — 21 October 2026
 
 CI #89 Windows Debug/Release each passed 158/159; the CI #88 regression suite

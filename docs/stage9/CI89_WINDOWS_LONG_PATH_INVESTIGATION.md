@@ -1,5 +1,10 @@
 # CI #89 — Windows long-path investigation and manual probe
 
+> Historical preparation record. Boss subsequently ran native diagnosis #1;
+> error 3 and the manifest correction are now confirmed. See the
+> [production repair and current gate](CI89_WINDOWS_MANIFEST_REPAIR.md).
+
+
 21 October 2026. Baseline `db4c979ecb9516ddf9544203c3e20c8bac10b5d9`.
 **Native evidence pending. No compiler path-handling repair is implemented.**
 Boss's follow-up authorizes preparation of one manual Windows-only diagnostic job;

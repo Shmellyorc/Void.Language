@@ -1,0 +1,139 @@
+{
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "runs": [
+    {
+      "process": "baseline",
+      "fixture": "short_control",
+      "returncode": 0,
+      "stdout": "absolute\t0\tsystem\tThe operation completed successfully.  \nutf16_length\t77\ncanonical\t0\tsystem\tThe operation completed successfully.  \nCreateFileW\t0\tsystem\tThe operation completed successfully.  \nGetFinalPathNameByHandleW\t0\tsystem\tThe operation completed successfully.  \nextended_canonical\t0\tsystem\tThe operation completed successfully.  \n",
+      "stderr": "",
+      "operations": {
+        "absolute": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        },
+        "canonical": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        },
+        "CreateFileW": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        },
+        "GetFinalPathNameByHandleW": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        },
+        "extended_canonical": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        }
+      }
+    },
+    {
+      "process": "baseline",
+      "fixture": "original_six_level",
+      "returncode": 0,
+      "stdout": "absolute\t0\tsystem\tThe operation completed successfully.  \nutf16_length\t353\ncanonical\t3\tsystem\tThe system cannot find the path specified.  \nCreateFileW\t3\tsystem\tThe system cannot find the path specified.  \nextended_canonical\t0\tsystem\tThe operation completed successfully.  \n",
+      "stderr": "",
+      "operations": {
+        "absolute": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        },
+        "canonical": {
+          "code": 3,
+          "category": "system",
+          "message": "The system cannot find the path specified.  "
+        },
+        "CreateFileW": {
+          "code": 3,
+          "category": "system",
+          "message": "The system cannot find the path specified.  "
+        },
+        "extended_canonical": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        }
+      }
+    },
+    {
+      "process": "longPathAware",
+      "fixture": "short_control",
+      "returncode": 0,
+      "stdout": "absolute\t0\tsystem\tThe operation completed successfully.  \nutf16_length\t77\ncanonical\t0\tsystem\tThe operation completed successfully.  \nCreateFileW\t0\tsystem\tThe operation completed successfully.  \nGetFinalPathNameByHandleW\t0\tsystem\tThe operation completed successfully.  \nextended_canonical\t0\tsystem\tThe operation completed successfully.  \n",
+      "stderr": "",
+      "operations": {
+        "absolute": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        },
+        "canonical": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        },
+        "CreateFileW": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        },
+        "GetFinalPathNameByHandleW": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        },
+        "extended_canonical": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        }
+      }
+    },
+    {
+      "process": "longPathAware",
+      "fixture": "original_six_level",
+      "returncode": 0,
+      "stdout": "absolute\t0\tsystem\tThe operation completed successfully.  \nutf16_length\t353\ncanonical\t0\tsystem\tThe operation completed successfully.  \nCreateFileW\t0\tsystem\tThe operation completed successfully.  \nGetFinalPathNameByHandleW\t0\tsystem\tThe operation completed successfully.  \nextended_canonical\t0\tsystem\tThe operation completed successfully.  \n",
+      "stderr": "",
+      "operations": {
+        "absolute": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        },
+        "canonical": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        },
+        "CreateFileW": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        },
+        "GetFinalPathNameByHandleW": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        },
+        "extended_canonical": {
+          "code": 0,
+          "category": "system",
+          "message": "The operation completed successfully.  "
+        }
+      }
+    }
+  ],
+  "LongPathsEnabled": 1,
+  "deep_directory": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\VOID Stage9 é 🎮 # % r826seoi\\game # % é\\nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "deep_utf16_length": 353
+}

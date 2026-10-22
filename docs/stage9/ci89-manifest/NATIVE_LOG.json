@@ -1,0 +1,10 @@
+{
+  "run": "https://github.com/Shmellyorc/Void.Language/actions/runs/39697081031",
+  "run_number": 1,
+  "head_sha": "8cd9139f592af0a2d2566df158139951ec3a1ea4",
+  "job_id": 119556968370,
+  "source": "GitHub connector decoded workflow job log, UTF-8 BOM and CRLF retained",
+  "decoded_log_sha256": "6867a344d131cfb592e8ad9ec9edd849396961cfbca87730c4b40bed49334c8d",
+  "decoded_log_bytes": 120876,
+  "results_source": "JSON printed in native job log; no invented results"
+}
