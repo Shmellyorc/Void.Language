@@ -42,6 +42,7 @@ struct AnalyzedDeclaration {
     bool builtin = false; // Compiler metadata only; has no filesystem definition target.
     int editor_symbol_kind = 0;
     std::string documentation = {};
+    bool readonly = false;
 };
 struct AnalyzedReference {
     std::string from, to, spelling;
@@ -87,6 +88,7 @@ AnalysisResult analyze_source(const SourceFile& source);
 using SourceOverrides = std::map<std::string, std::optional<SourceFile>>;
 // One configured source root shared by all frontend consumers. No cwd search.
 std::filesystem::path standard_library_root();
+void configure_standard_library_root(const std::filesystem::path& executable);
 struct ProjectSelection { std::filesystem::path entry, root; bool standalone = false; };
 ProjectSelection discover_project(const std::filesystem::path& workspace,
     const std::filesystem::path& active = {}, const std::filesystem::path& explicit_entry = {});

@@ -1,6 +1,7 @@
 #include "void/ir.hpp"
 #include "void/native_binding.hpp"
 #include "void/numeric.hpp"
+#include "void/temporal_ops.hpp"
 #include "void/reference_capabilities.hpp"
 #include <map>
 #include <algorithm>
@@ -251,7 +252,9 @@ Type readonly_view(Type type) {
 }
 Type field_type(Type owner,unsigned field) {
     if(collection_type(owner) && field==array_element_path)return array_element(owner);
-    auto result=Type(owner.definition->fields.at(field).type);
+    const auto& declaration=owner.definition->fields.at(field);
+    auto result=Type(declaration.type);
+    if(declaration.readonly)result=readonly_view(result);
     if (owner.kind==Type::managed_ref && !owner.definition->task_result) return owner.readonly ? readonly_view(result) : result;
     if(owner.readonly)return readonly_view(result);
     ReferencePaths projected=readonly_paths(result);
@@ -481,16 +484,21 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 if (d->fields.size()<base->fields.size()) fail("missing inherited field prefix");
                 for(unsigned n=0;n<base->fields.size();++n) {
                     const auto& a=d->fields[n];const auto& b=base->fields[n];
-                    if(a.name!=b.name || Type(a.type)!=Type(b.type) || capability_key(a.type)!=capability_key(b.type) || a.owner!=b.owner || a.using_field!=b.using_field || a.event!=b.event) fail("inconsistent inherited field ownership/type");
+                    if(a.name!=b.name || Type(a.type)!=Type(b.type) || capability_key(a.type)!=capability_key(b.type) || a.owner!=b.owner || a.using_field!=b.using_field || a.event!=b.event || a.visibility!=b.visibility || a.readonly!=b.readonly) fail("inconsistent inherited field ownership/type");
                 }
                 pending.emplace_back(base,Type::managed_ref);
             }
             std::set<std::string> fields;
+            unsigned field_index=0;auto inherited=d->base.lock();
             for (const auto& field:d->fields) {
                 if (field.name.empty() || field.name.find('\0')!=std::string::npos || !fields.insert(field.name).second || Type(field.type)==Type::none) fail("invalid value field");
                 if(field.using_field && ((Type(field.type).kind!=Type::aggregate && Type(field.type).kind!=Type::managed_ref) || field.type.nullable || (Type(field.type).definition && (Type(field.type).definition->callable || !Type(field.type).definition->cases.empty())))) fail("invalid using component type");
+                if(field.visibility!="public" && field.visibility!="internal" && field.visibility!="private")fail("invalid stored-field visibility");
+                if(field.event && field.readonly)fail("const event field");
+                if(!d->module_identity.empty() && (!inherited || field_index>=inherited->fields.size()) && field.owner!=d->identity)fail("forged stored-field declaring owner");
+                if(field.readonly && readonly_paths(field.type)!=reference_paths(field.type))fail("const field omits declared readonly reference profile");
                 if(Type(field.type).kind==Type::prepared_receiver) fail("prepared receiver cannot be stored in a field");
-
+                ++field_index;
                 pending.push_back(field.type);
             }
             // References break physical layout recursion, not graph validation.
@@ -558,11 +566,13 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         if(f.bound_receiver && (!f.closure || f.parameters.empty() || f.parameters[0].kind!=Type::managed_ref || f.parameters[0].definition->fields.size()!=1 || (field_type(f.parameters[0],0).kind!=Type::managed_ref && field_type(f.parameters[0],0).kind!=Type::interface_ref)))fail("invalid bound callback receiver");
         if (f.receiver) {
             if (f.parameters.empty() || (f.parameters[0].kind != Type::aggregate && f.parameters[0].kind != Type::managed_ref) || f.locals.empty() || f.locals[0] != f.parameters[0] || readonly_paths(f.locals[0])!=readonly_paths(f.parameters[0])) fail("invalid receiver signature/storage");
+            if(!f.module_identity.empty() && !f.parameters[0].definition->module_identity.empty() && f.module_identity!=f.parameters[0].definition->module_identity)fail("foreign receiver declaration");
         } else if (f.receiver_mutates) fail("receiver effect without receiver");
         if(f.accessor>2 || (f.accessor && (!f.receiver || f.initializer)) ||
            (f.accessor==1 && (f.parameters.size()!=1 || f.result==Type::none || f.receiver_mutates)) ||
            (f.accessor==2 && (f.parameters.size()!=2 || f.result!=Type::none)))fail("invalid property accessor");
         if (f.initializer && (!f.receiver || f.result != Type::none)) fail("invalid initializer signature");
+        if(f.initializer && !f.module_identity.empty() && f.method_name!="init")fail("initializer grant on an ordinary source method");
         if(f.initializer && f.parameters[0].construction && f.parameters[0].readonly) fail("initializer requires mutable construction storage");
         if(f.result.kind==Type::prepared_receiver) fail("prepared receiver cannot be returned");
         for(auto t:f.parameters) if(t.kind==Type::prepared_receiver) fail("prepared receiver cannot be a formal parameter");
@@ -627,6 +637,24 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     if(bindings.size()!=expected_bindings.size()) fail("incomplete interface binding universe");
     for (const auto& f : m.functions) {
         if (f.blocks.empty()) fail("function has no blocks");
+        if(!f.lexical_owner.empty()) {
+            if(f.receiver) {
+                if(f.parameters.empty() || Type::key(f.parameters[0])!=f.lexical_owner)fail("forged lexical field owner");
+                if(!f.module_identity.empty() && f.parameters[0].definition->module_identity!=f.module_identity)fail("foreign lexical field owner");
+            } else {
+                auto parent=functions.find(f.lexical_parent);
+                const bool adapter=!f.receiver && !f.asynchronous && f.visibility=="private" && f.name.starts_with(f.lexical_parent+"::$display$");
+                if((!f.closure && !adapter) || parent==functions.end() || parent->second==&f || parent->second->lexical_owner!=f.lexical_owner || parent->second->module_identity!=f.module_identity)fail("forged closure field owner");
+                bool selected=false;for(const auto& block:parent->second->blocks)for(const auto& i:block.instructions)selected|=(i.op==Op::function_reference || (adapter && i.op==Op::call)) && i.callee==f.name;
+                if(!selected)fail("closure field owner has no lexical creation");
+                std::set<std::string> ancestry{f.name};auto enclosing=parent->second;
+                while(!enclosing->receiver) {
+                    if(!ancestry.insert(enclosing->name).second || !functions.contains(enclosing->lexical_parent))fail("cyclic or unowned closure field context");
+                    enclosing=functions.at(enclosing->lexical_parent);
+                }
+                if(enclosing->parameters.empty() || Type::key(enclosing->parameters[0])!=f.lexical_owner)fail("closure field context has no declaring receiver");
+            }
+        }
         if(f.cleanup_entry && (!m.coordinated || *f.cleanup_entry>=f.blocks.size()))fail("invalid function cleanup entry");
         qualified_types.emplace_back();
         std::set<unsigned> group_slots;
@@ -642,7 +670,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 if(group_values[id] && (!validating || (validating->op!=Op::async_group_join && !(validating->op==Op::store && group_slots.contains(validating->a)))))fail("async group token escapes lifecycle operations");
                 return types[id];
             };
-            auto expect = [&](unsigned id, Type t) { if (!assignable(operand(id),t)) fail("mistyped operand in " + f.name); };
+            auto expect = [&](unsigned id, Type t) { if (!assignable(operand(id),t)) fail("mistyped operand in " + f.name+": expected "+type_name(t)+", received "+type_name(operand(id))+" at value "+std::to_string(id)); };
             auto slot = [&](unsigned id) {
                 if (id >= f.locals.size()) fail("invalid slot in " + f.name);
                 return f.locals[id];
@@ -656,6 +684,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     valid_type(i.type);auto from=operand(i.a);auto concrete=from;concrete.nullable=false;
                     if(from.construction || i.type.kind!=Type::interface_ref || (from.nullable && !i.type.nullable) || !capability_assignable(from,i.type)) fail("invalid interface erasure");
                     auto proof=structural_binding(m,concrete,i.type,f.module_identity);
+                    if(binding_requires_readonly(proof) && !i.type.readonly)fail("interface erasure discards const component authority");
                     if(i.callee!=proof.key || !bindings.contains(proof.key)) fail("interface pack bypasses scoped binding/access proof");
                     result=i.type;break;
                 }
@@ -694,9 +723,33 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if(operand(i.a).definition && operand(i.a).definition->task_result)fail("task payload access requires await");
                     auto object = operand(i.a);
                     if (!m.coordinated || object.kind != Type::managed_ref || i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= object.definition->fields.size()) fail("invalid managed field");
-                    auto field = object.definition->fields[static_cast<std::size_t>(i.immediate)].type;
-                    if (i.op == Op::gc_write) { if (object.readonly) fail("write through readonly reference"); expect(i.b, field); result = Type::none; }
-                    else { result = field; if (result.kind==Type::managed_ref) result.readonly=object.readonly; }
+                    const auto index=static_cast<unsigned>(i.immediate);
+                    const auto& declaration=object.definition->fields[index];
+                    bool commit_read=false;
+                    if(i.op==Op::gc_read && object.construction) {
+                        // A final complete-object commit may copy hidden storage,
+                        // but its private read cannot supply any other operation.
+                        unsigned uses=0;const auto id=types.size();
+                        for(const auto& user:b.instructions) {
+                            for(auto argument:user.arguments)if(argument==id){++uses;commit_read|=user.op==Op::gc_construct && user.receiver.has_value();}
+                            if((&user-b.instructions.data())<=static_cast<std::ptrdiff_t>(id))continue;
+                            // Slot numbers and formal indexes are not SSA uses.
+                            switch(user.op) {
+                            case Op::load:case Op::argument:case Op::constant:case Op::string_literal:case Op::stage_begin:break;
+                            case Op::store:if(user.b==id)++uses;break;
+                            default:if(user.a==id)++uses;if(user.b==id)++uses;break;
+                            }
+                        }
+                        if((b.end.kind==Terminator::Kind::return_value || b.end.kind==Terminator::Kind::branch) && b.end.value==id)++uses;
+                        commit_read&=uses==1;
+                    }
+                    if(!commit_read && !field_accessible(m,object,index,f.module_identity,f.lexical_owner))fail("inaccessible stored field '"+declaration.name+"' in "+f.name);
+                    auto field=field_type(object,index);
+                    if (i.op == Op::gc_write) {
+                        bool direct=f.initializer && f.receiver && declaration.owner==Type::key(f.parameters[0]) && b.instructions[i.a].op==Op::load && b.instructions[i.a].a==0;
+                        if(declaration.readonly && !direct)fail("write to const stored field outside declaring initializer");
+                        if (object.readonly) fail("write through readonly reference"); expect(i.b, field); result = Type::none;
+                    } else result=field;
                     break;
                 }
                 case Op::gc_release:
@@ -838,8 +891,14 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     auto owner=operand(i.a);if(owner.definition && ((owner.definition->callable) || (!owner.definition->cases.empty() && (i.op==Op::insert || i.immediate!=0))))fail("sum payload requires checked access");
                     auto t = operand(i.a);
                     if (t.kind != Type::aggregate || i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= t.definition->fields.size()) fail("invalid aggregate field");
-                    auto field = t.definition->fields[static_cast<std::size_t>(i.immediate)].type;
-                    if (i.op == Op::insert) { expect(i.b, field); result = t; }
+                    auto index=static_cast<unsigned>(i.immediate);
+                    if(!field_accessible(m,t,index,f.module_identity,f.lexical_owner))fail("inaccessible stored field '"+t.definition->fields[index].name+"' in "+f.name);
+                    auto field=field_type(t,index);
+                    if (i.op == Op::insert) {
+                        bool direct=f.initializer && f.receiver && t.definition->fields[index].owner==Type::key(f.parameters[0]) && b.instructions[i.a].op==Op::load && b.instructions[i.a].a==0;
+                        if(t.definition->fields[index].readonly && !direct)fail("write to const stored field outside declaring initializer");
+                        expect(i.b, field); result = t;
+                    }
                     else result = field;
                     break;
                 }
@@ -863,6 +922,34 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 case Op::argument:
                     if (i.a >= f.parameters.size()) fail("invalid argument index");
                     result = f.parameters[i.a]; break;
+                case Op::string_join:
+                    if(!m.coordinated || i.a || i.b || i.type!=Type::string || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat || i.immediate)fail("invalid interpolation join");
+                    for(auto value:i.arguments)if(operand(value)!=Type::string)fail("invalid interpolation text");result=Type::string;break;
+                case Op::format_unwrap: {
+                    auto type=operand(i.a);
+                    if(!m.coordinated || type.kind!=Type::aggregate || !type.definition || !type.definition->result_type || type.definition->fields.size()!=3 || field_type(type,1)!=Type::string || field_type(type,2)!=Type::string || i.b || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat || i.type!=Type::string)fail("invalid format unwrap");result=Type::string;break;
+                }
+                case Op::temporal_native: {
+                    if(!m.coordinated || i.a || i.b || i.immediate<0 || static_cast<std::size_t>(i.immediate)>=temporal::operations.size() || i.receiver || !i.callee.empty() || i.initialization || i.array_repeat)fail("invalid temporal operation");
+                    const auto& contract=temporal::operations.at(i.immediate);
+                    if(i.arguments.size()!=contract.arguments.size())fail("invalid temporal argument count");
+                    for(unsigned n=0;n<i.arguments.size();++n)expect(i.arguments[n],contract.arguments[n]=='t'?Type(Type::string):Type(Type::i64));
+                    valid_type(i.type);if(i.type.kind!=Type::aggregate || !i.type.definition->result_type || i.type.definition->fields.size()!=3 || field_type(i.type,2)!=Type::string)fail("invalid temporal result");
+                    auto value=field_type(i.type,1);
+                    if(contract.result_words<=1){if(value!=(contract.result_words?Type(Type::i64):Type(Type::string)))fail("invalid temporal scalar result");}
+                    else {if(value.kind!=Type::aggregate || Type::key(value)!="/@stdlib/time.void::_clock_sample" || value.definition->module_identity!="/@stdlib/time.void" || value.definition->fields.size()!=3)fail("invalid temporal clock sample");for(unsigned n=0;n<3;++n)if(field_type(value,n)!=Type::i64 || !value.definition->fields[n].readonly || value.definition->fields[n].visibility!="private")fail("invalid temporal clock sample fields");}
+                    result=i.type;break;
+                }
+                case Op::format_layout:
+                    if(!m.coordinated || operand(i.a)!=Type::string || i.b || i.immediate<0 || i.immediate>1 || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat || i.type.kind!=Type::aggregate || !i.type.definition || !i.type.definition->result_type || i.type.definition->fields.size()!=3 || field_type(i.type,1)!=Type::string || field_type(i.type,2)!=Type::string)fail("invalid format layout");
+                    valid_type(i.type);result=i.type;break;
+                case Op::scalar_display: case Op::scalar_format: {
+                    auto value=operand(i.a);
+                    if(!m.coordinated || (!numeric::number(value) && value!=Type::boolean && value!=Type::string) || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat || i.immediate)fail("invalid scalar display");
+                    if(i.op==Op::scalar_display){if(i.b || i.type!=Type::string)fail("invalid scalar display result");result=Type::string;}
+                    else {valid_type(i.type);if(operand(i.b)!=Type::string || i.type.kind!=Type::aggregate || !i.type.definition->result_type || i.type.definition->fields.size()!=3 || field_type(i.type,1)!=Type::string || field_type(i.type,2)!=Type::string)fail("invalid scalar format result");result=i.type;}
+                    break;
+                }
                 case Op::string_count: case Op::string_index: case Op::string_encode: case Op::string_decode: {
                     if(!m.coordinated || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization || i.array_repeat)fail("invalid text operation flags");
                     if(i.op==Op::string_decode){valid_type(i.type);if(operand(i.a).kind!=Type::growable_array || array_element(operand(i.a))!=Type::u8 || i.b || i.immediate || i.type.kind!=Type::aggregate || !i.type.definition->result_type || i.type.definition->fields.size()!=3 || field_type(i.type,1)!=Type::string || field_type(i.type,2)!=Type::string)fail("invalid UTF-8 decode");result=i.type;}
@@ -950,7 +1037,9 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                         auto t = slot(i.receiver->slot);
                         for (auto field : i.receiver->fields) {
                             if ((t.kind != Type::aggregate && t.kind!=Type::managed_ref) || field >= t.definition->fields.size()) fail("invalid receiver field path");
-                            t = t.definition->fields[field].type;
+                            if(!field_accessible(m,t,field,f.module_identity,f.lexical_owner))fail("inaccessible receiver field");
+                            if(signature.mutates && t.definition->fields[field].readonly)fail("mutating receiver through const field");
+                            t = field_type(t,field);
                         }
                         if (t != signature.parameters[0]) fail("receiver type mismatch");
                         first = 1;
@@ -1003,6 +1092,12 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     std::map<std::string,ReferenceEffects> worker_effects;
     auto* inferred=verified_effects?verified_effects:&worker_effects;
     validate_reference_capabilities(m,qualified_types,inferred);
+    for(const auto& hook:m.functions)if(hook.receiver && (hook.method_name=="string" || hook.method_name=="format")) {
+        bool signature=hook.method_name=="string"?hook.parameters.size()==1 && hook.result==Type::string:hook.parameters.size()==2 && hook.parameters[1]==Type::string && hook.result.definition && hook.result.definition->result_type && field_type(hook.result,1)==Type::string && field_type(hook.result,2)==Type::string;
+        if(!m.coordinated || !signature || hook.asynchronous || hook.receiver_mutates || hook.parameters[0].construction)fail("invalid display hook contract");
+        const auto& effects=inferred->at(hook.name);
+        for(const auto* set:{&effects.mutations,&effects.required_mutable})for(const auto& origin:*set)if(origin.parameter==0)fail("display hook requires mutable receiver authority");
+    }
     for(const auto& worker:m.functions)if(worker.worker){
         const auto& effects=inferred->at(worker.name);
         if(!effects.mutations.empty() || !effects.retained.empty() || !effects.required_mutable.empty())fail("worker has shared reference effects");
@@ -1018,6 +1113,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             for(const auto& block:f->blocks)for(const auto& i:block.instructions){
                 switch(i.op){
                 case Op::async_drain:if(f!=&worker)fail("worker task operation");break;
+                case Op::temporal_native:if(temporal::operations.at(i.immediate).clock)fail("worker cannot read Runtime clocks");break;
                 case Op::native_call:case Op::async_call:case Op::async_cancel:case Op::async_cancel_children:case Op::async_group_enter:case Op::async_group_join:case Op::await:case Op::function_call:case Op::interface_call:case Op::virtual_call:fail("unsupported worker task/indirect effect");break;
                 case Op::call:case Op::base_init:case Op::function_reference:{auto target=functions.find(i.callee);if(target==functions.end())fail("worker has unknown native effect");graph.push_back(target->second);break;}
                 default:break;

@@ -1,5 +1,12 @@
 # Stage 9 owner-controlled native gate
 
+> Windows update, 21 October 2026: **CI #95 accepted Debug 160/160 and Release
+> 160/160 (320/320)** at `e25816bdb80e3f32613edf77c9cf3258232af966`.
+> The blocking Windows investigation is **RESOLVED**; see the
+> [permanent Windows record](WINDOWS_ENGINEERING_RECORD.md). The original snapshot/
+> broader gate below remains historical; no complete seven-job matrix or actual
+> second-volume pass is claimed here. Further CI remains Boss-controlled.
+
 21 October 2026. This is a requirement, not authorization to start hosted CI.
 Linux local results cannot establish Windows/macOS success or a hosted lock.
 The existing seven-job workflow and CI #87 path override remain intact.

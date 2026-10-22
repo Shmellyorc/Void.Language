@@ -10,6 +10,7 @@
 #include "void/frontend.hpp"
 #include "void/tooling.hpp"
 #include "void/numeric.hpp"
+#include "void/temporal_ops.hpp"
 #include "void/runtime_abi.hpp"
 #include "void/async.hpp"
 #include "void/native_binding.hpp"
@@ -542,7 +543,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         llvm::Value* failure = async?fn->getArg(1):f.module_identity.empty() && !input.coordinated ? nullptr : fn->getArg(static_cast<unsigned>(f.parameters.size()));
         llvm::Value* root_frame = nullptr;
         const bool deinit_body=f.receiver && (f.method_name=="deinit" || f.method_name.starts_with("deinit::$body$"));
+        const bool display_body=f.receiver && (f.method_name=="string" || f.method_name=="format");
         auto leave_frame = [&] {
+            if(display_body)b.CreateCall(module->getOrInsertFunction("vd_display_leave",b.getVoidTy()));
             if(deinit_body)b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_leave",b.getVoidTy()));
             if (input.coordinated) b.CreateCall(module->getOrInsertFunction("vd_gc_frame_leave", b.getVoidTy(), b.getPtrTy()), {root_frame});
         };
@@ -696,6 +699,15 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             frame->setAlignment(llvm::Align(alignof(Runtime::Frame))); root_frame = frame;
             b.CreateCall(module->getOrInsertFunction("vd_gc_frame_enter",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type),
                 {root_frame,root_array,llvm::ConstantInt::get(size_type,entries.size())});
+        }
+        if(display_body) {
+            llvm::Value* object=f.parameters[0].kind==ir::Type::managed_ref?static_cast<llvm::Value*>(fn->getArg(0)):llvm::ConstantPointerNull::get(b.getPtrTy());
+            b.CreateCall(module->getOrInsertFunction("vd_display_enter",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{b.CreateGlobalStringPtr(f.name),object,failure});
+            auto* invalid=llvm::BasicBlock::Create(context,"display_hook_error",fn);auto* ready=llvm::BasicBlock::Create(context,"display_hook_ready",fn);
+            b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),invalid,ready);b.SetInsertPoint(invalid);
+            // Entry failed before any source cleanup was reached or guard pushed.
+            b.CreateCall(module->getOrInsertFunction("vd_gc_frame_leave",b.getVoidTy(),b.getPtrTy()),{root_frame});b.CreateRet(llvm::Constant::getNullValue(type(f.result)));
+            blocks[0]=ready;b.SetInsertPoint(ready);
         }
         if(deinit_body)b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_enter",b.getVoidTy()));
         llvm::SwitchInst* resume_states=nullptr;unsigned resume_serial=0;
@@ -1149,6 +1161,58 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     else if (f.receiver && f.parameters[0].kind==ir::Type::aggregate && instruction.a == 0) v = b.CreateLoad(type(f.parameters[0]),fn->getArg(0));
                     else v = fn->getArg(instruction.a);
                     break;
+                case Op::string_join: {
+                    auto* storage=value_roots[n].at(values.size());
+                    auto* pointers=llvm::ArrayType::get(b.getPtrTy(),instruction.arguments.size());
+                    llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
+                    auto* inputs=home(allocations.CreateAlloca(pointers),StorageRole::known_abi,llvm_backend::HomeKind::value);
+                    for(unsigned k=0;k<instruction.arguments.size();++k)b.CreateStore(value_roots[n].at(instruction.arguments[k]),b.CreateInBoundsGEP(pointers,inputs,{b.getInt32(0),b.getInt32(k)}));
+                    b.CreateCall(module->getOrInsertFunction("vd_string_join",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type,b.getPtrTy()),{storage,inputs,llvm::ConstantInt::get(size_type,instruction.arguments.size()),failure});
+                    fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Interpolation failed");v=b.CreateLoad(b.getPtrTy(),storage);break;
+                }
+                case Op::format_unwrap: {
+                    auto result=values[instruction.a];auto* bad=llvm::BasicBlock::Create(context,"format_rejected",fn);auto* ready=llvm::BasicBlock::Create(context,"format_accepted",fn);
+                    b.CreateCondBr(b.CreateICmpEQ(b.CreateExtractValue(result,0),b.getInt32(0)),ready,bad);b.SetInsertPoint(bad);
+                    b.CreateCall(module->getOrInsertFunction("vd_display_error",b.getVoidTy(),b.getPtrTy(),b.getPtrTy()),{b.CreateExtractValue(result,2),failure});trace_failure();b.SetInsertPoint(ready);v=b.CreateExtractValue(result,1);break;
+                }
+                case Op::temporal_native: {
+                    const auto& contract=temporal::operations.at(instruction.immediate);
+                    auto* storage=value_roots[n].at(values.size());b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)),storage);
+                    auto* text=b.CreateStructGEP(type(instruction.type),storage,2);
+                    llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
+                    auto* words_type=llvm::ArrayType::get(b.getInt64Ty(),3);auto* words=home(allocations.CreateAlloca(words_type),StorageRole::known_abi,llvm_backend::HomeKind::value);
+                    b.CreateStore(llvm::Constant::getNullValue(words_type),words);
+                    auto* integers_type=llvm::ArrayType::get(b.getInt64Ty(),contract.arguments.size());auto* texts_type=llvm::ArrayType::get(b.getPtrTy(),contract.arguments.size());
+                    auto* integers=home(allocations.CreateAlloca(integers_type),StorageRole::known_abi,llvm_backend::HomeKind::value);auto* texts=home(allocations.CreateAlloca(texts_type),StorageRole::known_abi,llvm_backend::HomeKind::value);
+                    auto* empty=llvm::ConstantPointerNull::get(b.getPtrTy());
+                    for(unsigned k=0;k<contract.arguments.size();++k){auto* integer=b.CreateInBoundsGEP(integers_type,integers,{b.getInt32(0),b.getInt32(k)});auto* pointer=b.CreateInBoundsGEP(texts_type,texts,{b.getInt32(0),b.getInt32(k)});b.CreateStore(contract.arguments[k]=='t'?static_cast<llvm::Value*>(b.getInt64(0)):values[instruction.arguments[k]],integer);b.CreateStore(contract.arguments[k]=='t'?values[instruction.arguments[k]]:empty,pointer);}
+                    auto* valid=b.CreateCall(module->getOrInsertFunction("vd_temporal",b.getInt1Ty(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{text,words,b.getInt32(instruction.immediate),integers,texts,failure});
+                    auto* failed=llvm::BasicBlock::Create(context,"temporal_failed",fn);auto* ready=llvm::BasicBlock::Create(context,"temporal_ready",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),failed,ready);b.SetInsertPoint(failed);trace_failure();b.SetInsertPoint(ready);
+                    llvm::Value* payload=b.CreateLoad(b.getPtrTy(),text);auto value_type=ir::field_type(instruction.type,1);
+                    if(contract.result_words){payload=llvm::Constant::getNullValue(type(value_type));for(unsigned k=0;k<contract.result_words;++k){auto* word=b.CreateLoad(b.getInt64Ty(),b.CreateInBoundsGEP(words_type,words,{b.getInt32(0),b.getInt32(k)}));payload=contract.result_words==1?static_cast<llvm::Value*>(word):b.CreateInsertValue(payload,word,k);}}
+                    v=llvm::Constant::getNullValue(type(instruction.type));v=b.CreateInsertValue(v,b.CreateSelect(valid,b.getInt32(0),b.getInt32(1)),0);v=b.CreateInsertValue(v,b.CreateSelect(valid,payload,llvm::Constant::getNullValue(type(value_type))),1);v=b.CreateInsertValue(v,b.CreateSelect(valid,empty,b.CreateLoad(b.getPtrTy(),text)),2);break;
+                }
+                case Op::format_layout: {
+                    auto* storage=value_roots[n].at(values.size());b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)),storage);
+                    auto* payload=b.CreateStructGEP(type(instruction.type),storage,1);
+                    auto* valid=b.CreateCall(module->getOrInsertFunction("vd_format_layout",b.getInt1Ty(),b.getPtrTy(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{payload,values[instruction.a],b.getInt32(instruction.immediate),failure});
+                    fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Format layout failed");auto* text=b.CreateLoad(b.getPtrTy(),payload);auto* empty=llvm::ConstantPointerNull::get(b.getPtrTy());
+                    v=llvm::Constant::getNullValue(type(instruction.type));v=b.CreateInsertValue(v,b.CreateSelect(valid,b.getInt32(0),b.getInt32(1)),0);v=b.CreateInsertValue(v,b.CreateSelect(valid,text,empty),1);v=b.CreateInsertValue(v,b.CreateSelect(valid,empty,text),2);break;
+                }
+                case Op::scalar_display: case Op::scalar_format: {
+                    const bool formatted=instruction.op==Op::scalar_format;
+                    auto t=operand_type(instruction.a);auto* storage=value_roots[n].at(values.size());
+                    auto* empty=llvm::ConstantPointerNull::get(b.getPtrTy());
+                    llvm::Value* payload=storage;
+                    if(formatted){b.CreateStore(llvm::Constant::getNullValue(type(instruction.type)),storage);payload=b.CreateStructGEP(type(instruction.type),storage,1);}
+                    auto* valid=b.CreateCall(module->getOrInsertFunction("vd_scalar_display",b.getInt1Ty(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy(),b.getPtrTy(),b.getInt1Ty(),b.getPtrTy()),
+                        {payload,b.getInt32(t==ir::Type::string?11:scalar_encoding(t)),t==ir::Type::string?static_cast<llvm::Value*>(b.getInt64(0)):bits(values[instruction.a],t),t==ir::Type::string?values[instruction.a]:empty,formatted?values[instruction.b]:empty,b.getInt1(formatted),failure});
+                    fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Display operation failed");
+                    auto* text=b.CreateLoad(b.getPtrTy(),payload);
+                    if(formatted){v=llvm::Constant::getNullValue(type(instruction.type));v=b.CreateInsertValue(v,b.CreateSelect(valid,b.getInt32(0),b.getInt32(1)),0);v=b.CreateInsertValue(v,b.CreateSelect(valid,text,empty),1);v=b.CreateInsertValue(v,b.CreateSelect(valid,empty,text),2);}
+                    else v=text;
+                    break;
+                }
                 case Op::string_count: case Op::string_index: case Op::string_encode: case Op::string_decode: {
                     auto text_failure=[&]{fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),instruction.op==Op::string_index?"String index outside extent":"UTF-8 text operation failed");};
                     if(instruction.op==Op::string_count)v=b.CreateCall(module->getOrInsertFunction("vd_string_count",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getPtrTy()),{values[instruction.a],b.getInt32(instruction.immediate),failure});
@@ -1464,6 +1528,8 @@ Jit::Jit(DebugCache cache) : impl_(std::make_shared<Impl>()) {
         return std::move(object);
     });
     bind("vd_gc_frame_enter",vd_gc_frame_enter); bind("vd_gc_frame_leave",vd_gc_frame_leave);
+    bind("vd_temporal",vd_temporal);bind("vd_format_layout",vd_format_layout);bind("vd_display_enter",vd_display_enter);bind("vd_display_leave",vd_display_leave);bind("vd_display_error",vd_display_error);
+    bind("vd_scalar_display",vd_scalar_display);bind("vd_string_join",vd_string_join);
     bind("vd_string_count",vd_string_count);bind("vd_string_index",vd_string_index);bind("vd_string_encode",vd_string_encode);bind("vd_string_decode",vd_string_decode);
     bind("vd_string_literal",vd_string_literal); bind("vd_string_concat",vd_string_concat); bind("vd_string_equal",vd_string_equal);
     bind("vd_array_default",vd_array_default);bind("vd_array_copy",vd_array_copy);

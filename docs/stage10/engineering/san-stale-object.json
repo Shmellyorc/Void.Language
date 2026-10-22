@@ -1,0 +1,5 @@
+{
+  "source_mtime_ns": 1792654671764889530,
+  "object_mtime_ns": 1792654717008818227,
+  "cause": "Compiler source was edited while the earlier sanitizer compilation was running; object completion time hid the stale parsed source. Strict compound-init fixture exposed the stale object. Rebuild only this generated object from final bytes."
+}

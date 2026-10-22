@@ -184,7 +184,8 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             if(e.kind==K::spawned){edges.spawns.insert(&e);edges.unsafe=true;}
             if(e.kind==K::awaited || e.kind==K::task_cancel || e.kind==K::function_call || e.asynchronous_call || e.interface_call || !e.virtual_slot.empty())edges.unsafe=true;
             if(e.kind==K::function_reference)edges.calls.insert(e.target);
-            if((e.kind==K::call || e.kind==K::method_call) && !functions.contains(e.target) && !e.target.starts_with("$array.") && !e.target.starts_with("$dict."))edges.unsafe=true;
+            if(e.target.starts_with("$time.") && temporal::operations.at(std::stoul(e.target.substr(6))).clock)edges.unsafe=true;
+            if((e.kind==K::call || e.kind==K::method_call) && !functions.contains(e.target) && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.") && !e.target.starts_with("$time.") && !e.target.starts_with("$layout.") && !e.target.starts_with("$display.") && e.target!="$interpolation" && e.target!="$hole")edges.unsafe=true;
             auto view=ir::reference_facts(e.type);
             if(e.kind==K::spawned)frontend_case([&] {auto result=expression(*e.parts[0]);view=ir::replaced_facts(view,1,result);
             }); else if(e.kind==K::awaited)frontend_case([&] {
@@ -240,7 +241,13 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             else if (e.kind==K::field) frontend_case([&] {
                 auto base=expression(*e.parts[0]);
                 if(e.target!="$array.count" && e.target!="$dict.count" && !e.target.starts_with("$text."))view=ir::field_facts(e.parts[0]->type,base,e.slot);
-            }); else if (e.kind==K::conversion) view=expression(*e.parts[0]);
+            }); else if (e.kind==K::conversion) {
+                view=expression(*e.parts[0]);
+                if(e.op=="interface")for(const auto& [id,root]:units)if(root->member_catalog) {
+                    for(const auto& binding:root->member_catalog->interface_bindings)if(binding.key==e.target && ir::binding_requires_readonly(binding))view[{}].readonly=true;
+                    break;
+                }
+            }
             else if (e.kind==K::call || e.kind==K::method_call) frontend_case([&] {
                 std::vector<ReferenceFacts> arguments;
                 for (auto& part:e.parts) arguments.push_back(expression(*part));
@@ -263,6 +270,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                         if(report && leaf->second.readonly)issue(e.token,"Cannot mutate a readonly list.");
                     }
                 }
+                if(!e.display_adapter.empty())invoke(e,e.display_adapter,arguments);
                 if(functions.contains(e.target)) {
                     if(!e.argument_indexes.empty()) {auto ordered=arguments;const unsigned first=e.kind==K::method_call?1:0;for(unsigned n=first;n<arguments.size();++n)ordered[first+e.argument_indexes[n-first]]=arguments[n];arguments=std::move(ordered);}
                     view=invoke(e,e.target,arguments);
@@ -484,6 +492,12 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         if(f.accessor==1 && (f.receiver_mutates || std::any_of(f.reference_effects.mutations.begin(),f.reference_effects.mutations.end(),[](const auto& o){return o.parameter==0;}))) {
             try {error(u->source,f.token,Code::readonly,"A property getter cannot mutate its receiver.");}
             catch(const CompilationError& failure){diagnostics.add(failure);}
+        }
+        if(f.receiver && !f.interface_requirement && (f.token.text=="string" || f.token.text=="format")) {
+            bool signature=f.token.text=="string" ? f.parameters.empty() && f.result==Type::string : f.parameters.size()==1 && f.parameters[0].type==Type::string && f.result.definition && f.result.definition->result_type && ir::field_type(f.result,1)==Type::string && ir::field_type(f.result,2)==Type::string;
+            bool mutating=f.receiver_mutates;
+            for(const auto* effects:{&f.reference_effects.mutations,&f.reference_effects.required_mutable})for(const auto& origin:*effects)mutating|=origin.parameter==0;
+            if(!signature || f.asynchronous || mutating)try{error(u->source,f.token,Code::readonly,"A display hook must have an exact synchronous string/format signature and a nonmutating readonly receiver.");}catch(const CompilationError& failure){diagnostics.add(failure);}
         }
         if(f.interface_requirement) {f.result=ir::fact_type(f.result,f.reference_effects.returned);f.receiver_mutates=std::any_of(f.reference_effects.mutations.begin(),f.reference_effects.mutations.end(),[](const auto& origin){return origin.parameter==0;});}
         auto origin=[](const ReferenceOrigin& value) {

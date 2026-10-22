@@ -1,0 +1,60 @@
+{
+  "status": "INCOMPLETE",
+  "baseline_head": "e25816bdb80e3f32613edf77c9cf3258232af966",
+  "checks": {
+    "fields": 54,
+    "numeric": 18663,
+    "source_conversion": 78,
+    "interpolation": 57
+  },
+  "debug": {
+    "passed": 11,
+    "total": 11,
+    "seconds": 16.57,
+    "log": "display-final-accepted.log",
+    "later_targeted_checks": [
+      "display-field-integration-aot.log",
+      "display-lsp-final.log",
+      "display-small-stack.log",
+      "display-neighbor-lsp2.log"
+    ]
+  },
+  "release": {
+    "passed": 5,
+    "total": 5,
+    "seconds": 2.13,
+    "log": "display-release-final.log"
+  },
+  "strict_sanitizers": {
+    "passed": 5,
+    "total": 5,
+    "seconds": 5.12,
+    "log": "display-san-final.log",
+    "asan": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "ubsan": "halt_on_error=1:print_stacktrace=1",
+    "execution": "outside sandbox ptrace"
+  },
+  "source_scope": "Debug includes final compiler-only intrinsic-reference metadata fix. Release/sanitizers verify primitive parsing, IR, LLVM and Runtime before that metadata-only fix. Full final stage acceptance remains open.",
+  "vscode": {
+    "version": "1.141.0",
+    "unit": "display-editor-unit-final.log",
+    "typecheck": "editor-typecheck4.log",
+    "native_profiles": [
+      "trusted",
+      "untrusted",
+      "multi-root"
+    ],
+    "native_log": "vscode-host-native3.log",
+    "scope": "native profiles passed before final intrinsic-reference metadata fix; stdio rename regression passes afterward"
+  },
+  "neovim": {
+    "version": "0.13.0-dev-1410+g510f61555b",
+    "log": "neovim-final.log",
+    "scope": "final metadata fix verified: field/display/interpolation, rename, dirty repair and multiline syntax"
+  },
+  "vim": "actual Vim binary unavailable; system vim is Neovim; targeted Vim9 script saved but not executed successfully",
+  "native_windows": "not available / not executed",
+  "native_macos": "not available / not executed",
+  "whole_stage_suite": "not run; Stage 10 not complete",
+  "git_hosted_publication": "not performed"
+}

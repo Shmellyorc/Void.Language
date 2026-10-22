@@ -76,9 +76,12 @@ output and call the existing `publish()` unchanged: cross-volume copying precede
 same-parent atomic replacement, with no COPY_ALLOWED fallback. Owned temporary
 paths are removed on success/ordinary failure. Locked destination, failed copy,
 compile, link or permission checks preserve the previous executable. No global
-cwd change or shell expansion occurs. [CI #90 implementation, security invariants
-and pending native acceptance](stage9/CI90_WINDOWS_NATIVE_LINK_REPAIR.md) is the
-current Windows record; Linux success does not resolve its Windows gate.
+cwd change or shell expansion occurs. The [permanent Windows engineering record](stage9/WINDOWS_ENGINEERING_RECORD.md)
+records CI #95 native acceptance at `e25816bdb80e3f32613edf77c9cf3258232af966`:
+Windows Debug/Release 160/160 each, 320/320 combined. The blocking investigation
+is RESOLVED; [CI #90's original implementation/evidence](stage9/CI90_WINDOWS_NATIVE_LINK_REPAIR.md)
+remains historical. Actual second-volume transfer and a complete seven-job matrix
+are not claimed by this acceptance.
 
 CMake generates `void-native.txt` beside the actual voidc target, using target-file
 generator expressions (including multi-configuration paths). It lists the pinned

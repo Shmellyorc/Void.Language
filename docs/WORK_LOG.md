@@ -1,5 +1,53 @@
 # Work log
 
+## Stage 10 complete-system research — 21 October 2026
+
+Prepared [the design and 44-step roadmap](STAGE10_DESIGN.md) against source baseline
+`e25816bdb80e3f32613edf77c9cf3258232af966`, preserving the existing Stage 9 worktree
+documentation. Four complete systems are specified: console/terminal I/O, shared
+display/formatting/interpolation with usable temporal values, private/readonly
+fields and owner-contained operators. Six supporting documents record behavior,
+source/external evidence, original local VOID console lessons and focused tests.
+
+The package distinguishes implemented foundations from proposals and identifies
+four Boss decision bundles. Documentation checks only; compiler/runtime/editor
+tests were not run. No production/test/root README edits, builds, Git mutations or
+hosted CI. Research stops for Wrench review and Boss authorization.
+
+## CI #95 Windows Stage 9 acceptance: RESOLVED — 21 October 2026
+
+Verified baseline `e25816bdb80e3f32613edf77c9cf3258232af966`,
+[Compiler Foundation CI #95](https://github.com/Shmellyorc/Void.Language/actions/runs/39724345062).
+Windows Release job `119644734324` and Debug job `119644734222` each completed
+successfully with **160/160**, zero failures: **320/320 combined Windows acceptance**.
+`application_workflow_stage9`, `native_output_paths_ci88` and
+`long_physical_paths_ci89` passed in both. This resolves the blocking Windows
+Stage 9 compiler/linker/test-harness investigation; no complete seven-job matrix
+success is claimed.
+
+The last engineering correction, between CI #94 and #95, changed only the fake
+Clang helper to wmain and production-equivalent once-only UTF-8 argv conversion.
+CI #94 still had 159/160 in both Windows configurations after private-root checks
+passed; its fake-tool Unicode failure is preserved alongside earlier CI #88–#93
+history. CI #95 confirms the repaired helper's deliberate malformed-PE/copy-failure
+cases, genuine deep launches, ACL fixture admission, reservations and preservation
+assertions through native workflow acceptance.
+
+[One permanent Windows engineering record](stage9/WINDOWS_ENGINEERING_RECORD.md)
+now owns the chronology, architecture and future guardrails. [Acceptance metadata](stage9/CI95_WINDOWS_ACCEPTANCE.json)
+links the two exact native test ZIPs, matching GitHub SHA-256 digests, 160 passing
+log markers each, source hashes, measured reservations and actual SDDL. Earlier
+repair reports receive current RESOLVED banners while their original bodies and
+historical evidence stay intact. Wrench handoff and workflow/index links point to
+the consolidated record.
+
+This documentation task performed read-only native evidence retrieval and document/
+hash/link checks; no compiler builds, test suites or hosted CI were started. Actual second-volume
+transfer remains unverified, explicitly reported pending by both native logs.
+The full seven-job matrix and independent Boss/Wrench review of this record are
+not claimed. No production/test/root README change, commit, push or branch.
+
+
 ## CI #93 temporary-root fixture repair — 21 October 2026
 
 Baseline `a6405689399019969f2dd6f76dd8434c097431cd`. Both native Windows jobs
@@ -14447,3 +14495,164 @@ retained in [the repair evidence](stage8/CI86_INCOMPLETE_SOURCE_REPAIR.md).
 Updated index, approvals, Wrench and final hosted checklist. Native Windows editor
 verification and Wrench review remain pending. No hosted action, commit/push/branch,
 root README or website change, or Stage 9 work. Stage 8 remains not hosted locked.
+
+
+## 21 October 2026 — Stage 10 full implementation authorized and started
+
+Boss authorized all 44 steps and B1–B4, including remainder overloads, immediate
+CR line completion and conservative cursor-response ownership. Recorded the
+superseding approvals in Stage 10 contracts and DECISIONS. Existing dirty Stage 9
+records and artifacts are preserved. No Git mutation/hosted action/root README edit.
+
+Focused pre-edit baseline: `ctest --test-dir build/ci-official-debug -R
+'^(frontend|numeric|composition|inheritance|reference_values|managed_initialization|properties|stage8_sprint6|stage9_workflow)$'
+--output-on-failure` selected only **numeric and frontend**, both passed (2/2,
+13.20 seconds). Other regex names did not select tests and are not counted.
+LLVM cache pins 19.1.7. `rg` is unavailable; using grep/find.
+
+Pinned dependency archives downloaded to /tmp/void-stage10-deps after sandbox DNS
+failure; authorized network execution succeeded. Dependency feasibility and
+production implementation are in progress, not accepted or complete.
+
+
+## 22 October 2026 — Stage 10 field core and native formatting dependencies
+
+The entire 44-step order remains active and authorized. **Stage 10 is incomplete.**
+[Permanent progress and open obligations](stage10/IMPLEMENTATION.md) records every
+roadmap step and completeness-matrix row; this is not a reduced mission or a new
+authorization gate. No independent Wrench review or release readiness is claimed.
+
+Implemented stored private/internal/public/const metadata, lexical owner/closure
+context, shared selection, constructor/pattern privacy, deep readonly projections
+and direct own-init grants (including builtin compound assignment). Extended
+existing independent IR/capability/construction checks and exact compatibility.
+Const promoted components produce readonly interface views rather than gaining
+mutable authority. Compiler-owned completion/hover and dirty-document rejection
+use the same field policy. Source field diagnostics retain declaration locations.
+
+Added an LLVM-free checked owned-byte builder and numeric plan/kernel shared as
+object code by existing core/Runtime archives. The native kernel covers all ten
+numeric tags, exact ties-to-even/percent scaling, patterns/aliases/grouping/signs,
+bases, scientific notation and scalar alignment, with checked extents and no new
+precision ceiling. Owned alignment avoids a redundant full output copy. Source
+conversion, interpolation/constant consumers and custom hooks are not connected.
+
+Verified pinned Ryu/date and IANA 2026e integration using actual downloaded bytes.
+The small date reader adaptation uses compiled-in data, with OS/remote loading
+disabled and no sidecar rules file. Embedded notices and installed license files
+retain the selected Boost/MIT/public-domain obligations. Exact archive/source
+hashes and commands/logs are under docs/stage10/engineering/. Native parser checks
+cover 344 zones, 253 links, 1,720 calendar projections, gaps/overlaps and historical
+second offsets; they do not establish source temporal APIs.
+
+Focused Linux outcomes: Debug **17/17**, Release **3/3**, strict ASan/UBSan/leaks
+**4/4**, plus final targeted numeric refinements, 1 MiB stack checks and byte-identical
+source/vector regeneration. Native field source tests include normal/O2 JIT and
+independently linked AOT; stdio LSP checks cover valid, invalid dirty and repaired
+field documents. Current harnesses contain 54 field checks and 18,663 native
+numeric checks. These are focused results, not the complete Stage 10 matrix.
+Native Windows/macOS and fresh actual editor acceptance remain unexecuted.
+
+Preserved all failed engineering attempts: missing baseline properties executable
+was built; early dependency-header and UTF-8 embedding guesses were corrected;
+original construction receiver capture and slot-vs-SSA private-commit checking
+were repaired. A const interface fixture initially violated the existing global
+retention summary and was corrected to a nonretaining requirement. The unchanged
+inheritance malformed-IR test reached readonly rejection earlier; its production
+diagnostic now names that authority. LeakSanitizer's sandbox ptrace fatal errors
+were resolved by running the same strict checks outside ptrace, not disabling
+protections. A stale sanitizer frontend object from an overlapping source edit
+was removed/rebuilt; premature and unsuccessful reruns remain in the logs.
+
+Still unimplemented: console/terminal APIs and print; all source display/format
+consumers, complete interpolation and hooks; source temporal values/clocks/zone
+APIs/formats; owner operators including remainder, captured custom compounds and
+recursive custom-equality key exclusion; remaining full tooling/cache/reload and
+acceptance work. No missing feature is disguised as unsupported hardware or
+placed in KNOWN_ISSUES. Dependency feasibility revealed no architecture blocker.
+
+Stage 9 Windows source corrections and pre-existing evidence are preserved. No
+commit, push, branch creation, hosted CI, publication or root README edit occurred.
+The already-authorized mission should continue from the engineering record.
+
+### Stage 10 continued integration — primitive source display/interpolation
+
+Connected numeric/bool/string conversion and formatting to the shared kernel,
+constant evaluator, typed IR/LLVM/Runtime, result error handling and compiler-owned
+metadata. Interpolation now accepts typed expressions/specs, triple literal text,
+multiline holes, comments and parenthesized bodies, preserving source offsets and
+written evaluation order. A single checked builder joins rooted converted parts.
+Focused Debug checks passed 9/9 (14.83s); Release checks passed 5/5 (1.86s).
+New stdio LSP and actual Neovim field/display/interpolation checks pass. VS Code
+unit/typecheck passes; native host and strict sanitizer verification are ongoing.
+The shell has no npm/node on PATH; installed bundled Node ran the local tooling.
+The system vim command is Neovim, so it cannot execute the Vim9 acceptance script.
+No completed Stage 10 claim: console, source temporal APIs, operators, composite
+and custom display, and full acceptance remain open.
+
+Stage 10 display integration verification resolved: Debug 11/11 (16.57s), Release
+5/5 (2.13s), strict sanitizers/leaks 5/5 (5.12s). Added 78 source conversion checks,
+57 interpolation checks, combined private const + display native AOT, a working
+example and 1 MiB-stack verification. Native VS Code 1.141.0 trusted/restricted/
+multi-root profiles and actual Neovim pass. Fixed a confirmed metadata defect:
+compiler-only interpolation calls had written references without declarations,
+blocking guarded rename. Final Debug stdio rename passes; Release/sanitizer runs
+precede only that metadata fix (exact scope in engineering/results.json). Initial
+stress fixture incorrectly used while; corrected to existing for syntax. Native
+VS Code first failed sandbox startup, then test serialization of MarkdownString
+as {}; direct value access fixed the test. Actual Vim unavailable (vim is Neovim).
+All prior failed attempts remain in evidence; entire Stage 10 remains incomplete.
+
+### Stage 10 continuation — nominal/custom display hooks (22 October 2026)
+
+Added ordinary compiler-owned display adapters for nominal, nullable and opaque
+reference values, exact readonly hooks, shared alignment and interpolation. Added
+per-thread hook recursion guards at actual generated hook entry and owned rejection
+messages. Fixed worker diagnostic retention so failing deferred formatting preserves
+both primary and cleanup errors. Whole unfinished-self display is rejected by
+construction analysis; independent IR rejects construction hook receivers. Debug
+normal/O2 focused hook suite passes 59 checks. Other Stage 10 systems and final
+acceptance remain open; see `stage10/IMPLEMENTATION.md`. No Git/publication action.
+
+### Stage 10 continuation — temporal APIs, hook identity and editor recovery
+
+Implemented the native temporal kernel and `use time` source library over the
+already pinned date/IANA dependencies. Private const values/factories cover date,
+time, local datetime, full-i64-second instant, offset, duration, canonical zones
+and zoned values. Arithmetic checks seconds/fractions without an i64-nanosecond
+range restriction. Zone overlap choice is explicit, gaps reject, historical second
+offsets survive. Temporal hooks and literal diagnostics share the runtime grammar.
+UTC/native resolution and per-Runtime monotonic sampling use native clocks;
+resolution is not an accuracy claim. The typed native bridge validates operations,
+copies inputs before NativeSafe and roots outputs afterward. Pure formatting is
+worker-safe; clocks remain prohibited in worker graphs.
+
+Compiler/tooling installations now include standard sources and notices and find
+them relative to the executable (explicit override first). Embedded rules need no
+sidecar. Added installed relocation/native executable packaging tests. Integration
+exposed a real display cache collision: readonly capability keys omit type identity.
+Adapter and prelude keys now include exact nominal kind/identity and nullability.
+Mixed-owner/nullability regressions extend hooks to 77 checks. Hook reload tests
+verify ordinary dependency edges, retained generations and incompatible visibility.
+
+Step 39 fixes incomplete conditional calls and comments while preserving source
+spans inside interpolation. Editor delimiter repair and source formatting use the
+existing lexer in physical-string mode, avoiding synthetic interpolation parentheses.
+Property getter completions and numeric contextual hints use declared result types.
+Added stdio LSP and native Neovim temporal API/navigation/privacy checks. See
+`stage10/IMPLEMENTATION.md` and engineering/results.json for exact final check scope.
+
+Owner clarified that bounded sequential engineering turns are expected; next step
+is 32 operator declaration metadata/parser, including remainder. No operator code
+has landed. Composite display, console/terminal and remaining integration remain
+open; Stage 10 is incomplete. No Git, hosted CI or publication action.
+
+Final current-source focused checkpoint: Debug 16/16 (53.35 s), Release 16/16
+(28.82 s), strict ASan/UBSan/leak 16/16 (53.71 s; outside ptrace). Includes 1,308
+temporal core, 132 display dependency/reload, 8 malformed temporal IR/worker,
+77 hooks and 23 temporal source JIT/O2/AOT/rejection checks. Installed relocation
+1/1 (3.49 s; 12 internal checks) and native Neovim pass. Final builds report no
+compiler warnings/errors; git diff --check passes. Exact raw logs/source hashes
+are saved under stage10/engineering. These are focused checks, not the complete
+Stage 10 suite. Native Windows/macOS/genuine Vim and latest native VS Code remain
+unverified. Next bounded task is step 32; completed source is preserved.

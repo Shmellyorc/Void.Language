@@ -1,14 +1,31 @@
 #include "void/runtime_abi.hpp"
 #include "void/async.hpp"
+#include "void/format.hpp"
 #include <new>
 #include <stdexcept>
 namespace vd {
+void Runtime::display_enter(std::string_view hook,void* identity) {
+    auto& active=thread().display_hooks;
+    if(active.size()>=64)throw std::length_error("Display hook nesting limit exceeded");
+    if(identity)for(const auto& invocation:active)if(invocation.first==hook && invocation.second==identity)throw std::logic_error("Recursive display hook");
+    active.emplace_back(hook,identity);
+}
+void Runtime::display_leave() noexcept {
+    if(!current_thread_ || current_thread_->display_hooks.empty())std::terminate();
+    current_thread_->display_hooks.pop_back();
+}
 Runtime& Runtime::current() {
     if (!current_runtime_) throw std::logic_error("generated code has no runtime attachment");
     return *current_runtime_;
 }
 }
 namespace {
+#define VD_DISPLAY_ENCODING(name) static_assert(static_cast<unsigned>(vd::ScalarEncoding::name)==static_cast<unsigned>(vd::formatting::NumberKind::name))
+VD_DISPLAY_ENCODING(i8);VD_DISPLAY_ENCODING(i16);VD_DISPLAY_ENCODING(i32);VD_DISPLAY_ENCODING(i64);
+VD_DISPLAY_ENCODING(u8);VD_DISPLAY_ENCODING(u16);VD_DISPLAY_ENCODING(u32);VD_DISPLAY_ENCODING(u64);
+VD_DISPLAY_ENCODING(f32);VD_DISPLAY_ENCODING(f64);
+#undef VD_DISPLAY_ENCODING
+static_assert(static_cast<unsigned>(vd::ScalarEncoding::boolean)==10);
 std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses=nullptr,std::size_t witness_count=0) noexcept {
     try {
         vd::Runtime runtime(256);
@@ -37,6 +54,58 @@ void construct(void** slot,std::size_t size,const std::size_t* offsets,std::size
 }
 }
 extern "C" {
+void vd_display_enter(const char* hook,void* identity,vd::RuntimeFailure* failure) noexcept {
+    try{vd::Runtime::current().display_enter(hook,identity);}
+    catch(const std::length_error&){failure->message="Display hook nesting limit exceeded";}
+    catch(const std::logic_error&){failure->message="Recursive display hook";}
+    catch(const std::bad_alloc&){failure->message="Display hook tracking allocation failed";}
+    catch(...){std::terminate();}
+}
+void vd_display_leave() noexcept {vd::Runtime::current().display_leave();}
+void vd_display_error(void* text,vd::RuntimeFailure* failure) noexcept {
+    try {auto bytes=vd::Runtime::current().string_bytes(text);std::string message="Format rejected: ";
+        for(char byte:bytes)if(byte)message+=byte;else message+="\\0";
+        vd::RuntimeFailure rejected;rejected.message=message.c_str();vd::retain_native_failure(rejected,failure);
+    }catch(const std::bad_alloc&){failure->message="Format error retention allocation failed";}
+    catch(const std::length_error&){failure->message="Format error extent is unrepresentable";}
+    catch(...){std::terminate();}
+}
+bool vd_scalar_display(void** out,unsigned encoding,std::uint64_t bits,void* source,void* specification,bool formatted,vd::RuntimeFailure* failure) noexcept {
+    try {
+        auto& runtime=vd::Runtime::current();std::string rendered;bool valid=true;
+        try {
+            // All borrows are consumed into owned bytes before managed allocation.
+            auto spec=formatted?runtime.string_bytes(specification):std::string_view{};
+            if(encoding<10)rendered=vd::formatting::number({static_cast<vd::formatting::NumberKind>(encoding),bits},spec);
+            else if(encoding==10)rendered=vd::formatting::text(bits?"true":"false",spec);
+            else if(encoding==11)rendered=vd::formatting::text(runtime.string_bytes(source),spec);
+            else throw std::invalid_argument("Invalid display scalar encoding");
+        }catch(const vd::formatting::Error& error){if(!formatted)throw;valid=false;rendered=error.what();}
+        runtime.string_into(out,rendered);return valid;
+    }catch(const std::bad_alloc&){failure->message="Display allocation failed";}
+    catch(const std::length_error&){failure->message="Display extent is unrepresentable";}
+    catch(const std::exception&){failure->message="Invalid display operation";}
+    catch(...){std::terminate();}return false;
+}
+bool vd_format_layout(void** out,void* specification,unsigned part,vd::RuntimeFailure* failure) noexcept {
+    try {auto& runtime=vd::Runtime::current();std::string result;bool valid=true;
+        try{auto spec=runtime.string_bytes(specification);auto layout=vd::formatting::split_layout(spec);
+            auto view=part?spec.substr(0,layout.pattern_offset):layout.pattern;if(part && view.ends_with('|'))view.remove_suffix(1);result=view;
+        }catch(const vd::formatting::Error& error){valid=false;result=error.what();}
+        runtime.string_into(out,result);return valid;
+    }catch(const std::bad_alloc&){failure->message="Format layout allocation failed";}
+    catch(const std::length_error&){failure->message="Format layout extent is unrepresentable";}
+    catch(...){std::terminate();}return false;
+}
+void vd_string_join(void** out,void*** roots,std::size_t count,vd::RuntimeFailure* failure) noexcept {
+    try {auto& runtime=vd::Runtime::current();vd::formatting::Builder builder;
+        for(std::size_t i=0;i<count;++i)builder.append(runtime.string_bytes(*roots[i]));
+        auto owned=std::move(builder).finish();runtime.string_into(out,owned);
+    }catch(const std::bad_alloc&){failure->message="Interpolation allocation failed";}
+    catch(const std::length_error&){failure->message="Interpolation extent is unrepresentable";}
+    catch(const std::exception&){failure->message="Invalid interpolation storage";}
+    catch(...){std::terminate();}
+}
 std::uint64_t vd_string_count(void* source,unsigned bytes,vd::RuntimeFailure* failure) noexcept {
     try{return vd::Runtime::current().string_count(source,bytes!=0);}
     catch(const std::exception&){failure->message="Invalid UTF-8 string storage";}catch(...){std::terminate();}return 0;

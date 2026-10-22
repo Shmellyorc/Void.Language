@@ -1,5 +1,14 @@
 # CI #89 — Windows long-path investigation and manual probe
 
+> **Current Windows status: RESOLVED by CI #95**, at
+> `e25816bdb80e3f32613edf77c9cf3258232af966`: Debug 160/160 and Release 160/160.
+> [Permanent engineering record and verified evidence](WINDOWS_ENGINEERING_RECORD.md)
+> supersede the earlier pending Windows acceptance statements below. Original
+> failures, local results and evidence remain historical; coverage limits and
+> independent Boss/Wrench review are recorded in the current reference.
+
+## Original engineering record (historical)
+
 > Historical preparation record. Boss subsequently ran native diagnosis #1;
 > error 3 and the manifest correction are now confirmed. See the
 > [production repair and current gate](CI89_WINDOWS_MANIFEST_REPAIR.md).

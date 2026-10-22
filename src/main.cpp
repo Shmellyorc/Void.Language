@@ -2,6 +2,7 @@
 #include "void/frontend.hpp"
 #include "void/path.hpp"
 #include "void/native_build.hpp"
+#include <llvm/Support/FileSystem.h>
 #include <cerrno>
 #include <cstdlib>
 #include <iostream>
@@ -19,6 +20,7 @@ std::int32_t input(const char* text) {
 }
 static int run_cli(int argc, char** argv) {
     try {
+        vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli))));
         for(int i=1;i<argc;++i)if(std::string(argv[i])=="--app")throw UsageError("--app has been removed; entry selection is automatic.");
         if(argc==3 && std::string(argv[1])=="--emit-proof") {
             vd::emit_object(vd::ir::architecture_proof(),vd::utf8_path(argv[2]),true);

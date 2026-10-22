@@ -1,7 +1,9 @@
 #pragma once
 #include "void/ir.hpp"
+#include "void/format.hpp"
 #include <string>
 namespace vd::numeric {
+formatting::Number display_number(std::uint64_t, ir::Type);
 bool integer(ir::Type);
 bool floating(ir::Type);
 bool signed_integer(ir::Type);

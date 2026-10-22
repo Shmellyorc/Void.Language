@@ -48,7 +48,13 @@ struct FieldType {
     FieldType(Type t);
     operator Type() const;
 };
-struct ValueField { std::string name; FieldType type; std::string owner = {}; bool using_field = false, event = false; };
+struct ValueField {
+    std::string name; FieldType type; std::string owner = {};
+    bool using_field = false, event = false;
+    std::string visibility = "public";
+    bool readonly = false;
+    std::size_t source_offset = 0;
+};
 struct SumCase { std::string name; unsigned begin=0, count=0; };
 struct ValueType {
     std::string identity, name;
@@ -118,7 +124,7 @@ std::uint64_t checked_array_index(std::uint64_t bits, Type index, std::uint64_t 
 enum class Op { bitcast, native_call, async_cancel_children, async_cancel, async_group_enter, async_group_join, async_drain, async_call, await, gc_release, cleanup_call, function_reference, function_call, function_null, sum, sum_get, pattern_equal, type_test, type_cast, panic, argument, constant, add, multiply, less, call, subtract, divide,
     remainder, equal, not_equal, less_equal, greater, greater_equal, logical_not, load, store, convert, negate, aggregate, extract, insert,
     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
-    upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal, string_count, string_index, string_encode, string_decode,
+    upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal, string_count, string_index, string_encode, string_decode, scalar_display, scalar_format, format_unwrap, format_layout, temporal_native, string_join,
     fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry };
 // A validated local aggregate storage path; never a source-visible reference.
 struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
@@ -161,6 +167,7 @@ struct Function {
     // Private scalar owned-value proof; source/native activation is separate.
     bool fixed_ownership = false;
     std::string display_name = {}; // Debug/diagnostic spelling, independent of native identity.
+    std::string lexical_owner = {}, lexical_parent = {};
 };
 struct Module {
     std::string identity;
@@ -198,12 +205,14 @@ struct MemberSelection {
     std::string method;
     std::vector<std::pair<std::vector<unsigned>,std::string>> candidates;
 };
-MemberSelection select_member(const Module&,Type,std::string_view,std::string_view scope,std::size_t* work=nullptr);
+bool field_accessible(const Module&,Type,unsigned,std::string_view scope,std::string_view lexical_owner = {});
+MemberSelection select_member(const Module&,Type,std::string_view,std::string_view scope,std::size_t* work=nullptr,std::string_view lexical_owner = {});
 bool method_accessible(const Module&,const Function&,std::string_view scope);
 void satisfy_constraint(const Module&,Type,Type,std::string_view scope);
 Module::Binding structural_binding(const Module&,Type,Type,std::string_view scope,std::size_t* work=nullptr);
 std::vector<Module::Binding> interface_universe(const Module&);
 std::string binding_key(const Module::Binding&);
+bool binding_requires_readonly(const Module::Binding&);
 struct VirtualTarget { Type dynamic_type; std::string implementation; };
 std::vector<VirtualTarget> virtual_targets(const Module&,const Function&);
 std::string construction_name(const std::string& symbol, const std::vector<unsigned>& parameters);

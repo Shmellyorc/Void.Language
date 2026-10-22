@@ -1,0 +1,87 @@
+{
+  "status": "INCOMPLETE",
+  "baseline_head": "e25816bdb80e3f32613edf77c9cf3258232af966",
+  "checkpoint": "Sequential implementation: nominal/custom hooks, temporal APIs, step 39 editor recovery. Next bounded step 32 operator declaration metadata/parser, including %. No operator implementation landed.",
+  "checks": {
+    "fields": 54,
+    "numeric": 18663,
+    "source_conversion": 78,
+    "interpolation": 57,
+    "nominal_custom_hooks": 77,
+    "temporal_core": 1308,
+    "temporal_ir_workers": 8,
+    "display_dependencies_reload": 132,
+    "source_temporal_jit_aot_rejection": 23,
+    "field_jit_aot": 16,
+    "source_display_jit_aot": 16,
+    "installed_relocation_packaging": 12
+  },
+  "debug": {
+    "passed": 16,
+    "total": 16,
+    "seconds": 53.35,
+    "log": "hooks-time-debug-tests.log",
+    "detail": "hooks-time-debug-detail.log"
+  },
+  "release": {
+    "passed": 16,
+    "total": 16,
+    "seconds": 28.82,
+    "log": "hooks-time-release-tests.log",
+    "detail": "hooks-time-release-detail.log"
+  },
+  "strict_sanitizers": {
+    "passed": 16,
+    "total": 16,
+    "seconds": 53.71,
+    "log": "hooks-time-san-tests.log",
+    "detail": "hooks-time-san-detail.log",
+    "asan": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "ubsan": "halt_on_error=1:print_stacktrace=1",
+    "execution": "outside sandbox ptrace; final current-source build"
+  },
+  "installed_relocation": {
+    "passed": 1,
+    "total": 1,
+    "seconds": 3.49,
+    "log": "hooks-time-current-install-tests.log",
+    "scope": "compiler/tooling install relocated to Unicode/spaced prefix, installed stdlib import proof and LSP, standalone native executable with embedded historical zone rules"
+  },
+  "source_scope": "Latest production source rebuilt before Debug/Release/strict sanitizer checks. Normal/O2 JIT and native AOT included. Sanitizers instrument C++ compiler/Runtime, not emitted application code to the same extent. Focused scope only; entire Stage 10 remains incomplete.",
+  "neovim": {
+    "version": "0.13.0-dev-1410+g510f61555b",
+    "log": "hooks-time-time-neovim-test2.log",
+    "scope": "native headless field/display/interpolation/rename/dirty recovery plus time API/property completion/privacy and installed stdlib navigation"
+  },
+  "vscode": {
+    "version": "1.141.0",
+    "unit": "display-editor-unit-final.log",
+    "typecheck": "editor-typecheck4.log",
+    "native_profiles": [
+      "trusted",
+      "untrusted",
+      "multi-root"
+    ],
+    "native_log": "vscode-host-native3.log",
+    "scope": "historical primitive checkpoint only; nominal/custom/temporal and latest editor changes not natively verified"
+  },
+  "vim": "actual Vim binary unavailable; system vim is Neovim; targeted Vim9 script saved but not executed successfully",
+  "native_windows": "not available / not executed",
+  "native_macos": "not available / not executed",
+  "failed_development_attempts": [
+    "Source temporal execution exposed mixed-type/nullability adapter identity collision, fixed and regression-tested.",
+    "Initial source-property LSP completion missing getter; fixed.",
+    "Incomplete conditional-call recovery failed; initial delimiter repair broke interpolation completion. Physical-string lexer mode fixes both, with old and new editor regression suites passing.",
+    "Initial native Neovim run failed readonly home logging and private client API use; tmp state/logs and public request flushing corrected.",
+    "New CMake target invoked before explicit regeneration; regenerated all three existing build trees."
+  ],
+  "whole_stage_suite": "not run; Stage 10 incomplete; console/terminal, composite display, owner operators/key exclusion and remaining cross-products open",
+  "git_hosted_publication": "not performed",
+  "commands": {
+    "configure": "cmake -S . -B build/ci-official-{debug,release,san} (each separately)",
+    "build": "cmake --build build/ci-official-TREE -j2 --target voidc voidls void_display_reload void_temporal_ir void_stage10_hooks void_temporal void_stage10_fields void_stage10_conversion void_stage10_interpolation void_format_numeric void_format_zones",
+    "ctest_regex": "^(stage10_display_reload|stage10_temporal_ir|format_temporal|stage10_hooks|stage10_fields|stage10_conversion|stage10_interpolation|format_numeric|format_zones|stage10_fields_aot|stage10_temporal_aot|stage10_conversion_aot|lsp_stage10_fields|lsp_stage10_display|lsp_sprint6|lsp_sprint3)$",
+    "install": "ctest --test-dir build/ci-official-debug --output-on-failure -R ^stage10_temporal_install$",
+    "neovim": "VOID_REPO=\"$PWD\" VOIDLS_PATH=\"$PWD/build/ci-official-debug/voidls\" XDG_STATE_HOME=/tmp/stage10-time-nvim-state NVIM_LOG_FILE=/tmp/stage10-time-nvim-native2.log nvim --headless -u NONE -l tests/stage10/editor.lua"
+  }
+}

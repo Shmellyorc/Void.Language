@@ -132,7 +132,9 @@
                 if(p.fields[n].text.empty())error(source,p.token,Code::syntax,"Struct patterns use named fields or one whole-value pattern.");
                 auto found=std::find_if(target.definition->fields.begin(),target.definition->fields.end(),[&](const auto& field){return field.name==p.fields[n].text;});
                 if(found==target.definition->fields.end())error(source,p.fields[n],Code::unknown_identifier,"Unknown struct pattern field.");
-                const auto index=static_cast<unsigned>(found-target.definition->fields.begin());p.indexes.push_back(index);check_pattern(p.children[n],ir::field_type(target,index));
+                const auto index=static_cast<unsigned>(found-target.definition->fields.begin());
+                if(!ir::field_accessible(*root.member_catalog,target,index,unit.identity,lexical_owner()))error(source,p.fields[n],Code::visibility,"Pattern field is not accessible from this lexical owner.");
+                p.indexes.push_back(index);check_pattern(p.children[n],ir::field_type(target,index));
             }
             return;
         }

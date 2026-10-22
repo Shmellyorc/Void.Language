@@ -1,5 +1,14 @@
 # CI #91: two focused Windows test repairs
 
+> **Current Windows status: RESOLVED by CI #95**, at
+> `e25816bdb80e3f32613edf77c9cf3258232af966`: Debug 160/160 and Release 160/160.
+> [Permanent engineering record and verified evidence](WINDOWS_ENGINEERING_RECORD.md)
+> supersede the earlier pending Windows acceptance statements below. Original
+> failures, local results and evidence remain historical; coverage limits and
+> independent Boss/Wrench review are recorded in the current reference.
+
+## Original engineering record (historical)
+
 21 October 2026. Baseline `8880cab35101ebb852600bd2c2a986ff4a241fa9`.
 **Locally verified; Windows-native acceptance pending. Wrench review pending.**
 Compiler native-linking implementation, manifests, staging and publication are unchanged.

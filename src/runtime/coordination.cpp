@@ -1,8 +1,10 @@
 #include "void/runtime.hpp"
+#include "void/temporal.hpp"
 #include "void/native_runtime.hpp"
 #include "void/callback.hpp"
 #include "void/utf8.hpp"
 #include <algorithm>
+#include <atomic>
 #include <cstring>
 #include <limits>
 #include <set>
@@ -11,6 +13,22 @@
 namespace vd {
 thread_local Runtime* Runtime::current_runtime_ = nullptr;
 thread_local Runtime::Thread* Runtime::current_thread_ = nullptr;
+std::int64_t Runtime::next_clock_identity() {
+    static std::atomic<std::uint64_t> next{1};
+    auto current=next.load(std::memory_order_relaxed);
+    do {if(current>static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max()))throw std::length_error("Runtime clock context identity exhausted");}
+    while(!next.compare_exchange_weak(current,current+1,std::memory_order_relaxed));
+    return static_cast<std::int64_t>(current);
+}
+std::array<std::int64_t,3> Runtime::monotonic_sample() {
+    if(is_managed()){Native safe(*this);return monotonic_sample();}
+    std::lock_guard lock(clock_mutex_);auto now=temporal::read_monotonic();
+    if(!clock_origin_){clock_identity_=next_clock_identity();clock_origin_=std::array<std::int64_t,2>{now.seconds,now.nanosecond};}
+    auto elapsed=temporal::difference({now.seconds,now.nanosecond},{(*clock_origin_)[0],static_cast<std::uint32_t>((*clock_origin_)[1])});
+    if(elapsed.seconds<0)throw std::runtime_error("Monotonic clock moved backwards");
+    return {elapsed.seconds,elapsed.nanosecond,clock_identity_};
+}
+std::uint64_t Runtime::monotonic_precision_ns(){return temporal::monotonic_precision_ns();}
 Runtime::~Runtime() {
     close();
     if (!threads_.empty() || !handles_.empty() || requested_ || callbacks_ || async_owner_!=std::thread::id{}) std::terminate();

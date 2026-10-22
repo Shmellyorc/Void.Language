@@ -120,6 +120,7 @@ CompilationError::CompilationError(std::vector<Diagnostic> diagnostics)
 #include "void/frontend.hpp"
 #include "void/path.hpp"
 #include <cstdlib>
+#include <mutex>
 #ifdef _WIN32
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -127,6 +128,12 @@ CompilationError::CompilationError(std::vector<Diagnostic> diagnostics)
 #include <windows.h>
 #endif
 namespace vd {
+namespace {std::mutex standard_sources_mutex;std::filesystem::path installed_standard_sources;}
+void configure_standard_library_root(const std::filesystem::path& executable) {
+    auto candidate=(executable.parent_path()/".."/"share"/"void"/"stdlib").lexically_normal();
+    std::error_code error;const bool available=candidate.is_absolute() && std::filesystem::is_directory(candidate,error);
+    std::lock_guard lock(standard_sources_mutex);installed_standard_sources=available?candidate:std::filesystem::path{};
+}
 std::filesystem::path standard_library_root() {
 #ifdef _WIN32
     if(const wchar_t* value=_wgetenv(L"VOID_STDLIB_ROOT")) {
@@ -138,7 +145,8 @@ std::filesystem::path standard_library_root() {
         if(!root.is_absolute())throw std::invalid_argument("VOID_STDLIB_ROOT must be absolute");
         return root;
     }
-    return utf8_path(VOID_STDLIB_ROOT);
+    std::lock_guard lock(standard_sources_mutex);
+    return installed_standard_sources.empty()?utf8_path(VOID_STDLIB_ROOT):installed_standard_sources;
 }
 ProjectSelection discover_project(const std::filesystem::path& workspace,
     const std::filesystem::path& active,const std::filesystem::path& explicit_entry) {

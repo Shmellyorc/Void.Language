@@ -1,5 +1,14 @@
 # CI #92: Unicode diagnostics and directory reservation
 
+> **Current Windows status: RESOLVED by CI #95**, at
+> `e25816bdb80e3f32613edf77c9cf3258232af966`: Debug 160/160 and Release 160/160.
+> [Permanent engineering record and verified evidence](WINDOWS_ENGINEERING_RECORD.md)
+> supersede the earlier pending Windows acceptance statements below. Original
+> failures, local results and evidence remain historical; coverage limits and
+> independent Boss/Wrench review are recorded in the current reference.
+
+## Original engineering record (historical)
+
 21 October 2026. Baseline `051f463ea35b2b738ce282cb2e93e5e60cdb1c2c`.
 **Focused repair implemented; native Windows observation/acceptance pending.**
 No link/emission/copy/publication changes. The sole production change adds

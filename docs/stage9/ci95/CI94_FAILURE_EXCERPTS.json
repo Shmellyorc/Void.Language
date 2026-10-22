@@ -1,0 +1,37 @@
+{
+  "run": "https://github.com/Shmellyorc/Void.Language/actions/runs/39722611806",
+  "baseline": "e5bebd4a8a0095fd618ea60e5f78685082fdf697",
+  "source": "Read-only connector retrieval of original native job logs; excerpts retain connector-decoded text",
+  "jobs": [
+    {
+      "job_id": 119639303051,
+      "name": "Windows 2022 / Debug",
+      "url": "https://github.com/Shmellyorc/Void.Language/actions/runs/39722611806/job/119639303051",
+      "result": "159/160; fake Clang Unicode failure",
+      "excerpts": [
+        "2026-10-22T04:35:12.1695544Z root_acl=inherited sddl=O:BAD:(A;OICIID;FA;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;FA;;;OW)",
+        "2026-10-22T04:35:12.1698569Z root_acl=private sddl=O:LAD:P(A;OICI;FA;;;LA)",
+        "2026-10-22T04:35:12.1699104Z private_root_verified=1 owner_access=1 restricted_mutation=0",
+        "2026-10-22T04:35:12.1703718Z root_acl=private sddl=O:LAD:P(A;OICI;FA;;;LA)",
+        "2026-10-22T04:35:12.1704334Z private_root_verified=1 owner_access=1 restricted_mutation=0",
+        "2026-10-22T04:35:12.1731187Z AssertionError: ([WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 � \\U0001f3ae # % 3f7sm6wl/relocated # % �/bin/voidc.exe'), 'build', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 � \\U0001f3ae # % 3f7sm6wl/game # % �/main.void'), '-o', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 � \\U0001f3ae # % 3f7sm6wl/game # % �/output # % �.exe')], '', 'No mapping for the Unicode character exists in the target multi-byte code page.\\nNative linker failed (status 1).\\n')",
+        "2026-10-22T04:46:24.6665882Z 99% tests passed, 1 tests failed out of 160"
+      ]
+    },
+    {
+      "job_id": 119639303103,
+      "name": "Windows 2022 / Release",
+      "url": "https://github.com/Shmellyorc/Void.Language/actions/runs/39722611806/job/119639303103",
+      "result": "159/160; fake Clang Unicode failure",
+      "excerpts": [
+        "2026-10-22T04:32:54.9103223Z root_acl=inherited sddl=O:BAD:(A;OICIID;FA;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;FA;;;OW)",
+        "2026-10-22T04:32:54.9105151Z root_acl=private sddl=O:LAD:P(A;OICI;FA;;;LA)",
+        "2026-10-22T04:32:54.9105578Z private_root_verified=1 owner_access=1 restricted_mutation=0",
+        "2026-10-22T04:32:54.9108157Z root_acl=private sddl=O:LAD:P(A;OICI;FA;;;LA)",
+        "2026-10-22T04:32:54.9108506Z private_root_verified=1 owner_access=1 restricted_mutation=0",
+        "2026-10-22T04:32:54.9123038Z AssertionError: ([WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 � \\U0001f3ae # % fxr_vxvf/relocated # % �/bin/voidc.exe'), 'build', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 � \\U0001f3ae # % fxr_vxvf/game # % �/main.void'), '-o', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 � \\U0001f3ae # % fxr_vxvf/game # % �/output # % �.exe')], '', 'No mapping for the Unicode character exists in the target multi-byte code page.\\nNative linker failed (status 1).\\n')",
+        "2026-10-22T04:36:42.7027531Z 99% tests passed, 1 tests failed out of 160"
+      ]
+    }
+  ]
+}

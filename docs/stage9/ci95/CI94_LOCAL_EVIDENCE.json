@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-21",
+  "baseline": "e5bebd4a8a0095fd618ea60e5f78685082fdf697",
+  "changed_file": "tests/stage9/windows_native_staging.cpp",
+  "change": "wmain receives UTF-16 argv; every argument including argv[0] converts to owned UTF-8 once using production conversion; stable null-terminated pointer array dispatches unchanged run_helper",
+  "preservation_checks": {
+    "original_helper_body": "Byte-identical after entry-function rename",
+    "conversion": "Byte-identical argument/string/pointer conversion block from src/main.cpp",
+    "scope": "Only requested source file changed; no docs or production changes"
+  },
+  "local": {
+    "platform": "Linux",
+    "debug": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 4.0,
+      "suites": [
+        "application_workflow_stage9",
+        "native_output_paths_ci88",
+        "long_physical_paths_ci89"
+      ]
+    },
+    "strict_sanitizers": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 8.0,
+      "suites": [
+        "application_workflow_stage9",
+        "native_output_paths_ci88",
+        "long_physical_paths_ci89"
+      ]
+    },
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "strict_execution": "Approved outside sandbox for LeakSanitizer",
+    "windows_syntax": "Clang 19.1.7 x86_64-w64-mingw32 -fsyntax-only passed using existing extracted MinGW headers and temporary LLVM_ON_UNIX configuration adjustment",
+    "diff_check": "Passed"
+  },
+  "native_pending": [
+    "MSVC native helper linkage through wmain",
+    "Fake Clang working-directory/output paths with Unicode/emoji/%",
+    "Malformed PE generation and staged-copy collision behaviors on Windows",
+    "Full native security/cleanup tests and Windows Debug/Release acceptance"
+  ],
+  "wrench_review": "Inspect startup conversion and owned argument lifetimes; existing helper body and assertions are unchanged. Linux/syntax outcomes do not establish native Windows execution.",
+  "constraints": {
+    "commits": false,
+    "pushes": false,
+    "hosted_ci": false
+  },
+  "sha256": {
+    "tests/stage9/windows_native_staging.cpp": "e053c4068361e6ee2a2860960c16e6e2553c038267219b3cfb8aa17e9c22ddeb",
+    "src/main.cpp": "bb39594b99bdf00a8298fd47bc63ff5c8cb9fdc4f236701685f10a2a75554508",
+    "src/native_build.cpp": "5d71c086bbd73011ca9f2465c8b081e3da38e3ad7080acc4d18f3c796a2ca8ea",
+    "src/native_windows.hpp": "f63d92220f790e4e10fe2119984d45eca66e2977f78fa8b6f13b7997df8a1e4c",
+    "tests/stage9/workflow.py": "8338a64dbdd9d155294400e2901f4b725ca6dd0ed54e6442fa3025a35951ae08"
+  }
+}

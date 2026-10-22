@@ -6,6 +6,16 @@
 #include <stdexcept>
 namespace vd::numeric {
 using ir::Type;
+formatting::Number display_number(std::uint64_t bits,Type t) {
+    switch(t.kind) {
+#define VD_DISPLAY(name) case Type::name:return {formatting::NumberKind::name,bits}
+    VD_DISPLAY(i8);VD_DISPLAY(i16);VD_DISPLAY(i32);VD_DISPLAY(i64);
+    VD_DISPLAY(u8);VD_DISPLAY(u16);VD_DISPLAY(u32);VD_DISPLAY(u64);
+    VD_DISPLAY(f32);VD_DISPLAY(f64);
+#undef VD_DISPLAY
+    default:throw std::invalid_argument("Display requires a numeric type");
+    }
+}
 bool floating(Type t) { return t == Type::f32 || t == Type::f64; }
 bool signed_integer(Type t) { return t == Type::i8 || t == Type::i16 || t == Type::i32 || t == Type::i64; }
 bool integer(Type t) { return signed_integer(t) || t == Type::u8 || t == Type::u16 || t == Type::u32 || t == Type::u64; }

@@ -98,7 +98,7 @@ struct Graph {
 };
 bool metadata_equal(const AnalyzedDeclaration& a,const AnalyzedDeclaration& b) {
     auto same_type=[](auto x,auto y) { return x==y && x.readonly==y.readonly && x.readonly_references==y.readonly_references; };
-    return a.base_identity==b.base_identity && a.virtual_slot==b.virtual_slot && a.override_target==b.override_target && a.using_field==b.using_field && a.kind==b.kind && a.module==b.module && a.owner==b.owner && a.visibility==b.visibility &&
+    return a.readonly==b.readonly && a.base_identity==b.base_identity && a.virtual_slot==b.virtual_slot && a.override_target==b.override_target && a.using_field==b.using_field && a.kind==b.kind && a.module==b.module && a.owner==b.owner && a.visibility==b.visibility &&
         a.parameters.size()==b.parameters.size() && std::equal(a.parameters.begin(),a.parameters.end(),b.parameters.begin(),same_type) && same_type(a.type,b.type) && a.constant_syntax==b.constant_syntax && a.value==b.value && same_type(a.receiver,b.receiver) && a.receiver_mutates==b.receiver_mutates && a.initialization_contract==b.initialization_contract && a.capability_contract==b.capability_contract && a.construction_parameters==b.construction_parameters && a.required_initialization_fields==b.required_initialization_fields;
 }
 void merge(Edges& into,const Edges& from) {

@@ -1,0 +1,10 @@
+{
+  "platform": "Linux-7.2.6-pikaos-x86_64-with-glibc2.44",
+  "configuration": "Release",
+  "command": "build/ci-official-release/void_format_workloads",
+  "stdout": "builder_bytes=1048576 precision_bytes=1000003 scalar_bytes=488890 elapsed_ms=7.5039",
+  "wall_seconds": 0.009930441970936954,
+  "peak_rss_kib": 13680,
+  "peak_scope": "single workload child including exec startup; no preceding verification children",
+  "live_memory": "not measured"
+}

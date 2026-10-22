@@ -1,5 +1,12 @@
 # Stage 9 engineering and acceptance — 21 October 2026
 
+> Windows update, 21 October 2026: **CI #95 accepted Debug 160/160 and Release
+> 160/160 (320/320)** at `e25816bdb80e3f32613edf77c9cf3258232af966`.
+> The blocking Windows investigation is **RESOLVED**; see the
+> [permanent Windows record](WINDOWS_ENGINEERING_RECORD.md). The original snapshot/
+> broader gate below remains historical; no complete seven-job matrix or actual
+> second-volume pass is claimed here. Further CI remains Boss-controlled.
+
 > CI #88 update, 21 October 2026: the owner reported five successful Linux/macOS
 > jobs and Windows Debug/Release 152/158 with a physical output ancestor regression.
 > [Focused repair/evidence](CI88_WINDOWS_PATH_REPAIR.md) supersede the current path

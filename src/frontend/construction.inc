@@ -59,6 +59,11 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             if (e.kind==K::call || e.kind==K::method_call) {
                 Mask mask;
                 for (unsigned i=0;i<e.parts.size();++i) if(auto origin=expression(*e.parts[i],ready)) {
+                    auto target=functions.find(e.target);
+                    const bool hook=target!=functions.end() && target->second.second->receiver &&
+                        (target->second.second->token.text=="string" || target->second.second->token.text=="format");
+                    if(!e.display_adapter.empty() || (target!=functions.end() && target->second.second->display_adapter) || (hook && i==0))
+                        issue(e.token,"Display hooks cannot observe unfinished self or its aliases.");
                     if(e.interface_call) issue(e.token,"Interface dispatch is prohibited on unfinished self or its aliases.");
                     if (!e.virtual_slot.empty()) issue(e.token,"Virtual-family calls are prohibited on unfinished self or its aliases, including direct super calls.");
                     for(unsigned field=0;field<e.parts[i]->type.definition->fields.size();++field) require_field(*origin,field,ready,e.token);

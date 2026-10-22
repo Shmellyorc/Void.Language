@@ -48,11 +48,8 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint6 ') as directory:
       ('return i32 has string','nonnullable'),
       ('var obj = counter()\n    return obj has counter','Unsupported type'),
       ('return counter has i32','nonnullable'),
-      ('var s = "{1}"\n    return input','Type mismatch'),
-      ('var s = "{true}"\n    return input','Type mismatch'),
       ('var s = "{input # hidden}"\n    return input','delimiter'),
-      ('var s = "{}"\n    return input','requires a string'),
-      ('var s = "{input:F2}"\n    return input','Expected'),
+      ('var s = "{}"\n    return input','requires an expression'),
       ('var s = "}"\n    return input','Unmatched'),
       ('var s = "{\"x\""\n    return input','control'),
       ('var x = if true:\n        1\n    return input','else'),
@@ -65,6 +62,10 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint6 ') as directory:
       ('var x = add(\n        left = 1,\n        left = 2,\n    )\n    return input','more than once'),
       ('var x = 1 +\n        2\n    return input','expression'),
     ]
+    # Stage 10 expands the same interpolation cases to type-aware conversion.
+    for expression,want in [('"{1}"','1'), ('"{true}"','true'), ('"{input:F2}"','4.00')]:
+        source.write_text('func entry(input: i32) -> i32:\n    if '+expression+' == "'+want+'":\n        return 7\n    return 0\n', encoding='utf-8')
+        for switches in [[],['--no-opt']]:assert run([compiler,'run',source,4,*switches]).stdout.strip()=='7'
     header='struct counter:\n    count: i32\nfunc add(left: i32, right: i32) -> i32:\n    return left + right\nfunc entry(input: i32) -> i32:\n    '
     for body,diagnostic in negatives:
         source.write_text(header+body+'\n', encoding='utf-8');p=run([compiler,'check',source],1)

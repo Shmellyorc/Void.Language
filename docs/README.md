@@ -1,5 +1,26 @@
 # VOID documentation
 
+## Stage 10 research design — 21 October 2026
+
+[Complete design and ordered roadmap](STAGE10_DESIGN.md) for console I/O, shared
+display/formatting/interpolation, private/readonly fields and operator overloading.
+Includes current-source evidence, original VOID console findings, full behavior
+contracts, 44 engineering steps and focused acceptance criteria. **Boss authorized the complete 44-step implementation, B1–B4 and Wrench
+amendments on 21 October 2026. Engineering is in progress; acceptance is pending.**
+[Current source progress, all 44 obligations and open matrix rows](stage10/IMPLEMENTATION.md).
+
+## Windows Stage 9: RESOLVED at CI #95 — 21 October 2026
+
+[Permanent Windows engineering record, CI #88–#95](stage9/WINDOWS_ENGINEERING_RECORD.md):
+verified baseline `e25816bdb80e3f32613edf77c9cf3258232af966`, Windows Debug and
+Release **160/160 each, 320/320 combined**. [Acceptance artifacts and hashes](stage9/CI95_WINDOWS_ACCEPTANCE.json)
+include both native logs and observed ACLs/reservations. The blocking investigation
+is resolved; older pending handoffs below retain their historical state.
+Actual second-volume transfer and complete seven-job matrix verification are not
+claimed. [Wrench's permanent guardrails](WRENCH_CLANKER.md#permanent-windows-guardrails)
+carry these lessons into future work.
+
+
 ## CI #93 private Windows test roots — 21 October 2026
 
 [Fixture repair, inherited-ACL investigation and Wrench gate](stage9/CI93_WINDOWS_TEMP_ROOT_FIXTURE.md).

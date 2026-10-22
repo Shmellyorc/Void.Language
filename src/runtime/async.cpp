@@ -97,6 +97,9 @@ struct Scope {
             {std::lock_guard lock(work_mutex);++admitted;announced=true;}work_changed.notify_all();
             for(;;){Task* task;
                 {vd::Runtime::Native native(runtime);std::unique_lock lock(work_mutex);work_changed.wait(lock,[&]{return stopping || work_head;});if(!work_head){if(stopping)return;continue;}task=work_head;work_head=task->next_worker;if(!work_head)work_tail=nullptr;}
+                // Retained dynamic diagnostics must survive every reached
+                // cleanup on this worker, independently of the executor's TLS.
+                vd::NativeCode::LeaseScope failure_scope({});
                 worker_task=task;vd::RuntimeFailure failure;
                 task->resume(task->frame.get(),&failure);
                 if(!failure.message && !task->work->completed)failure.message="Worker returned without checked completion";

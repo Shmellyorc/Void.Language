@@ -81,6 +81,9 @@ test('presentation covers approved keyword colors and space indentation', async 
     assert(braces.test('{{') && braces.test('}}') && !braces.test('{'));
     const interpolation = stringRule.patterns.find((p:{name:string}) => p.name === 'meta.interpolation.void');
     assert(interpolation && new RegExp(interpolation.begin).test('{text}'));
+    assert(!new RegExp(interpolation.end).test(''), 'Interpolation may span physical lines');
+    const triple = grammar.patterns.find((p:{name?:string}) => p.name === 'string.quoted.triple.void');
+    assert(triple && triple.begin === '"""' && triple.end === '"""', 'Triple strings need their own multiline region');
     assert(!new RegExp('^(?:' + interpolation.begin + ')').test('{{'));
 
     const types = new RegExp(grammar.patterns.find((p:{name?:string}) => p.name === 'storage.type.void').match);

@@ -1,0 +1,37 @@
+{
+  "status": "INCOMPLETE",
+  "baseline_head": "e25816bdb80e3f32613edf77c9cf3258232af966",
+  "checks": {
+    "fields": "54 field policy checks passed",
+    "numeric": "18663 numeric format checks passed"
+  },
+  "debug": {
+    "passed": 17,
+    "total": 17,
+    "seconds": 80.13,
+    "log": "debug-acceptance.log",
+    "numeric_refinement": "numeric-final-debug.log"
+  },
+  "release": {
+    "passed": 3,
+    "total": 3,
+    "seconds": 0.51,
+    "log": "release-acceptance.log",
+    "numeric_refinement": "numeric-final-release.log"
+  },
+  "strict_sanitizers": {
+    "passed": 4,
+    "total": 4,
+    "seconds": 5.96,
+    "log": "final-san-acceptance.log",
+    "numeric_refinement": "numeric-final-san.log",
+    "asan": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "ubsan": "halt_on_error=1:print_stacktrace=1",
+    "execution": "outside sandbox ptrace"
+  },
+  "whole_stage_suite": "not run",
+  "native_windows": "not available / not executed",
+  "native_macos": "not available / not executed",
+  "actual_editors": "not executed; stdio LSP tested",
+  "git_hosted_publication": "not performed"
+}

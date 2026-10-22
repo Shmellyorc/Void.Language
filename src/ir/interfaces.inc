@@ -8,7 +8,17 @@ bool method_accessible(const Module& m,const Function& f,std::string_view scope)
     auto found=m.source_imports.find(std::string(scope));
     return found!=m.source_imports.end() && found->second.contains(f.module_identity);
 }
-MemberSelection select_member(const Module& m,Type t,std::string_view name,std::string_view scope,std::size_t* work) {
+bool field_accessible(const Module& m,Type container,unsigned index,std::string_view scope,std::string_view lexical_owner) {
+    const auto& field=container.definition->fields.at(index);
+    if(field.visibility=="private")return !field.owner.empty() && field.owner==lexical_owner;
+    if(field.visibility=="internal") {
+        const ValueType* owner=container.definition.get();
+        for(const auto& t:m.nominal_types)if(t.definition && t.definition->identity==field.owner){owner=t.definition.get();break;}
+        return owner->module_identity.starts_with("/@stdlib/")==scope.starts_with("/@stdlib/");
+    }
+    return field.visibility=="public";
+}
+MemberSelection select_member(const Module& m,Type t,std::string_view name,std::string_view scope,std::size_t* work,std::string_view lexical_owner) {
     if(!t.definition || t.nullable)return {};
     if(t.kind==Type::interface_ref) {
         for(const auto& f:m.interface_requirements)if(f.method_name==name && !f.parameters.empty() && f.parameters[0].definition==t.definition)
@@ -23,7 +33,7 @@ MemberSelection select_member(const Module& m,Type t,std::string_view name,std::
         return nullptr;
     };
     for(unsigned n=0;n<t.definition->fields.size();++n) {charge();if(t.definition->fields[n].name==name)
-        return {MemberSelection::found,{n},{},{}};}
+        return {field_accessible(m,t,n,scope,lexical_owner)?MemberSelection::found:MemberSelection::inaccessible,{n},{},{}};}
     for(auto d=t.definition;d;d=d->base.lock()) if(auto f=method(d))
         return {method_accessible(m,*f,scope) ? MemberSelection::found : MemberSelection::inaccessible,{},f->name,{}};
     MemberSelection result; bool hidden=false;
@@ -40,7 +50,11 @@ MemberSelection select_member(const Module& m,Type t,std::string_view name,std::
         }
     }
     if(result.candidates.size()>1) result.status=MemberSelection::ambiguous;
-    else if(result.candidates.size()==1) {result.status=MemberSelection::found;result.path=result.candidates[0].first;result.method=result.candidates[0].second;}
+    else if(result.candidates.size()==1) {
+        result.status=MemberSelection::found;result.path=result.candidates[0].first;result.method=result.candidates[0].second;
+        auto owner=t;
+        for(auto field:result.path){if(!field_accessible(m,owner,field,scope,lexical_owner))result.status=MemberSelection::inaccessible;owner=field_type(owner,field);}
+    }
     else if(hidden) result.status=MemberSelection::inaccessible;
     return result;
 }
@@ -53,6 +67,17 @@ std::string binding_key(const Module::Binding& binding) {
         result+=encode(target.second);
     }
     return result;
+}
+bool binding_requires_readonly(const Module::Binding& binding) {
+    for(const auto& [name,route]:binding.methods) {
+        auto owner=binding.view;
+        for(auto index:route.first) {
+            if(owner.definition->fields.at(index).readonly)return true;
+            owner=field_type(owner,index);
+            if(owner.readonly || !readonly_paths(owner).empty())return true;
+        }
+    }
+    return false;
 }
 static Module::Binding structural_conformance(const Module& m,Type view,Type interface,std::string_view scope,std::size_t* work) {
     std::size_t local_work=8388608;if(!work) work=&local_work;

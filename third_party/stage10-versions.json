@@ -1,0 +1,14 @@
+{
+  "date": {
+    "revision": "5bdb7e6f31fac909c090a46dbd9fea27b6e609a4",
+    "archive_sha256": "eae789da25f758bbad768702efb40b917b91119dcf495c7df235f05d435ca068"
+  },
+  "ryu": {
+    "revision": "72e18e8d14d4392a4a3261f37cde248e4fbedbec",
+    "archive_sha256": "484b5f16b0c0eee01b10a4993fcda8c2cb7527a794f93239c594af31ae72c135"
+  },
+  "tzdata2026e": {
+    "revision": "2026e",
+    "archive_sha256": "b26882805f26aac59d5b222978e6580484b834ccdc98be89df2f05a6dc53a652"
+  }
+}

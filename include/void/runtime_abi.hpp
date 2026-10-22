@@ -17,8 +17,17 @@ struct RuntimeTypeRecord {
 extern "C" {
 std::uint64_t vd_string_count(void*,unsigned,vd::RuntimeFailure*) noexcept;
 void vd_string_index(void**,void*,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
+bool vd_temporal(void**,std::uint64_t*,unsigned,const std::uint64_t*,void* const*,vd::RuntimeFailure*) noexcept;
+void vd_display_enter(const char*,void*,vd::RuntimeFailure*) noexcept;
+void vd_display_leave() noexcept;
+void vd_display_error(void*,vd::RuntimeFailure*) noexcept;
 void vd_string_encode(void**,void*,vd::RuntimeFailure*) noexcept;
+// ScalarEncoding values 0..10, or 11 for immutable string. Formatting returns
+// success/error text through the same rooted output; allocation stays checked.
+bool vd_scalar_display(void**,unsigned,std::uint64_t,void*,void*,bool,vd::RuntimeFailure*) noexcept;
 bool vd_string_decode(void**,void**,vd::RuntimeFailure*) noexcept;
+bool vd_format_layout(void**,void*,unsigned,vd::RuntimeFailure*) noexcept;
+void vd_string_join(void**,void***,std::size_t,vd::RuntimeFailure*) noexcept;
 
 void vd_string_literal(void**, const char*, std::size_t, vd::RuntimeFailure*) noexcept;
 void vd_string_concat(void**, void*, void*, vd::RuntimeFailure*) noexcept;

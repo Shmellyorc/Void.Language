@@ -1,0 +1,122 @@
+{
+  "date": "2026-10-21",
+  "baseline": "e25816bdb80e3f32613edf77c9cf3258232af966",
+  "run": "https://github.com/Shmellyorc/Void.Language/actions/runs/39724345062",
+  "run_number": 95,
+  "status": "RESOLVED: blocking Windows Stage 9 investigation; native acceptance 320/320",
+  "scope": "Only Windows Debug and Release verified here; no complete seven-job matrix claim",
+  "retrieval": "Read-only GitHub API/connector job logs and native test artifacts; artifact ZIP digests verified against GitHub metadata; no new CI launched",
+  "workflow_snapshot": {
+    "status": "in_progress",
+    "conclusion": null
+  },
+  "jobs": [
+    {
+      "configuration": "Windows Debug",
+      "job_id": 119644734222,
+      "job_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/39724345062/job/119644734222",
+      "job_status": "completed",
+      "job_conclusion": "success",
+      "test_result": {
+        "passed": 160,
+        "failed": 0,
+        "required_suites_passed": [
+          "application_workflow_stage9",
+          "native_output_paths_ci88",
+          "long_physical_paths_ci89"
+        ]
+      },
+      "artifact": {
+        "id": 12402988796,
+        "name": "tests-Windows-X64-Debug",
+        "file": "ci95/windows-debug-tests.zip",
+        "zip_sha256": "bbd6138c73b5d346713fc5aae03343e3422c43cdf3919b2f9edcf7e7d0e8ca07",
+        "github_digest": "sha256:bbd6138c73b5d346713fc5aae03343e3422c43cdf3919b2f9edcf7e7d0e8ca07",
+        "last_test_member": "Debug/Testing/Temporary/LastTest.log",
+        "last_test_bytes": 169380,
+        "last_test_sha256": "f98b4ddaf5bb1dd29023ec8fdd04c150f6076ec3b2195479c4cad1a67c867385",
+        "encoding": "Exact UTF-8 CRLF bytes from downloaded artifact"
+      },
+      "native_observations": [
+        "rename_probe=metadata_only returned=1 failure=0 source_exists=0 destination_exists=1 source_original=0 destination_original=1 handles_original=1 handles=2 original_volume=1692368384 original_file_id=458752:739340",
+        "rename_probe=list_directory returned=0 failure=32 source_exists=1 destination_exists=0 source_original=1 destination_original=0 handles_original=1 handles=15 original_volume=1692368384 original_file_id=327680:1299700",
+        "Cross-volume copy pending: supply a writable second-volume directory",
+        "root_acl=inherited sddl=O:BAD:(A;OICIID;FA;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;FA;;;OW)",
+        "inherited_root_admitted=0 reason=Native temporary root permits untrusted modification.",
+        "root_acl=private sddl=O:LAD:P(A;OICI;FA;;;LA)",
+        "private_root_verified=1 owner_access=1 restricted_mutation=0",
+        "root_acl=private sddl=O:LAD:P(A;OICI;FA;;;LA)",
+        "private_root_verified=1 owner_access=1 restricted_mutation=0",
+        "Deep executable launched via explicit extended application: '\\\\\\\\?\\\\C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\VOID Stage9 \\xe9 \\U0001f3ae # % 4c2ika5h\\\\game # % \\xe9\\\\nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\build\\\\main.exe'",
+        "Stage 9 real workflow checks passed: 125",
+        "CI #88 physical output checks passed: 36",
+        "Deep executable launched via explicit extended application: '\\\\\\\\?\\\\C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\VOID CI89 \\xe9 \\U0001f3ae # % xh6f9d85\\\\nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\Exact Artifact \\xe9 \\U0001f3ae # %.exe'",
+        "CI #89 long physical path checks passed: 35"
+      ]
+    },
+    {
+      "configuration": "Windows Release",
+      "job_id": 119644734324,
+      "job_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/39724345062/job/119644734324",
+      "job_status": "completed",
+      "job_conclusion": "success",
+      "test_result": {
+        "passed": 160,
+        "failed": 0,
+        "required_suites_passed": [
+          "application_workflow_stage9",
+          "native_output_paths_ci88",
+          "long_physical_paths_ci89"
+        ]
+      },
+      "artifact": {
+        "id": 12402349074,
+        "name": "tests-Windows-X64-Release",
+        "file": "ci95/windows-release-tests.zip",
+        "zip_sha256": "6dd05ad20ec17b5ea3eab3f88ab9b41ef60c27fe48deb6e58979115f555adda5",
+        "github_digest": "sha256:6dd05ad20ec17b5ea3eab3f88ab9b41ef60c27fe48deb6e58979115f555adda5",
+        "last_test_member": "Release/Testing/Temporary/LastTest.log",
+        "last_test_bytes": 170285,
+        "last_test_sha256": "04d922eadd5426f6297ee1721286e0a9ac930fa9a66edaa7aef6785c23e4402e",
+        "encoding": "Exact UTF-8 CRLF bytes from downloaded artifact"
+      },
+      "native_observations": [
+        "rename_probe=metadata_only returned=1 failure=0 source_exists=0 destination_exists=1 source_original=0 destination_original=1 handles_original=1 handles=2 original_volume=1692368384 original_file_id=589824:739354",
+        "rename_probe=list_directory returned=0 failure=32 source_exists=1 destination_exists=0 source_original=1 destination_original=0 handles_original=1 handles=15 original_volume=1692368384 original_file_id=327680:991588",
+        "Cross-volume copy pending: supply a writable second-volume directory",
+        "root_acl=inherited sddl=O:BAD:(A;OICIID;FA;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;FA;;;OW)",
+        "inherited_root_admitted=0 reason=Native temporary root permits untrusted modification.",
+        "root_acl=private sddl=O:LAD:P(A;OICI;FA;;;LA)",
+        "private_root_verified=1 owner_access=1 restricted_mutation=0",
+        "root_acl=private sddl=O:LAD:P(A;OICI;FA;;;LA)",
+        "private_root_verified=1 owner_access=1 restricted_mutation=0",
+        "Deep executable launched via explicit extended application: '\\\\\\\\?\\\\C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\VOID Stage9 \\xe9 \\U0001f3ae # % r4sgglfn\\\\game # % \\xe9\\\\nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\build\\\\main.exe'",
+        "Stage 9 real workflow checks passed: 125",
+        "CI #88 physical output checks passed: 36",
+        "Deep executable launched via explicit extended application: '\\\\\\\\?\\\\C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\VOID CI89 \\xe9 \\U0001f3ae # % bq_q15r7\\\\nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\\Exact Artifact \\xe9 \\U0001f3ae # %.exe'",
+        "CI #89 long physical path checks passed: 35"
+      ]
+    }
+  ],
+  "combined_windows": {
+    "passed": 320,
+    "failed": 0
+  },
+  "remaining_limits": [
+    "Actual second-volume transfer not exercised: both native helper logs explicitly report pending",
+    "Complete seven-job matrix not verified by this documentation task",
+    "Final independent Boss/Wrench review of this record not claimed"
+  ],
+  "sha256_at_verified_baseline": {
+    "src/main.cpp": "bb39594b99bdf00a8298fd47bc63ff5c8cb9fdc4f236701685f10a2a75554508",
+    "src/native_build.cpp": "5d71c086bbd73011ca9f2465c8b081e3da38e3ad7080acc4d18f3c796a2ca8ea",
+    "src/native_windows.hpp": "f63d92220f790e4e10fe2119984d45eca66e2977f78fa8b6f13b7997df8a1e4c",
+    "tests/stage9/windows_native_staging.cpp": "e053c4068361e6ee2a2860960c16e6e2553c038267219b3cfb8aa17e9c22ddeb",
+    "tests/stage9/workflow.py": "8338a64dbdd9d155294400e2901f4b725ca6dd0ed54e6442fa3025a35951ae08",
+    "tests/stage9/long_paths.py": "0a4c7e44071ed6f9e89e4aac404b9a0e6a8d545e8222a95f01395a84806ed5bb",
+    "tests/stage9/native_paths.py": "b49ff2d996e489b8e7ce587c0df0afb146f1e26687338774f34507bdbc215572",
+    "tests/stage9/windows_process.py": "b781f18f00723878efadf97279548b3888e253ded41f0c7d8405a70e558c617d",
+    "cmake/LongPathAware.manifest": "3242062989f717f0f1846b13ad2082e37438d32bdc33903effeaecaa6cfb7382",
+    "CMakeLists.txt": "dd2b9dc88852815d8da306d8833547fff789ddb065e717c2f2b9757a0b0d996e"
+  }
+}

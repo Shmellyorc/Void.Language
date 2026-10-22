@@ -3410,3 +3410,42 @@ if, multiline calls and string-only automatic interpolation. Older examples usin
 numeric/bool/custom formatting, triple strings, generalized display/conversion,
 recursive composition tests or conditional compilation remain future direction.
 No full-Bible completeness or hosted lock follows from this bounded sprint.
+
+
+## Stage 10 authorization and current field engineering — 22 October 2026
+
+Boss approved the complete Stage 10 contracts, B1–B4 and Wrench amendments.
+Current local engineering adds declaring-owner private/internal/public stored
+fields and const field declarations, deep readonly projections and direct own-init
+replacement (including builtin compounds), with shared selection, independent IR
+checks, compatibility metadata and compiler/LSP support. Existing file-private
+method/property semantics remain unchanged. A const promoted component cannot
+be thawed by conversion to an interface. Focused evidence and remaining acceptance
+are in [the engineering record](stage10/IMPLEMENTATION.md).
+
+The native numeric formatter and embedded pinned rules loader are dependencies,
+not source print/format/time APIs. Complete console/terminal I/O, all display and
+interpolation consumers, validated source temporal values and owner-contained
+operators (including remainder) are not implemented by this checkpoint.
+**Stage 10 is incomplete.** Historical deferrals above are superseded only where
+actual current implementation and evidence establish the feature.
+
+Stage 10 continued integration (22 October 2026): source numeric/bool/string
+`string(value)` and result-returning `format(value, spec)` now share native and
+constant formatting. Typed primitive interpolation, literal specs, triple strings
+and multiline holes are implemented with checked rooted assembly. Composite and
+custom display, temporal values, console and custom operators remain incomplete;
+see `stage10/IMPLEMENTATION.md` for exact focused evidence and remaining work.
+
+### Stage 10 continuing implementation checkpoint (22 October 2026)
+
+Nominal/default/custom display now uses ordinary readonly calls, shared alignment
+and checked interpolation, with per-thread recursion protection and preserved hook
+errors. `use time` provides validated date/time/local/instant/offset/duration/zone/
+zoned factories, component access, checked arithmetic, temporal formatting, explicit
+overlap resolution/gap errors, UTC and monotonic samples/resolution. Pinned IANA
+2026e rules are embedded. Resolution describes native clock granularity, not clock
+accuracy. Source values use private const backing fields and existing result errors.
+These are implemented features under focused acceptance; collection/enum/result
+display, console/terminal and owner operators remain unfinished. The complete
+44-step status and acceptance limits are in `stage10/IMPLEMENTATION.md`.

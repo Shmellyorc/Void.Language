@@ -237,6 +237,26 @@ export async function run(): Promise<void> {
         await replace(worker, originalText);
         await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'string edit repair');
         assert.equal((await definitions())?.[0].uri.toString(), workerUri.toString());
+        const stage10 = originalText.replace('    return x + 42',
+            '    var b = stage10_box()\n    var shown = string(x)\n    var text = """Score:\n        {x:000}\n    """\n    return x + 42') +
+            '\nstruct stage10_box:\n    private secret: i32 = 7\n    const id: i32\n';
+        await replace(worker, stage10);
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'Stage 10 primitive display and multiline interpolation');
+        const conversionHover = await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider', workerUri, worker.positionAt(stage10.indexOf('string(x)') + 2));
+        assert(conversionHover?.some(h => h.contents.some(c => typeof c === 'object' && 'value' in c && c.value.replace(/&nbsp;/g, ' ').includes('value: i32'))), 'Stage 10 conversion hover');
+        const holeDefinition = await vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider', workerUri, worker.positionAt(stage10.indexOf('{x:000}') + 1));
+        assert(holeDefinition?.length, 'Stage 10 original interpolation expression span');
+        await replace(worker, stage10.replace('{x:000}', '{x:0.#0}'));
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.some(d => d.message.includes('Required fraction')), 'Stage 10 literal format diagnostic');
+        await replace(worker, stage10.replace('    return x + 42', '    return b.secret'));
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.some(d => d.message.includes('not accessible')), 'Stage 10 private field diagnostic');
+        await replace(worker, stage10.replace('    return x + 42', '    return b.id'));
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'Stage 10 field repair');
+        const fieldText = worker.getText();
+        const fieldHover = await vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider', workerUri, worker.positionAt(fieldText.indexOf('b.id') + 2));
+        assert(fieldHover?.some(h => h.contents.some(c => typeof c === 'object' && 'value' in c && c.value.replace(/&nbsp;/g, ' ').includes('const id'))), 'Stage 10 const field hover');
+        await replace(worker, originalText);
+        await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.length === 0, 'Stage 10 editor repair');
         record('Before save'); await worker.save(); record('After save');
         record('Before close'); await vscode.commands.executeCommand('workbench.action.closeAllEditors'); record('After close');
         assert(vscode.window.tabGroups.all.every(group => group.tabs.length === 0));

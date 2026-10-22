@@ -1098,3 +1098,51 @@ manifest/registry, external-project identities, CLI/build redesign or Stage 9 wo
 [Implementation contract](LOCAL_LIBRARIES.md) and [local evidence](local-libraries/ACCEPTANCE.md)
 record verification separately from approval. Boss retains Git/hosted controls;
 CI #87 is separate historical evidence. Root README remains protected.
+
+
+## Boss authorization — 21 October 2026
+
+Boss approved implementation of the entire 44-step Stage 10 mission, B1–B4,
+and the Wrench amendments. This supersedes the proposal-only authorization
+statements below; it does not claim implementation or acceptance.
+
+- One heterogeneous print and shared display/format kernel; exact numeric
+  ties-to-even rounding, checked allocation, no arbitrary width/precision cap.
+- Declaring-owner field privacy and deep const paths; direct own-initializer
+  replacement grant only; existing method/property privacy remains unchanged.
+- Owner-contained exact operators include binary `%` and derived `%=` in addition
+  to the other arithmetic, unary, equality and ordering families. Floating builtin
+  remainder remains prohibited. Independently declared `!=` remains prohibited.
+- Approved verified pinned Ryu/date and bundled versioned IANA rules; recursive
+  custom-equality dictionary-key exclusion remains required.
+- A standalone CR completes a line immediately. Pending CRLF continuation belongs
+  to logical line reads; mixed raw reads retain byte ownership.
+- Cursor queries require an accessible owned response channel. Redirected stdin,
+  unavailable ownership or responses return a recoverable error; no hidden tty.
+- Preserve Stage 9 Windows corrections, LLVM 19.1.7, ownership and GC. No Git
+  mutation, hosted CI dispatch, publication or root README edit is authorized.
+
+### Stage 10 implemented architecture checkpoint — hooks and temporal support
+
+Nominal adapters are ordinary compiler-owned typed functions using existing member
+selection, lexical access, effects, calls, roots and reload dependency edges. Their
+cache identities include actual type identity/nullability as well as readonly
+capabilities. Hook entry guards cover direct/virtual/interface/bound calls, with
+managed identity re-entry detection and the approved 64-active-hook resource bound.
+Worker error leases retain primary owned errors through failing cleanup.
+
+The temporal source library uses private const nominal values and validated
+result-returning factories. A closed, exact-signature typed-IR catalog permits the
+stdlib implementation to call the shared temporal native kernel; it is not a
+general source native-FFI mechanism. Full i64 seconds and separate nanoseconds
+avoid a representation-imposed ~292-year instant range. Calendar projection has
+its documented year bounds. Rules stay bundled/versioned on all platforms.
+Native UTC/monotonic resolution APIs report granularity, not accuracy; monotonic
+samples belong to one lazily initialized Runtime context. Native blocking/locked
+work uses existing NativeSafe and rooted publication. Installed CLI/LSP source
+lookup prefers explicit overrides, then executable-relative packaged libraries.
+
+Dirty-call repair uses physical tokens from the same lexer so generated
+interpolation parentheses cannot alter source delimiter accounting. Source
+formatting treats original literal bytes as opaque. This checkpoint does not
+close all Stage 10 requirements or replace independent Wrench review.

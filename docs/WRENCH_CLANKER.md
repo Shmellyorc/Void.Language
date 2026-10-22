@@ -1,5 +1,42 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## Current Windows milestone: RESOLVED — 21 October 2026
+
+At `e25816bdb80e3f32613edf77c9cf3258232af966`, Boss-run
+[CI #95](https://github.com/Shmellyorc/Void.Language/actions/runs/39724345062)
+passed Windows Debug **160/160** and Release **160/160**, **320/320** combined.
+All three Stage 9 workflow/path suites passed both configurations. The blocking
+Windows investigation is resolved. [Permanent Windows engineering record](stage9/WINDOWS_ENGINEERING_RECORD.md)
+is the authoritative technical reference, with exact acceptance artifacts and
+CI #88–#95 chronology. Older pending statements below are dated historical
+handoffs; preserve them without treating them as current blockers.
+
+### Permanent Windows guardrails
+
+- Receive Windows argv at a verified UTF-16 boundary, convert once to owned UTF-8,
+  and match that boundary in fake tools. Keep emoji/Unicode paths. Console-safe
+  diagnostics are a separate concern; do not change source/path rules to fix a print.
+- Retain both longPathAware manifests and the pinned LLVM/Clang **19.1.7** contract.
+  Awareness does not remove Clang's observed deep-working-directory limit.
+- Preserve Boss's short random private native-link workspace, verified transfer
+  into destination staging and unchanged same-parent atomic publication. Keep
+  exclusive ownership, PE/byte validation, old-executable preservation and cleanup.
+- Metadata-only directory handles did not prevent real rename. Retain
+  FILE_LIST_DIRECTORY with delete sharing excluded, error-32 and stable-identity
+  assertions. Use actual DACL readback and effective access checks; production
+  root trust must not be weakened to accommodate an inherited-ACL test fixture.
+- Preserve genuine deep fixtures, 8.3/exact-case/reparse/hard-link protections,
+  locked/colliding outputs and intentional malformed/copy failures. Classify the
+  actual failing boundary before changing production behavior or tests.
+- Linux/sanitizer and cross-target syntax outcomes do not prove native Windows
+  behavior. CI #95 supplies the native gate here. Actual second-volume transfer
+  remains unverified; the complete seven-job matrix is not certified by this record.
+
+No additional implementation is authorized by this milestone. Boss retains
+architecture, Git and hosted CI control; stop for Boss/Wrench review of the record,
+then follow Boss's chosen language-development scope and existing governance.
+
+
 ## CI #93 Wrench handoff — 21 October 2026
 
 Review [private-root fixture creation and evidence](stage9/CI93_WINDOWS_TEMP_ROOT_FIXTURE.md).
@@ -34,7 +71,7 @@ Earlier CI #90 records remain historical; no compiler, manifest, Git or hosted
 workflow changes are included.
 
 
-## Current succession handoff — 21 October 2026
+## Historical succession handoff — before CI #95
 
 CI #90's Windows native-link repair is implemented and locally verified:
 Linux Debug and strict ASan/UBSan/leaks each **9/9**. Native Windows acceptance
@@ -1138,6 +1175,17 @@ These are not surprise "bugs" that must be fixed immediately. They are documente
 
 ## 13. Current handoff prompt
 
+Read `docs/README.md`, the current governance above and
+`stage9/WINDOWS_ENGINEERING_RECORD.md`. Windows Stage 9 is native-accepted and
+RESOLVED at `e25816bdb80e3f32613edf77c9cf3258232af966`, CI #95: Debug/Release
+160/160 each, 320/320 combined. Review the permanent record, actual ACL/identity
+observations and acceptance artifacts without repeating the investigation or
+weakening tests. Actual second-volume coverage and the complete seven-job matrix
+are not claimed. No code changes or new CI are requested by the documentation
+handoff. Boss owns the next feature and Git/CI actions. Minimal output.
+
+### Historical CI #90 handoff (superseded by CI #95)
+
 Read `docs/README.md` and the current governance above. Review the implemented
 CI #90 repair using `stage9/CI90_WINDOWS_NATIVE_LINK_REPAIR.md`,
 `stage9/CI90_EVIDENCE.json`, `STAGE9_APPLICATION_WORKFLOW.md` and the latest
@@ -1219,3 +1267,27 @@ ranges extend the same frontend, typed IR, LLVM lowerer and GC buffers. Fixed
 children copy; growable children share. No secondary collector, ownership registry
 or certification path was added. Ordinary production tests cover the feature.
 See GROWABLE_ARRAYS.md and the latest WORK_LOG.md entry for semantics and evidence.
+
+
+## Stage 10 active engineering — 22 October 2026
+
+Boss authorized the entire 44-step mission and B1–B4, including remainder
+overloads, immediate CR completion and conservative cursor-response ownership.
+[Permanent engineering recovery record](stage10/IMPLEMENTATION.md) lists actual
+field-policy/native-format/dependency changes and every open obligation.
+**Stage 10 is incomplete; no independent Wrench acceptance is claimed.**
+Console/terminal, source display/format/interpolation, source temporal APIs and
+owner operators still require substantial implementation. The original complete
+authorization remains valid; ordinary continuation requires no new approval.
+Stage 9 Windows corrections and evidence are preserved. Boss retains Git, hosted
+CI and release control; root README is untouched.
+
+Stage 10 continued handoff: primitive numeric/bool/string conversion and formatting,
+constant formatting, typed interpolation and triple/multiline parsing now share
+the checked kernel and roots. Field/core and display verification, all 44 states,
+all completeness rows, dependency notices and exact remaining work are in
+[the implementation record](stage10/IMPLEMENTATION.md). VS Code/Neovim focused
+acceptance passes; native Vim/Windows/macOS and full stage acceptance remain open.
+Console, source temporal APIs, composite/custom display and owner operators are
+still unimplemented. This is an incomplete engineering handoff, not a completed
+Stage 10 return or independent review, and no additional authorization is needed.

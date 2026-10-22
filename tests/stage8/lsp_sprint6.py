@@ -40,7 +40,8 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint6 editor ') as directory:
         # UTF-16 position after the supplementary scalar points to the embedded call.
         line=source.splitlines()[9];column=len(line[:line.index('echo')+1].encode('utf-16-le'))//2
         assert q('textDocument/definition',9,column)['result']['range']['start']['line']==4
-        renamed=q('textDocument/rename',4,7,newName='display')['result'];assert renamed,renamed
+        response=q('textDocument/rename',4,7,newName='display');assert 'result' in response,response
+        renamed=response['result'];assert renamed,renamed
         # Completion and signature assistance on a multiline argument line.
         partial=source.replace('        suffix = "?",','        suffix = echo(')
         replace(partial);signature=q('textDocument/signatureHelp',10,len('        suffix = echo('))['result'];assert signature,signature
@@ -57,7 +58,9 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint6 editor ') as directory:
             assert len(formatted)==1,formatted
             pretty=formatted[0]['newText'];assert not replace(pretty)
             assert q('textDocument/formatting',options={'tabSize':4,'insertSpaces':True})['result']==[]
-        for invalid in [source.replace('{echo("hi")}','{1}'),source.replace('node has component','node has i32'),source.replace('        "none"','        9')]:
+        assert not replace(source.replace('{echo("hi")}','{1}'))
+        assert not replace(source)
+        for invalid in [source.replace('node has component','node has i32'),source.replace('        "none"','        9')]:
             errors=replace(invalid);assert errors,invalid
             assert not replace(source)
         # Ordinary incomplete edits must not terminate this same server or leak

@@ -2,6 +2,7 @@
 #include "void/heap.hpp"
 #include "void/buffer.hpp"
 #include <optional>
+#include <array>
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
@@ -43,6 +44,10 @@ public:
     static Runtime* attached() noexcept { return current_runtime_; }
     bool is_managed() const { return current_runtime_ == this && thread().state == State::managed; }
     void poll();
+    void display_enter(std::string_view,void* identity);
+    std::array<std::int64_t,3> monotonic_sample();
+    static std::uint64_t monotonic_precision_ns();
+    void display_leave() noexcept;
     Collection collect(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
     void allocate_into(void** rooted_slot, const TypeLayout&);
     bool begin_release(void*);
@@ -128,10 +133,15 @@ private:
     friend void native_shutdown(Runtime&);
     std::shared_ptr<NativeLibrary> native_library_;
     unsigned async_worker_limit_ = 4;
+    static std::int64_t next_clock_identity();
+    std::int64_t clock_identity_=0;
+    std::mutex clock_mutex_;
+    std::optional<std::array<std::int64_t,2>> clock_origin_;
     class PrivateRoot;
     struct Thread {
         std::thread::id owner = std::this_thread::get_id();
         State state = State::native_safe;
+        std::vector<std::pair<std::string,void*>> display_hooks;
         Frame* frames = nullptr;
         PrivateRoot* private_roots = nullptr;
         unsigned depth = 0;

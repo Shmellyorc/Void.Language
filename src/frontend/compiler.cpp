@@ -1,6 +1,8 @@
 #include "void/frontend.hpp"
 #include "void/path.hpp"
 #include "void/numeric.hpp"
+#include "void/temporal_ops.hpp"
+#include "void/temporal.hpp"
 #include "void/reference_capabilities.hpp"
 #include <algorithm>
 #include <charconv>
@@ -145,14 +147,14 @@ bool digit(char c) { return c >= '0' && c <= '9'; }
 const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue", "pass",
     "async", "await", "spawn", "event", "defer", "with", "enum", "has", "is", "match", "property", "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
 #include "strings.inc"
-std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::size_t begin=0, std::size_t end=std::string::npos, unsigned interpolation_depth=0) {
+std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::size_t begin=0, std::size_t end=std::string::npos, unsigned interpolation_depth=0,bool expand_interpolation=true) {
     const auto& text = source.text();
     std::vector<Token> tokens;
     std::vector<std::size_t> indents{0};
     std::size_t p = begin ? begin : text.starts_with("\xef\xbb\xbf") ? 3 : 0;
     end=std::min(end,text.size());
     std::vector<bool> parentheses;
-    bool beginning = !begin;unsigned braces=0;std::size_t line_tokens=0;
+    bool beginning = !begin;unsigned braces=interpolation_depth?1:0;std::size_t line_tokens=0;
     struct LiteralBlock {unsigned braces;std::size_t parent,indent;bool conditional;};std::vector<LiteralBlock> literal_blocks;
     auto emit = [&](TokenKind kind, std::string value, std::size_t offset) { tokens.push_back({kind, std::move(value), offset}); };
     while (p < end) {
@@ -198,19 +200,26 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
         if (c == '"') {
             if (tokens.empty() || tokens.back().text!="use") {
                 if(interpolation_depth>=64)error(source,{TokenKind::symbol,"",p},Code::nesting,"String interpolation nesting limit exceeded.");
-                std::vector<std::pair<std::size_t,std::size_t>> substitutions;std::vector<Token> chunks;
+                std::vector<InterpolationHole> substitutions;std::vector<Token> chunks;
                 auto token=string_token(source,p,&substitutions,&chunks);
-                if(substitutions.empty())tokens.push_back(std::move(token));
+                if(substitutions.empty() || !expand_interpolation)tokens.push_back(std::move(token));
                 else {
-                    emit(TokenKind::symbol,"(",token.offset);
+                    auto internal=[&](std::string name,std::size_t at){Token t{TokenKind::name,std::move(name),at};t.source_width=0;tokens.push_back(std::move(t));};
+                    internal("$interpolation",token.offset);emit(TokenKind::symbol,"(",token.offset);
                     for(std::size_t n=0;n<chunks.size();++n){
-                        if(n)emit(TokenKind::symbol,"+",chunks[n].offset);
+                        if(n)emit(TokenKind::symbol,",",chunks[n].offset);
                         tokens.push_back(std::move(chunks[n]));
                         if(n<substitutions.size()){
-                            auto [first,last]=substitutions[n];emit(TokenKind::symbol,"+",first);emit(TokenKind::symbol,"(",first);
-                            auto embedded=lex(source,diagnostics,first,last,interpolation_depth+1);
-                            for(auto& t:embedded)if(t.kind!=TokenKind::newline && t.kind!=TokenKind::end)tokens.push_back(std::move(t));
-                            emit(TokenKind::symbol,")",last);
+                            const auto hole=substitutions[n];emit(TokenKind::symbol,",",hole.begin);
+                            internal("$hole",hole.begin);emit(TokenKind::symbol,"(",hole.begin);emit(TokenKind::symbol,"(",hole.begin);
+                            auto embedded=lex(source,diagnostics,hole.begin,hole.end,interpolation_depth+1);
+                            // Keep statement-body indentation/newlines, dropping only
+                            // the artificial expression-range terminator newline.
+                            if(embedded.size()>=2 && embedded[embedded.size()-2].kind==TokenKind::newline)embedded.erase(embedded.end()-2);
+                            for(auto& t:embedded)if(t.kind!=TokenKind::end)tokens.push_back(std::move(t));
+                            emit(TokenKind::symbol,")",hole.end);emit(TokenKind::symbol,",",hole.spec_begin);
+                            Token spec{TokenKind::string,"\""+text.substr(hole.spec_begin,hole.spec_end-hole.spec_begin)+"\"",hole.spec_begin,text.substr(hole.spec_begin,hole.spec_end-hole.spec_begin)};
+                            spec.source_width=hole.spec_end-hole.spec_begin;tokens.push_back(std::move(spec));emit(TokenKind::symbol,")",hole.spec_end);
                         }
                     }
                     emit(TokenKind::symbol,")",p-1);
@@ -303,7 +312,7 @@ struct Expr {
     ir::ConstantValue aggregate_value;
     std::vector<Token> names;
     std::vector<std::unique_ptr<Expr>> omitted;
-    std::string initializer;
+    std::string initializer, display_adapter;
     std::vector<unsigned> field_indexes, argument_indexes;
     std::string literal_text;
     std::vector<std::unique_ptr<Expr>> parts;
@@ -340,6 +349,7 @@ struct Statement {
     std::vector<Statement> body, otherwise;
     unsigned slot = 0, flow = 0;
     bool readonly = false, invalid = false, using_field = false, event = false, task_group = false;
+    std::string visibility = "public";
     Statement(Kind k, Token t) : kind(k), token(std::move(t)) {}
 };
 struct Parameter {
@@ -357,7 +367,7 @@ struct ConstructionContext {
 struct GenericParameter { Token token; std::optional<Type> constraint; };
 struct Function {
     struct Capture {unsigned outer_slot;Type cell;Token token;bool snapshot=false;};
-    bool anonymous=false, deferred=false, bound_receiver=false, asynchronous=false;
+    bool anonymous=false, deferred=false, bound_receiver=false, asynchronous=false, display_adapter=false, display_has_string=false, display_has_format=false;
     Type task=Type::none;
     unsigned binding_ordinal=0;
     Type cleanup_type=Type::none;
@@ -380,6 +390,7 @@ struct Function {
     Token token;
     bool file_private = false, parse_failed = false;
     std::string symbol, visibility = "public";
+    std::string lexical_owner, lexical_parent;
     std::vector<Parameter> parameters;
     std::optional<Parameter> receiver;
     bool receiver_mutates = false, initializer = false;
@@ -506,7 +517,7 @@ struct Unit {
     std::list<ArraySyntax> arrays;
     std::list<GenericApplication> applications;
     std::vector<std::pair<Token,Type>> type_uses;
-    std::map<std::string,Function*> specialized_functions;
+    std::map<std::string,Function*> specialized_functions, display_adapters;
     std::map<std::string,Structure*> specialized_structures;
     std::map<std::string, Structure*> structure_names;
     std::map<std::string, Constant*> constant_names;
@@ -741,7 +752,7 @@ class Parser {
     std::unique_ptr<Expr> postfix(std::unique_ptr<Expr> e) {
         while(true) {
             if(accept(".")) {
-                auto member=std::make_unique<Expr>(Expr::Kind::field,name());
+                auto member=std::make_unique<Expr>(Expr::Kind::field,at("string")?take():name());
                 member->parts.push_back(std::move(e));e=std::move(member);
             } else if(at("[")) {
                 if(++nodes>512) error(source,peek(),Code::nesting,"Expression size limit exceeded.");
@@ -807,7 +818,7 @@ class Parser {
             return postfix(std::move(e));
         }
         if(token.text=="(") {auto e=expression();need(")");return postfix(std::move(e));}
-        if(token.kind==TokenKind::name && (!reserved.contains(token.text) || ((numeric::primitive(token.text)!=Type::none || token.text=="string") && at(".")))) return postfix(std::make_unique<Expr>(Expr::Kind::name,token));
+        if(token.kind==TokenKind::name && (!reserved.contains(token.text) || ((numeric::primitive(token.text)!=Type::none || token.text=="string") && at(".")) || (token.text=="string" && at("(")))) return postfix(std::make_unique<Expr>(Expr::Kind::name,token));
         error(source,token,Code::syntax,"Expected an expression, found '"+token.text+"'.");
     }
     std::unique_ptr<Expr> unary() {
@@ -1005,7 +1016,7 @@ public:
                     if(peek().text=="async")error(source,peek(),Code::unsupported_type,"Async interface methods require a reviewed calling and dispatch contract.");
                     need("func");Function requirement;requirement.interface_requirement=true;
                     requirement.visibility=f.visibility;requirement.file_private=f.file_private;
-                    requirement.token=name();
+                    requirement.token=at("string")?take():name();
                     if(requirement.token.text=="init" || requirement.token.text=="deinit") error(source,requirement.token,Code::initializer_deferred,"Lifecycle methods are not interface requirements.");
                     auto unresolved=std::make_shared<ir::ValueType>();unresolved->name=structure.token.text;unresolved->source_offset=structure.token.offset;
                     requirement.receiver=Parameter{structure.token,Type(unresolved,Type::unresolved)};
@@ -1024,11 +1035,17 @@ public:
                 bool fields=accept("<indent>");
                 if (!fields && !structure.definition->managed) need("<indent>");
                 while (fields && !at("<dedent>") && !at("<end of file>")) {
+                    std::string visibility="public";
+                    if(at("private") || at("internal") || at("public"))visibility=take().text;
+                    bool readonly=accept("const");
+                    if(at("private") || at("internal") || at("public") || at("const"))error(source,peek(),Code::syntax,"Duplicate, conflicting or out-of-order field modifiers; use visibility then const.");
                     bool composition = at("using") && peek(1).text != ":";
                     if (composition) take();
                     bool event=accept("event");auto start = p;
                     nodes=0;
                     Statement field(Statement::Kind::variable, name()); field.name = field.token.text;
+                    field.visibility=visibility;field.readonly=readonly;
+                    if(event && readonly)error(source,field.token,Code::readonly,"An event cannot be a const field.");
                     field.using_field = composition;field.event=event;
                     if (composition && !at(":")) {
                         p = start; field.annotation = type();
@@ -1096,7 +1113,7 @@ public:
                 auto receiver = name(); auto receiver_type = type(); need(")");
                 f.receiver = Parameter{receiver,receiver_type};
             }
-            f.token = name();
+            f.token = f.receiver && at("string") ? take() : name();
             f.generics=generic_parameters();
             parameters(f);
             auto body_begin = p;{FunctionScope scope(parsing_function,f);f.body=block();}
@@ -1325,10 +1342,21 @@ class Semantics {
         error(source, e.token, Code::unknown_function, "Unknown function '" + e.token.text + "'.", "Declare it here or import its declaring file; imports are not transitive exports.");
     }
 #include "generic_inference.inc"
+    std::string lexical_owner() const {
+        if(!current)return {};
+        return current->receiver?Type::key(current->receiver->type):current->lexical_owner;
+    }
     struct Member {
         std::vector<unsigned> path;
         const Function* function = nullptr;
     };
+    VOID_SEMANTIC_HANDLER void const_field_error(Type owner,unsigned index,const Token& token) {
+        auto* structure=owned_structure(owner).second;
+        const auto& origin=structure->effective_fields.at(index);
+        error(source,token,Code::readonly,"Cannot mutate a const stored field outside its direct declaring initializer.",
+            "Prepare mutable child state before assigning the field in its owner's initializer.",
+            {{span(origin.first->source,origin.second->token),"Const field declared here."}});
+    }
     const Function* direct_method(Type receiver, const Token& token) {
         auto key = receiver.definition->identity + "::method::" + token.text;
         for (const auto& [id,owner] : units)
@@ -1357,9 +1385,17 @@ class Semantics {
         }
         if (t.kind!=Type::aggregate && t.kind!=Type::managed_ref)
             error(source,token,calling ? Code::receiver : Code::type_mismatch,"Member access requires a struct.");
-        auto selected=ir::select_member(*root.member_catalog,t,token.text,unit.identity);
-        if(selected.status==ir::MemberSelection::inaccessible)
-            error(source,token,Code::visibility,"Member '"+token.text+"' is not accessible from this module.","Import its owning module and use a public method.");
+        auto selected=ir::select_member(*root.member_catalog,t,token.text,unit.identity,nullptr,lexical_owner());
+        if(selected.status==ir::MemberSelection::inaccessible) {
+            std::vector<RelatedLocation> related;auto owner=t;
+            for(auto index:selected.path) {
+                auto [module,structure]=owned_structure(owner);
+                const auto& origin=structure->effective_fields.at(index);
+                related.push_back({span(origin.first->source,origin.second->token),"Stored field declared by "+owner.definition->fields[index].owner+"."});
+                owner=ir::field_type(owner,index);
+            }
+            error(source,token,Code::visibility,"Member '"+token.text+"' is not accessible from this lexical context.","Use an accessible owner operation; stored-field privacy belongs to its declaring struct.",std::move(related));
+        }
         if(selected.status==ir::MemberSelection::ambiguous) {
             std::vector<RelatedLocation> related;std::string routes;
             auto [owner,structure]=owned_structure(t);
@@ -1556,7 +1592,7 @@ class Semantics {
         // A stored callable struct uses its ordinary call method. Keep the
         // field/property read in the receiver expression, preserving selection.
         if(!e.property && receiver.definition && !receiver.nullable && (receiver.kind==Type::aggregate || receiver.kind==Type::managed_ref)) {
-            auto selected=ir::select_member(*root.member_catalog,receiver,e.token.text,unit.identity);
+            auto selected=ir::select_member(*root.member_catalog,receiver,e.token.text,unit.identity,nullptr,lexical_owner());
             bool callable_field=selected.status==ir::MemberSelection::found && selected.method.empty();
             if(!selected.method.empty())for(const auto& f:root.member_catalog->functions)
                 if(f.name==selected.method && f.accessor==1 && (f.result.kind==Type::aggregate || f.result.kind==Type::managed_ref || f.result.kind==Type::interface_ref))callable_field=true;
@@ -1615,6 +1651,8 @@ class Semantics {
         }
         const Expr* candidate=e.parts[0].get();
         while (candidate->kind==Expr::Kind::field) {
+            const auto& field=candidate->parts[0]->type.definition->fields.at(candidate->slot);
+            e.receiver_readonly|=field.readonly;
             if (candidate->parts[0]->type.kind==Type::managed_ref) e.receiver_addressable=true;
             candidate=candidate->parts[0].get();
         }
@@ -1638,6 +1676,7 @@ class Semantics {
         if(!active)return;
         auto& out=diagnostics.editor->result;out.parameters.clear();out.signature=target.token.text+"(";
         for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==&target)out.documentation=source_documentation(u->source,target.token.offset);
+        if(auto builtin=unit.builtins.find(target.symbol);builtin!=unit.builtins.end())out.documentation=builtin->second.documentation;
         out.parameter_documentation.clear();
         for(const auto& p:target.parameters) {
             out.parameter_documentation.push_back(parameter_documentation(out.documentation,p.token.text));
@@ -1760,6 +1799,8 @@ class Semantics {
                 if(field!=fields.end() && field->event)error(source,e.names[n],Code::initializer,"Events always start empty; subscribe after construction.");
                 if (field == fields.end()) error(source,e.names[n],Code::unknown_identifier,"Unknown constructor field '" + e.names[n].text + "'.");
                 auto index = static_cast<unsigned>(field-fields.begin());
+                if(!ir::field_accessible(*root.member_catalog,Type(structure.definition,structure.definition->managed?Type::managed_ref:Type::aggregate),index,access.identity,lexical_owner()))
+                    error(source,e.names[n],Code::visibility,"Constructor field '"+field->name+"' is not accessible from this lexical owner.");
                 if (!initialized.insert(index).second) error(source,e.names[n],Code::duplicate,"Duplicate initializer for field '" + field->name + "'.");
                 e.field_indexes.push_back(index);
                 auto actual=expression(*e.parts[n],field->type);
@@ -1771,8 +1812,11 @@ class Semantics {
         if (!structure.initializer) for (unsigned n=0;n<structure.effective_fields.size();++n) {
             const auto& field=*structure.effective_fields[n].second; auto& field_owner=*structure.effective_fields[n].first;
             Type t = *field.annotation;
-            if (ir::requires_initialization(t) && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end())
+            if (ir::requires_initialization(t) && std::find(e.field_indexes.begin(),e.field_indexes.end(),n)==e.field_indexes.end()) {
+                if(!ir::field_accessible(*root.member_catalog,Type(structure.definition,structure.definition->managed?Type::managed_ref:Type::aggregate),n,access.identity,lexical_owner()))
+                    error(source,e.token,Code::visibility,"An inaccessible required field cannot be supplied by this caller: "+field.name+".","Provide an accessible owner initializer or factory.",{{span(field_owner.source,field.token),"Required field declared here."}});
                 error(source,e.token,Code::argument_count,"A non-nullable reference field requires an explicit value: " + field.name + ".",{},{{span(field_owner.source,field.token),"Required field declared here."}});
+            }
         }
         if (!structure.initializer || !structure.definition->managed) construction_fields(e,owner,structure,runtime);
     }
@@ -1863,6 +1907,8 @@ class Semantics {
             return selected.function ? std::optional<Type>(selected.function->result) : std::nullopt;
         }
         if (e.kind == K::call) {
+            if(e.token.text=="$interpolation" || e.token.text=="$hole")return text_anchor();
+            if(e.target.starts_with("$display.") || display_prelude(e))return e.token.text=="string"?text_anchor():text_result_anchor();
             if(e.target.starts_with("$numeric::") || !e.argument_indexes.empty())return e.type;
             if(auto* value=lookup(e.token.text);value && value->type.definition && value->type.definition->callable)return Type(*value->type.definition->call_result);
             if(current && e.qualifier.empty() && !lookup(e.token.text) && current->substitutions.contains(e.token.text))return current->substitutions.at(e.token.text);
@@ -1881,6 +1927,7 @@ class Semantics {
             if (base && (base->kind == Type::aggregate || base->kind == Type::managed_ref)) {
                 auto selected=member(*base,e.token);
                 if (!selected.function) { auto t=*base; for (auto index:selected.path) t=ir::field_type(t,index); return t; }
+                if(selected.function->accessor==1)return selected.function->result;
             }
             return {};
         }
@@ -1908,7 +1955,7 @@ class Semantics {
         if(std::none_of(bindings.begin(),bindings.end(),[&](const auto& b){return b.key==binding.key;})) bindings.push_back(binding);
         auto operand=std::make_unique<Expr>(std::move(e));
         e=Expr(Expr::Kind::conversion,operand->token);e.op="interface";e.target=binding.key;e.implicit=true;
-        e.type=target;e.type.readonly=from.readonly;e.parts.push_back(std::move(operand));return e.type;
+        e.type=target;e.type.readonly=from.readonly || ir::binding_requires_readonly(binding);e.parts.push_back(std::move(operand));return e.type;
     }
     VOID_SEMANTIC_HANDLER Type contextual_conversion(Expr& e, Type type, const std::optional<Type>& expected) {
         if(expected && expected->kind==Type::interface_ref && type!=error_type && type.kind!=Type::interface_ref) return interface_conversion(e,type,*expected);
@@ -1963,7 +2010,7 @@ class Semantics {
         if (invalid_function || unit.failed_import || (current && current->parse_failed)) {out.candidates.clear();out.signature.clear();out.parameters.clear();throw EditorProbeFound{};}
         std::map<std::string,EditorCandidate> candidates;
         auto add=[&](std::string name,Type type,int kind=6) -> EditorCandidate* {
-            if(!valid_editor_identifier(name) || type==error_type)return nullptr;
+            if((!valid_editor_identifier(name) && !(receiver && name=="string")) || type==error_type)return nullptr;
             return &candidates.emplace(name,EditorCandidate{name,ir::type_name(type),kind}).first->second;
         };
         if(receiver) {
@@ -1988,15 +2035,19 @@ class Semantics {
             std::set<std::string> names;
             for(const auto& [id,u]:units) {
                 for(const auto& structure:u->structures) for(const auto& f:structure.definition->fields) names.insert(f.name);
-                for(const auto& f:u->functions) if(f.receiver && !f.initializer && !f.accessor && f.token.text!="deinit") names.insert(f.token.text);
+                for(const auto& f:u->functions) if(f.receiver && !f.initializer && f.accessor!=2 && f.token.text!="deinit") names.insert(f.token.text);
             }
             for(const auto& name:names) try {
                 auto token=e.token;token.text=name;auto selected=member(t,token);
                 if(selected.function) {
                     if(t.readonly || !ir::readonly_paths(t).empty()) continue; // Recovered effects are not finalized.
-                    if(auto* candidate=add(name,selected.function->result,2))
+                    if(auto* candidate=add(name,selected.function->result,selected.function->accessor==1?10:2))
                         for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==selected.function)candidate->documentation=source_documentation(u->source,f.token.offset);
-                } else {auto type=t;for(auto field:selected.path)type=ir::field_type(type,field);add(name,type,5);}
+                } else {
+                    auto type=t;bool readonly=false;std::string declaring;
+                    for(auto field:selected.path){readonly|=type.definition->fields[field].readonly;declaring=type.definition->fields[field].owner;type=ir::field_type(type,field);}
+                    if(auto* candidate=add(name,type,5)){if(readonly)candidate->detail="const "+candidate->detail;candidate->documentation="Stored field declared by "+declaring+".";}
+                }
             } catch(const CompilationError&) {} catch(const Poison&) {}
         } else {
             if(e.qualifier.empty()) for(const auto& scope:scopes) for(const auto& [name,v]:scope) if(!v.task_group) add(name,v.type);
@@ -2018,6 +2069,7 @@ class Semantics {
             if(e.qualifier.empty()) {
                 for(const auto& [name,owners]:unit.qualifiers) candidates.emplace(name,EditorCandidate{name,"import",9});
                 for(const auto& name:{"true","false","null","not","match","if","func"}) candidates.emplace(name,EditorCandidate{name,"keyword",14});
+                for(const auto& name:{"string","format"})if(!candidates.contains(name))candidates.emplace(name,EditorCandidate{name,name==std::string("string")?"string(value) -> string":"format(value, spec: string) -> result<string, string>",3,{},"Invariant type-aware display and formatting."});
                 if(current && current->asynchronous)for(const auto& name:{"await","spawn"})candidates.emplace(name,EditorCandidate{name,"keyword",14});
             }
         }
@@ -2080,6 +2132,7 @@ class Semantics {
     VOID_SEMANTIC_HANDLER Type lambda_expression(Expr& e) {
         if(!current)error(source,e.token,Code::constant_call,"A closure needs a function activation.");
         auto parsed=current->lambdas.begin();std::advance(parsed,e.slot);unit.functions.push_back(std::move(*parsed));auto& lambda=unit.functions.back();
+        lambda.lexical_owner=lexical_owner();lambda.lexical_parent=current->symbol;
         lambda.symbol=current->symbol+"::$lambda$"+std::to_string(e.slot);lambda.concrete_name=lambda.symbol.substr(unit.identity.size()+2);lambda.display_name="<lambda>";lambda.prepared=true;lambda.instantiation_context=current->instantiation_context;lambda.specialization_depth=current->specialization_depth;lambda.substitutions=current->substitutions;lambda.substitution_sources=current->substitution_sources;
         for(auto& parameter:lambda.parameters)parameter.type=resolve_type(parameter.type,unit,root,units,parameter.token);lambda.result=resolve_type(lambda.result,unit,root,units,e.token);
         std::vector<Type> parameters;for(const auto& parameter:lambda.parameters)parameters.push_back(parameter.type);
@@ -2098,7 +2151,7 @@ class Semantics {
     VOID_SEMANTIC_HANDLER Type bind_method(Expr& value,const Token& method,Type signature,std::vector<Type> type_arguments={}){
         if(!current)error(source,method,Code::constant_call,"Bound callbacks require a function activation; use a named function in a pure template.");
         auto receiver=value.type;auto original=std::make_unique<Expr>(std::move(value));
-        Member selected{};if(receiver.kind==Type::interface_ref || ir::select_member(*root.member_catalog,receiver,method.text,unit.identity).status!=ir::MemberSelection::missing)selected=member(receiver,method);
+        Member selected{};if(receiver.kind==Type::interface_ref || ir::select_member(*root.member_catalog,receiver,method.text,unit.identity,nullptr,lexical_owner()).status!=ir::MemberSelection::missing)selected=member(receiver,method);
         if(selected.function){
             for(auto field:selected.path)embedded_receiver(original,field,method);receiver=original->type;
             auto* target=selected.function;
@@ -2332,7 +2385,7 @@ class Semantics {
         if(!t.definition->cases.empty())error(source,e.token,Code::type_mismatch,"Enum payloads are accessed through patterns.");
         Member selected;
         if(!e.type_arguments.empty()){auto* method=concrete_method(e,t,true);if(!method)error(source,e.token,Code::unsupported_type,"This member is not a generic method.");selected={{},method};}
-        else if(expected && expected->definition && expected->definition->callable && t.kind!=Type::interface_ref && ir::select_member(*root.member_catalog,t,e.token.text,unit.identity).status==ir::MemberSelection::missing){auto receiver=std::move(e.parts[0]);auto token=e.token;e=std::move(*receiver);return bind_method(e,token,*expected);}
+        else if(expected && expected->definition && expected->definition->callable && t.kind!=Type::interface_ref && ir::select_member(*root.member_catalog,t,e.token.text,unit.identity,nullptr,lexical_owner()).status==ir::MemberSelection::missing){auto receiver=std::move(e.parts[0]);auto token=e.token;e=std::move(*receiver);return bind_method(e,token,*expected);}
         else selected=member(t,e.token);
         if(selected.function && selected.function->accessor==1) {
             for(auto index:selected.path)embedded_receiver(e.parts[0],index,e.token);
@@ -2353,7 +2406,91 @@ class Semantics {
         e.event=owner.definition->fields[e.slot].event;e.event_owner=owner.definition->fields[e.slot].owner;if(e.event && !allow_event)error(source,e.token,Code::invalid_value,"Events support subscriptions and owner emission; subscriber storage cannot escape.");
         return e.type=ir::field_type(owner,e.slot);
     }
+#include "display_semantics.inc"
+    VOID_SEMANTIC_HANDLER Type interpolation_call(Expr& e) {
+        if(e.target=="$interpolation" || e.target=="$hole")return e.type;
+        if(e.token.text=="$interpolation") {
+            for(auto& part:e.parts)expect(expression(*part),Type::string,part->token);
+            e.target="$interpolation";return e.type=Type::string;
+        }
+        auto& operand=*e.parts.at(0);if(operand.kind==Expr::Kind::literal && operand.token.text=="null"){operand.type=Type::string;operand.token.source_width=4;operand.token.text="\"null\"";operand.aggregate_value.text="null";}
+        auto t=expression(operand);auto& spec=*e.parts.at(1);expect(expression(spec),Type::string,spec.token);
+        if(t==error_type)return e.type=error_type;
+        if(!numeric::number(t) && t!=Type::boolean && t!=Type::string) {
+            if(!t.definition || (t.kind!=Type::aggregate && t.kind!=Type::managed_ref && t.kind!=Type::interface_ref) || ir::collection_type(t) || !t.definition->cases.empty())error(source,e.parts[0]->token,Code::unsupported_type,"This value does not yet have a display implementation.");
+            if(t.definition->module_identity=="/@stdlib/time.void") {
+                const std::map<std::string,temporal::Kind> kinds={{"date",temporal::Kind::date},{"time_of_day",temporal::Kind::time},{"local_datetime",temporal::Kind::local},{"instant",temporal::Kind::instant},{"offset_datetime",temporal::Kind::offset},{"zoned_datetime",temporal::Kind::zoned},{"duration",temporal::Kind::duration}};
+                if(auto kind=kinds.find(t.definition->name);kind!=kinds.end())try{temporal::validate(kind->second,spec.aggregate_value.text);}catch(const formatting::Error& failure){auto site=spec.token;site.offset+=failure.offset;site.source_width=1;error(source,site,Code::invalid_value,failure.what());}
+            }
+            auto& adapter=nominal_display_adapter(t,true,e.parts[0]->token);e.display_adapter=adapter.symbol;
+            try{auto plan=formatting::split_layout(spec.aggregate_value.text);if(!adapter.display_has_format && !plan.pattern.empty())throw formatting::Error(plan.pattern_offset,"Type has no custom format hook");}catch(const formatting::Error& failure){auto site=spec.token;site.offset+=failure.offset;site.source_width=1;error(source,site,Code::invalid_value,failure.what());}
+            e.type_arguments.push_back(unit.make_result(Type::string,Type::string));e.target="$hole";return e.type=Type::string;
+        }
+        try {
+            if(numeric::number(t))formatting::validate(numeric::display_number(0,t).kind,formatting::parse_numeric(spec.aggregate_value.text));
+            else formatting::parse_text(spec.aggregate_value.text);
+        }catch(const formatting::Error& failure){auto site=spec.token;site.offset+=failure.offset;site.source_width=1;error(source,site,Code::invalid_value,failure.what());}
+        e.type_arguments.push_back(unit.make_result(Type::string,Type::string));e.target="$hole";return e.type=Type::string;
+    }
+    bool display_prelude(const Expr& e) {
+        if(!e.qualifier.empty() || (e.token.text!="string" && e.token.text!="format") || lookup(e.token.text) || unit.declarations.contains(e.token.text) || unit.constant_names.contains(e.token.text) || unit.invalid_declarations.contains(e.token.text))return false;
+        for(const auto& import:unit.imports)if(!import.explicit_alias && !import.target.empty()) {
+            const auto& owner=*units.at(import.target);
+            if(owner.declarations.contains(e.token.text) || owner.constant_names.contains(e.token.text) || owner.structure_names.contains(e.token.text) || owner.invalid_declarations.contains(e.token.text))return false;
+        }
+        return !unit.structure_names.contains(e.token.text);
+    }
+    VOID_SEMANTIC_HANDLER Type display_call(Expr& e) {
+        if(e.target=="$display.string" || e.target=="$display.format")return e.type;
+        if(!e.type_arguments.empty())error(source,e.token,Code::argument_count,"Display calls do not take explicit type arguments.");
+        const bool formatted=e.token.text=="format";
+        Function target;target.token=e.token;target.result=formatted?unit.make_result(Type::string,Type::string):Type(Type::string);
+        target.parameters.push_back({Token{TokenKind::name,"value",e.token.offset},Type::i32});
+        if(formatted)target.parameters.push_back({Token{TokenKind::name,"spec",e.token.offset},Type::string});
+        auto mapping=argument_mapping(e,target,0,false);
+        auto value=std::find(mapping.begin(),mapping.end(),0);
+        if(value==mapping.end())error(source,e.token,Code::argument_count,"Display requires a value argument.");
+        auto& operand=*e.parts[value-mapping.begin()];
+        if(operand.kind==Expr::Kind::literal && operand.token.text=="null"){operand.type=Type::string;operand.token.source_width=4;operand.token.text="\"null\"";operand.aggregate_value.text="null";}
+        auto t=expression(operand);
+        if(t==error_type)return e.type=error_type;
+        Function* adapter=nullptr;
+        if(!numeric::number(t) && t!=Type::boolean && t!=Type::string) {
+            if(!t.definition || (t.kind!=Type::aggregate && t.kind!=Type::managed_ref && t.kind!=Type::interface_ref) || ir::collection_type(t) || (!t.definition->cases.empty() && !t.definition->callable))error(source,e.token,Code::unsupported_type,"This value does not yet have a display implementation.");
+            adapter=&nominal_display_adapter(t,formatted,e.token);
+        }
+        target.parameters[0].type=ir::readonly_view(t);
+        target.symbol=std::string("$display.")+(formatted?"format":"string")+"::"+std::to_string(t.kind)+":"+std::to_string(Type::key(t).size())+":"+Type::key(t)+(t.nullable?"?":"")+"|"+ir::capability_key(t);
+        builtin_record(target,formatted?"Format a value using invariant patterns; invalid specifications return Err with a byte offset.":"Display a value using invariant type-aware text.");
+        e.source_target=target.symbol;e.target=adapter?adapter->symbol:formatted?"$display.format":"$display.string";
+        return e.type=call_arguments(e,target,0);
+    }
+    VOID_SEMANTIC_HANDLER Type temporal_call(Expr& e,unsigned operation) {
+        if(!current)error(source,e.token,Code::constant_call,"Temporal Runtime operations require runtime evaluation.");
+        const auto& contract=temporal::operations.at(operation);Function target;target.token=e.token;
+        Type result=contract.result_words==0?Type(Type::string):Type(Type::i64);
+        if(contract.result_words==3)result=Type(unit.structure_names.at("_clock_sample")->definition);
+        target.result=unit.make_result(result,Type::string);target.symbol="$time."+std::to_string(operation);
+        for(unsigned n=0;n<contract.arguments.size();++n)target.parameters.push_back({Token{TokenKind::name,"arg"+std::to_string(n),e.token.offset},contract.arguments[n]=='t'?Type(Type::string):Type(Type::i64)});
+        builtin_record(target,"Validated temporal Runtime kernel operation.");e.source_target=target.symbol;e.target=target.symbol;
+        return e.type=call_arguments(e,target,0);
+    }
     VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+        if(e.target=="$layout.unwrap")return e.type;
+        if(unit.identity=="/@stdlib/time.void" && e.qualifier.empty() && e.token.text=="_temporal_unwrap") {
+            Function target;target.token=e.token;target.symbol="$layout.unwrap";target.result=Type::string;target.parameters.push_back({Token{TokenKind::name,"value",e.token.offset},unit.make_result(Type::string,Type::string)});
+            builtin_record(target,"Checked temporal default display.");e.source_target=target.symbol;e.target=target.symbol;return e.type=call_arguments(e,target,0);
+        }
+        if(e.target.starts_with("$time."))return e.type;
+        if(unit.identity=="/@stdlib/time.void" && e.qualifier.empty())for(unsigned n=0;n<temporal::operations.size();++n)if(temporal::operations[n].name==e.token.text)return temporal_call(e,n);
+
+        if(e.token.text=="$display_format"){e.token.text="format";return display_call(e);}
+        if(e.token.text=="$display_pattern" || e.token.text=="$display_alignment") {
+            if(!e.target.empty())return e.type;
+            expect(expression(*e.parts.at(0)),Type::string,e.token);e.argument_indexes={0};e.target=e.token.text=="$display_pattern"?"$layout.pattern":"$layout.alignment";return e.type=unit.make_result(Type::string,Type::string);
+        }
+        if(e.token.text=="$interpolation" || e.token.text=="$hole")return interpolation_call(e);
+        if(e.target.starts_with("$display.") || display_prelude(e))return display_call(e);
         if(e.target.starts_with("$numeric::") || !e.argument_indexes.empty())return e.type;
         if(current && e.qualifier.empty() && !lookup(e.token.text) && current->substitutions.contains(e.token.text)) {
             if(!e.type_arguments.empty())error(source,e.token,Code::unsupported_type,"Type parameters are not generic constructors.");
@@ -2580,6 +2717,8 @@ class Semantics {
             if(s.selection) {
                 auto previous=allow_event;allow_event=true;t=expression(*s.selection);allow_event=previous;
                 std::function<void(const Expr&,bool)> writable=[&](const Expr& e,bool writeback){
+                    if(e.kind==Expr::Kind::field && !e.property && e.parts[0]->type.definition && e.parts[0]->type.definition->fields.at(e.slot).readonly)
+                        const_field_error(e.parts[0]->type,e.slot,e.token);
                     if(e.property && writeback && e.setter.empty())error(source,e.token,Code::readonly,"Property has no setter.");
                     if(e.kind==Expr::Kind::field || e.kind==Expr::Kind::array_index || e.property) {
                         auto owner=e.parts[0]->type;
@@ -2602,6 +2741,10 @@ class Semantics {
                 if (selected.function) error(source,field,Code::invalid_value,"Cannot assign to method '"+field.text+"'.");
                 for (unsigned n=0;n<selected.path.size();++n) {
                     auto index=selected.path[n]; auto token=field;
+                    const auto& declaration=t.definition->fields[index];
+                    bool grant=current && current->initializer && current->receiver && variable->slot==current->receiver->slot &&
+                        s.field_indexes.empty() && selected.path.size()==1 && s.fields.size()==1 && !s.index && declaration.owner==Type::key(current->receiver->type);
+                    if(declaration.readonly && !grant)const_field_error(t,index,field);
                     token.text=t.definition->fields[index].name;
                     expanded.push_back(token); s.implicit_fields.push_back(n+1<selected.path.size());
                     s.event=t.definition->fields[index].event;s.field_indexes.push_back(index); t=ir::field_type(t,index);
@@ -2708,7 +2851,7 @@ public:
                 if (source_visible(f->visibility,import.target,unit.identity)) visible_names.insert(name);
     }
     void validate_generic_receiver(Type receiver,const Token& token) {
-        auto selected=ir::select_member(*root.member_catalog,receiver,token.text,unit.identity);
+        auto selected=ir::select_member(*root.member_catalog,receiver,token.text,unit.identity,nullptr,lexical_owner());
         if(selected.path.empty() && !selected.method.empty())
             error(source,token,Code::receiver,"Inherited methods cannot be hidden by a method-specific generic declaration.");
     }
@@ -2952,9 +3095,9 @@ class Lowering {
         if(i.receiver && cells.contains(i.receiver->slot)) {
             i.receiver->slot=cells.at(i.receiver->slot);i.receiver->fields.insert(i.receiver->fields.begin(),0);
         }
-        if(i.op==ir::Op::dict_new)module.coordinated=true;
+        if(i.op==ir::Op::dict_new || i.op==ir::Op::string_join || i.op==ir::Op::format_unwrap || i.op==ir::Op::format_layout || i.op==ir::Op::temporal_native || i.op==ir::Op::scalar_display || i.op==ir::Op::scalar_format)module.coordinated=true;
         i.source = source.location(token.offset);
-        if (i.op==ir::Op::function_call || i.op==ir::Op::panic || i.op==ir::Op::pattern_equal || i.op==ir::Op::type_cast || i.op==ir::Op::sum_get || i.op==ir::Op::dict_get || i.op==ir::Op::dict_set || i.op==ir::Op::dict_contains || i.op==ir::Op::dict_remove || i.op==ir::Op::dict_clear || i.op==ir::Op::dict_entry || i.op==ir::Op::dict_check || i.op==ir::Op::dict_new || i.op==ir::Op::array_slice || i.op==ir::Op::list_insert || i.op==ir::Op::list_clear || i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_count || i.op==ir::Op::string_index || i.op==ir::Op::string_encode || i.op==ir::Op::string_decode || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
+        if (i.op==ir::Op::function_call || i.op==ir::Op::panic || i.op==ir::Op::pattern_equal || i.op==ir::Op::type_cast || i.op==ir::Op::sum_get || i.op==ir::Op::dict_get || i.op==ir::Op::dict_set || i.op==ir::Op::dict_contains || i.op==ir::Op::dict_remove || i.op==ir::Op::dict_clear || i.op==ir::Op::dict_entry || i.op==ir::Op::dict_check || i.op==ir::Op::dict_new || i.op==ir::Op::array_slice || i.op==ir::Op::list_insert || i.op==ir::Op::list_clear || i.op==ir::Op::list_push || i.op==ir::Op::list_remove || i.op==ir::Op::list_index || i.op==ir::Op::list_commit || i.op==ir::Op::array_get || i.op==ir::Op::array_set || i.op==ir::Op::string_join || i.op==ir::Op::format_unwrap || i.op==ir::Op::format_layout || i.op==ir::Op::temporal_native || i.op==ir::Op::scalar_display || i.op==ir::Op::scalar_format || i.op==ir::Op::string_count || i.op==ir::Op::string_index || i.op==ir::Op::string_encode || i.op==ir::Op::string_decode || i.op==ir::Op::string_literal || i.op==ir::Op::string_concat || i.op==ir::Op::string_equal || i.op == ir::Op::call || i.op==ir::Op::interface_pack || i.op==ir::Op::interface_prepare || i.op==ir::Op::interface_call || i.op == ir::Op::divide || i.op == ir::Op::remainder || i.op == ir::Op::convert || i.op == ir::Op::gc_construct || i.op == ir::Op::gc_read || i.op == ir::Op::gc_write)
             i.source_excerpt = source.excerpt(token.offset);
         auto& instructions = output.blocks[*current].instructions;
         auto id = static_cast<unsigned>(instructions.size()); instructions.push_back(std::move(i)); return id;
@@ -3034,7 +3177,7 @@ class Lowering {
     ir::Place select_place(ir::Place place, const std::vector<unsigned>& path, const Token& token) {
         auto t=output.locals.at(place.slot);
         for (auto field:path) {
-            if (t.kind==Type::managed_ref) {
+            if (t.kind==Type::managed_ref && !(output.initializer && t.construction && place.slot==0 && place.fields.empty())) {
                 auto slot=snapshot(read_place(place,token),t,token); place={slot,{}};
             }
             place.fields.push_back(field); t=ir::field_type(t,field);
@@ -3312,6 +3455,30 @@ class Lowering {
         case K::awaited: return emit({ir::Op::await,expression(*e.parts[0])},e.token);
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
         case K::method_call: case K::call: return frontend_case([&]() -> unsigned {
+            if(e.target.starts_with("$time.")) {
+                std::vector<unsigned> slots(e.parts.size());for(unsigned n=0;n<e.parts.size();++n)slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),e.parts[n]->type,e.parts[n]->token);
+                ir::Instruction operation{ir::Op::temporal_native};operation.type=e.type;operation.immediate=std::stoul(e.target.substr(6));for(auto slot:slots)operation.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(operation,e.token);
+            }
+            if(e.target=="$layout.unwrap"){ir::Instruction unwrap{ir::Op::format_unwrap,expression(*e.parts[0])};unwrap.type=Type::string;return emit(unwrap,e.token);}
+            if(e.target.starts_with("$layout.")){ir::Instruction layout{ir::Op::format_layout,expression(*e.parts[0])};layout.type=e.type;layout.immediate=e.target=="$layout.alignment";return emit(layout,e.token);}
+            if(e.target=="$interpolation")return frontend_case([&]() -> unsigned {
+                std::vector<unsigned> slots;for(const auto& part:e.parts)slots.push_back(snapshot(expression(*part),Type::string,part->token));
+                ir::Instruction join{ir::Op::string_join};join.type=Type::string;for(auto slot:slots)join.arguments.push_back(emit({ir::Op::load,slot},e.token));return emit(join,e.token);
+            });
+            if(e.target=="$hole")return frontend_case([&]() -> unsigned {
+                auto value=snapshot(expression(*e.parts[0]),expression_type(*e.parts[0]),e.parts[0]->token);
+                auto spec=expression(*e.parts[1]);ir::Instruction format{ir::Op::scalar_format,emit({ir::Op::load,value},e.token),spec};format.type=e.type_arguments.at(0);
+                if(!e.display_adapter.empty()){format.op=ir::Op::call;format.callee=e.display_adapter;format.arguments={format.a,format.b};format.a=format.b=0;}
+                ir::Instruction text{ir::Op::format_unwrap,emit(format,e.parts[0]->token)};text.type=Type::string;return emit(text,e.parts[0]->token);
+            });
+            if(e.target.starts_with("$display."))return frontend_case([&]() -> unsigned {
+                std::vector<unsigned> slots(e.parts.size());
+                for(unsigned n=0;n<e.parts.size();++n)slots[e.argument_indexes.at(n)]=snapshot(expression(*e.parts[n]),expression_type(*e.parts[n]),e.parts[n]->token);
+                auto value=emit({ir::Op::load,slots.at(0)},e.token);
+                ir::Instruction i{e.target=="$display.string"?ir::Op::scalar_display:ir::Op::scalar_format,value};i.type=e.type;
+                if(e.target=="$display.format")i.b=emit({ir::Op::load,slots.at(1)},e.token);
+                return emit(i,e.token);
+            });
             if(e.target.starts_with("$safe."))return safe_collection(e);
             if(e.target=="$text.to_utf8" || e.target=="$text.from_utf8"){ir::Instruction i{e.target=="$text.to_utf8"?ir::Op::string_encode:ir::Op::string_decode,expression(*e.parts[0])};i.type=e.type;return emit(i,e.token);}
             if(e.target=="$event.emit")return event_emit(e);
@@ -3604,7 +3771,7 @@ public:
     ir::Function lower(const Function& f, const ConstructionContext* construction=nullptr) {
         context=construction;normal_return=!f.body.empty() && f.body.back().kind==Statement::Kind::returned?&f.body.back():nullptr;
         output = {}; output.name = f.symbol; output.source_name = f.concrete_name.empty() ? f.token.text : f.concrete_name; output.display_name=f.display_name; output.source = source.location(f.token.offset);
-        output.asynchronous=f.asynchronous;output.task=f.task;
+        output.asynchronous=f.asynchronous;output.task=f.task;output.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;output.lexical_parent=f.lexical_parent;
         output.bound_receiver=f.bound_receiver;output.closure=f.anonymous;cells.clear();cleanup_head.reset();return_slot.reset();cleanup_jumps.clear();with_scopes.clear();loop_with_depth.clear();
         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
         if(f.cleanup_type!=Type::none){cleanup_head=output.locals.size();auto head=f.cleanup_type;head.nullable=true;output.locals.push_back(head);}
@@ -3875,6 +4042,35 @@ public:
 // Only typed, pure ASTs reach this evaluator. The shared software kernel
 // preserves declared precision and wrapping independently of host arithmetic.
 ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
+    if(e.target=="$interpolation") {
+        formatting::Builder builder;
+        for(const auto& part:e.parts){auto text=constant_value(source,*part).text;if(text.size()>ir::string_constant_limit-builder.size())error(source,part->token,Code::limit,"Folded string exceeds the 16 MiB constant limit.");builder.append(text);}
+        return {0,{},std::move(builder).finish()};
+    }
+    if(e.target=="$hole") {
+        auto value=constant_value(source,*e.parts[0]);const auto& spec=e.parts[1]->aggregate_value.text;
+        auto plan=formatting::parse_numeric(spec);
+        if(plan.alignment.width>ir::string_constant_limit || plan.minimum_integer>ir::string_constant_limit || plan.maximum_fraction>ir::string_constant_limit)error(source,e.token,Code::limit,"Folded display exceeds the 16 MiB constant limit.");
+        auto type=e.parts[0]->type;
+        auto text=numeric::number(type)?formatting::number(numeric::display_number(value.bits,type),plan):formatting::text(type==Type::boolean?(value.bits?"true":"false"):std::string_view(value.text),spec);
+        if(text.size()>ir::string_constant_limit)error(source,e.token,Code::limit,"Folded display exceeds the 16 MiB constant limit.");return {0,{},std::move(text)};
+    }
+    if(e.target.starts_with("$display.") && e.kind==Expr::Kind::call) {
+        std::vector<ir::ConstantValue> values(e.parts.size());std::vector<Type> types(e.parts.size());
+        for(unsigned n=0;n<e.parts.size();++n){auto index=e.argument_indexes.at(n);values[index]=constant_value(source,*e.parts[n]);types[index]=e.parts[n]->type;}
+        const bool formatted=e.target=="$display.format";std::string text;bool valid=true;
+        try {
+            auto spec=formatted?std::string_view(values[1].text):std::string_view{};
+            // Preserve the existing compiler constant budget before allocating
+            // requested padding; Runtime formatting has no arbitrary width cap.
+            auto plan=formatting::parse_numeric(spec);
+            if(plan.alignment.width>ir::string_constant_limit || plan.minimum_integer>ir::string_constant_limit || plan.maximum_fraction>ir::string_constant_limit)error(source,e.token,Code::limit,"Folded display exceeds the 16 MiB constant limit.");
+            text=numeric::number(types[0])?formatting::number(numeric::display_number(values[0].bits,types[0]),plan):formatting::text(types[0]==Type::boolean?(values[0].bits?"true":"false"):std::string_view(values[0].text),spec);
+        }catch(const formatting::Error& failure){if(!formatted)error(source,e.token,Code::invalid_value,failure.what());valid=false;text=failure.what();}
+        if(text.size()>ir::string_constant_limit)error(source,e.token,Code::limit,"Folded display exceeds the 16 MiB constant limit.");
+        if(!formatted)return {0,{},std::move(text)};
+        ir::ConstantValue result;result.fields.resize(3);result.fields[0].bits=valid?0:1;result.fields[valid?1:2].text=std::move(text);return result;
+    }
     if(e.target.starts_with("$numeric::") && e.kind==Expr::Kind::call) {
         std::vector<std::uint64_t> values(e.parts.size());
         for(unsigned n=0;n<e.parts.size();++n)values.at(e.argument_indexes.at(n))=constant_value(source,*e.parts[n]).bits;
@@ -3942,6 +4138,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
 ir::Function member_header(const Unit& u,const Function& f) {
     ir::Function header;header.name=f.symbol;header.module_identity=u.identity;header.method_name=f.concrete_method_name.empty()?f.token.text:f.concrete_method_name;
     header.asynchronous=f.asynchronous;header.task=f.task;header.bound_receiver=f.bound_receiver;header.closure=f.anonymous;header.accessor=f.accessor;header.receiver=static_cast<bool>(f.receiver);header.initializer=f.initializer;header.visibility=f.visibility;header.result=f.result;header.virtual_slot=f.virtual_slot;header.receiver_mutates=f.receiver_mutates;
+    header.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;header.lexical_parent=f.lexical_parent;
     header.parameters.clear();if(f.receiver)header.parameters.push_back(f.receiver->type);
     for(const auto& p:f.parameters)header.parameters.push_back(p.type);
     return header;
@@ -4281,7 +4478,8 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 }
                 if (expanded > 65536 - structure.expanded_fields) error(owner.source,field.token,Code::nesting,"Expanded value layout limit exceeded.","Reduce nested value duplication; the compiler currently permits 65536 expanded fields per value.");
                 structure.expanded_fields += expanded;
-                field.annotation = t; structure.definition->fields.push_back({field.name,t,structure.definition->identity,field.using_field,field.event});
+                if(field.readonly)t=ir::readonly_view(t);
+                field.annotation = t; structure.definition->fields.push_back({field.name,t,structure.definition->identity,field.using_field,field.event,field.visibility,field.readonly,field.token.offset});
                 structure.effective_fields.emplace_back(&owner,&field);
             }
             structure.layout_state = 2;
@@ -4543,7 +4741,7 @@ struct AnalysisAccess {
             result->editor_declarations_.push_back(std::move(record));
         }
         for(const auto& [id,u]:units)for(const auto& [symbol,record]:u->builtins)if(std::none_of(result->editor_declarations_.begin(),result->editor_declarations_.end(),[&](const auto& d){return d.identity==symbol;}))result->editor_declarations_.push_back(record);
-        result->contract_="18:numeric-prelude-v1:20:text-collections-v1:application-v1:"+result->entry_symbol_;
+        result->contract_="18:numeric-prelude-v1:20:text-collections-v1:display-v1:application-v1:"+result->entry_symbol_;
         for(const auto& [id,u]:units)for(const auto& f:u->functions)if(!f.native_symbol.empty())result->contract_+=":"+id+":"+f.native_symbol;
 
         auto graph = std::make_shared<const std::map<std::string, std::unique_ptr<Unit>>>(std::move(units));
@@ -4610,7 +4808,7 @@ struct AnalysisAccess {
             auto synthetic_types=unit->synthetic_types;std::sort(synthetic_types.begin(),synthetic_types.end(),[](auto a,auto b){return Type::key(a)<Type::key(b);});
             for(auto type:synthetic_types){
                 field(result->contract_,"compiler-value-layout");field(result->contract_,Type::key(type));auto base=type.definition->base.lock();field(result->contract_,base?base->identity:"");
-                for(const auto& member:type.definition->fields){field(result->contract_,member.name);field(result->contract_,ir::type_name(member.type));field(result->contract_,ir::capability_key(member.type));}
+                for(const auto& member:type.definition->fields){field(result->contract_,member.name);field(result->contract_,member.visibility);field(result->contract_,member.readonly?"const":"var");field(result->contract_,ir::type_name(member.type));field(result->contract_,ir::capability_key(member.type));}
             }
             // Canonical binding records: offsets and written path normalization are irrelevant.
             std::set<std::string> imports;
@@ -4636,22 +4834,23 @@ struct AnalysisAccess {
                 result->editor_declarations_.push_back({AnalyzedDeclaration::Kind::import_alias,id+"::import::"+import.alias.text,id,"private",location(import.alias),{},Type::none,{},{},id});
 #include "generic_tooling.inc"
             std::function<void(const Expr&,const std::string&,const std::map<unsigned,std::string>&,bool)> visit_expression;
-            auto expression = [&](const Expr& e, const std::string& owner, const std::map<unsigned,std::string>& locals) { visit_expression(e,owner,locals,false); };
+            auto expression = [&](const Expr& e, const std::string& owner, const std::map<unsigned,std::string>& locals) { visit_expression(e,owner,locals,owner.find("::$display$")!=std::string::npos); };
             visit_expression = [&](const Expr& e, const std::string& owner, const auto& locals, bool implicit) {
                 if(!e.qualifier.empty() && aliases.contains(e.qualifier)) {
                     Expr alias(Expr::Kind::name,e.qualifier_token);reference(owner,id+"::import::"+e.qualifier,alias,*unit,implicit,false);
                 }
-                if(!e.source_target.empty()) {reference(owner,e.source_target,e,*unit);if(!e.target.empty())reference(owner,e.target,e,*unit,true);}
+                if(!e.source_target.empty()) {reference(owner,e.source_target,e,*unit,implicit);if(!e.target.empty())reference(owner,e.target,e,*unit,true);}
                 else if(e.kind==Expr::Kind::conversion && e.op=="interface") {
                     reference(owner,e.type.definition->identity,e,*unit,true);
                     for(const auto& binding:graph->at(entry)->member_catalog->interface_bindings) if(binding.key==e.target)
                         for(const auto& [requirement,route]:binding.methods) {reference(owner,requirement,e,*unit,true);reference(owner,route.second,e,*unit,true);}
-                } else if (!e.target.empty() && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.")) reference(owner,e.target,e,*unit,implicit || e.implicit);
+                } else if (!e.target.empty() && e.target!="$interpolation" && e.target!="$hole" && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.")) reference(owner,e.target,e,*unit,implicit || e.implicit);
                 else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit || e.implicit,locals.at(e.slot).find("::const::")!=std::string::npos && locals.at(e.slot).substr(0,locals.at(e.slot).find("::const::"))==owner.substr(0,owner.find("::const::")));
                 if(!e.virtual_slot.empty() && !e.super_call) for(const auto& [id,target_unit]:*graph) for(const auto& target:target_unit->functions)
                     if(target.virtual_slot==e.virtual_slot) reference(owner,target.symbol,e,*unit,true);
                 if (!e.initializer.empty()) reference(owner,e.initializer,e,*unit,implicit);
                 if(!e.setter.empty())reference(owner,e.setter,e,*unit,true);
+                if(!e.display_adapter.empty())reference(owner,e.display_adapter,e,*unit,true);
                 if(!e.argument_indexes.empty() && !e.target.starts_with("$"))for(const auto& [target_id,target_unit]:*graph)for(const auto& target:target_unit->functions)if(target.symbol==e.target && target.generic_origin.empty()) {
                     for(unsigned n=0;n<e.names.size();++n)if(!e.names[n].text.empty()) {
                         const auto& parameter=target.parameters.at(e.argument_indexes.at(n));
@@ -4693,10 +4892,10 @@ struct AnalysisAccess {
                 for(const auto& variant:structure.definition->cases){field(layout,"variant");field(layout,variant.name);field(layout,std::to_string(variant.begin));field(layout,std::to_string(variant.count));}
                 for (const auto& member : structure.fields) {
                     auto t = *member.annotation; auto identity = key + "::field::" + member.name;
-                    field(layout,member.event?"event":member.using_field ? "using" : "ordinary-field"); field(layout,member.name); field(layout,t.kind == Type::aggregate ? t.definition->identity : ir::type_name(t)); field(layout,member.constant_syntax);
-                    AnalyzedDeclaration record{structure.definition->managed ? AnalyzedDeclaration::Kind::managed_field : AnalyzedDeclaration::Kind::value_field,identity,id,structure.visibility,location(member.token),{},t,member.constant_syntax,{},key};
+                    field(layout,member.event?"event":member.using_field ? "using" : "ordinary-field"); field(layout,member.visibility);field(layout,member.readonly?"const":"var");field(layout,member.name); field(layout,t.kind == Type::aggregate ? t.definition->identity : ir::type_name(t)); field(layout,member.constant_syntax);
+                    AnalyzedDeclaration record{structure.definition->managed ? AnalyzedDeclaration::Kind::managed_field : AnalyzedDeclaration::Kind::value_field,identity,id,member.visibility,location(member.token),{},t,member.constant_syntax,{},key};
                     if(member.source_end>member.token.offset){auto r=location(member.token);r.begin=unit->source.line_starts().at(unit->source.location(member.token.offset).line-1);r.end=member.source_end;record.extent=r;}
-                    record.using_field=member.using_field;record.editor_symbol_kind=member.event?24:8; declaration(std::move(record),true,structure.definition->cases.empty());
+                    record.using_field=member.using_field;record.readonly=member.readonly;record.editor_symbol_kind=member.event?24:8; declaration(std::move(record),true,structure.definition->cases.empty());
                     if (member.expression) expression(*member.expression,identity,{});
                 }
                 for(unsigned n=0;n<structure.case_tokens.size();++n){const auto& variant=structure.definition->cases[n];std::vector<Type> parameters;for(unsigned field=0;field<variant.count;++field)parameters.push_back(ir::field_type(Type(structure.definition),variant.begin+field));
@@ -4745,12 +4944,12 @@ struct AnalysisAccess {
                 if(f.source_end>f.token.offset){auto r=location(f.token);r.begin=unit->source.line_starts().at(unit->source.location(f.token.offset).line-1);r.end=f.source_end;
                     if(f.accessor)for(const auto& other:unit->functions)if(other.accessor && other.token.offset==f.token.offset)r.end=std::max(r.end,other.source_end);
                     method_record.extent=r;}
-                declaration(std::move(method_record),true,!f.anonymous && f.token.text!="$application");
+                declaration(std::move(method_record),true,!f.anonymous && !f.display_adapter && f.token.text!="$application");
                 if(f.overriding) {Expr use(Expr::Kind::name,f.token);reference(f.symbol,f.virtual_slot,use,*unit,true);}
                 for (const auto& p : f.parameters) if (p.default_expression) expression(*p.default_expression,f.symbol,{});
                 std::map<unsigned,std::string> locals;
                 for(const auto& binding:f.editor_bindings) {
-                    if(!f.generic_origin.empty())continue;
+                    if(!f.generic_origin.empty() || f.display_adapter)continue;
                     if(binding.readonly && std::none_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;})) continue;
                     auto key=source_identity(f.symbol)+"::local::"+std::to_string(binding.slot);
                     auto kind=std::any_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;}) ? AnalyzedDeclaration::Kind::parameter : AnalyzedDeclaration::Kind::local_variable;
@@ -4991,14 +5190,25 @@ EditorAssistance editor_assistance(const std::filesystem::path& entry,const Sour
         for(const auto& keyword:reserved)if(keyword.starts_with(prefix))empty.candidates.push_back({keyword,"keyword",14});
     }
     auto repaired=text;repaired.replace(begin,end-begin,"_void_editor_cursor_");
-    // Only close unmatched parentheses on this line. No invented declarations,
-    // signatures, imports or statement bodies enter the compiler context.
+    // Repair physical delimiters only; interpolation lowering adds synthetic
+    // parentheses at expression offsets that are not source characters.
+    Diagnostics physical_diagnostics;auto physical=lex(source,physical_diagnostics,0,std::string::npos,0,false);
+    if(physical_diagnostics.failed())return empty;
     int parentheses=0;
-    for(const auto& t:tokens) if(t.offset>=line && t.offset<begin){if(t.text=="(")++parentheses;else if(t.text==")")--parentheses;}
+    for(const auto& t:physical)if(t.offset>=line && t.offset<begin){if(t.text=="(")++parentheses;else if(t.text==")")--parentheses;}
     if(parentheses<0 || parentheses>32)return empty;
     auto stop=text.find_first_of("\r\n",end);if(stop==std::string::npos)stop=text.size();
-    int closing=0;for(const auto& t:tokens)if(t.offset>=end && t.offset<stop && t.text==")")++closing;
-    if(parentheses>closing)repaired.insert(stop+std::string_view("_void_editor_cursor_").size()-(end-begin),static_cast<std::size_t>(parentheses-closing),')');
+    int missing=parentheses;std::size_t insertion=end;const Token* last=nullptr;
+    for(const auto& token:physical) {
+        if(token.kind==TokenKind::string && token.offset<end && span(source,token).end>=end){last=&token;insertion=span(source,token).end;}
+        if(token.offset<end || token.offset>=stop || token.kind==TokenKind::newline || token.kind==TokenKind::indent || token.kind==TokenKind::dedent || token.kind==TokenKind::end)continue;
+        if(token.text=="(")++missing;else if(token.text==")")--missing;
+        last=&token;insertion=span(source,token).end;
+    }
+    if(missing<0 || missing>32)return empty;
+    // Keep the existing conditional colon and leave comments/literal bytes alone.
+    if(last && last->text==":")insertion=last->offset;
+    if(missing){if(insertion>stop)return empty;repaired.insert(insertion+std::string_view("_void_editor_cursor_").size()-(end-begin),static_cast<std::size_t>(missing),')');}
     auto frozen=overrides;frozen.insert_or_assign(module,SourceFile(source.path(),std::move(repaired)));
     EditorProbe probe{module,begin,{}};probe.result.begin=begin;probe.result.end=end;
     try {(void)validated_project(entry,frozen,true,nullptr,&probe);}
@@ -5010,7 +5220,7 @@ EditorAssistance editor_assistance(const std::filesystem::path& entry,const Sour
     return empty;
 }
 std::optional<std::string> format_source(const SourceFile& source) {
-    Diagnostics diagnostics;auto tokens=lex(source,diagnostics);
+    Diagnostics diagnostics;auto tokens=lex(source,diagnostics,0,std::string::npos,0,false);
     if(diagnostics.failed())return {};
     const auto& text=source.text();
     struct Edit {std::size_t begin,end;std::string text;};std::vector<Edit> edits;
@@ -5046,7 +5256,7 @@ std::optional<std::string> format_source(const SourceFile& source) {
     // Retokenization proves the same structural indentation, including literal
     // blocks. Ambiguous/unsupported relationships produce no edit.
     auto result=text;for(auto it=edits.rbegin();it!=edits.rend();++it)result.replace(it->begin,it->end-it->begin,it->text);
-    Diagnostics check;auto after=lex(SourceFile(source.path(),result),check);
+    Diagnostics check;auto after=lex(SourceFile(source.path(),result),check,0,std::string::npos,0,false);
     if(check.failed() || tokens.size()!=after.size())return {};
     for(std::size_t n=0;n<tokens.size();++n)if(tokens[n].kind!=after[n].kind || tokens[n].text!=after[n].text)return {};
     return result;

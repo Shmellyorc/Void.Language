@@ -3,6 +3,7 @@
 #include "void/numeric.hpp"
 #include <bit>
 #include <llvm/Support/JSON.h>
+#include <llvm/Support/FileSystem.h>
 #include <llvm/Support/raw_ostream.h>
 #include <algorithm>
 #include <cmath>
@@ -307,7 +308,8 @@ class Server {
         }else label+=": ";
         label+=vd::ir::type_name(d.type);
         if(d.receiver_mutates)label+=" (mutating receiver)";
-        if(d.kind==K::module_constant || d.kind==K::local_constant || d.type.readonly)label="const "+label;
+        if(d.kind==K::module_constant || d.kind==K::local_constant || d.type.readonly || d.readonly)label="const "+label;
+        if(d.kind==K::value_field || d.kind==K::managed_field)label+=" (declared by "+d.owner+")";
         if(d.visibility=="private" || d.visibility=="internal")label=d.visibility+" "+label;
         if(d.value && vd::numeric::integer(d.type)) {
             auto bits=*d.value;auto width=vd::numeric::width(d.type);
@@ -672,12 +674,14 @@ int run(const fs::path& entry) {
 #ifdef _WIN32
 int wmain(int argc,wchar_t** argv) {
     try {
+        auto executable=vd::path_utf8(fs::path(argv[0]));vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(executable.c_str(),reinterpret_cast<void*>(&wmain))));
         if(argc==5 && std::wstring_view(argv[1])==L"--discover")return preflight(fs::path(argv[2]),fs::path(argv[3]),fs::path(argv[4]));
         if(argc!=3 || std::wstring_view(argv[1])!=L"--entry") throw std::invalid_argument("Usage: voidls --entry <project entry.void>");
         return run(fs::path(argv[2]));
 #else
 int main(int argc,char** argv) {
     try {
+        vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&vd::configure_standard_library_root))));
         if(argc==5 && std::string_view(argv[1])=="--discover")return preflight(vd::utf8_path(argv[2]),vd::utf8_path(argv[3]),vd::utf8_path(argv[4]));
         if(argc!=3 || std::string_view(argv[1])!="--entry") throw std::invalid_argument("Usage: voidls --entry <project entry.void>");
         return run(vd::utf8_path(argv[2]));

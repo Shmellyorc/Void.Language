@@ -119,7 +119,7 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         check(values[i.a],f.locals.at(i.immediate),true);
                         local_changed|=join_facts(locals.at(i.immediate),values[i.a]);value={};break;
                     case Op::store: {
-                        if (!capability_assignable(types[function][block][i.b],f.locals[i.a])) fail("store discards reference or construction-place capability");
+                        if (!capability_assignable(types[function][block][i.b],f.locals[i.a])) fail("store discards readonly reference or construction-place capability");
                         const auto position=std::pair{block,n};
                         if(!initializations[i.a]) initializations[i.a]=position;
                         if(*initializations[i.a]==position) join_facts(capacities[i.a],values[i.b]);

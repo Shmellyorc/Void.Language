@@ -1,8 +1,12 @@
 // Included into the existing frontend after Token and diagnostic helpers.
+struct InterpolationHole {
+    std::size_t begin,end,spec_begin,spec_end;
+};
 Token string_token(const SourceFile& source,std::size_t& p,
-    std::vector<std::pair<std::size_t,std::size_t>>* substitutions=nullptr,std::vector<Token>* chunks=nullptr,unsigned nesting=0) {
+    std::vector<InterpolationHole>* substitutions=nullptr,std::vector<Token>* chunks=nullptr,unsigned nesting=0) {
     if(nesting>=64)error(source,{TokenKind::symbol,"",p},Code::nesting,"String interpolation nesting limit exceeded.");
-    const auto& text=source.text(); auto start=p++;
+    const auto& text=source.text(); auto start=p;
+    const bool multiline=text.compare(p,3,"\"\"\"")==0;const auto quotes=multiline?3u:1u;p+=quotes;
     std::string decoded;auto chunk_start=p;std::size_t decoded_size=0;
     auto reject=[&](std::size_t at,const std::string& message) {
         p=at; // Recovery consumes this physical line, never the following line.
@@ -13,28 +17,45 @@ Token string_token(const SourceFile& source,std::size_t& p,
             error(source,{TokenKind::symbol,"",start},Code::limit,"Decoded string exceeds the 16 MiB constant limit.");
         ++decoded_size;decoded+=c;
     };
-    if (text.compare(start,3,"\"\"\"")==0) reject(start,"Multiline strings are deferred.");
-    while (p<text.size() && text[p]!='"') {
+    auto closing=[&]{return multiline?text.compare(p,3,"\"\"\"")==0:text[p]=='"';};
+    while (p<text.size() && !closing()) {
         auto at=p; unsigned char c=text[p++];
-        if (c<32 || c==127) reject(at,"Raw control characters and line breaks are not allowed in strings; use an escape.");
+        if ((c<32 && !(multiline && (c=='\r' || c=='\n' || c=='\t'))) || c==127) reject(at,"Raw control characters and line breaks are not allowed in strings; use an escape.");
         if (c=='{' || c=='}') {
             if(p<text.size() && text[p]==c){++p;append(static_cast<char>(c));continue;}
             if(c=='}')reject(at,"Unmatched interpolation closing brace; double literal braces.");
             if(!substitutions || !chunks)reject(at,"Invalid interpolation context.");
             Token chunk{TokenKind::string,"\""+text.substr(chunk_start,at-chunk_start)+"\"",chunk_start,std::move(decoded)};chunk.source_width=at-chunk_start;chunks->push_back(std::move(chunk));decoded.clear();
-            auto first=p;unsigned braces=0;
+            auto first=p;std::vector<char> delimiters;std::size_t spec_begin=std::string::npos;
             while(p<text.size()){
                 auto ch=text[p];
-                if(ch=='\r' || ch=='\n')reject(p,"Interpolation expressions must remain on one physical line.");
-                if(ch=='"'){std::vector<std::pair<std::size_t,std::size_t>> nested;std::vector<Token> pieces;string_token(source,p,&nested,&pieces,nesting+1);continue;}
-                if(ch=='#')reject(p,"Comments cannot consume an interpolation closing delimiter.");
-                if(ch=='{')++braces;
-                else if(ch=='}'){if(!braces)break;--braces;}
+                if(ch=='"'){std::vector<InterpolationHole> nested;std::vector<Token> pieces;string_token(source,p,&nested,&pieces,nesting+1);continue;}
+                if(ch=='#'){while(p<text.size() && text[p]!='\r' && text[p]!='\n')++p;continue;}
+                if(ch==':' && delimiters.empty()){spec_begin=++p;break;}
+                if(ch=='(' || ch=='[' || ch=='{')delimiters.push_back(ch);
+                else if(ch==')' || ch==']' || ch=='}'){
+                    if(delimiters.empty()){if(ch=='}')break;reject(p,"Unbalanced interpolation delimiter.");}
+                    auto open=delimiters.back();if((ch==')' && open!='(')||(ch==']' && open!='[')||(ch=='}' && open!='{'))reject(p,"Unbalanced interpolation delimiter.");
+                    delimiters.pop_back();
+                }
                 ++p;
             }
-            if(p==text.size())reject(at,"Unterminated string interpolation.");
-            if(text.find_first_not_of(' ',first)>=p)reject(at,"Interpolation requires a string expression.");
-            substitutions->push_back({first,p});++p;chunk_start=p;
+            auto expression_end=spec_begin==std::string::npos?p:spec_begin-1;
+            if(spec_begin!=std::string::npos){
+                bool quoted=false;
+                while(p<text.size()){
+                    auto ch=text[p];
+                    if(ch=='\''){if(quoted && p+1<text.size() && text[p+1]=='\''){p+=2;continue;}quoted=!quoted;}
+                    else if(!quoted && ch=='}')break;
+                    else if(!quoted && ch=='{')reject(p,"Quote literal format braces; nested format fields are not supported.");
+                    else if(ch=='\r' || ch=='\n')reject(p,"Parenthesize an interpolation expression with a body colon before adding a format specification.");
+                    ++p;
+                }
+                if(quoted)reject(spec_begin,"Unterminated quoted format literal.");
+            }
+            if(p==text.size())reject(at,"Unterminated string interpolation: missing closing delimiter.");
+            if(text.find_first_not_of(" \r\n\t",first)>=expression_end)reject(at,"Interpolation requires an expression.");
+            substitutions->push_back({first,expression_end,spec_begin==std::string::npos?p:spec_begin,p});++p;chunk_start=p;
         } else if (c=='\\') {
             if (p>=text.size()) reject(at,"Unterminated string escape.");
             char escape=text[p++];
@@ -72,7 +93,7 @@ Token string_token(const SourceFile& source,std::size_t& p,
     if(substitutions && !substitutions->empty()){
         Token chunk{TokenKind::string,"\""+text.substr(chunk_start,p-chunk_start)+"\"",chunk_start,std::move(decoded)};chunk.source_width=p-chunk_start;chunks->push_back(std::move(chunk));
     }
-    ++p;
+    p+=quotes;
     auto spelling=text.substr(start,p-start);
     // Exact const/default/reload contracts retain the original whole literal,
     // even though evaluation consumes its pieces through ordinary expressions.
