@@ -1,5 +1,61 @@
 # Work log
 
+## CI #90 Windows native linking and permanent succession — 21 October 2026
+
+Baseline `ab357879599edaf816e18fc43587deca411d8aeb`. Implemented Boss's approved
+short-private-directory Windows repair before updating documentation. LLVM random
+leaf generation and exclusive reservation, complete UTF-16 linker-path bound,
+ancestor/reparse pinning, trusted-root admission, protected owner-only DACL
+creation/readback, verified archive copies and PE validation precede checked
+CREATE_NEW/flush/byte comparison into existing destination staging. Revalidate
+output and call `publish()` unchanged. Original source/VFS/output identities,
+8.3/exact-case/collision protections and both longPathAware manifests remain.
+POSIX behavior stays on the existing path. RAII owns only successful reservations.
+
+[Repair/design/native checklist](stage9/CI90_WINDOWS_NATIVE_LINK_REPAIR.md),
+[machine-readable evidence](stage9/CI90_EVIDENCE.json) and
+[retained failed Windows jobs](stage9/ci90/LOGS.json) carry details and hashes.
+CI #90 Windows Debug/Release each remains historically **158/160**, with the two
+Clang working-directory failures. CI #88's alias regression passed both later
+Windows configurations. No native acceptance of this new repair is asserted.
+
+| Local Linux configuration | Focused outcome |
+| --- | --- |
+| Debug | 9/9 passed |
+| Strict ASan/UBSan/leaks, outside sandbox | 9/9 passed |
+
+The selected set includes Stage 9 workflow, CI #88 native paths, CI #89 genuine
+long paths and Stage 8 discovery plus numeric, text/collections, application/native,
+ergonomics and local libraries. Initial Debug 8/9 lacked the Sprint 4 host binary;
+building it corrected the setup, followed by 9/9. The sandboxed strict attempt
+failed all nine on LeakSanitizer's ptrace restriction; the successful repeat kept
+leak detection and strict halt settings enabled. Cross-target Clang 19.1.7
+syntax-only checks passed for Windows source/helper using extracted MinGW headers
+and a temporary host-header configuration adjustment; this is not native execution.
+The initial header download was blocked by sandbox DNS; the approved read-only
+package download succeeded into `/tmp` without system installation.
+
+Windows coverage now extends the existing workflow suite with effective access,
+concurrent/colliding reservations, owned failure cleanup, complete-path bounds,
+temporary-root junction rejection, binary copies, locked handles, invalid successful
+link output and staged-copy failure preserving prior bytes. Normal suite inventory
+remains 160; original failing assertions and six-level fixtures were retained.
+Native Windows MSVC compile/link, all Windows subchecks, Debug/Release 160/160,
+actual second-volume transfer and post-repair macOS are **pending**. Wrench review
+is pending. Only Boss can supply native acceptance and mark CI #90 **RESOLVED**.
+
+After implementation/local verification, updated the workflow contract, index,
+permanent Wrench handoff and local-library/Bible/roadmap future-package boundaries.
+Recorded Git sources, explicit revisions, reproducible hashes/lockfile, local-import
+compatibility, target-aware native dependencies, eventual C integration, trust
+without unrestricted install scripts and future discovery/editor support; exact
+syntax/resolver/version/trust/link contracts remain future decisions. Governance
+retains Boss's architecture/Git/hosted control, three Clanker roles, Linux/focused
+local development, near-release full CI policy, repair of confirmed blockers,
+language-before-substantial-stdlib priority and protected public README.
+No commit, push, branch, hosted run, package implementation or root README change.
+
+
 ## CI #89 verified Windows manifest repair — 21 October 2026
 
 Native diagnosis #1 confirmed Windows error 3 at a 353-unit deep directory; the

@@ -238,7 +238,12 @@ engineering choices within the approved contract.
 
 ## Package-manager separation
 
-The future Git-based package manager remains separate. Preserve current local
+The future Git-based package manager remains separate. Boss's retained direction
+and undecided manifest/resolver/version/trust/native contracts are authoritative
+in [the local-library future boundary](LOCAL_LIBRARIES.md#future-external-package-manager--boss-direction-21-october-2026).
+Git sources, explicit revisions, reproducibility, hashes/lockfile, target-aware
+native compatibility, safe package integrity and future editor discovery are
+future capabilities, not Stage 9 deliverables. Preserve current local
 source consumption and canonical identities as useful interfaces. Stage 9 must
 not add Git/network fetching, version solving, registry/lockfile syntax, lifecycle
 scripts, package native-link permissions or an invented external-project identity

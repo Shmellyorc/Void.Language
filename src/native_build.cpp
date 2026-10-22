@@ -8,7 +8,7 @@
 #include <cctype>
 #include <stdexcept>
 #ifdef _WIN32
-#include <windows.h>
+#include "native_windows.hpp"
 #endif
 namespace vd {
 namespace {
@@ -71,6 +71,11 @@ fs::path output_path(const ValidatedAnalysis& analysis,const fs::path& requested
     }
     return path;
 }
+#ifdef _WIN32
+struct Staging : native_windows::Directory {
+    explicit Staging(const fs::path& output):Directory(output.parent_path(),false,native_windows::staging_leaf){}
+};
+#else
 struct Staging {
     fs::path directory;
     explicit Staging(const fs::path& output) {
@@ -92,6 +97,7 @@ struct Staging {
     }
     ~Staging(){std::error_code ignored;fs::remove_all(directory,ignored);}
 };
+#endif
 void publish(const fs::path& staged,const fs::path& output) {
     // POSIX rename and Windows MoveFileEx replace in one operation. Never remove
     // a good executable first; an executing/locked Windows file leaves it intact.
@@ -153,25 +159,47 @@ void publish_object(const ValidatedAnalysis& analysis,const fs::path& requested,
 void build_executable(const ValidatedAnalysis& analysis,const fs::path& requested,bool optimize,const char* argv0) {
     auto config=resources(argv0);
     auto output=output_path(analysis,requested);Staging stage(output);
-    version(config.driver,"clang version 19.1.7",stage.directory/"version.txt");
-    if(!config.linker.empty())version(config.linker,"LLD 19.1.7",stage.directory/"version.txt");
-    const auto object=stage.directory/"program.o";
 #ifdef _WIN32
-    const auto executable=stage.directory/"program.exe";
+    auto root=native_windows::temporary_root();exact_path(root);
+    native_windows::Directory linking(root,true);
+    const auto& work=linking.directory;
+    native_windows::copy_checked(config.runtime,work/"runtime.lib");
+    native_windows::copy_checked(config.fixture,work/"fixture.lib");
+    config.runtime="runtime.lib";config.fixture="fixture.lib";
+    const auto executable=work/"program.exe";
 #else
-    const auto executable=stage.directory/"program";
+    const auto& work=stage.directory;
+    const auto executable=work/"program";
 #endif
+    version(config.driver,"clang version 19.1.7",work/"version.txt");
+    if(!config.linker.empty())version(config.linker,"LLD 19.1.7",work/"version.txt");
+    const auto object=work/"program.o";
     emit_object(analysis.lower(),object,optimize,true);
     std::vector<std::string> args{path_utf8(config.driver),"--driver-mode=g++"};
     if(!config.linker.empty())args.push_back("--ld-path="+path_utf8(config.linker));
     args.insert(args.end(),config.flags.begin(),config.flags.end());
     // LLD 19 interprets '%' in absolute output paths. The driver's child working
-    // directory keeps the real project path and gives the linker a relative name.
-    args.insert(args.end(),{"-working-directory",path_utf8(stage.directory),path_utf8(object),path_utf8(config.runtime),path_utf8(config.fixture),"-o",path_utf8(executable.filename())});
+    // directory gives the linker a relative name. Windows uses a short private
+    // workspace because Clang cannot chdir to a genuine long project path.
+#ifdef _WIN32
+    const auto object_argument=object.filename();
+#else
+    const auto& object_argument=object;
+#endif
+    args.insert(args.end(),{"-working-directory",path_utf8(work),path_utf8(object_argument),path_utf8(config.runtime),path_utf8(config.fixture),"-o",path_utf8(executable.filename())});
     auto status=execute(args);
     if(status!=0)throw std::runtime_error("Native linker failed (status "+std::to_string(status)+").");
     if(!fs::is_regular_file(executable) || fs::file_size(executable)==0 || !llvm::sys::fs::can_execute(path_utf8(executable)))
         throw std::runtime_error("Native linker did not produce a usable executable.");
+#ifdef _WIN32
+    // Check PE structure through LLVM, not merely child status or nonempty bytes.
+    // Keep the original pinned, with writes/deletion denied, through transfer.
+    auto pinned=native_windows::verified_executable(executable);
+    const auto staged=stage.directory/"program.exe";
+    native_windows::copy_checked(executable,staged,true);
+    output_path(analysis,output);publish(staged,output);
+#else
     output_path(analysis,output);publish(executable,output);
+#endif
 }
 }

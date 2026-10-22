@@ -1,0 +1,157 @@
+{
+  "date": "2026-10-21",
+  "baseline": "ab357879599edaf816e18fc43587deca411d8aeb",
+  "status": "Implemented / locally verified; pending native verification, NOT RESOLVED",
+  "ci90_historical": {
+    "windows_debug": "158/160",
+    "windows_release": "158/160",
+    "failures": [
+      "application_workflow_stage9",
+      "long_physical_paths_ci89"
+    ],
+    "diagnostic": "clang: error: unable to set working directory",
+    "logs": "ci90/LOGS.json"
+  },
+  "local": {
+    "platform": "Linux",
+    "debug_build": "build/ci-official-debug",
+    "strict_build": "build/ci-official-san",
+    "build_targets": [
+      "voidc",
+      "voidls",
+      "void_sprint4_tests"
+    ],
+    "debug": {
+      "tests": 9,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 80.0,
+      "suites": [
+        "application_workflow_stage9",
+        "native_output_paths_ci88",
+        "long_physical_paths_ci89",
+        "lsp_stage8",
+        "numeric_sprint2",
+        "ergonomics_sprint6",
+        "local_libraries",
+        "application_native_sprint4",
+        "text_collections_sprint3"
+      ]
+    },
+    "strict_sanitizers": {
+      "tests": 9,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 87.0,
+      "suites": [
+        "application_workflow_stage9",
+        "native_output_paths_ci88",
+        "long_physical_paths_ci89",
+        "lsp_stage8",
+        "numeric_sprint2",
+        "ergonomics_sprint6",
+        "local_libraries",
+        "application_native_sprint4",
+        "text_collections_sprint3"
+      ]
+    },
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "strict_execution": "Approved outside sandbox; leak detection remained enabled",
+    "logs": "build/ci90-native-link/",
+    "debug_workflow_recheck": {
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 3.0,
+      "suites": [
+        "application_workflow_stage9"
+      ]
+    },
+    "earlier_attempts": [
+      {
+        "debug": "8/9; Sprint 4 host executable absent; built it and repeated 9/9"
+      },
+      {
+        "strict_sandbox": "0/9; LeakSanitizer fatal ptrace/sandbox limitation; repeated outside sandbox 9/9"
+      },
+      {
+        "windows_syntax_initial": "Host LLVM_ON_UNIX setting mismatched Windows headers; fixed only temporary syntax configuration"
+      },
+      {
+        "header_download": "Initial sandbox DNS failure; approved /tmp-only apt download succeeded, no system installation"
+      }
+    ],
+    "strict_workflow_recheck": {
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 5.0
+    }
+  },
+  "windows_cross_syntax": {
+    "status": "Passed, both translation units; syntax-only, no linking or execution",
+    "compiler": "Clang 19.1.7",
+    "target": "x86_64-w64-mingw32",
+    "headers": "MinGW 14.0.0 and GCC C++ 15-posix headers extracted under /tmp/void-ci90-mingw",
+    "temporary_llvm_config": "Copy of host llvm-config.h with LLVM_ON_UNIX undefined, under /tmp; repository and SDK headers untouched",
+    "log": "build/ci90-native-link/ci90-windows-syntax-final.log"
+  },
+  "native_pending": [
+    "MSVC production/helper compilation and linkage",
+    "Windows Debug 160/160",
+    "Windows Release 160/160",
+    "Windows-only DACL AccessCheck / collision / concurrency / cleanup / failure checks",
+    "Genuine >260 physical project and Unicode/% paths on Windows",
+    "Actual second-volume transfer and final replacement",
+    "Post-repair macOS execution",
+    "Independent Wrench review"
+  ],
+  "optional_second_volume": "void_windows_native_staging.exe <existing writable second-volume directory>; requires distinct native volume serial numbers",
+  "unchanged": [
+    "publish() body",
+    "root README.md",
+    "both production longPathAware manifests",
+    "original CI89 genuine-long-path suite",
+    "CI88 original regression suite",
+    "hosted workflows",
+    "source analysis/VFS identity code"
+  ],
+  "constraints": {
+    "commits": false,
+    "pushes": false,
+    "branches": false,
+    "hosted_dispatch": false,
+    "full_matrix": false,
+    "package_implementation": false
+  },
+  "sha256": {
+    "CMakeLists.txt": "dd2b9dc88852815d8da306d8833547fff789ddb065e717c2f2b9757a0b0d996e",
+    "src/native_build.cpp": "5d71c086bbd73011ca9f2465c8b081e3da38e3ad7080acc4d18f3c796a2ca8ea",
+    "src/native_windows.hpp": "9948dc6c9c087ff6fc2a267d833486114d5303bd080c783e4f506348a8fb10dd",
+    "include/void/native_build.hpp": "30bed0079880aef602fed26ad318980b10d90be5a9265119cfa3bf6adca089b0",
+    "tests/stage9/windows_native_staging.cpp": "cc0ba5c65fcd955ee8c9f8a645adc457096f743c48c6f0fd5e17fd69948ef093",
+    "tests/stage9/workflow.py": "9ac557d4ae35c2b0317e9a17f494c7301fca0077e386fceac94e6735abf18fac",
+    "tests/stage9/long_paths.py": "c94aec912687b60f38fe2350115fcff09c7214cbcb5709d07a3a982c4c33c3a6",
+    "tests/stage9/native_paths.py": "b49ff2d996e489b8e7ce587c0df0afb146f1e26687338774f34507bdbc215572",
+    "cmake/LongPathAware.manifest": "3242062989f717f0f1846b13ad2082e37438d32bdc33903effeaecaa6cfb7382",
+    "README.md": "c287f35842b03a1c5ac170718e674cc5498f877ade76eede5273859921d62add",
+    ".github/workflows/ci.yml": "efb35464c11f409e1d2191f66b61cd5c5e8fa6ef9a5d4a5096443e9c74ff78c5",
+    "docs/STAGE9_APPLICATION_WORKFLOW.md": "fe9c73e4d79f815109308295ed7e5a9d37168ccb0c8342f2eb031a3c06561bd3",
+    "docs/stage9/CI90_WINDOWS_NATIVE_LINK_REPAIR.md": "e80e492d045da36c7d336736626d873628c80fb4c5d394f12c83140e25510d7a",
+    "docs/LOCAL_LIBRARIES.md": "ed53cdfe99336d02939a375ce0d7d686e7b4b1c1811a8a91c97f4d75a0d68e49",
+    "docs/LANGUAGE_BIBLE.md": "e324c24b05f6edb7408d08540a4fcb3b507bbbb6e8b52c49d376971c929683e3",
+    "docs/STAGE9_ROADMAP.md": "1d0afd80abb2ceb0928a9e85e952eb5c7da04b06c36f4014c9d527066f655e7c",
+    "docs/WRENCH_CLANKER.md": "dcac27655dedb9fe3dfb24ff4bf676f6b3d30730a081423b9c0b311bcf20b347",
+    "docs/README.md": "718f23ca0eef9f687a0b9a9fe6aeb4c01d6cbc00033c4579a837b4fa403f089d",
+    "docs/WORK_LOG.md": "8f49dd7f4bec354d2ac084872c2195598ab1254d8e8db573f52af1c3266ca0ca"
+  },
+  "static_checks": [
+    "git diff --check passed",
+    "publish() body byte-identical to baseline",
+    "root README, production manifest, CI88 and CI89 path suites, frontend source/analysis and hosted workflow byte-identical to baseline",
+    "both saved Windows failure logs and gzip SHA-256 verified",
+    "updated documentation file links verified",
+    "Python workflow syntax passed"
+  ]
+}

@@ -58,10 +58,27 @@ removing the old executable. Concurrent external source/output mutation is not a
 filesystem transaction; frontend captured snapshots remain authoritative.
 
 LLVM unique-path generation is applied only to a generated temporary **leaf**;
-percent characters in physical ancestors remain literal. Clang receives the actual
-stage directory via `-working-directory` and a relative executable output name.
-This addresses LLVM 19's absolute percent-output issue while keeping the real
-project/output location. No global cwd change or shell expansion occurs.
+percent characters in physical ancestors remain literal. Linux/macOS keep the
+existing destination-stage working directory and relative executable output name.
+On Windows, Clang 19.1.7 cannot enter a genuine >260-character destination-stage
+path. Build therefore emits/links in a short private directory under a validated
+Windows temporary root, using relative `program.o`, `runtime.lib`, `fixture.lib`
+and `program.exe` names. The complete linker path, including NUL, is bounded to
+240 UTF-16 units. Creation is exclusive, collisions retry without adoption, and
+native protected owner-only DACLs are verified on both Windows staging directories.
+Ancestor handles reject/pin reparse paths; insecure/overlong temporary roots fail
+closed. The full project location, analysis and VFS identities remain unchanged.
+
+The generated Windows file must pass LLVM PE/section validation and private-file
+checks. Native checked copying uses CREATE_NEW, flush, size and byte comparison
+before transfer into existing destination staging. Revalidate the requested
+output and call the existing `publish()` unchanged: cross-volume copying precedes
+same-parent atomic replacement, with no COPY_ALLOWED fallback. Owned temporary
+paths are removed on success/ordinary failure. Locked destination, failed copy,
+compile, link or permission checks preserve the previous executable. No global
+cwd change or shell expansion occurs. [CI #90 implementation, security invariants
+and pending native acceptance](stage9/CI90_WINDOWS_NATIVE_LINK_REPAIR.md) is the
+current Windows record; Linux success does not resolve its Windows gate.
 
 CMake generates `void-native.txt` beside the actual voidc target, using target-file
 generator expressions (including multi-configuration paths). It lists the pinned

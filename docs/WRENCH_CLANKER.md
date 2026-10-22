@@ -1,5 +1,51 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## Current succession handoff — 21 October 2026
+
+CI #90's Windows native-link repair is implemented and locally verified:
+Linux Debug and strict ASan/UBSan/leaks each **9/9**. Native Windows acceptance
+is **pending**, not resolved. [Repair, retained CI #90 logs, safety invariants
+and Wrench checklist](stage9/CI90_WINDOWS_NATIVE_LINK_REPAIR.md) is authoritative.
+Boss chose a short private Windows link directory, checked transfer to existing
+destination staging and unchanged atomic publication. Preserve both manifests,
+CI #88's verified registered-8.3 repair and all original deep-path assertions.
+Earlier entries below retain their historical verification status.
+
+## Permanent Boss decisions — current governance, 21 October 2026
+
+These instructions supersede older sprint prompts or routine seven-job CI gates
+below; historical evidence does not itself authorize another sprint or hosted run.
+
+- **Boss** owns significant architecture approval, commits, pushes, branches and
+  hosted CI. **Research Clanker** investigates and supplies evidence. **Keyboard
+  Clanker** implements authorized engineering. **Wrench Clanker** independently
+  reviews architecture, source changes and evidence; implementation is not its own
+  independent acceptance. This handoff does not claim a completed Wrench review.
+- Linux is the primary development platform. Use focused local tests during
+  ordinary feature development. Do not routinely run the full seven-job hosted
+  matrix after each sprint. Comprehensive cross-platform CI returns near release,
+  except when Boss specifically authorizes targeted verification. Native claims
+  need native evidence; Linux success never substitutes for Windows/macOS.
+- Work in substantial authorized sprints with KISS/DRY, existing frontend/VFS,
+  typed IR, pinned LLVM/Clang **19.1.7**, Runtime and precise GC. Preserve actual
+  safety/correctness guarantees. Avoid speculative verification frameworks,
+  unnecessary complexity, artificial tiny gates or blanket final-byte certification.
+- **Do not defer a confirmed blocking defect merely by listing it in known issues.**
+  Repair the authorized blocker, verify it and retain failures/limitations honestly.
+  Deferred language features and checker limitations are not automatically bugs.
+- Complete VOID language features before substantial standard-library work.
+  [Future Git package-manager direction](LOCAL_LIBRARIES.md#future-external-package-manager--boss-direction-21-october-2026)
+  is preserved, not implemented: local `libs/` imports are not external packages.
+  Exact package syntax, resolver, version/trust and native contracts need future
+  design approval. Source imports never grant native execution/link authority.
+- Root `README.md` is protected. Internal status, decisions and Clanker succession
+  belong under `docs/`; start at [docs/README.md](README.md). Only explicit Boss
+  authorization permits public-facing root README changes.
+- Keep communication minimal: work continuously, ask only necessary questions,
+  and report concrete changes, verification and unresolved requirements at handoff.
+  Do not repeat settled owner choices. Boss chooses the next feature.
+
+
 ## CI #89 verified Windows manifest repair — 21 October 2026
 
 Native diagnosis #1 confirmed Windows error 3 at a 353-unit deep directory; the
@@ -1057,6 +1103,20 @@ These are not surprise "bugs" that must be fixed immediately. They are documente
 ---
 
 ## 13. Current handoff prompt
+
+Read `docs/README.md` and the current governance above. Review the implemented
+CI #90 repair using `stage9/CI90_WINDOWS_NATIVE_LINK_REPAIR.md`,
+`stage9/CI90_EVIDENCE.json`, `STAGE9_APPLICATION_WORKFLOW.md` and the latest
+`WORK_LOG.md`. Check actual source, Windows DACL/root admission, owned cleanup,
+PE/byte validation and checked cross-volume transfer before unchanged same-parent
+publication. Linux Debug/strict are 9/9 each; Windows Debug/Release **160/160**
+and actual second-volume execution remain pending. Preserve manifests, exact-case,
+8.3, Unicode/percent, source/hard-link and reparse protections. Boss controls
+native CI and Git; after passing native acceptance update CI #90 to **RESOLVED**.
+Record review evidence, then return to Boss-authorized VOID language development.
+No package implementation or public README changes. Minimal output.
+
+### Historical Stage 8 Sprint 5 handoff (superseded)
 
 Read `docs/README.md` first. Review Stage 8 Sprint 5 using
 `docs/STAGE8_ASYNC_RETENTION.md`, `docs/stage8/SPRINT5_ACCEPTANCE.md`, paired CSV,

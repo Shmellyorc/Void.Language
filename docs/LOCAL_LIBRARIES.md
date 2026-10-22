@@ -84,3 +84,23 @@ provider admission, generation leases, Runtime/GC and linkage rules remain intac
 Package installation, registries, manifests, versioning, external-project identity,
 automatic native linking and executable packaging require separate authorization.
 The separate CLI/build proposal and all Stage 9 work remain outside this sprint.
+
+## Future external package manager — Boss direction, 21 October 2026
+
+The future direction is a **Git-based package manager**: Git repositories as
+external VOID library sources, with explicit versions/revisions, reproducible
+dependency resolution, pinned identities/content hashes and a lockfile. Preserve
+compatibility with project-local `libs/` and `use lib/...`; today's project-owned
+imports are not already external packages and introduce no package trust boundary.
+
+Future design must account for target-aware native dependencies, platform and
+architecture compatibility, eventual C-library integration, package trust and
+integrity checks. Do not permit unrestricted automatic installation scripts.
+Package discovery and editor integration are future capabilities, using the
+compiler-owned source/identity model where appropriate.
+
+Exact manifest syntax, resolver design, version policy, trust rules, external
+identities and native-link contracts remain **future design decisions**, not
+approved implementations. No package manager is implemented by the local-library,
+Stage 9 or CI #90 repairs. Complete VOID language features before substantial
+standard-library implementation. This section records direction, not a new sprint.

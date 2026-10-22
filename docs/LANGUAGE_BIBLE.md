@@ -503,6 +503,18 @@ No import grants native binding/linking authority. See [the implementation
 contract](LOCAL_LIBRARIES.md); package management and external-package identities
 require future authorization. Hosted verification is not implied.
 
+### Future external packages [DIRECTION ONLY]
+
+Boss's future direction is a Git-based package manager with explicit repository
+versions/revisions, reproducible resolution, pinned identities/hashes and a
+lockfile, compatible with `libs/` / `use lib/...`. It must consider target-aware
+native dependencies, platform/architecture compatibility, eventual C integration,
+trust/integrity checks without unrestricted automatic installation scripts, and
+future package discovery/editor support. Today's local imports are project-owned
+sources. [Authoritative future boundary](LOCAL_LIBRARIES.md#future-external-package-manager--boss-direction-21-october-2026):
+manifest syntax, resolver, version policy, trust and native-link contracts remain
+unapproved future design decisions. No external package implementation is claimed.
+
 ### 10.1 Root constants
 
 ```python

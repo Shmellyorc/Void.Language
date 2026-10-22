@@ -1,0 +1,39 @@
+{
+  "run": "https://github.com/Shmellyorc/Void.Language/actions/runs/39698313538",
+  "baseline": "ab357879599edaf816e18fc43587deca411d8aeb",
+  "source": "Read-only GitHub connector retrieval; Boss launched CI",
+  "windows_logs": [
+    {
+      "configuration": "debug",
+      "job_id": 119561057931,
+      "job_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/39698313538/job/119561057931",
+      "log": "windows-debug.log.gz",
+      "encoding": "Connector-decoded UTF-8; CRLF normalized to LF; BOM retained",
+      "sha256": "1a7a237217b5312b8e773b7d01acdb6b1519d417a870400dde4936f97df4a1cc",
+      "gzip_sha256": "729ea586649f3feaf890f6f31990311279dbd7adfa04a375000ecf77bdbba182",
+      "evidence": [
+        "2026-10-22T00:18:49.5378980Z AssertionError: ([WindowsPath('D:/a/Void.Language/Void.Language/build/Debug/voidc.exe'), 'build', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 \ufffd \\U0001f3ae # % g61mnp6h/game # % \ufffd/nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/main.void')], 1, '', 'clang: error: unable to set working directory: C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 \ufffd \\U0001f3ae # % g61mnp6h/game # % \ufffd/nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/build/.void-build-6a9a96d147e3bbcd\\nNative linker failed (status 1).\\n')",
+        "2026-10-22T00:18:50.9114514Z AssertionError: ([WindowsPath('D:/a/Void.Language/Void.Language/build/Debug/voidc.exe'), 'build', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID CI89 \ufffd \\U0001f3ae # % h7e4_089/nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/main.void'), '-o', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID CI89 \ufffd \\U0001f3ae # % h7e4_089/nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/Exact Artifact \ufffd \\U0001f3ae # %.exe')], 1, '', 'clang: error: unable to set working directory: C:/Users/RUNNER~1/AppData/Local/Temp/VOID CI89 \ufffd \\U0001f3ae # % h7e4_089/nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/.void-build-db3372d840fc1fc7\\nNative linker failed (status 1).\\n')",
+        "2026-10-22T00:26:15.1841072Z 99% tests passed, 2 tests failed out of 160",
+        "2026-10-22T00:26:15.1845119Z \t  1 - application_workflow_stage9 (Failed)",
+        "2026-10-22T00:26:15.1846246Z \t  3 - long_physical_paths_ci89 (Failed)"
+      ]
+    },
+    {
+      "configuration": "release",
+      "job_id": 119561057968,
+      "job_url": "https://github.com/Shmellyorc/Void.Language/actions/runs/39698313538/job/119561057968",
+      "log": "windows-release.log.gz",
+      "encoding": "Connector-decoded UTF-8; CRLF normalized to LF; BOM retained",
+      "sha256": "7225c60c5fd5c3379788b891b26745fc17c527e3eacfd5de59d8445b91264a16",
+      "gzip_sha256": "15ed6c08aaab38a66c44661f36a4931e8f60347273a5cc0da6488b7276acbf6c",
+      "evidence": [
+        "2026-10-22T00:17:32.2748733Z AssertionError: ([WindowsPath('D:/a/Void.Language/Void.Language/build/Release/voidc.exe'), 'build', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 \ufffd \\U0001f3ae # % k7_gwvjk/game # % \ufffd/nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/main.void')], 1, '', 'clang: error: unable to set working directory: C:/Users/RUNNER~1/AppData/Local/Temp/VOID Stage9 \ufffd \\U0001f3ae # % k7_gwvjk/game # % \ufffd/nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/build/.void-build-85530894b4678a17\\nNative linker failed (status 1).\\n')",
+        "2026-10-22T00:17:33.6729602Z AssertionError: ([WindowsPath('D:/a/Void.Language/Void.Language/build/Release/voidc.exe'), 'build', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID CI89 \ufffd \\U0001f3ae # % 5nq_k9uh/nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/main.void'), '-o', WindowsPath('C:/Users/RUNNER~1/AppData/Local/Temp/VOID CI89 \ufffd \\U0001f3ae # % 5nq_k9uh/nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/Exact Artifact \ufffd \\U0001f3ae # %.exe')], 1, '', 'clang: error: unable to set working directory: C:/Users/RUNNER~1/AppData/Local/Temp/VOID CI89 \ufffd \\U0001f3ae # % 5nq_k9uh/nested-0-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-2-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-3-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-4-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/nested-5-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/.void-build-0b1ac3c1375b3092\\nNative linker failed (status 1).\\n')",
+        "2026-10-22T00:22:47.2134713Z 99% tests passed, 2 tests failed out of 160",
+        "2026-10-22T00:22:47.2137840Z \t  1 - application_workflow_stage9 (Failed)",
+        "2026-10-22T00:22:47.2138512Z \t  3 - long_physical_paths_ci89 (Failed)"
+      ]
+    }
+  ]
+}

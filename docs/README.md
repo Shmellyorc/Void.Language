@@ -1,5 +1,20 @@
 # VOID documentation
 
+## CI #90 Windows linking and permanent handoff — 21 October 2026
+
+[Implemented repair and native acceptance gate](stage9/CI90_WINDOWS_NATIVE_LINK_REPAIR.md):
+short private Windows link directory, verified transfer and unchanged atomic
+publication. Linux Debug and strict sanitizers each **9/9**; Windows Debug/Release
+**160/160 pending native verification**. Historical CI #90 remains **158/160** in
+both jobs; CI #88's 8.3 repair subsequently passed. Both longPathAware manifests
+and original deep-path regressions remain. Earlier dated entries below are history.
+
+Authoritative current records: [native-build contract](STAGE9_APPLICATION_WORKFLOW.md),
+[local evidence](stage9/CI90_EVIDENCE.json), [Wrench succession and Boss governance](WRENCH_CLANKER.md#permanent-boss-decisions--current-governance-21-october-2026)
+and [future Git-based package-manager direction](LOCAL_LIBRARIES.md#future-external-package-manager--boss-direction-21-october-2026).
+No package manager, root README edit, Git mutation or hosted dispatch is included.
+
+
 ## CI #89 verified Windows manifest repair — 21 October 2026
 
 Native diagnosis #1 confirmed Windows error 3 at a 353-unit deep directory; the
