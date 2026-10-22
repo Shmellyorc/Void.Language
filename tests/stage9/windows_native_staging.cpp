@@ -133,8 +133,8 @@ void describe_root_acl(const char* label,HANDLE root) {
     std::cout<<std::endl;
 }
 void test_root_command(bool create) {
-    // UTF-8 stdin preserves Unicode/% paths independently of main's narrow argv
-    // encoding on Windows. The command name itself is ASCII.
+    // Keep fixture paths on the existing UTF-8 stdin protocol; command-line
+    // arguments are also converted from UTF-16 once at the wmain boundary.
     std::string text;
     require(bool(std::getline(std::cin,text)) && !text.empty(),"missing UTF-8 test root path");
     const auto path=vd::utf8_path(text);
@@ -163,7 +163,7 @@ void test_root_command(bool create) {
     }
     // The Python TemporaryDirectory fixture owns eventual cleanup after success.
 }
-int main(int argc,char** argv)try {
+int run_helper(int argc,char** argv)try {
     if(argc==2 && (std::string(argv[1])=="--inspect-root" || std::string(argv[1])=="--create-private-root")) {
         test_root_command(std::string(argv[1])=="--create-private-root");return 0;
     }
@@ -261,3 +261,22 @@ int main(int argc,char** argv)try {
     std::cout<<"Windows staging ownership, collisions, cleanup, copies and effective access passed\n";
     return 0;
 } catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
+
+int wmain(int argc,wchar_t** argv) {
+    try {
+        // Match the production entry point: convert every native argument once,
+        // including argv[0], without passing Unicode paths through the ACP.
+        std::vector<std::string> arguments;
+        arguments.reserve(argc);
+        for(int i=0;i<argc;++i) {
+            auto text=std::filesystem::path(argv[i]).u8string();
+            arguments.emplace_back(text.begin(),text.end());
+        }
+        std::vector<char*> pointers;
+        for(auto& argument:arguments)pointers.push_back(argument.data());
+        pointers.push_back(nullptr);
+        return run_helper(argc,pointers.data());
+    } catch(const std::exception& error) {
+        std::cerr<<error.what()<<'\n';return 1;
+    }
+}
