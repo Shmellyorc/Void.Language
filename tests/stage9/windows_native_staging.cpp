@@ -20,7 +20,10 @@ void access_check(HANDLE directory) {
     struct Free{PSECURITY_DESCRIPTOR p;~Free(){LocalFree(p);}} memory{descriptor};
     HANDLE raw;if(!OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY|TOKEN_DUPLICATE,&raw))fail("Cannot open test token");
     Handle process(raw);HANDLE duplicate;
-    if(!DuplicateToken(process.value,SecurityImpersonation,&duplicate))fail("Cannot duplicate test token");
+    // AccessCheck queries the impersonation token; CreateRestrictedToken also
+    // needs TOKEN_DUPLICATE on this new handle (DuplicateToken omits it).
+    if(!DuplicateTokenEx(process.value,TOKEN_QUERY|TOKEN_DUPLICATE,nullptr,
+        SecurityImpersonation,TokenImpersonation,&duplicate))fail("Cannot duplicate test token");
     Handle token(duplicate);
     auto allowed=[&](HANDLE identity) {
         GENERIC_MAPPING mapping{FILE_GENERIC_READ,FILE_GENERIC_WRITE,FILE_GENERIC_EXECUTE,FILE_ALL_ACCESS};

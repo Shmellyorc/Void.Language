@@ -10,16 +10,17 @@ from urllib.request import url2pathname
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / 'tools'))
 from lsp_client import Client
+from windows_process import windows_application_path
 
 compiler = pathlib.Path(sys.argv[1]).resolve()
 server = pathlib.Path(sys.argv[2]).resolve()
 checks = 0
 
 
-def run(args, status=0, diagnostic=None):
+def run(args, status=0, diagnostic=None, executable=None):
     global checks
     result = subprocess.run([str(a) for a in args], capture_output=True,
-                            text=True, encoding='utf-8', timeout=90)
+                            text=True, encoding='utf-8', timeout=90, executable=executable)
     checks += 1
     assert result.returncode == status, (args, result.returncode, result.stdout, result.stderr)
     if diagnostic:
@@ -83,7 +84,14 @@ with tempfile.TemporaryDirectory(prefix='VOID CI89 é 🎮 # % ') as temporary:
         run([compiler, command, source, '-o', output])
         assert output.stat().st_size > 0
         if command == 'build':
-            run([output], 7)
+            application = None
+            if os.name == 'nt':
+                assert len(str(output).encode('utf-16-le')) // 2 > 260, output
+                application = windows_application_path(output)
+                assert os.path.samefile(output, application), (output, application)
+            run([output], 7, executable=application)
+            if os.name == 'nt':
+                print('Deep executable launched via explicit extended application:', application)
         before = output.read_bytes()
         wrong = output.with_name(output.name.swapcase())
         if wrong.exists():

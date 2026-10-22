@@ -1,0 +1,31 @@
+{
+  "run": "https://github.com/Shmellyorc/Void.Language/actions/runs/39715313742",
+  "baseline": "8880cab35101ebb852600bd2c2a986ff4a241fa9",
+  "source": "Read-only GitHub connector job-log retrieval; pre-repair historical evidence",
+  "windows_release": "158/160",
+  "windows_debug": "Cancelled; both focused failures observed, no completed suite total claimed",
+  "jobs": [
+    {
+      "job_id": 119615902183,
+      "name": "Windows 2022 / Release",
+      "conclusion": "failure",
+      "url": "https://github.com/Shmellyorc/Void.Language/actions/runs/39715313742/job/119615902183",
+      "excerpts": [
+        "2026-10-22T03:13:08.1545181Z AssertionError: (['D:/a/Void.Language/Void.Language/build/Release/void_windows_native_staging.exe'], 1, '', 'Cannot create restricted test token (Windows error 5).\\n')",
+        "2026-10-22T03:13:09.5173054Z FileNotFoundError: [WinError 206] The filename or extension is too long",
+        "2026-10-22T03:16:51.2391782Z 99% tests passed, 2 tests failed out of 160"
+      ]
+    },
+    {
+      "job_id": 119615902350,
+      "name": "Windows 2022 / Debug",
+      "conclusion": "cancelled",
+      "url": "https://github.com/Shmellyorc/Void.Language/actions/runs/39715313742/job/119615902350",
+      "excerpts": [
+        "2026-10-22T03:15:31.7155954Z AssertionError: (['D:/a/Void.Language/Void.Language/build/Debug/void_windows_native_staging.exe'], 1, '', 'Cannot create restricted test token (Windows error 5).\\n')",
+        "2026-10-22T03:15:33.9621934Z FileNotFoundError: [WinError 206] The filename or extension is too long",
+        "2026-10-22T03:26:02.9063197Z ##[error]The operation was canceled."
+      ]
+    }
+  ]
+}

@@ -1,13 +1,14 @@
 """Real host executables, automatic dispatch, transactional output and private install."""
 import os, pathlib, subprocess, sys, tempfile, time
+from windows_process import windows_application_path
 compiler=pathlib.Path(sys.argv[1]).resolve()
 build=pathlib.Path(sys.argv[2]).resolve()
 configuration=sys.argv[3]
 checks=0
 
-def run(args,status=0,stdout=None,cwd=None,diagnostic=None,env=None):
+def run(args,status=0,stdout=None,cwd=None,diagnostic=None,env=None,executable=None):
     global checks
-    p=subprocess.run([str(a) for a in args],cwd=cwd,capture_output=True,text=True,encoding='utf-8',timeout=90,env=env)
+    p=subprocess.run([str(a) for a in args],cwd=cwd,capture_output=True,text=True,encoding='utf-8',timeout=90,env=env,executable=executable)
     checks+=1
     assert p.returncode==status,(args,p.returncode,p.stdout,p.stderr)
     if stdout is not None: assert p.stdout==stdout,(args,p.stdout,p.stderr)
@@ -205,7 +206,15 @@ with tempfile.TemporaryDirectory(prefix='VOID Stage9 é 🎮 # % ') as temporary
     longsource=deep/'main.void';longsource.write_text('return 7\n',encoding='utf-8')
     assert len(str(longsource)) > 260, longsource
     run([compiler,'build',longsource],cwd=unrelated)
-    run([deep/'build'/('main'+suffix)],7,'')
+    deep_executable=deep/'build'/('main'+suffix)
+    application=None
+    if os.name=='nt':
+        assert len(str(deep_executable).encode('utf-16-le'))//2>260,deep_executable
+        application=windows_application_path(deep_executable)
+        assert os.path.samefile(deep_executable,application),(deep_executable,application)
+    run([deep_executable],7,'',executable=application)
+    if os.name=='nt':
+        print('Deep executable launched via explicit extended application:',application)
     # Real staged install, then relocation. Native config must use its own archives.
     prefix=root/'private install # % é'
     run(['cmake','--install',build,'--config',configuration,'--component','compiler','--prefix',prefix])

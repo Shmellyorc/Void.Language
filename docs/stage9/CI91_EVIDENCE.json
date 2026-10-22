@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-21",
+  "baseline": "8880cab35101ebb852600bd2c2a986ff4a241fa9",
+  "status": "Test repairs prepared and locally verified; native Windows acceptance pending",
+  "native_pre_repair": "CI91_NATIVE_EVIDENCE.json",
+  "local": {
+    "platform": "Linux",
+    "debug": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 4.0,
+      "suites": [
+        "application_workflow_stage9",
+        "native_output_paths_ci88",
+        "long_physical_paths_ci89"
+      ]
+    },
+    "strict_sanitizers": {
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 8.0,
+      "suites": [
+        "application_workflow_stage9",
+        "native_output_paths_ci88",
+        "long_physical_paths_ci89"
+      ]
+    },
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "strict_execution": "Approved outside sandbox for LeakSanitizer",
+    "python_syntax": "Passed for all three changed/new Python files",
+    "pure_windows_path_conversion": "8 checks passed: Unicode/% drive path, slash conversion, UNC, existing drive prefix, existing UNC prefix; reject relative, drive-relative and rooted-without-drive",
+    "windows_helper_cross_syntax": "Passed: Clang 19.1.7 x86_64-w64-mingw32 -fsyntax-only, extracted MinGW headers, /tmp-only LLVM_ON_UNIX configuration adjustment; no native execution/MSVC link claim",
+    "logs": "build/ci91-test-repair/"
+  },
+  "native_pending": [
+    "Windows MSVC build and helper execution",
+    "Owner AccessCheck succeeds; Everyone-restricted mutation AccessCheck denied",
+    "Both original genuine deep executable launches with explicit extended application, same-file proof and status 7",
+    "Complete Windows Debug/Release 160/160"
+  ],
+  "preserved": [
+    "All production compiler/native-link code",
+    "Both longPathAware manifests",
+    "Effective DACL assertions",
+    "Six-component deep fixtures and existing depth/status assertions",
+    "Security/path suites",
+    "CMake test inventory",
+    "Public README and hosted workflows"
+  ],
+  "constraints": {
+    "commits": false,
+    "pushes": false,
+    "branches": false,
+    "hosted_ci_started": false
+  },
+  "sha256": {
+    "tests/stage9/windows_native_staging.cpp": "6da58a9ee9e028243ed12a5673ae5a0c9258d6c694ddb92642ca4ba5eef581eb",
+    "tests/stage9/windows_process.py": "b781f18f00723878efadf97279548b3888e253ded41f0c7d8405a70e558c617d",
+    "tests/stage9/long_paths.py": "d92cc38413651ff2421f66e408ca90f67e7892db47637612aef9da31d78d7f4c",
+    "tests/stage9/workflow.py": "068636ecba22e8a73ba696d9ed65c8b7333ba935fe1620559a9fc78d69f3b8ff",
+    "src/native_build.cpp": "5d71c086bbd73011ca9f2465c8b081e3da38e3ad7080acc4d18f3c796a2ca8ea",
+    "src/native_windows.hpp": "9948dc6c9c087ff6fc2a267d833486114d5303bd080c783e4f506348a8fb10dd",
+    "cmake/LongPathAware.manifest": "3242062989f717f0f1846b13ad2082e37438d32bdc33903effeaecaa6cfb7382"
+  }
+}

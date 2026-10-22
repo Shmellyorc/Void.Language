@@ -1,5 +1,18 @@
 # 🔧🤖 THE WRENCH CLANKER
 
+## CI #91 focused Windows test repair — 21 October 2026
+
+The working short-directory native linker is preserved. Restricted-token tests
+now explicitly request duplicate/query rights; genuine deep executable tests use
+Python's explicit extended Windows application path while retaining location,
+identity, depth and exit-status checks. Linux Debug and strict sanitizers each
+passed **3/3**. **Native Windows acceptance remains pending**; Linux and syntax
+checks do not establish that the launch approach works on Windows.
+[Source rationale, CI #91 failures, evidence and Wrench gate](stage9/CI91_WINDOWS_TEST_REPAIR.md).
+Earlier CI #90 records remain historical; no compiler, manifest, Git or hosted
+workflow changes are included.
+
+
 ## Current succession handoff — 21 October 2026
 
 CI #90's Windows native-link repair is implemented and locally verified:
